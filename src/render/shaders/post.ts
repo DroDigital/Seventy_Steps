@@ -8,6 +8,7 @@
  */
 
 import { FOG_GLSL } from './fog';
+import { LIGHTING_GLSL } from './lighting';
 
 export const POST_VERT = /* glsl */ `
 void main() {
@@ -42,6 +43,7 @@ uniform float uDither;
 uniform float uGamma; // 1 / the brightness setting: below 1 lifts the dark
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
+${LIGHTING_GLSL}
 
 const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
@@ -204,7 +206,9 @@ void main() {
     e = isolate(e, share);
   }
   vec4 fog = fogAlong(uv, bayer4(cell) + 0.5); // the mist between the lens and the scene (round 16)
-  vec3 col = pow(stone(faint(hurt(vec3(a.r, b.g, e.b) * fog.a + fog.rgb, uv), uv), uv), vec3(uGamma));
+  float crease = mix(contactAo(uv, bayer4(cell) + 0.5), 1.0, person ? 0.6 : 0.0); // the corners of the world take less light (round 39); a person only a little less
+  vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
+  vec3 col = pow(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
   gl_FragColor = vec4(col, 1.0);
 }

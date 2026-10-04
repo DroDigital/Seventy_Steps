@@ -91,3 +91,14 @@ export const FOG_EYES = {
   rise: 1.4, // per second: the eyes come out over a second...
   fall: 0.7, // ...and go back over two
 };
+
+/** How the picture is lit and finished (round 39, render/shaders/post.ts and world.ts): what the shadow maps cannot give. */
+export const LIGHTING = {
+  ao: { strength: 1.0, radius: 0.75, reach: 55 }, // contact shadow: the share of light a crease, a foot, the base of a wall loses at most; metres it looks about; metres from the lens it fades out by
+  bloom: { strength: 0.95, from: 0.58, knee: 0.3, radius: 7 }, // what shines bleeds into what is about it: the strength, the brightness it begins at, how soft the start is, low-res pixels it spreads
+  vignette: 0.42, // how much the picture's corners darken, so the eye is kept toward the middle
+  sky: 1.3, // the ambient on a surface facing straight up (the sky's), against...
+  ground: 0.55, // ...one facing straight down (what the dark ground gives back)
+  sheen: { stone: 0.85, power: 30 }, // damp stone and wet cobbles catch the lantern and the lamps in a streak: the strength, how tight the streak
+  flicker: { lantern: 0.045, speed: 7 }, // how much the lantern's light breathes, and how fast
+};
