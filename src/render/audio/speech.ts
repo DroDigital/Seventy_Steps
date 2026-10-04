@@ -10,9 +10,11 @@
 import { clipOf, VOICE_BASE } from '../../data/speech';
 import { CAST } from '../../data/speechCast';
 import type { AudioEngine } from './engine';
+import { CHAMBER, roomBetween } from './voiceRoom';
 
 const KEEP = 10; // decoded recordings kept
 const FADE = 0.14; // seconds a cut-off voice takes to go
+const ROOM_TAIL = CHAMBER.decay + CHAMBER.predelay + 0.3; // seconds a room's reverb sounds on after the voice
 const HALL = { delay: 0.11, feedback: 0.4, wet: 0.55, tail: 2.5 }; // a full echo: one repeat a tenth of a second behind, fading; its tail in seconds
 
 export interface Speech {
@@ -40,7 +42,8 @@ export function trim<K, V>(map: Map<K, V>, keep: number): void {
 interface Voice {
   src: AudioBufferSourceNode;
   out: GainNode;
-  hall: AudioNode[]; // what the echo is made of, to be let go after its tail
+  hall: AudioNode[]; // what the echo or the room is made of, to be let go after its tail
+  tail: number; // seconds it sounds on
 }
 
 export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker: string, text: string, buf: AudioBuffer, rate: number) => void): Speech {
@@ -80,7 +83,7 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
   };
 
   /** Lets an echo's nodes go once its tail has sounded out. */
-  const release = (v: Voice): void => void setTimeout(() => [v.out, ...v.hall].forEach((n) => n.disconnect()), (HALL.tail + FADE) * 1000);
+  const release = (v: Voice): void => void setTimeout(() => [v.out, ...v.hall].forEach((n) => n.disconnect()), (v.tail + FADE) * 1000);
 
   const stop = (): void => {
     want = null;
@@ -107,8 +110,11 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
     src.playbackRate.value = m.rate;
     const out = ctx.createGain();
     out.gain.value = m.gain;
-    src.connect(out).connect(speech);
+    src.connect(out);
     const hall: AudioNode[] = [];
+    const room = !!CAST[speaker]?.room;
+    if (room) hall.push(...roomBetween(ctx, out, speech)); // the voice goes through the room, not straight to the bus
+    else out.connect(speech);
     if (m.echo > 0) {
       const delay = ctx.createDelay(1);
       delay.delayTime.value = HALL.delay;
@@ -121,7 +127,7 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
       delay.connect(wet).connect(speech);
       hall.push(delay, feedback, wet);
     }
-    const v: Voice = { src, out, hall };
+    const v: Voice = { src, out, hall, tail: room ? ROOM_TAIL : HALL.tail };
     voice = v;
     src.onended = () => {
       if (voice === v) voice = null;
