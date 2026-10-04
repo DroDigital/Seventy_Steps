@@ -61,6 +61,36 @@ vec3 lampLight(vec3 p, vec3 n, float facing) {
 }
 `;
 
+/**
+ * lampLight, and with it the streak each lamp makes across a glossy surface (round 39): `eye` is the direction to the eye,
+ * `power` how tight the streak is; the streaks are summed into `streak` (as the shadows take them, unlimited by the ceiling).
+ */
+export const LAMPS_GLOSS_GLSL = /* glsl */ `
+vec3 lampLightGloss(vec3 p, vec3 n, float facing, vec3 eye, float power, out vec3 streak) {
+  vec3 sum = vec3(0.0);
+  streak = vec3(0.0);
+  for (int i = 0; i < ${LAMP_SLOTS}; i++) {
+    vec4 l = uLamps[i];
+    if (l.w <= 0.0) continue;
+    vec3 to = l.xyz - p;
+    float d = length(to);
+    float x = clamp(d / l.w, 0.0, 1.0);
+    float x2 = x * x;
+    float win = 1.0 - x2 * x2;
+    vec3 dir = to / max(d, 0.001);
+    float face = mix(1.0, max(dot(n, dir), 0.0), facing);
+    float sh = 1.0;
+    float slot = uLampSlot[i];
+    if (slot > -0.5) sh = lampShadowOf(int(slot + 0.5), p, n);
+    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh;
+    sum += c * face;
+    streak += c * pow(max(dot(n, normalize(dir + eye)), 0.0), power);
+  }
+  float peak = max(max(sum.r, sum.g), sum.b);
+  return sum / (1.0 + 0.55 * peak);
+}
+`;
+
 /** Cheap value noise over the world, for texture variation. */
 export const NOISE_GLSL = /* glsl */ `
 float hash12(vec2 p) {

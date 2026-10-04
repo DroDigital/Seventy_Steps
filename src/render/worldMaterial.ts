@@ -1,7 +1,7 @@
 /** World materials: one shared uniform set (updated once per frame) + a procedural texture each. */
 
 import * as THREE from 'three';
-import { FX, LANTERN, LIGHT, WORLD, type Vec3 } from '../data/tuning';
+import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
 import type { FxParams } from './fx';
 import { ANOMALY } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
@@ -27,6 +27,8 @@ export const worldUniforms = {
   uLightDir: { value: v3(LIGHT.dir).normalize() },
   uLightColor: { value: v3(LIGHT.color) },
   uAmbient: { value: v3(LIGHT.ambient) },
+  uHemi: { value: new THREE.Vector2(LIGHTING.ground, LIGHTING.sky) }, // the ambient on a surface facing down and facing up (round 39: it was one flat share for all)
+  uSheen: { value: new THREE.Vector2(LIGHTING.sheen.stone, LIGHTING.sheen.power) }, // damp stone catches the lights in a streak: strength, tightness
   uGlowPos: { value: new THREE.Vector3() },
   uGlowColor: { value: v3(ANOMALY.magenta).multiplyScalar(LIGHT.glowIntensity) },
   uGlowRange: { value: LIGHT.glowRange },

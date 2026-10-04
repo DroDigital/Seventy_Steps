@@ -1,7 +1,7 @@
 /** The night of the arena and the open world: a dim low moon, a faint cold ambient, and the investigator's lantern. */
 
 import { wrapAngle } from '../core/geom';
-import { LANTERN, LIGHT } from '../data/tuning';
+import { LANTERN, LIGHT, LIGHTING } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { worldUniforms } from './worldMaterial';
 
@@ -18,6 +18,10 @@ export function lightNight(): void {
 export function placeLantern(g: Game, alpha: number): void {
   const tr = g.ecs.c.transform.get(g.player.id);
   if (!tr) return;
+  const t = g.frame / 60 + alpha / 60; // the flame breathes: three slow waves of its own
+  const breath = LIGHTING.flicker.speed;
+  const f = LIGHTING.flicker.lantern * (0.5 * Math.sin(t * breath) + 0.3 * Math.sin(t * breath * 2.37 + 1.7) + 0.2 * Math.sin(t * breath * 0.43));
+  worldUniforms.uLanternColor.value.set(...LANTERN.color).multiplyScalar(LANTERN.intensity * (1 + f));
   const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
   const [s, c] = [Math.sin(yaw), Math.cos(yaw)]; // forward (s, c), left (c, -s)
   const lerp = (p: number, q: number): number => p + (q - p) * alpha;

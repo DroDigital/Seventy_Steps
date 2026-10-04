@@ -7,7 +7,7 @@
  */
 
 import { PANE_GLSL } from '../paneLife';
-import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
+import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
 
@@ -18,6 +18,7 @@ ${SPACE_GLSL}
 uniform vec3 uLightDir;
 uniform vec3 uLightColor;
 uniform vec3 uAmbient;
+uniform vec2 uHemi;
 uniform vec3 uGlowPos;
 uniform vec3 uGlowColor;
 uniform float uGlowRange;
@@ -75,7 +76,7 @@ void main() {
   vUvw = vec3(uv0 * clip.w, clip.w);
 
   vec3 moon = uLightColor * max(dot(wn, uLightDir), 0.0);
-  vec3 light = uAmbient + moon;
+  vec3 light = uAmbient * mix(uHemi.x, uHemi.y, 0.5 + 0.5 * wn.y) + moon; // a hemisphere's ambient: the sky's on what faces up, the dark ground's on what faces down (round 39)
   vec3 toGlow = uGlowPos - wp.xyz;
   float gd = length(toGlow);
   float fall = clamp(1.0 - gd / uGlowRange, 0.0, 1.0);
@@ -113,6 +114,7 @@ uniform float uHasMap2; // 1: uMap2 blends in by vSplat (roads)
 uniform float uSeaLevel;
 uniform float uWet; // how soaked the ground is, 0..1 (weather.ts; round 34)
 uniform vec3 uLightColor;
+uniform vec2 uSheen;
 uniform float uHasMap3; uniform vec2 uPatch; // 1: uMap3 is laid over the ground in patches of the land's own noise, from uPatch.x, softly over uPatch.y (round 32: a field is not one ground)
 
 varying vec2 vUv;
@@ -127,6 +129,7 @@ varying float vSplat;
 uniform vec3 uLightDir;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
+${LAMPS_GLOSS_GLSL}
 ${NOISE_GLSL}
 ${SHADOW_GLSL}
 ${ELDRITCH_FRAG}
@@ -194,14 +197,23 @@ void main() {
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);
   float character = min(uCharacter, 1.0);
-  vec3 lamp = uLanternColor * lanternFalloff(ld) * mix(facing, share, character) * mix(1.0, lanternLit(vWorld, n), uLShadow.x * (1.0 - self)); // what stands between a point and the lantern takes its light (round 34)
-  lamp += lampLight(vWorld, n, 0.92 * (1.0 - character)) * mix(1.0, uCharacterLight, character); // the world's lamps, fires and windows: a face turned from a lamp takes little of it (round 36: half, so a torch on the inside of a wall lit the wall's outside)
+  float lanternVis = mix(1.0, lanternLit(vWorld, n), uLShadow.x * (1.0 - self)); // what stands between a point and the lantern takes its light (round 34)
+  vec3 lamp = uLanternColor * lanternFalloff(ld) * mix(facing, share, character) * lanternVis;
+  float floorish = smoothstep(0.55, 0.9, n.y) * (1.0 - uEmissive) * (1.0 - character); // damp stone, up where the light falls on it, catches it in a streak (round 39)
+  vec3 streak = vec3(0.0);
+  vec3 toEye = normalize(cameraPosition - vWorld);
+  lamp += lampLightGloss(vWorld, n, 0.92 * (1.0 - character), toEye, uSheen.y, streak) * mix(1.0, uCharacterLight, character); // the world's lamps, fires and windows: a face turned from a lamp takes little of it (round 36: half, so a torch on the inside of a wall lit the wall's outside)
+  if (floorish > 0.01) streak += 0.4 * uLanternColor * lanternFalloff(ld) * lanternVis * pow(max(dot(n, normalize(toLamp / max(ld, 0.001) + toEye)), 0.0), uSheen.y);
   lamp *= (1.0 - uEmissive) * vTint;
   vec3 lit = vLight - vMoon * (1.0 - moonLit(vWorld, n, max(dot(n, uLightDir), 0.0))) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
   float peak = max(max(lit.r, lit.g), max(lit.b, 0.001));
   lit *= mix(1.0, min(1.0, uSelfMax / peak), self * max(1.0 - uEmissive, 0.0));
   tex = mix(tex, vec3(1.0), 0.6 * uEmissive); // a lit thing shines through its texture
   vec3 col = eldritch(tex * lit);
+  if (floorish > 0.01) { // a streak of the lights across damp stone: stronger where the stone is pale and the ground wet, broken up so it glints
+    float gloss = uSheen.x * (0.35 + 0.65 * vnoise(vWorld.xz * 2.3 + 4.0)) * (0.4 + 1.2 * dot(tex, vec3(0.33))) + 0.6 * uWet;
+    col += streak * gloss * floorish * min(vTint.r + vTint.g + vTint.b, 1.5) * 0.45;
+  }
   if (pud > 0.01) { // a puddle throws back the lamps, the sky and the moon at a glancing look, and rings where the drops fall
     vec3 v = normalize(cameraPosition - vWorld);
     float mirror = (0.1 + 0.9 * pow(1.0 - max(v.y, 0.0), 4.0)) * 0.6;

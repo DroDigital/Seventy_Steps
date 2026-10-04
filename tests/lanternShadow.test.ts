@@ -104,8 +104,9 @@ describe('the lantern\'s map', () => {
   });
 
   it('takes the shadow out of the lantern\'s light alone, in the world and on the sprites', () => {
-    expect(WORLD_FRAG).toMatch(/uLanternColor \* lanternFalloff\(ld\) \* mix\(facing, share, character\) \* mix\(1\.0, lanternLit\(vWorld, n\), uLShadow\.x \* \(1\.0 - self\)\)/);
-    expect(WORLD_FRAG).not.toMatch(/lampLight\([^)]*\)[^;]*lanternLit/); // the lamps, fires and windows are not the lantern
+    expect(WORLD_FRAG).toMatch(/float lanternVis = mix\(1\.0, lanternLit\(vWorld, n\), uLShadow\.x \* \(1\.0 - self\)\)/);
+    expect(WORLD_FRAG).toMatch(/uLanternColor \* lanternFalloff\(ld\) \* mix\(facing, share, character\) \* lanternVis/);
+    expect(WORLD_FRAG).not.toMatch(/lampLight(Gloss)?\([^)]*\)[^;]*(lanternLit|lanternVis)/); // the lamps, fires and windows are not the lantern
     expect(SPRITE_VERT).toMatch(/uLanternColor \* lanternAt\(uLanternPos - wp\) \* lamp/);
   });
 });
