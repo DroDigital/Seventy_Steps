@@ -62,6 +62,7 @@ import { startLookTest } from './ui/lookTest';
 import { nextFrame, spriteAtlas } from './ui/loading';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
+import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
 import { createDialogue } from './ui/dialogue';
 import { showIntro, type Intro } from './ui/intro';
@@ -117,6 +118,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       // No pointer lock: a click on the canvas captures the mouse, as ever.
     }
   };
+  onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
   let spawned = false; // the world's own sound (ambience, drones, the realm's music) waits for the spawn: until then the theme plays on alone (round 29)
   const reveal = (): void => {
     spawned = true;
@@ -173,7 +175,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
-  const input = createInput(canvas);
+  const input = createInput(canvas, () => !menuOpen());
   const dialogue = createDialogue(game);
   const shop = createShopMenu(game);
   const painter = createMapPainter(game);
