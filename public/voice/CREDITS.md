@@ -7,6 +7,9 @@ voice library, cast in `src/data/speechCast.ts` (by voice id); what each says, w
 (`[weary]`, `[whispers]`, `[pause]`: performed, not read aloud), is in `src/data/speechNpcs.ts`,
 `speechFar.ts` and `speechBosses.ts`.
 
+The narrator of a new game's opening (`narrator:intro`, `src/data/intro.ts`) is the library voice
+*Finley - Articulate Anchor*, the same model.
+
 A file is named by who says the line and a hash of its words (`src/data/speech.ts`, `clipOf`), so a line
 whose words change needs a new recording, and one whose capitals or marks change does not.
 `index.json` lists the files there are; a line with no file here is shown, and not heard.

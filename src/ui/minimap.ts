@@ -32,7 +32,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
   canvas.style.cssText = `width:100%;height:100%;border-radius:50%;border:1px solid ${BONE}66;box-shadow:0 0 0 2px #000c;opacity:.92`;
   frame.append(canvas);
   const north = el(`position:absolute;left:50%;top:0;transform:translate(-50%,-50%);font-size:10px;text-shadow:0 0 3px #000,0 0 3px #000`, 'N', frame);
-  const label = el(`position:absolute;left:0;right:0;bottom:-16px;text-align:center;font-size:9px;letter-spacing:2px;opacity:.55`, '', frame);
+  const label = el(`position:absolute;left:-24px;right:-24px;bottom:-16px;text-align:center;white-space:nowrap;font-size:9px;letter-spacing:2px;opacity:.5`, '', frame);
   // The night's clock (round 35), small and under the map: a hair line the night runs along, a moon on it where the night is, and the hour's name.
   const clock = el(`position:absolute;left:14px;right:14px;bottom:-34px;height:12px`, '', frame);
   el(`position:absolute;left:0;right:0;top:5px;height:1px;background:linear-gradient(90deg,${BONE}55,${BONE}33 70%,#9a9aa866)`, '', clock);
@@ -44,7 +44,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
   if (!g.overworld) frame.style.display = 'none';
   return {
     update() {
-      setText(label, `${glyph('map').toUpperCase()}  MAP`); // the device in hand's button
+      setText(label, `${glyph('map').toUpperCase()} MAP  ·  ${glyph('journal').toUpperCase()} JOURNAL`); // the keys of the two screens, in the device in hand's words: small, under the map, and no more on the picture (round 39)
       if (!g.overworld) return;
       const phase = phaseOf(g.frame / SIM.hz);
       moon.style.left = `${(phase * 100).toFixed(1)}%`;

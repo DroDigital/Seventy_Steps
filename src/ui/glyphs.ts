@@ -8,7 +8,7 @@
 import { keyLayout, keyName } from '../core/bindings';
 import { deviceInUse } from '../core/device';
 
-export type Act = 'move' | 'look' | 'light' | 'heavy' | 'block' | 'parry' | 'dodge' | 'shoot' | 'reload' | 'lock' | 'heal' | 'item' | 'throw' | 'interact' | 'map' | 'pause' | 'back';
+export type Act = 'move' | 'look' | 'light' | 'heavy' | 'block' | 'parry' | 'dodge' | 'shoot' | 'reload' | 'lock' | 'heal' | 'item' | 'throw' | 'interact' | 'map' | 'journal' | 'pause' | 'back';
 
 const PAD: Readonly<Record<Act, string>> = {
   move: 'the left stick',
@@ -26,6 +26,7 @@ const PAD: Readonly<Record<Act, string>> = {
   throw: 'D-pad ↑',
   interact: 'A',
   map: 'View',
+  journal: 'Menu', // the pad has no button to spare: the pause menu holds it
   pause: 'Menu',
   back: 'B',
 };

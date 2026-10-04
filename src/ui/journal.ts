@@ -12,6 +12,7 @@ import { isDone, stageOf, UNSTARTED } from '../systems/quests';
 import { ENTITIES } from '../data/registry';
 import { bestiaryPage, beheld } from './bestiaryPage';
 import { documentPage } from './dialogue';
+import { keyLayout } from '../core/bindings';
 import { BONE } from './hudKit';
 import { button, el, footer, heading, tabs, title, type Page } from './menuKit';
 import { menuKeys } from './menuKeys';
@@ -19,7 +20,7 @@ import { menuKeys } from './menuKeys';
 const TABS = ['Under way', 'Documents', 'Bestiary'];
 
 export function journalPage(g: Game, back: () => void, show: (p: Page) => void, at = 0): Page {
-  const page: Page = { back, build() {} };
+  const page: Page = { back, build() {}, get backKeys() { return [keyLayout.journal]; } }; // its own key closes it, as the map's does
   const open = (i: number): void => show(journalPage(g, back, show, i));
   page.build = (p) => {
     p.dataset.body = '300'; // one height for the three tabs

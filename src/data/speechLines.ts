@@ -5,6 +5,7 @@
  * whoever makes the recordings, read them from here. Data and pure helpers.
  */
 
+import { INTRO, introText, NARRATOR } from './intro';
 import { NPCS } from './npcs';
 import { plain, shown, wordsOf, type Line } from './speech';
 import { BOSS_SAY } from './speechBosses';
@@ -33,8 +34,11 @@ export function bossLine(id: string, moment: Moment): Line | undefined {
 /** Every line the horrors say. */
 export const bossLines = (): Line[] => Object.keys(BOSS_SAY).flatMap((id) => (['arrive', 'fall'] as const).map((m) => bossLine(id, m)).filter((l): l is Line => !!l));
 
+/** What the narrator reads at a new game's opening. */
+export const introLines = (): Line[] => INTRO.map((c): Line => ({ speaker: NARRATOR, text: introText(c), say: c.say }));
+
 /** All of them. */
-export const speechLines = (): Line[] => [...npcLines(), ...bossLines()];
+export const speechLines = (): Line[] => [...npcLines(), ...bossLines(), ...introLines()];
 
 /** About how many seconds a line takes to say (the recordings run 12 to 15 letters and marks a second, with their pauses; a lowered voice takes longer): a caption is held that long. */
 export const spokenFor = (speaker: string, text: string): number => (0.8 + plain(text).length / 13) / (CAST[speaker]?.rate ?? 1);

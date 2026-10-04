@@ -5,6 +5,7 @@
  * the desktop shell a way out to the desktop (playtest round 12).
  */
 
+import { keyLayout } from '../core/bindings';
 import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
 import { ACCENT, button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
@@ -29,6 +30,7 @@ export interface PauseOptions {
 
 export interface PauseMenu {
   readonly open: boolean;
+  openJournal(): void; // the journal at its own key: leaving it returns to the game, not to the pause menu
 }
 
 const RESUME_MS = 1000; // how soon after the mouse was asked for (by any menu closing) a let-go is the browser's own Esc, not a pause
@@ -65,6 +67,12 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
   const pause = (): void => {
     if (!menuOpen() && !o.held?.()) screen.show(main);
   };
+  const openJournal = (): void => {
+    if (menuOpen() || o.held?.() || !o.journal) return;
+    document.exitPointerLock?.();
+    screen.show(o.journal(resume, (pg) => screen.show(pg)));
+  };
+  addEventListener('keydown', (e) => e.code === keyLayout.journal && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && openJournal());
   addEventListener('keydown', (e) => e.code === 'Escape' && !e.repeat && pause());
   document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement !== null || !document.hasFocus()) return;
@@ -84,5 +92,6 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     get open() {
       return screen.open;
     },
+    openJournal,
   };
 }

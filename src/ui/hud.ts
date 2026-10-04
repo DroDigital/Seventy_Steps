@@ -15,6 +15,7 @@ import { fightAction } from '../systems/fightActions';
 import { canLevel, LEVEL_IDS } from '../systems/levels';
 import { createBossHud } from './bossHud';
 import { createFoeBars } from './foeBars';
+import { createQuestMarks } from './questMarks';
 import { fill, glyph } from './glyphs';
 import { deathLine } from '../systems/deathNotes';
 import { EPITAPHS } from '../data/epitaphs';
@@ -95,6 +96,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const show = (text: string): void => great.show(text, 'place');
   const bosses = createBossHud(g, root, say, show);
   const foes = createFoeBars(g, root);
+  const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
   const me = g.player.id;
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
@@ -177,6 +179,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setText(prompt, act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
       bosses.update();
       foes.update(camera, canvas);
+      questSigns.update(camera, canvas);
 
       const t = g.lock.target;
       const aim = t === null ? null : aimPoint(g, t);

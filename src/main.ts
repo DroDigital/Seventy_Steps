@@ -132,7 +132,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     if (opts.intro) director.wake(); // a new game: the investigator wakes in the dream (round 20)
   };
   const journeys = createJourneys(game, veil, () => pipeline.warm(scene, camera).then(nextFrame)); // before the veil lifts, once the GPU has caught up
-  const intro: Intro | null = opts.intro ? showIntro(() => (capture(), journeys.arrive(reveal))) : null; // the world is made behind it
+  const intro: Intro | null = opts.intro ? showIntro(() => (capture(), journeys.arrive(reveal)), shell.engine) : null; // the world is made behind it
   if (!intro) journeys.arrive(reveal); // names where the investigator wakes while the world is made
   await made(0.1);
   const lights = createWorldLights(() => game.world); // what the eye can see of them stops at a wall (rounds 36 and 37: render/lightSight.ts)
