@@ -30,10 +30,14 @@ export interface PauseMenu {
   readonly open: boolean;
 }
 
+const RESUME_MS = 600; // how soon after resuming a let-go mouse is the browser's own Esc, not a pause
+
 export function createPauseMenu(o: PauseOptions): PauseMenu {
   const screen = createScreen(6);
+  let resumedAt = -1e9;
   const resume = (): void => {
     screen.close();
+    resumedAt = performance.now();
     o.resume();
   };
   const main: Page = {
@@ -62,7 +66,12 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     if (!menuOpen() && !o.held?.()) screen.show(main);
   };
   addEventListener('keydown', (e) => e.code === 'Escape' && !e.repeat && pause());
-  document.addEventListener('pointerlockchange', () => document.pointerLockElement === null && document.hasFocus() && pause());
+  document.addEventListener('pointerlockchange', () => {
+    if (document.pointerLockElement !== null || !document.hasFocus()) return;
+    // Resuming by Esc takes the mouse in the same key press the browser takes it back with (Esc lets a locked mouse go): the lock is let go at once. That is not the player leaving the game; the mouse is taken again a moment later, when the key has risen.
+    if (performance.now() - resumedAt < RESUME_MS) return void setTimeout(() => !menuOpen() && !o.held?.() && o.resume(), 150);
+    pause();
+  });
   addEventListener('blur', pause);
   onPadStart(pause);
   return {
