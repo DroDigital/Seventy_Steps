@@ -14,6 +14,7 @@ import { useDevice, onDeviceChange } from '../core/device';
 import { activePad, muteHeldPad, type PadReading } from '../core/pads';
 import { SERIF } from './hudKit';
 import { CSS, frame, INK, tabJustChanged } from './menuParts';
+import { installCursor, menuCursor } from './cursor';
 import { attachSkin, BASE, SKIN } from './menuSkin';
 import { SCALED_LAYER } from './uiScale';
 
@@ -55,6 +56,9 @@ let sound: () => void = () => undefined;
 let started = false;
 
 export const menuOpen = (): boolean => stack.length > 0;
+const clearWatchers: (() => void)[] = [];
+/** Once every menu has closed (and none opened in its place): the game is played again (round 39: the mouse is taken back). */
+export const onMenusClear = (fn: () => void): void => void clearWatchers.push(fn);
 export const onPadStart = (fn: () => void): void => void padStart.push(fn);
 /** With no screen open, the pad's Select (Back) calls these (the map). */
 export const onPadSelect = (fn: () => void): void => void padSelect.push(fn);
@@ -210,6 +214,7 @@ function startOnce(): void {
   document.head.append(style);
   addEventListener('keydown', onKey, true);
   addEventListener('pointerdown', () => useDevice('keys'), true);
+  installCursor();
   onDeviceChange(() => stack.at(-1)?.redraw()); // name the new device's buttons
   requestAnimationFrame(pollPad);
 }
@@ -267,6 +272,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
         skinned?.open();
         const redraw = (): void => void (entry && self.show(entry.page));
         stack.push((entry = { panel, page, since: performance.now(), redraw }));
+        menuCursor(true);
       }
       if (!keepLock) document.exitPointerLock?.();
       focusAt(panel, Math.max(0, at), fresh);
@@ -279,7 +285,11 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       entry = null;
       root.style.display = 'none';
       skinned?.close();
-      if (!stack.length) muteHeldPad(); // the B or A that closed it is not a dodge or a word
+      if (!stack.length) {
+        muteHeldPad(); // the B or A that closed it is not a dodge or a word
+        menuCursor(false);
+        queueMicrotask(() => stack.length === 0 && clearWatchers.forEach((fn) => fn())); // (a menu opened in the same breath, as the map is from the pause menu, is no return to the game)
+      }
       (document.activeElement as HTMLElement | null)?.blur?.();
       self.onClose?.();
     },

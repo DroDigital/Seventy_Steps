@@ -83,7 +83,8 @@ export interface InputDevice {
   invertY: boolean; // up looks down (the settings menu)
 }
 
-export function createInput(canvas: HTMLCanvasElement): InputDevice {
+/** `free`: whether the mouse may look about while the pointer is not captured (no menu has the screen): round 39. */
+export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () => false): InputDevice {
   const keys = new Set<string>();
   const held = noButtons(); // keyboard + mouse
   const down = noButtons(); // latched since the last poll
@@ -118,6 +119,7 @@ export function createInput(canvas: HTMLCanvasElement): InputDevice {
 
   addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
+    if (e.code !== 'Escape' && !captured()) capture(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
     keys.add(e.code); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
     if (e.repeat) return;
     useDevice('keys');
@@ -155,9 +157,10 @@ export function createInput(canvas: HTMLCanvasElement): InputDevice {
     mouseButtons.delete(e.button);
     release(b);
   });
+  canvas.style.cursor = 'none'; // the world has no pointer; the menus draw their own (ui/cursor.ts)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   addEventListener('mousemove', (e) => {
-    if (!captured()) return;
+    if (!captured() && !free()) return; // (not captured, and the game in play: the mouse looks about all the same, till a key or a click takes it)
     mouseX += e.movementX;
     mouseY += e.movementY;
   });
