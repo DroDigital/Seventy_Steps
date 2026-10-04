@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { ACTS, SEATED } from '../data/npcActs';
 import { npcDef, type NpcLook } from '../data/npcs';
+import { bevel, coatForms, faceForms, fist, foreArm, prism, shin, shoe, thigh, upperArm } from './bodyKit';
 import { cylinder, part, shade, skeleton, type Figure } from './figures';
 import { skirtPanel } from './investigator';
 import { addProps } from './npcProps';
@@ -30,21 +31,21 @@ const HAIR: Readonly<Record<NpcLook['hair'], Rgb>> = { grey: mixRgb(BASE.bone, B
 type Cut = 'combed' | 'short' | 'wild' | 'long' | 'bald';
 type Item = 'spectacles' | 'chain' | 'satchel' | 'bag' | 'cane' | 'pipe' | 'flask' | 'shawl' | 'morion' | 'cuirass' | 'knit' | 'staff' | 'scarf' | 'braces' | 'gloves' | 'moustache';
 /** What each is, beyond their coat, hat and beard: their hair, how pale, a waistcoat's colour, and what they carry or wear. */
-const WHO: Readonly<Record<string, { cut: Cut; skin?: number; vest?: Rgb; tie?: Rgb; items: readonly Item[] }>> = {
-  peaslee: { cut: 'combed', vest: [0.42, 0.34, 0.2], tie: [0.3, 0.16, 0.14], items: ['spectacles', 'chain', 'moustache'] },
-  gilman: { cut: 'wild', skin: 0.92, tie: [0.28, 0.3, 0.34], items: ['satchel', 'scarf'] },
-  morgan: { cut: 'short', vest: [0.3, 0.3, 0.32], tie: [0.2, 0.2, 0.22], items: ['bag', 'gloves', 'moustache'] },
-  kuranes: { cut: 'long', skin: 1.04, items: ['staff'] },
-  zadok: { cut: 'wild', skin: 0.84, items: ['flask', 'pipe', 'braces'] },
-  wilmarth: { cut: 'combed', vest: [0.3, 0.34, 0.3], tie: [0.34, 0.2, 0.18], items: ['spectacles', 'satchel', 'scarf'] },
-  willett: { cut: 'short', vest: [0.2, 0.2, 0.24], tie: [0.22, 0.22, 0.24], items: ['bag', 'chain'] },
-  curtis: { cut: 'wild', skin: 0.86, items: ['braces', 'pipe'] },
-  dyer: { cut: 'short', vest: [0.34, 0.3, 0.26], tie: [0.3, 0.3, 0.34], items: ['spectacles', 'gloves', 'scarf', 'moustache'] },
-  nathaniel: { cut: 'combed', skin: 0.94, vest: [0.4, 0.32, 0.22], items: ['spectacles', 'cane', 'chain'] },
-  zamacona: { cut: 'short', skin: 0.82, items: ['morion', 'cuirass'] },
-  johansen: { cut: 'short', skin: 0.88, items: ['knit', 'braces'] },
-  akeley: { cut: 'wild', skin: 0.9, items: ['shawl', 'cane'] },
-  carter: { cut: 'combed', vest: [0.26, 0.22, 0.3], tie: [0.36, 0.14, 0.18], items: ['satchel', 'cane', 'gloves'] },
+const WHO: Readonly<Record<string, { cut: Cut; skin?: number; vest?: Rgb; tie?: Rgb; build?: readonly [height: number, width: number]; items: readonly Item[] }>> = {
+  peaslee: { build: [1.02, 0.96], cut: 'combed', vest: [0.42, 0.34, 0.2], tie: [0.3, 0.16, 0.14], items: ['spectacles', 'chain', 'moustache'] },
+  gilman: { build: [1.03, 0.9], cut: 'wild', skin: 0.92, tie: [0.28, 0.3, 0.34], items: ['satchel', 'scarf'] },
+  morgan: { build: [0.99, 1.08], cut: 'short', vest: [0.3, 0.3, 0.32], tie: [0.2, 0.2, 0.22], items: ['bag', 'gloves', 'moustache'] },
+  kuranes: { build: [1.07, 0.93], cut: 'long', skin: 1.04, items: ['staff'] },
+  zadok: { build: [0.92, 0.98], cut: 'wild', skin: 0.84, items: ['flask', 'pipe', 'braces'] },
+  wilmarth: { build: [1.0, 0.94], cut: 'combed', vest: [0.3, 0.34, 0.3], tie: [0.34, 0.2, 0.18], items: ['spectacles', 'satchel', 'scarf'] },
+  willett: { build: [0.98, 1.0], cut: 'short', vest: [0.2, 0.2, 0.24], tie: [0.22, 0.22, 0.24], items: ['bag', 'chain'] },
+  curtis: { build: [1.02, 1.14], cut: 'wild', skin: 0.86, items: ['braces', 'pipe'] },
+  dyer: { build: [1.05, 1.1], cut: 'short', vest: [0.34, 0.3, 0.26], tie: [0.3, 0.3, 0.34], items: ['spectacles', 'gloves', 'scarf', 'moustache'] },
+  nathaniel: { build: [0.97, 0.95], cut: 'combed', skin: 0.94, vest: [0.4, 0.32, 0.22], items: ['spectacles', 'cane', 'chain'] },
+  zamacona: { build: [0.95, 1.1], cut: 'short', skin: 0.82, items: ['morion', 'cuirass'] },
+  johansen: { build: [1.0, 1.08], cut: 'short', skin: 0.88, items: ['knit', 'braces'] },
+  akeley: { build: [1.01, 0.88], cut: 'wild', skin: 0.9, items: ['shawl', 'cane'] },
+  carter: { build: [1.04, 0.96], cut: 'combed', vest: [0.26, 0.22, 0.3], tie: [0.36, 0.14, 0.18], items: ['satchel', 'cane', 'gloves'] },
   nasht: { cut: 'long', skin: 0.96, items: ['staff'] },
 };
 
@@ -97,21 +98,30 @@ export function npcFigure(id: string): Figure {
 
   // The coat: chest, shoulders, waist, lapels, collar, shirt, tie, waistcoat, buttons, belt; a robe hangs whole.
   const torso = [
-    box(0.42, 0.34, 0.25, 0, 0.43, 0, coatC), box(0.5, 0.1, 0.27, 0, 0.57, 0, coatC), box(0.4, 0.3, 0.24, 0, 0.13, 0, coatC),
-    box(0.22, 0.05, 0.16, 0, 0.625, 0, shirt), // the collar
-    ...(robe ? [box(0.46, 0.9, 0.29, 0, -0.4, 0, coatC), box(0.44, 0.07, 0.3, 0, 0.1, 0, facing), box(0.06, 0.55, 0.02, 0, 0.3, 0.135, facing)] : [
-      slab(0.07, 0.27, 0.02, -0.07, 0.45, 0.128, facing, -0.32), slab(0.07, 0.27, 0.02, 0.07, 0.45, 0.128, facing, 0.32),
-      box(0.08, 0.12, 0.02, 0, 0.53, 0.126, shirt), ...(vest ? [box(0.2, 0.3, 0.02, 0, 0.3, 0.126, vest)] : []),
-      ...(who.tie ? [box(0.035, 0.17, 0.02, 0, 0.47, 0.135, shade(who.tie, 1.5))] : []),
-      box(0.025, 0.025, 0.02, 0.06, 0.3, 0.14, brass), box(0.025, 0.025, 0.02, 0.06, 0.2, 0.14, brass),
-      box(0.43, 0.05, 0.27, 0, 0.0, 0, leather), box(0.06, 0.05, 0.02, 0, 0.0, 0.142, brass),
+    ...coatForms(coatC, { robe }),
+    bevel(0.24, 0.05, 0.17, 0, 0.635, 0.01, shirt, 0.012), // the collar
+    ...(robe ? [bevel(0.46, 0.07, 0.3, 0, 0.1, 0, facing, 0.015), bevel(0.55, 0.06, 0.36, 0, -0.84, 0, facing, 0.015), bevel(0.3, 0.3, 0.02, 0, 0.1, 0.16, shade(facing, 0.85), 0.006), // hem trim, and the sash's hanging end
+       bevel(0.06, 0.55, 0.02, 0, 0.3, 0.135, facing, 0.006)] : [
+      slab(0.075, 0.27, 0.022, -0.075, 0.45, 0.13, facing, -0.32), slab(0.075, 0.27, 0.022, 0.075, 0.45, 0.13, facing, 0.32), // lapels
+      box(0.08, 0.12, 0.02, 0, 0.53, 0.128, shirt), ...(vest ? [bevel(0.2, 0.3, 0.02, 0, 0.3, 0.128, vest, 0.006)] : []),
+      ...(who.tie ? [box(0.035, 0.17, 0.02, 0, 0.47, 0.137, shade(who.tie, 1.5))] : []),
+      bevel(0.03, 0.03, 0.02, 0.06, 0.3, 0.14, brass, 0.006), bevel(0.03, 0.03, 0.02, 0.06, 0.2, 0.14, brass, 0.006),
+      bevel(0.075, 0.03, 0.03, -0.13, 0.17, 0.126, facing, 0.008), bevel(0.075, 0.03, 0.03, 0.14, 0.17, 0.126, facing, 0.008), // pocket flaps
+      bevel(0.012, 0.42, 0.012, 0, 0.3, -0.132, shade(coatC, 0.72), 0.003), // the back seam
+      bevel(0.43, 0.05, 0.27, 0, 0.0, 0, leather, 0.012), bevel(0.06, 0.05, 0.025, 0, 0.0, 0.145, brass, 0.008),
     ]),
   ];
   if (has('chain')) torso.push(slab(0.1, 0.012, 0.012, -0.05, 0.28, 0.138, brass, -0.35), box(0.03, 0.04, 0.012, -0.1, 0.25, 0.14, brass));
   if (has('braces')) torso.push(box(0.03, 0.55, 0.02, -0.09, 0.32, 0.13, leather), box(0.03, 0.55, 0.02, 0.09, 0.32, 0.13, leather));
   if (has('scarf')) torso.push(box(0.28, 0.07, 0.26, 0, 0.63, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.6)), slab(0.07, 0.3, 0.025, 0.07, 0.46, 0.14, shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.6), 0.1));
-  if (has('shawl')) torso.push(box(0.56, 0.14, 0.32, 0, 0.57, 0, shade(mixRgb(BASE.rust, BASE.bone, 0.25), 1.6)), box(0.4, 0.4, 0.04, 0, 0.35, -0.15, shade(mixRgb(BASE.rust, BASE.bone, 0.25), 1.5)));
-  if (has('cuirass')) torso.push(box(0.46, 0.4, 0.29, 0, 0.4, 0.0, steel), box(0.5, 0.05, 0.3, 0, 0.6, 0, shade(steel, 0.85)), box(0.12, 0.3, 0.02, 0, 0.4, 0.15, shade(steel, 1.15)));
+  if (has('shawl')) { // draped over the shoulders and down the back, its fringe at the hem
+    const w = shade(mixRgb(BASE.rust, BASE.bone, 0.25), 1.6);
+    torso.push(prism(0, 0.55, 0, 0.62, 0.36, 0.36, 0.27, 0.17, w, 0.035), prism(0, 0.33, -0.15, 0.36, 0.05, 0.4, 0.05, 0.4, shade(w, 0.92), 0.02), bevel(0.38, 0.03, 0.06, 0, 0.12, -0.15, shade(w, 0.7), 0.01));
+  }
+  if (has('cuirass')) { // a breastplate with its ridge and rims, and the pauldrons
+    torso.push(prism(0, 0.4, 0.01, 0.4, 0.27, 0.47, 0.3, 0.4, steel, 0.03), bevel(0.04, 0.34, 0.05, 0, 0.4, 0.165, shade(steel, 1.2), 0.012), bevel(0.46, 0.03, 0.31, 0, 0.215, 0.01, shade(steel, 0.8), 0.01));
+    torso.push(prism(-0.27, 0.6, 0, 0.16, 0.2, 0.12, 0.16, 0.08, shade(steel, 0.95), 0.02), prism(0.27, 0.6, 0, 0.16, 0.2, 0.12, 0.16, 0.08, shade(steel, 0.95), 0.02));
+  }
   if (has('satchel')) torso.push(slab(0.045, 0.66, 0.02, 0, 0.33, 0.131, leather, 0.72), box(0.17, 0.15, 0.08, -0.2, -0.06, 0.04, leather), box(0.18, 0.03, 0.09, -0.2, 0.02, 0.04, shade(leather, 0.8)));
   if (has('bag')) torso.push(box(0.24, 0.17, 0.1, 0.27, -0.28, 0.0, dark), box(0.26, 0.03, 0.11, 0.27, -0.19, 0.0, shade(dark, 1.2)), box(0.03, 0.05, 0.04, 0.27, -0.16, 0.04, brass));
   if (has('flask')) torso.push(box(0.06, 0.14, 0.04, -0.2, -0.05, 0.1, steel), box(0.03, 0.03, 0.03, -0.2, 0.04, 0.1, brass));
@@ -128,12 +138,10 @@ export function npcFigure(id: string): Figure {
 
   // The head: a face with brow, nose, eyes, ears, jaw; moustache and beard; hair; spectacles; the hat.
   const head = [
-    box(0.2, 0.24, 0.22, 0, 0.13, 0.01, pale), box(0.04, 0.06, 0.05, 0, 0.11, 0.135, shade(pale, 0.92)), // face, nose
-    box(0.17, 0.025, 0.03, 0, 0.18, 0.12, shade(hair, 0.9)), // brow
-    box(0.045, 0.026, 0.02, -0.05, 0.15, 0.121, shade(BASE.bone, 1.15)), box(0.045, 0.026, 0.02, 0.05, 0.15, 0.121, shade(BASE.bone, 1.15)), // eyes: the white of them,
-    box(0.02, 0.024, 0.022, -0.05, 0.15, 0.124, dark), box(0.02, 0.024, 0.022, 0.05, 0.15, 0.124, dark), // and the dark of them
-    box(0.03, 0.06, 0.05, -0.108, 0.13, 0, shade(pale, 0.9)), box(0.03, 0.06, 0.05, 0.108, 0.13, 0, shade(pale, 0.9)), // ears
-    box(0.17, 0.05, 0.2, 0, 0.03, 0.02, shade(pale, 0.88)), // jaw
+    ...faceForms(pale),
+    bevel(0.17, 0.025, 0.03, 0, 0.172, 0.112, shade(hair, 0.9), 0.008), // brow
+    box(0.045, 0.026, 0.02, -0.05, 0.15, 0.123, shade(BASE.bone, 1.15)), box(0.045, 0.026, 0.02, 0.05, 0.15, 0.123, shade(BASE.bone, 1.15)), // eyes: the white of them,
+    box(0.02, 0.024, 0.022, -0.05, 0.15, 0.126, dark), box(0.02, 0.024, 0.022, 0.05, 0.15, 0.126, dark), // and the dark of them
     ...hairOf(look.hat === 'none' || who.cut !== 'short' ? who.cut : 'short', hair),
   ];
   if (look.beard) head.push(box(0.19, 0.12, 0.08, 0, 0.02, 0.1, hair), box(0.12, 0.1, 0.07, 0, -0.06, 0.1, shade(hair, 0.95)), box(0.1, 0.03, 0.03, 0, 0.075, 0.14, shade(hair, 1.05)));
@@ -153,18 +161,20 @@ export function npcFigure(id: string): Figure {
   // Arms: the sleeve and cuff, a hand (gloved for some), what they hold.
   const glove = has('gloves') ? leather : pale;
   for (const [arm, elbow, hand] of [[f.armR, f.elbowR, f.handR], [f.armL, f.elbowL, f.handL]]) {
-    part(f, arm, box(0.12, 0.32, 0.13, 0, -0.15, 0, sleeve), 'cloth');
-    part(f, elbow, mergeGeometries([box(0.115, 0.28, 0.125, 0, -0.13, 0, sleeve), box(0.13, 0.04, 0.14, 0, -0.245, 0, shirt)]), 'cloth');
-    part(f, hand, mergeGeometries([box(0.09, 0.1, 0.1, 0, -0.03, 0.01, glove), box(0.03, 0.06, 0.04, 0.04, -0.02, 0.06, glove)]), 'cloth');
+    part(f, arm, upperArm(sleeve), 'cloth');
+    part(f, elbow, mergeGeometries(foreArm(sleeve, shirt, shade(shirt, 0.85))), 'cloth');
+    part(f, hand, mergeGeometries(fist(glove)), 'cloth');
   }
   if (has('cane')) part(f, f.handR, mergeGeometries([box(0.03, 0.78, 0.03, 0, -0.4, 0.02, shade(BASE.charcoal, 1.6)), box(0.1, 0.035, 0.04, 0, 0.0, 0.02, brass), box(0.04, 0.05, 0.04, 0, -0.8, 0.02, brass)]), 'wood');
 
   // Legs: trousers, boots with a heel and a toecap.
   for (const [leg, knee, foot] of [[f.legR, f.kneeR, f.footR], [f.legL, f.kneeL, f.footL]]) {
-    part(f, leg, box(0.16, 0.45, 0.18, 0, -0.21, 0, robe ? coatC : trouser), 'cloth');
-    part(f, knee, mergeGeometries([box(0.15, 0.43, 0.17, 0, -0.2, 0, robe ? coatC : trouser), box(0.165, 0.1, 0.185, 0, -0.38, 0, leather)]), 'cloth');
-    part(f, foot, mergeGeometries([box(0.14, 0.05, 0.26, 0, -0.02, 0.07, leather), box(0.14, 0.03, 0.08, 0, -0.01, 0.17, shade(leather, 0.8))]), 'cloth');
+    const cloth = robe ? coatC : trouser;
+    part(f, leg, thigh(cloth), 'cloth');
+    part(f, knee, mergeGeometries(shin(cloth, robe ? facing : shade(trouser, 0.85))), 'cloth');
+    part(f, foot, mergeGeometries(shoe(leather, shade(BASE.charcoal, 0.9))), 'cloth');
   }
+  f.root.scale.set(who.build?.[1] ?? 1, who.build?.[0] ?? 1, who.build?.[1] ?? 1); // each their own height and girth
   const act = ACTS[id];
   if (act) addProps(f, act.kind, SEATED.has(act.kind)); // what they hold, and sit on, while they are at what they do (round 39)
   return f;

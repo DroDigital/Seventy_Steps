@@ -13,6 +13,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { LANTERN } from '../data/tuning';
 import { ARMS } from './armsMeshes';
 import { cylinder, part, shade, skeleton, type Figure } from './figures';
+import { bevel, coatForms, faceForms, fist, foreArm, prism, shin, shoe, thigh, upperArm } from './bodyKit';
 import { box, tint } from './meshKit';
 import { BASE, mixRgb, type Rgb } from './palette';
 
@@ -71,21 +72,31 @@ export function investigator(): Figure {
     part(f, panel, skirtPanel(side, coat), 'cloth');
   }
   part(f, f.torso, mergeGeometries([
-    box(0.42, 0.34, 0.25, 0, 0.43, 0, coat), // chest
-    box(0.5, 0.1, 0.27, 0, 0.57, 0, coat), // shoulders
-    box(0.4, 0.3, 0.24, 0, 0.13, 0, coat), // waist
-    slab(0.07, 0.27, 0.02, -0.07, 0.45, 0.128, facing, -0.32), // lapels
-    slab(0.07, 0.27, 0.02, 0.07, 0.45, 0.128, facing, 0.32),
-    box(0.07, 0.11, 0.02, 0, 0.53, 0.126, shirt), // shirt in the V...
-    box(0.035, 0.17, 0.02, 0, 0.47, 0.133, shade(BASE.rust, 1.1)), // ...and the tie
-    box(0.025, 0.025, 0.02, 0.05, 0.3, 0.127, brass), // buttons
-    box(0.025, 0.025, 0.02, 0.05, 0.19, 0.127, brass),
-    box(0.43, 0.06, 0.27, 0, 0.0, 0, leather), // belt
-    box(0.06, 0.05, 0.02, 0, 0.0, 0.142, brass), // buckle
-    box(0.27, 0.07, 0.25, 0, 0.625, 0, scarf), // scarf about the neck...
-    slab(0.08, 0.3, 0.03, 0.07, 0.46, -0.14, scarf, 0.12), // ...its tail down the back
-    slab(0.045, 0.66, 0.02, 0, 0.33, 0.131, leather, 0.72), // satchel strap
-    box(0.17, 0.15, 0.08, -0.2, -0.06, 0.04, leather), // satchel, on the right hip
+    ...coatForms(coat), // waist, chest and sloping shoulders
+    slab(0.075, 0.27, 0.022, -0.075, 0.45, 0.13, facing, -0.32), // lapels
+    slab(0.075, 0.27, 0.022, 0.075, 0.45, 0.13, facing, 0.32),
+    slab(0.05, 0.05, 0.024, -0.115, 0.545, 0.128, shade(facing, 1.08), -0.5), // their notches
+    slab(0.05, 0.05, 0.024, 0.115, 0.545, 0.128, shade(facing, 1.08), 0.5),
+    box(0.07, 0.11, 0.02, 0, 0.53, 0.128, shirt), // shirt in the V...
+    box(0.035, 0.17, 0.02, 0, 0.47, 0.135, shade(BASE.rust, 1.1)), // ...and the tie
+    bevel(0.03, 0.03, 0.02, 0.05, 0.3, 0.127, brass, 0.006), // buttons
+    bevel(0.03, 0.03, 0.02, 0.05, 0.19, 0.127, brass, 0.006),
+    bevel(0.075, 0.03, 0.03, -0.13, 0.17, 0.126, facing, 0.008), // pocket flaps
+    bevel(0.075, 0.03, 0.03, 0.14, 0.17, 0.126, facing, 0.008),
+    bevel(0.11, 0.022, 0.12, -0.2, 0.625, 0, leather, 0.008), // epaulettes: a field coat's
+    bevel(0.11, 0.022, 0.12, 0.2, 0.625, 0, leather, 0.008),
+    bevel(0.012, 0.42, 0.012, 0, 0.3, -0.132, shade(coat, 0.7), 0.003), // the back seam
+    bevel(0.44, 0.06, 0.275, 0, 0.0, 0, leather, 0.014), // belt
+    bevel(0.065, 0.055, 0.025, 0, 0.0, 0.145, brass, 0.008), // buckle
+    bevel(0.3, 0.11, 0.07, 0, 0.665, -0.115, facing, 0.015).rotateX(0), // the coat's collar, turned up behind the neck
+    bevel(0.07, 0.1, 0.2, -0.14, 0.655, -0.01, facing, 0.012), // ...and at its sides
+    bevel(0.07, 0.1, 0.2, 0.14, 0.655, -0.01, facing, 0.012),
+    bevel(0.215, 0.075, 0.215, 0, 0.64, 0.005, scarf, 0.02), // scarf about the neck...
+    bevel(0.07, 0.07, 0.05, 0.05, 0.595, 0.12, shade(scarf, 1.12), 0.012), // ...tied in a knot at the front...
+    slab(0.085, 0.3, 0.032, 0.07, 0.46, -0.14, scarf, 0.12), // ...its tail down the back
+    slab(0.045, 0.66, 0.022, 0, 0.33, 0.133, leather, 0.72), // satchel strap
+    bevel(0.17, 0.15, 0.085, -0.2, -0.06, 0.04, leather, 0.014), // satchel, on the right hip
+    bevel(0.18, 0.04, 0.095, -0.2, 0.02, 0.04, shade(leather, 0.8), 0.01), // its flap
   ]), 'cloth');
   const cage = shade(BASE.charcoal, 1.6);
   const [lx, ly, lz] = [0.29, -0.235, 0.02]; // the lantern hangs low at the left side of the belt, clear of the coat and the swinging arm
@@ -104,32 +115,24 @@ export function investigator(): Figure {
   f.torso.add(f.flame);
 
   part(f, f.head, mergeGeometries([
-    box(0.19, 0.22, 0.2, 0, 0.12, 0.01, pale), // face
-    box(0.04, 0.06, 0.05, 0, 0.1, 0.125, shade(pale, 0.93)), // nose
-    box(0.17, 0.03, 0.03, 0, 0.17, 0.105, shade(BASE.charcoal, 1.3)), // brow in the hat's shadow
-    box(0.17, 0.05, 0.19, 0, 0.03, 0.02, shade(pale, 0.86)), // jaw
-    box(0.03, 0.06, 0.05, -0.1, 0.12, 0, shade(pale, 0.9)), // ears
-    box(0.03, 0.06, 0.05, 0.1, 0.12, 0, shade(pale, 0.9)),
+    ...faceForms(pale),
+    box(0.05, 0.018, 0.02, -0.05, 0.14, 0.114, shade(BASE.bone, 1.2)), box(0.05, 0.018, 0.02, 0.05, 0.14, 0.114, shade(BASE.bone, 1.2)), // eyes, in the hat's shadow
+    box(0.02, 0.02, 0.022, -0.05, 0.14, 0.117, dark), box(0.02, 0.02, 0.022, 0.05, 0.14, 0.117, dark),
+    bevel(0.18, 0.026, 0.03, 0, 0.17, 0.108, shade(BASE.charcoal, 1.3), 0.008), // brow in the hat's shadow
     ...hairGeometry(hair),
   ]), 'cloth');
-  part(f, f.head, mergeGeometries([ // fedora: brim, pinched crown, band
-    cylinder(0.22, 0.22, 0.025, 0.25, dark),
-    cylinder(0.12, 0.135, 0.13, 0.32, dark),
-    box(0.03, 0.03, 0.2, 0, 0.385, 0, shade(dark, 0.8)),
-    cylinder(0.137, 0.137, 0.035, 0.28, shade(BASE.rust, 0.9)),
+  part(f, f.head, mergeGeometries([ // fedora: a brim, a crown pinched in the middle, a band
+    cylinder(0.225, 0.225, 0.022, 0.25, dark),
+    prism(0, 0.325, 0, 0.27, 0.28, 0.2, 0.25, 0.14, dark, 0.03),
+    bevel(0.03, 0.05, 0.2, 0, 0.395, 0, shade(dark, 0.75), 0.01), // the pinch
+    cylinder(0.138, 0.142, 0.035, 0.28, shade(BASE.rust, 0.9)),
   ]), 'cloth');
 
   // Arms: the upper sleeve at the shoulder, the forearm and cuff from the elbow, the gloved hand at the wrist.
   for (const [arm, elbow, hand] of [[f.armR, f.elbowR, f.handR], [f.armL, f.elbowL, f.handL]]) {
-    part(f, arm, box(0.13, 0.33, 0.14, 0, -0.15, 0, sleeve), 'cloth');
-    part(f, elbow, mergeGeometries([
-      box(0.12, 0.28, 0.13, 0, -0.12, 0, shade(sleeve, 0.94)),
-      box(0.135, 0.05, 0.145, 0, -0.25, 0, facing), // cuff
-    ]), 'cloth');
-    part(f, hand, mergeGeometries([
-      box(0.09, 0.1, 0.1, 0, -0.04, 0.01, leather), // glove
-      box(0.03, 0.06, 0.04, 0.04, -0.02, 0.06, leather), // thumb
-    ]), 'cloth');
+    part(f, arm, upperArm(sleeve), 'cloth');
+    part(f, elbow, mergeGeometries(foreArm(shade(sleeve, 0.94), facing, shade(facing, 1.25))), 'cloth');
+    part(f, hand, mergeGeometries(fist(leather)), 'cloth');
   }
   const cane = part(f, f.handR, mergeGeometries([ // the sword-cane: silver grip, shaft, ferrule
     box(0.035, 0.8, 0.035, 0, -0.42, 0.02, shade(BASE.bone, 0.9)),
@@ -159,12 +162,9 @@ export function investigator(): Figure {
   f.flash.visible = false;
   // Legs: the thigh at the hip, the shin and turn-up from the knee (0.42 m down), the shoe at the ankle (the soles 0.9 m below the hip).
   for (const [leg, knee, foot] of [[f.legR, f.kneeR, f.footR], [f.legL, f.kneeL, f.footL]]) {
-    part(f, leg, box(0.17, 0.47, 0.19, 0, -0.215, 0, dark), 'cloth');
-    part(f, knee, mergeGeometries([
-      box(0.155, 0.41, 0.175, 0, -0.175, 0, dark),
-      box(0.165, 0.03, 0.185, 0, -0.36, 0, shade(dark, 0.85)), // turn-up
-    ]), 'cloth');
-    part(f, foot, box(0.15, 0.1, 0.25, 0, -0.02, 0.035, shade(BASE.charcoal, 1.3)), 'cloth'); // shoe, from the ankle
+    part(f, leg, thigh(dark), 'cloth');
+    part(f, knee, mergeGeometries(shin(dark, shade(dark, 0.85), leather)), 'cloth');
+    part(f, foot, mergeGeometries(shoe(leather, shade(BASE.charcoal, 0.9))), 'cloth');
   }
   return f;
 }
