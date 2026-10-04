@@ -14,7 +14,7 @@ import { worldLayout } from '../world/placements';
 import { DIRS } from '../world/worldMap';
 import { ACTS } from '../data/npcActs';
 import type { Game } from './components';
-import { managed } from './npcLife';
+import { atAct, managed } from './npcLife';
 import { rumorFor } from './omens';
 import { stageOf, startQuest, talked, UNSTARTED } from './quests';
 import { QUESTS } from '../data/quests';
@@ -88,6 +88,7 @@ export function npcSystem(g: Game, dt: number): void {
   for (const [e, id] of g.ecs.c.npc) {
     const tr = g.ecs.c.transform.get(e)!;
     const n = npcDef(id);
+    if (e === g.player.listening && atAct(g, e)) continue; // at their act, they keep to it while spoken with
     if (n?.creature && e !== g.player.listening) continue; // a creature's own brain turns it
     if (e !== g.player.listening && managed(g, e)) continue; // and one who lives a round turns as it walks (npcLife.ts; round 26)
     const want = e === g.player.listening ? yawOf(me.x - tr.pos.x, me.z - tr.pos.z) : n && npcPlace(n)?.yaw;

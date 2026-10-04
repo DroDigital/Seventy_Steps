@@ -7,6 +7,7 @@ import { CAMERA, LAUDANUM, SANITY, WORLD } from '../src/data/tuning';
 import { dream, gatePlace, interactable, passGate, rest, signPlace, travel } from '../src/systems/checkpoints';
 import { isAbsent } from '../src/systems/components';
 import { npcEntity, npcPlace, talk } from '../src/systems/npcs';
+import { atAct } from '../src/systems/npcLife';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { changeInsight } from '../src/systems/insight';
 import { setSanity } from '../src/systems/sanity';
@@ -168,12 +169,13 @@ describe('E takes what the investigator faces (playtest round 12)', () => {
     expect(Math.abs(wrapAngle(tr.yaw - want))).toBeLessThan(0.05);
     expect(Math.abs(wrapAngle(g.camera.yaw - want - CAMERA.talkTurn))).toBeLessThan(0.1); // turned a little, the speaker clear of their back
     const them = g.ecs.c.transform.get(npcEntity(g, n.id)!)!;
-    expect(Math.abs(wrapAngle(them.yaw - yawOf(tr.pos.x - at.x, tr.pos.z - at.z)))).toBeLessThan(0.05); // and they to them
+    const acting = atAct(g, npcEntity(g, n.id)!);
+    if (!acting) expect(Math.abs(wrapAngle(them.yaw - yawOf(tr.pos.x - at.x, tr.pos.z - at.z)))).toBeLessThan(0.05); // and they to them (but for one at their act, who keeps to it)
     stepGame(g, { ...emptyInput(), moveY: 1 });
     expect(g.player.listening).toBeNull();
     run(g, 120);
     const now = g.ecs.c.transform.get(g.player.id)!.pos;
-    expect(Math.abs(wrapAngle(them.yaw - yawOf(now.x - them.pos.x, now.z - them.pos.z)))).toBeLessThan(0.3); // and still to whoever stands by them (round 26: the people have rounds of their own once the investigator has gone: npcLife.test.ts)
+    if (!acting) expect(Math.abs(wrapAngle(them.yaw - yawOf(now.x - them.pos.x, now.z - them.pos.z)))).toBeLessThan(0.3); // and still to whoever stands by them (round 26: the people have rounds of their own once the investigator has gone: npcLife.test.ts)
   });
 });
 

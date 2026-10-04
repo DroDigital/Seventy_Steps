@@ -15,9 +15,10 @@ export interface Voice {
   rate?: number; // playback rate, pitch and pace together (default 1)
   echo?: number; // how much of a hall is behind it, 0..1 (default none)
   gain?: number; // a level of its own (default 1)
+  room?: boolean; // set in a room: warmed, held level and given a stone chamber's reverb (render/audio/voiceRoom.ts; default none)
 }
 
-type Own = Pick<Voice, 'rate' | 'echo' | 'gain'>;
+type Own = Pick<Voice, 'rate' | 'echo' | 'gain' | 'room'>;
 /** A voice (id, name) and the way it is played for one speaker. */
 const v = (voice: readonly [string, string], more: Own = {}): Voice => ({ voice: voice[0], name: voice[1], ...more });
 
@@ -39,8 +40,8 @@ const DEEP_DARK = ['k1fCGnhRbXzd6bzwlD2B', 'Parasyte - Dweller in the Deep-Dark'
 const MOSSBEARD = ['bFrjFL4nlpeYNwNRhXxq', 'Mossbeard | The God of the Wild'] as const;
 
 export const CAST: Readonly<Record<string, Voice>> = {
-  // the narrator of a new game's opening (round 39): Finley, Articulate Anchor, a crisp and unflappable British voice, chosen by the author; played plain, a little hall behind it, never whispered
-  'narrator:intro': v(['fnYMz3F5gMEDGMWcH1ex', 'Finley - Articulate Anchor'], { echo: 0.12 }),
+  // the narrator of a new game's opening (round 39): Finley, Articulate Anchor, a crisp and unflappable British voice, chosen by the author; never whispered; set in a stone chamber (a warm, level voice with reverb, no slap-back echo)
+  'narrator:intro': v(['fnYMz3F5gMEDGMWcH1ex', 'Finley - Articulate Anchor'], { room: true }),
   // people met at the Elder Signs
   'npc:peaslee': v(ERIC),
   'npc:gilman': v(WILL),

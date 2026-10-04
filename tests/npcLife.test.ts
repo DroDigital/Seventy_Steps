@@ -121,15 +121,17 @@ describe('the people keep at what they do (round 39)', () => {
     expect(far).toBeLessThan(5);
   });
 
-  it('stand and turn to the investigator when close (the act is put down), and take it up again when they have gone', () => {
+  it('keep at it when the investigator comes close: no turning to them, the act not put down', () => {
     const g = night(0.05);
     const e = npcEntity(g, 'wilmarth')!;
     const tr = g.ecs.c.transform.get(e)!;
     for (let i = 0; i < 60 * 10; i++) { g.frame++; npcLife(g, DT); }
     expect(actOf(g, e)).toBe('smoke');
     place(g, g.player.id, tr.pos.x + 3, tr.pos.z, Math.PI);
+    const yaw = tr.yaw;
     for (let i = 0; i < 60 * 5; i++) { g.frame++; npcLife(g, DT); }
-    expect(actOf(g, e)).toBeNull();
+    expect(actOf(g, e)).toBe('smoke');
+    expect(tr.yaw).toBeCloseTo(yaw, 1);
     place(g, g.player.id, -5000, -5000, 0);
     for (let i = 0; i < 60 * 20; i++) { g.frame++; npcLife(g, DT); }
     expect(actOf(g, e)).toBe('smoke');
@@ -208,7 +210,7 @@ describe('those with a place of their own (round 39)', () => {
     }
   });
 
-  it('stand and turn when the investigator comes, and are at it again when they have gone', () => {
+  it('keep to their post when the investigator comes, and when they have gone', () => {
     const g = night(0.05);
     for (const n of posted) {
       const e = npcEntity(g, n.id)!;
@@ -217,7 +219,7 @@ describe('those with a place of their own (round 39)', () => {
       expect(actOf(g, e), n.id).toBe(ACTS[n.id].kind);
       place(g, g.player.id, tr.pos.x + 3, tr.pos.z, Math.PI);
       for (let i = 0; i < 60 * 5; i++) { g.frame++; npcLife(g, DT); }
-      expect(actOf(g, e), n.id).toBeNull();
+      expect(actOf(g, e), n.id).toBe(ACTS[n.id].kind);
       place(g, g.player.id, -5000, -5000, 0);
       for (let i = 0; i < 60 * 12; i++) { g.frame++; npcLife(g, DT); }
       expect(actOf(g, e), n.id).toBe(ACTS[n.id].kind);

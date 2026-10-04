@@ -89,6 +89,15 @@ export const mist: Skin = {
           g.fillStyle = grd;
           g.fillRect(x - b.rad, y - b.rad, b.rad * 2, b.rad * 2);
         }
+        if (stir > 0.01) { // a page changing (the intro's cards): the mist gathers over where the words were, so the middle is never bare
+          const r = Math.max(sw, sh) * 0.55;
+          const grd = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+          grd.addColorStop(0, `rgba(120,104,152,${stir * 0.22})`);
+          grd.addColorStop(0.6, `rgba(88,80,114,${stir * 0.1})`);
+          grd.addColorStop(1, 'rgba(60,56,80,0)');
+          g.fillStyle = grd;
+          g.fillRect(cx - r, cy - r, r * 2, r * 2);
+        }
         g.globalAlpha = 1;
         g.globalCompositeOperation = 'destination-in';
         g.drawImage(mask, -BLEED, -BLEED, w + BLEED * 2, h + BLEED * 2);

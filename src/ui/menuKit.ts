@@ -33,6 +33,8 @@ export interface Screen {
   readonly open: boolean;
   readonly root: HTMLElement; // the whole screen, backdrop and all (the intro fades it out as it ends)
   show(page: Page): void;
+  /** The skin's mist stirs and settles, as when a page changes (the intro stirs it between its cards). */
+  stir(): void;
   close(): void;
   /** Called once the screen has closed (round 29: the Elder Sign's menu lets the investigator rise). */
   onClose?: () => void;
@@ -255,6 +257,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       return entry !== null;
     },
     root,
+    stir: () => skinned?.stir(),
     show(page) {
       const same = entry?.page === page;
       const fresh = !same && !memory.has(page); // a page first opened is read from its top
