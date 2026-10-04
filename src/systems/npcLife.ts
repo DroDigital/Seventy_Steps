@@ -85,6 +85,9 @@ function stroll(g: Game, from: XZ, home: XZ, reach: number): XZ {
 
 const between = (g: Game, [lo, hi]: readonly [number, number]): number => lo + (hi - lo) * g.rng();
 
+/** Whether `e` is at their act now (and so keeps to it while spoken with: npcs.ts does not turn them). */
+export const atAct = (g: Game, e: Entity): boolean => !!walkers.get(g)?.get(e)?.doing;
+
 /** Whether `e` lives a round of its own (its turning is its own: npcs.ts leaves it, but for the one being talked with). */
 export const managed = (g: Game, e: Entity): boolean => !!walkers.get(g)?.has(e);
 
@@ -124,7 +127,10 @@ export function npcLife(g: Game, dt: number): void {
       }
       table.set(e, (w = { home: place, spot, kind: doing?.kind ?? null, doing: false, breather: false, left: between(g, SPELL), goal: null, wait: doing ? 0 : between(g, [1, 6]), look: spot.yaw, pace: 0 }));
     }
-    const near = g.player.listening === e || distXZ(tr.pos, me) < HOLD;
+    const posted = !!ACTS[id]?.post; // one with a place of their own keeps to it all night, and never strolls off
+    const busy = (hour !== 'waning' || posted) && w.kind !== null; // the last hour is dozing on their feet, whatever they do
+    const at = busy && !w.breather && distXZ(tr.pos, w.spot) <= ARRIVE + 0.1;
+    const near = !at && (g.player.listening === e || distXZ(tr.pos, me) < HOLD); // one at their act stays at it: no turning to the one beside them, nor to the one talking with them
     w.doing = false;
     if (near || w.wait > 0) w.pace = 0;
     if (near) { // they stand, and turn to the one beside them (npcs.ts does it faster for one being talked with)
@@ -133,8 +139,6 @@ export function npcLife(g: Game, dt: number): void {
       if (g.player.listening !== e) tr.yaw = turnToward(tr.yaw, yawOf(me.x - tr.pos.x, me.z - tr.pos.z), TURN * dt);
       continue;
     }
-    const posted = !!ACTS[id]?.post; // one with a place of their own keeps to it all night, and never strolls off
-    const busy = (hour !== 'waning' || posted) && w.kind !== null; // the last hour is dozing on their feet, whatever they do
     const reach = busy ? BREATHER : ROUND[hour].reach;
     tr.prev = { ...tr.pos };
     tr.prevYaw = tr.yaw;
@@ -145,7 +149,7 @@ export function npcLife(g: Game, dt: number): void {
         w.pace = 0;
         tr.yaw = turnToward(tr.yaw, w.spot.yaw, TURN * dt);
         w.doing = Math.abs(wrapAngle(w.spot.yaw - tr.yaw)) < 0.25;
-        if (w.doing && !posted && (w.left -= dt) <= 0) [w.breather, w.left, w.wait] = [true, between(g, SPELL), 0];
+        if (w.doing && !posted && !(g.player.listening === e) && (w.left -= dt) <= 0) [w.breather, w.left, w.wait] = [true, between(g, SPELL), 0];
         continue;
       }
     }

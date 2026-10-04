@@ -75,6 +75,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     if (!stage) return;
     const c = INTRO[i];
     show(true);
+    screen.stir();
     turning = false;
     rest = (seconds) => {
       clearTimeout(timer);
@@ -91,6 +92,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   function turn(): void {
     if (over || turning || !stage) return;
     turning = true;
+    screen.stir(); // the mist gathers as the words sink into it
     clearTimeout(timer);
     voice?.stop();
     const last = i === INTRO.length - 1;
@@ -115,7 +117,12 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
       const again = stage !== null; // drawn again (the player took up the other device: its buttons are named): the card stays where it is in its reading
       // A stage of one height for every card, so nothing moves as they change: the heading always where it was.
       stage = el(p, 'div', '', 'height:13.5em;display:flex;flex-direction:column;justify-content:flex-start');
-      row = el(p, 'div', '', 'display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:11px;letter-spacing:2px;opacity:0');
+      // the keys, in the screen's two lower corners (on the root, not the panel: the panel is the words' own)
+      screen.root.querySelector('[data-keys]')?.remove();
+      row = document.createElement('div');
+      row.dataset.keys = '';
+      row.style.cssText = 'position:absolute;left:28px;right:28px;bottom:22px;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:2px;opacity:0';
+      screen.root.append(row);
       if (again) row.style.opacity = '0.4';
       else row.animate([{ opacity: 0 }, { opacity: 0.4 }], { duration: 2400, delay: 1800, fill: 'forwards' }); // what the keys do, faint, once the first words are out
       el(row, 'div', `${glyph('back')} · skip`);
