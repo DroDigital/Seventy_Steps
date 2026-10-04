@@ -39,6 +39,8 @@ const DEEP_DARK = ['k1fCGnhRbXzd6bzwlD2B', 'Parasyte - Dweller in the Deep-Dark'
 const MOSSBEARD = ['bFrjFL4nlpeYNwNRhXxq', 'Mossbeard | The God of the Wild'] as const;
 
 export const CAST: Readonly<Record<string, Voice>> = {
+  // the narrator of a new game's opening (round 39): a resonant, mellow voice, with a little hall behind it
+  'narrator:intro': v(['MwEdKmZP07u6TIkZCkoz', 'Isaac - resonant, mellow narrator'], { echo: 0.12 }),
   // people met at the Elder Signs
   'npc:peaslee': v(ERIC),
   'npc:gilman': v(WILL),

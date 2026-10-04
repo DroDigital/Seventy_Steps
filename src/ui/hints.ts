@@ -19,7 +19,7 @@ const SHOW_MS = 9000;
 
 const HINTS = {
   move: 'Move with {move} and look with {look}. {dodge} dodges; hold it to run.',
-  lead: 'The ◇ on the minimap marks where the story leads. The Journal ({pause}) says what to do there.',
+  lead: 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there.',
   fight: '{light} strikes ({heavy}: a heavy blow). {block} blocks, and calls off a swing that has not landed; {parry} parries. {lock} locks on.',
   hurt: "{heal} injects West's Reagent and closes wounds. Its doses come back when you rest.",
   mind: '{item} takes a swallow of Laudanum and steadies the mind. Away from a fight it mends by itself (▲), faster by lamplight and firelight (▲▲); the Elder Signs, Echoes and your own lantern do not count.',
@@ -27,7 +27,7 @@ const HINTS = {
   echoes: 'You dropped your Echoes where you fell. Reach the spot again to take them back.',
   level: 'You carry Echoes enough for a level (▲). Rest at an Elder Sign to grow stronger, before you fall and drop them.',
   map: '{map} opens the map. Ground you have seen stays drawn on it.',
-  quest: 'The pause menu ({pause}) has a Journal with what you have been asked to do.',
+  quest: '{journal} opens the Journal, with what you have been asked to do.',
   boss: 'Watch the ground: a boss shows where its blows will land. Roll through rings and beams.',
   stoop: 'A colossus stoops after each blow of its own: its head comes down within reach, and a strike there hurts it several times over. Stand before its face. The revolver ({shoot}) aims for a head it can reach.',
   ship: "No blade finishes Cthulhu. Wound it until the Alert comes, then take her helm ({interact}) and drive her at it.",

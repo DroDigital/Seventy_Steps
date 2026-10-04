@@ -42,6 +42,8 @@ performance can be tried again over the same file.
 
 ## The cast
 
+The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Isaac, resonant, mellow narrator* (`MwEdKmZP07u6TIkZCkoz`), with a little hall (`echo` 0.12); his five cards are one take each, chosen unheard.
+
 Chosen from the voices' descriptions (nobody has listened to the casting). Ordinary speakers have ElevenLabs'
 own **premade** voices, which any plan can use; the monstrous, the old and the foreign have **library** voices,
 which a recording can be made with only on the Creator plan or above. `rate` lowers a voice and slows it
@@ -148,6 +150,7 @@ failed take from the free plan, a transcription node):
 | Willett | https://elevenlabs.io/app/flows/fGCpd3EC5aqNpuo8fOPw |
 | Curtis | https://elevenlabs.io/app/flows/Rox5Daq6zOrf9t72VRFE |
 | Dyer | https://elevenlabs.io/app/flows/w1Pi37BtbbwbN2qBSdf3 |
+| the narrator (the opening's five cards; one take each) | https://elevenlabs.io/app/flows/OQnEi4aA8UBUVUPPBTzx |
 | Nathaniel | https://elevenlabs.io/app/flows/z9vwDPvzyk9HQrKFoDFf |
 | Zamacona | https://elevenlabs.io/app/flows/EZHSLpdOLz3biacgvxGi |
 | Johansen | https://elevenlabs.io/app/flows/iCM4caRlch6txnH3ED7P |
