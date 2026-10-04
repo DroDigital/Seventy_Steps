@@ -42,7 +42,7 @@ performance can be tried again over the same file.
 
 ## The cast
 
-The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Isaac, resonant, mellow narrator* (`MwEdKmZP07u6TIkZCkoz`), with a little hall (`echo` 0.12); his five cards are one take each, chosen unheard.
+The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Finley - Articulate Anchor* (`fnYMz3F5gMEDGMWcH1ex`, British narration, the one the author picked in the library), with a little hall (`echo` 0.12); his five cards are one take each. They carry no whispering: no `[whispers]`, `[softly]` or `[quietly]` in them.
 
 Chosen from the voices' descriptions (nobody has listened to the casting). Ordinary speakers have ElevenLabs'
 own **premade** voices, which any plan can use; the monstrous, the old and the foreign have **library** voices,
@@ -163,6 +163,8 @@ failed take from the free plan, a transcription node):
 | Hastur, Tsathoggua, the Great Ones, Yog-Sothoth, 'Umr at-Tawil, Shub-Niggurath, Nyarlathotep | https://elevenlabs.io/app/flows/StyntZxdbmkjrFApkjsc |
 
 ## Licence and disclosure
+
+**Voices to check (round 39).** The ElevenLabs connector gives no licence or usage terms for a voice, so which of these carry the library's "free, unlimited use" mark has to be read in the app (Voices › Explore, each voice's page). Ten are ElevenLabs' own premade voices (Eric, Will, Roger, Brian, Callum, Chris, Bill, Daniel, George, Harry), which any plan can use. The others are library voices, each with its author's licence, still to be confirmed one by one: Finley - Articulate Anchor (the narrator), Josef Hammer, Desmond (UK), Jessie, Diego, Birk, Rick, The Ancient Evil, Parasyte (Whispers from the Deep Dark; Dweller in the Deep-Dark), Hellin, Matthew Schmitz (Ancient Sage Dragon Wizard; The Demon), Peter, GERALD, Mora, Ezekiel Wren, Eleanor, Kevo, Declan Graves, Harriet, Rodo, Frederick, Kalen, Blue, Katie, Justin, Beatrice, Mossbeard, Malvoryx. Any that is not free for a commercial game is recast in `speechCast.ts` and its lines recorded again (the clip names do not change with the voice, only the files do).
 
 Recordings made under a plan carry that plan's terms, and a library voice has its own licence: check both
 before the game is sold (`public/voice/CREDITS.md`). The credits (`data/credits.ts`) say the voices are

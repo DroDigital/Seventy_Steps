@@ -8,7 +8,7 @@ voice library, cast in `src/data/speechCast.ts` (by voice id); what each says, w
 `speechFar.ts` and `speechBosses.ts`.
 
 The narrator of a new game's opening (`narrator:intro`, `src/data/intro.ts`) is the library voice
-*Isaac - resonant, mellow narrator*, the same model.
+*Finley - Articulate Anchor*, the same model.
 
 A file is named by who says the line and a hash of its words (`src/data/speech.ts`, `clipOf`), so a line
 whose words change needs a new recording, and one whose capitals or marks change does not.
