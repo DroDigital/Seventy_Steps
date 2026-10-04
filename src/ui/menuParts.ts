@@ -21,7 +21,7 @@ export const CSS = `
 [data-menu] button.quiet{display:inline-block;width:auto;padding:2px 0;opacity:.55;text-shadow:0 0 6px #000,0 1px 2px #000}
 [data-menu] button.quiet::before{display:none}
 [data-menu] button.quiet:focus,[data-menu] button.quiet:hover:not(:disabled){outline:none;opacity:1;background:none}
-[data-menu] button:focus,[data-menu] button:hover:not(:disabled),[data-menu] label:focus-within,[data-menu] label:hover{outline:none;color:${BRIGHT};background:linear-gradient(90deg,${ACCENT}26,${ACCENT}0d 55%,transparent);border-top-color:${ACCENT}2a;border-bottom-color:${ACCENT}2a}
+[data-menu] button:focus,[data-menu] button:hover:not(:disabled),[data-menu] label:focus-within,[data-menu] label:hover{outline:none;color:${BRIGHT};background:linear-gradient(90deg,transparent,${ACCENT}26 14%,${ACCENT}0d 60%,transparent)}
 [data-menu] button:focus::before,[data-menu] button:hover:not(:disabled)::before{opacity:1;transform:rotate(45deg) scale(1);background:${ACCENT}}
 [data-menu] button.tab{display:inline-block;width:auto;margin:0 2px;padding:6px 14px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:${INK}70;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
 [data-menu] button.tab::before{display:none}
@@ -72,7 +72,7 @@ export function el<K extends keyof HTMLElementTagNameMap>(parent: HTMLElement, t
 }
 
 /** A page's section: small capitals in old brass over a hair rule (an empty one is the rule alone, before a closing button). */
-export const heading = (parent: HTMLElement, text: string): HTMLDivElement => el(parent, 'div', text, `margin:16px 0 6px;padding-bottom:3px;letter-spacing:3px;font-size:11px;color:${ACCENT};border-bottom:1px solid ${ACCENT}33`);
+export const heading = (parent: HTMLElement, text: string): HTMLDivElement => el(parent, 'div', text, `margin:16px 0 6px;padding-bottom:3px;letter-spacing:3px;font-size:11px;color:${ACCENT};border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
 
 /** A page's title: its name in pale capitals and a hair rule with a small lozenge, no more. */
 export function title(parent: HTMLElement, text: string): HTMLDivElement {
@@ -133,7 +133,7 @@ export function tabs(parent: HTMLElement, names: readonly string[], open: number
     tabbedAt = performance.now(); // the page drawn next comes in by its body only
     pick(i);
   };
-  const row = el(parent, 'div', '', `display:flex;justify-content:center;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid ${ACCENT}2a`);
+  const row = el(parent, 'div', '', `display:flex;justify-content:center;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
   row.dataset.pin = '';
   names.forEach((n, i) => button(row, n, () => go(i)).classList.add('tab', ...(i === open ? ['on'] : [])));
   page.tab = (by) => go((open + by + names.length) % names.length);
@@ -150,7 +150,7 @@ export function footer(parent: HTMLElement, hint: string, keys: readonly (readon
   body.className = 'scroll';
   body.append(...rest);
   if (parent.dataset.body) [body.style.flex, parent.dataset.body] = [`1 1 ${parent.dataset.body}px`, '']; // a page with tabs keeps one height, whichever tab is open (it is a size to start from, not a least: a small window still shrinks it)
-  const line = el(parent, 'div', hint, `margin-top:12px;padding-top:8px;border-top:1px solid ${ACCENT}2a`);
+  const line = el(parent, 'div', hint, `margin-top:12px;padding-top:8px;border-top:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
   line.className = 'hint';
   line.dataset.def = hint; // what it says when the chosen line has nothing of its own to say
   if (!hint && !body.querySelector('[data-hint]')) [line.className, line.style.minHeight] = ['', '0']; // nothing to say (a list of tomes): no room kept for it

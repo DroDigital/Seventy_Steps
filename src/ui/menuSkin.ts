@@ -9,8 +9,8 @@
 import { mist } from './skins/mist';
 
 export interface SkinArt {
-  /** Draws the art for `ms` since the screen opened; (0,0) is the panel's top left, and the art may reach `bleed` past it. `open` is 0 to 1 over the opening. */
-  draw(ctx: CanvasRenderingContext2D, ms: number, open: number): void;
+  /** Draws the art for `ms` since the screen opened; (0,0) is the panel's top left, and the art may reach `bleed` past it. `open` is 0 to 1 over the opening; `stir`, 1 falling to 0, is a page changing. */
+  draw(ctx: CanvasRenderingContext2D, ms: number, open: number, stir: number): void;
   /** Sets how the words come in at `open` (0 to 1): styles on the panel, whose resting transform is `base`. */
   words(panel: HTMLElement, open: number, base: string): void;
 }
@@ -21,6 +21,7 @@ export interface Skin {
   bleed: number; // pixels the art reaches past the panel's box
   pad: string; // the panel's padding: where its words may stand within the art
   openMs: number;
+  maxRatio?: number; // the most the canvas is drawn finer than the layout (else 2)
   maxVh?: number; // the most of the window's height the panel may take (else 95)
   build(w: number, h: number): SkinArt;
 }
@@ -30,12 +31,15 @@ export const SKIN: Skin = mist;
 
 export const BASE = 'translate(-50%,-50%)'; // the panel's resting transform (menuKit's panelCss)
 const FPS = 30;
+const STIR_MS = 700; // how long the art takes to settle after a page changes
 
 export interface Attached {
   /** The screen opens: the skin plays its opening. */
   open(): void;
   /** The screen closes. */
   close(): void;
+  /** A page changes: the art stirs and settles. */
+  stir(): void;
   /** The panel's size or contents changed. */
   fit(): void;
   /** For a script: the art as it is `ms` after opening (and still). */
@@ -50,7 +54,7 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
   const ctx = canvas.getContext('2d')!;
   let art: SkinArt | null = null;
   let size = '';
-  let [t0, timer, still] = [0, 0, -1];
+  let [t0, timer, still, stirred] = [0, 0, -1, -1e9];
   let ratio = 1;
 
   const elapsed = (): number => (still >= 0 ? still : performance.now() - t0);
@@ -60,7 +64,8 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     const open = Math.min(1, ms / skin.openMs);
     ctx.setTransform(ratio, 0, 0, ratio, skin.bleed * ratio, skin.bleed * ratio);
     ctx.clearRect(-skin.bleed, -skin.bleed, canvas.width / ratio, canvas.height / ratio);
-    art.draw(ctx, ms, open);
+    const stir = Math.max(0, 1 - (performance.now() - stirred) / STIR_MS) ** 2;
+    art.draw(ctx, ms, open, stir);
     art.words(panel, open, BASE);
   };
   const loop = (): void => {
@@ -73,7 +78,7 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     if (!w) return;
     const k = layer.getBoundingClientRect().width / (layer.offsetWidth || 1); // the layer is drawn at the UI scale
     Object.assign(canvas.style, { left: `${(layer.offsetWidth - panel.offsetWidth) / 2 - skin.bleed}px`, top: `${(layer.offsetHeight - panel.offsetHeight) / 2 - skin.bleed}px`, width: `${w + skin.bleed * 2}px`, height: `${h + skin.bleed * 2}px` });
-    ratio = Math.min(2, Math.max(1, k * (window.devicePixelRatio || 1)));
+    ratio = Math.min(skin.maxRatio ?? 2, Math.max(1, k * (window.devicePixelRatio || 1)));
     canvas.width = Math.ceil((w + skin.bleed * 2) * ratio);
     canvas.height = Math.ceil((h + skin.bleed * 2) * ratio);
     if (size !== `${w}x${h}`) [size, art] = [`${w}x${h}`, skin.build(w, h)];
@@ -92,6 +97,9 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
       clearTimeout(timer);
       panel.style.cssText = panel.style.cssText.replace(/(?:opacity|clip-path|filter):[^;]*;?/g, '');
       panel.style.transform = BASE;
+    },
+    stir() {
+      stirred = performance.now();
     },
     fit,
     seek(ms) {
