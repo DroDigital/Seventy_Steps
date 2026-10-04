@@ -9,6 +9,7 @@
  * be inverted (playtest round 12).
  */
 
+import { noteLockAsked } from './mouseLock';
 import { INPUT, SIM } from '../data/tuning';
 import { keyLayout, type Action } from './bindings';
 import { useDevice } from './device';
@@ -109,6 +110,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   };
   const captured = (): boolean => document.pointerLockElement === canvas;
   const capture = (): void => {
+    noteLockAsked();
     try {
       const r: unknown = canvas.requestPointerLock();
       if (r instanceof Promise) r.catch(() => undefined);

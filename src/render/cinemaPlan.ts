@@ -27,7 +27,7 @@ const smooth = (x: number): number => x * x * (3 - 2 * x);
 
 export function ease(kind: Ease, x: number): number {
   const k = clamp(x, 0, 1);
-  return kind === 'linear' ? k : kind === 'in' ? k * k : kind === 'out' ? 1 - (1 - k) ** 2 : smooth(k);
+  return kind === 'linear' ? k : kind === 'in' ? k * k : kind === 'out' ? 1 - (1 - k) ** 2 : kind === 'glide' ? k * k * k * (k * (k * 6 - 15) + 10) : smooth(k);
 }
 
 /** The seconds a scene lasts: its shots, one after another. */

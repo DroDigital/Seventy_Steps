@@ -46,6 +46,8 @@ export interface Cinema {
   readonly active: boolean;
   /** The simulation stands still under it. */
   readonly frozen: boolean;
+  /** Which scene is playing ('' when none). */
+  readonly sceneId: string;
   /** Seconds into the scene playing (0 when none). */
   readonly time: number;
   /** One fixed step's time: moves the scene on; whether the world takes its step. */
@@ -101,14 +103,23 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y), z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height: body.height };
   };
 
+  let pulled = 1; // how much of its line to the head the lens keeps: it is pulled in at once, but lets out slowly (a pop at a wall's edge is a step in the picture)
+  let pulledAt = 0;
+
   /** The lens pulled in along its line to `from` (the head of whoever it circles) short of anything between, and kept above the ground. */
   const clear = (from: V3, pos: V3): V3 => {
     const len = Math.hypot(pos.x - from.x, pos.y - from.y, pos.z - from.z);
     let k = 1;
     if (len > 1e-3) k = clamp(Math.max(raycast(g.world, from, pos) * len - KEEP, Math.min(len, KEEP + 0.5)) / len, 0, 1);
+    const now = performance.now();
+    const dt = clamp((now - pulledAt) / 1000, 0, 0.1);
+    pulledAt = now;
+    pulled = k < pulled ? k : pulled + (k - pulled) * (1 - Math.exp(-dt / 0.45));
+    k = pulled;
     const x = from.x + (pos.x - from.x) * k;
     const z = from.z + (pos.z - from.z) * k;
-    return { x, y: Math.max(from.y + (pos.y - from.y) * k, g.world.ground(x, z) + CAMERA.clearance + 0.2), z };
+    const [y, floor] = [from.y + (pos.y - from.y) * k, g.world.ground(x, z) + CAMERA.clearance + 0.2];
+    return { x, y: (y + floor + Math.hypot(y - floor, 0.3)) / 2, z }; // above the ground, by a soft maximum: no kink where the lens rises off it
   };
 
   const perform = (r: Run, b: Beat): void => {
@@ -132,6 +143,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   const begin = (scene: Scene, cast: Cast, resolve: () => void): void => {
     const r: Run = { scene, cast, length: sceneLength(scene), t: 0, resolve, skipAt: null, hinted: false, credit: 0, shakes: [] };
     run = r;
+    pulled = 1;
     ui.bars(true);
     if (scene.dark) ui.fade('black', 0);
     for (const b of beatsBetween(scene, -1, 0)) perform(r, b);
@@ -183,6 +195,9 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     },
     get frozen() {
       return !!run && run.scene.sim === 'frozen';
+    },
+    get sceneId() {
+      return run?.scene.id ?? '';
     },
     get time() {
       return run?.t ?? 0;

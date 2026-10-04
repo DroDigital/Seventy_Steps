@@ -10,9 +10,11 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { ACTS, SEATED } from '../data/npcActs';
 import { npcDef, type NpcLook } from '../data/npcs';
 import { cylinder, part, shade, skeleton, type Figure } from './figures';
 import { skirtPanel } from './investigator';
+import { addProps } from './npcProps';
 import { box, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, type Rgb } from './palette';
 
@@ -163,5 +165,7 @@ export function npcFigure(id: string): Figure {
     part(f, knee, mergeGeometries([box(0.15, 0.43, 0.17, 0, -0.2, 0, robe ? coatC : trouser), box(0.165, 0.1, 0.185, 0, -0.38, 0, leather)]), 'cloth');
     part(f, foot, mergeGeometries([box(0.14, 0.05, 0.26, 0, -0.02, 0.07, leather), box(0.14, 0.03, 0.08, 0, -0.01, 0.17, shade(leather, 0.8))]), 'cloth');
   }
+  const act = ACTS[id];
+  if (act) addProps(f, act.kind, SEATED.has(act.kind)); // what they hold, and sit on, while they are at what they do (round 39)
   return f;
 }

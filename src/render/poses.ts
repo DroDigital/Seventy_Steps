@@ -6,9 +6,12 @@
  * thigh; positive bends a knee back), y turns. Every pose ends settled on the ground (gait.ts).
  */
 
+import type { ActKind } from '../data/npcActs';
 import type { MoveDef } from '../data/moves';
 import type { Figure } from './figures';
 import { settle, stride, type Ground } from './gait';
+import { actPose } from './npcActs';
+import { showProps } from './npcProps';
 import { swing } from './swings';
 
 export interface PoseInput {
@@ -23,6 +26,7 @@ export interface PoseInput {
   time: number;
   ground?: Ground; // the lie of the land about the feet (flat when absent)
   kneel?: number; // 0–1: kneeling before an Elder Sign, eased in and out (round 15)
+  act?: { kind: ActKind; k: number }; // what a person is doing, and how far into it (0–1: they sit down, take it up; round 39)
 }
 
 const clamp01 = (t: number): number => Math.min(1, Math.max(0, t));
@@ -224,6 +228,10 @@ export function pose(f: Figure, p: PoseInput): void {
   if (!d || p.move === null) {
     stride(f, p.speed, p.stride, p.time, p.guard);
     if (p.kneel) kneel(f, p.kneel);
+    if (p.act) {
+      actPose(f, p.act.kind, p.act.k, p.time);
+      showProps(f, p.act.k > 0.02);
+    }
   }
   else if (p.move === 'death') fall(f, p.frame);
   else if (p.move === 'stagger' || p.move === 'guardBreak') reel(f, p.frame / d.frames, p.move === 'guardBreak' ? 1.6 : 1);

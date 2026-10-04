@@ -15,6 +15,7 @@ import { waterAbout } from './render/reflection';
 import { LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { createActorViews } from './render/actorViews';
+import { createNpcVeil } from './render/npcVeil';
 import { createGameAudio } from './render/audio/gameAudio';
 import { playMenuMusic } from './render/audio/music';
 import { createBossFx } from './render/bossFx';
@@ -62,6 +63,7 @@ import { startLookTest } from './ui/lookTest';
 import { nextFrame, spriteAtlas } from './ui/loading';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
+import { noteLockAsked } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
 import { createDialogue } from './ui/dialogue';
@@ -111,6 +113,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty });
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
+    noteLockAsked();
     try {
       const r: unknown = canvas.requestPointerLock();
       if (r instanceof Promise) r.catch(() => undefined);
@@ -119,9 +122,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     }
   };
   onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
+  const npcVeil = createNpcVeil(!!opts.intro && !opts.arena && settings.cutscenes > 0.5, { get active() { return cinema.active; }, get sceneId() { return cinema.sceneId; } }); // no one in view through the wake (round 39)
   let spawned = false; // the world's own sound (ambience, drones, the realm's music) waits for the spawn: until then the theme plays on alone (round 29)
   const reveal = (): void => {
     spawned = true;
+    npcVeil.arm(performance.now() / 1000);
     shell.music?.fadeOut(); // the title's theme plays on until the world shows, then sinks away under its ambience
     shell.music = undefined;
     if (opts.intro) director.wake(); // a new game: the investigator wakes in the dream (round 20)
@@ -151,7 +156,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   });
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);
-  const views = createActorViews(scene, game);
+  const views = createActorViews(scene, game, () => npcVeil.value(performance.now() / 1000));
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
   const hidden = createHiddenViews(scene, game);
   const fights = createFightViews(scene, game);
@@ -221,7 +226,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       render(blend) {
         const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
-        const time = simTime + alpha / SIM.hz;
+        const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         input.sensitivity = settings.sensitivity;
         input.invertY = settings.invertY > 0.5;
         FEEL.shake = settings.shake;

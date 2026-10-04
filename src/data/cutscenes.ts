@@ -10,7 +10,7 @@ import type { SampleSetId } from './samples';
 import type { StingerId } from './sounds';
 
 export type Subject = 'target' | 'player' | 'sign'; // the horror, the investigator, the Elder Sign the scene is at
-export type Ease = 'linear' | 'in' | 'out' | 'inout';
+export type Ease = 'linear' | 'in' | 'out' | 'inout' | 'glide'; // glide: slow out of rest and slow into it, with no jolt at either end
 export type Tint = 'black' | 'white' | 'red' | 'violet' | 'gold' | 'clear'; // what the screen goes to; clear lifts it
 
 /** A camera that stands `dist` from `on` at `yaw` from the line between it and the other party (0 between them, 180 behind `on`), and looks. Pairs run from the shot's first frame to its last. */
@@ -147,9 +147,8 @@ export const WAKE: Scene = {
   sim: 'frozen',
   blend: [0, 1.6],
   shots: [
-    shot({ dur: 2.8, on: 'player', yaw: to(206, 194), dist: to(3, 2.7), up: to(0.2, 0.4), look: to(0.3, 0.42), fov: to(46, 48), body: false, ease: 'out', sway: 0.35 }),
-    shot({ dur: 3.8, on: 'player', yaw: to(194, 180), dist: to(2.7, 3.7), up: to(0.4, 1.7), look: to(0.42, 0.76), fov: to(48, 57), body: false, sway: 0.3 }),
-    shot({ dur: 2.2, on: 'player', yaw: to(180, 176), dist: to(3.7, 4.3), up: to(1.7, 2.1), look: to(0.76, 0.89), fov: to(57, 60), body: false, ease: 'out', sway: 0.3 }),
+    // One move from first frame to last (round 39: three shots, each easing to a stop and away again, made the crane halt twice on its way up)
+    shot({ dur: 8.8, on: 'player', yaw: to(206, 176), dist: to(3, 4.3), up: to(0.2, 2.1), look: to(0.3, 0.89), fov: to(46, 60), body: false, ease: 'glide', sway: 0.3 }),
   ],
   beats: [
     { at: 0.3, sound: 'found', gain: 0.85 },

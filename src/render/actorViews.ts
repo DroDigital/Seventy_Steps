@@ -12,6 +12,8 @@ import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
+import type { ActKind } from '../data/npcActs';
+import { actOf } from '../systems/npcLife';
 import { cadence, type Ground } from './gait';
 import { FX_PREFIX } from './fightViews';
 import { SHRINE_MODEL } from './signViews';
@@ -31,6 +33,9 @@ interface View {
   hitAt: number; // sim seconds of the last landed blow
   blend: PoseBlend; // eases one pose into the next when the move or guard changes
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
+  act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
+  actK: number;
+  veil: number; // how hidden a person is (npcVeil.ts), as last set on their materials
 }
 
 export interface ActorViews {
@@ -52,7 +57,8 @@ function dispose(f: Figure): void {
   for (const m of f.materials) m.dispose();
 }
 
-export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
+/** `veil`: how hidden the people are, 1 to 0 (render/npcVeil.ts: through the wake they are not seen). */
+export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: number) => number = () => 0): ActorViews {
   const views = new Map<Entity, View>();
   const simTime = (): number => g.frame / SIM.hz;
   const tracer = new THREE.Mesh(
@@ -92,7 +98,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0 });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, veil: 0 });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -115,6 +121,13 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const f = v.figure;
     f.root.visible = !!tr && !g.ecs.c.dead.has(id);
     if (!tr || !f.root.visible) return;
+    const person = g.ecs.c.npc.has(id);
+    if (person) { // out of sight through the wake, then coming into view by a dither (npcVeil.ts)
+      const hidden = veil(time);
+      if (hidden !== v.veil) for (const m of f.materials) m.uniforms.uGhost.value = hidden;
+      v.veil = hidden;
+      if (hidden >= 1) return void (f.root.visible = false);
+    }
     const a = g.ecs.c.actor.get(id);
     const lerp = (p: number, q: number): number => p + (q - p) * alpha;
     f.root.position.set(lerp(tr.prev.x, tr.pos.x), lerp(tr.prev.y, tr.pos.y), lerp(tr.prev.z, tr.pos.z));
@@ -145,7 +158,15 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       if (u >= 1) rising = null;
     } else v.kneel += ((kneeling ? 1 : 0) - v.kneel) * Math.min(1, dt * 3);
     if (v.kneel < 0.004 && !kneeling) v.kneel = 0; // up: the walk is the walk's again
-    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time, ground: groundAbout(f.root), kneel: v.kneel });
+    let act: { kind: ActKind; k: number } | undefined;
+    if (person) { // sitting down to it, standing up from it, as they take it up and put it down (round 39)
+      const doing = actOf(g, id);
+      if (doing) v.act = doing;
+      v.actK += ((doing ? 1 : 0) - v.actK) * Math.min(1, dt * 2.2);
+      if (!doing && v.actK < 0.004) [v.actK, v.act] = [0, null];
+      if (v.act && v.actK > 0) act = { kind: v.act, k: v.actK };
+    }
+    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act });
     v.blend.apply(time);
     if (f.arms && id === g.player.id) for (const [w, m] of Object.entries(f.arms)) m.visible = w === g.player.weapon; // the weapon in hand
     if (f.gun && id === g.player.id) {

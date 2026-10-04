@@ -125,7 +125,7 @@ describe('the wake (round 22)', () => {
     expect(rise.rise).toBe(WAKE_RISE);
     expect(WAKE_RISE).toBeGreaterThanOrEqual(3);
     expect(rise.at + WAKE_RISE).toBeLessThan(sceneLength(WAKE) - 1); // standing a moment before the scene lets go
-    expect(rise.at).toBeGreaterThan(shotAt(WAKE, 0).shot.dur - 1); // kneeling for the shot that opens it
+    expect(rise.at).toBeGreaterThan(2); // kneeling through the opening moments of the one move
     const captions = WAKE.beats.filter((b) => b.caption);
     for (const c of captions) expect(c.at + (c.hold ?? 3)).toBeLessThan(sceneLength(WAKE)); // each said in full before the end
   });
