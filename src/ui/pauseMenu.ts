@@ -5,6 +5,7 @@
  * the desktop shell a way out to the desktop (playtest round 12).
  */
 
+import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
 import { ACCENT, button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
 import { menuKeys } from './menuKeys';
@@ -30,14 +31,13 @@ export interface PauseMenu {
   readonly open: boolean;
 }
 
-const RESUME_MS = 600; // how soon after resuming a let-go mouse is the browser's own Esc, not a pause
+const RESUME_MS = 1000; // how soon after the mouse was asked for (by any menu closing) a let-go is the browser's own Esc, not a pause
 
 export function createPauseMenu(o: PauseOptions): PauseMenu {
   const screen = createScreen(6);
-  let resumedAt = -1e9;
+  let retriedAt = -1e9;
   const resume = (): void => {
     screen.close();
-    resumedAt = performance.now();
     o.resume();
   };
   const main: Page = {
@@ -68,8 +68,14 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
   addEventListener('keydown', (e) => e.code === 'Escape' && !e.repeat && pause());
   document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement !== null || !document.hasFocus()) return;
-    // Resuming by Esc takes the mouse in the same key press the browser takes it back with (Esc lets a locked mouse go): the lock is let go at once. That is not the player leaving the game; the mouse is taken again a moment later, when the key has risen.
-    if (performance.now() - resumedAt < RESUME_MS) return void setTimeout(() => !menuOpen() && !o.held?.() && o.resume(), 150);
+    // Leaving a menu by Esc (this one, the Elder Sign's, a shop's) takes the mouse in the same key press the browser takes it back with (Esc lets a locked mouse go): the lock is let go at once. That is not the player leaving the game; the mouse is taken again a moment later, when the key has risen.
+    if (lockJustAsked(RESUME_MS)) {
+      if (performance.now() - retriedAt > 3000) { // once: if the browser keeps letting it go, it is the player's hand
+        retriedAt = performance.now();
+        setTimeout(() => !menuOpen() && !o.held?.() && o.resume(), 150);
+      }
+      return;
+    }
     pause();
   });
   addEventListener('blur', pause);
