@@ -14,7 +14,7 @@ import { useDevice, onDeviceChange } from '../core/device';
 import { activePad, muteHeldPad, type PadReading } from '../core/pads';
 import { SERIF } from './hudKit';
 import { CSS, frame, INK, tabJustChanged } from './menuParts';
-import { attachSkin, SKIN } from './menuSkin';
+import { attachSkin, BASE, SKIN } from './menuSkin';
 import { SCALED_LAYER } from './uiScale';
 
 export interface Page {
@@ -88,18 +88,40 @@ function move(panel: HTMLElement, by: number): void {
 }
 
 /**
- * How a page comes in when the screen is already open (round 38): quick and soft, out of a little blur and a little
- * lower than it will stand, each part a moment after the one above it. A tab changes only the body.
+ * How a page comes in when the screen is already open (round 38): the page that was there is lifted away (a copy of it
+ * drifts off the way it leaves, blurring, while the mist stirs) and the new one drifts in from the way it comes, out of
+ * a little blur, each part a moment after the one above. Choosing deeper (Settings, Arms) moves left; coming back, right.
+ * A tab changes only the body, in place. Under reduced motion, nothing moves.
  */
-function bring(panel: HTMLElement, tab: boolean): void {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+function bring(panel: HTMLElement, ghost: HTMLElement | null, tab: boolean, deeper: boolean): void {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return void ghost?.remove();
+  const way = deeper ? 1 : -1;
+  const ease = 'cubic-bezier(.2,.7,.25,1)';
+  if (ghost) {
+    ghost.animate([{ opacity: 1, filter: 'blur(0)', transform: `${BASE} translateX(0)` }, { opacity: 0, filter: 'blur(7px)', transform: `${BASE} translateX(${-22 * way}px)` }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
+    setTimeout(() => ghost.remove(), 260); // (not by the animation's end: a page changed again in between must not leave a copy behind)
+  }
   const parts = tab ? [...panel.querySelectorAll<HTMLElement>(':scope > .scroll')] : [...panel.children].filter((c): c is HTMLElement => c instanceof HTMLElement);
   parts.forEach((part, i) =>
     part.animate(
-      [{ opacity: 0, filter: 'blur(6px)', transform: 'translateY(8px)' }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
-      { duration: tab ? 150 : 190, delay: tab ? 0 : Math.min(i, 5) * 24, easing: 'cubic-bezier(.2,.7,.25,1)', fill: 'backwards' },
+      [{ opacity: 0, filter: 'blur(7px)', transform: tab ? 'translateY(8px)' : `translateX(${26 * way}px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
+      { duration: tab ? 150 : 280, delay: tab ? 0 : 70 + Math.min(i, 5) * 30, easing: ease, fill: 'backwards' },
     ),
   );
+}
+
+/** A still copy of the panel as it stands, laid over it (it cannot be pressed): the page that is being left. */
+function leave(layer: HTMLElement, panel: HTMLElement): HTMLElement {
+  const ghost = panel.cloneNode(true) as HTMLElement;
+  ghost.dataset.ghost = ''; // (it keeps the menu's look: it is the same page, still)
+  ghost.inert = true;
+  ghost.style.pointerEvents = 'none';
+  ghost.style.width = `${panel.offsetWidth}px`;
+  ghost.style.maxHeight = `${panel.offsetHeight}px`;
+  ghost.style.overflow = 'hidden';
+  ghost.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+  layer.append(ghost);
+  return ghost;
 }
 
 function back(top: Entry): void {
@@ -232,10 +254,13 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       const at = same ? focused() : (memory.get(page) ?? page.focus ?? 0);
       if (entry && !same) memory.set(entry.page, Math.max(0, focused()));
       page.redraw = () => void (entry?.page === page && self.show(page));
+      const tabbed = tabJustChanged();
+      const change = entry !== null && !same && !tabbed;
+      const ghost = change ? leave(layer, panel) : null; // the page being left, to drift away over the new one
       panel.replaceChildren();
       page.build(panel);
-      const tabbed = tabJustChanged();
-      if (entry && (!same || tabbed)) bring(panel, tabbed); // another page, or another tab: it comes in (round 38)
+      if (entry && (!same || tabbed)) bring(panel, ghost, tabbed, !memory.has(page)); // another page, or another tab: it comes in (round 38)
+      if (change) skinned?.stir();
       root.style.display = 'block';
       if (entry) entry.page = page;
       else {

@@ -22,7 +22,6 @@ export interface PauseOptions {
   journal?: (back: () => void, show: (p: Page) => void) => Page; // the journal's page (not in the arena)
   arms?: (back: () => void, show: (p: Page) => void) => Page; // the weapons owned
   achievements?: (back: () => void) => Page; // the achievements, earned or not (round 12)
-  next?: () => string | null; // what the story asks next, in a line: a return to the game begins with where it was left (round 38)
   quit(): void;
   held?: () => boolean; // something has the screen (a cutscene, round 20): the pause menu keeps out of it
 }
@@ -41,14 +40,9 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     back: resume,
     build(p) {
       title(p, 'PAUSED');
-      const next = o.next?.();
-      if (next) {
-        const line = el(p, 'div', `NEXT  ·  ${next}`, 'margin:-6px 14px 8px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7');
-        [line.title, line.dataset.pin] = [next, ''];
-      }
       const list = el(p, 'div');
       button(list, 'Resume', resume, true, 'Return to the dream.');
-      const rule = (): void => void el(list, 'div', '', `height:1px;margin:3px 14px;background:${ACCENT}26`);
+      const rule = (): void => void el(list, 'div', '', `height:1px;margin:3px 14px;background:linear-gradient(90deg,transparent,${ACCENT}40 20%,${ACCENT}40 80%,transparent)`);
       rule();
       if (o.map) button(list, 'Map', () => [screen.close(), o.map!()], true, 'The lands you have walked, the signs lit, and the way to travel between them.');
       if (o.journal) button(list, 'Journal', () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))), true, 'What is asked of you, the tomes read, and the creatures beheld.');
