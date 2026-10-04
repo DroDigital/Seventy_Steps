@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ACTS, SEATED } from '../src/data/npcActs';
 import { NPCS } from '../src/data/npcs';
 import { npcFigure } from '../src/render/npcFigures';
+import { pipeBeat } from '../src/render/npcActs';
 import { pose } from '../src/render/poses';
 
 const input = (kind: (typeof ACTS)[string]['kind'], k: number, time: number) => ({ move: null, def: undefined, frame: 0, speed: 0, stride: 0, guard: false, flinch: 0, rollYaw: 0, time, act: { kind, k } });
@@ -53,5 +54,34 @@ describe('the people at what they do (round 39)', () => {
     const before = shown();
     pose(f, input('drink', 1, 1));
     expect(shown()).toBeGreaterThan(before);
+  });
+});
+
+describe('Peaslee and Morgan at their places (round 39)', () => {
+  it('Peaslee has a chair and a table set where he is put, and a book; Morgan a pipe with its bowl and a mouth to draw it at', () => {
+    const peaslee = npcFigure('peaslee');
+    expect(peaslee.fixture?.children.length).toBeGreaterThan(1);
+    const morgan = npcFigure('morgan');
+    expect(morgan.pipe && morgan.mouth).toBeTruthy();
+    expect(morgan.fixture).toBeUndefined();
+  });
+
+  it('the pipe is drawn on and let out for a good part of each cycle, never both at once', () => {
+    let drawn = 0;
+    let out = 0;
+    for (let t = 0; t < 15; t += 0.1) {
+      const b = pipeBeat(t);
+      if (b.draw > 0.5) drawn++;
+      if (b.out > 0.5) out++;
+      expect(Math.min(b.draw, b.out), `t=${t}`).toBeLessThan(0.3);
+    }
+    expect(drawn).toBeGreaterThan(20);
+    expect(out).toBeGreaterThan(8);
+  });
+
+  it('a seated reader sits on the chair: the thighs level, the soles on the ground', () => {
+    const f = npcFigure('peaslee');
+    pose(f, input('read', 1, 3));
+    expect(Math.abs(sole(f))).toBeLessThan(0.2);
   });
 });

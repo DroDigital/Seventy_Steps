@@ -20,7 +20,7 @@ import { hourOf, phaseOf, type Hour } from './clock';
 import type { Game } from './components';
 import { npcPlace } from './npcs';
 import { clearStep, placeFor, type Spot } from './npcSpots';
-import type { ActKind } from '../data/npcActs';
+import { ACTS, type ActKind } from '../data/npcActs';
 
 const SPEED = 1.1; // m/s: an unhurried walk
 const ACCEL = 1.8; // m/s²: they get up to it, and ease off as they near a turn
@@ -88,6 +88,12 @@ const between = (g: Game, [lo, hi]: readonly [number, number]): number => lo + (
 /** Whether `e` lives a round of its own (its turning is its own: npcs.ts leaves it, but for the one being talked with). */
 export const managed = (g: Game, e: Entity): boolean => !!walkers.get(g)?.has(e);
 
+/** Where `e` does what they do, and what, if they have a place of their own (the view stands their chair or post there). */
+export const postOf = (g: Game, e: Entity): Spot | null => {
+  const w = walkers.get(g)?.get(e);
+  return w && w.kind !== null && ACTS[g.ecs.c.npc.get(e) ?? '']?.post ? w.spot : null;
+};
+
 /** What `e` is doing now, if they are at it (the view sits them down, or lifts the book). */
 export const actOf = (g: Game, e: Entity): ActKind | null => {
   const w = walkers.get(g)?.get(e);
@@ -127,7 +133,8 @@ export function npcLife(g: Game, dt: number): void {
       if (g.player.listening !== e) tr.yaw = turnToward(tr.yaw, yawOf(me.x - tr.pos.x, me.z - tr.pos.z), TURN * dt);
       continue;
     }
-    const busy = hour !== 'waning' && w.kind !== null; // the last hour is dozing on their feet, whatever they do
+    const posted = !!ACTS[id]?.post; // one with a place of their own keeps to it all night, and never strolls off
+    const busy = (hour !== 'waning' || posted) && w.kind !== null; // the last hour is dozing on their feet, whatever they do
     const reach = busy ? BREATHER : ROUND[hour].reach;
     tr.prev = { ...tr.pos };
     tr.prevYaw = tr.yaw;
@@ -138,7 +145,7 @@ export function npcLife(g: Game, dt: number): void {
         w.pace = 0;
         tr.yaw = turnToward(tr.yaw, w.spot.yaw, TURN * dt);
         w.doing = Math.abs(wrapAngle(w.spot.yaw - tr.yaw)) < 0.25;
-        if (w.doing && (w.left -= dt) <= 0) [w.breather, w.left, w.wait] = [true, between(g, SPELL), 0];
+        if (w.doing && !posted && (w.left -= dt) <= 0) [w.breather, w.left, w.wait] = [true, between(g, SPELL), 0];
         continue;
       }
     }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DOCUMENTS } from '../src/data/documents';
+import { ACTS } from '../src/data/npcActs';
 import { NPCS } from '../src/data/npcs';
 import { QUESTS } from '../src/data/quests';
 import { getEntity } from '../src/data/registry';
@@ -32,7 +33,7 @@ describe('the people met in the dream', () => {
       expect(at, n.id).toBeDefined();
       expect(regionAt(at.x, at.z)?.id, n.id).toBe(sign.region);
       expect(Math.hypot(at.x - sign.rest.x, at.z - sign.rest.z), n.id).toBeGreaterThan(WORLD.reach);
-      expect(Math.hypot(at.x - sign.rest.x, at.z - sign.rest.z), n.id).toBeLessThan(6);
+      expect(Math.hypot(at.x - sign.rest.x, at.z - sign.rest.z), n.id).toBeLessThan(ACTS[n.id]?.post ? 16 : 6); // the two with a chair or a post of their own are across the quad
       const p = { x: at.x, y: world.ground(at.x, at.z), z: at.z };
       resolveCapsule(world, p, 0.35, 1.8);
       expect(Math.hypot(p.x - at.x, p.z - at.z), `${n.id} stands in something`).toBeLessThan(0.01);

@@ -24,6 +24,7 @@ export function clearStep(g: Game, a: XZ, b: XZ): boolean {
 export function placeFor(id: string, home: Spot): { kind: ActKind; spot: Spot } | null {
   const act = ACTS[id];
   if (!act) return null;
+  if (act.post) return { kind: act.kind, spot: { x: act.post.x, z: act.post.z, yaw: act.post.yaw } }; // exactly where they are put
   const turn = (hash2(id.length, [...id].reduce((h, c) => h + c.charCodeAt(0), 0), 3) - 0.5) * 1.1; // a little turned from the sign, each their own way
   return { kind: act.kind, spot: { x: home.x, z: home.z, yaw: home.yaw + turn } };
 }

@@ -12,7 +12,9 @@ import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
-import type { ActKind } from '../data/npcActs';
+import { ACTS, type ActKind, type Post } from '../data/npcActs';
+import { pipeBeat } from './npcActs';
+import type { Smoker } from './pipeSmoke';
 import { actOf } from '../systems/npcLife';
 import { cadence, type Ground } from './gait';
 import { FX_PREFIX } from './fightViews';
@@ -35,13 +37,14 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
-  veil: number; // how hidden a person is (npcVeil.ts), as last set on their materials
 }
 
 export interface ActorViews {
   update(alpha: number, time: number): void;
   /** The investigator, up from the knee, takes `seconds` over it (a cutscene's slow rise); otherwise they rise as fast as they move. */
   rise(seconds: number): void;
+  /** The smokers at their pipes this frame (render/pipeSmoke.ts draws the smoke). */
+  readonly smokers: readonly Smoker[];
   /** Where the glow light sits this frame (the Echo drop), or null. */
   readonly glow: THREE.Vector3 | null;
   /** Where the investigator's lantern flame is drawn this frame, or null while they are not. */
@@ -57,8 +60,7 @@ function dispose(f: Figure): void {
   for (const m of f.materials) m.dispose();
 }
 
-/** `veil`: how hidden the people are, 1 to 0 (render/npcVeil.ts: through the wake they are not seen). */
-export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: number) => number = () => 0): ActorViews {
+export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
   const views = new Map<Entity, View>();
   const simTime = (): number => g.frame / SIM.hz;
   const tracer = new THREE.Mesh(
@@ -68,6 +70,7 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
   tracer.visible = false;
   scene.add(tracer);
   let tracerUntil = -1;
+  let smokers: Smoker[] = [];
   const glowAt = new THREE.Vector3();
   let glow: THREE.Vector3 | null = null;
   const flameAt = new THREE.Vector3();
@@ -98,7 +101,7 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, veil: 0 });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0 });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -116,18 +119,29 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
     return (x, z) => Math.min(0.3, Math.max(-0.3, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry));
   }
 
+  /** One with a chair or a post of their own: they step clear of it as they stand, and the chair and table stay where they were set, whichever way the figure turns. */
+  function placeAt(f: Figure, v: View, post: Post): void {
+    const up = 1 - Math.min(1, Math.max(0, v.actK));
+    const away = post.rise * up * up * (3 - 2 * up);
+    const yaw = f.root.rotation.y;
+    f.root.position.x += Math.sin(yaw) * away;
+    f.root.position.z += Math.cos(yaw) * away;
+    const fx = f.fixture;
+    if (!fx) return;
+    const [dx, dz] = [post.x - f.root.position.x, post.z - f.root.position.z];
+    const [s, c] = [f.root.scale, Math.cos(yaw)];
+    const sn = Math.sin(yaw);
+    fx.position.set((dx * c - dz * sn) / s.x, (g.world.ground(post.x, post.z) - f.root.position.y) / s.y, (dx * sn + dz * c) / s.z);
+    fx.rotation.y = wrapAngle(post.yaw - yaw);
+    fx.scale.set(1 / s.x, 1 / s.y, 1 / s.z);
+  }
+
   function draw(id: Entity, v: View, alpha: number, time: number): void {
     const tr = g.ecs.c.transform.get(id);
     const f = v.figure;
     f.root.visible = !!tr && !g.ecs.c.dead.has(id);
     if (!tr || !f.root.visible) return;
     const person = g.ecs.c.npc.has(id);
-    if (person) { // out of sight through the wake, then coming into view by a dither (npcVeil.ts)
-      const hidden = veil(time);
-      if (hidden !== v.veil) for (const m of f.materials) m.uniforms.uGhost.value = hidden;
-      v.veil = hidden;
-      if (hidden >= 1) return void (f.root.visible = false);
-    }
     const a = g.ecs.c.actor.get(id);
     const lerp = (p: number, q: number): number => p + (q - p) * alpha;
     f.root.position.set(lerp(tr.prev.x, tr.pos.x), lerp(tr.prev.y, tr.pos.y), lerp(tr.prev.z, tr.pos.z));
@@ -136,6 +150,8 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
       f.root.position.x += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
       f.root.position.z += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
     }
+    const post = person ? ACTS[g.ecs.c.npc.get(id) ?? '']?.post : undefined; // one with a chair or a post of their own
+    if (post) placeAt(f, v, post);
     const dt = Math.min(0.1, Math.max(0, time - v.lastTime));
     v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
     v.stride += 2 * Math.PI * cadence(v.speed) * dt;
@@ -167,6 +183,11 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
       if (v.act && v.actK > 0) act = { kind: v.act, k: v.actK };
     }
     pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act });
+    if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
+      f.root.updateMatrixWorld(true);
+      const beat = pipeBeat(time + id * 1.7);
+      smokers.push({ bowl: f.pipe.getWorldPosition(new THREE.Vector3()), mouth: f.mouth.getWorldPosition(new THREE.Vector3()), out: beat.out * v.actK, draw: beat.draw * v.actK });
+    }
     v.blend.apply(time);
     if (f.arms && id === g.player.id) for (const [w, m] of Object.entries(f.arms)) m.visible = w === g.player.weapon; // the weapon in hand
     if (f.gun && id === g.player.id) {
@@ -185,6 +206,9 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
     rise(seconds) {
       rising = seconds > 0 ? { seconds, at: null } : null;
     },
+    get smokers() {
+      return smokers;
+    },
     get glow() {
       return glow;
     },
@@ -196,6 +220,7 @@ export function createActorViews(scene: THREE.Scene, g: Game, veil: (time: numbe
     },
     update(alpha, time) {
       sync();
+      smokers = [];
       glow = null;
       flame = null;
       muzzle = null;

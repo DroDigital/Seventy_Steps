@@ -15,7 +15,6 @@ import { waterAbout } from './render/reflection';
 import { LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { createActorViews } from './render/actorViews';
-import { createNpcVeil } from './render/npcVeil';
 import { createGameAudio } from './render/audio/gameAudio';
 import { playMenuMusic } from './render/audio/music';
 import { createBossFx } from './render/bossFx';
@@ -33,6 +32,7 @@ import { createWorldLife } from './render/worldLife';
 import { createWorldLights } from './render/worldLights';
 import { createHurtFx } from './render/hurtFx';
 import { createParticles } from './render/particles';
+import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
 import { createFightViews } from './render/fightViews';
 import { placeCamera } from './render/followCamera';
@@ -122,11 +122,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     }
   };
   onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
-  const npcVeil = createNpcVeil(!!opts.intro && !opts.arena && settings.cutscenes > 0.5, { get active() { return cinema.active; }, get sceneId() { return cinema.sceneId; } }); // no one in view through the wake (round 39)
   let spawned = false; // the world's own sound (ambience, drones, the realm's music) waits for the spawn: until then the theme plays on alone (round 29)
   const reveal = (): void => {
     spawned = true;
-    npcVeil.arm(performance.now() / 1000);
     shell.music?.fadeOut(); // the title's theme plays on until the world shows, then sinks away under its ambience
     shell.music = undefined;
     if (opts.intro) director.wake(); // a new game: the investigator wakes in the dream (round 20)
@@ -156,7 +154,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   });
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);
-  const views = createActorViews(scene, game, () => npcVeil.value(performance.now() / 1000));
+  const views = createActorViews(scene, game);
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
   const hidden = createHiddenViews(scene, game);
   const fights = createFightViews(scene, game);
@@ -164,6 +162,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const audio = createGameAudio(shell.engine, shell.drones, game);
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
   const particles = createParticles(scene);
+  const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
@@ -266,6 +265,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         signs.update(time, camera.position);
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
+        pipeSmoke.update(camera, time, views.smokers);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
         const fx = computeFx(state);

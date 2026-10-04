@@ -53,14 +53,38 @@ function breathe(f: Figure, k: number, t: number): void {
   f.head.rotation.y += 0.05 * Math.sin(t * 0.37 + 1) * k;
 }
 
+/** The smoker's draw on his pipe, and the breath let out after it (shared with the smoke: render/pipeSmoke.ts). */
+export function pipeBeat(t: number): { draw: number; out: number } {
+  return { draw: pulse(t, 15, 6, 5, 0.9), out: pulse(t, 15, 11.4, 2.2, 0.5) };
+}
+
 const ACTS: Readonly<Record<ActKind, Act>> = {
-  // A book held open at the chest in both hands; a page turned every while, and a glance up from it.
+  // Seated well back in a chair, a book held open in both hands before the chest; a page turned every while, a glance up from it, and now and then the shifting of a leg.
   read(f, k, t) {
     const turn = pulse(t, 11, 8, 1.5);
     const glance = pulse(t, 17, 12, 2.4, 0.7);
-    arms(f, k, [-0.35, -1.75, 0.33], [-0.35 - 0.2 * turn, -1.75 - 0.2 * turn, 0.33 - 0.15 * turn]);
-    to(f.head, k * (1 - glance), 0.42);
-    to(f.head, k * glance, -0.05, 0.5 * Math.sin(t * 0.9));
+    const shift = pulse(t, 23, 15, 2.2, 0.8);
+    sit(f, k);
+    to(f.legR, k * shift, -1.62, 0.28);
+    arms(f, k, [-0.42, -1.5, 0.33], [-0.42 - 0.2 * turn, -1.5 - 0.2 * turn, 0.33 - 0.15 * turn]);
+    to(f.torso, k, -0.02 + 0.04 * shift);
+    to(f.head, k * (1 - glance), 0.5 + 0.03 * Math.sin(t * 0.5));
+    to(f.head, k * glance, -0.05, 0.45 * Math.sin(t * 0.9));
+    breathe(f, k, t);
+  },
+  // Leaning back against a post, one foot crossed over the other, an arm across the chest; the other hand with the pipe: held at the chest, now and then up to the mouth for a long draw, and a breath let out.
+  lounge(f, k, t) {
+    const { draw, out } = pipeBeat(t);
+    const idle = pulse(t, 19, 4, 3.5, 1);
+    f.body.rotation.x -= 0.2 * k;
+    f.body.position.z -= 0.17 * k;
+    f.body.rotation.z += 0.025 * k;
+    to(f.legR, k, -0.06, 0.06, -0.22);
+    to(f.legL, k, 0.1, 0, 0.04);
+    to(f.footR, k, 0.12 * pulse(t, 14, 9, 1.2, 0.3) * Math.sin(t * 9), 0.3);
+    arms(f, k, [-0.4 - 0.25 * draw, -1.2 - 1.3 * draw, 0.2], [-0.35, -1.65, 0.55]);
+    to(f.torso, k, -0.02 - 0.03 * draw);
+    to(f.head, k, -0.1 - 0.12 * out + 0.06 * draw, 0.45 * idle * Math.sin(t * 0.8) + 0.05 * Math.sin(t * 0.3));
     breathe(f, k, t);
   },
   // Seated, a notebook on the knee, a pen: scribbling, then a pause to look up and think.
