@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import type { ActKind } from '../data/npcActs';
+import type { ActKind, Post } from '../data/npcActs';
 import { cylinder, part, type Figure } from './figures';
 import { box } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb as shade, type Rgb } from './palette'; // (shade, here: figures.ts reaches this file as it is made, and its own is not yet there)
@@ -50,6 +50,10 @@ const HELD: Readonly<Record<ActKind, readonly { hand: 'R' | 'L'; geo: () => THRE
   vial: [{ hand: 'R', glow: 0.5, geo: () => mergeGeometries([held(0.032, 0.032, 0.12, 0, 0.03, 0.07, GLASS), held(0.022, 0.022, 0.07, 0, 0.03, 0.06, shade(ANOMALY.green, 0.8)), held(0.026, 0.026, 0.02, 0, 0.03, 0.14, WOOD)]) }],
   watch: [{ hand: 'R', geo: () => mergeGeometries([held(0.07, 0.07, 0.014, 0, 0.04, 0.04, BRASS), held(0.056, 0.056, 0.004, 0, 0.04, 0.049, PAPER), held(0.008, 0.008, 0.12, 0, 0.0, -0.04, BRASS)]) }],
   lean: [],
+  lounge: [ // the pipe, in the right hand: its bowl and stem, and the ember (the smoke is drawn apart: pipeSmoke.ts)
+    { hand: 'R', geo: () => mergeGeometries([held(0.016, 0.016, 0.12, 0, 0, 0.07, WOOD), held(0.05, 0.05, 0.06, 0, 0, 0.145, shade(WOOD, 0.65)), held(0.05, 0.05, 0.012, 0, 0, 0.178, shade(WOOD, 0.45))]) },
+    { hand: 'R', glow: 1, geo: () => held(0.032, 0.032, 0.01, 0, 0, 0.182, EMBER) },
+  ],
 };
 
 /** What stands under those who sit, and across their knees. */
@@ -69,9 +73,48 @@ interface Props {
 }
 const made = new WeakMap<Figure, Props>();
 
-/** Builds what `kind` holds and sits on into `f`, out of sight till they are at it. */
-export function addProps(f: Figure, kind: ActKind, seated: boolean): void {
+/** A reader's corner: an armchair of dark wood with a worn cushion, and a small round table at its side with a few books and a cup. Standing about the seat's own centre, facing +z, as the figure does. */
+function chairSet(f: Figure): THREE.Group {
+  const g = new THREE.Group();
+  const wood = shade(WOOD, 0.9);
+  const cushion = shade(LEATHER, 1.1);
+  const legs = [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].map(([x, z]) => box(0.045, 0.4, 0.045, x, 0.2, z - 0.08, wood));
+  const frame = mergeGeometries([
+    ...legs,
+    box(0.5, 0.05, 0.48, 0, 0.405, -0.08, wood), // the seat
+    box(0.44, 0.07, 0.42, 0, 0.465, -0.08, cushion),
+    box(0.045, 0.52, 0.045, -0.21, 0.67, -0.29, wood), box(0.045, 0.52, 0.045, 0.21, 0.67, -0.29, wood), // the back's posts
+    box(0.46, 0.09, 0.04, 0, 0.93, -0.29, shade(wood, 1.1)), box(0.38, 0.3, 0.035, 0, 0.7, -0.29, cushion),
+    box(0.04, 0.04, 0.34, -0.25, 0.64, -0.12, wood), box(0.04, 0.04, 0.34, 0.25, 0.64, -0.12, wood), // the arms
+    box(0.04, 0.2, 0.04, -0.25, 0.53, -0.01, wood), box(0.04, 0.2, 0.04, 0.25, 0.53, -0.01, wood),
+  ]);
+  part(f, g, frame, 'wood');
+  const table = mergeGeometries([
+    cylinder(0.27, 0.27, 0.035, 0.575, shade(WOOD, 1.15)), cylinder(0.04, 0.05, 0.54, 0.29, wood), cylinder(0.19, 0.2, 0.03, 0.015, wood),
+    box(0.2, 0.05, 0.14, -0.04, 0.62, 0.0, shade(LEATHER, 0.9)), box(0.19, 0.04, 0.13, -0.03, 0.665, 0.01, shade(PAPER, 0.8)), box(0.17, 0.035, 0.12, -0.05, 0.7, -0.01, shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.5)), // three books
+    cylinder(0.04, 0.03, 0.06, 0.64, shade(BASE.bone, 1.5)), box(0.05, 0.03, 0.012, 0.075, 0.64, 0, shade(BASE.bone, 1.5)), // a cup and its handle
+  ]);
+  const t = part(f, g, table, 'wood');
+  t.position.set(-0.92, 0, -0.05);
+  f.root.add(g);
+  return g;
+}
+
+/** Builds what `kind` holds and sits on into `f`, out of sight till they are at it; for one with a place of their own, the chair set or the pipe's markers. */
+export function addProps(f: Figure, kind: ActKind, seated: boolean, post?: Post): void {
   const p: Props = { seat: null, lap: null, held: [] };
+  if (post?.fixture === 'chair') {
+    f.fixture = chairSet(f);
+    seated = false; // the chair is the world's, not the figure's
+  }
+  if (kind === 'lounge') {
+    f.pipe = new THREE.Object3D(); // the bowl's top, in the right hand's own frame
+    f.pipe.position.set(0, 0, 0.19);
+    f.handR.add(f.pipe);
+    f.mouth = new THREE.Object3D();
+    f.mouth.position.set(0, 0.065, 0.15);
+    f.head.add(f.mouth);
+  }
   for (const h of HELD[kind]) {
     const mesh = part(f, h.hand === 'R' ? f.handR : f.handL, h.geo(), 'cloth', h.glow ?? 0);
     mesh.visible = false;

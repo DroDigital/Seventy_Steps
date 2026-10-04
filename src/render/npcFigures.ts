@@ -176,6 +176,6 @@ export function npcFigure(id: string): Figure {
   }
   f.root.scale.set(who.build?.[1] ?? 1, who.build?.[0] ?? 1, who.build?.[1] ?? 1); // each their own height and girth
   const act = ACTS[id];
-  if (act) addProps(f, act.kind, SEATED.has(act.kind)); // what they hold, and sit on, while they are at what they do (round 39)
+  if (act) addProps(f, act.kind, SEATED.has(act.kind), act.post); // what they hold, and sit on, while they are at what they do (round 39)
   return f;
 }

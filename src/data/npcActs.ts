@@ -8,16 +8,28 @@
 
 export type ActKind =
   | 'read' | 'write' | 'smoke' | 'gaze' | 'drink' | 'whittle' | 'map'
-  | 'polish' | 'mend' | 'brood' | 'key' | 'vial' | 'watch' | 'lean';
+  | 'polish' | 'mend' | 'brood' | 'key' | 'vial' | 'watch' | 'lean' | 'lounge';
+
+/** A place of their own, in the world's own coordinates, with something there to sit on or lean against (round 39). */
+export interface Post {
+  x: number;
+  z: number;
+  yaw: number; // the way they face
+  fixture: 'chair' | 'post'; // a chair set with a table and a book, or a street lamp's post at their back
+  rise: number; // metres they step forward as they stand up from it, so the chair or the post is not in them
+}
 
 export interface Act {
   kind: ActKind;
+  post?: Post; // those with one keep to it, all night: no breathers, no dozing at the sign
 }
 
 export const ACTS: Readonly<Record<string, Act>> = {
-  peaslee: { kind: 'read' }, // "I was reading when it happened. I remember turning a page"
+  // "I was reading when it happened. I remember turning a page": in a chair by the quad's eastern lamp, out of sight of where the investigator wakes
+  peaslee: { kind: 'read', post: { x: 267.75, z: 225.2, yaw: -1.62, fixture: 'chair', rise: 0.7 } },
   gilman: { kind: 'write' }, // counting the corners of the street, and setting the sums down
-  morgan: { kind: 'vial' }, // anatomy and medicine: a specimen held to the light
+  // anatomy and medicine, and the smoker's one vice: against the southern lamp's post, his pipe in hand, behind the one who wakes
+  morgan: { kind: 'lounge', post: { x: 252.6, z: 237.3, yaw: 2.79, fixture: 'post', rise: 0.45 } },
   kuranes: { kind: 'gaze' }, // a dreamer who stayed, looking up into the dream
   zadok: { kind: 'drink' }, // ninety-six, of Innsmouth, and has told the tale a hundred times to a bottle
   wilmarth: { kind: 'smoke' }, // folklore and a long night of letters: his pipe
@@ -32,4 +44,4 @@ export const ACTS: Readonly<Record<string, Act>> = {
 };
 
 /** The acts done sitting down. */
-export const SEATED: ReadonlySet<ActKind> = new Set(['write', 'smoke', 'drink', 'whittle', 'polish', 'mend', 'brood']);
+export const SEATED: ReadonlySet<ActKind> = new Set(['read', 'write', 'smoke', 'drink', 'whittle', 'polish', 'mend', 'brood']);

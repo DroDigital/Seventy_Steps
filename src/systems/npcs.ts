@@ -12,6 +12,7 @@ import { turnToward, yawOf } from '../core/geom';
 import { NPCS, npcDef, type NpcDef, type Topic, type When } from '../data/npcs';
 import { worldLayout } from '../world/placements';
 import { DIRS } from '../world/worldMap';
+import { ACTS } from '../data/npcActs';
 import type { Game } from './components';
 import { managed } from './npcLife';
 import { rumorFor } from './omens';
@@ -23,8 +24,10 @@ const SIDE = 3.8; // metres beside the rising point (out of reach from it: talki
 const AHEAD = 1; // ...and toward the sign
 const TURN = 4; // radians a second they turn to the one talking with them
 
-/** Where an NPC stands: beside their sign's rising point, facing it. */
+/** Where an NPC stands: beside their sign's rising point, facing it; or at the place the story gives them (data/npcActs.ts `post`). */
 export function npcPlace(n: NpcDef): { x: number; z: number; yaw: number } | undefined {
+  const post = ACTS[n.id]?.post; // a place of their own, not by the sign
+  if (post) return { x: post.x, z: post.z, yaw: post.yaw };
   const s = worldLayout().signs.find((x) => x.id === n.sign);
   if (!s) return undefined;
   const f = DIRS[s.face];
