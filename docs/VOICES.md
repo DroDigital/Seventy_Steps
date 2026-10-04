@@ -42,7 +42,7 @@ performance can be tried again over the same file.
 
 ## The cast
 
-The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Finley - Articulate Anchor* (`fnYMz3F5gMEDGMWcH1ex`, British narration, the one the author picked in the library), with a little hall (`echo` 0.12); his five cards are one take each. They carry no whispering: no `[whispers]`, `[softly]` or `[quietly]` in them.
+The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Finley - Articulate Anchor* (`fnYMz3F5gMEDGMWcH1ex`, British narration, the one the author picked in the library), with a little hall (`echo` 0.12); his five cards are one take each, but for the telegram's, made again (four takes, the steadiest kept) when the first proved too bright beside the rest. They carry no whispering: no `[whispers]`, `[softly]` or `[quietly]` in them.
 
 Chosen from the voices' descriptions (nobody has listened to the casting). Ordinary speakers have ElevenLabs'
 own **premade** voices, which any plan can use; the monstrous, the old and the foreign have **library** voices,

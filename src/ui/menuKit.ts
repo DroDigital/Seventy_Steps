@@ -31,6 +31,7 @@ export interface Page {
 
 export interface Screen {
   readonly open: boolean;
+  readonly root: HTMLElement; // the whole screen, backdrop and all (the intro fades it out as it ends)
   show(page: Page): void;
   close(): void;
   /** Called once the screen has closed (round 29: the Elder Sign's menu lets the investigator rise). */
@@ -253,6 +254,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
     get open() {
       return entry !== null;
     },
+    root,
     show(page) {
       const same = entry?.page === page;
       const fresh = !same && !memory.has(page); // a page first opened is read from its top

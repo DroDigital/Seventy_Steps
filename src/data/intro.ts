@@ -19,7 +19,7 @@ export const INTRO: readonly IntroCard[] = [
   {
     heading: 'Telegram · Arkham, Massachusetts · October 3rd, 1928',
     telegram: true,
-    say: '[solemnly] Come at once. [pause] Peaslee found asleep in the library Monday, and cannot be woken. [pause] Six more in town, the same. Will meet the Boston train. [long pause] [solemnly] Armitage.',
+    say: '[somberly] Come at once. [pause] Peaslee found asleep in the library Monday, and cannot be woken. [pause] [gravely] Six more in town, the same. [pause] Will meet the Boston train. [long pause] [heavily] Armitage.', // (round 39: made again, graver; the first take was too bright beside the others)
   },
   {
     heading: 'From the notebook · October 5th',

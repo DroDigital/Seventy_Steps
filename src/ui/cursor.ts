@@ -48,6 +48,7 @@ let mark: HTMLDivElement | null = null;
 let wisp: HTMLElement | null = null;
 let menus = false;
 let at = [0, 0]; // where the mouse was last seen (the middle of the window, till it moves)
+let moved = false; // whether the hand has moved since a menu was opened: till it has, no cursor (round 39: it sat in the middle of the opening's words, where nobody had put it)
 const trail: number[][] = []; // where the hand has been, newest first
 let frame = 0;
 let lastSample = 0;
@@ -72,10 +73,10 @@ function wisps(now: number): void {
 
 function sync(): void {
   const on = menus && document.pointerLockElement === null && deviceInUse() === 'keys';
-  document.body.classList.toggle('menu-cursor', on);
+  document.body.classList.toggle('menu-cursor', on); // (the system's arrow is hidden all the same: it is ours or none)
   if (!mark || !wisp) return;
-  mark.style.display = on ? 'block' : 'none';
-  wisp.style.display = on ? 'block' : 'none';
+  mark.style.display = on && moved ? 'block' : 'none';
+  wisp.style.display = on && moved ? 'block' : 'none';
   if (on) {
     mark.style.transform = `translate3d(${at[0]}px,${at[1]}px,0)`;
     trail.length = 0; // (no wisp from where it was last time)
@@ -88,6 +89,7 @@ function sync(): void {
 
 /** The menus: one is open, or none is. Said at the moment it happens, so the cursor never outlasts the last. */
 export function menuCursor(open: boolean): void {
+  if (open && !menus) moved = false;
   menus = open;
   sync();
 }
@@ -108,6 +110,10 @@ export function installCursor(): void {
   document.body.append(wisp, mark);
   addEventListener('pointermove', (e) => {
     at = [e.clientX, e.clientY];
+    if (!moved && menus && (e.movementX || e.movementY)) {
+      moved = true;
+      sync();
+    }
     if (menus && mark) mark.style.transform = `translate3d(${at[0]}px,${at[1]}px,0)`;
     const el = e.target instanceof HTMLElement ? e.target : null;
     mark?.classList.toggle('on', !!el && (!!el.closest(PRESSABLE) || el.style.cursor === 'pointer')); // (the map sets its own pointer over a lit sign)
