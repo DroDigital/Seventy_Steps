@@ -104,6 +104,15 @@ describe('the pad in hand (round 31)', () => {
       for (let i = 0; i < 5; i++) expect(activePad()?.id).toBe('same');
     });
 
+    it('takes the shell\u2019s standard reading of a pad the browser lists only in its own raw order (A and B swapped otherwise)', async () => {
+      let down: number[] = [];
+      const { activePad } = await withShell(() => [pad(0, { id: 'raw', mapping: '', down })], () => [pad(0, { id: 'raw (sdl)', down })]);
+      activePad(); // both seen at rest
+      down = [0];
+      expect(activePad()?.id).toBe('raw (sdl)');
+      expect(activePad()?.mapping).toBe('standard');
+    });
+
     it('is as before on the web, where there is no bridge', async () => {
       let down: number[] = [];
       vi.resetModules();

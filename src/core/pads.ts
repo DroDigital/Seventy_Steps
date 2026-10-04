@@ -136,6 +136,8 @@ export function activePad(): PadReading | null {
     const stay = source === 'shell' ? nativeUsed : webUsed;
     const other = stay === webUsed ? nativeUsed : webUsed;
     best = now - stay.used < STAY_MS || stay.used >= other.used ? stay : other;
+    const [stdWeb, stdNative] = [webUsed.reading.mapping === 'standard', nativeUsed.reading.mapping === 'standard'];
+    if (stdWeb !== stdNative) best = stdWeb ? webUsed : nativeUsed; // a pad the browser lists in its own raw order (not 'standard') and the shell reads in the standard one: the standard one, or A and B are the wrong buttons (round 39)
   }
   source = best ? (best === nativeUsed ? 'shell' : 'browser') : null;
   const heard = Math.max(web.heard, native.heard); // (the same pad may be in both lists)
