@@ -90,7 +90,7 @@ export function passFog(g: Game, w: FogWall): void {
   const frames = Math.max(40, Math.round(((distXZ(from, to)) / FOG_PACE) * 60));
   g.player.fogPass = { wall: w.id, from, to, frame: 0, frames };
   g.player.kneeling = null;
-  g.events.emit('FogPassing', { wall: w.id, x: me.x, z: me.z });
+  g.events.emit('FogPassing', { wall: w.id, x: me.x, z: me.z, frames });
 }
 
 /** One step of a pass: the walk, and its end. Runs before the movement system, which it leaves nothing to move. */

@@ -13,6 +13,7 @@ export interface PlayOptions {
   gain?: number;
   pan?: number; // -1 left .. 1 right
   pitch?: number; // frequency ratio
+  lowpass?: number; // Hz: dulled by distance (a sound heard from far off has lost its top)
 }
 
 const noiseBuffers = new WeakMap<BaseAudioContext, AudioBuffer>();
@@ -70,7 +71,12 @@ export function playSound(e: AudioEngine, sound: Sound, o: PlayOptions = {}): bo
   out.gain.value = o.gain ?? 1;
   const pan = ctx.createStereoPanner();
   pan.pan.value = Math.max(-1, Math.min(1, o.pan ?? 0));
-  out.connect(pan).connect(sfx);
+  if (o.lowpass && o.lowpass < 18000) {
+    const dull = ctx.createBiquadFilter();
+    dull.type = 'lowpass';
+    dull.frequency.value = o.lowpass;
+    out.connect(dull).connect(pan).connect(sfx);
+  } else out.connect(pan).connect(sfx);
   let last: AudioScheduledSourceNode | null = null;
   let end = 0;
   for (const l of sound) {

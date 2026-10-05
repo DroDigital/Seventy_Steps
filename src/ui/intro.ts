@@ -12,7 +12,7 @@ import { INTRO, NARRATOR, introText } from '../data/intro';
 import { createSpeech } from '../render/audio/speech';
 import type { AudioEngine } from '../render/audio/engine';
 import { BONE, TYPEWRITER } from './hudKit';
-import { createScreen, el, type Page } from './menuKit';
+import { createScreen, el, muteMenus, type Page } from './menuKit';
 import { keyLayout } from '../core/bindings';
 import { glyph } from './glyphs';
 
@@ -31,6 +31,7 @@ const CLOSE = 1800; // ms for the mist to fade to black after the last card (a s
 const PAD_A = 0;
 
 export function showIntro(done: () => void, engine?: AudioEngine): Intro {
+  muteMenus(true); // the opening has its theme and its narrator: the menus' sounds are not heard through it
   const screen = createScreen(9, '#000'); // the menus' mist skin
   let i = 0;
   let over = false;
@@ -53,6 +54,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     const ms = skipped ? CLOSE / 2 : CLOSE;
     screen.root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: 'ease-in-out', fill: 'forwards' }).finished.catch(() => undefined).then(() => {
       screen.close();
+      muteMenus(false);
       screen.root.getAnimations().forEach((a) => a.cancel());
       done();
     });

@@ -46,7 +46,7 @@ export function buyLevel(g: Game, id: LevelId): boolean {
   g.player.echoes -= cost;
   g.player.levels[id]++;
   applyLevels(g);
-  g.events.emit('Echoes', { change: 'spent', amount: cost, total: g.player.echoes });
+  g.events.emit('Echoes', { change: 'spent', amount: cost, total: g.player.echoes, on: 'level' });
   g.events.emit('LevelUp', { attribute: id, level: g.player.levels[id], total: levelsBought(g) });
   return true;
 }

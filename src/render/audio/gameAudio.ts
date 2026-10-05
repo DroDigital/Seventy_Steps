@@ -18,7 +18,8 @@ import type { V3 } from '../../core/geom';
 import { soundOf, type CreatureSound } from '../../data/creatureSounds';
 import { getEntity } from '../../data/registry';
 import { AMBIENCE, DUNGEON_AMBIENCE, SAMPLE_SETS, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES, type Ambience, type SampleSetId } from '../../data/samples';
-import { STINGERS, type StingerId } from '../../data/sounds';
+import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
+import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
 import { voiceIdOf, VOICES, type Voice, type VoiceId } from '../../data/voices';
 import { engagedFights } from '../../systems/bossFight';
@@ -36,7 +37,9 @@ import { CUES, cueFor, dullness, nextCall, placeSound, type Cue } from './cues';
 import { impactLayers, landedBlow } from './impact';
 import type { Drones } from './drones';
 import type { AudioEngine } from './engine';
+import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
+import { createVarier } from './vary';
 import { createSampler, setFiles } from './sampler';
 import { voicedCurve } from '../../core/pace';
 import { createSpeech } from './speech';
@@ -54,6 +57,10 @@ export interface GameAudio {
   stinger(sound: StingerId, o?: { gain?: number; pitch?: number }): void;
   /** A recording heard without place (round 20: a cutscene's laugh, its choir). */
   sample(set: SampleSetId, o?: { gain?: number; pitch?: number }): void;
+  /** A recording where `at` is (null: in the head): its level fading with the distance to `range` metres, dulled and panned (round 40: the doors). */
+  sampleAt(set: SampleSetId, at: V3 | null, o?: { gain?: number; pitch?: number; range?: number; delay?: number }): boolean;
+  /** A recipe where `at` is (null: in the head), a little different each time, the more by `vary` (0: as written), `key` telling one sound from another (round 40). */
+  recipe(key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; pitch?: number; range?: number; vary?: number }): boolean;
   /** Gets the realm's track ready (fetched, decoded) without sounding it: the world's sound begins when it shows (round 29). */
   warm(): void;
 }
@@ -74,7 +81,8 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const sampler = createSampler(e);
   void sampler.load(setFiles(Object.values(SAMPLE_SETS)));
   const ambience = createAmbience(e, sampler);
-  const foley = createFoley(g, sampler);
+  const foley = createFoley(g, sampler, (key, sound, o) => recipe(key, sound, o));
+  const acts = createActFoley(g, (key, sound, o) => recipe(key, sound, o));
   const weatherBed = createWeatherBed(e);
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard
   const place = (at: V3 | null, range: number): { gain: number; pan: number } => placeSound(listener, right, at, range);
@@ -83,13 +91,22 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const { gain, pan } = place(at, range);
     return gain > 0 && sampler.play(SAMPLE_SETS[id], { gain: gain * (o.gain ?? 1), pan, pitch: o.pitch, delay: o.delay, lowpass: at ? dullness(gain) : undefined });
   };
+  const varier = createVarier(); // round 40: a recipe is drawn a little anew each time it plays, and never at the last play's pitch
+  /** A recipe where `at` is: placed, dulled by the distance, varied. */
+  const recipe: GameAudio['recipe'] = (key, sound, o = {}) => {
+    const at = o.at ?? null;
+    const { gain, pan } = place(at, o.range ?? AUDIO.eventRange);
+    if (gain <= 0) return false;
+    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1), pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
+  };
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
     const level = gain * (cue.gain ?? 1);
     const [set, beneath] = STINGER_SAMPLES[cue.sound] ?? [null, 1];
     const took = set !== null && recorded(set, cue.at, AUDIO.eventRange, { gain: cue.gain, pitch: cue.pitch });
-    if (!took || beneath > 0) playSound(e, STINGERS[cue.sound], { gain: level * (took ? beneath : 1), pan, pitch: cue.pitch });
+    if (!took || beneath > 0) playSound(e, varier(`stinger:${cue.sound}`, STINGERS[cue.sound], STINGER_VARY[cue.sound] ?? 1), { gain: level * (took ? beneath : 1), pan, pitch: cue.pitch });
   };
+  g.events.on('Echoes', (ev) => void (ev.change === 'spent' && ev.on === 'ware' && recipe('hands:coins', HANDS.coins, { gain: CLASS_GAIN.hands }))); // a ware bought: coins counted out (a level has its own sound)
   for (const type of Object.keys(CUES) as (keyof GameEvents)[]) {
     g.events.on(type, (ev) => {
       const cue = cueFor(g, type, ev);
@@ -120,8 +137,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const set = v.sound ? ((o.alert ? v.sound.alert : undefined) ?? v.sound.call ?? VOICE_SAMPLES[v.id]) : ((o.alert ? VOICE_ALERTS[v.id] : undefined) ?? VOICE_SAMPLES[v.id]);
     const pitch = o.pitch ?? pitchOf(v);
     if (set && recorded(set, at, v.voice.range, { pitch, gain: o.gain })) return true;
-    const { gain, pan } = place(at, v.voice.range);
-    return gain > 0 && playSound(e, v.voice.call, { gain: gain * (o.gain ?? 1), pan, pitch });
+    return recipe(`voice:${v.id}`, v.voice.call, { at, range: v.voice.range, gain: o.gain, pitch, vary: 0.8 });
   };
   const cried = new Map<Entity, number>(); // the frame each creature last cried out at a blow
   g.events.on('Hit', (ev) => {
@@ -239,11 +255,12 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     sample(set, o = {}) {
       recorded(set, null, 1, o);
     },
+    sampleAt: (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o),
+    recipe,
     cry(id, at, gain = 1) {
       const [v, set, pitch] = [VOICES[id], VOICE_SAMPLES[id], 0.94 + 0.12 * Math.random()];
       if (set && recorded(set, at, v.range, { pitch, gain })) return;
-      const { gain: level, pan } = place(at, v.range);
-      if (level > 0) playSound(e, v.call, { gain: level * gain, pan, pitch });
+      recipe(`voice:${id}`, v.call, { at, range: v.range, gain, pitch, vary: 0.8 });
     },
     update(fx, seconds, camera, paused) {
       camera.updateMatrixWorld();
@@ -275,6 +292,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       whispers(fx.stress, seconds);
       calls(seconds);
       foley.update(seconds, place, (at) => play({ sound: 'danger', at: { ...at } }));
+      acts.update(seconds);
     },
   };
 }

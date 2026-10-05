@@ -6,11 +6,12 @@
  */
 
 import { KEYS_KEY, keyLayout, parseKeys } from '../core/bindings';
-import { STINGERS } from '../data/sounds';
+import { CLASS_GAIN, UI } from '../data/foleySounds';
 import { createDrones, type Drones } from '../render/audio/drones';
 import { createAudioEngine, type AudioEngine } from '../render/audio/engine';
 import type { Music } from '../render/audio/music';
 import { playSound } from '../render/audio/synth';
+import { createVarier } from '../render/audio/vary';
 import type { SaveStore } from '../systems/save';
 import { browserStore } from './autosave';
 import { recallSlot } from '../systems/save';
@@ -38,7 +39,8 @@ export function createShell(): Shell {
   const levels = (): { music: number; sfx: number; ambience: number } => ({ music: settings.music, sfx: settings.sfx, ambience: settings.ambience });
   const engine = createAudioEngine(settings.volume, levels());
   engine.setSpeech(settings.speech);
-  setMenuSound(() => playSound(engine, STINGERS.select));
+  const varier = createVarier();
+  setMenuSound((kind) => void playSound(engine, varier(`ui:${kind}`, UI[kind], kind === 'tick' ? 0.6 : 1.1), { gain: CLASS_GAIN.ui })); // round 40: each thing a menu does has its own sound, a little different each time (ui/menuSounds.ts)
   try {
     Object.assign(keyLayout, parseKeys(store?.getItem(KEYS_KEY) ?? null));
   } catch {

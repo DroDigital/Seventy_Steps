@@ -7,6 +7,7 @@
  */
 
 import { SAMPLE_PITCH, type SampleSet } from '../../data/samples';
+import { takeTrims } from '../../data/takeTrim';
 import { AUDIO } from '../../data/tuning';
 import type { AudioEngine } from './engine';
 import type { PlayOptions } from './synth';
@@ -42,6 +43,7 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
   const buffers = new Map<string, AudioBuffer | null>(); // null: it failed
   const pending = new Map<string, Promise<void>>();
   const last = new WeakMap<SampleSet, string>();
+  const trims = new WeakMap<SampleSet, Record<string, number>>(); // each take's level against its set's (data/takeTrim.ts)
   const fetchOne = (ctx: BaseAudioContext, file: string): Promise<void> => {
     let p = pending.get(file);
     if (!p) {
@@ -80,7 +82,9 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
       src.playbackRate.value = (lo + (hi - lo) * Math.random()) * (o.pitch ?? 1);
       src.detune.value = e.detune; // the sanity FX's sag, as the recipes take it
       const out = ctx.createGain();
-      out.gain.value = set.gain * (o.gain ?? 1);
+      let trim = trims.get(set);
+      if (!trim) trims.set(set, (trim = takeTrims(set)));
+      out.gain.value = set.gain * 10 ** ((trim[file] ?? 0) / 20) * (o.gain ?? 1);
       const pan = ctx.createStereoPanner();
       pan.pan.value = Math.max(-1, Math.min(1, o.pan ?? 0));
       let node: AudioNode = src;

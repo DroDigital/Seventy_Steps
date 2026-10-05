@@ -3,13 +3,17 @@
  * investigator's footsteps, one a stride, on what they walk on (the sea's shallows, a dungeon's stone,
  * a road, open ground); the whoosh of every blow a moment before it lands (the investigator's cuts
  * and swings, a creature's lower the bigger it is); a roll's tumble and a backstep's scuffs; the
- * Laudanum's cork; and a warning as a grab winds up. Read-only on the simulation.
+ * Laudanum's cork and its swallow, the Reagent's needle, a flask lobbed and burst, a guard taken up, an arm taken
+ * up, an arm reinforced, a knee bent and risen from (round 40: each placed on its move's own frames, data/foleySounds.ts
+ * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation.
  */
 
 import type { Entity } from '../../core/ecs';
 import type { V3 } from '../../core/geom';
 import { ATTACK_SOUNDS, soundOf, type AttackSound } from '../../data/creatureSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
+import { CLASS_GAIN, HAND_FRAMES, HANDS } from '../../data/foleySounds';
+import type { Sound } from '../../data/sounds';
 import type { AttackId } from '../../data/schema';
 import { WORLD } from '../../data/tuning';
 import type { MoveDef } from '../../data/moves';
@@ -65,12 +69,17 @@ export interface Foley {
   update(seconds: number, place: (at: V3, range: number) => { gain: number; pan: number }, warn: (at: V3) => void): void;
 }
 
-export function createFoley(g: Game, sampler: Sampler): Foley {
+/** Plays a recipe where `at` is (null: in the head): gameAudio's. */
+export type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; vary?: number }) => boolean;
+
+export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
   const seen = new Map<Entity, { move: string | null; frame: number }>();
   let last: V3 | null = null;
   let walked = 0;
   let before = 0;
   const play = (id: SampleSetId, gain = 1, pan = 0, pitch = 1, lowpass?: number): boolean => sampler.play(SAMPLE_SETS[id], { gain, pan, pitch, lowpass });
+  const hand = (id: keyof typeof HANDS, gain = 1): boolean => recipe(`hands:${id}`, HANDS[id], { gain: CLASS_GAIN[id === 'burst' || id === 'anvil' ? 'impact' : 'hands'] * gain });
+  let [arm, edge, knee]: [string, number, boolean | null] = [g.player.weapon, reinforcement(), null]; // what is in hand, how far it is reinforced, whether they kneel: heard to change
 
   function steps(seconds: number): void {
     const { transform, actor } = g.ecs.c;
@@ -111,6 +120,12 @@ export function createFoley(g: Game, sampler: Sampler): Foley {
         if (a.move === 'roll' && reached(26, a.frame, prev)) play('roll', 0.55);
         if (a.move === 'backstep' && (reached(2, a.frame, prev) || reached(10, a.frame, prev))) play(STEPS[surface()], 0.8);
         if (a.move === 'drink' && reached(10, a.frame, prev)) play('cork');
+        if (a.move === 'drink' && reached(HAND_FRAMES.drink.swallow, a.frame, prev)) hand('swallow');
+        if (a.move === 'parry' && reached(HAND_FRAMES.parry.guard, a.frame, prev)) hand('guard');
+        if (a.move === 'inject' && reached(HAND_FRAMES.inject.needle, a.frame, prev)) hand('needle');
+        if (a.move === 'inject' && reached(HAND_FRAMES.inject.plunger, a.frame, prev)) hand('plunger');
+        if (a.move === 'throw' && reached(HAND_FRAMES.throw.glug, a.frame, prev)) hand('glug');
+        if (a.move === 'throw' && reached(HAND_FRAMES.throw.lob, a.frame, prev)) hand('lob');
       }
       if (!player && def.hit?.unblockable && prev === null) warn(transform.get(id)!.pos); // a grab: no guard will stop it
       const strike = player ? undefined : strikeFrame(def);
@@ -138,10 +153,42 @@ export function createFoley(g: Game, sampler: Sampler): Foley {
     for (const id of seen.keys()) if (!actor.has(id)) seen.delete(id);
   }
 
+  /** A flask's burst where each new pool lies, a horror's spill, and the arm and the knee: heard as they change. */
+  const burned = new Set<Entity>();
+  function things(place: (at: V3, range: number) => { gain: number; pan: number }): void {
+    const { hazard, transform } = g.ecs.c;
+    for (const [id, h] of hazard) {
+      if (burned.has(id)) continue;
+      burned.add(id);
+      const at = transform.get(id)?.pos;
+      if (!at) continue;
+      if (h.fire) recipe('hands:burst', HANDS.burst, { at: { ...at }, gain: CLASS_GAIN.impact, range: 36 });
+      else {
+        const { gain, pan } = place(at, 30);
+        if (gain > 0) play('splat', gain, pan, 0.8 + 0.2 * Math.random(), dullness(gain));
+      }
+    }
+    for (const id of burned) if (!hazard.has(id)) burned.delete(id);
+    if (g.player.weapon !== arm) {
+      if (arm !== '') hand('equip');
+      arm = g.player.weapon;
+    }
+    const now = reinforcement();
+    if (now > edge) hand('anvil');
+    edge = now;
+    const kneeling = g.player.kneeling !== null;
+    if (knee !== null && kneeling !== knee) hand(kneeling ? 'kneel' : 'rise', 0.9);
+    knee = kneeling;
+  }
+  function reinforcement(): number {
+    return Object.values(g.player.reinforced).reduce((n, v) => n + v, 0);
+  }
+
   return {
     update(seconds, place, warn) {
       steps(seconds);
       moves(place, warn);
+      things(place);
     },
   };
 }
