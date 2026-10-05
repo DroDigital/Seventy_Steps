@@ -65,7 +65,7 @@ the game's, applied at playback, so a recast does not need them again.
 | `narrator:intro` | Finley - Articulate Anchor (**library**: the author's pick; licence unchecked, see below) | `fnYMz3F5gMEDGMWcH1ex` | room |
 | `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42) |
 | `npc:gilman` | Will - Relaxed Optimist (premade) | `bIHbv24MWmeRgasZH58o` | — |
-| `npc:morgan` | Dr. Francis Morgan (designed) | `Zu8OeRoG1W5wagFvqvfs` | clips raised to ~122 Hz, brightened, 10% brisker (round 42) |
+| `npc:morgan` | Dr. Francis Morgan (designed) | `Zu8OeRoG1W5wagFvqvfs` | clips lowered to ~88 Hz, +5 dB chest below 220 Hz, -3.5 dB above 5.5 kHz, light saturation, 96% pace (round 45; round 42 had raised him to ~122 Hz, which thinned him) |
 | `npc:kuranes` | Kuranes (designed) | `bY8puK6S3RGlr0wikENe` | — |
 | `npc:zadok` | Zadok Allen (designed) | `oS1Ldc1OhmULV32wNtyv` | — |
 | `npc:wilmarth` | Roger - Laid-Back, Casual, Resonant (premade) | `CwhRBWXzGAHq8TQ4Fs17` | — |
