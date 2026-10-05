@@ -8,7 +8,7 @@ be made: `docs/SUNO_SOUNDS.md`. Credits and licences: `public/audio/CREDITS.md`,
 | Layer | Where | Made of |
 | --- | --- | --- |
 | Event stingers | `data/sounds.ts` (`STINGERS`), `render/audio/cues.ts` | recipes: oscillators and noise through filters and envelopes, played by `synth.ts`; some with a recording in front (`data/samples.ts` `STINGER_SAMPLES`) |
-| Recorded sounds | `data/samples.ts`, `public/audio/sfx` | 236 CC0 recordings, a few takes to a set, one drawn at random (never the last twice) at a pitch drawn from the set's range |
+| Recorded sounds | `data/samples.ts`, `public/audio/sfx` | 291 CC0 recordings (55 of them found in round 40 for the doors, hands, mist and acts: `data/plannedSounds.ts`), a few takes to a set, one drawn at random (never the last twice) at a pitch drawn from the set's range |
 | Ambience | `data/samples.ts` `AMBIENCE`, `public/audio/amb`, `render/audio/ambience.ts` | looped beds with spot sounds, breathing |
 | Doors | `data/doorSounds.ts`, `render/doorViews.ts` | a recipe made for each swing (below) |
 | Menus | `data/foleySounds.ts` `UI`, `ui/menuSounds.ts` | seven small sounds (move, choose, back, tab, open, close, tick), quiet, wood and paper |
@@ -30,7 +30,7 @@ begins, the movement following its speed (which eases in and out), the stop as i
 (`oak`, `lacquer`, `bronze`, `iron`, `timber`, `stone`, `grind`, `flesh`, `cloth`: from the door's look), open or shut (a door let go of
 strikes harder than one let swing). It lasts as long as the swing, from where the door stands, and is drawn anew each time from the
 random numbers it is given (a pitch, the creaks' glides and beats, which recording lies under it): no two doors, and no door twice,
-sound the same. A recording of the door (`data/plannedSounds.ts`) will be played in front, to last the swing, once there is one.
+sound the same. A CC0 recording of each door (`data/plannedSounds.ts`) plays in front of its recipe (which stays beneath it, a third as loud), played faster or slower to last the swing.
 
 ## Variation
 

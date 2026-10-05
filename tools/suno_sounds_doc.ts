@@ -1,13 +1,13 @@
 /** Writes docs/SUNO_SOUNDS.md from data/plannedSounds.ts: `npx tsx tools/suno_sounds_doc.ts` (tests/plannedSounds.test.ts keeps the two one). */
-import { writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { PLANNED } from '../src/data/plannedSounds';
 
 export const head = `# Sounds to make with Suno Sounds
 
 The game plays well without these: each answers a sound the game makes already, from a recipe written in code
 (\`src/data/foleySounds.ts\`, \`src/data/doorSounds.ts\`). A recording would give it the grain a synthesised sound lacks.
-No search found a recording of any of them under a licence the game may use (the sound libraries it draws on are not
-reachable from where this was written), so each is described here to be made with **Suno Sounds** (Create › Custom ›
+Most have been found as CC0 recordings on Freesound and are in the game (credited in \`public/audio/CREDITS.md\`); this
+lists only those for which none could be found, each described to be made with **Suno Sounds** (Create › Custom ›
 Sounds (Beta); One Shot; 2 credits a take; a Pro or Premier plan). Suno's prompts read best as *sound, action, place,
 perspective, length*, and each below is written so.
 
@@ -26,7 +26,8 @@ Until a set's files are there, the game does not ask for them.
 ## The sounds
 `;
 
-const rows = PLANNED.map((p) => `### ${p.id}
+const missing = PLANNED.filter((p) => !existsSync(new URL(`../public/audio/sfx/${p.file}1.mp3`, import.meta.url)));
+const rows = missing.map((p) => `### ${p.id}
 - **files:** ${Array.from({ length: p.takes }, (_, k) => `\`sfx/${p.file}${k + 1}.mp3\``).join(', ')}
 - **length:** ${p.seconds[0]}–${p.seconds[1]} s${p.fit ? ' (**fit**: played to last exactly as long as the motion it sounds with, within a third either way, so make it close to this)' : ''}
 - **answers:** ${p.for.map((k) => `\`${k}\``).join(', ')}

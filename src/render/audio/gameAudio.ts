@@ -100,7 +100,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const { gain, pan } = place(at, o.range ?? AUDIO.eventRange);
     if (gain <= 0) return false;
     const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it
-    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit });
+    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) });
     return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
   const play = (cue: Cue): void => {

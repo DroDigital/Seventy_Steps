@@ -6,6 +6,7 @@ import { ACTS, HANDS } from '../src/data/foleySounds';
 import { PLANNED } from '../src/data/plannedSounds';
 import { PLANNED_SETS, RECORDED_FOR, setOf } from '../src/data/samples';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
+import { takeTrims } from '../src/data/takeTrim';
 import { createSampler, setFiles } from '../src/render/audio/sampler';
 import type { AudioEngine } from '../src/render/audio/engine';
 
@@ -47,6 +48,25 @@ describe('the recordings the game is ready for (data/plannedSounds.ts, docs/SUNO
     }
   });
 
+  it('every set that is there has all its takes, is levelled in its class\'s window, and has a peak under full scale', () => {
+    const windows: Record<string, readonly [number, number]> = { door: [-34, -16], hands: [-38, -18], mist: [-34, -18], act: [-50, -28] };
+    for (const p of PLANNED) {
+      const present = Array.from({ length: p.takes }, (_, k) => `${p.file}${k + 1}`).filter((f) => existsSync(`public/audio/sfx/${f}.mp3`));
+      if (!present.length) continue;
+      expect(present.length, `${p.id} lacks takes`).toBe(p.takes);
+      const kind = p.for[0].startsWith('door') ? 'door' : p.for[0].startsWith('mist') ? 'mist' : p.for[0].startsWith('act') ? 'act' : 'hands';
+      const class_ = Math.min(1, p.for.includes('act:gulp') ? 1 : kind === 'mist' ? 0.4 : kind === 'act' ? 0.5 : 1); // (what the recipe's own gain makes of it: gameAudio.ts)
+      for (const f of present) {
+        const l = SAMPLE_LEVELS[`sfx/${f}`];
+        const eff = l.rms + takeTrims(PLANNED_SETS[p.id])[f] + 20 * Math.log10(p.gain * class_); // (as it plays: levelled to its set's mean)
+        expect(eff, `${f} (${eff.toFixed(1)} dB)`).toBeGreaterThan(windows[kind][0]);
+        expect(eff, `${f} (${eff.toFixed(1)} dB)`).toBeLessThan(windows[kind][1]);
+        expect(l.peak + takeTrims(PLANNED_SETS[p.id])[f] + 20 * Math.log10(p.gain), f).toBeLessThanOrEqual(0);
+        if (p.fit) expect(l.sec, `${f} is too long to fit its motion (made ${p.seconds[0]}–${p.seconds[1]} s)`).toBeLessThan(p.seconds[1] * 1.7);
+      }
+    }
+  });
+
   it('plays only the files that are there: a planned set is not asked for before it is recorded', () => {
     const present = PLANNED.filter((p) => existsSync(`public/audio/sfx/${p.file}1.mp3`));
     const asked = setFiles(Object.values(PLANNED_SETS));
@@ -55,24 +75,27 @@ describe('the recordings the game is ready for (data/plannedSounds.ts, docs/SUNO
     expect(setFiles([{ files: ['thud1', 'nothing_here'], gain: 0.5 }])).toEqual(['sfx/thud1', 'sfx/nothing_here']);
   });
 
-  it('a file that is there is measured and credited as made, with the plan', () => {
+  it('a file that is there is measured and credited (found on Freesound as CC0, or made with Suno Sounds with its plan)', () => {
     const credits = readFileSync('public/audio/CREDITS.md', 'utf8');
     for (const p of PLANNED) for (let k = 1; k <= p.takes; k++) {
       const file = `${p.file}${k}`;
       if (!existsSync(`public/audio/sfx/${file}.mp3`)) continue;
       expect(SAMPLE_LEVELS[`sfx/${file}`], `${file} is not measured: run python3 tools/audio_levels.py`).toBeDefined();
-      expect(credits, `${file} is not credited`).toMatch(new RegExp(`\\| \`sfx/${file}\\.mp3\` \\| Suno Sounds \\|`));
+      expect(credits, `${file} is not credited`).toMatch(new RegExp(`\\| \`sfx/${file}\\.mp3\` \\| (Suno Sounds|\\[[^\\]]+\\]\\(https://freesound\\.org/people/[^)]+\\)) \\|`));
     }
   });
 
-  it('is described in docs/SUNO_SOUNDS.md, every one, as it is here (npx tsx tools/suno_sounds_doc.ts)', () => {
+  it('is described in docs/SUNO_SOUNDS.md, every one not yet recorded, as it is here (npx tsx tools/suno_sounds_doc.ts)', () => {
     const doc = readFileSync('docs/SUNO_SOUNDS.md', 'utf8');
-    for (const p of PLANNED) {
+    const missing = PLANNED.filter((p) => !existsSync(`public/audio/sfx/${p.file}1.mp3`));
+    expect(missing.length).toBeLessThan(PLANNED.length); // (most are found)
+    for (const p of PLANNED.filter((q) => !missing.includes(q))) expect(doc, `${p.id} is recorded: it needs no prompt`).not.toContain(`### ${p.id}\n`);
+    for (const p of missing) {
       expect(doc, p.id).toContain(`### ${p.id}\n`);
       expect(doc, p.id).toContain(p.prompt);
       for (let k = 1; k <= p.takes; k++) expect(doc, p.id).toContain(`sfx/${p.file}${k}.mp3`);
     }
-    expect([...doc.matchAll(/^### /gm)].length).toBe(PLANNED.length);
+    expect([...doc.matchAll(/^### /gm)].length).toBe(missing.length);
   });
 
   it('a set is found by its id, whether recorded or planned', () => {
