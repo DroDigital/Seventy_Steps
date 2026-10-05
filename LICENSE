@@ -1,0 +1,58 @@
+Seventy Steps (the "Project")
+Copyright (c) 2026 Alessandro A. Foddis (DroDigital). All rights reserved.
+
+This is a source-available licence, not an open-source one. The Project is
+published so that it can be read, studied and evaluated, and for nothing else
+without written permission from the copyright holder.
+
+1. WHAT YOU MAY DO
+   You may view and read the Project's source code, documentation and other
+   files; fork or clone it for the sole purpose of reading, studying or
+   evaluating it (including as part of reviewing the author's portfolio or
+   hiring); and run it locally for the same purposes, privately, without
+   distributing it or any result of running it.
+
+2. WHAT YOU MAY NOT DO
+   Without the copyright holder's prior written permission, you may not:
+   a. copy, redistribute, publish, host, sublicense, sell, rent or lend the
+      Project, or any part of it, in source or built form;
+   b. modify the Project or make derivative works from it, including
+      reskins, ports, remakes, "clones" and forks released to others;
+   c. use the Project, or any part of it, for any commercial purpose,
+      including selling or distributing it, or a game or product derived from
+      it, on any store, platform or website, with or without charge;
+   d. use the Project's name, logo, characters' presentation, writing,
+      artwork, music, recorded voices, sounds or other assets in any other
+      work;
+   e. use the Project, or any part of it, to train, fine-tune or evaluate a
+      machine-learning model, or include it in a dataset;
+   f. remove or alter any copyright, licence or credit notice.
+
+3. THIRD-PARTY MATERIAL
+   Some components of the Project belong to others and are used under their
+   own licences, listed in THIRD_PARTY_NOTICES.md and in the CREDITS.md files
+   under public/. Nothing in this licence changes those licences, and nothing
+   in this licence grants you any right in them beyond what theirs give you.
+   The stories and names of H. P. Lovecraft and his collaborators are credited
+   in the game; this licence claims no rights in their original works.
+
+4. NO TRADEMARK RIGHTS
+   No right is granted to use the name "Seventy Steps", "DroDigital" or the
+   author's name as a trademark, product name or endorsement.
+
+5. TERMINATION
+   Any breach of this licence ends your permissions under it at once. You
+   must then stop using the Project and delete every copy of it you hold.
+
+6. NO WARRANTY, NO LIABILITY
+   The Project is provided "as is", without warranty of any kind. The author
+   is not liable for any claim, damages or other liability arising from it or
+   its use.
+
+7. RESERVATION
+   All rights not expressly granted here are reserved by the copyright
+   holder. Publishing the Project on a public site does not waive, license
+   or dedicate any right in it.
+
+For permission to do anything this licence does not allow, contact the
+copyright holder through the repository's owner (DroDigital) on GitHub.

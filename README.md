@@ -47,4 +47,4 @@ where Steam Cloud can keep them.
 See the in-game Credits, [`public/audio/CREDITS.md`](public/audio/CREDITS.md) and
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-Copyright © 2026 DroDigital. All rights reserved. Source code is publicly viewable for portfolio and evaluation purposes only. No permission is granted to copy, redistribute, modify, or commercially use this project.
+Copyright © 2026 Alessandro A. Foddis (DroDigital). All rights reserved. Source code is publicly viewable for portfolio and evaluation purposes only. No permission is granted to copy, redistribute, modify, or commercially use this project. See [`LICENSE`](LICENSE).

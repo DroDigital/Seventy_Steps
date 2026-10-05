@@ -1,5 +1,7 @@
 # Third-party notices
 
+This file lists third-party material only. The project's own licence is in `LICENSE`.
+
 Seventy Steps draws its textures, sprites, meshes and synthesised sounds in code. What it ships from
 others is listed here, with each licence as its authors require.
 

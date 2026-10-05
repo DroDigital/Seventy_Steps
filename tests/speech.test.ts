@@ -114,9 +114,9 @@ describe('every line, whoever says it', () => {
     }
   });
 
-  it('are said in the credits to be synthetic, and whose', () => {
-    const voices = CREDITS.find((b) => b.heading === 'VOICES')!.lines.join(' ');
-    expect(voices).toMatch(/synthetic/);
+  it('are said in the credits to be synthesised, and by whom', () => {
+    const voices = CREDITS.find((b) => b.heading === 'TOOLS')!.lines.join(' ');
+    expect(voices).toMatch(/synthesised/);
     expect(voices).toMatch(/ElevenLabs/);
   });
 });
