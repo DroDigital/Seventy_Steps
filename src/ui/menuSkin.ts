@@ -9,7 +9,7 @@
 import { mist } from './skins/mist';
 
 export interface SkinArt {
-  /** Draws the art for `ms` since the screen opened; (0,0) is the panel's top left, and the art may reach `bleed` past it. `open` is 0 to 1 over the opening; `stir`, 1 falling to 0, is a page changing. */
+  /** Draws the art for `ms` since the screen opened; (0,0) is the panel's top left, and the art may reach `bleed` past it. `open` is 0 to 1 over the opening; `stir` (0 to 1) is a page changing: it swells and settles smoothly, never in a step. */
   draw(ctx: CanvasRenderingContext2D, ms: number, open: number, stir: number): void;
   /** Sets how the words come in at `open` (0 to 1): styles on the panel, whose resting transform is `base`. */
   words(panel: HTMLElement, open: number, base: string): void;
@@ -31,19 +31,27 @@ export const SKIN: Skin = mist;
 
 export const BASE = 'translate(-50%,-50%)'; // the panel's resting transform (menuKit's panelCss)
 const FPS = 30;
-const STIR_MS = 700; // how long the art takes to settle after a page changes
+const STIR_MS = 350; // how long a surge is held at its height when it is not told to hold longer
+const STIR_RISE = 0.18; // seconds (time constant) it takes to swell
+const STIR_FALL = 0.35; // and to settle
 
 export interface Attached {
   /** The screen opens: the skin plays its opening. */
   open(): void;
   /** The screen closes. */
   close(): void;
-  /** A page changes: the art stirs and settles. */
-  stir(): void;
+  /** A page changes: the art swells and settles (held at its height for `holdMs` first, for a change that takes longer: the intro's cards). */
+  stir(holdMs?: number): void;
   /** The panel's size or contents changed. */
   fit(): void;
   /** For a script: the art as it is `ms` after opening (and still). */
   seek(ms: number): void;
+}
+
+/** A surge's level after `dt` seconds toward `goal` (1 swelling, 0 settling): eased, so it never steps. */
+export function stirStep(level: number, goal: number, dt: number): number {
+  const next = level + (goal - level) * (1 - Math.exp(-dt / (goal > level ? STIR_RISE : STIR_FALL)));
+  return goal === 0 && next < 0.002 ? 0 : next;
 }
 
 /** Puts the skin's canvas behind `panel` in `layer`. */
@@ -54,7 +62,8 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
   const ctx = canvas.getContext('2d')!;
   let art: SkinArt | null = null;
   let size = '';
-  let [t0, timer, still, stirred] = [0, 0, -1, -1e9];
+  let [t0, timer, still, stirUntil] = [0, 0, -1, -1e9];
+  let [stirLevel, stirAt] = [0, 0]; // how far it has swelled, eased toward its goal each frame: a surge that began in a step moved every bank of mist at once
   let ratio = 1;
 
   const elapsed = (): number => (still >= 0 ? still : performance.now() - t0);
@@ -64,7 +73,12 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     const open = Math.min(1, ms / skin.openMs);
     ctx.setTransform(ratio, 0, 0, ratio, skin.bleed * ratio, skin.bleed * ratio);
     ctx.clearRect(-skin.bleed, -skin.bleed, canvas.width / ratio, canvas.height / ratio);
-    const stir = Math.max(0, 1 - (performance.now() - stirred) / STIR_MS) ** 2;
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - (stirAt || now)) / 1000);
+    stirAt = now;
+    const goal = now < stirUntil ? 1 : 0;
+    stirLevel = stirStep(stirLevel, goal, dt);
+    const stir = stirLevel * stirLevel * (3 - 2 * stirLevel); // smoothstep: no kink at either end
     art.draw(ctx, ms, open, stir);
     art.words(panel, open, BASE);
   };
@@ -98,8 +112,8 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
       panel.style.cssText = panel.style.cssText.replace(/(?:opacity|clip-path|filter):[^;]*;?/g, '');
       panel.style.transform = BASE;
     },
-    stir() {
-      stirred = performance.now();
+    stir(holdMs = STIR_MS) {
+      stirUntil = Math.max(stirUntil, performance.now() + holdMs); // (another while one is on goes on from where it is: no restart)
     },
     fit,
     seek(ms) {

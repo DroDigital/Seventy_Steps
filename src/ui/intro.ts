@@ -77,7 +77,6 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     if (!stage) return;
     const c = INTRO[i];
     show(true);
-    screen.stir();
     turning = false;
     rest = (seconds) => {
       clearTimeout(timer);
@@ -94,7 +93,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   function turn(): void {
     if (over || turning || !stage) return;
     turning = true;
-    screen.stir(); // the mist gathers as the words sink into it
+    screen.stir(OUT + GAP + 300); // the mist gathers as the words sink into it, holds through the breath between, and settles as the next card comes (one surge: it was two, the second a step back up)
     clearTimeout(timer);
     voice?.stop();
     const last = i === INTRO.length - 1;
