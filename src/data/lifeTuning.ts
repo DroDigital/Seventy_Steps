@@ -60,6 +60,13 @@ export const CLOCK = {
   start: 0.3, // where in it a new journey opens: round 35, the deep of the night, not the gloaming (a bright violet sky and a land lit plain to see were no night)
 };
 
+/** The light under a dungeon's roof (round 40: it followed the moon's course, the clock's darkness and the grey of the last hour, so a roofed room was a different place at different hours, and washed out when the moon stood high): fixed at the night's start, whatever the hour, and eased in and out at the door. */
+export const DUNGEON_LIGHT = {
+  dark: 0.35, // the share of the night's darkness a roofed room takes (it keeps its ambient legible)
+  moon: 0.55, // the share of the moon's light that reaches the stone: it has no roof to shine through, only a high slant from the start of the night
+  ease: 1.3, // 1/s: how fast the room's light takes over from the open sky's (and back) as the camera passes a door
+};
+
 /** How dark the night is kept (round 35: it was too bright to be creepy; render/realmLook.ts): at its deepest the sky, the mist, the far land and both lights are this much of what a realm's look gives them. */
 export const NIGHT_DARK = { sky: 0.24, mist: 0.28, far: 0.3, ambient: 0.2, moon: 0.28 };
 
