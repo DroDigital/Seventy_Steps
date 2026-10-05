@@ -45,7 +45,7 @@ export const CAST: Readonly<Record<string, Voice>> = {
   // people met at the Elder Signs
   'npc:peaslee': v(['tFaKZ4OQAewSluuxn7RB', 'Wingate Peaslee (Seventy Steps)']), // designed: a deep, old, dry professor (Eric was too young); the clips are lowered to ~95 Hz and 12% brisker (round 42)
   'npc:gilman': v(WILL),
-  'npc:morgan': v(['Zu8OeRoG1W5wagFvqvfs', 'Dr. Francis Morgan (Seventy Steps)']), // designed: elderly, dry, smoky; the clips are lowered to ~88 Hz, given chest below 220 Hz, a softer top and a little warm grit, at 96% of the pace: a resonant, soothing smoker's voice, not a sickly old man (round 45; round 42 had raised him)
+  'npc:morgan': v(['AFtA63zAzQAlNDuzSRKy', 'Josef Hammer - Deep & Expressive']), // library voice, the author's pick (round 45): mature, resonant, warm and slightly smoky; the clips are as recorded (~105 Hz). Its licence could not be read through the tools: check it on its library page
   'npc:kuranes': v(['bY8puK6S3RGlr0wikENe', 'Kuranes (Dream Lands)']), // designed: a gentle, dreamy Londoner
   'npc:zadok': v(['oS1Ldc1OhmULV32wNtyv', 'Zadok Allen (Innsmouth)']), // designed: ninety-six, cracked, slurred, a New England drawl
   'npc:wilmarth': v(ROGER),
