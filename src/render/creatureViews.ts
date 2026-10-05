@@ -66,7 +66,7 @@ export function lookOf(g: Game, id: Entity, time: number): Look | null {
     const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
     look = moving ? { state: 'move', frame: Math.floor(time * 5) % 2, opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: Math.floor(time * 1.6) % 2, opacity: 1, sink: 0, lash: 0 };
   }
-  if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.08);
+  if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
   return look;
 }
 

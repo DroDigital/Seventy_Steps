@@ -42,18 +42,18 @@ export interface AttackDef {
 const melee = (d: Omit<AttackDef, 'kind'>): AttackDef => ({ kind: 'melee', ...d });
 
 export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
-  sweep: melee({ windup: 18, active: 6, recovery: 22, power: 1, poise: 0.8, range: [0, 2.2], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60] }),
+  sweep: melee({ windup: 22, active: 6, recovery: 22, power: 1, poise: 0.8, range: [0, 2.2], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60] }),
   slam: melee({ windup: 30, active: 5, recovery: 30, power: 1.6, poise: 1.6, range: [0, 2.4], reach: 1.4, radius: 0.8, height: 0.4, arc: [0, 0] }),
-  lunge: melee({ windup: 24, active: 10, recovery: 34, power: 1.3, poise: 1.2, range: [2.5, 5.5], reach: 1.1, radius: 0.55, height: 0.55, arc: [15, -15], lunge: 4.2 }),
+  lunge: melee({ windup: 28, active: 10, recovery: 34, power: 1.3, poise: 1.2, range: [2.5, 5.5], reach: 1.1, radius: 0.55, height: 0.55, arc: [15, -15], lunge: 4.2 }),
   charge: melee({ windup: 30, active: 18, recovery: 36, power: 1.5, poise: 2, range: [4, 10], reach: 1.2, radius: 0.8, height: 0.5, arc: [0, 0], lunge: 8 }),
-  grab: melee({ windup: 22, active: 6, recovery: 40, power: 1.4, poise: 0.6, range: [0, 1.8], reach: 1, radius: 0.5, height: 0.6, arc: [30, -30], unblockable: true }),
-  bite: melee({ windup: 14, active: 5, recovery: 20, power: 0.9, poise: 0.6, range: [0, 1.8], reach: 1.1, radius: 0.45, height: 0.5, arc: [10, -10], lunge: 0.6 }),
-  tentacle_burst: melee({ windup: 26, active: 12, recovery: 30, power: 1.2, poise: 1, range: [0, 3.5], reach: 2.2, radius: 0.7, height: 0.5, arc: [120, -120] }),
-  projectile: { kind: 'ranged', windup: 26, active: 1, recovery: 30, power: 0.9, poise: 0.5, range: [4, 18], bolts: { count: 1, spread: 0, speed: 16, radius: 0.3 } },
-  projectile_fan: { kind: 'ranged', windup: 34, active: 1, recovery: 34, power: 0.7, poise: 0.4, range: [3, 14], bolts: { count: 5, spread: 56, speed: 12, radius: 0.3 } },
-  beam: { kind: 'ranged', windup: 40, active: 1, recovery: 36, power: 1.4, poise: 1, range: [5, 22], shot: 24 },
-  spit: { kind: 'ranged', windup: 20, active: 1, recovery: 26, power: 0.7, poise: 0.3, range: [2, 9], bolts: { count: 1, spread: 0, speed: 9, radius: 0.35, lob: true }, pool: { radius: 1.3, life: 240, tick: 30, power: 0.2 } },
-  wind_push: { kind: 'ranged', windup: 24, active: 8, recovery: 30, power: 0.4, poise: 2, range: [0, 5], reach: 2.5, radius: 1.2, height: 0.5, arc: [60, -60], push: 3.5 },
+  grab: melee({ windup: 28, active: 6, recovery: 40, power: 1.4, poise: 0.6, range: [0, 1.8], reach: 1, radius: 0.5, height: 0.6, arc: [30, -30], unblockable: true }),
+  bite: melee({ windup: 18, active: 5, recovery: 20, power: 0.9, poise: 0.6, range: [0, 1.8], reach: 1.1, radius: 0.45, height: 0.5, arc: [10, -10], lunge: 0.6 }),
+  tentacle_burst: melee({ windup: 30, active: 12, recovery: 30, power: 1.2, poise: 1, range: [0, 3.5], reach: 2.2, radius: 0.7, height: 0.5, arc: [120, -120] }),
+  projectile: { kind: 'ranged', windup: 40, active: 1, recovery: 38, power: 0.9, poise: 0.5, range: [4, 18], bolts: { count: 1, spread: 0, speed: 13, radius: 0.3 } }, // round 45: was 26 / 30 and 16 m/s: from a pack of them there was no time to read one and roll
+  projectile_fan: { kind: 'ranged', windup: 46, active: 1, recovery: 40, power: 0.7, poise: 0.4, range: [3, 14], bolts: { count: 5, spread: 56, speed: 10, radius: 0.3 } },
+  beam: { kind: 'ranged', windup: 52, active: 1, recovery: 40, power: 1.4, poise: 1, range: [5, 22], shot: 24 },
+  spit: { kind: 'ranged', windup: 32, active: 1, recovery: 32, power: 0.7, poise: 0.3, range: [2, 9], bolts: { count: 1, spread: 0, speed: 9, radius: 0.35, lob: true }, pool: { radius: 1.3, life: 240, tick: 30, power: 0.2 } },
+  wind_push: { kind: 'ranged', windup: 30, active: 8, recovery: 30, power: 0.4, poise: 2, range: [0, 5], reach: 2.5, radius: 1.2, height: 0.5, arc: [60, -60], push: 3.5 },
   aoe_ring: { kind: 'area', windup: 36, active: 6, recovery: 36, power: 1.3, poise: 1.5, range: [0, 3.5], reach: 0, radius: 3, height: 0.3, arc: [180, -180] },
   pool: { kind: 'area', windup: 30, active: 1, recovery: 30, power: 0, poise: 0, range: [2, 9], pool: { radius: 1.8, life: 300, tick: 30, power: 0.3 } },
   dive: { kind: 'area', windup: 30, active: 10, recovery: 40, power: 1.6, poise: 2, range: [3, 9], reach: 1, radius: 1, height: 0.4, arc: [0, 0], lunge: 6 },
@@ -66,11 +66,11 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   eruption: { kind: 'area', windup: 28, active: 1, recovery: 44, power: 1.3, poise: 1.6, range: [0, 16], marks: { count: 5, ring: [2.5, 5.5], delay: 42, stagger: 7, radius: 1.7 } },
   quake: { kind: 'area', windup: 32, active: 1, recovery: 42, power: 1.1, poise: 1.4, range: [0, 11], wave: { speed: 8, width: 1.1, reach: 15 } },
   sweep_beam: { kind: 'ranged', windup: 46, active: 44, recovery: 34, power: 1.2, poise: 1.2, range: [3, 15], sweep: { arc: [75, -75], length: 17, width: 0.7 } },
-  barrage: { kind: 'ranged', windup: 30, active: 70, recovery: 30, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17)
+  barrage: { kind: 'ranged', windup: 38, active: 70, recovery: 30, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17)
   vortex: { kind: 'special', windup: 24, active: 54, recovery: 1, power: 0, poise: 0, range: [3, 11], pull: { speed: 3, range: 12 }, follow: 'vortex_burst' },
   vortex_burst: { kind: 'area', windup: 8, active: 6, recovery: 44, power: 1.5, poise: 2, range: [0, 0], reach: 0, radius: 4.2, height: 0.3, arc: [180, -180], tight: true },
-  combo: melee({ windup: 16, active: 6, recovery: 6, power: 0.8, poise: 0.7, range: [0, 2.4], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60], lunge: 0.8, follow: 'combo_2' }),
-  combo_2: melee({ windup: 10, active: 6, recovery: 8, power: 0.8, poise: 0.7, range: [0, 0], reach: 1.3, radius: 0.5, height: 0.55, arc: [-70, 80], lunge: 0.6, follow: 'combo_3' }),
+  combo: melee({ windup: 20, active: 6, recovery: 6, power: 0.8, poise: 0.7, range: [0, 2.4], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60], lunge: 0.8, follow: 'combo_2' }),
+  combo_2: melee({ windup: 14, active: 6, recovery: 8, power: 0.8, poise: 0.7, range: [0, 0], reach: 1.3, radius: 0.5, height: 0.55, arc: [-70, 80], lunge: 0.6, follow: 'combo_3' }),
   combo_3: melee({ windup: 34, active: 5, recovery: 36, power: 1.5, poise: 1.6, range: [0, 0], reach: 1.5, radius: 0.8, height: 0.4, arc: [0, 0], lunge: 1.4 }),
   delayed_slam: melee({ windup: 54, active: 5, recovery: 34, power: 1.8, poise: 2, range: [0, 2.6], reach: 1.5, radius: 0.9, height: 0.4, arc: [0, 0] }),
 };

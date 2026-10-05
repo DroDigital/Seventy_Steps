@@ -37,7 +37,8 @@ export interface Screen {
   show(page: Page): void;
   /** The skin's mist stirs and settles, as when a page changes (the intro stirs it between its cards). */
   stir(holdMs?: number): void;
-  close(): void;
+  /** Closes it: the mist rolls off and the words dissolve (unless `instant`, or the player asked for no motion). */
+  close(instant?: boolean): void;
   /** Called once the screen has closed (round 29: the Elder Sign's menu lets the investigator rise). */
   onClose?: () => void;
 }
@@ -104,15 +105,15 @@ function bring(panel: HTMLElement, ghost: HTMLElement | null, tab: boolean, deep
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return void ghost?.remove();
   const way = deeper ? 1 : -1;
   const ease = 'cubic-bezier(.2,.7,.25,1)';
-  if (ghost) {
-    ghost.animate([{ opacity: 1, filter: 'blur(0)', transform: `${BASE} translateX(0)` }, { opacity: 0, filter: 'blur(7px)', transform: `${BASE} translateX(${-22 * way}px)` }], { duration: 170, easing: 'ease-in', fill: 'forwards' });
-    setTimeout(() => ghost.remove(), 260); // (not by the animation's end: a page changed again in between must not leave a copy behind)
+  if (ghost) { // the words being left dissolve where they stand, into the mist: a blur and a thinning, a little lifted (round 45: they slid sideways)
+    ghost.animate([{ opacity: 1, filter: 'blur(0)', transform: `${BASE} translateY(0)` }, { opacity: 0, filter: 'blur(9px)', transform: `${BASE} translateY(-5px)` }], { duration: 260, easing: 'ease-in', fill: 'forwards' });
+    setTimeout(() => ghost.remove(), 340); // (not by the animation's end: a page changed again in between must not leave a copy behind)
   }
   const parts = tab ? [...panel.querySelectorAll<HTMLElement>(':scope > .scroll')] : [...panel.children].filter((c): c is HTMLElement => c instanceof HTMLElement);
   parts.forEach((part, i) =>
     part.animate(
-      [{ opacity: 0, filter: 'blur(7px)', transform: tab ? 'translateY(8px)' : `translateX(${26 * way}px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
-      { duration: tab ? 150 : 280, delay: tab ? 0 : 70 + Math.min(i, 5) * 30, easing: ease, fill: 'backwards' },
+      [{ opacity: 0, filter: 'blur(9px)', transform: tab ? 'translateY(8px)' : `translate(${7 * way}px,6px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
+      { duration: tab ? 170 : 420, delay: tab ? 0 : 130 + Math.min(i, 6) * 45, easing: ease, fill: 'backwards' }, // each part gathers a moment after the one above, as the old words are going
     ),
   );
 }
@@ -256,6 +257,17 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
     const on = (document.activeElement as HTMLElement | null)?.closest<HTMLElement>('[data-hint]');
     if (out) out.textContent = on ? (on.dataset.hint ?? '') : (out.dataset.def ?? '');
   });
+  /** The screen as it stands open: let the closing fade go (it ends, or the screen is opened again), and `hide` it. */
+  const unfade = (hide: boolean): void => {
+    root.inert = false;
+    root.style.pointerEvents = '';
+    root.style.transition = '';
+    root.style.backgroundColor = backdrop;
+    if (hide) {
+      root.style.display = 'none';
+      skinned?.close();
+    }
+  };
   const self: Screen = {
     get open() {
       return entry !== null;
@@ -274,10 +286,11 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       panel.replaceChildren();
       page.build(panel);
       if (entry && (!same || tabbed)) bring(panel, ghost, tabbed, !memory.has(page)); // another page, or another tab: it comes in (round 38)
-      if (change) skinned?.stir();
+      if (change) skinned?.stir(); // (the mist drifts a little; it does not brighten)
       root.style.display = 'block';
       if (entry) entry.page = page;
       else {
+        unfade(false);
         skinned?.open();
         menuSound('open');
         const redraw = (): void => void (entry && self.show(entry.page));
@@ -288,14 +301,19 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       focusAt(panel, Math.max(0, at), fresh);
       if (fresh) scroller(panel).scrollTop = 0;
     },
-    close() {
+    close(instant = false) {
       if (!entry) return;
       menuSound('close');
       memory.clear();
       stack.splice(stack.indexOf(entry), 1);
       entry = null;
-      root.style.display = 'none';
-      skinned?.close();
+      if (skinned && !instant && !matchMedia('(prefers-reduced-motion: reduce)').matches) { // it goes the way it came (round 45), over the game that is already let back in
+        root.inert = true;
+        root.style.pointerEvents = 'none';
+        root.style.transition = 'background-color 800ms ease';
+        root.style.backgroundColor = 'transparent';
+        skinned.fade(() => unfade(true));
+      } else unfade(true);
       if (!stack.length) {
         muteHeldPad(); // the B or A that closed it is not a dodge or a word
         menuCursor(false);

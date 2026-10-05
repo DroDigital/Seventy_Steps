@@ -26,7 +26,7 @@ describe('every foe strikes (round 19: skirmishers held a ring their own blows c
     h.max = h.hp = 1e7;
     let hits = 0;
     g.events.on('Hit', (e) => void (e.target === g.player.id && e.attacker === foe && hits++));
-    for (let s = 0; s < 20 && !hits; s++) steps(g, 60);
+    for (let s = 0; s < 40 && !hits; s++) steps(g, 60); // (round 45: slower, longer-resting ranged foes: forty seconds)
     expect(hits).toBeGreaterThan(0);
   });
 
@@ -39,7 +39,7 @@ describe('every foe strikes (round 19: skirmishers held a ring their own blows c
     h.max = h.hp = 1e7;
     let hits = 0;
     g.events.on('Hit', (e) => void (e.target === g.player.id && e.attacker === foe && hits++));
-    for (let s = 0; s < 20 && !hits; s++) steps(g, 60);
+    for (let s = 0; s < 40 && !hits; s++) steps(g, 60); // (round 45: slower, longer-resting ranged foes: forty seconds)
     expect(hits).toBeGreaterThan(0);
   });
 

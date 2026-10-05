@@ -13,8 +13,8 @@ export const GREATER = tier('greater', [
   {
     id: 'elder_thing', name: 'Elder Thing', source: 'At the Mountains of Madness', regions: ['mountains'], canonLooks: true, voice: 'piping',
     sprite: { silhouette: 'barrel', palette: 'sea', scale: 2.8, eyes: 5, tentacles: 5, wings: 2 },
-    behavior: { archetype: 'skirmisher', attacks: ['tentacle_burst', 'sweep', 'projectile'] },
-    stats: st(520, 80, 26, 3.4, 1.2, 5), resist: ['blunt'], drops: { echoes: 500 }, insightOnSight: 0,
+    behavior: { archetype: 'skirmisher', params: { cooldown: [70, 120] }, attacks: ['tentacle_burst', 'sweep', 'projectile'] }, // round 45: it swung and shot as fast as a deep one (35-70 frames), with five times the health
+    stats: st(520, 80, 22, 3.4, 1.2, 5), resist: ['blunt'], drops: { echoes: 500 }, insightOnSight: 0,
   },
   {
     id: 'shoggoth', name: 'Shoggoth', source: 'At the Mountains of Madness', regions: ['mountains'], canonLooks: true, voice: 'tekeli',
