@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES } from '../src/data/registry';
-import { AMBIENCE, DUNGEON_AMBIENCE, SAMPLE_SETS, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES } from '../src/data/samples';
+import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, SAMPLE_SETS, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES } from '../src/data/samples';
 import { WORLD } from '../src/data/tuning';
 import { voiceIdOf } from '../src/data/voices';
 import { nextSpot } from '../src/render/audio/ambience';
@@ -20,15 +20,16 @@ const beds = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE)].fl
 
 describe('the recorded sounds (data/samples.ts, public/audio)', () => {
   it('every file a set or a bed names is there, and every file there is named', () => {
-    const named = new Set([...setFiles(Object.values(SAMPLE_SETS)), ...beds]);
+    const named = new Set([...setFiles([...Object.values(SAMPLE_SETS), ...Object.values(PLANNED_SETS)]), ...beds]);
     for (const f of named) expect(existsSync(`${AUDIO}/${f}.mp3`), f).toBe(true);
     for (const f of [...files('sfx'), ...files('amb')]) expect(named.has(f), `${f} is played by nothing`).toBe(true);
   });
 
-  it('every file is credited, and every one is public domain (CC0)', () => {
+  it('every file is credited, and every one is public domain (CC0) or made with Suno Sounds on a paid plan', () => {
     const credits = readFileSync(`${AUDIO}/CREDITS.md`, 'utf8');
     const rows = new Map([...credits.matchAll(/^\| `([^`]+)\.mp3` \| \[[^\]]+\]\((https:\/\/freesound\.org\/people\/[^/]+\/sounds\/\d+\/)\) \| ([^|]+) \| ([^|]+) \|/gm)].map((m) => [m[1], m[4].trim()]));
-    for (const f of [...files('sfx'), ...files('amb')]) expect(rows.get(f), f).toBe('CC0');
+    const suno = new Map([...credits.matchAll(/^\| `([^`]+)\.mp3` \| Suno Sounds \| ([^|]+) \| (\d{4}-\d{2}-\d{2}) \| ([^|]+) \|/gm)].map((m) => [m[1], m[4].trim()])); // made, not found: a row says the day and the plan
+    for (const f of [...files('sfx'), ...files('amb')]) expect(rows.get(f) ?? (suno.has(f) && /Pro|Premier/.test(suno.get(f)!) ? 'Suno' : undefined), f).toMatch(/^(CC0|Suno)$/);
   });
 
   it('stays small: under 10 MB in all, no one-shot over 200 KB', () => {

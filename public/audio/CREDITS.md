@@ -261,3 +261,12 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/zombie2.mp3` | [Zombie Groan 3](https://freesound.org/people/OwNathan/sounds/754441/) | OwNathan | CC0 | 0–0.85 s; tape speed ×0.95 (round 20) |
 | `sfx/zombie3.mp3` | [A Moaning Zombie.wav](https://freesound.org/people/kathol/sounds/58626/) | kathol | CC0 | 0.08–2.68 s; tape speed ×0.95 (round 20) |
 | `sfx/zombie4.mp3` | [Zombie Groan 0](https://freesound.org/people/OwNathan/sounds/754438/) | OwNathan | CC0 | 0–1 s; tape speed ×0.95 (round 20) |
+
+## Made with Suno Sounds
+
+Recordings the game is ready for and does not yet have are described in `docs/SUNO_SOUNDS.md` (the list is `src/data/plannedSounds.ts`).
+Any that is made is credited here, one row a file, with the **date and the plan** it was made on (Suno grants commercial use only to
+what a paid plan made). None is in the game yet.
+
+| File | Made with | Prompt | Date | Plan |
+| --- | --- | --- | --- | --- |

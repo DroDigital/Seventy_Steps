@@ -100,8 +100,9 @@ export function createDoors(scene: THREE.Scene, g: Game, audio: GameAudio): Door
     const at = { x: spec.x, y: spec.y + spec.height * 0.5, z: spec.z };
     const made = doorSound(spec.look, swing, closing, Math.random);
     const gain = DOOR_GAIN[materialOf(spec.look)];
-    audio.recipe(`door:${materialOf(spec.look)}:${closing ? 'close' : 'open'}`, made.sound, { at, range: DOOR_RANGE, gain, vary: 0.5 });
-    for (const u of made.under) audio.sampleAt(u.set, at, { gain: u.gain * gain, pitch: u.pitch, range: DOOR_RANGE, delay: u.at });
+    const key = `door:${materialOf(spec.look)}:${closing ? 'close' : 'open'}`;
+    audio.recipe(key, made.sound, { at, range: DOOR_RANGE, gain, vary: 0.5, fit: swing }); // (a recording of the door, once there is one, is played to last the swing)
+    if (!audio.recordedFor(key)) for (const u of made.under) audio.sampleAt(u.set, at, { gain: u.gain * gain, pitch: u.pitch, range: DOOR_RANGE, delay: u.at }); // (and brings its own stop)
   };
 
   return {

@@ -4,6 +4,10 @@ import { DOOR_LOOKS } from '../src/data/doors';
 import { doorSound } from '../src/data/doorSounds';
 import { ACTS, HAND_FRAMES, HANDS, mistPass } from '../src/data/foleySounds';
 import { PLAYER_MOVES } from '../src/data/moves';
+import { SAMPLE_SETS } from '../src/data/samples';
+import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
+import { armedMoves } from '../src/data/weapons';
+import { WEAPON_IDS } from '../src/data/weapons';
 import { STINGERS } from '../src/data/sounds';
 import { SIM } from '../src/data/tuning';
 import { DOOR_KINDS } from '../src/render/doorViews';
@@ -57,6 +61,24 @@ describe('a sound lasts as long as the motion it goes with (round 40)', () => {
     expect(5).toBeLessThan(PLAYER_MOVES.roll.frames);
     expect(26).toBeLessThan(PLAYER_MOVES.roll.frames);
     expect(10).toBeLessThan(PLAYER_MOVES.backstep.frames);
+  });
+
+  it("every arm's blows are heard as they are struck: the whoosh begins before the hit window, close to it, and is not far longer than the move", () => {
+    const lead = 4; // render/audio/foley.ts SWING_LEAD
+    const dur = (set: 'swingLight' | 'swingHeavy'): number => SAMPLE_SETS[set].files.reduce((n, f) => n + SAMPLE_LEVELS[`sfx/${f}`].sec, 0) / SAMPLE_SETS[set].files.length;
+    for (const id of WEAPON_IDS) {
+      for (const [name, def] of Object.entries(armedMoves(id))) {
+        if (!name.startsWith('light') && !name.startsWith('heavy')) continue;
+        const hit = (def as { frames: number; hit?: { window: readonly [number, number]; poise: number } }).hit;
+        if (!hit) continue;
+        const start = Math.max(0, hit.window[0] - lead);
+        const heavy = name.startsWith('heavy') || hit.poise >= 30;
+        const sec = dur(heavy ? 'swingHeavy' : 'swingLight');
+        expect(start, `${id} ${name}`).toBeLessThanOrEqual(hit.window[0]);
+        expect(start + frames(sec), `${id} ${name}: its whoosh outlasts the move (${(def as { frames: number }).frames} frames)`).toBeLessThanOrEqual((def as { frames: number }).frames + 14);
+        expect(frames(sec), `${id} ${name}: its whoosh is over before the blow lands`).toBeGreaterThan(lead);
+      }
+    }
   });
 
   it('the reload: the rounds are heard going in before the item frame, and the cylinder closes on it', () => {
