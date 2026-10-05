@@ -16,6 +16,7 @@ import type { SaveStore } from '../systems/save';
 import { browserStore } from './autosave';
 import { recallSlot } from '../systems/save';
 import { setMenuSound } from './menuKit';
+import { setPadSwap } from '../core/padMap';
 import { clampSetting, loadSettings, storeSettings, type SettingId, type Settings } from './settings';
 import { applyUiScale } from './uiScale';
 import { createVeil, type Veil } from './veil';
@@ -47,6 +48,7 @@ export function createShell(): Shell {
     // No storage: the default keys.
   }
   applyUiScale(settings.uiScale);
+  setPadSwap(settings.padSwap > 0.5); // (A and B the other way round: core/padMap.ts)
   addEventListener('resize', () => applyUiScale(settings.uiScale));
   const change = (id: SettingId, v: number): void => {
     settings[id] = clampSetting(id, v);
@@ -58,6 +60,7 @@ export function createShell(): Shell {
     if (id === 'music' || id === 'sfx' || id === 'ambience') engine.setLevels(levels());
     if (id === 'speech') engine.setSpeech(settings.speech);
     if (id === 'uiScale') applyUiScale(settings.uiScale);
+    if (id === 'padSwap') setPadSwap(settings.padSwap > 0.5);
   };
   const saveKeys = (): void => {
     try {

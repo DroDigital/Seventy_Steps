@@ -73,6 +73,7 @@ export const SETTINGS = {
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
+  padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   volume: [0, 1, 0.05, 0.7], // everything
   music: [0, 1, 0.05, 1], // the title's theme and the boss scores (round 12)
   sfx: [0, 1, 0.05, 1], // blows, steps, voices

@@ -14,6 +14,7 @@ import type { AudioEngine } from '../render/audio/engine';
 import { BONE, TYPEWRITER } from './hudKit';
 import { createScreen, el, muteMenus, type Page } from './menuKit';
 import { keyLayout } from '../core/bindings';
+import { PAD_BUTTON } from '../core/padMap';
 import { glyph } from './glyphs';
 
 export interface Intro {
@@ -28,7 +29,7 @@ const IN = 1600; // ms for a line to come out of the mist
 const OUT = 1300; // ms for a card's words to sink back into it
 const GAP = 450; // ms of mist alone between one card and the next
 const CLOSE = 1800; // ms for the mist to fade to black after the last card (a skip: half of it)
-const PAD_A = 0;
+const PAD_A = PAD_BUTTON.a;
 
 export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   muteMenus(true); // the opening has its theme and its narrator: the menus' sounds are not heard through it

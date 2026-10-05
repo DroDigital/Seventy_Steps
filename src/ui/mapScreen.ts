@@ -8,6 +8,7 @@
  * (playtest round 7, mapTravel.ts). M or Esc (pad B) closes it.
  */
 
+import { PAD_BUTTON } from '../core/padMap';
 import { travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { mainLead } from '../systems/lead';
@@ -147,11 +148,11 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       const [x, y] = [p.axes[0] ?? 0, p.axes[1] ?? 0];
       const step = (0.02 * view.w) / view.scale;
       if (Math.hypot(x, y) > 0.2) [view.cx, view.cz] = [view.cx - x * step, view.cz - y * step];
-      if (p.buttons[7]?.pressed) zoomBy(1.03);
-      if (p.buttons[6]?.pressed) zoomBy(0.97);
+      if (p.buttons[PAD_BUTTON.rt]?.pressed) zoomBy(1.03);
+      if (p.buttons[PAD_BUTTON.lt]?.pressed) zoomBy(0.97);
       const edge = (i: number): boolean => !!p.buttons[i]?.pressed && !padWas.has(i);
-      if (edge(4) || edge(5)) cycle(edge(4) ? -1 : 1);
-      if (edge(0)) {
+      if (edge(PAD_BUTTON.lb) || edge(PAD_BUTTON.rb)) cycle(edge(PAD_BUTTON.lb) ? -1 : 1);
+      if (edge(PAD_BUTTON.a)) {
         if (chosen) journey();
         else centreOnPlayer();
       }

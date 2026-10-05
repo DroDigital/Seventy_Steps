@@ -25,6 +25,7 @@ const LABELS: Record<SettingId, [label: string, show: (v: number) => string]> = 
   uiScale: ['Text & HUD', (v) => `×${v.toFixed(2)}`],
   shake: ['Screen shake', pct],
   cutscenes: ['Cutscenes', (v) => (v > 0.5 ? 'On' : 'Off')],
+  padSwap: ['Swap A / B', (v) => (v > 0.5 ? 'On' : 'Off')],
   volume: ['Volume', pct],
   music: ['Music', pct],
   sfx: ['Effects', pct],
@@ -82,7 +83,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
     build(panel) {
       title(panel, 'SETTINGS');
       tabs(panel, TAB_NAMES, open, (i) => ((open = i), (waiting = null), (refused = false), page.redraw?.()), page);
-      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys);
+      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0));
       const body = el(panel, 'div', '', 'min-height:226px');
       for (const id of TABS[open][1]) {
         const [label, show] = LABELS[id];
@@ -129,7 +130,7 @@ export const FIXED_CONTROLS: readonly (readonly [string, string, string])[] = [
 ];
 
 /** The controls tab: the actions with their keys (choose one, then press its new key) beside the pad's, and what is fixed. */
-function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void): void {
+function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void): void {
   const grid = el(panel, 'div', '', 'display:grid;grid-template-columns:1fr auto auto 1fr auto auto;gap:0 12px;align-items:center;padding:0 10px');
   for (const cell of ['', 'KEY', 'PAD', '', 'KEY', 'PAD']) el(grid, 'div', cell, 'opacity:.5;letter-spacing:3px;font-size:10px;padding-bottom:2px');
   const half = Math.ceil(ACTIONS.length / 2);
@@ -145,6 +146,7 @@ function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | nul
   el(panel, 'div', FIXED_CONTROLS.map(([what, keys]) => `${what}: ${keys}`).join('   ·   '), 'opacity:.4;font-size:11px;line-height:1.5;margin:8px 10px 0');
   const row = el(panel, 'div', '', 'display:flex;justify-content:space-between;align-items:center;padding:0 14px;margin-top:8px');
   button(row, 'Reset keys', () => (Object.assign(keyLayout, DEFAULT_KEYS), save(), page.redraw?.())).classList.add('tag');
+  button(row, `Swap A / B: ${swapped ? 'on' : 'off'}`, () => (swap(!swapped), page.redraw?.()), false, 'Turn this on if the pad\u2019s A and B act the wrong way round. Kept with the settings.').classList.add('tag');
   el(row, 'div', `Pad: ${padReport() || 'none heard (press a button on it)'}`, 'opacity:.45;font-size:11px');
   footer(panel, refused() ? 'That key is kept (Shift, Tab, Enter, Esc and the arrows belong to the game and its menus). Choose another.' : 'Choose a key, then press its new one.', menuKeys(true), page.back);
 }
