@@ -99,6 +99,11 @@ describe('every line, whoever says it', () => {
     }
   });
 
+  it('puts a hall behind every horror, and keeps Peaslee and Morgan out of one another\'s register', () => {
+    for (const [s, v] of Object.entries(CAST)) if (s.startsWith('boss:')) expect(v.echo ?? 0, s).toBeGreaterThan(0);
+    expect(CAST['npc:peaslee']?.voice).not.toBe(CAST['npc:morgan']?.voice);
+  });
+
   it('are named apart: no two lines with different words share a name', () => {
     const byName = new Map<string, string>();
     for (const l of lines) {
