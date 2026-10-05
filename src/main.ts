@@ -274,7 +274,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         applyReality(fx, game.reality);
         lightReality(game.reality);
         life.update(camera, time, enclosed); // after the night's light: the lightning adds to it
-        if (spawned) audio.update(fx, time, camera, still);
+        if (spawned) audio.update(fx, time, camera, still, cinema.active);
         const lens = lensAt(fx, time);
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
         updateWorldUniforms(fx, time, camera.position, views.glow ?? noGlow, pipeline.size);

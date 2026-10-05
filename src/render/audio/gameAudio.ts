@@ -22,13 +22,13 @@ import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
 import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
 import { voiceIdOf, VOICES, type Voice, type VoiceId } from '../../data/voices';
-import { engagedFights } from '../../systems/bossFight';
 import { isAbsent, isConcealed, type Game, type GameEvents } from '../../systems/components';
 import { kitOfRoom } from '../../world/dungeonKit';
 import { dungeonRoomAt } from '../../world/terrain';
 import type { FxParams } from '../fx';
 import { createAmbience } from './ambience';
 import { createBossMusic } from './bossMusic';
+import { bossScene } from './bossScene';
 import { realmTrackOf, type RealmTrackId } from '../../data/realmMusic';
 import { createRealmMusic } from './realmMusic';
 import { createDread } from './dread';
@@ -48,7 +48,7 @@ import { playSound } from './synth';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
-  update(fx: FxParams, seconds: number, camera: THREE.Camera, paused: boolean): void;
+  update(fx: FxParams, seconds: number, camera: THREE.Camera, paused: boolean, cinematic?: boolean): void;
   /** A voice where `at` is, recorded if it can be (round 18: the small lives' cries as they take fright). */
   cry(id: VoiceId, at: V3, gain?: number): void;
   /** A recording from afar: panned anywhere, duller the quieter (round 18: the thunder after lightning). */
@@ -187,6 +187,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
 
   const speech = createSpeech(e, undefined, (speaker, text, buf, rate) => g.events.emit('Speaking', { speaker, text, rate, seconds: buf.duration / rate, curve: voicedCurve(buf.getChannelData(0), buf.sampleRate) })); // the voices of the people and of the horrors that speak; a caption is told when and how a line sounds
   g.events.on('Said', ({ speaker, text }) => speech.say(speaker, text));
+  g.events.on('Speaking', ({ speaker, seconds }) => void (speaker.startsWith('boss:') && music.duck(seconds))); // a horror's line: its theme goes low under it (round 44)
   g.events.on('Silenced', () => speech.stop());
   g.events.on('Talked', ({ npc, lines }) => speech.ahead(`npc:${npc}`, lines.slice(0, AHEAD))); // their recordings loaded before they are said
 
@@ -267,7 +268,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       if (set && recorded(set, at, v.range, { pitch, gain })) return;
       recipe(`voice:${id}`, v.call, { at, range: v.range, gain, pitch, vary: 0.8 });
     },
-    update(fx, seconds, camera, paused) {
+    update(fx, seconds, camera, paused, cinematic = false) {
       camera.updateMatrixWorld();
       const m = camera.matrixWorld.elements;
       const len = Math.hypot(m[0], m[2]) || 1;
@@ -278,15 +279,15 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       hush += (hushTo - hush) * (hushTo > hush ? 0.018 : 0.012); // a few seconds to close, a few to open
       e.setMuffle(Math.max(HEART.need, hush * 0.9)); // near death the world dulls, and the heart is heard (round 23)
       region = g.overworld ? (g.overworld.region ?? region) : 'arena'; // out at sea, the last shore's drone
-      const [fight] = engagedFights(g);
-      drones.set(region, !!fight);
+      const scene = bossScene(g); // round 44: the fights engaged, and the horror nearest unmet
+      drones.set(region, scene.fights.length > 0);
       const at = g.ecs.c.transform.get(g.player.id)?.pos;
       const roofed = (g.overworld && at && inside(at)) || null;
       ambience.set(roofed || (AMBIENCE[region ?? ''] ?? null));
       weatherBed.set(g.overworld?.weather.kind ?? 'clear', g.overworld?.weather.amount ?? 0, !!roofed); // round 26
       ambience.update(seconds);
-      music.update(fight ? { id: fight[1].id, phase: fight[1].phase } : null);
-      realm.update(seconds, { track: trackHere(at), fight: !!fight, hush: e.hushed, paused });
+      music.update({ ...scene, scene: cinematic });
+      realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });
       dread.update(seconds, paused);
       drones.update(fx, seconds);
       if (paused) return;

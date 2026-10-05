@@ -22,7 +22,7 @@ export const CREDITS: readonly CreditBlock[] = [
     quiet: true,
     lines: [
       'the voices of the people and the horrors are synthesised voices, made with ElevenLabs (Eleven v4)',
-      'the fifteen tracks of the realms were made with Suno',
+      'the fifteen tracks of the realms and the forty-eight boss themes were made with Suno',
       'the code was written with the help of Claude Code, from Anthropic',
       'every texture, sprite, mesh and effect is generated in code',
     ],

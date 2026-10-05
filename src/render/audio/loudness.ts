@@ -44,9 +44,10 @@ const median = (xs: number[]): number => {
 export const dB = (linear: number): number => 20 * Math.log10(Math.max(1e-9, linear));
 export const fromDB = (db: number): number => Math.pow(10, db / 20);
 
-/** The gain, and the loop's body, of a decoded track. A silent track has a gain of 1 and the whole file for its body. */
-export function analyse(channels: readonly Float32Array[], rate: number): Analysis {
-  const { window, steady, target, ceiling } = REALM_MUSIC;
+/** The gain, and the loop's body, of a decoded track. A silent track has a gain of 1 and the whole file for its body. The level is the realms' unless told another (round 44: the boss themes' own). */
+export function analyse(channels: readonly Float32Array[], rate: number, level: { target: number; ceiling: number } = REALM_MUSIC): Analysis {
+  const { window, steady } = REALM_MUSIC;
+  const { target, ceiling } = level;
   const { rms, peak } = windowLevels(channels, rate, window);
   const mid = median(rms.filter((x) => x > 1e-5));
   const whole = (channels[0]?.length ?? 0) / rate;
