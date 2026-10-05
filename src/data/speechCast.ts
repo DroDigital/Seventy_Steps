@@ -43,9 +43,9 @@ export const CAST: Readonly<Record<string, Voice>> = {
   // the narrator of a new game's opening (round 39): Finley, Articulate Anchor, a crisp and unflappable British voice, chosen by the author; a LIBRARY voice (licence unchecked: docs/VOICES.md); never whispered; set in a stone chamber (a warm, level voice with reverb, no slap-back echo)
   'narrator:intro': v(['fnYMz3F5gMEDGMWcH1ex', 'Finley - Articulate Anchor'], { room: true }),
   // people met at the Elder Signs
-  'npc:peaslee': v(['tFaKZ4OQAewSluuxn7RB', 'Wingate Peaslee (Seventy Steps)']), // designed: a deep, old, dry professor (Eric was too young)
+  'npc:peaslee': v(['tFaKZ4OQAewSluuxn7RB', 'Wingate Peaslee (Seventy Steps)']), // designed: a deep, old, dry professor (Eric was too young); the clips are lowered to ~95 Hz and 12% brisker (round 42)
   'npc:gilman': v(WILL),
-  'npc:morgan': v(['Zu8OeRoG1W5wagFvqvfs', 'Dr. Francis Morgan (Seventy Steps)']), // designed: elderly, low, dry, smoky
+  'npc:morgan': v(['Zu8OeRoG1W5wagFvqvfs', 'Dr. Francis Morgan (Seventy Steps)']), // designed: elderly, dry, smoky; the clips are raised to ~122 Hz, brightened and 10% brisker so he is not Peaslee (round 42)
   'npc:kuranes': v(['bY8puK6S3RGlr0wikENe', 'Kuranes (Dream Lands)']), // designed: a gentle, dreamy Londoner
   'npc:zadok': v(['oS1Ldc1OhmULV32wNtyv', 'Zadok Allen (Innsmouth)']), // designed: ninety-six, cracked, slurred, a New England drawl
   'npc:wilmarth': v(ROGER),
@@ -59,24 +59,24 @@ export const CAST: Readonly<Record<string, Voice>> = {
   'npc:carter': v(DANIEL),
   'npc:nasht': v(PRIESTS, { echo: 0.2 }),
   // the horrors that speak
-  'boss:wilbur_whateley': v(HARRY, { rate: 0.96 }),
+  'boss:wilbur_whateley': v(HARRY, { rate: 0.96, echo: 0.15 }),
   'boss:dunwich_horror': v(HARRY, { rate: 0.72, echo: 0.5 }),
-  'boss:keziah_mason': v(['BbF0R6lcyCsZVwnjHzwi', 'Keziah Mason (Witch)']),
-  'boss:brown_jenkin': v(['XAfV6hn6JT4LPatdDizz', 'Brown Jenkin (Familiar)']),
+  'boss:keziah_mason': v(['BbF0R6lcyCsZVwnjHzwi', 'Keziah Mason (Witch)'], { echo: 0.25 }),
+  'boss:brown_jenkin': v(['XAfV6hn6JT4LPatdDizz', 'Brown Jenkin (Familiar)'], { echo: 0.2 }),
   'boss:black_man': v(['gdQL6olVLhkRDvue4G8n', 'The Black Man (Tempter)'], { rate: 0.97, echo: 0.25 }),
-  'boss:joseph_curwen': v(['ttJ9Yma2EKpRou0MKpVX', 'Joseph Curwen (Necromancer)']),
-  'boss:simon_orne': v(['MN6OV4FaLTmDyt2HbvDM', 'Simon Orne (Sorcerer)']),
-  'boss:edward_hutchinson': v(['d5fMF4XN1xXNbhcn2sVN', 'Edward Hutchinson (Alchemist)']),
-  'boss:ephraim_waite': v(['uLSdhli8Nh3oecMulCST', 'Ephraim Waite (Asenath)']),
-  'boss:whisperer': v(['GhTAOZ6TpanaXZ2BebFG', 'The Whisperer (Darkness)']),
+  'boss:joseph_curwen': v(['ttJ9Yma2EKpRou0MKpVX', 'Joseph Curwen (Necromancer)'], { echo: 0.3 }),
+  'boss:simon_orne': v(['MN6OV4FaLTmDyt2HbvDM', 'Simon Orne (Sorcerer)'], { echo: 0.25 }),
+  'boss:edward_hutchinson': v(['d5fMF4XN1xXNbhcn2sVN', 'Edward Hutchinson (Alchemist)'], { echo: 0.25 }),
+  'boss:ephraim_waite': v(['uLSdhli8Nh3oecMulCST', 'Ephraim Waite (Asenath)'], { echo: 0.3 }),
+  'boss:whisperer': v(['GhTAOZ6TpanaXZ2BebFG', 'The Whisperer (Darkness)'], { echo: 0.45 }),
   'boss:voice_in_the_tomb': v(['8sQoC7ywyRWufwwkpxmi', 'Voice in the Tomb (Sealed)'], { echo: 0.35 }),
   'boss:lilith': v(['ZpcPectqj6jA7upy2ds6', 'Lilith (Dark Queen)'], { rate: 0.96, echo: 0.3 }),
-  'boss:dr_munoz': v(['znCQdZ10eP9TPmKFUBiB', 'Dr. Munoz (Cold Apartment)']),
-  'boss:charles_le_sorcier': v(['XbbZLJxYknwZpVDBF8yd', 'Charles Le Sorcier (Cursed Lord)']),
-  'boss:medusa_gorgon': v(['mxxi4y139JdJkcoAWz38', 'Medusa (Gorgon)']),
-  'boss:hypnos': v(['2By09Lf6hdgEqSaKjF6R', 'Hypnos (Sleep)']),
-  'boss:terrible_old_man': v(['z0Hf7ohJe76SmjpHcSB1', 'Terrible Old Man (Kingsport)']),
-  'boss:zkauba': v(['FtER3HTVunb98SClCpA6', 'Zkauba (Wizard of Yaddith)']),
+  'boss:dr_munoz': v(['znCQdZ10eP9TPmKFUBiB', 'Dr. Munoz (Cold Apartment)'], { echo: 0.2 }),
+  'boss:charles_le_sorcier': v(['XbbZLJxYknwZpVDBF8yd', 'Charles Le Sorcier (Cursed Lord)'], { echo: 0.35 }),
+  'boss:medusa_gorgon': v(['mxxi4y139JdJkcoAWz38', 'Medusa (Gorgon)'], { echo: 0.3 }),
+  'boss:hypnos': v(['2By09Lf6hdgEqSaKjF6R', 'Hypnos (Sleep)'], { echo: 0.4 }),
+  'boss:terrible_old_man': v(['z0Hf7ohJe76SmjpHcSB1', 'Terrible Old Man (Kingsport)'], { echo: 0.25 }),
+  'boss:zkauba': v(['FtER3HTVunb98SClCpA6', 'Zkauba (Wizard of Yaddith)'], { echo: 0.3 }),
   'boss:cthulhu': v(['4BurENwzMIaL1Rien7nO', 'Cthulhu (Dreamer of R\'lyeh)'], { rate: 0.9, echo: 0.6 }),
   'boss:father_dagon': v(['e6kNUrNTHrY2UHszWVOb', 'Father Dagon (Deep One)'], { rate: 0.94, echo: 0.45 }),
   'boss:mother_hydra': v(HYDRA, { rate: 0.96, echo: 0.45 }),
