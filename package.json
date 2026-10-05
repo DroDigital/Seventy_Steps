@@ -3,6 +3,8 @@
   "productName": "Seventy Steps",
   "description": "A Lovecraftian open-world soulslike in retro 3D.",
   "private": true,
+  "author": "Alessandro A. Foddis",
+  "license": "SEE LICENSE IN LICENSE",
   "version": "0.12.0",
   "type": "module",
   "main": "desktop/main.js",
