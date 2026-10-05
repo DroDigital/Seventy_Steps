@@ -12,6 +12,7 @@ import { Matrix4, Quaternion, Vector3, type PerspectiveCamera } from 'three';
 import { keyLayout } from '../core/bindings';
 import type { Entity } from '../core/ecs';
 import { clamp, type V3 } from '../core/geom';
+import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
 import type { Beat, Scene, Subject } from '../data/cutscenes';
 import { CAMERA, SIM } from '../data/tuning';
@@ -31,7 +32,7 @@ const SKIP_FADE = 0.4; // to black, then out of the scene
 const KEEP = 0.7; // metres the lens keeps off a wall it was pulled in from
 const SIGN_HEIGHT = 2.4;
 const SKIP_KEYS: ReadonlySet<string> = new Set(['Escape', 'Enter', 'Space', 'NumpadEnter']);
-const PAD = { a: 0, b: 1, start: 9 };
+const PAD = PAD_BUTTON;
 
 /** Who the scene is about, besides the investigator: the horror. */
 export interface Cast {

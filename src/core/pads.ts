@@ -7,6 +7,8 @@
  * Gamepad API's own shape; those are read as the browser's are, the browser's list first.
  */
 
+import { faceSwapped } from './padMap';
+
 /** A pad as the Gamepad API gives it, and as the desktop shell's bridge does. */
 interface PadLike {
   readonly index: number;
@@ -142,7 +144,7 @@ export function activePad(): PadReading | null {
   source = best ? (best === nativeUsed ? 'shell' : 'browser') : null;
   const heard = Math.max(web.heard, native.heard); // (the same pad may be in both lists)
   report = best ? `${best.reading.id}${best.reading.mapping === 'standard' ? '' : ' (not a standard layout: some buttons may differ)'}` : heard ? `${heard} controller${heard > 1 ? 's' : ''} found: press a button on the one to use` : '';
-  return best?.reading ?? null;
+  return best ? { ...best.reading, buttons: faceSwapped(best.reading.buttons) as PadReading['buttons'] } : null; // (A and B exchanged when the player's switch is on: core/padMap.ts)
 }
 
 let resync = false;

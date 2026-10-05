@@ -13,6 +13,7 @@ import { noteLockAsked } from './mouseLock';
 import { INPUT, SIM } from '../data/tuning';
 import { keyLayout, type Action } from './bindings';
 import { useDevice } from './device';
+import { PAD_BUTTON } from './padMap';
 import { activePad, takeResync } from './pads';
 
 export const BUTTONS = ['light', 'heavy', 'dodge', 'block', 'parry', 'shoot', 'reload', 'lock', 'item', 'heal', 'throw', 'interact'] as const;
@@ -53,7 +54,7 @@ export function emptyInput(): InputFrame {
 const KEYED: readonly (readonly [Action, Button])[] = [['dodge', 'dodge'], ['shoot', 'shoot'], ['reload', 'reload'], ['lock', 'lock'], ['heal', 'heal'], ['item', 'item'], ['throw', 'throw'], ['interact', 'interact']];
 const keyButton = (code: string): Button | undefined => KEYED.find(([a]) => keyLayout[a] === code)?.[1];
 /** Standard-mapping pad: RB light, RT heavy, LB block, LT parry, B dodge, X revolver, d-pad left its reload, Y Reagent, d-pad down Laudanum, d-pad up a flask of oil, R3 lock-on, A interact. */
-const PAD: Readonly<Record<Button, number>> = { light: 5, heavy: 7, block: 4, parry: 6, dodge: 1, shoot: 2, reload: 14, lock: 11, heal: 3, item: 13, throw: 12, interact: 0 };
+const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD_BUTTON.rt, block: PAD_BUTTON.lb, parry: PAD_BUTTON.lt, dodge: PAD_BUTTON.b, shoot: PAD_BUTTON.x, reload: PAD_BUTTON.left, lock: PAD_BUTTON.r3, heal: PAD_BUTTON.y, item: PAD_BUTTON.down, throw: PAD_BUTTON.up, interact: PAD_BUTTON.a };
 
 interface PadState {
   lx: number;

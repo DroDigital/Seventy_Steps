@@ -11,6 +11,7 @@
  */
 
 import { useDevice, onDeviceChange } from '../core/device';
+import { PAD_BUTTON } from '../core/padMap';
 import { activePad, muteHeldPad, type PadReading } from '../core/pads';
 import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
@@ -49,7 +50,7 @@ interface Entry {
 }
 
 const GRACE_MS = 250;
-const PAD = { a: 0, b: 1, lb: 4, rb: 5, select: 8, start: 9, up: 12, down: 13, left: 14, right: 15 };
+const PAD = PAD_BUTTON;
 const STICK = 0.6;
 const REPEAT_MS = [380, 110] as const; // a held direction repeats after the first, then every second
 
