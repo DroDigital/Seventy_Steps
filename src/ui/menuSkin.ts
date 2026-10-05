@@ -45,7 +45,7 @@ export interface Attached {
   /** The panel's size or contents changed. */
   fit(): void;
   /** For a script: the art as it is `ms` after opening (and still). */
-  seek(ms: number): void;
+  seek(ms: number, stir?: number): void;
 }
 
 /** A surge's level after `dt` seconds toward `goal` (1 swelling, 0 settling): eased, so it never steps. */
@@ -63,6 +63,7 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
   let art: SkinArt | null = null;
   let size = '';
   let [t0, timer, still, stirUntil] = [0, 0, -1, -1e9];
+  let stillStir: number | undefined; // a script's: the surge held at a level (seek)
   let [stirLevel, stirAt] = [0, 0]; // how far it has swelled, eased toward its goal each frame: a surge that began in a step moved every bank of mist at once
   let ratio = 1;
 
@@ -78,7 +79,7 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     stirAt = now;
     const goal = now < stirUntil ? 1 : 0;
     stirLevel = stirStep(stirLevel, goal, dt);
-    const stir = stirLevel * stirLevel * (3 - 2 * stirLevel); // smoothstep: no kink at either end
+    const stir = stillStir ?? stirLevel * stirLevel * (3 - 2 * stirLevel); // smoothstep: no kink at either end
     art.draw(ctx, ms, open, stir);
     art.words(panel, open, BASE);
   };
@@ -116,9 +117,10 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
       stirUntil = Math.max(stirUntil, performance.now() + holdMs); // (another while one is on goes on from where it is: no restart)
     },
     fit,
-    seek(ms) {
+    seek(ms, level) {
       clearTimeout(timer);
       still = ms;
+      stillStir = level;
       fit();
     },
   };
