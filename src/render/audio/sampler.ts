@@ -7,6 +7,8 @@
  */
 
 import { SAMPLE_PITCH, type SampleSet } from '../../data/samples';
+import { SAMPLE_LEVELS } from '../../data/sampleLevels';
+import { takeTrims } from '../../data/takeTrim';
 import { AUDIO } from '../../data/tuning';
 import type { AudioEngine } from './engine';
 import type { PlayOptions } from './synth';
@@ -17,6 +19,7 @@ export interface SampleOptions extends PlayOptions {
   lowpass?: number; // Hz: dulled by distance
   bus?: AudioNode; // the one-shots bus by default
   delay?: number; // seconds after now it starts (round 20: a blow's layers land a moment apart)
+  fit?: number; // seconds: played faster or slower to last exactly this long (round 40: a door's swing), within a third either way
 }
 
 export interface Sampler {
@@ -42,6 +45,7 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
   const buffers = new Map<string, AudioBuffer | null>(); // null: it failed
   const pending = new Map<string, Promise<void>>();
   const last = new WeakMap<SampleSet, string>();
+  const trims = new WeakMap<SampleSet, Record<string, number>>(); // each take's level against its set's (data/takeTrim.ts)
   const fetchOne = (ctx: BaseAudioContext, file: string): Promise<void> => {
     let p = pending.get(file);
     if (!p) {
@@ -77,10 +81,13 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
       const [lo, hi] = set.pitch ?? SAMPLE_PITCH;
       const src = ctx.createBufferSource();
       src.buffer = buffers.get(`sfx/${file}`)!;
-      src.playbackRate.value = (lo + (hi - lo) * Math.random()) * (o.pitch ?? 1);
+      const rate = o.fit && src.buffer.duration > 0 ? Math.min(1.33, Math.max(0.75, src.buffer.duration / o.fit)) : (lo + (hi - lo) * Math.random()) * (o.pitch ?? 1);
+      src.playbackRate.value = rate;
       src.detune.value = e.detune; // the sanity FX's sag, as the recipes take it
       const out = ctx.createGain();
-      out.gain.value = set.gain * (o.gain ?? 1);
+      let trim = trims.get(set);
+      if (!trim) trims.set(set, (trim = takeTrims(set)));
+      out.gain.value = set.gain * 10 ** ((trim[file] ?? 0) / 20) * (o.gain ?? 1);
       const pan = ctx.createStereoPanner();
       pan.pan.value = Math.max(-1, Math.min(1, o.pan ?? 0));
       let node: AudioNode = src;
@@ -102,5 +109,5 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
   };
 }
 
-/** Every one-shot file the sets name, as the sampler loads them. */
-export const setFiles = (sets: Iterable<SampleSet>): string[] => [...new Set([...sets].flatMap((s) => s.files.map((f) => `sfx/${f}`)))];
+/** Every one-shot file the sets name, as the sampler loads them (a planned set's only if it has been recorded). */
+export const setFiles = (sets: Iterable<SampleSet>): string[] => [...new Set([...sets].flatMap((s) => s.files.filter((f) => !s.planned || SAMPLE_LEVELS[`sfx/${f}`]).map((f) => `sfx/${f}`)))]; // (a planned set's files are fetched only once they are there)

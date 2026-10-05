@@ -7,6 +7,7 @@
  */
 
 import { SERIF } from './hudKit';
+import { menuSound } from './menuSounds';
 
 /** The menus' colours (round 38): ash for the print and the ground, and the haunt's eldritch purple for what is lit. */
 export const INK = '#cbc7bd';
@@ -115,8 +116,10 @@ export function slider(parent: HTMLElement, label: string, [min, max, step]: rea
   const out = el(row, 'span', show(value));
   const fill = (): void => void input.style.setProperty('--fill', `${((Number(input.value) - min) / (max - min || 1)) * 100}%`);
   fill();
+  let ticked = 0;
   input.addEventListener('input', () => {
     fill();
+    if (performance.now() - ticked > 55) [ticked] = [performance.now(), menuSound('tick')]; // a step of it, not every pixel of a drag
     set(Number(input.value));
     out.textContent = show(Number(input.value));
   });
@@ -131,6 +134,7 @@ export const tabJustChanged = (): boolean => performance.now() - tabbedAt < 80;
 export function tabs(parent: HTMLElement, names: readonly string[], open: number, pick: (i: number) => void, page: Page): void {
   const go = (i: number): void => {
     tabbedAt = performance.now(); // the page drawn next comes in by its body only
+    menuSound('tab');
     pick(i);
   };
   const row = el(parent, 'div', '', `display:flex;justify-content:center;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);

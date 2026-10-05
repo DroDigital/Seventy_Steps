@@ -45,7 +45,7 @@ export function buy(g: Game, id: WareId): boolean {
   const price = WARES[id].price;
   g.player.echoes -= price;
   g.overworld!.sold.set(id, soldOf(g, id) + 1);
-  g.events.emit('Echoes', { change: 'spent', amount: price, total: g.player.echoes });
+  g.events.emit('Echoes', { change: 'spent', amount: price, total: g.player.echoes, on: 'ware' });
   if (id === 'oil') g.player.oil++;
   else if (id === 'rounds') g.player.rounds += GUN.box;
   else if (id === 'vial') addVial(g);

@@ -8,7 +8,7 @@
 
 import * as THREE from 'three';
 import { LOOKS, lookOf, type Look } from '../data/looks';
-import { NIGHT_DARK, SKY, type Vec3 } from '../data/tuning';
+import { DUNGEON_LIGHT, NIGHT_DARK, SKY, type Vec3 } from '../data/tuning';
 import type { FxParams } from './fx';
 import type { PostPass } from './postPass';
 import { buildRealmPalette, gradeTints } from './realmPalette';
@@ -81,7 +81,7 @@ function apart(a: Look, b: Look): number {
 export function createRealmLook(post: PostPass): RealmLook {
   let eased = lookOf(null); // the realm's look, eased from realm to realm
   let now = eased; // and as the night leaves it
-  let dark = 0;
+  let dark = 0; // the night's darkness as laid, eased (a door's threshold is not a step in the light)
   let built: Look | null = null;
   let want = eased;
   let at: readonly [string | null, boolean] = [null, false];
@@ -107,7 +107,6 @@ export function createRealmLook(post: PostPass): RealmLook {
       return now;
     },
     update(time, region, enclosed, camera, snap = false, deep = 0) {
-      dark = deep;
       const leapt = !!camera && was.distanceToSquared(camera) > SKY.jump * SKY.jump;
       if (camera) was.copy(camera);
       const dt = last < 0 || leapt || snap ? 1e9 : Math.min(0.1, Math.max(0, time - last));
@@ -115,6 +114,7 @@ export function createRealmLook(post: PostPass): RealmLook {
       at = [region, enclosed];
       want = enclosed ? indoors(lookOf(region)) : lookOf(region);
       eased = dt >= 1e9 ? want : easeLook(eased, want, Math.min(1, dt / SKY.fade));
+      dark = dt >= 1e9 ? deep : dark + (deep - dark) * Math.min(1, dt * DUNGEON_LIGHT.ease);
       publish();
     },
     snap() {

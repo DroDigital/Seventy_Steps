@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import type { DoorKind, DoorLook } from '../data/doors';
+import { DOOR_GAIN, doorSound, materialOf } from '../data/doorSounds';
 import type { Game } from '../systems/components';
 import { gatePlan, type DoorSpec } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
@@ -19,13 +20,14 @@ const MAKE = 70; // metres: nearer than this a door is made...
 const KEEP = 100; // ...and farther than this it is put away
 const SWING = 1.6; // radians a leaf opens
 /** Metres at which it begins to open, and how long (seconds) it takes. */
-const KIND: Readonly<Record<DoorKind, { reach: number; seconds: number }>> = {
+export const DOOR_KINDS: Readonly<Record<DoorKind, { reach: number; seconds: number }>> = {
   plank: { reach: 4.2, seconds: 0.8 },
   grille: { reach: 4.2, seconds: 0.6 },
   slab: { reach: 6.5, seconds: 1.5 },
   membrane: { reach: 4.2, seconds: 1.1 },
   curtain: { reach: 3.4, seconds: 0.6 },
 };
+const DOOR_RANGE = 24; // metres a door is heard from (a room or two off: the walls between are not heard through, but the next room's door is)
 const HOLD = 2; // metres farther a door stays open once it is
 
 interface Door {
@@ -37,6 +39,7 @@ interface Door {
   sign: 1 | -1; // which way it swings
   wasShut: boolean;
   quiet: number; // seconds until it may sound again
+  dir: -1 | 0 | 1; // the way it moved last frame: a swing's sound is made as one begins, and again if it turns
 }
 
 /** How open a door wants to be: wide when someone is within `reach` (farther than that, while it is open), else shut, or ajar until first approached. */
@@ -62,7 +65,7 @@ export interface DoorViews {
 }
 
 export function createDoors(scene: THREE.Scene, g: Game, audio: GameAudio): DoorViews {
-  const doors: Door[] = gatePlan(worldLayout()).doors.map((spec) => ({ spec, group: null, leaves: null, open: spec.ajar ? 0.35 : 0, touched: false, sign: 1, wasShut: true, quiet: 0 }));
+  const doors: Door[] = gatePlan(worldLayout()).doors.map((spec) => ({ spec, group: null, leaves: null, open: spec.ajar ? 0.35 : 0, touched: false, sign: 1, wasShut: true, quiet: 0, dir: 0 }));
   let last = -1;
 
   const make = (d: Door): void => {
@@ -91,6 +94,17 @@ export function createDoors(scene: THREE.Scene, g: Game, audio: GameAudio): Door
     d.group = d.leaves = null;
   };
 
+  /** The sound of a door going `swing` seconds, opening or closing, where it stands. */
+  const sound = (d: Door, swing: number, closing: boolean): void => {
+    const { spec } = d;
+    const at = { x: spec.x, y: spec.y + spec.height * 0.5, z: spec.z };
+    const made = doorSound(spec.look, swing, closing, Math.random);
+    const gain = DOOR_GAIN[materialOf(spec.look)];
+    const key = `door:${materialOf(spec.look)}:${closing ? 'close' : 'open'}`;
+    audio.recipe(key, made.sound, { at, range: DOOR_RANGE, gain, vary: 0.5, fit: swing }); // (a recording of the door, once there is one, is played to last the swing)
+    if (!audio.recordedFor(key)) for (const u of made.under) audio.sampleAt(u.set, at, { gain: u.gain * gain, pitch: u.pitch, range: DOOR_RANGE, delay: u.at }); // (and brings its own stop)
+  };
+
   return {
     update(camera, time, hidden) {
       const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, time - last));
@@ -114,7 +128,7 @@ export function createDoors(scene: THREE.Scene, g: Game, audio: GameAudio): Door
           if (far > MAKE) continue;
           make(d);
         }
-        const k = KIND[spec.look.kind];
+        const k = DOOR_KINDS[spec.look.kind];
         let near = Infinity;
         for (const m of movers) near = Math.min(near, Math.hypot(m.x - spec.x, m.z - spec.z));
         const want = wantOpen({ ajar: spec.ajar, touched: d.touched }, near, k.reach, d.open > 0.5);
@@ -126,10 +140,15 @@ export function createDoors(scene: THREE.Scene, g: Game, audio: GameAudio): Door
         const was = d.open;
         d.open += Math.sign(want - d.open) * Math.min(Math.abs(want - d.open), dt / k.seconds);
         d.quiet -= dt;
-        if (d.open - was > 0 && was < 0.04 && d.quiet <= 0 && near < 12 && spec.look.creak !== 'none') {
-          d.quiet = 1.5;
-          audio.sample(spec.look.creak === 'rumble' ? 'rumble' : spec.look.creak === 'flesh' ? 'flesh' : 'thud', { gain: spec.look.creak === 'thud' ? 0.3 : 0.4, pitch: spec.look.creak === 'rumble' ? 0.7 : 0.8 + 0.2 * Math.random() });
+        const dir = Math.sign(d.open - was) as -1 | 0 | 1;
+        if (dir !== 0 && dir !== d.dir && d.quiet <= 0) { // a swing begins (or turns): its sound is made for the swing it has to go, and heard where the door stands
+          const swing = Math.abs(want - was) * k.seconds;
+          if (swing >= 0.2) {
+            d.quiet = 0.4;
+            sound(d, swing, dir < 0);
+          }
         }
+        d.dir = dir;
         const p = pose(spec.look, d.open, d.sign, spec.height, spec.width, time);
         const [l, r] = d.leaves!;
         l.rotation.copy(p.left);

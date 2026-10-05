@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import { FOG_THEMES, type FogMotion, type FogTheme } from '../data/fogThemes';
+import { CLASS_GAIN, MIST_CLOSE, mistPass } from '../data/foleySounds';
 import type { Game } from '../systems/components';
 import { gatePlan, type FogWall } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
@@ -103,7 +104,7 @@ export interface BossFog {
 
 export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles, audio: GameAudio): BossFog {
   const walls: Wall[] = gatePlan(worldLayout()).fogs.map((w) => ({ w, theme: FOG_THEMES[w.theme], mesh: null, vis: 0, held: 0, gone: false, owed: 0, engaged: false }));
-  g.events.on('FogPassing', () => audio.sample('rumble', { gain: 0.4, pitch: 0.85 }));
+  g.events.on('FogPassing', (e) => void audio.recipe('mist:pass', mistPass(e.frames / 60), { gain: CLASS_GAIN.mist, vary: 0.6 })); // the sound is the walk through: as long as it is
   g.events.on('FogPassed', (e) => {
     const b = walls.find((w) => w.w.id === e.wall);
     if (b) burst(b, e); // it closes behind them
@@ -198,6 +199,7 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
   function burst(b: Wall, me: { x: number; z: number }): void {
     const [cx, cz] = nearest(b.w, me);
     for (let i = 0; i < 46; i++) mote(b, cx + (rand() - 0.5) * (b.w.kind === 'ring' ? 10 : b.w.width), cz + (rand() - 0.5) * 3, !!b.theme.sparks && rand() < b.theme.sparks.share * 1.4, 1.4);
-    audio.sample('rumble', { gain: 0.55, pitch: 0.62 });
+    audio.recipe('mist:close', MIST_CLOSE, { gain: CLASS_GAIN.mist, vary: 0.6 }); // the wall closes behind them...
+    audio.sample('rumble', { gain: 0.3, pitch: 0.62 }); // ...and the horror stirs
   }
 }

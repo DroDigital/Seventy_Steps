@@ -8,6 +8,7 @@
  * recipes play as before.
  */
 
+import { PLANNED, type PlannedId } from './plannedSounds';
 import type { StingerId } from './sounds';
 import type { VoiceId } from './voices';
 
@@ -15,6 +16,7 @@ export interface SampleSet {
   files: readonly string[]; // under audio/sfx/, without the extension
   gain: number;
   pitch?: readonly [lo: number, hi: number]; // playback rate (default: SAMPLE_PITCH)
+  planned?: boolean; // not yet recorded (data/plannedSounds.ts): its files are played only once they are there
 }
 
 export const SAMPLE_PITCH = [0.94, 1.06] as const;
@@ -121,6 +123,17 @@ export const SAMPLE_SETS = {
 } satisfies Record<string, SampleSet>;
 
 export type SampleSetId = keyof typeof SAMPLE_SETS;
+
+/** The recordings the game is ready for and does not yet have (data/plannedSounds.ts), as sets. */
+export const PLANNED_SETS: Readonly<Record<PlannedId, SampleSet>> = Object.fromEntries(
+  PLANNED.map((p) => [p.id, { files: takes(p.file, p.takes), gain: p.gain, pitch: p.fit ? ([1, 1] as const) : ([0.96, 1.04] as const), planned: true }]),
+);
+
+/** A set by its id, a recorded one's or a planned one's. */
+export const setOf = (id: SampleSetId | PlannedId): SampleSet => SAMPLE_SETS[id as SampleSetId] ?? PLANNED_SETS[id];
+
+/** The planned set that stands in front of a recipe (by its key), if there is one. */
+export const RECORDED_FOR: Readonly<Record<string, PlannedId>> = Object.fromEntries(PLANNED.flatMap((p) => p.for.map((k) => [k, p.id])));
 
 /** Stingers that are recorded: the set, and the share of the stinger's recipe kept beneath it (0: none). */
 export const STINGER_SAMPLES: Partial<Record<StingerId, readonly [SampleSetId, number]>> = {

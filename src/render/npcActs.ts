@@ -6,6 +6,7 @@
  */
 
 import { SEATED, type ActKind } from '../data/npcActs';
+import { TIMING as T } from '../data/actBeats';
 import type { Figure } from './figures';
 
 type Joint = Figure['legR'];
@@ -55,13 +56,13 @@ function breathe(f: Figure, k: number, t: number): void {
 
 /** The smoker's draw on his pipe, and the breath let out after it (shared with the smoke: render/pipeSmoke.ts). */
 export function pipeBeat(t: number): { draw: number; out: number } {
-  return { draw: pulse(t, 15, 6, 5, 0.9), out: pulse(t, 15, 11.4, 2.2, 0.5) };
+  return { draw: pulse(t, ...T.pipe.draw), out: pulse(t, ...T.pipe.out) };
 }
 
 const ACTS: Readonly<Record<ActKind, Act>> = {
   // Seated well back in a chair, a book held open in both hands before the chest; a page turned every while, a glance up from it, and now and then the shifting of a leg.
   read(f, k, t) {
-    const turn = pulse(t, 11, 8, 1.5);
+    const turn = pulse(t, ...T.read.turn);
     const glance = pulse(t, 17, 12, 2.4, 0.7);
     const shift = pulse(t, 23, 15, 2.2, 0.8);
     sit(f, k);
@@ -89,8 +90,8 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Seated, a notebook on the knee, a pen: scribbling, then a pause to look up and think.
   write(f, k, t) {
-    const think = pulse(t, 14, 9, 3.4, 0.6);
-    const scribble = (1 - think) * (Math.sin(t * 13) * 0.08 + Math.sin(t * 2.3) * 0.06);
+    const think = pulse(t, ...T.write.think);
+    const scribble = (1 - think) * (Math.sin(t * T.write.stroke) * 0.08 + Math.sin(t * 2.3) * 0.06);
     sit(f, k);
     arms(f, k, [-0.4 - 0.25 * think, -1.3 - 0.4 * think, 0.45], [-0.3, -1.1, 0.35]);
     to(f.handR, k, 0, scribble, 0);
@@ -101,7 +102,7 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Seated, the pipe in the hand on the knee; every while, up to the mouth, a long draw, and down again.
   smoke(f, k, t) {
-    const draw = pulse(t, 15, 6, 5, 0.9);
+    const draw = pulse(t, ...T.pipe.draw);
     sit(f, k);
     arms(f, k, [-0.35 - 0.2 * draw, -1.15 - 1.35 * draw, 0.15], [-0.3, -1.1, 0.15]);
     to(f.torso, k, 0.1 - 0.06 * draw);
@@ -121,7 +122,7 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Seated and swaying, a bottle in the hand on the knee; up it goes, the head back, and down; the head nods.
   drink(f, k, t) {
-    const sup = pulse(t, 17, 7, 4.5, 0.9);
+    const sup = pulse(t, ...T.drink.sup);
     sit(f, k);
     arms(f, k, [-0.3 - 0.25 * sup, -1.1 - 1.4 * sup, 0.12], [-0.3, -1.0, 0.12]);
     to(f.torso, k, 0.12 - 0.12 * sup, 0, 0.06 * Math.sin(t * 0.55));
@@ -130,8 +131,8 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Seated, the stick in the left hand, the knife in the right: strokes toward the body, then a look at the work.
   whittle(f, k, t) {
-    const look = pulse(t, 12, 8, 2.5, 0.5);
-    const stroke = (1 - look) * (0.5 + 0.5 * Math.sin(t * 5.2));
+    const look = pulse(t, ...T.whittle.look);
+    const stroke = (1 - look) * (0.5 + 0.5 * Math.sin(t * T.whittle.stroke));
     sit(f, k);
     arms(f, k, [-0.35 - 0.1 * stroke, -1.3 - 0.2 * stroke, 0.45], [-0.4, -1.2, 0.35]);
     to(f.handR, k, 0.15 * stroke, 0.25 * stroke);
@@ -141,15 +142,15 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Standing, the chart held open in both hands; now and then it is lowered and a hand points at the far hills.
   map(f, k, t) {
-    const point = pulse(t, 13, 8, 3.6, 0.7);
+    const point = pulse(t, ...T.map.point);
     arms(f, k, [-0.5 - 0.95 * point, -1.15 + 0.95 * point, 0.4 - 0.4 * point], [-0.5, -1.15, 0.4]);
     to(f.head, k, 0.3 - 0.35 * point, 0.7 * point * Math.sin(t * 0.35 + 1));
     breathe(f, k, t);
   },
   // Seated, a blade across the knees; a cloth drawn the length of it, over and over, the head bent to it.
   polish(f, k, t) {
-    const rest = pulse(t, 16, 12, 2.5, 0.5);
-    const rub = (1 - rest) * Math.sin(t * 2.4);
+    const rest = pulse(t, ...T.polish.rest);
+    const rub = (1 - rest) * Math.sin(t * T.polish.rub);
     sit(f, k);
     arms(f, k, [-0.45, -0.9, 0.15 + 0.32 * rub], [-0.4, -0.8, 0.25]);
     to(f.torso, k, 0.22);
@@ -158,7 +159,7 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Seated, a coil of rope in the lap, both hands working it: small turns, and every while a pull to test it.
   mend(f, k, t) {
-    const pull = pulse(t, 10, 6, 1.6, 0.4);
+    const pull = pulse(t, ...T.mend.pull);
     sit(f, k);
     arms(f, k, [-0.45 - 0.1 * pull, -1.1 - 0.3 * pull, 0.35 - 0.15 * pull]);
     to(f.handR, k, 0.1 * Math.sin(t * 3.1), 0.1 * Math.sin(t * 2.2));
@@ -180,16 +181,16 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Standing, the silver key held up in the left hand and turned in the light; then lowered and looked past.
   key(f, k, t) {
-    const past = pulse(t, 14, 9, 3.2, 0.7);
+    const past = pulse(t, ...T.key.past);
     to(f.armL, k, -1.0 + 0.6 * past, -0.3 * (1 - past));
     to(f.elbowL, k, -1.7 + 1.1 * past);
-    to(f.handL, k, 0, 1.4 * Math.sin(t * 0.9) * (1 - past));
+    to(f.handL, k, 0, 1.4 * Math.sin(t * T.key.turn) * (1 - past));
     to(f.head, k, 0.12 - 0.3 * past, 0.35 * past * Math.sin(t * 0.6));
     breathe(f, k, t);
   },
   // Standing, the vial raised to the eye and tilted this way and that; now and then, a shake, a look at the lamp.
   vial(f, k, t) {
-    const shake = pulse(t, 12, 8, 1.4, 0.3);
+    const shake = pulse(t, ...T.vial.shake);
     arms(f, k, [-0.9, -1.9 + 0.15 * Math.sin(t * 0.8), 0.1], [-0.25, -0.9, 0.2]);
     to(f.handR, k, 0.15 * Math.sin(t * 0.8), 0.3 * Math.sin(t * 0.55), 0.4 * shake * Math.sin(t * 22));
     to(f.head, k, 0.05, -0.2 + 0.15 * Math.sin(t * 0.4));
@@ -197,7 +198,7 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Standing, the watch taken out and held in the palm: looked at, held to the ear, looked at again, put away.
   watch(f, k, t) {
-    const listen = pulse(t, 13, 7, 3, 0.6);
+    const listen = pulse(t, ...T.watch.listen);
     const away = pulse(t, 13, 11, 2, 0.5);
     const out = 1 - away;
     arms(f, k, [-0.5 * out - 0.1 * listen, -1.2 * out - 1.2 * listen, 0.25], [-0.1, -0.35, 0.05]);
@@ -207,7 +208,7 @@ const ACTS: Readonly<Record<ActKind, Act>> = {
   },
   // Standing, both hands on the cane planted before them, the weight on it; looking slowly about, a tap of its foot.
   lean(f, k, t) {
-    const tap = pulse(t, 8, 6, 0.7, 0.2);
+    const tap = pulse(t, ...T.lean.tap);
     arms(f, k, [-0.4, -0.4, 0.05], [-0.5, -0.8, 0.3]);
     to(f.torso, k, 0.1);
     to(f.head, k, 0.05 - 0.05 * tap, 0.55 * Math.sin(t * 0.33) + 0.2 * Math.sin(t * 0.9));

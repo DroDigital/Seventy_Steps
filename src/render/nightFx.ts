@@ -7,7 +7,7 @@
  */
 
 import * as THREE from 'three';
-import { LIGHT } from '../data/tuning';
+import { CLOCK, DUNGEON_LIGHT, LIGHT } from '../data/tuning';
 import { dawnOf, moonHigh, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import type { PostPass } from './postPass';
@@ -24,24 +24,33 @@ export function moonDir(phase: number, out = new THREE.Vector3()): THREE.Vector3
 }
 
 export interface NightFx {
-  update(time: number): void;
+  /** `enclosed`: under a dungeon's roof, where the moon's course and the last hour's grey do not reach (DUNGEON_LIGHT). */
+  update(time: number, enclosed?: boolean): void;
 }
 
 export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx {
   const mat = sky.material as THREE.ShaderMaterial;
   const dir = new THREE.Vector3();
+  const still = moonDir(CLOCK.start); // the slant a roofed room keeps all night
+  let inside = 0; // how far the room's light has taken over from the sky's (0..1)
+  let last = -1;
   return {
-    update(time) {
+    update(time, enclosed = false) {
       if (!g.overworld) return; // the arena's night stays as it is
+      const dt = last < 0 ? 1 : Math.min(0.1, Math.max(0, time - last));
+      last = time;
+      inside += ((enclosed ? 1 : 0) - inside) * Math.min(1, dt * DUNGEON_LIGHT.ease);
       const phase = phaseOf(time);
-      moonDir(phase, dir);
+      moonDir(phase, dir).lerp(still, inside).normalize();
       (mat.uniforms.uMoonDir.value as THREE.Vector3).copy(dir);
       worldUniforms.uLightDir.value.copy(dir);
-      const dawn = dawnOf(phase);
+      worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - DUNGEON_LIGHT.moon)); // (reset each frame: realityFx.ts)
+      const dawn = dawnOf(phase) * (1 - inside); // the grey of the last hour is the sky's: it is not seen under a roof
       if (dawn <= 0.001) return;
       worldUniforms.uAmbient.value.addScalar(0.05 * dawn);
       worldUniforms.uLightColor.value.multiplyScalar(1 + 0.4 * dawn);
-      (mat.uniforms.uHazeColor.value as THREE.Vector3).multiplyScalar(1 + 1.3 * dawn);
+      (mat.uniforms.uHorizon.value as THREE.Vector3).addScalar(0.07 * dawn); // the sky's haze lifts (sky.ts sets these anew each frame; it was once uHazeColor, which the realms' skies no longer have, and the last hour crashed the game)
+      (mat.uniforms.uZenith.value as THREE.Vector3).addScalar(0.035 * dawn);
       post.uniforms.uFogColor.value.addScalar(0.035 * dawn);
     },
   };

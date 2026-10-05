@@ -13,6 +13,7 @@
 import { useDevice, onDeviceChange } from '../core/device';
 import { activePad, muteHeldPad, type PadReading } from '../core/pads';
 import { SERIF } from './hudKit';
+import { menuSound } from './menuSounds';
 import { CSS, frame, INK, tabJustChanged } from './menuParts';
 import { installCursor, menuCursor } from './cursor';
 import { attachSkin, BASE, SKIN } from './menuSkin';
@@ -55,7 +56,6 @@ const REPEAT_MS = [380, 110] as const; // a held direction repeats after the fir
 const stack: Entry[] = [];
 const padStart: (() => void)[] = [];
 const padSelect: (() => void)[] = [];
-let sound: () => void = () => undefined;
 let started = false;
 
 export const menuOpen = (): boolean => stack.length > 0;
@@ -65,8 +65,7 @@ export const onMenusClear = (fn: () => void): void => void clearWatchers.push(fn
 export const onPadStart = (fn: () => void): void => void padStart.push(fn);
 /** With no screen open, the pad's Select (Back) calls these (the map). */
 export const onPadSelect = (fn: () => void): void => void padSelect.push(fn);
-/** A soft tick as the focus moves or a choice is made. */
-export const setMenuSound = (fn: () => void): void => void (sound = fn);
+export { muteMenus, setMenuSound } from './menuSounds';
 
 /** What scrolls: the body between a page's pinned title and foot, else the whole panel. */
 const scroller = (panel: HTMLElement): HTMLElement => panel.querySelector<HTMLElement>(':scope > .scroll') ?? panel;
@@ -91,7 +90,7 @@ function move(panel: HTMLElement, by: number): void {
   if ((!list.length || (i >= 0 && !list[i + by])) && room > 1) box.scrollBy({ top: by * box.clientHeight * 0.6, behavior: 'smooth' }); // (a page of reading only, the achievements, is scrolled by the arrows)
   else if (list.length) list[i < 0 ? 0 : (i + by + list.length) % list.length].focus();
   else return;
-  sound();
+  menuSound('move');
 }
 
 /**
@@ -132,7 +131,10 @@ function leave(layer: HTMLElement, panel: HTMLElement): HTMLElement {
 }
 
 function back(top: Entry): void {
-  if (performance.now() - top.since > GRACE_MS) top.page.back?.();
+  if (performance.now() - top.since > GRACE_MS && top.page.back) {
+    menuSound('back');
+    top.page.back();
+  }
 }
 
 function nudge(by: 1 | -1, page?: Page): void {
@@ -244,7 +246,8 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   // A choice that rebuilds the page keeps the focus where it was.
   panel.addEventListener('click', (e) => {
     const i = items(panel).indexOf(e.target as HTMLElement);
-    sound();
+    const hit = (e.target as HTMLElement).closest?.('button, input');
+    if (hit && !hit.classList.contains('tab') && hit.getAttribute('type') !== 'range') menuSound('choose'); // (a tab and a slider have their own: ui/menuParts.ts)
     queueMicrotask(() => entry && i >= 0 && !panel.contains(document.activeElement) && focusAt(panel, i));
   });
   panel.addEventListener('focusin', () => { // what the chosen line is, said in the page's hint
@@ -275,6 +278,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       if (entry) entry.page = page;
       else {
         skinned?.open();
+        menuSound('open');
         const redraw = (): void => void (entry && self.show(entry.page));
         stack.push((entry = { panel, page, since: performance.now(), redraw }));
         menuCursor(true);
@@ -285,6 +289,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
     },
     close() {
       if (!entry) return;
+      menuSound('close');
       memory.clear();
       stack.splice(stack.indexOf(entry), 1);
       entry = null;
