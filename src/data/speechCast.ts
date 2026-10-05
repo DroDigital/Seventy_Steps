@@ -43,7 +43,7 @@ export const CAST: Readonly<Record<string, Voice>> = {
   // the narrator of a new game's opening (round 39): Finley, Articulate Anchor, a crisp and unflappable British voice, chosen by the author; never whispered; set in a stone chamber (a warm, level voice with reverb, no slap-back echo)
   'narrator:intro': v(['fnYMz3F5gMEDGMWcH1ex', 'Finley - Articulate Anchor'], { room: true }),
   // people met at the Elder Signs
-  'npc:peaslee': v(ERIC),
+  'npc:peaslee': v(['tFaKZ4OQAewSluuxn7RB', 'Wingate Peaslee (Seventy Steps)']), // a designed voice of our own (Voice Design): a deep, old, dry professor; Eric was too young for a man of seventy
   'npc:gilman': v(WILL),
   'npc:morgan': v(['AFtA63zAzQAlNDuzSRKy', 'Josef Hammer – Deep & Expressive']), // round 29: Adam was a generic firm voice for a trader who deals in Echoes; this one is smoky, low and unhurried
   'npc:kuranes': v(['jAW0IMxOTz75sgLAYWp6', 'Desmond (UK) - Distinguished Persuasion']),
