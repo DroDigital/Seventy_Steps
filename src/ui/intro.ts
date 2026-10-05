@@ -1,8 +1,8 @@
 /**
  * The new game's opening (playtest round 1; round 39: short cards, a narrator, mist): a telegram and the
  * investigator's notebook, a card at a time out of the mist over black, each read aloud (data/intro.ts), before
- * they wake in the dream. A card's words fade in out of the mist, the narrator reads them, and they fade out again
- * before the next comes; the last fades away with the mist itself. A card turns by itself when its reading is done;
+ * they wake in the dream. A card's words gather out of ash (ui/ashFx.ts), the narrator reads them, and they blow
+ * away as ash before the next comes back; the last goes, and then the mist itself. A card turns by itself when its reading is done;
  * E, Enter or Space (pad A) turns it sooner, Esc (pad B) skips to the end. With no recording to hear, a card waits
  * as long as it takes to read. One page throughout, its place never moving: the cards are its own to change (a
  * page change would drift the old words away over the new). The world waits until it is done (main.ts).
@@ -11,7 +11,7 @@
 import { INTRO, NARRATOR, introText } from '../data/intro';
 import { createSpeech } from '../render/audio/speech';
 import type { AudioEngine } from '../render/audio/engine';
-import { BONE, TYPEWRITER } from './hudKit';
+import { createAshCard, type AshCard } from './ashCard';
 import { createScreen, el, muteMenus, type Page } from './menuKit';
 import { keyLayout } from '../core/bindings';
 import { PAD_BUTTON } from '../core/padMap';
@@ -21,13 +21,13 @@ export interface Intro {
   readonly open: boolean;
 }
 
-const BEFORE = 2; // seconds from a card's first word showing to its voice: the words come out of the mist first
+const BEFORE = 2.2; // seconds from a card's first grain returning to its voice: the words gather out of the ash first
 const AFTER = 1.6; // and after the voice, the card is let rest
 const READ = 0.34; // seconds a word takes to read, for a card with no voice
 const LATE = 3; // a recording that has not begun this many seconds after it was asked for will not
-const IN = 1600; // ms for a line to come out of the mist
-const OUT = 1300; // ms for a card's words to sink back into it
-const GAP = 450; // ms of mist alone between one card and the next
+const IN = 2400; // ms for a card's words to come back out of the ash
+const OUT = 2200; // ms for them to blow away
+const GAP = 400; // ms of mist alone between one card and the next
 const CLOSE = 1800; // ms for the mist to fade to black after the last card (a skip: half of it)
 const PAD_A = PAD_BUTTON.a;
 
@@ -41,6 +41,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   let stage: HTMLElement | null = null;
   let hint: HTMLElement | null = null;
   let row: HTMLElement | null = null;
+  let ash: AshCard | null = null; // the card on the stage, drawn on a canvas (ui/ashCard.ts)
   let padWas = false;
   let rest: (seconds: number) => void = () => undefined; // sets the card's turn, from when its voice begins
   const voice = engine ? createSpeech(engine, undefined, (_s, _t, buf, rate) => rest(buf.duration / rate)) : null;
@@ -61,15 +62,14 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     });
   };
 
-  /** Card `i`'s words on the stage (faded in out of the mist, or at once when the page is only drawn again). */
+  /** Card `i`'s words on the stage (coming back out of the ash, or whole at once when the page is only drawn again). */
   function show(fade: boolean): void {
     if (!stage || !hint) return;
     const c = INTRO[i];
-    const telegram = !!c.telegram;
     stage.replaceChildren();
-    const heading = el(stage, 'div', c.heading, `letter-spacing:2px;font-size:12px;color:${BONE};opacity:.7;margin-bottom:16px`);
-    const text = el(stage, 'p', introText(c), `margin:0;font-size:${telegram ? 16 : 18}px;line-height:1.75;${telegram ? `font-family:${TYPEWRITER};letter-spacing:1px` : ''}`);
-    if (fade) [heading, text].forEach((n, k) => n.animate([{ opacity: 0, filter: 'blur(3px)', transform: 'translateY(5px)' }, { opacity: n === heading ? 0.7 : 1, filter: 'blur(0)', transform: 'none' }], { duration: IN, delay: k * 550, easing: 'cubic-bezier(.25,.6,.3,1)', fill: 'backwards' }));
+    ash = createAshCard(stage, { heading: c.heading, body: introText(c), telegram: !!c.telegram }, i + 1);
+    if (fade) void ash.form(IN);
+    else ash.hold();
     hint.textContent = `${glyph('interact')} · ${i < INTRO.length - 1 ? 'go on' : 'wake'}`;
   }
 
@@ -90,16 +90,15 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     });
   }
 
-  /** The card's words sink back into the mist; then the next, or the end. */
+  /** The card's words blow away as ash; then the next comes back out of it, or the end. */
   function turn(): void {
-    if (over || turning || !stage) return;
+    if (over || turning || !stage || !ash) return;
     turning = true;
-    screen.stir(OUT + GAP + 300); // the mist gathers as the words sink into it, holds through the breath between, and settles as the next card comes (one surge: it was two, the second a step back up)
     clearTimeout(timer);
     voice?.stop();
     const last = i === INTRO.length - 1;
-    const fading = [...stage.children, ...(last && row ? [row] : [])].map((n) => (n as HTMLElement).animate([{ opacity: getComputedStyle(n).opacity, filter: 'blur(0)', transform: 'none' }, { opacity: 0, filter: 'blur(3px)', transform: 'translateY(-4px)' }], { duration: OUT, easing: 'ease-in', fill: 'forwards' }));
-    void Promise.all(fading.map((a) => a.finished.catch(() => undefined))).then(() => {
+    const fading = last && row ? [row.animate([{ opacity: getComputedStyle(row).opacity }, { opacity: 0 }], { duration: OUT, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => undefined)] : [];
+    void Promise.all([ash.dissolve(OUT), ...fading]).then(() => {
       if (over) return;
       if (last) return finish(false); // the words gone first, then the mist (the loading under it is not seen through the last of them)
       i++;
