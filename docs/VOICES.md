@@ -44,56 +44,67 @@ performance can be tried again over the same file.
 
 The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Finley - Articulate Anchor* (`fnYMz3F5gMEDGMWcH1ex`, British narration, the one the author picked in the library), with a little hall (`echo` 0.12); his five cards are one take each, but for the telegram's, made again (four takes, the steadiest kept) when the first proved too bright beside the rest. They carry no whispering: no `[whispers]`, `[softly]` or `[quietly]` in them.
 
-Chosen from the voices' descriptions (nobody has listened to the casting). Ordinary speakers have ElevenLabs'
-own **premade** voices, which any plan can use; the monstrous, the old and the foreign have **library** voices,
-which a recording can be made with only on the Creator plan or above. `rate` lowers a voice and slows it
-(playback rate: pitch and pace together); `echo` puts some hall behind it. They are the game's, applied at
-playback, so a recast does not need them again.
+**Licence (round 41).** Only ElevenLabs' own **premade** voices, or voices **designed for this game** in its Voice
+Design (ours), are used: a library voice's licence cannot be told through the tools (they show a voice's category,
+not what its owner allows), so the library voices the cast once had (Josef Hammer, Desmond, Jessie, Diego, Birk,
+Rick, Mossbeard, Malvoryx, the Parasyte pair, and the rest of the horrors' set) are gone from it. Thirty voices
+were designed (the workspace's limit is thirty custom voices, so Yog-Sothoth, 'Umr at-Tawil and Shub-Niggurath speak in
+the Great Ones', the priests' and Hydra's, played lower and with their own hall). Each was described from the
+speaker's years, tongue and temper (Peaslee: a deep, old, dry professor of seventy, who with Eric had sounded too
+young), the previews could not be heard, so one of three was kept by what could be measured (slowest and lowest for the
+old, the great and the drowsy; briskest for the clipped Norwegian), and 112 lines were made again in them. The nine
+premade voices that stay (Will, Roger, Brian, Callum, Chris, Bill, Daniel, George, Harry) were each checked to be
+of the premade category. **Left open: the narrator**, Finley - Articulate Anchor, is a library voice (the author's
+own pick, not changed unasked): to make the game wholly licence-clean he is recast with a premade voice (George, or
+Daniel) or with a designed one once a voice slot is free (`creative_design_voice`), and his five cards made again.
+`rate` lowers a voice and slows it (playback rate: pitch and pace together); `echo` puts some hall behind it. They are
+the game's, applied at playback, so a recast does not need them again.
 
 | speaker | voice (ElevenLabs) | voice id | played with |
 |---|---|---|---|
-| `npc:peaslee` | Eric - Smooth, Trustworthy (premade) | `cjVigY5qzO86Huf0OWal` | — |
+| `narrator:intro` | Finley - Articulate Anchor (**library**: the author's pick; licence unchecked, see below) | `fnYMz3F5gMEDGMWcH1ex` | room |
+| `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | — |
 | `npc:gilman` | Will - Relaxed Optimist (premade) | `bIHbv24MWmeRgasZH58o` | — |
-| `npc:morgan` | Josef Hammer – Deep & Expressive (library; round 29, was Adam) | `AFtA63zAzQAlNDuzSRKy` | — |
-| `npc:kuranes` | Desmond (UK) - Distinguished Persuasion | `jAW0IMxOTz75sgLAYWp6` | — |
-| `npc:zadok` | Jessie - Vintage Narrator | `KgUSWQPFmuiZ5ycRbnty` | — |
+| `npc:morgan` | Dr. Francis Morgan (designed) | `Zu8OeRoG1W5wagFvqvfs` | — |
+| `npc:kuranes` | Kuranes (designed) | `bY8puK6S3RGlr0wikENe` | — |
+| `npc:zadok` | Zadok Allen (designed) | `oS1Ldc1OhmULV32wNtyv` | — |
 | `npc:wilmarth` | Roger - Laid-Back, Casual, Resonant (premade) | `CwhRBWXzGAHq8TQ4Fs17` | — |
 | `npc:willett` | Brian - Deep, Resonant and Comforting (premade) | `nPczCjzI2devNBz1zQrb` | — |
 | `npc:curtis` | Callum - Husky Trickster (premade) | `N2lVS1w4EtoT3dr4eOWO` | — |
 | `npc:dyer` | Chris - Charming, Down-to-Earth (premade) | `iP95p4xoKVk53GoZ742B` | — |
 | `npc:nathaniel` | Bill - Wise, Mature, Balanced (premade) | `pqHfZKP75CvOlQylNhV4` | — |
-| `npc:zamacona` | Diego - Professional and Smart | `FwXEXFL5y9qj7wNLrZeS` | — |
-| `npc:johansen` | Birk - Norwegian Male | `6moWX0dfuSmryJkGegeK` | — |
-| `npc:akeley` | Rick - Raspy Narrator | `wcATjh8zBDfepqUbl99V` | — |
+| `npc:zamacona` | Zamacona (designed) | `SCr2sXbLg0vczYt19ZiV` | — |
+| `npc:johansen` | Gustaf Johansen (designed) | `OJZxDfzqJBxrmTREQJcK` | — |
+| `npc:akeley` | Henry Akeley (designed) | `brfCSgEWKhVUk7i3sPp9` | — |
 | `npc:carter` | Daniel - Steady Broadcaster (premade) | `onwK4e9ZLuTAKqWW03F9` | — |
-| `npc:nasht` | Mossbeard – The God of the Wild | `bFrjFL4nlpeYNwNRhXxq` | echo: 0.2 |
+| `npc:nasht` | Nasht and Kaman-Thah (designed) | `t08TssFOUzUklDhgSgD1` | echo: 0.2 |
 | `boss:wilbur_whateley` | Harry - Fierce Warrior (premade) | `SOYHLrjzK2X1ezoPC6cr` | rate: 0.96 |
 | `boss:dunwich_horror` | Harry - Fierce Warrior (premade) | `SOYHLrjzK2X1ezoPC6cr` | rate: 0.72, echo: 0.5 |
-| `boss:keziah_mason` | The Ancient Evil | `HH3kybY6uEJ2ebSa9Vy3` | — |
-| `boss:brown_jenkin` | Parasyte - Whispers from the Deep Dark | `1KFdM0QCwQn4rmn5nn9C` | rate: 1.12 |
-| `boss:black_man` | Hellin - Deep Intense British Male | `vfaqCOvlrKi4Zp7C2IAm` | rate: 0.95, echo: 0.25 |
-| `boss:joseph_curwen` | Matthew Schmitz - Ancient Sage Dragon Wizard | `HAvvFKatz0uu0Fv55Riy` | — |
-| `boss:simon_orne` | Peter | `wldVCiOxtkWPlsr2mHyo` | — |
-| `boss:edward_hutchinson` | GERALD - Exciting Older Voice | `fGIZlgPQ75MMlvQ6WxgY` | — |
-| `boss:ephraim_waite` | Mora - Gritty and Enigmatic | `YHcCpa6SBWnKDaCPZJQR` | — |
-| `boss:whisperer` | Parasyte - Dweller in the Deep-Dark | `k1fCGnhRbXzd6bzwlD2B` | — |
-| `boss:voice_in_the_tomb` | Ezekiel Wren - The Voice Beneath the Floorboards | `2tTjAGX0n5ajDmazDcWk` | echo: 0.35 |
-| `boss:lilith` | Eleanor - Gracious and Authoritative | `2qQJWjw5XdG80GreshqG` | rate: 0.94, echo: 0.3 |
-| `boss:dr_munoz` | Kevo - Calm, slight accent | `4ISzXkLY6aTZQsrFLVme` | — |
-| `boss:charles_le_sorcier` | Declan Graves - Haunted Rasps and Old World Dread | `1BfrkuYXmEwp8AWqSLWk` | — |
-| `boss:medusa_gorgon` | Harriet - Mature British Actress | `aAsWcN5jdLdiYG7Hq0YL` | — |
-| `boss:hypnos` | Rodo - Calm & Low | `HY3TS25BHEPeVdb2Lwn4` | rate: 0.94 |
-| `boss:terrible_old_man` | Frederick - Old Gnarly Narrator | `uVKHymY7OYMd6OailpG5` | — |
-| `boss:zkauba` | Kalen | `wJitxbuYOmWYd7CIK0KK` | — |
-| `boss:cthulhu` | Matthew Schmitz - The Demon | `rCYFsCX2waxtHCgVD0e8` | rate: 0.8, echo: 0.6 |
-| `boss:father_dagon` | Malvoryx The Monster | `ysswSXp8U9dFpzPJqFje` | rate: 0.88, echo: 0.45 |
-| `boss:mother_hydra` | Blue - Commander with Grit | `YGWwh1G8pUwWmJyCCpma` | rate: 0.92, echo: 0.45 |
-| `boss:hastur` | Katie - Soft Whisper Voice | `jdrqQ2ZMWENd1cuRByWG` | echo: 0.5 |
-| `boss:tsathoggua` | Justin - Trusting Calm | `NyBVtlh1XAem9yCxNuWk` | rate: 0.78, echo: 0.4 |
-| `boss:great_ones` | Malvoryx The Monster | `ysswSXp8U9dFpzPJqFje` | rate: 0.82, echo: 0.6 |
-| `boss:yog_sothoth` | Parasyte - Dweller in the Deep-Dark | `k1fCGnhRbXzd6bzwlD2B` | rate: 0.88, echo: 0.7 |
-| `boss:umr_at_tawil` | Mossbeard – The God of the Wild | `bFrjFL4nlpeYNwNRhXxq` | — |
-| `boss:shub_niggurath` | Beatrice - Mature Female Storyteller | `kkPJzQOWz2Oz9cUaEaQd` | rate: 0.82, echo: 0.55 |
+| `boss:keziah_mason` | Keziah Mason (designed) | `BbF0R6lcyCsZVwnjHzwi` | — |
+| `boss:brown_jenkin` | Brown Jenkin (designed) | `XAfV6hn6JT4LPatdDizz` | — |
+| `boss:black_man` | The Black Man (designed) | `gdQL6olVLhkRDvue4G8n` | rate: 0.97, echo: 0.25 |
+| `boss:joseph_curwen` | Joseph Curwen (designed) | `ttJ9Yma2EKpRou0MKpVX` | — |
+| `boss:simon_orne` | Simon Orne (designed) | `MN6OV4FaLTmDyt2HbvDM` | — |
+| `boss:edward_hutchinson` | Edward Hutchinson (designed) | `d5fMF4XN1xXNbhcn2sVN` | — |
+| `boss:ephraim_waite` | Ephraim Waite (designed) | `uLSdhli8Nh3oecMulCST` | — |
+| `boss:whisperer` | The Whisperer (designed) | `GhTAOZ6TpanaXZ2BebFG` | — |
+| `boss:voice_in_the_tomb` | Voice in the Tomb (designed) | `8sQoC7ywyRWufwwkpxmi` | echo: 0.35 |
+| `boss:lilith` | Lilith (designed) | `ZpcPectqj6jA7upy2ds6` | rate: 0.96, echo: 0.3 |
+| `boss:dr_munoz` | Dr. Munoz (designed) | `znCQdZ10eP9TPmKFUBiB` | — |
+| `boss:charles_le_sorcier` | Charles Le Sorcier (designed) | `XbbZLJxYknwZpVDBF8yd` | — |
+| `boss:medusa_gorgon` | Medusa (designed) | `mxxi4y139JdJkcoAWz38` | — |
+| `boss:hypnos` | Hypnos (designed) | `2By09Lf6hdgEqSaKjF6R` | — |
+| `boss:terrible_old_man` | Terrible Old Man (designed) | `z0Hf7ohJe76SmjpHcSB1` | — |
+| `boss:zkauba` | Zkauba (designed) | `FtER3HTVunb98SClCpA6` | — |
+| `boss:cthulhu` | Cthulhu (designed) | `4BurENwzMIaL1Rien7nO` | rate: 0.9, echo: 0.6 |
+| `boss:father_dagon` | Father Dagon (designed) | `e6kNUrNTHrY2UHszWVOb` | rate: 0.94, echo: 0.45 |
+| `boss:mother_hydra` | Mother Hydra (designed) | `H6EAxZnCzTPJJFGIm1N0` | rate: 0.96, echo: 0.45 |
+| `boss:hastur` | Hastur (designed) | `sTz0TrsMTkIY2GFiSKEd` | echo: 0.5 |
+| `boss:tsathoggua` | Tsathoggua (designed) | `h66CqFXHNxmKocuuHudR` | rate: 0.9, echo: 0.4 |
+| `boss:great_ones` | The Great Ones (designed) | `feMEuaYQx2ITBOZd0ZFG` | rate: 0.92, echo: 0.6 |
+| `boss:yog_sothoth` | The Great Ones (designed; shared) | `feMEuaYQx2ITBOZd0ZFG` | rate: 0.84, echo: 0.7 |
+| `boss:umr_at_tawil` | Nasht and Kaman-Thah (designed; shared) | `t08TssFOUzUklDhgSgD1` | rate: 0.97, echo: 0.12 |
+| `boss:shub_niggurath` | Mother Hydra (designed; shared) | `H6EAxZnCzTPJJFGIm1N0` | rate: 0.84, echo: 0.55 |
 | `boss:nyarlathotep` | George - Warm, Captivating Storyteller (premade) | `JBFqnCBsd6RMkjVDRZzb` | rate: 0.97, echo: 0.15 |
 
 ## Making the recordings, and making them again
@@ -113,8 +124,9 @@ To change a **word**: change `data/npcs.ts` (or the line in `speechBosses.ts`) a
 delete the old recording and make the new one. A person's line added to `data/npcs.ts` fails `speech.test.ts`
 until its performed form is added, and is shown and not heard until its recording is made.
 
-If a plan cannot use library voices, every speaker can be given one of the premade ones (Eric, Will, Adam, Roger,
-Brian, Callum, Chris, Bill, Daniel, George, Harry): the first set of recordings was made that way.
+A designed voice is made with `creative_design_voice` (a description and a line of the speaker's own words, 100 to
+1000 characters; three previews), kept with `creative_save_designed_voice`, then used as any voice id. Its safety filter
+refused one description once (Brown Jenkin's, which said a man trapped in a rat; it passed said plainly as a creature).
 
 ## What was checked, and what was not
 

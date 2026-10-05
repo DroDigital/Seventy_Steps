@@ -2,8 +2,9 @@
 
 Every recording in this folder is one line of the game, spoken by a synthetic voice made with
 [ElevenLabs](https://elevenlabs.io) Text to Speech, model **Eleven v4** (`eleven_v4`). The people of the
-realms (`npc:<id>`) and the horrors that speak (`boss:<roster id>`) each have a voice from ElevenLabs'
-voice library, cast in `src/data/speechCast.ts` (by voice id); what each says, with its [audio tags]
+realms (`npc:<id>`) and the horrors that speak (`boss:<roster id>`) each have either one of ElevenLabs' own
+premade voices or a voice designed for this game in ElevenLabs' Voice Design (no library voice, whose licence cannot
+be checked, is cast but the narrator's), cast in `src/data/speechCast.ts` (by voice id); what each says, with its [audio tags]
 (`[weary]`, `[whispers]`, `[pause]`: performed, not read aloud), is in `src/data/speechNpcs.ts`,
 `speechFar.ts` and `speechBosses.ts`.
 
