@@ -8,13 +8,15 @@
  * after; while the ground has gone quiet before a horror (the hush) it gives way to a murmur; and
  * its level breathes very slowly, so a loop of four minutes is not heard to turn. It joins the
  * music's bus, so the music setting is its level. A file that cannot be had is passed over
- * quietly and asked for again after a while. Without WebAudio it is silent.
+ * quietly and asked for again after a while (trackCache.ts, shared with the boss themes). Without WebAudio
+ * it is silent.
  */
 
 import { REALM_MUSIC, realmFile, type RealmTrackId } from '../../data/realmMusic';
 import type { AudioEngine } from './engine';
 import { analyse, loopRegion, type Analysis, type Region } from './loudness';
 import { createRealmLoop, type RealmLoop } from './realmLoop';
+import { createTrackCache } from './trackCache';
 import { FADE_IN, FADE_OUT } from './themeLoop';
 
 export interface RealmState {
@@ -55,36 +57,21 @@ export function realmLevel(state: Pick<RealmState, 'fight' | 'hush'>, seconds: n
 }
 
 export function createRealmMusic(e: AudioEngine): RealmMusic {
-  const loaded = new Map<RealmTrackId, Promise<Loaded | null>>();
-  const failed = new Map<RealmTrackId, number>(); // seconds it may be asked for again
+  const cache = createTrackCache<RealmTrackId, Loaded>(e, {
+    url: realmFile,
+    make(buffer) {
+      const analysis = analyse(Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c)), buffer.sampleRate);
+      return { buffer, analysis, region: loopRegion(analysis, buffer.duration) };
+    },
+    keep: REALM_MUSIC.keep, // decoded tracks held: the one sounding and the one coming
+    retry: REALM_MUSIC.retry,
+    label: 'realm music',
+  });
   let mix: GainNode | null = null; // under the music bus: the fight's, the hush's, the swell's level
   let current: Voice | null = null;
   const leaving = new Set<Voice>();
   let wanted: RealmTrackId | null = null;
   let waiting: RealmTrackId | null = null; // the track being fetched
-  let clock = 0;
-
-  const fetchTrack = async (ctx: AudioContext, id: RealmTrackId): Promise<Loaded | null> => {
-    try {
-      const res = await fetch(realmFile(id));
-      if (!res.ok) throw new Error(String(res.status));
-      const buffer = await ctx.decodeAudioData(await res.arrayBuffer());
-      const analysis = analyse(Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c)), buffer.sampleRate);
-      return { buffer, analysis, region: loopRegion(analysis, buffer.duration) };
-    } catch (err) {
-      failed.set(id, clock + REALM_MUSIC.retry);
-      console.warn(`realm music: ${id} could not be loaded`, err);
-      return null;
-    }
-  };
-
-  /** Decoded tracks held: the one sounding, the one wanted, and no more. */
-  const trim = (): void => {
-    for (const id of [...loaded.keys()]) {
-      if (loaded.size <= REALM_MUSIC.keep) break;
-      if (id !== current?.id && id !== wanted) loaded.delete(id);
-    }
-  };
 
   /** The voice's level rises from nothing to its own, or falls from where it is to nothing, equal power. */
   const fade = (v: Voice, ctx: AudioContext, dir: 'in' | 'out', seconds: number): void => {
@@ -121,11 +108,10 @@ export function createRealmMusic(e: AudioEngine): RealmMusic {
       return current && current.endsAt === Infinity ? current.id : null;
     },
     warm(track) {
-      const ctx = e.ctx;
-      if (ctx && track && !loaded.has(track) && (failed.get(track) ?? 0) <= clock) loaded.set(track, fetchTrack(ctx, track));
+      if (track) void cache.load(track);
     },
     update(seconds, state) {
-      clock = seconds;
+      cache.tick(seconds);
       const [ctx, bus] = [e.ctx, e.music];
       if (!ctx || !bus || ctx.state !== 'running') return;
       wanted = state.track;
@@ -146,21 +132,18 @@ export function createRealmMusic(e: AudioEngine): RealmMusic {
         }
         return;
       }
-      if (current?.id === wanted || (failed.get(wanted) ?? 0) > seconds) return;
+      if (current?.id === wanted || cache.waiting(wanted)) return;
       if (waiting === wanted) return; // already asked for, and coming
       const asked = (waiting = wanted);
-      let pending = loaded.get(asked);
-      if (!pending) loaded.set(asked, (pending = fetchTrack(ctx, asked)));
-      void pending.then((t) => {
+      void cache.load(asked).then((t) => {
         if (waiting === asked) waiting = null;
-        if (!t) return void loaded.delete(asked);
-        if (wanted !== asked || current?.id === asked) return; // they have gone on, or it is already sounding
+        if (!t || wanted !== asked || current?.id === asked) return; // it would not load, or they have gone on, or it is already sounding
         try {
           enter(ctx, bus, asked, t);
-          trim();
+          cache.trim([current?.id, wanted]);
           console.info(`realm music: ${asked} (loop ${t.region.start.toFixed(1)}–${t.region.end.toFixed(1)} s, gain ${t.analysis.gain.toFixed(3)})`);
         } catch (err) {
-          failed.set(asked, clock + REALM_MUSIC.retry); // the browser refused it: not asked for again every frame
+          cache.fail(asked); // the browser refused it: not asked for again every frame
           console.warn(`realm music: ${asked} could not start`, err);
         }
       });
