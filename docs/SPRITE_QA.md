@@ -71,6 +71,16 @@ python3 tools/sprite_review.py fix <dir> <out>               # the mends that ne
   in `tools/sprites/notes.json` under `eye`, with the creatures that have no stride (`motion: glide`)
   and those that fly (`flies`: not held to the ground line). The report merges both.
 
+## Four-frame walks without drawing
+
+`python3 tools/sprites/walk4.py <pack> [--dry-run]` turns the two-frame side walks of the two-legged
+creatures it can read (`WALKERS` in it) into four: the two old frames become the contacts (`move_0`,
+`move_2`) and a passing pose is made from the pixels of each, legs swung in under the hip, the trailing
+foot lifted, the near (lighter) leg over the far, the standing foot on the ground line. The arms keep
+the contact's swing. It leaves alone any side that already has a `move_2` (a walk redrawn), keeps
+what it replaces in `walk4_backup/`, and adds the frames to the gallery's list. Four-legged creatures,
+robes that hide the legs and the off-model sets still need drawing.
+
 ## When the sprites come into the game
 
 The library is not in the game yet. The game's creatures are still drawn in code
