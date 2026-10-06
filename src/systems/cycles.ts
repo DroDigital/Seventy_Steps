@@ -7,7 +7,7 @@
  */
 
 import type { Entity } from '../core/ecs';
-import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type DifficultyId, type LevelId, type UpgradeId } from '../data/tuning';
+import { BOSS, DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type DifficultyId, type LevelId, type UpgradeId } from '../data/tuning';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
 import type { Game } from './components';
@@ -85,7 +85,8 @@ export const foeHealth = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.
 /** The weight this journey, and the difficulty chosen, put on a blow from `attacker` (1 for the investigator and their allies). */
 export function foeDamage(g: Game, attacker: Entity): number {
   if (g.ecs.c.combatant.get(attacker)?.faction !== 'enemy') return 1;
-  return DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle); // (round 38: the difficulty chosen at the start, and this journey's weight)
+  const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
+  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle); // (round 38: the difficulty chosen at the start, and this journey's weight)
 }
 
 /** The Echoes this journey's foes leave, against the first's. */

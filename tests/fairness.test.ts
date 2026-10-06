@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { ATTACKS } from '../src/data/attacks';
 import { ENTITIES, paramsOf } from '../src/data/registry';
-import { AI } from '../src/data/tuning';
+import { AI, BOSS } from '../src/data/tuning';
+import { createWorldGame } from '../src/systems/game';
+import { minionsOf, summon } from '../src/systems/specials';
+import { spawnCreature } from '../src/systems/creatures';
+import { run } from './worldHelpers';
 
 /**
  * Round 45: what a person can be asked to react to. A new cue takes about a quarter of a second to read and a roll
@@ -51,5 +55,17 @@ describe('fair play', () => {
   it('the Elder Thing no longer swings and shoots as fast as a deep one', () => {
     const e = ENTITIES.find((d) => d.id === 'elder_thing')!;
     expect(paramsOf(e.behavior).cooldown[0]).toBeGreaterThanOrEqual(60);
+  });
+
+  it('a boss strikes no oftener than every 1 s, keeps two servants at most, and calls them no oftener than every 9 s', () => {
+    expect(BOSS.gap[0]).toBeGreaterThanOrEqual(60);
+    expect(BOSS.minions).toBeLessThanOrEqual(2);
+    expect(BOSS.summonEvery).toBeGreaterThanOrEqual(540);
+    expect(BOSS.servantDamage).toBeLessThan(1);
+    const g = createWorldGame();
+    const boss = spawnCreature(g, 'keziah_mason', { x: 3000, z: 3000, yaw: 0 })!;
+    for (let i = 0; i < 5; i++) summon(g, boss, 'rat_swarm');
+    run(g, 2);
+    expect(minionsOf(g, boss).length).toBeLessThanOrEqual(2);
   });
 });

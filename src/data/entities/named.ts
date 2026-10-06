@@ -102,7 +102,7 @@ export const NAMED = tier('named', [
     id: 'the_unnamable', name: 'The Unnamable', source: 'The Unnamable', regions: ['arkham'], canonLooks: false,
     sprite: { silhouette: 'blob', palette: 'rubber', scale: 3.2, eyes: 6, tentacles: 5 },
     ...scripted('invisible_stalker', phases(ph(1, { grab: 2, tentacle_burst: 1, roar: 1, eruption: 1 }), ph(0.5, { grab: 1, tentacle_burst: 2, roar: 1, charge: 1, vortex: 1 }, { hooks: ['camera_warp'] }))),
-    stats: st(700, 160, 34, 4, 4, 12), drops: { echoes: 1800 }, insightOnSight: 2,
+    stats: st(850, 160, 34, 4, 4, 12), drops: { echoes: 1800 }, insightOnSight: 2,
   },
   {
     id: 'shunned_house_entity', name: 'The Shunned House Entity', source: 'The Shunned House', regions: ['providence'], canonLooks: true,
