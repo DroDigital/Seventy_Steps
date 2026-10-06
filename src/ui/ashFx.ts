@@ -65,10 +65,12 @@ export interface Ash {
   readonly flow: Float32Array;
   readonly patch: Float32Array;
   readonly cw: number;
+  readonly feather: readonly [number, number];
 }
 const STEP = 8;
 
-export function makeAsh(w: number, h: number, k: number, seed: number): Ash {
+/** `feather`: cells inward from the picture's edge over which the grains fade to nothing, across and down: the ash drifts into the dark beyond the words' box and is never cut off at the box's edge. */
+export function makeAsh(w: number, h: number, k: number, seed: number, feather: readonly [number, number] = [0, 0]): Ash {
   const cw = Math.ceil(w / STEP) + 2;
   const ch = Math.ceil(h / STEP) + 2;
   const [gust, flow, patch] = [new Float32Array(cw * ch), new Float32Array(cw * ch), new Float32Array(cw * ch)];
@@ -88,7 +90,7 @@ export function makeAsh(w: number, h: number, k: number, seed: number): Ash {
       dust[y * w + x] = hash2(x, y, seed + 5) * 255;
     }
   }
-  return { w, h, k, dir: seed % 2 ? -1 : 1, grain, dust, gust, flow, patch, cw };
+  return { w, h, k, dir: seed % 2 ? -1 : 1, grain, dust, gust, flow, patch, cw, feather };
 }
 
 function field(a: Ash, f: Float32Array, x: number, y: number): number {
@@ -139,8 +141,11 @@ export function paintAsh(a: Ash, mask: Float32Array, soft: Float32Array, d: numb
       const [ex, ey] = [x - vx * 1.8, y - vy * 1.8];
       let dust = 0;
       if (dustFade > 0 && ex >= 0 && ey >= 0 && ex < w && ey < h && a.dust[(ey | 0) * w + (ex | 0)] > 230) dust = sample(soft, w, h, ex, ey) * 0.72 * dustFade;
-      const ha = sample(soft, w, h, x - vx * (1.4 / 1), y - vy * (1.4 / 1)) * hazeFade;
-      const ti = Math.max(ta, dust);
+      const haze = sample(soft, w, h, x - vx * 1.4, y - vy * 1.4) * hazeFade;
+      const [fx, fy] = a.feather;
+      const edge = fx > 0 && fy > 0 ? smooth(0, 1, Math.min(Math.min(x, w - 1 - x) / fx, Math.min(y, h - 1 - y) / fy)) : 1; // the grains and the haze alike die before the picture's edge
+      const ti = Math.max(ta, dust) * edge;
+      const ha = haze * edge;
       const al = ti + ha * (1 - ti);
       if (al < 0.002) continue;
       const o = (y * w + x) * 4;

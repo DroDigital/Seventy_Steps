@@ -21,13 +21,13 @@ export interface Intro {
   readonly open: boolean;
 }
 
-const BEFORE = 2.2; // seconds from a card's first grain returning to its voice: the words gather out of the ash first
+const BEFORE = 1.6; // seconds from a card's first grain returning to its voice: the words gather out of the ash first
 const AFTER = 1.6; // and after the voice, the card is let rest
 const READ = 0.34; // seconds a word takes to read, for a card with no voice
 const LATE = 3; // a recording that has not begun this many seconds after it was asked for will not
-const IN = 2400; // ms for a card's words to come back out of the ash
-const OUT = 2200; // ms for them to blow away
-const GAP = 400; // ms of mist alone between one card and the next
+const IN = 1500; // ms for a card's words to come back out of the ash
+const OUT = 1800; // ms for them to blow away
+const OVERLAP = 0.6; // the next card begins to gather when this much of the last one's blowing away is done: no mist alone between them
 const CLOSE = 1800; // ms for the mist to fade to black after the last card (a skip: half of it)
 const PAD_A = PAD_BUTTON.a;
 
@@ -63,10 +63,10 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   };
 
   /** Card `i`'s words on the stage (coming back out of the ash, or whole at once when the page is only drawn again). */
-  function show(fade: boolean): void {
+  function show(fade: boolean, keep = false): void {
     if (!stage || !hint) return;
     const c = INTRO[i];
-    stage.replaceChildren();
+    if (!keep) stage.replaceChildren();
     ash = createAshCard(stage, { heading: c.heading, body: introText(c), telegram: !!c.telegram }, i + 1);
     if (fade) void ash.form(IN);
     else ash.hold();
@@ -74,10 +74,10 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
   }
 
   /** Card `i`, its lines coming out of the mist one after another, and its reading after a breath. */
-  function card(): void {
+  function card(keep = false): void {
     if (!stage) return;
     const c = INTRO[i];
-    show(true);
+    show(true, keep);
     turning = false;
     rest = (seconds) => {
       clearTimeout(timer);
@@ -98,12 +98,13 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     voice?.stop();
     const last = i === INTRO.length - 1;
     const fading = last && row ? [row.animate([{ opacity: getComputedStyle(row).opacity }, { opacity: 0 }], { duration: OUT, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => undefined)] : [];
-    void Promise.all([ash.dissolve(OUT), ...fading]).then(() => {
+    const old = ash;
+    void Promise.all([old.dissolve(OUT), ...fading]).then(() => {
       if (over) return;
       if (last) return finish(false); // the words gone first, then the mist (the loading under it is not seen through the last of them)
-      i++;
-      later(GAP, card);
+      old.remove();
     });
+    if (!last) later(OUT * OVERLAP, () => (i++, card(true))); // the old card's last grains drift on under the new
   }
 
   const page: Page = {
@@ -117,6 +118,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     build(p) {
       const again = stage !== null; // drawn again (the player took up the other device: its buttons are named): the card stays where it is in its reading
       // A stage of one height for every card, so nothing moves as they change: the heading always where it was.
+      p.style.overflow = 'visible'; // the panel's box must not cut the ash off: its edge was seen in the drift
       stage = el(p, 'div', '', 'height:13.5em;display:flex;flex-direction:column;justify-content:flex-start');
       // the keys, in the screen's two lower corners (on the root, not the panel: the panel is the words' own)
       screen.root.querySelector('[data-keys]')?.remove();

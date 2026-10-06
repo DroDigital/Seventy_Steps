@@ -23,12 +23,14 @@ export interface AshCard {
 }
 
 const CELL = 0.75; // cells per css pixel of the ash's grid (a little coarser than the screen: grains of a pixel and a bit, and a frame in a few ms)
+const PAD_X = 190; // css px of room about the words on each side for the ash to drift into (it blows up to some 140 px along): a canvas the size of the words alone cut the grains off at its edge (round 46)
+const PAD_Y = 80;
 const SIM = 14;
 const EVERY = 30; // ms between frames of the ash (about 30 a second: a frame costs a few ms, and grains in the wind do not need more) // the previews' line of type, in sim units
 
 export function createAshCard(stage: HTMLElement, words: CardWords, seed: number): AshCard {
   const canvas = document.createElement('canvas');
-  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+  canvas.style.cssText = 'position:absolute;pointer-events:none';
   canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-label', `${words.heading}. ${words.body}`);
   stage.style.position = 'relative';
@@ -73,13 +75,16 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
     if (!cw || !ch) return null;
     const ratio = Math.min(2, window.devicePixelRatio || 1) * Math.max(1, stage.getBoundingClientRect().width / cw); // (the UI is scaled: draw at what the screen shows)
     if (prepared && prepared.w === cw && prepared.h === ch && prepared.ratio === ratio) return prepared;
-    canvas.width = Math.ceil(cw * ratio);
-    canvas.height = Math.ceil(ch * ratio);
-    const [w, h] = [Math.ceil(cw * CELL), Math.ceil(ch * CELL)];
+    const [ew, eh] = [cw + 2 * PAD_X, ch + 2 * PAD_Y]; // the canvas: the words' box and the room about it
+    canvas.style.cssText = `position:absolute;pointer-events:none;left:${-PAD_X}px;top:${-PAD_Y}px;width:${ew}px;height:${eh}px`;
+    canvas.width = Math.ceil(ew * ratio);
+    canvas.height = Math.ceil(eh * ratio);
+    const [w, h] = [Math.ceil(ew * CELL), Math.ceil(eh * CELL)];
     const m = document.createElement('canvas');
     [m.width, m.height] = [w, h];
     const mg = m.getContext('2d', { willReadFrequently: true })!;
     mg.scale(CELL, CELL);
+    mg.translate(PAD_X, PAD_Y);
     layout(mg, cw);
     const alpha = mg.getImageData(0, 0, w, h).data;
     const mask = new Float32Array(w * h);
@@ -87,7 +92,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
     const buf = document.createElement('canvas');
     [buf.width, buf.height] = [w, h];
     const k = (size / SIM) * CELL; // cells per sim unit: a sim unit is size/14 css pixels
-    prepared = { w: cw, h: ch, ratio, ash: makeAsh(w, h, k, seed), mask, soft: soften(mask, w, h, Math.max(2, Math.round(size * CELL * 0.28))), buf, img: new ImageData(w, h) };
+    prepared = { w: cw, h: ch, ratio, ash: makeAsh(w, h, k, seed, [PAD_X * CELL * 0.55, PAD_Y * CELL * 0.55]), mask, soft: soften(mask, w, h, Math.max(2, Math.round(size * CELL * 0.28))), buf, img: new ImageData(w, h) };
     return prepared;
   }
 
@@ -99,7 +104,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
     g.clearRect(0, 0, canvas.width, canvas.height);
     const e = d < 0.001 ? 0 : Math.min(1, d / 0.1); // the crisp words give way to the grains over the first tenth
     if (e < 1) {
-      g.setTransform(s.ratio, 0, 0, s.ratio, 0, 0);
+      g.setTransform(s.ratio, 0, 0, s.ratio, PAD_X * s.ratio, PAD_Y * s.ratio);
       layout(g, s.w, 1 - e);
     }
     if (e > 0) {
@@ -123,7 +128,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
       const step = (now: number): void => {
         if (id !== run) return resolve(); // another move took over
         const k = Math.min(1, (now - t0) / span);
-        p = lerp(from, to, k);
+        p = lerp(from, to, to === 0 ? 1 - (1 - k) * (1 - k) : k); // forming eases out: the first grains return at once, not after a dead third
         if (k >= 1 || now - shown >= EVERY) {
           draw();
           shown = now;
