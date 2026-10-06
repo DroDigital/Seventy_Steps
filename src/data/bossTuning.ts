@@ -68,7 +68,7 @@ export const REALITY = {
 
 /** The Colour Out of Space: it heals by draining the world's colour. */
 export const COLOUR = {
-  heal: 30, // hp/s while the world still has colour to give
+  heal: 18, // hp/s while the world still has colour to give (round 47: it was 30, a wall at the standing a new player has in Arkham: 2.5 lives; docs/BALANCE.md, The opening)
   drain: 1 / 75, // the world's saturation lost per second of healing
 };
 

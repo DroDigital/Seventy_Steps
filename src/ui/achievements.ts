@@ -1,7 +1,7 @@
 /**
  * Achievements as they are earned (playtest round 12; systems/achievements.ts): once a second the
  * dream is looked over, and what it has newly earned is kept with the records, said on the HUD and
- * passed to the desktop shell (which will hand it to Steam once the shell speaks to it). The pause
+ * passed to the desktop shell, which hands it to Steam (round 47: desktop/steam.js). The pause
  * menu's page lists them all.
  */
 
@@ -17,6 +17,7 @@ import { el, footer, title, type Page } from './menuKit';
 
 export function watchAchievements(g: Game, store: SaveStore | null): void {
   let records = loadRecords(store);
+  for (const id of records.achievements) void desktop?.achieve?.(id); // Steam is told again of what was earned before (round 47: one earned offline, or before the shell spoke to Steam); it ignores what it has
   setInterval(() => {
     const got = newlyEarned(g, new Set(records.achievements), records.endings.length);
     if (!got.length) return;

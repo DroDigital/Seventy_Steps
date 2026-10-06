@@ -41,7 +41,7 @@ turns flesh to stone. It cannot be killed, and what it took is the tally.
 | 19 | The Whisperer in Akeley's Chair | 11/5/10 | 5 | 850 | 8 | 53 | 292 | 0.06 | 0 |
 | 20 | The Thing Beyond Erich Zann's Window | 11/5/11 | 5 | 850 | 8 | 78 | 292 | 0.10 | 0 |
 | 21 | Joseph Curwen | 11/5/11 | 5 | 900 | 10 | 86 | 292 | 0.11 | 0 |
-| 22 | The Colour Out of Space | 12/5/11 | 5 | 1000 | 37 | 594 | 304 | 0.70 | 0 |
+| 22 | The Colour Out of Space | 12/5/11 | 5 | 1000 | 19 | 314 | 304 | 0.37 | 0 |
 | 23 | High Priest Not to Be Described | 12/5/11 | 5 | 1000 | 12 | 64 | 304 | 0.08 | 0 |
 | 24 | The Haunter of the Dark | 12/6/11 | 5 | 1050 | 178 | 3376 | 304 | 3.97 | 0 |
 | 25 | The Daemon Pipers | 12/6/12 | 5 | 1200 | 11 | 170 | 304 | 0.20 | 0 |
@@ -69,3 +69,22 @@ turns flesh to stone. It cannot be killed, and what it took is the tally.
 | 47 | Azathoth | 20/10/19 | 5 | 6700 | 90 | 9960 | 400 | 8.89 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6), and the bot does not die.
+
+## The opening
+
+The same bot against the horrors of the first hours (the hub about the first Elder Sign, and Arkham), at the standing a new
+player has there: only those two realms' lesser foes (60% of them, in step) and their own bosses before it have
+given Echoes and star-stones. Each may cost at most 1.5 lives.
+
+| # | Boss | Vig/End/Might | Cane + | Health | Seconds | Taken | Our health | Lives | Deaths |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Brown Jenkin | 1/0/0 | 0 | 300 | 16 | 141 | 172 | 0.29 | 0 |
+| 2 | Dr. Muñoz | 2/1/1 | 1 | 400 | 10 | 108 | 184 | 0.21 | 0 |
+| 3 | Charles le Sorcier | 3/1/2 | 2 | 550 | 11 | 126 | 196 | 0.23 | 0 |
+| 4 | The Hound | 4/1/3 | 2 | 550 | 11 | 169 | 208 | 0.29 | 0 |
+| 5 | The Outsider | 4/2/3 | 3 | 550 | 7 | 31 | 208 | 0.05 | 0 |
+| 6 | Ephraim Waite | 4/2/4 | 3 | 600 | 21 | 53 | 208 | 0.09 | 0 |
+| 7 | Keziah Mason | 5/2/4 | 4 | 700 | 11 | 108 | 220 | 0.18 | 0 |
+| 8 | The Black Man | 5/2/5 | 4 | 750 | 18 | 147 | 220 | 0.24 | 0 |
+| 9 | The Unnamable | 6/2/5 | 4 | 850 | 10 | 96 | 232 | 0.15 | 0 |
+| 10 | The Colour Out of Space | 6/3/5 | 5 | 1000 | 27 | 594 | 232 | 0.91 | 0 |

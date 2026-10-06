@@ -17,17 +17,69 @@
     "desktop:dev": "electron . --dev",
     "icon": "node desktop/makeIcon.js",
     "audit": "vitest run --mode audit",
-    "check:all": "tsc --noEmit && vitest run --mode all"
+    "check:all": "tsc --noEmit && vitest run --mode all",
+    "package": "npm run build && electron-builder --dir",
+    "package:win": "npm run build && electron-builder --win --dir",
+    "package:linux": "npm run build && electron-builder --linux --dir",
+    "package:mac": "npm run build && electron-builder --mac --dir"
   },
   "dependencies": {
     "gamepad-node": "^1.5.0",
-    "three": "^0.186.0"
+    "steamworks.js": "^0.4.0"
   },
   "devDependencies": {
     "@types/three": "^0.186.0",
     "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "three": "^0.186.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^5.0.1"
+  },
+  "steam": {
+    "appId": 0
+  },
+  "build": {
+    "appId": "com.digitaldro.seventysteps",
+    "productName": "Seventy Steps",
+    "copyright": "© Alessandro A. Foddis",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**",
+      "desktop/**",
+      "!desktop/**/*.d.ts",
+      "!desktop/makeIcon.js",
+      "package.json",
+      "LICENSE"
+    ],
+    "asarUnpack": [
+      "node_modules/steamworks.js/**",
+      "node_modules/@kmamal/sdl/**",
+      "node_modules/gamepad-node/**"
+    ],
+    "npmRebuild": false,
+    "icon": "build/icon.png",
+    "win": {
+      "target": [
+        "dir"
+      ],
+      "executableName": "SeventySteps"
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ],
+      "executableName": "seventy-steps",
+      "category": "Game"
+    },
+    "mac": {
+      "target": [
+        "dir"
+      ],
+      "category": "public.app-category.role-playing-games"
+    }
   }
 }
