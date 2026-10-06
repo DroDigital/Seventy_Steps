@@ -14,6 +14,16 @@ Where the work on the creature library's walks stands, for whoever picks it up n
   line, listed in the gallery. Pilot: the Ghoul's left walk, made with ElevenLabs `gpt-image-2.5-sunburst`
   (1:1, 1K, quality medium, 1 generation, about 340 credits / 6 cents), passes every check in the audit.
 
+## Rebuilding walk_fix_v2.zip (it lived only in the first session's scratchpad)
+1. `python3 tools/sprite_review.py fetch <site> pack` (about 1,400 small frames, four at a time).
+2. `python3 tools/sprites/walk4.py pack`: the same 18 sides, from the same v1 frames.
+3. Codex's four walks (deep_one left, deep_one#eldritch left, joseph_curwen left and right) exist only in the
+   author's folder: do not redraw them; add `move_2`/`move_3` entries for those sides to `pack-data`, by the paths of
+   their `move_0` (e.g. `../sprites/deep_one/64x64/left/move_2.png`).
+4. Drop the host's injected `/cdn-cgi/` script from the end of the fetched `index.html` and save the page as
+   `previews/library.html`. The final zip holds only changed frames plus that page; the author lays it over a folder
+   that already has Codex's frames.
+
 ## To do: 47 sides, one generation each (about 16,000 credits)
 Left side only for the mirror-safe; both sides for those marked *own right*.
 dagon_priest, dagon_priest#eldritch, cthulhu_cultist, ghoul#eldritch, ghast, zoog, night_gaunt, moon_beast, man_of_leng,
