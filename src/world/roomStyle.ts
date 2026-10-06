@@ -188,7 +188,7 @@ export function inlaysOf(s: RoomStyle, r: RoomLayout, boards: boolean): Inlay[] 
       break;
     case 'cross': {
       const w = wide ? 1.6 : 0.9;
-      out.push({ tone: pale, box: [-w, w, -m, m] }, { tone: pale, box: [-m, -w, -w, w] }, { tone: pale, box: [w, m, -w, w] }, { tone: dark, box: [-w * 2, w * 2, -w * 2, w * 2] });
+      out.push({ tone: pale, box: [-w, w, -m, -w * 2] }, { tone: pale, box: [-w, w, w * 2, m] }, { tone: pale, box: [-m, -w * 2, -w, w] }, { tone: pale, box: [w * 2, m, -w, w] }, { tone: dark, box: [-w * 2, w * 2, -w * 2, w * 2] }); // (the arms stop at the dark square: round 45, they ran under it and fought it at its edge)
       break;
     }
     case 'chequer': {
@@ -204,23 +204,23 @@ export function inlaysOf(s: RoomStyle, r: RoomLayout, boards: boolean): Inlay[] 
     case 'rings': { // a boss's emblem: rings about the heart, a cross through them, a carpet in
       const k = wide ? 1 : 0.5;
       const reach = 14.5 * k;
-      out.push({ tone: dark, disc: [reach, reach - 0.9 * k] }, { tone: 'gilt', disc: [reach - 2 * k, reach - 2.3 * k] }, { tone: dark, disc: [9.5 * k, 8.6 * k] }, { tone: 'rug', disc: [5 * k, 0] }, { tone: 'gilt', disc: [5 * k, 4.6 * k] });
+      out.push({ tone: dark, disc: [reach, reach - 0.9 * k] }, { tone: 'gilt', disc: [reach - 2 * k, reach - 2.3 * k] }, { tone: dark, disc: [9.5 * k, 8.6 * k] }, { tone: 'rug', disc: [4.6 * k, 0] }, { tone: 'gilt', disc: [5 * k, 4.6 * k] });
       out.push(...approach(r, reach), ...arms(r, reach));
       break;
     }
     case 'squares': { // nested squares about the heart, gilt at their corners
       const k = wide ? 1 : 0.5;
-      out.push(...square(14 * k, 13 * k, dark), ...square(11.4 * k, 11 * k, 'gilt'), ...square(8.5 * k, 7.4 * k, dark), { tone: 'rug', box: [-4.4 * k, 4.4 * k, -4.4 * k, 4.4 * k] }, ...square(4.4 * k, 4 * k, 'gilt'));
+      out.push(...square(14 * k, 13 * k, dark), ...square(11.4 * k, 11 * k, 'gilt'), ...square(8.5 * k, 7.4 * k, dark), { tone: 'rug', box: [-4 * k, 4 * k, -4 * k, 4 * k] }, ...square(4.4 * k, 4 * k, 'gilt'));
       for (const [a, b] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) out.push({ tone: 'gilt', box: [Math.min(a * 9.6 * k, a * 10.4 * k), Math.max(a * 9.6 * k, a * 10.4 * k), Math.min(b * 9.6 * k, b * 10.4 * k), Math.max(b * 9.6 * k, b * 10.4 * k)] });
       out.push(...approach(r, 14 * k));
       break;
     }
     case 'quincunx': { // a disc at the heart, a smaller at each of the four ways, a cross of gilt joining them
       const k = wide ? 1 : 0.5;
-      out.push({ tone: dark, disc: [6 * k, 5 * k] }, { tone: 'rug', disc: [4.6 * k, 0] }, { tone: 'gilt', disc: [4.6 * k, 4.2 * k] });
+      out.push({ tone: dark, disc: [6 * k, 5 * k] }, { tone: 'rug', disc: [4.2 * k, 0] }, { tone: 'gilt', disc: [4.6 * k, 4.2 * k] });
       for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const [cu, cv] = [a * 12 * k, b * 12 * k];
-        out.push({ tone: dark, disc: [3 * k, 2.4 * k], at: [cu, cv] }, { tone: 'rug', disc: [2.2 * k, 0], at: [cu, cv] });
+        out.push({ tone: dark, disc: [2.8 * k, 2.2 * k], at: [cu, cv] }, { tone: 'rug', disc: [2.2 * k, 0], at: [cu, cv] }); // (it stops short of the frame about them)
       }
       const w = 0.4 * (wide ? 1 : 0.8);
       out.push({ tone: 'gilt', box: [-w, w, -9 * k, -6 * k] }, { tone: 'gilt', box: [-w, w, 6 * k, 9 * k] }, { tone: 'gilt', box: [-9 * k, -6 * k, -w, w] }, { tone: 'gilt', box: [6 * k, 9 * k, -w, w] });

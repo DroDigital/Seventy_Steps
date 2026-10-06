@@ -5,6 +5,7 @@
  * recovering it loses the old one. Kills pay the foe's bounty.
  */
 
+import { candleFor } from './candles';
 import { signPlace } from './checkpoints';
 import { bountyOf } from './relics';
 import type { Entity } from '../core/ecs';
@@ -75,16 +76,18 @@ export function resetFoes(g: Game): void {
   }
 }
 
-/** Respawn at the last Elder Sign; the foes reset. */
+/** Respawn at the lit candle that reaches where they fell (before a horror's fog), else at the last Elder Sign; the foes reset. */
 function respawn(g: Game): void {
   const p = g.player;
-  restore(g, p.id, p.checkpoint);
+  const candle = candleFor(g, g.ecs.c.transform.get(p.id)!.pos);
+  const at = candle ?? p.checkpoint;
+  restore(g, p.id, at);
   resetFoes(g);
   Object.assign(p, { buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockRaised: false });
   setLock(g, null);
   const sign = g.overworld ? signPlace(g.overworld.sign) : undefined;
-  p.kneeling = sign && distXZ(sign, p.checkpoint) < 8 ? { x: sign.x, z: sign.z } : null; // up from the stone on one knee, as after fast travel (round 31)
-  Object.assign(g.camera, { yaw: p.checkpoint.yaw, prevYaw: p.checkpoint.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
+  p.kneeling = !candle && sign && distXZ(sign, p.checkpoint) < 8 ? { x: sign.x, z: sign.z } : null; // up from the stone on one knee, as after fast travel (round 31)
+  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
   g.events.emit('Respawned', { entity: p.id });
 }
 

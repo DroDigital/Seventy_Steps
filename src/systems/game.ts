@@ -52,6 +52,7 @@ import { boltSystem } from './projectiles';
 import { questSystem } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
+import { candleSystem } from './candles';
 import { fogBlockSystem, fogPassSystem } from './fogGates';
 import { registerOmens } from './omens';
 import { registerDeathNotes } from './deathNotes';
@@ -191,6 +192,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   if (g.player.fogPass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
   playerControl(g, input);
   fogPassSystem(g);
+  candleSystem(g);
   weatherSystem(g, dt);
   const spent = g.reality.stolen <= 0 && fightActionSystem(g, input);
   checkpointSystem(g, spent ? { ...input, pressed: { ...input.pressed, interact: false } } : input);

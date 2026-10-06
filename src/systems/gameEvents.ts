@@ -29,6 +29,7 @@ export interface GameEvents {
   Died: { entity: Entity; killer: Entity | null; at: V3 };
   Vanished: { entity: Entity; at: V3; struck: boolean }; // a hallucination gone: struck, or faded
   Respawned: { entity: Entity };
+  CandleLit: { id: string; x: number; z: number }; // a candle before a horror's fog taken up (candles.ts)
   FogPassing: { wall: string; x: number; z: number; frames: number }; // frames: how long the walk through takes (the sound is made to its length) // the investigator sets out through a boss's fog (round 35)
   FogPassed: { wall: string; x: number; z: number };
   Echoes: { change: 'earned' | 'dropped' | 'recovered' | 'lost' | 'spent'; amount: number; total: number; on?: 'ware' | 'level' }; // `on`: what spent Echoes were spent on (the coins of a ware are heard; a level has its own sound)
