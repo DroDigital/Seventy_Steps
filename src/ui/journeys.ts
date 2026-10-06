@@ -9,6 +9,7 @@
  * Dying, the veil falls as the investigator does, and the death throes wait for it before the respawn.
  */
 
+import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
 import { WORLD } from '../data/tuning';
 import { gateBarred, gatePlace, interactable, passGate, signPlace } from '../systems/checkpoints';
@@ -96,7 +97,8 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
       const now = performance.now();
       if (phase === 'dying' && !fallen && now - since > DYING_MS) {
         fallen = true;
-        void veil.cover(restPlace(), 1.2);
+        const asked = g.player.ask && candleFor(g, g.ecs.c.transform.get(g.player.id)!.pos) !== null; // a lit candle reaches the fall: the rise menu stands on the veil, with no place's name on it (riseMenu.ts)
+        void veil.cover(asked ? '' : restPlace(), 1.2);
       }
       if (phase !== 'holding') return;
       if (since < 0) [since, from, peak] = [now, veil.fill, 0];

@@ -2,7 +2,7 @@
  * The candles before the fog (round 45; Elden Ring's Stakes of Marika, in the dream's own terms): before the fog
  * of each horror, on the way in, a stub of tallow stands in a saucer ringed in chalk, left by an earlier sleeper. Pass
  * near and it takes the flame (nothing is pressed). A lit candle is a place to rise: fall within its reach and you
- * wake there, a few steps from the fog, and not at the Elder Sign a long way back. It gives no rest (only an Elder
+ * may wake there, a few steps from the fog, instead of at the Elder Sign a long way back (a screen asks which: ui/riseMenu.ts). It gives no rest (only an Elder
  * Sign does: levels, doses, the creatures come back as on any death), and the map's travel is still there to carry
  * you to an Elder Sign when you would grow stronger instead. Lit candles are kept in the save.
  */
@@ -15,7 +15,7 @@ import type { Game } from './components';
 
 export const CANDLE = {
   light: 6, // metres from which passing takes the flame
-  reach: 85, // metres from a lit candle within which a fall wakes the investigator there (a horror's arena is within it)
+  reach: 100, // metres from a lit candle within which a fall wakes the investigator there (a horror's arena is within it)
   every: 8, // frames between looks
 };
 
@@ -36,7 +36,7 @@ export function candlesOf(): readonly Candle[] {
 }
 
 /** After a fall at `at`: the nearest lit candle that reaches it, or null (the Elder Sign it is). */
-export function candleFor(g: Game, at: { x: number; z: number }): Place | null {
+export function candleFor(g: Game, at: { x: number; z: number }): (Place & { wall: string }) | null {
   const ow = g.overworld;
   if (!ow || ow.candles.size === 0) return null;
   let best: { c: Candle; d: number } | null = null;
@@ -45,7 +45,7 @@ export function candleFor(g: Game, at: { x: number; z: number }): Place | null {
     const d = distXZ(c, at);
     if (d <= CANDLE.reach && (!best || d < best.d)) best = { c, d };
   }
-  return best ? { x: best.c.x, z: best.c.z, yaw: best.c.yaw } : null;
+  return best ? { x: best.c.x, z: best.c.z, yaw: best.c.yaw, wall: best.c.wall } : null;
 }
 
 /** Takes the flame to any candle the investigator passes. */

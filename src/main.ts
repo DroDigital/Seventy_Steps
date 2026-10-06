@@ -76,6 +76,7 @@ import { createSignMenu, type SignMenu } from './ui/signMenu';
 import { createSkyline } from './render/skyline';
 import { achievementsPage, watchAchievements } from './ui/achievements';
 import { createShopMenu } from './ui/shopMenu';
+import { createRiseMenu } from './ui/riseMenu';
 import { takeCarry } from './systems/records';
 import { takeFlag, title } from './ui/titleFlow';
 import { createArenaScene } from './world/arenaScene';
@@ -182,6 +183,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const input = createInput(canvas, () => !menuOpen());
   const dialogue = createDialogue(game);
   const shop = createShopMenu(game);
+  const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
   const hud = createHud(game, canvas, painter, echoFx.pending);
   const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
@@ -220,7 +222,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         if (!through) return; // the world stands still
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
-        stepGame(game, menu?.open || shop.open || ending.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
+        stepGame(game, menu?.open || shop.open || rise?.open || ending.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
       },
       render(blend) {
         const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still;

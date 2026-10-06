@@ -3,6 +3,7 @@ import { PLAYER_MOVES } from '../src/data/moves';
 import { candleFor, candlesOf, CANDLE } from '../src/systems/candles';
 import { signPlace } from '../src/systems/checkpoints';
 import { strike } from '../src/systems/combat';
+import { riseAt } from '../src/systems/death';
 import { createWorldGame } from '../src/systems/game';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
 import { roomAt } from '../src/world/dungeonKit';
@@ -89,5 +90,32 @@ describe('the candles before the fog', () => {
     const g = createWorldGame();
     expect(g.overworld!.candles.size).toBe(0);
     expect(candleFor(g, { x: 0, z: 0 })).toBeNull();
+  });
+
+  it('asks where to rise when a screen is there to ask: at the candle, or at the Elder Sign, as chosen', () => {
+    for (const where of ['candle', 'sign'] as const) {
+      const g = createWorldGame();
+      const c = candlesOf()[0];
+      g.player.ask = true;
+      g.overworld!.candles.add(c.id);
+      const asked = record(g, 'RiseChoice');
+      goTo(g, c.x + 20, c.z);
+      run(g, 1);
+      strike(g, g.player.id, g.player.id, deathblow);
+      run(g, PLAYER_MOVES.death.frames + 30);
+      expect(asked.length).toBe(1);
+      expect(asked[0].wall).toBe(c.wall);
+      expect(g.player.rising).not.toBeNull();
+      expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('death'); // they wait
+      riseAt(g, where);
+      const at = where === 'candle' ? c : signPlace(g.overworld!.sign)!.rest;
+      expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: at.x, z: at.z });
+      expect(g.player.rising).toBeNull();
+      expect(g.ecs.c.actor.get(g.player.id)!.move).toBeNull();
+    }
+  });
+
+  it('reaches a hundred metres', () => {
+    expect(CANDLE.reach).toBe(100);
   });
 });
