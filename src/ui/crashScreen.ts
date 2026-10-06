@@ -5,6 +5,7 @@
  * shell, out). Plain DOM, dependent on nothing that may itself have broken.
  */
 
+import { crashReport } from './crashLog';
 import { desktop } from './desktop';
 
 export type CrashKind = 'webgl' | 'lost' | 'error';
@@ -36,6 +37,8 @@ export function showCrash(kind: CrashKind, detail?: string): void {
     // Nothing held.
   }
   const w = WORDS[kind];
+  const report = crashReport(kind, detail);
+  void desktop?.writeLog?.(report); // kept as a file in the shell's logs folder, whatever the player does next
   const root = document.createElement('div');
   root.setAttribute('role', 'alertdialog');
   root.style.cssText =
@@ -66,6 +69,8 @@ export function showCrash(kind: CrashKind, detail?: string): void {
     return b;
   };
   const again = add('Wake again', () => void (location.href = location.pathname));
+  const copy = add('Copy report', () => void navigator.clipboard?.writeText(report).then(() => (copy.textContent = 'Copied'), () => (copy.textContent = 'Could not copy')));
+  if (desktop?.openLogs) add('Open logs', () => void desktop!.openLogs!());
   if (desktop) add('Quit', () => void desktop!.quit());
   panel.append(row);
   root.append(panel);

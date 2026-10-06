@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('desktop', {
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),
   isFullscreen: () => ipcRenderer.invoke('desktop:is-fullscreen'),
+  writeLog: (report) => ipcRenderer.invoke('desktop:write-log', String(report)), // a crash report, kept (round 46)
+  openLogs: () => ipcRenderer.invoke('desktop:open-logs'),
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
   store: { // saves, settings and records as files in the user's data folder (round 12)
     get: (key) => ipcRenderer.sendSync('desktop:store-get', String(key)),

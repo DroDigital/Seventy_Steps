@@ -12,8 +12,8 @@
  * macOS lists none to the page; the page reads them from the bridge when the browser's list is empty.
  */
 
-import { app, BrowserWindow, ipcMain, nativeImage, protocol, screen, utilityProcess } from 'electron';
-import { mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { app, BrowserWindow, dialog, ipcMain, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
+import { mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
@@ -32,6 +32,30 @@ function writeWhole(file, text) {
   writeFileSync(`${file}.tmp`, text);
   renameSync(`${file}.tmp`, file);
 }
+
+/** Round 46: a crash is kept as a file in the logs folder (the last ten), for the player to send; the shell's own faults too. */
+const logsDir = () => join(app.getPath('userData'), 'logs');
+function keepLog(text) {
+  try {
+    const dir = logsDir();
+    mkdirSync(dir, { recursive: true });
+    const file = join(dir, `crash-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`);
+    writeFileSync(file, text);
+    for (const old of readdirSync(dir).filter((f) => f.startsWith('crash-')).sort().slice(0, -10)) rmSync(join(dir, old), { force: true });
+    return file;
+  } catch {
+    return null;
+  }
+}
+process.on('uncaughtException', (e) => {
+  keepLog(`Seventy Steps shell fault (uncaught): ${e?.stack ?? e}\nelectron ${process.versions.electron} · ${process.platform} ${process.arch}`);
+  if (!quitting) dialog.showErrorBox('The dream broke', `The game's window stopped.\n\n${e?.message ?? e}\n\nA report was kept in:\n${logsDir()}`);
+});
+ipcMain.handle('desktop:write-log', (_e, report) => keepLog(String(report).slice(0, 60_000)));
+ipcMain.handle('desktop:open-logs', async () => {
+  mkdirSync(logsDir(), { recursive: true });
+  await shell.openPath(logsDir());
+});
 
 const windowFile = () => join(app.getPath('userData'), 'window.json');
 
@@ -92,6 +116,10 @@ function open() {
   win.webContents.on('will-navigate', (event, url) => {
     if (!url.startsWith(DEV ? 'http://localhost:5173/' : ORIGIN)) event.preventDefault(); // it only ever reloads itself
   });
+  win.webContents.on('render-process-gone', (_e, d) => { // the page's process died (out of memory, a driver crash): kept, and the window wakes again once
+    keepLog(`Seventy Steps: the page's process went (${d.reason}, exit ${d.exitCode})\nelectron ${process.versions.electron} · ${process.platform} ${process.arch}`);
+    if (!quitting && d.reason !== 'clean-exit' && reloads++ < 1) win.reload();
+  });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   void win.loadURL(URL_TO_OPEN);
 }
@@ -128,6 +156,7 @@ ipcMain.handle('desktop:is-fullscreen', (e) => !!BrowserWindow.fromWebContents(e
 let pads = [];
 let padStarts = 0;
 let quitting = false;
+let reloads = 0;
 app.on('before-quit', () => void (quitting = true));
 function startPads() {
   const worker = utilityProcess.fork(fileURLToPath(new URL('./padWorker.js', import.meta.url)), [], { serviceName: 'Seventy Steps controllers', stdio: 'inherit' });

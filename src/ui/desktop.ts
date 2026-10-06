@@ -9,6 +9,8 @@ export interface Desktop {
   setFullscreen(on: boolean): Promise<void>;
   isFullscreen(): Promise<boolean>;
   store?: { get(key: string): string | null; set(key: string, value: string): boolean; remove(key: string): boolean }; // files (round 12)
+  writeLog?(report: string): Promise<string | null>; // a crash report kept in the logs folder (round 46); its path
+  openLogs?(): Promise<void>; // the logs folder, shown
   achieve?(id: string): Promise<boolean>; // an achievement earned, for Steam's (round 12)
 }
 

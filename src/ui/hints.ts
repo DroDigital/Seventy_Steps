@@ -12,12 +12,13 @@ import { zonesOf } from '../systems/hurt';
 import { mainLead } from '../systems/lead';
 import { canLevel, LEVEL_IDS } from '../systems/levels';
 import { fill } from './glyphs';
+import { watch } from './hintWatch';
 import { BONE, el, setStyle, setText } from './hudKit';
 import { HINTS_KEY as KEY } from './loreLine';
 
 const SHOW_MS = 9000;
 
-const HINTS = {
+export const HINTS = {
   move: 'Move with {move} and look with {look}. {dodge} dodges; hold it to run.',
   lead: 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there.',
   fight: '{light} strikes ({heavy}: a heavy blow). {block} blocks, and calls off a swing that has not landed; {parry} parries. {lock} locks on.',
@@ -37,6 +38,10 @@ const HINTS = {
   spheres: 'The iridescent spheres are gates: touch one and you come out of the next, and now and then the whole arena leaps. Yog-Sothoth is struck where its own spheres rest.',
   blind: 'Azathoth cannot see you, and nothing you strike it with matters. It hears: running, rolling, swinging and shots carry far, walking less, and walking with {block} held or standing still not at all. Outlast the piping.',
   candle: 'A candle took the flame. Fall near a lit candle and you may rise beside it, a few steps from the horror that felled you, or at the Elder Sign, as you choose. The candle gives no rest: levels and doses are the Elder Signs\u2019.',
+  breath: 'The green bar is your breath: strikes, rolls, running and blocking spend it, and with it gone you are slow and open. Back off, and let it come back before you swing again.',
+  riposte: 'You parried: the foe is open. Strike at once for a riposte, which hits far harder. A blow to the back of a foe does the same.',
+  fog: 'The mist ahead holds a horror. {interact} passes through, and once you have, there is no leaving until one of you falls. Rest and grow stronger first, and light the candle before it, if you will.',
+  talk: '{interact} talks to the people you meet. Some have a quest to give, some wares to sell, and all of them know something.',
   insight: 'Insight buys strength when you rest at an Elder Sign.',
   gun: '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',
   oil: '{throw} throws a flask of lamp oil; it bursts and burns where it lands. Lock on first to throw it at a foe.',
@@ -72,12 +77,14 @@ export function createHints(g: Game, root: HTMLElement): Hints {
   const seen = load();
   const queue: HintId[] = [];
   let until = 0;
-  const hint = (id: HintId): void => {
+  const hint = (id: HintId, urgent = false): void => {
     if (!g.overworld || seen.has(id) || queue.includes(id)) return;
-    queue.push(id);
+    if (urgent) queue.unshift(id); // a hint for what is happening now goes before those waiting
+    else queue.push(id);
   };
   g.events.on('Hit', (e) => {
     if (e.target === g.player.id && e.damage > 0) hint('fight');
+    if (e.target === g.player.id && e.outcome === 'parried') hint('riposte', true);
     const by = g.ecs.c.actor.get(e.attacker);
     if (e.target === g.player.id && by && moveDef(by)?.hit?.unblockable) hint('grab');
     if (e.target === g.player.id && g.ecs.c.phantom.has(e.attacker)) hint('phantom');
@@ -107,6 +114,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
   let recap = g.overworld && g.overworld.quests.size > 0 ? mainLead(g)?.text : undefined; // a journey taken up again
   return {
     update() {
+      if (g.frame % 30 === 0) for (const id of watch(g)) hint(id, true);
       const now = performance.now();
       if (now < until) return;
       setStyle(box, 'opacity', '0');

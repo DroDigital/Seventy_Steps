@@ -8,6 +8,8 @@
 import type { XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { RegionDef } from '../data/regions';
+import { getEntity } from '../data/registry';
+import { START_SIGN } from '../data/sites';
 import { WORLD } from '../data/tuning';
 import { colliderBounds, toBoxFrame, type Collider } from './colliders';
 import type { Feature } from './features';
@@ -18,6 +20,12 @@ import { DIRS, rectDistance, regionRect } from './worldMap';
 import { MOUND_BAND } from './dungeonParts';
 
 const SAFE = WORLD.signClear; // metres of peace around every Elder Sign and gate
+export const FIRST_HOUR = 140; // metres about the first Elder Sign where only the gentlest foes stand: a first fight is learned on a rat or a corpse, not on what cannot be seen
+/** A foe for a first fight: of the lesser kind, hitting for little, and in plain sight, on its feet. */
+export const gentle = (id: string): boolean => {
+  const d = getEntity(id);
+  return !!d && d.tier === 'lesser' && d.stats.damage <= 14 && !['invisible_stalker', 'ambusher', 'burrower', 'mind_thief', 'caster', 'hover_ranged'].includes(d.behavior.archetype);
+};
 const PATROL = 95; // metres of road between patrols
 const MARGIN = 0.8; // metres a foe keeps from a prop's collider
 
@@ -63,9 +71,12 @@ export function planSpawns(region: RegionDef, features: readonly Feature[], road
     !solid(x, z);
 
   const out: SpawnPoint[] = [];
+  const start = w.signs.find((s) => s.id === START_SIGN);
+  const early = (x: number, z: number): boolean => !!start && Math.hypot(start.x - x, start.z - z) < FIRST_HOUR;
   const post = (x: number, z: number, yaw: number): boolean => {
-    const entity = pick(table, rng());
-    if (!entity || !clear(x, z)) return false;
+    let entity = pick(table, rng());
+    for (let k = 0; entity && early(x, z) && !gentle(entity) && k < 6; k++) entity = pick(table, rng()); // (round 46: the first hour's foes are the gentle ones)
+    if (!entity || !clear(x, z) || (early(x, z) && !gentle(entity))) return false;
     out.push({ id: `p:${region.id}:${out.length}`, entity, region: region.id, at: { x, z, yaw }, unique: false });
     return true;
   };
