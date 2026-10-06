@@ -31,7 +31,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 - The pad's A and B can never again be read two ways (one table of buttons, and a Swap A / B setting).
 
 **Voices**
-- Morgan is spoken by the library voice Josef Hammer.
+- Morgan is spoken by the library voice Josef Hammer. The intro narrator is a voice designed for the game (a slow, grave English baritone), where a widely used library voice stood.
 
 ## Before this round
 

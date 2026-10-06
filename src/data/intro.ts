@@ -12,7 +12,7 @@ export interface IntroCard {
   telegram?: boolean; // typed, not written
 }
 
-/** The narrator's speaker: a library voice, a crisp and authoritative British one; never whispered (his lines carry no [whispers], [softly] or [quietly]) (data/speechCast.ts). */
+/** The narrator's speaker: a voice designed for this game, a slow, grave English baritone; never whispered (his lines carry no [whispers], [softly] or [quietly]) (data/speechCast.ts). */
 export const NARRATOR = 'narrator:intro';
 
 export const INTRO: readonly IntroCard[] = [

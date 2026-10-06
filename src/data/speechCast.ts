@@ -3,7 +3,7 @@
  * (`npc:<id>`) and each horror that speaks (`boss:<roster id>`). Licence rule (round 41): only ElevenLabs'
  * own **premade** voices, or voices **designed for this game** in its Voice Design (ours, no library
  * licence in between). The library voices the cast once used could not be checked for their licence
- * through the tools, and are gone from it; the narrator's (the author's pick) is the one left, flagged in
+ * through the tools, and are gone from it; the narrator (round 46) is designed for the game too; the library voice once left open is gone. See
  * docs/VOICES.md. Nobody has listened to the casting: the designed voices were described from each
  * speaker's years, tongue and temper and picked by what could be measured (docs/VOICES.md). `rate` and
  * `echo` are the game's own: a playback rate below 1 lowers a voice and slows it (the great and the old),
@@ -40,8 +40,8 @@ const PRIESTS = ['t08TssFOUzUklDhgSgD1', 'Nasht and Kaman-Thah (Priests)'] as co
 const HYDRA = ['H6EAxZnCzTPJJFGIm1N0', 'Mother Hydra (Deep One)'] as const; // Shub-Niggurath too
 
 export const CAST: Readonly<Record<string, Voice>> = {
-  // the narrator of a new game's opening (round 39): Finley, Articulate Anchor, a crisp and unflappable British voice, chosen by the author; a LIBRARY voice (licence unchecked: docs/VOICES.md); never whispered; set in a stone chamber (a warm, level voice with reverb, no slap-back echo)
-  'narrator:intro': v(['fnYMz3F5gMEDGMWcH1ex', 'Finley - Articulate Anchor'], { room: true }),
+  // the narrator of a new game's opening (round 46): The Archivist, a voice designed for this game (Voice Design, so ours: no library licence in between), in place of the library voice of round 39 that the author found too recognisable as synthetic: a late-fifties English baritone with a soft northern edge and a faint dry rasp, slow and understated; never whispered; set in a stone chamber (a warm, level voice with reverb, no slap-back echo)
+  'narrator:intro': v(['uqOnApI3a2RVj8rEwlAi', 'The Archivist (Intro Narrator)'], { room: true }),
   // people met at the Elder Signs
   'npc:peaslee': v(['tFaKZ4OQAewSluuxn7RB', 'Wingate Peaslee (Seventy Steps)']), // designed: a deep, old, dry professor (Eric was too young); the clips are lowered to ~95 Hz and 12% brisker (round 42)
   'npc:gilman': v(WILL),
@@ -62,7 +62,6 @@ export const CAST: Readonly<Record<string, Voice>> = {
   'boss:wilbur_whateley': v(HARRY, { rate: 0.96, echo: 0.15 }),
   'boss:dunwich_horror': v(HARRY, { rate: 0.72, echo: 0.5 }),
   'boss:keziah_mason': v(['BbF0R6lcyCsZVwnjHzwi', 'Keziah Mason (Witch)'], { echo: 0.25 }),
-  'boss:brown_jenkin': v(['XAfV6hn6JT4LPatdDizz', 'Brown Jenkin (Familiar)'], { echo: 0.2 }),
   'boss:black_man': v(['gdQL6olVLhkRDvue4G8n', 'The Black Man (Tempter)'], { rate: 0.97, echo: 0.25 }),
   'boss:joseph_curwen': v(['ttJ9Yma2EKpRou0MKpVX', 'Joseph Curwen (Necromancer)'], { echo: 0.3 }),
   'boss:simon_orne': v(['MN6OV4FaLTmDyt2HbvDM', 'Simon Orne (Sorcerer)'], { echo: 0.25 }),
