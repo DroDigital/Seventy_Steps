@@ -18,12 +18,14 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { serveFrom } from './serve.js';
+import { startSteam, steamAchieve, steamEarly } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
+if (steamEarly(app.isPackaged)) app.exit(0); // a release build started outside Steam is started again through it (round 47: steam.js)
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
 /** Writes `text` to `file` whole or not at all (a crash mid-write leaves the old one). */
@@ -126,8 +128,8 @@ function open() {
 }
 
 ipcMain.handle('desktop:quit', () => app.quit());
-// An achievement earned: the game keeps it itself; this is where Steamworks will be told, once the shell carries it.
-ipcMain.handle('desktop:achieve', () => false);
+// An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
+ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
 
 // The game's storage as files, one a key (sync, as the Web Storage API it stands in for is).
 const keyFile = (key) => join(app.getPath('userData'), 'saves', `${String(key).replace(/[^A-Za-z0-9_-]+/g, '_')}.json`);
@@ -176,6 +178,7 @@ function startPads() {
 ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) after the pads were found asks for them once
 
 void app.whenReady().then(() => {
+  startSteam();
   startPads();
   protocol.handle('app', serveFrom(fileURLToPath(new URL('../dist/', import.meta.url))));
   open();

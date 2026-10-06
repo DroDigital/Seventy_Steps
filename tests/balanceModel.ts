@@ -30,11 +30,11 @@ export interface Standing {
 
 const bountyOf = (id: string): number => ENTITIES.find((e) => e.id === id)?.drops.echoes ?? 0;
 
-/** Every Echo the world's lesser foes carry (the bosses' own are the bosses'). */
-export function lesserEchoes(): number {
+/** Every Echo the world's lesser foes carry (the bosses' own are the bosses'), in `regions` (all of them by default). */
+export function lesserEchoes(regions?: readonly string[]): number {
   const w = worldLayout();
   let sum = 0;
-  for (const r of REGIONS) {
+  for (const r of REGIONS.filter((x) => !regions || regions.includes(x.id))) {
     for (const s of [...regionPlan(r).spawns.values()].flat()) if (!s.id.startsWith('boss:')) sum += bountyOf(s.entity);
     for (const s of w.spawns.filter((x) => x.region === r.id && !x.id.startsWith('boss:'))) sum += bountyOf(s.entity);
   }
@@ -67,10 +67,14 @@ export function reinforceWith(stones: number): number {
   return level;
 }
 
-/** The standing of the investigator at each scripted boss, in the order they meet them. */
-export function standings(): Standing[] {
-  const bosses = ENTITIES.filter((e) => e.bossScript).sort((a, b) => a.stats.hp - b.stats.hp || a.id.localeCompare(b.id));
-  const lesser = lesserEchoes();
+/**
+ * The standing of the investigator at each scripted boss, in the order they meet them. With `regions`, only those
+ * realms' bosses and lesser foes count (round 47: the opening, Arkham and the hub about the first Elder Sign, as a new
+ * player meets them, with nothing yet from farther realms).
+ */
+export function standings(regions?: readonly string[]): Standing[] {
+  const bosses = ENTITIES.filter((e) => e.bossScript && (!regions || e.regions.some((r) => regions.includes(r)))).sort((a, b) => a.stats.hp - b.stats.hp || a.id.localeCompare(b.id));
+  const lesser = lesserEchoes(regions);
   let [slain, stones] = [0, 0];
   return bosses.map((b, rank) => {
     const echoes = Math.round(KILLED * lesser * ((rank + 0.5) / bosses.length) + KEPT * slain);

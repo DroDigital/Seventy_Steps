@@ -36,6 +36,10 @@ player would notice, newest first. Versions before 1.0 were never released.
 - On a Steam Deck the first launch takes larger text; the smallest HUD text is a step larger everywhere.
 - Saves carry their format and the version that wrote them; a dream begun on this release candidate goes on after 1.0, and a save from a newer build is kept and named as such, never shown as empty or mended over.
 
+**Steam and balance**
+- Steam: achievements reach Steam as they are earned (and those earned before, at the next launch); the Steam overlay; packed for Steam with `npm run package` (docs/STEAM.md).
+- The Colour Out of Space heals more slowly (18 health a second, from 30): met early in Arkham, it was a wall.
+
 **Voices**
 - Morgan is spoken by the library voice Josef Hammer. The intro narrator is a voice designed for the game (a slow, grave English baritone), where a widely used library voice stood.
 
@@ -52,6 +56,7 @@ quests and documents; photo mode; the desktop shell for Steam; save slots; rebin
 
 - [ ] Run `?bench` on real machines and fill the table in `docs/PERFORMANCE.md`; write the minimum and recommended specs.
 - [ ] Native-speaker read of the German, French and Spanish interface (`docs/LOCALIZATION.md`).
-- [ ] Packaging for Windows, macOS and Linux, and Steamworks (achievements, cloud saves): they need a dependency and an account.
+- [x] Packaging (`npm run package`) and Steamworks in the shell (achievements, overlay); Auto-Cloud needs no code.
+- [ ] The Steamworks partner-site steps: app id into `package.json`, depots, Auto-Cloud roots, the achievements and their icons (`docs/STEAM.md`); pack Windows and macOS on those systems; macOS signing.
 - [ ] Confirm the licence of every generated voice and track for a commercial release (`docs/STORE_PAGE.md`, AI disclosure).
 - [ ] Capsule art, a trailer and screenshots from a real GPU (`tools/store_shots.mjs`, `?trailer`).
