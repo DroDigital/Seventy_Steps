@@ -8,6 +8,8 @@
  * (▲), two of them in the light of a lamp or a fire (▲▲).
  */
 
+import { t } from '../core/i18n';
+import type { Key } from '../data/lang';
 import { MIND_HUD, SANITY } from '../data/tuning';
 import type { Band, Game } from '../systems/components';
 import { atOrBelow, bandIndex } from '../systems/sanity';
@@ -15,9 +17,9 @@ import { glyph } from './glyphs';
 import { gauge } from './gauges';
 import { BONE, el, setStyle, setText } from './hudKit';
 
-const MAGENTA = '#d80073';
+const MAGENTA = '#b04a82';
 /** The bar and the band's name, from clear water to magenta (round 32: they were bone, bone, purple and magenta, and the bar was one of three of a colour). */
-const BAND_COLOURS: Record<Band, string> = { lucid: '#5aa6cf', uneasy: '#8a9be0', fractured: '#a257d6', unmoored: MAGENTA };
+const BAND_COLOURS: Record<Band, string> = { lucid: '#6a98b2', uneasy: '#8d98c0', fractured: '#9468b6', unmoored: MAGENTA };
 
 export interface MindHud {
   update(now: number): void;
@@ -46,8 +48,8 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
   g.events.on('SanityLost', () => (joltAt = performance.now()));
   g.events.on('SanityBandChanged', (e) => {
     const worse = bandIndex(e.to) > bandIndex(e.from);
-    const call = !worse || bandIndex(e.to) < bandIndex('fractured') ? '' : g.player.laudanum > 0 ? `  ·  ${glyph('item').toUpperCase()}  LAUDANUM` : '  ·  REST AT AN ELDER SIGN';
-    say(`${worse ? '▼' : '▲'} ${e.to.toUpperCase()}${call}`);
+    const call = !worse || bandIndex(e.to) < bandIndex('fractured') ? '' : g.player.laudanum > 0 ? `  ·  ${t('mind.laudanumCall', { key: glyph('item').toUpperCase() })}` : `  ·  ${t('mind.restCall')}`;
+    say(`${worse ? '▼' : '▲'} ${t(`mind.${e.to}` as Key)}${call}`);
   });
 
   return {
@@ -69,11 +71,11 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
         frame.style.boxShadow = jolt > 0 ? `0 0 ${Math.round(8 * jolt)}px ${MAGENTA}` : '';
         jolted = jolt > 0;
       }
-      setText(band, `${m.band.toUpperCase()} ${Math.ceil(m.sanity)}${m.mending > SANITY.mend.rate * 1.5 ? ' ▲▲' : m.mending > 0 ? ' ▲' : ''}`);
+      setText(band, `${t(`mind.${m.band}` as Key)} ${Math.ceil(m.sanity)}${m.mending > SANITY.mend.rate * 1.5 ? ' ▲▲' : m.mending > 0 ? ' ▲' : ''}`);
       setStyle(band, 'color', BAND_COLOURS[m.band]);
       const call = callsForLaudanum(g);
-      setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}LAUDANUM ×${g.player.laudanum}`);
-      setStyle(laudanum, 'color', call ? '#ff5aa8' : BONE);
+      setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}${t('mind.laudanum', { n: g.player.laudanum })}`);
+      setStyle(laudanum, 'color', call ? '#d26a9d' : BONE);
       setStyle(laudanum, 'opacity', call ? (0.7 + 0.3 * Math.sin(now / 260)).toFixed(2) : '0.7');
     },
   };

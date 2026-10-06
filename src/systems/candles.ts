@@ -7,6 +7,7 @@
  * you to an Elder Sign when you would grow stronger instead. Lit candles are kept in the save.
  */
 
+import { t } from '../core/i18n';
 import { distXZ } from '../core/geom';
 import type { Place } from '../data/arena';
 import { gatePlan } from '../world/gatePlan';
@@ -58,6 +59,6 @@ export function candleSystem(g: Game): void {
     if (ow.candles.has(c.id) || distXZ(c, me) > CANDLE.light) continue;
     ow.candles.add(c.id);
     g.events.emit('CandleLit', { id: c.id, x: c.x, z: c.z });
-    g.events.emit('Notice', { text: 'A CANDLE TAKES THE FLAME' });
+    g.events.emit('Notice', { text: t('n.candle') });
   }
 }

@@ -4,6 +4,7 @@
  * it. A white flash, a shutter, and a line on the HUD say it is done.
  */
 
+import { t } from '../core/i18n';
 import type { Game } from '../systems/components';
 import { enlarge, savePng, scaleFor } from './keepsake';
 
@@ -30,9 +31,9 @@ export function createPhoto(g: Game, canvas: HTMLCanvasElement, shutter: () => v
         flash.style.opacity = '0.8';
         requestAnimationFrame(() => ((flash.style.transition = 'opacity .5s'), (flash.style.opacity = '0')));
         shutter();
-        g.events.emit('Notice', { text: 'A PICTURE OF THE DREAM IS KEPT' });
+        g.events.emit('Notice', { text: t('n.pictureKept') });
       } catch {
-        g.events.emit('Notice', { text: 'THE PICTURE WOULD NOT KEEP' });
+        g.events.emit('Notice', { text: t('n.pictureFail') });
       }
     },
   };

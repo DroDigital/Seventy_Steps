@@ -35,7 +35,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
     return { slot, name, sum, chip, fill, status, ticks: [] as HTMLDivElement[] };
   });
   const gaze = el('position:absolute;left:16px;bottom:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'GAZE', root);
-  const gazeFill = bar(gaze, '#a257d6', 8);
+  const gazeFill = bar(gaze, '#9468b6', 8);
   const stone = el('position:absolute;left:16px;bottom:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'PETRIFICATION', root);
   const stoneFill = bar(stone, '#9ca29a', 8);
   const flash = el('position:absolute;inset:0;background:#e8e0cc;opacity:0', '', root);

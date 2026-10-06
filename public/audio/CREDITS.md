@@ -319,7 +319,7 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 
 ## Made with Suno Sounds
 
-Recordings the game is ready for and does not yet have are described in `docs/SUNO_SOUNDS.md` (the list is `src/data/plannedSounds.ts`).
+Recordings the game is ready for and does not yet have are listed, with the prompt to make each, in `src/data/plannedSounds.ts`.
 Any that is made is credited here, one row a file, with the **date and the plan** it was made on (Suno grants commercial use only to
 what a paid plan made). None is in the game yet.
 

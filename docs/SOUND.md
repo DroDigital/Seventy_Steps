@@ -1,7 +1,7 @@
 # Sound
 
 How the game sounds, what it is made of, and how its sound is kept in balance. (Voices: `docs/VOICES.md`. Recordings still to
-be made: `docs/SUNO_SOUNDS.md`. Credits and licences: `public/audio/CREDITS.md`, `public/music/CREDITS.md`.)
+be made: `src/data/plannedSounds.ts`. Credits and licences: `public/audio/CREDITS.md`, `public/music/CREDITS.md`.)
 
 ## What sounds are made of
 
@@ -107,5 +107,5 @@ the poses and by the sounds). Change a move or an act's timing and the test says
 
 - A recipe: a `Sound` in `data/foleySounds.ts` (or `sounds.ts`), a class gain, and its place (an event in `cues.ts`, a frame in
   `foley.ts`, a cue in `actBeats.ts`). `tests/soundMix.test.ts` will want its level.
-- A recording: see `docs/SUNO_SOUNDS.md` for the planned ones; for any other, a set in `data/samples.ts`, a row in `public/audio/CREDITS.md`
+- A recording: see `src/data/plannedSounds.ts` for the planned ones; for any other, a set in `data/samples.ts`, a row in `public/audio/CREDITS.md`
   (CC0, or made with Suno Sounds with its date and plan), and `python3 tools/audio_levels.py`.

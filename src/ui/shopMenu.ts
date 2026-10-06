@@ -35,7 +35,7 @@ export function createShopMenu(g: Game): ShopMenu {
           const note = `${fill(w.note)}${c ? `  (Carried: ${c.have} of ${c.most} ${c.unit}.)` : ''}`; // what a pocket holds, before it is asked (round 24)
           option(panel, `${w.name}  ·  ${tail}`, () => (buy(g, id), page.redraw?.()), ok, why, note); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
         }
-        footer(panel, '', menuKeys(false, 'Choose'), () => screen.close());
+        footer(panel, '', menuKeys(), () => screen.close());
       },
     };
     screen.show(page);

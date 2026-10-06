@@ -1,12 +1,12 @@
 /**
  * The recordings the game is ready for (round 40): sounds that a recording improves on the recipe that stands in for them.
  * Most have been found, CC0, on Freesound (public/audio/CREDITS.md); those with no files yet (pipeDraw) wait to be made
- * with Suno Sounds (docs/SUNO_SOUNDS.md). A recording improves on the recipe that stands in for it now (data/foleySounds.ts, data/doorSounds.ts). Each is a set of takes, named
+ * with Suno Sounds, from the prompt each carries. A recording improves on the recipe that stands in for it now (data/foleySounds.ts, data/doorSounds.ts). Each is a set of takes, named
  * `<file>1`, `<file>2` under public/audio/sfx. The game plays nothing of them until the files are there: drop them in,
  * credit them in public/audio/CREDITS.md, run `python3 tools/audio_levels.py`, and each stands in front of the recipe it
  * answers (which stays beneath it, a third as loud, so what a recording lacks the recipe lends). A set marked `fit` is
  * played faster or slower to last exactly as long as the motion it sounds with (a door's swing, the mist's walk).
- * Each carries the prompt to make it with Suno Sounds (docs/SUNO_SOUNDS.md lists those not yet recorded: a test keeps them one). Gains place the recorded takes in front of the recipe's level (tests/soundMix.test.ts). Data only.
+ * Each carries the prompt to make it with Suno Sounds (those with no takes yet are the ones to make). Gains place the recorded takes in front of the recipe's level (tests/soundMix.test.ts). Data only.
  */
 
 export interface Planned {

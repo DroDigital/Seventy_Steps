@@ -80,12 +80,32 @@ function backstep(f: Figure, t: number): void {
   f.elbowR.rotation.x = f.elbowL.rotation.x = -0.5 * b;
 }
 
-/** The off-hand sweeps out across the parry window. */
+/**
+ * A parry (round 46: the off-hand alone flapped out to the side, the feet stayed put, and nothing of the blade moved): the
+ * cane beats across the body in the first frames, wrist snapping, the body turning into the blow behind it with the lead foot
+ * stepped in and the knees given; it is held against the weight through the window with a small shudder as the blow rings off it,
+ * then let go in an easy recovery, the arm swinging back down past the guard rather than stopping at it.
+ */
 function parry(f: Figure, d: MoveDef, frame: number): void {
   const [p0, p1] = d.parry!;
-  const out = frame < p1 ? ease(frame / p0) : 1 - ease((frame - p1) / (d.frames - p1));
-  f.armL.rotation.set(-1.3 * out, 0.4 * out, 0.9 * out, 'YXZ');
-  f.torso.rotation.y = -0.3 * out;
+  const beat = ease(frame / Math.max(1, p0)); // the cane comes across
+  const letgo = ease((frame - p1) / Math.max(1, d.frames - p1)); // and goes
+  const out = beat * (1 - letgo);
+  const ring = frame >= p0 && frame < p1 + 6 ? Math.sin((frame - p0) * 2.4) * Math.exp(-(frame - p0) / 6) : 0; // the blow rings off it
+  const kick = bump(frame / (p0 + 3)) * (1 - letgo); // the arm throws past where it will rest, and comes back to it
+  f.armR.rotation.set(-0.6 * out - 0.4 * kick - 0.05 * ring, 0.8 * out + 0.25 * kick, -0.3 * out + 0.2 * (1 - beat) * out, 'YXZ'); // the hand across the face, the cane diagonal over it
+  f.elbowR.rotation.x = -0.9 * out - 0.25 * kick;
+  f.handR.rotation.set(-0.8 * out - 0.35 * kick, 0, 0.12 * ring, 'YXZ'); // the wrist cocked back, snapping at the beat
+  f.armL.rotation.set(0.45 * out, -0.35 * out, 0.65 * out, 'YXZ'); // the off-hand thrown back for balance
+  f.torso.rotation.y = 0.38 * out;
+  f.torso.rotation.x += 0.1 * out;
+  f.head.rotation.y = -0.2 * out; // the eyes stay on the blow
+  f.body.rotation.x += 0.08 * out;
+  f.body.position.y -= 0.07 * out;
+  f.legR.rotation.x = -0.5 * out; // the lead foot steps in...
+  f.kneeR.rotation.x = 0.25 * out;
+  f.legL.rotation.x = 0.32 * out; // ...the other braces behind
+  f.kneeL.rotation.x = 0.55 * out;
 }
 
 /** A swallow of Laudanum: the off-hand comes up to the mouth and the head tips back, then down again. */
@@ -152,18 +172,28 @@ function reel(f: Figure, t: number, k: number): void {
   f.kneeL.rotation.x = 0.4 * b;
 }
 
-/** Parried or interrupted: sinks to one knee, open to a riposte. */
-function slump(f: Figure, frame: number): void {
-  const t = ease(frame / 10);
-  f.body.position.y -= 0.28 * t;
-  f.body.rotation.x += 0.45 * t;
-  f.head.rotation.x += 0.4 * t;
-  f.legR.rotation.x = -0.9 * t;
-  f.legL.rotation.x = 0.25 * t;
-  f.kneeR.rotation.x = 1.1 * t;
-  f.kneeL.rotation.x = 1.4 * t; // down on the back knee
-  f.armR.rotation.x = f.armL.rotation.x = 0.2 * t;
-  f.elbowR.rotation.x = f.elbowL.rotation.x = -0.4 * t;
+/**
+ * Parried or interrupted (round 46: it dropped to one knee as if shot, for a second and a half, and every body did the same):
+ * the blow is thrown wide, the body knocked back on its heels with the weapon arm flung out and the head snapped away, then it
+ * comes forward, stooped, arms hanging and open, swaying a little, the breath of a foe caught and not yet recovered: open to a riposte.
+ */
+function recoil(f: Figure, frame: number): void {
+  const knock = ease(frame / 5);
+  const dazed = ease((frame - 7) / 14);
+  const sway = Math.sin(frame * 0.2) * dazed;
+  f.body.rotation.x += -0.28 * knock + 0.52 * dazed; // back on its heels, then forward and stooped
+  f.body.rotation.z += 0.05 * sway;
+  f.body.position.y -= 0.05 * knock + 0.1 * dazed;
+  f.torso.rotation.y = -0.45 * knock * (1 - dazed) + 0.1 * sway;
+  f.head.rotation.x += -0.35 * knock + 0.65 * dazed;
+  f.head.rotation.y = 0.5 * knock * (1 - dazed);
+  f.armR.rotation.set(0.5 * knock * (1 - dazed) + 0.25 * dazed, 0, -1.25 * knock * (1 - dazed) - 0.2 * dazed, 'YXZ'); // flung wide, then hanging
+  f.armL.rotation.set(0.3 * knock * (1 - dazed) + 0.2 * dazed, 0, 0.8 * knock * (1 - dazed) + 0.15 * dazed, 'YXZ');
+  f.elbowR.rotation.x = f.elbowL.rotation.x = -0.25 * knock - 0.35 * dazed;
+  f.legR.rotation.x = 0.35 * knock * (1 - dazed) - 0.55 * dazed; // the weight goes back, then settles forward: the thighs under the body that has stooped over them
+  f.legL.rotation.x = -0.2 * knock * (1 - dazed) - 0.4 * dazed;
+  f.kneeR.rotation.x = 0.2 * knock + 0.25 * dazed;
+  f.kneeL.rotation.x = 0.3 * knock + 0.3 * dazed;
 }
 
 /** Eases a joint toward a rotation by `t` (1: all the way there; 0: it stays as the walk left it). */
@@ -235,7 +265,7 @@ export function pose(f: Figure, p: PoseInput): void {
   }
   else if (p.move === 'death') fall(f, p.frame);
   else if (p.move === 'stagger' || p.move === 'guardBreak') reel(f, p.frame / d.frames, p.move === 'guardBreak' ? 1.6 : 1);
-  else if (p.move === 'parried') slump(f, p.frame);
+  else if (p.move === 'parried') recoil(f, p.frame);
   else if (d.hit) swing(f, d, p.frame);
   else if (d.motion?.dir === 'input') roll(f, d, p);
   else if (d.motion?.dir === 'back') backstep(f, p.frame / d.frames);

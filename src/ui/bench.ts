@@ -51,7 +51,10 @@ export function startBench(g: Game, stats: FrameStats, show: (text: string) => v
     at++;
     from = now;
     stats.clear();
-    if (at < SPOTS.length) travel(g, SPOTS[at].sign);
+    if (at < SPOTS.length) {
+      g.overworld?.discovered.add(SPOTS[at].sign); // (travel goes only to a sign found)
+      travel(g, SPOTS[at].sign);
+    }
   };
   go(performance.now());
   return {
