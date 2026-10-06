@@ -5,3 +5,4 @@ dist/
 build/
 store/
 release/
+__pycache__/
