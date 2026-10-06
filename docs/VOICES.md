@@ -42,7 +42,7 @@ performance can be tried again over the same file.
 
 ## The cast
 
-The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is the library voice *Finley - Articulate Anchor* (`fnYMz3F5gMEDGMWcH1ex`, British narration, the one the author picked in the library), with a little hall (`echo` 0.12); his five cards are one take each, but for the telegram's, made again (four takes, the steadiest kept) when the first proved too bright beside the rest. They carry no whispering: no `[whispers]`, `[softly]` or `[quietly]` in them.
+The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is *The Archivist (Intro Narrator)* (`uqOnApI3a2RVj8rEwlAi`), a voice **designed for the game** in round 46 (Voice Design, so no library licence is in between): a late-fifties English baritone from the north, long settled in the south, a low rounded chest tone with a faint dry rasp, slow, with real pauses, understated, an archivist reading from his own notes. It replaced the library voice Finley - Articulate Anchor, which the author found widely used by other creators and recognised as synthetic. Set in a stone chamber (`room`); his five cards are one take each, made in `eleven_v4` on 6 October 2026 (the design model, `eleven_ttv_v3`, is the only one Voice Design offers; v4 speaks it). He was chosen by the author from six previews of two descriptions (the author's, then a fresh one of Claude's: preview F of the second).
 
 **Licence (round 41).** Only ElevenLabs' own **premade** voices, or voices **designed for this game** in its Voice
 Design (ours), are used: a library voice's licence cannot be told through the tools (they show a voice's category,
@@ -54,15 +54,12 @@ speaker's years, tongue and temper (Peaslee: a deep, old, dry professor of seven
 young), the previews could not be heard, so one of three was kept by what could be measured (slowest and lowest for the
 old, the great and the drowsy; briskest for the clipped Norwegian), and 112 lines were made again in them. The nine
 premade voices that stay (Will, Roger, Brian, Callum, Chris, Bill, Daniel, George, Harry) were each checked to be
-of the premade category. **Left open: the narrator**, Finley - Articulate Anchor, is a library voice (the author's
-own pick, not changed unasked): to make the game wholly licence-clean he is recast with a premade voice (George, or
-Daniel) or with a designed one once a voice slot is free (`creative_design_voice`), and his five cards made again.
-`rate` lowers a voice and slows it (playback rate: pitch and pace together); `echo` puts some hall behind it. They are
+of the premade category. The narrator, once left open as a library voice, was recast in round 46 with a voice designed for the game (above), so the cast now holds only premade and designed voices, but for Morgan's library voice (Josef Hammer: licence unchecked). `rate` lowers a voice and slows it (playback rate: pitch and pace together); `echo` puts some hall behind it. They are
 the game's, applied at playback, so a recast does not need them again.
 
 | speaker | voice (ElevenLabs) | voice id | played with |
 |---|---|---|---|
-| `narrator:intro` | Finley - Articulate Anchor (**library**: the author's pick; licence unchecked, see below) | `fnYMz3F5gMEDGMWcH1ex` | room |
+| `narrator:intro` | The Archivist (Intro Narrator) (designed, round 46) | `uqOnApI3a2RVj8rEwlAi` | room |
 | `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42) |
 | `npc:gilman` | Will - Relaxed Optimist (premade) | `bIHbv24MWmeRgasZH58o` | — |
 | `npc:morgan` | Josef Hammer - Deep & Expressive (library; the author's pick after auditioning it against Julian and Jay Anderson) | `AFtA63zAzQAlNDuzSRKy` | clips as recorded, ~105 Hz (round 45). Its licence was not readable through the tools: confirm it, and its notice period, on its library page |
@@ -161,7 +158,7 @@ failed take from the free plan, a transcription node):
 | Willett | https://elevenlabs.io/app/flows/fGCpd3EC5aqNpuo8fOPw |
 | Curtis | https://elevenlabs.io/app/flows/Rox5Daq6zOrf9t72VRFE |
 | Dyer | https://elevenlabs.io/app/flows/w1Pi37BtbbwbN2qBSdf3 |
-| the narrator (the opening's five cards; one take each) | https://elevenlabs.io/app/flows/OQnEi4aA8UBUVUPPBTzx |
+| the narrator (the opening's five cards, round 46; one take each: flows VUOCILGa3nlTPHEwIwek, eywQHrG4a5BGk6DzK6P9, hHMX21aLEo88On8B9fYh, QoK9xCLHCINjTJUo6reJ, TOqVv3yBFD48pWelyKZz on elevenlabs.io/app/flows/) | (earlier: https://elevenlabs.io/app/flows/OQnEi4aA8UBUVUPPBTzx) |
 | Nathaniel | https://elevenlabs.io/app/flows/z9vwDPvzyk9HQrKFoDFf |
 | Zamacona | https://elevenlabs.io/app/flows/EZHSLpdOLz3biacgvxGi |
 | Johansen | https://elevenlabs.io/app/flows/iCM4caRlch6txnH3ED7P |
