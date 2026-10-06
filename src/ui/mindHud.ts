@@ -15,9 +15,9 @@ import { glyph } from './glyphs';
 import { gauge } from './gauges';
 import { BONE, el, setStyle, setText } from './hudKit';
 
-const MAGENTA = '#d80073';
+const MAGENTA = '#b04a82';
 /** The bar and the band's name, from clear water to magenta (round 32: they were bone, bone, purple and magenta, and the bar was one of three of a colour). */
-const BAND_COLOURS: Record<Band, string> = { lucid: '#5aa6cf', uneasy: '#8a9be0', fractured: '#a257d6', unmoored: MAGENTA };
+const BAND_COLOURS: Record<Band, string> = { lucid: '#6a98b2', uneasy: '#8d98c0', fractured: '#9468b6', unmoored: MAGENTA };
 
 export interface MindHud {
   update(now: number): void;
@@ -73,7 +73,7 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
       setStyle(band, 'color', BAND_COLOURS[m.band]);
       const call = callsForLaudanum(g);
       setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}LAUDANUM ×${g.player.laudanum}`);
-      setStyle(laudanum, 'color', call ? '#ff5aa8' : BONE);
+      setStyle(laudanum, 'color', call ? '#d26a9d' : BONE);
       setStyle(laudanum, 'opacity', call ? (0.7 + 0.3 * Math.sin(now / 260)).toFixed(2) : '0.7');
     },
   };

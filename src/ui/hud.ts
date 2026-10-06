@@ -33,7 +33,7 @@ import { createMindHud } from './mindHud';
 import { createMinimap } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
 
-const HOT = '#f2603f'; // the health bar at a stroke of the heart
+const HOT = '#d2674f'; // the health bar at a stroke of the heart
 const NOTICE_MS = 1100;
 const NOTICE_HOLD_MS = 700; // a notice stands at least this long before the next takes its place (round 19: two at once, the first was lost)
 
@@ -67,8 +67,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let chipHold = 0;
   const stamina = gauge(vitals, LEAF, 3);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
-  const reagent = pipRow(vitals, 'REAGENT', 'diamond', '#c9b6e0'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
-  const gun = pipRow(vitals, 'REVOLVER', 'round', '#d6b85a'); // the cylinder's six and the spare rounds (round 22)
+  const reagent = pipRow(vitals, 'REAGENT', 'diamond', '#bdb1cc'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
+  const gun = pipRow(vitals, 'REVOLVER', 'round', '#c2ae78'); // the cylinder's six and the spare rounds (round 22)
   const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', root);
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);
@@ -130,7 +130,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('QuestChanged', (e) => say(e.done ? `DONE · ${e.title.toUpperCase()}` : e.stage === 0 ? `JOURNAL · ${e.title.toUpperCase()}` : `${e.title.toUpperCase()} · UPDATED`));
   g.events.on('RestRefused', () => say('SOMETHING HUNTS YOU · NO REST'));
   g.events.on('Overheard', (e) => {
-    heard.replaceChildren(el('display:inline;font-style:normal;font-size:10px;letter-spacing:3px;color:#c9a45c;margin-right:10px', e.name.toUpperCase()), `“${e.text}”`);
+    heard.replaceChildren(el('display:inline;font-style:normal;font-size:10px;letter-spacing:3px;color:#b9a577;margin-right:10px', e.name.toUpperCase()), `“${e.text}”`);
     heardAt = performance.now();
   });
 
@@ -163,7 +163,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setText(reagent.after, g.player.oil > 0 ? `OIL ×${g.player.oil}` : ''); // flasks once any are carried (round 12)
       gun.set(g.player.ammo, GUN.chamber);
       setText(gun.after, `· ${g.player.rounds}`);
-      setStyle(gun.after, 'color', g.player.ammo === 0 ? '#c8503c' : BONE); // dry: it reddens
+      setStyle(gun.after, 'color', g.player.ammo === 0 ? '#b0604f' : BONE); // dry: it reddens
       setText(insight, `INSIGHT ${g.mind.insight}`);
       const ready = LEVEL_IDS.some((id) => canLevel(g, id)); // a level within reach: rest at an Elder Sign
       setText(echoes, `ECHOES ${Math.max(0, g.player.echoes - held())}${ready ? '  ▲' : ''}`);

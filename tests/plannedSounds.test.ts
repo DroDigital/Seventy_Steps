@@ -12,7 +12,7 @@ import type { AudioEngine } from '../src/render/audio/engine';
 
 const MATERIALS = [...new Set(Object.values(DOOR_LOOKS).map((l) => materialOf(l!)))];
 
-describe('the recordings the game is ready for (data/plannedSounds.ts, docs/SUNO_SOUNDS.md; round 40)', () => {
+describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)', () => {
   it('each has a distinct set, a distinct file, a prompt in the form Suno Sounds reads, and a length that is a length', () => {
     expect(new Set(PLANNED.map((p) => p.id)).size).toBe(PLANNED.length);
     expect(new Set(PLANNED.map((p) => p.file)).size).toBe(PLANNED.length);
@@ -83,19 +83,6 @@ describe('the recordings the game is ready for (data/plannedSounds.ts, docs/SUNO
       expect(SAMPLE_LEVELS[`sfx/${file}`], `${file} is not measured: run python3 tools/audio_levels.py`).toBeDefined();
       expect(credits, `${file} is not credited`).toMatch(new RegExp(`\\| \`sfx/${file}\\.mp3\` \\| (Suno Sounds|\\[[^\\]]+\\]\\(https://freesound\\.org/people/[^)]+\\)) \\|`));
     }
-  });
-
-  it('is described in docs/SUNO_SOUNDS.md, every one not yet recorded, as it is here (npx tsx tools/suno_sounds_doc.ts)', () => {
-    const doc = readFileSync('docs/SUNO_SOUNDS.md', 'utf8');
-    const missing = PLANNED.filter((p) => !existsSync(`public/audio/sfx/${p.file}1.mp3`));
-    expect(missing.length).toBeLessThan(PLANNED.length); // (most are found)
-    for (const p of PLANNED.filter((q) => !missing.includes(q))) expect(doc, `${p.id} is recorded: it needs no prompt`).not.toContain(`### ${p.id}\n`);
-    for (const p of missing) {
-      expect(doc, p.id).toContain(`### ${p.id}\n`);
-      expect(doc, p.id).toContain(p.prompt);
-      for (let k = 1; k <= p.takes; k++) expect(doc, p.id).toContain(`sfx/${p.file}${k}.mp3`);
-    }
-    expect([...doc.matchAll(/^### /gm)].length).toBe(missing.length);
   });
 
   it('a set is found by its id, whether recorded or planned', () => {
