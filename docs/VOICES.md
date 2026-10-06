@@ -5,7 +5,7 @@ Every line the people of the realms and the horrors that speak say is spoken by 
 the lines of the fifteen people met at the Elder Signs (`npc:<id>`, written in `data/npcs.ts` and
 `npcsFar.ts`); 54 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
 this: no horror spoke before): a line as it arrives and a last as it falls. Two have no scene, the Dunwich
-Horror (unseen) and Brown Jenkin (who joins a fight already begun), and say only a last, shown as a notice.
+Horror (unseen), who says only a last, shown as a notice. (Brown Jenkin had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
 A line with no recording is shown and not heard, as every line was before.
 
 ## Where it is
@@ -81,7 +81,6 @@ the game's, applied at playback, so a recast does not need them again.
 | `boss:wilbur_whateley` | Harry - Fierce Warrior (premade) | `SOYHLrjzK2X1ezoPC6cr` | rate: 0.96 |
 | `boss:dunwich_horror` | Harry - Fierce Warrior (premade) | `SOYHLrjzK2X1ezoPC6cr` | rate: 0.72, echo: 0.5 |
 | `boss:keziah_mason` | Keziah Mason (designed) | `BbF0R6lcyCsZVwnjHzwi` | — |
-| `boss:brown_jenkin` | Brown Jenkin (designed) | `XAfV6hn6JT4LPatdDizz` | — |
 | `boss:black_man` | The Black Man (designed) | `gdQL6olVLhkRDvue4G8n` | rate: 0.97, echo: 0.25 |
 | `boss:joseph_curwen` | Joseph Curwen (designed) | `ttJ9Yma2EKpRou0MKpVX` | — |
 | `boss:simon_orne` | Simon Orne (designed) | `MN6OV4FaLTmDyt2HbvDM` | — |
@@ -169,7 +168,7 @@ failed take from the free plan, a transcription node):
 | Akeley | https://elevenlabs.io/app/flows/bJcmDdpjp5QLapux1Vfl |
 | Carter | https://elevenlabs.io/app/flows/jaV5DlUOWZe9HqySKsdS |
 | Nasht | https://elevenlabs.io/app/flows/Cy5uUNSC9NKiC9sLQcxY |
-| Wilbur, the Dunwich Horror, Keziah Mason, Brown Jenkin, the Black Man, Curwen, Orne | https://elevenlabs.io/app/flows/9BYp05KTnTyJHuTy1Ges |
+| Wilbur, the Dunwich Horror, Keziah Mason, (Brown Jenkin: removed), the Black Man, Curwen, Orne | https://elevenlabs.io/app/flows/9BYp05KTnTyJHuTy1Ges |
 | Hutchinson, Waite, the Whisperer, the Voice in the Tomb, Lilith, Dr Muñoz, Charles le Sorcier | https://elevenlabs.io/app/flows/w90PhVB7eVQVdLnZf8gJ |
 | Cthulhu, Dagon, Hydra, Medusa, Hypnos, the Terrible Old Man, Zkauba | https://elevenlabs.io/app/flows/dOQRzJQiBkgIgsQwY5NL |
 | Hastur, Tsathoggua, the Great Ones, Yog-Sothoth, 'Umr at-Tawil, Shub-Niggurath, Nyarlathotep | https://elevenlabs.io/app/flows/StyntZxdbmkjrFApkjsc |

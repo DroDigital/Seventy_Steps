@@ -6,7 +6,7 @@
  * is performed, [audio tags], pauses and a leaned-on CAPITAL and all (speechNpcs.ts says how); the
  * words shown are those with the tags out and the capitals let down again (`shown`). Keyed by roster
  * id; the rest stay wordless, as their stories leave them. The two that have no scene (the Dunwich
- * Horror is unseen, Brown Jenkin joins a fight already begun) say only a last line, shown as a notice
+ * Horror is unseen, Brown Jenkin joins a fight already begun, and speaks no more: his one line was given up, round 46, for a voice's place) say only a last line, shown as a notice
  * (render/cinemaDirector.ts). Data only.
  */
 
@@ -26,9 +26,6 @@ export const BOSS_SAY: Readonly<Record<string, BossWords>> = {
   keziah_mason: {
     arrive: '[cackling] Come into my corner, child. [whispers] [pause] There are ANGLES here you have not learned.',
     fall: '[rasping] Brown Jenkin will weep for me. [bitter laugh] The Black Man will NOT.',
-  },
-  brown_jenkin: {
-    fall: '[squealing] No more corners... [whimpering] [pause] no more little hands.',
   },
   black_man: {
     arrive: '[smoothly] The book is open. [low voice] Sign it, sleeper... [whispers] and every corner in the world is YOURS.',

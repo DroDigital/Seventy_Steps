@@ -62,7 +62,6 @@ export const CAST: Readonly<Record<string, Voice>> = {
   'boss:wilbur_whateley': v(HARRY, { rate: 0.96, echo: 0.15 }),
   'boss:dunwich_horror': v(HARRY, { rate: 0.72, echo: 0.5 }),
   'boss:keziah_mason': v(['BbF0R6lcyCsZVwnjHzwi', 'Keziah Mason (Witch)'], { echo: 0.25 }),
-  'boss:brown_jenkin': v(['XAfV6hn6JT4LPatdDizz', 'Brown Jenkin (Familiar)'], { echo: 0.2 }),
   'boss:black_man': v(['gdQL6olVLhkRDvue4G8n', 'The Black Man (Tempter)'], { rate: 0.97, echo: 0.25 }),
   'boss:joseph_curwen': v(['ttJ9Yma2EKpRou0MKpVX', 'Joseph Curwen (Necromancer)'], { echo: 0.3 }),
   'boss:simon_orne': v(['MN6OV4FaLTmDyt2HbvDM', 'Simon Orne (Sorcerer)'], { echo: 0.25 }),
