@@ -13,8 +13,8 @@ export const BOSS = {
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)
   summonEvery: 540, // frames before a summoner calls again (round 46)
-  gap: [70, 120] as const, // frames between a boss's blows are never fewer than these (round 46: the hound struck every half-second)
-  servantGap: [70, 120] as const, // and a summon's, whose own pace is longer still by 1.4x: the boss is the fight, its servants the weather
+  gap: [60, 110] as const, // frames between a boss's blows are never fewer than these (round 46: the hound struck every half-second)
+  servantGap: [60, 110] as const, // and a summon's, whose own pace is longer still by 1.4x: the boss is the fight, its servants the weather
   servantDamage: 0.7, // what a summon's blow weighs against its kind's own
   summonRing: [2.5, 4.5] as const, // a summon rises this far from its summoner
   teleport: [3.5, 8] as const, // a teleport lands this far from its target

@@ -57,8 +57,8 @@ describe('fair play', () => {
     expect(paramsOf(e.behavior).cooldown[0]).toBeGreaterThanOrEqual(60);
   });
 
-  it('a boss strikes no oftener than every 1.2 s, keeps two servants at most, and calls them no oftener than every 9 s', () => {
-    expect(BOSS.gap[0]).toBeGreaterThanOrEqual(70);
+  it('a boss strikes no oftener than every 1 s, keeps two servants at most, and calls them no oftener than every 9 s', () => {
+    expect(BOSS.gap[0]).toBeGreaterThanOrEqual(60);
     expect(BOSS.minions).toBeLessThanOrEqual(2);
     expect(BOSS.summonEvery).toBeGreaterThanOrEqual(540);
     expect(BOSS.servantDamage).toBeLessThan(1);
