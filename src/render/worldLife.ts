@@ -15,6 +15,7 @@ import { createBossFog } from './bossFog';
 import { createChimneys } from './chimneys';
 import { createDoors } from './doorViews';
 import { createFauna, type Fauna } from './fauna';
+import { createCandleViews } from './candleViews';
 import { createGlints } from './glints';
 import { LIGHT_NERVES } from './worldLights';
 import { createLightning } from './lightning';
@@ -56,6 +57,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const sky = createSkyLife(scene, g, fauna, parts.sheet, (voice, at) => audio.cry(voice, at, 1.4));
   const lightning = createLightning(parts.sky, parts.post, (gain) => audio.far('thunder', gain));
   const glints = createGlints(scene, g);
+  const candles = createCandleViews(scene, g); // the candles before the horrors' fog (round 45)
   const watchers = createWatchers(scene, g);
   const omens = createOmenFx(g, parts.sky, parts.post, audio);
   const presence = createPresence(g, parts.particles, audio); // round 26: what a colossus does to the ground and the air
@@ -83,6 +85,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       fog.update(camera, time, !g.overworld);
       doors.update(camera, time, !g.overworld);
       glints.update(camera.position, time, !g.overworld);
+      candles.update(camera.position, time, !g.overworld);
       presence.update(camera, time);
       omens.update(time);
       parts.skyline.wrong(Math.min(1, Math.max(0, 1 - g.mind.sanity / 100)));

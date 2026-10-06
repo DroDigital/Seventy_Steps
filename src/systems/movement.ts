@@ -17,10 +17,12 @@ export function movementSystem(g: Game, dt: number): void {
   const wading = 1 - REALITY.floodSlow * g.reality.flood;
   for (const [id, tr] of transform) {
     if (managed(g, id)) continue; // a person on their round: npcLife.ts keeps their prev and their pose of the step (round 35: it was overwritten here, so they never showed as walking)
-    tr.prev.x = tr.pos.x;
-    tr.prev.y = tr.pos.y;
-    tr.prev.z = tr.pos.z;
-    tr.prevYaw = tr.yaw;
+    if (!(id === g.player.id && g.player.fogPass)) { // (one walked through a boss's fog keeps the prev fogGates.ts set: it was overwritten here, so the legs saw no ground go by and the walk was a glide, round 45)
+      tr.prev.x = tr.pos.x;
+      tr.prev.y = tr.pos.y;
+      tr.prev.z = tr.pos.z;
+      tr.prevYaw = tr.yaw;
+    }
     const b = body.get(id);
     const a = actor.get(id);
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;

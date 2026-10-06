@@ -5,6 +5,7 @@
  * recovering it loses the old one. Kills pay the foe's bounty.
  */
 
+import { candleFor } from './candles';
 import { signPlace } from './checkpoints';
 import { bountyOf } from './relics';
 import type { Entity } from '../core/ecs';
@@ -75,25 +76,39 @@ export function resetFoes(g: Game): void {
   }
 }
 
-/** Respawn at the last Elder Sign; the foes reset. */
-function respawn(g: Game): void {
+/** Respawn at the lit candle that reaches where they fell (before a horror's fog), else at the last Elder Sign; the foes reset. */
+function respawn(g: Game, candle: Place | null): void {
   const p = g.player;
-  restore(g, p.id, p.checkpoint);
+  p.rising = null;
+  const at = candle ?? p.checkpoint;
+  restore(g, p.id, at);
   resetFoes(g);
   Object.assign(p, { buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockRaised: false });
   setLock(g, null);
   const sign = g.overworld ? signPlace(g.overworld.sign) : undefined;
-  p.kneeling = sign && distXZ(sign, p.checkpoint) < 8 ? { x: sign.x, z: sign.z } : null; // up from the stone on one knee, as after fast travel (round 31)
-  Object.assign(g.camera, { yaw: p.checkpoint.yaw, prevYaw: p.checkpoint.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
+  p.kneeling = !candle && sign && distXZ(sign, p.checkpoint) < 8 ? { x: sign.x, z: sign.z } : null; // up from the stone on one knee, as after fast travel (round 31)
+  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
   g.events.emit('Respawned', { entity: p.id });
+}
+
+/** The choice made: rise at the candle that reaches the fall, or at the last Elder Sign. */
+export function riseAt(g: Game, where: 'candle' | 'sign'): void {
+  const c = g.player.rising;
+  if (c) respawn(g, where === 'candle' ? c : null);
 }
 
 export function deathSystem(g: Game): void {
   const { actor, dead, transform, drop } = g.ecs.c;
   for (const [id, a] of actor) {
     if (a.move !== 'death' || dead.has(id) || a.frame < a.moves.death.frames - 1) continue;
-    if (id === g.player.id) respawn(g);
-    else dead.set(id, true);
+    if (id === g.player.id) {
+      const candle = candleFor(g, transform.get(id)!.pos);
+      if (!candle || !g.player.ask) respawn(g, candle);
+      else if (!g.player.rising) { // a lit candle reaches the fall, and a screen is there to ask: they choose where to rise
+        g.player.rising = candle;
+        g.events.emit('RiseChoice', { candle, wall: candle.wall });
+      }
+    } else dead.set(id, true);
   }
   if (actor.get(g.player.id)!.move === 'death') return;
   const pp = transform.get(g.player.id)!.pos;

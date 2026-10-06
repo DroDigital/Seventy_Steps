@@ -60,6 +60,7 @@ export interface SaveData {
   named?: number; // times Hastur's name has appeared
   called?: string[]; // bosses called into the world
   watched?: string[]; // horrors whose arrival has been shown (round 20)
+  candles?: string[]; // the candles lit before the horrors' fog (round 45)
   ending?: string; // the ending chosen
   explored?: Record<string, string>; // the ground seen, as base64 bits by region (exploration.ts)
   quests?: Record<string, number>; // each quest begun: its stage (quests.ts)
@@ -116,6 +117,7 @@ export function snapshot(g: Game): SaveData {
     named: ow.named,
     called: [...ow.called],
     watched: [...ow.watched],
+    candles: [...ow.candles],
     ...(ow.ending && { ending: ow.ending }),
     explored: packExplored(ow.explored),
     quests: Object.fromEntries(ow.quests),
@@ -146,7 +148,7 @@ export function parseSave(json: string | null): SaveData | null {
   if (!has(o.at, 'x', 'z', 'yaw') || typeof o.sign !== 'string' || !isCounts(o.upgrades) || (o.levels !== undefined && !isCounts(o.levels))) return null;
   if (![o.discovered, o.slain, o.read, o.seen].every(isStrings)) return null;
   if (o.drop !== null && !has(o.drop, 'x', 'y', 'z', 'amount')) return null;
-  if ((o.named !== undefined && !isNum(o.named)) || (o.called !== undefined && !isStrings(o.called)) || (o.watched !== undefined && !isStrings(o.watched))) return null;
+  if ((o.named !== undefined && !isNum(o.named)) || (o.called !== undefined && !isStrings(o.called)) || (o.watched !== undefined && !isStrings(o.watched)) || (o.candles !== undefined && !isStrings(o.candles))) return null;
   if (o.ending !== undefined && !(ENDING_IDS as readonly unknown[]).includes(o.ending)) return null;
   if (o.explored !== undefined && (typeof o.explored !== 'object' || o.explored === null)) return null;
   if (o.quests !== undefined && (typeof o.quests !== 'object' || o.quests === null || !Object.values(o.quests).every(isNum))) return null;
@@ -175,6 +177,7 @@ export function applySave(g: Game, s: SaveData): void {
   ow.named = clampInt(s.named ?? 0, 0, 99);
   ow.called = new Set(s.called ?? []);
   ow.watched = new Set(s.watched ?? []);
+  ow.candles = new Set(s.candles ?? []);
   ow.ending = s.ending ?? null;
   ow.explored = unpackExplored(s.explored);
   ow.quests = new Map(Object.entries(s.quests ?? {}).filter(([id]) => QUESTS[id]).map(([id, n]) => [id, clampInt(n, -1, QUESTS[id].stages.length)]));

@@ -53,4 +53,21 @@ describe('the fog before a horror is a wall (round 35)', () => {
     expect(g.player.fogPass).toBeNull();
     expect(Math.sign(sideOf(w, tr.pos))).toBe(-before);
   });
+
+  it('the walk through is a walk: every step has ground going by, so the legs move (round 45: movement overwrote the step, and they glided)', () => {
+    const g = createWorldGame();
+    const w = doorway();
+    const a = beside(w, 1.6);
+    place(g, g.player.id, a.x, a.z, 0);
+    passFog(g, w);
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    const speeds: number[] = [];
+    for (let i = 0; i < 400 && g.player.fogPass; i++) {
+      stepGame(g, emptyInput());
+      if (g.player.fogPass) speeds.push(Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * 60);
+    }
+    expect(speeds.length).toBeGreaterThan(30);
+    expect(Math.min(...speeds.slice(5, -5))).toBeGreaterThan(0.8);
+    expect(Math.max(...speeds)).toBeLessThan(2.4);
+  });
 });

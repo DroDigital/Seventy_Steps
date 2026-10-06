@@ -36,6 +36,7 @@ const HINTS = {
   roots: 'While the spawning roots stand, Shub-Niggurath takes only a fifth of each blow, and they bring forth its young. Cut the roots down.',
   spheres: 'The iridescent spheres are gates: touch one and you come out of the next, and now and then the whole arena leaps. Yog-Sothoth is struck where its own spheres rest.',
   blind: 'Azathoth cannot see you, and nothing you strike it with matters. It hears: running, rolling, swinging and shots carry far, walking less, and walking with {block} held or standing still not at all. Outlast the piping.',
+  candle: 'A candle took the flame. Fall near a lit candle and you may rise beside it, a few steps from the horror that felled you, or at the Elder Sign, as you choose. The candle gives no rest: levels and doses are the Elder Signs\u2019.',
   insight: 'Insight buys strength when you rest at an Elder Sign.',
   gun: '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',
   oil: '{throw} throws a flask of lamp oil; it bursts and burns where it lands. Lock on first to throw it at a foe.',
@@ -88,6 +89,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
   g.events.on('SanityBandChanged', (e) => (hint('mind'), e.to === 'unmoored' && hint('unmoored')));
   g.events.on('Vanished', (e) => e.struck && hint('phantom'));
   g.events.on('Discovered', () => hint('sign'));
+  g.events.on('CandleLit', () => hint('candle'));
   g.events.on('Echoes', (e) => {
     if (e.change === 'dropped') hint('echoes');
     if (e.change === 'spent' && g.player.oil > 0) hint('oil');

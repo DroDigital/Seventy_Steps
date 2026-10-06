@@ -104,6 +104,7 @@ export function fogPassSystem(g: Game): void {
     p.fogPass = null;
     return;
   }
+  [tr.prev.x, tr.prev.y, tr.prev.z, tr.prevYaw] = [tr.pos.x, tr.pos.y, tr.pos.z, tr.yaw]; // the step they take is from here: the legs read it as the ground going by (movement.ts leaves it)
   pass.frame++;
   const u = Math.min(1, pass.frame / pass.frames);
   const ease = u * u * (3 - 2 * u) * 0.35 + u * 0.65; // a slow start, a steady walk, a slow end

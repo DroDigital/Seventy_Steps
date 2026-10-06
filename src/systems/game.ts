@@ -52,6 +52,7 @@ import { boltSystem } from './projectiles';
 import { questSystem } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
+import { candleSystem } from './candles';
 import { fogBlockSystem, fogPassSystem } from './fogGates';
 import { registerOmens } from './omens';
 import { registerDeathNotes } from './deathNotes';
@@ -89,7 +90,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, fogPass: null },
+    player: { id, buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, ask: false, rising: null, fogPass: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -191,6 +192,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   if (g.player.fogPass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
   playerControl(g, input);
   fogPassSystem(g);
+  candleSystem(g);
   weatherSystem(g, dt);
   const spent = g.reality.stolen <= 0 && fightActionSystem(g, input);
   checkpointSystem(g, spent ? { ...input, pressed: { ...input.pressed, interact: false } } : input);
