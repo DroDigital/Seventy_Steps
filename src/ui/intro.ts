@@ -21,13 +21,13 @@ export interface Intro {
   readonly open: boolean;
 }
 
-const BEFORE = 1.6; // seconds from a card's first grain returning to its voice: the words gather out of the ash first
+const BEFORE = 2.0; // seconds from a card's first grain returning to its voice: the words gather out of the ash first
 const AFTER = 1.6; // and after the voice, the card is let rest
 const READ = 0.34; // seconds a word takes to read, for a card with no voice
 const LATE = 3; // a recording that has not begun this many seconds after it was asked for will not
-const IN = 1500; // ms for a card's words to come back out of the ash
-const OUT = 1800; // ms for them to blow away
-const OVERLAP = 0.6; // the next card begins to gather when this much of the last one's blowing away is done: no mist alone between them
+const IN = 2400; // ms for a card's words to come back out of the ash
+const OUT = 2200; // ms for them to blow away
+const OVERLAP = 0.75; // the next card begins to gather when this much of the last one's blowing away is done: no mist alone between them
 const CLOSE = 1800; // ms for the mist to fade to black after the last card (a skip: half of it)
 const PAD_A = PAD_BUTTON.a;
 

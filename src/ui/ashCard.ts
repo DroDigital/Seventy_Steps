@@ -128,7 +128,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
       const step = (now: number): void => {
         if (id !== run) return resolve(); // another move took over
         const k = Math.min(1, (now - t0) / span);
-        p = lerp(from, to, to === 0 ? 1 - (1 - k) * (1 - k) : k); // forming eases out: the first grains return at once, not after a dead third
+        p = lerp(from, to, to === 0 ? Math.sin((k * Math.PI) / 2) : k); // forming eases out: the first grains return at once, not after a dead third
         if (k >= 1 || now - shown >= EVERY) {
           draw();
           shown = now;
