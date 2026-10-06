@@ -20,7 +20,7 @@ export function creditsPage(back: () => void, label = 'Back'): Page {
       for (const b of CREDITS) {
         const dim = b.quiet ? 'opacity:.4;font-size:10px;' : '';
         if (b.heading) el(names, 'div', b.heading, `opacity:${b.quiet ? '.32' : '.55'};font-size:${b.quiet ? '9' : '11'}px;letter-spacing:4px;margin-top:${b.quiet ? '34' : '26'}px`);
-        for (const line of b.lines) el(names, 'div', line, `${dim}margin:${b.quiet ? '3' : '5'}px 12px;line-height:1.5`);
+        b.lines.forEach((line, i) => el(names, 'div', line, b.title && i === 0 ? 'font-size:22px;letter-spacing:6px;margin:10px 12px 22px;line-height:1.5' : `${dim}margin:${b.quiet ? '3' : '5'}px 12px;line-height:1.5`));
       }
       const start = performance.now();
       const tick = (): void => {

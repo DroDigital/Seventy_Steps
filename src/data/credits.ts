@@ -9,10 +9,12 @@ export interface CreditBlock {
   heading: string;
   lines: readonly string[];
   quiet?: boolean; // set small and dim, below the names (the tools and technologies)
+  title?: boolean; // the first line is set large, as a name on a title card is (the studio's)
 }
 
 export const CREDITS: readonly CreditBlock[] = [
-  { heading: 'A GAME BY', lines: ['Alessandro A. Foddis', '© 2026 · All rights reserved'] },
+  { heading: 'A GAME BY', lines: ['Digital Dro Studios'], title: true },
+  { heading: 'DESIGNED, WRITTEN AND DIRECTED BY', lines: ['Alessandro A. Foddis', '© 2026 Digital Dro Studios · All rights reserved'] },
   { heading: 'AFTER THE STORIES OF', lines: ['H. P. Lovecraft', 'and the tales he revised and wrote with Zealia Bishop, Hazel Heald, Sonia Greene, Harry Houdini, E. Hoffmann Price, Kenneth Sterling, and the authors of "The Challenge from Beyond"'] },
   { heading: 'RECORDED SOUNDS', lines: ['from Freesound, dedicated to the public domain (CC0 1.0), cut and treated for the game:', 'Craig Smith (craigsmith)', 'Breviceps', 'EvaMusik', 'fonografico', 'corkob', 'Lsoundaccount', 'TheKingOfGeeks360', 'waterboy920'] },
   { heading: 'TITLE THEME', lines: ['"Subterranean Pulse"'] },
