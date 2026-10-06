@@ -12,6 +12,7 @@ export const AUDITS = [
   'tests/foeBot.test.ts',
   'tests/bossStand.test.ts',
   'tests/dungeonView.test.ts',
+  'tests/roofView.test.ts',
   'tests/objectView.test.ts',
   'tests/roam.test.ts',
   'tests/balance.test.ts',

@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { fbm } from '../core/noise';
 import type { DungeonKit } from '../data/kits';
 import { DUNGEON } from '../data/tuning';
-import { floorRange, kitOfRoom, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
+import { floorRange, kitOfRoom, roomAt, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
 import { MOUND_BAND, type BoxPart, type Part } from '../world/dungeonParts';
 import { bankEnds, grounded, outerFace, sweeps, type BankEnd } from '../world/moundBanks';
 import { DIRS } from '../world/worldMap';
@@ -46,10 +46,10 @@ function cap(r: RoomLayout, c: Rgb, seed: number): THREE.BufferGeometry {
 
 const RIM = 0.9; // the heap's brim above the roof
 
-/** A bank's cross-section, out from the wall's face and up: from the brim over its top down to the ground beyond the band. */
+/** A bank's cross-section, out from the wall's face and up: from the middle of the wall's thickness, where the heap over the room ends, across the brim to the face (round 45: it began at the face, and a slit half a wall wide ran along every ridge, the wall's top showing in dashes), then down to the ground beyond the band. */
 function profileOf(base: number, height: number): [number, number][] {
   const rise = height - base;
-  return [[0, height + RIM], [MOUND_BAND * 0.5, base + rise * 0.72], [MOUND_BAND, base + rise * 0.42], [MOUND_BAND + 1.4, base + 0.2], [MOUND_BAND + 2.4, base - 0.4]];
+  return [[-DUNGEON.wall / 2, height + RIM], [0, height + RIM], [MOUND_BAND * 0.5, base + rise * 0.72], [MOUND_BAND, base + rise * 0.42], [MOUND_BAND + 1.4, base + 0.2], [MOUND_BAND + 2.4, base - 0.4]];
 }
 
 /** A bank's point `o` metres out from (x, z) along the unit (dx, dz), at height y, roughened by the earth's lumps (its brim and its foot stay put). */
@@ -118,15 +118,44 @@ function skirt(p: BoxPart, ends: readonly [BankEnd, BankEnd], base: number, heig
   return tint(g, c);
 }
 
+/** Over a doorway, where no bank stands: the wall's top closed up to the brim, a riser on its outer face and a lip across its thickness (round 45: a notch of sky showed over every gate, under the heap's edge). */
+function brow(p: BoxPart, top: number, c: Rgb): THREE.BufferGeometry {
+  const n = DIRS[p.outer!];
+  const alongX = n.z !== 0;
+  const face = outerFace(p);
+  const [a0, a1] = alongX ? [p.min.x, p.max.x] : [p.min.z, p.max.z];
+  const [y0, y1] = [Math.min(p.max.y, top), top + RIM];
+  const sign = alongX ? n.z : n.x;
+  const at = (a: number, o: number, y: number): number[] => (alongX ? [a, y, face + sign * o] : [face + sign * o, y, a]);
+  const pos: number[] = [];
+  quad(pos, [at(a0, 0, y0), at(a1, 0, y0), at(a1, 0, y1), at(a0, 0, y1)]);
+  quad(pos, [at(a0, 0, y1), at(a1, 0, y1), at(a1, -DUNGEON.wall / 2, y1), at(a0, -DUNGEON.wall / 2, y1)]);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const uv: number[] = [];
+  for (let i = 0; i < pos.length; i += 3) uv.push((alongX ? pos[i] : pos[i + 2]) / 4, pos[i + 1] / 4);
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  return tint(g, c);
+}
+
 /** A pitched roof over a room, its ridge along the room's axis, with gable ends. */
-function roof(r: RoomLayout, c: Rgb): THREE.BufferGeometry {
+function roof(d: DungeonLayout, r: RoomLayout, c: Rgb): THREE.BufferGeometry {
   const over = 0.7;
-  const w = r.half + DUNGEON.wall / 2 + over;
+  // how far the roof reaches on each side of the room: past the wall with an eave where there is outside, only to the wall's outer face where another room stands (round 45: the eaves lay over the next room's heap, a few centimetres off it, and the two fought)
+  const reach = (dx: number, dz: number): number => {
+    const next = roomAt(d, r.x + dx * (r.half + DUNGEON.wall + 0.6), r.z + dz * (r.half + DUNGEON.wall + 0.6)) !== undefined;
+    return r.half + (next ? DUNGEON.wall : DUNGEON.wall / 2 + over);
+  };
+  const [ex, wx, ez, wz] = [reach(1, 0), reach(-1, 0), reach(0, 1), reach(0, -1)]; // east, west, north (+z), south
+  const w = Math.max(ex, wx, ez, wz);
   const rise = Math.min(7, w * 0.62);
   const y0 = top(r) + 0.4;
   const alongX = DIRS[r.axis].x !== 0;
+  const [a0, a1, b0, b1] = alongX ? [-wx, ex, -wz, ez] : [-wz, ez, -wx, ex]; // along the ridge, then across it
   const pts = (a: number, b: number, y: number): number[] => (alongX ? [r.x + a, y, r.z + b] : [r.x + b, y, r.z + a]);
-  const [A, B, C, D, E, F] = [pts(-w, -w, y0), pts(w, -w, y0), pts(w, 0, y0 + rise), pts(-w, 0, y0 + rise), pts(-w, w, y0), pts(w, w, y0)];
+  const ridge = (b0 + b1) / 2;
+  const [A, B, C, D, E, F] = [pts(a0, b0, y0), pts(a1, b0, y0), pts(a1, ridge, y0 + rise), pts(a0, ridge, y0 + rise), pts(a0, b1, y0), pts(a1, b1, y0)];
   const tris = [A, C, B, A, D, C, E, F, C, E, C, D, A, E, D, B, C, F]; // two slopes and the gables
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(tris.flat(), 3));
@@ -177,13 +206,17 @@ export function dungeonShell(d: DungeonLayout, parts: readonly Part[], tone: (ki
     const kit = kitOfRoom(d, r);
     if (kit.roof === 'beams') out.push(...beams(r).map((geo) => ({ texture: 'wood' as const, geo })));
     if (kit.shell === 'mound' && kit.roof !== 'open') out.push({ texture: 'rock', geo: cap(r, scaleRgb(tone(kit), 0.85), seed) });
-    if (kit.shell === 'building' && kit.roof !== 'open' && floorRange(r)[0] >= d.base - 1.5) out.push({ texture: 'shingle', geo: roof(r, scaleRgb([0.62, 0.6, 0.6], 1)) });
+    if (kit.shell === 'building' && kit.roof !== 'open' && floorRange(r)[0] >= d.base - 1.5) out.push({ texture: 'shingle', geo: roof(d, r, scaleRgb([0.62, 0.6, 0.6], 1)) });
   }
   for (const p of parts) {
-    if (!grounded(d, p)) continue; // not a lintel over the way in
+    if (p.shape !== 'box' || !p.outer) continue;
     const r = d.rooms[p.room];
     const kit = kitOfRoom(d, r);
     if (kit.shell !== 'mound' || kit.roof === 'open') continue;
+    if (!grounded(d, p)) { // a lintel over the way in: no bank, but its top is closed
+      out.push({ texture: 'rock', geo: brow(p, top(r), scaleRgb(tone(kit), 0.85)) });
+      continue;
+    }
     out.push({ texture: 'rock', geo: skirt(p, bankEnds(d, parts, p), d.base, top(r), scaleRgb(tone(kit), 0.85), seed) });
   }
   return out;
