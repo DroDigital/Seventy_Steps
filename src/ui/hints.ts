@@ -5,6 +5,8 @@
  * Round 14: a journey taken up again from a save first says where the story had led (the lead's line).
  */
 
+import { t } from '../core/i18n';
+import type { Key } from '../data/lang';
 import type { Entity } from '../core/ecs';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
@@ -18,38 +20,7 @@ import { HINTS_KEY as KEY } from './loreLine';
 
 const SHOW_MS = 9000;
 
-export const HINTS = {
-  move: 'Move with {move} and look with {look}. {dodge} dodges; hold it to run.',
-  lead: 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there.',
-  fight: '{light} strikes ({heavy}: a heavy blow). {block} blocks, and calls off a swing that has not landed; {parry} parries. {lock} locks on.',
-  hurt: "{heal} injects West's Reagent and closes wounds. Its doses come back when you rest.",
-  mind: '{item} takes a swallow of Laudanum and steadies the mind. Away from a fight it mends by itself (▲), faster by lamplight and firelight (▲▲); the Elder Signs, Echoes and your own lantern do not count.',
-  sign: 'Rest at an Elder Sign with {interact}. You rise at the last one you rested at, and the creatures you killed come back, but not those standing guard about the stone itself until you rest at another.',
-  echoes: 'You dropped your Echoes where you fell. Reach the spot again to take them back.',
-  level: 'You carry Echoes enough for a level (▲). Rest at an Elder Sign to grow stronger, before you fall and drop them.',
-  map: '{map} opens the map. Ground you have seen stays drawn on it.',
-  quest: '{journal} opens the Journal, with what you have been asked to do.',
-  boss: 'Watch the ground: a boss shows where its blows will land. Roll through rings and beams.',
-  stoop: 'A colossus stoops after each blow of its own: its head comes down within reach, and a strike there hurts it several times over. Stand before its face. The revolver ({shoot}) aims for a head it can reach.',
-  ship: "No blade finishes Cthulhu. Wound it until the Alert comes, then take her helm ({interact}) and drive her at it.",
-  powder: "The Dunwich Horror cannot be seen. Near it, {interact} scatters the Powder of Ibn Ghazi, three doses, and shows it for a while. At the last no blade finishes it: chant the incantation ({interact}) near it.",
-  cover: "Ghatanothoa's gaze turns flesh to stone: four seconds in its sight and you are lost, the colour draining and the picture cracking as it takes hold. Stand behind a monolith and it wears off.",
-  roots: 'While the spawning roots stand, Shub-Niggurath takes only a fifth of each blow, and they bring forth its young. Cut the roots down.',
-  spheres: 'The iridescent spheres are gates: touch one and you come out of the next, and now and then the whole arena leaps. Yog-Sothoth is struck where its own spheres rest.',
-  blind: 'Azathoth cannot see you, and nothing you strike it with matters. It hears: running, rolling, swinging and shots carry far, walking less, and walking with {block} held or standing still not at all. Outlast the piping.',
-  candle: 'A candle took the flame. Fall near a lit candle and you may rise beside it, a few steps from the horror that felled you, or at the Elder Sign, as you choose. The candle gives no rest: levels and doses are the Elder Signs\u2019.',
-  breath: 'The green bar is your breath: strikes, rolls, running and blocking spend it, and with it gone you are slow and open. Back off, and let it come back before you swing again.',
-  riposte: 'You parried: the foe is open. Strike at once for a riposte, which hits far harder. A blow to the back of a foe does the same.',
-  fog: 'The mist ahead holds a horror. {interact} passes through, and once you have, there is no leaving until one of you falls. Rest and grow stronger first, and light the candle before it, if you will.',
-  talk: '{interact} talks to the people you meet. Some have a quest to give, some wares to sell, and all of them know something.',
-  insight: 'Insight buys strength when you rest at an Elder Sign.',
-  gun: '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',
-  oil: '{throw} throws a flask of lamp oil; it bursts and burns where it lands. Lock on first to throw it at a foe.',
-  grab: 'A crimson flare means a grab: no guard stops it. Roll away ({dodge}).',
-  unmoored: 'Unmoored: you strike weaker and are struck harder, your breath comes back slower, and the body wears away a little. Laudanum ({item}), a lamp or a fire, or rest brings the mind back.',
-  phantom: 'It was never there. At the edge of madness the mind conjures horrors: they vanish when struck, and their blows wound only the mind. Laudanum ({item}) or rest steadies it.',
-} as const;
-type HintId = keyof typeof HINTS;
+type HintId = Key extends infer K ? (K extends `hint.${infer I}` ? I : never) : never;
 
 /** What a boss asks of the investigator besides striking (round 25: only Azathoth's was said before the fight). */
 const BOSS_HINTS: Readonly<Record<string, HintId>> = { azathoth: 'blind', cthulhu: 'ship', dunwich_horror: 'powder', ghatanothoa: 'cover', shub_niggurath: 'roots', yog_sothoth: 'spheres' };
@@ -131,7 +102,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
       } catch {
         // No storage: the hints show again next time.
       }
-      setText(box, fill(HINTS[next])); // the buttons of the device in hand
+      setText(box, fill(t(`hint.${next}` as Key))); // the buttons of the device in hand
       setStyle(box, 'opacity', '1');
       until = now + SHOW_MS;
     },

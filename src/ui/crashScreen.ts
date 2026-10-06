@@ -5,24 +5,17 @@
  * shell, out). Plain DOM, dependent on nothing that may itself have broken.
  */
 
+import { t } from '../core/i18n';
+import type { Key } from '../data/lang';
 import { crashReport } from './crashLog';
 import { desktop } from './desktop';
 
 export type CrashKind = 'webgl' | 'lost' | 'error';
 
-const WORDS: Record<CrashKind, { title: string; line: string }> = {
-  webgl: {
-    title: 'THE DREAM CANNOT BEGIN',
-    line: 'This computer or browser could not start the graphics the game needs (WebGL 2). Updating the graphics driver or the browser, or turning on hardware acceleration, usually helps.',
-  },
-  lost: {
-    title: 'THE PICTURE WAS LOST',
-    line: 'The graphics device stopped answering (a driver reset, or the GPU was taken by something else). Your progress was saved a moment ago.',
-  },
-  error: {
-    title: 'THE DREAM BREAKS',
-    line: 'Something went wrong and the game had to stop. Your progress stands as it was last saved, a few moments ago.',
-  },
+const WORDS: Record<CrashKind, { title: Key; line: Key }> = {
+  webgl: { title: 'crash.webgl.title', line: 'crash.webgl.line' },
+  lost: { title: 'crash.lost.title', line: 'crash.lost.line' },
+  error: { title: 'crash.error.title', line: 'crash.error.line' },
 };
 
 let shown = false;
@@ -46,10 +39,10 @@ export function showCrash(kind: CrashKind, detail?: string): void {
   const panel = document.createElement('div');
   panel.style.cssText = 'max-width:560px;padding:24px';
   const title = document.createElement('div');
-  title.textContent = w.title;
+  title.textContent = t(w.title);
   title.style.cssText = 'font-size:24px;letter-spacing:8px;margin-bottom:20px';
   const line = document.createElement('div');
-  line.textContent = w.line;
+  line.textContent = t(w.line);
   line.style.cssText = 'opacity:.8';
   panel.append(title, line);
   if (detail) {
@@ -68,10 +61,10 @@ export function showCrash(kind: CrashKind, detail?: string): void {
     row.append(b);
     return b;
   };
-  const again = add('Wake again', () => void (location.href = location.pathname));
-  const copy = add('Copy report', () => void navigator.clipboard?.writeText(report).then(() => (copy.textContent = 'Copied'), () => (copy.textContent = 'Could not copy')));
-  if (desktop?.openLogs) add('Open logs', () => void desktop!.openLogs!());
-  if (desktop) add('Quit', () => void desktop!.quit());
+  const again = add(t('crash.again'), () => void (location.href = location.pathname));
+  const copy = add(t('crash.copy'), () => void navigator.clipboard?.writeText(report).then(() => (copy.textContent = t('crash.copied')), () => (copy.textContent = t('crash.copyFail'))));
+  if (desktop?.openLogs) add(t('crash.logs'), () => void desktop!.openLogs!());
+  if (desktop) add(t('crash.quit'), () => void desktop!.quit());
   panel.append(row);
   root.append(panel);
   document.body.append(root);

@@ -6,6 +6,8 @@
  * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts).
  */
 
+import { t as tr } from '../core/i18n';
+import type { Key } from '../data/lang';
 import { Vector3, type Camera } from 'three';
 import { GUN, HEARD, HURT } from '../data/tuning';
 import type { Game, HitOutcome } from '../systems/components';
@@ -38,14 +40,14 @@ const NOTICE_MS = 1100;
 const NOTICE_HOLD_MS = 700; // a notice stands at least this long before the next takes its place (round 19: two at once, the first was lost)
 
 /** Notices for outcomes involving the player: [when the player dealt it, when the player took it]. */
-const NOTICES: Partial<Record<HitOutcome, readonly [dealt: string, taken: string]>> = {
-  parried: ['', 'PARRY'],
-  riposte: ['RIPOSTE', ''],
-  interrupted: ['INTERRUPTED', ''],
-  guardBreak: ['GUARD BROKEN', 'GUARD BROKEN'],
+const NOTICES: Partial<Record<HitOutcome, readonly [dealt: Key | '', taken: Key | '']>> = {
+  parried: ['', 'hud.parry'],
+  riposte: ['hud.riposte', ''],
+  interrupted: ['hud.interrupted', ''],
+  guardBreak: ['hud.guardBroken', 'hud.guardBroken'],
 };
 
-const signed = (n: number, what: string): string => `${n > 0 ? '+' : '−'}${Math.abs(n)} ${what}`;
+const sign = (n: number): string => (n > 0 ? '+' : '−');
 
 export interface Hud {
   update(camera: Camera): void;
@@ -67,8 +69,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let chipHold = 0;
   const stamina = gauge(vitals, LEAF, 3);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
-  const reagent = pipRow(vitals, 'REAGENT', 'diamond', '#bdb1cc'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
-  const gun = pipRow(vitals, 'REVOLVER', 'round', '#c2ae78'); // the cylinder's six and the spare rounds (round 22)
+  const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#bdb1cc'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
+  const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#c2ae78'); // the cylinder's six and the spare rounds (round 22)
   const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', root);
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);
@@ -100,35 +102,35 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const me = g.player.id;
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
-    if (n && e.attacker === me) say(n[0]);
-    else if (n && e.target === me) say(n[1]);
+    if (n && e.attacker === me) say(n[0] && tr(n[0]));
+    else if (n && e.target === me) say(n[1] && tr(n[1]));
   });
   g.events.on('Echoes', (e) => {
-    if (e.change === 'recovered') say(`ECHOES RECOVERED  +${e.amount}`);
-    else if (e.change === 'earned') say(`+${e.amount} ECHOES`);
+    if (e.change === 'recovered') say(tr('hud.echoesRecovered', { n: e.amount }));
+    else if (e.change === 'earned') say(tr('hud.echoesEarned', { n: e.amount }));
   });
   g.events.on('Died', (e) => {
     if (e.entity !== me) return;
-    great.show('UNMADE', 'death', 'YOUR ECHOES LIE WHERE YOU FELL', deathLine(g)); // what the last blow teaches, or a fragment of the place (round 26)
+    great.show(tr('hud.unmade'), 'death', tr('hud.lie'), deathLine(g)); // what the last blow teaches, or a fragment of the place (round 26)
     setTimeout(() => great.hide(), DYING_MS); // it fades as the veil falls (journeys.ts)
   });
   g.events.on('Respawned', () => great.hide());
   g.events.on('FirstSight', (e) => {
-    if (e.sanity || e.insight) say([e.name.toUpperCase(), e.sanity && signed(-e.sanity, 'SANITY'), e.insight && signed(e.insight, 'INSIGHT')].filter(Boolean).join('  '));
+    if (e.sanity || e.insight) say([e.name.toUpperCase(), e.sanity && tr('hud.sanityLoss', { n: e.sanity }), e.insight && tr('hud.insightGain', { sign: sign(e.insight), n: Math.abs(e.insight) })].filter(Boolean).join('  '));
   });
   g.events.on('InsightChanged', (e) => {
-    if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${signed(e.change, 'INSIGHT')}`);
+    if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
   });
   g.events.on('RegionEntered', (e) => show(e.name.toUpperCase()));
   g.events.on('Travelled', (e) => show(e.name.toUpperCase()));
-  g.events.on('Vanquished', (e) => great.show('HORROR VANQUISHED', 'victory', e.name.toUpperCase(), EPITAPHS[creatureOf(g, e.entity)?.id ?? '']));
-  g.events.on('Exhaled', (e) => setTimeout(() => great.show('THE DREAM BREATHES OUT', 'place', e.name.toUpperCase(), 'What lay on it has gone.'), 7500)); // after the fall's own words (round 26)
-  g.events.on('Foreboding', (e) => setTimeout(() => great.show('SOMETHING STIRS', 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
+  g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', e.name.toUpperCase(), EPITAPHS[creatureOf(g, e.entity)?.id ?? '']));
+  g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', e.name.toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
+  g.events.on('Foreboding', (e) => setTimeout(() => great.show(tr('hud.stirs'), 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
-  g.events.on('Discovered', (e) => say(`ELDER SIGN FOUND · ${e.name.toUpperCase()}`));
-  g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', `${e.found} OF ${e.of} PLACES · ${(REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase()}`)); // round 18
-  g.events.on('QuestChanged', (e) => say(e.done ? `DONE · ${e.title.toUpperCase()}` : e.stage === 0 ? `JOURNAL · ${e.title.toUpperCase()}` : `${e.title.toUpperCase()} · UPDATED`));
-  g.events.on('RestRefused', () => say('SOMETHING HUNTS YOU · NO REST'));
+  g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
+  g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
+  g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
+  g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Overheard', (e) => {
     heard.replaceChildren(el('display:inline;font-style:normal;font-size:10px;letter-spacing:3px;color:#b9a577;margin-right:10px', e.name.toUpperCase()), `“${e.text}”`);
     heardAt = performance.now();
@@ -160,13 +162,13 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setStyle(stamina, 'width', percent(s.value, s.max));
       mind.update(now0);
       reagent.set(g.player.reagent, g.player.reagentMax);
-      setText(reagent.after, g.player.oil > 0 ? `OIL ×${g.player.oil}` : ''); // flasks once any are carried (round 12)
+      setText(reagent.after, g.player.oil > 0 ? tr('hud.oil', { n: g.player.oil }) : ''); // flasks once any are carried (round 12)
       gun.set(g.player.ammo, GUN.chamber);
       setText(gun.after, `· ${g.player.rounds}`);
       setStyle(gun.after, 'color', g.player.ammo === 0 ? '#b0604f' : BONE); // dry: it reddens
-      setText(insight, `INSIGHT ${g.mind.insight}`);
+      setText(insight, tr('hud.insight', { n: g.mind.insight }));
       const ready = LEVEL_IDS.some((id) => canLevel(g, id)); // a level within reach: rest at an Elder Sign
-      setText(echoes, `ECHOES ${Math.max(0, g.player.echoes - held())}${ready ? '  ▲' : ''}`);
+      setText(echoes, `${tr('hud.echoes', { n: Math.max(0, g.player.echoes - held()) })}${ready ? '  ▲' : ''}`);
       const now = performance.now();
       if (waiting.length && now - noticeAt >= NOTICE_HOLD_MS) put(waiting.shift()!);
       setStyle(notice, 'opacity', String(Math.min(1, Math.max(0, (noticeUntil - now) / 300)).toFixed(2)));
@@ -174,7 +176,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setStyle(heard, 'opacity', String(Math.min(1, Math.max(0, Math.min(age / 500, left / 1500))).toFixed(2)));
       const act = fightAction(g);
       const near = interactable(g);
-      const verb = near?.kind === 'npc' ? 'talk to' : near?.kind === 'sign' ? 'rest at' : 'pass through';
+      const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
       setText(prompt, act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
       bosses.update();

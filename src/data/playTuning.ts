@@ -3,6 +3,7 @@
  * audio, the settings menu, consumables, hit feedback, overhead health bars and particles.
  */
 
+import { LANGS } from './lang';
 import type { Tier } from './schema';
 import type { Ramp, Vec3 } from './tuning';
 
@@ -79,6 +80,7 @@ export const SETTINGS = {
   sfx: [0, 1, 0.05, 1], // blows, steps, voices
   ambience: [0, 1, 0.05, 1], // the drones and the recorded ambience
   speech: [0, 1, 0.05, 1], // the people's and the horrors' spoken lines (the voices)
+  language: [0, LANGS.length - 1, 1, 0], // its place in data/lang (round 46); a first launch takes the browser's
 } satisfies Record<string, readonly [number, number, number, number]>;
 
 /**

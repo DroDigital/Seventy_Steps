@@ -5,6 +5,7 @@
  * The ones not yet seen are only counted.
  */
 
+import { t } from '../core/i18n';
 import { FIELD_NOTES } from '../data/bestiaryNotes';
 import { HABITS, TIER_NAMES, weaknessLine, wherever } from '../data/bestiaryFacts';
 import { ENTITIES } from '../data/registry';
@@ -28,7 +29,7 @@ function entryPage(e: EntityDef, back: () => void): Page {
       const weak = weaknessLine(e);
       if (weak) el(p, 'p', weak, 'font-size:14px;line-height:1.5;margin:0 0 6px;opacity:.8');
       el(p, 'p', `Met in: ${wherever(e)}.`, 'font-size:12px;line-height:1.5;margin:8px 0 4px;opacity:.5');
-      footer(p, '', [[glyph('back'), 'Back']], back);
+      footer(p, '', [[glyph('back'), t('keys.back')]], back);
     },
   };
 }

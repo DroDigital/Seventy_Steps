@@ -26,7 +26,7 @@ describe('the line under the veil (round 24)', () => {
   });
 
   it('every lesson names a hint that exists', async () => {
-    const src = (await import('node:fs')).readFileSync('src/ui/hints.ts', 'utf8');
-    for (const t of TIPS) expect(src, t.topic).toMatch(new RegExp(`\\b${t.topic}:`));
+    const { EN } = await import('../src/data/lang/en');
+    for (const t of TIPS) expect(Object.keys(EN), t.topic).toContain(`hint.${t.topic}`);
   });
 });

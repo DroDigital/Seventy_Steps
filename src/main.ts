@@ -7,6 +7,7 @@
  * sign breathes and its line fills (loading.ts), and every long jump after passes under it (journeys.ts).
  */
 
+import { t } from './core/i18n';
 import { PerspectiveCamera, Vector3 } from 'three';
 import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
@@ -118,7 +119,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
   const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty });
-  if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: 'A DAMAGED SAVE WAS MENDED FROM ITS BACKUP' }), 6000); // (systems/save.ts)
+  if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
     noteLockAsked();

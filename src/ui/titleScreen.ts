@@ -7,8 +7,10 @@
  * stays until the veil has covered it.
  */
 
+import { t } from '../core/i18n';
+import type { Key } from '../data/lang';
 import { TITLE_LINES } from '../data/intro';
-import { DIFFICULTIES, DIFFICULTY_IDS, type DifficultyId } from '../data/tuning';
+import { DIFFICULTY_IDS, type DifficultyId } from '../data/tuning';
 import { BONE, SERIF } from './hudKit';
 import { SCALED_LAYER } from './uiScale';
 import { creditsPage } from './credits';
@@ -78,7 +80,7 @@ export function showTitle(o: TitleOptions): void {
   const gate: Page = placed({
     keys: wake,
     build(p) {
-      const call = button(el(p, 'div', '', 'width:260px;margin:0 auto'), 'press any key', wake);
+      const call = button(el(p, 'div', '', 'width:260px;margin:0 auto'), t('title.press'), wake);
       call.style.cssText += ';text-align:center;border-color:transparent;background:none;letter-spacing:3px';
       call.animate([{ opacity: 0.2 }, { opacity: 0.75 }], { duration: 1600, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
     },
@@ -91,14 +93,14 @@ export function showTitle(o: TitleOptions): void {
       const menu = el(p, 'div', '', 'width:260px;margin:0 auto;text-align:left');
       const lines = o.slots();
       if (lines[o.active - 1]) {
-        button(menu, 'Continue', () => begin(false));
+        button(menu, t('title.continue'), () => begin(false));
         el(menu, 'div', lines[o.active - 1]!, 'margin:-2px 0 8px 30px;font-size:12px;opacity:.5;letter-spacing:.5px'); // where that dream was left (round 38)
       }
-      button(menu, 'New game', () => screen.show(slotPage('new')));
-      if (lines.some(Boolean)) button(menu, 'Load', () => screen.show(slotPage('load')));
-      button(menu, 'Settings', () => screen.show(placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys), '50%', false)));
-      button(menu, 'Credits', () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
-      if (desktop) button(menu, 'Quit', () => (saveNow(), void desktop!.quit())); // the desktop shell only (playtest round 12)
+      button(menu, t('title.new'), () => screen.show(slotPage('new')));
+      if (lines.some(Boolean)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
+      button(menu, t('menu.settings'), () => screen.show(placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys), '50%', false)));
+      button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
+      if (desktop) button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())); // the desktop shell only (playtest round 12)
       el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.3;margin-top:26px;font-size:11px;letter-spacing:2px;text-transform:uppercase');
     },
   }, '66%', true);
@@ -108,16 +110,16 @@ export function showTitle(o: TitleOptions): void {
     focus: DIFFICULTY_IDS.indexOf('deep'), // the dream as made
     back: () => screen.show(slotPage('new')),
     build(p) {
-      heading(p, 'HOW DEEP DO YOU SLEEP?');
+      heading(p, t('title.deep'));
       const menu = el(p, 'div', '', 'width:420px;margin:0 auto;text-align:left');
       for (const id of DIFFICULTY_IDS) {
-        button(menu, DIFFICULTIES[id].name, () => into(slot, true, id), true, DIFFICULTIES[id].note);
+        button(menu, t(`diff.${id}.name` as Key), () => into(slot, true, id), true, t(`diff.${id}.note` as Key));
       }
-      el(p, 'div', 'Only the blows of the dream\u2019s creatures change. This is chosen now, and cannot be changed once the dream has begun.', 'opacity:.5;font-size:12px;line-height:1.5;margin:14px auto 0;max-width:420px');
-      const note = el(p, 'div', DIFFICULTIES.deep.note, 'opacity:.75;font-size:13px;line-height:1.5;margin:10px auto 0;max-width:420px;min-height:3em');
+      el(p, 'div', t('title.deepNote'), 'opacity:.5;font-size:12px;line-height:1.5;margin:14px auto 0;max-width:420px');
+      const note = el(p, 'div', t('diff.deep.note'), 'opacity:.75;font-size:13px;line-height:1.5;margin:10px auto 0;max-width:420px;min-height:3em');
       note.className = 'hint';
-      note.dataset.def = DIFFICULTIES.deep.note;
-      const back = button(menu, 'Back', () => screen.show(slotPage('new')));
+      note.dataset.def = t('diff.deep.note');
+      const back = button(menu, t('title.back'), () => screen.show(slotPage('new')));
       back.style.marginTop = '8px';
     },
   }, '66%', true);
@@ -125,25 +127,25 @@ export function showTitle(o: TitleOptions): void {
   const slotPage = (to: 'new' | 'load'): Page => placed({
     back: () => screen.show(main),
     build(p) {
-      heading(p, to === 'new' ? 'NEW GAME · CHOOSE A SLOT' : 'LOAD');
+      heading(p, t(to === 'new' ? 'title.newSlot' : 'title.loadSlot'));
       const menu = el(p, 'div', '', 'width:360px;margin:0 auto;text-align:left');
       o.slots().forEach((line, k) => {
         const slot = k + 1;
-        const label = `Slot ${slot}  ·  ${line ?? 'empty'}`;
+        const label = t('title.slot', { n: slot, line: line ?? t('title.empty') });
         if (to === 'load') button(menu, label, () => into(slot, false), !!line);
         else button(menu, label, () => (line ? screen.show(confirm(slot)) : screen.show(difficultyPage(slot))));
       });
-      button(menu, 'Back', () => screen.show(main));
+      button(menu, t('title.back'), () => screen.show(main));
     },
   }, '66%', true);
   const confirm = (slot: number): Page => placed({
     back: () => screen.show(slotPage('new')),
     build(p) {
-      heading(p, 'BEGIN ANEW?');
-      el(p, 'div', `This deletes the dream in slot ${slot}. The endings you have reached are remembered.`, 'opacity:.6;margin-bottom:14px');
+      heading(p, t('title.anew'));
+      el(p, 'div', t('title.anewNote', { slot }), 'opacity:.6;margin-bottom:14px');
       const menu = el(p, 'div', '', 'width:260px;margin:0 auto;text-align:left');
-      button(menu, 'No, go back', () => screen.show(slotPage('new')));
-      button(menu, 'Yes, begin anew', () => screen.show(difficultyPage(slot)));
+      button(menu, t('title.no'), () => screen.show(slotPage('new')));
+      button(menu, t('title.yes'), () => screen.show(difficultyPage(slot)));
     },
   }, '66%', true);
   screen.show(gate);

@@ -3,6 +3,7 @@
  * themselves, from the title, the pause menu, and after an ending.
  */
 
+import { t } from '../core/i18n';
 import { CREDITS } from '../data/credits';
 import { GAME_NAME } from '../data/intro';
 import { glyph } from './glyphs';
@@ -10,7 +11,7 @@ import { button, el, type Page } from './menuKit';
 
 const SPEED = 22; // px a second
 
-export function creditsPage(back: () => void, label = 'Back'): Page {
+export function creditsPage(back: () => void, label = t('keys.back')): Page {
   return {
     back,
     build(panel) {

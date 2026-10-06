@@ -6,6 +6,7 @@
  * Back off the panel).
  */
 
+import { t } from '../core/i18n';
 import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
 
@@ -161,6 +162,6 @@ export function footer(parent: HTMLElement, hint: string, keys: readonly (readon
   const row = el(parent, 'div', '', `display:flex;justify-content:center;gap:20px;white-space:nowrap;margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK}70`);
   for (const [key, what] of keys) {
     const s = el(row, 'span', `${key}  ${what}`);
-    if (back && what === 'Back') [s.style.cursor, s.onclick] = ['pointer', back]; // the mouse's way back: a click on it (it is not a choice for the keys)
+    if (back && what === t('keys.back')) [s.style.cursor, s.onclick] = ['pointer', back]; // the mouse's way back: a click on it (it is not a choice for the keys)
   }
 }

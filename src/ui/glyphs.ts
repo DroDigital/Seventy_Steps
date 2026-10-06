@@ -5,6 +5,7 @@
  * Texts carry `{action}` tokens that `fill` replaces.
  */
 
+import { t } from '../core/i18n';
 import { keyLayout, keyName } from '../core/bindings';
 import { deviceInUse } from '../core/device';
 
@@ -38,7 +39,7 @@ function keysName(act: Act): string {
     case 'move':
       return [k.forward, k.left, k.back, k.right].map(keyName).join('');
     case 'look':
-      return 'the mouse';
+      return t('key.mouse');
     case 'light':
       return 'LMB';
     case 'heavy':
@@ -56,7 +57,8 @@ function keysName(act: Act): string {
 }
 
 /** The name of the button for `act` on the device in hand. */
-export const glyph = (act: Act): string => (deviceInUse() === 'pad' ? PAD[act] : keysName(act));
+const padName = (act: Act): string => (act === 'move' ? t('pad.moveStick') : act === 'look' ? t('pad.lookStick') : PAD[act]);
+export const glyph = (act: Act): string => (deviceInUse() === 'pad' ? padName(act) : keysName(act));
 
 /** `text` with each `{act}` replaced by its button's name (in capitals for a line in capitals). */
 export const fill = (text: string, upper = false): string =>

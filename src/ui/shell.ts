@@ -17,7 +17,8 @@ import { browserStore } from './autosave';
 import { recallSlot } from '../systems/save';
 import { setMenuSound } from './menuKit';
 import { setPadSwap } from '../core/padMap';
-import { clampSetting, loadSettings, storeSettings, type SettingId, type Settings } from './settings';
+import { detectLocale, setLocale } from '../core/i18n';
+import { clampSetting, loadSettings, SETTINGS_KEY, storeSettings, type SettingId, type Settings } from './settings';
 import { applyUiScale } from './uiScale';
 import { createVeil, type Veil } from './veil';
 
@@ -37,6 +38,8 @@ export function createShell(): Shell {
   const store = browserStore();
   recallSlot(store); // the save slot last used (round 12)
   const settings = loadSettings(store);
+  if (!store?.getItem(SETTINGS_KEY)) settings.language = detectLocale(navigator.languages ?? [navigator.language ?? 'en']); // a first launch: the browser's language, where there is one
+  setLocale(settings.language);
   const levels = (): { music: number; sfx: number; ambience: number } => ({ music: settings.music, sfx: settings.sfx, ambience: settings.ambience });
   const engine = createAudioEngine(settings.volume, levels());
   engine.setSpeech(settings.speech);
@@ -61,6 +64,7 @@ export function createShell(): Shell {
     if (id === 'speech') engine.setSpeech(settings.speech);
     if (id === 'uiScale') applyUiScale(settings.uiScale);
     if (id === 'padSwap') setPadSwap(settings.padSwap > 0.5);
+    if (id === 'language') setLocale(settings.language);
   };
   const saveKeys = (): void => {
     try {

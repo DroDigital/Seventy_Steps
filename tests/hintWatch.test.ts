@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fill } from '../src/ui/glyphs';
-import { HINTS } from '../src/ui/hints';
+import { LANGS } from '../src/data/lang';
 import { watch } from '../src/ui/hintWatch';
 import { teleport } from '../src/systems/checkpoints';
 import { spawnCreature } from '../src/systems/creatures';
@@ -12,9 +12,11 @@ describe('the first hour: hints before it costs', () => {
   const at = (g: ReturnType<typeof createWorldGame>) => g.ecs.c.transform.get(g.player.id)!.pos;
 
   it('every hint has words, and every {button} in one is a button the hint line knows', () => {
-    for (const [id, text] of Object.entries(HINTS)) {
-      expect(text.length, id).toBeGreaterThan(20);
-      expect(fill(text), id).not.toMatch(/\{\w+\}/);
+    for (const lang of LANGS) {
+      for (const [id, text] of Object.entries(lang.table).filter(([k]) => k.startsWith('hint.'))) {
+        expect(text.length, `${lang.id} ${id}`).toBeGreaterThan(20);
+        expect(fill(text), `${lang.id} ${id}`).not.toMatch(/\{\w+\}/);
+      }
     }
   });
 

@@ -5,6 +5,7 @@
  * the desktop shell a way out to the desktop (playtest round 12).
  */
 
+import { t } from '../core/i18n';
 import { keyLayout } from '../core/bindings';
 import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
@@ -45,22 +46,22 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
   const main: Page = {
     back: resume,
     build(p) {
-      title(p, 'PAUSED');
+      title(p, t('pause.title'));
       const list = el(p, 'div');
-      button(list, 'Resume', resume, true, 'Return to the dream.');
+      button(list, t('pause.resume'), resume, true, t('pause.resumeHint'));
       const rule = (): void => void el(list, 'div', '', `height:1px;margin:3px 14px;background:linear-gradient(90deg,transparent,${ACCENT}40 20%,${ACCENT}40 80%,transparent)`);
       rule();
-      if (o.map) button(list, 'Map', () => [screen.close(true), o.map!()], true, 'The lands you have walked, the signs lit, and the way to travel between them.');
-      if (o.journal) button(list, 'Journal', () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))), true, 'What is asked of you, the tomes read, and the creatures beheld.');
-      if (o.arms) button(list, 'Arms', () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))), true, 'The weapons you carry, and which is in hand.');
-      if (o.achievements) button(list, 'Achievements', () => screen.show(o.achievements!(() => screen.show(main))), true, 'What you have done, and what remains.');
+      if (o.map) button(list, t('pause.map'), () => [screen.close(true), o.map!()], true, t('pause.mapHint'));
+      if (o.journal) button(list, t('pause.journal'), () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.journalHint'));
+      if (o.arms) button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.armsHint'));
+      if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))), true, t('pause.achievementsHint'));
       rule();
-      button(list, 'Settings', () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)), true, 'Picture, sound, how you play, and the keys.');
-      button(list, 'Credits', () => screen.show(creditsPage(() => screen.show(main))), true, 'Who made this, and with what.');
+      button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)), true, t('pause.settingsHint'));
+      button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))), true, t('pause.creditsHint'));
       rule();
-      button(list, 'Quit to title', o.quit, true, 'Your progress is kept at the last sign you rested at.');
-      if (desktop) button(list, 'Quit to desktop', () => (saveNow(), void desktop!.quit()), true, 'Close the game.'); // the shell only: a browser tab is closed by its own hand
-      footer(p, 'Return to the dream.', menuKeys());
+      button(list, t('pause.quitTitle'), o.quit, true, t('pause.quitTitleHint'));
+      if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit()), true, t('pause.quitDesktopHint')); // the shell only: a browser tab is closed by its own hand
+      footer(p, t('pause.resumeHint'), menuKeys());
       p.querySelector<HTMLElement>('.hint')!.style.minHeight = '1.45em'; // every line's hint is one line: no room kept for two
     },
   };

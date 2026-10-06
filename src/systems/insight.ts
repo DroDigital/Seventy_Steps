@@ -5,6 +5,7 @@
  * Pure: no Three.js.
  */
 
+import { t as tr } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import { dist3, distXZ } from '../core/geom';
 import { PLAYER, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
@@ -71,7 +72,7 @@ export function insightSystem(g: Game): void {
       g.player.echoes += t.echoes;
       g.overworld?.read.add(t.name); // taken for good
       g.events.emit('Echoes', { change: 'earned', amount: t.echoes, total: g.player.echoes });
-      g.events.emit('Notice', { text: `A CACHE OF ECHOES · +${t.echoes}` });
+      g.events.emit('Notice', { text: tr('n.cache', { n: t.echoes }) });
     } else if (!t.vial) {
       if (t.insight > 0) changeInsight(g, t.insight, 'tome', t.name);
       g.overworld?.read.add(t.name);
@@ -79,7 +80,7 @@ export function insightSystem(g: Game): void {
     } else {
       addVial(g);
       g.overworld?.read.add(t.name);
-      g.events.emit('Notice', { text: `SILVER VIAL · REAGENT DOSES ${g.player.reagentMax}` });
+      g.events.emit('Notice', { text: tr('n.vial', { n: g.player.reagentMax }) });
     }
   }
 }
@@ -102,7 +103,7 @@ function takeRounds(g: Game, t: { rounds?: number; warned?: number }): boolean {
   if (giveRounds(g, t.rounds ?? 0)) return true;
   if (g.frame - (t.warned ?? -Infinity) > 3 * SIM.hz) {
     t.warned = g.frame;
-    g.events.emit('Notice', { text: 'YOU CARRY ALL THE ROUNDS YOU CAN' });
+    g.events.emit('Notice', { text: tr('n.rounds') });
   }
   return false;
 }

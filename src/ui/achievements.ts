@@ -5,6 +5,7 @@
  * menu's page lists them all.
  */
 
+import { t } from '../core/i18n';
 import { ACHIEVEMENT_IDS, ACHIEVEMENTS } from '../data/achievements';
 import { newlyEarned } from '../systems/achievements';
 import type { Game } from '../systems/components';
@@ -41,7 +42,7 @@ export function achievementsPage(store: SaveStore | null, back: () => void): Pag
         el(p, 'div', `${got ? '✦' : '·'}  ${a.name}`, `opacity:${got ? 1 : 0.45};margin-top:6px;padding:0 4px`);
         el(p, 'div', a.note, `opacity:${got ? 0.6 : 0.35};font-size:12px;margin:0 0 2px 20px`);
       }
-      footer(p, '', [[glyph('back'), 'Back']], back);
+      footer(p, '', [[glyph('back'), t('keys.back')]], back);
     },
   };
 }

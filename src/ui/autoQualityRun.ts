@@ -5,6 +5,7 @@
  * Settings › Display holds what it chose.
  */
 
+import { t } from '../core/i18n';
 import type { FrameStats } from '../core/frameStats';
 import { LADDER, nextRung, QUALITY, rungOf } from '../render/autoQuality';
 import type { SaveStore } from '../systems/save';
@@ -42,7 +43,7 @@ export function createAutoQuality(shell: Shell, stats: FrameStats, tell: (text: 
     } catch {
       // Storage refused: it measures again next time.
     }
-    if (rung !== start) tell('PICTURE SET FOR THIS COMPUTER · SETTINGS › DISPLAY');
+    if (rung !== start) tell(t('n.autoQuality'));
   };
   const intervened = (): boolean => {
     const r = LADDER[rung];

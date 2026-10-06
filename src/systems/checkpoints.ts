@@ -6,6 +6,7 @@
  * into the Dreamlands. A gate leads to its twin in another realm. Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import { talk } from './npcs';
 import { npcDef } from '../data/npcs';
 import type { InputFrame } from '../core/input';
@@ -149,7 +150,7 @@ export function passGate(g: Game, id: string): boolean {
   const twin = gatePlace(gatePlace(id)?.to ?? '');
   if (!g.overworld || !twin) return false;
   if (gateBarred(g)) {
-    g.events.emit('Notice', { text: 'THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU' });
+    g.events.emit('Notice', { text: t('n.gateHeld') });
     return false;
   }
   teleport(g, twin.arrive);

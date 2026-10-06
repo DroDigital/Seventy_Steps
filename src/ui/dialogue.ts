@@ -6,6 +6,7 @@
  * Space (pad A) goes on; Esc (pad B) closes. A merchant's last line goes on to their wares (shopMenu.ts).
  */
 
+import { t } from '../core/i18n';
 import { wordMoments } from '../core/pace';
 import { DOCUMENTS } from '../data/documents';
 import { spokenFor } from '../data/speechLines';
@@ -144,7 +145,7 @@ export function createDialogue(g: Game): Dialogue {
 }
 
 /** A tome's or note's text on a page; `back` closes it. */
-export function documentPage(name: string, back: () => void, label = 'Back'): Page {
+export function documentPage(name: string, back: () => void, label = t('keys.back')): Page {
   const doc = DOCUMENTS[name];
   return {
     back,
