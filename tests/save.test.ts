@@ -6,7 +6,7 @@ import { createWorldGame } from '../src/systems/game';
 import { buyUpgrade, changeInsight } from '../src/systems/insight';
 import { buyLevel, levelCost } from '../src/systems/levels';
 import { setSanity } from '../src/systems/sanity';
-import { clearSave, loadSave, parseSave, SAVE_KEY, saveGame, snapshot, type SaveData } from '../src/systems/save';
+import { backupKey, clearSave, loadSave, parseSave, SAVE_KEY, saveGame, snapshot, takeRecovery, type SaveData } from '../src/systems/save';
 import { spawnDrop } from '../src/systems/spawn';
 import { worldLayout } from '../src/world/placements';
 import { run } from './worldHelpers';
@@ -116,5 +116,47 @@ describe('save and load', () => {
     clearSave(store);
     expect(loadSave(store)).toBeNull();
     expect(worldLayout().tomes.some((t) => t.name === 'Necronomicon')).toBe(true);
+  });
+
+  describe('the backup', () => {
+    const memory = () => {
+      const data = new Map<string, string>();
+      return { data, store: { getItem: (k: string) => data.get(k) ?? null, setItem: (k: string, v: string) => void data.set(k, v), removeItem: (k: string) => void data.delete(k) } };
+    };
+
+    it('keeps the save before this one, no oftener than every five minutes, and never a damaged one', () => {
+      const { data, store } = memory();
+      const g = played();
+      const t = 1e12 + 7e8; // (a session's first save takes the one before it, if there is one)
+      saveGame(g, store, 1, t);
+      expect(data.has(backupKey(SAVE_KEY))).toBe(false); // nothing before it
+      g.player.echoes = 1;
+      saveGame(g, store, 1, t + 20_000);
+      expect(data.has(backupKey(SAVE_KEY))).toBe(true);
+      expect(JSON.parse(data.get(backupKey(SAVE_KEY))!).echoes).toBe(1234);
+      g.player.echoes = 2;
+      saveGame(g, store, 1, t + 40_000); // too soon: the backup stands
+      expect(JSON.parse(data.get(backupKey(SAVE_KEY))!).echoes).toBe(1234);
+      data.set(SAVE_KEY, '{"torn');
+      saveGame(g, store, 1, t + 10 * 60_000); // the damaged one is not kept
+      expect(JSON.parse(data.get(backupKey(SAVE_KEY))!).echoes).toBe(1234);
+    });
+
+    it('makes a damaged save good from its backup, and says so once', () => {
+      const { data, store } = memory();
+      const g = played();
+      saveGame(g, store, 1, 2e12);
+      g.player.echoes = 5;
+      saveGame(g, store, 1, 2e12 + 1000);
+      data.set(SAVE_KEY, '{"version":'); // torn mid-write
+      takeRecovery();
+      const got = loadSave(store, 1);
+      expect(got?.echoes).toBe(1234);
+      expect(takeRecovery()).toBe(true);
+      expect(takeRecovery()).toBe(false);
+      expect(parseSave(data.get(SAVE_KEY)!)?.echoes).toBe(1234); // the save itself is whole again
+      clearSave(store, 1);
+      expect(data.has(backupKey(SAVE_KEY))).toBe(false);
+    });
   });
 });

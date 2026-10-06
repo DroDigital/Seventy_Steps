@@ -49,8 +49,12 @@ import { applyReality, lightReality } from './render/realityFx';
 import { updateWorldUniforms, worldUniforms } from './render/worldMaterial';
 import { FEEL, HEART } from './render/feel';
 import { createGame, createWorldGame, stepGame } from './systems/game';
-import { clearSave, loadSave } from './systems/save';
+import { clearSave, loadSave, takeRecovery } from './systems/save';
 import { haltAutosave, saveNow, startAutosave } from './ui/autosave';
+import { createAutoQuality, firstLaunch } from './ui/autoQualityRun';
+import { startBench } from './ui/bench';
+import { installCrashLog } from './ui/crashLog';
+import { createPerf, createReadout } from './ui/perfMeter';
 import { showCrash } from './ui/crashScreen';
 import { startBestiary } from './ui/bestiary';
 import { HINTS, panelOptions, playerStats, spawnHint, worldStats } from './ui/debugHooks';
@@ -92,6 +96,8 @@ interface StartOptions {
   difficulty?: DifficultyId; // a new game's, chosen at the title (round 38)
   creature?: string;
   variant?: Variant;
+  bench?: boolean; // the benchmark (ui/bench.ts): the busiest places, measured
+  perf?: boolean; // the frame meter shown from the start (F3 toggles it)
 }
 
 async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
@@ -112,6 +118,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
   const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty });
+  if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: 'A DAMAGED SAVE WAS MENDED FROM ITS BACKUP' }), 6000); // (systems/save.ts)
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
     noteLockAsked();
@@ -204,6 +211,10 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   resize();
   addEventListener('resize', resize);
 
+  const perf = createPerf(!!opts.perf);
+  const readout = createReadout();
+  const auto = createAutoQuality(shell, perf.stats, (text) => game.events.emit('Notice', { text }), !opts.arena && !opts.debug && !opts.bench && (!!opts.intro || !opts.fresh) && firstLaunch(store)); // (round 46: a first launch's picture is set for the computer)
+  const bench = opts.bench && !opts.arena ? startBench(game, perf.stats, readout) : null;
   let simTime = 0;
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   let frames = 0;
@@ -228,6 +239,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
+        perf.frame();
+        auto.tick(performance.now());
+        bench?.tick(performance.now());
         input.sensitivity = settings.sensitivity;
         input.invertY = settings.invertY > 0.5;
         FEEL.shake = settings.shake;
@@ -283,6 +297,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
         if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
         hud.update(camera);
+        perf.update(pipeline.renderer.info.render.calls, pipeline.renderer.info.render.triangles);
         if (!panel) return;
         panel.refresh();
         frames++;
@@ -300,6 +315,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   );
 }
 
+installCrashLog(); // the last errors, for a crash report (ui/crashLog.ts)
 const params = new URLSearchParams(location.search);
 const variant = params.get('variant');
 if (params.has('look')) startLookTest();
@@ -311,6 +327,8 @@ else {
     fresh: params.has('fresh'),
     creature: params.get('spawn') ?? undefined,
     variant: variant === 'eldritch' || variant === 'boss' ? variant : undefined,
+    bench: params.has('bench'),
+    perf: params.has('perf'),
   };
   if (opts.arena || opts.fresh) void startGame(opts, createShell());
   else if (takeFlag(NEW_GAME_FLAG)) void startGame({ ...opts, fresh: true, intro: true }, createShell()); // begun anew from an ending

@@ -242,6 +242,60 @@ export function recallSlot(store: SaveStore | null): number {
   return (active = Number.isFinite(n) ? clampInt(n, 1, SLOTS) : 1);
 }
 
-export const saveGame = (g: Game, store: SaveStore, slot = active): void => store.setItem(slotKey(slot), JSON.stringify(snapshot(g)));
-export const loadSave = (store: SaveStore, slot = active): SaveData | null => parseSave(store.getItem(slotKey(slot)));
-export const clearSave = (store: SaveStore, slot = active): void => store.removeItem(slotKey(slot));
+/**
+ * The save before this one is kept beside it (round 46), taken at most every BACKUP_EVERY ms and the first time in a session
+ * (so the one from the session's start always stands), and only if it still reads: a save a bug has damaged never replaces
+ * a good one. A save that cannot be read is made good from it, once, and the player is told (`takeRecovery`).
+ */
+const BACKUP_EVERY = 5 * 60 * 1000;
+export const backupKey = (key: string): string => `${key}-backup`;
+let backedAt = -Infinity;
+let recovered = false;
+
+export function saveGame(g: Game, store: SaveStore, slot = active, now = Date.now()): void {
+  const key = slotKey(slot);
+  const json = JSON.stringify(snapshot(g));
+  if (now - backedAt >= BACKUP_EVERY) {
+    const prev = store.getItem(key);
+    if (prev && parseSave(prev)) {
+      try {
+        store.setItem(backupKey(key), prev);
+        backedAt = now;
+      } catch {
+        // Storage refused the copy: the save itself is still tried.
+      }
+    }
+  }
+  store.setItem(key, json);
+}
+
+export function loadSave(store: SaveStore, slot = active): SaveData | null {
+  const key = slotKey(slot);
+  const raw = store.getItem(key);
+  const own = parseSave(raw);
+  if (own || raw === null) return own;
+  const backup = store.getItem(backupKey(key)); // it exists and does not read: the one before it stands in, and is made the save
+  const spare = parseSave(backup);
+  if (spare && backup) {
+    recovered = true;
+    try {
+      store.setItem(key, backup);
+    } catch {
+      // Storage refused: it stands in for this session.
+    }
+  }
+  return spare;
+}
+
+/** Whether a save was damaged and its backup used instead, since last asked (the title says so, once). */
+export function takeRecovery(): boolean {
+  const was = recovered;
+  recovered = false;
+  return was;
+}
+
+export const clearSave = (store: SaveStore, slot = active): void => {
+  store.removeItem(slotKey(slot));
+  store.removeItem(backupKey(slotKey(slot)));
+  backedAt = -Infinity;
+};
