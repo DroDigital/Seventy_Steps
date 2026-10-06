@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 """Four walk frames from a generated 2x2 sheet on flat magenta, brought to the pack's 64x64 frames.
 
-  python3 fromsheet.py <sheet.png> <pack folder> <creature key> <side> [--dry-run]
+  python3 fromsheet.py <sheet.png> <pack folder> <creature key> <side> [--mirror-right] [--dry-run]
 
-Each cell is keyed off the magenta, all four scaled by one factor so the creature stands as tall as
-its own idle_0 (its bob between frames kept), each pixel the commonest colour of its block, then
-every colour snapped to the creature's own palette (its idle and old move frames). The frames stand
-on the idle's ground line, centred where the old walk was. move_0..move_3 are written and listed in
-the gallery; what they replace is kept under walk4_backup/."""
+Each cell is keyed off the magenta, all four scaled by one factor so the tallest stands as tall as
+its own idle_0, each pixel the commonest colour of its block, then every colour snapped to the
+creature's own palette (its idle and old move frames). A model never keeps its figure in the same
+place in every cell, so each frame is set by its own body, not by where it was drawn: its lowest
+pixel on the idle's ground line, its upper body (the audit's measure, the top 40% of the silhouette)
+over the idle's. move_0..move_3 are written and listed in the gallery; what they replace is kept
+under walk4_backup/. --mirror-right also writes the four frames, flipped, to the creature's right
+set (the right of a mirror-safe creature is its left, flipped)."""
 import json, os, re, shutil, sys
 import numpy as np
 from PIL import Image
 
 PAGES = ('previews/library.html', 'library.html', 'index.html')
 ALPHA = 40
+RARE_SHARE = 0.004   # a palette colour under this share of the creature's pixels is an accent
+RARE_NEAR = 36       # and takes only the pixels within this RGB distance of it
+GLOW_SAT = 0.55      # bright (over 130) and this saturated, a colour is a glow
+GLOW_NEAR = 90       # an accent that is a glow takes pixels within this distance
 
 
 def key_cells(sheet):
@@ -34,9 +41,22 @@ def _bbox(m):
     return ys.min(), ys.max(), xs.min(), xs.max()
 
 
-def _mode_downscale(rgb, m, scale, out_h, out_w):
-    """Each target pixel takes the commonest opaque colour of its source block (or stays clear)."""
+def _lum(px):
+    return 0.299 * px[:, 0] + 0.587 * px[:, 1] + 0.114 * px[:, 2]
+
+
+def _torso_x(m):
+    """Where the upper body stands, as the audit measures it: the mean column of the silhouette's top 40%."""
+    ys, _ = np.nonzero(m)
+    h = ys.max() - ys.min() + 1
+    return np.nonzero(m[ys.min():ys.min() + max(2, int(h * 0.4))])[1].mean()
+
+
+def _mode_downscale(rgb, m, scale, out_h, out_w, accents):
+    """Each target pixel takes the commonest opaque colour of its source block (or stays clear), unless the
+    block holds some of the creature's own glowing accent colour (`accents`), which then wins."""
     res = np.zeros((out_h, out_w, 4), np.uint8)
+    inner = _interior(m, 4)      # the edge of a figure drawn on magenta is blended with it: no accent there
     for y in range(out_h):
         y0, y1 = int(y / scale), max(int(y / scale) + 1, int((y + 1) / scale))
         for x in range(out_w):
@@ -45,6 +65,13 @@ def _mode_downscale(rgb, m, scale, out_h, out_w):
             if bm.size == 0 or bm.mean() < 0.5:
                 continue
             px = rgb[y0:y1, x0:x1][bm]
+            if len(accents):                                      # an eye or a claw tip is no noise: keep it
+                hit = (((px[:, None, :] - accents[None]) ** 2).sum(-1) <= GLOW_NEAR ** 2).any(1)
+                hit &= inner[y0:y1, x0:x1][bm]
+                if hit.sum() >= 2 and hit.sum() >= 0.08 * len(px):
+                    res[y, x, :3] = px[hit].mean(0)
+                    res[y, x, 3] = 255
+                    continue
             q = (px // 8).astype(int)
             codes = q[:, 0] * 1024 + q[:, 1] * 32 + q[:, 2]
             vals, counts = np.unique(codes, return_counts=True)
@@ -54,42 +81,79 @@ def _mode_downscale(rgb, m, scale, out_h, out_w):
     return res
 
 
-def _snap(frame, palette):
+def _interior(m, r):
+    """The pixels of mask m that lie more than r steps inside it."""
+    e = np.pad(m, r)
+    for _ in range(r):
+        n = e.copy()
+        n[1:] &= e[:-1]
+        n[:-1] &= e[1:]
+        n[:, 1:] &= e[:, :-1]
+        n[:, :-1] &= e[:, 1:]
+        e = n
+    return e[r:-r, r:-r]
+
+
+def _glows(px):
+    """Which colours (rows of px) are bright and saturated: a glowing eye, a claw tip."""
+    top, low = px.max(1), px.min(1)
+    return (top >= 130) & (top - low >= GLOW_SAT * np.maximum(top, 1))
+
+
+def _snap(frame, palette, rare):
+    """Every colour to the nearest of the creature's own. A rare one is for the pixels that really are that
+    colour (a glowing eye within reach of its glow, a stray dull pixel only when it is nearly it); it is no
+    fallback for a lighter or warmer shade of the body."""
     m = frame[..., 3] > 0
     px = frame[m][:, :3].astype(int)
     d = ((px[:, None, :] - palette[None, :, :]) ** 2).sum(-1)
+    near = np.where(_glows(palette), GLOW_NEAR, RARE_NEAR)[rare]
+    d[:, rare] = np.where(d[:, rare] > near ** 2, 1 << 30, d[:, rare])
+    edge = ~_interior(m, 1)[m]
+    d[np.ix_(edge, np.nonzero(rare)[0])] = 1 << 30    # an accent never sits on the edge of the figure
     frame[m, :3] = palette[d.argmin(1)]
     return frame
 
 
 def frames_from_sheet(sheet, idle, olds):
-    """Four 64x64 RGBA frames from the sheet, fitted to the idle frame and the old walk."""
+    """Four 64x64 RGBA frames from the sheet, fitted to the idle frame; `olds` lend their colours."""
     im = np.asarray(idle)
     im_m = im[..., 3] > ALPHA
     iy0, iy1, ix0, ix1 = _bbox(im_m)
-    pal = np.unique(np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]), axis=0).astype(int)
+    pal, uses = np.unique(np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]), axis=0, return_counts=True)
+    pal, rare = pal.astype(int), uses < RARE_SHARE * uses.sum()
+    accents = pal[rare & _glows(pal)]        # its eyes, its claw tips: rare, bright, saturated
     cells = key_cells(sheet)
     boxes = [_bbox(m) for _, m in cells]
-    src_h = max(b[1] - b[0] + 1 for b in boxes)
-    scale = (iy1 - iy0 + 1) / src_h
-    old_cx = np.mean([np.nonzero(o[..., 3] > ALPHA)[1].mean() for o in olds])
-    ground = max(b[1] for b in boxes)
-    out = []
+    scale = (iy1 - iy0 + 1) / max(b[1] - b[0] + 1 for b in boxes)
+    idle_x = _torso_x(im_m)
+    smalls = []
     for (rgb, m), (y0, y1, x0, x1) in zip(cells, boxes):
-        sub_rgb, sub_m = rgb[:ground + 1, x0:x1 + 1], m[:ground + 1, x0:x1 + 1]
-        top = min(b[0] for b in boxes)
-        sub_rgb, sub_m = sub_rgb[top:], sub_m[top:]
+        sub_rgb, sub_m = rgb[y0:y1 + 1, x0:x1 + 1], m[y0:y1 + 1, x0:x1 + 1]
         oh, ow = int(round(sub_m.shape[0] * scale)), int(round(sub_m.shape[1] * scale))
-        small = _snap(_mode_downscale(sub_rgb, sub_m, scale, oh, ow), pal)
+        smalls.append(_mode_downscale(sub_rgb, sub_m, scale, oh, ow, accents))
+    # a model paints lighter than the pixel art it is shown: bring the sheet to the creature's own tone
+    # (the mean luminance of its idle and old walk), the same brightness all over, so its look is kept
+    own = np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]).astype(float)
+    drawn = np.concatenate([s[s[..., 3] > 0][:, :3] for s in smalls]).astype(float)
+    gain = float(np.clip(_lum(own).mean() / max(1.0, _lum(drawn).mean()), 0.7, 1.3))
+    out = []
+    for small in smalls:
+        small[..., :3] = np.where(small[..., 3:4] > 0, np.clip(small[..., :3] * gain, 0, 255), 0).astype(np.uint8)
+        small = _snap(small, pal, rare)
+        ys, xs = np.nonzero(small[..., 3] > 0)
+        ox = int(round(idle_x - _torso_x(small[..., 3] > 0)))
+        oy = iy1 - int(ys.max())
+        lo, hi = xs.min() + ox, xs.max() + ox
+        if lo < 1 or hi > 62:      # a wide stride must not touch the canvas edge: nudge it in, no more than that
+            nudge = 1 - lo if lo < 1 else 62 - hi
+            print(f'  nudged {nudge:+d} px to clear the canvas edge', file=sys.stderr)
+            ox += nudge
+        keep = (ys + oy >= 0) & (ys + oy < 64) & (xs + ox >= 0) & (xs + ox < 64)
+        if not keep.all():
+            print(f'  clipped {int((~keep).sum())} px at the canvas edge', file=sys.stderr)
         canvas = np.zeros((64, 64, 4), np.uint8)
-        sm = small[..., 3] > 0
-        cx = np.nonzero(sm)[1].mean()
-        ox = int(round(old_cx - cx))
-        oy = iy1 - (oh - 1)
-        for y in range(oh):
-            for x in range(ow):
-                if sm[y, x] and 0 <= y + oy < 64 and 0 <= x + ox < 64:
-                    canvas[y + oy, x + ox] = small[y, x]
+        canvas[ys[keep] + oy, xs[keep] + ox] = small[ys[keep], xs[keep]]
         out.append(canvas)
     return out
 
@@ -98,20 +162,12 @@ def _rel(path):
     return os.path.normpath(path[3:] if path.startswith('../') else path)
 
 
-def main(sheet_path, root, key, side, dry):
-    page = next(p for p in PAGES if os.path.exists(os.path.join(root, p)))
-    html = open(os.path.join(root, page), encoding='utf-8').read()
-    m = re.search(r'(<script id="pack-data"[^>]*>)(.*?)(</script>)', html, re.S)
-    data = json.loads(m.group(2))
-    item = next(i for i in data['items'] if i['key'] == key)
+def _write(root, item, side, frames, flip=False):
+    """move_0..move_3 into the pack at the side's own paths (what they replace goes to walk4_backup/)
+    and into the gallery's list."""
     fr = item['frames'][side]
-    load = lambda p: np.asarray(Image.open(os.path.join(root, _rel(p))).convert('RGBA'))
-    olds = [load(fr[k]) for k in sorted(fr) if k.startswith('move_')]
-    new = frames_from_sheet(Image.open(sheet_path), load(fr['idle_0']), olds)
     prefix = fr['move_0'].rsplit('/', 1)[0]
-    if dry:
-        return new
-    for i, f in enumerate(new):
+    for i, f in enumerate(frames):
         name = f'move_{i}'
         dest = os.path.join(root, _rel(prefix + f'/{name}.png'))
         if os.path.exists(dest):
@@ -119,16 +175,37 @@ def main(sheet_path, root, key, side, dry):
             os.makedirs(back, exist_ok=True)
             if not os.path.exists(os.path.join(back, f'{name}.png')):
                 shutil.copy2(dest, os.path.join(back, f'{name}.png'))
-        Image.fromarray(f, 'RGBA').save(dest)
+        Image.fromarray(np.ascontiguousarray(f[:, ::-1]) if flip else f, 'RGBA').save(dest)
         fr[name] = prefix + f'/{name}.png'
+
+
+def main(sheet_path, root, key, side, dry, mirror):
+    page = next(p for p in PAGES if os.path.exists(os.path.join(root, p)))
+    html = open(os.path.join(root, page), encoding='utf-8').read()
+    m = re.search(r'(<script id="pack-data"[^>]*>)(.*?)(</script>)', html, re.S)
+    data = json.loads(m.group(2))
+    item = next(i for i in data['items'] if i['key'] == key)
+    fr = item['frames'][side]
+    other = 'right' if side == 'left' else 'left'
+    if mirror and 'move_0' not in (item['frames'].get(other) or {}):
+        sys.exit(f'{key} has no {other} set to mirror into')
+    load = lambda p: np.asarray(Image.open(os.path.join(root, _rel(p))).convert('RGBA'))
+    olds = [load(fr[k]) for k in sorted(fr) if k.startswith('move_')]
+    new = frames_from_sheet(Image.open(sheet_path), load(fr['idle_0']), olds)
+    if dry:
+        return new
+    _write(root, item, side, new)
+    if mirror:
+        _write(root, item, other, new, flip=True)
     html = html[:m.start(2)] + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + html[m.end(2):]
     open(os.path.join(root, page), 'w', encoding='utf-8').write(html)
-    print(f'{key} {side}: move_0..move_3 written')
+    print(f'{key} {side}: move_0..move_3 written' + (f', flipped into {other}' if mirror else ''))
     return new
 
 
 if __name__ == '__main__':
-    args = [a for a in sys.argv[1:] if a != '--dry-run']
-    if len(args) != 4:
+    flags = {a for a in sys.argv[1:] if a.startswith('--')}
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    if len(args) != 4 or flags - {'--dry-run', '--mirror-right'}:
         sys.exit(__doc__)
-    main(*args, dry='--dry-run' in sys.argv)
+    main(*args, dry='--dry-run' in flags, mirror='--mirror-right' in flags)
