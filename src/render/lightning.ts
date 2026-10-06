@@ -8,6 +8,7 @@
 
 import type * as THREE from 'three';
 import { LIGHTNING } from '../data/tuning';
+import { FEEL } from './feel';
 import type { PostPass } from './postPass';
 import { worldUniforms } from './worldMaterial';
 
@@ -17,11 +18,13 @@ export interface Lightning {
 
 const between = ([lo, hi]: readonly [number, number]): number => lo + (hi - lo) * Math.random();
 
-/** A strike's light `t` seconds in: three quick pulses, dying away. */
-export function flicker(t: number): number {
-  if (t < 0 || t >= LIGHTNING.flash) return 0;
+/** A strike's light `t` seconds in: three quick pulses, dying away; `flashes` below 1 dims it and melts the pulses into one soft swell (the Flashes setting, round 47). */
+export function flicker(t: number, flashes = 1): number {
+  if (t < 0 || t >= LIGHTNING.flash || flashes <= 0) return 0;
   const pulse = t < 0.06 ? 1 : t < 0.12 ? 0.2 : t < 0.2 ? 0.75 : t < 0.27 ? 0.15 : 0.45;
-  return pulse * (1 - t / LIGHTNING.flash);
+  const swell = 0.55 * Math.sin(Math.PI * Math.min(1, t / LIGHTNING.flash)) ** 2;
+  const k = Math.min(1, flashes);
+  return (swell + (pulse - swell) * k * k) * k * (1 - t / LIGHTNING.flash);
 }
 
 export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain: number) => void): Lightning {
@@ -43,7 +46,7 @@ export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain:
         thunder(rumble.gain);
         rumble = null;
       }
-      const f = hidden ? 0 : flicker(time - struck) * strength;
+      const f = hidden ? 0 : flicker(time - struck, FEEL.flashes) * strength;
       flash.value = 0.085 * LIGHTNING.sky * f; // what the sky's haze took of it before the realms had their own skies (round 32)
       if (f <= 0) return;
       worldUniforms.uLightColor.value.addScalar(LIGHTNING.light * f);

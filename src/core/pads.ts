@@ -142,12 +142,16 @@ export function activePad(): PadReading | null {
     if (stdWeb !== stdNative) best = stdWeb ? webUsed : nativeUsed; // a pad the browser lists in its own raw order (not 'standard') and the shell reads in the standard one: the standard one, or A and B are the wrong buttons (round 39)
   }
   source = best ? (best === nativeUsed ? 'shell' : 'browser') : null;
+  if (best) inHand = best.reading.id;
   const heard = Math.max(web.heard, native.heard); // (the same pad may be in both lists)
   report = best ? `${best.reading.id}${best.reading.mapping === 'standard' ? '' : ' (not a standard layout: some buttons may differ)'}` : heard ? `${heard} controller${heard > 1 ? 's' : ''} found: press a button on the one to use` : '';
   return best ? { ...best.reading, buttons: faceSwapped(best.reading.buttons) as PadReading['buttons'] } : null; // (A and B exchanged when the player's switch is on: core/padMap.ts)
 }
 
 let resync = false;
+let inHand = '';
+/** The id of the pad last in hand ('' before any): whose buttons the prompts name (ui/glyphs.ts, core/padFamily.ts). */
+export const padInHand = (): string => inHand;
 /** Buttons held now are not heard by the game until they are let go (a menu closed by the pad's B, or chosen with A). */
 export const muteHeldPad = (): void => void (resync = true);
 /** Taken once by the game's input: whether it must mute the buttons held now. */

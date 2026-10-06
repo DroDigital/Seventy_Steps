@@ -22,7 +22,7 @@ export interface Pips {
 
 /** A row of `shape` pips after a small `label`; `after` is a text that follows them. */
 export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'round', fill: string): Pips & { after: HTMLSpanElement } {
-  const row = el('display:flex;align-items:center;gap:6px;height:11px;margin-top:3px;font-size:9px;letter-spacing:2px', '', parent);
+  const row = el('display:flex;align-items:center;gap:6px;height:11px;margin-top:3px;font-size:10px;letter-spacing:2px', '', parent);
   el('opacity:.5;width:62px', label, row);
   const holder = el('display:flex;gap:4px;align-items:center', '', row);
   const after = document.createElement('span');

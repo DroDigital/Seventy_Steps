@@ -8,6 +8,8 @@
 import { t } from '../core/i18n';
 import { keyLayout, keyName } from '../core/bindings';
 import { deviceInUse } from '../core/device';
+import { padFamily, type PadFamily } from '../core/padFamily';
+import { padInHand } from '../core/pads';
 
 export type Act = 'move' | 'look' | 'light' | 'heavy' | 'block' | 'parry' | 'dodge' | 'shoot' | 'reload' | 'lock' | 'heal' | 'item' | 'throw' | 'interact' | 'map' | 'journal' | 'pause' | 'back';
 
@@ -30,6 +32,12 @@ const PAD: Readonly<Record<Act, string>> = {
   journal: 'Menu', // the pad has no button to spare: the pause menu holds it
   pause: 'Menu',
   back: 'B',
+};
+
+/** The same buttons as Sony and Nintendo print them (round 47): the standard layout numbers them by place, so the act stays on the same button. */
+const FAMILY: Readonly<Record<Exclude<PadFamily, 'xbox'>, Partial<Record<Act, string>>>> = {
+  playstation: { light: 'R1', heavy: 'R2', block: 'L1', parry: 'L2', dodge: '○', shoot: '□', heal: '△', interact: '✕', map: 'Create', journal: 'Options', pause: 'Options', back: '○' },
+  nintendo: { light: 'R', heavy: 'ZR', block: 'L', parry: 'ZL', dodge: 'A', shoot: 'Y', heal: 'X', interact: 'B', map: '−', journal: '+', pause: '+', back: 'A' },
 };
 
 /** What the keyboard and mouse call an act. */
@@ -57,7 +65,11 @@ function keysName(act: Act): string {
 }
 
 /** The name of the button for `act` on the device in hand. */
-const padName = (act: Act): string => (act === 'move' ? t('pad.moveStick') : act === 'look' ? t('pad.lookStick') : PAD[act]);
+export function padName(act: Act, family: PadFamily = padFamily(padInHand())): string {
+  if (act === 'move') return t('pad.moveStick');
+  if (act === 'look') return t('pad.lookStick');
+  return (family !== 'xbox' && FAMILY[family][act]) || PAD[act];
+}
 export const glyph = (act: Act): string => (deviceInUse() === 'pad' ? padName(act) : keysName(act));
 
 /** `text` with each `{act}` replaced by its button's name (in capitals for a line in capitals). */

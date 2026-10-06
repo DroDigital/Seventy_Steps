@@ -25,12 +25,14 @@ import { equip, stonesOfSlain } from './arms';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { setSanity } from './sanity';
 import { spawnDrop } from './spawn';
+import { carryForward, GAME_VERSION, newerSave, SAVE_VERSION } from './saveVersion';
 
 export const SAVE_KEY = 'lovecraft-souls-like/save';
-const VERSION = 2; // 2: the world doubled in size (playtest round 1), so a version 1 position means nothing now
+const VERSION = SAVE_VERSION; // 2: the world doubled in size (playtest round 1), so a version 1 position means nothing now; older and newer: saveVersion.ts
 
 export interface SaveData {
   version: typeof VERSION;
+  made?: string; // the game's version that wrote it (round 47)
   at: Place;
   sign: string;
   discovered: string[];
@@ -88,6 +90,7 @@ export function snapshot(g: Game): SaveData {
   const [drop] = g.ecs.query('drop');
   return {
     version: VERSION,
+    made: GAME_VERSION,
     at: { x: tr.pos.x, z: tr.pos.z, yaw: tr.yaw },
     sign: ow.sign,
     discovered: [...ow.discovered],
@@ -140,7 +143,7 @@ export function parseSave(json: string | null): SaveData | null {
   if (!json) return null;
   let o: unknown;
   try {
-    o = JSON.parse(json);
+    o = carryForward(JSON.parse(json));
   } catch {
     return null;
   }
@@ -273,7 +276,7 @@ export function loadSave(store: SaveStore, slot = active): SaveData | null {
   const key = slotKey(slot);
   const raw = store.getItem(key);
   const own = parseSave(raw);
-  if (own || raw === null) return own;
+  if (own || raw === null || newerSave(raw)) return own; // a newer build's save is not this one's to mend
   const backup = store.getItem(backupKey(key)); // it exists and does not read: the one before it stands in, and is made the save
   const spare = parseSave(backup);
   if (spare && backup) {

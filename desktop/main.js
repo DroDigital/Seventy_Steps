@@ -90,6 +90,7 @@ function open() {
       sandbox: true,
       nodeIntegration: false,
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
+      additionalArguments: process.env.SteamDeck === '1' ? ['--steam-deck'] : [], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text
     },
   });
   win.once('ready-to-show', () => {

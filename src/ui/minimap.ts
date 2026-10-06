@@ -35,7 +35,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
   const clock = el(`position:absolute;left:14px;right:14px;bottom:-34px;height:12px`, '', frame);
   el(`position:absolute;left:0;right:0;top:5px;height:1px;background:linear-gradient(90deg,${BONE}55,${BONE}33 70%,#9a9aa866)`, '', clock);
   const moon = el(`position:absolute;top:1px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#e9e3cf;box-shadow:inset -3px -1px 0 0 #0b0a0e,0 0 5px #e9e3cf55;opacity:.85`, '', clock);
-  const hour = el(`position:absolute;left:0;right:0;top:12px;text-align:center;font-size:8px;letter-spacing:3px;opacity:.5`, '', frame);
+  const hour = el(`position:absolute;left:0;right:0;top:12px;text-align:center;font-size:10px;letter-spacing:2px;opacity:.6`, '', frame);
   hour.style.top = `${SIZE + 37}px`;
   const ctx = canvas.getContext('2d')!;
   let tick = 0;

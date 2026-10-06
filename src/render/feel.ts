@@ -7,7 +7,8 @@
 
 import { HURT } from '../data/tuning';
 
-export const FEEL = { shake: 1 };
+/** Round 47: `flashes`, the Flashes setting: how bright lightning strikes; below 1 its three quick pulses also melt into one swell (no strobe). */
+export const FEEL = { shake: 1, flashes: 1 };
 
 /** How near death `share` of full health is: 0 at HURT.low and above (and once fallen), 1 with none to spare. */
 export const nearDeath = (share: number): number => (share <= 0 || share >= HURT.low ? 0 : 1 - share / HURT.low);

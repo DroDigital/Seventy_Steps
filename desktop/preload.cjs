@@ -13,6 +13,7 @@ ipcRenderer.on('desktop:pads', (_e, list) => take(list));
 void ipcRenderer.invoke('desktop:pads-get').then(take, () => undefined);
 
 contextBridge.exposeInMainWorld('desktop', {
+  deck: process.argv.includes('--steam-deck'), // running on a Steam Deck (round 47)
   pads: () => pads, // as navigator.getGamepads() lists them, for the page to read when the browser lists none (core/pads.ts)
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),

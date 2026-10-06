@@ -28,7 +28,7 @@ describe('save slots (round 12)', () => {
     expect(recallSlot(store)).toBe(2);
     expect(activeSlot()).toBe(2);
     expect(loadSave(store)!.echoes).toBe(111);
-    expect(slotLine(store, 2)).toMatch(/level 1/);
+    expect(slotLine(store, 2)?.line).toMatch(/level 1/);
     expect(slotLine(store, 3)).toBeNull();
     clearSave(store);
     expect(loadSave(store)).toBeNull();
