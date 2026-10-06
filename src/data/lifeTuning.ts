@@ -19,6 +19,8 @@ export const AI = {
   lookEvery: [3, 7] as const, // an idle creature that keeps its post looks about every so often
   amble: 0.35, // share of its pace a foe on its rounds walks at (round 18: roam.ts; how far, its archetype's `roam`)...
   linger: [3, 9] as const, // ...and seconds it lingers, looking about, before it moves on
+  rangedGap: 130, // frames a creature rests after a ranged blow before its next blow of any kind (round 45: a skirmisher fired as fast as it swung)
+  volleyGap: 30, // frames between one foe's ranged blow ending and another's beginning at the investigator, and never two at once: a pack shoots in turn
   tokens: 2, // hunters closing in to strike the investigator at once; the rest keep off, circling, waiting their turn
   wait: 4.5, // how far the waiting ones keep (at least this far beyond their reach)
   space: 1.1, // hunters keep this far apart (beyond their bodies)

@@ -15,6 +15,7 @@ import { distXZ, yawOf, type XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { BrainDef } from '../data/archetypes';
 import { AI, BOSS, SIM } from '../data/tuning';
+import { ATTACKS } from '../data/attacks';
 import { moveDef, startMove } from './actions';
 import { evade, holdInside, rimGap } from './bossArena';
 import { isAbsent, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
@@ -115,6 +116,14 @@ function unstick(g: Game, br: Brain, tr: Transform, m: Mover): void {
 }
 
 /** One step of the hunt for `target` (the creature is free: no move under way). */
+/** When the last ranged blow at the investigator by a foe not in an arena is over (the next may begin a breath after): they shoot in turn, never two at once (round 45). */
+const volleyFree = new WeakMap<Game, number>();
+const isRanged = (attack: string): boolean => ATTACKS[attack as keyof typeof ATTACKS]?.kind === 'ranged';
+function volleyBusy(g: Game, id: Entity): boolean {
+  for (const [o, a] of g.ecs.c.actor) if (o !== id && a.move !== null && isRanged(a.move) && g.ecs.c.brain.get(o)?.target === g.player.id && !g.ecs.c.fight.has(o)) return true;
+  return g.frame < (volleyFree.get(g) ?? 0);
+}
+
 export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, arena: ArenaCircle | undefined): void {
   const c = g.ecs.c;
   const p = br.def.params;
@@ -128,18 +137,25 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
   const waiting = !arena && target === g.player.id && !br.token && p.mobile && p.range[1] <= AI.wait;
   const [lo, hi] = p.cooldown;
   const ready = br.cooldown === 0 || (!arena && target === g.player.id && br.cooldown <= hi * (1 - AI.punish) && opening(g));
-  let dart = false;
+  let [dart, held] = [false, false];
   if (ready && !(waiting && d > p.range[1] + 1)) { // one waiting its turn strikes only what comes to it
-    const attack = chooseAttack(br.def, d, g.rng, p.mobile);
+    let attack = chooseAttack(br.def, d, g.rng, p.mobile);
+    const shooting = attack !== null && isRanged(attack) && !arena && target === g.player.id;
+    if (shooting && (br.cooldown > 0 || volleyBusy(g, id))) [attack, held] = [null, true]; // a ranged blow is never struck into an opening, and waits its turn behind another's
     if (attack) {
       startMove(c.actor.get(id)!, attack);
       br.cooldown = lo + Math.floor(g.rng() * (hi - lo + 1));
+      if (shooting) {
+        br.cooldown = Math.max(br.cooldown, AI.rangedGap);
+        const a = ATTACKS[attack as keyof typeof ATTACKS];
+        volleyFree.set(g, g.frame + a.windup + a.active + a.recovery + AI.volleyGap);
+      }
       if (!arena && p.strafe >= 0.8) br.fallBack = Math.round(AI.fallBack * SIM.hz);
       return;
     }
     // Ready, and its blows reach only nearer than it keeps: it darts in to strike (round 19: a skirmisher
     // whose blows all fell short of the ring it holds, the Innsmouth hybrid or Brown Jenkin, never struck).
-    dart = !waiting && !fleeing && reachesNearer(br.def, d);
+    dart = !waiting && !held && !fleeing && reachesNearer(br.def, d);
   }
   if (!p.mobile) return;
   if (arena) {

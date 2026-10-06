@@ -75,28 +75,19 @@ export const mist: Skin = {
         const [sw, sh] = [size.w, size.h];
         const [cx, cy] = [w / 2, h / 2];
         g.globalAlpha = smooth(0, 0.6, open);
-        feathered(g, (w - sw) / 2 + 4, (h - sh) / 2 + 4, (w + sw) / 2 - 4, (h + sh) / 2 - 4, FEATHER, '8,7,12', 0.7 - stir * 0.12); // the ground, with no edge to it
+        feathered(g, (w - sw) / 2 + 4, (h - sh) / 2 + 4, (w + sw) / 2 - 4, (h + sh) / 2 - 4, FEATHER, '8,7,12', 0.7); // the ground, with no edge to it
         g.globalAlpha = roll;
         for (const b of banks) { // the mist, turning (a surge when a page changes: it stirs, closer and brighter)
           const a = b.a + ms * b.spin + stir * 0.35;
           const out = lerp(1.9, b.ring - stir * 0.12, roll); // it comes from far off
           const [x, y] = [cx + Math.cos(a) * (sw / 2) * out + Math.sin(ms * 0.0006 + b.sway) * 10, cy + Math.sin(a) * (sh / 2) * out + Math.cos(ms * 0.0005 + b.sway) * 8];
-          const al = b.al * (1 + stir * 1.6);
+          const al = b.al * (1 + stir * 0.12); // (a page changing stirs the mist, which turns and draws in a little: it does not swell or brighten, round 45)
           const grd = g.createRadialGradient(x, y, 0, x, y, b.rad);
           grd.addColorStop(0, `rgba(132,114,166,${al})`);
           grd.addColorStop(0.5, `rgba(92,84,118,${al * 0.45})`);
           grd.addColorStop(1, 'rgba(60,56,80,0)');
           g.fillStyle = grd;
           g.fillRect(x - b.rad, y - b.rad, b.rad * 2, b.rad * 2);
-        }
-        if (stir > 0.01) { // a page changing (the intro's cards): the mist gathers over where the words were, so the middle is never bare
-          const r = Math.max(sw, sh) * 0.55;
-          const grd = g.createRadialGradient(cx, cy, 0, cx, cy, r);
-          grd.addColorStop(0, `rgba(120,104,152,${stir * 0.22})`);
-          grd.addColorStop(0.6, `rgba(88,80,114,${stir * 0.1})`);
-          grd.addColorStop(1, 'rgba(60,56,80,0)');
-          g.fillStyle = grd;
-          g.fillRect(cx - r, cy - r, r * 2, r * 2);
         }
         g.globalAlpha = 1;
         g.globalCompositeOperation = 'destination-in';

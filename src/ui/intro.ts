@@ -55,7 +55,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     voice?.stop();
     const ms = skipped ? CLOSE / 2 : CLOSE;
     screen.root.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: 'ease-in-out', fill: 'forwards' }).finished.catch(() => undefined).then(() => {
-      screen.close();
+      screen.close(true);
       muteMenus(false);
       screen.root.getAnimations().forEach((a) => a.cancel());
       done();

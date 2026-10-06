@@ -43,7 +43,8 @@ vec3 bloomAt(vec2 uv) {
     float a = float(i) * 0.5236 + (i >= 6 ? 0.26 : 0.0);
     vec2 o = vec2(cos(a), sin(a)) * px * (i < 6 ? 0.5 : 1.0);
     vec3 c = texture(tScene, uv + o).rgb;
-    sum += c * smoothstep(uBloom.y, uBloom.y + uBloom.z, dot(c, vec3(0.2126, 0.7152, 0.0722)));
+    float open = step(texture(tDepth, uv + o).x, 0.99999); // the open sky spills nothing: a star's two rings of taps drew a ring of dots about every star (round 45)
+    sum += c * open * smoothstep(uBloom.y, uBloom.y + uBloom.z, dot(c, vec3(0.2126, 0.7152, 0.0722)));
   }
   return sum / 12.0 * uBloom.x;
 }

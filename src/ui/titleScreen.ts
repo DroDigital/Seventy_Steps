@@ -61,7 +61,7 @@ export function showTitle(o: TitleOptions): void {
   const begin = (fresh: boolean, difficulty?: DifficultyId): void => {
     if (begun) return;
     begun = true;
-    o.start(fresh, () => screen.close(), difficulty);
+    o.start(fresh, () => screen.close(true), difficulty);
   };
   let first = true; // the lines under the name come up once the lighting is done, the first time the menu is drawn
   const riseLines = (): void => headLines.forEach((l, k) => l.animate([{ opacity: 0 }, { opacity: l.style.opacity }], { duration: 1600, delay: 2600 + 500 * k, fill: 'backwards', easing: 'ease-out' }));

@@ -31,6 +31,7 @@ export const SKIN: Skin = mist;
 
 export const BASE = 'translate(-50%,-50%)'; // the panel's resting transform (menuKit's panelCss)
 const FPS = 30;
+const CLOSE_MS = 800; // how long the mist takes to roll away and the words to dissolve when a screen closes (its opening, played backwards)
 const STIR_MS = 350; // how long a surge is held at its height when it is not told to hold longer
 const STIR_RISE = 0.18; // seconds (time constant) it takes to swell
 const STIR_FALL = 0.35; // and to settle
@@ -38,8 +39,10 @@ const STIR_FALL = 0.35; // and to settle
 export interface Attached {
   /** The screen opens: the skin plays its opening. */
   open(): void;
-  /** The screen closes. */
+  /** The screen closes at once. */
   close(): void;
+  /** The screen closes the way it opened, backwards: the words blur away and the mist rolls off; `done` when it has. Opening it again cancels. */
+  fade(done: () => void): void;
   /** A page changes: the art swells and settles (held at its height for `holdMs` first, for a change that takes longer: the intro's cards). */
   stir(holdMs?: number): void;
   /** The panel's size or contents changed. */
@@ -65,12 +68,13 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
   let [t0, timer, still, stirUntil] = [0, 0, -1, -1e9];
   let [stirLevel, stirAt] = [0, 0]; // how far it has swelled, eased toward its goal each frame: a surge that began in a step moved every bank of mist at once
   let ratio = 1;
+  let [closeAt, closed] = [-1, null as (() => void) | null]; // when the closing fade began, and what is done at its end
 
   const elapsed = (): number => (still >= 0 ? still : performance.now() - t0);
   const frame = (): void => {
     if (!art) return;
     const ms = elapsed();
-    const open = Math.min(1, ms / skin.openMs);
+    const open = closeAt >= 0 ? 1 - Math.min(1, Math.max(0, (performance.now() - closeAt) / CLOSE_MS)) : Math.min(1, ms / skin.openMs);
     ctx.setTransform(ratio, 0, 0, ratio, skin.bleed * ratio, skin.bleed * ratio);
     ctx.clearRect(-skin.bleed, -skin.bleed, canvas.width / ratio, canvas.height / ratio);
     const now = performance.now();
@@ -81,6 +85,12 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     const stir = stirLevel * stirLevel * (3 - 2 * stirLevel); // smoothstep: no kink at either end
     art.draw(ctx, ms, open, stir);
     art.words(panel, open, BASE);
+    if (closeAt >= 0 && open <= 0) {
+      const end = closed;
+      [closeAt, closed] = [-1, null];
+      clearTimeout(timer);
+      end?.();
+    }
   };
   const loop = (): void => {
     frame();
@@ -102,12 +112,17 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
 
   const api: Attached = {
     open() {
+      [closeAt, closed] = [-1, null];
       [t0, still] = [performance.now(), -1];
       fit();
       clearTimeout(timer);
       loop();
     },
+    fade(done) {
+      [closeAt, closed] = [performance.now(), done];
+    },
     close() {
+      [closeAt, closed] = [-1, null];
       clearTimeout(timer);
       panel.style.cssText = panel.style.cssText.replace(/(?:opacity|clip-path|filter):[^;]*;?/g, '');
       panel.style.transform = BASE;
