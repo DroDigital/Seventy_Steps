@@ -25,7 +25,7 @@ export const CSS = `
 [data-menu] button.quiet:focus,[data-menu] button.quiet:hover:not(:disabled){outline:none;opacity:1;background:none}
 [data-menu] button:focus,[data-menu] button:hover:not(:disabled),[data-menu] label:focus-within,[data-menu] label:hover{outline:none;color:${BRIGHT};background:linear-gradient(90deg,transparent,${ACCENT}26 14%,${ACCENT}0d 60%,transparent)}
 [data-menu] button:focus::before,[data-menu] button:hover:not(:disabled)::before{opacity:1;transform:rotate(45deg) scale(1);background:${ACCENT}}
-[data-menu] button.tab{display:inline-block;width:auto;margin:0 2px;padding:6px 14px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:${INK}70;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
+[data-menu] button.tab{display:inline-block;width:auto;flex:0 1 auto;white-space:nowrap;margin:0 1px;padding:6px 10px;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;color:${INK}70;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
 [data-menu] button.tab::before{display:none}
 [data-menu] button.tab.on{color:${BRIGHT};border-bottom-color:${ACCENT}}
 [data-menu] button.tab:focus,[data-menu] button.tab:hover:not(:disabled){color:${BRIGHT};background:${ACCENT}14}
@@ -138,7 +138,7 @@ export function tabs(parent: HTMLElement, names: readonly string[], open: number
     menuSound('tab');
     pick(i);
   };
-  const row = el(parent, 'div', '', `display:flex;justify-content:center;flex-wrap:wrap;margin:0 0 12px;border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
+  const row = el(parent, 'div', '', `display:flex;justify-content:center;flex-wrap:nowrap;margin:0 0 12px;border-bottom:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
   row.dataset.pin = '';
   names.forEach((n, i) => button(row, n, () => go(i)).classList.add('tab', ...(i === open ? ['on'] : [])));
   page.tab = (by) => go((open + by + names.length) % names.length);

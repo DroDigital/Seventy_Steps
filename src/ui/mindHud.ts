@@ -37,7 +37,7 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
   frame.insertBefore(chip, fill);
   fill.style.position = 'relative';
   for (const floor of SANITY.bands) el(`position:absolute;left:${floor}%;top:-2px;bottom:-2px;width:1px;background:${BONE}99`, '', frame);
-  const line = el('display:flex;justify-content:space-between;letter-spacing:2px;font-size:9px;margin-top:1px', '', vitals);
+  const line = el('display:flex;justify-content:space-between;letter-spacing:2px;font-size:10px;margin-top:1px', '', vitals);
   const band = el('', '', line);
   const laudanum = el('opacity:.7', '', line);
   let chipPct = 100;

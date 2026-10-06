@@ -5,6 +5,9 @@
  * UI scale to the page (the others are read each frame, main.ts).
  */
 
+import { applyCaptions } from './captions';
+import { DECK } from '../data/tuning';
+import { desktop } from './desktop';
 import { KEYS_KEY, keyLayout, parseKeys } from '../core/bindings';
 import { CLASS_GAIN, UI } from '../data/foleySounds';
 import { createDrones, type Drones } from '../render/audio/drones';
@@ -38,7 +41,10 @@ export function createShell(): Shell {
   const store = browserStore();
   recallSlot(store); // the save slot last used (round 12)
   const settings = loadSettings(store);
-  if (!store?.getItem(SETTINGS_KEY)) settings.language = detectLocale(navigator.languages ?? [navigator.language ?? 'en']); // a first launch: the browser's language, where there is one
+  if (!store?.getItem(SETTINGS_KEY)) {
+    settings.language = detectLocale(navigator.languages ?? [navigator.language ?? 'en']); // a first launch: the browser's language, where there is one
+    if (desktop?.deck) Object.assign(settings, DECK); // and on a Steam Deck's seven inches, larger text (round 47)
+  }
   setLocale(settings.language);
   const levels = (): { music: number; sfx: number; ambience: number } => ({ music: settings.music, sfx: settings.sfx, ambience: settings.ambience });
   const engine = createAudioEngine(settings.volume, levels());
@@ -51,6 +57,7 @@ export function createShell(): Shell {
     // No storage: the default keys.
   }
   applyUiScale(settings.uiScale);
+  applyCaptions(settings.captions, settings.captionBack > 0.5);
   setPadSwap(settings.padSwap > 0.5); // (A and B the other way round: core/padMap.ts)
   addEventListener('resize', () => applyUiScale(settings.uiScale));
   const change = (id: SettingId, v: number): void => {
@@ -63,6 +70,7 @@ export function createShell(): Shell {
     if (id === 'music' || id === 'sfx' || id === 'ambience') engine.setLevels(levels());
     if (id === 'speech') engine.setSpeech(settings.speech);
     if (id === 'uiScale') applyUiScale(settings.uiScale);
+    if (id === 'captions' || id === 'captionBack') applyCaptions(settings.captions, settings.captionBack > 0.5);
     if (id === 'padSwap') setPadSwap(settings.padSwap > 0.5);
     if (id === 'language') setLocale(settings.language);
   };

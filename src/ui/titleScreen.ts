@@ -7,6 +7,7 @@
  * stays until the veil has covered it.
  */
 
+import type { SlotLine } from './titleSlots';
 import { t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { TITLE_LINES } from '../data/intro';
@@ -23,7 +24,7 @@ import { settingsPage } from './menuPages';
 import type { SettingId, Settings } from './settings';
 
 export interface TitleOptions {
-  slots(): (string | null)[]; // each slot's line, null when empty (titleSlots.ts)
+  slots(): (SlotLine | null)[]; // each slot's line, null when empty (titleSlots.ts)
   active: number; // the slot in use
   useSlot(slot: number): void;
   settings: Settings;
@@ -92,12 +93,13 @@ export function showTitle(o: TitleOptions): void {
       first = false;
       const menu = el(p, 'div', '', 'width:260px;margin:0 auto;text-align:left');
       const lines = o.slots();
-      if (lines[o.active - 1]) {
+      const here = lines[o.active - 1];
+      if (here?.loads) {
         button(menu, t('title.continue'), () => begin(false));
-        el(menu, 'div', lines[o.active - 1]!, 'margin:-2px 0 8px 30px;font-size:12px;opacity:.5;letter-spacing:.5px'); // where that dream was left (round 38)
+        el(menu, 'div', here.line, 'margin:-2px 0 8px 30px;font-size:12px;opacity:.5;letter-spacing:.5px'); // where that dream was left (round 38)
       }
       button(menu, t('title.new'), () => screen.show(slotPage('new')));
-      if (lines.some(Boolean)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
+      if (lines.some((l) => l?.loads)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
       button(menu, t('menu.settings'), () => screen.show(placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys), '50%', false)));
       button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
       if (desktop) button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())); // the desktop shell only (playtest round 12)
@@ -131,8 +133,8 @@ export function showTitle(o: TitleOptions): void {
       const menu = el(p, 'div', '', 'width:360px;margin:0 auto;text-align:left');
       o.slots().forEach((line, k) => {
         const slot = k + 1;
-        const label = t('title.slot', { n: slot, line: line ?? t('title.empty') });
-        if (to === 'load') button(menu, label, () => into(slot, false), !!line);
+        const label = t('title.slot', { n: slot, line: line?.line ?? t('title.empty') });
+        if (to === 'load') button(menu, label, () => into(slot, false), !!line?.loads);
         else button(menu, label, () => (line ? screen.show(confirm(slot)) : screen.show(difficultyPage(slot))));
       });
       button(menu, t('title.back'), () => screen.show(main));

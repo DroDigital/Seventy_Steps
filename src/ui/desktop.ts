@@ -5,6 +5,7 @@
  */
 
 export interface Desktop {
+  deck?: boolean; // on a Steam Deck (round 47): a first launch takes larger text
   quit(): Promise<void>;
   setFullscreen(on: boolean): Promise<void>;
   isFullscreen(): Promise<boolean>;

@@ -6,6 +6,7 @@
  * Space (pad A) goes on; Esc (pad B) closes. A merchant's last line goes on to their wares (shopMenu.ts).
  */
 
+import { captionSize } from './captions';
 import { t } from '../core/i18n';
 import { wordMoments } from '../core/pace';
 import { DOCUMENTS } from '../data/documents';
@@ -93,7 +94,7 @@ export function createDialogue(g: Game): Dialogue {
       build(p) {
         el(p, 'div', name.toUpperCase(), `letter-spacing:3px;color:${BONE};${SHADOW}`);
         el(p, 'div', title, `opacity:.55;font-size:11px;margin-bottom:8px;${SHADOW}`);
-        const para = el(p, 'div', '', `font-size:16px;line-height:1.55;min-height:3.1em;${SHADOW}`);
+        const para = el(p, 'div', '', `font-size:${captionSize(16)};line-height:1.55;min-height:3.1em;background:var(--caption-bg, transparent);padding:2px 6px;margin:0 -6px;border-radius:2px;${SHADOW}`);
         const shown = said;
         spans = words(lines[i]).map((w, k) => {
           if (k) para.append(' ');

@@ -73,6 +73,9 @@ export const SETTINGS = {
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
+  captions: [0.8, 1.6, 0.1, 1], // the size of what is said aloud and shown: cutscene lines, a talk, what is overheard (round 47)
+  captionBack: [0, 1, 1, 0], // 1: a dark band behind them
+  flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   volume: [0, 1, 0.05, 0.7], // everything
@@ -99,6 +102,8 @@ export const isDifficulty = (v: unknown): v is DifficultyId => typeof v === 'str
 
 /** The UI's scale (ui/uiScale.ts): 1 at a window this tall, and never below or above these. */
 export const UI = { baseHeight: 720, least: 1, most: 2.5 };
+/** A first launch on a Steam Deck (round 47): its 1280 × 800 seven inches show the picture at 720 lines, the UI at ×1; larger text and captions. */
+export const DECK = { uiScale: 1.15, captions: 1.2 };
 
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
 export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {

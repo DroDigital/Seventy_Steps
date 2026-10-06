@@ -6,6 +6,7 @@
  * transition of the browser's own.
  */
 
+import { CAPTION_BAND, captionSize } from './captions';
 import type { Tint } from '../data/cutscenes';
 import { glyph } from './glyphs';
 import { BONE, SERIF } from './hudKit';
@@ -47,7 +48,7 @@ export function createCinemaUi(): CinemaUi {
   const veil = div('position:absolute;inset:0;background:#000;opacity:0', root);
   const bar = (edge: 'top' | 'bottom'): HTMLDivElement => div(`position:absolute;left:0;right:0;${edge}:0;height:${BAR}%;background:#000;transform:translateY(${edge === 'top' ? '-100%' : '100%'})`, root);
   const [top, bottom] = [bar('top'), bar('bottom')];
-  const caption = div(`position:absolute;left:0;right:0;bottom:${BAR / 2}%;transform:translateY(50%);text-align:center;font:italic calc(22px * var(--ui, 1))/1.5 ${SERIF};letter-spacing:.06em;color:${BONE};text-shadow:0 0 10px #000,0 0 3px #000;opacity:0;padding:0 8vw`, root);
+  const caption = div(`position:absolute;left:0;right:0;bottom:${BAR / 2}%;transform:translateY(50%);text-align:center;font:italic ${captionSize(22, true)}/1.5 ${SERIF};letter-spacing:.06em;color:${BONE};text-shadow:0 0 10px #000,0 0 3px #000;opacity:0;padding:0 8vw`, root);
   const card = div(`position:absolute;left:0;right:0;bottom:${BAR + 3}%;text-align:center;opacity:0;padding:calc(14px * var(--ui, 1)) 0;background:linear-gradient(90deg,#0000,#000b 25%,#000b 75%,#0000)`, root);
   const name = div(`font-family:${SERIF};font-size:calc(44px * var(--ui, 1));letter-spacing:.32em;color:#c9a45c;text-shadow:0 0 16px #000,0 0 4px #000;white-space:nowrap`, card);
   const line = div(`font:italic calc(16px * var(--ui, 1))/1.5 ${SERIF};letter-spacing:.12em;color:${BONE};opacity:.75;margin-top:calc(8px * var(--ui, 1));text-shadow:0 0 8px #000`, card);
@@ -92,7 +93,10 @@ export function createCinemaUi(): CinemaUi {
       else veilAnim = to(veil, [{ opacity: from }, { opacity: goal }], seconds * 1000, tint === 'clear' ? 'ease-out' : 'ease-in');
     },
     caption(text, hold) {
-      caption.textContent = text;
+      const words = document.createElement('span'); // (the band, where asked for, follows each wrapped line)
+      words.style.cssText = CAPTION_BAND;
+      words.textContent = text;
+      caption.replaceChildren(words);
       shown(caption, hold, 900);
     },
     title(words, under, hold) {

@@ -6,6 +6,7 @@
  * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts).
  */
 
+import { CAPTION_BAND } from './captions';
 import { t as tr } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { Vector3, type Camera } from 'three';
@@ -77,7 +78,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const reticle = el(`position:absolute;width:8px;height:8px;margin:-5px 0 0 -5px;border:1px solid ${BONE};transform:rotate(45deg)`, '', root);
   const notice = el('position:absolute;left:0;right:0;top:64%;text-align:center;font-size:16px;letter-spacing:4px', '', root);
   const prompt = el('position:absolute;left:0;right:0;bottom:64px;text-align:center;letter-spacing:2px;opacity:.85', '', root);
-  const heard = el('position:absolute;left:0;right:0;bottom:96px;padding:0 14%;text-align:center;font-style:italic;line-height:1.5;letter-spacing:1px;opacity:0;text-shadow:0 0 6px #000,0 0 2px #000', '', root); // what someone near says to themselves (round 34)
+  const heard = el('position:absolute;left:0;right:0;bottom:96px;padding:0 14%;text-align:center;font-style:italic;line-height:1.5;font-size:calc(var(--caption, 1) * 1em);letter-spacing:1px;opacity:0;text-shadow:0 0 6px #000,0 0 2px #000', '', root); // what someone near says to themselves (round 34)
   let heardAt = -Infinity;
   document.body.append(root);
 
@@ -132,7 +133,9 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Overheard', (e) => {
-    heard.replaceChildren(el('display:inline;font-style:normal;font-size:10px;letter-spacing:3px;color:#b9a577;margin-right:10px', e.name.toUpperCase()), `“${e.text}”`);
+    const band = el(`display:inline;${CAPTION_BAND}`); // (the band, where asked for, follows each wrapped line)
+    heard.replaceChildren(band);
+    band.append(el('display:inline;font-style:normal;font-size:.8em;letter-spacing:3px;color:#b9a577;margin-right:10px', e.name.toUpperCase()), `“${e.text}”`);
     heardAt = performance.now();
   });
 

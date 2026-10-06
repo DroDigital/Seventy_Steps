@@ -6,6 +6,7 @@
  * under the menus.
  */
 
+import { captionSize } from './captions';
 import { BONE, SERIF } from './hudKit';
 
 export type Tone = 'death' | 'victory' | 'place';
@@ -39,7 +40,7 @@ export function createBanner(): Banner {
   const sub = document.createElement('div');
   sub.style.cssText = `font-size:calc(13px * var(--ui, 1));letter-spacing:.32em;color:${BONE};opacity:.7;margin-top:calc(6px * var(--ui, 1))`;
   const said = document.createElement('div');
-  said.style.cssText = `font-size:calc(15px * var(--ui, 1));font-style:italic;color:${BONE};opacity:.8;max-width:min(720px,86vw);margin:calc(10px * var(--ui, 1)) auto 0;line-height:1.5`;
+  said.style.cssText = `font-size:${captionSize(15, true)};font-style:italic;color:${BONE};opacity:.8;max-width:min(720px,86vw);margin:calc(10px * var(--ui, 1)) auto 0;line-height:1.5`;
   root.append(words, sub, said);
   document.body.append(root);
   let anims: Animation[] = [];

@@ -1,0 +1,76 @@
+{
+ "version": 2,
+ "made": "1.0.0-rc.1",
+ "at": {
+  "x": 1377.2,
+  "z": 2252.6,
+  "yaw": -1.0000000000000009
+ },
+ "sign": "rlyeh_door",
+ "discovered": [
+  "hub_quad",
+  "arkham_streets",
+  "rlyeh_door",
+  "dream_wood"
+ ],
+ "slain": [
+  "boss:cthulhu"
+ ],
+ "read": [
+  "Necronomicon"
+ ],
+ "echoes": 4321,
+ "drop": null,
+ "hp": 160,
+ "sanity": 100,
+ "insight": 0,
+ "upgrades": {
+  "resolve": 0,
+  "draught": 0
+ },
+ "levels": {
+  "vigour": 3,
+  "endurance": 0,
+  "might": 0
+ },
+ "arms": [
+  "cane"
+ ],
+ "weapon": "cane",
+ "stones": 2,
+ "reinforced": {
+  "cane": 1,
+  "axe": 0,
+  "razor": 0,
+  "cutlass": 0,
+  "rapier": 0
+ },
+ "seen": [],
+ "laudanum": 1,
+ "reagent": 4,
+ "reagentMax": 4,
+ "oil": 0,
+ "ammo": 6,
+ "rounds": 6,
+ "gun": 0,
+ "cycle": 0,
+ "difficulty": "deep",
+ "named": 0,
+ "called": [],
+ "watched": [],
+ "candles": [],
+ "quests": {},
+ "met": [
+  "armitage"
+ ],
+ "places": [],
+ "told": [],
+ "sold": {},
+ "tally": {
+  "frames": 5,
+  "kills": 0,
+  "deaths": 7,
+  "echoes": 0
+ },
+ "wounds": {}
+}

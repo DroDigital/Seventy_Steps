@@ -30,6 +30,12 @@ player would notice, newest first. Versions before 1.0 were never released.
   blow away as ash. The vitals are a step less saturated.
 - The pad's A and B can never again be read two ways (one table of buttons, and a Swap A / B setting).
 
+**Accessibility, controllers and saves**
+- A new Accessibility tab: caption size and a dark band behind captions (cutscene lines, talks, what is overheard), Flashes (lightning dimmer, its strobe softened into one swell, or none), with Screen shake and FX intensity beside them.
+- A PlayStation or Nintendo pad has its prompts named as its buttons are printed (✕ ○ □ △, R1; B A Y X, ZR).
+- On a Steam Deck the first launch takes larger text; the smallest HUD text is a step larger everywhere.
+- Saves carry their format and the version that wrote them; a dream begun on this release candidate goes on after 1.0, and a save from a newer build is kept and named as such, never shown as empty or mended over.
+
 **Voices**
 - Morgan is spoken by the library voice Josef Hammer. The intro narrator is a voice designed for the game (a slow, grave English baritone), where a widely used library voice stood.
 
