@@ -22,6 +22,11 @@ it measures, and its numbers can be handed back as they stand. The latest findin
 - **Profile (left, right): four frames** `move_0..move_3`: contact (front foot heel down, legs widest),
   passing (the swinging leg beside the standing one, body 1 px higher), contact on the other foot,
   passing on the other foot. Bosses may have six (contact, down, passing, up, per foot).
+- **The legs swap.** The near leg (toward the viewer) is drawn lighter and whole; the far leg darker,
+  partly behind it. In `move_0` the near leg leads, in `move_2` the far leg leads and the near leg is
+  behind; under a robe the hem and the shoe that shows swap with them. `move_2` and `move_3` are
+  never copies of `move_0` and `move_1`, or one leg stays behind all cycle (the checker's
+  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so watch the walk too).
 - **Front and back:** two frames still pass; four are better.
 - **Drawn from `idle_0`:** the same posture, proportions, palette and size. Height within 3 px
   (or 8%) of the idle; the two halves of a stride within 15% of each other in area.

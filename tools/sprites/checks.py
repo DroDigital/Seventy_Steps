@@ -12,6 +12,7 @@ LIMITS = dict(
     pair_area=0.15,       # the two halves of a stride drawn the same size, within this share
     leg_motion=0.12,      # the legs' band must change by at least this share between strides
     torso_px=3,           # the upper body steady across the cycle, within this many pixels
+    leg_swap=0.10,        # move_2 and move_0 (and 3 and 1) must differ in the legs by at least this share
     alpha=40,
 )
 SIDES = ('left', 'right')
@@ -95,6 +96,28 @@ def check_direction(pack, item, direction, notes):
             out.append(_f(item, direction, 'torso-drift',
                           f'the upper body shifts {max(xs) - min(xs):.1f} px across the walk: it jitters',
                           fix='centre', px=round(max(xs) - min(xs), 1)))
+    if not glide and len(move) >= 4:
+        out += _same_leg(pack, item, direction, move)
+    return out
+
+
+def _same_leg(pack, item, direction, move):
+    """The second half of a four-frame walk must lead with the other leg: move_2 is the mirror of
+    move_0's stride, not a copy of it. A copy keeps the same leg in front for ever, which is the walk
+    that reads as one leg dragging behind."""
+    out = []
+    for a, b in ((0, 2), (1, 3)):
+        A, B = pack.image(move[a][1]).astype(int), pack.image(move[b][1]).astype(int)
+        ma, mb = A[..., 3] > LIMITS['alpha'], B[..., 3] > LIMITS['alpha']
+        s = shape(ma | mb)
+        y0, y1 = s['legs']
+        union = (ma | mb)[y0:y1]
+        differ = ((ma ^ mb) | (np.abs(A[..., :3] - B[..., :3]).sum(-1) > 40))[y0:y1] & union
+        share = differ.sum() / max(1, union.sum())
+        if share < LIMITS['leg_swap']:
+            out.append(_f(item, direction, 'same-leg',
+                          f'{move[b][0]} repeats {move[a][0]} in the legs ({share:.0%} different): the same leg '
+                          f'stays in front all cycle; in {move[b][0]} the other leg must lead', share=round(float(share), 2)))
     return out
 
 
