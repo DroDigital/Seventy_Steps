@@ -14,12 +14,17 @@ export function createOverworld(sign: string): Overworld {
   return { sign, discovered: new Set([sign]), slain: new Set(), killed: new Set(), wounds: new Map(), read: new Set(), named: 0, called: new Set(), watched: new Set(), candles: new Set(), ending: null, alive: new Map(), region: null, chunk: -1, dirty: true, explored: new Map(), lookedFrom: -1, quests: new Map(), met: new Set(), sold: new Map(), tally: newTally(), said: new Set(), heardAt: -Infinity, places: new Set(), told: new Set(), weather: newWeather() };
 }
 
-/** Foes killed since the last rest come back (population.ts respawns them), and every foe is whole again. */
+/** Foes killed since the last rest come back (population.ts respawns them), and every foe is whole again and at its post. */
 export function reopen(g: Game): void {
   const ow = g.overworld;
   if (!ow) return;
   ow.killed.clear();
   ow.wounds.clear();
+  for (const [id, e] of ow.alive) { // the foes standing are let go and the nearest posts filled afresh: with the 60 alive, those that had stood in the killed ones' stead kept them from coming back
+    if (isUnique(id) || id.startsWith('ally:')) continue;
+    ow.alive.delete(id);
+    g.ecs.despawn(e);
+  }
   ow.dirty = true;
 }
 

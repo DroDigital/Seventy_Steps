@@ -17,7 +17,7 @@ import type { Road } from './roads';
 import { DIRS, rectDistance, regionRect } from './worldMap';
 import { MOUND_BAND } from './dungeonParts';
 
-const SAFE = 30; // metres of peace around every Elder Sign and gate
+const SAFE = WORLD.signClear; // metres of peace around every Elder Sign and gate
 const PATROL = 95; // metres of road between patrols
 const MARGIN = 0.8; // metres a foe keeps from a prop's collider
 

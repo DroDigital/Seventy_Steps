@@ -236,7 +236,10 @@ function build(): WorldLayout {
       bucket({ x0: layout.rect.x0 - b, z0: layout.rect.z0 - b, x1: layout.rect.x1 + b, z1: layout.rect.z1 + b }, (k) => k.pads.push(rp));
       bucket(layout.rect, (k) => k.dungeons.push(layout));
       const [caches, boxed] = [echoCaches(def), roundCaches(def)];
-      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, caches.get(r.def.id), boxed.get(r.def.id)));
+      const [signs0, posts] = [w.signs.length, [] as SpawnPoint[]];
+      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, (s) => posts.push(s), caches.get(r.def.id), boxed.get(r.def.id)));
+      const rests = w.signs.slice(signs0).map((s) => s.rest); // the foes that return on a rest keep clear of this dungeon's Elder Signs (WORLD.signClear)
+      for (const s of posts) if (s.unique || s.id.startsWith('ally:') || rests.every((p) => Math.hypot(p.x - s.at.x, p.z - s.at.z) >= WORLD.signClear)) spawn(s);
       for (const d of decor) propCollide(d, collide);
       const first = layout.rooms[0];
       const on = first && layout.rooms.find((r) => r.def.from === first.def.id); // the way on: a sealed entrance's own axis faced its back wall (round 12)

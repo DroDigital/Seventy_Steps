@@ -266,6 +266,7 @@ export const WORLD = {
   faceWeight: 2, // E takes what the investigator faces: a thing straight behind them seems (1 + this) times as far
   gateArrive: 7.2, // those coming through a gate stand this far out from it: the camera behind them clears it, and its E is out of reach
   restFoes: 18, // no resting while a foe hunts the investigator within this distance
+  signClear: 30, // no foe that returns on a rest has its post nearer an Elder Sign than this (else a rest and a kill would farm Echoes)
   saveSeconds: 20, // autosave interval (also on rest, travel, death and leaving the page)
 };
 

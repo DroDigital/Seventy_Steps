@@ -69,16 +69,23 @@ export function opening(g: Game): boolean {
 export function assignTokens(g: Game): void {
   const c = g.ecs.c;
   const pp = c.transform.get(g.player.id)?.pos;
-  const hunters: { br: Brain; key: number }[] = [];
+  const hunters: { br: Brain; key: number; servant: boolean }[] = [];
   for (const [id, br] of c.brain) {
     const held = br.token === true;
     br.token = false;
     const p = br.def.params;
     if (!pp || br.state !== 'engage' || br.target !== g.player.id || c.fight.has(id) || !p.mobile || p.range[1] > AI.wait || isAbsent(g, id)) continue;
-    hunters.push({ br, key: distXZ(c.transform.get(id)!.pos, pp) - (held ? 1.5 : 0) });
+    hunters.push({ br, key: distXZ(c.transform.get(id)!.pos, pp) - (held ? 1.5 : 0), servant: c.minion.has(id) });
   }
   hunters.sort((a, b) => a.key - b.key);
-  for (const h of hunters.slice(0, AI.tokens)) h.br.token = true;
+  let servants = 0; // a boss's summons share one place between them (round 46)
+  let given = 0;
+  for (const h of hunters) {
+    if (given >= AI.tokens) break;
+    if (h.servant && servants++ >= 1) continue;
+    h.br.token = true;
+    given++;
+  }
 }
 
 /** Hunters keep a little room between them: a push away from any too near. */
@@ -135,7 +142,8 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
   const fleeing = h.hp < h.max * p.flee;
   if (evade(g, id, br)) return;
   const waiting = !arena && target === g.player.id && !br.token && p.mobile && p.range[1] <= AI.wait;
-  const [lo, hi] = p.cooldown;
+  const servant = c.minion.has(id);
+  const [lo, hi] = servant ? [Math.max(p.cooldown[0] * 1.4, BOSS.servantGap[0]), Math.max(p.cooldown[1] * 1.4, BOSS.servantGap[1])] : arena ? [Math.max(p.cooldown[0], BOSS.gap[0]), Math.max(p.cooldown[1], BOSS.gap[1])] : p.cooldown; // (round 46)
   const ready = br.cooldown === 0 || (!arena && target === g.player.id && br.cooldown <= hi * (1 - AI.punish) && opening(g));
   let [dart, held] = [false, false];
   if (ready && !(waiting && d > p.range[1] + 1)) { // one waiting its turn strikes only what comes to it

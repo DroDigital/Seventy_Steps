@@ -85,7 +85,9 @@ export function summon(g: Game, by: Entity, what: string, near?: XZ, cap: number
 
 function summonOne(g: Game, id: Entity): void {
   const list = summonsOf(g, id);
-  if (list.length) summon(g, id, list[Math.floor(g.rng() * list.length)]);
+  const sig = g.ecs.c.fight.get(id)?.sig;
+  if (!list.length || (sig && g.frame < (sig.calledAt ?? -Infinity) + BOSS.summonEvery)) return;
+  if (summon(g, id, list[Math.floor(g.rng() * list.length)]) && sig) sig.calledAt = g.frame;
 }
 
 /** One frame of a gaze: the buildup grows while the investigator is in range and sight; full, the mind reels. */
