@@ -56,7 +56,7 @@ python3 tools/sprite_review.py sheets <dir> <out> [key,key]  # contact sheets, f
 python3 tools/sprite_review.py fix <dir> <out>               # the mends that need no drawing, on a copy
 ```
 
-- `audit --strict` exits 1 while anything remains that `fix` cannot mend: the gate for a delivery.
+- `audit --strict` exits 1 while anything remains that `fix` cannot mend (a glider left on two keys for the engine to move is not counted): the gate for a delivery.
 - `fix` writes only the frames it changed, at their own paths, plus `fixes.json`. Copy `<out>/sprites`
   over the pack's `sprites` to apply. It mirrors a set that faces the wrong way, moves feet back to the
   ground line and holds a walk's upper body steady. It does not shift frames that are due to be redrawn.

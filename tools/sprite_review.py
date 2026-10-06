@@ -7,7 +7,8 @@
   python3 tools/sprite_review.py fix <dir> <out>       the mends that need no drawing, on a copy
 
 <dir> is the pack's root: the folder holding previews/library.html (or a fetched index.html).
---strict exits 1 while any finding the tool cannot mend remains: a gate for each new delivery."""
+--strict exits 1 while any finding the tool cannot mend remains (a glider's two keys are advice, not
+a failure): a gate for each new delivery."""
 import argparse, json, os, sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -50,7 +51,8 @@ def main():
         if args.json:
             with open(args.json, 'w', encoding='utf-8') as out:
                 json.dump(found, out, indent=1)
-        open_ = [i for i in found if not (i.get('fix') and i['check'] in report.MENDED)]
+        open_ = [i for i in found if i['check'] != 'glide-frames' and
+                 not (i.get('fix') and i['check'] in report.MENDED)]
         if args.strict and open_:
             sys.exit(1)
     elif args.cmd == 'sheets':
