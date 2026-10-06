@@ -98,7 +98,7 @@ export function rest(g: Game, id: string): boolean {
   ow.sign = id;
   g.player.checkpoint = { ...s.rest };
   resetFoes(g);
-  reopen(g);
+  reopen(g, tr.pos);
   g.player.kneeling = { x: s.x, z: s.z }; // down on one knee before the stone (round 15)
   g.events.emit('Rested', { sign: id, name: s.name });
   return true;

@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getEntity } from '../src/data/registry';
 import { WORLD } from '../src/data/tuning';
-import { rest, travel } from '../src/systems/checkpoints';
+import { rest, signPlace, travel } from '../src/systems/checkpoints';
 import { createWorldGame } from '../src/systems/game';
-import { chunkContent } from '../src/world/chunks';
 import { worldLayout } from '../src/world/placements';
 import { chunkSpan } from '../src/world/streaming';
 import { chunkOf } from '../src/world/worldMap';
-import { run } from './worldHelpers';
+import { goTo, run } from './worldHelpers';
 
 describe('resting at an Elder Sign', () => {
   it('brings back every foe killed, even where the 60 alive were refilled from further off', () => {
@@ -26,7 +24,8 @@ describe('resting at an Elder Sign', () => {
         g.ecs.c.health.get(e)!.hp = 0;
         g.ecs.c.dead.set(e, true);
         ow.killed.add(id);
-        killed.push(id);
+        ow.posts.set(id, { x: t.x, z: t.z });
+        if (Math.hypot(t.x - pp.x, t.z - pp.z) >= WORLD.signClear) killed.push(id); // (those nearer stay down: the next test)
       }
       expect(killed.length).toBeGreaterThan(5);
       run(g, 10); // the dead are cleared, and the posts further off fill the count
@@ -36,16 +35,35 @@ describe('resting at an Elder Sign', () => {
     }
   });
 
-  it('no foe that returns stands within signClear of an Elder Sign (no farming Echoes by resting)', () => {
+  it('foes posted about a sign stay down when it is rested at, and come back with a rest elsewhere', () => {
+    const g = createWorldGame();
+    for (const s of worldLayout().signs) g.overworld!.discovered.add(s.id);
+    const sign = signPlace('dunwich_sentinel')!; // a sign in a dungeon, its foes about it
+    travel(g, sign.id);
+    run(g, 31);
+    const ow = g.overworld!;
     const near: string[] = [];
-    for (const s of worldLayout().signs) {
-      const [cx, cz] = [chunkOf(s.rest.x), chunkOf(s.rest.z)];
-      for (let i = -2; i <= 2; i++) for (let j = -2; j <= 2; j++) for (const w of chunkContent(cx + i, cz + j).spawns) {
-        if (w.unique || w.id.startsWith('ally:') || getEntity(w.entity)?.tier === 'ally') continue;
-        const d = Math.hypot(w.at.x - s.rest.x, w.at.z - s.rest.z);
-        if (d < WORLD.signClear) near.push(`${s.id}: ${w.entity} (${w.id}) ${d.toFixed(0)} m`);
-      }
+    for (const [id, e] of ow.alive) {
+      const t = g.ecs.c.transform.get(e)!.pos;
+      if (id.startsWith('boss:') || id.startsWith('ally:') || Math.hypot(t.x - sign.rest.x, t.z - sign.rest.z) >= WORLD.signClear) continue;
+      g.ecs.c.health.get(e)!.hp = 0;
+      g.ecs.c.dead.set(e, true);
+      ow.killed.add(id);
+      ow.posts.set(id, { x: t.x, z: t.z });
+      near.push(id);
     }
-    expect(near).toEqual([]);
+    expect(near.length).toBeGreaterThan(3);
+    run(g, 10);
+    expect(rest(g, sign.id)).toBe(true);
+    run(g, 5);
+    expect(near.filter((id) => ow.alive.has(id)), 'back at once').toEqual([]);
+    travel(g, 'hub_quad');
+    run(g, 5);
+    const far = signPlace('hub_quad')!;
+    goTo(g, far.rest.x, far.rest.z);
+    expect(rest(g, 'hub_quad')).toBe(true);
+    travel(g, sign.id);
+    run(g, 31);
+    expect(near.filter((id) => !ow.alive.has(id)), 'back after a rest elsewhere').toEqual([]);
   });
 });
