@@ -1,0 +1,194 @@
+{
+ "ancient_ones": {
+  "motion": "glide"
+ },
+ "being_from_beyond": {
+  "motion": "glide",
+  "flies": true
+ },
+ "child_of_yig": {
+  "motion": "glide"
+ },
+ "colour_out_of_space": {
+  "motion": "glide",
+  "flies": true
+ },
+ "curwen_pit_thing": {
+  "motion": "glide"
+ },
+ "daemon_pipers": {
+  "motion": "glide"
+ },
+ "deep_one": {
+  "eye": [
+   {
+    "direction": "left",
+    "check": "facing",
+    "detail": "every LEFT frame faces right (every other creature's LEFT faces left), so LEFT and the mirrored RIGHT are swapped",
+    "fix": "mirror"
+   },
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "the walk is a crouched four-limbed lope with the arms trailing behind, the idle an upright stance: the body changes shape when it starts to move; draw the walk from the idle's posture"
+   }
+  ]
+ },
+ "deep_one#eldritch": {
+  "eye": [
+   {
+    "direction": "left",
+    "check": "facing",
+    "detail": "every LEFT frame faces right (every other creature's LEFT faces left), so LEFT and the mirrored RIGHT are swapped",
+    "fix": "mirror"
+   },
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "the walk is a crouched four-limbed lope with the arms trailing behind, the idle an upright stance: the body changes shape when it starts to move; draw the walk from the idle's posture"
+   }
+  ]
+ },
+ "dhole": {
+  "motion": "glide",
+  "eye": [
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "move_0 is stretched flat, move_1 coiled: it snaps between two shapes; draw the in-betweens of one undulation (four frames)"
+   }
+  ]
+ },
+ "elder_thing": {
+  "motion": "glide"
+ },
+ "flying_polyp": {
+  "motion": "glide",
+  "flies": true
+ },
+ "flying_polyp#boss": {
+  "motion": "glide",
+  "flies": true
+ },
+ "formless_spawn": {
+  "motion": "glide"
+ },
+ "hastur": {
+  "motion": "glide"
+ },
+ "haunter_of_the_dark": {
+  "motion": "glide",
+  "flies": true
+ },
+ "high_priest": {
+  "motion": "glide"
+ },
+ "high_priest#eldritch": {
+  "motion": "glide"
+ },
+ "hybrid_mummy": {
+  "eye": [
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "move_1 turns toward the viewer (three-quarter, knee raised) while move_0 and the idle are in profile: keep the walk in profile"
+   }
+  ]
+ },
+ "joseph_curwen": {
+  "eye": [
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "move_1 is drawn in paler colours than move_0 and the idle (a lighter coat and face): it flickers; repaint it in the idle's colours"
+   },
+   {
+    "direction": "right",
+    "check": "off-model",
+    "detail": "move_1 is smaller than move_0 (21% less area): redraw it at move_0's size"
+   }
+  ]
+ },
+ "martins_beach_horror": {
+  "motion": "glide"
+ },
+ "mi_go": {
+  "motion": "glide",
+  "flies": true
+ },
+ "mi_go#eldritch": {
+  "motion": "glide",
+  "flies": true
+ },
+ "moon_bog_wraith": {
+  "motion": "glide"
+ },
+ "night_gaunt": {
+  "flies": true
+ },
+ "nug": {
+  "motion": "glide"
+ },
+ "nyarlathotep#eldritch": {
+  "motion": "glide"
+ },
+ "other_gods": {
+  "motion": "glide"
+ },
+ "rat_swarm": {
+  "motion": "glide"
+ },
+ "serpent_man#eldritch": {
+  "motion": "glide"
+ },
+ "shantak": {
+  "eye": [
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "move_0 is a low crouch with the wings down, move_1 an upright pose with the wings raised (16 px taller): two poses, not one cycle; draw a four-frame wingbeat at one height"
+   }
+  ]
+ },
+ "shoggoth": {
+  "motion": "glide"
+ },
+ "shoggoth#boss": {
+  "motion": "glide"
+ },
+ "shunned_house_entity": {
+  "motion": "glide"
+ },
+ "the_unnamable": {
+  "motion": "glide"
+ },
+ "umr_at_tawil": {
+  "motion": "glide"
+ },
+ "voice_in_the_tomb": {
+  "motion": "glide"
+ },
+ "whisperer": {
+  "motion": "glide",
+  "eye": [
+   {
+    "direction": "left",
+    "check": "off-model",
+    "detail": "he moves seated in his chair, which slides: decide whether he moves at all; if he does, the chair needs no walk but an in-engine glide"
+   }
+  ]
+ },
+ "yeb": {
+  "motion": "glide"
+ },
+ "yig": {
+  "motion": "glide"
+ },
+ "yithian": {
+  "motion": "glide"
+ },
+ "zann_window_thing": {
+  "motion": "glide",
+  "flies": true
+ }
+}
