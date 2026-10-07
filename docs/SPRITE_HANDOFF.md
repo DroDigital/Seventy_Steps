@@ -24,7 +24,16 @@ Where the work on the creature library's walks stands, for whoever picks it up n
    `previews/library.html`. The final zip holds only changed frames plus that page; the author lays it over a folder
    that already has Codex's frames.
 
-## To do: 47 sides, one generation each (about 16,000 credits)
+## Now: the author draws the sheets in ChatGPT (2026-10-07, later)
+`docs/SPRITE_PROMPTS.md` has one prompt for each of the 105 entries (sections: A the 45 without a proper side
+walk, B the 16 that have one, C the 35 without legs, D the 9 colossi), `python3 tools/sprites/prompts.py refs
+<pack> <out>` makes the reference images (front and side idle, 8x, on magenta). The author saves each sheet as
+`NNN_key.png` and shares the folder. For each: `python3 tools/sprites/fromsheet.py <sheet> <pack> <key> left`
+(for `#eldritch` and `#boss` keys use the pack's key as it stands; the file stem has `-` for `#`), then
+`python3 tools/sprite_review.py audit <pack>` and look at every walk; mirror-safe creatures' right is the
+left mirrored. The plan below (ElevenLabs, 47 sides) stands only if the author stops drawing them.
+
+## To do (if not drawn by the author): 47 sides, one generation each (about 16,000 credits)
 Left side only for the mirror-safe; both sides for those marked *own right*.
 dagon_priest, dagon_priest#eldritch, cthulhu_cultist, ghoul#eldritch, ghast, zoog, night_gaunt, moon_beast, man_of_leng,
 cat_from_saturn, wamp, gnorri, serpent_man, ym_bhi, gyaa_yothn, martense_degenerate (left only; its right is done),

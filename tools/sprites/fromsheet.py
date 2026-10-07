@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Four walk frames from a generated 2x2 sheet on flat magenta, brought to the pack's 64x64 frames.
+"""Four walk frames from a generated 2x2 sheet on flat magenta, brought to the pack's frames (64x64; the
+colossi's are 128x128: the size is the idle's).
 
   python3 fromsheet.py <sheet.png> <pack folder> <creature key> <side> [--dry-run]
 
@@ -81,14 +82,15 @@ def frames_from_sheet(sheet, idle, olds):
         sub_rgb, sub_m = sub_rgb[top:], sub_m[top:]
         oh, ow = int(round(sub_m.shape[0] * scale)), int(round(sub_m.shape[1] * scale))
         small = _snap(_mode_downscale(sub_rgb, sub_m, scale, oh, ow), pal)
-        canvas = np.zeros((64, 64, 4), np.uint8)
+        size = im.shape[0]
+        canvas = np.zeros((size, size, 4), np.uint8)
         sm = small[..., 3] > 0
         cx = np.nonzero(sm)[1].mean()
         ox = int(round(old_cx - cx))
         oy = iy1 - (oh - 1)
         for y in range(oh):
             for x in range(ow):
-                if sm[y, x] and 0 <= y + oy < 64 and 0 <= x + ox < 64:
+                if sm[y, x] and 0 <= y + oy < size and 0 <= x + ox < size:
                     canvas[y + oy, x + ox] = small[y, x]
         out.append(canvas)
     return out
@@ -104,7 +106,7 @@ def main(sheet_path, root, key, side, dry):
     m = re.search(r'(<script id="pack-data"[^>]*>)(.*?)(</script>)', html, re.S)
     data = json.loads(m.group(2))
     item = next(i for i in data['items'] if i['key'] == key)
-    fr = item['frames'][side]
+    fr = (item['frames'] if 'frames' in item else item['movement'])[side]
     load = lambda p: np.asarray(Image.open(os.path.join(root, _rel(p))).convert('RGBA'))
     olds = [load(fr[k]) for k in sorted(fr) if k.startswith('move_')]
     new = frames_from_sheet(Image.open(sheet_path), load(fr['idle_0']), olds)
