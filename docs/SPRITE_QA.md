@@ -22,6 +22,11 @@ it measures, and its numbers can be handed back as they stand. The latest findin
 - **Profile (left, right): four frames** `move_0..move_3`: contact (front foot heel down, legs widest),
   passing (the swinging leg beside the standing one, body 1 px higher), contact on the other foot,
   passing on the other foot. Bosses may have six (contact, down, passing, up, per foot).
+- **The legs swap.** The near leg (toward the viewer) is drawn lighter and whole; the far leg darker,
+  partly behind it. In `move_0` the near leg leads, in `move_2` the far leg leads and the near leg is
+  behind; under a robe the hem and the shoe that shows swap with them. `move_2` and `move_3` are
+  never copies of `move_0` and `move_1`, or one leg stays behind all cycle (the checker's
+  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so watch the walk too).
 - **Front and back:** two frames still pass; four are better.
 - **Drawn from `idle_0`:** the same posture, proportions, palette and size. Height within 3 px
   (or 8%) of the idle; the two halves of a stride within 15% of each other in area.
@@ -65,6 +70,38 @@ python3 tools/sprite_review.py fix <dir> <out>               # the mends that ne
 - What a measurement cannot see (a frame turned toward the viewer, a repainted coat) is written by eye
   in `tools/sprites/notes.json` under `eye`, with the creatures that have no stride (`motion: glide`)
   and those that fly (`flies`: not held to the ground line). The report merges both.
+
+## Four-frame walks without drawing
+
+`python3 tools/sprites/walk4.py <pack> [--dry-run]` turns the two-frame side walks of the two-legged
+creatures it can read (`WALKERS` in it) into four: the two old frames become the contacts (`move_0`,
+`move_2`) and a passing pose is made from the pixels of each, legs swung in under the hip, the trailing
+foot lifted, the near (lighter) leg over the far, the standing foot on the ground line. The arms keep
+the contact's swing. It leaves alone any side that already has a `move_2` (a walk redrawn), keeps
+what it replaces in `walk4_backup/`, and adds the frames to the gallery's list. Four-legged creatures,
+robes that hide the legs and the off-model sets still need drawing.
+
+## Walks drawn by an image model
+
+`python3 tools/sprites/fromsheet.py <sheet.png> <pack> <key> <side> [--mirror-right] [--dry-run]` brings a
+generated 2x2 sheet (four walk frames on flat magenta, the brief in docs/SPRITE_HANDOFF.md) to the pack's
+64x64 frames. A model keeps neither the scale nor the place of its figure from cell to cell, so each frame
+is set by its own body: the four share one scale (the tallest and the shortest stand as far above the
+idle's height as below it), each one's lowest pixel goes on the idle's ground line and its upper body (the
+audit's measure) over the idle's, and a stride that would touch the canvas edge is nudged in by as little
+as it takes. The sheet is brought to the creature's own look: its tone (the model paints lighter than the
+pixel art it is shown), then every colour to the nearest of the creature's own palette. A colour that is
+rare in the creature (under 0.4% of its pixels) is for the pixels that nearly are it, so a stray tan pixel
+cannot spread through a body; its glowing accents (eyes, claw tips: rare, bright, saturated) are kept
+where a blob of them is drawn at a height where the creature's own frames carry one, which also keeps the
+magenta fringe off a hem. `--mirror-right` writes the same frames, flipped, to the right set (for a
+symmetrical creature that lists one).
+
+`python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs key:side ...]` is the hand-over:
+one zip of `previews/library.html` (the host's injected script dropped) and every frame that differs from
+the published pack, at its own path, to lay over the author's folder. `--theirs` names the sides the
+author drew themselves (Codex's), whose frames are in the author's folder only: none are written and the
+page lists `move_2`/`move_3` for them. It refuses a page that lists a frame the pack lacks.
 
 ## When the sprites come into the game
 
