@@ -86,15 +86,6 @@
  "high_priest#eldritch": {
   "motion": "glide"
  },
- "hybrid_mummy": {
-  "eye": [
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "move_1 turns toward the viewer (three-quarter, knee raised) while move_0 and the idle are in profile: keep the walk in profile"
-   }
-  ]
- },
  "joseph_curwen": {
   "eye": [
    {
@@ -140,15 +131,6 @@
  },
  "serpent_man#eldritch": {
   "motion": "glide"
- },
- "shantak": {
-  "eye": [
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "move_0 is a low crouch with the wings down, move_1 an upright pose with the wings raised (16 px taller): two poses, not one cycle; draw a four-frame wingbeat at one height"
-   }
-  ]
  },
  "shoggoth": {
   "motion": "glide"

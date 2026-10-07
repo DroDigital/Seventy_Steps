@@ -21,6 +21,7 @@ RARE_SHARE = 0.004   # a palette colour under this share of the creature's pixel
 RARE_NEAR = 36       # and takes only the pixels within this RGB distance of it
 GLOW_SAT = 0.55      # bright (over 130) and this saturated, a colour is a glow
 GLOW_NEAR = 90       # an accent that is a glow takes pixels within this distance
+BAND = 0.15          # and only at the heights (of the figure) where the creature's own frames hold one, give or take this
 
 
 def key_cells(sheet):
@@ -52,11 +53,19 @@ def _torso_x(m):
     return np.nonzero(m[ys.min():ys.min() + max(2, int(h * 0.4))])[1].mean()
 
 
-def _mode_downscale(rgb, m, scale, out_h, out_w, accents):
+def _mode_downscale(rgb, m, scale, out_h, out_w, accents, band):
     """Each target pixel takes the commonest opaque colour of its source block (or stays clear), unless the
-    block holds some of the creature's own glowing accent colour (`accents`), which then wins."""
+    block holds some of the creature's own glowing accent colour (`accents`), which then wins. Returns the
+    picture and which pixels were taken that way. It counts when it is a blob at least three pixels thick
+    (an eye in profile sits on the very edge of the face) or well inside the figure: the thin fringe the
+    magenta ground leaves along an edge is neither. It counts only within `band`, the heights (shares of
+    the figure, from its top) where the creature's own frames carry an accent: a pink hem is no eye."""
     res = np.zeros((out_h, out_w, 4), np.uint8)
-    inner = _interior(m, 4)      # the edge of a figure drawn on magenta is blended with it: no accent there
+    glowed = np.zeros((out_h, out_w), bool)
+    ordinary = np.zeros((out_h, out_w, 3), np.uint8)    # what a glowing pixel would be, were it not
+    if len(accents):
+        near = (((rgb[:, :, None, :] - accents[None, None]) ** 2).sum(-1) <= GLOW_NEAR ** 2).any(-1) & m
+        blob = _interior(near, 1) | (near & _interior(m, 4))
     for y in range(out_h):
         y0, y1 = int(y / scale), max(int(y / scale) + 1, int((y + 1) / scale))
         for x in range(out_w):
@@ -65,20 +74,26 @@ def _mode_downscale(rgb, m, scale, out_h, out_w, accents):
             if bm.size == 0 or bm.mean() < 0.5:
                 continue
             px = rgb[y0:y1, x0:x1][bm]
-            if len(accents):                                      # an eye or a claw tip is no noise: keep it
-                hit = (((px[:, None, :] - accents[None]) ** 2).sum(-1) <= GLOW_NEAR ** 2).any(1)
-                hit &= inner[y0:y1, x0:x1][bm]
-                if hit.sum() >= 2 and hit.sum() >= 0.08 * len(px):
-                    res[y, x, :3] = px[hit].mean(0)
-                    res[y, x, 3] = 255
-                    continue
             q = (px // 8).astype(int)
             codes = q[:, 0] * 1024 + q[:, 1] * 32 + q[:, 2]
             vals, counts = np.unique(codes, return_counts=True)
             sel = px[codes == vals[counts.argmax()]].mean(0)
             res[y, x, :3] = sel
             res[y, x, 3] = 255
-    return res
+            if len(accents) and band[0] <= (y + 0.5) / out_h <= band[1] and blob[y0:y1, x0:x1][bm].sum() >= 2:
+                ordinary[y, x] = sel
+                res[y, x, :3] = px[near[y0:y1, x0:x1][bm]].mean(0)
+                glowed[y, x] = True
+    if len(accents):       # lone accent pixels on the edge of the figure are fringe, not an eye...
+        pad = np.pad(glowed, 1)
+        others = sum(pad[1 + dy:1 + dy + out_h, 1 + dx:1 + dx + out_w]
+                     for dy in (-1, 0, 1) for dx in (-1, 0, 1) if dy or dx)
+        solid = res[..., 3] > 0
+        lone = glowed & (others == 0) & solid & ~_interior(solid, 1)
+        if lone.sum() < glowed.sum() or lone.sum() > 2:   # ...unless they are all the frame has: that is its eye
+            for y, x in zip(*np.nonzero(lone)):
+                res[y, x, :3], glowed[y, x] = ordinary[y, x], False
+    return res, glowed
 
 
 def _interior(m, r):
@@ -100,17 +115,28 @@ def _glows(px):
     return (top >= 130) & (top - low >= GLOW_SAT * np.maximum(top, 1))
 
 
-def _snap(frame, palette, rare):
+def _accent_band(frames, accents):
+    """The heights, as shares of the figure from its top, at which these frames hold an accent colour,
+    widened by BAND: where an eye or a claw tip may be drawn, and nowhere else."""
+    rels = []
+    for f in frames:
+        m = f[..., 3] > ALPHA
+        ys = np.nonzero(m)[0]
+        hit = m & (f[..., :3].astype(int)[:, :, None, :] == accents[None, None]).all(-1).any(-1)
+        rels += list((np.nonzero(hit)[0] - ys.min()) / (ys.max() - ys.min() + 1))
+    return (min(rels) - BAND, max(rels) + BAND) if rels else (0.0, 1.0)
+
+
+def _snap(frame, palette, rare, glowed):
     """Every colour to the nearest of the creature's own. A rare one is for the pixels that really are that
-    colour (a glowing eye within reach of its glow, a stray dull pixel only when it is nearly it); it is no
-    fallback for a lighter or warmer shade of the body."""
+    colour: a glowing accent within reach of its glow for a pixel taken as an accent (`glowed`), any other
+    rare colour only for a pixel nearly it. It is no fallback for a lighter or warmer shade of the body."""
     m = frame[..., 3] > 0
     px = frame[m][:, :3].astype(int)
     d = ((px[:, None, :] - palette[None, :, :]) ** 2).sum(-1)
-    near = np.where(_glows(palette), GLOW_NEAR, RARE_NEAR)[rare]
-    d[:, rare] = np.where(d[:, rare] > near ** 2, 1 << 30, d[:, rare])
-    edge = ~_interior(m, 1)[m]
-    d[np.ix_(edge, np.nonzero(rare)[0])] = 1 << 30    # an accent never sits on the edge of the figure
+    pick = np.nonzero(rare)[0]
+    reach = np.where(_glows(palette)[pick][None, :] & glowed[m][:, None], GLOW_NEAR, RARE_NEAR)
+    d[:, pick] = np.where(d[:, pick] > reach ** 2, 1 << 30, d[:, pick])
     frame[m, :3] = palette[d.argmin(1)]
     return frame
 
@@ -123,24 +149,26 @@ def frames_from_sheet(sheet, idle, olds):
     pal, uses = np.unique(np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]), axis=0, return_counts=True)
     pal, rare = pal.astype(int), uses < RARE_SHARE * uses.sum()
     accents = pal[rare & _glows(pal)]        # its eyes, its claw tips: rare, bright, saturated
+    band = _accent_band([im] + olds, accents) if len(accents) else (0.0, 1.0)
     cells = key_cells(sheet)
     boxes = [_bbox(m) for _, m in cells]
-    scale = (iy1 - iy0 + 1) / max(b[1] - b[0] + 1 for b in boxes)
+    heights = [b[1] - b[0] + 1 for b in boxes]      # one scale for all four: the tallest and the shortest frame
+    scale = 2 * (iy1 - iy0 + 1) / (max(heights) + min(heights))     # stand as far above the idle as below it
     idle_x = _torso_x(im_m)
     smalls = []
     for (rgb, m), (y0, y1, x0, x1) in zip(cells, boxes):
         sub_rgb, sub_m = rgb[y0:y1 + 1, x0:x1 + 1], m[y0:y1 + 1, x0:x1 + 1]
         oh, ow = int(round(sub_m.shape[0] * scale)), int(round(sub_m.shape[1] * scale))
-        smalls.append(_mode_downscale(sub_rgb, sub_m, scale, oh, ow, accents))
+        smalls.append(_mode_downscale(sub_rgb, sub_m, scale, oh, ow, accents, band))
     # a model paints lighter than the pixel art it is shown: bring the sheet to the creature's own tone
     # (the mean luminance of its idle and old walk), the same brightness all over, so its look is kept
     own = np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]).astype(float)
-    drawn = np.concatenate([s[s[..., 3] > 0][:, :3] for s in smalls]).astype(float)
+    drawn = np.concatenate([s[s[..., 3] > 0][:, :3] for s, _ in smalls]).astype(float)
     gain = float(np.clip(_lum(own).mean() / max(1.0, _lum(drawn).mean()), 0.7, 1.3))
     out = []
-    for small in smalls:
+    for small, glowed in smalls:
         small[..., :3] = np.where(small[..., 3:4] > 0, np.clip(small[..., :3] * gain, 0, 255), 0).astype(np.uint8)
-        small = _snap(small, pal, rare)
+        small = _snap(small, pal, rare, glowed)
         ys, xs = np.nonzero(small[..., 3] > 0)
         ox = int(round(idle_x - _torso_x(small[..., 3] > 0)))
         oy = iy1 - int(ys.max())
