@@ -13,6 +13,7 @@ LIMITS = dict(
     leg_motion=0.12,      # the legs' band must change by at least this share between strides
     torso_px=3,           # the upper body steady across the cycle, within this many pixels
     leg_swap=0.10,        # move_2 and move_0 (and 3 and 1) must differ in the legs by at least this share
+    turned=0.10,          # a side frame matching its idle this much better mirrored faces the other way
     alpha=40,
 )
 SIDES = ('left', 'right')
@@ -33,6 +34,40 @@ def shape(m):
     return dict(top=y0, bottom=y1, left=int(xs.min()), right=int(xs.max()), height=h,
                 area=int(m.sum()), torso_x=float(np.nonzero(top)[1].mean()),
                 legs=(y0 + int(h * 0.65), y1 + 1))
+
+
+def _shifted(a, dx, dy):
+    """The frame moved dx right and dy down; what leaves the canvas is dropped."""
+    out = np.zeros_like(a)
+    h, w = a.shape[:2]
+    out[max(dy, 0):h + min(dy, 0), max(dx, 0):w + min(dx, 0)] = \
+        a[max(-dy, 0):h - max(dy, 0), max(-dx, 0):w - max(dx, 0)]
+    return out
+
+
+def _mismatch(a, ref, rows):
+    """How far a frame's head and upper body are from the idle's: where one is drawn and the other
+    not, and the colour where both are, as a share of what either draws."""
+    ma, mr = mask(a)[rows], mask(ref)[rows]
+    colour = np.abs(a[rows, :, :3].astype(int) - ref[rows, :, :3].astype(int)).sum(-1) / 765
+    return ((ma ^ mr).sum() + 2 * (colour * (ma & mr)).sum()) / max(1, (ma | mr).sum())
+
+
+def facing(a, ref, reach=3):
+    """Above 0 the frame faces the way its idle does, below 0 the other way: how much better its head
+    and upper body (the top 60% of the idle) match the idle's as drawn than mirrored, each set over
+    the idle by its upper body and feet, then tried a few pixels either way. Near 0 it cannot tell
+    (a blob, a figure seen from the front)."""
+    r = shape(mask(ref))
+    rows = slice(r['top'], r['top'] + max(3, int(r['height'] * 0.6)))
+
+    def best(x):
+        s = shape(mask(x))
+        dx, dy = round(r['torso_x'] - s['torso_x']), r['bottom'] - s['bottom']
+        return min(_mismatch(_shifted(x, dx + i, dy + j), ref, rows)
+                   for i in range(-reach, reach + 1) for j in range(-2, 3))
+    same, flipped = best(a), best(a[:, ::-1])
+    return (flipped - same) / max(1e-6, flipped + same)
 
 
 def _f(item, direction, check, detail, fix=None, **numbers):
@@ -62,6 +97,14 @@ def check_direction(pack, item, direction, notes):
     for name, path, s in [(idle[0][0], idle[0][1], ref)] + frames:
         if s['top'] == 0 or s['left'] == 0 or s['right'] == size[1] - 1 or s['bottom'] == size[0] - 1:
             out.append(_f(item, direction, 'edge', f'{name} touches the canvas edge', frame=name))
+    if direction in SIDES:
+        for name, path, s in frames:
+            score = facing(pack.image(path), pack.image(idle[0][1]))
+            if score < -LIMITS['turned']:
+                out.append(_f(item, direction, 'turned',
+                              f'{name} faces the other way from the idle (mirrored, its head and upper body match '
+                              f'the idle\'s better: {score:+.2f}); redraw it facing {direction}',
+                              frame=name, score=round(float(score), 2)))
     grounded = ref['bottom'] >= LIMITS['grounded_row'] and not notes.get('flies') and not glide
     for name, path, s in frames:
         drop = s['bottom'] - ref['bottom']

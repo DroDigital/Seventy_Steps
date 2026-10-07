@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Reviews a creature sprite pack's walks (docs/SPRITE_QA.md); needs `pip install pillow numpy`.
 
-  python3 tools/sprite_review.py fetch <url> <dir>     copy a published pack's page and idle/move frames
+  python3 tools/sprite_review.py fetch <url> <dir> [--all]   copy a published pack's page and idle/move
+                                                             frames (--all: every file the page lists)
   python3 tools/sprite_review.py audit <dir> [--report docs/SPRITE_REVIEW.md] [--json out.json] [--strict]
   python3 tools/sprite_review.py sheets <dir> <out> [key,key...]   contact sheets for review by eye
   python3 tools/sprite_review.py fix <dir> <out>       the mends that need no drawing, on a copy
@@ -28,6 +29,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest='cmd', required=True)
     f = sub.add_parser('fetch'); f.add_argument('url'); f.add_argument('dir')
+    f.add_argument('--all', action='store_true')
     a = sub.add_parser('audit'); a.add_argument('dir'); a.add_argument('--report'); a.add_argument('--json')
     a.add_argument('--strict', action='store_true'); a.add_argument('--source')
     s = sub.add_parser('sheets'); s.add_argument('dir'); s.add_argument('out'); s.add_argument('keys', nargs='?')
@@ -35,7 +37,7 @@ def main():
     args = ap.parse_args()
 
     if args.cmd == 'fetch':
-        packs.fetch(args.url, args.dir)
+        packs.fetch(args.url, args.dir, everything=args.all)
         return
     p, found = load(args.dir)
     if args.cmd == 'audit':
