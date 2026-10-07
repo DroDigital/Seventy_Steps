@@ -1,6 +1,7 @@
 """The 105 library entries for `prompts.py`: (key, name, gait, how it looks, an extra line or '').
-The looks were written from the sprites themselves. SECTIONS says which are still without a four-frame
-side walk (NEEDED), which already have one (HAVE), which have no legs (NO_LEGS) and the colossi."""
+The looks were written from the sprites themselves. SECTIONS: the 35 without legs and the 9 colossi (no
+move cycle yet), the 45 whose four-frame side walk was drawn with ElevenLabs (NEEDED) and the 16 that had one
+already (HAVE)."""
 
 NEEDED = [
     # robed
@@ -127,10 +128,10 @@ COLOSSI = [
 ]
 
 SECTIONS = [
-    ('A', 'Still without a four-frame side walk (do these first)', NEEDED),
-    ('B', 'Already have a four-frame side walk (only if you want it redrawn)', HAVE),
-    ('C', 'No legs: a four-frame move cycle (slither, ooze, float, wingbeat)', NO_LEGS),
-    ('D', 'The nine colossi (128x128 frames; last, and only if you want them)', COLOSSI),
+    ('A', 'No legs: a four-frame move cycle (slither, ooze, float, wingbeat); nobody has drawn these yet', NO_LEGS),
+    ('B', 'The nine colossi (128x128 frames); nobody has drawn these yet', COLOSSI),
+    ('C', 'Side walks drawn in the last session with ElevenLabs (redo only the ones you do not like)', NEEDED),
+    ('D', 'Side walks made from the v1 frames or by Codex (redo only the ones you do not like)', HAVE),
 ]
-ALL = NEEDED + HAVE + NO_LEGS + COLOSSI
+ALL = NO_LEGS + COLOSSI + NEEDED + HAVE
 RIGHT_TOO = ('keziah_mason', 'the_outsider')

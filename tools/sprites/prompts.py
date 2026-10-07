@@ -46,7 +46,7 @@ def prompt(key, side='LEFT'):
                          extra=('\n\n' + extra) if extra else '', end=END_LEGGED if legged else END_LOOP)
 
 
-COLOSSUS_KEYS = {e[0] for e in SECTIONS[3][2]}
+COLOSSUS_KEYS = {e[0] for e in SECTIONS[1][2]}
 
 
 def stems():
@@ -78,9 +78,10 @@ One prompt for each of the library's {total} entries (96 creature sets and 9 col
 flips it for the right (`keziah_mason` and `the_outsider`, which are one-sided, also have an optional
 right-hand prompt). Idle, attack, hurt, front and back are not touched.
 
-Do them in this order: **A** first (the 45 that have no proper side walk at all), then **C** (the 35 without
-legs, which get a four-frame move cycle), then **B** (the 16 that already have a four-frame walk: only if you
-are not happy with it) and **D** (the colossi).
+Where the library stands: every creature with legs now has a four-frame side walk (made in the last session
+with ElevenLabs, or from the v1 frames, or by Codex), so **A** (the 35 without legs: slither, ooze, float,
+wingbeat) and **B** (the nine colossi) are the ones nobody has drawn. **C** and **D** are there for any walk
+you are not happy with: redo only those.
 
 ## How to use it
 1. A new chat for each entry (a fresh chat keeps one creature's style from leaking into the next).

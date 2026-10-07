@@ -81,6 +81,28 @@ the contact's swing. It leaves alone any side that already has a `move_2` (a wal
 what it replaces in `walk4_backup/`, and adds the frames to the gallery's list. Four-legged creatures,
 robes that hide the legs and the off-model sets still need drawing.
 
+## Walks drawn by an image model
+
+`python3 tools/sprites/fromsheet.py <sheet.png> <pack> <key> <side> [--mirror-right] [--dry-run]` brings a
+generated 2x2 sheet (four walk frames on flat magenta, the brief in docs/SPRITE_HANDOFF.md) to the pack's
+64x64 frames. A model keeps neither the scale nor the place of its figure from cell to cell, so each frame
+is set by its own body: the four share one scale (the tallest and the shortest stand as far above the
+idle's height as below it), each one's lowest pixel goes on the idle's ground line and its upper body (the
+audit's measure) over the idle's, and a stride that would touch the canvas edge is nudged in by as little
+as it takes. The sheet is brought to the creature's own look: its tone (the model paints lighter than the
+pixel art it is shown), then every colour to the nearest of the creature's own palette. A colour that is
+rare in the creature (under 0.4% of its pixels) is for the pixels that nearly are it, so a stray tan pixel
+cannot spread through a body; its glowing accents (eyes, claw tips: rare, bright, saturated) are kept
+where a blob of them is drawn at a height where the creature's own frames carry one, which also keeps the
+magenta fringe off a hem. `--mirror-right` writes the same frames, flipped, to the right set (for a
+symmetrical creature that lists one).
+
+`python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs key:side ...]` is the hand-over:
+one zip of `previews/library.html` (the host's injected script dropped) and every frame that differs from
+the published pack, at its own path, to lay over the author's folder. `--theirs` names the sides the
+author drew themselves (Codex's), whose frames are in the author's folder only: none are written and the
+page lists `move_2`/`move_3` for them. It refuses a page that lists a frame the pack lacks.
+
 ## When the sprites come into the game
 
 The library is not in the game yet. The game's creatures are still drawn in code
