@@ -1,8 +1,11 @@
-# Sprite walks: handoff (2026-10-07)
+# Sprite walks: handoff (2026-10-07, v6)
 
-Where the work on the creature library's walks stands, for whoever picks it up next. Every side the audit asked
-to be four frames is four frames, except the ones that are not to be drawn (below); 27 of the 31 sheet-made walks
-whose two contacts were one picture now exchange their legs, and four still do not.
+Where the work on the creature library's walks stands, for whoever picks it up next. Laid over the author's folder,
+`walk_fix_v6.zip` leaves nothing the audit gates on: `sprite_review.py audit --strict` exits 0 there, and what it
+still lists are 30 gliders on two keys (advisory: the engine moves them). Codex's own measure (the flags of its
+MEASUREMENTS.csv, recomputed) leaves 28, each on a flier or a glider, which keep no ground line, or on a boss
+assembly: Dunwich's back, the Colossus, Cthulhu and Father Dagon within the brief's 8% of their idles (Codex's
+measure allows 3 px), Azathoth, Yog-Sothoth and Shub-Niggurath measured against idles whose sparkles add height.
 
 ## Done
 - Review tooling: `tools/sprite_review.py` (audit, sheets, fix) and `docs/SPRITE_QA.md` (the walk rules). The
@@ -10,82 +13,128 @@ whose two contacts were one picture now exchange their legs, and four still do n
 - `tools/sprites/walk4.py`: 4-frame side walks for 13 two-legged creatures (18 sides), made from their own pixels.
 - Codex drew 4-frame walks for the Deep One (both forms, left) and Joseph Curwen (left and right). They exist only
   in the author's folder; the gallery page lists them (`move_2`/`move_3` by the paths of their `move_0`).
-- `tools/sprites/fromsheet.py`: an image model's 2x2 sheet (four walk frames on flat magenta) to the pack's 64x64
-  frames (docs/SPRITE_QA.md says how). Used for **48 sides**; six symmetrical creatures that list a right set
-  (Terrible Old Man, Zkauba, Tsathoggua, Rhan-Tegoth, Bokrug, Nyarlathotep) have it as their left, flipped
-  (`--mirror-right`): 54 sides in all.
-- The sheets: ElevenLabs `gpt-image-2.5-sunburst` (1:1, 1K, quality medium), one generation per try: **108 in
-  all, about 36,800 credits** (340 each), kept in three ElevenLabs flows (A `xxs21sloIhwgH2eXW5QE`, B
-  `jxB0JSq3Gr6tOiofWOVf`, C `7JT6s9L2XFThTJagbisX`); a node's `content_url` is signed and lasts two hours.
-- `tools/sprites/v1fixes.py`: the v1 defects that need no drawing (the Innsmouth Hybrid's swapped sides,
-  Cthulhu's swapped views, the gallery's load error that never cleared and its "complete" banner).
-- `tools/sprites/deliver.py`: the hand-over, **`walk_fix_v5.zip`** (13 MB): `previews/library.html` (host script
-  dropped, Codex's four sides listed, v1fixes' page mends) and the 54 creature folders the new walks are in,
-  whole: 276 changed frames and the 1,459 other files the page lists in those folders, as published.
+- `tools/sprites/fromsheet.py`: an image model's 2x2 sheet (four walk frames on flat magenta) to the pack's frames,
+  a sprite's 64x64 or a colossus's movement canvas (docs/SPRITE_QA.md says how): 48 sides in v5, 74 in v6.
+- `tools/sprites/ground.py` (every grounded creature on the brief's ground line) and `tools/sprites/legswap.py` (a
+  walk's second half from its first, its legs' shades exchanged): v6, no drawing.
+- `tools/sprites/v1fixes.py`: the v1 defects that need no drawing (the Innsmouth Hybrid's swapped sides, Cthulhu's
+  swapped views, the Colossus's right drawn apart from its left, the gallery's load error and its banner).
+- `tools/sprites/deliver.py`: the hand-over, **`walk_fix_v6.zip`** (22 MB): `previews/library.html` and the 76
+  creature folders the new frames are in, whole (2,614 files; 727 new frames in 169 sides).
+- The sheets: ElevenLabs `gpt-image-2.5-sunburst` (1:1, 1K, quality medium), one generation per try, in four flows
+  (A `xxs21sloIhwgH2eXW5QE`, B `jxB0JSq3Gr6tOiofWOVf`, C `7JT6s9L2XFThTJagbisX`, D `FEJIgzgUpUevmy9m7ZVU`); a
+  node's `content_url` is signed and lasts two hours. v5: 108 generations, about 36,800 credits. v6: 135
+  generations and two image edits (`gemini-3-pro-image`, 1,827 credits each), about 49,600 credits.
 
-## The leg exchange (walk_fix_v5)
-Codex's review of the author's folder found the sheet-made walks' second contact repeating the first (the same
-leading leg, the same hem), and the countercheck found it in 31 sides. The model, asked for "the legs exchanged",
-drew the same contact again; the audit's `same-leg` check only catches copies and near-copies, so it passed them.
-- **The prompt that worked** names each leg by its colour (the near leg light, the far leg dark), says where each
-  foot goes (toward the cell's left or right edge), and asks for cell 3 as cell 1 with the colours of the legs
-  exchanged, and cell 4 as cell 2 exchanged. Four-legged creatures count their feet from the front edge (cell 1:
-  light, dark, dark, light; cell 3: dark, light, light, dark). The retries added "draw cell 3 by recolouring
-  cell 1" and "cells 2 and 4 must not be the same picture either". The text is below (Making a sheet again).
-- **Round one** (31 sides): 20 exchange their legs. A three-sheet pilot came first (Terrible Old Man, Dagon
-  Priest, Bokrug); the first two passed, Bokrug's four legs did not, and the four-legged prompt was rewritten
-  before the rest were run. **Round two** (the 11 that failed): 7 more pass (Gug, Gnoph-keh, the Outsider's
-  right, Simon Orne, Edward Hutchinson, the Yekubian, Ephraim Waite's eldritch form).
-- **Still repeating after two tries**: the Ghoul, Brown Jenkin, Rhan-Tegoth and the Wamp. They keep their v4
-  frames (one failed redraw for another would only churn the author's folder). Bokrug's hind legs exchange, its
-  forelegs only half.
-- **How it was judged**: by eye, on the contacts' lower 40% at 8x, brightened (black robes and coats hide the
-  near/far shading), beside the passing poses; a measure of which foot leads (the two lowest blobs' luminance)
-  helped, but was fooled by four-legged walks and by robes. Then the audit: no frame turned, and two new
-  advisory findings (Simon Orne and Ephraim Waite: `move_0` and `move_1` differ by 18-19% in area, contact
-  against passing, over the 15% the check allows).
-- **Checked**: the 133 files that differ from v4 are exactly the 27 sides, the 3 mirrored rights, Innsmouth's 12
-  frames and the page. Laid over a simulation of the author's folder (as v4 left it, and as v3 had damaged it),
-  merged or by replacing folders: no listed file missing, Codex's frames untouched, every new frame in place,
-  and every image the page lists loads in Chromium (Codex's stand-ins aside). The page fixes were exercised there.
+## walk_fix_v6: what it mends
+Asked to mend everything left (Codex's review and measurements, the four walks whose legs still repeated, every
+finding the strict audit gates on), v6 draws 74 sides again and mends the rest in code.
+- **Legs** (5 sides): the Ghoul, Brown Jenkin, Rhan-Tegoth and the Wamp, whose legs still repeated after v5, and
+  Bokrug, whose forelegs only half exchanged. Brown Jenkin and Bokrug passed on the first sheet. Rhan-Tegoth's
+  three sheets repeated; an image edit of one kept its top row and drew the bottom row in the other phase. The
+  Ghoul's and the Wamp's sheets drew a good contact and passing pose but repeated them, so those two cells are
+  kept (`--frames move_0,move_1,-,-`) and `legswap.py` makes the second half: the Ghoul's two legs exchange their
+  shades; the Wamp, a crawler whose legs are alike in tone, has each leg mirrored about its own hip.
+- **Area** (8): the two halves of a stride more than 15% apart in area. The left walks of the Dagon Priest
+  (eldritch), the Cthulhu Cultist, the Serpent Man, Simon Orne, Ephraim Waite (eldritch), Zkauba and Nyarlathotep,
+  and the Martense degenerate's right, drawn again with a short stride and the four cells one width.
+- **Front and back** (29): walks a measure flagged (a move frame more than 3 px off the idle's height, the two
+  frames apart in area, the legs hardly moving), now four frames each; the Night-gaunt's back is four keys of a
+  hovering wingbeat. The first sheets drew both passing poses "feet together", one picture twice, and robes whose
+  hem hardly moved; the retries lift a different foot in each passing pose and swing the hem to the stepping side.
+- **Gliders** (28): what slithers, oozes or floats and whose two move keys were out of size against the idle
+  (taller or shorter by more than 3 px, or apart in area): the Shoggoth in both forms, Being from Beyond, the
+  Flying Polyp in both forms, Formless Spawn, the Curwen Pit Thing in all four directions, the Colour, the Elder
+  Thing, the Serpent Man's eldritch form, the Shunned House entity, Nug, Yeb, and the two by-eye notes, the Dhole
+  (it snapped between two shapes) and the Whisperer's chair: four keys of one motion each. The Shoggoth boss's left
+  takes its idle from the first key (`--frames idle_0+move_0,move_1,move_2,move_3`), so idle and motion are one
+  drawing.
+- **Mother Hydra** (boss, 4): its movement on the 128-px canvas. Its left came out seen from the front, so it is
+  its right sheet with each cell mirrored where it stands (`--flip-cells`); the Elder Thing's left sheet, drawn
+  facing right, is mended the same way.
+- **In code**: every grounded creature on the ground line (`ground.py`; 33 sides needed nothing else), the
+  Colossus of the Pyramids' right as its left, flipped (v1's right was drawn apart, `move_0` squashed to 83 px
+  against the idle's 95; `v1fixes.py`).
 
-## What became of walk_fix_v3
-`walk_fix_v3.zip` held only the 270 changed frames. Laid over the author's folder by replacing each creature
-folder (Finder's "Replace") instead of merging into it, it deleted everything else in those 54 folders: the
-1,465 files the page lists that Codex's review found missing, and whatever the page does not list (a creature's
-`QA.json`; the published site does not serve those, so only the author's own copy, such as the Drive upload made
-before v3, can bring them back). v4 and v5 bring back the listed ones whichever way they are laid over. Unzip by
-merging: `ditto -x -k walk_fix_v5.zip <folder>` on a Mac, or `unzip -o walk_fix_v5.zip -d <folder>`.
+## Checked
+- The audit of the v6 pack: 41 findings, 30 of them the advisory gliders and 11 on Codex's four sides, which the
+  pack has as published (v1). Laid over a copy of the author's folder (as v5 left it, and as the site has it),
+  merged or by replacing folders, with Codex's own frames copied from the author's Drive: `audit --strict` exits
+  0, the 30 gliders alone. Codex's measure: 131 flags in v5's pack, 30 in v6's, 28 with Codex's frames in place.
+- By eye: every side beside its idle, and its two contacts side by side at 8x, brightened; no frame turned.
+- In Chromium, in all four of those folders: the 3,082 images the page lists load, no page error, and the page's
+  mends hold (the banner, Cthulhu's views, the load error clearing).
+- Codex's frames: the zip ships the Deep One's folder whole, Codex's twelve frames in it byte for byte as the
+  author's Drive has them (`deliver.py --theirs-from`), every other file in it as the author has it or as v6
+  draws it (the base form's back walk). Curwen's folder holds no change and is not in the zip.
 
-## Left, none of it for the model
-- The four walks above whose legs still repeat: a third try, the colour exchange done in code on their own pixels
-  (each frame's lower legs relit), or drawing by hand.
-- Codex's four sides: the audit of the author's own folder, not of this pack, is their check.
-- The by-eye notes (`tools/sprites/notes.json`): the Deep One's facing and posture (both forms), Curwen's two,
-  the dhole's two shapes, the whisperer's chair.
-- v1 art (Codex's review, counterchecked): the Dhole's left walk 23/27 px against a 32 px idle; the Elder
-  Shoggoth's front, the Polyp swarm's, Formless Spawn's and Being from Beyond's left, and the Curwen Pit Thing
-  (which also floats in its move frames) out of size; the Colossus of the Pyramids' right `move_0` squashed; the
-  Shoggoth's idle 31 px from the front against 35 from the sides; Being from Beyond and the Elder Shoggoth
-  drawn two ways from frame to frame. The 35 gliders keep two keys (the engine moves them).
-- `docs/SPRITE_REVIEW.md` is still the audit of v1; regenerate it from the author's folder (`audit <dir>
-  --report docs/SPRITE_REVIEW.md`), not from this pack, which lacks Codex's frames.
+## Accepted, not mended
+- The Shoggoth boss's back: its move frames 57 px wide against a 48 px idle (the original `move_0` was 56).
+- The Dhole's back: its moves sit about 4 px right of the idle, the head swaying 4.4 px (the tail must clear the
+  canvas's edge).
+- The Cat from Saturn's back: the tail changes sides from step to step (a sway; see "mirror" below).
+- Being from Beyond's, the Flying Polyp's and Formless Spawn's left, the Mother Hydra's back: wider than their
+  idles, as their originals were.
+- The Ghast's back: the upper body drifts 0.8 px (0.7 before).
+- Older walks whose legs exchange only weakly in tone, which Codex did not flag: the Star Spawn, Lilith, Wilbur
+  Whateley, the Medusa Gorgon, Ephraim Waite (base). Dr Muñoz exchanges by eye; his dark shoes fool the measure.
+- The Whisperer: four keys of his chair's glide. Whether he moves at all is the game's call.
 
-## Rebuilding walk_fix_v5.zip (the scratch folders go with the session)
-1. `python3 tools/sprite_review.py fetch <site> published --all` (every file the page lists, about 3,000, four
-   at a time), then `cp -r published pack` and `python3 tools/sprites/walk4.py pack`: the same 18 sides.
-2. For each of the 48 sides, the sheet chosen, from the flows (the n-th generation for that side; the rest are
-   the first): Terrible Old Man, Dagon Priest (both forms), Cthulhu Cultist, Exham Troglodyte, Cat from Saturn,
-   Ghast, Moon-beast, Y'm-bhi, Martense degenerate, Charles le Sorcier, Whisperer (eldritch), Keziah Mason (both
-   sides), Shantak, Night-gaunt, Zoog, Thousand Young: 2; Gnorri, Gug, Gnoph-keh, Simon Orne, Edward Hutchinson,
-   the Yekubian, Black Man, Venusian man-lizard, the Outsider (both sides): 3; Beast in the Cave, Bokrug,
-   Nyarlathotep, Ephraim Waite (eldritch): 4. `python3 tools/sprites/fromsheet.py <sheet.png> pack <key> left`,
-   with `--mirror-right` for the six symmetrical ones; Keziah Mason and the Outsider also take a sheet for
-   `right`. Convert each side once, from a pack that still has its old frames: they lend their colours.
-3. `python3 tools/sprites/v1fixes.py pack` (once).
-4. `python3 tools/sprite_review.py audit pack`: no `turned`, and nothing new beyond the two `pair-size` notes.
-5. `python3 tools/sprites/deliver.py pack published walk_fix_v5.zip --theirs deep_one:left
-   'deep_one#eldritch:left' joseph_curwen:left joseph_curwen:right`. The same pack gives the same zip, byte for byte.
+## Codex's sides and the by-eye notes
+Codex's redraws, seen from the author's Drive, mend what `tools/sprites/notes.json` said of v1: the Deep One's left
+faces left in both forms and walks upright, from its idle; Curwen's left keeps its colours and his right its size.
+Those notes are gone, with the Dhole's and the Whisperer's (redrawn in v6): no by-eye note is left. The Deep One's
+facing note also told `fix` to mirror its left, which would now turn Codex's redraw the wrong way. The site still
+shows v1 for those four sides until the author publishes again.
+
+## Left
+- The 30 glider sides on two keys: motion in the engine (a bob, a squash, a sway) or four keys each.
+- `docs/SPRITE_REVIEW.md` is still the audit of v1: regenerate it from the author's folder once v6 is laid over it
+  (`audit <dir> --report docs/SPRITE_REVIEW.md`).
+- Bringing the library into the game (docs/SPRITE_QA.md, the last section).
+
+## Earlier hand-overs
+- **v5** (the leg exchange): Codex's review found the sheet-made walks' second contact repeating the first in 31
+  sides; asked for "the legs exchanged", the model had drawn the same contact again, and the audit's `same-leg`
+  only catches copies. Naming each leg by its colour (the near leg light, the far leg dark), saying where each foot
+  goes and asking for cell 3 as cell 1 recoloured got 27 of them in two rounds. Judged by eye on the contacts'
+  lower 40% at 8x, brightened; the measure of which foot leads is fooled by four legs, robes and dark shoes.
+- **v3** held only the changed frames. Laid over the author's folder by replacing each creature folder (Finder's
+  "Replace") instead of merging, it deleted everything else in those 54 folders: 1,465 listed files, and what the
+  page does not list (a creature's `QA.json`, which the site does not serve). Since v4 every zip carries its
+  folders whole. Unzip by merging: `ditto -x -k walk_fix_v6.zip <folder>` on a Mac, or `unzip -o walk_fix_v6.zip
+  -d <folder>`.
+
+## Rebuilding walk_fix_v6.zip (the scratch folders go with the session)
+This rebuild was run end to end from the published pack: the zip came out byte for byte the same.
+1. `python3 tools/sprite_review.py fetch <site> published --all`, `cp -r published pack`, `mkdir pack/previews`,
+   `cp pack/index.html pack/previews/library.html`, then `python3 tools/sprites/walk4.py pack` and
+   `python3 tools/sprites/ground.py pack`.
+2. v5's sides, each `fromsheet.py <sheet> pack <key> <side>` with the n-th generation of that side in flows A to C
+   (the first where none is named), `--mirror-right` for the Terrible Old Man and Tsathoggua: Dagon Priest, Ghast,
+   Shantak, Zoog, Night-gaunt, Moon-beast, Cat from Saturn, Y'm-bhi, Martense degenerate, Exham Troglodyte,
+   Thousand Young, Keziah Mason (left and right), Whisperer (eldritch), Charles le Sorcier, Terrible Old Man: 2;
+   Gnorri, Venusian man-lizard, Gnoph-keh, Gug, Yekubian, Black Man, Edward Hutchinson, the Outsider (left and
+   right): 3; Beast in the Cave: 4; Man of Leng, Albino Penguin, Hybrid Mummy, Ghoul (eldritch), Gyaa-Yothn, Winged
+   Hybrid, Being of Ib, Nameless City reptile, the Hound, Tsathoggua: 1. All left unless named.
+3. v6's 74 sides, from each side's node in flows A to D, the first generation unless named: Brown Jenkin, Bokrug,
+   Zkauba, Nyarlathotep (left) and Dagon Priest (eldritch, left): 1; Cthulhu Cultist (left, back), Simon Orne
+   (left), Martense degenerate (right), Black Man (back), Edward Hutchinson (front), Ghast (back): 2; Serpent Man
+   (left), Flying Polyp (boss, left), the Colour (left), Cat from Saturn (back), Albino Penguin (front), Nyarlathotep
+   (back), Dagon Priest (back): 3; Shoggoth (boss, back), Albino Penguin (back), Dagon Priest (front), Rhan-Tegoth
+   (left, the image edit): 4; Ephraim Waite (eldritch, left): 5. Flags: `--mirror-right` for Rhan-Tegoth, Bokrug,
+   Zkauba, Nyarlathotep, Nug and Yeb (left); `--frames move_0,move_1,-,-` for the Ghoul (its 2nd) and the Wamp
+   (its 3rd); `--frames idle_0+move_0,move_1,move_2,move_3` for the Shoggoth boss's left; `--flip-cells` for the
+   Elder Thing's left and for the Mother Hydra's left, which takes its right's first sheet. Convert each side once:
+   the frames it replaces lend their colours.
+4. `python3 tools/sprites/legswap.py pack ghoul left` and `python3 tools/sprites/legswap.py pack wamp left
+   --mirror-legs`.
+5. `python3 tools/sprites/v1fixes.py pack` (once), then `python3 tools/sprite_review.py audit pack`: 41 findings,
+   as above.
+6. `python3 tools/sprites/deliver.py pack published walk_fix_v6.zip --theirs-from <Codex's frames> --theirs
+   deep_one:left 'deep_one#eldritch:left' joseph_curwen:left joseph_curwen:right`, where `<Codex's frames>` holds
+   the Deep One's two left folders as the author has them (`sprites/deep_one/64x64/left`,
+   `sprites/deep_one/eldritch/64x64/left`).
 
 ## Making a sheet again
 1. Reference: the creature's `contacts.animation` sheet from the pack data (for example
@@ -120,12 +169,23 @@ merging: `ditto -x -k walk_fix_v5.zip <folder>` on a Mac, or `unzip -o walk_fix_
    A robe: only the feet show under the hem, the light foot steps out at the front in cell 1 and trails in cell 3,
    the hem's folds swing the other way. Four legs: count the feet from the front edge (cell 1 light, dark, dark,
    light; cell 3 dark, light, light, dark). Many legs: the light near legs forward and the dark far legs back in
-   cell 1, the other way in cell 3, every leg angled well forward or back. Never call a cell "the mirror" of
-   another: the model reads it as a flip of the whole figure.
-3. What the earlier retries added: a short stride and the figure the same width in every cell (a long stride
-   is cut at the cell's edge); the colours "exactly as in the reference" and the ones to leave out (Gnorri came
-   back tan); "its glowing eyes stay visible in every cell" (Black Man); Nyarlathotep's passing foot "bent at the
-   knee under the hip, never swung behind the body like a tail"; the Night-gaunt's legs and tail described cell
-   by cell in place of a stride.
-4. `fromsheet.py` the result; `sprite_review.py audit`; look at each walk beside its idle, and at its two
+   cell 1, the other way in cell 3, every leg angled well forward or back.
+3. What the retries added: a short stride and the figure the same width in every cell (a long stride is cut at the
+   cell's edge, and a contact much wider than its passing pose fails `pair-size`); the colours "exactly as in the
+   reference" and the ones to leave out (Gnorri came back tan); "its glowing eyes stay visible in every cell";
+   Nyarlathotep's passing foot "bent at the knee under the hip, never swung behind the body like a tail"; "keep
+   the upright posture and the full height of idle_0" for a walk that stooped.
+4. Front and back: seen from the front, cell 1 the figure's own left foot steps forward, cell 2 the weight on the
+   straight left leg and the right foot lifted clearly off the ground, two or three pixels higher, cells 3 and 4
+   the same on the other foot; the head and body still. Never "feet together" in a passing pose: both passing
+   cells come back as one picture. A robe's hem swings and lifts toward the stepping foot and bunches over the
+   lifted one; four legs move in diagonal pairs; a waddle leans two pixels to the stepping side.
+5. What glides, flies or oozes: "four evenly spaced keys of ONE slow, smooth, looping {motion}: not four different
+   poses", each cell the idle's pose and outline changed a little, cell 4 leading back into cell 1, every cell in
+   the idle's rendering and solidity, "hovering at the same height" or "resting on the same ground line". A boss:
+   the same, "Pixel-art game boss sprite sheet", converted onto its movement canvas.
+6. Never call a cell "the mirror" or "a mirror image" of another: the model reads it as a flip of the figure (three
+   v5 sheets turned their second half around; the Cat from Saturn's back swings its tail from side to side).
+   Name which foot each cell lifts instead.
+7. `fromsheet.py` the result; `sprite_review.py audit`; look at each walk beside its idle, and at its two
    contacts side by side, brightened: the audit sees neither a figure turned to the viewer nor a leg exchange.
