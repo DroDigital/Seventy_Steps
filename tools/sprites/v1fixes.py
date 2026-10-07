@@ -7,6 +7,8 @@
   form is right): the two folders change places, frames and all, walk4's frames with them (each side's
   were made from that side's own).
 - cthulhu: the turnaround's left view faces right and its right view left: the page's two paths change places.
+- colossus_pyramids: its RIGHT was drawn apart from its LEFT (smaller, and `move_0` squashed: 83 px high against
+  the idle's 95): the RIGHT set becomes the LEFT, flipped, idles and walk (the titan has nothing one-sided).
 - the gallery page: the load error ("Unable to load selected view.") now clears when the selected view loads
   or another creature is picked; the banner counts entries "accepted" (it reads their accepted flags, not
   whether their files load).
@@ -14,6 +16,8 @@
 Run it once, on a pack whose frames are converted (deliver.py zips what it leaves); a pack it has already
 mended is refused, since a second run would swap Innsmouth's sides back."""
 import json, os, re, sys
+import numpy as np
+from PIL import Image
 
 CTHULHU = ('"left":"../bosses/cthulhu/turnaround/left-v1.png"', '"right":"../bosses/cthulhu/turnaround/right-v1.png"')
 PAGE_EDITS = [
@@ -28,6 +32,17 @@ PAGE_EDITS = [
      "im.onerror=()=>{reviewErrors.push(path);$('load-error').hidden=false;$('load-error').dataset.kind='file';"),
     ("' entries complete · '", "' entries accepted · '"),
 ]
+
+
+def _rel(path):
+    return os.path.normpath(path[3:] if path.startswith('../') else path)
+
+
+def colossus(pack, data):
+    mv = next(i for i in data['items'] if i['key'] == 'colossus_pyramids')['movement']
+    for name, path in mv['left'].items():
+        a = np.asarray(Image.open(os.path.join(pack, _rel(path))).convert('RGBA'))
+        Image.fromarray(np.ascontiguousarray(a[:, ::-1]), 'RGBA').save(os.path.join(pack, _rel(mv['right'][name])))
 
 
 def main(pack):
@@ -48,6 +63,7 @@ def main(pack):
             sys.exit(f'the page has changed: {old[:50]}… not found once')
         page = page.replace(old, new)
 
+    colossus(pack, json.loads(m.group(2)))
     base = os.path.join(pack, 'sprites/innsmouth_hybrid/64x64')
     tmp = os.path.join(base, '_swap')
     os.rename(os.path.join(base, 'left'), tmp)
@@ -55,7 +71,7 @@ def main(pack):
     os.rename(tmp, os.path.join(base, 'right'))
     open(page_path, 'w', encoding='utf-8').write(page)
     print('innsmouth_hybrid: left and right sets swapped; cthulhu: left and right views swapped; '
-          'page: the load error clears, the banner says accepted')
+          'colossus_pyramids: right is its left, flipped; page: the load error clears, the banner says accepted')
 
 
 if __name__ == '__main__':
