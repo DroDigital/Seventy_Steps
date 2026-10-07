@@ -1,7 +1,8 @@
 """A creature sprite pack as the outside library lays it out: a gallery page (`previews/library.html`,
 or a site's `index.html`) whose `pack-data` script lists every creature, its renderer, its
 directions and their frames, by paths relative to the gallery. Loads it from a folder or a URL;
-`fetch` copies a published pack's idle and move frames (and its page) to a folder first."""
+`fetch` copies a published pack's idle and move frames (or every file it lists) and its page to a
+folder first."""
 import json, os, re, subprocess, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 import numpy as np
@@ -53,8 +54,18 @@ class Pack:
         return self._cache[path]
 
 
-def fetch(url, dest, workers=4):
-    """Copies a published pack to `dest`: its page and every idle and move frame."""
+def listed(data):
+    """Every file the gallery lists (frames, attacks, contact sheets, notes), as gallery paths."""
+    if isinstance(data, dict):
+        return [p for v in data.values() for p in listed(v)]
+    if isinstance(data, list):
+        return [p for v in data for p in listed(v)]
+    return [data] if isinstance(data, str) and data.startswith('../') else []
+
+
+def fetch(url, dest, workers=4, everything=False):
+    """Copies a published pack to `dest`: its page and every idle and move frame (`everything`: every
+    file the page lists, as a hand-over that puts whole folders in the zip needs)."""
     if url.endswith('.html'):
         base = url.rsplit('/', 1)[0] + '/'
     else:
@@ -69,6 +80,8 @@ def fetch(url, dest, workers=4):
         groups = item['frames'] if item.get('renderer') == 'sprite' else (item.get('movement') or {})
         for fr in groups.values():
             paths += [p for k, p in fr.items() if k.startswith(('idle', 'move'))]
+    if everything:
+        paths = sorted(set(listed(data['items'])))
 
     def one(path):
         out = os.path.join(dest, _rel(path))
@@ -78,7 +91,7 @@ def fetch(url, dest, workers=4):
         return _curl(urllib.parse.urljoin(base, path), out)
     with ThreadPoolExecutor(workers) as ex:
         got = list(ex.map(one, paths))
-    print(f'{sum(got)} of {len(paths)} frames in {dest}')
+    print(f'{sum(got)} of {len(paths)} {"files" if everything else "frames"} in {dest}')
 
 
 def _curl(url, out):

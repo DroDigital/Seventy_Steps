@@ -5,6 +5,7 @@ from .checks import LIMITS
 
 TITLES = OrderedDict([
     ('facing', 'Faces the wrong way'),
+    ('turned', 'A frame faces the other way'),
     ('off-model', 'Off model (seen by eye)'),
     ('same-leg', 'The same leg always leads'),
     ('pair-size', 'The two strides are different drawings'),

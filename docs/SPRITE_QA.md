@@ -33,8 +33,8 @@ it measures, and its numbers can be handed back as they stand. The latest findin
 - **Ground:** the lowest pixel of every frame on the idle's ground line (row 62 of 64), within 1 px.
 - **Steady body:** the upper body (top 40% of the silhouette) within 3 px across the cycle; the
   legs and arms move, the body does not jump.
-- **Facing:** LEFT faces left, RIGHT faces right, idle and walk alike; RIGHT is LEFT mirrored unless
-  the creature has one-sided anatomy (the pack's `mirror_safe`).
+- **Facing:** LEFT faces left, RIGHT faces right, idle and walk alike, every frame of the cycle;
+  RIGHT is LEFT mirrored unless the creature has one-sided anatomy (the pack's `mirror_safe`).
 - **No stride, no walk:** what slithers, oozes, drifts or flies (`motion: glide` in
   `tools/sprites/notes.json`) needs no leg cycle. The engine moves it (a bob, a squash, a sway), or
   it gets four keys of one undulation or wingbeat, never two unrelated poses.
@@ -55,13 +55,19 @@ Then run the review on what comes back. It passes when its lines are gone from t
 Needs `pip install pillow numpy`. `<dir>` is the pack's root (the folder holding `previews/library.html`).
 
 ```
-python3 tools/sprite_review.py fetch <published url> <dir>   # or use the pack on disk as it is
+python3 tools/sprite_review.py fetch <published url> <dir> [--all]   # or use the pack on disk as it is
 python3 tools/sprite_review.py audit <dir> --report docs/SPRITE_REVIEW.md [--strict]
 python3 tools/sprite_review.py sheets <dir> <out> [key,key]  # contact sheets, findings beside each row
 python3 tools/sprite_review.py fix <dir> <out>               # the mends that need no drawing, on a copy
 ```
 
+- `fetch` copies the page and the idle and move frames, what the audit reads; `--all` copies every file
+  the page lists (attacks, hurt frames, contact sheets, notes), which `deliver.py` needs.
 - `audit --strict` exits 1 while anything remains that `fix` cannot mend (a glider left on two keys for the engine to move is not counted): the gate for a delivery.
+- `turned`: a side view's frame that faces the other way from its idle. Each frame's head and upper
+  body (the top 60% of the idle's height) are set over the idle's as drawn and mirrored; when the
+  mirror matches better by over 10% (`LIMITS['turned']`) the frame is turned. A blob or a figure seen
+  from the front scores near 0 either way, so it is not flagged: look at those by eye.
 - `fix` writes only the frames it changed, at their own paths, plus `fixes.json`. Copy `<out>/sprites`
   over the pack's `sprites` to apply. It mirrors a set that faces the wrong way, moves feet back to the
   ground line and holds a walk's upper body steady. It does not shift frames that are due to be redrawn.
@@ -95,13 +101,20 @@ rare in the creature (under 0.4% of its pixels) is for the pixels that nearly ar
 cannot spread through a body; its glowing accents (eyes, claw tips: rare, bright, saturated) are kept
 where a blob of them is drawn at a height where the creature's own frames carry one, which also keeps the
 magenta fringe off a hem. `--mirror-right` writes the same frames, flipped, to the right set (for a
-symmetrical creature that lists one).
+symmetrical creature that lists one). Nothing in the conversion can see which way a cell faces: the
+audit's `turned` check does (a first prompt that asked for cell 3 as "the mirror of cell 1" had three
+sheets back with their second half drawn facing right).
 
 `python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs key:side ...]` is the hand-over:
-one zip of `previews/library.html` (the host's injected script dropped) and every frame that differs from
-the published pack, at its own path, to lay over the author's folder. `--theirs` names the sides the
-author drew themselves (Codex's), whose frames are in the author's folder only: none are written and the
-page lists `move_2`/`move_3` for them. It refuses a page that lists a frame the pack lacks.
+one zip of `previews/library.html` (the host's injected script dropped) and every creature folder
+(`sprites/<name>`) holding a frame that differs from the published pack, whole: every file the page lists
+under it, so the folder comes out complete whether the zip is merged over the author's folder or
+replaces its folders (Finder's "Replace" deletes what a folder held; a zip of loose frames laid over
+that way cost the author 1,465 files). The published pack must be fetched with `--all`. `--theirs`
+names the sides the author drew themselves (Codex's), whose frames are in the author's folder only:
+none are written and the page lists `move_2`/`move_3` for them. It refuses a page that lists a frame
+the pack lacks. Unzip it by merging: `ditto -x -k <zip> <folder>` on a Mac, or `unzip -o <zip> -d <folder>`;
+files the page does not list (a creature's `QA.json`) are only kept by a merge.
 
 ## When the sprites come into the game
 
