@@ -26,7 +26,8 @@ it measures, and its numbers can be handed back as they stand. The latest findin
   partly behind it. In `move_0` the near leg leads, in `move_2` the far leg leads and the near leg is
   behind; under a robe the hem and the shoe that shows swap with them. `move_2` and `move_3` are
   never copies of `move_0` and `move_1`, or one leg stays behind all cycle (the checker's
-  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so watch the walk too).
+  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so look at the two contacts side by
+  side at 8x, brightened for dark creatures: the light leg leads in one and trails in the other).
 - **Front and back:** two frames still pass; four are better.
 - **Drawn from `idle_0`:** the same posture, proportions, palette and size. Height within 3 px
   (or 8%) of the idle; the two halves of a stride within 15% of each other in area.
@@ -103,7 +104,9 @@ where a blob of them is drawn at a height where the creature's own frames carry 
 magenta fringe off a hem. `--mirror-right` writes the same frames, flipped, to the right set (for a
 symmetrical creature that lists one). Nothing in the conversion can see which way a cell faces: the
 audit's `turned` check does (a first prompt that asked for cell 3 as "the mirror of cell 1" had three
-sheets back with their second half drawn facing right).
+sheets back with their second half drawn facing right). Nor can it see a leg exchange: asked for "the legs
+exchanged", the model mostly drew the first contact again (31 of the 48 sheets); naming each leg by its colour
+and asking for cell 3 as cell 1 recoloured got 27 of them right in two tries (docs/SPRITE_HANDOFF.md).
 
 `python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs key:side ...]` is the hand-over:
 one zip of `previews/library.html` (the host's injected script dropped) and every creature folder
@@ -115,6 +118,10 @@ names the sides the author drew themselves (Codex's), whose frames are in the au
 none are written and the page lists `move_2`/`move_3` for them. It refuses a page that lists a frame
 the pack lacks. Unzip it by merging: `ditto -x -k <zip> <folder>` on a Mac, or `unzip -o <zip> -d <folder>`;
 files the page does not list (a creature's `QA.json`) are only kept by a merge.
+
+`python3 tools/sprites/v1fixes.py <pack>` mends, once, the v1 defects that need no drawing: the Innsmouth
+Hybrid's left and right sets (swapped in v1), Cthulhu's left and right views, and the gallery's load error
+(it now clears on a good load) and banner (it counts entries accepted, which is what it reads).
 
 ## When the sprites come into the game
 
