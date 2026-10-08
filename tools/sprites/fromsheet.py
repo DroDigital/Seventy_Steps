@@ -25,9 +25,12 @@ BAND = 0.15          # and only at the heights (of the figure) where the creatur
 
 
 def key_cells(sheet):
-    a = np.asarray(sheet.convert('RGB')).astype(int)
+    """The four cells and what is drawn in each: the ground is flat magenta, or clear (a model may hand
+    the sheet back transparent)."""
+    rgba = np.asarray(sheet.convert('RGBA')).astype(int)
+    a = rgba[..., :3]
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    magenta = (r > 170) & (b > 170) & (g < 110) & (np.abs(r - b) < 70)
+    magenta = (r > 170) & (b > 170) & (g < 110) & (np.abs(r - b) < 70) | (rgba[..., 3] < 128)
     h, w = magenta.shape
     cells = []
     for cy in (0, 1):
