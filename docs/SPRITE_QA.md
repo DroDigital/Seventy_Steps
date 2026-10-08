@@ -26,15 +26,16 @@ it measures, and its numbers can be handed back as they stand. The latest findin
   partly behind it. In `move_0` the near leg leads, in `move_2` the far leg leads and the near leg is
   behind; under a robe the hem and the shoe that shows swap with them. `move_2` and `move_3` are
   never copies of `move_0` and `move_1`, or one leg stays behind all cycle (the checker's
-  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so watch the walk too).
+  `same-leg`; it finds copies and near-copies, not a swap drawn wrongly, so look at the two contacts side by
+  side at 8x, brightened for dark creatures: the light leg leads in one and trails in the other).
 - **Front and back:** two frames still pass; four are better.
 - **Drawn from `idle_0`:** the same posture, proportions, palette and size. Height within 3 px
   (or 8%) of the idle; the two halves of a stride within 15% of each other in area.
 - **Ground:** the lowest pixel of every frame on the idle's ground line (row 62 of 64), within 1 px.
 - **Steady body:** the upper body (top 40% of the silhouette) within 3 px across the cycle; the
   legs and arms move, the body does not jump.
-- **Facing:** LEFT faces left, RIGHT faces right, idle and walk alike; RIGHT is LEFT mirrored unless
-  the creature has one-sided anatomy (the pack's `mirror_safe`).
+- **Facing:** LEFT faces left, RIGHT faces right, idle and walk alike, every frame of the cycle;
+  RIGHT is LEFT mirrored unless the creature has one-sided anatomy (the pack's `mirror_safe`).
 - **No stride, no walk:** what slithers, oozes, drifts or flies (`motion: glide` in
   `tools/sprites/notes.json`) needs no leg cycle. The engine moves it (a bob, a squash, a sway), or
   it gets four keys of one undulation or wingbeat, never two unrelated poses.
@@ -55,13 +56,19 @@ Then run the review on what comes back. It passes when its lines are gone from t
 Needs `pip install pillow numpy`. `<dir>` is the pack's root (the folder holding `previews/library.html`).
 
 ```
-python3 tools/sprite_review.py fetch <published url> <dir>   # or use the pack on disk as it is
+python3 tools/sprite_review.py fetch <published url> <dir> [--all]   # or use the pack on disk as it is
 python3 tools/sprite_review.py audit <dir> --report docs/SPRITE_REVIEW.md [--strict]
 python3 tools/sprite_review.py sheets <dir> <out> [key,key]  # contact sheets, findings beside each row
 python3 tools/sprite_review.py fix <dir> <out>               # the mends that need no drawing, on a copy
 ```
 
+- `fetch` copies the page and the idle and move frames, what the audit reads; `--all` copies every file
+  the page lists (attacks, hurt frames, contact sheets, notes), which `deliver.py` needs.
 - `audit --strict` exits 1 while anything remains that `fix` cannot mend (a glider left on two keys for the engine to move is not counted): the gate for a delivery.
+- `turned`: a side view's frame that faces the other way from its idle. Each frame's head and upper
+  body (the top 60% of the idle's height) are set over the idle's as drawn and mirrored; when the
+  mirror matches better by over 10% (`LIMITS['turned']`) the frame is turned. A blob or a figure seen
+  from the front scores near 0 either way, so it is not flagged: look at those by eye.
 - `fix` writes only the frames it changed, at their own paths, plus `fixes.json`. Copy `<out>/sprites`
   over the pack's `sprites` to apply. It mirrors a set that faces the wrong way, moves feet back to the
   ground line and holds a walk's upper body steady. It does not shift frames that are due to be redrawn.
@@ -83,25 +90,60 @@ robes that hide the legs and the off-model sets still need drawing.
 
 ## Walks drawn by an image model
 
-`python3 tools/sprites/fromsheet.py <sheet.png> <pack> <key> <side> [--mirror-right] [--dry-run]` brings a
-generated 2x2 sheet (four walk frames on flat magenta, the brief in docs/SPRITE_HANDOFF.md) to the pack's
-64x64 frames. A model keeps neither the scale nor the place of its figure from cell to cell, so each frame
-is set by its own body: the four share one scale (the tallest and the shortest stand as far above the
-idle's height as below it), each one's lowest pixel goes on the idle's ground line and its upper body (the
-audit's measure) over the idle's, and a stride that would touch the canvas edge is nudged in by as little
-as it takes. The sheet is brought to the creature's own look: its tone (the model paints lighter than the
-pixel art it is shown), then every colour to the nearest of the creature's own palette. A colour that is
-rare in the creature (under 0.4% of its pixels) is for the pixels that nearly are it, so a stray tan pixel
-cannot spread through a body; its glowing accents (eyes, claw tips: rare, bright, saturated) are kept
-where a blob of them is drawn at a height where the creature's own frames carry one, which also keeps the
-magenta fringe off a hem. `--mirror-right` writes the same frames, flipped, to the right set (for a
-symmetrical creature that lists one).
+`python3 tools/sprites/fromsheet.py <sheet.png> <pack> <key> <side> [--mirror-right] [--dry-run] [--frames
+a,b,c,d] [--flip-cells]` brings a generated 2x2 sheet (four walk frames on flat magenta, the brief in
+docs/SPRITE_HANDOFF.md) to the pack's frames: a sprite's 64x64, or a colossus's movement canvas, whatever its
+`idle_0` is. A model keeps neither the scale nor the place of its figure from cell to cell, so each frame is set
+by its own body: the four share one scale (the tallest and the shortest stand as far above the idle's height as
+below it), each one's lowest pixel goes on the idle's ground line and its upper body (the audit's measure) over
+the idle's, and a stride that would touch the canvas edge is nudged in by as little as it takes. The sheet is
+brought to the creature's own look: its tone (the model paints lighter than the pixel art it is shown), then every
+colour to the nearest of the creature's own palette. A colour that is rare in the creature (under 0.4% of its
+pixels) is for the pixels that nearly are it, so a stray tan pixel cannot spread through a body; its glowing
+accents (eyes, claw tips: rare, bright, saturated) are kept where a blob of them is drawn at a height where the
+creature's own frames carry one, which also keeps the magenta fringe off a hem. `--mirror-right` writes the same
+frames, flipped, to the right set (for a symmetrical creature that lists one). `--frames` names what each cell
+becomes, in reading order: `-` leaves a cell unused (a sheet whose second half failed, for `legswap.py` to make),
+`a+b` writes one cell to two frames (`idle_0+move_0`: an idle taken from the motion, so the two are one drawing).
+`--flip-cells` mirrors each cell where it stands: a sheet drawn facing the other way, or the other side's sheet.
+Nothing in the conversion can see which way a cell faces: the audit's `turned` check does (a first prompt that
+asked for cell 3 as "the mirror of cell 1" had three sheets back with their second half drawn facing right). Nor
+can it see a leg exchange: asked for "the legs exchanged", the model mostly drew the first contact again (31 of
+the 48 sheets); naming each leg by its colour and asking for cell 3 as cell 1 recoloured got 27 of them right in
+two tries (docs/SPRITE_HANDOFF.md). Front and back walks fail the same way when the passing poses are asked for as
+"feet together" (both come back as one picture, the audit's `same-leg`, and a robe's hem hardly moves,
+`legs-still`): ask for a different foot lifted in each, and the hem swung toward the stepping foot. Never call one
+cell the mirror of another: the model flips the whole figure.
 
-`python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs key:side ...]` is the hand-over:
-one zip of `previews/library.html` (the host's injected script dropped) and every frame that differs from
-the published pack, at its own path, to lay over the author's folder. `--theirs` names the sides the
-author drew themselves (Codex's), whose frames are in the author's folder only: none are written and the
-page lists `move_2`/`move_3` for them. It refuses a page that lists a frame the pack lacks.
+`python3 tools/sprites/ground.py <pack> [--dry-run]` sets every grounded creature on the brief's ground line (its
+lowest pixel on row 61, the 62nd of 64). A direction's frames move together, by what puts its `idle_0` on the
+line, so an attack's leap or a hurt stagger keeps its height over the idle; then each move frame still off the
+line is set on it. What flies (`flies` in notes.json) hovers where it is drawn; the colossi are left alone.
+
+`python3 tools/sprites/legswap.py <pack> <key> <side> [--mirror-legs] [--from-second] [--mirror-right]` makes a
+walk's second half (`move_2`, `move_3`) from its first, for a sheet whose contact and passing pose are good but
+whose second half repeats them: the two legs exchange their shades below the crotch, rank for rank, so the dark far
+leg leads where the light one did. `--mirror-legs` is for many legs alike in tone (a crawler): each leg is mirrored
+about its own hip instead, a leg reaching forward reaching back. `--from-second` makes the first half from the
+second.
+
+`python3 tools/sprites/deliver.py <pack> <published pack> <out.zip> [--theirs-from <dir>] [--theirs key:side ...]`
+is the hand-over: one zip of `previews/library.html` (the host's injected script dropped) and every creature
+folder (`sprites/<name>`) holding a frame that differs from the published pack, whole: every file the page lists
+under it, so the folder comes out complete whether the zip is merged over the author's folder or replaces its
+folders (Finder's "Replace" deletes what a folder held; a zip of loose frames laid over that way cost the author
+1,465 files). The published pack must be fetched with `--all`. `--theirs` names the sides the author drew
+themselves (Codex's), whose frames are in the author's folder only: none are written and the page lists
+`move_2`/`move_3` for them. Where such a side's creature folder is in the zip (another of its sides changed),
+`--theirs-from` names a copy of the author's own frames for those sides, which go in byte for byte, so the folder
+is whole and safe to replace; it refuses a copy that lacks one. It refuses a page that lists a frame the pack
+lacks. Unzip it by merging: `ditto -x -k <zip> <folder>` on a Mac, or `unzip -o <zip> -d <folder>`; files the page
+does not list (a creature's `QA.json`) are only kept by a merge.
+
+`python3 tools/sprites/v1fixes.py <pack>` mends, once, the v1 defects that need no drawing: the Innsmouth Hybrid's
+left and right sets (swapped in v1), Cthulhu's left and right views, and the gallery's load error (it now clears
+on a good load) and banner (it counts entries accepted, which is what it reads), and the Colossus of the Pyramids'
+right, which v1 drew apart from its left (smaller, its `move_0` squashed): its left, flipped.
 
 ## When the sprites come into the game
 

@@ -19,45 +19,8 @@
  "daemon_pipers": {
   "motion": "glide"
  },
- "deep_one": {
-  "eye": [
-   {
-    "direction": "left",
-    "check": "facing",
-    "detail": "every LEFT frame faces right (every other creature's LEFT faces left), so LEFT and the mirrored RIGHT are swapped",
-    "fix": "mirror"
-   },
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "the walk is a crouched four-limbed lope with the arms trailing behind, the idle an upright stance: the body changes shape when it starts to move; draw the walk from the idle's posture"
-   }
-  ]
- },
- "deep_one#eldritch": {
-  "eye": [
-   {
-    "direction": "left",
-    "check": "facing",
-    "detail": "every LEFT frame faces right (every other creature's LEFT faces left), so LEFT and the mirrored RIGHT are swapped",
-    "fix": "mirror"
-   },
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "the walk is a crouched four-limbed lope with the arms trailing behind, the idle an upright stance: the body changes shape when it starts to move; draw the walk from the idle's posture"
-   }
-  ]
- },
  "dhole": {
-  "motion": "glide",
-  "eye": [
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "move_0 is stretched flat, move_1 coiled: it snaps between two shapes; draw the in-betweens of one undulation (four frames)"
-   }
-  ]
+  "motion": "glide"
  },
  "elder_thing": {
   "motion": "glide"
@@ -85,20 +48,6 @@
  },
  "high_priest#eldritch": {
   "motion": "glide"
- },
- "joseph_curwen": {
-  "eye": [
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "move_1 is drawn in paler colours than move_0 and the idle (a lighter coat and face): it flickers; repaint it in the idle's colours"
-   },
-   {
-    "direction": "right",
-    "check": "off-model",
-    "detail": "move_1 is smaller than move_0 (21% less area): redraw it at move_0's size"
-   }
-  ]
  },
  "martins_beach_horror": {
   "motion": "glide"
@@ -151,14 +100,7 @@
   "motion": "glide"
  },
  "whisperer": {
-  "motion": "glide",
-  "eye": [
-   {
-    "direction": "left",
-    "check": "off-model",
-    "detail": "he moves seated in his chair, which slides: decide whether he moves at all; if he does, the chair needs no walk but an in-engine glide"
-   }
-  ]
+  "motion": "glide"
  },
  "yeb": {
   "motion": "glide"

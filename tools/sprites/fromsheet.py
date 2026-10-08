@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Four walk frames from a generated 2x2 sheet on flat magenta, brought to the pack's frames (64x64; a colossus's are 128x128: the idle's size).
+"""Four walk frames from a generated 2x2 sheet on flat magenta, brought to the pack's frames (a sprite's 64x64,
+an assembly's movement canvas: whatever its idle_0 is).
 
   python3 fromsheet.py <sheet.png> <pack folder> <creature key> <side> [--mirror-right] [--dry-run]
+                       [--frames move_0,move_1,move_2,move_3] [--flip-cells]
 
 Each cell is keyed off the magenta, all four scaled by one factor so the tallest stands as tall as
 its own idle_0, each pixel the commonest colour of its block, then every colour snapped to the
@@ -10,7 +12,10 @@ place in every cell, so each frame is set by its own body, not by where it was d
 pixel on the idle's ground line, its upper body (the audit's measure, the top 40% of the silhouette)
 over the idle's. move_0..move_3 are written and listed in the gallery; what they replace is kept
 under walk4_backup/. --mirror-right also writes the four frames, flipped, to the creature's right
-set (the right of a mirror-safe creature is its left, flipped)."""
+set (the right of a mirror-safe creature is its left, flipped). --frames names what each cell becomes,
+in reading order: `-` leaves a cell unused, `a+b` writes one cell to two frames (an idle that took a
+cell of the motion, to keep one look throughout). --flip-cells mirrors each cell where it stands, for a
+sheet drawn facing the other way (or the other side's sheet, for a creature whose two sides are alike)."""
 import json, os, re, shutil, sys
 import numpy as np
 from PIL import Image
@@ -24,7 +29,7 @@ GLOW_NEAR = 90       # an accent that is a glow takes pixels within this distanc
 BAND = 0.15          # and only at the heights (of the figure) where the creature's own frames hold one, give or take this
 
 
-def key_cells(sheet):
+def key_cells(sheet, flip=False):
     """The four cells and what is drawn in each: the ground is flat magenta, or clear (a model may hand
     the sheet back transparent)."""
     rgba = np.asarray(sheet.convert('RGBA')).astype(int)
@@ -36,7 +41,8 @@ def key_cells(sheet):
     for cy in (0, 1):
         for cx in (0, 1):
             sl = (slice(cy * h // 2, (cy + 1) * h // 2), slice(cx * w // 2, (cx + 1) * w // 2))
-            cells.append((a[sl], ~magenta[sl]))
+            rgb, m = a[sl], ~magenta[sl]
+            cells.append((rgb[:, ::-1], m[:, ::-1]) if flip else (rgb, m))
     return cells
 
 
@@ -144,18 +150,17 @@ def _snap(frame, palette, rare, glowed):
     return frame
 
 
-def frames_from_sheet(sheet, idle, olds):
-    """Four RGBA frames (the idle's size: 64x64, a colossus's 128x128) from the sheet, fitted to the idle
-    frame; `olds` lend their colours."""
+def frames_from_sheet(sheet, idle, olds, flip=False):
+    """Four 64x64 RGBA frames from the sheet, fitted to the idle frame; `olds` lend their colours."""
     im = np.asarray(idle)
-    size = im.shape[0]
+    ch, cw = im.shape[:2]
     im_m = im[..., 3] > ALPHA
     iy0, iy1, ix0, ix1 = _bbox(im_m)
     pal, uses = np.unique(np.concatenate([o[o[..., 3] > ALPHA][:, :3] for o in [im] + olds]), axis=0, return_counts=True)
     pal, rare = pal.astype(int), uses < RARE_SHARE * uses.sum()
     accents = pal[rare & _glows(pal)]        # its eyes, its claw tips: rare, bright, saturated
     band = _accent_band([im] + olds, accents) if len(accents) else (0.0, 1.0)
-    cells = key_cells(sheet)
+    cells = key_cells(sheet, flip)
     boxes = [_bbox(m) for _, m in cells]
     heights = [b[1] - b[0] + 1 for b in boxes]      # one scale for all four: the tallest and the shortest frame
     scale = 2 * (iy1 - iy0 + 1) / (max(heights) + min(heights))     # stand as far above the idle as below it
@@ -178,72 +183,78 @@ def frames_from_sheet(sheet, idle, olds):
         ox = int(round(idle_x - _torso_x(small[..., 3] > 0)))
         oy = iy1 - int(ys.max())
         lo, hi = xs.min() + ox, xs.max() + ox
-        if lo < 1 or hi > size - 2:      # a wide stride must not touch the canvas edge: nudge it in, no more than that
-            nudge = 1 - lo if lo < 1 else size - 2 - hi
+        if lo < 1 or hi > cw - 2:  # a wide stride must not touch the canvas edge: nudge it in, no more than that
+            nudge = 1 - lo if lo < 1 else cw - 2 - hi
             print(f'  nudged {nudge:+d} px to clear the canvas edge', file=sys.stderr)
             ox += nudge
-        keep = (ys + oy >= 0) & (ys + oy < size) & (xs + ox >= 0) & (xs + ox < size)
+        keep = (ys + oy >= 0) & (ys + oy < ch) & (xs + ox >= 0) & (xs + ox < cw)
         if not keep.all():
             print(f'  clipped {int((~keep).sum())} px at the canvas edge', file=sys.stderr)
-        canvas = np.zeros((size, size, 4), np.uint8)
+        canvas = np.zeros((ch, cw, 4), np.uint8)
         canvas[ys[keep] + oy, xs[keep] + ox] = small[ys[keep], xs[keep]]
         out.append(canvas)
     return out
-
-
-def _groups(item):
-    """The directions' frame lists: a sprite's `frames`, a colossus's `movement`."""
-    return item['frames'] if 'frames' in item else item['movement']
 
 
 def _rel(path):
     return os.path.normpath(path[3:] if path.startswith('../') else path)
 
 
-def _write(root, item, side, frames, flip=False):
-    """move_0..move_3 into the pack at the side's own paths (what they replace goes to walk4_backup/)
-    and into the gallery's list."""
-    fr = _groups(item)[side]
+def _sets(item):
+    """A sprite's frames by direction, or an assembly's movement."""
+    return item['frames'] if item.get('renderer') == 'sprite' else item['movement']
+
+
+def _write(root, item, side, frames, names, flip=False):
+    """The frames into the pack at the side's own paths (what they replace goes to walk4_backup/) and into
+    the gallery's list, each under its name(s): `names` holds one entry per cell."""
+    fr = _sets(item)[side]
     prefix = fr['move_0'].rsplit('/', 1)[0]
-    for i, f in enumerate(frames):
-        name = f'move_{i}'
-        dest = os.path.join(root, _rel(prefix + f'/{name}.png'))
-        if os.path.exists(dest):
-            back = os.path.join(root, 'walk4_backup', os.path.dirname(_rel(prefix + '/x')))
-            os.makedirs(back, exist_ok=True)
-            if not os.path.exists(os.path.join(back, f'{name}.png')):
-                shutil.copy2(dest, os.path.join(back, f'{name}.png'))
-        Image.fromarray(np.ascontiguousarray(f[:, ::-1]) if flip else f, 'RGBA').save(dest)
-        fr[name] = prefix + f'/{name}.png'
+    for f, entry in zip(frames, names):
+        for name in [n for n in entry.split('+') if n != '-']:
+            dest = os.path.join(root, _rel(prefix + f'/{name}.png'))
+            if os.path.exists(dest):
+                back = os.path.join(root, 'walk4_backup', os.path.dirname(_rel(prefix + '/x')))
+                os.makedirs(back, exist_ok=True)
+                if not os.path.exists(os.path.join(back, f'{name}.png')):
+                    shutil.copy2(dest, os.path.join(back, f'{name}.png'))
+            Image.fromarray(np.ascontiguousarray(f[:, ::-1]) if flip else f, 'RGBA').save(dest)
+            fr[name] = prefix + f'/{name}.png'
 
 
-def main(sheet_path, root, key, side, dry, mirror):
+def main(sheet_path, root, key, side, dry, mirror, names=('move_0', 'move_1', 'move_2', 'move_3'), flip=False):
     page = next(p for p in PAGES if os.path.exists(os.path.join(root, p)))
     html = open(os.path.join(root, page), encoding='utf-8').read()
     m = re.search(r'(<script id="pack-data"[^>]*>)(.*?)(</script>)', html, re.S)
     data = json.loads(m.group(2))
     item = next(i for i in data['items'] if i['key'] == key)
-    fr = _groups(item)[side]
+    fr = _sets(item)[side]
     other = 'right' if side == 'left' else 'left'
-    if mirror and 'move_0' not in (_groups(item).get(other) or {}):
+    if mirror and 'move_0' not in (_sets(item).get(other) or {}):
         sys.exit(f'{key} has no {other} set to mirror into')
     load = lambda p: np.asarray(Image.open(os.path.join(root, _rel(p))).convert('RGBA'))
     olds = [load(fr[k]) for k in sorted(fr) if k.startswith('move_')]
-    new = frames_from_sheet(Image.open(sheet_path), load(fr['idle_0']), olds)
+    new = frames_from_sheet(Image.open(sheet_path), load(fr['idle_0']), olds, flip)
     if dry:
         return new
-    _write(root, item, side, new)
+    _write(root, item, side, new, names)
     if mirror:
-        _write(root, item, other, new, flip=True)
+        _write(root, item, other, new, names, flip=True)
     html = html[:m.start(2)] + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + html[m.end(2):]
     open(os.path.join(root, page), 'w', encoding='utf-8').write(html)
-    print(f'{key} {side}: move_0..move_3 written' + (f', flipped into {other}' if mirror else ''))
+    print(f'{key} {side}: {",".join(names)} written' + (f', flipped into {other}' if mirror else ''))
     return new
 
 
 if __name__ == '__main__':
-    flags = {a for a in sys.argv[1:] if a.startswith('--')}
-    args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    if len(args) != 4 or flags - {'--dry-run', '--mirror-right'}:
+    argv = sys.argv[1:]
+    names = ('move_0', 'move_1', 'move_2', 'move_3')
+    if '--frames' in argv:
+        i = argv.index('--frames')
+        names = tuple(argv[i + 1].split(','))
+        argv = argv[:i] + argv[i + 2:]
+    flags = {a for a in argv if a.startswith('--')}
+    args = [a for a in argv if not a.startswith('--')]
+    if len(args) != 4 or flags - {'--dry-run', '--mirror-right', '--flip-cells'} or len(names) != 4:
         sys.exit(__doc__)
-    main(*args, dry='--dry-run' in flags, mirror='--mirror-right' in flags)
+    main(*args, dry='--dry-run' in flags, mirror='--mirror-right' in flags, names=names, flip='--flip-cells' in flags)
