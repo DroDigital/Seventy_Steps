@@ -64,6 +64,7 @@ import { createHud } from './ui/hud';
 import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
 import { nextFrame, spriteAtlas } from './ui/loading';
+import { installGameEvidence } from './ui/gameEvidence';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
 import { noteLockAsked } from './core/mouseLock';
@@ -202,6 +203,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
   const noGlow = new Vector3(0, -1e4, 0);
   if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist });
+  if (debug) installGameEvidence(game, creatures);
   placeCamera(camera, game, 1);
   void pipeline.compile(scene, camera); // compiling while the chunks are built (in parallel, where the browser can)
   await made(0.55);
