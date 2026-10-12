@@ -68,6 +68,7 @@ void main() {
 
 export const SPRITE_FRAG = /* glsl */ `
 uniform sampler2D uAtlas;
+uniform float uReviewed; // authored PNG alpha is transparency, never a glow marker
 uniform vec3 uFogColor;
 uniform float uFogAmount;
 uniform float uMarkCharacters;
@@ -111,13 +112,13 @@ void main() {
     gl_FragColor = vec4(mix(voidAt(gl_FragCoord.xy, uTime) + vec3(0.12, 0.0, 0.18), uFogColor, vFog * uFogAmount), 1.0);
     return;
   }
-  if (t.a < 0.3 || vOpacity < bayer4(gl_FragCoord.xy)) discard;
-  bool glow = t.a < 0.9;
+  if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
+  bool glow = uReviewed < 0.5 && t.a < 0.9;
   vec3 col = glow ? t.rgb : t.rgb * vLight;
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   col = mix(col, vec3(1.0), vFlash);
   float fog = vFog * uFogAmount;
-  if (vOutside > 0.5) {
+  if (vOutside > 0.5 && uReviewed < 0.5) {
     // A colour no palette holds: every hue at once, crawling over it, bright wherever it is lit.
     vec3 hue = 0.5 + 0.5 * cos(6.2832 * (uTime * 0.23 + dot(t.rgb, vec3(1.7, -0.9, 0.6)) + vec3(0.0, 0.33, 0.67)));
     gl_FragColor = vec4(hue * (0.55 + 0.45 * dot(col, vec3(0.3333))), uMarkCharacters > 0.5 ? 0.31 : 1.0);

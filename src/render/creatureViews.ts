@@ -25,9 +25,10 @@ import { beyond, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
 import { MIST } from './volumetricFog';
 import { sight } from '../systems/perception';
-import { SPRITE_FRAG, SPRITE_VERT } from './shaders/sprite';
 import { CELL, spriteKey, type SpriteAtlas, type SpriteState } from './sprites/atlas';
-import { worldUniforms } from './worldMaterial';
+import { spriteBatch, reviewedTextures } from './sprites/batch';
+import { attackFrame, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type SpriteDirection } from './sprites/directional';
+import { reviewedClips, reviewedSize, type ReviewedManifest } from './sprites/reviewed';
 
 const CAPACITY = 64;
 const REACTIONS = new Set(['stagger', 'guardBreak', 'parried']);
@@ -41,7 +42,7 @@ interface Look {
 }
 
 /** Which frame of which state a creature shows, from its move and speed. */
-export function lookOf(g: Game, id: Entity, time: number): Look | null {
+export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteState, number>> = {}): Look | null {
   const c = g.ecs.c;
   const br = c.brain.get(id);
   if (isAbsent(g, id) || br?.state === 'hidden' || isUnseen(g, id)) return null;
@@ -52,19 +53,19 @@ export function lookOf(g: Game, id: Entity, time: number): Look | null {
   let look: Look;
   if (a.move === 'death' && def) {
     const t = a.frame / def.frames;
-    look = { state: 'hurt', frame: 1, opacity: 1 - t, sink: t, lash: 0 };
+    look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1 - t, sink: t, lash: 0 };
   } else if (a.move === 'evade') {
-    look = { state: 'move', frame: Math.floor(time * 8) % 2, opacity: 1, sink: 0, lash: 0 };
+    look = { state: 'move', frame: loopFrame(time, counts.move ?? 2, 0.5), opacity: 1, sink: 0, lash: 0 };
   } else if (a.move !== null && REACTIONS.has(a.move)) {
-    look = { state: 'hurt', frame: a.frame < 8 ? 0 : 1, opacity: 1, sink: 0, lash: 0 };
+    look = { state: 'hurt', frame: reactionFrame(a.frame, def?.frames ?? 16, counts.hurt ?? 2), opacity: 1, sink: 0, lash: 0 };
   } else if (a.move !== null && def) {
     const strike = strikeFrame(def) ?? Math.floor(def.frames / 3);
     const end = def.hit?.window[1] ?? strike + 6;
-    const frame = a.frame < strike ? 0 : a.frame < end ? 1 : 2;
-    look = { state: 'attack', frame, opacity: 1, sink: 0, lash: frame === 1 ? 1 : frame === 0 ? a.frame / Math.max(1, strike) * 0.3 : 0.3 };
+    const frame = attackFrame(a.frame, def.frames, strike, end, counts.attack ?? 3);
+    look = { state: 'attack', frame, opacity: 1, sink: 0, lash: a.frame < strike ? a.frame / Math.max(1, strike) * 0.3 : a.frame < end ? 1 : 0.3 };
   } else {
     const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
-    look = moving ? { state: 'move', frame: Math.floor(time * 5) % 2, opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: Math.floor(time * 1.6) % 2, opacity: 1, sink: 0, lash: 0 };
+    look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
   }
   if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
   return look;
@@ -79,7 +80,12 @@ function ghost(a: Assembly, share: number): Assembly {
 export interface CreatureViews {
   update(alpha: number, time: number, camera: THREE.Camera): void;
   /** The sprite atlas and its texture, for others that draw a creature's likeness (round 18: skyLife.ts). */
-  readonly sheet: { atlas: SpriteAtlas; texture: THREE.Texture };
+  readonly sheet: { atlas: SpriteAtlas; texture: THREE.Texture; reviewed?: { manifest: ReviewedManifest; textures: THREE.Texture[] } };
+  debugFrames(): readonly CreatureFrame[];
+}
+export interface CreatureFrame {
+  id: Entity; key: string; direction: SpriteDirection; state: SpriteState; frame: number;
+  source: string; mirror: boolean; page: number; width: number; height: number;
 }
 
 export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAtlas): CreatureViews {
@@ -88,22 +94,15 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   tex.minFilter = THREE.NearestFilter;
   tex.generateMipmaps = false;
   tex.needsUpdate = true;
-  const material = new THREE.ShaderMaterial({
-    // The shared world uniform objects (snap, fog, light), so the world's per-frame updates reach sprites too.
-    uniforms: { ...worldUniforms, uAtlas: { value: tex } },
-    vertexShader: SPRITE_VERT,
-    fragmentShader: SPRITE_FRAG,
-  });
-  const geo = new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0);
-  const cells = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
-  const info = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
-  const weird = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY), 1).setUsage(THREE.DynamicDrawUsage);
-  geo.setAttribute('aCell', cells);
-  geo.setAttribute('aInfo', info);
-  geo.setAttribute('aWeird', weird);
-  const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
-  batch.frustumCulled = false;
-  scene.add(batch);
+  const fallback = spriteBatch(scene, tex, CAPACITY);
+  const { cells, info, weird, mesh: batch } = fallback;
+  const art = atlas.reviewed;
+  const textures = reviewedTextures(art?.pages ?? []);
+  const pages = textures.map((texture) => spriteBatch(scene, texture, CAPACITY, true));
+  const clips = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedClips(entity, key)]));
+  const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
+  const directions = new Map<Entity, SpriteDirection>();
+  const debug: CreatureFrame[] = [];
   const glows = createHalos(CAPACITY, 0.55);
   scene.add(glows.mesh);
   const flat = new THREE.Vector3(); // the camera's right, level
@@ -136,13 +135,16 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const looking = new Map<Entity, number>(); // 0..1: how far a creature's eyes have come out of the mist (round 35)
 
   return {
-    sheet: { atlas, texture: tex },
+    sheet: { atlas, texture: tex, reviewed: art ? { manifest: art.manifest, textures } : undefined },
+    debugFrames: () => debug,
     update(alpha, time, camera) {
       camera.updateMatrixWorld();
       right.setFromMatrixColumn(camera.matrixWorld, 0);
       flat.set(right.x, 0, right.z).normalize();
       glows.begin();
       let n = 0;
+      const counts = pages.map(() => 0);
+      debug.length = 0;
       seen.clear();
       for (const [id, model] of g.ecs.c.model) {
         if (!model.startsWith(MODEL_PREFIX)) continue;
@@ -157,6 +159,30 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
+        const key = spriteKey(cid, variant);
+        const entry = art?.manifest.entities[key];
+        if (entry && art) {
+          if (!look) continue;
+          const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
+          const direction = spriteDirection(yaw, { x, z }, camera.position, directions.get(id));
+          directions.set(id, direction);
+          const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
+          if (!clip) continue;
+          const pose = lookOf(g, id, time, { [look.state]: clip.frames.length })!;
+          const frame = art.manifest.frames[clip.frames[pose.frame]];
+          const page = art.manifest.pages[frame.page];
+          const b = pages[frame.page];
+          const index = counts[frame.page];
+          if (index >= CAPACITY) continue;
+          b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
+          b.info.setXYZW(index, flash, pose.opacity, clip.mirror_horizontal ? 1 : 0, 0);
+          b.weird.setX(index, 0); // accepted anatomy, texture and palette stay intact through the cycle
+          const size = sizes.get(key)!;
+          b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
+          counts[frame.page]++;
+          debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
+          continue;
+        }
         if (def.assembly) {
           let asm = assemblies.get(id);
           if (asm?.model !== model) {
@@ -204,17 +230,15 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, amt * blink);
       }
       for (const id of looking.keys()) if (!seen.has(id)) looking.delete(id);
+      for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);
       for (const [id, asm] of assemblies) {
         if (seen.has(id)) continue;
         drop(asm);
         assemblies.delete(id);
       }
-      batch.count = n;
+      pages.forEach((page, index) => page.finish(counts[index]));
+      fallback.finish(n);
       glows.end();
-      batch.instanceMatrix.needsUpdate = true;
-      cells.needsUpdate = true;
-      info.needsUpdate = true;
-      weird.needsUpdate = true;
     },
   };
 }
