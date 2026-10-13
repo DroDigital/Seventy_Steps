@@ -32,6 +32,7 @@ import { reviewedClips, reviewedSize, type ReviewedManifest } from './sprites/re
 
 const CAPACITY = 64;
 const REACTIONS = new Set(['stagger', 'guardBreak', 'parried']);
+const PHANTOM_WEIRD = 0.45; // how far a hallucination (or a boss's decoy) slips and glitches: it is not quite there
 
 interface Look {
   state: SpriteState;
@@ -176,7 +177,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           if (index >= CAPACITY) continue;
           b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
           b.info.setXYZW(index, flash, pose.opacity, clip.mirror_horizontal ? 1 : 0, 0);
-          b.weird.setX(index, 0); // accepted anatomy, texture and palette stay intact through the cycle
+          b.weird.setX(index, g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
           const size = sizes.get(key)!;
           b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
           counts[frame.page]++;
@@ -217,7 +218,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         cells.setXYZW(n, cx / atlas.width, cy / atlas.height, (cx + CELL) / atlas.width, (cy + CELL) / atlas.height);
         const facingRight = Math.sin(tr.yaw) * right.x + Math.cos(tr.yaw) * right.z >= 0;
         info.setXYZW(n, flash, look.opacity, facingRight ? 0 : 1, def.sprite.outside ? 1 : 0);
-        weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? 0.45 : 0)); // a hallucination slips and glitches: it is not quite there
+        weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         const br = g.ecs.c.brain.get(id);
