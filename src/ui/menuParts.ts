@@ -158,7 +158,7 @@ export function tabs(parent: HTMLElement, names: readonly string[], open: number
 
 /** A page's foot: a hint line (what the chosen line is: set by `data-hint`), and the keys it answers to, whose Back goes back when clicked. */
 export function footer(parent: HTMLElement, hint: string, keys: readonly (readonly [string, string])[], back?: () => void): void {
-  const rest = [...parent.children].filter((c) => !(c as HTMLElement).dataset.pin); // all but the title and tabs scroll between them and the foot
+  const rest = [...parent.children].filter((c) => !c.hasAttribute('data-pin')); // all but the title and tabs scroll between them and the foot
   const body = el(parent, 'div');
   body.className = 'scroll';
   body.append(...rest);

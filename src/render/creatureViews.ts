@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle } from '../core/geom';
 import type { Variant } from '../data/registry';
-import { REVIEWED_EYES, REVIEWED_LIFT } from '../data/reviewedLook';
+import { REVIEWED_EYES } from '../data/reviewedLook';
 import { FEEDBACK, FOG_EYES, LIGHT, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import { isAbsent, isUnseen, type Game } from '../systems/components';
@@ -136,14 +136,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
-  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, lift: number) => {
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
     const page = art!.manifest.pages[frame.page];
     const b = pages[frame.page];
     const index = counts[frame.page];
     if (index >= CAPACITY) return null;
     b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
-    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, lift);
+    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, 0);
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
     b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
@@ -239,8 +239,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           if (!clip) continue;
           const pose = lookOf(g, id, time, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
-          const lift = REVIEWED_LIFT[key] ?? 0;
-          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, lift);
+          const frame = put(key, clip, pose, x, y, z, flash, 1, weird);
           if (!frame) continue;
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
           if (direction === 'front' && !clip.mirror_horizontal) reviewedEyes(key, x, y, z, pose, camera.position, mistLook(id, time));
@@ -252,7 +251,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0, lift);
+              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
             });
           }
           continue;

@@ -56,6 +56,7 @@ describe('an outer god on reviewed art', () => {
     expect(reviewed().count).toBe(1 + 1 + ECHOES.length);
     const opacity = Array.from({ length: reviewed().count }, (_, i) => reviewed().geometry.getAttribute('aInfo').getY(i));
     for (const e of ECHOES) expect(opacity.some((o) => Math.abs(o - (1 - e.ghost)) < 1e-6)).toBe(true);
+    for (let i = 0; i < reviewed().count; i++) expect(reviewed().geometry.getAttribute('aInfo').getW(i)).toBe(0); // authored bodies and echoes use ordinary lighting, with no rim override
     expect(views.debugFrames().filter((f) => f.key === 'azathoth')).toHaveLength(1); // the echoes are not the diagnostics' business
   });
 });
