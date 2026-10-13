@@ -11,6 +11,9 @@ Needs `pip install pillow numpy`. Run it when the pack in public/creatures/revie
   lift   how much a form needs its edge lit: the darkest forms (by the median brightness of their
          front idle) are near-black on a dark floor and vanish into it; a pale rim along their top
          and sides, in the moon's cool tint, gives them back their outline (render/shaders/sprite.ts).
+  body   how wide the painted body of a boss form is in the three bands its hurt zones are (legs, torso,
+         head; data/bossTuning.ts ZONES): the half-width of the mass, as a fraction of the form's height, from
+         its front idle. The fight strikes a colossus where the picture shows it (data/assemblyShape.ts).
 """
 
 import json
@@ -35,6 +38,10 @@ EYED = {
 EYE_WINDOW = 9  # pixels across which a mark is told from what is about it
 EYE_MAX = 12  # pixels of a mark, at most
 EYE_SPREAD = 0.07  # their spread, at most, as a fraction of the picture's width
+
+LEGS_TOP = 0.34  # the bands of a boss's body, as fractions of its painted height: data/bossTuning.ts ZONES (tests/reviewedLook.test.ts holds them equal)
+TORSO_TOP = 0.72
+BODY_SHARE = 75  # the percentile of a band's rows' widths taken for its breadth: the mass, not the farthest claw
 
 DARK = 0.165  # median brightness (0..1) below which a form is lit at its edge
 FLOOR = 0.55  # the rim a form just under DARK gets (0..1); the darkest of all get 1
@@ -115,15 +122,29 @@ def find_eyes(px, bounds, box=None):
     return (cx / px.shape[1], cy / px.shape[0], spread / px.shape[1], *[float(c) for c in colour])
 
 
+def body_bands(px, bounds):
+    """Half-widths of the painted mass in the legs, torso and head bands, as fractions of the painted height."""
+    solid = px[..., 3] > 128
+    x0, y0, x1, y1 = bounds
+    height = y1 - y0
+    bands = []
+    for lo, hi in ((0, LEGS_TOP), (LEGS_TOP, TORSO_TOP), (TORSO_TOP, 1)):
+        widths = [solid[y].sum() for y in range(int(y1 - hi * height), int(y1 - lo * height)) if solid[y].any()]
+        bands.append(round(float(np.percentile(widths, BODY_SHARE)) / 2 / height, 3) if widths else 0.0)
+    return bands
+
+
 def main():
     manifest = json.loads((PACK / 'index.json').read_text())
     frames = manifest['frames']
     pages = [np.array(Image.open(PACK / p['file']).convert('RGBA')) for p in manifest['pages']]
-    lift, eyes = {}, {}
+    lift, eyes, body = {}, {}, {}
     for key, entity in manifest['entities'].items():
         front = frames[entity['directions']['front']['actions']['idle'][0]]
         px = frame_pixels(pages, front)
         m = median_brightness(px)
+        if entity['assetGroup'] == 'bosses':
+            body[key] = body_bands(px, front['bounds'])
         if m < DARK:
             lift[key] = round(FLOOR + (1 - FLOOR) * min(1.0, (DARK - m) / DEPTH), 2)
         if key in EYED:
@@ -148,9 +169,16 @@ def main():
         'export const REVIEWED_EYES: Readonly<Record<string, readonly [x: number, y: number, spread: number, r: number, g: number, b: number]>> = {',
     ]
     lines += [f"  '{key}': [{', '.join(str(v) for v in value)}]," for key, value in sorted(eyes.items())]
+    lines += [
+        '};',
+        '',
+        "/** By boss form: the painted body's half-width in its legs, torso and head bands, as fractions of its height (what the fight's hurt zones are never narrower than: data/assemblyShape.ts). */",
+        'export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, torso: number, head: number]>> = {',
+    ]
+    lines += [f"  '{key}': [{', '.join(str(v) for v in value)}]," for key, value in sorted(body.items())]
     lines += ['};', '']
     OUT.write_text('\n'.join(lines))
-    print(f'{OUT.relative_to(ROOT)}: {len(lift)} forms lit at the edge, {len(eyes)} with eyes', file=sys.stderr)
+    print(f'{OUT.relative_to(ROOT)}: {len(lift)} forms lit at the edge, {len(eyes)} with eyes, {len(body)} boss bodies measured', file=sys.stderr)
 
 
 if __name__ == '__main__':

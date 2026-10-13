@@ -58,3 +58,16 @@ export const REVIEWED_EYES: Readonly<Record<string, readonly [x: number, y: numb
   'medusa_gorgon': [0.484, 0.188, 0.047, 0.929, 0.902, 0.8],
   'winged_hybrid': [0.5, 0.625, 0.062, 0.667, 0.663, 0.663],
 };
+
+/** By boss form: the painted body's half-width in its legs, torso and head bands, as fractions of its height (what the fight's hurt zones are never narrower than: data/assemblyShape.ts). */
+export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, torso: number, head: number]>> = {
+  'azathoth': [0.479, 0.34, 0.01],
+  'colossus_pyramids': [0.314, 0.289, 0.205],
+  'cthulhu': [0.307, 0.372, 0.255],
+  'dunwich_horror': [0.374, 0.388, 0.22],
+  'father_dagon': [0.315, 0.371, 0.24],
+  'ghatanothoa': [0.321, 0.288, 0.21],
+  'mother_hydra': [0.401, 0.413, 0.205],
+  'shub_niggurath': [0.54, 0.322, 0.023],
+  'yog_sothoth': [0.363, 0.392, 0.183],
+};

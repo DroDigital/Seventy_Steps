@@ -10,10 +10,11 @@ import { ATTACKS, compileAttack } from '../data/attacks';
 import { EVADE } from './bossArena';
 import type { Place } from '../data/arena';
 import { REACTIONS, type MoveDef } from '../data/moves';
+import { REVIEWED_BODY } from '../data/reviewedLook';
 import { BOSS } from '../data/tuning';
 import type { CombatantDef } from '../data/placeholders';
 import { getEntity, variantOf, type Variant } from '../data/registry';
-import type { AttackId, EntityDef, Silhouette } from '../data/schema';
+import type { AssemblyRecipe, AttackId, EntityDef, Silhouette } from '../data/schema';
 import type { Dread, Game } from './components';
 import { phaseBrain } from './fightPhase';
 import { newFight } from './fightTypes';
@@ -67,6 +68,10 @@ export function attacksOf(def: EntityDef): AttackId[] {
   return [...ids];
 }
 
+/** A lathed colossus's recipe with the breadth its picture paints (a body of spheres or a mound keeps its own). */
+const painted = (recipe: AssemblyRecipe, id: string): AssemblyRecipe =>
+  recipe.body === 'lathe' && REVIEWED_BODY[id] ? { ...recipe, painted: REVIEWED_BODY[id] } : recipe;
+
 export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   const { height, radius } = bodyOf(def);
   const moves: Record<string, MoveDef> = { ...REACTIONS, death: { frames: 80, hold: true } };
@@ -82,7 +87,7 @@ export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
     radius,
     height,
     aimHeight: Math.min(6, height * 0.6),
-    ...(def.assembly && { assembly: def.assembly }),
+    ...(def.assembly && { assembly: painted(def.assembly, def.id) }),
     bounty: def.drops.echoes,
     brain,
     moves,
