@@ -13,10 +13,10 @@ export interface Rung {
   shadows: number;
 }
 
-/** From the sharpest the game draws to the plainest it can. */
+/** From the default picture to the plainest it can draw; sharper resolutions remain a player's choice. */
 export const LADDER: readonly Rung[] = [
-  { resolution: 2, fog: 1, shadows: 1 },
-  { resolution: 2, fog: 1, shadows: 0 },
+  { resolution: 1.5, fog: 1, shadows: 1 },
+  { resolution: 1.5, fog: 1, shadows: 0 },
   { resolution: 1.5, fog: 0.75, shadows: 0 },
   { resolution: 1, fog: 0.5, shadows: 0 },
   { resolution: 0.75, fog: 0.25, shadows: 0 },

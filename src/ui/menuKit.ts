@@ -17,7 +17,7 @@ import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
 import { CSS, frame, INK, tabJustChanged } from './menuParts';
 import { installCursor, menuCursor } from './cursor';
-import { attachSkin, BASE, SKIN } from './menuSkin';
+import { attachSkin, SKIN } from './menuSkin';
 import { SCALED_LAYER } from './uiScale';
 
 export interface Page {
@@ -97,22 +97,22 @@ function move(panel: HTMLElement, by: number): void {
 
 /**
  * How a page comes in when the screen is already open (round 38): the page that was there is lifted away (a copy of it
- * drifts off the way it leaves, blurring, while the mist stirs) and the new one drifts in from the way it comes, out of
- * a little blur, each part a moment after the one above. Choosing deeper (Settings, Arms) moves left; coming back, right.
+ * dissolves in place, blurring, while the mist stirs) and the new one rises gently out of
+ * a little blur, each part a moment after the one above. Pages keep their horizontal position going in and back.
  * A tab changes only the body, in place. Under reduced motion, nothing moves.
  */
-function bring(panel: HTMLElement, ghost: HTMLElement | null, tab: boolean, deeper: boolean): void {
+function bring(panel: HTMLElement, ghost: HTMLElement | null, tab: boolean): void {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return void ghost?.remove();
-  const way = deeper ? 1 : -1;
   const ease = 'cubic-bezier(.2,.7,.25,1)';
   if (ghost) { // the words being left dissolve where they stand, into the mist: a blur and a thinning, a little lifted (round 45: they slid sideways)
-    ghost.animate([{ opacity: 1, filter: 'blur(0)', transform: `${BASE} translateY(0)` }, { opacity: 0, filter: 'blur(9px)', transform: `${BASE} translateY(-5px)` }], { duration: 260, easing: 'ease-in', fill: 'forwards' });
+    const base = ghost.style.transform === 'none' ? '' : ghost.style.transform;
+    ghost.animate([{ opacity: 1, filter: 'blur(0)', transform: `${base} translateY(0)` }, { opacity: 0, filter: 'blur(9px)', transform: `${base} translateY(-5px)` }], { duration: 260, easing: 'ease-in', fill: 'forwards' });
     setTimeout(() => ghost.remove(), 340); // (not by the animation's end: a page changed again in between must not leave a copy behind)
   }
   const parts = tab ? [...panel.querySelectorAll<HTMLElement>(':scope > .scroll')] : [...panel.children].filter((c): c is HTMLElement => c instanceof HTMLElement);
   parts.forEach((part, i) =>
     part.animate(
-      [{ opacity: 0, filter: 'blur(9px)', transform: tab ? 'translateY(8px)' : `translate(${7 * way}px,6px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
+      [{ opacity: 0, filter: 'blur(9px)', transform: `translateY(${tab ? 8 : 6}px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
       { duration: tab ? 170 : 420, delay: tab ? 0 : 130 + Math.min(i, 6) * 45, easing: ease, fill: 'backwards' }, // each part gathers a moment after the one above, as the old words are going
     ),
   );
@@ -124,11 +124,18 @@ function leave(layer: HTMLElement, panel: HTMLElement): HTMLElement {
   ghost.dataset.ghost = ''; // (it keeps the menu's look: it is the same page, still)
   ghost.inert = true;
   ghost.style.pointerEvents = 'none';
-  ghost.style.width = `${panel.offsetWidth}px`;
-  ghost.style.maxHeight = `${panel.offsetHeight}px`;
+  const size = getComputedStyle(panel);
+  ghost.style.width = size.width;
+  ghost.style.height = size.height;
   ghost.style.overflow = 'hidden';
   ghost.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
   layer.append(ghost);
+  // Cloning does not keep the scroll positions: the fading words must stay where the player left them.
+  const original = [panel, ...panel.querySelectorAll<HTMLElement>('*')];
+  [ghost, ...ghost.querySelectorAll<HTMLElement>('*')].forEach((copy, i) => {
+    copy.scrollLeft = original[i].scrollLeft;
+    copy.scrollTop = original[i].scrollTop;
+  });
   return ghost;
 }
 
@@ -287,7 +294,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
       const ghost = change ? leave(layer, panel) : null; // the page being left, to drift away over the new one
       panel.replaceChildren();
       page.build(panel);
-      if (entry && (!same || tabbed)) bring(panel, ghost, tabbed, !memory.has(page)); // another page, or another tab: it comes in (round 38)
+      if (entry && (!same || tabbed)) bring(panel, ghost, tabbed); // another page, or another tab: it comes in (round 38)
       if (change) skinned?.stir(); // (the mist drifts a little; it does not brighten)
       root.style.display = 'block';
       if (entry) entry.page = page;

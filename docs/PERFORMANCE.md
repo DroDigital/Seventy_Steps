@@ -23,8 +23,8 @@ four steps; under 28 fps it steps down two. `render/autoQuality.ts`:
 
 | Rung | Resolution | Volumetric fog | Shadows |
 | --- | --- | --- | --- |
-| 0 (default) | 2× (800 × 450) | 100% | on |
-| 1 | 2× | 100% | off |
+| 0 (default) | 1.5× (600 × 338) | 100% | on |
+| 1 | 1.5× | 100% | off |
 | 2 | 1.5× | 75% | off |
 | 3 | 1× | 50% | off |
 | 4 | 0.75× | 25% | off |

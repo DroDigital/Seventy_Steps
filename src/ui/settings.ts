@@ -12,7 +12,7 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Settings kept before this version start at the most resolution again (playtest round 13: the game starts at its sharpest). */
+/** Legacy entries take the current resolution default once; choices saved at this version remain untouched. */
 const VERSION = 13;
 
 export function defaultSettings(): Settings {
