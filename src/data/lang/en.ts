@@ -142,6 +142,7 @@ export const EN = {
   'ctl.padNone': 'none heard (press a button on it)',
   'ctl.refused': 'That key is kept (Shift, Tab, Enter, Esc and the arrows belong to the game and its menus). Choose another.',
   'ctl.choose': 'Choose a key, then press its new one.',
+  'ctl.waiting': 'Press the new key for “{action}”. Esc cancels.',
   // where to rise
   'rise.title': 'RISE',
   'rise.candle': 'At the candle',

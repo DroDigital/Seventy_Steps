@@ -134,6 +134,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'ctl.padNone': "ninguno detectado (pulsa un botón)",
   'ctl.refused': "Esa tecla está reservada (Mayús, Tab, Intro, Esc y las flechas pertenecen al juego y a sus menús). Elige otra.",
   'ctl.choose': "Elige una tecla y pulsa la nueva.",
+  'ctl.waiting': "Pulsa la nueva tecla para «{action}». Esc cancela.",
   'rise.title': "LEVANTARSE",
   'rise.candle': "Junto a la vela",
   'rise.candleBoss': "A pocos pasos de la niebla de {boss}, donde arde la llama. Las criaturas vuelven; tus Ecos yacen donde caíste.",

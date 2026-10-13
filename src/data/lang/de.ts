@@ -134,6 +134,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'ctl.padNone': "keines erkannt (eine Taste daran drücken)",
   'ctl.refused': "Diese Taste ist vergeben (Umschalt, Tab, Eingabe, Esc und die Pfeile gehören dem Spiel und seinen Menüs). Wählt eine andere.",
   'ctl.choose': "Wählt eine Taste und drückt dann die neue.",
+  'ctl.waiting': "Neue Taste für „{action}“ drücken. Esc bricht ab.",
   'rise.title': "ERHEBEN",
   'rise.candle': "An der Kerze",
   'rise.candleBoss': "Wenige Schritte vor dem Nebel von {boss}, wo die Flamme brennt. Die Wesen kehren zurück; eure Echos liegen, wo ihr gefallen seid.",

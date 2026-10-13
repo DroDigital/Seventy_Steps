@@ -28,7 +28,7 @@ import { creditsPage } from './credits';
 import { BONE, el, SERIF } from './hudKit';
 import { button, createScreen, heading, type Page } from './menuKit';
 
-const BUTTON = `display:inline-block;width:auto;text-align:center;margin:28px 10px 0;padding:6px 16px;font:14px ${SERIF};letter-spacing:2px;color:${BONE};background:#141416;border:1px solid ${BONE}55;cursor:pointer`;
+const BUTTON = `display:inline-block;width:auto;text-align:center;margin:28px 10px 0;padding:6px 18px 6px 28px;font:14px ${SERIF};letter-spacing:2px;color:${BONE};background:#141416;border:1px solid ${BONE}55;cursor:pointer`;
 
 /** Set before a reload: the page opens straight into a new game with its opening (main.ts). */
 export const NEW_GAME_FLAG = 'lovecraft-souls-like/new-game';

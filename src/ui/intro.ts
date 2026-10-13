@@ -126,8 +126,8 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
       row.dataset.keys = '';
       row.style.cssText = 'position:absolute;left:28px;right:28px;bottom:22px;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:2px;opacity:0';
       screen.root.append(row);
-      if (again) row.style.opacity = '0.4';
-      else row.animate([{ opacity: 0 }, { opacity: 0.4 }], { duration: 2400, delay: 1800, fill: 'forwards' }); // what the keys do, faint, once the first words are out
+      if (again) row.style.opacity = '0.55';
+      else row.animate([{ opacity: 0 }, { opacity: 0.55 }], { duration: 2400, delay: 1800, fill: 'forwards' }); // what the keys do, faint, once the first words are out
       el(row, 'div', `${glyph('back')} · skip`);
       hint = el(row, 'div', '');
       hint.style.cursor = 'pointer';

@@ -9,6 +9,7 @@
 import { t } from '../core/i18n';
 import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
+import { moreAt } from './scrollCue';
 
 /** The menus' colours (round 38): ash for the print and the ground, and the haunt's eldritch purple for what is lit. */
 export const INK = '#cbc7bd';
@@ -20,12 +21,13 @@ export const CSS = `
 [data-menu] button{position:relative;display:block;width:100%;margin:0;padding:7px 14px 7px 30px;text-align:left;font:15px ${SERIF};letter-spacing:.8px;color:${INK}c0;background:none;border:none;border-top:1px solid transparent;border-bottom:1px solid transparent;cursor:pointer;transition:color .15s,background .15s,border-color .15s}
 [data-menu] button::before{content:'';position:absolute;left:12px;top:50%;width:5px;height:5px;margin-top:-3px;border:1px solid ${ACCENT};transform:rotate(45deg) scale(.3);opacity:0;transition:opacity .15s,transform .15s}
 [data-menu] button:disabled{opacity:.5;cursor:default}
+[data-menu] button .sub{display:block;margin-top:1px;font-size:12px;line-height:1.35;letter-spacing:.4px;opacity:.62}
 [data-menu] button.quiet{display:inline-block;width:auto;padding:2px 0;opacity:.55;text-shadow:0 0 6px #000,0 1px 2px #000}
 [data-menu] button.quiet::before{display:none}
 [data-menu] button.quiet:focus,[data-menu] button.quiet:hover:not(:disabled){outline:none;opacity:1;background:none}
 [data-menu] button:focus,[data-menu] button:hover:not(:disabled),[data-menu] label:focus-within,[data-menu] label:hover{outline:none;color:${BRIGHT};background:linear-gradient(90deg,transparent,${ACCENT}26 14%,${ACCENT}0d 60%,transparent)}
 [data-menu] button:focus::before,[data-menu] button:hover:not(:disabled)::before{opacity:1;transform:rotate(45deg) scale(1);background:${ACCENT}}
-[data-menu] button.tab{display:inline-block;width:auto;flex:0 1 auto;white-space:nowrap;margin:0 1px;padding:6px 10px;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;color:${INK}70;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
+[data-menu] button.tab{display:inline-block;width:auto;flex:0 1 auto;white-space:nowrap;margin:0 1px;padding:6px 10px;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;color:${INK}8c;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
 [data-menu] button.tab::before{display:none}
 [data-menu] button.tab.on{color:${BRIGHT};border-bottom-color:${ACCENT}}
 [data-menu] button.tab:focus,[data-menu] button.tab:hover:not(:disabled){color:${BRIGHT};background:${ACCENT}14}
@@ -48,6 +50,9 @@ export const CSS = `
 [data-menu] .scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;margin:0 -10px;padding:0 10px;scrollbar-width:thin;scrollbar-color:${ACCENT}55 transparent}
 [data-menu] .scroll::-webkit-scrollbar{width:6px}
 [data-menu] .scroll::-webkit-scrollbar-thumb{background:${ACCENT}44}
+[data-menu] .scroll[data-more=below]{-webkit-mask-image:linear-gradient(#000 calc(100% - 26px),transparent);mask-image:linear-gradient(#000 calc(100% - 26px),transparent)}
+[data-menu] .scroll[data-more=above]{-webkit-mask-image:linear-gradient(transparent,#000 26px);mask-image:linear-gradient(transparent,#000 26px)}
+[data-menu] .scroll[data-more=both]{-webkit-mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 26px,#000 calc(100% - 26px),transparent)}
 [data-menu] .hint{min-height:2.9em;padding-bottom:4px;white-space:pre-line;font-size:13px;line-height:1.45;color:${INK}99}
 [data-menu]{scrollbar-width:thin;scrollbar-color:${ACCENT}55 transparent}
 [data-menu]::-webkit-scrollbar{width:6px}
@@ -88,8 +93,10 @@ export function title(parent: HTMLElement, text: string): HTMLDivElement {
   return box;
 }
 
-export function button(parent: HTMLElement, text: string, run: () => void, enabled = true, hint = ''): HTMLButtonElement {
+/** `sub`: a smaller line under the choice's name (what a saved slot holds, what a level would change). */
+export function button(parent: HTMLElement, text: string, run: () => void, enabled = true, hint = '', sub = ''): HTMLButtonElement {
   const b = el(parent, 'button', text);
+  if (sub) el(b, 'span', sub).className = 'sub';
   if (hint) b.dataset.hint = hint;
   b.disabled = !enabled;
   b.addEventListener('click', run);
@@ -101,8 +108,8 @@ export function button(parent: HTMLElement, text: string, run: () => void, enabl
  * and why it could not be taken, could not be read): it stays a line to choose, dimmed, and choosing it says
  * `why` in the page's foot instead of doing anything. `hint` is what the foot says while it is the chosen line.
  */
-export function option(parent: HTMLElement, text: string, run: () => void, ok: boolean, why: string, hint = ''): HTMLButtonElement {
-  const b = button(parent, text, () => (ok ? run() : void (b.closest('[data-menu]')?.querySelector('.hint') as HTMLElement | null)?.replaceChildren(why)), true, hint);
+export function option(parent: HTMLElement, text: string, run: () => void, ok: boolean, why: string, hint = '', sub = ''): HTMLButtonElement {
+  const b = button(parent, text, () => (ok ? run() : void (b.closest('[data-menu]')?.querySelector('.hint') as HTMLElement | null)?.replaceChildren(why)), true, hint, sub);
   if (!ok) b.style.opacity = '.65';
   return b;
 }
@@ -154,12 +161,15 @@ export function footer(parent: HTMLElement, hint: string, keys: readonly (readon
   const body = el(parent, 'div');
   body.className = 'scroll';
   body.append(...rest);
+  const more = (): void => void (body.dataset.more = moreAt(body.scrollTop, body.clientHeight, body.scrollHeight)); // the words fade toward an edge with more beyond it
+  body.addEventListener('scroll', more, { passive: true });
+  new ResizeObserver(more).observe(body);
   if (parent.dataset.body) [body.style.flex, parent.dataset.body] = [`1 1 ${parent.dataset.body}px`, '']; // a page with tabs keeps one height, whichever tab is open (it is a size to start from, not a least: a small window still shrinks it)
   const line = el(parent, 'div', hint, `margin-top:12px;padding-top:8px;border-top:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
   line.className = 'hint';
   line.dataset.def = hint; // what it says when the chosen line has nothing of its own to say
   if (!hint && !body.querySelector('[data-hint]')) [line.className, line.style.minHeight] = ['', '0']; // nothing to say (a list of tomes): no room kept for it
-  const row = el(parent, 'div', '', `display:flex;justify-content:center;gap:20px;white-space:nowrap;margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK}70`);
+  const row = el(parent, 'div', '', `display:flex;justify-content:center;gap:20px;white-space:nowrap;margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK}8c`);
   for (const [key, what] of keys) {
     const s = el(row, 'span', `${key}  ${what}`);
     if (back && what === t('keys.back')) [s.style.cursor, s.onclick] = ['pointer', back]; // the mouse's way back: a click on it (it is not a choice for the keys)

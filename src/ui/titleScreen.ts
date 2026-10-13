@@ -7,7 +7,7 @@
  * stays until the veil has covered it.
  */
 
-import type { SlotLine } from './titleSlots';
+import { slotParts, type SlotLine } from './titleSlots';
 import { t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { TITLE_LINES } from '../data/intro';
@@ -103,7 +103,7 @@ export function showTitle(o: TitleOptions): void {
       button(menu, t('menu.settings'), () => screen.show(placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys), '50%', false)));
       button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
       if (desktop) button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())); // the desktop shell only (playtest round 12)
-      el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.3;margin-top:26px;font-size:11px;letter-spacing:2px;text-transform:uppercase');
+      el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.5;margin-top:26px;font-size:11px;letter-spacing:2px;text-transform:uppercase');
     },
   }, '66%', true);
   const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));
@@ -130,12 +130,12 @@ export function showTitle(o: TitleOptions): void {
     back: () => screen.show(main),
     build(p) {
       heading(p, t(to === 'new' ? 'title.newSlot' : 'title.loadSlot'));
-      const menu = el(p, 'div', '', 'width:360px;margin:0 auto;text-align:left');
+      const menu = el(p, 'div', '', 'width:420px;margin:0 auto;text-align:left'); // (wide enough that a slot's second line is one line)
       o.slots().forEach((line, k) => {
         const slot = k + 1;
-        const label = t('title.slot', { n: slot, line: line?.line ?? t('title.empty') });
-        if (to === 'load') button(menu, label, () => into(slot, false), !!line?.loads);
-        else button(menu, label, () => (line ? screen.show(confirm(slot)) : screen.show(difficultyPage(slot))));
+        const [label, sub] = slotParts(t('title.slot', { n: slot, line: line?.line ?? t('title.empty') }), !!line);
+        if (to === 'load') button(menu, label, () => into(slot, false), !!line?.loads, '', sub);
+        else button(menu, label, () => (line ? screen.show(confirm(slot)) : screen.show(difficultyPage(slot))), true, '', sub);
       });
       button(menu, t('title.back'), () => screen.show(main));
     },
