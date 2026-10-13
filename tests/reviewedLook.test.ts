@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { REVIEWED_EYES, REVIEWED_LIFT } from '../src/data/reviewedLook';
+import { ZONES } from '../src/data/bossTuning';
+import { REVIEWED_BODY, REVIEWED_EYES, REVIEWED_LIFT } from '../src/data/reviewedLook';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
 import type { ReviewedManifest } from '../src/render/sprites/reviewed';
 
@@ -42,5 +43,26 @@ describe('what the renderer adds to the reviewed art (tools/reviewed_look.py)', 
       for (const c of rgb) expect(c).toBeLessThanOrEqual(1);
     }
     expect(Object.keys(REVIEWED_EYES).length).toBeGreaterThanOrEqual(8);
+  });
+});
+
+describe('the painted body of a boss form (tools/reviewed_look.py)', () => {
+  const bosses = Object.entries(manifest.entities).filter(([, e]) => e.assetGroup === 'bosses').map(([key]) => key);
+
+  it('is measured for every boss form, in three bands, each a plausible share of its height', () => {
+    expect(Object.keys(REVIEWED_BODY).sort()).toEqual(bosses.sort());
+    for (const [key, bands] of Object.entries(REVIEWED_BODY)) {
+      expect(bands, key).toHaveLength(3);
+      for (const half of bands) {
+        expect(half, key).toBeGreaterThan(0);
+        expect(half, key).toBeLessThan(0.6);
+      }
+    }
+  });
+
+  it('is cut into the bands the fight has: the tool and the zones name the same heights', () => {
+    const tool = readFileSync('tools/reviewed_look.py', 'utf8');
+    expect(Number(/^LEGS_TOP = ([\d.]+)/m.exec(tool)?.[1])).toBe(ZONES.legs.top);
+    expect(Number(/^TORSO_TOP = ([\d.]+)/m.exec(tool)?.[1])).toBe(ZONES.torso.top);
   });
 });

@@ -49,10 +49,15 @@ export function reviewedClips(entity: ReviewedEntity, key: string): DirectionalC
       : key === 'innsmouth_hybrid' && direction === 'right' ? 'left' : direction;
     const view = entity.directions[authored];
     clips[direction] = {};
-    for (const state of ['idle', 'move', 'attack', 'hurt', 'stoop'] as const) {
+    for (const state of ['idle', 'move', 'attack', 'hurt', 'stoop', 'stoop_mid'] as const) {
       const frames = view.actions[state];
       if (frames) clips[direction]![state] = { frames, mirror_horizontal: view.mirror };
     }
+  }
+  // A boss's combat art is drawn from its left and its back; its right is the left mirrored once (its walk and idle on that side are its own).
+  const [left, right] = [clips.left!, clips.right!];
+  for (const state of ['attack', 'hurt'] as const) {
+    if (left[state] && !right[state]) right[state] = { frames: left[state]!.frames, mirror_horizontal: !left[state]!.mirror_horizontal };
   }
   return clips;
 }
