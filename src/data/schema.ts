@@ -152,6 +152,8 @@ export interface AssemblyRecipe {
   wings?: number;
   eyes?: number;
   spheres?: number;
+  /** A body of spheres as the reviewed art paints it: each sphere's place and size as a fraction of `scale` (across from the picture's centre, up from its foot, radius), what is struck (data/assemblyShape.ts). */
+  hit?: readonly (readonly [across: number, up: number, radius: number])[];
   glow?: Glow;
 }
 
