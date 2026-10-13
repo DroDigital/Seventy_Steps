@@ -1,5 +1,7 @@
 # Art briefs for the next two redraws
 
+*Both were drawn and delivered (the seven in-between frames and the 126 side and back frames), checked and imported (`tools/add_reviewed_frames.py`; docs/CREATURE_ART.md, "Later deliveries"). They stay here as the brief the next redraw can start from.*
+
 Prompts for the image model (GPT / Codex) that drew the 105-creature library and the colossi's stoop. Each is
 written to be pasted whole. What they ask for is what `tools/add_reviewed_frames.py` checks, so a frame that
 breaks a rule is refused at import, not found later in the game. Where the numbers come from:

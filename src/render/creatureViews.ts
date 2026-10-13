@@ -43,8 +43,8 @@ interface Look {
   lash: number; // 0..1 around an attack's strike
 }
 
-/** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began. */
-export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0): Look | null {
+/** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose). */
+export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number): Look | null {
   const c = g.ecs.c;
   const br = c.brain.get(id);
   if (isAbsent(g, id) || br?.state === 'hidden' || isUnseen(g, id)) return null;
@@ -57,7 +57,10 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
     const t = a.frame / def.frames;
     look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1 - t, sink: t, lash: 0 };
   } else if ((counts.stoop ?? 0) > 0 && stooped(g, id)) { // a colossus after a blow of its own, or reeling: its head is down within reach (hurt.ts), and the picture bows to match; once, then held
-    look = { state: 'stoop', frame: stoopAge < FEEDBACK.bowSeconds ? 0 : counts.stoop! - 1, opacity: 1, sink: 0, lash: 0 };
+    const down = (counts.stoop_mid ?? 0) > 0 ? FEEDBACK.midSeconds : 0; // the head comes down through its halfway pose, where it has one
+    look = stoopAge < down ? { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 } : { state: 'stoop', frame: stoopAge < down + FEEDBACK.bowSeconds ? 0 : counts.stoop! - 1, opacity: 1, sink: 0, lash: 0 };
+  } else if ((counts.stoop_mid ?? 0) > 0 && riseAge !== undefined && riseAge < FEEDBACK.riseSeconds && a.move === null) { // and comes up through it
+    look = { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 };
   } else if (a.move === 'evade') {
     look = { state: 'move', frame: loopFrame(time, counts.move ?? 2, 0.5), opacity: 1, sink: 0, lash: 0 };
   } else if (a.move !== null && REACTIONS.has(a.move)) {
@@ -105,15 +108,26 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const pages = textures.map((texture) => spriteBatch(scene, texture, CAPACITY, true));
   const clips = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedClips(entity, key)]));
   const stoops = new Map(Object.entries(art?.manifest.entities ?? {}).flatMap(([key, entity]) => (entity.directions.front.actions.stoop?.length ? [[key, entity.directions.front.actions.stoop.length] as const] : []))); // the frames of the stoop of each reviewed form that has one
+  const mids = new Set(Object.entries(art?.manifest.entities ?? {}).flatMap(([key, entity]) => (entity.directions.front.actions.stoop_mid?.length ? [key] : []))); // those that have its in-between pose too
   const stoopSince = new Map<Entity, number>(); // when each stooped colossus began its stoop (seconds)
-  /** The stoop a reviewed colossus is in: its frames and the seconds since it began; undefined when it has none or is on its feet. */
-  const stoopOf = (id: Entity, key: string, time: number): { frames: number; age: number } | undefined => {
+  const riseSince = new Map<Entity, number>(); // when each that has stood up began to (seconds)
+  /** The stoop a reviewed colossus is in: its frames, whether it has the in-between pose, the seconds since it began (or, as it stands up, `rise` since it ended); undefined when it has none or is on its feet. */
+  const stoopOf = (id: Entity, key: string, time: number): { frames: number; mid: boolean; age: number; rise?: number } | undefined => {
     const frames = stoops.get(key);
     if (!frames) return undefined;
-    if (!stooped(g, id)) return void stoopSince.delete(id);
+    const mid = mids.has(key);
+    if (!stooped(g, id)) {
+      if (stoopSince.delete(id) && mid) riseSince.set(id, time);
+      const rise = riseSince.get(id);
+      if (rise === undefined || time - rise >= FEEDBACK.riseSeconds) return void riseSince.delete(id);
+      return { frames, mid, age: 0, rise: time - rise };
+    }
+    riseSince.delete(id);
     if (!stoopSince.has(id)) stoopSince.set(id, time);
-    return { frames, age: time - stoopSince.get(id)! };
+    return { frames, mid, age: time - stoopSince.get(id)! };
   };
+  /** The frames each state has, as `lookOf` is told, with a stoop's. */
+  const known = (bow: ReturnType<typeof stoopOf>): Partial<Record<SpriteAction, number>> => (bow ? { stoop: bow.frames, ...(bow.mid && { stoop_mid: 1 }) } : {});
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const glows = createHalos(CAPACITY, 0.55);
@@ -210,7 +224,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
         const bow = entry ? stoopOf(id, key, time) : undefined;
-        const look = lookOf(g, id, time, bow ? { stoop: bow.frames } : {}, bow?.age);
+        const look = lookOf(g, id, time, known(bow), bow?.age, bow?.rise);
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
@@ -223,7 +237,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
-          const pose = lookOf(g, id, time, { [look.state]: clip.frames.length }, bow?.age)!;
+          const pose = lookOf(g, id, time, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           const lift = REVIEWED_LIFT[key] ?? 0;
           const frame = put(key, clip, pose, x, y, z, flash, 1, weird, lift);
@@ -232,13 +246,13 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           if (direction === 'front' && !clip.mirror_horizontal) reviewedEyes(key, x, y, z, pose, camera.position, mistLook(id, time));
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
             ECHOES.forEach((e, i) => {
-              const behind = bow ? { stoop: bow.frames } : {};
+              const behind = known(bow);
               const age = bow ? Math.max(0, bow.age - e.lag) : 0;
-              const late = lookOf(g, id, time - e.lag, behind, age);
+              const late = lookOf(g, id, time - e.lag, behind, age, bow?.rise);
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, time - e.lag, { [late.state]: lagged.frames.length }, age)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0, lift);
+              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0, lift);
             });
           }
           continue;
@@ -271,7 +285,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           continue;
         }
         const frames = atlas.frames.get(spriteKey(cid, variant));
-        if (!look || look.state === 'stoop' || !frames || !def.sprite || n >= CAPACITY) continue; // (the drawn sprites have no stoop)
+        if (!look || look.state === 'stoop' || look.state === 'stoop_mid' || !frames || !def.sprite || n >= CAPACITY) continue; // (the drawn sprites have no stoop)
         const cell = frames[look.state][look.frame];
         const [cx, cy] = [(cell % (atlas.width / CELL)) * CELL, Math.floor(cell / (atlas.width / CELL)) * CELL];
         cells.setXYZW(n, cx / atlas.width, cy / atlas.height, (cx + CELL) / atlas.width, (cy + CELL) / atlas.height);

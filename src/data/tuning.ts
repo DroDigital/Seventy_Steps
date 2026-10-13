@@ -244,6 +244,8 @@ export const FEEDBACK = {
   echoGlowHeight: 0.6, // light above an Echo drop
   revealSeconds: 0.5, // hidden-layer geometry flickers this long as it comes and goes
   bowSeconds: 0.3, // a colossus's stoop: its first pose (the bow) shows this long, then its last (the hold) until the stoop ends
+  midSeconds: 0.1, // ...with the in-between pose before the bow, where it has one
+  riseSeconds: 0.18, // ...and again, as it stands up, before its idle
 };
 
 /** The open world (spec §3D). Distances in metres. */

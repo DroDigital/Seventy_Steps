@@ -4,14 +4,17 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2591,
+  "unique_png_count": 2728,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
     "When mirror_horizontal is true, use the listed source PNGs and reflect horizontally once.",
     "Frames retain their complete source canvas and alpha; do not trim or independently resize frames within a cycle.",
     "Boss movement PNGs are 2D animation assets; existing materials, meshes or rigs require separate game integration.",
-    "'stoop' (front view only): two frames, the first once on entering the pose and the second held until it ends; they are a later delivery, packed onto their own atlas page by tools/add_reviewed_frames.py."
+    "'stoop' (front view only): two frames, the first once on entering the pose and the second held until it ends; they are a later delivery, packed onto their own atlas page by tools/add_reviewed_frames.py.",
+    "umr_at_tawil: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); its right view is drawn, not mirrored from its left, its four frames on a shelf at the foot of its page.",
+    "front/stoop_mid: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
+    "back/attack, back/hurt, left/attack, left/hurt: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held)."
   ],
   "entities": [
     {
@@ -12952,6 +12955,56 @@
                   "sha256": "6a1faf224b0b6540777f5998e298a2a92f46faa3ad6fee9773576c8dba1753ba"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/dunwich_horror/movement/back/attack_0.png",
+                  "sha256": "30559bad2867a6d14a5e2f302115c22d98660ce5eb0783365617dda7749693e8"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/dunwich_horror/movement/back/attack_1.png",
+                  "sha256": "af54f588bd51420db88f69f89278d14e19cb436366032fce66c213a30b92f968"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/dunwich_horror/movement/back/attack_2.png",
+                  "sha256": "32b4516f0688b6463e0713edcb5b9abba300eb209f773b9c5897ef78fef9b1e3"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/dunwich_horror/movement/back/attack_3.png",
+                  "sha256": "aad7b3f33ecbb00f353b36967b51713e4be5020412147fb7702899aed11a6edf"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/dunwich_horror/movement/back/hurt_0.png",
+                  "sha256": "58f9528691480951c56a468825c713dbde5f697a9c0a95d2084323abaadad5ee"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/dunwich_horror/movement/back/hurt_1.png",
+                  "sha256": "60b1c640ddd09c98392f21e8eb0a76703767f642d2c0b2ea38c2fa6063a51894"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/dunwich_horror/movement/back/hurt_2.png",
+                  "sha256": "8ce931bec2fb0e60ad51846c46a4706ec675d77b847155aa3d338fa290cddc9f"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/dunwich_horror/movement/back/hurt_3.png",
+                  "sha256": "87132a92cda7b254dfa2eb4a9f343e93e20bed79d070d0145fe4edac39cde2f5"
+                }
+              ]
             }
           }
         },
@@ -12996,6 +13049,56 @@
                   "name": "move_3",
                   "path": "bosses/dunwich_horror/movement/left/move_3.png",
                   "sha256": "e89ebd9400e6281a291894adb7463a5aa9182330f5ef2c86f0cceabbb9f35a27"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/dunwich_horror/movement/left/attack_0.png",
+                  "sha256": "b5193c4788da49a90f52db68b11044a48ec8a5ecb23958ba91797d0accae5ea2"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/dunwich_horror/movement/left/attack_1.png",
+                  "sha256": "7624cec26bf7649766ad73900b6335144d04be8a61d9cb6ba0f4f1a556562d9b"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/dunwich_horror/movement/left/attack_2.png",
+                  "sha256": "a931324ed9513383f91abe132f6102d7ada42b24d6d194c00b5a6816cef1cb70"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/dunwich_horror/movement/left/attack_3.png",
+                  "sha256": "606ba7cfa849b02fddbaac5325aa3320eb63a8a6562565eec7e325fd7bd31dac"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/dunwich_horror/movement/left/hurt_0.png",
+                  "sha256": "303781116a406f631a610b1a64762fcd3c1d82ade0e15d5ff55bf741422a2559"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/dunwich_horror/movement/left/hurt_1.png",
+                  "sha256": "655df3b417f88a8465f4950cefa4cd17eb33aeeaf5df00c0dfd9519596a8a5c4"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/dunwich_horror/movement/left/hurt_2.png",
+                  "sha256": "f86c54c56d9d39767ee7b0e1752016cda630b8a6ce760853e582cf5f3cdc9fc4"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/dunwich_horror/movement/left/hurt_3.png",
+                  "sha256": "ca0fdd8ffc7b775fe8f16a0d0415873cfe184922da95c78ab09a583aacb78c40"
                 }
               ]
             }
@@ -17585,6 +17688,16 @@
                   "sha256": "d45f9bd22d0e38b3145094941af3310d09dcbb9a7c9af95d167f90136e3738b4"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/colossus_pyramids/movement/front/stoop_mid_0.png",
+                  "sha256": "30fa96f1b9ed6400a8fcb2e7164f700bd0f9c4c96d512201389467865bff60c8"
+                }
+              ]
             }
           }
         },
@@ -17631,6 +17744,56 @@
                   "sha256": "658a358683a0bf7e940a6f10861bf9bdff38644f82969d118d0a85faaa837eac"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/colossus_pyramids/movement/back/attack_0.png",
+                  "sha256": "5b18df9a73c0a0d4f1b986a87f6f9ec26b5cff4455590ee8288b7428e688b78d"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/colossus_pyramids/movement/back/attack_1.png",
+                  "sha256": "fab8c0a58898a09e4c4168341e00010fbe85ed391e8d8b6732fe91eb430e2746"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/colossus_pyramids/movement/back/attack_2.png",
+                  "sha256": "6395a04a82b8bd65c38cd8e8a5575bf7da2ab6d74b9368ca5ae1a4bbe471d95a"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/colossus_pyramids/movement/back/attack_3.png",
+                  "sha256": "e3d7b3279f713a122d7d7970ce8676332f47b38ab011f3871ceee36f1f58f621"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/colossus_pyramids/movement/back/hurt_0.png",
+                  "sha256": "cca69e9b4845f27a10924c398c45d417cdc747191921472f4c399018eb511ba9"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/colossus_pyramids/movement/back/hurt_1.png",
+                  "sha256": "ec6577f98f5b897a88f3c3af8d27f34bc96ca35f8691b41eea7bb73ae9039a8e"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/colossus_pyramids/movement/back/hurt_2.png",
+                  "sha256": "4cc332ff90dfcc2208c5a97ce9506df146566a8fc6bb80af98c4830ee46c50a3"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/colossus_pyramids/movement/back/hurt_3.png",
+                  "sha256": "0126459f6fe71cfd34fdf38debe3db27e8926dd9465d968946220dbd157ef5d4"
+                }
+              ]
             }
           }
         },
@@ -17675,6 +17838,56 @@
                   "name": "move_3",
                   "path": "bosses/colossus_pyramids/movement/left/move_3.png",
                   "sha256": "4e71391fdcdd84fd9a3e6645d0ef7f48af75dcca36068209b024b9707aa76920"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/colossus_pyramids/movement/left/attack_0.png",
+                  "sha256": "b024f7ab79892d2a461a4af327cbc2554c66fbc299b445c2f9fd08df10ea2021"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/colossus_pyramids/movement/left/attack_1.png",
+                  "sha256": "48414fb642875e26aea3a1c5ad161a0e0307d4e2b7c48347eb5e92a4d5fdf630"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/colossus_pyramids/movement/left/attack_2.png",
+                  "sha256": "d3967572f32a488629f7e2042a20f64cdfbb1c90e13805ce6f77533d40f76387"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/colossus_pyramids/movement/left/attack_3.png",
+                  "sha256": "a0b94a9a4d5a57c1fbfe07a585b2f99c45ab2db895bbf69a268023315dfa3032"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/colossus_pyramids/movement/left/hurt_0.png",
+                  "sha256": "a9432b16afef4333a4d662e52ecb5174593b5e583794feb525597e95177ff413"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/colossus_pyramids/movement/left/hurt_1.png",
+                  "sha256": "c8297f605e70d4524ceb3016a2858eb2eeaeae42db7315f050207359b10af6a4"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/colossus_pyramids/movement/left/hurt_2.png",
+                  "sha256": "b3d84ac4e89449a7ccfdee267fdbb3d2f157aebeb05628bd4646da38f4b8a48e"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/colossus_pyramids/movement/left/hurt_3.png",
+                  "sha256": "dad5fa7469761feac2826b56e1c75e128e61306b60fe6df70d08839d3732a141"
                 }
               ]
             }
@@ -19671,6 +19884,16 @@
                   "sha256": "c05b227ff72220112819225c330c0d1d681fa14690830fede6c0fa0e4a4bd607"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/cthulhu/movement/front/stoop_mid_0.png",
+                  "sha256": "24ee7b62ad4b827aee395e38523b353c83285a57731089890649bb2a84c1e4c3"
+                }
+              ]
             }
           }
         },
@@ -19717,6 +19940,41 @@
                   "sha256": "6ad31824744eb26fbf4317fd05416e7e9b9da401ad5251ca351e6e206fd560a2"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/cthulhu/movement/back/attack_0.png",
+                  "sha256": "9dbedec26db358e6acc80fed38af8141a607154099d68e95f46a9e27e7d08c21"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/cthulhu/movement/back/attack_1.png",
+                  "sha256": "a8cbd5812423e2f378adf6afcd13bfb012630d9dc1dfd361275c8191b8698606"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/cthulhu/movement/back/attack_2.png",
+                  "sha256": "5878b16ea5cfa39317f7183fd8afbc60f62ddc4b9594fab07c5691462af9d1bb"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/cthulhu/movement/back/hurt_0.png",
+                  "sha256": "54322847e58d00dff53d31f465e1237ff26784970a454029fa902d3aa60487c6"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/cthulhu/movement/back/hurt_1.png",
+                  "sha256": "032759a78c504bc375c2ff13f9c6a4525db9c00aa1b454b0ec973c814401315a"
+                }
+              ]
             }
           }
         },
@@ -19761,6 +20019,41 @@
                   "name": "move_3",
                   "path": "bosses/cthulhu/movement/left/move_3.png",
                   "sha256": "915a17e2853a4fb3a4e5f7ace7ffe5e3e26e2e1574b8c997be31bd028962da23"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/cthulhu/movement/left/attack_0.png",
+                  "sha256": "14a9b878dbed480523ba448aafe0e5f0cb89333371310184e8734f5e518d392d"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/cthulhu/movement/left/attack_1.png",
+                  "sha256": "633c0109626d013781b399de8e4d69f67b5327f6ed781c4d2b88fd61a5e21f2b"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/cthulhu/movement/left/attack_2.png",
+                  "sha256": "de1ac808b42f07b3659e9dc4dd00870a36eb0eec529efa6f8d552bb07e3bf6e8"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/cthulhu/movement/left/hurt_0.png",
+                  "sha256": "a26a345c7aa4dbfc4d34b0a61cf4d14e262acd269ce7380a76d5556fd774310e"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/cthulhu/movement/left/hurt_1.png",
+                  "sha256": "6752da75b570d60ab1112a40e990b95dd0b0c8b03abcf79d4d29326ebfc3f05f"
                 }
               ]
             }
@@ -19930,6 +20223,16 @@
                   "sha256": "9447ffb743f276a91b0735fa5e47b500fc217efc324fb0d41d7ee6b150b659e5"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/father_dagon/movement/front/stoop_mid_0.png",
+                  "sha256": "8f5a0ff4e23ea678d1d1877eb02a5854af1ad3c937069035cd1651006bcfd62d"
+                }
+              ]
             }
           }
         },
@@ -19976,6 +20279,56 @@
                   "sha256": "1137501e603b5d9566bf355aba3710f86418ecb4e851b6e091c7baf78c88d2f4"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/father_dagon/movement/back/attack_0.png",
+                  "sha256": "963d24bf3bd47c3913a856bf06d36b157b2f70d613e87a14f0d85d1ffd29a813"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/father_dagon/movement/back/attack_1.png",
+                  "sha256": "753a41d0b0c8df50d188366ed627b4f01a5a9d4a95ea64a6baa1f09e14b4e4dd"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/father_dagon/movement/back/attack_2.png",
+                  "sha256": "7532aa62d7309a51c416153e6c93c968d6a1a0567c68570700272a29bb8bd972"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/father_dagon/movement/back/attack_3.png",
+                  "sha256": "f7c5e582905255e91452dad88351e18e9a0b667c50506ea3f6ebf5e062a03179"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/father_dagon/movement/back/hurt_0.png",
+                  "sha256": "8109f9a6caefc052dff5746c981dce0ccee068b38e0c9eab10cfb2995f0dc293"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/father_dagon/movement/back/hurt_1.png",
+                  "sha256": "c20ac22b8c8a867a5dfeb04967f8773da69f18f124f46e3a1e2ddf0beb77347c"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/father_dagon/movement/back/hurt_2.png",
+                  "sha256": "f5b9289e04f30b9a09e7c83aaf4c07b8e46d3141064c4d5a69c660438bb2464a"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/father_dagon/movement/back/hurt_3.png",
+                  "sha256": "ad9968ba424608f4560e71128cd49929f1669083b12feb1f07b63be3376fc9c3"
+                }
+              ]
             }
           }
         },
@@ -20020,6 +20373,56 @@
                   "name": "move_3",
                   "path": "bosses/father_dagon/movement/left/move_3.png",
                   "sha256": "4d57de698cc704c13c999b1095aa201ce8eb547d4832a9948192e257614e9f7d"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/father_dagon/movement/left/attack_0.png",
+                  "sha256": "1e146eb34d263a71d5dbd6422f3a8733d610cf513d4f6ee062d64146eaa434bf"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/father_dagon/movement/left/attack_1.png",
+                  "sha256": "c9dae5fbd7fac945fee7b932bc2ea5aeb7646d6ea396075d591b3101c50eae26"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/father_dagon/movement/left/attack_2.png",
+                  "sha256": "a21a8bde0a73095462a9cf50017aaffcbff85fd3dfe75b37ff18c662dd38d044"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/father_dagon/movement/left/attack_3.png",
+                  "sha256": "2d50cb3eaee2e20294bbac373010abf963fc1d4f883aaadda7ce733ad7285d54"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/father_dagon/movement/left/hurt_0.png",
+                  "sha256": "6f185a1cdaaa0c077fb7a671b609d770ee8d495dc1819998582b9f74defdbdf7"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/father_dagon/movement/left/hurt_1.png",
+                  "sha256": "a22228283f0502957bdc3d2797f85f72b7bef94b025552f5f5ed32566280428e"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/father_dagon/movement/left/hurt_2.png",
+                  "sha256": "e78fe65ef41486ff21412c5cd96f35a49017d660cded0153574270562deffa8c"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/father_dagon/movement/left/hurt_3.png",
+                  "sha256": "9f792e87b664daa38dce6ba9d500e9b5d2c582dd215832cb99f72a29405629e4"
                 }
               ]
             }
@@ -20189,6 +20592,16 @@
                   "sha256": "36c8579b730b9db60405cd09b386e391aeb83de26cf613dd54b7ea6114c50bea"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/mother_hydra/movement/front/stoop_mid_0.png",
+                  "sha256": "3483bfbf56a55ad2962a7873cf1255feb77ee096da54774826857fce2aacc076"
+                }
+              ]
             }
           }
         },
@@ -20235,6 +20648,56 @@
                   "sha256": "92c64333ae43ce67b86854e6686670881fa0584983a232ff4703a9e49cce29e9"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/mother_hydra/movement/back/attack_0.png",
+                  "sha256": "de0ab33aaba2390543e915cdcaa3ff9042106c233c3d74e1813b8f105a43f91d"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/mother_hydra/movement/back/attack_1.png",
+                  "sha256": "71e884acb0179c44aa5e9e5e5df5d286a1aef6eb128fd0a781323156748f46a7"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/mother_hydra/movement/back/attack_2.png",
+                  "sha256": "db8448c897cdf06a98be5bb40c463590336ee5752c78e98979285da5942def6b"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/mother_hydra/movement/back/attack_3.png",
+                  "sha256": "809ab55d6c81513369f1ab0be9899c72d2313649b1c16ede5b89ca6765804c3b"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/mother_hydra/movement/back/hurt_0.png",
+                  "sha256": "90b708c925ab4a885a8a45b4c8f888f88bca5b2b46d4f7a16d674f5291e4abff"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/mother_hydra/movement/back/hurt_1.png",
+                  "sha256": "071b4114b89c15db50526caf80f0e519c0fce422656d25bc1277023c9c977661"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/mother_hydra/movement/back/hurt_2.png",
+                  "sha256": "3f7271bb59e08978e41ff970b34029bcdd4f2f419be7898f6a9a397d6d5fef78"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/mother_hydra/movement/back/hurt_3.png",
+                  "sha256": "a9ce8a6122a968f342a2fe366f219f5ee9ca5f88fc1fd99315ac4a1a64320090"
+                }
+              ]
             }
           }
         },
@@ -20279,6 +20742,56 @@
                   "name": "move_3",
                   "path": "bosses/mother_hydra/movement/left/move_3.png",
                   "sha256": "9b1326f1ff87d0de37118ae0c8c0b09fe52de35f8ad896669ee5a998a9180ba9"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/mother_hydra/movement/left/attack_0.png",
+                  "sha256": "f23e8a4a3b5f671d90077363784ea2da3eb60010beae23f4896e8926f6d06fd7"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/mother_hydra/movement/left/attack_1.png",
+                  "sha256": "0b5e270a60752e9cd8a257703108fe90650d49c91d4de19026849f4cb836ea5c"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/mother_hydra/movement/left/attack_2.png",
+                  "sha256": "c3fe5aefa18cd563f963ba38241dbd9b87aa0e1341c3197f63d2bb8de25040a0"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/mother_hydra/movement/left/attack_3.png",
+                  "sha256": "b9dcbf98e2ad9add5ea07e665733014d2049891d415f6e03f090d532e65f88d4"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/mother_hydra/movement/left/hurt_0.png",
+                  "sha256": "0ce65f09ccf13febf53046f5eb1c2a78b57131d786df9307b4c1c61a34fcf157"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/mother_hydra/movement/left/hurt_1.png",
+                  "sha256": "487a9bd25cc2509edcdc5a7eb874d5cedd3a614a4d1b65d7afd5325de22b57a5"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/mother_hydra/movement/left/hurt_2.png",
+                  "sha256": "71b1f6c5acde5d818be78a1f53ed8cac72dea0e6c9fc63f43da64155c35ca35a"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/mother_hydra/movement/left/hurt_3.png",
+                  "sha256": "9bbd963c13f4ac6813d7c1c420b8fbefc6cc4bcd33f701aa62096b88f1ae06b4"
                 }
               ]
             }
@@ -20916,6 +21429,16 @@
                   "sha256": "c3c864b0b424b9bd63f04c31ddc8ca2143ed04f006a5590677be5e497f448f60"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/ghatanothoa/movement/front/stoop_mid_0.png",
+                  "sha256": "a9033dbd059114014977d9164bb345b11c309800a77faa2acd8d998961f20e6e"
+                }
+              ]
             }
           }
         },
@@ -20952,6 +21475,56 @@
                   "sha256": "7ce2b566b154d3361a0098ecb0ba55cc4797e5917e7560ac9c0d8e1cc0b92a8e"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/ghatanothoa/movement/back/attack_0.png",
+                  "sha256": "de2ebfd8b833bde63d66643fc3dbfdb004bc36ef89e1c61912c1c01819013d9f"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/ghatanothoa/movement/back/attack_1.png",
+                  "sha256": "d2a5577f949220e1a5ecae12179b3a7cbcc07f81e391f2f9d6184614900f6ab5"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/ghatanothoa/movement/back/attack_2.png",
+                  "sha256": "21d20a8d385a1de02a26238dde3a1dcd1addf4071ecc1d5c3778d52d97f0c3b9"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/ghatanothoa/movement/back/attack_3.png",
+                  "sha256": "c19a05e51ad98739260d6571d01015b4ca510bafdeb53c70efc468f893f76f50"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/ghatanothoa/movement/back/hurt_0.png",
+                  "sha256": "8e6c87a3a63e3c9b9c1efb25fc8aa6c3ec8154e6708c9066b28a8f1af72df775"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/ghatanothoa/movement/back/hurt_1.png",
+                  "sha256": "b515e3410c17613135a1ce8dff9282edcc341c4fed4eabd037c7538178fb062a"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/ghatanothoa/movement/back/hurt_2.png",
+                  "sha256": "147cb68d13b42ea671d29ffa43e328d1366cf57c283519b678261128de86a3d9"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/ghatanothoa/movement/back/hurt_3.png",
+                  "sha256": "46ce30ca22e845a8e3eb1fa867f11c76a01f1f26fe3dafea830ee4068d7a9175"
+                }
+              ]
             }
           }
         },
@@ -20986,6 +21559,56 @@
                   "name": "move_1",
                   "path": "bosses/ghatanothoa/movement/left/move_1.png",
                   "sha256": "fd3d86e018b62e080863c3dcc9575886e12a5eb934de749a7013bebd01fcd949"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/ghatanothoa/movement/left/attack_0.png",
+                  "sha256": "83f31065b1ce0c3809f703e6999b47f92569db1345319fe62d106f3872aad04b"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/ghatanothoa/movement/left/attack_1.png",
+                  "sha256": "39359f50ac61acb112394addcba870e2e806a13b8c2167e9fa135f32886a2053"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/ghatanothoa/movement/left/attack_2.png",
+                  "sha256": "34c831440b518656a074a8fdd70c8c3dcd58c34ca008eb7e77b05ed869ad015f"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/ghatanothoa/movement/left/attack_3.png",
+                  "sha256": "10a6391d1424d90c64fc3a4dd909965e56d8f9f0712f5b5e1ad183f2b8ea46ba"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/ghatanothoa/movement/left/hurt_0.png",
+                  "sha256": "666e3bbb6e5df547d469833dcac3c1326dc7a57a7ac67b783c4006af8968e9af"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/ghatanothoa/movement/left/hurt_1.png",
+                  "sha256": "b95cd7645bd40824cf289d4f43178f62f004deac058241810c9a8146f9ebde56"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/ghatanothoa/movement/left/hurt_2.png",
+                  "sha256": "57c3bf5a16465e436ecc931f1af578896916ab97770797ecab330b2163b3cff4"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/ghatanothoa/movement/left/hurt_3.png",
+                  "sha256": "1901695996dfbbc439aec5ff19add9542e90e19e960f6f9923a4d346477bf898"
                 }
               ]
             }
@@ -22434,6 +23057,16 @@
                   "sha256": "09fddde52f68c8b25ef26477366d69d86b41984fc665f0dbc8185089b90229d9"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/azathoth/movement/front/stoop_mid_0.png",
+                  "sha256": "459d3bbe06a9aa5a96896315ce322c06cdc9de642ea5b8f3a3d51aa109bfa882"
+                }
+              ]
             }
           }
         },
@@ -22470,6 +23103,41 @@
                   "sha256": "eed65ee416e5c81750ef84cfae5ed15e1918d7b3fba5a4d94e38759f2d737eaf"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/azathoth/movement/back/attack_0.png",
+                  "sha256": "33681fd506ef4bac28821ec289064bbf5faec088266a73db4023fcb2cbd51f5a"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/azathoth/movement/back/attack_1.png",
+                  "sha256": "6e9e45907aa7c3194478076d3ad14bf4204fd933a3aa0874fe09cbca00d0cced"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/azathoth/movement/back/attack_2.png",
+                  "sha256": "33463fcec1fecddb2be2c29f0db2f883eedb90983a841d905e093c3f92fc61ef"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/azathoth/movement/back/hurt_0.png",
+                  "sha256": "31df4960a932f9c3cd87931c3b20e64d5c90cc9c86b482d3218fb796405f91f9"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/azathoth/movement/back/hurt_1.png",
+                  "sha256": "64be669515c48c74338e2301cbb5404cf79b984810055754aede2af97f7340b1"
+                }
+              ]
             }
           }
         },
@@ -22504,6 +23172,41 @@
                   "name": "move_1",
                   "path": "bosses/azathoth/movement/left/move_1.png",
                   "sha256": "aa1f0c477aaaee3b163f92adf65eb79346ca4a8d08f05cc9e828117d3c52e0e6"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/azathoth/movement/left/attack_0.png",
+                  "sha256": "bd2020b7a479a8c67b0f73d067adba30c98e84d52947b51fa901f3a069829d1e"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/azathoth/movement/left/attack_1.png",
+                  "sha256": "648842c0642b0f9ef320c2fca208ea0134c298e4b1d38334ce62c640134ca5b2"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/azathoth/movement/left/attack_2.png",
+                  "sha256": "b7ba3647f1243bb572f18b16a9444294360dda7b3bf02eed183bc8418fb47f8f"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/azathoth/movement/left/hurt_0.png",
+                  "sha256": "8f83c839ed99c65b25165e241e15de0c6b0a8a7ee6a4881a33cb65659ffb9d44"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/azathoth/movement/left/hurt_1.png",
+                  "sha256": "c8afebd551740f151f1199632b4dd1e547a1606347d07c51f871fb2f43079d42"
                 }
               ]
             }
@@ -23037,6 +23740,41 @@
                   "sha256": "10c59cb0a18bed0b31358bf72df38cb530532aa382a602e605922340c350b575"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/yog_sothoth/movement/back/attack_0.png",
+                  "sha256": "58c616b780969862b0493665a080306b2ee5ff2e1dec2ac9ca1c6eca569717e8"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/yog_sothoth/movement/back/attack_1.png",
+                  "sha256": "f7024d43f3d2caef479fe6ea4b55455c1e9ac409f253fde71eeb2d8dbeebba91"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/yog_sothoth/movement/back/attack_2.png",
+                  "sha256": "23575f4e197fa00715f087b3d97ff319e02ddd565fe8a5e794e1406a4553458b"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/yog_sothoth/movement/back/hurt_0.png",
+                  "sha256": "42b2c4d289b763e2c2735fb6d29a7c00a0762ac9f32bec1bf0cda260345886e2"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/yog_sothoth/movement/back/hurt_1.png",
+                  "sha256": "a95c2c223c94296a5b825c012c76d018334726b958391e763d022238359c6728"
+                }
+              ]
             }
           }
         },
@@ -23071,6 +23809,41 @@
                   "name": "move_1",
                   "path": "bosses/yog_sothoth/movement/left/move_1.png",
                   "sha256": "05297d81b3217f98a9215fb27e61603e102e9a08d642414c238ee09dbe1ccb0c"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/yog_sothoth/movement/left/attack_0.png",
+                  "sha256": "708b7267be06d334ed69fa2f01efba1d8ad4d81a520b8e128a2659d2d07dbc9e"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/yog_sothoth/movement/left/attack_1.png",
+                  "sha256": "283ebb12f138715c4685a23dbf90b6d3b3b6ed767d7f7ba0c6068a533de8cc8b"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/yog_sothoth/movement/left/attack_2.png",
+                  "sha256": "166a19d918edb3fc2b5a747e5469b985e242c88886da1abfb9a33b2ef7855b7a"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/yog_sothoth/movement/left/hurt_0.png",
+                  "sha256": "f11fb63069b717864633c5b7d991006b721168baa1516234f2c3cb650bd7dbfd"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/yog_sothoth/movement/left/hurt_1.png",
+                  "sha256": "d9f8d5ca464388ba81dcffddfadc884991ee4b2fbf1531ff25bd65749f2c9141"
                 }
               ]
             }
@@ -23132,12 +23905,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/umr_at_tawil/64x64/front/idle_0.png",
-                  "sha256": "a6fffb8b5f461d75d85a7cae2860ebab6391f9b71fac8184b52802aace57603d"
+                  "sha256": "d92fc549ec86b8fc0de8442379eb0af65c9ed202502812e03d8ad04756e806e1"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/umr_at_tawil/64x64/front/idle_1.png",
-                  "sha256": "4b3943a73427718c93b9e68872236a3b83ccb6cdca17e24a9dac5f6a322a32ec"
+                  "sha256": "a193aaf904328fedc5db379477829fedf83bd3901af41a09f7b29d30067b3c4e"
                 }
               ]
             },
@@ -23147,12 +23920,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/umr_at_tawil/64x64/front/move_0.png",
-                  "sha256": "2b38a32c6d14e55f945460947d177cf6b7bd2261c393670728827d1f1a1a06d9"
+                  "sha256": "2a9194f116762b6e6cf28215e312a1e700d94e1ad650776ee99d77991efa73b5"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/umr_at_tawil/64x64/front/move_1.png",
-                  "sha256": "2392d2f3e07bc05feb1e6647ea646fa61dcf74f8e58df5b356a2bf92e23a994f"
+                  "sha256": "37f9a5c8473be0d440b027713926be6b99c74ae09317f92d6e6da407964a1ab7"
                 }
               ]
             },
@@ -23162,17 +23935,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/umr_at_tawil/64x64/front/attack_0.png",
-                  "sha256": "557138e8085256264668d03aa1b92452d84bfd3d5a5471f513dfaa96a10be238"
+                  "sha256": "ce936e7492071d4d01417c8cede660bb8f23bc49b20982a4bf0f5a05fa82a3a4"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/umr_at_tawil/64x64/front/attack_1.png",
-                  "sha256": "c84ed23686ef2d3e31eb79eb6000886d7cec35c9cf61c0807f4087a1e576261d"
+                  "sha256": "d862fd412f90b1b138d23addfe37264ec633d597f3f77e5b324d5fdf73652352"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/umr_at_tawil/64x64/front/attack_2.png",
-                  "sha256": "5b31bfbc6b6487fb7635d5c26633423a0a57dc992c7c1798f29c75b78de166fe"
+                  "sha256": "2b6128a9c7051731232469e8bbcb84e9af093eb094517003d97af02aa42902c2"
                 }
               ]
             },
@@ -23182,12 +23955,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/umr_at_tawil/64x64/front/hurt_0.png",
-                  "sha256": "a515ed8843f50c35308982c5de11604ae31417e11d7422c0f76440130f5eee3c"
+                  "sha256": "b4ac72734e7bbcfaba0b98f4b30adad56e9a20f7d7e9749700b873b3ef38d39a"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/umr_at_tawil/64x64/front/hurt_1.png",
-                  "sha256": "d8c161f327da969309b60d7b015f2f30e87a5d93c25326ff6edbf5d9bed07161"
+                  "sha256": "d59a5da9b2fb3ab8cb81958e1059878a2febab149aa0335611cf237bda16e8d2"
                 }
               ]
             }
@@ -23203,12 +23976,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/umr_at_tawil/64x64/back/idle_0.png",
-                  "sha256": "a96061fce9f6cc27a5dd6ef224d4ad8c783b42d370da6a7a4416cb696ef61ac2"
+                  "sha256": "2c634d26e1f960861d2197cb4e33696abf219cee207cc04c13911332459614b0"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/umr_at_tawil/64x64/back/idle_1.png",
-                  "sha256": "69f322906af30b92d5084e9ce600b2114db897b5929fb2d6083e346e37547821"
+                  "sha256": "d8c7679046c701ffa74509fce4da0e3f7b65d49b56ecd6724b94a080b7e1bcd4"
                 }
               ]
             },
@@ -23218,12 +23991,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/umr_at_tawil/64x64/back/move_0.png",
-                  "sha256": "6153a2e8e399ac8c983070870623cb01d72fd60eebea8d5cba1a55ce6f162f77"
+                  "sha256": "3be29692910ce907373d21f06b4f9a7b615b729de884beffc30fbbb2f3bd0db7"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/umr_at_tawil/64x64/back/move_1.png",
-                  "sha256": "e21d289ffa6adc75c08a17753aed85183dcdb766a20c9fae15912ef968040f6c"
+                  "sha256": "5819daf168ff4f0040b2ef70e44b02268a2deb40e8e6a8e9e1070441dfc00c88"
                 }
               ]
             }
@@ -23239,12 +24012,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/umr_at_tawil/64x64/left/idle_0.png",
-                  "sha256": "fe9065828b75e644f295aee94298b1c365119969a9bb5af6731eafa68dd75c7c"
+                  "sha256": "d54ccce559989a804fbf1dd3fc66873d5e7d0cd9fc66da6491a882e944daf41a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/umr_at_tawil/64x64/left/idle_1.png",
-                  "sha256": "a69947a3769da43303e0fcc0cba650d8b0e5f3400474e0455c9d2bf502939c44"
+                  "sha256": "3688e7615098e0f61f1f2c19788bdce821652a01c66016ff87a5a741ca92bcc0"
                 }
               ]
             },
@@ -23254,33 +24027,33 @@
                 {
                   "name": "move_0",
                   "path": "sprites/umr_at_tawil/64x64/left/move_0.png",
-                  "sha256": "649b72c2a6aabf4a0db85fec1bed38ddcddfde30e4a8ef9fd884fc0ee683c398"
+                  "sha256": "5fc54061f226823f9149ccdc265f8aad2d3cf0099931b678796a6fd634a5674f"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/umr_at_tawil/64x64/left/move_1.png",
-                  "sha256": "66eca7db4503d317001fc7ce3790447f23efc960b62427f7636599806c76aaf2"
+                  "sha256": "f9c3b167798cee8ed85b6cc7815c22fc5e40ada5429944a83922db31703ff74d"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "left",
-          "mirror_horizontal": true,
+          "source_direction": "right",
+          "mirror_horizontal": false,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "sprites/umr_at_tawil/64x64/left/idle_0.png",
-                  "sha256": "fe9065828b75e644f295aee94298b1c365119969a9bb5af6731eafa68dd75c7c"
+                  "path": "sprites/umr_at_tawil/64x64/right/idle_0.png",
+                  "sha256": "9eb42431c59ba871953032e7905adfef5b5a032c26f83e198e4aa0befaef8065"
                 },
                 {
                   "name": "idle_1",
-                  "path": "sprites/umr_at_tawil/64x64/left/idle_1.png",
-                  "sha256": "a69947a3769da43303e0fcc0cba650d8b0e5f3400474e0455c9d2bf502939c44"
+                  "path": "sprites/umr_at_tawil/64x64/right/idle_1.png",
+                  "sha256": "b425e4b34d401507609ad8ee42e73de6a0c13fc798483f653694370bd6c91bab"
                 }
               ]
             },
@@ -23289,13 +24062,13 @@
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "sprites/umr_at_tawil/64x64/left/move_0.png",
-                  "sha256": "649b72c2a6aabf4a0db85fec1bed38ddcddfde30e4a8ef9fd884fc0ee683c398"
+                  "path": "sprites/umr_at_tawil/64x64/right/move_0.png",
+                  "sha256": "75e7c094416c20a78cd918483d7d3cda318513de32a53aac60b8e1cd89c8119a"
                 },
                 {
                   "name": "move_1",
-                  "path": "sprites/umr_at_tawil/64x64/left/move_1.png",
-                  "sha256": "66eca7db4503d317001fc7ce3790447f23efc960b62427f7636599806c76aaf2"
+                  "path": "sprites/umr_at_tawil/64x64/right/move_1.png",
+                  "sha256": "7614006605f02b8d167d2de20da980a750b08fc91e5223bda933bedb1bef561b"
                 }
               ]
             }
@@ -23638,6 +24411,16 @@
                   "sha256": "0c1d4119902662b3706ccc2db0802cd0e736f89eddd1fe9854f600d2a63eef17"
                 }
               ]
+            },
+            "stoop_mid": {
+              "frame_count": 1,
+              "frames": [
+                {
+                  "name": "stoop_mid_0",
+                  "path": "bosses/shub_niggurath/movement/front/stoop_mid_0.png",
+                  "sha256": "f2d22212ea45ff45edad95c1611172c664937f8575540443eedb55909a2b5fef"
+                }
+              ]
             }
           }
         },
@@ -23674,6 +24457,56 @@
                   "sha256": "1fbdafaadfe7c32f8363532326f7793e543546535f6183b0c46db7336dafa22d"
                 }
               ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/shub_niggurath/movement/back/attack_0.png",
+                  "sha256": "a0735244468667c398781e7adef3daa52686eb1bec6ee129b4cb4852acef6b94"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/shub_niggurath/movement/back/attack_1.png",
+                  "sha256": "77ebfce4bd43d997e3ed17a46705eb3d9f5f608f39d701aaa1cd9362abd2a7bf"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/shub_niggurath/movement/back/attack_2.png",
+                  "sha256": "7d9a994a6cea49023a336207e96b42521f5224cdc78e15ec70e53a60f116ceca"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/shub_niggurath/movement/back/attack_3.png",
+                  "sha256": "7195476e19467652009accb9446ffde38d4ae79d2f8f3342f52e4a356f3f92eb"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/shub_niggurath/movement/back/hurt_0.png",
+                  "sha256": "06c7fe2afc4702efa720533b60e4e162de4103d5a465b6ababa96ab3a0142163"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/shub_niggurath/movement/back/hurt_1.png",
+                  "sha256": "dd4df51d83a95bf575c7dc1bdfc57d203a49a746da9b27b2a5a5ec0a5481addb"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/shub_niggurath/movement/back/hurt_2.png",
+                  "sha256": "86acfcb20542df77e9010b5bddbe753e9b18e14c303422a5c52e2c5513cfe70b"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/shub_niggurath/movement/back/hurt_3.png",
+                  "sha256": "86b8d2c4ad8087ea89ffb6c35be3cafa9161153a110e4758167f8eef9507462e"
+                }
+              ]
             }
           }
         },
@@ -23708,6 +24541,56 @@
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/left/move_1.png",
                   "sha256": "4631267ddbe9f8d4f27e99c743710a2709c7abc3dd7918f7af452e1e6e5451ce"
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "attack_0",
+                  "path": "bosses/shub_niggurath/movement/left/attack_0.png",
+                  "sha256": "f9df91cdcbb20ba5972582f782a54db91a07e17f11c42f46a6143b5a2d8a206e"
+                },
+                {
+                  "name": "attack_1",
+                  "path": "bosses/shub_niggurath/movement/left/attack_1.png",
+                  "sha256": "7002f824418bd8ea0847966273e01dc96221804f8b225af3678bff2a06080c30"
+                },
+                {
+                  "name": "attack_2",
+                  "path": "bosses/shub_niggurath/movement/left/attack_2.png",
+                  "sha256": "d711d792894de7ea7eda4944aa867f915984957623678a725427aa4a35b48263"
+                },
+                {
+                  "name": "attack_3",
+                  "path": "bosses/shub_niggurath/movement/left/attack_3.png",
+                  "sha256": "aa2ce4f7375a96672eeaed1159afc8000f512cf5de6b31a6c9dd32fcd142a60d"
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "hurt_0",
+                  "path": "bosses/shub_niggurath/movement/left/hurt_0.png",
+                  "sha256": "91c52b08d963dc233b66f04e3468d6e8c3a72d1cd00184f46a2e5801f64000e3"
+                },
+                {
+                  "name": "hurt_1",
+                  "path": "bosses/shub_niggurath/movement/left/hurt_1.png",
+                  "sha256": "f888ff98469883119fc822c6eb897cca931f8ca26e38d24a65855832e168d480"
+                },
+                {
+                  "name": "hurt_2",
+                  "path": "bosses/shub_niggurath/movement/left/hurt_2.png",
+                  "sha256": "8d368ca1af988ffd4b819c00486d3a590bfc850544cf5ba67fc071d7a9afe6bf"
+                },
+                {
+                  "name": "hurt_3",
+                  "path": "bosses/shub_niggurath/movement/left/hurt_3.png",
+                  "sha256": "4ae5ab361bd460620cd78ff5198f8b54b5bcd2d0b9e9ab164d0f10bb2b9ed1d9"
                 }
               ]
             }

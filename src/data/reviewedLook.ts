@@ -37,7 +37,7 @@ export const REVIEWED_LIFT: Readonly<Record<string, number>> = {
   'the_unnamable': 0.64,
   'thousand_young': 0.9,
   'tsathoggua': 0.55,
-  'umr_at_tawil': 0.57,
+  'umr_at_tawil': 0.68,
   'venusian_man_lizard': 0.59,
   'wamp': 0.7,
   'winged_hybrid': 0.93,

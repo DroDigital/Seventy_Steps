@@ -15,6 +15,10 @@ const hash = (bytes: Uint8Array): string => createHash('sha256').update(bytes).d
 const read = (name: string): Uint8Array => readFileSync(`${ASSET_DIR}/${name}`);
 const text = (bytes: Uint8Array): string => new TextDecoder().decode(bytes);
 const DIRECTIONS = ['front', 'back', 'left', 'right'] as const;
+const FIRST_LATER_PAGE = 4; // the library's four pages, then a page for each later delivery (tools/add_reviewed_frames.py)
+/** What the author drew after the library: the colossi's stoop and its in-between pose, and the bosses' left and back attack and hurt. */
+const later = (assetGroup: string, direction: string, action: string): boolean =>
+  action === 'stoop' || action === 'stoop_mid' || (assetGroup === 'bosses' && (direction === 'left' || direction === 'back') && (action === 'attack' || action === 'hurt'));
 
 interface Frame {
   source: string; sourceSha256: string; pixelSha256: string;
@@ -32,7 +36,7 @@ interface Pack {
   pages: { file: string; width: number; height: number; sha256: string; pngBytes: number }[];
   frames: Frame[];
   entities: Record<string, {
-    id: string; scale: number; page: number;
+    id: string; assetGroup: string; scale: number; page: number;
     directions: Record<string, { sourceDirection: string; mirror: boolean; actions: Record<string, number[]> }>;
   }>;
 }
@@ -128,20 +132,20 @@ describe('reviewed creature artwork imported into the game', () => {
           expect(frames.length, `${original.key}/${direction}/${action}`).toBe(registration.frame_count);
           expect(frames.map((f) => f.source)).toEqual(registration.frames.map((f) => f.path));
           expect(frames.map((f) => f.sourceSha256)).toEqual(registration.frames.map((f) => f.sha256));
-          // The stoop is a later delivery (tools/add_reviewed_frames.py): its frames are on their own page, after the pack's.
-          if (action === 'stoop') expect(frames.every((f) => f.page === pack.pages.length - 1 && f.page !== imported.page)).toBe(true);
-          else expect(frames.every((f) => f.page === imported.page)).toBe(true);
+          // A later delivery's frames are on a page of their own, after the library's.
+          if (later(imported.assetGroup, direction, action)) expect(frames.every((f) => f.page >= FIRST_LATER_PAGE && f.page !== imported.page), `${original.key}/${direction}/${action}`).toBe(true);
+          else expect(frames.every((f) => f.page === imported.page), `${original.key}/${direction}/${action}`).toBe(true);
         }
       }
     }
-    expect(scopes).toBe(1057); // 1,050 of the library, and the stoop of seven colossi
-    expect(mirrors).toBe(82);
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2591);
+    expect(scopes).toBe(1100); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), and the bosses' left and back attack and hurt (36)
+    expect(mirrors).toBe(81); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2728);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2591); // 2,577 of the library, and the stoop's fourteen
+    expect(pack.frameCount).toBe(2728); // 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, and 'Umr at-Tawil's four right-hand frames
   });
 
-  it('preserves all 2591 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
+  it('preserves all 2728 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
     expect(pack.filter).toBe('nearest');
     expect(pack.mipmaps).toBe(false);
     const pages = pack.pages.map((page) => {
@@ -166,7 +170,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2330, '128x128': 230, '128x160': 31 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2334, '128x128': 352, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');
@@ -175,6 +179,8 @@ describe('reviewed creature artwork imported into the game', () => {
     expect(pack.entities.innsmouth_hybrid.directions.right.mirror).toBe(false);
     expect(pack.entities.rhan_tegoth.directions.right.mirror).toBe(false);
     expect(pack.entities.yeb.directions.right.mirror).toBe(false);
+    expect(pack.entities.umr_at_tawil.directions.right.mirror).toBe(false); // drawn again whole: his right is no longer his left turned round
+    expect(pack.entities.umr_at_tawil.directions.right.actions.move).not.toEqual(pack.entities.umr_at_tawil.directions.left.actions.move);
   });
 
   it('selects all authored scopes through the runtime adapter and keeps one fixed canvas scale', () => {
@@ -191,9 +197,11 @@ describe('reviewed creature artwork imported into the game', () => {
           : key === 'innsmouth_hybrid' && direction === 'right' ? 'left' : direction;
         const frameIds = entity.directions[authored].actions[action];
         const clip = resolveDirectionalClip(clips, direction, action)!;
-        const sourceDirection = frameIds ? authored : 'front';
+        // A boss drawn in combat from its left has its right the left's, mirrored once; else the front's, as before.
+        const mirrored = !frameIds && direction === 'right' && !!entity.directions.left.actions[action];
+        const sourceDirection = frameIds ? authored : mirrored ? 'left' : 'front';
         expect(clip.frames, `${key}/${direction}/${action}`).toEqual(entity.directions[sourceDirection].actions[action]);
-        expect(clip.mirror_horizontal).toBe(entity.directions[sourceDirection].mirror);
+        expect(clip.mirror_horizontal).toBe(mirrored ? !entity.directions.left.mirror : entity.directions[sourceDirection].mirror);
       }
     }
   });
