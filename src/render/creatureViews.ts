@@ -14,7 +14,7 @@ import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle } from '../core/geom';
 import type { Variant } from '../data/registry';
-import { REVIEWED_LIFT } from '../data/reviewedLook';
+import { REVIEWED_EYES, REVIEWED_LIFT } from '../data/reviewedLook';
 import { FEEDBACK, FOG_EYES, LIGHT, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import { isAbsent, isUnseen, type Game } from '../systems/components';
@@ -124,19 +124,43 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     counts[frame.page]++;
     return frame;
   };
+  const rgbOf = new Float32Array(3);
+  /** A faint glow at (px, py, pz), `spread` metres wide, in colour `rgb`: eyes, or a mark that glows, that look out of the dark as the investigator nears, or out of a mist once they have seen them. */
+  const glow = (px: number, py: number, pz: number, spread: number, rgb: ArrayLike<number>, look: Look, eye: THREE.Vector3, out = 0): void => {
+    const [lo, hi] = LIGHT.eyes;
+    const d = Math.hypot(px - eye.x, py - eye.y, pz - eye.z);
+    const near = Math.max(1 - THREE.MathUtils.smoothstep(d, lo, hi), out * (1 - THREE.MathUtils.smoothstep(d, hi, hi + FOG_EYES.reach))); // in a mist, one that has seen the investigator looks out of it from far off
+    const gain = (LIGHT.eyeGlow.gain + FOG_EYES.boost * out) * near * look.opacity * (1 - look.sink);
+    if (gain > 0.01) glows.put(px, py, pz, LIGHT.eyeGlow.radius * (1 + FOG_EYES.swell * out) + spread, rgb, gain);
+  };
   /** A faint glow about the eyes of a sprite drawn at (x, y, z), `size` metres, in atlas cell `cell`. */
   const eyes = (cell: number, x: number, y: number, z: number, size: number, flip: boolean, look: Look, eye: THREE.Vector3, out = 0): void => {
     const k = cell * 4;
     if (!atlas.eyes[k + 3]) return;
     const [ex, ey] = [atlas.eyes[k] / CELL, atlas.eyes[k + 1] / CELL];
     const along = (flip ? 0.5 - ex : ex - 0.5) * size;
-    const [px, py, pz] = [x + flat.x * along, y + (1 - ey) * size, z + flat.z * along];
-    const [lo, hi] = LIGHT.eyes;
-    const d = Math.hypot(px - eye.x, py - eye.y, pz - eye.z);
-    const near = Math.max(1 - THREE.MathUtils.smoothstep(d, lo, hi), out * (1 - THREE.MathUtils.smoothstep(d, hi, hi + FOG_EYES.reach))); // in a mist, one that has seen the investigator looks out of it from far off
-    const gain = (LIGHT.eyeGlow.gain + FOG_EYES.boost * out) * near * look.opacity * (1 - look.sink);
-    const rgb = atlas.eyeColors.subarray(cell * 3, cell * 3 + 3);
-    if (gain > 0.01) glows.put(px, py, pz, LIGHT.eyeGlow.radius * (1 + FOG_EYES.swell * out) + (atlas.eyes[k + 2] / CELL) * size, rgb, gain);
+    glow(x + flat.x * along, y + (1 - ey) * size, z + flat.z * along, (atlas.eyes[k + 2] / CELL) * size, atlas.eyeColors.subarray(cell * 3, cell * 3 + 3), look, eye, out);
+  };
+  /** The eyes of a reviewed form seen from the front (the art holds them only there), where `REVIEWED_EYES` has them. */
+  const reviewedEyes = (key: string, x: number, y: number, z: number, look: Look, eye: THREE.Vector3, out: number): void => {
+    const found = REVIEWED_EYES[key];
+    if (!found) return;
+    const [ex, ey, spread, r, gr, b] = found;
+    const size = sizes.get(key)!;
+    rgbOf.set([r, gr, b]);
+    const along = (ex - 0.5) * size.width;
+    glow(x + flat.x * along, y - size.groundOffset - look.sink * size.height * 0.3 + (1 - ey) * size.height, z + flat.z * along, spread * size.width, rgbOf, look, eye, out);
+  };
+
+  /** 0..1: how far this creature's eyes have come out of the mist (it sees the investigator, in a mist: they come out of it, not on), dimmed in a blink now and then (round 35). */
+  const mistLook = (id: Entity, time: number): number => {
+    const br = g.ecs.c.brain.get(id);
+    const foggy = Math.min(1, Math.max(0, (MIST.thickness - FOG_EYES.from) / FOG_EYES.span));
+    const sees = foggy > 0 && !!br && br.state !== 'hidden' && br.state !== 'return' && br.state !== 'follow' && sight(g, id, g.player.id, br.def.params) >= FOG_EYES.sees;
+    const was = looking.get(id) ?? 0;
+    const amt = was + ((sees ? foggy : 0) - was) * Math.min(1, (sees ? FOG_EYES.rise : FOG_EYES.fall) / 60);
+    looking.set(id, amt);
+    return amt * (Math.sin(time * 0.9 + id * 7.3) > 0.985 ? 0.15 : 1);
   };
 
   const STOOP_LEAN = 1.5; // how far a stooped colossus bends (assemblies.ts tips the body a quarter of it, in radians)
@@ -192,6 +216,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const frame = put(key, clip, pose, x, y, z, flash, 1, weird, lift);
           if (!frame) continue;
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
+          if (direction === 'front' && !clip.mirror_horizontal) reviewedEyes(key, x, y, z, pose, camera.position, mistLook(id, time));
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
             ECHOES.forEach((e, i) => {
               const late = lookOf(g, id, time - e.lag);
@@ -240,14 +265,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
-        const br = g.ecs.c.brain.get(id);
-        const foggy = Math.min(1, Math.max(0, (MIST.thickness - FOG_EYES.from) / FOG_EYES.span));
-        const sees = foggy > 0 && !!br && br.state !== 'hidden' && br.state !== 'return' && br.state !== 'follow' && sight(g, id, g.player.id, br.def.params) >= FOG_EYES.sees; // a creature that sees the investigator, in a mist
-        const was = looking.get(id) ?? 0;
-        const amt = was + ((sees ? foggy : 0) - was) * Math.min(1, (sees ? FOG_EYES.rise : FOG_EYES.fall) / 60); // they come out of it, not on
-        looking.set(id, amt);
-        const blink = Math.sin(time * 0.9 + id * 7.3) > 0.985 ? 0.15 : 1; // now and then, a blink
-        eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, amt * blink);
+        eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, mistLook(id, time));
       }
       for (const id of looking.keys()) if (!seen.has(id)) looking.delete(id);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);

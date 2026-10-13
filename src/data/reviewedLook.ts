@@ -44,3 +44,17 @@ export const REVIEWED_LIFT: Readonly<Record<string, number>> = {
   'yeb': 0.72,
   'zann_window_thing': 0.68,
 };
+
+/** By form: where its eyes are in its front view (across and down as fractions of the picture, their spread as a fraction of its width) and their colour (0..1). */
+export const REVIEWED_EYES: Readonly<Record<string, readonly [x: number, y: number, spread: number, r: number, g: number, b: number]>> = {
+  'black_man': [0.49, 0.203, 0.042, 0.416, 0.051, 0.678],
+  'charles_le_sorcier': [0.484, 0.25, 0.031, 0.931, 0.171, 0.541],
+  'cthulhu_cultist': [0.5, 0.234, 0.031, 0.502, 0.475, 0.431],
+  'ghoul': [0.492, 0.422, 0.07, 0.929, 0.902, 0.8],
+  'ghoul#eldritch': [0.492, 0.422, 0.07, 0.929, 0.902, 0.8],
+  'gnoph_keh': [0.492, 0.359, 0.039, 0.675, 0.659, 0.624],
+  'gug': [0.484, 0.25, 0.07, 0.584, 0.376, 0.478],
+  'martense_degenerate': [0.523, 0.266, 0.023, 0.978, 0.706, 0.035],
+  'medusa_gorgon': [0.484, 0.188, 0.047, 0.929, 0.902, 0.8],
+  'winged_hybrid': [0.5, 0.625, 0.062, 0.667, 0.663, 0.663],
+};

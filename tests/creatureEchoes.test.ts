@@ -28,8 +28,13 @@ function viewsOver(ids: string[]) {
   const scene = new THREE.Scene();
   const views = createCreatureViews(scene, g, atlas);
   const reviewed = () => scene.children.find((c) => (c as THREE.InstancedMesh<THREE.PlaneGeometry, THREE.ShaderMaterial>).material?.uniforms?.uReviewed?.value === 1) as THREE.InstancedMesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
-  return { g, views, reviewed };
+  return { g, views, reviewed, scene };
 }
+
+const halos = (scene: THREE.Scene): number => {
+  const mesh = scene.children.find((c) => (c as THREE.Mesh<THREE.InstancedBufferGeometry>).geometry?.getAttribute?.('aHalo')) as THREE.Mesh<THREE.InstancedBufferGeometry>;
+  return mesh.geometry.instanceCount;
+};
 
 describe('an outer god on reviewed art', () => {
   it('drifts about itself within its drift', () => {
@@ -52,5 +57,35 @@ describe('an outer god on reviewed art', () => {
     const opacity = Array.from({ length: reviewed().count }, (_, i) => reviewed().geometry.getAttribute('aInfo').getY(i));
     for (const e of ECHOES) expect(opacity.some((o) => Math.abs(o - (1 - e.ghost)) < 1e-6)).toBe(true);
     expect(views.debugFrames().filter((f) => f.key === 'azathoth')).toHaveLength(1); // the echoes are not the diagnostics' business
+  });
+});
+
+describe('the eyes of a reviewed form', () => {
+  const camera = () => {
+    const c = new THREE.PerspectiveCamera();
+    c.position.set(0, 1.6, 9);
+    return c;
+  };
+
+  it('glow as the investigator nears, in the dark, from the front only', () => {
+    const { g, views, scene } = viewsOver(['ghoul', 'deep_one']);
+    const ghoul = spawnCreature(g, 'ghoul', { x: 0, z: 0, yaw: 0 })!; // faces +z: the camera at +z sees its front
+    views.update(1, 1, camera());
+    expect(g.ecs.c.model.get(ghoul)).toBe('creature:ghoul');
+    expect(views.debugFrames()[0].direction).toBe('front');
+    expect(halos(scene)).toBe(1);
+
+    const back = new THREE.PerspectiveCamera();
+    back.position.set(0, 1.6, -9);
+    views.update(1, 1, back);
+    expect(views.debugFrames()[0].direction).toBe('back');
+    expect(halos(scene)).toBe(0);
+  });
+
+  it('are the pack\'s own: a form without them has none', () => {
+    const { g, views, scene } = viewsOver(['deep_one']);
+    spawnCreature(g, 'deep_one', { x: 0, z: 0, yaw: 0 });
+    views.update(1, 1, camera());
+    expect(halos(scene)).toBe(0);
   });
 });

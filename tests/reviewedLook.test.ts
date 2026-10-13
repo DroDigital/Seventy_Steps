@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { REVIEWED_LIFT } from '../src/data/reviewedLook';
+import { REVIEWED_EYES, REVIEWED_LIFT } from '../src/data/reviewedLook';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
 import type { ReviewedManifest } from '../src/render/sprites/reviewed';
 
@@ -24,5 +24,23 @@ describe('what the renderer adds to the reviewed art (tools/reviewed_look.py)', 
 
   it('is read by the sprite shader from the reviewed batches only', () => {
     expect(SPRITE_FRAG).toContain('float lift = uReviewed > 0.5 ? vOutside : 0.0');
+  });
+
+  it('puts every eye inside the form it belongs to, with a colour', () => {
+    for (const [key, [x, y, spread, ...rgb]] of Object.entries(REVIEWED_EYES)) {
+      const entity = manifest.entities[key];
+      expect(entity, key).toBeDefined();
+      const frame = manifest.frames[entity.directions.front.actions.idle![0]];
+      const [x0, y0, x1, y1] = frame.bounds;
+      expect(x * frame.width, key).toBeGreaterThanOrEqual(x0);
+      expect(x * frame.width, key).toBeLessThanOrEqual(x1);
+      expect(y * frame.height, key).toBeGreaterThanOrEqual(y0);
+      expect(y * frame.height, key).toBeLessThanOrEqual(y0 + (y1 - y0) * 0.6); // in the head
+      expect(spread).toBeGreaterThan(0);
+      expect(spread).toBeLessThanOrEqual(0.07 + 1e-9);
+      for (const c of rgb) expect(c).toBeGreaterThanOrEqual(0);
+      for (const c of rgb) expect(c).toBeLessThanOrEqual(1);
+    }
+    expect(Object.keys(REVIEWED_EYES).length).toBeGreaterThanOrEqual(8);
   });
 });
