@@ -82,7 +82,7 @@ Each line: what was seen → what it did to the player → the fix → how it wa
    A click on that line is a click on the row (menuKit.ts keeps the focus there). Checked at ×1 and ×1.5.
 7. **Title › New game / Load: a saved slot wrapped with a "·" opening its second line.** Fix: the slot's name is the line and what
    it holds is its second line (widest: 420 px). `slotParts` (titleSlots.ts), tested for all four languages' wording.
-8. **Ending card: the choice's lozenge stood on the first letter** of its button ("◆Go on"). Fix: room made for it (padding).
+8. **Ending card: the choice's lozenge stood on the first letter** of its button ("◆Go on"). Fix: for these boxed buttons the lozenge stands in the padding (3 px from the edge); the buttons keep their width, so the three of "Begin anew?" still make one row (a first fix that widened them wrapped the third onto a second row and was replaced).
 9. **Faint text that carries something to read**, measured against the menus' ground (#0b0a09; the standard menus also sit under
    an 80–87% black backdrop, so a bright world behind adds little):
 
