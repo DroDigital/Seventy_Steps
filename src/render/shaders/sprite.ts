@@ -23,7 +23,7 @@ uniform vec3 uLightColor;
 uniform float uCharacterLight;
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
-attribute vec4 aInfo; // flash, opacity, flip, outside the palette
+attribute vec4 aInfo; // flash, opacity, flip, outside the palette (reviewed art: how far its edge is lit)
 attribute float aWeird; // 0..1: how far it refuses to hold its shape (eldritch.ts)
 
 varying vec2 vUv;
@@ -103,6 +103,12 @@ vec2 slip(vec2 uv) {
   return vec2(clamp(uv.x, vCell.x, vCell.z), uv.y);
 }
 
+/** 1 where this cell holds art at uv, 0 where it is clear or beyond the cell. */
+float solid(vec2 uv) {
+  bool within = uv.x >= vCell.x && uv.x <= vCell.z && uv.y >= vCell.y && uv.y <= vCell.w;
+  return within ? step(0.3, texture(uAtlas, uv).a) : 0.0;
+}
+
 void main() {
   vec2 uv = vWeird > 0.2 ? slip(vUv) : vUv;
   vec4 t = texture(uAtlas, uv);
@@ -114,7 +120,13 @@ void main() {
   }
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 col = glow ? t.rgb : t.rgb * vLight;
+  float lift = uReviewed > 0.5 ? vOutside : 0.0; // reviewed art so dark it would vanish into a dark floor: its edge is lit (data/reviewedLook.ts)
+  vec3 col = glow ? t.rgb : t.rgb * max(vLight, vec3(0.3 * lift));
+  if (lift > 0.0) { // a pale rim along its top and sides, in the moon's cool tint: the outline it would lose
+    vec2 px = 1.0 / vec2(textureSize(uAtlas, 0));
+    float open = 1.0 - min(min(solid(uv - vec2(0.0, px.y)), solid(uv + vec2(px.x, 0.0))), solid(uv - vec2(px.x, 0.0)));
+    col = mix(col, vec3(0.72, 0.78, 0.96), open * lift * 0.95);
+  }
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   col = mix(col, vec3(1.0), vFlash);
   float fog = vFog * uFogAmount;

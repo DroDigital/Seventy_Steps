@@ -4,7 +4,8 @@
  * mounded body is a column of three bands, legs, torso and head (its outline, PROFILE); a body of
  * spheres is its spheres, placed from the creature's seed alike in the picture and in the fight.
  * Pure: no Three.js. Heights and offsets are metres in the body's own frame (as the figure is drawn: its
- * local +x is its left, +z ahead, turned by its yaw).
+ * local +x is its left, +z ahead, turned by its yaw). Where the reviewed art paints a body of spheres
+ * (`recipe.hit`), it is struck where the picture shows them, not where the seed would put them.
  */
 
 import { createRng } from '../core/rng';
@@ -51,6 +52,21 @@ export function globes(r: AssemblyRecipe, seed: number): Globe[] {
   });
 }
 
+const PICTURE_REACH = 1.15; // a painted sphere is struck within this many body radii of the axis: nearer than the picture's edge, so a blade can reach it
+
+/**
+ * The painted spheres of `hit` (fractions of the height `h`), as the fight has them: the picture shows them from
+ * wherever it is seen, so each is ringed about the axis, four ways; one that stands within a step of the axis is one;
+ * and none stands out past the body's reach.
+ */
+export function pictured(hit: NonNullable<AssemblyRecipe['hit']>, h: number, radius: number): Globe[] {
+  return hit.flatMap(([across, up, size]) => {
+    const [y, r] = [up * h, size * h];
+    const d = Math.max(0, Math.min(Math.abs(across) * h, radius * PICTURE_REACH - r));
+    return d < 0.3 ? [{ x: 0, y, z: 0, r }] : [{ x: d, y, z: 0, r }, { x: 0, y, z: d, r }, { x: -d, y, z: 0, r }, { x: 0, y, z: -d, r }];
+  });
+}
+
 /** One place a blow may land: a vertical column (`ball` false: its axis `y0`..`y1`, its breadth `r`) or a sphere (`y0` its centre). */
 export interface ZoneShape {
   x: number;
@@ -70,7 +86,7 @@ export interface ZoneShape {
  */
 export function zoneShapes(recipe: AssemblyRecipe | undefined, radius: number, height: number, seed: number, stooped: boolean): ZoneShape[] | null {
   if (!recipe || height < ZONES.height) return null;
-  if (recipe.body === 'spheres') return globes(recipe, seed).map((g) => ({ x: g.x, z: g.z, y0: g.y, y1: g.y, r: g.r, ball: true, damage: ZONES.legs.damage }));
+  if (recipe.body === 'spheres') return (recipe.hit ? pictured(recipe.hit, height, radius) : globes(recipe, seed)).map((g) => ({ x: g.x, z: g.z, y0: g.y, y1: g.y, r: g.r, ball: true, damage: ZONES.legs.damage }));
   const z: ZoneShape[] = [
     { x: 0, z: 0, y0: 0, y1: ZONES.legs.top * height, r: radius, ball: false, damage: ZONES.legs.damage },
     { x: 0, z: 0, y0: ZONES.legs.top * height, y1: ZONES.torso.top * height, r: radius * ZONES.torso.reach, ball: false, damage: ZONES.torso.damage },

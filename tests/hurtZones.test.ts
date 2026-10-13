@@ -3,9 +3,10 @@
  * legs take a blow whole, its body soaks it, and its head takes it several times over, out of a
  * blade's reach until the colossus stoops after a blow of its own.
  */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
-import { globes, zoneShapes } from '../src/data/assemblyShape';
+import { globes, pictured, zoneShapes } from '../src/data/assemblyShape';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
 import { PLAYER } from '../src/data/tuning';
@@ -71,6 +72,34 @@ describe('hurt zones (round 24)', () => {
     expect(gl.filter((s) => s.y < 4).length).toBeGreaterThanOrEqual(4);
     expect(globes(r, 7)).toEqual(gl); // the same each time: the picture and the fight agree
     expect(zoneShapes(r, 7.6, 20, 7, false)!.every((z) => z.ball)).toBe(true);
+  });
+
+  it('Yog-Sothoth is struck where its spheres are painted: ringed about it, within a blade\'s reach of its body, the lowest on the ground', () => {
+    const r = recipe('yog_sothoth');
+    const body = { height: 20, radius: 7.6 };
+    expect(r.hit).toHaveLength(7);
+    const zones = zoneShapes(r, body.radius, body.height, 7, false)!;
+    expect(zones.every((z) => z.ball)).toBe(true);
+    expect(zones.length).toBeGreaterThan(r.hit!.length); // ringed
+    for (const z of zones) expect(Math.hypot(z.x, z.z) + z.r).toBeLessThanOrEqual(body.radius * 1.15 + 1e-9);
+    expect(Math.min(...zones.map((z) => z.y0 - z.r))).toBeLessThan(0.1); // a blade on the ground reaches one
+    expect(zoneShapes(r, body.radius, body.height, 99, false)).toEqual(zones); // not from the seed
+    expect(pictured([[0.01, 0.3, 0.1]], 20, 7.6)).toHaveLength(1); // on the axis: one, not four
+  });
+
+  it('and its table lies within the painted body, in the art\'s own scale', () => {
+    const manifest = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8'));
+    const entity = manifest.entities.yog_sothoth;
+    const frame = manifest.frames[entity.directions.front.actions.idle[0]];
+    const [x0, y0, x1, y1] = frame.bounds as number[];
+    const tall = y1 - y0; // the figure's height in pixels is `scale` metres: a fraction of the scale is that fraction of it
+    for (const [across, up, size] of recipe('yog_sothoth').hit!) {
+      const [px, py, pr] = [frame.width / 2 + across * tall, y1 - up * tall, size * tall];
+      expect(px - pr).toBeGreaterThanOrEqual(x0 - 2);
+      expect(px + pr).toBeLessThanOrEqual(x1 + 2);
+      expect(py - pr).toBeGreaterThanOrEqual(y0 - 2);
+      expect(py + pr).toBeLessThanOrEqual(y1 + 2);
+    }
   });
 
   it('a blow at the feet of a colossus on its feet takes the legs\' share; stooped, the head\'s', () => {
