@@ -13,11 +13,11 @@ import { shot, to, type Beat, type Scene } from './cutscenes';
 
 type Maker = (name: string, epithet: string | undefined) => Scene;
 
-const named = (at: number, name: string, epithet: string | undefined, hold = 3.4): Beat => ({ at, title: [name.toUpperCase(), epithet], hold });
-const scene = (id: string, shots: Scene['shots'], beats: Beat[], extra: Partial<Scene> = {}): Scene => ({ id: `arrival:${id}`, sim: 'frozen', shots, beats, ...extra });
+export const named = (at: number, name: string, epithet: string | undefined, hold = 3.4): Beat => ({ at, title: [name.toUpperCase(), epithet], hold });
+export const scene = (id: string, shots: Scene['shots'], beats: Beat[], extra: Partial<Scene> = {}): Scene => ({ id: `arrival:${id}`, sim: 'frozen', shots, beats, ...extra });
 
 /** Over the investigator's shoulder at the horror, closing in or drawing back. */
-const behind = (dur: number, yaw: readonly [number, number], dist: readonly [number, number], up: readonly [number, number], look: readonly [number, number], fov: readonly [number, number], extra = {}) =>
+export const behind = (dur: number, yaw: readonly [number, number], dist: readonly [number, number], up: readonly [number, number], look: readonly [number, number], fov: readonly [number, number], extra = {}) =>
   shot({ dur, on: 'player', aim: 'other', yaw, dist, up, look, fov, sway: 0.5, ...extra });
 
 export const BESPOKE: Readonly<Record<string, Maker>> = {
