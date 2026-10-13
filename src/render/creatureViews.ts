@@ -21,13 +21,13 @@ import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
 import { strikeFrame } from '../systems/realityTricks';
 import { buildAssembly, type Assembly } from './assemblies';
-import { beyond, ECHOES, WRONGNESS } from './eldritch';
+import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
 import { MIST } from './volumetricFog';
 import { sight } from '../systems/perception';
 import { CELL, spriteKey, type SpriteAtlas, type SpriteState } from './sprites/atlas';
 import { spriteBatch, reviewedTextures } from './sprites/batch';
-import { attackFrame, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type SpriteDirection } from './sprites/directional';
+import { attackFrame, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteDirection } from './sprites/directional';
 import { reviewedClips, reviewedSize, type ReviewedManifest } from './sprites/reviewed';
 
 const CAPACITY = 64;
@@ -101,12 +101,28 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const textures = reviewedTextures(art?.pages ?? []);
   const pages = textures.map((texture) => spriteBatch(scene, texture, CAPACITY, true));
   const clips = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedClips(entity, key)]));
-  const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const glows = createHalos(CAPACITY, 0.55);
   scene.add(glows.mesh);
   const flat = new THREE.Vector3(); // the camera's right, level
+  const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
+  const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
+  /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number) => {
+    const frame = art!.manifest.frames[clip.frames[pose.frame]];
+    const page = art!.manifest.pages[frame.page];
+    const b = pages[frame.page];
+    const index = counts[frame.page];
+    if (index >= CAPACITY) return null;
+    b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
+    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, 0);
+    b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
+    const size = sizes.get(key)!;
+    b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
+    counts[frame.page]++;
+    return frame;
+  };
   /** A faint glow about the eyes of a sprite drawn at (x, y, z), `size` metres, in atlas cell `cell`. */
   const eyes = (cell: number, x: number, y: number, z: number, size: number, flip: boolean, look: Look, eye: THREE.Vector3, out = 0): void => {
     const k = cell * 4;
@@ -144,7 +160,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       flat.set(right.x, 0, right.z).normalize();
       glows.begin();
       let n = 0;
-      const counts = pages.map(() => 0);
+      counts.fill(0);
       debug.length = 0;
       seen.clear();
       for (const [id, model] of g.ecs.c.model) {
@@ -170,18 +186,19 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
           const pose = lookOf(g, id, time, { [look.state]: clip.frames.length })!;
-          const frame = art.manifest.frames[clip.frames[pose.frame]];
-          const page = art.manifest.pages[frame.page];
-          const b = pages[frame.page];
-          const index = counts[frame.page];
-          if (index >= CAPACITY) continue;
-          b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
-          b.info.setXYZW(index, flash, pose.opacity, clip.mirror_horizontal ? 1 : 0, 0);
-          b.weird.setX(index, g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
-          const size = sizes.get(key)!;
-          b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
-          counts[frame.page]++;
+          const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
+          const frame = put(key, clip, pose, x, y, z, flash, 1, weird);
+          if (!frame) continue;
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
+          if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
+            ECHOES.forEach((e, i) => {
+              const late = lookOf(g, id, time - e.lag);
+              const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
+              if (!late || !lagged) return;
+              const d = echoDrift(i, time, def.assembly!.scale);
+              put(key, lagged, lookOf(g, id, time - e.lag, { [late.state]: lagged.frames.length })!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
+            });
+          }
           continue;
         }
         if (def.assembly) {
@@ -204,8 +221,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           asm.animate(time, look.lash, lean);
           for (const m of asm.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
           asm.echoes.forEach((e, i) => { // an outer god's body a moment behind itself, drifting
-            const { lag, drift } = ECHOES[i];
-            e.root.position.set(x + Math.sin(time * 0.7 + i * 2.1) * drift * h, y - look.sink * h * 0.6, z + Math.cos(time * 0.53 + i) * drift * h);
+            const [{ lag }, d] = [ECHOES[i], echoDrift(i, time, h)];
+            e.root.position.set(x + d.x, y - look.sink * h * 0.6, z + d.z);
             e.root.rotation.y = yaw + Math.sin(time * 0.4 + i) * 0.35;
             e.animate(time - lag, look.lash, lean);
           });
