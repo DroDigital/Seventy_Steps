@@ -28,6 +28,7 @@ export const CSS = `
 [data-menu] button:focus,[data-menu] button:hover:not(:disabled),[data-menu] label:focus-within,[data-menu] label:hover{outline:none;color:${BRIGHT};background:linear-gradient(90deg,transparent,${ACCENT}26 14%,${ACCENT}0d 60%,transparent)}
 [data-menu] button:focus::before,[data-menu] button:hover:not(:disabled)::before{opacity:1;transform:rotate(45deg) scale(1);background:${ACCENT}}
 [data-menu] button.tab{display:inline-block;width:auto;flex:0 1 auto;white-space:nowrap;margin:0 1px;padding:6px 10px;font-size:11px;letter-spacing:2.2px;text-transform:uppercase;color:${INK}8c;background:none;border-top-color:transparent;border-bottom:2px solid transparent}
+[data-menu] button[data-chip]::before{left:3px}
 [data-menu] button.tab::before{display:none}
 [data-menu] button.tab.on{color:${BRIGHT};border-bottom-color:${ACCENT}}
 [data-menu] button.tab:focus,[data-menu] button.tab:hover:not(:disabled){color:${BRIGHT};background:${ACCENT}14}
