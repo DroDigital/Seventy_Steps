@@ -243,6 +243,7 @@ export const FEEDBACK = {
   strideEase: 14, // per second: how quickly a figure's stride takes up its ground speed (render/gait.ts)
   echoGlowHeight: 0.6, // light above an Echo drop
   revealSeconds: 0.5, // hidden-layer geometry flickers this long as it comes and goes
+  bowSeconds: 0.3, // a colossus's stoop: its first pose (the bow) shows this long, then its last (the hold) until the stoop ends
 };
 
 /** The open world (spec §3D). Distances in metres. */

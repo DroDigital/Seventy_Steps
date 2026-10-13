@@ -1,7 +1,7 @@
 /** Camera-relative authored sprite views and timing; read-only on combat and movement. */
 
 export type SpriteDirection = 'front' | 'left' | 'back' | 'right';
-export type SpriteAction = 'idle' | 'move' | 'attack' | 'hurt';
+export type SpriteAction = 'idle' | 'move' | 'attack' | 'hurt' | 'stoop';
 interface PositionXZ { x: number; z: number }
 
 const QUARTER = Math.PI / 2;
@@ -37,11 +37,11 @@ export interface DirectionalClip<T> {
 }
 export type DirectionalClips<T> = Partial<Record<SpriteDirection, Partial<Record<SpriteAction, DirectionalClip<T>>>>>;
 
-/** Side combat art is not authored in this pack; keep its accepted front action and mirror flag. */
+/** Side combat art (and the colossi's stoop) is authored only from the front in this pack; keep its accepted front action and mirror flag. */
 export function resolveDirectionalClip<T>(clips: DirectionalClips<T>, direction: SpriteDirection, action: SpriteAction): DirectionalClip<T> | undefined {
   const exact = clips[direction]?.[action];
   if (exact?.frames.length) return exact;
-  if (action === 'attack' || action === 'hurt') {
+  if (action === 'attack' || action === 'hurt' || action === 'stoop') {
     const front = clips.front?.[action];
     if (front?.frames.length) return front;
   }

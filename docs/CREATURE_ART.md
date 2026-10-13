@@ -1,11 +1,11 @@
 # Reviewed creature artwork
 
-The game uses the accepted 105-entry creature library for every enemy form: 93 base enemies and 12 variants. Its 2,577 registered source PNGs are packed without resizing, trimming, recoloring or changing frame order.
+The game uses the accepted 105-entry creature library for every enemy form: 93 base enemies and 12 variants. Its 2,577 registered source PNGs are packed without resizing, trimming, recoloring or changing frame order; the stoop of seven colossi (14 more frames, drawn afterwards) is packed beside them.
 
 ## Runtime files
 
 - `public/creatures/reviewed/index.json`: page rectangles, native canvas sizes, scales, directions, mirror flags and action registrations.
-- `public/creatures/reviewed/creatures-0.png` through `creatures-3.png`: four lossless PNG texture pages, with transparent gutters and nearest filtering.
+- `public/creatures/reviewed/creatures-0.png` through `creatures-3.png`: four lossless PNG texture pages, with transparent gutters and nearest filtering; `creatures-4.png` holds the fourteen stoop frames.
 - `public/creatures/reviewed/source-index.json`: the active source registrations used to build this pack.
 
 These files are copied into `dist/creatures/reviewed/` by the normal production build and served by the existing Electron package. No separate sprite folder needs to be installed into the game. The seven allies that have no supplied artwork retain their procedural sprites.
@@ -41,12 +41,18 @@ Mended afterwards, on the author's asking (none of it redraws a frame):
 Left as they are, for the author:
 
 - Attack and hurt art exist only from the front, for all 105 forms: seen from the side or behind, a creature that strikes or is struck shows its front. Side and back art for those two states would end it.
-- The seven colossi whose weak head comes down after each blow of their own (the Colossus, Cthulhu, Father Dagon, Mother Hydra, Ghatanothoa, Azathoth, Shub-Niggurath; Yog-Sothoth is spheres and has no head) no longer show it: the stoop hint and the head zone still work, but the picture stands straight. A drawn stooping pose per colossus (one front pose, a `stoop` action in the pack) is the lasting mend; a tilt of the billboard would stand in for it.
+- The seven colossi whose weak head comes down after each blow of their own no longer showed it: the stoop hint and the head zone worked, but the picture stood straight. (Mended since: see "The stoop" below.)
 - The eight colossi are painted 1.3 to 1.65 times wider than their combat radius, so the investigator can stand inside the painted body; widening the capsules is a balance change, and was not made.
 - Eyes of the forms not in `REVIEWED_EYES` (the Shoggoths' green spots, the rat swarm's and Wamp's amber, the Haunter's visor, and any seen from the side) are not given a glow.
+
+## The stoop
+
+Seven colossi (the Colossus, Cthulhu, Father Dagon, Mother Hydra, Ghatanothoa, Azathoth, Shub-Niggurath) have a drawn pose for the moment their head comes down: two front frames, `stoop_0` (the bow) and `stoop_1` (the hold), on the canvas, scale and ground line of their front idle, in the palette of that idle (the author's `Seventy-Steps-Colossi-Front-Bow-Hold-oct13` delivery). While `stooped()` (`systems/hurt.ts`: recovering from the creature's own blow and a little after, or reeling from a stagger or a parry) is true, the billboard shows the bow for `FEEDBACK.bowSeconds`, then holds the last frame until the stoop ends, and goes back to its idle; the weak-head hit zone is the same, so what is struck is what is shown. The art is front only, so from the side or behind the front pose is used, as for attack and hurt. The outer gods' echoes bow a moment behind. `?bestiary` cycles it with the other actions.
+
+The frames are added to the pack by `python3 tools/add_reviewed_frames.py <delivery folder>` (Pillow): it checks each frame's bytes against the delivery's manifest and that its idle is the idle the pack holds, puts them on `creatures-4.png`, gives each creature's front view a `stoop` action in `index.json` and `source-index.json`, and the integrity test holds them to the same account as the library (2,591 frames, 1,057 scopes). `tools/pack_reviewed_assets.py` rebuilds the pack from the library alone, so after a repack run the tool again on the delivery (or add the stoop to the library's registrations first).
 
 ## Rebuilding and checking
 
 Run `python3 tools/pack_reviewed_assets.py --source /path/to/accepted/library --output public/creatures/reviewed` with Pillow available. The source folder must contain its current `CURRENT-GAME-ANIMATIONS.json` and every referenced PNG. The packer rejects changed source hashes and verifies every RGBA crop after packing.
 
-`npm run check:all` includes checks for all 105 registry keys, all 1,050 animation scopes, every packed frame's RGBA hash and bounds, native canvases, mirroring, variable animation timing and Electron asset serving. `npm run build` includes the artwork in the production game.
+`npm run check:all` includes checks for all 105 registry keys, all 1,057 animation scopes (1,050 of the library and the stoop of seven colossi), every packed frame's RGBA hash and bounds, native canvases, mirroring, variable animation timing and Electron asset serving. `npm run build` includes the artwork in the production game.

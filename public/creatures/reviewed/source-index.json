@@ -4,13 +4,14 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2577,
+  "unique_png_count": 2591,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
     "When mirror_horizontal is true, use the listed source PNGs and reflect horizontally once.",
     "Frames retain their complete source canvas and alpha; do not trim or independently resize frames within a cycle.",
-    "Boss movement PNGs are 2D animation assets; existing materials, meshes or rigs require separate game integration."
+    "Boss movement PNGs are 2D animation assets; existing materials, meshes or rigs require separate game integration.",
+    "'stoop' (front view only): two frames, the first once on entering the pose and the second held until it ends; they are a later delivery, packed onto their own atlas page by tools/add_reviewed_frames.py."
   ],
   "entities": [
     {
@@ -17569,6 +17570,21 @@
                   "sha256": "4fc6040602d9a6e5e0313c9d2431e7fdc885436b4fb1509e04c8cc45146ba075"
                 }
               ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/colossus_pyramids/movement/front/stoop_0.png",
+                  "sha256": "54e6f3a94688942e2359719ab6224e99520c0b2e024a23243160d7779ed5dbba"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/colossus_pyramids/movement/front/stoop_1.png",
+                  "sha256": "d45f9bd22d0e38b3145094941af3310d09dcbb9a7c9af95d167f90136e3738b4"
+                }
+              ]
             }
           }
         },
@@ -17914,7 +17930,7 @@
     {
       "key": "dr_munoz",
       "id": "dr_munoz",
-      "display_name": "Dr. Muñoz",
+      "display_name": "Dr. Mu\u00f1oz",
       "asset_group": "sprites",
       "sprite_scale": 2,
       "scale_unit": "metres square billboard side",
@@ -19640,6 +19656,21 @@
                   "sha256": "9af465efc5c9002ccaffafda72898f3e8722ac80067c2b93042d785c7798709a"
                 }
               ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/cthulhu/movement/front/stoop_0.png",
+                  "sha256": "bc224589d8acd26d796c2ecab6f0ed6cefed9f84948fa5b04c662fb8b8906fed"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/cthulhu/movement/front/stoop_1.png",
+                  "sha256": "c05b227ff72220112819225c330c0d1d681fa14690830fede6c0fa0e4a4bd607"
+                }
+              ]
             }
           }
         },
@@ -19884,6 +19915,21 @@
                   "sha256": "7708b471c63f06481e287cde477f6ef87e7f7565b4ee0b3907e06710522e0d0b"
                 }
               ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/father_dagon/movement/front/stoop_0.png",
+                  "sha256": "57235d95ee53fea333a39b6ff54c900373baff3decb61ce6b8228ffb3e8f138d"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/father_dagon/movement/front/stoop_1.png",
+                  "sha256": "9447ffb743f276a91b0735fa5e47b500fc217efc324fb0d41d7ee6b150b659e5"
+                }
+              ]
             }
           }
         },
@@ -20126,6 +20172,21 @@
                   "name": "hurt_3",
                   "path": "bosses/mother_hydra/movement/front/hurt_3.png",
                   "sha256": "3fdfbfca63446a51e5ee4a96aaeedba527424f6db05e0873bf707b8141247dd2"
+                }
+              ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/mother_hydra/movement/front/stoop_0.png",
+                  "sha256": "2a99b67cfe220e56a683ca3095c56995ccf8c2090fbe4c6ddbe49d8a013f4fec"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/mother_hydra/movement/front/stoop_1.png",
+                  "sha256": "36c8579b730b9db60405cd09b386e391aeb83de26cf613dd54b7ea6114c50bea"
                 }
               ]
             }
@@ -20838,6 +20899,21 @@
                   "name": "hurt_3",
                   "path": "bosses/ghatanothoa/movement/front/hurt_3.png",
                   "sha256": "93c3be41c31b955eacce9f91e3531b1d921abb42d1e82fa88680542751d5e9b5"
+                }
+              ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/ghatanothoa/movement/front/stoop_0.png",
+                  "sha256": "803b642d10e196fe26b0ae592d02eeb738258b993fe9734f76d590c445ebb778"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/ghatanothoa/movement/front/stoop_1.png",
+                  "sha256": "c3c864b0b424b9bd63f04c31ddc8ca2143ed04f006a5590677be5e497f448f60"
                 }
               ]
             }
@@ -22343,6 +22419,21 @@
                   "sha256": "b853edc5c01bc9fc77c42d7fa7bd9a419e0e87dddb17abcfa7ccf30a8574f132"
                 }
               ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/azathoth/movement/front/stoop_0.png",
+                  "sha256": "a82e11319716b59c2cbcfcca1fb860575e5a68fdbc6a4de37692941312d6c1ba"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/azathoth/movement/front/stoop_1.png",
+                  "sha256": "09fddde52f68c8b25ef26477366d69d86b41984fc665f0dbc8185089b90229d9"
+                }
+              ]
             }
           }
         },
@@ -23530,6 +23621,21 @@
                   "name": "hurt_3",
                   "path": "bosses/shub_niggurath/movement/front/hurt_3.png",
                   "sha256": "a888a47c3db09aefd27ee4d5d114969862f3ae51876494839c1ccbd828159c23"
+                }
+              ]
+            },
+            "stoop": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "stoop_0",
+                  "path": "bosses/shub_niggurath/movement/front/stoop_0.png",
+                  "sha256": "b58d815729967a6d4b4d34c11e0ad3d5415f118fa48a61b8271dc7680a6fca77"
+                },
+                {
+                  "name": "stoop_1",
+                  "path": "bosses/shub_niggurath/movement/front/stoop_1.png",
+                  "sha256": "0c1d4119902662b3706ccc2db0802cd0e736f89eddd1fe9854f600d2a63eef17"
                 }
               ]
             }

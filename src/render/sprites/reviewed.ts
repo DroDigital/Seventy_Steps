@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 /** Lossless reviewed PNG pages and their authored animation registrations. */
-import type { SpriteState } from './atlas';
-import type { DirectionalClips, SpriteDirection } from './directional';
+import type { DirectionalClips, SpriteAction, SpriteDirection } from './directional';
 
 export interface ReviewedFrame {
   source: string;
@@ -24,7 +23,7 @@ export interface ReviewedEntity {
   directions: Record<SpriteDirection, {
     sourceDirection: SpriteDirection;
     mirror: boolean;
-    actions: Partial<Record<SpriteState, number[]>>;
+    actions: Partial<Record<SpriteAction, number[]>>;
   }>;
 }
 export interface ReviewedManifest {
@@ -50,7 +49,7 @@ export function reviewedClips(entity: ReviewedEntity, key: string): DirectionalC
       : key === 'innsmouth_hybrid' && direction === 'right' ? 'left' : direction;
     const view = entity.directions[authored];
     clips[direction] = {};
-    for (const state of ['idle', 'move', 'attack', 'hurt'] as const) {
+    for (const state of ['idle', 'move', 'attack', 'hurt', 'stoop'] as const) {
       const frames = view.actions[state];
       if (frames) clips[direction]![state] = { frames, mirror_horizontal: view.mirror };
     }

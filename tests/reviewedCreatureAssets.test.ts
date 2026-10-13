@@ -128,18 +128,20 @@ describe('reviewed creature artwork imported into the game', () => {
           expect(frames.length, `${original.key}/${direction}/${action}`).toBe(registration.frame_count);
           expect(frames.map((f) => f.source)).toEqual(registration.frames.map((f) => f.path));
           expect(frames.map((f) => f.sourceSha256)).toEqual(registration.frames.map((f) => f.sha256));
-          expect(frames.every((f) => f.page === imported.page)).toBe(true);
+          // The stoop is a later delivery (tools/add_reviewed_frames.py): its frames are on their own page, after the pack's.
+          if (action === 'stoop') expect(frames.every((f) => f.page === pack.pages.length - 1 && f.page !== imported.page)).toBe(true);
+          else expect(frames.every((f) => f.page === imported.page)).toBe(true);
         }
       }
     }
-    expect(scopes).toBe(1050);
+    expect(scopes).toBe(1057); // 1,050 of the library, and the stoop of seven colossi
     expect(mirrors).toBe(82);
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2577);
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2591);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2577);
+    expect(pack.frameCount).toBe(2591); // 2,577 of the library, and the stoop's fourteen
   });
 
-  it('preserves all 2577 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
+  it('preserves all 2591 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
     expect(pack.filter).toBe('nearest');
     expect(pack.mipmaps).toBe(false);
     const pages = pack.pages.map((page) => {
@@ -164,7 +166,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2330, '128x128': 218, '128x160': 29 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2330, '128x128': 230, '128x160': 31 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');

@@ -70,14 +70,14 @@ function tile(grid: HTMLElement, d: EntityDef, variant?: Variant): { canvas: HTM
   return { canvas, caption };
 }
 
-interface AuthoredClip { direction: SpriteDirection; state: SpriteState; frames: readonly number[]; mirror: boolean; duration: number }
-const CLIP_SECONDS = { idle: 2, move: 0.8, attack: 0.8, hurt: 0.6 };
+interface AuthoredClip { direction: SpriteDirection; state: SpriteState | 'stoop'; frames: readonly number[]; mirror: boolean; duration: number }
+const CLIP_SECONDS = { idle: 2, move: 0.8, attack: 0.8, hurt: 0.6, stoop: 1.2 };
 
 function authoredClips(entity: ReviewedEntity, key: string): AuthoredClip[] {
   const clips = reviewedClips(entity, key);
   return (['front', 'left', 'back', 'right'] as const).flatMap((direction) => {
     const view = clips[direction]!;
-    return SPRITE_STATES.flatMap((state) => {
+    return [...SPRITE_STATES, 'stoop' as const].flatMap((state) => {
       const clip = view[state];
       return clip?.frames.length ? [{ direction, state, frames: clip.frames, mirror: clip.mirror_horizontal, duration: CLIP_SECONDS[state] }] : [];
     });
