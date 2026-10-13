@@ -83,14 +83,14 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     const shot = (n: number): number => Math.round(PLAYER_MOVES.shoot.shot.damage * might(g, g.player.id) * gunEdge(n));
     const whole = (n: number): number => GUN.reach.near + n * GUN.level.reach;
     const gunName = `Revolver +${level}`;
-    option(panel, price === undefined ? `${gunName}  ·  fully set` : `${gunName} → +${level + 1}  ·  ${price} star-stone${price === 1 ? '' : 's'}  ·  shot ${shot(level)} → ${shot(level + 1)}  ·  whole to ${whole(level)} → ${whole(level + 1)} m`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), price === undefined ? 'The revolver is fully set.' : `Not enough star-stones: ${price}, and you carry ${g.player.stones}.`);
+    option(panel, price === undefined ? `${gunName}  ·  fully set` : `${gunName} → +${level + 1}  ·  ${price} star-stone${price === 1 ? '' : 's'}`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), price === undefined ? 'The revolver is fully set.' : `Not enough star-stones: ${price}, and you carry ${g.player.stones}.`, '', price === undefined ? '' : `shot ${shot(level)} → ${shot(level + 1)}  ·  whole to ${whole(level)} → ${whole(level + 1)} m`);
     for (const id of g.player.arms) {
       const level = g.player.reinforced[id];
       const cost = reinforceCost(g, id);
       const light = (n: number): number => Math.round((WEAPONS[id].moves.light1?.hit?.damage ?? 0) * might(g, g.player.id) * edgeAt(n));
       const name = `${WEAPONS[id].name} +${level}`;
-      const label = cost === undefined ? `${name}  ·  fully reinforced` : `${name} → +${level + 1}  ·  ${cost} star-stone${cost === 1 ? '' : 's'}  ·  light ${light(level)} → ${light(level + 1)}`;
-      option(panel, label, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : `Not enough star-stones: ${cost}, and you carry ${g.player.stones}.`);
+      const label = cost === undefined ? `${name}  ·  fully reinforced` : `${name} → +${level + 1}  ·  ${cost} star-stone${cost === 1 ? '' : 's'}`;
+      option(panel, label, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : `Not enough star-stones: ${cost}, and you carry ${g.player.stones}.`, '', cost === undefined ? '' : `light ${light(level)} → ${light(level + 1)}`);
     }
   }
 

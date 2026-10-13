@@ -39,7 +39,7 @@ export function journalPage(g: Game, back: () => void, show: (p: Page) => void, 
       }
       if (done.length) {
         heading(body, `DONE · ${done.length}`).style.margin = '18px 14px 4px';
-        for (const id of done) el(body, 'div', `${QUESTS[id].title}. ${QUESTS[id].done}`, 'opacity:.4;line-height:1.5;margin:4px 14px 0;font-size:13px');
+        for (const id of done) el(body, 'div', `${QUESTS[id].title}. ${QUESTS[id].done}`, 'opacity:.55;line-height:1.5;margin:4px 14px 0;font-size:13px');
       }
     } else if (at === 1) {
       const read = [...(g.overworld?.read ?? [])].filter((n) => DOCUMENTS[n]);

@@ -134,6 +134,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'ctl.padNone': "aucune détectée (appuyez sur un bouton)",
   'ctl.refused': "Cette touche est réservée (Maj, Tab, Entrée, Échap et les flèches appartiennent au jeu et à ses menus). Choisissez-en une autre.",
   'ctl.choose': "Choisissez une touche, puis appuyez sur la nouvelle.",
+  'ctl.waiting': "Appuyez sur la nouvelle touche pour « {action} ». Échap annule.",
   'rise.title': "SE RELEVER",
   'rise.candle': "Près de la bougie",
   'rise.candleBoss': "À quelques pas de la brume de {boss}, là où brûle la flamme. Les créatures reviennent ; vos Échos gisent là où vous êtes tombé.",

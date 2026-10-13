@@ -11,7 +11,7 @@
  */
 
 import { useDevice, onDeviceChange } from '../core/device';
-import { PAD_BUTTON } from '../core/padMap';
+import { PAD_BUTTON, padSwapped } from '../core/padMap';
 import { activePad, muteHeldPad, type PadReading } from '../core/pads';
 import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
@@ -174,6 +174,7 @@ function onKey(e: KeyboardEvent): void {
 }
 
 let prev = new Set<number>();
+let swapWas = false; // whether A and B were exchanged at the last look (Settings › Controls)
 let held = 0; // the direction held: -1 up, 1 down, 0 none
 let repeatAt = 0;
 
@@ -182,6 +183,7 @@ function pollPad(now: number): void {
   const down = new Set<number>();
   pad?.buttons.forEach((b, i) => (b.pressed || b.value > 0.5) && down.add(i));
   const [lx, ly] = [pad?.axes[0] ?? 0, pad?.axes[1] ?? 0];
+  if (padSwapped() !== swapWas) [swapWas, prev] = [padSwapped(), new Set(down)]; // the A that turned the exchange on or off is still held, and now reads as the other button: it is not a press of it
   const edge = (i: number): boolean => down.has(i) && !prev.has(i);
   if ([...down].some((i) => !prev.has(i)) || Math.abs(lx) > STICK || Math.abs(ly) > STICK) useDevice('pad');
   const top = stack.at(-1);
@@ -247,8 +249,8 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   const focused = (): number => items(panel).indexOf(document.activeElement as HTMLElement);
   // A choice that rebuilds the page keeps the focus where it was.
   panel.addEventListener('click', (e) => {
-    const i = items(panel).indexOf(e.target as HTMLElement);
     const hit = (e.target as HTMLElement).closest?.('button, input');
+    const i = items(panel).indexOf(hit as HTMLElement); // (a click on a choice's smaller line is a click on the choice)
     if (hit && !hit.classList.contains('tab') && hit.getAttribute('type') !== 'range') menuSound('choose'); // (a tab and a slider have their own: ui/menuParts.ts)
     queueMicrotask(() => entry && i >= 0 && !panel.contains(document.activeElement) && focusAt(panel, i));
   });
