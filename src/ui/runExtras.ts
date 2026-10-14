@@ -30,8 +30,8 @@ export interface Extras {
   readonly hidesHud: boolean;
 }
 
-export function createExtras(game: Game, shell: Shell, store: SaveStore | null, o: ExtrasOptions): Extras {
-  const perf = createPerf(!!o.perf);
+export function createExtras(game: Game, shell: Shell, store: SaveStore | null, o: ExtrasOptions, notes?: () => string): Extras {
+  const perf = createPerf(!!o.perf, notes);
   const readout = createReadout();
   const auto = createAutoQuality(shell, perf.stats, (text) => game.events.emit('Notice', { text }), !o.arena && !o.debug && !o.bench && (!!o.intro || !o.fresh) && firstLaunch(store)); // a first launch's picture is set for the computer
   const bench = o.bench && !o.arena ? startBench(game, perf.stats, readout) : null;

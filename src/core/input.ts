@@ -14,7 +14,7 @@ import { INPUT, SIM } from '../data/tuning';
 import { keyLayout, type Action } from './bindings';
 import { useDevice } from './device';
 import { PAD_BUTTON } from './padMap';
-import { activePad, takeResync } from './pads';
+import { activePad, recalibratePads, takeResync } from './pads';
 
 export const BUTTONS = ['light', 'heavy', 'dodge', 'block', 'parry', 'shoot', 'reload', 'lock', 'item', 'heal', 'throw', 'interact'] as const;
 export type Button = (typeof BUTTONS)[number];
@@ -46,6 +46,8 @@ export const noButtons = (): Buttons => ({
   interact: false,
 });
 
+const noFrames = (): Record<Button, number> => Object.fromEntries(BUTTONS.map((b) => [b, 0])) as Record<Button, number>;
+
 export function emptyInput(): InputFrame {
   return { moveX: 0, moveY: 0, lookX: 0, lookY: 0, held: noButtons(), pressed: noButtons(), released: noButtons(), switchTarget: 0 };
 }
@@ -56,7 +58,15 @@ const keyButton = (code: string): Button | undefined => KEYED.find(([a]) => keyL
 /** Standard-mapping pad: RB light, RT heavy, LB block, LT parry, B dodge, X revolver, d-pad left its reload, Y Reagent, d-pad down Laudanum, d-pad up a flask of oil, R3 lock-on, A interact. */
 const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD_BUTTON.rt, block: PAD_BUTTON.lb, parry: PAD_BUTTON.lt, dodge: PAD_BUTTON.b, shoot: PAD_BUTTON.x, reload: PAD_BUTTON.left, lock: PAD_BUTTON.r3, heal: PAD_BUTTON.y, item: PAD_BUTTON.down, throw: PAD_BUTTON.up, interact: PAD_BUTTON.a };
 
+/** The buttons the game reads as held (guard, and the dodge that sprints): every other acts on its press alone, so one that stays down for seconds is stuck. */
+const HOLDS: ReadonlySet<Button> = new Set<Button>(['dodge', 'block']);
+const STUCK_FRAMES = SIM.hz * 2;
+/** Which bit of a mouse event's `buttons` each button of its `button` is. */
+const MOUSE_BIT: Readonly<Record<number, number>> = { 0: 1, 1: 4, 2: 2 };
+const isMeta = (code: string): boolean => code === 'MetaLeft' || code === 'MetaRight';
+
 interface PadState {
+  id: string;
   lx: number;
   ly: number;
   rx: number;
@@ -76,11 +86,15 @@ function readPad(): PadState | null {
     const btn = pad.buttons[PAD[b]];
     buttons[b] = !!btn && (btn.pressed || btn.value > 0.5);
   }
-  return { lx: axis(0), ly: -axis(1), rx: axis(2), ry: axis(3), buttons };
+  return { id: pad.id, lx: axis(0), ly: -axis(1), rx: axis(2), ry: axis(3), buttons };
 }
 
 export interface InputDevice {
   poll(): InputFrame;
+  /** Lets go of every key and button as if none were down, and takes the pads' sticks, where they lie, for their rest (pausing does it: a stuck key or a drifted stick is set right by it). */
+  reset(): void;
+  /** What is held and what the pad says, in words, for the frame meter (F3): a player who is walking on alone can say what it hears. */
+  describe(): string;
   sensitivity: number; // look speed multiplier (the settings menu)
   invertY: boolean; // up looks down (the settings menu)
 }
@@ -100,6 +114,8 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   let flickCooldown = 0;
   let stickArmed = true;
   let keySwitch: -1 | 0 | 1 = 0;
+  const heldFor = noFrames();
+  let lastPad: PadState | null = null;
 
   const press = (b: Button): void => {
     if (!held[b]) down[b] = true;
@@ -121,6 +137,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   };
 
   addEventListener('keydown', (e) => {
+    if (e.metaKey && !isMeta(e.code)) return; // a Command shortcut (on macOS a key pressed with Command is never heard to rise, so one taken for the game stays down): not the game's
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
     if (e.code !== 'Escape' && !captured()) capture(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
     keys.add(e.code); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
@@ -132,20 +149,31 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     else if (e.code === 'ArrowRight') keySwitch = 1;
   });
   addEventListener('keyup', (e) => {
+    if (isMeta(e.code)) return letGo(); // keys let go while Command was down were never heard to rise (a key still held says so again with its next repeat)
     keys.delete(e.code);
     const b = keyButton(e.code);
     if (b) release(b);
   });
-  const letGo = (): void => { // a key or button let go while the window was elsewhere is never heard to rise: nothing is held on leaving it, or on coming back (round 31)
+  function letGo(): void { // a key or button let go while the window was elsewhere is never heard to rise: nothing is held on leaving it, or on coming back (round 31)
     keys.clear();
     mouseButtons.clear();
     for (const b of BUTTONS) release(b);
+  }
+  /** A button the page thinks is down but the mouse says is up: its release was never heard (let go over another window, or under a screenshot's overlay). */
+  const reconcile = (e: MouseEvent): void => {
+    if (typeof e.buttons !== 'number') return;
+    for (const [btn, b] of mouseButtons) {
+      if (e.buttons & (MOUSE_BIT[btn] ?? 0)) continue;
+      mouseButtons.delete(btn);
+      release(b);
+    }
   };
   addEventListener('blur', letGo);
   addEventListener('focus', letGo);
   document.addEventListener('visibilitychange', letGo);
   canvas.addEventListener('mousedown', (e) => {
     useDevice('keys');
+    reconcile(e);
     if (!captured()) capture();
     const b: Button | undefined =
       e.button === 0 ? (e.shiftKey ? 'heavy' : 'light') : e.button === 2 ? (e.shiftKey ? 'parry' : 'block') : e.button === 1 ? 'lock' : undefined;
@@ -163,6 +191,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   canvas.style.cursor = 'none'; // the world has no pointer; the menus draw their own (ui/cursor.ts)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   addEventListener('mousemove', (e) => {
+    reconcile(e);
     if (!captured() && !free()) return; // (not captured, and the game in play: the mouse looks about all the same, till a key or a click takes it)
     mouseX += e.movementX;
     mouseY += e.movementY;
@@ -173,9 +202,22 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   const device: InputDevice = {
     sensitivity: 1,
     invertY: false,
+    reset() {
+      letGo();
+      muted.clear();
+      recalibratePads();
+    },
+    describe() {
+      const pad = lastPad;
+      const [keyed, clicked] = [[...keys].join(' '), [...mouseButtons.values()].join(' ')];
+      const stick = pad ? `L ${pad.lx.toFixed(2)} ${pad.ly.toFixed(2)} · R ${pad.rx.toFixed(2)} ${pad.ry.toFixed(2)}` : '';
+      const buttons = pad ? BUTTONS.filter((b) => pad.buttons[b]).join(' ') : '';
+      return `keys ${keyed || '-'} · mouse ${clicked || '-'}\npad ${pad ? `${pad.id.slice(0, 40)} ${stick}${buttons ? ` · ${buttons}` : ''}` : 'none heard'}`;
+    },
     poll() {
       const dt = 1 / SIM.hz;
       const pad = readPad();
+      lastPad = pad;
       const f = emptyInput();
       if (pad && (Object.values(pad.buttons).some(Boolean) || Math.hypot(pad.lx, pad.ly, pad.rx, pad.ry) > 0)) useDevice('pad');
 
@@ -219,6 +261,16 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
         else muted.delete(b);
       }
       for (const b of BUTTONS) {
+        if (HOLDS.has(b) || !(held[b] || padHeld[b])) heldFor[b] = 0;
+        else if (++heldFor[b] > STUCK_FRAMES) { // an action that acts on its press, down for seconds, is stuck (a release not heard, a pad's button that glitched): let go, and heard again when pressed afresh
+          release(b);
+          for (const [btn, v] of mouseButtons) if (v === b) mouseButtons.delete(btn);
+          if (padHeld[b]) {
+            padHeld[b] = false;
+            muted.add(b);
+          }
+          heldFor[b] = 0;
+        }
         f.held[b] = held[b] || padHeld[b];
         f.pressed[b] = down[b] || (padHeld[b] && !prevPad[b]);
         f.released[b] = up[b] || (!padHeld[b] && prevPad[b]);
