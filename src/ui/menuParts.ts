@@ -37,10 +37,10 @@ export const CSS = `
 [data-menu] .pause button{display:block;width:fit-content;min-width:300px;margin:0 auto;padding:7px 48px;text-align:center}
 [data-menu] .pause button::before{left:22px}
 [data-menu] .pause button::after{content:'';position:absolute;right:22px;top:50%;width:5px;height:5px;margin-top:-3px;border:1px solid ${ACCENT};transform:rotate(45deg) scale(.3);opacity:0;transition:opacity .15s,transform .15s}
-[data-menu] .pause button:focus,[data-menu] .pause button:hover:not(:disabled){text-shadow:0 0 12px ${ACCENT}b0;background:linear-gradient(90deg,transparent,${ACCENT}26 22%,${ACCENT}26 78%,transparent)}
+[data-menu] .pause button:focus,[data-menu] .pause button:hover:not(:disabled){text-shadow:0 0 12px ${ACCENT}b0;background:linear-gradient(90deg,transparent,${ACCENT}1a 22%,${ACCENT}1a 78%,transparent)}
 [data-menu] .pause button:focus::before,[data-menu] .pause button:hover:not(:disabled)::before,[data-menu] .pause button:focus::after,[data-menu] .pause button:hover:not(:disabled)::after{opacity:1;transform:rotate(45deg) scale(1);background:${ACCENT};box-shadow:0 0 8px ${ACCENT}}
 [data-menu] .pause button.exit{color:${INK}80}
-[data-menu] .pause button.exit:focus,[data-menu] .pause button.exit:hover:not(:disabled){color:#e6bdb3;text-shadow:0 0 12px #c0614fb0;background:linear-gradient(90deg,transparent,#b0554826 22%,#b0554826 78%,transparent)}
+[data-menu] .pause button.exit:focus,[data-menu] .pause button.exit:hover:not(:disabled){color:#e6bdb3;text-shadow:0 0 12px #c0614fb0;background:linear-gradient(90deg,transparent,#b055481a 22%,#b055481a 78%,transparent)}
 [data-menu] .pause button.exit::after,[data-menu] .pause button.exit::before{border-color:#c0614f}
 [data-menu] .pause button.exit:focus::before,[data-menu] .pause button.exit:hover:not(:disabled)::before,[data-menu] .pause button.exit:focus::after,[data-menu] .pause button.exit:hover:not(:disabled)::after{background:#c0614f;box-shadow:0 0 8px #c0614f}
 [data-menu] label{display:flex;gap:12px;align-items:center;margin:0;padding:6px 14px;border-top:1px solid transparent;border-bottom:1px solid transparent;transition:background .15s,border-color .15s}
