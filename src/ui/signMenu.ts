@@ -21,7 +21,7 @@ import { canUpgradeGun, gunCost, gunEdge, upgradeGun } from '../systems/gun';
 import type { Game } from '../systems/components';
 import { buyUpgrade, upgradeName } from '../systems/insight';
 import { closedBy, heldOpen, listed } from '../systems/veil';
-import { mainLead } from '../systems/lead';
+import { currentLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
 import { worldLayout, type SignPlace } from '../world/placements';
 import { deviceInUse } from '../core/device';
@@ -72,13 +72,14 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       option(panel, `${levelName(id)}  ${g.player.levels[id]}/${LEVELS[id].max}  ·  ${GAINS[id]}  ·  ${full ? 'fully grown' : `${nextLevelCost(g)} Echoes`}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
     }
     heading(panel, `MIND  ·  INSIGHT ${g.mind.insight}`).style.margin = '12px 0 4px';
-    const open = heldOpen(g.mind.insight);
-    el(panel, 'div', `Insight also holds hidden passages open${open.length ? ` (${open.length} now: ${listed(open)})` : ''}. What is spent here is gone, and a passage it held open is a wall again.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 6px');
+    const read = g.overworld?.read;
+    const open = heldOpen(g.mind.insight, read);
+    el(panel, 'div', `Insight also holds hidden passages open${open.length ? `, ${open.length} that you have yet to pass` : ''}. What is spent here is gone, and a passage it held open is a wall again.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 6px');
     for (const id of Object.keys(UPGRADES) as UpgradeId[]) {
       const u = UPGRADES[id];
       const level = g.mind.upgrades[id];
-      const shut = level < u.max && g.mind.insight >= u.cost ? closedBy(g.mind.insight, u.cost) : [];
-      const costs = shut.length ? `Spending ${u.cost} insight shuts ${listed(shut, 3)} again.` : '';
+      const shut = level < u.max && g.mind.insight >= u.cost ? closedBy(g.mind.insight, u.cost, read) : [];
+      const costs = shut.length ? `Spending ${u.cost} insight shuts ${listed(shut, 3)} again, before you have passed ${shut.length === 1 ? 'it' : 'them'}.` : '';
       option(panel, `${upgradeName(id)}  ${level}/${u.max}  ·  ${GAINS[id]}  ·  ${level < u.max ? `${u.cost} insight` : 'fully grown'}`, () => (buyUpgrade(g, id), main.redraw?.()), level < u.max && g.mind.insight >= u.cost, level >= u.max ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`, costs, shut.length ? `shuts ${shut.length} passage${shut.length === 1 ? '' : 's'}` : '');
     }
   }
@@ -127,7 +128,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     const lead = `${g.player.cycle ? `JOURNEY ${g.player.cycle + 1}  ·  ` : ''}${g.player.difficulty === DEFAULT_DIFFICULTY ? '' : `${DIFFICULTIES[g.player.difficulty].name.toUpperCase()}  ·  `}`;
     const stat = el(panel, 'div', `${lead}LEVEL ${levelsBought(g) + 1}  ·  ECHOES ${g.player.echoes}  ·  INSIGHT ${g.mind.insight}  ·  STAR-STONES ${g.player.stones}`, `margin:-6px 0 12px;text-align:center;font-size:11px;letter-spacing:2px;color:${ACCENT}`);
     stat.dataset.pin = '';
-    const next = mainLead(g)?.text; // what the story asks next: a resting place is where it is thought of (round 38)
+    const next = currentLead(g)?.text; // what the story asks next: a resting place is where it is thought of (round 38)
     if (next) {
       const line = el(panel, 'div', `NEXT  ·  ${next}`, `margin:-6px 14px 10px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7`);
       [line.title, line.dataset.pin] = [next, ''];

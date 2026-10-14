@@ -207,7 +207,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'slot.journey': "Reise {n}",
   'slot.newer': "von einer neueren Version des Spiels: aktualisieren, um weiterzuspielen",
   'hint.move': "Bewegt euch mit {move} und seht euch um mit {look}. {dodge} weicht aus; gehalten läuft ihr.",
-  'hint.lead': "Das ◇ auf der Minikarte zeigt, wohin die Geschichte führt. Das Tagebuch ({journal}) sagt, was dort zu tun ist.",
+  'hint.lead': "Das ◇ auf der Minikarte zeigt, wohin die Geschichte führt. Das Tagebuch ({journal}) sagt, was dort zu tun ist, und bewahrt jeden Hinweis in seinem Feldführer auf.",
   'hint.fight': "{light} schlägt zu ({heavy}: ein schwerer Schlag). {block} blockt und bricht einen Hieb ab, der noch nicht getroffen hat; {parry} pariert. {lock} visiert an.",
   'hint.hurt': "{heal} spritzt Wests Reagenz und schließt Wunden. Die Dosen kehren zurück, wenn ihr ruht.",
   'hint.mind': "{item} nimmt einen Schluck Laudanum und beruhigt den Geist. Abseits eines Kampfes heilt er von selbst (▲), schneller bei Lampen- und Feuerschein (▲▲); die Ältesten Zeichen, Echos und die eigene Laterne zählen nicht.",

@@ -36,10 +36,10 @@ haunting (ui/veil.ts); *own* is a panel with its own look and no mist.
 | Loading veil, place line (veil.ts, journeys.ts) | any journey | veil | yes (seen, not changed) |
 | Pause (pauseMenu.ts) | Esc, Start → world | skin | yes |
 | Map (mapScreen.ts) | M, pause → world | own (canvas) | yes (a first-hour map: little charted) |
-| Journal: Under way, Documents, Bestiary; a document; the bestiary list; an entry (journal.ts, bestiaryPage.ts, dialogue.ts) | pause, J → | skin | yes, empty and seeded |
+| Journal: Under way (with Follow it on the map), Documents, Field Guide, Bestiary; a document; a hint; the bestiary list; an entry (journal.ts, fieldGuide.ts, bestiaryPage.ts, dialogue.ts) | pause, J → | skin | yes, empty and seeded |
 | Arms (armsPage.ts) | pause → pause | skin | yes |
 | Achievements (achievements.ts) | pause → pause | skin | yes, top and end, empty and seeded |
-| Elder Sign menu: Grow, Arms, Travel, a region's signs; the Court's two endings; the Sleeper's Sign (signMenu.ts) | rest at a sign → world | skin | yes, all (the descent button: its closed line only) |
+| Elder Sign menu: Grow, Arms (with Move reinforcement and its page), Relics (and a slot's page), Travel, a region's signs; the Court's two endings; the Sleeper's Sign (signMenu.ts) | rest at a sign → world | skin | yes, all (the descent button: its closed line only) |
 | Merchants: Morgan, Curtis, Dyer (shopMenu.ts) | the talk's last line → world | skin | Morgan (rich, poor, a purchase) and Curtis; Dyer's list is Curtis's with oil |
 | Talk (dialogue.ts) | a person → world | own (words on the world) | yes |
 | Reading a tome or note in the world (dialogue.ts) | pick-up → world | own (the dark framed leaf) | yes |

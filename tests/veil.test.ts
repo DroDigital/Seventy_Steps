@@ -34,4 +34,14 @@ describe('what insight holds open, and what spending it would shut', () => {
     expect(listed(PASSAGES.slice(0, 1))).toBe(`${PASSAGES[0].dungeon}: ${PASSAGES[0].room}`);
     expect(listed(PASSAGES, 2)).toMatch(/; and \d+ more$/);
   });
+
+  it('counts only what is still to be found: a passage whose tome is read is no loss', () => {
+    const read = new Set(["Keziah's Formulae"]);
+    expect(heldOpen(1, read).some((p) => p.room === 'closet')).toBe(false);
+    expect(heldOpen(1).some((p) => p.room === 'closet')).toBe(true);
+    expect(closedBy(2, 2, read).map((p) => p.room)).toContain('burrow'); // its diary is not read
+    expect(closedBy(2, 2, read).map((p) => p.room)).not.toContain('closet');
+    const all = new Set(PASSAGES.flatMap((p) => (p.tome ? [p.tome] : [])));
+    expect(heldOpen(3, all).every((p) => p.tome === undefined)).toBe(true); // all that is left are the bridges
+  });
 });

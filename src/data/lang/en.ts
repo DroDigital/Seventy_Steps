@@ -221,7 +221,7 @@ export const EN = {
   'slot.newer': "made by a newer version of the game: update to go on",
   // hints for a new investigator
   'hint.move': 'Move with {move} and look with {look}. {dodge} dodges; hold it to run.',
-  'hint.lead': 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there.',
+  'hint.lead': 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there, and keeps every hint you are given in its Field Guide.',
   'hint.fight': '{light} strikes ({heavy}: a heavy blow). {block} blocks, and calls off a swing that has not landed; {parry} parries. {lock} locks on.',
   'hint.hurt': "{heal} injects West's Reagent and closes wounds. Its doses come back when you rest.",
   'hint.mind': '{item} takes a swallow of Laudanum and steadies the mind. Away from a fight it mends by itself (▲), faster by lamplight and firelight (▲▲); the Elder Signs, Echoes and your own lantern do not count.',
