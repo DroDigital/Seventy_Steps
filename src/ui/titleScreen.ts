@@ -91,19 +91,25 @@ export function showTitle(o: TitleOptions): void {
     build(p) {
       if (first) riseLines();
       first = false;
-      const menu = el(p, 'div', '', 'width:260px;margin:0 auto;text-align:left');
+      const menu = el(p, 'div');
+      menu.className = 'pause'; // centred lines, each on a plaque of its own, as the pause menu's (ui/menuParts.ts)
+      const gap = (): void => void el(menu, 'div', '', 'height:14px'); // the groups are told apart by space
       const lines = o.slots();
       const here = lines[o.active - 1];
       if (here?.loads) {
         button(menu, t('title.continue'), () => begin(false));
-        el(menu, 'div', here.line, 'margin:-2px 0 8px 30px;font-size:12px;opacity:.5;letter-spacing:.5px'); // where that dream was left (round 38)
+        el(menu, 'div', here.line, 'margin:-2px auto 8px;max-width:420px;font-size:12px;line-height:1.35;opacity:.5;letter-spacing:.5px;text-align:center'); // where that dream was left (round 38)
       }
       button(menu, t('title.new'), () => screen.show(slotPage('new')));
       if (lines.some((l) => l?.loads)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
+      gap();
       button(menu, t('menu.settings'), () => screen.show(placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys), '50%', false)));
       button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
-      if (desktop) button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())); // the desktop shell only (playtest round 12)
-      el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.5;margin-top:26px;font-size:11px;letter-spacing:2px;text-transform:uppercase');
+      if (desktop) { // the desktop shell only (playtest round 12): the way out is dimmer, and light ash-red when chosen
+        gap();
+        button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())).classList.add('exit');
+      }
+      el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.5;margin-top:26px;padding-left:2px;font-size:11px;letter-spacing:2px;text-transform:uppercase'); // (the padding is its letter-spacing, which trails the last letter)
     },
   }, '66%', true);
   const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));

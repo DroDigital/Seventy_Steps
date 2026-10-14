@@ -95,7 +95,7 @@ export const heading = (parent: HTMLElement, text: string): HTMLDivElement => el
 export function title(parent: HTMLElement, text: string): HTMLDivElement {
   const box = el(parent, 'div', '', 'margin:0 0 14px;text-align:center');
   box.dataset.pin = ''; // stays put above a scrolling body (footer)
-  el(box, 'div', text, `font-size:17px;letter-spacing:7px;color:${BRIGHT}`);
+  el(box, 'div', text, `padding-left:7px;font-size:17px;letter-spacing:7px;color:${BRIGHT}`); // (the padding is the letter-spacing, which trails the last letter: without it the words stand half of it left of the middle, the rule under them)
   const rule = el(box, 'div', '', 'display:flex;align-items:center;gap:8px;margin:8px 18px 0');
   el(rule, 'span', '', `flex:1;height:1px;background:linear-gradient(90deg,transparent,${ACCENT}77)`);
   el(rule, 'span', '', `width:5px;height:5px;transform:rotate(45deg);border:1px solid ${ACCENT}`);
