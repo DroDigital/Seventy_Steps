@@ -23,6 +23,7 @@ import { changeInsight } from './insight';
 import { applyLevels, laudanumMax, LEVEL_IDS } from './levels';
 import { equip, stonesOfSlain } from './arms';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
+import { settleRelics } from './relics';
 import { setSanity } from './sanity';
 import { spawnDrop } from './spawn';
 import { carryForward, GAME_VERSION, newerSave, SAVE_VERSION } from './saveVersion';
@@ -187,6 +188,7 @@ export function applySave(g: Game, s: SaveData): void {
   ow.met = new Set(s.met ?? []);
   ow.places = new Set(s.places ?? []);
   ow.told = new Set(s.told ?? []);
+  settleRelics(ow.told); // a save from before the slots: the first two relics found stay worn
   for (const k of Object.keys(ow.tally) as (keyof Tally)[]) ow.tally[k] = Math.max(0, Math.round(s.tally?.[k] ?? 0));
   ow.sold = new Map(Object.entries(s.sold ?? {}).filter(([id]) => id in WARES).map(([id, n]) => [id, clampInt(n, 0, 99)]));
   ow.wounds = new Map(Object.entries(s.wounds ?? {}).map(([id, f]) => [id, Math.min(1, Math.max(0.01, f))]));

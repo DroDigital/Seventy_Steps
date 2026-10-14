@@ -51,6 +51,25 @@ export function reinforce(g: Game, id: WeaponId): boolean {
   return true;
 }
 
+/**
+ * Levels of reinforcement that could be moved from weapon `from` into weapon `to` now: what `from` has set in, as much as
+ * `to` has room for. Both must be theirs. Nothing is lost or made in the move, so a new weapon can be tried with the
+ * cane's reinforcement and the cane have it back.
+ */
+export function movable(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId): number {
+  const { arms, reinforced } = g.player;
+  if (from === to || !arms.includes(from) || !arms.includes(to)) return 0;
+  return Math.max(0, Math.min(reinforced[from], REINFORCE.max - reinforced[to]));
+}
+
+/** Moves up to `count` levels of reinforcement from `from` to `to`; how many moved. */
+export function moveLevels(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId, count = 1): number {
+  const n = Math.min(Math.max(0, Math.floor(count)), movable(g, from, to));
+  g.player.reinforced[from] -= n;
+  g.player.reinforced[to] += n;
+  return n;
+}
+
 /** Star-stones a boss of roster id `id` leaves (by its tier). */
 export const stonesOf = (id: string): number => STAR_STONES[getEntity(id)?.tier ?? 'lesser'] ?? 0;
 

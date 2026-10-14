@@ -22,6 +22,9 @@ const SHOW_MS = 9000;
 
 type HintId = Key extends infer K ? (K extends `hint.${infer I}` ? I : never) : never;
 
+/** A hint that is followed at once by another: a passage shown by insight, then what spending the insight does to it. */
+const THEN: Readonly<Partial<Record<string, HintId>>> = { passage: 'passageCost' };
+
 /** What a boss asks of the investigator besides striking (round 25: only Azathoth's was said before the fight). */
 const BOSS_HINTS: Readonly<Record<string, HintId>> = { azathoth: 'blind', cthulhu: 'ship', dunwich_horror: 'powder', ghatanothoa: 'cover', shub_niggurath: 'roots', yog_sothoth: 'spheres' };
 
@@ -50,8 +53,10 @@ export function createHints(g: Game, root: HTMLElement): Hints {
   let until = 0;
   const hint = (id: HintId, urgent = false): void => {
     if (!g.overworld || seen.has(id) || queue.includes(id)) return;
-    if (urgent) queue.unshift(id); // a hint for what is happening now goes before those waiting
-    else queue.push(id);
+    const then = THEN[id];
+    const both = then && !seen.has(then) && !queue.includes(then) ? [id, then] : [id];
+    if (urgent) queue.unshift(...both); // a hint for what is happening now goes before those waiting
+    else queue.push(...both);
   };
   g.events.on('Hit', (e) => {
     if (e.target === g.player.id && e.damage > 0) hint('fight');

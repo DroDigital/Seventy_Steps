@@ -1,7 +1,7 @@
 /**
  * The Elder Sign's menu (spec §3D), opened by resting at one: spend Echoes on a level of Vigour,
  * Endurance or Might (playtest round 4) and insight on Resolve or a Draught; set star-stones into a
- * weapon (round 12); travel to any Elder Sign
+ * weapon (round 12) and move them from one weapon to another (signMove.ts); choose the two relics to wear (signRelics.ts); travel to any Elder Sign
  * found, chosen by region and then by name (playtest round 12: one list grew past forty); at the hub's
  * Sleeper's Sign, descend the Seventy Steps into the Dreamlands; and at the Court's, once Azathoth
  * slumbers, choose one of two endings (Phase 5), first of all. A menu screen (menuKit.ts: mouse, keys
@@ -20,6 +20,7 @@ import { courtEndings, endGame } from '../systems/endings';
 import { canUpgradeGun, gunCost, gunEdge, upgradeGun } from '../systems/gun';
 import type { Game } from '../systems/components';
 import { buyUpgrade, upgradeName } from '../systems/insight';
+import { closedBy, heldOpen, listed } from '../systems/veil';
 import { mainLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
 import { worldLayout, type SignPlace } from '../world/placements';
@@ -28,6 +29,8 @@ import { ACCENT, button, createScreen, el, footer, heading, option, tabs, title,
 import { menuKeys } from './menuKeys';
 import { keyLayout } from '../core/bindings';
 import { glyph } from './glyphs';
+import { moveSection, movePage } from './signMove';
+import { relicsTab, slotPage } from './signRelics';
 
 /** What one more level of each gives, in words. */
 const GAINS: Record<LevelId | UpgradeId, string> = {
@@ -57,7 +60,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   };
   const regionName = (id: string): string => getRegion(id)?.name ?? id;
 
-  const TABS = ['Grow', 'Arms', 'Travel'];
+  const TABS = ['Grow', 'Arms', 'Relics', 'Travel'];
   let tab = 0; // the tab open: Grow again at each rest
   const REST = 'You rest. Your health, sanity, Laudanum and Reagent are restored, the revolver is loaded from your spare rounds, and the creatures you killed are back.';
 
@@ -69,10 +72,14 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       option(panel, `${levelName(id)}  ${g.player.levels[id]}/${LEVELS[id].max}  ·  ${GAINS[id]}  ·  ${full ? 'fully grown' : `${nextLevelCost(g)} Echoes`}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
     }
     heading(panel, `MIND  ·  INSIGHT ${g.mind.insight}`).style.margin = '12px 0 4px';
+    const open = heldOpen(g.mind.insight);
+    el(panel, 'div', `Insight also holds hidden passages open${open.length ? ` (${open.length} now: ${listed(open)})` : ''}. What is spent here is gone, and a passage it held open is a wall again.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 6px');
     for (const id of Object.keys(UPGRADES) as UpgradeId[]) {
       const u = UPGRADES[id];
       const level = g.mind.upgrades[id];
-      option(panel, `${upgradeName(id)}  ${level}/${u.max}  ·  ${GAINS[id]}  ·  ${level < u.max ? `${u.cost} insight` : 'fully grown'}`, () => (buyUpgrade(g, id), main.redraw?.()), level < u.max && g.mind.insight >= u.cost, level >= u.max ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`);
+      const shut = level < u.max && g.mind.insight >= u.cost ? closedBy(g.mind.insight, u.cost) : [];
+      const costs = shut.length ? `Spending ${u.cost} insight shuts ${listed(shut, 3)} again.` : '';
+      option(panel, `${upgradeName(id)}  ${level}/${u.max}  ·  ${GAINS[id]}  ·  ${level < u.max ? `${u.cost} insight` : 'fully grown'}`, () => (buyUpgrade(g, id), main.redraw?.()), level < u.max && g.mind.insight >= u.cost, level >= u.max ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`, costs, shut.length ? `shuts ${shut.length} passage${shut.length === 1 ? '' : 's'}` : '');
     }
   }
 
@@ -92,6 +99,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       const label = cost === undefined ? `${name}  ·  fully reinforced` : `${name} → +${level + 1}  ·  ${cost} star-stone${cost === 1 ? '' : 's'}`;
       option(panel, label, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : `Not enough star-stones: ${cost}, and you carry ${g.player.stones}.`, '', cost === undefined ? '' : `light ${light(level)} → ${light(level + 1)}`);
     }
+    moveSection(panel, g, (from) => screen.show(movePage(g, from, () => screen.show(main))));
   }
 
   /** The regions with signs found: one line each rather than every sign in one long list (round 12). */
@@ -139,6 +147,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     tabs(panel, TABS, tab, (i) => ((tab = i), main.redraw?.()), main);
     if (tab === 0) grow(panel);
     else if (tab === 1) arms(panel);
+    else if (tab === 2) relicsTab(panel, g, (slot) => screen.show(slotPage(g, slot, () => screen.show(main))));
     else travelTab(panel);
     const pad = deviceInUse() === 'pad';
     footer(panel, REST, [...menuKeys(true).slice(0, 3), [pad ? glyph('back') : `${glyph('interact')} / ${glyph('back')}`, 'Back']], close);

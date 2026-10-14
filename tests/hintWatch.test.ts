@@ -5,7 +5,9 @@ import { watch } from '../src/ui/hintWatch';
 import { teleport } from '../src/systems/checkpoints';
 import { spawnCreature } from '../src/systems/creatures';
 import { allFogs } from '../src/systems/fogGates';
-import { createWorldGame } from '../src/systems/game';
+import { createGame, createWorldGame } from '../src/systems/game';
+import { changeInsight } from '../src/systems/insight';
+import { grant } from '../src/systems/relics';
 import { run } from './worldHelpers';
 
 describe('the first hour: hints before it costs', () => {
@@ -40,5 +42,34 @@ describe('the first hour: hints before it costs', () => {
     const q = g.ecs.c.transform.get(npc)!.pos;
     teleport(g, { x: q.x + 3, z: q.z, yaw: 0 });
     expect(watch(g)).toContain('talk');
+  });
+
+  it('a doorway only insight shows is noticed once the mind sees it and the investigator is near', () => {
+    const g = createGame(); // the arena has a stone that shows to insight 1
+    run(g, 2);
+    const me = g.ecs.c.transform.get(g.player.id)!.pos;
+    const piece = [...g.ecs.c.piece.keys()].find((id) => g.ecs.c.layer.get(id)?.minInsight !== undefined)!;
+    const at = g.ecs.c.transform.get(piece)!.pos;
+    Object.assign(me, { x: at.x + 4, z: at.z });
+    expect(g.ecs.c.layer.get(piece)!.shown).toBe(false);
+    expect(watch(g)).not.toContain('passage'); // near it, but it is a wall to this mind
+    changeInsight(g, 1, 'tome', 'a book');
+    expect(g.ecs.c.layer.get(piece)!.shown).toBe(true);
+    expect(watch(g)).toContain('passage');
+    Object.assign(me, { x: at.x + 40, z: at.z });
+    expect(watch(g)).not.toContain('passage'); // too far to be shown it
+  });
+
+  it('a relic found and a weapon found beside a reinforced one are each noticed', () => {
+    const g = createWorldGame();
+    run(g, 5);
+    expect(watch(g)).not.toContain('relic');
+    expect(watch(g)).not.toContain('transfer');
+    grant(g, 'starHook');
+    expect(watch(g)).toContain('relic');
+    g.player.reinforced.cane = 2;
+    expect(watch(g)).not.toContain('transfer'); // one weapon: nothing to move it to
+    g.player.arms.push('rapier');
+    expect(watch(g)).toContain('transfer');
   });
 });

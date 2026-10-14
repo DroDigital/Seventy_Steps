@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENTITIES, variantOf } from '../src/data/registry';
 import { LEVELS, REINFORCE, STAR_STONES } from '../src/data/tuning';
 import { WEAPONS } from '../src/data/weapons';
-import { canReinforce, edge, edgeAt, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
+import { canReinforce, edge, edgeAt, movable, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
 import { createWorldGame } from '../src/systems/game';
 import { snapshot } from '../src/systems/save';
 import { spawnCreature } from '../src/systems/creatures';
@@ -79,5 +79,55 @@ describe('reinforcing arms with star-stones (round 12)', () => {
     for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(90);
     const keziah = ENTITIES.find((d) => d.id === 'keziah_mason')!;
     expect(keziah.stats.hp / cane).toBeLessThanOrEqual(35); // the first boss on the main line, with nothing bought
+  });
+});
+
+describe('moving reinforcement from one weapon to another (an Elder Sign)', () => {
+  const armed = () => {
+    const { g } = scriptedGame();
+    g.player.arms.push('rapier', 'axe');
+    g.player.reinforced.cane = 4;
+    return g;
+  };
+
+  it('moves levels whole, none lost and none made', () => {
+    const g = armed();
+    const total = () => Object.values(g.player.reinforced).reduce((a, b) => a + b, 0);
+    const before = total();
+    expect(moveLevels(g, 'cane', 'rapier')).toBe(1);
+    expect([g.player.reinforced.cane, g.player.reinforced.rapier]).toEqual([3, 1]);
+    expect(moveLevels(g, 'cane', 'rapier', 99)).toBe(3); // all that is left, and it fits
+    expect([g.player.reinforced.cane, g.player.reinforced.rapier]).toEqual([0, 4]);
+    expect(total()).toBe(before);
+    expect(moveLevels(g, 'rapier', 'cane', 4)).toBe(4); // and back again, for nothing
+    expect(g.player.reinforced.cane).toBe(4);
+  });
+
+  it('stops where the other weapon is full', () => {
+    const g = armed();
+    g.player.reinforced.rapier = REINFORCE.max - 1;
+    expect(movable(g, 'cane', 'rapier')).toBe(1);
+    expect(moveLevels(g, 'cane', 'rapier', 3)).toBe(1);
+    expect(g.player.reinforced.rapier).toBe(REINFORCE.max);
+    expect(g.player.reinforced.cane).toBe(3);
+    expect(moveLevels(g, 'cane', 'rapier')).toBe(0);
+  });
+
+  it('refuses a weapon that is not theirs, the same weapon, and a source with nothing set in', () => {
+    const g = armed();
+    expect(moveLevels(g, 'cane', 'cutlass')).toBe(0); // not found yet
+    expect(moveLevels(g, 'cutlass', 'cane')).toBe(0);
+    expect(moveLevels(g, 'cane', 'cane')).toBe(0);
+    expect(moveLevels(g, 'axe', 'cane')).toBe(0); // nothing in it
+    expect(moveLevels(g, 'cane', 'axe', -3)).toBe(0);
+    expect(moveLevels(g, 'cane', 'axe', 0.9)).toBe(0);
+    expect(g.player.reinforced.cane).toBe(4);
+  });
+
+  it('the weapon in hand strikes with the level it was moved to', () => {
+    const g = armed();
+    g.player.weapon = 'rapier';
+    moveLevels(g, 'cane', 'rapier', 4);
+    expect(edge(g, g.player.id)).toBeCloseTo(edgeAt(4));
   });
 });
