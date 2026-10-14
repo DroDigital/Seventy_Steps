@@ -3,7 +3,7 @@
  * what to slay, where to go — or, before a main quest begins, who will ask it of the investigator;
  * and where that is. The journal says it, and the map and minimap mark it, so a new investigator
  * always has somewhere to go; a goal in another realm is marked where the way to it begins (round
- * 17, leadWay.ts). Pure: no Three.js.
+ * 17, leadWay.ts). A side quest followed from the journal leads in its place. Pure: no Three.js.
  */
 
 import { distXZ, type XZ } from '../core/geom';
@@ -35,7 +35,20 @@ export function goalPlace(goal: Goal): XZ | null {
     return s ? { x: s.x, z: s.z } : null;
   }
   if (goal.kind === 'seals') return null; // it has no one place (sealLead)
+  if (goal.kind === 'read') return docPlace(goal.doc);
   return bossPlace(goal.boss);
+}
+
+/** Where a tome or note lies: where it is set in the open, or the room of the dungeon that holds it. */
+function docPlace(name: string): XZ | null {
+  const w = worldLayout();
+  const open = w.tomes.find((t) => t.name === name);
+  if (open) return { x: open.at.x, z: open.at.z };
+  for (const d of w.dungeons) {
+    const room = d.layout.rooms.find((r) => r.def.tome?.name === name);
+    if (room) return { x: room.x, z: room.z };
+  }
+  return null;
 }
 
 /** Where a boss is met: its arena, or where it stands. */
@@ -62,20 +75,37 @@ function sealLead(g: Game, count: number, note: string): Lead {
   return { text: `${note} (${Math.min(count, sealsBroken(g))} of ${count} have fallen.)`, at: at && wayTo(g, from, at) };
 }
 
+/** The lead a quest's open stage gives: what to do, and where. */
+function stageLead(g: Game, id: string, stage: number): Lead {
+  const q = QUESTS[id];
+  const goal = q.stages[stage].goal;
+  if (goal.kind === 'seals') return sealLead(g, goal.count, q.stages[stage].note);
+  const at = goalPlace(goal);
+  return { text: q.stages[stage].note, at: at && wayTo(g, me(g), at) };
+}
+
 /** The main line's next step, or null once it is done (or out of the open world). */
 export function mainLead(g: Game): Lead | null {
   if (!g.overworld) return null;
   for (const [id, q] of Object.entries(QUESTS)) {
     if (!q.main || isDone(g, id) || (q.after && !isDone(g, q.after))) continue;
     const stage = stageOf(g, id);
-    const goal = stage !== UNSTARTED ? q.stages[stage].goal : null;
-    if (goal?.kind === 'seals') return sealLead(g, goal.count, q.stages[stage].note);
-    const way = (at: XZ | null): XZ | null => at && wayTo(g, me(g), at);
-    if (goal) return { text: q.stages[stage].note, at: way(goalPlace(goal)) };
+    if (stage !== UNSTARTED) return stageLead(g, id, stage);
     const giver = NPCS.find((n) => n.topics.some((t) => t.starts === id));
     if (!giver) continue;
     const sign = worldLayout().signs.find((s) => s.id === giver.sign)?.name ?? 'an Elder Sign';
-    return { text: `Speak with ${giver.name}, by the Elder Sign at ${sign}.`, at: way(npcAt(giver.id)) };
+    const place = npcAt(giver.id);
+    return { text: `Speak with ${giver.name}, by the Elder Sign at ${sign}.`, at: place && wayTo(g, me(g), place) };
   }
   return null;
 }
+
+/** The step of the side quest being followed (quests.ts `track`), or null when none is, or it is done. */
+export function trackedLead(g: Game): Lead | null {
+  const id = g.overworld?.tracked;
+  if (!id || !QUESTS[id] || stageOf(g, id) === UNSTARTED || isDone(g, id)) return null;
+  return stageLead(g, id, stageOf(g, id));
+}
+
+/** Where the minimap and the map lead: the side quest followed, else the main line. */
+export const currentLead = (g: Game): Lead | null => trackedLead(g) ?? mainLead(g);

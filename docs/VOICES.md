@@ -1,9 +1,9 @@
 # The voices
 
 Every line the people of the realms and the horrors that speak say is spoken by a recording in
-`public/voice`: 177 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 24 minutes, 25.7 MB. 123 are
+`public/voice`: 191 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 26 minutes, 26.8 MB. 133 are
 the lines of the fifteen people met at the Elder Signs (`npc:<id>`, written in `data/npcs.ts` and
-`npcsFar.ts`); 54 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
+`npcsFar.ts`); 53 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
 this: no horror spoke before): a line as it arrives and a last as it falls. Two have no scene, the Dunwich
 Horror (unseen), who says only a last, shown as a notice. (Brown Jenkin had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
 A line with no recording is shown and not heard, as every line was before.
@@ -125,6 +125,13 @@ A designed voice is made with `creative_design_voice` (a description and a line 
 refused one description once (Brown Jenkin's, which said a man trapped in a rat; it passed said plainly as a creature).
 
 ## What was checked, and what was not
+
+**14 October 2026 (the Witch House's ten lines of Gilman).** The five stages of the Witch House quest brought ten new lines for
+`npc:gilman` (`data/npcs.ts`, performed in `speechNpcs.ts`); each was made in his cast voice (Will - Relaxed Optimist, premade) in
+`eleven_v4`, one take each, 1,745 credits in all (about one credit a character: `creative_generate_speech` priced the longest at 252
+for 252 characters before it was run), and saved under its clip name; no line now lacks a recording. They are 6.3 to 15.4 seconds
+and 119 to 265 KB. Read back offline (faster-whisper `base.en`): no `[tag]` was spoken as a word, nine match the words to 0.97 or
+better, and one (`npc-gilman-155qy3l`) says "She's in the garret" for "She is in the garret" — kept, the same words contracted.
 
 The takes were made on 1 October 2026 on a Creator plan; v4 then cost no credits.
 

@@ -10,11 +10,13 @@ export type Goal =
   | { kind: 'give'; npc: string; item: 'laudanum' } // speak with them holding it: they take one
   | { kind: 'slay'; boss: string } // a boss slain for good (its roster id)
   | { kind: 'reach'; sign: string } // an Elder Sign found
+  | { kind: 'read'; doc: string } // a tome or note read (data/documents.ts), wherever it lies
   | { kind: 'seals'; count: number }; // this many of the waking world's seals broken (systems/seals.ts)
 
 export interface QuestStage {
   goal: Goal;
   note: string; // the journal's line while it is open
+  gift?: { insight?: number; echoes?: number }; // what closing this stage by its own goal gives (a stage the world passed over gives nothing)
 }
 
 export interface QuestDef {
@@ -22,6 +24,7 @@ export interface QuestDef {
   main?: boolean; // the main line
   after?: string; // begins only once this one is done
   auto?: boolean; // begins by itself once `after` is done (no one need ask it)
+  lenient?: boolean; // what the world has already done is done: a later stage whose goal is met closes the ones before it (a horror slain before its quest was sought)
   stages: readonly QuestStage[];
   done: string; // the journal's line once it is done
   reward: { echoes?: number; insight?: number; vial?: boolean; stones?: number; weapon?: WeaponId }; // star-stones and a weapon: round 12
@@ -42,7 +45,14 @@ export const QUESTS: Readonly<Record<string, QuestDef>> = {
     title: 'The Witch House',
     main: true,
     after: 'sleepers',
-    stages: [{ goal: { kind: 'slay', boss: 'keziah_mason' }, note: 'Keziah Mason is still in the Witch House in Arkham. Gilman cannot think straight while she is there.' }],
+    lenient: true, // Keziah may be met without the clues; the quest is done when she falls
+    stages: [
+      { goal: { kind: 'read', doc: "Officer Riley's Report" }, note: "Gilman says the police went into the Witch House on the third of October. Officer Riley's report is lying somewhere in Arkham. Read what he found before going in." },
+      { goal: { kind: 'talk', npc: 'gilman' }, note: 'Riley found a hole in the attic wall and small footprints with fingers. Take it to Gilman: he knows what it means.', gift: { insight: 1 } },
+      { goal: { kind: 'reach', sign: 'arkham_witch' }, note: 'Gilman has shown you how to look at a corner until it gives. Climb the Witch House to the stair landing, where an Elder Sign stands, and rest there before the attic.' },
+      { goal: { kind: 'read', doc: "Keziah's Formulae" }, note: 'Her formulae are in a closet off the landing that only a mind that has learned to look can see. Read them: Gilman says they tell what she is doing, and when.' },
+      { goal: { kind: 'slay', boss: 'keziah_mason' }, note: 'Keziah Mason is in the garret above the landing, with the rat thing with the little hands. Gilman cannot think straight while she is there.' },
+    ],
     done: 'Keziah Mason is gone from the Witch House.',
     reward: { echoes: 1200, insight: 1 },
   },

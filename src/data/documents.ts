@@ -19,6 +19,7 @@ export const DOCUMENTS: Readonly<Record<string, Document>> = {
   ),
   "Keziah's Formulae": tome(
     'Loose sheets in a woman\'s hand, very old, the ink gone brown. Most of it is arithmetic. Some of the figures describe angles that add up to more than a corner should.',
+    'Set out plainly, the method wants four things: a sleeper\'s name, a knife, a candle lit from the black man\'s flame, and the right angle on Walpurgis Night. The rat carries the name. The angle does the rest. She has set the night in the margin, and it is soon.',
     'On the last sheet, in a much newer hand: "It works. God help me, it works. W.G."',
   ),
   "Curwen's Journal": tome(

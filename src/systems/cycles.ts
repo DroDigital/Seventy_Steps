@@ -1,12 +1,13 @@
 /**
  * A new journey through the dream (playtest round 12: there was no NG+). After an ending, beginning
  * anew may carry the investigator's strength into a new dream: levels, arms and how far each is
- * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels and Echoes. Everything else (the
+ * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels, Echoes and the hints given. Everything else (the
  * world, its quests and bosses) begins again, and each journey's foes are hardier, strike harder
  * and leave more Echoes (NEW_GAME_PLUS). Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';
+import { GUIDE, HINT_IDS, HINT_KEPT, hintGiven } from '../data/fieldGuide';
 import { BOSS, DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type DifficultyId, type LevelId, type UpgradeId } from '../data/tuning';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
@@ -25,6 +26,7 @@ export interface Carry {
   upgrades: Record<UpgradeId, number>;
   reagentMax: number;
   echoes: number;
+  hints: string[]; // the hints given: one who has been told how to dodge is not told again (the Field Guide goes with them)
 }
 
 /** What the investigator carries into the next journey. */
@@ -40,6 +42,7 @@ export const carryOf = (g: Game): Carry => ({
   upgrades: { ...g.mind.upgrades },
   reagentMax: g.player.reagentMax,
   echoes: g.player.echoes,
+  hints: HINT_IDS.filter((id) => !!g.overworld && hintGiven(g.overworld.told, id)),
 });
 
 const num = (x: unknown, lo: number, hi: number): number => (typeof x === 'number' && Number.isFinite(x) ? Math.min(hi, Math.max(lo, Math.round(x))) : lo);
@@ -64,6 +67,7 @@ export function parseCarry(raw: unknown): Carry | null {
     upgrades: counts(o.upgrades, Object.keys(UPGRADES) as UpgradeId[], (k) => UPGRADES[k].max),
     reagentMax: num(o.reagentMax, REAGENT.doses, REAGENT.maxDoses),
     echoes: num(o.echoes, 0, 1e9),
+    hints: (Array.isArray(o.hints) ? o.hints : []).filter((id): id is string => typeof id === 'string' && id in GUIDE),
   };
 }
 
@@ -77,6 +81,7 @@ export function applyCarry(g: Game, c: Carry): void {
   const h = g.ecs.c.health.get(p.id)!;
   h.hp = h.max;
   if (!equip(g, c.weapon)) equip(g, 'cane');
+  for (const id of c.hints) g.overworld?.told.add(HINT_KEPT + id);
 }
 
 /** How much hardier this journey's foes are than the first's. */

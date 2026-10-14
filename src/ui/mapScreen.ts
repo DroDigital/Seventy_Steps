@@ -11,7 +11,7 @@
 import { PAD_BUTTON } from '../core/padMap';
 import { travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
-import { mainLead } from '../systems/lead';
+import { currentLead } from '../systems/lead';
 import { exploredShare } from '../systems/exploration';
 import { realmOf, realmRect, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
@@ -88,7 +88,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     if (held.has('ArrowDown') || held.has('KeyS')) view.cz -= step;
     workArt(ART_MS);
     painter.paint(ctx, view, realm(), true);
-    drawLead(ctx, view, mainLead(g)?.at ?? null, realm(), false);
+    drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), false);
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now);
     if (chosen) drawRing(ctx, view, chosen, true, !!travelBar(g), now);
     requestAnimationFrame(frame);

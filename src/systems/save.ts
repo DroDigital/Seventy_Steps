@@ -23,12 +23,13 @@ import { changeInsight } from './insight';
 import { applyLevels, laudanumMax, LEVEL_IDS } from './levels';
 import { equip, stonesOfSlain } from './arms';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
+import { settleRelics } from './relics';
 import { setSanity } from './sanity';
 import { spawnDrop } from './spawn';
 import { carryForward, GAME_VERSION, newerSave, SAVE_VERSION } from './saveVersion';
 
 export const SAVE_KEY = 'lovecraft-souls-like/save';
-const VERSION = SAVE_VERSION; // 2: the world doubled in size (playtest round 1), so a version 1 position means nothing now; older and newer: saveVersion.ts
+const VERSION = SAVE_VERSION; // 2: the world doubled in size (playtest round 1), so a version 1 position means nothing now; 3: the Witch House's stages; older and newer: saveVersion.ts
 
 export interface SaveData {
   version: typeof VERSION;
@@ -66,6 +67,7 @@ export interface SaveData {
   ending?: string; // the ending chosen
   explored?: Record<string, string>; // the ground seen, as base64 bits by region (exploration.ts)
   quests?: Record<string, number>; // each quest begun: its stage (quests.ts)
+  tracked?: string; // the side quest followed on the minimap and the map
   met?: string[]; // the people talked with
   places?: string[]; // the named places found (round 18)
   told?: string[]; // what has been told or shown once (round 26)
@@ -124,6 +126,7 @@ export function snapshot(g: Game): SaveData {
     ...(ow.ending && { ending: ow.ending }),
     explored: packExplored(ow.explored),
     quests: Object.fromEntries(ow.quests),
+    ...(ow.tracked && { tracked: ow.tracked }),
     met: [...ow.met],
     places: [...ow.places],
     told: [...ow.told],
@@ -156,6 +159,7 @@ export function parseSave(json: string | null): SaveData | null {
   if (o.explored !== undefined && (typeof o.explored !== 'object' || o.explored === null)) return null;
   if (o.quests !== undefined && (typeof o.quests !== 'object' || o.quests === null || !Object.values(o.quests).every(isNum))) return null;
   if (o.met !== undefined && !isStrings(o.met)) return null;
+  if (o.tracked !== undefined && typeof o.tracked !== 'string') return null;
   if ((o.places !== undefined && !isStrings(o.places)) || (o.told !== undefined && !isStrings(o.told))) return null;
   if ((o.sold !== undefined && !isCounts(o.sold)) || (o.tally !== undefined && !isCounts(o.tally))) return null;
   if ((o.arms !== undefined && !isStrings(o.arms)) || (o.weapon !== undefined && typeof o.weapon !== 'string')) return null;
@@ -184,9 +188,11 @@ export function applySave(g: Game, s: SaveData): void {
   ow.ending = s.ending ?? null;
   ow.explored = unpackExplored(s.explored);
   ow.quests = new Map(Object.entries(s.quests ?? {}).filter(([id]) => QUESTS[id]).map(([id, n]) => [id, clampInt(n, -1, QUESTS[id].stages.length)]));
+  ow.tracked = s.tracked && QUESTS[s.tracked] && !QUESTS[s.tracked].main && ow.quests.has(s.tracked) && ow.quests.get(s.tracked)! < QUESTS[s.tracked].stages.length ? s.tracked : null;
   ow.met = new Set(s.met ?? []);
   ow.places = new Set(s.places ?? []);
   ow.told = new Set(s.told ?? []);
+  settleRelics(ow.told); // a save from before the slots: the first two relics found stay worn
   for (const k of Object.keys(ow.tally) as (keyof Tally)[]) ow.tally[k] = Math.max(0, Math.round(s.tally?.[k] ?? 0));
   ow.sold = new Map(Object.entries(s.sold ?? {}).filter(([id]) => id in WARES).map(([id, n]) => [id, clampInt(n, 0, 99)]));
   ow.wounds = new Map(Object.entries(s.wounds ?? {}).map(([id, f]) => [id, Math.min(1, Math.max(0.01, f))]));

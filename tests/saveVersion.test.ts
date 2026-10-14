@@ -1,9 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createWorldGame } from '../src/systems/game';
-import { backupKey, loadSave, parseSave, SAVE_KEY } from '../src/systems/save';
+import { QUESTS } from '../src/data/quests';
+import { isDone } from '../src/systems/quests';
+import { backupKey, loadSave, parseSave, SAVE_KEY, snapshot } from '../src/systems/save';
 import { carryForward, newerSave, SAVE_VERSION } from '../src/systems/saveVersion';
 import { slotLine } from '../src/ui/titleSlots';
+import { run } from './worldHelpers';
 
 /** A save as 1.0.0-rc.1 wrote it (round 47): every later build must go on from it. */
 const RC1 = readFileSync('tests/fixtures/save-v2-rc1.json', 'utf8');
@@ -45,5 +48,21 @@ describe('save versions', () => {
     expect(data.get(SAVE_KEY)).toBe(newer); // the backup did not overwrite it
     expect(slotLine(store, 1)).toMatchObject({ loads: false });
     expect(slotLine(store, 2)).toBeNull();
+  });
+
+  it('goes on from a save written before the Witch House had five stages, without paying its reward again', () => {
+    const old = (stage: number) => ({ ...JSON.parse(RC1), version: 2, quests: { sleepers: 1, witch_house: stage }, slain: ['boss:keziah_mason'] });
+    const was = (stage: number) => parseSave(JSON.stringify(old(stage)))!;
+    expect(SAVE_VERSION).toBe(3);
+    expect(was(0).version).toBe(3);
+    expect(was(0).quests!.witch_house).toBe(QUESTS.witch_house.stages.length - 1); // the witch still to be put down: the last stage
+    expect(was(1).quests!.witch_house).toBe(QUESTS.witch_house.stages.length); // done stays done
+    expect(parseSave(JSON.stringify({ ...old(0), quests: { sleepers: 1 } }))!.quests).toEqual({ sleepers: 1 }); // no quest, nothing to read again
+    const g = createWorldGame({ save: was(1) });
+    const [echoes, insight] = [g.player.echoes, g.mind.insight];
+    run(g, 90);
+    expect(isDone(g, 'witch_house')).toBe(true);
+    expect([g.player.echoes, g.mind.insight]).toEqual([echoes, insight]); // not paid a second time
+    expect(JSON.parse(JSON.stringify(snapshot(g))).version).toBe(3); // and saved in the new format from now on
   });
 });
