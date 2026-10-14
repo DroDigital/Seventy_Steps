@@ -12,7 +12,7 @@ export const NPC_SAID: Readonly<Record<string, readonly string[]>> = {
     "[weary] You came in through the reading room, didn't you? [sighs] Armitage sent you. [dryly] [short pause] He always did like sending OTHER people.",
     "[calmly] I'm Peaslee. I've been here since the first of the month... [pause] as near as I can tell. [tired] [sighs] It's hard to keep time.",
     "[seriously] If you die here, you wake at the last of those carved signs you rested at. [quietly] It hurts... and you lose whatever you were carrying. [grimly] [pause] I've done it more often than I like.",
-    "[gravely] The others who fell asleep are out there somewhere. [thoughtfully] Walter Gilman was the second. He had a room in the old Witch House in Arkham, west of here. [urgently] Find HIM. [uneasy] [low voice] He talked with the tall man more than any of us.",
+    "[gravely] The others who fell asleep are out there somewhere. [thoughtfully] Walter Gilman was the second. He had a room in the old Witch House in Arkham, west of here. [quietly] Find him. [long pause] [uneasy] [low voice] He talked with the tall man more than any of us.",
     "[encouragingly] Gilman's in Arkham, west past the university grounds. [warmly] Follow the road.",
     "[gently] Rest at the signs when you find them. [wryly] Whatever you've killed will be back afterwards... [pause] but so will your STRENGTH.",
     "[quietly] You've been to the Gate. [long pause] [softly] I can tell by the way you stand.",

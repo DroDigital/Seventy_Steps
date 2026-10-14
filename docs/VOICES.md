@@ -60,7 +60,7 @@ the game's, applied at playback, so a recast does not need them again.
 | speaker | voice (ElevenLabs) | voice id | played with |
 |---|---|---|---|
 | `narrator:intro` | The Archivist (Intro Narrator) (designed, round 46) | `uqOnApI3a2RVj8rEwlAi` | room |
-| `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42) |
+| `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42; `tools/voice_process.py` does it again) |
 | `npc:gilman` | Will - Relaxed Optimist (premade) | `bIHbv24MWmeRgasZH58o` | — |
 | `npc:morgan` | Josef Hammer - Deep & Expressive (library; the author's pick after auditioning it against Julian and Jay Anderson) | `AFtA63zAzQAlNDuzSRKy` | clips as recorded, ~105 Hz (round 45). Its licence was not readable through the tools: confirm it, and its notice period, on its library page |
 | `npc:kuranes` | Kuranes (designed) | `bY8puK6S3RGlr0wikENe` | — |
@@ -111,7 +111,7 @@ the game's, applied at playback, so a recast does not need them again.
    ElevenLabs connector (`creative_generate_speech`, one generation each, the voice id from the table, the
    performed text as the prompt, with the three names above respelt in IPA). A take that sounds wrong is made
    again, not cut.
-3. Save the MP3 (128 kbit/s, 44.1 kHz, as ElevenLabs gives it) as `public/voice/<clip name>.mp3`.
+3. Save the MP3 (128 kbit/s, 44.1 kHz, as ElevenLabs gives it) as `public/voice/<clip name>.mp3`. Peaslee's takes first go through `tools/voice_process.py` (his treatment, below); no other voice is touched.
 4. `VOICES_INDEX=1 npx vitest run tests/voiceCoverage.test.ts` rewrites `index.json`; `npm run check`.
 
 To **recast** a speaker: change its voice in `speechCast.ts`, make its lines again (the names do not change),
@@ -132,6 +132,10 @@ refused one description once (Brown Jenkin's, which said a man trapped in a rat;
 for 252 characters before it was run), and saved under its clip name; no line now lacks a recording. They are 6.3 to 15.4 seconds
 and 119 to 265 KB. Read back offline (faster-whisper `base.en`): no `[tag]` was spoken as a word, nine match the words to 0.97 or
 better, and one (`npc-gilman-155qy3l`) says "She's in the garret" for "She is in the garret" — kept, the same words contracted.
+
+**14 October 2026 (Peaslee's "Find him.").** The author heard it shouted, and with too little pause after it. The performed line had `[urgently] Find HIM.`; measured on the clip (faster-whisper word times, RMS per word), "Find" and "him" ran at -16 and -14 dB (peaks 0.85 and 0.68) against -19 to -26 dB (peaks 0.2 to 0.4) for the words that follow, the speech-to-text pass wrote "him!", and the silence after it was 0.34 s (round 42's treatment cuts every pause over 0.4 s to 0.22 s, so no tag could have given it more). The line is now `[quietly] Find him. [long pause]` and was made again in his cast voice (`eleven_v4`, one take, 271 credits, flow ZbPmAJXxTjkJ0CBzCA0a; the clip name does not change, as no word did), then treated as his others are, with `tools/voice_process.py` (below), holding that one pause at 1.0 s. Measured on the clip as shipped: "Find" and "him" at -21 and -26 dB (peaks 0.37 and 0.32, the louder words of the line reach 0.8), then 0.96 s of silence; 12.0 s long (it was 11.35 s); the words read back as before ("a tall man" for "the tall man", as the old take did). Its median pitch is 90 Hz where the old take's was 98: the delivery is lower, and his other lines run from 83 to 131 Hz. Not yet auditioned. A tag of urgency together with a leaned-on capital makes this model shout: use one or the other, and check a line that leans on a word by its peak.
+
+**Peaslee's clips are treated** (round 42; `tools/voice_process.py`, made 14 October 2026 because the round left no script): a take is played at 0.91 (his pitch and pace fall), sped by WSOLA (x1.26: about 12% brisker than the take), every silence over 0.4 s cut to 0.22 s (`--hold START:LEN` keeps one), levelled to a peak of 0.87 and written at 56 kbit/s mono. The numbers were fitted, not recovered: run on the unprocessed take of a line still in the history (698a0e2) they give the clip that shipped, to the same length, its pauses within 0.1 s and its spectrum within 0.3 dB a band to 6.4 kHz. **To make a Peaslee line again, run the take through it** before it goes into `public/voice`: a raw take is a different, higher and slower, voice.
 
 The takes were made on 1 October 2026 on a Creator plan; v4 then cost no credits.
 
