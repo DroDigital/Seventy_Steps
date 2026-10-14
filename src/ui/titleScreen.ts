@@ -17,7 +17,7 @@ import { SCALED_LAYER } from './uiScale';
 import { creditsPage } from './credits';
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
-import { button, createScreen, el, heading, type Page } from './menuKit';
+import { button, createScreen, el, heading, LIFT_ROOM, type Page } from './menuKit';
 import { wordmark } from './logo';
 import { menuKeys } from './menuKeys';
 import { settingsPage } from './menuPages';
@@ -38,7 +38,7 @@ export interface TitleOptions {
 }
 
 export function showTitle(o: TitleOptions): void {
-  const screen = createScreen(5, '#000', 'left:50%;top:66%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:60vh;overflow-x:hidden;overflow-y:auto;text-align:center'); // the menu stands in the lower half; the name has the upper (round 38)
+  const screen = createScreen(5, '#000', 'left:50%;top:66%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:60vh;overflow-x:hidden;overflow-y:auto;text-align:center;' + LIFT_ROOM); // the menu stands in the lower half; the name has the upper (round 38)
   const logo = wordmark(); // the name cut in stone (round 20), made once
   // The name and its two lines: a layer of their own over the upper half, centred in it, so each page of the menu below can stand where it likes.
   const head = document.createElement('div');
