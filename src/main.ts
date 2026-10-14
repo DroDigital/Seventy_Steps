@@ -214,7 +214,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   resize();
   addEventListener('resize', resize);
 
-  const extras = createExtras(game, shell, store, opts); // the frame meter, the first launch's picture, the benchmark, the trailer (round 46)
+  const extras = createExtras(game, shell, store, opts, () => input.describe()); // the frame meter (with what the input hears), the first launch's picture, the benchmark, the trailer (round 46)
   let simTime = 0;
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   let frames = 0;
@@ -223,10 +223,13 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   building = false;
   let waterNow = false;
   let heldAt = 0; // when a talk or a menu last held the investigator
+  let wasPaused = false;
   startLoop(
     {
       step(dt) {
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
+        if (pause.open && !wasPaused) input.reset(); // pausing lets go of every key and button and sets a drifted stick right: the way out of an input that has stuck (round 49)
+        wasPaused = pause.open;
         if (menu?.open || shop.open || dialogue.open || pause.open || map.open) heldAt = performance.now();
         else if (performance.now() - heldAt < INTERACT_GRACE_MS) frame.pressed.interact = false; // E mashed through a talk does not rest at the sign behind it (round 17)
         const through = pause.open || map.open || dialogue.reading || intro?.open ? null : journeys.before(frame);

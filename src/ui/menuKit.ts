@@ -95,6 +95,14 @@ function move(panel: HTMLElement, by: number): void {
   menuSound('move');
 }
 
+const LIFT = 8; // the most a part is lifted from where it comes to rest, as it comes in (px)
+/**
+ * What a panel that scrolls, and has no padding of its own, takes (round 49): a page comes in lifted, and a lift that runs
+ * past the end of a panel that scrolls is overflow, so a scrollbar came in for the moment it lasted (on a Mac with a mouse,
+ * on Windows) and the whole page shifted sideways to make room, and back. Padding at the end takes the lift in.
+ */
+export const LIFT_ROOM = `padding:${LIFT + 2}px 0`;
+
 /**
  * How a page comes in when the screen is already open (round 38): the page that was there is lifted away (a copy of it
  * dissolves in place, blurring, while the mist stirs) and the new one rises gently out of
@@ -112,7 +120,7 @@ function bring(panel: HTMLElement, ghost: HTMLElement | null, tab: boolean): voi
   const parts = tab ? [...panel.querySelectorAll<HTMLElement>(':scope > .scroll')] : [...panel.children].filter((c): c is HTMLElement => c instanceof HTMLElement);
   parts.forEach((part, i) =>
     part.animate(
-      [{ opacity: 0, filter: 'blur(9px)', transform: `translateY(${tab ? 8 : 6}px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
+      [{ opacity: 0, filter: 'blur(9px)', transform: `translateY(${tab ? LIFT : LIFT - 2}px)` }, { opacity: 1, filter: 'blur(0)', transform: 'none' }],
       { duration: tab ? 170 : 420, delay: tab ? 0 : 130 + Math.min(i, 6) * 45, easing: ease, fill: 'backwards' }, // each part gathers a moment after the one above, as the old words are going
     ),
   );
