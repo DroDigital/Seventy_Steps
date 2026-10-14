@@ -2,7 +2,7 @@
  * Where a region's foes stand (spec §3D): around the fires of its camps, among ruins, groves, stone
  * circles and graveyards, guarding every dungeon door and the approach to every boss's ring, in
  * pairs along its roads, wandering its towns' streets, and a thin scatter over open ground. Never
- * near an Elder Sign or a gate, inside a site, or in a prop. Pure.
+ * near an Elder Sign or a gate, inside a site, in a prop, or walled in. Pure.
  */
 
 import type { XZ } from '../core/geom';
@@ -12,6 +12,7 @@ import { getEntity } from '../data/registry';
 import { START_SIGN } from '../data/sites';
 import { WORLD } from '../data/tuning';
 import { colliderBounds, toBoxFrame, type Collider } from './colliders';
+import { escapes } from './escape';
 import type { Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
 import { propCollider, type Prop } from './props';
@@ -68,7 +69,8 @@ export function planSpawns(region: RegionDef, features: readonly Feature[], road
     x > rect.x0 + 6 && x < rect.x1 - 6 && z > rect.z0 + 6 && z < rect.z1 - 6 &&
     safe.every((p) => Math.hypot(p.x - x, p.z - z) >= SAFE) &&
     w.pads.every((p) => (p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) > p.radius + 1 : rectDistance(p.rect, x, z) > 2 + MOUND_BAND + 1)) && // clear of a mound heaped over a dungeon (round 13)
-    !solid(x, z);
+    !solid(x, z) &&
+    escapes(solid, x, z); // and not shut in by walls: a foe inside a ring of ruin walls could not come out, nor the investigator in (round 49)
 
   const out: SpawnPoint[] = [];
   const start = w.signs.find((s) => s.id === START_SIGN);

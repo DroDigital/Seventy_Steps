@@ -134,17 +134,31 @@ function circle(f: Feature, rng: Rng): Prop[] {
   return out;
 }
 
+/** A point of the world in a feature's own frame (the inverse of `local`). */
+const toLocal = (f: Pick<Feature, 'x' | 'z' | 'yaw'>, x: number, z: number): XZ => {
+  const [s, c] = [Math.sin(f.yaw), Math.cos(f.yaw)];
+  const [dx, dz] = [x - f.x, z - f.z];
+  return { x: dx * c - dz * s, z: dx * s + dz * c };
+};
+
+const RUIN_GATE = 2.4; // half the gap in a ruin's front wall: the way in, which stays (round 49: four walls that met shut two foes in, and the investigator out)
+
 function ruin(f: Feature, rng: Rng, ctx: FeatureContext): Prop[] {
   const [hw, hd] = [f.r * (0.55 + 0.15 * rng()), f.r * (0.45 + 0.15 * rng())];
   const sides: [XZ, XZ][] = [
     [{ x: -hw, z: -hd }, { x: hw, z: -hd }],
-    [{ x: -hw, z: hd }, { x: hw, z: hd }],
+    [{ x: -hw, z: hd }, { x: -RUIN_GATE, z: hd }], // the front, broken at its middle
+    [{ x: RUIN_GATE, z: hd }, { x: hw, z: hd }],
     [{ x: -hw, z: -hd }, { x: -hw, z: hd }],
     [{ x: hw, z: -hd }, { x: hw, z: hd }],
   ];
   const out: Prop[] = [];
   for (const [a, b] of sides) if (rng() < 0.85) out.push(...wallRun(f, rng, a, b, 'ruin').filter(() => rng() < 0.8));
-  out.push(...scatter({ ...f, r: Math.min(hw, hd) }, rng, 3 + Math.floor(rng() * 3), 1.6, ctx, () => 'rock').map((p) => ({ ...p, w: p.w * 0.5, h: p.h * 0.5 })));
+  const lane = (p: Prop): boolean => { // the way in is kept clear of rubble
+    const l = toLocal(f, p.x, p.z);
+    return Math.abs(l.x) > RUIN_GATE + 1.4 || l.z < 0;
+  };
+  out.push(...scatter({ ...f, r: Math.min(hw, hd) * 0.6 }, rng, 3 + Math.floor(rng() * 3), 1.6, ctx, () => 'rock').filter(lane).map((p) => ({ ...p, w: p.w * 0.5, h: p.h * 0.5 })));
   if (rng() < 0.5) out.push(makeProp('pillar', local(f, hw, hd).x, local(f, hw, hd).z, rng));
   return out;
 }
@@ -201,20 +215,28 @@ function fenceRun(f: Filler, rng: Rng, a: XZ, b: XZ): Prop[] {
   });
 }
 
-/** A farmstead: a house and a barn facing the way in, a fenced yard between them with a gap, trees and a stump or two about. */
+/** A farmstead: a house and a barn facing the way in, a fenced yard behind them with a gap, trees and a stump or two about. The buildings stand beyond the fences' ends with the way out of the yard running between them (round 49: they stood across it, and shut the yard). */
 function farm(f: Filler, rng: Rng, ctx: FeatureContext): Prop[] {
   const style = ctx.house ?? 'clapboard';
-  const house = local(f, -5, 4);
-  const barn = local(f, 6.5, 5);
-  const out: Prop[] = [
-    makeProp('house', house.x, house.z, rng, f.yaw, undefined, style),
-    makeProp('house', barn.x, barn.z, rng, f.yaw + (rng() < 0.5 ? 0 : Math.PI), [5.5, 4, 5], style),
-  ];
   const [hw, hd] = [f.r * 0.7, f.r * 0.5];
   const gate = 2.4;
+  const lane = gate + 1.2; // the way between the buildings: the gate's width and a body's either side
+  const beyond = hd * 0.3 + 0.8; // the side fences end short of this
+  const size: [number, number, number] = [3.5 + 1.5 * rng(), 3 + 1.5 * rng(), 5 + 2 * rng()]; // (as makeProp sizes a house)
+  const barnSize: [number, number, number] = [5.5, 4, 5];
+  const house = local(f, -(lane + size[0]), beyond + size[1]);
+  const barn = local(f, lane + barnSize[0], beyond + barnSize[1]);
+  const out: Prop[] = [
+    makeProp('house', house.x, house.z, rng, f.yaw, size, style),
+    makeProp('house', barn.x, barn.z, rng, f.yaw + (rng() < 0.5 ? 0 : Math.PI), barnSize, style),
+  ];
   out.push(...fenceRun(f, rng, { x: -hw, z: -hd }, { x: hw, z: -hd }), ...fenceRun(f, rng, { x: -hw, z: -hd }, { x: -hw, z: hd * 0.3 }), ...fenceRun(f, rng, { x: hw, z: -hd }, { x: hw, z: hd * 0.3 }));
   out.push(...fenceRun(f, rng, { x: -hw, z: -hd * 0.2 }, { x: -gate, z: -hd * 0.2 }), ...fenceRun(f, rng, { x: gate, z: -hd * 0.2 }, { x: hw, z: -hd * 0.2 }));
-  out.push(...scatter(f, rng, 3 + Math.floor(rng() * 3), 4, ctx, () => (rng() < 0.7 ? 'tree' : 'stump')).filter((p) => Math.hypot(p.x - house.x, p.z - house.z) > 6 && Math.hypot(p.x - barn.x, p.z - barn.z) > 7));
+  const clearOfWay = (p: Prop): boolean => { // no tree or stump in the gate or the lane out of it
+    const l = toLocal(f, p.x, p.z);
+    return Math.abs(l.x) > lane + 1 || l.z < -hd * 0.2 - 2;
+  };
+  out.push(...scatter(f, rng, 3 + Math.floor(rng() * 3), 4, ctx, () => (rng() < 0.7 ? 'tree' : 'stump')).filter((p) => clearOfWay(p) && Math.hypot(p.x - house.x, p.z - house.z) > 6 && Math.hypot(p.x - barn.x, p.z - barn.z) > 7));
   return out;
 }
 
