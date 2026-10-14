@@ -132,6 +132,59 @@ describe('a button that acts on its press, down for seconds', () => {
   });
 });
 
+describe('a key that was heard to repeat, and then goes silent', () => {
+  it('is let go after a few seconds: a held key goes on repeating, so its release was lost', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    t.mockReturnValue(600);
+    pg.key('keydown', 'KeyW', { repeat: true });
+    expect(pg.poll().moveY).toBe(1);
+    t.mockReturnValue(600 + 3000);
+    expect(pg.poll().moveY).toBe(1); // not yet
+    t.mockReturnValue(600 + 4000);
+    expect(pg.poll().moveY).toBe(0);
+    t.mockRestore();
+  });
+
+  it('is kept while it keeps repeating', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    for (let at = 600; at <= 20000; at += 1000) {
+      t.mockReturnValue(at);
+      pg.key('keydown', 'KeyW', { repeat: true });
+      expect(pg.poll().moveY, `at ${at}`).toBe(1);
+    }
+    t.mockRestore();
+  });
+
+  it('is kept however long when it was never heard to repeat (its repeats may be off, or taken by the system)', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyA');
+    t.mockReturnValue(60000);
+    expect(pg.poll().moveX).toBe(-1);
+    t.mockRestore();
+  });
+
+  it('the dodge on the space bar is let go the same way', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'Space');
+    t.mockReturnValue(700);
+    pg.key('keydown', 'Space', { repeat: true });
+    expect(pg.poll().held.dodge).toBe(true);
+    t.mockReturnValue(700 + 4000);
+    expect(pg.poll().held.dodge).toBe(false);
+    t.mockRestore();
+  });
+});
+
 describe('a pad whose stick has drifted', () => {
   it('walks the investigator on alone only for a while: a stick that lies still off centre is at rest there', async () => {
     const t = vi.spyOn(performance, 'now');

@@ -61,6 +61,8 @@ const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD
 /** The buttons the game reads as held (guard, and the dodge that sprints): every other acts on its press alone, so one that stays down for seconds is stuck. */
 const HOLDS: ReadonlySet<Button> = new Set<Button>(['dodge', 'block']);
 const STUCK_FRAMES = SIM.hz * 2;
+/** A key that has been heard to repeat and then says nothing for this long is no longer down (a held key repeats within two seconds at the slowest setting, and goes on). */
+const SILENT_MS = 3500;
 /** Which bit of a mouse event's `buttons` each button of its `button` is. */
 const MOUSE_BIT: Readonly<Record<number, number>> = { 0: 1, 1: 4, 2: 2 };
 const isMeta = (code: string): boolean => code === 'MetaLeft' || code === 'MetaRight';
@@ -101,7 +103,8 @@ export interface InputDevice {
 
 /** `free`: whether the mouse may look about while the pointer is not captured (no menu has the screen): round 39. */
 export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () => false): InputDevice {
-  const keys = new Set<string>();
+  const keys = new Map<string, number>(); // the keys down, and when each last said so (a press or a repeat)
+  const repeats = new Set<string>(); // the keys heard to repeat: only those can be told to be let go by their silence (a key whose repeats are off, or whose repeats the system takes, says nothing while held)
   const held = noButtons(); // keyboard + mouse
   const down = noButtons(); // latched since the last poll
   const up = noButtons();
@@ -140,7 +143,8 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     if (e.metaKey && !isMeta(e.code)) return; // a Command shortcut (on macOS a key pressed with Command is never heard to rise, so one taken for the game stays down): not the game's
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
     if (e.code !== 'Escape' && !captured()) capture(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
-    keys.add(e.code); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
+    keys.set(e.code, performance.now()); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
+    if (e.repeat) repeats.add(e.code);
     if (e.repeat) return;
     useDevice('keys');
     const b = keyButton(e.code);
@@ -198,6 +202,15 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   });
 
   const key = (code: string): number => (keys.has(code) ? 1 : 0);
+  /** Lets go of the keys that were heard to repeat and have been silent: a release that was never heard (round 49). */
+  const expire = (now: number): void => {
+    for (const [code, at] of keys) {
+      if (!repeats.has(code) || now - at < SILENT_MS) continue;
+      keys.delete(code);
+      const b = keyButton(code);
+      if (b) release(b);
+    }
+  };
 
   const device: InputDevice = {
     sensitivity: 1,
@@ -209,13 +222,14 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     },
     describe() {
       const pad = lastPad;
-      const [keyed, clicked] = [[...keys].join(' '), [...mouseButtons.values()].join(' ')];
+      const [keyed, clicked] = [[...keys.keys()].join(' '), [...mouseButtons.values()].join(' ')];
       const stick = pad ? `L ${pad.lx.toFixed(2)} ${pad.ly.toFixed(2)} · R ${pad.rx.toFixed(2)} ${pad.ry.toFixed(2)}` : '';
       const buttons = pad ? BUTTONS.filter((b) => pad.buttons[b]).join(' ') : '';
       return `keys ${keyed || '-'} · mouse ${clicked || '-'}\npad ${pad ? `${pad.id.slice(0, 40)} ${stick}${buttons ? ` · ${buttons}` : ''}` : 'none heard'}`;
     },
     poll() {
       const dt = 1 / SIM.hz;
+      expire(performance.now());
       const pad = readPad();
       lastPad = pad;
       const f = emptyInput();
