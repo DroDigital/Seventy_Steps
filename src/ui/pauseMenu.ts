@@ -9,7 +9,7 @@ import { t } from '../core/i18n';
 import { keyLayout } from '../core/bindings';
 import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
-import { ACCENT, button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
+import { button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
 import { menuKeys } from './menuKeys';
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
@@ -37,7 +37,7 @@ export interface PauseMenu {
 const RESUME_MS = 1000; // how soon after the mouse was asked for (by any menu closing) a let-go is the browser's own Esc, not a pause
 
 export function createPauseMenu(o: PauseOptions): PauseMenu {
-  const screen = createScreen(6);
+  const screen = createScreen(6, '#050506b3'); // the world shows through a little more than behind the others' dim (70% dark, not 87%): its vitals and minimap stay crisp, which a blur of it would take
   let retriedAt = -1e9;
   const resume = (): void => {
     screen.close();
@@ -48,21 +48,22 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     build(p) {
       title(p, t('pause.title'));
       const list = el(p, 'div');
+      list.className = 'pause'; // centred lines, each on a plaque of its own (ui/menuParts.ts)
       button(list, t('pause.resume'), resume, true, t('pause.resumeHint'));
-      const rule = (): void => void el(list, 'div', '', `height:1px;margin:3px 14px;background:linear-gradient(90deg,transparent,${ACCENT}40 20%,${ACCENT}40 80%,transparent)`);
-      rule();
+      const gap = (): void => void el(list, 'div', '', 'height:14px'); // the groups are told apart by space, not by faint rules
+      gap();
       if (o.map) button(list, t('pause.map'), () => [screen.close(true), o.map!()], true, t('pause.mapHint'));
       if (o.journal) button(list, t('pause.journal'), () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.journalHint'));
       if (o.arms) button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.armsHint'));
       if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))), true, t('pause.achievementsHint'));
-      rule();
+      gap();
       button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)), true, t('pause.settingsHint'));
       button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))), true, t('pause.creditsHint'));
-      rule();
-      button(list, t('pause.quitTitle'), o.quit, true, t('pause.quitTitleHint'));
-      if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit()), true, t('pause.quitDesktopHint')); // the shell only: a browser tab is closed by its own hand
+      gap();
+      button(list, t('pause.quitTitle'), o.quit, true, t('pause.quitTitleHint')).classList.add('exit'); // the ways out are dimmer, and light ash-red when chosen
+      if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit()), true, t('pause.quitDesktopHint')).classList.add('exit'); // the shell only: a browser tab is closed by its own hand
       footer(p, t('pause.resumeHint'), menuKeys());
-      p.querySelector<HTMLElement>('.hint')!.style.minHeight = '1.45em'; // every line's hint is one line: no room kept for two
+      Object.assign(p.querySelector<HTMLElement>('.hint')!.style, { minHeight: '1.45em', textAlign: 'center' }); // every line's hint is one line: no room kept for two; centred, as the lines are
     },
   };
   const pause = (): void => {
