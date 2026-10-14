@@ -123,12 +123,19 @@ describe('the Witch House, in five stages', () => {
     expect(stageOf(g, 'descent')).toBe(0);
   });
 
-  it('takes the world as it finds it: formulae read before Gilman was seen close every stage before them', () => {
+  it("takes the world as it finds it, but does not pass over Gilman's lesson: it waits, and what is met after it closes with it", () => {
     const g = begun();
-    g.overworld!.read.add(FORMULAE);
+    g.overworld!.read.add(FORMULAE); // the formulae read before the report, before Gilman, before the stair
+    g.overworld!.discovered.add('arkham_witch');
     run(g, 31);
-    expect(stageOf(g, 'witch_house')).toBe(4); // the report, the talk and the stair are passed over
-    expect(g.mind.insight).toBe(0); // and the talk's gift is not given
+    expect(stageOf(g, 'witch_house')).toBe(1); // the report is passed over; Gilman's word is not
+    expect(g.mind.insight).toBe(0);
+    run(g, 91);
+    expect(stageOf(g, 'witch_house')).toBe(1); // it waits for him
+    said(g, 'gilman');
+    expect(g.mind.insight).toBe(1); // the lesson is given after all
+    run(g, 91);
+    expect(stageOf(g, 'witch_house')).toBe(4); // and the stair and the formulae, already met, close behind it
   });
 
   it('says one change for a run of stages the world has passed over, not one for each', () => {

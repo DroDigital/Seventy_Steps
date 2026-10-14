@@ -46,13 +46,13 @@ export function startQuest(g: Game, id: string): boolean {
 
 /**
  * Closes the open stage: the next opens, or the quest is done and pays. `to`: the stage that opens, when the world has passed over
- * some (settle); a stage gives its gift only when it is closed by its own goal, not passed over.
+ * some (settle); `paid`: the closed stage's gift is given (it is not for a stage the world passed over).
  */
-function advance(g: Game, id: string, to = stageOf(g, id) + 1): void {
+function advance(g: Game, id: string, to = stageOf(g, id) + 1, paid = true): void {
   const q = QUESTS[id];
   const stage = stageOf(g, id);
   g.overworld!.quests.set(id, to);
-  const gift = to === stage + 1 ? q.stages[stage].gift : undefined;
+  const gift = paid ? q.stages[stage].gift : undefined;
   if (gift?.echoes) {
     g.player.echoes += gift.echoes;
     g.events.emit('Echoes', { change: 'earned', amount: gift.echoes, total: g.player.echoes });
@@ -76,7 +76,9 @@ function advance(g: Game, id: string, to = stageOf(g, id) + 1): void {
 
 /**
  * A lenient quest takes the world as it finds it: a later stage whose goal is already met by the world (a boss slain, a sign found, a
- * page read) closes with every stage before it, all at once, and what a stage gives is not given for one the world passed over.
+ * page read) closes with every stage before it, all at once. When the last stage is met the quest is over, and what its stages
+ * give is not given. Short of that a stage with a gift is not passed over: it waits for its own goal (a word with someone), so what it
+ * gives is not lost, and the stages after it that are met close as soon as it does.
  */
 function settle(g: Game, id: string): void {
   const q = QUESTS[id];
@@ -85,7 +87,13 @@ function settle(g: Game, id: string): void {
   q.stages.forEach((s, k) => {
     if (k > open && s.goal.kind !== 'talk' && s.goal.kind !== 'give' && met(g, s.goal)) last = k;
   });
-  if (last >= 0) advance(g, id, last + 1);
+  if (last < 0) return;
+  let to = last + 1;
+  if (last < q.stages.length - 1) {
+    const gifted = q.stages.findIndex((s, k) => k >= open && k <= last && s.gift);
+    if (gifted >= 0) to = Math.min(to, gifted);
+  }
+  if (to > open) advance(g, id, to, false);
 }
 
 /** The open goals of every quest under way. */
