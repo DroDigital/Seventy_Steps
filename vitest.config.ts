@@ -13,6 +13,7 @@ export const AUDITS = [
   'tests/bossStand.test.ts',
   'tests/dungeonView.test.ts',
   'tests/roofView.test.ts',
+  'tests/outsideView.test.ts',
   'tests/objectView.test.ts',
   'tests/roam.test.ts',
   'tests/enclosedAudit.test.ts',

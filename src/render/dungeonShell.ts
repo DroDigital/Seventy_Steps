@@ -79,7 +79,9 @@ function skirt(p: BoxPart, ends: readonly [BankEnd, BankEnd], base: number, heig
   const face = outerFace(p);
   const out: [number, number] = [n.x, n.z];
   const profile = profileOf(base, height);
-  const cut = (e: BankEnd): number => (e === 'joined' || e === 'neighbour' ? DUNGEON.wall / 2 : 0);
+  // a joined end meets the next wall's bank at the cell's edge, exactly (the earth is the same wherever two pieces meet): cut by half a wall
+  // each side would leave one wall's width open at the seam, through which the wall's outside showed (round 46)
+  const cut = (e: BankEnd): number => (e === 'neighbour' ? DUNGEON.wall / 2 : 0);
   const [a0, a1] = alongX ? [p.min.x + cut(ends[0]), p.max.x - cut(ends[1])] : [p.min.z + cut(ends[0]), p.max.z - cut(ends[1])];
   const onFace = (a: number): [number, number] => (alongX ? [a, face] : [face, a]);
   const band = (x0: number, z0: number, u: readonly [number, number], x1: number, z1: number, v: readonly [number, number], pos: number[]): void => {

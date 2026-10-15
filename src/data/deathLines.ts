@@ -14,6 +14,7 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   lunge: 'It crosses the ground in a breath. Roll as it leaves the ground, and be behind it.',
   charge: 'It runs in a line and cannot turn. Step aside at the last, not before.',
   grab: 'A crimson flare is a grab, and no guard stops it. Roll away the moment it shows.',
+  seize: 'A grab that a guard can hold. Give it the guard, or roll before its hands close.',
   bite: 'Quick, and close. Block it, or stand a pace further off than it likes.',
   tentacle_burst: 'The tentacles sweep all round at once. Roll through them, or be out of their reach.',
   projectile: 'One bolt, straight. Step off its line and it is nothing.',
