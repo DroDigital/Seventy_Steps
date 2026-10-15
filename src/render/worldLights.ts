@@ -6,11 +6,12 @@
  * wears a soft additive halo (halos.ts), so lights glow through the dark as lights should. The
  * investigator's lantern wears one too. Round 22: `lightAt` tells the simulation how well lit the
  * ground is at a point (the mind mends faster in lamplight; sanity.ts), by the same spots. Round 37:
- * only what the eye can see of them lights the world or glows (lightSight.ts): not a torch on the
- * far side of a wall.
+ * lights beyond a wall stay out (lightSight.ts). Lighting follows the investigator's chest while
+ * halo visibility follows the camera: orbiting behind a pillar must not put out a whole room.
  */
 
 import * as THREE from 'three';
+import type { V3 } from '../core/geom';
 import { LIGHTS, SANITY, type LightDef, type LightKind } from '../data/tuning';
 import type { CollisionWorld } from '../world/colliders';
 import { createHalos } from './halos';
@@ -47,8 +48,8 @@ export interface WorldLights {
   remove(key: number): void;
   /** How well lit the ground at a point is by lamps, fires, torches and windows (0..1) at `time`: each counts within its share of its light's range, and the Elder Signs' glow, an Echo's and the lantern's own do not. */
   lightAt(x: number, y: number, z: number, time: number): number;
-  /** Lights the world about the camera at `eye`; `lantern` (the investigator's flame, as drawn) wears its halo (null: none). */
-  update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null): void;
+  /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
+  update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3): void;
   /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps), nearest first (round 35: lampShadows.ts). */
   readonly casters: readonly Caster[];
 }
@@ -74,8 +75,10 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
   const batch = createHalos(MAX_HALOS, LIGHTS.haloFog);
   const halos = batch.mesh;
   const sight = createLightSight(world);
-  const near: { s: LightSpot; d: number; v: number }[] = []; // in reach of the eye, nearest first; `v`: the share of each that shows
-  const seen: typeof near = []; // those that show at all
+  const haloSight = createLightSight(world);
+  const near: { s: LightSpot; d: number; v: number }[] = []; // in reach of the investigator, nearest first
+  const visible: typeof near = []; // halo visibility belongs to the eye; lighting belongs to the investigator
+  const seen: typeof near = [];
   const casters: Caster[] = [];
   return {
     halos,
@@ -99,16 +102,21 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       }
       return Math.min(1, sum);
     },
-    update(eye, time, lantern) {
+    update(eye, time, lantern, at = eye) {
       near.length = 0;
+      visible.length = 0;
       for (const list of spots.values()) {
         for (const s of list) {
-          const d = Math.hypot(s.x - eye.x, s.y - eye.y, s.z - eye.z);
+          const d = Math.hypot(s.x - at.x, s.y - at.y, s.z - at.z);
           if (d < LIGHTS.haloReach) near.push({ s, d, v: 1 });
+          const hd = Math.hypot(s.x - eye.x, s.y - eye.y, s.z - eye.z);
+          if (hd < LIGHTS.haloReach) visible.push({ s, d: hd, v: 1 });
         }
       }
       near.sort((a, b) => a.d - b.d);
-      sight.update(near, eye, time);
+      sight.update(near, at, time);
+      visible.sort((a, b) => a.d - b.d);
+      haloSight.update(visible, eye, time);
       seen.length = 0;
       for (const n of near) if (n.v > 0.02) seen.push(n); // the lamps are for the lights that show: one in the next room takes none
       const reach = Math.min(LIGHTS.reach, seen[LAMP_SLOTS]?.d ?? Infinity); // the next in line is at nothing
@@ -129,7 +137,8 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       }
       batch.begin();
       if (lantern) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time));
-      for (const { s, v } of seen) {
+      for (const { s, v } of visible) {
+        if (v <= 0.02) continue;
         const k: LightDef = LIGHTS.kinds[s.kind];
         if (s.glass) {
           const face = glassFacing(s, eye) * v * (s.pane === undefined ? 1 : paneLit(s.pane, time));

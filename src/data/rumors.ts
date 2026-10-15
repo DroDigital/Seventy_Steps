@@ -1,7 +1,7 @@
 /**
  * What the people of the dream say of a horror's fall (round 26: the world went on as if nothing had
- * happened): one line for each of the great ones, told once by each person the next time they are
- * talked with, the latest fall first. Data only (systems/omens.ts).
+ * happened): written news for each of the great ones, shared once by each person after a completed
+ * conversation, the latest fall first. These have no voice recordings. Data only (systems/omens.ts).
  */
 
 export const RUMORS: Readonly<Record<string, string>> = {

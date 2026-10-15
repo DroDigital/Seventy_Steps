@@ -63,7 +63,7 @@ vec3 lampLight(vec3 p, vec3 n, float facing) {
 
 /**
  * lampLight, and with it the streak each lamp makes across a glossy surface (round 39): `eye` is the direction to the eye,
- * `power` how tight the streak is; the streaks are summed into `streak` (as the shadows take them, unlimited by the ceiling).
+ * `power` how tight the streak is; the streaks share the diffuse ceiling so overlapping torches never burn the floor white.
  */
 export const LAMPS_GLOSS_GLSL = /* glsl */ `
 vec3 lampLightGloss(vec3 p, vec3 n, float facing, vec3 eye, float power, out vec3 streak) {
@@ -87,6 +87,7 @@ vec3 lampLightGloss(vec3 p, vec3 n, float facing, vec3 eye, float power, out vec
     streak += c * pow(max(dot(n, normalize(dir + eye)), 0.0), power);
   }
   float peak = max(max(sum.r, sum.g), sum.b);
+  streak /= 1.0 + 0.55 * peak;
   return sum / (1.0 + 0.55 * peak);
 }
 `;

@@ -17,6 +17,12 @@ and “It has been alone a very long time.”) are narrative text: it has no cas
 The other silent bosses' scene captions and epithets are also read, not spoken. Adding a speaking
 role requires authored lines, a cast entry and recordings; a narrative caption is not a missing take.
 
+**World rumours are written notes.** The 18 paragraphs in `data/rumors.ts` have no recordings in
+any NPC's voice. They appear in a separate “A rumour” reading card after a completed conversation,
+outside its numbered, voiced lines. Aborting a conversation leaves its note unread for next time;
+showing the note marks it read, and dismissing it opens a merchant's wares where applicable.
+All 133 authored NPC topic lines have recordings, required by `voiceCoverage.test.ts`.
+
 ## Where it is
 
 | | |

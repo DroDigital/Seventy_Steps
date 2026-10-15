@@ -40,14 +40,18 @@ describe('the dream answers a fall (round 26)', () => {
     expect(heard.map((h) => h.region)).toEqual([lone.region]);
   });
 
-  it('each person tells of the latest fall they have not told of, once', () => {
+  it('each person shares the latest fall once its note is read, retaining it after an aborted talk', () => {
     const g = createWorldGame();
     const told = Object.keys(RUMORS).slice(0, 2);
     for (const id of told) g.overworld!.slain.add(`boss:${id}`);
-    expect(rumorFor(g, 'morgan')).toBe(RUMORS[told[1]]); // the latest first
-    expect(rumorFor(g, 'morgan')).toBe(RUMORS[told[0]]);
+    const next = { boss: told[1], text: RUMORS[told[1]] };
+    expect(rumorFor(g, 'morgan')).toEqual(next); // the latest first
+    expect(rumorFor(g, 'morgan')).toEqual(next); // not marked until the note is actually shown
+    g.events.emit('RumorRead', { npc: 'morgan', boss: told[1] });
+    expect(rumorFor(g, 'morgan')).toEqual({ boss: told[0], text: RUMORS[told[0]] });
+    g.events.emit('RumorRead', { npc: 'morgan', boss: told[0] });
     expect(rumorFor(g, 'morgan')).toBeUndefined();
-    expect(rumorFor(g, 'curtis')).toBe(RUMORS[told[1]]); // another person has not yet
+    expect(rumorFor(g, 'curtis')).toEqual(next); // another person has not yet
   });
 
   it('every rumour is of a boss that exists', () => {
