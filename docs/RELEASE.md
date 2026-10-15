@@ -1,6 +1,6 @@
 # Release
 
-What stands between the game and Steam, for Windows and macOS (and Linux). Round 49. The first half is done and checked by a
+What stands between the game and Steam, for Windows and macOS (and Linux). Round 50. The first half is done and checked by a
 machine of each platform; the second half is what only the author can do, because it needs an account or a device that is theirs.
 
 ## What is done

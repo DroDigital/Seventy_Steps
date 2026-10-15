@@ -19,7 +19,7 @@ the author can reach.
 
 `npm run package` builds the game, makes the icon (`build/` is not kept) and packs it for the platform it runs on, unpacked, into
 `release/` (electron-builder, the `build` field of `package.json`): a folder to upload as a depot, not an installer (Steam installs
-it). Round 49: the release itself, Windows and Mac builds, their check and how to send them are in **docs/RELEASE.md**.
+it). Round 50: the release itself, Windows and Mac builds, their check and how to send them are in **docs/RELEASE.md**.
 
 - `npm run package:win`, `package:linux`, `package:mac` name the platform. **Pack each platform on that platform** (or
   in CI on one of each): the controllers' SDL library (`@kmamal/sdl`) downloads its native build for the machine it is

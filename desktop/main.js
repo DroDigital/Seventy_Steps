@@ -10,7 +10,7 @@
  * in the user's data folder (saves/, where Steam Cloud can find them), not the browser's storage.
  * Round 36: controllers are read natively too (padWorker.js, gamepad-node over SDL2), for Chromium on
  * macOS lists none to the page; the page reads them from the bridge when the browser's list is empty.
- * Round 49 (the release): one instance at a time, the Windows taskbar's own id, no menu bar with developer tools in
+ * Round 50 (the release): one instance at a time, the Windows taskbar's own id, no menu bar with developer tools in
  * a release (macOS keeps its app menu, whose Quit and Hide it needs), and `--smoke-test`: the packed game starts,
  * reaches its title, reports what it found (the Steam binding, the controllers' worker) and quits (tools/smoke_packaged.mjs).
  */

@@ -65,7 +65,10 @@ jobs:
         run: node tools/smoke_packaged.mjs --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: Starts under Rosetta (Intel)
         continue-on-error: true
-        run: arch -x86_64 node tools/smoke_packaged.mjs --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: |
+          arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
+          arch -x86_64 /usr/bin/true
+          node tools/smoke_packaged.mjs --arch x86_64 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: One app for both
         continue-on-error: true
         run: node tools/package_mac.mjs --universal --no-build

@@ -1,5 +1,5 @@
 // Starts a packed build with --smoke-test and fails unless it reaches its title (desktop/main.js: `smoke`).
-// usage: node tools/smoke_packaged.mjs [--app <path to the executable>] [--require steam,pads]
+// usage: node tools/smoke_packaged.mjs [--app <path to the executable>] [--require steam,pads] [--arch x86_64]
 // On a machine with no GPU (CI on Linux) set SMOKE_SOFTWARE_GL=1; under Linux's CI the Chromium sandbox is off (--no-sandbox).
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -20,7 +20,9 @@ if (!exe || !existsSync(exe)) {
   process.exit(2);
 }
 const need = flag('--require') ?? (process.platform === 'linux' ? 'steam' : 'steam,pads'); // (a CI Linux box may have no SDL video or HID to start the worker on)
-const child = spawn(exe, ['--smoke-test', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])], { env: { ...process.env, SMOKE_REQUIRE: need }, stdio: ['ignore', 'pipe', 'pipe'] });
+const arch = flag('--arch'); // macOS: `--arch x86_64` starts the Intel app under Rosetta (`arch -x86_64`: it needs no Intel node, only the app)
+const shell = ['--smoke-test', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])];
+const child = spawn(arch ? 'arch' : exe, arch ? [`-${arch}`, exe, ...shell] : shell, { env: { ...process.env, SMOKE_REQUIRE: need }, stdio: ['ignore', 'pipe', 'pipe'] });
 let ok = false;
 for (const [stream, out] of [[child.stdout, process.stdout], [child.stderr, process.stderr]]) {
   stream.on('data', (d) => {
