@@ -55,8 +55,9 @@ machine of each platform; the second half is what only the author can do, becaus
    Mac that packs, then `MAC_SIGN_IDENTITY="Developer ID Application: Name (TEAMID)" APPLE_ID=… APPLE_APP_SPECIFIC_PASSWORD=…
    APPLE_TEAM_ID=… npm run package:mac -- --universal`: every app is signed with the hardened runtime and
    `packaging/entitlements.mac.plist`, and notarised. (CI does not do this: it would need the certificate as a secret.)
-3. **Windows**: nothing is needed to run through Steam. A signed `SeventySteps.exe` (an EV or OV code-signing certificate) only
-   matters for a build handed out outside Steam.
+3. **Windows**: nothing is needed to run through Steam. `SeventySteps.exe` is not code-signed (CI reads its signature as
+   `NotSigned`); a signed one (an EV or OV code-signing certificate) only matters for a build handed out outside Steam, where
+   SmartScreen warns about an unsigned one.
 4. **Try it on a real machine of each kind** before setting a build live: Windows 10 and 11, a Mac with Apple Silicon and an Intel
    Mac (or the Rosetta start), a controller on each, Steam's overlay (Shift+Tab), fullscreen (F11, Alt+Enter), alt-tab and back,
    a save, quitting and continuing, and Steam Cloud between two machines. CI proves a packed build starts and reaches its title on
