@@ -68,13 +68,24 @@ jobs:
         run: |
           arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
           arch -x86_64 /usr/bin/true
-          node tools/smoke_packaged.mjs --arch x86_64 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+          node tools/smoke_packaged.mjs --arch x86_64 --verbose --timeout 90 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: One app for both
         continue-on-error: true
         run: node tools/package_mac.mjs --universal --no-build
       - name: Universal app starts
         continue-on-error: true
-        run: node tools/smoke_packaged.mjs --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: node tools/smoke_packaged.mjs --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: What the Mac apps are (for the log)
+        if: always()
+        continue-on-error: true
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            app="release/$d/Seventy Steps.app"
+            [ -d "$app" ] || continue
+            echo "== $d"; lipo -info "$app/Contents/MacOS/Seventy Steps"; codesign -dv "$app" 2>&1 | grep -E 'Identifier|Signature|flags|Format' || true
+            ls "$app/Contents/Resources" | head -20
+          done
+          ls -t ~/Library/Logs/DiagnosticReports 2>/dev/null | head -5
       - name: Zip the depots (ditto keeps the bundle's links and permissions)
         run: |
           for d in mac-arm64 mac mac-universal; do
