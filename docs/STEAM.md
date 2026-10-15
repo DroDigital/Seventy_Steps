@@ -28,7 +28,8 @@ it). Round 50: the release itself, Windows and Mac builds, their check and how t
   Steam the launch option `--no-sandbox` only if the Steam Runtime's container refuses Chromium's sandbox.
 - The packed game holds `dist/` (the built page, its music, sounds and voices), `desktop/`, and the native modules
   unpacked beside the archive. About 615 MB on Linux.
-- macOS: an Apple Silicon app and an Intel one, each with its own SDL (`npm run package:mac`, `tools/package_mac.mjs`), signed ad hoc;
+- macOS: an Apple Silicon app and an Intel one, each with its own SDL, and with `-- --universal` one app of both
+  (`npm run package:mac`, `tools/package_mac.mjs`), signed ad hoc;
   an app Apple has not notarised is refused by Gatekeeper outside Steam; signing and notarisation need an Apple developer account
   (docs/RELEASE.md: `MAC_SIGN_IDENTITY` and the `APPLE_*` variables). Not set up.
 

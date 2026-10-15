@@ -22,11 +22,22 @@ machine of each platform; the second half is what only the author can do, becaus
 
   A Mac build makes each architecture with its own copy of the controllers' SDL library (`@kmamal/sdl` downloads the one of the
   machine it is installed on; `tools/package_mac.mjs` fetches the other), so **a Mac build is made on a Mac**; Windows on Windows.
+  The Mac apps are packed without an asar (`-c.asar=false`): the two architectures then differ only in their native files, which is
+  what `@electron/universal` needs to merge them. The universal app holds both apps whole (`app-arm64`, `app-x64`) behind a small
+  launcher, so it is about the size of the two together (913 MB zipped, against 469 and 476) and starts the one that fits the Mac.
 - **A packed game is started, not only packed** (`npm run smoke`, `tools/smoke_packaged.mjs`, the shell's `--smoke-test`): it must
   reach the title, find the shell's bridge, load the Steam binding and start the controllers' worker, or it fails. It runs against a
-  temporary data folder, never a player's saves.
+  temporary data folder, never a player's saves, and an uncaught error in the shell ends it with the error printed instead of the
+  error box nobody could click away. `--arch x86_64` starts an Intel app under Rosetta, `--timeout` and `--verbose` (Chromium's log,
+  and on a Mac a stack sample of a start that never answers) are for finding out why one does not start.
 - **CI does both on a machine of each platform** (`.github/workflows/release-builds.yml`: runs when the shell or packaging changes,
-  by hand, and on a `v*` tag) and keeps the depots as artifacts for seven days.
+  by hand, and on a `v*` tag) and keeps the depots as artifacts for seven days. On GitHub's hosted runners it has packed and started
+  (title reached, bridge, Steam binding and the controllers' worker all found): Windows Server 2025 (x64); Ubuntu (x64, a virtual
+  screen and software GL, so without the controllers' worker); macOS 26 on Apple Silicon: the Apple Silicon app, the Intel app
+  under Rosetta (its first start takes minutes: Rosetta translates the Electron framework before the app runs) and the universal
+  app on its Apple Silicon side, all signed ad hoc, the universal one passing `codesign --verify --deep --strict`. **Not run
+  anywhere**: the universal app on its Intel side, a real Steam client (the binding loads and finds none), a controller, a GPU,
+  a window kept open for more than the title, and Windows 10 / an older macOS.
 - **Uploading**: `tools/steam_upload.mjs` writes the SteamPipe scripts for the folders above (`steam/build/`, not kept) and, with
   `--run`, sends them with `steamcmd`. It refuses to set a build live on `default`: that is done on the partner site.
 

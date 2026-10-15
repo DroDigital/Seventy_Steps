@@ -40,6 +40,10 @@ jobs:
       - run: npm run package:win
       - name: Starts, and reaches its title
         run: node tools/smoke_packaged.mjs
+      - name: Is the executable code-signed (for the log)
+        shell: pwsh
+        continue-on-error: true
+        run: Get-AuthenticodeSignature release/win-unpacked/SeventySteps.exe | Format-List Status, StatusMessage
       - name: Zip the depot
         shell: pwsh
         run: Compress-Archive -Path release/win-unpacked -DestinationPath seventy-steps-windows.zip -CompressionLevel Fastest
@@ -64,16 +68,13 @@ jobs:
       - name: Starts, and reaches its title (Apple Silicon)
         run: node tools/smoke_packaged.mjs --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: Starts under Rosetta (Intel)
-        continue-on-error: true
         run: |
           arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
           arch -x86_64 /usr/bin/true
           node tools/smoke_packaged.mjs --arch x86_64 --verbose --timeout 600 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: One app for both
-        continue-on-error: true
         run: node tools/package_mac.mjs --universal --no-build
       - name: Universal app starts
-        continue-on-error: true
         run: node tools/smoke_packaged.mjs --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: What the Mac apps are (for the log)
         if: always()
