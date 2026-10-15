@@ -67,6 +67,7 @@ if (universal) {
     arm64AppPath: copies.arm64,
     outAppPath: universalApp,
     force: true,
+    mergeASARs: true, // one app.asar, not app-arm64.asar and app-x64.asar behind a stub that picks one (that build sat in a loop in its own startup on the Mac runner)
     x64ArchFiles: '**/steamworks.js/**', // (the Steam binding carries its own libraries for both: identical in both apps)
   });
   rmSync(staging, { recursive: true, force: true });

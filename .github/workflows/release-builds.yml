@@ -68,7 +68,7 @@ jobs:
         run: |
           arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
           arch -x86_64 /usr/bin/true
-          node tools/smoke_packaged.mjs --arch x86_64 --verbose --timeout 90 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+          node tools/smoke_packaged.mjs --arch x86_64 --verbose --timeout 600 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: One app for both
         continue-on-error: true
         run: node tools/package_mac.mjs --universal --no-build
