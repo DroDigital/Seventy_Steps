@@ -16,11 +16,11 @@ export function creditsPage(back: () => void, label = t('keys.back')): Page {
     back,
     build(panel) {
       el(panel, 'div', GAME_NAME.toUpperCase(), 'font-size:20px;letter-spacing:8px;text-align:center;margin:6px 0 12px');
-      const roll = el(panel, 'div', '', 'height:330px;overflow:hidden;text-align:center');
+      const roll = el(panel, 'div', '', 'height:330px;overflow:hidden;text-align:center;-webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)'); // the names rise out of the dark and go into it: no line is cut by the roll's edge, or set against the Back row
       const names = el(roll, 'div', '', 'padding:300px 0 40px');
       for (const b of CREDITS) {
-        const dim = b.quiet ? 'opacity:.4;font-size:10px;' : '';
-        if (b.heading) el(names, 'div', b.heading, `opacity:${b.quiet ? '.32' : '.55'};font-size:${b.quiet ? '9' : '11'}px;letter-spacing:4px;margin-top:${b.quiet ? '34' : '26'}px`);
+        const dim = b.quiet ? 'opacity:.55;font-size:10px;' : '';
+        if (b.heading) el(names, 'div', b.heading, `opacity:${b.quiet ? '.5' : '.55'};font-size:${b.quiet ? '9' : '11'}px;letter-spacing:4px;margin-top:${b.quiet ? '34' : '26'}px`);
         b.lines.forEach((line, i) => el(names, 'div', line, b.title && i === 0 ? 'font-size:22px;letter-spacing:6px;margin:10px 12px 22px;line-height:1.5' : `${dim}margin:${b.quiet ? '3' : '5'}px 12px;line-height:1.5`));
       }
       const start = performance.now();

@@ -21,6 +21,7 @@ import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, se
 import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
 import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
+import { bossLine } from '../../data/speechLines';
 import { voiceIdOf, VOICES, type Voice, type VoiceId } from '../../data/voices';
 import { isAbsent, isConcealed, type Game, type GameEvents } from '../../systems/components';
 import { kitOfRoom } from '../../world/dungeonKit';
@@ -190,6 +191,12 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   g.events.on('Speaking', ({ speaker, seconds }) => void (speaker.startsWith('boss:') && music.duck(seconds))); // a horror's line: its theme goes low under it (round 44)
   g.events.on('Silenced', () => speech.stop());
   g.events.on('Talked', ({ npc, lines }) => speech.ahead(`npc:${npc}`, lines.slice(0, AHEAD))); // their recordings loaded before they are said
+  const warmBoss = ({ entity }: { entity: Entity }): void => {
+    const id = g.ecs.c.fight.get(entity)?.id ?? g.ecs.c.dread.get(entity)?.id;
+    if (id) speech.ahead(`boss:${id}`, (['arrive', 'fall'] as const).flatMap((moment) => bossLine(id, moment)?.text ?? []));
+  };
+  g.events.on('FirstSight', warmBoss);
+  g.events.on('BossEngaged', warmBoss); // get both recordings ready before their scene's voice beat
 
   const callers = new Map<Entity, Caller>();
   const music = createBossMusic(e);

@@ -4,6 +4,7 @@ import { BESPOKE, bespokeArrival } from '../src/data/cutscenesBoss';
 import { getEntity } from '../src/data/registry';
 import { SAMPLE_SETS } from '../src/data/samples';
 import { STINGERS } from '../src/data/sounds';
+import { bossLine } from '../src/data/speechLines';
 import { speaking } from '../src/render/cinemaDirector';
 import { frameOf, sceneLength, shotAt, type Anchor } from '../src/render/cinemaPlan';
 
@@ -14,7 +15,8 @@ describe('the great horrors\' own arrivals (round 34)', () => {
   const ids = Object.keys(BESPOKE);
 
   it('are for bosses that are in the roster and fight from a script, each with its card', () => {
-    expect(ids.length).toBeGreaterThanOrEqual(8);
+    expect(ids.length).toBe(17);
+    for (const later of ['ghatanothoa', 'mother_hydra', 'colossus_pyramids', 'tsathoggua', 'yig', 'wilbur_whateley', 'joseph_curwen']) expect(ids, later).toContain(later);
     for (const id of ids) {
       expect(getEntity(id)?.bossScript, id).toBeDefined();
       expect(EPITHETS[id], id).toBeTruthy();
@@ -57,6 +59,31 @@ describe('the great horrors\' own arrivals (round 34)', () => {
           expect(Math.hypot(f.pos.x - f.look.x, f.pos.y - f.look.y, f.pos.z - f.look.z), id).toBeGreaterThan(0.2);
         }
       }
+    }
+  });
+
+  it('leave the horrors that speak (of the later seven) to their own words: no caption of the scene\'s to run over them', () => {
+    for (const id of ['mother_hydra', 'tsathoggua', 'wilbur_whateley', 'joseph_curwen']) {
+      expect(bossLine(id, 'arrive'), id).toBeDefined();
+      expect(bespokeArrival(id, 'X', undefined)!.beats.filter((b) => b.caption), id).toEqual([]);
+    }
+  });
+
+  it('give those that are silent their lines, kept short enough to read between the shots', () => {
+    for (const id of ['ghatanothoa', 'colossus_pyramids', 'yig']) {
+      expect(bossLine(id, 'arrive'), id).toBeUndefined();
+      const captions = bespokeArrival(id, 'X', undefined)!.beats.filter((b) => b.caption);
+      expect(captions.length, id).toBeGreaterThanOrEqual(2);
+      for (let i = 1; i < captions.length; i++) expect(captions[i].at - captions[i - 1].at, `${id}: a caption waits for the one before`).toBeGreaterThanOrEqual((captions[i - 1].hold ?? 3) - 0.9);
+    }
+  });
+
+  it('open on black, to be lifted from it, where the horror is met in the dark', () => {
+    for (const id of ['colossus_pyramids', 'tsathoggua']) {
+      const s = bespokeArrival(id, 'X', undefined)!;
+      expect(s.dark, id).toBe(true);
+      expect(s.blend?.[0], id).toBe(0);
+      expect(s.beats.some((b) => b.fade === 'clear'), id).toBe(true);
     }
   });
 

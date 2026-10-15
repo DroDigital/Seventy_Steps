@@ -10,22 +10,39 @@
  * in the user's data folder (saves/, where Steam Cloud can find them), not the browser's storage.
  * Round 36: controllers are read natively too (padWorker.js, gamepad-node over SDL2), for Chromium on
  * macOS lists none to the page; the page reads them from the bridge when the browser's list is empty.
+ * Round 50 (the release): one instance at a time, the Windows taskbar's own id, no menu bar with developer tools in
+ * a release (macOS keeps its app menu, whose Quit and Hide it needs), and `--smoke-test`: the packed game starts,
+ * reaches its title, reports what it found (the Steam binding, the controllers' worker) and quits (tools/smoke_packaged.mjs).
  */
 
-import { app, BrowserWindow, dialog, ipcMain, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
-import { mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { serveFrom } from './serve.js';
-import { startSteam, steamAchieve, steamEarly } from './steam.js';
+import { channel, startSteam, steamAchieve, steamBinding, steamEarly } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
+const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the title, reports, quits: a packed build's own check
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
+if (SMOKE) {
+  app.setPath('userData', mkdtempSync(join(tmpdir(), 'seventy-steps-smoke-'))); // a check never touches a player's saves, window or logs
+  if (process.env.SMOKE_SOFTWARE_GL) for (const [k, v] of [['use-gl', 'angle'], ['use-angle', 'swiftshader'], ['enable-unsafe-swiftshader', ''], ['ignore-gpu-blocklist', '']]) app.commandLine.appendSwitch(k, v || undefined); // a machine with no GPU (CI on Linux)
+}
 if (steamEarly(app.isPackaged)) app.exit(0); // a release build started outside Steam is started again through it (round 47: steam.js)
+if (process.platform === 'win32') app.setAppUserModelId('com.digitaldro.seventysteps'); // the taskbar groups and names the window as the game's own
+if (!SMOKE && !DEV && !app.requestSingleInstanceLock()) app.exit(0); // a second start (Steam launching again) only brings the first forward
+app.on('second-instance', () => {
+  const win = BrowserWindow.getAllWindows()[0];
+  if (!win) return;
+  if (win.isMinimized()) win.restore();
+  win.focus();
+});
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
 /** Writes `text` to `file` whole or not at all (a crash mid-write leaves the old one). */
@@ -51,6 +68,11 @@ function keepLog(text) {
 }
 process.on('uncaughtException', (e) => {
   keepLog(`Seventy Steps shell fault (uncaught): ${e?.stack ?? e}\nelectron ${process.versions.electron} · ${process.platform} ${process.arch}`);
+  if (SMOKE) { // a check has no one to click the box away: it says what broke, and ends
+    console.error(`SMOKE FAIL: uncaught in the shell: ${e?.stack ?? e}`);
+    app.exit(1);
+    return;
+  }
   if (!quitting) dialog.showErrorBox('The dream broke', `The game's window stopped.\n\n${e?.message ?? e}\n\nA report was kept in:\n${logsDir()}`);
 });
 ipcMain.handle('desktop:write-log', (_e, report) => keepLog(String(report).slice(0, 60_000)));
@@ -91,6 +113,7 @@ function open() {
       contextIsolation: true,
       sandbox: true,
       nodeIntegration: false,
+      devTools: DEV || process.argv.includes('--devtools'), // a release has none to open (Ctrl+Shift+I, the View menu); `--devtools` is for a tester who is asked for one
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
       additionalArguments: process.env.SteamDeck === '1' ? ['--steam-deck'] : [], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text
     },
@@ -125,6 +148,7 @@ function open() {
   });
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   void win.loadURL(URL_TO_OPEN);
+  return win;
 }
 
 ipcMain.handle('desktop:quit', () => app.quit());
@@ -157,6 +181,7 @@ ipcMain.handle('desktop:is-fullscreen', (e) => !!BrowserWindow.fromWebContents(e
 
 // The controllers, as the SDL worker reports them: kept here, and sent to every window as they change.
 let pads = [];
+let padState = 'starting'; // the SDL worker: 'ready', or why it is not
 let padStarts = 0;
 let quitting = false;
 let reloads = 0;
@@ -164,7 +189,11 @@ app.on('before-quit', () => void (quitting = true));
 function startPads() {
   const worker = utilityProcess.fork(fileURLToPath(new URL('./padWorker.js', import.meta.url)), [], { serviceName: 'Seventy Steps controllers', stdio: 'inherit' });
   worker.on('message', (m) => {
-    if (m?.type === 'unavailable') console.warn(`controllers: SDL is not available (${m.reason}); the browser's own list is used`);
+    if (m?.type === 'ready') padState = 'ready';
+    if (m?.type === 'unavailable') {
+      padState = `unavailable: ${m.reason}`;
+      console.warn(`controllers: SDL is not available (${m.reason}); the browser's own list is used`);
+    }
     if (m?.type !== 'pads') return;
     pads = m.pads;
     for (const w of BrowserWindow.getAllWindows()) w.webContents.send('desktop:pads', pads);
@@ -177,10 +206,40 @@ function startPads() {
 }
 ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) after the pads were found asks for them once
 
+/** What `--smoke-test` checks: the page reached its title and found the shell's bridge, and (as SMOKE_REQUIRE names them) the Steam binding loaded and the controllers' worker started. Prints one line and quits with 0 or 1. */
+function smoke(win) {
+  const needs = (process.env.SMOKE_REQUIRE ?? '').split(',').map((s) => s.trim()).filter(Boolean);
+  const began = Date.now();
+  const timer = setInterval(async () => {
+    let page = null;
+    try {
+      page = await win.webContents.executeJavaScript("({ title: /new game/i.test(document.body.innerText), bridge: typeof window.desktop?.quit === 'function' })");
+    } catch {
+      // the page is still loading
+    }
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
+    const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
+    const late = report.seconds > 150;
+    if (!settled && !late) return;
+    clearInterval(timer);
+    const missing = [!report.title && 'the title never appeared', !report.bridge && "the shell's bridge is missing", needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load', needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`].filter(Boolean);
+    console.log(`${missing.length ? 'SMOKE FAIL' : 'SMOKE OK'} ${JSON.stringify(report)}${missing.length ? ` :: ${missing.join('; ')}` : ''}`);
+    app.exit(missing.length ? 1 : 0);
+  }, 1000);
+}
+
+/** The menu bar: none in a release on Windows and Linux (it held developer tools); on macOS the app menu a Mac needs (About, Hide, Quit) and full screen. */
+function setMenu() {
+  if (DEV) return;
+  Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { label: 'View', submenu: [{ role: 'togglefullscreen' }] }, { role: 'windowMenu' }]) : null);
+}
+
 void app.whenReady().then(() => {
+  setMenu();
   startSteam();
   startPads();
   protocol.handle('app', serveFrom(fileURLToPath(new URL('../dist/', import.meta.url))));
-  open();
+  const win = open();
+  if (SMOKE) smoke(win);
 });
 app.on('window-all-closed', () => app.quit());

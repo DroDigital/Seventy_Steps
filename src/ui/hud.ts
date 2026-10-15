@@ -61,7 +61,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
   const minimap = createMinimap(g, root, painter);
   const hints = createHints(g, root);
-  const vitals = el('position:absolute;left:18px;bottom:14px;width:196px', '', root);
+  const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', root); // (the vitals at the upper left, the hints at the lower: round 52)
   const hp = gauge(vitals, BLOOD, 7, true);
   const chip = el(`position:absolute;left:0;top:0;height:100%;width:100%;background:${BONE}aa`, '', hp.parentElement!);
   hp.parentElement!.insertBefore(chip, hp);
@@ -70,8 +70,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let chipHold = 0;
   const stamina = gauge(vitals, LEAF, 3);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
-  const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#bdb1cc'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
-  const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#c2ae78'); // the cylinder's six and the spare rounds (round 22)
+  const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#8a8678'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
+  const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#8a8678'); // the cylinder's six and the spare rounds (round 22)
   const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', root);
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);

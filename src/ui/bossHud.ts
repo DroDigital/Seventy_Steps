@@ -21,22 +21,22 @@ export interface BossHud {
 }
 
 export function createBossHud(g: Game, root: HTMLElement, say: (text: string) => void, show: (title: string) => void): BossHud {
-  const box = el('position:absolute;left:50%;bottom:100px;width:52%;margin-left:-26%;display:flex;flex-direction:column-reverse', '', root); // bottom centre, as a boss's bar should be
+  const box = el('position:absolute;left:50%;bottom:38px;width:38%;margin-left:-19%;opacity:.88;display:flex;flex-direction:column-reverse', '', root); // bottom centre, low, thin and quiet (round 52: it cluttered the picture)
   const slots = Array.from({ length: BARS }, () => {
-    const slot = el('margin-bottom:6px', '', box);
+    const slot = el('margin-bottom:4px', '', box);
     const head = el('display:flex;justify-content:space-between;align-items:baseline', '', slot);
-    const name = el('letter-spacing:3px;font-size:14px', '', head);
-    const sum = el('font-size:13px;letter-spacing:1px', '', head); // the run of blows, as soulslikes show it (round 14)
-    const fill = bar(slot, BLOOD, 14);
+    const name = el('letter-spacing:3px;font-size:11px;opacity:.85', '', head);
+    const sum = el('font-size:11px;letter-spacing:1px', '', head); // the run of blows, as soulslikes show it (round 14)
+    const fill = bar(slot, BLOOD, 7);
     const chip = el(`position:absolute;left:0;top:0;height:100%;background:${BONE}99`, '', fill.parentElement!);
     fill.parentElement!.insertBefore(chip, fill);
     fill.style.position = 'relative';
-    const status = el('letter-spacing:2px;font-size:11px;opacity:.8', '', slot);
+    const status = el('letter-spacing:2px;font-size:10px;opacity:.7', '', slot);
     return { slot, name, sum, chip, fill, status, ticks: [] as HTMLDivElement[] };
   });
-  const gaze = el('position:absolute;left:16px;bottom:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'GAZE', root);
+  const gaze = el('position:absolute;left:16px;top:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'GAZE', root);
   const gazeFill = bar(gaze, '#9468b6', 8);
-  const stone = el('position:absolute;left:16px;bottom:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'PETRIFICATION', root);
+  const stone = el('position:absolute;left:16px;top:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'PETRIFICATION', root);
   const stoneFill = bar(stone, '#9ca29a', 8);
   const flash = el('position:absolute;inset:0;background:#e8e0cc;opacity:0', '', root);
   const name = el(`position:absolute;left:0;right:0;top:36%;text-align:center;font-size:72px;letter-spacing:28px;color:${BONE};opacity:0`, '', root);

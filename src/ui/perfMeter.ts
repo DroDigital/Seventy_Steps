@@ -1,6 +1,6 @@
 /**
  * The frame meter (round 46): F3 (or `?perf`) shows the frame rate, the slowest hundredth of the frames, the worst frame and
- * the draw calls over the last ten seconds or so, in any build, so a player can say how it runs on their computer and a
+ * the draw calls over the last ten seconds or so (and, if given `notes`, what the input hears: round 49), in any build, so a player can say how it runs on their computer and a
  * tester can see where it stutters. `frame()` is called once a picture; `stats` is what the auto-quality and the benchmark read.
  */
 
@@ -15,7 +15,7 @@ export interface Perf {
   toggle(): void;
 }
 
-export function createPerf(on = false): Perf {
+export function createPerf(on = false, notes?: () => string): Perf {
   const stats = createFrameStats(600);
   const box = document.createElement('pre');
   box.setAttribute('aria-hidden', 'true');
@@ -44,7 +44,7 @@ export function createPerf(on = false): Perf {
       if (!shown || now - at < 500) return;
       at = now;
       const s = stats.summary();
-      box.textContent = `${s.fps.toFixed(0)} fps · 1% low ${s.low.toFixed(0)}\nframe ${(1000 / Math.max(1, s.fps)).toFixed(1)} ms · worst ${s.worst.toFixed(0)} ms\n${draws} draws · ${(triangles / 1000).toFixed(0)}k tris`;
+      box.textContent = `${s.fps.toFixed(0)} fps · 1% low ${s.low.toFixed(0)}\nframe ${(1000 / Math.max(1, s.fps)).toFixed(1)} ms · worst ${s.worst.toFixed(0)} ms\n${draws} draws · ${(triangles / 1000).toFixed(0)}k tris${notes ? `\n${notes()}` : ''}`;
     },
   };
 }

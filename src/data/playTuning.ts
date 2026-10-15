@@ -62,12 +62,15 @@ export const MUSIC = {
   ahead: 0.25, // notes are scheduled this far ahead on the audio clock
 };
 
-/** The settings menu (Phase 6): [min, max, step, default]. */
+/** Extra resolution scales offered only after opening the optional higher resolutions and their immersion warning. */
+export const HIGH_RESOLUTIONS = [1.75, 2] as const;
+
+/** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {
   fxCap: [0, 1, 0.05, 1], // caps every sanity effect (accessibility); the default is FX.capDefault's
   sensitivity: [0.25, 3, 0.05, 1], // look speed: mouse, stick and arrows
   invertY: [0, 1, 1, 0], // 1: up looks down (round 12)
-  resolution: [0.5, 2, 0.25, 2], // internal resolution, × RENDER's 400 × 225 (the most, 800 × 450, by default since playtest round 13)
+  resolution: [0.5, 1.5, 0.25, 1.5], // internal resolution, × RENDER's 400 × 225 (600 × 338 by default and at the standard maximum)
   brightness: [0.7, 1.6, 0.05, 1], // lifts the dark (a gamma, after the grade; round 12)
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
@@ -134,7 +137,7 @@ export const OIL = { carry: 5 };
  */
 export const GUN = {
   chamber: 6, // rounds the cylinder holds
-  carry: 24, // spare rounds carried
+  carry: 12, // two spare cylinders carried, beyond the six already loaded
   start: 6, // spare rounds a new investigator carries (and the cylinder starts full)
   box: 6, // rounds in a box bought
   find: 4, // rounds in a box lying about the open world...
@@ -200,8 +203,8 @@ export const LIGHTS = {
   kinds: {
     lamp: { color: [1, 0.8, 0.52], strength: 2.6, range: 11, halo: 1.4, haloGain: 0.8, flicker: 0.03 }, // a pool about six metres across under a lamp three and a half up, and the walls about it
     window: { color: [1, 0.76, 0.48], strength: 1.1, range: 6.5, halo: 0.9, haloGain: 0.38, flicker: 0 }, // a warm patch on the wall and ground before it
-    fire: { color: [1, 0.66, 0.36], strength: 2.6, range: 12, halo: 1.8, haloGain: 0.7, flicker: 0.2 },
-    torch: { color: [1, 0.72, 0.42], strength: 1.9, range: 8.5, halo: 1.2, haloGain: 0.85, flicker: 0.14 }, // round 30: a torch glows as a flame should
+    fire: { color: [1, 0.66, 0.36], strength: 1.8, range: 9, halo: 1.1, haloGain: 0.45, flicker: 0.2 },
+    torch: { color: [1, 0.72, 0.42], strength: 1.1, range: 6.5, halo: 0.65, haloGain: 0.4, flicker: 0.1 }, // local warm pools, with dark stone between sconces
     // A lit Elder Sign: a pale violet light, too grey to count as an anomaly hue, so madness's colour
     // isolation never floods its ground (playtest round 12); its halo and carving keep Cosmic Purple.
     sigil: { color: [0.8, 0.72, 1], strength: 1.1, range: 8, halo: 1.3, haloGain: 0.3, haloColor: [0.62, 0.26, 1], flicker: 0 },

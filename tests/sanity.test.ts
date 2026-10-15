@@ -230,11 +230,21 @@ describe('what sanity does, and what restores it', () => {
     steps(g, PLAYER_MOVES.drink.item - 1);
     expect(g.mind.sanity).toBe(30);
     steps(g, 1);
-    expect(g.mind.sanity).toBe(30 + LAUDANUM.sanity);
+    expect(g.mind.sanity).toBe(80); // a dose restores half the full meter, not half the missing sanity
     steps(g, PLAYER_MOVES.drink.frames);
     g.player.laudanum = 0;
     stepGame(g, press('item'));
     expect(a.move).toBeNull();
+  });
+
+  it.each([[0, 50], [75, 100]] as const)('a dose at %d sanity restores 50 points, capped at a full meter', (before, after) => {
+    const { g } = scriptedGame();
+    g.mind.fought = Infinity;
+    setSanity(g, before);
+    stepGame(g, press('item'));
+    steps(g, PLAYER_MOVES.drink.item);
+    expect(g.mind.sanity).toBe(after);
+    expect(g.player.laudanum).toBe(LAUDANUM.doses - 1);
   });
 
   it('respawning at the Elder Sign restores sanity and Laudanum', () => {

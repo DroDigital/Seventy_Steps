@@ -22,9 +22,13 @@ export function absorb(s: Stamina, amount: number): boolean {
   return s.value <= 0;
 }
 
-/** One sim step: sprint drains, otherwise regen resumes once the delay has run out (slower while guarding, and at `pace` of its rate: less than 1 for a mind Unmoored, round 23). */
+/** One sim step: sprint drains (and regen waits `sprintDelay` after it, not an action's `regenDelay`), otherwise regen resumes once the delay has run out (slower while guarding, and at `pace` of its rate: less than 1 for a mind Unmoored, round 23). */
 export function tickStamina(s: Stamina, mode: StaminaMode, dt: number, pace = 1): void {
-  if (mode === 'sprint') return spend(s, STAMINA.sprintDrain * dt);
+  if (mode === 'sprint') {
+    s.value = Math.max(0, s.value - STAMINA.sprintDrain * dt);
+    s.delay = Math.max(s.delay, STAMINA.sprintDelay); // a short beat after the run ends; the longer one an action has just begun is not cut short by it
+    return;
+  }
   if (s.delay > 0) {
     s.delay--;
     return;

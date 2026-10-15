@@ -78,8 +78,8 @@ export function talk(g: Game, id: string): void {
   if (topic.starts) startQuest(g, topic.starts);
   g.overworld?.met.add(id);
   g.player.listening = npcEntity(g, id) ?? null; // turned to them, the camera framing them (round 12)
-  const rumor = rumorFor(g, id); // what they have heard of the latest horror to fall (round 26)
-  g.events.emit('Talked', { npc: id, name: n.name, title: n.title, lines: rumor ? [...topic.lines, rumor] : topic.lines, ...(n.shop && { shop: n.shop }) });
+  const rumor = rumorFor(g, id); // unrecorded world news is a written note after the voiced conversation
+  g.events.emit('Talked', { npc: id, name: n.name, title: n.title, lines: topic.lines, ...(rumor && { rumor }), ...(n.shop && { shop: n.shop }) });
 }
 
 /** Each step: the one talked with turns to the investigator, the others back toward where they rise (round 12). */

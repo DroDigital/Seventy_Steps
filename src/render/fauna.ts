@@ -40,7 +40,7 @@ export function createFauna(scene: THREE.Scene, g: Game, cry: (voice: VoiceId, a
   const tex = new THREE.DataTexture(atlas.data, atlas.width, atlas.height);
   [tex.magFilter, tex.minFilter, tex.generateMipmaps, tex.needsUpdate] = [THREE.NearestFilter, THREE.NearestFilter, false, true];
   const fog = { value: 1 }; // their own share of the world's fog
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uFogAmount: fog, uAtlas: { value: tex } }, vertexShader: SPRITE_VERT, fragmentShader: SPRITE_FRAG });
+  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uFogAmount: fog, uAtlas: { value: tex }, uReviewed: { value: 0 } }, vertexShader: SPRITE_VERT, fragmentShader: SPRITE_FRAG });
   const geo = new THREE.PlaneGeometry(1, 1).translate(0, 0.5, 0);
   const attr = (n: number): THREE.InstancedBufferAttribute => new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * n), n).setUsage(THREE.DynamicDrawUsage);
   const [cells, info] = [attr(4), attr(4)];

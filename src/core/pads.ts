@@ -42,9 +42,15 @@ interface Seen {
   rest: number[];
   stuck: Set<number>; // buttons down since first seen, ignored until let go
   armedAt: number; // timestamp of the last real use (0: not yet used)
+  raw: number[]; // the axes as last read, and the buttons then down: what a recalibration takes as the pad's rest
+  down: number[];
+  still: { at: number; v: number }[]; // for each axis, where it has lain and since when (a stick that has drifted lies quite still, a thumb does not)
 }
 const seen = new Map<string, Seen>();
 const PUSH = 0.5; // how far off its rest an axis must be to count as used
+const DRIFT_MAX = 0.4; // a stick lying still this far or less off its rest has drifted: that is its rest now (further off, it is held)
+const DRIFT_MS = 4000; // ...once it has lain so long
+const STEADY = 0.015; // and has not moved more than this
 let report = '';
 let listed = -1; // how many devices the browser lists (-1: it has not been asked)
 let blocked = ''; // why it could not be asked
@@ -74,17 +80,24 @@ export const padReport = (): string => report;
 /** What the browser itself says of pads, for the controls page (round 33: the desktop shell heard none, and nothing said why). */
 export const padFacts = (): string => [blocked ? `the browser refused: ${blocked}` : listed < 0 ? 'not asked yet' : `${listed} device${listed === 1 ? '' : 's'} listed by the browser`, `${shellPads} by the shell's SDL`, ...events.slice(-3)].join(' · ');
 
-function read(p: PadLike, from: Source): { reading: PadReading; used: number } {
+const downOf = (p: PadLike): number[] => p.buttons.flatMap((b, i) => (b.pressed || b.value > 0.5 ? [i] : []));
+
+function read(p: PadLike, from: Source, now = performance.now()): { reading: PadReading; used: number } {
   const key = `${from}:${p.index}:${p.id}`;
   let s = seen.get(key);
   if (!s) {
-    s = { rest: [...p.axes], stuck: new Set(p.buttons.flatMap((b, i) => (b.pressed || b.value > 0.5 ? [i] : []))), armedAt: 0 };
+    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })) };
     seen.set(key, s);
   }
+  [s.raw, s.down] = [[...p.axes], downOf(p)];
   const axes = p.axes.map((v, i) => {
     if (p.mapping === 'standard' && i < 4 && Math.abs(v) < 0.1) s.rest[i] = 0; // a stick seen at centre rests at centre
+    const lay = (s.still[i] ??= { at: now, v });
+    if (Math.abs(v - lay.v) > STEADY) [lay.at, lay.v] = [now, v];
+    else if (i < 4 && now - lay.at > DRIFT_MS && Math.abs(v - (s.rest[i] ?? 0)) < DRIFT_MAX) s.rest[i] = v; // round 49: a stick that has drifted off centre and lies there is at rest there (it walked the investigator on alone)
     const r = s.rest[i] ?? 0;
-    return Math.abs(r) > 0.3 ? (Math.abs(v - r) > 0.2 ? v - r : 0) : v; // an axis that lay off centre is read from where it lay
+    const d = v - r;
+    return Math.abs(r) > 0.3 ? (Math.abs(d) > 0.2 ? d : 0) : Math.abs(r) > 0.02 ? d : v; // an axis that lay off centre is read from where it lay
   });
   const buttons = p.buttons.map((b, i) => {
     const down = b.pressed || b.value > 0.5;
@@ -146,6 +159,16 @@ export function activePad(): PadReading | null {
   const heard = Math.max(web.heard, native.heard); // (the same pad may be in both lists)
   report = best ? `${best.reading.id}${best.reading.mapping === 'standard' ? '' : ' (not a standard layout: some buttons may differ)'}` : heard ? `${heard} controller${heard > 1 ? 's' : ''} found: press a button on the one to use` : '';
   return best ? { ...best.reading, buttons: faceSwapped(best.reading.buttons) as PadReading['buttons'] } : null; // (A and B exchanged when the player's switch is on: core/padMap.ts)
+}
+
+/** Takes every pad's sticks, where they lie now, for where they rest (one off by up to `DRIFT_MAX`), and ignores the buttons held now until they are let go: what pausing does, so that a pad that has drifted, or has a button that stuck, is set right by it. */
+export function recalibratePads(): void {
+  for (const s of seen.values()) {
+    s.raw.forEach((v, i) => {
+      if (i < 4 && Math.abs(v - (s.rest[i] ?? 0)) < DRIFT_MAX) s.rest[i] = v;
+    });
+    s.stuck = new Set(s.down);
+  }
 }
 
 let resync = false;

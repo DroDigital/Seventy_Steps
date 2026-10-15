@@ -7,7 +7,7 @@
  */
 
 import * as THREE from 'three';
-import { FX, RENDER } from '../data/tuning';
+import { FX, RENDER, SETTINGS } from '../data/tuning';
 import { createLanternShadow, type LanternShadow } from './lanternShadow';
 import { createLampShadows, type LampShadows } from './lampShadows';
 import { createReflection, type Reflection } from './reflection';
@@ -110,7 +110,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
       renderer.readRenderTargetPixels(target, 0, 0, width, height, data);
       return { data, width, height };
     },
-    resize(lowRes, scale = 1) {
+    resize(lowRes, scale = SETTINGS.resolution[3]) {
       const aspect = RENDER.width / RENDER.height;
       const cssW = Math.min(innerWidth, innerHeight * aspect);
       const cssH = cssW / aspect;

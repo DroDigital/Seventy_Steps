@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { createFrameStats } from '../src/core/frameStats';
 import { LADDER, nextRung, QUALITY, rungOf } from '../src/render/autoQuality';
+import { AUTO_KEY, createAutoQuality, firstLaunch } from '../src/ui/autoQualityRun';
+import { defaultSettings, SETTINGS_KEY } from '../src/ui/settings';
+import type { Shell } from '../src/ui/shell';
 
 const feed = (ms: number[]) => {
   const s = createFrameStats(600);
@@ -36,8 +39,8 @@ describe('frame statistics', () => {
 });
 
 describe('the quality ladder', () => {
-  it('starts at the sharpest and every rung is no sharper than the one above', () => {
-    expect(LADDER[0]).toEqual({ resolution: 2, fog: 1, shadows: 1 });
+  it('starts at the default picture and every rung is no sharper than the one above', () => {
+    expect(LADDER[0]).toEqual({ resolution: 1.5, fog: 1, shadows: 1 });
     for (let i = 1; i < LADDER.length; i++) {
       expect(LADDER[i].resolution).toBeLessThanOrEqual(LADDER[i - 1].resolution);
       expect(LADDER[i].fog).toBeLessThanOrEqual(LADDER[i - 1].fog);
@@ -54,6 +57,54 @@ describe('the quality ladder', () => {
     expect(nextRung(0, at(20))).toBe(2);
     expect(nextRung(0, at(10, 2))).toBe(0);
     expect(nextRung(LADDER.length - 1, at(5))).toBe(LADDER.length - 1);
+  });
+});
+
+describe('first-launch picture', () => {
+  function launch() {
+    const kept = new Map<string, string>();
+    const settings = defaultSettings();
+    const store = {
+      getItem: (key: string) => kept.get(key) ?? null,
+      setItem: (key: string, value: string) => void kept.set(key, value),
+      removeItem: (key: string) => void kept.delete(key),
+    };
+    const shell = { settings, store, change: (id, value) => { settings[id] = value; } } as Shell;
+    const stats = createFrameStats();
+    const notices: string[] = [];
+    const quality = createAutoQuality(shell, stats, (text) => notices.push(text), firstLaunch(store));
+    const measuredAt = 1000 + (QUALITY.warm + QUALITY.measure) * 1000;
+    quality.tick(1000);
+    quality.tick(1000 + QUALITY.warm * 1000);
+    const frames = (fps: number) => { for (let i = 0; i < 300; i++) stats.push(1000 / fps); };
+    return { settings, store, quality, measuredAt, frames, notices };
+  }
+
+  it('keeps 600 × 338 when the default picture runs smoothly', () => {
+    const run = launch();
+    run.frames(60);
+    run.quality.tick(run.measuredAt);
+    expect(run.settings).toEqual(defaultSettings());
+    expect(run.store.getItem(AUTO_KEY)).toBe('1');
+    expect(run.notices).toEqual([]);
+  });
+
+  it('measures the new default and removes shadows before reducing its resolution', () => {
+    const run = launch();
+    run.frames(40);
+    run.quality.tick(run.measuredAt);
+    expect(run.settings).toEqual({ ...defaultSettings(), shadows: 0 });
+    run.frames(60);
+    run.quality.tick(run.measuredAt + (1.5 + QUALITY.measure) * 1000);
+    expect(run.settings.resolution).toBe(1.5);
+    expect(run.store.getItem(AUTO_KEY)).toBe('1');
+    expect(run.notices).toHaveLength(1);
+  });
+
+  it('leaves a saved resolution choice out of first-launch tuning', () => {
+    const run = launch();
+    run.store.setItem(SETTINGS_KEY, JSON.stringify({ ...defaultSettings(), resolution: 2, v: 15 }));
+    expect(firstLaunch(run.store)).toBe(false);
   });
 });
 

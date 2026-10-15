@@ -114,6 +114,7 @@ export const PLAYER = {
 export const STAMINA = {
   regen: 24, // per second at the start; each Endurance level adds LEVELS.endurance.regen (round 22: it was 40 for all, and a bar refilled so soon that rolling on and on cost nothing)
   regenDelay: 48, // frames of no regen after any spending: longer than a roll, so a chain of rolls draws on the bar alone
+  sprintDelay: 18, // frames of no regen once a sprint ends (round 48: the run's own drain is its cost, and the action's 48 left one who ran to the foe with an empty bar waiting nearly a second)
   guardRegen: 0.35, // regen multiplier while guarding
   sprintDrain: 18, // per second
 };
@@ -172,7 +173,7 @@ export const SANITY = {
 /** The investigator's sanity tonic, refilled at the Elder Sign. */
 export const LAUDANUM = {
   doses: 3,
-  sanity: 30, // restored per dose
+  sanity: 50, // half the full sanity meter restored per dose
   steady: 10, // seconds after a swallow in which auras, roars, gazes and the void take no sanity (playtest round 7)
 };
 
@@ -243,6 +244,9 @@ export const FEEDBACK = {
   strideEase: 14, // per second: how quickly a figure's stride takes up its ground speed (render/gait.ts)
   echoGlowHeight: 0.6, // light above an Echo drop
   revealSeconds: 0.5, // hidden-layer geometry flickers this long as it comes and goes
+  bowSeconds: 0.3, // a colossus's stoop: its first pose (the bow) shows this long, then its last (the hold) until the stoop ends
+  midSeconds: 0.1, // ...with the in-between pose before the bow, where it has one
+  riseSeconds: 0.18, // ...and again, as it stands up, before its idle
 };
 
 /** The open world (spec §3D). Distances in metres. */

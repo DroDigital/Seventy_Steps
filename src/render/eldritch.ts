@@ -22,6 +22,12 @@ export const ECHOES: readonly { lag: number; ghost: number; drift: number }[] = 
   { lag: 0.8, ghost: 0.78, drift: 0.12 },
 ];
 
+/** Where echo `i` of a body `h` metres tall stands about the body at `time` (seconds): it drifts around it. */
+export const echoDrift = (i: number, time: number, h: number): { x: number; z: number } => ({
+  x: Math.sin(time * 0.7 + i * 2.1) * ECHOES[i].drift * h,
+  z: Math.cos(time * 0.53 + i) * ECHOES[i].drift * h,
+});
+
 /** Whether a body this wrong lags echoes and wears a halo. */
 export const beyond = (wrongness: number): boolean => wrongness >= 0.9;
 

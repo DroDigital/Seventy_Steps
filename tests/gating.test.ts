@@ -4,6 +4,7 @@ import { gatePlace, passGate, teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
+import { QUESTS } from '../src/data/quests';
 import { mainLead } from '../src/systems/lead';
 import { startQuest, stageOf } from '../src/systems/quests';
 import { bossAwake, SEAL_REGIONS, sealsBroken } from '../src/systems/sealCount';
@@ -86,7 +87,7 @@ describe('playtest round 12: the way on is earned', () => {
 
   it('the journal counts the seals and points to the nearest horror still holding one', () => {
     const g = createWorldGame();
-    for (const q of ['sleepers', 'witch_house', 'descent']) g.overworld!.quests.set(q, 1);
+    for (const q of ['sleepers', 'witch_house', 'descent']) g.overworld!.quests.set(q, QUESTS[q].stages.length);
     startQuest(g, 'kadath');
     breakSeals(g, 1);
     const lead = mainLead(g)!;

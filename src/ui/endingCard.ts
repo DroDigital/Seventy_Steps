@@ -30,6 +30,9 @@ import { button, createScreen, heading, type Page } from './menuKit';
 
 const BUTTON = `display:inline-block;width:auto;text-align:center;margin:28px 10px 0;padding:6px 16px;font:14px ${SERIF};letter-spacing:2px;color:${BONE};background:#141416;border:1px solid ${BONE}55;cursor:pointer`;
 
+/** One of the card's boxed choices: the lozenge that marks the one chosen stands out in the padding (it stood on the first letter). */
+const boxed = (b: HTMLButtonElement): HTMLButtonElement => ((b.style.cssText = BUTTON), (b.dataset.chip = ''), b);
+
 /** Set before a reload: the page opens straight into a new game with its opening (main.ts). */
 export const NEW_GAME_FLAG = 'lovecraft-souls-like/new-game';
 
@@ -96,7 +99,7 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
     music ??= theme?.();
     const records = noteEnding(store, id as EndingId);
     const told = fates(g, id as EndingId);
-    const goOn = (p: HTMLElement, next: Page): void => void (button(el('', '', p), 'Go on', () => screen.show(next)).style.cssText = BUTTON);
+    const goOn = (p: HTMLElement, next: Page): void => void (boxed(button(el('', '', p), 'Go on', () => screen.show(next))));
     const card: Page = {
       build(page) {
         const title = el('font-size:26px;letter-spacing:10px;margin-bottom:26px', e.title, page);
@@ -122,9 +125,9 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
         const table = el('display:grid;grid-template-columns:1fr auto;gap:0 24px;max-width:340px;margin:0 auto;text-align:left;font-size:14px', '', page);
         for (const [k, v] of numbers(g, records)) (el('opacity:.6', k, table), el('', v, table));
         const buttons = el('', '', page);
-        button(buttons, 'Keep the card', () => savePng(runCard(e.title, numbers(g, records)), `dream-${g.player.cycle + 1}-${e.title.toLowerCase().replace(/\W+/g, '-')}`)).style.cssText = BUTTON; // round 26: a plate to show
-        button(buttons, 'Walk on', walkOn).style.cssText = BUTTON;
-        button(buttons, 'Begin anew', () => screen.show(confirm)).style.cssText = BUTTON;
+        boxed(button(buttons, 'Keep the card', () => savePng(runCard(e.title, numbers(g, records)), `dream-${g.player.cycle + 1}-${e.title.toLowerCase().replace(/\W+/g, '-')}`))); // round 26: a plate to show
+        boxed(button(buttons, 'Walk on', walkOn));
+        boxed(button(buttons, 'Begin anew', () => screen.show(confirm)));
       },
     };
     const confirm: Page = {
@@ -134,9 +137,9 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
         el('opacity:.6;margin-bottom:14px', 'This dream is forgotten and a new one begins. The endings you have reached are remembered.', page);
         el('opacity:.5;font-size:13px;margin-bottom:10px', "You may carry your strength into it: your levels, arms and their stones, the mind's upgrades, vials and Echoes. Its horrors will be hardier for it.", page);
         const buttons = el('', '', page);
-        button(buttons, 'No, go back', () => screen.show(end)).style.cssText = BUTTON;
-        button(buttons, 'Begin anew', beginAnew).style.cssText = BUTTON;
-        button(buttons, `Begin journey ${g.player.cycle + 2}, carrying your strength`, () => (storeCarry(store, carryOf(g)), beginAnew())).style.cssText = BUTTON;
+        boxed(button(buttons, 'No, go back', () => screen.show(end)));
+        boxed(button(buttons, 'Begin anew', beginAnew));
+        boxed(button(buttons, `Begin journey ${g.player.cycle + 2}, carrying your strength`, () => (storeCarry(store, carryOf(g)), beginAnew())));
       },
     };
     screen.show(card);

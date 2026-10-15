@@ -1,12 +1,27 @@
 # The voices
 
 Every line the people of the realms and the horrors that speak say is spoken by a recording in
-`public/voice`: 177 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 24 minutes, 25.7 MB. 123 are
+`public/voice`: 191 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 26 minutes, 26.8 MB. 133 are
 the lines of the fifteen people met at the Elder Signs (`npc:<id>`, written in `data/npcs.ts` and
-`npcsFar.ts`); 54 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
-this: no horror spoke before): a line as it arrives and a last as it falls. Two have no scene, the Dunwich
-Horror (unseen), who says only a last, shown as a notice. (Brown Jenkin had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
+`npcsFar.ts`); 53 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
+this: no horror spoke before): a line as it arrives and a last as it falls. The Dunwich Horror (unseen)
+says only a last, shown as a notice. The Voice in the Tomb has no phase script: its arrival line is a
+spoken notice on first sight, and its last words are a spoken notice when vanquished. (Brown Jenkin
+had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
 A line with no recording is shown and not heard, as every line was before.
+
+**Speech and narrative captions are separate.** The 27 speakers in `BOSS_SAY` have 53 authored lines,
+all recorded; `voiceCoverage.test.ts` requires a recording for each. Other horrors have no authored
+speech. In particular, the Outsider's arrival captions (“Something is climbing up out of the dark.”
+and “It has been alone a very long time.”) are narrative text: it has no cast voice or recording.
+The other silent bosses' scene captions and epithets are also read, not spoken. Adding a speaking
+role requires authored lines, a cast entry and recordings; a narrative caption is not a missing take.
+
+**World rumours are written notes.** The 18 paragraphs in `data/rumors.ts` have no recordings in
+any NPC's voice. They appear in a separate “A rumour” reading card after a completed conversation,
+outside its numbered, voiced lines. Aborting a conversation leaves its note unread for next time;
+showing the note marks it read, and dismissing it opens a merchant's wares where applicable.
+All 133 authored NPC topic lines have recordings, required by `voiceCoverage.test.ts`.
 
 ## Where it is
 
@@ -16,7 +31,7 @@ A line with no recording is shown and not heard, as every line was before.
 | `data/speechNpcs.ts`, `speechFar.ts`, `speechBosses.ts` | each line as it is **performed**, with its [audio tags] |
 | `data/speechLines.ts` | every line said aloud, gathered (`speechLines()`); `spokenFor`: how long a caption is held |
 | `data/speechCast.ts` | who speaks in which voice, and how the game plays it |
-| `render/audio/speech.ts` | the player: `public/voice/index.json` once, a recording fetched and decoded when its line is first said (a talk's next five are fetched ahead), ten decoded ones kept, one voice at a time (the next cuts off the last in 0.14 s), the cast's playback rate (lowers and slows a great voice) and echo |
+| `render/audio/speech.ts` | the player: `public/voice/index.json` once, a recording fetched and decoded when its line is first said (a talk's next five are fetched ahead, a horror's two on first sight or engagement), ten decoded ones kept, one voice at a time (the next cuts off the last in 0.14 s), the cast's playback rate (lowers and slows a great voice) and echo |
 | `render/audio/engine.ts`, `gameAudio.ts` | the speech bus (before the limiter, after the sanity shaper and the muffle, so a failing mind does not smear the voices; `AUDIO.speech`, a make-up gain of 1.5); the `Said`, `Silenced` and `Talked` events |
 | `render/cinemaDirector.ts`, `cinema.ts` | a horror's scene: `speaking()` lays a caption beat and a voice beat over its arrival and its fall and holds the last shot until it is said; skipping a scene silences it |
 | `ui/dialogue.ts`, `ui/menuPages.ts` | a person's line is said as it is shown; Settings › Audio › **Voices** |
@@ -60,7 +75,7 @@ the game's, applied at playback, so a recast does not need them again.
 | speaker | voice (ElevenLabs) | voice id | played with |
 |---|---|---|---|
 | `narrator:intro` | The Archivist (Intro Narrator) (designed, round 46) | `uqOnApI3a2RVj8rEwlAi` | room |
-| `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42) |
+| `npc:peaslee` | Wingate Peaslee (designed) | `tFaKZ4OQAewSluuxn7RB` | clips lowered to ~95 Hz, 12% brisker (round 42; `tools/voice_process.py` does it again) |
 | `npc:gilman` | Will - Relaxed Optimist (premade) | `bIHbv24MWmeRgasZH58o` | — |
 | `npc:morgan` | Josef Hammer - Deep & Expressive (library; the author's pick after auditioning it against Julian and Jay Anderson) | `AFtA63zAzQAlNDuzSRKy` | clips as recorded, ~105 Hz (round 45). Its licence was not readable through the tools: confirm it, and its notice period, on its library page |
 | `npc:kuranes` | Kuranes (designed) | `bY8puK6S3RGlr0wikENe` | — |
@@ -111,7 +126,7 @@ the game's, applied at playback, so a recast does not need them again.
    ElevenLabs connector (`creative_generate_speech`, one generation each, the voice id from the table, the
    performed text as the prompt, with the three names above respelt in IPA). A take that sounds wrong is made
    again, not cut.
-3. Save the MP3 (128 kbit/s, 44.1 kHz, as ElevenLabs gives it) as `public/voice/<clip name>.mp3`.
+3. Save the MP3 (128 kbit/s, 44.1 kHz, as ElevenLabs gives it) as `public/voice/<clip name>.mp3`. Peaslee's takes first go through `tools/voice_process.py` (his treatment, below); no other voice is touched.
 4. `VOICES_INDEX=1 npx vitest run tests/voiceCoverage.test.ts` rewrites `index.json`; `npm run check`.
 
 To **recast** a speaker: change its voice in `speechCast.ts`, make its lines again (the names do not change),
@@ -125,6 +140,17 @@ A designed voice is made with `creative_design_voice` (a description and a line 
 refused one description once (Brown Jenkin's, which said a man trapped in a rat; it passed said plainly as a creature).
 
 ## What was checked, and what was not
+
+**14 October 2026 (the Witch House's ten lines of Gilman).** The five stages of the Witch House quest brought ten new lines for
+`npc:gilman` (`data/npcs.ts`, performed in `speechNpcs.ts`); each was made in his cast voice (Will - Relaxed Optimist, premade) in
+`eleven_v4`, one take each, 1,745 credits in all (about one credit a character: `creative_generate_speech` priced the longest at 252
+for 252 characters before it was run), and saved under its clip name; no line now lacks a recording. They are 6.3 to 15.4 seconds
+and 119 to 265 KB. Read back offline (faster-whisper `base.en`): no `[tag]` was spoken as a word, nine match the words to 0.97 or
+better, and one (`npc-gilman-155qy3l`) says "She's in the garret" for "She is in the garret" — kept, the same words contracted.
+
+**14 October 2026 (Peaslee's "Find him.").** The author heard it shouted, and with too little pause after it. The performed line had `[urgently] Find HIM.`; measured on the clip (faster-whisper word times, RMS per word), "Find" and "him" ran at -16 and -14 dB (peaks 0.85 and 0.68) against -19 to -26 dB (peaks 0.2 to 0.4) for the words that follow, the speech-to-text pass wrote "him!", and the silence after it was 0.34 s (round 42's treatment cuts every pause over 0.4 s to 0.22 s, so no tag could have given it more). It was made again twice. First through the connector, `[quietly] Find him. [long pause]`, one take, 271 credits, flow ZbPmAJXxTjkJ0CBzCA0a: the author did not like it. Then by the author in ElevenLabs' Text to Speech, Eleven v4, his cast voice, **speed 100%, stability 50%, similarity 75%** (the take's file name says so); its tags were not kept, so those in `speechNpcs.ts` (`[quietly] Find him. [long pause]`) are the first re-make's and may differ from the take's. That take (15.7 s, the words as written, 1.26 s of silence after "him") was treated as his others are, with `tools/voice_process.py` (below), the pause held at 1.0 s. Measured on the clip as shipped: "Find" and "him" at -18 and -22 dB (peaks 0.79 and 0.38; "Gilman" is -14 dB at 0.84 and "had a room" -12 to -13 dB, so the phrase sits under the line's loudest words), then 1.0 s of silence; 12.8 s long (it was 11.35 s); median pitch 103 Hz (the old take's 98; his lines run from 83 to 131). The speech-to-text pass writes "a tall man" for "the tall man" on the treated clip, as it did on the old one; on the untreated take it read "the". Level and spectrum sit within the spread of his other ten (mean level -27 dB against -23 to -27). The treated clip has not been listened to yet (the author heard the take before it was treated). A tag of urgency together with a leaned-on capital makes this model shout: use one or the other, and check a line that leans on a word by its peak.
+
+**Peaslee's clips are treated** (round 42; `tools/voice_process.py`, made 14 October 2026 because the round left no script): a take is played at 0.91 (his pitch and pace fall), sped by WSOLA (x1.26: about 12% brisker than the take), every silence over 0.4 s cut to 0.22 s (`--hold START:LEN` keeps one), levelled to a peak of 0.87 and written at 56 kbit/s mono. The numbers were fitted, not recovered: run on the unprocessed take of a line still in the history (698a0e2) they give the clip that shipped, to the same length, its pauses within 0.1 s and its spectrum within 0.3 dB a band to 6.4 kHz. **To make a Peaslee line again, run the take through it** before it goes into `public/voice`: a raw take is a different, higher and slower, voice.
 
 The takes were made on 1 October 2026 on a Creator plan; v4 then cost no credits.
 

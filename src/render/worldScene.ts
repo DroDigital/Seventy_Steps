@@ -59,7 +59,7 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
   const slicer = createSlicer(() => performance.now());
   const chunks = new Map<number, THREE.Mesh[]>(); // loaded chunks and the meshes built for them so far
   const all = sites();
-  const sea = createSea(); // round 30: waves, not a texture
+  const sea = createSea(worldLayout().dungeons.flatMap((d) => d.layout.rooms.map((r) => r.rect))); // waves stop at each room's walls
   sea.group.name = 'sea'; // the mirrored scene leaves it out (reflection.ts)
   scene.add(sea.group);
   let at = -1; // the investigator's chunk key

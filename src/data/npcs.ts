@@ -69,8 +69,21 @@ const NEAR_NPCS: readonly NpcDef[] = [
         'I was studying Keziah Mason. They tried her for witchcraft in 1692 and she got out of Salem gaol through the corner of a cell. She knew a way to turn a corner that isn\'t in the room. I found it too.',
         'The tall man came to my room the night before I slept. He was very polite. He asked if I had ever wanted to see where her angles lead. He had a key on his watch chain, silver and very old.',
         "She's still in that house, her and the rat thing with the little hands. While they're there I can't think straight. Please.",
+        "But don't go in blind. The police were called to the house on the third. Officer Riley wrote it up and the report is lying somewhere in Arkham. Read it, and come back to me.",
       ] },
-      { when: [at('witch_house', 0)], lines: ['The Witch House is on the south side of town. Mind the attic. The ceiling slopes the wrong way.'] },
+      { when: [at('witch_house', 0)], lines: [
+        "Riley's report is somewhere in Arkham. The police wrote it up and left it lying, like everything else here. Your map shows where.",
+        'The Witch House is on the south side of town. Mind the attic. The ceiling slopes the wrong way.',
+      ] },
+      { when: [at('witch_house', 1)], lines: [
+        "Footprints like a rat's, with fingers, and a hole where the ceiling meets the wall. That is Brown Jenkin, and the hole is how she goes where she goes.",
+        "She isn't only hiding in that house. She is using it: a sleeper's name, a knife, a candle lit from the tall man's flame, and the right angle on the right night. I have watched her do it from behind my own eyelids.",
+        "She wrote it down, in a closet off the landing, behind a wall you can't see yet. Here. Look at the corner until it gives. Do you see it? It is one more corner than the room should have.",
+        "Hold on to that. You can spend what you see at an Elder Sign, but then the corner shuts again, and the closet with it. Go to the landing. There is a sign there.",
+      ] },
+      { when: [at('witch_house', 2)], lines: ["The stair landing is the last quiet place in that house. There's a sign on it. Rest there before the attic.", "Her formulae are in the closet off it. You will see the door if you are still holding what I showed you."] },
+      { when: [at('witch_house', 3)], lines: ['The closet is off the landing, to the west. Read what she wrote. It will say what she is waiting for.'] },
+      { when: [at('witch_house', 4)], lines: ["She is in the garret above the landing, with that thing. You know what she is doing now. Mind the ceiling."] },
       { when: [at('witch_house', 'done'), at('descent', 0)], lines: [
         "It's quieter in my head now. Thank you.",
         "I've been thinking about that key. Randolph Carter had one like it, the writer from Boston. He's gone missing, the papers said. The tall man must have taken it from him.",

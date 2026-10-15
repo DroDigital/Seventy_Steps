@@ -5,6 +5,8 @@
  * in a release build, a relaunch through Steam when the game is started outside it. Saves need nothing here:
  * Steam Auto-Cloud keeps the saves folder (main.js). The app id: `STEAM_APP_ID`, else `steam.appId` in
  * package.json (0 until there is one), else a `steam_appid.txt` beside the program (Steam's own, for a dev run).
+ * Another store's build (itch.io) is packed with `channel` set in its package.json (`-c.extraMetadata.channel=itch`): the shell then
+ * keeps off Steam altogether, whatever app id is set (no relaunch through Steam, no overlay, no achievements sent).
  */
 
 import { createRequire } from 'node:module';
@@ -26,6 +28,11 @@ function readPkg() {
   }
 }
 
+/** The store this build is for: "itch" when packed for itch.io (docs/RELEASE.md), else "steam". */
+export function channel(pkg = readPkg()) {
+  return pkg?.channel === 'itch' ? 'itch' : 'steam';
+}
+
 let lib = null;
 let client = null;
 
@@ -41,6 +48,7 @@ function load() {
 
 /** Before the app is ready: the overlay must be asked for first. Returns true when a release build was relaunched through Steam (quit at once). */
 export function steamEarly(packaged) {
+  if (channel() !== 'steam') return false; // another store's build never goes through Steam
   const sw = load();
   if (!sw) return false;
   const id = steamAppId();
@@ -55,6 +63,7 @@ export function steamEarly(packaged) {
 
 /** Steam's client, once the app is ready; null without Steam. */
 export function startSteam() {
+  if (channel() !== 'steam') return null;
   const sw = load();
   if (!sw) return null;
   try {
@@ -77,3 +86,6 @@ export function steamAchieve(id) {
 
 /** Whether the shell is speaking to Steam. */
 export const steamOn = () => client !== null;
+
+/** Whether steamworks.js (its native binding for this platform) loaded at all, Steam running or not: what a packed build is checked for (`--smoke-test`, main.js). */
+export const steamBinding = () => !!load();

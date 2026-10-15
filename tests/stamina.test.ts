@@ -41,6 +41,33 @@ describe('stamina rules', () => {
     const s = bar(10);
     for (let i = 0; i < SIM.hz; i++) tickStamina(s, 'sprint', dt);
     expect(s.value).toBe(0);
+    expect(s.delay).toBe(STAMINA.sprintDelay);
+  });
+
+  it('waits only a short beat after a run ends, not an action\'s whole delay', () => {
+    expect(STAMINA.sprintDelay).toBeLessThan(STAMINA.regenDelay);
+    const s = bar(100);
+    for (let i = 0; i < SIM.hz * 3; i++) tickStamina(s, 'sprint', dt);
+    const left = s.value;
+    expect(left).toBeCloseTo(100 - STAMINA.sprintDrain * 3, 3);
+    for (let i = 0; i < STAMINA.sprintDelay; i++) tickStamina(s, 'idle', dt);
+    expect(s.value).toBeCloseTo(left, 6); // nothing back during the beat
+    tickStamina(s, 'idle', dt);
+    expect(s.value).toBeCloseTo(left + STAMINA.regen * dt, 6); // and it comes back after it
+  });
+
+  it('a run that empties the bar can act again after the beat', () => {
+    const s = bar(5);
+    for (let i = 0; i < SIM.hz; i++) tickStamina(s, 'sprint', dt);
+    expect(canAfford(s)).toBe(false);
+    for (let i = 0; i <= STAMINA.sprintDelay; i++) tickStamina(s, 'idle', dt);
+    expect(canAfford(s)).toBe(true);
+  });
+
+  it('a sprint does not cut short the delay of an action just taken', () => {
+    const s = bar(100);
+    spend(s, 14); // a blow, then straight into a run
+    tickStamina(s, 'sprint', dt);
     expect(s.delay).toBe(STAMINA.regenDelay);
   });
 

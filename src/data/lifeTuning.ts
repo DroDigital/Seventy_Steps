@@ -49,6 +49,8 @@ export const FAUNA = {
 /** Lightning where storms roll (round 18: render/lightning.ts): now and then the sky flashes, and the thunder follows. */
 export const LIGHTNING = {
   every: { dunwich: [35, 100], innsmouth: [50, 140], rlyeh: [20, 60], mountains: [70, 170] } as Readonly<Record<string, readonly [number, number]>>,
+  storm: 0.65, // rain or gale must have gathered this much before lightning rolls through it
+  inside: 0.35, // the share of a thunderclap that reaches through a dungeon's roof
   flash: 0.45, // seconds of flicker
   light: 1.8, // how much it lights the world (added to the moon; the ambient takes half)...
   sky: 7, // ...brightens the sky's haze...

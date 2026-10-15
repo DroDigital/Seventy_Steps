@@ -13,6 +13,7 @@ import type { Pose, Sketch } from './parts';
 import { createCanvas, GLINT, GLOW, outline, type Canvas } from './raster';
 import { skinOf } from './skins';
 import { cephalopod, giant, humanoid, hunched, robed, spectre } from './uprights';
+import type { ReviewedArt } from './reviewed';
 
 export const CELL = 64;
 export const ATLAS_COLUMNS = 32;
@@ -86,6 +87,7 @@ export function spriteRecipes(): { key: string; recipe: SpriteRecipe }[] {
 }
 
 export interface SpriteAtlas {
+  reviewed?: ReviewedArt;
   width: number;
   height: number;
   data: Uint8Array; // RGBA, row-major, y down

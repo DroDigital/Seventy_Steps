@@ -1,6 +1,7 @@
 /**
  * Relics and weapon traits (round 26: every build played the same): a horror slain for good leaves
- * a relic, worn from then on, each a gift with a price in the mind; and each weapon has a temper of
+ * a relic, each a gift with a price in the mind (all that were found used to be worn at once, so the
+ * builds met in the middle; now two are worn, chosen at an Elder Sign); and each weapon has a temper of
  * its own, felt at a kill. Numbers are multipliers (1: none) or sanity (per kill). Data only.
  */
 
@@ -24,6 +25,8 @@ export const RELICS = {
 } satisfies Record<string, Relic>;
 export type RelicId = keyof typeof RELICS;
 export const RELIC_IDS = Object.keys(RELICS) as RelicId[];
+/** How many relics are worn at once: five are found, two are worn, so which two is the build (changed at an Elder Sign). */
+export const RELIC_SLOTS = 2;
 
 /** What a weapon does to the mind and the purse when it kills (sanity is added; echoes multiplied). */
 export const TEMPERS: Readonly<Partial<Record<WeaponId, { sanity?: number; echoes?: number; line: string }>>> = {

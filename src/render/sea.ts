@@ -10,6 +10,8 @@
 
 import * as THREE from 'three';
 import { WORLD } from '../data/tuning';
+import type { Rect } from '../world/worldMap';
+import { seaRoomMask } from './seaMask';
 import { AMP_SUM, WAVES_GLSL } from './seaWaves';
 import { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
@@ -53,6 +55,8 @@ uniform float uFogAmount;
 uniform float uTime;
 uniform float uChop;
 uniform sampler2D uReflect; // the scene mirrored in the sea (reflection.ts; round 35)
+uniform sampler2D uSeaMask;
+uniform vec4 uSeaMaskBounds; // world XZ origin and size of the dungeon room mask
 uniform float uReflectOn;
 uniform vec2 uRes;
 varying vec3 vWorld;
@@ -74,6 +78,8 @@ vec2 ripple(vec2 p, float t) {
 }
 
 void main() {
+  vec2 roomUv = (vWorld.xz - uSeaMaskBounds.xy) / uSeaMaskBounds.zw;
+  if (all(greaterThanEqual(roomUv, vec2(0.0))) && all(lessThan(roomUv, vec2(1.0))) && texture(uSeaMask, roomUv).r > 0.5) discard;
   vec3 view = uCamPos - vWorld;
   float dist = length(view);
   vec3 v = view / max(dist, 0.001);
@@ -158,12 +164,15 @@ export interface Sea {
   update(x: number, z: number): void;
 }
 
-export function createSea(): Sea {
+export function createSea(rooms: readonly Rect[] = []): Sea {
+  const mask = seaRoomMask(rooms);
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...worldUniforms,
       uChop: SEA.chop,
       uSeaLevel: { value: WORLD.seaLevel },
+      uSeaMask: { value: mask.texture },
+      uSeaMaskBounds: { value: mask.bounds },
     },
     vertexShader: VERT,
     fragmentShader: FRAG,

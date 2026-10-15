@@ -64,6 +64,7 @@ import { createHud } from './ui/hud';
 import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
 import { nextFrame, spriteAtlas } from './ui/loading';
+import { installGameEvidence } from './ui/gameEvidence';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
 import { noteLockAsked } from './core/mouseLock';
@@ -202,6 +203,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
   const noGlow = new Vector3(0, -1e4, 0);
   if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist });
+  if (debug) installGameEvidence(game, creatures);
   placeCamera(camera, game, 1);
   void pipeline.compile(scene, camera); // compiling while the chunks are built (in parallel, where the browser can)
   await made(0.55);
@@ -212,7 +214,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   resize();
   addEventListener('resize', resize);
 
-  const extras = createExtras(game, shell, store, opts); // the frame meter, the first launch's picture, the benchmark, the trailer (round 46)
+  const extras = createExtras(game, shell, store, opts, () => input.describe()); // the frame meter (with what the input hears), the first launch's picture, the benchmark, the trailer (round 46)
   let simTime = 0;
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   let frames = 0;
@@ -221,10 +223,13 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   building = false;
   let waterNow = false;
   let heldAt = 0; // when a talk or a menu last held the investigator
+  let wasPaused = false;
   startLoop(
     {
       step(dt) {
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
+        if (pause.open && !wasPaused) input.reset(); // pausing lets go of every key and button and sets a drifted stick right: the way out of an input that has stuck (round 49)
+        wasPaused = pause.open;
         if (menu?.open || shop.open || dialogue.open || pause.open || map.open) heldAt = performance.now();
         else if (performance.now() - heldAt < INTERACT_GRACE_MS) frame.pressed.interact = false; // E mashed through a talk does not rest at the sign behind it (round 17)
         const through = pause.open || map.open || dialogue.reading || intro?.open ? null : journeys.before(frame);
@@ -265,7 +270,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time);
         placeLantern(game, alpha);
-        lights.update(camera.position, time, views.flame);
+        lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z });
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)

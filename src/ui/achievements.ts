@@ -5,14 +5,12 @@
  * menu's page lists them all.
  */
 
-import { t } from '../core/i18n';
 import { ACHIEVEMENT_IDS, ACHIEVEMENTS } from '../data/achievements';
 import { newlyEarned } from '../systems/achievements';
 import type { Game } from '../systems/components';
 import { loadRecords, noteAchievements } from '../systems/records';
 import type { SaveStore } from '../systems/save';
 import { desktop } from './desktop';
-import { glyph } from './glyphs';
 import { el, footer, title, type Page } from './menuKit';
 
 export function watchAchievements(g: Game, store: SaveStore | null): void {
@@ -40,10 +38,10 @@ export function achievementsPage(store: SaveStore | null, back: () => void): Pag
       for (const id of ACHIEVEMENT_IDS) {
         const a = ACHIEVEMENTS[id];
         const got = held.has(id);
-        el(p, 'div', `${got ? '✦' : '·'}  ${a.name}`, `opacity:${got ? 1 : 0.45};margin-top:6px;padding:0 4px`);
-        el(p, 'div', a.note, `opacity:${got ? 0.6 : 0.35};font-size:12px;margin:0 0 2px 20px`);
+        el(p, 'div', `${got ? '✦' : '·'}  ${a.name}`, `opacity:${got ? 1 : 0.6};margin-top:6px;padding:0 4px`);
+        el(p, 'div', a.note, `opacity:${got ? 0.7 : 0.5};font-size:12px;margin:0 0 2px 20px`);
       }
-      footer(p, '', [[glyph('back'), t('keys.back')]], back);
+      footer(p, '', back);
     },
   };
 }

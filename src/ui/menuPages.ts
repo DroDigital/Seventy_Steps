@@ -12,7 +12,7 @@ import { LANGS, type Key } from '../data/lang';
 import { RENDER, SETTINGS } from '../data/tuning';
 import { desktop } from './desktop';
 import { button, el, footer, slider, tabs, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
+import { createResolutionSetting } from './resolutionSetting';
 import type { SettingId, Settings } from './settings';
 
 const pct = (v: number): string => `${Math.round(v * 100)}%`;
@@ -63,11 +63,16 @@ const isFullscreen = async (): Promise<boolean> => (desktop ? desktop.isFullscre
 
 /** Every change goes to `change` (which applies and keeps it); `back` leaves. `at`: the tab it opens on. Controls is the last tab (the keys' table: controlsTab). */
 export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0): Page {
+  const resolution = createResolutionSetting();
   let open = at;
   let waiting: Action | null = null;
   let refused = false; // the last key pressed was one that cannot be taken
   const page: Page = {
-    back: () => ((waiting = null), (refused = false), back()),
+    back: () => {
+      if (waiting) return void ((waiting = null), page.redraw?.()); // Esc while a key is awaited cancels the wait; the next goes back
+      refused = false;
+      back();
+    },
     keys(e) {
       if (!waiting || e.repeat || e.code === 'Escape') return;
       e.preventDefault();
@@ -82,13 +87,16 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
       if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0));
       const body = el(panel, 'div', '', 'min-height:226px');
       if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
-      for (const id of TABS[open][1]) slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+      for (const id of TABS[open][1]) {
+        if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
+        else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+      }
       if (open === 0) {
         const b = button(body, t('set.fullscreen'), () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), true, t('set.fullscreenHint'));
         const label = (): void => void isFullscreen().then((on) => (b.textContent = t('set.fullscreenState', { state: t(on ? 'val.onLc' : 'val.offLc') })));
         label();
       }
-      footer(panel, t('set.footer'), menuKeys(true), page.back);
+      footer(panel, t('set.footer'), page.back);
     },
   };
   return page;
@@ -109,22 +117,23 @@ export const fixedControls = (): readonly (readonly [string, string, string])[] 
 
 /** The controls tab: the actions with their keys (choose one, then press its new key) beside the pad's, and what is fixed. */
 function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void): void {
-  const grid = el(panel, 'div', '', 'display:grid;grid-template-columns:1fr auto auto 1fr auto auto;gap:0 12px;align-items:center;padding:0 10px');
+  const grid = el(panel, 'div', '', 'display:grid;grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr) auto auto;gap:0 10px;align-items:center;margin:0 -16px;padding:0 10px'); // (the labels give way: a longer word wraps rather than pushing the pad's columns out of the panel)
   for (const cell of ['', t('ctl.key'), t('ctl.pad'), '', t('ctl.key'), t('ctl.pad')]) el(grid, 'div', cell, 'opacity:.5;letter-spacing:3px;font-size:10px;padding-bottom:2px');
   const half = Math.ceil(ACTIONS.length / 2);
   const cells = (a: Action | undefined): void => {
     if (!a) return void [0, 1, 2].forEach(() => el(grid, 'div'));
-    el(grid, 'div', KEYED(a), 'font-size:12px;white-space:nowrap');
+    el(grid, 'div', KEYED(a), 'font-size:12px;line-height:1.25');
     const b = button(grid, waiting() === a ? '…' : keyName(keyLayout[a]), () => (wait(a), page.redraw?.()));
     b.classList.add('tag');
     b.style.cssText = 'margin:1px 0;padding:1px 6px;min-width:6ch;font-size:12px';
     el(grid, 'div', PAD_OF(a), 'opacity:.55;font-size:11px;white-space:nowrap');
   };
   for (let i = 0; i < half; i++) [ACTIONS[i], ACTIONS[i + half]].forEach(cells);
-  el(panel, 'div', fixedControls().map(([what, keys]) => `${what}: ${keys}`).join('   ·   '), 'opacity:.4;font-size:11px;line-height:1.5;margin:8px 10px 0');
+  el(panel, 'div', fixedControls().map(([what, keys]) => `${what}: ${keys}`).join('   ·   '), 'opacity:.55;font-size:11px;line-height:1.5;margin:8px 10px 0');
   const row = el(panel, 'div', '', 'display:flex;justify-content:space-between;align-items:center;padding:0 14px;margin-top:8px');
   button(row, t('ctl.reset'), () => (Object.assign(keyLayout, DEFAULT_KEYS), save(), page.redraw?.())).classList.add('tag');
-  button(row, t('ctl.swap', { state: t(swapped ? 'val.onLc' : 'val.offLc') }), () => (swap(!swapped), page.redraw?.()), false, t('ctl.swapHint')).classList.add('tag');
-  el(row, 'div', t('ctl.padReport', { report: padReport() || t('ctl.padNone') }), 'opacity:.45;font-size:11px');
-  footer(panel, t(refused() ? 'ctl.refused' : 'ctl.choose'), menuKeys(true), page.back);
+  button(row, t('ctl.swap', { state: t(swapped ? 'val.onLc' : 'val.offLc') }), () => (swap(!swapped), page.redraw?.()), true, t('ctl.swapHint')).classList.add('tag');
+  el(row, 'div', t('ctl.padReport', { report: padReport() || t('ctl.padNone') }), 'opacity:.55;font-size:11px');
+  const on = waiting();
+  footer(panel, refused() ? t('ctl.refused') : on ? t('ctl.waiting', { action: KEYED(on) }) : t('ctl.choose'), page.back);
 }

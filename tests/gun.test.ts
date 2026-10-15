@@ -216,10 +216,10 @@ describe('the cylinder holds six, and rounds are spent (round 22)', () => {
     g.player.rounds = 3;
     expect(rest(g, signPlace('hub_quad')!.id)).toBe(true);
     expect(g.player).toMatchObject({ ammo: 4, rounds: 0 });
-    g.player.rounds = 20;
+    g.player.rounds = GUN.carry;
     g.player.ammo = 0;
     g.events.emit('Respawned', { entity: g.player.id });
-    expect(g.player).toMatchObject({ ammo: GUN.chamber, rounds: 14 });
+    expect(g.player).toMatchObject({ ammo: GUN.chamber, rounds: GUN.carry - GUN.chamber });
     expect(loadRounds(g)).toBe(0);
   });
 });

@@ -9,7 +9,7 @@
 import { EXPLORE, SIM } from '../data/tuning';
 import { hourName, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
-import { mainLead } from '../systems/lead';
+import { currentLead } from '../systems/lead';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
 import { BONE, el, setText } from './hudKit';
@@ -59,7 +59,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       ctx.rotate(yaw); // what the camera looks at, up (the round face hides the square's turned corners)
       ctx.translate(-SIZE / 2, -SIZE / 2);
       painter.paint(ctx, view, realmOf(region), false);
-      drawLead(ctx, view, mainLead(g)?.at ?? null, realmOf(region), true);
+      drawLead(ctx, view, currentLead(g)?.at ?? null, realmOf(region), true);
       ctx.restore();
       const r = SIZE / 2 - 1;
       north.style.left = `${SIZE / 2 + Math.sin(yaw) * r}px`;

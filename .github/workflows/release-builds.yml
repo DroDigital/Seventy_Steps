@@ -1,0 +1,213 @@
+name: Release builds
+
+# The game packed for Steam, on a machine of each platform (the controllers' SDL library is downloaded for the machine it is installed on:
+# docs/STEAM.md), and started once (`--smoke-test`: it must reach its title, find the Steam binding and start the controllers' worker).
+# Runs when the shell or the packaging changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
+# By hand with "itch" ticked it packs for itch.io instead (Steam off in the build) and pushes each platform with butler: it needs the
+# BUTLER_API_KEY secret (without it, only what would be sent is shown). A Mac signed with a Developer ID, and notarised, needs the
+# MAC_CERT_P12_BASE64, MAC_CERT_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID secrets (docs/RELEASE.md); without them the Mac is signed ad hoc.
+
+on:
+  pull_request:
+    paths:
+      - 'desktop/**'
+      - 'packaging/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tools/package_mac.mjs'
+      - 'tools/smoke_packaged.mjs'
+      - 'tools/steam_upload.mjs'
+      - 'tools/itch_push.mjs'
+      - '.github/workflows/release-builds.yml'
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      itch:
+        description: 'Pack for itch.io (Steam off) and push it with butler'
+        type: boolean
+        default: false
+      itch_target:
+        description: 'The itch.io project: <user>/<URL name>'
+        default: 'digitaldro/seventy-steps'
+
+permissions:
+  contents: read
+
+concurrency: # a push cancels the run it replaces, but a manual run (an itch.io push) is never cancelled, nor cancels a pull request's
+  group: release-builds-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run package:win -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+        shell: bash
+      - name: Starts, and reaches its title
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }}
+      - name: The executable wears the Elder Sign (its icon, 32 px, is printed as base64 for the log)
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.Drawing
+          $bmp = [System.Drawing.Icon]::ExtractAssociatedIcon((Resolve-Path release/win-unpacked/SeventySteps.exe).Path).ToBitmap()
+          $ms = New-Object System.IO.MemoryStream
+          $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+          Write-Host ("ICON " + [Convert]::ToBase64String($ms.ToArray()))
+          $purple = 0
+          for ($x = 0; $x -lt $bmp.Width; $x++) { for ($y = 0; $y -lt $bmp.Height; $y++) { $p = $bmp.GetPixel($x, $y); if ($p.A -gt 100 -and $p.B -gt $p.G + 60) { $purple++ } } }
+          Write-Host "purple pixels in the icon: $purple of $($bmp.Width * $bmp.Height)"
+          if ($purple -lt 40) { Write-Error "the executable's icon has no purple glow: it is not the Elder Sign's"; exit 1 }
+      - name: Is the executable code-signed (for the log)
+        shell: pwsh
+        continue-on-error: true
+        run: Get-AuthenticodeSignature release/win-unpacked/SeventySteps.exe | Format-List Status, StatusMessage
+      - name: Zip the depot
+        shell: pwsh
+        run: Compress-Archive -Path release/win-unpacked -DestinationPath seventy-steps-windows.zip -CompressionLevel Fastest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-windows
+          path: seventy-steps-windows.zip
+          retention-days: 7
+          compression-level: 0
+      - name: Push to itch.io
+        if: ${{ inputs.itch }}
+        shell: bash
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_TARGET: ${{ inputs.itch_target }}
+        run: |
+          if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only windows --get-butler --run
+          else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only windows --get-butler; fi
+
+  mac:
+    runs-on: macos-latest # Apple Silicon: the Intel build is made on it too (package_mac.mjs fetches that architecture's SDL)
+    timeout-minutes: 60
+    env:
+      HAS_DEVELOPER_ID: ${{ secrets.MAC_CERT_P12_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Import the Developer ID certificate (when its secrets are set)
+        if: ${{ env.HAS_DEVELOPER_ID == 'true' }}
+        env:
+          CERT: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain-db"; PW="$(uuidgen)"
+          security create-keychain -p "$PW" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$PW" "$KEYCHAIN"
+          echo "$CERT" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "$CERT_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$PW" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          rm -f "$RUNNER_TEMP/cert.p12"
+          IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep 'Developer ID Application' | head -1 | sed -E 's/.*"(.*)"/\1/')"
+          [ -n "$IDENTITY" ] || { echo "::error::that certificate holds no Developer ID Application identity"; exit 1; }
+          echo "MAC_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+      - run: npm run package:mac -- ${{ inputs.itch && '--channel itch' || '' }}
+      - name: Starts, and reaches its title (Apple Silicon)
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: Starts under Rosetta (Intel)
+        run: |
+          arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
+          arch -x86_64 /usr/bin/true
+          node tools/smoke_packaged.mjs --arch x86_64 --verbose --timeout 600 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: One app for both (notarised when the Apple secrets are set)
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: node tools/package_mac.mjs --universal --no-build
+      - name: Universal app starts
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: The Mac apps wear the Elder Sign (each icon, 48 px, is printed as base64 for the log)
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            app="release/$d/Seventy Steps.app"
+            [ -d "$app" ] || continue
+            [ "$(plutil -extract CFBundleIconFile raw -o - "$app/Contents/Info.plist")" = "icon.icns" ] || { echo "::error::$d names no icon.icns"; exit 1; }
+            sips -s format png "$app/Contents/Resources/icon.icns" --out "$RUNNER_TEMP/$d.png" > /dev/null
+            sips -Z 48 "$RUNNER_TEMP/$d.png" --out "$RUNNER_TEMP/$d-48.png" > /dev/null
+            echo "ICON $d $(base64 -i "$RUNNER_TEMP/$d-48.png")"
+          done
+      - name: Does Gatekeeper accept the universal app (for the log)
+        if: ${{ env.HAS_DEVELOPER_ID == 'true' }}
+        continue-on-error: true
+        run: spctl --assess --type execute --verbose=4 "release/mac-universal/Seventy Steps.app"
+      - name: What the Mac apps are (for the log)
+        if: always()
+        continue-on-error: true
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            app="release/$d/Seventy Steps.app"
+            [ -d "$app" ] || continue
+            echo "== $d"; lipo -info "$app/Contents/MacOS/Seventy Steps"; codesign -dv "$app" 2>&1 | grep -E 'Identifier|Signature|flags|Format' || true
+            ls "$app/Contents/Resources" | head -20
+          done
+          ls -t ~/Library/Logs/DiagnosticReports 2>/dev/null | head -5
+      - name: Zip the depots (ditto keeps the bundle's links and permissions)
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            [ -d "release/$d/Seventy Steps.app" ] && ditto -c -k --sequesterRsrc --keepParent "release/$d/Seventy Steps.app" "seventy-steps-$d.zip" || true
+          done
+          ls -la *.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-mac
+          path: seventy-steps-*.zip
+          retention-days: 7
+          compression-level: 0
+      - name: Push to itch.io
+        if: ${{ inputs.itch }}
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_TARGET: ${{ inputs.itch_target }}
+        run: |
+          if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only osx --get-butler --run
+          else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only osx --get-butler; fi
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run package:linux -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+      - name: Starts, and reaches its title
+        env:
+          SMOKE_SOFTWARE_GL: '1' # no GPU here
+        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }}
+      - name: Pack the depot (tar keeps the executable bit)
+        run: tar -czf seventy-steps-linux.tar.gz -C release linux-unpacked
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-linux
+          path: seventy-steps-linux.tar.gz
+          retention-days: 7
+          compression-level: 0
+      - name: Push to itch.io
+        if: ${{ inputs.itch }}
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+          ITCH_TARGET: ${{ inputs.itch_target }}
+        run: |
+          if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only linux --get-butler --run
+          else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only linux --get-butler; fi

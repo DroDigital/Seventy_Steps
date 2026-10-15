@@ -88,7 +88,7 @@ export function createDialogue(g: Game): Dialogue {
     begin(wordMoments(spans.map((s) => s.textContent ?? ''), curve, rate)); // by where the voice sounds in the recording: as it is said
   });
 
-  g.events.on('Talked', ({ npc, name, title, lines, shop }) => {
+  g.events.on('Talked', ({ npc, name, title, lines, rumor, shop }) => {
     let i = 0;
     const line = (): void => {
       stopSaying();
@@ -126,7 +126,22 @@ export function createDialogue(g: Game): Dialogue {
         return say();
       }
       leave();
-      if (shop) g.events.emit('Trade', { shop, name }); // a merchant's wares follow (round 12)
+      const finish = (): void => {
+        read.close();
+        if (shop) g.events.emit('Trade', { shop, name }); // a merchant's wares follow the optional note
+      };
+      if (!rumor) return finish();
+      read.show({
+        back: finish,
+        keys: (e) => void (advances(e.code) && !e.repeat && finish()),
+        build(p) {
+          el(p, 'div', 'A RUMOUR', 'letter-spacing:3px;margin-bottom:6px');
+          el(p, 'div', `From ${name}`, 'opacity:.55;font-size:11px;margin-bottom:14px');
+          el(p, 'p', rumor.text, `font-size:${captionSize(16)};line-height:1.6;margin:0 0 14px`);
+          button(p, `${glyph('interact')} · Put it away`, finish);
+        },
+      });
+      g.events.emit('RumorRead', { npc, boss: rumor.boss });
     };
     line();
     talk.show(page);

@@ -61,11 +61,11 @@ turns flesh to stone. It cannot be killed, and what it took is the tally.
 | 39 | Tsathoggua | 16/8/16 | 5 | 3250 | 52 | 1841 | 352 | 1.87 | 0 |
 | 40 | 'Umr at-Tawil | 16/8/16 | 5 | 3600 | 80 | 2322 | 352 | 2.36 | 0 |
 | 41 | Hastur | 17/8/17 | 5 | 4200 | 55 | 1240 | 364 | 1.22 | 0 |
-| 42 | Cthulhu | 18/8/17 | 5 | 4300 | 150 | 2963 | 376 | 2.81 | 0 |
+| 42 | Cthulhu | 18/8/17 | 5 | 4300 | 250 | 6003 | 376 | 5.70 | 0 |
 | 43 | Ghatanothoa | 18/9/17 | 5 | 4850 | 82 | 1713 | 376 | 1.63 | 0 |
 | 44 | Nyarlathotep | 18/9/18 | 5 | 5150 | 83 | 3027 | 376 | 2.88 | 0 |
 | 45 | Shub-Niggurath | 19/9/18 | 5 | 5450 | 102 | 2427 | 388 | 2.23 | 0 |
-| 46 | Yog-Sothoth | 20/9/19 | 5 | 6100 | 121 | 3868 | 400 | 3.45 | 0 |
+| 46 | Yog-Sothoth | 20/9/19 | 5 | 6100 | 111 | 3534 | 400 | 3.16 | 0 |
 | 47 | Azathoth | 20/10/19 | 5 | 6700 | 90 | 9960 | 400 | 8.89 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6), and the bot does not die.

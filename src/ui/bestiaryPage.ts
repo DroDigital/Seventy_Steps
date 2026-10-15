@@ -5,15 +5,12 @@
  * The ones not yet seen are only counted.
  */
 
-import { t } from '../core/i18n';
 import { FIELD_NOTES } from '../data/bestiaryNotes';
 import { HABITS, TIER_NAMES, weaknessLine, wherever } from '../data/bestiaryFacts';
 import { ENTITIES } from '../data/registry';
 import { TIERS, type EntityDef } from '../data/schema';
 import type { Game } from '../systems/components';
 import { button, el, footer, heading, title, type Page } from './menuKit';
-import { glyph } from './glyphs';
-import { menuKeys } from './menuKeys';
 
 /** The creatures beheld, in the order of the roster. */
 export const beheld = (g: Pick<Game, 'mind'>): EntityDef[] => ENTITIES.filter((e) => g.mind.seen.has(e.id));
@@ -29,7 +26,7 @@ function entryPage(e: EntityDef, back: () => void): Page {
       const weak = weaknessLine(e);
       if (weak) el(p, 'p', weak, 'font-size:14px;line-height:1.5;margin:0 0 6px;opacity:.8');
       el(p, 'p', `Met in: ${wherever(e)}.`, 'font-size:12px;line-height:1.5;margin:8px 0 4px;opacity:.5');
-      footer(p, '', [[glyph('back'), t('keys.back')]], back);
+      footer(p, '', back);
     },
   };
 }
@@ -48,7 +45,7 @@ export function bestiaryPage(g: Game, back: () => void, show: (p: Page) => void)
         heading(p, `${TIER_NAMES[tier]} · ${list.length}`).style.margin = '12px 14px 4px';
         for (const e of list) button(p, e.name, () => show(entryPage(e, () => show(page))));
       }
-      footer(p, '', menuKeys(), back);
+      footer(p, '', back);
     },
   };
   return page;

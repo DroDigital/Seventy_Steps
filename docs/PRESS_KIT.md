@@ -11,7 +11,7 @@
 | Title | Seventy Steps |
 | Developer | Digital Dro Studios (Alessandro A. Foddis) |
 | Genre | Open-world action RPG, soulslike, horror |
-| Platforms | PC (the desktop game, Windows, macOS and Linux, is planned: `npm run desktop`); runs in a browser too |
+| Platforms | PC: the desktop game for Windows, macOS (Apple Silicon and Intel) and Linux, for Steam (docs/RELEASE.md); runs in a browser too |
 | Version | 1.0.0-rc.1 (a release candidate: `CHANGELOG.md`) |
 | Players | Single player |
 | Controls | Keyboard and mouse, or a pad (rebindable; the prompts follow the device in hand) |

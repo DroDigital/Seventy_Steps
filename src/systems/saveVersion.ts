@@ -9,7 +9,7 @@
 declare const __APP_VERSION__: string | undefined;
 
 /** The format saves are written in. Raise it, and add the step from the last, when a saved field changes its meaning. */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 /** The oldest format that can still be carried forward. */
 export const OLDEST_SAVE = 2;
 /** The game's version that writes a save (kept in it, for a crash report or a migration's judgement). */
@@ -17,8 +17,19 @@ export const GAME_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION_
 
 type Raw = Record<string, unknown>;
 
-/** Each step takes a save of format n to n + 1 (none yet: format 2 is the one 1.0 ships with). */
-export const STEPS: Record<number, (o: Raw) => Raw> = {};
+/**
+ * Each step takes a save of format n to n + 1. Format 3: the Witch House became five stages (the report, Gilman's word, the stair, the
+ * formulae, the witch) where it had been one (the witch), so what a save says of how far it had come is read again: the witch
+ * still to be put down (0) is the last stage (4), and done (1) is done (5), which pays nothing a second time.
+ */
+export const STEPS: Record<number, (o: Raw) => Raw> = {
+  2: (o) => {
+    const quests = o.quests;
+    if (typeof quests !== 'object' || quests === null || typeof (quests as Raw).witch_house !== 'number') return o;
+    const was = (quests as Raw).witch_house as number;
+    return { ...o, quests: { ...quests, witch_house: was < 0 ? was : was === 0 ? 4 : 5 } };
+  },
+};
 
 const isObj = (x: unknown): x is Raw => typeof x === 'object' && x !== null && !Array.isArray(x);
 const versionOf = (o: Raw): number | null => (typeof o.version === 'number' && Number.isInteger(o.version) ? o.version : null);

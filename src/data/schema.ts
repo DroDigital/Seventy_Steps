@@ -152,6 +152,10 @@ export interface AssemblyRecipe {
   wings?: number;
   eyes?: number;
   spheres?: number;
+  /** A body of spheres as the reviewed art paints it: each sphere's place and size as a fraction of `scale` (across from the picture's centre, up from its foot, radius), what is struck (data/assemblyShape.ts). */
+  hit?: readonly (readonly [across: number, up: number, radius: number])[];
+  /** A lathed body as the reviewed art paints it: its half-width in the legs, torso and head bands, as fractions of `scale` (set from data/reviewedLook.ts when it is made a combatant; its zones are never narrower: data/assemblyShape.ts). */
+  painted?: readonly [legs: number, torso: number, head: number];
   glow?: Glow;
 }
 

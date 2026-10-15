@@ -51,7 +51,7 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
   let listing: Promise<void> | undefined;
   const buffers = new Map<string, AudioBuffer | null>(); // null: it would not load
   const pending = new Map<string, Promise<AudioBuffer | null>>();
-  let want: string | null = null; // the recording that should be sounding now
+  let request = 0; // each request is distinct, even when two ask for the same recording before it loads
   let voice: Voice | null = null;
 
   /** Reads which recordings exist, once. A missing or broken list means none: the game is silent, not broken. */
@@ -86,7 +86,7 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
   const release = (v: Voice): void => void setTimeout(() => [v.out, ...v.hall].forEach((n) => n.disconnect()), (v.tail + FADE) * 1000);
 
   const stop = (): void => {
-    want = null;
+    request++;
     const v = voice;
     const ctx = e.ctx;
     voice = null;
@@ -141,10 +141,10 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
     say(speaker, text) {
       const id = clipOf(speaker, text);
       stop();
-      want = id;
+      const wanted = request;
       void known().then(() => {
-        if (want !== id || !index?.has(id)) return undefined;
-        return load(id).then((buf) => void (buf && want === id && play(speaker, text, buf)));
+        if (request !== wanted || !index?.has(id)) return undefined;
+        return load(id).then((buf) => void (buf && request === wanted && play(speaker, text, buf)));
       });
     },
     ahead(speaker, texts) {

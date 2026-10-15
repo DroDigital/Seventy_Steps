@@ -12,9 +12,10 @@ import { edgeAt, equip } from '../systems/arms';
 import type { Game } from '../systems/components';
 import { falloff, gunEdge } from '../systems/gun';
 import { might } from '../systems/levels';
+import { effectsOf, owned, worn } from '../systems/relics';
+import { RELICS } from '../data/relics';
 import { button, el, footer, heading, title, type Page } from './menuKit';
 import { fill } from './glyphs';
-import { menuKeys } from './menuKeys';
 
 /** A weapon's numbers: its first light and heavy blows (times `k`, the Might bonus), how soon the light one lands, its reach and cost. */
 export function weaponStats(w: WeaponDef, k = 1): string {
@@ -45,9 +46,18 @@ export function armsPage(g: Game, back: () => void, show: (p: Page) => void): Pa
       const left = (m: number): number => Math.round(100 * falloff(m, g.player.gun));
       el(p, 'div', `Revolver${g.player.gun ? ` +${g.player.gun}` : ''}   ·   ${g.player.ammo}/${GUN.chamber} loaded   ·   ${g.player.rounds} spare`, 'padding:4px 14px 0');
       el(p, 'div', `shot ${shot}  ·  ${left(6)}% at 6 m  ·  ${left(9)}% at 9 m  ·  ${left(12)}% at 12 m`, 'padding:0 14px;opacity:.55;font-size:12px;font-variant-numeric:lining-nums tabular-nums');
+      if (owned(g).length) {
+        heading(p, 'RELICS WORN').style.margin = '14px 14px 4px';
+        for (const id of worn(g)) {
+          el(p, 'div', RELICS[id].name, 'padding:4px 14px 0');
+          el(p, 'div', effectsOf(id), 'padding:0 14px;opacity:.55;font-size:12px');
+        }
+        if (!worn(g).length) el(p, 'div', 'None are worn.', 'padding:4px 14px 0;opacity:.55');
+        el(p, 'div', 'Two at a time; changed at an Elder Sign.', 'padding:2px 14px 0;opacity:.4;font-size:12px;font-style:italic');
+      }
       const unfound = WEAPON_IDS.length - g.player.arms.length;
       if (unfound > 0) el(p, 'div', `${unfound === 1 ? 'One more weapon lies' : `${unfound} more weapons lie`} somewhere in the dream.`, 'opacity:.4;font-style:italic;margin:10px 14px 0;font-size:13px');
-      footer(p, fill('Choose a weapon to take it up. The revolver is loaded with {reload}; its rounds are found in boxes and caches, and sold by those who trade.'), menuKeys(), back);
+      footer(p, fill('Choose a weapon to take it up. The revolver is loaded with {reload}; its rounds are found in boxes and caches, and sold by those who trade.'), back);
     },
   };
   return page;

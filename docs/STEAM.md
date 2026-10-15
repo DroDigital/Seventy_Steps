@@ -17,8 +17,9 @@ the author can reach.
 
 ## Packaging
 
-`npm run package` builds the game and packs it for the platform it runs on, unpacked, into `release/` (electron-builder,
-the `build` field of `package.json`): a folder to upload as a depot, not an installer (Steam installs it).
+`npm run package` builds the game, makes the icon (`build/` is not kept) and packs it for the platform it runs on, unpacked, into
+`release/` (electron-builder, the `build` field of `package.json`): a folder to upload as a depot, not an installer (Steam installs
+it). Round 50: the release itself, Windows and Mac builds, their check and how to send them are in **docs/RELEASE.md**.
 
 - `npm run package:win`, `package:linux`, `package:mac` name the platform. **Pack each platform on that platform** (or
   in CI on one of each): the controllers' SDL library (`@kmamal/sdl`) downloads its native build for the machine it is
@@ -27,13 +28,15 @@ the `build` field of `package.json`): a folder to upload as a depot, not an inst
   Steam the launch option `--no-sandbox` only if the Steam Runtime's container refuses Chromium's sandbox.
 - The packed game holds `dist/` (the built page, its music, sounds and voices), `desktop/`, and the native modules
   unpacked beside the archive. About 615 MB on Linux.
-- macOS: an app Apple has not notarised is refused by Gatekeeper outside Steam; signing and notarisation need an Apple
-  developer account (`mac.identity`, `notarize` in the `build` field). Not set up.
+- macOS: an Apple Silicon app and an Intel one, each with its own SDL, and with `-- --universal` one app of both
+  (`npm run package:mac`, `tools/package_mac.mjs`), signed ad hoc;
+  an app Apple has not notarised is refused by Gatekeeper outside Steam; signing and notarisation need an Apple developer account
+  (docs/RELEASE.md: `MAC_SIGN_IDENTITY` and the `APPLE_*` variables). Not set up.
 
 ## In the Steamworks partner site
 
 1. **App id**: put it in `package.json` (`steam.appId`).
-2. **Depots**: one a platform; upload `release/win-unpacked`, `release/linux-unpacked`, `release/mac` with SteamPipe.
+2. **Depots**: one a platform; upload `release/win-unpacked`, `release/linux-unpacked`, `release/mac-universal` (or `mac-arm64`) with SteamPipe (`npm run steam:upload`: docs/RELEASE.md).
 3. **Launch options**: the executable above for each platform.
 4. **Steam Cloud › Auto-Cloud**, a root a platform (the shell's data folder, Electron's `userData`, named after the product):
 

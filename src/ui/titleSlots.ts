@@ -31,3 +31,11 @@ export function slotLine(store: SaveStore | null, slot: number): SlotLine | null
 
 /** Every slot's line, first to last. */
 export const slotLines = (store: SaveStore | null): (SlotLine | null)[] => Array.from({ length: SLOTS }, (_, k) => slotLine(store, k + 1));
+
+const SEP = '  ·  ';
+
+/** A slot's label as the title lists it: its name, and, for a saved one, what it holds, to stand on a line of its own (a wrap never opens with a "·"). An empty slot is the one line. */
+export function slotParts(label: string, held: boolean): [string, string] {
+  const [name, ...rest] = label.split(SEP);
+  return held ? [name, rest.join(SEP)] : [label, ''];
+}

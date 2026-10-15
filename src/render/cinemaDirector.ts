@@ -3,16 +3,18 @@
  * investigator (remembered in the save: it is not shown again after a death); its fall, slowed; the
  * wake of a new game; an ending's, and then its card. Nothing plays in the arena test or while
  * another scene has the screen, except an ending, which waits its turn. Its size, from its body,
- * chooses how the camera treats it (data/cutscenes.ts), unless it has an arrival of its own (data/cutscenesBoss.ts). A horror that speaks
+ * chooses how the camera treats it (data/cutscenes.ts), unless it has an arrival or a fall of its own (data/cutscenesBoss.ts, data/cutscenesMore.ts, data/cutscenesFall.ts). A horror that speaks
  * (data/speechBosses.ts) says its line as it arrives and its last as it falls, the words low on the
- * screen, the last shot held until it is said; one with no scene says its last line as it falls, as a notice.
+ * screen, the last shot held until it is said; one without a fight script speaks on first sight and
+ * falls with its last words as a notice.
  */
 
 import type { Entity } from '../core/ecs';
 import { yawOf } from '../core/geom';
 import { EPITHETS } from '../data/bossCards';
 import { arrival, ENDING_SCENES, fall, scaleOf, WAKE, type Scene } from '../data/cutscenes';
-import { bespokeArrival } from '../data/cutscenesBoss';
+import { bespokeFall } from '../data/cutscenesFall';
+import { arrivalOf } from '../data/cutscenesMore';
 import { bossLine, spokenFor, type Moment } from '../data/speechLines';
 import { signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
@@ -58,6 +60,13 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
   const memory = new Set<string>(); // the arrivals shown, where no save keeps them (the arena)
   const height = (e: Entity): number => g.ecs.c.body.get(e)?.height ?? 2;
   const alive = (): boolean => g.ecs.c.actor.get(g.player.id)?.move !== 'death';
+  const rosterId = (e: Entity): string | undefined => g.ecs.c.fight.get(e)?.id ?? g.ecs.c.dread.get(e)?.id;
+  const notice = (id: string | undefined, moment: Moment): void => {
+    const line = id ? bossLine(id, moment) : undefined;
+    if (!line || !alive()) return;
+    g.events.emit('Said', { speaker: line.speaker, text: line.text });
+    g.events.emit('Notice', { text: line.text.toUpperCase() });
+  };
   /** Whether a scene is worth playing about this horror: one seen and heard, that stands as itself in the fight. */
   const worth = (e: Entity): boolean => {
     const f = g.ecs.c.fight.get(e);
@@ -69,16 +78,16 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
     const seen = g.overworld?.watched ?? memory;
     if (!f || !worth(entity) || seen.has(f.id) || cinema.active) return;
     seen.add(f.id);
-    void cinema.play(speaking(bespokeArrival(f.id, name, EPITHETS[f.id]) ?? arrival(scaleOf(height(entity)), name, EPITHETS[f.id]), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)
+    void cinema.play(speaking(arrivalOf(f.id, name, EPITHETS[f.id]) ?? arrival(scaleOf(height(entity)), name, EPITHETS[f.id]), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)
+  });
+  g.events.on('FirstSight', ({ entity }) => {
+    if (!g.ecs.c.fight.has(entity) && !cinema.active) notice(rosterId(entity), 'arrive'); // the Voice in the Tomb has words, but no phase script to send BossEngaged
   });
   g.events.on('Vanquished', ({ entity }) => {
-    const id = g.ecs.c.fight.get(entity)?.id;
-    const last = id ? bossLine(id, 'fall') : undefined; // its last words, if it has any
+    const id = rosterId(entity);
     if (cinema.active) return;
-    if (worth(entity)) return void cinema.play(speaking(fall(scaleOf(height(entity))), id, 'fall'), { target: entity });
-    if (!last || !alive()) return;
-    g.events.emit('Said', { speaker: last.speaker, text: last.text }); // no scene to lay it over: it is heard, and its words shown as a notice
-    g.events.emit('Notice', { text: last.text.toUpperCase() });
+    if (worth(entity)) return void cinema.play(speaking((id && bespokeFall(id)) || fall(scaleOf(height(entity))), id, 'fall'), { target: entity }); // the great horrors fall each their own way too
+    notice(id, 'fall'); // no scene to lay it over: it is heard, and its words shown as a notice
   });
   g.events.on('Ending', ({ id }) => {
     const scene = ENDING_SCENES[id];
