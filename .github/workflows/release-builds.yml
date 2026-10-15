@@ -34,9 +34,9 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: release-builds-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+concurrency: # a push cancels the run it replaces, but a manual run (an itch.io push) is never cancelled, nor cancels a pull request's
+  group: release-builds-${{ github.event_name }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' }}
 
 jobs:
   windows:
