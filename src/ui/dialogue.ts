@@ -10,10 +10,11 @@ import { captionSize } from './captions';
 import { t } from '../core/i18n';
 import { wordMoments } from '../core/pace';
 import { DOCUMENTS } from '../data/documents';
+import { paper } from './skins/paper';
 import { spokenFor } from '../data/speechLines';
 import type { Game } from '../systems/components';
 import { BONE } from './hudKit';
-import { button, createScreen, el, frame as panelFrame, type Page } from './menuKit';
+import { button, createScreen, el, frame as panelFrame, type Page, type Screen } from './menuKit';
 import { keyLayout } from '../core/bindings';
 import { glyph } from './glyphs';
 
@@ -36,6 +37,16 @@ const SHADOW = 'text-shadow:0 0 9px #000,0 0 3px #000,0 1px 2px #000';
 const UNSAID = 'display:inline-block;opacity:0;filter:blur(3px);transform:translateY(2px);letter-spacing:.07em;transition:opacity .55s ease-out,filter .7s ease-out,transform .7s ease-out,letter-spacing .8s ease-out';
 const SAID = 'opacity:1;filter:blur(0);transform:none;letter-spacing:normal';
 const LATE = 600; // ms a line waits for its recording to begin before it is said by the clock instead (no recording, or one still loading)
+
+/** The note screen, made the first time a note is read: a note on burnt paper (ui/skins/paper.ts). Made late so it stands over the other screens. */
+let letters: Screen | null = null;
+const letterScreen = (): Screen => (letters ??= createScreen(8, '#050506cc', undefined, true, false, paper));
+
+/** A note (a letter, a clipping, a report) on its burnt paper. `label` is its button: from the world it is put away; from the journal it goes back to the journal (which stays open beneath it). */
+export function showNote(name: string, label = `${glyph('interact')} · Put it away`): void {
+  const screen = letterScreen();
+  screen.show(documentPage(name, () => screen.close(), label));
+}
 
 export function createDialogue(g: Game): Dialogue {
   const talk = createScreen(8, 'transparent', 'left:50%;bottom:17%;transform:translateX(-50%);width:min(680px,92vw);padding:14px 18px', true, true); // no box: the words stand on the world (round 30)
@@ -129,18 +140,19 @@ export function createDialogue(g: Game): Dialogue {
   g.events.on('Read', ({ name }) => {
     const doc = DOCUMENTS[name];
     if (!doc) return;
-    read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
+    if (doc.kind === 'note') showNote(name);
+    else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
   });
 
   return {
     get open() {
-      return talk.open || read.open;
+      return talk.open || read.open || !!letters?.open;
     },
     get talking() {
       return talk.open;
     },
     get reading() {
-      return read.open;
+      return read.open || !!letters?.open;
     },
   };
 }

@@ -11,8 +11,9 @@ import { mainLead } from '../systems/lead';
 import { isDone, stageOf, UNSTARTED } from '../systems/quests';
 import { ENTITIES } from '../data/registry';
 import { bestiaryPage, beheld } from './bestiaryPage';
-import { documentPage } from './dialogue';
+import { documentPage, showNote } from './dialogue';
 import { keyLayout } from '../core/bindings';
+import { t } from '../core/i18n';
 import { BONE } from './hudKit';
 import { button, el, footer, heading, tabs, title, type Page } from './menuKit';
 import { menuKeys } from './menuKeys';
@@ -49,7 +50,7 @@ export function journalPage(g: Game, back: () => void, show: (p: Page) => void, 
         const some = read.filter((n) => DOCUMENTS[n].kind === kind);
         if (!some.length) continue;
         heading(body, `${head} · ${some.length}`).style.margin = '12px 14px 4px';
-        for (const name of some) button(body, name, () => show(documentPage(name, () => show(page))));
+        for (const name of some) button(body, name, () => (kind === 'note' ? showNote(name, t('keys.back')) : show(documentPage(name, () => show(page)))));
       }
     } else {
       el(body, 'div', `${beheld(g).length} of ${ENTITIES.length} beheld`, 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
