@@ -13,7 +13,7 @@ export type Settings = Record<SettingId, number>;
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
 /** Legacy entries take the current resolution default once; choices saved at this version remain untouched. */
-const VERSION = 13;
+const VERSION = 14;
 
 export function defaultSettings(): Settings {
   return Object.fromEntries(SETTING_IDS.map((id) => [id, SETTINGS[id][3]])) as Settings;
