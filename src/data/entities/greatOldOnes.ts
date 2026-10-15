@@ -74,8 +74,11 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   {
     id: 'bokrug', name: 'Bokrug', source: 'The Doom that Came to Sarnath', regions: ['dreamlands'], canonLooks: false,
     sprite: { silhouette: 'quadruped', palette: 'sea', scale: 9, eyes: 2 },
-    ...scripted('boss', phases(ph(1, { bite: 2, charge: 1, pool: 1, quake: 1 }, { hooks: ['flood'] }), ph(0.5, { charge: 2, bite: 2, summon: 1, pool: 1, vortex: 1 }, { summons: ['being_of_ib'], hooks: ['flood', 'camera_warp'] }))),
-    stats: st(3250, 1400, 74, 3, 5, 12), drops: { echoes: 12000 }, insightOnSight: 3,
+    // round 46: too hard in almost every way. Its first phase has no flood (the drag on the feet); its second keeps the flood alone, with no
+    // summoning and no camera warp (the view swaying over its charges). Health, damage and the sanity it drains come down into the band of
+    // Rhan-Tegoth and Nug.
+    ...scripted('boss', phases(ph(1, { bite: 2, charge: 1, pool: 1, quake: 1 }), ph(0.5, { charge: 1, bite: 2, pool: 1, vortex: 1 }, { hooks: ['flood'] }))),
+    stats: st(2600, 1400, 60, 3, 5, 8), drops: { echoes: 12000 }, insightOnSight: 3,
   },
   {
     id: 'nug', name: 'Nug', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
