@@ -4,9 +4,18 @@ Every line the people of the realms and the horrors that speak say is spoken by 
 `public/voice`: 191 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 26 minutes, 26.8 MB. 133 are
 the lines of the fifteen people met at the Elder Signs (`npc:<id>`, written in `data/npcs.ts` and
 `npcsFar.ts`); 53 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
-this: no horror spoke before): a line as it arrives and a last as it falls. Two have no scene, the Dunwich
-Horror (unseen), who says only a last, shown as a notice. (Brown Jenkin had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
+this: no horror spoke before): a line as it arrives and a last as it falls. The Dunwich Horror (unseen)
+says only a last, shown as a notice. The Voice in the Tomb has no phase script: its arrival line is a
+spoken notice on first sight, and its last words are a spoken notice when vanquished. (Brown Jenkin
+had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
 A line with no recording is shown and not heard, as every line was before.
+
+**Speech and narrative captions are separate.** The 27 speakers in `BOSS_SAY` have 53 authored lines,
+all recorded; `voiceCoverage.test.ts` requires a recording for each. Other horrors have no authored
+speech. In particular, the Outsider's arrival captions (“Something is climbing up out of the dark.”
+and “It has been alone a very long time.”) are narrative text: it has no cast voice or recording.
+The other silent bosses' scene captions and epithets are also read, not spoken. Adding a speaking
+role requires authored lines, a cast entry and recordings; a narrative caption is not a missing take.
 
 ## Where it is
 
@@ -16,7 +25,7 @@ A line with no recording is shown and not heard, as every line was before.
 | `data/speechNpcs.ts`, `speechFar.ts`, `speechBosses.ts` | each line as it is **performed**, with its [audio tags] |
 | `data/speechLines.ts` | every line said aloud, gathered (`speechLines()`); `spokenFor`: how long a caption is held |
 | `data/speechCast.ts` | who speaks in which voice, and how the game plays it |
-| `render/audio/speech.ts` | the player: `public/voice/index.json` once, a recording fetched and decoded when its line is first said (a talk's next five are fetched ahead), ten decoded ones kept, one voice at a time (the next cuts off the last in 0.14 s), the cast's playback rate (lowers and slows a great voice) and echo |
+| `render/audio/speech.ts` | the player: `public/voice/index.json` once, a recording fetched and decoded when its line is first said (a talk's next five are fetched ahead, a horror's two on first sight or engagement), ten decoded ones kept, one voice at a time (the next cuts off the last in 0.14 s), the cast's playback rate (lowers and slows a great voice) and echo |
 | `render/audio/engine.ts`, `gameAudio.ts` | the speech bus (before the limiter, after the sanity shaper and the muffle, so a failing mind does not smear the voices; `AUDIO.speech`, a make-up gain of 1.5); the `Said`, `Silenced` and `Talked` events |
 | `render/cinemaDirector.ts`, `cinema.ts` | a horror's scene: `speaking()` lays a caption beat and a voice beat over its arrival and its fall and holds the last shot until it is said; skipping a scene silences it |
 | `ui/dialogue.ts`, `ui/menuPages.ts` | a person's line is said as it is shown; Settings › Audio › **Voices** |
