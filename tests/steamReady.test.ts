@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 import { iconPixels, iconPng } from '../desktop/icon.js';
@@ -48,6 +49,29 @@ describe('the desktop icon (round 12)', () => {
     expect(px[3]).toBe(0); // a transparent corner
     const at = (x: number, y: number): number[] => [...px.subarray((y * 64 + x) * 4, (y * 64 + x) * 4 + 4)];
     expect(at(32, 40)[0]).toBeGreaterThan(150); // the stem, in bone
+  });
+
+  it('has a Mac icon set in from the edge with a shadow, a plain square for a store, and a sign that is still there at 16 px (round 52)', () => {
+    const at = (px: Uint8Array, n: number, x: number, y: number): number[] => [...px.subarray((y * n + x) * 4, (y * n + x) * 4 + 4)];
+    const mac = iconPixels(256, 'mac');
+    expect(at(mac, 256, 2, 2)[3]).toBe(0); // the margin about the square is clear...
+    expect(at(mac, 256, 128, 232)[3]).toBeGreaterThan(20); // ...but for the shadow a little below it
+    expect(at(mac, 256, 128, 128)[3]).toBe(255);
+    const plain = iconPixels(256, 'plain');
+    expect(at(plain, 256, 0, 0)[3]).toBe(255); // no corners: the store crops it
+    expect(Math.max(...at(plain, 256, 128, 110).slice(0, 3))).toBeGreaterThan(150); // the sign is in the middle
+    const small = iconPixels(16);
+    expect(at(small, 16, 8, 8)[0]).toBeGreaterThan(120); // the stem is bone, not smeared into the dark, even at 16 px
+  });
+
+  it('is what the Mac app, the Windows executable and the browser tab wear (round 52)', () => {
+    const read = (path: string): string => readFileSync(path, 'utf8'); // (the tests run from the project's root)
+    const pkg = JSON.parse(read('package.json'));
+    expect(pkg.build.icon).toBe('build/icon.png');
+    expect(pkg.build.mac.icon).toBe('build/icon-mac.png');
+    expect(read('desktop/makeIcon.js')).toMatch(/icon-mac\.png/);
+    const favicon = decodeURIComponent(read('index.html').match(/rel="icon" href="([^"]+)"/)![1]);
+    expect(favicon.match(/M\d/g)).toHaveLength(5); // the Elder Sign's five strokes, not the old stair
   });
 });
 

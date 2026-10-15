@@ -22,7 +22,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { serveFrom } from './serve.js';
-import { startSteam, steamAchieve, steamBinding, steamEarly } from './steam.js';
+import { channel, startSteam, steamAchieve, steamBinding, steamEarly } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
@@ -217,7 +217,7 @@ function smoke(win) {
     } catch {
       // the page is still loading
     }
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > 150;
     if (!settled && !late) return;

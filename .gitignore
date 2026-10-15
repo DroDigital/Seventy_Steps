@@ -8,3 +8,4 @@ release/
 __pycache__/
 steam/build/
 steam/output/
+.butler/

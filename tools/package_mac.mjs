@@ -4,6 +4,7 @@
 //   --only arm64|x64   build one architecture
 //   --universal        also merge the two into release/mac-universal (needs both)
 //   --no-build         only merge and sign what is already in release/ (with --universal)
+//   --channel itch     pack for itch.io: the shell keeps off Steam (desktop/steam.js; docs/RELEASE.md)
 // Signing: with MAC_SIGN_IDENTITY set (a "Developer ID Application: …" in the keychain) every app is signed with the hardened runtime and
 // packaging/entitlements.mac.plist; with APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID too it is notarised. Without them the apps are signed ad hoc, which is enough to run on this Mac (and on one with Gatekeeper off) and what Steam needs; docs/RELEASE.md.
 import { spawnSync } from 'node:child_process';
@@ -15,6 +16,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const args = process.argv.slice(2);
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null;
 const arches = only ? [only] : ['arm64', 'x64'];
+const channel = args.includes('--channel') ? args[args.indexOf('--channel') + 1] : null;
 const APP = 'Seventy Steps.app';
 const dirOf = { arm64: join(root, 'release', 'mac-arm64'), x64: join(root, 'release', 'mac') };
 
@@ -29,7 +31,7 @@ const host = process.arch;
 if (!args.includes('--no-build')) {
   for (const arch of arches) {
     if (existsSync(sdlScripts)) run('node', ['install.mjs'], { cwd: sdlScripts, env: { CROSS_COMPILE_ARCH: arch } }); // this architecture's SDL for the build
-    run('npx', ['electron-builder', '--mac', `--${arch}`, '--dir', '-c.asar=false']); // no asar: the two apps differ only in their native files, which is what merging them into one needs
+    run('npx', ['electron-builder', '--mac', `--${arch}`, '--dir', '-c.asar=false', ...(channel ? [`-c.extraMetadata.channel=${channel}`] : [])]); // no asar: the two apps differ only in their native files, which is what merging them into one needs
   }
   if (existsSync(sdlScripts) && arches.at(-1) !== host) run('node', ['install.mjs'], { cwd: sdlScripts, env: { CROSS_COMPILE_ARCH: host } }); // and this machine's own again
 }

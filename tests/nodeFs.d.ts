@@ -7,6 +7,11 @@ declare module 'node:fs' {
   export function statSync(path: string): { size: number };
   export function appendFileSync(path: string, data: string): void;
   export function writeFileSync(path: string, data: string): void;
+  export function mkdirSync(path: string, options: { recursive: boolean }): void;
+  export function mkdtempSync(prefix: string): string;
+}
+declare module 'node:os' {
+  export function tmpdir(): string;
 }
 declare const process: { env: Record<string, string | undefined>; execPath: string };
 declare module 'node:child_process' {
