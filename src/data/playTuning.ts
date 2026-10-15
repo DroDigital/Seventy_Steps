@@ -62,12 +62,15 @@ export const MUSIC = {
   ahead: 0.25, // notes are scheduled this far ahead on the audio clock
 };
 
-/** The settings menu (Phase 6): [min, max, step, default]. */
+/** Extra resolution scales offered only after opening the optional higher resolutions and their immersion warning. */
+export const HIGH_RESOLUTIONS = [1.75, 2] as const;
+
+/** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {
   fxCap: [0, 1, 0.05, 1], // caps every sanity effect (accessibility); the default is FX.capDefault's
   sensitivity: [0.25, 3, 0.05, 1], // look speed: mouse, stick and arrows
   invertY: [0, 1, 1, 0], // 1: up looks down (round 12)
-  resolution: [0.5, 2, 0.25, 1.75], // internal resolution, × RENDER's 400 × 225 (700 × 394 by default)
+  resolution: [0.5, 1.5, 0.25, 1.5], // internal resolution, × RENDER's 400 × 225 (600 × 338 by default and at the standard maximum)
   brightness: [0.7, 1.6, 0.05, 1], // lifts the dark (a gamma, after the grade; round 12)
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)

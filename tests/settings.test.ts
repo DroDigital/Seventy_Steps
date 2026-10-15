@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RENDER, SETTINGS } from '../src/data/tuning';
+import { HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
 import { clampSetting, defaultSettings, loadSettings, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
 
 function memoryStore() {
@@ -12,12 +12,13 @@ function memoryStore() {
 }
 
 describe('settings', () => {
-  it('defaults to full FX, sensitivity 1, 700 × 394 and every level full', () => {
+  it('defaults to full FX, sensitivity 1, 600 × 338 and every level full', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.75, brightness: 1, fog: 1, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.5, brightness: 1, fog: 1, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, padSwap: 0,
       volume: SETTINGS.volume[3], music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
-    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([700, 394]);
+    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([600, 338]);
+    expect(SETTINGS.resolution[1]).toBe(defaultSettings().resolution);
   });
 
   it('clamps into range and snaps to the step', () => {
@@ -50,12 +51,29 @@ describe('settings', () => {
     expect(loadSettings(null)).toEqual(defaultSettings());
   });
 
-  it('an older entry starts at the default resolution; versioned choices remain unchanged', () => {
-    expect(parseSettings('{"resolution":1}').resolution).toBe(1.75);
-    expect(parseSettings('{"resolution":1.5,"v":13}').resolution).toBe(1.75); // the last version's choice, 600 × 338, takes the new default once
-    for (const resolution of [0.5, 1, 1.5, 2]) expect(parseSettings(JSON.stringify({ resolution, v: 14 })).resolution).toBe(resolution);
+  it('returns older high resolutions to the standard maximum without disturbing other settings', () => {
+    expect(parseSettings('{"resolution":1}').resolution).toBe(1.5);
+    for (const version of [13, 14]) {
+      for (const resolution of [0.5, 0.75, 1, 1.25, 1.5]) expect(parseSettings(JSON.stringify({ resolution, v: version })).resolution).toBe(resolution);
+      for (const resolution of HIGH_RESOLUTIONS) {
+        const chosen = { ...defaultSettings(), resolution, fxCap: 0.4, brightness: 1.25, fog: 0.5 };
+        expect(parseSettings(JSON.stringify({ ...chosen, v: version }))).toEqual({ ...chosen, resolution: 1.5 });
+      }
+    }
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), resolution: 1 });
     expect(loadSettings(store).resolution).toBe(1);
+  });
+
+  it('accepts optional higher resolutions and preserves them after an explicit choice', () => {
+    expect(HIGH_RESOLUTIONS.map((scale) => [RENDER.width, RENDER.height].map((v) => Math.round(v * scale)))).toEqual([[700, 394], [800, 450]]);
+    const store = memoryStore();
+    for (const resolution of HIGH_RESOLUTIONS) {
+      expect(clampSetting('resolution', resolution)).toBe(resolution);
+      storeSettings(store, { ...defaultSettings(), resolution });
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(15);
+      expect(loadSettings(store).resolution).toBe(resolution);
+    }
+    expect(clampSetting('resolution', 99)).toBe(2);
   });
 });
