@@ -18,10 +18,12 @@
     "icon": "node desktop/makeIcon.js",
     "audit": "vitest run --mode audit",
     "check:all": "tsc --noEmit && vitest run --mode all",
-    "package": "npm run build && electron-builder --dir",
-    "package:win": "npm run build && electron-builder --win --dir",
-    "package:linux": "npm run build && electron-builder --linux --dir",
-    "package:mac": "npm run build && electron-builder --mac --dir"
+    "package": "npm run build && npm run icon && electron-builder --dir",
+    "package:win": "npm run build && npm run icon && electron-builder --win --dir",
+    "package:linux": "npm run build && npm run icon && electron-builder --linux --dir",
+    "package:mac": "npm run build && npm run icon && node tools/package_mac.mjs",
+    "smoke": "node tools/smoke_packaged.mjs",
+    "steam:upload": "node tools/steam_upload.mjs"
   },
   "dependencies": {
     "gamepad-node": "^1.5.0",
@@ -64,9 +66,16 @@
     "icon": "build/icon.png",
     "win": {
       "target": [
-        "dir"
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
-      "executableName": "SeventySteps"
+      "executableName": "SeventySteps",
+      "requestedExecutionLevel": "asInvoker",
+      "legalTrademarks": "Seventy Steps"
     },
     "linux": {
       "target": [
@@ -77,9 +86,23 @@
     },
     "mac": {
       "target": [
-        "dir"
+        {
+          "target": "dir",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
       ],
-      "category": "public.app-category.role-playing-games"
+      "category": "public.app-category.role-playing-games",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "packaging/entitlements.mac.plist",
+      "entitlementsInherit": "packaging/entitlements.mac.plist",
+      "extendInfo": {
+        "NSSupportsAutomaticGraphicsSwitching": true,
+        "NSHighResolutionCapable": true
+      }
     }
   }
 }

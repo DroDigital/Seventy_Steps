@@ -77,3 +77,6 @@ export function steamAchieve(id) {
 
 /** Whether the shell is speaking to Steam. */
 export const steamOn = () => client !== null;
+
+/** Whether steamworks.js (its native binding for this platform) loaded at all, Steam running or not: what a packed build is checked for (`--smoke-test`, main.js). */
+export const steamBinding = () => !!load();
