@@ -35,7 +35,7 @@ export const LESSER = tier('lesser', [
     sprite: { silhouette: 'hunched', palette: 'mold', scale: 2.2, eyes: 2 },
     behavior: { archetype: 'pack_hunter', attacks: ['bite', 'sweep', 'lunge'] },
     stats: st(160, 30, 16, 3.8, 0.3, 2), drops: { echoes: 120 }, insightOnSight: 0,
-    eldritchVariant: { sprite: { eyes: 3, glow: 'green' } },
+    eldritchVariant: { sprite: { eyes: 3 } }, // its eyes stand plain, no glow (round 46: it looked silly)
   },
   {
     id: 'ghast', name: 'Ghast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true, voice: 'cough',

@@ -34,6 +34,7 @@ export const ATTACK_IDS = [
   'lunge',
   'charge',
   'grab',
+  'seize',
   'bite',
   'tentacle_burst',
   'projectile',

@@ -53,8 +53,8 @@ export const GREATER = tier('greater', [
   {
     id: 'gug', name: 'Gug', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'giant', palette: 'charcoal', scale: 6, eyes: 2, limbs: 4 },
-    behavior: { archetype: 'brute', attacks: ['slam', 'grab', 'sweep'] },
-    stats: st(1100, 200, 44, 3, 1.5, 5), drops: { echoes: 900 }, insightOnSight: 0,
+    behavior: { archetype: 'brute', attacks: ['slam', 'seize', 'sweep'] }, // round 46: a grab it can be guarded against, and less damage (34, was 44) and health (900, was 1100): it was the strongest brute of its tier
+    stats: st(900, 200, 34, 3, 1.5, 5), drops: { echoes: 900 }, insightOnSight: 0,
   },
   {
     id: 'dhole', name: 'Dhole', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond'], canonLooks: true,

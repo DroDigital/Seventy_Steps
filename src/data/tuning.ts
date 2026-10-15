@@ -96,7 +96,7 @@ export const LANTERN = {
 /** The player character (spec §3B). Speeds in m/s, turn rates in rad/s. */
 export const PLAYER = {
   hp: 160,
-  poise: 30,
+  poise: 60, // the stagger budget: a blow's poise is the attack's times the creature's damage, so 30 let two bites stagger (round 46: 60)
   stamina: 100,
   radius: 0.4, // capsule
   height: 1.8,

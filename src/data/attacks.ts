@@ -47,6 +47,7 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   lunge: melee({ windup: 28, active: 10, recovery: 34, power: 1.3, poise: 1.2, range: [2.5, 5.5], reach: 1.1, radius: 0.55, height: 0.55, arc: [15, -15], lunge: 4.2 }),
   charge: melee({ windup: 30, active: 18, recovery: 36, power: 1.5, poise: 2, range: [4, 10], reach: 1.2, radius: 0.8, height: 0.5, arc: [0, 0], lunge: 8 }),
   grab: melee({ windup: 28, active: 6, recovery: 40, power: 1.4, poise: 0.6, range: [0, 1.8], reach: 1, radius: 0.5, height: 0.6, arc: [30, -30], unblockable: true }),
+  seize: melee({ windup: 28, active: 6, recovery: 40, power: 1.4, poise: 0.6, range: [0, 1.8], reach: 1, radius: 0.5, height: 0.6, arc: [30, -30] }), // the grab a guard can stop (Gug's: the unblockable grab was unfair at its damage, round 46)
   bite: melee({ windup: 18, active: 5, recovery: 20, power: 0.9, poise: 0.6, range: [0, 1.8], reach: 1.1, radius: 0.45, height: 0.5, arc: [10, -10], lunge: 0.6 }),
   tentacle_burst: melee({ windup: 30, active: 12, recovery: 30, power: 1.2, poise: 1, range: [0, 3.5], reach: 2.2, radius: 0.7, height: 0.5, arc: [120, -120] }),
   projectile: { kind: 'ranged', windup: 40, active: 1, recovery: 38, power: 0.9, poise: 0.5, range: [4, 18], bolts: { count: 1, spread: 0, speed: 13, radius: 0.3 } }, // round 45: was 26 / 30 and 16 m/s: from a pack of them there was no time to read one and roll
