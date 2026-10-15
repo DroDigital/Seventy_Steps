@@ -10,7 +10,6 @@
 import { slotParts, type SlotLine } from './titleSlots';
 import { t } from '../core/i18n';
 import type { Key } from '../data/lang';
-import { TITLE_LINES } from '../data/intro';
 import { DIFFICULTY_IDS, type DifficultyId } from '../data/tuning';
 import { BONE, SERIF } from './hudKit';
 import { SCALED_LAYER } from './uiScale';
@@ -19,7 +18,6 @@ import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { button, createScreen, el, heading, LIFT_ROOM, type Page } from './menuKit';
 import { wordmark } from './logo';
-import { menuKeys } from './menuKeys';
 import { settingsPage } from './menuPages';
 import type { SettingId, Settings } from './settings';
 
@@ -40,14 +38,28 @@ export interface TitleOptions {
 export function showTitle(o: TitleOptions): void {
   const screen = createScreen(5, '#000', 'left:50%;top:66%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:60vh;overflow-x:hidden;overflow-y:auto;text-align:center;' + LIFT_ROOM); // the menu stands in the lower half; the name has the upper (round 38)
   const logo = wordmark(); // the name cut in stone (round 20), made once
-  // The name and its two lines: a layer of their own over the upper half, centred in it, so each page of the menu below can stand where it likes.
+  // The name: a layer of its own over the upper half, standing midway between the top of the screen and the menu under it (`settle`), so each page of the menu below can stand where it likes.
   const head = document.createElement('div');
   head.style.cssText = `position:fixed;inset:0;z-index:6;pointer-events:none;transition:opacity .5s;font:14px/1.45 ${SERIF};color:${BONE}`;
   const headLayer = el(head, 'div', '', SCALED_LAYER);
-  const headBox = el(headLayer, 'div', '', 'position:absolute;left:0;right:0;top:25%;transform:translateY(-50%);text-align:center');
+  const headBox = el(headLayer, 'div', '', 'position:absolute;left:0;right:0;top:29%;transform:translateY(-50%);text-align:center');
   headBox.append(logo.canvas);
-  const headLines = [el(headBox, 'div', TITLE_LINES[0], 'opacity:.6;letter-spacing:2px;margin:6px auto'), el(headBox, 'div', TITLE_LINES[1], 'opacity:.45;font-style:italic;margin:0 auto;max-width:380px')];
   document.body.append(head);
+  /** The name stands midway between the top of the screen and the top of the menu, whatever lines the menu has (a saved game adds Continue and Load): clear of it, and centred in the room above it; in a window too small for both at their size it is drawn smaller to fit (round 49). */
+  let settled = false;
+  const settle = (): void => {
+    const panel = screen.root.querySelector<HTMLElement>('[data-menu]');
+    if (!panel || !panel.offsetHeight) return;
+    const menuTop = panel.offsetTop - panel.offsetHeight / 2; // (the panel is centred on its top by a translate)
+    const room = Math.max(48, menuTop - 24); // a margin above and below the name
+    logo.canvas.style.maxWidth = `min(94%, ${(room * logo.canvas.width) / logo.canvas.height}px)`; // (its height follows its width)
+    const half = headBox.offsetHeight / 2;
+    headBox.style.top = `${Math.max(half + 8, menuTop / 2)}px`;
+    if (!settled) [settled, headBox.style.transition] = [true, 'top .45s ease']; // (it glides as the page changes, but not as it first stands)
+  };
+  const seen = new ResizeObserver(settle); // (the menu's own size changes with each page, and from nothing as the screen is first shown)
+  seen.observe(headLayer);
+  for (const panel of screen.root.querySelectorAll('[data-menu]')) seen.observe(panel);
   const showHead = (on: boolean): void => void (head.style.opacity = on ? '1' : '0');
   screen.onClose = () => head.remove();
   /** Where a page stands, and whether the name is over it: set as the page is built. */
@@ -66,8 +78,6 @@ export function showTitle(o: TitleOptions): void {
     begun = true;
     o.start(fresh, () => screen.close(true), difficulty);
   };
-  let first = true; // the lines under the name come up once the lighting is done, the first time the menu is drawn
-  const riseLines = (): void => headLines.forEach((l, k) => l.animate([{ opacity: 0 }, { opacity: l.style.opacity }], { duration: 1600, delay: 2600 + 500 * k, fill: 'backwards', easing: 'ease-out' }));
   let awake = false;
   const wake = (): void => {
     if (awake) return;
@@ -89,8 +99,6 @@ export function showTitle(o: TitleOptions): void {
   addEventListener('pointerdown', wake, true);
   const main: Page = placed({
     build(p) {
-      if (first) riseLines();
-      first = false;
       const menu = el(p, 'div');
       menu.className = 'pause'; // centred lines, each on a plaque of its own, as the pause menu's (ui/menuParts.ts)
       const gap = (): void => void el(menu, 'div', '', 'height:14px'); // the groups are told apart by space
@@ -109,7 +117,6 @@ export function showTitle(o: TitleOptions): void {
         gap();
         button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())).classList.add('exit');
       }
-      el(p, 'div', menuKeys().map(([k, w]) => `${k} ${w}`).join('   ·   '), 'opacity:.5;margin-top:26px;padding-left:2px;font-size:11px;letter-spacing:2px;text-transform:uppercase'); // (the padding is its letter-spacing, which trails the last letter)
     },
   }, '66%', true);
   const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));

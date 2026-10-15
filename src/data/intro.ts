@@ -42,8 +42,5 @@ export const INTRO: readonly IntroCard[] = [
 /** What a card shows: its performed words with the performance taken out. */
 export const introText = (card: IntroCard): string => shown(card.say);
 
-/** Under the title: the time and place, and what is wrong there. */
 /** The game's name (proposed in playtest round 4; index.html's <title> matches it). */
 export const GAME_NAME = 'Seventy Steps';
-
-export const TITLE_LINES = ['Arkham, Massachusetts · October 1928', 'Eleven people in Arkham have fallen asleep and cannot be woken.'] as const;

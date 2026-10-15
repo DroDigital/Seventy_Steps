@@ -13,7 +13,6 @@ import { riseAt } from '../systems/death';
 import { gatePlan } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
 import { createScreen, footer, option, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 export interface RiseMenu {
   readonly open: boolean;
@@ -31,7 +30,7 @@ export function createRiseMenu(g: Game): RiseMenu {
         title(panel, t('rise.title'));
         option(panel, t('rise.candle'), () => choose('candle'), true, '', boss ? t('rise.candleBoss', { boss }) : t('rise.candleFog'));
         option(panel, sign ? t('rise.signNamed', { sign }) : t('rise.sign'), () => choose('sign'), true, '', t('rise.signHint'));
-        footer(panel, t('rise.footer'), menuKeys().filter((k) => k[1] !== t('keys.back')));
+        footer(panel, t('rise.footer'));
       },
     };
     screen.show(page);

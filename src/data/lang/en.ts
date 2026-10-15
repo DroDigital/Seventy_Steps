@@ -7,10 +7,7 @@
 
 export const EN = {
   // keys at the foot of a page
-  'keys.choose': 'Choose',
-  'keys.select': 'Select',
   'keys.back': 'Back',
-  'keys.tabs': 'Tabs',
   'val.on': 'On',
   'val.off': 'Off',
   'val.onLc': 'on',
@@ -43,21 +40,12 @@ export const EN = {
   // the pause menu
   'pause.title': 'PAUSED',
   'pause.resume': 'Resume',
-  'pause.resumeHint': 'Return to the dream.',
   'pause.map': 'Map',
-  'pause.mapHint': 'The lands you have walked, the signs lit, and the way to travel between them.',
   'pause.journal': 'Journal',
-  'pause.journalHint': 'What is asked of you, the tomes read, and the creatures beheld.',
   'pause.arms': 'Arms',
-  'pause.armsHint': 'The weapons you carry, and which is in hand.',
   'pause.achievements': 'Achievements',
-  'pause.achievementsHint': 'What you have done, and what remains.',
-  'pause.settingsHint': 'Picture, sound, how you play, and the keys.',
-  'pause.creditsHint': 'Who made this, and with what.',
   'pause.quitTitle': 'Quit to title',
-  'pause.quitTitleHint': 'Your progress is kept at the last sign you rested at.',
   'pause.quitDesktop': 'Quit to desktop',
-  'pause.quitDesktopHint': 'Close the game.',
   // settings
   'set.title': 'SETTINGS',
   'set.tab.display': 'Display',

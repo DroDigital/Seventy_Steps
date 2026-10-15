@@ -7,7 +7,6 @@ import { RELICS } from '../data/relics';
 import type { Game } from '../systems/components';
 import { effectsOf, owned, slotsOf, wear } from '../systems/relics';
 import { button, el, footer, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 const NUMERALS = ['I', 'II', 'III'];
 
@@ -38,7 +37,7 @@ export function slotPage(g: Game, slot: number, back: () => void): Page {
         const here = at === slot ? '    ·  worn here' : at >= 0 ? `    ·  worn in slot ${NUMERALS[at]}` : '';
         button(p, `${RELICS[id].name}${here}`, () => choose(id), true, RELICS[id].note, effectsOf(id));
       }
-      footer(p, 'Choose what to wear here. A relic worn in the other slot changes places with it.', menuKeys(), back);
+      footer(p, 'Choose what to wear here. A relic worn in the other slot changes places with it.', back);
     },
   };
   return page;

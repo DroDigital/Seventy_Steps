@@ -24,11 +24,8 @@ import { closedBy, heldOpen, listed } from '../systems/veil';
 import { currentLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
 import { worldLayout, type SignPlace } from '../world/placements';
-import { deviceInUse } from '../core/device';
 import { ACCENT, button, createScreen, el, footer, heading, option, tabs, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 import { keyLayout } from '../core/bindings';
-import { glyph } from './glyphs';
 import { moveSection, movePage } from './signMove';
 import { relicsTab, slotPage } from './signRelics';
 
@@ -150,8 +147,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     else if (tab === 1) arms(panel);
     else if (tab === 2) relicsTab(panel, g, (slot) => screen.show(slotPage(g, slot, () => screen.show(main))));
     else travelTab(panel);
-    const pad = deviceInUse() === 'pad';
-    footer(panel, REST, [...menuKeys(true).slice(0, 3), [pad ? glyph('back') : `${glyph('interact')} / ${glyph('back')}`, 'Back']], close);
+    footer(panel, REST, close);
   }
 
   // E and Esc leave without reaching the game (E would rest again at once).
@@ -171,7 +167,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
         build(panel) {
           title(panel, regionName(region).toUpperCase());
           for (const s of found().get(region) ?? []) button(panel, s.name, () => journey(s));
-          footer(panel, '', menuKeys(), page.back);
+          footer(panel, '', page.back);
         },
       };
       regionPages.set(region, (p = page));

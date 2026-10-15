@@ -12,7 +12,6 @@ import { LANGS, type Key } from '../data/lang';
 import { RENDER, SETTINGS } from '../data/tuning';
 import { desktop } from './desktop';
 import { button, el, footer, slider, tabs, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 import type { SettingId, Settings } from './settings';
 
 const pct = (v: number): string => `${Math.round(v * 100)}%`;
@@ -92,7 +91,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
         const label = (): void => void isFullscreen().then((on) => (b.textContent = t('set.fullscreenState', { state: t(on ? 'val.onLc' : 'val.offLc') })));
         label();
       }
-      footer(panel, t('set.footer'), menuKeys(true), page.back);
+      footer(panel, t('set.footer'), page.back);
     },
   };
   return page;
@@ -131,5 +130,5 @@ function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | nul
   button(row, t('ctl.swap', { state: t(swapped ? 'val.onLc' : 'val.offLc') }), () => (swap(!swapped), page.redraw?.()), true, t('ctl.swapHint')).classList.add('tag');
   el(row, 'div', t('ctl.padReport', { report: padReport() || t('ctl.padNone') }), 'opacity:.55;font-size:11px');
   const on = waiting();
-  footer(panel, refused() ? t('ctl.refused') : on ? t('ctl.waiting', { action: KEYED(on) }) : t('ctl.choose'), menuKeys(true), page.back);
+  footer(panel, refused() ? t('ctl.refused') : on ? t('ctl.waiting', { action: KEYED(on) }) : t('ctl.choose'), page.back);
 }

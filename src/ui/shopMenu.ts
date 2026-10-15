@@ -9,7 +9,6 @@ import type { Game } from '../systems/components';
 import { buy, canBuy, carried, hasRoom, stockLeft } from '../systems/trade';
 import { fill } from './glyphs';
 import { ACCENT, createScreen, el, footer, option, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 export interface ShopMenu {
   readonly open: boolean;
@@ -35,7 +34,7 @@ export function createShopMenu(g: Game): ShopMenu {
           const note = `${fill(w.note)}${c ? `  (Carried: ${c.have} of ${c.most} ${c.unit}.)` : ''}`; // what a pocket holds, before it is asked (round 24)
           option(panel, `${w.name}  ·  ${tail}`, () => (buy(g, id), page.redraw?.()), ok, why, note); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
         }
-        footer(panel, '', menuKeys(), () => screen.close());
+        footer(panel, '', () => screen.close());
       },
     };
     screen.show(page);
