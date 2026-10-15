@@ -35,11 +35,16 @@ if (!args.includes('--no-build')) {
 }
 
 const identity = process.env.MAC_SIGN_IDENTITY ?? '-'; // '-' is ad hoc
-const { signAsync } = await import('@electron/osx-sign');
 const entitlements = join(root, 'packaging', 'entitlements.mac.plist');
 const sign = async (app) => {
   console.log(`signing ${app} (${identity === '-' ? 'ad hoc' : identity})`);
-  await signAsync({ app, identity, platform: 'darwin', optionsForFile: () => ({ entitlements, hardenedRuntime: identity !== '-' }) });
+  if (identity === '-') { // (osx-sign looks an identity up in the keychain and finds none for '-': codesign itself, the whole bundle, inside out)
+    run('codesign', ['--force', '--deep', '--sign', '-', app]);
+    run('codesign', ['--verify', '--deep', '--strict', app]);
+    return;
+  }
+  const { signAsync } = await import('@electron/osx-sign');
+  await signAsync({ app, identity, platform: 'darwin', optionsForFile: () => ({ entitlements, hardenedRuntime: true }) });
 };
 
 if (args.includes('--universal')) {
