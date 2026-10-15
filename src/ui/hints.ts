@@ -1,5 +1,5 @@
 /**
- * Hints for a new investigator (playtest round 1): a line at the upper left the first time each
+ * Hints for a new investigator (playtest round 1): a line at the lower left (round 52: the vitals have the upper) the first time each
  * thing comes up — moving, where the story leads, a fight, a wound, a failing mind, an Elder Sign, dropped Echoes, the map,
  * a level within reach, a quest, a boss (and what each asks besides striking: blind Azathoth, Cthulhu's ship, the Dunwich Horror's powder, Ghatanothoa's stone, Shub-Niggurath's roots, Yog-Sothoth's spheres, a colossus's stoop; round 25), insight, a doorway only insight shows (and what spending the insight does to it), a relic, a flask of oil bought, a grab, a hallucination — then never again in that save. What has been told is kept in the save, and read again in the Journal's Field Guide (ui/fieldGuide.ts); a save from before took up what this browser had been told.
  * Round 14: a journey taken up again from a save first says where the story had led (the lead's line).
@@ -47,7 +47,7 @@ function load(): Set<string> {
 }
 
 export function createHints(g: Game, root: HTMLElement): Hints {
-  const box = el(`position:absolute;left:16px;top:16px;max-width:360px;font-size:11px;line-height:1.5;padding:6px 10px;background:#050506b0;border-left:2px solid ${BONE}66;opacity:0;transition:opacity .6s`, '', root);
+  const box = el(`position:absolute;left:16px;bottom:14px;max-width:min(360px,22vw);font-size:11px;line-height:1.5;padding:6px 10px;background:#050506b0;border-left:2px solid ${BONE}66;opacity:0;transition:opacity .6s`, '', root);
   const browser = load(); // what this browser was told: before hints were kept in each save, and still what the lore lines go by (loreLine.ts)
   const told = g.overworld?.told;
   if (told) takeUpBrowser(told, browser); // a save from before: its investigator was not told these there, but this browser had been
