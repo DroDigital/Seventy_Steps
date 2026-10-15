@@ -170,6 +170,18 @@ describe('a line said', () => {
     expect(sources).toHaveLength(1);
   });
 
+  it('plays a repeated line only once when both requests are still loading', async () => {
+    const id = clip('boss:cthulhu', LINE);
+    files['v/index.json'] = JSON.stringify([id]);
+    files[`v/${id}.mp3`] = new ArrayBuffer(64);
+    const { engine, sources } = fakeEngine();
+    const speech = createSpeech(engine, 'v/');
+    speech.say('boss:cthulhu', LINE);
+    speech.say('boss:cthulhu', LINE);
+    await flush();
+    expect(sources).toHaveLength(1);
+  });
+
   it('has a talk\'s lines fetched ahead, only those that exist, and each once', async () => {
     const [a, b] = [clip('npc:peaslee', LINE), clip('npc:peaslee', OTHER)];
     files['v/index.json'] = JSON.stringify([a]); // only the first has been recorded

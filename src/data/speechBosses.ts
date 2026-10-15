@@ -5,9 +5,10 @@
  * cutscene shows it low on the screen as it is said) and a last as they fall. Each is written as it
  * is performed, [audio tags], pauses and a leaned-on CAPITAL and all (speechNpcs.ts says how); the
  * words shown are those with the tags out and the capitals let down again (`shown`). Keyed by roster
- * id; the rest stay wordless, as their stories leave them. The two that have no scene (the Dunwich
- * Horror is unseen, Brown Jenkin joins a fight already begun, and speaks no more: his one line was given up, round 46, for a voice's place) say only a last line, shown as a notice
- * (render/cinemaDirector.ts). Data only.
+ * id; the rest stay wordless, as their stories leave them. The unseen Dunwich Horror says only a
+ * last line, as a notice; the Voice in the Tomb has no phase script and speaks in notices on first
+ * sight and when vanquished (render/cinemaDirector.ts). Brown Jenkin is wordless: his one line was
+ * given up, round 46, for a voice's place. Data only.
  */
 
 export interface BossWords {
