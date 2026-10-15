@@ -165,8 +165,8 @@ export function tabs(parent: HTMLElement, names: readonly string[], open: number
   });
 }
 
-/** A page's foot: a hint line (what the chosen line is: set by `data-hint`), and the keys it answers to, whose Back goes back when clicked. */
-export function footer(parent: HTMLElement, hint: string, keys: readonly (readonly [string, string])[], back?: () => void): void {
+/** A page's foot: a hint line (what the chosen line is: set by `data-hint`), and Back, which goes back when clicked (the keys have their own). A page with neither has no foot at all. Round 49: the line of keys that stood here ("↑ ↓ Choose · Enter Select · Esc Back") is gone: a player knows how to use a menu. */
+export function footer(parent: HTMLElement, hint: string, back?: () => void): void {
   const rest = [...parent.children].filter((c) => !c.hasAttribute('data-pin')); // all but the title and tabs scroll between them and the foot
   const body = el(parent, 'div');
   body.className = 'scroll';
@@ -175,13 +175,13 @@ export function footer(parent: HTMLElement, hint: string, keys: readonly (readon
   body.addEventListener('scroll', more, { passive: true });
   new ResizeObserver(more).observe(body);
   if (parent.dataset.body) [body.style.flex, parent.dataset.body] = [`1 1 ${parent.dataset.body}px`, '']; // a page with tabs keeps one height, whichever tab is open (it is a size to start from, not a least: a small window still shrinks it)
+  if (!hint && !back && !body.querySelector('[data-hint]')) return; // nothing to say, and nowhere to go back to (the pause menu)
   const line = el(parent, 'div', hint, `margin-top:12px;padding-top:8px;border-top:1px solid;border-image:linear-gradient(90deg,transparent,${ACCENT}33 16%,${ACCENT}33 84%,transparent) 1`);
   line.className = 'hint';
   line.dataset.def = hint; // what it says when the chosen line has nothing of its own to say
   if (!hint && !body.querySelector('[data-hint]')) [line.className, line.style.minHeight] = ['', '0']; // nothing to say (a list of tomes): no room kept for it
+  if (!back) return;
   const row = el(parent, 'div', '', `display:flex;justify-content:center;gap:20px;white-space:nowrap;margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:${INK}8c`);
-  for (const [key, what] of keys) {
-    const s = el(row, 'span', `${key}  ${what}`);
-    if (back && what === t('keys.back')) [s.style.cursor, s.onclick] = ['pointer', back]; // the mouse's way back: a click on it (it is not a choice for the keys)
-  }
+  const s = el(row, 'span', t('keys.back'));
+  [s.style.cursor, s.onclick] = ['pointer', back]; // the mouse's way back: a click on it (it is not a choice for the keys)
 }

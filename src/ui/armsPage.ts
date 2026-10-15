@@ -16,7 +16,6 @@ import { effectsOf, owned, worn } from '../systems/relics';
 import { RELICS } from '../data/relics';
 import { button, el, footer, heading, title, type Page } from './menuKit';
 import { fill } from './glyphs';
-import { menuKeys } from './menuKeys';
 
 /** A weapon's numbers: its first light and heavy blows (times `k`, the Might bonus), how soon the light one lands, its reach and cost. */
 export function weaponStats(w: WeaponDef, k = 1): string {
@@ -58,7 +57,7 @@ export function armsPage(g: Game, back: () => void, show: (p: Page) => void): Pa
       }
       const unfound = WEAPON_IDS.length - g.player.arms.length;
       if (unfound > 0) el(p, 'div', `${unfound === 1 ? 'One more weapon lies' : `${unfound} more weapons lie`} somewhere in the dream.`, 'opacity:.4;font-style:italic;margin:10px 14px 0;font-size:13px');
-      footer(p, fill('Choose a weapon to take it up. The revolver is loaded with {reload}; its rounds are found in boxes and caches, and sold by those who trade.'), menuKeys(), back);
+      footer(p, fill('Choose a weapon to take it up. The revolver is loaded with {reload}; its rounds are found in boxes and caches, and sold by those who trade.'), back);
     },
   };
   return page;

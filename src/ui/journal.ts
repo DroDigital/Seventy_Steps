@@ -17,7 +17,6 @@ import { fieldGuideBody } from './fieldGuide';
 import { keyLayout } from '../core/bindings';
 import { BONE } from './hudKit';
 import { button, el, footer, heading, tabs, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 const TABS = ['Under way', 'Documents', 'Field Guide', 'Bestiary'];
 
@@ -61,7 +60,7 @@ export function journalPage(g: Game, back: () => void, show: (p: Page) => void, 
       el(body, 'div', `${beheld(g).length} of ${ENTITIES.length} beheld`, 'opacity:.45;font-size:12px;letter-spacing:2px;padding:0 14px 6px');
       button(body, 'The creatures beheld', () => show(bestiaryPage(g, () => show(page), show)), true, 'Each creature met: a field note, its habits, its weakness, and where it is found.');
     }
-    footer(p, '', menuKeys(true), back);
+    footer(p, '', back);
   };
   return page;
 }

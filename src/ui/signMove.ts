@@ -9,7 +9,6 @@ import { WEAPONS, type WeaponId } from '../data/weapons';
 import { movable, moveLevels } from '../systems/arms';
 import type { Game } from '../systems/components';
 import { button, el, footer, heading, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 const named = (g: Game, id: WeaponId): string => `${WEAPONS[id].name} +${g.player.reinforced[id]}`;
 
@@ -46,7 +45,7 @@ export function movePage(g: Game, from: WeaponId, back: () => void): Page {
           if (room > 1) button(p, `Move ${room} levels  ·  +${now} → +${now + room}`, () => (moveLevels(g, from, to, room), left()), true, `All ${WEAPONS[to].name} has room for.`);
         }
       }
-      footer(p, `Levels are moved whole: ${WEAPONS[from].name} gives them up, the other weapon takes them. Nothing is lost.`, menuKeys(), back);
+      footer(p, `Levels are moved whole: ${WEAPONS[from].name} gives them up, the other weapon takes them. Nothing is lost.`, back);
     },
   };
   return page;

@@ -11,7 +11,6 @@ import type { Game } from '../systems/components';
 import { fill } from './glyphs';
 import { BONE } from './hudKit';
 import { button, el, footer, heading, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 
 /** The hints this save has been given. */
 export const given = (g: Game): HintId[] => HINT_IDS.filter((id) => !!g.overworld && hintGiven(g.overworld.told, id));
@@ -40,7 +39,7 @@ export function guidePage(id: HintId, back: () => void): Page {
       el(p, 'div', GUIDE[id].title.toUpperCase(), `letter-spacing:3px;color:${BONE};margin-bottom:4px`);
       el(p, 'div', GUIDE[id].group, 'opacity:.45;font-size:11px;margin-bottom:14px');
       el(p, 'p', hintText(id), 'font-size:15px;line-height:1.6;margin:0 0 10px');
-      footer(p, '', menuKeys(), back);
+      footer(p, '', back);
     },
   };
   return page;

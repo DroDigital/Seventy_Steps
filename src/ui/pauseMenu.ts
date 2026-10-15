@@ -10,7 +10,6 @@ import { keyLayout } from '../core/bindings';
 import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
 import { button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
-import { menuKeys } from './menuKeys';
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { settingsPage } from './menuPages';
@@ -49,21 +48,20 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
       title(p, t('pause.title'));
       const list = el(p, 'div');
       list.className = 'pause'; // centred lines, each on a plaque of its own (ui/menuParts.ts)
-      button(list, t('pause.resume'), resume, true, t('pause.resumeHint'));
+      button(list, t('pause.resume'), resume);
       const gap = (): void => void el(list, 'div', '', 'height:14px'); // the groups are told apart by space, not by faint rules
       gap();
-      if (o.map) button(list, t('pause.map'), () => [screen.close(true), o.map!()], true, t('pause.mapHint'));
-      if (o.journal) button(list, t('pause.journal'), () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.journalHint'));
-      if (o.arms) button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))), true, t('pause.armsHint'));
-      if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))), true, t('pause.achievementsHint'));
+      if (o.map) button(list, t('pause.map'), () => [screen.close(true), o.map!()]);
+      if (o.journal) button(list, t('pause.journal'), () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))));
+      if (o.arms) button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))));
+      if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))));
       gap();
-      button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)), true, t('pause.settingsHint'));
-      button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))), true, t('pause.creditsHint'));
+      button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)));
+      button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))));
       gap();
-      button(list, t('pause.quitTitle'), o.quit, true, t('pause.quitTitleHint')).classList.add('exit'); // the ways out are dimmer, and light ash-red when chosen
-      if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit()), true, t('pause.quitDesktopHint')).classList.add('exit'); // the shell only: a browser tab is closed by its own hand
-      footer(p, t('pause.resumeHint'), menuKeys());
-      Object.assign(p.querySelector<HTMLElement>('.hint')!.style, { minHeight: '1.45em', textAlign: 'center' }); // every line's hint is one line: no room kept for two; centred, as the lines are
+      button(list, t('pause.quitTitle'), o.quit).classList.add('exit'); // the ways out are dimmer, and light ash-red when chosen
+      if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit())).classList.add('exit'); // the shell only: a browser tab is closed by its own hand
+      footer(p, ''); // (no foot: the lines are what they say, and a menu is used by the keys and the mouse without a word of how; round 49)
     },
   };
   const pause = (): void => {
