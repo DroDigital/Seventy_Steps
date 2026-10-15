@@ -29,7 +29,7 @@ const host = process.arch;
 if (!args.includes('--no-build')) {
   for (const arch of arches) {
     if (existsSync(sdlScripts)) run('node', ['install.mjs'], { cwd: sdlScripts, env: { CROSS_COMPILE_ARCH: arch } }); // this architecture's SDL for the build
-    run('npx', ['electron-builder', '--mac', `--${arch}`, '--dir']);
+    run('npx', ['electron-builder', '--mac', `--${arch}`, '--dir', '-c.asar=false']); // no asar: the two apps differ only in their native files, which is what merging them into one needs
   }
   if (existsSync(sdlScripts) && arches.at(-1) !== host) run('node', ['install.mjs'], { cwd: sdlScripts, env: { CROSS_COMPILE_ARCH: host } }); // and this machine's own again
 }
@@ -67,7 +67,6 @@ if (universal) {
     arm64AppPath: copies.arm64,
     outAppPath: universalApp,
     force: true,
-    mergeASARs: true, // one app.asar, not app-arm64.asar and app-x64.asar behind a stub that picks one (that build sat in a loop in its own startup on the Mac runner)
     x64ArchFiles: '**/steamworks.js/**', // (the Steam binding carries its own libraries for both: identical in both apps)
   });
   rmSync(staging, { recursive: true, force: true });
