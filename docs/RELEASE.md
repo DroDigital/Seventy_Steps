@@ -99,12 +99,14 @@ because a Steam build started outside Steam would relaunch itself through it.
   warning, get an Apple Developer ID ($99 a year) and set the secrets `MAC_CERT_P12_BASE64` (the Developer ID Application certificate exported
   as .p12, base64), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`: the Mac job then signs with the
   hardened runtime and notarises the universal app (written, not yet run: expect one round of fixing when the first certificate is used).
-- **The page's pictures:** `node tools/itch_art.mjs` (the dev server running, and Playwright: see its header) makes the screenshots (1920 × 1080:
-  the title, the dream's places, the town with its HUD), the cover (630 × 500, the wordmark over a place) and the profile picture (the Elder Sign,
-  512 square) in `store/itch/`; `--from <folder>` dresses pictures of your own instead (the game's photo mode, P, keeps one as a PNG), which on a
-  real GPU will be better than a software renderer's. The icon of the .exe and the .app is the Elder Sign too (`npm run icon`: `desktop/icon.js`;
-  the Mac's is set in from the edge with a shadow, as macOS draws them), and CI prints what each shipped file carries. There is no .dmg: the Mac
-  build is the `.app` (itch's app runs it; a browser download gets it zipped).
+- **The page's pictures:** `node tools/itch_art.mjs frames` (the dev server running, and Playwright: see its header) photographs the title and
+  five fights (the investigator walks into each horror's ring and strikes: Cthulhu's talons overhead, Shub-Niggurath's young, Yog-Sothoth's beam,
+  Hastur, the Colossus) into `store/itch/frames/`, 1920 × 1080, with no sanity distortion and no hint over them; you choose the best by eye, and
+  `node tools/itch_art.mjs pack --hero <the best> <the others...>` makes the set: numbered screenshots, the cover (630 × 500), the social image
+  (1200 × 630), the wide cover (21:9), a transparent logo and the profile picture (the Elder Sign, 512 square). A software renderer is a minute a
+  place and flatter than a GPU's: pictures of your own (photo mode, P) go through `pack` just as well. The icon of the .exe and the .app is the
+  Elder Sign too (`npm run icon`: `desktop/icon.js`; the Mac's is set in from the edge with a shadow, as macOS draws them), and CI prints what each
+  shipped file carries. There is no .dmg: the Mac build is the `.app` (itch's app runs it; a browser download gets it zipped).
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
 
