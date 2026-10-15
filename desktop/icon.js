@@ -26,15 +26,14 @@ function segDist(px, py, [ax, ay, bx, by]) {
 
 /**
  * RGBA pixels of the icon, `size` square. `shape`: "round" (a rounded square to the edge), "mac" (the same, set in to 80% with a soft
- * shadow under it: Apple's template) or "plain" (no corners: the picture a store crops itself, the sign set in the middle).
+ * shadow under it: Apple's template) or "plain" (no corners, the sign set in to 80%: the picture a store crops itself).
  */
 export function iconPixels(size, shape = 'round') {
   const mac = shape === 'mac';
   const plain = shape === 'plain';
-  const inset = mac ? 0.805 : 1; // the square's side, of the canvas
-  const lift = plain ? -0.03 : 0; // the sign sits a little higher in a picture that is cropped round
+  const inset = mac ? 0.805 : plain ? 0.8 : 1; // the square's side, of the canvas (a picture a store crops, perhaps round, keeps the sign well inside)
   const segs = STROKES.map(([x0, y0, lean, len]) => {
-    const [ax, ay] = [0.5 + (FOOT[0] - 0.5 + x0 * SCALE) * inset, 0.5 + (FOOT[1] - 0.5 - y0 * SCALE) * inset + lift];
+    const [ax, ay] = [0.5 + (FOOT[0] - 0.5 + x0 * SCALE) * inset, 0.5 + (FOOT[1] - 0.5 - y0 * SCALE) * inset];
     return [ax, ay, ax + Math.sin(lean) * len * SCALE * inset, ay - Math.cos(lean) * len * SCALE * inset];
   });
   const width = WIDTH * inset;
