@@ -17,7 +17,7 @@ import { SERIF } from './hudKit';
 import { menuSound } from './menuSounds';
 import { CSS, frame, INK, tabJustChanged } from './menuParts';
 import { installCursor, menuCursor } from './cursor';
-import { attachSkin, SKIN } from './menuSkin';
+import { attachSkin, SKIN, type Skin } from './menuSkin';
 import { SCALED_LAYER } from './uiScale';
 
 export interface Page {
@@ -243,9 +243,9 @@ function startOnce(): void {
   requestAnimationFrame(pollPad);
 }
 
-/** A screen at stacking level `z`; `panelCss` places and styles its panel. `keepLock`: the mouse stays captured while it is open (a talk, which is read and answered by key: round 31, so leaving one needs no click to look about again). */
-export function createScreen(z: number, backdrop = '#050506dd', panelCss?: string, scaled = true, keepLock = false): Screen {
-  const skin = panelCss === undefined && scaled ? SKIN : null; // the standard panel takes the menus' skin (menuSkin.ts); one with its own look does not
+/** A screen at stacking level `z`; `panelCss` places and styles its panel. `keepLock`: the mouse stays captured while it is open (a talk, which is read and answered by key: round 31, so leaving one needs no click to look about again). `look`: another skin for a standard panel (a note's burnt paper). */
+export function createScreen(z: number, backdrop = '#050506dd', panelCss?: string, scaled = true, keepLock = false, look?: Skin): Screen {
+  const skin = look ?? (panelCss === undefined && scaled ? SKIN : null); // the standard panel takes the menus' skin (menuSkin.ts); one with its own look does not
   panelCss ??= `left:50%;top:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:min(594px,92vw);max-height:${skin ? (skin.maxVh ?? 95) : 90}vh;overflow:auto;${skin ? `padding:${skin.pad}` : frame()}`;
   startOnce();
   const root = document.createElement('div');

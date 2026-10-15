@@ -1,5 +1,11 @@
 # Sprite walks: handoff (2026-10-07, v6)
 
+> **2026-10-08, the author's call:** every ElevenLabs-made walk (v5, v6) is set aside as unlike its reference;
+> the base is the author's unchanged backup, v1 (the published site). The author now draws the walks in ChatGPT
+> from `docs/SPRITE_BATCHES.md` (`tools/sprites/batches.py`: 174 sheets in 19 requests, every two- and four-legged
+> creature's front, back and side, from v1); `docs/SPRITE_PROMPTS.md` (`prompts.py`) has a prompt per entry. The
+> v6 notes below stand as a record and for the tools (`fromsheet.py`, `ground.py`, `legswap.py`, `v1fixes.py`).
+
 Where the work on the creature library's walks stands, for whoever picks it up next. Laid over the author's folder,
 `walk_fix_v6.zip` leaves nothing the audit gates on: `sprite_review.py audit --strict` exits 0 there, and what it
 still lists are 30 gliders on two keys (advisory: the engine moves them). Codex's own measure (the flags of its
