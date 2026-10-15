@@ -95,6 +95,7 @@
           ]
         }
       ],
+      "icon": "build/icon-mac.png",
       "category": "public.app-category.role-playing-games",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,

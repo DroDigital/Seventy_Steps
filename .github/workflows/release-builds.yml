@@ -53,6 +53,18 @@ jobs:
         shell: bash
       - name: Starts, and reaches its title
         run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }}
+      - name: The executable wears the Elder Sign (its icon, 32 px, is printed as base64 for the log)
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.Drawing
+          $bmp = [System.Drawing.Icon]::ExtractAssociatedIcon((Resolve-Path release/win-unpacked/SeventySteps.exe).Path).ToBitmap()
+          $ms = New-Object System.IO.MemoryStream
+          $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+          Write-Host ("ICON " + [Convert]::ToBase64String($ms.ToArray()))
+          $purple = 0
+          for ($x = 0; $x -lt $bmp.Width; $x++) { for ($y = 0; $y -lt $bmp.Height; $y++) { $p = $bmp.GetPixel($x, $y); if ($p.A -gt 100 -and $p.B -gt $p.G + 60) { $purple++ } } }
+          Write-Host "purple pixels in the icon: $purple of $($bmp.Width * $bmp.Height)"
+          if ($purple -lt 40) { Write-Error "the executable's icon has no purple glow: it is not the Elder Sign's"; exit 1 }
       - name: Is the executable code-signed (for the log)
         shell: pwsh
         continue-on-error: true
@@ -122,6 +134,16 @@ jobs:
         run: node tools/package_mac.mjs --universal --no-build
       - name: Universal app starts
         run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: The Mac apps wear the Elder Sign (each icon, 48 px, is printed as base64 for the log)
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            app="release/$d/Seventy Steps.app"
+            [ -d "$app" ] || continue
+            [ "$(plutil -extract CFBundleIconFile raw -o - "$app/Contents/Info.plist")" = "icon.icns" ] || { echo "::error::$d names no icon.icns"; exit 1; }
+            sips -s format png "$app/Contents/Resources/icon.icns" --out "$RUNNER_TEMP/$d.png" > /dev/null
+            sips -Z 48 "$RUNNER_TEMP/$d.png" --out "$RUNNER_TEMP/$d-48.png" > /dev/null
+            echo "ICON $d $(base64 -i "$RUNNER_TEMP/$d-48.png")"
+          done
       - name: Does Gatekeeper accept the universal app (for the log)
         if: ${{ env.HAS_DEVELOPER_ID == 'true' }}
         continue-on-error: true
