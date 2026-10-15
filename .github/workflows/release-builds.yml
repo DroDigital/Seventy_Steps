@@ -75,23 +75,6 @@ jobs:
       - name: Universal app starts
         continue-on-error: true
         run: node tools/smoke_packaged.mjs --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
-      - name: Why the universal app does not start (a copy, its stub made to say what it throws)
-        if: always()
-        continue-on-error: true
-        run: |
-          set -x
-          ROOT="$PWD"; D=/tmp/diag; rm -rf "$D"; mkdir -p "$D"
-          [ -d "release/mac-universal/Seventy Steps.app" ] || exit 0
-          ditto "release/mac-universal/Seventy Steps.app" "$D/Seventy Steps.app"
-          R="$D/Seventy Steps.app/Contents/Resources"
-          ls -la "$R" | head -12
-          cat "$R/app-arm64/package.json" | head -12
-          node "$ROOT/node_modules/@electron/asar/bin/asar.js" extract "$R/app.asar" "$D/stub"
-          ls -la "$D/stub"; cat "$D/stub/package.json"
-          node -e "const fs=require('fs');const f='$D/stub/index.js';let s=fs.readFileSync(f,'utf8');s=s.replace('require(process._archPath);','try{require(process._archPath);}catch(e){console.error(\'STUB FAIL\',e&&e.stack||e);process.exit(3);}');fs.writeFileSync(f,s)"
-          node "$ROOT/node_modules/@electron/asar/bin/asar.js" pack "$D/stub" "$R/app.asar"
-          codesign --force --deep --sign - "$D/Seventy Steps.app"
-          node tools/smoke_packaged.mjs --verbose --timeout 60 --app "$D/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: What the Mac apps are (for the log)
         if: always()
         continue-on-error: true

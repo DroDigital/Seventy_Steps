@@ -7,7 +7,7 @@
 // Signing: with MAC_SIGN_IDENTITY set (a "Developer ID Application: …" in the keychain) every app is signed with the hardened runtime and
 // packaging/entitlements.mac.plist; with APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID too it is notarised. Without them the apps are signed ad hoc, which is enough to run on this Mac (and on one with Gatekeeper off) and what Steam needs; docs/RELEASE.md.
 import { spawnSync } from 'node:child_process';
-import { existsSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -69,6 +69,18 @@ if (universal) {
     force: true,
     x64ArchFiles: '**/steamworks.js/**', // (the Steam binding carries its own libraries for both: identical in both apps)
   });
+  // The merge makes a launcher (Resources/app.asar: it picks app-arm64 or app-x64) that carries a copy of this package.json, "type": "module"
+  // and all: that makes its CommonJS launcher an ES module, which cannot start, and Electron stands at its own error box. The launcher's
+  // package.json is made CommonJS again (the game's main, in app-arm64 and app-x64, is still the ES module it is).
+  const asarBin = join(root, 'node_modules', '@electron', 'asar', 'bin', 'asar.js');
+  const launcher = join(universalApp, 'Contents', 'Resources', 'app.asar');
+  const unpacked = join(staging, 'launcher');
+  run(process.execPath, [asarBin, 'extract', launcher, unpacked]);
+  const metaFile = join(unpacked, 'package.json');
+  const meta = JSON.parse(readFileSync(metaFile, 'utf8'));
+  delete meta.type;
+  writeFileSync(metaFile, JSON.stringify(meta));
+  run(process.execPath, [asarBin, 'pack', unpacked, launcher]);
   rmSync(staging, { recursive: true, force: true });
   await sign(universalApp);
 }
