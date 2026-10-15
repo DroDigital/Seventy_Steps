@@ -12,6 +12,7 @@ import { LANGS, type Key } from '../data/lang';
 import { RENDER, SETTINGS } from '../data/tuning';
 import { desktop } from './desktop';
 import { button, el, footer, slider, tabs, title, type Page } from './menuKit';
+import { createResolutionSetting } from './resolutionSetting';
 import type { SettingId, Settings } from './settings';
 
 const pct = (v: number): string => `${Math.round(v * 100)}%`;
@@ -62,6 +63,7 @@ const isFullscreen = async (): Promise<boolean> => (desktop ? desktop.isFullscre
 
 /** Every change goes to `change` (which applies and keeps it); `back` leaves. `at`: the tab it opens on. Controls is the last tab (the keys' table: controlsTab). */
 export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0): Page {
+  const resolution = createResolutionSetting();
   let open = at;
   let waiting: Action | null = null;
   let refused = false; // the last key pressed was one that cannot be taken
@@ -85,7 +87,10 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
       if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0));
       const body = el(panel, 'div', '', 'min-height:226px');
       if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
-      for (const id of TABS[open][1]) slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+      for (const id of TABS[open][1]) {
+        if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
+        else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+      }
       if (open === 0) {
         const b = button(body, t('set.fullscreen'), () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), true, t('set.fullscreenHint'));
         const label = (): void => void isFullscreen().then((on) => (b.textContent = t('set.fullscreenState', { state: t(on ? 'val.onLc' : 'val.offLc') })));

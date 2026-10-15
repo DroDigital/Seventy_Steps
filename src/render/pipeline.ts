@@ -1,6 +1,6 @@
 /**
  * Render pipeline (spec §2): the world renders into a low-res target (400×225 scaled by the
- * resolution setting: 700×394 by default), then the one post pass draws into a canvas of the same
+ * resolution setting: 600×338 by default), then the one post pass draws into a canvas of the same
  * size, which CSS upscales nearest-neighbour (`image-rendering: pixelated`) into a letterboxed 16:9 box.
  * The shaders a scene needs are compiled ahead, out of sight (playtest round 10: compiled on the
  * first frame drawn, they held the page on black): in parallel, where the browser can.

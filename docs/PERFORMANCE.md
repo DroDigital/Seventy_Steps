@@ -17,13 +17,17 @@ Run the benchmark below on the machines you care about and write the results int
 
 ## What the game sets by itself
 
+The default and standard maximum resolution is 600 × 338 (1.5×). Settings › Display offers lower resolutions directly;
+optional higher resolutions (700 × 394 and 800 × 450) are collapsed by default and carry an immersion warning. Existing higher
+settings from before this warning return to 600 × 338 once; lower choices and newly chosen optional resolutions are kept.
+
 On a first launch (no settings kept, no choice made) the first seconds of play are measured (4 s to settle, 5 s measured). If the
 average is under 50 fps the picture steps down a rung of this ladder, and is measured again (1.5 s to settle, 5 s measured), up to
 four steps; under 28 fps it steps down two. `render/autoQuality.ts`:
 
 | Rung | Resolution | Volumetric fog | Shadows |
 | --- | --- | --- | --- |
-| 0 (default) | 1.75× (700 × 394) | 100% | on |
+| 0 (default) | 1.5× (600 × 338) | 100% | on |
 | 1 | 1.5× | 100% | off |
 | 2 | 1.5× | 75% | off |
 | 3 | 1× | 50% | off |
