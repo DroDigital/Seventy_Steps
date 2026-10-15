@@ -68,6 +68,11 @@ function keepLog(text) {
 }
 process.on('uncaughtException', (e) => {
   keepLog(`Seventy Steps shell fault (uncaught): ${e?.stack ?? e}\nelectron ${process.versions.electron} · ${process.platform} ${process.arch}`);
+  if (SMOKE) { // a check has no one to click the box away: it says what broke, and ends
+    console.error(`SMOKE FAIL: uncaught in the shell: ${e?.stack ?? e}`);
+    app.exit(1);
+    return;
+  }
   if (!quitting) dialog.showErrorBox('The dream broke', `The game's window stopped.\n\n${e?.message ?? e}\n\nA report was kept in:\n${logsDir()}`);
 });
 ipcMain.handle('desktop:write-log', (_e, report) => keepLog(String(report).slice(0, 60_000)));
