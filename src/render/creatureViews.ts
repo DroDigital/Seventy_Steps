@@ -72,8 +72,7 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
     look = { state: 'attack', frame, opacity: 1, sink: 0, lash: a.frame < strike ? a.frame / Math.max(1, strike) * 0.3 : a.frame < end ? 1 : 0.3 };
   } else {
     const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
-    const flies = (br?.def.params.hover ?? 0) > 0; // a flyer's walk frames are legs on the ground (the shantak walked in the air, round 46): in flight it flutters on its hover frames
-    look = moving && !flies ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, flies ? 0.35 : 1.25), opacity: 1, sink: 0, lash: 0 };
+    look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
   }
   if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
   return look;
