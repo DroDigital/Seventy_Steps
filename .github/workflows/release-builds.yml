@@ -1,0 +1,110 @@
+name: Release builds
+
+# The game packed for Steam, on a machine of each platform (the controllers' SDL library is downloaded for the machine it is installed on:
+# docs/STEAM.md), and started once (`--smoke-test`: it must reach its title, find the Steam binding and start the controllers' worker).
+# Runs when the shell or the packaging changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
+
+on:
+  pull_request:
+    paths:
+      - 'desktop/**'
+      - 'packaging/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tools/package_mac.mjs'
+      - 'tools/smoke_packaged.mjs'
+      - 'tools/steam_upload.mjs'
+      - '.github/workflows/release-builds.yml'
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-builds-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run package:win
+      - name: Starts, and reaches its title
+        run: node tools/smoke_packaged.mjs
+      - name: Zip the depot
+        shell: pwsh
+        run: Compress-Archive -Path release/win-unpacked -DestinationPath seventy-steps-windows.zip -CompressionLevel Fastest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-windows
+          path: seventy-steps-windows.zip
+          retention-days: 7
+          compression-level: 0
+
+  mac:
+    runs-on: macos-latest # Apple Silicon: the Intel build is made on it too (package_mac.mjs fetches that architecture's SDL)
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run package:mac
+      - name: Starts, and reaches its title (Apple Silicon)
+        run: node tools/smoke_packaged.mjs --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: Starts under Rosetta (Intel)
+        continue-on-error: true
+        run: arch -x86_64 node tools/smoke_packaged.mjs --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: One app for both
+        continue-on-error: true
+        run: node tools/package_mac.mjs --universal --no-build
+      - name: Universal app starts
+        continue-on-error: true
+        run: node tools/smoke_packaged.mjs --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+      - name: Zip the depots (ditto keeps the bundle's links and permissions)
+        run: |
+          for d in mac-arm64 mac mac-universal; do
+            [ -d "release/$d/Seventy Steps.app" ] && ditto -c -k --sequesterRsrc --keepParent "release/$d/Seventy Steps.app" "seventy-steps-$d.zip" || true
+          done
+          ls -la *.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-mac
+          path: seventy-steps-*.zip
+          retention-days: 7
+          compression-level: 0
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run package:linux
+      - name: Starts, and reaches its title
+        env:
+          SMOKE_SOFTWARE_GL: '1' # no GPU here
+        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs
+      - name: Pack the depot (tar keeps the executable bit)
+        run: tar -czf seventy-steps-linux.tar.gz -C release linux-unpacked
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seventy-steps-linux
+          path: seventy-steps-linux.tar.gz
+          retention-days: 7
+          compression-level: 0
