@@ -3,7 +3,8 @@
  * game to start, and what the tools around it refuse. The packed game itself is started by CI (.github/workflows/release-builds.yml).
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8')); // (the tests run from the project's root)
@@ -56,5 +57,50 @@ describe('the scripts', () => {
     expect(bare.stderr).toMatch(/No depot/);
     const live = run({ STEAM_APP_ID: '480', STEAM_DEPOT_WINDOWS: '481', STEAM_BRANCH: 'default' });
     expect(live.status).toBe(2);
+  });
+});
+
+describe('the itch.io release (round 51)', () => {
+  const push = (env: Record<string, string>, ...args: string[]) => spawnSync(process.execPath, ['tools/itch_push.mjs', ...args], { env: { PATH: process.env.PATH ?? '', ...env }, encoding: 'utf8' });
+  /** A release folder with a universal Mac app whose package.json holds `meta` (what the tool reads to tell which store a pack is for). */
+  const fakeRelease = (meta: string): string => {
+    const dir = mkdtempSync(`${tmpdir()}/itch-test-`);
+    const resources = `${dir}/mac-universal/Seventy Steps.app/Contents/Resources/app-arm64`;
+    mkdirSync(resources, { recursive: true });
+    writeFileSync(`${resources}/package.json`, meta);
+    return dir;
+  };
+
+  it('has a script, and asks for the project it sends to', () => {
+    expect(pkg.scripts['itch:push']).toBe('node tools/itch_push.mjs');
+    const bare = push({});
+    expect(bare.status).toBe(2);
+    expect(bare.stderr).toMatch(/ITCH_TARGET/);
+    expect(push({ ITCH_TARGET: 'not a project' }).status).toBe(2);
+  });
+
+  it('refuses a pack made for Steam: it would relaunch itself through Steam', () => {
+    const r = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: fakeRelease('{"steam":{"appId":1234560}}') }, '--only', 'osx');
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/Steam, not itch\.io/);
+  });
+
+  it('accepts a pack made for itch.io, writes what the itch app launches, and sends nothing without --run', () => {
+    const dir = fakeRelease('{"channel":"itch"}');
+    const r = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: dir }, '--only', 'osx');
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/digitaldro\/seventy-steps:osx/);
+    expect(r.stdout).toMatch(/Nothing sent/);
+    expect(readFileSync(`${dir}/mac-universal/.itch.toml`, 'utf8')).toContain('path = "Seventy Steps.app"');
+  });
+
+  it('the workflow packs for itch.io only when asked, checks the channel, and pushes with a secret it never prints', () => {
+    const wf = read('.github/workflows/release-builds.yml');
+    expect(wf).toMatch(/channel=itch/);
+    expect(wf).toMatch(/--channel itch/);
+    expect(wf).toMatch(/secrets\.BUTLER_API_KEY/);
+    expect(wf).toMatch(/itch_push\.mjs --only windows/);
+    expect(wf).toMatch(/itch_push\.mjs --only osx/);
+    expect(wf).toMatch(/itch_push\.mjs --only linux/);
   });
 });

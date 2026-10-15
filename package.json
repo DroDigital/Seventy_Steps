@@ -23,7 +23,8 @@
     "package:linux": "npm run build && npm run icon && electron-builder --linux --dir",
     "package:mac": "npm run build && npm run icon && node tools/package_mac.mjs",
     "smoke": "node tools/smoke_packaged.mjs",
-    "steam:upload": "node tools/steam_upload.mjs"
+    "steam:upload": "node tools/steam_upload.mjs",
+    "itch:push": "node tools/itch_push.mjs"
   },
   "dependencies": {
     "gamepad-node": "^1.5.0",

@@ -78,3 +78,27 @@ STEAM_APP_ID=… STEAM_DEPOT_WINDOWS=… STEAM_DEPOT_MACOS=… STEAM_DEPOT_LINUX
 Without `--run` it only writes the scripts, so they can be read first. Each platform's folder is sent from the machine that
 packed it (or from CI's artifacts, unzipped: a Mac's with `ditto -x -k`, a Linux's with `tar -xzf`, so that the links and the
 executable bit are kept).
+
+## itch.io (before Steam)
+
+A build packed with `channel` set to `itch` in its package.json keeps off Steam altogether (no relaunch through Steam, no overlay,
+nothing sent to Steam), whatever `steam.appId` holds: `desktop/steam.js`. `tools/itch_push.mjs` refuses a pack that is not marked,
+because a Steam build started outside Steam would relaunch itself through it.
+
+- **From CI (the way):** Actions › Release builds › Run workflow, tick *itch*. Each platform is packed for itch.io, started (`--channel itch`
+  must show in its report) and pushed with butler to the channels `windows`, `osx` (the universal app) and `linux`, as version
+  `package.json`'s. It needs the repository secret `BUTLER_API_KEY` (itch.io › Settings › API keys); without it only the plan is shown.
+  The project is `digitaldro/seventy-steps` unless the *itch_target* input says another.
+- **From a machine:** `npm run package:win -- -c.extraMetadata.channel=itch` (likewise `package:linux`; the Mac: `npm run package:mac --
+  --universal --channel itch`), then `ITCH_TARGET=digitaldro/seventy-steps npm run itch:push -- --get-butler` (shows the plan) and again
+  with `--run` (sends it; `butler login` once, or `BUTLER_API_KEY`).
+- **What a player meets.** *Windows:* the exe is not code-signed, so a download from the website can show SmartScreen's "unknown publisher"
+  (More info › Run anyway). *macOS:* an app that is not notarised is stopped by Gatekeeper when it comes from a browser download ("cannot be
+  opened" or "damaged"); the way round is System Settings › Privacy & Security › Open Anyway, or `xattr -dr com.apple.quarantine "Seventy Steps.app"`.
+  Say both on the page, and point players to the itch app, whose installs I expect are not quarantined (not checked). To remove the Mac
+  warning, get an Apple Developer ID ($99 a year) and set the secrets `MAC_CERT_P12_BASE64` (the Developer ID Application certificate exported
+  as .p12, base64), `MAC_CERT_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`: the Mac job then signs with the
+  hardened runtime and notarises the universal app (written, not yet run: expect one round of fixing when the first certificate is used).
+- **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
+  through a browser.
+
