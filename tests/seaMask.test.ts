@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { WORLD } from '../src/data/tuning';
 import { createSea } from '../src/render/sea';
 import { seaRoomMask } from '../src/render/seaMask';
+import { seaHeight } from '../src/render/seaWaves';
+import { floorAt, roomPoint } from '../src/world/dungeonKit';
 import { worldLayout } from '../src/world/placements';
 
 /** Sample exactly as the sea's fragment shader does, before waves and sanity move its surface. */
@@ -53,5 +55,23 @@ describe('the sea stays outside dungeon rooms', () => {
     expect(masked(mask, 217, -385)).toBe(false);
     expect(material.fragmentShader).toContain('texture(uSeaMask, roomUv).r > 0.5) discard;');
     expect(masked(seaRoomMask([]), 0, 0)).toBe(false);
+  });
+
+  it('keeps every flight down to the Dreamlands dry even where storm waves stand above the steps', () => {
+    const dungeon = worldLayout().dungeons.find((d) => d.layout.def.id === 'slumber')!.layout;
+    const mask = seaRoomMask(dungeon.rooms.map((r) => r.rect));
+    const stairs = dungeon.rooms.filter((r) => r.def.kind === 'stair');
+    let floodedWithoutMask = 0;
+    for (const r of stairs) {
+      for (const share of [0.001, 0.25, 0.5, 0.75, 0.999]) {
+        const p = roomPoint(r, 0, (share * 2 - 1) * r.half);
+        expect(masked(mask, p.x, p.z), `${r.def.id} at ${share}`).toBe(true);
+        for (const time of [0, 17, 103]) {
+          if (WORLD.seaLevel + seaHeight(p.x, p.z, time, 2.85) > floorAt(r, p.x, p.z)) floodedWithoutMask++;
+        }
+      }
+    }
+    expect(stairs).toHaveLength(8);
+    expect(floodedWithoutMask).toBeGreaterThan(50);
   });
 });

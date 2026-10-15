@@ -11,7 +11,7 @@ import { createGame, createWorldGame } from '../src/systems/game';
 import { canUpgradeGun, gunCost, giveRounds, upgradeGun } from '../src/systems/gun';
 import { spawnTome } from '../src/systems/insight';
 import { parseSave, snapshot } from '../src/systems/save';
-import { buy, canBuy } from '../src/systems/trade';
+import { buy, canBuy, carried } from '../src/systems/trade';
 import { roundCaches } from '../src/world/caches';
 import { worldLayout } from '../src/world/placements';
 import { steps } from './helpers';
@@ -61,6 +61,32 @@ describe('rounds are found and bought (round 22)', () => {
     g.player.echoes = WARES.rounds.price - 1;
     expect(buy(g, 'rounds')).toBe(false);
     expect(WARES.rounds.stock).toBeUndefined(); // the pocket is the limit, not the stock
+  });
+
+  it('carries two spare cylinders and leaves a further pickup until there is room for the whole box', () => {
+    const g = createWorldGame();
+    g.player.rounds = 8;
+    spawnTome(g, { ...at(g), name: 'Cartridges: last four', insight: 0, rounds: 4 });
+    steps(g, 1);
+    expect(g.player).toMatchObject({ ammo: 6, rounds: 12 });
+    spawnTome(g, { ...at(g), name: 'Cartridges: over cap', insight: 0, rounds: 4 });
+    steps(g, 1);
+    expect(g.player.rounds).toBe(12);
+    expect(g.overworld!.read.has('Cartridges: over cap')).toBe(false);
+    expect([...g.ecs.c.tome.values()].some((t) => t.name === 'Cartridges: over cap')).toBe(true);
+  });
+
+  it('buys two spare cylinders, reports the twelve-round cap, and refuses a third without spending Echoes', () => {
+    const g = createWorldGame();
+    g.player.rounds = 0;
+    g.player.echoes = WARES.rounds.price * 3;
+    expect(buy(g, 'rounds')).toBe(true);
+    expect(buy(g, 'rounds')).toBe(true);
+    expect(g.player).toMatchObject({ ammo: 6, rounds: 12, echoes: WARES.rounds.price });
+    expect(carried(g, 'rounds')).toEqual({ have: 12, most: 12, unit: 'spare rounds' });
+    expect(buy(g, 'rounds')).toBe(false);
+    expect(g.player).toMatchObject({ rounds: 12, echoes: WARES.rounds.price });
+    expect(g.overworld!.sold.get('rounds')).toBe(2);
   });
 
   it('three people trade in them, each a real person with a real shop', () => {
@@ -130,5 +156,13 @@ describe('the gun is upgraded with star-stones at an Elder Sign (round 22)', () 
     const next = createWorldGame({ carry: parseCarry(JSON.parse(JSON.stringify(carryOf(g))))! });
     expect(next.player).toMatchObject({ gun: 2, ammo: GUN.chamber, rounds: GUN.start });
     expect(parseSave(JSON.stringify({ ...snapshot(g), ammo: 'many' }))).toBeNull();
+  });
+
+  it('loads older twenty-four-round inventories at the new spare limit and keeps that limit when saved again', () => {
+    const old = { ...snapshot(createWorldGame()), ammo: 6, rounds: 24 };
+    const loaded = createWorldGame({ save: parseSave(JSON.stringify(old))! });
+    expect(loaded.player).toMatchObject({ ammo: 6, rounds: 12 });
+    const back = createWorldGame({ save: parseSave(JSON.stringify(snapshot(loaded)))! });
+    expect(back.player).toMatchObject({ ammo: 6, rounds: 12 });
   });
 });

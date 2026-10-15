@@ -99,6 +99,6 @@ export const LIGHTING = {
   vignette: 0.42, // how much the picture's corners darken, so the eye is kept toward the middle
   sky: 1.3, // the ambient on a surface facing straight up (the sky's), against...
   ground: 0.55, // ...one facing straight down (what the dark ground gives back)
-  sheen: { stone: 0.85, power: 30 }, // damp stone and wet cobbles catch the lantern and the lamps in a streak: the strength, how tight the streak
+  sheen: { stone: 0.35, power: 30 }, // stone catches a restrained glint; rain adds its own wet sheen
   flicker: { lantern: 0.045, speed: 7 }, // how much the lantern's light breathes, and how fast
 };

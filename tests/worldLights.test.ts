@@ -11,6 +11,7 @@ import { dungeonJob } from '../src/render/siteMeshes';
 import { createWorldLights, type LightSpot } from '../src/render/worldLights';
 import { worldUniforms } from '../src/render/worldMaterial';
 import { worldLayout } from '../src/world/placements';
+import type { CollisionWorld } from '../src/world/colliders';
 import type { Prop } from '../src/world/props';
 
 const eye = new THREE.Vector3();
@@ -65,6 +66,43 @@ describe('how well lit the ground is, for the mind to mend by (round 22)', () =>
 });
 
 describe("the world's lights (render/worldLights.ts)", () => {
+  it('keeps a room lit when an orbiting camera loses sight of a flame behind a pillar, while hiding its halo', () => {
+    const pillar: CollisionWorld = { colliders: [{ kind: 'box', min: { x: 0.5, y: -5, z: 1 }, max: { x: 1.5, y: 8, z: 3 } }], off: new Set(), ground: () => -100, contain: () => undefined };
+    const lights = createWorldLights(() => pillar);
+    const reference = createWorldLights(() => pillar);
+    const torch: LightSpot = { x: 3, y: 2, z: 0, kind: 'torch' };
+    lights.add(1, [torch]);
+    reference.add(1, [torch]);
+    const at = { x: 0, y: 1.25, z: 0 };
+    const clearEye = new THREE.Vector3(0, 1.7, -4);
+    const blockedEye = new THREE.Vector3(0, 1.7, 4);
+    for (let frame = 0; frame <= 120; frame++) {
+      const time = frame / 60;
+      reference.update(clearEye, time, null, at);
+      const expected = { position: lamps[0].toArray(), color: worldUniforms.uLampColors.value[0].toArray(), key: reference.casters[0]?.key };
+      lights.update(frame <= 60 ? clearEye : blockedEye, time, null, at);
+      expect(lamps[0].toArray()).toEqual(expected.position);
+      expect(worldUniforms.uLampColors.value[0].toArray()).toEqual(expected.color);
+      expect(lights.casters[0]?.key).toBe(expected.key);
+    }
+    expect(glow(0)).toBeGreaterThan(0.5);
+    expect(halos(reference)).toBe(1);
+    expect(halos(lights)).toBe(0);
+  });
+
+  it('chooses the same lamps and shadow casters throughout a camera orbit around a stationary investigator', () => {
+    const lights = createWorldLights();
+    lights.add(1, row(20, 'lamp'));
+    lights.update(eye, 0, null, eye);
+    const initial = lamps.map((l, i) => [l.toArray(), worldUniforms.uLampColors.value[i].toArray()]);
+    const casters = [...lights.casters];
+    for (const x of [-5, 5]) {
+      lights.update(new THREE.Vector3(x, 2, 4), 0, null, eye);
+      expect(lamps.map((l, i) => [l.toArray(), worldUniforms.uLampColors.value[i].toArray()])).toEqual(initial);
+      expect(lights.casters).toEqual(casters);
+    }
+  });
+
   it('the nearest spots light the world, the last of them fading out as the next comes into line', () => {
     const lights = createWorldLights();
     lights.add(1, row(20, 'window'));

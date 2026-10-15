@@ -74,7 +74,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       const outside = !enclosed && !!g.overworld;
       fauna.update(camera, time, !outside);
       sky.update(camera, time, !outside);
-      lightning.update(time, g.overworld?.region ?? null, !outside);
+      lightning.update(time, g.overworld?.region ?? null, !outside, g.overworld?.weather);
       beacons.update(camera, time, !outside);
       night.update(time, enclosed);
       LIGHT_NERVES.madness = madnessOf(g.mind.sanity); // the flames waver harder in a failing mind's world

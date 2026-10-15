@@ -173,7 +173,7 @@ export const SANITY = {
 /** The investigator's sanity tonic, refilled at the Elder Sign. */
 export const LAUDANUM = {
   doses: 3,
-  sanity: 30, // restored per dose
+  sanity: 50, // half the full sanity meter restored per dose
   steady: 10, // seconds after a swallow in which auras, roars, gazes and the void take no sanity (playtest round 7)
 };
 

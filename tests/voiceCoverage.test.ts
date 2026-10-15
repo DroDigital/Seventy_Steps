@@ -7,7 +7,7 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { describe, expect, it } from 'vitest';
 import { clipOf } from '../src/data/speech';
 import { CAST } from '../src/data/speechCast';
-import { bossLines, speechLines } from '../src/data/speechLines';
+import { bossLines, npcLines, speechLines } from '../src/data/speechLines';
 
 const env = (globalThis as unknown as { process?: { env: Record<string, string | undefined> } }).process?.env ?? {}; // (the tests carry no Node typings)
 const DIR = 'public/voice';
@@ -31,6 +31,10 @@ describe('the recordings (public/voice)', () => {
 
   it('include every authored boss line, so a missing take cannot silently become a caption', () => {
     for (const line of bossLines()) expect(listed, `${line.speaker}: ${line.text}`).toContain(clipOf(line.speaker, line.text));
+  });
+
+  it('include every authored NPC line, so a missing take cannot silently become a caption', () => {
+    for (const line of npcLines()) expect(listed, `${line.speaker}: ${line.text}`).toContain(clipOf(line.speaker, line.text));
   });
 
   it('are audio files of a length worth hearing, and small enough to ship', () => {

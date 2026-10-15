@@ -1,6 +1,6 @@
 /**
  * Lightning where storms roll (playtest round 18; LIGHTNING in tuning): over Dunwich's round hills,
- * Innsmouth's sea, R'lyeh and the mountains, now and then the sky flickers white and the world with
+ * Innsmouth's sea, R'lyeh and the mountains, during spells of rain or gale the sky flickers white and the world with
  * it, and the thunder rolls after, later and duller the farther the strike (under a dungeon's roof,
  * only the thunder is heard). Updated each frame once the night's light is set (main.ts), it adds its
  * flash to the moon, the ambient light, the sky's haze and the mist.
@@ -8,12 +8,13 @@
 
 import type * as THREE from 'three';
 import { LIGHTNING } from '../data/tuning';
+import type { Weather } from '../systems/weather';
 import { FEEL } from './feel';
 import type { PostPass } from './postPass';
 import { worldUniforms } from './worldMaterial';
 
 export interface Lightning {
-  update(time: number, region: string | null, hidden: boolean): void;
+  update(time: number, region: string | null, hidden: boolean, weather: Weather | undefined): void;
 }
 
 const between = ([lo, hi]: readonly [number, number]): number => lo + (hi - lo) * Math.random();
@@ -31,9 +32,16 @@ export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain:
   const flash = (sky.material as THREE.ShaderMaterial).uniforms.uFlash; // the sky's own flash (shaders/sky.ts)
   let [next, struck, strength] = [NaN, -Infinity, 0];
   let rumble: { when: number; gain: number } | null = null;
+  let place: string | null = null;
   return {
-    update(time, region, hidden) {
-      const every = region ? LIGHTNING.every[region] : undefined;
+    update(time, region, hidden, weather) {
+      if (region !== place) {
+        place = region;
+        [next, struck] = [NaN, -Infinity];
+        rumble = null; // a journey cannot bring the last region's strike and thunder with it
+      }
+      const storm = weather && (weather.kind === 'rain' || weather.kind === 'gale') && weather.amount >= LIGHTNING.storm;
+      const every = region && storm ? LIGHTNING.every[region] : undefined;
       if (!every) next = NaN;
       else if (Number.isNaN(next)) next = time + between(every) * 0.5;
       else if (time >= next) {
@@ -43,7 +51,7 @@ export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain:
         rumble = { when: time + LIGHTNING.delay[0] + (LIGHTNING.delay[1] - LIGHTNING.delay[0]) * far, gain: 1 - 0.6 * far };
       }
       if (rumble && time >= rumble.when) {
-        thunder(rumble.gain);
+        thunder(rumble.gain * (hidden ? LIGHTNING.inside : 1));
         rumble = null;
       }
       const f = hidden ? 0 : flicker(time - struck, FEEL.flashes) * strength;

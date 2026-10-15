@@ -2,7 +2,7 @@
  * The dream's answer to a horror's fall (round 26: nothing around a fallen horror changed): a region whose
  * every boss has fallen breathes out (`Exhaled`: its mist thins, its sky brightens, the small lives come
  * back, render/ and ui/ read `calmOf`), and the dream as a whole grows a little lighter with each of the great
- * horrors put down (`reliefOf`). The people it has not told yet are heard to speak of it (`rumorFor`).
+ * horrors put down (`reliefOf`). The people share written rumours after a conversation (`rumorFor`).
  * Pure: no Three.js.
  */
 
@@ -33,16 +33,15 @@ export function reliefOf(g: Game): number {
   return all.length ? all.filter((id) => g.overworld?.slain.has(id)).length / all.length : 0;
 }
 
-/** The line someone has to say of the latest fall they have not yet told of (and it is marked told), or undefined. */
-export function rumorFor(g: Game, npc: string): string | undefined {
+/** The latest fall someone has not yet told of. Reading the note marks it told; aborting a talk does not. */
+export function rumorFor(g: Game, npc: string): { boss: string; text: string } | undefined {
   const ow = g.overworld;
   if (!ow) return undefined;
   for (const id of [...ow.slain].reverse()) {
     const boss = id.slice(5);
     const line = id.startsWith('boss:') ? RUMORS[boss] : undefined;
     if (!line || ow.told.has(`rumor:${npc}:${boss}`)) continue;
-    ow.told.add(`rumor:${npc}:${boss}`);
-    return line;
+    return { boss, text: line };
   }
   return undefined;
 }
@@ -52,6 +51,9 @@ export const regionName = (id: string): string => REGIONS.find((r) => r.id === i
 
 /** A boss's fall may end a region's horror: it breathes out, once (and again never, on a later load). */
 export function registerOmens(g: Game): void {
+  g.events.on('RumorRead', ({ npc, boss }) => {
+    if (RUMORS[boss] && g.overworld?.slain.has(`boss:${boss}`)) g.overworld.told.add(`rumor:${npc}:${boss}`);
+  });
   g.events.on('Vanquished', ({ entity }) => {
     const ow = g.overworld;
     const spawn = g.ecs.c.origin.get(entity);
