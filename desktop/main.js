@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
+import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
 import { channel, startSteam, steamAchieve, steamBinding, steamEarly } from './steam.js';
 
@@ -185,10 +186,30 @@ let padState = 'starting'; // the SDL worker: 'ready', or why it is not
 let padStarts = 0;
 let quitting = false;
 let reloads = 0;
+let worker = null; // the SDL worker's utility process, now
+let restarting = false; // a start over is in hand: its exit starts the worker again at once
+let rescanTimer = null;
+let rescanMs; // the last wait before a look (padRescan.js)
 app.on('before-quit', () => void (quitting = true));
+/** No controller heard: start the worker over after a wait, so SDL lists the ones connected now (round 54, padRescan.js). */
+function scheduleRescan() {
+  clearTimeout(rescanTimer);
+  if (quitting || padState.startsWith('unavailable')) return; // (without SDL a start over finds nothing)
+  rescanMs = rescanWait(rescanMs);
+  rescanTimer = setTimeout(restartPads, rescanMs);
+}
+function restartPads() {
+  rescanTimer = null;
+  if (quitting || !worker) return;
+  if (pads.length) return void (rescanMs = undefined); // one is heard now: no start over, and the next look starts from the first wait
+  restarting = true;
+  worker.kill();
+}
 function startPads() {
-  const worker = utilityProcess.fork(fileURLToPath(new URL('./padWorker.js', import.meta.url)), [], { serviceName: 'Seventy Steps controllers', stdio: 'inherit' });
-  worker.on('message', (m) => {
+  const w = utilityProcess.fork(fileURLToPath(new URL('./padWorker.js', import.meta.url)), [], { serviceName: 'Seventy Steps controllers', stdio: 'inherit' });
+  worker = w;
+  scheduleRescan();
+  w.on('message', (m) => {
     if (m?.type === 'ready') padState = 'ready';
     if (m?.type === 'unavailable') {
       padState = `unavailable: ${m.reason}`;
@@ -196,12 +217,21 @@ function startPads() {
     }
     if (m?.type !== 'pads') return;
     pads = m.pads;
-    for (const w of BrowserWindow.getAllWindows()) w.webContents.send('desktop:pads', pads);
+    if (pads.length) {
+      clearTimeout(rescanTimer); // a pad heard: no look is needed, and the next one starts from the first wait
+      rescanMs = undefined;
+    } else scheduleRescan(); // none now (one let go): look again after a wait
+    for (const win of BrowserWindow.getAllWindows()) win.webContents.send('desktop:pads', pads);
   });
-  worker.on('exit', (code) => {
+  w.on('exit', (code) => {
+    const again = restarting;
+    restarting = false;
+    clearTimeout(rescanTimer);
     pads = [];
-    for (const w of BrowserWindow.getAllWindows()) w.webContents.send('desktop:pads', pads);
-    if (!quitting && code !== 0 && padStarts++ < 3) setTimeout(startPads, 1000); // a fault in the native module stops the pads for a moment, not the game
+    for (const win of BrowserWindow.getAllWindows()) win.webContents.send('desktop:pads', pads);
+    if (quitting) return;
+    if (again) return void startPads(); // a start over is the look for controllers, not a fault
+    if (code !== 0 && padStarts++ < 3) setTimeout(startPads, 1000); // a fault in the native module stops the pads for a moment, not the game
   });
 }
 ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) after the pads were found asks for them once
