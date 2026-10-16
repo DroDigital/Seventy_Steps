@@ -32,6 +32,8 @@ LIMIT = 2048
 GUTTER = 1
 GROUND = {'default': 2, 'yog_sothoth': 4}  # pixels a frame's base may stand from its view's idle (a body of drifting spheres has a looser base)
 EXACT = ('stoop', 'stoop_mid')  # the stoop's frames stand on the very ground line of the idle (tests/colossusStoop.test.ts)
+FLYING = ('flight',)  # a flyer's flight cycle: its wings lift its lowest pixel off the idle's ground line (round 48: the Shantak), so it may rise, not sink
+FLIGHT_RISE, FLIGHT_SINK = 12, 2  # pixels a flight frame may stand above, and below, its idle's ground line
 
 
 def sha256(data: bytes) -> str:
@@ -87,7 +89,11 @@ def main(delivery: Path, dry: bool) -> None:
             bounds = rgba.getchannel('A').getbbox()
             if bounds is None or list(bounds) != frame['bounds']:
                 sys.exit(f"{frame['path']}: bounds {bounds} against the manifest's {frame['bounds']}")
-            if abs(bounds[3] - idle['bounds'][3]) > tolerance:
+            if action in FLYING:
+                lift = idle['bounds'][3] - bounds[3]
+                if not -FLIGHT_SINK <= lift <= FLIGHT_RISE:
+                    problems.append(f"{frame['path']}: stands on row {bounds[3]}, its idle on {idle['bounds'][3]} (a flight frame may lift {FLIGHT_RISE} and sink {FLIGHT_SINK})")
+            elif abs(bounds[3] - idle['bounds'][3]) > tolerance:
                 problems.append(f"{frame['path']}: stands on row {bounds[3]}, its idle on {idle['bounds'][3]} (at most {tolerance} apart)")
             frames.append({
                 'source': frame['path'], 'sourceSha256': frame['sha256'], 'pixelSha256': sha256(rgba.tobytes()),

@@ -49,7 +49,7 @@ export function reviewedClips(entity: ReviewedEntity, key: string): DirectionalC
       : key === 'innsmouth_hybrid' && direction === 'right' ? 'left' : direction;
     const view = entity.directions[authored];
     clips[direction] = {};
-    for (const state of ['idle', 'move', 'attack', 'hurt', 'stoop', 'stoop_mid'] as const) {
+    for (const state of ['idle', 'move', 'flight', 'attack', 'hurt', 'stoop', 'stoop_mid'] as const) {
       const frames = view.actions[state];
       if (frames) clips[direction]![state] = { frames, mirror_horizontal: view.mirror };
     }

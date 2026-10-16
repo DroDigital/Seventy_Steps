@@ -72,7 +72,9 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
     look = { state: 'attack', frame, opacity: 1, sink: 0, lash: a.frame < strike ? a.frame / Math.max(1, strike) * 0.3 : a.frame < end ? 1 : 0.3 };
   } else {
     const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
-    look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
+    // a creature with its own flight cycle flies it (the Shantak's wing-beat, round 48); the others walk or stand as before
+    if (moving && counts.flight) look = { state: 'flight', frame: loopFrame(time, counts.flight, 1), opacity: 1, sink: 0, lash: 0 };
+    else look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
   }
   if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
   return look;
@@ -285,7 +287,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         }
         const frames = atlas.frames.get(spriteKey(cid, variant));
         if (!look || look.state === 'stoop' || look.state === 'stoop_mid' || !frames || !def.sprite || n >= CAPACITY) continue; // (the drawn sprites have no stoop)
-        const cell = frames[look.state][look.frame];
+        const drawn = look.state === 'flight' ? 'move' : look.state; // (the drawn sprites have no flight: they fly as they walk)
+        const cell = frames[drawn][look.frame % frames[drawn].length];
         const [cx, cy] = [(cell % (atlas.width / CELL)) * CELL, Math.floor(cell / (atlas.width / CELL)) * CELL];
         cells.setXYZW(n, cx / atlas.width, cy / atlas.height, (cx + CELL) / atlas.width, (cy + CELL) / atlas.height);
         const facingRight = Math.sin(tr.yaw) * right.x + Math.cos(tr.yaw) * right.z >= 0;
