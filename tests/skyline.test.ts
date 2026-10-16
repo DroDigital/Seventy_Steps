@@ -55,6 +55,20 @@ describe('the far silhouettes (round 19: render/skyline.ts)', () => {
     expect(shown(at.z - r.z1)).toBeCloseTo(SKY.farAngle, 1); // from the realm's north edge, where it rose 50°
   });
 
+  it("stay drawn as the investigator walks up to them, in every realm (round 49: a town vanished inside 1.5 of its drawing distance, the Dreamlands' city by the sea among them)", () => {
+    for (const [id, list] of Object.entries(SKYLINES)) {
+      const region = REGIONS.find((x) => x.id === id);
+      if (!region) continue;
+      const r = regionRect(region);
+      for (const def of list) {
+        for (const d of [20, 60, 140, 400]) {
+          const meshes = lookFrom(id, r.x0 + def.at[0], r.z0 + def.at[1] - d);
+          expect(meshes.filter((m) => m.visible).length).toBe(list.length); // all of the realm's, from every place it is looked at
+        }
+      }
+    }
+  });
+
   it('a false one rises on the horizon only for a failing mind, slowly, and goes at once (round 26)', () => {
     expect(falseShown(0.3, 8)).toBe(0); // a steady mind sees none
     expect(falseShown(0.9, -1)).toBe(0);

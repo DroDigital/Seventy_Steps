@@ -7,7 +7,8 @@
  * realm's colour (data/looks.ts), darker than the haze, its foot fading into it, at the bearing of
  * where it truly stands, sized to the angle it would fill from there (so it drifts as the investigator
  * walks, no more than a far thing would), up to SKY.farAngle; a town has a few windows lit. Each
- * realm's fade in as it is entered; a dungeon's walls hide them. A failing mind sees a city of towers
+ * realm's fade in as it is entered; a dungeon's walls hide them, and the real world covers them where it stands (round 49: a
+ * town walked up to is seen as itself, not cut off inside 1.5 of its distance). A failing mind sees a city of towers
  * where there is none (`wrong`). Render only.
  */
 
@@ -156,7 +157,8 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
       for (const f of fars) {
         const [dx, dz] = [f.x - cam.x, f.z - cam.z];
         const d = Math.hypot(dx, dz);
-        f.mesh.visible = alpha.get(f.region)!.value > 0.01 && d > R * 1.5;
+        // Never hidden for being near: the silhouettes are drawn first, so what stands where it stands (the sea, the world, a nearer town) draws over it (round 49: it vanished inside 1.5 R).
+        f.mesh.visible = alpha.get(f.region)!.value > 0.01 && d > 1; // (a bearing needs a distance)
         if (!f.mesh.visible) continue;
         shown.push({ f, d });
         // Farther things are paler (the air between), so a far castle behind a nearer hill is the lighter of the two.
