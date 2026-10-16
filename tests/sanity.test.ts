@@ -81,7 +81,7 @@ describe('sanity drains', () => {
   it('drains near a creature with an aura, fading with distance', () => {
     const { g, player, deepOne } = scriptedGame();
     const d = g.ecs.c.dread.get(deepOne)!;
-    const aura = d.aura * (d.tier === 'lesser' ? SANITY.lesserAura : 1); // the vermin's weigh less (round 17)
+    const aura = d.aura * SANITY.auraScale * (d.tier === 'lesser' ? SANITY.lesserAura : 1); // the vermin's weigh less (round 17)
     const r = g.ecs.c.body.get(deepOne)!.radius;
     g.mind.fought = Infinity; // (in a fight, the mind does not mend: round 22)
     place(g, deepOne, 0, 0, 0);
@@ -100,7 +100,7 @@ describe('sanity drains', () => {
   it('a crowd weighs on the mind, but not as its sum: the strongest aura whole, the rest in part (round 17)', () => {
     const { g, player, deepOne } = scriptedGame();
     const d = g.ecs.c.dread.get(deepOne)!;
-    const one = d.aura * (d.tier === 'lesser' ? SANITY.lesserAura : 1);
+    const one = d.aura * SANITY.auraScale * (d.tier === 'lesser' ? SANITY.lesserAura : 1);
     const twin = g.ecs.spawn();
     g.ecs.c.dread.set(twin, { ...d });
     g.ecs.c.transform.set(twin, { pos: { x: 0, y: 0, z: 0 }, prev: { x: 0, y: 0, z: 0 }, yaw: 0, prevYaw: 0 });
@@ -113,7 +113,7 @@ describe('sanity drains', () => {
 
   it("landed blows take the attacker's sanityDamage; blocked and dodged ones do not", () => {
     const { g, player, deepOne } = scriptedGame();
-    const loss = g.ecs.c.dread.get(deepOne)!.blow;
+    const loss = g.ecs.c.dread.get(deepOne)!.blow * SANITY.attackScale;
     place(g, player, 0, 0, 0);
     place(g, deepOne, 0, 1.5, Math.PI);
     strike(g, deepOne, player, blow(10));
@@ -140,16 +140,16 @@ describe('sanity drains', () => {
     place(g, g.player.id, -8, 4, Math.PI); // the pillar at (-8, 1) stands between them
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    const muffled = 100 - roar.amount * SANITY.muffled;
+    const muffled = 100 - roar.amount * SANITY.attackScale * SANITY.muffled;
     expect(g.mind.sanity).toBeCloseTo(muffled, 5);
     place(g, g.player.id, -4, -2, -Math.PI / 2); // in the open
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount, 5);
+    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * SANITY.attackScale, 5);
     place(g, g.player.id, -8, -2 + roar.range + 1, Math.PI);
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount, 5);
+    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * SANITY.attackScale, 5);
   });
 
   it('a gaze needs line of sight', () => {
@@ -169,7 +169,7 @@ describe('sanity drains', () => {
     place(g, g.player.id, -4, 4, Math.PI);
     startMove(g.ecs.c.actor.get(gazer)!, 'gaze');
     steps(g, 80);
-    expect(g.mind.sanity).toBeCloseTo(100 - gaze.amount, 5);
+    expect(g.mind.sanity).toBeCloseTo(100 - gaze.amount * SANITY.attackScale, 5);
   });
 });
 

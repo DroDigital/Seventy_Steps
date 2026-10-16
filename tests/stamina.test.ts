@@ -79,6 +79,19 @@ describe('stamina rules', () => {
     expect(absorb(bar(22), 22)).toBe(true);
     expect(absorb(bar(5), 22)).toBe(true);
   });
+
+  it('recovers from a block sooner than from an action, including when the guard broke', () => {
+    for (const value of [100, 5]) {
+      const s = bar(value);
+      absorb(s, 22);
+      const left = s.value;
+      for (let frame = 0; frame < STAMINA.guardDelay; frame++) tickStamina(s, 'idle', dt);
+      expect(s.value).toBe(left);
+      tickStamina(s, 'idle', dt);
+      expect(s.value).toBeGreaterThan(left);
+    }
+    expect(STAMINA.guardDelay).toBeLessThan(STAMINA.regenDelay);
+  });
 });
 
 describe('stamina in play', () => {
@@ -111,6 +124,7 @@ describe('stamina in play', () => {
       place(g, player, 0, 1.2, Math.PI);
       place(g, deepOne, 0, 0, 0);
       s.value = start;
+      s.delay = STAMINA.regenDelay; // measure the block from this bar, without recovering during the wind-up
       stepGame(g, block);
       startMove(g.ecs.c.actor.get(deepOne)!, 'claw');
       const seen: string[] = [];
@@ -119,14 +133,14 @@ describe('stamina in play', () => {
       off();
       expect(seen).toEqual([outcome]);
       expect(hp.hp).toBe(PLAYER.hp);
-      expect(s.value).toBeCloseTo(Math.max(0, start - claw.hit!.guard), 0);
+      expect(s.value).toBeCloseTo(Math.max(0, start - claw.hit!.guard * STAMINA.guardCost), 0);
       if (outcome === 'guardBreak') expect(a.move).toBe('guardBreak');
       steps(g, 120);
     }
   });
 });
 
-describe('stamina returns slowly, and faster with each level of Endurance (round 22)', () => {
+describe('stamina recovers between attacks, and faster with each level of Endurance', () => {
   /** Seconds a bar takes to fill from empty once its delay is over. */
   const fill = (regen: number | undefined, max = 100): number => {
     const s: Stamina = { value: 0, max, delay: 0, regen };
@@ -135,10 +149,11 @@ describe('stamina returns slowly, and faster with each level of Endurance (round
     return frames / SIM.hz;
   };
 
-  it('a first-level investigator takes long to refill, and the twentieth regains it as fast as everyone once did', () => {
-    expect(fill(undefined)).toBeGreaterThan(4); // (it was under two and a half seconds)
+  it('a first-level investigator refills in about three seconds, and Endurance improves the rate', () => {
+    expect(fill(undefined)).toBeGreaterThan(3);
+    expect(fill(undefined)).toBeLessThan(3.2);
     expect(staminaRegen(0)).toBe(STAMINA.regen);
-    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(40, 6);
+    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(48, 6);
     for (let n = 1; n <= LEVELS.endurance.max; n++) expect(staminaRegen(n)).toBeGreaterThan(staminaRegen(n - 1));
   });
 
@@ -147,9 +162,9 @@ describe('stamina returns slowly, and faster with each level of Endurance (round
     expect(fill(staminaRegen(0))).toBeCloseTo(fill(undefined), 6);
   });
 
-  it('nothing comes back between rolls run on at their fastest, so a chain of them draws on the bar alone', () => {
+  it('rolls chained at their earliest cancel or their full duration still drain the bar', () => {
     const roll = PLAYER_MOVES.roll;
-    expect(STAMINA.regenDelay).toBeGreaterThanOrEqual(roll.frames); // the delay outlasts the whole roll
+    expect(STAMINA.regenDelay).toBeGreaterThanOrEqual(roll.frames);
     const s = bar(100);
     let rolls = 0;
     while (s.value > 0) {

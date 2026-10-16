@@ -93,14 +93,14 @@ function drain(g: Game, dt: number): number {
     if (a > top) [top, rest] = [a, rest + top];
     else rest += a;
   }
-  let loss = (top + SANITY.auraStack * rest) * dt; // a crowd weighs on the mind, but not as its sum (round 17)
+  let loss = (top + SANITY.auraStack * rest) * SANITY.auraScale * dt; // passive dread builds over a fight, with a crowd still weighing in part
   for (const [id, a] of actor) {
     const s = moveDef(a)?.sanity;
     if (!s || a.frozen || !inWindow(s.window, a.frame) || isAbsent(g, id) || combatant.get(id)?.faction !== 'enemy') continue;
     if (distXZ(transform.get(id)!.pos, pp) > s.range) continue;
     const seen = hasLineOfSight(g.world, aimPoint(g, id)!, playerEye(g));
     if (s.sight && !seen) continue;
-    loss += (s.amount / (s.window[1] - s.window[0])) * (seen ? 1 : SANITY.muffled); // a roar past a wall is muffled (round 12)
+    loss += (s.amount / (s.window[1] - s.window[0])) * SANITY.attackScale * (seen ? 1 : SANITY.muffled); // a roar past a wall is muffled (round 12)
   }
   return loss;
 }
@@ -137,7 +137,7 @@ export function bleed(g: Game, dt: number): void {
 
 /**
  * One step: drains, or (with nothing pressing on the mind) mends, and a swallow of Laudanum on its move's `item` frame. The swallow also steadies
- * the mind for LAUDANUM.steady seconds: auras, roars and gazes take nothing while it holds (playtest
+ * the mind for LAUDANUM.steady seconds: auras, blows, roars and gazes take nothing while it holds (playtest
  * round 7: a dose should stop the drain, not only refill what it took).
  */
 export function sanitySystem(g: Game, dt: number): void {
@@ -173,7 +173,9 @@ export function tollOnce(t: Toll, frame: number, cost: number, spell: number): n
 export function registerSanity(g: Game): void {
   g.events.on('Hit', ({ attacker, target, damage, lingering }) => {
     const blow = g.ecs.c.dread.get(attacker)?.blow ?? 0;
-    if (target === g.player.id && damage > 0 && !lingering && blow > 0) loseSanity(g, tollOnce(g.mind.struck, g.frame, blow, SANITY.volley));
+    if (target === g.player.id && damage > 0 && !lingering && blow > 0 && g.player.steady <= 0) {
+      loseSanity(g, tollOnce(g.mind.struck, g.frame, blow, SANITY.volley) * SANITY.attackScale);
+    }
     const me = g.player.id;
     const other = attacker === me ? target : target === me ? attacker : null; // a real blow between the investigator and a real foe (a hallucination's, a pool's and a swing at the air are none) is a fight
     if (!lingering && other !== null && !g.ecs.c.phantom.has(other) && g.ecs.c.combatant.get(other)?.faction === 'enemy') g.mind.fought = g.frame;

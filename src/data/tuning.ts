@@ -112,10 +112,12 @@ export const PLAYER = {
 };
 
 export const STAMINA = {
-  regen: 24, // per second at the start; each Endurance level adds LEVELS.endurance.regen (round 22: it was 40 for all, and a bar refilled so soon that rolling on and on cost nothing)
-  regenDelay: 48, // frames of no regen after any spending: longer than a roll, so a chain of rolls draws on the bar alone
+  regen: 32, // per second at the start; Endurance adds to it, but a new investigator can recover between boss attacks
+  regenDelay: 48, // frames after actions: outlasts a full roll, so repeated dodges cannot refund their next attempt
+  guardDelay: 24, // frames after a blocked hit: defending recovers in 0.4 seconds, with room to counter
+  guardCost: 0.5, // share of a blocked blow's guard damage paid in stamina: a single wave leaves room to dodge and counter
   sprintDelay: 18, // frames of no regen once a sprint ends (round 48: the run's own drain is its cost, and the action's 48 left one who ran to the foe with an empty bar waiting nearly a second)
-  sprintDrain: 18, // per second
+  sprintDrain: 14, // per second: repositioning leaves more of the bar for the fight
 };
 
 export const COMBAT = {
@@ -143,10 +145,12 @@ export const SANITY = {
   auraNear: 3, // metres beyond a creature's body where its aura is at full strength...
   auraFar: 12, // ...fading to nothing here
   auraStack: 0.35, // the strongest aura weighs whole, each of the rest this share (round 17: a pack of rats drained a mind in minutes)
+  auraScale: 0.1, // passive dread should build over a fight: the strongest boss drains 1/s, rather than 10/s
+  attackScale: 0.5, // landed blows, roars and gazes take half their listed sanity damage
   lesserAura: 0.6, // and the vermin's (the lesser tier's) weigh this much
   sightRange: 30, // metres: first sight needs a creature this close, in line of sight...
   sightCone: 50, // ...and within this many degrees of the camera's forward
-  firstSight: { lesser: 0, greater: 6, named: 10, great_old_one: 18, outer_god: 25, ally: 0 }, // sanity lost on first sight, by tier...
+  firstSight: { lesser: 0, greater: 4, named: 6, great_old_one: 10, outer_god: 12, ally: 0 }, // sanity lost on first sight, by tier...
   muffled: 0.35, // share of a roar's toll that carries through a wall (round 12: whole, from 12 m)
   together: 240, // ...but of those first seen within this many frames of each other, only the greatest (round 12)
   volley: 75, // frames in which landed blows take the mind once: the greatest of them (a barrage's bolts, a swarm's bites; round 12)
@@ -173,7 +177,7 @@ export const SANITY = {
 export const LAUDANUM = {
   doses: 3,
   sanity: 50, // half the full sanity meter restored per dose
-  steady: 10, // seconds after a swallow in which auras, roars, gazes and the void take no sanity (playtest round 7)
+  steady: 20, // seconds after a swallow in which auras, blows, roars, gazes and the void take no sanity
 };
 
 /** Insight upgrades (spec §3A): insight per level, the most levels, and what each level adds. The body's strength is bought with Echoes (LEVELS). */

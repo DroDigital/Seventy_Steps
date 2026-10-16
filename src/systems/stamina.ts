@@ -19,6 +19,7 @@ export function spend(s: Stamina, cost: number): void {
 /** Takes a blocked hit's stamina damage; true when it empties the bar (guard break). */
 export function absorb(s: Stamina, amount: number): boolean {
   spend(s, amount);
+  s.delay = STAMINA.guardDelay;
   return s.value <= 0;
 }
 

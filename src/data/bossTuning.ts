@@ -20,7 +20,7 @@ export const BOSS = {
   teleport: [3.5, 8] as const, // a teleport lands this far from its target
   gazeRate: 0.025, // gaze buildup per frame of a gaze in sight: half a gaze's worth...
   gazeDecay: 0.0015, // ...and it ebbs this much a frame with none on the investigator: three gazes close together fill it
-  gazeSanity: 12, // a full gaze: this much sanity, and a stagger
+  gazeSanity: 6, // a full gaze: this much sanity, and a stagger (already scaled to the lighter attack toll)
   darkFrames: 420, // a darkness attack keeps the arena dark this long
   boltLife: 240, // frames before a bolt gutters out, whatever its range
   boltGrace: 20, // frames after a bolt lands on the investigator in which the same caster's next ones pass (round 17: a barrage emptied a full bar in seconds)

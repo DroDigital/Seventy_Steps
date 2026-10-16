@@ -111,7 +111,7 @@ export const DECK = { uiScale: 1.15, captions: 1.2 };
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
 export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {
   vigour: { max: 20, hp: 12 },
-  endurance: { max: 20, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all twenty levels bring it back to the 40 a second it once was
+  endurance: { max: 20, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all twenty levels reach 48 a second
   might: { max: 20, damage: 0.04 }, // share added to the investigator's blows and shots
 };
 export type LevelId = keyof typeof LEVELS;

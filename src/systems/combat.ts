@@ -12,7 +12,7 @@
 import type { Entity } from '../core/ecs';
 import { segSegDist2, wrapAngle, yawOf, type V3 } from '../core/geom';
 import type { HitDef } from '../data/moves';
-import { COMBAT, IMPACT } from '../data/tuning';
+import { COMBAT, IMPACT, STAMINA } from '../data/tuning';
 import { inWindow, moveDef, startMove } from './actions';
 import { isAbsent, type Actor, type Game, type Health, type HitOutcome, type Poise, type Stamina } from './components';
 import { edge } from './arms';
@@ -54,7 +54,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
   if (inWindow(def?.iframes, f)) return { outcome: 'dodged', damage: 0 };
   if (blow.parryable && frontal && inWindow(def?.parry, f)) return { outcome: 'parried', damage: 0 };
   if (frontal && d.actor.guard && !blow.unblockable) {
-    if (!d.stamina || !absorb(d.stamina, blow.guard)) return { outcome: 'blocked', damage: 0 };
+    if (!d.stamina || !absorb(d.stamina, blow.guard * STAMINA.guardCost)) return { outcome: 'blocked', damage: 0 };
     startMove(d.actor, 'guardBreak');
     return { outcome: 'guardBreak', damage: 0 };
   }

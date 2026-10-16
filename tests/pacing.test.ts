@@ -33,7 +33,7 @@ describe('fair pacing (round 12)', () => {
 
   it('blows landing together take the mind once, the greatest of them', () => {
     const { g, player, deepOne } = scriptedGame();
-    const blow = g.ecs.c.dread.get(deepOne)!.blow;
+    const blow = g.ecs.c.dread.get(deepOne)!.blow * SANITY.attackScale;
     expect(blow).toBeGreaterThan(0);
     const light: Blow = { ...heavy, poise: 0 };
     for (let i = 0; i < 4; i++) strike(g, deepOne, player, light);
