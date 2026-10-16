@@ -37,6 +37,11 @@ export interface DirectionalClip<T> {
 }
 export type DirectionalClips<T> = Partial<Record<SpriteDirection, Partial<Record<SpriteAction, DirectionalClip<T>>>>>;
 
+/** A flyer in the sky: its own wing-beat where it has one (the Shantak's flight, round 48), else its walk (round 49: a visitor always drew its walk). */
+export function flyingClip<T>(clips: DirectionalClips<T>, direction: SpriteDirection): DirectionalClip<T> | undefined {
+  return resolveDirectionalClip(clips, direction, 'flight') ?? resolveDirectionalClip(clips, direction, 'move');
+}
+
 /** Side combat art (and the colossi's stoop) is authored only from the front in this pack, but for the nine bosses' left and back; one without its own keeps its accepted front action and mirror flag. */
 export function resolveDirectionalClip<T>(clips: DirectionalClips<T>, direction: SpriteDirection, action: SpriteAction): DirectionalClip<T> | undefined {
   const exact = clips[direction]?.[action];
