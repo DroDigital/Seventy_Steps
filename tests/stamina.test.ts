@@ -22,16 +22,13 @@ describe('stamina rules', () => {
     expect(s.value).toBe(0);
   });
 
-  it('regenerates only after the delay, slower while guarding', () => {
+  it('regenerates only after the delay, at the same rate whether guarding or not (round 48)', () => {
     const s = bar(50);
     spend(s, 10);
     for (let i = 0; i < STAMINA.regenDelay; i++) tickStamina(s, 'idle', dt);
     expect(s.value).toBe(40);
     tickStamina(s, 'idle', dt);
     expect(s.value).toBeCloseTo(40 + STAMINA.regen * dt);
-    const g = bar(40);
-    tickStamina(g, 'guard', dt);
-    expect(g.value).toBeCloseTo(40 + STAMINA.regen * dt * STAMINA.guardRegen);
     const full = bar(100);
     tickStamina(full, 'idle', dt);
     expect(full.value).toBe(100);

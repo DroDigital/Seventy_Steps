@@ -4,7 +4,7 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2728,
+  "unique_png_count": 2760,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
@@ -14,7 +14,8 @@
     "'stoop' (front view only): two frames, the first once on entering the pose and the second held until it ends; they are a later delivery, packed onto their own atlas page by tools/add_reviewed_frames.py.",
     "umr_at_tawil: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); its right view is drawn, not mirrored from its left, its four frames on a shelf at the foot of its page.",
     "front/stoop_mid: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
-    "back/attack, back/hurt, left/attack, left/hurt: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held)."
+    "back/attack, back/hurt, left/attack, left/hurt: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
+    "back/flight, front/flight, left/flight, right/flight: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held)."
   ],
   "entities": [
     {
@@ -11351,6 +11352,51 @@
                   "sha256": "5753f46224048e91810006944368d3450f8a459471fd2598b62efd4cb62afb90"
                 }
               ]
+            },
+            "flight": {
+              "frame_count": 8,
+              "frames": [
+                {
+                  "name": "move_0",
+                  "path": "flight/front/move_0.png",
+                  "sha256": "67744c5231e3333547b535292c0ca3d15e4d5872e4f656bc0e2ffed49dea716d"
+                },
+                {
+                  "name": "move_1",
+                  "path": "flight/front/move_1.png",
+                  "sha256": "496400170946495fb9e9e68409e95b4112f4f02dc0e128dc98c10f3d6e867e8a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "flight/front/move_2.png",
+                  "sha256": "a6a4fe9f34e6a6933e6a82e8860f36fd13ab619f8b6fbbfb35bc39a72a6afe93"
+                },
+                {
+                  "name": "move_3",
+                  "path": "flight/front/move_3.png",
+                  "sha256": "b12f6198fda150b7782fba64f7e7810a6a48c2e1202a19589c8bd3bd006eb01f"
+                },
+                {
+                  "name": "move_4",
+                  "path": "flight/front/move_4.png",
+                  "sha256": "0f937fbb47ed424f1d6bf64dc44c8a13e5de08b4351057983aa9b293169379f2"
+                },
+                {
+                  "name": "move_5",
+                  "path": "flight/front/move_5.png",
+                  "sha256": "36fb05dfc6e2fea9a9b1b505192e5fb7e680c73724b23c394c9f7ecffe795700"
+                },
+                {
+                  "name": "move_6",
+                  "path": "flight/front/move_6.png",
+                  "sha256": "3d64e5ea4e04a851b47dabf0319ffdcaf5b79c4f1adf84b7c1494330adf4490f"
+                },
+                {
+                  "name": "move_7",
+                  "path": "flight/front/move_7.png",
+                  "sha256": "2c59407262e2043f51ff347ff3709cae0442b67265d85c6728d03f3701772410"
+                }
+              ]
             }
           }
         },
@@ -11395,6 +11441,51 @@
                   "name": "move_3",
                   "path": "sprites/shantak/64x64/back/move_3.png",
                   "sha256": "1ffbf9dc4e2168ee3a376cfbfa5d31155c951b4d24c3f4e06082e53a69dd46d7"
+                }
+              ]
+            },
+            "flight": {
+              "frame_count": 8,
+              "frames": [
+                {
+                  "name": "move_0",
+                  "path": "flight/back/move_0.png",
+                  "sha256": "08d943f836892646c0601ca834c5c2d7a987876ff7e6af05aab42a3f4147b0ca"
+                },
+                {
+                  "name": "move_1",
+                  "path": "flight/back/move_1.png",
+                  "sha256": "f54222985458f513a56463a9fac1c8cb44bf51a0416a650a420bd1a220caa2e9"
+                },
+                {
+                  "name": "move_2",
+                  "path": "flight/back/move_2.png",
+                  "sha256": "035933b7c26fcc774e27b98c44f3eb22a96566d414fecefaa25ede3fa19b47ac"
+                },
+                {
+                  "name": "move_3",
+                  "path": "flight/back/move_3.png",
+                  "sha256": "0a9fab613bd725521e2c2b945bfd2a7875b24a49718454ed0d1ef66123face89"
+                },
+                {
+                  "name": "move_4",
+                  "path": "flight/back/move_4.png",
+                  "sha256": "6da45ce65badc8ed6542d44c86f3dff53423e96299a7decd3b43e23d5fd27903"
+                },
+                {
+                  "name": "move_5",
+                  "path": "flight/back/move_5.png",
+                  "sha256": "6d9e03449f7f1fd5d3d6d3ac3da63bd7ffe5d06cb8a4d1f1a710f3ddbbc46131"
+                },
+                {
+                  "name": "move_6",
+                  "path": "flight/back/move_6.png",
+                  "sha256": "e535ddd445f573129b813f759a16dc7fb216ca01f1a9485106addc91259314a0"
+                },
+                {
+                  "name": "move_7",
+                  "path": "flight/back/move_7.png",
+                  "sha256": "2aac55361ab26b580bce457be1f2b20485c2197e7b4747635c520a25b663836f"
                 }
               ]
             }
@@ -11453,6 +11544,51 @@
                   "sha256": "763677b05dc17be19593999abfda08d5427a5a95322d67f0e4a4ccbda3bb45bc"
                 }
               ]
+            },
+            "flight": {
+              "frame_count": 8,
+              "frames": [
+                {
+                  "name": "move_0",
+                  "path": "flight/left/move_0.png",
+                  "sha256": "252b8aae6d899db0bcfcfdee11bc0961941ca21d8a96aa7455667eea77b8f0e3"
+                },
+                {
+                  "name": "move_1",
+                  "path": "flight/left/move_1.png",
+                  "sha256": "1951f05ad81e60843dffc75a8082886813d57534bedde96ba66faa343f005374"
+                },
+                {
+                  "name": "move_2",
+                  "path": "flight/left/move_2.png",
+                  "sha256": "0e695aee59c9e4f692fdfc45f69a2ee13ffe05915ccefad4327977ffa4b89e2e"
+                },
+                {
+                  "name": "move_3",
+                  "path": "flight/left/move_3.png",
+                  "sha256": "42bde01f10269d34d856e33ccaff198f23c13d0033713884c9c8a1c49c8efa88"
+                },
+                {
+                  "name": "move_4",
+                  "path": "flight/left/move_4.png",
+                  "sha256": "3bdc463f7fc8792cd6b6c9d0886bf78f30ffc69e09775edba4a84f6fd37f34fa"
+                },
+                {
+                  "name": "move_5",
+                  "path": "flight/left/move_5.png",
+                  "sha256": "21a6287f5c06cec8727767075e13632b22b3e986247f401a8e08942857391b2b"
+                },
+                {
+                  "name": "move_6",
+                  "path": "flight/left/move_6.png",
+                  "sha256": "1d593fe1afd81e8b476ba3900539be748a3577a701e5630583503fd9f1a06a56"
+                },
+                {
+                  "name": "move_7",
+                  "path": "flight/left/move_7.png",
+                  "sha256": "d4b4c7dea2eaf6a591994101e84623ec18901fc4461fef5d49f8f48274594e89"
+                }
+              ]
             }
           }
         },
@@ -11507,6 +11643,51 @@
                   "name": "move_5",
                   "path": "sprites/shantak/64x64/left/move_5.png",
                   "sha256": "763677b05dc17be19593999abfda08d5427a5a95322d67f0e4a4ccbda3bb45bc"
+                }
+              ]
+            },
+            "flight": {
+              "frame_count": 8,
+              "frames": [
+                {
+                  "name": "move_0",
+                  "path": "flight/right/move_0.png",
+                  "sha256": "252b8aae6d899db0bcfcfdee11bc0961941ca21d8a96aa7455667eea77b8f0e3"
+                },
+                {
+                  "name": "move_1",
+                  "path": "flight/right/move_1.png",
+                  "sha256": "1951f05ad81e60843dffc75a8082886813d57534bedde96ba66faa343f005374"
+                },
+                {
+                  "name": "move_2",
+                  "path": "flight/right/move_2.png",
+                  "sha256": "0e695aee59c9e4f692fdfc45f69a2ee13ffe05915ccefad4327977ffa4b89e2e"
+                },
+                {
+                  "name": "move_3",
+                  "path": "flight/right/move_3.png",
+                  "sha256": "42bde01f10269d34d856e33ccaff198f23c13d0033713884c9c8a1c49c8efa88"
+                },
+                {
+                  "name": "move_4",
+                  "path": "flight/right/move_4.png",
+                  "sha256": "3bdc463f7fc8792cd6b6c9d0886bf78f30ffc69e09775edba4a84f6fd37f34fa"
+                },
+                {
+                  "name": "move_5",
+                  "path": "flight/right/move_5.png",
+                  "sha256": "21a6287f5c06cec8727767075e13632b22b3e986247f401a8e08942857391b2b"
+                },
+                {
+                  "name": "move_6",
+                  "path": "flight/right/move_6.png",
+                  "sha256": "1d593fe1afd81e8b476ba3900539be748a3577a701e5630583503fd9f1a06a56"
+                },
+                {
+                  "name": "move_7",
+                  "path": "flight/right/move_7.png",
+                  "sha256": "d4b4c7dea2eaf6a591994101e84623ec18901fc4461fef5d49f8f48274594e89"
                 }
               ]
             }

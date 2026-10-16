@@ -6,7 +6,7 @@
 import { STAMINA } from '../data/tuning';
 import type { Stamina } from './components';
 
-export type StaminaMode = 'idle' | 'guard' | 'sprint';
+export type StaminaMode = 'idle' | 'sprint';
 
 /** Entities without stamina (enemies) can always act. */
 export const canAfford = (s: Stamina | undefined): boolean => !s || s.value > 0;
@@ -22,7 +22,7 @@ export function absorb(s: Stamina, amount: number): boolean {
   return s.value <= 0;
 }
 
-/** One sim step: sprint drains (and regen waits `sprintDelay` after it, not an action's `regenDelay`), otherwise regen resumes once the delay has run out (slower while guarding, and at `pace` of its rate: less than 1 for a mind Unmoored, round 23). */
+/** One sim step: sprint drains (and regen waits `sprintDelay` after it, not an action's `regenDelay`), otherwise regen resumes once the delay has run out, at the same rate whether or not the guard is up (at `pace` of its rate: less than 1 for a mind Unmoored, round 23). */
 export function tickStamina(s: Stamina, mode: StaminaMode, dt: number, pace = 1): void {
   if (mode === 'sprint') {
     s.value = Math.max(0, s.value - STAMINA.sprintDrain * dt);
@@ -33,5 +33,5 @@ export function tickStamina(s: Stamina, mode: StaminaMode, dt: number, pace = 1)
     s.delay--;
     return;
   }
-  s.value = Math.min(s.max, s.value + (s.regen ?? STAMINA.regen) * dt * pace * (mode === 'guard' ? STAMINA.guardRegen : 1));
+  s.value = Math.min(s.max, s.value + (s.regen ?? STAMINA.regen) * dt * pace);
 }

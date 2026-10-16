@@ -115,7 +115,6 @@ export const STAMINA = {
   regen: 24, // per second at the start; each Endurance level adds LEVELS.endurance.regen (round 22: it was 40 for all, and a bar refilled so soon that rolling on and on cost nothing)
   regenDelay: 48, // frames of no regen after any spending: longer than a roll, so a chain of rolls draws on the bar alone
   sprintDelay: 18, // frames of no regen once a sprint ends (round 48: the run's own drain is its cost, and the action's 48 left one who ran to the foe with an empty bar waiting nearly a second)
-  guardRegen: 0.35, // regen multiplier while guarding
   sprintDrain: 18, // per second
 };
 

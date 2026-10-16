@@ -1,7 +1,7 @@
 /** Camera-relative authored sprite views and timing; read-only on combat and movement. */
 
 export type SpriteDirection = 'front' | 'left' | 'back' | 'right';
-export type SpriteAction = 'idle' | 'move' | 'attack' | 'hurt' | 'stoop' | 'stoop_mid';
+export type SpriteAction = 'idle' | 'move' | 'flight' | 'attack' | 'hurt' | 'stoop' | 'stoop_mid'; // 'flight': a flyer's own wing cycle, where it has one (round 48)
 interface PositionXZ { x: number; z: number }
 
 const QUARTER = Math.PI / 2;

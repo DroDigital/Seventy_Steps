@@ -57,45 +57,46 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   };
   const regionName = (id: string): string => getRegion(id)?.name ?? id;
 
-  const TABS = ['Grow', 'Arms', 'Relics', 'Travel'];
-  let tab = 0; // the tab open: Grow again at each rest
-  const REST = 'You rest. Your health, sanity, Laudanum and Reagent are restored, the revolver is loaded from your spare rounds, and the creatures you killed are back.';
+  const TABS = ['Level up', 'Weapons', 'Relics', 'Travel'];
+  let tab = 0; // the tab open: Level up again at each rest
+  const REST = 'Resting restores health, sanity, Laudanum and Reagent, reloads the revolver, and brings back the creatures you killed.';
 
-  /** Levels and the mind's upgrades: what the Echoes and the insight buy. */
+  /** Levels and the mind's upgrades: each row a name and its count, with what it gives and costs beneath (round 48: one long line before). */
   function grow(panel: HTMLElement): void {
-    heading(panel, `BODY  ·  ECHOES  ·  NEXT LEVEL ${nextLevelCost(g)}`).style.margin = '0 0 4px';
+    heading(panel, 'BODY').style.margin = '0 0 4px';
     for (const id of LEVEL_IDS) {
       const full = g.player.levels[id] >= LEVELS[id].max;
-      option(panel, `${levelName(id)}  ${g.player.levels[id]}/${LEVELS[id].max}  ·  ${GAINS[id]}  ·  ${full ? 'fully grown' : `${nextLevelCost(g)} Echoes`}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
+      option(panel, `${levelName(id)}  ${g.player.levels[id]}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`, '', `${GAINS[id]}  ·  ${full ? 'fully grown' : `${nextLevelCost(g)} Echoes`}`);
     }
     heading(panel, `MIND  ·  INSIGHT ${g.mind.insight}`).style.margin = '12px 0 4px';
     const read = g.overworld?.read;
     const open = heldOpen(g.mind.insight, read);
-    el(panel, 'div', `Insight also holds hidden passages open${open.length ? `, ${open.length} that you have yet to pass` : ''}. What is spent here is gone, and a passage it held open is a wall again.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 6px');
+    el(panel, 'div', `Insight opens hidden passages${open.length ? ` (${open.length} held open for now)` : ''}. Spending it shuts any passage it holds.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 6px');
     for (const id of Object.keys(UPGRADES) as UpgradeId[]) {
       const u = UPGRADES[id];
       const level = g.mind.upgrades[id];
       const shut = level < u.max && g.mind.insight >= u.cost ? closedBy(g.mind.insight, u.cost, read) : [];
       const costs = shut.length ? `Spending ${u.cost} insight shuts ${listed(shut, 3)} again, before you have passed ${shut.length === 1 ? 'it' : 'them'}.` : '';
-      option(panel, `${upgradeName(id)}  ${level}/${u.max}  ·  ${GAINS[id]}  ·  ${level < u.max ? `${u.cost} insight` : 'fully grown'}`, () => (buyUpgrade(g, id), main.redraw?.()), level < u.max && g.mind.insight >= u.cost, level >= u.max ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`, costs, shut.length ? `shuts ${shut.length} passage${shut.length === 1 ? '' : 's'}` : '');
+      const sub = `${GAINS[id]}  ·  ${level < u.max ? `${u.cost} insight` : 'fully grown'}${shut.length ? `  ·  shuts ${shut.length} passage${shut.length === 1 ? '' : 's'}` : ''}`;
+      option(panel, `${upgradeName(id)}  ${level}/${u.max}`, () => (buyUpgrade(g, id), main.redraw?.()), level < u.max && g.mind.insight >= u.cost, level >= u.max ? `${upgradeName(id)} is fully grown.` : `Not enough insight: ${u.cost}, and you hold ${g.mind.insight}. Insight comes of tomes, and of what the mind has borne.`, costs, sub);
     }
   }
 
   /** Star-stones set into the weapons owned, and the revolver, a level at a time (round 12; round 38: a tab, no longer a page of its own). */
   function arms(panel: HTMLElement): void {
-    el(panel, 'div', `Star-stones: ${g.player.stones}. The horrors slain for good leave them; each level set into a weapon adds ${Math.round(REINFORCE.damage * 100)}% to its blows, and into the revolver ${Math.round(GUN.level.damage * 100)}% to its shots, with a truer aim and a longer reach.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 8px');
+    el(panel, 'div', `Star-stones: ${g.player.stones}. Each level set into a weapon adds ${Math.round(REINFORCE.damage * 100)}% to its blows; into the revolver, ${Math.round(GUN.level.damage * 100)}% to its shots.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 8px');
     const [level, price] = [g.player.gun, gunCost(g)];
     const shot = (n: number): number => Math.round(PLAYER_MOVES.shoot.shot.damage * might(g, g.player.id) * gunEdge(n));
     const whole = (n: number): number => GUN.reach.near + n * GUN.level.reach;
-    const gunName = `Revolver +${level}`;
-    option(panel, price === undefined ? `${gunName}  ·  fully set` : `${gunName} → +${level + 1}  ·  ${price} star-stone${price === 1 ? '' : 's'}`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), price === undefined ? 'The revolver is fully set.' : `Not enough star-stones: ${price}, and you carry ${g.player.stones}.`, '', price === undefined ? '' : `shot ${shot(level)} → ${shot(level + 1)}  ·  whole to ${whole(level)} → ${whole(level + 1)} m`);
+    const gunName = `Revolver  +${level}`;
+    option(panel, price === undefined ? `${gunName}  ·  fully set` : `${gunName}  →  +${level + 1}`, () => (upgradeGun(g), main.redraw?.()), canUpgradeGun(g), price === undefined ? 'The revolver is fully set.' : `Not enough star-stones: ${price}, and you carry ${g.player.stones}.`, price === undefined ? '' : `Shot ${shot(level)} → ${shot(level + 1)}; whole reach ${whole(level)} → ${whole(level + 1)} m, with a truer aim.`, price === undefined ? '' : `${price} star-stone${price === 1 ? '' : 's'}`);
     for (const id of g.player.arms) {
       const level = g.player.reinforced[id];
       const cost = reinforceCost(g, id);
       const light = (n: number): number => Math.round((WEAPONS[id].moves.light1?.hit?.damage ?? 0) * might(g, g.player.id) * edgeAt(n));
-      const name = `${WEAPONS[id].name} +${level}`;
-      const label = cost === undefined ? `${name}  ·  fully reinforced` : `${name} → +${level + 1}  ·  ${cost} star-stone${cost === 1 ? '' : 's'}`;
-      option(panel, label, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : `Not enough star-stones: ${cost}, and you carry ${g.player.stones}.`, '', cost === undefined ? '' : `light ${light(level)} → ${light(level + 1)}`);
+      const name = `${WEAPONS[id].name}  +${level}`;
+      const label = cost === undefined ? `${name}  ·  fully reinforced` : `${name}  →  +${level + 1}`;
+      option(panel, label, () => (reinforce(g, id), main.redraw?.()), canReinforce(g, id), cost === undefined ? `${WEAPONS[id].name} is fully reinforced.` : `Not enough star-stones: ${cost}, and you carry ${g.player.stones}.`, cost === undefined ? '' : `Light blow ${light(level)} → ${light(level + 1)}.`, cost === undefined ? '' : `${cost} star-stone${cost === 1 ? '' : 's'}`);
     }
     moveSection(panel, g, (from) => screen.show(movePage(g, from, () => screen.show(main))));
   }
