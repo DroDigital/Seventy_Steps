@@ -28,7 +28,7 @@ import { MIST } from './volumetricFog';
 import { sight } from '../systems/perception';
 import { CELL, spriteKey, type SpriteAtlas } from './sprites/atlas';
 import { spriteBatch, reviewedTextures } from './sprites/batch';
-import { attackFrame, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteAction, type SpriteDirection } from './sprites/directional';
+import { attackFrame, clipCounts, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteAction, type SpriteDirection } from './sprites/directional';
 import { reviewedClips, reviewedSize, type ReviewedManifest } from './sprites/reviewed';
 
 const CAPACITY = 64;
@@ -226,16 +226,17 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
         const bow = entry ? stoopOf(id, key, time) : undefined;
-        const look = lookOf(g, id, time, known(bow), bow?.age, bow?.rise);
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
+        // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
+        const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
+        const direction = entry && art ? spriteDirection(yaw, { x, z }, camera.position, directions.get(id)) : undefined;
+        const look = lookOf(g, id, time, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise);
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
-        if (entry && art) {
+        if (entry && art && direction) {
           if (!look) continue;
-          const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
-          const direction = spriteDirection(yaw, { x, z }, camera.position, directions.get(id));
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;

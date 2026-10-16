@@ -37,6 +37,13 @@ export interface DirectionalClip<T> {
 }
 export type DirectionalClips<T> = Partial<Record<SpriteDirection, Partial<Record<SpriteAction, DirectionalClip<T>>>>>;
 
+/** How many frames each action has in one facing: what lookOf is told of a creature's clips (round 49). */
+export function clipCounts<T>(clips: DirectionalClips<T>, direction: SpriteDirection): Partial<Record<SpriteAction, number>> {
+  const out: Partial<Record<SpriteAction, number>> = {};
+  for (const [action, clip] of Object.entries(clips[direction] ?? {}) as [SpriteAction, DirectionalClip<T>][]) if (clip.frames.length) out[action] = clip.frames.length;
+  return out;
+}
+
 /** A flyer in the sky: its own wing-beat where it has one (the Shantak's flight, round 48), else its walk (round 49: a visitor always drew its walk). */
 export function flyingClip<T>(clips: DirectionalClips<T>, direction: SpriteDirection): DirectionalClip<T> | undefined {
   return resolveDirectionalClip(clips, direction, 'flight') ?? resolveDirectionalClip(clips, direction, 'move');

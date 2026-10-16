@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { flyingClip, type DirectionalClips } from '../src/render/sprites/directional';
+import { clipCounts, flyingClip, type DirectionalClips } from '../src/render/sprites/directional';
 import { reviewedClips, type ReviewedEntity } from '../src/render/sprites/reviewed';
 
 const index = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as { entities: Record<string, ReviewedEntity> };
@@ -31,5 +31,12 @@ describe('a flyer in the sky flies its own wing-beat where it has one (round 49:
     expect(flyingClip(clips, 'front')!.frames).toEqual([1, 2]);
     expect(flyingClip(clips, 'back')!.frames).toEqual([4]);
     expect(flyingClip(clips, 'left')).toBeUndefined();
+  });
+
+  it('tells the view which states a creature has in its facing, so a flyer is known to fly (round 49)', () => {
+    expect(clipCounts(clipsOf('shantak'), 'front').flight).toBe(8);
+    expect(clipCounts(clipsOf('shantak'), 'back').flight).toBe(8);
+    const fake: DirectionalClips<number> = { left: { move: { frames: [1, 2, 3], mirror_horizontal: false }, idle: { frames: [], mirror_horizontal: false } } };
+    expect(clipCounts(fake, 'left')).toEqual({ move: 3 });
   });
 });
