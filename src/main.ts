@@ -160,7 +160,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     arms: (back, show) => armsPage(game, back, show),
     achievements: opts.arena ? undefined : (back) => achievementsPage(store, back),
     quit: () => void veil.cover('', 0.8).then(() => (location.href = location.pathname)),
-    held: () => cinema.active || journeys.busy || building, // a cutscene, the veil or the making of the world has the screen: leaving the window then must not pause (round 31)
+    held: () => building || cinema.active || journeys.busy, // check building first: cinema is not made yet while the sprites load; leaving during loading or a cutscene must not pause
   });
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);

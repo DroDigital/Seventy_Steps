@@ -1,5 +1,5 @@
 /**
- * The pause menu (Phase 6): Esc, the pad's Start, or losing the captured mouse (switching away)
+ * The pause menu (Phase 6): Esc, the pad's Start, or leaving the game (switching away)
  * opens it whenever no other menu is open. The world stands still while it is open (main.ts). It
  * offers Resume, the Map, the Journal, Arms, Settings (with the Controls) and a return to the title screen, and in
  * the desktop shell a way out to the desktop (playtest round 12).
@@ -34,11 +34,25 @@ export interface PauseMenu {
 }
 
 const RESUME_MS = 1000; // how soon after the mouse was asked for (by any menu closing) a let-go is the browser's own Esc, not a pause
+const FOCUS_MS = 150; // a brief window-focus change is not leaving the game
 
 export function createPauseMenu(o: PauseOptions): PauseMenu {
   const screen = createScreen(6, '#050506b3'); // the world shows through a little more than behind the others' dim (70% dark, not 87%): its vitals and minimap stay crisp, which a blur of it would take
   let retriedAt = -1e9;
+  let locked = document.pointerLockElement !== null;
+  let focusTimer: ReturnType<typeof setTimeout> | undefined;
+  let retryTimer: ReturnType<typeof setTimeout> | undefined;
+  const cancelFocusCheck = (): void => {
+    clearTimeout(focusTimer);
+    focusTimer = undefined;
+  };
+  const cancelRetry = (): void => {
+    clearTimeout(retryTimer);
+    retryTimer = undefined;
+  };
   const resume = (): void => {
+    cancelFocusCheck();
+    cancelRetry();
     screen.close();
     o.resume();
   };
@@ -65,6 +79,8 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     },
   };
   const pause = (): void => {
+    cancelFocusCheck();
+    cancelRetry();
     if (!menuOpen() && !o.held?.()) screen.show(main);
   };
   const openJournal = (): void => {
@@ -75,18 +91,37 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
   addEventListener('keydown', (e) => e.code === keyLayout.journal && !e.repeat && !e.ctrlKey && !e.metaKey && !e.altKey && openJournal());
   addEventListener('keydown', (e) => e.code === 'Escape' && !e.repeat && pause());
   document.addEventListener('pointerlockchange', () => {
-    if (document.pointerLockElement !== null || !document.hasFocus()) return;
+    const wasLocked = locked;
+    locked = document.pointerLockElement !== null;
+    if (locked) cancelRetry();
+    if (locked || !wasLocked || !document.hasFocus() || menuOpen() || o.held?.()) return;
     // Leaving a menu by Esc (this one, the Elder Sign's, a shop's) takes the mouse in the same key press the browser takes it back with (Esc lets a locked mouse go): the lock is let go at once. That is not the player leaving the game; the mouse is taken again a moment later, when the key has risen.
     if (lockJustAsked(RESUME_MS)) {
       if (performance.now() - retriedAt > 3000) { // once: if the browser keeps letting it go, it is the player's hand
         retriedAt = performance.now();
-        setTimeout(() => !menuOpen() && !o.held?.() && o.resume(), 150);
+        retryTimer = setTimeout(() => {
+          retryTimer = undefined;
+          if (document.hasFocus() && document.visibilityState === 'visible' && document.pointerLockElement === null && !menuOpen() && !o.held?.()) o.resume();
+        }, 150);
       }
       return;
     }
     pause();
   });
-  addEventListener('blur', pause);
+  addEventListener('blur', () => {
+    cancelFocusCheck();
+    cancelRetry();
+    if (menuOpen() || o.held?.()) return;
+    focusTimer = setTimeout(() => {
+      focusTimer = undefined;
+      if (!document.hasFocus() || document.visibilityState === 'hidden') pause();
+    }, FOCUS_MS);
+  });
+  addEventListener('focus', cancelFocusCheck);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') pause();
+    else if (document.hasFocus()) cancelFocusCheck();
+  });
   onPadStart(pause);
   return {
     get open() {
