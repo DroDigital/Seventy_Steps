@@ -15,7 +15,7 @@ import type { Game } from '../systems/components';
 import type { Fauna } from './fauna';
 import { CELL, spriteKey, type SpriteAtlas } from './sprites/atlas';
 import { spriteBatch } from './sprites/batch';
-import { loopFrame, resolveDirectionalClip, spriteDirection, type DirectionalClips, type SpriteDirection } from './sprites/directional';
+import { flyingClip, loopFrame, spriteDirection, type DirectionalClips, type SpriteDirection } from './sprites/directional';
 import { reviewedClips, reviewedSize, type ReviewedEntity, type ReviewedManifest } from './sprites/reviewed';
 import { worldUniforms } from './worldMaterial';
 
@@ -115,7 +115,7 @@ export function createSkyLife(scene: THREE.Scene, g: Game, fauna: Fauna, sheet: 
         const bob = Math.sin(s.t * 0.9 + s.phase);
         if (s.reviewed && sheet.reviewed) {
           s.direction = spriteDirection(s.yaw, s, eye, s.direction);
-          const clip = resolveDirectionalClip(s.reviewed.clips, s.direction, 'move');
+          const clip = flyingClip(s.reviewed.clips, s.direction);
           if (!clip) continue;
           const frame = sheet.reviewed.manifest.frames[clip.frames[loopFrame(time + s.phase, clip.frames.length)]];
           const page = sheet.reviewed.manifest.pages[frame.page];
