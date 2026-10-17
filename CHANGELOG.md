@@ -3,6 +3,14 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Unreleased
+
+### Blocking balance
+
+- Holding block restores stamina at 35% of the normal rate again. Lower the guard to recover faster; stamina does not regenerate during a guard break.
+- An underfunded block absorbs only the share of the hit its remaining stamina can pay for. An empty bar takes the full damage, and a hit that exactly empties the bar is still fully absorbed but breaks the guard.
+- Raising block or parrying after an attack lands now waits for its recovery cancel frame. Calling off a wind-up still works, and a blocked hit no longer shortens a longer recovery delay from an action.
+
 ## 1.0.0-rc.2: since the release candidate
 
 Everything between the release candidate and this build: mounts you can hear and ride like a horse, a thunderstorm that can strike the ground,
