@@ -169,8 +169,8 @@ void main() {
   if (uSeabedOn > 0.5) {
     float surge = 0.18 + 0.14 * sin(uTime * 0.7 + vWorld.x * 0.11 + vWorld.z * 0.07) + 0.05 * sin(uTime * 1.7 + vWorld.z * 0.3);
     float shoreLace = vnoise(vWorld.xz * 2.4 + vec2(uTime * 0.2, 0.0)) * 0.6 + vnoise(vWorld.xz * 7.0 - uTime * 0.35) * 0.4;
-    foam = max(foam, smoothstep(surge + 0.34, surge, depth) * smoothstep(0.3, 0.7, shoreLace));
-    foam = max(foam, smoothstep(surge + 1.5, surge + 0.5, depth) * smoothstep(0.64, 0.86, shoreLace) * 0.5);
+    foam = max(foam, (1.0 - smoothstep(surge, surge + 0.34, depth)) * smoothstep(0.3, 0.7, shoreLace));
+    foam = max(foam, (1.0 - smoothstep(surge + 0.5, surge + 1.5, depth)) * smoothstep(0.64, 0.86, shoreLace) * 0.5);
   }
   foam = max(foam, max(rings.z, rain.z * 0.5) * 0.9); // the splash's rings, and the rain's
   vec3 white = (uAmbient * 1.6 + uLightColor * 0.4 + lamp) * vec3(0.7, 0.76, 0.74);

@@ -33,7 +33,7 @@ vec3 rippleRings(vec2 p, float t) {
     float env = q.w * exp(-age * 0.5) / (1.0 + dist * 0.18);
     float train = sin(k * 4.2) * exp(-abs(k) * 0.5) * step(k, 0.5); // a few crests behind the front, none ahead of it
     r.xy += (d / max(dist, 0.001)) * train * env * 0.55;
-    r.z += exp(-k * k * 1.6) * env * smoothstep(2.4, 0.0, age); // foam on the front while it is young
+    r.z += exp(-k * k * 1.6) * env * (1.0 - smoothstep(0.0, 2.4, age)); // foam on the front while it is young
   }
   return r;
 }

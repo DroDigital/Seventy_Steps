@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { PLAYER, WATER, WORLD } from '../src/data/tuning';
 import { fallDark, fallSystem } from '../src/systems/falls';
 import { createWorldGame } from '../src/systems/game';
+import { seaChop } from '../src/systems/seaChop';
+import { seaHeight } from '../src/world/seaSurface';
 import { enterSea, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
 import type { Collider } from '../src/world/colliders';
 
@@ -111,6 +113,33 @@ describe('a body dropped into the sea from a height', () => {
     expect(high[0]!.size).toBeGreaterThan(low[0]!.size);
     expect(splashSize(0)).toBeGreaterThan(0);
     expect(splashSize(100)).toBe(1);
+  });
+});
+
+describe('the surface it meets is the one drawn (round 55)', () => {
+  it('rides the swell as the wind has raised it: a body that falls in a storm splashes at the storm\'s water, not the calm\'s', () => {
+    const g = createWorldGame();
+    g.overworld!.region = 'rlyeh';
+    Object.assign(g.overworld!.weather, { kind: 'storm', amount: 1 });
+    const chop = seaChop(g);
+    expect(chop).toBeGreaterThan(2.5);
+    g.world = { ground: () => -9, colliders: [], off: new Set(), contain: () => {} };
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    tr.pos = { x: -600, y: 3, z: 220 };
+    tr.prev = { ...tr.pos };
+    g.player.falling = { frame: 0, vy: 0, vx: 0, vz: 0, spin: 1, lip: { ...tr.pos }, water: enterSea(tr.pos, { x: 0, z: 0 }, g.frame, chop) };
+    const meets: { y: number; frame: number }[] = [];
+    g.events.on('Splash', (d) => meets.push({ y: d.at.y, frame: g.frame }));
+    for (let i = 0; i < 90; i++) {
+      g.frame++;
+      fallSystem(g);
+    }
+    expect(meets).toHaveLength(1);
+    const [x, z] = [-600, 220];
+    const drawn = WORLD.seaLevel + seaHeight(x, z, meets[0]!.frame / 60, chop);
+    const calm = WORLD.seaLevel + seaHeight(x, z, meets[0]!.frame / 60, 1);
+    expect(Math.abs(meets[0]!.y - drawn)).toBeLessThan(0.05); // (the body has moved a hair sideways in the air)
+    expect(Math.abs(drawn - calm)).toBeGreaterThan(0.1); // and the two differ here, so the test tells them apart
   });
 });
 

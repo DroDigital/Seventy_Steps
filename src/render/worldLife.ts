@@ -8,6 +8,7 @@
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
+import { seaChop } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
 import { createBeacons } from './beacons';
 import type { Beams } from './beams';
@@ -50,13 +51,6 @@ export interface LifeParts {
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
-}
-
-/** How hard the wind drives the sea: R'lyeh's lies restless, a gale and rain raise any. */
-export function seaChop(g: Game): number {
-  const wx = g.overworld?.weather;
-  const wind = wx ? (wx.kind === 'gale' ? 0.9 : wx.kind === 'storm' ? 1.1 : wx.kind === 'rain' ? 0.3 : 0) * wx.amount : 0;
-  return (g.overworld?.region === 'rlyeh' ? 1.5 : g.overworld?.region === 'innsmouth' ? 1.15 : 1) * (1 + wind);
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
