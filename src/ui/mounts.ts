@@ -1,11 +1,12 @@
 /** Mount selection and store ownership. A save remembers a preference, never an entitlement. */
-import { FREE_MOUNT, MOUNT_IDS, MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import { FREE_MOUNT, MOUNT_IDS, MOUNTS, type MountId } from '../data/mounts';
 import type { Game } from '../systems/components';
 import { mountAvailable, mountUnlocked, selectMount, setAutomobileEntitlement, setChariotEntitlement } from '../systems/mounts';
 import { desktop } from './desktop';
 import { t } from '../core/i18n';
 import { fill } from './glyphs';
-import { ACCENT, button, el, heading, option } from './menuKit';
+import { button, el, heading, option } from './menuKit';
+import { chips, price } from './menuChips';
 import { saveNow } from './autosave';
 
 const pending = new WeakMap<Game, Promise<void>>();
@@ -41,16 +42,16 @@ function owned(g: Game, id: MountId): boolean {
 export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void {
   const unlocked = mountUnlocked(g);
   heading(panel, t('mounts.title')).style.marginTop = '0';
-  el(panel, 'div', unlocked ? fill(t('mounts.intro')) : t('mounts.locked'), 'opacity:.7;font-size:13px;line-height:1.5;padding:0 14px 10px');
-  el(panel, 'div', t('mounts.same'), `font-size:12px;line-height:1.5;padding:0 14px 12px;color:${ACCENT}`);
+  el(panel, 'div', unlocked ? fill(t('mounts.intro')) : t('mounts.locked'), 'opacity:.6;font-size:12px;line-height:1.5;padding:0 14px 8px');
   for (const id of MOUNT_IDS) {
     const selected = g.player.mount.selected === id;
     const has = owned(g, id);
-    const status = !has ? t('mounts.dlc') : !unlocked ? t('mounts.needQuest') : selected ? t('mounts.selected') : t('mounts.available');
     const why = !unlocked ? t('mounts.whyQuest') : t('mounts.whyDlc');
-    option(panel, `${MOUNTS[id].name}  ·  ${status}`, () => {
+    const b = option(panel, MOUNTS[id].name, () => {
       if (selectMount(g, id)) { saveNow(); redraw(); }
-    }, mountAvailable(g, id), why, NOTES[id](), `${id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional')}  ·  ${t('mounts.speeds', { cruise: MOUNT_TRAVERSAL.cruise, gallop: MOUNT_TRAVERSAL.gallop })}`);
+    }, mountAvailable(g, id), why, NOTES[id]());
+    if (id === FREE_MOUNT || has) chips(b, [{ text: id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional'), tone: 'dim' }]); // (a mount not owned says what it costs at the right, once)
+    price(b, !has ? t('mounts.dlc') : !unlocked ? t('mounts.needQuest') : selected ? t('mounts.selected') : t('mounts.available'), selected ? 'ok' : 'max'); // the one chosen is boxed and lit; the rest are a quiet word
   }
   if (desktop?.ownsAutomobileDlc || desktop?.ownsChariotDlc) {
     const refresh = button(panel, t('mounts.refresh'), () => {

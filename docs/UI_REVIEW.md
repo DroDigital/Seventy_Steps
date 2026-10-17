@@ -167,3 +167,12 @@ Reviewed, retained, and checked in the game: Title main, Begin anew, difficulty,
 Reviewed in source, not opened: the title gate, the place banner, cutscene bars, the desktop shell's pages.
 
 Not player-facing, left alone: the developer pages.
+
+## Round 52: numbers in menus
+
+The Elder Sign's tabs (Level up, Weapons, Relics, Travel, Mounts), a relic's slot page, the merchant's wares and the pause menu's Arms page say their
+numbers one way (`ui/menuChips.ts`; decision in docs/DECISIONS.md, "Menus, round 52"): the figure a row would change under its name (green when it favours
+the investigator, red when it costs them), its price boxed at the right (bright when it can be paid, red when it cannot, "MAX" when there is no more),
+and what is carried above, in a strip with the figure the tab spends lit. Checked in a browser (960×540, before and after kept in the session's
+scratchpad): every tab, the relic page, a poor investigator (all prices red, one star-stone), the merchant at 3000 Echoes (one price red, one
+"left"), and Arms with two relics worn. Not changed: the pause, rise, settings, journal and map pages, which already said little.

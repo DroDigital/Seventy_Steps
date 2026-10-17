@@ -1,28 +1,36 @@
 /**
  * The Elder Sign's Relics tab: the two slots and what each holds, and for each a page of the relics found to put in it
  * (systems/relics.ts). A relic worn in the other slot changes places with the one chosen; what is not worn does nothing.
+ * Round 52: each relic's effects are figures, green for a gift and red for a price, in place of a paragraph of rules and a line of words.
  */
 
-import { RELICS } from '../data/relics';
+import { RELICS, type RelicId } from '../data/relics';
 import type { Game } from '../systems/components';
-import { effectsOf, owned, slotsOf, wear } from '../systems/relics';
-import { button, el, footer, title, type Page } from './menuKit';
+import { owned, relicEffects, slotsOf, wear } from '../systems/relics';
+import { chips } from './menuChips';
+import { button, el, footer, heading, title, type Page } from './menuKit';
 import { relicGlyph } from './relicGlyphs';
 
 const NUMERALS = ['I', 'II', 'III'];
 
+/** A relic's effects as coloured figures. */
+export const effectChips = (parent: HTMLElement, id: RelicId, style = ''): void =>
+  chips(parent, relicEffects(id).map((e) => ({ text: e.text, tone: e.good ? 'good' : 'bad' })), style);
+
 /** The tab's body: a line to choose for each slot, and what is kept besides. `pick` opens the page for a slot. */
 export function relicsTab(panel: HTMLElement, g: Game, pick: (slot: number) => void): void {
   const [found, slots] = [owned(g), slotsOf(g)];
-  el(panel, 'div', `Two relics are worn at a time; each is a gift with a price. Those kept do nothing until they are worn. Relics found: ${found.length}.`, 'opacity:.6;font-size:13px;line-height:1.5;padding:0 14px 8px');
+  heading(panel, `WORN  ·  ${slots.filter(Boolean).length} OF ${slots.length}`).style.marginTop = '0';
   slots.forEach((id, slot) => {
-    const name = id ? RELICS[id].name : 'empty';
-    const b = button(panel, `Slot ${NUMERALS[slot]}  ·  ${name}  ›`, () => pick(slot), true, id ? RELICS[id].note : 'Nothing worn here.', id ? effectsOf(id) : '');
-    if (id) b.prepend(relicGlyph(id));
+    const b = button(panel, `Slot ${NUMERALS[slot]}  ·  ${id ? RELICS[id].name : 'empty'}  ›`, () => pick(slot), true, id ? RELICS[id].note : 'Nothing worn here.');
+    if (id) {
+      effectChips(b, id);
+      b.prepend(relicGlyph(id));
+    }
   });
   const kept = found.filter((id) => !slots.includes(id));
-  if (kept.length) el(panel, 'div', `Kept: ${kept.map((id) => RELICS[id].name).join(', ')}.`, 'opacity:.5;font-size:12px;line-height:1.5;padding:8px 14px 0');
-  if (!found.length) el(panel, 'div', 'A horror slain for good leaves one. The first two found are worn at once.', 'opacity:.5;font-style:italic;padding:8px 14px 0;font-size:13px');
+  if (kept.length) el(panel, 'div', `Kept: ${kept.map((id) => RELICS[id].name).join(', ')}`, 'opacity:.5;font-size:12px;line-height:1.5;padding:8px 14px 0');
+  if (!found.length) el(panel, 'div', 'A horror slain for good leaves one.', 'opacity:.5;font-style:italic;padding:8px 14px 0;font-size:13px');
 }
 
 /** The page for one slot: nothing, or any relic found. `back` returns to the tab, which is drawn again. */
@@ -37,9 +45,11 @@ export function slotPage(g: Game, slot: number, back: () => void): Page {
       for (const id of owned(g)) {
         const at = slots.indexOf(id);
         const here = at === slot ? '    ·  worn here' : at >= 0 ? `    ·  worn in slot ${NUMERALS[at]}` : '';
-        button(p, `${RELICS[id].name}${here}`, () => choose(id), true, RELICS[id].note, effectsOf(id)).prepend(relicGlyph(id));
+        const b = button(p, `${RELICS[id].name}${here}`, () => choose(id), true, RELICS[id].note);
+        effectChips(b, id);
+        b.prepend(relicGlyph(id));
       }
-      footer(p, 'Choose what to wear here. A relic worn in the other slot changes places with it.', back);
+      footer(p, 'A relic worn in the other slot changes places with it.', back);
     },
   };
   return page;

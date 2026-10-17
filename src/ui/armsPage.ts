@@ -12,9 +12,10 @@ import { edgeAt, equip } from '../systems/arms';
 import type { Game } from '../systems/components';
 import { falloff, gunEdge } from '../systems/gun';
 import { might } from '../systems/levels';
-import { effectsOf, owned, worn } from '../systems/relics';
+import { owned, worn } from '../systems/relics';
 import { RELICS } from '../data/relics';
 import { button, el, footer, heading, title, type Page } from './menuKit';
+import { effectChips } from './signRelics';
 import { fill } from './glyphs';
 
 /** A weapon's numbers: its first light and heavy blows (times `k`, the Might bonus), how soon the light one lands, its reach and cost. */
@@ -50,14 +51,14 @@ export function armsPage(g: Game, back: () => void, show: (p: Page) => void): Pa
         heading(p, 'RELICS WORN').style.margin = '14px 14px 4px';
         for (const id of worn(g)) {
           el(p, 'div', RELICS[id].name, 'padding:4px 14px 0');
-          el(p, 'div', effectsOf(id), 'padding:0 14px;opacity:.55;font-size:12px');
+          effectChips(p, id, 'padding:0 14px');
         }
         if (!worn(g).length) el(p, 'div', 'None are worn.', 'padding:4px 14px 0;opacity:.55');
         el(p, 'div', 'Two at a time; changed at an Elder Sign.', 'padding:2px 14px 0;opacity:.4;font-size:12px;font-style:italic');
       }
       const unfound = WEAPON_IDS.length - g.player.arms.length;
       if (unfound > 0) el(p, 'div', `${unfound === 1 ? 'One more weapon lies' : `${unfound} more weapons lie`} somewhere in the dream.`, 'opacity:.4;font-style:italic;margin:10px 14px 0;font-size:13px');
-      footer(p, fill('Choose a weapon to take it up. The revolver is loaded with {reload}; its rounds are found in boxes and caches, and sold by those who trade.'), back);
+      footer(p, fill('Choose a weapon to take it up. {reload} reloads the revolver.'), back);
     },
   };
   return page;

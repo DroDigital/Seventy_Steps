@@ -8,7 +8,8 @@ import { SHOPS, WARES } from '../data/wares';
 import type { Game } from '../systems/components';
 import { buy, canBuy, carried, hasRoom, stockLeft } from '../systems/trade';
 import { fill } from './glyphs';
-import { ACCENT, createScreen, el, footer, option, title, type Page } from './menuKit';
+import { createScreen, footer, option, title, type Page } from './menuKit';
+import { chips, price, resources } from './menuChips';
 
 export interface ShopMenu {
   readonly open: boolean;
@@ -22,17 +23,19 @@ export function createShopMenu(g: Game): ShopMenu {
       back: () => screen.close(),
       build(panel) {
         title(panel, name.toUpperCase());
-        const stat = el(panel, 'div', `ECHOES ${g.player.echoes}`, `margin:-6px 0 12px;text-align:center;font-size:11px;letter-spacing:3px;color:${ACCENT}`);
-        stat.dataset.pin = '';
+        resources(panel, [{ label: 'ECHOES', value: g.player.echoes, hot: true }]);
         for (const id of wares) {
           const w = WARES[id];
           const left = stockLeft(g, id);
           const ok = canBuy(g, id);
-          const why = left === 0 ? 'Sold out.' : !hasRoom(g, id) ? 'No room to carry it.' : 'Not enough Echoes.';
-          const tail = left === 0 ? 'sold out' : !hasRoom(g, id) ? 'no room to carry it' : `${w.price} Echoes${left === undefined ? '' : `  ·  ${left} left`}`; // (a full pocket said nothing, round 24)
-          const c = carried(g, id);
-          const note = `${fill(w.note)}${c ? `  (Carried: ${c.have} of ${c.most} ${c.unit}.)` : ''}`; // what a pocket holds, before it is asked (round 24)
-          option(panel, `${w.name}  ·  ${tail}`, () => (buy(g, id), page.redraw?.()), ok, why, note); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
+          const room = hasRoom(g, id);
+          const why = left === 0 ? 'Sold out.' : !room ? 'No room to carry it.' : 'Not enough Echoes.';
+          const c = carried(g, id); // what a pocket holds, before it is asked (round 24)
+          const b = option(panel, left === undefined || left === 0 ? w.name : `${w.name}  ·  ${left} left`, () => (buy(g, id), page.redraw?.()), ok, why, fill(w.note)); // round 38: still a line to choose, so that what it is can be read, and why it cannot be bought
+          if (c) chips(b, [{ text: `Carried ${c.have} of ${c.most} ${c.unit}`, tone: 'dim' }]);
+          if (left === 0) price(b, 'SOLD OUT', 'max');
+          else if (!room) price(b, 'NO ROOM', 'no'); // (a full pocket said nothing, round 24)
+          else price(b, `${w.price} Echoes`, ok ? 'ok' : 'no');
         }
         footer(panel, '', () => screen.close());
       },

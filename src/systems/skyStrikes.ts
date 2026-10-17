@@ -3,7 +3,7 @@
  * one near a foe) is marked by a ring of crackling light; a moment later (`SKY_STRIKE.warn`, a second and a half) a bolt falls on it
  * and hurts whoever stands in the ring, the investigator and the foes alike: strong, and staggering. The ring is the warning, and
  * enough of one: a walk takes a body clear, a roll through the last of it does as well (i-frames), and none is struck under a roof,
- * on a dungeon floor or in an arena. From the game's own random stream, so a replay sees the same sky. Pure: no Three.js.
+ * or on a dungeon floor. From the game's own random stream, so a replay sees the same sky. Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';

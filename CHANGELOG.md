@@ -3,6 +3,25 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Menus
+
+- The Elder Sign's menu says less and shows more. What you carry sits in one strip under the title (level, Echoes, insight, star-stones), and the figure the open tab spends is lit and underlined. Every row has its price boxed at the right, bright when you can pay it, red when you cannot, "MAX" when there is no more to buy. What the next level gives is green under its name, and a passage that spending insight would shut again is red.
+- Relics show their effects as figures: green for a gift, red for a price (a hit taken less is green). The paragraph that explained them is gone, here, on the relic page, and on the Arms page.
+- The Weapons tab names what each level does ("Light blow 35 → 40", "Shot 30 → 35, reach 3 → 4.5 m") instead of a paragraph about percentages, and the long line about resting that stood under every tab is one short line, different for each tab.
+- A merchant's wares have their price boxed (red when you cannot pay, "SOLD OUT", "NO ROOM"), the Echoes you carry above them, and what you carry of each beneath it. The Mounts tab lists each mount with one quiet word at the right (selected, available, the quest it waits on, its price) and says its shared speeds once, in the foot.
+
+## Weather
+
+- Rain and thunderstorms come round. A test of two hours saw no storm: clear spells were two to seven minutes and the hub had no weather at all. They are one to three and a half minutes now, the hub and every other region have rain and thunderstorms, and a thunderstorm gathers anywhere.
+- In a thunderstorm a bolt now and then falls on the ground. A ring of crackling light opens near you (sometimes near a foe) a second and a half before it falls, and anything standing in it is struck hard and staggered, you and the foes alike. Walking out is enough; so is a roll through the last of it. Nothing is struck under a roof or in a dungeon.
+- Rain falls in grains and splashes where it lands, and closes the world in under a haze that deepens with the storm. A thunderstorm has a wind in it. Lightning is forked on the far ground, white-hot at its heart, and the thunder rolls after it, later and duller the farther the strike. Under a roof the rain is a dull patter on the tiles.
+
+## Riding (round 52)
+
+- A horse-drawn rig, the plain chariot or the spectral one, now turns like a horse: it follows a circle that widens with its pace, slows into a turn and never to a stop, and the horses step round ahead of the carriage and bend into the turn. A standing horse steps round on the spot.
+- The mount no longer sticks when you change direction. A wall that blocked its turn used to hold it where it stood; it now takes what turn it can and backs off what it cannot swing into.
+- The metallic clatter is gone. The wheels roll softly and low, swelling with their turn, over the rush of air. The motor car's engine climbs through its gears, and the spectral chariot has a cold drone with a breath of wind that rises as it quickens.
+
 ## Horrors' attacks
 
 - Every attack of a horror was redrawn. A mark on the ground is now found on any floor (Cthulhu's was a teal nearly as dark as the ground): the colours that must be seen are lifted to a floor of brightness, in the horror's own hue, with a dark outline so they read on pale ground and dark.

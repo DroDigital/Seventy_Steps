@@ -33,12 +33,24 @@ foley (not placed in the world, or the follow camera would swallow them) and pre
 hears. Every hoofbeat is a foot that comes down in the gait the picture shows (`systems/mountGait.ts`: the simulation counts the cycle
 in `MountState.phase`, by metres ridden), panned by the foot, its timbre by the ground (dirt, road, stone, shallows) and by the shoe
 (iron, or a skeleton's bone, with an echo); for the included horse a recorded footfall pitched down lies beneath. Beneath the beats, beds
-follow the speed and the ground: a chassis roar, gravel and cobble rattle pulsing with the wheel's turn, the air rushing by, the motor
-car's engine (it climbs with its speed, and starts and stalls on summon and dismiss), the spectral chariot's cold drone. Over them: the
-harness' brass on each stride (a chain's rattle for the skeletons), timber creaks, wheel knocks, a snort at the gallop and one now and
-then at rest. Every one-shot is held between -22 and -11 dBFS rms (a landed blow is about -18) and below full scale, a walking hoofbeat
+follow the speed and the ground: a chassis roar, a soft low roll (a low-passed noise whose cut-off follows the ground, swelling a little with
+the wheel's turn; it was a bandpassed rattle at the wheel's rate until round 52, which was metallic and tiring), the air rushing by, the motor
+car's engine (four gears, it climbs through each with its speed, drops at the shift, and starts and stalls on summon and dismiss), the spectral chariot's
+cold drone with a breath of wind through it that rises as it quickens. Over them: the leather and timber shifting on each second stride, timber creaks, soft wheel
+thumps, a snort at the gallop and one now and then at rest (round 52 took out the brass jingle and the chain's rattle: most of their energy lay above
+2.5 kHz). Every one-shot is held between -22 and -11 dBFS rms (a landed blow is about -18) and below full scale, a walking hoofbeat
 5 dB under a gallop's and far above a footfall: `tests/mountAudio.test.ts`. A recorded set can replace the recipes later without
 changing when they play.
+
+## Turning (round 52)
+
+A horse-drawn rig, the plain chariot and the spectral one, follows a circle (`systems/mountSteer.ts`, numbers in `MOUNT_TURNING`): the tightest circle
+widens with the pace, so a turn takes it down toward a walk and no further and it never stops to turn; a standing horse steps round on the spot, and that
+fades out as the pace quickens. The yaw rate takes hold and lets go over a few tenths of a second and never passes the heading the rig is coming round
+to. The horses lead the carriage into the turn and bend with it (`bend` in `render/mountViews.ts`). The motor car keeps its arcade steering, with a creep in
+place of a stop. In `moveMounted` (`mountMotion.ts`) a rotation the colliders refuse is tried at half and a quarter of its step, a scrape nudges the heading
+away from the wall only while the rider is steering, and a jam of six frames backs the rig off the obstacle: a mount no longer holds still against a wall
+it is turning on. `tests/mountTurning.test.ts` holds each of these (run against the previous code the stall tests fail).
 
 Peaslee’s spoken lines do not name the mount. The journal, the completion notice, the Mounts tab and `hint.mount`
 (English, German, French, Spanish) are what changed. A new voiced line would need a recording in `public/voice`.
