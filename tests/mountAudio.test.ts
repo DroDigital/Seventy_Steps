@@ -209,7 +209,7 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
     expect(bedTargets('grey', 0, 'dirt').spectral).toBe(0);
     expect(bedTargets('grey', 18, 'dirt').engine).toBe(0);
     let last = bedTargets('grey', 0, 'road');
-    for (const v of [2, 5, 8, 11, 14, 18]) {
+    for (const v of [1, 2.5, 4, 5.5, 7.5, 9, 10.4]) { // (up to the full gallop, where the load is whole)
       const now = bedTargets('grey', v, 'road');
       expect(now.rumble, `${v}`).toBeGreaterThan(last.rumble);
       expect(now.roll, `${v}`).toBeGreaterThan(last.roll);

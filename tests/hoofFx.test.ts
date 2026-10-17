@@ -1,3 +1,4 @@
+import { MOUNT_TRAVERSAL } from '../src/data/mounts';
 import { describe, expect, it } from 'vitest';
 import { createHoofFx } from '../src/render/hoofFx';
 import type { ParticleSpec, Particles } from '../src/render/particles';
@@ -47,12 +48,13 @@ describe('what a ride throws up (round 50)', () => {
     const r = ride('grey');
     let beats = 0;
     let phase = 0;
+    const pace = MOUNT_TRAVERSAL.cruise;
     for (let i = 0; i < 180; i++) {
-      const next = phase + cyclesFor(11 / 60, 11);
-      beats += touchdowns(phase, next, 11).length;
+      const next = phase + cyclesFor(pace / 60, pace);
+      beats += touchdowns(phase, next, pace).length;
       phase = next;
     }
-    r.advance(180, 11);
+    r.advance(180, pace);
     expect(r.spawned.length).toBeGreaterThanOrEqual(beats);
     expect(r.spawned.length).toBeLessThan(beats * 8);
   });

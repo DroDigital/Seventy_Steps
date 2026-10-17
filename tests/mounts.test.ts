@@ -96,7 +96,7 @@ describe('the borrowed reins', () => {
   it('accelerates, brakes and steers its heading instead of translating sideways', () => {
     const g = openGame();
     expect(toggleMount(g)).toBe(true);
-    ride(g, 50);
+    ride(g, 80);
     expect(g.player.mount.speed).toBeCloseTo(MOUNT_TRAVERSAL.cruise);
     const before = g.ecs.c.transform.get(g.player.id)!.yaw;
     const turn = emptyInput();
