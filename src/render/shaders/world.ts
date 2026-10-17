@@ -191,6 +191,20 @@ void main() {
     tex *= 1.0 + uVary * (n - 0.5) * 0.9;
     tex *= 1.0 + uVary * vec3(0.16, 0.02, -0.18) * (vnoise(vWorld.xz * 0.012 + 40.0) - 0.5); // drier and warmer here, damper and cooler there: no field is one colour
   }
+#ifdef SHORE
+  { // Ground under the sea (round 55): the red of the light goes first, so the bed is green and then dark, and the swell lays its light on it in moving nets.
+    float under = uSeaLevel - vWorld.y;
+    if (under > -0.05) {
+      float d = max(under, 0.0);
+      float k = smoothstep(-0.05, 0.12, under);
+      tex *= mix(vec3(1.0), exp(-d * vec3(1.15, 0.45, 0.36)) * vec3(0.95, 1.0, 1.0), k);
+      float c1 = vnoise(vWorld.xz * 0.9 + vec2(uTime * 0.31, -uTime * 0.2));
+      float c2 = vnoise(vWorld.xz * 1.5 - vec2(uTime * 0.23, uTime * 0.34));
+      float caustic = pow(max(1.0 - abs(c1 - c2) * 3.2, 0.0), 3.0);
+      tex += tex * caustic * 1.6 * exp(-d * 0.75) * k;
+    }
+  }
+#endif
   // The lantern, per pixel: a smooth pool, brightest at the investigator. Characters take a fixed
   // share of it (no N·L, like sprites), so their values hold as they turn; the investigator takes less
   // of their own, which hangs at their hip, and whatever lights them is held below uSelfMax, so their

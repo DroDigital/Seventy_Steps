@@ -14,6 +14,13 @@ export const EDGES: readonly string[] = [
   'A well has no bottom a living man has found. Go round it.',
 ];
 
+/** Into the sea (round 55): what stands in the shallows is not alone there. */
+export const SEAS: readonly string[] = [
+  'The sea at the land\'s edge is not empty. Something waits under the dark water, and it is not shy of the shore.',
+  'What has hold of you in the water does not let go. Keep to the land, and do not wade where the ground gives way.',
+  'The deep takes what the shore lets slip. Turn back before the ground goes under the water.',
+];
+
 /** How each blow is met. */
 export const TIPS: Readonly<Record<AttackId, string>> = {
   sweep: 'A sweep comes low and wide. Roll toward it, not away, and you are through it.',

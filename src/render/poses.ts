@@ -28,7 +28,7 @@ export interface PoseInput {
   ground?: Ground; // the lie of the land about the feet (flat when absent)
   kneel?: number; // 0–1: kneeling before an Elder Sign, eased in and out (round 15)
   act?: { kind: ActKind; k: number }; // what a person is doing, and how far into it (0–1: they sit down, take it up; round 39)
-  drop?: { t: number; spin: number }; // over an edge: seconds into the fall, and which way it tumbles, 1 head first (round 54)
+  drop?: { t: number; spin: number; sea?: { since: number; held: number } }; // over an edge: seconds into the fall, and which way it tumbles, 1 head first (round 54); in the sea (round 55): seconds since it met the water (-1 before), and seconds the tentacle has had it
 }
 
 const clamp01 = (t: number): number => Math.min(1, Math.max(0, t));
@@ -265,6 +265,28 @@ function plunge(f: Figure, t: number, spin: number): void {
   f.kneeL.rotation.x = 0.35 + 0.8 * Math.max(0, flail) * grab;
 }
 
+/**
+ * In the water (round 55): upright and chest-deep, the arms thrown up and beating the surface, the legs kicking for a floor that is not there;
+ * then, once the tentacle has hold, drawn over onto the back, the arms flung to the sky, and the flailing weaker as the breath goes.
+ */
+function thrash(f: Figure, t: number, held: number): void {
+  const grip = ease(held / 0.3); // drawn back
+  const tire = ease((held - 0.7) / 0.6); // the breath going
+  const flail = Math.sin(t * 13) * (1 - 0.7 * tire);
+  const kick = Math.sin(t * 9.5) * (1 - 0.8 * tire);
+  f.body.rotation.set(-0.12 - 0.75 * grip, 0, 0.14 * Math.sin(t * 4.1) * (1 - tire), 'YXZ');
+  f.body.position.y = f.hip * (1 - 0.06 * grip);
+  f.torso.rotation.x = -0.25 - 0.3 * grip;
+  f.head.rotation.x = -0.5 - 0.4 * grip + 0.1 * tire;
+  f.armR.rotation.set(-2.4 + 0.55 * flail, 0, -0.55 - 0.3 * grip, 'YXZ');
+  f.armL.rotation.set(-2.4 - 0.55 * flail, 0, 0.55 + 0.3 * grip, 'YXZ');
+  f.elbowR.rotation.x = f.elbowL.rotation.x = -0.4 - 0.5 * Math.abs(flail);
+  f.legR.rotation.x = -0.35 + 0.55 * kick;
+  f.legL.rotation.x = -0.35 - 0.55 * kick;
+  f.kneeR.rotation.x = 0.5 + 0.5 * Math.max(0, -kick);
+  f.kneeL.rotation.x = 0.5 + 0.5 * Math.max(0, kick);
+}
+
 export function pose(f: Figure, p: PoseInput): void {
   rest(f);
   if (f.rig === 'prop') return;
@@ -279,7 +301,7 @@ export function pose(f: Figure, p: PoseInput): void {
     f.body.rotation.x = -0.35 * Math.sin(t * Math.PI * 3) * (1 - t) - 0.1 * p.flinch * Math.sin(p.time * 40);
     return;
   }
-  if (p.drop) return plunge(f, p.drop.t, p.drop.spin);
+  if (p.drop) return p.drop.sea && p.drop.sea.since >= 0 ? thrash(f, p.drop.sea.since, p.drop.sea.held) : plunge(f, p.drop.t, p.drop.spin);
   if (!d || p.move === null) {
     stride(f, p.speed, p.stride, p.time, p.guard);
     if (p.kneel) kneel(f, p.kneel);

@@ -273,6 +273,18 @@ export interface Falling {
   vz: number;
   spin: number; // the tumble's direction, 1 head first, -1 on the back
   lip: V3; // the last safe feet: the Lost Echoes lie on the ground there
+  water: WaterFall | null; // the fall is into the sea (round 55: the water's, not the air's, once it has met it)
+}
+
+/** A body in the sea (round 55, systems/waterFall.ts). */
+export interface WaterFall {
+  surface: number; // the water's height at the body, this frame
+  entered: number; // the frame the body met the water, -1 before
+  grab: number; // the frame the tentacle took hold of it, -1 before
+  root: V3; // where the tentacle comes up (and, once it has hold, stays ahead of the body: it is drawing it out)
+  heading: { x: number; z: number }; // the way it draws the body, a unit vector (set when it takes hold)
+  held: number; // frames the tentacle has had hold of it
+  depth: number; // metres its feet are under the surface (0 above it)
 }
 
 /** The investigator's mind (spec §3A). */

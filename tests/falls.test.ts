@@ -55,8 +55,8 @@ describe('fatal edges', () => {
     tr.pos = { x: -40, y: -6, z: 220 };
     g.player.echoes = 40;
     fallSystem(g);
-    expect(g.player.falling).not.toBeNull(); // the sea is a fall too (round 55), and the death comes at the foot of it
-    for (let i = 0; i < FALL.frames; i++) fallSystem(g);
+    expect(g.player.falling).not.toBeNull(); // the sea is a fall too (round 55), and the death comes at the end of it
+    for (let i = 0; i < 400 && g.ecs.c.health.get(g.player.id)!.hp > 0; i++) { g.frame++; fallSystem(g); }
     const [drop] = g.ecs.query('drop');
     expect(g.ecs.c.drop.get(drop)!.amount).toBe(40);
     expect(g.ecs.c.transform.get(drop)!.pos.x).toBeCloseTo(12);
@@ -286,7 +286,8 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
     expect(fellAt!.y).toBeLessThanOrEqual(WORLD.seaLevel + 0.4 + 0.05); // ...and only at the water
     expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(PLAYER.hp); // a fall, not the quick end
     expect(g.ecs.c.actor.get(g.player.id)!.move).not.toBe('death');
-    for (let i = 0; i < FALL.frames; i++) fallSystem(g);
+    expect(g.player.falling!.water).not.toBeNull(); // it is the sea's fall (systems/waterFall.ts): the splash, the tentacle, the depth
+    for (let i = 0; i < 400 && g.ecs.c.health.get(g.player.id)!.hp > 0; i++) { g.frame++; fallSystem(g); }
     expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(0);
   });
 
@@ -348,7 +349,7 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
   });
 
   it('closes the picture to black as the drop goes on, and holds it black until the waking', () => {
-    const f = (frame: number) => fallDark({ frame, vy: 0, vx: 0, vz: 0, spin: 1, lip: { x: 0, y: 0, z: 0 } });
+    const f = (frame: number) => fallDark({ frame, vy: 0, vx: 0, vz: 0, spin: 1, lip: { x: 0, y: 0, z: 0 }, water: null });
     expect(fallDark(null)).toBe(0);
     expect(f(0)).toBe(0);
     expect(f(Math.floor(FALL.frames * FALL.dark[0]))).toBe(0);

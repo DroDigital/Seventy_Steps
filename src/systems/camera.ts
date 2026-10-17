@@ -6,7 +6,7 @@
  */
 
 import { clamp, wrapAngle, yawOf, type V3 } from '../core/geom';
-import { CAMERA, FALL } from '../data/tuning';
+import { CAMERA, FALL, WATER } from '../data/tuning';
 import { raycast, type CollisionWorld } from '../world/colliders';
 
 export interface CameraRig {
@@ -30,6 +30,7 @@ export interface CameraInput {
   behind: number; // the player's yaw, for recentring
   distance?: number; // a vehicle needs a longer boom; collision still shortens it
   probe?: number; // over an edge: the height the boom's walls are read at (hangPoint)
+  sea?: boolean; // the fall is into the sea: the camera follows the body down and looks down at it, not straight down (round 55)
 }
 
 export function createCameraRig(yaw: number): CameraRig {
@@ -53,8 +54,8 @@ export function shoulderPoint(w: CollisionWorld, pivot: V3, yaw: number): V3 {
 }
 
 /** The height the camera follows the investigator at: over an edge it follows only part of the way down, and looks down after them (round 54). */
-export function followY(f: { lip: V3 } | null, y: number): number {
-  return f ? f.lip.y + (y - f.lip.y) * FALL.follow : y;
+export function followY(f: { lip: V3; water?: unknown } | null, y: number): number {
+  return f ? f.lip.y + (y - f.lip.y) * (f.water ? WATER.follow : FALL.follow) : y;
 }
 
 /**
@@ -92,7 +93,7 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
     rig.pitch += (clamp(want, CAMERA.pitchMin, CAMERA.lockPitchMax) - rig.pitch) * k;
     rig.recenter = 0;
   } else if (inp.probe !== undefined) {
-    rig.pitch += (FALL.lookPitch - rig.pitch) * k; // over an edge the camera is not the hand's: it swings up to look down after the fall (round 54)
+    rig.pitch += ((inp.sea ? WATER.lookPitch : FALL.lookPitch) - rig.pitch) * k; // over an edge the camera is not the hand's: it swings up to look down after the fall (round 54)
     rig.recenter = 0;
   } else if (rig.recenter > 0) {
     rig.recenter--;

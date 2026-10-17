@@ -29,6 +29,8 @@ import { createPresence } from './presence';
 import type { PostPass } from './postPass';
 import { createSkyLife } from './skyLife';
 import { createWatchers } from './watchers';
+import { createDragTentacle } from './dragTentacle';
+import { createSplashFx } from './splashFx';
 import { createTentacles } from './tentacles';
 import { createWeatherFx } from './weather';
 import type { Skyline } from './skyline';
@@ -73,6 +75,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const night = createNightFx(g, parts.sky, parts.post); // round 26: the moon's course, and the grey of the last hour
   const weather = createWeatherFx(scene, g, parts.particles); // round 26: rain, gale and motes
   const deep = createTentacles(scene, g, parts.particles, audio); // round 30: now and then, far out, a tentacle in the water
+  const drag = createDragTentacle(scene, g, parts.particles); // round 55: the one that takes hold of the investigator in the water...
+  const splash = createSplashFx(g, parts.particles); // ...and what the water throws up as they go in
   const doors = createDoors(scene, g, audio); // round 27: a door in each doorway that has one
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
@@ -91,6 +95,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
       deep.update(camera, time, !outside);
+      drag.update(time);
+      splash.update(time);
       SEA.chop.value += (seaChop(g) - SEA.chop.value) * 0.02; // the wind raises the sea, slowly (round 30)
       fog.update(camera, time, !g.overworld);
       doors.update(camera, time, !g.overworld);

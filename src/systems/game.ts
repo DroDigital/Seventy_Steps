@@ -187,7 +187,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   g.camera.mountLift += ((g.player.mount.active ? 1.05 : 0) - g.camera.mountLift) * Math.min(1, dt * 6);
   const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance, probe: g.player.falling ? g.player.falling.lip.y + CAMERA.pivotHeight : undefined }, g.world, dt);
+  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance, probe: g.player.falling ? g.player.falling.lip.y + CAMERA.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
 }
 
 /**

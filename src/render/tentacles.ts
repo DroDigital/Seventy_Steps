@@ -16,6 +16,7 @@ import type { Particles } from './particles';
 import { SEA } from './sea';
 import { seaHeight } from './seaWaves';
 import { centreline, done, LIFE, pickSpot, radius, rise } from './tentacleShape';
+import { createTubeGeometry } from './tentacleMesh';
 import { createWorldMaterial } from './worldMaterial';
 
 const STEPS = 14;
@@ -34,27 +35,6 @@ interface One {
   seed: number;
   mesh: THREE.Mesh;
   splashed: number; // seconds of its last splash
-}
-
-function build(): THREE.BufferGeometry {
-  const geo = new THREE.BufferGeometry();
-  const n = (STEPS + 1) * SIDES;
-  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  const uv = new Float32Array(n * 2);
-  const index: number[] = [];
-  for (let i = 0; i <= STEPS; i++) {
-    for (let j = 0; j < SIDES; j++) {
-      uv.set([(j / SIDES) * 2, (i / STEPS) * 7], (i * SIDES + j) * 2);
-      if (i < STEPS) {
-        const [a, b, c, d] = [i * SIDES + j, i * SIDES + ((j + 1) % SIDES), (i + 1) * SIDES + j, (i + 1) * SIDES + ((j + 1) % SIDES)];
-        index.push(a, c, b, b, c, d);
-      }
-    }
-  }
-  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-  geo.setIndex(index);
-  return geo;
 }
 
 export interface Tentacles {
@@ -89,7 +69,7 @@ export function createTentacles(scene: THREE.Scene, g: Game, particles: Particle
       const x = spot.x + (k ? (rand() * 2 - 1) * 9 : 0);
       const z = spot.z + (k ? (rand() * 2 - 1) * 9 : 0);
       if (!water(x, z)) continue;
-      const mesh = new THREE.Mesh(build(), material);
+      const mesh = new THREE.Mesh(createTubeGeometry(STEPS, SIDES), material);
       mesh.frustumCulled = false;
       scene.add(mesh);
       live.push({

@@ -3,6 +3,13 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Unreleased: the sea
+
+- **The water looks like water.** The sea knows how deep it is. Where the light reaches the bottom it is a pale turquoise and thin enough to see the sand through, going through the greens to black a few metres out; it thins to nothing at the waterline, where a wash of foam runs up the shore and slips back and leaves a lace of it in the shallows. The shallows are calmer than the open sea. The sky is mirrored in it by Schlick's fresnel (dark looking down, a mirror at a glance), the moon in a path of glitter that sparkles, and rain pocks it with rings. Under the surface the ground is tinted by the water over it, darker and greener with depth, and wavering with the light that plays on the bottom.
+- **Falling into the sea is a fall into the sea.** You go off the edge in the air under real gravity, meet the water with a splash sized by how fast you hit it (droplets, a crown of spray, rings that spread on the surface and a sound to match, so a drop from a cliff is a great one and a stumble in the shallows a small one), and float, chest deep, bobbing on the swell. The camera follows you in and tilts to the water.
+- **Something takes hold of you.** After about two-thirds of a second afloat a tentacle rises out of the sea ahead of you, arches over, coils about your waist and drags you out and down along the line you were swimming, the body thrashing, bubbles and a wake behind it. It holds a second and a half, and the picture goes to black as it takes you under. The Lost Echoes lie on the last of the ground. A death by the sea has its own lines.
+- **One sea for the sim and the picture.** The table of waves is shared by the simulation, the shader and the tentacles in the water far out (`world/seaSurface.ts`), so what is seen to rise and fall is what you float on.
+
 ## 1.0.0-rc.4: the shore, the wells, slower mounts and things on the ground
 
 - **The world's edge goes down into the sea.** Past the border of the land the ground goes on and slopes away to the water, but the fall began at the border itself, so you dropped through ground that was still there, a few steps before the cliff. The land is taken to end where the water is now: you walk off the border and down the slope, and the fall begins where the ground goes under the sea (still a balance on the last of the ground, and a fall of a second and a bit, and then the death).

@@ -89,6 +89,20 @@ export const STINGERS = {
     tone('sine', 640, 1, 0.045, { to: 210, at: 0.1, attack: 0.3, vibrato: [5, 30] }),
     tone('sine', 62, 1.1, 0.3, { to: 38, at: 0.05, attack: 0.5 }),
   ],
+  // Round 55, the sea: a body meets the water: the slap of broken water, bright at first and dulling, the weight going in, and the bubbles of its air going up.
+  splash: [
+    noise('bandpass', 2600, 0.24, 0.3, { to: 900, q: 0.9, attack: 0.004 }),
+    noise('lowpass', 1000, 0.8, 0.34, { to: 240, attack: 0.02 }),
+    tone('sine', 112, 0.55, 0.36, { to: 46, attack: 0.01 }),
+    ...notes('sine', [[0.14, 540, 0.1], [0.22, 780, 0.09], [0.33, 660, 0.08], [0.42, 1020, 0.07], [0.55, 860, 0.06]], 0.05),
+  ],
+  // Round 55, the tentacle takes hold in the water: a wet squeeze, a groan from far below, the water drawn after it.
+  seized: [
+    noise('bandpass', 420, 0.9, 0.24, { to: 150, q: 3, attack: 0.08 }),
+    tone('sine', 54, 2, 0.42, { to: 34, attack: 0.15, vibrato: [3, 8] }),
+    noise('lowpass', 520, 1.8, 0.26, { to: 90, attack: 0.5 }),
+    tone('sawtooth', 72, 1.3, 0.05, { to: 44, attack: 0.2, filter: lp(320, 90) }),
+  ],
   rise: [noise('lowpass', 300, 2, 0.2, { to: 1200, attack: 1.2 }), tone('sine', 55, 2.2, 0.25, { to: 110, attack: 1 })],
   sight: [...chord('sawtooth', [233.1, 246.9, 349.2, 370], 1.8, 0.28, { attack: 0.02, vibrato: [6, 18], filter: lp(3000, 700) }), noise('highpass', 2500, 1.2, 0.08, { attack: 0.05 })],
   slip: [tone('sine', 62, 0.22, 0.45, { to: 44 }), tone('sine', 2637, 0.9, 0.025, { at: 0.03, attack: 0.15, to: 2489, vibrato: [8, 30] })], // sanity lost at once: a thud in the chest, a thin ringing
