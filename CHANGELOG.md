@@ -3,7 +3,7 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## After 1.0.0-rc.3 (not yet released)
+## 1.0.0-rc.4: the shore, the wells, slower mounts and things on the ground
 
 - **Mounts are slower.** A gallop was 18 m/s and a cruise 11, against 6.4 for a sprint on foot, and it read as a speed hack. A cruise is 7 m/s now and a gallop 10.5: still a good way across the land (a gallop is about two-thirds faster than a sprint on foot, and it costs stamina as before), and no longer a different game. They come up to speed and stop in the same second or so as before, turn on proportionally tighter circles, and the horse's gait, the hoofbeats and the car's gears follow the new speeds.
 - **The shore and the world's rim are no longer instant death.** Walking into the sea or off the land's end killed at once, the one edge round 54 had left as it was. They are edges like a pit's now: stand on the last of the ground and step back, and nothing happens; only when none of your feet has ground under it do you fall, and the death comes at the foot of the drop. Your Lost Echoes lie on the ground where you stepped off.
