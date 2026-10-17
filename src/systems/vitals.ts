@@ -7,9 +7,10 @@ import { tickStamina } from './stamina';
 export function vitalsSystem(g: Game, dt: number): void {
   const { stamina, poise, health } = g.ecs.c;
   for (const [id, s] of stamina) {
+    const a = g.ecs.c.actor.get(id);
     const sprint = id === g.player.id && g.player.sprinting;
     const unmoored = id === g.player.id && g.mind.band === 'unmoored'; // a mind come apart tires the body (round 23)
-    tickStamina(s, sprint ? 'sprint' : 'idle', dt, unmoored ? SANITY.unmoored.stamina : 1);
+    tickStamina(s, sprint ? 'sprint' : a?.move === 'guardBreak' ? 'broken' : a?.guard ? 'guard' : 'idle', dt, unmoored ? SANITY.unmoored.stamina : 1);
   }
   for (const po of poise.values()) {
     if (++po.calm >= COMBAT.poiseReset) po.value = po.max;

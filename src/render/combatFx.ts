@@ -57,7 +57,7 @@ export function createCombatFx(g: Game, fx: Particles, muzzle: () => V3 | null =
     const { at, dx, dz } = wound;
     if (e.outcome === 'blocked' || e.outcome === 'guardBreak') spray(at, -dx, -dz, 10, SPARK, 2.5, true);
     else if (e.outcome === 'parried') spray(at, -dx, -dz, 18, SPARK, 4, true);
-    else if (e.outcome !== 'dodged' && e.damage > 0) {
+    if (e.outcome !== 'dodged' && e.damage > 0) {
       const flesh = e.target === g.player.id ? BLOOD : ICHOR;
       spray(at, dx, dz, e.outcome === 'riposte' || e.outcome === 'kill' ? 22 : 10, flesh, 2.2);
     }

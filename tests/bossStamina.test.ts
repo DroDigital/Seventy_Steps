@@ -63,16 +63,19 @@ describe('stamina against the Other Gods', () => {
     expect(g.ecs.c.health.get(player)!.hp).toBe(PLAYER.hp);
   });
 
-  it('still breaks a low-stamina guard when the wave reaches it', () => {
+  it('breaks a low-stamina guard and only absorbs the funded share of the wave', () => {
     const { g, player, boss, stamina, hits } = otherGods();
     stamina.value = 20;
     stamina.delay = STAMINA.regenDelay;
     startMove(g.ecs.c.actor.get(boss)!, 'quake');
     until(g, () => hits.length > 0);
 
-    expect(hits[0]).toMatchObject({ outcome: 'guardBreak', damage: 0, stamina: 0 });
+    const wave = g.ecs.c.actor.get(boss)!.moves.quake.wave!;
+    const overflow = wave.damage * (1 - 20 / 39.5); // the same 39.5 cost as a fully blocked wave
+    expect(hits[0]).toMatchObject({ outcome: 'guardBreak', stamina: 0 });
+    expect(hits[0].damage).toBeCloseTo(overflow, 6);
     expect(g.ecs.c.actor.get(player)!.move).toBe('guardBreak');
-    expect(g.ecs.c.health.get(player)!.hp).toBe(PLAYER.hp);
+    expect(g.ecs.c.health.get(player)!.hp).toBeCloseTo(PLAYER.hp - overflow, 6);
   });
 
   it('keeps a heavy slam costly and breaks a guard that takes repeated slams', () => {
@@ -90,9 +93,10 @@ describe('stamina against the Other Gods', () => {
     expect(firstCost).toBeGreaterThan(50);
     expect(firstCost).toBeLessThanOrEqual(65);
     expect(hits.length).toBeGreaterThan(1);
-    expect(hits.at(-1)).toMatchObject({ outcome: 'guardBreak', damage: 0, stamina: 0 });
+    expect(hits.at(-1)).toMatchObject({ outcome: 'guardBreak', stamina: 0 });
+    expect(hits.at(-1)!.damage).toBeGreaterThan(0);
     expect(stamina.value).toBe(0);
-    expect(g.ecs.c.health.get(player)!.hp).toBe(PLAYER.hp);
+    expect(g.ecs.c.health.get(player)!.hp).toBeCloseTo(PLAYER.hp - hits.at(-1)!.damage, 6);
   });
 
   it('still exhausts stamina and refuses a roll when full-duration rolls run straight on', () => {

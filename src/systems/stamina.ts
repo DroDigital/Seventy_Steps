@@ -6,7 +6,7 @@
 import { STAMINA } from '../data/tuning';
 import type { Stamina } from './components';
 
-export type StaminaMode = 'idle' | 'sprint';
+export type StaminaMode = 'idle' | 'guard' | 'broken' | 'sprint';
 
 /** Entities without stamina (enemies) can always act. */
 export const canAfford = (s: Stamina | undefined): boolean => !s || s.value > 0;
@@ -18,12 +18,13 @@ export function spend(s: Stamina, cost: number): void {
 
 /** Takes a blocked hit's stamina damage; true when it empties the bar (guard break). */
 export function absorb(s: Stamina, amount: number): boolean {
-  spend(s, amount);
-  s.delay = STAMINA.guardDelay;
+  if (amount <= 0) return false; // a hallucination has no guard pressure, even against an empty bar
+  s.value = Math.max(0, s.value - amount);
+  s.delay = Math.max(s.delay, STAMINA.guardDelay); // a block cannot shorten an action's recovery
   return s.value <= 0;
 }
 
-/** One sim step: sprint drains (and regen waits `sprintDelay` after it, not an action's `regenDelay`), otherwise regen resumes once the delay has run out, at the same rate whether or not the guard is up (at `pace` of its rate: less than 1 for a mind Unmoored, round 23). */
+/** Sprint drains; recovery waits after spending, slows while guarding, and stops during a guard break. `pace` also scales recovery for a mind Unmoored. */
 export function tickStamina(s: Stamina, mode: StaminaMode, dt: number, pace = 1): void {
   if (mode === 'sprint') {
     s.value = Math.max(0, s.value - STAMINA.sprintDrain * dt);
@@ -34,5 +35,6 @@ export function tickStamina(s: Stamina, mode: StaminaMode, dt: number, pace = 1)
     s.delay--;
     return;
   }
-  s.value = Math.min(s.max, s.value + (s.regen ?? STAMINA.regen) * dt * pace);
+  if (mode === 'broken') return;
+  s.value = Math.min(s.max, s.value + (s.regen ?? STAMINA.regen) * dt * pace * (mode === 'guard' ? STAMINA.guardRegen : 1));
 }

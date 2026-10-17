@@ -22,7 +22,7 @@ describe('stamina rules', () => {
     expect(s.value).toBe(0);
   });
 
-  it('regenerates only after the delay, at the same rate whether guarding or not (round 48)', () => {
+  it('regenerates only after the delay, and never past the maximum', () => {
     const s = bar(50);
     spend(s, 10);
     for (let i = 0; i < STAMINA.regenDelay; i++) tickStamina(s, 'idle', dt);
@@ -80,16 +80,14 @@ describe('stamina rules', () => {
     expect(absorb(bar(5), 22)).toBe(true);
   });
 
-  it('recovers from a block sooner than from an action, including when the guard broke', () => {
-    for (const value of [100, 5]) {
-      const s = bar(value);
-      absorb(s, 22);
-      const left = s.value;
-      for (let frame = 0; frame < STAMINA.guardDelay; frame++) tickStamina(s, 'idle', dt);
-      expect(s.value).toBe(left);
-      tickStamina(s, 'idle', dt);
-      expect(s.value).toBeGreaterThan(left);
-    }
+  it('recovers from a successful block sooner than from an action', () => {
+    const s = bar(100);
+    absorb(s, 22);
+    const left = s.value;
+    for (let frame = 0; frame < STAMINA.guardDelay; frame++) tickStamina(s, 'idle', dt);
+    expect(s.value).toBe(left);
+    tickStamina(s, 'idle', dt);
+    expect(s.value).toBeGreaterThan(left);
     expect(STAMINA.guardDelay).toBeLessThan(STAMINA.regenDelay);
   });
 });
@@ -132,7 +130,9 @@ describe('stamina in play', () => {
       steps(g, claw.hit!.window[1] + 1, { ...emptyInput(), held: { ...block.held } });
       off();
       expect(seen).toEqual([outcome]);
-      expect(hp.hp).toBe(PLAYER.hp);
+      const cost = claw.hit!.guard * STAMINA.guardCost;
+      const overflow = claw.hit!.damage * Math.max(0, 1 - start / cost);
+      expect(hp.hp).toBeCloseTo(PLAYER.hp - overflow, 6);
       expect(s.value).toBeCloseTo(Math.max(0, start - claw.hit!.guard * STAMINA.guardCost), 0);
       if (outcome === 'guardBreak') expect(a.move).toBe('guardBreak');
       steps(g, 120);
