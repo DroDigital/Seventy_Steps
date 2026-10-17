@@ -34,6 +34,7 @@ uniform vec3 uMid;
 uniform vec3 uHigh;
 uniform vec4 uHurt; // the investigator's recent wound: x strength, yz the screen direction it came from
 uniform vec2 uFaint; // near death: x how red the edge of the picture is, y how much of its colour the picture has lost
+uniform float uFade; // a fall into the dark (round 54): 0..1 to black, the edges first
 uniform float uStone; // a petrifying gaze (round 25): 0..1 to stone, which the colour drains to, the edges close in grey, and past half the picture cracks
 uniform float uBlur; // low-res pixels the edges blur by
 uniform vec3 uAnomalyHues;
@@ -114,6 +115,13 @@ float vnoise(vec2 p) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x), mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
 }
+vec3 plunge(vec3 col, vec2 uv) {
+  if (uFade <= 0.0) return col;
+  float edge = length(uv - 0.5) * 1.6; // 0 at the middle, a little over 1 in the corners
+  float dark = clamp(uFade * 1.35 - (1.0 - edge) * 0.35, 0.0, 1.0);
+  return col * (1.0 - dark * dark * (3.0 - 2.0 * dark));
+}
+
 vec3 stone(vec3 col, vec2 uv) {
   if (uStone <= 0.0) return col;
   float l = dot(col, LUMA);
@@ -183,7 +191,7 @@ void main() {
 
   vec4 centre = texture(tScene, uv);
   if (centre.a < 0.5) {
-    gl_FragColor = vec4(pow(centre.rgb, vec3(uGamma)), 1.0); // outside the palette: no grade, no quantising
+    gl_FragColor = vec4(pow(plunge(centre.rgb, uv), vec3(uGamma)), 1.0); // outside the palette: no grade, no quantising
     return;
   }
   bool person = centre.a < 0.9; // marked 0.75; the Colour's own mark (0.31) was dealt with above
@@ -208,7 +216,7 @@ void main() {
   vec4 fog = fogAlong(uv, bayer4(cell) + 0.5); // the mist between the lens and the scene (round 16)
   float crease = mix(contactAo(uv, bayer4(cell) + 0.5), 1.0, person ? 0.6 : 0.0); // the corners of the world take less light (round 39); a person only a little less
   vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
-  vec3 col = pow(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
+  vec3 col = pow(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
   gl_FragColor = vec4(col, 1.0);
 }

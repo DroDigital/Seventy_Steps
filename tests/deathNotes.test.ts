@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FRAGMENTS, GENERIC, TIPS } from '../src/data/deathLines';
+import { EDGES, FRAGMENTS, GENERIC, TIPS } from '../src/data/deathLines';
 import { REGIONS } from '../src/data/regions';
 import { ATTACK_IDS } from '../src/data/schema';
 import { deathLine } from '../src/systems/deathNotes';
@@ -32,5 +32,16 @@ describe('what the last blow teaches (round 26)', () => {
     const g = createWorldGame();
     g.events.emit('Petrified', { by: 1 });
     expect(deathLine(g).toLowerCase()).toContain('monolith');
+  });
+
+  it('a fall over an edge reads one of its own lines, not the blow taken long before it (round 54)', () => {
+    const g = createWorldGame();
+    const foe = spawnCreature(g, 'deep_one', { x: 0, z: 0, yaw: 0 })!;
+    g.ecs.c.actor.get(foe)!.move = 'slam';
+    g.events.emit('Hit', { attacker: foe, target: g.player.id, outcome: 'hit', damage: 10 });
+    g.events.emit('Fell', { entity: g.player.id, at: { x: 0, y: 0, z: 0 }, frames: 66 });
+    expect(EDGES).toContain(deathLine(g));
+    g.events.emit('Respawned', { entity: g.player.id });
+    expect(EDGES).not.toContain(deathLine(g));
   });
 });

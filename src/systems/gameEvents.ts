@@ -32,6 +32,7 @@ export interface GameEvents {
   Reloaded: { entity: Entity; loaded: number }; // the revolver's cylinder filled from the spare rounds
   DryFire: { entity: Entity }; // the trigger pulled on an empty cylinder with nothing to load it from
   Died: { entity: Entity; killer: Entity | null; at: V3 };
+  Fell: { entity: Entity; at: V3; frames: number }; // the investigator goes over an edge: the fall begins, and ends in Died `frames` later (systems/falls.ts; round 54)
   Vanished: { entity: Entity; at: V3; struck: boolean }; // a hallucination gone: struck, or faded
   Respawned: { entity: Entity };
   RiseChoice: { candle: { x: number; z: number; yaw: number }; wall: string }; // a fall that a lit candle reaches, and a screen to ask where to rise (death.ts)

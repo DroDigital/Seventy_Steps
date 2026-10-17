@@ -25,7 +25,7 @@ export function playerControl(g: Game, real: InputFrame): void {
   const { actor, mover, stamina, transform } = g.ecs.c;
   const a = actor.get(p.id)!;
   const m = mover.get(p.id)!;
-  if (a.move === 'death') {
+  if (a.move === 'death' || p.falling) {
     Object.assign(m, { vx: 0, vz: 0, face: null });
     p.sprinting = false;
     return;

@@ -110,7 +110,8 @@ describe('journeys (ui/journeys.ts)', () => {
     expect(asked).toEqual([]); // the fall shows first, UNMADE over it (round 14)
     at(DYING_MS + 100);
     j.update(0);
-    expect(asked).toEqual(['cover THE ELDER SIGN']);
+    expect(asked).toHaveLength(1);
+    expect(asked[0]).toMatch(/^cover THE ELDER SIGN · \S/); // in the dark, where UNMADE stood alone before it, what the last blow teaches is read (round 54)
     for (let i = 0; i < 400; i++) {
       const input = j.before(emptyInput());
       if (input) stepGame(g, input);

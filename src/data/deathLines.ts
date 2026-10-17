@@ -7,6 +7,13 @@
 
 import type { AttackId } from './schema';
 
+/** Over an edge (round 54): the floor is not always where the eye leaves it. */
+export const EDGES: readonly string[] = [
+  'The dark below a ledge is deeper than it looks. Walk the stone, and keep your feet on it.',
+  'A bridge with a gap in it is not a bridge. Look for what opens it before you cross.',
+  'A well has no bottom a living man has found. Go round it.',
+];
+
 /** How each blow is met. */
 export const TIPS: Readonly<Record<AttackId, string>> = {
   sweep: 'A sweep comes low and wide. Roll toward it, not away, and you are through it.',

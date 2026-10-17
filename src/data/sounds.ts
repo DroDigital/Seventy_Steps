@@ -81,6 +81,14 @@ export const STINGERS = {
     tone('sine', 3100, 3.4, 0.03, { at: 0.5, attack: 0.6, to: 2900, vibrato: [6, 22] }),
     noise('bandpass', 700, 3, 0.1, { to: 150, q: 2, at: 0.4 }),
   ],
+  // Round 54, over an edge: a breath caught, the air beginning to rush past, rising and thinning as the speed builds, a long falling whistle of it, and a low weight below that is cut short by the dark.
+  plunge: [
+    noise('bandpass', 1300, 0.28, 0.2, { to: 800, q: 1.6, attack: 0.05 }),
+    noise('bandpass', 260, 1.1, 0.3, { to: 2100, q: 1.3, attack: 0.55 }),
+    noise('lowpass', 500, 1.1, 0.2, { to: 160, attack: 0.3 }),
+    tone('sine', 640, 1, 0.045, { to: 210, at: 0.1, attack: 0.3, vibrato: [5, 30] }),
+    tone('sine', 62, 1.1, 0.3, { to: 38, at: 0.05, attack: 0.5 }),
+  ],
   rise: [noise('lowpass', 300, 2, 0.2, { to: 1200, attack: 1.2 }), tone('sine', 55, 2.2, 0.25, { to: 110, attack: 1 })],
   sight: [...chord('sawtooth', [233.1, 246.9, 349.2, 370], 1.8, 0.28, { attack: 0.02, vibrato: [6, 18], filter: lp(3000, 700) }), noise('highpass', 2500, 1.2, 0.08, { attack: 0.05 })],
   slip: [tone('sine', 62, 0.22, 0.45, { to: 44 }), tone('sine', 2637, 0.9, 0.025, { at: 0.03, attack: 0.15, to: 2489, vibrato: [8, 30] })], // sanity lost at once: a thud in the chest, a thin ringing

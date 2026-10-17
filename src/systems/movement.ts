@@ -33,6 +33,7 @@ export function movementSystem(g: Game, dt: number): void {
       continue;
     }
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
+    if (id === g.player.id && g.player.falling) continue; // over an edge: gravity has it (falls.ts), not the ground it was snapped to (round 54)
     if (id === g.player.id) {
       if (shove.has(id)) dismissMount(g); // a wind or vortex still moves the investigator and expires normally
       const ride = moveMounted(g, dt);

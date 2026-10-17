@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { MOUNT_QUEST } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
-import { PLAYER } from '../src/data/tuning';
-import { fallSystem } from '../src/systems/falls';
+import { FALL, PLAYER, SIM } from '../src/data/tuning';
+import { fallDark, fallSystem } from '../src/systems/falls';
+import { restore } from '../src/systems/death';
+import { playerControl } from '../src/systems/playerControl';
+import { emptyInput } from '../src/core/input';
 import { applySave, snapshot } from '../src/systems/save';
 import { createWorldGame } from '../src/systems/game';
 import { spawnPiece } from '../src/systems/hiddenLayer';
@@ -145,5 +148,147 @@ describe('a fall is not saved into (round 50)', () => {
     const at = loaded.ecs.c.transform.get(loaded.player.id)!.pos;
     expect(at.x).toBeCloseTo(here.x);
     expect(at.z).toBeCloseTo(here.z);
+  });
+});
+
+
+describe('a ledge is a fall, not a wall of death (round 54)', () => {
+  /** A pit east of the hub's spawn, on flat ground, and the investigator on its western lip. */
+  function atTheLip() {
+    const g = createWorldGame();
+    const home = g.player.checkpoint;
+    const pit: Collider = { kind: 'box', fall: true, min: { x: home.x + 10, y: -9, z: home.z - 3 }, max: { x: home.x + 16, y: 9, z: home.z + 3 } };
+    g.world = { ground: () => 0, colliders: [pit], off: new Set(), contain: () => {} };
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    const place = (x: number): void => {
+      tr.prev = { x: tr.pos.x, y: 0, z: home.z };
+      tr.pos = { x, y: 0, z: home.z };
+    };
+    return { g, tr, pit, place, home };
+  }
+
+  it('lets the body balance on the very edge and step back: nothing begins while any of the feet is on the floor', () => {
+    const { g, tr, pit, place } = atTheLip();
+    const fell: string[] = [];
+    g.events.on('Fell', () => void fell.push('Fell'));
+    place(pit.min.x - PLAYER.radius + 0.1); // the capsule hangs over the void by a hand's breadth: the centre is a stride short of it
+    fallSystem(g);
+    for (const over of [0.05, 0.12, FALL.foot - 0.01]) { // the centre over the void, a heel still on the stone
+      place(pit.min.x + over);
+      fallSystem(g);
+      expect(g.player.falling).toBeNull();
+      expect(g.ecs.c.actor.get(g.player.id)!.move).toBeNull(); // no animation is begun that would condemn a body that can still save itself
+    }
+    place(pit.min.x - 0.5); // stepping back
+    fallSystem(g);
+    expect(g.player.falling).toBeNull();
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(PLAYER.hp);
+    expect(fell).toEqual([]);
+    expect(tr.pos.x).toBeCloseTo(pit.min.x - 0.5);
+  });
+
+  it('falls only when none of the feet has the floor, along any side of the drop', () => {
+    const { g, pit, place, home } = atTheLip();
+    place(pit.min.x + FALL.foot + 0.03);
+    fallSystem(g);
+    expect(g.player.falling).not.toBeNull();
+    // The far side too, and the corner: a ring that still reaches the floor keeps the body up.
+    const again = atTheLip();
+    again.place(pit.max.x - FALL.foot + 0.03);
+    fallSystem(again.g);
+    expect(again.g.player.falling).toBeNull();
+    again.place(pit.max.x - FALL.foot - 0.03);
+    fallSystem(again.g);
+    expect(again.g.player.falling).not.toBeNull();
+    const corner = atTheLip();
+    corner.tr.pos = { x: pit.min.x + FALL.foot * 0.8, y: 0, z: home.z - 3 + FALL.foot * 0.8 }; // over the corner by less than a foot each way
+    fallSystem(corner.g);
+    expect(corner.g.player.falling).toBeNull();
+  });
+
+  it('goes over, falls for a second and a bit with the run-up carried a little way, and dies at the foot of the drop', () => {
+    const { g, tr, pit, place } = atTheLip();
+    const events: string[] = [];
+    let died: { x: number; y: number; z: number } | undefined;
+    g.events.on('Fell', () => void events.push('Fell'));
+    g.events.on('Died', ({ entity, at }) => {
+      if (entity !== g.player.id) return;
+      events.push('Died');
+      died = at;
+    });
+    g.player.echoes = 55;
+    place(pit.min.x - 0.2);
+    fallSystem(g); // safe: the last feet are stored here
+    const lip = { x: tr.pos.x, z: tr.pos.z };
+    tr.prev = { ...tr.pos };
+    tr.pos = { ...tr.pos, x: pit.min.x + 0.25 }; // a run of 6 m/s a frame over: no part of the feet is on the floor
+    tr.prev.x = tr.pos.x - 6 / SIM.hz;
+    fallSystem(g);
+    expect(g.player.falling).not.toBeNull();
+    expect(events).toEqual(['Fell']);
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(PLAYER.hp); // alive: it is a fall, not a wall
+    const x0 = tr.pos.x;
+    let last = tr.pos.y;
+    for (let i = 1; i < FALL.frames; i++) {
+      movementSystem(g, 1 / SIM.hz); // the ground has no say over the falling body
+      fallSystem(g);
+      expect(tr.pos.y).toBeLessThan(last);
+      last = tr.pos.y;
+      expect(g.ecs.c.actor.get(g.player.id)!.move).not.toBe('death');
+    }
+    expect(tr.pos.x - x0).toBeGreaterThan(0.1); // the run-up carried it on...
+    expect(tr.pos.x - x0).toBeLessThan(0.5); // ...but not across the pit
+    expect(last).toBeLessThan(-8); // a deep drop
+    expect(events).toEqual(['Fell']);
+    movementSystem(g, 1 / SIM.hz);
+    fallSystem(g); // the last frame of the drop
+    expect(events).toEqual(['Fell', 'Died']);
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(0);
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('death');
+    expect(died!.x).toBeCloseTo(lip.x);
+    expect(died!.z).toBeCloseTo(lip.z);
+    const [drop] = g.ecs.query('drop');
+    expect(g.ecs.c.drop.get(drop)!.amount).toBe(55);
+    expect(g.ecs.c.transform.get(drop)!.pos.x).toBeCloseTo(lip.x); // the Echoes wait on the ground at the lip, not in the pit
+    for (let i = 0; i < 90; i++) movementSystem(g, 1 / SIM.hz);
+    expect(tr.pos.y).toBeLessThan(-8); // and the body stays where it fell until the waking
+    restore(g, g.player.id, g.player.checkpoint);
+    expect(g.player.falling).toBeNull();
+    expect(tr.pos.y).toBeGreaterThan(-1);
+  });
+
+  it('lets go of what the body was doing, and hears no input while it falls', () => {
+    const { g, tr, pit, place } = atTheLip();
+    place(pit.min.x - 0.2);
+    fallSystem(g);
+    Object.assign(g.player, { sprinting: true, dodgeHeld: 20, blockHeld: true });
+    tr.prev = { ...tr.pos };
+    tr.pos.x = pit.min.x + 0.25;
+    fallSystem(g);
+    expect(g.player.falling).not.toBeNull();
+    expect(g.player.sprinting).toBe(false);
+    expect(g.player.dodgeHeld).toBe(-1);
+    expect(g.player.blockHeld).toBe(false);
+    const input = emptyInput();
+    input.moveY = 1;
+    input.pressed.light = true;
+    playerControl(g, input);
+    const m = g.ecs.c.mover.get(g.player.id)!;
+    expect([m.vx, m.vz]).toEqual([0, 0]);
+    expect(g.player.buffer.action).toBeNull(); // a press while falling is not queued for the waking
+  });
+
+  it('closes the picture to black as the drop goes on, and holds it black until the waking', () => {
+    const f = (frame: number) => fallDark({ frame, vy: 0, vx: 0, vz: 0, spin: 1, lip: { x: 0, y: 0, z: 0 } });
+    expect(fallDark(null)).toBe(0);
+    expect(f(0)).toBe(0);
+    expect(f(Math.floor(FALL.frames * FALL.dark[0]))).toBe(0);
+    let before = 0;
+    for (let i = 0; i <= FALL.frames; i++) {
+      expect(f(i)).toBeGreaterThanOrEqual(before);
+      before = f(i);
+    }
+    expect(f(FALL.frames)).toBe(1);
+    expect(f(FALL.frames + 150)).toBe(1);
   });
 });

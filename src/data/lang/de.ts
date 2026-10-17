@@ -192,7 +192,6 @@ export const DE: Readonly<Record<Key, string>> = {
   'hud.echoesRecovered': "ECHOS ZURÜCKGEHOLT  +{n}",
   'hud.echoesEarned': "+{n} ECHOS",
   'hud.unmade': "VERNICHTET",
-  'hud.lie': "EURE ECHOS LIEGEN, WO IHR GEFALLEN SEID",
   'hud.sanityLoss': "−{n} VERSTAND",
   'hud.insightGain': "{sign}{n} EINSICHT",
   'hud.signFound': "ÄLTESTES ZEICHEN GEFUNDEN · {name}",

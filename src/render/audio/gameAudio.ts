@@ -182,6 +182,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   let hush = 0; // the world's high end, closed on an unmaking and let go again on the waking (round 31)
   let hushTo = 0;
   g.events.on('Respawned', () => void (hushTo = 0));
+  g.events.on('Fell', () => void play({ sound: 'plunge', at: null })); // over an edge (round 54): the breath, the rush of air; the death at the foot of it is UNMADE's
   g.events.on('Died', ({ entity }) => {
     if (entity === g.player.id) { // UNMADE: the heart stops, the world dulls and goes under, the voices the dying hear
       hushTo = 1;

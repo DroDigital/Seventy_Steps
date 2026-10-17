@@ -297,3 +297,16 @@ export const SEALS = {
   again: 20, // ...at most every this many seconds
   after: { yog_sothoth: 'umr_at_tawil', azathoth: 'yog_sothoth' } as Readonly<Record<string, string>>, // the Beyond's order: each waits for the one before to fall
 };
+
+/** The edge (round 54, systems/falls.ts): stepping past a ledge is a fall of its own, and the death comes at the bottom of it. */
+export const FALL = {
+  foot: 0.18, // metres: the feet's hold, a ring this wide about the body's centre. While any of it is on the floor the body stands, balanced on the very edge if need be, and can step back; the fall begins when none of it is
+  gravity: 22, // m/s²: the drop is a drop (a pit is 12 m: a second and a bit)
+  frames: 66, // the fall lasts this long (1.1 s: the death move then plays at the foot, in the dark)
+  carry: 4.5, // m/s: the most of the run-up the body keeps as it goes over...
+  drag: 10, // ...per second it is lost over the void: a run takes the body 0.45 m past the lip (4.5 / 10), not across the pit
+  follow: 0.65, // the camera follows the falling body this share of the way down...
+  lookPitch: 1.42, // ...and swings up over the hole to look down after them (radians: the ledge would hide a body that fell from a camera behind it)
+  dark: [0.4, 1] as readonly [from: number, to: number], // the share of the fall in which the picture goes dark, edges first
+  spin: 3.4, // rad/s: the tumble, head first
+};

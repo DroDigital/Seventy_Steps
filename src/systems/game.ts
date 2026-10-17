@@ -23,7 +23,7 @@ import { createWorldCollision } from '../world/worldCollision';
 import { actionSystem } from './actions';
 import { fightSystem, registerFights, setArena } from './bossFight';
 import { brainSystem } from './brain';
-import { createCameraRig, stepCamera } from './camera';
+import { createCameraRig, followY, stepCamera } from './camera';
 import { checkpointSystem, furnishWorld, signPlace } from './checkpoints';
 import { meleeSystem } from './combat';
 import { createStores, type Game, type GameEvents } from './components';
@@ -94,7 +94,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, ask: false, rising: null, fogPass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, falling: null, ask: false, rising: null, fogPass: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -185,9 +185,9 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   const tr = g.ecs.c.transform.get(g.player.id)!;
   g.camera.prevMountLift = g.camera.mountLift;
   g.camera.mountLift += ((g.player.mount.active ? 1.05 : 0) - g.camera.mountLift) * Math.min(1, dt * 6);
-  const pivot = { x: tr.pos.x, y: tr.pos.y + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
+  const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance }, g.world, dt);
+  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance, probe: g.player.falling ? g.player.falling.lip.y + CAMERA.pivotHeight : undefined }, g.world, dt);
 }
 
 /**

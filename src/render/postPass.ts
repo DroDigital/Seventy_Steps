@@ -49,6 +49,7 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uHigh: { value: new THREE.Vector3(...high) },
     uHurt: { value: new THREE.Vector4(0, 0, 0, 0) },
     uFaint: { value: new THREE.Vector2(0, 0) }, // near death (hurtFx.ts; round 23)
+    uFade: { value: 0 }, // a fall into the dark (hurtFx.ts; round 54)
     uStone: { value: 0 }, // a petrifying gaze: the colour drains, the edges close in, it cracks (hurtFx.ts; round 25)
     uBlur: { value: 0 }, // a failing mind: the edges of sight lose their focus (round 22)
     uAnomalyHues: { value: new THREE.Vector3(...ANOMALY_HUES) },

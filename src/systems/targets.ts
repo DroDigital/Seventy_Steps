@@ -9,7 +9,7 @@ export function hostiles(g: Game, faction: Combatant['faction'] | undefined, con
   const { combatant, health, body, phantom } = g.ecs.c;
   const out: Entity[] = [];
   for (const [t, c] of combatant) {
-    if ((t === g.player.id && g.cutscene) || awaitsIntroduction(g, t)) continue;
+    if ((t === g.player.id && (g.cutscene || g.player.falling)) || awaitsIntroduction(g, t)) continue; // (nothing in the room can reach a body that has gone over an edge, round 54)
     if (c.faction === faction || isAbsent(g, t) || !body.has(t) || isConcealed(g, t)) continue;
     if (phantom.has(t) ? !byPlayer : conjured && t !== g.player.id) continue;
     if ((health.get(t)?.hp ?? 0) > 0) out.push(t);
