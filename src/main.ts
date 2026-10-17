@@ -22,6 +22,7 @@ import { createBossFx } from './render/bossFx';
 import { createCinema } from './render/cinema';
 import { createDirector, wakeKneeling } from './render/cinemaDirector';
 import { createCombatFx } from './render/combatFx';
+import { createHoofFx } from './render/hoofFx';
 import { createEchoFx } from './render/echoFx';
 import { createImpactFx } from './render/impactFx';
 import { createShadows } from './render/shadows';
@@ -178,6 +179,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const particles = createParticles(scene);
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
+  const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
   const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise }); // round 20: wake, arrivals, falls, endings
@@ -283,6 +285,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         hidden.update(time);
         fights.update(alpha, time);
         combatFx.update();
+        hoofFx.update(time);
         echoFx.update(time);
         signs.update(time, camera.position);
         bossFx.update(alpha, time, camera);

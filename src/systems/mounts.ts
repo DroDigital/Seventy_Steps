@@ -1,5 +1,6 @@
 /** Mount access, intent and lifecycle. No health, stamina or action state is restored on mounting. */
 import { yawOf } from '../core/geom';
+import { t } from '../core/i18n';
 import type { InputFrame } from '../core/input';
 import { FREE_MOUNT, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
 import { PLAYER } from '../data/tuning';
@@ -17,7 +18,7 @@ export interface MountState {
   automobileOwned: boolean;
   chariotOwned: boolean;
   speed: number;
-  phase: number; // distance-driven animation cycle, in revolutions
+  phase: number; // gait cycles ridden since the summon, by distance (systems/mountGait.ts): the picture and the hoofbeats both count from it
   cooldownUntil: number;
 }
 
@@ -68,14 +69,14 @@ export function dismissMount(g: Game): void {
 /** Why summoning is barred, in words that can be shown directly. */
 export function mountBar(g: Game): string | null {
   const p = g.player;
-  if (!g.overworld) return 'Mounts can only be called in the open world.';
-  if (!mountUnlocked(g)) return 'Complete The Borrowed Reins: speak with Peaslee, then find the Sleeper’s Sign.';
-  if (!mountAvailable(g, p.mount.selected)) return `${MOUNTS[p.mount.selected].name} is optional DLC. ${MOUNTS.grey.name} is included.`;
-  if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0) return 'Wait until you can stand freely before calling your mount.';
-  if (g.frame < p.mount.cooldownUntil) return 'Recover from the blow before calling your mount.';
+  if (!g.overworld) return t('n.mountOpen');
+  if (!mountUnlocked(g)) return t('n.mountQuest');
+  if (!mountAvailable(g, p.mount.selected)) return t('n.mountDlc', { name: MOUNTS[p.mount.selected].name.toUpperCase(), free: MOUNTS.grey.name.toUpperCase() });
+  if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0) return t('n.mountStand');
+  if (g.frame < p.mount.cooldownUntil) return t('n.mountHurt');
   const tr = g.ecs.c.transform.get(p.id)!;
-  if (!mountGroundAllowed(g, tr.pos)) return 'Call your mount on dry open ground, outside dungeons and boss arenas.';
-  if (!footprintClear(g, tr.pos, tr.yaw)) return 'There is not enough clear ground for your mount.';
+  if (!mountGroundAllowed(g, tr.pos)) return t('n.mountGround');
+  if (!footprintClear(g, tr.pos, tr.yaw)) return t('n.mountRoom');
   return null;
 }
 
@@ -90,7 +91,7 @@ export function toggleMount(g: Game): boolean {
     return false;
   }
   const p = g.player;
-  Object.assign(p.mount, { active: p.mount.selected, speed: 0 });
+  Object.assign(p.mount, { active: p.mount.selected, speed: 0, phase: 0 });
   p.buffer = createBuffer(); // no pre-summon dodge or attack may start while riding
   p.listening = p.kneeling = null;
   p.dodgeHeld = -1;
@@ -137,6 +138,6 @@ export function registerMounts(g: Game): void {
   g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id) dismissMount(g); });
   for (const event of ['Rested', 'Travelled', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
   g.events.on('QuestChanged', ({ id, done }) => {
-    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: 'The Borrowed Reins are yours. The chariot answers on open ground.' });
+    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: t('n.mountYours') });
   });
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { t } from '../src/core/i18n';
 import { emptyInput } from '../src/core/input';
 import { MOUNT_IDS, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
@@ -138,7 +139,7 @@ describe('the borrowed reins', () => {
     const before = { ...pos };
     expect(toggleMount(g)).toBe(false);
     expect(pos).toEqual(before);
-    expect(mountBar(g)).toContain('clear ground');
+    expect(mountBar(g)).toBe(t('n.mountRoom'));
   });
 
   it('stops its whole footprint at another body and consumes wind shoves after dismounting', () => {

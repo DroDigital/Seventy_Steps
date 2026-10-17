@@ -1,214 +1,146 @@
-/** One carriage horse, Kenney's CC0 animal-horse, dressed so the block reads as a bay.
- * Walk and run are the file's node curves, not a skin. The chariot around it is not this asset.
+/**
+ * The included chariot's horse (round 50): a chestnut draft horse in black harness, built here (horseBody.ts, horseLegs.ts) and
+ * rigged on the joints a horse has. Its feet are placed by the shared gait (systems/mountGait.ts): each foot stands still on the
+ * ground while it is down, folds through the air, and comes down on the frame the hoofbeat is heard; the two bones of each leg bend
+ * by a two-bone solve so the knees fold forward and the hocks drive back, and the whole body rides over them: a stooped crouch at
+ * speed, a rocking back in the canter, the neck nodding in the walk and reaching out in the gallop. Standing, it breathes, flicks
+ * an ear, swishes its tail and, now and then, paws the ground. Render only.
  */
 import * as THREE from 'three';
 import { hash2 } from '../core/rng';
-import { MOUNT_TRAVERSAL } from '../data/mounts';
-import { DRAFT_HORSE_JSON } from './draftHorseData';
-import { tint } from './meshKit';
-import { MountBuilder, group, type Point } from './mountKit';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { footAt, gaitAt, legPhase } from '../systems/mountGait';
+import { BODY_Y, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
+import { CANNON, FETLOCK, LEGS, LEG_NAMES, cannonBone, hoofOf, upperBone } from './horseLegs';
+import { MountBuilder, group } from './mountKit';
 
-/** Fits the spectral shafts: hooves on the ground, withers about a horse's height, head toward +z. */
-export const DRAFT_PLACE = { x: 0, z: 2.7, scale: 2.7 } as const;
-
-interface HorseNode { name: string; parent: number; t: number[]; pos?: number[]; nrm?: number[]; idx?: number[] }
-interface Channel { node: string; path: string; times: number[]; values: number[] }
-interface Clip { duration: number; channels: Channel[] }
-interface Pack { nodes: HorseNode[]; clips: { walk: Clip; run: Clip } }
-
-const PACK = JSON.parse(DRAFT_HORSE_JSON) as Pack;
-const BAY: Point = [0.3, 0.15, 0.07];
-const POINT: Point = [0.07, 0.045, 0.03];
-const MUZZLE: Point = [0.5, 0.36, 0.26];
-const MANE: Point = [0.05, 0.035, 0.025];
-const BELLY: Point = [0.05, 0.028, 0.016];
-const BLAZE: Point = [0.58, 0.46, 0.34];
-
-const clamp = (t: number): number => Math.min(1, Math.max(0, t));
-const mix = (a: Point, b: Point, t: number): Point => {
-  const u = clamp(t);
-  return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
-};
-
-/** A dark bay: black points, a dull muzzle and blaze, a black mane. Broad steps, so the palette keeps them. */
-function coatOf(name: string, x: number, y: number, z: number): Point {
-  if (name.startsWith('leg')) return mix(BAY, POINT, (0.02 - y) / 0.28);
-  if (name === 'tail') return MANE;
-  if (name === 'neck') return mix(BAY, MANE, (y - 0.08) / 0.26);
-  if (name === 'head') {
-    let c = mix(BAY, MUZZLE, (-x - 0.06) / 0.2);
-    c = mix(c, MANE, (y - 0.2) / 0.07);
-    if (Math.abs(z) < 0.05 && y > 0.14 && x > -0.12) c = mix(c, BLAZE, 0.7);
-    return c;
-  }
-  if (name === 'torso') return mix(BAY, BELLY, (0.11 - y) / 0.11);
-  return BAY;
-}
-
-/** The file splits each corner, so a face's normal paints a panel. Average them and the coat is one hide. */
-function soften(geo: THREE.BufferGeometry): void {
-  const pos = geo.getAttribute('position');
-  const nrm = geo.getAttribute('normal');
-  const acc = new Map<string, Point>();
-  const key = (i: number): string => `${pos.getX(i).toFixed(4)},${pos.getY(i).toFixed(4)},${pos.getZ(i).toFixed(4)}`;
-  for (let i = 0; i < pos.count; i++) {
-    const k = key(i);
-    const a = acc.get(k) ?? [0, 0, 0];
-    acc.set(k, [a[0] + nrm.getX(i), a[1] + nrm.getY(i), a[2] + nrm.getZ(i)]);
-  }
-  for (let i = 0; i < pos.count; i++) {
-    const a = acc.get(key(i))!;
-    const len = Math.hypot(a[0], a[1], a[2]) || 1;
-    nrm.setXYZ(i, a[0] / len, a[1] / len, a[2] / len);
-  }
-}
-
-/** Two dark eyes and a catch of light, one mesh, on the head so the walk carries them. */
-function horseEyes(): THREE.BufferGeometry {
-  const pieces: THREE.BufferGeometry[] = [];
-  for (const side of [-1, 1]) {
-    pieces.push(tint(new THREE.SphereGeometry(0.028, 6, 4).translate(-0.08, 0.175, side * 0.112), [0.015, 0.012, 0.01]));
-    pieces.push(tint(new THREE.SphereGeometry(0.009, 4, 3).translate(-0.098, 0.188, side * 0.13), [0.72, 0.64, 0.46]));
-  }
-  const geo = mergeGeometries(pieces)!;
-  for (const piece of pieces) piece.dispose();
-  return geo;
-}
-
-/** Vertex colour and hair UVs. The hide grain is one value; the bay lives here. */
-function dress(geo: THREE.BufferGeometry, name: string): void {
-  const pos = geo.getAttribute('position');
-  const nrm = geo.getAttribute('normal');
-  const uvs = geo.getAttribute('uv');
-  const cols = new Float32Array(pos.count * 3);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
-    const ny = Math.max(-1, Math.min(1, nrm.getY(i)));
-    const c = coatOf(name, x, y, z);
-    const k = (0.84 + 0.14 * (ny * 0.5 + 0.5)) * (0.97 + 0.03 * hash2(Math.floor((x + z) * 18), Math.floor(y * 22), 7));
-    cols[i * 3] = c[0] * k;
-    cols[i * 3 + 1] = c[1] * k;
-    cols[i * 3 + 2] = c[2] * k;
-    const along = name.startsWith('leg') || name === 'neck' || name === 'tail' ? y : x;
-    uvs.setXY(i, along * 3 + z, (name.startsWith('leg') ? z : y) * 8 + x);
-  }
-  geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-}
+/** Where the horse stands in the chariot's frame, and where the shaft tips meet the collar (the shafts run to it). */
+export const DRAFT_PLACE = { x: 0, z: 2.5 } as const;
+export const DRAFT_HITCH = { x: 0.49, y: 1.4, z: DRAFT_PLACE.z + 0.5 } as const;
 
 export interface DraftHorse {
   root: THREE.Group;
   bit: THREE.Object3D;
-  update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void;
+  /** `cycle`: gait cycles ridden (the simulation's `MountState.phase`); `ground`: the land's height at (x, z) in the chariot's frame. */
+  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void;
 }
 
-const scratchA = new THREE.Quaternion();
-const scratchB = new THREE.Quaternion();
-const clipA = new THREE.Quaternion();
-const clipB = new THREE.Quaternion();
-const blended = new THREE.Quaternion();
-const restQ = new THREE.Quaternion();
-const posA = new THREE.Vector3();
-const posB = new THREE.Vector3();
-
-function sampleQuat(ch: Channel, t: number, out: THREE.Quaternion): void {
-  const { times, values } = ch;
-  const last = times.length - 1;
-  const at = (i: number, q: THREE.Quaternion) => q.set(values[i * 4], values[i * 4 + 1], values[i * 4 + 2], values[i * 4 + 3]);
-  if (t <= times[0]) return void at(0, out);
-  if (t >= times[last]) return void at(last, out);
-  let i = 0;
-  while (times[i + 1] < t) i++;
-  const f = (t - times[i]) / (times[i + 1] - times[i] || 1);
-  at(i, scratchA); at(i + 1, scratchB); out.copy(scratchA).slerp(scratchB, f);
-}
-
-function samplePos(ch: Channel, t: number, out: THREE.Vector3): void {
-  const { times, values } = ch;
-  const last = times.length - 1;
-  if (t <= times[0]) return void out.set(values[0], values[1], values[2]);
-  if (t >= times[last]) return void out.set(values[last * 3], values[last * 3 + 1], values[last * 3 + 2]);
-  let i = 0;
-  while (times[i + 1] < t) i++;
-  const f = (t - times[i]) / (times[i + 1] - times[i] || 1);
-  out.set(
-    values[i * 3] * (1 - f) + values[(i + 1) * 3] * f,
-    values[i * 3 + 1] * (1 - f) + values[(i + 1) * 3 + 1] * f,
-    values[i * 3 + 2] * (1 - f) + values[(i + 1) * 3 + 2] * f,
-  );
-}
+const clamp = (v: number, a = 0, b = 1): number => Math.min(b, Math.max(a, v));
+const smooth = (t: number): number => t * t * (3 - 2 * t);
+const TAU = Math.PI * 2;
+const MAX_SWEEP = 1.5;
+const LIFT = { front: 0.3, hind: 0.24 } as const;
 
 export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z: number): DraftHorse {
   const root = group(parent, x, 0, z);
   root.name = 'draft-horse';
   const lean = group(root);
-  const facing = group(lean);
-  facing.rotation.y = Math.PI / 2;
-  facing.scale.setScalar(DRAFT_PLACE.scale);
+  const body = group(lean, 0, BODY_Y, 0);
   const hide = b.material('hide');
-  // A wide repeat of the mottle quantizes into stripes. One soft patch across the body does not.
-  (hide.uniforms.uUvScale.value as THREE.Vector2).set(0.05, 0.05);
-  const parts = new Map<string, THREE.Object3D>();
-  for (const node of PACK.nodes) {
-    const where = node.parent < 0 ? facing : parts.get(PACK.nodes[node.parent].name)!;
-    const part = group(where, node.t[0], node.t[1], node.t[2]);
-    part.name = node.name;
-    if (node.pos && node.nrm && node.idx) {
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(node.pos), 3));
-      geo.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(node.nrm), 3));
-      geo.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(node.pos.length / 3 * 2), 2));
-      geo.setIndex(node.idx);
-      soften(geo);
-      dress(geo, node.name);
-      const mesh = new THREE.Mesh(geo, hide);
-      if (node.name === 'torso') mesh.name = 'draft-body';
-      part.add(mesh);
-    }
-    parts.set(node.name, part);
-  }
-  const head = parts.get('head')!;
-  const bit = group(head, -0.2, 0.02, 0);
+  const cloth = b.material('cloth');
+  const part = (at: THREE.Object3D, geo: THREE.BufferGeometry, material: THREE.ShaderMaterial, name: string): THREE.Mesh => {
+    const m = new THREE.Mesh(geo, material);
+    m.name = name;
+    at.add(m);
+    return m;
+  };
+  const barrelMesh = part(body, barrel(), hide, 'draft-body');
+  part(body, harness(), cloth, 'draft-harness');
+  const neckG = group(body, 0, NECK_AT.y, NECK_AT.z);
+  neckG.name = 'neck';
+  part(neckG, neck(), hide, 'draft-neck');
+  const headG = group(neckG, 0, 0.02, NECK_LENGTH);
+  headG.name = 'head';
+  const face = head();
+  part(headG, face.skin, hide, 'draft-head');
+  part(headG, face.eyes, b.material('hide', 0.5), 'draft-eyes');
+  part(headG, bridle(), cloth, 'draft-bridle');
+  const bit = group(headG, 0, -0.1, 0.57);
   bit.name = 'draft-bit';
-  const eyes = new THREE.Mesh(horseEyes(), b.material('hide', 0.5));
-  eyes.name = 'draft-eyes';
-  head.add(eyes);
-  const byClip = (clip: Clip) => new Map(clip.channels.map((ch) => [`${ch.node}:${ch.path}`, ch]));
-  const walk = byClip(PACK.clips.walk);
-  const run = byClip(PACK.clips.run);
-  const span = MOUNT_TRAVERSAL.gallop - MOUNT_TRAVERSAL.cruise;
-  return { root, bit, update(time, phase, speed, turn, ground) {
-    const moving = Math.min(1, Math.max(0, speed) / 1.5);
-    const gallop = Math.min(1, Math.max(0, (speed - MOUNT_TRAVERSAL.cruise) / span));
-    const u = ((phase / (Math.PI * 2)) % 1 + 1) % 1;
-    const walkT = u * PACK.clips.walk.duration;
-    const runT = u * PACK.clips.run.duration;
-    root.position.y = ground?.(x, z) ?? 0;
-    lean.rotation.y = -turn * 0.12;
-    lean.rotation.z = -turn * 0.04;
-    for (const node of PACK.nodes) {
-      const obj = parts.get(node.name)!;
-      const spinW = walk.get(`${node.name}:rotation`);
-      const spinR = run.get(`${node.name}:rotation`);
-      if (spinW && spinR) {
-        sampleQuat(spinW, walkT, clipA);
-        sampleQuat(spinR, runT, clipB);
-        blended.copy(clipA).slerp(clipB, gallop);
-        obj.quaternion.copy(restQ).slerp(blended, moving);
-        if (node.name === 'neck') obj.rotateY(Math.sin(time * 0.6) * 0.05 * (1 - moving));
-      }
-      const moveW = walk.get(`${node.name}:translation`);
-      const moveR = run.get(`${node.name}:translation`);
-      if (moveW && moveR) {
-        samplePos(moveW, walkT, posA);
-        samplePos(moveR, runT, posB);
-        posA.lerp(posB, gallop);
-        obj.position.set(
-          node.t[0] + (posA.x - node.t[0]) * moving,
-          node.t[1] + (posA.y - node.t[1]) * moving,
-          node.t[2] + (posA.z - node.t[2]) * moving,
-        );
-      }
+  const ears = [-1, 1].map((s) => {
+    const g = group(headG, s * 0.07, 0.125, 0);
+    g.name = 'ear';
+    part(g, ear(), hide, 'draft-ear');
+    return g;
+  });
+  const tailG = group(body, 0, 0.23, -0.84);
+  tailG.name = 'tail';
+  part(tailG, tail(), hide, 'draft-tail');
+
+  const legs = LEGS.map((plan, i) => {
+    const pivot = group(body, ...plan.hip);
+    pivot.name = LEG_NAMES[i];
+    part(pivot, upperBone(plan), hide, `${LEG_NAMES[i]}-upper`);
+    const knee = group(pivot, 0, -plan.upper, 0);
+    part(knee, cannonBone(plan), hide, `${LEG_NAMES[i]}-cannon`);
+    const fetlock = group(knee, 0, -CANNON, 0);
+    part(fetlock, hoofOf(plan), hide, `${LEG_NAMES[i]}-hoof`);
+    return { plan, pivot, knee, fetlock, flat: 0 };
+  });
+
+  const inverse = new THREE.Matrix4();
+  const aim = new THREE.Vector3();
+  const hips = LEGS.map((l) => l.hip);
+
+  return { root, bit, update(time, cycle, speed, turn, ground) {
+    const gait = gaitAt(speed);
+    const moving = smooth(clamp((speed - 0.15) / 1.1));
+    const stretch = gait.stretch * moving;
+    const flight = smooth(clamp((gait.stretch - 0.3) / 0.3)); // 0 in a walk or a trot, 1 in a canter or gallop: one bounce a cycle, not two
+    const floor = ground?.(x, z) ?? 0;
+    root.position.y = floor;
+    const slope = clamp(-Math.atan2((ground?.(x, z + 0.8) ?? 0) - (ground?.(x, z - 0.8) ?? 0), 1.6), -0.25, 0.25);
+    const bounce = (1 - flight) * Math.cos(2 * TAU * (cycle - 0.1)) * (0.012 + 0.014 * gait.stretch) + flight * Math.cos(TAU * (cycle - 0.15)) * (0.03 + 0.04 * gait.stretch);
+    const settle = 0.012 * Math.sin(time * 0.9) * (1 - moving);
+    body.position.y = BODY_Y - 0.04 * moving - 0.12 * stretch + (bounce + settle) * moving;
+    body.rotation.x = slope * 0.8 + 0.05 * Math.sin(TAU * (cycle - 0.05)) * flight * gait.stretch - 0.03 * stretch;
+    body.rotation.z = -turn * 0.05 + 0.014 * Math.sin(TAU * cycle) * moving * (1 - flight);
+    body.rotation.y = 0.012 * Math.sin(TAU * cycle) * moving * (1 - flight);
+    lean.rotation.y = -turn * 0.1;
+    barrelMesh.scale.y = 1 + (0.008 + 0.014 * stretch) * Math.sin(time * (1.5 + 5 * stretch));
+
+    const nod = Math.sin(TAU * (cycle - 0.1)) * (0.07 * (1 - flight) + 0.1 * flight) * moving;
+    neckG.rotation.x = -NECK_RISE + 0.26 * stretch + nod - 0.02 * Math.sin(time * 0.8) * (1 - moving);
+    neckG.rotation.y = turn * 0.3 + Math.sin(time * 0.35) * 0.05 * (1 - moving);
+    headG.rotation.x = HEAD_DROP - 0.55 * nod - 0.12 * stretch + 0.03 * Math.sin(time * 0.6 + 1) * (1 - moving);
+    headG.rotation.y = turn * 0.12;
+    tailG.rotation.x = 0.1 + 0.5 * stretch + 0.1 * Math.sin(TAU * (cycle - 0.3)) * moving + 0.07 * Math.sin(time * 1.3) * (1 - moving);
+    tailG.rotation.z = Math.sin(time * 1.9) * 0.12 * (1 - 0.6 * moving) - turn * 0.2;
+    ears.forEach((e, i) => {
+      const flick = Math.max(0, Math.sin(time * (0.8 + 0.13 * i) + i * 2)) ** 24;
+      e.rotation.x = -0.35 + 0.6 * stretch + 0.5 * flick * (1 - moving);
+      e.rotation.z = (i ? 1 : -1) * (0.18 + 0.55 * flick);
+    });
+
+    // The frame feet are placed in: the horse's own, so a body that pitches and rolls leaves them where the ground is.
+    lean.updateMatrix();
+    body.updateMatrix();
+    inverse.multiplyMatrices(lean.matrix, body.matrix).invert();
+    const paw = hash2(Math.floor(time / 9), 3, 17) > 0.45 ? clamp((time % 9 - 2) / 1.6) : 0; // now and then, a front hoof is pawed at the ground
+    for (let i = 0; i < legs.length; i++) {
+      const leg = legs[i];
+      const { plan } = leg;
+      const sweep = Math.min(MAX_SWEEP, gait.duty * gait.length);
+      const foot = footAt(legPhase(cycle, gait.offsets[i]), gait.duty, sweep);
+      const reach = foot.z * moving;
+      const stand = i === 0 && paw > 0 && paw < 1 ? Math.sin(paw * Math.PI * 3) : 0;
+      const lift = (foot.lift * moving + Math.max(0, stand) * (1 - moving)) * (plan.front ? LIFT.front : LIFT.hind) * (1 - 0.1 * gait.stretch);
+      const hipX = hips[i][0];
+      const hipZ = hips[i][2] + (plan.front ? 0.2 : 0.12) * reach; // the shoulder and the hip slide with the stride
+      leg.pivot.position.z = hipZ;
+      const footZ = hips[i][2] + (plan.front ? 0.04 : 0) + reach - 0.14 * Math.max(0, stand) * (1 - moving);
+      const local = ground?.(x + hipX, z + footZ) ?? 0;
+      aim.set(hipX, local - floor + lift + FETLOCK, footZ).applyMatrix4(inverse); // the fetlock is placed: the hoof hangs flat below it
+      const [dz, dy] = [aim.z - hipZ, aim.y - leg.pivot.position.y];
+      const d = clamp(Math.hypot(dy, dz), 0.2, plan.upper + plan.lower - 0.003);
+      const lineAngle = Math.atan2(dz, -dy);
+      const a = Math.acos(clamp((plan.upper ** 2 + d * d - plan.lower ** 2) / (2 * plan.upper * d), -1, 1));
+      const c = Math.acos(clamp((plan.lower ** 2 + d * d - plan.upper ** 2) / (2 * plan.lower * d), -1, 1));
+      const bend = plan.front ? 1 : -1; // a knee folds forward, a hock back
+      const upperAngle = lineAngle + bend * a;
+      const lowerAngle = lineAngle - bend * c;
+      leg.pivot.rotation.x = -upperAngle;
+      leg.knee.rotation.x = upperAngle - lowerAngle;
+      leg.fetlock.rotation.x = lowerAngle - body.rotation.x + 0.55 * foot.lift * moving; // flat on the ground, toe dropping as it lifts
     }
   } };
 }

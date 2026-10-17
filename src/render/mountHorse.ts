@@ -4,6 +4,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { prism } from './bodyKit';
 import { tint } from './meshKit';
 import { MOUNT_COLORS as C, MountBuilder, group, orb, panel, rod, tube, type Point } from './mountKit';
+import { footAt, gaitAt, legPhase } from '../systems/mountGait';
 import { horseFlame, type HorseWisp } from './mountEffects';
 
 export interface SpectralHorse { root: THREE.Group; flame: HorseWisp; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void }
@@ -65,10 +66,11 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
   const hoovesAt: Point[] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
   return { root, flame, update(time, phase, speed, turn, ground) {
     const moving = Math.min(1, speed / 1.5), gallop = Math.min(1, Math.max(0, (speed - 3) / 5));
-    const cycle = phase + offset, bob = Math.sin(cycle * 2) * 0.045 * moving;
+    const gait = gaitAt(speed), cycle = phase + offset, bob = Math.sin(cycle * 2) * 0.045 * moving;
+    const drop = 0.16 * moving * (0.4 + 0.6 * gait.stretch); // the body settles as the stride lengthens, so the legs reach
     const floor = ground?.(x, z) ?? 0;
     root.position.y = floor;
-    body.position.y = 1.36 + bob + 0.055 * Math.sin(time * 1.7 + offset) * (1 - moving);
+    body.position.y = 1.36 + bob - drop + 0.055 * Math.sin(time * 1.7 + offset) * (1 - moving);
     body.rotation.x = Math.sin(cycle) * 0.035 * gallop;
     body.rotation.z = -turn * 0.045 + Math.cos(cycle) * 0.018 * moving;
     neck.rotation.x = Math.sin(cycle + 0.3) * 0.085 * moving - 0.07 * gallop;
@@ -77,12 +79,10 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
     tail.rotation.set(Math.sin(cycle) * 0.12 * moving - 0.16 * gallop, Math.sin(time * 2.5 + offset) * 0.18, 0);
     for (let i = 0; i < 4; i++) {
       const side = i % 2 ? 1 : -1, front = i < 2, hipZ = front ? 0.5 : -0.6, hipX = side * 0.23;
-      const trotOffset = [0, Math.PI, Math.PI, 0][i], gallopOffset = [0, 0.45, Math.PI + 0.7, Math.PI + 0.2][i];
-      const ph = cycle + trotOffset + (gallopOffset - trotOffset) * gallop;
-      const stride = Math.sin(ph) * (0.3 + gallop * 0.32) * moving;
-      const lift = Math.max(0, Math.cos(ph)) * (0.18 + 0.16 * gallop) * moving;
+      const foot = footAt(legPhase(cycle / (Math.PI * 2), gait.offsets[[1, 0, 3, 2][i]]), gait.duty, Math.min(0.95, gait.duty * gait.length)); // the shared gait: this foot stands still while it is down
+      const stride = foot.z * moving, lift = foot.lift * (0.2 + 0.14 * gait.stretch) * moving;
       const localGround = Math.max(-0.23, Math.min(0.23, (ground?.(x + hipX, z + hipZ + stride) ?? floor) - floor));
-      const fy = -1.285 - bob + lift + localGround, fz = hipZ + stride;
+      const fy = -1.285 - bob + drop + lift + localGround, fz = hipZ + stride;
       const dy = fy, dz = fz - hipZ, distance = Math.min(1.28, Math.hypot(dy, dz));
       const upper = 0.63, lower = 0.68, along = (upper * upper - lower * lower + distance * distance) / (2 * distance);
       const h = Math.sqrt(Math.max(0, upper * upper - along * along)), bend = front ? 1 : -1;
@@ -90,7 +90,7 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
       segment(i * 3, [hipX, 0, hipZ], [hipX, ky, kz]);
       segment(i * 3 + 1, [hipX, ky, kz], [hipX, fy + 0.05, fz]);
       segment(i * 3 + 2, [hipX + side * 0.035, ky - 0.04, kz], [hipX + side * 0.027, fy + 0.13, fz], 0.45);
-      matrix.makeRotationX(-0.32 * Math.max(0, Math.cos(ph)) * moving); matrix.setPosition(hipX, fy, fz);
+      matrix.makeRotationX(-0.4 * foot.lift * moving); matrix.setPosition(hipX, fy, fz);
       hooves.setMatrixAt(i, matrix);
       hoovesAt[i] = [hipX, fy, fz];
     }

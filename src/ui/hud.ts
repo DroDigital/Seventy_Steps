@@ -192,9 +192,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       if (mountKey !== mountTip) { mountTip = mountKey; mountTipUntil = 0; }
       if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
       const mountShown = mountKey !== '' && now < mountTipUntil;
-      const mountLine = mounted
-        ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss`
-        : `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}`;
+      const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
       setText(prompt, mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
       bosses.update();
       foes.update(camera, canvas);
