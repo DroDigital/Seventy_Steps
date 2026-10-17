@@ -189,6 +189,36 @@ describe('a rig riding the world does not stop to turn (round 52)', () => {
     expect(g.player.mount.active).not.toBe(null);
   });
 
+  it('a scrape past a wall swings the rig no more than a few degrees a frame, even at a gallop where a frame is two steps (round 52)', () => {
+    const g = openGame();
+    expect(toggleMount(g)).toBe(true);
+    const gallop = (heading: number): void => {
+      g.camera.yaw = 0;
+      g.player.dodgeHeld = 99; // the dodge key held past a tap, and breath enough: the actions system that counts it does not run here
+      g.ecs.c.stamina.get(g.player.id)!.value = 999;
+      const input = emptyInput();
+      input.moveY = Math.cos(heading);
+      input.moveX = -Math.sin(heading);
+      input.held.dodge = true;
+      controlMount(g, input);
+    };
+    for (let i = 0; i < 90; i++) { gallop(0); movementSystem(g, DT); }
+    expect(g.player.mount.speed).toBeGreaterThan(T.cruise + 3);
+    // A wall across the way a little ahead, the rider turning left of it: the rig scrapes along it as it swings.
+    g.world.colliders.push({ kind: 'box', min: { x: 200, y: -1, z: where(g).pos.z + 5 }, max: { x: 300, y: 5, z: where(g).pos.z + 5.3 } });
+    let [last, worst, scraped] = [where(g).yaw, 0, 0];
+    for (let i = 0; i < 120; i++) {
+      gallop(0.9);
+      movementSystem(g, DT);
+      const d = Math.abs(wrapAngle(where(g).yaw - last));
+      last = where(g).yaw;
+      worst = Math.max(worst, d);
+      if (g.player.mount.speed > 0.2) scraped++;
+    }
+    expect(scraped).toBeGreaterThan(5); // it rode on into the wall, not stood at a distance
+    expect(worst).toBeLessThan(0.07); // the steered turn (about 0.02 a frame at a gallop) and a scrape's few hundredths: it was 0.1 a step, and 0.2 when both steps of a frame scraped
+  });
+
   it('a rider driving straight at a wall stops at it, and the rig is not slid along it', () => {
     const g = openGame();
     expect(toggleMount(g)).toBe(true);

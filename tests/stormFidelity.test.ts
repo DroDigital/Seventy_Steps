@@ -182,6 +182,18 @@ describe('a thunderstorm flashes in every region, and a bolt on the ground light
     expect(quiet.thunder).not.toHaveBeenCalled();
   });
 
+  it('a ground strike falling between a flash and its thunder does not take that thunder away (round 52)', () => {
+    const r = rig();
+    r.lightning.update(10, 'hub', false, r.weather); // clear: nothing rolls of its own
+    r.lightning.strikeNow(1); // far off: its thunder is seconds away
+    r.lightning.update(11, 'hub', false, r.weather);
+    r.lightning.strikeNow(0); // overhead, a moment later: its thunder is at once
+    r.lightning.update(11.1, 'hub', false, r.weather);
+    expect(r.thunder).toHaveBeenCalledTimes(1);
+    r.lightning.update(10 + LIGHTNING.delay[1] + 0.1, 'hub', false, r.weather);
+    expect(r.thunder).toHaveBeenCalledTimes(2); // the far one still rolls in
+  });
+
   it('a storm that is gathering (not yet at the old threshold) flashes already; a bolt seen indoors is not drawn', () => {
     const r = rig();
     Object.assign(r.weather, { kind: 'storm', want: 'storm', amount: LIGHTNING.stormGather + 0.01 });

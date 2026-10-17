@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { V3 } from '../src/core/geom';
-import { SIM, SKY_STRIKE } from '../src/data/tuning';
+import { SIM, SKY_STRIKE, WORLD } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { createWorldGame } from '../src/systems/game';
 import { pendingStrikes, skyStrikeSystem } from '../src/systems/skyStrikes';
@@ -173,5 +173,43 @@ describe('a bolt on the ground, a ring of light before it (round 52)', () => {
     expect(died).toBe(true);
     expect(s.g.ecs.c.actor.get(s.player)!.move).toBe('death');
     expect(s.g.ecs.c.transform.size).toBe(bodies); // the bolt's body is gone with it
+  });
+
+  it('a body that steps under a roof within the ring when the bolt falls is not struck (round 52)', () => {
+    const s = stormy();
+    s.untilWarned();
+    const room = worldLayout().dungeons[0]!.layout.rooms[0]!;
+    const pending = pendingStrikes(s.g)[0]!;
+    pending.at = { x: room.x, y: pending.at.y, z: room.z }; // the ring was marked outside; it is the body that moved
+    place(s.g, s.player, room.x, room.z, 0);
+    s.g.ecs.c.transform.get(s.player)!.pos.y = pending.at.y;
+    const hp = s.g.ecs.c.health.get(s.player)!.hp;
+    s.run(SKY_STRIKE.warn);
+    expect(s.landed).toHaveLength(1);
+    expect(s.g.ecs.c.health.get(s.player)!.hp).toBe(hp);
+  });
+
+  it('never marks the shallows or the seabed, however near the coast the investigator stands (round 52)', () => {
+    const g = createWorldGame();
+    const ground = (x: number, z: number): number => g.world.ground(x, z);
+    const sea = WORLD.seaLevel + 0.4;
+    const shore = { x: 1024, z: 1024 }; // Innsmouth's seaward corner: land, with the sea close on several sides
+    const wet = Array.from({ length: 16 }, (_, k) => ground(shore.x + Math.sin((k / 16) * Math.PI * 2) * 12, shore.z + Math.cos((k / 16) * Math.PI * 2) * 12)).filter((y) => y <= sea).length;
+    expect(ground(shore.x, shore.z), 'land under the investigator').toBeGreaterThan(sea + 2);
+    expect(wet, 'sea within a strike\'s reach').toBeGreaterThanOrEqual(4);
+    g.overworld!.region = 'innsmouth';
+    Object.assign(g.overworld!.weather, { kind: 'storm', want: 'storm', amount: 1 });
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    tr.pos.x = shore.x;
+    tr.pos.z = shore.z;
+    tr.pos.y = ground(shore.x, shore.z);
+    const marked: V3[] = [];
+    g.events.on('StrikeWarned', (e) => void marked.push(e.at));
+    for (let f = 0; f < 60 * 60 * 90 && marked.length < 40; f++) {
+      g.frame++;
+      skyStrikeSystem(g);
+    }
+    expect(marked.length).toBeGreaterThan(20);
+    for (const at of marked) expect(at.y, `${at.x},${at.z}`).toBeGreaterThan(sea);
   });
 });

@@ -8,7 +8,7 @@
 
 import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
-import { SIM, SKY_STRIKE } from '../data/tuning';
+import { SIM, SKY_STRIKE, WORLD } from '../data/tuning';
 import { roofedAt, inDungeon } from '../world/terrain';
 import { strike } from './combat';
 import { isAbsent, type Game } from './components';
@@ -62,6 +62,7 @@ function aim(g: Game): V3 | null {
     const z = centre.z + Math.cos(a) * d;
     if (inDungeon(x, z) || roofedAt(x, z)) continue;
     const y = g.world.ground(x, z);
+    if (y <= WORLD.seaLevel + 0.4) continue; // the shallows and the seabed: a bolt there is a ring no one sees
     return { x, y, z };
   }
   return null;
@@ -79,6 +80,7 @@ function land(g: Game, p: Pending): void {
     const body = c.body.get(id);
     if (!pos || !c.health.has(id) || !c.actor.has(id) || c.dead.has(id) || isAbsent(g, id)) continue;
     if (Math.hypot(pos.x - p.at.x, pos.z - p.at.z) > SKY_STRIKE.radius + (body?.radius ?? 0.4) * 0.5 || Math.abs(pos.y - p.at.y) > 4) continue;
+    if (roofedAt(pos.x, pos.z) || inDungeon(pos.x, pos.z)) continue; // stepping under a roof within the ring is as good as leaving it
     victims.push(id);
   }
   for (const id of victims) {

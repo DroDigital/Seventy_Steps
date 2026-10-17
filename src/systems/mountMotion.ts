@@ -20,6 +20,7 @@ export type MountMove = 'idle' | 'rode' | 'drop';
 
 const JAM_FRAMES = 6; // frames wanting to turn and unable to, before the rig is backed off what it is against
 const NUDGE = 0.1; // radians a rig may swing from its heading to scrape past a corner, in a step
+const SCRAPE = 0.04; // and in a frame, however many steps it takes (at a gallop two): about twice the pace a horse comes round at a gallop, so a scrape past a wall is not a steer, and no snap either
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
 /**
@@ -79,6 +80,7 @@ export function moveMounted(g: Game, dt: number): MountMove {
   const n = Math.max(1, Math.ceil(distance / t.substep));
   const step = distance / n;
   let blocked = false;
+  let scrape = SCRAPE;
   for (let i = 0; i < n; i++) {
     const [sx, sz] = [Math.sin(tr.yaw) * step, Math.cos(tr.yaw) * step];
     const next = { x: tr.pos.x + sx, y: tr.pos.y, z: tr.pos.z + sz };
@@ -98,13 +100,14 @@ export function moveMounted(g: Game, dt: number): MountMove {
     // Something in the way. A rider steering round it scrapes past, swung a little toward where they want to go; one driving straight at it stops.
     const error = m.face === null ? 0 : wrapAngle(m.face - tr.yaw);
     let slid = false;
-    for (const swing of Math.abs(error) > 0.12 ? [Math.sign(error) * NUDGE] : []) {
+    for (const swing of Math.abs(error) > 0.12 && scrape > 1e-3 ? [Math.sign(error) * Math.min(NUDGE, scrape, Math.abs(error))] : []) {
       const yaw = wrapAngle(tr.yaw + swing);
       const slide = { x: tr.pos.x + Math.sin(yaw) * step, y: tr.pos.y, z: tr.pos.z + Math.cos(yaw) * step };
       slide.y = g.world.ground(slide.x, slide.z);
       if (Math.abs(slide.y - tr.pos.y) > climb || !footprintClear(g, slide, yaw, true)) continue;
       Object.assign(tr.pos, slide);
       tr.yaw = yaw;
+      scrape -= Math.abs(swing);
       mount.phase += cyclesFor(step, mount.speed);
       slid = true;
       break;

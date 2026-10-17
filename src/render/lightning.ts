@@ -34,12 +34,12 @@ export function flicker(t: number, flashes = 1): number {
 export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain: number) => void, onFlash: (far: number) => void = () => undefined): Lightning {
   const flash = (sky.material as THREE.ShaderMaterial).uniforms.uFlash; // the sky's own flash (shaders/sky.ts)
   let [next, struck, strength] = [NaN, -Infinity, 0];
-  let rumble: { when: number; gain: number } | null = null;
+  let rumbles: { when: number; gain: number }[] = []; // thunder on its way: a ground strike's can fall between a flash and its own
   let place: string | null = null;
   let now = 0;
   const strike = (far: number, at: number): void => {
     [struck, strength] = [at, 1 - 0.65 * far];
-    rumble = { when: at + (far < 0.02 ? 0.04 : LIGHTNING.delay[0] + (LIGHTNING.delay[1] - LIGHTNING.delay[0]) * far), gain: 1 - 0.6 * far };
+    rumbles.push({ when: at + (far < 0.02 ? 0.04 : LIGHTNING.delay[0] + (LIGHTNING.delay[1] - LIGHTNING.delay[0]) * far), gain: 1 - 0.6 * far });
   };
   return {
     strikeNow(far) {
@@ -50,7 +50,7 @@ export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain:
       if (region !== place) {
         place = region;
         [next, struck] = [NaN, -Infinity];
-        rumble = null; // a journey cannot bring the last region's strike and thunder with it
+        rumbles = []; // a journey cannot bring the last region's strike and thunder with it
       }
       const storm = weather && (((weather.kind === 'rain' || weather.kind === 'gale') && weather.amount >= LIGHTNING.storm) || (weather.kind === 'storm' && weather.amount >= LIGHTNING.stormGather));
       const every = region && storm ? (weather.kind === 'storm' ? LIGHTNING.stormEvery : LIGHTNING.every[region]) : undefined;
@@ -62,10 +62,8 @@ export function createLightning(sky: THREE.Mesh, post: PostPass, thunder: (gain:
         strike(far, time);
         if (!hidden) onFlash(far);
       }
-      if (rumble && time >= rumble.when) {
-        thunder(rumble.gain * (hidden ? LIGHTNING.inside : 1));
-        rumble = null;
-      }
+      for (const r of rumbles.filter((x) => time >= x.when)) thunder(r.gain * (hidden ? LIGHTNING.inside : 1));
+      rumbles = rumbles.filter((x) => time < x.when);
       const f = hidden ? 0 : flicker(time - struck, FEEL.flashes) * strength;
       flash.value = 0.085 * LIGHTNING.sky * f; // what the sky's haze took of it before the realms had their own skies (round 32)
       if (f <= 0) return;
