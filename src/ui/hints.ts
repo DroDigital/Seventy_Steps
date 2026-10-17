@@ -19,6 +19,7 @@ import { fill } from './glyphs';
 import { createGateHint, watch } from './hintWatch';
 import { BONE, el, setStyle, setText } from './hudKit';
 import { HINTS_KEY as KEY } from './loreLine';
+import { mountUnlocked } from '../systems/mounts';
 
 /** A hint that is followed at once by another: a passage shown by insight, then what spending the insight does to it. */
 const THEN: Readonly<Partial<Record<string, HintId>>> = { passage: 'passageCost' };
@@ -98,6 +99,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
       if (g.frame - watched >= 30) { // twice a second of the game's own time (not on a frame that is a multiple of 30: a slow picture steps the game in strides that may never land on one)
         watched = g.frame;
         for (const id of watch(g)) hint(id, true);
+        if (mountUnlocked(g)) hint('mount', true);
       }
       if (gateEntered(g)) {
         const queued = queue.indexOf('fog');

@@ -7,6 +7,8 @@
 import { createEcs, type Entity } from '../core/ecs';
 import { createEventBus } from '../core/events';
 import type { InputFrame } from '../core/input';
+import { createMountState, mountSystem, registerMounts } from './mounts';
+import { MOUNT_QUEST } from '../data/mounts';
 import { yawOf, type V3 } from '../core/geom';
 import { createRng } from '../core/rng';
 import { ARENA } from '../data/arena';
@@ -49,7 +51,7 @@ import { playerControl } from './playerControl';
 import { npcSystem, spawnNpcs } from './npcs';
 import { populationSystem } from './population';
 import { boltSystem } from './projectiles';
-import { questSystem } from './quests';
+import { questSystem, startQuest } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
 import { candleSystem } from './candles';
@@ -90,7 +92,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, ask: false, rising: null, fogPass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, mended: 0, listening: null, kneeling: null, ask: false, rising: null, fogPass: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -99,6 +101,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     cutscene: false,
     reality: createReality(),
   };
+  registerMounts(g);
   registerDeath(g);
   registerSanity(g);
   registerHiddenLayer(g);
@@ -133,6 +136,7 @@ export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty }: 
   spawnNpcs(g);
   if (save) applySave(g, save);
   else if (carry) applyCarry(g, carry); // a new journey (NG+): before the world fills, so its foes are that journey's
+  startQuest(g, MOUNT_QUEST); // offered on new and older saves; no boss or purchase is required
   refreshSeals(g); // bosses slain in the save break their seals
   populationSystem(g);
   cameraSystem(g, 0, 0, 0);
@@ -177,9 +181,11 @@ function talkFocus(pivot: V3, at: V3 | null): V3 | null {
 
 function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   const tr = g.ecs.c.transform.get(g.player.id)!;
-  const pivot = { x: tr.pos.x, y: tr.pos.y + CAMERA.pivotHeight, z: tr.pos.z };
+  g.camera.prevMountLift = g.camera.mountLift;
+  g.camera.mountLift += ((g.player.mount.active ? 1.05 : 0) - g.camera.mountLift) * Math.min(1, dt * 6);
+  const pivot = { x: tr.pos.x, y: tr.pos.y + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw }, g.world, dt);
+  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance }, g.world, dt);
 }
 
 /**
@@ -191,6 +197,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   const dt = 1 / SIM.hz;
   g.frame++;
   if (g.player.fogPass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
+  mountSystem(g);
   playerControl(g, input);
   fogPassSystem(g);
   candleSystem(g);

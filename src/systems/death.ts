@@ -16,6 +16,7 @@ import type { Game, GameEvents } from './components';
 import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { spawnDrop } from './spawn';
+import { dismissMount } from './mounts';
 
 function echoes(g: Game, change: GameEvents['Echoes']['change'], amount: number): void {
   g.events.emit('Echoes', { change, amount, total: g.player.echoes });
@@ -47,6 +48,10 @@ export function registerDeath(g: Game): void {
 
 /** Puts an entity back at `at`, whole: full health, poise and stamina, no move. */
 export function restore(g: Game, id: Entity, at: Place): void {
+  if (id === g.player.id) {
+    dismissMount(g);
+    Object.assign(g.camera, { mountLift: 0, prevMountLift: 0, dist: CAMERA.distance, prevDist: CAMERA.distance });
+  }
   const { transform, health, poise, stamina, actor, mover, dead } = g.ecs.c;
   const tr = transform.get(id)!;
   tr.pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };

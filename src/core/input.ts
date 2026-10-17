@@ -16,7 +16,7 @@ import { useDevice } from './device';
 import { PAD_BUTTON } from './padMap';
 import { activePad, recalibratePads, takeResync } from './pads';
 
-export const BUTTONS = ['light', 'heavy', 'dodge', 'block', 'parry', 'shoot', 'reload', 'lock', 'item', 'heal', 'throw', 'interact'] as const;
+export const BUTTONS = ['light', 'heavy', 'dodge', 'block', 'parry', 'shoot', 'reload', 'lock', 'item', 'heal', 'throw', 'interact', 'mount'] as const;
 export type Button = (typeof BUTTONS)[number];
 export type Buttons = Record<Button, boolean>;
 
@@ -44,6 +44,7 @@ export const noButtons = (): Buttons => ({
   heal: false,
   throw: false,
   interact: false,
+  mount: false,
 });
 
 const noFrames = (): Record<Button, number> => Object.fromEntries(BUTTONS.map((b) => [b, 0])) as Record<Button, number>;
@@ -53,10 +54,10 @@ export function emptyInput(): InputFrame {
 }
 
 /** The buttons the keyboard presses, by the action whose key presses them. */
-const KEYED: readonly (readonly [Action, Button])[] = [['dodge', 'dodge'], ['shoot', 'shoot'], ['reload', 'reload'], ['lock', 'lock'], ['heal', 'heal'], ['item', 'item'], ['throw', 'throw'], ['interact', 'interact']];
+const KEYED: readonly (readonly [Action, Button])[] = [['dodge', 'dodge'], ['shoot', 'shoot'], ['reload', 'reload'], ['lock', 'lock'], ['heal', 'heal'], ['item', 'item'], ['throw', 'throw'], ['interact', 'interact'], ['mount', 'mount']];
 const keyButton = (code: string): Button | undefined => KEYED.find(([a]) => keyLayout[a] === code)?.[1];
 /** Standard-mapping pad: RB light, RT heavy, LB block, LT parry, B dodge, X revolver, d-pad left its reload, Y Reagent, d-pad down Laudanum, d-pad up a flask of oil, R3 lock-on, A interact. */
-const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD_BUTTON.rt, block: PAD_BUTTON.lb, parry: PAD_BUTTON.lt, dodge: PAD_BUTTON.b, shoot: PAD_BUTTON.x, reload: PAD_BUTTON.left, lock: PAD_BUTTON.r3, heal: PAD_BUTTON.y, item: PAD_BUTTON.down, throw: PAD_BUTTON.up, interact: PAD_BUTTON.a };
+const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD_BUTTON.rt, block: PAD_BUTTON.lb, parry: PAD_BUTTON.lt, dodge: PAD_BUTTON.b, shoot: PAD_BUTTON.x, reload: PAD_BUTTON.left, lock: PAD_BUTTON.r3, heal: PAD_BUTTON.y, item: PAD_BUTTON.down, throw: PAD_BUTTON.up, interact: PAD_BUTTON.a, mount: PAD_BUTTON.l3 };
 
 /** The buttons the game reads as held (guard, and the dodge that sprints): every other acts on its press alone, so one that stays down for seconds is stuck. */
 const HOLDS: ReadonlySet<Button> = new Set<Button>(['dodge', 'block']);

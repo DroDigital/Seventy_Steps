@@ -28,6 +28,7 @@ import { ACCENT, button, createScreen, el, footer, heading, option, tabs, title,
 import { keyLayout } from '../core/bindings';
 import { moveSection, movePage } from './signMove';
 import { relicsTab, slotPage } from './signRelics';
+import { mountsTab, refreshMountEntitlement } from './mounts';
 
 /** What one more level of each gives, in words. */
 const GAINS: Record<LevelId | UpgradeId, string> = {
@@ -57,7 +58,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   };
   const regionName = (id: string): string => getRegion(id)?.name ?? id;
 
-  const TABS = ['Level up', 'Weapons', 'Relics', 'Travel'];
+  const TABS = ['Level up', 'Weapons', 'Relics', 'Travel', 'Mounts'];
   let tab = 0; // the tab open: Level up again at each rest
   const REST = 'Resting restores health, sanity, Laudanum and Reagent, reloads the revolver, and brings back the creatures you killed.';
 
@@ -147,7 +148,8 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     if (tab === 0) grow(panel);
     else if (tab === 1) arms(panel);
     else if (tab === 2) relicsTab(panel, g, (slot) => screen.show(slotPage(g, slot, () => screen.show(main))));
-    else travelTab(panel);
+    else if (tab === 3) travelTab(panel);
+    else mountsTab(panel, g, () => main.redraw?.());
     footer(panel, REST, close);
   }
 
@@ -176,7 +178,11 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     return p;
   };
 
-  g.events.on('Rested', () => ((tab = 0), screen.show(main)));
+  g.events.on('Rested', () => {
+    tab = 0;
+    screen.show(main);
+    void refreshMountEntitlement(g).then(() => { if (screen.open) main.redraw?.(); });
+  });
   return {
     get open() {
       return screen.open;

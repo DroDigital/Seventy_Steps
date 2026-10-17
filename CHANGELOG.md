@@ -3,6 +3,15 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Mount update
+
+- The Borrowed Reins, an early university errand, unlocks a spectral chariot pulled by two skeletal horses.
+- A circa-1914 touring automobile provides an optional $0.99 DLC appearance; both mounts share every traversal setting.
+- Faster open-world travel with acceleration, heading-based steering, stamina-driven galloping and a shared collision footprint.
+- Animated horse limbs, necks and reins, spectral fire, wheel rotation, suspension, steering, seated drivers and travel audio.
+- Mount selection at Elder Signs, rebindable B / L3 controls, saved preference, and verified Steam entitlement.
+- A read-only coach-house exhibit (`?mounts`) presents both models. Steam app IDs and store pricing still require release setup.
+
 ## 1.0.0-rc.1: the release candidate
 
 **For the first hour and the way to a release**

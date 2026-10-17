@@ -219,6 +219,22 @@ describe('a pad whose stick has drifted', () => {
 });
 
 describe('reset (what pausing does)', () => {
+  it('maps the mount to B and L3 with one press per release, independently of dodge', async () => {
+    const pg = await page();
+    pg.key('keydown', 'KeyB');
+    expect(pg.poll().pressed.mount).toBe(true);
+    expect(pg.poll().pressed.mount).toBe(false);
+    pg.key('keyup', 'KeyB');
+    pg.poll();
+    pg.pad = { axes: [0, 0, 0, 0], down: [] };
+    pg.poll();
+    pg.pad = { axes: [0, 0, 0, 0], down: [10] };
+    const f = pg.poll();
+    expect(f.pressed.mount).toBe(true);
+    expect(f.pressed.dodge).toBe(false);
+    expect(pg.poll().pressed.mount).toBe(false);
+  });
+
   it('lets go of every key and button', async () => {
     const pg = await page();
     pg.key('keydown', 'KeyW');

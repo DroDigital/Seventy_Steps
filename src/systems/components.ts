@@ -21,6 +21,7 @@ export type { Overworld } from './overworldTypes';
 export { BANDS, type Band, type GameEvents, type HitOutcome } from './gameEvents';
 import type { InputBuffer } from './inputBuffer';
 import type { LockState } from './lockOn';
+import type { MountState } from './mounts';
 
 export interface Transform {
   pos: V3; // feet
@@ -232,6 +233,7 @@ export const isAbsent = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.c.d
 /** Player-only state that is not a component. */
 export interface Pilot {
   id: Entity;
+  mount: MountState;
   buffer: InputBuffer;
   dodgeHeld: number; // frames the dodge button has been down, -1 while up
   sprinting: boolean;

@@ -21,6 +21,7 @@ contextBridge.exposeInMainWorld('desktop', {
   writeLog: (report) => ipcRenderer.invoke('desktop:write-log', String(report)), // a crash report, kept (round 46)
   openLogs: () => ipcRenderer.invoke('desktop:open-logs'),
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
+  ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; never purchases or accepts an app id from the page
   store: { // saves, settings and records as files in the user's data folder (round 12)
     get: (key) => ipcRenderer.sendSync('desktop:store-get', String(key)),
     set: (key, value) => ipcRenderer.sendSync('desktop:store-set', String(key), String(value)),

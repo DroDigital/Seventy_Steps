@@ -85,6 +85,8 @@ import { takeCarry } from './systems/records';
 import { takeFlag, title } from './ui/titleFlow';
 import { createArenaScene } from './world/arenaScene';
 import { roofedAt } from './world/terrain';
+import { refreshMountEntitlement } from './ui/mounts';
+import { startMountGallery } from './ui/mountGallery';
 
 const INTERACT_GRACE_MS = 350; // after a talk or a menu closes, E is held back this long
 
@@ -120,6 +122,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
   const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty });
+  void refreshMountEntitlement(game);
+  addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
@@ -270,6 +274,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time);
         placeLantern(game, alpha);
+        if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z });
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
@@ -319,7 +324,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
 installCrashLog(); // the last errors, for a crash report (ui/crashLog.ts)
 const params = new URLSearchParams(location.search);
 const variant = params.get('variant');
-if (params.has('look')) startLookTest();
+if (params.has('mounts')) void startMountGallery();
+else if (params.has('look')) startLookTest();
 else if (params.has('bestiary')) startBestiary();
 else {
   const opts: StartOptions = {

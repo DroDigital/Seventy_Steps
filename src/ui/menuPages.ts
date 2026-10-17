@@ -104,7 +104,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
 
 const KEYED = (a: Action): string => t(`ctl.${a}` as Key);
 const PAD_OF = (a: Action): string => ({ forward: t('ctl.stick'), back: t('ctl.stick'), left: t('ctl.stick'), right: t('ctl.stick'),
-  dodge: 'B', shoot: 'X', reload: 'D-pad ←', lock: 'R3', heal: 'Y', item: 'D-pad ↓', throw: 'D-pad ↑', interact: 'A', map: 'View', journal: 'Menu',
+  dodge: 'B', shoot: 'X', reload: 'D-pad ←', lock: 'R3', heal: 'Y', item: 'D-pad ↓', throw: 'D-pad ↑', interact: 'A', map: 'View', journal: 'Menu', mount: 'L3',
 } as Record<Action, string>)[a];
 /** What cannot be rebound: the mouse's buttons, looking, and the menus' own keys. */
 export const fixedControls = (): readonly (readonly [string, string, string])[] => [
