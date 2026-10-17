@@ -12,6 +12,7 @@ export interface BoxCollider {
   kind: 'box';
   min: V3;
   max: V3;
+  fall?: boolean; // a drop: the investigator falls through; everyone else is still pushed out
 }
 
 export interface CylinderCollider {
@@ -21,6 +22,7 @@ export interface CylinderCollider {
   radius: number;
   y0: number;
   y1: number;
+  fall?: boolean;
 }
 
 /** A box turned about the vertical axis: walls, fences and houses at any angle. */
@@ -33,6 +35,7 @@ export interface OrientedBoxCollider {
   yaw: number; // radians, yaw 0 faces +z like everything else
   y0: number;
   y1: number;
+  fall?: boolean;
 }
 
 export type Collider = BoxCollider | CylinderCollider | OrientedBoxCollider;
@@ -95,9 +98,9 @@ const NONE: readonly Collider[] = [];
 
 const GROUND_STEPS = 12;
 
-function pushOut(w: CollisionWorld, list: readonly Collider[], pos: V3, r: number, h: number): void {
+function pushOut(w: CollisionWorld, list: readonly Collider[], pos: V3, r: number, h: number, openEdge: boolean): void {
   for (const c of list) {
-    if (w.off.has(c)) continue;
+    if (w.off.has(c) || (openEdge && c.fall)) continue;
     if (c.kind === 'box') {
       if (pos.y + h <= c.min.y || pos.y >= c.max.y) continue;
       pushOutOfRect(pos, r, c.min.x, c.min.z, c.max.x, c.max.z);
@@ -127,11 +130,15 @@ function pushOut(w: CollisionWorld, list: readonly Collider[], pos: V3, r: numbe
   }
 }
 
-/** Pushes a standing capsule (feet at `pos`, radius `r`, height `h`) out of every collider and back onto walkable ground. */
-export function resolveCapsule(w: CollisionWorld, pos: V3, r: number, h: number): void {
-  pushOut(w, w.colliders, pos, r, h);
-  pushOut(w, w.near?.(pos.x - r, pos.z - r, pos.x + r, pos.z + r) ?? NONE, pos, r, h);
-  w.contain(pos, r);
+/**
+ * Pushes a standing capsule (feet at `pos`, radius `r`, height `h`) out of every collider and back onto
+ * walkable ground. `openEdge` is the investigator in the open world: pits, wells, bridge gaps and the
+ * land's edge are walked onto, and the fall system kills them there.
+ */
+export function resolveCapsule(w: CollisionWorld, pos: V3, r: number, h: number, openEdge = false): void {
+  pushOut(w, w.colliders, pos, r, h, openEdge);
+  pushOut(w, w.near?.(pos.x - r, pos.z - r, pos.x + r, pos.z + r) ?? NONE, pos, r, h, openEdge);
+  if (!openEdge) w.contain(pos, r);
 }
 
 function firstHit(w: CollisionWorld, list: readonly Collider[], from: V3, d: V3, t: number): number {
