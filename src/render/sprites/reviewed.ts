@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 /** Lossless reviewed PNG pages and their authored animation registrations. */
 import type { DirectionalClips, SpriteAction, SpriteDirection } from './directional';
+import { mergeReviewedArt, validateAlliedManifest, validateReviewedManifest } from './reviewedMerge';
 
 export interface ReviewedFrame {
   source: string;
@@ -77,14 +78,12 @@ export function reviewedSize(entity: ReviewedEntity, manifest: ReviewedManifest)
 }
 
 /** Assets resolve under both a hosted subdirectory and Electron's app:// package. */
-export async function loadReviewedArt(made: (share: number) => void): Promise<ReviewedArt> {
-  const base = `${import.meta.env.BASE_URL}creatures/reviewed/`;
+async function loadArtworkPack(base: string, expectedCount: number, made: (share: number) => void): Promise<ReviewedArt> {
   const response = await fetch(`${base}index.json`);
   if (!response.ok) throw new Error(`Creature artwork index could not load (${response.status}).`);
   const manifest = await response.json() as ReviewedManifest;
-  if (manifest.format !== 'seventy-steps-reviewed-atlas-v1' || manifest.entityCount !== 105 || manifest.frames.length !== manifest.frameCount) {
-    throw new Error('Creature artwork index is incomplete or incompatible.');
-  }
+  validateReviewedManifest(manifest, expectedCount);
+  if (expectedCount === 7) validateAlliedManifest(manifest);
   let completed = 0;
   const pages = await Promise.all(manifest.pages.map((page) => new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
@@ -97,4 +96,15 @@ export async function loadReviewedArt(made: (share: number) => void): Promise<Re
     image.src = `${base}${page.file}`;
   })));
   return { manifest, pages };
+}
+
+/** The original 105-creature atlas and the seven-ally atlas remain separate files. */
+export async function loadReviewedArt(made: (share: number) => void): Promise<ReviewedArt> {
+  let oldShare = 0, allyShare = 0;
+  const progress = (): void => made(oldShare * 0.9 + allyShare * 0.1);
+  const [base, allies] = await Promise.all([
+    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/reviewed/`, 105, share => { oldShare = share; progress(); }),
+    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/allies/`, 7, share => { allyShare = share; progress(); }),
+  ]);
+  return mergeReviewedArt(base, allies);
 }

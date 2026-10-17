@@ -1,0 +1,5183 @@
+{
+  "format": "seventy-steps-reviewed-atlas-v1",
+  "entityCount": 7,
+  "frameCount": 272,
+  "filter": "nearest",
+  "mipmaps": false,
+  "gutter": 1,
+  "sourceIndexSha256": "02619aab93807389528c5c3bfcd79d20c0dcd8e0578b1d419f56dec9905fe5ee",
+  "pages": [
+    {
+      "file": "allies-0.png",
+      "width": 1980,
+      "height": 660,
+      "sha256": "9c9a19c47d6b2f285622a51911c989b7bf78cbb8707ca139ce4b715c06023a7a"
+    }
+  ],
+  "frames": [
+    {
+      "source": "sprites/nodens/64x64/front/idle_0.png",
+      "sourceSha256": "e18a44ebd0ae75f9b4eae49bc7bc72717cb0e52377ac51841805c3f2f6db0635",
+      "pixelSha256": "84dbd5e07dc2e5167271239ae86989bc8ec2072bd715674e31dd52249fb7cde3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        7,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/idle_1.png",
+      "sourceSha256": "aec85807d6ccf1b7685f11c9282fcab6155f397fd9c09e531541dd7f09643774",
+      "pixelSha256": "91f206159ca06fc8b2b42ceb4fb9f7f7a45475e92f5a046474201660998542af",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_0.png",
+      "sourceSha256": "b8119244f17f12f7f87b21757e218ae9d0a49c7ac9e724feebcc9283eb908862",
+      "pixelSha256": "5bb3aa412544df643a4297652028607509299d2c96e3f4e91f3c320f2a7f5cb2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_1.png",
+      "sourceSha256": "ff37a3f920290ff4ef30e75b3aaa65b2e205153b86177ebc734d805913584af7",
+      "pixelSha256": "788e32c23f4af6dde8f44536ebc29947b96285dfbff874741e6c2d6cc451daef",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_2.png",
+      "sourceSha256": "a70a9c1b86362d8f8396fdcd9bf5153979e3a67db7daf27dac1c659f8bb8be88",
+      "pixelSha256": "ffc843e807bed5456d57df51ff49debb19f6cc20709e9b623363ba6398dcdd6d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_3.png",
+      "sourceSha256": "faddf80ba87eb5c9963890424f9e865a221602b4f333f009dd2e157748453ea5",
+      "pixelSha256": "ab07d15905c5f2774b871f029916542c78ffd5b7ca11cc42c429e322c8051bee",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        7,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_4.png",
+      "sourceSha256": "7e684a4ad39fb9c8b39c7cb355906655f76f70eef97a9dffa2a2ce16665e572c",
+      "pixelSha256": "c3c5b0dc1e4daea69c63e8b45ad04dd6150bc5e155b8abab08a21717737567fc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        7,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/move_5.png",
+      "sourceSha256": "7169f165946ef7b75662a29d6fb5887cfcd4105873dc267538685fe49a98a615",
+      "pixelSha256": "9d2339e4acfa450705e022fbd427c3ac865efb90818ad05cf83410b04268735e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/attack_0.png",
+      "sourceSha256": "ea36e6ac37d21656173755957b98e9faa4c4917c611bbcbb84220f7963515ec2",
+      "pixelSha256": "9ec67065a973a7d9ac593c15ce0181e0d273b454ba5cbbff97d8ff1531a05f01",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/attack_1.png",
+      "sourceSha256": "1626455533dddb01dbac8082c9eacb5c71b8484c474c7bb63de360f71f1dcc7f",
+      "pixelSha256": "54982efb1e6ff0f974714c80fb6250ccdfb9b96d48c36432d8670072c50227f8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        7,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/attack_2.png",
+      "sourceSha256": "d108b2a97b9659d2b1ab9fee5ee3b1f6fae2f08e4ed92e830ef46db9f108a19a",
+      "pixelSha256": "2c89769ec0cdd701e7316631b781414ee45d281b5cf770ea64b56614527125e6",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        7,
+        52,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/hurt_0.png",
+      "sourceSha256": "b7b7d0be34ed572097cfd36392c8f486db0feda97352a35011cc9470240aa756",
+      "pixelSha256": "32b991094592b552d69304caf8aecd480251501faf0d64ceb02da3d654416591",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        10,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/front/hurt_1.png",
+      "sourceSha256": "54ede2c72b43faff2cfd1001b152c6c72fe9cc624fb1eee525d8d8491823ab0e",
+      "pixelSha256": "b662a184165b8695bf1e87b678f751591029befe14c1bfd7ecf0ff2dd85b8dda",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/idle_0.png",
+      "sourceSha256": "31eb96d8ca1ebd707b1fd29b323b2703473c0f68fea512a54a830aa9c6ae219e",
+      "pixelSha256": "1767c93f6fb188950f8f7caf818af7c95d56bdf2af2c18e76857c55f3b606cd7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/idle_1.png",
+      "sourceSha256": "0a3db02c4d8a11c2eaac17b88dba3cb57235dcfdfacf990e85f9ca82c7037ab5",
+      "pixelSha256": "d698fc4b3bdb65239cf9213a9cadd194cd04657f9dba3a4b2a7f774807a8001e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        7,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_0.png",
+      "sourceSha256": "7bc53ad8c3867a73505491ce0048a45e8345241a9aabd56548c0504820b2d6ba",
+      "pixelSha256": "38540ed58cafd4ca9d2a86e0a80df8e9710eea4f938663b3cef8651c5dfc0f78",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_1.png",
+      "sourceSha256": "8aca05cf8ce5aec65334e83341a9a75c292f3f328c59dc34d42acb6af1b04497",
+      "pixelSha256": "4f8ed1e7a252f8109a91339711932144315788e71b2dda1216c6498b62fab374",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        7,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_2.png",
+      "sourceSha256": "16734fcb83b054953e2adfea52e8e75938a344afa1ec4b73b63f7e7d211d2061",
+      "pixelSha256": "12d15dfa2a482b2ed4337ad302473c44b018afb4003f1226ead3cfa5522ca625",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        8,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_3.png",
+      "sourceSha256": "39e9840861d8af3767ead02b149aef55cc712e95bdcd5c8c5d1f82f519e1350b",
+      "pixelSha256": "1d628c2dca677c2e85afb792bd14e3a0d898145e3626225db79109745f87b047",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_4.png",
+      "sourceSha256": "2b526e13e627e1dbd65ad2c71ea7c57a4ba3f304fcb3b4289427936d57ebc4cd",
+      "pixelSha256": "737bba21f98be8ca82502be4a2dc5283f40435a84f0c07ca7990db877fce94cb",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        7,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/move_5.png",
+      "sourceSha256": "a12b8ff8a4e42940f5acafded8247939330da45a141181736f1d8b7d38ddaa00",
+      "pixelSha256": "4fe24c63e83170e015b9941d06672de77f4ba28e943c73fc69e3c335f079d026",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        7,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/attack_0.png",
+      "sourceSha256": "d7195b9e17539e2efbdc0150a7e73a4850a12f823260d50acba8d6c4ae8c3ddd",
+      "pixelSha256": "e5d135182ff86e7a7bb9ae80c4304f0179857fee4b1edf09cec01f453cd15ec7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        6,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/attack_1.png",
+      "sourceSha256": "3771e36d64c334a9a8ed36b9f2fc018833ed54df2a416fc359f91543a47eba85",
+      "pixelSha256": "b4e77d169fa78a4dfa4b2ac091cfda38c8fb10397ada691842292e68b2dda377",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        2,
+        6,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/attack_2.png",
+      "sourceSha256": "febb693bfebc936bda5c5c34be0724de2296e052ffcad9fabd74c329d567fb02",
+      "pixelSha256": "4ea0dd79b5cc0c4e78f2ef6cedf0136745545a31b1e402252222d27a5fb336a3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        7,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/hurt_0.png",
+      "sourceSha256": "caf260a328849058462d700054dba6835c59c6ff3dbb715caaef7f63382e92b6",
+      "pixelSha256": "07a2966bfea64adc2e7ad390eb1c1c72c0fd7e22903ee5953ba64ef422018964",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        8,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/left/hurt_1.png",
+      "sourceSha256": "664c82c0962b65e6845ec3c7bb6e8d9a56020d59067c4bcca4fc229eae3ccfaf",
+      "pixelSha256": "454252692f5c6fa2b261a0890fff1f7e74db8b019f5e22841692c4dabda5eed7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        8,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/back/idle_0.png",
+      "sourceSha256": "e039a3d27cceaf23d298557d68755f05cb49a3cfb5234ccf68dfd81d976b9d2f",
+      "pixelSha256": "1698655581c005d48e835d3649837d5005e5bdd62f346f0b612f0ac23f361842",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/back/idle_1.png",
+      "sourceSha256": "8b4340e5e76c13b9cb0adcd10d20b5a673e8676e4d4216eccd90dfa75936b842",
+      "pixelSha256": "be7fac9353deab6f4f63d7b72bab37401c601ee228a2df275d6ceb44079e5137",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        7,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_0.png",
+      "sourceSha256": "899e7e24987e2deb0f81666c5f25694eb6cabb4c7e22010ae8c7ddd7b702cd6d",
+      "pixelSha256": "ce2cbf58a6e59992ca66eee696d269b4c0e873511c0fff89c99000cadccf62d3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        6,
+        52,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_1.png",
+      "sourceSha256": "f82aea04ed36a78602e6be00b3f0fbb73edfbbe24023bd1285cea6e8b850346c",
+      "pixelSha256": "015357a11efc3d7278ae971a1c0b9de98da7ba79882212cceeb15291c3b4268b",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        6,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 1
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_2.png",
+      "sourceSha256": "84423762d24f6d57d1a6ecd6c40ad232b4b149f5aea8fb2c6c8b63b210c09284",
+      "pixelSha256": "ea485d4b61990c2a5b98cd9000303d3dc42f0695e85feb7c34ca3873b41775f1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        6,
+        52,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_3.png",
+      "sourceSha256": "ed7ee228213658f5b33c3040d6a281498529e7cbcb353d54e73efa324f4cef5b",
+      "pixelSha256": "0fa0d8ff5f07c80a0c3362e8fc206e5c809769fe6c683685eacf46ef01c06393",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        6,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_4.png",
+      "sourceSha256": "672f6d69bf1be19e23f664541c0146002a1d7615e8a7e438dd0c26890e05a069",
+      "pixelSha256": "489cfc3bcd3be0f56cf942bed4811a32bfb45f2256b11c2e1043687ce18e06c9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        7,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/move_5.png",
+      "sourceSha256": "240e12ee5bf155571cb4d41ebf802100273070504d0f9bd887510f6c3895ad29",
+      "pixelSha256": "9267ca06db842185e340f116c3c8ce31a510e10a73005e1583571536ad0ecb8c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        7,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/attack_0.png",
+      "sourceSha256": "53b6e5457a426f874ee814641b295d22b2bc29ad838d442c15ccc15fb244e663",
+      "pixelSha256": "78a3613828568e220542d30910733c1578f947a5e3dd52952f00c78f9d599d68",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        9,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/attack_1.png",
+      "sourceSha256": "fa9951b3be0ac49e1f33e0a5d684391d6f55158280cf9854af610c1cd7f37496",
+      "pixelSha256": "90af839fd3ee473ed583d5f6ad78a7f58068ca0dd376b0147228afc7595db101",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        8,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/attack_2.png",
+      "sourceSha256": "166ddb3ec2770ed092456df299c4950c5a149a516d569839bf336267c03fe2d1",
+      "pixelSha256": "c3faeaf31c5d556216cef78748233e57d0193de48415e5f31052ec39415d27fa",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        9,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/hurt_0.png",
+      "sourceSha256": "1c508836eeeb91d0e4da0292b32e6dc5438a25fa2448d7e1f97dfc43c1114ed1",
+      "pixelSha256": "b18010d91eb1e6afbe80c6ef630dd73bf36b93fb0ead31ffb75209f0b2d98d69",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        11,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 67
+    },
+    {
+      "source": "sprites/nodens/64x64/back/hurt_1.png",
+      "sourceSha256": "533fa5bd262957d2efc0cdaf8706c1f31122b954858b2ddb3fd3806319f0a16b",
+      "pixelSha256": "63f564e9155e14bb73fad04958030cb2e18665b27272689a87f0c089a6ca94bb",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        8,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/idle_0.png",
+      "sourceSha256": "de438d4f3d1a736422f44c5f52e7e4c20cd42e29a356e227bdff38f246704253",
+      "pixelSha256": "f2f1e3b70e2c55ef0186f47bd01197a65d0f3fcc57be0b8451d40f76bcdfee58",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/idle_1.png",
+      "sourceSha256": "c5118c3d63f53bad0cba1ad1281e403ba035eccea15e23a7a96170b68d0b2c25",
+      "pixelSha256": "9c89ba129ad640b9f2cd2c85972187f5725a3a1f990503f73a62ae208f68be4a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        11,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_0.png",
+      "sourceSha256": "a59ff1d8391e7934a5f7ca96442f77e8f21643ac30c02d84890d3b2717c73de4",
+      "pixelSha256": "1d3ff68ce7d8e2d70c3a846ac17f8c8cff2a35f282a4e06fa328991a1b92c086",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_1.png",
+      "sourceSha256": "f5c66138123f2fd9785b46a8eb860db02f071eba98952ed2c419fc7626e18ad7",
+      "pixelSha256": "897e5d26af23da26145b0226188a4f364b4b164d1163d81c2b1c82224c005097",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_2.png",
+      "sourceSha256": "47f0633e4e401d2134a91fbd90c960cb8badefc4b236ac03ab4aaa919c568120",
+      "pixelSha256": "d58cdf53f87fdfb067a7050c73cbfaac2ea6d236748026482d91aec398009153",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_3.png",
+      "sourceSha256": "8a076b016617ea4605bd6900b4c19dd2e4eb5838bab32a6d0fe66dfbc62a33a3",
+      "pixelSha256": "9684d0258d091fedce43d0fb3bd580cb0829f7294b933b689b0746210f8bce0e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        46,
+        61
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_4.png",
+      "sourceSha256": "03e5a7afacf2c8a3de177bf911f1f7eea0f1b55448574e7ee49629f221a6a8b9",
+      "pixelSha256": "882dd5d6d9780805e31c11d3ff99f9dd7838272ed435be5df7fd3435eab7adf3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/move_5.png",
+      "sourceSha256": "f2161c03c7acf4e5fd1231e6bef37ed6b416920dbb909aa1e22f619b08fa445a",
+      "pixelSha256": "ea577143670700f81c3619c755a9f1caa7201892e70be9e23800276508b4d5f1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        10,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/attack_0.png",
+      "sourceSha256": "5df8c4e37829dc7007a65af1a5611420ed20a513a2d532f4cfea61b8a1351fd2",
+      "pixelSha256": "881fbd0ffaa00d5623cdbd85e04c291453e3df128a2a9cb38450dcd0a15e519c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        11,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/attack_1.png",
+      "sourceSha256": "277f19844fc5132fd3d818bab9522a1acabc93dee30d6337d2c12e6aa4895390",
+      "pixelSha256": "2456298bfa76b65b85fb87ec7c658dbb1b0536d2d098a43b2d86094917eac303",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        12,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/attack_2.png",
+      "sourceSha256": "006078929db6ea429a2d84f70c496b327a1fea66dbfb983a5ae4b0c7f3c499eb",
+      "pixelSha256": "1cf50fcb3ffead938728df82c76f5c878ac06f6d746bd008e3ad09b601dcff3d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        11,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/hurt_0.png",
+      "sourceSha256": "b0b940437f41ecf323bddf27bbf5063f3a499cc22bca28754c06ca32d9ad7c15",
+      "pixelSha256": "8e588e37576cf2a991bd887f261cb8ae0d8dabb01eeef04ef7db8af8abac6bce",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        13,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/front/hurt_1.png",
+      "sourceSha256": "21c1642dbea88f01194953f2b5c89b5bed28440e3a90199bb9a6f0c1800bb868",
+      "pixelSha256": "54126b0941cfa1c17896d9f1e3bc83f248228f45dd4542b5d99e06d70f998ac0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        13,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/idle_0.png",
+      "sourceSha256": "e73274ed7684c533c39db3c14eb6b1faf2e7ceb51eba5ce4671c1f1e01f49a86",
+      "pixelSha256": "9eba0f15e77e2b467a87793f2975f316ddafd90ebd61b92d18ce52c265f1c33f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        20,
+        12,
+        44,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/idle_1.png",
+      "sourceSha256": "4ed10db701ff952eeb9efe8f0578aba78054a052dc6bf84979a7868995db5dbf",
+      "pixelSha256": "1789ecae75da56d72034c7b4b73f640810684e525ab50e1eac96bdaa461b0dfd",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        21,
+        13,
+        43,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_0.png",
+      "sourceSha256": "c0901b9a24b20ccbf8e65adf0566850b64e3519b9ce40fecf20ec0c88a9016b8",
+      "pixelSha256": "f2a56b59870c85709c70458a3748069ec37d873954cbe012bd8bd78cf18b6c43",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        13,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_1.png",
+      "sourceSha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
+      "pixelSha256": "6fe0a305c1111826eabd84274caccec0bdbb5e6fb355a5ecea8975c7a9873428",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        13,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_2.png",
+      "sourceSha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
+      "pixelSha256": "61c4575718c85d710dc38060039df500f94bbda3c05f3e7e6bf916f2d7b02301",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        22,
+        13,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_3.png",
+      "sourceSha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
+      "pixelSha256": "af3ea0cb8f104fdef95b85609f4bdefa83733826a799c49bbf0f8fa401b49318",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        20,
+        13,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_4.png",
+      "sourceSha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
+      "pixelSha256": "8da90afd6b9b756ba43486458d9441bebcce05ee3febb4b9ce3baf8da3c17f6a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        21,
+        13,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/move_5.png",
+      "sourceSha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
+      "pixelSha256": "46cac3a7287489389cf5af7950b7317e13309a20e5f45ea2adeddbcd6d05dbd7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        22,
+        13,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 67
+    },
+    {
+      "source": "sprites/tritons/64x64/left/attack_0.png",
+      "sourceSha256": "27e57bb8a5fc0ce4809abbde4664933ede456bbff4b26c70375e30817bad3971",
+      "pixelSha256": "487454b18392cac88b76dfcbe510c8a8bf7cbc9f4d9ee1bdf2b8e2d5b262616e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        15,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/left/attack_1.png",
+      "sourceSha256": "a3aff00a2b7676d67ed26d1049adc35a83e93d8f0a7d3f52aa246cf0564d7f39",
+      "pixelSha256": "b21783fad904d72f46103a7ff5df6940707be1fc66b9f31155a65561c06c82c5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        18,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/left/attack_2.png",
+      "sourceSha256": "ffccae4787267c52413762069bfd04514cdf4e4a32f39af148d1f2d1424434a5",
+      "pixelSha256": "f311f944c8a9c95ab42482cb670f53b429363ca89552a772e1f8a4494dfacdf4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        18,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/left/hurt_0.png",
+      "sourceSha256": "0948a56ee49fdbcf58a46f485d521844f385055045e76fd03fedd378fa5137d4",
+      "pixelSha256": "717cd301c3df213b00554af04bfb6bb72bc91cda19d0d7a8be6bfcac6e1882e8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        14,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/left/hurt_1.png",
+      "sourceSha256": "f64686f12b02d9baa2275d0b6783abc8502d46f3e1dace6be909a6a8071c19cc",
+      "pixelSha256": "e150ee183c89cfe97e651bdd1bf7cc91b7227f1078305891c4d5f2cbe4c431a0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        14,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/idle_0.png",
+      "sourceSha256": "6d68460f6fb18d8ef6f009881e6ffc641864dba9f2239901a8ec21f9868a32e2",
+      "pixelSha256": "934aedd62b1a75f411d3776b81dabfaeed9a80c22b7702dd406510fdcef6e4d6",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/idle_1.png",
+      "sourceSha256": "02c146b8b4d52584fa5fd54c36784fc6f811704f60718e029ccf6c78a5cfaa4b",
+      "pixelSha256": "cb04737ce5a96dd1db5584d2f660aa1d5d3ef73a9bc88918755cbb7500839a5e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_0.png",
+      "sourceSha256": "db27b1882a8c24f02d4b69fbe43ebeacadbb02dd4594746e675e7b388d1ef5b6",
+      "pixelSha256": "ded00fbeb2c575dc019b99ce853b2ad71dc03903f2da4e93f2a0dbea96b8ec5d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        46,
+        63
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_1.png",
+      "sourceSha256": "851adbd34b57c1353c101404799549da324d0681b7c748cac1abeb66b761d16b",
+      "pixelSha256": "fd1493b83b53a6e625f0e6ea1c5410d1fe2d5594e0a6d651d76b0a9adb15ff2b",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        11,
+        46,
+        61
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_2.png",
+      "sourceSha256": "4506ea0155590943e7c9750dd07496035c9f8daed1c925c886609432500b0648",
+      "pixelSha256": "23f5a4697da27a560ae0ebe6a705d172d88c781ceec344aa39b4ae232a2f94d4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        11,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_3.png",
+      "sourceSha256": "ba227c91be264eb23e25cf8fbac4ad14f2d298e30a4a308f138fa4cfd39f414f",
+      "pixelSha256": "b7e97f0691560ef0972a5ecf668b788b32303b06f6ad74755abaedff3bea8b0f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        11,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_4.png",
+      "sourceSha256": "32b2fd66d5ca7e74405ea2143cccf05d217fcfbb5c7c25df784cc53c5b6cdf3d",
+      "pixelSha256": "34434c780b93ab20f2d8854598babbb24e5b5ce15d9ba82ab0fd391ea8432efc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        11,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/move_5.png",
+      "sourceSha256": "8023e302ac27fa478f563baa491164e846fb36be0e8960f95118846fd66bdbee",
+      "pixelSha256": "6211a0f986705545a2879fad3ab454ed82f0c66442f1dfe20c234a9a34f9c949",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        11,
+        48,
+        61
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/attack_0.png",
+      "sourceSha256": "74941814bf425002b5b7ecac7dd38ca86be3cc7906f2e18f1ffbe7049d2b235a",
+      "pixelSha256": "022e7f28cc172c871ce36633897e05c66fb7407f1945412b13e60dc4337302ad",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        9,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/attack_1.png",
+      "sourceSha256": "d75273d859e6c2082ff52be764ebcd4182236de101f2adf23d6b3bab974675a3",
+      "pixelSha256": "6a42d470412428a62b21489657a0e0ed5239ff06dfaf201b1876f536b4856fbe",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        14,
+        53,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/attack_2.png",
+      "sourceSha256": "bc685e7bb8eec5e6083dcd57f03b9efa006c802350e4c470d376deb1ed3e32c0",
+      "pixelSha256": "0e7986dca5acf1f81026eaf4b9b978deca22708376dbc731598af4ba606366d5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        11,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/hurt_0.png",
+      "sourceSha256": "54a27fba28733c29f880c34947827e11ff200222d61fdd77846c11e2a4ebec5e",
+      "pixelSha256": "34d4ccfc065a9a51b9a9da4d1d2ae6bc4b7e000bd73b55c19bde54de7f68c27a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        14,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 133
+    },
+    {
+      "source": "sprites/tritons/64x64/back/hurt_1.png",
+      "sourceSha256": "49b56abb15b4089c291c0545e7634d3b7cce04bf0e1b0029da67eddb4762d60b",
+      "pixelSha256": "8c01872800849ccc30caaeb0fd3bd369d05573ea666663c5657cd410bb8a67d0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        12,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/idle_0.png",
+      "sourceSha256": "865b839858d7d3fabe978d134b7e4b4edbfa2681d54c61b5da38447489dbc021",
+      "pixelSha256": "221ea5690e7e11ecd974ad417625636b8c8b3b1835f9fb301161260b4fa74c26",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/idle_1.png",
+      "sourceSha256": "2a20fb56a211393f22413640f31250a6d5b0daff45ed07891df315d32bd7ee4e",
+      "pixelSha256": "647f5b7437c764b2041925b91fc020ca7f5e811f264755a426c12aa6dce48727",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        29,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_0.png",
+      "sourceSha256": "e8045bfe08d4a827ebe45a1bd3b5bdda65e0f6decdc4d815416ad85d852f6872",
+      "pixelSha256": "95b7ac0a9fa68c70135a1127c9948fff4136420d16686179b19ddb4d11b66343",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        30,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_1.png",
+      "sourceSha256": "b2e8ce5cb4cc3a1473e784c1f0e72a4bfb758e9c93481e3714d7c68cfaaecba7",
+      "pixelSha256": "3bcc34f67aa1d8c1fb54557b1d2f2c3a6349dd4f919800d6ed1af1f3e8d08934",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        30,
+        45,
+        61
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_2.png",
+      "sourceSha256": "15a1bab5f5d83285fa2a9c43c2d14fdbdf6ef1aa68fee2f834ae110f97661950",
+      "pixelSha256": "3ab67707bd773cbda374af41d325344724afb3bf9018e1c715eaba9a43006f93",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        20,
+        30,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_3.png",
+      "sourceSha256": "8adb0832eab01c768fda989839adb17ff7ce17bcf1618d6e47f94684f934685c",
+      "pixelSha256": "93d17bd4575a263562a23928a14a65034b2c559bbff03b47d30810728b9f2056",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        30,
+        42,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_4.png",
+      "sourceSha256": "e0b60ddb63e0e9420f3ecc90df40db6845bd5fe483f4867c3ad1e8346db1bb16",
+      "pixelSha256": "f1413e9461dde27e7cda9ea145d45e8554d4e0a422dd04ead050c6cb83c9df35",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        30,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/move_5.png",
+      "sourceSha256": "5f6f11b9d18547545a4279eac0e4e6cdca27dd87297021fe67f933c2166ed648",
+      "pixelSha256": "c7cc20ae1dddd209d2ee21b0ed6ab30fdd2df9804a0cb1cbbf8ee23cc7afca5f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        30,
+        44,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/attack_0.png",
+      "sourceSha256": "3b682410d98342c2610668cea87134bbb0deb44d04db4285dff889d508bbad92",
+      "pixelSha256": "d122e5335450cf508eb815a7b4417011c9d23fb18a854bb65a311525814bfaf6",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        33,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/attack_1.png",
+      "sourceSha256": "2319c35663282e76ab7f5ed23674d9187e42a33a7927f3c103800a2e92918110",
+      "pixelSha256": "d7dcca317c123373c6662c1ba7d7a8b9ba2efd933f4e66138ae593addbaaa534",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        31,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/attack_2.png",
+      "sourceSha256": "3fa046a3ec712068d4396aa1299b10c673aa3aa96e5ca3d3244d752d2fbed399",
+      "pixelSha256": "267e78b359ec5a350955e1789fe840e1b985a90861309c3453bc950aef171937",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        30,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/hurt_0.png",
+      "sourceSha256": "c84560c848fe26ae4a8142c36c48b1ffe4899f2ecfd7dddec31d09007c80d41a",
+      "pixelSha256": "2f0d44cb6c15afd88ab04c3d540662b2bd43c3c2abecd6b2fe19c1a47e2afadd",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        34,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 133
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/front/hurt_1.png",
+      "sourceSha256": "06a31536e6c6e0aa6053bb3f0feeb5a8d6f6aab99e7c92595566b2aba4bf0a66",
+      "pixelSha256": "e877f7c0c0139b0357290c29887fb043fa6657e4c8cf6eff1a0aee81c34c8efb",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        43,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/idle_0.png",
+      "sourceSha256": "0e96e84584ddb38d3eb663145aa790fa2a6acfa67c432ca3f587e829bdbb85ea",
+      "pixelSha256": "1f66d8bdf0dd957093a1a5f42164b19b4418a61537bdeddaa3e761751fc4f5b5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        29,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/idle_1.png",
+      "sourceSha256": "bdfb76b28c93420f9713422524a9dc850452f3e526f38ae8934e337c3153e123",
+      "pixelSha256": "e6c8cdc3aee8d0ec5ed55885ee1fbef2f5ba6f86702e0917e02f404b68611621",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        29,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_0.png",
+      "sourceSha256": "ff6b0dfa841849232cb701cfaa64de470522c2a0bdc82c1f148336c2e484d735",
+      "pixelSha256": "30c7f1cc0fbbb5154d94e78869dfad494d7e5b767f9eb86e650b3a754d396ae9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        56,
+        63
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_1.png",
+      "sourceSha256": "15964d253934f5ab7d9cba09eb1105d1d02c9aad5b63f5cc088777a05b0fd0f7",
+      "pixelSha256": "cb4afb10375195c8e87e3726fd1678c6cb71e21389604eacdf8a5b36462f5e26",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        60,
+        63
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_2.png",
+      "sourceSha256": "a2e3e42499294d59c7e3a50eb87fcb8af9464a2da90a2d48b0865369260a3c26",
+      "pixelSha256": "5bc08e0e3c83189bb231b61a2e210b5594b694def7d315120ae324f48427306d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_3.png",
+      "sourceSha256": "1cf392def9a5f2da64448c76a1953d5ebdcf169b65dcdcb3fe98cbeacccca761",
+      "pixelSha256": "347c0c77eb471d6618674713688d3f9b005281eff55a83390369eb3c409cdcc0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        58,
+        63
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_4.png",
+      "sourceSha256": "ae3ebed854d3c6441431c1e466d473cfcf18b30f59d2beb67c22307fd8aa509f",
+      "pixelSha256": "b5d479e8cdc74650cfcfada67636c6245efa5f4225851fb9f8572a896d87899c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/move_5.png",
+      "sourceSha256": "fd57fe3f60dcc37d94731b03c2043cf3e479b4b5ce8ad2a1ca1266fa5d979826",
+      "pixelSha256": "25e65aacb48161ab9ab0d43c812f22ff8335cab089e1132e78f373327d82f38a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        30,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/attack_0.png",
+      "sourceSha256": "0e9d9b93d98e1ecab7e5fc42a2f81c2933cd43c11729cb69c027ee53b6b91a39",
+      "pixelSha256": "dfddeec0fe8392209d00a329ece30bfe04f2ae66c428179e3b50f4db067eb719",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        27,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/attack_1.png",
+      "sourceSha256": "8c409a85410f808db70600f242582e8e1458c497cd9126a362b4ebdfe71b4337",
+      "pixelSha256": "dfaa930e7020b7766743272cb2fa03b0d214830132f5c170c2345b3a6e10e252",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        33,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/attack_2.png",
+      "sourceSha256": "80b808f47d66948784770e4644e5df04395a21606b7e7a35cd65120f27a68568",
+      "pixelSha256": "7e7a821705389569a7ec77b9a96eac79ec6996bed46233c81628284a12db9aa7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        31,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/hurt_0.png",
+      "sourceSha256": "ee2765bad2094b641c1f42882a7ed1b2184d023ddb0e1db81f22b3da5449121c",
+      "pixelSha256": "2603abf75ef5752a565b53dc2853543927b56b9b1bf26c8e2650fe19468db4d8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        33,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/left/hurt_1.png",
+      "sourceSha256": "bfb7872caee776f675580839e0c46a078d8d340038bac41056624299222b98f1",
+      "pixelSha256": "39ff8ac0ad892fea86ab07a02466622a238be847b13616be9cde811dff9bc56d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        31,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/idle_0.png",
+      "sourceSha256": "060ae1edc9aaabd6e6883ead7e93fb8b9e67e36eaf7baa8b35f86ab076172d3b",
+      "pixelSha256": "686f747b0b1ba77c7a45a98019fa38e7bda0a5a97fbbf602bda2797b64ff4f9d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        40,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/idle_1.png",
+      "sourceSha256": "02064ab8c4c4fac30b0ec28e908346e73f18253054967ed49836611ca80e8a60",
+      "pixelSha256": "69bab28b970fa74b325e51af39f97885b22e9bea38176c12f338ffdf80072758",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        40,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_0.png",
+      "sourceSha256": "33fcc33241c6d87948239383644c6e76b264db3ecfcfabe9625637488e58b908",
+      "pixelSha256": "a4cabb5d8225c71adb73e0cc678ed239dd032dd77d8a80fcc4055ea72bfe388c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_1.png",
+      "sourceSha256": "c648c647dfc4c85b88f455b52627137ca5c40bbd733e5f4dd56e452c92bdb0c6",
+      "pixelSha256": "c7ac732f0b99dd3f75118483cb52d1d0c48418c415a5b31920cdbd719378a436",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        40,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_2.png",
+      "sourceSha256": "7a614c1422eed2d85e4e568cc7164a0f00bae8108e7af198079439aed9545f76",
+      "pixelSha256": "49115764d084d45a69977c17b04b7772c8352722f162641d29bd720ac45343d4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_3.png",
+      "sourceSha256": "56fd03664974c0494e9786279c66aa8e713bc593efbf1b611799313d37dd275b",
+      "pixelSha256": "c94e8f065e2acc1de9313df97691f6b780e1fb911f85eb65b518944ab1d0e3f7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        24,
+        29,
+        45,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_4.png",
+      "sourceSha256": "a9058e80c16b2d29b8b186fbae9fc8dd9a771779c93dcc5301dae2bfc496de1e",
+      "pixelSha256": "7222e24428ef26d0ac12f8489b1e7a88624e4192aaba0c88da7c9e0a28222d9d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        23,
+        29,
+        43,
+        61
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/move_5.png",
+      "sourceSha256": "5d803f9df3c76a8631f9767112440fb85c5ebdd4ab7d748e66931b4e55b8d4fe",
+      "pixelSha256": "e5c96e2aeb3d27ee87e3eca16944b1b29e22d0a51ab6a0b488603f91fd5f575c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        19,
+        29,
+        41,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/attack_0.png",
+      "sourceSha256": "e2884766ed6b16c2ad5c8f0f2d2db5f291485298349112240b26f1da39b39906",
+      "pixelSha256": "7996162c1676261b065473ec63aa8db1ada2110fe058ce3f2825d55361ac8bb2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        34,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/attack_1.png",
+      "sourceSha256": "fd5d63d219d133d6ac0a339582754764a2a5ba3a1fd3974491c6e9829e5a30d3",
+      "pixelSha256": "a617c55d9ee0820fe903c625b2750f6fd4fa9a0a998ecc555d3cf421839c0d2b",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        29,
+        38,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/attack_2.png",
+      "sourceSha256": "79fbc838f21d7e13d18cc877161bc239c4e47cd8bdac62fddc2c9e2339578176",
+      "pixelSha256": "75f4c189e94fb852a5e7fa1ba71d1efded4ad0ef3882ae66b5774f436ba73f57",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        33,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/hurt_0.png",
+      "sourceSha256": "36d075924a7f0ef9bc5c2f5b456597988f26bf92a2461cd30ad89e48a37bf6cf",
+      "pixelSha256": "44f667a264f698300ce9397ef42e3a6d7ccd032f62bff1ea8ad3d9bea238bc61",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        20,
+        35,
+        47,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 199
+    },
+    {
+      "source": "sprites/cats_of_ulthar/64x64/back/hurt_1.png",
+      "sourceSha256": "78b4cc85542545e504d6aeadae0c738d0d97254cf563ce865c8d6a79048580be",
+      "pixelSha256": "1b04c5325ea8c11ae8b62a92256a193cd6d263b3cc9e73f690ee715378c21e80",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        20,
+        30,
+        42,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 199
+    },
+    {
+      "source": "sprites/pickman/64x64/front/idle_0.png",
+      "sourceSha256": "9a297fbdc01dc633596fb4febb07a57432c5fafc06a9dafa3f1b291d7d067c84",
+      "pixelSha256": "887c080c68b3394291f872873a6e1d1124522f6d5050c3ba37ef195217195e6e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 199
+    },
+    {
+      "source": "sprites/pickman/64x64/front/idle_1.png",
+      "sourceSha256": "7189efff883ee8e0fea5d6fc530692290cbf85f32a16b84b16cfd2ae5f55ad1d",
+      "pixelSha256": "5c1dad76ecdcaa7f3722e1379ac731ec630599f37ae66b5a994b462b006548f5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        11,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 199
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_0.png",
+      "sourceSha256": "fcbdb4969e027e1665010c5cc3f2c11131228c273aae1ddb05efe71e8dafa229",
+      "pixelSha256": "76c11474e4ccbc9f7b0c521bbbdaded5b13afb6d2eb6d56e00abc677ac694e0e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        9,
+        54,
+        61
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 199
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_1.png",
+      "sourceSha256": "ac55f9339d7b79024d91baabcfcd71b676ea23961e9ae0732e826b3ded9b353f",
+      "pixelSha256": "82e9cce27683dc7e7d2d6b32d4942cbef10bebd9dd44d10c243f657ca2deb707",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        8,
+        53,
+        61
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_2.png",
+      "sourceSha256": "b49d134c0a3f3ee1ceaf37a8ad68c6dd163dccd6402b7e07fb13f53aa3e86a37",
+      "pixelSha256": "d46a37cc98abdee8eba717cb58cbd4282699e9603af21e7456b3ae64ba007671",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        8,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_3.png",
+      "sourceSha256": "505b84f9d9022e4691d60914e339f9a5af66a585020ad8dad4f4e6f472883701",
+      "pixelSha256": "ea355f42e31ad0665773b796c2b96aa0b7db1d44b8537ad44499aa4b4445f6f1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        8,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_4.png",
+      "sourceSha256": "147addafb68e7761033a736f01377d42e3aecea8b812fd5097dd66904cc7446c",
+      "pixelSha256": "7461c52a618ba3bf9e85ec4ef0909bda243b0741c1e1d1debad79bb49d3101c2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        8,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/move_5.png",
+      "sourceSha256": "37d7804fb0029434a049899ee87420b166e2a00e8adbd2f8cc568274af1d3c09",
+      "pixelSha256": "f9fa4d87f44f7773e6f3cbd76e36a1507fd8f3af6429de7a6eed6190909a35b0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        8,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/attack_0.png",
+      "sourceSha256": "ba3c32f191a564df89db9867f0dd7c334047981b41fe3d59b442060750b95226",
+      "pixelSha256": "c7fa5c82aefb78061ed4a2494dc3e8c6fc0f9e97f339b802d546ae32c6c3b4d9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        11,
+        50,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/attack_1.png",
+      "sourceSha256": "dc8ac9ded5708b2d19552270385deeff1cc4790a7f6bab547f952ba2a8267871",
+      "pixelSha256": "ab029d729dff02f247e55c1c444d4ce90eff203795c2754598915b446d4019cd",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        10,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/attack_2.png",
+      "sourceSha256": "7a4e90bcf0904b4169a730f62f1ea4fdbb2ba0df65b14b1deaca24b75387eeac",
+      "pixelSha256": "9eeb38e4ebfeb0f441e8e8a7f718523b869283bd8ae45a1b68e4c25deee975fc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        13,
+        51,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/hurt_0.png",
+      "sourceSha256": "6d36ead9f451b6fa5e35dfab9aa83f14556fbf0f829989f0848bf2f76f142e3c",
+      "pixelSha256": "74e6414fa95fac6620200bf5ce2ffe9b333996c784c2aad3feefaa35c155725c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        12,
+        48,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/front/hurt_1.png",
+      "sourceSha256": "dff9937229da3e14c21505d9b88c8464f4e8dac7b8b8ec5356868262a6299276",
+      "pixelSha256": "0d6cde36acb4ee09afc688c9ae538ede1ccffed4979ba5e24fc57804bcb02e0a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        11,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/idle_0.png",
+      "sourceSha256": "f8ba3d8f2c6f3294d190293c4e556ee02ab3ae55a1a3a40c5512162b101cb1c5",
+      "pixelSha256": "51c0ad7dbe44f90b3565cfdf11544392b2e1788466400aaf9bf90afaf0a19ba9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/idle_1.png",
+      "sourceSha256": "af35f90aa28a5a9d573bcd1e87bb40623c65bd363ccef7ffcab16936838c7539",
+      "pixelSha256": "510da158cb2b4d96a6d84a87fdc675fb6b3ea6b5746ee3200645380251effcfa",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        12,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_0.png",
+      "sourceSha256": "86055e97481dc2e4a207f7b996c7a1177e1f4ca558a9a20c9017dbbf46b33e03",
+      "pixelSha256": "5852d8466c14742fb88d32218ca063dbd9d0f17ef42afd1e29fb8219a75751de",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        10,
+        60,
+        61
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_1.png",
+      "sourceSha256": "261d5b6311aeece39d8526c7de0e0cf480384a199f9862f8a3fd8e068a131266",
+      "pixelSha256": "9283de8ed09df63114c0b777e54c6cd5f0b6949379a6658005ac0b7d3195fd6f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        11,
+        61,
+        61
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_2.png",
+      "sourceSha256": "5b72dacbb9527b54ffcb46dbdfa1de6eb3c8cf1fde79b8c5491a5f3914ef1b67",
+      "pixelSha256": "405d1cfc277f36bc90e105709a1f3bfe49e239134945d5b280dc889bcc2abdd7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        10,
+        59,
+        63
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_3.png",
+      "sourceSha256": "eabd9321dd2e470b0c21621899c731b9f563bc98c63650800bb17e6fa6cb482e",
+      "pixelSha256": "869be5c8cfb9ce858032605777609c4aecda3cbca796f8b8c9900953d538ce24",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_4.png",
+      "sourceSha256": "cb4816024f3ae00bc1556f739d4808deda3bcec84a7bcf0604d37304905feee6",
+      "pixelSha256": "c3a2c99469c9eff8ac972ad8286958f6a484465cc07d0a3036fc8160177cf272",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/move_5.png",
+      "sourceSha256": "55e6e0741324f814c7e3eb910037ce00c363b8544a0936125b7e46404786f41c",
+      "pixelSha256": "ea42528265a4fc4244eb963708d5c830802d8c9b4734c8bb987e559666e899dc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/attack_0.png",
+      "sourceSha256": "4e7785137a7743915163dfa1dd438de93c1a8cf05436185fafc67ace23889cc5",
+      "pixelSha256": "29aadf15cef34310de9d9c6b2493f3f0188f52040d989eca402187ec1c226416",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        10,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/attack_1.png",
+      "sourceSha256": "f50cf24f5618238de91e49827de53bc9b296594dbfdc7dc8a9b6449b821e2d86",
+      "pixelSha256": "b966afb0896160fd6d6aeb59413d88e8a606118c04acba0cacfbb9ff0b1c47d2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        14,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/attack_2.png",
+      "sourceSha256": "2d97a3a0d9ce36a23078888cd0e27576ad906317570060400ef5ceeb9dcf0308",
+      "pixelSha256": "29639d6c3d65aa18e093284563b37cd18dd003b1c74dca1b47a79bc594620d1a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        16,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/hurt_0.png",
+      "sourceSha256": "e5f1b2a3bda351451b9b30b0fdecccbfae1ea2e9948b8d7be10338b641c82465",
+      "pixelSha256": "1608c5030f97d0c28e7c5f8dbc06460d46de519062f2ed4c36b295917314b67a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        12,
+        49,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/left/hurt_1.png",
+      "sourceSha256": "739fb3f2bca6ffe7f6484adc01beaafa036257b557544c57890e954e33e10cb0",
+      "pixelSha256": "0128feaa3a7dc2b002cb3a9079cea01e529210c97800f93f57f9d0eccff387ed",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        12,
+        54,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/idle_0.png",
+      "sourceSha256": "0a504e4806b27e6ddc825ecc52c4567e322208de974908f520f1562a52bd52a6",
+      "pixelSha256": "d9eac243c31ce3c5886429aa712455a01dd3f0a66984495ba7c376894361a50d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/idle_1.png",
+      "sourceSha256": "40687b785bb89466a4193aa3b5b1cd60b934cc802780dc0489cf7054ac4df0cf",
+      "pixelSha256": "f72f7eeed1317325523d05102ba9bfdbfeec91fe9d68d21e2db44b5a04bdb7e0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        55,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_0.png",
+      "sourceSha256": "9822864b8d9466ec004a356158fe7d0c3ab0f493e9a37b698a3cca5c445114f9",
+      "pixelSha256": "7fc3816562ec9747ef43fa97b87a87b25b292e8d0d77980e7b2cca3c101dc279",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_1.png",
+      "sourceSha256": "ac7b1d1267085a4ae8b629aef4ed142e418bd45462da2da99a80f5d8bf1b95df",
+      "pixelSha256": "ab74c57b989158f4014a4051af05a877468297111a58e308c206c81555674421",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        55,
+        61
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_2.png",
+      "sourceSha256": "1bf6d6120db90f78c0ce9998ccbdfba96de5f0a35c0874fcc49d951e107e66d5",
+      "pixelSha256": "307553b5713cc09498e3255167efde7f7218e1c8646aa5afd02d89a3a6650369",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_3.png",
+      "sourceSha256": "229754112e2308179874a7b267491e30f5088e01966f45367d4dfb72bbe1baaf",
+      "pixelSha256": "a61ae3e62a2da92c83143f99021b3fa5a218c887635ec4ce89a265d7304c511d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        56,
+        63
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_4.png",
+      "sourceSha256": "08d2d8cbe1d951c8bb77680097ba38141d220cd53d6c4c311735d9abba123a37",
+      "pixelSha256": "e08792357b9d4b892fa52b00a89b053a502d6bca0b9aa46b89ebd453fb7fd5f6",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        9,
+        56,
+        63
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 265
+    },
+    {
+      "source": "sprites/pickman/64x64/back/move_5.png",
+      "sourceSha256": "99b7bb783f8c570734abc117092a99d488b385fb47568682c4914f9d467f4096",
+      "pixelSha256": "54312d3d6ac2005f16575cc3feea05de413e6e71f423b5ddaf008f7ae241a449",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        9,
+        55,
+        63
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 331
+    },
+    {
+      "source": "sprites/pickman/64x64/back/attack_0.png",
+      "sourceSha256": "5662ba222033b2bb6e038b33ab446705dee415b39339e6ddff539db385101b26",
+      "pixelSha256": "296995c511d30774902b9411237606f3b1909631fe7b4be43236425c58ea7ebe",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        11,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 331
+    },
+    {
+      "source": "sprites/pickman/64x64/back/attack_1.png",
+      "sourceSha256": "0c7d9a8175be2b38fa18b13cf7eaf169d204a141c25dbccd76d75cf0486fa9a4",
+      "pixelSha256": "d424b0f3faf1cd6fda2db9dd1dd5622f54c97620c2c72dca1943463c8d97a24c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        12,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 331
+    },
+    {
+      "source": "sprites/pickman/64x64/back/attack_2.png",
+      "sourceSha256": "b7847a8670b15598f80a09b3e1b820a80c976b164c178e15ab1fd593f68a86fa",
+      "pixelSha256": "2281f7b6e6d62360652b600ebee85f38bed546884377b8c074a22f9afa0f0156",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        14,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 331
+    },
+    {
+      "source": "sprites/pickman/64x64/back/hurt_0.png",
+      "sourceSha256": "fed4fba7d8b5445e1ae07397e5674af27c38c23c55fd039ab03ba744e23a4443",
+      "pixelSha256": "3271a6620cc7ed7ca8a248fe96b1cf9c569a4023c6021e4419b18de3c71f6917",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        15,
+        46,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 331
+    },
+    {
+      "source": "sprites/pickman/64x64/back/hurt_1.png",
+      "sourceSha256": "ecbe90a3bf3370a3e4ae2896eb17f7ac866cff3905e257f5c74f154142ba629c",
+      "pixelSha256": "efe633de8fb0c15179e83b7941bd22c4dfbdb586a46a35210a730718d4c08e0f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/idle_0.png",
+      "sourceSha256": "f39defb21d9dfce6b412ca46897858c9bd0facf4478bd55498c36cd1b6e00285",
+      "pixelSha256": "e25dfc644cfc7cfe312c9a6ab111a8ee0e4dcc7a4564f17f80dbf712c09d0537",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/idle_1.png",
+      "sourceSha256": "e18fcc694bf4614669f170e51c24319fa36c69dd973bc48adb61557823929b4d",
+      "pixelSha256": "18831bede30706dd4448b135720334df0b69d3f9cc1b5534d9624d564de68c54",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_0.png",
+      "sourceSha256": "c413bb10676611f9a50d2df4b95e656771372c17cff6aa425cd8d5a2a087c9ec",
+      "pixelSha256": "a8c1671a2a25e712c8826abb656204af95f13fbf7e17cb4728e0af0b499301b2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        6,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_1.png",
+      "sourceSha256": "31c09a970c41d2590a258165adcbc44c7338af12778c2aa605ac51166c52001e",
+      "pixelSha256": "74d1b5bc0788f497c7ddcd4995946baf7b65a9c9093e22bff658ac2a4ba3ff21",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_2.png",
+      "sourceSha256": "dcca8453a0c3384fd8cdc35cf118a0b6347fd2628f078b65c079fff5ef72ead2",
+      "pixelSha256": "b7ac62a6e14cb4b13a7444cda75d9dd6caaa139679f18e8059b65c8bad69eb0f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        7,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_3.png",
+      "sourceSha256": "2a7d8990cbc94f24b3ca2f10a722abb44bd4321bc4a18a703f606f2d2c7ff2a2",
+      "pixelSha256": "5d8c2d2f86790f328cddded1ac3feea6229086abb57803d020b7630363655234",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_4.png",
+      "sourceSha256": "cd1bf7412e49139423359ae267c355f8fc681fd78a28edfaefb2840f2cabc54f",
+      "pixelSha256": "f76c18b44e54ce1e3fb291cbf75d62c84745a29d04a55aefbf4878ade9d3cfce",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/move_5.png",
+      "sourceSha256": "d0b3b17ec44371f05d311bda379c87877c346e8972b09ad329a81f994bcfdf24",
+      "pixelSha256": "be806d5714a017dbf76e120b889ea9fa22cdc48bea245a85d7d2be6c449e337e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/attack_0.png",
+      "sourceSha256": "6a35e9b90a655c82da919f869da3f34c0b6fc9e8c515dcb8adb4a9b094db4707",
+      "pixelSha256": "4f13b34c4a53ee628f558352abd13bad657e8d52f2c69a6b97b27cf45832066f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        6,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/attack_1.png",
+      "sourceSha256": "0259834266479283ecdf824cdc6e5e08a8c862396025e41d6c52cb9629389097",
+      "pixelSha256": "44a11f7d0af7dc1d532e71fa94fe3bbbe46cf78da8891bfebe110a86a682ed19",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/attack_2.png",
+      "sourceSha256": "ea6b22cefa5a955c4c73e4325dcb9da9d9125bdb92befd8d5189ea314b198854",
+      "pixelSha256": "ac64ceecc74418f3e74bb6083f9c6f5f4dfa2bf9e46bfdb42943b572c236e561",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/hurt_0.png",
+      "sourceSha256": "191264fc399cba70b713073a30a53b36d51a95d7583147b4f32db995b83277c7",
+      "pixelSha256": "b289d0c5ebe67d7d0d877a512a4530e0de782ce7ab10b5bf28970d1c9e8c5da0",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        8,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/front/hurt_1.png",
+      "sourceSha256": "066f24d1030d48671874d33ae3bde509c4daadfc5da046fb4ffd652ae0c9518e",
+      "pixelSha256": "d74c42631dd049d0a4f2450c028ba4f6d68c9c09f19321ef0b26058670ae83c8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        10,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/idle_0.png",
+      "sourceSha256": "1167e4bdfae4a4460dd732fe3ba2366cd83800fc2692048c5c2b3caed5b42937",
+      "pixelSha256": "bc28cfe5c919f1835ecdb6dc763051f37c3c6cbeaaa7c5b42dc3c17e00c86c41",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/idle_1.png",
+      "sourceSha256": "2beddc8c5ab095b9cddcd75390e7a9f380e399d7e4099698d506ae0def0d7f4b",
+      "pixelSha256": "29e9fe5833222672e397d076f7a0f75e965dd775f4580c1364340aefbf31509e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_0.png",
+      "sourceSha256": "3db04813cc251c2a91f579f4a787cc8f71ac1334e26fcabe87590f364745a15b",
+      "pixelSha256": "08f176d7024cee1da11c654834dcc3c356b37fe9bb672b78fb445a6ca78c1de2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        7,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_1.png",
+      "sourceSha256": "a9700d04fb1282c90dfd4b1e5d656dc60e0e1ca9cf66547128fdac86ffd73046",
+      "pixelSha256": "2c4c533b399b8667839da92eefbc58871e521fc0b10f2121b23dd3388b3d8920",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        7,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_2.png",
+      "sourceSha256": "f33ee7167050e66591fe397d9a8ac4a7f602cf77f07740281e40c10148388f56",
+      "pixelSha256": "ad129f66ee098751ee0d88d78d3c0b472214168450165937d134097d4ee0a7de",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_3.png",
+      "sourceSha256": "3b072cd7045ad8d859a550fcef01d6f5308b42bc67056b7f507c35561d38926d",
+      "pixelSha256": "8755f724b670b5f95c867f7143156f94e7b82c6bae6f9261a42abb7789db7419",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_4.png",
+      "sourceSha256": "9cf3210bdda845a0f22876bb933a61387c59e06703c0d3c31b29aa207120654b",
+      "pixelSha256": "2739daf6f063d302f828022b74d71419d380c480c566425f52fa0e9a0f41a215",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/move_5.png",
+      "sourceSha256": "fcf10dce13b764c6c505f7b2a6cecec5f213ff9b1f1d849a5dfb72af4a23d6af",
+      "pixelSha256": "4fbb47f04cb742f28fe267533aee60b1a73d3498623e2c87230300fc53750b1f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/attack_0.png",
+      "sourceSha256": "5260f23dbd4daff7895845589cf97267a69e8a62bc7f4dfc76b5ca66ff8d8dc5",
+      "pixelSha256": "35cdb6ba28a9ccc4a0e166812dcba92434b6d51cef95ae9703a9716afaabe1b9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        9,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/attack_1.png",
+      "sourceSha256": "04d1c97d19e5ddb196e878fda5980f43f5d74ed1fd86fe630fa2d43e1e894bd3",
+      "pixelSha256": "08bdcff5e49b3b88f3e6c081b82e09e894714278f18287089258c0eb74745f0e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        2,
+        9,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/attack_2.png",
+      "sourceSha256": "cba3b056bbed02fc000dc0fcf729eb07a1135c83e664ca9b7b56b93fea16404d",
+      "pixelSha256": "b1cfa18f271fe7523db55ede0e757cfad851f3ab7d52e11c1e14b5124155c6b3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        9,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 331
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/hurt_0.png",
+      "sourceSha256": "74a19e24f8d104a61249524e6da1e084da4e30d4117867fef3d3b721b8c017ab",
+      "pixelSha256": "2686416d01fd50c3a2cba2df67deb54db26575fa64f062bb96790226ac5be89f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        2,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/left/hurt_1.png",
+      "sourceSha256": "b3d05caf42e3080b1aeed9d8913e387a4410bd1fcd44d80752466d0e342b1273",
+      "pixelSha256": "4d89c3e75ca84f9800704d4cad25363a49a7f08ffe0a31813ea9b1f334c1fcbc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/idle_0.png",
+      "sourceSha256": "2d0475d01770b864a94191ae52500d300d0b169b59cf113e41ffd1bb9acc780f",
+      "pixelSha256": "db9e259d1c8873e49533afa2246643c763f65a5bcb999671be2d53a54fbc6b15",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        7,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/idle_1.png",
+      "sourceSha256": "c3cabaf87b6ea58a012c1735517a243070aa7d42e9ca9aa30ee34bf568ead2ba",
+      "pixelSha256": "73f18b5901729e9afb9fe3dc6de14c225e3b13b4c0f202bc3762b494cf6c49ea",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_0.png",
+      "sourceSha256": "dceef3fe28e4fc041bc8f3dd0e6846e6907631fccc80d5a58b078033b2bf4017",
+      "pixelSha256": "f940cd7c023e10c14574f4e3b76b9e0009c7868bb07fed3f5657307cef8239cb",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        6,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_1.png",
+      "sourceSha256": "b528403422fdea140e880e730e2242d29a3401815783920bc783033d6e8a8d76",
+      "pixelSha256": "1788fe821ed02fcb1dc5beb61e93635286d21d352c32683acabe6aaef931067c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        6,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_2.png",
+      "sourceSha256": "4e46f6c9bda9f7163fd70791984a76cc3fb040f10172a0c62e69ebbea613e66c",
+      "pixelSha256": "a3535109ed8e9aa2cd354a72ce6ec81f053387f6a29087454e2ec3b106839f18",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        7,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_3.png",
+      "sourceSha256": "aae1d3d6bdf8723d6e6839d286115c82b0bfc4dc9306830c6c346f8d5f96f65f",
+      "pixelSha256": "2cd2f8ebbb32ebb9e1ca90f3d78860789439881348f7c4d2c2287f7a588babfd",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_4.png",
+      "sourceSha256": "e17451f856afb0f81c5b05a55a3856141d8400aa3fb0ffb044eb88333f8a05d8",
+      "pixelSha256": "6b00b893e1a74ef9586f1e8bee3e4f4c379ceb8f09e28a70e2f569aa6b8954d1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/move_5.png",
+      "sourceSha256": "9eb07edcfee9e3df82a5e5bd1a3e751dc801c0516460e8719b8a9934b0e8ef2d",
+      "pixelSha256": "910f3ea0fd280f51e35e28bbd517fc9c2c72e79fe00cb4044ee0bb76b16b9997",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        2,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/attack_0.png",
+      "sourceSha256": "8063276e39dd6a529a6bba29305e67c68ad24c17d17944eaba3d24c8f184f2f4",
+      "pixelSha256": "510be840f3dc24a603d52bd620dbd18bfa109cd628871607d4445387a7265f3d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        8,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/attack_1.png",
+      "sourceSha256": "0280d9f86e0c7a7e941bb128312ce92a30b27498b570a3e233541a056e6113db",
+      "pixelSha256": "8704e51d775d5e6d1ab5bc9642f1f04ba464f44ae04848be41b3dde12cd1e785",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        3,
+        8,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/attack_2.png",
+      "sourceSha256": "d24268c27838a96f6c0d4417143bfaf59eea8e205034c53926fd31cfa5d4afb3",
+      "pixelSha256": "d40544ec557da373ef13781cd209e8153c7cb5b6093e1cc06b5794ea09629028",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        2,
+        8,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/hurt_0.png",
+      "sourceSha256": "00d971408c262a1a086091684d3f05f4ca81177498b02bd1502ea48fbae3a259",
+      "pixelSha256": "3b1fc53df5d00afa022564f5a4bbcdafef07f7d0dab5e2299d3b00e5024926a9",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        8,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 397
+    },
+    {
+      "source": "sprites/nasht_kaman_thah/64x64/back/hurt_1.png",
+      "sourceSha256": "de856e0f50e89394a2a96218b1cdf45b742523c700ffcd428d42467f9d0a09d1",
+      "pixelSha256": "59e85484f3b5c577fa891fc42b3326b412051ddda7a2e3f311c33d705c3e1a39",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        9,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/idle_0.png",
+      "sourceSha256": "09c86912d3d4ac9589eeb50e4ad25b81b740f537cee55b1bfb502b70af5c069c",
+      "pixelSha256": "dbeee11210d116cb8ecaa19b0dfec71202c7ea52e997094eeb88dc60b3fee5cf",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        11,
+        47,
+        58
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/idle_1.png",
+      "sourceSha256": "c132c9caf6fdbe380daa52ba38c5ff14f629d30e7394e389b43581db9326fdec",
+      "pixelSha256": "8fbf4f78a9452aa2e8e8e2e3fc0c1b3207be06c04454582e92a78fe4b7ae03f3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/move_0.png",
+      "sourceSha256": "041db6f51fb1d6e3b266c922c34f8975c41febaa6daa9b45f1f16ccced5011b6",
+      "pixelSha256": "5c1edc3bc24ff9d67b2bc997ebecdcfa743915c0c639afe282139aae4ab2a219",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        10,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/move_1.png",
+      "sourceSha256": "fe2be27bbfaecd2912fc16364be314c46d5baf26619e46e5cc533f3b30f25131",
+      "pixelSha256": "7669521b8ef2652b00d5c81fbfd98f24a93d87e558c3e6d90abae124be6f742c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        49,
+        58
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/move_2.png",
+      "sourceSha256": "1da4dfa8c4c590ee86e42680836bcf004098660336ba5e7c271932b5bdbe543f",
+      "pixelSha256": "7a26837c66e5ebb172d5fa013ded6a1cbaecb76e3f02fb07631e8e931f7fb76f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        11,
+        50,
+        58
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/move_3.png",
+      "sourceSha256": "d71fd3a36feef4d4ebe197bf5f9487f0473cd4740808e3b1d5ea06ac3e667f25",
+      "pixelSha256": "af30c0efaad54215b9dfefa26e145238c0adc236add9967e82b0ea8e8b94f16b",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        11,
+        51,
+        58
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/attack_0.png",
+      "sourceSha256": "cf21b8c598ee2e3cb8568fe1883ec015821190d7a26e0307b6cd6fee24bab811",
+      "pixelSha256": "537c2b041eeef968c801d2170a3fbc07b98ff15f9f96045b5b9f18c97fcfa60c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        47,
+        58
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/attack_1.png",
+      "sourceSha256": "1900ada0a3a8767cf90df8f9c75aaa0495750bd5bd98325fb856d93e1b8be6ba",
+      "pixelSha256": "e92496cff8d8e2f49b9b73341e42aea709f27fac93f6670b0fae53045ff9e5b5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        56,
+        58
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/attack_2.png",
+      "sourceSha256": "cba6d851c97617e3c2d1d3952552a45a89a10b480bc52d4c9e0d6d051ac900fe",
+      "pixelSha256": "3eaaca6d77423dfd365b74b72a8c417598c85037792a70cae50fda14cc99b3c4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        11,
+        49,
+        58
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/hurt_0.png",
+      "sourceSha256": "4bdfbba9309b668a7fbe5b30cfb32c596496544ca155348bcfa6f48a8ba50a82",
+      "pixelSha256": "d3c6c45d201e6260fe7228bbde90fb405bd8830d81371bcb03567cdd14feca12",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        15,
+        46,
+        58
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/front/hurt_1.png",
+      "sourceSha256": "08b4dfd45cb23633c853c6e03cf93daf4d4164b70b12440c9819339ae6ae6ce2",
+      "pixelSha256": "cb3c8c1a88cb20670da1ad1eddaccf35eedb106c50f4bdd13dceeaf0441fe987",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        14,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/idle_0.png",
+      "sourceSha256": "171496b4ae9d61dd08a0cddd4bc4cab769a52a5b09a3b57ae6deaf9bf22fbe89",
+      "pixelSha256": "016a1b4d7a516b5c9939c66e7a5e58771ea8fa6356c9c9befa4fb47ffb882c90",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        10,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/idle_1.png",
+      "sourceSha256": "83c63ec09717c2c33b81f66ad89ad7d0261e62baecc38b555a823dbc93c346ef",
+      "pixelSha256": "29b65dbf9bc1304d52870142ab8d6b6ef31cff36d55b2d667ed3be458b1d6b4a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        11,
+        51,
+        58
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/move_0.png",
+      "sourceSha256": "2bd1156fd6dbbe0a24571dcc5db9f4718db535a2d6416a50123b7e5aa2743670",
+      "pixelSha256": "5a646e2e97bf6d38ad555348eb9b4d015c0d1781b78a839fe0cb9d4610b67182",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        11,
+        51,
+        58
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/move_1.png",
+      "sourceSha256": "da05da7ebf464966f54b7ebb49cfbf078eccd17d52576a9add2bc9349fec396e",
+      "pixelSha256": "adc997a220bc3e7e58ce62001bf6d54acdd6784fe8ea337f8c68625b3b2c1264",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        10,
+        52,
+        58
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 397
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/move_2.png",
+      "sourceSha256": "dccff907fe34bf81126f59e66160ea92cf73c40834b21132eadc0f6f51e58ed4",
+      "pixelSha256": "8592ea9efe9d9738c7c0e2b69038862c728669f5423f7dcd91a07414a52bae23",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        12,
+        11,
+        52,
+        58
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/move_3.png",
+      "sourceSha256": "42afcee4974856cfe5214ffc9da142a2d79cf41a1c0e12826db5a2fec203697e",
+      "pixelSha256": "30829437393c4eca5d619c7726a110b8a36dd0376f626ef0ff4bdcb0f7ee0cc1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        12,
+        55,
+        58
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/attack_0.png",
+      "sourceSha256": "e7d1d5af10462504cbe8fbdcd698be15853bc4e7de178f1c98db44557da2bf14",
+      "pixelSha256": "2b69d7ae10bbc7cc26916c1ab49b409a0fcbb982c80deedb58eeb48cd635ea8e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        13,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/attack_1.png",
+      "sourceSha256": "fb75916e3ec9e7d74c7443e070c9f626c58b49cd9da66163e2d293be15059fdd",
+      "pixelSha256": "384693150965112c4c9b5bcc62157b292cdbfac7b9060409ae9cadf416f1a3e1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        11,
+        58,
+        58
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/attack_2.png",
+      "sourceSha256": "ce72ee7b3a6cdcc7f559c7337e8c26fb39157496e690485bb9b78f8cb66a244b",
+      "pixelSha256": "25cb7b5e42093048d6fe273feb9c54efb2daf810f443f7452ca9ccf5335bf962",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        12,
+        56,
+        58
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/hurt_0.png",
+      "sourceSha256": "bca8e1b88b2e3c24dfe1c951039d930e5e5e31ec41fc9f5e4e73a7c77f72fce5",
+      "pixelSha256": "fcc428289f6954f39af942c146440219cd9645555067612380c73396879afaf7",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        22,
+        47,
+        58
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/left/hurt_1.png",
+      "sourceSha256": "e88677e151226682b51c1656d9d7b17a37c7ace7a540a093ed046eccc59b39c1",
+      "pixelSha256": "a0f8c14dd41ca392b2745ff27d8f6628fb621c72bfa6fde370440efba3c22610",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        11,
+        53,
+        58
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/idle_0.png",
+      "sourceSha256": "4945abac0b187cae074923e185adb0c0ae3b3db09fe13a172c0ce8ede2d6022a",
+      "pixelSha256": "59a9ae8ce8c8d2c4f80c062c47eb08d110a10f3f078ec0873aba06f270fbb4bb",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        10,
+        49,
+        58
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/idle_1.png",
+      "sourceSha256": "310b14ead90c534932cd4ce85ce8faa9b71b57fb5814b476a13c81ac2d8f0e1d",
+      "pixelSha256": "210479ef7b387d7f241c10636e3e3446a08cc9ae28d3f2ce0f3b3a6266eb2fa2",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        11,
+        49,
+        58
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/move_0.png",
+      "sourceSha256": "4cab0d3b5a21187f2369460d8a0dc8ca07cf44878066b3ab4312012cce839df3",
+      "pixelSha256": "a1fd56908cf8c5b47f3c77d1a509cc301e4e2722950f64a4c3a9ebf1f88c8ff5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        16,
+        10,
+        48,
+        58
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/move_1.png",
+      "sourceSha256": "34ac5e660a76d2ed056b64a9a4333adda8df152860752dace0344caf728a922e",
+      "pixelSha256": "1699bed02ea04b8b0d1ca96af4f2d92904797b6925dea15aa24e0d64f0a45a80",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        11,
+        50,
+        58
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/move_2.png",
+      "sourceSha256": "8519b81763dd3f263d45e29dcdee3e8401277c5a44caacdb2cb13e73f0199df8",
+      "pixelSha256": "83208e61cff37815ad5e241fe8a4196e19428866edc048ae866ae718fe73fbd1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        11,
+        51,
+        58
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/move_3.png",
+      "sourceSha256": "10213a2fbf50cf15c85bc23c323e00f880dec2d0c7a11a8426d985456e351f87",
+      "pixelSha256": "11c3773bc68155f5ade3d1766c0198a4ec21d4be3a7c5cfc87c1e0610c35af0c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        11,
+        52,
+        58
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/attack_0.png",
+      "sourceSha256": "3e16c2c8e6f4df4f5a764fbf228892802504155f105a9454f8a74a6ce5d4f3da",
+      "pixelSha256": "4ae46d202cb41ba31f20c3822fcc73d73453062fffa4438921fa4fe338c2d058",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        17,
+        18,
+        47,
+        58
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/attack_1.png",
+      "sourceSha256": "84c93d4b8b3ac2a9968236e85bfc5f2962f56da9a609eb0753e3daee867be41f",
+      "pixelSha256": "2ba7d143e2d1b6ec0fd371e5921f02afd7965724b1f8c372e322af33ae5cdc7f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        10,
+        51,
+        58
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/attack_2.png",
+      "sourceSha256": "f134068df56de5269815d62e5059d2c088cb679cb1cdc4dbb989dffe6b9f6007",
+      "pixelSha256": "5a0520c91b5b60979d08da769962f65f5127d4c969f07701ae4459710113604e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        9,
+        50,
+        58
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/hurt_0.png",
+      "sourceSha256": "060a74677943955c7bf0723b8671678e2919812a2931d7caac25b4b621c5d721",
+      "pixelSha256": "ef290a61b7f4d7c4f5cf892ead82587aced987191b55e3c65f643d97d1d586d8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        18,
+        21,
+        46,
+        58
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 463
+    },
+    {
+      "source": "sprites/algol_light_being/64x64/back/hurt_1.png",
+      "sourceSha256": "4f990cdf5be6f34c6a2a87059aea820c9163d741b63a13cd13cdf1555fcaff4d",
+      "pixelSha256": "3d6bd5d790e0c60ddbf5f187dc7c98f7b34d84891fe3daac0f978e2122c90445",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        15,
+        10,
+        50,
+        58
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/idle_0.png",
+      "sourceSha256": "2c3f5177428f5a9f5e1c5e857bbb55b61f47d9324cfb3c14b775b1dc4ae22f10",
+      "pixelSha256": "10f88dfd8b5f331531cf31ae1b016b4a4ae0fddada04d07ce2e4c53e4ef2e1d4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/idle_1.png",
+      "sourceSha256": "37655f8baa31da0ccb22ec31da771d1b82187ab974aeb974013b6c5fd7b94ff8",
+      "pixelSha256": "076d6e9aeb67766c19610bf67da49ed06d08e284bb24e2148e64201a61259358",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/move_0.png",
+      "sourceSha256": "5488bf9a2e3b6673a63d24e573219e165550594c327421dee13daffd8963140c",
+      "pixelSha256": "a3550bd4b9cc9cf5961ea09a84651bfcdefee8e05399250bd47b13c845ebc610",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        6,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/move_1.png",
+      "sourceSha256": "981bb7e0444ea9d267be5c21167f548a05493b32aee952260b70796ab56e76de",
+      "pixelSha256": "8ceb642d388ce5daa9f22e84af33fb6735327c205dc5b5ff871c02d8ca641283",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/move_2.png",
+      "sourceSha256": "ce8612f3737d2cad0c2565a1ecd29f1360bf56b42e692b604830af6606e009b8",
+      "pixelSha256": "8eefb22509df0b378162e569ebb8ae742c2b8b27df93d3ead3bd600c8ea9f83d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/move_3.png",
+      "sourceSha256": "2e515e4a174ffa41c96e3d43a2c5f51541cabdd8279548aa5211d6efe456fa10",
+      "pixelSha256": "ff157f1ab3fdee0b5e0e5a91409446fc40b9f6017fdb5f989362cece501c6140",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        6,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/attack_0.png",
+      "sourceSha256": "87a6e65e1b1e2e6f72d03574df68c8acf94aca006a28e9e6cb11f1c183e3a021",
+      "pixelSha256": "cc55fd277960e78f61553ec9f505b46185f95278f195936e2f590e892ee32c62",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        10,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/attack_1.png",
+      "sourceSha256": "977943692632b88a1e0c0eed85c995d47747b08755b3d7820439c05c99cd1af6",
+      "pixelSha256": "234ddceb3390e4c61bec21204d0ec7e1040f38697364cc943d09ceb9d2701299",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/attack_2.png",
+      "sourceSha256": "1be742e57d081be53727492322987b676c27deb54035b967368be826a3a4bb16",
+      "pixelSha256": "56d6b901cd55fac70a0ba4cdab3102afc22ce9e82100b5c097ae14abb77424d8",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/hurt_0.png",
+      "sourceSha256": "9c1ead7a461eed27ea8aa4b16244b6d6eb13c9fa99612382e3960ffb445416c9",
+      "pixelSha256": "9dc167954432dd1cfb0c219e6f5ba6a72b325b450a734ddf2acb7815d5e228cf",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        18,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/front/hurt_1.png",
+      "sourceSha256": "d201d43aca7028412cfbf5afc40347372d38fec5ba4c838d5b8a2ed903b92a98",
+      "pixelSha256": "7f08a820f4a7d9f670238fb65be67e22b0903a17556ce6126b866281b8b437e3",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        10,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/idle_0.png",
+      "sourceSha256": "e4542bfc0d78a081afe963557de6a9e3187add1410543709561d29add27ff076",
+      "pixelSha256": "c9dd5945eb6977eccbc6740e8a32da79a1d812d71c103cc8f1e5b82b04e8e9ec",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        9,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 463
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/idle_1.png",
+      "sourceSha256": "64d86613eceaf37b87c04f91ce7ecf5f1e4ef5c49f34d5aa56e1c9f871fc4119",
+      "pixelSha256": "f5098a2b2f3549e00ee1d04e18f1b8d9b5eff7135aa115e10589c8fe877f0a26",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        8,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/move_0.png",
+      "sourceSha256": "90a280661ff567ee9856bcca2981e6399ea610bf351e0485f892bcc301cad80a",
+      "pixelSha256": "a6027660b1422f52b9631d9144420fcd61b389eb10ed936608da0e256da2b7ec",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        9,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/move_1.png",
+      "sourceSha256": "613ac695feaaf298148108282adfb68fe03d13c5eae42b276a6ba105e1aef28a",
+      "pixelSha256": "2e216ebacccd173c8b6282b93d428aa8885ba452ad1d89583f2935b0dc432d44",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        9,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 133,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/move_2.png",
+      "sourceSha256": "5b8b247fd7e4e47aa97dc0576c04f9c9dddd298de269ef8330274f460e4deffc",
+      "pixelSha256": "f6898b1e1a53275c45aedf39da7a12c18d4de98e1b21ef281168a2b21d7f7b91",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        10,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 199,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/move_3.png",
+      "sourceSha256": "8ed530b7d7f5276bc38412366eb71202fcda36260a27e65c9ad1bd041f707546",
+      "pixelSha256": "427186d0e209726ea9529f02c942cc1a96b115f8285582755f3224593cca5d87",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        12,
+        10,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 265,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/attack_0.png",
+      "sourceSha256": "3b5f558ed42ae5b35eb2a4fe7f589e3b1b433194af5c71b3d848cb5d634f2e92",
+      "pixelSha256": "d8c061c8e719e3c0e0db7d7e1fca10cf859adff21d867ce9e463472ebeeb81a4",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        12,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 331,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/attack_1.png",
+      "sourceSha256": "9c443e514c15e3ecfe3d648756a081941bd3e4b43b551fc9f040fe37f7b53d89",
+      "pixelSha256": "f51825106a5c7d0844fb9a91bfc5cc44404de1e1433fe8e8bc9baaa76cc9d60e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        12,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 397,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/attack_2.png",
+      "sourceSha256": "cf7a03de7f570466b80b01a70a0ba43e119aab8c2b9ce9280486ae96fd7d9bbc",
+      "pixelSha256": "eb5693e716f403d627bf7b8817cd88fec721f07ab5b6064318c6cd8a0aa344b5",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        11,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 463,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/hurt_0.png",
+      "sourceSha256": "daa6fc57e95fa42267fdda09f0ab44b98b64a0d9506072159b6da2dbdcc65fc0",
+      "pixelSha256": "85a86a3cbd1ef31ef3fd9da54eeefe8ffba1a3c4afe13fe2bfee850731a3052d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        15,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 529,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/left/hurt_1.png",
+      "sourceSha256": "8821757f8d6f259181264c57295bf7730a1d31f09f62143567ee767c5c3afb0f",
+      "pixelSha256": "0fa39ee3ef6ee9a1106b60a8a5e0a1172c6c4c2d5e31c0de86344067f23073bc",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        13,
+        14,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 595,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/idle_0.png",
+      "sourceSha256": "2dc52a1420ed31e448bf714a7a758a310889396dedc1b2c36a153c5b18d726b6",
+      "pixelSha256": "d975a774ae66f9512defbd84f4c1f8ccb8ff6c48c2336b698643529d7b4a3bcd",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        7,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 661,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/idle_1.png",
+      "sourceSha256": "768dadba10a024ee6098ab1bf3e1364ea980fdb9e018fafcebeae493e1217452",
+      "pixelSha256": "bd5e44b2786e5cf05a990e499e8fa7bb5e14f47178ee147412e3d4e975feb161",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 727,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/move_0.png",
+      "sourceSha256": "3a39d24a10ad0c751102fb0dc100d7f0e8e1df55c248940c2cb115d75182e7cd",
+      "pixelSha256": "d7fb65945b898f44b20672308b79f704132522328eca5c6e7946397d8cab902e",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        7,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 793,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/move_1.png",
+      "sourceSha256": "23cb2018261a2af16a2417daac983f720fc96144085bf7d02bda5d90d011b42b",
+      "pixelSha256": "94b56f76df895dcbed2783756a7050ffc98cabd66d138d7884be60c79bd3947d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        5,
+        7,
+        56,
+        62
+      ],
+      "page": 0,
+      "x": 859,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/move_2.png",
+      "sourceSha256": "3d45b695b0ef91c4b4430f7e593198a593517212c7ed3180ababfd84caa4ba3e",
+      "pixelSha256": "28fe799516531331b76a0551714287f8c66cb2ca3ce685b59fa03871de9d2c04",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 925,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/move_3.png",
+      "sourceSha256": "9479c27db4319cf0503556dc25362988f58176578aaf4f277f66ac3c1a0675c6",
+      "pixelSha256": "5a8406d5a27ea38ee903b1134ba6c1e44a00c5978db9c7a449da911465b5811d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        7,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 991,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/attack_0.png",
+      "sourceSha256": "004c33eafc77efa2c835a2a739d632124645ebad3d2352dda82cd306705b73cb",
+      "pixelSha256": "bde81125bee52494a097f51478e6f432970eb4d45b0a5098cd2fb0dcdabba782",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        10,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 1057,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/attack_1.png",
+      "sourceSha256": "74904a918485e503fb3136a85d226323ef093ce0eb48360995a87a10a032a387",
+      "pixelSha256": "5abd5b6c83b41b2fb33dc5dd8373bb0f1418d23fb343778382ca8c654a94b24d",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        10,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1123,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/attack_2.png",
+      "sourceSha256": "112f8e9e1eecae855f5cbd0650305bf8a038f5593977d535fc039be3663c5404",
+      "pixelSha256": "dc4325c594c724a94ff81b1aea08945e4156b68ac2f17498e55645a407486e9b",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        7,
+        8,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1189,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/hurt_0.png",
+      "sourceSha256": "404ae20a2b5d2eccf7b1734b59aa5000ad9463d86bfbe7efd97a9842c8f1249a",
+      "pixelSha256": "ce93bdb5b051760e4af4aeed131ba7af5a786786f8e67ca4c1c391919c473622",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        17,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1255,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/back/hurt_1.png",
+      "sourceSha256": "f2bd68ed5ed2640c828df1c10db73de3297ea91dda74585c9cf2f02827a20fce",
+      "pixelSha256": "e02947d54d58f6639876fbb92e57cc952582f87f54741afe51bff343ff882832",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        16,
+        61,
+        62
+      ],
+      "page": 0,
+      "x": 1321,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/idle_0.png",
+      "sourceSha256": "493b8232d845b0dc4b976570e1b69fd2104d630598680caa625fc53a5039ef4a",
+      "pixelSha256": "cb84d149d1b17de36b8c4d2ef1c2ae71e136cff7c4863a1641f55bdbd51a809c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        9,
+        7,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1387,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/idle_1.png",
+      "sourceSha256": "e21bdae8561b0827d904ccbc5776ca6b915248f0dc5395cb77b6865144e61619",
+      "pixelSha256": "978811fe84c14278357df3c680f0553714316ae437c7032c1be2761e2f683db1",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        7,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1453,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/move_0.png",
+      "sourceSha256": "eaf6ae641443f15827b9e6939f61f73daa3d8566ac5016e7530d53a92af18932",
+      "pixelSha256": "4cbd350c510b5d9e89721b2c76009a64f10774a77bd5cda2ef75324399ceb499",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        10,
+        6,
+        59,
+        62
+      ],
+      "page": 0,
+      "x": 1519,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/move_1.png",
+      "sourceSha256": "f3d8667c1559c6597bdeec832baeaa0054e4dab8b23e1fe379508f150366e93b",
+      "pixelSha256": "107569e920d21536ad546993dc61a38ea40c099751b17467f66f96565c9a4418",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1585,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/move_2.png",
+      "sourceSha256": "a7f70e7a1c7a45e6a1238e82460436f22051fdf772ed5e966387b3d320752cf4",
+      "pixelSha256": "bc6ee332b8a599d2c1f2579a103fec8b79d231d9eca758f569d5910c89db3b1a",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        14,
+        9,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1651,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/move_3.png",
+      "sourceSha256": "6d4ceb70b328ffbc6170149eefcf8ac820f22eef538d75ecf1641b7bd2e66343",
+      "pixelSha256": "1f650dffb5a93885bc25b8c0ff904aeb7314a0089fd3d69bb303a1c8d65ed284",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        4,
+        7,
+        58,
+        62
+      ],
+      "page": 0,
+      "x": 1717,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/attack_0.png",
+      "sourceSha256": "503acce350a3878df938e4c6d4d1ead37ecd4983826bf206a97dbe973c1ec394",
+      "pixelSha256": "f8c7e9463a4b91ef5b81a048b9e2f5cbf863177e0657d21ac0b35be40537e94f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        6,
+        7,
+        57,
+        62
+      ],
+      "page": 0,
+      "x": 1783,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/attack_1.png",
+      "sourceSha256": "1d258970b70793c01ef566502c2f48b1743f9b912815154e0004a5b1b6875db8",
+      "pixelSha256": "d3d7835e93d28e00cef387d11f14cac935a5abadfb43df6580b707f8da725f7f",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        1,
+        8,
+        62,
+        62
+      ],
+      "page": 0,
+      "x": 1849,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/attack_2.png",
+      "sourceSha256": "7ca49a53e14d8464fbce5dfc33d44f590416b69d149e8698c87e30d4bc5878cf",
+      "pixelSha256": "de4444e40e9b05786307ece448bdfbd924a06f8bfac194979f852b0b5656964c",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        12,
+        9,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 1915,
+      "y": 529
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/hurt_0.png",
+      "sourceSha256": "7c5fa537480f32b7da42f267f90f9c63a71d1ee4367dced2bcb0f875795ff0d0",
+      "pixelSha256": "54c8a184dc532edb112476c62f3990bf58d2426a76f256ec297d8f1f61fc1198",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        8,
+        15,
+        60,
+        62
+      ],
+      "page": 0,
+      "x": 1,
+      "y": 595
+    },
+    {
+      "source": "sprites/yithian_archivist/64x64/right/hurt_1.png",
+      "sourceSha256": "2eb8125dd44ac76314703476e703c285c75eed6f262e761e1a5b558748758fb2",
+      "pixelSha256": "704a7325d50da2ae1ac1eadd6a29f1eaed7e5fc00b767e4e73c7ea087cdc2091",
+      "width": 64,
+      "height": 64,
+      "bounds": [
+        11,
+        11,
+        63,
+        62
+      ],
+      "page": 0,
+      "x": 67,
+      "y": 595
+    }
+  ],
+  "entities": {
+    "nodens": {
+      "id": "nodens",
+      "name": "Nodens",
+      "assetGroup": "sprites",
+      "scale": 3.2,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              0,
+              1
+            ],
+            "move": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "attack": [
+              8,
+              9,
+              10
+            ],
+            "hurt": [
+              11,
+              12
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              13,
+              14
+            ],
+            "move": [
+              15,
+              16,
+              17,
+              18,
+              19,
+              20
+            ],
+            "attack": [
+              21,
+              22,
+              23
+            ],
+            "hurt": [
+              24,
+              25
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              26,
+              27
+            ],
+            "move": [
+              28,
+              29,
+              30,
+              31,
+              32,
+              33
+            ],
+            "attack": [
+              34,
+              35,
+              36
+            ],
+            "hurt": [
+              37,
+              38
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              13,
+              14
+            ],
+            "move": [
+              15,
+              16,
+              17,
+              18,
+              19,
+              20
+            ],
+            "attack": [
+              21,
+              22,
+              23
+            ],
+            "hurt": [
+              24,
+              25
+            ]
+          }
+        }
+      }
+    },
+    "tritons": {
+      "id": "tritons",
+      "name": "Tritons of Nodens' Court",
+      "assetGroup": "sprites",
+      "scale": 2.2,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              39,
+              40
+            ],
+            "move": [
+              41,
+              42,
+              43,
+              44,
+              45,
+              46
+            ],
+            "attack": [
+              47,
+              48,
+              49
+            ],
+            "hurt": [
+              50,
+              51
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              52,
+              53
+            ],
+            "move": [
+              54,
+              55,
+              56,
+              57,
+              58,
+              59
+            ],
+            "attack": [
+              60,
+              61,
+              62
+            ],
+            "hurt": [
+              63,
+              64
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              65,
+              66
+            ],
+            "move": [
+              67,
+              68,
+              69,
+              70,
+              71,
+              72
+            ],
+            "attack": [
+              73,
+              74,
+              75
+            ],
+            "hurt": [
+              76,
+              77
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              52,
+              53
+            ],
+            "move": [
+              54,
+              55,
+              56,
+              57,
+              58,
+              59
+            ],
+            "attack": [
+              60,
+              61,
+              62
+            ],
+            "hurt": [
+              63,
+              64
+            ]
+          }
+        }
+      }
+    },
+    "cats_of_ulthar": {
+      "id": "cats_of_ulthar",
+      "name": "Cats of Ulthar",
+      "assetGroup": "sprites",
+      "scale": 1,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              78,
+              79
+            ],
+            "move": [
+              80,
+              81,
+              82,
+              83,
+              84,
+              85
+            ],
+            "attack": [
+              86,
+              87,
+              88
+            ],
+            "hurt": [
+              89,
+              90
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              91,
+              92
+            ],
+            "move": [
+              93,
+              94,
+              95,
+              96,
+              97,
+              98
+            ],
+            "attack": [
+              99,
+              100,
+              101
+            ],
+            "hurt": [
+              102,
+              103
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              104,
+              105
+            ],
+            "move": [
+              106,
+              107,
+              108,
+              109,
+              110,
+              111
+            ],
+            "attack": [
+              112,
+              113,
+              114
+            ],
+            "hurt": [
+              115,
+              116
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              91,
+              92
+            ],
+            "move": [
+              93,
+              94,
+              95,
+              96,
+              97,
+              98
+            ],
+            "attack": [
+              99,
+              100,
+              101
+            ],
+            "hurt": [
+              102,
+              103
+            ]
+          }
+        }
+      }
+    },
+    "pickman": {
+      "id": "pickman",
+      "name": "Richard Upton Pickman",
+      "assetGroup": "sprites",
+      "scale": 2.2,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              117,
+              118
+            ],
+            "move": [
+              119,
+              120,
+              121,
+              122,
+              123,
+              124
+            ],
+            "attack": [
+              125,
+              126,
+              127
+            ],
+            "hurt": [
+              128,
+              129
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              130,
+              131
+            ],
+            "move": [
+              132,
+              133,
+              134,
+              135,
+              136,
+              137
+            ],
+            "attack": [
+              138,
+              139,
+              140
+            ],
+            "hurt": [
+              141,
+              142
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              143,
+              144
+            ],
+            "move": [
+              145,
+              146,
+              147,
+              148,
+              149,
+              150
+            ],
+            "attack": [
+              151,
+              152,
+              153
+            ],
+            "hurt": [
+              154,
+              155
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              130,
+              131
+            ],
+            "move": [
+              132,
+              133,
+              134,
+              135,
+              136,
+              137
+            ],
+            "attack": [
+              138,
+              139,
+              140
+            ],
+            "hurt": [
+              141,
+              142
+            ]
+          }
+        }
+      }
+    },
+    "nasht_kaman_thah": {
+      "id": "nasht_kaman_thah",
+      "name": "Nasht & Kaman-Thah",
+      "assetGroup": "sprites",
+      "scale": 2.4,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              156,
+              157
+            ],
+            "move": [
+              158,
+              159,
+              160,
+              161,
+              162,
+              163
+            ],
+            "attack": [
+              164,
+              165,
+              166
+            ],
+            "hurt": [
+              167,
+              168
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              169,
+              170
+            ],
+            "move": [
+              171,
+              172,
+              173,
+              174,
+              175,
+              176
+            ],
+            "attack": [
+              177,
+              178,
+              179
+            ],
+            "hurt": [
+              180,
+              181
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              182,
+              183
+            ],
+            "move": [
+              184,
+              185,
+              186,
+              187,
+              188,
+              189
+            ],
+            "attack": [
+              190,
+              191,
+              192
+            ],
+            "hurt": [
+              193,
+              194
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              169,
+              170
+            ],
+            "move": [
+              171,
+              172,
+              173,
+              174,
+              175,
+              176
+            ],
+            "attack": [
+              177,
+              178,
+              179
+            ],
+            "hurt": [
+              180,
+              181
+            ]
+          }
+        }
+      }
+    },
+    "algol_light_being": {
+      "id": "algol_light_being",
+      "name": "The Light-Being from Algol",
+      "assetGroup": "sprites",
+      "scale": 2.6,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              195,
+              196
+            ],
+            "move": [
+              197,
+              198,
+              199,
+              200
+            ],
+            "attack": [
+              201,
+              202,
+              203
+            ],
+            "hurt": [
+              204,
+              205
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              206,
+              207
+            ],
+            "move": [
+              208,
+              209,
+              210,
+              211
+            ],
+            "attack": [
+              212,
+              213,
+              214
+            ],
+            "hurt": [
+              215,
+              216
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              217,
+              218
+            ],
+            "move": [
+              219,
+              220,
+              221,
+              222
+            ],
+            "attack": [
+              223,
+              224,
+              225
+            ],
+            "hurt": [
+              226,
+              227
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "left",
+          "mirror": true,
+          "actions": {
+            "idle": [
+              206,
+              207
+            ],
+            "move": [
+              208,
+              209,
+              210,
+              211
+            ],
+            "attack": [
+              212,
+              213,
+              214
+            ],
+            "hurt": [
+              215,
+              216
+            ]
+          }
+        }
+      }
+    },
+    "yithian_archivist": {
+      "id": "yithian_archivist",
+      "name": "Yithian Archivist",
+      "assetGroup": "sprites",
+      "scale": 3.4,
+      "scaleUnit": "canvas-height-metres",
+      "page": 0,
+      "directions": {
+        "front": {
+          "sourceDirection": "front",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              228,
+              229
+            ],
+            "move": [
+              230,
+              231,
+              232,
+              233
+            ],
+            "attack": [
+              234,
+              235,
+              236
+            ],
+            "hurt": [
+              237,
+              238
+            ]
+          }
+        },
+        "left": {
+          "sourceDirection": "left",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              239,
+              240
+            ],
+            "move": [
+              241,
+              242,
+              243,
+              244
+            ],
+            "attack": [
+              245,
+              246,
+              247
+            ],
+            "hurt": [
+              248,
+              249
+            ]
+          }
+        },
+        "back": {
+          "sourceDirection": "back",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              250,
+              251
+            ],
+            "move": [
+              252,
+              253,
+              254,
+              255
+            ],
+            "attack": [
+              256,
+              257,
+              258
+            ],
+            "hurt": [
+              259,
+              260
+            ]
+          }
+        },
+        "right": {
+          "sourceDirection": "right",
+          "mirror": false,
+          "actions": {
+            "idle": [
+              261,
+              262
+            ],
+            "move": [
+              263,
+              264,
+              265,
+              266
+            ],
+            "attack": [
+              267,
+              268,
+              269
+            ],
+            "hurt": [
+              270,
+              271
+            ]
+          }
+        }
+      }
+    }
+  }
+}

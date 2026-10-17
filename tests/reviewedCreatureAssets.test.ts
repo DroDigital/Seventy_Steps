@@ -101,7 +101,7 @@ describe('reviewed creature artwork imported into the game', () => {
   const pack = JSON.parse(text(read('index.json'))) as Pack;
   const source = JSON.parse(text(read('source-index.json'))) as { entity_count: number; unique_png_count: number; entities: SourceEntity[] };
 
-  it('covers all 105 reviewed entries; only the seven unprovided allies use procedural art', () => {
+  it('covers all 105 reviewed entries and leaves the seven allies to their own atlas', () => {
     const expected = ENTITIES.filter((d) => d.tier !== 'ally').flatMap((d) => [d.id, ...(['eldritch', 'boss'] as const).filter((v) => variantOf(d, v)).map((v) => `${d.id}#${v}`)]);
     expect(Object.keys(pack.entities).sort()).toEqual(expected.sort());
     expect(Object.keys(pack.entities).sort()).toEqual(source.entities.map((e) => e.key).sort());
