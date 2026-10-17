@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { V3 } from '../src/core/geom';
-import { MOUNT_IDS, type MountId } from '../src/data/mounts';
+import { MOUNT_IDS, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import { CREAK, MOUNT_MIX, TRACE_SHIFT, hoofBeat, wheelThump, type Ground } from '../src/data/mountSounds';
 import type { Sound } from '../src/data/sounds';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
@@ -78,13 +78,13 @@ describe('mounts, heard (round 50)', () => {
 
   it('a horse that stops against a wall stops at once, and a long gap or a jump brings no backlog of beats', () => {
     const r = ride('grey');
-    r.advance(120, 11);
+    r.advance(120, MOUNT_TRAVERSAL.cruise);
     r.heard.length = 0;
     r.advance(60, 0);
     expect(hooves(r.heard)).toEqual([]);
     for (const id of MOUNT_IDS) {
       const { heard, audio, pos, mount, advance } = ride(id);
-      advance(10, 10);
+      advance(10, MOUNT_TRAVERSAL.cruise);
       heard.length = 0;
       pos.x += 1000;
       mount.phase += 40;
@@ -99,7 +99,7 @@ describe('mounts, heard (round 50)', () => {
   it('the left feet are heard on the left and the right on the right; a hind hoof lands deeper than a fore', () => {
     const r = ride('grey');
     r.heard.length = 0;
-    r.advance(240, 11);
+    r.advance(240, MOUNT_TRAVERSAL.cruise);
     const by = (leg: number): Heard[] => r.heard.filter((h) => h.key === `mount:grey:hoof:${leg}`);
     for (const leg of [0, 1, 2, 3]) expect(by(leg).length, `leg ${leg}`).toBeGreaterThan(2);
     expect(by(0).every((h) => (h.pan ?? 0) < 0) && by(2).every((h) => (h.pan ?? 0) < 0)).toBe(true);
@@ -109,7 +109,7 @@ describe('mounts, heard (round 50)', () => {
 
   it("the included horse's hooves have a recorded footfall beneath them, pitched down; the skeletons' and the car's do not", () => {
     const grey = ride('grey');
-    grey.advance(180, 11);
+    grey.advance(180, MOUNT_TRAVERSAL.cruise);
     expect(grey.layered.length).toBeGreaterThan(5);
     for (const l of grey.layered) {
       expect(Object.values(SAMPLE_SETS)).toContain(l.set);
@@ -119,7 +119,7 @@ describe('mounts, heard (round 50)', () => {
     }
     for (const id of ['chariot', 'automobile'] as const) {
       const r = ride(id);
-      r.advance(180, 11);
+      r.advance(180, MOUNT_TRAVERSAL.cruise);
       expect(r.layered).toEqual([]);
     }
   });
@@ -127,17 +127,17 @@ describe('mounts, heard (round 50)', () => {
   it('only wheeled mounts that have hooves have the harness, the creak and the snort, and the skeletons alone the whisper; the car has an engine and no hooves', () => {
     const car = ride('automobile');
     car.heard.length = 0;
-    car.advance(600, 16);
+    car.advance(600, MOUNT_TRAVERSAL.gallop);
     expect(hooves(car.heard)).toEqual([]);
     expect(car.heard.some((h) => h.key.endsWith(':thump'))).toBe(true);
     expect(car.heard.some((h) => /trace|creak|snort|whisper/.test(h.key))).toBe(false);
     const grey = ride('grey');
     grey.heard.length = 0;
-    grey.advance(600, 18);
+    grey.advance(600, MOUNT_TRAVERSAL.gallop); // (the real top speed: the snort is for a gallop, which the first set reached only at an artificial 18)
     for (const part of ['trace', 'creak', 'snort', 'thump']) expect(grey.heard.some((h) => h.key.endsWith(`:${part}`)), part).toBe(true);
     const spectral = ride('chariot');
     spectral.heard.length = 0;
-    spectral.advance(600, 18);
+    spectral.advance(600, MOUNT_TRAVERSAL.gallop);
     expect(spectral.heard.some((h) => h.key.endsWith(':snort'))).toBe(false);
     expect(spectral.heard.some((h) => h.key.endsWith(':trace'))).toBe(true);
     expect(spectral.heard.some((h) => h.key.endsWith(':whisper'))).toBe(true);
@@ -159,7 +159,7 @@ describe('mounts, heard (round 50)', () => {
 
   it('pausing silences the beds', () => {
     const r = ride('chariot');
-    r.advance(30, 12);
+    r.advance(30, MOUNT_TRAVERSAL.cruise);
     expect(r.beds.at(-1)!.spectral).toBeGreaterThan(0);
     r.audio.pause();
     expect(r.beds.at(-1)).toEqual(SILENT_BED);
@@ -173,7 +173,7 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
     for (const id of MOUNT_IDS) {
       const r = ride(id);
       r.heard.length = 0;
-      r.advance(900, 18);
+      r.advance(900, MOUNT_TRAVERSAL.gallop);
       r.mount.active = null;
       r.audio.update(1 / 60);
       const loudest = new Map<string, Heard>();
@@ -290,7 +290,7 @@ describe('the wheels no longer clatter (round 52)', () => {
     for (const id of MOUNT_IDS) {
       const r = ride(id);
       r.heard.length = 0;
-      r.advance(1500, 14);
+      r.advance(1500, MOUNT_TRAVERSAL.gallop);
       for (const h of r.heard) expect(h.key, id).not.toMatch(/jingle|knock/);
     }
   });
@@ -311,16 +311,16 @@ describe('the car shifts gear and the spectral chariot breathes (round 52)', () 
   });
 
   it('the spectral chariot\'s wind rises as it quickens, and the car eases off with an exhaust pop', () => {
-    expect(bedTargets('chariot', 18, 'road').spectralHz).toBeGreaterThan(bedTargets('chariot', 2, 'road').spectralHz + 400);
+    expect(bedTargets('chariot', MOUNT_TRAVERSAL.gallop, 'road').spectralHz).toBeGreaterThan(bedTargets('chariot', 2, 'road').spectralHz + 400);
     const car = ride('automobile');
-    car.advance(200, 16);
+    car.advance(200, MOUNT_TRAVERSAL.gallop);
     car.heard.length = 0;
-    for (let i = 0; i < 300 && !car.heard.some((h) => h.key.endsWith(':pop')); i++) car.advance(10, 16 - (i % 2 ? 0 : 6)); // easing off, taking it up again
+    for (let i = 0; i < 300 && !car.heard.some((h) => h.key.endsWith(':pop')); i++) car.advance(10, MOUNT_TRAVERSAL.gallop - (i % 2 ? 0 : 6)); // easing off, taking it up again
     expect(car.heard.some((h) => h.key.endsWith(':pop'))).toBe(true);
     const horse = ride('grey');
-    horse.advance(200, 16);
+    horse.advance(200, MOUNT_TRAVERSAL.gallop);
     horse.heard.length = 0;
-    for (let i = 0; i < 100; i++) horse.advance(10, 16 - (i % 2 ? 0 : 6));
+    for (let i = 0; i < 100; i++) horse.advance(10, MOUNT_TRAVERSAL.gallop - (i % 2 ? 0 : 6));
     expect(horse.heard.some((h) => h.key.endsWith(':pop'))).toBe(false);
   });
 });

@@ -14,7 +14,7 @@ import {
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import type { Sound } from '../../data/sounds';
 import type { Game } from '../../systems/components';
-import { gaitAt, hoofWeight, touchdowns } from '../../systems/mountGait';
+import { gaitAt, gaitScale, hoofWeight, touchdowns } from '../../systems/mountGait';
 import { surfaceAt } from './foley';
 import { SILENT_BED, bedTargets, type MountBed } from './mountBed';
 import type { Sampler } from './sampler';
@@ -24,7 +24,7 @@ type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; r
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
 const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [1.4, 2.4], stone: [1.1, 1.8], water: [99, 99] }; // metres between a wheel's thumps
 const PAIR = 0.059; // the second spectral horse's gait, a share of a cycle behind the first (0.37 rad: render/mountCarriage.ts)
-const GALLOP_SNORT = 14; // m/s
+const GALLOP_SNORT = 14 * gaitScale; // m/s: set for a gallop of 18, kept in step with the mounts' (round 55: a gallop of 10.5 never reached 14)
 
 const between = ([a, b]: readonly [number, number]): number => a + (b - a) * Math.random();
 
@@ -136,7 +136,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
         thumpAt = between(THUMP_EVERY[ground]);
         if (ground !== 'water') recipe(`mount:${id}:thump`, wheelThump(id === 'automobile' ? 'rubber' : 'wood', ground), { gain: MOUNT_MIX.thump * (0.5 + 0.5 * Math.min(1, speed / MOUNT_TRAVERSAL.gallop)) * (ground === 'dirt' ? 0.75 : 1), vary: 0.5, pan: Math.random() * 0.5 - 0.25 });
       }
-      if (id === 'automobile' && lastSpeed - speed > 0.12 && lastSpeed > 9 && Math.random() < 0.5) { // easing off at speed: the exhaust pops
+      if (id === 'automobile' && lastSpeed - speed > 0.12 && lastSpeed > 9 * gaitScale && Math.random() < 0.5) { // easing off at speed: the exhaust pops
         recipe('mount:automobile:pop', EXHAUST_POP, { gain: MOUNT_MIX.pop, pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.3 - 0.15 });
       }
       lastSpeed = speed;
