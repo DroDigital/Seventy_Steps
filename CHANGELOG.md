@@ -5,7 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Plain chariot
 
-- The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. The horse is a formed bay: hide grain, darker under the belly, and a gait whose knees bend and whose hooves plant.
+- The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. The horse is Kenney's, a dark bay with a quiet coat, black points, a pale muzzle, a dark mane, and eyes.
 - The save id is still `grey`, so an older journey keeps its mount. The spectral chariot and the motor car are unchanged, and still no faster.
 - On the desktop build, looking for a controller no longer closes and reopens the helper process, which was waking the macOS dock and pausing the game.
 
