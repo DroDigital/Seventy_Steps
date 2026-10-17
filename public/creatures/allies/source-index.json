@@ -919,20 +919,20 @@
                 {
                   "name": "move_1.png",
                   "path": "sprites/tritons/64x64/left/move_1.png",
-                  "sha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
+                  "sha256": "4361151d1696e0d83adf57e6d81b0907933259b0f99dc95dac61153216b0cefb",
                   "bounds": [
-                    18,
+                    22,
                     13,
-                    49,
+                    45,
                     62
                   ]
                 },
                 {
                   "name": "move_2.png",
                   "path": "sprites/tritons/64x64/left/move_2.png",
-                  "sha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
+                  "sha256": "e763eb31cc30cf4d357b6ccd3d6b79668652b35c78b9254e1845e848d3c0cd8e",
                   "bounds": [
-                    22,
+                    21,
                     13,
                     50,
                     62
@@ -941,33 +941,33 @@
                 {
                   "name": "move_3.png",
                   "path": "sprites/tritons/64x64/left/move_3.png",
-                  "sha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
+                  "sha256": "724bda47750a47e116c011967e0f13873614a5c5dcbe86726ea47c1a57fec4b0",
                   "bounds": [
-                    20,
+                    18,
                     13,
-                    53,
+                    51,
                     62
                   ]
                 },
                 {
                   "name": "move_4.png",
                   "path": "sprites/tritons/64x64/left/move_4.png",
-                  "sha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
+                  "sha256": "fec7aebb4a5696b5d656e6034c7031d405a716876ff66bf4f93aac545e3b949e",
                   "bounds": [
                     21,
                     13,
-                    48,
+                    43,
                     62
                   ]
                 },
                 {
                   "name": "move_5.png",
                   "path": "sprites/tritons/64x64/left/move_5.png",
-                  "sha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
+                  "sha256": "396ee730bba07476f1b04af26351671c5a26b6784bd6b5fe9cb59ec6dca56690",
                   "bounds": [
                     22,
                     13,
-                    49,
+                    53,
                     62
                   ]
                 }
@@ -1257,20 +1257,20 @@
                 {
                   "name": "move_1.png",
                   "path": "sprites/tritons/64x64/left/move_1.png",
-                  "sha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
+                  "sha256": "4361151d1696e0d83adf57e6d81b0907933259b0f99dc95dac61153216b0cefb",
                   "bounds": [
-                    18,
+                    22,
                     13,
-                    49,
+                    45,
                     62
                   ]
                 },
                 {
                   "name": "move_2.png",
                   "path": "sprites/tritons/64x64/left/move_2.png",
-                  "sha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
+                  "sha256": "e763eb31cc30cf4d357b6ccd3d6b79668652b35c78b9254e1845e848d3c0cd8e",
                   "bounds": [
-                    22,
+                    21,
                     13,
                     50,
                     62
@@ -1279,33 +1279,33 @@
                 {
                   "name": "move_3.png",
                   "path": "sprites/tritons/64x64/left/move_3.png",
-                  "sha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
+                  "sha256": "724bda47750a47e116c011967e0f13873614a5c5dcbe86726ea47c1a57fec4b0",
                   "bounds": [
-                    20,
+                    18,
                     13,
-                    53,
+                    51,
                     62
                   ]
                 },
                 {
                   "name": "move_4.png",
                   "path": "sprites/tritons/64x64/left/move_4.png",
-                  "sha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
+                  "sha256": "fec7aebb4a5696b5d656e6034c7031d405a716876ff66bf4f93aac545e3b949e",
                   "bounds": [
                     21,
                     13,
-                    48,
+                    43,
                     62
                   ]
                 },
                 {
                   "name": "move_5.png",
                   "path": "sprites/tritons/64x64/left/move_5.png",
-                  "sha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
+                  "sha256": "396ee730bba07476f1b04af26351671c5a26b6784bd6b5fe9cb59ec6dca56690",
                   "bounds": [
                     22,
                     13,
-                    49,
+                    53,
                     62
                   ]
                 }

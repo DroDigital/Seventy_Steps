@@ -5,13 +5,13 @@
   "filter": "nearest",
   "mipmaps": false,
   "gutter": 1,
-  "sourceIndexSha256": "02619aab93807389528c5c3bfcd79d20c0dcd8e0578b1d419f56dec9905fe5ee",
+  "sourceIndexSha256": "84a3d712d810d10e2bd48c72f11818651260b089acd369b87b7f24d0eb489f43",
   "pages": [
     {
       "file": "allies-0.png",
       "width": 1980,
       "height": 660,
-      "sha256": "9c9a19c47d6b2f285622a51911c989b7bf78cbb8707ca139ce4b715c06023a7a"
+      "sha256": "3fec4dd7d7704395d637fe068df84fbbe3c12c9bf97072621c51670a98313e4b"
     }
   ],
   "frames": [
@@ -897,14 +897,14 @@
     },
     {
       "source": "sprites/tritons/64x64/left/move_1.png",
-      "sourceSha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
-      "pixelSha256": "6fe0a305c1111826eabd84274caccec0bdbb5e6fb355a5ecea8975c7a9873428",
+      "sourceSha256": "4361151d1696e0d83adf57e6d81b0907933259b0f99dc95dac61153216b0cefb",
+      "pixelSha256": "1e831a79f5abc39782ae785b6b13a0dae58a2bf4d9cc0655aebc39c903ac088f",
       "width": 64,
       "height": 64,
       "bounds": [
-        18,
+        22,
         13,
-        49,
+        45,
         62
       ],
       "page": 0,
@@ -913,12 +913,12 @@
     },
     {
       "source": "sprites/tritons/64x64/left/move_2.png",
-      "sourceSha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
-      "pixelSha256": "61c4575718c85d710dc38060039df500f94bbda3c05f3e7e6bf916f2d7b02301",
+      "sourceSha256": "e763eb31cc30cf4d357b6ccd3d6b79668652b35c78b9254e1845e848d3c0cd8e",
+      "pixelSha256": "ff15dadc56084cd24291a6d01baf7d13776f0dd9dc6510cc0c92bf5b38e1c283",
       "width": 64,
       "height": 64,
       "bounds": [
-        22,
+        21,
         13,
         50,
         62
@@ -929,14 +929,14 @@
     },
     {
       "source": "sprites/tritons/64x64/left/move_3.png",
-      "sourceSha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
-      "pixelSha256": "af3ea0cb8f104fdef95b85609f4bdefa83733826a799c49bbf0f8fa401b49318",
+      "sourceSha256": "724bda47750a47e116c011967e0f13873614a5c5dcbe86726ea47c1a57fec4b0",
+      "pixelSha256": "260a22dfceed0307ab2f13f05828701171ba1a53e59d7a4a242302232a5794be",
       "width": 64,
       "height": 64,
       "bounds": [
-        20,
+        18,
         13,
-        53,
+        51,
         62
       ],
       "page": 0,
@@ -945,14 +945,14 @@
     },
     {
       "source": "sprites/tritons/64x64/left/move_4.png",
-      "sourceSha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
-      "pixelSha256": "8da90afd6b9b756ba43486458d9441bebcce05ee3febb4b9ce3baf8da3c17f6a",
+      "sourceSha256": "fec7aebb4a5696b5d656e6034c7031d405a716876ff66bf4f93aac545e3b949e",
+      "pixelSha256": "8b228e2011789d5bacbfc73fee34696923fecf03eb3b124dcafe91088d46afcc",
       "width": 64,
       "height": 64,
       "bounds": [
         21,
         13,
-        48,
+        43,
         62
       ],
       "page": 0,
@@ -961,14 +961,14 @@
     },
     {
       "source": "sprites/tritons/64x64/left/move_5.png",
-      "sourceSha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
-      "pixelSha256": "46cac3a7287489389cf5af7950b7317e13309a20e5f45ea2adeddbcd6d05dbd7",
+      "sourceSha256": "396ee730bba07476f1b04af26351671c5a26b6784bd6b5fe9cb59ec6dca56690",
+      "pixelSha256": "4706b8001bacf04db10891a3ad450ebc84f9fa24613fd5ca7fb15907a183d1db",
       "width": 64,
       "height": 64,
       "bounds": [
         22,
         13,
-        49,
+        53,
         62
       ],
       "page": 0,
