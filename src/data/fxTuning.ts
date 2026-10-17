@@ -72,12 +72,12 @@ export const LAMP_SHADOWS = {
 
 /** The moon's shadows (round 34, render/moonShadow.ts): one depth map drawn from the moon over the investigator. Lengths in metres. */
 export const SHADOW = {
-  size: 1024, // texels a side: with `range`, a texel is 7 cm
+  size: 1536, // texels a side: with `range`, a texel is 4.4 cm (round 54: it was 1024 and 6.6 cm, which a house's foot and a trunk's are within)
   range: 34, // half the width of ground the map covers about the investigator (the shadows fade out toward its edge)
   depth: 160, // how far the map looks along the moon's rays, about the investigator
-  strength: 0.9, // the share of the moon's light a shadow takes away (the rest is the sky's, and what the land gives back)
-  bias: 0.07, // metres a surface is held from its own shadow, more where it turns from the moon
-  offset: 0.12, // metres a point is pushed off its surface along the normal before it is looked up
+  strength: 0.94, // the share of the moon's light a shadow takes away (the rest is the sky's, and what the land gives back)
+  bias: 0.035, // metres a surface is held from its own shadow, more where it turns from the moon (round 54: 0.07, which left a hand's breadth of lit ground, a gap, under a wall's foot)
+  offset: 0.06, // metres a point is pushed off its surface along the normal before it is looked up (round 54: 0.12)
 };
 
 /** Eyes out of the mist (round 35, render/creatureViews.ts): in a mist, a creature that sees the investigator shows its eyes from far off, glowing out of it. */
@@ -94,11 +94,29 @@ export const FOG_EYES = {
 
 /** How the picture is lit and finished (round 39, render/shaders/post.ts and world.ts): what the shadow maps cannot give. */
 export const LIGHTING = {
-  ao: { strength: 1.0, radius: 0.75, reach: 55 }, // contact shadow: the share of light a crease, a foot, the base of a wall loses at most; metres it looks about; metres from the lens it fades out by
+  ao: { strength: 0.85, radius: 0.75, reach: 55 }, // contact shadow: the share of light a crease, a foot, the base of a wall loses at most; metres it looks about; metres from the lens it fades out by
   bloom: { strength: 0.95, from: 0.58, knee: 0.3, radius: 7 }, // what shines bleeds into what is about it: the strength, the brightness it begins at, how soft the start is, low-res pixels it spreads
   vignette: 0.42, // how much the picture's corners darken, so the eye is kept toward the middle
-  sky: 1.3, // the ambient on a surface facing straight up (the sky's), against...
-  ground: 0.55, // ...one facing straight down (what the dark ground gives back)
+  sky: 1.05, // the ambient on a surface facing straight up (the sky's), against... (round 54: 1.3 and 0.55, which left shade too bright against what the light reaches)
+  ground: 0.38, // ...one facing straight down (what the dark ground gives back)
   sheen: { stone: 0.35, power: 30 }, // stone catches a restrained glint; rain adds its own wet sheen
   flicker: { lantern: 0.045, speed: 7 }, // how much the lantern's light breathes, and how fast
 };
+
+/**
+ * Where things meet the ground (round 54; world/groundContact.ts, render/terrainMesh.ts, render/baseCover.ts): a house, a tree or a stone is not set
+ * on the land like a model on a table. The terrain about its foot is darkened and turned toward bare earth in its vertices, an irregular
+ * edge to it, and a few roots, tufts and pebbles stand where the two meet. Lengths in metres.
+ */
+export const GROUND_CONTACT = {
+  dark: 0.62, // the share of its light the ground loses at the very foot of a thing, falling away smoothly to its reach (no ring, no halo)
+  soil: 0.7, // how far the ground's tint is turned to bare earth at the foot
+  earth: [0.5, 0.38, 0.28] as readonly [number, number, number], // the earth's tint (the terrain's own tints are about this bright)
+  reach0: 1.1, // how far from a footprint's edge the ground is touched: this, ...
+  reachPer: 0.55, // ...and this much more for each metre of the thing's own size (its radius, or the root of its two half-sides)...
+  reachMax: 3.4, // ...at most this far
+  wobble: 0.45, // metres by which the earth's edge is broken up by noise: a patch, not a ring
+  minSize: 0.2, // things slimmer than this (a lamp post, a cross, a fence) leave no mark
+  cover: { tufts: 0.7, roots: 4 }, // the plants about a base: tufts to each metre of reach, and roots about a tree's foot (render/baseCover.ts)
+};
+

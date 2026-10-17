@@ -3,6 +3,11 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## After 1.0.0-rc.3 (not yet released)
+
+- **Things stand on the ground.** A house, a tree or a stone no longer sits on the land like a model on a table. The ground about its foot is darker and turned to bare earth, with an uneven edge (a patch, not a ring), tufts, ferns, pebbles and the odd toadstool stand thicker about the base, and a tree's roots flare out of its trunk into the earth. Shadows meet the ground more closely: the moon's shadow map is finer (4.4 cm to a texel, and was 6.6) and holds a surface a hair from its own shadow, not a hand's breadth, so there is no lit gap beneath a wall; the contact shadow in the picture is a little gentler, so it darkens a foundation or a stone's foot without a black halo; and shadows thin out over the far half of the map's width instead of the last third.
+- **Shade is darker.** The sky's ambient light is lower (1.3 to 1.05 on what faces up, and 0.55 to 0.38 on what faces down), so what the moon and the lantern do not reach is noticeably darker than what they do, and still readable.
+
 ## 1.0.0-rc.3: the edge, UNMADE, the run and the rain
 
 - **The edge is a fall, not a wall of death.** A hand's breadth of the body over a pit, a well or a bridge's gap used to kill at once. Now you can stand on the very edge, with your heels over the void, and step back: nothing happens, and no animation begins that would condemn you, while any of your feet has stone under it. Only when none of it does, you fall: the arms fly up, the legs run on in the air, you tumble head first, the camera swings up over the hole to look down after you, the picture closes in to black and a rush of air goes by, and the death comes at the foot of the drop. Your Lost Echoes lie on the ground at the lip. Nothing in the room can strike you while you fall. The sea and the land's end are as quick as they were.

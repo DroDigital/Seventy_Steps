@@ -17,10 +17,10 @@ import { chunkKey, rectDistance } from '../world/worldMap';
 import type { PropMat } from './propShapes';
 
 type Rgb = readonly [number, number, number];
-type Kind = 'tuft' | 'reed' | 'dry' | 'litter' | 'pebble' | 'nodule' | 'fern' | 'tallgrass' | 'flower' | 'mushroom' | 'bramble';
+export type Kind = 'tuft' | 'reed' | 'dry' | 'litter' | 'pebble' | 'nodule' | 'fern' | 'tallgrass' | 'flower' | 'mushroom' | 'bramble';
 
 /** Pieces a chunk holds, by its ground, and what they are. */
-const COVER: Readonly<Record<GroundTexture, { count: number; mix: readonly [Kind, number][] }>> = {
+export const COVER: Readonly<Record<GroundTexture, { count: number; mix: readonly [Kind, number][] }>> = {
   // Round 35 (more foliage, where it would grow): ferns, brambles and toadstools under the trees, tall seeding grass and a few wildflowers in the meadows, reeds along the mud.
   grass: { count: 190, mix: [['tuft', 0.34], ['tallgrass', 0.18], ['fern', 0.08], ['flower', 0.06], ['bramble', 0.06], ['litter', 0.12], ['mushroom', 0.04], ['pebble', 0.12]] },
   rot: { count: 110, mix: [['dry', 0.4], ['mushroom', 0.2], ['bramble', 0.15], ['pebble', 0.25]] },
@@ -36,7 +36,7 @@ const COVER: Readonly<Record<GroundTexture, { count: number; mix: readonly [Kind
   water: { count: 0, mix: [] },
 };
 
-const COLORS: Readonly<Record<Kind, readonly Rgb[]>> = {
+export const COLORS: Readonly<Record<Kind, readonly Rgb[]>> = {
   tuft: [[0.5, 0.52, 0.34], [0.58, 0.55, 0.36], [0.44, 0.47, 0.32]],
   reed: [[0.4, 0.44, 0.34], [0.5, 0.5, 0.36]],
   dry: [[0.7, 0.62, 0.44], [0.62, 0.56, 0.42]],
@@ -50,7 +50,7 @@ const COLORS: Readonly<Record<Kind, readonly Rgb[]>> = {
   bramble: [[0.34, 0.3, 0.24], [0.4, 0.34, 0.26]],
 };
 
-class Builder {
+export class Builder {
   constructor(private readonly swaying = false) {} // a geometry that is blown carries aSway for it; one that is not (stones) must not, or it will not merge with the props' (propMeshes.ts)
   pos: number[] = [];
   col: number[] = [];
@@ -79,8 +79,8 @@ class Builder {
   }
 }
 
-const shade = (c: Rgb, k: number): Rgb => [c[0] * k, c[1] * k, c[2] * k];
-const GAIN = 1.8; // textures average about half brightness: vertex colours are raised to show their own
+export const shade = (c: Rgb, k: number): Rgb => [c[0] * k, c[1] * k, c[2] * k];
+export const GAIN = 1.8; // textures average about half brightness: vertex colours are raised to show their own
 
 /** Blades from (x, y, z), each a thin triangle leaning out, both faces. */
 function blades(b: Builder, rng: Rng, x: number, y: number, z: number, n: number, h: number, w: number, c: Rgb): void {
@@ -182,6 +182,21 @@ function litter(b: Builder, rng: Rng, x: number, y: number, z: number): void {
   }
 }
 
+/** One piece of cover of `kind` standing at (x, y, z): blades and leaves into `leaf`, stones and nodules into `stone`. */
+export function plantAt(kind: Kind, leaf: Builder, stone: Builder, rng: Rng, x: number, y: number, z: number): void {
+  const c = shade(COLORS[kind][Math.floor(rng() * COLORS[kind].length)], GAIN);
+  if (kind === 'tuft') blades(leaf, rng, x, y, z, 4 + Math.floor(rng() * 4), 0.45, 0.05, c);
+  else if (kind === 'dry') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 0.35, 0.04, c);
+  else if (kind === 'reed') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 1.1, 0.04, c);
+  else if (kind === 'litter') litter(leaf, rng, x, y, z);
+  else if (kind === 'fern') fern(leaf, rng, x, y, z, c);
+  else if (kind === 'tallgrass') tallgrass(leaf, rng, x, y, z, c);
+  else if (kind === 'flower') flower(leaf, rng, x, y, z, c);
+  else if (kind === 'mushroom') mushroom(leaf, rng, x, y, z, c);
+  else if (kind === 'bramble') bramble(leaf, rng, x, y, z, c);
+  else pebble(stone, rng, x, y, z, c);
+}
+
 /** The chunk's ground cover, as a geometry per material (leaf: blades and leaves; stone: pebbles and nodules). */
 export function groundCover(cx: number, cz: number, region: RegionDef, roads: readonly RoadSeg[]): Partial<Record<PropMat, THREE.BufferGeometry>> {
   const cover = COVER[region.biome.texture];
@@ -196,17 +211,7 @@ export function groundCover(cx: number, cz: number, region: RegionDef, roads: re
     if (pads.some((p) => (p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) < p.radius + 1 : rectDistance(p.rect, x, z) < 1))) continue;
     const y = surface(x, z);
     if (y < WORLD.seaLevel) continue;
-    const c = shade(COLORS[kind][Math.floor(rng() * COLORS[kind].length)], GAIN);
-    if (kind === 'tuft') blades(leaf, rng, x, y, z, 4 + Math.floor(rng() * 4), 0.45, 0.05, c);
-    else if (kind === 'dry') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 0.35, 0.04, c);
-    else if (kind === 'reed') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 1.1, 0.04, c);
-    else if (kind === 'litter') litter(leaf, rng, x, y, z);
-    else if (kind === 'fern') fern(leaf, rng, x, y, z, c);
-    else if (kind === 'tallgrass') tallgrass(leaf, rng, x, y, z, c);
-    else if (kind === 'flower') flower(leaf, rng, x, y, z, c);
-    else if (kind === 'mushroom') mushroom(leaf, rng, x, y, z, c);
-    else if (kind === 'bramble') bramble(leaf, rng, x, y, z, c);
-    else pebble(stone, rng, x, y, z, c);
+    plantAt(kind, leaf, stone, rng, x, y, z);
   }
   const out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
   const [lg, sg] = [leaf.geometry(), stone.geometry()];

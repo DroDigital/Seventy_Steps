@@ -11,7 +11,9 @@ import { REGION_LAYOUTS, type RoadTexture } from '../data/regionFeatures';
 import type { GroundTexture } from '../data/regions';
 import { chunkContent } from '../world/chunks';
 import { roadShare } from '../world/regionPlan';
+import { GROUND_CONTACT } from '../data/fxTuning';
 import { WORLD } from '../data/tuning';
+import { contactsNearChunkJob, markAt, type Contact } from '../world/groundContact';
 import { inDungeon, surface } from '../world/terrain';
 import { regionOfChunk, regionsNearChunk } from '../world/worldMap';
 import { createWorldMaterial } from './worldMaterial';
@@ -58,6 +60,9 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
   const splat = new Float32Array(count);
   const roads = chunkContent(cx, cz).roads;
   const tint = region.biome.tint;
+  let contacts: Contact[] = []; // what stands on this ground: its foot is darkened and turned to earth (world/groundContact.ts)
+  yield* contactsNearChunkJob(cx, cz, (c) => (contacts = c));
+  const earth = GROUND_CONTACT.earth;
   const at = (i: number, j: number): number => h[(j + 1) * w + (i + 1)];
   for (let j = 0, v = 0; j <= n; j++) {
     for (let i = 0; i <= n; i++, v++) {
@@ -68,8 +73,14 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
       const len = Math.hypot(dx, 1, dz);
       nor.set([-dx / len, 1 / len, -dz / len], v * 3);
       uv.set([x / TILE, z / TILE], v * 2);
-      const k = GAIN * (0.62 + 0.38 * fbm(x * 0.15, z * 0.15, 99, 2));
-      col.set([tint[0] * k, tint[1] * k, tint[2] * k], v * 3);
+      let k = GAIN * (0.62 + 0.38 * fbm(x * 0.15, z * 0.15, 99, 2));
+      const mark = contacts.length ? markAt(contacts, x, z) : null;
+      if (!mark || (mark.dark <= 0 && mark.soil <= 0)) col.set([tint[0] * k, tint[1] * k, tint[2] * k], v * 3);
+      else {
+        k *= 1 - GROUND_CONTACT.dark * mark.dark;
+        const e = GROUND_CONTACT.soil * mark.soil;
+        col.set([(tint[0] + (earth[0] - tint[0]) * e) * k, (tint[1] + (earth[1] - tint[1]) * e) * k, (tint[2] + (earth[2] - tint[2]) * e) * k], v * 3);
+      }
       splat[v] = roadShare(roads, x, z);
     }
     if (j % ROWS_PER_STEP === ROWS_PER_STEP - 1) yield;
