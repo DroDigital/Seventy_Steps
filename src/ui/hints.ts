@@ -6,7 +6,6 @@
  */
 
 import { t } from '../core/i18n';
-import { TOOLTIPS } from '../data/tuning';
 import { HINT_KEPT, hintGiven, takeUpBrowser, type HintId } from '../data/fieldGuide';
 import type { Key } from '../data/lang';
 import type { Entity } from '../core/ecs';
@@ -16,10 +15,13 @@ import { zonesOf } from '../systems/hurt';
 import { mainLead } from '../systems/lead';
 import { canLevel, LEVEL_IDS } from '../systems/levels';
 import { fill } from './glyphs';
-import { createGateHint, watch } from './hintWatch';
+import { watch } from './hintWatch';
 import { BONE, el, setStyle, setText } from './hudKit';
 import { HINTS_KEY as KEY } from './loreLine';
 import { mountUnlocked } from '../systems/mounts';
+
+const SHOW_MS = 9000; // the least a hint stays, however short
+const READ_MS = 60; // a character's worth of reading, for the long ones (they stay until the last word can be read)
 
 /** A hint that is followed at once by another: a passage shown by insight, then what spending the insight does to it. */
 const THEN: Readonly<Partial<Record<string, HintId>>> = { passage: 'passageCost' };
@@ -34,7 +36,7 @@ export function bossHints(g: Game, boss: Entity): HintId[] {
 }
 
 export interface Hints {
-  update(ms: number): void;
+  update(): void;
 }
 
 function load(): Set<string> {
@@ -46,17 +48,15 @@ function load(): Set<string> {
 }
 
 export function createHints(g: Game, root: HTMLElement): Hints {
-  const box = el(`position:absolute;left:16px;bottom:14px;max-width:min(400px,32%);font-size:13px;line-height:1.6;padding:9px 12px;background:#050506e6;border-left:2px solid ${BONE}aa;opacity:0`, '', root);
+  const box = el(`position:absolute;left:16px;bottom:14px;max-width:min(360px,22vw);font-size:11px;line-height:1.5;padding:6px 10px;background:#050506b0;border-left:2px solid ${BONE}66;opacity:0;transition:opacity .6s`, '', root);
   const browser = load(); // what this browser was told: before hints were kept in each save, and still what the lore lines go by (loreLine.ts)
   const told = g.overworld?.told;
   if (told) takeUpBrowser(told, browser); // a save from before: its investigator was not told these there, but this browser had been
   const seen = (id: HintId): boolean => !!told && hintGiven(told, id);
   const queue: HintId[] = [];
   let until = 0;
-  let now = 0;
-  const gateEntered = createGateHint();
-  const hint = (id: HintId, urgent = false, repeat = false): void => {
-    if (!g.overworld || (!repeat && seen(id)) || queue.includes(id)) return;
+  const hint = (id: HintId, urgent = false): void => {
+    if (!g.overworld || seen(id) || queue.includes(id)) return;
     const then = THEN[id];
     const both = then && !seen(then) && !queue.includes(then) ? [id, then] : [id];
     if (urgent) queue.unshift(...both); // a hint for what is happening now goes before those waiting
@@ -94,25 +94,18 @@ export function createHints(g: Game, root: HTMLElement): Hints {
   let watched = -Infinity;
   let recap = g.overworld && g.overworld.quests.size > 0 ? mainLead(g)?.text : undefined; // a journey taken up again
   return {
-    update(ms) {
-      now += Math.max(0, ms);
+    update() {
       if (g.frame - watched >= 30) { // twice a second of the game's own time (not on a frame that is a multiple of 30: a slow picture steps the game in strides that may never land on one)
         watched = g.frame;
         for (const id of watch(g)) hint(id, true);
         if (mountUnlocked(g)) hint('mount', true);
       }
-      if (gateEntered(g)) {
-        const queued = queue.indexOf('fog');
-        if (queued >= 0) queue.splice(queued, 1);
-        hint('fog', true, true);
-        until = 0; // approaching again shows the instructions at once, even if already kept in the Field Guide
-      }
-      setStyle(box, 'opacity', Math.min(1, Math.max(0, (until - now) / TOOLTIPS.hintFade)).toFixed(2));
+      const now = performance.now();
       if (now < until) return;
       setStyle(box, 'opacity', '0');
-      if (recap && g.frame > 30 && queue[0] !== 'fog') { // once the veil has lifted; a gate in reach takes priority
+      if (recap && g.frame > 30) { // once the veil has lifted and the world moves
         setText(box, `Where you left off: ${recap}`);
-        [recap, until] = [undefined, now + Math.max(TOOLTIPS.hintHold, box.textContent!.length * TOOLTIPS.hintRead) + TOOLTIPS.hintFade];
+        [recap, until] = [undefined, now + SHOW_MS];
         return setStyle(box, 'opacity', '1');
       }
       const next = queue.shift();
@@ -127,7 +120,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
       const words = fill(t(`hint.${next}` as Key)); // the buttons of the device in hand
       setText(box, words);
       setStyle(box, 'opacity', '1');
-      until = now + Math.max(TOOLTIPS.hintHold, words.length * TOOLTIPS.hintRead) + TOOLTIPS.hintFade;
+      until = now + Math.max(SHOW_MS, words.length * READ_MS);
     },
   };
 }

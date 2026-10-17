@@ -105,7 +105,6 @@ export const isDifficulty = (v: unknown): v is DifficultyId => typeof v === 'str
 
 /** The UI's scale (ui/uiScale.ts): 1 at a window this tall, and never below or above these. */
 export const UI = { baseHeight: 720, least: 1, most: 2.5 };
-export const TOOLTIPS = { noticeHold: 3500, noticeRead: 45, noticeFade: 1200, hintHold: 10000, hintRead: 65, hintFade: 1500, gateReset: 0.6 }; // milliseconds; gateReset in metres
 /** A first launch on a Steam Deck (round 47): its 1280 × 800 seven inches show the picture at 720 lines, the UI at ×1; larger text and captions. */
 export const DECK = { uiScale: 1.15, captions: 1.2 };
 
