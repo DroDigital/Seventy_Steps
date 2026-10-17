@@ -60,8 +60,8 @@ export function setSanity(g: Pick<Game, 'mind' | 'events'>, value: number): void
 }
 
 /** Takes sanity; each level of the Resolve upgrade lessens every loss. A loss of SANITY.jolt or more at once is announced. */
-export function loseSanity(g: Pick<Game, 'mind' | 'events'>, amount: number): void {
-  if (amount <= 0) return;
+export function loseSanity(g: Pick<Game, 'mind' | 'events' | 'cutscene'>, amount: number): void {
+  if (amount <= 0 || g.cutscene) return;
   const resist = g.mind.upgrades.resolve * (UPGRADES.resolve.resist ?? 0);
   const before = g.mind.sanity;
   setSanity(g, before - amount * (1 - resist));
@@ -131,7 +131,7 @@ export function mendRate(g: Game): number {
 /** Unmoored, the body wears away as well (round 23): a little of full health a second, never to death, and none while a shot of Reagent holds the body. */
 export function bleed(g: Game, dt: number): void {
   const h = g.ecs.c.health.get(g.player.id);
-  if (!h || g.mind.band !== 'unmoored' || h.hp <= 1 || g.player.mended > 0) return; // (a fallen body, at 0, has nothing to lose)
+  if (!h || g.cutscene || g.mind.band !== 'unmoored' || h.hp <= 1 || g.player.mended > 0) return; // (a fallen body, at 0, has nothing to lose)
   h.hp = Math.max(1, h.hp - h.max * SANITY.unmoored.bleed * dt);
 }
 

@@ -93,6 +93,7 @@ const platforms: HookStep = (g, fights) => {
 };
 
 const petrify: HookStep = (g, fights) => {
+  if (g.cutscene) return;
   const r = g.reality;
   const c = g.ecs.c;
   const eye = playerEye(g);

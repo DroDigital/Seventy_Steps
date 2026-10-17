@@ -7,13 +7,28 @@
  */
 
 import { distXZ } from '../core/geom';
-import { fogNear } from '../systems/fogGates';
+import { FOG_REACH, fogNear } from '../systems/fogGates';
+import { TOOLTIPS } from '../data/tuning';
 import { isAbsent, type Game } from '../systems/components';
 import { owned } from '../systems/relics';
 
 export type Watched = 'fight' | 'breath' | 'fog' | 'talk' | 'passage' | 'relic' | 'transfer';
 
 const NEAR = { foe: 32, fog: 14, person: 7, passage: 10 }; // metres
+
+/** An entry into a gate's interaction range. A small step back rearms it; standing still never repeats it. */
+export function createGateHint(): (g: Game) => boolean {
+  let gate: string | null = null;
+  return (g) => {
+    const p = g.ecs.c.transform.get(g.player.id)?.pos;
+    if (!p || g.player.fogPass || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return false;
+    const near = fogNear(g, p, FOG_REACH + TOOLTIPS.gateReset);
+    if (!near) gate = null;
+    if (!near || near.gap > FOG_REACH || near.wall.id === gate) return false;
+    gate = near.wall.id;
+    return true;
+  };
+}
 
 /** Whether a doorway or bridge that insight alone shows stands open within reach of `me`: the first the investigator is shown. */
 function nearPassage(g: Game, me: { x: number; z: number }): boolean {

@@ -28,6 +28,7 @@ import { callPack, hears, noiseOf, perceive, sight, tracks } from './perception'
 import { roam } from './roam';
 import { assignTokens, fight, walk } from './tactics';
 import { targetsOf } from './targets';
+import { awaitsIntroduction } from './npcIntroduction';
 
 export { chooseAttack } from './tactics';
 
@@ -57,6 +58,12 @@ function settle(g: Game, id: Entity, br: Brain, m: Mover): void {
 function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transform, arena: ArenaCircle | undefined): void {
   const p = br.def.params;
   const ally = br.def.archetype === 'ally';
+  if (ally && awaitsIntroduction(g, id)) {
+    // A speaking ally is first met at their post, before following or fighting can carry them away.
+    br.target = null;
+    settle(g, id, br, m);
+    return;
+  }
   const anchor: XZ = ally ? g.ecs.c.transform.get(g.player.id)!.pos : g.ecs.c.home.get(id) ?? tr.pos;
   const perceived = perceive(g, id, br.target, p);
   const seen = arena ? arenaSight(g, id, br, arena, perceived) : perceived;
@@ -187,6 +194,7 @@ export function brainSystem(g: Game): void {
     const tr = transform.get(id)!;
     m.vx = 0;
     m.vz = 0;
+    if (g.cutscene && br.target === g.player.id) continue;
     if (isAbsent(g, id) || a.frozen || (health.get(id)?.hp ?? 0) <= 0 || waitsToJoin(g, id, br)) continue;
     const arena = arenaOf(g, id);
     if (arena || br.def.archetype === 'ally') steady(g, id, br, a, m, tr, arena);

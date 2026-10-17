@@ -294,6 +294,7 @@ export interface Game {
   lock: LockState;
   rng: Rng;
   frame: number;
+  cutscene: boolean; // transient: the camera holds control, so the investigator cannot be targeted or hurt
   reality: Reality;
   overworld?: Overworld;
   /** How well lit the ground at a point is by the world's lamps, fires and torches, 0..1 (handed in by the renderer, which knows where they are; the dark when absent: sanity.ts mends faster in it). */

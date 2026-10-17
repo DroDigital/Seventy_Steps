@@ -98,6 +98,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     lock: { target: null, unseen: 0 },
     rng: createRng(seed),
     frame: 0,
+    cutscene: false,
     reality: createReality(),
   };
   registerMounts(g);

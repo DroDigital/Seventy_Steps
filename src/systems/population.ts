@@ -52,7 +52,12 @@ export function populationSystem(g: Game): void {
     for (const s of chunkContent(ch.cx, ch.cz).spawns) {
       if (ow.alive.size >= WORLD.maxActive) return;
       if (ow.alive.has(s.id) || ow.killed.has(s.id) || ow.slain.has(s.id)) continue;
-      if (getEntity(s.entity)?.bossScript?.called && !ow.called.has(s.entity)) continue; // not called yet: its arena waits empty
+      const script = getEntity(s.entity)?.bossScript;
+      if (script?.joins && ow.slain.has(`boss:${script.joins.with}`)) {
+        ow.slain.add(s.id); // its leader fell before it was streamed in (or in a save from before paired deaths)
+        continue;
+      }
+      if (script?.called && !ow.called.has(s.entity)) continue; // not called yet: its arena waits empty
       if (!bossAwake(g, s.entity)) continue; // the one before it still stands (the Beyond's order): its arena waits empty
       const e = spawnCreature(g, s.entity, s.at, s.variant);
       if (e === undefined) continue;

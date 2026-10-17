@@ -11,6 +11,7 @@ import { resolveCapsule } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
 import { isAbsent, type Game } from './components';
 import { managed } from './npcLife';
+import { awaitsIntroduction } from './npcIntroduction';
 import { dismissMount, moveMounted } from './mounts';
 import { footprintClear } from './mountGround';
 
@@ -27,6 +28,10 @@ export function movementSystem(g: Game, dt: number): void {
     }
     const b = body.get(id);
     const a = actor.get(id);
+    if (awaitsIntroduction(g, id)) {
+      shove.delete(id);
+      continue;
+    }
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
     if (id === g.player.id) {
       if (shove.has(id)) dismissMount(g); // a wind or vortex still moves the investigator and expires normally
@@ -81,7 +86,9 @@ function separate(g: Game): void {
     for (let j = i + 1; j < ids.length; j++) {
       const ba = body.get(ids[i])!;
       const bb = body.get(ids[j])!;
-      if (ba.fixed && bb.fixed) continue;
+      const fixedA = ba.fixed || awaitsIntroduction(g, ids[i]);
+      const fixedB = bb.fixed || awaitsIntroduction(g, ids[j]);
+      if (fixedA && fixedB) continue;
       const pa = transform.get(ids[i])!.pos;
       const pb = transform.get(ids[j])!.pos;
       const dx = pb.x - pa.x;
@@ -90,7 +97,7 @@ function separate(g: Game): void {
       const push = ba.radius + bb.radius - d;
       if (push <= 0) continue;
       const [nx, nz] = d > 1e-6 ? [dx / d, dz / d] : [1, 0];
-      const wa = ba.fixed ? 0 : bb.fixed ? 1 : mass(bb.radius) / (mass(ba.radius) + mass(bb.radius)); // the share A gives way by
+      const wa = fixedA ? 0 : fixedB ? 1 : mass(bb.radius) / (mass(ba.radius) + mass(bb.radius)); // the share A gives way by
       pa.x -= nx * push * wa;
       pa.z -= nz * push * wa;
       pb.x += nx * push * (1 - wa);
