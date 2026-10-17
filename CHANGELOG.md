@@ -9,6 +9,13 @@ player would notice, newest first. Versions before 1.0 were never released.
 - The save id is still `grey`, so an older journey keeps its mount. The spectral chariot and the motor car are unchanged, and still no faster.
 - On the desktop build, looking for a controller no longer closes and reopens the helper process, which was waking the macOS dock and pausing the game.
 
+## Edges and horrors
+
+- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. Riding off the land is the same fall. The Lost Echoes stay on the ground where you stepped off.
+- Each horror's attacks keep their motion and take that horror's own colours: the telegraphs, the bursts and the beams.
+- Casters no longer share one green fireball. Yog-Sothoth still throws that light. The Colour's orb is its own hue. Other shots are shards, drops, sparks or darts.
+- A horror's areas wear its own mark: tide, runes, cracks, flame, spores, coils, an eye, roots, stars, frost, ash or a stain. The ground they cover, and when they land, is unchanged.
+
 ## Allied sprites
 
 - Nodens, the Tritons, the Cats of Ulthar, Pickman, Nasht and Kaman-Thah, the Light-Being from Algol and the Yithian Archivist are drawn from authored sprites: idle, walk or glide, attack and hurt, from all four sides.

@@ -29,6 +29,7 @@ import { meleeSystem } from './combat';
 import { createStores, type Game, type GameEvents } from './components';
 import { dreadOf, resolveCreature, spawnCreature } from './creatures';
 import { deathSystem, registerDeath } from './death';
+import { fallSystem } from './falls';
 import { fightActionSystem } from './fightActions';
 import { hallucinationSystem, registerHallucinations } from './hallucinations';
 import { hazardSystem } from './hazards';
@@ -190,7 +191,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
 
 /**
  * One fixed 60 Hz step. The order matters: intent → a boss fight's E, then signs, gates and talk → moves →
- * AI → motion → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
+ * AI → motion → falls → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
  * their reality hooks → lock → camera → sight → the words of rooms and people → hallucinations → death → population.
  */
 export function stepGame(g: Game, input: InputFrame): void {
@@ -211,6 +212,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   wanderSystem(g);
   hookSystem(g);
   movementSystem(g, dt);
+  fallSystem(g);
   fogBlockSystem(g);
   meleeSystem(g);
   shotSystem(g);

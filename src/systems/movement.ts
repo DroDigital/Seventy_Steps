@@ -67,7 +67,7 @@ export function movementSystem(g: Game, dt: number): void {
       if (--s.frames <= 0) shove.delete(id);
     }
     tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
-    resolveCapsule(g.world, tr.pos, b.radius, b.height);
+    resolveCapsule(g.world, tr.pos, b.radius, b.height, id === g.player.id && !!g.overworld);
     tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
   }
   separate(g);

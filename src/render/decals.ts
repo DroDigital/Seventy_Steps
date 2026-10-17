@@ -3,10 +3,12 @@
  * as one instanced batch. A disc, a sector (a swing's arc), a lane (a charge's path), a ring (a
  * quake's band) and a swirl (a vortex's reach). Each has a bright edge and a dim fill that grows
  * with its `fill` (0..1: how far the wind-up has come) with a brighter front; transparency is
- * ordered-dithered like the particles', so nothing needs sorting.
+ * ordered-dithered like the particles', so nothing needs sorting. `style` sets whose mark is drawn
+ * inside that fill. The plain mark is the old even wash.
  */
 
 import * as THREE from 'three';
+import { PLAIN_AOE, type AoeStyle } from './aoeLook';
 import type { Rgb } from './palette';
 import { worldUniforms } from './worldMaterial';
 
@@ -24,6 +26,8 @@ export interface Decals {
   lane(x: number, y: number, z: number, yaw: number, length: number, half: number, fill: number, color: Rgb, alpha?: number): void;
   ring(x: number, y: number, z: number, radius: number, width: number, color: Rgb, alpha?: number): void;
   swirl(x: number, y: number, z: number, radius: number, color: Rgb, alpha?: number): void;
+  /** The mark drawn inside every shape until the next `style` or `begin`. */
+  style(mark: AoeStyle): void;
   end(time: number): void;
 }
 
@@ -32,16 +36,19 @@ uniform float uFogNear;
 uniform float uFogFar;
 attribute vec4 aShape; // kind, fill, a, b
 attribute vec4 aColor;
+attribute vec4 aMark; // motif, seed, freq, arms
 varying vec2 vP;
 varying vec2 vScale;
 varying vec4 vShape;
 varying vec4 vColor;
+varying vec4 vMark;
 varying float vFog;
 void main() {
   vP = position.xz;
   vScale = vec2(length(instanceMatrix[0].xyz), length(instanceMatrix[2].xyz));
   vShape = aShape;
   vColor = aColor;
+  vMark = aMark;
   vec4 vp = viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
   gl_Position = projectionMatrix * vp;
@@ -56,7 +63,30 @@ varying vec2 vP;
 varying vec2 vScale;
 varying vec4 vShape;
 varying vec4 vColor;
+varying vec4 vMark;
 varying float vFog;
+float motifMask(float r, float ang) {
+  int m = int(vMark.x + 0.5);
+  float seed = vMark.y;
+  float freq = vMark.z;
+  float arms = vMark.w;
+  if (m == 1) return 0.35 + 0.65 * smoothstep(0.15, 0.9, sin(r * freq * 14.0 - uTime * 1.3 + seed));
+  if (m == 2) return step(0.72, max(abs(sin(ang * arms + seed)), abs(sin(r * freq * 10.0))));
+  if (m == 3) return 1.0 - smoothstep(0.02, 0.09, abs(fract(ang / 6.2832 * arms + seed) - 0.5));
+  if (m == 4) return smoothstep(0.0, 0.8, sin(ang * arms + uTime * 5.0 + seed)) * (0.35 + 0.65 * r);
+  if (m == 5) return smoothstep(0.2, 0.85, sin((vP.x * freq + seed) * 6.0 + uTime * 0.6) * sin((vP.y * freq) * 6.0));
+  if (m == 6) {
+    float s = fract(ang / 6.2832 * arms + r * freq - uTime * 0.35 + seed);
+    return smoothstep(0.12, 0.4, s) * (1.0 - smoothstep(0.55, 0.85, s));
+  }
+  if (m == 7) return max(1.0 - smoothstep(0.1, 0.2, r), smoothstep(0.18, 0.28, r) * (1.0 - smoothstep(0.7, 0.82, r)) * (0.55 + 0.45 * step(0.9, abs(sin(ang * arms)))));
+  if (m == 8) return smoothstep(0.55, 0.95, sin(ang * arms + r * freq * 4.0 + seed));
+  if (m == 9) return pow(abs(sin(ang * arms * 0.5 + seed)), 6.0);
+  if (m == 10) return step(0.16, abs(fract(ang / 6.2832 * arms + seed) - 0.5)) * step(0.1, abs(fract(r * freq) - 0.5));
+  if (m == 12) return smoothstep(-0.2, 1.2, sin(vP.x * freq * 3.0 + seed) + sin(vP.y * freq * 2.4 + seed * 1.7));
+  float ash = sin(vP.x * freq * 9.0 + uTime + seed) * sin(vP.y * freq * 8.0 - uTime * 0.6);
+  return smoothstep(0.3, 0.9, ash);
+}
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
@@ -87,8 +117,9 @@ void main() {
       float t = (r - vShape.z) / max(1.0 - vShape.z, 0.001);
       edge = step(1.0 - e, r);
       body = 0.4 + 0.6 * t;
-    } else if (kind == 4) { // swirl: arms turning inward
-      float arms = fract(ang / 6.2832 * 3.0 + r * 1.2 + uTime * 0.7);
+    } else if (kind == 4) { // swirl: arms turning inward; a mark may cut more of them
+      float nArms = vMark.x > 0.5 ? max(3.0, vMark.w) : 3.0;
+      float arms = fract(ang / 6.2832 * nArms + r * 1.2 + uTime * 0.7);
       body = smoothstep(0.55, 0.8, arms) * (1.0 - smoothstep(0.85, 1.0, arms)) * r;
       edge = step(1.0 - e, r) * 0.6;
     } else {
@@ -99,6 +130,7 @@ void main() {
       front = fill < 0.999 ? 1.0 - smoothstep(0.0, e * 2.0, abs(r - fill)) : 0.0;
     }
   }
+  if (vMark.x > 0.5) body *= 0.28 + 0.72 * motifMask(r, atan(vP.x, vP.y));
   float ready = fill >= 0.999 ? 0.35 + 0.35 * sin(uTime * 30.0) : 0.0; // the blow is falling
   float lit = kind == 3 ? 0.75 : kind == 4 ? 0.5 : 0.32 + ready; // a quake's band and a vortex's arms are the danger itself
   float a = vColor.a * max(max(edge * 0.9, front), body * lit);
@@ -112,8 +144,10 @@ export function createDecals(scene: THREE.Scene): Decals {
   const geo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
   const shapes = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
   const colors = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
+  const marks = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
   geo.setAttribute('aShape', shapes);
   geo.setAttribute('aColor', colors);
+  geo.setAttribute('aMark', marks);
   const material = new THREE.ShaderMaterial({
     uniforms: { ...worldUniforms, uTime: { value: 0 } },
     vertexShader: VERT,
@@ -135,11 +169,13 @@ export function createDecals(scene: THREE.Scene): Decals {
   const at = new THREE.Vector3();
   const scale = new THREE.Vector3();
   let n = 0;
+  let mark = PLAIN_AOE;
   const put = (x: number, y: number, z: number, yaw: number, sx: number, sz: number, shape: readonly [number, number, number, number], color: Rgb, alpha: number): void => {
     if (n >= CAPACITY || sx <= 0 || sz <= 0) return;
     batch.setMatrixAt(n, m4.compose(at.set(x, y + LIFT, z), q.setFromAxisAngle(up, yaw), scale.set(sx, 1, sz)));
     shapes.setXYZW(n, ...shape);
     colors.setXYZW(n, color[0], color[1], color[2], alpha);
+    marks.setXYZW(n, mark.motif, mark.seed, mark.freq, mark.arms);
     n++;
   };
   const clamp01 = (v: number): number => Math.min(1, Math.max(0, v));
@@ -147,6 +183,10 @@ export function createDecals(scene: THREE.Scene): Decals {
   return {
     begin() {
       n = 0;
+      mark = PLAIN_AOE;
+    },
+    style(next) {
+      mark = next;
     },
     disc(x, y, z, radius, fill, color, alpha = 1) {
       put(x, y, z, 0, radius, radius, [KIND.disc, clamp01(fill), 0, 0], color, alpha);
@@ -172,6 +212,7 @@ export function createDecals(scene: THREE.Scene): Decals {
       batch.instanceMatrix.needsUpdate = true;
       shapes.needsUpdate = true;
       colors.needsUpdate = true;
+      marks.needsUpdate = true;
     },
   };
 }

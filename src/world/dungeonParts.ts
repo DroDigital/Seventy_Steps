@@ -1,8 +1,7 @@
 /**
- * The dungeon kit's pieces (spec §3D): a layout becomes floors, walls with doorways and lintels,
- * corridor and stair blocks, steps, hall pillars, pits and bridge chasms (edges that stop feet but
- * not eyes), and wells. Solid parts are colliders; hidden doors and bridges become hidden-layer
- * pieces. `roomSpots` says where signs, gates, tomes, bosses and spawns stand. Pure: no Three.js.
+ * The dungeon kit's pieces (spec §3D): floors, walls, stairs, pillars, pits, bridge chasms and wells.
+ * A pit, gap or well stops a foe and drops the investigator. Hidden doors and bridges are pieces.
+ * `roomSpots` places signs, gates, tomes, bosses and spawns. Pure: no Three.js.
  */
 
 import type { V3 } from '../core/geom';
@@ -24,6 +23,7 @@ export interface BoxPart {
   min: V3;
   max: V3;
   solid: boolean;
+  fall?: boolean; // the investigator falls through; foes are still stopped
   room: number; // the room it belongs to (its kit decides its look; round 13)
   outer?: Dir; // a wall with nothing beyond it on this side: the dungeon's outside face
   tone?: Tone; // an inlay's stone or cloth (roomStyle.ts; round 32)
@@ -38,6 +38,7 @@ export interface CylPart {
   y0: number;
   y1: number;
   solid: boolean;
+  fall?: boolean;
   room: number;
   inner?: number; // an inlay's ring: the radius it is hollow within (round 32)
   tone?: Tone;
@@ -50,8 +51,12 @@ export interface DungeonParts {
   pieces: HiddenPieceDef[];
 }
 
+const dropped = (p: Part): { fall: true } | Record<string, never> => (p.fall ? { fall: true } : {});
+
 export const partCollider = (p: Part): Collider =>
-  p.shape === 'box' ? { kind: 'box', min: p.min, max: p.max } : { kind: 'cylinder', x: p.x, z: p.z, radius: p.radius, y0: p.y0, y1: p.y1 };
+  p.shape === 'box'
+    ? { kind: 'box', min: p.min, max: p.max, ...dropped(p) }
+    : { kind: 'cylinder', x: p.x, z: p.z, radius: p.radius, y0: p.y0, y1: p.y1, ...dropped(p) };
 
 /** An axis-aligned box over a room-local rectangle (u across the axis, v along it). */
 function local(r: RoomLayout, u0: number, u1: number, v0: number, v1: number, y0: number, y1: number, look: Look, solid: boolean): BoxPart {
@@ -113,7 +118,7 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
       floor(-h, -p, -p, p);
       floor(p, h, -p, p);
       out.push(local(r, -p, p, -p, p, L - chasm, L, 'chasm', false));
-      out.push(local(r, -p, p, -p, p, L - chasm, L + rim, 'none', true));
+      out.push({ ...local(r, -p, p, -p, p, L - chasm, L + rim, 'none', true), fall: true });
       break;
     }
     case 'bridge': {
@@ -121,15 +126,15 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
       floor(-h, h, -h, -p);
       floor(-h, h, p, h);
       out.push(local(r, -h, h, -p, p, L - chasm, L, 'chasm', false));
-      out.push(local(r, -h, -deck / 2, -p, p, L - chasm, L + rim, 'none', true));
-      out.push(local(r, deck / 2, h, -p, p, L - chasm, L + rim, 'none', true));
+      out.push({ ...local(r, -h, -deck / 2, -p, p, L - chasm, L + rim, 'none', true), fall: true });
+      out.push({ ...local(r, deck / 2, h, -p, p, L - chasm, L + rim, 'none', true), fall: true });
       if (r.def.hidden) pieces.push(bridgePiece(r, name, p, r.def.hidden));
       else out.push(local(r, -deck / 2, deck / 2, -p - 0.3, p + 0.3, L - 0.4, L + 0.05, 'deck', false)); // its planks laid 5 cm proud of the stone they rest on (round 19: flush, the two fought)
       break;
     }
     case 'well': {
       floor(-h, h, -h, h);
-      out.push({ shape: 'cyl', look: 'rim', x: r.x, z: r.z, radius: well + 0.35, y0: L - chasm, y1: L + 0.9, solid: true, room: r.index });
+      out.push({ shape: 'cyl', look: 'rim', x: r.x, z: r.z, radius: well + 0.35, y0: L - chasm, y1: L + 0.9, solid: true, fall: true, room: r.index });
       break;
     }
   }
@@ -221,12 +226,7 @@ function wallParts(d: DungeonLayout, out: Part[], pieces: HiddenPieceDef[]): voi
   }
 }
 
-/**
- * A roofed room's ceiling, level with its walls' tops (round 13: every dungeon stood open to the sky).
- * It reaches to the middle of the walls about it, no further (round 21: it reached their outer faces,
- * so a cellar's dark ceiling lay in the plane of the wall of the room above it, beside it, and the
- * two fought: flat wedges of stone over the bricks of the library).
- */
+/** A roofed room's ceiling, level with its walls and only to their middle (round 21: further, and it fought the wall beside it). */
 function ceiling(d: DungeonLayout, r: RoomLayout, out: Part[]): void {
   if (kitOfRoom(d, r).roof === 'open') return;
   const top = floorRange(r)[1] + DUNGEON.height;

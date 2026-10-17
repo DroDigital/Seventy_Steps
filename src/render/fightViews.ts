@@ -1,5 +1,5 @@
 /**
- * Draws what boss fights put into the world (spec §3E): bolts in flight as self-lit shards, pools
+ * Draws what boss fights put into the world (spec §3E): bolts (boltViews.ts), pools
  * as sickly discs on the ground, the arenas' props (a lamp: its post, and while it is lit its flame
  * and a faint circle of light where a light-bound boss burns; a monolith of Mu; the Alert, riding
  * the flood; Shub-Niggurath's spawning roots; Yog-Sothoth's floating spheres), the flood's water,
@@ -13,14 +13,16 @@ import type { Entity } from '../core/ecs';
 import { BOSS, REALITY, YOG } from '../data/tuning';
 import { engagedFights } from '../systems/bossFight';
 import type { Fight, Game, Prop } from '../systems/components';
+import { creatureOf } from '../systems/creatures';
 import { hooksOf, platformsOf, platformsShown } from '../systems/reality';
+import { AOE_SKIN, aoeLook } from './aoeLook';
+import { attackTheme, DEFAULT_ATTACK_THEME } from './attackTheme';
+import { createBoltViews } from './boltViews';
 import { box, tileUv, tint } from './meshKit';
-import { ANOMALY, BASE, mixRgb, scaleRgb } from './palette';
+import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import { createWorldMaterial } from './worldMaterial';
 
 export const FX_PREFIX = 'fx:';
-
-const CAPACITY = 96; // bolts drawn at once
 
 export interface FightViews {
   update(alpha: number, time: number): void;
@@ -30,13 +32,14 @@ export interface FightViews {
 const flat = (radius: number, segments = 24): THREE.BufferGeometry =>
   new THREE.RingGeometry(0.05, radius, segments, Math.max(1, Math.ceil(radius / 1.5))).rotateX(-Math.PI / 2);
 
-function pool(radius: number, fire = false): THREE.Mesh {
+function pool(radius: number, fire = false, ink?: Rgb, motif = 0): THREE.Mesh {
   if (fire) { // burning lamp oil (round 12): bright, and it crawls
     const geo = tint(flat(radius), [1, 0.52, 0.2]); // flame, not bone: the grade pales a dull colour to grey
     return new THREE.Mesh(geo, createWorldMaterial({ texture: 'cloth', uvScale: [radius * 2, radius * 2], uvScroll: [0.4, 0.7], emissive: 1, vertexColors: true }));
   }
-  const geo = tint(flat(radius), scaleRgb(mixRgb(BASE.rust, BASE.seaGrey, 0.5), 0.9));
-  return new THREE.Mesh(geo, createWorldMaterial({ texture: 'flesh', uvScale: [radius, radius], uvScroll: [0.05, 0.03], emissive: 0.35, vertexColors: true }));
+  const skin = AOE_SKIN[motif] ?? AOE_SKIN[0]!;
+  const geo = tint(flat(radius), ink ?? scaleRgb(mixRgb(BASE.rust, BASE.seaGrey, 0.5), 0.9));
+  return new THREE.Mesh(geo, createWorldMaterial({ texture: skin.texture, uvScale: [radius, radius], uvScroll: skin.scroll, emissive: skin.emissive, vertexColors: true }));
 }
 
 /** A lamp on its post: the flame and its circle of light show while it is lit. */
@@ -114,26 +117,22 @@ const PROPS: Record<Prop['kind'], () => THREE.Group> = { lamp, monolith, ship, r
 
 export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
   const voids = new Map<Fight, THREE.Group>();
-  const shard = tint(new THREE.OctahedronGeometry(1, 0), BASE.bone);
-  const bolts = new THREE.InstancedMesh(shard, createWorldMaterial({ texture: 'stone', emissive: 1, vertexColors: true }), CAPACITY);
-  bolts.frustumCulled = false;
-  scene.add(bolts);
+  const bolts = createBoltViews(scene, g);
   const water = new THREE.Mesh(flat(1, 64), createWorldMaterial({ texture: 'water', uvScale: [12, 12], uvScroll: [0.03, 0.02], emissive: 0.1 }));
   water.visible = false;
   scene.add(water);
   const views = new Map<Entity, THREE.Object3D>();
-  const m4 = new THREE.Matrix4();
-  const q = new THREE.Quaternion();
-  const axis = new THREE.Vector3(0.3, 1, 0.2).normalize();
-  const at = new THREE.Vector3();
-  const size = new THREE.Vector3();
 
   function sync(): void {
     const c = g.ecs.c;
     for (const [id, h] of c.hazard) {
       if (views.has(id)) continue;
       const p = c.transform.get(id)!.pos;
-      const mesh = pool(h.radius, h.fire);
+      const who = creatureOf(g, h.owner)?.id;
+      const look = aoeLook(who);
+      const theme = attackTheme(g, h.owner);
+      const ink = theme === DEFAULT_ATTACK_THEME ? undefined : mixRgb(theme.danger, BASE.bone, 0.28);
+      const mesh = pool(h.radius, h.fire, ink, look.motif);
       mesh.userData.life0 = Math.max(1, h.life);
       mesh.position.set(p.x, p.y + 0.05, p.z);
       scene.add(mesh);
@@ -172,16 +171,7 @@ export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
         const orb = v.getObjectByName('orb');
         if (orb) orb.position.y = YOG.height + 0.25 * Math.sin(time * 1.3 + id);
       }
-      let n = 0;
-      for (const [id, b] of c.bolt) {
-        const tr = c.transform.get(id);
-        if (!tr || n >= CAPACITY || (b.pool?.fire && b.faction === 'player')) continue; // a flask of oil is drawn by flaskFx.ts
-        at.set(tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.y + (tr.pos.y - tr.prev.y) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha);
-        q.setFromAxisAngle(axis, time * 9 + id);
-        bolts.setMatrixAt(n++, m4.compose(at, q, size.setScalar(b.radius)));
-      }
-      bolts.count = n;
-      bolts.instanceMatrix.needsUpdate = true;
+      bolts.update(alpha, time);
       const under = new Set(engagedFights(g).filter(([, f]) => hooksOf(f).includes('hidden_platforms')).map(([, f]) => f));
       for (const f of under) {
         if (voids.has(f)) continue;

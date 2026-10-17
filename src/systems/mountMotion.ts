@@ -1,8 +1,17 @@
 /** Swept, substepped locomotion for both mount appearances. The investigator keeps their ordinary hurtbox. */
-import { turnToward, wrapAngle } from '../core/geom';
+import { turnToward, wrapAngle, type V3 } from '../core/geom';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
+import { WORLD } from '../data/tuning';
+import { inDungeon } from '../world/terrain';
+import { regionAt } from '../world/worldMap';
 import type { Game } from './components';
 import { footprintClear } from './mountGround';
+
+/** The coast, the sea or the abyss: one step is taken, then the fall kills. Walls still stop the mount. */
+function environmentalDrop(g: Game, at: V3): boolean {
+  if (!g.overworld || inDungeon(at.x, at.z)) return false;
+  return !regionAt(at.x, at.z) || at.y <= WORLD.seaLevel + 0.4;
+}
 
 export function moveMounted(g: Game, dt: number): boolean {
   const p = g.player;
@@ -28,7 +37,13 @@ export function moveMounted(g: Game, dt: number): boolean {
   for (let i = 0; i < n; i++) {
     const next = { x: tr.pos.x + sx, y: tr.pos.y, z: tr.pos.z + sz };
     next.y = g.world.ground(next.x, next.z);
-    if (Math.abs(next.y - tr.pos.y) > Math.max(t.maxStep, step * t.maxSlope) || !footprintClear(g, next, tr.yaw)) {
+    if (environmentalDrop(g, next)) {
+      Object.assign(tr.pos, next);
+      mount.speed = 0;
+      p.sprinting = false;
+      break;
+    }
+    if (Math.abs(next.y - tr.pos.y) > Math.max(t.maxStep, step * t.maxSlope) || !footprintClear(g, next, tr.yaw, true)) {
       mount.speed = 0;
       p.sprinting = false;
       break;
