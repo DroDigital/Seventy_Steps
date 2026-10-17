@@ -9,10 +9,30 @@ import { regionAt } from '../world/worldMap';
 import { engagedFights } from './bossFight';
 import { isAbsent, type Game } from './components';
 
+/** A dungeon room, or a boss arena out to the chariot's own margin. */
+export function mountPlaceForbidden(x: number, z: number): boolean {
+  if (inDungeon(x, z)) return true;
+  const margin = MOUNT_TRAVERSAL.radius;
+  return worldLayout().arenas.some((a) => Math.hypot(x - a.x, z - a.z) < a.radius + margin);
+}
+
+/** The rider or any circle of the chariot lies in a dungeon or a boss arena. */
+export function mountFootprintForbidden(at: V3, yaw: number): boolean {
+  if (mountPlaceForbidden(at.x, at.z)) return true;
+  const t = MOUNT_TRAVERSAL;
+  const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
+  for (const offset of t.offsets) {
+    const x = at.x + s * offset;
+    const z = at.z + c * offset;
+    if (mountPlaceForbidden(x, z)) return true;
+    for (const side of [-1, 1]) if (mountPlaceForbidden(x + c * t.radius * side, z - s * t.radius * side)) return true;
+  }
+  return false;
+}
+
 export function mountGroundAllowed(g: Game, at: V3): boolean {
-  if (!g.overworld || !regionAt(at.x, at.z) || inDungeon(at.x, at.z) || at.y <= WORLD.seaLevel + 0.4 || g.reality.flood > 0.05 || engagedFights(g).length) return false;
-  const r = MOUNT_TRAVERSAL.radius;
-  return !worldLayout().arenas.some((a) => Math.hypot(at.x - a.x, at.z - a.z) < a.radius + r);
+  if (!g.overworld || !regionAt(at.x, at.z) || mountPlaceForbidden(at.x, at.z) || at.y <= WORLD.seaLevel + 0.4 || g.reality.flood > 0.05 || engagedFights(g).length) return false;
+  return true;
 }
 
 /** Past the region's edge the ground is the fall, not a wall. Water and slopes still refuse. */

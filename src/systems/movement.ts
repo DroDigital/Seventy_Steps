@@ -35,7 +35,9 @@ export function movementSystem(g: Game, dt: number): void {
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
     if (id === g.player.id) {
       if (shove.has(id)) dismissMount(g); // a wind or vortex still moves the investigator and expires normally
-      if (moveMounted(g, dt)) continue;
+      const ride = moveMounted(g, dt);
+      if (ride === 'drop') dismissMount(g);
+      if (ride !== 'idle') continue;
     }
     const m = mover.get(id);
     const def = a && moveDef(a);
