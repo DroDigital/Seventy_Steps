@@ -203,7 +203,6 @@ export const EN = {
   'hud.echoesRecovered': 'ECHOES RECOVERED  +{n}',
   'hud.echoesEarned': '+{n} ECHOES',
   'hud.unmade': 'UNMADE',
-  'hud.lie': 'YOUR ECHOES LIE WHERE YOU FELL',
   'hud.sanityLoss': '−{n} SANITY',
   'hud.insightGain': '{sign}{n} INSIGHT',
   'hud.signFound': 'ELDER SIGN FOUND · {name}',

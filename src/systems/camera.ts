@@ -6,7 +6,7 @@
  */
 
 import { clamp, wrapAngle, yawOf, type V3 } from '../core/geom';
-import { CAMERA } from '../data/tuning';
+import { CAMERA, FALL } from '../data/tuning';
 import { raycast, type CollisionWorld } from '../world/colliders';
 
 export interface CameraRig {
@@ -29,6 +29,7 @@ export interface CameraInput {
   focus: V3 | null; // lock-on aim point
   behind: number; // the player's yaw, for recentring
   distance?: number; // a vehicle needs a longer boom; collision still shortens it
+  probe?: number; // over an edge: the height the boom's walls are read at (hangPoint)
 }
 
 export function createCameraRig(yaw: number): CameraRig {
@@ -51,6 +52,25 @@ export function shoulderPoint(w: CollisionWorld, pivot: V3, yaw: number): V3 {
   return { x: pivot.x + rx * k, y: pivot.y, z: pivot.z + rz * k };
 }
 
+/** The height the camera follows the investigator at: over an edge it follows only part of the way down, and looks down after them (round 54). */
+export function followY(f: { lip: V3 } | null, y: number): number {
+  return f ? f.lip.y + (y - f.lip.y) * FALL.follow : y;
+}
+
+/**
+ * Where the boom hangs from, and the point its walls are read at. Over an edge the body is below the ground the world reads (a pit's floor
+ * is the room's), so the ground and walls are read from the lip's height, `probe`, and only the hanging point drops: the camera stays at the
+ * rim and looks down after the fall, rather than being shut in against the floor the body has gone through (round 54).
+ */
+export function hangPoint(w: CollisionWorld, pivot: V3, yaw: number, probe?: number): { read: V3; base: V3 } {
+  if (probe === undefined) {
+    const base = shoulderPoint(w, pivot, yaw);
+    return { read: base, base };
+  }
+  const read = shoulderPoint(w, { ...pivot, y: probe }, yaw);
+  return { read, base: { ...read, y: pivot.y } };
+}
+
 /** Lens position for a boom hanging from `base`, kept above the ground. */
 export function lensPosition(w: CollisionWorld, base: V3, yaw: number, pitch: number, dist: number): V3 {
   const d = boomDir(yaw, pitch);
@@ -71,6 +91,9 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
     const want = CAMERA.lockPitch + Math.atan2(inp.pivot.y - inp.focus.y + CAMERA.lockLift, Math.max(1, Math.hypot(dx, dz)));
     rig.pitch += (clamp(want, CAMERA.pitchMin, CAMERA.lockPitchMax) - rig.pitch) * k;
     rig.recenter = 0;
+  } else if (inp.probe !== undefined) {
+    rig.pitch += (FALL.lookPitch - rig.pitch) * k; // over an edge the camera is not the hand's: it swings up to look down after the fall (round 54)
+    rig.recenter = 0;
   } else if (rig.recenter > 0) {
     rig.recenter--;
     rig.yaw = wrapAngle(rig.yaw + wrapAngle(inp.behind - rig.yaw) * k);
@@ -79,11 +102,11 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
     rig.yaw = wrapAngle(rig.yaw - inp.lookX);
     rig.pitch = clamp(rig.pitch + inp.lookY, CAMERA.pitchMin, CAMERA.pitchMax);
   }
-  const base = shoulderPoint(w, inp.pivot, rig.yaw);
+  const { read, base } = hangPoint(w, inp.pivot, rig.yaw, inp.probe);
   const d = boomDir(rig.yaw, rig.pitch);
   const reach = (inp.distance ?? CAMERA.distance) + CAMERA.margin;
-  const end = { x: base.x + d.x * reach, y: base.y + d.y * reach, z: base.z + d.z * reach };
-  const allowed = Math.max(CAMERA.minDistance, raycast(w, base, end) * reach - CAMERA.margin);
+  const end = { x: read.x + d.x * reach, y: read.y + d.y * reach, z: read.z + d.z * reach };
+  const allowed = Math.max(CAMERA.minDistance, raycast(w, read, end) * reach - CAMERA.margin);
   rig.dist = allowed < rig.dist ? allowed : Math.min(allowed, rig.dist + CAMERA.easeOut * dt);
   rig.pos = lensPosition(w, base, rig.yaw, rig.pitch, rig.dist);
 }

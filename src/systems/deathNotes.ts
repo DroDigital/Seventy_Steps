@@ -5,7 +5,7 @@
  * has its own. Pure: no Three.js.
  */
 
-import { FRAGMENTS, GENERIC, TIPS } from '../data/deathLines';
+import { EDGES, FRAGMENTS, GENERIC, TIPS } from '../data/deathLines';
 import type { AttackId } from '../data/schema';
 import type { Game } from './components';
 
@@ -18,6 +18,7 @@ export function registerDeathNotes(g: Game): void {
     if (e.target !== g.player.id || e.damage <= 0) return;
     last.set(g, { move: g.ecs.c.actor.get(e.attacker)?.move ?? null, by: g.ecs.c.combatant.get(e.attacker)?.name ?? '' });
   });
+  g.events.on('Fell', () => void last.set(g, { move: 'fell', by: 'the edge' }));
   g.events.on('Petrified', () => void last.set(g, { move: 'petrified', by: 'stone' }));
   g.events.on('Respawned', () => void last.delete(g));
 }
@@ -25,6 +26,7 @@ export function registerDeathNotes(g: Game): void {
 /** The line to read under a fall: how the last blow is met, or else a fragment of the place. */
 export function deathLine(g: Game): string {
   const blow = last.get(g)?.move;
+  if (blow === 'fell') return EDGES[Math.floor(g.rng() * EDGES.length)];
   if (blow === 'petrified') return 'Stone takes four seconds. Break its sight behind a monolith, and it wears off.';
   if (blow && blow in TIPS) return TIPS[blow as AttackId];
   const before = said.get(g);

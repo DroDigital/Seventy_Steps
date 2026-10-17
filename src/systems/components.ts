@@ -259,9 +259,20 @@ export interface Pilot {
   mended: number; // frames left in which a shot of Reagent holds the body: lingering hurts (pools, the void) do no harm
   listening: Entity | null; // the person talked with: they face them and the camera frames them until they move or look away (round 12)
   kneeling: { x: number; z: number } | null; // the Elder Sign rested at: they kneel to it until they move or act (round 15)
+  falling: Falling | null; // over an edge and dropping, until the death at the foot of it (systems/falls.ts; round 54)
   ask: boolean; // a screen asks where to rise when a lit candle reaches a fall (ui/riseMenu.ts); without one the candle is where they rise (round 45)
   rising: (Place & { wall: string }) | null; // the candle that reaches the fall, while the choice waits
   fogPass: { wall: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a boss's fog being walked through (round 35: fogGates.ts)
+}
+
+/** A fall in the air (round 54): the body is let go of by the ground, and gravity takes it. */
+export interface Falling {
+  frame: number; // frames since the body went over
+  vy: number; // m/s, down is negative
+  vx: number; // the run-up that is still carried over the void...
+  vz: number;
+  spin: number; // the tumble's direction, 1 head first, -1 on the back
+  lip: V3; // the last safe feet: the Lost Echoes lie on the ground there
 }
 
 /** The investigator's mind (spec §3A). */

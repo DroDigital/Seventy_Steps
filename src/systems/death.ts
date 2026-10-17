@@ -50,6 +50,7 @@ export function registerDeath(g: Game): void {
 export function restore(g: Game, id: Entity, at: Place): void {
   if (id === g.player.id) {
     dismissMount(g);
+    g.player.falling = null; // up from a fall (falls.ts)
     Object.assign(g.camera, { mountLift: 0, prevMountLift: 0, dist: CAMERA.distance, prevDist: CAMERA.distance });
   }
   const { transform, health, poise, stamina, actor, mover, dead } = g.ecs.c;

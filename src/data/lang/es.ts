@@ -192,7 +192,6 @@ export const ES: Readonly<Record<Key, string>> = {
   'hud.echoesRecovered': "ECOS RECUPERADOS  +{n}",
   'hud.echoesEarned': "+{n} ECOS",
   'hud.unmade': "DESHECHO",
-  'hud.lie': "TUS ECOS YACEN DONDE CAÍSTE",
   'hud.sanityLoss': "−{n} CORDURA",
   'hud.insightGain': "{sign}{n} DISCERNIMIENTO",
   'hud.signFound': "SIGNO ARCANO ENCONTRADO · {name}",

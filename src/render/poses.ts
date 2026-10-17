@@ -7,6 +7,7 @@
  */
 
 import type { ActKind } from '../data/npcActs';
+import { FALL } from '../data/tuning';
 import type { MoveDef } from '../data/moves';
 import type { Figure } from './figures';
 import { settle, stride, type Ground } from './gait';
@@ -27,6 +28,7 @@ export interface PoseInput {
   ground?: Ground; // the lie of the land about the feet (flat when absent)
   kneel?: number; // 0–1: kneeling before an Elder Sign, eased in and out (round 15)
   act?: { kind: ActKind; k: number }; // what a person is doing, and how far into it (0–1: they sit down, take it up; round 39)
+  drop?: { t: number; spin: number }; // over an edge: seconds into the fall, and which way it tumbles, 1 head first (round 54)
 }
 
 const clamp01 = (t: number): number => Math.min(1, Math.max(0, t));
@@ -241,6 +243,28 @@ function fall(f: Figure, frame: number): void {
   f.legR.rotation.x = -0.5 * t;
 }
 
+/**
+ * Over the edge (round 54). The body is still going the way it was: the arms fly up and out as the footing goes, the legs run on in the
+ * air, the head throws back; then the weight takes the hips over and it tumbles, head first, about the hip, arms thrown wide, until it is
+ * small and dark. No ground is under it, so nothing is settled to one.
+ */
+function plunge(f: Figure, t: number, spin: number): void {
+  const grab = ease(t / 0.16); // the footing gone: the arms go up
+  const tip = ease((t - 0.1) / 0.5); // then the hips go over
+  const flail = Math.sin(t * 17);
+  f.body.rotation.set(spin * (0.18 * grab + FALL.spin * Math.max(0, t - 0.12)), 0, 0.22 * Math.sin(t * 6.5) * grab, 'YXZ');
+  f.body.position.y = f.hip * (1 - 0.1 * tip);
+  f.torso.rotation.x = -0.35 * grab + 0.25 * tip; // the chest thrown out, then folding
+  f.head.rotation.x = -0.6 * grab * (1 - tip) + 0.2 * tip; // the head back, looking for the ledge
+  f.armR.rotation.set(-2.7 * grab + 0.5 * tip + 0.28 * flail, 0, -0.55 * grab - 0.25 * tip, 'YXZ');
+  f.armL.rotation.set(-2.7 * grab + 0.5 * tip - 0.28 * flail, 0, 0.55 * grab + 0.25 * tip, 'YXZ');
+  f.elbowR.rotation.x = f.elbowL.rotation.x = -0.35 - 0.3 * Math.abs(flail) * grab;
+  f.legR.rotation.x = -0.95 * grab + 0.7 * flail * grab; // running on the air
+  f.legL.rotation.x = -0.95 * grab - 0.7 * flail * grab;
+  f.kneeR.rotation.x = 0.35 + 0.8 * Math.max(0, -flail) * grab;
+  f.kneeL.rotation.x = 0.35 + 0.8 * Math.max(0, flail) * grab;
+}
+
 export function pose(f: Figure, p: PoseInput): void {
   rest(f);
   if (f.rig === 'prop') return;
@@ -255,6 +279,7 @@ export function pose(f: Figure, p: PoseInput): void {
     f.body.rotation.x = -0.35 * Math.sin(t * Math.PI * 3) * (1 - t) - 0.1 * p.flinch * Math.sin(p.time * 40);
     return;
   }
+  if (p.drop) return plunge(f, p.drop.t, p.drop.spin);
   if (!d || p.move === null) {
     stride(f, p.speed, p.stride, p.time, p.guard);
     if (p.kneel) kneel(f, p.kneel);

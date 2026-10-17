@@ -47,7 +47,7 @@ export function saveNow(): void {
 
 export function startAutosave(g: Game, store: SaveStore): void {
   const save = (): void => {
-    if (halted || g.ecs.c.dead.has(g.player.id) || g.ecs.c.actor.get(g.player.id)?.move === 'death') return; // broken, or mid-death (a fall's included, which does not mark the investigator dead): the respawn saves
+    if (halted || g.ecs.c.dead.has(g.player.id) || g.ecs.c.actor.get(g.player.id)?.move === 'death' || g.player.falling) return; // broken, or mid-death (a fall's included, which does not mark the investigator dead): the respawn saves
     try {
       saveGame(g, store);
     } catch {

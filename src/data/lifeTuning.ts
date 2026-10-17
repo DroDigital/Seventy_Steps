@@ -97,20 +97,21 @@ export const DUNGEON_LIGHT = {
 export const NIGHT_DARK = { sky: 0.24, mist: 0.28, far: 0.3, ambient: 0.2, moon: 0.28 };
 
 export const WEATHER = {
-  calm: [60, 220] as const, // seconds of clear skies between spells (round 52: they were 150 to 420: a test of two hours saw no storm)
-  spell: [110, 290] as const, // seconds a spell of rain, a thunderstorm or a gale lasts
+  first: [300, 780] as const, // seconds of clear sky at the start of a game or a load, before the weather is first chosen (it was chosen at once: one load in four began in rain)
+  calm: [240, 840] as const, // seconds of clear skies between spells (round 52: 60 to 220, from 150 to 420, because a test of two hours saw no storm; round 53: too many, it rained 45% of the time)
+  spell: [100, 260] as const, // seconds a spell of rain, a thunderstorm or a gale lasts
   ease: 12, // seconds for a spell to come on or pass
-  clear: 1.3, // the odds of clear skies against all the region's weather together: another calm follows a calm 1 time in 4 (it was 1 in 2.6)
+  clear: 1.3, // the odds of clear skies against all the region's weather together: another calm follows a calm 1 time in 4
   // The kinds each region knows, by weight (the rest of the time it is clear): rain, a thunderstorm, a gale, the motes of the dream.
   regions: {
-    hub: { rain: 3, storm: 2, gale: 1 },
-    arkham: { rain: 3, storm: 3, gale: 1 },
-    dunwich: { rain: 2, storm: 3, gale: 2 },
-    innsmouth: { rain: 3, storm: 3, gale: 2 },
-    providence: { rain: 3, storm: 2, gale: 1 },
-    vermont: { rain: 2, storm: 2, gale: 2 },
-    mountains: { gale: 4, storm: 1 },
-    pnakotus: { gale: 3, storm: 1 },
+    hub: { rain: 5, storm: 3, gale: 1 },
+    arkham: { rain: 4, storm: 3, gale: 1 },
+    dunwich: { rain: 3, storm: 3, gale: 2 },
+    innsmouth: { rain: 4, storm: 3, gale: 2 },
+    providence: { rain: 5, storm: 2, gale: 1 },
+    vermont: { rain: 4, storm: 2, gale: 2 },
+    mountains: { gale: 5, storm: 1 },
+    pnakotus: { gale: 4, storm: 1 },
     rlyeh: { rain: 3, storm: 4, gale: 1 },
     dreamlands: { motes: 3 },
     yuggoth: { motes: 2 },

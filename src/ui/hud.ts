@@ -20,7 +20,6 @@ import { createBossHud } from './bossHud';
 import { createFoeBars } from './foeBars';
 import { createQuestMarks } from './questMarks';
 import { fill, glyph } from './glyphs';
-import { deathLine } from '../systems/deathNotes';
 import { EPITAPHS } from '../data/epitaphs';
 import { REGIONS } from '../data/regions';
 import { creatureOf } from '../systems/creatures';
@@ -89,6 +88,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let mountTip = '';
   let mountTipUntil = 0;
   const waiting: string[] = []; // notices held back while one stands
+  let dying = false; // from UNMADE until the next waking: nothing else is written on the screen (round 54)
   let noticeAt = -Infinity;
   const put = (text: string): void => {
     notice.textContent = fill(text, true); // a notice may name a button: {pause}
@@ -96,11 +96,12 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
     noticeUntil = noticeAt + NOTICE_MS;
   };
   const say = (text: string): void => {
-    if (!text || waiting.includes(text)) return;
+    if (!text || dying || waiting.includes(text)) return;
     if (performance.now() - noticeAt < NOTICE_HOLD_MS) void (waiting.length < 3 && waiting.push(text));
     else put(text);
   };
-  const great = createBanner(); // a death, a horror's fall, a place: the great words (banner.ts)
+  const banner = createBanner(); // a death, a horror's fall, a place: the great words (banner.ts)
+  const great = { ...banner, show: ((...a: Parameters<typeof banner.show>) => void (dying || banner.show(...a))) as typeof banner.show };
   const show = (text: string): void => great.show(text, 'place');
   const bosses = createBossHud(g, root, say, show);
   const foes = createFoeBars(g, root);
@@ -117,10 +118,16 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   });
   g.events.on('Died', (e) => {
     if (e.entity !== me) return;
-    great.show(tr('hud.unmade'), 'death', tr('hud.lie'), deathLine(g)); // what the last blow teaches, or a fragment of the place (round 26)
-    setTimeout(() => great.hide(), DYING_MS); // it fades as the veil falls (journeys.ts)
+    dying = true; // UNMADE alone: the bars, notices and plates fade, and no other great words are shown over it
+    waiting.length = 0;
+    banner.show(tr('hud.unmade'), 'death');
+    setTimeout(() => banner.hide(), DYING_MS); // it fades as the veil falls (journeys.ts), which says what the last blow teaches
   });
-  g.events.on('Respawned', () => great.hide());
+  g.events.on('Fell', () => void ((dying = true), (waiting.length = 0))); // over an edge: the screen is already giving way to the dark, and nothing else is written on it
+  g.events.on('Respawned', () => {
+    dying = false;
+    banner.hide();
+  });
   g.events.on('FirstSight', (e) => {
     if (e.sanity || e.insight) say([e.name.toUpperCase(), e.sanity && tr('hud.sanityLoss', { n: e.sanity }), e.insight && tr('hud.insightGain', { sign: sign(e.insight), n: Math.abs(e.insight) })].filter(Boolean).join('  '));
   });
@@ -148,7 +155,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const v = new Vector3();
   root.style.transition = 'opacity .6s';
   return {
-    hide: (on) => void (root.style.opacity = on ? '0' : '1'),
+    hide: (on) => void (root.style.opacity = on || dying ? '0' : '1'),
     update(camera) {
       minimap.update();
       if (!menuOpen()) hints.update();

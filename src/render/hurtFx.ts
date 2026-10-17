@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { HURT } from '../data/tuning';
 import type { Game } from '../systems/components';
+import { fallDark } from '../systems/falls';
 import type { PostPass } from './postPass';
 import { FEEL, HEART } from './feel';
 
@@ -47,6 +48,7 @@ export function createHurtFx(g: Game): HurtFx {
       post.uniforms.uHurt.value.set(k, dir.x, dir.y, 0);
       const need = HEART.need; // near death, the heart (feel.ts): red about the edge, and the colour draining
       post.uniforms.uFaint.value.set(need * HURT.lowBase + HEART.swell * HURT.lowPulse * (0.35 + 0.65 * need), need * HURT.lowDrain);
+      post.uniforms.uFade.value = fallDark(g.player.falling); // over an edge: the picture closes in to black (systems/falls.ts)
       post.uniforms.uStone.value = g.reality.petrify; // turning to stone (the bar on the boss's HUD is the other half)
       if (k > 0.01) {
         const j = HURT.shake * k * FEEL.shake;

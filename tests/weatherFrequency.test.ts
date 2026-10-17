@@ -3,27 +3,43 @@ import { WEATHER } from '../src/data/tuning';
 import { createWorldGame } from '../src/systems/game';
 import { kindsOf, quietOf, weatherSystem, type WeatherKind } from '../src/systems/weather';
 
-/** Two hours of weather over `region`, as a share of the time each kind is blowing hard, and how often a storm gathers. */
-function twoHours(region: string) {
-  const g = createWorldGame();
+interface Sky {
+  share: (k: WeatherKind) => number;
+  /** Thunderstorms and wet spells (rain or storm) that begin, an hour. */
+  stormsAnHour: number;
+  wetAnHour: number;
+  /** Minutes before the first rain or storm, and the longest run without either. */
+  first: number;
+  longest: number;
+}
+
+/** `hours` of weather over `region`, from `seed`, as a share of the time each kind is blowing (over a third of its strength) and how often a spell comes. */
+function skies(region: string, seed: number, hours: number): Sky {
+  const g = createWorldGame({ seed });
   g.overworld!.region = region;
   const time: Partial<Record<WeatherKind, number>> = {};
-  let [storms, last, gap, longest] = [0, 'clear' as WeatherKind, 0, 0];
-  for (let f = 0; f < 7200 * 60; f++) {
+  let [storms, wet, last, since, longest, first] = [0, 0, 'clear' as WeatherKind, 0, 0, Infinity];
+  for (let f = 0; f < hours * 3600 * 60; f++) {
     g.frame++;
     weatherSystem(g, 1 / 60);
     const w = g.overworld!.weather;
     const kind: WeatherKind = w.amount > 0.3 ? w.kind : 'clear';
     time[kind] = (time[kind] ?? 0) + 1 / 60;
+    const raining = kind === 'rain' || kind === 'storm';
     if (kind === 'storm' && last !== 'storm') storms++;
+    if (raining && last !== 'rain' && last !== 'storm') wet++;
+    if (raining && first === Infinity) first = f / 3600;
+    since = raining ? 0 : since + 1 / 60;
+    longest = Math.max(longest, since / 60);
     last = kind;
-    gap = kind === 'rain' || kind === 'storm' ? 0 : gap + 1 / 60;
-    longest = Math.max(longest, gap);
   }
-  return { share: (k: WeatherKind) => (time[k] ?? 0) / 7200, storms, longest };
+  return { share: (k) => (time[k] ?? 0) / (hours * 3600), stormsAnHour: storms / hours, wetAnHour: wet / hours, first, longest };
 }
 
-describe('rain and thunderstorms come round (round 52: two hours in the hub saw none)', () => {
+const SEEDS = [1926, 7, 99];
+const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
+
+describe('how often it rains (round 52: none in two hours; round 53: it rained 45% of the time, which is too much)', () => {
   it('the start region has weather, and every region with weather has rain or a storm or a gale in it', () => {
     expect(kindsOf('hub').length).toBeGreaterThan(0);
     for (const region of Object.keys(WEATHER.regions)) expect(kindsOf(region).length, region).toBeGreaterThan(0);
@@ -31,26 +47,33 @@ describe('rain and thunderstorms come round (round 52: two hours in the hub saw 
     for (const region of ['arkham', 'providence', 'vermont', 'dunwich', 'innsmouth', 'rlyeh']) expect(kindsOf(region).map(([k]) => k), region).toContain('storm');
   });
 
-  it.each(['hub', 'arkham', 'providence', 'vermont', 'dunwich', 'innsmouth', 'rlyeh'])('%s: in two hours, rain falls for a good share of them, thunderstorms gather several times, and the skies are not left alone for long', (region) => {
-    const r = twoHours(region);
-    expect(r.share('rain') + r.share('storm')).toBeGreaterThan(0.2);
-    expect(r.share('storm')).toBeGreaterThan(0.1);
-    expect(r.storms).toBeGreaterThanOrEqual(3);
-    expect(r.share('clear')).toBeGreaterThan(0.15); // and there are clear skies between
-    expect(r.longest).toBeLessThan(25 * 60); // never half an hour of dry sky: a test would see it
+  it.each(['hub', 'arkham', 'providence', 'vermont', 'dunwich', 'innsmouth', 'rlyeh'])('%s: wet about a fifth of the time, a spell every quarter hour or so, a thunderstorm now and then, and clear skies between', (region) => {
+    const runs = SEEDS.map((s) => skies(region, s, 4));
+    const wet = mean(runs.map((r) => r.share('rain') + r.share('storm')));
+    expect(wet, 'wet share').toBeGreaterThan(0.1); // it does rain
+    expect(wet, 'wet share').toBeLessThan(0.28); // and not for half the day
+    expect(mean(runs.map((r) => r.share('storm'))), 'storm share').toBeLessThan(0.16);
+    expect(mean(runs.map((r) => r.share('clear'))), 'clear share').toBeGreaterThan(0.65);
+    expect(mean(runs.map((r) => r.wetAnHour)), 'wet spells an hour').toBeGreaterThan(2);
+    expect(mean(runs.map((r) => r.wetAnHour)), 'wet spells an hour').toBeLessThan(5); // never one every ten minutes
+    expect(mean(runs.map((r) => r.stormsAnHour)), 'storms an hour').toBeGreaterThan(0.7); // one in the first hour and a half, as a rule
+    expect(mean(runs.map((r) => r.stormsAnHour)), 'storms an hour').toBeLessThan(3);
+    for (const r of runs) expect(r.longest, 'longest dry spell, minutes').toBeLessThan(75); // a test of an hour or two will see rain
   });
 
-  it('the first rain or storm comes within the first quarter hour in the start region', () => {
-    const g = createWorldGame();
-    g.overworld!.region = 'hub';
-    let first = Infinity;
-    for (let f = 0; f < 900 * 60 && first === Infinity; f++) {
-      g.frame++;
-      weatherSystem(g, 1 / 60);
-      const w = g.overworld!.weather;
-      if ((w.kind === 'rain' || w.kind === 'storm') && w.amount > 0.3) first = f / 60;
+  it('a game, or a load, opens on clear skies and the first spell is not before the first few minutes', () => {
+    for (const seed of SEEDS) {
+      const r = skies('hub', seed, 2);
+      expect(r.first, `seed ${seed}`).toBeGreaterThan(4); // minutes
+      expect(r.first, `seed ${seed}`).toBeLessThan(60);
     }
-    expect(first).toBeLessThan(900);
+  });
+
+  it('the mountains are a place of wind, with a storm a rare thing there', () => {
+    const runs = SEEDS.map((s) => skies('mountains', s, 4));
+    expect(mean(runs.map((r) => r.share('gale')))).toBeGreaterThan(0.1);
+    expect(mean(runs.map((r) => r.share('rain')))).toBe(0);
+    expect(mean(runs.map((r) => r.stormsAnHour))).toBeLessThan(1.2);
   });
 
   it('a thunderstorm hushes footsteps more than rain does, and a gale hushes them too', () => {

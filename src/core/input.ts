@@ -62,8 +62,14 @@ const PAD: Readonly<Record<Button, number>> = { light: PAD_BUTTON.rb, heavy: PAD
 /** The buttons the game reads as held (guard, and the dodge that sprints): every other acts on its press alone, so one that stays down for seconds is stuck. */
 const HOLDS: ReadonlySet<Button> = new Set<Button>(['dodge', 'block']);
 const STUCK_FRAMES = SIM.hz * 2;
-/** A key that has been heard to repeat and then says nothing for this long is no longer down (a held key repeats within two seconds at the slowest setting, and goes on). */
+/**
+ * A key that has been heard to repeat and then says nothing for this long is no longer down (a held key repeats within two seconds at the slowest
+ * setting, and goes on). Only the key pressed last is repeated by the system: the others, though held, fall silent from the moment another is
+ * pressed, so silence says nothing of them (round 53: a run held on W, then sprinting on Space, stopped dead three and a half seconds in).
+ */
 const SILENT_MS = 3500;
+/** A window that is left and returned to within this long (a notification, an overlay, a stolen focus) has not let go of what the hand held. */
+const BLIP_MS = 400;
 /** Which bit of a mouse event's `buttons` each button of its `button` is. */
 const MOUSE_BIT: Readonly<Record<number, number>> = { 0: 1, 1: 4, 2: 2 };
 const isMeta = (code: string): boolean => code === 'MetaLeft' || code === 'MetaRight';
@@ -145,8 +151,8 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
     if (e.code !== 'Escape' && !captured()) capture(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
     keys.set(e.code, performance.now()); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
-    if (e.repeat) repeats.add(e.code);
-    if (e.repeat) return;
+    if (e.repeat) return void repeats.add(e.code);
+    repeats.clear(); // a key newly pressed takes the system's repeating from the rest: they are silent now, and still held (round 53)
     useDevice('keys');
     const b = keyButton(e.code);
     if (b) press(b);
@@ -156,6 +162,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   addEventListener('keyup', (e) => {
     if (isMeta(e.code)) return letGo(); // keys let go while Command was down were never heard to rise (a key still held says so again with its next repeat)
     keys.delete(e.code);
+    repeats.delete(e.code);
     const b = keyButton(e.code);
     if (b) release(b);
   });
@@ -173,9 +180,26 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
       release(b);
     }
   };
-  addEventListener('blur', letGo);
-  addEventListener('focus', letGo);
-  document.addEventListener('visibilitychange', letGo);
+  /** What was held when the window was left, for the moment it is back (a blip: round 53). */
+  let away: { at: number; keys: string[]; mouse: [number, Button][]; held: Buttons } | null = null;
+  const leave = (): void => {
+    away ??= { at: performance.now(), keys: [...keys.keys()], mouse: [...mouseButtons], held: { ...held } };
+    letGo();
+  };
+  const comeBack = (): void => {
+    const was = away;
+    if (!was) return; // (a return is often two events, visibilitychange and focus: the second finds nothing saved, and must not let go of what the first gave back; and a focus with no blur before it held nothing to let go)
+    away = null;
+    letGo();
+    if ( performance.now() - was.at > BLIP_MS) return; // a long absence: nothing is held on coming back (round 31)
+    const now = performance.now(); // a short one (a notification, an overlay, focus taken and given back) is not a hand let go: the run goes on, the sprint with it
+    for (const code of was.keys) keys.set(code, now);
+    for (const [btn, b] of was.mouse) mouseButtons.set(btn, b);
+    for (const b of BUTTONS) if (was.held[b]) held[b] = true;
+  };
+  addEventListener('blur', leave);
+  addEventListener('focus', comeBack);
+  document.addEventListener('visibilitychange', () => (document.visibilityState === 'hidden' ? leave() : comeBack()));
   canvas.addEventListener('mousedown', (e) => {
     useDevice('keys');
     reconcile(e);
@@ -217,6 +241,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     sensitivity: 1,
     invertY: false,
     reset() {
+      away = null;
       letGo();
       muted.clear();
       recalibratePads();

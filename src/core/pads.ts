@@ -94,7 +94,7 @@ function read(p: PadLike, from: Source, now = performance.now()): { reading: Pad
     if (p.mapping === 'standard' && i < 4 && Math.abs(v) < 0.1) s.rest[i] = 0; // a stick seen at centre rests at centre
     const lay = (s.still[i] ??= { at: now, v });
     if (Math.abs(v - lay.v) > STEADY) [lay.at, lay.v] = [now, v];
-    else if (i < 4 && now - lay.at > DRIFT_MS && Math.abs(v - (s.rest[i] ?? 0)) < DRIFT_MAX) s.rest[i] = v; // round 49: a stick that has drifted off centre and lies there is at rest there (it walked the investigator on alone)
+    else if (i < 4 && now - lay.at > DRIFT_MS && Math.abs(v - (s.rest[i] ?? 0)) < DRIFT_MAX && !s.down.length) s.rest[i] = v; // round 49: a stick that has drifted off centre and lies there is at rest there (it walked the investigator on alone); round 53: not while a button is held (a stick held steady through a sprint is not a stick at rest)
     const r = s.rest[i] ?? 0;
     const d = v - r;
     return Math.abs(r) > 0.3 ? (Math.abs(d) > 0.2 ? d : 0) : Math.abs(r) > 0.02 ? d : v; // an axis that lay off centre is read from where it lay
