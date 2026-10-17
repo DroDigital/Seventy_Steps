@@ -310,3 +310,29 @@ export const FALL = {
   dark: [0.4, 1] as readonly [from: number, to: number], // the share of the fall in which the picture goes dark, edges first
   spin: 3.4, // rad/s: the tumble, head first
 };
+
+/**
+ * The sea (round 55, systems/waterFall.ts): a body that goes off the land's edge into the water does not drop through the seabed: it meets
+ * the surface where the waves have it, throws up a splash by how hard it came, floats chest-deep for a moment, and something from the deep
+ * takes hold and drags it down.
+ */
+export const WATER = {
+  gravity: 9.81, // m/s²: in the air above the water it falls as a body does (a pit's drop is the game's own, FALL.gravity)
+  entryKeep: 0.42, // the share of its fall's speed it keeps on meeting the water (the rest is the water's: a body does not plunge on at a walk's speed)
+  entryAcross: 0.38, // ...and of its run-up
+  afloat: 1.0, // metres: how deep the feet hang when it floats, chest-deep: the lungs' air holds a body up there...
+  spring: 9, // m/s² per metre of depth it is off that, ...
+  damp: 5.5, // ...per second of its speed in the water: it settles in a second or so
+  swim: 3.2, // per second: the speed it has across the water is lost, but for what is drawn on it
+  seize: 40, // frames after it meets the water that the tentacle has hold of it (the tentacle rises in the first 0.5 s, and coils on it by this)
+  pull: 17, // m/s²: how hard it is drawn down once it has hold, over `ramp` frames (the seabed is under it: where the sea is shallow it is dragged along the bottom)...
+  ramp: 14,
+  draw: 17, // ...and out along the way the tentacle lies, into the deep, m/s² (the water holds it to about 5 m/s)
+  drag: 1.9, // quadratic drag in the water (per metre)
+  held: 96, // frames it is held before the death: dragged out and under, and gone
+  max: 220, // frames: it is over by now whatever happens
+  root: 4, // metres: the tentacle rises this far from the body, ahead of it and to one side (out of deeper water), and stays this far ahead as it draws it out
+  follow: 0.92, // the camera follows the body this far down: it sees the surface close over it
+  lookPitch: 0.95, // radians: and looks down at it, not straight down (the water is not a hole)
+  dark: [34, 90] as readonly [from: number, to: number], // frames held between which the picture goes to black
+};

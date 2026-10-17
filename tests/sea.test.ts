@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { WORLD } from '../src/data/tuning';
 import { createSea, SEA } from '../src/render/sea';
 import { AMP_SUM, seaHeight, WAVES, WAVES_GLSL } from '../src/render/seaWaves';
-import { seaChop } from '../src/render/worldLife';
+import { seaChop } from '../src/systems/seaChop';
 import { createWorldGame } from '../src/systems/game';
 
 describe('the sea (round 30)', () => {

@@ -229,6 +229,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const labHold = { on: false }; // the effects lab (?debug, ui/fxLab.ts) holds the world still and steps it by hand
   installFxLab(game, camera, { hold: labHold, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
+  game.seaTime = () => simTime; // a body that falls into the sea meets the wave that is drawn (round 55: waterFall.ts)
   let frames = 0;
   let statsAt = performance.now();
 

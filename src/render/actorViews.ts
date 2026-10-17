@@ -185,7 +185,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       if (v.act && v.actK > 0) act = { kind: v.act, k: v.actK };
     }
     const falling = id === g.player.id && move !== 'death' ? g.player.falling : null; // over an edge, before the death at the foot of it (round 54)
-    const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin } : undefined;
+    const water = falling?.water;
+    const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin, sea: water ? { since: water.entered < 0 ? -1 : (falling.frame + alpha - water.entered) / SIM.hz, held: water.grab < 0 ? 0 : (falling.frame + alpha - water.grab) / SIM.hz } : undefined } : undefined;
     pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop });
     if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
       f.root.updateMatrixWorld(true);

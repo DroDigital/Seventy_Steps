@@ -105,5 +105,5 @@ export const ACTS = {
  */
 export const STINGER_VARY: Partial<Record<StingerId, number>> = {
   hit: 1.5, blocked: 1.4, parried: 1.1, guardBreak: 1.3, riposte: 1.3, kill: 1.2, dodged: 1.5, shot: 0.8, beam: 1, cylinder: 1.2, dry: 1.3, reload: 0.5, lock: 1.2, page: 1.4, lampLit: 1, lampOut: 1,
-  heartbeat: 0.2, unmade: 0.25, plunge: 0.25, death: 0.35, title: 0.2, ending: 0.2, levelUp: 0.3, found: 0.3, place: 0.3, rested: 0.3, vanquished: 0.3, healed: 0.4, insight: 0.4, quest: 0.4, better: 0.5, worse: 0.5, boss: 0.5, phase: 0.5,
+  heartbeat: 0.2, unmade: 0.25, plunge: 0.25, splash: 1.3, seized: 0.5, death: 0.35, title: 0.2, ending: 0.2, levelUp: 0.3, found: 0.3, place: 0.3, rested: 0.3, vanquished: 0.3, healed: 0.4, insight: 0.4, quest: 0.4, better: 0.5, worse: 0.5, boss: 0.5, phase: 0.5,
 };

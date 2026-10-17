@@ -20,9 +20,11 @@ import { inDungeon } from '../world/terrain';
 import { regionAt } from '../world/worldMap';
 import { startMove } from './actions';
 import type { Falling, Game } from './components';
+import { enterSea, seaTimeOf, waterDark, waterStep } from './waterFall';
 import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { dismissMount } from './mounts';
+import { seaChop } from './seaChop';
 
 const SEA = WORLD.seaLevel + 0.4;
 const LIP = new WeakMap<Game, V3>();
@@ -117,12 +119,19 @@ function beginFall(g: Game, lip: V3): void {
   const [dx, dz] = [(tr.pos.x - tr.prev.x) * SIM.hz, (tr.pos.z - tr.prev.z) * SIM.hz];
   const run = Math.hypot(dx, dz);
   const k = run > FALL.carry ? FALL.carry / run : 1;
-  p.falling = { frame: 0, vy: 0, vx: dx * k, vz: dz * k, spin: 1, lip: { ...lip } };
-  g.events.emit('Fell', { entity: p.id, at: { ...tr.pos }, frames: FALL.frames });
+  const sea = overSea(g, tr.pos, g.ecs.c.body.get(p.id)!.height);
+  p.falling = { frame: 0, vy: 0, vx: dx * k, vz: dz * k, spin: 1, lip: { ...lip }, water: sea ? enterSea(tr.pos, { x: dx, z: dz }, seaTimeOf(g), seaChop(g)) : null };
+  g.events.emit('Fell', { entity: p.id, at: { ...tr.pos }, frames: FALL.frames, sea });
+}
+
+/** Whether what ends the land here is the sea, and not a drop: outside a dungeon, with the feet at the water and clear of every pit and gap (round 55). */
+function overSea(g: Game, pos: V3, h: number): boolean {
+  return !inDungeon(pos.x, pos.z) && pos.y <= SEA + 0.05 && !inFall(g.world, pos, FALL.foot, h);
 }
 
 /** One frame of the drop; at its foot the death, with the body left there in the dark (movement.ts leaves it be until the next waking). */
 function dropStep(g: Game, f: Falling): void {
+  if (f.water) return waterStep(g, f, beginDeath); // the sea has it (systems/waterFall.ts)
   const tr = g.ecs.c.transform.get(g.player.id)!;
   if (f.frame >= FALL.frames) return;
   const dt = 1 / SIM.hz;
@@ -140,6 +149,7 @@ function dropStep(g: Game, f: Falling): void {
 /** How dark the picture is for a fall, 0 to 1: clear for the first of it, then closing in until the foot of it, and black until the waking. */
 export function fallDark(f: Falling | null): number {
   if (!f) return 0;
+  if (f.water) return waterDark(f.water);
   const [from, to] = FALL.dark;
   const t = (f.frame / FALL.frames - from) / (to - from);
   return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t);

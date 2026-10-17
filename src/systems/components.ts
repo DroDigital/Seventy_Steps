@@ -273,6 +273,18 @@ export interface Falling {
   vz: number;
   spin: number; // the tumble's direction, 1 head first, -1 on the back
   lip: V3; // the last safe feet: the Lost Echoes lie on the ground there
+  water: WaterFall | null; // the fall is into the sea (round 55: the water's, not the air's, once it has met it)
+}
+
+/** A body in the sea (round 55, systems/waterFall.ts). */
+export interface WaterFall {
+  surface: number; // the water's height at the body, this frame
+  entered: number; // the frame the body met the water, -1 before
+  grab: number; // the frame the tentacle took hold of it, -1 before
+  root: V3; // where the tentacle comes up (and, once it has hold, stays ahead of the body: it is drawing it out)
+  heading: { x: number; z: number }; // the way it draws the body, a unit vector (set when it takes hold)
+  held: number; // frames the tentacle has had hold of it
+  depth: number; // metres its feet are under the surface (0 above it)
 }
 
 /** The investigator's mind (spec §3A). */
@@ -310,4 +322,6 @@ export interface Game {
   overworld?: Overworld;
   /** How well lit the ground at a point is by the world's lamps, fires and torches, 0..1 (handed in by the renderer, which knows where they are; the dark when absent: sanity.ts mends faster in it). */
   lit?: (at: V3) => number;
+  /** The clock the sea's waves are drawn by, in seconds (handed in by the renderer: it runs on through a cutscene that stands the world still, which `frame` does not; the frames' own when absent: waterFall.ts meets the water where it is drawn). */
+  seaTime?: () => number;
 }

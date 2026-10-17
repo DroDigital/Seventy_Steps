@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { EDGES, FRAGMENTS, GENERIC, TIPS } from '../src/data/deathLines';
+import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS } from '../src/data/deathLines';
 import { REGIONS } from '../src/data/regions';
 import { ATTACK_IDS } from '../src/data/schema';
 import { deathLine } from '../src/systems/deathNotes';
@@ -42,6 +42,13 @@ describe('what the last blow teaches (round 26)', () => {
     g.events.emit('Fell', { entity: g.player.id, at: { x: 0, y: 0, z: 0 }, frames: 66 });
     expect(EDGES).toContain(deathLine(g));
     g.events.emit('Respawned', { entity: g.player.id });
+    expect(EDGES).not.toContain(deathLine(g));
+  });
+
+  it('a fall into the sea reads one of the sea\'s lines, and not an edge\'s (round 55)', () => {
+    const g = createWorldGame();
+    g.events.emit('Fell', { entity: g.player.id, at: { x: 0, y: -2, z: 0 }, frames: 66, sea: true });
+    expect(SEAS).toContain(deathLine(g));
     expect(EDGES).not.toContain(deathLine(g));
   });
 });
