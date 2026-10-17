@@ -1,4 +1,4 @@
-/** Shared instanced billboard buffers for procedural allies and reviewed PNG pages. */
+/** Shared instanced billboard buffers for the procedural fallback and reviewed PNG pages. */
 import * as THREE from 'three';
 import { SPRITE_FRAG, SPRITE_VERT } from '../shaders/sprite';
 import { worldUniforms } from '../worldMaterial';

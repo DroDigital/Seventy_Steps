@@ -6,13 +6,11 @@
  * ahead in the idle moments while the title waits for a choice.
  */
 
-import { atlasBuilder, spriteRecipes, type AtlasBuilder, type SpriteAtlas } from '../render/sprites/atlas';
-import { ENTITIES } from '../data/registry';
+import { atlasBuilder, type AtlasBuilder, type SpriteAtlas } from '../render/sprites/atlas';
 import { loadReviewedArt, type ReviewedArt } from '../render/sprites/reviewed';
 
 const IDLE_MS = 8; // atlas drawing per idle moment while the title waits
 const FRAME_MS = 28; // atlas drawing per frame while the veil waits on it
-const allies = new Set(ENTITIES.filter((entity) => entity.tier === 'ally').map((entity) => entity.id));
 let reviewed: Promise<ReviewedArt> | undefined;
 const artwork = (made: (share: number) => void): Promise<ReviewedArt> => (reviewed ??= loadReviewedArt(made));
 
@@ -20,7 +18,7 @@ const artwork = (made: (share: number) => void): Promise<ReviewedArt> => (review
 export const nextFrame = (): Promise<void> => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
 let atlas: AtlasBuilder | null = null;
-const builder = (): AtlasBuilder => (atlas ??= atlasBuilder(spriteRecipes().filter((entry) => allies.has(entry.key))));
+const builder = (): AtlasBuilder => (atlas ??= atlasBuilder([]));
 
 /** While the title waits: draws the sprite atlas in the page's idle moments. */
 export function makeAhead(): void {

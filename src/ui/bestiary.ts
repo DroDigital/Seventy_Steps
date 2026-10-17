@@ -1,7 +1,7 @@
 /**
- * `?bestiary`: every reviewed creature and variant, plus the unprovided allies. The same authored
- * frames as the game cycle through all registered directions and actions. Only allies use the
- * procedural fallback. Clicking a card spawns that exact form in the arena.
+ * `?bestiary`: every creature and variant, including the seven authored allies. The same authored
+ * frames as the game cycle through all registered directions and actions.
+ * Clicking a card spawns that exact form in the arena.
  */
 
 import * as THREE from 'three';
@@ -138,7 +138,7 @@ export async function startBestiary(): Promise<void> {
     console.error(error);
     return;
   }
-  status.textContent = `${ENTITIES.length} entities · 105 reviewed forms + 7 allies · click a form to spawn it in the arena · `;
+  status.textContent = `${ENTITIES.length} entities · ${atlas.reviewed?.manifest.entityCount ?? 0} authored forms including 7 allies · click a form to spawn it in the arena · `;
   status.append(
     Object.assign(el('a', `color:${BONE}`, 'back to the arena'), { href: '?arena' }),
   );

@@ -8,7 +8,9 @@ The game uses the accepted 105-entry creature library for every enemy form: 93 b
 - `public/creatures/reviewed/creatures-0.png` through `creatures-3.png`: four lossless PNG texture pages, with transparent gutters and nearest filtering; `creatures-4.png` holds the fourteen stoop frames, `creatures-5.png` the seven in-between frames and `creatures-6.png` the bosses' 126 side and back frames; 'Umr at-Tawil's new frames are in place on `creatures-3.png` (which grew a shelf at its foot for his right view).
 - `public/creatures/reviewed/source-index.json`: the active source registrations used to build this pack.
 
-These files are copied into `dist/creatures/reviewed/` by the normal production build and served by the existing Electron package. No separate sprite folder needs to be installed into the game. The seven allies that have no supplied artwork retain their procedural sprites.
+These files are copied into `dist/creatures/reviewed/` by the normal production build and served by the existing Electron package. No separate sprite folder needs to be installed into the game.
+
+The seven allies have their own lossless atlas in `public/creatures/allies/` (`index.json`, `source-index.json`, `allies-0.png`: 272 unique 64×64 frames, 348 logical frames). It loads beside the 105-creature atlas and the two are joined in memory; the enemy pages are not repacked. Nodens, the Tritons, the Cats of Ulthar, Pickman and Nasht & Kaman-Thah walk on six frames. The Light-Being from Algol and the Yithian Archivist glide on four. Each has two idle, three attack and two hurt frames in front, left, back and right. A right view mirrors its left except the Yithian's, which is drawn. Each keeps the world height of the sprite it replaces.
 
 ## Animation behavior
 
@@ -18,7 +20,7 @@ All frames of a creature keep one canvas scale and ground anchor taken from its 
 
 ## Inspecting the artwork
 
-- `?bestiary` displays all 105 reviewed forms and seven allies, cycling every registered direction and action. Each card identifies the current view, action and frame; clicking it spawns that exact form in the arena.
+- `?bestiary` displays all 112 authored forms (105 reviewed enemies and seven allies), cycling every registered direction and action. Each card identifies the current view, action and frame; clicking it spawns that exact form in the arena.
 - `?spawn=deep_one&debug` starts a creature test with read-only animation diagnostics.
 - `?spawn=deep_one&variant=eldritch&debug` tests a variant.
 - `?spawn=cthulhu&debug` tests the tall boss canvas.

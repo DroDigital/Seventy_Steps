@@ -1,0 +1,4662 @@
+{
+  "format": "seventy-steps-current-game-animations-v1",
+  "entity_count": 7,
+  "unique_png_count": 272,
+  "logical_frame_count": 348,
+  "entities": [
+    {
+      "key": "nodens",
+      "id": "nodens",
+      "display_name": "Nodens",
+      "asset_group": "sprites",
+      "sprite_scale": 3.2,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nodens/64x64/front/idle_0.png",
+                  "sha256": "e18a44ebd0ae75f9b4eae49bc7bc72717cb0e52377ac51841805c3f2f6db0635",
+                  "bounds": [
+                    17,
+                    7,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nodens/64x64/front/idle_1.png",
+                  "sha256": "aec85807d6ccf1b7685f11c9282fcab6155f397fd9c09e531541dd7f09643774",
+                  "bounds": [
+                    18,
+                    7,
+                    50,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nodens/64x64/front/move_0.png",
+                  "sha256": "b8119244f17f12f7f87b21757e218ae9d0a49c7ac9e724feebcc9283eb908862",
+                  "bounds": [
+                    14,
+                    7,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nodens/64x64/front/move_1.png",
+                  "sha256": "ff37a3f920290ff4ef30e75b3aaa65b2e205153b86177ebc734d805913584af7",
+                  "bounds": [
+                    18,
+                    7,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nodens/64x64/front/move_2.png",
+                  "sha256": "a70a9c1b86362d8f8396fdcd9bf5153979e3a67db7daf27dac1c659f8bb8be88",
+                  "bounds": [
+                    18,
+                    7,
+                    51,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nodens/64x64/front/move_3.png",
+                  "sha256": "faddf80ba87eb5c9963890424f9e865a221602b4f333f009dd2e157748453ea5",
+                  "bounds": [
+                    16,
+                    7,
+                    51,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nodens/64x64/front/move_4.png",
+                  "sha256": "7e684a4ad39fb9c8b39c7cb355906655f76f70eef97a9dffa2a2ce16665e572c",
+                  "bounds": [
+                    17,
+                    7,
+                    51,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nodens/64x64/front/move_5.png",
+                  "sha256": "7169f165946ef7b75662a29d6fb5887cfcd4105873dc267538685fe49a98a615",
+                  "bounds": [
+                    18,
+                    7,
+                    51,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nodens/64x64/front/attack_0.png",
+                  "sha256": "ea36e6ac37d21656173755957b98e9faa4c4917c611bbcbb84220f7963515ec2",
+                  "bounds": [
+                    14,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nodens/64x64/front/attack_1.png",
+                  "sha256": "1626455533dddb01dbac8082c9eacb5c71b8484c474c7bb63de360f71f1dcc7f",
+                  "bounds": [
+                    10,
+                    7,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nodens/64x64/front/attack_2.png",
+                  "sha256": "d108b2a97b9659d2b1ab9fee5ee3b1f6fae2f08e4ed92e830ef46db9f108a19a",
+                  "bounds": [
+                    13,
+                    7,
+                    52,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nodens/64x64/front/hurt_0.png",
+                  "sha256": "b7b7d0be34ed572097cfd36392c8f486db0feda97352a35011cc9470240aa756",
+                  "bounds": [
+                    11,
+                    10,
+                    55,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nodens/64x64/front/hurt_1.png",
+                  "sha256": "54ede2c72b43faff2cfd1001b152c6c72fe9cc624fb1eee525d8d8491823ab0e",
+                  "bounds": [
+                    15,
+                    10,
+                    50,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nodens/64x64/left/idle_0.png",
+                  "sha256": "31eb96d8ca1ebd707b1fd29b323b2703473c0f68fea512a54a830aa9c6ae219e",
+                  "bounds": [
+                    18,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nodens/64x64/left/idle_1.png",
+                  "sha256": "0a3db02c4d8a11c2eaac17b88dba3cb57235dcfdfacf990e85f9ca82c7037ab5",
+                  "bounds": [
+                    17,
+                    7,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nodens/64x64/left/move_0.png",
+                  "sha256": "7bc53ad8c3867a73505491ce0048a45e8345241a9aabd56548c0504820b2d6ba",
+                  "bounds": [
+                    14,
+                    7,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nodens/64x64/left/move_1.png",
+                  "sha256": "8aca05cf8ce5aec65334e83341a9a75c292f3f328c59dc34d42acb6af1b04497",
+                  "bounds": [
+                    18,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nodens/64x64/left/move_2.png",
+                  "sha256": "16734fcb83b054953e2adfea52e8e75938a344afa1ec4b73b63f7e7d211d2061",
+                  "bounds": [
+                    16,
+                    8,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nodens/64x64/left/move_3.png",
+                  "sha256": "39e9840861d8af3767ead02b149aef55cc712e95bdcd5c8c5d1f82f519e1350b",
+                  "bounds": [
+                    14,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nodens/64x64/left/move_4.png",
+                  "sha256": "2b526e13e627e1dbd65ad2c71ea7c57a4ba3f304fcb3b4289427936d57ebc4cd",
+                  "bounds": [
+                    16,
+                    7,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nodens/64x64/left/move_5.png",
+                  "sha256": "a12b8ff8a4e42940f5acafded8247939330da45a141181736f1d8b7d38ddaa00",
+                  "bounds": [
+                    15,
+                    7,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nodens/64x64/left/attack_0.png",
+                  "sha256": "d7195b9e17539e2efbdc0150a7e73a4850a12f823260d50acba8d6c4ae8c3ddd",
+                  "bounds": [
+                    14,
+                    6,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nodens/64x64/left/attack_1.png",
+                  "sha256": "3771e36d64c334a9a8ed36b9f2fc018833ed54df2a416fc359f91543a47eba85",
+                  "bounds": [
+                    2,
+                    6,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nodens/64x64/left/attack_2.png",
+                  "sha256": "febb693bfebc936bda5c5c34be0724de2296e052ffcad9fabd74c329d567fb02",
+                  "bounds": [
+                    11,
+                    7,
+                    57,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nodens/64x64/left/hurt_0.png",
+                  "sha256": "caf260a328849058462d700054dba6835c59c6ff3dbb715caaef7f63382e92b6",
+                  "bounds": [
+                    10,
+                    8,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nodens/64x64/left/hurt_1.png",
+                  "sha256": "664c82c0962b65e6845ec3c7bb6e8d9a56020d59067c4bcca4fc229eae3ccfaf",
+                  "bounds": [
+                    19,
+                    8,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nodens/64x64/back/idle_0.png",
+                  "sha256": "e039a3d27cceaf23d298557d68755f05cb49a3cfb5234ccf68dfd81d976b9d2f",
+                  "bounds": [
+                    14,
+                    7,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nodens/64x64/back/idle_1.png",
+                  "sha256": "8b4340e5e76c13b9cb0adcd10d20b5a673e8676e4d4216eccd90dfa75936b842",
+                  "bounds": [
+                    15,
+                    7,
+                    50,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nodens/64x64/back/move_0.png",
+                  "sha256": "899e7e24987e2deb0f81666c5f25694eb6cabb4c7e22010ae8c7ddd7b702cd6d",
+                  "bounds": [
+                    16,
+                    6,
+                    52,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nodens/64x64/back/move_1.png",
+                  "sha256": "f82aea04ed36a78602e6be00b3f0fbb73edfbbe24023bd1285cea6e8b850346c",
+                  "bounds": [
+                    15,
+                    6,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nodens/64x64/back/move_2.png",
+                  "sha256": "84423762d24f6d57d1a6ecd6c40ad232b4b149f5aea8fb2c6c8b63b210c09284",
+                  "bounds": [
+                    15,
+                    6,
+                    52,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nodens/64x64/back/move_3.png",
+                  "sha256": "ed7ee228213658f5b33c3040d6a281498529e7cbcb353d54e73efa324f4cef5b",
+                  "bounds": [
+                    15,
+                    6,
+                    55,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nodens/64x64/back/move_4.png",
+                  "sha256": "672f6d69bf1be19e23f664541c0146002a1d7615e8a7e438dd0c26890e05a069",
+                  "bounds": [
+                    15,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nodens/64x64/back/move_5.png",
+                  "sha256": "240e12ee5bf155571cb4d41ebf802100273070504d0f9bd887510f6c3895ad29",
+                  "bounds": [
+                    16,
+                    7,
+                    53,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nodens/64x64/back/attack_0.png",
+                  "sha256": "53b6e5457a426f874ee814641b295d22b2bc29ad838d442c15ccc15fb244e663",
+                  "bounds": [
+                    11,
+                    9,
+                    54,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nodens/64x64/back/attack_1.png",
+                  "sha256": "fa9951b3be0ac49e1f33e0a5d684391d6f55158280cf9854af610c1cd7f37496",
+                  "bounds": [
+                    9,
+                    8,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nodens/64x64/back/attack_2.png",
+                  "sha256": "166ddb3ec2770ed092456df299c4950c5a149a516d569839bf336267c03fe2d1",
+                  "bounds": [
+                    10,
+                    9,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nodens/64x64/back/hurt_0.png",
+                  "sha256": "1c508836eeeb91d0e4da0292b32e6dc5438a25fa2448d7e1f97dfc43c1114ed1",
+                  "bounds": [
+                    10,
+                    11,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nodens/64x64/back/hurt_1.png",
+                  "sha256": "533fa5bd262957d2efc0cdaf8706c1f31122b954858b2ddb3fd3806319f0a16b",
+                  "bounds": [
+                    14,
+                    8,
+                    51,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nodens/64x64/left/idle_0.png",
+                  "sha256": "31eb96d8ca1ebd707b1fd29b323b2703473c0f68fea512a54a830aa9c6ae219e",
+                  "bounds": [
+                    18,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nodens/64x64/left/idle_1.png",
+                  "sha256": "0a3db02c4d8a11c2eaac17b88dba3cb57235dcfdfacf990e85f9ca82c7037ab5",
+                  "bounds": [
+                    17,
+                    7,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nodens/64x64/left/move_0.png",
+                  "sha256": "7bc53ad8c3867a73505491ce0048a45e8345241a9aabd56548c0504820b2d6ba",
+                  "bounds": [
+                    14,
+                    7,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nodens/64x64/left/move_1.png",
+                  "sha256": "8aca05cf8ce5aec65334e83341a9a75c292f3f328c59dc34d42acb6af1b04497",
+                  "bounds": [
+                    18,
+                    7,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nodens/64x64/left/move_2.png",
+                  "sha256": "16734fcb83b054953e2adfea52e8e75938a344afa1ec4b73b63f7e7d211d2061",
+                  "bounds": [
+                    16,
+                    8,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nodens/64x64/left/move_3.png",
+                  "sha256": "39e9840861d8af3767ead02b149aef55cc712e95bdcd5c8c5d1f82f519e1350b",
+                  "bounds": [
+                    14,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nodens/64x64/left/move_4.png",
+                  "sha256": "2b526e13e627e1dbd65ad2c71ea7c57a4ba3f304fcb3b4289427936d57ebc4cd",
+                  "bounds": [
+                    16,
+                    7,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nodens/64x64/left/move_5.png",
+                  "sha256": "a12b8ff8a4e42940f5acafded8247939330da45a141181736f1d8b7d38ddaa00",
+                  "bounds": [
+                    15,
+                    7,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nodens/64x64/left/attack_0.png",
+                  "sha256": "d7195b9e17539e2efbdc0150a7e73a4850a12f823260d50acba8d6c4ae8c3ddd",
+                  "bounds": [
+                    14,
+                    6,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nodens/64x64/left/attack_1.png",
+                  "sha256": "3771e36d64c334a9a8ed36b9f2fc018833ed54df2a416fc359f91543a47eba85",
+                  "bounds": [
+                    2,
+                    6,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nodens/64x64/left/attack_2.png",
+                  "sha256": "febb693bfebc936bda5c5c34be0724de2296e052ffcad9fabd74c329d567fb02",
+                  "bounds": [
+                    11,
+                    7,
+                    57,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nodens/64x64/left/hurt_0.png",
+                  "sha256": "caf260a328849058462d700054dba6835c59c6ff3dbb715caaef7f63382e92b6",
+                  "bounds": [
+                    10,
+                    8,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nodens/64x64/left/hurt_1.png",
+                  "sha256": "664c82c0962b65e6845ec3c7bb6e8d9a56020d59067c4bcca4fc229eae3ccfaf",
+                  "bounds": [
+                    19,
+                    8,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "tritons",
+      "id": "tritons",
+      "display_name": "Tritons of Nodens' Court",
+      "asset_group": "sprites",
+      "sprite_scale": 2.2,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/tritons/64x64/front/idle_0.png",
+                  "sha256": "de438d4f3d1a736422f44c5f52e7e4c20cd42e29a356e227bdff38f246704253",
+                  "bounds": [
+                    18,
+                    10,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/tritons/64x64/front/idle_1.png",
+                  "sha256": "c5118c3d63f53bad0cba1ad1281e403ba035eccea15e23a7a96170b68d0b2c25",
+                  "bounds": [
+                    18,
+                    11,
+                    46,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/tritons/64x64/front/move_0.png",
+                  "sha256": "a59ff1d8391e7934a5f7ca96442f77e8f21643ac30c02d84890d3b2717c73de4",
+                  "bounds": [
+                    18,
+                    10,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/tritons/64x64/front/move_1.png",
+                  "sha256": "f5c66138123f2fd9785b46a8eb860db02f071eba98952ed2c419fc7626e18ad7",
+                  "bounds": [
+                    18,
+                    10,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/tritons/64x64/front/move_2.png",
+                  "sha256": "47f0633e4e401d2134a91fbd90c960cb8badefc4b236ac03ab4aaa919c568120",
+                  "bounds": [
+                    18,
+                    10,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/tritons/64x64/front/move_3.png",
+                  "sha256": "8a076b016617ea4605bd6900b4c19dd2e4eb5838bab32a6d0fe66dfbc62a33a3",
+                  "bounds": [
+                    18,
+                    10,
+                    46,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/tritons/64x64/front/move_4.png",
+                  "sha256": "03e5a7afacf2c8a3de177bf911f1f7eea0f1b55448574e7ee49629f221a6a8b9",
+                  "bounds": [
+                    18,
+                    10,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/tritons/64x64/front/move_5.png",
+                  "sha256": "f2161c03c7acf4e5fd1231e6bef37ed6b416920dbb909aa1e22f619b08fa445a",
+                  "bounds": [
+                    18,
+                    10,
+                    47,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/tritons/64x64/front/attack_0.png",
+                  "sha256": "5df8c4e37829dc7007a65af1a5611420ed20a513a2d532f4cfea61b8a1351fd2",
+                  "bounds": [
+                    16,
+                    11,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/tritons/64x64/front/attack_1.png",
+                  "sha256": "277f19844fc5132fd3d818bab9522a1acabc93dee30d6337d2c12e6aa4895390",
+                  "bounds": [
+                    17,
+                    12,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/tritons/64x64/front/attack_2.png",
+                  "sha256": "006078929db6ea429a2d84f70c496b327a1fea66dbfb983a5ae4b0c7f3c499eb",
+                  "bounds": [
+                    17,
+                    11,
+                    46,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/tritons/64x64/front/hurt_0.png",
+                  "sha256": "b0b940437f41ecf323bddf27bbf5063f3a499cc22bca28754c06ca32d9ad7c15",
+                  "bounds": [
+                    18,
+                    13,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/tritons/64x64/front/hurt_1.png",
+                  "sha256": "21c1642dbea88f01194953f2b5c89b5bed28440e3a90199bb9a6f0c1800bb868",
+                  "bounds": [
+                    18,
+                    13,
+                    46,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/tritons/64x64/left/idle_0.png",
+                  "sha256": "e73274ed7684c533c39db3c14eb6b1faf2e7ceb51eba5ce4671c1f1e01f49a86",
+                  "bounds": [
+                    20,
+                    12,
+                    44,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/tritons/64x64/left/idle_1.png",
+                  "sha256": "4ed10db701ff952eeb9efe8f0578aba78054a052dc6bf84979a7868995db5dbf",
+                  "bounds": [
+                    21,
+                    13,
+                    43,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/tritons/64x64/left/move_0.png",
+                  "sha256": "c0901b9a24b20ccbf8e65adf0566850b64e3519b9ce40fecf20ec0c88a9016b8",
+                  "bounds": [
+                    18,
+                    13,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/tritons/64x64/left/move_1.png",
+                  "sha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
+                  "bounds": [
+                    18,
+                    13,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/tritons/64x64/left/move_2.png",
+                  "sha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
+                  "bounds": [
+                    22,
+                    13,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/tritons/64x64/left/move_3.png",
+                  "sha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
+                  "bounds": [
+                    20,
+                    13,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/tritons/64x64/left/move_4.png",
+                  "sha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
+                  "bounds": [
+                    21,
+                    13,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/tritons/64x64/left/move_5.png",
+                  "sha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
+                  "bounds": [
+                    22,
+                    13,
+                    49,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/tritons/64x64/left/attack_0.png",
+                  "sha256": "27e57bb8a5fc0ce4809abbde4664933ede456bbff4b26c70375e30817bad3971",
+                  "bounds": [
+                    13,
+                    15,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/tritons/64x64/left/attack_1.png",
+                  "sha256": "a3aff00a2b7676d67ed26d1049adc35a83e93d8f0a7d3f52aa246cf0564d7f39",
+                  "bounds": [
+                    1,
+                    18,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/tritons/64x64/left/attack_2.png",
+                  "sha256": "ffccae4787267c52413762069bfd04514cdf4e4a32f39af148d1f2d1424434a5",
+                  "bounds": [
+                    13,
+                    18,
+                    51,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/tritons/64x64/left/hurt_0.png",
+                  "sha256": "0948a56ee49fdbcf58a46f485d521844f385055045e76fd03fedd378fa5137d4",
+                  "bounds": [
+                    17,
+                    14,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/tritons/64x64/left/hurt_1.png",
+                  "sha256": "f64686f12b02d9baa2275d0b6783abc8502d46f3e1dace6be909a6a8071c19cc",
+                  "bounds": [
+                    16,
+                    14,
+                    48,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/tritons/64x64/back/idle_0.png",
+                  "sha256": "6d68460f6fb18d8ef6f009881e6ffc641864dba9f2239901a8ec21f9868a32e2",
+                  "bounds": [
+                    17,
+                    10,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/tritons/64x64/back/idle_1.png",
+                  "sha256": "02c146b8b4d52584fa5fd54c36784fc6f811704f60718e029ccf6c78a5cfaa4b",
+                  "bounds": [
+                    17,
+                    10,
+                    47,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/tritons/64x64/back/move_0.png",
+                  "sha256": "db27b1882a8c24f02d4b69fbe43ebeacadbb02dd4594746e675e7b388d1ef5b6",
+                  "bounds": [
+                    17,
+                    10,
+                    46,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/tritons/64x64/back/move_1.png",
+                  "sha256": "851adbd34b57c1353c101404799549da324d0681b7c748cac1abeb66b761d16b",
+                  "bounds": [
+                    17,
+                    11,
+                    46,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/tritons/64x64/back/move_2.png",
+                  "sha256": "4506ea0155590943e7c9750dd07496035c9f8daed1c925c886609432500b0648",
+                  "bounds": [
+                    18,
+                    11,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/tritons/64x64/back/move_3.png",
+                  "sha256": "ba227c91be264eb23e25cf8fbac4ad14f2d298e30a4a308f138fa4cfd39f414f",
+                  "bounds": [
+                    17,
+                    11,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/tritons/64x64/back/move_4.png",
+                  "sha256": "32b2fd66d5ca7e74405ea2143cccf05d217fcfbb5c7c25df784cc53c5b6cdf3d",
+                  "bounds": [
+                    18,
+                    11,
+                    47,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/tritons/64x64/back/move_5.png",
+                  "sha256": "8023e302ac27fa478f563baa491164e846fb36be0e8960f95118846fd66bdbee",
+                  "bounds": [
+                    18,
+                    11,
+                    48,
+                    61
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/tritons/64x64/back/attack_0.png",
+                  "sha256": "74941814bf425002b5b7ecac7dd38ca86be3cc7906f2e18f1ffbe7049d2b235a",
+                  "bounds": [
+                    16,
+                    9,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/tritons/64x64/back/attack_1.png",
+                  "sha256": "d75273d859e6c2082ff52be764ebcd4182236de101f2adf23d6b3bab974675a3",
+                  "bounds": [
+                    13,
+                    14,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/tritons/64x64/back/attack_2.png",
+                  "sha256": "bc685e7bb8eec5e6083dcd57f03b9efa006c802350e4c470d376deb1ed3e32c0",
+                  "bounds": [
+                    17,
+                    11,
+                    46,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/tritons/64x64/back/hurt_0.png",
+                  "sha256": "54a27fba28733c29f880c34947827e11ff200222d61fdd77846c11e2a4ebec5e",
+                  "bounds": [
+                    18,
+                    14,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/tritons/64x64/back/hurt_1.png",
+                  "sha256": "49b56abb15b4089c291c0545e7634d3b7cce04bf0e1b0029da67eddb4762d60b",
+                  "bounds": [
+                    17,
+                    12,
+                    45,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/tritons/64x64/left/idle_0.png",
+                  "sha256": "e73274ed7684c533c39db3c14eb6b1faf2e7ceb51eba5ce4671c1f1e01f49a86",
+                  "bounds": [
+                    20,
+                    12,
+                    44,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/tritons/64x64/left/idle_1.png",
+                  "sha256": "4ed10db701ff952eeb9efe8f0578aba78054a052dc6bf84979a7868995db5dbf",
+                  "bounds": [
+                    21,
+                    13,
+                    43,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/tritons/64x64/left/move_0.png",
+                  "sha256": "c0901b9a24b20ccbf8e65adf0566850b64e3519b9ce40fecf20ec0c88a9016b8",
+                  "bounds": [
+                    18,
+                    13,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/tritons/64x64/left/move_1.png",
+                  "sha256": "34304566abfaa37be2ef2467a913c2b507cd87b21d04c6ea8eca2ea124accb0f",
+                  "bounds": [
+                    18,
+                    13,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/tritons/64x64/left/move_2.png",
+                  "sha256": "6a79a88d92ba64300fcf3e72165ad3b637e8627b2b4646cd52eba0ad16f4d3da",
+                  "bounds": [
+                    22,
+                    13,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/tritons/64x64/left/move_3.png",
+                  "sha256": "cc0524c9d620f2d835eda68f5d9aaac81fc0296e0a14c9625e65411b083512c7",
+                  "bounds": [
+                    20,
+                    13,
+                    53,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/tritons/64x64/left/move_4.png",
+                  "sha256": "deb90b270480707d79392da027265937b3d1db2fe2072aff81bd9b64b0448119",
+                  "bounds": [
+                    21,
+                    13,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/tritons/64x64/left/move_5.png",
+                  "sha256": "0bfc54c42749b9b9d63dc2badb8e86a9e485f382382eefb3ed77ec4f1f850c43",
+                  "bounds": [
+                    22,
+                    13,
+                    49,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/tritons/64x64/left/attack_0.png",
+                  "sha256": "27e57bb8a5fc0ce4809abbde4664933ede456bbff4b26c70375e30817bad3971",
+                  "bounds": [
+                    13,
+                    15,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/tritons/64x64/left/attack_1.png",
+                  "sha256": "a3aff00a2b7676d67ed26d1049adc35a83e93d8f0a7d3f52aa246cf0564d7f39",
+                  "bounds": [
+                    1,
+                    18,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/tritons/64x64/left/attack_2.png",
+                  "sha256": "ffccae4787267c52413762069bfd04514cdf4e4a32f39af148d1f2d1424434a5",
+                  "bounds": [
+                    13,
+                    18,
+                    51,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/tritons/64x64/left/hurt_0.png",
+                  "sha256": "0948a56ee49fdbcf58a46f485d521844f385055045e76fd03fedd378fa5137d4",
+                  "bounds": [
+                    17,
+                    14,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/tritons/64x64/left/hurt_1.png",
+                  "sha256": "f64686f12b02d9baa2275d0b6783abc8502d46f3e1dace6be909a6a8071c19cc",
+                  "bounds": [
+                    16,
+                    14,
+                    48,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "cats_of_ulthar",
+      "id": "cats_of_ulthar",
+      "display_name": "Cats of Ulthar",
+      "asset_group": "sprites",
+      "sprite_scale": 1,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/idle_0.png",
+                  "sha256": "865b839858d7d3fabe978d134b7e4b4edbfa2681d54c61b5da38447489dbc021",
+                  "bounds": [
+                    19,
+                    29,
+                    41,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/idle_1.png",
+                  "sha256": "2a20fb56a211393f22413640f31250a6d5b0daff45ed07891df315d32bd7ee4e",
+                  "bounds": [
+                    23,
+                    29,
+                    45,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_0.png",
+                  "sha256": "e8045bfe08d4a827ebe45a1bd3b5bdda65e0f6decdc4d815416ad85d852f6872",
+                  "bounds": [
+                    23,
+                    30,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_1.png",
+                  "sha256": "b2e8ce5cb4cc3a1473e784c1f0e72a4bfb758e9c93481e3714d7c68cfaaecba7",
+                  "bounds": [
+                    23,
+                    30,
+                    45,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_2.png",
+                  "sha256": "15a1bab5f5d83285fa2a9c43c2d14fdbdf6ef1aa68fee2f834ae110f97661950",
+                  "bounds": [
+                    20,
+                    30,
+                    41,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_3.png",
+                  "sha256": "8adb0832eab01c768fda989839adb17ff7ce17bcf1618d6e47f94684f934685c",
+                  "bounds": [
+                    23,
+                    30,
+                    42,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_4.png",
+                  "sha256": "e0b60ddb63e0e9420f3ecc90df40db6845bd5fe483f4867c3ad1e8346db1bb16",
+                  "bounds": [
+                    19,
+                    30,
+                    41,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/move_5.png",
+                  "sha256": "5f6f11b9d18547545a4279eac0e4e6cdca27dd87297021fe67f933c2166ed648",
+                  "bounds": [
+                    23,
+                    30,
+                    44,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/attack_0.png",
+                  "sha256": "3b682410d98342c2610668cea87134bbb0deb44d04db4285dff889d508bbad92",
+                  "bounds": [
+                    16,
+                    33,
+                    47,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/attack_1.png",
+                  "sha256": "2319c35663282e76ab7f5ed23674d9187e42a33a7927f3c103800a2e92918110",
+                  "bounds": [
+                    15,
+                    31,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/attack_2.png",
+                  "sha256": "3fa046a3ec712068d4396aa1299b10c673aa3aa96e5ca3d3244d752d2fbed399",
+                  "bounds": [
+                    19,
+                    30,
+                    45,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/hurt_0.png",
+                  "sha256": "c84560c848fe26ae4a8142c36c48b1ffe4899f2ecfd7dddec31d09007c80d41a",
+                  "bounds": [
+                    15,
+                    34,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/front/hurt_1.png",
+                  "sha256": "06a31536e6c6e0aa6053bb3f0feeb5a8d6f6aab99e7c92595566b2aba4bf0a66",
+                  "bounds": [
+                    19,
+                    29,
+                    43,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/idle_0.png",
+                  "sha256": "0e96e84584ddb38d3eb663145aa790fa2a6acfa67c432ca3f587e829bdbb85ea",
+                  "bounds": [
+                    10,
+                    29,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/idle_1.png",
+                  "sha256": "bdfb76b28c93420f9713422524a9dc850452f3e526f38ae8934e337c3153e123",
+                  "bounds": [
+                    10,
+                    29,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_0.png",
+                  "sha256": "ff6b0dfa841849232cb701cfaa64de470522c2a0bdc82c1f148336c2e484d735",
+                  "bounds": [
+                    10,
+                    30,
+                    56,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_1.png",
+                  "sha256": "15964d253934f5ab7d9cba09eb1105d1d02c9aad5b63f5cc088777a05b0fd0f7",
+                  "bounds": [
+                    10,
+                    30,
+                    60,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_2.png",
+                  "sha256": "a2e3e42499294d59c7e3a50eb87fcb8af9464a2da90a2d48b0865369260a3c26",
+                  "bounds": [
+                    10,
+                    30,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_3.png",
+                  "sha256": "1cf392def9a5f2da64448c76a1953d5ebdcf169b65dcdcb3fe98cbeacccca761",
+                  "bounds": [
+                    10,
+                    30,
+                    58,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_4.png",
+                  "sha256": "ae3ebed854d3c6441431c1e466d473cfcf18b30f59d2beb67c22307fd8aa509f",
+                  "bounds": [
+                    10,
+                    30,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_5.png",
+                  "sha256": "fd57fe3f60dcc37d94731b03c2043cf3e479b4b5ce8ad2a1ca1266fa5d979826",
+                  "bounds": [
+                    10,
+                    30,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_0.png",
+                  "sha256": "0e9d9b93d98e1ecab7e5fc42a2f81c2933cd43c11729cb69c027ee53b6b91a39",
+                  "bounds": [
+                    10,
+                    27,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_1.png",
+                  "sha256": "8c409a85410f808db70600f242582e8e1458c497cd9126a362b4ebdfe71b4337",
+                  "bounds": [
+                    4,
+                    33,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_2.png",
+                  "sha256": "80b808f47d66948784770e4644e5df04395a21606b7e7a35cd65120f27a68568",
+                  "bounds": [
+                    8,
+                    31,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/hurt_0.png",
+                  "sha256": "ee2765bad2094b641c1f42882a7ed1b2184d023ddb0e1db81f22b3da5449121c",
+                  "bounds": [
+                    5,
+                    33,
+                    51,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/hurt_1.png",
+                  "sha256": "bfb7872caee776f675580839e0c46a078d8d340038bac41056624299222b98f1",
+                  "bounds": [
+                    8,
+                    31,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/idle_0.png",
+                  "sha256": "060ae1edc9aaabd6e6883ead7e93fb8b9e67e36eaf7baa8b35f86ab076172d3b",
+                  "bounds": [
+                    19,
+                    29,
+                    40,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/idle_1.png",
+                  "sha256": "02064ab8c4c4fac30b0ec28e908346e73f18253054967ed49836611ca80e8a60",
+                  "bounds": [
+                    19,
+                    29,
+                    40,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_0.png",
+                  "sha256": "33fcc33241c6d87948239383644c6e76b264db3ecfcfabe9625637488e58b908",
+                  "bounds": [
+                    19,
+                    29,
+                    41,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_1.png",
+                  "sha256": "c648c647dfc4c85b88f455b52627137ca5c40bbd733e5f4dd56e452c92bdb0c6",
+                  "bounds": [
+                    19,
+                    29,
+                    40,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_2.png",
+                  "sha256": "7a614c1422eed2d85e4e568cc7164a0f00bae8108e7af198079439aed9545f76",
+                  "bounds": [
+                    19,
+                    29,
+                    41,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_3.png",
+                  "sha256": "56fd03664974c0494e9786279c66aa8e713bc593efbf1b611799313d37dd275b",
+                  "bounds": [
+                    24,
+                    29,
+                    45,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_4.png",
+                  "sha256": "a9058e80c16b2d29b8b186fbae9fc8dd9a771779c93dcc5301dae2bfc496de1e",
+                  "bounds": [
+                    23,
+                    29,
+                    43,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/move_5.png",
+                  "sha256": "5d803f9df3c76a8631f9767112440fb85c5ebdd4ab7d748e66931b4e55b8d4fe",
+                  "bounds": [
+                    19,
+                    29,
+                    41,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/attack_0.png",
+                  "sha256": "e2884766ed6b16c2ad5c8f0f2d2db5f291485298349112240b26f1da39b39906",
+                  "bounds": [
+                    18,
+                    34,
+                    47,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/attack_1.png",
+                  "sha256": "fd5d63d219d133d6ac0a339582754764a2a5ba3a1fd3974491c6e9829e5a30d3",
+                  "bounds": [
+                    11,
+                    29,
+                    38,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/attack_2.png",
+                  "sha256": "79fbc838f21d7e13d18cc877161bc239c4e47cd8bdac62fddc2c9e2339578176",
+                  "bounds": [
+                    18,
+                    33,
+                    46,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/hurt_0.png",
+                  "sha256": "36d075924a7f0ef9bc5c2f5b456597988f26bf92a2461cd30ad89e48a37bf6cf",
+                  "bounds": [
+                    20,
+                    35,
+                    47,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/back/hurt_1.png",
+                  "sha256": "78b4cc85542545e504d6aeadae0c738d0d97254cf563ce865c8d6a79048580be",
+                  "bounds": [
+                    20,
+                    30,
+                    42,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/idle_0.png",
+                  "sha256": "0e96e84584ddb38d3eb663145aa790fa2a6acfa67c432ca3f587e829bdbb85ea",
+                  "bounds": [
+                    10,
+                    29,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/idle_1.png",
+                  "sha256": "bdfb76b28c93420f9713422524a9dc850452f3e526f38ae8934e337c3153e123",
+                  "bounds": [
+                    10,
+                    29,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_0.png",
+                  "sha256": "ff6b0dfa841849232cb701cfaa64de470522c2a0bdc82c1f148336c2e484d735",
+                  "bounds": [
+                    10,
+                    30,
+                    56,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_1.png",
+                  "sha256": "15964d253934f5ab7d9cba09eb1105d1d02c9aad5b63f5cc088777a05b0fd0f7",
+                  "bounds": [
+                    10,
+                    30,
+                    60,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_2.png",
+                  "sha256": "a2e3e42499294d59c7e3a50eb87fcb8af9464a2da90a2d48b0865369260a3c26",
+                  "bounds": [
+                    10,
+                    30,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_3.png",
+                  "sha256": "1cf392def9a5f2da64448c76a1953d5ebdcf169b65dcdcb3fe98cbeacccca761",
+                  "bounds": [
+                    10,
+                    30,
+                    58,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_4.png",
+                  "sha256": "ae3ebed854d3c6441431c1e466d473cfcf18b30f59d2beb67c22307fd8aa509f",
+                  "bounds": [
+                    10,
+                    30,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/move_5.png",
+                  "sha256": "fd57fe3f60dcc37d94731b03c2043cf3e479b4b5ce8ad2a1ca1266fa5d979826",
+                  "bounds": [
+                    10,
+                    30,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_0.png",
+                  "sha256": "0e9d9b93d98e1ecab7e5fc42a2f81c2933cd43c11729cb69c027ee53b6b91a39",
+                  "bounds": [
+                    10,
+                    27,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_1.png",
+                  "sha256": "8c409a85410f808db70600f242582e8e1458c497cd9126a362b4ebdfe71b4337",
+                  "bounds": [
+                    4,
+                    33,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/attack_2.png",
+                  "sha256": "80b808f47d66948784770e4644e5df04395a21606b7e7a35cd65120f27a68568",
+                  "bounds": [
+                    8,
+                    31,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/hurt_0.png",
+                  "sha256": "ee2765bad2094b641c1f42882a7ed1b2184d023ddb0e1db81f22b3da5449121c",
+                  "bounds": [
+                    5,
+                    33,
+                    51,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/cats_of_ulthar/64x64/left/hurt_1.png",
+                  "sha256": "bfb7872caee776f675580839e0c46a078d8d340038bac41056624299222b98f1",
+                  "bounds": [
+                    8,
+                    31,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "pickman",
+      "id": "pickman",
+      "display_name": "Richard Upton Pickman",
+      "asset_group": "sprites",
+      "sprite_scale": 2.2,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/pickman/64x64/front/idle_0.png",
+                  "sha256": "9a297fbdc01dc633596fb4febb07a57432c5fafc06a9dafa3f1b291d7d067c84",
+                  "bounds": [
+                    8,
+                    10,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/pickman/64x64/front/idle_1.png",
+                  "sha256": "7189efff883ee8e0fea5d6fc530692290cbf85f32a16b84b16cfd2ae5f55ad1d",
+                  "bounds": [
+                    9,
+                    11,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/pickman/64x64/front/move_0.png",
+                  "sha256": "fcbdb4969e027e1665010c5cc3f2c11131228c273aae1ddb05efe71e8dafa229",
+                  "bounds": [
+                    10,
+                    9,
+                    54,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/pickman/64x64/front/move_1.png",
+                  "sha256": "ac55f9339d7b79024d91baabcfcd71b676ea23961e9ae0732e826b3ded9b353f",
+                  "bounds": [
+                    11,
+                    8,
+                    53,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/pickman/64x64/front/move_2.png",
+                  "sha256": "b49d134c0a3f3ee1ceaf37a8ad68c6dd163dccd6402b7e07fb13f53aa3e86a37",
+                  "bounds": [
+                    11,
+                    8,
+                    54,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/pickman/64x64/front/move_3.png",
+                  "sha256": "505b84f9d9022e4691d60914e339f9a5af66a585020ad8dad4f4e6f472883701",
+                  "bounds": [
+                    9,
+                    8,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/pickman/64x64/front/move_4.png",
+                  "sha256": "147addafb68e7761033a736f01377d42e3aecea8b812fd5097dd66904cc7446c",
+                  "bounds": [
+                    9,
+                    8,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/pickman/64x64/front/move_5.png",
+                  "sha256": "37d7804fb0029434a049899ee87420b166e2a00e8adbd2f8cc568274af1d3c09",
+                  "bounds": [
+                    13,
+                    8,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/pickman/64x64/front/attack_0.png",
+                  "sha256": "ba3c32f191a564df89db9867f0dd7c334047981b41fe3d59b442060750b95226",
+                  "bounds": [
+                    1,
+                    11,
+                    50,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/pickman/64x64/front/attack_1.png",
+                  "sha256": "dc8ac9ded5708b2d19552270385deeff1cc4790a7f6bab547f952ba2a8267871",
+                  "bounds": [
+                    1,
+                    10,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/pickman/64x64/front/attack_2.png",
+                  "sha256": "7a4e90bcf0904b4169a730f62f1ea4fdbb2ba0df65b14b1deaca24b75387eeac",
+                  "bounds": [
+                    5,
+                    13,
+                    51,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/pickman/64x64/front/hurt_0.png",
+                  "sha256": "6d36ead9f451b6fa5e35dfab9aa83f14556fbf0f829989f0848bf2f76f142e3c",
+                  "bounds": [
+                    8,
+                    12,
+                    48,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/pickman/64x64/front/hurt_1.png",
+                  "sha256": "dff9937229da3e14c21505d9b88c8464f4e8dac7b8b8ec5356868262a6299276",
+                  "bounds": [
+                    8,
+                    11,
+                    57,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/pickman/64x64/left/idle_0.png",
+                  "sha256": "f8ba3d8f2c6f3294d190293c4e556ee02ab3ae55a1a3a40c5512162b101cb1c5",
+                  "bounds": [
+                    15,
+                    10,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/pickman/64x64/left/idle_1.png",
+                  "sha256": "af35f90aa28a5a9d573bcd1e87bb40623c65bd363ccef7ffcab16936838c7539",
+                  "bounds": [
+                    15,
+                    12,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/pickman/64x64/left/move_0.png",
+                  "sha256": "86055e97481dc2e4a207f7b996c7a1177e1f4ca558a9a20c9017dbbf46b33e03",
+                  "bounds": [
+                    13,
+                    10,
+                    60,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/pickman/64x64/left/move_1.png",
+                  "sha256": "261d5b6311aeece39d8526c7de0e0cf480384a199f9862f8a3fd8e068a131266",
+                  "bounds": [
+                    13,
+                    11,
+                    61,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/pickman/64x64/left/move_2.png",
+                  "sha256": "5b72dacbb9527b54ffcb46dbdfa1de6eb3c8cf1fde79b8c5491a5f3914ef1b67",
+                  "bounds": [
+                    16,
+                    10,
+                    59,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/pickman/64x64/left/move_3.png",
+                  "sha256": "eabd9321dd2e470b0c21621899c731b9f563bc98c63650800bb17e6fa6cb482e",
+                  "bounds": [
+                    15,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/pickman/64x64/left/move_4.png",
+                  "sha256": "cb4816024f3ae00bc1556f739d4808deda3bcec84a7bcf0604d37304905feee6",
+                  "bounds": [
+                    14,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/pickman/64x64/left/move_5.png",
+                  "sha256": "55e6e0741324f814c7e3eb910037ce00c363b8544a0936125b7e46404786f41c",
+                  "bounds": [
+                    15,
+                    10,
+                    62,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/pickman/64x64/left/attack_0.png",
+                  "sha256": "4e7785137a7743915163dfa1dd438de93c1a8cf05436185fafc67ace23889cc5",
+                  "bounds": [
+                    1,
+                    10,
+                    55,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/pickman/64x64/left/attack_1.png",
+                  "sha256": "f50cf24f5618238de91e49827de53bc9b296594dbfdc7dc8a9b6449b821e2d86",
+                  "bounds": [
+                    1,
+                    14,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/pickman/64x64/left/attack_2.png",
+                  "sha256": "2d97a3a0d9ce36a23078888cd0e27576ad906317570060400ef5ceeb9dcf0308",
+                  "bounds": [
+                    1,
+                    16,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/pickman/64x64/left/hurt_0.png",
+                  "sha256": "e5f1b2a3bda351451b9b30b0fdecccbfae1ea2e9948b8d7be10338b641c82465",
+                  "bounds": [
+                    6,
+                    12,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/pickman/64x64/left/hurt_1.png",
+                  "sha256": "739fb3f2bca6ffe7f6484adc01beaafa036257b557544c57890e954e33e10cb0",
+                  "bounds": [
+                    6,
+                    12,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/pickman/64x64/back/idle_0.png",
+                  "sha256": "0a504e4806b27e6ddc825ecc52c4567e322208de974908f520f1562a52bd52a6",
+                  "bounds": [
+                    9,
+                    10,
+                    55,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/pickman/64x64/back/idle_1.png",
+                  "sha256": "40687b785bb89466a4193aa3b5b1cd60b934cc802780dc0489cf7054ac4df0cf",
+                  "bounds": [
+                    9,
+                    10,
+                    55,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/pickman/64x64/back/move_0.png",
+                  "sha256": "9822864b8d9466ec004a356158fe7d0c3ab0f493e9a37b698a3cca5c445114f9",
+                  "bounds": [
+                    9,
+                    10,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/pickman/64x64/back/move_1.png",
+                  "sha256": "ac7b1d1267085a4ae8b629aef4ed142e418bd45462da2da99a80f5d8bf1b95df",
+                  "bounds": [
+                    9,
+                    10,
+                    55,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/pickman/64x64/back/move_2.png",
+                  "sha256": "1bf6d6120db90f78c0ce9998ccbdfba96de5f0a35c0874fcc49d951e107e66d5",
+                  "bounds": [
+                    8,
+                    10,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/pickman/64x64/back/move_3.png",
+                  "sha256": "229754112e2308179874a7b267491e30f5088e01966f45367d4dfb72bbe1baaf",
+                  "bounds": [
+                    8,
+                    10,
+                    56,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/pickman/64x64/back/move_4.png",
+                  "sha256": "08d2d8cbe1d951c8bb77680097ba38141d220cd53d6c4c311735d9abba123a37",
+                  "bounds": [
+                    8,
+                    9,
+                    56,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/pickman/64x64/back/move_5.png",
+                  "sha256": "99b7bb783f8c570734abc117092a99d488b385fb47568682c4914f9d467f4096",
+                  "bounds": [
+                    10,
+                    9,
+                    55,
+                    63
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/pickman/64x64/back/attack_0.png",
+                  "sha256": "5662ba222033b2bb6e038b33ab446705dee415b39339e6ddff539db385101b26",
+                  "bounds": [
+                    3,
+                    11,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/pickman/64x64/back/attack_1.png",
+                  "sha256": "0c7d9a8175be2b38fa18b13cf7eaf169d204a141c25dbccd76d75cf0486fa9a4",
+                  "bounds": [
+                    9,
+                    12,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/pickman/64x64/back/attack_2.png",
+                  "sha256": "b7847a8670b15598f80a09b3e1b820a80c976b164c178e15ab1fd593f68a86fa",
+                  "bounds": [
+                    7,
+                    14,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/pickman/64x64/back/hurt_0.png",
+                  "sha256": "fed4fba7d8b5445e1ae07397e5674af27c38c23c55fd039ab03ba744e23a4443",
+                  "bounds": [
+                    10,
+                    15,
+                    46,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/pickman/64x64/back/hurt_1.png",
+                  "sha256": "ecbe90a3bf3370a3e4ae2896eb17f7ac866cff3905e257f5c74f154142ba629c",
+                  "bounds": [
+                    8,
+                    10,
+                    56,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/pickman/64x64/left/idle_0.png",
+                  "sha256": "f8ba3d8f2c6f3294d190293c4e556ee02ab3ae55a1a3a40c5512162b101cb1c5",
+                  "bounds": [
+                    15,
+                    10,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/pickman/64x64/left/idle_1.png",
+                  "sha256": "af35f90aa28a5a9d573bcd1e87bb40623c65bd363ccef7ffcab16936838c7539",
+                  "bounds": [
+                    15,
+                    12,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/pickman/64x64/left/move_0.png",
+                  "sha256": "86055e97481dc2e4a207f7b996c7a1177e1f4ca558a9a20c9017dbbf46b33e03",
+                  "bounds": [
+                    13,
+                    10,
+                    60,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/pickman/64x64/left/move_1.png",
+                  "sha256": "261d5b6311aeece39d8526c7de0e0cf480384a199f9862f8a3fd8e068a131266",
+                  "bounds": [
+                    13,
+                    11,
+                    61,
+                    61
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/pickman/64x64/left/move_2.png",
+                  "sha256": "5b72dacbb9527b54ffcb46dbdfa1de6eb3c8cf1fde79b8c5491a5f3914ef1b67",
+                  "bounds": [
+                    16,
+                    10,
+                    59,
+                    63
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/pickman/64x64/left/move_3.png",
+                  "sha256": "eabd9321dd2e470b0c21621899c731b9f563bc98c63650800bb17e6fa6cb482e",
+                  "bounds": [
+                    15,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/pickman/64x64/left/move_4.png",
+                  "sha256": "cb4816024f3ae00bc1556f739d4808deda3bcec84a7bcf0604d37304905feee6",
+                  "bounds": [
+                    14,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/pickman/64x64/left/move_5.png",
+                  "sha256": "55e6e0741324f814c7e3eb910037ce00c363b8544a0936125b7e46404786f41c",
+                  "bounds": [
+                    15,
+                    10,
+                    62,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/pickman/64x64/left/attack_0.png",
+                  "sha256": "4e7785137a7743915163dfa1dd438de93c1a8cf05436185fafc67ace23889cc5",
+                  "bounds": [
+                    1,
+                    10,
+                    55,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/pickman/64x64/left/attack_1.png",
+                  "sha256": "f50cf24f5618238de91e49827de53bc9b296594dbfdc7dc8a9b6449b821e2d86",
+                  "bounds": [
+                    1,
+                    14,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/pickman/64x64/left/attack_2.png",
+                  "sha256": "2d97a3a0d9ce36a23078888cd0e27576ad906317570060400ef5ceeb9dcf0308",
+                  "bounds": [
+                    1,
+                    16,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/pickman/64x64/left/hurt_0.png",
+                  "sha256": "e5f1b2a3bda351451b9b30b0fdecccbfae1ea2e9948b8d7be10338b641c82465",
+                  "bounds": [
+                    6,
+                    12,
+                    49,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/pickman/64x64/left/hurt_1.png",
+                  "sha256": "739fb3f2bca6ffe7f6484adc01beaafa036257b557544c57890e954e33e10cb0",
+                  "bounds": [
+                    6,
+                    12,
+                    54,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "nasht_kaman_thah",
+      "id": "nasht_kaman_thah",
+      "display_name": "Nasht & Kaman-Thah",
+      "asset_group": "sprites",
+      "sprite_scale": 2.4,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/idle_0.png",
+                  "sha256": "f39defb21d9dfce6b412ca46897858c9bd0facf4478bd55498c36cd1b6e00285",
+                  "bounds": [
+                    6,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/idle_1.png",
+                  "sha256": "e18fcc694bf4614669f170e51c24319fa36c69dd973bc48adb61557823929b4d",
+                  "bounds": [
+                    5,
+                    7,
+                    59,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_0.png",
+                  "sha256": "c413bb10676611f9a50d2df4b95e656771372c17cff6aa425cd8d5a2a087c9ec",
+                  "bounds": [
+                    4,
+                    6,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_1.png",
+                  "sha256": "31c09a970c41d2590a258165adcbc44c7338af12778c2aa605ac51166c52001e",
+                  "bounds": [
+                    5,
+                    7,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_2.png",
+                  "sha256": "dcca8453a0c3384fd8cdc35cf118a0b6347fd2628f078b65c079fff5ef72ead2",
+                  "bounds": [
+                    6,
+                    7,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_3.png",
+                  "sha256": "2a7d8990cbc94f24b3ca2f10a722abb44bd4321bc4a18a703f606f2d2c7ff2a2",
+                  "bounds": [
+                    6,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_4.png",
+                  "sha256": "cd1bf7412e49139423359ae267c355f8fc681fd78a28edfaefb2840f2cabc54f",
+                  "bounds": [
+                    5,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/move_5.png",
+                  "sha256": "d0b3b17ec44371f05d311bda379c87877c346e8972b09ad329a81f994bcfdf24",
+                  "bounds": [
+                    5,
+                    7,
+                    59,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/attack_0.png",
+                  "sha256": "6a35e9b90a655c82da919f869da3f34c0b6fc9e8c515dcb8adb4a9b094db4707",
+                  "bounds": [
+                    6,
+                    6,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/attack_1.png",
+                  "sha256": "0259834266479283ecdf824cdc6e5e08a8c862396025e41d6c52cb9629389097",
+                  "bounds": [
+                    5,
+                    7,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/attack_2.png",
+                  "sha256": "ea6b22cefa5a955c4c73e4325dcb9da9d9125bdb92befd8d5189ea314b198854",
+                  "bounds": [
+                    5,
+                    7,
+                    59,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/hurt_0.png",
+                  "sha256": "191264fc399cba70b713073a30a53b36d51a95d7583147b4f32db995b83277c7",
+                  "bounds": [
+                    5,
+                    8,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/front/hurt_1.png",
+                  "sha256": "066f24d1030d48671874d33ae3bde509c4daadfc5da046fb4ffd652ae0c9518e",
+                  "bounds": [
+                    5,
+                    10,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/idle_0.png",
+                  "sha256": "1167e4bdfae4a4460dd732fe3ba2366cd83800fc2692048c5c2b3caed5b42937",
+                  "bounds": [
+                    14,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/idle_1.png",
+                  "sha256": "2beddc8c5ab095b9cddcd75390e7a9f380e399d7e4099698d506ae0def0d7f4b",
+                  "bounds": [
+                    16,
+                    7,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_0.png",
+                  "sha256": "3db04813cc251c2a91f579f4a787cc8f71ac1334e26fcabe87590f364745a15b",
+                  "bounds": [
+                    8,
+                    7,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_1.png",
+                  "sha256": "a9700d04fb1282c90dfd4b1e5d656dc60e0e1ca9cf66547128fdac86ffd73046",
+                  "bounds": [
+                    8,
+                    7,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_2.png",
+                  "sha256": "f33ee7167050e66591fe397d9a8ac4a7f602cf77f07740281e40c10148388f56",
+                  "bounds": [
+                    8,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_3.png",
+                  "sha256": "3b072cd7045ad8d859a550fcef01d6f5308b42bc67056b7f507c35561d38926d",
+                  "bounds": [
+                    9,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_4.png",
+                  "sha256": "9cf3210bdda845a0f22876bb933a61387c59e06703c0d3c31b29aa207120654b",
+                  "bounds": [
+                    10,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_5.png",
+                  "sha256": "fcf10dce13b764c6c505f7b2a6cecec5f213ff9b1f1d849a5dfb72af4a23d6af",
+                  "bounds": [
+                    9,
+                    7,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_0.png",
+                  "sha256": "5260f23dbd4daff7895845589cf97267a69e8a62bc7f4dfc76b5ca66ff8d8dc5",
+                  "bounds": [
+                    7,
+                    9,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_1.png",
+                  "sha256": "04d1c97d19e5ddb196e878fda5980f43f5d74ed1fd86fe630fa2d43e1e894bd3",
+                  "bounds": [
+                    2,
+                    9,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_2.png",
+                  "sha256": "cba3b056bbed02fc000dc0fcf729eb07a1135c83e664ca9b7b56b93fea16404d",
+                  "bounds": [
+                    7,
+                    9,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/hurt_0.png",
+                  "sha256": "74a19e24f8d104a61249524e6da1e084da4e30d4117867fef3d3b721b8c017ab",
+                  "bounds": [
+                    2,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/hurt_1.png",
+                  "sha256": "b3d05caf42e3080b1aeed9d8913e387a4410bd1fcd44d80752466d0e342b1273",
+                  "bounds": [
+                    5,
+                    10,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/idle_0.png",
+                  "sha256": "2d0475d01770b864a94191ae52500d300d0b169b59cf113e41ffd1bb9acc780f",
+                  "bounds": [
+                    6,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/idle_1.png",
+                  "sha256": "c3cabaf87b6ea58a012c1735517a243070aa7d42e9ca9aa30ee34bf568ead2ba",
+                  "bounds": [
+                    3,
+                    7,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_0.png",
+                  "sha256": "dceef3fe28e4fc041bc8f3dd0e6846e6907631fccc80d5a58b078033b2bf4017",
+                  "bounds": [
+                    3,
+                    6,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_1.png",
+                  "sha256": "b528403422fdea140e880e730e2242d29a3401815783920bc783033d6e8a8d76",
+                  "bounds": [
+                    4,
+                    6,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_2.png",
+                  "sha256": "4e46f6c9bda9f7163fd70791984a76cc3fb040f10172a0c62e69ebbea613e66c",
+                  "bounds": [
+                    4,
+                    7,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_3.png",
+                  "sha256": "aae1d3d6bdf8723d6e6839d286115c82b0bfc4dc9306830c6c346f8d5f96f65f",
+                  "bounds": [
+                    3,
+                    7,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_4.png",
+                  "sha256": "e17451f856afb0f81c5b05a55a3856141d8400aa3fb0ffb044eb88333f8a05d8",
+                  "bounds": [
+                    3,
+                    7,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/move_5.png",
+                  "sha256": "9eb07edcfee9e3df82a5e5bd1a3e751dc801c0516460e8719b8a9934b0e8ef2d",
+                  "bounds": [
+                    2,
+                    7,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/attack_0.png",
+                  "sha256": "8063276e39dd6a529a6bba29305e67c68ad24c17d17944eaba3d24c8f184f2f4",
+                  "bounds": [
+                    3,
+                    8,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/attack_1.png",
+                  "sha256": "0280d9f86e0c7a7e941bb128312ce92a30b27498b570a3e233541a056e6113db",
+                  "bounds": [
+                    3,
+                    8,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/attack_2.png",
+                  "sha256": "d24268c27838a96f6c0d4417143bfaf59eea8e205034c53926fd31cfa5d4afb3",
+                  "bounds": [
+                    2,
+                    8,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/hurt_0.png",
+                  "sha256": "00d971408c262a1a086091684d3f05f4ca81177498b02bd1502ea48fbae3a259",
+                  "bounds": [
+                    4,
+                    8,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/back/hurt_1.png",
+                  "sha256": "de856e0f50e89394a2a96218b1cdf45b742523c700ffcd428d42467f9d0a09d1",
+                  "bounds": [
+                    4,
+                    9,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/idle_0.png",
+                  "sha256": "1167e4bdfae4a4460dd732fe3ba2366cd83800fc2692048c5c2b3caed5b42937",
+                  "bounds": [
+                    14,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/idle_1.png",
+                  "sha256": "2beddc8c5ab095b9cddcd75390e7a9f380e399d7e4099698d506ae0def0d7f4b",
+                  "bounds": [
+                    16,
+                    7,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 6,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_0.png",
+                  "sha256": "3db04813cc251c2a91f579f4a787cc8f71ac1334e26fcabe87590f364745a15b",
+                  "bounds": [
+                    8,
+                    7,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_1.png",
+                  "sha256": "a9700d04fb1282c90dfd4b1e5d656dc60e0e1ca9cf66547128fdac86ffd73046",
+                  "bounds": [
+                    8,
+                    7,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_2.png",
+                  "sha256": "f33ee7167050e66591fe397d9a8ac4a7f602cf77f07740281e40c10148388f56",
+                  "bounds": [
+                    8,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_3.png",
+                  "sha256": "3b072cd7045ad8d859a550fcef01d6f5308b42bc67056b7f507c35561d38926d",
+                  "bounds": [
+                    9,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_4.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_4.png",
+                  "sha256": "9cf3210bdda845a0f22876bb933a61387c59e06703c0d3c31b29aa207120654b",
+                  "bounds": [
+                    10,
+                    7,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_5.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/move_5.png",
+                  "sha256": "fcf10dce13b764c6c505f7b2a6cecec5f213ff9b1f1d849a5dfb72af4a23d6af",
+                  "bounds": [
+                    9,
+                    7,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_0.png",
+                  "sha256": "5260f23dbd4daff7895845589cf97267a69e8a62bc7f4dfc76b5ca66ff8d8dc5",
+                  "bounds": [
+                    7,
+                    9,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_1.png",
+                  "sha256": "04d1c97d19e5ddb196e878fda5980f43f5d74ed1fd86fe630fa2d43e1e894bd3",
+                  "bounds": [
+                    2,
+                    9,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/attack_2.png",
+                  "sha256": "cba3b056bbed02fc000dc0fcf729eb07a1135c83e664ca9b7b56b93fea16404d",
+                  "bounds": [
+                    7,
+                    9,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/hurt_0.png",
+                  "sha256": "74a19e24f8d104a61249524e6da1e084da4e30d4117867fef3d3b721b8c017ab",
+                  "bounds": [
+                    2,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/nasht_kaman_thah/64x64/left/hurt_1.png",
+                  "sha256": "b3d05caf42e3080b1aeed9d8913e387a4410bd1fcd44d80752466d0e342b1273",
+                  "bounds": [
+                    5,
+                    10,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "algol_light_being",
+      "id": "algol_light_being",
+      "display_name": "The Light-Being from Algol",
+      "asset_group": "sprites",
+      "sprite_scale": 2.6,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/algol_light_being/64x64/front/idle_0.png",
+                  "sha256": "09c86912d3d4ac9589eeb50e4ad25b81b740f537cee55b1bfb502b70af5c069c",
+                  "bounds": [
+                    18,
+                    11,
+                    47,
+                    58
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/algol_light_being/64x64/front/idle_1.png",
+                  "sha256": "c132c9caf6fdbe380daa52ba38c5ff14f629d30e7394e389b43581db9326fdec",
+                  "bounds": [
+                    17,
+                    10,
+                    48,
+                    58
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/algol_light_being/64x64/front/move_0.png",
+                  "sha256": "041db6f51fb1d6e3b266c922c34f8975c41febaa6daa9b45f1f16ccced5011b6",
+                  "bounds": [
+                    16,
+                    10,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/algol_light_being/64x64/front/move_1.png",
+                  "sha256": "fe2be27bbfaecd2912fc16364be314c46d5baf26619e46e5cc533f3b30f25131",
+                  "bounds": [
+                    15,
+                    10,
+                    49,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/algol_light_being/64x64/front/move_2.png",
+                  "sha256": "1da4dfa8c4c590ee86e42680836bcf004098660336ba5e7c271932b5bdbe543f",
+                  "bounds": [
+                    14,
+                    11,
+                    50,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/algol_light_being/64x64/front/move_3.png",
+                  "sha256": "d71fd3a36feef4d4ebe197bf5f9487f0473cd4740808e3b1d5ea06ac3e667f25",
+                  "bounds": [
+                    13,
+                    11,
+                    51,
+                    58
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/algol_light_being/64x64/front/attack_0.png",
+                  "sha256": "cf21b8c598ee2e3cb8568fe1883ec015821190d7a26e0307b6cd6fee24bab811",
+                  "bounds": [
+                    17,
+                    10,
+                    47,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/algol_light_being/64x64/front/attack_1.png",
+                  "sha256": "1900ada0a3a8767cf90df8f9c75aaa0495750bd5bd98325fb856d93e1b8be6ba",
+                  "bounds": [
+                    9,
+                    10,
+                    56,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/algol_light_being/64x64/front/attack_2.png",
+                  "sha256": "cba6d851c97617e3c2d1d3952552a45a89a10b480bc52d4c9e0d6d051ac900fe",
+                  "bounds": [
+                    15,
+                    11,
+                    49,
+                    58
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/algol_light_being/64x64/front/hurt_0.png",
+                  "sha256": "4bdfbba9309b668a7fbe5b30cfb32c596496544ca155348bcfa6f48a8ba50a82",
+                  "bounds": [
+                    18,
+                    15,
+                    46,
+                    58
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/algol_light_being/64x64/front/hurt_1.png",
+                  "sha256": "08b4dfd45cb23633c853c6e03cf93daf4d4164b70b12440c9819339ae6ae6ce2",
+                  "bounds": [
+                    17,
+                    14,
+                    48,
+                    58
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/idle_0.png",
+                  "sha256": "171496b4ae9d61dd08a0cddd4bc4cab769a52a5b09a3b57ae6deaf9bf22fbe89",
+                  "bounds": [
+                    17,
+                    10,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/idle_1.png",
+                  "sha256": "83c63ec09717c2c33b81f66ad89ad7d0261e62baecc38b555a823dbc93c346ef",
+                  "bounds": [
+                    13,
+                    11,
+                    51,
+                    58
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_0.png",
+                  "sha256": "2bd1156fd6dbbe0a24571dcc5db9f4718db535a2d6416a50123b7e5aa2743670",
+                  "bounds": [
+                    13,
+                    11,
+                    51,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_1.png",
+                  "sha256": "da05da7ebf464966f54b7ebb49cfbf078eccd17d52576a9add2bc9349fec396e",
+                  "bounds": [
+                    13,
+                    10,
+                    52,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_2.png",
+                  "sha256": "dccff907fe34bf81126f59e66160ea92cf73c40834b21132eadc0f6f51e58ed4",
+                  "bounds": [
+                    12,
+                    11,
+                    52,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_3.png",
+                  "sha256": "42afcee4974856cfe5214ffc9da142a2d79cf41a1c0e12826db5a2fec203697e",
+                  "bounds": [
+                    10,
+                    12,
+                    55,
+                    58
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_0.png",
+                  "sha256": "e7d1d5af10462504cbe8fbdcd698be15853bc4e7de178f1c98db44557da2bf14",
+                  "bounds": [
+                    17,
+                    13,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_1.png",
+                  "sha256": "fb75916e3ec9e7d74c7443e070c9f626c58b49cd9da66163e2d293be15059fdd",
+                  "bounds": [
+                    6,
+                    11,
+                    58,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_2.png",
+                  "sha256": "ce72ee7b3a6cdcc7f559c7337e8c26fb39157496e690485bb9b78f8cb66a244b",
+                  "bounds": [
+                    9,
+                    12,
+                    56,
+                    58
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/hurt_0.png",
+                  "sha256": "bca8e1b88b2e3c24dfe1c951039d930e5e5e31ec41fc9f5e4e73a7c77f72fce5",
+                  "bounds": [
+                    17,
+                    22,
+                    47,
+                    58
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/hurt_1.png",
+                  "sha256": "e88677e151226682b51c1656d9d7b17a37c7ace7a540a093ed046eccc59b39c1",
+                  "bounds": [
+                    11,
+                    11,
+                    53,
+                    58
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/algol_light_being/64x64/back/idle_0.png",
+                  "sha256": "4945abac0b187cae074923e185adb0c0ae3b3db09fe13a172c0ce8ede2d6022a",
+                  "bounds": [
+                    16,
+                    10,
+                    49,
+                    58
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/algol_light_being/64x64/back/idle_1.png",
+                  "sha256": "310b14ead90c534932cd4ce85ce8faa9b71b57fb5814b476a13c81ac2d8f0e1d",
+                  "bounds": [
+                    15,
+                    11,
+                    49,
+                    58
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/algol_light_being/64x64/back/move_0.png",
+                  "sha256": "4cab0d3b5a21187f2369460d8a0dc8ca07cf44878066b3ab4312012cce839df3",
+                  "bounds": [
+                    16,
+                    10,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/algol_light_being/64x64/back/move_1.png",
+                  "sha256": "34ac5e660a76d2ed056b64a9a4333adda8df152860752dace0344caf728a922e",
+                  "bounds": [
+                    14,
+                    11,
+                    50,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/algol_light_being/64x64/back/move_2.png",
+                  "sha256": "8519b81763dd3f263d45e29dcdee3e8401277c5a44caacdb2cb13e73f0199df8",
+                  "bounds": [
+                    14,
+                    11,
+                    51,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/algol_light_being/64x64/back/move_3.png",
+                  "sha256": "10213a2fbf50cf15c85bc23c323e00f880dec2d0c7a11a8426d985456e351f87",
+                  "bounds": [
+                    13,
+                    11,
+                    52,
+                    58
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/algol_light_being/64x64/back/attack_0.png",
+                  "sha256": "3e16c2c8e6f4df4f5a764fbf228892802504155f105a9454f8a74a6ce5d4f3da",
+                  "bounds": [
+                    17,
+                    18,
+                    47,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/algol_light_being/64x64/back/attack_1.png",
+                  "sha256": "84c93d4b8b3ac2a9968236e85bfc5f2962f56da9a609eb0753e3daee867be41f",
+                  "bounds": [
+                    14,
+                    10,
+                    51,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/algol_light_being/64x64/back/attack_2.png",
+                  "sha256": "f134068df56de5269815d62e5059d2c088cb679cb1cdc4dbb989dffe6b9f6007",
+                  "bounds": [
+                    14,
+                    9,
+                    50,
+                    58
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/algol_light_being/64x64/back/hurt_0.png",
+                  "sha256": "060a74677943955c7bf0723b8671678e2919812a2931d7caac25b4b621c5d721",
+                  "bounds": [
+                    18,
+                    21,
+                    46,
+                    58
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/algol_light_being/64x64/back/hurt_1.png",
+                  "sha256": "4f990cdf5be6f34c6a2a87059aea820c9163d741b63a13cd13cdf1555fcaff4d",
+                  "bounds": [
+                    15,
+                    10,
+                    50,
+                    58
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "left",
+          "mirror_horizontal": true,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/idle_0.png",
+                  "sha256": "171496b4ae9d61dd08a0cddd4bc4cab769a52a5b09a3b57ae6deaf9bf22fbe89",
+                  "bounds": [
+                    17,
+                    10,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/idle_1.png",
+                  "sha256": "83c63ec09717c2c33b81f66ad89ad7d0261e62baecc38b555a823dbc93c346ef",
+                  "bounds": [
+                    13,
+                    11,
+                    51,
+                    58
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_0.png",
+                  "sha256": "2bd1156fd6dbbe0a24571dcc5db9f4718db535a2d6416a50123b7e5aa2743670",
+                  "bounds": [
+                    13,
+                    11,
+                    51,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_1.png",
+                  "sha256": "da05da7ebf464966f54b7ebb49cfbf078eccd17d52576a9add2bc9349fec396e",
+                  "bounds": [
+                    13,
+                    10,
+                    52,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_2.png",
+                  "sha256": "dccff907fe34bf81126f59e66160ea92cf73c40834b21132eadc0f6f51e58ed4",
+                  "bounds": [
+                    12,
+                    11,
+                    52,
+                    58
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/algol_light_being/64x64/left/move_3.png",
+                  "sha256": "42afcee4974856cfe5214ffc9da142a2d79cf41a1c0e12826db5a2fec203697e",
+                  "bounds": [
+                    10,
+                    12,
+                    55,
+                    58
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_0.png",
+                  "sha256": "e7d1d5af10462504cbe8fbdcd698be15853bc4e7de178f1c98db44557da2bf14",
+                  "bounds": [
+                    17,
+                    13,
+                    48,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_1.png",
+                  "sha256": "fb75916e3ec9e7d74c7443e070c9f626c58b49cd9da66163e2d293be15059fdd",
+                  "bounds": [
+                    6,
+                    11,
+                    58,
+                    58
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/algol_light_being/64x64/left/attack_2.png",
+                  "sha256": "ce72ee7b3a6cdcc7f559c7337e8c26fb39157496e690485bb9b78f8cb66a244b",
+                  "bounds": [
+                    9,
+                    12,
+                    56,
+                    58
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/algol_light_being/64x64/left/hurt_0.png",
+                  "sha256": "bca8e1b88b2e3c24dfe1c951039d930e5e5e31ec41fc9f5e4e73a7c77f72fce5",
+                  "bounds": [
+                    17,
+                    22,
+                    47,
+                    58
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/algol_light_being/64x64/left/hurt_1.png",
+                  "sha256": "e88677e151226682b51c1656d9d7b17a37c7ace7a540a093ed046eccc59b39c1",
+                  "bounds": [
+                    11,
+                    11,
+                    53,
+                    58
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    },
+    {
+      "key": "yithian_archivist",
+      "id": "yithian_archivist",
+      "display_name": "Yithian Archivist",
+      "asset_group": "sprites",
+      "sprite_scale": 3.4,
+      "scale_unit": "canvas-height-metres",
+      "directions": {
+        "front": {
+          "source_direction": "front",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/yithian_archivist/64x64/front/idle_0.png",
+                  "sha256": "2c3f5177428f5a9f5e1c5e857bbb55b61f47d9324cfb3c14b775b1dc4ae22f10",
+                  "bounds": [
+                    7,
+                    7,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/yithian_archivist/64x64/front/idle_1.png",
+                  "sha256": "37655f8baa31da0ccb22ec31da771d1b82187ab974aeb974013b6c5fd7b94ff8",
+                  "bounds": [
+                    10,
+                    7,
+                    59,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/yithian_archivist/64x64/front/move_0.png",
+                  "sha256": "5488bf9a2e3b6673a63d24e573219e165550594c327421dee13daffd8963140c",
+                  "bounds": [
+                    9,
+                    6,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/yithian_archivist/64x64/front/move_1.png",
+                  "sha256": "981bb7e0444ea9d267be5c21167f548a05493b32aee952260b70796ab56e76de",
+                  "bounds": [
+                    9,
+                    7,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/yithian_archivist/64x64/front/move_2.png",
+                  "sha256": "ce8612f3737d2cad0c2565a1ecd29f1360bf56b42e692b604830af6606e009b8",
+                  "bounds": [
+                    9,
+                    7,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/yithian_archivist/64x64/front/move_3.png",
+                  "sha256": "2e515e4a174ffa41c96e3d43a2c5f51541cabdd8279548aa5211d6efe456fa10",
+                  "bounds": [
+                    10,
+                    6,
+                    58,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/yithian_archivist/64x64/front/attack_0.png",
+                  "sha256": "87a6e65e1b1e2e6f72d03574df68c8acf94aca006a28e9e6cb11f1c183e3a021",
+                  "bounds": [
+                    7,
+                    10,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/yithian_archivist/64x64/front/attack_1.png",
+                  "sha256": "977943692632b88a1e0c0eed85c995d47747b08755b3d7820439c05c99cd1af6",
+                  "bounds": [
+                    7,
+                    10,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/yithian_archivist/64x64/front/attack_2.png",
+                  "sha256": "1be742e57d081be53727492322987b676c27deb54035b967368be826a3a4bb16",
+                  "bounds": [
+                    8,
+                    10,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/yithian_archivist/64x64/front/hurt_0.png",
+                  "sha256": "9c1ead7a461eed27ea8aa4b16244b6d6eb13c9fa99612382e3960ffb445416c9",
+                  "bounds": [
+                    7,
+                    18,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/yithian_archivist/64x64/front/hurt_1.png",
+                  "sha256": "d201d43aca7028412cfbf5afc40347372d38fec5ba4c838d5b8a2ed903b92a98",
+                  "bounds": [
+                    7,
+                    10,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "left": {
+          "source_direction": "left",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/yithian_archivist/64x64/left/idle_0.png",
+                  "sha256": "e4542bfc0d78a081afe963557de6a9e3187add1410543709561d29add27ff076",
+                  "bounds": [
+                    9,
+                    9,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/yithian_archivist/64x64/left/idle_1.png",
+                  "sha256": "64d86613eceaf37b87c04f91ce7ecf5f1e4ef5c49f34d5aa56e1c9f871fc4119",
+                  "bounds": [
+                    10,
+                    8,
+                    57,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/yithian_archivist/64x64/left/move_0.png",
+                  "sha256": "90a280661ff567ee9856bcca2981e6399ea610bf351e0485f892bcc301cad80a",
+                  "bounds": [
+                    9,
+                    9,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/yithian_archivist/64x64/left/move_1.png",
+                  "sha256": "613ac695feaaf298148108282adfb68fe03d13c5eae42b276a6ba105e1aef28a",
+                  "bounds": [
+                    9,
+                    9,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/yithian_archivist/64x64/left/move_2.png",
+                  "sha256": "5b8b247fd7e4e47aa97dc0576c04f9c9dddd298de269ef8330274f460e4deffc",
+                  "bounds": [
+                    9,
+                    10,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/yithian_archivist/64x64/left/move_3.png",
+                  "sha256": "8ed530b7d7f5276bc38412366eb71202fcda36260a27e65c9ad1bd041f707546",
+                  "bounds": [
+                    12,
+                    10,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/yithian_archivist/64x64/left/attack_0.png",
+                  "sha256": "3b5f558ed42ae5b35eb2a4fe7f589e3b1b433194af5c71b3d848cb5d634f2e92",
+                  "bounds": [
+                    13,
+                    12,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/yithian_archivist/64x64/left/attack_1.png",
+                  "sha256": "9c443e514c15e3ecfe3d648756a081941bd3e4b43b551fc9f040fe37f7b53d89",
+                  "bounds": [
+                    1,
+                    12,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/yithian_archivist/64x64/left/attack_2.png",
+                  "sha256": "cf7a03de7f570466b80b01a70a0ba43e119aab8c2b9ce9280486ae96fd7d9bbc",
+                  "bounds": [
+                    14,
+                    11,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/yithian_archivist/64x64/left/hurt_0.png",
+                  "sha256": "daa6fc57e95fa42267fdda09f0ab44b98b64a0d9506072159b6da2dbdcc65fc0",
+                  "bounds": [
+                    11,
+                    15,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/yithian_archivist/64x64/left/hurt_1.png",
+                  "sha256": "8821757f8d6f259181264c57295bf7730a1d31f09f62143567ee767c5c3afb0f",
+                  "bounds": [
+                    13,
+                    14,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "back": {
+          "source_direction": "back",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/yithian_archivist/64x64/back/idle_0.png",
+                  "sha256": "2dc52a1420ed31e448bf714a7a758a310889396dedc1b2c36a153c5b18d726b6",
+                  "bounds": [
+                    10,
+                    7,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/yithian_archivist/64x64/back/idle_1.png",
+                  "sha256": "768dadba10a024ee6098ab1bf3e1364ea980fdb9e018fafcebeae493e1217452",
+                  "bounds": [
+                    9,
+                    7,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/yithian_archivist/64x64/back/move_0.png",
+                  "sha256": "3a39d24a10ad0c751102fb0dc100d7f0e8e1df55c248940c2cb115d75182e7cd",
+                  "bounds": [
+                    7,
+                    7,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/yithian_archivist/64x64/back/move_1.png",
+                  "sha256": "23cb2018261a2af16a2417daac983f720fc96144085bf7d02bda5d90d011b42b",
+                  "bounds": [
+                    5,
+                    7,
+                    56,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/yithian_archivist/64x64/back/move_2.png",
+                  "sha256": "3d45b695b0ef91c4b4430f7e593198a593517212c7ed3180ababfd84caa4ba3e",
+                  "bounds": [
+                    9,
+                    7,
+                    61,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/yithian_archivist/64x64/back/move_3.png",
+                  "sha256": "9479c27db4319cf0503556dc25362988f58176578aaf4f277f66ac3c1a0675c6",
+                  "bounds": [
+                    8,
+                    7,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/yithian_archivist/64x64/back/attack_0.png",
+                  "sha256": "004c33eafc77efa2c835a2a739d632124645ebad3d2352dda82cd306705b73cb",
+                  "bounds": [
+                    8,
+                    10,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/yithian_archivist/64x64/back/attack_1.png",
+                  "sha256": "74904a918485e503fb3136a85d226323ef093ce0eb48360995a87a10a032a387",
+                  "bounds": [
+                    10,
+                    10,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/yithian_archivist/64x64/back/attack_2.png",
+                  "sha256": "112f8e9e1eecae855f5cbd0650305bf8a038f5593977d535fc039be3663c5404",
+                  "bounds": [
+                    7,
+                    8,
+                    59,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/yithian_archivist/64x64/back/hurt_0.png",
+                  "sha256": "404ae20a2b5d2eccf7b1734b59aa5000ad9463d86bfbe7efd97a9842c8f1249a",
+                  "bounds": [
+                    10,
+                    17,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/yithian_archivist/64x64/back/hurt_1.png",
+                  "sha256": "f2bd68ed5ed2640c828df1c10db73de3297ea91dda74585c9cf2f02827a20fce",
+                  "bounds": [
+                    9,
+                    16,
+                    61,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "right": {
+          "source_direction": "right",
+          "mirror_horizontal": false,
+          "actions": {
+            "idle": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "idle_0.png",
+                  "path": "sprites/yithian_archivist/64x64/right/idle_0.png",
+                  "sha256": "493b8232d845b0dc4b976570e1b69fd2104d630598680caa625fc53a5039ef4a",
+                  "bounds": [
+                    9,
+                    7,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "idle_1.png",
+                  "path": "sprites/yithian_archivist/64x64/right/idle_1.png",
+                  "sha256": "e21bdae8561b0827d904ccbc5776ca6b915248f0dc5395cb77b6865144e61619",
+                  "bounds": [
+                    11,
+                    7,
+                    60,
+                    62
+                  ]
+                }
+              ]
+            },
+            "move": {
+              "frame_count": 4,
+              "frames": [
+                {
+                  "name": "move_0.png",
+                  "path": "sprites/yithian_archivist/64x64/right/move_0.png",
+                  "sha256": "eaf6ae641443f15827b9e6939f61f73daa3d8566ac5016e7530d53a92af18932",
+                  "bounds": [
+                    10,
+                    6,
+                    59,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_1.png",
+                  "path": "sprites/yithian_archivist/64x64/right/move_1.png",
+                  "sha256": "f3d8667c1559c6597bdeec832baeaa0054e4dab8b23e1fe379508f150366e93b",
+                  "bounds": [
+                    11,
+                    7,
+                    58,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_2.png",
+                  "path": "sprites/yithian_archivist/64x64/right/move_2.png",
+                  "sha256": "a7f70e7a1c7a45e6a1238e82460436f22051fdf772ed5e966387b3d320752cf4",
+                  "bounds": [
+                    14,
+                    9,
+                    63,
+                    62
+                  ]
+                },
+                {
+                  "name": "move_3.png",
+                  "path": "sprites/yithian_archivist/64x64/right/move_3.png",
+                  "sha256": "6d4ceb70b328ffbc6170149eefcf8ac820f22eef538d75ecf1641b7bd2e66343",
+                  "bounds": [
+                    4,
+                    7,
+                    58,
+                    62
+                  ]
+                }
+              ]
+            },
+            "attack": {
+              "frame_count": 3,
+              "frames": [
+                {
+                  "name": "attack_0.png",
+                  "path": "sprites/yithian_archivist/64x64/right/attack_0.png",
+                  "sha256": "503acce350a3878df938e4c6d4d1ead37ecd4983826bf206a97dbe973c1ec394",
+                  "bounds": [
+                    6,
+                    7,
+                    57,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_1.png",
+                  "path": "sprites/yithian_archivist/64x64/right/attack_1.png",
+                  "sha256": "1d258970b70793c01ef566502c2f48b1743f9b912815154e0004a5b1b6875db8",
+                  "bounds": [
+                    1,
+                    8,
+                    62,
+                    62
+                  ]
+                },
+                {
+                  "name": "attack_2.png",
+                  "path": "sprites/yithian_archivist/64x64/right/attack_2.png",
+                  "sha256": "7ca49a53e14d8464fbce5dfc33d44f590416b69d149e8698c87e30d4bc5878cf",
+                  "bounds": [
+                    12,
+                    9,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            },
+            "hurt": {
+              "frame_count": 2,
+              "frames": [
+                {
+                  "name": "hurt_0.png",
+                  "path": "sprites/yithian_archivist/64x64/right/hurt_0.png",
+                  "sha256": "7c5fa537480f32b7da42f267f90f9c63a71d1ee4367dced2bcb0f875795ff0d0",
+                  "bounds": [
+                    8,
+                    15,
+                    60,
+                    62
+                  ]
+                },
+                {
+                  "name": "hurt_1.png",
+                  "path": "sprites/yithian_archivist/64x64/right/hurt_1.png",
+                  "sha256": "2eb8125dd44ac76314703476e703c285c75eed6f262e761e1a5b558748758fb2",
+                  "bounds": [
+                    11,
+                    11,
+                    63,
+                    62
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "palette": {
+        "color_count": 48,
+        "check": "passed"
+      }
+    }
+  ]
+}
