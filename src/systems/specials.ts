@@ -106,7 +106,7 @@ function gaze(g: Game, id: Entity, range: number): boolean {
   loseSanity(g, BOSS.gazeSanity);
   const a = c.actor.get(g.player.id)!;
   if (a.move !== 'death') startMove(a, 'stagger');
-  g.events.emit('GazeBurst', { sanity: BOSS.gazeSanity });
+  g.events.emit('GazeBurst', { sanity: BOSS.gazeSanity, by: id });
   return true;
 }
 

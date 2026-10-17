@@ -37,7 +37,7 @@ export function createAttackFx(g: Game, fx: Particles): AttackFx {
   };
   const paint = (id: number): AttackThemeColors => {
     const theme = attackTheme(g, id);
-    if (theme === DEFAULT_ATTACK_THEME) return { hot: theme.danger, dust: theme.ring, mind: theme.mind, smoke: SMOKE, summon: ANOMALY.purple };
+    if (theme === DEFAULT_ATTACK_THEME) return { hot: theme.danger, dust: theme.ring, mind: theme.mind, smoke: SMOKE, summon: ANOMALY.green }; // (an unthemed summoner's burst is the old green)
     return { hot: theme.danger, dust: theme.ring, mind: theme.mind, smoke: scaleRgb(theme.danger, 0.45), summon: theme.line };
   };
 
@@ -60,9 +60,9 @@ export function createAttackFx(g: Game, fx: Particles): AttackFx {
     const p = bodyAt(by);
     if (p) burst(p, 30, paint(by).smoke, 3.5, false, 0.9, 1);
   });
-  g.events.on('GazeBurst', () => {
+  g.events.on('GazeBurst', ({ by }) => {
     const p = bodyAt(g.player.id);
-    if (p) burst(p, 14, DEFAULT_ATTACK_THEME.mind, 1.5, true, 0.08, 1);
+    if (p) burst(p, 14, paint(by).mind, 1.5, true, 0.08, 1); // the gazer's own colour, as its lane was drawn
   });
   g.events.on('BossPhase', ({ entity, phase }) => {
     const p = c.transform.get(entity)?.pos;

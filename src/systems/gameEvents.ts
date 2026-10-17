@@ -54,7 +54,7 @@ export interface GameEvents {
   BossPhase: { entity: Entity; phase: number };
   Teleported: { entity: Entity; from: V3; to: V3 };
   Summoned: { entity: Entity; by: Entity };
-  GazeBurst: { sanity: number };
+  GazeBurst: { sanity: number; by: Entity };
   Darkened: { by: Entity };
   TimeSkipped: { entity: Entity };
   BodyStolen: { frames: number };

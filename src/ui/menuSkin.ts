@@ -93,8 +93,8 @@ export function attachSkin(layer: HTMLElement, panel: HTMLElement, skin: Skin): 
     }
   };
   const loop = (): void => {
+    timer = window.setTimeout(loop, 1000 / FPS); // (set first: a fade that ends inside the frame clears it, where it had been set again after the clear and ran on, hidden, for good)
     frame();
-    timer = window.setTimeout(loop, 1000 / FPS);
   };
   const fit = (): void => {
     // in layout units (a transform on the panel, while its words come in, must not move the art): the panel is centred in its layer
