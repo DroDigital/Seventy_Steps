@@ -3,7 +3,7 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## After 1.0.0-rc.2 (not yet released)
+## 1.0.0-rc.3: the edge, UNMADE, the run and the rain
 
 - **The edge is a fall, not a wall of death.** A hand's breadth of the body over a pit, a well or a bridge's gap used to kill at once. Now you can stand on the very edge, with your heels over the void, and step back: nothing happens, and no animation begins that would condemn you, while any of your feet has stone under it. Only when none of it does, you fall: the arms fly up, the legs run on in the air, you tumble head first, the camera swings up over the hole to look down after you, the picture closes in to black and a rush of air goes by, and the death comes at the foot of the drop. Your Lost Echoes lie on the ground at the lip. Nothing in the room can strike you while you fall. The sea and the land's end are as quick as they were.
 - **UNMADE stands alone.** From the moment you fall or die, the bars, notices, prompts, plates and hints leave the screen, no other great words come over it, and the two lines that stood under it ("YOUR ECHOES LIE WHERE YOU FELL" and what the last blow teaches) are gone. What the last blow teaches is read in the dark afterwards, on the veil under where you wake. A fall has its own lines there.
