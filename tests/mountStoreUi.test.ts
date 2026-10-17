@@ -86,7 +86,8 @@ describe('mount purchases in the Elder Sign menu', () => {
     expect(buttons).toHaveLength(2);
     expect(buttons.every((button) => !button.disabled)).toBe(true);
     buttons[0].run();
-    await vi.waitFor(() => expect(view.text()).toContain('After payment on itch.io, download'));
+    await vi.waitFor(() => expect(view.text()).toContain('After paying with PayPal on itch.io, choose Claim purchase.'));
+    expect(view.text()).toContain('On the redemption page, choose Download unlock');
     expect(buy).toHaveBeenCalledWith('chariot');
     expect(owns).not.toHaveBeenCalled();
     expect(g.player.mount.chariotOwned).toBe(false);

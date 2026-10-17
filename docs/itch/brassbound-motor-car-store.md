@@ -10,9 +10,9 @@ The Brassbound Motor Car has the same speed and handling as the Chariot included
 
 ## Install your appearance
 
-1. After payment, download `brassbound-motor-car.seventysteps-dlc` from your itch.io purchase page.
+1. After payment on itch.io, choose **Claim** on the purchase page, then **Claim & download unlock** on the redemption page to save your `.seventysteps-dlc` file.
 2. Open the updated desktop game and visit an Elder Sign.
 3. Open **Mounts**, choose **Import mount unlock file**, and select the downloaded file.
 4. Select **The Brassbound Motor Car**. If needed, choose **Refresh DLC ownership**.
 
-Keep the file or your purchase link so you can install it again. Normal game updates preserve your saves and imported appearance. This purchase unlocks the Brassbound Motor Car only and does not include a Steam DLC key.
+Keep the downloaded file as a backup. Each purchase issues one unlock; you can retry an interrupted download in the same browser session. If your purchase is already claimed elsewhere, check your downloads or contact the publisher for recovery. Normal game updates preserve your saves and imported appearance. This purchase unlocks the Brassbound Motor Car only and does not include a Steam DLC key.

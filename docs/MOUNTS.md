@@ -50,12 +50,14 @@ game’s retro pipeline. The plain chariot reuses that coach. Its horse is a che
 
 ## Store entitlements
 
-The itch desktop edition can open separate paid itch.io product pages and import a signed download for either appearance.
-Checkout stays on itch.io, where the seller can enable PayPal; opening a page or returning from checkout does not grant access.
-The import checks the publisher's signature and grants only the appearance named in the file. This DRM-free download does
-not identify the purchaser or automatically revoke access after refunds. Purchase buttons remain disabled until real product
-URLs are configured. See [itch DLC setup and player instructions](ITCH_DLC_SETUP.md) for the $0.99 products, signing-key handling,
-and release checks. Browser builds have no desktop import bridge, and itch unlock files do not grant Steam licenses.
+The itch desktop edition opens native Sub-products & DLC checkout on the existing Seventy Steps page, with PayPal handled
+by itch.io. After payment, Claim sends itch.io's signed token to the HTTPS redemption service, which checks the configured
+product and expiry, records the purchase once, and delivers a purchase-specific signed unlock file. Importing that file
+grants only its named appearance; opening checkout or returning from it does not grant access. The offline unlock can be
+copied and is not automatically revoked after a refund. Purchase buttons remain disabled until the native product IDs and
+redemption endpoint are configured. See [itch DLC setup and player instructions](ITCH_DLC_SETUP.md) for the two $0.99 native
+products, server deployment and release checks. Browser builds have no desktop import bridge, and itch unlock files do not
+grant Steam licenses.
 
 ### Steam
 

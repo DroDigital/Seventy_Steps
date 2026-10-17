@@ -1,76 +1,87 @@
-# Sell the cosmetic mounts on itch.io
+# Native itch.io mount DLC setup
 
-The itch desktop build supports two independent cosmetic purchases: **The Spectral Chariot** and **The Brassbound Motor Car**, each with a minimum price of **US $0.99**. The included Chariot remains free. All three use the same movement settings, and the paid appearances still require completion of *The Borrowed Reins*.
+The two cosmetic mounts are native **Sub-products & DLC** on the existing [Seventy Steps page](https://digitaldro.itch.io/seventy-steps). Each costs **US $0.99 minimum**, plus any applicable tax. The included Chariot remains free; all three share 10 m/s cruise, 17 m/s gallop and the same handling. Paid appearances still require *The Borrowed Reins*.
 
-The game opens a configured itch.io product page in the player's browser. itch.io handles checkout, including PayPal when enabled for the seller. After payment, the player downloads that product's signed unlock file and imports it through the game's Mounts tab. No PayPal credentials, payment-card details, itch seller API key, or signing private key belong in the game.
+itch.io handles checkout, including PayPal. After payment, its **Claim** action sends a signed purchase token to the redemption service. The service verifies the purchase and issues a purchase-specific signed `.seventysteps-dlc` file for import through the game's Mounts tab. Opening checkout alone never unlocks an appearance.
 
-## Current setup
+## Configure the existing game's DLCs
 
-The public verification key is configured in `package.json` under `itchDlc.publicKey`. The two paid download files have been generated locally:
+1. Sign in to the account that owns Seventy Steps. In the game's dashboard, open **Sub-products & DLC**.
+2. Create these two products, each with a **US $0.99** price:
 
-- `release/dlc/spectral-chariot.seventysteps-dlc`
-- `release/dlc/brassbound-motor-car.seventysteps-dlc`
+   | Product | External ID |
+   | --- | --- |
+   | The Spectral Chariot | `spectral-chariot` |
+   | The Brassbound Motor Car | `brassbound-motor-car` |
 
-These files and the publisher's private key are excluded from git. They must also stay out of the freely downloadable base build and public release attachments. The product URLs are currently empty, so the game's purchase buttons show **Purchase setup pending** until real product pages are configured and the updated game is shipped.
+3. Copy each product's actual numeric sub-product ID from the dashboard. The IDs must be distinct. Use the matching ID in both the server environment and the desktop game's `itchDlc.products` configuration below.
+4. Use the corresponding description from [Spectral Chariot copy](itch/spectral-chariot-store.md) or [Motor Car copy](itch/brassbound-motor-car-store.md). Review how the base game's 100%-off promotion affects the displayed DLC prices; confirm that each DLC still costs $0.99 before publishing it.
+5. Set the dashboard's **Redeem URL** to the deployed HTTPS `/redeem` endpoint. Setting it generates the project's secret token. Store that token as the server's `ITCH_REDEEM_SECRET`; never put it in `package.json`, the game, git, screenshots, or public documentation.
 
-## Enable PayPal checkout
+Use native sub-products, rather than separate game pages or individually priced files. Do not upload the old generic unlock files to itch.io: the redemption service generates a distinct file for each verified purchase. The [official sub-products reference](https://itch.io/docs/api/sub-products) documents checkout parameters and the signed redemption callback.
 
-1. Sign in to the itch.io account that owns [Seventy Steps](https://digitaldro.itch.io/seventy-steps), then open [Seller Settings](https://itch.io/user/settings/seller).
-2. If this account already accepts PayPal purchases, keep its existing payment mode. Otherwise choose a supported payment mode:
-   - **Collected by itch.io:** complete itch.io's seller onboarding, tax interview and seller terms. itch.io offers the supported buyer payment methods, including PayPal, and collects the payments. Configure your payout method separately to receive earnings.
-   - **Direct to you:** connect the PayPal account that should receive payments. Some regions require a business PayPal account; follow the requirements shown by itch.io and PayPal.
-3. Confirm that PayPal is offered by the product's checkout before announcing it for sale. Do not substitute a PayPal.me donation link: the downloadable product is delivered by itch.io after its own checkout.
+## Enable PayPal
 
-The $0.99 price is a minimum before any additional tax or optional tip. Payment processing fees apply; itch.io notes that their fixed component is significant for purchases around $1. See the [official payment guide](https://itch.io/docs/creators/payments).
+In [Seller Settings](https://itch.io/user/settings/seller), keep the account's existing payment mode if it already offers PayPal. Otherwise complete one of itch.io's supported setups:
 
-## Create two separate paid product pages
+- **Collected by itch.io:** complete seller onboarding, the tax interview and seller terms. itch.io collects payments and offers its supported buyer methods, including PayPal; configure your payout method separately.
+- **Direct to you:** connect the receiving PayPal account. Follow any regional business-account requirements shown by itch.io and PayPal.
 
-Use a separate project for each appearance so buyers can choose either one independently. Two files both priced at $0.99 on the base game's page would be a purchase tier: paying $0.99 would grant access to both files. See [itch.io's pricing rules](https://itch.io/docs/creators/pricing).
+Confirm that PayPal appears in each DLC's real checkout. Payment processing fees apply, including a fixed component that is significant at $0.99. See the [official payment guide](https://itch.io/docs/creators/payments). The game and redemption service do not collect PayPal credentials or payment-card details.
 
-1. From the creator dashboard, create **Seventy Steps — The Spectral Chariot**. Describe it as optional cosmetic DLC requiring the desktop edition of Seventy Steps and the free mount quest. Link to the base game and explain the import steps below.
-2. Set pricing to **Paid**, with a minimum of **US $0.99**. Upload only `spectral-chariot.seventysteps-dlc` as its downloadable unlock file. Do not enable free downloads for this file.
-3. Create **Seventy Steps — The Brassbound Motor Car** in the same way, uploading only `brassbound-motor-car.seventysteps-dlc`, also at **US $0.99**.
-4. Keep both new projects out of the base game's 100%-off promotion. Review the selected projects in any account-wide or future sale before publishing it.
-5. Publish the two product pages and check each public checkout. Each page must deliver its own file, and its PayPal option must work through itch.io.
+## Deploy the redemption service
 
-Do not attach these files to a free upload channel or commit them as sample data. The native itch.io Sub-products API is a different integration: its documented redemption flow requires a server, a private redeem secret, and a purchase database. This implementation uses ordinary paid downloadable projects.
+Use **Node.js 24**, persistent storage for SQLite, and an HTTPS reverse proxy forwarding the service's routes, including `/redeem`, `/claim` and `/download`. Configure these server environment variables:
 
-## Configure the purchase buttons and ship
+| Variable | Value |
+| --- | --- |
+| `ITCH_REDEEM_SECRET` | Secret generated by this game's Redeem URL setting, at least 32 bytes; inject through the host's secret manager. |
+| `DLC_SIGNING_KEY_FILE` | Private Ed25519 signing-key file matching `itchDlc.publicKey`. |
+| `ITCH_CHARIOT_SUB_PRODUCT_ID` | Actual numeric ID of `spectral-chariot`. |
+| `ITCH_AUTOMOBILE_SUB_PRODUCT_ID` | Actual numeric ID of `brassbound-motor-car`. |
+| `DLC_DB_PATH` | Persistent writable path, for example `/persistent/purchases.sqlite`. |
+| `HOST` | `127.0.0.1` when the reverse proxy is on the same host. |
+| `PORT` | `8787`, or the port forwarded by the proxy. |
 
-Copy the two actual published URLs into `package.json`:
+Start the configured service from the repository root:
 
-- `itchDlc.urls.chariot`: the Spectral Chariot's product URL.
-- `itchDlc.urls.automobile`: the Brassbound Motor Car's product URL.
+```sh
+npm run dlc:serve
+```
 
-Accepted URLs use `https://digitaldro.itch.io/` followed by the real project slug, optionally ending in `/purchase`. The base game's own page is not accepted as a DLC checkout. Do not invent slugs or use a PayPal URL in these fields.
+Use the host's process manager to keep it running, or follow the [service's Docker deployment instructions](../services/itch-redeem/README.md#docker). Mount the persistent database directory, including SQLite sidecar files; do not place it on an ephemeral deployment filesystem. Back up that volume securely. Do not restore an older purchase database into production without reconciling subsequent claims, as that could allow already redeemed purchases to be claimed again.
 
-Build, check and publish the updated itch edition through the normal [release process](RELEASE.md). Existing downloads will not gain working purchase buttons until players install this updated build. Checkout pages alone do not activate either appearance.
+Keep the redemption secret, private signing key and purchase database on the server only, with access restricted to the service. The database contains issued unlock files and active claim sessions. The existing signing key was created at `/workspace/work/seventy-steps.dlc-private.pem`; transfer it securely to the server and set `DLC_SIGNING_KEY_FILE` to its deployed path. Keep a persistent backup outside git. Only its public key belongs in the desktop build. Preserve this key across deployments so previously issued unlocks continue to verify.
+
+Disable or redact query strings in reverse-proxy and application access logs: the incoming `jwt` query parameter is a short-lived purchase credential. Serve redemption responses through HTTPS and prevent caching of purchase tokens and unlock downloads. Forward the session cookie and all service routes so a player can complete the claim and retry an interrupted download in the same browser.
+
+## Configure and ship the desktop game
+
+Set these public fields in `package.json`:
+
+- `itchDlc.purchaseUrl`: `https://digitaldro.itch.io/seventy-steps/purchase`.
+- `itchDlc.redemptionUrl`: the actual public HTTPS `/redeem` endpoint configured in the dashboard.
+- `itchDlc.products.chariot.externalId`: `spectral-chariot`.
+- `itchDlc.products.chariot.subProductId`: the actual numeric Spectral Chariot ID.
+- `itchDlc.products.automobile.externalId`: `brassbound-motor-car`.
+- `itchDlc.products.automobile.subProductId`: the actual numeric Motor Car ID.
+- `itchDlc.publicKey`: retain the existing public verification key matching the server's private signing key.
+
+The purchase links select the native DLC through `external_product_id`; they do not send players to a separate project. The numeric IDs must match the server and dashboard. Finish configuration before announcing availability, then build and publish the updated itch edition through the normal [release process](RELEASE.md). Existing copies need this update to expose the new purchase and import flow.
+
+The service source, public key and product IDs can ship in the repository. Private keys, redemption secrets, purchase databases and issued unlock files must stay out of git, public release attachments and the base game's download. This PR prepares the integration; it does not deploy a public service or configure the live dashboard.
 
 ## Player instructions
 
-1. Update to the desktop build that supports itch mount unlock files.
-2. At an Elder Sign, open **Mounts** and choose **Buy on itch.io · $0.99** for the desired appearance.
-3. Finish checkout on itch.io, choosing PayPal if desired, then download that appearance's `.seventysteps-dlc` file from the purchase's download page.
-4. Return to **Mounts**, choose **Import mount unlock file**, and select the downloaded file. Import the other product's file separately if you bought both.
-5. After completing *The Borrowed Reins*, select the unlocked appearance. Use **Refresh DLC ownership** if needed.
+1. Update the itch.io desktop game. At an Elder Sign, open **Mounts** and choose **Buy on itch.io · $0.99** for the desired appearance.
+2. Finish checkout on itch.io, choosing PayPal if desired.
+3. Choose **Claim** on the purchase page, then choose **Claim & download unlock** on the redemption page to save the `.seventysteps-dlc` file.
+4. Return to **Mounts**, choose **Import mount unlock file**, and select the downloaded file. After completing *The Borrowed Reins*, select the appearance. Use **Refresh DLC ownership** if needed.
 
-Imported files are kept in the user's game data folder under `dlc/`, separately from both the installation and `saves/`. Normal game updates preserve them. Keep the original download or your itch.io purchase link as a backup. A Steam build continues to use Steam's DLC ownership checks; an itch unlock file does not grant a Steam DLC license.
+Keep the downloaded file as a backup. A purchase issues one unlock; the same unexpired browser session can resume an interrupted download without issuing another. Returning through itch.io verifies the new claim link's expiry even when resuming. If a purchase is already claimed elsewhere or its browser session has expired, check your existing downloads or contact the publisher with your itch.io purchase receipt for recovery. There is no public recovery endpoint. Imported files live in the game's user data under `dlc/`, separately from the installation and `saves/`. Normal updates preserve both progress and imported appearances. An itch purchase does not grant a Steam DLC license.
 
-## Signing-key maintenance
+## Verify before launch
 
-The initial setup used this private-key path outside the repository:
+Check each configured checkout, PayPal option and Claim route. Confirm that a valid, unexpired token for each configured product issues only that appearance; expired, altered, unknown-product and repeated claims must not issue another unlock. The database records each purchase atomically before granting access. Run the service's documented local tests before deployment; do not use real customer charges as automated tests.
 
-```sh
-node tools/itch_dlc.mjs init --key /workspace/work/seventy-steps.dlc-private.pem
-node tools/itch_dlc.mjs pack --key /workspace/work/seventy-steps.dlc-private.pem
-```
-
-`init` has already run; do not generate a replacement key for routine builds. `pack` can recreate the two product files using that same private key. Keep a secure, persistent backup of the private key outside git and outside the base game's distribution; this workspace alone is not a backup. Use the restored private-key path when running these commands on another machine.
-
-Only the public verification key ships with the game. Do not publish, print, email, or upload the private key as part of a DLC product. Do not rotate the configured public key without a migration plan: files signed with the previous key would stop working in new builds. If the private key is lost, restore its backup instead of replacing the configured publisher.
-
-## Verification and limits
-
-Before announcing the products, verify both paid downloads on the itch build: a valid file imports only its own appearance; editing its product name or signature fails; imported unlocks survive a restart and game update; the free Chariot and shared movement remain available as before. Verify both real checkout pages and their file delivery separately. Do not make a real charge solely as an automated test.
-
-This is DRM-free downloadable DLC. The signature verifies that the publisher issued the file; it does not identify the individual buyer. Files can be copied between computers, and refunds do not automatically revoke an already downloaded offline unlock. No payment is accepted or marked successful by the game itself. Online purchase verification and refund revocation would require a different integration.
+The service verifies itch.io's HS256 purchase token, its expiry and the configured numeric product ID. It also checks the external product ID when itch.io includes that optional field. It redirects to a clean claim page before the player requests the unlock. Before issuance, the session ends at the earlier of JWT expiry or 15 minutes; after issuance, the same browser can download the stored receipt for 15 minutes. The desktop import verifies the resulting publisher signature. The signed file is an offline unlock: it can be copied, and a refund does not automatically revoke an already imported appearance. Purchase-specific signatures and one-time issuance do not turn it into an account-bound online license.

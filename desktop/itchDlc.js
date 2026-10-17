@@ -7,6 +7,7 @@ export const DLC_GAME = 'com.digitaldro.seventysteps';
 export const DLC_LIMIT = 16_384;
 export const paidMount = (id) => id === 'chariot' || id === 'automobile';
 export const unlockPayload = (id) => `${DLC_GAME}\n1\n${id}\n`;
+export const purchaseUnlockPayload = (id, purchaseId) => `${DLC_GAME}\n2\n${id}\n${purchaseId}\n`;
 export const readDlcPackage = () => JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 function publicKey(pkg) {
@@ -21,16 +22,33 @@ function publicKey(pkg) {
 /** Source builds without a configured Steam app are itch builds for DLC purposes too. */
 export const dlcChannel = (pkg) => pkg?.channel === 'itch' || (!pkg?.channel && !pkg?.steam?.appId) ? 'itch' : 'steam';
 
-/** The renderer supplies a product id, never a URL. Only the publisher's configured itch pages can open. */
+const PURCHASE_URL = 'https://digitaldro.itch.io/seventy-steps/purchase';
+const PRODUCT_EXTERNAL_IDS = Object.freeze({ chariot: 'spectral-chariot', automobile: 'brassbound-motor-car' });
+function subProductId(value) {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !/^[1-9]\d*$/.test(value))) return null;
+  const id = Number(value);
+  return Number.isSafeInteger(id) && id > 0 ? String(id) : null;
+}
+function redemptionConfigured(value) {
+  if (typeof value !== 'string' || value.includes('?') || value.includes('#')) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && !url.username && !url.password && url.pathname === '/redeem';
+  } catch { return false; }
+}
+
+/** The renderer supplies a mount id, never a URL. Native itch sub-products stay on the base game's checkout. */
 export function mountCheckoutUrl(id, pkg = readDlcPackage()) {
   if (!paidMount(id) || dlcChannel(pkg) !== 'itch' || !publicKey(pkg)) return null;
-  try {
-    const url = new URL(pkg?.itchDlc?.urls?.[id]);
-    if (url.protocol !== 'https:' || url.hostname !== 'digitaldro.itch.io' || url.port || url.username || url.password) return null;
-    // Separate paid product pages, not the base game checkout or an arbitrary site.
-    if (!/^\/[a-z0-9][a-z0-9-]*(?:\/purchase)?\/?$/.test(url.pathname) || /^\/seventy-steps(?:\/purchase)?\/?$/.test(url.pathname)) return null;
-    return url.href;
-  } catch { return null; }
+  const config = pkg?.itchDlc;
+  if (config?.purchaseUrl !== PURCHASE_URL || !redemptionConfigured(config.redemptionUrl)) return null;
+  const product = config.products?.[id];
+  const productId = subProductId(product?.subProductId);
+  const otherId = subProductId(config.products?.[id === 'chariot' ? 'automobile' : 'chariot']?.subProductId);
+  if (!productId || productId === otherId || product.externalId !== PRODUCT_EXTERNAL_IDS[id]) return null;
+  const url = new URL(PURCHASE_URL);
+  url.searchParams.set('external_product_id', PRODUCT_EXTERNAL_IDS[id]);
+  return url.href;
 }
 
 export function mountDlcStore(pkg = readDlcPackage()) {
@@ -42,11 +60,15 @@ export function verifyMountUnlock(text, pkg = readDlcPackage()) {
   if (typeof text !== 'string' || Buffer.byteLength(text, 'utf8') > DLC_LIMIT || dlcChannel(pkg) !== 'itch') return null;
   try {
     const file = JSON.parse(text);
-    if (file.version !== 1 || file.game !== DLC_GAME || !paidMount(file.mount) || typeof file.signature !== 'string') return null;
+    if (file.game !== DLC_GAME || !paidMount(file.mount) || typeof file.signature !== 'string') return null;
+    // Retain previously issued v1 files; native itch redemption always issues purchase-specific v2.
+    if (file.version !== 1 && file.version !== 2) return null;
+    if (file.version === 2 && (!Number.isSafeInteger(file.purchaseId) || file.purchaseId <= 0)) return null;
     const signature = Buffer.from(file.signature, 'base64');
     if (signature.length !== 64 || signature.toString('base64') !== file.signature) return null;
     const key = publicKey(pkg);
-    return key && verify(null, Buffer.from(unlockPayload(file.mount)), key, signature) ? file.mount : null;
+    const payload = file.version === 2 ? purchaseUnlockPayload(file.mount, file.purchaseId) : unlockPayload(file.mount);
+    return key && verify(null, Buffer.from(payload), key, signature) ? file.mount : null;
   } catch { return null; }
 }
 
