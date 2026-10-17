@@ -9,7 +9,7 @@
 import { captionSize } from './captions';
 import { t } from '../core/i18n';
 import { wordMoments } from '../core/pace';
-import { DOCUMENTS } from '../data/documents';
+import { DOCUMENTS, documentSkin } from '../data/documents';
 import { paper } from './skins/paper';
 import { spokenFor } from '../data/speechLines';
 import type { Game } from '../systems/components';
@@ -38,9 +38,9 @@ const UNSAID = 'display:inline-block;opacity:0;filter:blur(3px);transform:transl
 const SAID = 'opacity:1;filter:blur(0);transform:none;letter-spacing:normal';
 const LATE = 600; // ms a line waits for its recording to begin before it is said by the clock instead (no recording, or one still loading)
 
-/** The note screen, made the first time a note is read: a note on burnt paper (ui/skins/paper.ts). Made late so it stands over the other screens. */
-let letters: Screen | null = null;
-const letterScreen = (): Screen => (letters ??= createScreen(8, '#050506cc', undefined, true, false, paper));
+/** The one burnt-paper screen, shared by notes, letters and rumours. A host that rebuilds its menus clears `screen`. */
+export const notePaper: { screen: Screen | null } = { screen: null };
+const letterScreen = (): Screen => (notePaper.screen ??= createScreen(8, '#050506cc', undefined, true, false, paper));
 
 /** A note (a letter, a clipping, a report) on its burnt paper. `label` is its button: from the world it is put away; from the journal it goes back to the journal (which stays open beneath it). */
 export function showNote(name: string, label = `${glyph('interact')} · Put it away`): void {
@@ -128,10 +128,11 @@ export function createDialogue(g: Game): Dialogue {
       leave();
       const finish = (): void => {
         read.close();
+        notePaper.screen?.close();
         if (shop) g.events.emit('Trade', { shop, name }); // a merchant's wares follow the optional note
       };
       if (!rumor) return finish();
-      read.show({
+      letterScreen().show({
         back: finish,
         keys: (e) => void (advances(e.code) && !e.repeat && finish()),
         build(p) {
@@ -155,19 +156,19 @@ export function createDialogue(g: Game): Dialogue {
   g.events.on('Read', ({ name }) => {
     const doc = DOCUMENTS[name];
     if (!doc) return;
-    if (doc.kind === 'note') showNote(name);
+    if (documentSkin(doc) === 'paper') showNote(name);
     else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
   });
 
   return {
     get open() {
-      return talk.open || read.open || !!letters?.open;
+      return talk.open || read.open || !!notePaper.screen?.open;
     },
     get talking() {
       return talk.open;
     },
     get reading() {
-      return read.open || !!letters?.open;
+      return read.open || !!notePaper.screen?.open;
     },
   };
 }

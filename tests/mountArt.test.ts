@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { MOUNT_IDS } from '../src/data/mounts';
 import { buildFigure } from '../src/render/figures';
 import { createMount, poseMountedRider, type MountVisual } from '../src/render/mounts';
 import { CASTER } from '../src/render/moonShadow';
@@ -13,19 +14,46 @@ function meshes(visual: MountVisual): THREE.Mesh[] {
 }
 
 describe('procedural mount art', () => {
-  it('draws exactly two skeletal horses and keeps the coach and car within their geometry budgets', () => {
-    for (const id of ['chariot', 'automobile'] as const) {
+  it('keeps each appearance inside its geometry budget, with fire on the spectral horses only', () => {
+    const limit = { grey: 16, chariot: 42, automobile: 12 } as const;
+    for (const id of MOUNT_IDS) {
       const visual = createMount(id);
       const horses: THREE.Object3D[] = [];
-      visual.root.traverse(o => { if (o.name === 'spectral-skeleton-horse') horses.push(o); });
+      const flames: THREE.Object3D[] = [];
+      visual.root.traverse(o => {
+        if (o.name === 'spectral-skeleton-horse') horses.push(o);
+        if (o.name === 'spectral-flame' || o.name === 'spectral-flame-neck') flames.push(o);
+      });
       expect(horses).toHaveLength(id === 'chariot' ? 2 : 0);
-      if (id === 'chariot') expect(horses.map(h => h.position.x)).toEqual([-0.67, 0.67]);
+      expect(flames).toHaveLength(id === 'chariot' ? 4 : 0);
+      if (id === 'chariot') expect(horses.map(h => h.position.x).sort((a, b) => a - b)).toEqual([-0.67, 0.67]);
+      for (const flame of flames) {
+        let onHorse = false;
+        for (let p: THREE.Object3D | null = flame; p; p = p.parent) if (p.name === 'spectral-skeleton-horse') onHorse = true;
+        expect(onHorse).toBe(true);
+        expect(flame.parent).not.toBe(visual.root);
+      }
+      if (id === 'grey') {
+        const breath = visual.root.getObjectByName('mount-breath');
+        expect(breath?.parent).not.toBe(visual.root);
+        expect(visual.root.getObjectByName('borrowed-grey')).toBeTruthy();
+      }
       const bodies = meshes(visual);
-      expect(bodies.length).toBeLessThanOrEqual(id === 'chariot' ? 35 : 12);
+      expect(bodies.length).toBeLessThanOrEqual(limit[id]);
       const triangles = bodies.reduce((sum, m) => sum + (m.geometry.index?.count ?? m.geometry.getAttribute('position').count) / 3 * (m instanceof THREE.InstancedMesh ? m.count : 1), 0);
-      expect(triangles).toBeLessThanOrEqual(id === 'chariot' ? 30000 : 15000);
+      expect(triangles).toBeLessThanOrEqual(id === 'automobile' ? 15000 : 30000);
       visual.dispose();
     }
+  });
+
+  it('stirs the hoof fire with the gait', () => {
+    const visual = createMount('chariot');
+    const flame = visual.root.getObjectByName('spectral-flame') as THREE.Mesh;
+    visual.update({ time: 0, dt: 0, speed: 0 });
+    const rest = Array.from(flame.geometry.getAttribute('position').array as ArrayLike<number>);
+    visual.update({ time: 1, dt: 0.1, speed: 12, turn: 0.2 });
+    expect(Array.from(flame.geometry.getAttribute('position').array as ArrayLike<number>)).not.toEqual(rest);
+    visual.dispose();
   });
 
   it('transforms instanced limb vertices before world lighting and excludes their unsupported depth shadows', () => {
@@ -43,8 +71,10 @@ describe('procedural mount art', () => {
     expect(ordinary.layers.isEnabled(CASTER)).toBe(true);
     expect(WORLD_VERT).not.toContain('mountPosition');
     const other = createMount('automobile');
+    const grey = createMount('grey');
     expect(visual.materials.some(m => other.materials.includes(m))).toBe(false);
-    visual.dispose(); other.dispose();
+    expect(visual.materials.some(m => grey.materials.includes(m))).toBe(false);
+    visual.dispose(); other.dispose(); grey.dispose();
   });
 
   it('keeps ground-following rest, cruise and gallop poses finite and actually articulates limbs', () => {
@@ -65,7 +95,7 @@ describe('procedural mount art', () => {
   });
 
   it('seats the driver with forward knees, planted feet and hands reaching the controls', () => {
-    for (const id of ['chariot', 'automobile'] as const) {
+    for (const id of MOUNT_IDS) {
       const visual = createMount(id), rider = buildFigure('player');
       visual.seat.add(rider.root); visual.update({ time: 1, dt: 0, speed: 0 });
       poseMountedRider(rider, id, 1, 11, 0.4); visual.root.updateMatrixWorld(true);
@@ -82,19 +112,21 @@ describe('procedural mount art', () => {
   });
 
   it('releases every owned mesh and shader without disposing shared world textures', () => {
-    const visual = createMount('chariot'), scene = new THREE.Scene(); scene.add(visual.root);
-    const geoCount = new Map<THREE.BufferGeometry, number>(), matCount = new Map<THREE.Material, number>();
-    for (const mesh of meshes(visual)) {
-      geoCount.set(mesh.geometry, 0);
-      mesh.geometry.addEventListener('dispose', () => geoCount.set(mesh.geometry, geoCount.get(mesh.geometry)! + 1));
+    for (const id of ['chariot', 'grey'] as const) {
+      const visual = createMount(id), scene = new THREE.Scene(); scene.add(visual.root);
+      const geoCount = new Map<THREE.BufferGeometry, number>(), matCount = new Map<THREE.Material, number>();
+      for (const mesh of meshes(visual)) {
+        geoCount.set(mesh.geometry, 0);
+        mesh.geometry.addEventListener('dispose', () => geoCount.set(mesh.geometry, geoCount.get(mesh.geometry)! + 1));
+      }
+      for (const material of visual.materials) {
+        matCount.set(material, 0);
+        material.addEventListener('dispose', () => matCount.set(material, matCount.get(material)! + 1));
+      }
+      visual.dispose();
+      expect([...geoCount.values()].every(n => n === 1)).toBe(true);
+      expect([...matCount.values()].every(n => n === 1)).toBe(true);
+      expect(visual.root.parent).toBe(null);
     }
-    for (const material of visual.materials) {
-      matCount.set(material, 0);
-      material.addEventListener('dispose', () => matCount.set(material, matCount.get(material)! + 1));
-    }
-    visual.dispose();
-    expect([...geoCount.values()].every(n => n === 1)).toBe(true);
-    expect([...matCount.values()].every(n => n === 1)).toBe(true);
-    expect(visual.root.parent).toBe(null);
   });
 });

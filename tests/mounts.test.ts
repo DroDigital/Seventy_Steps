@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
-import { MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL } from '../src/data/mounts';
+import { MOUNT_IDS, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
 import { CAMERA, PLAYER, SIM } from '../src/data/tuning';
 import { discover, rest, teleport, travel } from '../src/systems/checkpoints';
 import { strike } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
-import { mountAvailable, mountBar, controlMount, dismissMount, mountSystem, selectMount, setAutomobileEntitlement, toggleMount } from '../src/systems/mounts';
+import { mountAvailable, mountBar, controlMount, dismissMount, mountSystem, selectMount, setAutomobileEntitlement, setChariotEntitlement, toggleMount } from '../src/systems/mounts';
 import { movementSystem } from '../src/systems/movement';
 import { talk } from '../src/systems/npcs';
 import { playerControl } from '../src/systems/playerControl';
@@ -40,10 +40,10 @@ function ride(g: Game, frames: number, gallop = false, dt = 1 / SIM.hz): void {
 }
 
 describe('the borrowed reins', () => {
-  it('offers an early quest and unlocks the free chariot without a kill, purchase or consumable', () => {
+  it('offers an early quest and unlocks the free grey without a kill, purchase or consumable', () => {
     const g = createWorldGame();
     expect(stageOf(g, MOUNT_QUEST)).toBe(0);
-    expect(mountAvailable(g, 'chariot')).toBe(false);
+    expect(mountAvailable(g, 'grey')).toBe(false);
     talk(g, 'peaslee');
     expect(stageOf(g, MOUNT_QUEST)).toBe(1);
     discover(g, 'hub_dream');
@@ -51,33 +51,42 @@ describe('the borrowed reins', () => {
     questSystem(g);
     expect(isDone(g, MOUNT_QUEST)).toBe(true);
     expect(g.overworld!.slain.size).toBe(0);
-    expect(mountAvailable(g, 'chariot')).toBe(true);
+    expect(mountAvailable(g, 'grey')).toBe(true);
+    expect(mountAvailable(g, 'chariot')).toBe(false);
     expect(mountAvailable(g, 'automobile')).toBe(false);
+    expect(selectMount(g, 'chariot')).toBe(false);
     expect(selectMount(g, 'automobile')).toBe(false);
+    setChariotEntitlement(g, true);
+    expect(mountAvailable(g, 'chariot')).toBe(true);
     setAutomobileEntitlement(g, true);
     expect(mountAvailable(g, 'automobile')).toBe(true);
   });
 
-  it('does not unlock either appearance merely because the optional DLC is owned', () => {
+  it('does not unlock any appearance merely because optional DLC is owned', () => {
     const g = createWorldGame();
     setAutomobileEntitlement(g, true);
+    setChariotEntitlement(g, true);
+    expect(mountAvailable(g, 'grey')).toBe(false);
     expect(mountAvailable(g, 'chariot')).toBe(false);
     expect(mountAvailable(g, 'automobile')).toBe(false);
   });
 
-  it('uses the identical immutable traversal model and produces the same motion and stamina for both', () => {
+  it('uses the identical immutable traversal model and produces the same motion and stamina for every appearance', () => {
+    expect(MOUNTS.grey.traversal).toBe(MOUNTS.chariot.traversal);
     expect(MOUNTS.chariot.traversal).toBe(MOUNTS.automobile.traversal);
     expect(Object.isFrozen(MOUNT_TRAVERSAL)).toBe(true);
     expect(Object.isFrozen(MOUNT_TRAVERSAL.offsets)).toBe(true);
-    const results = (['chariot', 'automobile'] as const).map((id) => {
+    const results = MOUNT_IDS.map((id) => {
       const g = openGame();
       setAutomobileEntitlement(g, true);
+      setChariotEntitlement(g, true);
       selectMount(g, id);
       expect(toggleMount(g)).toBe(true);
       ride(g, 60, true);
       return { at: { ...g.ecs.c.transform.get(g.player.id)!.pos }, stamina: g.ecs.c.stamina.get(g.player.id)!.value, speed: g.player.mount.speed };
     });
-    expect(results[0]).toEqual(results[1]);
+    expect(results[1]).toEqual(results[0]);
+    expect(results[2]).toEqual(results[0]);
     expect(results[0].speed).toBeGreaterThan(PLAYER.sprintSpeed);
     expect(results[0].stamina).toBeLessThan(PLAYER.stamina);
   });
@@ -101,11 +110,12 @@ describe('the borrowed reins', () => {
   });
 
   it('cannot sweep through a thin wall at maximum speed, including a long step', () => {
-    const results = (['chariot', 'automobile'] as const).map((id) => {
+    const results = MOUNT_IDS.map((id) => {
       const g = openGame();
       setAutomobileEntitlement(g, true);
-      selectMount(g, id);
-      toggleMount(g);
+      setChariotEntitlement(g, true);
+      expect(selectMount(g, id)).toBe(true);
+      expect(toggleMount(g)).toBe(true);
       g.world.colliders.push({ kind: 'box', min: { x: 250, y: -1, z: 246 }, max: { x: 262, y: 5, z: 246.02 } });
       g.player.mount.speed = MOUNT_TRAVERSAL.gallop;
       const m = g.ecs.c.mover.get(g.player.id)!;
@@ -116,7 +126,8 @@ describe('the borrowed reins', () => {
       expect(g.player.mount.speed).toBe(0);
       return pos.z;
     });
-    expect(results[0]).toBe(results[1]);
+    expect(results[1]).toBe(results[0]);
+    expect(results[2]).toBe(results[0]);
   });
 
   it('refuses cramped summons without pushing or teleporting the investigator', () => {
@@ -209,7 +220,7 @@ describe('the borrowed reins', () => {
     g.player.dodgeHeld = 20;
     playerControl(g, release);
     expect(g.player.buffer.action).toBe(null);
-    expect(g.player.mount.active).toBe('chariot');
+    expect(g.player.mount.active).toBe('grey');
     const attack = emptyInput();
     attack.pressed.light = true;
     playerControl(g, attack);
@@ -238,8 +249,15 @@ describe('the borrowed reins', () => {
     toggleMount(g);
     setAutomobileEntitlement(g, false);
     expect(g.player.mount.active).toBe(null);
-    expect(g.player.mount.selected).toBe('chariot');
+    expect(g.player.mount.selected).toBe('grey');
     expect(mountAvailable(g, 'automobile')).toBe(false);
+    setChariotEntitlement(g, true);
+    selectMount(g, 'chariot');
+    toggleMount(g);
+    setChariotEntitlement(g, false);
+    expect(g.player.mount.active).toBe(null);
+    expect(g.player.mount.selected).toBe('grey');
+    expect(mountAvailable(g, 'chariot')).toBe(false);
     dismissMount(g);
     mountSystem(g);
   });
@@ -264,17 +282,23 @@ describe('the borrowed reins', () => {
     const s = snapshot(g);
     expect(s.mount).toBe('automobile');
     const loaded = createWorldGame({ save: parseSave(JSON.stringify({ ...s, automobileOwned: true, activeMount: 'automobile' }))! });
-    expect(mountAvailable(loaded, 'chariot')).toBe(true);
+    expect(mountAvailable(loaded, 'grey')).toBe(true);
     expect(loaded.player.mount.selected).toBe('automobile');
     expect(loaded.player.mount.active).toBe(null);
     expect(loaded.player.mount.automobileOwned).toBe(false);
+    expect(loaded.player.mount.chariotOwned).toBe(false);
     expect(mountAvailable(loaded, 'automobile')).toBe(false);
+    expect(mountAvailable(loaded, 'chariot')).toBe(false);
     setAutomobileEntitlement(loaded, false);
-    expect(loaded.player.mount.selected).toBe('chariot');
-    expect(mountAvailable(loaded, 'chariot')).toBe(true);
+    expect(loaded.player.mount.selected).toBe('grey');
+    expect(mountAvailable(loaded, 'grey')).toBe(true);
+    const kept = createWorldGame({ save: parseSave(JSON.stringify({ ...s, mount: 'chariot' }))! });
+    expect(kept.player.mount.selected).toBe('chariot');
+    setChariotEntitlement(kept, false);
+    expect(kept.player.mount.selected).toBe('grey');
     delete s.mount;
     expect(parseSave(JSON.stringify(s))).not.toBe(null);
-    expect(createWorldGame({ save: s }).player.mount.selected).toBe('chariot');
+    expect(createWorldGame({ save: s }).player.mount.selected).toBe('grey');
     expect(parseSave(JSON.stringify({ ...s, mount: 'forged' }))).toBe(null);
   });
 });

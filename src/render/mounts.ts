@@ -5,7 +5,7 @@ import { CASTER } from './moonShadow';
 import { MountBuilder, type CoachWheel } from './mountKit';
 import { automobileArt } from './mountAutomobile';
 import { animateReins, carriageArt } from './mountCarriage';
-import { mountFire } from './mountEffects';
+import { greyHorse } from './mountGrey';
 import type { Figure } from './figures';
 
 export type { MountId } from '../data/mounts';
@@ -27,11 +27,14 @@ export interface MountVisual {
 
 export function createMount(id: MountId): MountVisual {
   const root = new THREE.Group(); root.name = `mount-${id}`;
-  const b = new MountBuilder(), car = id === 'automobile' ? automobileArt(b, root) : null;
+  const b = new MountBuilder();
+  const car = id === 'automobile' ? automobileArt(b, root) : null;
   const coach = id === 'chariot' ? carriageArt(b, root) : null;
-  const art = (car ?? coach)!;
-  const fire = coach ? mountFire(root) : null;
-  const materials = [...b.materials, ...(fire ? [fire.material] : [])];
+  const grey = id === 'grey' ? greyHorse(b, root) : null;
+  const art = car ?? coach ?? grey;
+  if (!art) throw new Error(`unknown mount ${id}`);
+  const wheels = car?.wheels ?? coach?.wheels ?? [];
+  const materials = [...b.materials, ...(coach ? coach.horses.map((horse) => horse.flame.material) : []), ...(grey ? [grey.breath.material] : [])];
   // The global depth-only shadow shader has no instance transform. Ordinary coachwork casts;
   // animated limb instances stay out of that pass instead of casting their unposed rest mesh.
   root.traverse(o => {
@@ -54,12 +57,13 @@ export function createMount(id: MountId): MountVisual {
       art.body.position.y = (rear + front) * 0.5 + suspension * movement;
       art.body.rotation.x = Math.max(-0.22, Math.min(0.22, -Math.atan2(front - rear, 1.75))) + Math.max(-0.035, Math.min(0.035, (lastSpeed - pace) * 0.025));
       art.body.rotation.z = Math.max(-0.2, Math.min(0.2, Math.atan2(right - left, 1.6))) - steer * 0.035 * movement;
-      for (const w of art.wheels) poseWheel(w, steer, ground);
+      for (const w of wheels) poseWheel(w, steer, ground);
       if (car) car.steering.rotation.z = -steer * 0.48;
       if (coach) {
         for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground);
-        animateReins(coach, time, pace); fire!.update(time, pace);
+        animateReins(coach, time, pace);
       }
+      if (grey) grey.update(time, phase, pace, steer, ground);
       lastSpeed = pace;
     },
     dispose() {
@@ -71,7 +75,7 @@ export function createMount(id: MountId): MountVisual {
 
 /** A seated driver with bent knees, hands on reins/wheel, weight braced through acceleration and turns. */
 export function poseMountedRider(f: Figure, id: MountId, time: number, speed: number, turn = 0): void {
-  const moving = Math.min(1, Math.max(0, speed) / 3), chariot = id === 'chariot';
+  const moving = Math.min(1, Math.max(0, speed) / 3), reins = id !== 'automobile';
   f.body.position.set(0, 0.48 + Math.sin(time * 7) * 0.008 * moving, 0);
   f.body.rotation.set(0.045 + moving * 0.035, 0, -turn * 0.025);
   f.torso.rotation.set(Math.sin(time * 1.6) * 0.012, turn * 0.05, 0);
@@ -80,8 +84,8 @@ export function poseMountedRider(f: Figure, id: MountId, time: number, speed: nu
     leg.rotation.set(-1.38, 0, side * 0.08); knee.rotation.set(1.32, 0, 0); foot.rotation.set(0.04, 0, 0);
   }
   for (const [arm, elbow, hand, side] of [[f.armR, f.elbowR, f.handR, -1], [f.armL, f.elbowL, f.handL, 1]] as const) {
-    arm.rotation.set(chariot ? -0.65 : -0.9, side * -0.12, side * 0.08);
-    elbow.rotation.set(chariot ? -0.93 : -0.55, 0, 0); hand.rotation.set(0, 0, side * 0.12);
+    arm.rotation.set(reins ? -0.65 : -0.9, side * -0.12, side * 0.08);
+    elbow.rotation.set(reins ? -0.93 : -0.55, 0, 0); hand.rotation.set(0, 0, side * 0.12);
   }
   for (const skirt of f.skirt) skirt.rotation.x = -1.05;
   for (const weapon of Object.values(f.arms ?? {})) weapon.visible = false;

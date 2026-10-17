@@ -12,7 +12,7 @@ import { ENDING_IDS } from '../data/endings';
 import { QUESTS } from '../data/quests';
 import { WARES } from '../data/wares';
 import { START_SIGN } from '../data/sites';
-import { isMount, type MountId } from '../data/mounts';
+import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
 import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
@@ -180,7 +180,7 @@ export function applySave(g: Game, s: SaveData): void {
   const ow = g.overworld!;
   const c = g.ecs.c;
   const m = g.mind;
-  g.player.mount.selected = isMount(s.mount) ? s.mount : 'chariot';
+  g.player.mount.selected = isMount(s.mount) ? s.mount : FREE_MOUNT;
   ow.sign = signPlace(s.sign) ? s.sign : START_SIGN;
   ow.discovered = new Set([...s.discovered.filter((id) => signPlace(id)), ow.sign]);
   g.player.checkpoint = { ...signPlace(ow.sign)!.rest };

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
-import { automobileDlcAppId, steamOwnsAutomobileDlc } from '../desktop/steam.js';
+import { automobileDlcAppId, chariotDlcAppId, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from '../desktop/steam.js';
 
 const pkg = { steam: { appId: 100, automobileDlcAppId: 200 } };
 const client = (owns: boolean, installed: boolean) => ({ apps: {
@@ -47,7 +47,7 @@ describe('the optional cosmetic automobile DLC', () => {
 
   it('exposes only a fixed ownership read through the sandboxed preload', async () => {
     const invoke = vi.fn((channel: string) => Promise.resolve(channel === 'desktop:pads-get' ? [] : true));
-    let bridge: { ownsAutomobileDlc(): Promise<boolean> } | undefined;
+    let bridge: { ownsAutomobileDlc(): Promise<boolean>; ownsChariotDlc(): Promise<boolean> } | undefined;
     const runPreload = new Function('require', 'process', readFileSync('desktop/preload.cjs', 'utf8'));
     runPreload(() => ({
       contextBridge: { exposeInMainWorld: (_key: string, value: typeof bridge) => { bridge = value; } },
@@ -55,5 +55,33 @@ describe('the optional cosmetic automobile DLC', () => {
     }), { argv: [] });
     expect(await bridge!.ownsAutomobileDlc()).toBe(true);
     expect(invoke).toHaveBeenLastCalledWith('desktop:automobile-dlc');
+    expect(await bridge!.ownsChariotDlc()).toBe(true);
+    expect(invoke).toHaveBeenLastCalledWith('desktop:chariot-dlc');
+  });
+});
+
+describe('the optional spectral chariot DLC', () => {
+  const chariotPkg = { steam: { appId: 100, chariotDlcAppId: 201, automobileDlcAppId: 200 } };
+
+  it('requires its own configured id, distinct from the base game and the automobile', () => {
+    expect(chariotDlcAppId({}, null)).toBeUndefined();
+    expect(chariotDlcAppId({}, { steam: { chariotDlcAppId: 0 } })).toBeUndefined();
+    expect(chariotDlcAppId({}, chariotPkg)).toBe(201);
+    expect(chariotDlcAppId({ STEAM_CHARIOT_DLC_APP_ID: '301' }, chariotPkg)).toBe(301);
+    expect(chariotDlcAppId({}, { steam: { appId: 100, chariotDlcAppId: 200, automobileDlcAppId: 200 } })).toBeUndefined();
+    expect(automobileDlcAppId({}, { steam: { appId: 100, chariotDlcAppId: 200, automobileDlcAppId: 200 } })).toBeUndefined();
+    expect(steamOwnsChariotDlc(client(true, true), {}, pkg)).toBe(false);
+  });
+
+  it('grants access only when Steam reports both ownership and installation', () => {
+    const steam = client(true, true);
+    expect(steamOwnsChariotDlc(steam, {}, chariotPkg)).toBe(true);
+    expect(steam.apps.isSubscribedApp).toHaveBeenCalledWith(201);
+    expect(steam.apps.isDlcInstalled).toHaveBeenCalledWith(201);
+    expect(steamOwnsChariotDlc(client(true, false), {}, chariotPkg)).toBe(false);
+    expect(steamOwnsChariotDlc(client(false, true), {}, chariotPkg)).toBe(false);
+    expect(steamOwnsChariotDlc(client(true, true), {}, { ...chariotPkg, channel: 'itch' })).toBe(false);
+    expect(steamOwnsChariotDlc({ apps: { isSubscribedApp: () => { throw Error('offline'); } } }, {}, chariotPkg)).toBe(false);
+    expect(steamOwnsChariotDlc()).toBe(false);
   });
 });

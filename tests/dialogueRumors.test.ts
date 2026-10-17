@@ -6,7 +6,7 @@ import { clipOf } from '../src/data/speech';
 import { npcLines } from '../src/data/speechLines';
 import { createWorldGame } from '../src/systems/game';
 import { talk } from '../src/systems/npcs';
-import { createDialogue } from '../src/ui/dialogue';
+import { createDialogue, notePaper } from '../src/ui/dialogue';
 import type { Page } from '../src/ui/menuKit';
 import { record } from './worldHelpers';
 
@@ -41,12 +41,15 @@ vi.mock('../src/ui/menuKit', () => ({
 }));
 
 beforeEach(() => {
+  notePaper.screen = null;
   menu.screens.length = 0;
   vi.useFakeTimers();
   vi.stubGlobal('window', { setTimeout });
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
 });
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
+
+const rumour = (): Screen => menu.screens.find((s) => s.panel.text.includes('A RUMOUR'))!;
 
 const advance = (): void => menu.screens[0].panel.buttons[0]();
 
@@ -64,13 +67,13 @@ describe('voiced conversations and written rumours', () => {
     advance();
     expect(dialogue.talking).toBe(false);
     expect(dialogue.reading).toBe(true);
-    expect(menu.screens[1].panel.text).toContain('A RUMOUR');
-    expect(menu.screens[1].panel.text).toContain(RUMORS.keziah_mason);
+    expect(rumour().panel.text).toContain('A RUMOUR');
+    expect(rumour().panel.text).toContain(RUMORS.keziah_mason);
     expect(said).toHaveLength(2);
     expect(g.overworld!.told.has('rumor:nasht:keziah_mason')).toBe(true);
-    menu.screens[1].page!.keys!({ code: 'KeyE', repeat: true } as KeyboardEvent);
+    rumour().page!.keys!({ code: 'KeyE', repeat: true } as KeyboardEvent);
     expect(dialogue.reading).toBe(true);
-    menu.screens[1].page!.keys!({ code: 'KeyE', repeat: false } as KeyboardEvent);
+    rumour().page!.keys!({ code: 'KeyE', repeat: false } as KeyboardEvent);
     expect(dialogue.reading).toBe(false);
     talk(g, 'nasht');
     advance(); advance();
@@ -100,7 +103,7 @@ describe('voiced conversations and written rumours', () => {
     advance();
     expect(dialogue.reading).toBe(true);
     expect(trades).toHaveLength(0);
-    menu.screens[1].page!.back!();
+    rumour().page!.back!();
     expect(dialogue.open).toBe(false);
     expect(trades).toEqual([{ shop: 'morgan', name: 'Morgan' }]);
   });

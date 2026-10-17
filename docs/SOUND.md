@@ -103,6 +103,16 @@ the hands on their moves' frames (`HAND_FRAMES`), the whoosh before each blow's 
 before its item frame, a door's swing, the mist's walk, and each act's cues on its own pulse (`TIMING` in `data/actBeats.ts` is read by
 the poses and by the sounds). Change a move or an act's timing and the test says where its sound now lies.
 
+## Mounts
+
+The three mounts share one scheduler (`render/audio/mountAudio.ts`). Nothing is placed in the world: the follow camera
+sits about eight metres back, and a sound at the hooves falls under the music. They are the rider’s own foley, as footsteps are.
+Recipes are procedural placeholders (no files in `public/audio`): a nicker, breath and snort for the grey; hollow wind, paired
+hooves, harness and creak for the chariot; an engine for the motor car; wheels for both wheeled mounts; a summon and a dismiss.
+Hoof and wheel timbre follows dirt, road, stone and water. A gallop shortens the stride and lifts the pitch. Rendered peaks
+stay under −12 dBFS (`tests/mountAudio.test.ts`) and above about −24 dBFS, under combat impact. A recorded set can replace a
+recipe later; do not add these ids to `plannedSounds` until the files exist.
+
 ## Adding
 
 - A recipe: a `Sound` in `data/foleySounds.ts` (or `sounds.ts`), a class gain, and its place (an event in `cues.ts`, a frame in

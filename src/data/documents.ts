@@ -6,7 +6,15 @@
 
 export interface Document {
   kind: 'tome' | 'note';
+  /** Burnt paper is the note default. A tome may opt in; a note may opt out with `plain`. */
+  skin?: 'paper' | 'plain';
   text: readonly string[]; // paragraphs
+}
+
+/** Notes burn at the edges unless they say otherwise. Tomes stay on the plain page unless they ask for paper. */
+export function documentSkin(doc: Document): 'paper' | 'plain' {
+  if (doc.skin) return doc.skin;
+  return doc.kind === 'note' ? 'paper' : 'plain';
 }
 
 const tome = (...text: string[]): Document => ({ kind: 'tome', text });

@@ -5,7 +5,7 @@
  * beheld, with its field note (ui/bestiaryPage.ts). A side quest under way can be followed: the minimap and the map lead to it.
  */
 
-import { DOCUMENTS } from '../data/documents';
+import { DOCUMENTS, documentSkin } from '../data/documents';
 import { QUESTS } from '../data/quests';
 import type { Game } from '../systems/components';
 import { mainLead } from '../systems/lead';
@@ -53,7 +53,7 @@ export function journalPage(g: Game, back: () => void, show: (p: Page) => void, 
         const some = read.filter((n) => DOCUMENTS[n].kind === kind);
         if (!some.length) continue;
         heading(body, `${head} · ${some.length}`).style.margin = '12px 14px 4px';
-        for (const name of some) button(body, name, () => (kind === 'note' ? showNote(name, t('keys.back')) : show(documentPage(name, () => show(page)))));
+        for (const name of some) button(body, name, () => (documentSkin(DOCUMENTS[name]) === 'paper' ? showNote(name, t('keys.back')) : show(documentPage(name, () => show(page)))));
       }
     } else if (at === 2) {
       fieldGuideBody(body, g, show, page);
