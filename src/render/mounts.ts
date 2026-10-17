@@ -1,6 +1,7 @@
 /** Mounted traversal art: shared suspension and rider pose; two equally sized gameplay origins. */
 import * as THREE from 'three';
-import { MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import type { MountId } from '../data/mounts';
+import { cyclesFor } from '../systems/mountGait';
 import { CASTER } from './moonShadow';
 import { MountBuilder, type CoachWheel } from './mountKit';
 import { automobileArt } from './mountAutomobile';
@@ -10,6 +11,8 @@ import type { Figure } from './figures';
 export type { MountId } from '../data/mounts';
 export interface MountFrame {
   time: number; dt: number; speed: number;
+  /** Gait cycles ridden since the summon (`MountState.phase`). Without it the exhibit counts them from its own speed. */
+  cycle?: number;
   /** Signed turning intensity, -1..1. */
   turn?: number;
   /** Ground relative to the root, sampled in local mount coordinates (+z forward). */
@@ -38,17 +41,19 @@ export function createMount(id: MountId): MountVisual {
   root.traverse(o => {
     if (o instanceof THREE.Mesh && !(o instanceof THREE.InstancedMesh) && ![o.material].flat().some(m => m.transparent)) o.layers.enable(CASTER);
   });
-  let distance = 0, phase = 0, lastSpeed = 0;
+  let distance = 0, phase = 0, cycle = 0, lastSpeed = 0;
   function poseWheel(w: CoachWheel, turn: number, ground?: MountFrame['ground']): void {
     w.pivot.position.y = w.radius + (ground?.(w.x, w.z) ?? 0);
     w.pivot.rotation.y = w.steer ? turn * 0.3 : 0;
     w.spin.rotation.x = distance / w.radius;
   }
   return { root, seat: art.seat, materials,
-    update({ time, dt, speed, turn = 0, ground }) {
+    update({ time, dt, speed, turn = 0, ground, cycle: ridden }) {
       const step = Math.max(0, Math.min(0.1, dt)), pace = Math.max(0, speed), steer = Math.max(-1, Math.min(1, turn));
       distance = (distance + pace * step) % (Math.PI * 2 * 1e4);
-      phase = (phase + pace * step / MOUNT_TRAVERSAL.stride * Math.PI * 2) % (Math.PI * 2);
+      if (ridden === undefined) cycle += cyclesFor(pace * step, pace);
+      else cycle = Math.abs(ridden - cycle) > 0.75 ? ridden : cycle + (ridden - cycle) * Math.min(1, step * 40); // the simulation's count, eased between its steps
+      phase = (cycle * Math.PI * 2) % (Math.PI * 2);
       const rear = ground?.(0, -1.1) ?? 0, front = ground?.(0, 0.65) ?? 0;
       const left = ground?.(-0.8, -0.2) ?? 0, right = ground?.(0.8, -0.2) ?? 0;
       const movement = Math.min(1, pace / 2), suspension = Math.sin(distance * 7.1) * 0.018 + Math.sin(distance * 11.9) * 0.008;
@@ -59,7 +64,7 @@ export function createMount(id: MountId): MountVisual {
       if (car) car.steering.rotation.z = -steer * 0.48;
       if (coach) {
         for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground);
-        coach.draft?.update(time, phase, pace, steer, ground);
+        coach.draft?.update(time, cycle, pace, steer, ground);
         animateReins(coach, time, pace);
       }
       lastSpeed = pace;

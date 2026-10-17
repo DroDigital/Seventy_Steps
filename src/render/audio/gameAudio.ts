@@ -41,6 +41,7 @@ import type { AudioEngine } from './engine';
 import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
 import { createMountAudio } from './mountAudio';
+import { createMountBed } from './mountBed';
 import { createVarier } from './vary';
 import { createSampler, setFiles } from './sampler';
 import { voicedCurve } from '../../core/pace';
@@ -62,7 +63,7 @@ export interface GameAudio {
   /** A recording where `at` is (null: in the head): its level fading with the distance to `range` metres, dulled and panned (round 40: the doors). */
   sampleAt(set: SampleSetId, at: V3 | null, o?: { gain?: number; pitch?: number; range?: number; delay?: number }): boolean;
   /** A recipe where `at` is (null: in the head), a little different each time, the more by `vary` (0: as written), `key` telling one sound from another (round 40). A recording that stands in front of it (data/plannedSounds.ts) is played to last `fit` seconds, if told. */
-  recipe(key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; pitch?: number; range?: number; vary?: number; fit?: number }): boolean;
+  recipe(key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; pitch?: number; range?: number; vary?: number; fit?: number; pan?: number }): boolean;
   /** Whether a recording stands in front of the recipe `key` and has loaded (the door's own recording needs no recorded thud beneath it). */
   recordedFor(key: string): boolean;
   /** Gets the realm's track ready (fetched, decoded) without sounding it: the world's sound begins when it shows (round 29). */
@@ -103,9 +104,9 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     if (gain <= 0) return false;
     const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it
     const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) });
-    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
+    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
-  const mounts = createMountAudio(g, recipe);
+  const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
@@ -302,7 +303,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });
       dread.update(seconds, paused);
       drones.update(fx, seconds);
-      if (paused) return;
+      if (paused) return void mounts.pause();
       mounts.update(dt);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
         lastBeat = HEART.beats;

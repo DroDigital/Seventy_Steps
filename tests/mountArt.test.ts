@@ -15,7 +15,7 @@ function meshes(visual: MountVisual): THREE.Mesh[] {
 
 describe('procedural mount art', () => {
   it('keeps each appearance inside its geometry budget, with fire on the spectral horses only', () => {
-    const limit = { grey: 16, chariot: 42, automobile: 12 } as const;
+    const limit = { grey: 34, chariot: 42, automobile: 12 } as const;
     for (const id of MOUNT_IDS) {
       const visual = createMount(id);
       const horses: THREE.Object3D[] = [];
@@ -44,36 +44,46 @@ describe('procedural mount art', () => {
         expect(visual.seat.position.z).toBeCloseTo(0.08);
         visual.update({ time: 0, dt: 0, speed: 0 });
         visual.root.updateMatrixWorld(true);
-        const head = visual.root.getObjectByName('head')!.getWorldPosition(new THREE.Vector3());
-        const tail = visual.root.getObjectByName('tail')!.getWorldPosition(new THREE.Vector3());
-        const bit = visual.root.getObjectByName('draft-bit')!.getWorldPosition(new THREE.Vector3());
-        expect(head.z).toBeGreaterThan(tail.z + 0.8);
-        expect(visual.root.getObjectByName('draft-horse')!.position.x).toBe(0);
-        expect(bit.z).toBeGreaterThan(2.5);
-        expect(bit.y).toBeGreaterThan(1);
-        expect(bit.y).toBeLessThan(2.4);
+        const at = (name: string): THREE.Vector3 => visual.root.getObjectByName(name)!.getWorldPosition(new THREE.Vector3());
+        expect(at('head').z).toBeGreaterThan(at('tail').z + 1.8);
+        expect(at('draft-horse').x).toBe(0);
+        const bit = at('draft-bit');
+        expect(bit.z).toBeGreaterThan(3.8);
+        expect(bit.y).toBeGreaterThan(1.2);
+        expect(bit.y).toBeLessThan(2.3);
+        const horse = new THREE.Box3().setFromObject(visual.root.getObjectByName('draft-horse')!);
+        expect(horse.max.y).toBeGreaterThan(2.1); // a draft horse stands sixteen hands, its head up
+        expect(horse.max.y).toBeLessThan(2.6);
+        expect(horse.min.y).toBeGreaterThan(-0.02);
+        expect(horse.max.x - horse.min.x).toBeLessThan(1.3);
+        const lumaOf = (mesh: THREE.Mesh): number[] => {
+          const col = mesh.geometry.getAttribute('color');
+          return Array.from({ length: col.count }, (_, i) => 0.2126 * col.getX(i) + 0.7152 * col.getY(i) + 0.0722 * col.getZ(i));
+        };
         const bodyMesh = visual.root.getObjectByName('draft-body') as THREE.Mesh;
-        const col = bodyMesh.geometry.getAttribute('color');
-        const uv = bodyMesh.geometry.getAttribute('uv');
-        const nrm = bodyMesh.geometry.getAttribute('normal');
-        const pos = bodyMesh.geometry.getAttribute('position');
-        let c0 = Infinity, c1 = -Infinity, span = 0, top = -Infinity, topN = 0;
-        for (let i = 0; i < col.count; i++) {
-          const y = 0.2126 * col.getX(i) + 0.7152 * col.getY(i) + 0.0722 * col.getZ(i);
-          c0 = Math.min(c0, y); c1 = Math.max(c1, y);
-          span = Math.max(span, Math.abs(uv.getX(i)), Math.abs(uv.getY(i)));
-          if (pos.getY(i) > top) { top = pos.getY(i); topN = nrm.getY(i); }
-        }
-        expect(c1 - c0).toBeGreaterThan(0.12);
-        expect(span).toBeGreaterThan(2);
-        expect(topN).toBeGreaterThan(0.4);
+        const body = lumaOf(bodyMesh);
+        expect(Math.max(...body) - Math.min(...body)).toBeGreaterThan(0.12); // a coat, not a flat colour
         expect((bodyMesh.material as THREE.ShaderMaterial).uniforms.uMap.value.name.startsWith('hide')).toBe(true);
-        expect(visual.root.getObjectByName('draft-eyes')).toBeTruthy();
+        const mane = lumaOf(visual.root.getObjectByName('draft-neck') as THREE.Mesh);
+        expect(Math.max(...mane)).toBeGreaterThan(Math.min(...body) + 0.35); // a pale mane on the chestnut, which reads in the dark
+        const face = lumaOf(visual.root.getObjectByName('draft-head') as THREE.Mesh);
+        expect(Math.max(...face)).toBeGreaterThan(0.7); // the blaze
+        for (const part of ['draft-eyes', 'draft-harness', 'draft-bridle', 'draft-tail']) expect(visual.root.getObjectByName(part), part).toBeTruthy();
+        expect(visual.root.getObjectsByProperty('name', 'ear')).toHaveLength(2);
+        const hoofs = ['leg-front-left', 'leg-front-right', 'leg-back-left', 'leg-back-right'].map(n => visual.root.getObjectByName(`${n}-hoof`)!);
+        const bottoms = (): number[] => hoofs.map(h => new THREE.Box3().setFromObject(h).min.y);
+        for (const y of bottoms()) expect(Math.abs(y)).toBeLessThan(0.02); // all four on the ground at rest
         const leg = visual.root.getObjectByName('leg-front-left')!;
         const rest = leg.quaternion.toArray();
-        visual.update({ time: 0.4, dt: 0.1, speed: 12, turn: 0.2 });
+        for (const speed of [1.5, 5.5, 11, 18]) for (let i = 0; i < 40; i++) {
+          visual.update({ time: i / 60, dt: 1 / 60, speed, turn: 0.2, cycle: (i / 60) * speed / 4.4 });
+          visual.root.updateMatrixWorld(true);
+          const low = bottoms();
+          expect(Math.min(...low), `${speed} m/s`).toBeGreaterThan(-0.03); // never through the ground
+          expect(Math.max(...low), `${speed} m/s`).toBeLessThan(0.4);
+          if (speed < 4) expect(Math.min(...low), `${speed} m/s`).toBeLessThan(0.02); // a walk always has a foot down
+        }
         expect(leg.quaternion.toArray()).not.toEqual(rest);
-        visual.root.updateMatrixWorld(true);
         visual.root.traverse(o => { expect(o.matrixWorld.elements.every(Number.isFinite)).toBe(true); });
       }
       const bodies = meshes(visual);

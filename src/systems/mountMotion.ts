@@ -4,6 +4,7 @@ import { MOUNT_TRAVERSAL } from '../data/mounts';
 import { WORLD } from '../data/tuning';
 import { inDungeon } from '../world/terrain';
 import { regionAt } from '../world/worldMap';
+import { cyclesFor } from './mountGait';
 import type { Game } from './components';
 import { footprintClear, mountFootprintForbidden, mountPlaceForbidden } from './mountGround';
 
@@ -54,7 +55,7 @@ export function moveMounted(g: Game, dt: number): MountMove {
       break;
     }
     Object.assign(tr.pos, next);
-    mount.phase += step / t.stride;
+    mount.phase += cyclesFor(step, mount.speed);
   }
   return 'rode';
 }

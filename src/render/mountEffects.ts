@@ -26,7 +26,7 @@ void main() {
 }`;
 
 const FRAG = `precision highp float;
-uniform float uTime; uniform float uGhost; uniform float uStyle;
+uniform float uTime; uniform float uSpeed; uniform float uGhost; uniform float uStyle;
 uniform vec3 uFogColor; uniform float uFogNear; uniform float uFogFar; uniform float uFogAmount;
 varying vec2 vUv; varying float vSeed; varying float vDistance;
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -36,15 +36,15 @@ void main(){
   vec2 p = vUv; float n = noise(vec2(p.x * 3.0 + vSeed, p.y * 5.0 - uTime * 1.3));
   float edge = abs(p.x - 0.5) * 2.0;
   float width = (1.0 - p.y) * (0.42 + 0.25 * n);
-  float alpha = smoothstep(width + 0.2, width - 0.02, edge) * smoothstep(1.0, 0.2, p.y) * (0.32 + 0.38 * n);
+  float alpha = (1.0 - smoothstep(width - 0.02, width + 0.2, edge)) * (1.0 - smoothstep(0.2, 1.0, p.y)) * (0.32 + 0.38 * n); // (edges the right way round: a smoothstep with them reversed is undefined in GLSL)
   alpha *= smoothstep(0.0, 0.07, p.y);
   if (alpha < 0.02) discard;
-  vec3 spectral = mix(vec3(0.14, 0.02, 0.28), vec3(0.42, 0.08, 0.55), n);
+  vec3 spectral = mix(vec3(0.32, 0.05, 0.62), vec3(0.72, 0.24, 0.98), n);
   vec3 breath = mix(vec3(0.42, 0.44, 0.46), vec3(0.7, 0.73, 0.75), n);
   vec3 col = mix(breath, spectral, uStyle);
   float pace = uStyle > 0.5 ? mix(0.8, 1.05, clamp(uSpeed / 12.0, 0.0, 1.0)) : mix(1.0, 0.35, clamp(uSpeed / 8.0, 0.0, 1.0));
   float fog = smoothstep(uFogNear, uFogFar, vDistance) * uFogAmount;
-  float presence = mix(0.22, 0.36, uStyle);
+  float presence = mix(0.22, 1.0, uStyle);
   gl_FragColor = vec4(mix(col, uFogColor, fog), alpha * (1.0 - fog) * (1.0 - uGhost) * presence * pace);
 }`;
 
@@ -91,17 +91,17 @@ export function horseFlame(body: THREE.Object3D, neck: THREE.Object3D): HorseWis
   const mat = material(1);
   const pos: number[] = [], uv: number[] = [], seeds: number[] = [], spans: Span[] = [];
   let seed = 1;
-  for (let i = 0; i < 4; i++) tongue(pos, uv, seeds, (i % 2 ? 0.04 : -0.04), 0.22, -0.42 + i * 0.28, 0.2, 0.11, seed++, 0.2);
+  for (let i = 0; i < 4; i++) tongue(pos, uv, seeds, (i % 2 ? 0.04 : -0.04), 0.22, -0.42 + i * 0.28, 0.32, 0.16, seed++, 0.2);
   for (let i = 0; i < 4; i++) {
     const start = pos.length / 3;
-    const count = tongue(pos, uv, seeds, 0, 0.02, 0.02, 0.13, 0.08, seed++, i);
+    const count = tongue(pos, uv, seeds, 0, 0.02, 0.02, 0.22, 0.12, seed++, i);
     const base = new Float32Array(count * 3);
     for (let v = 0; v < count; v++) base.set(pos.slice((start + v) * 3, (start + v) * 3 + 3), v * 3);
     spans.push({ start, count, base });
   }
   const bodyMesh = mesh(body, pos, uv, seeds, mat, 'spectral-flame');
   const npos: number[] = [], nuv: number[] = [], nseeds: number[] = [];
-  for (let i = 0; i < 3; i++) tongue(npos, nuv, nseeds, 0, 0.12 + i * 0.16, 0.08, 0.14, 0.08, seed++, 0.4);
+  for (let i = 0; i < 3; i++) tongue(npos, nuv, nseeds, 0, 0.12 + i * 0.16, 0.08, 0.22, 0.12, seed++, 0.4);
   mesh(neck, npos, nuv, nseeds, mat, 'spectral-flame-neck');
   const attr = bodyMesh.geometry.getAttribute('position') as THREE.BufferAttribute;
   return { material: mat, update(time, speed, hooves) {

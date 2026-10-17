@@ -3,6 +3,13 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Riding
+
+- You can hear a ride now. Every hoofbeat is a foot coming down in the horse's gait, panned left and right, on dirt, road, stone or in the shallows; under them run the wheels' roar and rattle, the rush of air and, for the motor car, an engine that climbs with its speed; over them the harness' brass, the creak of timber and a snort at the gallop.
+- The chariot's horse is a new chestnut draft horse with a flaxen mane and white stockings, in black and brass harness, hitched to the shafts. It walks, trots, canters and gallops with its feet on the ground and stops where it stands. Its hooves throw dust, spray and sparks.
+- The spectral chariot's violet fire is visible at last (it was not drawn at all), and the skeleton horses use the same gait.
+- The mount's prompts, refusals and the Mounts tab are in English, German, French and Spanish.
+
 ## Mounts
 
 - The included mount is called Chariot. The summon and ride prompts leave after a few seconds.
@@ -10,7 +17,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Plain chariot
 
-- The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. The horse is Kenney's, a dark bay with a quiet coat, black points, a pale muzzle, a dark mane, and eyes.
+- The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. Its horse is a chestnut draft horse (see Riding).
 - The save id is still `grey`, so an older journey keeps its mount. The spectral chariot and the motor car are unchanged, and still no faster.
 - On the desktop build, looking for a controller no longer closes and reopens the helper process, which was waking the macOS dock and pausing the game.
 

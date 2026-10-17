@@ -3,8 +3,9 @@
  */
 import * as THREE from 'three';
 import { tint } from './meshKit';
+import { scaleRgb } from './palette';
 import { MOUNT_COLORS as C, MountBuilder, coachLamp, group, leafSpring, orb, panel, rod, tube, wheel, tuftedSeat, type CoachWheel, type Point } from './mountKit';
-import { DRAFT_PLACE, draftHorse, type DraftHorse } from './draftHorse';
+import { DRAFT_HITCH, DRAFT_PLACE, draftHorse, type DraftHorse } from './draftHorse';
 import { spectralHorse, type SpectralHorse } from './mountHorse';
 
 export interface CarriageArt {
@@ -27,7 +28,7 @@ export function carriageArt(b: MountBuilder, root: THREE.Group, plain = false): 
       panel(0.045, 0.07, 1.37, side * 0.79, 0.98, -0.94, C.trim),
       panel(0.04, 0.05, 1.37, side * 0.79, 1.41, -0.94, C.trim),
       panel(0.38, 0.065, 0.55, side * 0.89, 0.57, 0.02, C.iron),
-      rod([side * 0.57, 0.64, 0.39], [side * 0.57, 0.83, 2.43], 0.042, C.iron),
+      ...(plain ? [rod([side * 0.57, 0.64, 0.39], [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], 0.05, scaleRgb(C.wood, 0.8)), orb(0.06, [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], C.brass)] : [rod([side * 0.57, 0.64, 0.39], [side * 0.57, 0.83, 2.43], 0.042, C.iron)]),
       ...leafSpring(side * 0.6, -1.05), ...leafSpring(side * 0.6, 0.48));
     for (const zz of [-1.72, -0.44]) {
       wood.push(panel(0.095, 1.28, 0.095, side * 0.71, 2.03, zz, paint),
