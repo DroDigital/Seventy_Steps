@@ -30,6 +30,9 @@ export interface AttackLook {
   core: Rgb; // the white-hot heart of a light, in the horror's tint
   ember: Rgb; // what a spark cools to
   ink: Rgb; // what a blow leaves on the ground: the author's own dark
+  punch: number; // 0.85..1.2: how much matter its bursts throw, so two horrors of one element are not one
+  twist: number; // 0.6..1.5: how fast that matter tumbles
+  pitch: number; // 0.92..1.08: its sounds' pitch
 }
 
 const clamp1 = (c: Rgb): Rgb => [Math.min(1, c[0]), Math.min(1, c[1]), Math.min(1, c[2])];
@@ -56,6 +59,15 @@ const MADE_OF: Readonly<Record<CreaturePalette, AoeMotif>> = {
   stone: 'crack', sand: 'crack', rust: 'crack', bone: 'ash', charcoal: 'ash', pallid: 'frost',
 };
 
+/** Three small numbers from the id, the same each time. */
+function temper(id: string | undefined): Pick<AttackLook, 'punch' | 'twist' | 'pitch'> {
+  let n = 2166136261;
+  for (const ch of id ?? '') n = Math.imul(n ^ ch.charCodeAt(0), 16777619);
+  n >>>= 0;
+  const at = (shift: number): number => ((n >>> shift) & 255) / 255;
+  return { punch: id ? 0.85 + 0.35 * at(0) : 1, twist: id ? 0.6 + 0.9 * at(8) : 1, pitch: id ? 0.92 + 0.16 * at(16) : 1 };
+}
+
 function build(id: string | undefined, theme: AttackTheme): AttackLook {
   const themed = !!id && theme !== DEFAULT_ATTACK_THEME;
   const plain = !themed && !!id && !!getEntity(id);
@@ -70,6 +82,7 @@ function build(id: string | undefined, theme: AttackTheme): AttackLook {
     core: mixRgb(line, [1, 1, 1], 0.7),
     ember: scaleRgb(mixRgb(danger, BASE.charcoal, 0.4), 0.5),
     ink: theme.danger,
+    ...temper(id),
   };
 }
 

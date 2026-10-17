@@ -12,6 +12,7 @@
 
 import * as THREE from 'three';
 import { PLAIN_AOE, type AoeStyle } from './aoeLook';
+import { FEEL } from './feel';
 import type { Rgb } from './palette';
 import { worldUniforms } from './worldMaterial';
 
@@ -66,6 +67,7 @@ const FRAG = /* glsl */ `
 uniform vec3 uFogColor;
 uniform float uFogAmount;
 uniform float uTime;
+uniform float uFlash; // the Flashes setting: 1 strobes as the blow falls, 0 holds steady
 varying vec2 vP;
 varying vec2 vScale;
 varying vec4 vShape;
@@ -167,8 +169,8 @@ void main() {
   if (vMark.x > 0.5 && solid) body *= 0.3 + 0.7 * motifMask(r, ang);
   if (solid && kind != 2) body *= 0.5 + 0.5 * smoothstep(0.0, max(fill, 0.05), r); // the light gathers toward the front
   float ready = solid && fill >= 0.999 ? 1.0 : 0.0; // the blow is falling
-  float flash = ready * (0.5 + 0.5 * sin(uTime * 38.0));
-  float pulse = 0.5 + 0.5 * sin(uTime * (7.0 + 13.0 * fill));
+  float flash = ready * mix(0.5, 0.5 + 0.5 * sin(uTime * 38.0), uFlash);
+  float pulse = mix(0.5, 0.5 + 0.5 * sin(uTime * (7.0 + 13.0 * fill)), uFlash);
   float hatch = solid && fill < 0.999 ? 0.2 * step(0.55, fract((vP.x * vScale.x + vP.y * vScale.y) / 0.75)) : 0.0; // the whole of it, promised from the first frame
   float cover = vColor.a * max(max(max(edge * 0.95, front * 0.95), body * (lit + 0.5 * ready + 0.3 * chev)), max(hatch, glow));
   float shade = vColor.a * max(outline * 0.85, dark);
@@ -191,7 +193,7 @@ export function createDecals(scene: THREE.Scene): Decals {
   geo.setAttribute('aColor', colors);
   geo.setAttribute('aMark', marks);
   const material = new THREE.ShaderMaterial({
-    uniforms: { ...worldUniforms, uTime: { value: 0 } },
+    uniforms: { ...worldUniforms, uTime: { value: 0 }, uFlash: { value: 1 } },
     vertexShader: VERT,
     fragmentShader: FRAG,
     depthWrite: false,
@@ -256,6 +258,7 @@ export function createDecals(scene: THREE.Scene): Decals {
     },
     end(time) {
       material.uniforms.uTime.value = time;
+      material.uniforms.uFlash.value = FEEL.flashes;
       batch.count = n;
       batch.instanceMatrix.needsUpdate = true;
       shapes.needsUpdate = true;

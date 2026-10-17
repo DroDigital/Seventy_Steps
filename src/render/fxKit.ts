@@ -67,7 +67,8 @@ export function flash(fx: Particles, e: Element, at: V3, radius: number, look: A
 }
 
 /** A burst of the element's matter flung out of `at`, from a few metres' radius to a colossus's. */
-export function burst(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, power = 1): void {
+export function burst(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, strength = 1): void {
+  const power = strength * look.punch;
   const c = colorOf(e, look);
   const end = endOf(e, look, c);
   const size = chunkSize(radius);
@@ -76,13 +77,13 @@ export function burst(fx: Particles, e: Element, at: V3, radius: number, look: A
   for (let i = 0; i < crown; i++) {
     const a = (i / crown) * tau + rand(-0.2, 0.2);
     const s = radius * rand(1.3, 2.4);
-    fx.spawn({ x: at.x, y: at.y + 0.15, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(0.5, 2.5), life: rand(0.5, 1), size: size * rand(0.7, 1.3), grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: e.gravity, drag: 1.4, spin: rand(-9, 9), rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2 });
+    fx.spawn({ x: at.x, y: at.y + 0.15, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(0.5, 2.5), life: rand(0.5, 1), size: size * rand(0.7, 1.3), grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: e.gravity, drag: 1.4, spin: rand(-9, 9) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2 });
   }
   const fountain = Math.round((6 + radius * 2.2) * power);
   for (let i = 0; i < fountain; i++) {
     const a = rand(0, tau);
     const d = Math.sqrt(Math.random()) * radius * 0.6;
-    fx.spawn({ x: at.x + Math.cos(a) * d, y: at.y + 0.2, z: at.z + Math.sin(a) * d, vx: Math.cos(a) * rand(0, 2.5), vz: Math.sin(a) * rand(0, 2.5), vy: rand(3.5, 8.5), life: rand(0.7, 1.3), size: size * rand(0.6, 1.1), grow: e.glow ? 0.3 : 0.8, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 5) + (e.glow ? 2 : 0), drag: 0.6, spin: rand(-7, 7), rot: rand(0, tau), alpha: 0.95, hold: 0.25, stretch: 0.18 });
+    fx.spawn({ x: at.x + Math.cos(a) * d, y: at.y + 0.2, z: at.z + Math.sin(a) * d, vx: Math.cos(a) * rand(0, 2.5), vz: Math.sin(a) * rand(0, 2.5), vy: rand(3.5, 8.5), life: rand(0.7, 1.3), size: size * rand(0.6, 1.1), grow: e.glow ? 0.3 : 0.8, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 5) + (e.glow ? 2 : 0), drag: 0.6, spin: rand(-7, 7) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.25, stretch: 0.18 });
   }
   const cloud = Math.round((5 + radius * 1.6) * power);
   const mist = e.smoke ? look.ember : look.ring;
@@ -129,7 +130,7 @@ export function impact(fx: Particles, e: Element, at: V3, dir: { x: number; z: n
 export function trail(fx: Particles, e: Element, at: V3, vel: V3, radius: number, look: AttackLook, lit: boolean): void {
   const speed = Math.hypot(vel.x, vel.y, vel.z) || 1;
   const c = colorOf(e, look);
-  fx.spawn({ x: at.x, y: at.y, z: at.z, life: 0.1, size: radius * 3, grow: 0.8, color: look.line, glow: true, shape: 'wisp', alpha: 0.7 });
+  fx.spawn({ x: at.x, y: at.y, z: at.z, life: 0.1, size: radius * 4.4, grow: 0.8, color: look.line, glow: true, shape: 'wisp', alpha: 0.85 });
   fx.spawn({ x: at.x, y: at.y, z: at.z, vx: -vel.x * 0.12 + rand(-0.4, 0.4), vy: -vel.y * 0.12 + rand(-0.2, 0.6), vz: -vel.z * 0.12 + rand(-0.4, 0.4), life: rand(0.3, 0.55), size: radius * rand(0.9, 1.5), grow: e.mist < 0 ? 1.4 : 2.2, color: lit ? look.core : c, colorEnd: endOf(e, look, c), shape: e.chunk === 'disc' ? 'disc' : 'wisp', glow: e.glow || lit, alpha: 0.8, drag: 2, gravity: Math.max(0, e.gravity) * 0.2, hold: 0.2 });
   if (Math.random() < 0.55) fx.spawn({ x: at.x, y: at.y, z: at.z, vx: -vel.x * 0.25 + rand(-1.5, 1.5), vy: rand(-0.5, 1.5), vz: -vel.z * 0.25 + rand(-1.5, 1.5), life: rand(0.2, 0.5), size: radius * 0.6 + 0.06, color: WHITE, colorEnd: look.line, glow: true, shape: e.glint ?? 'spark', gravity: 3, spin: 6, hold: 0.3 });
   if (speed > 6 && Math.random() < 0.5) fx.spawn({ x: at.x, y: at.y, z: at.z, vx: vel.x * 0.1, vy: vel.y * 0.1, vz: vel.z * 0.1, life: 0.14, size: radius * 0.9, color: look.core, glow: true, shape: 'streak', stretch: 0.05, alpha: 0.9 });

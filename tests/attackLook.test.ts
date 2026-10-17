@@ -60,4 +60,22 @@ describe('a horror\'s marks are found against any ground (round 51)', () => {
     expect(luma(lookOf('deep_one').line)).toBeGreaterThanOrEqual(LIGHT_FLOOR - 0.01);
     expect(shotLook('cthulhu').color).toEqual(lookOf('cthulhu').line); // a bolt is drawn in the light the horror's other attacks use
   });
+
+  it('two horrors of one element are tempered differently, the same each time, within bounds', () => {
+    const punches = new Set<number>();
+    for (const id of bosses) {
+      const look = lookOf(id);
+      expect(look.punch, id).toBeGreaterThanOrEqual(0.85);
+      expect(look.punch, id).toBeLessThanOrEqual(1.2);
+      expect(look.twist, id).toBeGreaterThanOrEqual(0.6);
+      expect(look.twist, id).toBeLessThanOrEqual(1.5);
+      expect(look.pitch, id).toBeGreaterThanOrEqual(0.92);
+      expect(look.pitch, id).toBeLessThanOrEqual(1.08);
+      punches.add(look.punch);
+    }
+    expect(punches.size).toBeGreaterThan(bosses.length * 0.8);
+    expect(lookOf('keziah_mason').punch).toBe(lookOf('keziah_mason').punch);
+    expect(lookOf(undefined).punch).toBe(1);
+    expect(lookOf(undefined).pitch).toBe(1);
+  });
 });

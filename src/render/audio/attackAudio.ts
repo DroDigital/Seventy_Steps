@@ -30,9 +30,9 @@ const RANGE = { bolt: 70, burst: 110, phase: 170 } as const;
 
 export function createAttackAudio(g: Game, play: Play, sampleAt: Sample): AttackAudio {
   const c = g.ecs.c;
-  const timbreOf = (id: number): { t: Timbre; key: string } => {
-    const motif = attackLook(g, id).motif;
-    return { t: TIMBRE[motif], key: motif };
+  const timbreOf = (id: number): { t: Timbre; key: string; pitch: number } => {
+    const look = attackLook(g, id);
+    return { t: TIMBRE[look.motif], key: look.motif, pitch: look.pitch }; // (each horror a little higher or lower than the next of its element)
   };
   const loose = new Map<number, number>(); // owner → frame of its last bolt sound
   let now = 0;
@@ -42,54 +42,54 @@ export function createAttackAudio(g: Game, play: Play, sampleAt: Sample): Attack
   g.events.on('BoltLoosed', ({ owner, at, fire, conjured }) => {
     if (fire || g.frame - (loose.get(owner) ?? -99) < 8) return; // a fan of bolts is one sound
     loose.set(owner, g.frame);
-    const { t, key } = timbreOf(owner);
-    play(`atk:loose:${key}`, loosed(t), { at, gain: ATTACK_MIX.loosed * (conjured ? 0.5 : 1), range: RANGE.bolt });
+    const { t, key, pitch } = timbreOf(owner);
+    play(`atk:loose:${key}`, loosed(t), { at, gain: ATTACK_MIX.loosed * (conjured ? 0.5 : 1), range: RANGE.bolt, pitch });
   });
   g.events.on('BoltLanded', ({ owner, at, on, radius, fire, conjured }) => {
     if (fire || on === 'spent') return;
-    const { t, key } = timbreOf(owner);
-    play(`atk:land:${key}`, landed(t, Math.min(1, radius / 0.9)), { at, gain: ATTACK_MIX.landed * (on === 'body' ? 0.55 : 1) * (conjured ? 0.5 : 1), range: RANGE.bolt });
+    const { t, key, pitch } = timbreOf(owner);
+    play(`atk:land:${key}`, landed(t, Math.min(1, radius / 0.9)), { at, gain: ATTACK_MIX.landed * (on === 'body' ? 0.55 : 1) * (conjured ? 0.5 : 1), range: RANGE.bolt, pitch });
   });
   g.events.on('Shot', ({ shooter, to }) => {
     if (shooter === g.player.id) return;
-    const { t, key } = timbreOf(shooter);
-    play(`atk:land:${key}`, landed(t, 0.7), { at: to, gain: ATTACK_MIX.landed, range: RANGE.bolt });
+    const { t, key, pitch } = timbreOf(shooter);
+    play(`atk:land:${key}`, landed(t, 0.7), { at: to, gain: ATTACK_MIX.landed, range: RANGE.bolt, pitch });
   });
   g.events.on('Erupted', ({ at, radius, by }) => {
-    const { t, key } = timbreOf(by);
-    play(`atk:burst:${key}`, burst(t, Math.min(1, radius / 4)), { at, gain: ATTACK_MIX.burst, range: RANGE.burst });
+    const { t, key, pitch } = timbreOf(by);
+    play(`atk:burst:${key}`, burst(t, Math.min(1, radius / 4)), { at, gain: ATTACK_MIX.burst, range: RANGE.burst, pitch });
     sampleAt('boom', at, { gain: 0.35 + 0.08 * radius, pitch: 0.75 + 0.1 * Math.random(), range: RANGE.burst });
   });
   g.events.on('Quaked', ({ at, by }) => {
-    const { t, key } = timbreOf(by);
-    play(`atk:burst:${key}`, burst(t, 0.9), { at, gain: ATTACK_MIX.burst * 0.9, range: RANGE.burst });
+    const { t, key, pitch } = timbreOf(by);
+    play(`atk:burst:${key}`, burst(t, 0.9), { at, gain: ATTACK_MIX.burst * 0.9, range: RANGE.burst, pitch });
   });
   g.events.on('Swung', ({ entity, at }) => {
     const h = moveDef(c.actor.get(entity)!)?.hit;
     if (!h || entity === g.player.id || !isThemed(creatureOf(g, entity)?.id)) return;
-    const { t, key } = timbreOf(entity);
+    const { t, key, pitch } = timbreOf(entity);
     if (h.reach < 0.05 || Math.abs(h.arc[0] - h.arc[1]) < 1) {
-      play(`atk:burst:${key}`, burst(t, Math.min(1, (h.radius + 0.4) / 4)), { at, gain: ATTACK_MIX.burst * 0.8, range: RANGE.burst });
-    } else play(`atk:swing:${key}`, swing(t, Math.min(1, h.reach / 4)), { at, gain: ATTACK_MIX.swing, range: RANGE.bolt });
+      play(`atk:burst:${key}`, burst(t, Math.min(1, (h.radius + 0.4) / 4)), { at, gain: ATTACK_MIX.burst * 0.8, range: RANGE.burst, pitch });
+    } else play(`atk:swing:${key}`, swing(t, Math.min(1, h.reach / 4)), { at, gain: ATTACK_MIX.swing, range: RANGE.bolt, pitch });
   });
   g.events.on('Summoned', ({ entity, by }) => {
     const p = c.transform.get(entity)?.pos;
     if (!p) return;
-    const { t, key } = timbreOf(by);
-    play(`atk:summon:${key}`, summon(t), { at: p, gain: ATTACK_MIX.summon, range: RANGE.burst });
+    const { t, key, pitch } = timbreOf(by);
+    play(`atk:summon:${key}`, summon(t), { at: p, gain: ATTACK_MIX.summon, range: RANGE.burst, pitch });
   });
   g.events.on('Teleported', ({ entity, from, to }) => {
-    const { t, key } = timbreOf(entity);
-    play(`atk:depart:${key}`, depart(t), { at: from, gain: ATTACK_MIX.depart, range: RANGE.bolt });
-    play(`atk:arrive:${key}`, arrive(t), { at: to, gain: ATTACK_MIX.arrive, range: RANGE.bolt });
+    const { t, key, pitch } = timbreOf(entity);
+    play(`atk:depart:${key}`, depart(t), { at: from, gain: ATTACK_MIX.depart, range: RANGE.bolt, pitch });
+    play(`atk:arrive:${key}`, arrive(t), { at: to, gain: ATTACK_MIX.arrive, range: RANGE.bolt, pitch });
   });
   g.events.on('Darkened', () => void play('atk:dark', DARKNESS, { gain: ATTACK_MIX.dark }));
   g.events.on('GazeBurst', () => void play('atk:gaze', GAZE_BURST, { gain: ATTACK_MIX.gazeBurst }));
   g.events.on('BossPhase', ({ entity, phase: n }) => {
     const p = c.transform.get(entity)?.pos;
     if (!p || n === 0) return;
-    const { t, key } = timbreOf(entity);
-    play(`atk:phase:${key}`, phase(t), { at: p, gain: ATTACK_MIX.phase, range: RANGE.phase });
+    const { t, key, pitch } = timbreOf(entity);
+    play(`atk:phase:${key}`, phase(t), { at: p, gain: ATTACK_MIX.phase, range: RANGE.phase, pitch });
   });
 
   /** One breath of a kept-up hum if `every` seconds have passed since the last of `key`. */
@@ -110,8 +110,8 @@ export function createAttackAudio(g: Game, play: Play, sampleAt: Sample): Attack
           if (gathered.get(id) !== a.move) {
             gathered.set(id, a.move ?? '');
             const p = c.transform.get(id)?.pos;
-            const { t, key } = timbreOf(id);
-            if (p) play(`atk:gather:${key}`, gather(t, GATHER / 60), { at: p, gain: ATTACK_MIX.gather, range: RANGE.bolt });
+            const { t, key, pitch } = timbreOf(id);
+            if (p) play(`atk:gather:${key}`, gather(t, GATHER / 60), { at: p, gain: ATTACK_MIX.gather, range: RANGE.bolt, pitch });
           }
         } else if (gathered.has(id) && a.frame < (rel ?? 0) - GATHER) gathered.delete(id);
         const p = c.transform.get(id)?.pos;

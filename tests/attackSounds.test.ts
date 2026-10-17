@@ -4,6 +4,7 @@ import { ATTACK_MIX, TIMBRE, arrive, burst, DARKNESS, depart, gather, GAZE_BURST
 import type { Sound } from '../src/data/sounds';
 import { AOE_MOTIFS } from '../src/render/aoeLook';
 import { createAttackAudio } from '../src/render/audio/attackAudio';
+import { lookOf } from '../src/render/attackLook';
 import { startMove } from '../src/systems/actions';
 import { bossGame, calm, engage } from './bossHelpers';
 import { steps } from './helpers';
@@ -58,9 +59,9 @@ function listen(id: string) {
   engage(b);
   calm(b);
   steps(b.g, 70); // the move the engagement began has ended
-  const plays: { key: string; at: V3 | null | undefined; gain: number }[] = [];
+  const plays: { key: string; at: V3 | null | undefined; gain: number; pitch?: number }[] = [];
   const samples: string[] = [];
-  const audio = createAttackAudio(b.g, (key, _sound, o) => (plays.push({ key, at: o?.at, gain: o?.gain ?? 1 }), true), (set) => (samples.push(set), true));
+  const audio = createAttackAudio(b.g, (key, _sound, o) => (plays.push({ key, at: o?.at, gain: o?.gain ?? 1, pitch: o?.pitch }), true), (set) => (samples.push(set), true));
   const act = b.g.ecs.c.actor.get(b.boss)!;
   const run = (frames: number): void => {
     for (let i = 0; i < frames; i++) {
@@ -99,6 +100,7 @@ describe('a horror\'s blows are heard where they happen (round 51)', () => {
     w.g.events.emit('Erupted', { at, radius: 2, by: w.boss });
     expect(w.keys('atk:burst:tide')).toHaveLength(1);
     expect(w.keys('atk:burst:tide')[0]!.at).toEqual(at);
+    expect(w.keys('atk:burst:tide')[0]!.pitch).toBeCloseTo(lookOf('cthulhu').pitch, 5); // each horror's own pitch
     expect(w.samples).toEqual(['boom']);
     w.g.events.emit('Swung', { entity: w.boss, at, yaw: 0 });
     expect(w.plays.length).toBeGreaterThanOrEqual(2);
