@@ -40,6 +40,7 @@ import type { Drones } from './drones';
 import type { AudioEngine } from './engine';
 import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
+import { createMountAudio } from './mountAudio';
 import { createVarier } from './vary';
 import { createSampler, setFiles } from './sampler';
 import { voicedCurve } from '../../core/pace';
@@ -104,6 +105,8 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) });
     return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
+  const mounts = createMountAudio(g, recipe);
+  let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
     const level = gain * (cue.gain ?? 1);
@@ -276,6 +279,8 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       recipe(`voice:${id}`, v.call, { at, range: v.range, gain, pitch, vary: 0.8 });
     },
     update(fx, seconds, camera, paused, cinematic = false) {
+      const dt = lastSeconds === null ? 0 : seconds - lastSeconds;
+      lastSeconds = seconds;
       camera.updateMatrixWorld();
       const m = camera.matrixWorld.elements;
       const len = Math.hypot(m[0], m[2]) || 1;
@@ -298,6 +303,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       dread.update(seconds, paused);
       drones.update(fx, seconds);
       if (paused) return;
+      mounts.update(dt);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
         lastBeat = HEART.beats;
         playSound(e, STINGERS.heartbeat, { gain: 0.7 + 0.5 * HEART.need });

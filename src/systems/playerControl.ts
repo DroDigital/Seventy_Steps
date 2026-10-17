@@ -15,6 +15,7 @@ import { bufferPress } from './inputBuffer';
 import { possessed } from './realityTricks';
 import { switchLock, toggleLock } from './lockOn';
 import { canAfford } from './stamina';
+import { controlMount, dismissMount, toggleMount } from './mounts';
 
 const BUFFERED = ['light', 'heavy', 'parry', 'shoot', 'reload', 'item', 'heal', 'throw'] as const;
 
@@ -28,6 +29,15 @@ export function playerControl(g: Game, real: InputFrame): void {
     Object.assign(m, { vx: 0, vz: 0, face: null });
     p.sprinting = false;
     return;
+  }
+
+  if (input.pressed.mount) toggleMount(g);
+  if (p.mount.active) {
+    if (BUFFERED.some((b) => input.pressed[b]) || input.held.block || input.pressed.lock || input.pressed.interact) dismissMount(g);
+    else {
+      controlMount(g, input);
+      return;
+    }
   }
 
   if (input.pressed.lock) toggleLock(g);

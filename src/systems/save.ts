@@ -12,6 +12,7 @@ import { ENDING_IDS } from '../data/endings';
 import { QUESTS } from '../data/quests';
 import { WARES } from '../data/wares';
 import { START_SIGN } from '../data/sites';
+import { isMount, type MountId } from '../data/mounts';
 import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
@@ -59,6 +60,7 @@ export interface SaveData {
   rounds?: number;
   gun?: number;
   cycle?: number; // the journey through the dream (NG+; round 12)
+  mount?: MountId; // preferred appearance only: active mounts and verified DLC ownership are never saved
   difficulty?: string; // chosen when the dream began (round 38; none: the default)
   named?: number; // times Hastur's name has appeared
   called?: string[]; // bosses called into the world
@@ -119,6 +121,7 @@ export function snapshot(g: Game): SaveData {
     gun: g.player.gun,
     cycle: g.player.cycle,
     difficulty: g.player.difficulty,
+    mount: g.player.mount.selected,
     named: ow.named,
     called: [...ow.called],
     watched: [...ow.watched],
@@ -165,6 +168,7 @@ export function parseSave(json: string | null): SaveData | null {
   if ((o.arms !== undefined && !isStrings(o.arms)) || (o.weapon !== undefined && typeof o.weapon !== 'string')) return null;
   if ([o.ammo, o.rounds, o.gun].some((n) => n !== undefined && !isNum(n))) return null;
   if ((o.cycle !== undefined && !isNum(o.cycle)) || (o.oil !== undefined && !isNum(o.oil)) || (o.stones !== undefined && !isNum(o.stones)) || (o.reinforced !== undefined && !isCounts(o.reinforced))) return null;
+  if (o.mount !== undefined && !isMount(o.mount)) return null;
   if (o.wounds !== undefined && (typeof o.wounds !== 'object' || o.wounds === null || !Object.values(o.wounds).every(isNum))) return null;
   return o as unknown as SaveData;
 }
@@ -176,6 +180,7 @@ export function applySave(g: Game, s: SaveData): void {
   const ow = g.overworld!;
   const c = g.ecs.c;
   const m = g.mind;
+  g.player.mount.selected = isMount(s.mount) ? s.mount : 'chariot';
   ow.sign = signPlace(s.sign) ? s.sign : START_SIGN;
   ow.discovered = new Set([...s.discovered.filter((id) => signPlace(id)), ow.sign]);
   g.player.checkpoint = { ...signPlace(ow.sign)!.rest };

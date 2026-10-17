@@ -6,7 +6,7 @@
  * given to one action is taken from any other that had it, which gets the first one's old key.
  */
 
-export const ACTIONS = ['forward', 'back', 'left', 'right', 'dodge', 'shoot', 'reload', 'lock', 'heal', 'item', 'throw', 'interact', 'map', 'journal'] as const;
+export const ACTIONS = ['forward', 'back', 'left', 'right', 'dodge', 'shoot', 'reload', 'lock', 'heal', 'item', 'throw', 'interact', 'map', 'journal', 'mount'] as const;
 export type Action = (typeof ACTIONS)[number];
 export type KeyLayout = Record<Action, string>;
 
@@ -25,6 +25,7 @@ export const DEFAULT_KEYS: Readonly<KeyLayout> = {
   interact: 'KeyE',
   map: 'KeyM',
   journal: 'KeyJ', // the journal at a key, not only in the pause menu (round 39)
+  mount: 'KeyB',
 };
 
 /** Keys no action may take: the menus' own, and Shift (the heavy blow's and the parry's modifier: "move back" on Shift made every step back a heavy blow; round 24). */

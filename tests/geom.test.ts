@@ -69,4 +69,13 @@ describe('third-person camera', () => {
     expect(rig.yaw).toBeGreaterThan(0); // toward +x = yaw π/2
     expect(rig.yaw).toBeLessThan(Math.PI / 2);
   });
+
+  it('extends the vehicle boom gradually in open space and still pulls in at a wall', () => {
+    const rig = createCameraRig(0);
+    const pivot = v3(0, 2.6, 10);
+    for (let i = 0; i < 180; i++) stepCamera(rig, { ...still, pivot, distance: 8.5 }, w, 1 / 60);
+    expect(rig.dist).toBeCloseTo(8.5);
+    stepCamera(rig, { ...still, pivot: v3(-8, 1.55, 3.5), distance: 8.5 }, w, 1 / 60);
+    expect(rig.dist).toBeLessThan(CAMERA.distance);
+  });
 });

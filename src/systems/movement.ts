@@ -11,6 +11,8 @@ import { resolveCapsule } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
 import { isAbsent, type Game } from './components';
 import { managed } from './npcLife';
+import { dismissMount, moveMounted } from './mounts';
+import { footprintClear } from './mountGround';
 
 export function movementSystem(g: Game, dt: number): void {
   const { transform, body, mover, actor, shove } = g.ecs.c;
@@ -26,6 +28,10 @@ export function movementSystem(g: Game, dt: number): void {
     const b = body.get(id);
     const a = actor.get(id);
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
+    if (id === g.player.id) {
+      if (shove.has(id)) dismissMount(g); // a wind or vortex still moves the investigator and expires normally
+      if (moveMounted(g, dt)) continue;
+    }
     const m = mover.get(id);
     const def = a && moveDef(a);
     const k = id === g.player.id ? wading : 1;
@@ -60,6 +66,8 @@ export function movementSystem(g: Game, dt: number): void {
     tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
   }
   separate(g);
+  const rider = transform.get(g.player.id)!;
+  if (g.player.mount.active && !footprintClear(g, rider.pos, rider.yaw)) dismissMount(g);
 }
 
 /** What a body weighs in a shove (round 24): by its footprint, so a colossus is not pushed about at half the pace of the man who bumps it. */

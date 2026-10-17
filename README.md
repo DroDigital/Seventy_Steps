@@ -31,10 +31,18 @@ creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 | Lock on | Q | R3 |
 | West's Reagent / Laudanum / lamp oil | R / T / G | Y / D-pad ↓ / D-pad ↑ |
 | Rest, talk, act | E | A |
+| Summon / dismiss mount | B | L3 |
 | Map / pause | M / Esc | View / Menu |
 
 Every keyboard action can be rebound under Controls. Prompts name the buttons of whichever device you
 used last.
+
+Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the spectral
+chariot. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.
+The optional $0.99 automobile appearance has the same traversal characteristics. Its Steam DLC needs
+release configuration before it can be owned: [`docs/MOUNTS.md`](docs/MOUNTS.md).
+Inspect both animated models in the read-only coach house at `?mounts`. The automobile follows a researched
+circa-1914 touring design within the requested 1890–1940 range: [`reference research`](docs/MOUNT_CAR_REFERENCES.md).
 
 ## Saves
 

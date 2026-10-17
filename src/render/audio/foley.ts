@@ -90,7 +90,7 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
     if (!tr || !a) return;
     const moved = last ? Math.hypot(tr.pos.x - last.x, tr.pos.z - last.z) : 0;
     last = { ...tr.pos };
-    if (moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id)) return (walked = 0), undefined; // a jump, a move or a fall: no stride
+    if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id)) return (walked = 0), undefined; // mounted, a jump, a move or a fall: no stride
     const speed = moved / dt;
     if (speed < 0.3) return;
     walked += moved;

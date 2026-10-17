@@ -18,6 +18,7 @@ import { fill } from './glyphs';
 import { watch } from './hintWatch';
 import { BONE, el, setStyle, setText } from './hudKit';
 import { HINTS_KEY as KEY } from './loreLine';
+import { mountUnlocked } from '../systems/mounts';
 
 const SHOW_MS = 9000; // the least a hint stays, however short
 const READ_MS = 60; // a character's worth of reading, for the long ones (they stay until the last word can be read)
@@ -97,6 +98,7 @@ export function createHints(g: Game, root: HTMLElement): Hints {
       if (g.frame - watched >= 30) { // twice a second of the game's own time (not on a frame that is a multiple of 30: a slow picture steps the game in strides that may never land on one)
         watched = g.frame;
         for (const id of watch(g)) hint(id, true);
+        if (mountUnlocked(g)) hint('mount', true);
       }
       const now = performance.now();
       if (now < until) return;

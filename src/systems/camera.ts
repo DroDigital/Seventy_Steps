@@ -18,6 +18,8 @@ export interface CameraRig {
   prevDist: number;
   pos: V3; // lens position after the last step
   recenter: number; // frames left swinging behind the player
+  mountLift: number; // eased vehicle perspective above the ordinary pivot
+  prevMountLift: number;
 }
 
 export interface CameraInput {
@@ -26,11 +28,12 @@ export interface CameraInput {
   pivot: V3;
   focus: V3 | null; // lock-on aim point
   behind: number; // the player's yaw, for recentring
+  distance?: number; // a vehicle needs a longer boom; collision still shortens it
 }
 
 export function createCameraRig(yaw: number): CameraRig {
   const { pitch, distance } = CAMERA;
-  return { yaw, pitch, dist: distance, prevYaw: yaw, prevPitch: pitch, prevDist: distance, pos: { x: 0, y: 0, z: 0 }, recenter: 0 };
+  return { yaw, pitch, dist: distance, prevYaw: yaw, prevPitch: pitch, prevDist: distance, pos: { x: 0, y: 0, z: 0 }, recenter: 0, mountLift: 0, prevMountLift: 0 };
 }
 
 /** Unit vector from the pivot toward the lens. */
@@ -78,7 +81,7 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
   }
   const base = shoulderPoint(w, inp.pivot, rig.yaw);
   const d = boomDir(rig.yaw, rig.pitch);
-  const reach = CAMERA.distance + CAMERA.margin;
+  const reach = (inp.distance ?? CAMERA.distance) + CAMERA.margin;
   const end = { x: base.x + d.x * reach, y: base.y + d.y * reach, z: base.z + d.z * reach };
   const allowed = Math.max(CAMERA.minDistance, raycast(w, base, end) * reach - CAMERA.margin);
   rig.dist = allowed < rig.dist ? allowed : Math.min(allowed, rig.dist + CAMERA.easeOut * dt);

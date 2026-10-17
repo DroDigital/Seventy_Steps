@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
-import { channel, startSteam, steamAchieve, steamBinding, steamEarly } from './steam.js';
+import { channel, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
@@ -155,6 +155,8 @@ function open() {
 ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
+// The automobile is cosmetic DLC; only Steam ownership and installation can unlock it.
+ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc());
 
 // The game's storage as files, one a key (sync, as the Web Storage API it stands in for is).
 const keyFile = (key) => join(app.getPath('userData'), 'saves', `${String(key).replace(/[^A-Za-z0-9_-]+/g, '_')}.json`);

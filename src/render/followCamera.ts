@@ -12,7 +12,7 @@ export function placeCamera(camera: PerspectiveCamera, g: Game, alpha: number): 
   const lerp = (p: number, q: number): number => p + (q - p) * alpha;
   const pivot = {
     x: lerp(tr.prev.x, tr.pos.x),
-    y: lerp(tr.prev.y, tr.pos.y) + CAMERA.pivotHeight,
+    y: lerp(tr.prev.y, tr.pos.y) + CAMERA.pivotHeight + lerp(rig.prevMountLift, rig.mountLift),
     z: lerp(tr.prev.z, tr.pos.z),
   };
   const yaw = rig.prevYaw + wrapAngle(rig.yaw - rig.prevYaw) * alpha;
