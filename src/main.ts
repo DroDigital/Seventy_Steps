@@ -31,6 +31,8 @@ import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
+import { weatherHaze } from './render/weather';
+import { createGroundFx } from './render/groundFx';
 import { createWorldLights } from './render/worldLights';
 import { createHurtFx } from './render/hurtFx';
 import { createParticles } from './render/particles';
@@ -186,13 +188,14 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const signs = createSignViews(scene, game, particles, lights);
-  const bossFx = createBossFx(scene, game, particles);
+  const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
+  const bossFx = createBossFx(scene, game, particles, ground);
   const shadows = createShadows(scene, game);
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
@@ -300,6 +303,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         sky.strange(fx.strange);
         look.apply(fx);
         applyReality(fx, game.reality);
+        weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
         life.update(camera, time, enclosed); // after the night's light: the lightning adds to it
         if (spawned) audio.update(fx, time, camera, still, cinema.active);

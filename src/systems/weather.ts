@@ -1,5 +1,6 @@
 /**
  * The weather (round 26: the sky did nothing but sit there): over each region that knows any, spells of rain,
+ * of a thunderstorm (round 52: heavy rain, a wind, lightning, and now and then a bolt on the ground: systems/skyStrikes.ts),
  * of a gale, or of the dream's own glowing motes come on, last a few minutes and pass, with clear skies between.
  * It eases in and out over seconds, so a spell is walked into and out of, and is chosen from the game's own
  * random stream (a replay sees the same sky). In rain and gale the investigator's footsteps and blows carry
@@ -10,7 +11,7 @@
 import { SIM, WEATHER } from '../data/tuning';
 import type { Game } from './components';
 
-export type WeatherKind = 'clear' | 'rain' | 'gale' | 'motes';
+export type WeatherKind = 'clear' | 'rain' | 'storm' | 'gale' | 'motes';
 
 export interface Weather {
   kind: WeatherKind; // what is blowing, or has been and is going
@@ -39,7 +40,7 @@ export function weatherSystem(g: Game, dt: number): void {
       w.until = g.frame + between(g, WEATHER.calm);
     } else {
       const total = kinds.reduce((n, [, weight]) => n + weight, 0);
-      let roll = g.rng() * total * 1.6; // the rest of the time, clear
+      let roll = g.rng() * total * WEATHER.clear; // the rest of the time, clear
       const pick = kinds.find(([, weight]) => (roll -= weight) < 0)?.[0] ?? 'clear';
       w.want = pick;
       w.until = g.frame + (pick === 'clear' ? between(g, WEATHER.calm) : between(g, WEATHER.spell));
@@ -56,5 +57,5 @@ export function weatherSystem(g: Game, dt: number): void {
 /** How much of the investigator's noise survives the weather: less in rain and in a gale, at its fullest by WEATHER.quiet. */
 export const quietOf = (g: Game): number => {
   const w = g.overworld?.weather;
-  return w && (w.kind === 'rain' || w.kind === 'gale') ? 1 - WEATHER.quiet * w.amount : 1;
+  return w && (w.kind === 'rain' || w.kind === 'storm' || w.kind === 'gale') ? 1 - WEATHER.quiet * w.amount * (w.kind === 'storm' ? 1.25 : 1) : 1;
 };

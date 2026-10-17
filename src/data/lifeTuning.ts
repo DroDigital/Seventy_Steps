@@ -48,14 +48,36 @@ export const FAUNA = {
 
 /** Lightning where storms roll (round 18: render/lightning.ts): now and then the sky flashes, and the thunder follows. */
 export const LIGHTNING = {
-  every: { dunwich: [35, 100], innsmouth: [50, 140], rlyeh: [20, 60], mountains: [70, 170] } as Readonly<Record<string, readonly [number, number]>>,
-  storm: 0.65, // rain or gale must have gathered this much before lightning rolls through it
+  every: { dunwich: [35, 100], innsmouth: [50, 140], rlyeh: [20, 60], mountains: [70, 170] } as Readonly<Record<string, readonly [number, number]>>, // the old regions' strikes in rain and gale (a thunderstorm, any region, is stormEvery)
+  stormEvery: [12, 38] as const, // seconds between flashes in a thunderstorm (round 52)
+  storm: 0.65, // rain or gale must have gathered this much before lightning rolls through it (a thunderstorm: stormGather)
+  stormGather: 0.35,
   inside: 0.35, // the share of a thunderclap that reaches through a dungeon's roof
   flash: 0.45, // seconds of flicker
   light: 1.8, // how much it lights the world (added to the moon; the ambient takes half)...
   sky: 7, // ...brightens the sky's haze...
   mist: 0.3, // ...and the mist
   delay: [0.6, 3.2] as const, // seconds before the thunder: the farther the strike, the later and quieter
+};
+
+/**
+ * A strike that falls on the ground (round 52; systems/skyStrikes.ts): now and then in a thunderstorm a spot near the investigator
+ * (sometimes near a foe) is marked by a ring of crackling light, and a bolt falls on it a moment after. It hurts whoever stands in it,
+ * the investigator and the foes alike; a body out of the ring is untouched, and a roll through the last moment's fall is as good as a
+ * step aside.
+ */
+export const SKY_STRIKE = {
+  gather: 0.6, // how much of a storm must have gathered before the ground is struck
+  first: [8, 24] as const, // seconds from a storm's gathering to its first strike
+  every: [28, 75] as const, // seconds between strikes after
+  warn: 90, // frames the ring is shown before the bolt falls (1.5 s: a walk takes a body 6 m clear)
+  radius: 3.4, // metres: the ring, and what the bolt reaches
+  near: [3, 24] as const, // metres from the investigator a strike may fall
+  hunt: 0.3, // the share of strikes that fall near a foe instead (one within `scan` metres of the investigator)
+  scan: 30,
+  player: 55, // damage to the investigator (of 160)
+  foe: [40, 0.2, 320] as const, // damage to anything else: a base, and a share of its health, to a cap
+  poise: 90, // poise damage: the bolt staggers all it strikes
 };
 
 /** The night's turn and the weather (round 26; systems/clock.ts, systems/weather.ts): the night is one long night that turns, and the weather rolls over it. */
@@ -75,26 +97,30 @@ export const DUNGEON_LIGHT = {
 export const NIGHT_DARK = { sky: 0.24, mist: 0.28, far: 0.3, ambient: 0.2, moon: 0.28 };
 
 export const WEATHER = {
-  calm: [150, 420] as const, // seconds of clear skies between spells
-  spell: [110, 300] as const, // seconds a spell of rain or gale lasts
+  calm: [60, 220] as const, // seconds of clear skies between spells (round 52: they were 150 to 420: a test of two hours saw no storm)
+  spell: [110, 290] as const, // seconds a spell of rain, a thunderstorm or a gale lasts
   ease: 12, // seconds for a spell to come on or pass
-  // The kinds each region knows, by weight (the rest of the time it is clear): rain, a gale, the motes of the dream.
+  clear: 1.3, // the odds of clear skies against all the region's weather together: another calm follows a calm 1 time in 4 (it was 1 in 2.6)
+  // The kinds each region knows, by weight (the rest of the time it is clear): rain, a thunderstorm, a gale, the motes of the dream.
   regions: {
-    arkham: { rain: 3, gale: 1 },
-    dunwich: { rain: 2, gale: 2 },
-    innsmouth: { rain: 3, gale: 2 },
-    providence: { rain: 3 },
-    vermont: { rain: 2, gale: 2 },
-    mountains: { gale: 4 },
-    pnakotus: { gale: 3 },
-    rlyeh: { rain: 3, gale: 1 },
+    hub: { rain: 3, storm: 2, gale: 1 },
+    arkham: { rain: 3, storm: 3, gale: 1 },
+    dunwich: { rain: 2, storm: 3, gale: 2 },
+    innsmouth: { rain: 3, storm: 3, gale: 2 },
+    providence: { rain: 3, storm: 2, gale: 1 },
+    vermont: { rain: 2, storm: 2, gale: 2 },
+    mountains: { gale: 4, storm: 1 },
+    pnakotus: { gale: 3, storm: 1 },
+    rlyeh: { rain: 3, storm: 4, gale: 1 },
     dreamlands: { motes: 3 },
     yuggoth: { motes: 2 },
-  } as Readonly<Record<string, Readonly<Partial<Record<'rain' | 'gale' | 'motes', number>>>>>,
+  } as Readonly<Record<string, Readonly<Partial<Record<'rain' | 'storm' | 'gale' | 'motes', number>>>>>,
   quiet: 0.35, // how much of the investigator's noise is lost in it (a rain hushes footsteps; a gale takes them): at its fullest
-  rain: 420, // streaks of rain about the lens at its fullest
+  rain: 420, // streaks of rain about the lens at its fullest (a thunderstorm: rainStorm)
+  rainStorm: 680,
   soak: 0.3, // per second, how fast the ground takes the wet of a rain falling (render/weather.ts; round 34)...
   dry: 0.04, // ...and how slowly it dries once it has passed: puddles are gone in about a minute
+  haze: { rain: 0.32, storm: 0.5, gale: 0.12 } as Readonly<Record<string, number>>, // how much of the fog's reach a spell takes at its fullest: the rain closes the world in
 };
 
 /** What the people say to themselves as the investigator passes (round 34; data/overheard.ts, systems/overheard.ts). */
