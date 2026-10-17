@@ -108,6 +108,8 @@ export const FR: Readonly<Record<Key, string>> = {
   'ctl.interact': "Se reposer, parler, agir",
   'ctl.map': "Carte",
   'ctl.journal': "Journal",
+  'ctl.mount': 'Appeler / renvoyer la monture',
+  'hint.mount': 'Les Rênes empruntées répondent à {mount} : appelez ou renvoyez votre monture sur un terrain sec et dégagé. Maintenez {dodge} pour galoper en dépensant de l’endurance. Agir ou subir un coup la renvoie. Choisissez son apparence dans Montures à un Signe des Anciens ; les deux se conduisent de façon identique.',
   'ctl.stick': "stick gauche",
   'ctl.fixed.attack': "Attaque légère / lourde",
   'ctl.fixed.block': "Garde / parade",

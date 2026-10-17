@@ -35,6 +35,8 @@ import { createHints } from './hints';
 import { createMindHud } from './mindHud';
 import { createMinimap } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
+import { MOUNTS } from '../data/mounts';
+import { mountUnlocked } from '../systems/mounts';
 
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
 const NOTICE_MS = 1100;
@@ -132,6 +134,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
+  g.events.on('Notice', ({ text }) => say(text));
   g.events.on('Overheard', (e) => {
     const band = el(`display:inline;${CAPTION_BAND}`); // (the band, where asked for, follows each wrapped line)
     heard.replaceChildren(band);
@@ -181,7 +184,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const near = interactable(g);
       const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
-      setText(prompt, act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
+      const mounted = g.player.mount.active;
+      setText(prompt, mounted ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss` : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : mountUnlocked(g) ? `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);

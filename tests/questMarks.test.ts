@@ -3,13 +3,13 @@ import { DEFAULT_KEYS, ACTIONS } from '../src/core/bindings';
 import { INTRO, introText } from '../src/data/intro';
 import { createWorldGame } from '../src/systems/game';
 import { questMarks } from '../src/systems/questMarks';
-import { startQuest } from '../src/systems/quests';
+import { talk } from '../src/systems/npcs';
 
 describe('who has something for the investigator', () => {
-  it('the first of the main line asks, and then the one the quest waits on answers', () => {
+  it('the first talk answers the carriage errand and begins the main line, whose next person answers', () => {
     const g = createWorldGame();
-    expect(questMarks(g).get('peaslee')).toBe('ask');
-    startQuest(g, 'sleepers');
+    expect(questMarks(g).get('peaslee')).toBe('answer');
+    talk(g, 'peaslee');
     const marks = questMarks(g);
     expect(marks.get('gilman')).toBe('answer');
     expect(marks.get('peaslee')).toBeUndefined();

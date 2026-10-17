@@ -11,7 +11,7 @@ import { deviceInUse } from '../core/device';
 import { padFamily, type PadFamily } from '../core/padFamily';
 import { padInHand } from '../core/pads';
 
-export type Act = 'move' | 'look' | 'light' | 'heavy' | 'block' | 'parry' | 'dodge' | 'shoot' | 'reload' | 'lock' | 'heal' | 'item' | 'throw' | 'interact' | 'map' | 'journal' | 'pause' | 'back';
+export type Act = 'move' | 'look' | 'light' | 'heavy' | 'block' | 'parry' | 'dodge' | 'shoot' | 'reload' | 'lock' | 'heal' | 'item' | 'throw' | 'interact' | 'map' | 'journal' | 'mount' | 'pause' | 'back';
 
 const PAD: Readonly<Record<Act, string>> = {
   move: 'the left stick',
@@ -28,6 +28,7 @@ const PAD: Readonly<Record<Act, string>> = {
   item: 'D-pad ↓',
   throw: 'D-pad ↑',
   interact: 'A',
+  mount: 'L3',
   map: 'View',
   journal: 'Menu', // the pad has no button to spare: the pause menu holds it
   pause: 'Menu',

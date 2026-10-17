@@ -13,6 +13,7 @@ export interface Desktop {
   writeLog?(report: string): Promise<string | null>; // a crash report kept in the logs folder (round 46); its path
   openLogs?(): Promise<void>; // the logs folder, shown
   achieve?(id: string): Promise<boolean>; // an achievement earned, for Steam's (round 12)
+  ownsAutomobileDlc?(): Promise<boolean>; // current Steam ownership + installation of the cosmetic automobile; absent on web
 }
 
 export const desktop: Desktop | undefined = (globalThis as { desktop?: Desktop }).desktop;

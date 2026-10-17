@@ -26,6 +26,7 @@ import { laudanumMax } from './levels';
 import { setLock } from './lockOn';
 import { reopen } from './overworld';
 import { setSanity } from './sanity';
+import { dismissMount } from './mounts';
 
 export const signPlace = (id: string): SignPlace | undefined => worldLayout().signs.find((s) => s.id === id);
 export const gatePlace = (id: string): GatePlace | undefined => worldLayout().gates.find((g) => g.id === id);
@@ -49,6 +50,7 @@ export function furnishWorld(g: Game): void {
 
 /** Moves the investigator to `at` (no healing), the camera behind them. */
 export function teleport(g: Game, at: Place): void {
+  dismissMount(g);
   const tr = g.ecs.c.transform.get(g.player.id)!;
   tr.pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };
   tr.prev = { ...tr.pos };
@@ -57,7 +59,7 @@ export function teleport(g: Game, at: Place): void {
   setLock(g, null);
   g.player.listening = null;
   g.player.kneeling = null;
-  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
+  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch, mountLift: 0, prevMountLift: 0, dist: CAMERA.distance, prevDist: CAMERA.distance });
 }
 
 /** Marks a sign found; true the first time. */

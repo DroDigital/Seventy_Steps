@@ -26,6 +26,7 @@ import { createPoseBlend, type PoseBlend } from './poseBlend';
 import { pose } from './poses';
 import { createWorldMaterial } from './worldMaterial';
 import { FEEL } from './feel';
+import { createMountViews } from './mountViews';
 
 interface View {
   figure: Figure;
@@ -62,6 +63,7 @@ function dispose(f: Figure): void {
 
 export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
   const views = new Map<Entity, View>();
+  const mounts = createMountViews(scene, g);
   const simTime = (): number => g.frame / SIM.hz;
   const tracer = new THREE.Mesh(
     box(0.07, 0.07, 1, 0, 0, 0.5, BASE.bone),
@@ -145,7 +147,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const a = g.ecs.c.actor.get(id);
     const lerp = (p: number, q: number): number => p + (q - p) * alpha;
     f.root.position.set(lerp(tr.prev.x, tr.pos.x), lerp(tr.prev.y, tr.pos.y), lerp(tr.prev.z, tr.pos.z));
-    f.root.rotation.y = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
+    f.root.rotation.set(0, tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha, 0);
     if (a && a.hitstop > 0) {
       f.root.position.x += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
       f.root.position.z += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
@@ -195,6 +197,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       f.gun.visible = drawn;
       if (f.holstered) f.holstered.visible = !drawn;
     }
+    if (id === g.player.id) mounts.place(f, time, dt);
     const flash = id === g.player.id ? 0 : FEEDBACK.flashLevel * Math.max(0, 1 - since / FEEDBACK.flashSeconds); // the investigator never blinks (hurtFx.ts)
     for (const m of f.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
     if (f.rig === 'echo') glow = glowAt.set(f.root.position.x, f.root.position.y + FEEDBACK.echoGlowHeight, f.root.position.z);

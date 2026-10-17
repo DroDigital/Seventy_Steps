@@ -34,6 +34,16 @@ import { SEALS } from './tuning';
 import type { WeaponId } from './weapons';
 
 export const QUESTS: Readonly<Record<string, QuestDef>> = {
+  borrowed_reins: {
+    title: 'The Borrowed Reins',
+    auto: true,
+    stages: [
+      { goal: { kind: 'talk', npc: 'peaslee' }, note: 'Speak with Wingate Peaslee on the Miskatonic Quad about the carriage that waits in the mist.' },
+      { goal: { kind: 'reach', sign: 'hub_dream' }, note: 'Find the Sleeper’s Sign, southwest across the university grounds. The borrowed reins wait there; no horror need fall to claim them.' },
+    ],
+    done: 'The borrowed reins answer my call on dry open ground. The spectral chariot is mine. An optional motor car appearance follows the same roads, at the same speed.',
+    reward: {},
+  },
   sleepers: {
     title: 'The Sleepers',
     main: true,

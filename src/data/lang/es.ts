@@ -108,6 +108,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'ctl.interact': "Descansar, hablar, actuar",
   'ctl.map': "Mapa",
   'ctl.journal': "Diario",
+  'ctl.mount': 'Invocar / despedir montura',
+  'hint.mount': 'Las Riendas prestadas responden a {mount}: invoca o despide tu montura en terreno seco y despejado. Mantén {dodge} para galopar, gastando resistencia. Actuar o recibir un golpe la despide. Elige su apariencia en Monturas, en un Signo Arcano; ambas se manejan igual.',
   'ctl.stick': "stick izquierdo",
   'ctl.fixed.attack': "Ataque ligero / pesado",
   'ctl.fixed.block': "Bloquear / parar",

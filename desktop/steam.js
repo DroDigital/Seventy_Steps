@@ -20,6 +20,14 @@ export function steamAppId(env = process.env, pkg = readPkg()) {
   return Number.isInteger(id) && id > 0 ? id : undefined;
 }
 
+/** The optional cosmetic automobile's DLC id. Unconfigured or invalid ids never grant access. */
+export function automobileDlcAppId(env = process.env, pkg = readPkg()) {
+  const raw = env.STEAM_AUTOMOBILE_DLC_APP_ID ?? pkg?.steam?.automobileDlcAppId ?? 0;
+  if (typeof raw !== 'number' && (typeof raw !== 'string' || !/^\d+$/.test(raw))) return undefined;
+  const id = Number(raw);
+  return Number.isSafeInteger(id) && id > 0 && id <= 0xffffffff && id !== steamAppId(env, pkg) ? id : undefined;
+}
+
 function readPkg() {
   try {
     return JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -81,6 +89,21 @@ export function steamAchieve(id) {
     return client.achievement.isActivated(id) || client.achievement.activate(id);
   } catch {
     return false;
+  }
+}
+
+/**
+ * Read Steam's current ownership and installation state; nothing in a save can unlock paid content.
+ * Rechecked on every call so installing/removing the DLC during a session takes effect on refresh.
+ * Arguments allow a binding-free test; the IPC handler always calls this with the real client/config.
+ */
+export function steamOwnsAutomobileDlc(dlcClient = client, env = process.env, pkg = readPkg()) {
+  const id = automobileDlcAppId(env, pkg);
+  if (channel(pkg) !== 'steam' || !dlcClient || !id) return false;
+  try {
+    return dlcClient.apps.isSubscribedApp(id) === true && dlcClient.apps.isDlcInstalled(id) === true;
+  } catch {
+    return false; // Steam unavailable, an older binding, or a failed entitlement check
   }
 }
 

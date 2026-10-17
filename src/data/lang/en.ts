@@ -116,6 +116,8 @@ export const EN = {
   'ctl.interact': 'Rest, talk, act',
   'ctl.map': 'Map',
   'ctl.journal': 'Journal',
+  'ctl.mount': 'Summon / dismiss mount',
+  'hint.mount': 'The Borrowed Reins answer {mount}: summon or dismiss your mount on clear, dry open ground. Hold {dodge} to gallop, using stamina. Acting or taking a hit dismisses it. Choose an appearance under Mounts at an Elder Sign; both ride identically.',
   'ctl.stick': 'left stick',
   'ctl.fixed.attack': 'Light / heavy attack',
   'ctl.fixed.block': 'Block / parry',
