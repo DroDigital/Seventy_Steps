@@ -7,7 +7,8 @@
  * going dark; the death comes at the foot of the drop (round 54: it had been instant, the moment a hand's
  * breadth of the body touched the void). The shore and the world's rim are edges too (round 55: walking into
  * the sea, or off the land's end, had stayed the instant death): the same balance on the last of the ground, and
- * the same fall once none is left. The Lost Echoes stay at the last safe feet, on the ground there, so the drop is not left in the
+ * the same fall once none is left. Past the end of a region the ground goes on, down a slope to the sea, and is
+ * walked down: it is the water that ends it, not the border. The Lost Echoes stay at the last safe feet, on the ground there, so the drop is not left in the
  * void. Foes, mounts' walls and the arena ring are unchanged: those colliders still push. A cutscene and
  * a death already playing do not fall again.
  */
@@ -56,9 +57,13 @@ function inFall(w: CollisionWorld, pos: V3, r: number, h: number): boolean {
 
 const RING = Array.from({ length: 8 }, (_, k) => [Math.cos((k * Math.PI) / 4), Math.sin((k * Math.PI) / 4)] as const);
 
-/** Whether a point is on a region's ground above the sea (outside a dungeon): else the land has ended. */
+/**
+ * Whether a point is on ground above the sea (or a dungeon's floor): else the land has ended. The ground does not end at a region's border: it goes on
+ * past it and sinks to the sea floor over `WORLD.coast` metres, a slope that is drawn and that feet follow (round 55: the land was taken to end at the border,
+ * and the body fell through that slope a few steps before the water, instead of going down it into the sea).
+ */
 function onLand(pos: V3): boolean {
-  return !!regionAt(pos.x, pos.z) && (inDungeon(pos.x, pos.z) || pos.y > SEA);
+  return inDungeon(pos.x, pos.z) || pos.y > SEA;
 }
 
 /** One foot's hold: on the land and clear of a drop. (A point beside the body stands on the ground there, not at the body's height.) */
