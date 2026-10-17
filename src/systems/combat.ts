@@ -54,19 +54,26 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
   const f = d.actor.frame;
   if (inWindow(def?.iframes, f)) return { outcome: 'dodged', damage: 0 };
   if (blow.parryable && frontal && inWindow(def?.parry, f)) return { outcome: 'parried', damage: 0 };
+  let damage = blow.damage;
+  let broken = false;
   if (frontal && d.actor.guard && !blow.unblockable) {
-    if (!d.stamina || !absorb(d.stamina, blow.guard * STAMINA.guardCost)) return { outcome: 'blocked', damage: 0 };
+    const cost = blow.guard * STAMINA.guardCost;
+    const available = d.stamina?.value ?? 0;
+    if (!d.stamina || !absorb(d.stamina, cost)) return { outcome: 'blocked', damage: 0 };
     startMove(d.actor, 'guardBreak');
-    return { outcome: 'guardBreak', damage: 0 };
+    broken = true;
+    // Only the funded share is absorbed: a nearly empty bar cannot erase a whole boss blow.
+    damage *= cost > 0 ? Math.max(0, 1 - available / cost) : 1;
   }
   const riposte = d.actor.move === 'parried' || !!blow.critical;
-  const damage = blow.damage * (riposte ? COMBAT.riposte : 1);
+  damage *= riposte ? COMBAT.riposte : 1;
   d.health.hp = Math.max(d.health.immortal ? 1 : d.health.floor ?? 0, d.health.hp - damage);
   d.health.calm = 0;
   if (d.health.hp <= 0) {
     startMove(d.actor, 'death');
     return { outcome: 'kill', damage };
   }
+  if (broken) return { outcome: 'guardBreak', damage }; // keep the break's full opening, even for a blow that would stagger
   if (riposte) {
     startMove(d.actor, 'stagger');
     return { outcome: 'riposte', damage };

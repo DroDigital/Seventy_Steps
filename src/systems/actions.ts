@@ -1,8 +1,8 @@
 /**
  * Action state machine for every combatant (spec §3B): move frames, hitstop, combo chains, and the
  * player's buffered action, consumed at the end of recovery or at a cancel window. Raising the guard
- * (block pressed, or a parry) calls off the investigator's attack while it winds up or recovers,
- * though not while the blow is landing; a blow struck with the guard already up plays out. Moving
+ * (block pressed, or a parry) calls off the investigator's attack while it winds up, or once its
+ * recovery reaches the cancel frame; a blow struck with the guard already up plays out. Moving
  * walks the investigator out of a move's late recovery (its `release` frame: a dodge, a blow, a
  * swallow), and a move that must `rest` cannot be chained into itself (the backstep). A dodge may cut
  * a blow short soon after it lands; without a lock a blow or a shot turns to a foe just off its line
@@ -92,11 +92,11 @@ export function comboMove(a: Actor, button: 'light' | 'heavy'): string {
   return next ?? `${button}1`; // chains start at light1 / heavy1
 }
 
-/** Whether the guard may cut the move short now: an attack (a blow or a shot) winding up or recovering, not while it lands. */
+/** Guard and parry can cancel a wind-up, but a committed blow or shot must reach its recovery cancel frame. */
 export function guardCancels(a: Actor): boolean {
   const def = moveDef(a);
-  if (def?.hit) return a.frame < def.hit.window[0] || a.frame >= def.hit.window[1];
-  if (def?.shot) return a.frame !== def.shot.frame;
+  if (def?.hit) return a.frame < def.hit.window[0] || (a.frame >= def.hit.window[1] && a.frame >= (def.cancel ?? def.frames));
+  if (def?.shot) return a.frame < def.shot.frame || (a.frame > def.shot.frame && a.frame >= (def.cancel ?? def.frames));
   return false;
 }
 

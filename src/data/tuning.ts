@@ -114,8 +114,9 @@ export const PLAYER = {
 export const STAMINA = {
   regen: 32, // per second at the start; Endurance adds to it, but a new investigator can recover between boss attacks
   regenDelay: 48, // frames after actions: outlasts a full roll, so repeated dodges cannot refund their next attempt
-  guardDelay: 24, // frames after a blocked hit: defending recovers in 0.4 seconds, with room to counter
+  guardDelay: 24, // minimum frames after a blocked hit; a longer action delay still applies, and a broken guard cannot recover
   guardCost: 0.5, // share of a blocked blow's guard damage paid in stamina: a single wave leaves room to dodge and counter
+  guardRegen: 0.35, // recover at the pre-round-48 share while guarding; lower the guard to recover fully
   sprintDelay: 18, // frames of no regen once a sprint ends (round 48: the run's own drain is its cost, and the action's 48 left one who ran to the foe with an empty bar waiting nearly a second)
   sprintDrain: 14, // per second: repositioning leaves more of the bar for the fight
 };
