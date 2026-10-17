@@ -34,6 +34,7 @@ export function weatherSystem(g: Game, dt: number): void {
   if (!w) return;
   const kinds = kindsOf(g.overworld!.region);
   if (w.want !== 'clear' && !kinds.some(([k]) => k === w.want)) w.want = 'clear'; // out of the region that had it
+  if (w.until === 0) w.until = g.frame + between(g, WEATHER.first); // a new game, or a load: clear skies first (the weather is not kept in a save)
   if (g.frame >= w.until) {
     if (w.want !== 'clear' || !kinds.length) {
       w.want = 'clear';

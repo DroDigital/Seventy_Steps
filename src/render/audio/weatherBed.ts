@@ -1,6 +1,6 @@
 /**
- * The weather heard (round 26; made fuller in round 52): rain as three layers, the hiss of it far off, the body of it on the ground and the
- * patter of the near drops (two slow waves on its level make it fall in grains, not in a wash); a gale as a low rush that swells and falls in
+ * The weather heard (round 26; made fuller in round 52, softer in round 53): rain as a soft wash with the drops on it, light ones in a light rain
+ * and a crowd of them in a downpour (render/audio/rainTexture.ts: it was bands of white noise, which is static to the ear); a gale as a low rush that swells and falls in
  * gusts with a howl in it that wanders in pitch; a thunderstorm as heavy rain with a wind behind it; the dream's motes as nothing (they are
  * silent). Made of the audio engine's own context, in the bed (so the ambience setting governs it, and a horror's hush takes it too); under a
  * roof the whole bed is closed behind a low-pass, a dull patter on the tiles, not the rain itself.
@@ -8,6 +8,7 @@
 
 import type { WeatherKind } from '../../systems/weather';
 import type { AudioEngine } from './engine';
+import { dropTexture, washTexture, type Texture } from './rainTexture';
 
 export interface WeatherBed {
   /** `kind` and how much of it (0..1), each frame; `inside`: under a roof. */
@@ -15,8 +16,9 @@ export interface WeatherBed {
 }
 
 export interface WeatherLevels {
-  rain: number; // the hiss and the body of the rain
-  patter: number; // its near drops
+  rain: number; // the wash of the rain
+  patter: number; // its drops
+  shower: number; // the crowd of drops in a downpour
   gale: number; // the low rush of the wind
   howl: number; // the wind's thin voice
   cutoff: number; // Hz: the bed's low-pass (wide open in the air, closed under a roof)
@@ -31,11 +33,17 @@ export function levelsOf(kind: WeatherKind, amount: number, inside: boolean): We
   return {
     rain: wet * (inside ? 0.33 : 1),
     patter: wet * (inside ? 0.7 : 0.85),
+    shower: wet > 0.4 ? ((wet - 0.4) / 0.6) * (inside ? 0.6 : 0.9) : 0, // the heavier the rain, the more drops fall on each other
     gale: wind * (inside ? 0.2 : 1),
     howl: howl * (inside ? 0.12 : 1),
     cutoff: inside ? 720 : 18000,
   };
 }
+
+/** How loud each rain layer is at its fullest, against the bed's other sounds (tests/rainTexture.test.ts holds the whole of it to a few decibels). */
+export const WASH = 0.17;
+export const DROPS = 0.17;
+export const SHOWER = 0.13;
 
 export function createWeatherBed(e: AudioEngine): WeatherBed {
   let apply: ((l: WeatherLevels) => void) | null = null;
@@ -78,16 +86,23 @@ export function createWeatherBed(e: AudioEngine): WeatherBed {
       return o;
     };
 
-    // Rain: the far hiss, the body on the ground, the near drops in grains.
-    const hiss = gain();
-    source().connect(filter('bandpass', 3200, 0.4)).connect(hiss).connect(roof);
-    const body = gain();
-    source().connect(filter('lowpass', 900, 0.5)).connect(body).connect(roof);
-    const patter = gain();
-    const grains = gain(0.6); // two waves that never agree, on the level of the drops: they come in handfuls
-    wave(6.7, 0.28, grains.gain);
-    wave(10.9, 0.22, grains.gain);
-    source().connect(filter('highpass', 1700, 0.7)).connect(filter('bandpass', 4300, 1.1)).connect(grains).connect(patter).connect(roof);
+    // Rain: a soft wash, and the drops on it, from loops that close on themselves (round 53).
+    const loop = (t: Texture): AudioBufferSourceNode => {
+      const b = ctx.createBuffer(2, t.left.length, ctx.sampleRate);
+      b.copyToChannel(t.left, 0);
+      b.copyToChannel(t.right, 1);
+      const src = ctx.createBufferSource();
+      src.buffer = b;
+      src.loop = true;
+      src.start(0, Math.random() * b.duration);
+      return src;
+    };
+    const wash = gain();
+    loop(washTexture(ctx.sampleRate, 7, 1)).connect(wash).connect(roof);
+    const drops = gain();
+    loop(dropTexture(ctx.sampleRate, 9, 11, 1)).connect(drops).connect(roof);
+    const shower = gain();
+    loop(dropTexture(ctx.sampleRate, 11, 34, 2)).connect(shower).connect(roof);
 
     // Wind: the rush, in gusts, and the howl that wanders.
     const rushed = gain();
@@ -111,9 +126,9 @@ export function createWeatherBed(e: AudioEngine): WeatherBed {
     apply = (l) => {
       const at = ctx.currentTime;
       const to = (p: AudioParam, v: number, tau = 1.2): void => void p.setTargetAtTime(v, at, tau);
-      to(hiss.gain, l.rain * 0.12);
-      to(body.gain, l.rain * 0.1);
-      to(patter.gain, l.patter * 0.075);
+      to(wash.gain, l.rain * WASH);
+      to(drops.gain, l.patter * DROPS);
+      to(shower.gain, l.shower * SHOWER);
       to(rushed.gain, l.gale * 0.3);
       to(howl.gain, l.howl * 0.1);
       to(roof.frequency, l.cutoff, 0.5);

@@ -185,6 +185,129 @@ describe('a key that was heard to repeat, and then goes silent', () => {
   });
 });
 
+describe('a run that goes on through a sprint, a roll and a blink of the window (round 53: it stopped dead, and no one knew why)', () => {
+  /** The system repeats only the key pressed last: W is held and silent from the moment Space goes down. */
+  it('W held, then Space for the sprint: W is still down, ten seconds into the run', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    t.mockReturnValue(600);
+    pg.key('keydown', 'KeyW', { repeat: true });
+    t.mockReturnValue(1200);
+    pg.key('keydown', 'Space'); // the sprint: from here the system repeats Space, and W says nothing
+    for (let at = 1700; at <= 12000; at += 33) {
+      t.mockReturnValue(at);
+      if (at % 990 < 33) pg.key('keydown', 'Space', { repeat: true });
+      pg.poll();
+    }
+    const f = pg.poll();
+    expect(f.moveY).toBe(1); // before: W was let go at 4.1 seconds, and the investigator stood sprinting nowhere
+    expect(f.held.dodge).toBe(true);
+    t.mockRestore();
+  });
+
+  it('and when the sprint is let go, W, which the system no longer repeats, is still held', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    t.mockReturnValue(600);
+    pg.key('keydown', 'KeyW', { repeat: true });
+    t.mockReturnValue(1000);
+    pg.key('keydown', 'Space');
+    t.mockReturnValue(1300);
+    pg.key('keyup', 'Space'); // a roll
+    t.mockReturnValue(15000);
+    expect(pg.poll().moveY).toBe(1);
+    pg.key('keyup', 'KeyW');
+    expect(pg.poll().moveY).toBe(0); // and a release that is heard is a release
+    t.mockRestore();
+  });
+
+  it('a key that repeats on alone and then falls silent, with no other key pressed since, is still let go', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    t.mockReturnValue(600);
+    pg.key('keydown', 'KeyW', { repeat: true });
+    t.mockReturnValue(600 + 4000);
+    expect(pg.poll().moveY).toBe(0);
+    t.mockRestore();
+  });
+
+  it('a window left and returned to within a blink does not let go of the run or the sprint', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    pg.key('keydown', 'Space');
+    pg.mouse('mousedown', { button: 2, buttons: 2 });
+    pg.poll();
+    t.mockReturnValue(1000);
+    pg.win('blur');
+    expect(pg.poll().moveY).toBe(0); // away: nothing is held
+    t.mockReturnValue(1120);
+    pg.win('focus');
+    const f = pg.poll();
+    expect(f.moveY).toBe(1); // before: the run was gone, and the system repeats only the last key to bring one back
+    expect(f.held.dodge).toBe(true);
+    expect(f.held.block).toBe(true);
+    expect(f.pressed.dodge).toBe(false); // a sprint carried on, not begun again
+    t.mockRestore();
+  });
+
+  it('a window left for longer holds nothing on its return, and a hidden page the same', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    pg.key('keydown', 'Space');
+    pg.poll();
+    t.mockReturnValue(1000);
+    pg.win('blur');
+    t.mockReturnValue(3000);
+    pg.win('focus');
+    const f = pg.poll();
+    expect([f.moveX, f.moveY]).toEqual([0, 0]);
+    expect(f.held.dodge).toBe(false);
+    t.mockRestore();
+  });
+
+  it('pausing (reset) while away forgets what was held: nothing comes back after a menu', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    pg.poll();
+    t.mockReturnValue(1000);
+    pg.win('blur');
+    pg.input.reset();
+    t.mockReturnValue(1100);
+    pg.win('focus');
+    expect(pg.poll().moveY).toBe(0);
+    t.mockRestore();
+  });
+
+  it('on a pad, a stick held forward and the sprint button held for ten seconds stay as they are', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.pad = { axes: [0, 0, 0, 0], down: [] };
+    pg.poll();
+    for (const at of [100, 2500, 5000, 7500, 10000]) {
+      t.mockReturnValue(at);
+      pg.pad = { axes: [0, -0.3, 0, 0], down: [1] }; // a light push (under what is taken for a stick at rest) and B (the dodge) held
+      pg.poll();
+    }
+    const f = pg.poll();
+    expect(f.moveY).toBeCloseTo(0.3, 1); // before: taken for drift after four seconds, and the sprint went nowhere
+    expect(f.held.dodge).toBe(true);
+    t.mockRestore();
+  });
+});
+
 describe('a pad whose stick has drifted', () => {
   it('walks the investigator on alone only for a while: a stick that lies still off centre is at rest there', async () => {
     const t = vi.spyOn(performance, 'now');

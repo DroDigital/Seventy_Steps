@@ -3,6 +3,12 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## After 1.0.0-rc.2 (not yet released)
+
+- **The run no longer stops by itself.** Sprinting on foot or galloping on a mount, the character sometimes stood still with the keys held, and no one could say why. (The sprint itself ends at an empty stamina bar, about seven seconds from a full one; that is as it was.) Two causes, both in how the keyboard was read. Holding W and then Space for the sprint, the system repeats only the key pressed last, so W fell silent, and after three and a half seconds the game took it for released. And a blink of the window (a notification, an overlay, focus taken and given back) let go of every key, and only the last pressed came back on its own repeat. Both are mended; a key whose release was truly lost is still let go. On a controller, the correction for a stick that has drifted could take a stick held steady through a sprint for one at rest; it does not while a button is held.
+- **Rain is quieter and softer.** It was bands of white noise, which is static to the ear and fought the crickets and the wind. It is a soft wash with drops on it now: a few light ones in a drizzle, a crowd of them in a downpour, a heavy one now and then, and what a roof lets through is the low ones. Heard against the rest of the night it sits at the level of the ambience, a few decibels under what it was.
+- **It rains less often.** In the last update it rained or stormed about 45% of the time, a spell every five minutes, and a game could open in the middle of one. It is about a fifth of the time now: a spell every quarter of an hour or so, a thunderstorm every half hour to an hour (more in the sea and the drowned city, fewer in the hills and none on the mountains), clear skies between, and a game or a load opens on clear skies with the first spell some minutes in.
+
 ## 1.0.0-rc.2: since the release candidate
 
 Everything between the release candidate and this build: mounts you can hear and ride like a horse, a thunderstorm that can strike the ground,
