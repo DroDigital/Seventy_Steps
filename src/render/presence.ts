@@ -71,6 +71,7 @@ export function createPresence(g: Game, particles: Particles, audio: GameAudio):
     const h = moveDef(g.ecs.c.actor.get(entity)!)?.hit;
     if (h && entity !== g.player.id && isThemed(creatureOf(g, entity)?.id) && (h.reach < 0.05 || Math.abs(h.arc[0] - h.arc[1]) < 1)) felt(p, 0.07 + 0.02 * h.radius, 12 + 2 * h.radius); // a slam or a ring: the ground answers
   });
+  g.events.on('StrikeLanded', ({ at: p }) => felt(p, 0.24, 55)); // a bolt on the ground shakes it
   g.events.on('GazeBurst', () => void ([jolted, at] = [Math.max(jolted, 0.1), clock])); // the look strikes the head
   g.events.on('Foreboding', ({ shake }) => void ([jolted, at] = [Math.max(jolted, shake), clock])); // the ground answers, far off
   g.events.on('Quaked', ({ by }) => void (g.ecs.c.transform.has(by) && land(by, clock, 0.3)));

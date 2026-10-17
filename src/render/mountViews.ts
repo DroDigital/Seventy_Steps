@@ -1,6 +1,7 @@
 /** Keeps the active mount aligned with the interpolated investigator and seats the driver. */
 import * as THREE from 'three';
 import { wrapAngle } from '../core/geom';
+import { MOUNT_TURNING } from '../data/mounts';
 import { SIM } from '../data/tuning';
 import type { Game } from '../systems/components';
 import type { Figure } from './figures';
@@ -44,11 +45,13 @@ export function createMountViews(scene: THREE.Scene, g: Game): { place(f: Figure
       current.root.visible = shown > 0;
       if (!current.root.visible) return;
       const tr = g.ecs.c.transform.get(g.player.id)!;
-      const turn = Math.max(-1, Math.min(1, wrapAngle(tr.yaw - tr.prevYaw) * SIM.hz / 1.8));
+      const rate = id ? g.player.mount.yawRate : wrapAngle(tr.yaw - tr.prevYaw) * SIM.hz; // the turn the rig is in, in rad/s
+      const turn = Math.max(-1, Math.min(1, rate / 1.1));
+      const bend = id ? Math.max(-0.32, Math.min(0.32, rate * MOUNT_TURNING[id].lead)) : 0; // a horse leads a turn, the carriage comes after
       const [rx, ry, rz, yaw] = [current.root.position.x, current.root.position.y, current.root.position.z, current.root.rotation.y];
       const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
       const speed = id ? Math.min(22, Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz) : 0;
-      current.update({ time, dt, speed, turn, cycle: g.player.mount.phase, ground: (x, z) => Math.max(-0.7, Math.min(0.7, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry)) });
+      current.update({ time, dt, speed, turn, bend, cycle: g.player.mount.phase, ground: (x, z) => Math.max(-0.7, Math.min(0.7, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry)) });
       for (const material of current.materials) if (material.uniforms.uGhost) material.uniforms.uGhost.value = 1 - shown;
       if (!id) return;
       current.root.updateMatrixWorld(true);

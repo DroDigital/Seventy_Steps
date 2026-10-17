@@ -15,6 +15,8 @@ export interface MountFrame {
   cycle?: number;
   /** Signed turning intensity, -1..1. */
   turn?: number;
+  /** Radians the horse is turned ahead of the carriage (to the left positive). */
+  bend?: number;
   /** Ground relative to the root, sampled in local mount coordinates (+z forward). */
   ground?: (x: number, z: number) => number;
 }
@@ -48,7 +50,7 @@ export function createMount(id: MountId): MountVisual {
     w.spin.rotation.x = distance / w.radius;
   }
   return { root, seat: art.seat, materials,
-    update({ time, dt, speed, turn = 0, ground, cycle: ridden }) {
+    update({ time, dt, speed, turn = 0, bend = 0, ground, cycle: ridden }) {
       const step = Math.max(0, Math.min(0.1, dt)), pace = Math.max(0, speed), steer = Math.max(-1, Math.min(1, turn));
       distance = (distance + pace * step) % (Math.PI * 2 * 1e4);
       if (ridden === undefined) cycle += cyclesFor(pace * step, pace);
@@ -63,8 +65,8 @@ export function createMount(id: MountId): MountVisual {
       for (const w of wheels) poseWheel(w, steer, ground);
       if (car) car.steering.rotation.z = -steer * 0.48;
       if (coach) {
-        for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground);
-        coach.draft?.update(time, cycle, pace, steer, ground);
+        for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground, bend);
+        coach.draft?.update(time, cycle, pace, steer, ground, bend);
         animateReins(coach, time, pace);
       }
       lastSpeed = pace;

@@ -3,6 +3,7 @@
  * creature and look at it, frame by frame, from where it chooses. `window.fxlab`:
  *   hold(true)           the world stands still until it is stepped
  *   advance(seconds)     steps the simulation, in tenths of a second with a picture drawn between each, and resolves
+ *   skip(seconds)        steps the simulation with no picture drawn at all (to get to the weather's turn quickly)
  *   target(id)           which roster creature the rest is about (default: the nearest that fights the investigator)
  *   moves()              the names of its moves
  *   fire(name)           that creature begins that move now
@@ -17,6 +18,7 @@ import type { Game } from '../systems/components';
 export interface FxLab {
   hold(on: boolean): void;
   advance(seconds: number): Promise<void>;
+  skip(seconds: number): void;
   target(id: string | null): void;
   moves(): string[];
   fire(name: string): void;
@@ -79,6 +81,9 @@ export function installFxLab(game: Game, camera: THREE.PerspectiveCamera, hooks:
         hooks.step(Math.min(6, left));
         await frames(2);
       }
+    },
+    skip(seconds) {
+      hooks.step(Math.round(seconds * 60));
     },
     target: (id) => void (only = id),
     moves: () => Object.keys(c.actor.get(foe() ?? -1)?.moves ?? {}),

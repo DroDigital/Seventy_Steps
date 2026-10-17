@@ -15,6 +15,9 @@ import { moreAt } from './scrollCue';
 export const INK = '#cbc7bd';
 export const BRIGHT = '#ece9e2';
 export const ACCENT = '#9078bd';
+/** A gift and a price (round 52): what favours the investigator is green, what costs them red, wherever a number is shown (a relic's effects, a cost that cannot be met). */
+export const GOOD = '#8fcf9d';
+export const BAD = '#e27f70';
 import type { Page } from './menuKit';
 
 export const CSS = `
@@ -22,6 +25,14 @@ export const CSS = `
 [data-menu] button::before{content:'';position:absolute;left:12px;top:50%;width:5px;height:5px;margin-top:-3px;border:1px solid ${ACCENT};transform:rotate(45deg) scale(.3);opacity:0;transition:opacity .15s,transform .15s}
 [data-menu] button:disabled{opacity:.5;cursor:default}
 [data-menu] button .sub{display:block;margin-top:1px;font-size:12px;line-height:1.35;letter-spacing:.4px;opacity:.62}
+[data-menu] button .chips{display:flex;flex-wrap:wrap;gap:0 12px;margin-top:2px;font-size:12px;line-height:1.35;letter-spacing:.4px;font-variant-numeric:lining-nums tabular-nums}
+[data-menu] .chips .good{color:${GOOD}}
+[data-menu] .chips .bad{color:${BAD}}
+[data-menu] .chips .dim{opacity:.62}
+[data-menu] button.priced{padding-right:112px}
+[data-menu] button .cost{position:absolute;right:14px;top:50%;transform:translateY(-50%);min-width:44px;padding:1px 8px;border:1px solid ${ACCENT}77;text-align:center;font-size:12px;letter-spacing:.6px;color:${BRIGHT};font-variant-numeric:lining-nums tabular-nums}
+[data-menu] button .cost.no{color:${BAD};border-color:${BAD}66}
+[data-menu] button .cost.max{border-color:transparent;color:${INK};opacity:.5}
 [data-menu] button.quiet{display:inline-block;width:auto;padding:2px 0;opacity:.55;text-shadow:0 0 6px #000,0 1px 2px #000}
 [data-menu] button.quiet::before{display:none}
 [data-menu] button.quiet:focus,[data-menu] button.quiet:hover:not(:disabled){outline:none;opacity:1;background:none}

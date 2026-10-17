@@ -32,7 +32,9 @@ function sky() {
       run(1 / 60, hidden);
     }
   };
-  return { run, weather, walk, drops, g };
+  /** The drops thrown by a stride (the rain's own splashes on the ground about the lens, round 52, are another size and shape). */
+  const strides = (): number => drops.filter((p) => (p as { size: number }).size === 0.07).length;
+  return { run, weather, walk, drops: { get length(): number { return strides(); } }, g };
 }
 
 describe('wet ground', () => {
@@ -80,6 +82,22 @@ describe('wet ground', () => {
     expect(drops.length).toBe(walked);
     walk(5, 3, true); // under a roof
     expect(drops.length).toBe(walked);
+  });
+
+  it('the rain splashes where it lands about the lens: more in a thunderstorm than in rain, none in clear skies, a gale or under a roof (round 52)', () => {
+    const spawned = (kind: 'clear' | 'rain' | 'storm' | 'gale', hidden = false): number => {
+      const g = createWorldGame();
+      const specs: { shape?: string }[] = [];
+      const fx = createWeatherFx(new THREE.Scene(), g, { spawn: (p: { shape?: string }) => specs.push(p) } as unknown as Particles);
+      Object.assign(g.overworld!.weather, { kind, want: kind, amount: kind === 'clear' ? 0 : 1 });
+      const camera = new THREE.PerspectiveCamera();
+      for (let i = 0; i < 240; i++) fx.update(camera, i / 60, hidden);
+      return specs.filter((p) => p.shape === 'spark' || p.shape === 'wisp').length;
+    };
+    expect(spawned('rain')).toBeGreaterThan(80);
+    expect(spawned('storm')).toBeGreaterThan(spawned('rain') * 1.5);
+    expect(spawned('clear')).toBe(0);
+    expect(spawned('rain', true)).toBe(0);
   });
 
   it('is eased at the rates the tuning names', () => {

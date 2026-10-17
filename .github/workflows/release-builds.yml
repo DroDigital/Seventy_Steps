@@ -30,6 +30,9 @@ on:
       itch_target:
         description: 'The itch.io project: <user>/<URL name>'
         default: 'digitaldro/seventy-steps'
+      itch_version:
+        description: "The version itch.io shows for these builds, e.g. 1.0.0-rc.2 (empty: package.json's)"
+        default: ''
 
 permissions:
   contents: read
@@ -84,6 +87,7 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           ITCH_TARGET: ${{ inputs.itch_target }}
+          ITCH_VERSION: ${{ inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only windows --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only windows --get-butler; fi
@@ -176,6 +180,7 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           ITCH_TARGET: ${{ inputs.itch_target }}
+          ITCH_VERSION: ${{ inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only osx --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only osx --get-butler; fi
@@ -208,6 +213,7 @@ jobs:
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
           ITCH_TARGET: ${{ inputs.itch_target }}
+          ITCH_VERSION: ${{ inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only linux --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only linux --get-butler; fi

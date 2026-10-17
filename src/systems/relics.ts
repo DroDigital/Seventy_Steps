@@ -105,10 +105,16 @@ export function registerRelics(g: Game): void {
   });
 }
 
-/** What a relic does, in numbers: its gifts and its prices, as the menus say them. */
-export function effectsOf(id: RelicId): string {
+/** One thing a relic does, as the menus show it: `text` is the figure ("Damage +10%"), `good` whether it favours the investigator (a gift is green, a price red: a smaller blow taken is a gift). */
+export interface Effect {
+  text: string;
+  good: boolean;
+}
+
+/** What a relic does, in numbers: its gifts and its prices, in the order of the table. */
+export function relicEffects(id: RelicId): Effect[] {
   const r = RELICS[id] as Relic;
   const pct = (v: number): string => `${v >= 1 ? '+' : '−'}${Math.round(Math.abs(v - 1) * 100)}%`;
-  const parts: [number | undefined, string][] = [[r.dealt, 'your blows'], [r.taken, 'blows you take'], [r.echoes, 'Echoes from kills'], [r.mend, 'the mind’s mending']];
-  return parts.filter(([v]) => v !== undefined).map(([v, what]) => `${what} ${pct(v!)}`).join('  ·  ');
+  const rows: [number | undefined, string, boolean][] = [[r.dealt, 'Damage', true], [r.taken, 'Damage taken', false], [r.echoes, 'Echoes', true], [r.mend, 'Mending', true]]; // the last: whether more of it is a gift
+  return rows.filter(([v]) => v !== undefined && v !== 1).map(([v, what, more]) => ({ text: `${what} ${pct(v!)}`, good: (v! > 1) === more }));
 }

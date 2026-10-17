@@ -59,7 +59,7 @@ describe('the weather (round 26)', () => {
   });
 
   it('stays clear where the region knows none, and stops a spell that has left its region', () => {
-    expect([...run('hub', 1800).seen]).toEqual(['clear']);
+    expect([...run('kn_yan', 1800).seen]).toEqual(['clear']); // (round 52: the hub has weather now; the caverns of K'n-yan do not)
     const g = createWorldGame();
     g.overworld!.region = 'innsmouth';
     Object.assign(g.overworld!.weather, { kind: 'rain', want: 'rain', amount: 1, until: g.frame + 99999 });

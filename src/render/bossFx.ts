@@ -7,21 +7,22 @@
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { createAttackFx } from './attackFx';
-import { createBeams } from './beams';
+import { createBeams, type Beams } from './beams';
 import { createDecals } from './decals';
 import { createFlaskFx } from './flaskFx';
 import { createFogGates } from './fogGates';
-import { createGroundFx } from './groundFx';
+import type { GroundFx } from './groundFx';
 import { createMeleeFx } from './meleeFx';
 import type { Particles } from './particles';
 import { createTelegraphs } from './telegraphs';
 
 export interface BossFx {
   update(alpha: number, time: number, camera: THREE.Camera): void;
+  /** The beams, whose ribbons also draw a bolt of lightning (render/worldLife.ts). */
+  beams: Beams;
 }
 
-export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles): BossFx {
-  const ground = createGroundFx(); // what a blow leaves on the ground and sends along it (round 51)
+export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles, ground: GroundFx): BossFx {
   const telegraphs = createTelegraphs(g, createDecals(scene), ground);
   const beams = createBeams(scene, g);
   const fx = createAttackFx(g, particles, ground);
@@ -29,6 +30,7 @@ export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles):
   const fog = createFogGates(g, particles);
   const flasks = createFlaskFx(scene, g, particles); // round 29: a flask of lamp oil, in flight and burning
   return {
+    beams,
     update(alpha, time, camera) {
       telegraphs.update(alpha, time);
       beams.update(alpha, time, camera);

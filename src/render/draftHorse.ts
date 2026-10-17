@@ -11,7 +11,7 @@ import { hash2 } from '../core/rng';
 import { footAt, gaitAt, legPhase } from '../systems/mountGait';
 import { BODY_Y, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
 import { CANNON, FETLOCK, LEGS, LEG_NAMES, cannonBone, hoofOf, upperBone } from './horseLegs';
-import { MountBuilder, group } from './mountKit';
+import { MountBuilder, group, swingAbout } from './mountKit';
 
 /** Where the horse stands in the chariot's frame, and where the shaft tips meet the collar (the shafts run to it). */
 export const DRAFT_PLACE = { x: 0, z: 2.5 } as const;
@@ -21,7 +21,7 @@ export interface DraftHorse {
   root: THREE.Group;
   bit: THREE.Object3D;
   /** `cycle`: gait cycles ridden (the simulation's `MountState.phase`); `ground`: the land's height at (x, z) in the chariot's frame. */
-  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void;
+  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number): void;
 }
 
 const clamp = (v: number, a = 0, b = 1): number => Math.min(b, Math.max(a, v));
@@ -81,7 +81,8 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
   const aim = new THREE.Vector3();
   const hips = LEGS.map((l) => l.hip);
 
-  return { root, bit, update(time, cycle, speed, turn, ground) {
+  return { root, bit, update(time, cycle, speed, turn, ground, bend = 0) {
+    swingAbout(root, DRAFT_PLACE, { x: 0, z: DRAFT_HITCH.z }, bend); // the horse leads a turn, about the collar the shafts meet; the carriage follows
     const gait = gaitAt(speed);
     const moving = smooth(clamp((speed - 0.15) / 1.1));
     const stretch = gait.stretch * moving;

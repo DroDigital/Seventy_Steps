@@ -10,6 +10,9 @@ import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
 import type { GameAudio } from './audio/gameAudio';
 import { createBeacons } from './beacons';
+import type { Beams } from './beams';
+import type { GroundFx } from './groundFx';
+import { createSkyStrikeFx, type SkyStrikeFx } from './skyStrikeFx';
 import { SEA } from './sea';
 import { createBossFog } from './bossFog';
 import { createChimneys } from './chimneys';
@@ -43,19 +46,24 @@ export interface LifeParts {
   sheet: { atlas: SpriteAtlas; texture: THREE.Texture }; // the creatures' sprites, for the great winged things
   skyline: Skyline; // the far silhouettes, given a false one by a failing mind (round 26)
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
+  ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
+  beams: Beams; // whose ribbons draw a bolt of lightning
 }
 
 /** How hard the wind drives the sea: R'lyeh's lies restless, a gale and rain raise any. */
 export function seaChop(g: Game): number {
   const wx = g.overworld?.weather;
-  const wind = wx ? (wx.kind === 'gale' ? 0.9 : wx.kind === 'rain' ? 0.3 : 0) * wx.amount : 0;
+  const wind = wx ? (wx.kind === 'gale' ? 0.9 : wx.kind === 'storm' ? 1.1 : wx.kind === 'rain' ? 0.3 : 0) * wx.amount : 0;
   return (g.overworld?.region === 'rlyeh' ? 1.5 : g.overworld?.region === 'innsmouth' ? 1.15 : 1) * (1 + wind);
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
   const fauna = createFauna(scene, g, (voice, at) => audio.cry(voice, at));
   const sky = createSkyLife(scene, g, fauna, parts.sheet, (voice, at) => audio.cry(voice, at, 1.4));
-  const lightning = createLightning(parts.sky, parts.post, (gain) => audio.far('thunder', gain));
+  let eye: THREE.Camera | null = null; // the camera of the last frame, for the bolts drawn on the far ground
+  let strikes: SkyStrikeFx | null = null;
+  const lightning = createLightning(parts.sky, parts.post, (gain) => audio.thunder(gain), (far) => void (eye && strikes?.distant(far, eye)));
+  strikes = createSkyStrikeFx(g, parts.particles, parts.ground, parts.beams, lightning); // round 52: a thunderstorm's bolts on the ground, a ring of light before them
   const glints = createGlints(scene, g);
   const candles = createCandleViews(scene, g); // the candles before the horrors' fog (round 45)
   const watchers = createWatchers(scene, g);
@@ -71,6 +79,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   return {
     fauna,
     update(camera, time, enclosed) {
+      eye = camera;
+      strikes?.update(time);
       const outside = !enclosed && !!g.overworld;
       fauna.update(camera, time, !outside);
       sky.update(camera, time, !outside);

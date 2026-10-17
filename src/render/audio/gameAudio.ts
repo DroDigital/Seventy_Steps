@@ -41,6 +41,8 @@ import type { AudioEngine } from './engine';
 import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
 import { createAttackAudio } from './attackAudio';
+import { createStormAudio } from './stormAudio';
+import { STORM_MIX, thunderRoll } from '../../data/stormSounds';
 import { createMountAudio } from './mountAudio';
 import { createMountBed } from './mountBed';
 import { createVarier } from './vary';
@@ -57,6 +59,8 @@ export interface GameAudio {
   cry(id: VoiceId, at: V3, gain?: number): void;
   /** A recording from afar: panned anywhere, duller the quieter (round 18: the thunder after lightning). */
   far(set: SampleSetId, gain?: number, pitch?: number): void;
+  /** Thunder of `gain` (1: overhead; less, farther or through a roof): the recording, and beneath it a recipe made to its distance (round 52). */
+  thunder(gain: number): void;
   /** A stinger heard without place, recorded if it can be (round 20: an Echo drawn into the investigator). */
   stinger(sound: StingerId, o?: { gain?: number; pitch?: number }): void;
   /** A recording heard without place (round 20: a cutscene's laugh, its choir). */
@@ -108,6 +112,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
+  createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
   const attacks = createAttackAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 51: a horror's blows heard as their matter
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
@@ -266,6 +271,11 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     },
     far(set, gain = 1, pitch) {
       sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.7, lowpass: 900 + 4000 * gain, pitch, bus: e.bed ?? undefined });
+    },
+    thunder(gain) {
+      sampler.play(SAMPLE_SETS.thunder, { gain, pan: (Math.random() * 2 - 1) * 0.7, lowpass: 900 + 4000 * gain, bus: e.bed ?? undefined });
+      const far = Math.min(1, Math.max(0, (1 - gain) / 0.6)); // (a thunderclap's gain is 1 - 0.6 far; through a roof it is a third of that, and sounds as far)
+      recipe('storm:thunder', thunderRoll(far), { gain: STORM_MIX.thunder * Math.min(1, gain + 0.15), pan: (Math.random() * 2 - 1) * 0.5, vary: 1 });
     },
     stinger(sound, o = {}) {
       play({ sound, at: null, ...o });

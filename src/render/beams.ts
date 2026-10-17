@@ -13,14 +13,19 @@ import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { beamLine } from '../systems/strikes';
 import { attackLook } from './attackLook';
+import { FEEL } from './feel';
+import { flicker } from './lightning';
+import type { BoltPath } from './lightningPath';
 import type { Rgb } from './palette';
 import { worldUniforms } from './worldMaterial';
 
-const CAPACITY = 48; // ribbons: two to a beam
+const CAPACITY = 160; // ribbons: two to a beam, two to a segment of a bolt of lightning
 const FLASH = 0.26; // seconds a fired beam lingers
 
 export interface Beams {
   update(alpha: number, time: number, camera: THREE.Camera): void;
+  /** A bolt of lightning (round 52): its main line and forks drawn as one flash for `life` seconds, as thick as `width`; `time` is render seconds, as `update`'s. */
+  bolt(path: BoltPath, life: number, width: number, color: Rgb, core: Rgb): void;
 }
 
 const VERT = /* glsl */ `
@@ -29,11 +34,14 @@ uniform float uFogFar;
 attribute vec4 aColor;
 attribute vec3 aCore;
 attribute vec2 aAcross; // x: -1..1 across the ribbon; y: metres along it from its source
+attribute vec2 aStyle; // x: how much of the fog's colour it takes at a distance (a beam a half, a bolt of lightning none); y: how much of its width is white-hot (a beam an eighth, a bolt a third)
 varying vec4 vColor;
 varying vec3 vCore;
 varying vec2 vAcross;
 varying float vFog;
+varying vec2 vStyle;
 void main() {
+  vStyle = aStyle;
   vColor = aColor;
   vCore = aCore;
   vAcross = aAcross;
@@ -51,6 +59,7 @@ varying vec4 vColor;
 varying vec3 vCore;
 varying vec2 vAcross;
 varying float vFog;
+varying vec2 vStyle;
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
@@ -62,12 +71,12 @@ void main() {
   float d = clamp(abs(vAcross.x) + rag * abs(vAcross.x), 0.0, 1.0);
   float run = 0.5 + 0.5 * sin(along * 1.1 - uTime * 16.0); // energy running out from the source
   float breath = 0.82 + 0.18 * sin(uTime * 23.0 + along * 0.4);
-  float core = (1.0 - smoothstep(0.08, 0.3, d)) * breath;
+  float core = (1.0 - smoothstep(vStyle.y, vStyle.y + 0.22, d)) * breath;
   float glow = pow(1.0 - d, 1.6) * (0.65 + 0.35 * run);
   float a = vColor.a * max(core, glow);
   if (a < bayer4(gl_FragCoord.xy)) discard;
   vec3 c = mix(vColor.rgb * (0.9 + 0.35 * run), vCore, core);
-  gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount * 0.5), 1.0);
+  gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount * vStyle.x), 1.0);
 }
 `;
 
@@ -77,12 +86,14 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   const col = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 4), 4).setUsage(THREE.DynamicDrawUsage);
   const core = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 3), 3).setUsage(THREE.DynamicDrawUsage);
   const across = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 2), 2).setUsage(THREE.DynamicDrawUsage);
+  const style = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 2), 2).setUsage(THREE.DynamicDrawUsage);
   const index: number[] = [];
   for (let i = 0; i < CAPACITY; i++) index.push(i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 2, i * 4 + 1, i * 4 + 3);
   geo.setAttribute('position', pos);
   geo.setAttribute('aColor', col);
   geo.setAttribute('aCore', core);
   geo.setAttribute('aAcross', across);
+  geo.setAttribute('aStyle', style);
   geo.setIndex(index);
   const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uTime: { value: 0 } }, vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide, depthWrite: false });
   const mesh = new THREE.Mesh(geo, material);
@@ -90,6 +101,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   scene.add(mesh);
 
   const flashes: { from: V3; to: V3; at: number; color: Rgb; core: Rgb }[] = [];
+  const bolts: { path: BoltPath; at: number; life: number; width: number; color: Rgb; core: Rgb }[] = [];
   let now = 0;
   g.events.on('Shot', ({ shooter, from, to }) => {
     if (shooter !== g.player.id) flashes.push({ from: { ...from }, to: { ...to }, at: now, color: attackLook(g, shooter).line, core: attackLook(g, shooter).core });
@@ -100,7 +112,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   const side = new THREE.Vector3();
   const view = new THREE.Vector3();
   let n = 0;
-  const ribbon = (a: V3, b: V3, width: number, color: Rgb, white: Rgb, alpha: number): void => {
+  const ribbon = (a: V3, b: V3, width: number, color: Rgb, white: Rgb, alpha: number, mix = 0.5, hot = 0.08): void => {
     if (n >= CAPACITY) return;
     dir.set(b.x - a.x, b.y - a.y, b.z - a.z);
     const length = dir.length();
@@ -116,16 +128,21 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
       col.setXYZW(k + i, color[0], color[1], color[2], alpha);
       core.setXYZ(k + i, white[0], white[1], white[2]);
       across.setXY(k + i, i % 2 === 0 ? -1 : 1, i < 2 ? 0 : length);
+      style.setXY(k + i, mix, hot);
     }
     n++;
   };
   /** A beam's two ribbons: its aura, wide and faint, and the beam. */
-  const beam = (a: V3, b: V3, width: number, look: { line: Rgb; core: Rgb }, alpha: number): void => {
-    ribbon(a, b, width * 2.8, look.line, look.core, alpha * 0.45);
-    ribbon(a, b, width, look.line, look.core, alpha);
+  const beam = (a: V3, b: V3, width: number, look: { line: Rgb; core: Rgb }, alpha: number, mix = 0.5, hot = 0.08): void => {
+    ribbon(a, b, width * 2.8, look.line, look.core, alpha * (hot > 0.2 ? 0.6 : 0.45), mix, hot);
+    ribbon(a, b, width, look.line, look.core, alpha, mix, hot);
   };
 
   return {
+    bolt(path, life, width, color, core) {
+      if (bolts.length >= 6) bolts.shift();
+      bolts.push({ path, at: now, life, width, color, core });
+    },
     update(alpha, time, camera) {
       now = time;
       material.uniforms.uTime.value = time;
@@ -147,11 +164,26 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
         }
         beam(f.from, f.to, 1.1 * (1 - t) + 0.2, { line: f.color, core: f.core }, 1 - t * t);
       }
+      for (let i = bolts.length - 1; i >= 0; i--) {
+        const b = bolts[i]!;
+        const t = (time - b.at) / b.life;
+        if (t >= 1) {
+          bolts.splice(i, 1);
+          continue;
+        }
+        if (t < 0) continue;
+        const k = Math.max(0.2, flicker(time - b.at, FEEL.flashes)) * (1 - t * 0.5); // a few quick pulses (a swell under the Flashes setting), thinning as it goes
+        const line = { line: b.color, core: b.core };
+        const wide = (p: V3, w: number): number => Math.max(w, 0.018 * Math.hypot(p.x - eye.x, p.y - eye.y, p.z - eye.z)); // a bolt does not thin to a hair with the distance: it keeps its width on the screen
+        for (let j = 0; j + 1 < b.path.main.length; j++) beam(b.path.main[j]!, b.path.main[j + 1]!, wide(b.path.main[j]!, b.width * (0.6 + 0.4 * (j / b.path.main.length))), line, k, 0, 0.36);
+        for (const fork of b.path.forks) for (let j = 0; j + 1 < fork.length; j++) beam(fork[j]!, fork[j + 1]!, wide(fork[j]!, b.width * 0.45 * (1 - j / fork.length)), line, k * 0.85, 0, 0.3);
+      }
       geo.setDrawRange(0, n * 6);
       pos.needsUpdate = true;
       col.needsUpdate = true;
       core.needsUpdate = true;
       across.needsUpdate = true;
+      style.needsUpdate = true;
     },
   };
 }

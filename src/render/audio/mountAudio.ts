@@ -9,7 +9,7 @@
 import type { V3 } from '../../core/geom';
 import { MOUNT_TRAVERSAL, type MountId } from '../../data/mounts';
 import {
-  CREAK, ENGINE_START, ENGINE_STOP, HARNESS_JINGLE, MOUNT_MIX, NICKER, SNORT, SPECTRAL_DISMISS, SPECTRAL_SUMMON, UNHITCH, WHEEL_KNOCK, hoofBeat, type Ground,
+  CREAK, ENGINE_START, ENGINE_STOP, EXHAUST_POP, MOUNT_MIX, NICKER, SNORT, SPECTRAL_DISMISS, SPECTRAL_SUMMON, SPECTRAL_WHISPER, TRACE_SHIFT, UNHITCH, hoofBeat, wheelThump, type Ground,
 } from '../../data/mountSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import type { Sound } from '../../data/sounds';
@@ -22,7 +22,7 @@ import type { Sampler } from './sampler';
 type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number }) => boolean;
 
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
-const KNOCK_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [1.4, 2.4], stone: [1.1, 1.8], water: [99, 99] }; // metres between a wheel's knocks
+const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [1.4, 2.4], stone: [1.1, 1.8], water: [99, 99] }; // metres between a wheel's thumps
 const PAIR = 0.059; // the second spectral horse's gait, a share of a cycle behind the first (0.37 rad: render/mountCarriage.ts)
 const GALLOP_SNORT = 14; // m/s
 
@@ -42,8 +42,10 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
   let ground: Ground = 'dirt';
   let frames = 0;
   let metres = 0;
-  let knockAt = 4;
+  let thumpAt = 4;
   let creakIn = 2;
+  let whisperIn = 3;
+  let lastSpeed = 0;
   let snortIn = 6;
   let idleIn = 8;
   let galloping = false;
@@ -51,8 +53,10 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
   const reset = (from: number): void => {
     phase = from;
     metres = 0;
-    knockAt = between(KNOCK_EVERY[ground]);
+    thumpAt = between(THUMP_EVERY[ground]);
     creakIn = between([1.2, 3]);
+    whisperIn = between([2, 5]);
+    lastSpeed = 0;
     snortIn = between([5, 9]);
     idleIn = between([7, 14]);
     galloping = false;
@@ -100,8 +104,15 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
         for (const leg of touchdowns(was, phase, speed)) strike(id, leg, speed, false);
         if (id === 'chariot') for (const leg of touchdowns(was + PAIR, phase + PAIR, speed)) strike(id, leg, speed, true);
         const load = Math.min(1, speed / MOUNT_TRAVERSAL.gallop);
-        if (Math.floor(phase) > Math.floor(was) && speed > 0.8) {
-          recipe(`mount:${id}:jingle`, HARNESS_JINGLE, { gain: MOUNT_MIX.jingle * (0.4 + 0.6 * load) * (id === 'chariot' ? 0.8 : 1), pitch: id === 'chariot' ? 0.72 : 1, vary: 0.5, pan: Math.random() * 0.4 - 0.2 });
+        if (Math.floor(phase) > Math.floor(was) && Math.floor(phase) % 2 === 0 && speed > 2.5) { // leather and wood shifting, once in two strides
+          recipe(`mount:${id}:trace`, TRACE_SHIFT, { gain: MOUNT_MIX.trace * (0.4 + 0.6 * load), pitch: id === 'chariot' ? 0.85 : 1, vary: 0.5, pan: Math.random() * 0.4 - 0.2 });
+        }
+        if (id === 'chariot') { // a cold breath through the bones, now and then, and the violet fire crackling in it
+          whisperIn -= dt * (0.5 + load);
+          if (speed > 1 && whisperIn <= 0) {
+            whisperIn = between([3, 7]);
+            recipe('mount:chariot:whisper', SPECTRAL_WHISPER, { gain: MOUNT_MIX.whisper * (0.5 + 0.5 * load), pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.6 - 0.3 });
+          }
         }
         creakIn -= dt * (0.4 + 1.6 * load);
         if (speed > 1.5 && creakIn <= 0) {
@@ -120,11 +131,15 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
         }
       }
       metres += travelled;
-      if (metres >= knockAt && speed > 1.5) {
+      if (metres >= thumpAt && speed > 1.5) {
         metres = 0;
-        knockAt = between(KNOCK_EVERY[ground]);
-        if (ground !== 'water') recipe(`mount:${id}:knock`, WHEEL_KNOCK, { gain: MOUNT_MIX.knock * (0.5 + 0.5 * Math.min(1, speed / MOUNT_TRAVERSAL.gallop)) * (ground === 'dirt' ? 0.7 : 1), pitch: id === 'automobile' ? 0.8 : 1, vary: 0.5, pan: Math.random() * 0.5 - 0.25 });
+        thumpAt = between(THUMP_EVERY[ground]);
+        if (ground !== 'water') recipe(`mount:${id}:thump`, wheelThump(id === 'automobile' ? 'rubber' : 'wood', ground), { gain: MOUNT_MIX.thump * (0.5 + 0.5 * Math.min(1, speed / MOUNT_TRAVERSAL.gallop)) * (ground === 'dirt' ? 0.75 : 1), vary: 0.5, pan: Math.random() * 0.5 - 0.25 });
       }
+      if (id === 'automobile' && lastSpeed - speed > 0.12 && lastSpeed > 9 && Math.random() < 0.5) { // easing off at speed: the exhaust pops
+        recipe('mount:automobile:pop', EXHAUST_POP, { gain: MOUNT_MIX.pop, pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.3 - 0.15 });
+      }
+      lastSpeed = speed;
     },
   };
 }

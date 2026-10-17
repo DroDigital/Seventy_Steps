@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { RELIC_IDS, RELIC_SLOTS, RELICS } from '../src/data/relics';
 import { createWorldGame } from '../src/systems/game';
-import { boon, bountyOf, grant, owned, relicFor, slotsOf, wear, worn } from '../src/systems/relics';
+import { boon, bountyOf, grant, owned, relicEffects, relicFor, slotsOf, wear, worn } from '../src/systems/relics';
 import { mendRate } from '../src/systems/sanity';
 import { parseSave, snapshot } from '../src/systems/save';
 
@@ -119,5 +119,18 @@ describe('two relics are worn at a time, chosen at an Elder Sign', () => {
     const loaded = createWorldGame({ save: parseSave(JSON.stringify(old))! });
     expect(slotsOf(loaded)).toEqual(['yellowSeal', 'saltCharm']);
     expect(owned(loaded)).toEqual(['yellowSeal', 'saltCharm', 'starHook']);
+  });
+
+  it('the menus show each effect as a signed figure, green for a gift and red for a price (round 52)', () => {
+    for (const id of RELIC_IDS) {
+      const fx = relicEffects(id);
+      expect(fx.some((e) => e.good), id).toBe(true);
+      expect(fx.some((e) => !e.good), id).toBe(true);
+      for (const e of fx) expect(e.text, id).toMatch(/ [+−]\d+%$/);
+    }
+    const hook = relicEffects('starHook');
+    expect(hook).toEqual([{ text: 'Damage +10%', good: true }, { text: 'Mending −40%', good: false }]);
+    expect(relicEffects('saltCharm')).toEqual([{ text: 'Damage taken −8%', good: true }, { text: 'Echoes −15%', good: false }]); // less harm taken is a gift
+    expect(relicEffects('blackCoin')).toEqual([{ text: 'Damage taken +8%', good: false }, { text: 'Echoes +30%', good: true }]);
   });
 });

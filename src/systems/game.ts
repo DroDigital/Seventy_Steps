@@ -52,6 +52,7 @@ import { playerControl } from './playerControl';
 import { npcSystem, spawnNpcs } from './npcs';
 import { populationSystem } from './population';
 import { boltSystem } from './projectiles';
+import { skyStrikeSystem } from './skyStrikes';
 import { questSystem, startQuest } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
@@ -220,6 +221,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   strikeSystem(g);
   boltSystem(g);
   hazardSystem(g);
+  skyStrikeSystem(g); // round 52: a thunderstorm's bolt on the ground, a ring of light before it
   vitalsSystem(g, dt);
   sanitySystem(g, dt);
   reagentSystem(g);
