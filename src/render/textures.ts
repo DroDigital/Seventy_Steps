@@ -1,6 +1,6 @@
 /**
  * Procedural 128×128 world textures (spec §2): rock all of a piece (standing stones, playtest round 7),
- * wet flesh, water and figure cloth here; the natural ground (grass, dirt, mud, blighted earth, sand,
+ * wet flesh, a horse's hide, water and figure cloth here; the natural ground (grass, dirt, mud, blighted earth, sand,
  * snow, gravel, leaf litter; round 32) in textureGround.ts; masonry, flagstones, brick, cobbles,
  * clapboard, shingles and wood in textureMasonry.ts. Pure (no Three.js): tileable RGBA8 pixels built
  * of muted colours. A texture spans twice the texels of the old 64-texel set at the same density, so it repeats
@@ -17,7 +17,7 @@ export const TEXTURE_SIZE = 128;
 /** UV units per texture repeat: geometry UVs count 64 texels to the unit, as they always have. */
 export const UV_PER_TEXTURE = TEXTURE_SIZE / 64;
 export const TEXTURE_KINDS = [
-  'stone', 'slab', 'wood', 'rot', 'flesh', 'water', 'cloth', 'grass', 'mud', 'sand', 'snow', 'cobble', 'brick', 'clapboard', 'shingle', 'rock', 'dirt', 'gravel', 'leaves',
+  'stone', 'slab', 'wood', 'rot', 'flesh', 'hide', 'water', 'cloth', 'grass', 'mud', 'sand', 'snow', 'cobble', 'brick', 'clapboard', 'shingle', 'rock', 'dirt', 'gravel', 'leaves',
 ] as const;
 export type TextureKind = (typeof TEXTURE_KINDS)[number];
 
@@ -47,6 +47,21 @@ const flesh: TexelFn = (u, v, seed) => {
   return c;
 };
 
+/**
+ * Horse hide: hair along v, in clumps, with a few darker strands. Nearly one value, and only
+ * slightly warm, so a bay or a black point is the vertex colour and not this picture.
+ */
+const hide: TexelFn = (u, v, seed) => {
+  const patch = fbm(u * 2, v * 2, seed, 3, 2, 2);
+  const lay = fbm(u * 4, v * 6, seed + 3, 3, 4, 6);
+  const strand = 0.5 + 0.5 * Math.sin((u * 9 + lay) * Math.PI * 2);
+  const pore = fbm(u * 12, v * 14, seed + 8, 2, 12, 14);
+  let k = 0.55 + 0.28 * patch + 0.12 * lay + 0.05 * (pore - 0.5);
+  k *= 0.72 + 0.28 * strand;
+  k = Math.min(1, Math.max(0.32, k));
+  return [k * 0.99, k * 0.95, k * 0.9];
+};
+
 /** Dark still water: wavy ripples with pale crests. */
 const water: TexelFn = (u, v, seed) => {
   const warp = fbm(u * 8, v * 8, seed, 3, 8);
@@ -64,7 +79,7 @@ const cloth: TexelFn = (u, v, seed) => {
   return [k, k, k];
 };
 
-const TEXELS: Record<TextureKind, TexelFn> = { stone, slab, wood, rot, flesh, water, cloth, grass, mud, sand, snow, cobble, brick, clapboard, shingle, rock, dirt, gravel, leaves };
+const TEXELS: Record<TextureKind, TexelFn> = { stone, slab, wood, rot, flesh, hide, water, cloth, grass, mud, sand, snow, cobble, brick, clapboard, shingle, rock, dirt, gravel, leaves };
 
 const to8 = (x: number): number => Math.round(Math.min(1, Math.max(0, x)) * 255);
 
