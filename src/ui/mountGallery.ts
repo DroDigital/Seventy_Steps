@@ -58,7 +58,7 @@ export async function startMountGallery(): Promise<void> {
   overlay.className = 'mount-exhibit'; overlay.setAttribute('aria-label', 'Mount exhibit controls');
   const style = document.createElement('style'); style.textContent = STYLE; overlay.append(style);
   overlay.insertAdjacentHTML('beforeend', `<header><div><div class="eyebrow">Seventy Steps · The coach house</div><h2 class="brand">A SWIFTER PASSAGE</h2></div><a href="${location.pathname}">Return to title ↗</a></header>
-    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · A plain chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom<br>1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
+    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · Chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom<br>1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
   document.body.append(overlay);
   const heading = overlay.querySelector('h1')!;
   const description = overlay.querySelector('p')!;
@@ -72,7 +72,7 @@ export async function startMountGallery(): Promise<void> {
   const rates = [0, MOUNT_TRAVERSAL.cruise, MOUNT_TRAVERSAL.gallop];
   const refresh = (): void => {
     const data = MOUNTS[id]; heading.textContent = data.name; description.textContent = data.description;
-    chapter.textContent = id === 'grey' ? 'I · A plain chariot' : id === 'chariot' ? 'II · The spectral procession' : 'III · A machine out of time';
+    chapter.textContent = id === 'grey' ? 'I · Chariot' : id === 'chariot' ? 'II · The spectral procession' : 'III · A machine out of time';
     status.textContent = `${['AT REST', 'TRAVELLING', 'GALLOPING'][gait]}${paused ? ' · PAUSED' : ''} · VISUAL EXHIBIT`;
     for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.mount ? b.dataset.mount === id : b.dataset.gait ? Number(b.dataset.gait) === gait : b.dataset.action === 'pause' ? paused : b.dataset.action === 'orbit' ? auto : b.dataset.action === 'resolution' ? detailed : false));
   };
@@ -89,7 +89,7 @@ export async function startMountGallery(): Promise<void> {
   const choose = (next: MountId): void => {
     mounts[id].root.visible = false; id = next; mounts[id].root.visible = true; frame(); refresh();
   };
-  const labels: Record<MountId, string> = { grey: '1 · Plain chariot', chariot: '2 · Spectral chariot', automobile: '3 · Brassbound motor car' };
+  const labels: Record<MountId, string> = { grey: '1 · Chariot', chariot: '2 · Spectral chariot', automobile: '3 · Brassbound motor car' };
   for (const mount of MOUNT_IDS) button('mount', labels[mount], () => choose(mount), { mount });
   ['Rest', 'Walk', 'Gallop'].forEach((label, i) => button('gait', label, () => { gait = i; }, { gait: String(i) }));
   const pauseButton = button('gait', 'Pause', () => { paused = !paused; }, { action: 'pause' });

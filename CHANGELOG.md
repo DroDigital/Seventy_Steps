@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Mounts
 
+- The included mount is called Chariot. The summon and ride prompts leave after a few seconds.
 - A mount drops when the ride reaches a dungeon or a boss arena. It cannot be summoned in either place.
 
 ## Plain chariot

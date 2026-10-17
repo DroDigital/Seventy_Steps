@@ -25,7 +25,7 @@ export const MOUNT_TRAVERSAL = Object.freeze({
 });
 
 export const MOUNTS = Object.freeze({
-  grey: Object.freeze({ id: 'grey', name: 'The Plain Chariot', description: 'A wooden chariot of the spectral coach\'s pattern, drawn by one horse. No fire, no funeral dress.', dlc: false, price: 0, traversal: MOUNT_TRAVERSAL }),
+  grey: Object.freeze({ id: 'grey', name: 'Chariot', description: 'A wooden chariot of the spectral coach\'s pattern, drawn by one horse. No fire, no funeral dress.', dlc: false, price: 0, traversal: MOUNT_TRAVERSAL }),
   chariot: Object.freeze({ id: 'chariot', name: 'The Spectral Chariot', description: 'A mourning carriage drawn by two spectral skeleton horses.', dlc: true, price: 0.99, traversal: MOUNT_TRAVERSAL }),
   automobile: Object.freeze({ id: 'automobile', name: 'The Brassbound Motor Car', description: 'An antique touring automobile in black enamel and tarnished brass.', dlc: true, price: 0.99, traversal: MOUNT_TRAVERSAL }),
 });
