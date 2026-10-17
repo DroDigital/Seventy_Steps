@@ -16,6 +16,7 @@ import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
 import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
+import { footingSafe } from './falls';
 import type { Game } from './components';
 import { packExplored, unpackExplored } from './exploration';
 import { woundsNow } from './overworld';
@@ -228,7 +229,9 @@ export function applySave(g: Game, s: SaveData): void {
   g.player.difficulty = isDifficulty(s.difficulty) ? s.difficulty : DEFAULT_DIFFICULTY;
   g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before the world fills: its foes are this journey's
   if (s.drop && s.drop.amount > 0) spawnDrop(g, Math.round(s.drop.amount), { x: s.drop.x, y: s.drop.y, z: s.drop.z });
-  teleport(g, regionAt(s.at.x, s.at.z) ? s.at : g.player.checkpoint);
+  const body = c.body.get(g.player.id)!;
+  const standing = regionAt(s.at.x, s.at.z) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // (a save taken in the middle of a fall must not load inside it)
+  teleport(g, standing ? s.at : g.player.checkpoint);
 }
 
 /** Save slots (round 12): three, the first under the old key so a save from before slots is its. */

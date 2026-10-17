@@ -8,7 +8,7 @@ import { cyclesFor } from './mountGait';
 import type { Game } from './components';
 import { footprintClear, mountFootprintForbidden, mountPlaceForbidden } from './mountGround';
 
-/** The coast, the sea or the abyss: one step is taken, then the fall kills. Walls still stop the mount. */
+/** The coast, the sea or the abyss, where nothing stops the mount first: one step is taken, then the fall kills. (In play the world's containing wall stops the ride a rider's length short of the land's edge: it is on foot that the edge is walked off.) */
 function environmentalDrop(g: Game, at: V3): boolean {
   if (!g.overworld || inDungeon(at.x, at.z)) return false;
   return !regionAt(at.x, at.z) || at.y <= WORLD.seaLevel + 0.4;

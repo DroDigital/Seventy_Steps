@@ -23,7 +23,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Edges and horrors
 
-- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. Riding off the land is the same fall. The Lost Echoes stay on the ground where you stepped off.
+- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. A ride stops short of the land's edge, as it does at a wall: it is on foot that the edge is walked off. The Lost Echoes stay on the ground where you stepped off.
 - Each horror's attacks keep their motion and take that horror's own colours: the telegraphs, the bursts and the beams.
 - Casters no longer share one green fireball. Yog-Sothoth still throws that light. The Colour's orb is its own hue. Other shots are shards, drops, sparks or darts.
 - A horror's areas wear its own mark: tide, runes, cracks, flame, spores, coils, an eye, roots, stars, frost, ash or a stain. The ground they cover, and when they land, is unchanged.

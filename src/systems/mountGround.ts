@@ -35,7 +35,7 @@ export function mountGroundAllowed(g: Game, at: V3): boolean {
   return true;
 }
 
-/** Past the region's edge the ground is the fall, not a wall. Water and slopes still refuse. */
+/** Past the region's edge the ground is the fall, not a wall (where the world has no containing wall: in play it does, and a ride stops a rider's length short of the drop, as it does at a wall). Water and slopes still refuse. */
 function overVoid(at: V3): boolean {
   return !regionAt(at.x, at.z);
 }
