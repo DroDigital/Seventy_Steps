@@ -16,10 +16,11 @@ resting, travelling, death, forced movement and entering a boss fight also dismi
 or a boss arena dismisses it at the threshold, and it cannot be summoned again until the investigator is outside.
 Buildings, water and steep terrain still stop the ride where it stands.
 
-Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 11 m/s, gallop 18 m/s, shared
+Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 10 m/s, gallop 17 m/s, shared
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.
 The rider keeps the ordinary hurtbox; mounting gives no healing, stamina refill, invulnerability or combat bonus.
-Only the preferred appearance is saved. Mount use resets on load; ownership is checked from Steam again.
+Only the preferred appearance is saved. Mount use resets on load; ownership is checked again through the build's store:
+Steam verifies installed DLC, while itch verifies an imported publisher-signed unlock file kept separately in user data.
 Removal or failed ownership verification falls back to the included chariot.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–3) with orbit, rest/cruise/gallop, pause and inspection
@@ -47,7 +48,16 @@ The corrected automobile brief is **1890–1940**. The model uses a coherent cir
 documented in [the historical reference brief](MOUNT_CAR_REFERENCES.md). The automobile and the spectral coach are original procedural art in the
 game’s retro pipeline. The plain chariot reuses that coach. Its horse is a chestnut draft horse of sixteen hands: a lofted barrel with haunches and shoulders, an arched neck, a flaxen mane and tail, a blaze, white stockings with feathered fetlocks, ears, eyes, and a black harness with brass (collar and hames, back pad and tugs, girth, breeching, crupper, bridle, blinkers and bit) hitched to the shafts. It is rigged on a horse's joints; each leg is a two-bone solve placing the fetlock, so hooves lie flat on the ground at every speed and each foot stands still on it while down. The gait is one pure model (`mountGait.ts`: walk, trot, canter, gallop, with the cycle's length and the share a foot is down), which also drives the skeleton horses' feet, the hoofbeats and the dust (`hoofFx.ts`).
 
-## Steam entitlement
+## Store entitlements
+
+The itch desktop edition can open separate paid itch.io product pages and import a signed download for either appearance.
+Checkout stays on itch.io, where the seller can enable PayPal; opening a page or returning from checkout does not grant access.
+The import checks the publisher's signature and grants only the appearance named in the file. This DRM-free download does
+not identify the purchaser or automatically revoke access after refunds. Purchase buttons remain disabled until real product
+URLs are configured. See [itch DLC setup and player instructions](ITCH_DLC_SETUP.md) for the $0.99 products, signing-key handling,
+and release checks. Browser builds have no desktop import bridge, and itch unlock files do not grant Steam licenses.
+
+### Steam
 
 The desktop shell exposes `desktop.ownsAutomobileDlc()` and `desktop.ownsChariotDlc()`, each a `Promise<boolean>`.
 Every call reads Steam's current `apps.isSubscribedApp` and `apps.isDlcInstalled` for that appearance's app id; both
@@ -69,9 +79,9 @@ the spectral chariot stays locked and the plain chariot is what a finished quest
    there is no separate asset download in this implementation.
 5. In a Steam test branch, verify an owner with each DLC installed, a non-owner, an owner with it disabled, offline
    startup, and refund/removal followed by an ownership refresh. Confirm the early quest grants only the plain chariot, and that
-   all three appearances handle identically once owned. A non-Steam build offers only the plain chariot.
+   all three appearances handle identically once owned. The itch build instead uses its signed-file import described above.
 
-The game never starts a purchase or changes a Steam subscription. Unit tests use fake read-only Steam clients;
+Steam entitlement checks never start a purchase or change a Steam subscription. Unit tests use fake read-only Steam clients;
 live account entitlement, checkout, regional pricing and refund behavior require the configured Steam test branch.
 
 ## Notes

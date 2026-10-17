@@ -9,3 +9,5 @@ __pycache__/
 steam/build/
 steam/output/
 .butler/
+*.seventysteps-dlc
+*.dlc-private.pem

@@ -106,5 +106,12 @@
         "NSHighResolutionCapable": true
       }
     }
+  },
+  "itchDlc": {
+    "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAvyT3aOiIv8PP3SkEemNGdQrkYu9KuUs/SO+dwKchenU=\n-----END PUBLIC KEY-----\n",
+    "urls": {
+      "chariot": "",
+      "automobile": ""
+    }
   }
 }
