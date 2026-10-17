@@ -29,6 +29,7 @@ uniform vec2 uUvScale;
 uniform vec2 uUvScroll;
 
 attribute float aSplat; // the second ground texture's share (roads, paths); 0 where a mesh has none
+attribute float aEdge; // the share of the region beside's ground, toward the border between two regions; 0 where a mesh has none (round 55)
 #ifdef SWAY
 attribute float aSway; // metres this vertex is blown at the height of a gust: nothing at a trunk's foot, most at the tip of a bough or a blade (round 34)
 uniform float uWind;
@@ -50,6 +51,7 @@ varying vec3 vWorld;
 varying vec3 vNormal;
 varying float vFog;
 varying float vSplat;
+varying float vEdge;
 
 void main() {
   vLocal = position / max(uBodyScale, 0.001);
@@ -90,6 +92,7 @@ void main() {
   vMoon = moon * (1.0 - uEmissive) * tint;
   vNormal = wn;
   vSplat = aSplat;
+  vEdge = aEdge;
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
 }
 `;
@@ -98,6 +101,8 @@ export const WORLD_FRAG = /* glsl */ `
 uniform sampler2D uMap;
 uniform sampler2D uMap2;
 uniform sampler2D uMap3;
+uniform sampler2D uMap4;
+uniform float uHasMap4; // 1: uMap4 (the region beside's ground) blends in by vEdge
 uniform float uAffine;
 uniform vec3 uFogColor;
 uniform float uFogAmount;
@@ -126,6 +131,7 @@ varying vec3 vWorld;
 varying vec3 vNormal;
 varying float vFog;
 varying float vSplat;
+varying float vEdge;
 uniform vec3 uLightDir;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
@@ -166,6 +172,7 @@ void main() {
   vec2 gx = dFdx(vUv);
   vec2 gy = dFdy(vUv);
   vec3 tex = sampleMap(uMap, uv, gx, gy);
+  if (uHasMap4 > 0.5 && vEdge > 0.003) tex = mix(tex, sampleMap(uMap4, uv, gx, gy), vEdge);
   if (uHasMap2 > 0.5 && vSplat > 0.01) {
     float edge = vSplat + 0.35 * (vnoise(vWorld.xz * 0.9) - 0.5);
     tex = mix(tex, textureGrad(uMap2, uv, gx, gy).rgb, smoothstep(0.35, 0.65, edge));

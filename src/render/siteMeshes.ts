@@ -137,17 +137,29 @@ function inward(g: THREE.BufferGeometry): THREE.BufferGeometry {
 }
 
 /**
- * A well: a stone rim knee-high above its floor, and the dark water far below. The rim has its
- * inner face down to the water (round 19: without it, the floor beyond and whatever stood there
- * showed through the far side of the rim).
+ * A well: a stone curb knee-high above its floor, and the shaft. With a `bottom` the shaft goes down to it (a dungeon's well: its floor is cut away
+ * where it stands, round 55): the wall of it darkens as it sinks, band by band, to a floor of black water far below, so that it reads as
+ * a hole and not a bowl of stone. Without one (the open world's, on the ground) it is a pan a hand's breadth deep. The curb has its inner face
+ * all the way down (round 19: without it, the floor beyond and whatever stood there showed through the far side of the rim).
  */
-export function well(x: number, z: number, radius: number, top: number, c: Rgb): THREE.BufferGeometry[] {
+export function well(x: number, z: number, radius: number, top: number, c: Rgb, bottom?: number): THREE.BufferGeometry[] {
   const rim = tint(tileUv(new THREE.CylinderGeometry(radius, radius, 0.9, 10, 1, true).translate(x, top - 0.45, z), Math.PI * 2 * radius, 0.9), c);
-  const inner = tint(tileUv(inward(new THREE.CylinderGeometry(radius - 0.35, radius - 0.35, 0.6, 10, 1, true)).translate(x, top - 0.3, z), Math.PI * 2 * radius, 0.6), scaleRgb(c, 0.6));
   const turn = Math.PI / 10; // a ring's ten corners start a half step from a cylinder's (round 21: the lip stood off the walls it joins, in ten slivers of open air about the well)
   const lip = tint(new THREE.RingGeometry(radius - 0.35, radius, 10).rotateZ(turn).rotateX(-Math.PI / 2).translate(x, top, z), c);
-  const shaft = tint(new THREE.CircleGeometry(radius - 0.35, 10).rotateZ(turn).rotateX(-Math.PI / 2).translate(x, top - 0.6, z), scaleRgb(c, 0.08));
-  return [rim, inner, lip, shaft];
+  const r = radius - 0.35;
+  if (bottom === undefined) {
+    const inner = tint(tileUv(inward(new THREE.CylinderGeometry(r, r, 0.6, 10, 1, true)).translate(x, top - 0.3, z), Math.PI * 2 * radius, 0.6), scaleRgb(c, 0.6));
+    const shaft = tint(new THREE.CircleGeometry(r, 10).rotateZ(turn).rotateX(-Math.PI / 2).translate(x, top - 0.6, z), scaleRgb(c, 0.08));
+    return [rim, inner, lip, shaft];
+  }
+  const depth = top - bottom;
+  const bands: [from: number, to: number, light: number][] = [[0, 0.9, 0.6], [0.9, 2.2, 0.34], [2.2, 4, 0.16], [4, 6.5, 0.07], [6.5, 9.5, 0.03], [9.5, depth, 0.012]];
+  const walls = bands.filter(([a, b]) => b > a).map(([a, b, light]) => {
+    const to = Math.min(b, depth);
+    return tint(tileUv(inward(new THREE.CylinderGeometry(r, r, to - a, 10, 1, true)).translate(x, top - (a + to) / 2, z), Math.PI * 2 * radius, to - a), scaleRgb(c, light));
+  });
+  const water = tint(new THREE.CircleGeometry(r, 10).rotateZ(turn).rotateX(-Math.PI / 2).translate(x, bottom + 0.05, z), scaleRgb(c, 0.02));
+  return [rim, lip, ...walls, water];
 }
 
 /**
@@ -175,7 +187,7 @@ function ruin(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCo
 function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext): Built[] {
   if (p.look === 'inlay') return [floorInlay(p, c, kit, at)];
   if (p.shape === 'cyl') {
-    if (p.look === 'rim') return well(p.x, p.z, p.radius, p.y1, c).map((geo) => ({ kind: 'wall', geo }));
+    if (p.look === 'rim') return well(p.x, p.z, p.radius, p.y1, c, p.y0).map((geo) => ({ kind: 'wall', geo }));
     const h = p.y1 - p.y0;
     const shaft = tint(tileUv(new THREE.CylinderGeometry(p.radius * 0.88, p.radius, h, 7, Math.ceil(h)).translate(p.x, p.y0 + h / 2, p.z), Math.PI * 2 * p.radius, h), c);
     const base = tint(new THREE.CylinderGeometry(p.radius * 1.3, p.radius * 1.4, 0.4, 8).translate(p.x, p.y0 + 0.2, p.z), scaleRgb(c, 0.85));

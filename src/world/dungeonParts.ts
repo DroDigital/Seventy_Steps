@@ -133,7 +133,18 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
       break;
     }
     case 'well': {
-      floor(-h, h, -h, h);
+      // The floor has a hole where the shaft goes down (round 55: it had been whole under the well, a dark pan a hand's breadth deep): slabs in strips either side of a circle that lies
+      // between the shaft's wall and the curb's outer face, so every edge of it is hidden behind one or under the other.
+      const [inner, outer, strip] = [well, well + 0.35, 0.3];
+      const reach = Math.floor(outer / strip) * strip;
+      floor(-h, h, -h, -reach);
+      floor(-h, h, reach, h);
+      for (let v = -reach; v < reach - 1e-9; v += strip) {
+        const [near, far] = [Math.min(Math.abs(v), Math.abs(v + strip)), Math.max(Math.abs(v), Math.abs(v + strip))];
+        const hole = near >= inner ? 0 : (Math.sqrt(inner * inner - near * near) + Math.sqrt(outer * outer - far * far)) / 2;
+        if (hole === 0) floor(-h, h, v, v + strip);
+        else { floor(-h, -hole, v, v + strip); floor(hole, h, v, v + strip); }
+      }
       out.push({ shape: 'cyl', look: 'rim', x: r.x, z: r.z, radius: well + 0.35, y0: L - chasm, y1: L + 0.9, solid: true, room: r.index }); // a wall for all, the investigator included: the curb is not a lip to fall over
       break;
     }
