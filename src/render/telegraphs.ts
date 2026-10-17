@@ -14,6 +14,7 @@ import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { targetOf } from '../systems/specials';
 import { creatureOf } from '../systems/creatures';
+import { aoeLook } from './aoeLook';
 import { attackTheme } from './attackTheme';
 import { shotLook } from './shotLook';
 import type { Decals } from './decals';
@@ -34,6 +35,7 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
 
   /** What one boss's move shows at this frame. */
   function show(id: Entity, def: MoveDef, frame: number, alpha: number): void {
+    decals.style(aoeLook(creatureOf(g, id)?.id));
     const theme = attackTheme(g, id);
     const { danger: DANGER, ring: RING, mind: MIND } = theme;
     const LINE = shotLook(creatureOf(g, id)?.id).color;
@@ -111,11 +113,15 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
       }
       for (const [e, mk] of c.mark) {
         const p = c.transform.get(e)?.pos;
-        if (p) decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackTheme(g, mk.owner).danger);
+        if (!p) continue;
+        decals.style(aoeLook(creatureOf(g, mk.owner)?.id));
+        decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackTheme(g, mk.owner).danger);
       }
       for (const [e, w] of c.wave) {
         const p = c.transform.get(e)?.pos;
-        if (p) decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackTheme(g, w.owner).ring);
+        if (!p) continue;
+        decals.style(aoeLook(creatureOf(g, w.owner)?.id));
+        decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackTheme(g, w.owner).ring);
       }
       decals.end(time);
     },

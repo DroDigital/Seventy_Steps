@@ -13,10 +13,13 @@ import type { Entity } from '../core/ecs';
 import { BOSS, REALITY, YOG } from '../data/tuning';
 import { engagedFights } from '../systems/bossFight';
 import type { Fight, Game, Prop } from '../systems/components';
+import { creatureOf } from '../systems/creatures';
 import { hooksOf, platformsOf, platformsShown } from '../systems/reality';
+import { AOE_SKIN, aoeLook } from './aoeLook';
+import { attackTheme, DEFAULT_ATTACK_THEME } from './attackTheme';
 import { createBoltViews } from './boltViews';
 import { box, tileUv, tint } from './meshKit';
-import { ANOMALY, BASE, mixRgb, scaleRgb } from './palette';
+import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import { createWorldMaterial } from './worldMaterial';
 
 export const FX_PREFIX = 'fx:';
@@ -29,13 +32,14 @@ export interface FightViews {
 const flat = (radius: number, segments = 24): THREE.BufferGeometry =>
   new THREE.RingGeometry(0.05, radius, segments, Math.max(1, Math.ceil(radius / 1.5))).rotateX(-Math.PI / 2);
 
-function pool(radius: number, fire = false): THREE.Mesh {
+function pool(radius: number, fire = false, ink?: Rgb, motif = 0): THREE.Mesh {
   if (fire) { // burning lamp oil (round 12): bright, and it crawls
     const geo = tint(flat(radius), [1, 0.52, 0.2]); // flame, not bone: the grade pales a dull colour to grey
     return new THREE.Mesh(geo, createWorldMaterial({ texture: 'cloth', uvScale: [radius * 2, radius * 2], uvScroll: [0.4, 0.7], emissive: 1, vertexColors: true }));
   }
-  const geo = tint(flat(radius), scaleRgb(mixRgb(BASE.rust, BASE.seaGrey, 0.5), 0.9));
-  return new THREE.Mesh(geo, createWorldMaterial({ texture: 'flesh', uvScale: [radius, radius], uvScroll: [0.05, 0.03], emissive: 0.35, vertexColors: true }));
+  const skin = AOE_SKIN[motif] ?? AOE_SKIN[0]!;
+  const geo = tint(flat(radius), ink ?? scaleRgb(mixRgb(BASE.rust, BASE.seaGrey, 0.5), 0.9));
+  return new THREE.Mesh(geo, createWorldMaterial({ texture: skin.texture, uvScale: [radius, radius], uvScroll: skin.scroll, emissive: skin.emissive, vertexColors: true }));
 }
 
 /** A lamp on its post: the flame and its circle of light show while it is lit. */
@@ -124,7 +128,11 @@ export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
     for (const [id, h] of c.hazard) {
       if (views.has(id)) continue;
       const p = c.transform.get(id)!.pos;
-      const mesh = pool(h.radius, h.fire);
+      const who = creatureOf(g, h.owner)?.id;
+      const look = aoeLook(who);
+      const theme = attackTheme(g, h.owner);
+      const ink = theme === DEFAULT_ATTACK_THEME ? undefined : mixRgb(theme.danger, BASE.bone, 0.28);
+      const mesh = pool(h.radius, h.fire, ink, look.motif);
       mesh.userData.life0 = Math.max(1, h.life);
       mesh.position.set(p.x, p.y + 0.05, p.z);
       scene.add(mesh);
