@@ -48,11 +48,15 @@ describe('fatal edges', () => {
   it('drops the Lost Echoes on the last safe ground, not in the void', () => {
     const g = createWorldGame();
     const tr = g.ecs.c.transform.get(g.player.id)!;
+    const land = g.world.ground;
+    g.world = { ...g.world, ground: (x, z) => (x < 0 ? -6 : land(x, z)) }; // the sea lies west of the shore
     const y = g.world.ground(12, 220);
     tr.prev = { x: 12, y, z: 220 };
     tr.pos = { x: -40, y: -6, z: 220 };
     g.player.echoes = 40;
     fallSystem(g);
+    expect(g.player.falling).not.toBeNull(); // the sea is a fall too (round 55), and the death comes at the foot of it
+    for (let i = 0; i < FALL.frames; i++) fallSystem(g);
     const [drop] = g.ecs.query('drop');
     expect(g.ecs.c.drop.get(drop)!.amount).toBe(40);
     expect(g.ecs.c.transform.get(drop)!.pos.x).toBeCloseTo(12);
@@ -77,7 +81,7 @@ describe('fatal edges', () => {
     expect(g.ecs.c.health.get(player)!.hp).toBe(PLAYER.hp);
   });
 
-  it('marks pits, bridge gaps and wells as falls, and leaves mound banks solid', () => {
+  it('marks pits and bridge gaps as falls, and leaves mound banks and wells solid (a well has a wall, round 55)', () => {
     let holes = 0;
     let banks = 0;
     let wells = 0;
@@ -85,7 +89,8 @@ describe('fatal edges', () => {
       for (const p of d.parts) {
         if (p.look === 'none' && p.solid && p.fall) holes++;
         if (p.look === 'none' && p.solid && !p.fall) banks++;
-        if (p.shape === 'cyl' && p.look === 'rim' && p.fall) wells++;
+        if (p.shape === 'cyl' && p.look === 'rim' && p.solid && !p.fall) wells++;
+        expect(p.shape === 'cyl' && p.look === 'rim' && !!p.fall).toBe(false);
       }
     }
     expect(holes).toBeGreaterThan(0);
@@ -256,6 +261,42 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
     restore(g, g.player.id, g.player.checkpoint);
     expect(g.player.falling).toBeNull();
     expect(tr.pos.y).toBeGreaterThan(-1);
+  });
+
+  it('treats the land\'s end and the shore as edges: balance on the last of the ground, fall when none is left, no instant death (round 55)', () => {
+    const rim = (x: number, ground: (x: number, z: number) => number, y: number) => {
+      const g = createWorldGame();
+      g.world = { ground, colliders: [], off: new Set(), contain: () => {} };
+      const tr = g.ecs.c.transform.get(g.player.id)!;
+      tr.prev = { x, y, z: 220 };
+      tr.pos = { x, y, z: 220 };
+      return { g, tr };
+    };
+    const flat = (): number => 4;
+    // The world's western rim: x < -512 is owned by no region.
+    const on = rim(-511.9, flat, 4);
+    fallSystem(on.g);
+    expect(on.g.player.falling).toBeNull();
+    const balanced = rim(-512 - FALL.foot * 0.5, flat, 4); // the centre is over the void, a part of the feet is still on the land
+    fallSystem(balanced.g);
+    expect(balanced.g.player.falling).toBeNull();
+    expect(balanced.g.ecs.c.health.get(balanced.g.player.id)!.hp).toBe(PLAYER.hp);
+    const over = rim(-512 - FALL.foot - 0.1, flat, 4);
+    fallSystem(over.g);
+    expect(over.g.player.falling).not.toBeNull(); // a fall...
+    expect(over.g.ecs.c.health.get(over.g.player.id)!.hp).toBe(PLAYER.hp); // ...and not the quick end
+    expect(over.g.ecs.c.actor.get(over.g.player.id)!.move).not.toBe('death');
+    for (let i = 0; i < FALL.frames; i++) fallSystem(over.g);
+    expect(over.g.ecs.c.health.get(over.g.player.id)!.hp).toBe(0);
+    // The shore: the ground slopes down under the sea, and a step into the water is the same.
+    const shore = (x: number): number => (x > 100 ? -1.2 : -3);
+    const wading = rim(100.05, shore, -3);
+    fallSystem(wading.g);
+    expect(wading.g.player.falling).toBeNull();
+    const deep = rim(99, shore, -3);
+    fallSystem(deep.g);
+    expect(deep.g.player.falling).not.toBeNull();
+    expect(deep.g.ecs.c.health.get(deep.g.player.id)!.hp).toBe(PLAYER.hp);
   });
 
   it('lets go of what the body was doing, and hears no input while it falls', () => {

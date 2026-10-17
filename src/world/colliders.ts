@@ -132,8 +132,8 @@ function pushOut(w: CollisionWorld, list: readonly Collider[], pos: V3, r: numbe
 
 /**
  * Pushes a standing capsule (feet at `pos`, radius `r`, height `h`) out of every collider and back onto
- * walkable ground. `openEdge` is the investigator in the open world: pits, wells, bridge gaps and the
- * land's edge are walked onto, and the fall system kills them there.
+ * walkable ground. `openEdge` is the investigator in the open world: pits, bridge gaps, the shore and the
+ * land's edge are walked onto, and the fall system takes them over there (a well has a wall, which stops them).
  */
 export function resolveCapsule(w: CollisionWorld, pos: V3, r: number, h: number, openEdge = false): void {
   pushOut(w, w.colliders, pos, r, h, openEdge);

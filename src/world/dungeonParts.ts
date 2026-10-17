@@ -1,6 +1,6 @@
 /**
  * The dungeon kit's pieces (spec §3D): floors, walls, stairs, pillars, pits, bridge chasms and wells.
- * A pit, gap or well stops a foe and drops the investigator. Hidden doors and bridges are pieces.
+ * A pit or a gap stops a foe and drops the investigator; a well has a wall of its own (a curb knee-high above the floor), which stops everyone and is not fallen over (round 55). Hidden doors and bridges are pieces.
  * `roomSpots` places signs, gates, tomes, bosses and spawns. Pure: no Three.js.
  */
 
@@ -134,7 +134,7 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
     }
     case 'well': {
       floor(-h, h, -h, h);
-      out.push({ shape: 'cyl', look: 'rim', x: r.x, z: r.z, radius: well + 0.35, y0: L - chasm, y1: L + 0.9, solid: true, fall: true, room: r.index });
+      out.push({ shape: 'cyl', look: 'rim', x: r.x, z: r.z, radius: well + 0.35, y0: L - chasm, y1: L + 0.9, solid: true, room: r.index }); // a wall for all, the investigator included: the curb is not a lip to fall over
       break;
     }
   }
