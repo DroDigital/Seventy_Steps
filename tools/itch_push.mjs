@@ -3,6 +3,8 @@
 //   node tools/itch_push.mjs --run           and pushes them (butler uses BUTLER_API_KEY, or the login `butler login` keeps)
 //   --only windows,osx,linux                 some platforms only
 //   --get-butler                             downloads butler into .butler/ when it is not on the PATH
+// The version the itch app and the page show for a build is `package.json`'s (a pack carries the same), or what ITCH_VERSION (or --version) says:
+// bump it before a push (`1.0.0-rc.2`, then `-rc.3`...), or a new build wears the last one's name.
 // Environment: ITCH_TARGET (or --target): "digitaldro/seventy-steps", your itch.io user and the project's URL name; BUTLER: the path to butler;
 // ITCH_RELEASE: the folder the packs are in (release/). The channels are named windows, osx and linux, which is how the itch app tells the platforms apart.
 // Every pack is checked to have been made for itch.io (`channel` "itch" in its package.json: desktop/steam.js): a Steam build, started
@@ -27,6 +29,9 @@ const fail = (text) => {
 
 const target = flag('--target') ?? process.env.ITCH_TARGET ?? '';
 if (!/^[\w.-]+\/[\w.-]+$/.test(target)) fail('Name the project: ITCH_TARGET=<your itch.io user>/<the project\'s URL name>, e.g. digitaldro/seventy-steps (or --target).');
+
+const version = (flag('--version') ?? process.env.ITCH_VERSION ?? '').trim() || pkg.version; // the label butler gives each channel's build (the one the page shows)
+if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/.test(version)) fail(`"${version}" is not a version (1.0.0-rc.2).`);
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
 /** package.json out of an asar (a Windows or Linux pack). */
@@ -59,7 +64,7 @@ for (const p of todo) {
   if (channel !== 'itch') fail(`${p.os}: ${dir} was packed for ${channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
   writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n`);
   plan.push({ ...p, dir });
-  console.log(`${p.os}: ${dir} → ${target}:${p.name} (version ${pkg.version})`);
+  console.log(`${p.os}: ${dir} → ${target}:${p.name} (version ${version})`);
 }
 if (!plan.length) fail('Nothing is packed for itch.io.');
 
@@ -93,6 +98,6 @@ if (!args.includes('--run')) {
   process.exit(0);
 }
 for (const p of plan) {
-  const r = spawnSync(cmd, ['push', p.dir, `${target}:${p.name}`, '--userversion', pkg.version, '--if-changed'], { stdio: 'inherit' });
+  const r = spawnSync(cmd, ['push', p.dir, `${target}:${p.name}`, '--userversion', version, '--if-changed'], { stdio: 'inherit' });
   if (r.status !== 0) process.exit(r.status ?? 1);
 }

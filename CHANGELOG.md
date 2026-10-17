@@ -3,26 +3,31 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Menus
+## 1.0.0-rc.2: since the release candidate
+
+Everything between the release candidate and this build: mounts you can hear and ride like a horse, a thunderstorm that can strike the ground,
+every horror's attacks redrawn, the Elder Sign's menus rewritten to be read at a glance, fatal edges, and the allies drawn from their own sprites.
+
+### Menus
 
 - The Elder Sign's menu says less and shows more. What you carry sits in one strip under the title (level, Echoes, insight, star-stones), and the figure the open tab spends is lit and underlined. Every row has its price boxed at the right, bright when you can pay it, red when you cannot, "MAX" when there is no more to buy. What the next level gives is green under its name, and a passage that spending insight would shut again is red.
 - Relics show their effects as figures: green for a gift, red for a price (a hit taken less is green). The paragraph that explained them is gone, here, on the relic page, and on the Arms page.
 - The Weapons tab names what each level does ("Light blow 35 → 40", "Shot 30 → 35, reach 3 → 4.5 m") instead of a paragraph about percentages, and the long line about resting that stood under every tab is one short line, different for each tab.
 - A merchant's wares have their price boxed (red when you cannot pay, "SOLD OUT", "NO ROOM"), the Echoes you carry above them, and what you carry of each beneath it. The Mounts tab lists each mount with one quiet word at the right (selected, available, the quest it waits on, its price) and says its shared speeds once, in the foot.
 
-## Weather
+### Weather
 
 - Rain and thunderstorms come round. A test of two hours saw no storm: clear spells were two to seven minutes and the hub had no weather at all. They are one to three and a half minutes now, the hub and every other region have rain and thunderstorms, and a thunderstorm gathers anywhere.
 - In a thunderstorm a bolt now and then falls on the ground. A ring of crackling light opens near you (sometimes near a foe) a second and a half before it falls, and anything standing in it is struck hard and staggered, you and the foes alike. Walking out is enough; so is a roll through the last of it. Nothing is struck under a roof or in a dungeon.
 - Rain falls in grains and splashes where it lands, and closes the world in under a haze that deepens with the storm. A thunderstorm has a wind in it. Lightning is forked on the far ground, white-hot at its heart, and the thunder rolls after it, later and duller the farther the strike. Under a roof the rain is a dull patter on the tiles.
 
-## Riding (round 52)
+### Riding (round 52)
 
 - A horse-drawn rig, the plain chariot or the spectral one, now turns like a horse: it follows a circle that widens with its pace, slows into a turn and never to a stop, and the horses step round ahead of the carriage and bend into the turn. A standing horse steps round on the spot.
 - The mount no longer sticks when you change direction. A wall that blocked its turn used to hold it where it stood; it now takes what turn it can and backs off what it cannot swing into.
 - The metallic clatter is gone. The wheels roll softly and low, swelling with their turn, over the rush of air. The motor car's engine climbs through its gears, and the spectral chariot has a cold drone with a breath of wind that rises as it quickens.
 
-## Horrors' attacks
+### Horrors' attacks
 
 - Every attack of a horror was redrawn. A mark on the ground is now found on any floor (Cthulhu's was a teal nearly as dark as the ground): the colours that must be seen are lifted to a floor of brightness, in the horror's own hue, with a dark outline so they read on pale ground and dark.
 - A telegraph shows the whole of what is coming from its first frame, fills toward its front, runs chevrons along a charge's lane, and flashes as the blow falls. A swirl draws a vortex's arms and its eye.
@@ -31,36 +36,36 @@ player would notice, newest first. Versions before 1.0 were never released.
 - A caster gathers before it looses: light is drawn in to it, and a gaze streams from its eye to your head, thicker as your mind gives way. A teleport collapses where it was and arrives under a sigil; a summoning rises as a column of light from a circle; a phase change shakes the arena.
 - You can hear them. A bolt as it leaves and lands, a burst, a swing, a summoning, an arrival, a phase change, the gaze and the dark each sound as the horror's element (water splashes, stone cracks, fire crackles, frost shatters, ink slaps); a beam and a vortex hum while they last, and the gathering before a blow rises to its release. A burst, a slam, a phase change and a gaze jolt the camera by how near they are (the Screen shake setting scales it).
 
-## Riding
+### Riding
 
 - You can hear a ride now. Every hoofbeat is a foot coming down in the horse's gait, panned left and right, on dirt, road, stone or in the shallows; under them run the wheels' roar and rattle, the rush of air and, for the motor car, an engine that climbs with its speed; over them the harness' brass, the creak of timber and a snort at the gallop.
 - The chariot's horse is a new chestnut draft horse with a flaxen mane and white stockings, in black and brass harness, hitched to the shafts. It walks, trots, canters and gallops with its feet on the ground and stops where it stands. Its hooves throw dust, spray and sparks.
 - The spectral chariot's violet fire is visible at last (it was not drawn at all), and the skeleton horses use the same gait.
 - The mount's prompts, refusals and the Mounts tab are in English, German, French and Spanish.
 
-## Mounts
+### Mounts
 
 - The included mount is called Chariot. The summon and ride prompts leave after a few seconds.
 - A mount drops when the ride reaches a dungeon or a boss arena. It cannot be summoned in either place.
 
-## Plain chariot
+### Plain chariot
 
 - The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. Its horse is a chestnut draft horse (see Riding).
 - The save id is still `grey`, so an older journey keeps its mount. The spectral chariot and the motor car are unchanged, and still no faster.
 - On the desktop build, looking for a controller no longer closes and reopens the helper process, which was waking the macOS dock and pausing the game.
 
-## Edges and horrors
+### Edges and horrors
 
 - Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. A ride stops short of the land's edge, as it does at a wall: it is on foot that the edge is walked off. The Lost Echoes stay on the ground where you stepped off.
 - Each horror's attacks keep their motion and take that horror's own colours: the telegraphs, the bursts and the beams.
 - Casters no longer share one green fireball. Yog-Sothoth still throws that light. The Colour's orb is its own hue. Other shots are shards, drops, sparks or darts.
 - A horror's areas wear its own mark: tide, runes, cracks, flame, spores, coils, an eye, roots, stars, frost, ash or a stain. The ground they cover, and when they land, is unchanged.
 
-## Allied sprites
+### Allied sprites
 
 - Nodens, the Tritons, the Cats of Ulthar, Pickman, Nasht and Kaman-Thah, the Light-Being from Algol and the Yithian Archivist are drawn from authored sprites: idle, walk or glide, attack and hurt, from all four sides.
 
-## Mount update
+### Mount update
 
 - The Borrowed Reins unlocks the Borrowed Grey, a plain saddled mare from the university stables.
 - The spectral chariot is now optional $0.99 DLC, gated like the motor car. Neither is faster than the grey.

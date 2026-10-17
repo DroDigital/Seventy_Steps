@@ -62,8 +62,8 @@ machine of each platform; the second half is what only the author can do, becaus
    Mac (or the Rosetta start), a controller on each, Steam's overlay (Shift+Tab), fullscreen (F11, Alt+Enter), alt-tab and back,
    a save, quitting and continuing, and Steam Cloud between two machines. CI proves a packed build starts and reaches its title on
    a runner with no controller and no Steam; it has not played the game.
-5. **The version**: `1.0.0-rc.1` is in `package.json` and goes into the macOS bundle, where Apple wants digits only: set `1.0.0`
-   when it is released, and `CHANGELOG.md` with it. Steam's build ids are its own.
+5. **The version**: `package.json`'s (`1.0.0-rc.2`; raise it before each build that goes out, `-rc.3`, `-rc.4`…, with its `CHANGELOG.md` heading) is what itch.io shows for a build, and it goes into the macOS bundle, where Apple wants digits only: set `1.0.0`
+   when it is released. A push to itch.io takes another label if asked: the workflow's *itch_version* input, or `ITCH_VERSION` / `--version` for `tools/itch_push.mjs`. Steam's build ids are its own.
 
 ## Sending a build
 
