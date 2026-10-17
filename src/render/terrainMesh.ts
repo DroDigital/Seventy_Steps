@@ -29,12 +29,17 @@ const ORGANIC = new Set<GroundTexture>(['rot', 'grass', 'mud', 'sand', 'snow', '
 /**
  * One shared material per ground, road and patch texture: varied in world space, (organic ground)
  * bombed with a turned second sample so it never repeats, the road texture blended in along the roads,
- * and the biome's patch ground laid over it here and there, and the ground of the region beside it blended in toward their border (aEdge, round 55).
+ * and the biome's patch ground laid over it here and there, and the ground of the region beside it blended in toward their border (aEdge, round 55): its ground and its road
+ * style cross-fade with this one's, and a patch of a different ground fades out.
  */
-export function groundMaterial(texture: GroundTexture, road: RoadTexture = 'cobble', patch?: GroundTexture, beside?: GroundTexture): THREE.ShaderMaterial {
-  const key = `${texture}|${road}|${patch ?? ''}|${beside ?? ''}`;
+export interface Beside { texture: GroundTexture; road: RoadTexture; patch?: GroundTexture }
+
+export function groundMaterial(texture: GroundTexture, road: RoadTexture = 'cobble', patch?: GroundTexture, beside?: Beside): THREE.ShaderMaterial {
+  const roadBeside = beside && beside.road !== road ? beside.road : undefined; // a road meets another road's style at a border: the two cross-fade, as the ground does
+  const fade = !!beside && beside.patch !== patch; // and a patch of another ground than the one beside fades out toward the border, so its edge is not cut there
+  const key = `${texture}|${road}|${patch ?? ''}|${beside?.texture ?? ''}|${roadBeside ?? ''}|${fade ? 'fade' : ''}`;
   let m = materials.get(key);
-  if (!m) materials.set(key, (m = createWorldMaterial({ texture, texture2: road, texture3: patch, texture4: beside, vertexColors: true, vary: 0.9, bomb: ORGANIC.has(texture), shore: true })));
+  if (!m) materials.set(key, (m = createWorldMaterial({ texture, texture2: road, texture3: patch, texture4: beside?.texture, texture5: roadBeside, patchFade: fade, vertexColors: true, vary: 0.9, bomb: ORGANIC.has(texture), shore: true })));
   return m;
 }
 
@@ -120,5 +125,5 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
   geo.setAttribute('aEdge', new THREE.BufferAttribute(edge, 1));
   geo.setIndex(index);
   geo.computeBoundingSphere();
-  done(new THREE.Mesh(geo, groundMaterial(region.biome.texture, (REGION_LAYOUTS[region.id] ?? REGION_LAYOUTS.hub).road, region.biome.patch, blended ? beside!.region.biome.texture : undefined)));
+  done(new THREE.Mesh(geo, groundMaterial(region.biome.texture, (REGION_LAYOUTS[region.id] ?? REGION_LAYOUTS.hub).road, region.biome.patch, blended ? { texture: beside!.region.biome.texture, road: (REGION_LAYOUTS[beside!.region.id] ?? REGION_LAYOUTS.hub).road, patch: beside!.region.biome.patch } : undefined)));
 }

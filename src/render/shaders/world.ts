@@ -103,6 +103,9 @@ uniform sampler2D uMap2;
 uniform sampler2D uMap3;
 uniform sampler2D uMap4;
 uniform float uHasMap4; // 1: uMap4 (the region beside's ground) blends in by vEdge
+uniform sampler2D uMap5;
+uniform float uHasMap5; // 1: uMap5 (its road's) cross-fades with uMap2 by vEdge
+uniform float uPatchFade; // 1: the patches (uMap3) fade out toward the border, where vEdge is a half either side
 uniform float uAffine;
 uniform vec3 uFogColor;
 uniform float uFogAmount;
@@ -175,10 +178,12 @@ void main() {
   if (uHasMap4 > 0.5 && vEdge > 0.003) tex = mix(tex, sampleMap(uMap4, uv, gx, gy), vEdge);
   if (uHasMap2 > 0.5 && vSplat > 0.01) {
     float edge = vSplat + 0.35 * (vnoise(vWorld.xz * 0.9) - 0.5);
-    tex = mix(tex, textureGrad(uMap2, uv, gx, gy).rgb, smoothstep(0.35, 0.65, edge));
+    vec3 road = textureGrad(uMap2, uv, gx, gy).rgb;
+    if (uHasMap5 > 0.5 && vEdge > 0.003) road = mix(road, textureGrad(uMap5, uv, gx, gy).rgb, vEdge); // (the road's style, as the ground's, changes over the band and not along a line)
+    tex = mix(tex, road, smoothstep(0.35, 0.65, edge));
   }
   if (uHasMap3 > 0.5) {
-    float pn = 0.5 * vnoise(vWorld.xz * 0.045 + 17.0) + 0.3 * vnoise(vWorld.xz * 0.13 + 3.0) + 0.2 * vnoise(vWorld.xz * 0.5), pm = smoothstep(uPatch.x, uPatch.x + uPatch.y, pn) * (1.0 - smoothstep(0.1, 0.5, vSplat)); // never over a road
+    float pn = 0.5 * vnoise(vWorld.xz * 0.045 + 17.0) + 0.3 * vnoise(vWorld.xz * 0.13 + 3.0) + 0.2 * vnoise(vWorld.xz * 0.5), pm = smoothstep(uPatch.x, uPatch.x + uPatch.y, pn) * (1.0 - smoothstep(0.1, 0.5, vSplat)) * (1.0 - uPatchFade * 4.0 * vEdge * (1.0 - vEdge)); // never over a road; and fading out toward a border (the same in whichever region's chunk: vEdge and its complement give one 4e(1-e))
     if (pm > 0.01) tex = mix(tex, textureGrad(uMap3, uv * 0.9 + vec2(0.31, 0.57), gx * 0.9, gy * 0.9).rgb, pm);
   }
   if (uVary > 0.0) {
