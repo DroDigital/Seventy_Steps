@@ -5,8 +5,9 @@
  * would condemn a body that could still save itself. Only when none of it is, with no contact with the
  * floor left, the ground lets go of the body and it falls, tumbling, for a second and a bit, the picture
  * going dark; the death comes at the foot of the drop (round 54: it had been instant, the moment a hand's
- * breadth of the body touched the void). Walking off the land or into the sea is still the quick end it
- * was. The Lost Echoes stay at the last safe feet, on the ground there, so the drop is not left in the
+ * breadth of the body touched the void). The shore and the world's rim are edges too (round 55: walking into
+ * the sea, or off the land's end, had stayed the instant death): the same balance on the last of the ground, and
+ * the same fall once none is left. The Lost Echoes stay at the last safe feet, on the ground there, so the drop is not left in the
  * void. Foes, mounts' walls and the arena ring are unchanged: those colliders still push. A cutscene and
  * a death already playing do not fall again.
  */
@@ -55,16 +56,29 @@ function inFall(w: CollisionWorld, pos: V3, r: number, h: number): boolean {
 
 const RING = Array.from({ length: 8 }, (_, k) => [Math.cos((k * Math.PI) / 4), Math.sin((k * Math.PI) / 4)] as const);
 
-/** What the feet have under them: the floor (the centre is on it), the edge (the centre is over a drop but some of the feet's hold is on the floor still), or air (none is). */
-function holdOf(w: CollisionWorld, pos: V3, h: number): 'floor' | 'edge' | 'air' {
-  if (!inFall(w, pos, FALL.foot, h)) return 'floor'; // (nowhere near an edge: the common case, one look)
-  if (!inFall(w, pos, 0, h)) return 'floor';
-  return RING.some(([c, s]) => !inFall(w, { x: pos.x + c * FALL.foot, y: pos.y, z: pos.z + s * FALL.foot }, 0, h)) ? 'edge' : 'air';
-}
-
-/** Whether the centre is on a region's ground above the sea (outside a dungeon): else the land has ended. */
+/** Whether a point is on a region's ground above the sea (outside a dungeon): else the land has ended. */
 function onLand(pos: V3): boolean {
   return !!regionAt(pos.x, pos.z) && (inDungeon(pos.x, pos.z) || pos.y > SEA);
+}
+
+/** One foot's hold: on the land and clear of a drop. (A point beside the body stands on the ground there, not at the body's height.) */
+function holds(w: CollisionWorld, x: number, z: number, y: number, h: number): boolean {
+  const at = { x, y, z };
+  return onLand(at) && !inFall(w, at, 0, h);
+}
+
+/**
+ * What the feet have under them: the floor (the centre holds), the edge (it does not, over a drop, the sea or the land's end, but some of the feet's
+ * ring does: free to step back), or air (none does). The shore and the world's rim are edges like a pit's (round 55: they had stayed the instant
+ * death of round 50, the moment the centre was in the water). A foot's own ground is used for the sea, as the shore slopes under the body.
+ */
+function holdOf(w: CollisionWorld, pos: V3, h: number): 'floor' | 'edge' | 'air' {
+  if (holds(w, pos.x, pos.z, pos.y, h)) return 'floor';
+  const foot = (c: number, s: number): boolean => {
+    const [x, z] = [pos.x + c * FALL.foot, pos.z + s * FALL.foot];
+    return holds(w, x, z, Math.max(pos.y, w.ground(x, z)), h);
+  };
+  return RING.some(([c, s]) => foot(c, s)) ? 'edge' : 'air';
 }
 
 /** Feet that can stand: on a region's ground, clear of a drop, and above the sea outside a dungeon. */
@@ -135,11 +149,8 @@ export function fallSystem(g: Game): void {
   if (!a || !tr || !b) return;
   if (g.player.falling) return dropStep(g, g.player.falling);
   if (a.move === 'death') return;
-  const land = onLand(tr.pos);
-  const hold = land ? holdOf(g.world, tr.pos, b.height) : 'air';
+  const hold = holdOf(g.world, tr.pos, b.height);
   if (hold === 'floor') LIP.set(g, { ...tr.pos }); // the last feet on the floor: the Echoes will lie here
   if (hold !== 'air') return; // on the floor, or balanced on the very edge of it, and free to step back
-  const lip = LIP.get(g) ?? tr.prev;
-  if (land) beginFall(g, lip); // no contact with the floor left: past saving by stepping back
-  else beginDeath(g, lip); // the sea, or the land's end: no ledge to go over
+  beginFall(g, LIP.get(g) ?? tr.prev); // no contact with the floor left: past saving by stepping back, and the drop is the death
 }
