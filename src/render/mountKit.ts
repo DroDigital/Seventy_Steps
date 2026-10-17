@@ -19,6 +19,13 @@ export const MOUNT_COLORS = {
 export function group(parent: THREE.Object3D, x = 0, y = 0, z = 0): THREE.Group {
   const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g;
 }
+/** Turns `obj` (which stands at `home` in its parent's frame) by `angle` about the vertical through `pivot`, so what is hitched there stays hitched: a horse leading a turn about the collar its shafts meet. */
+export function swingAbout(obj: THREE.Object3D, home: { x: number; z: number }, pivot: { x: number; z: number }, angle: number): void {
+  const [lx, lz, c, s] = [pivot.x - home.x, pivot.z - home.z, Math.cos(angle), Math.sin(angle)];
+  obj.rotation.y = angle;
+  obj.position.x = pivot.x - (lx * c + lz * s);
+  obj.position.z = pivot.z - (-lx * s + lz * c);
+}
 export const panel = (w: number, h: number, d: number, x: number, y: number, z: number, c: Rgb, r = 0.025): THREE.BufferGeometry => bevel(w, h, d, x, y, z, c, r);
 export const orb = (r: number, at: Point, c: Rgb): THREE.BufferGeometry => tint(new THREE.SphereGeometry(r, 8, 5).translate(...at), c);
 export function rod(a: Point, b: Point, radius: number, c: Rgb, r1 = radius): THREE.BufferGeometry {

@@ -3,7 +3,9 @@
  * footsteps are muted on a mount, so a ride was nearly silent). A ride is now heard as a body of sound: a hoofbeat on every
  * foot that comes down (the gait's own: systems/mountGait.ts), the wheels' rumble and rattle and the rush of air as continuous
  * beds that follow the speed and the ground, the harness's brass and leather on each stride, creaks and knocks from the
- * chariot, a snort at the gallop, and for the motor car an engine that climbs with its speed. Procedural recipes
+ * chariot, a snort at the gallop, and for the motor car an engine that climbs with its speed. Round 52: the wheels no longer clatter
+ * (a brass jingle, a clacking knock and a pulsing rattle were metallic and tiring): they roll, softly, and thump over a joint; the harness is leather
+ * and wood; the skeletons' hooves knock hollow; the spectral chariot breathes and the motor car shifts gear. Procedural recipes
  * (data/sounds.ts) until recordings stand in front of them; levels in `MOUNT_MIX` are set against the impacts (a clang at
  * about -21 dBFS rms): a ride is as present as a fight, and tests/mountAudio.test.ts holds it there.
  */
@@ -19,18 +21,20 @@ export type Shoe = 'iron' | 'bone';
 export const MOUNT_MIX = {
   hoof: 0.8, // a hoofbeat at its full weight
   hoofSample: 3, // the recorded footfall laid beneath it, pitched down: its set's own gain (0.15 to 0.38) is made up here
-  knock: 0.85, // a wheel over a joint or a stone
-  jingle: 2.3, // the harness on a stride
-  creak: 2.6,
+  thump: 1.15, // a wheel over a joint or a stone: a soft knock, not a clack
+  trace: 1.2, // leather and wood shifting in the harness on a stride
+  creak: 2.2,
   snort: 1.3,
   nicker: 1.3,
   unhitch: 1.3,
+  whisper: 1.5, // the spectral chariot's breath and violet crackle
+  pop: 1.1, // the car's exhaust, easing off
   spectralSummon: 0.85,
   spectralDismiss: 0.9,
   engineStart: 1.2,
   engineStop: 1.2,
   bedRumble: 0.7, // the chassis' low roar
-  bedGrind: 0.4, // gravel, cobbles and rattle
+  bedRoll: 0.4, // the wheels rolling: soft, low, and slower than the speed
   bedWind: 0.24, // the air rushing by, with the square of the speed
   bedEngine: 0.3,
   bedSpectral: 0.28,
@@ -42,13 +46,12 @@ export function hoofBeat(ground: Ground, o: { hind?: boolean; shoe?: Shoe; weigh
   const weight = o.weight ?? 1;
   const body = o.hind ? 0.9 : 1;
   const layers: Sound[number][] = [];
-  if (o.shoe === 'bone') {
+  if (o.shoe === 'bone') { // a hollow knock, bone on the ground: soft in its edge, a little ring inside it
     layers.push(
-      tone('triangle', 430 * body, 0.1, 0.58, { to: 290 * body, filter: { type: 'bandpass', hz: 520, q: 1.4 } }),
-      tone('sine', 150 * body, 0.14, 0.62, { to: 62 }),
-      noise('bandpass', 2300, 0.035, 0.58, { q: 3 }),
-      tone('triangle', 330 * body, 0.12, 0.24, { at: 0.11, to: 230 }),
-      noise('bandpass', 1900, 0.03, 0.2, { at: 0.11, q: 3 }),
+      tone('sine', 190 * body, 0.12, 0.72, { to: 92 }),
+      tone('triangle', 340 * body, 0.09, 0.4, { to: 210, filter: { type: 'lowpass', hz: 900 } }),
+      noise('bandpass', 1500, 0.03, 0.34, { q: 1.6 }),
+      tone('sine', 280 * body, 0.16, 0.16, { at: 0.07, to: 220 }),
     );
     if (ground === 'water') layers.push(noise('bandpass', 950, 0.2, 0.36, { to: 320, q: 0.6, attack: 0.008 }));
   } else if (ground === 'dirt') {
@@ -83,28 +86,30 @@ export function hoofBeat(ground: Ground, o: { hind?: boolean; shoe?: Shoe; weigh
   return layers;
 }
 
-/** The wheels over a joint, a cobble or a rut: a thump through the axle and a knock of wood. */
-export const WHEEL_KNOCK: Sound = [
-  tone('triangle', 150, 0.1, 0.62, { to: 74 }),
-  noise('lowpass', 900, 0.07, 0.55, { to: 300 }),
-  tone('square', 250, 0.035, 0.12, { filter: { type: 'bandpass', hz: 680, q: 1.2 } }),
+/**
+ * A wheel over a joint, a cobble or a rut: a soft thump through the axle, not a clack. `wood` is a coach's iron-shod rim on its felloes, deadened;
+ * `rubber` the car's tyre and its springs: lower and rounder.
+ */
+export function wheelThump(kind: 'wood' | 'rubber', ground: Ground = 'road'): Sound {
+  const body = kind === 'rubber' ? 78 : 104;
+  return [
+    tone('sine', body, 0.15, 0.62, { to: body * 0.5 }),
+    noise('lowpass', ground === 'stone' ? 1100 : ground === 'dirt' ? 520 : 760, 0.1, 0.42, { to: 200, q: 0.6 }),
+    ...(kind === 'wood' ? [tone('triangle', 180, 0.06, 0.16, { to: 118, filter: { type: 'lowpass', hz: 560 } })] : [tone('sine', 150, 0.12, 0.14, { at: 0.04, to: 96 })]),
+  ];
+}
+
+/** Leather and wood shifting in the harness on a stride: a slap of trace on a hame, the shaft taking the load. Nothing rings. */
+export const TRACE_SHIFT: Sound = [
+  noise('lowpass', 620, 0.13, 0.34, { to: 240, q: 0.5 }),
+  tone('sine', 128, 0.11, 0.2, { to: 88 }),
+  noise('bandpass', 880, 0.05, 0.12, { at: 0.018, q: 0.9 }),
 ];
 
-/** Brass rings, buckles and hames shaken on a stride: a small shower of bells above a leather slap. */
-export const HARNESS_JINGLE: Sound = [
-  tone('sine', 2093, 0.16, 0.12),
-  tone('sine', 2794, 0.12, 0.1, { at: 0.012 }),
-  tone('sine', 3520, 0.09, 0.08, { at: 0.026 }),
-  tone('sine', 1568, 0.2, 0.09, { at: 0.006 }),
-  noise('highpass', 5200, 0.05, 0.18, { at: 0.004 }),
-  noise('bandpass', 1300, 0.045, 0.38, { q: 2.6 }),
-];
-
-/** Old timber and leather taking a load. */
+/** Old timber and leather taking a load: low and woody, no squeal. */
 export const CREAK: Sound = [
-  noise('bandpass', 360, 0.3, 0.5, { to: 520, q: 2.8, attack: 0.03 }),
-  tone('triangle', 128, 0.28, 0.2, { to: 172, vibrato: [11, 26], filter: { type: 'lowpass', hz: 640 } }),
-  tone('sawtooth', 420, 0.2, 0.05, { at: 0.05, to: 330, filter: { type: 'bandpass', hz: 700, q: 3 } }),
+  noise('bandpass', 330, 0.34, 0.45, { to: 470, q: 1.4, attack: 0.04 }),
+  tone('triangle', 118, 0.32, 0.2, { to: 156, vibrato: [9, 24], filter: { type: 'lowpass', hz: 560 } }),
 ];
 
 /** Air blown out through the nose: the horse's snort at the gallop's start. */
@@ -123,13 +128,28 @@ export const NICKER: Sound = [
   tone('sine', 95, 0.4, 0.25, { to: 70 }),
 ];
 
-/** The chariot's horse let go: a toss of the head, the harness shaking. */
+/** The chariot's horse let go: a toss of the head, the harness shaken loose. */
 export const UNHITCH: Sound = [
-  noise('bandpass', 1500, 0.22, 0.45, { to: 600, q: 2, attack: 0.01 }),
-  tone('sine', 2230, 0.2, 0.1, { at: 0.02 }),
-  tone('sine', 3000, 0.14, 0.08, { at: 0.05 }),
+  noise('bandpass', 1100, 0.24, 0.42, { to: 480, q: 1.2, attack: 0.012 }),
   noise('lowpass', 300, 0.3, 0.4, { to: 120 }),
   tone('triangle', 120, 0.3, 0.3, { to: 70 }),
+];
+
+/** The spectral chariot's breath: a cold sigh through the bones with a faint violet crackle in it. */
+export const SPECTRAL_WHISPER: Sound = [
+  noise('bandpass', 620, 0.7, 0.4, { to: 1250, q: 1.6, attack: 0.25 }),
+  tone('sine', 196, 0.8, 0.14, { to: 175, attack: 0.3, vibrato: [4, 30] }),
+  noise('highpass', 3800, 0.03, 0.14, { at: 0.34 }),
+  noise('highpass', 4300, 0.025, 0.12, { at: 0.46 }),
+  noise('highpass', 3500, 0.03, 0.1, { at: 0.55 }),
+];
+
+/** The car's exhaust easing off: a pop and a burble. */
+export const EXHAUST_POP: Sound = [
+  noise('lowpass', 520, 0.07, 0.55, { to: 180 }),
+  tone('sine', 78, 0.12, 0.45, { to: 46 }),
+  noise('bandpass', 700, 0.05, 0.3, { at: 0.11, q: 1.2 }),
+  tone('sine', 66, 0.1, 0.3, { at: 0.12, to: 44 }),
 ];
 
 /** A great cold wind drawn through a carriage: the spectral chariot's summons. */
