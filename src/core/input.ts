@@ -188,9 +188,10 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   };
   const comeBack = (): void => {
     const was = away;
+    if (!was) return; // (a return is often two events, visibilitychange and focus: the second finds nothing saved, and must not let go of what the first gave back; and a focus with no blur before it held nothing to let go)
     away = null;
     letGo();
-    if (!was || performance.now() - was.at > BLIP_MS) return; // a long absence: nothing is held on coming back (round 31)
+    if ( performance.now() - was.at > BLIP_MS) return; // a long absence: nothing is held on coming back (round 31)
     const now = performance.now(); // a short one (a notification, an overlay, focus taken and given back) is not a hand let go: the run goes on, the sprint with it
     for (const code of was.keys) keys.set(code, now);
     for (const [btn, b] of was.mouse) mouseButtons.set(btn, b);

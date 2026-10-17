@@ -16,6 +16,7 @@ interface Page {
   key(type: 'keydown' | 'keyup', code: string, o?: { repeat?: boolean; metaKey?: boolean }): void;
   mouse(type: 'mousedown' | 'mouseup' | 'mousemove', o?: { button?: number; buttons?: number; shiftKey?: boolean }): void;
   win(type: string): void;
+  vis(state: 'hidden' | 'visible'): void;
   pad: { axes: number[]; down: number[] } | null;
   poll(n?: number): InputFrame;
 }
@@ -29,7 +30,8 @@ async function page(): Promise<Page> {
   const state: Page['pad'] = null;
   const p = { pad: state } as { pad: Page['pad'] };
   vi.stubGlobal('addEventListener', on(win));
-  vi.stubGlobal('document', { pointerLockElement: null, addEventListener: on(doc), visibilityState: 'visible' });
+  const docStub = { pointerLockElement: null, addEventListener: on(doc), visibilityState: 'visible' };
+  vi.stubGlobal('document', docStub);
   vi.stubGlobal('navigator', {
     getGamepads: () => [p.pad && ({ index: 0, id: 'Test Pad', connected: true, mapping: 'standard', timestamp: 1, axes: p.pad.axes, buttons: Array.from({ length: 17 }, (_, i) => ({ pressed: p.pad!.down.includes(i), value: p.pad!.down.includes(i) ? 1 : 0 })) })],
   });
@@ -43,6 +45,10 @@ async function page(): Promise<Page> {
     key: (type, code, o = {}) => fire(win, type, { ...common, code, repeat: false, metaKey: false, ...o }),
     mouse: (type, o = {}) => fire(type === 'mousedown' ? cv : win, type, { ...common, button: 0, buttons: 0, shiftKey: false, movementX: 0, movementY: 0, ...o }),
     win: (t) => fire(win, t, {}),
+    vis: (state) => {
+      docStub.visibilityState = state;
+      fire(doc, 'visibilitychange', {});
+    },
     poll: (n = 1) => {
       let f = input.poll();
       for (let i = 1; i < n; i++) f = input.poll();
@@ -255,6 +261,26 @@ describe('a run that goes on through a sprint, a roll and a blink of the window 
     expect(f.held.dodge).toBe(true);
     expect(f.held.block).toBe(true);
     expect(f.pressed.dodge).toBe(false); // a sprint carried on, not begun again
+    t.mockRestore();
+  });
+
+  it('a return that is two events, the page shown and the window focused, keeps the run the first gave back (Codex, PR #132)', async () => {
+    const t = vi.spyOn(performance, 'now');
+    t.mockReturnValue(0);
+    const pg = await page();
+    pg.key('keydown', 'KeyW');
+    pg.key('keydown', 'Space');
+    pg.poll();
+    t.mockReturnValue(1000);
+    pg.vis('hidden');
+    pg.win('blur'); // both come, and the second finds the first's saved state kept
+    expect(pg.poll().moveY).toBe(0);
+    t.mockReturnValue(1100);
+    pg.vis('visible');
+    pg.win('focus'); // before: this second return let go of what the first had restored
+    const f = pg.poll();
+    expect(f.moveY).toBe(1);
+    expect(f.held.dodge).toBe(true);
     t.mockRestore();
   });
 

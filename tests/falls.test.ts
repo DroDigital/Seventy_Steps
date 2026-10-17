@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { MOUNT_QUEST } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
 import { FALL, PLAYER, SIM } from '../src/data/tuning';
+import { shove, strike } from '../src/systems/combat';
 import { fallDark, fallSystem } from '../src/systems/falls';
 import { restore } from '../src/systems/death';
 import { playerControl } from '../src/systems/playerControl';
@@ -276,6 +277,23 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
     const m = g.ecs.c.mover.get(g.player.id)!;
     expect([m.vx, m.vz]).toEqual([0, 0]);
     expect(g.player.buffer.action).toBeNull(); // a press while falling is not queued for the waking
+  });
+
+  it('cannot be struck or shoved by any source while it falls, a ground strike included (Codex, PR #132)', () => {
+    const { g, tr, pit, place } = atTheLip();
+    place(pit.min.x + 0.25);
+    fallSystem(g);
+    expect(g.player.falling).not.toBeNull();
+    const sky = g.ecs.spawn(); // a body of no kind, as a bolt from the sky is dealt (skyStrikes.ts)
+    g.ecs.c.transform.set(sky, { pos: { ...tr.pos }, prev: { ...tr.pos }, yaw: 0, prevYaw: 0 });
+    const outcome = strike(g, sky, g.player.id, { damage: 500, poise: 99, guard: 0, hitstop: 6, parryable: false, interrupts: false, unblockable: true }, tr.pos);
+    expect(outcome).toBe('dodged');
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(PLAYER.hp);
+    const at = { ...tr.pos };
+    shove(g, g.player.id, { x: at.x - 2, y: at.y, z: at.z }, 3);
+    expect(g.ecs.c.shove.has(g.player.id)).toBe(false);
+    g.player.falling = null; // and once up again, the same bolt strikes
+    expect(strike(g, sky, g.player.id, { damage: 5, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false, unblockable: true }, tr.pos)).not.toBe('dodged');
   });
 
   it('closes the picture to black as the drop goes on, and holds it black until the waking', () => {

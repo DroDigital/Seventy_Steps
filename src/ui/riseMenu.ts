@@ -10,9 +10,10 @@ import { getEntity } from '../data/registry';
 import { signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { riseAt } from '../systems/death';
+import { deathLine } from '../systems/deathNotes';
 import { gatePlan } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
-import { createScreen, footer, option, title, type Page } from './menuKit';
+import { createScreen, el, footer, option, title, type Page } from './menuKit';
 
 export interface RiseMenu {
   readonly open: boolean;
@@ -28,6 +29,7 @@ export function createRiseMenu(g: Game): RiseMenu {
     const page: Page = {
       build(panel) {
         title(panel, t('rise.title'));
+        el(panel, 'div', deathLine(g), 'opacity:.55;font-style:italic;font-size:13px;line-height:1.5;margin:0 14px 10px'); // what the last blow teaches, which the veil does not say where a screen asks (round 54)
         option(panel, t('rise.candle'), () => choose('candle'), true, '', boss ? t('rise.candleBoss', { boss }) : t('rise.candleFog'));
         option(panel, sign ? t('rise.signNamed', { sign }) : t('rise.sign'), () => choose('sign'), true, '', t('rise.signHint'));
         footer(panel, t('rise.footer'));
