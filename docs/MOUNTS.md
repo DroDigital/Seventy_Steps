@@ -23,7 +23,7 @@ Removal or failed ownership verification falls back to the included chariot.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–3) with orbit, rest/cruise/gallop, pause and inspection
 resolution controls. It never opens a save or grants DLC access. The included chariot is the spectral coach's body and
-seat, without curtains, crest, violet lamps or mourning black, drawn by one horse. That horse is lofted in the game's own materials, a bay with a hide grain, and is not an imported model.
+seat, without curtains, crest, violet lamps or mourning black, drawn by one horse. That horse is Kenney's CC0 animal-horse, retinted as a bay under the hide grain. The chariot mesh is not imported.
 The spectral chariot’s violet fire is parented to each skeleton horse’s spine, neck and hooves and kept dim. Procedural coachwork
 is batched; the spectral horses' limbs are instanced.
 
@@ -39,7 +39,7 @@ Peaslee’s spoken lines do not name the mount. The journal, the completion noti
 
 The corrected automobile brief is **1890–1940**. The model uses a coherent circa-1914 touring silhouette,
 documented in [the historical reference brief](MOUNT_CAR_REFERENCES.md). The automobile and the spectral coach are original procedural art in the
-game’s retro pipeline. The plain chariot reuses that coach. Its horse is the same kind of built form: a loft along the barrel, neck, head and legs, a hide texture that is only hair and grain, and vertex colour for the bay, the black points and the shade under the belly. The legs are two bones, so the knee bends and the hoof stays on the ground. The spectral chariot’s fire still wants a look at how subtle it reads in motion.
+game’s retro pipeline. The plain chariot reuses that coach. Its horse is Kenney's CC0 animal-horse (`src/render/draftHorseData.ts`): the pack's node curves for the walk and the run, and a soft hide with vertex colour for a dark bay, the black points, the pale muzzle and the dark mane, and a pair of eyes on the head. The spectral chariot’s fire still wants a look at how subtle it reads in motion.
 
 ## Steam entitlement
 

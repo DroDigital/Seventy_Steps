@@ -48,18 +48,17 @@ const flesh: TexelFn = (u, v, seed) => {
 };
 
 /**
- * Horse hide: hair along v, in clumps, with a few darker strands. Nearly one value, and only
- * slightly warm, so a bay or a black point is the vertex colour and not this picture.
+ * Horse hide: a soft mottle, nearly one value and only slightly warm. No hair lines:
+ * a sine of strands read as stripes once the picture was quantized. The bay, the points
+ * and the muzzle are vertex colour, not this picture.
  */
 const hide: TexelFn = (u, v, seed) => {
-  const patch = fbm(u * 2, v * 2, seed, 3, 2, 2);
-  const lay = fbm(u * 4, v * 6, seed + 3, 3, 4, 6);
-  const strand = 0.5 + 0.5 * Math.sin((u * 9 + lay) * Math.PI * 2);
-  const pore = fbm(u * 12, v * 14, seed + 8, 2, 12, 14);
-  let k = 0.55 + 0.28 * patch + 0.12 * lay + 0.05 * (pore - 0.5);
-  k *= 0.72 + 0.28 * strand;
-  k = Math.min(1, Math.max(0.32, k));
-  return [k * 0.99, k * 0.95, k * 0.9];
+  const patch = fbm(u * 2, v * 3, seed, 3, 2, 3);
+  const lay = fbm(u * 5, v * 7, seed + 3, 2, 5, 7);
+  const pore = fbm(u * 11, v * 13, seed + 8, 2, 11, 13);
+  let k = 0.8 + 0.16 * (patch - 0.5) + 0.1 * (lay - 0.5) + 0.05 * (pore - 0.5);
+  k = Math.min(0.94, Math.max(0.66, k));
+  return [k * 0.99, k * 0.96, k * 0.92];
 };
 
 /** Dark still water: wavy ripples with pale crests. */

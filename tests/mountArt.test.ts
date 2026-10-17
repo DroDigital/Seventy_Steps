@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { MOUNT_IDS } from '../src/data/mounts';
 import { buildFigure } from '../src/render/figures';
-import { solveLeg } from '../src/render/horseGait';
 import { createMount, poseMountedRider, type MountVisual } from '../src/render/mounts';
 import { CASTER } from '../src/render/moonShadow';
 import { WORLD_VERT } from '../src/render/shaders/world';
@@ -13,19 +12,6 @@ function meshes(visual: MountVisual): THREE.Mesh[] {
   visual.root.traverse(o => { if (o instanceof THREE.Mesh) result.push(o); });
   return result;
 }
-
-describe('carriage horse gait', () => {
-  it('stands straight and folds the knee the way that leg bends', () => {
-    const straight = solveLeg(0, -1.04, 0.46, 0.58, -1);
-    expect(straight.upper).toBeCloseTo(0, 2);
-    expect(straight.lower).toBeCloseTo(0, 2);
-    expect(straight.hy).toBeCloseTo(-1.04, 2);
-    const fore = solveLeg(0.2, -0.72, 0.46, 0.58, -1);
-    expect(fore.kz).toBeGreaterThan(fore.hz);
-    const hind = solveLeg(0.2, -0.78, 0.48, 0.62, 1);
-    expect(hind.kz).toBeLessThan(0);
-  });
-});
 
 describe('procedural mount art', () => {
   it('keeps each appearance inside its geometry budget, with fire on the spectral horses only', () => {
@@ -82,40 +68,13 @@ describe('procedural mount art', () => {
         expect(span).toBeGreaterThan(2);
         expect(topN).toBeGreaterThan(0.4);
         expect((bodyMesh.material as THREE.ShaderMaterial).uniforms.uMap.value.name.startsWith('hide')).toBe(true);
+        expect(visual.root.getObjectByName('draft-eyes')).toBeTruthy();
         const leg = visual.root.getObjectByName('leg-front-left')!;
-        const hoof = visual.root.getObjectByName('hoof-front-left')!;
-        const knee = visual.root.getObjectByName('knee-front-left')!;
-        const legMesh = leg.children.find((c): c is THREE.Mesh => c instanceof THREE.Mesh)!;
-        const depth = (): number => {
-          const p = legMesh.geometry.getAttribute('position');
-          let m = Infinity;
-          for (let i = 0; i < p.count; i++) m = Math.min(m, p.getY(i));
-          return m;
-        };
-        const lead = (): number => {
-          const p = legMesh.geometry.getAttribute('position');
-          let m = -Infinity;
-          for (let i = 0; i < p.count; i++) if (p.getY(i) > -0.75) m = Math.max(m, p.getZ(i));
-          return m;
-        };
-        const planted = depth();
-        let low = Infinity, high = -Infinity, lifted = planted, kneeLead = -Infinity, meshLead = -Infinity;
-        for (let i = 0; i < 40; i++) {
-          visual.update({ time: i / 20, dt: 0.05, speed: 12, turn: 0 });
-          visual.root.updateMatrixWorld(true);
-          const hy = hoof.getWorldPosition(new THREE.Vector3()).y;
-          low = Math.min(low, hy); high = Math.max(high, hy);
-          lifted = Math.max(lifted, depth());
-          meshLead = Math.max(meshLead, lead());
-          kneeLead = Math.max(kneeLead, knee.getWorldPosition(new THREE.Vector3()).z - leg.getWorldPosition(new THREE.Vector3()).z);
-          visual.root.traverse(o => { expect(o.matrixWorld.elements.every(Number.isFinite)).toBe(true); });
-        }
-        expect(low).toBeLessThan(0.05);
-        expect(low).toBeGreaterThan(-0.08);
-        expect(high - low).toBeGreaterThan(0.1);
-        expect(lifted).toBeGreaterThan(planted + 0.08);
-        expect(kneeLead).toBeGreaterThan(0.05);
-        expect(meshLead).toBeGreaterThan(0.2);
+        const rest = leg.quaternion.toArray();
+        visual.update({ time: 0.4, dt: 0.1, speed: 12, turn: 0.2 });
+        expect(leg.quaternion.toArray()).not.toEqual(rest);
+        visual.root.updateMatrixWorld(true);
+        visual.root.traverse(o => { expect(o.matrixWorld.elements.every(Number.isFinite)).toBe(true); });
       }
       const bodies = meshes(visual);
       expect(bodies.length).toBeLessThanOrEqual(limit[id]);
