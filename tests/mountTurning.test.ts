@@ -19,14 +19,14 @@ const DT = 1 / SIM.hz;
 describe('a horse-drawn rig comes round on a circle (round 52)', () => {
   it('the faster it goes, the wider its tightest circle, and the slower it must go to turn tightly', () => {
     let last = 0;
-    for (const v of [0, 1.5, 4, 8, 11, 18]) {
+    for (const v of [0, 1.5, 3, 5, 7, 10.5]) {
       const r = turnRadius(v, horse);
       expect(r).toBeGreaterThanOrEqual(last);
       last = r;
     }
     expect(turnRadius(0, horse)).toBeLessThan(3);
-    expect(turnRadius(T.gallop, horse)).toBeGreaterThan(12);
-    for (const v of [2.4, 6, 11, 18]) expect(turnCap(v, horse)).toBeLessThanOrEqual(v / turnRadius(v, horse) + horse.pivot * Math.max(0, 1 - v / 4) + 1e-9);
+    expect(turnRadius(T.gallop, horse)).toBeGreaterThan(8);
+    for (const v of [2.4, 4, 7, 10.5]) expect(turnCap(v, horse)).toBeLessThanOrEqual(v / turnRadius(v, horse) + horse.pivot * Math.max(0, 1 - v / 4) + 1e-9);
     expect(turnCap(0, horse)).toBeCloseTo(horse.pivot, 5); // a horse steps round on the spot, slowly
     expect(turnCap(T.gallop, horse)).toBeLessThan(turnCap(6, horse) + 0.3);
   });

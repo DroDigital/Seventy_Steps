@@ -4,7 +4,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { prism } from './bodyKit';
 import { tint } from './meshKit';
 import { MOUNT_COLORS as C, MountBuilder, group, orb, panel, rod, swingAbout, tube, type Point } from './mountKit';
-import { footAt, gaitAt, legPhase } from '../systems/mountGait';
+import { footAt, gaitAt, gaitScale, legPhase } from '../systems/mountGait';
 import { horseFlame, type HorseWisp } from './mountEffects';
 
 export interface SpectralHorse { root: THREE.Group; flame: HorseWisp; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number): void }
@@ -66,7 +66,7 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
   const hoovesAt: Point[] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
   return { root, flame, update(time, phase, speed, turn, ground, bend = 0) {
     swingAbout(root, { x, z }, { x: 0, z: 2.45 }, bend * 0.8); // the pair lead a turn about the pole's tip
-    const moving = Math.min(1, speed / 1.5), gallop = Math.min(1, Math.max(0, (speed - 3) / 5));
+    const moving = Math.min(1, speed / 1.5), gallop = Math.min(1, Math.max(0, (speed / gaitScale - 3) / 5)); // (3 to 8 m/s of the gallop of 18 the gaits were set for)
     const gait = gaitAt(speed), cycle = phase + offset, bob = Math.sin(cycle * 2) * 0.045 * moving;
     const drop = 0.16 * moving * (0.4 + 0.6 * gait.stretch); // the body settles as the stride lengthens, so the legs reach
     const floor = ground?.(x, z) ?? 0;

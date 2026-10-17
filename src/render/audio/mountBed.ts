@@ -33,7 +33,7 @@ export const SILENT_BED: BedTargets = { rumble: 0, roll: 0, rollHz: 500, rollRat
 const ROLL: Record<Ground, { hz: number; level: number }> = { dirt: { hz: 380, level: 0.85 }, road: { hz: 600, level: 1 }, stone: { hz: 820, level: 1.05 }, water: { hz: 320, level: 0.7 } };
 const WHEEL = 0.5; // metres: a wheel's radius, for its turn
 /** The motor car's gears: the speeds each begins at (m/s). The engine's note climbs through one and falls as the next is taken. */
-export const GEARS = [0, 4.5, 9, 13.5, 18.5] as const;
+export const GEARS = [0, 4.5, 9, 13.5, 18.5].map((v) => (v * MOUNT_TRAVERSAL.gallop) / 18) as readonly number[]; // (set for a gallop of 18; round 55 scaled them to the mounts')
 
 /** The engine's note at `speed`: 22 Hz idling, a rising firing rate through each gear, the shift dropping it back. */
 export function engineNote(speed: number): number {

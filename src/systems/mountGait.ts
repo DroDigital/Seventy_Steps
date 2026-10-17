@@ -6,6 +6,8 @@
  * so the picture does not skate and the sound is the foot's own. No Three.js, no randomness.
  */
 
+import { MOUNT_TRAVERSAL } from '../data/mounts';
+
 /** Legs in the order the rig and the hoofbeats share. */
 export const LEG = { LF: 0, RF: 1, LH: 2, RH: 3 } as const;
 export const LEG_COUNT = 4;
@@ -19,12 +21,14 @@ const CANTER: Legs = [0.67, 0.33, 0.33, 0]; // three beats: the right hind, the 
 const GALLOP: Legs = [0.62, 0.48, 0.14, 0]; // four beats and a flight: the hinds, a pause, the fores
 
 interface Key { speed: number; length: number; duty: number; offsets: Legs; kind: GaitKind }
+/** The speeds below were set for a full gallop of 18 m/s (round 50); they follow the mounts' gallop as it is changed (round 55: 10.5). */
+export const gaitScale = MOUNT_TRAVERSAL.gallop / 18;
 /** Metres a cycle covers and the share of it a foot is down, at the speed each gait settles into. */
 const KEYS: readonly Key[] = [
-  { speed: 1.5, length: 1.8, duty: 0.64, offsets: WALK, kind: 'walk' },
-  { speed: 5.5, length: 3.2, duty: 0.46, offsets: TROT, kind: 'trot' },
-  { speed: 10, length: 4.4, duty: 0.32, offsets: CANTER, kind: 'canter' },
-  { speed: 17, length: 5.4, duty: 0.26, offsets: GALLOP, kind: 'gallop' },
+  { speed: 1.5 * gaitScale, length: 1.8, duty: 0.64, offsets: WALK, kind: 'walk' },
+  { speed: 5.5 * gaitScale, length: 3.2, duty: 0.46, offsets: TROT, kind: 'trot' },
+  { speed: 10 * gaitScale, length: 4.4, duty: 0.32, offsets: CANTER, kind: 'canter' },
+  { speed: 17 * gaitScale, length: 5.4, duty: 0.26, offsets: GALLOP, kind: 'gallop' },
 ];
 
 /** Below this a mount stands. */
