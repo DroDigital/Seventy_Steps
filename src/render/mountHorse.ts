@@ -4,8 +4,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { prism } from './bodyKit';
 import { tint } from './meshKit';
 import { MOUNT_COLORS as C, MountBuilder, group, orb, panel, rod, tube, type Point } from './mountKit';
+import { horseFlame, type HorseWisp } from './mountEffects';
 
-export interface SpectralHorse { root: THREE.Group; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void }
+export interface SpectralHorse { root: THREE.Group; flame: HorseWisp; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number): void }
 const UP = new THREE.Vector3(0, 1, 0);
 
 export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z: number, offset: number): SpectralHorse {
@@ -49,6 +50,7 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
     rod([side * 0.31, -0.17, 0.46], [side * 0.31, -0.14, -0.65], 0.023, C.leather),
     orb(0.049, [side * 0.34, -0.13, 0.46], C.brass)]));
   b.add(tail, [tube([[0, 0, 0], [0, -0.16, -0.22], [0.04, -0.45, -0.35], [0.02, -0.72, -0.41]], 0.035, C.bone)], 'flesh', 0.2);
+  const flame = horseFlame(body, neck);
 
   const boneGeo = mergeGeometries([tint(new THREE.CylinderGeometry(0.033, 0.027, 1, 6), C.bone), orb(0.047, [0, -0.5, 0], C.bone), orb(0.047, [0, 0.5, 0], C.bone)]);
   const bones = new THREE.InstancedMesh(boneGeo, b.material('flesh', 0.22), 12); bones.frustumCulled = false; bones.instanceMatrix.setUsage(THREE.DynamicDrawUsage); body.add(bones);
@@ -60,7 +62,8 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
     q.setFromUnitVectors(UP, d.clone().normalize()); s.set(thickness, d.length(), thickness);
     matrix.compose(p, q, s); bones.setMatrixAt(i, matrix);
   }
-  return { root, update(time, phase, speed, turn, ground) {
+  const hoovesAt: Point[] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
+  return { root, flame, update(time, phase, speed, turn, ground) {
     const moving = Math.min(1, speed / 1.5), gallop = Math.min(1, Math.max(0, (speed - 3) / 5));
     const cycle = phase + offset, bob = Math.sin(cycle * 2) * 0.045 * moving;
     const floor = ground?.(x, z) ?? 0;
@@ -89,7 +92,9 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
       segment(i * 3 + 2, [hipX + side * 0.035, ky - 0.04, kz], [hipX + side * 0.027, fy + 0.13, fz], 0.45);
       matrix.makeRotationX(-0.32 * Math.max(0, Math.cos(ph)) * moving); matrix.setPosition(hipX, fy, fz);
       hooves.setMatrixAt(i, matrix);
+      hoovesAt[i] = [hipX, fy, fz];
     }
     bones.instanceMatrix.needsUpdate = true; hooves.instanceMatrix.needsUpdate = true;
+    flame.update(time, speed, hoovesAt);
   }};
 }

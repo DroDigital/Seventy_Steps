@@ -20,12 +20,25 @@ export function steamAppId(env = process.env, pkg = readPkg()) {
   return Number.isInteger(id) && id > 0 ? id : undefined;
 }
 
-/** The optional cosmetic automobile's DLC id. Unconfigured or invalid ids never grant access. */
-export function automobileDlcAppId(env = process.env, pkg = readPkg()) {
-  const raw = env.STEAM_AUTOMOBILE_DLC_APP_ID ?? pkg?.steam?.automobileDlcAppId ?? 0;
+/** A positive DLC id, distinct from the base game. Unconfigured or invalid ids never grant access. */
+function rawDlcId(raw, env, pkg) {
   if (typeof raw !== 'number' && (typeof raw !== 'string' || !/^\d+$/.test(raw))) return undefined;
   const id = Number(raw);
   return Number.isSafeInteger(id) && id > 0 && id <= 0xffffffff && id !== steamAppId(env, pkg) ? id : undefined;
+}
+
+/** The optional cosmetic automobile's DLC id. The same number as the chariot's id grants neither. */
+export function automobileDlcAppId(env = process.env, pkg = readPkg()) {
+  const id = rawDlcId(env.STEAM_AUTOMOBILE_DLC_APP_ID ?? pkg?.steam?.automobileDlcAppId ?? 0, env, pkg);
+  const other = rawDlcId(env.STEAM_CHARIOT_DLC_APP_ID ?? pkg?.steam?.chariotDlcAppId ?? 0, env, pkg);
+  return id !== undefined && id !== other ? id : undefined;
+}
+
+/** The optional spectral chariot's DLC id. The same number as the automobile's id grants neither. */
+export function chariotDlcAppId(env = process.env, pkg = readPkg()) {
+  const id = rawDlcId(env.STEAM_CHARIOT_DLC_APP_ID ?? pkg?.steam?.chariotDlcAppId ?? 0, env, pkg);
+  const other = rawDlcId(env.STEAM_AUTOMOBILE_DLC_APP_ID ?? pkg?.steam?.automobileDlcAppId ?? 0, env, pkg);
+  return id !== undefined && id !== other ? id : undefined;
 }
 
 function readPkg() {
@@ -97,14 +110,22 @@ export function steamAchieve(id) {
  * Rechecked on every call so installing/removing the DLC during a session takes effect on refresh.
  * Arguments allow a binding-free test; the IPC handler always calls this with the real client/config.
  */
-export function steamOwnsAutomobileDlc(dlcClient = client, env = process.env, pkg = readPkg()) {
-  const id = automobileDlcAppId(env, pkg);
+function ownsApp(id, dlcClient, pkg) {
   if (channel(pkg) !== 'steam' || !dlcClient || !id) return false;
   try {
     return dlcClient.apps.isSubscribedApp(id) === true && dlcClient.apps.isDlcInstalled(id) === true;
   } catch {
     return false; // Steam unavailable, an older binding, or a failed entitlement check
   }
+}
+
+export function steamOwnsAutomobileDlc(dlcClient = client, env = process.env, pkg = readPkg()) {
+  return ownsApp(automobileDlcAppId(env, pkg), dlcClient, pkg);
+}
+
+/** The spectral chariot, read the same way as the automobile: subscribed and installed, or locked. */
+export function steamOwnsChariotDlc(dlcClient = client, env = process.env, pkg = readPkg()) {
+  return ownsApp(chariotDlcAppId(env, pkg), dlcClient, pkg);
 }
 
 /** Whether the shell is speaking to Steam. */

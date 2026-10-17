@@ -1,7 +1,7 @@
 /** Mount access, intent and lifecycle. No health, stamina or action state is restored on mounting. */
 import { yawOf } from '../core/geom';
 import type { InputFrame } from '../core/input';
-import { MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import { FREE_MOUNT, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
 import { PLAYER } from '../data/tuning';
 import type { Game } from './components';
 import { createBuffer } from './inputBuffer';
@@ -15,20 +15,38 @@ export interface MountState {
   selected: MountId;
   active: MountId | null;
   automobileOwned: boolean;
+  chariotOwned: boolean;
   speed: number;
   phase: number; // distance-driven animation cycle, in revolutions
   cooldownUntil: number;
 }
 
-export const createMountState = (): MountState => ({ selected: 'chariot', active: null, automobileOwned: false, speed: 0, phase: 0, cooldownUntil: 0 });
+export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, phase: 0, cooldownUntil: 0 });
 export const mountUnlocked = (g: Game): boolean => isDone(g, MOUNT_QUEST);
-export const mountAvailable = (g: Game, id: MountId): boolean => mountUnlocked(g) && (!MOUNTS[id].dlc || g.player.mount.automobileOwned);
 
-/** Only a verified runtime platform query should call this; it is deliberately absent from saves. */
+function dlcOwned(g: Game, id: MountId): boolean {
+  if (id === 'automobile') return g.player.mount.automobileOwned;
+  if (id === 'chariot') return g.player.mount.chariotOwned;
+  return true;
+}
+
+export const mountAvailable = (g: Game, id: MountId): boolean => mountUnlocked(g) && (!MOUNTS[id].dlc || dlcOwned(g, id));
+
+function releaseIfLost(g: Game, id: MountId, owned: boolean): void {
+  if (owned) return;
+  if (g.player.mount.active === id) dismissMount(g);
+  if (g.player.mount.selected === id) g.player.mount.selected = FREE_MOUNT;
+}
+
+/** Only a verified runtime platform query should call these; they are deliberately absent from saves. */
 export function setAutomobileEntitlement(g: Game, owned: boolean): void {
   g.player.mount.automobileOwned = owned === true;
-  if (!owned && g.player.mount.active === 'automobile') dismissMount(g);
-  if (!owned && g.player.mount.selected === 'automobile') g.player.mount.selected = 'chariot';
+  releaseIfLost(g, 'automobile', owned === true);
+}
+
+export function setChariotEntitlement(g: Game, owned: boolean): void {
+  g.player.mount.chariotOwned = owned === true;
+  releaseIfLost(g, 'chariot', owned === true);
 }
 
 export function selectMount(g: Game, id: MountId): boolean {
@@ -52,7 +70,7 @@ export function mountBar(g: Game): string | null {
   const p = g.player;
   if (!g.overworld) return 'Mounts can only be called in the open world.';
   if (!mountUnlocked(g)) return 'Complete The Borrowed Reins: speak with Peaslee, then find the Sleeper’s Sign.';
-  if (!mountAvailable(g, p.mount.selected)) return 'The motor car requires the optional $0.99 DLC. The spectral chariot is included.';
+  if (!mountAvailable(g, p.mount.selected)) return `${MOUNTS[p.mount.selected].name} is optional DLC. The Borrowed Grey is included.`;
   if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0) return 'Wait until you can stand freely before calling your mount.';
   if (g.frame < p.mount.cooldownUntil) return 'Recover from the blow before calling your mount.';
   const tr = g.ecs.c.transform.get(p.id)!;
@@ -119,6 +137,6 @@ export function registerMounts(g: Game): void {
   g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id) dismissMount(g); });
   for (const event of ['Rested', 'Travelled', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
   g.events.on('QuestChanged', ({ id, done }) => {
-    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: 'The Borrowed Reins are yours. Choose your mount at an Elder Sign.' });
+    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: 'The Borrowed Reins are yours. The grey answers on open ground.' });
   });
 }

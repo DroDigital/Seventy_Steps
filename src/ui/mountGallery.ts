@@ -3,11 +3,11 @@ import * as THREE from 'three';
 import { startLoop } from '../core/loop';
 import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
-import { MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import { MOUNT_IDS, MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
 import { RENDER, SIM } from '../data/tuning';
 import { allEffectsOn, computeFx } from '../render/fx';
 import { tint } from '../render/meshKit';
-import { createMount } from '../render/mounts';
+import { createMount, type MountVisual } from '../render/mounts';
 import { createPipeline } from '../render/pipeline';
 import { updatePostUniforms } from '../render/postPass';
 import { createWorldMaterial, updateWorldUniforms, worldUniforms } from '../render/worldMaterial';
@@ -36,8 +36,9 @@ export async function startMountGallery(): Promise<void> {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0.013, 0.014, 0.022);
   const camera = new THREE.PerspectiveCamera(42, RENDER.width / RENDER.height, 0.1, 90);
-  const mounts = { chariot: createMount('chariot'), automobile: createMount('automobile') };
+  const mounts: Record<MountId, MountVisual> = { grey: createMount('grey'), chariot: createMount('chariot'), automobile: createMount('automobile') };
   for (const m of Object.values(mounts)) scene.add(m.root);
+  mounts.chariot.root.visible = false;
   mounts.automobile.root.visible = false;
   const stage = makeStage(scene);
   const enabled = allEffectsOn();
@@ -57,21 +58,21 @@ export async function startMountGallery(): Promise<void> {
   overlay.className = 'mount-exhibit'; overlay.setAttribute('aria-label', 'Mount exhibit controls');
   const style = document.createElement('style'); style.textContent = STYLE; overlay.append(style);
   overlay.insertAdjacentHTML('beforeend', `<header><div><div class="eyebrow">Seventy Steps · The coach house</div><h2 class="brand">A SWIFTER PASSAGE</h2></div><a href="${location.pathname}">Return to title ↗</a></header>
-    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · The spectral procession</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · TWO APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom<br>1 / 2: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
+    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · A borrowed mare</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom<br>1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
   document.body.append(overlay);
   const heading = overlay.querySelector('h1')!;
   const description = overlay.querySelector('p')!;
   const chapter = overlay.querySelector('.plate .eyebrow')!;
   const status = overlay.querySelector('.status')!;
   const buttons: HTMLButtonElement[] = [];
-  let id: MountId = 'chariot', gait = 2, paused = false, auto = true, detailed = false;
+  let id: MountId = 'grey', gait = 2, paused = false, auto = true, detailed = false;
   let yaw = -0.92, pitch = 0.22, radius = 11, distance = 11, time = 0, speed = 0;
   let dragging = false, lastX = 0, lastY = 0, hidden = false;
   const target = new THREE.Vector3(0, 1.2, 1.3), aim = target.clone();
   const rates = [0, MOUNT_TRAVERSAL.cruise, MOUNT_TRAVERSAL.gallop];
   const refresh = (): void => {
     const data = MOUNTS[id]; heading.textContent = data.name; description.textContent = data.description;
-    chapter.textContent = id === 'chariot' ? 'I · The spectral procession' : 'II · A machine out of time';
+    chapter.textContent = id === 'grey' ? 'I · A borrowed mare' : id === 'chariot' ? 'II · The spectral procession' : 'III · A machine out of time';
     status.textContent = `${['AT REST', 'TRAVELLING', 'GALLOPING'][gait]}${paused ? ' · PAUSED' : ''} · VISUAL EXHIBIT`;
     for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.mount ? b.dataset.mount === id : b.dataset.gait ? Number(b.dataset.gait) === gait : b.dataset.action === 'pause' ? paused : b.dataset.action === 'orbit' ? auto : b.dataset.action === 'resolution' ? detailed : false));
   };
@@ -88,7 +89,8 @@ export async function startMountGallery(): Promise<void> {
   const choose = (next: MountId): void => {
     mounts[id].root.visible = false; id = next; mounts[id].root.visible = true; frame(); refresh();
   };
-  for (const mount of ['chariot', 'automobile'] as const) button('mount', mount === 'chariot' ? '1 · Spectral chariot' : '2 · Brassbound motor car', () => choose(mount), { mount });
+  const labels: Record<MountId, string> = { grey: '1 · Borrowed grey', chariot: '2 · Spectral chariot', automobile: '3 · Brassbound motor car' };
+  for (const mount of MOUNT_IDS) button('mount', labels[mount], () => choose(mount), { mount });
   ['Rest', 'Walk', 'Gallop'].forEach((label, i) => button('gait', label, () => { gait = i; }, { gait: String(i) }));
   const pauseButton = button('gait', 'Pause', () => { paused = !paused; }, { action: 'pause' });
   button('view', 'Orbit', () => { auto = !auto; }, { action: 'orbit' });
@@ -111,7 +113,7 @@ export async function startMountGallery(): Promise<void> {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     const key = e.key.toLowerCase();
     if (key === ' ' && e.target instanceof HTMLElement && ['BUTTON', 'A'].includes(e.target.tagName)) return;
-    if (key === '1' || key === '2') choose(key === '1' ? 'chariot' : 'automobile');
+    if (key === '1' || key === '2' || key === '3') choose(MOUNT_IDS[Number(key) - 1]);
     if (key === ' ') { e.preventDefault(); paused = !paused; }
     if (key === 'o') auto = !auto;
     if (key === 'h') { hidden = !hidden; overlay.classList.toggle('is-hidden', hidden); }
@@ -126,7 +128,8 @@ export async function startMountGallery(): Promise<void> {
       const pad = activePad();
       const down = new Set(pad?.buttons.flatMap((b, i) => b.pressed ? [i] : []) ?? []);
       const hit = (n: number): boolean => down.has(n) && !padHeld.has(n);
-      if (hit(PAD_BUTTON.lb) || hit(PAD_BUTTON.rb)) choose(id === 'chariot' ? 'automobile' : 'chariot');
+      if (hit(PAD_BUTTON.lb)) choose(MOUNT_IDS[(MOUNT_IDS.indexOf(id) + MOUNT_IDS.length - 1) % MOUNT_IDS.length]);
+      if (hit(PAD_BUTTON.rb)) choose(MOUNT_IDS[(MOUNT_IDS.indexOf(id) + 1) % MOUNT_IDS.length]);
       if (hit(PAD_BUTTON.a)) { paused = !paused; refresh(); }
       if (hit(PAD_BUTTON.up)) { gait = (gait + 1) % 3; refresh(); }
       padHeld = down;

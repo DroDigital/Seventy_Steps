@@ -201,11 +201,17 @@ function gate(): Figure {
   return f;
 }
 
-/** A note left on a crate: a letter or a clipping, its paper glowing faintly so it reads in the dark. */
+/** A note left on a crate: burnt paper, a charred rim and two small embers, so every placed note shares the look. */
 function note(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
   part(f, f.body, box(0.6, 0.5, 0.45, 0, 0.25, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.3), 1.7)), 'wood');
-  part(f, f.body, box(0.26, 0.02, 0.34, 0.05, 0.51, 0, shade(BASE.bone, 1.1)).rotateY(0.3), 'cloth', 0.7);
+  const yaw = 0.3;
+  const ember = mixRgb(BASE.rust, ANOMALY.purple, 0.28);
+  const sheet = box(0.24, 0.016, 0.3, 0.05, 0.522, 0, shade(BASE.bone, 1.02)).rotateY(yaw);
+  const char = box(0.28, 0.01, 0.36, 0.05, 0.508, 0, shade(BASE.charcoal, 0.45)).rotateY(yaw);
+  const spark = box(0.04, 0.014, 0.035, 0.14, 0.532, 0.1, shade(ember, 1.25)).rotateY(yaw);
+  const mote = box(0.02, 0.012, 0.018, -0.04, 0.53, -0.1, shade(ember, 0.85)).rotateY(yaw);
+  part(f, f.body, mergeGeometries([char, sheet, spark, mote]), 'cloth', 0.72);
   return f;
 }
 

@@ -5,12 +5,11 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Mount update
 
-- The Borrowed Reins, an early university errand, unlocks a spectral chariot pulled by two skeletal horses.
-- A circa-1914 touring automobile provides an optional $0.99 DLC appearance; both mounts share every traversal setting.
-- Faster open-world travel with acceleration, heading-based steering, stamina-driven galloping and a shared collision footprint.
-- Animated horse limbs, necks and reins, spectral fire, wheel rotation, suspension, steering, seated drivers and travel audio.
-- Mount selection at Elder Signs, rebindable B / L3 controls, saved preference, and verified Steam entitlement.
-- A read-only coach-house exhibit (`?mounts`) presents both models. Steam app IDs and store pricing still require release setup.
+- The Borrowed Reins unlocks the Borrowed Grey, a plain saddled mare from the university stables.
+- The spectral chariot is now optional $0.99 DLC, gated like the motor car. Neither is faster than the grey.
+- Mount foley is audible: hooves by gait and ground, wheels, harness, idle breath or wind, summon and dismiss. The recipes are procedural placeholders.
+- Violet fire follows each spectral horse. Notes and rumours use the burnt-paper screen; placed notes are charred.
+- A read-only coach-house exhibit (`?mounts`) presents all three models. Steam app IDs still require release setup.
 
 ## 1.0.0-rc.1: the release candidate
 

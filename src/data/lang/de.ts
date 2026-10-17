@@ -109,7 +109,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'ctl.map': "Karte",
   'ctl.journal': "Tagebuch",
   'ctl.mount': 'Gefährt rufen / entlassen',
-  'hint.mount': 'Die geliehenen Zügel gehorchen {mount}: Ruft oder entlasst euer Gefährt auf freiem, trockenem Gelände. Haltet {dodge} zum Galoppieren; das verbraucht Ausdauer. Handeln oder ein Treffer entlässt es. Wählt das Aussehen unter Gefährte an einem Ältesten Zeichen; beide fahren gleich.',
+  'hint.mount': 'Die geliehenen Zügel gehorchen {mount}: Ruft oder entlasst euer Gefährt auf freiem, trockenem Gelände. Haltet {dodge} zum Galoppieren; das verbraucht Ausdauer. Handeln oder ein Treffer entlässt es. Wählt das Aussehen unter Gefährte an einem Ältesten Zeichen; alle fahren gleich.',
   'ctl.stick': "linker Stick",
   'ctl.fixed.attack': "Leichter / schwerer Angriff",
   'ctl.fixed.block': "Blocken / Parieren",
