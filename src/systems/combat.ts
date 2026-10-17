@@ -191,6 +191,7 @@ export function meleeSystem(g: Game): void {
     const tr = transform.get(id)!;
     const n = hit.window[1] - hit.window[0];
     const k = a.frame - hit.window[0];
+    if (k === 0) g.events.emit('Swung', { entity: id, at: { ...tr.pos }, yaw: tr.yaw });
     const s0 = hitCentre(tr.pos, tr.yaw, hit, k / n);
     const s1 = hitCentre(tr.pos, tr.yaw, hit, (k + 1) / n);
     const root = hit.reach > COMBAT.limb || hit.thrust ? { x: tr.pos.x, y: s1.y, z: tr.pos.z } : null; // a long limb, or a thrust's whole line, swept from the body out

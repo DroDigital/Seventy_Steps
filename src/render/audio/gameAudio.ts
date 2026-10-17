@@ -40,6 +40,7 @@ import type { Drones } from './drones';
 import type { AudioEngine } from './engine';
 import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
+import { createAttackAudio } from './attackAudio';
 import { createMountAudio } from './mountAudio';
 import { createMountBed } from './mountBed';
 import { createVarier } from './vary';
@@ -107,6 +108,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
+  const attacks = createAttackAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 51: a horror's blows heard as their matter
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
@@ -305,6 +307,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       drones.update(fx, seconds);
       if (paused) return void mounts.pause();
       mounts.update(dt);
+      attacks.update(dt);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
         lastBeat = HEART.beats;
         playSound(e, STINGERS.heartbeat, { gain: 0.7 + 0.5 * HEART.need });

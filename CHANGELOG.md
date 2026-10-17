@@ -3,6 +3,15 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Horrors' attacks
+
+- Every attack of a horror was redrawn. A mark on the ground is now found on any floor (Cthulhu's was a teal nearly as dark as the ground): the colours that must be seen are lifted to a floor of brightness, in the horror's own hue, with a dark outline so they read on pale ground and dark.
+- A telegraph shows the whole of what is coming from its first frame, fills toward its front, runs chevrons along a charge's lane, and flashes as the blow falls. A swirl draws a vortex's arms and its eye.
+- Each horror's blows are made of its element: the sea throws drops and spray, stone shards and dust, fire embers that cool to black and smoke that climbs, frost splinters and a settling fog, spores and ash drift, ink falls in black beads, stars and eyes flash and shed light.
+- A blow leaves its mark: burnt ground whose cracks glow and cool, shock rings racing out, a summoning's circle, the arc a swing swept. Bolts leave in a flash, trail their light and land in a spray and a scar. A beam has a hot core in an aura that crawls, with flares at both ends and a scorch where it crosses the ground.
+- A caster gathers before it looses: light is drawn in to it, and a gaze streams from its eye to your head, thicker as your mind gives way. A teleport collapses where it was and arrives under a sigil; a summoning rises as a column of light from a circle; a phase change shakes the arena.
+- You can hear them. A bolt as it leaves and lands, a burst, a swing, a summoning, an arrival, a phase change, the gaze and the dark each sound as the horror's element (water splashes, stone cracks, fire crackles, frost shatters, ink slaps); a beam and a vortex hum while they last, and the gathering before a blow rises to its release. A burst, a slam, a phase change and a gaze jolt the camera by how near they are (the Screen shake setting scales it).
+
 ## Riding
 
 - You can hear a ride now. Every hoofbeat is a foot coming down in the horse's gait, panned left and right, on dirt, road, stone or in the shallows; under them run the wheels' roar and rattle, the rush of air and, for the motor car, an engine that climbs with its speed; over them the harness' brass, the creak of timber and a snort at the gallop.
@@ -23,7 +32,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Edges and horrors
 
-- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. Riding off the land is the same fall. The Lost Echoes stay on the ground where you stepped off.
+- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. A ride stops short of the land's edge, as it does at a wall: it is on foot that the edge is walked off. The Lost Echoes stay on the ground where you stepped off.
 - Each horror's attacks keep their motion and take that horror's own colours: the telegraphs, the bursts and the beams.
 - Casters no longer share one green fireball. Yog-Sothoth still throws that light. The Colour's orb is its own hue. Other shots are shards, drops, sparks or darts.
 - A horror's areas wear its own mark: tide, runes, cracks, flame, spores, coils, an eye, roots, stars, frost, ash or a stain. The ground they cover, and when they land, is unchanged.

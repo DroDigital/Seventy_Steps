@@ -15,15 +15,15 @@ import { isAbsent, type Game } from '../systems/components';
 import { targetOf } from '../systems/specials';
 import { creatureOf } from '../systems/creatures';
 import { aoeLook } from './aoeLook';
-import { attackTheme } from './attackTheme';
-import { shotLook } from './shotLook';
+import { attackLook } from './attackLook';
 import type { Decals } from './decals';
+import type { GroundFx } from './groundFx';
 
 export interface Telegraphs {
   update(alpha: number, time: number): void;
 }
 
-export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
+export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Telegraphs {
   const c = g.ecs.c;
   const lerp = (id: Entity, alpha: number): V3 | undefined => {
     const tr = c.transform.get(id);
@@ -36,9 +36,7 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
   /** What one boss's move shows at this frame. */
   function show(id: Entity, def: MoveDef, frame: number, alpha: number): void {
     decals.style(aoeLook(creatureOf(g, id)?.id));
-    const theme = attackTheme(g, id);
-    const { danger: DANGER, ring: RING, mind: MIND } = theme;
-    const LINE = shotLook(creatureOf(g, id)?.id).color;
+    const { danger: DANGER, ring: RING, mind: MIND, line: LINE } = attackLook(g, id); // (lifted: a mark in near black on a dark floor is not seen)
     const p = lerp(id, alpha)!;
     const tr = c.transform.get(id)!;
     const yaw = tr.prevYaw + (tr.yaw - tr.prevYaw) * alpha;
@@ -93,7 +91,7 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
       if (blast) decals.disc(p.x, p.y, p.z, blast.radius + 0.4, frame / pl.window[1], DANGER);
     }
     const ef = def.effect;
-    if (ef?.kind === 'gaze' && frame < ef.window[1]) decals.lane(p.x, p.y, p.z, toward, ef.range, 0.25, frame / ef.window[0], MIND, 0.6);
+    if (ef?.kind === 'gaze' && frame < ef.window[1]) decals.lane(p.x, p.y, p.z, toward, ef.range, 0.5, frame / ef.window[0], MIND, 0.7);
     if (ef?.kind === 'summon' && frame < ef.window[0]) decals.ring(p.x, p.y, p.z, body + 3, 0.5, MIND, 0.8);
     const sa = def.sanity;
     if (sa && !sa.sight && frame >= sa.window[0] && frame < sa.window[1]) {
@@ -115,14 +113,15 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
         const p = c.transform.get(e)?.pos;
         if (!p) continue;
         decals.style(aoeLook(creatureOf(g, mk.owner)?.id));
-        decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackTheme(g, mk.owner).danger);
+        decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackLook(g, mk.owner).danger);
       }
       for (const [e, w] of c.wave) {
         const p = c.transform.get(e)?.pos;
         if (!p) continue;
         decals.style(aoeLook(creatureOf(g, w.owner)?.id));
-        decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackTheme(g, w.owner).ring);
+        decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackLook(g, w.owner).ring);
       }
+      ground.draw(decals, time);
       decals.end(time);
     },
   };

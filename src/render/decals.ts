@@ -1,21 +1,25 @@
 /**
- * Ground telegraphs (render only): flat, self-lit shapes laid on the ground where a blow will land,
- * as one instanced batch. A disc, a sector (a swing's arc), a lane (a charge's path), a ring (a
- * quake's band) and a swirl (a vortex's reach). Each has a bright edge and a dim fill that grows
- * with its `fill` (0..1: how far the wind-up has come) with a brighter front; transparency is
- * ordered-dithered like the particles', so nothing needs sorting. `style` sets whose mark is drawn
- * inside that fill. The plain mark is the old even wash.
+ * Ground marks (render only): flat, self-lit shapes laid on the ground, as one instanced batch. The
+ * telegraphs: a disc, a sector (a swing's arc), a lane (a charge's path), a ring (a quake's band) and a
+ * swirl (a vortex's reach). Each has a bright edge with a dark outline (so it reads on pale ground and
+ * dark), a hatched promise of the whole of it from the first frame, a fill that grows with its `fill`
+ * (0..1: how far the wind-up has come) and gathers its light at its front, and, once it is full, a flash
+ * for the blow that is falling. A lane runs chevrons the way it points. And what the blow leaves: the
+ * `scar` (burnt ground whose cracks cool), and the `sigil` (a circle of rings and spokes drawn in for a
+ * summoning). Transparency is ordered-dithered like the particles', so nothing needs sorting. `style`
+ * sets whose mark is drawn inside that fill. The plain mark is the old even wash.
  */
 
 import * as THREE from 'three';
 import { PLAIN_AOE, type AoeStyle } from './aoeLook';
+import { FEEL } from './feel';
 import type { Rgb } from './palette';
 import { worldUniforms } from './worldMaterial';
 
-const CAPACITY = 160;
+const CAPACITY = 256;
 const LIFT = 0.05; // metres above the ground
 const DEG = Math.PI / 180;
-const KIND = { disc: 0, sector: 1, lane: 2, ring: 3, swirl: 4 } as const;
+const KIND = { disc: 0, sector: 1, lane: 2, ring: 3, swirl: 4, scar: 5, sigil: 6 } as const;
 
 export interface Decals {
   begin(): void;
@@ -26,6 +30,10 @@ export interface Decals {
   lane(x: number, y: number, z: number, yaw: number, length: number, half: number, fill: number, color: Rgb, alpha?: number): void;
   ring(x: number, y: number, z: number, radius: number, width: number, color: Rgb, alpha?: number): void;
   swirl(x: number, y: number, z: number, radius: number, color: Rgb, alpha?: number): void;
+  /** Ground a blow burnt: `age` 0 (fresh, its cracks lit) to 1 (cold, gone); `color` is the heat of its cracks. */
+  scar(x: number, y: number, z: number, radius: number, age: number, color: Rgb, alpha?: number): void;
+  /** A circle drawn in from its centre outward as `fill` goes 0..1: rings, ticks and turning spokes. */
+  sigil(x: number, y: number, z: number, radius: number, fill: number, color: Rgb, alpha?: number): void;
   /** The mark drawn inside every shape until the next `style` or `begin`. */
   style(mark: AoeStyle): void;
   end(time: number): void;
@@ -59,6 +67,7 @@ const FRAG = /* glsl */ `
 uniform vec3 uFogColor;
 uniform float uFogAmount;
 uniform float uTime;
+uniform float uFlash; // the Flashes setting: 1 strobes as the blow falls, 0 holds steady
 varying vec2 vP;
 varying vec2 vScale;
 varying vec4 vShape;
@@ -92,50 +101,85 @@ float bayer4(vec2 p) {
   ivec2 q = ivec2(mod(p, 4.0));
   return (m[q.x + q.y * 4] + 0.5) / 16.0;
 }
-const float EDGE = 0.14; // metres
+const float EDGE = 0.16; // metres
 void main() {
   int kind = int(vShape.x + 0.5);
   float fill = vShape.y;
   float r = length(vP);
-  float e = EDGE / vScale.x;
-  float edge = 0.0, body = 0.0, front = 0.0;
+  float ang = atan(vP.x, vP.y);
+  float inside = 0.0; // metres in from the shape's boundary
+  float body = 0.0, front = 0.0, chev = 0.0, lit = 0.34, glow = 0.0, dark = 0.0;
+  bool solid = kind <= 2; // a telegraph that fills
+  bool outlined = kind <= 4; // a shape with a boundary to draw
   if (kind == 2) { // lane: x across, y along from its start (-1) to its end (+1)
-    vec2 ea = EDGE / vScale;
     float t = (vP.y + 1.0) * 0.5;
-    edge = max(step(1.0 - ea.x, abs(vP.x)), step(1.0 - ea.y, abs(vP.y)));
+    inside = min((1.0 - abs(vP.x)) * vScale.x, (1.0 - abs(vP.y)) * vScale.y);
     body = step(t, fill);
-    front = fill < 0.999 ? 1.0 - smoothstep(0.0, ea.y * 2.0, abs(t - fill)) : 0.0;
+    front = fill < 0.999 ? 1.0 - smoothstep(0.0, EDGE * 3.0 / vScale.y, abs(t - fill)) : 0.0;
+    float along = t * vScale.y * 2.0;
+    float ph = fract((along - abs(vP.x) * vScale.x * 0.8) / 1.7 - uTime * 1.1);
+    chev = smoothstep(0.0, 0.08, ph) * (1.0 - smoothstep(0.2, 0.34, ph)) * body;
+  } else if (kind == 5) { // a scar: burnt ground, ragged at its edge, its cracks still glowing
+    float wob = 0.86 + 0.14 * sin(ang * 5.0 + vMark.y) * sin(ang * 3.0 - vMark.y * 1.7);
+    float rr = r / wob;
+    if (rr > 1.0) discard;
+    float cracks = vMark.x > 0.5 ? motifMask(r, ang) : smoothstep(0.55, 0.95, sin(ang * max(vMark.w, 3.0) * 1.5 + rr * 6.0 + vMark.y));
+    float warm = (1.0 - fill) * (1.0 - fill);
+    glow = warm * cracks * (1.0 - smoothstep(0.35, 1.0, rr));
+    dark = (1.0 - fill) * (0.2 + 0.6 * (1.0 - smoothstep(0.5, 1.0, rr)));
+    lit = 0.0;
   } else {
     if (r > 1.0) discard;
-    float ang = atan(vP.x, vP.y);
     if (kind == 1) { // sector between angles a and b
       if (ang < vShape.z || ang > vShape.w) discard;
       float side = min(abs(sin(ang - vShape.z)), abs(sin(vShape.w - ang))) * r;
-      edge = step(1.0 - e, r) + (vShape.w - vShape.z < 6.2 ? step(side, e) : 0.0);
+      inside = min((1.0 - r) * vScale.x, vShape.w - vShape.z < 6.2 ? side * vScale.x : 9.0);
     } else if (kind == 3) { // ring band from a to 1: its leading edge brightest
       if (r < vShape.z) discard;
       float t = (r - vShape.z) / max(1.0 - vShape.z, 0.001);
-      edge = step(1.0 - e, r);
-      body = 0.4 + 0.6 * t;
+      inside = (1.0 - r) * vScale.x;
+      body = t * t * (0.5 + 0.5 * motifMask(r, ang));
+      front = smoothstep(0.82, 1.0, t);
+      lit = 0.9;
     } else if (kind == 4) { // swirl: arms turning inward; a mark may cut more of them
       float nArms = vMark.x > 0.5 ? max(3.0, vMark.w) : 3.0;
       float arms = fract(ang / 6.2832 * nArms + r * 1.2 + uTime * 0.7);
-      body = smoothstep(0.55, 0.8, arms) * (1.0 - smoothstep(0.85, 1.0, arms)) * r;
-      edge = step(1.0 - e, r) * 0.6;
+      body = smoothstep(0.42, 0.72, arms) * (1.0 - smoothstep(0.86, 1.0, arms)) * (0.45 + 0.55 * r);
+      body = max(body, (1.0 - smoothstep(0.0, 0.16, r)) * (0.7 + 0.3 * sin(uTime * 14.0))); // the eye of it
+      inside = (1.0 - r) * vScale.x;
+      lit = 0.85;
+    } else if (kind == 6) { // a sigil: rings and ticks, spokes turning, drawn in from the centre
+      float w = 0.13 / vScale.x;
+      float rot = uTime * 0.5 + vMark.y;
+      float rings = max(1.0 - smoothstep(w * 0.5, w, abs(r - 0.95)), 1.0 - smoothstep(w * 0.5, w, abs(r - 0.6)));
+      float ticks = step(0.5, fract((ang + rot) / 6.2832 * max(vMark.w, 3.0) * 4.0)) * step(0.63, r) * step(r, 0.92) * 0.55;
+      float spokes = (1.0 - smoothstep(0.0, w * 1.4 / max(r, 0.25), abs(sin((ang - rot) * max(vMark.w, 3.0) * 0.5)))) * step(0.12, r) * step(r, 0.6);
+      body = max(max(rings, ticks), spokes) * step(r, fill);
+      lit = 1.0;
     } else {
-      edge = step(1.0 - e, r);
+      inside = (1.0 - r) * vScale.x;
     }
     if (kind < 3) {
       body = step(r, fill);
-      front = fill < 0.999 ? 1.0 - smoothstep(0.0, e * 2.0, abs(r - fill)) : 0.0;
+      front = fill < 0.999 ? 1.0 - smoothstep(0.0, EDGE * 3.0 / vScale.x, abs(r - fill)) : 0.0;
     }
   }
-  if (vMark.x > 0.5) body *= 0.28 + 0.72 * motifMask(r, atan(vP.x, vP.y));
-  float ready = fill >= 0.999 ? 0.35 + 0.35 * sin(uTime * 30.0) : 0.0; // the blow is falling
-  float lit = kind == 3 ? 0.75 : kind == 4 ? 0.5 : 0.32 + ready; // a quake's band and a vortex's arms are the danger itself
-  float a = vColor.a * max(max(edge * 0.9, front), body * lit);
-  if (a < bayer4(gl_FragCoord.xy)) discard;
-  vec3 c = vColor.rgb * (0.8 + 0.5 * max(edge, front) + ready);
+  float edge = outlined ? step(inside, EDGE) * (kind == 4 ? 0.6 : 1.0) : 0.0;
+  float outline = outlined ? step(inside, EDGE * 2.1) * (1.0 - step(inside, EDGE)) : 0.0;
+  if (vMark.x > 0.5 && solid) body *= 0.3 + 0.7 * motifMask(r, ang);
+  if (solid && kind != 2) body *= 0.5 + 0.5 * smoothstep(0.0, max(fill, 0.05), r); // the light gathers toward the front
+  float ready = solid && fill >= 0.999 ? 1.0 : 0.0; // the blow is falling
+  float flash = ready * mix(0.5, 0.5 + 0.5 * sin(uTime * 38.0), uFlash);
+  float pulse = mix(0.5, 0.5 + 0.5 * sin(uTime * (7.0 + 13.0 * fill)), uFlash);
+  float hatch = solid && fill < 0.999 ? 0.2 * step(0.55, fract((vP.x * vScale.x + vP.y * vScale.y) / 0.75)) : 0.0; // the whole of it, promised from the first frame
+  float cover = vColor.a * max(max(max(edge * 0.95, front * 0.95), body * (lit + 0.5 * ready + 0.3 * chev)), max(hatch, glow));
+  float shade = vColor.a * max(outline * 0.85, dark);
+  float b = bayer4(gl_FragCoord.xy);
+  bool hot = cover >= b;
+  if (!hot && shade < b) discard;
+  vec3 c = vColor.rgb * (0.85 + 0.45 * max(edge, front) * (0.7 + 0.6 * pulse) + 0.5 * ready + 0.4 * chev);
+  c = mix(c, vec3(1.0, 0.97, 0.9), clamp(0.45 * flash + 0.3 * front + 0.25 * glow, 0.0, 0.7));
+  c = hot ? c : vColor.rgb * 0.12;
   gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount), 1.0);
 }
 `;
@@ -149,7 +193,7 @@ export function createDecals(scene: THREE.Scene): Decals {
   geo.setAttribute('aColor', colors);
   geo.setAttribute('aMark', marks);
   const material = new THREE.ShaderMaterial({
-    uniforms: { ...worldUniforms, uTime: { value: 0 } },
+    uniforms: { ...worldUniforms, uTime: { value: 0 }, uFlash: { value: 1 } },
     vertexShader: VERT,
     fragmentShader: FRAG,
     depthWrite: false,
@@ -206,8 +250,15 @@ export function createDecals(scene: THREE.Scene): Decals {
     swirl(x, y, z, radius, color, alpha = 1) {
       put(x, y, z, 0, radius, radius, [KIND.swirl, 0, 0, 0], color, alpha);
     },
+    scar(x, y, z, radius, age, color, alpha = 1) {
+      put(x, y, z, 0, radius, radius, [KIND.scar, clamp01(age), 0, 0], color, alpha);
+    },
+    sigil(x, y, z, radius, fill, color, alpha = 1) {
+      put(x, y, z, 0, radius, radius, [KIND.sigil, clamp01(fill), 0, 0], color, alpha);
+    },
     end(time) {
       material.uniforms.uTime.value = time;
+      material.uniforms.uFlash.value = FEEL.flashes;
       batch.count = n;
       batch.instanceMatrix.needsUpdate = true;
       shapes.needsUpdate = true;

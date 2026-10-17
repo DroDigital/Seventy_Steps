@@ -64,11 +64,13 @@ export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyD
   const faction = c.combatant.get(owner)?.faction ?? 'enemy';
   c.bolt.set(e, { owner, faction, vel, radius: v.radius, damage: conjured ? 0 : v.damage, poise: conjured ? 0 : v.poise, life, lob: v.lob, conjured, passed: [], pool: v.pool });
   c.model.set(e, 'fx:bolt');
+  g.events.emit('BoltLoosed', { owner, at: { ...from }, vel: { ...vel }, fire: !!v.pool?.fire, conjured });
 }
 
-function land(g: Game, e: Entity, at: V3): void {
+function land(g: Game, e: Entity, at: V3, on: 'body' | 'ground' | 'wall' | 'spent'): void {
   const b = g.ecs.c.bolt.get(e)!;
   if (b.pool && !b.conjured) spawnPool(g, b.owner, b.faction, at, b.pool);
+  g.events.emit('BoltLanded', { owner: b.owner, at: { ...at }, vel: { ...b.vel }, on, radius: b.radius, lob: b.lob, fire: !!b.pool?.fire, conjured: b.conjured });
   g.ecs.despawn(e);
 }
 
@@ -105,16 +107,16 @@ export function boltSystem(g: Game): void {
       }
       if (t === g.player.id) landed.set(b.owner, g.frame);
       const p = c.transform.get(t)!.pos;
-      land(g, e, { x: p.x, y: p.y, z: p.z });
+      land(g, e, { x: p.x, y: p.y + (c.body.get(t)?.aimHeight ?? 1) * 0.7, z: p.z }, 'body');
       struck = true;
       break;
     }
     if (struck) continue;
     const wall = raycast(g.world, from, to);
     const ground = g.world.ground(to.x, to.z);
-    if (wall < 1) land(g, e, { x: from.x + (to.x - from.x) * wall, y: 0, z: from.z + (to.z - from.z) * wall });
-    else if (to.y <= ground) land(g, e, { x: to.x, y: ground, z: to.z });
-    else if (--b.life <= 0) g.ecs.despawn(e);
+    if (wall < 1) land(g, e, { x: from.x + (to.x - from.x) * wall, y: from.y + (to.y - from.y) * wall, z: from.z + (to.z - from.z) * wall }, 'wall');
+    else if (to.y <= ground) land(g, e, { x: to.x, y: ground, z: to.z }, 'ground');
+    else if (--b.life <= 0) land(g, e, { ...from }, 'spent');
     else tr.pos = to;
   }
 }

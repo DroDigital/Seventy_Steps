@@ -88,7 +88,7 @@ export function createBoltViews(scene: THREE.Scene, g: Game): BoltViews {
           euler.set(0, tr.prevYaw + (tr.yaw - tr.prevYaw) * alpha, 0);
           q.setFromEuler(euler);
         } else q.setFromAxisAngle(axis, time * (look.form === 'orb' ? 2.2 : 7) + id);
-        const s = b.radius * (look.form === 'dart' ? 1.7 : look.form === 'spark' ? 0.9 : 1.15);
+        const s = b.radius * (look.form === 'dart' ? 2 : look.form === 'spark' ? 1.1 : 1.45); // (round 51: a little larger, the light about it is the halo's)
         mesh.setMatrixAt(n, m4.compose(at, q, size.set(s, look.form === 'drop' ? s * 0.75 : s, s)));
         mesh.setColorAt(n, tint.setRGB(look.color[0], look.color[1], look.color[2]));
         nOf[look.form] = n + 1;

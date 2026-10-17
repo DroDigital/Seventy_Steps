@@ -66,6 +66,7 @@ import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
 import { nextFrame, spriteAtlas } from './ui/loading';
 import { installGameEvidence } from './ui/gameEvidence';
+import { installFxLab } from './ui/fxLab';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
 import { noteLockAsked } from './core/mouseLock';
@@ -222,6 +223,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
 
   const extras = createExtras(game, shell, store, opts, () => input.describe()); // the frame meter (with what the input hears), the first launch's picture, the benchmark, the trailer (round 46)
   let simTime = 0;
+  const labHold = { on: false }; // the effects lab (?debug, ui/fxLab.ts) holds the world still and steps it by hand
+  installFxLab(game, camera, { hold: labHold, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   let frames = 0;
   let statsAt = performance.now();
@@ -239,13 +242,13 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         if (menu?.open || shop.open || dialogue.open || pause.open || map.open) heldAt = performance.now();
         else if (performance.now() - heldAt < INTERACT_GRACE_MS) frame.pressed.interact = false; // E mashed through a talk does not rest at the sign behind it (round 17)
         const through = pause.open || map.open || dialogue.reading || intro?.open ? null : journeys.before(frame);
-        if (!through) return; // the world stands still
+        if (!through || labHold.on) return; // the world stands still
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
         stepGame(game, menu?.open || shop.open || rise?.open || ending.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
       },
       render(blend) {
-        const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still;
+        const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still || labHold.on;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         extras.tick();
