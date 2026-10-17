@@ -5,7 +5,6 @@ import { CASTER } from './moonShadow';
 import { MountBuilder, type CoachWheel } from './mountKit';
 import { automobileArt } from './mountAutomobile';
 import { animateReins, carriageArt } from './mountCarriage';
-import { greyHorse } from './mountGrey';
 import type { Figure } from './figures';
 
 export type { MountId } from '../data/mounts';
@@ -29,12 +28,11 @@ export function createMount(id: MountId): MountVisual {
   const root = new THREE.Group(); root.name = `mount-${id}`;
   const b = new MountBuilder();
   const car = id === 'automobile' ? automobileArt(b, root) : null;
-  const coach = id === 'chariot' ? carriageArt(b, root) : null;
-  const grey = id === 'grey' ? greyHorse(b, root) : null;
-  const art = car ?? coach ?? grey;
+  const coach = id === 'chariot' || id === 'grey' ? carriageArt(b, root, id === 'grey') : null;
+  const art = car ?? coach;
   if (!art) throw new Error(`unknown mount ${id}`);
   const wheels = car?.wheels ?? coach?.wheels ?? [];
-  const materials = [...b.materials, ...(coach ? coach.horses.map((horse) => horse.flame.material) : []), ...(grey ? [grey.breath.material] : [])];
+  const materials = [...b.materials, ...(coach ? coach.horses.map((horse) => horse.flame.material) : [])];
   // The global depth-only shadow shader has no instance transform. Ordinary coachwork casts;
   // animated limb instances stay out of that pass instead of casting their unposed rest mesh.
   root.traverse(o => {
@@ -61,9 +59,9 @@ export function createMount(id: MountId): MountVisual {
       if (car) car.steering.rotation.z = -steer * 0.48;
       if (coach) {
         for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground);
+        coach.draft?.update(time, phase, pace, steer, ground);
         animateReins(coach, time, pace);
       }
-      if (grey) grey.update(time, phase, pace, steer, ground);
       lastSpeed = pace;
     },
     dispose() {

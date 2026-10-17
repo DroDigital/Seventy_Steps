@@ -70,7 +70,7 @@ export function mountBar(g: Game): string | null {
   const p = g.player;
   if (!g.overworld) return 'Mounts can only be called in the open world.';
   if (!mountUnlocked(g)) return 'Complete The Borrowed Reins: speak with Peaslee, then find the Sleeper’s Sign.';
-  if (!mountAvailable(g, p.mount.selected)) return `${MOUNTS[p.mount.selected].name} is optional DLC. The Borrowed Grey is included.`;
+  if (!mountAvailable(g, p.mount.selected)) return `${MOUNTS[p.mount.selected].name} is optional DLC. ${MOUNTS.grey.name} is included.`;
   if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0) return 'Wait until you can stand freely before calling your mount.';
   if (g.frame < p.mount.cooldownUntil) return 'Recover from the blow before calling your mount.';
   const tr = g.ecs.c.transform.get(p.id)!;
@@ -137,6 +137,6 @@ export function registerMounts(g: Game): void {
   g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id) dismissMount(g); });
   for (const event of ['Rested', 'Travelled', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
   g.events.on('QuestChanged', ({ id, done }) => {
-    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: 'The Borrowed Reins are yours. The grey answers on open ground.' });
+    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: 'The Borrowed Reins are yours. The chariot answers on open ground.' });
   });
 }

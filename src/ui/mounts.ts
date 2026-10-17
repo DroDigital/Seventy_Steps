@@ -31,7 +31,7 @@ export function refreshMountEntitlement(g: Game): Promise<void> {
 }
 
 const NOTES: Record<MountId, string> = {
-  grey: 'A plain grey mare from the university stables. Saddle, bridle, and a cool breath in the night. Nothing spectral about her.',
+  grey: 'A wooden chariot built on the spectral coach\'s pattern, drawn by one horse. The seat is that coach\'s. Nothing on it burns.',
   chariot: 'A black funeral carriage drawn by two skeletal horses. Violet fire clings to each horse; no breath leaves their jaws.',
   automobile: 'A black touring motorcar with brass lamps, spoked wheels and a weathered folding canopy. Its engine turns in the dark.',
 };
@@ -44,7 +44,7 @@ function owned(g: Game, id: MountId): boolean {
 export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void {
   const unlocked = mountUnlocked(g);
   heading(panel, 'THE BORROWED REINS').style.marginTop = '0';
-  el(panel, 'div', unlocked ? fill('The grey answers {mount}. Hold {dodge} while moving to gallop; release to cruise. Acting or taking a hit dismisses it.') : 'Speak with Peaslee on the university grounds, then visit the Sleeper’s Sign. His errand unlocks the borrowed grey. The chariot and the motor car are optional.', 'opacity:.7;font-size:13px;line-height:1.5;padding:0 14px 10px');
+  el(panel, 'div', unlocked ? fill('The chariot answers {mount}. Hold {dodge} while moving to gallop; release to cruise. Acting or taking a hit dismisses it.') : 'Speak with Peaslee on the university grounds, then visit the Sleeper’s Sign. His errand unlocks the plain chariot. The spectral chariot and the motor car are optional.', 'opacity:.7;font-size:13px;line-height:1.5;padding:0 14px 10px');
   el(panel, 'div', 'All three share exactly the same speed, acceleration, handling and collision footprint. Optional appearances grant no gameplay advantage.', `font-size:12px;line-height:1.5;padding:0 14px 12px;color:${ACCENT}`);
   for (const id of MOUNT_IDS) {
     const selected = g.player.mount.selected === id;
@@ -63,5 +63,5 @@ export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void
       void refreshMountEntitlement(g).then(() => { if (refresh.isConnected) redraw(); });
     }, true, 'Checks Steam again after installing or removing an optional mount.');
   }
-  else el(panel, 'div', 'The chariot and the motor car are available through the Steam edition. The borrowed grey is included here.', 'font-size:12px;opacity:.5;line-height:1.5;padding:12px 14px 0');
+  else el(panel, 'div', 'The spectral chariot and the motor car are available through the Steam edition. The plain chariot is included here.', 'font-size:12px;opacity:.5;line-height:1.5;padding:12px 14px 0');
 }

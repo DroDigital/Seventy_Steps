@@ -17,8 +17,8 @@ const port = process.parentPort;
 const EVERY_MS = 8; // twice a frame: a press is never older than half of one
 
 try {
-  const { GamepadManager } = await import('gamepad-node');
-  const manager = new GamepadManager();
+  const { GamepadManager, getSdl } = await import('gamepad-node');
+  let manager = new GamepadManager();
   let last = [];
   const send = (force = false) => {
     const now = snapshot(manager.getGamepads());
@@ -26,8 +26,28 @@ try {
     last = now;
     port.postMessage({ type: 'pads', pads: now });
   };
-  manager.on('gamepadconnected', () => send(true));
-  manager.on('gamepaddisconnected', () => send(true));
+  const listen = (m) => {
+    m.on('gamepadconnected', () => send(true));
+    m.on('gamepaddisconnected', () => send(true));
+  };
+  listen(manager);
+  // A fresh manager reads SDL's current list. The process stays up: replacing it wakes the macOS dock.
+  const rescan = () => {
+    const sdl = getSdl();
+    for (const bus of [sdl.controller, sdl.joystick]) {
+      bus.removeAllListeners('deviceAdd');
+      bus.removeAllListeners('deviceRemove');
+    }
+    manager.destroy();
+    manager = new GamepadManager();
+    listen(manager);
+    send(true);
+  };
+  port.on('message', (event) => {
+    const data = event?.data ?? event;
+    if (data?.type !== 'rescan') return;
+    try { rescan(); } catch { /* a failed look leaves the pads as they are; the process stays */ }
+  });
   setInterval(send, EVERY_MS);
   port.postMessage({ type: 'ready' });
 } catch (e) {

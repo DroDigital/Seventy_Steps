@@ -38,10 +38,10 @@ export const QUESTS: Readonly<Record<string, QuestDef>> = {
     title: 'The Borrowed Reins',
     auto: true,
     stages: [
-      { goal: { kind: 'talk', npc: 'peaslee' }, note: 'Speak with Wingate Peaslee on the Miskatonic Quad. A grey from the university stables is waiting to be borrowed.' },
-      { goal: { kind: 'reach', sign: 'hub_dream' }, note: 'Find the Sleeper’s Sign, southwest across the university grounds. The reins of the grey wait there; no horror need fall, and nothing is owed.' },
+      { goal: { kind: 'talk', npc: 'peaslee' }, note: 'Speak with Wingate Peaslee on the Miskatonic Quad. A chariot from the university stables is waiting to be borrowed.' },
+      { goal: { kind: 'reach', sign: 'hub_dream' }, note: 'Find the Sleeper’s Sign, southwest across the university grounds. The reins of the chariot wait there; no horror need fall, and nothing is owed.' },
     ],
-    done: 'The borrowed reins answer my call on dry open ground. The grey is mine. A spectral chariot and a motor car may be chosen later at an Elder Sign; neither is any faster.',
+    done: 'The borrowed reins answer my call on dry open ground. The chariot is mine. A spectral chariot and a motor car may be chosen later at an Elder Sign; neither is any faster.',
     reward: {},
   },
   sleepers: {

@@ -49,12 +49,13 @@ describe('mounts, heard', () => {
     expect(grey.heard.map((h) => h.key)).toEqual(['mount:grey:summon']);
     grey.heard.length = 0;
     grey.advance(180);
-    expect(grey.heard.some((h) => h.key.endsWith(':breath') || h.key.endsWith(':snort'))).toBe(true);
-    expect(grey.heard.some((h) => /:(hooves|wheels|wind|engine)$/.test(h.key))).toBe(false);
+    expect(grey.heard.some((h) => /:(breath|snort|hooves|wheels|wind|engine|harness)$/.test(h.key))).toBe(false);
     grey.heard.length = 0;
     grey.advance(120, 16);
     expect(grey.heard.some((h) => h.key.endsWith(':hooves'))).toBe(true);
-    expect(grey.heard.some((h) => h.key.endsWith(':wheels'))).toBe(false);
+    expect(grey.heard.some((h) => h.key.endsWith(':wheels'))).toBe(true);
+    expect(grey.heard.some((h) => h.key.endsWith(':harness'))).toBe(true);
+    expect(grey.heard.some((h) => h.key.endsWith(':wind'))).toBe(false);
   });
 
   it('a parked automobile idles, rolls only once it moves, and dismounts with one stall', () => {

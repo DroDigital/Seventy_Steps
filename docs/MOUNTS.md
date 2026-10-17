@@ -1,14 +1,15 @@
 # Mounts
 
-The borrowed grey, a plain mare from the university stables, is included in the base game. The spectral chariot and the
+The plain chariot, one horse drawing a wooden coach, is included in the base game. The spectral chariot and the
 automobile are optional cosmetic DLCs, each with a target US price of **$0.99**. Traversal, handling and every other
-gameplay characteristic match the free grey: all three share one frozen `MOUNT_TRAVERSAL` object. The early-game quest
-unlocks mount use; owning either DLC does not skip the quest, and neither paid appearance is faster.
+gameplay characteristic match the free chariot: all three share one frozen `MOUNT_TRAVERSAL` object. The early-game quest
+unlocks mount use; owning either DLC does not skip the quest, and neither paid appearance is faster. The save id of the
+included mount is still `grey`, so a journey saved before this change keeps it.
 
 ## Play and inspect
 
 The Borrowed Reins is offered at the start of a new or resumed journey. Speak with Peaslee on the Miskatonic Quad,
-then discover the Sleeper’s Sign (`hub_dream`); no boss, consumable or payment is required. The quest grants the grey.
+then discover the Sleeper’s Sign (`hub_dream`); no boss, consumable or payment is required. The quest grants the plain chariot.
 At any Elder Sign, the Mounts tab selects an available appearance. B (rebindable) or the pad’s L3 summons/dismisses it on clear,
 dry open ground. Hold the dodge/sprint button while moving to gallop. Acting or taking damage dismisses it;
 resting, travelling, death, forced movement and entering a boss fight also dismiss it. Dungeons, buildings,
@@ -18,17 +19,19 @@ Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 11 
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.
 The rider keeps the ordinary hurtbox; mounting gives no healing, stamina refill, invulnerability or combat bonus.
 Only the preferred appearance is saved. Mount use resets on load; ownership is checked from Steam again.
-Removal or failed ownership verification falls back to the included grey.
+Removal or failed ownership verification falls back to the included chariot.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–3) with orbit, rest/cruise/gallop, pause and inspection
-resolution controls. It never opens a save or grants DLC access. The grey is one saddled mare with a cool breath.
-The chariot’s violet fire is parented to each skeleton horse’s spine, neck and hooves and kept dim. Procedural coachwork
-is batched; horse limbs are instanced.
+resolution controls. It never opens a save or grants DLC access. The included chariot is the spectral coach's body and
+seat, without curtains, crest, violet lamps or mourning black, drawn by one horse. That horse is Kenney's CC0
+`animal-horse` (node curves, not a skin), retinted and faced forward; the chariot mesh is not an imported model.
+The spectral chariot’s violet fire is parented to each skeleton horse’s spine, neck and hooves and kept dim. Procedural coachwork
+is batched; the spectral horses' limbs are instanced.
 
 Travel sounds are the rider’s own foley (not placed in the world, or the follow camera would swallow them). They are
-procedural placeholders in `src/render/audio/mountAudio.ts`: a nicker, breath and snort for the grey; a hollow wind,
-paired hooves, harness and creak for the chariot; an engine for the motor car; wheels on both wheeled mounts; a summon
-and a dismiss. Hoof and wheel timbre follows dirt, road, stone and water, and the stride shortens into a gallop.
+procedural placeholders in `src/render/audio/mountAudio.ts`: a nicker for the plain chariot, then one horse's hooves,
+wheels, harness and creak; a hollow wind, paired hooves, harness and creak for the spectral chariot; an engine for the motor car;
+wheels on every wheeled mount; a summon and a dismiss. Hoof and wheel timbre follows dirt, road, stone and water, and the stride shortens into a gallop.
 Rendered peaks sit under −12 dBFS and above about −24 dBFS. No new audio files were added. A recorded set can replace
 these recipes later without changing when they play.
 
@@ -36,9 +39,10 @@ Peaslee’s spoken lines do not name the mount. The journal, the completion noti
 (English, German, French, Spanish) are what changed. A new voiced line would need a recording in `public/voice`.
 
 The corrected automobile brief is **1890–1940**. The model uses a coherent circa-1914 touring silhouette,
-documented in [the historical reference brief](MOUNT_CAR_REFERENCES.md). This is original procedural art in the
-game’s retro pipeline. The grey is meant to be a simple early horse, in the spirit of a borrowed mare, and still wants
-an in-engine look at silhouette, saddle and breath. The chariot’s fire wants the same pass for how subtle it reads in motion.
+documented in [the historical reference brief](MOUNT_CAR_REFERENCES.md). The automobile and the spectral coach are original procedural art in the
+game’s retro pipeline. The plain chariot reuses that coach. Its horse is Kenney's Prototype Kit `animal-horse.glb`
+(CC0-1.0, no attribution required), extracted by `tools/draft_horse.mjs` into `src/render/draftHorseData.ts`.
+The spectral chariot’s fire still wants a look at how subtle it reads in motion.
 
 ## Steam entitlement
 
@@ -51,7 +55,7 @@ for itch.io. A thrown check fails both closed. Browser builds have no Steam enti
 can detect installation or removal while the game is running; no ownership is cached here.
 
 The repository does not have live Steam app ids. Until `steam.chariotDlcAppId` (or `STEAM_CHARIOT_DLC_APP_ID`) is set,
-the spectral chariot stays locked and the grey is what a finished quest summons. Store configuration remains release work:
+the spectral chariot stays locked and the plain chariot is what a finished quest summons. Store configuration remains release work:
 
 1. Create the chariot and the automobile as separate DLCs attached to the real base game in Steamworks.
 2. Set each US price to $0.99 and review Steam's regional pricing before publishing.
@@ -61,8 +65,8 @@ the spectral chariot stays locked and the grey is what a finished quest summons.
 4. Configure each DLC so Steam reports it installed when enabled. The cosmetic assets ship in the base game build;
    there is no separate asset download in this implementation.
 5. In a Steam test branch, verify an owner with each DLC installed, a non-owner, an owner with it disabled, offline
-   startup, and refund/removal followed by an ownership refresh. Confirm the early quest grants only the grey, and that
-   all three appearances handle identically once owned. A non-Steam build offers only the grey.
+   startup, and refund/removal followed by an ownership refresh. Confirm the early quest grants only the plain chariot, and that
+   all three appearances handle identically once owned. A non-Steam build offers only the plain chariot.
 
 The game never starts a purchase or changes a Steam subscription. Unit tests use fake read-only Steam clients;
 live account entitlement, checkout, regional pricing and refund behavior require the configured Steam test branch.
@@ -77,6 +81,6 @@ stay in the journal; they are a catalog, not papers found in the world.
 
 ## Verification
 
-- `npm run check` must pass before commit. In-engine review still wanted: the grey's silhouette and breath, how dim
+- `npm run check` must pass before commit. In-engine review still wanted: the plain chariot's horse against the shafts, how dim
   the violet fire reads while the horses move, and the mount mix against realm music and footsteps.
 - Live Steam purchase and entitlement were not available here. Screenshot the coach house at `?mounts` when a browser can run.

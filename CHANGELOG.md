@@ -3,6 +3,12 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Plain chariot
+
+- The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. The horse is Kenney's CC0 animal-horse.
+- The save id is still `grey`, so an older journey keeps its mount. The spectral chariot and the motor car are unchanged, and still no faster.
+- On the desktop build, looking for a controller no longer closes and reopens the helper process, which was waking the macOS dock and pausing the game.
+
 ## Allied sprites
 
 - Nodens, the Tritons, the Cats of Ulthar, Pickman, Nasht and Kaman-Thah, the Light-Being from Algol and the Yithian Archivist are drawn from authored sprites: idle, walk or glide, attack and hurt, from all four sides.

@@ -37,8 +37,8 @@ creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 Every keyboard action can be rebound under Controls. Prompts name the buttons of whichever device you
 used last.
 
-Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the borrowed grey,
-a plain mare from the university stables. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.
+Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the plain chariot,
+one horse drawing a wooden coach of the spectral chariot's pattern. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.
 The spectral chariot and the $0.99 automobile are optional appearances with the same traversal. Their Steam DLCs need
 release configuration before either can be owned: [`docs/MOUNTS.md`](docs/MOUNTS.md).
 Inspect the three animated models in the read-only coach house at `?mounts`. The automobile follows a researched

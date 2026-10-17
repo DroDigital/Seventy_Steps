@@ -34,9 +34,28 @@ describe('procedural mount art', () => {
         expect(flame.parent).not.toBe(visual.root);
       }
       if (id === 'grey') {
-        const breath = visual.root.getObjectByName('mount-breath');
-        expect(breath?.parent).not.toBe(visual.root);
-        expect(visual.root.getObjectByName('borrowed-grey')).toBeTruthy();
+        expect(visual.root.getObjectByName('plain-chariot')).toBeTruthy();
+        expect(visual.root.getObjectByName('draft-horse')).toBeTruthy();
+        expect(visual.root.getObjectByName('gothic-mourning-coach')).toBeFalsy();
+        expect(visual.root.getObjectByName('borrowed-grey')).toBeFalsy();
+        expect(visual.root.getObjectByName('mount-breath')).toBeFalsy();
+        expect(visual.seat.name).toBe('rider-seat-feet-origin');
+        expect(visual.seat.position.y).toBeCloseTo(0.79);
+        expect(visual.seat.position.z).toBeCloseTo(0.08);
+        const leg = visual.root.getObjectByName('leg-front-left')!;
+        visual.update({ time: 0, dt: 0, speed: 0 });
+        const rest = leg.quaternion.toArray();
+        visual.update({ time: 0.4, dt: 0.1, speed: 12, turn: 0.2 });
+        expect(leg.quaternion.toArray()).not.toEqual(rest);
+        visual.root.updateMatrixWorld(true);
+        const head = visual.root.getObjectByName('head')!.getWorldPosition(new THREE.Vector3());
+        const tail = visual.root.getObjectByName('tail')!.getWorldPosition(new THREE.Vector3());
+        const bit = visual.root.getObjectByName('draft-bit')!.getWorldPosition(new THREE.Vector3());
+        expect(head.z).toBeGreaterThan(tail.z + 0.8);
+        expect(visual.root.getObjectByName('draft-horse')!.position.x).toBe(0);
+        expect(bit.z).toBeGreaterThan(2.5);
+        expect(bit.y).toBeGreaterThan(1);
+        expect(bit.y).toBeLessThan(2.4);
       }
       const bodies = meshes(visual);
       expect(bodies.length).toBeLessThanOrEqual(limit[id]);

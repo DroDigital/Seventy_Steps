@@ -48,14 +48,6 @@ const CREAK: Sound = [
   noise('bandpass', 340, 0.18, 0.28, { to: 480, q: 2.2, attack: 0.015 }),
   tone('triangle', 132, 0.16, 0.12, { to: 165, vibrato: [14, 9], filter: { type: 'lowpass', hz: 700 } }),
 ];
-const BREATH: Sound = [
-  noise('bandpass', 260, 0.32, 0.08, { to: 160, q: 0.55, attack: 0.08 }),
-  noise('lowpass', 140, 0.28, 0.045, { attack: 0.1 }),
-];
-const SNORT: Sound = [
-  noise('bandpass', 170, 0.11, 0.1, { to: 80, q: 0.7, attack: 0.01 }),
-  tone('triangle', 130, 0.08, 0.04, { to: 70 }),
-];
 const WIND: Sound = [
   noise('bandpass', 420, 0.36, 0.12, { to: 240, q: 0.45, attack: 0.06 }),
   tone('sine', 88, 0.3, 0.05, { to: 64 }),
@@ -109,8 +101,6 @@ export function createMountAudio(g: Game, recipe: Recipe): MountAudio {
   let wheelMetres = 0;
   let harnessMetres = 0;
   let engineSeconds = 0;
-  let breath = 0;
-  let snort = 0;
   let wind = 0;
   let beat = 0;
   let speed = 0;
@@ -125,14 +115,14 @@ export function createMountAudio(g: Game, recipe: Recipe): MountAudio {
       if (now !== active) {
         const prev = active;
         active = now;
-        travelled = wheelMetres = harnessMetres = engineSeconds = breath = snort = wind = speed = beat = 0;
+        travelled = wheelMetres = harnessMetres = engineSeconds = wind = speed = beat = 0;
         if (prev) recipe(`mount:${prev}:dismiss`, dismissOf(prev), { gain: 0.9, vary: 0.2 });
         if (now) recipe(`mount:${now}:summon`, summonOf(now), { gain: 0.85, vary: 0.25 });
         return;
       }
       if (!active || !pos) return;
       if (!(dt > 0 && dt <= 0.1) || moved > Math.max(3, mount.speed * dt * 3)) {
-        travelled = wheelMetres = harnessMetres = engineSeconds = breath = snort = wind = speed = beat = 0;
+        travelled = wheelMetres = harnessMetres = engineSeconds = wind = speed = beat = 0;
         return;
       }
       const id = active;
@@ -143,12 +133,6 @@ export function createMountAudio(g: Game, recipe: Recipe): MountAudio {
       const play = (key: string, sound: Sound, gain = 1, pitch = 1): void => {
         recipe(`mount:${id}:${key}`, sound, { gain, pitch, vary: 0.12 });
       };
-      if (speed < 1.4 && id === 'grey') {
-        breath += dt;
-        snort += dt;
-        if (breath >= 2.4) { breath %= 2.4; play('breath', BREATH, 0.9); }
-        if (snort >= 6.4) { snort %= 6.4; play('snort', SNORT, 0.85); }
-      }
       if (speed < 1.4 && id === 'chariot') {
         wind += dt;
         if (wind >= 2.8) { wind %= 2.8; play('wind', WIND, 0.85); }
@@ -173,9 +157,8 @@ export function createMountAudio(g: Game, recipe: Recipe): MountAudio {
           play('hooves', hooves(surface, beat++, id === 'chariot'), (id === 'grey' ? 0.72 : 0.8) + 0.12 * load, pitch);
         }
       } else travelled = 0;
-      if (id === 'grey') return;
       wheelMetres += moved;
-      if (id === 'chariot') {
+      if (id !== 'automobile') {
         harnessMetres += moved;
         if (harnessMetres >= 4.3) {
           harnessMetres %= 4.3;
