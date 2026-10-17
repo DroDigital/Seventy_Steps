@@ -10,9 +10,9 @@ import { prism } from './bodyKit';
 import { blob, join, lit, loft, mixC, paintOf, type Paint, type Station } from './horseLoft';
 import type { Rgb } from './palette';
 
-export const COAT: Rgb = [0.55, 0.25, 0.105];
-export const COAT_DEEP: Rgb = [0.3, 0.125, 0.055];
-export const COAT_HI: Rgb = [0.69, 0.335, 0.14];
+export const COAT: Rgb = [0.5, 0.255, 0.125];
+export const COAT_DEEP: Rgb = [0.28, 0.13, 0.065];
+export const COAT_HI: Rgb = [0.64, 0.34, 0.17];
 export const FLAX: Rgb = [0.92, 0.74, 0.45];
 export const FLAX_DEEP: Rgb = [0.66, 0.48, 0.28];
 export const CREAM: Rgb = [0.97, 0.9, 0.76];
