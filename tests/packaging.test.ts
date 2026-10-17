@@ -63,11 +63,13 @@ describe('the scripts', () => {
 describe('the itch.io release (round 51)', () => {
   const push = (env: Record<string, string>, ...args: string[]) => spawnSync(process.execPath, ['tools/itch_push.mjs', ...args], { env: { PATH: process.env.PATH ?? '', ...env }, encoding: 'utf8' });
   /** A release folder with a universal Mac app whose package.json holds `meta` (what the tool reads to tell which store a pack is for). */
-  const fakeRelease = (meta: string): string => {
+  const fakeRelease = (meta: string, intelMeta = meta): string => {
     const dir = mkdtempSync(`${tmpdir()}/itch-test-`);
-    const resources = `${dir}/mac-universal/Seventy Steps.app/Contents/Resources/app-arm64`;
-    mkdirSync(resources, { recursive: true });
-    writeFileSync(`${resources}/package.json`, meta);
+    for (const [arch, text] of [['app-arm64', meta], ['app-x64', intelMeta]]) {
+      const resources = `${dir}/mac-universal/Seventy Steps.app/Contents/Resources/${arch}`;
+      mkdirSync(resources, { recursive: true });
+      writeFileSync(`${resources}/package.json`, text);
+    }
     return dir;
   };
 
@@ -86,12 +88,36 @@ describe('the itch.io release (round 51)', () => {
   });
 
   it('accepts a pack made for itch.io, writes what the itch app launches, and sends nothing without --run', () => {
-    const dir = fakeRelease('{"channel":"itch"}');
+    const dir = fakeRelease(JSON.stringify({ channel: 'itch', version: pkg.version }));
     const r = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: dir }, '--only', 'osx');
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/digitaldro\/seventy-steps:osx/);
+    expect(r.stdout).toContain(`(version ${pkg.version})`);
     expect(r.stdout).toMatch(/Nothing sent/);
     expect(readFileSync(`${dir}/mac-universal/.itch.toml`, 'utf8')).toContain('path = "Seventy Steps.app"');
+  });
+
+  it('refuses a stale or unversioned pack before changing it or trying to upload it', () => {
+    for (const version of ['0.0.1', undefined]) {
+      const dir = fakeRelease(JSON.stringify({ channel: 'itch', version }));
+      const r = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: dir }, '--only', 'osx', '--run');
+      expect(r.status).toBe(2);
+      expect(r.stderr).toContain('packed version');
+      expect(r.stderr).toContain('Rebuild this platform');
+      expect(existsSync(`${dir}/mac-universal/.itch.toml`)).toBe(false);
+      expect(r.stdout).not.toContain('butler:');
+    }
+  });
+
+  it('checks that the Intel half of a universal Mac app has the same version and itch channel', () => {
+    const appleSilicon = JSON.stringify({ channel: 'itch', version: pkg.version });
+    for (const intel of [{ channel: 'itch', version: '0.0.1' }, { channel: 'steam', version: pkg.version }]) {
+      const dir = fakeRelease(appleSilicon, JSON.stringify(intel));
+      const r = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: dir }, '--only', 'osx');
+      expect(r.status).toBe(2);
+      expect(r.stderr).toContain('macOS Intel:');
+      expect(existsSync(`${dir}/mac-universal/.itch.toml`)).toBe(false);
+    }
   });
 
   it('the workflow packs for itch.io only when asked, checks the channel, and pushes with a secret it never prints', () => {

@@ -15,7 +15,7 @@ declare module 'node:os' {
 }
 declare const process: { env: Record<string, string | undefined>; execPath: string };
 declare module 'node:child_process' {
-  export function spawnSync(command: string, args: string[], options: { env: Record<string, string | undefined>; encoding: 'utf8' }): { status: number | null; stdout: string; stderr: string };
+  export function spawnSync(command: string, args: string[], options: { env: Record<string, string | undefined>; encoding: 'utf8'; cwd?: string }): { status: number | null; stdout: string; stderr: string };
 }
 declare module 'node:zlib' {
   export function inflateSync(data: Uint8Array): Uint8Array;
