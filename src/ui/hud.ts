@@ -41,6 +41,7 @@ import { mountUnlocked } from '../systems/mounts';
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
 const NOTICE_MS = 1100;
 const NOTICE_HOLD_MS = 700; // a notice stands at least this long before the next takes its place (round 19: two at once, the first was lost)
+const MOUNT_TIP_MS = 5000; // the summon and ride lines leave; they are not a permanent prompt
 
 /** Notices for outcomes involving the player: [when the player dealt it, when the player took it]. */
 const NOTICES: Partial<Record<HitOutcome, readonly [dealt: Key | '', taken: Key | '']>> = {
@@ -85,6 +86,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   document.body.append(root);
 
   let noticeUntil = 0;
+  let mountTip = '';
+  let mountTipUntil = 0;
   const waiting: string[] = []; // notices held back while one stands
   let noticeAt = -Infinity;
   const put = (text: string): void => {
@@ -185,7 +188,14 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
       const mounted = g.player.mount.active;
-      setText(prompt, mounted ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss` : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : mountUnlocked(g) ? `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}` : '');
+      const mountKey = mounted ? mounted : mountUnlocked(g) ? `summon:${g.player.mount.selected}` : '';
+      if (mountKey !== mountTip) { mountTip = mountKey; mountTipUntil = 0; }
+      if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
+      const mountShown = mountKey !== '' && now < mountTipUntil;
+      const mountLine = mounted
+        ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss`
+        : `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}`;
+      setText(prompt, mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);
