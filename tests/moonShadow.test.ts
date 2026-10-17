@@ -16,13 +16,19 @@ describe('the frame of the moon\'s shadow map (round 34)', () => {
     expect(to.dot(toMoon)).toBeCloseTo(SHADOW.depth / 2, 3); // half its depth up the rays, however it is shifted across them
   });
 
-  it('holds to the map\'s own texel grid: a step of less than a texel does not move it, so the shadows do not shimmer as the investigator walks', () => {
-    const at = new THREE.Vector3(100, 2, 100);
-    const a = moonFrame(toMoon, at, texel, SHADOW.depth);
-    const b = moonFrame(toMoon, at.clone().addScaledVector(a.right, texel * 0.2), texel, SHADOW.depth);
-    expect(b.position.distanceTo(a.position)).toBeLessThan(1e-6);
-    const c = moonFrame(toMoon, at.clone().addScaledVector(a.right, texel * 1.2), texel, SHADOW.depth);
-    expect(c.position.distanceTo(a.position)).toBeCloseTo(texel, 4); // a whole texel when it has gone a whole one
+  it('holds to the map\'s own texel grid: it moves by whole texels only, and a step of a fifth of one rarely moves it, so the shadows do not shimmer as the investigator walks', () => {
+    let moved = 0;
+    for (let i = 0; i < 40; i++) {
+      const at = new THREE.Vector3(100 + i * 0.137, 2, 100 + i * 0.211);
+      const a = moonFrame(toMoon, at, texel, SHADOW.depth);
+      const small = moonFrame(toMoon, at.clone().addScaledVector(a.right, texel * 0.2), texel, SHADOW.depth).position.distanceTo(a.position);
+      expect(small < 1e-6 || Math.abs(small - texel) < 1e-4).toBe(true); // not at all, or one whole texel: never between
+      if (small > 1e-6) moved++;
+      const step = moonFrame(toMoon, at.clone().addScaledVector(a.right, texel * 1.2), texel, SHADOW.depth).position.distanceTo(a.position);
+      expect(Math.abs(step / texel - Math.round(step / texel))).toBeLessThan(1e-3); // a whole number of them
+      expect(step).toBeGreaterThanOrEqual(texel - 1e-4); // and a step of more than a texel moves it by at least one
+    }
+    expect(moved).toBeLessThan(16);
   });
 
   it('has an up to hold itself by even when the moon is straight overhead', () => {

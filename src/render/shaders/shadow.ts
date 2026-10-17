@@ -21,7 +21,7 @@ float moonLit(vec3 wp, vec3 n, float ndl) {
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(0.3, -0.7)).r)
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(0.7, 0.3)).r)
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(-0.3, 0.7)).r);
-  return mix(1.0, 0.25 * lit, 1.0 - smoothstep(0.7, 0.97, e));
+  return mix(1.0, 0.25 * lit, 1.0 - smoothstep(0.5, 0.98, e)); // the shadows thin out over the far half of the map's width, and are gone at its edge (round 54: from 0.7)
 }
 
 uniform sampler2D uLShadowMap;
