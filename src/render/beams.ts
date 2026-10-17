@@ -9,7 +9,9 @@ import type { V3 } from '../core/geom';
 import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { beamLine } from '../systems/strikes';
-import { ANOMALY, type Rgb } from './palette';
+import { creatureOf } from '../systems/creatures';
+import type { Rgb } from './palette';
+import { shotLook } from './shotLook';
 import { worldUniforms } from './worldMaterial';
 
 const CAPACITY = 24;
@@ -76,7 +78,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   const flashes: { from: V3; to: V3; at: number; color: Rgb }[] = [];
   let now = 0;
   g.events.on('Shot', ({ shooter, from, to }) => {
-    if (shooter !== g.player.id) flashes.push({ from: { ...from }, to: { ...to }, at: now, color: ANOMALY.green });
+    if (shooter !== g.player.id) flashes.push({ from: { ...from }, to: { ...to }, at: now, color: shotLook(creatureOf(g, shooter)?.id).color });
   });
 
   const eye = new THREE.Vector3();
@@ -108,7 +110,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
         if (!sw || a.frame < sw.window[0] || a.frame >= sw.window[1] || isAbsent(g, id)) continue;
         const { from, to } = beamLine(g, id, sw, a.frame + alpha);
         const flicker = 0.85 + 0.15 * Math.sin(time * 70 + id);
-        ribbon(from, to, 0.9 * sw.width + 0.5, ANOMALY.green, flicker);
+        ribbon(from, to, 0.9 * sw.width + 0.5, shotLook(creatureOf(g, id)?.id).color, flicker);
       }
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i];

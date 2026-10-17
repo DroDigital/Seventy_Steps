@@ -1,5 +1,5 @@
 /**
- * Draws what boss fights put into the world (spec §3E): bolts in flight as self-lit shards, pools
+ * Draws what boss fights put into the world (spec §3E): bolts (boltViews.ts), pools
  * as sickly discs on the ground, the arenas' props (a lamp: its post, and while it is lit its flame
  * and a faint circle of light where a light-bound boss burns; a monolith of Mu; the Alert, riding
  * the flood; Shub-Niggurath's spawning roots; Yog-Sothoth's floating spheres), the flood's water,
@@ -14,13 +14,12 @@ import { BOSS, REALITY, YOG } from '../data/tuning';
 import { engagedFights } from '../systems/bossFight';
 import type { Fight, Game, Prop } from '../systems/components';
 import { hooksOf, platformsOf, platformsShown } from '../systems/reality';
+import { createBoltViews } from './boltViews';
 import { box, tileUv, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb } from './palette';
 import { createWorldMaterial } from './worldMaterial';
 
 export const FX_PREFIX = 'fx:';
-
-const CAPACITY = 96; // bolts drawn at once
 
 export interface FightViews {
   update(alpha: number, time: number): void;
@@ -114,19 +113,11 @@ const PROPS: Record<Prop['kind'], () => THREE.Group> = { lamp, monolith, ship, r
 
 export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
   const voids = new Map<Fight, THREE.Group>();
-  const shard = tint(new THREE.OctahedronGeometry(1, 0), BASE.bone);
-  const bolts = new THREE.InstancedMesh(shard, createWorldMaterial({ texture: 'stone', emissive: 1, vertexColors: true }), CAPACITY);
-  bolts.frustumCulled = false;
-  scene.add(bolts);
+  const bolts = createBoltViews(scene, g);
   const water = new THREE.Mesh(flat(1, 64), createWorldMaterial({ texture: 'water', uvScale: [12, 12], uvScroll: [0.03, 0.02], emissive: 0.1 }));
   water.visible = false;
   scene.add(water);
   const views = new Map<Entity, THREE.Object3D>();
-  const m4 = new THREE.Matrix4();
-  const q = new THREE.Quaternion();
-  const axis = new THREE.Vector3(0.3, 1, 0.2).normalize();
-  const at = new THREE.Vector3();
-  const size = new THREE.Vector3();
 
   function sync(): void {
     const c = g.ecs.c;
@@ -172,16 +163,7 @@ export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
         const orb = v.getObjectByName('orb');
         if (orb) orb.position.y = YOG.height + 0.25 * Math.sin(time * 1.3 + id);
       }
-      let n = 0;
-      for (const [id, b] of c.bolt) {
-        const tr = c.transform.get(id);
-        if (!tr || n >= CAPACITY || (b.pool?.fire && b.faction === 'player')) continue; // a flask of oil is drawn by flaskFx.ts
-        at.set(tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.y + (tr.pos.y - tr.prev.y) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha);
-        q.setFromAxisAngle(axis, time * 9 + id);
-        bolts.setMatrixAt(n++, m4.compose(at, q, size.setScalar(b.radius)));
-      }
-      bolts.count = n;
-      bolts.instanceMatrix.needsUpdate = true;
+      bolts.update(alpha, time);
       const under = new Set(engagedFights(g).filter(([, f]) => hooksOf(f).includes('hidden_platforms')).map(([, f]) => f));
       for (const f of under) {
         if (voids.has(f)) continue;

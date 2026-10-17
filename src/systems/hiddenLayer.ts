@@ -63,6 +63,7 @@ export function spawnPiece(g: Game, def: HiddenPieceDef): Entity {
   g.ecs.c.transform.set(e, { pos, prev: { ...pos }, yaw: 0, prevYaw: 0 });
   const colliders = pieceColliders(def);
   const seal = def.seal ? pieceColliders({ ...def, boxes: def.seal.boxes }) : [];
+  if (def.seal?.look === 'none') for (const c of seal) c.fall = true; // a hidden bridge's chasm: the investigator falls, a foe is stopped
   g.world.colliders.push(...colliders, ...seal);
   for (const c of seal) g.world.off.add(c); // a fresh layer counts as shown until addLayer settles it
   g.ecs.c.piece.set(e, { def, colliders, seal });

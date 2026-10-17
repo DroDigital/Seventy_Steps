@@ -3,6 +3,12 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Edges and horrors
+
+- Walking off the land, into the sea, or through a pit, a well or a bridge's gap is fatal. Riding off the land is the same fall. The Lost Echoes stay on the ground where you stepped off.
+- Each horror's attacks keep their motion and take that horror's own colours: the telegraphs, the bursts and the beams.
+- Casters no longer share one green fireball. Yog-Sothoth still throws that light. The Colour's orb is its own hue. Other shots are shards, drops, sparks or darts.
+
 ## Allied sprites
 
 - Nodens, the Tritons, the Cats of Ulthar, Pickman, Nasht and Kaman-Thah, the Light-Being from Algol and the Yithian Archivist are drawn from authored sprites: idle, walk or glide, attack and hurt, from all four sides.

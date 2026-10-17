@@ -13,13 +13,10 @@ import type { MoveDef } from '../data/moves';
 import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { targetOf } from '../systems/specials';
+import { creatureOf } from '../systems/creatures';
+import { attackTheme } from './attackTheme';
+import { shotLook } from './shotLook';
 import type { Decals } from './decals';
-import { ANOMALY, BASE, mixRgb } from './palette';
-
-const DANGER = ANOMALY.magenta; // where a blow lands
-const LINE = mixRgb(ANOMALY.green, BASE.bone, 0.25); // where a bolt or a beam runs
-const RING = BASE.bone; // a quake's band: roll through it
-const MIND = ANOMALY.purple; // what works on the mind or draws the body in
 
 export interface Telegraphs {
   update(alpha: number, time: number): void;
@@ -37,6 +34,9 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
 
   /** What one boss's move shows at this frame. */
   function show(id: Entity, def: MoveDef, frame: number, alpha: number): void {
+    const theme = attackTheme(g, id);
+    const { danger: DANGER, ring: RING, mind: MIND } = theme;
+    const LINE = shotLook(creatureOf(g, id)?.id).color;
     const p = lerp(id, alpha)!;
     const tr = c.transform.get(id)!;
     const yaw = tr.prevYaw + (tr.yaw - tr.prevYaw) * alpha;
@@ -111,11 +111,11 @@ export function createTelegraphs(g: Game, decals: Decals): Telegraphs {
       }
       for (const [e, mk] of c.mark) {
         const p = c.transform.get(e)?.pos;
-        if (p) decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, DANGER);
+        if (p) decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackTheme(g, mk.owner).danger);
       }
       for (const [e, w] of c.wave) {
         const p = c.transform.get(e)?.pos;
-        if (p) decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, RING);
+        if (p) decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackTheme(g, w.owner).ring);
       }
       decals.end(time);
     },
