@@ -8,6 +8,7 @@
 // Every pack is checked to have been made for itch.io (`channel` "itch" in its package.json: desktop/steam.js): a Steam build, started
 // outside Steam, would relaunch itself through Steam. Pack with `npm run package:win|linux -- -c.extraMetadata.channel=itch`
 // or `npm run package:mac -- --universal --channel itch`.
+// Each packed version must match package.json; CI stamps both before packaging with tools/itch_version.mjs.
 import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -40,7 +41,7 @@ const app = 'Seventy Steps.app';
 const resources = (dir) => join(dir, app, 'Contents', 'Resources');
 const platforms = [
   { name: 'windows', os: 'Windows', dir: 'win-unpacked', play: 'SeventySteps.exe', pack: (d) => inAsar(join(d, 'resources', 'app.asar')) },
-  { name: 'osx', os: 'macOS', dir: 'mac-universal', play: app, pack: (d) => readJson(join(resources(d), 'app-arm64', 'package.json')), hint: 'the universal app, for Intel Macs too: npm run package:mac -- --universal --channel itch' },
+  { name: 'osx', os: 'macOS', dir: 'mac-universal', play: app, pack: (d) => readJson(join(resources(d), 'app-arm64', 'package.json')), otherPack: (d) => readJson(join(resources(d), 'app-x64', 'package.json')), hint: 'the universal app, for Intel Macs too: npm run package:mac -- --universal --channel itch' },
   { name: 'linux', os: 'Linux', dir: 'linux-unpacked', play: 'seventy-steps', pack: (d) => inAsar(join(d, 'resources', 'app.asar')) },
 ];
 const only = flag('--only')?.split(',');
@@ -55,13 +56,22 @@ for (const p of todo) {
     console.log(`${p.os}: not packed, left out`);
     continue;
   }
-  const channel = p.pack(dir).channel;
-  if (channel !== 'itch') fail(`${p.os}: ${dir} was packed for ${channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
-  writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n`);
-  plan.push({ ...p, dir });
-  console.log(`${p.os}: ${dir} → ${target}:${p.name} (version ${pkg.version})`);
+  const pack = p.pack(dir);
+  const checkPack = (meta, label) => {
+    if (meta.channel !== 'itch') fail(`${label}: ${dir} was packed for ${meta.channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
+    if (!meta.version || meta.version !== pkg.version) fail(`${label}: packed version ${meta.version ?? '(missing)'} does not match package.json (${pkg.version}). Rebuild this platform before uploading; an old pack must not be labelled as a new release.`);
+  };
+  checkPack(pack, p.os);
+  if (p.otherPack) checkPack(p.otherPack(dir), `${p.os} Intel`);
+  plan.push({ ...p, dir, version: pack.version });
 }
 if (!plan.length) fail('Nothing is packed for itch.io.');
+// Validate every selected platform before writing manifests or sending anything.
+for (const p of plan) {
+  const dir = p.dir;
+  writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n`);
+  console.log(`${p.os}: ${dir} → ${target}:${p.name} (version ${p.version})`);
+}
 
 /** butler: BUTLER, the PATH, or .butler/ (downloaded with --get-butler). */
 async function butler() {
@@ -93,6 +103,6 @@ if (!args.includes('--run')) {
   process.exit(0);
 }
 for (const p of plan) {
-  const r = spawnSync(cmd, ['push', p.dir, `${target}:${p.name}`, '--userversion', pkg.version, '--if-changed'], { stdio: 'inherit' });
+  const r = spawnSync(cmd, ['push', p.dir, `${target}:${p.name}`, '--userversion', p.version, '--if-changed'], { stdio: 'inherit' });
   if (r.status !== 0) process.exit(r.status ?? 1);
 }

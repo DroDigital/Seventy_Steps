@@ -5,7 +5,7 @@
   "private": true,
   "author": "Alessandro A. Foddis",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.1",
   "type": "module",
   "main": "desktop/main.js",
   "scripts": {
@@ -24,7 +24,8 @@
     "package:mac": "npm run build && npm run icon && node tools/package_mac.mjs",
     "smoke": "node tools/smoke_packaged.mjs",
     "steam:upload": "node tools/steam_upload.mjs",
-    "itch:push": "node tools/itch_push.mjs"
+    "itch:push": "node tools/itch_push.mjs",
+    "dlc:serve": "node services/itch-redeem/server.mjs"
   },
   "dependencies": {
     "gamepad-node": "^1.5.0",
@@ -104,6 +105,21 @@
       "extendInfo": {
         "NSSupportsAutomaticGraphicsSwitching": true,
         "NSHighResolutionCapable": true
+      }
+    }
+  },
+  "itchDlc": {
+    "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAvyT3aOiIv8PP3SkEemNGdQrkYu9KuUs/SO+dwKchenU=\n-----END PUBLIC KEY-----\n",
+    "purchaseUrl": "https://digitaldro.itch.io/seventy-steps/purchase",
+    "redemptionUrl": "",
+    "products": {
+      "chariot": {
+        "externalId": "spectral-chariot",
+        "subProductId": ""
+      },
+      "automobile": {
+        "externalId": "brassbound-motor-car",
+        "subProductId": ""
       }
     }
   }

@@ -84,11 +84,12 @@ describe('the borrowed reins', () => {
       setChariotEntitlement(g, true);
       selectMount(g, id);
       expect(toggleMount(g)).toBe(true);
-      ride(g, 60, true);
+      ride(g, 90, true);
       return { at: { ...g.ecs.c.transform.get(g.player.id)!.pos }, stamina: g.ecs.c.stamina.get(g.player.id)!.value, speed: g.player.mount.speed };
     });
     expect(results[1]).toEqual(results[0]);
     expect(results[2]).toEqual(results[0]);
+    expect(results[0].speed).toBeCloseTo(17);
     expect(results[0].speed).toBeGreaterThan(PLAYER.sprintSpeed);
     expect(results[0].stamina).toBeLessThan(PLAYER.stamina);
   });
@@ -97,7 +98,7 @@ describe('the borrowed reins', () => {
     const g = openGame();
     expect(toggleMount(g)).toBe(true);
     ride(g, 50);
-    expect(g.player.mount.speed).toBeCloseTo(MOUNT_TRAVERSAL.cruise);
+    expect(g.player.mount.speed).toBeCloseTo(10);
     const before = g.ecs.c.transform.get(g.player.id)!.yaw;
     const turn = emptyInput();
     turn.moveX = 1;

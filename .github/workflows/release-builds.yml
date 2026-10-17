@@ -18,6 +18,7 @@ on:
       - 'tools/smoke_packaged.mjs'
       - 'tools/steam_upload.mjs'
       - 'tools/itch_push.mjs'
+      - 'tools/itch_version.mjs'
       - '.github/workflows/release-builds.yml'
   push:
     tags: ['v*']
@@ -49,6 +50,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Give this itch build a distinct version
+        if: ${{ inputs.itch }}
+        run: node tools/itch_version.mjs
       - run: npm run package:win -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
         shell: bash
       - name: Starts, and reaches its title
@@ -100,6 +104,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Give this itch build a distinct version
+        if: ${{ inputs.itch }}
+        run: node tools/itch_version.mjs
       - name: Import the Developer ID certificate (when its secrets are set)
         if: ${{ env.HAS_DEVELOPER_ID == 'true' }}
         env:
@@ -190,6 +197,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Give this itch build a distinct version
+        if: ${{ inputs.itch }}
+        run: node tools/itch_version.mjs
       - run: npm run package:linux -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
       - name: Starts, and reaches its title
         env:

@@ -62,8 +62,9 @@ machine of each platform; the second half is what only the author can do, becaus
    Mac (or the Rosetta start), a controller on each, Steam's overlay (Shift+Tab), fullscreen (F11, Alt+Enter), alt-tab and back,
    a save, quitting and continuing, and Steam Cloud between two machines. CI proves a packed build starts and reaches its title on
    a runner with no controller and no Steam; it has not played the game.
-5. **The version**: `1.0.0-rc.1` is in `package.json` and goes into the macOS bundle, where Apple wants digits only: set `1.0.0`
-   when it is released, and `CHANGELOG.md` with it. Steam's build ids are its own.
+5. **The version**: `package.json` and `package-lock.json` hold the release version (next: `1.0.1`). Before a later named release,
+   run `npm version patch --no-git-tag-version`, update `CHANGELOG.md`, then rebuild. Do this before packaging: changing the number
+   afterwards does not update an existing binary. Steam's build ids are its own; itch CI adds a distinct build suffix as below.
 
 ## Sending a build
 
@@ -81,17 +82,30 @@ executable bit are kept).
 
 ## itch.io (before Steam)
 
+Player-facing update and save instructions, the description insertion, and the first devlogs are in
+[`docs/ITCH_PAGE.md`](ITCH_PAGE.md). Keep the description notice visible and publish devlogs for builds players can download.
+
 A build packed with `channel` set to `itch` in its package.json keeps off Steam altogether (no relaunch through Steam, no overlay,
 nothing sent to Steam), whatever `steam.appId` holds: `desktop/steam.js`. `tools/itch_push.mjs` refuses a pack that is not marked,
 because a Steam build started outside Steam would relaunch itself through it.
 
 - **From CI (the way):** Actions › Release builds › Run workflow, tick *itch*. Each platform is packed for itch.io, started (`--channel itch`
-  must show in its report) and pushed with butler to the channels `windows`, `osx` (the universal app) and `linux`, as version
-  `package.json`'s. It needs the repository secret `BUTLER_API_KEY` (itch.io › Settings › API keys); without it only the plan is shown.
+  must show in its report) and pushed with butler to the channels `windows`, `osx` (the universal app) and `linux`. Before packaging,
+  `tools/itch_version.mjs` stamps the release version plus the workflow run and attempt into both package files, for example
+  `1.0.1-build.42.1`. Platforms built in the same run and attempt share the label; another run or retry gets a distinct label.
+  Retrying only failed jobs updates only those platforms' attempt suffixes. The game's built-in version
+  and the label passed to butler come from this same stamped version. Apple's bundle version fields keep the numeric release base.
+  The checked-in release version stays `1.0.1` until bumped.
+  It needs the repository secret `BUTLER_API_KEY` (itch.io › Settings › API keys); without it only the plan is shown.
   The project is `digitaldro/seventy-steps` unless the *itch_target* input says another.
 - **From a machine:** `npm run package:win -- -c.extraMetadata.channel=itch` (likewise `package:linux`; the Mac: `npm run package:mac --
   --universal --channel itch`), then `ITCH_TARGET=digitaldro/seventy-steps npm run itch:push -- --get-butler` (shows the plan) and again
   with `--run` (sends it; `butler login` once, or `BUTLER_API_KEY`).
+- **Version checks:** the uploader refuses a packed version that differs from the checkout's `package.json`, including either half
+  of the universal Mac app. It sends the version read from the validated package, so a stale `release/` folder cannot be labelled
+  with a newly bumped release number. Rebuild all platforms for that release. For later local releases, bump the patch before packaging.
+  Existing uploads retain their old labels; the corrected label appears after a new build is uploaded. Reusing a label did not by itself
+  stop updates: [butler orders builds by upload order](https://itch.io/docs/butler/pushing.html), independently of the displayed version.
 - **What a player meets.** *Windows:* the exe is not code-signed, so a download from the website can show SmartScreen's "unknown publisher"
   (More info › Run anyway). *macOS:* an app that is not notarised is stopped by Gatekeeper when it comes from a browser download ("cannot be
   opened" or "damaged"); the way round is System Settings › Privacy & Security › Open Anyway, or `xattr -dr com.apple.quarantine "Seventy Steps.app"`.

@@ -9,3 +9,13 @@ __pycache__/
 steam/build/
 steam/output/
 .butler/
+*.seventysteps-dlc
+*.dlc-private.pem
+
+# Redemption service state and local secrets
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

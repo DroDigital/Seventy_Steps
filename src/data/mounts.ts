@@ -8,8 +8,8 @@ export const FREE_MOUNT: MountId = 'grey';
 
 /** Metres and seconds; every mount shares this exact frozen object. */
 export const MOUNT_TRAVERSAL = Object.freeze({
-  cruise: 11,
-  gallop: 18,
+  cruise: 10,
+  gallop: 17,
   acceleration: 14,
   braking: 26,
   turnRate: 1.8,

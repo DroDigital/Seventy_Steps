@@ -1,0 +1,10 @@
+**
+!package.json
+!desktop/
+!desktop/itchDlc.js
+!services/
+!services/itch-redeem/
+!services/itch-redeem/core.mjs
+!services/itch-redeem/server.mjs
+!services/itch-redeem/Dockerfile
+!services/itch-redeem/Dockerfile.dockerignore

@@ -16,7 +16,7 @@
  */
 
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +24,7 @@ import { iconPng } from './icon.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
 import { channel, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
+import { DLC_LIMIT, installMountUnlock, mountCheckoutUrl, mountDlcStore, ownsItchMount } from './itchDlc.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
@@ -155,9 +156,26 @@ function open() {
 ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
-// Cosmetic mount DLC; only Steam ownership and installation can unlock either appearance.
-ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc());
-ipcMain.handle('desktop:chariot-dlc', () => steamOwnsChariotDlc());
+// Store-specific entitlement reads: itch verifies a publisher-signed paid download; Steam checks its own client.
+const dlcDir = () => join(app.getPath('userData'), 'dlc');
+ipcMain.handle('desktop:automobile-dlc', () => mountDlcStore().channel === 'itch' ? ownsItchMount('automobile', dlcDir()) : steamOwnsAutomobileDlc());
+ipcMain.handle('desktop:chariot-dlc', () => mountDlcStore().channel === 'itch' ? ownsItchMount('chariot', dlcDir()) : steamOwnsChariotDlc());
+ipcMain.handle('desktop:mount-dlc-store', () => mountDlcStore());
+ipcMain.handle('desktop:buy-mount-dlc', async (_e, id) => {
+  const url = mountCheckoutUrl(id);
+  if (!url) return false;
+  try { await shell.openExternal(url); return true; } catch { return false; }
+});
+ipcMain.handle('desktop:import-mount-dlc', async () => {
+  if (mountDlcStore().channel !== 'itch') return { status: 'unavailable' };
+  try {
+    const result = await dialog.showOpenDialog({ title: 'Install mount DLC', properties: ['openFile'], filters: [{ name: 'Seventy Steps DLC unlock', extensions: ['seventysteps-dlc'] }] });
+    if (result.canceled || result.filePaths.length !== 1) return { status: 'cancelled' };
+    const path = result.filePaths[0];
+    if (statSync(path).size > DLC_LIMIT) return { status: 'invalid' };
+    return installMountUnlock(readFileSync(path, 'utf8'), dlcDir());
+  } catch { return { status: 'unavailable' }; }
+});
 
 // The game's storage as files, one a key (sync, as the Web Storage API it stands in for is).
 const keyFile = (key) => join(app.getPath('userData'), 'saves', `${String(key).replace(/[^A-Za-z0-9_-]+/g, '_')}.json`);
