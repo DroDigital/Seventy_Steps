@@ -32,7 +32,6 @@ import { HEART } from '../render/feel';
 import type { MapPainter } from './mapPainter';
 import { menuOpen } from './menuKit';
 import { createHints } from './hints';
-import { createNotices } from './notices';
 import { createMindHud } from './mindHud';
 import { createMinimap } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
@@ -40,6 +39,8 @@ import { MOUNTS } from '../data/mounts';
 import { mountUnlocked } from '../systems/mounts';
 
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
+const NOTICE_MS = 1100;
+const NOTICE_HOLD_MS = 700; // a notice stands at least this long before the next takes its place (round 19: two at once, the first was lost)
 
 /** Notices for outcomes involving the player: [when the player dealt it, when the player took it]. */
 const NOTICES: Partial<Record<HitOutcome, readonly [dealt: Key | '', taken: Key | '']>> = {
@@ -77,16 +78,25 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);
   const reticle = el(`position:absolute;width:8px;height:8px;margin:-5px 0 0 -5px;border:1px solid ${BONE};transform:rotate(45deg)`, '', root);
-  const notice = el('position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:76%;top:64%;padding:9px 16px;background:#050506e6;border:1px solid #d9d0b855;text-align:center;font-size:18px;line-height:1.5;letter-spacing:2px;opacity:0', '', root);
-  const prompt = el('position:absolute;left:50%;transform:translateX(-50%);width:max-content;max-width:76%;bottom:64px;padding:6px 12px;background:#050506df;text-align:center;font-size:14px;letter-spacing:2px', '', root);
+  const notice = el('position:absolute;left:0;right:0;top:64%;text-align:center;font-size:16px;letter-spacing:4px', '', root);
+  const prompt = el('position:absolute;left:0;right:0;bottom:64px;text-align:center;letter-spacing:2px;opacity:.85', '', root);
   const heard = el('position:absolute;left:0;right:0;bottom:96px;padding:0 14%;text-align:center;font-style:italic;line-height:1.5;font-size:calc(var(--caption, 1) * 1em);letter-spacing:1px;opacity:0;text-shadow:0 0 6px #000,0 0 2px #000', '', root); // what someone near says to themselves (round 34)
   let heardAt = -Infinity;
   document.body.append(root);
 
-  const notices = createNotices();
-  const say = (text: string): void => notices.say(text);
-  let tick = performance.now();
-  let hidden = false;
+  let noticeUntil = 0;
+  const waiting: string[] = []; // notices held back while one stands
+  let noticeAt = -Infinity;
+  const put = (text: string): void => {
+    notice.textContent = fill(text, true); // a notice may name a button: {pause}
+    noticeAt = performance.now();
+    noticeUntil = noticeAt + NOTICE_MS;
+  };
+  const say = (text: string): void => {
+    if (!text || waiting.includes(text)) return;
+    if (performance.now() - noticeAt < NOTICE_HOLD_MS) void (waiting.length < 3 && waiting.push(text));
+    else put(text);
+  };
   const great = createBanner(); // a death, a horror's fall, a place: the great words (banner.ts)
   const show = (text: string): void => great.show(text, 'place');
   const bosses = createBossHud(g, root, say, show);
@@ -135,15 +145,11 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const v = new Vector3();
   root.style.transition = 'opacity .6s';
   return {
-    hide: (on) => { hidden = on; root.style.opacity = on ? '0' : '1'; },
+    hide: (on) => void (root.style.opacity = on ? '0' : '1'),
     update(camera) {
       minimap.update();
-      const now = performance.now();
-      const visible = !hidden && !menuOpen();
-      const ms = visible ? Math.max(0, now - tick) : 0;
-      tick = now;
-      if (visible) hints.update(ms);
-      const busy = visible ? 'visible' : 'hidden'; // a dialogue, menu or cutscene has the screen
+      if (!menuOpen()) hints.update();
+      const busy = menuOpen() ? 'hidden' : 'visible'; // a dialogue or menu has the screen
       setStyle(prompt, 'visibility', busy);
       setStyle(notice, 'visibility', busy);
       setStyle(heard, 'visibility', busy);
@@ -169,9 +175,9 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setText(insight, tr('hud.insight', { n: g.mind.insight }));
       const ready = LEVEL_IDS.some((id) => canLevel(g, id)); // a level within reach: rest at an Elder Sign
       setText(echoes, `${tr('hud.echoes', { n: Math.max(0, g.player.echoes - held()) })}${ready ? '  ▲' : ''}`);
-      const line = notices.update(ms);
-      setText(notice, fill(line.text, true)); // fill at draw time, so a changed input device names its own buttons
-      setStyle(notice, 'opacity', line.opacity.toFixed(2));
+      const now = performance.now();
+      if (waiting.length && now - noticeAt >= NOTICE_HOLD_MS) put(waiting.shift()!);
+      setStyle(notice, 'opacity', String(Math.min(1, Math.max(0, (noticeUntil - now) / 300)).toFixed(2)));
       const [age, left] = [now - heardAt, HEARD.shown * 1000 - (now - heardAt)]; // in over half a second, out over the last second and a half
       setStyle(heard, 'opacity', String(Math.min(1, Math.max(0, Math.min(age / 500, left / 1500))).toFixed(2)));
       const act = fightAction(g);
@@ -179,9 +185,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
       const mounted = g.player.mount.active;
-      const promptText = mounted ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss` : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : mountUnlocked(g) ? `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}` : '';
-      setText(prompt, promptText);
-      setStyle(prompt, 'display', promptText ? 'block' : 'none');
+      setText(prompt, mounted ? `${MOUNTS[mounted].name}  ·  ${glyph('dodge')} hold to gallop  ·  ${glyph('mount')} dismiss` : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : mountUnlocked(g) ? `${glyph('mount')} · Summon ${MOUNTS[g.player.mount.selected].name}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);
