@@ -235,6 +235,8 @@ function ceiling(d: DungeonLayout, r: RoomLayout, out: Part[]): void {
 
 /** Metres of heaped earth and rock that stand out from a mound's outer walls (render/dungeonShell.ts): feet stop at them. */
 export const MOUND_BAND = 2;
+/** The steep bank reaches this far before its low skirt meets the ground. */
+export const MOUND_FOOT = MOUND_BAND + 1.4;
 
 /** The heaped earth outside a mound-shelled room's outer walls (and round its corners: round 19): an unseen edge that feet cannot climb. */
 function moundBands(d: DungeonLayout, out: Part[]): void {
@@ -242,13 +244,13 @@ function moundBands(d: DungeonLayout, out: Part[]): void {
   for (const p of walls) {
     if (!grounded(d, p) || kitOfRoom(d, d.rooms[p.room]).shell !== 'mound') continue; // not a lintel over the way in
     const n = DIRS[p.outer];
-    const [lo, hi] = bankEnds(d, walls, p).map((e) => (e === 'corner' ? MOUND_BAND : 0));
+    const [lo, hi] = bankEnds(d, walls, p).map((e) => (e === 'corner' ? MOUND_FOOT : 0));
     const min = n.z !== 0 ? { ...p.min, x: p.min.x - lo } : { ...p.min, z: p.min.z - lo };
     const max = n.z !== 0 ? { ...p.max, x: p.max.x + hi } : { ...p.max, z: p.max.z + hi };
-    if (n.x > 0) [min.x, max.x] = [p.max.x, p.max.x + MOUND_BAND];
-    if (n.x < 0) [min.x, max.x] = [p.min.x - MOUND_BAND, p.min.x];
-    if (n.z > 0) [min.z, max.z] = [p.max.z, p.max.z + MOUND_BAND];
-    if (n.z < 0) [min.z, max.z] = [p.min.z - MOUND_BAND, p.min.z];
+    if (n.x > 0) [min.x, max.x] = [p.max.x, p.max.x + MOUND_FOOT];
+    if (n.x < 0) [min.x, max.x] = [p.min.x - MOUND_FOOT, p.min.x];
+    if (n.z > 0) [min.z, max.z] = [p.max.z, p.max.z + MOUND_FOOT];
+    if (n.z < 0) [min.z, max.z] = [p.min.z - MOUND_FOOT, p.min.z];
     out.push({ shape: 'box', look: 'none', solid: true, room: p.room, min, max });
   }
 }

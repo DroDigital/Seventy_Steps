@@ -144,6 +144,8 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   const begin = (scene: Scene, cast: Cast, resolve: () => void): void => {
     const r: Run = { scene, cast, length: sceneLength(scene), t: 0, resolve, skipAt: null, hinted: false, credit: 0, shakes: [] };
     run = r;
+    g.cutscene = true;
+    g.ecs.c.shove.delete(g.player.id);
     pulled = 1;
     ui.bars(true);
     if (scene.dark) ui.fade('black', 0);
@@ -164,6 +166,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     if (r.scene.shut) queueMicrotask(() => ui.wipe()); // the ending's card comes up first, out of the black
     const next = waiting.shift();
     if (next) begin(next.scene, next.cast, next.resolve);
+    else g.cutscene = false;
   };
 
   const skip = (): void => {
@@ -220,7 +223,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       padDown = down;
       if ((r.skipAt !== null && r.t >= r.skipAt + SKIP_FADE) || r.t >= r.length) {
         finish(r.skipAt !== null);
-        return true; // the world takes this step as itself
+        return !run || run.scene.sim !== 'frozen'; // a queued frozen scene holds the world from its first step
       }
       if (r.scene.sim === 'frozen') return false;
       r.credit += r.scene.slow ?? 0.3;

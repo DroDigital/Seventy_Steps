@@ -23,6 +23,7 @@ import { damageScale } from './sanity';
 import { absorb } from './stamina';
 import { refreshStoops, zoneGap } from './hurt';
 import { live, targetsOf } from './targets';
+import { awaitsIntroduction } from './npcIntroduction';
 
 /** What a blow carries into resolution; melee hits and revolver shots both fit. */
 export interface Blow {
@@ -135,6 +136,7 @@ export function capsuleGap2(g: Game, target: Entity, a: V3, b: V3, reach = 0): {
  * where it comes from, for the guard arc (a bolt or a pool; else the attacker, who may be gone).
  */
 export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, from?: V3): HitOutcome {
+  if ((g.cutscene && target === g.player.id) || awaitsIntroduction(g, target)) return 'dodged';
   if (blow.lingering && target === g.player.id && g.player.mended > 0) return 'dodged'; // the Reagent holds: a pool's or the void's tick does nothing
   const { actor, health, poise, stamina, transform } = g.ecs.c;
   const aa = actor.get(attacker);
@@ -162,6 +164,7 @@ const SHOVE_FRAMES = 12;
 
 /** Pushes a body `metres` straight away from `from`, over a few frames (movement.ts moves it). */
 export function shove(g: Game, target: Entity, from: V3, metres: number): void {
+  if ((g.cutscene && target === g.player.id) || awaitsIntroduction(g, target)) return;
   const p = g.ecs.c.transform.get(target)?.pos;
   if (!p || g.ecs.c.body.get(target)?.fixed) return;
   const [dx, dz] = [p.x - from.x, p.z - from.z];

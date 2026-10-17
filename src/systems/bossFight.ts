@@ -11,6 +11,7 @@
 
 import type { Entity } from '../core/ecs';
 import { applyChange, clearProps, removeProp } from './arenaChanges';
+import { startMove } from './actions';
 import { holdInVeil } from './bossArena';
 import type { ArenaCircle, Fight, Game } from './components';
 import { defOf } from './creatures';
@@ -115,11 +116,21 @@ export function fightSystem(g: Game): void {
   }
 }
 
-/** Subscribes the fights to deaths: a boss's ends its fight; the investigator's resets them all. */
+/** A boss's death ends its fight and takes any joining bosses with it; the investigator's resets them all. */
 export function registerFights(g: Game): void {
-  g.events.on('Died', ({ entity }) => {
-    const f = g.ecs.c.fight.get(entity);
+  g.events.on('Died', ({ entity, killer }) => {
+    const c = g.ecs.c;
+    const f = c.fight.get(entity);
     if (f?.engaged) endFight(g, entity, f);
+    if (!f) return;
+    for (const [e, joining] of c.fight) {
+      if (joining.script.joins?.with !== f.id) continue;
+      const [h, a, tr] = [c.health.get(e), c.actor.get(e), c.transform.get(e)];
+      if (!h || h.hp <= 0 || !a || !tr || c.dead.has(e)) continue;
+      h.hp = 0;
+      startMove(a, 'death');
+      g.events.emit('Died', { entity: e, killer, at: { ...tr.pos } });
+    }
   });
   g.events.on('Respawned', () => {
     for (const [e, f] of g.ecs.c.fight) resetFight(g, e, f);

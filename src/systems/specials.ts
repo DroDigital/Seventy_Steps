@@ -92,7 +92,7 @@ function summonOne(g: Game, id: Entity): void {
 
 /** One frame of a gaze: the buildup grows while the investigator is in range and sight; full, the mind reels. */
 function gaze(g: Game, id: Entity, range: number): boolean {
-  if (g.player.steady > 0) return false;
+  if (g.cutscene || g.player.steady > 0) return false;
   const c = g.ecs.c;
   const me = c.transform.get(id)!.pos;
   const pp = c.transform.get(g.player.id)!.pos;

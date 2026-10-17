@@ -11,7 +11,7 @@ import { fbm } from '../core/noise';
 import type { DungeonKit } from '../data/kits';
 import { DUNGEON } from '../data/tuning';
 import { floorRange, kitOfRoom, roomAt, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
-import { MOUND_BAND, type BoxPart, type Part } from '../world/dungeonParts';
+import { MOUND_BAND, MOUND_FOOT, type BoxPart, type Part } from '../world/dungeonParts';
 import { bankEnds, grounded, outerFace, sweeps, type BankEnd } from '../world/moundBanks';
 import { DIRS } from '../world/worldMap';
 import { box, tileUv, tint } from './meshKit';
@@ -49,7 +49,7 @@ const RIM = 0.9; // the heap's brim above the roof
 /** A bank's cross-section, out from the wall's face and up: from the middle of the wall's thickness, where the heap over the room ends, across the brim to the face (round 45: it began at the face, and a slit half a wall wide ran along every ridge, the wall's top showing in dashes), then down to the ground beyond the band. */
 function profileOf(base: number, height: number): [number, number][] {
   const rise = height - base;
-  return [[-DUNGEON.wall / 2, height + RIM], [0, height + RIM], [MOUND_BAND * 0.5, base + rise * 0.72], [MOUND_BAND, base + rise * 0.42], [MOUND_BAND + 1.4, base + 0.2], [MOUND_BAND + 2.4, base - 0.4]];
+  return [[-DUNGEON.wall / 2, height + RIM], [0, height + RIM], [MOUND_BAND * 0.5, base + rise * 0.72], [MOUND_BAND, base + rise * 0.42], [MOUND_FOOT, base + 0.2], [MOUND_FOOT + 1, base - 0.4]];
 }
 
 /** A bank's point `o` metres out from (x, z) along the unit (dx, dz), at height y, roughened by the earth's lumps (its brim and its foot stay put). */
