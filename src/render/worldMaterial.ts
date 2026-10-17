@@ -82,6 +82,9 @@ export interface WorldMaterialOptions {
   bomb?: boolean; // blend a turned second sample by a noise mask: organic textures never repeat
   texture2?: TextureKind; // a second texture blended in by the geometry's aSplat attribute (roads)
   texture3?: TextureKind; // a third laid over the ground in patches of world-space noise (shaders/world.ts; round 32)
+  texture4?: TextureKind; // the ground of the region beside, blended in by the geometry's aEdge toward their border (terrainMesh.ts; round 55)
+  texture5?: TextureKind; // its road's, cross-faded with `texture2` by the same share, where the two regions' roads differ
+  patchFade?: boolean; // `texture3`'s patches fade out toward that border (where the region beside has other patches)
   patch?: readonly [begin: number, soft: number]; // where those patches begin in the noise (0.5 is the middle of it) and how soft their edge is
   eldritch?: number; // 0..1: how far the body refuses to hold its shape (shaders/eldritch.ts)
   bodyScale?: number; // metres: the body's height, which that is measured in
@@ -122,6 +125,11 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
       uHasMap2: { value: o.texture2 ? 1 : 0 },
       uMap3: { value: createTexture(o.texture3 ?? o.texture, o.seed ?? 1) },
       uHasMap3: { value: o.texture3 ? 1 : 0 },
+      uMap4: { value: createTexture(o.texture4 ?? o.texture, o.seed ?? 1) },
+      uHasMap4: { value: o.texture4 ? 1 : 0 },
+      uMap5: { value: createTexture(o.texture5 ?? o.texture2 ?? o.texture, o.seed ?? 1) },
+      uHasMap5: { value: o.texture5 ? 1 : 0 },
+      uPatchFade: { value: o.patchFade ? 1 : 0 },
       uPatch: { value: new THREE.Vector2(...(o.patch ?? [0.54, 0.08])) },
       uVary: { value: o.vary ?? 0 },
       uBomb: { value: o.bomb ? 1 : 0 },

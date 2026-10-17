@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { MOUNT_QUEST } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
-import { FALL, PLAYER, SIM } from '../src/data/tuning';
+import { FALL, PLAYER, SIM, WORLD } from '../src/data/tuning';
 import { shove, strike } from '../src/systems/combat';
 import { fallDark, fallSystem } from '../src/systems/falls';
 import { restore } from '../src/systems/death';
@@ -263,7 +263,34 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
     expect(tr.pos.y).toBeGreaterThan(-1);
   });
 
-  it('treats the land\'s end and the shore as edges: balance on the last of the ground, fall when none is left, no instant death (round 55)', () => {
+  it('goes down the slope past the land\'s end into the sea, and falls only where the water is, not at the border (round 55)', () => {
+    const g = createWorldGame();
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    // West of Arkham: x < -512 is owned by no region, and the ground goes on, sinking to the sea floor over WORLD.coast metres.
+    const walk = { x: -500, z: 220 };
+    tr.pos = { x: walk.x, y: g.world.ground(walk.x, walk.z), z: walk.z };
+    tr.prev = { ...tr.pos };
+    let crossed = -1;
+    let fellAt: { x: number; y: number; ground: number } | null = null;
+    for (let f = 0; f < 600 && !fellAt; f++) {
+      tr.prev = { ...tr.pos };
+      tr.pos.x -= 0.07; // the ground has the body's feet (movement.ts): it goes where the surface goes
+      tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
+      if (crossed < 0 && regionAt(tr.pos.x, tr.pos.z) === undefined) crossed = f;
+      fallSystem(g);
+      if (g.player.falling) fellAt = { x: tr.pos.x, y: tr.pos.y, ground: g.world.ground(tr.pos.x, tr.pos.z) };
+    }
+    expect(crossed).toBeGreaterThan(0);
+    expect(fellAt).not.toBeNull();
+    expect(fellAt!.x).toBeLessThan(-512 - 3); // well past the border, on the slope...
+    expect(fellAt!.y).toBeLessThanOrEqual(WORLD.seaLevel + 0.4 + 0.05); // ...and only at the water
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(PLAYER.hp); // a fall, not the quick end
+    expect(g.ecs.c.actor.get(g.player.id)!.move).not.toBe('death');
+    for (let i = 0; i < FALL.frames; i++) fallSystem(g);
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(0);
+  });
+
+  it('balances at the last of the ground by the shore, and falls where none is left (round 55)', () => {
     const rim = (x: number, ground: (x: number, z: number) => number, y: number) => {
       const g = createWorldGame();
       g.world = { ground, colliders: [], off: new Set(), contain: () => {} };
@@ -272,23 +299,6 @@ describe('a ledge is a fall, not a wall of death (round 54)', () => {
       tr.pos = { x, y, z: 220 };
       return { g, tr };
     };
-    const flat = (): number => 4;
-    // The world's western rim: x < -512 is owned by no region.
-    const on = rim(-511.9, flat, 4);
-    fallSystem(on.g);
-    expect(on.g.player.falling).toBeNull();
-    const balanced = rim(-512 - FALL.foot * 0.5, flat, 4); // the centre is over the void, a part of the feet is still on the land
-    fallSystem(balanced.g);
-    expect(balanced.g.player.falling).toBeNull();
-    expect(balanced.g.ecs.c.health.get(balanced.g.player.id)!.hp).toBe(PLAYER.hp);
-    const over = rim(-512 - FALL.foot - 0.1, flat, 4);
-    fallSystem(over.g);
-    expect(over.g.player.falling).not.toBeNull(); // a fall...
-    expect(over.g.ecs.c.health.get(over.g.player.id)!.hp).toBe(PLAYER.hp); // ...and not the quick end
-    expect(over.g.ecs.c.actor.get(over.g.player.id)!.move).not.toBe('death');
-    for (let i = 0; i < FALL.frames; i++) fallSystem(over.g);
-    expect(over.g.ecs.c.health.get(over.g.player.id)!.hp).toBe(0);
-    // The shore: the ground slopes down under the sea, and a step into the water is the same.
     const shore = (x: number): number => (x > 100 ? -1.2 : -3);
     const wading = rim(100.05, shore, -3);
     fallSystem(wading.g);

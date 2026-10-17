@@ -20,7 +20,22 @@ export interface ChunkContent {
   props: Prop[];
   colliders: Collider[]; // the props' and the fixed sites'
   spawns: SpawnPoint[]; // posted foes and fixed sites
-  roads: readonly RoadSeg[]; // road pieces touching the chunk
+  roads: readonly RoadSeg[]; // road pieces touching the chunk, its neighbour regions' too (the edge of a road that runs beside a border is not cut at it: round 55)
+}
+
+/** The road pieces over a chunk: its own region's plan's, and those of the regions beside it, whose roads the plan of this one does not hold. */
+function roadsOver(cx: number, cz: number, key: number): readonly RoadSeg[] {
+  const seen = new Set<string>();
+  const out: RoadSeg[] = [];
+  for (let dz = -1; dz <= 1; dz++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const r = regionOfChunk(cx + dx, cz + dz);
+      if (!r || seen.has(r.id)) continue;
+      seen.add(r.id);
+      out.push(...(regionPlan(r).segs.get(key) ?? []));
+    }
+  }
+  return out;
 }
 
 function generate(cx: number, cz: number): ChunkContent {
@@ -35,7 +50,7 @@ function generate(cx: number, cz: number): ChunkContent {
     props: plan?.props.get(key) ?? [],
     colliders: [...st.colliders, ...(plan?.colliders.get(key) ?? [])],
     spawns: [...st.spawns, ...(plan?.spawns.get(key) ?? [])],
-    roads: plan?.segs.get(key) ?? [],
+    roads: roadsOver(cx, cz, key),
   };
 }
 

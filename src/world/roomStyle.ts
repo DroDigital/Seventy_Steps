@@ -15,7 +15,7 @@ import { kitOfRoom, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { DIRS } from './worldMap';
 
 export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring';
-export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands' | 'ring';
+export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands';
 
 export interface RoomStyle {
   pillars: Pillars;
@@ -76,8 +76,7 @@ export function roomStyle(d: DungeonLayout, r: RoomLayout): RoomStyle {
   else if (kind === 'hall') {
     s = r.size === 3 ? WIDE : SMALL[(Math.floor(start * SMALL.length) + same * 3) % SMALL.length];
   } else if (kind === 'corridor') s = style('none', CORRIDOR[(Math.floor(start * 3) + same) % 3]);
-  else if (kind === 'well') s = style('none', same % 2 === 0 ? 'ring' : 'plain');
-  else s = style('none', 'plain');
+  else s = style('none', 'plain'); // (a well's curb stands bare on the floor: round 55 took away the rings once laid about it)
   return organic && !r.def.boss ? { ...s, floor: 'plain' } : s; // earth keeps its own floor
 }
 
@@ -230,9 +229,6 @@ export function inlaysOf(s: RoomStyle, r: RoomLayout, boards: boolean): Inlay[] 
     }
     case 'bands': // corridor: thresholds laid across at every four metres
       for (let v = -h + 3.5; v < h - 3; v += 4) out.push({ tone: pale, box: [-DUNGEON.lane / 2 + 0.3, DUNGEON.lane / 2 - 0.3, v, v + 0.5] });
-      break;
-    case 'ring':
-      out.push({ tone: dark, disc: [DUNGEON.well + 1.9, DUNGEON.well + 1.3] }, { tone: pale, disc: [DUNGEON.well + 2.4, DUNGEON.well + 2.2] });
       break;
   }
   return out;

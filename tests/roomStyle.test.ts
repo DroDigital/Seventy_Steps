@@ -37,7 +37,7 @@ describe('how a dungeon room is laid out (round 32: every hall had the same pill
   it('uses every plan somewhere: pillars, floors, cross-shaped halls and buttressed ones', () => {
     const all = w.dungeons.flatMap((d) => d.layout.rooms.map((r) => roomStyle(d.layout, r)));
     for (const p of ['four', 'pairs', 'colonnade', 'ring']) expect(all.some((s) => s.pillars === p), p).toBe(true);
-    for (const f of ['runner', 'frame', 'cross', 'chequer', 'nested', 'bands', 'ring', 'rings', 'squares', 'quincunx']) expect(all.some((s) => s.floor === f), f).toBe(true);
+    for (const f of ['runner', 'frame', 'cross', 'chequer', 'nested', 'bands', 'rings', 'squares', 'quincunx']) expect(all.some((s) => s.floor === f), f).toBe(true);
     expect(all.some((s) => s.corners > 0)).toBe(true);
     expect(all.some((s) => s.bays)).toBe(true);
   });
