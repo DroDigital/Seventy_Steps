@@ -322,4 +322,6 @@ export interface Game {
   overworld?: Overworld;
   /** How well lit the ground at a point is by the world's lamps, fires and torches, 0..1 (handed in by the renderer, which knows where they are; the dark when absent: sanity.ts mends faster in it). */
   lit?: (at: V3) => number;
+  /** The clock the sea's waves are drawn by, in seconds (handed in by the renderer: it runs on through a cutscene that stands the world still, which `frame` does not; the frames' own when absent: waterFall.ts meets the water where it is drawn). */
+  seaTime?: () => number;
 }

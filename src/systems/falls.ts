@@ -20,7 +20,7 @@ import { inDungeon } from '../world/terrain';
 import { regionAt } from '../world/worldMap';
 import { startMove } from './actions';
 import type { Falling, Game } from './components';
-import { enterSea, waterDark, waterStep } from './waterFall';
+import { enterSea, seaTimeOf, waterDark, waterStep } from './waterFall';
 import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { dismissMount } from './mounts';
@@ -120,7 +120,7 @@ function beginFall(g: Game, lip: V3): void {
   const run = Math.hypot(dx, dz);
   const k = run > FALL.carry ? FALL.carry / run : 1;
   const sea = overSea(g, tr.pos, g.ecs.c.body.get(p.id)!.height);
-  p.falling = { frame: 0, vy: 0, vx: dx * k, vz: dz * k, spin: 1, lip: { ...lip }, water: sea ? enterSea(tr.pos, { x: dx, z: dz }, g.frame, seaChop(g)) : null };
+  p.falling = { frame: 0, vy: 0, vx: dx * k, vz: dz * k, spin: 1, lip: { ...lip }, water: sea ? enterSea(tr.pos, { x: dx, z: dz }, seaTimeOf(g), seaChop(g)) : null };
   g.events.emit('Fell', { entity: p.id, at: { ...tr.pos }, frames: FALL.frames, sea });
 }
 

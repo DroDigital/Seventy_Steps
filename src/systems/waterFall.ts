@@ -21,17 +21,20 @@ const smooth = (x: number): number => {
 /** The splash's size, 0 to 1, for a body meeting the water at `speed` m/s: a step in is a ripple, a fall from a height a fountain. */
 export const splashSize = (speed: number): number => clamp(0.12 + 0.13 * speed, 0, 1);
 
-/** The water's height at a place and a frame, as the picture draws it: the waves raised by the wind's `chop` (`seaChop(g)`; 1 as the sea lies). */
-export const surfaceAt = (x: number, z: number, frame: number, chop = 1): number => WORLD.seaLevel + seaHeight(x, z, frame / SIM.hz, chop);
+/** The sea's clock, in seconds: the one the shader draws the waves by (`Game.seaTime`, the renderer's, which runs on through a cutscene that holds the frames still), else the frames'. */
+export const seaTimeOf = (g: Game): number => g.seaTime?.() ?? g.frame / SIM.hz;
+
+/** The water's height at a place and a time, as the picture draws it: the waves raised by the wind's `chop` (`seaChop(g)`; 1 as the sea lies). */
+export const surfaceAt = (x: number, z: number, time: number, chop = 1): number => WORLD.seaLevel + seaHeight(x, z, time, chop);
 
 /** A body that has gone into the sea: where the tentacle comes up (ahead of it, the way it was going, and to one side) and what has happened so far (nothing). */
-export function enterSea(at: V3, run: { x: number; z: number }, frame: number, chop = 1): WaterFall {
+export function enterSea(at: V3, run: { x: number; z: number }, time: number, chop = 1): WaterFall {
   const len = Math.hypot(run.x, run.z);
   const [dx, dz] = len > 0.5 ? [run.x / len, run.z / len] : [0, 1];
   const side = Math.sin(at.x * 12.9898 + at.z * 78.233) > 0 ? 1 : -1; // (either side, the same whenever it is the same place)
   const [px, pz] = [-dz * side, dx * side];
   const [x, z] = [at.x + dx * WATER.root * 0.85 + px * WATER.root * 0.5, at.z + dz * WATER.root * 0.85 + pz * WATER.root * 0.5];
-  return { surface: surfaceAt(at.x, at.z, frame, chop), entered: -1, grab: -1, root: { x, y: surfaceAt(x, z, frame, chop), z }, heading: { x: 0, z: 1 }, held: 0, depth: 0 };
+  return { surface: surfaceAt(at.x, at.z, time, chop), entered: -1, grab: -1, root: { x, y: surfaceAt(x, z, time, chop), z }, heading: { x: 0, z: 1 }, held: 0, depth: 0 };
 }
 
 /**
@@ -44,9 +47,10 @@ export function waterStep(g: Game, f: Falling, die: (g: Game, lip: V3) => void):
   const tr = g.ecs.c.transform.get(id)!;
   const dt = 1 / SIM.hz;
   const chop = seaChop(g);
+  const time = seaTimeOf(g);
   if (f.frame >= WATER.max) return;
   f.frame++;
-  w.surface = surfaceAt(tr.pos.x, tr.pos.z, g.frame, chop);
+  w.surface = surfaceAt(tr.pos.x, tr.pos.z, time, chop);
   if (w.entered < 0) {
     f.vy -= WATER.gravity * dt; // still in the air: it falls as a body does, and keeps its run
     tr.pos.x += f.vx * dt;
@@ -97,7 +101,7 @@ export function waterStep(g: Game, f: Falling, die: (g: Game, lip: V3) => void):
   if (w.grab >= 0) { // it is drawing the body out: the root stays ahead of it
     w.root.x = tr.pos.x + w.heading.x * WATER.root;
     w.root.z = tr.pos.z + w.heading.z * WATER.root;
-    w.root.y = surfaceAt(w.root.x, w.root.z, g.frame, chop);
+    w.root.y = surfaceAt(w.root.x, w.root.z, time, chop);
   }
   if (w.held >= WATER.held || f.frame >= WATER.max) die(g, f.lip);
 }

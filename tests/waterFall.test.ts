@@ -4,7 +4,7 @@ import { fallDark, fallSystem } from '../src/systems/falls';
 import { createWorldGame } from '../src/systems/game';
 import { seaChop } from '../src/systems/seaChop';
 import { seaHeight } from '../src/world/seaSurface';
-import { enterSea, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
+import { enterSea, seaTimeOf, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
 import type { Collider } from '../src/world/colliders';
 
 /** Walks the real ground west of Arkham, past its border and down the slope, until the body falls; then plays the fall out, frame by frame. */
@@ -117,29 +117,42 @@ describe('a body dropped into the sea from a height', () => {
 });
 
 describe('the surface it meets is the one drawn (round 55)', () => {
-  it('rides the swell as the wind has raised it: a body that falls in a storm splashes at the storm\'s water, not the calm\'s', () => {
+  /** A body falls into the sea from 3 m, in R'lyeh in a storm; returns where it met the water, and when by the sea's clock. */
+  const fallsInStorm = (clock: (g: ReturnType<typeof createWorldGame>) => number | null) => {
     const g = createWorldGame();
     g.overworld!.region = 'rlyeh';
     Object.assign(g.overworld!.weather, { kind: 'storm', amount: 1 });
     const chop = seaChop(g);
-    expect(chop).toBeGreaterThan(2.5);
+    if (clock(g) !== null) g.seaTime = () => clock(g)!;
     g.world = { ground: () => -9, colliders: [], off: new Set(), contain: () => {} };
     const tr = g.ecs.c.transform.get(g.player.id)!;
     tr.pos = { x: -600, y: 3, z: 220 };
     tr.prev = { ...tr.pos };
-    g.player.falling = { frame: 0, vy: 0, vx: 0, vz: 0, spin: 1, lip: { ...tr.pos }, water: enterSea(tr.pos, { x: 0, z: 0 }, g.frame, chop) };
-    const meets: { y: number; frame: number }[] = [];
-    g.events.on('Splash', (d) => meets.push({ y: d.at.y, frame: g.frame }));
+    g.player.falling = { frame: 0, vy: 0, vx: 0, vz: 0, spin: 1, lip: { ...tr.pos }, water: enterSea(tr.pos, { x: 0, z: 0 }, seaTimeOf(g), chop) };
+    const meets: { y: number; time: number }[] = [];
+    g.events.on('Splash', (d) => meets.push({ y: d.at.y, time: seaTimeOf(g) }));
     for (let i = 0; i < 90; i++) {
       g.frame++;
       fallSystem(g);
     }
     expect(meets).toHaveLength(1);
-    const [x, z] = [-600, 220];
-    const drawn = WORLD.seaLevel + seaHeight(x, z, meets[0]!.frame / 60, chop);
-    const calm = WORLD.seaLevel + seaHeight(x, z, meets[0]!.frame / 60, 1);
-    expect(Math.abs(meets[0]!.y - drawn)).toBeLessThan(0.05); // (the body has moved a hair sideways in the air)
+    const at = (time: number, c: number) => WORLD.seaLevel + seaHeight(-600, 220, time, c);
+    return { chop, met: meets[0]!, drawn: at(meets[0]!.time, chop), calm: at(meets[0]!.time, 1) };
+  };
+
+  it('rides the swell as the wind has raised it: a body that falls in a storm splashes at the storm\'s water, not the calm\'s', () => {
+    const { chop, met, drawn, calm } = fallsInStorm(() => null);
+    expect(chop).toBeGreaterThan(2.5);
+    expect(Math.abs(met.y - drawn)).toBeLessThan(0.05); // (the body has moved a hair sideways in the air)
     expect(Math.abs(drawn - calm)).toBeGreaterThan(0.1); // and the two differ here, so the test tells them apart
+  });
+
+  it('takes the wave by the clock the picture runs on, which a cutscene that held the frames still has set apart from them', () => {
+    const offset = 37.3; // seconds the picture's clock has run on (a cutscene: main.ts advances it, and `g.frame` waits)
+    const { chop, met, drawn } = fallsInStorm((g) => offset + g.frame / 60);
+    const byFrames = WORLD.seaLevel + seaHeight(-600, 220, met.time - offset, chop); // where the frames' own clock would have had the water
+    expect(Math.abs(met.y - drawn)).toBeLessThan(0.05);
+    expect(Math.abs(drawn - byFrames)).toBeGreaterThan(0.1); // the frames' clock would have put it at another wave
   });
 });
 
