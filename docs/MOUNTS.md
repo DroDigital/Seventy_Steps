@@ -12,8 +12,9 @@ The Borrowed Reins is offered at the start of a new or resumed journey. Speak wi
 then discover the Sleeper’s Sign (`hub_dream`); no boss, consumable or payment is required. The quest grants the plain chariot.
 At any Elder Sign, the Mounts tab selects an available appearance. B (rebindable) or the pad’s L3 summons/dismisses it on clear,
 dry open ground. Hold the dodge/sprint button while moving to gallop. Acting or taking damage dismisses it;
-resting, travelling, death, forced movement and entering a boss fight also dismiss it. Dungeons, buildings,
-water, steep terrain and boss grounds exclude mounted traversal.
+resting, travelling, death, forced movement and entering a boss fight also dismiss it. Riding into a dungeon
+or a boss arena dismisses it at the threshold, and it cannot be summoned again until the investigator is outside.
+Buildings, water and steep terrain still stop the ride where it stands.
 
 Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 11 m/s, gallop 18 m/s, shared
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.

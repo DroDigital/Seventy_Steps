@@ -3,6 +3,10 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Mounts
+
+- A mount drops when the ride reaches a dungeon or a boss arena. It cannot be summoned in either place.
+
 ## Plain chariot
 
 - The included mount is a one-horse wooden chariot. Its body and seat follow the spectral coach, without the funeral dress or the violet fire. The horse is Kenney's, a dark bay with a quiet coat, black points, a pale muzzle, a dark mane, and eyes.

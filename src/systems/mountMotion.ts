@@ -5,7 +5,7 @@ import { WORLD } from '../data/tuning';
 import { inDungeon } from '../world/terrain';
 import { regionAt } from '../world/worldMap';
 import type { Game } from './components';
-import { footprintClear } from './mountGround';
+import { footprintClear, mountFootprintForbidden, mountPlaceForbidden } from './mountGround';
 
 /** The coast, the sea or the abyss: one step is taken, then the fall kills. Walls still stop the mount. */
 function environmentalDrop(g: Game, at: V3): boolean {
@@ -13,11 +13,15 @@ function environmentalDrop(g: Game, at: V3): boolean {
   return !regionAt(at.x, at.z) || at.y <= WORLD.seaLevel + 0.4;
 }
 
-export function moveMounted(g: Game, dt: number): boolean {
+/** `idle` is on foot. `rode` kept the saddle. `drop` reached a dungeon or a boss arena. */
+export type MountMove = 'idle' | 'rode' | 'drop';
+
+export function moveMounted(g: Game, dt: number): MountMove {
   const p = g.player;
   const mount = p.mount;
-  if (!mount.active) return false;
+  if (!mount.active) return 'idle';
   const tr = g.ecs.c.transform.get(p.id)!;
+  if (mountPlaceForbidden(tr.pos.x, tr.pos.z)) return 'drop';
   const m = g.ecs.c.mover.get(p.id)!;
   const t = MOUNT_TRAVERSAL;
   if (m.face !== null) {
@@ -46,10 +50,11 @@ export function moveMounted(g: Game, dt: number): boolean {
     if (Math.abs(next.y - tr.pos.y) > Math.max(t.maxStep, step * t.maxSlope) || !footprintClear(g, next, tr.yaw, true)) {
       mount.speed = 0;
       p.sprinting = false;
+      if (mountFootprintForbidden(next, tr.yaw)) return 'drop';
       break;
     }
     Object.assign(tr.pos, next);
     mount.phase += step / t.stride;
   }
-  return true;
+  return 'rode';
 }

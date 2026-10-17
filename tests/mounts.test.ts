@@ -7,6 +7,7 @@ import { discover, rest, teleport, travel } from '../src/systems/checkpoints';
 import { strike } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
+import { mountFootprintForbidden } from '../src/systems/mountGround';
 import { mountAvailable, mountBar, controlMount, dismissMount, mountSystem, selectMount, setAutomobileEntitlement, setChariotEntitlement, toggleMount } from '../src/systems/mounts';
 import { movementSystem } from '../src/systems/movement';
 import { talk } from '../src/systems/npcs';
@@ -159,10 +160,32 @@ describe('the borrowed reins', () => {
 
   it('refuses dungeons, boss grounds, floods and ground below the waterline', () => {
     const g = openGame();
+    expect(toggleMount(g)).toBe(true);
     const room = worldLayout().dungeons[0].layout.rooms[0];
-    teleport(g, { x: room.x, z: room.z, yaw: 0 });
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    tr.pos.x = room.x;
+    tr.pos.z = room.z;
+    mountSystem(g);
+    expect(g.player.mount.active).toBe(null);
     expect(toggleMount(g)).toBe(false);
     const arena = worldLayout().arenas[0];
+    teleport(g, { x: arena.x, z: arena.z - arena.radius - 20, yaw: 0 });
+    g.camera.yaw = 0;
+    expect(toggleMount(g)).toBe(true);
+    const started = tr.pos.z;
+    const input = emptyInput();
+    input.moveY = 1;
+    for (let i = 0; i < 240 && g.player.mount.active; i++) {
+      controlMount(g, input);
+      movementSystem(g, 1 / SIM.hz);
+    }
+    expect(g.player.mount.active).toBe(null);
+    expect(tr.pos.z).toBeGreaterThan(started);
+    const dist = Math.hypot(tr.pos.x - arena.x, tr.pos.z - arena.z);
+    expect(dist).toBeGreaterThan(arena.radius);
+    expect(dist).toBeLessThan(arena.radius + 12);
+    const ahead = { x: tr.pos.x + Math.sin(tr.yaw), y: tr.pos.y, z: tr.pos.z + Math.cos(tr.yaw) };
+    expect(mountFootprintForbidden(ahead, tr.yaw)).toBe(true);
     teleport(g, { x: arena.x, z: arena.z, yaw: 0 });
     expect(toggleMount(g)).toBe(false);
     teleport(g, { x: 256, z: 240, yaw: 0 });
