@@ -16,7 +16,7 @@ import type { Fight, Game, Prop } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { hooksOf, platformsOf, platformsShown } from '../systems/reality';
 import { AOE_SKIN, aoeLook } from './aoeLook';
-import { attackTheme, DEFAULT_ATTACK_THEME } from './attackTheme';
+import { attackLook, isThemed } from './attackLook';
 import { createBoltViews } from './boltViews';
 import { box, tileUv, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
@@ -130,8 +130,7 @@ export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
       const p = c.transform.get(id)!.pos;
       const who = creatureOf(g, h.owner)?.id;
       const look = aoeLook(who);
-      const theme = attackTheme(g, h.owner);
-      const ink = theme === DEFAULT_ATTACK_THEME ? undefined : mixRgb(theme.danger, BASE.bone, 0.28);
+      const ink = isThemed(who) ? mixRgb(attackLook(g, h.owner).danger, BASE.bone, 0.2) : undefined; // (the lifted colour: a pool that hurts is a pool that is seen)
       const mesh = pool(h.radius, h.fire, ink, look.motif);
       mesh.userData.life0 = Math.max(1, h.life);
       mesh.position.set(p.x, p.y + 0.05, p.z);

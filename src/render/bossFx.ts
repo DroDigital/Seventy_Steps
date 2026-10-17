@@ -11,6 +11,8 @@ import { createBeams } from './beams';
 import { createDecals } from './decals';
 import { createFlaskFx } from './flaskFx';
 import { createFogGates } from './fogGates';
+import { createGroundFx } from './groundFx';
+import { createMeleeFx } from './meleeFx';
 import type { Particles } from './particles';
 import { createTelegraphs } from './telegraphs';
 
@@ -19,9 +21,11 @@ export interface BossFx {
 }
 
 export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles): BossFx {
-  const telegraphs = createTelegraphs(g, createDecals(scene));
+  const ground = createGroundFx(); // what a blow leaves on the ground and sends along it (round 51)
+  const telegraphs = createTelegraphs(g, createDecals(scene), ground);
   const beams = createBeams(scene, g);
-  const fx = createAttackFx(g, particles);
+  const fx = createAttackFx(g, particles, ground);
+  const melee = createMeleeFx(g, particles, ground);
   const fog = createFogGates(g, particles);
   const flasks = createFlaskFx(scene, g, particles); // round 29: a flask of lamp oil, in flight and burning
   return {
@@ -29,6 +33,7 @@ export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles):
       telegraphs.update(alpha, time);
       beams.update(alpha, time, camera);
       fx.update(alpha);
+      melee.update(alpha);
       fog.update(time);
       flasks.update(alpha, time);
     },
