@@ -7,6 +7,7 @@
 
 import { EDITION } from '../data/edition';
 import { desktop } from './desktop';
+import { scrub } from './scrub';
 
 const KEEP = 60;
 const lines: string[] = [];
@@ -64,7 +65,7 @@ export function graphicsName(): string {
 /** What a bug report needs: when, what ran it, how it was set, and the record. `what`: a crash's, or one the player asked for (ui/reportPage.ts). */
 export function crashReport(kind: string, detail?: string, what = 'crash report'): string {
   const gl = graphicsName();
-  return [
+  return scrub([ // (pasted in public: no home folder's name, e-mail address or query key goes with it: ui/scrub.ts)
     `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} ${what}: ${kind}`,
     new Date().toISOString(),
     `${navigator.userAgent}${desktop ? ' (desktop shell)' : ''}`,
@@ -72,5 +73,5 @@ export function crashReport(kind: string, detail?: string, what = 'crash report'
     detail ? `\n${detail}` : '',
     '\nthe last errors and warnings:',
     ...lines,
-  ].join('\n');
+  ].join('\n'));
 }
