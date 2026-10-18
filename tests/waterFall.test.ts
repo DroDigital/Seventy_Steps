@@ -4,7 +4,7 @@ import { fallDark, fallSystem } from '../src/systems/falls';
 import { createWorldGame } from '../src/systems/game';
 import { seaChopNow } from '../src/systems/seaChop';
 import { seaHeight } from '../src/world/seaSurface';
-import { blendAt, enterSea, seaTimeOf, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
+import { enterSea, seaTimeOf, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
 import type { Collider } from '../src/world/colliders';
 
 /** Walks the real ground west of Arkham, past its border and down the slope, until the body falls; then plays the fall out, frame by frame. */
@@ -175,17 +175,12 @@ describe('the end of the fall (round 55)', () => {
     expect(tr.pos).toEqual(died); // it did not go on sinking and drifting to the end of the frames
   });
 
-  it('knows how far on the picture is from the last step by the sea\'s clock, which a cutscene does not throw off', () => {
+  it('reads the sea\'s clock from the picture when it is handed in, else from the frames', () => {
     const g = createWorldGame();
-    g.frame = 5; // (a cutscene has held the frames still while the clock ran on)
-    g.seaTime = () => 100;
-    expect(blendAt(g, 100)).toBe(0);
-    expect(blendAt(g, 100 + 0.5 / 60)).toBeCloseTo(0.5, 6);
-    expect(blendAt(g, 100 + 3)).toBe(1);
-    expect(blendAt(g, 99)).toBe(0);
-    g.seaTime = undefined;
     g.frame = 120;
-    expect(blendAt(g, 2 + 0.25 / 60)).toBeCloseTo(0.25, 6); // without a clock handed in, the frames' own
+    expect(seaTimeOf(g)).toBeCloseTo(2, 6);
+    g.seaTime = () => 100; // (a cutscene has held the frames still while the picture's clock ran on)
+    expect(seaTimeOf(g)).toBe(100);
   });
 });
 

@@ -24,9 +24,6 @@ export const splashSize = (speed: number): number => clamp(0.12 + 0.13 * speed, 
 /** The sea's clock, in seconds: the one the shader draws the waves by (`Game.seaTime`, the renderer's, which runs on through a cutscene that holds the frames still), else the frames'. */
 export const seaTimeOf = (g: Game): number => g.seaTime?.() ?? g.frame / SIM.hz;
 
-/** How far the picture's `time` is on from the last step toward the next, 0 to 1: by the sea's clock, which the steps and the picture share (the frames' own count falls behind it in a cutscene that holds the world still). */
-export const blendAt = (g: Game, time: number): number => clamp((time - seaTimeOf(g)) * SIM.hz, 0, 1);
-
 /** The water's height at a place and a time, as the picture draws it: the waves raised by the wind's `chop` (`seaChopNow(g)`; 1 as the sea lies). */
 export const surfaceAt = (x: number, z: number, time: number, chop = 1): number => WORLD.seaLevel + seaHeight(x, z, time, chop);
 

@@ -38,8 +38,8 @@ import type { Skyline } from './skyline';
 import type { SpriteAtlas } from './sprites/atlas';
 
 export interface WorldLife {
-  /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof. */
-  update(camera: THREE.Camera, time: number, enclosed: boolean): void;
+  /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof; `alpha`: how far the picture is from the last step to the next, as the bodies are drawn at it. */
+  update(camera: THREE.Camera, time: number, enclosed: boolean, alpha: number): void;
   readonly fauna: Fauna;
 }
 
@@ -76,7 +76,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
   return {
     fauna,
-    update(camera, time, enclosed) {
+    update(camera, time, enclosed, alpha) {
       eye = camera;
       strikes?.update(time);
       const outside = !enclosed && !!g.overworld;
@@ -89,7 +89,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
       deep.update(camera, time, !outside);
-      drag.update(time);
+      drag.update(time, alpha);
       splash.update(time);
       SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn)
       fog.update(camera, time, !g.overworld);
