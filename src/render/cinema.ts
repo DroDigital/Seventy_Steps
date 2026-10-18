@@ -135,6 +135,10 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       g.player.kneeling = null;
       o.rise?.(b.rise);
     }
+    if (b.kneel) {
+      const s = g.overworld && signPlace(g.overworld.sign);
+      if (s) g.player.kneeling = { x: s.x, z: s.z };
+    }
     if (b.burst) {
       const at = anchorOf(b.burst.on, 1);
       if (at) burst(particles, b.burst.kind, at, at.height, b.burst.count);
@@ -158,6 +162,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     run = undefined;
     hold = 0;
     if (skipped && r.scene.beats.some((b) => b.rise !== undefined && b.at > r.t)) g.player.kneeling = null; // skipped before they got up: up now, under the fade
+    if (r.scene.beats.some((b) => b.kneel)) g.player.kneeling = null; // knelt in the scene: up when it is over (its end is black, and the card that follows is read standing)
     if (skipped && r.scene.beats.some((b) => b.voice)) g.events.emit('Silenced', {}); // and a line being said is cut off with it
     ui.hint(false);
     ui.clear(0.8);
@@ -241,11 +246,12 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       const on = anchorOf(shot.on, alpha) ?? anchorOf('player', alpha);
       if (!on) return;
       const other = anchorOf(shot.on === 'target' ? 'player' : shot.on === 'player' ? 'target' : 'player', alpha);
-      const f = frameOf(shot, u, on, other && other !== on ? other : null, t);
+      const f = frameOf(shot, u, on, other && other !== on ? other : null, t, shot.aim === 'sign' ? anchorOf('sign', alpha) : null);
       let shake = 0;
       for (const s of r.shakes) shake += tremor(s.amount, t - s.at, s.hold);
       const wobble = (k: number): number => Math.sin(t * k) * Math.cos(t * (k * 0.53 + 3));
-      const pos = clear({ x: on.x, y: on.y + on.height * 0.85, z: on.z }, { x: f.pos.x + wobble(71) * shake, y: f.pos.y + wobble(59) * shake, z: f.pos.z + wobble(83) * shake });
+      const from = shot.on === 'sign' ? anchorOf('player', alpha) ?? on : on; // (the Elder Sign is a solid: a line drawn from inside it would be stopped at once and the lens drawn in against it; it is kept clear of walls from the investigator's head instead)
+      const pos = clear({ x: from.x, y: from.y + from.height * 0.85, z: from.z }, { x: f.pos.x + wobble(71) * shake, y: f.pos.y + wobble(59) * shake, z: f.pos.z + wobble(83) * shake });
       hold = holdOf(r.scene, t, r.length);
       fov = f.fov;
       eye.set(pos.x, pos.y, pos.z);

@@ -1,6 +1,6 @@
 /**
  * The cutscenes (playtest round 20): the wake that opens a new game, a horror's arrival and fall, and
- * the three endings. A scene is a run of shots (a camera that circles someone, or something, moving
+ * (the endings' are in data/cutscenesEndings.ts). A scene is a run of shots (a camera that circles someone, or something, moving
  * from one stand to another) with beats laid over them (a line said, a fade, a sound, a burst of
  * motes). The simulation stands still through it (`frozen`) or runs slowed (`slow`), and the scene
  * blends in from the follow camera and out to it again. Data only; render/cinemaPlan.ts reads it.
@@ -21,7 +21,7 @@ export interface Shot {
   dist: readonly [number, number]; // metres from it (of its height, with `body`)
   up: readonly [number, number]; // above its feet
   look: readonly [number, number]; // the height it aims at, of the aimed body's height (of the subject's, or of the other party's with aim: 'other')
-  aim?: 'on' | 'other'; // at the subject (the default) or at the other party
+  aim?: 'on' | 'other' | 'sign'; // at the subject (the default), at the other party, or at the Elder Sign the scene is at (round 55: from the investigator's side, or from a stand of its own about the sign, with it in view)
   fov: readonly [number, number]; // degrees
   roll?: readonly [number, number]; // degrees
   ease?: Ease; // default inout
@@ -44,6 +44,7 @@ export interface Beat {
   burst?: { kind: 'ash' | 'motes' | 'embers' | 'stars'; on: Subject; count: number };
   shake?: number; // the camera trembles this hard (metres) for `hold` seconds
   rise?: number; // the investigator gets up from the knee, over this many seconds (0: as fast as they would in play)
+  kneel?: boolean; // the investigator goes down on one knee before the Elder Sign the scene is at; the scene's end has them up again (round 55: the herald's)
   voice?: { by: string; text: string }; // a line said aloud by `boss:<id>` (data/speechLines.ts; the voices): its recording plays
 }
 
@@ -157,62 +158,4 @@ export const WAKE: Scene = {
     { at: 2.7, rise: WAKE_RISE },
     { at: 3.9, caption: 'A key. A tall man in a good coat.', hold: 2.8 },
   ],
-};
-
-/** The endings, each ending on black; the card comes up out of it (ui/endingCard.ts). */
-export const ENDING_SCENES: Readonly<Record<string, Scene>> = {
-  seal: {
-    id: 'ending:seal',
-    sim: 'frozen',
-    shut: true,
-    blend: [0.8, 0],
-    shots: [
-      shot({ dur: 5, on: 'player', yaw: to(180, 212), dist: to(3.4, 6), up: to(1.6, 3.6), look: to(0.72, 0.89), fov: to(52, 60), sway: 0.3 }),
-      shot({ dur: 4.4, on: 'sign', yaw: to(0, 20), dist: to(4.5, 6.5), up: to(0.4, 0.6), look: to(0.42, 5), fov: to(60, 72), ease: 'in', sway: 0.2 }),
-    ],
-    beats: [
-      { at: 0.2, fade: 'white', over: 0.5, sound: 'found', gain: 0.8 },
-      { at: 0.7, fade: 'clear', over: 2.2 },
-      { at: 1.2, caption: 'The key in your hand crumbles to ash.', hold: 3.2, burst: { kind: 'ash', on: 'player', count: 24 } },
-      { at: 5.2, caption: 'It is morning in the reading room.', hold: 3 },
-      { at: 7.2, fade: 'white', over: 1.6 },
-      { at: 8.9, fade: 'black', over: 0.5 },
-    ],
-  },
-  silver_key: {
-    id: 'ending:silver_key',
-    sim: 'frozen',
-    shut: true,
-    blend: [0.8, 0],
-    shots: [
-      shot({ dur: 4.4, on: 'player', yaw: to(180, 176), dist: to(4.2, 2.4), up: to(1.9, 1.7), look: to(0.78, 0.78), fov: to(52, 84), ease: 'in', sway: 0.2 }),
-      shot({ dur: 4.2, on: 'player', yaw: to(176, 180), dist: to(2.4, 0.8), up: to(1.7, 1.6), look: to(0.78, 0.67), fov: to(84, 118), roll: to(0, 12), ease: 'in' }),
-    ],
-    beats: [
-      { at: 0, fade: 'violet', over: 0.01, sound: 'teleport', gain: 0.9 },
-      { at: 0.1, fade: 'clear', over: 1.6, burst: { kind: 'stars', on: 'player', count: 40 } },
-      { at: 1.4, caption: 'You follow the Guide through the Gate.', hold: 3, set: 'choral', gain: 0.7 },
-      { at: 4.2, burst: { kind: 'stars', on: 'player', count: 60 }, sound: 'rise', gain: 0.9 },
-      { at: 6.2, fade: 'white', over: 1.6, sound: 'levelUp', gain: 0.6 },
-      { at: 8, fade: 'black', over: 0.6 },
-    ],
-  },
-  herald: {
-    id: 'ending:herald',
-    sim: 'frozen',
-    shut: true,
-    blend: [0.8, 0],
-    shots: [
-      shot({ dur: 4.4, on: 'player', yaw: to(12, -8), dist: to(2.8, 2), up: to(0.35, 0.45), look: to(0.56, 0.75), fov: to(44, 40), roll: to(2, -1), sway: 0.3 }),
-      shot({ dur: 4.6, on: 'sign', yaw: to(0, 30), dist: to(3, 5), up: to(0.3, 6), look: to(0.58, 2.5), fov: to(54, 66), ease: 'in', sway: 0.15 }),
-    ],
-    beats: [
-      { at: 0, fade: 'red', over: 0.01, sound: 'darkness', gain: 0.9 },
-      { at: 0.1, fade: 'clear', over: 2.6, burst: { kind: 'embers', on: 'sign', count: 26 } },
-      { at: 1.2, caption: 'The tall man thanks you, and helps you to your feet.', hold: 3.4, set: 'whisper', gain: 0.9, pitch: 0.8 },
-      { at: 4.6, burst: { kind: 'embers', on: 'sign', count: 40 }, set: 'laugh', gain: 0.75, pitch: 0.7, shake: 0.08 },
-      { at: 6.6, fade: 'red', over: 1.8 },
-      { at: 8.5, fade: 'black', over: 0.5 },
-    ],
-  },
 };

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { EPITHETS } from '../src/data/bossCards';
-import { arrival, ARRIVAL, ENDING_SCENES, fall, FALL, scaleOf, WAKE, WAKE_RISE, type Scale, type Scene } from '../src/data/cutscenes';
+import { arrival, ARRIVAL, fall, FALL, scaleOf, WAKE, WAKE_RISE, type Scale, type Scene } from '../src/data/cutscenes';
+import { ENDING_SCENES } from '../src/data/cutscenesEndings';
 import { getEntity } from '../src/data/registry';
 import { ROSTER_IDS } from '../src/data/roster';
 import { SAMPLE_SETS } from '../src/data/samples';

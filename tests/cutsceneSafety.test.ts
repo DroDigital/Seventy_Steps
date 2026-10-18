@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { arrival, ENDING_SCENES, fall, shot, WAKE, type Scene } from '../src/data/cutscenes';
+import { arrival, fall, shot, WAKE, type Scene } from '../src/data/cutscenes';
+import { ENDING_SCENES } from '../src/data/cutscenesEndings';
 import { BOSS, REALITY, SIM } from '../src/data/tuning';
 import { createCinema } from '../src/render/cinema';
 import { sceneLength } from '../src/render/cinemaPlan';

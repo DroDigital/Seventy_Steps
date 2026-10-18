@@ -12,7 +12,8 @@
 import type { Entity } from '../core/ecs';
 import { yawOf } from '../core/geom';
 import { EPITHETS } from '../data/bossCards';
-import { arrival, ENDING_SCENES, fall, scaleOf, WAKE, type Scene } from '../data/cutscenes';
+import { arrival, fall, scaleOf, WAKE, type Scene } from '../data/cutscenes';
+import { ENDING_SCENES } from '../data/cutscenesEndings';
 import { bespokeFall } from '../data/cutscenesFall';
 import { arrivalOf } from '../data/cutscenesMore';
 import { bossLine, spokenFor, type Moment } from '../data/speechLines';
@@ -91,7 +92,8 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
   });
   g.events.on('Ending', ({ id }) => {
     const scene = ENDING_SCENES[id];
-    void (scene ? cinema.play(scene) : Promise.resolve()).then(() => opens(id));
+    const guide = id === 'silver_key' ? [...g.ecs.c.fight].find(([, f]) => f.id === 'umr_at_tawil')?.[0] : undefined; // its camera is on the Guide the investigator goes through the Gate with (round 55)
+    void (scene ? cinema.play(scene, guide === undefined ? {} : { target: guide }) : Promise.resolve()).then(() => opens(id));
   });
 
   return { wake: () => void cinema.play(WAKE) };
