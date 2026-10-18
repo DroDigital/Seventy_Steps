@@ -40,17 +40,30 @@ export function installCrashLog(): void {
   addEventListener('unhandledrejection', (e) => note('rejected', e.reason));
 }
 
+let graphics: string | undefined;
+
+/**
+ * The graphics card's name, asked of a context of its own once and kept: a report made again and again (Report a problem,
+ * opened and left) must not leave contexts behind, for past the browser's limit it takes the oldest, the game's own
+ * (review of PR 142). The borrowed context is let go at once.
+ */
+export function graphicsName(): string {
+  if (graphics !== undefined) return graphics;
+  graphics = 'unknown';
+  try {
+    const c = document.createElement('canvas').getContext('webgl2');
+    const x = c?.getExtension('WEBGL_debug_renderer_info');
+    if (c && x) graphics = String(c.getParameter(x.UNMASKED_RENDERER_WEBGL));
+    c?.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch {
+    // No WebGL 2, or the name withheld: "unknown" it stays.
+  }
+  return graphics;
+}
+
 /** What a bug report needs: when, what ran it, how it was set, and the record. `what`: a crash's, or one the player asked for (ui/reportPage.ts). */
 export function crashReport(kind: string, detail?: string, what = 'crash report'): string {
-  const gl = (() => {
-    try {
-      const c = document.createElement('canvas').getContext('webgl2');
-      const x = c?.getExtension('WEBGL_debug_renderer_info');
-      return c && x ? String(c.getParameter(x.UNMASKED_RENDERER_WEBGL)) : 'unknown';
-    } catch {
-      return 'unknown';
-    }
-  })();
+  const gl = graphicsName();
   return [
     `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} ${what}: ${kind}`,
     new Date().toISOString(),
