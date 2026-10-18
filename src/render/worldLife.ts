@@ -78,6 +78,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
     fauna,
     update(camera, time, enclosed, alpha) {
       eye = camera;
+      SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn). Before anything is set on the water: the tentacles are placed on the surface the sea is drawn at
       strikes?.update(time);
       const outside = !enclosed && !!g.overworld;
       fauna.update(camera, time, !outside);
@@ -91,7 +92,6 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);
-      SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn)
       fog.update(camera, time, !g.overworld);
       doors.update(camera, time, !g.overworld);
       glints.update(camera.position, time, !g.overworld);
