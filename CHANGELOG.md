@@ -3,7 +3,7 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased: the sea, and the endings
+## 1.0.0-rc.5: the sea, the endings and a new Nyarlathotep
 
 - **An ending is told once.** After any ending, resting at the Court's Elder Sign offered both of the Court's endings again, and a second choice replayed the scene and the card, overwrote the first ending and counted the dream as finished twice. The Court offers nothing once the dream has ended, and a second ending is not told.
 - **Walking on after the Gate is walking on.** After passing through the Gate with 'Umr at-Tawil, the card said "walk on", but the fog of the Guide's fight still held you in its ring until you struck it down. The Guide takes no more part once you have gone through with it: it hunts no more, the fight and its fog are let go of at once, and a save keeps it so.
