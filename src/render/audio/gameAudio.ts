@@ -21,6 +21,10 @@ import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, se
 import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
 import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
+import { ENDING_NARRATION } from '../../data/endingNarration';
+import type { EndingId } from '../../data/endings';
+import { NARRATOR } from '../../data/intro';
+import { shown } from '../../data/speech';
 import { bossLine } from '../../data/speechLines';
 import { voiceIdOf, VOICES, type Voice, type VoiceId } from '../../data/voices';
 import { isAbsent, isConcealed, type Game, type GameEvents } from '../../systems/components';
@@ -217,6 +221,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   };
   g.events.on('FirstSight', warmBoss);
   g.events.on('BossEngaged', warmBoss); // get both recordings ready before their scene's voice beat
+  g.events.on('Ending', ({ id }) => speech.ahead(NARRATOR, (ENDING_NARRATION[id as EndingId] ?? []).map((l) => shown(l.say)))); // and the narrator's three lines, before the ending's scene says the first (round 55)
 
   const callers = new Map<Entity, Caller>();
   const music = createBossMusic(e);

@@ -55,7 +55,7 @@ export function drift(t: number, seed = 0): V3 {
  * it circles; `other` the party opposite (the investigator to a horror and the horror to them): the
  * line between them is the shot's zero of yaw, and without one it is the way `on` faces.
  */
-export function frameOf(shot: Shot, u: number, on: Anchor, other: Anchor | null, t: number): Frame {
+export function frameOf(shot: Shot, u: number, on: Anchor, other: Anchor | null, t: number, sign: Anchor | null = null): Frame {
   const k = ease(shot.ease ?? 'inout', u);
   const mix = (p: readonly [number, number]): number => p[0] + (p[1] - p[0]) * k;
   const scale = shot.body ? on.height : 1;
@@ -63,7 +63,7 @@ export function frameOf(shot: Shot, u: number, on: Anchor, other: Anchor | null,
   const base = other && apart > 0.5 ? yawOf(other.x - on.x, other.z - on.z) : on.yaw;
   const facing = base + mix(shot.yaw) * RAD;
   const [d, up] = [mix(shot.dist) * scale, mix(shot.up) * scale];
-  const aimed = shot.aim === 'other' && other ? other : on;
+  const aimed = shot.aim === 'sign' && sign ? sign : shot.aim === 'other' && other ? other : on;
   const [sway, s] = [shot.sway ?? 0, drift(t)];
   const amp = 0.07 * sway * clamp(d / 4, 0.6, 3);
   return {

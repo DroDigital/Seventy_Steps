@@ -1,10 +1,11 @@
 # The voices
 
 Every line the people of the realms and the horrors that speak say is spoken by a recording in
-`public/voice`: 191 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 26 minutes, 26.8 MB. 133 are
+`public/voice`: 200 clips of ElevenLabs' **Eleven v4** (`eleven_v4`), about 28 minutes, 28.5 MB. 133 are
 the lines of the fifteen people met at the Elder Signs (`npc:<id>`, written in `data/npcs.ts` and
 `npcsFar.ts`); 53 are those of the horrors that speak in their own stories (`boss:<roster id>`, written for
-this: no horror spoke before): a line as it arrives and a last as it falls. The Dunwich Horror (unseen)
+this: no horror spoke before): a line as it arrives and a last as it falls; 14 are the narrator's (`narrator:intro`: the opening's five cards, and the nine lines
+he speaks over the three endings, round 55). The Dunwich Horror (unseen)
 says only a last, shown as a notice. The Voice in the Tomb has no phase script: its arrival line is a
 spoken notice on first sight, and its last words are a spoken notice when vanquished. (Brown Jenkin
 had a last line too; it was given up in round 46 to free a voice's place in the workspace, and he is wordless now.)
@@ -58,6 +59,17 @@ performance can be tried again over the same file.
 ## The cast
 
 The narrator of a new game's opening (`narrator:intro`, `data/intro.ts`) is *The Archivist (Intro Narrator)* (`uqOnApI3a2RVj8rEwlAi`), a voice **designed for the game** in round 46 (Voice Design, so no library licence is in between): a late-fifties English baritone from the north, long settled in the south, a low rounded chest tone with a faint dry rasp, slow, with real pauses, understated, an archivist reading from his own notes. It replaced the library voice Finley - Articulate Anchor, which the author found widely used by other creators and recognised as synthetic. Set in a stone chamber (`room`); his five cards are one take each, made in `eleven_v4` on 6 October 2026 (the design model, `eleven_ttv_v3`, is the only one Voice Design offers; v4 speaks it). He was chosen by the author from six previews of two descriptions (the author's, then a fresh one of Claude's: preview F of the second).
+
+**His lines over the endings (round 55).** The three endings' cutscenes (`data/cutscenesEndings.ts`) are narrated by him, three lines each, written in `data/endingNarration.ts`
+(the second person, as the cards that follow are; performed with the tags the opening's cards use: `[solemnly]`, `[gravely]`, `[calmly]`, `[thoughtfully]`, `[heavily]`, `[ominously]`,
+`[pause]`, `[long pause]`, never `[whispers]`, `[softly]` or `[quietly]`). Nine takes, one each, made on 18 October 2026 in the same voice (`uqOnApI3a2RVj8rEwlAi`) and model
+(`eleven_v4`) through the connector (`creative_generate_speech`, one generation each, in the flow https://elevenlabs.io/app/flows/QlzsuVzjQ8h5w8w5wzKp), 1,463 credits in all
+(about a credit a character; 26 cents). They are 7.3 to 13.1 seconds, 135 to 228 KB, 44.1 kHz mono at 128 kbit/s, as ElevenLabs gave them: **like the opening's, untreated**
+(nothing is done to a take after it is made). What the opening's narrator is heard with is done at playback, by who is speaking, and so is the same for these: his cast entry
+(`speechCast.ts`) has `room` and no `rate` or `echo` (so the pitch is as recorded: not lowered, not raised) and the same `createSpeech` plays him on the same engine's speech bus in the
+cutscene as in the opening (`ui/intro.ts`, `render/audio/gameAudio.ts`); the chamber is `voiceRoom.ts`' (a low shelf, some presence, a gentle compressor, a small stone room). `tests/endingNarration.test.ts` holds
+all of that: the speaker, the cast entry, and each take's length against the one the scene is cut to (read from the file's frames). Not heard: nobody has auditioned them, and a machine has not read them back (no
+speech-to-text was run on this round's takes), so that no `[tag]` was spoken as a word is not checked.
 
 **Licence (round 41).** Only ElevenLabs' own **premade** voices, or voices **designed for this game** in its Voice
 Design (ours), are used: a library voice's licence cannot be told through the tools (they show a voice's category,
@@ -184,7 +196,7 @@ failed take from the free plan, a transcription node):
 | Willett | https://elevenlabs.io/app/flows/fGCpd3EC5aqNpuo8fOPw |
 | Curtis | https://elevenlabs.io/app/flows/Rox5Daq6zOrf9t72VRFE |
 | Dyer | https://elevenlabs.io/app/flows/w1Pi37BtbbwbN2qBSdf3 |
-| the narrator (the opening's five cards, round 46; one take each: flows VUOCILGa3nlTPHEwIwek, eywQHrG4a5BGk6DzK6P9, hHMX21aLEo88On8B9fYh, QoK9xCLHCINjTJUo6reJ, TOqVv3yBFD48pWelyKZz on elevenlabs.io/app/flows/) | (earlier: https://elevenlabs.io/app/flows/OQnEi4aA8UBUVUPPBTzx) |
+| the narrator (the opening's five cards, round 46; one take each: flows VUOCILGa3nlTPHEwIwek, eywQHrG4a5BGk6DzK6P9, hHMX21aLEo88On8B9fYh, QoK9xCLHCINjTJUo6reJ, TOqVv3yBFD48pWelyKZz on elevenlabs.io/app/flows/; and the nine lines over the endings, round 55: QlzsuVzjQ8h5w8w5wzKp) | (earlier: https://elevenlabs.io/app/flows/OQnEi4aA8UBUVUPPBTzx) |
 | Nathaniel | https://elevenlabs.io/app/flows/z9vwDPvzyk9HQrKFoDFf |
 | Zamacona | https://elevenlabs.io/app/flows/EZHSLpdOLz3biacgvxGi |
 | Johansen | https://elevenlabs.io/app/flows/iCM4caRlch6txnH3ED7P |
