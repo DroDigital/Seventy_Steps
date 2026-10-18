@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """Replace a creature's frames in the packed reviewed art with a new drawing of it, in place.
 
-Needs `pip install pillow`. For a creature the author drew again whole (the 'Umr at-Tawil, 21 frames), as against frames
-added to one that has them (tools/add_reviewed_frames.py).
+Needs `pip install pillow`. For a creature the author drew again whole (the 'Umr at-Tawil, 21 frames; Nyarlathotep's two
+forms), as against frames added to one that has them (tools/add_reviewed_frames.py).
 
   python3 tools/replace_reviewed_sprite.py [--dry] <key> <delivery folder>
 
-The folder holds the library's tree: sprites/<key>/64x64/<direction>/<action>_<n>.png. Each frame must be the canvas of the
-creature's front idle, stand within GROUND pixels of its ground line, and be an action the creature already has, with as many
-frames as it has; its pixels are pasted over the old frame's rectangle on its page, and the frame's hashes and bounds, the page's
-and both indexes are brought in line, so the integrity test holds the new art to the same account as the old. A view the
-creature had by mirroring another (its right, from its left) and the delivery draws on its own is given its frames on a new
-shelf at the foot of the creature's page, and no longer mirrors. `--dry` checks all of it and writes nothing.
+The folder holds the library's tree: sprites/<id>[/<variant>]/64x64/<direction>/<action>_<n>.png (the key of a variant is
+<id>#<variant>). Each frame must be the canvas of the creature's front idle, stand within GROUND pixels of its ground line, and
+be an action the creature already has, with at least as many frames as it has; its pixels are pasted over the old frame's
+rectangle on its page, and the frame's hashes and bounds, the page's and both indexes are brought in line, so the integrity
+test holds the new art to the same account as the old. A scope drawn with more frames than it had (a walk of two made six) keeps
+the old frames' places and gets the rest on a new shelf at the foot of the creature's page. A view the creature had by
+mirroring another (its right, from its left) stays mirrored when the delivery's is that other turned round, pixel for pixel;
+one the delivery draws on its own is given its frames on the shelf, and no longer mirrors. `--dry` checks all of it and writes
+nothing.
 """
 
 import hashlib
@@ -21,7 +24,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 PACK = ROOT / 'public' / 'creatures' / 'reviewed'
@@ -45,7 +48,8 @@ def main(key: str, delivery: Path, dry: bool) -> None:
     page_no = entity['page']
     frames = index['frames']
     idle = frames[entity['directions']['front']['actions']['idle'][0]]
-    tree = delivery / 'sprites' / key / '64x64'
+    prefix = idle['source'].rsplit('/', 2)[0]  # sprites/<id>[/<variant>]/64x64
+    tree = delivery / prefix
 
     # What the delivery brings, by direction and action, in frame order.
     brought = {}
@@ -55,7 +59,13 @@ def main(key: str, delivery: Path, dry: bool) -> None:
             sys.exit(f'{path}: not a frame name')
         brought.setdefault((path.parent.name, match.group(1)), {})[int(match.group(2))] = path
 
-    replace, fresh, problems = [], [], []  # (frame id or None, direction, action, n, path, rgba, bytes)
+    def load(path: Path) -> Image.Image:
+        with Image.open(io.BytesIO(path.read_bytes())) as decoded:
+            return decoded.convert('RGBA')
+
+    # (frame id or None, direction, action, n, path, rgba, bytes, bounds): in place; a view the pack mirrored, drawn; extra frames
+    replace, fresh, grown, problems = [], [], [], []
+    kept = set()  # (direction, action) of the views the pack mirrors and the delivery turns round the same way
     for (direction, action), by_n in sorted(brought.items()):
         view = entity['directions'][direction]
         own = view['sourceDirection'] == direction
@@ -64,12 +74,16 @@ def main(key: str, delivery: Path, dry: bool) -> None:
         ids = view['actions'].get(action)
         if ids is None:
             sys.exit(f'{key} has no {direction}/{action} to replace')
-        if len(ids) != len(by_n):
+        if own and len(ids) > len(by_n):
             sys.exit(f'{direction}/{action}: {len(by_n)} frames brought, {len(ids)} there')
+        if not own and view['mirror']:
+            twin = brought.get((view['sourceDirection'], action), {})
+            if sorted(twin) == sorted(by_n) and all(ImageOps.mirror(load(twin[n])).tobytes() == load(p).tobytes() for n, p in by_n.items()):
+                kept.add((direction, action))
+                continue
         for n, path in sorted(by_n.items()):
             data = path.read_bytes()
-            with Image.open(io.BytesIO(data)) as decoded:
-                rgba = decoded.convert('RGBA')
+            rgba = load(path)
             if (rgba.width, rgba.height) != (idle['width'], idle['height']):
                 sys.exit(f'{path}: {rgba.width}x{rgba.height}, the canvas is {idle["width"]}x{idle["height"]}')
             bounds = rgba.getchannel('A').getbbox()
@@ -77,13 +91,19 @@ def main(key: str, delivery: Path, dry: bool) -> None:
                 sys.exit(f'{path}: nothing painted')
             if abs(bounds[3] - idle['bounds'][3]) > GROUND:
                 problems.append(f'{path}: stands on row {bounds[3]}, the ground line is {idle["bounds"][3]}')
-            (replace if own else fresh).append((ids[n] if own else None, direction, action, n, path, rgba, data, bounds))
+            row = (ids[n] if own and n < len(ids) else None, direction, action, n, path, rgba, data, bounds)
+            (replace if row[0] is not None else grown if own else fresh).append(row)
     missing = [f'{d}/{a}' for d, v in entity['directions'].items() for a in v['actions'] if (d, a) not in brought]
     if problems:
         sys.exit('\n'.join(problems))
-    print(f'{len(replace)} frames to replace, {len(fresh)} new, {len(missing)} scopes left as they were{": " + ", ".join(missing) if missing else ""}', file=sys.stderr)
+    print(f'{len(replace)} frames to replace, {len(fresh)} drawn for views that mirrored, {len(grown)} added to scopes that had fewer, '
+          f'{len(kept)} views kept mirrored, {len(missing)} scopes left as they were{": " + ", ".join(missing) if missing else ""}', file=sys.stderr)
     if dry:
         return
+
+    def registered_as(direction: str) -> list:
+        """The source index's views that read `direction`'s frames: itself, and any that mirrors it (it lists their frames again)."""
+        return [v for v in original['directions'].values() if v['source_direction'] == direction]
 
     page_info = index['pages'][page_no]
     with Image.open(PACK / page_info['file']) as opened:
@@ -94,12 +114,14 @@ def main(key: str, delivery: Path, dry: bool) -> None:
             sys.exit(f'frame {fid} is {f["source"]}, not {direction}/{action}_{n}')
         page.paste(rgba, (f['x'], f['y']))  # every channel, no mask
         f.update(sourceSha256=sha256(data), pixelSha256=sha256(rgba.tobytes()), bounds=list(bounds))
-        original['directions'][direction]['actions'][action]['frames'][n]['sha256'] = sha256(data)
+        for view in registered_as(direction):
+            view['actions'][action]['frames'][n]['sha256'] = sha256(data)
 
-    if fresh:  # a new shelf at the foot of the page
+    shelf = fresh + grown
+    if shelf:  # a new shelf at the foot of the page
         w, h = idle['width'] + GUTTER * 2, idle['height'] + GUTTER * 2
         top, x, spots = page.height, 0, []
-        for _ in fresh:
+        for _ in shelf:
             if x + w > LIMIT:
                 x, top = 0, top + h
             spots.append({'x': x + GUTTER, 'y': top + GUTTER})
@@ -107,17 +129,20 @@ def main(key: str, delivery: Path, dry: bool) -> None:
         height = max(spot['y'] for spot in spots) + idle['height'] + GUTTER
         if height > LIMIT:
             sys.exit('the page cannot grow to hold the new frames')
-        grown = Image.new('RGBA', (page.width, height))
-        grown.paste(page, (0, 0))
-        page = grown
-        by_scope = {}
-        for (fid, direction, action, n, path, rgba, data, bounds), spot in zip(fresh, spots):
+        grown_page = Image.new('RGBA', (page.width, height))
+        grown_page.paste(page, (0, 0))
+        page = grown_page
+        placed = []  # (frame id, direction, action, n, bytes) in shelf order
+        for (_, direction, action, n, path, rgba, data, bounds), spot in zip(shelf, spots):
             page.paste(rgba, (spot['x'], spot['y']))
             frames.append({
-                'source': f'sprites/{key}/64x64/{direction}/{action}_{n}.png', 'sourceSha256': sha256(data), 'pixelSha256': sha256(rgba.tobytes()),
+                'source': f'{prefix}/{direction}/{action}_{n}.png', 'sourceSha256': sha256(data), 'pixelSha256': sha256(rgba.tobytes()),
                 'width': rgba.width, 'height': rgba.height, 'bounds': list(bounds), 'page': page_no, 'x': spot['x'], 'y': spot['y'],
             })
-            by_scope.setdefault((direction, action), []).append((len(frames) - 1, n, data))
+            placed.append((len(frames) - 1, direction, action, n, data))
+        by_scope = {}
+        for fid, direction, action, n, data in placed[:len(fresh)]:
+            by_scope.setdefault((direction, action), []).append((fid, n, data))
         for direction in {d for d, _ in by_scope}:
             entity['directions'][direction] = {'sourceDirection': direction, 'mirror': False, 'actions': {}}
             original['directions'][direction] = {'source_direction': direction, 'mirror_horizontal': False, 'actions': {}}
@@ -125,9 +150,18 @@ def main(key: str, delivery: Path, dry: bool) -> None:
             entity['directions'][direction]['actions'][action] = [i for i, _, _ in items]
             original['directions'][direction]['actions'][action] = {
                 'frame_count': len(items),
-                'frames': [{'name': f'{action}_{n}', 'path': f'sprites/{key}/64x64/{direction}/{action}_{n}.png', 'sha256': sha256(d)} for _, n, d in items],
+                'frames': [{'name': f'{action}_{n}', 'path': f'{prefix}/{direction}/{action}_{n}.png', 'sha256': sha256(d)} for _, n, d in items],
             }
-        source['unique_png_count'] += len(fresh)
+        for fid, direction, action, n, data in placed[len(fresh):]:  # the extra frames of a scope: after its old ones, in order
+            ids = entity['directions'][direction]['actions'][action]
+            if n != len(ids):
+                sys.exit(f'{direction}/{action}: frame {n} comes after {len(ids)}')
+            ids.append(fid)
+            for view in registered_as(direction):  # its own, and each view that is it turned round
+                registered = view['actions'][action]
+                registered['frames'].append({'name': f'{action}_{n}', 'path': f'{prefix}/{direction}/{action}_{n}.png', 'sha256': sha256(data)})
+                registered['frame_count'] = len(registered['frames'])
+        source['unique_png_count'] += len(shelf)
         page_info['height'] = page.height
 
     page.save(PACK / page_info['file'], optimize=True)
@@ -135,19 +169,24 @@ def main(key: str, delivery: Path, dry: bool) -> None:
     with Image.open(io.BytesIO(encoded)) as decoded:
         decoded = decoded.convert('RGBA')
         for f in frames:
-            if f['page'] != page_no or not (f['source'].startswith(f'sprites/{key}/')):
+            if f['page'] != page_no or not f['source'].startswith(f'{prefix}/'):
                 continue
             if sha256(decoded.crop((f['x'], f['y'], f['x'] + f['width'], f['y'] + f['height'])).tobytes()) != f['pixelSha256']:
                 sys.exit(f"the page lost pixels of {f['source']}")
     page_info.update(sha256=sha256(encoded), pngBytes=len(encoded))
+    notes = [f'{len(grown)} frames of scopes that had fewer are on a shelf at the foot of its page'] if grown else []
+    if fresh:
+        notes.append(f'its {"/".join(sorted({d for _, d, *_ in fresh}))} view is drawn, not mirrored, its {len(fresh)} frames on that shelf')
+    if kept:
+        notes.append(f'{len(kept)} views stay mirrored, the delivery\'s being the same turned round')
     source['import_rules'].append(
         f"{key}: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); "
-        + ('its right view is drawn, not mirrored from its left, its four frames on a shelf at the foot of its page.' if fresh else 'the same views and counts as before.'))
+        + ('; '.join(notes) if notes else 'the same views and counts as before') + '.')
     source_path.write_text(json.dumps(source, indent=2) + '\n')
     index['sourceIndexSha256'] = sha256(source_path.read_bytes())
     index['frameCount'] = len(frames)
     (PACK / 'index.json').write_text(json.dumps(index, separators=(',', ':')) + '\n')
-    print(f'{key}: {len(replace)} frames replaced, {len(fresh)} added to {page_info["file"]} ({page.width}x{page.height}); {len(frames)} frames in all', file=sys.stderr)
+    print(f'{key}: {len(replace)} frames replaced, {len(shelf)} added to {page_info["file"]} ({page.width}x{page.height}); {len(frames)} frames in all', file=sys.stderr)
 
 
 if __name__ == '__main__':

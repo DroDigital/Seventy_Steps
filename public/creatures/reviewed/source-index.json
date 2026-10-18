@@ -4,7 +4,7 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2760,
+  "unique_png_count": 2768,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
@@ -15,7 +15,9 @@
     "umr_at_tawil: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); its right view is drawn, not mirrored from its left, its four frames on a shelf at the foot of its page.",
     "front/stoop_mid: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
     "back/attack, back/hurt, left/attack, left/hurt: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
-    "back/flight, front/flight, left/flight, right/flight: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held)."
+    "back/flight, front/flight, left/flight, right/flight: a later delivery, packed onto its own atlas page by tools/add_reviewed_frames.py; the frames of an action play in order on the canvas and ground line of their view's idle (the stoop's: once, the last held).",
+    "nyarlathotep: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 2 views stay mirrored, the delivery's being the same turned round.",
+    "nyarlathotep#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 8 frames of scopes that had fewer are on a shelf at the foot of its page."
   ],
   "entities": [
     {
@@ -24833,12 +24835,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/64x64/front/idle_0.png",
-                  "sha256": "4a2d7480f68167fd80e9d11099d07603a66a8a797b80ca1540dae34a9d972b51"
+                  "sha256": "e4c0689efda06abc5f763e4234e857e1370365fe3fa8c5e67a5b699ac247f8d9"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/64x64/front/idle_1.png",
-                  "sha256": "931e0d5ff5213daf49c0f83c66de7978af85e172aa135a699e90d790ba96c130"
+                  "sha256": "79dd41cb0ab6693fdc8350cb583c62f2e0b2097dcd2fbb8e883a187cddb5a0c3"
                 }
               ]
             },
@@ -24848,22 +24850,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/64x64/front/move_0.png",
-                  "sha256": "dce36d34245ff77557a7e410a5248df6444214e19f43802aa1db10e3c4f203f3"
+                  "sha256": "3c0ca055c7b42f405ecda47a1fb9baa504d8e0b53f0c55a0e379a3c400146903"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/64x64/front/move_1.png",
-                  "sha256": "1cf8fc64fe925fcabe115e06f37859192e8c3e4a512999d3f019692581cb866f"
+                  "sha256": "f88decc8f2bf22844e380e82bda7b9767b7697dc07598da8c0779e3d5658d2e7"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/64x64/front/move_2.png",
-                  "sha256": "901226e174b5eabf009e57049dfa2bad645d1ed412cc50f19c1d91ce8c6a22c3"
+                  "sha256": "83f79fe1805bc9ae863e44d226b8b50d439867f7457483b9a90a1a515d47bebb"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/64x64/front/move_3.png",
-                  "sha256": "9786b4c71ef1d739df0d1c6ba2807c0edcba857a9c4b87f2d5c38e6b83418553"
+                  "sha256": "465e2a7531b34de9de4ea2700d2859411cd2152421238b14c9001c6de87c9ff2"
                 }
               ]
             },
@@ -24873,22 +24875,22 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/nyarlathotep/64x64/front/attack_0.png",
-                  "sha256": "29878ae0b20ce189d8e16fbe4fe76b6d872630f34d5aa935a46cf7b1f203a3f3"
+                  "sha256": "7b8b2eae388396d5327f30c22e5784cd55afed2897ba48a9dac937b6738a112e"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/nyarlathotep/64x64/front/attack_1.png",
-                  "sha256": "96cfff7cbe862be96b42941d5311b6f9226af2dfab1877ce10476f42c5f5d6d2"
+                  "sha256": "1cbb379fa956a37821009974e19f3cdfe6bdb59313e69b2b77f971773aea924e"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/nyarlathotep/64x64/front/attack_2.png",
-                  "sha256": "cad32560de205e42f0f6d2aaa42ef2489a4a40f11d744b925c70b758dfdd370a"
+                  "sha256": "0e5f9869ee0f8d0ed9d7480a4af394101763d43dbf3e4f4c40d39295f5135f3e"
                 },
                 {
                   "name": "attack_3",
                   "path": "sprites/nyarlathotep/64x64/front/attack_3.png",
-                  "sha256": "d261a413e44f061873d284de692778c94341326c240d46e8c07a865724779da9"
+                  "sha256": "79d431537ec77b94fd0fc37e64b7b94222a8d189d36c4becde3927ac9e53beaf"
                 }
               ]
             },
@@ -24898,12 +24900,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/nyarlathotep/64x64/front/hurt_0.png",
-                  "sha256": "f16a3f26d47f09fdade5d272b744df1109e883ce192e0edea91c07fcbe5aaef0"
+                  "sha256": "d7afd55a207a57392d80ef48ea0dea38f2396a2caee3de945bf01bc44663de72"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/nyarlathotep/64x64/front/hurt_1.png",
-                  "sha256": "ad82725a8bed0b93a4ff3254aaf8d8ed8e8ba97c9d8b4e7772473a1b77e38ef2"
+                  "sha256": "9bc3767989740e8c8bd0b8b30c4e740ab182129ce00f05c975a3adf02107891e"
                 }
               ]
             }
@@ -24919,12 +24921,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/64x64/back/idle_0.png",
-                  "sha256": "e44b50831496199d7ea2c52a66e3b622d9a2eed03821a2daca706195c372d8ed"
+                  "sha256": "50a56c9f6ea8ce94356f0cec0c46993842a676693e9402955541beaf0c2d2c6d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/64x64/back/idle_1.png",
-                  "sha256": "838ab9864cd409741f79aa05ee53271c57a34c508fa34cb61a4277e23c53a593"
+                  "sha256": "1c57da14514bf190e173fc7e9df5c0794bb4eb48daac9777551089477dc80f46"
                 }
               ]
             },
@@ -24934,22 +24936,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/64x64/back/move_0.png",
-                  "sha256": "cfe5424c1043fadeee4db84ba4e196ec6b12a045cdf57decda20e258e4b0d269"
+                  "sha256": "9e0ff39ba4e5acbb104d47cb61f38cfab85a9b10935fe02e6fa2c421026b01e8"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/64x64/back/move_1.png",
-                  "sha256": "8298a2ac9751ceefab9d2676b6e58b831b8d9c9e712be71710399ecdd8368e85"
+                  "sha256": "23a1360095d799f5e520786f139344e8b5f6dc0f7ae9a6ff25df0bff3327d182"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/64x64/back/move_2.png",
-                  "sha256": "628bde41080996dc8e6fdb0f34176d863b4b03e58f4f78f70a1ff84029d86b99"
+                  "sha256": "06f0719640d1d0629ea045685d1659ab4218b756cec8efe186ab4d02ec11f4e8"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/64x64/back/move_3.png",
-                  "sha256": "0978433d6bbd6c2852ccb4c7544e6337e6fc2d049df54e4334f8e7c2669fc866"
+                  "sha256": "95de43e3ed0c767a2110661009578d76b9e506128c45da2b6297811fbcacacef"
                 }
               ]
             }
@@ -24965,12 +24967,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/64x64/left/idle_0.png",
-                  "sha256": "1d50fc4fe82c43625add5ea9c205ffb1b6eeb14582ab40f5b48c0764dff99407"
+                  "sha256": "0474ad70b5fb0b6cabedaa2f6ad58f4e78dfed07ce825b5d402b88b1a446db1a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/64x64/left/idle_1.png",
-                  "sha256": "2c148dccc99074cc0bef098a06973c2b9506a9b18fab6e0f2fe4d43eb8b99065"
+                  "sha256": "3ab89aadd1c80fca5237ea0fc95387865d84fb71cde0c7587a99b3b13d54c03b"
                 }
               ]
             },
@@ -24980,32 +24982,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/64x64/left/move_0.png",
-                  "sha256": "3df275af5c5d6ad2a9f82c0928054111a29d334c8e38a046aa836157a3431b5a"
+                  "sha256": "9a217a41cb1071baeb6b8f553824ba67d9f3eb9fcce8fb9a5fd56a82dbca33d6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/64x64/left/move_1.png",
-                  "sha256": "ea8305249fbe23df711e0e03e835526dae374a3842f4d47fea513b40bbd93bc6"
+                  "sha256": "dc66fecb0ff37d0cbf5797e09686e7ede42cb257a2e4af0c94a3eae7bb480dc0"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/64x64/left/move_2.png",
-                  "sha256": "308223199aa191c9b03354b9d823b582e075d99eeeccd110a5b7d99cc38aa1f3"
+                  "sha256": "a5b98444a4e0725ba3f0f64e7b6567620654aba2147a3f99d65d8f1bdd6e989c"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/64x64/left/move_3.png",
-                  "sha256": "abff0dc4a2609e8c2adb5b9c858c984128e8f7360ed02aa401f9bcefa82ec13e"
+                  "sha256": "c19f73277de683b956c64d111275c940931baf2d167689ae47d8f199f29c83e9"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/nyarlathotep/64x64/left/move_4.png",
-                  "sha256": "094b6aa9d578942500b88b677dd3fe4e0d30489a0b1fd1262e04603934b2cae6"
+                  "sha256": "b86ba167694c5e8e13d68c0176d8597e575f12f10bff2b0a0878e7c8b55debb5"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/nyarlathotep/64x64/left/move_5.png",
-                  "sha256": "3518970056cc48fbf22a3c29bc594a37ae0ccd090f648a73db2182e9d1bcfa8a"
+                  "sha256": "12d4131bad87d5073406964e57cd1d40326046e4f9a2600873b22912301d72bc"
                 }
               ]
             }
@@ -25021,12 +25023,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/64x64/left/idle_0.png",
-                  "sha256": "1d50fc4fe82c43625add5ea9c205ffb1b6eeb14582ab40f5b48c0764dff99407"
+                  "sha256": "0474ad70b5fb0b6cabedaa2f6ad58f4e78dfed07ce825b5d402b88b1a446db1a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/64x64/left/idle_1.png",
-                  "sha256": "2c148dccc99074cc0bef098a06973c2b9506a9b18fab6e0f2fe4d43eb8b99065"
+                  "sha256": "3ab89aadd1c80fca5237ea0fc95387865d84fb71cde0c7587a99b3b13d54c03b"
                 }
               ]
             },
@@ -25036,32 +25038,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/64x64/left/move_0.png",
-                  "sha256": "3df275af5c5d6ad2a9f82c0928054111a29d334c8e38a046aa836157a3431b5a"
+                  "sha256": "9a217a41cb1071baeb6b8f553824ba67d9f3eb9fcce8fb9a5fd56a82dbca33d6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/64x64/left/move_1.png",
-                  "sha256": "ea8305249fbe23df711e0e03e835526dae374a3842f4d47fea513b40bbd93bc6"
+                  "sha256": "dc66fecb0ff37d0cbf5797e09686e7ede42cb257a2e4af0c94a3eae7bb480dc0"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/64x64/left/move_2.png",
-                  "sha256": "308223199aa191c9b03354b9d823b582e075d99eeeccd110a5b7d99cc38aa1f3"
+                  "sha256": "a5b98444a4e0725ba3f0f64e7b6567620654aba2147a3f99d65d8f1bdd6e989c"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/64x64/left/move_3.png",
-                  "sha256": "abff0dc4a2609e8c2adb5b9c858c984128e8f7360ed02aa401f9bcefa82ec13e"
+                  "sha256": "c19f73277de683b956c64d111275c940931baf2d167689ae47d8f199f29c83e9"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/nyarlathotep/64x64/left/move_4.png",
-                  "sha256": "094b6aa9d578942500b88b677dd3fe4e0d30489a0b1fd1262e04603934b2cae6"
+                  "sha256": "b86ba167694c5e8e13d68c0176d8597e575f12f10bff2b0a0878e7c8b55debb5"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/nyarlathotep/64x64/left/move_5.png",
-                  "sha256": "3518970056cc48fbf22a3c29bc594a37ae0ccd090f648a73db2182e9d1bcfa8a"
+                  "sha256": "12d4131bad87d5073406964e57cd1d40326046e4f9a2600873b22912301d72bc"
                 }
               ]
             }
@@ -25087,12 +25089,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/idle_0.png",
-                  "sha256": "c6f28d4dac6dfd929f4a3eddaa69381c853c544010f7ef665317e14bd16c35e0"
+                  "sha256": "5ee8d6165637eed89c4b9e8c626482970da07c968a3558ab5d8b86e2b8172cea"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/idle_1.png",
-                  "sha256": "c8d680de159b6d8ae22908db246fd46aee13aed680ddad1479b3ca0d9b1bbb64"
+                  "sha256": "f242db74356094713495d1519bad57fdc292d1313bbf4a79e3d6e1c284a5f843"
                 }
               ]
             },
@@ -25102,32 +25104,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_0.png",
-                  "sha256": "59f57ffc7c6bc839e282b8365b01ff83fb0e699143d1a1579b3bfd6c815d79c0"
+                  "sha256": "bfe73ba9a3c659bc6db6849039083b429291e8ecbf2533f4531957223983671a"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_1.png",
-                  "sha256": "dc098a8dac8b0c497202a742a2da79c4cfbac112c0cf1e836290a948725f8258"
+                  "sha256": "6634404b4e47c196f45d269b33e4cee88fc7173538ec917b3b61c1bfbabc0c78"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_2.png",
-                  "sha256": "427efae5873487be8d479d4fa453158207c9058d1a536029d86f8e00880cd761"
+                  "sha256": "0aa0778ca5f1bab87cdcba6774e4ff70843b206c5a0921ae0857a7dcdbdae4e5"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_3.png",
-                  "sha256": "48b864dd580fc1bf4ec493edc7caf4e64640179da242e4155cefcaaa831da19b"
+                  "sha256": "b692c0aa00ad179dd188f5d526e083af64943cec3f1bc017250bfff62e8f433b"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_4.png",
-                  "sha256": "ddedf99e862b9260de0c11da5d487d92e9d3673befdd9d850d0aa6ea90aac6b7"
+                  "sha256": "91bf2ecc1b647b52c973afd95423964146c71515c618540d656fac5a2203242a"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/move_5.png",
-                  "sha256": "c21c2146db89d76446424a1db657951d4a42720f48baec6a57acc7de58acf270"
+                  "sha256": "54f5adb01d2792589ae10c50871540284f361d2984845719d82e496a02d4bb4e"
                 }
               ]
             },
@@ -25137,17 +25139,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/attack_0.png",
-                  "sha256": "3490ee06a1b21a08a5f585c11cf7e00932c1d6eecb39aeca710cd385539ecab8"
+                  "sha256": "1c0342281ea1620eefda23049332f4c6c3465c9dbfc2fd8dff18bfb569bd4f60"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/attack_1.png",
-                  "sha256": "e656c96d5d9d39e485c22394759dd5c0ec1518a99fdb3d25291e2b715530baa2"
+                  "sha256": "6eaeaea3892bcf63f41060122a1f8760972687ec3d4a8975e0e7340348e9e0b4"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/attack_2.png",
-                  "sha256": "65b173a2720172152aa2a82c482a36d0ee9553c4ea0e603d9df6dca3906143ac"
+                  "sha256": "bbe2eba58a0eb9b124b52e11469678ade5b9863326f6120d5bd24f2f1951f577"
                 }
               ]
             },
@@ -25157,12 +25159,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/hurt_0.png",
-                  "sha256": "719954938f83424f14d424294f5e8bb3fddba4cf9dc9064ebda54bbcdf04ba26"
+                  "sha256": "41347958703bd508f93d322af26839389361cceb5a73aa27b1d939f4f4e1e038"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/front/hurt_1.png",
-                  "sha256": "86ebb154e06bc436afc74dad292cbc16e5e31db6f75461ed4b4ab5a8d4f84f2f"
+                  "sha256": "0a5841700fdcf76f0cbfcdbdc11f258bfd179a8a2f620d3e86d722f3a008e6eb"
                 }
               ]
             }
@@ -25178,12 +25180,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/idle_0.png",
-                  "sha256": "046cf9ac2260ca19770348140d6ee3b0088fdd865c4b8c2865c44b4cc7348afa"
+                  "sha256": "8b92eb715ddfeb0d20d0a072aa4d8ec688ecc75a8a1dc3b7856f42ea5ede6a91"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/idle_1.png",
-                  "sha256": "fb0b41ffab57abd68c163b1b034c26f26e63c3124f36b044f7fdee096175000a"
+                  "sha256": "3509f9e496aabbcab1d2adb9930be4c7d9aae9332278e504789e5cb08cf14fd9"
                 }
               ]
             },
@@ -25193,32 +25195,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_0.png",
-                  "sha256": "eddea1b4ca9a5054a690cf501ca6d565de83da4519e4e0ef649754ecaa7d48ab"
+                  "sha256": "bcb791bb4b3327fd3bb548ec1ae8562dc41787ac0c920c17b46ade154b4e5513"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_1.png",
-                  "sha256": "6c4f5de3fff08add038cc246fdd020a4b4fc057dffa392dda9827a9126fb1aac"
+                  "sha256": "38171c19fc0d5aa673bbf50455de481aeedcdc8a62ac09f43a369cdba9c59857"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_2.png",
-                  "sha256": "e66d27b64e2e728a17597adc041de09b3334427c8ba401a569b7b02aa477dacf"
+                  "sha256": "536a2a23eaf2848cbc08c4a5f6c76c81d49c4e2b734e948ccbea2df9f6d5b2aa"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_3.png",
-                  "sha256": "f37e037687034fa3f985a6ac3b501b6cfd86ba3d4623db82f804e54aca84b5ab"
+                  "sha256": "5aa341312119e5223328aa89687643f9804258791e82316c9d815c95794e9307"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_4.png",
-                  "sha256": "37b8d981e3a2ee6a47f893ea1e07a58a6a0429ed5e5f4c67fba29eb0c1120ecd"
+                  "sha256": "1ea7bdd8375098d3f430c6acbc2a87bd10513a32a6759a0dc4161a789e4e0092"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/nyarlathotep/eldritch/64x64/back/move_5.png",
-                  "sha256": "095ffb5eccbf5378d3314670b6467df7958b0a635e531138605a9eb54fa35fca"
+                  "sha256": "61798cd022ae6d10359285ddba3cc139511f4cf5024eede0b42f925380e732d4"
                 }
               ]
             }
@@ -25234,27 +25236,47 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/left/idle_0.png",
-                  "sha256": "96866c155a62d37e76268b6b503cab8dde75921e5f66e95a76f8b4dca45f1ba1"
+                  "sha256": "ee3cf4b7cedca56ade0fc6ea3aa77deb490b7b26de979f1954face20bf06cc88"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/left/idle_1.png",
-                  "sha256": "463cfa00e76c95b2783f7d844d8c55e50ec9a57ab607899bfc1f57d14f8ff497"
+                  "sha256": "17666dd7a312d094da551df37fe2fcb9ff759d1833b4f319965de130ada71175"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 6,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/left/move_0.png",
-                  "sha256": "9ecb256a7b329daceafe6974e7bbea31789aa9162df533dc95f3a42cd1488c69"
+                  "sha256": "bf6cb526620cb675d488bafcee7acc7c1ec1145f52e46457b519b5cbb3270795"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/left/move_1.png",
-                  "sha256": "32b6679838ec2f14b9ca258592926de34cc28b408dc8d0b9c8d576930ebf0b3a"
+                  "sha256": "73ff9719c9db81179be433c165574c97adbdd99ee4b2a7aeba4673cb5a0a8326"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/left/move_2.png",
+                  "sha256": "399fa2b0c18b6c1a1d82c7266f46169782c428ab8cdee6e75e1e146942b1851d"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/left/move_3.png",
+                  "sha256": "d0dfabc4cd8e38461eb5e563aa7b98f60fa4a2e2eaa064bbbe4bdc1ac933ee7e"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/left/move_4.png",
+                  "sha256": "d4c199c515453a9ebf3fa4d5c122d74790118f7312e861db5eab43096d24b21a"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/left/move_5.png",
+                  "sha256": "a03c03c46292ea227462c6b55a881891e7d6a885e8708bd2c2ee4416a418f9d7"
                 }
               ]
             }
@@ -25270,27 +25292,47 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/right/idle_0.png",
-                  "sha256": "8a6961e462a68c433e6866ddf86f7a4b72d28723853d3b58849f559c6077ff20"
+                  "sha256": "974f5b6f44349da00b18c6f4369efd2f0bb2c29eee18902e5ea08df09af1f7cd"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/right/idle_1.png",
-                  "sha256": "2e7d905203cfdc661e33b5a39e84a31e56a355f96a7c5541ebdcf5392987727f"
+                  "sha256": "ccf1db3e1b208e43d7a5fad941a5d582b636ea1bbace1fdc381ef416e8e8a7ef"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 6,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nyarlathotep/eldritch/64x64/right/move_0.png",
-                  "sha256": "53757661d5333e614d389818e003331b3a848a2b73ddafce40e91ad1fa1ac8b3"
+                  "sha256": "513fe3948004bfa8072756fb6097876f8efc4b924e1fc9799472610200a78b93"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nyarlathotep/eldritch/64x64/right/move_1.png",
-                  "sha256": "e09e4855258e9a638a2b12bd68ad7314cdd45d7599ef58f9a3152cc1cfcaf60e"
+                  "sha256": "1edbd0ab118248edeb22aa1403b38cd11660d00a7f67ef02770b96a89119ab66"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/right/move_2.png",
+                  "sha256": "9755cc372266c4cbdc2337b6442bfd9bcafaf81c4a073e52ee1e5b4181f68db3"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/right/move_3.png",
+                  "sha256": "07775fac4d22c7c9b8329dbac14a518f91f216051a2aa92bc5095e63183bdde9"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/right/move_4.png",
+                  "sha256": "8f77a0ed16a37636457ac05491d9e3db445c07ea53ffb80becdaaa0b4bbd05e9"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/nyarlathotep/eldritch/64x64/right/move_5.png",
+                  "sha256": "df23d1ab6a35ddbbaf219a1c05eb131f6fff4c74c65eed93b87cb0bd78acf4ec"
                 }
               ]
             }
