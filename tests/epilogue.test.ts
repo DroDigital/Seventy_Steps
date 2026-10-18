@@ -19,7 +19,11 @@ describe("an ending's last pages (round 12)", () => {
       if (f.quest) expect(QUESTS[f.quest], `${n.id}: ${f.quest}`).toBeDefined();
     }
     expect(fateOf('gilman', 'seal', true)).toBe(FATES.gilman.done);
-    expect(fateOf('gilman', 'seal', false)).toBe(FATES.gilman.undone);
+    expect(fateOf('gilman', 'silver_key', false)).toBe(FATES.gilman.undone);
+    expect(fateOf('gilman', 'seal', false)).toBe(FATES.gilman.undoneEndings!.seal); // the sleepers wake under these two (their cards say so), and so does he
+    expect(fateOf('gilman', 'herald', false)).toBe(FATES.gilman.undoneEndings!.herald);
+    expect(fateOf('gilman', 'seal', true)).toBe(FATES.gilman.done); // his favour done: the same line under every ending
+    for (const e of ['seal', 'herald'] as const) expect(fateOf('gilman', e, false)).not.toMatch(/did not wake/);
     expect(fateOf('carter', 'silver_key', true)).toBe(FATES.carter.endings!.silver_key);
     expect(fateOf('nasht', 'seal', true)).toBeUndefined();
   });

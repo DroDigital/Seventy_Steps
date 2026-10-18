@@ -171,4 +171,32 @@ describe('the outer gods (spec §3E)', () => {
     steps(g, 1, press('interact'));
     expect(endings).toEqual([{ id: 'silver_key' }]);
   });
+
+  it("after the passage through the Gate the Guide takes no more part: its fight and fog are let go of, and the investigator is not held in its ring (round 55)", () => {
+    const b = bossGame('umr_at_tawil', undefined, 5);
+    const { g, boss, fight } = b;
+    g.overworld = createWorldGame().overworld; // (the ending is the world's: the arena has none)
+    engage(b);
+    g.ecs.c.health.get(boss)!.hp *= 0.2;
+    steps(g, 2);
+    const me = (): { x: number; z: number } => g.ecs.c.transform.get(g.player.id)!.pos; // (place() sets a new position: read it afresh)
+    const outside = (): void => place(g, g.player.id, fight.arena.x, fight.arena.z + fight.arena.radius + 2, Math.PI);
+    outside();
+    steps(g, 1);
+    expect(distXZ(me(), fight.arena)).toBeLessThanOrEqual(fight.arena.radius); // while it is engaged, the fog sets them back at the rim
+    const at = g.ecs.c.transform.get(boss)!.pos;
+    place(g, g.player.id, at.x, at.z + 4, Math.PI);
+    steps(g, 1, press('interact'));
+    expect(g.overworld!.ending).toBe('silver_key');
+    const health = g.ecs.c.health.get(g.player.id)!.hp;
+    steps(g, 2);
+    expect(fight.engaged).toBe(false);
+    expect(fight.veiled).toBe(false);
+    expect(g.ecs.c.brain.get(boss)!.state).not.toBe('engage');
+    outside();
+    steps(g, 30);
+    expect(distXZ(me(), fight.arena)).toBeGreaterThan(fight.arena.radius); // nothing sets them back: they walk on
+    expect(g.ecs.c.brain.get(boss)!.state).not.toBe('engage');
+    expect(g.ecs.c.health.get(g.player.id)!.hp).toBe(health);
+  });
 });

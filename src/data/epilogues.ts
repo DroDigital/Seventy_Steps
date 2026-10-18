@@ -10,6 +10,7 @@ export interface Fate {
   quest?: string; // their favour
   done: string;
   undone?: string; // their favour left undone (else `done` serves)
+  undoneEndings?: Partial<Record<EndingId, string>>; // their favour left undone, under an ending that says something of them (round 55)
   endings?: Partial<Record<EndingId, string>>;
 }
 
@@ -22,6 +23,10 @@ export const FATES: Readonly<Record<string, Fate>> = {
     quest: 'witch_house',
     done: 'Walter Gilman passed his examinations that spring. He moved out of the Witch House and would not say why.',
     undone: 'Walter Gilman did not wake. The doctors at St. Mary\'s moved him to a room without corners.',
+    undoneEndings: { // the sleepers wake under these two endings (their cards say so): he wakes with them, and not well
+      seal: 'Walter Gilman woke with the others, and would not say what he had seen. The doctors at St. Mary\'s kept him a month longer, in a room without corners.',
+      herald: 'Walter Gilman woke in the night with the others, and did not stop screaming until morning. The doctors at St. Mary\'s moved him to a room without corners.',
+    },
   },
   kuranes: {
     quest: 'kadath',
@@ -85,5 +90,6 @@ export const FATES: Readonly<Record<string, Fate>> = {
 export function fateOf(npc: string, ending: EndingId, done: boolean): string | undefined {
   const f = FATES[npc];
   if (!f) return undefined;
-  return f.endings?.[ending] ?? (f.quest && !done ? (f.undone ?? f.done) : f.done);
+  const open = !!f.quest && !done;
+  return (open ? f.undoneEndings?.[ending] : undefined) ?? f.endings?.[ending] ?? (open ? (f.undone ?? f.done) : f.done);
 }
