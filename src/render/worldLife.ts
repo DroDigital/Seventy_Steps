@@ -8,7 +8,7 @@
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
-import { seaChop } from '../systems/seaChop';
+import { seaChopNow } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
 import { createBeacons } from './beacons';
 import type { Beams } from './beams';
@@ -38,8 +38,8 @@ import type { Skyline } from './skyline';
 import type { SpriteAtlas } from './sprites/atlas';
 
 export interface WorldLife {
-  /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof. */
-  update(camera: THREE.Camera, time: number, enclosed: boolean): void;
+  /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof; `alpha`: how far the picture is from the last step to the next, as the bodies are drawn at it. */
+  update(camera: THREE.Camera, time: number, enclosed: boolean, alpha: number): void;
   readonly fauna: Fauna;
 }
 
@@ -76,8 +76,9 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
   return {
     fauna,
-    update(camera, time, enclosed) {
+    update(camera, time, enclosed, alpha) {
       eye = camera;
+      SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn). Before anything is set on the water: the tentacles are placed on the surface the sea is drawn at
       strikes?.update(time);
       const outside = !enclosed && !!g.overworld;
       fauna.update(camera, time, !outside);
@@ -89,9 +90,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
       deep.update(camera, time, !outside);
-      drag.update(time);
+      drag.update(time, alpha);
       splash.update(time);
-      SEA.chop.value += (seaChop(g) - SEA.chop.value) * 0.02; // the wind raises the sea, slowly (round 30)
       fog.update(camera, time, !g.overworld);
       doors.update(camera, time, !g.overworld);
       glints.update(camera.position, time, !g.overworld);

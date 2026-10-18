@@ -11,7 +11,7 @@ import { clamp, type V3 } from '../core/geom';
 import { SIM, WATER, WORLD } from '../data/tuning';
 import { seaHeight } from '../world/seaSurface';
 import type { Falling, Game, WaterFall } from './components';
-import { seaChop } from './seaChop';
+import { seaChopNow } from './seaChop';
 
 const smooth = (x: number): number => {
   const t = clamp(x, 0, 1);
@@ -24,7 +24,7 @@ export const splashSize = (speed: number): number => clamp(0.12 + 0.13 * speed, 
 /** The sea's clock, in seconds: the one the shader draws the waves by (`Game.seaTime`, the renderer's, which runs on through a cutscene that holds the frames still), else the frames'. */
 export const seaTimeOf = (g: Game): number => g.seaTime?.() ?? g.frame / SIM.hz;
 
-/** The water's height at a place and a time, as the picture draws it: the waves raised by the wind's `chop` (`seaChop(g)`; 1 as the sea lies). */
+/** The water's height at a place and a time, as the picture draws it: the waves raised by the wind's `chop` (`seaChopNow(g)`; 1 as the sea lies). */
 export const surfaceAt = (x: number, z: number, time: number, chop = 1): number => WORLD.seaLevel + seaHeight(x, z, time, chop);
 
 /** A body that has gone into the sea: where the tentacle comes up (ahead of it, the way it was going, and to one side) and what has happened so far (nothing). */
@@ -46,9 +46,9 @@ export function waterStep(g: Game, f: Falling, die: (g: Game, lip: V3) => void):
   const id = g.player.id;
   const tr = g.ecs.c.transform.get(id)!;
   const dt = 1 / SIM.hz;
-  const chop = seaChop(g);
+  const chop = seaChopNow(g);
   const time = seaTimeOf(g);
-  if (f.frame >= WATER.max) return;
+  if (f.frame >= WATER.max || g.ecs.c.actor.get(id)!.move === 'death') return; // (the death comes, and the body lies where it is, as at the foot of a pit: it is not drawn on in the dark)
   f.frame++;
   w.surface = surfaceAt(tr.pos.x, tr.pos.z, time, chop);
   if (w.entered < 0) {

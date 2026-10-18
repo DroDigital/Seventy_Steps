@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PLAYER, WATER, WORLD } from '../src/data/tuning';
 import { fallDark, fallSystem } from '../src/systems/falls';
 import { createWorldGame } from '../src/systems/game';
-import { seaChop } from '../src/systems/seaChop';
+import { seaChopNow } from '../src/systems/seaChop';
 import { seaHeight } from '../src/world/seaSurface';
 import { enterSea, seaTimeOf, splashSize, surfaceAt, waterDark } from '../src/systems/waterFall';
 import type { Collider } from '../src/world/colliders';
@@ -122,7 +122,7 @@ describe('the surface it meets is the one drawn (round 55)', () => {
     const g = createWorldGame();
     g.overworld!.region = 'rlyeh';
     Object.assign(g.overworld!.weather, { kind: 'storm', amount: 1 });
-    const chop = seaChop(g);
+    const chop = seaChopNow(g);
     if (clock(g) !== null) g.seaTime = () => clock(g)!;
     g.world = { ground: () => -9, colliders: [], off: new Set(), contain: () => {} };
     const tr = g.ecs.c.transform.get(g.player.id)!;
@@ -153,6 +153,34 @@ describe('the surface it meets is the one drawn (round 55)', () => {
     const byFrames = WORLD.seaLevel + seaHeight(-600, 220, met.time - offset, chop); // where the frames' own clock would have had the water
     expect(Math.abs(met.y - drawn)).toBeLessThan(0.05);
     expect(Math.abs(drawn - byFrames)).toBeGreaterThan(0.1); // the frames' clock would have put it at another wave
+  });
+});
+
+describe('the end of the fall (round 55)', () => {
+  it('lies where it died: nothing draws the body on in the dark once the death has come', () => {
+    const g = createWorldGame();
+    g.world = { ground: () => -9, colliders: [], off: new Set(), contain: () => {} };
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    tr.pos = { x: -600, y: 0, z: 220 };
+    tr.prev = { ...tr.pos };
+    g.player.falling = { frame: 0, vy: 0, vx: 0, vz: 0, spin: 1, lip: { ...tr.pos }, water: enterSea(tr.pos, { x: 0, z: 0 }, 0) };
+    let died: { x: number; y: number; z: number } | null = null;
+    g.events.on('Died', () => (died = { ...tr.pos }));
+    for (let i = 0; i < WATER.max + 20; i++) {
+      g.frame++;
+      fallSystem(g);
+    }
+    expect(died).not.toBeNull();
+    expect(g.player.falling!.frame).toBeGreaterThan(0);
+    expect(tr.pos).toEqual(died); // it did not go on sinking and drifting to the end of the frames
+  });
+
+  it('reads the sea\'s clock from the picture when it is handed in, else from the frames', () => {
+    const g = createWorldGame();
+    g.frame = 120;
+    expect(seaTimeOf(g)).toBeCloseTo(2, 6);
+    g.seaTime = () => 100; // (a cutscene has held the frames still while the picture's clock ran on)
+    expect(seaTimeOf(g)).toBe(100);
   });
 });
 

@@ -63,6 +63,7 @@ import { registerDeathNotes } from './deathNotes';
 import { hookSystem } from './hook';
 import { registerSurvey } from './survey';
 import { wanderSystem } from './wanderers';
+import { easeSeaChop } from './seaChop';
 import { weatherSystem } from './weather';
 import { refreshSeals, registerSeals, sealSystem } from './seals';
 import { createReality, realitySystem, registerReality } from './reality';
@@ -204,6 +205,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   fogPassSystem(g);
   candleSystem(g);
   weatherSystem(g, dt);
+  easeSeaChop(g);
   const spent = g.reality.stolen <= 0 && fightActionSystem(g, input);
   checkpointSystem(g, spent ? { ...input, pressed: { ...input.pressed, interact: false } } : input);
   npcSystem(g, dt);

@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { WORLD } from '../src/data/tuning';
 import { createSea, SEA } from '../src/render/sea';
 import { AMP_SUM, seaHeight, WAVES, WAVES_GLSL } from '../src/render/seaWaves';
-import { seaChop } from '../src/systems/seaChop';
-import { createWorldGame } from '../src/systems/game';
+import { emptyInput } from '../src/core/input';
+import { easeSeaChop, seaChop, seaChopNow } from '../src/systems/seaChop';
+import { createWorldGame, stepGame } from '../src/systems/game';
 
 describe('the sea (round 30)', () => {
   it('has waves of several lengths, heights bounded by their amplitudes, that move', () => {
@@ -54,5 +55,23 @@ describe('the sea (round 30)', () => {
     g.overworld!.region = 'rlyeh';
     expect(seaChop(g)).toBeGreaterThan(calm);
     expect(SEA.chop.value).toBeGreaterThan(0);
+  });
+
+  it('comes up to the wind a little each step, the one value the picture and a body in the water both read (round 55)', () => {
+    const g = createWorldGame();
+    Object.assign(g.overworld!.weather, { kind: 'clear', amount: 0 });
+    expect(seaChopNow(g)).toBeCloseTo(seaChop(g), 6); // before any step, where the wind would have it
+    easeSeaChop(g); // the first step: it begins there
+    g.overworld!.region = 'rlyeh';
+    const [from, to] = [seaChopNow(g), seaChop(g)];
+    expect(to).toBeGreaterThan(from);
+    easeSeaChop(g);
+    expect(seaChopNow(g)).toBeGreaterThan(from);
+    expect(seaChopNow(g)).toBeLessThan(from + (to - from) * 0.05); // slowly
+    const before = seaChopNow(g);
+    stepGame(g, emptyInput()); // and the game's step is what eases it
+    expect(seaChopNow(g)).toBeGreaterThan(before);
+    for (let i = 0; i < 600; i++) easeSeaChop(g);
+    expect(seaChopNow(g)).toBeCloseTo(to, 3);
   });
 });

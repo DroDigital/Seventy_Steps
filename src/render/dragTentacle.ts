@@ -7,7 +7,7 @@
 
 import * as THREE from 'three';
 import { clamp } from '../core/geom';
-import { SIM, WATER, WORLD } from '../data/tuning';
+import { WATER, WORLD } from '../data/tuning';
 import type { Game } from '../systems/components';
 import type { Particles } from './particles';
 import { SEA } from './sea';
@@ -26,7 +26,8 @@ const smooth = (x: number): number => {
 };
 
 export interface DragTentacle {
-  update(time: number): void;
+  /** `alpha`: how far the picture is from the last step to the next, 0 to 1: the investigator's own interpolation, so the tentacle holds the body as it is drawn. */
+  update(time: number, alpha: number): void;
 }
 
 export function createDragTentacle(scene: THREE.Scene, g: Game, particles: Particles): DragTentacle {
@@ -53,7 +54,7 @@ export function createDragTentacle(scene: THREE.Scene, g: Game, particles: Parti
   const [p0, p1, p2, p3, pt, helix, side] = [0, 0, 0, 0, 0, 0, 0].map(() => new THREE.Vector3());
 
   return {
-    update(time) {
+    update(time, alpha) {
       const f = g.player.falling;
       const w = f?.water;
       if (!f || !w || w.entered < 0) {
@@ -61,9 +62,9 @@ export function createDragTentacle(scene: THREE.Scene, g: Game, particles: Parti
         return;
       }
       const tr = g.ecs.c.transform.get(g.player.id)!;
-      const alpha = clamp(time * SIM.hz - g.frame, 0, 1);
-      const frame = f.frame + (Number.isFinite(alpha) ? alpha : 0);
-      const body = new THREE.Vector3(lerp(tr.prev.x, tr.pos.x, alpha), lerp(tr.prev.y, tr.pos.y, alpha) + 0.95, lerp(tr.prev.z, tr.pos.z, alpha)); // the waist
+      const blend = clamp(Number.isFinite(alpha) ? alpha : 0, 0, 1);
+      const frame = f.frame + blend;
+      const body = new THREE.Vector3(lerp(tr.prev.x, tr.pos.x, blend), lerp(tr.prev.y, tr.pos.y, blend) + 0.95, lerp(tr.prev.z, tr.pos.z, blend)); // the waist
       const since = frame - w.entered;
       const rise = smooth((since - 3) / (WATER.seize - 10)); // up out of the water, and over, by the time it has hold
       const held = Math.max(0, frame - w.grab);

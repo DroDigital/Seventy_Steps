@@ -306,7 +306,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         applyReality(fx, game.reality);
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
-        life.update(camera, time, enclosed); // after the night's light: the lightning adds to it
+        life.update(camera, time, enclosed, alpha); // after the night's light: the lightning adds to it
         if (spawned) audio.update(fx, time, camera, still, cinema.active);
         const lens = lensAt(fx, time);
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
