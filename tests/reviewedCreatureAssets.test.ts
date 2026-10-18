@@ -140,9 +140,9 @@ describe('reviewed creature artwork imported into the game', () => {
     }
     expect(scopes).toBe(1104); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the bosses' left and back attack and hurt (36), and the Shantak's flight in its four views (4)
     expect(mirrors).toBe(81); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2760);
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2768);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2760); // 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, and the Shantak's 32 flight frames
+    expect(pack.frameCount).toBe(2768); // 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
   });
 
   it('preserves all 2728 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
@@ -170,7 +170,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2366, '128x128': 352, '128x160': 42 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2374, '128x128': 352, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');
