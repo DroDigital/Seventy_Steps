@@ -76,7 +76,6 @@ import { createMapScreen } from './ui/mapScreen';
 import { noteLockAsked } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
-import { reportPage } from './ui/reportPage';
 import { createDialogue } from './ui/dialogue';
 import { showIntro, type Intro } from './ui/intro';
 import { journalPage } from './ui/journal';
@@ -170,7 +169,6 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     journal: opts.arena ? undefined : (back, show) => journalPage(game, back, show),
     arms: (back, show) => armsPage(game, back, show),
     achievements: opts.arena ? undefined : (back) => achievementsPage(store, back),
-    report: (back) => reportPage(game, settings, back),
     quit: () => void veil.cover('', 0.8).then(() => (location.href = location.pathname)),
     held: () => building || cinema.active || journeys.busy, // check building first: cinema is not made yet while the sprites load; leaving during loading or a cutscene must not pause
   });

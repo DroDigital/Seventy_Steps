@@ -44,9 +44,9 @@ export function installCrashLog(): void {
 let graphics: string | undefined;
 
 /**
- * The graphics card's name, asked of a context of its own once and kept: a report made again and again (Report a problem,
- * opened and left) must not leave contexts behind, for past the browser's limit it takes the oldest, the game's own
- * (review of PR 142). The borrowed context is let go at once.
+ * The graphics card's name, asked of a context of its own once and kept: a report made again and again must not leave
+ * contexts behind, for past the browser's limit it takes the oldest, the game's own (review of PR 142). The borrowed
+ * context is let go at once.
  */
 export function graphicsName(): string {
   if (graphics !== undefined) return graphics;
@@ -62,11 +62,11 @@ export function graphicsName(): string {
   return graphics;
 }
 
-/** What a bug report needs: when, what ran it, how it was set, and the record. `what`: a crash's, or one the player asked for (ui/reportPage.ts). */
-export function crashReport(kind: string, detail?: string, what = 'crash report'): string {
+/** What a bug report needs: when, what ran it, how it was set, and the record. */
+export function crashReport(kind: string, detail?: string): string {
   const gl = graphicsName();
   return scrub([ // (pasted in public: no home folder's name, e-mail address or query key goes with it: ui/scrub.ts)
-    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} ${what}: ${kind}`,
+    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} crash report: ${kind}`,
     new Date().toISOString(),
     `${navigator.userAgent}${desktop ? ' (desktop shell)' : ''}`,
     `graphics: ${gl} · screen ${screen.width}x${screen.height} @${window.devicePixelRatio}x · window ${innerWidth}x${innerHeight}`,

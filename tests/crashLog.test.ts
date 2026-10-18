@@ -31,7 +31,7 @@ describe('the graphics card named in a report (review of PR 142)', () => {
     vi.stubGlobal('innerHeight', 720);
     vi.resetModules();
     const { crashReport } = await import('../src/ui/crashLog');
-    for (let i = 0; i < 20; i++) expect(crashReport('asked from the pause menu', 'here', 'problem report')).toContain('graphics: Test GPU');
+    for (let i = 0; i < 20; i++) expect(crashReport('the dream broke', 'here')).toContain('graphics: Test GPU');
     expect([made, lost]).toEqual([1, 1]);
   });
 

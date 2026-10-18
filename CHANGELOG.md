@@ -3,9 +3,8 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased: a demo, and a way to report a problem
+## Unreleased: a demo
 
-- **Report a problem.** The pause menu has a page that writes a report of where you are and how the game is set (its version, your system and graphics, the realm and the spot you stand on, your lead, play time, the horrors slain, the settings and the last errors), shows it, copies it with one press and opens the game's page, so a bug can be pasted in a comment. Nothing is sent by the game itself.
 - **A free demo.** The same game, kept to Miskatonic University and Arkham with the Blasted Heath (six Elder Signs, the Witch House and the horrors of those two realms), ending when Keziah Mason falls: a card says that the stair under the Sleeper's Sign leads into the full game and that your save carries over. A bank of grey mist stands along the edge of the two realms, which holds you at the step and says why; the gates to far realms, the stair, and a sign found beyond them are refused where they begin. The title says DEMO under the name.
 - **Nyarlathotep's true form is struck where it is drawn.** In the last phase of its fight the Crawling Chaos kept the body of the grey heap it replaced, a ball twice as broad as the tall figure now drawn: blows landed on air a metre short of its legs, and you were held off as by a wall. It is now as wide as its legs' stance and upper arms, so you can close in to its legs, and a blow that falls short of them misses.
 

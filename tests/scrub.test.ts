@@ -59,7 +59,7 @@ describe('a report pasted in public carries nothing that names the player (round
     vi.resetModules();
     const { crashReport, note } = await import('../src/ui/crashLog');
     note('error', new Error("EPERM: open 'C:\\Users\\Jane\\AppData\\Roaming\\Seventy Steps\\saves\\a.json' (mail jane@example.com)"));
-    const report = crashReport('asked from the pause menu', 'played 1:02 · last sign Miskatonic Quad', 'problem report');
+    const report = crashReport('the dream broke', 'played 1:02 · last sign Miskatonic Quad');
     expect(report).not.toMatch(/Jane|jane@example\.com/);
     expect(report).toContain('C:\\Users\\<user>\\AppData');
     expect(report).toContain('<email>');
