@@ -58,6 +58,7 @@ export function startAutosave(g: Game, store: SaveStore): void {
   g.events.on('Rested', save);
   g.events.on('Travelled', save);
   g.events.on('Respawned', save);
+  g.events.on('Ending', save); // the ending is kept at once (round 55: it reached the disk on the next interval, and a kill before it put the investigator back at the Court with both endings offered)
   addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && save());
   setInterval(save, WORLD.saveSeconds * 1000);

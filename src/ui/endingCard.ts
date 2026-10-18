@@ -88,6 +88,10 @@ function numbers(g: Game, records: Records): [string, string][] {
 export function createEndingCard(g: Game, store: SaveStore | null, theme?: () => Music): EndingCard {
   const screen = createScreen(4, '#050506', `left:50%;top:34%;width:min(640px,90vw);transform:translate(-50%,-30%);text-align:center;font:16px/1.8 ${SERIF}`);
   let music: Music | undefined;
+  let noted: Records | null = null; // the ending is remembered when it is chosen, not when the card opens (round 55: a quit during the scene lost it)
+  g.events.on('Ending', ({ id }) => {
+    if (ENDINGS[id as EndingId]) noted = noteEnding(store, id as EndingId);
+  });
   const walkOn = (): void => {
     screen.close();
     music?.fadeOut(4);
@@ -97,7 +101,7 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
     const e = ENDINGS[id as EndingId];
     if (!e || !g.overworld) return;
     music ??= theme?.();
-    const records = noteEnding(store, id as EndingId);
+    const records = noted ?? noteEnding(store, id as EndingId);
     const told = fates(g, id as EndingId);
     const goOn = (p: HTMLElement, next: Page): void => void (boxed(button(el('', '', p), 'Go on', () => screen.show(next))));
     const card: Page = {

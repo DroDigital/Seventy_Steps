@@ -27,6 +27,7 @@ import { isAbsent, type Actor, type ArenaCircle, type Brain, type Game, type Mov
 import { callPack, hears, noiseOf, perceive, sight, tracks } from './perception';
 import { roam } from './roam';
 import { assignTokens, fight, walk } from './tactics';
+import { parted } from './endings';
 import { targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
 
@@ -56,6 +57,11 @@ function settle(g: Game, id: Entity, br: Brain, m: Mover): void {
 
 /** An ally or a boss: the ways they had before the hunt was reworked. */
 function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transform, arena: ArenaCircle | undefined): void {
+  if (parted(g, g.ecs.c.fight.get(id)?.id)) { // the Guide the investigator went through the Gate with (endings.ts): it hunts no more, and its fight, fog and all, is let go of at once (fightSystem)
+    br.target = null;
+    settle(g, id, br, m);
+    return;
+  }
   const p = br.def.params;
   const ally = br.def.archetype === 'ally';
   if (ally && awaitsIntroduction(g, id)) {

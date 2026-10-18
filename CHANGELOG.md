@@ -3,7 +3,12 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased: the sea
+## Unreleased: the sea, and the endings
+
+- **An ending is told once.** After any ending, resting at the Court's Elder Sign offered both of the Court's endings again, and a second choice replayed the scene and the card, overwrote the first ending and counted the dream as finished twice. The Court offers nothing once the dream has ended, and a second ending is not told.
+- **Walking on after the Gate is walking on.** After passing through the Gate with 'Umr at-Tawil, the card said "walk on", but the fog of the Guide's fight still held you in its ring until you struck it down. The Guide takes no more part once you have gone through with it: it hunts no more, the fight and its fog are let go of at once, and a save keeps it so.
+- **The ending is kept when it is chosen.** It reached the disk on the next autosave (up to twenty seconds on), so a quit in between put you back at the Court with both endings offered; and the record of the ending reached was made when the card opened, so a quit during the scene lost it. Both are done at the choice.
+- **Gilman wakes with the others.** Under the Gate's sealing and the herald's kneeling the cards say the sleepers at St. Mary's woke, and the epilogue said Walter Gilman, if his favour was left undone, "did not wake". He wakes with them now, and not well; under the passage through the Gate, which says nothing of the sleepers, the line is as it was.
 
 - **The water looks like water.** The sea knows how deep it is. Where the light reaches the bottom it is a pale turquoise and thin enough to see the sand through, going through the greens to black a few metres out; it thins to nothing at the waterline, where a wash of foam runs up the shore and slips back and leaves a lace of it in the shallows. The shallows are calmer than the open sea. The sky is mirrored in it by Schlick's fresnel (dark looking down, a mirror at a glance), the moon in a path of glitter that sparkles, and rain pocks it with rings. Under the surface the ground is tinted by the water over it, darker and greener with depth, and wavering with the light that plays on the bottom.
 - **Falling into the sea is a fall into the sea.** You go off the edge in the air under real gravity, meet the water with a splash sized by how fast you hit it (droplets, a crown of spray, rings that spread on the surface and a sound to match, so a drop from a cliff is a great one and a stumble in the shallows a small one), and float, chest deep, bobbing on the swell. The camera follows you in and tilts to the water.
