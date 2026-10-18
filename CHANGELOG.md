@@ -6,7 +6,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 ## Unreleased: a demo, and a way to report a problem
 
 - **Report a problem.** The pause menu has a page that writes a report of where you are and how the game is set (its version, your system and graphics, the realm and the spot you stand on, your lead, play time, the horrors slain, the settings and the last errors), shows it, copies it with one press and opens the game's page, so a bug can be pasted in a comment. Nothing is sent by the game itself.
-- **A free demo.** The same game, kept to Miskatonic University and Arkham with the Blasted Heath (six Elder Signs, the Witch House and the horrors of those two realms), ending when Keziah Mason falls: a card says that the stair under the Sleeper's Sign leads into the full game and that your save carries over. The edge of the two realms holds you at the step and says why; the gates to far realms, the stair, and a sign found beyond them are refused where they begin. The title says DEMO under the name.
+- **A free demo.** The same game, kept to Miskatonic University and Arkham with the Blasted Heath (six Elder Signs, the Witch House and the horrors of those two realms), ending when Keziah Mason falls: a card says that the stair under the Sleeper's Sign leads into the full game and that your save carries over. A bank of grey mist stands along the edge of the two realms, which holds you at the step and says why; the gates to far realms, the stair, and a sign found beyond them are refused where they begin. The title says DEMO under the name.
 
 ## 1.0.0-rc.5: the sea, the endings and a new Nyarlathotep
 

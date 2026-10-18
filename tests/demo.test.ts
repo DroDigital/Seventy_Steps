@@ -10,7 +10,9 @@ import type { Game } from '../src/systems/components';
 import { DEMO, demoAllows } from '../src/systems/demo';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { worldLayout } from '../src/world/placements';
-import { regionAt, TILE } from '../src/world/worldMap';
+import { regionAt, regionRect, TILE } from '../src/world/worldMap';
+import { borderRuns } from '../src/world/demoBorder';
+import { WORLD } from '../src/data/tuning';
 import { edition } from '../desktop/steam.js';
 import { goTo, record, run } from './worldHelpers';
 
@@ -81,6 +83,33 @@ describe('the demo (round 56): the university and Arkham, to the fall of Keziah 
     signBeyondDemo(demo, beyond.id);
     gateBeyondDemo(demo, out.id);
     expect(said.length).toBe(0); // asking says nothing: only a refusal does
+  });
+
+  it('stands its mist along the whole of its border with the land beyond, and nowhere else (asked: "visible mist please")', () => {
+    const runs = borderRuns(DEMO.regions);
+    expect(runs.length).toBeGreaterThan(0);
+    const along = (r: (typeof runs)[number]): [number, number] => [(r.a.x + r.b.x) / 2, (r.a.z + r.b.z) / 2];
+    for (const r of runs) {
+      expect(r.a.x === r.b.x || r.a.z === r.b.z).toBe(true); // along the grid
+      const [mx, mz] = along(r);
+      expect(inDemo(mx + r.inward.x, mz + r.inward.z)).toBe(true); // the demo on its inward side...
+      const out = regionAt(mx - r.inward.x, mz - r.inward.z);
+      expect(out && !DEMO.regions.has(out.id)).toBe(true); // ...land of another realm on the other
+    }
+    // Every step of the border is under a run: walk each demo chunk's edges, and every one that meets the land beyond lies on one.
+    const s = WORLD.chunk;
+    for (const id of DEMO.regions) {
+      const rc = regionRect(REGIONS.find((r) => r.id === id)!);
+      for (let x = rc.x0 + s / 2; x < rc.x1; x += s) for (let z = rc.z0 + s / 2; z < rc.z1; z += s) {
+        for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+          const n = regionAt(x + dx * s, z + dz * s);
+          if (!n || DEMO.regions.has(n.id)) continue;
+          const [ex, ez] = [x + (dx * s) / 2, z + (dz * s) / 2];
+          expect(runs.some((r) => Math.min(r.a.x, r.b.x) <= ex && ex <= Math.max(r.a.x, r.b.x) && Math.min(r.a.z, r.b.z) <= ez && ez <= Math.max(r.a.z, r.b.z)), `${ex},${ez}`).toBe(true);
+        }
+      }
+    }
+    expect(borderRuns(new Set(REGIONS.map((r) => r.id)))).toEqual([]); // the full game has no border
   });
 
   it('says its end once, when Keziah Mason has fallen, and keeps it in the save', () => {
