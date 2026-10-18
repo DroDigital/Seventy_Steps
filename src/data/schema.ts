@@ -141,6 +141,7 @@ export interface SpriteRecipe {
   glow?: Glow; // eyes and markings glow in this anomaly colour
   gear?: readonly Gear[]; // what they wear or carry (the upright, hunched and robed bodies only)
   outside?: boolean; // drawn in a hue outside the palette (the Colour Out of Space)
+  body?: readonly [height: number, radius: number]; // the capsule struck and stood off, as fractions of `scale`, where the art's body is not its silhouette's (systems/creatures.ts)
   seed?: number;
 }
 

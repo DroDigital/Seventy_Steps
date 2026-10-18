@@ -23,7 +23,7 @@ import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
 
-/** Body height and capsule radius as fractions of the sprite's scale. */
+/** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
 const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
   humanoid: [0.9, 0.18],
   hunched: [0.85, 0.22],
@@ -53,7 +53,7 @@ export const creatureModel = (id: string, variant?: Variant): string => `${MODEL
 
 export function bodyOf(def: EntityDef): { height: number; radius: number } {
   if (def.sprite) {
-    const [h, r] = BODY[def.sprite.silhouette];
+    const [h, r] = def.sprite.body ?? BODY[def.sprite.silhouette];
     return { height: def.sprite.scale * h, radius: Math.max(0.2, def.sprite.scale * r) };
   }
   const { scale, body } = def.assembly!;
