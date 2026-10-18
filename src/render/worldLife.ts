@@ -8,7 +8,7 @@
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
-import { seaChop } from '../systems/seaChop';
+import { seaChopNow } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
 import { createBeacons } from './beacons';
 import type { Beams } from './beams';
@@ -91,7 +91,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       deep.update(camera, time, !outside);
       drag.update(time);
       splash.update(time);
-      SEA.chop.value += (seaChop(g) - SEA.chop.value) * 0.02; // the wind raises the sea, slowly (round 30)
+      SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn)
       fog.update(camera, time, !g.overworld);
       doors.update(camera, time, !g.overworld);
       glints.update(camera.position, time, !g.overworld);

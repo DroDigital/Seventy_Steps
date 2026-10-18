@@ -7,8 +7,9 @@
 
 import * as THREE from 'three';
 import { clamp } from '../core/geom';
-import { SIM, WATER, WORLD } from '../data/tuning';
+import { WATER, WORLD } from '../data/tuning';
 import type { Game } from '../systems/components';
+import { blendAt } from '../systems/waterFall';
 import type { Particles } from './particles';
 import { SEA } from './sea';
 import { seaHeight } from './seaWaves';
@@ -61,7 +62,7 @@ export function createDragTentacle(scene: THREE.Scene, g: Game, particles: Parti
         return;
       }
       const tr = g.ecs.c.transform.get(g.player.id)!;
-      const alpha = clamp(time * SIM.hz - g.frame, 0, 1);
+      const alpha = blendAt(g, time);
       const frame = f.frame + (Number.isFinite(alpha) ? alpha : 0);
       const body = new THREE.Vector3(lerp(tr.prev.x, tr.pos.x, alpha), lerp(tr.prev.y, tr.pos.y, alpha) + 0.95, lerp(tr.prev.z, tr.pos.z, alpha)); // the waist
       const since = frame - w.entered;
