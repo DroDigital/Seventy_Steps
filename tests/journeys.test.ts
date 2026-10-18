@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { emptyInput } from '../src/core/input';
-import { signPlace, travel } from '../src/systems/checkpoints';
+import { gatePlace, signPlace, travel } from '../src/systems/checkpoints';
+import { demoAllows } from '../src/systems/demo';
+import { t } from '../src/core/i18n';
 import { WORLD } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
 import { createWorldGame, stepGame } from '../src/systems/game';
@@ -97,6 +99,22 @@ describe('journeys (ui/journeys.ts)', () => {
     expect(asked).toEqual([`cover ${twin.name.toUpperCase()}`]);
     await covers();
     expect(pos(g)).toMatchObject({ x: twin.arrive.x, z: twin.arrive.z });
+  });
+
+  it('in the demo, E at a gate out of its realms is refused at once: no veil falls, and the reason is said (review of PR 142)', () => {
+    const g = createWorldGame({ demo: true });
+    const inDemo = (x: number, z: number): boolean => demoAllows(g, { x, z });
+    const gate = worldLayout().gates.find((gt) => inDemo(gt.x, gt.z) && !inDemo(gatePlace(gt.to)!.arrive.x, gatePlace(gt.to)!.arrive.z))!;
+    const back = (WORLD.reach - 0.7) / WORLD.gateArrive;
+    goTo(g, gate.x + (gate.arrive.x - gate.x) * back, gate.z + (gate.arrive.z - gate.z) * back);
+    const before = { ...pos(g) };
+    const said = record(g, 'Notice');
+    const { veil, asked } = fakeVeil();
+    const j = createJourneys(g, veil);
+    expect(j.before(press('interact'))?.pressed.interact).toBe(false);
+    expect([asked, j.busy]).toEqual([[], false]); // no cover, no journey under way
+    expect(said.map((n) => n.text)).toEqual([t('demo.closed')]);
+    expect(pos(g)).toMatchObject({ x: before.x, z: before.z });
   });
 
   it('dying, the veil falls and the death throes wait for it before the respawn', async () => {

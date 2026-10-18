@@ -9,7 +9,7 @@
 const HOME_WIN = /([A-Za-z]:(?:\\+|\/+)(?:Users|Documents and Settings)(?:\\+|\/+))(?:[^\\/'"`:;,)\r\n]+?(?=[\\/])|[^\\/\s'"`:;,)]+)/gi; // C:\Users\<name>, C:/Users/<name> (a file:// address)
 const HOME_UNIX = /(\/(?:Users|home)\/)(?:[^\\/'"`:;,)\r\n]+?(?=[\\/])|[^\\/\s'"`:;,)]+)/g; // /Users/<name> (macOS), /home/<name> (Linux)
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b/g; // (a version, three@0.170.0, is not one)
-const QUERY = /(\b(?:https?|wss?|app|file):\/\/[^\s?#'"`]*)[?#][^\s'"`):]*/gi; // an address keeps its path and line, not its query
+const QUERY = /(\b(?:https?|wss?|app|file):\/\/[^\s?#'"`]*)[?#][^\s'"`)]*?(:\d+:\d+)?(?=[\s'"`)]|$)/gim; // an address loses its whole query (a key, a nested address, colons and all) and keeps the line a stack trace points at
 
 export const scrub = (text: string): string =>
-  text.replace(HOME_WIN, '$1<user>').replace(HOME_UNIX, '$1<user>').replace(EMAIL, '<email>').replace(QUERY, '$1');
+  text.replace(HOME_WIN, '$1<user>').replace(HOME_UNIX, '$1<user>').replace(EMAIL, '<email>').replace(QUERY, '$1$2');

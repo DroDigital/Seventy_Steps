@@ -24,6 +24,15 @@ describe('a report pasted in public carries nothing that names the player (round
     expect(scrub('at r (app://seventy-steps/assets/index-AbC12.js#token=abc:1:5)')).toBe('app://seventy-steps/assets/index-AbC12.js:1:5'.replace(/^/, 'at r (') + ')');
   });
 
+  it('takes the whole of a query, colons and nested addresses with it, and still keeps a stack trace\'s line (review of PR 142)', () => {
+    expect(scrub('GET https://api.example.com/x?token=abc:def failed')).toBe('GET https://api.example.com/x failed');
+    expect(scrub('to https://a.example/login?redirect=https://private.example/path?key=SECRET:9 then')).toBe('to https://a.example/login then');
+    expect(scrub('"https://a.example/cb#access_token=ya29:a0:b1"')).toBe('"https://a.example/cb"');
+    expect(scrub('at f (https://x.example/a.js?sig=ab:cd:2:41)')).toBe('at f (https://x.example/a.js:2:41)');
+    expect(scrub('see https://x.example/p?k=SECRET:1:2 and on')).not.toContain('SECRET');
+    expect(scrub('two: https://a.example/?k=1 and https://b.example/?k=2:3:4')).toBe('two: https://a.example/ and https://b.example/:3:4');
+  });
+
   it('keeps what a fix is found by: file names, line numbers, versions, the game\'s own words', () => {
     const kept = [
       'TypeError: Cannot read properties of undefined (reading \'pos\') at stepGame (app://seventy-steps/assets/index-AbC12.js:1:23456)',

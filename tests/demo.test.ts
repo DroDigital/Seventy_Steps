@@ -5,7 +5,7 @@ import { t } from '../src/core/i18n';
 import { DEMO_KEY, editionOf } from '../src/data/edition';
 import { GAME_PAGE } from '../src/data/links';
 import { REGIONS } from '../src/data/regions';
-import { dream, gatePlace, passGate, signPlace, travel } from '../src/systems/checkpoints';
+import { dream, gateBeyondDemo, gatePlace, passGate, signBeyondDemo, signPlace, travel } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { DEMO, demoAllows } from '../src/systems/demo';
 import { createWorldGame, stepGame } from '../src/systems/game';
@@ -68,6 +68,19 @@ describe('the demo (round 56): the university and Arkham, to the fall of Keziah 
     expect(travel(g, beyond.id)).toBe(false);
     expect(inDemo(pos(g).x, pos(g).z)).toBe(true);
     expect(said.length).toBeGreaterThan(0);
+  });
+
+  it('names, before any journey begins, the signs and gates it refuses: the map greys them, the sign lists them not (review of PR 142)', () => {
+    const [demo, full] = [createWorldGame({ demo: true }), createWorldGame()];
+    const beyond = worldLayout().signs.find((s) => !inDemo(s.rest.x, s.rest.z))!;
+    const within = worldLayout().signs.find((s) => inDemo(s.rest.x, s.rest.z))!;
+    const out = worldLayout().gates.find((gt) => inDemo(gt.x, gt.z) && !inDemo(gatePlace(gt.to)!.arrive.x, gatePlace(gt.to)!.arrive.z))!;
+    expect([signBeyondDemo(demo, beyond.id), signBeyondDemo(demo, within.id), signBeyondDemo(full, beyond.id)]).toEqual([true, false, false]);
+    expect([gateBeyondDemo(demo, out.id), gateBeyondDemo(full, out.id)]).toEqual([true, false]);
+    const said = closed(demo);
+    signBeyondDemo(demo, beyond.id);
+    gateBeyondDemo(demo, out.id);
+    expect(said.length).toBe(0); // asking says nothing: only a refusal does
   });
 
   it('says its end once, when Keziah Mason has fallen, and keeps it in the save', () => {
