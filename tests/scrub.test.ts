@@ -13,6 +13,10 @@ describe('a report pasted in public carries nothing that names the player (round
       ['at /home/jdoe/.local/share/itch/apps/seventy-steps/resources/app.asar/main.js:12:4', 'at /home/<user>/.local/share/itch/apps/seventy-steps/resources/app.asar/main.js:12:4'],
       ['C:\\Documents and Settings\\Owner\\x', 'C:\\Documents and Settings\\<user>\\x'],
       ['could not open C:\\Users\\Jane; retrying', 'could not open C:\\Users\\<user>; retrying'], // a name with nothing after it: the name alone
+      ["open 'C:\\Users\\O'Neil\\AppData\\Roaming\\x.json'", "open 'C:\\Users\\<user>\\AppData\\Roaming\\x.json'"], // review of PR 142: a name with an apostrophe...
+      ['C:\\Users\\Jane Doe (Work)\\AppData', 'C:\\Users\\<user>\\AppData'], // ...or brackets...
+      ['C:/Users/D\'Arcy, Smith/Saved Games/x', 'C:/Users/<user>/Saved Games/x'], // ...or a comma, in a file:// address
+      ["home is C:\\Users\\O'Neil", 'home is C:\\Users\\<user>'], // ...and with nothing after it
     ];
     for (const [raw, clean] of cases) expect(scrub(raw)).toBe(clean);
   });

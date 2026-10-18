@@ -5,9 +5,10 @@
  * names, line numbers and versions a fix is found by. Pure.
  */
 
-// A home folder's name runs to the next separator, spaces and all (C:\Users\Jane Doe\...), or is one word where none follows.
-const HOME_WIN = /([A-Za-z]:(?:\\+|\/+)(?:Users|Documents and Settings)(?:\\+|\/+))(?:[^\\/'"`:;,)\r\n]+?(?=[\\/])|[^\\/\s'"`:;,)]+)/gi; // C:\Users\<name>, C:/Users/<name> (a file:// address)
-const HOME_UNIX = /(\/(?:Users|home)\/)(?:[^\\/'"`:;,)\r\n]+?(?=[\\/])|[^\\/\s'"`:;,)]+)/g; // /Users/<name> (macOS), /home/<name> (Linux)
+// A Windows home folder's name is every character a folder's name may hold (all but < > : " / \ | ? *: apostrophes, brackets,
+// commas and spaces too, O'Neil, Jane Doe (Work)) up to the next separator, or, where none follows, up to a space, ";" or ",".
+const HOME_WIN = /([A-Za-z]:(?:\\+|\/+)(?:Users|Documents and Settings)(?:\\+|\/+))(?:[^\\/:"<>|?*\r\n]+?(?=[\\/])|[^\\/\s:"<>|?*;,]+)/gi; // C:\Users\<name>, C:/Users/<name> (a file:// address)
+const HOME_UNIX = /(\/(?:Users|home)\/)[^/\s'"`:;,)]+/g; // /Users/<name> (macOS), /home/<name> (Linux): a user's short name, which holds no space or quote
 const EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b/g; // (a version, three@0.170.0, is not one)
 const QUERY = /(\b(?:https?|wss?|app|file):\/\/[^\s?#'"`]*)[?#][^\s'"`)]*?(:\d+:\d+)?(?=[\s'"`)]|$)/gim; // an address loses its whole query (a key, a nested address, colons and all) and keeps the line a stack trace points at
 
