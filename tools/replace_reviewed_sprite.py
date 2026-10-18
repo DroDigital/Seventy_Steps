@@ -13,8 +13,10 @@ rectangle on its page, and the frame's hashes and bounds, the page's and both in
 test holds the new art to the same account as the old. A scope drawn with more frames than it had (a walk of two made six) keeps
 the old frames' places and gets the rest on a new shelf at the foot of the creature's page. A view the creature had by
 mirroring another (its right, from its left) stays mirrored when the delivery's is that other turned round, pixel for pixel;
-one the delivery draws on its own is given its frames on the shelf, and no longer mirrors. `--dry` checks all of it and writes
-nothing.
+one the delivery draws on its own is given its frames on the shelf, and no longer mirrors; a view is one or the other whole, so
+its other actions that the delivery sends as the source turned round are put on the shelf too (the delivery's own files for
+them), and one the delivery leaves out is refused, as is a drawn view with fewer frames than the mirrored one had. A scope that
+grows grows in every view that mirrors it, in both indexes. `--dry` checks all of it and writes nothing.
 """
 
 import hashlib
@@ -65,7 +67,7 @@ def main(key: str, delivery: Path, dry: bool) -> None:
 
     # (frame id or None, direction, action, n, path, rgba, bytes, bounds): in place; a view the pack mirrored, drawn; extra frames
     replace, fresh, grown, problems = [], [], [], []
-    kept = set()  # (direction, action) of the views the pack mirrors and the delivery turns round the same way
+    kept = {}  # (direction, action) -> its rows: a view the pack mirrors, that the delivery turns round the same way
     for (direction, action), by_n in sorted(brought.items()):
         view = entity['directions'][direction]
         own = view['sourceDirection'] == direction
@@ -74,13 +76,9 @@ def main(key: str, delivery: Path, dry: bool) -> None:
         ids = view['actions'].get(action)
         if ids is None:
             sys.exit(f'{key} has no {direction}/{action} to replace')
-        if own and len(ids) > len(by_n):
+        if len(ids) > len(by_n):  # a mirrored view's frames are its source's: drawn on its own, it may not be shorter either
             sys.exit(f'{direction}/{action}: {len(by_n)} frames brought, {len(ids)} there')
-        if not own and view['mirror']:
-            twin = brought.get((view['sourceDirection'], action), {})
-            if sorted(twin) == sorted(by_n) and all(ImageOps.mirror(load(twin[n])).tobytes() == load(p).tobytes() for n, p in by_n.items()):
-                kept.add((direction, action))
-                continue
+        rows = []
         for n, path in sorted(by_n.items()):
             data = path.read_bytes()
             rgba = load(path)
@@ -91,8 +89,22 @@ def main(key: str, delivery: Path, dry: bool) -> None:
                 sys.exit(f'{path}: nothing painted')
             if abs(bounds[3] - idle['bounds'][3]) > GROUND:
                 problems.append(f'{path}: stands on row {bounds[3]}, the ground line is {idle["bounds"][3]}')
-            row = (ids[n] if own and n < len(ids) else None, direction, action, n, path, rgba, data, bounds)
+            rows.append((ids[n] if own and n < len(ids) else None, direction, action, n, path, rgba, data, bounds))
+        if not own and view['mirror']:
+            twin = brought.get((view['sourceDirection'], action), {})
+            if sorted(twin) == sorted(by_n) and all(ImageOps.mirror(load(twin[n])).tobytes() == load(p).tobytes() for n, p in by_n.items()):
+                kept[(direction, action)] = rows
+                continue
+        for row in rows:
             (replace if row[0] is not None else grown if own else fresh).append(row)
+    # A view the delivery draws on its own no longer mirrors, and a view is one or the other whole: what it kept turned round is
+    # given the delivery's own files for it (the same picture), and an action of it that the delivery leaves out is refused.
+    for direction in sorted({row[1] for row in fresh}):
+        for action in entity['directions'][direction]['actions']:
+            if (direction, action) in kept:
+                fresh.extend(kept.pop((direction, action)))
+            elif not any(row[1:3] == (direction, action) for row in fresh):
+                sys.exit(f'{direction}/{action}: the delivery draws {direction} on its own, which then no longer mirrors, and brings no {action} for it')
     missing = [f'{d}/{a}' for d, v in entity['directions'].items() for a in v['actions'] if (d, a) not in brought]
     if problems:
         sys.exit('\n'.join(problems))
@@ -101,9 +113,12 @@ def main(key: str, delivery: Path, dry: bool) -> None:
     if dry:
         return
 
-    def registered_as(direction: str) -> list:
-        """The source index's views that read `direction`'s frames: itself, and any that mirrors it (it lists their frames again)."""
-        return [v for v in original['directions'].values() if v['source_direction'] == direction]
+    def readers(views, source_key: str, direction: str, action: str) -> list:
+        """The views of an index that read `direction`'s frames of `action`: itself, and any that mirrors it (each lists them again)."""
+        return [v for v in views.values() if v[source_key] == direction and action in v['actions']]
+
+    def registered_as(direction: str, action: str) -> list:
+        return readers(original['directions'], 'source_direction', direction, action)
 
     page_info = index['pages'][page_no]
     with Image.open(PACK / page_info['file']) as opened:
@@ -114,7 +129,7 @@ def main(key: str, delivery: Path, dry: bool) -> None:
             sys.exit(f'frame {fid} is {f["source"]}, not {direction}/{action}_{n}')
         page.paste(rgba, (f['x'], f['y']))  # every channel, no mask
         f.update(sourceSha256=sha256(data), pixelSha256=sha256(rgba.tobytes()), bounds=list(bounds))
-        for view in registered_as(direction):
+        for view in registered_as(direction, action):
             view['actions'][action]['frames'][n]['sha256'] = sha256(data)
 
     shelf = fresh + grown
@@ -153,11 +168,11 @@ def main(key: str, delivery: Path, dry: bool) -> None:
                 'frames': [{'name': f'{action}_{n}', 'path': f'{prefix}/{direction}/{action}_{n}.png', 'sha256': sha256(d)} for _, n, d in items],
             }
         for fid, direction, action, n, data in placed[len(fresh):]:  # the extra frames of a scope: after its old ones, in order
-            ids = entity['directions'][direction]['actions'][action]
-            if n != len(ids):
-                sys.exit(f'{direction}/{action}: frame {n} comes after {len(ids)}')
-            ids.append(fid)
-            for view in registered_as(direction):  # its own, and each view that is it turned round
+            for view in readers(entity['directions'], 'sourceDirection', direction, action):  # its own, and each view that is it turned round
+                if n != len(view['actions'][action]):
+                    sys.exit(f'{direction}/{action}: frame {n} comes after {len(view["actions"][action])}')
+                view['actions'][action].append(fid)
+            for view in registered_as(direction, action):
                 registered = view['actions'][action]
                 registered['frames'].append({'name': f'{action}_{n}', 'path': f'{prefix}/{direction}/{action}_{n}.png', 'sha256': sha256(data)})
                 registered['frame_count'] = len(registered['frames'])
