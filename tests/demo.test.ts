@@ -7,8 +7,9 @@ import { GAME_PAGE } from '../src/data/links';
 import { REGIONS } from '../src/data/regions';
 import { dream, gateBeyondDemo, gatePlace, passGate, signBeyondDemo, signPlace, travel } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
-import { DEMO, demoAllows } from '../src/systems/demo';
+import { DEMO, demoAllows, demoEndShown } from '../src/systems/demo';
 import { createWorldGame, stepGame } from '../src/systems/game';
+import { applySave, parseSave, snapshot } from '../src/systems/save';
 import { worldLayout } from '../src/world/placements';
 import { regionAt, regionRect, TILE } from '../src/world/worldMap';
 import { borderRuns } from '../src/world/demoBorder';
@@ -112,15 +113,31 @@ describe('the demo (round 56): the university and Arkham, to the fall of Keziah 
     expect(borderRuns(new Set(REGIONS.map((r) => r.id)))).toEqual([]); // the full game has no border
   });
 
-  it('says its end once, when Keziah Mason has fallen, and keeps it in the save', () => {
+  it('says its end once, when Keziah Mason has fallen, and keeps it in the save only once its card has been shown (review of PR 142)', () => {
     const g = createWorldGame({ demo: true });
     const ended = record(g, 'DemoEnded');
     run(g, 5);
     expect(ended).toHaveLength(0);
     g.overworld!.slain.add(`boss:${DEMO.lastBoss}`);
     run(g, 5);
-    expect(ended).toHaveLength(1);
-    expect(g.overworld!.told.has(DEMO.told)).toBe(true);
+    run(g, 5);
+    expect(ended).toHaveLength(1); // once a session
+    expect(snapshot(g).told).not.toContain(DEMO.told); // said, not yet seen: the autosave of a page closed now must not call it told
+    const reload = (from: Game): Game => {
+      const next = createWorldGame({ demo: true });
+      applySave(next, parseSave(JSON.stringify(snapshot(from)))!);
+      return next;
+    };
+    const again = reload(g);
+    const sayings = record(again, 'DemoEnded');
+    run(again, 5);
+    expect(sayings).toHaveLength(1); // ...so the next launch says it again, and the card is not lost
+    demoEndShown(g); // the card is on the screen
+    expect(snapshot(g).told).toContain(DEMO.told);
+    const later = reload(g);
+    const none = record(later, 'DemoEnded');
+    run(later, 5);
+    expect(none).toHaveLength(0); // and now it is said no more
   });
 
   it('wakes a save from the full game, made beyond its realms, at the university', () => {

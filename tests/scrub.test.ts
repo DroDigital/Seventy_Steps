@@ -37,11 +37,27 @@ describe('a report pasted in public carries nothing that names the player (round
     expect(scrub('two: https://a.example/?k=1 and https://b.example/?k=2:3:4')).toBe('two: https://a.example/ and https://b.example/:3:4');
   });
 
+  it('takes a query whole where it holds brackets, quotes or apostrophes of its own, and ends one only at the mark that closed its address (review of PR 142)', () => {
+    // a bracket in a query value, which a URL may hold unescaped, was taken for the end of the address
+    expect(scrub('https://api.example/x?redirect=https://private.example/(user)?key=SECRET')).toBe('https://api.example/x');
+    expect(scrub('at g (https://x.example/a.js?r=https://p.example/(u)?k=SECRET:5:6)')).toBe('at g (https://x.example/a.js:5:6)'); // the frame's own bracket still closes it
+    expect(scrub('GET https://x.example/p?a=((b))&k=SECRET end')).toBe('GET https://x.example/p end');
+    expect(scrub('GET https://x.example/p?a=[1,2]&k=SECRET end')).toBe('GET https://x.example/p end');
+    // one that nothing opened runs to the space, whatever it holds: a lone bracket or an apostrophe is as likely a key's as an end
+    expect(scrub('see https://x.example/p?a=1)&k=SECRET now')).toBe('see https://x.example/p now');
+    expect(scrub("see https://x.example/p?name=O'Neil&k=SECRET now")).toBe('see https://x.example/p now');
+    expect(scrub('at h (https://x.example/a.js?a=(b&k=SECRET:1:2)')).not.toContain('SECRET'); // an unclosed one takes more, never less
+    // one in a quote or a bracket ends where that closes
+    expect(scrub('"url":"https://x.example/p?k=SECRET","next":1')).toBe('"url":"https://x.example/p","next":1');
+    expect(scrub("open 'https://x.example/p?k=SECRET' and 'https://y.example/q?k=SECRET'")).toBe("open 'https://x.example/p' and 'https://y.example/q'");
+    expect(scrub('<https://x.example/p?k=SECRET> and [https://y.example/q?k=SECRET]')).toBe('<https://x.example/p> and [https://y.example/q]');
+  });
+
   it('keeps what a fix is found by: file names, line numbers, versions, the game\'s own words', () => {
     const kept = [
       'TypeError: Cannot read properties of undefined (reading \'pos\') at stepGame (app://seventy-steps/assets/index-AbC12.js:1:23456)',
       'three@0.170.0 WebGL: INVALID_OPERATION: drawElements',
-      'Seventy Steps 1.0.0-rc.5 demo problem report: asked from the pause menu',
+      'Seventy Steps 1.0.0-rc.5 demo crash report: the dream broke',
       'at Miskatonic University (257.2, 3.0, 224.6) · lead: Speak with Wingate Peaslee, by the Elder Sign at Miskatonic Quad.',
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) seventy-steps/1.0.0-rc.5 Chrome/142.0.0.0 Electron/39.0.0 Safari/537.36',
       'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002503) Direct3D11 vs_5_0 ps_5_0, D3D11)',

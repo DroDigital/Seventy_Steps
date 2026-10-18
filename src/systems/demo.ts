@@ -1,7 +1,8 @@
 /**
  * The demo (round 56): the same game with its world kept to the university and Arkham (`DEMO.regions`), and its story to
  * the Witch House. When Keziah Mason falls, the stair under the Sleeper's Sign opens onto the full game, and the demo says
- * so once (DemoEnded: ui/demoEnd.ts). A walk over the edge of the two is held back at the step, as a boss's fog holds one
+ * so once (DemoEnded: ui/demoEnd.ts: its card marks the end told when it is on the screen, not before: a page closed in
+ * between says it again on the next launch). A walk over the edge of the two is held back at the step, as a boss's fog holds one
  * (fogGates.ts). A leap past it is refused where it begins (checkpoints.ts): a gate to a far realm, the stair, or a sign
  * found in a save from the full game. A save that wakes outside them wakes at the university's sign. Off in the full game
  * (`g.demo` unset). Pure: no Three.js.
@@ -17,7 +18,7 @@ export const DEMO = {
   regions: new Set(['hub', 'arkham']), // the university and Arkham with the Blasted Heath
   lastBoss: 'keziah_mason', // her fall ends the demo
   start: 'hub_quad', // where a save from beyond them wakes
-  told: 'demo:end', // kept in the save's `told`: the end is said once
+  told: 'demo:end', // kept in the save's `told` once the card has been shown: the end is said once
   walk: 3, // a step longer than this (metres) is a leap, not a walk
   noticeFrames: 240, // the refusal is said at most once in four seconds
 } as const;
@@ -43,6 +44,7 @@ export function demoRefuses(g: Game): boolean {
 
 const startRest = (): { x: number; z: number; yaw: number } => worldLayout().signs.find((s) => s.id === DEMO.start)!.rest;
 const lastIn = new WeakMap<Game, XZ>();
+const announced = new WeakSet<Game>(); // the games that have sent DemoEnded: once a session; the save's marker says the card was shown
 
 /** One step: the investigator kept within the demo's realms, and its end said once Keziah Mason has fallen. */
 export function demoSystem(g: Game): void {
@@ -62,8 +64,13 @@ export function demoSystem(g: Game): void {
     p.mount.speed = 0; // a rig reined in at the edge, not pressing on against it
     demoRefuses(g);
   }
-  if (ow.slain.has(`boss:${DEMO.lastBoss}`) && !ow.told.has(DEMO.told)) {
-    ow.told.add(DEMO.told);
-    g.events.emit('DemoEnded', {});
+  if (ow.slain.has(`boss:${DEMO.lastBoss}`) && !ow.told.has(DEMO.told) && !announced.has(g)) {
+    announced.add(g);
+    g.events.emit('DemoEnded', {}); // (not marked told here: the card may wait on a cutscene, and a page closed meanwhile has not shown it)
   }
+}
+
+/** The end's card is on the screen: only now is it told, in the save (ui/demoEnd.ts). */
+export function demoEndShown(g: Game): void {
+  g.overworld?.told.add(DEMO.told);
 }
