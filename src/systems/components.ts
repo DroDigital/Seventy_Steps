@@ -324,4 +324,6 @@ export interface Game {
   lit?: (at: V3) => number;
   /** The clock the sea's waves are drawn by, in seconds (handed in by the renderer: it runs on through a cutscene that stands the world still, which `frame` does not; the frames' own when absent: waterFall.ts meets the water where it is drawn). */
   seaTime?: () => number;
+  /** The free demo (round 56): the world kept to the university and Arkham, and its end said when Keziah Mason falls (systems/demo.ts). */
+  demo?: boolean;
 }

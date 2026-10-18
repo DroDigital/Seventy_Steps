@@ -44,6 +44,7 @@ export const EN = {
   'pause.journal': 'Journal',
   'pause.arms': 'Arms',
   'pause.achievements': 'Achievements',
+  'pause.report': 'Report a problem',
   'pause.quitTitle': 'Quit to title',
   'pause.quitDesktop': 'Quit to desktop',
   // settings
@@ -190,6 +191,20 @@ export const EN = {
   'crash.copyFail': 'Could not copy',
   'crash.logs': 'Open logs',
   'crash.quit': 'Quit',
+  // a problem reported (ui/reportPage.ts) and the demo (systems/demo.ts, ui/demoEnd.ts; round 56)
+  'report.title': 'REPORT A PROBLEM',
+  'report.line': "Something broken, stuck or strange? Copy this report and paste it in a comment on the game's itch.io page, with a line on what you were doing.",
+  'report.privacy': "It holds nothing personal: the game's version, your system and graphics, where you are in the dream, and the last errors.",
+  'report.copy': 'Copy the report',
+  'report.copied': 'Copied: paste it in a comment',
+  'report.open': "Open the game's page",
+  'demo.tag': 'DEMO',
+  'demo.closed': 'That way leads into the full game. The demo keeps to the university and Arkham.',
+  'demo.end.title': 'THE END OF THE DEMO',
+  'demo.end.line': "Keziah Mason is gone from the Witch House, and under the Sleeper's Sign the seventy steps of light slumber open. They lead into the full game: the Dreamlands, Dunwich, Innsmouth, R'lyeh and the horrors that wait there.",
+  'demo.end.save': 'Your progress is kept: the full game carries on from this save, on this computer.',
+  'demo.end.buy': 'Get the full game',
+  'demo.end.stay': 'Keep exploring',
   // the HUD
   'hud.parry': 'PARRY',
   'hud.riposte': 'RIPOSTE',

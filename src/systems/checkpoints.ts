@@ -27,6 +27,7 @@ import { setLock } from './lockOn';
 import { reopen } from './overworld';
 import { setSanity } from './sanity';
 import { dismissMount } from './mounts';
+import { demoAllows, demoRefuses } from './demo';
 
 export const signPlace = (id: string): SignPlace | undefined => worldLayout().signs.find((s) => s.id === id);
 export const gatePlace = (id: string): GatePlace | undefined => worldLayout().gates.find((g) => g.id === id);
@@ -112,6 +113,7 @@ export function travel(g: Game, id: string): boolean {
   const ow = g.overworld;
   const s = signPlace(id);
   if (!ow || !s || !ow.discovered.has(id)) return false;
+  if (!demoAllows(g, s.rest)) return !demoRefuses(g); // a sign beyond the demo (found in a save from the full game)
   teleport(g, s.rest);
   g.player.kneeling = { x: s.x, z: s.z }; // they arrive on one knee before the stone, as after a rest (round 29)
   ow.sign = id;
@@ -137,6 +139,7 @@ export const descentOpen = (g: Game): boolean => !!g.overworld?.slain.has('boss:
 export function dream(g: Game): boolean {
   const at = worldLayout().dream;
   if (!g.overworld || !at || !signPlace(g.overworld.sign)?.dream || !descentOpen(g)) return false;
+  if (!demoAllows(g, at)) return !demoRefuses(g); // the stair leads into the full game
   teleport(g, at);
   g.events.emit('Travelled', { via: 'dream', to: 'slumber', name: 'Stairs of Slumber' });
   return true;
@@ -155,6 +158,7 @@ export function passGate(g: Game, id: string): boolean {
     g.events.emit('Notice', { text: t('n.gateHeld') });
     return false;
   }
+  if (!demoAllows(g, twin.arrive)) return !demoRefuses(g); // a far realm, in the full game
   teleport(g, twin.arrive);
   g.events.emit('Travelled', { via: 'gate', to: twin.id, name: twin.name });
   return true;

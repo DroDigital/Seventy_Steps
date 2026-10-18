@@ -110,3 +110,17 @@ because a Steam build started outside Steam would relaunch itself through it.
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
 
+## The demo (round 56)
+
+The demo is the same game packed with `edition` set to `demo` in its package.json: the university and Arkham only, ending when Keziah Mason
+falls (`src/systems/demo.ts`; in a browser, `?demo`). Its title says DEMO under the name, and its end offers the game's page. Saves carry
+over to the full game (the same save folder).
+
+- **From CI:** Actions › Release builds › Run workflow, tick *itch* and *demo*. Each platform is packed as the demo for itch.io, started
+  (`--edition demo` must show in its report) and pushed to the channels `windows-demo`, `osx-demo` and `linux-demo` of the same project,
+  beside the full game's. Run it once more without *demo* for the full game: the two are separate runs.
+- **From a machine:** add `-c.extraMetadata.edition=demo` to the `package:win` / `package:linux` line (the Mac: `--edition demo`), then
+  `npm run itch:push` as above: it sees the edition and names the `-demo` channels.
+- **On the page (only you can):** in the project's editor, under Uploads, tick *This file is a demo* on each `-demo` upload, so itch.io
+  shows a "Download demo" button beside the purchase. Not checked: no demo has been pushed.
+

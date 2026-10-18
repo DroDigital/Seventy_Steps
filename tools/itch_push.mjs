@@ -10,6 +10,8 @@
 // Every pack is checked to have been made for itch.io (`channel` "itch" in its package.json: desktop/steam.js): a Steam build, started
 // outside Steam, would relaunch itself through Steam. Pack with `npm run package:win|linux -- -c.extraMetadata.channel=itch`
 // or `npm run package:mac -- --universal --channel itch`.
+// The demo (round 56: packed with `-c.extraMetadata.edition=demo`, or `--edition demo` on the Mac) goes to channels of its own,
+// windows-demo, osx-demo and linux-demo, beside the full game's on the same page: mark its uploads "demo" in the page's editor.
 import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -60,11 +62,13 @@ for (const p of todo) {
     console.log(`${p.os}: not packed, left out`);
     continue;
   }
-  const channel = p.pack(dir).channel;
+  const packed = p.pack(dir);
+  const channel = packed.channel;
   if (channel !== 'itch') fail(`${p.os}: ${dir} was packed for ${channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
   writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n`);
-  plan.push({ ...p, dir });
-  console.log(`${p.os}: ${dir} → ${target}:${p.name} (version ${version})`);
+  const name = packed.edition === 'demo' ? `${p.name}-demo` : p.name; // the demo's own channel, never the full game's
+  plan.push({ ...p, dir, name });
+  console.log(`${p.os}: ${dir} → ${target}:${name} (version ${version})`);
 }
 if (!plan.length) fail('Nothing is packed for itch.io.');
 

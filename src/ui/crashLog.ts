@@ -5,6 +5,7 @@
  * promise nobody caught) are kept too, and a crash report names them: they are often the first sign of what broke.
  */
 
+import { EDITION } from '../data/edition';
 import { desktop } from './desktop';
 
 const KEEP = 60;
@@ -39,8 +40,8 @@ export function installCrashLog(): void {
   addEventListener('unhandledrejection', (e) => note('rejected', e.reason));
 }
 
-/** What a bug report needs: when, what ran it, how it was set, and the record. */
-export function crashReport(kind: string, detail?: string): string {
+/** What a bug report needs: when, what ran it, how it was set, and the record. `what`: a crash's, or one the player asked for (ui/reportPage.ts). */
+export function crashReport(kind: string, detail?: string, what = 'crash report'): string {
   const gl = (() => {
     try {
       const c = document.createElement('canvas').getContext('webgl2');
@@ -51,7 +52,7 @@ export function crashReport(kind: string, detail?: string): string {
     }
   })();
   return [
-    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'} crash report: ${kind}`,
+    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} ${what}: ${kind}`,
     new Date().toISOString(),
     `${navigator.userAgent}${desktop ? ' (desktop shell)' : ''}`,
     `graphics: ${gl} · screen ${screen.width}x${screen.height} @${window.devicePixelRatio}x · window ${innerWidth}x${innerHeight}`,

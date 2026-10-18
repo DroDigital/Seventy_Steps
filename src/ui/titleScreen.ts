@@ -18,6 +18,7 @@ import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { button, createScreen, el, heading, LIFT_ROOM, type Page } from './menuKit';
 import { wordmark } from './logo';
+import { EDITION } from '../data/edition';
 import { settingsPage } from './menuPages';
 import type { SettingId, Settings } from './settings';
 
@@ -44,6 +45,7 @@ export function showTitle(o: TitleOptions): void {
   const headLayer = el(head, 'div', '', SCALED_LAYER);
   const headBox = el(headLayer, 'div', '', 'position:absolute;left:0;right:0;top:29%;transform:translateY(-50%);text-align:center');
   headBox.append(logo.canvas);
+  if (EDITION === 'demo') el(headBox, 'div', t('demo.tag'), `margin-top:6px;padding-left:9px;font-size:13px;letter-spacing:9px;color:${BONE}99`); // under the name, the demo says it is one (round 56)
   document.body.append(head);
   /** The name stands midway between the top of the screen and the top of the menu, whatever lines the menu has (a saved game adds Continue and Load): clear of it, and centred in the room above it; in a window too small for both at their size it is drawn smaller to fit (round 49). */
   let settled = false;

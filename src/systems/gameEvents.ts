@@ -76,6 +76,7 @@ export interface GameEvents {
   Notice: { text: string }; // a short line mid-screen
   Overheard: { name: string; text: string }; // someone near says a line to themselves (overheard.ts; round 34)
   Ending: { id: string }; // one of the three endings (endings.ts)
+  DemoEnded: Record<string, never>; // the demo's last horror has fallen: its end is said, once a save (systems/demo.ts; round 56)
   Healed: { entity: Entity; amount: number }; // a shot of West's Reagent
   Erupted: { at: V3; radius: number; by: Entity }; // a marked spot bursts
   Quaked: { at: V3; by: Entity }; // a ring goes racing out

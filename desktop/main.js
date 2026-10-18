@@ -23,12 +23,13 @@ import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
-import { channel, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
+import { channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
 const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the title, reports, quits: a packed build's own check
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
+const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
 if (SMOKE) {
@@ -81,6 +82,7 @@ ipcMain.handle('desktop:open-logs', async () => {
   mkdirSync(logsDir(), { recursive: true });
   await shell.openPath(logsDir());
 });
+ipcMain.handle('desktop:open-page', () => shell.openExternal(GAME_PAGE)); // round 56: the game's page, in the player's browser (no address from the page is opened)
 
 const windowFile = () => join(app.getPath('userData'), 'window.json');
 
@@ -116,7 +118,7 @@ function open() {
       nodeIntegration: false,
       devTools: DEV || process.argv.includes('--devtools'), // a release has none to open (Ctrl+Shift+I, the View menu); `--devtools` is for a tester who is asked for one
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
-      additionalArguments: process.env.SteamDeck === '1' ? ['--steam-deck'] : [], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text
+      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56)
     },
   });
   win.once('ready-to-show', () => {
@@ -246,7 +248,7 @@ function smoke(win) {
     } catch {
       // the page is still loading
     }
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > 150;
     if (!settled && !late) return;

@@ -15,6 +15,7 @@ import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
 import { CLOCK, DUNGEON_LIGHT, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
+import { EDITION } from './data/edition';
 import { createActorViews } from './render/actorViews';
 import { createGameAudio } from './render/audio/gameAudio';
 import { playMenuMusic } from './render/audio/music';
@@ -63,6 +64,7 @@ import { HINTS, panelOptions, playerStats, spawnHint, worldStats } from './ui/de
 import { createCinemaUi } from './ui/cinemaUi';
 import { createDebugPanel } from './ui/debugPanel';
 import { createEndingCard, NEW_GAME_FLAG } from './ui/endingCard';
+import { createDemoEnd } from './ui/demoEnd';
 import { createHud } from './ui/hud';
 import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
@@ -74,6 +76,7 @@ import { createMapScreen } from './ui/mapScreen';
 import { noteLockAsked } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
+import { reportPage } from './ui/reportPage';
 import { createDialogue } from './ui/dialogue';
 import { showIntro, type Intro } from './ui/intro';
 import { journalPage } from './ui/journal';
@@ -125,7 +128,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const store = opts.arena ? null : shell.store;
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
-  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty });
+  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
   void refreshMountEntitlement(game);
   addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
@@ -167,6 +170,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     journal: opts.arena ? undefined : (back, show) => journalPage(game, back, show),
     arms: (back, show) => armsPage(game, back, show),
     achievements: opts.arena ? undefined : (back) => achievementsPage(store, back),
+    report: (back) => reportPage(game, settings, back),
     quit: () => void veil.cover('', 0.8).then(() => (location.href = location.pathname)),
     held: () => building || cinema.active || journeys.busy, // check building first: cinema is not made yet while the sprites load; leaving during loading or a cutscene must not pause
   });
@@ -187,6 +191,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
   const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
+  const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
@@ -249,7 +254,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         if (!through || labHold.on) return; // the world stands still
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
-        stepGame(game, menu?.open || shop.open || rise?.open || ending.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
+        stepGame(game, menu?.open || shop.open || rise?.open || ending.open || demoEnd?.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
       },
       render(blend) {
         const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still || labHold.on;

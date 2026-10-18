@@ -2,7 +2,7 @@
  * The pause menu (Phase 6): Esc, the pad's Start, or leaving the game (switching away)
  * opens it whenever no other menu is open. The world stands still while it is open (main.ts). It
  * offers Resume, the Map, the Journal, Arms, Settings (with the Controls) and a return to the title screen, and in
- * the desktop shell a way out to the desktop (playtest round 12).
+ * the desktop shell a way out to the desktop (playtest round 12). Round 56: Report a problem (ui/reportPage.ts).
  */
 
 import { t } from '../core/i18n';
@@ -24,6 +24,7 @@ export interface PauseOptions {
   journal?: (back: () => void, show: (p: Page) => void) => Page; // the journal's page (not in the arena)
   arms?: (back: () => void, show: (p: Page) => void) => Page; // the weapons owned
   achievements?: (back: () => void) => Page; // the achievements, earned or not (round 12)
+  report?: (back: () => void) => Page; // a report of a problem, to copy to the game's page (round 56: ui/reportPage.ts)
   quit(): void;
   held?: () => boolean; // something has the screen (a cutscene, round 20): the pause menu keeps out of it
 }
@@ -72,6 +73,7 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
       gap();
       button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)));
       button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))));
+      if (o.report) button(list, t('pause.report'), () => screen.show(o.report!(() => screen.show(main))));
       gap();
       button(list, t('pause.quitTitle'), o.quit).classList.add('exit'); // the ways out are dimmer, and light ash-red when chosen
       if (desktop) button(list, t('pause.quitDesktop'), () => (saveNow(), void desktop!.quit())).classList.add('exit'); // the shell only: a browser tab is closed by its own hand
