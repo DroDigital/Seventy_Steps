@@ -1,7 +1,8 @@
 /**
  * The demo's end (round 56): when Keziah Mason has fallen (systems/demo.ts: DemoEnded), and her fall's cutscene and any menu
  * are done, a card says that the stair under the Sleeper's Sign leads into the full game, that the save carries over, and
- * offers the game's page or the rest of Arkham. The world stands still while it is open (main.ts).
+ * offers the game's page or the rest of Arkham. The world stands still while it is open, as under the pause menu: nothing
+ * steps, so nothing left in the arena can hurt the investigator behind it, and the play time does not run (main.ts).
  */
 
 import { t } from '../core/i18n';

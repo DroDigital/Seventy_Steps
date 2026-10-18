@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { t } from '../src/core/i18n';
+import { DEMO_KEY, editionOf } from '../src/data/edition';
 import { GAME_PAGE } from '../src/data/links';
 import { REGIONS } from '../src/data/regions';
 import { dream, gatePlace, passGate, signPlace, travel } from '../src/systems/checkpoints';
@@ -112,6 +113,19 @@ describe('the demo (round 56): the university and Arkham, to the fall of Keziah 
     expect(signPlace(DEMO.start)).toBeDefined();
     const bosses = REGIONS.filter((r) => DEMO.regions.has(r.id)).flatMap((r) => r.bosses);
     expect(bosses).toContain(DEMO.lastBoss);
+  });
+
+  it('in a browser, stays the demo through the game\'s own reloads, which drop the address\'s ?demo (review of PR 142)', () => {
+    const kept = new Map<string, string>();
+    const tab = { getItem: (k: string) => kept.get(k) ?? null, setItem: (k: string, v: string) => void kept.set(k, v) };
+    expect(editionOf(undefined, '', tab)).toBe('full'); // a tab never asked
+    expect(editionOf(undefined, '?demo&fresh', tab)).toBe('demo');
+    expect(kept.get(DEMO_KEY)).toBe('1');
+    expect(editionOf(undefined, '', tab)).toBe('demo'); // back at the title (location.pathname), the same tab
+    expect(editionOf(undefined, '', null)).toBe('full'); // another tab
+    const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+    expect([editionOf(undefined, '?demo', blocked), editionOf(undefined, '', blocked)]).toEqual(['demo', 'full']); // storage refused: the address alone
+    expect([editionOf('demo', '', null), editionOf('full', '', null)]).toEqual(['demo', 'full']); // the shell's pack says
   });
 
   it('is packed as one (desktop/steam.js), and opens only the game\'s page, which the shell names too', () => {

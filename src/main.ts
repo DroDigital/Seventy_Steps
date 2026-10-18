@@ -250,14 +250,14 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         wasPaused = pause.open;
         if (menu?.open || shop.open || dialogue.open || pause.open || map.open) heldAt = performance.now();
         else if (performance.now() - heldAt < INTERACT_GRACE_MS) frame.pressed.interact = false; // E mashed through a talk does not rest at the sign behind it (round 17)
-        const through = pause.open || map.open || dialogue.reading || intro?.open ? null : journeys.before(frame);
+        const through = pause.open || map.open || dialogue.reading || intro?.open || demoEnd?.open ? null : journeys.before(frame); // (the demo's end card holds the world still, as the pause does)
         if (!through || labHold.on) return; // the world stands still
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
-        stepGame(game, menu?.open || shop.open || rise?.open || ending.open || demoEnd?.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
+        stepGame(game, menu?.open || shop.open || rise?.open || ending.open || dialogue.talking || cinema.active ? emptyInput() : through); // talking, the world goes on while the investigator listens
       },
       render(blend) {
-        const still = pause.open || map.open || dialogue.reading || !!intro?.open || journeys.still || labHold.on;
+        const still = pause.open || map.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         extras.tick();
