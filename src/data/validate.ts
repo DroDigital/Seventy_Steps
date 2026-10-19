@@ -43,6 +43,8 @@ function checkLook(report: Report, d: EntityDef): void {
     num(report, 'sprite.tentacles', s.tentacles, 0, 16, true);
     num(report, 'sprite.wings', s.wings, 0, 4, true);
     num(report, 'sprite.limbs', s.limbs, 0, 12, true);
+    num(report, 'sprite.body height', s.body?.[0], 0.2, 1);
+    num(report, 'sprite.body radius', s.body?.[1], 0.05, 0.5);
   }
   const a = d.assembly;
   if (a) {

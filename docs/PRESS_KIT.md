@@ -12,7 +12,7 @@
 | Developer | Digital Dro Studios (Alessandro A. Foddis) |
 | Genre | Open-world action RPG, soulslike, horror |
 | Platforms | PC: the desktop game for Windows, macOS (Apple Silicon and Intel) and Linux, for Steam (docs/RELEASE.md); runs in a browser too |
-| Version | 1.0.0-rc.4 (a release candidate: `CHANGELOG.md`) |
+| Version | 1.0.0-rc.5 (a release candidate: `CHANGELOG.md`) |
 | Players | Single player |
 | Controls | Keyboard and mouse, or a pad (rebindable; the prompts follow the device in hand) |
 | Interface languages | English, German, French, Spanish (voices and story: English) |

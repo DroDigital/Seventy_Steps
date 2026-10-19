@@ -9,7 +9,7 @@
  */
 
 import { PAD_BUTTON } from '../core/padMap';
-import { travel, travelBar } from '../systems/checkpoints';
+import { signBeyondDemo, travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
 import { exploredShare } from '../systems/exploration';
@@ -61,6 +61,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   const padWas = new Set<number>();
   let lit: MapPlace[] = []; // the realm's lit signs, nearest first (the world stands still while the map is open)
   let chosen: MapPlace | null = null;
+  /** Why no journey may be made to `p` now, or null: the state of things (travelBar), or, in the demo, a sign beyond its realms. */
+  const barOf = (p: MapPlace): keyof typeof BAR_WORDS | null => travelBar(g) ?? (signBeyondDemo(g, p.id) ? 'demo' : null);
   let hover: MapPlace | null = null;
 
   const realm = () => {
@@ -90,7 +92,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     painter.paint(ctx, view, realm(), true);
     drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), false);
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now);
-    if (chosen) drawRing(ctx, view, chosen, true, !!travelBar(g), now);
+    if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now);
     requestAnimationFrame(frame);
   };
 
@@ -101,7 +103,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   };
   const choose = (p: MapPlace | null): void => {
     chosen = p;
-    const bar = p ? travelBar(g) : null;
+    const bar = p ? barOf(p) : null;
     if (!prompt) return;
     const again = deviceInUse() === 'pad' ? 'PRESS A' : 'CLICK AGAIN OR ENTER';
     prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${BAR_WORDS[bar]}` : `TRAVEL TO ${p.name.toUpperCase()}  ·  ${again}`;
@@ -109,7 +111,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   };
   const journey = (): void => {
     const p = chosen;
-    if (!p || travelBar(g)) return;
+    if (!p || barOf(p)) return; // (refused before the map closes and any veil falls)
     close();
     go(p.name.toUpperCase(), () => travel(g, p.id));
   };

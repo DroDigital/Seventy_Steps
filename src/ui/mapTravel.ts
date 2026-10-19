@@ -17,6 +17,7 @@ export const BAR_WORDS = {
   boss: 'NO JOURNEY WHILE THE FIGHT IS ON',
   foes: 'FOES HUNT YOU  ·  NO JOURNEY NOW',
   fallen: 'NO JOURNEY NOW',
+  demo: 'IN THE FULL GAME', // a sign beyond the demo's realms, found in a save from the full game (round 56)
 } as const;
 
 /** The lit Elder Signs of the realm, nearest `from` first. */

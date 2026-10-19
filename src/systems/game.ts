@@ -30,6 +30,7 @@ import { createStores, type Game, type GameEvents } from './components';
 import { dreadOf, resolveCreature, spawnCreature } from './creatures';
 import { deathSystem, registerDeath } from './death';
 import { fallSystem } from './falls';
+import { demoSystem } from './demo';
 import { fightActionSystem } from './fightActions';
 import { hallucinationSystem, registerHallucinations } from './hallucinations';
 import { hazardSystem } from './hazards';
@@ -119,8 +120,9 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
 }
 
 /** The open world (spec §3D): a new investigator wakes at the Miskatonic Quad; a save puts them back where they were. */
-export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty }: { seed?: number; save?: SaveData; carry?: Carry; difficulty?: DifficultyId } = {}): Game {
+export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty, demo }: { seed?: number; save?: SaveData; carry?: Carry; difficulty?: DifficultyId; demo?: boolean } = {}): Game {
   const g = baseGame(createWorldCollision(), signPlace(START_SIGN)!.rest, seed);
+  if (demo) g.demo = true; // the free demo (systems/demo.ts)
   if (difficulty) g.player.difficulty = difficulty; // a new dream's, chosen at the title (a save or a carry brings its own, which replaces it)
   g.overworld = createOverworld(START_SIGN);
   registerOverworld(g);
@@ -217,6 +219,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   movementSystem(g, dt);
   fallSystem(g);
   fogBlockSystem(g);
+  demoSystem(g); // the demo's realms kept (round 56)
   meleeSystem(g);
   shotSystem(g);
   specialSystem(g);

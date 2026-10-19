@@ -4,7 +4,8 @@ name: Release builds
 # docs/STEAM.md), and started once (`--smoke-test`: it must reach its title, find the Steam binding and start the controllers' worker).
 # Runs when the shell or the packaging changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
 # By hand with "itch" ticked it packs for itch.io instead (Steam off in the build) and pushes each platform with butler: it needs the
-# BUTLER_API_KEY secret (without it, only what would be sent is shown). A Mac signed with a Developer ID, and notarised, needs the
+# BUTLER_API_KEY secret (without it, only what would be sent is shown); with "demo" ticked too it packs the demo and pushes it to the
+# windows-demo, osx-demo and linux-demo channels (round 56: tools/itch_push.mjs). A Mac signed with a Developer ID, and notarised, needs the
 # MAC_CERT_P12_BASE64, MAC_CERT_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID secrets (docs/RELEASE.md); without them the Mac is signed ad hoc.
 
 on:
@@ -33,6 +34,10 @@ on:
       itch_version:
         description: "The version itch.io shows for these builds, e.g. 1.0.0-rc.2 (empty: package.json's)"
         default: ''
+      demo:
+        description: 'Pack the demo (the university and Arkham only); with itch, push it to the -demo channels'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -52,10 +57,10 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run package:win -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+      - run: npm run package:win -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }} ${{ inputs.demo && '-c.extraMetadata.edition=demo' || '' }}
         shell: bash
       - name: Starts, and reaches its title
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }}
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
       - name: The executable wears the Elder Sign (its icon, 32 px, is printed as base64 for the log)
         shell: pwsh
         run: |
@@ -122,9 +127,9 @@ jobs:
           IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep 'Developer ID Application' | head -1 | sed -E 's/.*"(.*)"/\1/')"
           [ -n "$IDENTITY" ] || { echo "::error::that certificate holds no Developer ID Application identity"; exit 1; }
           echo "MAC_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
-      - run: npm run package:mac -- ${{ inputs.itch && '--channel itch' || '' }}
+      - run: npm run package:mac -- ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
       - name: Starts, and reaches its title (Apple Silicon)
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: Starts under Rosetta (Intel)
         run: |
           arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
@@ -137,7 +142,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: node tools/package_mac.mjs --universal --no-build
       - name: Universal app starts
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: The Mac apps wear the Elder Sign (each icon, 48 px, is printed as base64 for the log)
         run: |
           for d in mac-arm64 mac mac-universal; do
@@ -195,11 +200,11 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run package:linux -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+      - run: npm run package:linux -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }} ${{ inputs.demo && '-c.extraMetadata.edition=demo' || '' }}
       - name: Starts, and reaches its title
         env:
           SMOKE_SOFTWARE_GL: '1' # no GPU here
-        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }}
+        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
       - name: Pack the depot (tar keeps the executable bit)
         run: tar -czf seventy-steps-linux.tar.gz -C release linux-unpacked
       - uses: actions/upload-artifact@v4

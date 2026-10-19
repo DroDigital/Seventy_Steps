@@ -62,7 +62,7 @@ machine of each platform; the second half is what only the author can do, becaus
    Mac (or the Rosetta start), a controller on each, Steam's overlay (Shift+Tab), fullscreen (F11, Alt+Enter), alt-tab and back,
    a save, quitting and continuing, and Steam Cloud between two machines. CI proves a packed build starts and reaches its title on
    a runner with no controller and no Steam; it has not played the game.
-5. **The version**: `package.json`'s (`1.0.0-rc.4`; raise it before each build that goes out, `-rc.5`, `-rc.6`…, with its `CHANGELOG.md` heading) is what itch.io shows for a build, and it goes into the macOS bundle, where Apple wants digits only: set `1.0.0`
+5. **The version**: `package.json`'s (`1.0.0-rc.5`; raise it before each build that goes out, `-rc.6`, `-rc.7`…, with its `CHANGELOG.md` heading) is what itch.io shows for a build, and it goes into the macOS bundle, where Apple wants digits only: set `1.0.0`
    when it is released. A push to itch.io takes another label if asked: the workflow's *itch_version* input, or `ITCH_VERSION` / `--version` for `tools/itch_push.mjs`. Steam's build ids are its own.
 
 ## Sending a build
@@ -109,4 +109,18 @@ because a Steam build started outside Steam would relaunch itself through it.
   shipped file carries. There is no .dmg: the Mac build is the `.app` (itch's app runs it; a browser download gets it zipped).
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
+
+## The demo (round 56)
+
+The demo is the same game packed with `edition` set to `demo` in its package.json: the university and Arkham only, ending when Keziah Mason
+falls (`src/systems/demo.ts`; in a browser, `?demo`). Its title says DEMO under the name, and its end offers the game's page. Saves carry
+over to the full game (the same save folder).
+
+- **From CI:** Actions › Release builds › Run workflow, tick *itch* and *demo*. Each platform is packed as the demo for itch.io, started
+  (`--edition demo` must show in its report) and pushed to the channels `windows-demo`, `osx-demo` and `linux-demo` of the same project,
+  beside the full game's. Run it once more without *demo* for the full game: the two are separate runs.
+- **From a machine:** add `-c.extraMetadata.edition=demo` to the `package:win` / `package:linux` line (the Mac: `--edition demo`), then
+  `npm run itch:push` as above: it sees the edition and names the `-demo` channels.
+- **On the page (only you can):** in the project's editor, under Uploads, tick *This file is a demo* on each `-demo` upload, so itch.io
+  shows a "Download demo" button beside the purchase. Not checked: no demo has been pushed.
 

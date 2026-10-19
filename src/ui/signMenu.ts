@@ -15,7 +15,7 @@ import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, typ
 import { WEAPONS } from '../data/weapons';
 import { canReinforce, edgeAt, reinforce, reinforceCost } from '../systems/arms';
 import { ENDINGS } from '../data/endings';
-import { descentOpen, dream, signPlace, travel } from '../systems/checkpoints';
+import { descentOpen, dream, signBeyondDemo, signPlace, travel } from '../systems/checkpoints';
 import { courtEndings, endGame } from '../systems/endings';
 import { canUpgradeGun, gunCost, gunEdge, upgradeGun } from '../systems/gun';
 import type { Game } from '../systems/components';
@@ -52,11 +52,11 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   screen.onClose = () => void (g.player.kneeling = null); // rested at the stone, they rise when the menu is left, not when they next move (round 29)
   const close = (): void => screen.close();
   const journey = (s: SignPlace): void => (close(), go(s.name.toUpperCase(), () => travel(g, s.id)));
-  /** The signs found, but the one rested at, by region in the world's order. */
+  /** The signs found, but the one rested at (and, in the demo, any beyond its realms, from a full game's save), by region in the world's order. */
   const found = (): Map<string, SignPlace[]> => {
     const ow = g.overworld!;
     const regions = new Map<string, SignPlace[]>();
-    for (const s of worldLayout().signs) if (ow.discovered.has(s.id) && s.id !== ow.sign) regions.set(s.region, [...(regions.get(s.region) ?? []), s]);
+    for (const s of worldLayout().signs) if (ow.discovered.has(s.id) && s.id !== ow.sign && !signBeyondDemo(g, s.id)) regions.set(s.region, [...(regions.get(s.region) ?? []), s]);
     return regions;
   };
   const regionName = (id: string): string => getRegion(id)?.name ?? id;
@@ -162,7 +162,8 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     if (here?.dream) {
       const box = pinned(panel);
       heading(box, 'THE SLEEPER’S SIGN').style.marginTop = '0';
-      if (descentOpen(g)) button(box, 'Descend the Seventy Steps of Light Slumber', () => (close(), go('THE SEVENTY STEPS OF LIGHT SLUMBER', () => dream(g), DESCENT_LINE)));
+      if (descentOpen(g) && g.demo) el(box, 'div', t('demo.closed'), 'opacity:.6;margin:4px 0 8px;font-size:13px'); // the stair leads out of the demo (round 56)
+      else if (descentOpen(g)) button(box, 'Descend the Seventy Steps of Light Slumber', () => (close(), go('THE SEVENTY STEPS OF LIGHT SLUMBER', () => dream(g), DESCENT_LINE)));
       else el(box, 'div', 'The stair will not open while Keziah Mason troubles the sleepers, in the Witch House in Arkham.', 'opacity:.6;margin:4px 0 8px;font-size:13px');
     }
     tabs(panel, TABS, tab, (i) => ((tab = i), main.redraw?.()), main);

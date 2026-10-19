@@ -3,7 +3,12 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased: the sea, and the endings
+## Unreleased: a demo
+
+- **A free demo.** The same game, kept to Miskatonic University and Arkham with the Blasted Heath (six Elder Signs, the Witch House and the horrors of those two realms), ending when Keziah Mason falls: a card says that the stair under the Sleeper's Sign leads into the full game and that your save carries over. A bank of grey mist stands along the edge of the two realms, which holds you at the step and says why; the gates to far realms, the stair, and a sign found beyond them are refused where they begin. The title says DEMO under the name.
+- **Nyarlathotep's true form is struck where it is drawn.** In the last phase of its fight the Crawling Chaos kept the body of the grey heap it replaced, a ball twice as broad as the tall figure now drawn: blows landed on air a metre short of its legs, and you were held off as by a wall. It is now as wide as its legs' stance and upper arms, so you can close in to its legs, and a blow that falls short of them misses.
+
+## 1.0.0-rc.5: the sea, the endings and a new Nyarlathotep
 
 - **An ending is told once.** After any ending, resting at the Court's Elder Sign offered both of the Court's endings again, and a second choice replayed the scene and the card, overwrote the first ending and counted the dream as finished twice. The Court offers nothing once the dream has ended, and a second ending is not told.
 - **Walking on after the Gate is walking on.** After passing through the Gate with 'Umr at-Tawil, the card said "walk on", but the fog of the Guide's fight still held you in its ring until you struck it down. The Guide takes no more part once you have gone through with it: it hunts no more, the fight and its fog are let go of at once, and a save keeps it so.

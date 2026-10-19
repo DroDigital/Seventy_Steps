@@ -54,6 +54,11 @@ export function channel(pkg = readPkg()) {
   return pkg?.channel === 'itch' ? 'itch' : 'steam';
 }
 
+/** "demo" when packed as the demo (`-c.extraMetadata.edition=demo`, round 56: Arkham and the Quad only), else "full". */
+export function edition(pkg = readPkg()) {
+  return pkg?.edition === 'demo' ? 'demo' : 'full';
+}
+
 let lib = null;
 let client = null;
 

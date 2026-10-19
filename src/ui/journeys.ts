@@ -12,7 +12,8 @@
 import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
 import { WORLD } from '../data/tuning';
-import { gateBarred, gatePlace, interactable, passGate, signPlace } from '../systems/checkpoints';
+import { gateBarred, gateBeyondDemo, gatePlace, interactable, passGate, signPlace } from '../systems/checkpoints';
+import { demoRefuses } from '../systems/demo';
 import type { Game } from '../systems/components';
 import { deathLine } from '../systems/deathNotes';
 import { regionAt } from '../world/worldMap';
@@ -90,6 +91,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
       if (t?.kind === 'gate') {
         frame.pressed.interact = false;
         if (gateBarred(g)) passGate(g, t.id); // refused: it says why, and no veil falls
+        else if (gateBeyondDemo(g, t.id)) demoRefuses(g); // the demo's edge: said at once, before any veil (review of PR 142)
         else self.go((gatePlace(gatePlace(t.id)?.to ?? '')?.name ?? '').toUpperCase(), () => passGate(g, t.id));
       }
       return frame;

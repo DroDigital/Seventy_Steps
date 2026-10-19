@@ -1,6 +1,6 @@
 // Starts a packed build with --smoke-test and fails unless it reaches its title (desktop/main.js: `smoke`).
-// usage: node tools/smoke_packaged.mjs [--app <path to the executable>] [--require steam,pads] [--arch x86_64] [--timeout seconds] [--verbose] [--channel itch]
-// --channel: the store the build must say it was packed for ("itch" or "steam"), or the check fails.
+// usage: node tools/smoke_packaged.mjs [--app <path to the executable>] [--require steam,pads] [--arch x86_64] [--timeout seconds] [--verbose] [--channel itch] [--edition demo]
+// --channel: the store the build must say it was packed for ("itch" or "steam"), or the check fails. --edition: "demo" or "full", the same way (round 56).
 // --verbose: Chromium's own log on stderr, and on macOS what a start that never answers was doing (`sample`) when it was ended.
 // On a machine with no GPU (CI on Linux) set SMOKE_SOFTWARE_GL=1; under Linux's CI the Chromium sandbox is off (--no-sandbox).
 import { spawn, spawnSync } from 'node:child_process';
@@ -29,11 +29,13 @@ const limit = Number(flag('--timeout') ?? 240);
 const child = spawn(arch ? 'arch' : exe, arch ? [`-${arch}`, exe, ...shell] : shell, { env: { ...process.env, SMOKE_REQUIRE: need, ...(verbose ? { ELECTRON_ENABLE_LOGGING: '1' } : {}) }, stdio: ['ignore', 'pipe', 'pipe'] });
 let ok = false;
 let said = ''; // the channel the build reports
+let edition = ''; // and its edition
 for (const [stream, out] of [[child.stdout, process.stdout], [child.stderr, process.stderr]]) {
   stream.on('data', (d) => {
     const text = String(d);
     if (text.includes('SMOKE OK')) ok = true;
     said = text.match(/"channel":"(\w+)"/)?.[1] ?? said;
+    edition = text.match(/"edition":"(\w+)"/)?.[1] ?? edition;
     out.write(text);
   });
 }
@@ -46,5 +48,7 @@ child.on('exit', (code) => {
   clearTimeout(timer);
   const channelOk = !flag('--channel') || said === flag('--channel');
   if (!channelOk) console.error(`SMOKE FAIL: the build says channel "${said}", not "${flag('--channel')}"`);
-  process.exit(ok && code === 0 && channelOk ? 0 : 1);
+  const editionOk = !flag('--edition') || edition === flag('--edition');
+  if (!editionOk) console.error(`SMOKE FAIL: the build says edition "${edition}", not "${flag('--edition')}"`);
+  process.exit(ok && code === 0 && channelOk && editionOk ? 0 : 1);
 });

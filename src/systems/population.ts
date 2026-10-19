@@ -4,7 +4,7 @@
  * budget), unless it was killed since the last rest or, for a boss, slain for good. A creature that
  * strays beyond the 7 × 7 is let go, remembering its wounds for when it stands again (only resting
  * or dying makes a foe whole), and the dead are cleared away after their death throes. Also announces each region the
- * investigator enters. Pure: no Three.js.
+ * investigator enters. In the demo, a spawn point beyond its realms' border is never filled (systems/demo.ts). Pure: no Three.js.
  */
 
 import { getEntity } from '../data/registry';
@@ -15,6 +15,7 @@ import { chunkKey, chunkOf, regionAt } from '../world/worldMap';
 import { setArena } from './bossFight';
 import type { Game } from './components';
 import { spawnCreature } from './creatures';
+import { demoAllows } from './demo';
 import { voice } from './npcs';
 import { bossAwake } from './sealCount';
 
@@ -52,6 +53,7 @@ export function populationSystem(g: Game): void {
     for (const s of chunkContent(ch.cx, ch.cz).spawns) {
       if (ow.alive.size >= WORLD.maxActive) return;
       if (ow.alive.has(s.id) || ow.killed.has(s.id) || ow.slain.has(s.id)) continue;
+      if (!demoAllows(g, s.at)) continue; // at the demo's edge the loaded chunks reach beyond its border: what lives there is not brought in (it would see the investigator, and come over)
       const script = getEntity(s.entity)?.bossScript;
       if (script?.joins && ow.slain.has(`boss:${script.joins.with}`)) {
         ow.slain.add(s.id); // its leader fell before it was streamed in (or in a save from before paired deaths)

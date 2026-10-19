@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
 import { emptyInput, type InputFrame } from '../src/core/input';
+import { getEntity, variantOf } from '../src/data/registry';
 import { AZATHOTH, SHUB, YOG } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
+import { bodyOf } from '../src/systems/creatures';
 import { fightAction } from '../src/systems/fightActions';
 import { createWorldGame } from '../src/systems/game';
 import { setSanity } from '../src/systems/sanity';
@@ -70,6 +72,7 @@ describe('the outer gods (spec §3E)', () => {
     g.ecs.c.health.get(boss)!.hp *= 0.25;
     steps(g, 3);
     expect(g.ecs.c.model.get(boss)).toBe('creature:nyarlathotep#eldritch');
+    expect(g.ecs.c.body.get(boss)).toMatchObject(bodyOf(variantOf(getEntity('nyarlathotep')!, 'eldritch')!)); // struck as its true form is drawn
     setSanity(g, 30);
     setSanity(g, 100);
     steps(g, 2);

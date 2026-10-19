@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { loopFrame, type SpriteDirection } from '../src/render/sprites/directional';
 import { reviewedClips, reviewedSize, type ReviewedManifest } from '../src/render/sprites/reviewed';
+import { getEntity, variantOf } from '../src/data/registry';
+import { bodyOf } from '../src/systems/creatures';
 
 const pack = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as ReviewedManifest & { frames: { source: string; sourceSha256: string; bounds: number[]; width: number; height: number }[] };
 const [human, chaos] = [pack.entities.nyarlathotep!, pack.entities['nyarlathotep#eldritch']!];
@@ -54,5 +56,21 @@ describe("Nyarlathotep drawn again, both forms (the author's 'Redesigned' delive
       }
       expect(clips.right!.move!.mirror_horizontal).toBe(key === 'nyarlathotep');
     }
+  });
+
+  it('is struck where it is drawn: no capsule wider than either form in any view; the man to his crown, the Crawling Chaos to its shoulders and neck', () => {
+    const nyarlathotep = getEntity('nyarlathotep')!;
+    const [man, chaosBody] = [bodyOf(nyarlathotep), bodyOf(variantOf(nyarlathotep, 'eldritch')!)];
+    const metres = (e: typeof human): number => e.scale / 64;
+    const top = (e: typeof human): number => (62 - Math.min(...e.directions.front.actions.idle!.map((id) => pack.frames[id]!.bounds[1]!))) * metres(e);
+    for (const [body, e] of [[man, human], [chaosBody, chaos]] as const) {
+      for (const view of ['front', 'left', 'back'] as const) {
+        const [x0, , x1] = frame(e, view, 'idle', 0).bounds;
+        expect(body.radius, `${e.id} ${view}`).toBeLessThan(((x1! - x0!) / 2) * metres(e)); // (the true form's was 2.16 m: a wall a metre out from its legs and body)
+      }
+    }
+    expect(Math.abs(man.height - top(human))).toBeLessThan(0.1);
+    expect(chaosBody.height).toBeGreaterThan(0.74 * top(chaos)); // its shoulders stand at 3.75 m of 5.06
+    expect(chaosBody.height).toBeLessThan(top(chaos)); // the thin curl over them is out of reach
   });
 });

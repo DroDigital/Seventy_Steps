@@ -15,10 +15,24 @@ import { worldLayout } from '../world/placements';
 import type { GameAudio } from './audio/gameAudio';
 import type { Particles } from './particles';
 
-const VERT = `varying vec3 vWorld; varying vec2 vUv;
+export const FOG_VERT = `varying vec3 vWorld; varying vec2 vUv;
 void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vWorld = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 
-const FRAG = `uniform vec3 uBase, uTop, uSpark, uGlow; uniform vec3 uCentre; uniform vec4 uPart; // uPart: where the fog parts (a walker passing), and how wide
+/**
+ * The fog's fragment shader. A boss's fog takes the defaults; the demo's border (render/demoMist.ts) the rest:
+ * `height`, the GLSL for how far up the wall a point is (0 at its foot, 1 at its crown; by default, a wall over level ground, by its
+ * world height); `far`, a factor on what shows (thinning with distance from the eye); `solid`, above 0, a depth-only pass that keeps
+ * only where it shows at least that much (so what the post pass reads from the depth, its haze and contact shadows, is the wall, not
+ * what stands behind it); `lit`, its colour by the world's light (uAmbient, uLightColor: worldUniforms), so it is not lit at night.
+ */
+export interface FogFragOptions {
+  height?: string;
+  far?: string;
+  solid?: number;
+  lit?: boolean;
+}
+export const fogFrag = ({ height = 'clamp((vWorld.y - uFoot) / uHeight, 0.0, 1.0)', far = '1.0', solid = 0, lit = false }: FogFragOptions = {}): string => `${lit ? 'uniform vec3 uAmbient, uLightColor;' : ''}
+uniform vec3 uBase, uTop, uSpark, uGlow; uniform vec3 uCentre; uniform vec4 uPart; // uPart: where the fog parts (a walker passing), and how wide
 uniform float uTime, uVis, uDensity, uSpeed, uMode, uShimmer, uShare, uFoot, uHeight, uHeld, uGlyph;
 varying vec3 vWorld; varying vec2 vUv;
 float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -30,7 +44,7 @@ float noise(vec3 x) {
 float fbm(vec3 p) { return 0.55 * noise(p) + 0.3 * noise(p * 2.1 + 7.0) + 0.15 * noise(p * 4.3 + 3.0); }
 void main() {
   float col_boost = 0.0;
-  float h = clamp((vWorld.y - uFoot) / uHeight, 0.0, 1.0);
+  float h = ${height};
   float t = uTime * uSpeed * 0.3;
   vec3 p = vec3(vWorld.x, vWorld.y, vWorld.z) * 0.32;
   if (uMode < 0.5) p.y -= t * 1.4;                                          // rise
@@ -60,9 +74,13 @@ void main() {
     col += uSpark * s * 0.9; a = max(a, s * 0.7 * uVis * foot);
   }
   if (uGlyph > 0.0) col += uGlow * pow(n, 5.0) * 1.6 * (0.6 + 0.4 * sin(uTime * 1.3));
-  gl_FragColor = vec4(col + col_boost, a);
+  ${lit ? 'col *= clamp(uAmbient * 1.6 + uLightColor * 0.55, 0.36, 1.0); // the light of the hour on it' : ''}
+  float shown = a * (${far});
+  ${solid > 0 ? `if (shown < ${solid.toFixed(3)}) discard;` : ''}
+  gl_FragColor = vec4(col + col_boost, shown);
 }`;
 
+const FRAG = fogFrag();
 const MODE: Record<FogMotion, number> = { rise: 0, roll: 1, swirl: 2, shear: 3 };
 const SEE = 138; // metres from its nearest point past which a wall is not made
 const FADE = [112, 134] as const; // and over which it thins to nothing
@@ -75,17 +93,19 @@ export const fogSeen = (distance: number): number => Math.min(1, Math.max(0, (FA
 export const wallGap = (w: Pick<FogWall, 'kind' | 'x' | 'z' | 'radius'>, p: { x: number; z: number }): number =>
   w.kind === 'ring' ? Math.abs(Math.hypot(p.x - w.x, p.z - w.z) - w.radius) : Math.hypot(p.x - w.x, p.z - w.z);
 
-function materialOf(w: FogWall, theme: FogTheme): THREE.ShaderMaterial {
+/** A fog's material in `theme`: `centre` its middle (a swirl turns about it), `foot` and `height` its wall's (the default shader's). */
+export function fogMaterial(theme: FogTheme, centre: { x: number; y: number; z: number }, foot: number, height: number, frag = FRAG): THREE.ShaderMaterial {
   const v = (c: readonly number[]): THREE.Vector3 => new THREE.Vector3(c[0], c[1], c[2]);
   return new THREE.ShaderMaterial({
     uniforms: {
-      uBase: { value: v(theme.base) }, uTop: { value: v(theme.top) }, uSpark: { value: v(theme.sparks?.colour ?? [0, 0, 0]) }, uGlow: { value: v(theme.glyph ?? [0, 0, 0]) }, uCentre: { value: new THREE.Vector3(w.x, w.y, w.z) },
+      uBase: { value: v(theme.base) }, uTop: { value: v(theme.top) }, uSpark: { value: v(theme.sparks?.colour ?? [0, 0, 0]) }, uGlow: { value: v(theme.glyph ?? [0, 0, 0]) }, uCentre: { value: new THREE.Vector3(centre.x, centre.y, centre.z) },
       uTime: { value: 0 }, uVis: { value: 0 }, uDensity: { value: theme.density }, uSpeed: { value: theme.speed }, uMode: { value: MODE[theme.motion] },
-      uShimmer: { value: theme.shimmer ?? 0 }, uShare: { value: theme.sparks?.share ?? 0 }, uFoot: { value: w.y }, uHeight: { value: w.height }, uHeld: { value: 0 }, uPart: { value: new THREE.Vector4(0, 0, 0, 0) }, uGlyph: { value: theme.glyph ? 1 : 0 },
+      uShimmer: { value: theme.shimmer ?? 0 }, uShare: { value: theme.sparks?.share ?? 0 }, uFoot: { value: foot }, uHeight: { value: height }, uHeld: { value: 0 }, uPart: { value: new THREE.Vector4(0, 0, 0, 0) }, uGlyph: { value: theme.glyph ? 1 : 0 },
     },
-    vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false, side: THREE.DoubleSide,
+    vertexShader: FOG_VERT, fragmentShader: frag, transparent: true, depthWrite: false, side: THREE.DoubleSide,
   });
 }
+const materialOf = (w: FogWall, theme: FogTheme): THREE.ShaderMaterial => fogMaterial(theme, w, w.y, w.height);
 
 interface Wall {
   w: FogWall;

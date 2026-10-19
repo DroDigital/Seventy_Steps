@@ -14,12 +14,14 @@ void ipcRenderer.invoke('desktop:pads-get').then(take, () => undefined);
 
 contextBridge.exposeInMainWorld('desktop', {
   deck: process.argv.includes('--steam-deck'), // running on a Steam Deck (round 47)
+  edition: process.argv.includes('--edition=demo') ? 'demo' : 'full', // the demo's pack (round 56: data/edition.ts)
   pads: () => pads, // as navigator.getGamepads() lists them, for the page to read when the browser lists none (core/pads.ts)
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),
   isFullscreen: () => ipcRenderer.invoke('desktop:is-fullscreen'),
   writeLog: (report) => ipcRenderer.invoke('desktop:write-log', String(report)), // a crash report, kept (round 46)
   openLogs: () => ipcRenderer.invoke('desktop:open-logs'),
+  openPage: () => ipcRenderer.invoke('desktop:open-page'), // the game's page, in the browser (round 56); the shell names it, not the page
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
   ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; never purchases or accepts an app id from the page
   ownsChariotDlc: () => ipcRenderer.invoke('desktop:chariot-dlc'),

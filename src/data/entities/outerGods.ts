@@ -78,6 +78,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.3, { tentacle_burst: 2, grab: 1, roar: 1, vortex: 1, quake: 1 }, { hooks: ['darkness', 'camera_warp'] }), // the Crawling Chaos: it borrows the slain bosses' attacks too
     ), { range: [3, 10], strafe: 0.4 }),
     stats: st(5150, 3000, 100, 3.4, 8, 20), drops: { echoes: 35000 }, insightOnSight: 5,
-    eldritchVariant: { name: 'Nyarlathotep, the Crawling Chaos', sprite: { silhouette: 'blob', palette: 'ichor', scale: 6, tentacles: 10, eyes: 1 } },
+    // its true form is drawn a lanky figure five metres tall, not a mass: struck at its legs' stance, its body and upper arms (1.2 m either side; the long hands hang out of it), up to its shoulders and neck; the curl over them is out of reach
+    eldritchVariant: { name: 'Nyarlathotep, the Crawling Chaos', sprite: { silhouette: 'blob', palette: 'ichor', scale: 6, tentacles: 10, eyes: 1, body: [0.7, 0.2] } },
   },
 ]);

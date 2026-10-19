@@ -16,6 +16,7 @@ import type { GroundFx } from './groundFx';
 import { createSkyStrikeFx, type SkyStrikeFx } from './skyStrikeFx';
 import { SEA } from './sea';
 import { createBossFog } from './bossFog';
+import { createDemoMist } from './demoMist';
 import { createChimneys } from './chimneys';
 import { createDoors } from './doorViews';
 import { createFauna, type Fauna } from './fauna';
@@ -73,6 +74,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const splash = createSplashFx(g, parts.particles); // ...and what the water throws up as they go in
   const doors = createDoors(scene, g, audio); // round 27: a door in each doorway that has one
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
+  const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
   return {
     fauna,
@@ -93,6 +95,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       drag.update(time, alpha);
       splash.update(time);
       fog.update(camera, time, !g.overworld);
+      demoMist?.update(camera, time, !outside);
       doors.update(camera, time, !g.overworld);
       glints.update(camera.position, time, !g.overworld);
       candles.update(camera.position, time, !g.overworld);

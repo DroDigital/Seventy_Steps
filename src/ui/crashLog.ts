@@ -5,7 +5,9 @@
  * promise nobody caught) are kept too, and a crash report names them: they are often the first sign of what broke.
  */
 
+import { EDITION } from '../data/edition';
 import { desktop } from './desktop';
+import { scrub } from './scrub';
 
 const KEEP = 60;
 const lines: string[] = [];
@@ -39,24 +41,37 @@ export function installCrashLog(): void {
   addEventListener('unhandledrejection', (e) => note('rejected', e.reason));
 }
 
+let graphics: string | undefined;
+
+/**
+ * The graphics card's name, asked of a context of its own once and kept: a report made again and again must not leave
+ * contexts behind, for past the browser's limit it takes the oldest, the game's own (review of PR 142). The borrowed
+ * context is let go at once.
+ */
+export function graphicsName(): string {
+  if (graphics !== undefined) return graphics;
+  graphics = 'unknown';
+  try {
+    const c = document.createElement('canvas').getContext('webgl2');
+    const x = c?.getExtension('WEBGL_debug_renderer_info');
+    if (c && x) graphics = String(c.getParameter(x.UNMASKED_RENDERER_WEBGL));
+    c?.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch {
+    // No WebGL 2, or the name withheld: "unknown" it stays.
+  }
+  return graphics;
+}
+
 /** What a bug report needs: when, what ran it, how it was set, and the record. */
 export function crashReport(kind: string, detail?: string): string {
-  const gl = (() => {
-    try {
-      const c = document.createElement('canvas').getContext('webgl2');
-      const x = c?.getExtension('WEBGL_debug_renderer_info');
-      return c && x ? String(c.getParameter(x.UNMASKED_RENDERER_WEBGL)) : 'unknown';
-    } catch {
-      return 'unknown';
-    }
-  })();
-  return [
-    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'} crash report: ${kind}`,
+  const gl = graphicsName();
+  return scrub([ // (pasted in public: no home folder's name, e-mail address or query key goes with it: ui/scrub.ts)
+    `Seventy Steps ${typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'dev'}${EDITION === 'demo' ? ' demo' : ''} crash report: ${kind}`,
     new Date().toISOString(),
     `${navigator.userAgent}${desktop ? ' (desktop shell)' : ''}`,
     `graphics: ${gl} · screen ${screen.width}x${screen.height} @${window.devicePixelRatio}x · window ${innerWidth}x${innerHeight}`,
     detail ? `\n${detail}` : '',
     '\nthe last errors and warnings:',
     ...lines,
-  ].join('\n');
+  ].join('\n'));
 }
