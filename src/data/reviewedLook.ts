@@ -24,5 +24,5 @@ export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, tors
   'ghatanothoa': [0.321, 0.288, 0.21],
   'mother_hydra': [0.401, 0.413, 0.205],
   'shub_niggurath': [0.54, 0.322, 0.023],
-  'yog_sothoth': [0.363, 0.392, 0.183],
+  'yog_sothoth': [0.431, 0.374, 0.204],
 };

@@ -41,7 +41,7 @@ export const GREATER = tier('greater', [
   },
   {
     id: 'flying_polyp', name: 'Flying Polyp', source: 'The Shadow out of Time', regions: ['pnakotus', 'beyond'], canonLooks: true, voice: 'whistle',
-    sprite: { silhouette: 'blob', palette: 'ichor', scale: 3.6, eyes: 0, tentacles: 8 },
+    sprite: { silhouette: 'blob', palette: 'ichor', scale: 3.6, eyes: 0, tentacles: 8, body: [0.7, 0.22] }, // its drawn body, not a blob's 1.3 m: 0.8 (round 56)
     behavior: { archetype: 'invisible_stalker', attacks: ['wind_push', 'grab', 'tentacle_burst'] },
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
     bossVariant: {

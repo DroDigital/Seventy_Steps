@@ -87,7 +87,7 @@ export const LESSER = tier('lesser', [
   },
   {
     id: 'serpent_man', name: 'Serpent Man of Valusia', source: 'The Haunter of the Dark', regions: ['kn_yan'], canonLooks: false,
-    sprite: { silhouette: 'humanoid', palette: 'mold', scale: 2.2, eyes: 2 },
+    sprite: { silhouette: 'humanoid', palette: 'mold', scale: 2.2, eyes: 2, body: [0.9, 0.12] }, // a slighter man than a humanoid's 0.4 m: 0.26 (round 56)
     behavior: { archetype: 'mind_thief', attacks: ['spit', 'bite', 'projectile'] },
     stats: st(140, 22, 14, 3.6, 0.4, 3), drops: { echoes: 120 }, insightOnSight: 0,
     eldritchVariant: { sprite: { silhouette: 'serpent' } },
@@ -100,7 +100,7 @@ export const LESSER = tier('lesser', [
   },
   {
     id: 'ym_bhi', name: "Y'm-bhi", source: 'The Mound', regions: ['kn_yan'], canonLooks: true,
-    sprite: { silhouette: 'hunched', palette: 'pallid', scale: 2.1, eyes: 2 },
+    sprite: { silhouette: 'hunched', palette: 'pallid', scale: 2.1, eyes: 2, body: [0.85, 0.18] }, // 0.38, as it stands drawn (round 56)
     behavior: { archetype: 'brute', attacks: ['slam', 'grab'] },
     stats: st(160, 40, 14, 2.2, 0.3, 2), drops: { echoes: 70 }, insightOnSight: 0,
   },
