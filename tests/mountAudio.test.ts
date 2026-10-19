@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { V3 } from '../src/core/geom';
 import { MOUNT_IDS, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
-import { CREAK, MOUNT_MIX, TRACE_SHIFT, hoofBeat, wheelThump, type Ground } from '../src/data/mountSounds';
+import {
+  CREAK, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, REIN_SLAP, TAIL_SWISH, TRACE_SHIFT, hoofBeat, hoofScrape, wheelThump, type Ground,
+} from '../src/data/mountSounds';
 import type { Sound } from '../src/data/sounds';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
 import { SAMPLE_SETS } from '../src/data/samples';
@@ -10,6 +12,7 @@ import { GEARS, SILENT_BED, bedTargets, engineNote, type BedTargets } from '../s
 import { createMountAudio } from '../src/render/audio/mountAudio';
 import type { Sampler } from '../src/render/audio/sampler';
 import { createGame } from '../src/systems/game';
+import { PAW, pawAt, pawLanded } from '../src/systems/horseIdle';
 import { cyclesFor, touchdowns } from '../src/systems/mountGait';
 import { render } from './soundRender';
 
@@ -322,5 +325,143 @@ describe('the car shifts gear and the spectral chariot breathes (round 52)', () 
     horse.heard.length = 0;
     for (let i = 0; i < 100; i++) horse.advance(10, MOUNT_TRAVERSAL.gallop - (i % 2 ? 0 : 6));
     expect(horse.heard.some((h) => h.key.endsWith(':pop'))).toBe(false);
+  });
+});
+
+describe('the horse and the reins, heard (round 57)', () => {
+  const keys = (heard: Heard[], part: string): Heard[] => heard.filter((h) => h.key.endsWith(`:${part}`));
+
+  it('each slap of the reins is heard as it lands, and the horse answers a moment after, but not every time', () => {
+    const r = ride('grey');
+    r.heard.length = 0;
+    for (let i = 0; i < 40; i++) { r.mount.reins.struck++; r.mount.reins.begun++; r.advance(60, 0); }
+    expect(keys(r.heard, 'slap')).toHaveLength(40);
+    const answered = keys(r.heard, 'urge').length;
+    expect(answered).toBeGreaterThan(18);
+    expect(answered).toBeLessThan(39);
+    const one = ride('grey');
+    one.heard.length = 0;
+    one.mount.reins.struck++;
+    one.advance(1, 0);
+    expect(keys(one.heard, 'slap')).toHaveLength(1);
+    expect(keys(one.heard, 'urge')).toEqual([]); // the answer is a beat behind the hand
+    expect(one.heard.every((h) => h.at == null)).toBe(true);
+    const skeletons = ride('chariot');
+    skeletons.heard.length = 0;
+    skeletons.mount.reins.struck++;
+    skeletons.advance(60, 0);
+    expect(keys(skeletons.heard, 'slap')).toHaveLength(1);
+    expect(keys(skeletons.heard, 'urge')).toEqual([]); // bones do not whicker
+    const car = ride('automobile');
+    car.heard.length = 0;
+    car.mount.reins.struck++;
+    car.mount.reins.halts++;
+    car.advance(120, 0);
+    expect(car.heard).toEqual([]);
+  });
+
+  it('a hard pull is a blow through the nose, hooves braking and the harness shaken as the head goes up, harder from a gallop', () => {
+    const gallop = ride('grey'), cruise = ride('grey');
+    for (const [r, speed] of [[gallop, MOUNT_TRAVERSAL.gallop], [cruise, 4]] as const) {
+      r.heard.length = 0;
+      r.mount.reins.halts++;
+      r.mount.reins.haltSpeed = speed;
+      r.advance(1, 0);
+      expect(keys(r.heard, 'halt')).toHaveLength(1);
+      expect(keys(r.heard, 'scrape')).toHaveLength(1);
+      expect(keys(r.heard, 'shake')).toEqual([]);
+      r.advance(40, 0);
+      expect(keys(r.heard, 'shake')).toHaveLength(1);
+    }
+    expect(keys(gallop.heard, 'halt')[0].gain).toBeGreaterThan(keys(cruise.heard, 'halt')[0].gain);
+    expect(keys(gallop.heard, 'scrape')[0].gain).toBeGreaterThan(keys(cruise.heard, 'scrape')[0].gain);
+    const spectral = ride('chariot');
+    spectral.heard.length = 0;
+    spectral.mount.reins.halts++;
+    spectral.mount.reins.haltSpeed = MOUNT_TRAVERSAL.gallop;
+    spectral.advance(60, 0);
+    expect(keys(spectral.heard, 'halt')).toEqual([]);
+    for (const part of ['scrape', 'shake', 'whisper']) expect(keys(spectral.heard, part), part).toHaveLength(1);
+  });
+
+  it('no stale sounds follow a long gap or a new summon: what was begun and not heard is not played late', () => {
+    const r = ride('grey');
+    r.mount.reins.struck += 5;
+    r.mount.reins.halts += 2;
+    r.heard.length = 0;
+    r.audio.update(1); // a long gap: the beds and the counters begin again
+    r.advance(120, 0);
+    expect(r.heard.filter((h) => /:(slap|halt|scrape|urge)$/.test(h.key))).toEqual([]);
+  });
+
+  it('a standing horse makes the small noises of a horse that is awake, now and then, and never the same one twice running', () => {
+    const r = ride('grey');
+    r.heard.length = 0;
+    r.advance(60 * 180, 0); // three minutes at its harness
+    const idle = r.heard.filter((h) => /:(blow|whicker|shake|swish|flutter|snort)$/.test(h.key));
+    expect(idle.length).toBeGreaterThan(10);
+    expect(idle.length).toBeLessThan(40);
+    expect(new Set(idle.map((h) => h.key)).size).toBeGreaterThanOrEqual(3);
+    for (let i = 1; i < idle.length; i++) expect(idle[i].key).not.toBe(idle[i - 1].key);
+    expect(r.heard.every((h) => h.at == null)).toBe(true);
+    const spectral = ride('chariot');
+    spectral.heard.length = 0;
+    spectral.advance(60 * 180, 0);
+    expect(spectral.heard.filter((h) => h.key.endsWith(':shake')).length).toBeGreaterThan(5);
+    expect(spectral.heard.filter((h) => /:(blow|whicker|swish|flutter|snort)$/.test(h.key))).toEqual([]);
+    const car = ride('automobile');
+    car.heard.length = 0;
+    car.advance(60 * 60, 0);
+    expect(car.heard).toEqual([]);
+  });
+
+  it('puts the hoof down where the picture does: each pawing stroke lands on its own clock, twice, and only while it stands', () => {
+    expect(pawLanded(0, 0)).toBe(0);
+    let start = 0;
+    while (pawAt(start * PAW.period + PAW.from + 0.5 * PAW.span) === 0) start++; // a period the horse paws in
+    const from = start * PAW.period;
+    expect(pawLanded(from, from + PAW.period)).toBe(2);
+    expect(pawLanded(from, from + PAW.from + PAW.span * 0.3)).toBe(0); // the hoof is still in the air
+    expect(pawLanded(from + PAW.from + PAW.span * 0.3, from + PAW.from + PAW.span * 0.4)).toBe(1);
+    let quiet = 0;
+    while (pawAt(quiet * PAW.period + PAW.from + 0.5 * PAW.span) !== 0) quiet++;
+    expect(pawLanded(quiet * PAW.period, (quiet + 1) * PAW.period)).toBe(0);
+
+    const r = ride('grey');
+    let clock = from;
+    r.g.seaTime = () => clock;
+    r.audio.update(1 / 60);
+    r.heard.length = 0;
+    for (let i = 0; i < PAW.period * 60; i++) { clock += 1 / 60; r.audio.update(1 / 60); r.pos.x += 0; }
+    expect(r.heard.filter((h) => h.key === 'mount:grey:hoof:paw')).toHaveLength(2);
+    const moving = ride('grey');
+    clock = from;
+    moving.g.seaTime = () => clock;
+    moving.heard.length = 0;
+    for (let i = 0; i < PAW.period * 60; i++) { clock += 1 / 60; moving.advance(1, 4); }
+    expect(moving.heard.filter((h) => h.key === 'mount:grey:hoof:paw')).toEqual([]);
+  });
+
+  it('the new sounds are as present as a landed blow, the small ones softer: between -22 and -11 dBFS rms, or -30 and -11 for the asides', () => {
+    const all: [name: string, sound: Sound, gain: number, aside?: true][] = [
+      ['slap', REIN_SLAP, MOUNT_MIX.slap], ['urge', HORSE_URGE, MOUNT_MIX.urge], ['halt', HORSE_HALT, MOUNT_MIX.halt],
+      ['shake', HARNESS_SHAKE, MOUNT_MIX.shake], ['blow', HORSE_BLOW, MOUNT_MIX.blow], ['whicker', HORSE_WHICKER, MOUNT_MIX.whicker],
+      ['swish', TAIL_SWISH, MOUNT_MIX.swish, true], ['flutter', LIP_FLUTTER, MOUNT_MIX.flutter, true],
+      ...(['dirt', 'road', 'stone', 'water'] as Ground[]).map((g): [string, Sound, number, true?] => [`scrape ${g}`, hoofScrape(g), MOUNT_MIX.scrape, g === 'water' ? true : undefined]),
+    ];
+    for (const [name, sound, gain, aside] of all) {
+      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain })));
+      expect(out.rms, name).toBeGreaterThan(aside ? -30 : -22);
+      expect(out.rms, name).toBeLessThan(-11);
+      expect(out.peak, name).toBeLessThan(0);
+      expect(out.sec, name).toBeLessThan(1.3);
+    }
+  });
+
+  it('is leather, hide and breath: little of it is high, and none of it rings', () => {
+    for (const [name, sound] of [['slap', REIN_SLAP], ['halt', HORSE_HALT], ['shake', HARNESS_SHAKE], ['blow', HORSE_BLOW], ['whicker', HORSE_WHICKER], ['flutter', LIP_FLUTTER]] as const) {
+      for (const layer of sound) if (layer.src !== 'noise') expect(layer.hz!, name).toBeLessThan(700); // no bell: every tone is a voice or a thump
+      expect(sound.some((l) => l.src === 'sine' || l.src === 'triangle' || l.src === 'sawtooth' || l.src === 'noise'), name).toBe(true);
+    }
   });
 });

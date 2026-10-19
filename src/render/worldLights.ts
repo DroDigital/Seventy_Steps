@@ -49,7 +49,7 @@ export interface WorldLights {
   /** How well lit the ground at a point is by lamps, fires, torches and windows (0..1) at `time`: each counts within its share of its light's range, and the Elder Signs' glow, an Echo's and the lantern's own do not. */
   lightAt(x: number, y: number, z: number, time: number): number;
   /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
-  update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3): void;
+  update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3, lanternCover?: number): void;
   /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps), nearest first (round 35: lampShadows.ts). */
   readonly casters: readonly Caster[];
 }
@@ -102,7 +102,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       }
       return Math.min(1, sum);
     },
-    update(eye, time, lantern, at = eye) {
+    update(eye, time, lantern, at = eye, lanternCover = 0) {
       near.length = 0;
       visible.length = 0;
       for (const list of spots.values()) {
@@ -136,7 +136,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * (n.s.pane === undefined ? 1 : paneLit(n.s.pane, time)));
       }
       batch.begin();
-      if (lantern) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time));
+      if (lantern && lanternCover < 1) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * (1 - lanternCover) * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time)); // (a seat back between the eye and it takes its halo: round 57)
       for (const { s, v } of visible) {
         if (v <= 0.02) continue;
         const k: LightDef = LIGHTS.kinds[s.kind];

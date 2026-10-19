@@ -16,6 +16,9 @@ export const MOUNT_COLORS = {
   wood: mixRgb(BASE.rust, BASE.bone, 0.26), pale: scaleRgb(BASE.bone, 1.3),
 };
 
+/** What the reins do to a horse at the bit: `check` 0 to 1 a haul (the head comes up and in, the weight sits back); `urge` 0 to 1 a ripple arriving (the nose pops up, the ears go back). */
+export interface HorseCue { check: number; urge: number }
+
 export function group(parent: THREE.Object3D, x = 0, y = 0, z = 0): THREE.Group {
   const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g;
 }

@@ -87,13 +87,13 @@ describe('reviewed creature artwork imported into the game', () => {
       }
     }
     expect(scopes).toBe(1100); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the other eight bosses' left and back attack and hurt (32), and the Shantak's flight in its four views (4); Yog-Sothoth's, drawn again whole with front combat only, are no more
-    expect(mirrors).toBe(84); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do)
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2844);
+    expect(mirrors).toBe(85); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do), and so has round 57's Horror at Martin's Beach (its own before)
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2856);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2844); // (2768 before round 56's sixteen: their ninety frames beyond the old places, less the 14 dropped, Rhan-Tegoth's own right and Yog-Sothoth's left and back combat); 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
+    expect(pack.frameCount).toBe(2856); // (2844 before round 57's nine, which brought twelve frames more: the Ghouls' four more left walk frames each and the Polyp Swarm's six more, less the Dhole's two fewer in its back walk (the Horror at Martin's Beach's longer walks took the places its own right had); 2768 before round 56's sixteen: their ninety frames beyond the old places, less the 14 dropped, Rhan-Tegoth's own right and Yog-Sothoth's left and back combat); 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
   });
 
-  it('preserves all 2728 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
+  it('preserves all 2856 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
     expect(pack.filter).toBe('nearest');
     expect(pack.mipmaps).toBe(false);
     const pages = pack.pages.map((page) => {
@@ -118,7 +118,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2458, '128x128': 344, '128x160': 42 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2470, '128x128': 344, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');

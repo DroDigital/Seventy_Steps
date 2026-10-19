@@ -287,7 +287,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         views.update(alpha, time);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
-        lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z });
+        lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, views.flameCover(camera.position));
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)

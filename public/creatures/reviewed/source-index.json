@@ -4,7 +4,7 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2844,
+  "unique_png_count": 2856,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
@@ -33,7 +33,16 @@
     "lilith: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
     "being_of_ib: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 29 frames drawn (25 in place, 2 into places the old drawing left, 2 on a shelf), 0 old frames dropped, right mirrored.",
     "shunned_house_entity: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 0 old frames dropped, right mirrored.",
-    "great_ones: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 29 frames drawn (23 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored."
+    "great_ones: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 29 frames drawn (23 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
+    "dhole: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (27 in place, 0 into places the old drawing left, 0 on a shelf), 2 old frames dropped, right mirrored.",
+    "lilith: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (27 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "serpent_man: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "great_ones: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 29 frames drawn (29 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "martins_beach_horror: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (19 in place, 4 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "flying_polyp#boss: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
+    "zkauba: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "ghoul: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
+    "ghoul#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored."
   ],
   "entities": [
     {
@@ -1897,12 +1906,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/64x64/front/idle_0.png",
-                  "sha256": "aea554095c4953602e267d2724ca12e46cd264b9046009d2a99a26b4d042102f"
+                  "sha256": "20e11677c2f25e89bd7ae8ca4a9dc268a71adb11ca5a4d12fc5ab30d80ae14df"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/64x64/front/idle_1.png",
-                  "sha256": "5822040de3cc09cdf597f0e94c484d9b9337a198935d4098adc2b687bebd8c45"
+                  "sha256": "75f54b4d458f551299a603f08c0baa488ba85b4af4a7eed6c3add527eb1f4bb7"
                 }
               ]
             },
@@ -1912,22 +1921,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/64x64/front/move_0.png",
-                  "sha256": "9ecf4afb39705472b4992503191488f5805ce3c5c5989530df108075941bf68e"
+                  "sha256": "13618befac4c102b56a86799ccd302af8d6b915b0b1b117762b053f975bdff67"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/64x64/front/move_1.png",
-                  "sha256": "ee0e5a111a18737a0e6f1173f099bcb83fe9776fd062c25221edfb84b1e3b53e"
+                  "sha256": "386fbe609d2082e5d8fc6f337047963bf6962c818bf690a86893bd92b46c48a7"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/64x64/front/move_2.png",
-                  "sha256": "500d6c62a8d4269f8b9bd7f2c82ca85eed7aa6e28be850d5869ee66cb6a61c3e"
+                  "sha256": "abf31e6bb48d9745ce8a1ed4991d6e1a53f687a3bb6725d2916bec9e97ef9f7d"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/64x64/front/move_3.png",
-                  "sha256": "4c4847e975e0b034fc6501ea1bfa4474be4e93f194a4a975b57adb6027854289"
+                  "sha256": "2fcb12198596c8d542b6f67530da01c88628928414c3d519dde65078c228ae25"
                 }
               ]
             },
@@ -1937,17 +1946,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/ghoul/64x64/front/attack_0.png",
-                  "sha256": "bfe12a01b571e8af03e0429c6576014913802833fbddbcd2e912be22a25052ed"
+                  "sha256": "4ce5b43b7ece8b7f5f8ad942ebbd3a36a09636fb2bde64b04d424ca059f7bc66"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/ghoul/64x64/front/attack_1.png",
-                  "sha256": "988b927dac5a8f12926e8602abce129f8d4f15bfa68958b581f4eddc7b8d93f5"
+                  "sha256": "f5b669681261e00e975e10593bab33535a3d5a7e124a457c765c63a201082a0a"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/ghoul/64x64/front/attack_2.png",
-                  "sha256": "73a5b038639f4cee20f91ca20e76b49e1c232860e0787c1bee99744f84a6ff4b"
+                  "sha256": "6192731c47c4efc4d392957fd7f3faa7637d4548dddd879c565b0940ba60d237"
                 }
               ]
             },
@@ -1957,12 +1966,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/ghoul/64x64/front/hurt_0.png",
-                  "sha256": "c694f973baf6f7d5d4bf1348d156320062e5ca15dcd97a231838e21731612851"
+                  "sha256": "a9b26a389c0ae2f5e0cc0f4ca70599ae709a1b34fd347b5f8399fc573be19b1a"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/ghoul/64x64/front/hurt_1.png",
-                  "sha256": "f2abe1ec9700be4a1ec62aa1b44ce53a6ac2782132f1f7685686f5fa6afc4997"
+                  "sha256": "2aa7fc04360d7767a15072f5e6d4e4cff574efef7564d33e66870c3b7fb6c07c"
                 }
               ]
             }
@@ -1978,12 +1987,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/64x64/back/idle_0.png",
-                  "sha256": "7266a1637e34ff36ec23aff89ff067a470937dca598546fa4f03c8b8443e00ad"
+                  "sha256": "c621f66baca8d106f5c2ffbee7199efeee794d836f2edd5baed9de16eeef0541"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/64x64/back/idle_1.png",
-                  "sha256": "9947f8b232765364c1b4b6fa0fa1daf3f88aae344652834825a2f63886c4c93c"
+                  "sha256": "a2726d1f5e8e37ee73620504fb0f0c558d1e1300576e49eb2a9e3f5641434321"
                 }
               ]
             },
@@ -1993,22 +2002,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/64x64/back/move_0.png",
-                  "sha256": "f392b167e2748202904394a4129d207c7dea5b24e01b57666f676858545e3c26"
+                  "sha256": "759052aba7f09fad14a6e5306c1497ce1d7c8b7a29d38c1962a941198d01533a"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/64x64/back/move_1.png",
-                  "sha256": "c54c11c6d28f430403816c67ece907407b73a038148ed1579c02fa1f3aea8466"
+                  "sha256": "03e5910895329ac0681d0a532c55138069f747b1f2391b787162a5c24fae6e86"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/64x64/back/move_2.png",
-                  "sha256": "e0da505b475f23e6c35709f854b6c1251cf7fe70a8713ddf8ecca4225549f1be"
+                  "sha256": "5652ed666436defc048437ae2c783834a5dad3b195966225e47bdaab37206e1d"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/64x64/back/move_3.png",
-                  "sha256": "a9eb9adcf17abbe9b5762ca6b7b97450cdb94120bb43dbab5e5d257e00abde19"
+                  "sha256": "e31337389d255c24fb22b2b26374ae329cf067bffd2476bde5905c1b0de30306"
                 }
               ]
             }
@@ -2024,37 +2033,57 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/64x64/left/idle_0.png",
-                  "sha256": "d4edb841ebf1297244d8a350f18a9d4c32f6f12b044e4c56bcab4356650411fe"
+                  "sha256": "466759ce84a0412c201fd9e420fb9f422e7e227459e0874c1b6c7196ce472118"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/64x64/left/idle_1.png",
-                  "sha256": "4da0e74740644deaa1bbc4170bc418e005ea95988064b501a45ab57ef5bffc26"
+                  "sha256": "7bfdf0dd4cd550ea5e3fcd8d73bc6521a4402710c1f11801096dc9abbaa2021b"
                 }
               ]
             },
             "move": {
-              "frame_count": 4,
+              "frame_count": 8,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/64x64/left/move_0.png",
-                  "sha256": "b14f6538df4915734c82403011e1ca584a1ae0d1d38f9d1a3a583f2f0cee161f"
+                  "sha256": "da6f001f17132a053934fb153b5d939bf822c20bb4898faca3a061a919c223dd"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/64x64/left/move_1.png",
-                  "sha256": "fee2c0d6a3d4af0d68065661847f6f0a3dd555801d05efe240b50895b307756a"
+                  "sha256": "e748461f0bf903731d0aa318065f485aeb52187986bc0b05247bee7b26ced63c"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/64x64/left/move_2.png",
-                  "sha256": "caa65e76d2cd50347e7952aded03ee698ca4cb8b2a5c4c899e74eb5b79dbd62e"
+                  "sha256": "1b0650476730cbe06247a6be847755f3fd4741b0528435f40f2923d209910c99"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/64x64/left/move_3.png",
-                  "sha256": "47a1b006eb9fcbbdd62c531ae7d9efe01dea92ac13f1674989868f9dddbaf7b6"
+                  "sha256": "2cbd2f2101b379f00480c5d3c7ebd2f2846d2c4688a6cf1b958bf79fdbff8c13"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/ghoul/64x64/left/move_4.png",
+                  "sha256": "42619e08234211216840a2062491d189d0b231675f6f1e09b7c9a1f27d2e7298"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/ghoul/64x64/left/move_5.png",
+                  "sha256": "25ec69727a560e7e67ae63ba94d9fa06ad8f871e803cee8fe88be2896ba4132b"
+                },
+                {
+                  "name": "move_6",
+                  "path": "sprites/ghoul/64x64/left/move_6.png",
+                  "sha256": "29e283869927a44ef72178a89d73be1ee834603a3a21916066be38df2b68d9ad"
+                },
+                {
+                  "name": "move_7",
+                  "path": "sprites/ghoul/64x64/left/move_7.png",
+                  "sha256": "2d3697834b025f69db6f1c6f2c8a0e199bf0b1909ca4666f49dfbeb0f7c8bea1"
                 }
               ]
             }
@@ -2070,37 +2099,57 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/64x64/left/idle_0.png",
-                  "sha256": "d4edb841ebf1297244d8a350f18a9d4c32f6f12b044e4c56bcab4356650411fe"
+                  "sha256": "466759ce84a0412c201fd9e420fb9f422e7e227459e0874c1b6c7196ce472118"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/64x64/left/idle_1.png",
-                  "sha256": "4da0e74740644deaa1bbc4170bc418e005ea95988064b501a45ab57ef5bffc26"
+                  "sha256": "7bfdf0dd4cd550ea5e3fcd8d73bc6521a4402710c1f11801096dc9abbaa2021b"
                 }
               ]
             },
             "move": {
-              "frame_count": 4,
+              "frame_count": 8,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/64x64/left/move_0.png",
-                  "sha256": "b14f6538df4915734c82403011e1ca584a1ae0d1d38f9d1a3a583f2f0cee161f"
+                  "sha256": "da6f001f17132a053934fb153b5d939bf822c20bb4898faca3a061a919c223dd"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/64x64/left/move_1.png",
-                  "sha256": "fee2c0d6a3d4af0d68065661847f6f0a3dd555801d05efe240b50895b307756a"
+                  "sha256": "e748461f0bf903731d0aa318065f485aeb52187986bc0b05247bee7b26ced63c"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/64x64/left/move_2.png",
-                  "sha256": "caa65e76d2cd50347e7952aded03ee698ca4cb8b2a5c4c899e74eb5b79dbd62e"
+                  "sha256": "1b0650476730cbe06247a6be847755f3fd4741b0528435f40f2923d209910c99"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/64x64/left/move_3.png",
-                  "sha256": "47a1b006eb9fcbbdd62c531ae7d9efe01dea92ac13f1674989868f9dddbaf7b6"
+                  "sha256": "2cbd2f2101b379f00480c5d3c7ebd2f2846d2c4688a6cf1b958bf79fdbff8c13"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/ghoul/64x64/left/move_4.png",
+                  "sha256": "42619e08234211216840a2062491d189d0b231675f6f1e09b7c9a1f27d2e7298"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/ghoul/64x64/left/move_5.png",
+                  "sha256": "25ec69727a560e7e67ae63ba94d9fa06ad8f871e803cee8fe88be2896ba4132b"
+                },
+                {
+                  "name": "move_6",
+                  "path": "sprites/ghoul/64x64/left/move_6.png",
+                  "sha256": "29e283869927a44ef72178a89d73be1ee834603a3a21916066be38df2b68d9ad"
+                },
+                {
+                  "name": "move_7",
+                  "path": "sprites/ghoul/64x64/left/move_7.png",
+                  "sha256": "2d3697834b025f69db6f1c6f2c8a0e199bf0b1909ca4666f49dfbeb0f7c8bea1"
                 }
               ]
             }
@@ -2126,12 +2175,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/eldritch/64x64/front/idle_0.png",
-                  "sha256": "1f859c4fb4cd0f2e5a7d4cd3f7e0f1206b12aee3c418a83c18bb3034f4a9baa1"
+                  "sha256": "d1c35bf1dedb16e0da570b02a961f7419532acc603e674df82d760c1fc00047f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/eldritch/64x64/front/idle_1.png",
-                  "sha256": "9cf538bb76906e5b91d8bdb81609ae09e234a089962367f8bb78848c4af9d51d"
+                  "sha256": "8f541e9e8534a94f33fcb696ca8b9fd767dc8bee5f61ae3713397e2ae98b97ae"
                 }
               ]
             },
@@ -2141,22 +2190,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/eldritch/64x64/front/move_0.png",
-                  "sha256": "a4be2f75b68627282213f9216207c4d165ed955d53b8f661277d564dc69ab6a0"
+                  "sha256": "7727d58af4063972486a9a4ce6695fd2d297cf409c8c863d3c802840910fc991"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/eldritch/64x64/front/move_1.png",
-                  "sha256": "527be743c66339589866b3b15fbf19d9db39c1ab81d6453679b252e4dde7c8b9"
+                  "sha256": "f9041d8eabe90b3062a13b1cc3593e59eab54889b34e025dec6c04d029df9810"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/eldritch/64x64/front/move_2.png",
-                  "sha256": "3772a6ad2164f3e461b8c4e16d8a75b28e28944589d60e1df50be2926b0c3052"
+                  "sha256": "c0338e5efa76ad4d3ef04d22a1ed0de88e52c53976409d0945ca42173f949dbc"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/eldritch/64x64/front/move_3.png",
-                  "sha256": "77266bce03616d7177fb7a24eefcc7ee19612f256e82445565f363191d5fe831"
+                  "sha256": "c1e8ae9d1279c5b94873dbdb85c3c39850e4111b19844299aeea969601dbb1f4"
                 }
               ]
             },
@@ -2166,17 +2215,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/ghoul/eldritch/64x64/front/attack_0.png",
-                  "sha256": "0c55c61ff27ec1c5ddab59e78b1a3deb8134225e02ee496edd7977138c3a61c3"
+                  "sha256": "47919d450fbff8574f7ff4d4ef1cac2b5486419f349b983e0e6cf5eabbfb4336"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/ghoul/eldritch/64x64/front/attack_1.png",
-                  "sha256": "6c10c418bfe3441172e156c1d55d4954b70d56757e46859192bb43dc9268d359"
+                  "sha256": "de0f80da1eb286176a32f23f60b6f716824f8d72ec02873927f29d19b36789fa"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/ghoul/eldritch/64x64/front/attack_2.png",
-                  "sha256": "41560033192218844e1467eee1f5b4325d1e0586dbf20dc93b348dae16386b3b"
+                  "sha256": "bee3688b202a2b661855963f53540b20083351b20bd75e9abefdf693dca853d4"
                 }
               ]
             },
@@ -2186,12 +2235,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/ghoul/eldritch/64x64/front/hurt_0.png",
-                  "sha256": "4e811e6bd09a71f975ea72a19bbb1bee80654923d11ac28c81a218bab50546aa"
+                  "sha256": "0ab19255d373fd54ca9c7aa3f77711c1047e9f1a0896a6b91ea7b79f2620c9a5"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/ghoul/eldritch/64x64/front/hurt_1.png",
-                  "sha256": "232a31d845813ba4640c5e7dd175dbaa3dfbcc4b90208367d792c1640a6f93fc"
+                  "sha256": "72ab9ce9ff229c1d0481cd526e10650cf6eeae05df65ff304d8c2b5c2e801e7e"
                 }
               ]
             }
@@ -2207,12 +2256,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/eldritch/64x64/back/idle_0.png",
-                  "sha256": "b86112519d6102b17b81cbec65d2ee29673ead2453de5d89b31188fca4bbf0ed"
+                  "sha256": "53e0ec2bc95322071ac90085f51514ae3bc19cc8c3f69330a14558c086e49e05"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/eldritch/64x64/back/idle_1.png",
-                  "sha256": "f836dac38ffa3a9e8e4f24460a765d528642aa79fcb05c574a0dba360d0b4f62"
+                  "sha256": "bc48611148dac2a2d0e47b544a3cbd7e5176ce7ed194f96e881c93b74306a25d"
                 }
               ]
             },
@@ -2222,22 +2271,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/eldritch/64x64/back/move_0.png",
-                  "sha256": "96384d6d1571d5821e165adf1de67a33acb5765dbee9123d38cd0eded1103b48"
+                  "sha256": "e68b64a3c23300b46e53d70e16fcb94eb2c01b7a3316deda7fbfc527ea6c16f0"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/eldritch/64x64/back/move_1.png",
-                  "sha256": "b35471e348124c7be8ba1a643603ea435dc0f84dbdec2d8cea1db5dcbbdecf12"
+                  "sha256": "edfe4924f3e6c794f8383c5cf12ab3fd6e2d98459a735a9b55bb73f6e2433d69"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/eldritch/64x64/back/move_2.png",
-                  "sha256": "aabcfad2469fe921a4c6b336bc3ab5e85dfdc16fc61f1cadd8be98edd73c8b53"
+                  "sha256": "a7d5024e7bd43d3c1e83777e09fa86e38be4354797302c41197454b0b9d0a520"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/eldritch/64x64/back/move_3.png",
-                  "sha256": "8db466c8224814d2a0163d4eaf09adfa217a6c27e4c5e43e6a134eda7ed5f47c"
+                  "sha256": "592a1e2a895dbbe8b677b07adc24cb48f0c58efcb814ada38d80fbf06d6b28b7"
                 }
               ]
             }
@@ -2253,37 +2302,57 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/eldritch/64x64/left/idle_0.png",
-                  "sha256": "aa04dfc9f060d5dcb312bf64ac59a2ed98bb466e895f9f10fa1e3dfc55397d66"
+                  "sha256": "b09772f9448379e3751b8c2aba6c0d80aef02aebeb0faa83cd3340a707ffde5f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/eldritch/64x64/left/idle_1.png",
-                  "sha256": "39481ea2f545e67890ea838b47f3314d51979e9e542aa6825aa8f8eddf0c1ac6"
+                  "sha256": "dd86b21a337f137631c40454f4531fd47a7ccb5ef66ce18d5a9ddada1b9ec849"
                 }
               ]
             },
             "move": {
-              "frame_count": 4,
+              "frame_count": 8,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_0.png",
-                  "sha256": "05493515ec01130b10d323ab9b1f96efe23c0f1579931b735bb97c4ba8d7a3b9"
+                  "sha256": "714822d18dc5e76b8c49b562dffc3ea56260e09be6e2f33125a01e883c3a9115"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_1.png",
-                  "sha256": "ce6761056a5afafa2dd1df05be8009de480e15e6fcbe79f51ec0aee99aa680fc"
+                  "sha256": "08e4d18d5d11cd1ce3c82ac4c5da6b1d4698011b2ebe702a9eddcaabe7ec32ff"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_2.png",
-                  "sha256": "d00659f7b2a9f859782a38a17e9a0cf4c19a7bc00b5e5be062a3355e5d8a8abf"
+                  "sha256": "f8f50b0673cae0b48fe2212d5ac2858ecbc661a3dc77ea8c94b8a74517034101"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_3.png",
-                  "sha256": "efae8c9eb880a126c8b092f71b9618c3d480f4484d5451bd84e50487323438c3"
+                  "sha256": "066a59cf3f1b4136f61b20880f60455389b37f303a51b58ab8defdef9c94d165"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_4.png",
+                  "sha256": "238f0a6a32353951796b27e0641a7b322cd96100005a6b6f24fb63e9bd0302b8"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_5.png",
+                  "sha256": "8a4539f0be21eadf1dae26c1298ea5f67a931bfd8e0dd80f37b60dd9fac34a80"
+                },
+                {
+                  "name": "move_6",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_6.png",
+                  "sha256": "a8a6b8fb9e56c37b9a0d08ff60b670226b212d3787c2ee7ac10e67a65e651b7e"
+                },
+                {
+                  "name": "move_7",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_7.png",
+                  "sha256": "fa6abdbc9c51655a7c5927ccad8c7c7a465c8c456957cf881033fe5d8c2f77a8"
                 }
               ]
             }
@@ -2299,37 +2368,57 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/ghoul/eldritch/64x64/left/idle_0.png",
-                  "sha256": "aa04dfc9f060d5dcb312bf64ac59a2ed98bb466e895f9f10fa1e3dfc55397d66"
+                  "sha256": "b09772f9448379e3751b8c2aba6c0d80aef02aebeb0faa83cd3340a707ffde5f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/ghoul/eldritch/64x64/left/idle_1.png",
-                  "sha256": "39481ea2f545e67890ea838b47f3314d51979e9e542aa6825aa8f8eddf0c1ac6"
+                  "sha256": "dd86b21a337f137631c40454f4531fd47a7ccb5ef66ce18d5a9ddada1b9ec849"
                 }
               ]
             },
             "move": {
-              "frame_count": 4,
+              "frame_count": 8,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_0.png",
-                  "sha256": "05493515ec01130b10d323ab9b1f96efe23c0f1579931b735bb97c4ba8d7a3b9"
+                  "sha256": "714822d18dc5e76b8c49b562dffc3ea56260e09be6e2f33125a01e883c3a9115"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_1.png",
-                  "sha256": "ce6761056a5afafa2dd1df05be8009de480e15e6fcbe79f51ec0aee99aa680fc"
+                  "sha256": "08e4d18d5d11cd1ce3c82ac4c5da6b1d4698011b2ebe702a9eddcaabe7ec32ff"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_2.png",
-                  "sha256": "d00659f7b2a9f859782a38a17e9a0cf4c19a7bc00b5e5be062a3355e5d8a8abf"
+                  "sha256": "f8f50b0673cae0b48fe2212d5ac2858ecbc661a3dc77ea8c94b8a74517034101"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/ghoul/eldritch/64x64/left/move_3.png",
-                  "sha256": "efae8c9eb880a126c8b092f71b9618c3d480f4484d5451bd84e50487323438c3"
+                  "sha256": "066a59cf3f1b4136f61b20880f60455389b37f303a51b58ab8defdef9c94d165"
+                },
+                {
+                  "name": "move_4",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_4.png",
+                  "sha256": "238f0a6a32353951796b27e0641a7b322cd96100005a6b6f24fb63e9bd0302b8"
+                },
+                {
+                  "name": "move_5",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_5.png",
+                  "sha256": "8a4539f0be21eadf1dae26c1298ea5f67a931bfd8e0dd80f37b60dd9fac34a80"
+                },
+                {
+                  "name": "move_6",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_6.png",
+                  "sha256": "a8a6b8fb9e56c37b9a0d08ff60b670226b212d3787c2ee7ac10e67a65e651b7e"
+                },
+                {
+                  "name": "move_7",
+                  "path": "sprites/ghoul/eldritch/64x64/left/move_7.png",
+                  "sha256": "fa6abdbc9c51655a7c5927ccad8c7c7a465c8c456957cf881033fe5d8c2f77a8"
                 }
               ]
             }
@@ -4442,12 +4531,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/serpent_man/64x64/front/idle_0.png",
-                  "sha256": "c07e19d2be39642bd3cf058ff59ff88e8cf8c81b87b2d8aef62946799fc14c67"
+                  "sha256": "711673f62959b03e97d16311d44ad26ba4352f6d62db11da1368c6d723044c3d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/serpent_man/64x64/front/idle_1.png",
-                  "sha256": "bed7300676edee50499fec90270b6af40578c0f2379bb4549c33a68d881acae7"
+                  "sha256": "d3d3ae5f77ec83de9d9bc38888eecd0fe7f51433f2e5f04ad955062e151851c1"
                 }
               ]
             },
@@ -4457,22 +4546,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/serpent_man/64x64/front/move_0.png",
-                  "sha256": "67b2611f8e1f51ca132fe0eb80fcc10552edb11e4f279682839f8b34c0f65e07"
+                  "sha256": "dd787dffbc33199f6eef23e7171428109529da935614ddbf226777d5ffe81ae7"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/serpent_man/64x64/front/move_1.png",
-                  "sha256": "fab23d19d5454c4e02d51703453ad0f100da3a2fb37c674790ff63b1aa95ff71"
+                  "sha256": "8839aa14fe224983e802a90031d5b8a625e1c46d9e697e10b8420df5e4e78a22"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/serpent_man/64x64/front/move_2.png",
-                  "sha256": "287a416838f553f4e2bea24a35f14941590540f41ea383f72c43a9f019c8a568"
+                  "sha256": "d0bebd444693690c3087c1fe0a521f9a033620138263d84340e8856b3b5a4f7c"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/serpent_man/64x64/front/move_3.png",
-                  "sha256": "6536c2d983748a20b13fb6461d1f92ea6feb48a6b674fbac8f500d36c99d315d"
+                  "sha256": "e633a695d8531589e8aab6473ea85846052380236632a4ac9da1520428b223d0"
                 }
               ]
             },
@@ -4482,17 +4571,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/serpent_man/64x64/front/attack_0.png",
-                  "sha256": "90be0e4c0daf58711fccfd2790906f126a82fdc3d04eedb860838b9d37a03870"
+                  "sha256": "6fb9eb7efad63d4baed80f3a2088cea4447d879d9f04ddf97ccd61acc32ba017"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/serpent_man/64x64/front/attack_1.png",
-                  "sha256": "f1258db3400e6ec35db9ca1bc3a82f7be76a53c653cb0ea7935b29812e907292"
+                  "sha256": "0ac1884f7180e2b3467f3a1872a73d9b56f3f8882e9a2aa180058874bc19eec7"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/serpent_man/64x64/front/attack_2.png",
-                  "sha256": "d64caeaf8ff18bb125d258e303eb5de30449ed13f0ad9fff063458ab46ca349e"
+                  "sha256": "6da15c501d7fb87c04d0e715b5fe7e4b8510d2df1d2301ba9d9f59456e6d3c7b"
                 }
               ]
             },
@@ -4502,12 +4591,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/serpent_man/64x64/front/hurt_0.png",
-                  "sha256": "29227a30d72f512090503784dd732b771d8a98b922d6b18584aec508fa1d90da"
+                  "sha256": "2cb7eb8caff4370139e79faf088add85ab8dff8941621f04a4b485b61ca32096"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/serpent_man/64x64/front/hurt_1.png",
-                  "sha256": "3e2ac50a9a0ffcc9ac1282bcc93af548eb1a00eace05874e0e58d995adf762ce"
+                  "sha256": "d2226c6841926247ec215bdfc8e3599264ae036fb3fc7d5c02b1cc53be7086fb"
                 }
               ]
             }
@@ -4523,12 +4612,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/serpent_man/64x64/back/idle_0.png",
-                  "sha256": "ea030a3bf0234c6dfeb632ff83b6b1769ec9ecd228501607f0bee5811951e124"
+                  "sha256": "33e2ca05ca3dab0c849444825a495e3273c6f6a2d05ac8d9d481231c926f6cf7"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/serpent_man/64x64/back/idle_1.png",
-                  "sha256": "3d024c6322321d575928b6df24988de3ddf9c1b0ec384e339484e9047ae7a39b"
+                  "sha256": "a90077878c432c5ee215efac89c57b6efbfbf1c2276491f44d1337f9786db551"
                 }
               ]
             },
@@ -4538,22 +4627,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/serpent_man/64x64/back/move_0.png",
-                  "sha256": "c011d7690ace43f043628653edd6c599a99c103804d823f4d0b28f923a31733a"
+                  "sha256": "39feedde82ef1740585cf7f1c2574d8cdd39825f2d0a4c6e0eb2ab926df6b7cb"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/serpent_man/64x64/back/move_1.png",
-                  "sha256": "4ac3f367cd643cfaf6bc0fb4406a22a569e3273dd438409bd2908af819977fd9"
+                  "sha256": "f6175982d4ee2b060fb0c3a0e408b5ed23bc2d26f13424df62fadb91223a0530"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/serpent_man/64x64/back/move_2.png",
-                  "sha256": "a79fe91b874bf05cce924e9c8250689fb4b480cc625a8c7488d30ff161d15ec4"
+                  "sha256": "70f2b9a74507a38c8382914df1c3d1d0fd9714c17cbdd62baaf15e00b19601f7"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/serpent_man/64x64/back/move_3.png",
-                  "sha256": "71a434422991feba6c87f457b11af20ccd18026c9106e80775791a4745e79e19"
+                  "sha256": "cc685856a5a6bcc08c95d1f3270a54f4c5d21e4426ffc7a7de713f48c89a3ecd"
                 }
               ]
             }
@@ -4569,12 +4658,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/serpent_man/64x64/left/idle_0.png",
-                  "sha256": "32f71a5c5d4f74d2ed3e7664a1e2846d05193a20c21ca448ef298488aa4354bd"
+                  "sha256": "9cae874edc78b79c604baf254548ce22dd525b34bfffc436698c9d06217deff0"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/serpent_man/64x64/left/idle_1.png",
-                  "sha256": "ce5581f6d45feb24e67824e7e1612dad7322cad4ce2717c590abc215a02bc077"
+                  "sha256": "ba7b41c0208b1204fb1c550c9f66af792f99833b95227011e0bb5f6f44171390"
                 }
               ]
             },
@@ -4584,22 +4673,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/serpent_man/64x64/left/move_0.png",
-                  "sha256": "1ad34c108574cf682cf56045f0da942c721595fb8ebcd0e0f494ab1adcd823ea"
+                  "sha256": "a7f381f86d5575a6db7d728b5f3685f061b964c4fd0c65d70d715aabba152b52"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/serpent_man/64x64/left/move_1.png",
-                  "sha256": "a1d8487b01c34488373eb584687f32ac95fba9693d62852dafc5ee6a8f3e3e0f"
+                  "sha256": "1a971844c560abaa2b6a002698f469baf69511197c2774f82840cb7b7c6110f5"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/serpent_man/64x64/left/move_2.png",
-                  "sha256": "a286f998b4df64c51146b3e7339266aa48bafb02f0a99c224fc2ab283cdbe09c"
+                  "sha256": "8a148a2ddaf0db2fea3e0423f5696091bc423c9dd81df0f72d5dcc0a4da47e51"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/serpent_man/64x64/left/move_3.png",
-                  "sha256": "604cf60a628b726cb0cd3849b909ad92cc2134eb5cae58bc3f9bc00c8d569e02"
+                  "sha256": "777238409c59b8517173fbe6dc1d4aada73913b2a09ebc18082265510d34675a"
                 }
               ]
             }
@@ -4615,12 +4704,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/serpent_man/64x64/left/idle_0.png",
-                  "sha256": "32f71a5c5d4f74d2ed3e7664a1e2846d05193a20c21ca448ef298488aa4354bd"
+                  "sha256": "9cae874edc78b79c604baf254548ce22dd525b34bfffc436698c9d06217deff0"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/serpent_man/64x64/left/idle_1.png",
-                  "sha256": "ce5581f6d45feb24e67824e7e1612dad7322cad4ce2717c590abc215a02bc077"
+                  "sha256": "ba7b41c0208b1204fb1c550c9f66af792f99833b95227011e0bb5f6f44171390"
                 }
               ]
             },
@@ -4630,22 +4719,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/serpent_man/64x64/left/move_0.png",
-                  "sha256": "1ad34c108574cf682cf56045f0da942c721595fb8ebcd0e0f494ab1adcd823ea"
+                  "sha256": "a7f381f86d5575a6db7d728b5f3685f061b964c4fd0c65d70d715aabba152b52"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/serpent_man/64x64/left/move_1.png",
-                  "sha256": "a1d8487b01c34488373eb584687f32ac95fba9693d62852dafc5ee6a8f3e3e0f"
+                  "sha256": "1a971844c560abaa2b6a002698f469baf69511197c2774f82840cb7b7c6110f5"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/serpent_man/64x64/left/move_2.png",
-                  "sha256": "a286f998b4df64c51146b3e7339266aa48bafb02f0a99c224fc2ab283cdbe09c"
+                  "sha256": "8a148a2ddaf0db2fea3e0423f5696091bc423c9dd81df0f72d5dcc0a4da47e51"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/serpent_man/64x64/left/move_3.png",
-                  "sha256": "604cf60a628b726cb0cd3849b909ad92cc2134eb5cae58bc3f9bc00c8d569e02"
+                  "sha256": "777238409c59b8517173fbe6dc1d4aada73913b2a09ebc18082265510d34675a"
                 }
               ]
             }
@@ -10735,27 +10824,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/flying_polyp/boss/64x64/front/idle_0.png",
-                  "sha256": "114cdf531158155c10957d6645496ccbe7fa39a833120f733b27e103f1d82ec9"
+                  "sha256": "8f65e0dc366494cb9185df312cc07e9caf80b357968cce39c11d4157566f36bf"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/flying_polyp/boss/64x64/front/idle_1.png",
-                  "sha256": "cef92e1b0938b0d76b8f48840ab1eac4a6fbc98b66fa2b9ac76a98da799cb705"
+                  "sha256": "09e9e6638c215365172372d0ad42919d222d090910cfde19e2771711788ae25c"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/flying_polyp/boss/64x64/front/move_0.png",
-                  "sha256": "2cb27bad5f99f7b1a1599b4f7aad296f988cdc3a92c8028db86d454dc37de61c"
+                  "sha256": "17ed64dc22f97eaa497e2beac751a378af855b86f884d044e76b8ca7742e4761"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/flying_polyp/boss/64x64/front/move_1.png",
-                  "sha256": "8061f4beabc7949739c94a831021a46b4122ddc1dccf1d2799daceb48f360ea2"
+                  "sha256": "6131951921813569d95f7e9ab32f139df63cc5c88fe3287bb1e536478f22a88c"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/flying_polyp/boss/64x64/front/move_2.png",
+                  "sha256": "bd521b59f2e0b1ae612ad73c6295804f42dd0f222a9485f9751eac2454f437c1"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/flying_polyp/boss/64x64/front/move_3.png",
+                  "sha256": "6f951e0d369e5f9000ac6ab745184ba8db2f0b7974388c4664bf71705b19879f"
                 }
               ]
             },
@@ -10765,17 +10864,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/flying_polyp/boss/64x64/front/attack_0.png",
-                  "sha256": "9096e74f26ec5f38489dc63d7e1138975fdd3bb760a077d566cfe117919a65d2"
+                  "sha256": "650624125cc4d8fea3d3718c655683dda40c08736e51e43623e06e01a856fff5"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/flying_polyp/boss/64x64/front/attack_1.png",
-                  "sha256": "14d8697c40142208253735f544506d345b06646278165ee1998d335dd6779688"
+                  "sha256": "093fbb16de5ccf2928b3000285f887801d3f748738bc136280200df747e22824"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/flying_polyp/boss/64x64/front/attack_2.png",
-                  "sha256": "b92ded773a281a7dc509dc1ddcaf268e4c3cba3234433cd8632159628c7675cc"
+                  "sha256": "2039abd9469b8f2345bd98d0175009ec3c78ec82860d97c09fcdf085ac3ee84e"
                 }
               ]
             },
@@ -10785,12 +10884,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/flying_polyp/boss/64x64/front/hurt_0.png",
-                  "sha256": "3d9de491f797b6ccabe9c6c582a568178cfcf5539dce5e07468c588ef02e2ea7"
+                  "sha256": "76689b92721107be77de607d639850ec06188d77ded42c140802bcd7333d40d0"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/flying_polyp/boss/64x64/front/hurt_1.png",
-                  "sha256": "cecdb88d62982c1b9b04c992ae527011332179466af42d397a30faf47a52cc4b"
+                  "sha256": "53ea8b9621358f4a7a53ef81c90bd501fbc2d1d7db711159b2c3e8cba879f5a7"
                 }
               ]
             }
@@ -10806,27 +10905,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/flying_polyp/boss/64x64/back/idle_0.png",
-                  "sha256": "a2cfa6a973e1c67c745b18d439570aa7dd816f219b4a03e072832ddd30d97b3e"
+                  "sha256": "a44a75880cd8fbd5fd6ebcf5d4510698ea528b7a33d25ceaa8c8f6eba9b889b9"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/flying_polyp/boss/64x64/back/idle_1.png",
-                  "sha256": "23a61e5cd7543f688462090d391d51b3ad51f90915988e4395675054a8da32b3"
+                  "sha256": "fdb15b34a3baf4744acb08ff9c0b816a16157576bb6b90355be10cace085f659"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/flying_polyp/boss/64x64/back/move_0.png",
-                  "sha256": "6eb5e6c6b45446ae34d914e525d072e04400a42de9bfd0c0b8241f33f359e45d"
+                  "sha256": "2718f2ccdd39f8ee9dfb3ca9775ca47ab3c5907b849e522f27ab4cdeb530e11d"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/flying_polyp/boss/64x64/back/move_1.png",
-                  "sha256": "a1873128fb3a182e0e7f78a085b0601d7f1e878a598772e80eb9d58a3dd4a31e"
+                  "sha256": "652c7abc1e48d71b0c3bae272dccb2c72284f5a435312d285775852aba025a02"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/flying_polyp/boss/64x64/back/move_2.png",
+                  "sha256": "d349ee72e2bc2adabd29eb315a6458feb77e47331d0545dc2a3587d638fa41aa"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/flying_polyp/boss/64x64/back/move_3.png",
+                  "sha256": "7a8d1ec3997d7c8d4a41079980115fa8984633da3e8c17d9c385969dcf14251a"
                 }
               ]
             }
@@ -10842,27 +10951,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/flying_polyp/boss/64x64/left/idle_0.png",
-                  "sha256": "e9230b51b90a0fd2cc0e0287fc0e18734bc3f8f02857557db5b290db91333a2f"
+                  "sha256": "2ab14ba8718ba9dc87d49d3d6ab48ed7957103758b41bceacdaabb07feb010f5"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/flying_polyp/boss/64x64/left/idle_1.png",
-                  "sha256": "a52339adc1fc8665df27a42d6a5eca806930aa5b5dd0ed7a37531c6c38a44543"
+                  "sha256": "376a13e7b05000115c324b2a0f9e37d34c70dcbbe76de6a9f904b7d244386257"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/flying_polyp/boss/64x64/left/move_0.png",
-                  "sha256": "9f1ec6eb97ca6ab82b314f0963ef21125e16968e5e319186905ab01fa7da5594"
+                  "sha256": "592414bb09176f54895dc0657cc3c7d806cf5a75b9443a06919a415f7078168b"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/flying_polyp/boss/64x64/left/move_1.png",
-                  "sha256": "25215c3e8c1131ee469255643da4b36189c3e66010a17f2697b76f3374cdf623"
+                  "sha256": "19717085e3f36b057121728be303867136e251d962197f9196473b9d33d2f46a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/flying_polyp/boss/64x64/left/move_2.png",
+                  "sha256": "ef08b751e1f6ae2d0781c24db87ce7182423b7ac982ce7b60661497fdcc884a8"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/flying_polyp/boss/64x64/left/move_3.png",
+                  "sha256": "3b0ced944933d5975721fbf03fcc66e071634937ca518b33ce3213570d1ab923"
                 }
               ]
             }
@@ -10878,27 +10997,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/flying_polyp/boss/64x64/left/idle_0.png",
-                  "sha256": "e9230b51b90a0fd2cc0e0287fc0e18734bc3f8f02857557db5b290db91333a2f"
+                  "sha256": "2ab14ba8718ba9dc87d49d3d6ab48ed7957103758b41bceacdaabb07feb010f5"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/flying_polyp/boss/64x64/left/idle_1.png",
-                  "sha256": "a52339adc1fc8665df27a42d6a5eca806930aa5b5dd0ed7a37531c6c38a44543"
+                  "sha256": "376a13e7b05000115c324b2a0f9e37d34c70dcbbe76de6a9f904b7d244386257"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/flying_polyp/boss/64x64/left/move_0.png",
-                  "sha256": "9f1ec6eb97ca6ab82b314f0963ef21125e16968e5e319186905ab01fa7da5594"
+                  "sha256": "592414bb09176f54895dc0657cc3c7d806cf5a75b9443a06919a415f7078168b"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/flying_polyp/boss/64x64/left/move_1.png",
-                  "sha256": "25215c3e8c1131ee469255643da4b36189c3e66010a17f2697b76f3374cdf623"
+                  "sha256": "19717085e3f36b057121728be303867136e251d962197f9196473b9d33d2f46a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/flying_polyp/boss/64x64/left/move_2.png",
+                  "sha256": "ef08b751e1f6ae2d0781c24db87ce7182423b7ac982ce7b60661497fdcc884a8"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/flying_polyp/boss/64x64/left/move_3.png",
+                  "sha256": "3b0ced944933d5975721fbf03fcc66e071634937ca518b33ce3213570d1ab923"
                 }
               ]
             }
@@ -11254,37 +11383,27 @@
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/dhole/64x64/back/move_0.png",
-                  "sha256": "049bfafca2b87e6b001bcf227caffd39f7c6deefcbaf8acde65b4ae0e52c0490"
+                  "sha256": "710c2f33c3f1085f5dc4219b0983c9d47e6646c599dc20004aa108c1f270ce6c"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/dhole/64x64/back/move_1.png",
-                  "sha256": "e916827517ab05333963bc56312fd7d0b929f833caf4b68c26354aec92ff25d3"
+                  "sha256": "45e0c82149990c8e574e01825b0c50fe9ef5ec49933b063a9e4b9d846815549e"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/dhole/64x64/back/move_2.png",
-                  "sha256": "52666863829f97c887175c8f5409c0128ef222f7de6cf302512daa1f2eedeef2"
+                  "sha256": "81f8398f772532b45b5f51abf4589125de356692aa297e6454d8280efbb5a326"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/dhole/64x64/back/move_3.png",
-                  "sha256": "f047ab4b181cc54366d57cf9a2b4a49841409f62df14cb19102896d31c634c59"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/dhole/64x64/back/move_4.png",
-                  "sha256": "9e84d296475c2afde8a445c38bf215a6f172e6df223c495834ac0b895bd75a67"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/dhole/64x64/back/move_5.png",
-                  "sha256": "d9a2faafba1cd8b3a281e6c4debadde8ec8de3ea1f73084e2712ad8614499aa0"
+                  "sha256": "b4003052046715924b5a27116acce87ce6e5c16eb6a0fdf08f5c82b658d43f73"
                 }
               ]
             }
@@ -17186,22 +17305,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/lilith/64x64/left/move_0.png",
-                  "sha256": "7367c2fb1017c94f57f9a1c395b6d46ea355c5805faf849cde7b6ac3c5a8c873"
+                  "sha256": "79b60d3d44331cd31ebaff0459c7674a4268169c9c313b554f2e75362fdfd4e9"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/lilith/64x64/left/move_1.png",
-                  "sha256": "9f49a75b798ebaee1dced77276e0db923b38a56c168ec6ec618577254bf57a8e"
+                  "sha256": "419661d83854d2fa67e980753881e338bfbef04af20ad472f8efeb64f9e668d6"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/lilith/64x64/left/move_2.png",
-                  "sha256": "935ebe580b0ea47451f483e3c60d8f74e8a3d1073a6098c0fb2fc5759bb2bf7a"
+                  "sha256": "4d39ee9813dbaa8034be683755fec5e2d36f8db489a65e1e16fcdef08a70caa3"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/lilith/64x64/left/move_3.png",
-                  "sha256": "f7fa2948458753db0ad3099cc4344e4d9e79c1228f4ae4f667d564fab273d83a"
+                  "sha256": "1baefeac0b6917ff7cb310204ee75384b248b4e24d06113b5af7f6b85fc99c98"
                 }
               ]
             }
@@ -17232,22 +17351,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/lilith/64x64/left/move_0.png",
-                  "sha256": "7367c2fb1017c94f57f9a1c395b6d46ea355c5805faf849cde7b6ac3c5a8c873"
+                  "sha256": "79b60d3d44331cd31ebaff0459c7674a4268169c9c313b554f2e75362fdfd4e9"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/lilith/64x64/left/move_1.png",
-                  "sha256": "9f49a75b798ebaee1dced77276e0db923b38a56c168ec6ec618577254bf57a8e"
+                  "sha256": "419661d83854d2fa67e980753881e338bfbef04af20ad472f8efeb64f9e668d6"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/lilith/64x64/left/move_2.png",
-                  "sha256": "935ebe580b0ea47451f483e3c60d8f74e8a3d1073a6098c0fb2fc5759bb2bf7a"
+                  "sha256": "4d39ee9813dbaa8034be683755fec5e2d36f8db489a65e1e16fcdef08a70caa3"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/lilith/64x64/left/move_3.png",
-                  "sha256": "f7fa2948458753db0ad3099cc4344e4d9e79c1228f4ae4f667d564fab273d83a"
+                  "sha256": "1baefeac0b6917ff7cb310204ee75384b248b4e24d06113b5af7f6b85fc99c98"
                 }
               ]
             }
@@ -18538,12 +18657,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/martins_beach_horror/64x64/front/idle_0.png",
-                  "sha256": "dac0689b87908495d39439a0c7999816aebc7368c10f72db0ea9490dd08cb66e"
+                  "sha256": "7f561a12c30f7959a4dc3c46433be70a0eadd035ef23822af310bf72ec697233"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/martins_beach_horror/64x64/front/idle_1.png",
-                  "sha256": "f1782a2779f74da191baeb70ae031688bf86e0824cdd165b4a02b568e3885d20"
+                  "sha256": "b1cde56c7b683d25faafc9985488a7b6bb89fb9f193e32bbd6476ae60353fb37"
                 }
               ]
             },
@@ -18553,22 +18672,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/martins_beach_horror/64x64/front/move_0.png",
-                  "sha256": "a4d13fa7b1ca1efb30c74c6c3e3b468fe1266f62204b4ded83684a7fcc37de16"
+                  "sha256": "7067ef2dc9406d89718cb184d71aa8af9e76effcc620eb0b6486d426f40c9339"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/martins_beach_horror/64x64/front/move_1.png",
-                  "sha256": "a3ef857a3f6eb3e6c18d6c9fc25d83be7d4d04b38dc00e30418d8a1ad820d388"
+                  "sha256": "e0bd3d73075acc86ac7d65ec8a36663d844e0acfd814a0483411a2b7e60342b3"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/martins_beach_horror/64x64/front/move_2.png",
-                  "sha256": "df5dd14aac32f3ff30668d9c39fe0cc3e48a671e2e09d3fd7bc34d4af1121ef8"
+                  "sha256": "b080d8b72ce1cc1343c0f1951e9f65738e592ac97b1075f0c863e02d1cd6272b"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/martins_beach_horror/64x64/front/move_3.png",
-                  "sha256": "0e09411140ba176cebe15cfaf9a6119f14015f01bbd7f0b755e89b89733e8495"
+                  "sha256": "1b54b27dc189c02d92f5da491a04b15d732598da14e3952f3959189f0d220aa5"
                 }
               ]
             },
@@ -18578,17 +18697,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/martins_beach_horror/64x64/front/attack_0.png",
-                  "sha256": "fe538fc6f422372dc43bfaa9747cb1ea4c24aecf6850c8ecbad2fe1312ebb89b"
+                  "sha256": "6d503a873650c345e004a81bfa375fa842902b083f8db2213f08e9c2e03ef38f"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/martins_beach_horror/64x64/front/attack_1.png",
-                  "sha256": "ab887c7e49731defd19a38966f9ffbc503c809deb42a7b4421cdfaa664792466"
+                  "sha256": "4d6d826ce64cbef23d2935ba0e398292cf6ac4957e1592fbca72b6595cf8be06"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/martins_beach_horror/64x64/front/attack_2.png",
-                  "sha256": "60b328a64c2601c882e318bf88f2a754df81b19c7314d56a9ee810447e5d1950"
+                  "sha256": "dce91552218081b448a969a3e3980e5580e1638283d859c52cb03ae026399397"
                 }
               ]
             },
@@ -18598,12 +18717,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/martins_beach_horror/64x64/front/hurt_0.png",
-                  "sha256": "98a8a72ccef11a0a31244b7fc32082ee44902b61d167e242c4cc490056cca088"
+                  "sha256": "e7025a018a2d5256a8fd176421f17af9dbacda44d81158513f0e54615403be95"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/martins_beach_horror/64x64/front/hurt_1.png",
-                  "sha256": "4855c0e2563e9a42c35ef113b7e9d747c1268e390b4d46e444c9b302c8deb8a0"
+                  "sha256": "9e8d5dce9300f42dd0520c3d4a146043ed490b2b816067507822fbfbd88ccf65"
                 }
               ]
             }
@@ -18619,27 +18738,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/martins_beach_horror/64x64/back/idle_0.png",
-                  "sha256": "8747d4f47b3479d93adcbd1ba74a962105c5ff8f1094c49f26988e59d83ff869"
+                  "sha256": "2c467be54f82ec7f5ef992b1b55206d999ef2fe2f1cbbb20513b162961df033d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/martins_beach_horror/64x64/back/idle_1.png",
-                  "sha256": "92ff6b7cfb60d886de1e17a242b2a07e71a190606aa589a18b4e60f731485c0d"
+                  "sha256": "529c54b36d8f399e93abef24e60d7769a54e1742793316a06d51073b83e8364c"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/martins_beach_horror/64x64/back/move_0.png",
-                  "sha256": "e4512ca7bbe06b9d2765aa4e3cdc992de8366e52342284ef5b9c59a33d187684"
+                  "sha256": "09a6afb6880b70cb8da920a1711ced69fe9f376f39b5792c2fee4ffc72e51caa"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/martins_beach_horror/64x64/back/move_1.png",
-                  "sha256": "93c8df7e9d94a47c8c4820e7d8c1d9216699085c5b14b9a16224e40397fd7887"
+                  "sha256": "3f66dca4fd109afd8de77228f89753d5dc5307c57a35fb676080816caf7c7b9a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/martins_beach_horror/64x64/back/move_2.png",
+                  "sha256": "7436277f0710a92444b11d6decf790216d96d3e11c565f633312392fd0c1774b"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/martins_beach_horror/64x64/back/move_3.png",
+                  "sha256": "60f925ed00d3d61a87269b8f51af2affb0c8279749df38aa5e32af9ffe9c4fc8"
                 }
               ]
             }
@@ -18655,63 +18784,83 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/martins_beach_horror/64x64/left/idle_0.png",
-                  "sha256": "ca1e14f85b7d6443778870df1759a8e2c103f9e1557438840dc87618c3e71607"
+                  "sha256": "55a259ff1695356577f9658852bf8dc0292f8d51526df1ef0734cf20edb581a2"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/martins_beach_horror/64x64/left/idle_1.png",
-                  "sha256": "78f4827c7fe88a1e076854f3607ef63587e457507adc2707d96bc178e2f6f6cf"
+                  "sha256": "20b6cf3c27bea3294ac8ab0a08bf792daf658ed9bfcb7a19498f8c623f0e2bed"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/martins_beach_horror/64x64/left/move_0.png",
-                  "sha256": "dac1355a02dcfff80083ff2f4ed1ff114cfcab8759b50838254bca6bbc4959ea"
+                  "sha256": "f10276786fd8a958afed7b546acae8ab13bc33cd95248a3cbbc0073122975b3e"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/martins_beach_horror/64x64/left/move_1.png",
-                  "sha256": "5df4b873271ddfbf7d758d0fb053bc633d283b9661f2b60fefba4e42ec913a24"
+                  "sha256": "81e487a6afd0b945691cb3a62315c0f16ea89c7ca8ef6aeab098bbca3f39957a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/martins_beach_horror/64x64/left/move_2.png",
+                  "sha256": "886e2e9d0e08374ddf87800ca871f47f7e8aa656d247321e322777cce92da33b"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/martins_beach_horror/64x64/left/move_3.png",
+                  "sha256": "7751bfcf0f778e8c397c9958593e7e3c651427673a04c67db71f21149f0a505a"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "sprites/martins_beach_horror/64x64/right/idle_0.png",
-                  "sha256": "7eac71cd0c9a563e6cc8cd766745ada968eb0cc0e8eac8a1ae74859124f1539e"
+                  "path": "sprites/martins_beach_horror/64x64/left/idle_0.png",
+                  "sha256": "55a259ff1695356577f9658852bf8dc0292f8d51526df1ef0734cf20edb581a2"
                 },
                 {
                   "name": "idle_1",
-                  "path": "sprites/martins_beach_horror/64x64/right/idle_1.png",
-                  "sha256": "07f8111efd2e3ec8ca4dc3f1ea20322cf9b0d0ef073337c5f5d895050e35c89d"
+                  "path": "sprites/martins_beach_horror/64x64/left/idle_1.png",
+                  "sha256": "20b6cf3c27bea3294ac8ab0a08bf792daf658ed9bfcb7a19498f8c623f0e2bed"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "sprites/martins_beach_horror/64x64/right/move_0.png",
-                  "sha256": "4a41e1d1bd84e3333a184ce114265736bd4a1ba72f0136fec4ff7ba99d5e7cd4"
+                  "path": "sprites/martins_beach_horror/64x64/left/move_0.png",
+                  "sha256": "f10276786fd8a958afed7b546acae8ab13bc33cd95248a3cbbc0073122975b3e"
                 },
                 {
                   "name": "move_1",
-                  "path": "sprites/martins_beach_horror/64x64/right/move_1.png",
-                  "sha256": "7a50e8ac7aa0fbd804c51b1a2d54d3376a73d5cee68d5e3d3015edc490b796f9"
+                  "path": "sprites/martins_beach_horror/64x64/left/move_1.png",
+                  "sha256": "81e487a6afd0b945691cb3a62315c0f16ea89c7ca8ef6aeab098bbca3f39957a"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/martins_beach_horror/64x64/left/move_2.png",
+                  "sha256": "886e2e9d0e08374ddf87800ca871f47f7e8aa656d247321e322777cce92da33b"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/martins_beach_horror/64x64/left/move_3.png",
+                  "sha256": "7751bfcf0f778e8c397c9958593e7e3c651427673a04c67db71f21149f0a505a"
                 }
               ]
             }
@@ -20151,12 +20300,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zkauba/64x64/front/idle_0.png",
-                  "sha256": "2d2fd9e60e388fe71d066f8b80e7893183ecd4f4cea47415a674db5526719b03"
+                  "sha256": "7fbcbbadabc8a5c12236d688fc4ea95812b0586d2d67e2807bb67f4a07763d9f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zkauba/64x64/front/idle_1.png",
-                  "sha256": "72bff834c5cae2ca5c9622f61f56f5c4af7483e4cc8d1999b24d9666ab9665ff"
+                  "sha256": "1a0563ecfbf3df6c34074dc91e9643456869a94ebfdb56dc96eab6c5d9859465"
                 }
               ]
             },
@@ -20166,22 +20315,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zkauba/64x64/front/move_0.png",
-                  "sha256": "58a6755d937e6ae2843764999ec19bc5fb8eae36ce47d392438d29914e2349c1"
+                  "sha256": "84a47922d7d4ac78bb1cfbeb024b6ffedcd0822e9ea68d14df3d3a2a39ae1531"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zkauba/64x64/front/move_1.png",
-                  "sha256": "31dbb7cd8f3c1edd2158094883d43570fc6fd02e0d0d0399813e679f38f1956e"
+                  "sha256": "886ba63f1f5016723766413383a21b6c7ca7ba030620f95fa76ec97523637123"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/zkauba/64x64/front/move_2.png",
-                  "sha256": "67f3477ec36893d6d8e91151a361bc4fc3bcffd0c2ad614c46fe3d7886f535eb"
+                  "sha256": "98f5f4c2bef6f5f3552d6c73cd7796cee72a7fc1de15869081668cc7420ba157"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/zkauba/64x64/front/move_3.png",
-                  "sha256": "6c9a03218f3c5c8d290602478070849ffa52428e0ac7e507beab26827967a888"
+                  "sha256": "76efef34a9bf3eee46f20a3ecce83732888b163d1600dd670fc0ad2672123adf"
                 }
               ]
             },
@@ -20191,17 +20340,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/zkauba/64x64/front/attack_0.png",
-                  "sha256": "015f326d08d2d8e6558fad6998f73ebd30e0e5e7db07a75afd8bfdb72246462c"
+                  "sha256": "268bcb8d7197919f7571a7699a668af36d2b4070554220481cc073e909578701"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/zkauba/64x64/front/attack_1.png",
-                  "sha256": "e34eb1183ba45e1dfcb5ac1229302ff19df9a807720b1345a6a285f6a6027212"
+                  "sha256": "87655a3020359b833fb860360eb4bde14f44848790fd7144990a17ff5ec271a8"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/zkauba/64x64/front/attack_2.png",
-                  "sha256": "2a32ef4486b601f34f3638db67f59ed6b8f7adbbcb1cccc689b13b42f46d54ee"
+                  "sha256": "ff7d45df440226d8470c273deaade1dcef2eb5c91f42df5055e21f056f3def08"
                 }
               ]
             },
@@ -20211,12 +20360,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/zkauba/64x64/front/hurt_0.png",
-                  "sha256": "bd7f43bb23b4e562c8753e8784c63528a6d8265ab3505f93b0325f2af8c48f75"
+                  "sha256": "b6aaebe032eb74d8aaf55ead9d83e0f6b00c2a20c236276abacfc4c80e100739"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/zkauba/64x64/front/hurt_1.png",
-                  "sha256": "5e56db9752b05a40810859fe42b4999f369b72501f992de0e4ce028ec0d45bdf"
+                  "sha256": "2875e47f069313553d7eeee0d8063763dd09652692c7c9966a04b0d8eeac8bd1"
                 }
               ]
             }
@@ -20232,12 +20381,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zkauba/64x64/back/idle_0.png",
-                  "sha256": "617f36f24fe0ef584404475edcd933236bee65c2d66e24b72f568d813d411653"
+                  "sha256": "f43187d2ffac4f629058c5e0518f4dfd6632598a23a4cfc1a52a36385cd81a33"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zkauba/64x64/back/idle_1.png",
-                  "sha256": "30b0ccd31b4475218202d94874e22504f0ffcde9450a9d2b88e981d02ed17584"
+                  "sha256": "1ab20326ba53e4005edf118387e96f87a5b990a8e1de908574131ae655ec8582"
                 }
               ]
             },
@@ -20247,22 +20396,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zkauba/64x64/back/move_0.png",
-                  "sha256": "fad701191217c4e45b6e78fdde6a17863cc896174e43ce7e82c3d0ddacd85597"
+                  "sha256": "8d1a818b86dc1646a4341edfca83bcf3c1a6a6d84418b015b4cc7af54c81e390"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zkauba/64x64/back/move_1.png",
-                  "sha256": "e0ec7e25b9a270ad22f9d480176d33ee168bd3eb7ce9e4cc3f1cf88ec7beaa17"
+                  "sha256": "34f53c125b5acaf66e11cccf10e96eb8c63c1b63e3e1966eba59187477fcc934"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/zkauba/64x64/back/move_2.png",
-                  "sha256": "8952b452344d5068a9ee6092bd97019d6fa527905a41bb7132fefa04a995c289"
+                  "sha256": "0bc9fdb1f50a6bd7614344dcad0cc73578e7d8cba30509a717c06862bd3f2469"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/zkauba/64x64/back/move_3.png",
-                  "sha256": "998dc10f60ef64d9a11414ed3525365a389a5e057f1d85f3dbafbbfaefac6409"
+                  "sha256": "dceff822379f8fc50b53eaa03ba4fe269e6a326a33b5d920014c621b4769aded"
                 }
               ]
             }
@@ -20278,12 +20427,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zkauba/64x64/left/idle_0.png",
-                  "sha256": "78366ca20925c043abc8d22b5904bed2b2ba302225583b330580bf48db59c864"
+                  "sha256": "ec79db93aa00da080ad8b482de555e34a6cdc0208b7f1190f18a3f9d0175f2cc"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zkauba/64x64/left/idle_1.png",
-                  "sha256": "bfebe59696ae55f80b440c3857b8c67f4e9fd440fd9d991b2b96f3c72b746cd3"
+                  "sha256": "72a6d23e89fe4558b4aa784aa3b4326ddce97437d3374a267b883ed390fc241a"
                 }
               ]
             },
@@ -20293,22 +20442,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zkauba/64x64/left/move_0.png",
-                  "sha256": "dce0da18bca68f588186c6df5d4cbc1ae08bf8358d8dda4935ab4fb61c75df17"
+                  "sha256": "a96575035f82d6365e5756a0c81cca6f1b32b33d27b4e3b5b07c7a5349db0a34"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zkauba/64x64/left/move_1.png",
-                  "sha256": "038661b651ac869451cd0dfed23f1fc2106a16a73b7f27d81e26c942f490d109"
+                  "sha256": "0b9515ae3d796fc54ccce36710020a2105dc8a4ba76019cf9e5025c1b439ace8"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/zkauba/64x64/left/move_2.png",
-                  "sha256": "9b553a6577b5445a4c50e2c177f74e379c481bf1d196cff682593cc185d3e140"
+                  "sha256": "7e31da780ff1af595d76c94d6aa0ea90331d4586155eaed658b18dc6763a205e"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/zkauba/64x64/left/move_3.png",
-                  "sha256": "300975f2b5a604f0630e47511f08fdfccb8455e1b7e16231956fea70c978f89b"
+                  "sha256": "c80a5a38a092b3dcaac10f2c18d38b9b53b6ba0011d5e9a045c4603872b95eb3"
                 }
               ]
             }
@@ -20324,12 +20473,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zkauba/64x64/left/idle_0.png",
-                  "sha256": "78366ca20925c043abc8d22b5904bed2b2ba302225583b330580bf48db59c864"
+                  "sha256": "ec79db93aa00da080ad8b482de555e34a6cdc0208b7f1190f18a3f9d0175f2cc"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zkauba/64x64/left/idle_1.png",
-                  "sha256": "bfebe59696ae55f80b440c3857b8c67f4e9fd440fd9d991b2b96f3c72b746cd3"
+                  "sha256": "72a6d23e89fe4558b4aa784aa3b4326ddce97437d3374a267b883ed390fc241a"
                 }
               ]
             },
@@ -20339,22 +20488,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zkauba/64x64/left/move_0.png",
-                  "sha256": "dce0da18bca68f588186c6df5d4cbc1ae08bf8358d8dda4935ab4fb61c75df17"
+                  "sha256": "a96575035f82d6365e5756a0c81cca6f1b32b33d27b4e3b5b07c7a5349db0a34"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zkauba/64x64/left/move_1.png",
-                  "sha256": "038661b651ac869451cd0dfed23f1fc2106a16a73b7f27d81e26c942f490d109"
+                  "sha256": "0b9515ae3d796fc54ccce36710020a2105dc8a4ba76019cf9e5025c1b439ace8"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/zkauba/64x64/left/move_2.png",
-                  "sha256": "9b553a6577b5445a4c50e2c177f74e379c481bf1d196cff682593cc185d3e140"
+                  "sha256": "7e31da780ff1af595d76c94d6aa0ea90331d4586155eaed658b18dc6763a205e"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/zkauba/64x64/left/move_3.png",
-                  "sha256": "300975f2b5a604f0630e47511f08fdfccb8455e1b7e16231956fea70c978f89b"
+                  "sha256": "c80a5a38a092b3dcaac10f2c18d38b9b53b6ba0011d5e9a045c4603872b95eb3"
                 }
               ]
             }
@@ -23424,12 +23573,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/front/idle_0.png",
-                  "sha256": "b6abdd2e00e4e15ce867b0ccd3bfb83384b69b0e6e755d36f2b575d0d3d8518d"
+                  "sha256": "9f054534616ea5acdd3fc4a73c38d8a77bf978dc00e2d51673a17ea7da05983e"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/front/idle_1.png",
-                  "sha256": "d0d45ef09fffbefa3f8f264bbed38ebe38fa5bb5fb319720e6d19a6fa1fecdfd"
+                  "sha256": "58fd6a1e0ec1c9ef8575035f30a5e93af07d2ec0ae1877c20242ce11f24e2d46"
                 }
               ]
             },
@@ -23439,32 +23588,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/front/move_0.png",
-                  "sha256": "4d93ab1814d0c91a571480455e9f089d5e3f14aba47c9a6affa22a5c85843811"
+                  "sha256": "fd5669e61817ddafcd332902a548e35ac1e3829537db8bc3b135968ef1152ede"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/front/move_1.png",
-                  "sha256": "5d4a6fdd4322cf8540c7a85f4b1c4c234f5ac63d4facad2a518b9ab07952fff9"
+                  "sha256": "290d96d209e910d498ccf824d898bd1666cf8bd2c7bf33091ecab3c746ca40c6"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/front/move_2.png",
-                  "sha256": "930b60f20bfe5d39ad0b8cffac0b60d540f3567ba75e61a8dab43860add89b09"
+                  "sha256": "0ac4040c57fe8062e2252d5cca50eb0c8129cc194bd386089958bab2d748a9c3"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/front/move_3.png",
-                  "sha256": "fcaf312b9c8debc21c5cc4d5b411bae4301fe3f15f081083f46813275c78c16b"
+                  "sha256": "8ece081168aaf3c07711d13306bdb7f023e772569e4d697de1d1151835e2b56c"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/front/move_4.png",
-                  "sha256": "cf640a4f63811310e6aa71a7832afe050f0d1472adefdf498a6f9923f7ed40bd"
+                  "sha256": "786de45a78b7efc55df270ea5b51e74a487dfc212563e2b3562f65501042f2dd"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/front/move_5.png",
-                  "sha256": "a136162bc2c813fb29bf1c7fa8bd681e87a6a46dded335c7fe9a9a8ab24a9617"
+                  "sha256": "e06f6a3c4d5d8eae26c1f81c45031680c5d0e88f0150817151258ed799b1f08e"
                 }
               ]
             },
@@ -23474,17 +23623,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/great_ones/64x64/front/attack_0.png",
-                  "sha256": "ee15b7d55bb26d140ddc6ea1cfdc96f8463369cbbd02e0a583945980b76584f7"
+                  "sha256": "c2789120bbc9307bb437d32e3cdfca59771bd5e172338515dcdf280a471b811c"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/great_ones/64x64/front/attack_1.png",
-                  "sha256": "4427733bad5d0994d6593871c52951c77bc1d6568e6df06209886907643afcda"
+                  "sha256": "c095d8c3f87326b92dc98377002b18f8b585a111ae958a572fadd8cf51c5cae3"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/great_ones/64x64/front/attack_2.png",
-                  "sha256": "41a1af3262cd55b0a2457e07bfafa46359ea0aff212e905d8d7b5872da40f99d"
+                  "sha256": "71cc3cba5766a4f675eb1cca4e031292eba2a5140b1d8b6c033778581d1199f4"
                 }
               ]
             },
@@ -23494,12 +23643,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/great_ones/64x64/front/hurt_0.png",
-                  "sha256": "a5d2350cb9f18f6e99f1fe5ceb1bb823651ca85057631375151040f422e7e5f8"
+                  "sha256": "51659fe775b5ec58299583667a71cd653f15cf08ede6c173cb191dfa08cf2436"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/great_ones/64x64/front/hurt_1.png",
-                  "sha256": "a93e0639d1635c61541136f87c1b36e7ab5fd8f123f5e33e1185bb01b3aba570"
+                  "sha256": "1ac177970060bdfe9e0825fb174627a289d40da2ad3c675744f80a85535e04b6"
                 }
               ]
             }
@@ -23515,12 +23664,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/back/idle_0.png",
-                  "sha256": "fb4d18c4c1a1ed8cc6724d7b61c480b759892eef0c6ae3f0566089d234555ef9"
+                  "sha256": "1d200e9e273d6b1ce878878e9f4d13ca1ff6ce25df3f03f56097f3ac2b145905"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/back/idle_1.png",
-                  "sha256": "69e2adabd526070490025bde29c1373283004d587d0788b7d8a8bee7a28c43d6"
+                  "sha256": "bb7173ef640a85d13145e851f66b25e747449e6bc61b00faca61f1ea500bfa6a"
                 }
               ]
             },
@@ -23530,32 +23679,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/back/move_0.png",
-                  "sha256": "86bebd68db990b66a8687b72a7302a2a26c10b9819d64965e85c89a42fe0e7d8"
+                  "sha256": "b0712c5761bb4febc45a934a799d4782db036f634e4b4c468bd824788b12241b"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/back/move_1.png",
-                  "sha256": "2f0ce1cba7ba1f72cb5b9fd80272ca4f37fd80a16847fc720bc4ac78c8635b62"
+                  "sha256": "10bb11099ae29208a571a0305516bdc8a5d37b8a6fe41d856d91c6b7fafc2d3b"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/back/move_2.png",
-                  "sha256": "6da287570dd757c3b6f011b495a4117c87af68810a7a061edbaec7c05574585b"
+                  "sha256": "26c814fa3223942b028930a06adddeb1d1b61cb7f61206204fc18d6f18e5d218"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/back/move_3.png",
-                  "sha256": "1a75f5a23d48eb7c31f3b570b467a115ccabf51985dda584eef6f0b34a35ba86"
+                  "sha256": "d6b6e4691e04f468b852726c379d02ca795e72def6ae8317d996e2ce7a26d437"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/back/move_4.png",
-                  "sha256": "2f25f0cd4be99a593fe7cb765812d1fb40c04c751f6b8358f68287bd17709f9a"
+                  "sha256": "8f9718398d367db54ac5f9ed238e090b71c58a42b58a4b7e003b14c0e5841057"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/back/move_5.png",
-                  "sha256": "e8678cc6614588c57aa66e25fd175edd57e12d02d6b470eab24641e45e5febf4"
+                  "sha256": "6a3356fd02ca8bf85914645d267b266e73c34af5b6a41027c146dc32ea31e6eb"
                 }
               ]
             }
@@ -23571,12 +23720,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/left/idle_0.png",
-                  "sha256": "2e428c1e45cbbe296c2b3d4b27cd30df37b0537bef790ab3ad6cc0f623850a13"
+                  "sha256": "ee7a66e54f0d3fe63d90fe9d1a6af173122eb1a0fdfe6e3b7dc6d7b5bff334ec"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/left/idle_1.png",
-                  "sha256": "084995bcefeae31cd2e9e6a0438044876e3300524bde2e38bb3908b461729cfd"
+                  "sha256": "0e6631ecd4d2c46c0c1e1738f7bf660f0918c066631f53500d53ac4660b31960"
                 }
               ]
             },
@@ -23586,32 +23735,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/left/move_0.png",
-                  "sha256": "ca36a35aa6cf536028edaf1be79a84026d3edb0edcf59a35c1d5f7ba87ddf6b9"
+                  "sha256": "850bcce7c718e186ab542138619cab15addb81bf2d053281ba14f4df5bf22566"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/left/move_1.png",
-                  "sha256": "e030375a40a379f2ab201680461dd2f53a2f813767d28656e2f85bd7936b2e2e"
+                  "sha256": "b9061e8b3d744c773ee90ccdf12d23cf621b8b6744817b148d29a2cd6b58d4ad"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/left/move_2.png",
-                  "sha256": "75121e0845342f9653c7dc8a5414c541890eafe5a4ee90665a02376d72aa973f"
+                  "sha256": "ad709cb46c2cb93e0fa864bcc345f1d16282468a18cdfe732e255ea5362028c9"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/left/move_3.png",
-                  "sha256": "52f8c08e5d2e0f19b311d2753acfcb0800b4b57e0e097fde05cef7442e728ce2"
+                  "sha256": "7dac3fda93b09ec7f97d430c0b8567061fc60601e0d649200b4381e7e01fd62b"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/left/move_4.png",
-                  "sha256": "bade3beec4692d05f2f909ba45f0d7aa7db59d09c72690913487b22201cd8589"
+                  "sha256": "633fec2980a14cc73300f10cbc6bb0a9c34d07f11abf574aa0ea2ddb582a92cf"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/left/move_5.png",
-                  "sha256": "0e41b32e53c4c32c74679cd8054ddfc22eb528e89325b7342d7ef67ee03b2814"
+                  "sha256": "c916e43d624fc1f8b1c93dd26fb19f6cb4d4e1a850242cb678393e28e2d50171"
                 }
               ]
             }
@@ -23627,12 +23776,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/left/idle_0.png",
-                  "sha256": "2e428c1e45cbbe296c2b3d4b27cd30df37b0537bef790ab3ad6cc0f623850a13"
+                  "sha256": "ee7a66e54f0d3fe63d90fe9d1a6af173122eb1a0fdfe6e3b7dc6d7b5bff334ec"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/left/idle_1.png",
-                  "sha256": "084995bcefeae31cd2e9e6a0438044876e3300524bde2e38bb3908b461729cfd"
+                  "sha256": "0e6631ecd4d2c46c0c1e1738f7bf660f0918c066631f53500d53ac4660b31960"
                 }
               ]
             },
@@ -23642,32 +23791,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/left/move_0.png",
-                  "sha256": "ca36a35aa6cf536028edaf1be79a84026d3edb0edcf59a35c1d5f7ba87ddf6b9"
+                  "sha256": "850bcce7c718e186ab542138619cab15addb81bf2d053281ba14f4df5bf22566"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/left/move_1.png",
-                  "sha256": "e030375a40a379f2ab201680461dd2f53a2f813767d28656e2f85bd7936b2e2e"
+                  "sha256": "b9061e8b3d744c773ee90ccdf12d23cf621b8b6744817b148d29a2cd6b58d4ad"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/left/move_2.png",
-                  "sha256": "75121e0845342f9653c7dc8a5414c541890eafe5a4ee90665a02376d72aa973f"
+                  "sha256": "ad709cb46c2cb93e0fa864bcc345f1d16282468a18cdfe732e255ea5362028c9"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/left/move_3.png",
-                  "sha256": "52f8c08e5d2e0f19b311d2753acfcb0800b4b57e0e097fde05cef7442e728ce2"
+                  "sha256": "7dac3fda93b09ec7f97d430c0b8567061fc60601e0d649200b4381e7e01fd62b"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/left/move_4.png",
-                  "sha256": "bade3beec4692d05f2f909ba45f0d7aa7db59d09c72690913487b22201cd8589"
+                  "sha256": "633fec2980a14cc73300f10cbc6bb0a9c34d07f11abf574aa0ea2ddb582a92cf"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/left/move_5.png",
-                  "sha256": "0e41b32e53c4c32c74679cd8054ddfc22eb528e89325b7342d7ef67ee03b2814"
+                  "sha256": "c916e43d624fc1f8b1c93dd26fb19f6cb4d4e1a850242cb678393e28e2d50171"
                 }
               ]
             }

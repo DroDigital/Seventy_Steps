@@ -5,6 +5,7 @@ import { WORLD } from '../data/tuning';
 import { inDungeon } from '../world/terrain';
 import { regionAt } from '../world/worldMap';
 import { cyclesFor } from './mountGait';
+import { stepReins } from './mountReins';
 import { steerArcade, steerHorse } from './mountSteer';
 import type { Game } from './components';
 import { footprintClear, mountFootprintForbidden, mountPlaceForbidden } from './mountGround';
@@ -125,5 +126,6 @@ export function moveMounted(g: Game, dt: number): MountMove {
     const error = wrapAngle(m.face - tr.yaw);
     if (backOff(g, tr, clamp(error, -0.03, 0.03))) mount.speed = Math.max(mount.speed, k.creep * 0.5);
   }
+  if (!k.arcade) stepReins(mount.reins, dt, mount.speed, mount.yawRate, p.sprinting, blocked ? 0 : target); // the motor car has a wheel, not reins; a rig held against something is hauled up on, whatever the stick asks
   return 'rode';
 }

@@ -223,7 +223,7 @@ void main() {
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);
   float character = min(uCharacter, 1.0);
-  float lanternVis = mix(1.0, lanternLit(vWorld, n), uLShadow.x * (1.0 - self)); // what stands between a point and the lantern takes its light (round 34)
+  float lanternVis = mix(1.0, lanternLit(vWorld, n), uLShadow.x * (1.0 - self)) * lanternSlab(vWorld); // what stands between a point and the lantern takes its light (round 34), the seat back of a rig among it (round 57)
   vec3 lamp = uLanternColor * lanternFalloff(ld) * mix(facing, share, character) * lanternVis;
   float floorish = smoothstep(0.55, 0.9, n.y) * (1.0 - uEmissive) * (1.0 - character); // damp stone, up where the light falls on it, catches it in a streak (round 39)
   vec3 streak = vec3(0.0);

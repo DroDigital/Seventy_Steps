@@ -45,7 +45,7 @@ export const GREATER = tier('greater', [
     behavior: { archetype: 'invisible_stalker', attacks: ['wind_push', 'grab', 'tentacle_burst'] },
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
     bossVariant: {
-      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.7, 0.36] }, stats: { hp: 1900, poise: 800, damage: 55 }, // its unchanged boss art keeps the blob's body
+      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.73, 0.25] }, stats: { hp: 1900, poise: 800, damage: 55 }, // its redrawn body: a mass 3 m across under 6.25 m of tentacle; struck up to 5.84 m, for its hall's roof is at 6 and a capsule that reaches it is pushed out through the wall (round 57)
       drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
       bossScript: phases(ph(1, { wind_push: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['decoys'] }), ph(0.5, { wind_push: 2, aoe_ring: 1, tentacle_burst: 1, grab: 1, barrage: 1 }, { hooks: ['decoys', 'control_swap'] })),
     },

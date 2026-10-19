@@ -9,6 +9,7 @@ import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { isDone } from './quests';
 import { mountGroundAllowed, footprintClear } from './mountGround';
+import { createReins, type ReinState } from './mountReins';
 
 export { moveMounted } from './mountMotion';
 
@@ -22,9 +23,10 @@ export interface MountState {
   jam: number; // frames it has wanted to turn and could not (systems/mountMotion.ts: after a few it is backed off the obstacle)
   phase: number; // gait cycles ridden since the summon, by distance (systems/mountGait.ts): the picture and the hoofbeats both count from it
   cooldownUntil: number;
+  reins: ReinState; // the driver's hands: slaps at a gallop, a pull to stop, a hand drawn into a turn (systems/mountReins.ts; the picture and the sound read it)
 }
 
-export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0 });
+export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins() });
 export const mountUnlocked = (g: Game): boolean => isDone(g, MOUNT_QUEST);
 
 function dlcOwned(g: Game, id: MountId): boolean {
@@ -62,7 +64,7 @@ export function selectMount(g: Game, id: MountId): boolean {
 /** Dissolves in place: no teleport, healing, stamina, invulnerability or action cancellation. */
 export function dismissMount(g: Game): void {
   if (!g.player.mount.active) return;
-  Object.assign(g.player.mount, { active: null, speed: 0, yawRate: 0, jam: 0 });
+  Object.assign(g.player.mount, { active: null, speed: 0, yawRate: 0, jam: 0, reins: createReins() });
   g.player.sprinting = false;
   g.player.dodgeHeld = -1;
   Object.assign(g.ecs.c.mover.get(g.player.id)!, { vx: 0, vz: 0 });
@@ -93,7 +95,7 @@ export function toggleMount(g: Game): boolean {
     return false;
   }
   const p = g.player;
-  Object.assign(p.mount, { active: p.mount.selected, speed: 0, yawRate: 0, jam: 0, phase: 0 });
+  Object.assign(p.mount, { active: p.mount.selected, speed: 0, yawRate: 0, jam: 0, phase: 0, reins: createReins() });
   p.buffer = createBuffer(); // no pre-summon dodge or attack may start while riding
   p.listening = p.kneeling = null;
   p.dodgeHeld = -1;

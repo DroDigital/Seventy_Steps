@@ -113,6 +113,15 @@ Hoof and wheel timbre follows dirt, road, stone and water. A gallop shortens the
 stay under −12 dBFS (`tests/mountAudio.test.ts`) and above about −24 dBFS, under combat impact. A recorded set can replace a
 recipe later; do not add these ids to `plannedSounds` until the files exist.
 
+The reins and the horse (round 57) are heard too, from state the simulation keeps (`MountState.reins`, `systems/mountReins.ts`: counters
+the sound reads once each, so nothing plays twice and nothing late): the reins slapped on a horse's back (`REIN_SLAP`) as they land, with
+the horse's huff (`HORSE_URGE`) a beat behind on three slaps of four; a hard pull (the stick let go: not the sprint let go at a gallop, which is only an easing of the hands) is the blow through the nose (`HORSE_HALT`), hooves
+braking (`hoofScrape`, by the ground) and the harness shaken a moment later (`HARNESS_SHAKE`), harder from a gallop; the skeleton team
+scrapes, shakes and whispers instead. Standing, the horse passes the time every six to fourteen seconds with one of a breath, a low
+whicker, a shake of the harness, the tail, the lips or a snort, never the same twice running (the skeletons only shake), and puts its
+hoof down on the two landings of the pawing the picture draws (`systems/horseIdle.ts`, the same clock). Leather, hide and breath, no
+ring; `tests/mountAudio.test.ts` holds each between −22 and −11 dBFS rms (the tail and the lips, as asides, to −30).
+
 ## Adding
 
 - A recipe: a `Sound` in `data/foleySounds.ts` (or `sounds.ts`), a class gain, and its place (an event in `cues.ts`, a frame in

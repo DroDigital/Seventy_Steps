@@ -147,7 +147,7 @@ export const NAMED = tier('named', [
   },
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
-    sprite: { silhouette: 'serpent', palette: 'sea', scale: 7, eyes: 2 },
+    sprite: { silhouette: 'serpent', palette: 'sea', scale: 7, eyes: 2, body: [0.734375, 0.25] }, // the head and neck rise 5.1 m out of the coils, not a serpent's 3.5 m (round 57)
     ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 3, grab: 1, wind_push: 1, quake: 1 }, { hooks: ['flood', 'camera_warp'] }))),
     stats: st(1200, 400, 44, 2, 3, 10), drops: { echoes: 3000 }, insightOnSight: 2,
   },
@@ -189,7 +189,7 @@ export const NAMED = tier('named', [
   },
   {
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
-    sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'] },
+    sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
     ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, eruption: 1 }, { hooks: ['arena_reconnect'] }))),
     stats: st(750, 160, 32, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },

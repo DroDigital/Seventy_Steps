@@ -50,6 +50,8 @@ export interface ActorViews {
   readonly glow: THREE.Vector3 | null;
   /** Where the investigator's lantern flame is drawn this frame, or null while they are not. */
   readonly flame: THREE.Vector3 | null;
+  /** How much of the lantern's halo, seen from `eye`, the seat back of the rig being ridden takes, 0 to 1. */
+  flameCover(eye: THREE.Vector3): number;
   /** Where the muzzle of the investigator's revolver is this frame (posed, drawn or not), or null while they are not drawn. */
   readonly muzzle: THREE.Vector3 | null;
 }
@@ -200,7 +202,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       f.gun.visible = drawn;
       if (f.holstered) f.holstered.visible = !drawn;
     }
-    if (id === g.player.id) mounts.place(f, time, dt);
+    if (id === g.player.id) mounts.place(f, time, dt, alpha);
     const flash = id === g.player.id ? 0 : FEEDBACK.flashLevel * Math.max(0, 1 - since / FEEDBACK.flashSeconds); // the investigator never blinks (hurtFx.ts)
     for (const m of f.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
     if (f.rig === 'echo') glow = glowAt.set(f.root.position.x, f.root.position.y + FEEDBACK.echoGlowHeight, f.root.position.z);
@@ -223,6 +225,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     },
     get muzzle() {
       return muzzle;
+    },
+    flameCover(eye) {
+      return flame ? mounts.cover(eye, flame) : 0;
     },
     update(alpha, time) {
       sync();

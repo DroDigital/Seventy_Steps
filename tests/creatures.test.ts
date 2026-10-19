@@ -34,7 +34,7 @@ describe('roster creatures as combatants', () => {
   });
 
   it('keeps the Polyp Swarm\'s body separate from the redrawn Flying Polyp\'s', () => {
-    for (const [variant, height, radius] of [[undefined, 2.52, 0.792], ['boss', 5.6, 2.88]] as const) {
+    for (const [variant, height, radius] of [[undefined, 2.52, 0.792], ['boss', 5.84, 2]] as const) {
       const g = createGame({ creature: 'flying_polyp', variant });
       const [e] = [...g.ecs.c.model].find(([, m]) => m === creatureModel('flying_polyp', variant))!;
       const body = g.ecs.c.body.get(e)!;

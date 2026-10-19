@@ -68,6 +68,8 @@ export const worldUniforms = {
   uLShadowProj: { value: new THREE.Matrix4() },
   uLShadowNF: { value: new THREE.Vector2(0.35, 13) }, // its near and far planes
   uLShadow: { value: new THREE.Vector4() }, // strength (0: none), a texel, the bias, the offset
+  uLSlab: { value: new THREE.Vector4() }, // the seat back that hides the driver's lantern from what lies behind it: half-width (0: none), low edge, high edge, the plane's z, in its own frame (round 57: mountViews.ts)
+  uLSlabInv: { value: new THREE.Matrix4() }, // and the world to that frame
 };
 
 export interface WorldMaterialOptions {

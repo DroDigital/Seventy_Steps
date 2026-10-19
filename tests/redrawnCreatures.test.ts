@@ -1,6 +1,8 @@
 /**
- * The sixteen creatures the author drew again in round 56 (the 'Repairs v4' delivery, put in by tools/replace_reviewed_sprite.py):
- * what is registered for each, the standing rule that attack and hurt are front art only, and the hurtboxes fitted to the new bodies.
+ * The twenty-one creatures the author drew again, in round 56 (the 'Repairs v4' delivery, sixteen of them) and round 57 (the 'v7' delivery:
+ * the Dhole's back walk, Lilith's left, the Serpent Man, the Great Ones, the Horror at Martin's Beach, the Polyp Swarm, Zkauba and the two Ghouls),
+ * put in by tools/replace_reviewed_sprite.py: what is registered for each, the standing rule that attack and hurt are front art only,
+ * and the hurtboxes fitted to the new bodies.
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -18,23 +20,28 @@ const DELIVERED: [key: string, front: number[], side: number[], back: number[], 
   ['haunter_of_the_dark', [2, 8, 3, 2], [2, 8], [2, 8], 'f1318091d93c3df46f56f0686641d17a7dca15109d9023416bd074a6f8730dfe', 'cf5f61613d3ef211e993f246426d6d25db489aa9e9c55aaf27192883e79af700'],
   ['high_priest#eldritch', [2, 6, 3, 2], [2, 6], [2, 6], '53af28d4e09f9159a36675f28109cafa82ce0f4307e9bee92291ac1006aba9c4', '47c6ee7e9e1141ec4368a9532748532c14267214b5740c4dbc161c8c3ce216f9'],
   ['rhan_tegoth', [2, 6, 3, 2], [2, 6], [2, 6], 'e01e3319c57f21a326df56ecdab2098b82ece12e2539203d5355c72dc8c768c5', '38c428ad56c4f61a6e0501b0283513264815e35dddce976e842d5cb1e486f9eb'],
-  ['dhole', [2, 6, 3, 2], [2, 6], [2, 6], '096a217168112b26a153483857ee496ab9aa9b18098a111ed31bd3ec98a91e83', 'e1b9a665e362751d1f5ca9dca8ffbdec3379cea18c9f3fccf7433317b698f540'],
+  ['dhole', [2, 6, 3, 2], [2, 6], [2, 4], '096a217168112b26a153483857ee496ab9aa9b18098a111ed31bd3ec98a91e83', 'e1b9a665e362751d1f5ca9dca8ffbdec3379cea18c9f3fccf7433317b698f540'],
   ['yog_sothoth', [2, 4, 3, 2], [2, 4], [2, 4], '04d18205368960fb89f59c47c1741ae93627a400b9eef3bf5fd771f1709688c6', '82ca69c3f5063946acbc8738631251cd34c76e223eebc6ac286acad2bcc101b2'],
   ['man_of_leng', [4, 4, 4, 4], [4, 6], [4, 4], 'f7bfd9788a03305703a8310f89158b923ea16359e41451df5bd33af83dc5e005', 'f8a00063a9b22511b8ec475b15b49c2b9a98b4756d7a7e3a81c018c6f2eb288d'],
-  ['serpent_man', [2, 4, 3, 2], [2, 4], [2, 4], 'c07e19d2be39642bd3cf058ff59ff88e8cf8c81b87b2d8aef62946799fc14c67', '604cf60a628b726cb0cd3849b909ad92cc2134eb5cae58bc3f9bc00c8d569e02'],
+  ['serpent_man', [2, 4, 3, 2], [2, 4], [2, 4], '711673f62959b03e97d16311d44ad26ba4352f6d62db11da1368c6d723044c3d', '777238409c59b8517173fbe6dc1d4aada73913b2a09ebc18082265510d34675a'],
   ['flying_polyp', [2, 6, 3, 2], [2, 6], [2, 6], '4afd0918220e7fb38f9a81e5fbb4b5544fd92eb675c93a0d246621fa463bc0db', '8cdac2c0b60e6e3d781051110dd5d84d7cad45b97c30283303afb5b0905894d7'],
   ['ym_bhi', [2, 6, 3, 2], [2, 4], [2, 6], '82bbc8ea81e01f28d89fc9b2130c9cc4696bf8f152f6b0fef7f83045250f681d', 'e9caae64f02900c44a2db114f5961742172f10b9aa4d3ea433de77b04061f30a'],
   ['daemon_pipers', [2, 6, 3, 2], [2, 6], [2, 6], '1d0a843ef4ecbc3ff971c9092790ffdf1dda4b8a7947a456688d64a1bef94b02', '0127da4df5e28862087cba28505602aed6b51175fdaf116384c2fb254ec48858'],
   ['other_gods', [2, 4, 3, 2], [2, 4], [2, 4], '6482b324386a797bfe8b32fe493e2fc9777ff0ec64e25e6dd112f6a66ce6f62c', '0bc61f9dbae581f9af1da66278665ac5762acd403dca821edbc91ce0a4aafdad'],
-  ['lilith', [2, 6, 3, 2], [2, 4], [2, 6], '33ce248cddd01521df31c0c08bb57d883035ca466e1ed6e122c393e461b21fa9', 'f7fa2948458753db0ad3099cc4344e4d9e79c1228f4ae4f667d564fab273d83a'],
+  ['lilith', [2, 6, 3, 2], [2, 4], [2, 6], '33ce248cddd01521df31c0c08bb57d883035ca466e1ed6e122c393e461b21fa9', '1baefeac0b6917ff7cb310204ee75384b248b4e24d06113b5af7f6b85fc99c98'],
   ['being_of_ib', [2, 6, 3, 2], [2, 6], [2, 6], 'b755af0d58868c8e3d389957a7e2527de2dfdb6fdbd42f081299ef9074bdd30f', 'f8f897781c5268e3aad0763ed3d965614e2e52382c93f5e8fd8b60ab38be9282'],
   ['shunned_house_entity', [2, 4, 3, 2], [2, 4], [2, 4], 'ef4279f8082397ea1c0176c9015736beb65870734d50dfca1e71158518478813', '9d11ce299080ab7c7a6a751f88dda653f84bf2e74be1d1e37aebd084787a0163'],
-  ['great_ones', [2, 6, 3, 2], [2, 6], [2, 6], 'b6abdd2e00e4e15ce867b0ccd3bfb83384b69b0e6e755d36f2b575d0d3d8518d', '0e41b32e53c4c32c74679cd8054ddfc22eb528e89325b7342d7ef67ee03b2814'],
+  ['great_ones', [2, 6, 3, 2], [2, 6], [2, 6], '9f054534616ea5acdd3fc4a73c38d8a77bf978dc00e2d51673a17ea7da05983e', 'c916e43d624fc1f8b1c93dd26fb19f6cb4d4e1a850242cb678393e28e2d50171'],
+  ['martins_beach_horror', [2, 4, 3, 2], [2, 4], [2, 4], '7f561a12c30f7959a4dc3c46433be70a0eadd035ef23822af310bf72ec697233', '7751bfcf0f778e8c397c9958593e7e3c651427673a04c67db71f21149f0a505a'],
+  ['flying_polyp#boss', [2, 4, 3, 2], [2, 4], [2, 4], '8f65e0dc366494cb9185df312cc07e9caf80b357968cce39c11d4157566f36bf', '3b0ced944933d5975721fbf03fcc66e071634937ca518b33ce3213570d1ab923'],
+  ['zkauba', [2, 4, 3, 2], [2, 4], [2, 4], '7fbcbbadabc8a5c12236d688fc4ea95812b0586d2d67e2807bb67f4a07763d9f', 'c80a5a38a092b3dcaac10f2c18d38b9b53b6ba0011d5e9a045c4603872b95eb3'],
+  ['ghoul', [2, 4, 3, 2], [2, 8], [2, 4], '20e11677c2f25e89bd7ae8ca4a9dc268a71adb11ca5a4d12fc5ab30d80ae14df', '2d3697834b025f69db6f1c6f2c8a0e199bf0b1909ca4666f49dfbeb0f7c8bea1'],
+  ['ghoul#eldritch', [2, 4, 3, 2], [2, 8], [2, 4], 'd1c35bf1dedb16e0da570b02a961f7419532acc603e674df82d760c1fc00047f', 'fa6abdbc9c51655a7c5927ccad8c7c7a465c8c456957cf881033fe5d8c2f77a8'],
 ];
 
-describe('the sixteen creatures drawn again in round 56', () => {
+describe('the twenty-one creatures drawn again in rounds 56 and 57', () => {
   it('are the delivery\'s own frames, in the counts it drew: idle and walk in all four views, attack and hurt from the front', () => {
-    expect(DELIVERED).toHaveLength(16);
+    expect(DELIVERED).toHaveLength(21);
     for (const [key, front, side, back, idle0, lastWalk] of DELIVERED) {
       const views = pack.entities[key].directions;
       const counts = (view: typeof views.front, actions: ('idle' | 'move' | 'attack' | 'hurt')[]): number[] => actions.map((a) => view.actions[a]?.length ?? 0);
@@ -91,7 +98,7 @@ describe('their hurtboxes, fitted to the new bodies', () => {
   it('are as wide as the body they hold, within a quarter either way, and no body of a silhouette it does not wear', () => {
     for (const [key] of DELIVERED.filter(([k]) => k !== 'yog_sothoth')) {
       const [id, variant] = key.split('#');
-      const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch')! : getEntity(id)!;
+      const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch' | 'boss')! : getEntity(id)!;
       const ratio = bodyOf(def).radius / painted(key, def.sprite!.scale);
       expect(ratio, key).toBeGreaterThan(0.75);
       expect(ratio, key).toBeLessThan(1.35);
@@ -104,11 +111,11 @@ describe('their hurtboxes, fitted to the new bodies', () => {
   it('scale each one\'s blows by the height it was balanced at: a body fitted to the picture moves what is struck, not how far a blow reaches', () => {
     for (const [key] of DELIVERED.filter(([k]) => k !== 'yog_sothoth')) {
       const [id, variant] = key.split('#');
-      const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch')! : getEntity(id)!;
+      const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch' | 'boss')! : getEntity(id)!;
       if (!def.sprite?.body) continue;
       const bare = { ...def, sprite: { ...def.sprite, body: undefined } };
       expect(reachOf(def), key).toBeCloseTo(bodyOf(bare).height, 9);
-      const made = toCombatant(def, variant as 'eldritch' | undefined);
+      const made = toCombatant(def, variant as 'eldritch' | 'boss' | undefined);
       expect(made.reach ?? made.height, key).toBeCloseTo(bodyOf(bare).height, 9);
     }
   });
@@ -122,6 +129,35 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     expect(toCombatant(getEntity('yig')!).reach).toBeCloseTo(3, 9);
   });
 
+  /** The tallest painted idle across the front, the side and the back, metres (rows from the crown to the foot). */
+  function paintedHeight(key: string, scale: number): number {
+    const views = pack.entities[key].directions;
+    let tall = 0;
+    for (const direction of ['front', 'left', 'back'] as const) for (const id of views[direction].actions.idle!) {
+      const frame = pack.frames[id];
+      tall = Math.max(tall, ((frame.bounds[3] - frame.bounds[1]) * scale) / frame.height);
+    }
+    return tall;
+  }
+
+  it('are struck as high as they are drawn, round 57: the Horror at Martin\'s Beach 5.1 m, the Great Ones 4.2 m, Zkauba 1.8 m, the serpent Serpent Man 1.65 m', () => {
+    for (const key of ['martins_beach_horror', 'great_ones', 'zkauba', 'serpent_man#eldritch']) {
+      const [id, variant] = key.split('#');
+      const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch' | 'boss')! : getEntity(id)!;
+      const ratio = bodyOf(def).height / paintedHeight(key, def.sprite!.scale);
+      expect(ratio, key).toBeGreaterThan(0.97);
+      expect(ratio, key).toBeLessThan(1.03);
+      expect(toCombatant(def).reach, key).toBeCloseTo(def.sprite!.scale * { martins_beach_horror: 0.5, great_ones: 0.95, zkauba: 0.85, 'serpent_man#eldritch': 0.5 }[key]!, 9); // the blows keep the height they were balanced at
+    }
+  });
+
+  it('strike the Polyp Swarm as high as its hall lets it be: its picture is 6.25 m, the roof is at 6, and a capsule that reaches the roof is pushed out of the room (tests/bossStand.test.ts)', () => {
+    const swarm = variantOf(getEntity('flying_polyp')!, 'boss')!;
+    expect(bodyOf(swarm).height).toBeLessThan(5.9);
+    expect(bodyOf(swarm).height / paintedHeight('flying_polyp#boss', swarm.sprite!.scale)).toBeGreaterThan(0.9);
+    expect(reachOf(swarm)).toBeCloseTo(8 * 0.7, 9);
+  });
+
   it('drop a body fitted to the base\'s art when a variant draws another silhouette and brings none', () => {
     const base = getEntity('serpent_man')!;
     const swapped = applyOverride(base, { sprite: { silhouette: 'serpent' } });
@@ -129,7 +165,7 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     expect(bodyOf(swapped)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 });
     expect(applyOverride(base, { sprite: { silhouette: 'serpent', body: [0.5, 0.25] } }).sprite!.body).toEqual([0.5, 0.25]); // one that brings its own keeps it
     expect(applyOverride(base, { sprite: { scale: 4 } }).sprite!.body).toEqual([0.9, 0.12]); // a change of scale only: the fractions still fit
-    expect(bodyOf(variantOf(base, 'eldritch')!)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 }); // as the entry has it
+    expect(bodyOf(variantOf(base, 'eldritch')!)).toEqual({ height: 2.2 * 0.75, radius: 2.2 * 0.25 }); // as the entry has it: as tall as the hood is drawn
   });
 
   it('strike Yog-Sothoth at its seven painted spheres, the lowest standing on the ground', () => {
