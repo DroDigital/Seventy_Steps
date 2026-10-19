@@ -178,3 +178,23 @@ describe('procedural mount art', () => {
     }
   });
 });
+
+describe('the draft horse stands in four white socks (round 57)', () => {
+  it('every leg has its sock, and the foot of each is painted white to the ground', async () => {
+    const { LEGS, cannonBone, hoofOf } = await import('../src/render/horseLegs');
+    expect(LEGS.map((l) => l.sock > 0.1)).toEqual([true, true, true, true]); // the right fore had none: one dark foot of four
+    expect(new Set(LEGS.map((l) => l.sock)).size).toBe(4); // no two socks the same height
+    const lowest = (geo: THREE.BufferGeometry): number => { // the average lightness of the lowest vertices (the legs hang down the -y axis)
+      const [pos, col] = [geo.getAttribute('position'), geo.getAttribute('color')];
+      let low = Infinity;
+      for (let i = 0; i < pos.count; i++) low = Math.min(low, pos.getY(i));
+      let [sum, n] = [0, 0];
+      for (let i = 0; i < pos.count; i++) if (pos.getY(i) < low + 0.03) { sum += (col.getX(i) + col.getY(i) + col.getZ(i)) / 3; n++; }
+      return sum / n;
+    };
+    const lights = LEGS.map((plan) => lowest(cannonBone(plan)));
+    for (const l of lights) expect(l).toBeGreaterThan(0.6);
+    expect(Math.max(...lights) - Math.min(...lights)).toBeLessThan(0.2); // as white as one another
+    expect(hoofOf(LEGS[1]).getAttribute('color').count).toBe(hoofOf(LEGS[0]).getAttribute('color').count);
+  });
+});
