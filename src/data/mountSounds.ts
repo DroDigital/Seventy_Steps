@@ -27,6 +27,15 @@ export const MOUNT_MIX = {
   snort: 1.3,
   nicker: 1.3,
   unhitch: 1.3,
+  slap: 1.1, // the reins slapped on a horse's back (round 57)
+  urge: 1.2, // the horse's answer to it
+  halt: 1.3, // hauled up at speed: the blow through the nose
+  scrape: 1.3, // hooves braking on the ground
+  shake: 2.0, // the harness shaken as the head is tossed
+  blow: 1.9, // idle: a breath out
+  whicker: 1.8, // idle: a low shaking call
+  swish: 1.6, // idle: the tail
+  flutter: 1.6, // idle: the lips
   whisper: 1.5, // the spectral chariot's breath and violet crackle
   pop: 1.1, // the car's exhaust, easing off
   spectralSummon: 0.85,
@@ -179,4 +188,80 @@ export const ENGINE_STOP: Sound = [
   noise('lowpass', 240, 0.4, 0.45, { to: 70 }),
   noise('bandpass', 900, 0.04, 0.5, { at: 0.34, q: 1.4 }),
   tone('triangle', 3400, 0.05, 0.04, { at: 0.5, to: 2600 }),
+];
+
+/**
+ * The horse and the reins (round 57). What the driver's hands do is heard, and the horse answers: the reins slapped on its back and its
+ * eager huff, a hard pull and the blow through its nose with the hooves braking and the harness shaken as the head goes up, and, standing,
+ * the small noises of a horse that is not asleep: a breath, a low whicker, a shake of the harness, the tail, the lips, a hoof put down.
+ * Leather, hide, breath and wood: nothing rings (as with every sound of a ride).
+ */
+
+/** The reins slapped on the horse's back: a crack of leather, the flat of it on a hide, and the thump under. */
+export const REIN_SLAP: Sound = [
+  noise('highpass', 2400, 0.045, 0.5, { attack: 0.002 }),
+  noise('bandpass', 1150, 0.12, 0.5, { to: 520, q: 0.8, attack: 0.003 }),
+  tone('sine', 165, 0.11, 0.38, { to: 78 }),
+  noise('lowpass', 520, 0.18, 0.26, { at: 0.03, to: 200 }),
+];
+
+/** A horse answering a slap: a short eager huff and a grunt in the throat as it digs in. */
+export const HORSE_URGE: Sound = [
+  noise('bandpass', 1300, 0.16, 0.5, { to: 620, q: 0.8, attack: 0.01 }),
+  tone('sawtooth', 168, 0.2, 0.22, { to: 132, vibrato: [18, 70], attack: 0.015, filter: { type: 'lowpass', hz: 820 } }),
+  tone('sine', 98, 0.2, 0.26, { to: 72 }),
+];
+
+/** Hauled up at speed: a hard blow through the nose with the lips fluttering in it, and the head thrown up. */
+export const HORSE_HALT: Sound = [
+  noise('bandpass', 980, 0.42, 0.6, { to: 300, q: 0.7, attack: 0.015 }),
+  noise('lowpass', 380, 0.46, 0.45, { to: 120, attack: 0.02 }),
+  tone('sawtooth', 92, 0.4, 0.2, { to: 70, vibrato: [27, 520], attack: 0.03, filter: { type: 'lowpass', hz: 650 } }),
+  tone('sine', 120, 0.3, 0.3, { to: 70 }),
+];
+
+/** Hooves braking on the ground: a slide and a dig, sharper where the ground is hard, wet in the shallows. */
+export function hoofScrape(ground: Ground): Sound {
+  if (ground === 'water') return [noise('lowpass', 700, 0.3, 0.7, { to: 260, attack: 0.02 }), noise('bandpass', 1500, 0.2, 0.4, { q: 0.6, attack: 0.03 })];
+  const hard = ground === 'stone' ? 1 : ground === 'road' ? 0.6 : 0;
+  return [
+    noise('bandpass', 700 + 1500 * hard, 0.3, 0.52, { to: 340 + 700 * hard, q: 0.6, attack: 0.02 }),
+    noise('lowpass', 480, 0.26, 0.4, { to: 160, attack: 0.015 }),
+    tone('sine', 82, 0.22, 0.3, { to: 52, at: 0.03 }),
+  ];
+}
+
+/** The harness shaken as the horse tosses its head: leather and wood, three soft slaps, no ring. */
+export const HARNESS_SHAKE: Sound = [
+  noise('lowpass', 700, 0.1, 0.38, { to: 260, q: 0.5 }),
+  noise('lowpass', 640, 0.1, 0.3, { at: 0.1, to: 240, q: 0.5 }),
+  noise('lowpass', 580, 0.12, 0.26, { at: 0.2, to: 220, q: 0.5 }),
+  noise('bandpass', 900, 0.06, 0.14, { at: 0.02, q: 0.9 }),
+  tone('sine', 112, 0.22, 0.2, { to: 82 }),
+];
+
+/** Standing: a soft breath out through the nose. */
+export const HORSE_BLOW: Sound = [
+  noise('bandpass', 760, 0.5, 0.42, { to: 420, q: 0.6, attack: 0.06 }),
+  noise('lowpass', 360, 0.5, 0.3, { to: 150, attack: 0.08 }),
+  tone('sine', 108, 0.4, 0.14, { to: 80, attack: 0.05 }),
+];
+
+/** Standing: a quiet, low, shaking whicker, shorter than the nicker that greets a rider. */
+export const HORSE_WHICKER: Sound = [
+  tone('sawtooth', 168, 0.42, 0.24, { to: 138, vibrato: [24, 110], attack: 0.05, filter: { type: 'lowpass', hz: 780 } }),
+  tone('triangle', 330, 0.3, 0.12, { at: 0.04, to: 250, vibrato: [10, 40], attack: 0.04 }),
+  noise('bandpass', 620, 0.4, 0.14, { to: 420, q: 1.1, attack: 0.06 }),
+];
+
+/** Standing: the tail brushing across the flanks: air and a little hair. */
+export const TAIL_SWISH: Sound = [
+  noise('bandpass', 1900, 0.22, 0.22, { to: 3000, q: 0.6, attack: 0.05 }),
+  noise('lowpass', 900, 0.2, 0.14, { attack: 0.05 }),
+];
+
+/** Standing: the lips blown loose, a soft burr. */
+export const LIP_FLUTTER: Sound = [
+  tone('sawtooth', 84, 0.34, 0.2, { to: 62, vibrato: [24, 600], attack: 0.03, filter: { type: 'lowpass', hz: 520 } }),
+  noise('lowpass', 420, 0.34, 0.22, { attack: 0.03 }),
 ];

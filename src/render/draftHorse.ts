@@ -7,11 +7,11 @@
  * an ear, swishes its tail and, now and then, paws the ground. Render only.
  */
 import * as THREE from 'three';
-import { hash2 } from '../core/rng';
+import { pawAt } from '../systems/horseIdle';
 import { footAt, gaitAt, legPhase } from '../systems/mountGait';
 import { BODY_Y, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
 import { CANNON, FETLOCK, LEGS, LEG_NAMES, cannonBone, hoofOf, upperBone } from './horseLegs';
-import { MountBuilder, group, swingAbout } from './mountKit';
+import { MountBuilder, group, swingAbout, type HorseCue } from './mountKit';
 
 /** Where the horse stands in the chariot's frame, and where the shaft tips meet the collar (the shafts run to it). */
 export const DRAFT_PLACE = { x: 0, z: 2.5 } as const;
@@ -21,7 +21,7 @@ export interface DraftHorse {
   root: THREE.Group;
   bit: THREE.Object3D;
   /** `cycle`: gait cycles ridden (the simulation's `MountState.phase`); `ground`: the land's height at (x, z) in the chariot's frame. */
-  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number): void;
+  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number, reins?: HorseCue): void;
 }
 
 const clamp = (v: number, a = 0, b = 1): number => Math.min(b, Math.max(a, v));
@@ -81,7 +81,7 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
   const aim = new THREE.Vector3();
   const hips = LEGS.map((l) => l.hip);
 
-  return { root, bit, update(time, cycle, speed, turn, ground, bend = 0) {
+  return { root, bit, update(time, cycle, speed, turn, ground, bend = 0, reins = { check: 0, urge: 0 }) {
     swingAbout(root, DRAFT_PLACE, { x: 0, z: DRAFT_HITCH.z }, bend); // the horse leads a turn, about the collar the shafts meet; the carriage follows
     const gait = gaitAt(speed);
     const moving = smooth(clamp((speed - 0.15) / 1.1));
@@ -93,22 +93,22 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
     const bounce = (1 - flight) * Math.cos(2 * TAU * (cycle - 0.1)) * (0.012 + 0.014 * gait.stretch) + flight * Math.cos(TAU * (cycle - 0.15)) * (0.03 + 0.04 * gait.stretch);
     const settle = 0.012 * Math.sin(time * 0.9) * (1 - moving);
     body.position.y = BODY_Y - 0.04 * moving - 0.12 * stretch + (bounce + settle) * moving;
-    body.rotation.x = slope * 0.8 + 0.05 * Math.sin(TAU * (cycle - 0.05)) * flight * gait.stretch - 0.03 * stretch;
+    body.rotation.x = slope * 0.8 + 0.05 * Math.sin(TAU * (cycle - 0.05)) * flight * gait.stretch - 0.03 * stretch - 0.035 * reins.check; // sat back on its haunches
     body.rotation.z = -turn * 0.05 + 0.014 * Math.sin(TAU * cycle) * moving * (1 - flight);
     body.rotation.y = 0.012 * Math.sin(TAU * cycle) * moving * (1 - flight);
     lean.rotation.y = -turn * 0.1;
     barrelMesh.scale.y = 1 + (0.008 + 0.014 * stretch) * Math.sin(time * (1.5 + 5 * stretch));
 
     const nod = Math.sin(TAU * (cycle - 0.1)) * (0.07 * (1 - flight) + 0.1 * flight) * moving;
-    neckG.rotation.x = -NECK_RISE + 0.26 * stretch + nod - 0.02 * Math.sin(time * 0.8) * (1 - moving);
+    neckG.rotation.x = -NECK_RISE + 0.26 * stretch + nod - 0.02 * Math.sin(time * 0.8) * (1 - moving) - 0.2 * reins.check - 0.08 * reins.urge;
     neckG.rotation.y = turn * 0.3 + Math.sin(time * 0.35) * 0.05 * (1 - moving);
-    headG.rotation.x = HEAD_DROP - 0.55 * nod - 0.12 * stretch + 0.03 * Math.sin(time * 0.6 + 1) * (1 - moving);
+    headG.rotation.x = HEAD_DROP - 0.55 * nod - 0.12 * stretch + 0.03 * Math.sin(time * 0.6 + 1) * (1 - moving) + 0.32 * reins.check - 0.22 * reins.urge;
     headG.rotation.y = turn * 0.12;
-    tailG.rotation.x = 0.1 + 0.5 * stretch + 0.1 * Math.sin(TAU * (cycle - 0.3)) * moving + 0.07 * Math.sin(time * 1.3) * (1 - moving);
+    tailG.rotation.x = 0.1 + 0.5 * stretch + 0.1 * Math.sin(TAU * (cycle - 0.3)) * moving + 0.07 * Math.sin(time * 1.3) * (1 - moving) + 0.25 * reins.urge + 0.1 * reins.check;
     tailG.rotation.z = Math.sin(time * 1.9) * 0.12 * (1 - 0.6 * moving) - turn * 0.2;
     ears.forEach((e, i) => {
       const flick = Math.max(0, Math.sin(time * (0.8 + 0.13 * i) + i * 2)) ** 24;
-      e.rotation.x = -0.35 + 0.6 * stretch + 0.5 * flick * (1 - moving);
+      e.rotation.x = -0.35 + 0.6 * stretch + 0.5 * flick * (1 - moving) - 0.45 * reins.urge - 0.2 * reins.check;
       e.rotation.z = (i ? 1 : -1) * (0.18 + 0.55 * flick);
     });
 
@@ -116,7 +116,7 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
     lean.updateMatrix();
     body.updateMatrix();
     inverse.multiplyMatrices(lean.matrix, body.matrix).invert();
-    const paw = hash2(Math.floor(time / 9), 3, 17) > 0.45 ? clamp((time % 9 - 2) / 1.6) : 0; // now and then, a front hoof is pawed at the ground
+    const paw = pawAt(time); // now and then, a front hoof is pawed at the ground (systems/horseIdle.ts: the sound is its landing)
     for (let i = 0; i < legs.length; i++) {
       const leg = legs[i];
       const { plan } = leg;

@@ -36,6 +36,21 @@ float lanternDepth(vec2 uv) {
   return uLShadowNF.x * uLShadowNF.y / (uLShadowNF.y - d * (uLShadowNF.y - uLShadowNF.x));
 }
 
+uniform vec4 uLSlab; // the seat back of a rig being ridden, a thin slab in the carriage's frame: half-width (0: no slab), low edge, high edge, the z of its middle plane
+uniform mat4 uLSlabInv; // world to that frame
+
+// 1 where the seat back lets the lantern (carried at the driver's hip, in front of it) reach wp, 0 where the slab stands between: the line from wp to the lantern crosses its plane inside its edges. Soft over a few centimetres at its edge.
+float lanternSlab(vec3 wp) {
+  if (uLSlab.x <= 0.0) return 1.0;
+  vec3 a = (uLSlabInv * vec4(wp, 1.0)).xyz;
+  vec3 b = (uLSlabInv * vec4(uLanternPos, 1.0)).xyz;
+  float da = a.z - uLSlab.w, db = b.z - uLSlab.w;
+  if (da * db >= 0.0) return 1.0;
+  vec3 p = mix(a, b, da / (da - db));
+  float beyond = length(vec2(max(abs(p.x) - uLSlab.x, 0.0), max(max(uLSlab.y - p.y, p.y - uLSlab.z), 0.0)));
+  return smoothstep(0.0, 0.06, beyond);
+}
+
 // 1 where the lantern reaches wp (surface normal n), 0 where something solid stands between: four taps, turned, over a map drawn from the far faces of what is solid.
 float lanternLit(vec3 wp, vec3 n) {
   if (uLShadow.x <= 0.0) return 1.0;

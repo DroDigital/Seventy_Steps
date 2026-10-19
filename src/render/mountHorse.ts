@@ -3,11 +3,11 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { prism } from './bodyKit';
 import { tint } from './meshKit';
-import { MOUNT_COLORS as C, MountBuilder, group, orb, panel, rod, swingAbout, tube, type Point } from './mountKit';
+import { MOUNT_COLORS as C, MountBuilder, group, orb, panel, rod, swingAbout, tube, type HorseCue, type Point } from './mountKit';
 import { footAt, gaitAt, gaitScale, legPhase } from '../systems/mountGait';
 import { horseFlame, type HorseWisp } from './mountEffects';
 
-export interface SpectralHorse { root: THREE.Group; flame: HorseWisp; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number): void }
+export interface SpectralHorse { root: THREE.Group; flame: HorseWisp; update(time: number, phase: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number, reins?: HorseCue): void }
 const UP = new THREE.Vector3(0, 1, 0);
 
 export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z: number, offset: number): SpectralHorse {
@@ -64,7 +64,7 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
     matrix.compose(p, q, s); bones.setMatrixAt(i, matrix);
   }
   const hoovesAt: Point[] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
-  return { root, flame, update(time, phase, speed, turn, ground, bend = 0) {
+  return { root, flame, update(time, phase, speed, turn, ground, bend = 0, reins = { check: 0, urge: 0 }) {
     swingAbout(root, { x, z }, { x: 0, z: 2.45 }, bend * 0.8); // the pair lead a turn about the pole's tip
     const moving = Math.min(1, speed / 1.5), gallop = Math.min(1, Math.max(0, (speed / gaitScale - 3) / 5)); // (3 to 8 m/s of the gallop of 18 the gaits were set for)
     const gait = gaitAt(speed), cycle = phase + offset, bob = Math.sin(cycle * 2) * 0.045 * moving;
@@ -74,9 +74,9 @@ export function spectralHorse(b: MountBuilder, parent: THREE.Object3D, x: number
     body.position.y = 1.36 + bob - drop + 0.055 * Math.sin(time * 1.7 + offset) * (1 - moving);
     body.rotation.x = Math.sin(cycle) * 0.035 * gallop;
     body.rotation.z = -turn * 0.045 + Math.cos(cycle) * 0.018 * moving;
-    neck.rotation.x = Math.sin(cycle + 0.3) * 0.085 * moving - 0.07 * gallop;
+    neck.rotation.x = Math.sin(cycle + 0.3) * 0.085 * moving - 0.07 * gallop - 0.12 * reins.check - 0.06 * reins.urge; // the reins hauled on: the head comes up
     neck.rotation.y = Math.sin(time * 0.7 + offset) * 0.045 * (1 - moving);
-    skull.rotation.x = -neck.rotation.x * 0.65;
+    skull.rotation.x = -neck.rotation.x * 0.65 + 0.2 * reins.check - 0.15 * reins.urge;
     tail.rotation.set(Math.sin(cycle) * 0.12 * moving - 0.16 * gallop, Math.sin(time * 2.5 + offset) * 0.18, 0);
     for (let i = 0; i < 4; i++) {
       const side = i % 2 ? 1 : -1, front = i < 2, hipZ = front ? 0.5 : -0.6, hipX = side * 0.23;
