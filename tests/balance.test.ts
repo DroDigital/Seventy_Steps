@@ -41,8 +41,10 @@ in the arena at the standing a person has when they reach it (\`tests/balanceMod
 their health, the world's lesser foes give ${Math.round(KILLED * 100)}% of their Echoes in step with them and each boss slain most of its
 own; the Echoes are spent on levels as a person builds (Vigour and Might most, Endurance less), and the star-stones the
 bosses leave are set into the sword-cane. The bot closes to the edge of the body and strikes without pause, reads the
-wind-up of every blow and rolls from ${Math.round(SKILL * 100)}% of them, takes the Alert's helm, and keeps behind a monolith from a gaze that
-turns flesh to stone. It cannot be killed, and what it took is the tally.
+wind-up of every blow and rolls from ${Math.round(SKILL * 100)}% of them, takes the Alert's helm, keeps behind a monolith from a gaze that
+turns flesh to stone, and (round 58) drinks Laudanum when the HUD calls for it, as a person is told to: it never did, and the harder
+mind of round 58 left it Unmoored in the long fights, taking more and striking less for the rest of them. It cannot be killed, and
+what it took is the tally.
 
 - **Seconds** is how long the boss took at that steady pace. A person strikes for perhaps a third of a fight, so their fight
   is about three times as long.
