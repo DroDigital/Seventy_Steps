@@ -11,8 +11,10 @@ import { DEMO, demoAllows, demoEndShown } from '../src/systems/demo';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
 import { worldLayout } from '../src/world/placements';
-import { regionAt, regionRect, TILE } from '../src/world/worldMap';
+import { chunkOf, regionAt, regionRect, TILE } from '../src/world/worldMap';
 import { borderRuns } from '../src/world/demoBorder';
+import { chunkContent } from '../src/world/chunks';
+import { chunksAround } from '../src/world/streaming';
 import { WORLD } from '../src/data/tuning';
 import { edition } from '../desktop/steam.js';
 import { goTo, record, run } from './worldHelpers';
@@ -50,6 +52,26 @@ describe('the demo (round 56): the university and Arkham, to the fall of Keziah 
     expect(pos(g).z).toBeGreaterThan(edge - 4); // it walked up to the edge, and there it stands
     expect(said.length).toBeGreaterThan(0);
     expect(said.length).toBeLessThanOrEqual(Math.ceil(600 / DEMO.noticeFrames)); // said now and then, not every frame
+  });
+
+  it('brings in no creature that lives beyond its border, though the chunks about the investigator at the edge reach past it (review of PR 142)', () => {
+    const hub = REGIONS.find((r) => r.id === 'hub')!;
+    const x = (hub.area[0] + 0.5) * TILE;
+    const edge = (hub.area[1] + 1) * TILE;
+    const spawnsBeyond = (): string[] =>
+      chunksAround(chunkOf(x), chunkOf(edge - 6), WORLD.load).flatMap((ch) => chunkContent(ch.cx, ch.cz).spawns).filter((s) => !inDemo(s.at.x, s.at.z)).map((s) => s.id);
+    const liveBeyond = (g: Game): string[] => spawnsBeyond().filter((id) => g.overworld!.alive.has(id));
+    expect(spawnsBeyond().length).toBeGreaterThan(0); // there are some to bring in: the test means something
+    const demo = createWorldGame({ demo: true });
+    goTo(demo, x, edge - 6);
+    run(demo, 70);
+    expect(demo.overworld!.alive.size).toBeGreaterThan(0); // the land on this side is peopled...
+    expect(liveBeyond(demo)).toEqual([]); // ...and nothing from the other
+    for (const e of demo.overworld!.alive.values()) expect(inDemo(demo.ecs.c.transform.get(e)!.pos.x, demo.ecs.c.transform.get(e)!.pos.z)).toBe(true);
+    const full = createWorldGame();
+    goTo(full, x, edge - 6);
+    run(full, 70);
+    expect(liveBeyond(full).length).toBeGreaterThan(0); // the full game brings them in, as it always did
   });
 
   it('refuses a gate to a far realm, the stair, and a sign beyond it, where each begins', () => {
