@@ -1,14 +1,15 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { inflateSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 import { serveFrom } from '../desktop/serve.js';
 import { ENTITIES, variantOf } from '../src/data/registry';
+import { REVIEWED_GROUND } from '../src/data/reviewedLook';
 import {
   attackFrame, directionForAngle, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection,
   type DirectionalClips,
 } from '../src/render/sprites/directional';
 import { reviewedClips, reviewedSize, type ReviewedManifest } from '../src/render/sprites/reviewed';
+import { alphaBounds, crop, pngRgba } from './reviewedPackHelpers';
 
 const ASSET_DIR = 'public/creatures/reviewed';
 const hash = (bytes: Uint8Array): string => createHash('sha256').update(bytes).digest('hex');
@@ -17,7 +18,7 @@ const text = (bytes: Uint8Array): string => new TextDecoder().decode(bytes);
 const DIRECTIONS = ['front', 'back', 'left', 'right'] as const;
 const FIRST_LATER_PAGE = 4; // the library's four pages, then a page for each later delivery (tools/add_reviewed_frames.py)
 /** What the author drew after the library: the colossi's stoop and its in-between pose, the bosses' left and back attack and hurt, and the Shantak's flight cycle (round 48). */
-const later = (assetGroup: string, direction: string, action: string): boolean =>
+const later = (assetGroup: string, direction: string, action: string): boolean => // (Yog-Sothoth, drawn again whole in round 56, has front combat only: the standing rule)
   action === 'stoop' || action === 'stoop_mid' || action === 'flight' || (assetGroup === 'bosses' && (direction === 'left' || direction === 'back') && (action === 'attack' || action === 'hurt'));
 
 interface Frame {
@@ -41,65 +42,11 @@ interface Pack {
   }>;
 }
 
-/** Decode the committed PNGs independently, so a packed frame cannot quietly change pixels. */
-function pngRgba(bytes: Uint8Array): { width: number; height: number; rgba: Uint8Array } {
-  expect([...bytes.subarray(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
-  const u32 = (at: number): number => new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(at);
-  const width = u32(16), height = u32(20);
-  expect([...bytes.subarray(24, 29)]).toEqual([8, 6, 0, 0, 0]); // RGBA8, lossless, non-interlaced.
-  const chunks: Uint8Array[] = [];
-  for (let at = 8; at < bytes.length;) {
-    const length = u32(at), name = text(bytes.subarray(at + 4, at + 8));
-    if (name === 'IDAT') chunks.push(bytes.subarray(at + 8, at + 8 + length));
-    at += length + 12;
-  }
-  const compressed = new Uint8Array(chunks.reduce((sum, chunk) => sum + chunk.length, 0));
-  let offset = 0;
-  for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
-  const raw = inflateSync(compressed), stride = width * 4;
-  expect(raw.length).toBe(height * (stride + 1));
-  const rgba = new Uint8Array(width * height * 4);
-  const paeth = (a: number, b: number, c: number): number => {
-    const p = a + b - c, da = Math.abs(p - a), db = Math.abs(p - b), dc = Math.abs(p - c);
-    return da <= db && da <= dc ? a : db <= dc ? b : c;
-  };
-  for (let y = 0; y < height; y++) {
-    const filter = raw[y * (stride + 1)];
-    expect(filter).toBeLessThanOrEqual(4);
-    for (let x = 0; x < stride; x++) {
-      const at = y * stride + x;
-      const left = x >= 4 ? rgba[at - 4] : 0;
-      const up = y ? rgba[at - stride] : 0;
-      const corner = y && x >= 4 ? rgba[at - stride - 4] : 0;
-      const prediction = filter === 1 ? left : filter === 2 ? up : filter === 3 ? Math.floor((left + up) / 2) : filter === 4 ? paeth(left, up, corner) : 0;
-      rgba[at] = (raw[y * (stride + 1) + x + 1] + prediction) & 255;
-    }
-  }
-  return { width, height, rgba };
-}
-
-function crop(frame: Frame, page: ReturnType<typeof pngRgba>): Uint8Array {
-  const pixels = new Uint8Array(frame.width * frame.height * 4);
-  for (let y = 0; y < frame.height; y++) {
-    const start = ((frame.y + y) * page.width + frame.x) * 4;
-    pixels.set(page.rgba.subarray(start, start + frame.width * 4), y * frame.width * 4);
-  }
-  return pixels;
-}
-
-function alphaBounds(pixels: Uint8Array, width: number, height: number): number[] {
-  let x0 = width, y0 = height, x1 = 0, y1 = 0;
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-    if (!pixels[(y * width + x) * 4 + 3]) continue;
-    x0 = Math.min(x0, x); y0 = Math.min(y0, y);
-    x1 = Math.max(x1, x + 1); y1 = Math.max(y1, y + 1);
-  }
-  return [x0, y0, x1, y1];
-}
-
 describe('reviewed creature artwork imported into the game', () => {
   const pack = JSON.parse(text(read('index.json'))) as Pack;
-  const source = JSON.parse(text(read('source-index.json'))) as { entity_count: number; unique_png_count: number; entities: SourceEntity[] };
+  const source = JSON.parse(text(read('source-index.json'))) as { entity_count: number; unique_png_count: number; import_rules: string[]; entities: SourceEntity[] };
+  /** The creatures the author drew again whole (tools/replace_reviewed_sprite.py): where the old drawing's places ran out, their extra frames are on a shelf at the foot of a library page. */
+  const redrawn = new Set(source.import_rules.filter((rule) => rule.includes('drawn again whole')).map((rule) => rule.slice(0, rule.indexOf(':'))));
 
   it('covers all 105 reviewed entries and leaves the seven allies to their own atlas', () => {
     const expected = ENTITIES.filter((d) => d.tier !== 'ally').flatMap((d) => [d.id, ...(['eldritch', 'boss'] as const).filter((v) => variantOf(d, v)).map((v) => `${d.id}#${v}`)]);
@@ -134,15 +81,16 @@ describe('reviewed creature artwork imported into the game', () => {
           expect(frames.map((f) => f.sourceSha256)).toEqual(registration.frames.map((f) => f.sha256));
           // A later delivery's frames are on a page of their own, after the library's.
           if (later(imported.assetGroup, direction, action)) expect(frames.every((f) => f.page >= FIRST_LATER_PAGE && f.page !== imported.page), `${original.key}/${direction}/${action}`).toBe(true);
+          else if (redrawn.has(original.key)) expect(frames.every((f) => f.page === imported.page || f.page < FIRST_LATER_PAGE), `${original.key}/${direction}/${action}`).toBe(true);
           else expect(frames.every((f) => f.page === imported.page), `${original.key}/${direction}/${action}`).toBe(true);
         }
       }
     }
-    expect(scopes).toBe(1104); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the bosses' left and back attack and hurt (36), and the Shantak's flight in its four views (4)
-    expect(mirrors).toBe(81); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2768);
+    expect(scopes).toBe(1100); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the other eight bosses' left and back attack and hurt (32), and the Shantak's flight in its four views (4); Yog-Sothoth's, drawn again whole with front combat only, are no more
+    expect(mirrors).toBe(84); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do)
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2844);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2768); // 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
+    expect(pack.frameCount).toBe(2844); // (2768 before round 56's sixteen: their ninety frames beyond the old places, less the 14 dropped, Rhan-Tegoth's own right and Yog-Sothoth's left and back combat); 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
   });
 
   it('preserves all 2728 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
@@ -170,14 +118,14 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2374, '128x128': 352, '128x160': 42 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2458, '128x128': 344, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');
     expect(pack.entities.winged_hybrid.directions.right.actions.move).toEqual(winged);
     expect(pack.entities.winged_hybrid.directions.right.mirror).toBe(true);
     expect(pack.entities.innsmouth_hybrid.directions.right.mirror).toBe(false);
-    expect(pack.entities.rhan_tegoth.directions.right.mirror).toBe(false);
+    expect(pack.entities.rhan_tegoth.directions.right.mirror).toBe(true); // drawn again whole in round 56: its right is its left turned round, as its picture now is
     expect(pack.entities.yeb.directions.right.mirror).toBe(false);
     expect(pack.entities.umr_at_tawil.directions.right.mirror).toBe(false); // drawn again whole: his right is no longer his left turned round
     expect(pack.entities.umr_at_tawil.directions.right.actions.move).not.toEqual(pack.entities.umr_at_tawil.directions.left.actions.move);
@@ -189,7 +137,8 @@ describe('reviewed creature artwork imported into the game', () => {
       const clips = reviewedClips(entity, key), size = reviewedSize(entity, manifest);
       const idle = manifest.frames[entity.directions.front.actions.idle![0]];
       expect(size.width / size.height, key).toBeCloseTo(idle.width / idle.height, 8);
-      expect(size.groundOffset, key).toBeCloseTo(size.height * (1 - idle.bounds[3] / idle.height), 8);
+      const ground = REVIEWED_GROUND[key] ?? idle.bounds[3] / idle.height;
+      expect(size.groundOffset, key).toBeCloseTo(size.height * (1 - ground), 8);
       if (entity.assetGroup === 'bosses') expect(size.height * (idle.bounds[3] - idle.bounds[1]) / idle.height, key).toBeCloseTo(entity.scale, 8);
       else expect(size.height, key).toBe(entity.scale);
       for (const direction of DIRECTIONS) for (const action of ['idle', 'move', 'attack', 'hurt'] as const) {

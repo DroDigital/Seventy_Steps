@@ -106,13 +106,13 @@ export const NAMED = tier('named', [
   },
   {
     id: 'shunned_house_entity', name: 'The Shunned House Entity', source: 'The Shunned House', regions: ['providence'], canonLooks: true,
-    sprite: { silhouette: 'blob', palette: 'fungus', scale: 3, eyes: 1, glow: 'green' },
+    sprite: { silhouette: 'blob', palette: 'fungus', scale: 3, eyes: 1, glow: 'green', body: [0.5625, 0.28] }, // 1.6875 m at its tallest idle breath; keep the established 0.84 m radius (round 56)
     ...scripted('stationary_horror', phases(ph(1, { tentacle_burst: 2, pool: 1, grab: 1, eruption: 1 }), ph(0.5, { pool: 2, tentacle_burst: 2, grab: 1, eruption: 2, quake: 1 }, { hooks: ['darkness'] }))),
     stats: st(750, 300, 30, 0, 3, 8), weak: ['fire'], drops: { echoes: 1600 }, insightOnSight: 1,
   },
   {
     id: 'lilith', name: 'Lilith', source: 'The Horror at Red Hook', regions: ['providence'], canonLooks: true,
-    sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['horns'] },
+    sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['horns'], body: [0.9, 0.14] }, // 0.29, a slender woman (round 56)
     ...scripted('caster', phases(ph(1, { grab: 1, projectile: 2, summon: 1, combo: 1 }, { summons: ['cthulhu_cultist'] }), ph(0.5, { projectile_fan: 2, grab: 1, summon: 1, teleport: 1, barrage: 1, vortex: 1 }, { summons: ['cthulhu_cultist'] }))),
     stats: st(750, 160, 32, 3.8, 3, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },
@@ -137,7 +137,7 @@ export const NAMED = tier('named', [
       ph(0.2, { beam: 2, gaze: 2, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['darkness'] }),
     ), { range: [5, 12], strafe: 0.3 }),
     stats: st(1000, 220, 36, 3, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
-    eldritchVariant: { sprite: { silhouette: 'blob', tentacles: 6 } },
+    eldritchVariant: { sprite: { silhouette: 'blob', tentacles: 6, body: [0.7, 0.23] } }, // its true form stands as tall as a blob does and half as wide: a metre of air either side of the drawn body (round 56)
   },
   {
     id: 'colossus_pyramids', name: 'The Colossus Beneath the Pyramids', source: 'Under the Pyramids', regions: ['pnakotus'], canonLooks: true,

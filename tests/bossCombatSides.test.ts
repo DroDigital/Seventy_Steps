@@ -1,7 +1,8 @@
 /**
- * The nine bosses' combat art from their left and their back (a later delivery, packed by tools/add_reviewed_frames.py):
+ * The eight bosses' combat art from their left and their back (a later delivery, packed by tools/add_reviewed_frames.py):
  * a boss that swings or reels while the investigator circles it is drawn from the side they see, not facing the camera;
- * its right is its left mirrored once; a creature without such art is drawn as before.
+ * its right is its left mirrored once; a creature without such art is drawn as before. Yog-Sothoth, drawn again whole in
+ * round 56 under the rule that attack and hurt are front art only, has none: from the side it shows its front.
  */
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -13,7 +14,7 @@ import { reviewedClips, type ReviewedManifest } from '../src/render/sprites/revi
 import { spawnCreature } from '../src/systems/creatures';
 import { createGame } from '../src/systems/game';
 
-const BOSSES = ['cthulhu', 'father_dagon', 'mother_hydra', 'ghatanothoa', 'colossus_pyramids', 'azathoth', 'shub_niggurath', 'yog_sothoth', 'dunwich_horror'];
+const BOSSES = ['cthulhu', 'father_dagon', 'mother_hydra', 'ghatanothoa', 'colossus_pyramids', 'azathoth', 'shub_niggurath', 'dunwich_horror'];
 const pack = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as ReviewedManifest;
 
 describe('the bosses\' left and back combat art in the pack', () => {
@@ -70,6 +71,7 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
   const seen = (key: string, move: string, at: [number, number]) => {
     const { g, views } = viewsOver();
     const boss = spawnCreature(g, key, { x: 0, z: 0, yaw: 0 })!;
+    g.ecs.c.unseen.delete(boss); // (the Dunwich Horror is unseen until it is revealed)
     const a = g.ecs.c.actor.get(boss)!;
     a.move = move;
     a.frame = 10;
@@ -88,9 +90,18 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
   });
 
   it('reels from the side it is seen too', () => {
-    expect(seen('yog_sothoth', 'stagger', [12, 0]).source).toMatch(/yog_sothoth\/movement\/left\/hurt_\d\.png$/);
-    expect(seen('yog_sothoth', 'stagger', [0, -12]).source).toMatch(/yog_sothoth\/movement\/back\/hurt_\d\.png$/);
-    expect(seen('yog_sothoth', 'stagger', [-12, 0])).toMatchObject({ state: 'hurt', mirror: true });
+    expect(seen('dunwich_horror', 'stagger', [12, 0]).source).toMatch(/dunwich_horror\/movement\/left\/hurt_\d\.png$/); // (the colossi that stoop show the stoop instead)
+    expect(seen('dunwich_horror', 'stagger', [0, -12]).source).toMatch(/dunwich_horror\/movement\/back\/hurt_\d\.png$/);
+    expect(seen('dunwich_horror', 'stagger', [-12, 0])).toMatchObject({ state: 'hurt', mirror: true });
+  });
+
+  it('is front art only for Yog-Sothoth, whatever the side it is seen from: no left, right or back attack or hurt is in the pack for it', () => {
+    const views = pack.entities.yog_sothoth.directions;
+    for (const direction of ['left', 'back', 'right'] as const) expect(Object.keys(views[direction].actions).sort(), direction).toEqual(['idle', 'move']);
+    for (const at of [[12, 0], [0, -12], [-12, 0]] as [number, number][]) {
+      expect(seen('yog_sothoth', 'beam', at).source, `${at}`).toMatch(/yog_sothoth\/movement\/front\/attack_\d\.png$/);
+      expect(seen('yog_sothoth', 'stagger', at).source, `${at}`).toMatch(/yog_sothoth\/movement\/front\/hurt_\d\.png$/);
+    }
   });
 
   it('is unchanged for a creature that has no such art: it swings facing the camera, as before', () => {

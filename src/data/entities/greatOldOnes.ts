@@ -61,13 +61,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   },
   {
     id: 'rhan_tegoth', name: 'Rhan-Tegoth', source: 'The Horror in the Museum', regions: ['yuggoth'], canonLooks: true,
-    sprite: { silhouette: 'toad', palette: 'bone', scale: 5, eyes: 3, limbs: 6 },
+    sprite: { silhouette: 'toad', palette: 'bone', scale: 5, eyes: 3, limbs: 6, body: [0.6, 0.3] }, // as wide as its crouch is drawn, not a toad's 1.8 m (round 56)
     ...scripted('boss', phases(ph(1, { grab: 2, bite: 2, sweep: 1, combo: 1 }), ph(0.5, { grab: 2, bite: 1, charge: 1, roar: 1, quake: 1 }, { hooks: ['camera_warp'] }))),
     stats: st(2600, 1000, 70, 3, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
   {
     id: 'yig', name: 'Yig', source: 'The Curse of Yig', regions: ['kn_yan'], canonLooks: false,
-    sprite: { silhouette: 'serpent', palette: 'sand', scale: 6, eyes: 2 },
+    sprite: { silhouette: 'serpent', palette: 'sand', scale: 6, eyes: 2, body: [0.75, 0.25] }, // 4.5 m painted idle height, with its established 1.5 m radius
     ...scripted('boss', phases(ph(1, { bite: 2, lunge: 2, spit: 1, combo: 1 }), ph(0.5, { bite: 2, lunge: 1, summon: 1, spit: 1, charge: 1, eruption: 1 }, { summons: ['child_of_yig'] }))),
     stats: st(2950, 1200, 70, 4, 5, 12), drops: { echoes: 10000 }, insightOnSight: 3,
   },
@@ -94,7 +94,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   },
   {
     id: 'great_ones', name: 'The Great Ones', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
-    sprite: { silhouette: 'giant', palette: 'stone', scale: 5, eyes: 2, limbs: 2 },
+    sprite: { silhouette: 'giant', palette: 'stone', scale: 5, eyes: 2, limbs: 2, body: [0.95, 0.12] }, // a tall slim figure, 0.6 across, not a giant's 1.0 (round 56)
     ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, teleport: 1, barrage: 1 }), ph(0.5, { slam: 2, sweep: 1, teleport: 1, aoe_ring: 1, sweep_beam: 1 }, { hooks: ['hidden_platforms'] }))),
     stats: st(2950, 1200, 70, 3.4, 4, 10), drops: { echoes: 10000 }, insightOnSight: 3,
   },
