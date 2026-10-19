@@ -106,7 +106,7 @@ export const NAMED = tier('named', [
   },
   {
     id: 'shunned_house_entity', name: 'The Shunned House Entity', source: 'The Shunned House', regions: ['providence'], canonLooks: true,
-    sprite: { silhouette: 'blob', palette: 'fungus', scale: 3, eyes: 1, glow: 'green', body: [0.553, 0.28] }, // 1.66 m tall as drawn, 0.84 across, not a blob's 1.08: the drawn body is 0.64, and the bot's fight is no shorter than it was at 0.84 (a 0.69 one is 5.6 s, under the table's 6; round 56)
+    sprite: { silhouette: 'blob', palette: 'fungus', scale: 3, eyes: 1, glow: 'green', body: [0.5625, 0.28] }, // 1.6875 m at its tallest idle breath; keep the established 0.84 m radius (round 56)
     ...scripted('stationary_horror', phases(ph(1, { tentacle_burst: 2, pool: 1, grab: 1, eruption: 1 }), ph(0.5, { pool: 2, tentacle_burst: 2, grab: 1, eruption: 2, quake: 1 }, { hooks: ['darkness'] }))),
     stats: st(750, 300, 30, 0, 3, 8), weak: ['fire'], drops: { echoes: 1600 }, insightOnSight: 1,
   },

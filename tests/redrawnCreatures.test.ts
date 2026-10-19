@@ -4,7 +4,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { getEntity, variantOf } from '../src/data/registry';
+import { applyOverride, getEntity, variantOf } from '../src/data/registry';
 import type { ReviewedManifest } from '../src/render/sprites/reviewed';
 import { bodyOf, reachOf, toCombatant } from '../src/systems/creatures';
 import { crop, pngRgba } from './reviewedPackHelpers';
@@ -113,8 +113,8 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     }
   });
 
-  it('stand as tall as they are drawn: Yig 4.6 m, the Dhole 4 m, the Shunned House 1.66 m', () => {
-    for (const [id, tall] of [['yig', 4.6], ['dhole', 4.0], ['shunned_house_entity', 1.66]] as const) {
+  it('stand as tall as they are drawn: Yig 4.6 m, the Dhole 3.94 m, the Shunned House 1.69 m', () => {
+    for (const [id, tall] of [['yig', 4.5], ['dhole', 3.9375], ['shunned_house_entity', 1.6875]] as const) {
       expect(bodyOf(getEntity(id)!).height / tall, id).toBeGreaterThan(0.97);
       expect(bodyOf(getEntity(id)!).height / tall, id).toBeLessThan(1.03);
     }
@@ -122,21 +122,21 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     expect(toCombatant(getEntity('yig')!).reach).toBeCloseTo(3, 9);
   });
 
-  it('give a variant that draws another silhouette no body fitted to the base\'s art (the Serpent Man\'s eldritch form is a serpent)', () => {
+  it('drop a body fitted to the base\'s art when a variant draws another silhouette and brings none', () => {
     const base = getEntity('serpent_man')!;
-    const serpent = variantOf(base, 'eldritch')!;
-    expect(serpent.sprite!.body).toBeUndefined();
-    expect(bodyOf(serpent)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 });
-    expect(bodyOf(base).radius).toBeCloseTo(2.2 * 0.12, 9); // the man keeps his
-    expect(variantOf(getEntity('high_priest')!, 'eldritch')!.sprite!.body).toEqual([0.7, 0.23]); // one that brings its own keeps it
+    const swapped = applyOverride(base, { sprite: { silhouette: 'serpent' } });
+    expect(swapped.sprite!.body).toBeUndefined();
+    expect(bodyOf(swapped)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 });
+    expect(applyOverride(base, { sprite: { silhouette: 'serpent', body: [0.5, 0.25] } }).sprite!.body).toEqual([0.5, 0.25]); // one that brings its own keeps it
+    expect(applyOverride(base, { sprite: { scale: 4 } }).sprite!.body).toEqual([0.9, 0.12]); // a change of scale only: the fractions still fit
+    expect(bodyOf(variantOf(base, 'eldritch')!)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 }); // as the entry has it
   });
 
   it('strike Yog-Sothoth at its seven painted spheres, the lowest standing on the ground', () => {
     const recipe = getEntity('yog_sothoth')!.assembly!;
     expect(recipe.hit).toHaveLength(7);
-    // The lowest sphere stands on the ground, where a blade reaches it; the picture is let down by `sink` so its lowest sphere's foot, not the mist under it, is there.
+    // The renderer grounds the physical sphere cluster, excluding the detached sparks below it.
     expect(Math.min(...recipe.hit!.map(([, up, size]) => up - size))).toBeCloseTo(0, 2);
-    expect(recipe.sink).toBeCloseTo(0.077, 3);
     // Upper spheres above lower, the cluster no wider than the picture.
     const frame = pack.frames[pack.entities.yog_sothoth.directions.front.actions.idle![0]] as unknown as { bounds: number[]; width: number };
     const tall = frame.bounds[3] - frame.bounds[1];

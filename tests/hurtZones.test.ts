@@ -9,6 +9,7 @@ import { emptyInput } from '../src/core/input';
 import { globes, pictured, zoneShapes } from '../src/data/assemblyShape';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
+import { reviewedSize, type ReviewedManifest } from '../src/render/sprites/reviewed';
 import { PLAYER } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { stepGame } from '../src/systems/game';
@@ -88,13 +89,15 @@ describe('hurt zones (round 24)', () => {
   });
 
   it('and its table lies within the painted body, in the art\'s own scale', () => {
-    const manifest = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8'));
+    const manifest = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as ReviewedManifest;
     const entity = manifest.entities.yog_sothoth;
-    const frame = manifest.frames[entity.directions.front.actions.idle[0]];
+    const frame = manifest.frames[entity.directions.front.actions.idle![0]];
+    const size = reviewedSize(entity, manifest);
+    const ground = frame.height * (1 - size.groundOffset / size.height);
     const [x0, y0, x1, y1] = frame.bounds as number[];
     const tall = y1 - y0; // the figure's height in pixels is `scale` metres: a fraction of the scale is that fraction of it
     for (const [across, up, size] of recipe('yog_sothoth').hit!) {
-      const [px, py, pr] = [frame.width / 2 + across * tall, y1 - up * tall, size * tall];
+      const [px, py, pr] = [frame.width / 2 + across * tall, ground - up * tall, size * tall];
       expect(px - pr).toBeGreaterThanOrEqual(x0 - 2);
       expect(px + pr).toBeLessThanOrEqual(x1 + 2);
       expect(py - pr).toBeGreaterThanOrEqual(y0 - 2);

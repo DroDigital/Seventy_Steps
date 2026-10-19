@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { serveFrom } from '../desktop/serve.js';
 import { ENTITIES, variantOf } from '../src/data/registry';
+import { REVIEWED_GROUND } from '../src/data/reviewedLook';
 import {
   attackFrame, directionForAngle, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection,
   type DirectionalClips,
@@ -136,7 +137,8 @@ describe('reviewed creature artwork imported into the game', () => {
       const clips = reviewedClips(entity, key), size = reviewedSize(entity, manifest);
       const idle = manifest.frames[entity.directions.front.actions.idle![0]];
       expect(size.width / size.height, key).toBeCloseTo(idle.width / idle.height, 8);
-      expect(size.groundOffset, key).toBeCloseTo(size.height * (1 - idle.bounds[3] / idle.height), 8);
+      const ground = REVIEWED_GROUND[key] ?? idle.bounds[3] / idle.height;
+      expect(size.groundOffset, key).toBeCloseTo(size.height * (1 - ground), 8);
       if (entity.assetGroup === 'bosses') expect(size.height * (idle.bounds[3] - idle.bounds[1]) / idle.height, key).toBeCloseTo(entity.scale, 8);
       else expect(size.height, key).toBe(entity.scale);
       for (const direction of DIRECTIONS) for (const action of ['idle', 'move', 'attack', 'hurt'] as const) {

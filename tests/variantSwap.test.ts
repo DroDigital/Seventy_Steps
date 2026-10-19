@@ -41,6 +41,33 @@ describe('VariantSwap', () => {
     expect(g.ecs.c.body.get(foe)!.height).toBeCloseTo(bodyOf(getEntity('innsmouth_hybrid')!).height);
   });
 
+  it('keeps the Serpent Man\'s serpent body and bite when sanity changes or it appears to a fractured mind', () => {
+    const g = createGame({ creature: 'serpent_man' });
+    const foe = find(g, creatureModel('serpent_man'));
+    const body = { ...g.ecs.c.body.get(foe)! };
+    const moves = g.ecs.c.actor.get(foe)!.moves;
+    expect(body.height).toBeCloseTo(1.98);
+    expect(body.radius).toBeCloseTo(0.264);
+
+    setSanity(g, 39);
+    const arrived = spawnCreature(g, 'serpent_man', { x: 0, z: 0, yaw: 0 })!;
+    for (const e of [foe, arrived]) {
+      expect(model(g, e)).toBe(creatureModel('serpent_man', 'eldritch'));
+      expect(g.ecs.c.body.get(e)!.height).toBeCloseTo(1.1);
+      expect(g.ecs.c.body.get(e)!.radius).toBeCloseTo(0.55);
+      const bite = g.ecs.c.actor.get(e)!.moves.bite.hit!;
+      expect(bite.height).toBeCloseTo(0.55);
+      expect(bite.reach).toBeCloseTo(1.1);
+    }
+
+    setSanity(g, 43);
+    for (const e of [foe, arrived]) {
+      expect(model(g, e)).toBe(creatureModel('serpent_man'));
+      expect(g.ecs.c.body.get(e)).toEqual(body);
+      expect(g.ecs.c.actor.get(e)!.moves).toEqual(moves);
+    }
+  });
+
   it('leaves alone creatures without one, a requested variant, and the placeholder Deep One', () => {
     const plain = createGame({ creature: 'ghast' });
     setSanity(plain, 10);

@@ -45,7 +45,7 @@ export const GREATER = tier('greater', [
     behavior: { archetype: 'invisible_stalker', attacks: ['wind_push', 'grab', 'tentacle_burst'] },
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
     bossVariant: {
-      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14 }, stats: { hp: 1900, poise: 800, damage: 55 },
+      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.7, 0.36] }, stats: { hp: 1900, poise: 800, damage: 55 }, // its unchanged boss art keeps the blob's body
       drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
       bossScript: phases(ph(1, { wind_push: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['decoys'] }), ph(0.5, { wind_push: 2, aoe_ring: 1, tentacle_burst: 1, grab: 1, barrage: 1 }, { hooks: ['decoys', 'control_swap'] })),
     },
@@ -58,7 +58,7 @@ export const GREATER = tier('greater', [
   },
   {
     id: 'dhole', name: 'Dhole', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond'], canonLooks: true,
-    sprite: { silhouette: 'serpent', palette: 'pallid', scale: 6, eyes: 0, body: [0.667, 0.25] }, // 4 m tall as drawn, the serpent's breadth; its blows stay scaled by 3 m (round 56)
+    sprite: { silhouette: 'serpent', palette: 'pallid', scale: 6, eyes: 0, body: [0.65625, 0.25] }, // 3.9375 m painted idle height, with its established 1.5 m radius
     behavior: { archetype: 'burrower', attacks: ['bite', 'slam', 'spit'] },
     stats: st(1200, 220, 46, 3.4, 2, 6), drops: { echoes: 1000 }, insightOnSight: 0,
   },

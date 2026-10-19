@@ -33,6 +33,16 @@ describe('roster creatures as combatants', () => {
     steps(g, 60);
   });
 
+  it('keeps the Polyp Swarm\'s body separate from the redrawn Flying Polyp\'s', () => {
+    for (const [variant, height, radius] of [[undefined, 2.52, 0.792], ['boss', 5.6, 2.88]] as const) {
+      const g = createGame({ creature: 'flying_polyp', variant });
+      const [e] = [...g.ecs.c.model].find(([, m]) => m === creatureModel('flying_polyp', variant))!;
+      const body = g.ecs.c.body.get(e)!;
+      expect(body.height).toBeCloseTo(height);
+      expect(body.radius).toBeCloseTo(radius);
+    }
+  });
+
   it('replaces the placeholder Deep One with an enemy, and keeps it beside an ally', () => {
     const models = (id: string): string[] => [...createGame({ creature: id }).ecs.c.model.values()];
     expect(models('ghoul')).not.toContain('deepOne');
