@@ -53,7 +53,7 @@ describe('VariantSwap', () => {
     const arrived = spawnCreature(g, 'serpent_man', { x: 0, z: 0, yaw: 0 })!;
     for (const e of [foe, arrived]) {
       expect(model(g, e)).toBe(creatureModel('serpent_man', 'eldritch'));
-      expect(g.ecs.c.body.get(e)!.height).toBeCloseTo(1.1);
+      expect(g.ecs.c.body.get(e)!.height).toBeCloseTo(1.65); // as tall as the hood is drawn; its bite is still scaled by the serpent's 1.1
       expect(g.ecs.c.body.get(e)!.radius).toBeCloseTo(0.55);
       const bite = g.ecs.c.actor.get(e)!.moves.bite.hit!;
       expect(bite.height).toBeCloseTo(0.55);
