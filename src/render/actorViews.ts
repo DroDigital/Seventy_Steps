@@ -27,6 +27,8 @@ import { pose } from './poses';
 import { createWorldMaterial } from './worldMaterial';
 import { FEEL } from './feel';
 import { createMountViews } from './mountViews';
+import { lightFlame } from './lantern';
+import { lanternGain } from './lanternLife';
 
 interface View {
   figure: Figure;
@@ -207,6 +209,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     for (const m of f.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
     if (f.rig === 'echo') glow = glowAt.set(f.root.position.x, f.root.position.y + FEEDBACK.echoGlowHeight, f.root.position.z);
     if (f.flame && id === g.player.id) flame = f.flame.getWorldPosition(flameAt); // posed: it tumbles with a roll
+    if (f.flameMesh && id === g.player.id) lightFlame(f.flameMesh, lanternGain(g, alpha));
     if (f.flash && id === g.player.id) muzzle = f.flash.getWorldPosition(muzzleAt); // the barrel's tip, wherever the arm has it
   }
 

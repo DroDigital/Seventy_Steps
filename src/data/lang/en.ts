@@ -283,7 +283,7 @@ export const EN = {
   'hint.gun': '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',
   'hint.oil': '{throw} throws a flask of lamp oil; it bursts and burns where it lands. Lock on first to throw it at a foe.',
   'hint.grab': 'A crimson flare means a grab: no guard stops it. Roll away ({dodge}).',
-  'hint.unmoored': 'Unmoored: you strike weaker and are struck harder, your breath comes back slower, and the body wears away a little. Laudanum ({item}), a lamp or a fire, or rest brings the mind back.',
+  'hint.unmoored': 'Unmoored: you strike weaker and are struck harder, your breath comes back slower, and the body wears away a little. Laudanum ({item}), a lamp or a fire, or rest brings the mind back. Your lantern gutters out while you are Unmoored, and kindles again once you have climbed above it.',
   'hint.phantom': 'It was never there. At the edge of madness the mind conjures horrors: they vanish when struck, and their blows wound only the mind. Laudanum ({item}) or rest steadies it.',} as const satisfies Record<string, string>;
 
 export type Key = keyof typeof EN;

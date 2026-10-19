@@ -268,6 +268,6 @@ export const FR: Readonly<Record<Key, string>> = {
   'hint.gun': "{shoot} tire au revolver : six balles, et celles de réserve que vous portez. {reload} le recharge. Il frappe fort de près et peu de loin, et manque les petites cibles à distance. Des balles gisent dans des caisses à travers le rêve et sont vendues par des marchands.",
   'hint.oil': "{throw} lance une fiole d’huile de lampe ; elle éclate et brûle là où elle tombe. Verrouillez d’abord la cible pour la lancer sur un ennemi.",
   'hint.grab': "Un éclat cramoisi annonce une saisie : aucune garde ne l’arrête. Roulez pour l’éviter ({dodge}).",
-  'hint.unmoored': "À la dérive : vous frappez plus faiblement et êtes frappé plus fort, votre souffle revient plus lentement, et le corps s’use un peu. Le laudanum ({item}), une lampe ou un feu, ou le repos ramènent l’esprit.",
+  'hint.unmoored': "À la dérive : vous frappez plus faiblement et êtes frappé plus fort, votre souffle revient plus lentement, et le corps s’use un peu. Le laudanum ({item}), une lampe ou un feu, ou le repos ramènent l’esprit. Votre lanterne vacille et s’éteint tant que vous êtes à la dérive, et se rallume dès que vous en êtes sorti.",
   'hint.phantom': "Cela n’a jamais été là. Au bord de la folie, l’esprit conjure des horreurs : elles s’évanouissent quand on les frappe, et leurs coups ne blessent que l’esprit. Le laudanum ({item}) ou le repos l’apaise.",
 };

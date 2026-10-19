@@ -268,6 +268,6 @@ export const ES: Readonly<Record<Key, string>> = {
   'hint.gun': "{shoot} dispara el revólver: seis balas, y las de reserva que llevas. {reload} lo recarga. Golpea fuerte de cerca y poco de lejos, y falla los blancos pequeños a distancia. Hay balas en cajas por el sueño y las venden los mercaderes.",
   'hint.oil': "{throw} lanza un frasco de aceite de lámpara; estalla y arde donde cae. Fija primero el objetivo para lanzarlo a un enemigo.",
   'hint.grab': "Un destello carmesí es un agarre: ninguna guardia lo detiene. Rueda para evitarlo ({dodge}).",
-  'hint.unmoored': "A la deriva: golpeas más débil y te golpean más fuerte, tu aliento vuelve más despacio y el cuerpo se desgasta un poco. El láudano ({item}), una lámpara o un fuego, o el descanso devuelven la mente.",
+  'hint.unmoored': "A la deriva: golpeas más débil y te golpean más fuerte, tu aliento vuelve más despacio y el cuerpo se desgasta un poco. El láudano ({item}), una lámpara o un fuego, o el descanso devuelven la mente. Tu linterna parpadea y se apaga mientras estás a la deriva, y se enciende de nuevo cuando te has alzado por encima.",
   'hint.phantom': "Nunca estuvo allí. Al borde de la locura la mente conjura horrores: se desvanecen al golpearlos, y sus golpes solo hieren la mente. El láudano ({item}) o el descanso la serena.",
 };

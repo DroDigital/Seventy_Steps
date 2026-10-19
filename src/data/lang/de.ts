@@ -268,6 +268,6 @@ export const DE: Readonly<Record<Key, string>> = {
   'hint.gun': "{shoot} feuert den Revolver: sechs Patronen und die Reserve, die ihr tragt. {reload} lädt ihn. Er schlägt aus der Nähe hart zu und aus der Ferne wenig, und er verfehlt kleine Ziele auf Distanz. Patronen liegen in Kisten im Traum und werden von Händlern verkauft.",
   'hint.oil': "{throw} wirft eine Flasche Lampenöl; sie platzt und brennt, wo sie landet. Visiert zuerst an, um sie auf einen Gegner zu werfen.",
   'hint.grab': "Ein purpurnes Aufblitzen bedeutet einen Griff: keine Deckung hält ihn auf. Rollt weg ({dodge}).",
-  'hint.unmoored': "Entwurzelt: ihr schlagt schwächer zu und werdet härter getroffen, euer Atem kehrt langsamer wieder, und der Körper zehrt ein wenig ab. Laudanum ({item}), eine Lampe oder ein Feuer oder Rast bringen den Geist zurück.",
+  'hint.unmoored': "Entwurzelt: ihr schlagt schwächer zu und werdet härter getroffen, euer Atem kehrt langsamer wieder, und der Körper zehrt ein wenig ab. Laudanum ({item}), eine Lampe oder ein Feuer oder Rast bringen den Geist zurück. Eure Laterne flackert und erlischt, solange ihr entwurzelt seid, und entzündet sich wieder, sobald ihr darüber hinaus seid.",
   'hint.phantom': "Es war nie da. Am Rand des Wahnsinns beschwört der Geist Schrecken herauf: Sie verschwinden, wenn man sie schlägt, und ihre Hiebe verwunden nur den Geist. Laudanum ({item}) oder Rast beruhigt ihn.",
 };

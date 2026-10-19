@@ -53,7 +53,6 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   g.events.on('LampChanged', (e) => say(e.lit ? 'THE LAMP BURNS AGAIN' : 'A LAMP GOES OUT'));
   g.events.on('Petrified', () => say('TURNED TO STONE'));
   g.events.on('Title', (e) => show(e.text));
-  g.events.on('Notice', (e) => say(e.text));
   g.events.on('Named', (e) => {
     name.textContent = e.name;
     nameUntil = performance.now() + NAME_MS * e.count; // it stays longer each time it comes

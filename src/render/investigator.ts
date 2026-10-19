@@ -109,10 +109,10 @@ export function investigator(): Figure {
     slab(0.022, 0.09, 0.024, (0.225 + lx) / 2, ly + 0.15, lz, leather, Math.atan2(lx - 0.225, 0.055)), // ...a strap down and out to the ring
     box(0.026, 0.026, 0.03, 0.225, -0.07, lz, brass), // a brass clip where they meet
   ]), 'cloth');
-  part(f, f.torso, box(0.09, 0.12, 0.09, lx, ly, lz, LANTERN.color), 'cloth', 1); // its flame (its light: lantern.ts)
   f.flame = new THREE.Object3D();
   f.flame.position.set(lx, ly, lz);
   f.torso.add(f.flame);
+  f.flameMesh = part(f, f.flame, box(0.09, 0.12, 0.09, 0, 0, 0, LANTERN.color), 'cloth', 1); // its flame (its light: lantern.ts), which gutters out with the mind (lanternLife.ts)
 
   part(f, f.head, mergeGeometries([
     ...faceForms(pale),

@@ -41,13 +41,23 @@ export function sealedHere(g: Game): string | null {
   return null;
 }
 
-const warnedAt = new WeakMap<Game, number>();
+/** What the investigator was last told here: the words, the frame, and the frame since which they have been out of reach (a door walked away from is forgotten, so the next approach is told again). */
+interface Warned { text: string; at: number; away?: number }
+const warned = new WeakMap<Game, Warned>();
 
-/** Every half second: at a sealed door or a sleeping horror's arena, the investigator is told what it waits for. */
+/** Every half second: at a sealed door or a sleeping horror's arena, the investigator is told what it waits for, and again on coming back to it. */
 export function sealSystem(g: Game): void {
-  if (!g.overworld || g.frame % 30 !== 0 || g.frame - (warnedAt.get(g) ?? -Infinity) < SEALS.again * 60) return;
+  if (!g.overworld || g.frame % 30 !== 0) return;
   const text = sealedHere(g);
-  if (!text) return;
-  warnedAt.set(g, g.frame);
+  const last = warned.get(g);
+  if (!text) { // out of reach
+    if (!last) return;
+    last.away ??= g.frame;
+    if (g.frame - last.away >= SEALS.away * 60) warned.delete(g);
+    return;
+  }
+  if (last) last.away = undefined;
+  if (last && last.text === text && g.frame - last.at < SEALS.again * 60) return;
+  warned.set(g, { text, at: g.frame });
   g.events.emit('Notice', { text });
 }
