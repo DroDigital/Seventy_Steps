@@ -40,7 +40,7 @@ describe('frame statistics', () => {
 
 describe('the quality ladder', () => {
   it('starts at the default picture and every rung is no sharper than the one above', () => {
-    expect(LADDER[0]).toEqual({ resolution: 1.5, fog: 1, shadows: 1 });
+    expect(LADDER[0]).toEqual({ resolution: 1.6, fog: 1, shadows: 1 });
     for (let i = 1; i < LADDER.length; i++) {
       expect(LADDER[i].resolution).toBeLessThanOrEqual(LADDER[i - 1].resolution);
       expect(LADDER[i].fog).toBeLessThanOrEqual(LADDER[i - 1].fog);
@@ -80,7 +80,7 @@ describe('first-launch picture', () => {
     return { settings, store, quality, measuredAt, frames, notices };
   }
 
-  it('keeps 600 × 338 when the default picture runs smoothly', () => {
+  it('keeps 640 × 360 when the default picture runs smoothly', () => {
     const run = launch();
     run.frames(60);
     run.quality.tick(run.measuredAt);
@@ -96,7 +96,7 @@ describe('first-launch picture', () => {
     expect(run.settings).toEqual({ ...defaultSettings(), shadows: 0 });
     run.frames(60);
     run.quality.tick(run.measuredAt + (1.5 + QUALITY.measure) * 1000);
-    expect(run.settings.resolution).toBe(1.5);
+    expect(run.settings.resolution).toBe(1.6);
     expect(run.store.getItem(AUTO_KEY)).toBe('1');
     expect(run.notices).toHaveLength(1);
   });

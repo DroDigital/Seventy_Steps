@@ -67,7 +67,7 @@ function skipAhead(g: Game, e: Entity, f: Fight): void {
   const pick = options.find((x) => (roll -= x.weight) < 0);
   if (!pick) return;
   const body = c.body.get(e)!;
-  const [lo, hi] = attackRange(pick.id, body.height);
+  const [lo, hi] = attackRange(pick.id, body.reach ?? body.height);
   const d = Math.min(12, Math.max(body.radius + 1, (lo + hi) / 2));
   const pp = c.transform.get(g.player.id)!.pos;
   const p = groundNear(g, pp, [d, d], body.radius, f.arena);

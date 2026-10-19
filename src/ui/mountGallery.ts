@@ -4,7 +4,7 @@ import { startLoop } from '../core/loop';
 import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
 import { MOUNT_IDS, MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
-import { RENDER, SIM } from '../data/tuning';
+import { RENDER, SETTINGS, SIM } from '../data/tuning';
 import { allEffectsOn, computeFx } from '../render/fx';
 import { tint } from '../render/meshKit';
 import { createMount, type MountVisual } from '../render/mounts';
@@ -97,7 +97,7 @@ export async function startMountGallery(): Promise<void> {
   button('view', 'Profile', () => { yaw = -Math.PI / 2; pitch = 0.12; auto = false; radius = distance; });
   button('view', 'Three-quarter', () => { yaw = -0.92; pitch = 0.22; auto = false; radius = distance; });
   const resolutionButton = button('view', 'Inspect at 800px', () => { detailed = !detailed; resize(); }, { action: 'resolution' });
-  const resize = (): void => { pipeline.resize(true, detailed ? 2 : 1.5); resolutionButton.textContent = detailed ? 'Game resolution' : 'Inspect at 800px'; };
+  const resize = (): void => { pipeline.resize(true, detailed ? 2 : SETTINGS.resolution[3]); resolutionButton.textContent = detailed ? 'Game resolution' : 'Inspect at 800px'; };
   const listeners = new AbortController(), signal = listeners.signal;
   addEventListener('resize', resize, { signal });
   canvas.addEventListener('pointerdown', e => { dragging = true; lastX = e.clientX; lastY = e.clientY; auto = false; canvas.setPointerCapture(e.pointerId); refresh(); }, { signal });

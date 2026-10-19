@@ -36,7 +36,7 @@ export function refreshBrain(g: Game, e: Entity, f: Fight): void {
   const def = defOf(g, e);
   const body = g.ecs.c.body.get(e);
   const br = g.ecs.c.brain.get(e);
-  if (def && body && br) br.def = phaseBrain(def, f.phase, body.height, SIGNATURES[f.id]?.extra?.(g, e, f), f.script);
+  if (def && body && br) br.def = phaseBrain(def, f.phase, body.reach ?? body.height, SIGNATURES[f.id]?.extra?.(g, e, f), f.script);
 }
 
 function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {

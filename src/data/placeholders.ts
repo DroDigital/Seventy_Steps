@@ -15,6 +15,7 @@ export interface CombatantDef {
   speed: number; // m/s
   radius: number; // capsule
   height: number;
+  reach?: number; // the height its blows are scaled by (attacks.ts), where it differs from the capsule's: a fitted body does not change a fight
   aimHeight: number;
   bounty: number; // Echoes for the kill
   immortal?: boolean; // hp never drops below 1 and refills when left alone
