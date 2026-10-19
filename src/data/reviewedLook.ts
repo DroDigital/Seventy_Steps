@@ -26,3 +26,8 @@ export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, tors
   'shub_niggurath': [0.54, 0.322, 0.023],
   'yog_sothoth': [0.431, 0.374, 0.204],
 };
+
+/** By form: the physical body's ground row as a fraction of the canvas height, excluding detached sparks. */
+export const REVIEWED_GROUND: Readonly<Record<string, number>> = {
+  'yog_sothoth': 0.8671875,
+};

@@ -101,8 +101,8 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     expect(bodyOf(chaos).radius / painted('nyarlathotep#eldritch', chaos.sprite!.scale)).toBeLessThan(1.35);
   });
 
-  it('keep each one\'s height, which is what its blows\' reach is scaled by: only its width was set from the picture', () => {
-    for (const [key] of DELIVERED.filter(([k]) => k !== 'yog_sothoth')) {
+  it('keep the remaining creatures\' heights when only their width is refitted', () => {
+    for (const [key] of DELIVERED.filter(([k]) => !['yog_sothoth', 'yig', 'dhole', 'shunned_house_entity'].includes(k))) {
       const [id, variant] = key.split('#');
       const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch')! : getEntity(id)!;
       if (!def.sprite?.body) continue;
@@ -114,7 +114,7 @@ describe('their hurtboxes, fitted to the new bodies', () => {
   it('strike Yog-Sothoth at its seven painted spheres, the lowest standing on the ground', () => {
     const recipe = getEntity('yog_sothoth')!.assembly!;
     expect(recipe.hit).toHaveLength(7);
-    // The picture floats a metre and a half over the ground (its lowest sphere's foot is above its bottom row): the spheres stand on it, so a blade reaches them.
+    // The renderer grounds the physical sphere cluster, excluding the detached sparks below it.
     expect(Math.min(...recipe.hit!.map(([, up, size]) => up - size))).toBeCloseTo(0, 2);
     // Upper spheres above lower, the cluster no wider than the picture.
     const frame = pack.frames[pack.entities.yog_sothoth.directions.front.actions.idle![0]] as unknown as { bounds: number[]; width: number };

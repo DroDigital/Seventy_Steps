@@ -35,7 +35,7 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['beyond'], canonLooks: true,
     assembly: {
       body: 'spheres', palette: 'pallid', scale: 20, spheres: 14, glow: 'green',
-      hit: [[0.01, 0.718, 0.092], [-0.184, 0.544, 0.175], [0.199, 0.544, 0.165], [0.01, 0.398, 0.218], [-0.262, 0.223, 0.18], [0.248, 0.228, 0.184], [0, 0.107, 0.107]], // fitted to the painted spheres of its front view (fractions of the painted height: across from the picture's middle, up from the lowest sphere's foot): the picture floats a metre and a half over the ground, and the fight stands the spheres on it, so a blade reaches the lowest of them
+      hit: [[0.01, 0.718, 0.092], [-0.184, 0.544, 0.175], [0.199, 0.544, 0.165], [0.01, 0.398, 0.218], [-0.262, 0.223, 0.18], [0.248, 0.228, 0.184], [0, 0.107, 0.107]], // fitted to the front view's painted spheres: across from the picture's middle, up from the physical sphere cluster's foot, which the renderer grounds through REVIEWED_GROUND
     },
     ...scripted('boss', phases(
       ph(1, { beam: 2, teleport: 1, aoe_ring: 1, barrage: 1, eruption: 1 }, { hooks: ['arena_reconnect'], arena: 'spheres' }),

@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 /** Lossless reviewed PNG pages and their authored animation registrations. */
 import type { DirectionalClips, SpriteAction, SpriteDirection } from './directional';
+import { REVIEWED_GROUND } from '../../data/reviewedLook';
 import { mergeReviewedArt, validateAlliedManifest, validateReviewedManifest } from './reviewedMerge';
 
 export interface ReviewedFrame {
@@ -70,10 +71,11 @@ export function reviewedSize(entity: ReviewedEntity, manifest: ReviewedManifest)
   const height = entity.assetGroup === 'bosses'
     ? entity.scale * reference.height / (reference.bounds[3] - reference.bounds[1])
     : entity.scale;
+  const ground = REVIEWED_GROUND[entity.id] ?? reference.bounds[3] / reference.height;
   return {
     width: height * reference.width / reference.height,
     height,
-    groundOffset: height * (1 - reference.bounds[3] / reference.height),
+    groundOffset: height * (1 - ground),
   };
 }
 

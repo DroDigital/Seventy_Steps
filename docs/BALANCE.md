@@ -55,7 +55,7 @@ turns flesh to stone. It cannot be killed, and what it took is the tally.
 | 33 | Rhan-Tegoth | 14/7/14 | 5 | 2600 | 34 | 816 | 328 | 0.89 | 0 |
 | 34 | Yeb | 15/7/14 | 5 | 2600 | 28 | 689 | 340 | 0.72 | 0 |
 | 35 | The Great Ones | 15/7/15 | 5 | 2950 | 37 | 1817 | 340 | 1.91 | 0 |
-| 36 | Yig | 16/7/15 | 5 | 2950 | 30 | 1061 | 352 | 1.08 | 0 |
+| 36 | Yig | 16/7/15 | 5 | 2950 | 31 | 1058 | 352 | 1.07 | 0 |
 | 37 | Mother Hydra | 16/7/15 | 5 | 3100 | 18 | 737 | 352 | 0.75 | 0 |
 | 38 | Father Dagon | 16/8/15 | 5 | 3250 | 27 | 1071 | 352 | 1.09 | 0 |
 | 39 | Tsathoggua | 16/8/16 | 5 | 3250 | 39 | 1323 | 352 | 1.34 | 0 |
@@ -65,7 +65,7 @@ turns flesh to stone. It cannot be killed, and what it took is the tally.
 | 43 | Ghatanothoa | 18/9/17 | 5 | 4850 | 77 | 1111 | 376 | 1.06 | 0 |
 | 44 | Nyarlathotep | 18/9/18 | 5 | 5150 | 73 | 2219 | 376 | 2.11 | 0 |
 | 45 | Shub-Niggurath | 19/9/19 | 5 | 5450 | 92 | 2125 | 388 | 1.96 | 0 |
-| 46 | Yog-Sothoth | 20/9/19 | 5 | 6100 | 176 | 6127 | 400 | 5.47 | 0 |
+| 46 | Yog-Sothoth | 20/9/19 | 5 | 6100 | 182 | 6565 | 400 | 5.86 | 0 |
 | 47 | Azathoth | 20/10/19 | 5 | 6700 | 90 | 9544 | 400 | 8.52 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6), and the bot does not die.
