@@ -126,6 +126,6 @@ export function moveMounted(g: Game, dt: number): MountMove {
     const error = wrapAngle(m.face - tr.yaw);
     if (backOff(g, tr, clamp(error, -0.03, 0.03))) mount.speed = Math.max(mount.speed, k.creep * 0.5);
   }
-  if (!k.arcade) stepReins(mount.reins, dt, mount.speed, mount.yawRate, p.sprinting); // the motor car has a wheel, not reins
+  if (!k.arcade) stepReins(mount.reins, dt, mount.speed, mount.yawRate, p.sprinting, blocked ? 0 : target); // the motor car has a wheel, not reins; a rig held against something is hauled up on, whatever the stick asks
   return 'rode';
 }

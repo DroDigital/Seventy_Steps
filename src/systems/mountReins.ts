@@ -16,6 +16,9 @@ export const REINS = Object.freeze({
   every: Object.freeze([1.15, 2.5] as const), // seconds between slaps at a gallop
   burst: 0.1, // seconds after a gallop begins that the first falls
   brake: -2.5, // m/s²: slowing faster than this is a pull
+  stop: 1, // m/s: a rider who asks for less than this wants a standstill (a stick let go, or a wall in the way); only a pull to a stop is a haul
+  ease: 0.4, // the most the hands draw in for slowing that is not a stop (a gallop let go to a cruise, a stick eased): never a halt
+  easeBy: 30, // m/s² of slowing for the whole of it
   hard: 0.55, // how much of a pull is a halt: the snort and the hoof's scrape
   release: 2.2, // per second: how fast the hands let go after the rig stands
   hold: 0.25, // seconds the pull is kept after the braking stops
@@ -50,8 +53,12 @@ export const createReins = (): ReinState => ({ gallop: false, slapAge: REINS.tot
 const clamp = (v: number, lo = 0, hi = 1): number => Math.min(hi, Math.max(lo, v));
 const ease = (t: number): number => { const c = clamp(t); return c * c * (3 - 2 * c); };
 
-/** One frame of the hands: `speed` m/s, `yawRate` rad/s (left positive), `sprinting` the gallop held. */
-export function stepReins(r: ReinState, dt: number, speed: number, yawRate: number, sprinting: boolean): void {
+/**
+ * One frame of the hands: `speed` m/s, `yawRate` rad/s (left positive), `sprinting` the gallop held, and `want` the speed the rider asks
+ * for (0 when the stick is let go, or the rig is held against a wall): a gallop let go falls to a cruise at the same braking as a stop, so
+ * the slowing alone cannot tell a haul to a standstill from an easing; what the rider wants does.
+ */
+export function stepReins(r: ReinState, dt: number, speed: number, yawRate: number, sprinting: boolean, want: number): void {
   if (!(dt > 0)) return;
   r.accel += ((speed - r.lastSpeed) / dt - r.accel) * Math.min(1, dt * 14);
   const was = r.gallop;
@@ -73,10 +80,15 @@ export function stepReins(r: ReinState, dt: number, speed: number, yawRate: numb
   }
 
   r.recent = Math.max(speed, r.recent - dt * 8);
-  if (r.accel < REINS.brake && r.recent > 1) {
+  const slowing = r.accel < REINS.brake && r.recent > 1;
+  if (slowing && want < REINS.stop) { // a pull to a standstill: a haul
     r.pull += (clamp(-r.accel / 12, 0.35, 1) - r.pull) * Math.min(1, dt * 20);
     r.hold = REINS.hold;
     if (!r.pulling && r.pull > REINS.hard && r.recent > 2.5) { r.pulling = true; r.halts++; r.haltSpeed = r.recent; }
+  } else if (slowing) { // easing off, still going: the hands draw in a little, and never past what is a halt
+    const ease = clamp(-r.accel / REINS.easeBy, 0, REINS.ease);
+    r.pull = r.pull < ease ? r.pull + (ease - r.pull) * Math.min(1, dt * 10) : Math.max(ease, r.pull - dt * REINS.release);
+    r.hold = REINS.hold * 0.4;
   } else if (r.hold > 0) r.hold -= dt;
   else r.pull = Math.max(0, r.pull - dt * REINS.release);
   if (r.pull < 0.1) r.pulling = false;

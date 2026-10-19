@@ -23,7 +23,7 @@ function ride(r: ReinState, plan: { to: number; seconds: number; rate?: number; 
     for (let i = 0; i < leg.seconds * SIM.hz; i++) {
       const rate = leg.rate ?? (leg.to > speed ? T.acceleration : T.braking);
       speed = leg.to > speed ? Math.min(leg.to, speed + rate * DT) : Math.max(leg.to, speed - rate * DT);
-      stepReins(r, DT, speed, leg.yaw ?? 0, leg.sprint ?? false);
+      stepReins(r, DT, speed, leg.yaw ?? 0, leg.sprint ?? false, leg.to); // what the rider asks for is where the leg is going
     }
   }
   return speed;
@@ -39,7 +39,7 @@ describe('the hands slap the reins at a gallop (round 57)', () => {
     let speed: number = T.cruise;
     for (let i = 0; i < 30 * SIM.hz; i++, t += DT) {
       speed = Math.min(T.gallop, speed + T.acceleration * DT);
-      stepReins(r, DT, speed, 0, true);
+      stepReins(r, DT, speed, 0, true, T.gallop);
       if (r.begun > seen) { seen = r.begun; begun.push(t); }
     }
     expect(begun[0]).toBeLessThan(0.6); // as the gallop is taken
@@ -61,7 +61,7 @@ describe('the hands slap the reins at a gallop (round 57)', () => {
     const before = r.struck;
     r.slapAge = 0; r.begun++;
     let lands = 0;
-    for (let i = 0; i < 2 * SIM.hz; i++) { const was = r.struck; stepReins(r, DT, T.gallop, 0, true); if (r.struck > was) lands++; if (r.slapAge < REINS.strikeAt) expect(r.struck).toBe(before + lands); }
+    for (let i = 0; i < 2 * SIM.hz; i++) { const was = r.struck; stepReins(r, DT, T.gallop, 0, true, T.gallop); if (r.struck > was) lands++; if (r.slapAge < REINS.strikeAt) expect(r.struck).toBe(before + lands); }
     expect(lands).toBeGreaterThanOrEqual(1);
   });
 
@@ -88,7 +88,7 @@ describe('a pull to stop (round 57)', () => {
     let speed: number = T.gallop;
     for (let i = 0; i < 4 * SIM.hz; i++) {
       speed = Math.max(0, speed - T.braking * DT);
-      stepReins(r, DT, speed, 0, false);
+      stepReins(r, DT, speed, 0, false, 0);
       peak = Math.max(peak, r.pull);
       if (speed === 0 && stopped < 0) stopped = i * DT;
       if (stopped >= 0 && r.pull < 0.05 && released < 0) released = i * DT;
@@ -103,9 +103,9 @@ describe('a pull to stop (round 57)', () => {
 
   it('is gentler for a gentle slowing, and a halt is counted only for a hard one', () => {
     const r = createReins();
-    ride(r, [{ to: T.cruise, seconds: 2 }, { to: 4, seconds: 1, rate: 3 }]);
-    expect(r.pull).toBeGreaterThan(0.2);
-    expect(r.pull).toBeLessThan(0.5);
+    ride(r, [{ to: T.cruise, seconds: 2 }, { to: 4, seconds: 1, rate: 3 }]); // a stick eased: it is still going
+    expect(r.pull).toBeGreaterThan(0.05);
+    expect(r.pull).toBeLessThan(REINS.hard);
     expect(r.halts).toBe(0);
     const s = createReins();
     ride(s, [{ to: T.cruise, seconds: 2 }, { to: 0, seconds: 1 }]); // braked to a standstill from a cruise
@@ -115,11 +115,39 @@ describe('a pull to stop (round 57)', () => {
     expect(s.halts).toBe(1);
   });
 
+  it('letting the gallop go is an easing, not a haul: the rig falls to a cruise at the braking of a stop, and is not pulled up (review of PR 145)', () => {
+    const r = createReins();
+    ride(r, [{ to: T.gallop, seconds: 3, sprint: true }]);
+    let peak = 0, pulled = false;
+    for (let i = 0; i < 2 * SIM.hz; i++) { // the sprint let go, the stick held: the pace falls from a gallop to a cruise at 15 m/s²
+      ride(r, [{ to: T.cruise, seconds: DT }], r.lastSpeed);
+      peak = Math.max(peak, r.pull);
+      pulled ||= r.pulling;
+    }
+    expect(r.halts).toBe(0);
+    expect(pulled).toBe(false);
+    expect(peak).toBeGreaterThan(0.1); // the hands draw in a little
+    expect(peak).toBeLessThan(REINS.hard);
+    expect(r.pull).toBeLessThan(0.05); // and let go once it has settled
+    const stopped = ride(r, [{ to: 0, seconds: 1.5 }], T.cruise);
+    expect(stopped).toBe(0);
+    expect(r.halts).toBe(1); // letting the stick go after is a pull to a stop
+  });
+
+  it('easing the stick, or slowing into a turn, draws the hands in a little and never counts as a halt', () => {
+    const r = createReins();
+    ride(r, [{ to: T.cruise, seconds: 2 }]);
+    let peak = 0;
+    for (let i = 0; i < 2 * SIM.hz; i++) { ride(r, [{ to: 2.4, seconds: DT, rate: 12 }], r.lastSpeed); peak = Math.max(peak, r.pull); } // eased from a cruise to a creep, not to a stop
+    expect(r.halts).toBe(0);
+    expect(peak).toBeLessThan(REINS.hard);
+  });
+
   it('a rig that meets a wall (its speed gone at once) is hauled up on', () => {
     const r = createReins();
     ride(r, [{ to: T.gallop, seconds: 3, sprint: true }]);
-    stepReins(r, DT, 0, 0, true);
-    for (let i = 0; i < 5; i++) stepReins(r, DT, 0, 0, true);
+    stepReins(r, DT, 0, 0, true, 0); // the speed gone at once, the stick still held: moveMounted asks for nothing of a rig that is blocked
+    for (let i = 0; i < 5; i++) stepReins(r, DT, 0, 0, true, 0);
     expect(r.pull).toBeGreaterThan(0.9);
     expect(r.halts).toBe(1);
   });
@@ -197,6 +225,23 @@ describe('riding the world gives the hands their work (round 57)', () => {
     toggleMount(g);
     toggleMount(g);
     expect(g.player.mount.reins).toEqual(createReins());
+  });
+
+  it('letting the sprint go at a gallop (the stick held) is no halt: the rig falls to a cruise, still going, and only the stick let go is a pull to a stop (review of PR 145)', () => {
+    const g = openGame();
+    expect(selectMount(g, 'grey')).toBe(true);
+    expect(toggleMount(g)).toBe(true);
+    for (let i = 0; i < 4 * SIM.hz; i++) { hold(g, true, true); movementSystem(g, DT); }
+    expect(g.player.mount.speed).toBeCloseTo(T.gallop, 0);
+    const r = g.player.mount.reins, halts = r.halts;
+    let peak = 0;
+    for (let i = 0; i < 1.2 * SIM.hz; i++) { hold(g, true, false); movementSystem(g, DT); peak = Math.max(peak, r.pull); }
+    expect(g.player.mount.speed).toBeCloseTo(T.cruise, 0); // still going
+    expect(r.halts).toBe(halts);
+    expect(peak).toBeLessThan(REINS.hard);
+    for (let i = 0; i < 2 * SIM.hz; i++) { hold(g, false); movementSystem(g, DT); }
+    expect(g.player.mount.speed).toBe(0);
+    expect(r.halts).toBe(halts + 1);
   });
 
   it('the motor car has a wheel, not reins: its hands are never worked', () => {
