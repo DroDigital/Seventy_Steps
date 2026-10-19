@@ -12,8 +12,8 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. */
-const VERSION = 15;
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). */
+const VERSION = 16;
 
 export function defaultSettings(): Settings {
   return Object.fromEntries(SETTING_IDS.map((id) => [id, SETTINGS[id][3]])) as Settings;
@@ -24,7 +24,7 @@ export function clampSetting(id: SettingId, v: unknown): number {
   const [min, standardMax, step, fallback] = SETTINGS[id];
   const max = id === 'resolution' ? Math.max(standardMax, ...HIGH_RESOLUTIONS) : standardMax;
   if (typeof v !== 'number' || !Number.isFinite(v)) return fallback;
-  const snapped = min + Math.round((Math.min(max, Math.max(min, v)) - min) / step) * step;
+  const snapped = min + Math.round((Math.min(max, Math.max(min, v)) - min) / step + 1e-9) * step; // (a tie goes up, whatever the float error)
   return Number(Math.min(max, snapped).toFixed(6));
 }
 
@@ -37,9 +37,10 @@ export function parseSettings(json: string | null): Settings {
   }
   const r = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
   const s = Object.fromEntries(SETTING_IDS.map((id) => [id, clampSetting(id, r[id])])) as Settings;
-  // Keep versions 13 and 14's lower choices; older entries still take the default, as they did before.
+  // Keep a choice made since version 13 (snapped to today's steps above); 13 and 14's higher ones were made without the warning, so they, and anything older, take the default.
+  const warned = r.v === VERSION || r.v === 15;
   const prior = r.v === 13 || r.v === 14;
-  if (r.v !== VERSION && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = SETTINGS.resolution[3];
+  if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = SETTINGS.resolution[3];
   return s;
 }
 
