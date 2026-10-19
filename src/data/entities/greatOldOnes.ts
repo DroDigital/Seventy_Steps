@@ -67,7 +67,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   },
   {
     id: 'yig', name: 'Yig', source: 'The Curse of Yig', regions: ['kn_yan'], canonLooks: false,
-    sprite: { silhouette: 'serpent', palette: 'sand', scale: 6, eyes: 2 },
+    sprite: { silhouette: 'serpent', palette: 'sand', scale: 6, eyes: 2, body: [0.767, 0.25] }, // 4.6 m tall as drawn, the serpent's breadth; its blows stay scaled by 3 m (round 56)
     ...scripted('boss', phases(ph(1, { bite: 2, lunge: 2, spit: 1, combo: 1 }), ph(0.5, { bite: 2, lunge: 1, summon: 1, spit: 1, charge: 1, eruption: 1 }, { summons: ['child_of_yig'] }))),
     stats: st(2950, 1200, 70, 4, 5, 12), drops: { echoes: 10000 }, insightOnSight: 3,
   },

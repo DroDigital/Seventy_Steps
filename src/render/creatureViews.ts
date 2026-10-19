@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle } from '../core/geom';
-import type { Variant } from '../data/registry';
+import { getEntity, type Variant } from '../data/registry';
 import { REVIEWED_EYES } from '../data/reviewedLook';
 import { FEEDBACK, FOG_EYES, LIGHT, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
@@ -136,7 +136,10 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   scene.add(glows.mesh);
   const flat = new THREE.Vector3(); // the camera's right, level
   const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
-  const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
+  const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => {
+    const size = reviewedSize(entity, art!.manifest);
+    return [key, { ...size, groundOffset: size.groundOffset + (getEntity(key.split('#')[0])?.assembly?.sink ?? 0) * size.height }] as const;
+  }));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
   const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];

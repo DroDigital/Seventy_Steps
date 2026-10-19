@@ -58,7 +58,7 @@ export const GREATER = tier('greater', [
   },
   {
     id: 'dhole', name: 'Dhole', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond'], canonLooks: true,
-    sprite: { silhouette: 'serpent', palette: 'pallid', scale: 6, eyes: 0 },
+    sprite: { silhouette: 'serpent', palette: 'pallid', scale: 6, eyes: 0, body: [0.667, 0.25] }, // 4 m tall as drawn, the serpent's breadth; its blows stay scaled by 3 m (round 56)
     behavior: { archetype: 'burrower', attacks: ['bite', 'slam', 'spit'] },
     stats: st(1200, 220, 46, 3.4, 2, 6), drops: { echoes: 1000 }, insightOnSight: 0,
   },

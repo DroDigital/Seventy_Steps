@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getEntity, variantOf } from '../src/data/registry';
 import type { ReviewedManifest } from '../src/render/sprites/reviewed';
-import { bodyOf } from '../src/systems/creatures';
+import { bodyOf, reachOf, toCombatant } from '../src/systems/creatures';
 import { crop, pngRgba } from './reviewedPackHelpers';
 
 const ASSET_DIR = 'public/creatures/reviewed';
@@ -101,21 +101,42 @@ describe('their hurtboxes, fitted to the new bodies', () => {
     expect(bodyOf(chaos).radius / painted('nyarlathotep#eldritch', chaos.sprite!.scale)).toBeLessThan(1.35);
   });
 
-  it('keep each one\'s height, which is what its blows\' reach is scaled by: only its width was set from the picture', () => {
+  it('scale each one\'s blows by the height it was balanced at: a body fitted to the picture moves what is struck, not how far a blow reaches', () => {
     for (const [key] of DELIVERED.filter(([k]) => k !== 'yog_sothoth')) {
       const [id, variant] = key.split('#');
       const def = variant ? variantOf(getEntity(id)!, variant as 'eldritch')! : getEntity(id)!;
       if (!def.sprite?.body) continue;
       const bare = { ...def, sprite: { ...def.sprite, body: undefined } };
-      expect(bodyOf(def).height, key).toBeCloseTo(bodyOf(bare).height, 9);
+      expect(reachOf(def), key).toBeCloseTo(bodyOf(bare).height, 9);
+      const made = toCombatant(def, variant as 'eldritch' | undefined);
+      expect(made.reach ?? made.height, key).toBeCloseTo(bodyOf(bare).height, 9);
     }
+  });
+
+  it('stand as tall as they are drawn: Yig 4.6 m, the Dhole 4 m, the Shunned House 1.66 m', () => {
+    for (const [id, tall] of [['yig', 4.6], ['dhole', 4.0], ['shunned_house_entity', 1.66]] as const) {
+      expect(bodyOf(getEntity(id)!).height / tall, id).toBeGreaterThan(0.97);
+      expect(bodyOf(getEntity(id)!).height / tall, id).toBeLessThan(1.03);
+    }
+    // Yig's blows are still scaled by 3 m: the same moves as before the capsule was fitted
+    expect(toCombatant(getEntity('yig')!).reach).toBeCloseTo(3, 9);
+  });
+
+  it('give a variant that draws another silhouette no body fitted to the base\'s art (the Serpent Man\'s eldritch form is a serpent)', () => {
+    const base = getEntity('serpent_man')!;
+    const serpent = variantOf(base, 'eldritch')!;
+    expect(serpent.sprite!.body).toBeUndefined();
+    expect(bodyOf(serpent)).toEqual({ height: 2.2 * 0.5, radius: 2.2 * 0.25 });
+    expect(bodyOf(base).radius).toBeCloseTo(2.2 * 0.12, 9); // the man keeps his
+    expect(variantOf(getEntity('high_priest')!, 'eldritch')!.sprite!.body).toEqual([0.7, 0.23]); // one that brings its own keeps it
   });
 
   it('strike Yog-Sothoth at its seven painted spheres, the lowest standing on the ground', () => {
     const recipe = getEntity('yog_sothoth')!.assembly!;
     expect(recipe.hit).toHaveLength(7);
-    // The picture floats a metre and a half over the ground (its lowest sphere's foot is above its bottom row): the spheres stand on it, so a blade reaches them.
+    // The lowest sphere stands on the ground, where a blade reaches it; the picture is let down by `sink` so its lowest sphere's foot, not the mist under it, is there.
     expect(Math.min(...recipe.hit!.map(([, up, size]) => up - size))).toBeCloseTo(0, 2);
+    expect(recipe.sink).toBeCloseTo(0.077, 3);
     // Upper spheres above lower, the cluster no wider than the picture.
     const frame = pack.frames[pack.entities.yog_sothoth.directions.front.actions.idle![0]] as unknown as { bounds: number[]; width: number };
     const tall = frame.bounds[3] - frame.bounds[1];

@@ -60,6 +60,11 @@ export function bodyOf(def: EntityDef): { height: number; radius: number } {
   return { height: scale, radius: scale * ASSEMBLY_RADIUS[body] }; // as wide as it looks: nothing walks inside a colossus
 }
 
+/** The height its blows are scaled by: its silhouette's, whatever capsule its art was fitted to (a `body` moves what is struck, not how far a blow reaches). */
+export function reachOf(def: EntityDef): number {
+  return def.sprite ? def.sprite.scale * BODY[def.sprite.silhouette][0] : bodyOf(def).height;
+}
+
 /** Every attack the entity may use: its own list plus its boss script's. */
 export function attacksOf(def: EntityDef): AttackId[] {
   const ids = new Set<AttackId>(def.behavior.attacks);
@@ -74,9 +79,10 @@ const painted = (recipe: AssemblyRecipe, id: string): AssemblyRecipe =>
 
 export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   const { height, radius } = bodyOf(def);
+  const reach = reachOf(def);
   const moves: Record<string, MoveDef> = { ...REACTIONS, death: { frames: 80, hold: true } };
-  for (const id of attacksOf(def)) moves[id] = compileAttack(id, def.stats, height);
-  const brain = phaseBrain(def, 0, height); // a boss starts in its script's first phase (bossFight.ts moves it on)
+  for (const id of attacksOf(def)) moves[id] = compileAttack(id, def.stats, reach);
+  const brain = phaseBrain(def, 0, reach); // a boss starts in its script's first phase (bossFight.ts moves it on)
   if (brain.params.evade > 0) moves.evade = EVADE;
   return {
     name: def.name,
@@ -86,7 +92,8 @@ export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
     speed: def.stats.speed,
     radius,
     height,
-    aimHeight: Math.min(6, height * 0.6),
+    ...(reach !== height && { reach }),
+    aimHeight: Math.min(6, reach * 0.6), // by the blows' height, not the capsule's: a body fitted to the picture does not move where shots and lock-on aim
     ...(def.assembly && { assembly: painted(def.assembly, def.id) }),
     bounty: def.drops.echoes,
     brain,
@@ -153,7 +160,7 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   const c = g.ecs.c;
   c.model.set(e, cd.model);
   Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
-  Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, aimHeight: cd.aimHeight, assembly: cd.assembly });
+  Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
   const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * foeHealth(g));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];

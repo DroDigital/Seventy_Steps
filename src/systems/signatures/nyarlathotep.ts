@@ -65,14 +65,14 @@ export const NYARLATHOTEP_SIGNATURE: Signature = {
   extra(g, e, f) {
     if (!lastPhase(f)) return [];
     const a = g.ecs.c.actor.get(e)!;
-    const { height } = g.ecs.c.body.get(e)!;
+    const { height, reach } = g.ecs.c.body.get(e)!;
     const stats = defOf(g, e)!.stats;
     const own = new Set(f.script.phases[f.phase].attacks.map((x) => x.id));
     return borrowed(g)
       .filter((id) => !own.has(id))
       .map((id) => {
-        if (!a.moves[id]) a.moves = { ...a.moves, [id]: compileAttack(id, stats, height) };
-        return { move: id, weight: 1, range: attackRange(id, height) };
+        if (!a.moves[id]) a.moves = { ...a.moves, [id]: compileAttack(id, stats, reach ?? height) };
+        return { move: id, weight: 1, range: attackRange(id, reach ?? height) };
       });
   },
   action(g, _e, f) {

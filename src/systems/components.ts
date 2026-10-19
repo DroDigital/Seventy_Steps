@@ -34,6 +34,7 @@ export interface Transform {
 export interface Body {
   radius: number;
   height: number;
+  reach?: number; // the height blows are scaled by, where it differs from `height` (creatures.ts)
   aimHeight: number;
   fixed: boolean;
   assembly?: AssemblyRecipe; // a colossus's shape: its hurt zones follow it (hurt.ts)

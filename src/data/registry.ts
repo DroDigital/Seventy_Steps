@@ -17,13 +17,20 @@ export const getEntity = (id: string): EntityDef | undefined => BY_ID.get(id);
 
 export type Variant = 'eldritch' | 'boss';
 
+/** A variant's sprite: the base's with the override on top. A `body` was fitted to the base's art, so a variant that draws another silhouette drops it unless it brings its own. */
+function spriteOf(base: SpriteRecipe | undefined, o: Partial<SpriteRecipe>): SpriteRecipe {
+  const merged = { ...base, ...o } as SpriteRecipe;
+  if (!o.body && o.silhouette && o.silhouette !== base?.silhouette) delete merged.body;
+  return merged;
+}
+
 /** A copy of `def` with an override merged one level deep (variants carry no variants of their own). */
 export function applyOverride(def: EntityDef, o: EntityOverride): EntityDef {
   const { eldritchVariant: _e, bossVariant: _b, ...base } = def;
   return {
     ...base,
     name: o.name ?? def.name,
-    sprite: o.sprite ? ({ ...def.sprite, ...o.sprite } as SpriteRecipe) : def.sprite,
+    sprite: o.sprite ? spriteOf(def.sprite, o.sprite) : def.sprite,
     assembly: o.assembly ? ({ ...def.assembly, ...o.assembly } as AssemblyRecipe) : def.assembly,
     behavior: o.behavior ? ({ ...def.behavior, ...o.behavior } as Behavior) : def.behavior,
     stats: { ...def.stats, ...o.stats },
