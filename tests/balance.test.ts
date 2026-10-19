@@ -76,7 +76,7 @@ const OPENING_LIVES = 1.5; // a horror of the first hours costs at most this (a 
 /** One fight at a standing: what it took and cost. */
 function fightAt(s: Standing): Row {
   const w = WAIVED[s.id];
-  const r = botFight(s.id, FRAMES, undefined, { levels: s.levels, reinforced: s.reinforced, skill: SKILL, floor: true, smart: true, waive: w?.waive });
+  const r = botFight(s.id, FRAMES, undefined, { levels: s.levels, reinforced: s.reinforced, skill: SKILL, floor: true, smart: true, mind: true, waive: w?.waive });
   expect(r.bad).toEqual([]);
   return { ...s, dealt: r.dealt, taken: r.taken, fell: r.fell, deaths: r.deaths, seconds: (r.frames / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), pressure: r.taken / (s.hp * (1 + REAGENT.doses * REAGENT.heal)) };
 }

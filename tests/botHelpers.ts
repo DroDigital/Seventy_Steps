@@ -6,6 +6,7 @@ import { emptyInput, type Button } from '../src/core/input';
 import type { Variant } from '../src/data/registry';
 import type { Game } from '../src/systems/components';
 import { fightAction } from '../src/systems/fightActions';
+import { callsForLaudanum } from '../src/ui/mindHud';
 import { applyLevels } from '../src/systems/levels';
 import { stepGame } from '../src/systems/game';
 import { setLock } from '../src/systems/lockOn';
@@ -19,6 +20,7 @@ export interface BotStyle {
   skill?: number; // 0..1: the share of telegraphed blows it rolls away from, as they are about to land (0: it only rolls now and again)
   floor?: boolean; // stops when the foe's health is at its floor as well as when it falls (a horror no blade finishes)
   smart?: boolean; // it keeps behind a monolith from a gaze that turns flesh to stone, and cuts down the spawning roots before the horror
+  mind?: boolean; // it keeps its mind as a person is told to (the HUD's call, ui/mindHud.ts: Fractured, a dose left): it drinks Laudanum, which the bot never did, and so was left Unmoored by round 58's harder mind, taking more and striking less for the rest of a fight
   waive?: readonly ('petrify' | 'roots')[]; // what it is let off, to measure the rest of a fight whose mechanic the bot plays badly: the gaze never takes hold; the roots are down at once
 }
 
@@ -76,6 +78,7 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   const propsOf = (kind: string): Entity[] => (c.fight.get(boss)?.props ?? []).filter((p) => c.prop.get(p)?.kind === kind && (kind !== 'root' || (c.health.get(p)?.hp ?? 0) > 0));
   let held = new Set<Button>();
   let dodgeIn = 60;
+  let drank = -Infinity;
   let frame = 0;
   for (; frame < frames; frame++) {
     const from = c.transform.get(g.player.id)!;
@@ -113,6 +116,10 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
     }
     if (reach > 4 && frame % 90 === 45) want.add('shoot'); // and, from afar, the revolver
     if (fightAction(g)) want.add('interact'); // the helm, the powder, the incantation
+    if (style.mind && callsForLaudanum(g) && frame - drank > 60) {
+      drank = frame; // the HUD says to drink: so it does, and not twice in a second
+      want.add('item');
+    }
     if (style.skill !== undefined) { // it reads the wind-ups of what is about to strike it, and rolls away from some
       const key = blowIn(g);
       if (key && !rolled.has(key)) {
@@ -127,7 +134,7 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
       f.moveX = rng() < 0.5 ? -1 : 1;
       dodgeIn = 70 + Math.floor(rng() * 60);
     }
-    for (const b of ['light', 'heavy', 'dodge', 'shoot', 'interact'] as const) {
+    for (const b of ['light', 'heavy', 'dodge', 'shoot', 'interact', 'item'] as const) {
       f.held[b] = want.has(b);
       f.pressed[b] = want.has(b) && !held.has(b);
       f.released[b] = held.has(b) && !want.has(b);
