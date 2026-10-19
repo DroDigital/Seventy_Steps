@@ -4,7 +4,7 @@ import { SANITY, SIM } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { strike } from '../src/systems/combat';
 import type { Band, Game } from '../src/systems/components';
-import { fighting, mendRate, setSanity } from '../src/systems/sanity';
+import { darkRate, fighting, mendRate, sanitySystem, setSanity } from '../src/systems/sanity';
 import { place, press, scriptedGame, steps } from './helpers';
 
 const blow = (damage: number) => ({ damage, poise: 0, guard: 5, hitstop: 2, parryable: false, interrupts: false });
@@ -23,7 +23,24 @@ describe('the mind mends by itself, apart from a fight (round 22)', () => {
     seconds(g, 1);
     expect(g.mind.sanity).toBe(100);
     expect(g.mind.mending).toBe(0);
-    expect(SANITY.mend.rate * 60 * 7).toBeGreaterThan(100); // a whole mind in under seven minutes: slow
+    expect(SANITY.mend.rate * 60 * 25).toBeGreaterThan(100); // a whole mind in about twenty minutes: slow, five points a minute (round 58: seven; a wound is carried through a dungeon now)
+    expect(SANITY.mend.rate * 60 * 15).toBeLessThan(100);
+  });
+
+  it('Unmoored the mind clings harder in the dark, so the way back to where the lantern kindles is a minute at worst, and no trap (round 58)', () => {
+    const { g } = scriptedGame();
+    setSanity(g, 3);
+    expect(g.mind.band).toBe('unmoored');
+    expect(mendRate(g)).toBe(SANITY.mend.clinging);
+    expect(darkRate(g.mind)).toBe(SANITY.mend.clinging);
+    expect(SANITY.mend.clinging).toBeGreaterThan(SANITY.mend.rate * 3);
+    expect((SANITY.bands[2] + SANITY.hysteresis) / SANITY.mend.clinging).toBeLessThanOrEqual(60); // from nothing to Fractured again
+    for (let frame = 0; frame < 60 * SIM.hz; frame++) { // the mind alone: the hallucinations' blows are the game's, not the mending's
+      g.frame++;
+      sanitySystem(g, 1 / SIM.hz);
+    }
+    expect(g.mind.band).toBe('fractured');
+    expect(mendRate(g)).toBe(SANITY.mend.rate); // and from there the dark's own rate
   });
 
   it('faster the better lit the ground: a lamp, a fire, a torch, never past the light at its foot', () => {

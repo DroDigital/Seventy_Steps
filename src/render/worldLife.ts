@@ -40,7 +40,7 @@ import type { SpriteAtlas } from './sprites/atlas';
 
 export interface WorldLife {
   /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof; `alpha`: how far the picture is from the last step to the next, as the bodies are drawn at it. */
-  update(camera: THREE.Camera, time: number, enclosed: boolean, alpha: number): void;
+  update(camera: THREE.Camera, time: number, enclosed: boolean, alpha: number, gloom?: number): void;
   readonly fauna: Fauna;
 }
 
@@ -78,7 +78,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
   return {
     fauna,
-    update(camera, time, enclosed, alpha) {
+    update(camera, time, enclosed, alpha, gloom) {
       eye = camera;
       SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn). Before anything is set on the water: the tentacles are placed on the surface the sea is drawn at
       strikes?.update(time);
@@ -87,7 +87,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       sky.update(camera, time, !outside);
       lightning.update(time, g.overworld?.region ?? null, !outside, g.overworld?.weather);
       beacons.update(camera, time, !outside);
-      night.update(time, enclosed);
+      night.update(time, enclosed, gloom);
       LIGHT_NERVES.madness = madnessOf(g.mind.sanity); // the flames waver harder in a failing mind's world
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);

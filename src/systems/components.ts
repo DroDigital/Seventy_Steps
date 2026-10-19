@@ -257,6 +257,7 @@ export interface Pilot {
   difficulty: DifficultyId; // chosen when the dream began, never after (round 38; data/playTuning.ts)
   cycle: number; // the journey through the dream, 0 the first (NG+, cycles.ts; round 12)
   steady: number; // frames left in which a swallow of Laudanum holds the mind: no sanity lost to auras, roars, gazes or the void
+  tonic: number[]; // the frames of the swallows lately taken: the tonic dulls the mind that takes it again soon (sanity.ts; round 58)
   mended: number; // frames left in which a shot of Reagent holds the body: lingering hurts (pools, the void) do no harm
   listening: Entity | null; // the person talked with: they face them and the camera frames them until they move or look away (round 12)
   kneeling: { x: number; z: number } | null; // the Elder Sign rested at: they kneel to it until they move or act (round 15)

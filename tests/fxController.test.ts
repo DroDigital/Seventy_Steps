@@ -24,7 +24,7 @@ describe('FX controller', () => {
     fx.update(state, far, 10 + FX.pulseSeconds / 2);
     expect(state.pulse).toBeCloseTo(0.5);
     fx.update(state, far, 10 + FX.pulseSeconds);
-    expect(state.pulse).toBe(0);
+    expect(state.pulse).toBeCloseTo(0, 9);
     setSanity(g, 80); // climbing back does not pulse
     fx.update(state, far, 20);
     expect(state.pulse).toBe(0);

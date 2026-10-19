@@ -165,7 +165,7 @@ export function updateWorldUniforms(
   u.uRes.value.copy(res);
   u.uSnap.value = fx.snapPixels;
   u.uAffine.value = fx.affine;
-  u.uDisplace.value = fx.displace;
+  u.uDisplace.value = fx.displace * (0.45 + 0.55 * fx.surge); // the far walls swim in waves, not at one pace (round 58)
   u.uCamPos.value.copy(camPos);
   u.uGlowPos.value.copy(glowPos);
   u.uFogNear.value = fx.fogNear;

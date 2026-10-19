@@ -22,6 +22,10 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform float uRipple;
 uniform float uChroma;
+uniform float uGhost; // a failing mind's second picture, a little to one side (round 58)
+uniform float uTear; // the chance the picture tears in slices now (the edge of Unmoored, at a surge's height)
+uniform float uSurge; // 0..1: how strong this moment of the warp is: it swells and lulls
+uniform vec2 uShock; // the ring a band lost sends out of the middle: x how far it pushes the picture (UV units), y how far it has gone (picture heights)
 uniform float uIsolate;
 uniform float uDesat;
 uniform float uAnomalyProximity;
@@ -182,12 +186,36 @@ void main() {
   vec2 cell = floor(gl_FragCoord.xy);
   vec2 uv = (cell + 0.5) / uRes;
 
-  // 4. Sanity warp: UV ripple and chromatic split, scaled by (1 - sanity/100).
+  // 4. A failing mind's picture (round 58: it was two sines laid over the whole screen, and a split that turned about, a filter). The middle of the
+  // picture holds, where a fight is read; its edges flow, as warm air does, in patches that come and go; the lens splits the colours outward; a faint
+  // second picture drifts to one side at a surge's height; at the edge of Unmoored the picture may tear in slices, rarely; and a band lost sends a ring
+  // out of the middle. All of it swells and lulls with uSurge, so it comes in waves, not as a constant.
   vec2 c = uv - 0.5;
-  float r = length(c);
-  uv += uRipple * vec2(sin(uv.y * 29.0 + uTime * 2.3), sin(uv.x * 21.0 - uTime * 1.7));
-  uv += uRipple * 0.7 * (c / max(r, 1e-4)) * sin(r * 38.0 - uTime * 3.1);
-  vec2 split = uChroma * (0.4 + r) * vec2(cos(uTime * 0.7), sin(uTime * 0.9));
+  vec2 ca = c * vec2(uRes.x / uRes.y, 1.0); // the picture's true shape: a ring is round
+  float r = length(ca);
+  float edge = smoothstep(0.2, 0.78, r);
+  vec2 push = vec2(0.0);
+  if (uRipple > 0.0) {
+    vec2 q = ca * 2.4 + vec2(uTime * 0.05, -uTime * 0.038);
+    vec2 f1 = vec2(vnoise(q + 1.7), vnoise(q + 5.2)) * 2.0 - 1.0;
+    vec2 f2 = vec2(vnoise(q * 2.3 + 9.1 - uTime * 0.07), vnoise(q * 2.3 + 3.3 + uTime * 0.06)) * 2.0 - 1.0;
+    float blotch = smoothstep(0.3, 0.75, vnoise(ca * 1.7 + vec2(-uTime * 0.03, uTime * 0.026) + 11.0));
+    push += (f1 + 0.45 * f2) * uRipple * (0.3 + 0.7 * uSurge) * edge * (0.35 + 0.65 * blotch);
+  }
+  if (uShock.x > 0.0) {
+    float d = (r - uShock.y) / 0.075;
+    push += (ca / max(r, 1e-3)) * vec2(uRes.y / uRes.x, 1.0) * exp(-d * d) * uShock.x;
+  }
+  uv += push;
+  if (uTear > 0.0) {
+    float band = floor(uv.y * uRes.y / 9.0);
+    float beat = floor(uTime * 7.0);
+    float on = step(0.955, hash21(vec2(band, beat))) * uTear;
+    uv.x += on * (hash21(vec2(band + 7.0, beat + 3.0)) - 0.5) * 0.06 * (0.35 + 0.65 * edge);
+  }
+  vec2 split = c * uChroma * 2.6 * (0.5 + 0.5 * uSurge); // the lens: nothing at the middle, the colours apart at the edge
+  float ghostK = uGhost * (0.35 + 0.65 * smoothstep(0.3, 0.9, uSurge));
+  vec2 ghostAt = vec2(0.0045 + 0.0035 * sin(uTime * 0.31), 0.0012 * sin(uTime * 0.23 + 1.0)) * (0.55 + 0.9 * edge);
 
   vec4 centre = texture(tScene, uv);
   if (centre.a < 0.5) {
@@ -198,6 +226,12 @@ void main() {
   vec3 a = texture(tScene, uv + split).rgb;
   vec3 b = centre.rgb;
   vec3 e = texture(tScene, uv - split).rgb;
+  if (ghostK > 0.002) {
+    vec3 gh = texture(tScene, uv + ghostAt).rgb; // the second picture
+    a = mix(a, gh, ghostK);
+    b = mix(b, gh, ghostK);
+    e = mix(e, gh, ghostK);
+  }
   float soft = uBlur * edgeOf(uv); // the edges of sight lose their focus
   if (soft > 0.05) {
     vec2 o = vec2(soft) / uRes;

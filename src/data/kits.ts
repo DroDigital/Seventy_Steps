@@ -26,30 +26,31 @@ export interface DungeonKit {
   sound: KitSound;
   shell: 'mound' | 'building' | 'none'; // outside: earth and rock heaped over it, a building's roof, or bare ruins
   below?: string; // (a KitId) the kit of rooms sunk below the entrance (a house's cellar is not of boards)
+  gloom: number; // round 58: how dark its roofed rooms are kept, 0..1 (world/gloom.ts: DUNGEON_LIGHT): the lantern is what is walked by in a crypt, a cellar and a mine; a library, a church and a marble hall have their candles
 }
 
 export const KITS = {
-  masonry: { wall: 'stone', floor: 'slab', mix: 0.35, trim: 'masonry', flames: 0.33, roof: 'vault', sound: 'cave', shell: 'mound' },
-  library: { wall: 'brick', floor: 'slab', tone: [0.86, 0.76, 0.66], mix: 0.35, trim: 'masonry', flames: 0.5, roof: 'beams', sound: 'house', shell: 'building', below: 'crypt' },
-  timber: { wall: 'wood', floor: 'wood', tone: [0.72, 0.64, 0.54], mix: 0.5, trim: 'timber', flames: 0.2, roof: 'beams', sound: 'house', shell: 'building', below: 'cellar' },
-  townhouse: { wall: 'brick', floor: 'wood', tone: [0.78, 0.68, 0.6], mix: 0.35, trim: 'timber', flames: 0.25, roof: 'beams', sound: 'house', shell: 'building', below: 'cellar' },
-  cellar: { wall: 'brick', floor: 'mud', tone: [0.62, 0.56, 0.5], mix: 0.5, trim: 'none', flames: 0.15, roof: 'vault', sound: 'cave', shell: 'mound' },
-  mine: { wall: 'rock', floor: 'mud', tone: [0.5, 0.52, 0.5], mix: 0.6, trim: 'timber', flames: 0.1, roof: 'vault', sound: 'cave', shell: 'mound' },
-  brick: { wall: 'brick', floor: 'cobble', tone: [0.8, 0.7, 0.64], mix: 0.35, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound' },
-  crypt: { wall: 'stone', floor: 'slab', tone: [0.66, 0.7, 0.66], mix: 0.45, trim: 'masonry', flames: 0.25, roof: 'vault', sound: 'cave', shell: 'mound' },
-  church: { wall: 'stone', floor: 'slab', tone: [0.6, 0.6, 0.62], mix: 0.45, trim: 'masonry', flames: 0.4, roof: 'beams', sound: 'house', shell: 'building', below: 'crypt' },
-  marble: { wall: 'stone', floor: 'slab', tone: [0.9, 0.86, 0.8], mix: 0.3, trim: 'masonry', flames: 0.5, roof: 'vault', sound: 'house', shell: 'building' },
-  hill: { wall: 'rock', floor: 'mud', tone: [0.64, 0.66, 0.6], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' },
-  drowned: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'vault', sound: 'drowned', shell: 'mound' },
-  sunken: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' }, // the drowned temple, its vault fallen (round 24: Dagon and Hydra stand fifteen metres tall, and the vault's slab, six up, pushed them out through the wall)
-  elder: { wall: 'slab', floor: 'slab', tone: [0.84, 0.86, 0.88], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' },
-  basalt: { wall: 'rock', floor: 'slab', tone: [0.42, 0.42, 0.47], mix: 0.65, trim: 'masonry', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound' },
-  tsath: { wall: 'stone', floor: 'cobble', tone: [0.55, 0.6, 0.74], mix: 0.55, trim: 'masonry', flames: 0.5, roof: 'open', sound: 'open', shell: 'none' },
-  dream: { wall: 'stone', floor: 'slab', tone: [0.92, 0.82, 0.66], mix: 0.4, trim: 'masonry', flames: 0.7, roof: 'vault', sound: 'cave', shell: 'mound' },
-  onyx: { wall: 'slab', floor: 'cobble', tone: [0.4, 0.4, 0.46], mix: 0.65, trim: 'masonry', flames: 0.35, roof: 'open', sound: 'open', shell: 'none' },
-  cyclopean: { wall: 'slab', floor: 'rock', tone: [0.44, 0.54, 0.5], mix: 0.7, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' },
-  fungoid: { wall: 'flesh', floor: 'rot', tone: [0.56, 0.5, 0.56], mix: 0.6, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' },
-  void: { wall: 'slab', floor: 'slab', tone: [0.24, 0.24, 0.3], mix: 0.8, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none' },
+  masonry: { wall: 'stone', floor: 'slab', mix: 0.35, trim: 'masonry', flames: 0.33, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.88 },
+  library: { wall: 'brick', floor: 'slab', tone: [0.86, 0.76, 0.66], mix: 0.35, trim: 'masonry', flames: 0.5, roof: 'beams', sound: 'house', shell: 'building', below: 'crypt', gloom: 0.72 },
+  timber: { wall: 'wood', floor: 'wood', tone: [0.72, 0.64, 0.54], mix: 0.5, trim: 'timber', flames: 0.2, roof: 'beams', sound: 'house', shell: 'building', below: 'cellar', gloom: 0.76 },
+  townhouse: { wall: 'brick', floor: 'wood', tone: [0.78, 0.68, 0.6], mix: 0.35, trim: 'timber', flames: 0.25, roof: 'beams', sound: 'house', shell: 'building', below: 'cellar', gloom: 0.76 },
+  cellar: { wall: 'brick', floor: 'mud', tone: [0.62, 0.56, 0.5], mix: 0.5, trim: 'none', flames: 0.15, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
+  mine: { wall: 'rock', floor: 'mud', tone: [0.5, 0.52, 0.5], mix: 0.6, trim: 'timber', flames: 0.1, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.95 },
+  brick: { wall: 'brick', floor: 'cobble', tone: [0.8, 0.7, 0.64], mix: 0.35, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.85 },
+  crypt: { wall: 'stone', floor: 'slab', tone: [0.66, 0.7, 0.66], mix: 0.45, trim: 'masonry', flames: 0.25, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.92 },
+  church: { wall: 'stone', floor: 'slab', tone: [0.6, 0.6, 0.62], mix: 0.45, trim: 'masonry', flames: 0.4, roof: 'beams', sound: 'house', shell: 'building', below: 'crypt', gloom: 0.72 },
+  marble: { wall: 'stone', floor: 'slab', tone: [0.9, 0.86, 0.8], mix: 0.3, trim: 'masonry', flames: 0.5, roof: 'vault', sound: 'house', shell: 'building', gloom: 0.62 },
+  hill: { wall: 'rock', floor: 'mud', tone: [0.64, 0.66, 0.6], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  drowned: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'vault', sound: 'drowned', shell: 'mound', gloom: 0.9 },
+  sunken: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 }, // the drowned temple, its vault fallen (round 24: Dagon and Hydra stand fifteen metres tall, and the vault's slab, six up, pushed them out through the wall)
+  elder: { wall: 'slab', floor: 'slab', tone: [0.84, 0.86, 0.88], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  basalt: { wall: 'rock', floor: 'slab', tone: [0.42, 0.42, 0.47], mix: 0.65, trim: 'masonry', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
+  tsath: { wall: 'stone', floor: 'cobble', tone: [0.55, 0.6, 0.74], mix: 0.55, trim: 'masonry', flames: 0.5, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  dream: { wall: 'stone', floor: 'slab', tone: [0.92, 0.82, 0.66], mix: 0.4, trim: 'masonry', flames: 0.7, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.5 },
+  onyx: { wall: 'slab', floor: 'cobble', tone: [0.4, 0.4, 0.46], mix: 0.65, trim: 'masonry', flames: 0.35, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  cyclopean: { wall: 'slab', floor: 'rock', tone: [0.44, 0.54, 0.5], mix: 0.7, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  fungoid: { wall: 'flesh', floor: 'rot', tone: [0.56, 0.5, 0.56], mix: 0.6, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
+  void: { wall: 'slab', floor: 'slab', tone: [0.24, 0.24, 0.3], mix: 0.8, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
 } satisfies Record<string, DungeonKit>;
 
 export type KitId = keyof typeof KITS;

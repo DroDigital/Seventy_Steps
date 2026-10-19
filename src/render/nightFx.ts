@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import { CLOCK, DUNGEON_LIGHT, LIGHT } from '../data/tuning';
+import { moonShare } from '../world/gloom';
 import { dawnOf, moonHigh, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import type { PostPass } from './postPass';
@@ -24,8 +25,8 @@ export function moonDir(phase: number, out = new THREE.Vector3()): THREE.Vector3
 }
 
 export interface NightFx {
-  /** `enclosed`: under a dungeon's roof, where the moon's course and the last hour's grey do not reach (DUNGEON_LIGHT). */
-  update(time: number, enclosed?: boolean): void;
+  /** `enclosed`: under a dungeon's roof, where the moon's course and the last hour's grey do not reach (DUNGEON_LIGHT); `gloom`: how dark that room is kept, 0..1 (world/gloom.ts), which dims the moon that reaches it. */
+  update(time: number, enclosed?: boolean, gloom?: number): void;
 }
 
 export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx {
@@ -33,18 +34,20 @@ export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx
   const dir = new THREE.Vector3();
   const still = moonDir(CLOCK.start); // the slant a roofed room keeps all night
   let inside = 0; // how far the room's light has taken over from the sky's (0..1)
+  let shade = 0; // and the gloom of the room, eased as the light is
   let last = -1;
   return {
-    update(time, enclosed = false) {
+    update(time, enclosed = false, gloom = 0) {
       if (!g.overworld) return; // the arena's night stays as it is
       const dt = last < 0 ? 1 : Math.min(0.1, Math.max(0, time - last));
       last = time;
       inside += ((enclosed ? 1 : 0) - inside) * Math.min(1, dt * DUNGEON_LIGHT.ease);
+      shade += ((enclosed ? gloom : 0) - shade) * Math.min(1, dt * DUNGEON_LIGHT.ease);
       const phase = phaseOf(time);
       moonDir(phase, dir).lerp(still, inside).normalize();
       (mat.uniforms.uMoonDir.value as THREE.Vector3).copy(dir);
       worldUniforms.uLightDir.value.copy(dir);
-      worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - DUNGEON_LIGHT.moon)); // (reset each frame: realityFx.ts)
+      worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - moonShare(shade))); // (reset each frame: realityFx.ts)
       const dawn = dawnOf(phase) * (1 - inside); // the grey of the last hour is the sky's: it is not seen under a roof
       if (dawn <= 0.001) return;
       worldUniforms.uAmbient.value.addScalar(0.05 * dawn);

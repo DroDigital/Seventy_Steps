@@ -7,7 +7,7 @@ import { startMove } from '../src/systems/actions';
 import { strike } from '../src/systems/combat';
 import type { Band, Game } from '../src/systems/components';
 import { createGame, stepGame } from '../src/systems/game';
-import { auraShare, bandOf, loseSanity, nextBand, setSanity } from '../src/systems/sanity';
+import { auraShare, auraWeight, bandOf, blowWeight, loseSanity, nextBand, setSanity } from '../src/systems/sanity';
 import { callsForLaudanum } from '../src/ui/mindHud';
 import { place, press, scriptedGame, steps } from './helpers';
 
@@ -81,7 +81,7 @@ describe('sanity drains', () => {
   it('drains near a creature with an aura, fading with distance', () => {
     const { g, player, deepOne } = scriptedGame();
     const d = g.ecs.c.dread.get(deepOne)!;
-    const aura = d.aura * SANITY.auraScale * (d.tier === 'lesser' ? SANITY.lesserAura : 1); // the vermin's weigh less (round 17)
+    const aura = d.aura * SANITY.auraScale * auraWeight(d.tier); // by its tier (round 58)
     const r = g.ecs.c.body.get(deepOne)!.radius;
     g.mind.fought = Infinity; // (in a fight, the mind does not mend: round 22)
     place(g, deepOne, 0, 0, 0);
@@ -100,7 +100,7 @@ describe('sanity drains', () => {
   it('a crowd weighs on the mind, but not as its sum: the strongest aura whole, the rest in part (round 17)', () => {
     const { g, player, deepOne } = scriptedGame();
     const d = g.ecs.c.dread.get(deepOne)!;
-    const one = d.aura * SANITY.auraScale * (d.tier === 'lesser' ? SANITY.lesserAura : 1);
+    const one = d.aura * SANITY.auraScale * auraWeight(d.tier);
     const twin = g.ecs.spawn();
     g.ecs.c.dread.set(twin, { ...d });
     g.ecs.c.transform.set(twin, { pos: { x: 0, y: 0, z: 0 }, prev: { x: 0, y: 0, z: 0 }, yaw: 0, prevYaw: 0 });
@@ -113,7 +113,7 @@ describe('sanity drains', () => {
 
   it("landed blows take the attacker's sanityDamage; blocked and dodged ones do not", () => {
     const { g, player, deepOne } = scriptedGame();
-    const loss = g.ecs.c.dread.get(deepOne)!.blow * SANITY.attackScale;
+    const loss = g.ecs.c.dread.get(deepOne)!.blow * blowWeight(g.ecs.c.dread.get(deepOne)!.tier);
     place(g, player, 0, 0, 0);
     place(g, deepOne, 0, 1.5, Math.PI);
     strike(g, deepOne, player, blow(10));
@@ -140,16 +140,16 @@ describe('sanity drains', () => {
     place(g, g.player.id, -8, 4, Math.PI); // the pillar at (-8, 1) stands between them
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    const muffled = 100 - roar.amount * SANITY.attackScale * SANITY.muffled;
+    const muffled = 100 - roar.amount * blowWeight('lesser') * SANITY.muffled;
     expect(g.mind.sanity).toBeCloseTo(muffled, 5);
     place(g, g.player.id, -4, -2, -Math.PI / 2); // in the open
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * SANITY.attackScale, 5);
+    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * blowWeight('lesser'), 5);
     place(g, g.player.id, -8, -2 + roar.range + 1, Math.PI);
     startMove(g.ecs.c.actor.get(priest)!, 'roar');
     steps(g, 60);
-    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * SANITY.attackScale, 5);
+    expect(g.mind.sanity).toBeCloseTo(muffled - roar.amount * blowWeight('lesser'), 5);
   });
 
   it('a gaze needs line of sight', () => {
@@ -169,7 +169,7 @@ describe('sanity drains', () => {
     place(g, g.player.id, -4, 4, Math.PI);
     startMove(g.ecs.c.actor.get(gazer)!, 'gaze');
     steps(g, 80);
-    expect(g.mind.sanity).toBeCloseTo(100 - gaze.amount * SANITY.attackScale, 5);
+    expect(g.mind.sanity).toBeCloseTo(100 - gaze.amount * blowWeight('greater'), 5);
   });
 });
 
@@ -230,14 +230,14 @@ describe('what sanity does, and what restores it', () => {
     steps(g, PLAYER_MOVES.drink.item - 1);
     expect(g.mind.sanity).toBe(30);
     steps(g, 1);
-    expect(g.mind.sanity).toBe(80); // a dose restores half the full meter, not half the missing sanity
+    expect(g.mind.sanity).toBe(30 + LAUDANUM.sanity); // a dose restores a third of the full meter, not a third of the missing sanity (round 58: a half)
     steps(g, PLAYER_MOVES.drink.frames);
     g.player.laudanum = 0;
     stepGame(g, press('item'));
     expect(a.move).toBeNull();
   });
 
-  it.each([[0, 50], [75, 100]] as const)('a dose at %d sanity restores 50 points, capped at a full meter', (before, after) => {
+  it.each([[0, LAUDANUM.sanity], [75, 100]] as const)('a dose at %d sanity restores its points, capped at a full meter', (before, after) => {
     const { g } = scriptedGame();
     g.mind.fought = Infinity;
     setSanity(g, before);
