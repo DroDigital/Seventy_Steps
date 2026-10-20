@@ -148,7 +148,7 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
       if (!at) continue;
       const { gain, pan } = place(at, SWING_RANGE);
       const size = body.get(id)?.radius ?? 0.5;
-      if (gain > 0) play('swingHeavy', gain * 0.8, pan, Math.max(0.55, Math.min(1.15, 1.2 - 0.3 * size)), dullness(gain));
+      if (gain > 0) play('swipe', gain * 0.8, pan, Math.max(0.6, Math.min(1.15, 1.2 - 0.3 * size)), dullness(gain)); // its own swing, not the investigator's (round 59)
     }
     for (const id of seen.keys()) if (!actor.has(id)) seen.delete(id);
   }

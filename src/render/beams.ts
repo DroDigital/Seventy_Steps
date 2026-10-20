@@ -20,7 +20,9 @@ import type { Rgb } from './palette';
 import { worldUniforms } from './worldMaterial';
 
 const CAPACITY = 160; // ribbons: two to a beam, two to a segment of a bolt of lightning
-const FLASH = 0.26; // seconds a fired beam lingers
+const FLASH = 0.42; // seconds a fired beam lingers (round 59: at 0.26 s, thinning from the first frame, it was gone before it was seen)
+const HOLD = 0.3; // of which it holds at its full width before it thins
+const SCREEN = 0.012; // the least width of a beam, as a share of its distance: it keeps its width on the screen far off, as a bolt of lightning does
 
 export interface Beams {
   update(alpha: number, time: number, camera: THREE.Camera): void;
@@ -137,6 +139,11 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
     ribbon(a, b, width * 2.8, look.line, look.core, alpha * (hot > 0.2 ? 0.6 : 0.45), mix, hot);
     ribbon(a, b, width, look.line, look.core, alpha, mix, hot);
   };
+  /** How wide a beam is drawn: its own width, or at a distance the width that keeps it on the screen (from the nearer of its ends, and its middle). */
+  const seen = (a: V3, b: V3, width: number): number => {
+    const near = Math.min(...[a, b, { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: (a.z + b.z) / 2 }].map((p) => Math.hypot(p.x - eye.x, p.y - eye.y, p.z - eye.z)));
+    return Math.max(width, SCREEN * near);
+  };
 
   return {
     bolt(path, life, width, color, core) {
@@ -153,7 +160,8 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
         if (!sw || a.frame < sw.window[0] || a.frame >= sw.window[1] || isAbsent(g, id)) continue;
         const { from, to } = beamLine(g, id, sw, a.frame + alpha);
         const flicker = 0.85 + 0.15 * Math.sin(time * 70 + id);
-        beam(from, to, 0.9 * sw.width + 0.5, attackLook(g, id), flicker);
+        const into = Math.min(1, (a.frame + alpha - sw.window[0]) / 6); // it opens over a tenth of a second, from a thread to its width
+        beam(from, to, seen(from, to, (1.05 * sw.width + 0.6) * (0.35 + 0.65 * into)), attackLook(g, id), flicker, 0.4, 0.12);
       }
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i];
@@ -162,7 +170,8 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
           flashes.splice(i, 1);
           continue;
         }
-        beam(f.from, f.to, 1.1 * (1 - t) + 0.2, { line: f.color, core: f.core }, 1 - t * t);
+        const thin = t < HOLD ? 0 : (t - HOLD) / (1 - HOLD); // full, then thinning to a thread as it fades
+        beam(f.from, f.to, seen(f.from, f.to, 1.5 * (1 - thin) + 0.18), { line: f.color, core: f.core }, 1 - thin * thin, 0.4, 0.14);
       }
       for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i]!;

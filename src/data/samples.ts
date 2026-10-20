@@ -86,6 +86,7 @@ export const SAMPLE_SETS = {
   click: set(takes('click', 3), 0.34, [0.9, 1.15]),
   spit: set(takes('spit', 3), 1, [0.9, 1.1]),
   gust: set(takes('gust', 2), 0.48, [0.85, 1.1]),
+  swipe: set(takes('swipe', 4), 0.42, [0.85, 1.12]), // a creature's limb, claw or bulk swung through the air (round 59: they swung with the investigator's own heavy whoosh)
   // footsteps
   stepDirt: set(takes('step_dirt', 4), 0.26, [0.9, 1.08]),
   stepRoad: set(takes('step_road', 4), 0.38, [0.92, 1.08]),

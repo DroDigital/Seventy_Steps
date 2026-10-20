@@ -29,6 +29,36 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `amb/wind_ghost.mp3` | [S41-21 Spooky singing ghost wind.wav](https://freesound.org/people/craigsmith/sounds/675716/) | craigsmith | CC0 | 0.4–15.1 s; looped (a 1.5 s crossfade) |
 | `sfx/anvil1.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 0.55–2.2 s; Round 40 |
 | `sfx/anvil2.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 5.9–7.4 s; Round 40 |
+| `sfx/atk_arcane1.mp3` | [Magical Impact with Trippy Trail FX](https://freesound.org/people/CVLTIV8R/sounds/849412/) | CVLTIV8R | CC0 | 0.3–1.5 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_arcane2.mp3` | [Energy impact 4](https://freesound.org/people/ihitokage/sounds/413224/) | ihitokage | CC0 | 0.2–1.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_arcane3.mp3` | [magicProjectile_impact.wav](https://freesound.org/people/rafaelzimrp/sounds/570855/) | rafaelzimrp | CC0 | 0–1.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_cast1.mp3` | [Magic - Blast or Whoosh](https://freesound.org/people/Vrymaa/sounds/802725/) | Vrymaa | CC0 | 4.35–5.9 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_cast2.mp3` | [Magic Fire Spell Movement](https://freesound.org/people/TheLittleCrow/sounds/761330/) | TheLittleCrow | CC0 | 4.5–5.8 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_cast3.mp3` | [Magical Impact with Trippy Trail FX](https://freesound.org/people/CVLTIV8R/sounds/849412/) | CVLTIV8R | CC0 | 2.15–3.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fire1.mp3` | [fireball_impact2.wav](https://freesound.org/people/pepingrillin/sounds/252092/) | pepingrillin | CC0 | 0–1.6 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fire2.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 2.18–3.5 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fire3.mp3` | [Magic Fire Spell Movement](https://freesound.org/people/TheLittleCrow/sounds/761330/) | TheLittleCrow | CC0 | 23.85–25.2 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fwoosh1.mp3` | [Basic Fire Whoosh 2](https://freesound.org/people/LookIMadeAThing/sounds/260555/) | LookIMadeAThing | CC0 | 0.05–1.3 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fwoosh2.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 0.05–1.15 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_fwoosh3.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 1.18–2.15 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_ice1.mp3` | [Break something (ice/glass/...)](https://freesound.org/people/Aurelon/sounds/422633/) | Aurelon | CC0 | 0.25–1.1 s; high-pass 120 Hz; a fade (round 59) |
+| `sfx/atk_ice2.mp3` | [Break Ice](https://freesound.org/people/davilca/sounds/677230/) | davilca | CC0 | 12.24–13.3 s; high-pass 120 Hz; a fade (round 59) |
+| `sfx/atk_ice3.mp3` | [Break Ice](https://freesound.org/people/davilca/sounds/677230/) | davilca | CC0 | 2.02–3.1 s; high-pass 120 Hz; a fade (round 59) |
+| `sfx/atk_ice4.mp3` | [Ice break](https://freesound.org/people/humanoide9000/sounds/329744/) | humanoide9000 | CC0 | 4.74–5.6 s; high-pass 120 Hz; a fade (round 59) |
+| `sfx/atk_stone1.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 0–1.2 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_stone2.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 3.98–5.2 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_stone3.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 7.97–8.82 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_stone4.mp3` | [Gravel Impacts and Falls.wav](https://freesound.org/people/lolamadeus/sounds/179341/) | lolamadeus | CC0 | 2.33–3.35 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_water1.mp3` | [Water Impact](https://freesound.org/people/Kastenfrosch/sounds/521950/) | Kastenfrosch | CC0 | 0–1.3 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_water2.mp3` | [Water Splash Free](https://freesound.org/people/AardsReal/sounds/842165/) | AardsReal | CC0 | 0.2–1.5 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_water3.mp3` | [Water Splashes](https://freesound.org/people/Phil25/sounds/207371/) | Phil25 | CC0 | 19.6–20.9 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_wet1.mp3` | [Gel Squelches.wav](https://freesound.org/people/mincedbeats/sounds/593990/) | mincedbeats | CC0 | 8.65–9.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_wet2.mp3` | [Gel Squelches.wav](https://freesound.org/people/mincedbeats/sounds/593990/) | mincedbeats | CC0 | 2.6–3.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_wet3.mp3` | [Mud Splat](https://freesound.org/people/Breviceps/sounds/445109/) | Breviceps | CC0 | 0–0.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_wet4.mp3` | [Gel Squelches.wav](https://freesound.org/people/mincedbeats/sounds/593990/) | mincedbeats | CC0 | 6.6–7.3 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_whip1.mp3` | [Whip Cracks.WAV](https://freesound.org/people/G.Lamont/sounds/118068/) | G.Lamont | CC0 | 5.46–6.3 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_whip2.mp3` | [Whip Cracks.WAV](https://freesound.org/people/G.Lamont/sounds/118068/) | G.Lamont | CC0 | 13.58–14.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_whip3.mp3` | [Whip Cracks.WAV](https://freesound.org/people/G.Lamont/sounds/118068/) | G.Lamont | CC0 | 3.51–4.3 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/bat1.mp3` | [Screech](https://freesound.org/people/Phorgador/sounds/788212/) | Phorgador | CC0 | 0.06–1.21 s; tape speed ×0.7 (round 20) |
 | `sfx/bat2.mp3` | [bat-like monster sonar click.wav](https://freesound.org/people/vestibule-door/sounds/669717/) | vestibule-door | CC0 | 3.06–4.21 s; tape speed ×0.7 (round 20) |
 | `sfx/bat3.mp3` | [Bat Screech](https://freesound.org/people/Yoyodaman234/sounds/667579/) | Yoyodaman234 | CC0 | 0–1.8 s; tape speed ×0.7 (round 20) |
@@ -286,6 +316,10 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/swing2.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 11.73–12.36 s |
 | `sfx/swing3.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 15.49–16.12 s |
 | `sfx/swing4.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 17.59–18.22 s |
+| `sfx/swipe1.mp3` | [FX - Swoosh - Low Pitch](https://freesound.org/people/bolkmar/sounds/475135/) | bolkmar | CC0 | 0.08–0.75 s; high-pass 60 Hz; a fade (round 59) |
+| `sfx/swipe2.mp3` | [Heavy Whoosh](https://freesound.org/people/SoundBiterSFX/sounds/730959/) | SoundBiterSFX | CC0 | 1–2 s; high-pass 60 Hz; a fade (round 59) |
+| `sfx/swipe3.mp3` | [Heavy Whoosh, Swoosh, Low, sfx, effect](https://freesound.org/people/FALL-E/sounds/697432/) | FALL-E | CC0 | 36.4–37.4 s; high-pass 60 Hz; a fade (round 59) |
+| `sfx/swipe4.mp3` | [whoosh dark.wav](https://freesound.org/people/sfx4animation/sounds/431976/) | sfx4animation | CC0 | 0.35–1 s; high-pass 60 Hz; a fade (round 59) |
 | `sfx/swish1.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 6.68–7.18 s; low-pass 7000 Hz |
 | `sfx/swish2.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 11.24–11.74 s; low-pass 7000 Hz |
 | `sfx/swish3.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 16.06–16.56 s; low-pass 7000 Hz |
