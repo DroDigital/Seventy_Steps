@@ -74,3 +74,51 @@ describe('rain is a soft wash and drops, not static (round 53)', () => {
     expect(levelsOf('rain', 1, true).shower).toBeLessThan(heavy.shower); // under a roof, fewer and duller
   });
 });
+
+import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
+import { SAMPLE_SETS } from '../src/data/samples';
+import { RAIN_BEDS, RAIN_GAIN, RAIN_SOFT, rainMix } from '../src/render/audio/weatherBed';
+
+describe('the rain is recorded (round 59)', () => {
+  const level = (file: string): number => SAMPLE_LEVELS[file]!.rms;
+  const at = (l: ReturnType<typeof levelsOf>): number => 10 * Math.log10((10 ** (level(RAIN_BEDS.light) / 10)) * (l.light * RAIN_GAIN.light) ** 2 + (10 ** (level(RAIN_BEDS.heavy) / 10)) * (l.heavy * RAIN_GAIN.heavy) ** 2);
+
+  it('has a light rain and a downpour, each a loop long enough not to be heard turning over', () => {
+    for (const f of Object.values(RAIN_BEDS)) expect(SAMPLE_LEVELS[f]?.sec, f).toBeGreaterThan(25);
+    expect(RAIN_SOFT).toBeGreaterThan(4000); // softened, not dulled: the drops keep their edges
+  });
+
+  it('a light rain is the light bed alone; the downpour comes in over it as it thickens and is the louder', () => {
+    const light = levelsOf('rain', 0.3, false);
+    const heavy = levelsOf('rain', 1, false);
+    expect(light.heavy).toBe(0);
+    expect(light.light).toBeGreaterThan(0.25);
+    expect(heavy.heavy).toBe(1);
+    expect(heavy.light).toBeLessThan(heavy.heavy);
+    expect(at(heavy)).toBeGreaterThan(at(light) + 6);
+    expect(levelsOf('rain', 1, true).heavy).toBeLessThan(heavy.heavy); // under a roof, a dull patter
+  });
+
+  it('sits in the bed as rain does: a light rain about -40 dBFS, a storm\'s downpour about -30, under the wind and the music', () => {
+    expect(at(levelsOf('rain', 0.3, false))).toBeGreaterThan(-46);
+    expect(at(levelsOf('rain', 0.3, false))).toBeLessThan(-36);
+    expect(at(levelsOf('storm', 1, false))).toBeGreaterThan(-34);
+    expect(at(levelsOf('storm', 1, false))).toBeLessThan(-26);
+    expect(levelsOf('gale', 1, false).light + levelsOf('gale', 1, false).heavy).toBe(0); // a gale is dry
+  });
+
+  it('plays the recordings or the made rain, never both: one recording loaded without its fellow is silent (Codex on PR 149)', () => {
+    const l = levelsOf('storm', 1, false);
+    const real = rainMix(l, true);
+    expect(real.light + real.heavy).toBeGreaterThan(0);
+    expect(real.wash + real.drops + real.shower).toBe(0);
+    const made = rainMix(l, false);
+    expect(made.light + made.heavy).toBe(0);
+    expect(made.wash + made.drops + made.shower).toBeGreaterThan(0);
+  });
+
+  it('a bolt on the ground is a recording of a close strike, four takes of it', () => {
+    expect(SAMPLE_SETS.strike.files).toHaveLength(4);
+    for (const f of SAMPLE_SETS.strike.files) expect(SAMPLE_LEVELS[`sfx/${f}`]?.sec, f).toBeGreaterThan(3);
+  });
+});

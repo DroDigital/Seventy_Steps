@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
+import { TIMBRE } from '../src/data/attackSounds';
 import { DOOR_LOOKS } from '../src/data/doors';
 import { materialOf } from '../src/data/doorSounds';
 import { ACTS, HANDS } from '../src/data/foleySounds';
@@ -27,7 +28,8 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
     }
   });
 
-  it('answers recipes that exist: every door of every material, open and shut, and the hands, the mist and the acts it names', () => {
+  it('answers recipes that exist: every door of every material, open and shut, and the hands, the mist, the acts and the horrors\' blows it names', () => {
+    for (const motif of Object.keys(TIMBRE)) for (const what of ['land', 'burst', 'loose']) expect(RECORDED_FOR[`atk:${what}:${motif}`], `atk:${what}:${motif}`).toBeDefined(); // every element's landing, burst and throw is recorded (round 59)
     for (const m of MATERIALS) for (const way of ['open', 'close']) expect(RECORDED_FOR[`door:${m}:${way}`], `door:${m}:${way}`).toBeDefined();
     for (const p of PLANNED) {
       for (const key of p.for) {
@@ -35,7 +37,11 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
         if (kind === 'hands') expect(name in HANDS, key).toBe(true);
         else if (kind === 'act') expect(name in ACTS, key).toBe(true);
         else if (kind === 'mist') expect(['pass', 'close'], key).toContain(name);
-        else expect(kind, key).toBe('door');
+        else if (kind === 'atk') { // a horror's blow, by its element (round 59): a recipe attackAudio.ts plays under that key
+          const [, what, motif] = key.split(':');
+          expect(['land', 'burst', 'loose'], key).toContain(what);
+          expect(Object.keys(TIMBRE), key).toContain(motif);
+        } else expect(kind, key).toBe('door');
       }
     }
     expect(Object.keys(RECORDED_FOR).length).toBe(PLANNED.reduce((n, p) => n + p.for.length, 0)); // (no recipe has two recordings)
@@ -49,12 +55,12 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
   });
 
   it('every set that is there has all its takes, is levelled in its class\'s window, and has a peak under full scale', () => {
-    const windows: Record<string, readonly [number, number]> = { door: [-34, -16], hands: [-38, -18], mist: [-34, -18], act: [-50, -28] };
+    const windows: Record<string, readonly [number, number]> = { door: [-34, -16], hands: [-38, -18], mist: [-34, -18], act: [-50, -28], atk: [-34, -14] };
     for (const p of PLANNED) {
       const present = Array.from({ length: p.takes }, (_, k) => `${p.file}${k + 1}`).filter((f) => existsSync(`public/audio/sfx/${f}.mp3`));
       if (!present.length) continue;
       expect(present.length, `${p.id} lacks takes`).toBe(p.takes);
-      const kind = p.for[0].startsWith('door') ? 'door' : p.for[0].startsWith('mist') ? 'mist' : p.for[0].startsWith('act') ? 'act' : 'hands';
+      const kind = p.for[0].startsWith('door') ? 'door' : p.for[0].startsWith('mist') ? 'mist' : p.for[0].startsWith('act') ? 'act' : p.for[0].startsWith('atk') ? 'atk' : 'hands';
       const class_ = Math.min(1, p.for.includes('act:gulp') ? 1 : kind === 'mist' ? 0.4 : kind === 'act' ? 0.5 : 1); // (what the recipe's own gain makes of it: gameAudio.ts)
       for (const f of present) {
         const l = SAMPLE_LEVELS[`sfx/${f}`];

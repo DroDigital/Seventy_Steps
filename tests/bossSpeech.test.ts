@@ -20,7 +20,7 @@ describe('all the horrors\' authored speech', () => {
         scenes.push(scene);
         return Promise.resolve();
       });
-      createDirector(g, { play, active: false } as never, () => undefined);
+      createDirector(g, { play, active: false, heightOf: (e: number) => g.ecs.c.body.get(e)?.height ?? 2 } as never, () => undefined);
       const f = g.ecs.c.fight.get(entity);
       g.events.emit('FirstSight', { entity, name, sanity: 0, insight: 0 });
       if (f) g.events.emit('BossEngaged', { entity, name });
@@ -37,7 +37,7 @@ describe('all the horrors\' authored speech', () => {
   it('keeps a stationary horror from interrupting a scene or speaking over the investigator\'s death', () => {
     const g = createGame({ creature: 'voice_in_the_tomb' });
     const entity = [...g.ecs.c.dread].find(([, d]) => d.id === 'voice_in_the_tomb')![0];
-    const cinema = { play: vi.fn(), active: true };
+    const cinema = { play: vi.fn(), active: true, heightOf: () => 2 };
     const said = vi.fn();
     g.events.on('Said', said);
     createDirector(g, cinema as never, () => undefined);

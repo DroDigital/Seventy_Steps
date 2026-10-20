@@ -45,6 +45,23 @@ export const PLANNED: readonly Planned[] = [
   { id: 'quillScratch', file: 'quill_scratch', takes: 3, gain: 0.42, for: ['act:scratch'], seconds: [0.08, 0.2], prompt: `A steel nib scratching a few quick strokes on rough paper, close perspective, 0.15 second duration${NO_MUSIC}` },
   { id: 'keyChime', file: 'key_chime', takes: 2, gain: 0.32, for: ['act:keys'], seconds: [0.2, 0.4], prompt: `A small silver key turned slowly in lamplight, a few tiny bright chimes of its ward, close perspective, 0.3 second duration${NO_MUSIC}` },
   { id: 'vialRing', file: 'vial_ring', takes: 2, gain: 0.16, for: ['act:glass'], seconds: [0.2, 0.4], prompt: `A small glass vial tapped against a lamp, one clear high ring that fades, close perspective, 0.3 second duration${NO_MUSIC}` },
+  // A horror's blows, by what they are made of (round 59: data/attackSounds.ts made them of sines and filtered noise alone, which to the
+  // ear were blips): where a bolt or a beam lands and where the ground bursts, and the throw or the cast as a bolt leaves. All found, CC0.
+  ...atk('atkWater', 'atk_water', 3, 0.55, ['land:tide', 'burst:tide'], 'A heavy mass of seawater slamming onto wet stone, a big splash with spray falling after it'),
+  ...atk('atkWet', 'atk_wet', 4, 0.5, ['land:stain', 'burst:stain', 'land:spore', 'burst:spore', 'land:root', 'burst:root'], 'A wet mass of slime and flesh striking the ground, a thick squelching splat'),
+  ...atk('atkStone', 'atk_stone', 4, 0.55, ['land:crack', 'burst:crack', 'land:ash', 'burst:ash', 'land:plain', 'burst:plain'], 'A heavy stone impact on rock, cracking and a scatter of debris and gravel falling after it'),
+  ...atk('atkFire', 'atk_fire', 3, 0.5, ['land:flame', 'burst:flame'], 'A ball of fire bursting against stone, a roaring whump and crackling flames dying away'),
+  ...atk('atkIce', 'atk_ice', 4, 0.6, ['land:frost', 'burst:frost'], 'A shard of ice shattering against stone, a sharp crack and tinkling splinters'),
+  ...atk('atkArcane', 'atk_arcane', 3, 0.45, ['land:glyph', 'burst:glyph', 'land:eye', 'burst:eye', 'land:star', 'burst:star'], 'An eldritch bolt of energy striking, a deep magical impact with a shimmering ringing tail'),
+  ...atk('atkWhip', 'atk_whip', 3, 0.5, ['land:coil', 'burst:coil'], 'A long whip cracking hard through the air'),
+  ...atk('atkCast', 'atk_cast', 3, 0.45, ['loose:glyph', 'loose:eye', 'loose:star', 'loose:coil'], 'A spell cast and hurled, a magical whoosh rising and rushing away'),
+  ...atk('atkFwoosh', 'atk_fwoosh', 3, 0.5, ['loose:flame'], 'A ball of fire hurled through the air, a rushing fire whoosh'),
+  ...atk('atkThrow', 'swipe', 4, 0.5, ['loose:tide', 'loose:stain', 'loose:spore', 'loose:root', 'loose:crack', 'loose:ash', 'loose:plain', 'loose:frost'], 'A heavy limb or a thrown mass swung hard through the air, a low dark whoosh'),
 ];
+
+/** One of a horror's blows as a planned set: what it stands in front of, by its recipes' keys (render/audio/attackAudio.ts). */
+function atk(id: string, file: string, takes: number, gain: number, keys: readonly string[], sound: string): Planned[] {
+  return [{ id, file, takes, gain, for: keys.map((k) => `atk:${k}`), seconds: [0.4, 1.6], prompt: `${sound}, dark fantasy battle, medium perspective, 1 second duration${NO_MUSIC}` }];
+}
 
 export type PlannedId = string;

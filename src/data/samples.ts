@@ -86,6 +86,7 @@ export const SAMPLE_SETS = {
   click: set(takes('click', 3), 0.34, [0.9, 1.15]),
   spit: set(takes('spit', 3), 1, [0.9, 1.1]),
   gust: set(takes('gust', 2), 0.48, [0.85, 1.1]),
+  swipe: set(takes('swipe', 4), 0.42, [0.85, 1.12]), // a creature's limb, claw or bulk swung through the air (round 59: they swung with the investigator's own heavy whoosh)
   // footsteps
   stepDirt: set(takes('step_dirt', 4), 0.26, [0.9, 1.08]),
   stepRoad: set(takes('step_road', 4), 0.38, [0.92, 1.08]),
@@ -117,6 +118,7 @@ export const SAMPLE_SETS = {
   hull: set(['spot_boat'], 0.3),
   creak: set(['spot_creak1', 'spot_creak2'], 0.22, [0.8, 1]),
   thunder: set(['spot_thunder'], 0.35, [0.85, 1]),
+  strike: set(takes('strike', 4), 1, [0.9, 1.04]), // a bolt on the ground close by (round 59: the recipe's crack was a blip): the crack, the tearing and the crash
   gurgle: set(['spot_gurgle'], 0.3, [0.8, 1]),
   chains: set(['spot_chains'], 0.22, [0.85, 1]),
   timber: set(['spot_groan'], 0.25, [0.7, 0.95]),

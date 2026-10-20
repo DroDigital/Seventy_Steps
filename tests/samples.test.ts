@@ -7,6 +7,7 @@ import { WORLD } from '../src/data/tuning';
 import { voiceIdOf } from '../src/data/voices';
 import { nextSpot } from '../src/render/audio/ambience';
 import { reached, strideAt, surfaceAt } from '../src/render/audio/foley';
+import { RAIN_BEDS } from '../src/render/audio/weatherBed';
 import { dullness } from '../src/render/audio/cues';
 import { pickTake, setFiles } from '../src/render/audio/sampler';
 import { createGame, createWorldGame } from '../src/systems/game';
@@ -16,7 +17,7 @@ import { chunkOf } from '../src/world/worldMap';
 
 const AUDIO = 'public/audio';
 const files = (dir: string): string[] => readdirSync(`${AUDIO}/${dir}`).map((f) => `${dir}/${f.replace(/\.mp3$/, '')}`);
-const beds = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE)].flatMap((a) => a.beds.map(([f]) => `amb/${f}`));
+const beds = [...[...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE)].flatMap((a) => a.beds.map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59)
 
 describe('the recorded sounds (data/samples.ts, public/audio)', () => {
   it('every file a set or a bed names is there, and every file there is named', () => {

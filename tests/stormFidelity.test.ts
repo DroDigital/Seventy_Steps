@@ -87,9 +87,18 @@ describe('thunder is made to its distance (round 52)', () => {
     const at = { x: 4, y: 0, z: 9 };
     g.events.emit('StrikeWarned', { at, radius: 3.4, frames: 90 });
     g.events.emit('StrikeLanded', { at, radius: 3.4 });
-    expect(heardAt.map((h) => h.key)).toEqual(['storm:warn', 'storm:crack']);
+    expect(heardAt.map((h) => h.key)).toEqual(['storm:warn']); // the crack is recorded (round 59)
     expect(heardAt.every((h) => h.at === at || (h.at && h.at.x === 4))).toBe(true);
-    expect(samples).toEqual(['boom']);
+    expect(samples).toEqual(['strike', 'boom']);
+    expect(STORM_MIX.strike).toBeGreaterThan(0);
+  });
+
+  it('makes the crack itself until the recording of a strike has loaded (round 59)', () => {
+    const g = createGame();
+    const keys: string[] = [];
+    createStormAudio(g, (key) => (keys.push(key), true), (set) => set !== 'strike');
+    g.events.emit('StrikeLanded', { at: { x: 0, y: 0, z: 0 }, radius: 3 });
+    expect(keys).toEqual(['storm:crack']);
     expect(STORM_MIX.crack).toBeGreaterThan(0);
   });
 });
