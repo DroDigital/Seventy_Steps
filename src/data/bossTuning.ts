@@ -9,6 +9,11 @@ export const BOSS = {
   margin: 8, // metres past its ring's edge a boss still holds the investigator...
   grace: 150, // ...and frames it waits for them to come back from beyond that before it gives up
   rim: 2.5, // metres inside the ring's edge a boss keeps to
+  wake: 45, // frames a boss holds its first blow once it wakes: the investigator has their hands again first (round 60: one struck as the fog let them go)
+  opening: 64, // frames a parried or interrupted boss stays open (a common foe: 96, REACTIONS.parried), so the riposte is a punish taken at once: a heavy blow begun as the parry's recovery ends still lands (58 frames after the earliest catch)...
+  riposte: 1.25, // ...and what it weighs on a boss (a common foe: COMBAT.riposte). Round 60: any blow within 1.6 s of a parry or a shot landed at x2.5, half a human-sized horror's bar
+  shot: 0.3, // the share of the investigator's shot a boss takes: the revolver breaks a horror's wind-up and chips it, the blade fells it (round 60: a full carry of rounds, alone, felled most of the human-sized ones)...
+  rearm: 240, // ...and frames after a shot breaks its wind-up before another can: no holding it in place with the trigger
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)
@@ -142,7 +147,7 @@ export const ZONES = {
   height: 12, // metres: only assembly bodies this tall have zones
   legs: { top: 0.34, damage: 1 }, // the lowest third of it, and the share of a blow taken there
   torso: { top: 0.72, reach: 0.95, damage: 0.6 }, // up to here; its breadth, of the body's; the share of a blow
-  head: { reach: 0.65, damage: 2.5, stoop: 4.5 }, // above that; breadth; the share of a blow; how low it comes (metres) when it stoops
+  head: { reach: 0.65, damage: 1.5, stoop: 4.5 }, // above that; breadth; the share of a blow (round 60: 2.5, and a riposte to it was six times a blow); how low it comes (metres) when it stoops
   linger: 24, // frames it stays stooped after its recovery ends
   aimReach: 18, // metres: a head higher than this is out of a bullet's range, and the revolver aims at the body as before
 };

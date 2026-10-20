@@ -12,7 +12,7 @@
 import type { Entity } from '../core/ecs';
 import { segSegDist2, wrapAngle, yawOf, type V3 } from '../core/geom';
 import type { HitDef } from '../data/moves';
-import { COMBAT, IMPACT, STAMINA } from '../data/tuning';
+import { BOSS, COMBAT, IMPACT, STAMINA } from '../data/tuning';
 import { inWindow, moveDef, startMove } from './actions';
 import { isAbsent, type Actor, type Game, type Health, type HitOutcome, type Poise, type Stamina } from './components';
 import { edge } from './arms';
@@ -22,7 +22,7 @@ import { relicScale } from './relics';
 import { damageScale } from './sanity';
 import { absorb } from './stamina';
 import { refreshStoops, zoneGap } from './hurt';
-import { live, targetsOf } from './targets';
+import { live, outOfReach, targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
 
 /** What a blow carries into resolution; melee hits and revolver shots both fit. */
@@ -36,6 +36,7 @@ export interface Blow {
   unblockable?: boolean; // a grab, or a pool: no guard stops it
   lingering?: boolean; // a pool's or the void's tick: it hurts, but it is no blow on the mind
   critical?: boolean; // struck into an unguarded back: it lands as a riposte does (round 12)
+  ranged?: boolean; // a shot: it never ripostes, the opening a parry or a shot makes is the hand's to take (round 60)
 }
 
 export interface Defender {
@@ -43,6 +44,7 @@ export interface Defender {
   health: Health;
   poise: Poise;
   stamina?: Stamina;
+  riposte?: number; // what a riposte weighs on it (COMBAT.riposte unless said: a boss's is BOSS.riposte)
 }
 
 /**
@@ -65,8 +67,8 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
     // Only the funded share is absorbed: a nearly empty bar cannot erase a whole boss blow.
     damage *= cost > 0 ? Math.max(0, 1 - available / cost) : 1;
   }
-  const riposte = d.actor.move === 'parried' || !!blow.critical;
-  damage *= riposte ? COMBAT.riposte : 1;
+  const riposte = (d.actor.move === 'parried' && !blow.ranged) || !!blow.critical;
+  damage *= riposte ? d.riposte ?? COMBAT.riposte : 1;
   d.health.hp = Math.max(d.health.immortal ? 1 : d.health.floor ?? 0, d.health.hp - damage);
   d.health.calm = 0;
   if (d.health.hp <= 0) {
@@ -143,7 +145,7 @@ export function capsuleGap2(g: Game, target: Entity, a: V3, b: V3, reach = 0): {
  * where it comes from, for the guard arc (a bolt or a pool; else the attacker, who may be gone).
  */
 export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, from?: V3): HitOutcome {
-  if (((g.cutscene || g.player.falling) && target === g.player.id) || awaitsIntroduction(g, target)) return 'dodged'; // (a body over an edge is out of reach of every source, a ground strike's included: round 54)
+  if ((target === g.player.id && outOfReach(g)) || awaitsIntroduction(g, target)) return 'dodged'; // (a body over an edge is out of reach of every source, a ground strike's included: round 54)
   if (blow.lingering && target === g.player.id && g.player.mended > 0) return 'dodged'; // the Reagent holds: a pool's or the void's tick does nothing
   const { actor, health, poise, stamina, transform } = g.ecs.c;
   const aa = actor.get(attacker);
@@ -151,11 +153,14 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const tt = transform.get(target)!;
   const frontal = isFrontal(tt.pos, tt.yaw, from ?? transform.get(attacker)?.pos ?? tt.pos);
   const h = health.get(target)!;
-  const defender = { actor: ta, health: h, poise: poise.get(target)!, stamina: stamina.get(target) };
+  const defender = { actor: ta, health: h, poise: poise.get(target)!, stamina: stamina.get(target), ...(g.ecs.c.fight.has(target) && { riposte: BOSS.riposte }) };
   const felt = g.ecs.c.phantom.has(attacker)
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
     : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
+  const fight = g.ecs.c.fight.get(target);
+  if (fight && g.frame - (fight.interruptedAt ?? -Infinity) < BOSS.rearm) felt.interrupts = false; // a horror's wind-up broken is not broken again at once
   const { outcome, damage } = resolveHit(defender, felt, frontal);
+  if (outcome === 'interrupted' && fight) fight.interruptedAt = g.frame;
   if (outcome === 'parried' && aa) startMove(aa, 'parried');
   if (outcome !== 'dodged' && blow.hitstop > 0) {
     const stop = blow.hitstop + (attacker === g.player.id && (outcome === 'kill' || outcome === 'riposte') ? IMPACT.finisher : 0); // the moment a finishing blow lands hangs (round 20)
@@ -171,7 +176,7 @@ const SHOVE_FRAMES = 12;
 
 /** Pushes a body `metres` straight away from `from`, over a few frames (movement.ts moves it). */
 export function shove(g: Game, target: Entity, from: V3, metres: number): void {
-  if (((g.cutscene || g.player.falling) && target === g.player.id) || awaitsIntroduction(g, target)) return;
+  if ((target === g.player.id && outOfReach(g)) || awaitsIntroduction(g, target)) return;
   const p = g.ecs.c.transform.get(target)?.pos;
   if (!p || g.ecs.c.body.get(target)?.fixed) return;
   const [dx, dz] = [p.x - from.x, p.z - from.z];

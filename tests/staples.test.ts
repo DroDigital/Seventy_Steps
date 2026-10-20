@@ -29,7 +29,7 @@ describe('backstabs (round 12)', () => {
     };
     const front = hitFrom(false);
     const back = hitFrom(true);
-    expect(back.dealt).toBe(Math.round(front.dealt * COMBAT.riposte));
+    expect(back.dealt).toBeCloseTo(front.dealt * COMBAT.riposte, 5);
     expect(back.move).toBe('stagger');
   });
 
