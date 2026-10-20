@@ -332,7 +332,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       dread.update(seconds, paused);
       drones.update(fx, seconds);
       if (paused) return void mounts.pause();
-      mounts.update(dt);
+      mounts.update(dt, seconds);
       attacks.update(dt);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
         lastBeat = HEART.beats;

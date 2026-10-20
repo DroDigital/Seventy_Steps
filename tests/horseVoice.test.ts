@@ -24,13 +24,13 @@ function ride(id: MountId) {
     { set: () => undefined },
   );
   const mount = g.player.mount;
-  audio.update(1 / 60);
+  audio.update(1 / 60, frame / 60);
   const advance = (frames: number, speed = 0): void => {
     for (let i = 0; i < frames; i++) {
       frame++;
       mount.speed = speed;
       mount.phase += cyclesFor(speed / 60, speed);
-      audio.update(1 / 60);
+      audio.update(1 / 60, frame / 60);
     }
   };
   return { heard, stepped, mount, advance };

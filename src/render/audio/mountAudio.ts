@@ -18,7 +18,7 @@ import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import { SIM } from '../../data/tuning';
 import type { Sound } from '../../data/sounds';
 import type { Game } from '../../systems/components';
-import { pawLanded } from '../../systems/horseIdle';
+import { HORSE_TOSS, pawLanded } from '../../systems/horseIdle';
 import { gaitAt, gaitScale, hoofWeight, touchdowns } from '../../systems/mountGait';
 import { surfaceAt } from './foley';
 import { SILENT_BED, bedTargets, type MountBed } from './mountBed';
@@ -40,7 +40,7 @@ type Idle = (typeof IDLE_NOISES)[number][0];
 
 export interface MountAudio {
   /** Delta seconds between consecutive render frames; called only while the world advances. */
-  update(dt: number): void;
+  update(dt: number, seconds?: number): void;
   /** Play has stopped (a menu, the title): the beds go quiet. */
   pause(): void;
 }
@@ -80,6 +80,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     later.length = 0;
     tossed = false;
     pawClock = null;
+    g.player.mount.idleToss = null;
     bed?.set(SILENT_BED);
   };
   const strike = (id: MountId, leg: number, speed: number, pair: boolean): void => {
@@ -106,7 +107,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     if (id === 'chariot') later.push({ in: 0.35, play: () => recipe('mount:chariot:whisper', SPECTRAL_WHISPER, { gain: MOUNT_MIX.whisper * (0.5 + 0.4 * load), pitch: around(0.2, 0.9), vary: 0.5, pan: spread(0.5) }) });
   };
   /** One small noise of a horse standing at its harness, never the same twice running. */
-  const idle = (id: MountId): void => {
+  const idle = (id: MountId, seconds: number): void => {
     const pool = id === 'grey' ? IDLE_NOISES.filter(([name]) => name !== idleLast && !(tossed && name === 'shake')) : ([['shake', 1]] as const);
     tossed = false;
     let roll = Math.random() * pool.reduce((sum, [, weight]) => sum + weight, 0);
@@ -122,7 +123,12 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     else recipe(key, SNORT, { ...o, gain: MOUNT_MIX.snort * 0.6, pitch: around(0.16, 0.92 + 0.08) });
     if (id === 'grey' && (name === 'blow' || name === 'snort') && Math.random() < (name === 'snort' ? 0.4 : 0.25)) { // a breath out, and the head goes up: the harness answers it
       tossed = true;
-      later.push({ in: between([0.28, 0.45]), play: () => recipe('mount:grey:toss', HARNESS_SHAKE, { gain: MOUNT_MIX.shake, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) }) });
+      const delay = between([0.28, 0.45]);
+      const cue = g.player.mount.idleToss = { start: seconds, peak: seconds + delay };
+      later.push({ in: delay, play: () => {
+        if (g.player.mount.idleToss !== cue || g.player.mount.active !== 'grey' || g.player.mount.speed >= 0.5) return;
+        recipe('mount:grey:toss', HARNESS_SHAKE, { gain: MOUNT_MIX.shake, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) });
+      } });
     }
   };
   /** Called, it is there: the whinny, the harness taking the rider's weight, and a low whicker. Hooves sound only on gait or paw landings. */
@@ -133,7 +139,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
 
   return {
     pause: () => bed?.set(SILENT_BED),
-    update(dt) {
+    update(dt, seconds = g.seaTime?.() ?? g.frame / SIM.hz) {
       const mount = g.player.mount;
       const pos = g.ecs.c.transform.get(g.player.id)?.pos;
       const now = !g.ecs.c.dead.has(g.player.id) && pos ? mount.active : null;
@@ -151,6 +157,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
       if (!active || !pos) return;
       const id = active;
       const speed = Math.max(0, mount.speed);
+      if (speed >= 0.5 || (mount.idleToss && seconds >= mount.idleToss.peak + HORSE_TOSS.settle)) mount.idleToss = null;
       if (!(dt > 0 && dt <= 0.25) || moved > Math.max(3, speed * dt * 3)) { // a long gap, a pause or a jump of place: no backlog of beats
         reset(mount.phase);
         return;
@@ -165,7 +172,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
         if (reins.struck > seen.struck) { seen.struck = reins.struck; slap(id); }
         if (reins.halts > seen.halts) { seen.halts = reins.halts; halt(id, reins.haltSpeed); }
         for (let i = later.length - 1; i >= 0; i--) if ((later[i].in -= dt) <= 0) later.splice(i, 1)[0].play();
-        if (speed < 0.5 && (idleIn -= dt) <= 0) { idleIn = between([6, 14]); idle(id); } // standing, the small noises of a horse that is awake
+        if (speed < 0.5 && (idleIn -= dt) <= 0) { idleIn = between([6, 14]); idle(id, seconds); } // standing, the small noises of a horse that is awake
         const clock = id === 'grey' && speed < 0.5 ? g.seaTime?.() ?? g.frame / SIM.hz : null; // and its hoof put down in the pawing the picture draws (systems/horseIdle.ts)
         if (clock !== null && pawClock !== null && clock - pawClock < 0.25 && pawLanded(pawClock, clock) > 0) {
           recipe('mount:grey:hoof:paw', hoofBeat(ground, { hind: false, shoe: 'iron', weight: 0.85 }), { gain: MOUNT_MIX.hoof * 0.8, pitch: 1.02, vary: 0.4, pan: -0.3 });

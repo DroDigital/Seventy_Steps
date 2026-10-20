@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import type { MountId } from '../data/mounts';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
 import { cyclesFor } from '../systems/mountGait';
+import type { HorseToss } from '../systems/horseIdle';
 import { CASTER } from './moonShadow';
 import { MountBuilder, type CoachWheel } from './mountKit';
 import { automobileArt } from './mountAutomobile';
@@ -25,6 +26,8 @@ export interface MountFrame {
   ground?: (x: number, z: number) => number;
   /** What the driver's hands are doing (a pull, a slap's ripple): the horse answers it at the bit. */
   cue?: RiderCue;
+  /** A stationary horse's head lift and harness rattle share this clock. */
+  idleToss?: HorseToss | null;
   /** Someone is driving: the reins are drawn by `holdReins`, from their hands, once they are posed. */
   rider?: boolean;
 }
@@ -66,7 +69,7 @@ export function createMount(id: MountId): MountVisual {
     holdReins(hands, cue) {
       if (coach) animateReins(coach, shown.time, shown.pace, hands, cue);
     },
-    update({ time, dt, speed, turn = 0, bend = 0, ground, cycle: ridden, cue = CALM, rider = false }) {
+    update({ time, dt, speed, turn = 0, bend = 0, ground, cycle: ridden, cue = CALM, idleToss, rider = false }) {
       const step = Math.max(0, Math.min(0.1, dt)), pace = Math.max(0, speed), steer = Math.max(-1, Math.min(1, turn));
       shown.time = time; shown.pace = pace;
       distance = (distance + pace * step) % (Math.PI * 2 * 1e4);
@@ -84,7 +87,7 @@ export function createMount(id: MountId): MountVisual {
       if (coach) {
         const answer = { check: cue.pull, urge: cue.arrive }; // the horse feels the reins at the bit: a haul on them, a ripple's end
         for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground, bend, answer);
-        coach.draft?.update(time, cycle, pace, steer, ground, bend, answer);
+        coach.draft?.update(time, cycle, pace, steer, ground, bend, answer, idleToss);
         if (!rider) animateReins(coach, time, pace);
         if (coach.lamps.length && step > 0) { // the lanterns hang plumb while the box speeds up, brakes, comes round and tilts about them
           accel += ((pace - lastSpeed) / step - accel) * Math.min(1, step * 10);

@@ -7,7 +7,7 @@
  * an ear, swishes its tail and, now and then, paws the ground. Render only.
  */
 import * as THREE from 'three';
-import { pawAt } from '../systems/horseIdle';
+import { pawAt, tossAt, type HorseToss } from '../systems/horseIdle';
 import { footAt, gaitAt, legPhase } from '../systems/mountGait';
 import { BODY_Y, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
 import { CANNON, FETLOCK, LEGS, LEG_NAMES, cannonBone, hoofOf, upperBone } from './horseLegs';
@@ -21,7 +21,7 @@ export interface DraftHorse {
   root: THREE.Group;
   bit: THREE.Object3D;
   /** `cycle`: gait cycles ridden (the simulation's `MountState.phase`); `ground`: the land's height at (x, z) in the chariot's frame. */
-  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number, reins?: HorseCue): void;
+  update(time: number, cycle: number, speed: number, turn: number, ground?: (x: number, z: number) => number, bend?: number, reins?: HorseCue, idleToss?: HorseToss | null): void;
 }
 
 const clamp = (v: number, a = 0, b = 1): number => Math.min(b, Math.max(a, v));
@@ -81,7 +81,7 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
   const aim = new THREE.Vector3();
   const hips = LEGS.map((l) => l.hip);
 
-  return { root, bit, update(time, cycle, speed, turn, ground, bend = 0, reins = { check: 0, urge: 0 }) {
+  return { root, bit, update(time, cycle, speed, turn, ground, bend = 0, reins = { check: 0, urge: 0 }, idleToss) {
     swingAbout(root, DRAFT_PLACE, { x: 0, z: DRAFT_HITCH.z }, bend); // the horse leads a turn, about the collar the shafts meet; the carriage follows
     const gait = gaitAt(speed);
     const moving = smooth(clamp((speed - 0.15) / 1.1));
@@ -100,9 +100,12 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
     barrelMesh.scale.y = 1 + (0.008 + 0.014 * stretch) * Math.sin(time * (1.5 + 5 * stretch));
 
     const nod = Math.sin(TAU * (cycle - 0.1)) * (0.07 * (1 - flight) + 0.1 * flight) * moving;
+    const toss = speed < 0.5 ? tossAt(time, idleToss) : 0;
     neckG.rotation.x = -NECK_RISE + 0.26 * stretch + nod - 0.02 * Math.sin(time * 0.8) * (1 - moving) - 0.2 * reins.check - 0.08 * reins.urge;
+    neckG.rotation.x -= 0.3 * toss;
     neckG.rotation.y = turn * 0.3 + Math.sin(time * 0.35) * 0.05 * (1 - moving);
     headG.rotation.x = HEAD_DROP - 0.55 * nod - 0.12 * stretch + 0.03 * Math.sin(time * 0.6 + 1) * (1 - moving) + 0.32 * reins.check - 0.22 * reins.urge;
+    headG.rotation.x -= 0.12 * toss;
     headG.rotation.y = turn * 0.12;
     tailG.rotation.x = 0.1 + 0.5 * stretch + 0.1 * Math.sin(TAU * (cycle - 0.3)) * moving + 0.07 * Math.sin(time * 1.3) * (1 - moving) + 0.25 * reins.urge + 0.1 * reins.check;
     tailG.rotation.z = Math.sin(time * 1.9) * 0.12 * (1 - 0.6 * moving) - turn * 0.2;

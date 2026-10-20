@@ -136,6 +136,10 @@ Called, the horse arrives in a short run of sounds (`arrive` in `mountAudio.ts`)
 rider's weight a quarter second on, and a low whicker two seconds in. There is no arrival footfall while the hooves stay planted;
 hoofbeats follow the gait and the shared pawing clock above. Standing, it keeps to its six-to-fourteen-second round of small noises, now with the recordings in them,
 and after a breath out or a snort the head goes up now and then (`mount:grey:toss`): the harness answers a third of a second later.
+That lift and rattle share `MountState.idleToss`, a transient start and peak on the render clock (`systems/horseIdle.ts`): the neck
+and head rise to the peak when the harness sounds, then settle over half a second. Moving off, dismissal or a long frame gap clears
+the cue and cancels its pending rattle. It is never saved. `tests/horseToss.test.ts` compares the actual rendered head and bit with
+the neutral pose at the same time, including the frame the harness sounds and those cancellation paths.
 `tests/horseVoice.test.ts` holds the order and timing of the arrival, the toss, that the ride plays every recipe a recording answers,
 and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rms as it plays).
 
