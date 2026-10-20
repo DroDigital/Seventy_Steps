@@ -17,7 +17,7 @@ import type { Entity } from '../../core/ecs';
 import type { V3 } from '../../core/geom';
 import { soundOf, type CreatureSound } from '../../data/creatureSounds';
 import { getEntity } from '../../data/registry';
-import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, setOf, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES, type Ambience, type SampleSetId } from '../../data/samples';
+import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, setOf, STINGER_SAMPLES, recipeShare, VOICE_ALERTS, VOICE_SAMPLES, type Ambience, type SampleSetId } from '../../data/samples';
 import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
 import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
@@ -101,9 +101,9 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard
   const place = (at: V3 | null, range: number): { gain: number; pan: number } => placeSound(listener, right, at, range);
   /** One of a set's takes where `at` is; false when none has loaded. */
-  const recorded = (id: SampleSetId | string, at: V3 | null, range: number, o: { gain?: number; pitch?: number; delay?: number; fit?: number } = {}): boolean => {
+  const recorded = (id: SampleSetId | string, at: V3 | null, range: number, o: { gain?: number; pitch?: number; delay?: number; fit?: number; pan?: number } = {}): boolean => {
     const { gain, pan } = place(at, range);
-    return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? dullness(gain) : undefined });
+    return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? dullness(gain) : undefined });
   };
   const varier = createVarier(); // round 40: a recipe is drawn a little anew each time it plays, and never at the last play's pitch
   /** A recipe where `at` is: placed, dulled by the distance, varied. */
@@ -111,9 +111,11 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const at = o.at ?? null;
     const { gain, pan } = place(at, o.range ?? AUDIO.eventRange);
     if (gain <= 0) return false;
-    const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it
-    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) });
-    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (took ? 0.33 : 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
+    const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it (or none: a horse's voice, round 59)
+    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1), pan: o.pan });
+    const under = recipeShare(rec, took);
+    if (under <= 0) return true;
+    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * under, pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack

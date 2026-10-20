@@ -9,6 +9,10 @@ cut of one recording treated for the game (below), encoded as mono MP3 (ambience
 looped by crossfading their end into their start; the rest at 44.1 kHz, 96 kbps). `amb/` holds the beds,
 `sfx/` everything else. The engine plays them with more variation still (render/audio/sampler.ts).
 
+The horse's calls and breaths and its harness (`sfx/horse_*`, round 59) were cut from the HQ preview that each Freesound page serves
+without a login (a 128 kbps MP3 of the original), then high-passed, faded at both ends, levelled to a peak of −1.4 dBFS like the rest, and
+encoded again as above. Only the nine recordings named in their rows were used.
+
 The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 
 | File | Recording | By | Licence | Treatment |
@@ -129,6 +133,25 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/gust2.mp3` | [Woosh](https://freesound.org/people/florianreichelt/sounds/683096/) | florianreichelt | CC0 | 0–1.2 s; tape speed ×0.85 (round 20) |
 | `sfx/hiss1.mp3` | [S27-21 Alligator hiss twice.wav](https://freesound.org/people/craigsmith/sounds/675513/) | craigsmith | CC0 | 1.6–5.4 s |
 | `sfx/hiss2.mp3` | [S27-21 Alligator hiss twice.wav](https://freesound.org/people/craigsmith/sounds/675513/) | craigsmith | CC0 | 14.9–18.2 s |
+| `sfx/horse_blow1.mp3` | [HORSE BLOWS FARM AMBIANCE.wav](https://freesound.org/people/ohmypro/sounds/400702/) | ohmypro | CC0 | 6.10–6.72 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_blow2.mp3` | [HORSE BLOWS FARM AMBIANCE.wav](https://freesound.org/people/ohmypro/sounds/400702/) | ohmypro | CC0 | 17.70–18.22 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_blow3.mp3` | [horse snort.wav](https://freesound.org/people/bruno.auzet/sounds/538697/) | bruno.auzet | CC0 | 7.72–8.38 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_harness1.mp3` | [R17-14-Jingling Metal.wav](https://freesound.org/people/craigsmith/sounds/486292/) | craigsmith | CC0 | 0.95–2.15 s; high-pass 150 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_harness2.mp3` | [R17-14-Jingling Metal.wav](https://freesound.org/people/craigsmith/sounds/486292/) | craigsmith | CC0 | 14.40–15.30 s; high-pass 150 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_harness3.mp3` | [R17-14-Jingling Metal.wav](https://freesound.org/people/craigsmith/sounds/486292/) | craigsmith | CC0 | 5.75–6.95 s; high-pass 150 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_harness4.mp3` | [R17-14-Jingling Metal.wav](https://freesound.org/people/craigsmith/sounds/486292/) | craigsmith | CC0 | 7.60–8.80 s; high-pass 150 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_snort1.mp3` | [R12-60-Horses Snort and Vocalize.wav](https://freesound.org/people/craigsmith/sounds/479672/) | craigsmith | CC0 | 2.00–2.62 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_snort2.mp3` | [R12-60-Horses Snort and Vocalize.wav](https://freesound.org/people/craigsmith/sounds/479672/) | craigsmith | CC0 | 3.14–3.92 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_snort3.mp3` | [G38-16-Four Horse Snorts.wav](https://freesound.org/people/craigsmith/sounds/437111/) | craigsmith | CC0 | 4.28–4.82 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_snort4.mp3` | [G38-16-Four Horse Snorts.wav](https://freesound.org/people/craigsmith/sounds/437111/) | craigsmith | CC0 | 5.98–6.98 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_snort5.mp3` | [horse snort.wav](https://freesound.org/people/bruno.auzet/sounds/538697/) | bruno.auzet | CC0 | 0.08–0.98 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whicker1.mp3` | [Horses - Soft Nicker](https://freesound.org/people/TheKingOfGeeks360/sounds/861234/) | TheKingOfGeeks360 | CC0 | 0–0.6 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whicker2.mp3` | [R12-60-Horses Snort and Vocalize.wav](https://freesound.org/people/craigsmith/sounds/479672/) | craigsmith | CC0 | 0.06–1.05 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whicker3.mp3` | [R12-60-Horses Snort and Vocalize.wav](https://freesound.org/people/craigsmith/sounds/479672/) | craigsmith | CC0 | 4.28–5.08 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whinny1.mp3` | [Horse_Whinny.wav](https://freesound.org/people/foxen10/sounds/149024/) | foxen10 | CC0 | 3.28–5.50 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whinny2.mp3` | [horse's whinny](https://freesound.org/people/Kubuzz/sounds/347036/) | Kubuzz | CC0 | 1.12–3.20 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whinny3.mp3` | [G38-15-Perfect Horse Whinny.wav](https://freesound.org/people/craigsmith/sounds/437110/) | craigsmith | CC0 | 10.62–12.42 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
+| `sfx/horse_whinny4.mp3` | [Horse_Whinny.wav](https://freesound.org/people/foxen10/sounds/149024/) | foxen10 | CC0 | 5.45–6.78 s; high-pass 60 Hz; levelled to a peak of −1.4 dBFS (round 59) |
 | `sfx/howl1.mp3` | [S28-04 Wolf howls with reverb.wav](https://freesound.org/people/craigsmith/sounds/675445/) | craigsmith | CC0 | 1.2–5.5 s; tape speed ×0.84 |
 | `sfx/howl2.mp3` | [S28-04 Wolf howls with reverb.wav](https://freesound.org/people/craigsmith/sounds/675445/) | craigsmith | CC0 | 9–11.3 s; tape speed ×0.84 |
 | `sfx/howl3.mp3` | [S28-04 Wolf howls with reverb.wav](https://freesound.org/people/craigsmith/sounds/675445/) | craigsmith | CC0 | 17.3–19 s; tape speed ×0.84 |

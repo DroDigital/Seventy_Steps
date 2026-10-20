@@ -4,7 +4,7 @@ import { DOOR_LOOKS } from '../src/data/doors';
 import { materialOf } from '../src/data/doorSounds';
 import { ACTS, HANDS } from '../src/data/foleySounds';
 import { PLANNED } from '../src/data/plannedSounds';
-import { PLANNED_SETS, RECORDED_FOR, setOf } from '../src/data/samples';
+import { PLANNED_SETS, RECORDED_FOR, recipeShare, setOf } from '../src/data/samples';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
 import { takeTrims } from '../src/data/takeTrim';
 import { createSampler, setFiles } from '../src/render/audio/sampler';
@@ -35,6 +35,7 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
         if (kind === 'hands') expect(name in HANDS, key).toBe(true);
         else if (kind === 'act') expect(name in ACTS, key).toBe(true);
         else if (kind === 'mist') expect(['pass', 'close'], key).toContain(name);
+        else if (kind === 'mount') expect(key, key).toMatch(/^mount:grey:[a-z]+$/); // (that the ride plays each is held by tests/mountAudio.test.ts)
         else expect(kind, key).toBe('door');
       }
     }
@@ -49,12 +50,12 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
   });
 
   it('every set that is there has all its takes, is levelled in its class\'s window, and has a peak under full scale', () => {
-    const windows: Record<string, readonly [number, number]> = { door: [-34, -16], hands: [-38, -18], mist: [-34, -18], act: [-50, -28] };
+    const windows: Record<string, readonly [number, number]> = { door: [-34, -16], hands: [-38, -18], mist: [-34, -18], act: [-50, -28], mount: [-26, -14] };
     for (const p of PLANNED) {
       const present = Array.from({ length: p.takes }, (_, k) => `${p.file}${k + 1}`).filter((f) => existsSync(`public/audio/sfx/${f}.mp3`));
       if (!present.length) continue;
       expect(present.length, `${p.id} lacks takes`).toBe(p.takes);
-      const kind = p.for[0].startsWith('door') ? 'door' : p.for[0].startsWith('mist') ? 'mist' : p.for[0].startsWith('act') ? 'act' : 'hands';
+      const kind = p.for[0].startsWith('door') ? 'door' : p.for[0].startsWith('mist') ? 'mist' : p.for[0].startsWith('act') ? 'act' : p.for[0].startsWith('mount') ? 'mount' : 'hands';
       const class_ = Math.min(1, p.for.includes('act:gulp') ? 1 : kind === 'mist' ? 0.4 : kind === 'act' ? 0.5 : 1); // (what the recipe's own gain makes of it: gameAudio.ts)
       for (const f of present) {
         const l = SAMPLE_LEVELS[`sfx/${f}`];
@@ -65,6 +66,19 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
         if (p.fit) expect(l.sec, `${f} is too long to fit its motion (made ${p.seconds[0]}–${p.seconds[1]} s)`).toBeLessThan(p.seconds[1] * 1.7);
       }
     }
+  });
+
+  it('a horse\'s voice stands alone in front of its recipe, and every other recording keeps a third of its recipe beneath it (round 59)', () => {
+    const horse = PLANNED.filter((p) => p.for.every((k) => k.startsWith('mount:')));
+    expect(horse.map((p) => p.id).sort()).toEqual(['horseBlow', 'horseHarness', 'horseSnort', 'horseWhicker', 'horseWhinny']);
+    for (const p of horse) {
+      expect(p.under, p.id).toBe(0);
+      expect(recipeShare(p.id, true), p.id).toBe(0); // a synthesised nicker under a real whinny would only muddy it
+      expect(recipeShare(p.id, false), p.id).toBe(1); // and where the file has not loaded the recipe plays as before
+    }
+    for (const p of PLANNED.filter((q) => !horse.includes(q))) expect(recipeShare(p.id, true), p.id).toBeCloseTo(0.33, 9);
+    expect(recipeShare(undefined, false)).toBe(1);
+    expect(recipeShare(undefined, true)).toBe(1); // (no recording of it: nothing to stand in front of)
   });
 
   it('plays only the files that are there: a planned set is not asked for before it is recorded', () => {

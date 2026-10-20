@@ -132,6 +132,12 @@ export const PLANNED_SETS: Readonly<Record<PlannedId, SampleSet>> = Object.fromE
 /** A set by its id, a recorded one's or a planned one's. */
 export const setOf = (id: SampleSetId | PlannedId): SampleSet => SAMPLE_SETS[id as SampleSetId] ?? PLANNED_SETS[id];
 
+/** The share of its recipe that stays beneath a planned recording, by the set's id (a third unless the set says: data/plannedSounds.ts `under`). */
+export const UNDER_RECORDING: Readonly<Record<PlannedId, number>> = Object.fromEntries(PLANNED.map((p) => [p.id, p.under ?? 0.33]));
+
+/** How much of a recipe plays with its recording: all of it where no recording was heard, else what the set leaves beneath it. */
+export const recipeShare = (set: PlannedId | undefined, took: boolean): number => (took && set ? UNDER_RECORDING[set] ?? 0.33 : 1);
+
 /** The planned set that stands in front of a recipe (by its key), if there is one. */
 export const RECORDED_FOR: Readonly<Record<string, PlannedId>> = Object.fromEntries(PLANNED.flatMap((p) => p.for.map((k) => [k, p.id])));
 
