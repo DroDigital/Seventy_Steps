@@ -90,8 +90,9 @@ export const CLOCK = {
 export const DUNGEON_LIGHT = {
   dark: 0.35, // the share of the night's darkness a roofed room with no gloom takes (it keeps its ambient legible)...
   deep: 1, // ...and the share the deepest gloom takes, of all of it (round 58: every room took the first, and the lantern was a decoration; world/gloom.ts, data/kits.ts)
-  moon: 0.5, // the share of the moon's light that reaches the stone: it has no roof to shine through, only a high slant from the start of the night (round 58: 0.55, with the night's floor for the moon at 0.11; the floor is 0.28 again for the open land, so these are set so that a room's moon is what round 58 first made it)...
-  moonDeep: 0.024, // ...and in the deepest gloom (0.06 then)
+  moon: 0.55, // the share of the moon's light that reaches the stone: it has no roof to shine through, only a high slant from the start of the night...
+  moonDeep: 0.06, // ...and in the deepest gloom (round 58)
+  moonFloor: 0.11, // what the night leaves of the moon under a roof at its darkest (round 58): the open land's is NIGHT_DARK.moon, 0.28 again, and a room's moon is made what it first was by world/gloom.ts `moonShare`, which takes the difference out
   refuge: 0.35, // the most gloom a room with an Elder Sign keeps: a place to rest, and to be seen resting (round 58)
   arena: 0.5, // and a horror's arena: a fight is read by what the horror throws and by its braziers (round 58)
   adapt: 0.15, // the eye widens without a lantern: the darkness, in a room or on the road, is this much less of what it was where the lantern has gone out (render/lanternLife.ts; round 58)

@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEONS } from '../src/data/dungeons';
 import { DUNGEON_LIGHT, NIGHT_DARK } from '../src/data/lifeTuning';
 import { KITS } from '../src/data/kits';
-import { LANTERN } from '../src/data/tuning';
+import { CLOCK, LANTERN } from '../src/data/tuning';
 import { mistTone } from '../src/render/volumetricFog';
+import { darkOf } from '../src/systems/clock';
 import { kitOfRoom } from '../src/world/dungeonKit';
 import { adapted, darkShare, gloomAt, moonShare, roomGloom } from '../src/world/gloom';
 import { worldLayout } from '../src/world/placements';
@@ -54,13 +55,22 @@ describe('round 58: the dark under a roof is the lantern\'s to walk through', ()
     expect(gloomAt(-1e6, -1e6)).toBe(0);
   });
 
+  it('the moon that reaches a room is what round 58 first made it, whatever the open land\'s moon is kept at: at every gloom, not only at its ends', () => {
+    const night = darkOf(CLOCK.start); // the darkness a room keeps all night
+    for (let gloom = 0; gloom <= 1.0001; gloom += 0.05) {
+      const dark = night * darkShare(gloom);
+      const reaching = (1 - dark * (1 - NIGHT_DARK.moon)) * moonShare(gloom, night); // the land's moon, darkened as the room is, then what the roof lets through
+      const first = (1 - dark * (1 - 0.11)) * (0.55 + (0.06 - 0.55) * gloom); // round 58's first numbers: a floor of 0.11, a share from 0.55 to 0.06
+      expect(reaching, `gloom ${gloom.toFixed(2)}`).toBeCloseTo(first, 9);
+    }
+    expect(moonShare(0.7, night)).toBeLessThan(moonShare(0.3, night));
+  });
+
   it('a deeper gloom takes more of the night and more of the moon, from the old room to the deepest', () => {
     expect(darkShare(0)).toBe(DUNGEON_LIGHT.dark);
     expect(darkShare(1)).toBe(DUNGEON_LIGHT.deep);
     expect(darkShare(0.5)).toBeGreaterThan(darkShare(0.2));
     expect(darkShare(2)).toBe(darkShare(1));
-    expect(moonShare(0)).toBe(DUNGEON_LIGHT.moon);
-    expect(moonShare(1)).toBeCloseTo(DUNGEON_LIGHT.moonDeep, 9);
     expect(moonShare(0.7)).toBeLessThan(moonShare(0.3));
     expect(DUNGEON_LIGHT.deep).toBeGreaterThan(DUNGEON_LIGHT.dark * 2); // the old room took 0.35 of the dark; the darkest take all of it
   });

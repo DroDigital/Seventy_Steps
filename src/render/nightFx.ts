@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import { CLOCK, DUNGEON_LIGHT, LIGHT } from '../data/tuning';
 import { moonShare } from '../world/gloom';
-import { dawnOf, moonHigh, phaseOf } from '../systems/clock';
+import { darkOf, dawnOf, moonHigh, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import type { PostPass } from './postPass';
 import { worldUniforms } from './worldMaterial';
@@ -33,6 +33,7 @@ export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx
   const mat = sky.material as THREE.ShaderMaterial;
   const dir = new THREE.Vector3();
   const still = moonDir(CLOCK.start); // the slant a roofed room keeps all night
+  const night = darkOf(CLOCK.start); // and the darkness it keeps (it is the deep of the night: 1)
   let inside = 0; // how far the room's light has taken over from the sky's (0..1)
   let shade = 0; // and the gloom of the room, eased as the light is
   let last = -1;
@@ -47,7 +48,7 @@ export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx
       moonDir(phase, dir).lerp(still, inside).normalize();
       (mat.uniforms.uMoonDir.value as THREE.Vector3).copy(dir);
       worldUniforms.uLightDir.value.copy(dir);
-      worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - moonShare(shade))); // (reset each frame: realityFx.ts)
+      worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - moonShare(shade, night))); // (reset each frame: realityFx.ts)
       const dawn = dawnOf(phase) * (1 - inside); // the grey of the last hour is the sky's: it is not seen under a roof
       if (dawn <= 0.001) return;
       worldUniforms.uAmbient.value.addScalar(0.05 * dawn);
