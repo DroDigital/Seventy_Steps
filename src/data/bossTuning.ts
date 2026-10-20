@@ -10,6 +10,8 @@ export const BOSS = {
   grace: 150, // ...and frames it waits for them to come back from beyond that before it gives up
   rim: 2.5, // metres inside the ring's edge a boss keeps to
   wake: 45, // frames a boss holds its first blow once it wakes: the investigator has their hands again first (round 60: one struck as the fog let them go)
+  opening: 40, // frames a parried or interrupted boss stays open (a common foe: 96, REACTIONS.parried), so the riposte is a punish taken at once...
+  riposte: 1.5, // ...and what it weighs on a boss (a common foe: COMBAT.riposte). Round 60: any blow within 1.6 s of a parry or a shot landed at x2.5, half a human-sized horror's bar
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)

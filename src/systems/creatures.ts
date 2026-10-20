@@ -84,6 +84,7 @@ export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   for (const id of attacksOf(def)) moves[id] = compileAttack(id, def.stats, reach);
   const brain = phaseBrain(def, 0, reach); // a boss starts in its script's first phase (bossFight.ts moves it on)
   if (brain.params.evade > 0) moves.evade = EVADE;
+  if (def.bossScript) moves.parried = { frames: BOSS.opening }; // a horror gathers itself sooner than a common foe (round 60)
   return {
     name: def.name,
     model: creatureModel(def.id, variant),

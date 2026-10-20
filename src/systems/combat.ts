@@ -12,7 +12,7 @@
 import type { Entity } from '../core/ecs';
 import { segSegDist2, wrapAngle, yawOf, type V3 } from '../core/geom';
 import type { HitDef } from '../data/moves';
-import { COMBAT, IMPACT, STAMINA } from '../data/tuning';
+import { BOSS, COMBAT, IMPACT, STAMINA } from '../data/tuning';
 import { inWindow, moveDef, startMove } from './actions';
 import { isAbsent, type Actor, type Game, type Health, type HitOutcome, type Poise, type Stamina } from './components';
 import { edge } from './arms';
@@ -43,6 +43,7 @@ export interface Defender {
   health: Health;
   poise: Poise;
   stamina?: Stamina;
+  riposte?: number; // what a riposte weighs on it (COMBAT.riposte unless said: a boss's is BOSS.riposte)
 }
 
 /**
@@ -66,7 +67,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
     damage *= cost > 0 ? Math.max(0, 1 - available / cost) : 1;
   }
   const riposte = d.actor.move === 'parried' || !!blow.critical;
-  damage *= riposte ? COMBAT.riposte : 1;
+  damage *= riposte ? d.riposte ?? COMBAT.riposte : 1;
   d.health.hp = Math.max(d.health.immortal ? 1 : d.health.floor ?? 0, d.health.hp - damage);
   d.health.calm = 0;
   if (d.health.hp <= 0) {
@@ -151,7 +152,7 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const tt = transform.get(target)!;
   const frontal = isFrontal(tt.pos, tt.yaw, from ?? transform.get(attacker)?.pos ?? tt.pos);
   const h = health.get(target)!;
-  const defender = { actor: ta, health: h, poise: poise.get(target)!, stamina: stamina.get(target) };
+  const defender = { actor: ta, health: h, poise: poise.get(target)!, stamina: stamina.get(target), ...(g.ecs.c.fight.has(target) && { riposte: BOSS.riposte }) };
   const felt = g.ecs.c.phantom.has(attacker)
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
     : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
