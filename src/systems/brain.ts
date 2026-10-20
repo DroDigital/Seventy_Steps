@@ -124,7 +124,7 @@ function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   const joins = g.ecs.c.fight.get(id)?.script.joins;
   if (!joins || br.state === 'engage') return false;
   if (!mayJoin(g, joins)) return (br.state = 'hidden'), true;
-  [br.state, br.cooldown, br.target] = ['engage', 0, g.player.id];
+  [br.state, br.cooldown, br.target] = ['engage', BOSS.wake, g.player.id]; // it gathers itself before its first blow, as one woken does (round 60)
   g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} JOINS THE FIGHT` });
   return false;
 }
