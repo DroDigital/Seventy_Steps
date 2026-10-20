@@ -59,6 +59,23 @@ describe('every foe\'s blow is seen (round 59)', () => {
       fx.update(0.5); // two pictures to a step
     }
     expect(glints()).toBe(1);
+    // a picture that comes late (a hitch from before the tell to the blow), or a foe first drawn mid-swing, does not glint at a blow already falling (Codex on PR 149)
+    for (const first of [h.window[0], h.window[0] + 2]) {
+      const late = rig('gug');
+      const b = late.c.actor.get(late.foe)!;
+      startMove(b, 'slam');
+      b.frame = TELL.windup - TELL.lead - 4;
+      late.fx.update(0);
+      b.frame = first;
+      late.fx.update(0);
+      expect(late.spawned.filter((p) => p.shape === 'spark' && p.hold === 0.25), `skipped to ${first}`).toHaveLength(0);
+      const seen = rig('gug');
+      const m = seen.c.actor.get(seen.foe)!;
+      startMove(m, 'slam');
+      m.frame = first;
+      seen.fx.update(0);
+      expect(seen.spawned.filter((p) => p.shape === 'spark' && p.hold === 0.25), `first seen at ${first}`).toHaveLength(0);
+    }
     const quick = rig('zoog');
     const b = quick.c.actor.get(quick.foe)!;
     startMove(b, 'bite');

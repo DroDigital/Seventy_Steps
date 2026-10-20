@@ -58,6 +58,13 @@ export const WASH = 0.17;
 export const DROPS = 0.17;
 export const SHOWER = 0.13;
 
+/** The rain's layers at `l`: the recordings when both are there (`real`), else the made rain alone (one recording without the other, its fellow failed, is silent: it would double the rain that stands in). */
+export function rainMix(l: WeatherLevels, real: boolean): { light: number; heavy: number; wash: number; drops: number; shower: number } {
+  return real
+    ? { light: l.light * RAIN_GAIN.light, heavy: l.heavy * RAIN_GAIN.heavy, wash: 0, drops: 0, shower: 0 }
+    : { light: 0, heavy: 0, wash: l.rain * WASH, drops: l.patter * DROPS, shower: l.shower * SHOWER };
+}
+
 export function createWeatherBed(e: AudioEngine, sampler?: Sampler): WeatherBed {
   let apply: ((l: WeatherLevels) => void) | null = null;
   let asked = false; // the recordings are fetched with the first rain
@@ -170,11 +177,12 @@ export function createWeatherBed(e: AudioEngine, sampler?: Sampler): WeatherBed 
         void sampler.load([RAIN_BEDS.light, RAIN_BEDS.heavy]);
       }
       const real = startRecorded(); // the recordings, once both are there; the made rain until then
-      to(recorded.light.gain, l.light * RAIN_GAIN.light);
-      to(recorded.heavy.gain, l.heavy * RAIN_GAIN.heavy);
-      to(wash.gain, real ? 0 : l.rain * WASH);
-      to(drops.gain, real ? 0 : l.patter * DROPS);
-      to(shower.gain, real ? 0 : l.shower * SHOWER);
+      const mix = rainMix(l, real);
+      to(recorded.light.gain, mix.light);
+      to(recorded.heavy.gain, mix.heavy);
+      to(wash.gain, mix.wash);
+      to(drops.gain, mix.drops);
+      to(shower.gain, mix.shower);
       to(rushed.gain, l.gale * 0.3);
       to(howl.gain, l.howl * 0.1);
       to(roof.frequency, l.cutoff, 0.5);

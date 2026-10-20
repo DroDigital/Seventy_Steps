@@ -141,7 +141,7 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
         const was = last.get(id);
         last.set(id, { move: a.move, frame: a.frame });
         const before = was && was.move === a.move && was.frame <= a.frame ? was.frame : -1; // (once, however many pictures are drawn to a step, or steps to a picture)
-        if (told >= 0 && before < told && a.frame >= told) {
+        if (told >= 0 && before < told && a.frame >= told && a.frame < h.window[0]) { // (and only before the blow: a picture late after a hitch, or a foe come into sight mid-swing, does not glint at it)
           const t = c.transform.get(id)!;
           tell(id, def, { x: t.pos.x, y: g.world.ground(t.pos.x, t.pos.z), z: t.pos.z }, t.yaw);
         }

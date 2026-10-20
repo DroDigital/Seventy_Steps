@@ -77,7 +77,7 @@ describe('rain is a soft wash and drops, not static (round 53)', () => {
 
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
 import { SAMPLE_SETS } from '../src/data/samples';
-import { RAIN_BEDS, RAIN_GAIN, RAIN_SOFT } from '../src/render/audio/weatherBed';
+import { RAIN_BEDS, RAIN_GAIN, RAIN_SOFT, rainMix } from '../src/render/audio/weatherBed';
 
 describe('the rain is recorded (round 59)', () => {
   const level = (file: string): number => SAMPLE_LEVELS[file]!.rms;
@@ -105,6 +105,16 @@ describe('the rain is recorded (round 59)', () => {
     expect(at(levelsOf('storm', 1, false))).toBeGreaterThan(-34);
     expect(at(levelsOf('storm', 1, false))).toBeLessThan(-26);
     expect(levelsOf('gale', 1, false).light + levelsOf('gale', 1, false).heavy).toBe(0); // a gale is dry
+  });
+
+  it('plays the recordings or the made rain, never both: one recording loaded without its fellow is silent (Codex on PR 149)', () => {
+    const l = levelsOf('storm', 1, false);
+    const real = rainMix(l, true);
+    expect(real.light + real.heavy).toBeGreaterThan(0);
+    expect(real.wash + real.drops + real.shower).toBe(0);
+    const made = rainMix(l, false);
+    expect(made.light + made.heavy).toBe(0);
+    expect(made.wash + made.drops + made.shower).toBeGreaterThan(0);
   });
 
   it('a bolt on the ground is a recording of a close strike, four takes of it', () => {
