@@ -133,8 +133,8 @@ not loaded, as before. The tail, the lips and the hoof keep their recipes (no cl
 team and the car, which have no living horse.
 
 Called, the horse arrives in a short run of sounds (`arrive` in `mountAudio.ts`): the whinny at once (the summon), the harness taking the
-rider's weight a quarter second on, a hoof planted a second after (the recipe's hoof over the recorded footfall, as the pawing is),
-and a low whicker two seconds in. Standing, it keeps to its six-to-fourteen-second round of small noises, now with the recordings in them,
+rider's weight a quarter second on, and a low whicker two seconds in. There is no arrival footfall while the hooves stay planted;
+hoofbeats follow the gait and the shared pawing clock above. Standing, it keeps to its six-to-fourteen-second round of small noises, now with the recordings in them,
 and after a breath out or a snort the head goes up now and then (`mount:grey:toss`): the harness answers a third of a second later.
 `tests/horseVoice.test.ts` holds the order and timing of the arrival, the toss, that the ride plays every recipe a recording answers,
 and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rms as it plays).

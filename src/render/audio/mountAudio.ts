@@ -125,16 +125,9 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
       later.push({ in: between([0.28, 0.45]), play: () => recipe('mount:grey:toss', HARNESS_SHAKE, { gain: MOUNT_MIX.shake, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) }) });
     }
   };
-  /** Called, it is there: the whinny (the summon itself), the harness taking the rider's weight, a hoof planted as it stands, and a low whicker once it has settled. */
+  /** Called, it is there: the whinny, the harness taking the rider's weight, and a low whicker. Hooves sound only on gait or paw landings. */
   const arrive = (): void => {
     later.push({ in: between([0.2, 0.32]), play: () => recipe('mount:grey:settle', HARNESS_SHAKE, { gain: MOUNT_MIX.shake, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) }) });
-    later.push({
-      in: between([0.85, 1.15]),
-      play: () => {
-        recipe('mount:grey:stamp', hoofBeat(ground, { hind: false, shoe: 'iron', weight: 0.9 }), { gain: MOUNT_MIX.hoof * 0.9, pitch: 1.02, vary: 0.4, pan: -0.3 });
-        sampler?.play(SAMPLE_SETS[STEP_SET[ground]], { gain: MOUNT_MIX.hoofSample * 0.8, pan: -0.3, pitch: 0.78 });
-      },
-    });
     later.push({ in: between([1.9, 2.5]), play: () => recipe('mount:grey:greet', HORSE_WHICKER, { gain: MOUNT_MIX.whicker, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) }) });
   };
 

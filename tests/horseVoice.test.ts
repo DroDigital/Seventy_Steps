@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import { PLANNED } from '../src/data/plannedSounds';
-import { RECORDED_FOR, SAMPLE_SETS } from '../src/data/samples';
+import { RECORDED_FOR } from '../src/data/samples';
 import type { Sound } from '../src/data/sounds';
 import { createMountAudio } from '../src/render/audio/mountAudio';
 import type { Sampler } from '../src/render/audio/sampler';
@@ -35,26 +35,24 @@ function ride(id: MountId) {
   };
   return { heard, stepped, mount, advance };
 }
-const ARRIVAL = /:(settle|stamp|greet)$/;
+const ARRIVAL = /:(settle|greet)$/;
 
 describe('a called horse arrives (round 59)', () => {
-  it('whinnies, shifts under the harness as the rider takes its weight, plants a hoof, and whickers low once it has settled: once each, in that order, within the first three seconds', () => {
+  it('whinnies, settles its harness and whickers low within the first three seconds, without a footfall while its hooves stay planted', () => {
     const r = ride('grey');
     expect(r.heard.map((h) => h.key)).toEqual(['mount:grey:summon']); // the call itself is at once
     r.heard.length = 0;
     r.advance(60 * 4, 0);
     const arrival = r.heard.filter((h) => ARRIVAL.test(h.key));
-    expect(arrival.map((h) => h.key)).toEqual(['mount:grey:settle', 'mount:grey:stamp', 'mount:grey:greet']);
-    const [settle, stamp, greet] = arrival.map((h) => h.at);
+    expect(arrival.map((h) => h.key)).toEqual(['mount:grey:settle', 'mount:grey:greet']);
+    const [settle, greet] = arrival.map((h) => h.at);
     expect(settle).toBeGreaterThan(0.15);
     expect(settle).toBeLessThan(0.45);
-    expect(stamp).toBeGreaterThan(0.8);
-    expect(stamp).toBeLessThan(1.3);
     expect(greet).toBeGreaterThan(1.8);
     expect(greet).toBeLessThan(2.7);
-    expect(r.heard.every((h) => !h.key.includes(':hoof:'))).toBe(true); // (a standing horse is without hoofbeats: the stamp is its own)
-    expect(r.stepped).toHaveLength(1); // and the planted hoof has the recorded footfall beneath it, once
-    expect(Object.values(SAMPLE_SETS)).toContain(r.stepped[0]);
+    expect(r.heard.some((h) => h.key === 'mount:grey:stamp')).toBe(false); // no arrival hoofbeat without a visible stroke
+    expect(r.heard.every((h) => !h.key.includes(':hoof:'))).toBe(true);
+    expect(r.stepped).toEqual([]); // the recorded footfall must stay quiet too
   });
 
   it('only the included horse: the skeletons and the car have their own summons and no hoof, harness or whicker of a living horse', () => {
