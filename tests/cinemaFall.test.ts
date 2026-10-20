@@ -93,7 +93,7 @@ describe('the great horrors\' own falls', () => {
     for (const [creature, expected] of [['cthulhu', 'fall:cthulhu'], ['black_man', 'fall:person']] as const) {
       const g = createGame({ creature });
       const play = vi.fn(() => Promise.resolve());
-      createDirector(g, { play, active: false } as never, () => undefined);
+      createDirector(g, { play, active: false, heightOf: (e: number) => g.ecs.c.body.get(e)?.height ?? 2 } as never, () => undefined);
       const [e] = [...g.ecs.c.fight.keys()];
       g.events.emit('Vanquished', { entity: e, name: 'X' });
       expect((play.mock.calls[0] as unknown[])[0], creature).toMatchObject({ id: expected });

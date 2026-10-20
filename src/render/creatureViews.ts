@@ -29,7 +29,7 @@ import { sight } from '../systems/perception';
 import { CELL, spriteKey, type SpriteAtlas } from './sprites/atlas';
 import { spriteBatch, reviewedTextures } from './sprites/batch';
 import { attackFrame, clipCounts, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteAction, type SpriteDirection } from './sprites/directional';
-import { reviewedClips, reviewedSize, type ReviewedManifest } from './sprites/reviewed';
+import { reviewedClips, reviewedSize, reviewedSpan, type ReviewedManifest } from './sprites/reviewed';
 
 const CAPACITY = 64;
 const REACTIONS = new Set(['stagger', 'guardBreak', 'parried']);
@@ -91,6 +91,8 @@ export interface CreatureViews {
   /** The sprite atlas and its texture, for others that draw a creature's likeness (round 18: skyLife.ts). */
   readonly sheet: { atlas: SpriteAtlas; texture: THREE.Texture; reviewed?: { manifest: ReviewedManifest; textures: THREE.Texture[] } };
   debugFrames(): readonly CreatureFrame[];
+  /** Where the creature's drawing stands, in metres above its feet (with a flyer's hover), for one drawn from the reviewed art; undefined for any other. */
+  figure(id: Entity): { bottom: number; top: number } | undefined;
 }
 export interface CreatureFrame {
   id: Entity; key: string; direction: SpriteDirection; state: SpriteAction; frame: number;
@@ -137,6 +139,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const flat = new THREE.Vector3(); // the camera's right, level
   const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
+  const spans = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSpan(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
   const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
@@ -207,6 +210,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   return {
     sheet: { atlas, texture: tex, reviewed: art ? { manifest: art.manifest, textures } : undefined },
     debugFrames: () => debug,
+    figure(id) {
+      const model = g.ecs.c.model.get(id);
+      if (!model?.startsWith(MODEL_PREFIX)) return undefined;
+      const [cid, variant] = model.slice(MODEL_PREFIX.length).split('#') as [string, Variant | undefined];
+      const span = spans.get(spriteKey(cid, variant));
+      const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
+      return span && { bottom: span.bottom + hover, top: span.top + hover };
+    },
     update(alpha, time, camera) {
       camera.updateMatrixWorld();
       right.setFromMatrixColumn(camera.matrixWorld, 0);

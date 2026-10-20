@@ -40,6 +40,8 @@ export interface Cast {
 }
 
 export interface Cinema {
+  /** How tall a creature is as the camera frames it: its drawing's, else its body's. */
+  heightOf(e: Entity): number;
   /** Plays a scene; resolves once it has ended or been skipped. Waits for the one playing. */
   play(scene: Scene, cast?: Cast): Promise<void>;
   skip(): void;
@@ -77,6 +79,8 @@ export interface CinemaOptions {
   enabled: () => boolean;
   /** The investigator gets up from the knee over this many seconds (0: at once); the view draws the slow rise (actorViews.ts). */
   rise?: (seconds: number) => void;
+  /** Where a creature's drawing stands above its feet (creatureViews.ts): the camera frames that, not the capsule it is struck by, which for some is a third taller than its picture and for one half as tall. */
+  figure?: (e: Entity) => { bottom: number; top: number } | undefined;
 }
 
 const [m, q, spin, eye, aim, up] = [new Matrix4(), new Quaternion(), new Quaternion(), new Vector3(), new Vector3(), new Vector3(0, 1, 0)]; // scratch, so a frame allocates nothing
@@ -101,7 +105,9 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     const [tr, body] = e === undefined ? [undefined, undefined] : [c.transform.get(e), c.body.get(e)];
     if (!tr || !body) return null;
     const lerp = (a: number, b: number): number => a + (b - a) * alpha;
-    return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y), z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height: body.height };
+    const drawn = who === 'target' ? o.figure?.(e!) : undefined;
+    const [lift, height] = drawn && drawn.top - drawn.bottom > 0.2 ? [drawn.bottom, drawn.top - drawn.bottom] : [0, body.height];
+    return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y) + lift, z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height };
   };
 
   let pulled = 1; // how much of its line to the head the lens keeps: it is pulled in at once, but lets out slowly (a pop at a wall's edge is a step in the picture)
@@ -199,6 +205,10 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       return new Promise((resolve) => (run ? waiting.push({ scene, cast, resolve }) : begin(scene, cast, resolve)));
     },
     skip,
+    heightOf(e) {
+      const drawn = o.figure?.(e);
+      return drawn && drawn.top - drawn.bottom > 0.2 ? drawn.top - drawn.bottom : g.ecs.c.body.get(e)?.height ?? 2;
+    },
     get active() {
       return !!run;
     },

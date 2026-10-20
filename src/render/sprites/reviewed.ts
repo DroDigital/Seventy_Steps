@@ -79,6 +79,14 @@ export function reviewedSize(entity: ReviewedEntity, manifest: ReviewedManifest)
   };
 }
 
+/** Where the painted figure stands, in metres above its feet: the lowest and highest painted row of the frame `reviewedSize` is scaled by (a cutscene frames this, not the capsule it is struck by). */
+export function reviewedSpan(entity: ReviewedEntity, manifest: ReviewedManifest): { bottom: number; top: number } {
+  const reference = manifest.frames[entity.directions.front.actions.idle![0]];
+  const { height, groundOffset } = reviewedSize(entity, manifest);
+  const row = (r: number): number => height * (1 - r / reference.height) - groundOffset;
+  return { bottom: Math.max(0, row(reference.bounds[3])), top: row(reference.bounds[1]) };
+}
+
 /** Assets resolve under both a hosted subdirectory and Electron's app:// package. */
 async function loadArtworkPack(base: string, expectedCount: number, made: (share: number) => void): Promise<ReviewedArt> {
   const response = await fetch(`${base}index.json`);
