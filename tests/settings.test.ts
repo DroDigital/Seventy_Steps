@@ -94,6 +94,18 @@ describe('settings', () => {
     expect(kept(2.4, 16)).toBe(2.4); // a sharper choice
     expect(kept(2, 16)).toBe(2);
     expect(kept(1.6, 17)).toBe(1.6); // chosen since: a person who wants 640 × 360 keeps it
+    // a first launch that stopped on a lowered rung (shadows off, the fog thinned) is a machine that missed the target at 640 × 360: it is not moved up
+    const tuned = (extra: object, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.6, ...extra, v })).resolution;
+    for (const v of [15, 16]) {
+      expect(tuned({ shadows: 0 }, v), `shadows off, v${v}`).toBe(1.6);
+      expect(tuned({ shadows: 0, fog: 0.75 }, v), `shadows off, thinner fog, v${v}`).toBe(1.6);
+      expect(tuned({ fog: 0.5 }, v), `fog thinned, v${v}`).toBe(1.6);
+      expect(tuned({}, v), `untouched, v${v}`).toBe(2);
+    }
+    expect(tuned({ shadows: 0, fxCap: 0.4, brightness: 1.25 }, 16)).toBe(1.6); // the rest of the profile is what it was
+    // (and a save from before the warning took the default of the day; a marked one still takes the old one, as it did)
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, shadows: 0, v: 12 })).resolution).toBe(1.6);
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, v: 12 })).resolution).toBe(2);
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), resolution: 1.6 });
     expect(loadSettings(store).resolution).toBe(1.6);

@@ -41,8 +41,10 @@ export function parseSettings(json: string | null): Settings {
   // Keep a choice made since version 13 (snapped to today's steps above); 13 and 14's higher ones were made without the warning, so they, and anything older, take the default.
   const warned = r.v === VERSION || r.v === 16 || r.v === 15;
   const prior = r.v === 13 || r.v === 14;
-  if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = SETTINGS.resolution[3];
-  if (r.v !== VERSION && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
+  // The first launch's steps down (render/autoQuality.ts) leave their mark in the fog and the shadows: a profile so marked is a machine that missed the frame target at 640 × 360, and is not moved up to 800 × 450 (a sharper choice, made without the warning, is another matter: it goes to the default).
+  const tuned = s.fog < SETTINGS.fog[3] || s.shadows < SETTINGS.shadows[3];
+  if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = tuned && s.resolution <= OLD_DEFAULT ? OLD_DEFAULT : SETTINGS.resolution[3];
+  if (r.v !== VERSION && !tuned && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
   return s;
 }
 
