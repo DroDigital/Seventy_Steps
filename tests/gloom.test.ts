@@ -89,6 +89,21 @@ describe('round 58: the dark under a roof is the lantern\'s to walk through', ()
     expect(NIGHT_DARK.openFog).toBe(1);
   });
 
+  it('the mist\'s tone is carried across a roof by a share, not a switch: a half-way roof is half-way between the open air and the room', () => {
+    expect(mistTone(1, 0)).toBe(mistTone(1)); // (the open air)
+    expect(mistTone(1, 1)).toBe(mistTone(1, true));
+    expect(mistTone(1, 0.5)).toBeCloseTo((mistTone(1, 0) + mistTone(1, 1)) / 2, 9);
+    let last = mistTone(1, 0);
+    for (let roof = 0.1; roof <= 1.0001; roof += 0.1) {
+      const tone = mistTone(1, roof);
+      expect(tone).toBeLessThan(last); // darker by degrees at every step into the room, in no single jump
+      expect(last - tone).toBeLessThan((1 - NIGHT_DARK.fog) / 5);
+      last = tone;
+    }
+    expect(mistTone(1, -2)).toBe(1);
+    expect(mistTone(1, 9)).toBeCloseTo(NIGHT_DARK.fog, 9);
+  });
+
   it('the lantern lights a pool, not a corridor: a tighter range and a lower flame than before, but a pool all the same', () => {
     expect(LANTERN.range).toBeLessThanOrEqual(9);
     expect(LANTERN.range).toBeGreaterThanOrEqual(7);

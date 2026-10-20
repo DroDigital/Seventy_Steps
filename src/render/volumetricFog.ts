@@ -52,6 +52,7 @@ export function easeFog(from: FogDef, to: FogDef, k: number): FogDef {
 export function createVolumetricFog(post: PostPass): VolumetricFog {
   let now: FogDef | null = null;
   let ground = 0;
+  let roof = 0; // how far under a roof the mist is (0 in the open air, 1 enclosed): eased like the mist itself, so its tone crosses a threshold as its density does
   let last = -1;
   let [dx, dz] = [0, 0]; // how far the wind has carried the mist
   return {
@@ -62,6 +63,7 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, time - last));
       last = time;
       const want = fogOf(f.region, f.enclosed);
+      roof = now ? mix(roof, f.enclosed ? 1 : 0, Math.min(1, dt * FOG.ease)) : f.enclosed ? 1 : 0;
       now = now ? easeFog(now, want, Math.min(1, dt * FOG.ease)) : want; // the first frame takes the place's own at once
       ground = dt === 0 ? f.ground : mix(ground, f.ground, Math.min(1, dt * 2));
       [dx, dz] = [dx + now.wind[0] * dt, dz + now.wind[1] * dt];
@@ -74,14 +76,14 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       u.uFog.value.set(now.density * thick, now.height, ground - 0.3, now.patchy);
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
       u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, 0);
-      u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0, f.enclosed)); // (round 58: under a roof the mist is no longer the realm's own at every hour; in the open air it is, as before)
+      u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0, roof)); // (round 58: under a roof the mist is no longer the realm's own at every hour; in the open air it is, as before)
       u.uFogDrift.value.set(dx, dz, time);
     },
   };
 }
 
-/** The share of the mist's own light that survives a night laid `dark` deep (0: all of it): down to NIGHT_DARK.fog of it in the deepest, under a roof, and NIGHT_DARK.openFog (all of it) in the open air. */
-export const mistTone = (dark: number, enclosed = false): number => 1 - Math.min(1, Math.max(0, dark)) * (1 - (enclosed ? NIGHT_DARK.fog : NIGHT_DARK.openFog));
+/** The share of the mist's own light that survives a night laid `dark` deep (0: all of it): down to NIGHT_DARK.fog of it in the deepest, under a roof, and NIGHT_DARK.openFog (all of it) in the open air; `roof`, how far under a roof the mist is (a share, eased as the mist is, so a threshold is crossed over a moment, not a frame). */
+export const mistTone = (dark: number, roof: number | boolean = 0): number => 1 - Math.min(1, Math.max(0, dark)) * (1 - mix(NIGHT_DARK.openFog, NIGHT_DARK.fog, Math.min(1, Math.max(0, Number(roof)))));
 
 /** How thick the mist is about the investigator now (the density at the ground, as drawn: round 35, for what looks out of it). */
 export const MIST = { thickness: 0 };
