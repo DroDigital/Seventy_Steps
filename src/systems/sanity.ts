@@ -195,7 +195,7 @@ export function registerSanity(g: Game): void {
     const dread = g.ecs.c.dread.get(attacker);
     const blow = dread?.blow ?? 0;
     if (target === g.player.id && damage > 0 && !lingering && blow > 0 && g.player.steady <= 0) {
-      loseSanity(g, tollOnce(g.mind.struck, g.frame, blow, SANITY.volley) * blowWeight(dread!.tier));
+      loseSanity(g, tollOnce(g.mind.struck, g.frame, blow * blowWeight(dread!.tier), SANITY.volley));
     }
     const me = g.player.id;
     const other = attacker === me ? target : target === me ? attacker : null; // a real blow between the investigator and a real foe (a hallucination's, a pool's and a swing at the air are none) is a fight
