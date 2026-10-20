@@ -60,6 +60,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
   let idleIn = 8;
   let galloping = false;
   let idleLast: Idle | null = null;
+  let tossed = false; // the head went up after the last noise: the harness has spoken, and the next is not a shake
   let pawClock: number | null = null;
   const seen = { struck: 0, halts: 0 }; // the driver's slaps and hard pulls already heard (systems/mountReins.ts)
   const later: { in: number; play: () => void }[] = []; // a horse answers a moment after the hand
@@ -77,6 +78,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     seen.struck = g.player.mount.reins.struck;
     seen.halts = g.player.mount.reins.halts;
     later.length = 0;
+    tossed = false;
     pawClock = null;
     bed?.set(SILENT_BED);
   };
@@ -105,7 +107,8 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
   };
   /** One small noise of a horse standing at its harness, never the same twice running. */
   const idle = (id: MountId): void => {
-    const pool = id === 'grey' ? IDLE_NOISES.filter(([name]) => name !== idleLast) : ([['shake', 1]] as const);
+    const pool = id === 'grey' ? IDLE_NOISES.filter(([name]) => name !== idleLast && !(tossed && name === 'shake')) : ([['shake', 1]] as const);
+    tossed = false;
     let roll = Math.random() * pool.reduce((sum, [, weight]) => sum + weight, 0);
     const [name] = pool.find(([, weight]) => (roll -= weight) < 0) ?? pool[0];
     idleLast = name;
@@ -118,7 +121,7 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     else if (name === 'flutter') recipe(key, LIP_FLUTTER, { ...o, gain: MOUNT_MIX.flutter, pitch: around(0.2, 1) });
     else recipe(key, SNORT, { ...o, gain: MOUNT_MIX.snort * 0.6, pitch: around(0.16, 0.92 + 0.08) });
     if (id === 'grey' && (name === 'blow' || name === 'snort') && Math.random() < (name === 'snort' ? 0.4 : 0.25)) { // a breath out, and the head goes up: the harness answers it
-      idleLast = 'shake'; // (the next noise is not another shake)
+      tossed = true;
       later.push({ in: between([0.28, 0.45]), play: () => recipe('mount:grey:toss', HARNESS_SHAKE, { gain: MOUNT_MIX.shake, pitch: around(0.2, 1), vary: 0.5, pan: spread(0.3) }) });
     }
   };

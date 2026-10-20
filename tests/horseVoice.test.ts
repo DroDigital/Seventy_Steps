@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import { PLANNED } from '../src/data/plannedSounds';
 import { RECORDED_FOR, SAMPLE_SETS } from '../src/data/samples';
@@ -80,22 +80,29 @@ describe('a called horse arrives (round 59)', () => {
 });
 
 describe('a horse standing at its harness (round 59)', () => {
-  it('sometimes raises its head after a breath out, and the harness answers a moment later; never a shake straight after a shake', () => {
-    const r = ride('grey');
-    r.heard.length = 0;
-    r.advance(60 * 60 * 20, 0); // twenty minutes
-    const noises = r.heard.filter((h) => /:(blow|whicker|shake|swish|flutter|snort|toss)$/.test(h.key));
-    const tosses = noises.filter((h) => h.key === 'mount:grey:toss');
-    expect(tosses.length).toBeGreaterThan(4);
-    expect(tosses.length).toBeLessThan(noises.length / 3);
-    noises.forEach((h, i) => {
-      if (h.key !== 'mount:grey:toss') return;
-      expect(noises[i - 1].key, `before the toss at ${h.at.toFixed(1)} s`).toMatch(/:(blow|snort)$/);
-      expect(h.at - noises[i - 1].at).toBeGreaterThan(0.25);
-      expect(h.at - noises[i - 1].at).toBeLessThan(0.55);
-      if (noises[i + 1]) expect(noises[i + 1].key).not.toBe('mount:grey:shake');
-    });
-    for (let i = 1; i < noises.length; i++) if (noises[i].key === 'mount:grey:shake') expect(noises[i - 1].key).not.toBe('mount:grey:toss');
+  it('sometimes raises its head after a breath out, and the harness answers a moment later; never a shake straight after a shake, nor the same noise twice running', () => {
+    let tosses = 0, all = 0;
+    for (const seed of [11, 12, 13, 14, 15, 16]) { // (the order of its noises is a matter of chance: six rounds of it, each the same every run)
+      const random = vi.spyOn(Math, 'random').mockImplementation(((state) => () => { state = (state * 1664525 + 1013904223) >>> 0; return state / 4294967296; })(seed));
+      const r = ride('grey');
+      r.heard.length = 0;
+      r.advance(60 * 60 * 20, 0); // twenty minutes
+      random.mockRestore();
+      const noises = r.heard.filter((h) => /:(blow|whicker|shake|swish|flutter|snort|toss)$/.test(h.key));
+      all += noises.length;
+      noises.forEach((h, i) => {
+        if (h.key !== 'mount:grey:toss') return;
+        tosses++;
+        expect(noises[i - 1].key, `before the toss at ${h.at.toFixed(1)} s (seed ${seed})`).toMatch(/:(blow|snort)$/);
+        expect(h.at - noises[i - 1].at).toBeGreaterThan(0.25);
+        expect(h.at - noises[i - 1].at).toBeLessThan(0.55);
+        if (noises[i + 1]) expect(noises[i + 1].key, `after the toss at ${h.at.toFixed(1)} s (seed ${seed})`).not.toBe('mount:grey:shake');
+      });
+      const rounds = noises.filter((h) => h.key !== 'mount:grey:toss'); // the round of noises, with the tosses that answer some of them left out of it
+      for (let i = 1; i < rounds.length; i++) expect(rounds[i].key, `at ${rounds[i].at.toFixed(1)} s (seed ${seed})`).not.toBe(rounds[i - 1].key); // (a toss between two is not a reason to repeat)
+    }
+    expect(tosses).toBeGreaterThan(20);
+    expect(tosses).toBeLessThan(all / 3);
   });
 
   it('a horse that is called, ridden, slapped and hauled up plays every recipe that a recording stands in front of, and each recording has its recipe to fall back on', () => {
