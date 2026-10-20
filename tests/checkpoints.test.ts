@@ -78,6 +78,20 @@ describe('Elder Signs', () => {
     expect(regions.map((r) => r.region)).toEqual(['rlyeh']);
   });
 
+  it('a sign walked up to is a journey\'s end at once, never rested at (round 60: asked, "instead of having to rest on it first")', () => {
+    const g = createWorldGame();
+    const s = signPlace('hub_dream')!;
+    expect(g.overworld!.sign).not.toBe('hub_dream');
+    goTo(g, s.x + WORLD.discover - 1.5, s.z);
+    run(g, 2);
+    expect(g.overworld!.discovered.has('hub_dream')).toBe(true);
+    expect(g.overworld!.sign).not.toBe('hub_dream'); // found, not rested at
+    goTo(g, s.x + 150, s.z + 80);
+    run(g, 2);
+    expect(travel(g, 'hub_dream')).toBe(true);
+    expect(pos(g)).toMatchObject({ x: s.rest.x, z: s.rest.z });
+  });
+
   it("the Sleeper's Sign descends into the Dreamlands: seventy steps down, the Cavern of Flame", () => {
     const g = createWorldGame();
     rest(g, START_SIGN);

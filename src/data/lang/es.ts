@@ -201,7 +201,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hud.unmade': "DESHECHO",
   'hud.sanityLoss': "−{n} CORDURA",
   'hud.insightGain': "{sign}{n} DISCERNIMIENTO",
-  'hud.signFound': "SIGNO ARCANO ENCONTRADO · {name}",
+  'hud.signFound': "SIGNO ARCANO ENCONTRADO · {name} · VIAJA AQUÍ DESDE EL MAPA ({map})",
   'hud.places': "{found} DE {of} LUGARES · {region}",
   'hud.questDone': "HECHO · {title}",
   'hud.questNew': "DIARIO · {title}",

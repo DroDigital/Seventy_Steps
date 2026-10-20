@@ -213,7 +213,7 @@ export const EN = {
   'hud.unmade': 'UNMADE',
   'hud.sanityLoss': '−{n} SANITY',
   'hud.insightGain': '{sign}{n} INSIGHT',
-  'hud.signFound': 'ELDER SIGN FOUND · {name}',
+  'hud.signFound': 'ELDER SIGN FOUND · {name} · TRAVEL HERE FROM THE MAP ({map})', // found is enough: no rest is needed to journey to it (round 60)
   'hud.places': '{found} OF {of} PLACES · {region}',
   'hud.questDone': 'DONE · {title}',
   'hud.questNew': 'JOURNAL · {title}',
