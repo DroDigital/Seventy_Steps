@@ -5,12 +5,13 @@
  * from the cylinder (gun.ts), strike hard up close, and fall away with distance: the bullet may stray
  * in a cone that widens with the range to what it is aimed at, so a small or far foe is more often missed
  * (the smaller the body, the narrower the mark), and what does hit it hits for less. A shot that keeps
- * under half its damage no longer interrupts.
+ * under half its damage no longer interrupts. A boss takes a share of a shot, is not interrupted again
+ * at once, and no shot ripostes (round 60: a carry of rounds alone felled the human-sized horrors).
  */
 
 import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
-import { COMBAT } from '../data/tuning';
+import { BOSS, COMBAT } from '../data/tuning';
 import { raycast } from '../world/colliders';
 import { moveDef } from './actions';
 import { capsuleGap2, strike, targetsOf } from './combat';
@@ -83,8 +84,9 @@ export function shotSystem(g: Game): void {
     g.events.emit('Shot', { shooter: id, from, to: end, target });
     if (target === null) continue;
     const [d, level] = [along * shot.range, mine ? g.player.gun : 0];
-    const damage = mine ? shotDamage(shot.damage, d, level) : shot.damage;
+    const share = mine && g.ecs.c.fight.has(target) ? BOSS.shot : 1; // a horror takes a share of it (round 60)
+    const damage = (mine ? shotDamage(shot.damage, d, level) : shot.damage) * share;
     const kept = mine ? falloff(d, level) : 1;
-    strike(g, id, target, { damage, poise: shot.poise * kept, guard: damage, hitstop: shot.hitstop, parryable: false, interrupts: kept >= INTERRUPTS });
+    strike(g, id, target, { damage, poise: shot.poise * kept * share, guard: damage, hitstop: shot.hitstop, parryable: false, interrupts: kept >= INTERRUPTS, ranged: true });
   }
 }

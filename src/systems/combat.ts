@@ -36,6 +36,7 @@ export interface Blow {
   unblockable?: boolean; // a grab, or a pool: no guard stops it
   lingering?: boolean; // a pool's or the void's tick: it hurts, but it is no blow on the mind
   critical?: boolean; // struck into an unguarded back: it lands as a riposte does (round 12)
+  ranged?: boolean; // a shot: it never ripostes, the opening a parry or a shot makes is the hand's to take (round 60)
 }
 
 export interface Defender {
@@ -66,7 +67,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
     // Only the funded share is absorbed: a nearly empty bar cannot erase a whole boss blow.
     damage *= cost > 0 ? Math.max(0, 1 - available / cost) : 1;
   }
-  const riposte = d.actor.move === 'parried' || !!blow.critical;
+  const riposte = (d.actor.move === 'parried' && !blow.ranged) || !!blow.critical;
   damage *= riposte ? d.riposte ?? COMBAT.riposte : 1;
   d.health.hp = Math.max(d.health.immortal ? 1 : d.health.floor ?? 0, d.health.hp - damage);
   d.health.calm = 0;
@@ -156,7 +157,10 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const felt = g.ecs.c.phantom.has(attacker)
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
     : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
+  const fight = g.ecs.c.fight.get(target);
+  if (fight && g.frame - (fight.interruptedAt ?? -Infinity) < BOSS.rearm) felt.interrupts = false; // a horror's wind-up broken is not broken again at once
   const { outcome, damage } = resolveHit(defender, felt, frontal);
+  if (outcome === 'interrupted' && fight) fight.interruptedAt = g.frame;
   if (outcome === 'parried' && aa) startMove(aa, 'parried');
   if (outcome !== 'dodged' && blow.hitstop > 0) {
     const stop = blow.hitstop + (attacker === g.player.id && (outcome === 'kill' || outcome === 'riposte') ? IMPACT.finisher : 0); // the moment a finishing blow lands hangs (round 20)

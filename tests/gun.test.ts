@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PLAYER_MOVES } from '../src/data/moves';
-import { GUN, PLAYER } from '../src/data/tuning';
+import { BOSS, GUN, PLAYER } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { rest, signPlace } from '../src/systems/checkpoints';
 import type { GameEvents } from '../src/systems/components';
@@ -41,7 +41,7 @@ describe('a shot falls away with distance (round 22: it was seven damage from tw
     steps(g, 1, press('shoot'));
     steps(g, PLAYER_MOVES.shoot.frames);
     expect(hits).toHaveLength(1);
-    expect(hits[0].damage).toBe(SHOT.damage); // whole: two metres to it, not eight
+    expect(hits[0].damage).toBe(Math.round(SHOT.damage * BOSS.shot)); // whole (of what a horror takes of a shot, round 60): two metres to it, not eight
     const [s] = shots;
     expect(Math.hypot(s.to.x - s.from.x, s.to.z - s.from.z)).toBeLessThan(GUN.reach.near + 1); // and the bullet ends on its side
   });

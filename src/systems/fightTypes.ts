@@ -29,6 +29,7 @@ export interface Fight {
   sig: Record<string, number>; // its signature mechanic's counters
   form: string; // the model its brain was built for: a variant swap rebuilds it
   stoopUntil: number; // a colossus is stooped, its head within reach, until this frame (hurt.ts; round 24)
+  interruptedAt?: number; // the frame a shot last broke its wind-up (round 60: BOSS.rearm)
 }
 
 /** What a boss's arena change puts up (spec §3E): its colliders stand in the world while it does. */
