@@ -60,7 +60,7 @@ describe('round 58: the dark under a roof is the lantern\'s to walk through', ()
     expect(darkShare(0.5)).toBeGreaterThan(darkShare(0.2));
     expect(darkShare(2)).toBe(darkShare(1));
     expect(moonShare(0)).toBe(DUNGEON_LIGHT.moon);
-    expect(moonShare(1)).toBe(DUNGEON_LIGHT.moonDeep);
+    expect(moonShare(1)).toBeCloseTo(DUNGEON_LIGHT.moonDeep, 9);
     expect(moonShare(0.7)).toBeLessThan(moonShare(0.3));
     expect(DUNGEON_LIGHT.deep).toBeGreaterThan(DUNGEON_LIGHT.dark * 2); // the old room took 0.35 of the dark; the darkest take all of it
   });
@@ -74,17 +74,19 @@ describe('round 58: the dark under a roof is the lantern\'s to walk through', ()
     expect(adapted(0, 0)).toBe(0);
   });
 
-  it('the night keeps floors that leave only the lantern, the lamps and the moon\'s shapes, and the mist has no light of its own by night but its share', () => {
+  it('the night keeps floors that leave only the lantern, the lamps and the moon\'s shapes; under a roof the mist has only its share of light, and in the open air it keeps all of it, as it did', () => {
     expect(NIGHT_DARK.ambient).toBeLessThanOrEqual(0.12);
     expect(NIGHT_DARK.mist).toBeLessThanOrEqual(0.15);
     expect(NIGHT_DARK.sky).toBeLessThanOrEqual(0.2);
-    expect(NIGHT_DARK.moon).toBeLessThanOrEqual(0.15);
-    expect(mistTone(0)).toBe(1);
-    expect(mistTone(1)).toBeCloseTo(NIGHT_DARK.fog, 9);
-    expect(mistTone(0.5)).toBeGreaterThan(mistTone(0.9));
-    expect(mistTone(-3)).toBe(1);
-    expect(mistTone(7)).toBeCloseTo(NIGHT_DARK.fog, 9);
-    expect(NIGHT_DARK.fog).toBeGreaterThan(0.05); // never black: the horizon is a faint line to walk toward
+    expect(NIGHT_DARK.moon).toBeGreaterThanOrEqual(0.28); // the moon's own light on the open land is as it was: its slopes and shadows are what the night is
+    expect(mistTone(0, true)).toBe(1);
+    expect(mistTone(1, true)).toBeCloseTo(NIGHT_DARK.fog, 9);
+    expect(mistTone(0.5, true)).toBeGreaterThan(mistTone(0.9, true));
+    expect(mistTone(-3, true)).toBe(1);
+    expect(mistTone(7, true)).toBeCloseTo(NIGHT_DARK.fog, 9);
+    expect(NIGHT_DARK.fog).toBeGreaterThan(0.05); // never black
+    for (const dark of [0, 0.3, 0.7, 1]) expect(mistTone(dark), `dark ${dark}`).toBe(1); // the open air: the glow of the mist on the heath, as it was
+    expect(NIGHT_DARK.openFog).toBe(1);
   });
 
   it('the lantern lights a pool, not a corridor: a tighter range and a lower flame than before, but a pool all the same', () => {

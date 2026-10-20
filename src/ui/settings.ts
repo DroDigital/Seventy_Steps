@@ -12,8 +12,9 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). */
-const VERSION = 16;
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). */
+const VERSION = 17;
+const OLD_DEFAULT = 1.6; // 640 × 360
 
 export function defaultSettings(): Settings {
   return Object.fromEntries(SETTING_IDS.map((id) => [id, SETTINGS[id][3]])) as Settings;
@@ -38,9 +39,10 @@ export function parseSettings(json: string | null): Settings {
   const r = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
   const s = Object.fromEntries(SETTING_IDS.map((id) => [id, clampSetting(id, r[id])])) as Settings;
   // Keep a choice made since version 13 (snapped to today's steps above); 13 and 14's higher ones were made without the warning, so they, and anything older, take the default.
-  const warned = r.v === VERSION || r.v === 15;
+  const warned = r.v === VERSION || r.v === 16 || r.v === 15;
   const prior = r.v === 13 || r.v === 14;
   if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = SETTINGS.resolution[3];
+  if (r.v !== VERSION && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
   return s;
 }
 

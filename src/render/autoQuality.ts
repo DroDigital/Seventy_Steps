@@ -15,9 +15,10 @@ export interface Rung {
 
 /** From the default picture to the plainest it can draw; sharper resolutions remain a player's choice. */
 export const LADDER: readonly Rung[] = [
-  { resolution: 1.6, fog: 1, shadows: 1 },
-  { resolution: 1.6, fog: 1, shadows: 0 },
-  { resolution: 1.6, fog: 0.75, shadows: 0 },
+  { resolution: 2, fog: 1, shadows: 1 },
+  { resolution: 2, fog: 1, shadows: 0 },
+  { resolution: 2, fog: 0.75, shadows: 0 },
+  { resolution: 1.6, fog: 0.5, shadows: 0 },
   { resolution: 1.2, fog: 0.5, shadows: 0 },
   { resolution: 0.8, fog: 0.25, shadows: 0 },
   { resolution: 0.8, fog: 0, shadows: 0 },

@@ -22,7 +22,7 @@ export interface FogFrame {
   stress: number; // 0–1: the sanity effects' stress (capped by the FX setting)
   setting: number; // the Fog setting, 0–1
   wood?: number; // 0–1: how wooded the land underfoot is (world/planFill.ts `strewn`): the mist gathers among the trees (round 35)
-  dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): the mist has no light of its own to speak of in the deep of it (round 58)
+  dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
 
 export interface VolumetricFog {
@@ -74,14 +74,14 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       u.uFog.value.set(now.density * thick, now.height, ground - 0.3, now.patchy);
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
       u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, 0);
-      u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0)); // (round 58: it was the realm's own mist at every hour, and the night's picture was mostly this: a bank of it lit from nowhere)
+      u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0, f.enclosed)); // (round 58: under a roof the mist is no longer the realm's own at every hour; in the open air it is, as before)
       u.uFogDrift.value.set(dx, dz, time);
     },
   };
 }
 
-/** The share of the mist's own light that survives a night laid `dark` deep (0: all of it): down to NIGHT_DARK.fog of it in the deepest. */
-export const mistTone = (dark: number): number => 1 - Math.min(1, Math.max(0, dark)) * (1 - NIGHT_DARK.fog);
+/** The share of the mist's own light that survives a night laid `dark` deep (0: all of it): down to NIGHT_DARK.fog of it in the deepest, under a roof, and NIGHT_DARK.openFog (all of it) in the open air. */
+export const mistTone = (dark: number, enclosed = false): number => 1 - Math.min(1, Math.max(0, dark)) * (1 - (enclosed ? NIGHT_DARK.fog : NIGHT_DARK.openFog));
 
 /** How thick the mist is about the investigator now (the density at the ground, as drawn: round 35, for what looks out of it). */
 export const MIST = { thickness: 0 };
