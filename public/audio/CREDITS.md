@@ -20,11 +20,15 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `amb/frogs.mp3` | [G12-20-Frogs Croaking.wav](https://freesound.org/people/craigsmith/sounds/437952/) | craigsmith | CC0 | 64–100 s; high-pass 90 Hz; looped (a 2 s crossfade) |
 | `amb/leaves.mp3` | [Wind Through Leaves](https://freesound.org/people/craigsmith/sounds/817192/) | craigsmith | CC0 | 5–37 s; looped (a 2 s crossfade) |
 | `amb/murmur.mp3` | [S41-06 Filtered auditorium crowd atmosphere; strange; wind-like.wav](https://freesound.org/people/craigsmith/sounds/675048/) | craigsmith | CC0 | 3–35 s; tape speed ×0.9; low-pass 4000 Hz; looped (a 2 s crossfade) |
+| `amb/rain_heavy.mp3` | [Rain heavy 2 (rural)](https://freesound.org/people/jmbphilmes/sounds/200272/) | jmbphilmes | CC0 | 4–36 s; high-pass 70 Hz; looped (a 2 s crossfade) (round 59) |
+| `amb/rain_light.mp3` | [Rain light 2 (rural)](https://freesound.org/people/jmbphilmes/sounds/200273/) | jmbphilmes | CC0 | 6–38 s; high-pass 90 Hz; looped (a 2 s crossfade) (round 59) |
 | `amb/surf.mp3` | [S35-25 Surf; medium distance; loopable.wav](https://freesound.org/people/craigsmith/sounds/675578/) | craigsmith | CC0 | 0.2–41.5 s; looped (a 3 s crossfade) |
 | `amb/waves.mp3` | [R25-03-Four Big Ocean Waves.wav](https://freesound.org/people/craigsmith/sounds/480848/) | craigsmith | CC0 | 13.3–43.5 s; tape speed ×0.85; looped (a 3 s crossfade) |
 | `amb/wind.mp3` | [Four Seasons Wind](https://freesound.org/people/craigsmith/sounds/817191/) | craigsmith | CC0 | 4–36 s; looped (a 2 s crossfade) |
 | `amb/wind_cold.mp3` | [R27-28-Big Cold Winter Wind.wav](https://freesound.org/people/craigsmith/sounds/481148/) | craigsmith | CC0 | 6–40 s; looped (a 2 s crossfade) |
 | `amb/wind_ghost.mp3` | [S41-21 Spooky singing ghost wind.wav](https://freesound.org/people/craigsmith/sounds/675716/) | craigsmith | CC0 | 0.4–15.1 s; looped (a 1.5 s crossfade) |
+| `sfx/anvil1.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 0.55–2.2 s; Round 40 |
+| `sfx/anvil2.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 5.9–7.4 s; Round 40 |
 | `sfx/bat1.mp3` | [Screech](https://freesound.org/people/Phorgador/sounds/788212/) | Phorgador | CC0 | 0.06–1.21 s; tape speed ×0.7 (round 20) |
 | `sfx/bat2.mp3` | [bat-like monster sonar click.wav](https://freesound.org/people/vestibule-door/sounds/669717/) | vestibule-door | CC0 | 3.06–4.21 s; tape speed ×0.7 (round 20) |
 | `sfx/bat3.mp3` | [Bat Screech](https://freesound.org/people/Yoyodaman234/sounds/667579/) | Yoyodaman234 | CC0 | 0–1.8 s; tape speed ×0.7 (round 20) |
@@ -67,6 +71,9 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/click1.mp3` | [singleCicada.wav](https://freesound.org/people/gabytoledosci/sounds/401977/) | gabytoledosci | CC0 | 0.92–1.64 s; tape speed ×0.8 (round 20) |
 | `sfx/click2.mp3` | [singleCicada.wav](https://freesound.org/people/gabytoledosci/sounds/401977/) | gabytoledosci | CC0 | 3.02–3.92 s; tape speed ×0.8 (round 20) |
 | `sfx/click3.mp3` | [Click Beetle](https://freesound.org/people/BugginOut.wav/sounds/831713/) | BugginOut.wav | CC0 | 0.12–1.72 s; tape speed ×0.8 (round 20) |
+| `sfx/coins1.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 0.5–1.4 s; Round 40 |
+| `sfx/coins2.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 2.7–3.4 s; Round 40 |
+| `sfx/coins3.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 4.2–4.96 s; Round 40 |
 | `sfx/cork.mp3` | [R30-41-Pull Corks Out of Bottle.wav](https://freesound.org/people/craigsmith/sounds/481940/) | craigsmith | CC0 | 3.51–3.9 s |
 | `sfx/croak1.mp3` | [Common toad (Bufo bufo)](https://freesound.org/people/Breviceps/sounds/462863/) | Breviceps | CC0 | 1.63–1.96 s; tape speed ×0.62 |
 | `sfx/croak2.mp3` | [Common toad (Bufo bufo)](https://freesound.org/people/Breviceps/sounds/462863/) | Breviceps | CC0 | 3.74–4.07 s; tape speed ×0.62 |
@@ -90,11 +97,39 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/dieMid3.mp3` | [monster_dying.wav](https://freesound.org/people/vox_artist/sounds/513621/) | vox_artist | CC0 | 0–1.55 s; tape speed ×0.9 (round 20) |
 | `sfx/dieMid4.mp3` | [dying monster.wav](https://freesound.org/people/rezidentevil/sounds/396046/) | rezidentevil | CC0 | 0.02–2.42 s; tape speed ×0.9 (round 20) |
 | `sfx/dieSlime1.mp3` | [Slime Death](https://freesound.org/people/qubodup/sounds/751340/) | qubodup | CC0 | 0–0.29 s; tape speed ×0.8 (round 20) |
+| `sfx/door_cloth1.mp3` | [Curtains Opening or Closing 3 Short.wav](https://freesound.org/people/RutgerMuller/sounds/51139/) | RutgerMuller | CC0 | 0–0.9 s; Round 40 |
+| `sfx/door_cloth2.mp3` | [Pulling down drapes](https://freesound.org/people/cribbler/sounds/369195/) | cribbler | CC0 | 3.12–3.75 s; Round 40 |
+| `sfx/door_cloth3.mp3` | [showercurtain.wav](https://freesound.org/people/j1987/sounds/106132/) | j1987 | CC0 | 0–0.7 s; Round 40 |
+| `sfx/door_flesh_close1.mp3` | [Meat Slap 2](https://freesound.org/people/magnuswaker/sounds/540076/) | magnuswaker | CC0 | 0–0.7 s; Round 40 |
+| `sfx/door_flesh_close2.mp3` | [Wet Impact (2)](https://freesound.org/people/Kastenfrosch/sounds/521958/) | Kastenfrosch | CC0 | 0.01–1.27 s; Round 40 |
+| `sfx/door_flesh_close3.mp3` | [Gore Impact - "LOT OF HEART"](https://freesound.org/people/magnuswaker/sounds/641046/) | magnuswaker | CC0 | 0–1.01 s; Round 40 |
+| `sfx/door_flesh_open1.mp3` | [squelching.mp3](https://freesound.org/people/tiddles451/sounds/547446/) | tiddles451 | CC0 | 2.91–4.0 s; Round 40 |
+| `sfx/door_flesh_open2.mp3` | [Gelatinous Cube Approach](https://freesound.org/people/e_r_r_1012/sounds/837146/) | e_r_r_1012 | CC0 | 4.05–5.5 s; Round 40 |
+| `sfx/door_iron_close1.mp3` | [Open and Close an iron gate](https://freesound.org/people/launemax/sounds/274767/) | launemax | CC0 | 9.3–10.5 s; Round 40 |
+| `sfx/door_iron_close2.mp3` | [Open and Close an iron gate](https://freesound.org/people/launemax/sounds/274767/) | launemax | CC0 | 3.3–4.45 s; Round 40 |
+| `sfx/door_iron_close3.mp3` | [metal gate - rattle handle, swing, clang.wav](https://freesound.org/people/Widds/sounds/330522/) | Widds | CC0 | 11.5–12.7 s; Round 40 |
+| `sfx/door_iron_open1.mp3` | [Squeaky Metal Fence .wav](https://freesound.org/people/Shamewap/sounds/389691/) | Shamewap | CC0 | 1.9–2.55 s; Round 40 |
+| `sfx/door_iron_open2.mp3` | [Squeaky Metal Door](https://freesound.org/people/Breviceps/sounds/515289/) | Breviceps | CC0 | 2.27–3.38 s; Round 40 |
+| `sfx/door_iron_open3.mp3` | [gate.ogg](https://freesound.org/people/saha213131/sounds/691474/) | saha213131 | CC0 | 0.07–1.2 s; Round 40 |
+| `sfx/door_oak_close1.mp3` | [Door close](https://freesound.org/people/KINIT%C3%98.dev/sounds/868091/) | KINIT%C3%98.dev | CC0 | 0.05–0.52 s; Round 40 |
+| `sfx/door_oak_close2.mp3` | [Door Close Heavy Wooden Slow Quiet Seal Theatre](https://freesound.org/people/LampEight/sounds/402466/) | LampEight | CC0 | 0–1.71 s; Round 40 |
+| `sfx/door_oak_close3.mp3` | [Gate Latch](https://freesound.org/people/mhtaylor67/sounds/126041/) | mhtaylor67 | CC0 | 0.4–1.35 s; Round 40 |
+| `sfx/door_oak_open1.mp3` | [Creaking Door #2](https://freesound.org/people/True_Killian/sounds/845753/) | True_Killian | CC0 | 0.01–1.2 s; Round 40 |
+| `sfx/door_oak_open2.mp3` | [Wooden_Door_Squeak_04](https://freesound.org/people/BlondPanda/sounds/778462/) | BlondPanda | CC0 | 0.04–0.78 s; Round 40 |
+| `sfx/door_oak_open3.mp3` | [Heavy Door Squeaking.wav](https://freesound.org/people/not_yr/sounds/656529/) | not_yr | CC0 | 0.27–1.3 s; Round 40 |
+| `sfx/door_stone_close1.mp3` | [big stone door suddenly slamming shut](https://freesound.org/people/PaceHeart/sounds/465807/) | PaceHeart | CC0 | 0–0.79 s; Round 40 |
+| `sfx/door_stone_close2.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 11.3–12.92 s; Round 40 |
+| `sfx/door_stone_open1.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 5.05–6.65 s; Round 40 |
+| `sfx/door_stone_open2.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 9.0–10.6 s; Round 40 |
+| `sfx/door_stone_open3.mp3` | [Heavy stone door opens 2](https://freesound.org/people/PostProdDog/sounds/578491/) | PostProdDog | CC0 | 0.2–1.9 s; Round 40 |
 | `sfx/dragon1.mp3` | [Dragon Roar](https://freesound.org/people/tambascot/sounds/203105/) | tambascot | CC0 | 0.18–2.58 s; tape speed ×0.85 (round 20) |
 | `sfx/dragon2.mp3` | [Dragon Roar](https://freesound.org/people/qubodup/sounds/442964/) | qubodup | CC0 | 0–2.4 s; tape speed ×0.85 (round 20) |
 | `sfx/dragon3.mp3` | [DRAGON_ROAR.wav](https://freesound.org/people/JoelAudio/sounds/85568/) | JoelAudio | CC0 | 0–2.4 s; tape speed ×0.85 (round 20) |
 | `sfx/dragon4.mp3` | [Dino Hiss Dragon Roar](https://freesound.org/people/999999990/sounds/320345/) | 999999990 | CC0 | 2.88–5.28 s; tape speed ×0.85 (round 20) |
 | `sfx/dying.mp3` | [R15-29-Man Grunting in Pain.wav](https://freesound.org/people/craigsmith/sounds/483253/) | craigsmith | CC0 | 13.42–14.35 s; tape speed ×0.8 |
+| `sfx/flask_burst1.mp3` | [Molotovin_koktaili.mp3](https://freesound.org/people/ertzsi/sounds/622890/) | ertzsi | CC0 | 0.05–1.65 s; Round 40 |
+| `sfx/flask_burst2.mp3` | [R29-26-Molotov Cocktails through Windows and Explode.wav](https://freesound.org/people/craigsmith/sounds/483288/) | craigsmith | CC0 | 0–1.6 s; Round 40 |
+| `sfx/flask_burst3.mp3` | [Glass Bottle Shatter](https://freesound.org/people/decadylan/sounds/825803/) | decadylan | CC0 | 0–1.3 s; Round 40 |
 | `sfx/flesh1.mp3` | [Blunt Force Trauma (Clean and Juicy)](https://freesound.org/people/TheFilmLook/sounds/365574/) | TheFilmLook | CC0 | 0.86–1.3 s; low-pass 6000 Hz (round 20) |
 | `sfx/flesh2.mp3` | [Blunt Force Trauma (Clean and Juicy)](https://freesound.org/people/TheFilmLook/sounds/365574/) | TheFilmLook | CC0 | 3.64–4.08 s; low-pass 6000 Hz (round 20) |
 | `sfx/flesh3.mp3` | [Blunt Force Trauma (Clean and Juicy)](https://freesound.org/people/TheFilmLook/sounds/365574/) | TheFilmLook | CC0 | 4.35–4.79 s; low-pass 6000 Hz (round 20) |
@@ -139,16 +174,31 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/hurtMan1.mp3` | [Male Grunts](https://freesound.org/people/Kodack/sounds/256603/) | Kodack | CC0 | 0.28–0.88 s; tape speed ×0.9 (round 20) |
 | `sfx/hurtMan2.mp3` | [Voice_AdultMale_PainGrunts_09.wav](https://freesound.org/people/MrFossy/sounds/547209/) | MrFossy | CC0 | 0–0.319637 s; tape speed ×0.9 (round 20) |
 | `sfx/hurtMan3.mp3` | [Male Grunting In Pain](https://freesound.org/people/elynch0901/sounds/464486/) | elynch0901 | CC0 | 0–0.574195 s; tape speed ×0.9 (round 20) |
+| `sfx/key_chime1.mp3` | [Keys 4](https://freesound.org/people/zmobie/sounds/319813/) | zmobie | CC0 | 0–0.36 s; Round 40 |
+| `sfx/key_chime2.mp3` | [grabbing keys off of a wood counter 1](https://freesound.org/people/FOSSarts/sounds/740408/) | FOSSarts | CC0 | 0.31–0.8 s; Round 40 |
+| `sfx/knife_scrape1.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 2.8–3.1 s; Round 40 |
+| `sfx/knife_scrape2.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 4.3–4.55 s; Round 40 |
+| `sfx/knife_scrape3.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 6.95–7.3 s; Round 40 |
 | `sfx/laugh1.mp3` | [EvilManLaugh.wav](https://freesound.org/people/bbakersvoice/sounds/400503/) | bbakersvoice | CC0 | 0.48–2.88 s; tape speed ×0.75 (round 20) |
 | `sfx/laugh2.mp3` | [SFX - Dark Laughter](https://freesound.org/people/TheEndOfACycle/sounds/692731/) | TheEndOfACycle | CC0 | 0–3.4 s; tape speed ×0.75 (round 20) |
 | `sfx/laugh3.mp3` | [SFX - Dark Laughter](https://freesound.org/people/TheEndOfACycle/sounds/692731/) | TheEndOfACycle | CC0 | 3.4–5.36 s; tape speed ×0.75 (round 20) |
 | `sfx/match.mp3` | [R16-13-Match Being Struck and Lit.wav](https://freesound.org/people/craigsmith/sounds/481838/) | craigsmith | CC0 | 3.97–5.3 s |
+| `sfx/mist_close1.mp3` | [Spirit-Breath1.aif](https://freesound.org/people/timgormly/sounds/152721/) | timgormly | CC0 | 0.22–1.3 s; Round 40 |
+| `sfx/mist_close2.mp3` | [- Deep Breath](https://freesound.org/people/rrehl/sounds/717167/) | rrehl | CC0 | 1.91–2.95 s; Round 40 |
+| `sfx/mist_pass1.mp3` | [Spectral Ghost Whisper Breeze Whoosh](https://freesound.org/people/brktkrgll/sounds/856169/) | brktkrgll | CC0 | 0.18–2.06 s; Round 40 |
+| `sfx/mist_pass2.mp3` | [Creepy Whoosh Subtle](https://freesound.org/people/SoundEffectsForAll/sounds/840812/) | SoundEffectsForAll | CC0 | 0.4–3.4 s; Round 40 |
 | `sfx/page1.mp3` | [R19-10-Sheet of Paper Movement and Crumple.wav](https://freesound.org/people/craigsmith/sounds/481871/) | craigsmith | CC0 | 6.08–6.62 s |
 | `sfx/page2.mp3` | [R19-10-Sheet of Paper Movement and Crumple.wav](https://freesound.org/people/craigsmith/sounds/481871/) | craigsmith | CC0 | 8.04–8.78 s |
 | `sfx/parry.mp3` | [R28-04-Sword Hits ans Slides.wav](https://freesound.org/people/craigsmith/sounds/481962/) | craigsmith | CC0 | 2.1–2.98 s; pitch +3 semitones |
 | `sfx/penguin1.mp3` | [Penguin Squeak](https://freesound.org/people/Breviceps/sounds/705839/) | Breviceps | CC0 | 0–0.6 s; tape speed ×0.75 (round 20) |
 | `sfx/penguin2.mp3` | [Pinguin Colony at Gourdin Island  in the Antarctica Peninsula](https://freesound.org/people/al.barbosa/sounds/150873/) | al.barbosa | CC0 | 0.12–2.52 s; tape speed ×0.75 (round 20) |
 | `sfx/penguin3.mp3` | [Pinguin Colony at Gourdin Island  in the Antarctica Peninsula](https://freesound.org/people/al.barbosa/sounds/150873/) | al.barbosa | CC0 | 2.52–4.92 s; tape speed ×0.75 (round 20) |
+| `sfx/pipe_breath1.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 0.18–1.52 s; Round 40 |
+| `sfx/pipe_breath2.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 3.78–5.0 s; Round 40 |
+| `sfx/pipe_breath3.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 7.9–9.0 s; Round 40 |
+| `sfx/quill_scratch1.mp3` | [pen (marker pen) writes on paper](https://freesound.org/people/SSkiba88/sounds/751055/) | SSkiba88 | CC0 | 0.24–0.5 s; Round 40 |
+| `sfx/quill_scratch2.mp3` | [Ink Quill Writing on Parchment ASMR](https://freesound.org/people/brktkrgll/sounds/856167/) | brktkrgll | CC0 | 0.41–0.65 s; Round 40 |
+| `sfx/quill_scratch3.mp3` | [Ink Quill Writing on Parchment ASMR](https://freesound.org/people/brktkrgll/sounds/856167/) | brktkrgll | CC0 | 4.62–4.85 s; Round 40 |
 | `sfx/rattle1.mp3` | [rattlesnake](https://freesound.org/people/bjelicvuk/sounds/733002/) | bjelicvuk | CC0 | 0–1.32 s; tape speed ×0.9 (round 20) |
 | `sfx/rattle2.mp3` | [Reptiles - Snake; Timber Rattlesnake, Rattle, Close Perspective](https://freesound.org/people/TheKingOfGeeks360/sounds/855914/) | TheKingOfGeeks360 | CC0 | 0–1.29 s; tape speed ×0.9 (round 20) |
 | `sfx/rattle3.mp3` | [G12-26-Rattlesnake Rattle.wav](https://freesound.org/people/craigsmith/sounds/437958/) | craigsmith | CC0 | 0.04–2.04 s; tape speed ×0.9 (round 20) |
@@ -225,6 +275,13 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/step_water1.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 3–3.42 s |
 | `sfx/step_water2.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 5.5–5.92 s |
 | `sfx/step_water3.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 8–8.42 s |
+| `sfx/strike1.mp3` | [Closeup Thunder Strike 01](https://freesound.org/people/loganzsound/sounds/840628/) | loganzsound | CC0 | 0.6–4.6 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
+| `sfx/strike2.mp3` | [210914 Thunder, crack, pretty close, bit of distortion, urban, TORONTO](https://freesound.org/people/TRP/sounds/616992/) | TRP | CC0 | 0.97–5 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
+| `sfx/strike3.mp3` | [Thunderstorm lightning strike](https://freesound.org/people/foad/sounds/243614/) | foad | CC0 | 7.36–11.4 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
+| `sfx/strike4.mp3` | [Close lightning strike 2018 07 07](https://freesound.org/people/csengeri/sounds/434359/) | csengeri | CC0 | 2–6 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
+| `sfx/swallow1.mp3` | [Drink_Gulp.mp3](https://freesound.org/people/Defaultv/sounds/534336/) | Defaultv | CC0 | 0.01–1.04 s; Round 40 |
+| `sfx/swallow2.mp3` | [Gulp - Hard Swallow](https://freesound.org/people/magnuswaker/sounds/531755/) | magnuswaker | CC0 | 0–0.52 s; Round 40 |
+| `sfx/swallow3.mp3` | [Drink Sip and Swallow](https://freesound.org/people/OwlStorm/sounds/320139/) | OwlStorm | CC0 | 1.56–2.31 s; Round 40 |
 | `sfx/swing1.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 5.74–6.37 s |
 | `sfx/swing2.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 11.73–12.36 s |
 | `sfx/swing3.mp3` | [R26-31-Large Sword Whooshes.wav](https://freesound.org/people/craigsmith/sounds/481954/) | craigsmith | CC0 | 15.49–16.12 s |
@@ -233,12 +290,16 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/swish2.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 11.24–11.74 s; low-pass 7000 Hz |
 | `sfx/swish3.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 16.06–16.56 s; low-pass 7000 Hz |
 | `sfx/swish4.mp3` | [S23-27 Whip swishes; several.wav](https://freesound.org/people/craigsmith/sounds/675835/) | craigsmith | CC0 | 20.1–20.6 s; low-pass 7000 Hz |
+| `sfx/syringe1.mp3` | [Syringe Pop](https://freesound.org/people/Chaos-Kid/sounds/740045/) | Chaos-Kid | CC0 | 0.05–0.7 s; Round 40 |
+| `sfx/syringe2.mp3` | [Syringe plunger multiple pop.m4a](https://freesound.org/people/Coniela/sounds/458424/) | Coniela | CC0 | 2.0–2.55 s; Round 40 |
 | `sfx/thud1.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 3.08–3.99 s |
 | `sfx/thud2.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 5.48–6.39 s |
 | `sfx/thud3.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 7.94–8.85 s |
 | `sfx/troll1.mp3` | [Troll 1.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330015/) | _eanarmstrong95 | CC0 | 1.04–3.14 s; tape speed ×0.9 (round 20) |
 | `sfx/troll2.mp3` | [Troll 2.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330014/) | _eanarmstrong95 | CC0 | 3.5–5.6 s; tape speed ×0.9 (round 20) |
 | `sfx/troll3.mp3` | [Troll 3.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330013/) | _eanarmstrong95 | CC0 | 5.28–7.02 s; tape speed ×0.9 (round 20) |
+| `sfx/vial_ring1.mp3` | [Glass Ping](https://freesound.org/people/tix99/sounds/745014/) | tix99 | CC0 | 0–1.0 s; Round 40 |
+| `sfx/vial_ring2.mp3` | [small wine glass.wav](https://freesound.org/people/Tairblenn/sounds/549899/) | Tairblenn | CC0 | 0–0.87 s; Round 40 |
 | `sfx/wail1.mp3` | [Woooooo_TreasureIsland](https://freesound.org/people/sierra721/sounds/718952/) | sierra721 | CC0 | 0.4–2.9 s; tape speed ×0.85 (round 20) |
 | `sfx/wail2.mp3` | [Hell Sound](https://freesound.org/people/ChristmasKrumble666/sounds/753647/) | ChristmasKrumble666 | CC0 | 5.12–8.52 s; tape speed ×0.85 (round 20) |
 | `sfx/wail3.mp3` | [male-ghosts-song](https://freesound.org/people/FaraiGame1/sounds/625874/) | FaraiGame1 | CC0 | 0–3.4 s; tape speed ×0.85 (round 20) |
@@ -261,61 +322,6 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/zombie2.mp3` | [Zombie Groan 3](https://freesound.org/people/OwNathan/sounds/754441/) | OwNathan | CC0 | 0–0.85 s; tape speed ×0.95 (round 20) |
 | `sfx/zombie3.mp3` | [A Moaning Zombie.wav](https://freesound.org/people/kathol/sounds/58626/) | kathol | CC0 | 0.08–2.68 s; tape speed ×0.95 (round 20) |
 | `sfx/zombie4.mp3` | [Zombie Groan 0](https://freesound.org/people/OwNathan/sounds/754438/) | OwNathan | CC0 | 0–1 s; tape speed ×0.95 (round 20) |
-| `sfx/door_oak_open1.mp3` | [Creaking Door #2](https://freesound.org/people/True_Killian/sounds/845753/) | True_Killian | CC0 | 0.01–1.2 s; Round 40 |
-| `sfx/door_oak_open2.mp3` | [Wooden_Door_Squeak_04](https://freesound.org/people/BlondPanda/sounds/778462/) | BlondPanda | CC0 | 0.04–0.78 s; Round 40 |
-| `sfx/door_oak_open3.mp3` | [Heavy Door Squeaking.wav](https://freesound.org/people/not_yr/sounds/656529/) | not_yr | CC0 | 0.27–1.3 s; Round 40 |
-| `sfx/door_oak_close1.mp3` | [Door close](https://freesound.org/people/KINIT%C3%98.dev/sounds/868091/) | KINIT%C3%98.dev | CC0 | 0.05–0.52 s; Round 40 |
-| `sfx/door_oak_close2.mp3` | [Door Close Heavy Wooden Slow Quiet Seal Theatre](https://freesound.org/people/LampEight/sounds/402466/) | LampEight | CC0 | 0–1.71 s; Round 40 |
-| `sfx/door_oak_close3.mp3` | [Gate Latch](https://freesound.org/people/mhtaylor67/sounds/126041/) | mhtaylor67 | CC0 | 0.4–1.35 s; Round 40 |
-| `sfx/door_iron_open1.mp3` | [Squeaky Metal Fence .wav](https://freesound.org/people/Shamewap/sounds/389691/) | Shamewap | CC0 | 1.9–2.55 s; Round 40 |
-| `sfx/door_iron_open2.mp3` | [Squeaky Metal Door](https://freesound.org/people/Breviceps/sounds/515289/) | Breviceps | CC0 | 2.27–3.38 s; Round 40 |
-| `sfx/door_iron_open3.mp3` | [gate.ogg](https://freesound.org/people/saha213131/sounds/691474/) | saha213131 | CC0 | 0.07–1.2 s; Round 40 |
-| `sfx/door_iron_close1.mp3` | [Open and Close an iron gate](https://freesound.org/people/launemax/sounds/274767/) | launemax | CC0 | 9.3–10.5 s; Round 40 |
-| `sfx/door_iron_close2.mp3` | [Open and Close an iron gate](https://freesound.org/people/launemax/sounds/274767/) | launemax | CC0 | 3.3–4.45 s; Round 40 |
-| `sfx/door_iron_close3.mp3` | [metal gate - rattle handle, swing, clang.wav](https://freesound.org/people/Widds/sounds/330522/) | Widds | CC0 | 11.5–12.7 s; Round 40 |
-| `sfx/door_stone_open1.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 5.05–6.65 s; Round 40 |
-| `sfx/door_stone_open2.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 9.0–10.6 s; Round 40 |
-| `sfx/door_stone_open3.mp3` | [Heavy stone door opens 2](https://freesound.org/people/PostProdDog/sounds/578491/) | PostProdDog | CC0 | 0.2–1.9 s; Round 40 |
-| `sfx/door_stone_close1.mp3` | [big stone door suddenly slamming shut](https://freesound.org/people/PaceHeart/sounds/465807/) | PaceHeart | CC0 | 0–0.79 s; Round 40 |
-| `sfx/door_stone_close2.mp3` | [Stone Slab Door Grinding - Heavy Rock Scrape (Mono)](https://freesound.org/people/NahuelMartinez/sounds/844329/) | NahuelMartinez | CC0 | 11.3–12.92 s; Round 40 |
-| `sfx/door_flesh_open1.mp3` | [squelching.mp3](https://freesound.org/people/tiddles451/sounds/547446/) | tiddles451 | CC0 | 2.91–4.0 s; Round 40 |
-| `sfx/door_flesh_open2.mp3` | [Gelatinous Cube Approach](https://freesound.org/people/e_r_r_1012/sounds/837146/) | e_r_r_1012 | CC0 | 4.05–5.5 s; Round 40 |
-| `sfx/door_flesh_close1.mp3` | [Meat Slap 2](https://freesound.org/people/magnuswaker/sounds/540076/) | magnuswaker | CC0 | 0–0.7 s; Round 40 |
-| `sfx/door_flesh_close2.mp3` | [Wet Impact (2)](https://freesound.org/people/Kastenfrosch/sounds/521958/) | Kastenfrosch | CC0 | 0.01–1.27 s; Round 40 |
-| `sfx/door_flesh_close3.mp3` | [Gore Impact - "LOT OF HEART"](https://freesound.org/people/magnuswaker/sounds/641046/) | magnuswaker | CC0 | 0–1.01 s; Round 40 |
-| `sfx/door_cloth1.mp3` | [Curtains Opening or Closing 3 Short.wav](https://freesound.org/people/RutgerMuller/sounds/51139/) | RutgerMuller | CC0 | 0–0.9 s; Round 40 |
-| `sfx/door_cloth2.mp3` | [Pulling down drapes](https://freesound.org/people/cribbler/sounds/369195/) | cribbler | CC0 | 3.12–3.75 s; Round 40 |
-| `sfx/door_cloth3.mp3` | [showercurtain.wav](https://freesound.org/people/j1987/sounds/106132/) | j1987 | CC0 | 0–0.7 s; Round 40 |
-| `sfx/swallow1.mp3` | [Drink_Gulp.mp3](https://freesound.org/people/Defaultv/sounds/534336/) | Defaultv | CC0 | 0.01–1.04 s; Round 40 |
-| `sfx/swallow2.mp3` | [Gulp - Hard Swallow](https://freesound.org/people/magnuswaker/sounds/531755/) | magnuswaker | CC0 | 0–0.52 s; Round 40 |
-| `sfx/swallow3.mp3` | [Drink Sip and Swallow](https://freesound.org/people/OwlStorm/sounds/320139/) | OwlStorm | CC0 | 1.56–2.31 s; Round 40 |
-| `sfx/syringe1.mp3` | [Syringe Pop](https://freesound.org/people/Chaos-Kid/sounds/740045/) | Chaos-Kid | CC0 | 0.05–0.7 s; Round 40 |
-| `sfx/syringe2.mp3` | [Syringe plunger multiple pop.m4a](https://freesound.org/people/Coniela/sounds/458424/) | Coniela | CC0 | 2.0–2.55 s; Round 40 |
-| `sfx/flask_burst1.mp3` | [Molotovin_koktaili.mp3](https://freesound.org/people/ertzsi/sounds/622890/) | ertzsi | CC0 | 0.05–1.65 s; Round 40 |
-| `sfx/flask_burst2.mp3` | [R29-26-Molotov Cocktails through Windows and Explode.wav](https://freesound.org/people/craigsmith/sounds/483288/) | craigsmith | CC0 | 0–1.6 s; Round 40 |
-| `sfx/flask_burst3.mp3` | [Glass Bottle Shatter](https://freesound.org/people/decadylan/sounds/825803/) | decadylan | CC0 | 0–1.3 s; Round 40 |
-| `sfx/coins1.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 0.5–1.4 s; Round 40 |
-| `sfx/coins2.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 2.7–3.4 s; Round 40 |
-| `sfx/coins3.mp3` | [Counting Me Shillings.mp3](https://freesound.org/people/husky70/sounds/161315/) | husky70 | CC0 | 4.2–4.96 s; Round 40 |
-| `sfx/anvil1.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 0.55–2.2 s; Round 40 |
-| `sfx/anvil2.mp3` | [Forging](https://freesound.org/people/adamcreeper/sounds/780503/) | adamcreeper | CC0 | 5.9–7.4 s; Round 40 |
-| `sfx/mist_pass1.mp3` | [Spectral Ghost Whisper Breeze Whoosh](https://freesound.org/people/brktkrgll/sounds/856169/) | brktkrgll | CC0 | 0.18–2.06 s; Round 40 |
-| `sfx/mist_pass2.mp3` | [Creepy Whoosh Subtle](https://freesound.org/people/SoundEffectsForAll/sounds/840812/) | SoundEffectsForAll | CC0 | 0.4–3.4 s; Round 40 |
-| `sfx/mist_close1.mp3` | [Spirit-Breath1.aif](https://freesound.org/people/timgormly/sounds/152721/) | timgormly | CC0 | 0.22–1.3 s; Round 40 |
-| `sfx/mist_close2.mp3` | [- Deep Breath](https://freesound.org/people/rrehl/sounds/717167/) | rrehl | CC0 | 1.91–2.95 s; Round 40 |
-| `sfx/pipe_breath1.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 0.18–1.52 s; Round 40 |
-| `sfx/pipe_breath2.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 3.78–5.0 s; Round 40 |
-| `sfx/pipe_breath3.mp3` | [blowing_smoke_3.wav](https://freesound.org/people/ivanmilic/sounds/513854/) | ivanmilic | CC0 | 7.9–9.0 s; Round 40 |
-| `sfx/knife_scrape1.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 2.8–3.1 s; Round 40 |
-| `sfx/knife_scrape2.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 4.3–4.55 s; Round 40 |
-| `sfx/knife_scrape3.mp3` | [R22-41-Whittle Wood with Knife.wav](https://freesound.org/people/craigsmith/sounds/481889/) | craigsmith | CC0 | 6.95–7.3 s; Round 40 |
-| `sfx/quill_scratch1.mp3` | [pen (marker pen) writes on paper](https://freesound.org/people/SSkiba88/sounds/751055/) | SSkiba88 | CC0 | 0.24–0.5 s; Round 40 |
-| `sfx/quill_scratch2.mp3` | [Ink Quill Writing on Parchment ASMR](https://freesound.org/people/brktkrgll/sounds/856167/) | brktkrgll | CC0 | 0.41–0.65 s; Round 40 |
-| `sfx/quill_scratch3.mp3` | [Ink Quill Writing on Parchment ASMR](https://freesound.org/people/brktkrgll/sounds/856167/) | brktkrgll | CC0 | 4.62–4.85 s; Round 40 |
-| `sfx/key_chime1.mp3` | [Keys 4](https://freesound.org/people/zmobie/sounds/319813/) | zmobie | CC0 | 0–0.36 s; Round 40 |
-| `sfx/key_chime2.mp3` | [grabbing keys off of a wood counter 1](https://freesound.org/people/FOSSarts/sounds/740408/) | FOSSarts | CC0 | 0.31–0.8 s; Round 40 |
-| `sfx/vial_ring1.mp3` | [Glass Ping](https://freesound.org/people/tix99/sounds/745014/) | tix99 | CC0 | 0–1.0 s; Round 40 |
-| `sfx/vial_ring2.mp3` | [small wine glass.wav](https://freesound.org/people/Tairblenn/sounds/549899/) | Tairblenn | CC0 | 0–0.87 s; Round 40 |
 
 ## Made with Suno Sounds
 

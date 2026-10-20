@@ -117,6 +117,7 @@ export const SAMPLE_SETS = {
   hull: set(['spot_boat'], 0.3),
   creak: set(['spot_creak1', 'spot_creak2'], 0.22, [0.8, 1]),
   thunder: set(['spot_thunder'], 0.35, [0.85, 1]),
+  strike: set(takes('strike', 4), 1, [0.9, 1.04]), // a bolt on the ground close by (round 59: the recipe's crack was a blip): the crack, the tearing and the crash
   gurgle: set(['spot_gurgle'], 0.3, [0.8, 1]),
   chains: set(['spot_chains'], 0.22, [0.85, 1]),
   timber: set(['spot_groan'], 0.25, [0.7, 0.95]),
