@@ -166,7 +166,7 @@ describe('the horrors', () => {
 describe('which scene plays', () => {
   const stub = () => {
     const play = vi.fn(() => Promise.resolve());
-    return { play, cinema: { play, active: false } as never };
+    return { play, cinema: { play, active: false, heightOf: () => 2 } as never }; // (a person's height: the size its scene is chosen by)
   };
 
   it('shows a horror\'s arrival once, however many times it turns on the investigator, and its fall', () => {

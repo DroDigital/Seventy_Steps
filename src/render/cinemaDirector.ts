@@ -59,7 +59,7 @@ export interface Director {
 
 export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string) => void): Director {
   const memory = new Set<string>(); // the arrivals shown, where no save keeps them (the arena)
-  const height = (e: Entity): number => g.ecs.c.body.get(e)?.height ?? 2;
+  const height = (e: Entity): number => cinema.heightOf(e); // as it is drawn: the size its scenes are chosen by
   const alive = (): boolean => g.ecs.c.actor.get(g.player.id)?.move !== 'death';
   const rosterId = (e: Entity): string | undefined => g.ecs.c.fight.get(e)?.id ?? g.ecs.c.dread.get(e)?.id;
   const notice = (id: string | undefined, moment: Moment): void => {

@@ -11,7 +11,8 @@ import { noise, tone, type Sound } from './sounds';
 export const STORM_MIX = {
   thunder: 1.1, // the recipe beneath the recording
   warn: 0.9, // the ring's crackle
-  crack: 1, // the bolt on the ground
+  crack: 1, // the bolt on the ground, made (until the recording has loaded)
+  strike: 1, // the bolt on the ground, recorded (round 59)
 } as const;
 
 /** Thunder `far` (0 overhead .. 1 on the horizon) away: near, a crack and a tear and a boom; far, only the rolling and a mutter. */

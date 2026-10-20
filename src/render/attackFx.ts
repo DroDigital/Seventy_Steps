@@ -165,6 +165,21 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     if (tick % 4 === 0) fx.spawn({ x: head.x, y: head.y, z: head.z, life: 0.35, size: 2.4 - 1.5 * k, grow: 0.25, color: look.mind, glow: true, shape: 'ring', thick: 0.1, alpha: 0.5 + 0.5 * k });
   }
 
+  /** A pulse of dread going out (a `sanity` move with no gaze in it): its front, the ring the telegraph draws, thrown up in motes of the mind's colour as it passes. */
+  function pulse(id: number, sa: { window: readonly [number, number]; range: number }, frame: number): void {
+    const p = c.transform.get(id)?.pos;
+    if (!p) return;
+    const t = (frame - sa.window[0]) / (sa.window[1] - sa.window[0]);
+    const r = (c.body.get(id)?.radius ?? 0.5) + t * sa.range;
+    const { look } = style(id);
+    const n = Math.min(14, 4 + Math.round(r * 0.6));
+    for (let i = 0; i < n; i++) {
+      const a = rand(0, Math.PI * 2);
+      const [x, z] = [p.x + Math.cos(a) * r, p.z + Math.sin(a) * r];
+      fx.spawn({ x, y: g.world.ground(x, z) + rand(0.1, 0.5), z, vx: Math.cos(a) * 2.5, vz: Math.sin(a) * 2.5, vy: rand(0.6, 2.2), life: rand(0.35, 0.6), size: rand(0.12, 0.22), grow: 0.6, color: look.mind, colorEnd: look.core, glow: true, shape: i % 3 ? 'spark' : 'streak', stretch: 0.08, alpha: 0.85 * (1 - t * 0.6), hold: 0.3, spin: 4 });
+    }
+  }
+
   let tick = 0;
   return {
     update(alpha) {
@@ -194,11 +209,14 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         const p = c.transform.get(e)!.pos;
         const { look, el } = style(w.owner);
         const r = w.r + w.speed * alpha;
-        for (let i = 0; i < 4; i++) {
+        const n = Math.min(16, 3 + Math.round(r * 0.45)); // round 59: four to a frame left a colossus's front a scatter of specks; it is thrown up along its whole round
+        for (let i = 0; i < n; i++) {
           const a = rand(0, Math.PI * 2);
           const x = p.x + Math.cos(a) * r;
           const z = p.z + Math.sin(a) * r;
-          fx.spawn({ x, y: p.y + 0.2, z, vy: rand(1, 3.5), vx: Math.cos(a) * 1.5, vz: Math.sin(a) * 1.5, life: 0.5, size: 0.3 + w.width * 0.1, grow: el.chunk === 'shard' ? 1 : 2, color: i % 2 ? look.ring : look.line, glow: false, shape: i % 2 ? 'wisp' : el.chunk, gravity: 6, alpha: 0.7, drag: 2, spin: rand(-8, 8) });
+          const y = g.world.ground(x, z); // on the ground it runs over, not at the height of where it began
+          if (!near({ x, y, z }, 60)) continue;
+          fx.spawn({ x, y: y + 0.2, z, vy: rand(1, 3.5), vx: Math.cos(a) * 1.5, vz: Math.sin(a) * 1.5, life: 0.5, size: 0.3 + w.width * 0.1, grow: el.chunk === 'shard' ? 1 : 2, color: i % 2 ? look.ring : look.line, glow: false, shape: i % 2 ? 'wisp' : el.chunk, gravity: 6, alpha: 0.7, drag: 2, spin: rand(-8, 8) });
         }
       }
       for (const [id, a] of c.actor) {
@@ -214,6 +232,8 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         }
         const ef = def.effect;
         if (ef?.kind === 'gaze' && a.frame >= ef.window[0] && a.frame < ef.window[1]) gazing(id);
+        const sa = def.sanity;
+        if (sa && !sa.sight && a.frame >= sa.window[0] && a.frame < sa.window[1] && tick % 2 === 0) pulse(id, sa, a.frame + alpha);
         const pl = def.pull;
         if (pl && a.frame >= pl.window[0] - 20 && a.frame < pl.window[1]) {
           const p = c.transform.get(id)!.pos;

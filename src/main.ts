@@ -189,7 +189,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
-  const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise }); // round 20: wake, arrivals, falls, endings
+  const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise, figure: creatures.figure }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
