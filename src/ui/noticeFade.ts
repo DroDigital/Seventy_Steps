@@ -28,3 +28,45 @@ export function noticeOpacity(age: number, hold: number): number {
 
 /** Whether it has gone from the screen altogether. */
 export const noticeGone = (age: number, hold: number): boolean => age >= hold + NOTICE.fadeOut;
+
+/** The line in the middle of the screen as a clock: what is up, what waits, and when each is to go. `put` writes the words on the screen (a button named in them filled in) and says what it wrote. */
+export interface NoticeBoard {
+  /** A notice said at `now` ms: shown at once if nothing stands in full, else kept waiting; said again while it is up, it stands afresh and is not shown twice. */
+  say(text: string, now: number): void;
+  /** Takes the next that waits, once the one up has stood in full. */
+  step(now: number): void;
+  /** 0..1 at `now`. */
+  opacity(now: number): number;
+  /** What is up goes at once, and what waits is dropped (a death, a fall: round 58: a long notice outlasts the fall and came back after the waking). */
+  clear(): void;
+}
+
+export function createNoticeBoard(put: (text: string) => string): NoticeBoard {
+  const waiting: string[] = [];
+  let at = -Infinity;
+  let holds = 0;
+  let up = '';
+  const show = (text: string, now: number): void => {
+    up = text;
+    at = now;
+    holds = noticeHold(put(text));
+  };
+  return {
+    say(text, now) {
+      if (!text || waiting.includes(text)) return;
+      const age = now - at;
+      if (text === up && !noticeGone(age, holds)) return void (at = now - NOTICE.fadeIn); // said again while it is up: it stands afresh at once, not twice
+      if (age < holds) void (waiting.length < NOTICE.queued && waiting.push(text)); // it stands in full before the next takes its place (round 19: two at once, the first was lost)
+      else show(text, now);
+    },
+    step(now) {
+      if (waiting.length && now - at >= holds) show(waiting.shift()!, now);
+    },
+    opacity: (now) => noticeOpacity(now - at, holds),
+    clear() {
+      waiting.length = 0;
+      [up, at, holds] = ['', -Infinity, 0];
+      put('');
+    },
+  };
+}
