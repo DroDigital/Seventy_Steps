@@ -102,6 +102,19 @@ describe('first-launch picture', () => {
     expect(run.notices).toHaveLength(1);
   });
 
+  it('keeps stepping while a machine stays slow, and reaches the last rung', () => {
+    const run = launch();
+    let at = run.measuredAt;
+    for (let i = 0; i < LADDER.length; i++, at += (1.5 + QUALITY.measure) * 1000) {
+      run.frames(40); // slow, though not poor enough to take two rungs at a time
+      run.quality.tick(at);
+    }
+    const last = LADDER[LADDER.length - 1];
+    expect(run.settings).toMatchObject({ resolution: last.resolution, fog: last.fog, shadows: last.shadows });
+    expect(run.settings.resolution).toBeLessThan(defaultSettings().resolution);
+    expect(run.store.getItem(AUTO_KEY)).toBe('1');
+  });
+
   it('leaves a saved resolution choice out of first-launch tuning', () => {
     const run = launch();
     run.store.setItem(SETTINGS_KEY, JSON.stringify({ ...defaultSettings(), resolution: 2, v: 15 }));
