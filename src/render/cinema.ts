@@ -23,7 +23,7 @@ import { raycast } from '../world/colliders';
 import { yawOfDir } from '../world/worldMap';
 import type { GameAudio } from './audio/gameAudio';
 import { burst } from './cinemaBursts';
-import { beatsBetween, frameOf, holdOf, sceneLength, shotAt, tremor, type Anchor } from './cinemaPlan';
+import { beatsBetween, frameOf, holdOf, keepGrain, sceneLength, shotAt, tremor, type Anchor } from './cinemaPlan';
 import type { Particles } from './particles';
 
 const GRACE = 0.6; // seconds before a key skips (the one that began it is not a skip)
@@ -80,7 +80,7 @@ export interface CinemaOptions {
   /** The investigator gets up from the knee over this many seconds (0: at once); the view draws the slow rise (actorViews.ts). */
   rise?: (seconds: number) => void;
   /** Where a creature's drawing stands above its feet (creatureViews.ts): the camera frames that, not the capsule it is struck by, which for some is a third taller than its picture and for one half as tall. */
-  figure?: (e: Entity) => { bottom: number; top: number } | undefined;
+  figure?: (e: Entity) => { bottom: number; top: number; rows?: number } | undefined;
 }
 
 const [m, q, spin, eye, aim, up] = [new Matrix4(), new Quaternion(), new Quaternion(), new Vector3(), new Vector3(), new Vector3(0, 1, 0)]; // scratch, so a frame allocates nothing
@@ -106,8 +106,10 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     if (!tr || !body) return null;
     const lerp = (a: number, b: number): number => a + (b - a) * alpha;
     const drawn = who === 'target' ? o.figure?.(e!) : undefined;
-    const [lift, height] = drawn && drawn.top - drawn.bottom > 0.2 ? [drawn.bottom, drawn.top - drawn.bottom] : [0, body.height];
-    return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y) + lift, z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height };
+    const painted = drawn && drawn.top - drawn.bottom > 0.2 ? drawn : undefined;
+    const [lift, height] = painted ? [painted.bottom, painted.top - painted.bottom] : [0, body.height];
+    const grain = painted?.rows ? height / painted.rows : undefined; // metres to a pixel of its picture
+    return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y) + lift, z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height, grain };
   };
 
   let pulled = 1; // how much of its line to the head the lens keeps: it is pulled in at once, but lets out slowly (a pop at a wall's edge is a step in the picture)
@@ -256,7 +258,8 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       const on = anchorOf(shot.on, alpha) ?? anchorOf('player', alpha);
       if (!on) return;
       const other = anchorOf(shot.on === 'target' ? 'player' : shot.on === 'player' ? 'target' : 'player', alpha);
-      const f = frameOf(shot, u, on, other && other !== on ? other : null, t, shot.aim === 'sign' ? anchorOf('sign', alpha) : null);
+      const opposite = other && other !== on ? other : null;
+      const f = keepGrain(frameOf(shot, u, on, opposite, t, shot.aim === 'sign' ? anchorOf('sign', alpha) : null), shot.aim === 'other' ? opposite?.grain : shot.aim === 'sign' ? undefined : on.grain); // a coarse picture is not looked at from nearer than its pixels allow
       let shake = 0;
       for (const s of r.shakes) shake += tremor(s.amount, t - s.at, s.hold);
       const wobble = (k: number): number => Math.sin(t * k) * Math.cos(t * (k * 0.53 + 3));

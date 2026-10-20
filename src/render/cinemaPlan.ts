@@ -12,7 +12,14 @@ import type { Beat, Ease, Scene, Shot } from '../data/cutscenes';
 export interface Anchor extends V3 {
   yaw: number;
   height: number;
+  /** Metres one pixel of its picture covers, for a figure drawn from the reviewed art (a close-up comes no nearer than `GRAIN` allows). */
+  grain?: number;
 }
+
+/** The most of the picture's height one pixel of a figure may cover (round 59): a close-up of a coarse picture stands back, so the Haunter's twenty-eight painted rows are not a wall of blocks. */
+export const GRAIN = 1 / 32;
+/** Metres the lens's line to the horror passes beside the investigator, in a shot over their shoulder (round 59: straight behind them, a horror of their size was hidden by them). */
+export const SHOULDER = 0.6;
 
 /** The lens: where it is, the point it looks at, its field of view (degrees) and its roll (radians). */
 export interface Frame {
@@ -61,9 +68,11 @@ export function frameOf(shot: Shot, u: number, on: Anchor, other: Anchor | null,
   const scale = shot.body ? on.height : 1;
   const apart = other ? Math.hypot(other.x - on.x, other.z - on.z) : 0;
   const base = other && apart > 0.5 ? yawOf(other.x - on.x, other.z - on.z) : on.yaw;
-  const facing = base + mix(shot.yaw) * RAD;
   const [d, up] = [mix(shot.dist) * scale, mix(shot.up) * scale];
   const aimed = shot.aim === 'sign' && sign ? sign : shot.aim === 'other' && other ? other : on;
+  const lean = Math.sign(shot.yaw[1] - 180) || Math.sign(shot.yaw[0] - 180) || 1;
+  const yaw = aimed === other && other ? past(mix(shot.yaw), d, on.y + up, other.y + mix(shot.look) * other.height, apart, on, lean) : mix(shot.yaw);
+  const facing = base + yaw * RAD;
   const [sway, s] = [shot.sway ?? 0, drift(t)];
   const amp = 0.07 * sway * clamp(d / 4, 0.6, 3);
   return {
@@ -72,6 +81,31 @@ export function frameOf(shot: Shot, u: number, on: Anchor, other: Anchor | null,
     fov: mix(shot.fov),
     roll: shot.roll ? mix(shot.roll) * RAD : 0,
   };
+}
+
+/**
+ * A shot over the shoulder of `on` at the party opposite (`yaw` degrees, 180 straight behind `on`, the lens `d` metres off at a height of
+ * `eye`, looking at a height of `sight` on the other `apart` metres away): turned off the line between them just far enough that the
+ * line of sight passes `SHOULDER` metres beside `on`, unless it passes over their head. It turns to the side the shot leans to (`lean`).
+ */
+function past(yaw: number, d: number, eye: number, sight: number, apart: number, on: Anchor, lean: number): number {
+  if (apart < 0.5 || d < 0.3) return yaw;
+  const off = ((((yaw - 180) % 360) + 540) % 360) - 180; // degrees off straight behind, signed
+  const over = eye + ((sight - eye) * d) / (d + apart); // the line's height as it passes them
+  if (over > on.y + on.height + 0.15) return yaw;
+  const least = Math.min(30, Math.asin(clamp((SHOULDER * (apart + d)) / (apart * d), 0, 1)) / RAD);
+  return Math.abs(off) >= least ? yaw : 180 + (Math.sign(off) || lean) * least;
+}
+
+/** `f` stood back along its line of sight as far as a figure of `grain` metres to a pixel needs, so that no pixel of it covers more than `GRAIN` of the picture's height. */
+export function keepGrain(f: Frame, grain: number | undefined): Frame {
+  if (!grain) return f;
+  const [dx, dy, dz] = [f.pos.x - f.look.x, f.pos.y - f.look.y, f.pos.z - f.look.z];
+  const d = Math.hypot(dx, dy, dz);
+  const least = grain / GRAIN / (2 * Math.tan((f.fov * RAD) / 2));
+  if (d >= least || d < 1e-3) return f;
+  const k = least / d;
+  return { ...f, pos: { x: f.look.x + dx * k, y: f.look.y + dy * k, z: f.look.z + dz * k } };
 }
 
 /** How firmly the scene holds the camera `t` seconds in (of `length`): 0 is the follow camera's, 1 the scene's; it eases in and out. */

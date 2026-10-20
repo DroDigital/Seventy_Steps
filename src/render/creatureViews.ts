@@ -92,7 +92,7 @@ export interface CreatureViews {
   readonly sheet: { atlas: SpriteAtlas; texture: THREE.Texture; reviewed?: { manifest: ReviewedManifest; textures: THREE.Texture[] } };
   debugFrames(): readonly CreatureFrame[];
   /** Where the creature's drawing stands, in metres above its feet (with a flyer's hover), for one drawn from the reviewed art; undefined for any other. */
-  figure(id: Entity): { bottom: number; top: number } | undefined;
+  figure(id: Entity): { bottom: number; top: number; rows: number } | undefined;
 }
 export interface CreatureFrame {
   id: Entity; key: string; direction: SpriteDirection; state: SpriteAction; frame: number;
@@ -216,7 +216,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       const [cid, variant] = model.slice(MODEL_PREFIX.length).split('#') as [string, Variant | undefined];
       const span = spans.get(spriteKey(cid, variant));
       const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
-      return span && { bottom: span.bottom + hover, top: span.top + hover };
+      return span && { bottom: span.bottom + hover, top: span.top + hover, rows: span.rows };
     },
     update(alpha, time, camera) {
       camera.updateMatrixWorld();

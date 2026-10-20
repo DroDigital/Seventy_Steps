@@ -8,15 +8,14 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { EPITHETS } from '../src/data/bossCards';
-import { arrival, fall, scaleOf, type Scene } from '../src/data/cutscenes';
+import { arrival, fall, scaleOf, shot, to, type Scene } from '../src/data/cutscenes';
 import { bespokeFall } from '../src/data/cutscenesFall';
 import { arrivalOf } from '../src/data/cutscenesMore';
 import { ENTITIES, paramsOf } from '../src/data/registry';
 import { createCinema } from '../src/render/cinema';
-import { frameOf, type Anchor, type Frame } from '../src/render/cinemaPlan';
+import { frameOf, GRAIN, keepGrain, SHOULDER, type Anchor, type Frame } from '../src/render/cinemaPlan';
 import { reviewedSpan, type ReviewedManifest } from '../src/render/sprites/reviewed';
-import { toCombatant } from '../src/systems/creatures';
-import { spawnCreature } from '../src/systems/creatures';
+import { spawnCreature, toCombatant } from '../src/systems/creatures';
 import { createGame } from '../src/systems/game';
 import type { CinemaUi } from '../src/ui/cinemaUi';
 
@@ -86,6 +85,32 @@ describe('a cutscene frames the horror as it is drawn', () => {
         });
       }
     }
+  });
+
+  it('stands back from a coarse picture until no pixel of it covers more than its share of the picture', () => {
+    const near: Frame = { pos: { x: 0, y: 3, z: 1.6 }, look: { x: 0, y: 3.5, z: 0 }, fov: 45, roll: 0 };
+    const grain = 1.75 / 28; // the Haunter: twenty-eight painted rows
+    const kept = keepGrain(near, grain);
+    const d = Math.hypot(kept.pos.x - kept.look.x, kept.pos.y - kept.look.y, kept.pos.z - kept.look.z);
+    expect(grain / (2 * d * Math.tan((45 * Math.PI) / 360))).toBeCloseTo(GRAIN, 5);
+    expect(kept.look).toEqual(near.look); // it looks where it looked, from further back along the same line
+    expect((kept.pos.z - kept.look.z) / (kept.pos.y - kept.look.y)).toBeCloseTo((near.pos.z - near.look.z) / (near.pos.y - near.look.y), 5);
+    expect(keepGrain(near, 0.001)).toBe(near); // a fine picture: as the shot has it
+    expect(keepGrain(near, undefined)).toBe(near);
+  });
+
+  it('sees past the investigator over their shoulder, unless it looks over their head', () => {
+    const me: Anchor = { x: 0, y: 0, z: 0, yaw: 0, height: 1.8 };
+    const passBeside = (f: Frame): number => { // how far the line of sight passes from the investigator's axis, in the ground's plane
+      const [ax, az, bx, bz] = [f.pos.x, f.pos.z, f.look.x, f.look.z];
+      return Math.abs(ax * (bz - az) - az * (bx - ax)) / Math.hypot(bx - ax, bz - az);
+    };
+    const behind = shot({ dur: 2, on: 'player', aim: 'other', yaw: to(180, 176), dist: to(2.2, 3), up: to(0.9, 1.6), look: to(0.4, 0.7) });
+    const person: Anchor = { x: 0, y: 0, z: 9, yaw: Math.PI, height: 1.8 };
+    for (const u of [0, 0.5, 1]) expect(passBeside(frameOf(behind, u, me, person, 0)), `at ${u}`).toBeGreaterThan(SHOULDER - 0.02);
+    const giant: Anchor = { x: 0, y: 0, z: 20, yaw: Math.PI, height: 40 };
+    const upward = shot({ dur: 2, on: 'player', aim: 'other', yaw: to(180, 180), dist: to(2.4, 2.4), up: to(1, 1), look: to(0.9, 0.9) });
+    expect(passBeside(frameOf(upward, 0.5, me, giant, 0))).toBeLessThan(0.05); // its face is far over their head: straight behind them, as it was
   });
 
   it("frames a target by its drawing where there is one, and by its body where not", () => {
