@@ -40,6 +40,7 @@ export function createFxController(g: Game): FxController {
       state.sanity = g.mind.sanity;
       state.anomalyProximity = nearestAnomaly(g, camera);
       state.pulse = Math.max(0, 1 - (seconds - pulseAt) / FX.pulseSeconds);
+      state.time = seconds;
     },
   };
 }

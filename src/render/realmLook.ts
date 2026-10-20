@@ -17,6 +17,8 @@ import { worldUniforms } from './worldMaterial';
 export interface RealmLook {
   /** The look now, eased from realm to realm. */
   readonly now: Look;
+  /** How deep the night is laid now, 0..1, eased (what `update` was given as `dark`): the mist's own light follows it (render/volumetricFog.ts). */
+  readonly dark: number;
   /** Every realm's own, to be tuned live (the debug panel: `window.look.looks`). */
   readonly looks: typeof LOOKS;
   /** Lays this frame's: eased toward the realm's, or at once when the camera has leapt (a journey) and `snap` says so. */
@@ -105,6 +107,9 @@ export function createRealmLook(post: PostPass): RealmLook {
     looks: LOOKS,
     get now() {
       return now;
+    },
+    get dark() {
+      return dark;
     },
     update(time, region, enclosed, camera, snap = false, deep = 0) {
       const leapt = !!camera && was.distanceToSquared(camera) > SKY.jump * SKY.jump;

@@ -31,6 +31,7 @@ import { HEART } from '../render/feel';
 import type { MapPainter } from './mapPainter';
 import { menuOpen } from './menuKit';
 import { createHints } from './hints';
+import { createNoticeBoard } from './noticeFade';
 import { createMindHud } from './mindHud';
 import { createMinimap } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
@@ -38,8 +39,6 @@ import { MOUNTS } from '../data/mounts';
 import { mountUnlocked } from '../systems/mounts';
 
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
-const NOTICE_MS = 1100;
-const NOTICE_HOLD_MS = 700; // a notice stands at least this long before the next takes its place (round 19: two at once, the first was lost)
 const MOUNT_TIP_MS = 5000; // the summon and ride lines leave; they are not a permanent prompt
 
 /** Notices for outcomes involving the player: [when the player dealt it, when the player took it]. */
@@ -62,8 +61,8 @@ export interface Hud {
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
   const minimap = createMinimap(g, root, painter);
-  const hints = createHints(g, root);
-  const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', root); // (the vitals at the upper left, the hints at the lower: round 52)
+  const hints = createHints(g);
+  const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', root); // (the vitals at the upper left)
   const hp = gauge(vitals, BLOOD, 7, true);
   const chip = el(`position:absolute;left:0;top:0;height:100%;width:100%;background:${BONE}aa`, '', hp.parentElement!);
   hp.parentElement!.insertBefore(chip, hp);
@@ -84,21 +83,12 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let heardAt = -Infinity;
   document.body.append(root);
 
-  let noticeUntil = 0;
   let mountTip = '';
   let mountTipUntil = 0;
-  const waiting: string[] = []; // notices held back while one stands
   let dying = false; // from UNMADE until the next waking: nothing else is written on the screen (round 54)
-  let noticeAt = -Infinity;
-  const put = (text: string): void => {
-    notice.textContent = fill(text, true); // a notice may name a button: {pause}
-    noticeAt = performance.now();
-    noticeUntil = noticeAt + NOTICE_MS;
-  };
+  const board = createNoticeBoard((text) => (notice.textContent = fill(text, true))); // a notice may name a button: {pause}
   const say = (text: string): void => {
-    if (!text || dying || waiting.includes(text)) return;
-    if (performance.now() - noticeAt < NOTICE_HOLD_MS) void (waiting.length < 3 && waiting.push(text));
-    else put(text);
+    if (!dying) board.say(text, performance.now());
   };
   const banner = createBanner(); // a death, a horror's fall, a place: the great words (banner.ts)
   const great = { ...banner, show: ((...a: Parameters<typeof banner.show>) => void (dying || banner.show(...a))) as typeof banner.show };
@@ -119,11 +109,11 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('Died', (e) => {
     if (e.entity !== me) return;
     dying = true; // UNMADE alone: the bars, notices and plates fade, and no other great words are shown over it
-    waiting.length = 0;
+    board.clear(); // (and the notice that is up goes, not to be seen again at the waking)
     banner.show(tr('hud.unmade'), 'death');
     setTimeout(() => banner.hide(), DYING_MS); // it fades as the veil falls (journeys.ts), which says what the last blow teaches
   });
-  g.events.on('Fell', () => void ((dying = true), (waiting.length = 0))); // over an edge: the screen is already giving way to the dark, and nothing else is written on it
+  g.events.on('Fell', () => void ((dying = true), board.clear())); // over an edge: the screen is already giving way to the dark, and nothing else is written on it
   g.events.on('Respawned', () => {
     dying = false;
     banner.hide();
@@ -186,8 +176,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const ready = LEVEL_IDS.some((id) => canLevel(g, id)); // a level within reach: rest at an Elder Sign
       setText(echoes, `${tr('hud.echoes', { n: Math.max(0, g.player.echoes - held()) })}${ready ? '  ▲' : ''}`);
       const now = performance.now();
-      if (waiting.length && now - noticeAt >= NOTICE_HOLD_MS) put(waiting.shift()!);
-      setStyle(notice, 'opacity', String(Math.min(1, Math.max(0, (noticeUntil - now) / 300)).toFixed(2)));
+      board.step(now);
+      setStyle(notice, 'opacity', board.opacity(now).toFixed(2));
       const [age, left] = [now - heardAt, HEARD.shown * 1000 - (now - heardAt)]; // in over half a second, out over the last second and a half
       setStyle(heard, 'opacity', String(Math.min(1, Math.max(0, Math.min(age / 500, left / 1500))).toFixed(2)));
       const act = fightAction(g);

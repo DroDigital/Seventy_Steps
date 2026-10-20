@@ -88,13 +88,18 @@ export const CLOCK = {
 
 /** The light under a dungeon's roof (round 40: it followed the moon's course, the clock's darkness and the grey of the last hour, so a roofed room was a different place at different hours, and washed out when the moon stood high): fixed at the night's start, whatever the hour, and eased in and out at the door. */
 export const DUNGEON_LIGHT = {
-  dark: 0.35, // the share of the night's darkness a roofed room takes (it keeps its ambient legible)
-  moon: 0.55, // the share of the moon's light that reaches the stone: it has no roof to shine through, only a high slant from the start of the night
+  dark: 0.35, // the share of the night's darkness a roofed room with no gloom takes (it keeps its ambient legible)...
+  deep: 1, // ...and the share the deepest gloom takes, of all of it (round 58: every room took the first, and the lantern was a decoration; world/gloom.ts, data/kits.ts)
+  moon: 0.55, // the share of the moon's light that reaches the stone: it has no roof to shine through, only a high slant from the start of the night...
+  moonDeep: 0.06, // ...and in the deepest gloom (round 58)
+  refuge: 0.35, // the most gloom a room with an Elder Sign keeps: a place to rest, and to be seen resting (round 58)
+  arena: 0.5, // and a horror's arena: a fight is read by what the horror throws and by its braziers (round 58)
+  adapt: 0.15, // the eye widens without a lantern: the darkness, in a room or on the road, is this much less of what it was where the lantern has gone out (render/lanternLife.ts; round 58)
   ease: 1.3, // 1/s: how fast the room's light takes over from the open sky's (and back) as the camera passes a door
 };
 
 /** How dark the night is kept (round 35: it was too bright to be creepy; render/realmLook.ts): at its deepest the sky, the mist, the far land and both lights are this much of what a realm's look gives them. */
-export const NIGHT_DARK = { sky: 0.24, mist: 0.28, far: 0.3, ambient: 0.2, moon: 0.28 };
+export const NIGHT_DARK = { sky: 0.16, mist: 0.11, far: 0.13, ambient: 0.09, moon: 0.11, fog: 0.2 }; // (round 58, "the open world at night lacks darkness": it was 0.24, 0.28, 0.3, 0.2 and 0.28, and the mist alone lit the road: only the lantern, the lamps and the moon's shapes are seen now; `fog`: what the volumetric mist's own light keeps of itself at the deepest, which no floor reached before, and it was the glow of most of the night's picture)
 
 export const WEATHER = {
   first: [300, 780] as const, // seconds of clear sky at the start of a game or a load, before the weather is first chosen (it was chosen at once: one load in four began in rain)

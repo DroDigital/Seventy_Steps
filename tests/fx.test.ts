@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { FX, RENDER } from '../src/data/tuning';
+import { driftAt, surgeAt } from '../src/render/warpWaves';
 import {
   allEffectsOn,
   anomalyProximity,
@@ -163,5 +164,75 @@ describe('a failing mind warps the picture more slowly past a point, and loses i
     s.enabled.dread = false;
     expect(computeFx(s)).toMatchObject({ blur: 0, strange: 0 });
     expect(computeFx(s).ripple).toBeGreaterThan(0); // the warp is its own toggle
+  });
+});
+
+
+describe('round 58: a failing mind\'s picture is flow at the edges, a lens, a second picture and a rare tear, in waves', () => {
+  const at = (sanity: number, time: number, extra: Partial<FxState> = {}): ReturnType<typeof computeFx> => computeFx({ ...state(sanity), time, ...extra });
+  const times = Array.from({ length: 2400 }, (_, i) => i * 0.1);
+
+  it('the surge is the warp\'s waves at this moment, and the picture swells and lulls with it', () => {
+    for (const t of [0, 7.3, 31.9, 120.4]) expect(at(30, t).surge).toBe(surgeAt(t, 0.7));
+    const xs = times.map((t) => at(30, t).surge);
+    expect(Math.min(...xs)).toBeLessThan(0.45);
+    expect(Math.max(...xs)).toBeGreaterThan(0.85);
+  });
+
+  it('a second picture comes with the warp, never while lucid, never past the cap or its toggle', () => {
+    expect(at(100, 5).ghost).toBe(0);
+    expect(at(76, 5).ghost).toBeLessThan(FX.ghost[1] * 0.03);
+    expect(at(20, 5).ghost).toBeGreaterThan(at(60, 5).ghost);
+    expect(at(0, 5).ghost).toBeLessThanOrEqual(FX.ghost[1]);
+    expect(at(0, 5, { cap: 0 }).ghost).toBe(0);
+    const off = state(0);
+    off.enabled.warp = false;
+    expect(computeFx({ ...off, time: 5 }).ghost).toBe(0);
+  });
+
+  it('the picture tears only at the edge of Unmoored, and only at the height of a surge', () => {
+    for (const t of times) expect(at(40, t).tear).toBe(0); // Fractured: never
+    const mad = times.map((time) => ({ surge: at(5, time).surge, tear: at(5, time).tear }));
+    expect(mad.some((m) => m.tear > 0.8)).toBe(true);
+    expect(mad.some((m) => m.tear === 0)).toBe(true);
+    for (const m of mad) expect(m.surge < 0.7 ? m.tear : 0).toBe(0); // a lull never tears
+    expect(Math.max(...times.map((t) => at(25, t).tear))).toBeLessThan(Math.max(...mad.map((m) => m.tear)));
+  });
+
+  it('a band lost sends a ring out of the middle, which pushes the picture as it passes and is gone with the pulse', () => {
+    expect(at(100, 0, { pulse: 0 }).shock).toBe(0);
+    expect(at(100, 0, { pulse: 1 }).shockAt).toBe(0);
+    let peak = 0;
+    let last = -1;
+    for (let pulse = 1; pulse > 0; pulse -= 0.05) {
+      const fx = at(100, 0, { pulse });
+      expect(fx.shockAt).toBeGreaterThan(last);
+      last = fx.shockAt;
+      peak = Math.max(peak, fx.shock);
+    }
+    expect(peak).toBeCloseTo(FX.shock, 2);
+    expect(at(100, 0, { pulse: 0.5, cap: 0.5 }).shock).toBeLessThan(at(100, 0, { pulse: 0.5 }).shock);
+    expect(at(100, 0, { pulse: 0.5, cap: 0 }).shock).toBe(0);
+  });
+
+  it('the lens drifts unevenly within its bounds and the surge gives it more, none while lucid', () => {
+    const mad = times.map((t) => lensAt(at(5, t), t));
+    expect(Math.max(...mad.map((l) => Math.abs(l.fovDeg - RENDER.fovDeg)))).toBeLessThanOrEqual(FX.fovBreatheDeg[1] * 0.7 + 1e-9);
+    expect(Math.max(...mad.map((l) => Math.abs(l.fovDeg - RENDER.fovDeg)))).toBeGreaterThan(FX.fovBreatheDeg[1] * 0.2);
+    expect(Math.max(...mad.map((l) => Math.abs(l.skew)))).toBeLessThanOrEqual(FX.skew[1] * 0.7 + 1e-9);
+    for (const t of [0, 3.3, 90]) {
+      const lens = lensAt(at(100, t), t);
+      expect(lens.fovDeg).toBe(RENDER.fovDeg);
+      expect(Math.abs(lens.skew)).toBe(0);
+    }
+    expect(driftAt(0)).toBeLessThan(1);
+  });
+
+  it('the warp ramps and the new parts live under the warp\'s own toggle', () => {
+    expect(EFFECT_PARAMS.warp).toEqual(expect.arrayContaining(['ripple', 'chroma', 'ghost', 'tear', 'shock']));
+    const calm = at(100, 9);
+    const mad = at(0, 9);
+    expect([calm.ghost, calm.tear]).toEqual([0, 0]);
+    expect(mad.ghost).toBeGreaterThan(0);
   });
 });

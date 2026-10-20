@@ -13,6 +13,8 @@
 import { boon } from './relics';
 import type { Entity } from '../core/ecs';
 import { distXZ } from '../core/geom';
+import { t } from '../core/i18n';
+import type { Tier } from '../data/schema';
 import { LAUDANUM, SANITY, SIM, UPGRADES } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
@@ -77,6 +79,10 @@ export function damageScale(g: Pick<Game, 'mind' | 'player'>, attacker: Entity, 
   return (attacker === g.player.id ? SANITY.dealt[i] : 1) * (target === g.player.id ? SANITY.taken[i] : 1);
 }
 
+/** How much of a creature's listed passive dread weighs on the mind, by its tier (SANITY.weigh), and how much of its blows, roars and gazes. */
+export const auraWeight = (tier: Tier): number => SANITY.weigh.aura[tier];
+export const blowWeight = (tier: Tier): number => SANITY.weigh.blow[tier];
+
 /** Share of an aura felt `gap` metres beyond the creature's body: whole within auraNear, none past auraFar. */
 export const auraShare = (gap: number): number => Math.min(1, Math.max(0, (SANITY.auraFar - gap) / (SANITY.auraFar - SANITY.auraNear)));
 
@@ -89,7 +95,7 @@ function drain(g: Game, dt: number): number {
   for (const [id, d] of dread) {
     if (d.aura <= 0 || isAbsent(g, id)) continue;
     const gap = distXZ(transform.get(id)!.pos, pp) - (body.get(id)?.radius ?? 0);
-    const a = d.aura * auraShare(gap) * (d.tier === 'lesser' ? SANITY.lesserAura : 1);
+    const a = d.aura * auraShare(gap) * auraWeight(d.tier);
     if (a > top) [top, rest] = [a, rest + top];
     else rest += a;
   }
@@ -100,7 +106,7 @@ function drain(g: Game, dt: number): number {
     if (distXZ(transform.get(id)!.pos, pp) > s.range) continue;
     const seen = hasLineOfSight(g.world, aimPoint(g, id)!, playerEye(g));
     if (s.sight && !seen) continue;
-    loss += (s.amount / (s.window[1] - s.window[0])) * SANITY.attackScale * (seen ? 1 : SANITY.muffled); // a roar past a wall is muffled (round 12)
+    loss += (s.amount / (s.window[1] - s.window[0])) * blowWeight(dread.get(id)?.tier ?? 'lesser') * (seen ? 1 : SANITY.muffled); // a roar past a wall is muffled (round 12)
   }
   return loss;
 }
@@ -121,11 +127,15 @@ export function fighting(g: Game): boolean {
   return false;
 }
 
+/** What the mind mends a second in the dark: slow, but Unmoored it clings harder (round 58), so that the lantern's return is never a long wait in the dark. */
+export const darkRate = (m: Mind): number => (m.band === 'unmoored' ? SANITY.mend.clinging : SANITY.mend.rate);
+
 /** Sanity mended a second now: none in a fight, or fallen, or whole; else the dark's rate, more the better lit the ground they stand on. */
 export function mendRate(g: Game): number {
   if (g.mind.sanity >= SANITY.max || g.ecs.c.actor.get(g.player.id)?.move === 'death' || fighting(g)) return 0;
   const lit = Math.min(1, Math.max(0, g.lit?.(g.ecs.c.transform.get(g.player.id)!.pos) ?? 0));
-  return (SANITY.mend.rate + (SANITY.mend.lit - SANITY.mend.rate) * lit) * boon(g, 'mend');
+  const dark = darkRate(g.mind);
+  return (dark + (Math.max(dark, SANITY.mend.lit) - dark) * lit) * boon(g, 'mend');
 }
 
 /** Unmoored, the body wears away as well (round 23): a little of full health a second, never to death, and none while a shot of Reagent holds the body. */
@@ -150,8 +160,18 @@ export function sanitySystem(g: Game, dt: number): void {
   const a = g.ecs.c.actor.get(g.player.id)!;
   const def = moveDef(a);
   if (a.frozen || a.frame !== def?.item || (def.use ?? 'laudanum') !== 'laudanum') return;
-  restoreSanity(g, LAUDANUM.sanity);
+  const share = tonicShare(g);
+  restoreSanity(g, LAUDANUM.sanity * share);
   g.player.steady = Math.round(LAUDANUM.steady * SIM.hz);
+  g.player.tonic = g.player.tonic.filter((at) => g.frame - at < LAUDANUM.window * SIM.hz); // (only the swallows still remembered are kept)
+  g.player.tonic.push(g.frame);
+  if (share < 1) g.events.emit('Notice', { text: t('n.tonicDull') });
+}
+
+/** How much of a dose a swallow now restores (round 58): whole, less LAUDANUM.dull for each taken within LAUDANUM.window seconds, to LAUDANUM.floor at least. */
+export function tonicShare(g: Pick<Game, 'player' | 'frame'>): number {
+  const recent = g.player.tonic.filter((at) => g.frame - at < LAUDANUM.window * SIM.hz).length;
+  return Math.max(LAUDANUM.floor, 1 - recent * LAUDANUM.dull);
 }
 
 /**
@@ -172,9 +192,10 @@ export function tollOnce(t: Toll, frame: number, cost: number, spell: number): n
 /** Subscribes the event-driven rules: landed blows take the attacker's sanityDamage, once a volley; respawning restores sanity and Laudanum. */
 export function registerSanity(g: Game): void {
   g.events.on('Hit', ({ attacker, target, damage, lingering }) => {
-    const blow = g.ecs.c.dread.get(attacker)?.blow ?? 0;
+    const dread = g.ecs.c.dread.get(attacker);
+    const blow = dread?.blow ?? 0;
     if (target === g.player.id && damage > 0 && !lingering && blow > 0 && g.player.steady <= 0) {
-      loseSanity(g, tollOnce(g.mind.struck, g.frame, blow, SANITY.volley) * SANITY.attackScale);
+      loseSanity(g, tollOnce(g.mind.struck, g.frame, blow * blowWeight(dread!.tier), SANITY.volley));
     }
     const me = g.player.id;
     const other = attacker === me ? target : target === me ? attacker : null; // a real blow between the investigator and a real foe (a hallucination's, a pool's and a swing at the air are none) is a fight

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { CLOCK, DUNGEON_LIGHT } from '../src/data/tuning';
+import { moonShare } from '../src/world/gloom';
 import { createNightFx, moonDir } from '../src/render/nightFx';
 import { worldUniforms } from '../src/render/worldMaterial';
 import { dawnOf, phaseOf } from '../src/systems/clock';
@@ -14,13 +15,13 @@ function rig() {
   const post = { uniforms: { uFogColor: { value: v3(0.1, 0.1, 0.1) } } };
   const fx = createNightFx({ overworld: {} } as unknown as Game, sky as never, post as never);
   /** One frame as the renderer lays it: the lights are set anew, then the night is added. */
-  const frame = (time: number, enclosed: boolean): void => {
+  const frame = (time: number, enclosed: boolean, gloom?: number): void => {
     worldUniforms.uAmbient.value.set(0.2, 0.2, 0.2);
     worldUniforms.uLightColor.value.set(0.5, 0.5, 0.5);
     sky.material.uniforms.uHorizon.value.set(0.1, 0.1, 0.1);
     sky.material.uniforms.uZenith.value.set(0.05, 0.05, 0.05);
     post.uniforms.uFogColor.value.set(0.1, 0.1, 0.1);
-    fx.update(time, enclosed);
+    fx.update(time, enclosed, gloom);
   };
   return { fx, sky, post, frame };
 }
@@ -50,6 +51,21 @@ describe('the night under a roof (round 40)', () => {
     expect(moon).toBeCloseTo(0.5 * DUNGEON_LIGHT.moon, 2);
     const still = moonDir(CLOCK.start);
     expect(worldUniforms.uLightDir.value.distanceTo(still)).toBeLessThan(1e-3);
+  });
+
+  it('dims the moon more in a room kept darker, to its own share, and the same whatever the hour (round 58)', () => {
+    const light = (gloom: number, phase: number): number => {
+      const { frame } = rig();
+      const t0 = at(phase);
+      for (let i = 0; i < 400; i++) frame(t0 + i / 60, true, gloom);
+      return worldUniforms.uLightColor.value.x;
+    };
+    expect(light(0, 0.3)).toBeCloseTo(0.5 * moonShare(0), 3);
+    expect(light(1, 0.3)).toBeCloseTo(0.5 * moonShare(1), 3);
+    expect(light(1, 0.3)).toBeLessThan(light(0.5, 0.3));
+    expect(light(0.5, 0.3)).toBeLessThan(light(0, 0.3));
+    expect(light(1, 0.05)).toBeCloseTo(light(1, 0.8), 6);
+    expect(light(1, 0.3)).toBeLessThan(0.5 * 0.12); // the stone is near black in the deepest of them
   });
 
   it('eases between the sky and the room, so a door is no step in the light', () => {

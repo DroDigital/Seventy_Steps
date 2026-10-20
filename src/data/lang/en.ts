@@ -235,6 +235,7 @@ export const EN = {
   'n.pictureKept': 'A PICTURE OF THE DREAM IS KEPT',
   'n.pictureFail': 'THE PICTURE WOULD NOT KEEP',
   'n.recovered': 'A DAMAGED SAVE WAS MENDED FROM ITS BACKUP',
+  'n.tonicDull': 'THE TONIC DULLS · A WEAKER DOSE, TAKEN SO SOON',
   'n.autoQuality': 'PICTURE SET FOR THIS COMPUTER · SETTINGS › DISPLAY',
   'n.gateHeld': 'THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU',
   'n.cache': 'A CACHE OF ECHOES · +{n}',
@@ -256,7 +257,7 @@ export const EN = {
   'hint.lead': 'The ◇ on the minimap marks where the story leads. The Journal ({journal}) says what to do there, and keeps every hint you are given in its Field Guide.',
   'hint.fight': '{light} strikes ({heavy}: a heavy blow). {block} blocks, and calls off a swing that has not landed; {parry} parries. {lock} locks on.',
   'hint.hurt': "{heal} injects West's Reagent and closes wounds. Its doses come back when you rest.",
-  'hint.mind': '{item} takes a swallow of Laudanum and steadies the mind. Away from a fight it mends by itself (▲), faster by lamplight and firelight (▲▲); the Elder Signs, Echoes and your own lantern do not count.',
+  'hint.mind': '{item} takes a swallow of Laudanum and steadies the mind; swallowed again within the minute, it dulls. Away from a fight it mends by itself (▲), faster by lamplight and firelight (▲▲); the Elder Signs, Echoes and your own lantern do not count.',
   'hint.sign': 'Rest at an Elder Sign with {interact}. You rise at the last one you rested at, and the creatures you killed come back, but not those standing guard about the stone itself until you rest at another.',
   'hint.echoes': 'You dropped your Echoes where you fell. Reach the spot again to take them back.',
   'hint.level': 'You carry Echoes enough for a level (▲). Rest at an Elder Sign to grow stronger, before you fall and drop them.',
@@ -283,7 +284,7 @@ export const EN = {
   'hint.gun': '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',
   'hint.oil': '{throw} throws a flask of lamp oil; it bursts and burns where it lands. Lock on first to throw it at a foe.',
   'hint.grab': 'A crimson flare means a grab: no guard stops it. Roll away ({dodge}).',
-  'hint.unmoored': 'Unmoored: you strike weaker and are struck harder, your breath comes back slower, and the body wears away a little. Laudanum ({item}), a lamp or a fire, or rest brings the mind back.',
+  'hint.unmoored': 'Unmoored: you strike weaker and are struck harder, your breath comes back slower, and the body wears away a little. Laudanum ({item}), a lamp or a fire, or rest brings the mind back. Your lantern gutters out while you are Unmoored, and kindles again once you have climbed above it.',
   'hint.phantom': 'It was never there. At the edge of madness the mind conjures horrors: they vanish when struck, and their blows wound only the mind. Laudanum ({item}) or rest steadies it.',} as const satisfies Record<string, string>;
 
 export type Key = keyof typeof EN;

@@ -6,7 +6,7 @@ import { startMove } from '../src/systems/actions';
 import { strike } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
 import { createGame } from '../src/systems/game';
-import { loseSanity, sanitySystem, setSanity } from '../src/systems/sanity';
+import { blowWeight, loseSanity, sanitySystem, setSanity } from '../src/systems/sanity';
 import { specialSystem } from '../src/systems/specials';
 import { place } from './helpers';
 
@@ -44,10 +44,10 @@ const hit = (g: Game, boss: Entity): void => {
 
 describe('boss sanity pressure leaves time to fight', () => {
   it.each([
-    ['colour_out_of_space', 70],
-    ['father_dagon', 54],
-    ['other_gods', 46],
-    ['yog_sothoth', 28],
+    ['colour_out_of_space', 52.6],
+    ['father_dagon', 51],
+    ['other_gods', 43],
+    ['yog_sothoth', 25],
   ] as const)('%s: a minute in its full aura, including first sight, leaves %d sanity without Resolve or a dose', (id, remaining) => {
     const { g } = pressure(id);
     seconds(g, 60);
@@ -55,16 +55,16 @@ describe('boss sanity pressure leaves time to fight', () => {
     expect(g.mind.band).not.toBe('unmoored');
   });
 
-  it('every scripted boss leaves at least 28 sanity after first sight and a minute of its full passive aura', () => {
+  it('every scripted boss leaves at least 25 sanity after first sight and a minute of its full passive aura', () => {
     for (const def of Object.values(ENTITIES).filter((d) => d.bossScript)) {
       const { g } = pressure(def.id);
       seconds(g, 60);
-      expect(g.mind.sanity, def.id).toBeGreaterThanOrEqual(28 - 1e-8);
+      expect(g.mind.sanity, def.id).toBeGreaterThanOrEqual(25 - 1e-8);
       expect(g.mind.sanity, def.id).toBeLessThan(100);
     }
   });
 
-  it('one dose supports two minutes against the Other Gods with three hits and two roars, without Resolve', () => {
+  it('two doses, a minute apart, carry two minutes against the Other Gods with three hits and two roars, without Resolve (round 58: one did, at half a meter)', () => {
     const { g, boss } = pressure('other_gods');
     const actor = g.ecs.c.actor.get(boss)!;
     for (let second = 0; second < 120; second++) {
@@ -81,12 +81,12 @@ describe('boss sanity pressure leaves time to fight', () => {
         actor.move = null;
         seconds(g, 1 - (roar.window[1] - roar.window[0]) / SIM.hz);
       } else {
-        if (second === 60) drink(g);
+        if (second === 35 || second === 100) drink(g);
         seconds(g, 1);
       }
       expect(g.mind.band, `second ${second}`).not.toBe('unmoored');
     }
-    expect(g.mind.sanity).toBeCloseTo(28, 4);
+    expect(g.mind.sanity).toBeCloseTo(45, 4);
   });
 
   it('Resolve still reduces auras, landed blows and roars by its full advertised share', () => {
@@ -126,7 +126,7 @@ describe('Laudanum protects against every recurring sanity attack', () => {
     expect(g.player.steady).toBe(0);
     expect(g.mind.sanity).toBe(sanity);
     strike(g, boss, g.player.id, blow);
-    expect(g.mind.sanity).toBe(sanity - g.ecs.c.dread.get(boss)!.blow * SANITY.attackScale);
+    expect(g.mind.sanity).toBe(sanity - g.ecs.c.dread.get(boss)!.blow * blowWeight(g.ecs.c.dread.get(boss)!.tier));
   });
 
   it('prevents a near-full gaze from bursting and lets its buildup decay during protection', () => {

@@ -29,7 +29,7 @@ const [FRONT_UPPER, HIND_UPPER] = [0.58, 0.66];
 /** The four legs, in the order of the gait: left fore, right fore, left hind, right hind. */
 export const LEGS: readonly LegPlan[] = [
   { front: true, side: 1, hip: [0.21, -0.1, 0.5], upper: FRONT_UPPER, lower: CANNON, sock: 0.28 },
-  { front: true, side: -1, hip: [-0.21, -0.1, 0.5], upper: FRONT_UPPER, lower: CANNON, sock: 0 },
+  { front: true, side: -1, hip: [-0.21, -0.1, 0.5], upper: FRONT_UPPER, lower: CANNON, sock: 0.3 }, // (round 57: it had none, and the one dark foot of four stood out; the socks are no two the same height)
   { front: false, side: 1, hip: [0.23, -0.06, -0.56], upper: HIND_UPPER, lower: CANNON, sock: 0.5 },
   { front: false, side: -1, hip: [-0.23, -0.06, -0.56], upper: HIND_UPPER, lower: CANNON, sock: 0.42 },
 ];

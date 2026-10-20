@@ -1,8 +1,10 @@
 /** The night of the arena and the open world: a dim low moon, a faint cold ambient, and the investigator's lantern. */
 
+import type * as THREE from 'three';
 import { wrapAngle } from '../core/geom';
 import { LANTERN, LIGHT, LIGHTING } from '../data/tuning';
 import type { Game } from '../systems/components';
+import { lanternGain } from './lanternLife';
 import { worldUniforms } from './worldMaterial';
 
 /** Switches the shared world light from the look test's moonlight to night: a dim low moon, and the lantern. */
@@ -21,7 +23,7 @@ export function placeLantern(g: Game, alpha: number): void {
   const t = g.frame / 60 + alpha / 60; // the flame breathes: three slow waves of its own
   const breath = LIGHTING.flicker.speed;
   const f = LIGHTING.flicker.lantern * (0.5 * Math.sin(t * breath) + 0.3 * Math.sin(t * breath * 2.37 + 1.7) + 0.2 * Math.sin(t * breath * 0.43));
-  worldUniforms.uLanternColor.value.set(...LANTERN.color).multiplyScalar(LANTERN.intensity * (1 + f));
+  worldUniforms.uLanternColor.value.set(...LANTERN.color).multiplyScalar(LANTERN.intensity * (1 + f) * lanternGain(g, alpha)); // (it gutters out when the mind comes Unmoored: lanternLife.ts)
   const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
   const [s, c] = [Math.sin(yaw), Math.cos(yaw)]; // forward (s, c), left (c, -s)
   const lerp = (p: number, q: number): number => p + (q - p) * alpha;
@@ -30,4 +32,11 @@ export function placeLantern(g: Game, alpha: number): void {
     lerp(tr.prev.y, tr.pos.y) + LANTERN.height,
     lerp(tr.prev.z, tr.pos.z) + c * LANTERN.forward - s * LANTERN.side,
   );
+}
+
+/** The flame drawn at the investigator's belt at `gain` of its light: smaller and dimmer as it gutters, gone when it is out (lanternLife.ts). */
+export function lightFlame(mesh: THREE.Mesh, gain: number): void {
+  mesh.visible = gain > 0.02;
+  mesh.scale.setScalar(0.45 + 0.55 * gain);
+  (mesh.material as THREE.ShaderMaterial).uniforms.uEmissive.value = gain;
 }

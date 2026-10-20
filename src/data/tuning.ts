@@ -4,6 +4,8 @@
  * blended by stress = min(1 - sanity/100, fx cap).
  */
 
+import type { Tier } from './schema';
+
 export type Ramp = readonly [calm: number, mad: number];
 export type Vec3 = readonly [number, number, number];
 
@@ -34,8 +36,10 @@ export const FX = {
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
   ditherSpread: [0.05, 0.12] as Ramp,
-  ripple: [0, 0.012] as Ramp, // UV units
-  chroma: [0, 0.009] as Ramp, // UV units
+  ripple: [0, 0.016] as Ramp, // UV units: how far the flow of the picture's edge carries it (round 58: the amplitude of a sine laid over the whole screen, 0.012)
+  chroma: [0, 0.009] as Ramp, // UV units: the lens's split of the colours at the edge of the picture (round 58: it turned about, whole)
+  ghost: [0, 0.34] as Ramp, // round 58: the share of a second picture, a little to one side, that a failing mind sees double with, at the surge's height (a fraction of that, as the warp is)
+  tearFrom: 0.8, // round 58: from this stress (sanity 20: the edge of Unmoored) the picture may tear in slices, now and then, at the height of a surge
   displace: [0, 1] as Ramp,
   displaceAmp: 0.6, // metres
   displaceFreq: 0.35,
@@ -49,15 +53,16 @@ export const FX = {
   dreadFrom: 0.25, // what a failing mind does besides begins at this stress and grows to madness: the edges of sight lose their focus...
   blur: [0, 1.1] as Ramp, // ...by up to this many low-res pixels...
   strange: [0, 1] as Ramp, // ...and the stars crawl, crowd and flicker (render/shaders/sky.ts)
-  fovBreatheDeg: [0, 7] as Ramp,
+  fovBreatheDeg: [0, 5] as Ramp, // (round 58: 7, and a pure sine: the lens drifts unevenly now, with the surges; render/warpWaves.ts)
   breatheHz: 0.23,
-  skew: [0, 0.07] as Ramp, // horizontal shear per unit of screen height
+  skew: [0, 0.05] as Ramp, // horizontal shear per unit of screen height (round 58: 0.07)
   skewHz: 0.11,
   anomalyNear: 4, // metres: anomalyProximity is 1 at this distance...
   anomalyFar: 30, // ...and 0 beyond this one
-  pulseSeconds: 0.8, // a band change for the worse sends a pulse of warp that fades over this long...
+  pulseSeconds: 1.1, // a band change for the worse sends a pulse of warp, and a ring from the middle of the picture, over this long (round 58: 0.8, and no ring)...
   pulseRipple: 0.012, // ...adding this much ripple...
-  pulseChroma: 0.01, // ...and chromatic split at its peak
+  pulseChroma: 0.01, // ...and chromatic split at its peak...
+  shock: 0.024, // ...the most the ring pushes the picture out as it passes, in UV units (round 58)
   detune: [0, -70] as Ramp, // cents the whole mix sags
   wobble: [0, 40] as Ramp, // cents it drifts around that
   distortion: [0, 0.85] as Ramp, // saturation amount, 0..1: loud sounds grow gritty and squashed, quiet ones stay as they are (engine.ts)
@@ -82,8 +87,8 @@ export const LIGHT = {
 /** The investigator's lantern: a warm point light at the hip, the night's only real light. */
 export const LANTERN = {
   color: [1, 0.82, 0.58] as Vec3,
-  intensity: 1.5,
-  range: 11, // metres: the light fades smoothly to nothing here (no hard edge)
+  intensity: 1.15, // (round 58: 1.5; the lantern lit a whole corridor and the road about it, and the dark it was to be walked through was not there)
+  range: 8.5, // metres: the light fades smoothly to nothing here (no hard edge) (round 58: 11)
   decay: 0.12, // inverse-square falloff, per m², so the pool is brightest at the player
   facing: 0.5, // weight of N·L: surfaces turned away keep 1 - facing of the light
   self: 0.45, // the investigator's share of it (of a character's): it hangs at their hip, well below the face...
@@ -147,11 +152,16 @@ export const SANITY = {
   auraFar: 12, // ...fading to nothing here
   auraStack: 0.35, // the strongest aura weighs whole, each of the rest this share (round 17: a pack of rats drained a mind in minutes)
   auraScale: 0.1, // passive dread should build over a fight: the strongest boss drains 1/s, rather than 10/s
-  attackScale: 0.5, // landed blows, roars and gazes take half their listed sanity damage
-  lesserAura: 0.6, // and the vermin's (the lesser tier's) weigh this much
+  // How much of a creature's listed sanity numbers weigh on the mind, by its tier (round 58: "standard enemies and certain bosses inflict minimal
+  // sanity loss". The great horrors and the gods were weighed right, at the old halves and wholes; the small and the middling were not: a deep one's
+  // blow took one point, and a named horror's fight of forty seconds, with first sight, some twenty):
+  weigh: {
+    aura: { lesser: 1, greater: 1.5, named: 1.6, great_old_one: 1, outer_god: 1, ally: 1 } as Readonly<Record<Tier, number>>, // the passive dread (was 0.6 for the vermin, 1 for the rest)
+    blow: { lesser: 0.9, greater: 0.8, named: 0.85, great_old_one: 0.5, outer_god: 0.5, ally: 0.5 } as Readonly<Record<Tier, number>>, // landed blows, roars and gazes (was a half of all)
+  },
   sightRange: 30, // metres: first sight needs a creature this close, in line of sight...
   sightCone: 50, // ...and within this many degrees of the camera's forward
-  firstSight: { lesser: 0, greater: 4, named: 6, great_old_one: 10, outer_god: 12, ally: 0 }, // sanity lost on first sight, by tier...
+  firstSight: { lesser: 0, greater: 6, named: 9, great_old_one: 13, outer_god: 15, ally: 0 }, // sanity lost on first sight, by tier (round 58: was 0, 4, 6, 10, 12)...
   muffled: 0.35, // share of a roar's toll that carries through a wall (round 12: whole, from 12 m)
   together: 240, // ...but of those first seen within this many frames of each other, only the greatest (round 12)
   volley: 75, // frames in which landed blows take the mind once: the greatest of them (a barrage's bolts, a swarm's bites; round 12)
@@ -164,9 +174,10 @@ export const SANITY = {
   },
   // The mind mends by itself while it is not in a fight (round 22): a real blow struck or taken, or a foe hunting them, holds it off; swinging at the air does not. Sanity regained a second in the dark, and standing at a lamp, fire or torch (not the Elder Signs' glow, an Echo's or the lantern's own).
   mend: {
-    rate: 0.25, // in the dark: a full mind in under seven minutes
-    lit: 1.6, // in the light of a lamp: a dose of Laudanum's worth in twenty seconds
-    delay: 6, // seconds after the last real blow before it begins
+    rate: 0.08, // in the dark: five points a minute, a full mind in twenty (round 58: 0.25, so that a dungeon's every wound was healed by the walk to its next room; the lamps are where the mind is mended now)
+    clinging: 0.3, // ...but Unmoored it takes hold again faster, so that the way back to Fractured, where the lantern kindles, is a minute at worst and no trap (round 58)
+    lit: 1.2, // in the light of a lamp: a dose of Laudanum's worth in thirty seconds (round 58: 1.6)
+    delay: 8, // seconds after the last real blow before it begins (round 58: 6)
     foes: 45, // metres: a hunting foe this close is a fight (aggro)
     reach: 0.6, // the share of a light's range (LIGHTS.kinds) its mending reaches; it falls off as 1 − distance/reach, to this power
     curve: 1.3,
@@ -177,8 +188,13 @@ export const SANITY = {
 /** The investigator's sanity tonic, refilled at the Elder Sign. */
 export const LAUDANUM = {
   doses: 3,
-  sanity: 50, // half the full sanity meter restored per dose
-  steady: 20, // seconds after a swallow in which auras, blows, roars, gazes and the void take no sanity
+  sanity: 35, // a third of the full sanity meter restored per dose (round 58: half, so that three swallows were a whole mind again)
+  steady: 10, // seconds after a swallow in which auras, blows, roars, gazes and the void take no sanity (round 58: 20)
+  // The tonic dulls the mind that takes it again soon (round 58): a swallow within `window` seconds of others restores `dull` less for each, down to `floor` of a dose,
+  // so three in a row are worth about two (35 + 21 + 10), and a dose taken a minute after the last is whole again.
+  window: 60,
+  dull: 0.4,
+  floor: 0.3,
 };
 
 /** Insight upgrades (spec §3A): insight per level, the most levels, and what each level adds. The body's strength is bought with Echoes (LEVELS). */

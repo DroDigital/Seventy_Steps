@@ -8,7 +8,7 @@ import { QUESTS } from '../src/data/quests';
 import { mainLead } from '../src/systems/lead';
 import { startQuest, stageOf } from '../src/systems/quests';
 import { bossAwake, SEAL_REGIONS, sealsBroken } from '../src/systems/sealCount';
-import { sealedHere } from '../src/systems/seals';
+import { sealedHere, sealSystem } from '../src/systems/seals';
 import { worldLayout } from '../src/world/placements';
 import { goTo, record, run } from './worldHelpers';
 
@@ -66,6 +66,32 @@ describe('playtest round 12: the way on is earned', () => {
     expect(g.ecs.c.layer.get(id)!.shown).toBe(true);
     expect(door.seal.every((c) => g.world.off.has(c))).toBe(true); // the way is open
     expect(sealedHere(g)).toBeNull();
+  });
+
+  it('the sealed door says so again on coming back to it, not only after twenty seconds', () => {
+    const g = createWorldGame();
+    const [, door] = [...g.ecs.c.piece].find(([, p]) => p.def.minSeals !== undefined)!;
+    const said: string[] = [];
+    g.events.on('Notice', (e) => said.push(e.text));
+    const near = { x: door.def.x, z: door.def.z - 3, yaw: 0 };
+    const far = { x: door.def.x, z: door.def.z - 3 - SEALS.warn - 20, yaw: 0 };
+    const stand = (at: typeof near, seconds: number): void => { // the system looks every half second of the game's own time
+      teleport(g, at);
+      for (let i = 0; i < seconds * 2; i++) { g.frame += 30 - (g.frame % 30); sealSystem(g); }
+    };
+    stand(near, 1);
+    expect(said).toHaveLength(1);
+    stand(near, SEALS.again / 2);
+    expect(said).toHaveLength(1); // still at the door: not told again before the time is up
+    stand(far, 1);
+    stand(near, 1);
+    expect(said).toHaveLength(1); // out of reach for a moment only: it does not repeat itself at the edge
+    stand(far, SEALS.away + 1);
+    stand(near, 1);
+    expect(said).toHaveLength(2); // walked away and come back: told again
+    expect(said[1]).toBe(said[0]);
+    stand(near, SEALS.again + 1);
+    expect(said).toHaveLength(3); // and a long wait at the door says it every twenty seconds
   });
 
   it("beyond the Gate the horrors wake in order: 'Umr at-Tawil, then Yog-Sothoth, then Azathoth", () => {

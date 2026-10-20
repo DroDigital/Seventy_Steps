@@ -13,7 +13,7 @@ import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
-import { CLOCK, DUNGEON_LIGHT, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
+import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
 import { createActorViews } from './render/actorViews';
@@ -46,6 +46,7 @@ import { createFxController } from './render/fxController';
 import { createHiddenViews } from './render/hiddenViews';
 import { createWorldScene } from './render/worldScene';
 import { lightNight, placeLantern } from './render/lantern';
+import { lanternGain } from './render/lanternLife';
 import { applyLens } from './render/lens';
 import { ANOMALY } from './render/palette';
 import { createPipeline } from './render/pipeline';
@@ -90,6 +91,7 @@ import { createRiseMenu } from './ui/riseMenu';
 import { takeCarry } from './systems/records';
 import { takeFlag, title } from './ui/titleFlow';
 import { createArenaScene } from './world/arenaScene';
+import { adapted, darkShare, gloomAt } from './world/gloom';
 import { roofedAt } from './world/terrain';
 import { refreshMountEntitlement } from './ui/mounts';
 import { startMountGallery } from './ui/mountGallery';
@@ -272,10 +274,12 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
         hud.hide(cinema.active || extras.hidesHud);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
-        look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? (enclosed ? darkOf(CLOCK.start) * DUNGEON_LIGHT.dark : darkOf(phaseOf(time))) : 0);
+        const lantern = lanternGain(game, alpha); // (the eye widens where it has gone out: world/gloom.ts)
+        const gloom = enclosed ? gloomAt(camera.position.x, camera.position.z) : 0; // how dark the room under a roof is kept: the lantern is what is walked by (round 58)
+        look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? adapted(enclosed ? darkOf(CLOCK.start) * darkShare(gloom) : darkOf(phaseOf(time)), lantern) : 0);
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0 });
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, dark: look.dark });
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
@@ -287,7 +291,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         views.update(alpha, time);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
-        lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, views.flameCover(camera.position));
+        lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
@@ -309,7 +313,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         applyReality(fx, game.reality);
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
-        life.update(camera, time, enclosed, alpha); // after the night's light: the lightning adds to it
+        life.update(camera, time, enclosed, alpha, gloom); // after the night's light: the lightning adds to it
         if (spawned) audio.update(fx, time, camera, still, cinema.active);
         const lens = lensAt(fx, time);
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);

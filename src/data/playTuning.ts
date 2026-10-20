@@ -294,7 +294,8 @@ export const SEALS = {
   exempt: ['hub', 'dreamlands', 'beyond'] as readonly string[], // regions holding no seal
   kadath: 4, // seals broken before the Great Ones' door opens (Keziah's, on the main line, is one)
   warn: 6, // metres: this close to a sealed door, the investigator is told what it waits for...
-  again: 20, // ...at most every this many seconds
+  again: 20, // ...at most every this many seconds while it stays near...
+  away: 3, // ...and again at once on coming back to it, once it has been this many seconds out of reach (round 58: a door walked away from was not told again for twenty seconds)
   after: { yog_sothoth: 'umr_at_tawil', azathoth: 'yog_sothoth' } as Readonly<Record<string, string>>, // the Beyond's order: each waits for the one before to fall
 };
 

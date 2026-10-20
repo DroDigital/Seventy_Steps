@@ -37,6 +37,10 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uTime: { value: 0 },
     uRipple: { value: 0 },
     uChroma: { value: 0 },
+    uGhost: { value: 0 }, // a failing mind's double picture, its tears, the surge it comes in and the ring a band lost sends out (round 58)
+    uTear: { value: 0 },
+    uSurge: { value: 0 },
+    uShock: { value: new THREE.Vector2(0, 0) },
     uIsolate: { value: 0 },
     uDesat: { value: 0 },
     uAnomalyProximity: { value: 0 },
@@ -96,6 +100,10 @@ export function updatePostUniforms(post: PostPass, fx: FxParams, time: number, r
   u.uTime.value = time;
   u.uRipple.value = fx.ripple;
   u.uChroma.value = fx.chroma;
+  u.uGhost.value = fx.ghost;
+  u.uTear.value = fx.tear;
+  u.uSurge.value = fx.surge;
+  u.uShock.value.set(fx.shock, fx.shockAt);
   u.uIsolate.value = fx.isolate ? 1 : 0;
   u.uDesat.value = fx.desaturate;
   u.uAnomalyProximity.value = fx.anomalyProximity;

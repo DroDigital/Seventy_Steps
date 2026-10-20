@@ -62,8 +62,11 @@ describe("the investigator's lantern", () => {
 
   it('outshines their face, however brightly the night lights it (playtest round 5)', () => {
     const f = buildFigure('player');
-    const flame = f.torso.children.filter((o): o is THREE.Mesh => o instanceof THREE.Mesh && (o.material as ShaderMaterial).uniforms.uEmissive.value === 1);
-    expect(flame).toHaveLength(1); // at the belt, where its halo hangs
+    const flame = f.flameMesh ? [f.flameMesh] : [];
+    expect(flame).toHaveLength(1);
+    expect(f.flameMesh!.parent).toBe(f.flame); // at the belt, where its halo hangs (and where it is dimmed and put out as the mind fails: lanternLife.ts)
+    expect((flame[0].material as ShaderMaterial).uniforms.uEmissive.value).toBe(1);
+    expect(f.torso.children.filter((o) => o instanceof THREE.Mesh && (o.material as ShaderMaterial).uniforms.uEmissive.value === 1)).toHaveLength(0); // no other flame on the torso
     f.root.updateMatrixWorld(true);
     const box = flame[0].geometry.boundingBox ?? (flame[0].geometry.computeBoundingBox(), flame[0].geometry.boundingBox!);
     expect(f.flame!.getWorldPosition(new THREE.Vector3()).distanceTo(box.getCenter(new THREE.Vector3()).applyMatrix4(flame[0].matrixWorld))).toBeLessThan(1e-6);
