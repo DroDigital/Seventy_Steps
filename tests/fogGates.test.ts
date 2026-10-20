@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { strike, targetsOf } from '../src/systems/combat';
-import { allFogs, crosses, fogBlockSystem, fogBetween, fogNear, fogToPass, passFog, sideOf } from '../src/systems/fogGates';
+import { allFogs, crosses, fogBlockSystem, fogBetween, fogNear, fogToPass, passFog, sideOf, walkAlong } from '../src/systems/fogGates';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { interactable } from '../src/systems/checkpoints';
 import { place } from './helpers';
@@ -55,7 +55,7 @@ describe('the fog before a horror is a wall (round 35)', () => {
     expect(Math.sign(sideOf(w, tr.pos))).toBe(-before);
   });
 
-  it('the walk through is a walk: every step has ground going by, so the legs move (round 45: movement overwrote the step, and they glided)', () => {
+  it('the walk through is a walk, from rest to rest: under way the ground goes by, so the legs move (round 45: movement overwrote the step, and they glided), and it ends standing (round 60)', () => {
     const g = createWorldGame();
     const w = doorway();
     const a = beside(w, 1.6);
@@ -65,11 +65,30 @@ describe('the fog before a horror is a wall (round 35)', () => {
     const speeds: number[] = [];
     for (let i = 0; i < 400 && g.player.fogPass; i++) {
       stepGame(g, emptyInput());
-      if (g.player.fogPass) speeds.push(Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * 60);
+      speeds.push(Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * 60); // (the last is the step it ends on)
     }
+    const third = Math.floor(speeds.length / 3);
     expect(speeds.length).toBeGreaterThan(30);
-    expect(Math.min(...speeds.slice(5, -5))).toBeGreaterThan(0.8);
+    expect(Math.min(...speeds.slice(third, -third)), 'a walk once under way').toBeGreaterThan(1.5);
     expect(Math.max(...speeds)).toBeLessThan(2.4);
+    expect(speeds[0], 'it sets off from standing').toBeLessThan(0.3);
+    expect(speeds.at(-1), 'it ends standing: an arrival that holds the world as it ends shows them still, not striding in place').toBeLessThan(0.2);
+    for (let i = speeds.length - 30; i < speeds.length; i++) expect(speeds[i], 'and it slows into it').toBeLessThanOrEqual(speeds[i - 1] + 1e-9);
+  });
+
+  it('walkAlong runs from 0 to 1 without a jump, never back, its pace from rest to rest', () => {
+    for (const seconds of [0.7, 1.3, 2.5, 4]) {
+      let last = 0;
+      for (let k = 1; k <= 200; k++) {
+        const now = walkAlong(k / 200, seconds);
+        expect(now).toBeGreaterThanOrEqual(last);
+        expect(now - last, `${seconds} s at ${k}`).toBeLessThan(0.02);
+        last = now;
+      }
+      expect(last).toBe(1);
+      expect(walkAlong(0.002, seconds) / 0.002).toBeLessThan(0.1); // from rest
+      expect((1 - walkAlong(0.998, seconds)) / 0.002).toBeLessThan(0.1); // to rest
+    }
   });
 
   it('the walk is the fog\'s, so nothing sees or strikes the investigator on it: the horror wakes as it ends, not while they cannot answer (round 60)', () => {
