@@ -7,7 +7,7 @@
 
 import type { RoomDef, RoomKind } from '../data/dungeons';
 import type { DungeonKit } from '../data/kits';
-import { DUNGEON_LIGHT } from '../data/lifeTuning';
+import { DUNGEON_LIGHT, NIGHT_DARK } from '../data/lifeTuning';
 import { kitOfRoom } from './dungeonKit';
 import { dungeonRoomAt } from './terrain';
 
@@ -35,8 +35,17 @@ const lerp = (a: number, b: number, k: number): number => a + (b - a) * k;
 /** The share of the night's darkness a room of this gloom takes (the open sky is its own: render/realmLook.ts). */
 export const darkShare = (gloom: number): number => lerp(DUNGEON_LIGHT.dark, DUNGEON_LIGHT.deep, clamp01(gloom));
 
-/** The share of the moon's light that reaches a room of this gloom. */
-export const moonShare = (gloom: number): number => lerp(DUNGEON_LIGHT.moon, DUNGEON_LIGHT.moonDeep, clamp01(gloom));
+/**
+ * The share of the moon's light that reaches a room of this gloom, after the night has darkened it. The open land's moon is darkened to
+ * `NIGHT_DARK.moon` at its deepest and a room's was meant to be darkened to `DUNGEON_LIGHT.moonFloor`, by the same darkness (`night`: how
+ * deep the night is laid at the start of a journey, which a room keeps all night; 1, the deep of it, unless said) taken by the room's gloom; the share is what
+ * makes the one the other, so the light that reaches the stone is `lerp(moon, moonDeep, gloom)` of the moon at the room's own floor, whatever the land's.
+ */
+export const moonShare = (gloom: number, night = 1): number => {
+  const g = clamp01(gloom);
+  const dark = clamp01(night * darkShare(g));
+  return (lerp(DUNGEON_LIGHT.moon, DUNGEON_LIGHT.moonDeep, g) * (1 - dark * (1 - DUNGEON_LIGHT.moonFloor))) / (1 - dark * (1 - NIGHT_DARK.moon));
+};
 
 /** The darkness with the eye taken into account: where the lantern has gone out (`lantern` 0: render/lanternLife.ts) it widens, and the dark is `DUNGEON_LIGHT.adapt` less of what it was. */
 export const adapted = (dark: number, lantern: number): number => dark * (1 - DUNGEON_LIGHT.adapt * (1 - clamp01(lantern)));

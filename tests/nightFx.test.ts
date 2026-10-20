@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { CLOCK, DUNGEON_LIGHT } from '../src/data/tuning';
+import { CLOCK } from '../src/data/tuning';
 import { moonShare } from '../src/world/gloom';
 import { createNightFx, moonDir } from '../src/render/nightFx';
 import { worldUniforms } from '../src/render/worldMaterial';
-import { dawnOf, phaseOf } from '../src/systems/clock';
+import { darkOf, dawnOf, phaseOf } from '../src/systems/clock';
 import type { Game } from '../src/systems/components';
 
 const v3 = (...c: number[]): THREE.Vector3 => new THREE.Vector3(...c);
@@ -48,7 +48,7 @@ describe('the night under a roof (round 40)', () => {
     expect(new Set(seen).size).toBe(1);
     const [amb, moon] = seen[0].split(',').map(Number);
     expect(amb).toBeCloseTo(0.2, 3);
-    expect(moon).toBeCloseTo(0.5 * DUNGEON_LIGHT.moon, 2);
+    expect(moon).toBeCloseTo(0.5 * moonShare(0, darkOf(CLOCK.start)), 2);
     const still = moonDir(CLOCK.start);
     expect(worldUniforms.uLightDir.value.distanceTo(still)).toBeLessThan(1e-3);
   });
@@ -60,8 +60,8 @@ describe('the night under a roof (round 40)', () => {
       for (let i = 0; i < 400; i++) frame(t0 + i / 60, true, gloom);
       return worldUniforms.uLightColor.value.x;
     };
-    expect(light(0, 0.3)).toBeCloseTo(0.5 * moonShare(0), 3);
-    expect(light(1, 0.3)).toBeCloseTo(0.5 * moonShare(1), 3);
+    expect(light(0, 0.3)).toBeCloseTo(0.5 * moonShare(0, darkOf(CLOCK.start)), 3);
+    expect(light(1, 0.3)).toBeCloseTo(0.5 * moonShare(1, darkOf(CLOCK.start)), 3);
     expect(light(1, 0.3)).toBeLessThan(light(0.5, 0.3));
     expect(light(0.5, 0.3)).toBeLessThan(light(0, 0.3));
     expect(light(1, 0.05)).toBeCloseTo(light(1, 0.8), 6);

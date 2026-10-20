@@ -13,7 +13,7 @@ import { SETTINGS_KEY } from './settings';
 import type { Shell } from './shell';
 
 export const AUTO_KEY = 'lovecraft-souls-like/autoquality';
-const MOST = 4; // steps at most
+const MOST = LADDER.length - 1; // steps at most: the whole ladder, whatever its length
 
 /** Whether this launch is the first, and the picture is the game's to set. */
 export function firstLaunch(store: SaveStore | null): boolean {

@@ -1,9 +1,12 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DUNGEON_FOG, dungeonFogOf, FOGS } from '../src/data/fogs';
-import { LOOKS } from '../src/data/looks';
+import { LOOKS, lookOf } from '../src/data/looks';
 import { REGIONS } from '../src/data/regions';
+import { NIGHT_DARK } from '../src/data/lifeTuning';
 import { FOG } from '../src/data/tuning';
-import { easeFog, fogOf } from '../src/render/volumetricFog';
+import type { PostPass } from '../src/render/postPass';
+import { createVolumetricFog, easeFog, fogOf } from '../src/render/volumetricFog';
 
 const EYE = 3.5; // metres above the ground: about where the follow camera stands
 
@@ -65,5 +68,26 @@ describe('volumetric fog (playtest rounds 16 and 23)', () => {
     expect(half.haze).toBeCloseTo((FOGS.hub.haze + FOGS.innsmouth.haze) / 2, 6);
     expect(half.color[1]).toBeCloseTo((FOGS.hub.color[1] + FOGS.innsmouth.color[1]) / 2, 6);
     expect(easeFog(FOGS.hub, FOGS.innsmouth, 1)).toEqual({ ...FOGS.innsmouth, color: [...FOGS.innsmouth.color], wind: [...FOGS.innsmouth.wind] });
+  });
+
+  it("carries the mist's night tone over a dungeon's threshold as it carries its density: eased, never in one frame (round 58)", () => {
+    const v3 = () => ({ value: new THREE.Vector3() }), v4 = () => ({ value: new THREE.Vector4() });
+    const uniforms = { uProjInv: { value: new THREE.Matrix4() }, uCamWorld: { value: new THREE.Matrix4() }, uCamPos: v3(), uFog: v4(), uFogAir: v4(), uFogColor: v3(), uFogDrift: v3() };
+    const fog = createVolumetricFog({ uniforms } as unknown as PostPass);
+    const camera = new THREE.PerspectiveCamera();
+    const frame = (enclosed: boolean) => ({ region: 'hub', enclosed, ground: 0, stress: 0, setting: 1, dark: 1 });
+    const colour = () => uniforms.uFogColor.value.clone();
+    fog.update(camera, 10, frame(false));
+    const open = colour();
+    expect(open.length()).toBeGreaterThan(0);
+    const dt = 1 / 60, k = Math.min(1, dt * FOG.ease);
+    fog.update(camera, 10 + dt, frame(true)); // the step through the door
+    const into = colour(), room = new THREE.Vector3(...dungeonFogOf('hub').color).multiplyScalar(NIGHT_DARK.fog); // (the deepest night: the tone is the mist's share, k of the way from the open air's to the room's)
+    const want = new THREE.Vector3(...easeFog({ ...FOGS.hub, color: lookOf('hub').mist }, dungeonFogOf('hub'), k).color).multiplyScalar(NIGHT_DARK.openFog + (NIGHT_DARK.fog - NIGHT_DARK.openFog) * k);
+    expect(into.distanceTo(want)).toBeLessThan(1e-9); // one frame in: the tone is k of the way, as the density is
+    expect(into.length()).toBeGreaterThan(room.length() * 1.5); // not the room's dim tone at once
+    for (let i = 2; i < 4000; i++) fog.update(camera, 10 + i * dt, frame(true));
+    expect(colour().distanceTo(room)).toBeLessThan(1e-6); // and it arrives
+    expect(NIGHT_DARK.fog).toBeLessThan(1);
   });
 });
