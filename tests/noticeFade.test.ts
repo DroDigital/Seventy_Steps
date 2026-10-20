@@ -6,7 +6,8 @@ describe('round 58: a notice stands long enough to read, and fades slowly', () =
     const [short, gate, vast] = ['PARRY', 'THE DOOR IS SEALED · 1 OF 4 GREAT HORRORS HAVE FALLEN', 'X'.repeat(500)];
     expect(noticeHold(short)).toBeGreaterThanOrEqual(NOTICE.base);
     expect(noticeHold(gate)).toBeGreaterThan(noticeHold(short));
-    expect(noticeHold(gate)).toBeGreaterThan(4000); // the gate's line was up for 1.1 s
+    expect(noticeHold(gate)).toBeGreaterThan(2000); // the gate's line was up for 1.1 s, then 4.5 s; it is read in about two and a quarter
+    expect(noticeHold(gate) + NOTICE.fadeOut).toBeLessThan(3500); // and is gone in about three, half what it was
     expect(noticeHold(vast)).toBe(NOTICE.max);
   });
 
@@ -88,7 +89,7 @@ describe('round 58: the board that keeps the line in the middle of the screen', 
     board.clear(); // the fall begins at 1 s
     expect(screen.text).toBe('');
     expect(board.opacity(1000)).toBe(0);
-    // the waking, after the dying: a notice's own hold (4.6 s) and fade would have run on
+    // the waking, after the dying: a notice's own hold (2.2 s) and fade would have run on
     for (const now of [2500, 3000, 4600, 5500, 60_000]) {
       board.step(now);
       expect(board.opacity(now), `at ${now}`).toBe(0);
