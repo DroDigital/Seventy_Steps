@@ -6,6 +6,7 @@
  * credit them in public/audio/CREDITS.md, run `python3 tools/audio_levels.py`, and each stands in front of the recipe it
  * answers (which stays beneath it, a third as loud, so what a recording lacks the recipe lends). A set marked `fit` is
  * played faster or slower to last exactly as long as the motion it sounds with (a door's swing, the mist's walk).
+ * The horse's (round 59) are the mounts' own foley, found on Freesound as CC0, and stand alone (`under: 0`) in front of the recipes in data/mountSounds.ts.
  * Each carries the prompt to make it with Suno Sounds (those with no takes yet are the ones to make). Gains place the recorded takes in front of the recipe's level (tests/soundMix.test.ts). Data only.
  */
 
@@ -17,6 +18,7 @@ export interface Planned {
   for: readonly string[]; // the recipes (by key: render/audio/gameAudio.ts `recipe`) it stands in front of
   seconds: readonly [number, number]; // how long to make it
   fit?: boolean; // played to last as long as its motion
+  under?: number; // the share of its recipe that stays beneath it (a third unless said; 0 for a voice, where a recipe beneath would only muddy a recording)
   prompt: string; // for Suno Sounds, One Shot: sound, action, place, perspective, length
 }
 
@@ -45,6 +47,12 @@ export const PLANNED: readonly Planned[] = [
   { id: 'quillScratch', file: 'quill_scratch', takes: 3, gain: 0.42, for: ['act:scratch'], seconds: [0.08, 0.2], prompt: `A steel nib scratching a few quick strokes on rough paper, close perspective, 0.15 second duration${NO_MUSIC}` },
   { id: 'keyChime', file: 'key_chime', takes: 2, gain: 0.32, for: ['act:keys'], seconds: [0.2, 0.4], prompt: `A small silver key turned slowly in lamplight, a few tiny bright chimes of its ward, close perspective, 0.3 second duration${NO_MUSIC}` },
   { id: 'vialRing', file: 'vial_ring', takes: 2, gain: 0.16, for: ['act:glass'], seconds: [0.2, 0.4], prompt: `A small glass vial tapped against a lamp, one clear high ring that fades, close perspective, 0.3 second duration${NO_MUSIC}` },
+  // the horse (round 59): what the Chariot's draft horse says and does when it is called and while it stands (render/audio/mountAudio.ts)
+  { id: 'horseWhinny', file: 'horse_whinny', takes: 4, gain: 0.7, under: 0, for: ['mount:grey:summon'], seconds: [1.3, 2.3], prompt: `A draft horse whinnying once, a long loud call that breaks high and falls away, in a quiet stable yard at night, medium perspective, 2 seconds duration${NO_MUSIC}` },
+  { id: 'horseWhicker', file: 'horse_whicker', takes: 3, gain: 0.55, under: 0, for: ['mount:grey:whicker', 'mount:grey:greet'], seconds: [0.6, 1], prompt: `A horse giving one low soft whickering nicker, a breathy shaking call deep in the throat, a quiet stable, close perspective, 0.8 second duration${NO_MUSIC}` },
+  { id: 'horseSnort', file: 'horse_snort', takes: 5, gain: 0.65, under: 0, for: ['mount:grey:snort', 'mount:grey:urge'], seconds: [0.5, 1], prompt: `A horse snorting once through its nostrils, a short hard blast of air with a wet flutter in it, quiet night air, close perspective, 0.7 second duration${NO_MUSIC}` },
+  { id: 'horseBlow', file: 'horse_blow', takes: 3, gain: 0.85, under: 0, for: ['mount:grey:blow', 'mount:grey:halt'], seconds: [0.45, 0.7], prompt: `A horse blowing out one long soft breath through its nostrils, a low airy huff, quiet night air, close perspective, 0.6 second duration${NO_MUSIC}` },
+  { id: 'horseHarness', file: 'horse_harness', takes: 4, gain: 0.9, under: 0, for: ['mount:grey:shake', 'mount:grey:settle', 'mount:grey:toss'], seconds: [1.2, 1.5], prompt: `The harness of a draft horse jingling and rattling as it tosses its head, leather and small iron rings, quiet night air, close perspective, 1.3 second duration${NO_MUSIC}` },
   // A horror's blows, by what they are made of (round 59: data/attackSounds.ts made them of sines and filtered noise alone, which to the
   // ear were blips): where a bolt or a beam lands and where the ground bursts, and the throw or the cast as a bolt leaves. All found, CC0.
   ...atk('atkWater', 'atk_water', 3, 0.55, ['land:tide', 'burst:tide'], 'A heavy mass of seawater slamming onto wet stone, a big splash with spray falling after it'),

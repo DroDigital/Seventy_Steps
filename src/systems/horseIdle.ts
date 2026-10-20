@@ -1,5 +1,5 @@
 /**
- * The draft horse's pawing at the ground while it stands (round 57: the picture and the ear share one clock). Now and then, by the
+ * The draft horse's idle motions: its head toss and pawing share their clocks with the sound. Now and then, by the
  * nine-second period it is drawn on, a fore hoof is lifted and put down twice; `landed` says whether one came down between two moments,
  * so the sound is the hoof's own (render/audio/mountAudio.ts) and render/draftHorse.ts draws the stroke. No Three.js.
  */
@@ -7,7 +7,19 @@ import { hash2 } from '../core/rng';
 
 export const PAW = Object.freeze({ period: 9, from: 2, span: 1.6, landings: Object.freeze([1 / 3, 1] as const) });
 
+/** A breath followed by a head toss: the renderer rises to `peak`, when the harness sounds, then settles. Presentation only, never saved. */
+export interface HorseToss { start: number; peak: number }
+export const HORSE_TOSS = Object.freeze({ settle: 0.5 });
+
 const clamp = (v: number, lo = 0, hi = 1): number => Math.min(hi, Math.max(lo, v));
+
+/** The shared head lift, 0 at rest and 1 when the harness rattles. */
+export function tossAt(time: number, cue?: HorseToss | null): number {
+  if (!cue || !(cue.peak > cue.start) || time <= cue.start || time >= cue.peak + HORSE_TOSS.settle) return 0;
+  const share = time <= cue.peak ? (time - cue.start) / (cue.peak - cue.start) : 1 - (time - cue.peak) / HORSE_TOSS.settle;
+  const t = clamp(share);
+  return t * t * (3 - 2 * t);
+}
 
 /** 0 when the hoof is not pawing; otherwise 0 to 1 through the stroke (the picture lifts the hoof by the sine of 3 pi times it). */
 export function pawAt(time: number): number {

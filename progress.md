@@ -24,3 +24,17 @@ Original prompt: Implement all reviewed creature sprites and animations correctl
 - Inspected 630 side samples across all entries; normal Innsmouth alone needed left/right registration routing correction.
 - Final code bundle compiled successfully; normal local copy of older cached audio stalled, so clean-checkout CI will verify final packaging.
 - Final live production browser pass and GitHub publication pending.
+
+## PR 148 review fix (2026-10-20)
+
+- Request: address and fix the issues found by the review.
+- The arrival stamp played a hoofbeat and recorded footfall without a matching hoof animation. Remove that extra cue; keep the whinny, harness settle, whicker and the gait/paw landing sounds.
+- Updated the arrival regression to reject both the stamp and its recorded footfall; confirmed it fails against the reviewed code before applying the fix.
+- Validation: `npm run check -- --maxWorkers=2` (272 files, 2,622 tests), `npm run build`, and `git diff --check` passed. Browser checks with the actual mount renderer and scheduler passed standing arrival/rest, walking (11 hoof cues and 11 footfall samples), dismissal and two shared-clock paw landings; no browser errors. The browser harness logs source callbacks rather than playing the audio mix.
+
+## PR 148 follow-up: visible head toss (2026-10-20)
+
+- Request: address the new review finding that an idle harness rattle had no visible head toss.
+- The idle breath now starts one transient toss cue, shared by the renderer and audio scheduler on the render clock. The head rises before the harness rattle at its peak, then settles; moving off, dismissal and long frame gaps cancel the cue and pending rattle.
+- Existing arrival, hoof, reins and recorded sounds remain in place; the presentation cue is not saved.
+- Validation: `npm run check -- --maxWorkers=2` passed (273 files, 2,629 tests), including seven new rig/audio integration regressions; the renderer-disconnect mutation failed as expected. `npm run build` and `git diff --check` passed. Browser inspection confirmed a 38.79 cm bit lift at the real harness callback (3.33 ms from the toss peak), return to the neutral pose, and movement/dismissal cancellation, with no browser errors. Source callbacks were logged; the audio mix was not evaluated by listening.

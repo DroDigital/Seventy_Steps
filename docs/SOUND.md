@@ -109,11 +109,11 @@ the poses and by the sounds). Change a move or an act's timing and the test says
 
 The three mounts share one scheduler (`render/audio/mountAudio.ts`). Nothing is placed in the world: the follow camera
 sits about eight metres back, and a sound at the hooves falls under the music. They are the rider’s own foley, as footsteps are.
-Recipes are procedural placeholders (no files in `public/audio`): a nicker, breath and snort for the grey; hollow wind, paired
+Recipes are procedural, and stand wherever a recording does not (the included horse's voice and harness are recordings, below): a nicker, breath and snort for the grey; hollow wind, paired
 hooves, harness and creak for the chariot; an engine for the motor car; wheels for both wheeled mounts; a summon and a dismiss.
 Hoof and wheel timbre follows dirt, road, stone and water. A gallop shortens the stride and lifts the pitch. Rendered peaks
 stay under −12 dBFS (`tests/mountAudio.test.ts`) and above about −24 dBFS, under combat impact. A recorded set can replace a
-recipe later; do not add these ids to `plannedSounds` until the files exist.
+recipe: add it to `plannedSounds` once its files exist.
 
 The reins and the horse (round 57) are heard too, from state the simulation keeps (`MountState.reins`, `systems/mountReins.ts`: counters
 the sound reads once each, so nothing plays twice and nothing late): the reins slapped on a horse's back (`REIN_SLAP`) as they land, with
@@ -123,6 +123,27 @@ scrapes, shakes and whispers instead. Standing, the horse passes the time every 
 whicker, a shake of the harness, the tail, the lips or a snort, never the same twice running (the skeletons only shake), and puts its
 hoof down on the two landings of the pawing the picture draws (`systems/horseIdle.ts`, the same clock). Leather, hide and breath, no
 ring; `tests/mountAudio.test.ts` holds each between −22 and −11 dBFS rms (the tail and the lips, as asides, to −30).
+
+### The horse's voice and its arrival (round 59)
+
+The included horse (the Chariot's draft horse) is heard as a horse: a whinny, low whickers, snorts, breaths out and the jingle of its
+harness are recordings, nineteen takes cut from nine CC0 recordings on Freesound (`public/audio/CREDITS.md` names each cut). They are
+`PLANNED` sets (`data/plannedSounds.ts`: `horseWhinny`, `horseWhicker`, `horseSnort`, `horseBlow`, `horseHarness`) that stand in front of
+the recipes by key (`mount:grey:summon`, `:whicker`, `:greet`, `:snort`, `:urge`, `:blow`, `:halt`, `:shake`, `:settle`, `:toss`), and, unlike
+the doors' and hands', they stand alone (`under: 0`): a synthesised nicker beneath a real whinny only muddies it. A recipe plays where a file has
+not loaded, as before. The tail, the lips and the hoof keep their recipes (no clean recording of them was found), and so do the skeletons'
+team and the car, which have no living horse.
+
+Called, the horse arrives in a short run of sounds (`arrive` in `mountAudio.ts`): the whinny at once (the summon), the harness taking the
+rider's weight a quarter second on, and a low whicker two seconds in. There is no arrival footfall while the hooves stay planted;
+hoofbeats follow the gait and the shared pawing clock above. Standing, it keeps to its six-to-fourteen-second round of small noises, now with the recordings in them,
+and after a breath out or a snort the head goes up now and then (`mount:grey:toss`): the harness answers a third of a second later.
+That lift and rattle share `MountState.idleToss`, a transient start and peak on the render clock (`systems/horseIdle.ts`): the neck
+and head rise to the peak when the harness sounds, then settle over half a second. Moving off, dismissal or a long frame gap clears
+the cue and cancels its pending rattle. It is never saved. `tests/horseToss.test.ts` compares the actual rendered head and bit with
+the neutral pose at the same time, including the frame the harness sounds and those cancellation paths.
+`tests/horseVoice.test.ts` holds the order and timing of the arrival, the toss, that the ride plays every recipe a recording answers,
+and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rms as it plays).
 
 ## Adding
 

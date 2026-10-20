@@ -60,7 +60,7 @@ export function createMountViews(scene: THREE.Scene, g: Game): { place(f: Figure
       const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
       const speed = id ? Math.min(22, Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz) : 0;
       const cue = id ? riderCue(g.player.mount.reins, alpha / SIM.hz) : undefined;
-      current.update({ time, dt, speed, turn, bend, cue, rider: !!id, cycle: g.player.mount.phase, ground: (x, z) => Math.max(-0.7, Math.min(0.7, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry)) });
+      current.update({ time, dt, speed, turn, bend, cue, idleToss: id === 'grey' && g.player.mount.speed < 0.5 ? g.player.mount.idleToss : null, rider: !!id, cycle: g.player.mount.phase, ground: (x, z) => Math.max(-0.7, Math.min(0.7, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry)) });
       for (const material of current.materials) if (material.uniforms.uGhost) material.uniforms.uGhost.value = 1 - shown;
       if (!id) return;
       current.root.updateMatrixWorld(true);

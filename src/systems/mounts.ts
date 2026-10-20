@@ -10,6 +10,7 @@ import { setLock } from './lockOn';
 import { isDone } from './quests';
 import { mountGroundAllowed, footprintClear } from './mountGround';
 import { createReins, type ReinState } from './mountReins';
+import type { HorseToss } from './horseIdle';
 
 export { moveMounted } from './mountMotion';
 
@@ -24,9 +25,10 @@ export interface MountState {
   phase: number; // gait cycles ridden since the summon, by distance (systems/mountGait.ts): the picture and the hoofbeats both count from it
   cooldownUntil: number;
   reins: ReinState; // the driver's hands: slaps at a gallop, a pull to stop, a hand drawn into a turn (systems/mountReins.ts; the picture and the sound read it)
+  idleToss: HorseToss | null; // transient presentation cue shared by the horse's head and its harness sound; never saved
 }
 
-export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins() });
+export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins(), idleToss: null });
 export const mountUnlocked = (g: Game): boolean => isDone(g, MOUNT_QUEST);
 
 function dlcOwned(g: Game, id: MountId): boolean {
@@ -64,7 +66,7 @@ export function selectMount(g: Game, id: MountId): boolean {
 /** Dissolves in place: no teleport, healing, stamina, invulnerability or action cancellation. */
 export function dismissMount(g: Game): void {
   if (!g.player.mount.active) return;
-  Object.assign(g.player.mount, { active: null, speed: 0, yawRate: 0, jam: 0, reins: createReins() });
+  Object.assign(g.player.mount, { active: null, speed: 0, yawRate: 0, jam: 0, reins: createReins(), idleToss: null });
   g.player.sprinting = false;
   g.player.dodgeHeld = -1;
   Object.assign(g.ecs.c.mover.get(g.player.id)!, { vx: 0, vz: 0 });
@@ -95,7 +97,7 @@ export function toggleMount(g: Game): boolean {
     return false;
   }
   const p = g.player;
-  Object.assign(p.mount, { active: p.mount.selected, speed: 0, yawRate: 0, jam: 0, phase: 0, reins: createReins() });
+  Object.assign(p.mount, { active: p.mount.selected, speed: 0, yawRate: 0, jam: 0, phase: 0, reins: createReins(), idleToss: null });
   p.buffer = createBuffer(); // no pre-summon dodge or attack may start while riding
   p.listening = p.kneeling = null;
   p.dodgeHeld = -1;
