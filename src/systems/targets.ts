@@ -4,12 +4,15 @@ import type { Entity } from '../core/ecs';
 import { isAbsent, isConcealed, type Combatant, type Game } from './components';
 import { awaitsIntroduction } from './npcIntroduction';
 
+/** Whether nothing may reach the investigator now: in a cutscene, over an edge (round 54), or walked through a boss's fog (round 60: the walk is the fog's, so it is no time to be struck). */
+export const outOfReach = (g: Game): boolean => g.cutscene || !!g.player.falling || !!g.player.fogPass;
+
 /** Who a blow from `faction` can touch: living, present, unconcealed combatants of the other side with a body. Hallucinations and the investigator touch only each other. */
 export function hostiles(g: Game, faction: Combatant['faction'] | undefined, conjured: boolean, byPlayer: boolean): Entity[] {
   const { combatant, health, body, phantom } = g.ecs.c;
   const out: Entity[] = [];
   for (const [t, c] of combatant) {
-    if ((t === g.player.id && (g.cutscene || g.player.falling)) || awaitsIntroduction(g, t)) continue; // (nothing in the room can reach a body that has gone over an edge, round 54)
+    if ((t === g.player.id && outOfReach(g)) || awaitsIntroduction(g, t)) continue; // (nothing in the room can reach a body that has gone over an edge, round 54, or one in the fog, round 60)
     if (c.faction === faction || isAbsent(g, t) || !body.has(t) || isConcealed(g, t)) continue;
     if (phantom.has(t) ? !byPlayer : conjured && t !== g.player.id) continue;
     if ((health.get(t)?.hp ?? 0) > 0) out.push(t);

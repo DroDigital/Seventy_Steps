@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
-import { allFogs, crosses, fogBlockSystem, fogBetween, fogToPass, passFog, sideOf } from '../src/systems/fogGates';
+import { strike, targetsOf } from '../src/systems/combat';
+import { allFogs, crosses, fogBlockSystem, fogBetween, fogNear, fogToPass, passFog, sideOf } from '../src/systems/fogGates';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { interactable } from '../src/systems/checkpoints';
 import { place } from './helpers';
@@ -69,5 +70,35 @@ describe('the fog before a horror is a wall (round 35)', () => {
     expect(speeds.length).toBeGreaterThan(30);
     expect(Math.min(...speeds.slice(5, -5))).toBeGreaterThan(0.8);
     expect(Math.max(...speeds)).toBeLessThan(2.4);
+  });
+
+  it('the walk is the fog\'s, so nothing sees or strikes the investigator on it: the horror wakes as it ends, not while they cannot answer (round 60)', () => {
+    const g = createWorldGame();
+    const w = doorway();
+    let at = { x: w.stake.x, z: w.stake.z };
+    for (let i = 0; i < 400 && !fogNear(g, at, 2.4); i++) { // from its candle up to the fog, as one comes to it
+      const d = Math.hypot(w.x - at.x, w.z - at.z);
+      at = { x: at.x + ((w.x - at.x) / d) * 0.1, z: at.z + ((w.z - at.z) / d) * 0.1 };
+    }
+    place(g, g.player.id, at.x, at.z, 0);
+    for (let i = 0; i < 120; i++) stepGame(g, emptyInput()); // the horror beyond is streamed in
+    place(g, g.player.id, at.x, at.z, 0);
+    const boss = [...g.ecs.c.fight].find(([, f]) => w.bosses.includes(f.id))![0];
+    let [frame, engaged, hurt, ended] = [0, -1, -1, -1];
+    g.events.on('BossEngaged', () => void (engaged < 0 && (engaged = frame)));
+    g.events.on('Hit', (e) => void (e.target === g.player.id && e.outcome !== 'dodged' && hurt < 0 && (hurt = frame)));
+    passFog(g, fogNear(g, at)!.wall);
+    for (; frame < 400 && ended < 0; frame++) {
+      stepGame(g, emptyInput());
+      if (!g.player.fogPass) ended = frame;
+      else {
+        expect(targetsOf(g, boss)).not.toContain(g.player.id);
+        expect(strike(g, boss, g.player.id, { damage: 50, poise: 10, guard: 10, hitstop: 0, parryable: false, interrupts: false })).toBe('dodged');
+      }
+    }
+    expect(ended).toBeGreaterThan(0);
+    expect(ended / 60, 'the walk is a few steps, not a long march').toBeLessThan(2.6);
+    expect(engaged, 'woke while the fog still walked them in').toBe(ended);
+    expect(hurt).toBe(-1);
   });
 });

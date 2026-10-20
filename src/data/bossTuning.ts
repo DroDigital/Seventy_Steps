@@ -9,6 +9,7 @@ export const BOSS = {
   margin: 8, // metres past its ring's edge a boss still holds the investigator...
   grace: 150, // ...and frames it waits for them to come back from beyond that before it gives up
   rim: 2.5, // metres inside the ring's edge a boss keeps to
+  wake: 45, // frames a boss holds its first blow once it wakes: the investigator has their hands again first (round 60: one struck as the fog let them go)
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)

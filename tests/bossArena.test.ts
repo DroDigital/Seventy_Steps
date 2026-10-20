@@ -35,6 +35,25 @@ describe('a boss keeps to its arena (spec §3E)', () => {
     expect(b.fight.engaged).toBe(true);
   });
 
+  it('gathers itself a moment once it wakes: its first blow waits BOSS.wake frames, whoever stands at its feet (round 60)', () => {
+    expect(BOSS.wake / 60).toBeGreaterThanOrEqual(0.5); // long enough to raise a guard or roll
+    const b = ringed('the_outsider', 8, 12);
+    steps(b.g, 30);
+    place(b.g, b.g.player.id, b.ring.x, b.ring.z + 1.6, Math.PI); // within its reach
+    let woke = -1;
+    for (let k = 0; k < 400; k++) {
+      steps(b.g, 1);
+      if (woke < 0 && b.fight.engaged) woke = k;
+      const move = b.g.ecs.c.actor.get(b.boss)!.move;
+      if (woke >= 0 && move !== null && move !== 'evade') {
+        expect(k - woke).toBeGreaterThanOrEqual(BOSS.wake); // (without it, the Outsider seized them the frame after it woke)
+        expect(k - woke).toBeLessThan(BOSS.wake + 120); // and then it fights
+        return;
+      }
+    }
+    throw new Error('it never struck');
+  });
+
   it('holds the fight while the investigator stays in its ring, however far off and out of sight', () => {
     const b = bossGame('keziah_mason', undefined, 20);
     engage(b);

@@ -3,8 +3,9 @@
  * walked through, and the horror saw them across it): while its horrors live nothing crosses it, not
  * the investigator, not a foe, and nothing sees across it; the one way through is E, near it. E turns
  * the investigator to it and they walk in on their own, slowly, the fog parting about them, to a
- * place a few steps beyond. The fog is gone, for good, once every horror it keeps is slain. Pure: no
- * Three.js (render/bossFog.ts draws it, and the parting).
+ * place a few steps beyond; on the way nothing sees them or reaches them (round 60: the horror woke
+ * as they crossed and struck while the walk was not theirs). The fog is gone, for good, once every
+ * horror it keeps is slain. Pure: no Three.js (render/bossFog.ts draws it, and the parting).
  */
 
 import { distXZ, type XZ } from '../core/geom';
@@ -13,8 +14,8 @@ import { worldLayout } from '../world/placements';
 import type { Game } from './components';
 
 export const FOG_REACH = 2.6; // metres from a wall within which E passes it
-const FOG_BEYOND = 2.4; // metres past the wall they are walked to
-const FOG_PACE = 1.5; // metres a second they walk through it
+const FOG_BEYOND = 1.8; // metres past the wall they are walked to (round 60: 2.4, and the walk ran on long after the fog let them by)
+const FOG_PACE = 1.8; // metres a second they walk through it
 const JAMB = 0.35; // a doorway's wall reaches this far past its opening, into the jambs
 
 let plan: FogWall[] | null = null;

@@ -10,6 +10,7 @@
  */
 
 import type { Entity } from '../core/ecs';
+import { BOSS } from '../data/tuning';
 import { applyChange, clearProps, removeProp } from './arenaChanges';
 import { startMove } from './actions';
 import { holdInVeil } from './bossArena';
@@ -55,6 +56,8 @@ function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {
 
 function engage(g: Game, e: Entity, f: Fight): void {
   Object.assign(f, { engaged: true, frames: 0, sig: {}, veiled: false });
+  const br = g.ecs.c.brain.get(e);
+  if (br) br.cooldown = Math.max(br.cooldown, BOSS.wake); // it gathers itself before its first blow (round 60)
   g.events.emit('BossEngaged', { entity: e, name: g.ecs.c.combatant.get(e)?.name ?? f.id });
   SIGNATURES[f.id]?.engage?.(g, e, f);
   enterPhase(g, e, f, 0);
