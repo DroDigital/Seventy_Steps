@@ -67,7 +67,12 @@ const CHANGES: Readonly<Record<ArenaChange, (g: Game, e: Entity, f: Fight) => vo
     for (const p of ring(f, BOSS.monoliths, BOSS.monolithShare)) f.props.push(monolith(g, e, p));
   },
   ship: (g, e, f) => {
-    const [p] = ring(f, 1, CTHULHU.shipShare);
+    // on the far side of the arena from Cthulhu (round 60: she came in at its north, and the god stood between her and a person as often as not)
+    const at = g.ecs.c.transform.get(e)!.pos;
+    const me = g.ecs.c.transform.get(g.player.id)?.pos ?? at;
+    const [dx, dz] = Math.hypot(f.arena.x - at.x, f.arena.z - at.z) > 1 ? [f.arena.x - at.x, f.arena.z - at.z] : [me.x - f.arena.x, me.z - f.arena.z];
+    const [r, t] = [f.arena.radius * CTHULHU.shipShare, Math.atan2(dx, dz)];
+    const p = { x: f.arena.x + Math.sin(t) * r, z: f.arena.z + Math.cos(t) * r };
     f.props.push(spawnProp(g, e, 'ship', p, yawOf(f.arena.x - p.x, f.arena.z - p.z)));
   },
   roots: (g, e, f) => {

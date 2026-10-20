@@ -88,7 +88,7 @@ export const DUNWICH = {
 
 /** Cthulhu: it cannot be killed. The Alert rams it; it bursts, reforms, and R'lyeh sinks. */
 export const CTHULHU = {
-  shipShare: 0.8, // the Alert comes in at this share of the arena's radius
+  shipShare: 0.8, // the Alert comes in at this share of the arena's radius, on its far side from Cthulhu
   helm: 5, // metres: the investigator takes the helm this close to it
   sail: 14, // m/s, straight at Cthulhu
   ram: 3, // metres beyond its body where the bows strike

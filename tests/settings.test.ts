@@ -12,11 +12,14 @@ function memoryStore() {
 }
 
 describe('settings', () => {
-  it('defaults to full FX, sensitivity 1, 800 × 450 and every level full', () => {
+  it('defaults to full FX, sensitivity 1, 800 × 450 and the mix a player found best (round 60)', () => {
     expect(defaultSettings()).toEqual({
       fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, padSwap: 0,
-      volume: SETTINGS.volume[3], music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
+      volume: 0.5, music: 0.5, sfx: 1, ambience: 0.45, speech: 0.55, language: 0,
     });
+    // within a tenth of what was asked: half the volume, the music, the ambience and the voices, the effects full
+    const asked = { volume: 0.5, music: 0.5, sfx: 1, ambience: 0.5, speech: 0.5 } as const;
+    for (const [id, level] of Object.entries(asked)) expect(Math.abs(defaultSettings()[id as keyof typeof asked] / level - 1), id).toBeLessThanOrEqual(0.11);
     expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([800, 450]);
     // the standard steps are 320 × 180 to 800 × 450, the default the sharpest of them (round 58, asked; it was 640 × 360, which is drawn a whole number of times over on a 720p, 1080p, 1440p and 4K screen: 800 × 450 is not on any of them)
     expect([0.8, 1.2, 1.6, 2].map((scale) => clampSetting('resolution', scale))).toEqual([0.8, 1.2, 1.6, 2]);
@@ -79,7 +82,7 @@ describe('settings', () => {
     for (const resolution of HIGH_RESOLUTIONS) {
       expect(clampSetting('resolution', resolution)).toBe(resolution);
       storeSettings(store, { ...defaultSettings(), resolution });
-      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(17);
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(18);
       expect(loadSettings(store).resolution).toBe(resolution);
     }
     expect(clampSetting('resolution', 99)).toBe(2.4);
@@ -109,5 +112,15 @@ describe('settings', () => {
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), resolution: 1.6 });
     expect(loadSettings(store).resolution).toBe(1.6);
+  });
+
+  it('moves a sound level kept at the default before round 60 to the new mix once, and keeps every other choice', () => {
+    const before = { ...defaultSettings(), volume: 0.7, music: 1, sfx: 1, ambience: 1, speech: 1 };
+    const mix = (o: object, v: number) => { const s = parseSettings(JSON.stringify({ ...before, ...o, v })); return [s.volume, s.music, s.sfx, s.ambience, s.speech]; };
+    expect(mix({}, 17)).toEqual([0.5, 0.5, 1, 0.45, 0.55]); // the old defaults, kept by every save
+    expect(mix({ volume: 0.4, music: 0.3 }, 17)).toEqual([0.4, 0.3, 1, 0.45, 0.55]); // chosen: kept
+    expect(mix({ sfx: 0.8, ambience: 0.5, speech: 0.5 }, 16)).toEqual([0.5, 0.5, 0.8, 0.5, 0.5]); // (the very mix asked for, kept)
+    expect(mix({}, 18)).toEqual([0.7, 1, 1, 1, 1]); // chosen since: a person who wants it loud keeps it
+    expect(parseSettings(JSON.stringify({ ...before, resolution: 1.6, v: 17 })).resolution).toBe(1.6); // 17's choice of picture is still its own
   });
 });

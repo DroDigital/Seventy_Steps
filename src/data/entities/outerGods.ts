@@ -42,7 +42,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { beam: 2, projectile_fan: 1, teleport: 1, summon: 1, sweep_beam: 1, barrage: 1 }, { summons: ['dhole'], hooks: ['arena_reconnect', 'camera_warp'] }),
       ph(0.25, { beam: 3, aoe_ring: 1, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['arena_reconnect', 'camera_warp', 'time_skip'] }),
     ), { mobile: false, range: [0, 40] }),
-    stats: st(6100, 5000, 62, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 25: damage was 120; the balance table had it at 7.6 lives)
+    stats: st(4400, 5000, 38, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it)
   },
   {
     id: 'umr_at_tawil', name: "'Umr at-Tawil", source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
@@ -67,7 +67,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(1, { tentacle_burst: 2, charge: 1, pool: 1, summon: 1, eruption: 2 }, { summons: ['thousand_young'], arena: 'roots' }),
       ph(0.5, { tentacle_burst: 2, pool: 2, charge: 1, summon: 1, roar: 1, eruption: 1, quake: 1, vortex: 1 }, { summons: ['thousand_young'], hooks: ['darkness'] }),
     )),
-    stats: st(5450, 3000, 100, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5,
+    stats: st(3800, 3000, 34, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it)
   },
   {
     id: 'nyarlathotep', name: 'Nyarlathotep', source: 'Nyarlathotep', regions: ['dreamlands', 'beyond'], canonLooks: true,
@@ -77,7 +77,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { projectile_fan: 2, beam: 2, teleport: 1, gaze: 1, sweep_beam: 1, eruption: 1 }, { hooks: ['decoys', 'camera_warp'] }),
       ph(0.3, { tentacle_burst: 2, grab: 1, roar: 1, vortex: 1, quake: 1 }, { hooks: ['darkness', 'camera_warp'] }), // the Crawling Chaos: it borrows the slain bosses' attacks too
     ), { range: [3, 10], strafe: 0.4 }),
-    stats: st(5150, 3000, 100, 3.4, 8, 20), drops: { echoes: 35000 }, insightOnSight: 5,
+    stats: st(4000, 3000, 42, 3.4, 8, 20), drops: { echoes: 35000 }, insightOnSight: 5, // (round 60: health 5150 and damage 100, which cost the balance bot 2.01 lives where a person first meets it)
     // its true form is drawn a lanky figure five metres tall, not a mass: struck at its legs' stance, its body and upper arms (1.2 m either side; the long hands hang out of it), up to its shoulders and neck; the curl over them is out of reach
     eldritchVariant: { name: 'Nyarlathotep, the Crawling Chaos', sprite: { silhouette: 'blob', palette: 'ichor', scale: 6, tentacles: 10, eyes: 1, body: [0.7, 0.2] } },
   },
