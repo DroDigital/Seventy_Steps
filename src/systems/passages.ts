@@ -46,6 +46,21 @@ export function settle(g: Game, id: Entity): void {
   }
 }
 
+/**
+ * A load stands the investigator where they were saved (save.ts): a passage that they stood at, and that the saved mind shows, is
+ * already open, as it was when they left it, so that a bridge they were out on holds them and a door they were in is not shut on them.
+ * (The world is made before the save is read, with the body at the start and the mind not yet its own, so `spawnPiece`'s own reading of
+ * where the body stands has nothing to go on.)
+ */
+export function openAround(g: Game, at: { x: number; z: number }): void {
+  for (const [id, l] of g.ecs.c.layer) {
+    const piece = g.ecs.c.piece.get(id);
+    if (!piece?.def.seal || !l.shown || l.open >= 1 || distXZ(piece.def, at) > wakeOf(piece.def)) continue;
+    l.open = 1;
+    settle(g, id);
+  }
+}
+
 /** One step: each shown passage the investigator is near begins to open, and each begun goes on to its end. */
 export function passageSystem(g: Game): void {
   const me = g.ecs.c.transform.get(g.player.id)?.pos;

@@ -9,6 +9,7 @@ import { createWorldGame } from '../src/systems/game';
 import { changeInsight } from '../src/systems/insight';
 import { passageKind, wakeOf } from '../src/systems/passages';
 import { spawnPiece } from '../src/systems/hiddenLayer';
+import { snapshot } from '../src/systems/save';
 import { goTo, record, run } from './worldHelpers';
 import type { Game } from '../src/systems/components';
 
@@ -140,6 +141,23 @@ describe('a secret bridge (round 61)', () => {
     expect(passageKind(d!.def)).toMatch(/door|sealed/);
     expect(wakeOf(b.def)).toBe(PASSAGE.wake + b.def.bridge!.half);
     expect(wakeOf(b.def)).toBeGreaterThan(wakeOf(d!.def));
+  });
+
+  it('is formed again on a load that stands the investigator on it: the world is made before the save is read, and the footing is judged on the deck', () => {
+    const g = withMind();
+    const [id, piece] = bridge(g);
+    const at = brink(piece.def, 2);
+    goTo(g, at.x, at.z);
+    run(g, Math.ceil(PASSAGE.frames.bridge * PASSAGE.solidAt) + 2);
+    expect(deckOn(g, id)).toBe(true);
+    goTo(g, piece.def.x, piece.def.z); // out over the gap, on the deck
+    const save = snapshot(g);
+    const loaded = createWorldGame({ save });
+    const me = loaded.ecs.c.transform.get(loaded.player.id)!.pos;
+    expect(Math.hypot(me.x - save.at.x, me.z - save.at.z)).toBeLessThan(0.01); // where they stood, not sent back to the checkpoint
+    const [again] = [...loaded.ecs.c.piece].filter(([, p]) => p.def.name === piece.def.name).map(([e]) => e);
+    expect(deckOn(loaded, again!)).toBe(true);
+    expect(sealOn(loaded, again!)).toBe(false);
   });
 
   it('forms faster than a door opens, and a sealed door of the Beyond opens more slowly than either', () => {

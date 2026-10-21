@@ -235,7 +235,8 @@ export const isConcealed = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.
  */
 export const isUnroused = (g: Pick<Game, 'ecs' | 'overworld'>, id: Entity): boolean => {
   const f = g.overworld ? g.ecs.c.fight.get(id) : undefined;
-  return !!f && !f.engaged && !f.script.unseen;
+  if (!f || f.engaged || f.script.unseen) return false;
+  return (g.ecs.c.health.get(id)?.hp ?? 1) > 0; // a horror that has fallen is roused: its death ends its fight, and it is seen to fall
 };
 
 /** Invisible and not revealed (spec §3E, the Dunwich Horror), or a boss not yet roused: not drawn, locked on to or beheld, though it is there. */

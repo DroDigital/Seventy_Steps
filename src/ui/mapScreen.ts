@@ -200,8 +200,9 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const q = at(e);
     markAtPoint(q.x, q.y);
   });
-  canvas.addEventListener('pointerdown', (e) => void (drag = { x: e.clientX, y: e.clientY, moved: 0 }));
+  canvas.addEventListener('pointerdown', (e) => void (e.button === 0 && (drag = { x: e.clientX, y: e.clientY, moved: 0 }))); // the primary button chooses and drags: the secondary sets the marker (contextmenu), and its pointer events are not a choice of where to travel
   addEventListener('pointerup', (e) => {
+    if (e.button !== 0) return;
     const click = !!drag && drag.moved < CLICK_PX && screen.open;
     drag = null;
     if (!click) return;

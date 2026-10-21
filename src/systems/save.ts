@@ -17,6 +17,7 @@ import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, OIL, REAG
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
 import { footingSafe } from './falls';
+import { openAround } from './passages';
 import type { Game } from './components';
 import { packExplored, unpackExplored } from './exploration';
 import { woundsNow } from './overworld';
@@ -234,6 +235,7 @@ export function applySave(g: Game, s: SaveData): void {
   g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before the world fills: its foes are this journey's
   if (s.drop && s.drop.amount > 0) spawnDrop(g, Math.round(s.drop.amount), { x: s.drop.x, y: s.drop.y, z: s.drop.z });
   const body = c.body.get(g.player.id)!;
+  openAround(g, s.at); // the passages they stood at, open as they left them, before the footing is judged
   const standing = regionAt(s.at.x, s.at.z) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // (a save taken in the middle of a fall must not load inside it)
   teleport(g, standing ? s.at : g.player.checkpoint);
 }

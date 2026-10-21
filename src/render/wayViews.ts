@@ -30,6 +30,7 @@ interface Made {
   group: THREE.Group;
   plates: { glow: THREE.ShaderMaterial; at: THREE.Vector3 }[];
   lights: { flame: THREE.Mesh; top: number }[];
+  own: THREE.Material[]; // the materials made for this run alone (the shared ones are the views' for good)
 }
 
 export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
@@ -43,7 +44,7 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
 
   const make = (run: WayRun): Made => {
     const group = new THREE.Group();
-    const m: Made = { group, plates: [], lights: [] };
+    const m: Made = { group, plates: [], lights: [], own: [] };
     for (const p of run.plates) {
       const shape = plateShape(p.rune);
       const glowMat = shine();
@@ -53,6 +54,7 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
       at.add(new THREE.Mesh(shape.stone, stone), new THREE.Mesh(tint(shape.rune.clone(), hue), glowMat));
       group.add(at);
       m.plates.push({ glow: glowMat, at: at.position });
+      m.own.push(glowMat);
     }
     if (run.tablet) {
       const t = tabletShape(run.tablet.rune);
@@ -60,7 +62,9 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
       const at = new THREE.Group();
       at.position.set(run.tablet.x, run.tablet.y - 0.05, run.tablet.z);
       at.rotation.y = run.tablet.yaw;
-      at.add(new THREE.Mesh(t.stone, stone), new THREE.Mesh(tint(t.rune.clone(), hue), shine()));
+      const glow = shine();
+      at.add(new THREE.Mesh(t.stone, stone), new THREE.Mesh(tint(t.rune.clone(), hue), glow));
+      m.own.push(glow);
       group.add(at);
     }
     const rite = run.plan.way.rite;
@@ -78,9 +82,14 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
     return m;
   };
 
+  /** A run's views put away: out of the scene, and their geometry and their own materials given back (three.js keeps a buffer until it is told, and a way walked past again is made anew). */
   const drop = (run: WayRun): void => {
     const m = made.get(run);
-    if (m) scene.remove(m.group);
+    if (m) {
+      scene.remove(m.group);
+      m.group.traverse((o) => void (o instanceof THREE.Mesh && o.geometry.dispose()));
+      for (const mat of m.own) mat.dispose();
+    }
     made.delete(run);
   };
 

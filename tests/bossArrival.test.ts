@@ -8,6 +8,7 @@ import { ARRIVAL } from '../src/data/bossTuning';
 import { arrivalSeconds, arrivedBy, createArrivals, risenFrom, risesOut } from '../src/render/bossArrival';
 import { lookOf } from '../src/render/creatureViews';
 import { isUnroused, isUnseen } from '../src/systems/components';
+import { startMove } from '../src/systems/actions';
 import { spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
 import { inSight } from '../src/systems/insight';
@@ -111,6 +112,20 @@ describe('a boss of the open world is not seen until it is roused', () => {
     f.engaged = false; // reset: it gave up the chase, or the investigator fell
     expect(isUnroused(g, boss)).toBe(true);
     expect(lookOf(g, boss, 0)).toBeNull();
+  });
+
+  it('stays in view through its fall: its fight ends with its death, and a horror dying is not a horror not yet roused', () => {
+    const g = createWorldGame();
+    const boss = place(g, 'father_dagon');
+    const f = g.ecs.c.fight.get(boss)!;
+    f.engaged = true;
+    g.ecs.c.health.get(boss)!.hp = 0;
+    startMove(g.ecs.c.actor.get(boss)!, 'death');
+    g.events.emit('Died', { entity: boss, killer: g.player.id, at: { ...g.ecs.c.transform.get(boss)!.pos } }); // registerFights ends the fight: engaged is false from here
+    expect(f.engaged).toBe(false);
+    expect(isUnroused(g, boss)).toBe(false);
+    expect(isUnseen(g, boss)).toBe(false);
+    expect(lookOf(g, boss, 0)).not.toBeNull(); // the death animation is drawn
   });
 
   it('is shown at once in the combat arena and the bestiary, which have no open world: the viewers show every creature', () => {
