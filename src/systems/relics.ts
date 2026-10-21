@@ -9,6 +9,7 @@
 import { hash2 } from '../core/rng';
 import { RELICS, RELIC_IDS, RELIC_SLOTS, TEMPERS, type Relic, type RelicId } from '../data/relics';
 import type { Game } from './components';
+import { markNew } from './finds';
 import { restoreSanity } from './sanity';
 
 const KEY = 'relic:'; // owned: `relic:<id>`, in the order found
@@ -95,8 +96,10 @@ export function registerRelics(g: Game): void {
     const id = relicFor(g, name);
     if (!id || !g.overworld) return;
     const on = grant(g, id);
-    const words = `${RELICS[id].name.toUpperCase()} · ${RELICS[id].note.toUpperCase()}`;
-    g.events.emit('Notice', { text: on ? words : `${words} · KEPT: CHOOSE WHAT TO WEAR AT AN ELDER SIGN` });
+    markNew(g, 'relic', id);
+    const words = `RELIC · ${RELICS[id].name.toUpperCase()} · ${on ? 'WORN' : 'KEPT: CHOOSE WHAT TO WEAR AT AN ELDER SIGN'}`;
+    g.events.emit('Notice', { text: words });
+    g.events.emit('Found', { kind: 'relic', id, from: name, worn: on });
   });
   g.events.on('Died', ({ entity, killer }) => {
     if (killer !== g.player.id || entity === g.player.id) return;

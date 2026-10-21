@@ -69,7 +69,7 @@ function advance(g: Game, id: string, to = stageOf(g, id) + 1, paid = true): voi
     if (r.insight) changeInsight(g, r.insight, 'quest', q.title);
     if (r.vial) addVial(g);
     if (r.stones) giveStones(g, r.stones);
-    if (r.weapon) takeUp(g, r.weapon);
+    if (r.weapon) takeUp(g, r.weapon, q.title);
   }
   g.events.emit('QuestChanged', { id, title: q.title, stage: to, done });
 }

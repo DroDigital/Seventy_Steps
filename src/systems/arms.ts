@@ -12,6 +12,7 @@ import { REINFORCE, STAR_STONES } from '../data/tuning';
 import { getEntity } from '../data/registry';
 import { armedMoves, isWeapon, WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
 import type { Game } from './components';
+import { markNew } from './finds';
 
 /** Puts weapon `id` in the investigator's hand; false when it is not theirs. */
 export function equip(g: Game, id: string): boolean {
@@ -21,11 +22,16 @@ export function equip(g: Game, id: string): boolean {
   return true;
 }
 
-/** A weapon found: it is theirs now, to take up from the pause menu. */
-export function takeUp(g: Game, id: string): void {
+/**
+ * A weapon found: it is theirs now, to take up from the card that says so or from the pause menu (round 60: it was picked up by
+ * walking over it, with a line that faded, and many did not know they had it or where to take it up). `from`: who gave it, if anyone.
+ */
+export function takeUp(g: Game, id: string, from?: string): void {
   if (!isWeapon(id) || g.player.arms.includes(id)) return;
   g.player.arms.push(id);
-  g.events.emit('Notice', { text: `${WEAPONS[id].name.toUpperCase()} · TAKE IT UP FROM THE MENU ({pause} · ARMS)` }); // the HUD names the button
+  markNew(g, 'weapon', id);
+  g.events.emit('Notice', { text: `${WEAPONS[id].name.toUpperCase()} · A NEW WEAPON · TAKE IT UP FROM {pause} · ARMS` }); // the HUD names the button
+  g.events.emit('Found', { kind: 'weapon', id, from });
 }
 
 /** The share a weapon reinforced `level` times adds to its blows: 1 at none. */

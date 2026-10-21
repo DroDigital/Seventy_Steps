@@ -296,6 +296,14 @@ export const EXPLORE = {
   minimap: 110, // metres from the centre to the minimap's edge
 };
 
+/** The card for a weapon or a relic found (round 60, ui/findCard.ts): the milliseconds a find waits before it opens, once the investigator is free. A weapon's pickup is felt first; a relic's horror has fallen, and its banner and its Echoes are read. */
+export const FINDS = {
+  wait: { weapon: 900, relic: 5200 },
+};
+
+/** The map's marker (round 60, systems/marker.ts): how near the investigator must come for it to be reached, and so cleared (metres). */
+export const MARKER = { arrive: 10 };
+
 /** The seals on Kadath's door (playtest round 12, systems/seals.ts). */
 export const SEALS = {
   exempt: ['hub', 'dreamlands', 'beyond'] as readonly string[], // regions holding no seal
