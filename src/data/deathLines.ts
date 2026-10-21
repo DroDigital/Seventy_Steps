@@ -54,6 +54,8 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   combo_2: 'The second blow follows at once. Keep your guard up.',
   combo_3: 'The last is the heavy one. Roll it.',
   delayed_slam: 'It holds the blow a long breath. Do not roll early; roll when it falls.',
+  crushing_blow: 'Its heaviest blow is lifted a full second. Roll as it falls, not as it rises; then strike while it recovers.',
+  great_mark: 'The ground it marks under you will break. Leave the circle, or roll as it breaks.',
 };
 
 /** A fragment of the place where it happened: the waking world, then the dream's realms. */

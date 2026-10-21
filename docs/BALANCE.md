@@ -51,7 +51,7 @@ nothing in its way.
 | 22 | The Dunwich Horror | 13/6/12 | 5 | 1550 | 18 | 416 | 316 | 0.47 | 0 |
 | 23 | Mother Hydra | 11/5/11 | 5 | 3100 | 30 | 596 | 292 | 0.73 | 0 |
 | 24 | Father Dagon | 11/5/11 | 5 | 3250 | 37 | 601 | 292 | 0.74 | 0 |
-| 25 | Shub-Niggurath | 11/5/11 | 5 | 3800 | 80 | 629 | 292 | 0.77 | 0 |
+| 25 | Shub-Niggurath | 11/5/11 | 5 | 4300 | 87 | 663 | 292 | 0.81 | 0 |
 | 26 | Hypnos | 14/7/14 | 5 | 650 | 15 | 25 | 328 | 0.03 | 0 |
 | 27 | High Priest Not to Be Described | 16/7/15 | 5 | 1000 | 9 | 106 | 352 | 0.11 | 0 |
 | 28 | The Colossus Beneath the Pyramids | 17/8/17 | 5 | 1650 | 15 | 398 | 364 | 0.39 | 0 |
@@ -62,17 +62,17 @@ nothing in its way.
 | 33 | Yeb | 16/8/15 | 5 | 2600 | 29 | 662 | 352 | 0.67 | 0 |
 | 34 | The Great Ones | 16/8/15 | 5 | 2950 | 34 | 706 | 352 | 0.72 | 0 |
 | 35 | Yig | 16/8/15 | 5 | 2950 | 29 | 751 | 352 | 0.76 | 0 |
-| 36 | Tsathoggua | 16/8/15 | 5 | 3250 | 36 | 764 | 352 | 0.78 | 0 |
-| 37 | Nyarlathotep | 16/8/15 | 5 | 4000 | 51 | 769 | 352 | 0.78 | 0 |
+| 36 | Tsathoggua | 16/8/15 | 5 | 3000 | 35 | 764 | 352 | 0.78 | 0 |
+| 37 | Nyarlathotep | 16/8/15 | 5 | 4000 | 48 | 747 | 352 | 0.76 | 0 |
 | 38 | Hastur | 16/8/15 | 5 | 4200 | 43 | 616 | 352 | 0.62 | 0 |
-| 39 | Cthulhu | 16/8/15 | 5 | 4300 | 50 | 764 | 352 | 0.78 | 0 |
+| 39 | Cthulhu | 16/8/15 | 5 | 4600 | 46 | 806 | 352 | 0.82 | 0 |
 | 40 | Ghatanothoa | 16/8/15 | 5 | 4850 | 84 | 676 | 352 | 0.69 | 0 |
 | 41 | Zkauba the Wizard | 18/9/17 | 5 | 750 | 7 | 70 | 376 | 0.07 | 0 |
 | 42 | The Thing Beyond Erich Zann's Window | 18/9/18 | 5 | 850 | 6 | 17 | 376 | 0.02 | 0 |
 | 43 | The Daemon Pipers | 18/9/18 | 5 | 1200 | 11 | 119 | 376 | 0.11 | 0 |
 | 44 | The Ancient Ones | 18/9/18 | 5 | 1550 | 13 | 20 | 376 | 0.02 | 0 |
 | 45 | 'Umr at-Tawil | 18/9/18 | 5 | 3600 | 47 | 619 | 376 | 0.59 | 0 |
-| 46 | Yog-Sothoth | 18/9/18 | 5 | 4400 | 44 | 728 | 376 | 0.69 | 0 |
+| 46 | Yog-Sothoth | 18/9/18 | 5 | 4200 | 42 | 791 | 376 | 0.75 | 0 |
 | 47 | Azathoth | 18/9/18 | 5 | 6700 | 90 | 8864 | 376 | 8.42 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1), and the bot does not die.

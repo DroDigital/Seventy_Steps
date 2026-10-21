@@ -37,6 +37,8 @@ export const ATTACK_SOUNDS: Partial<Record<AttackId, AttackSound>> = {
   combo_3: { set: 'boom', gain: 0.3 },
   slam: { set: 'boom', gain: 0.35 },
   delayed_slam: { set: 'boom', gain: 0.5 },
+  crushing_blow: { set: 'boom', gain: 0.75 },
+  great_mark: { set: 'boom', gain: 0.75 },
   charge: { set: 'gust', gain: 0.7 },
   dive: { set: 'gust', gain: 0.7 },
   wind_push: { set: 'gust', gain: 1 },

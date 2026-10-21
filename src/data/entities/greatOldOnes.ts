@@ -12,11 +12,11 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     id: 'cthulhu', name: 'Cthulhu', source: 'The Call of Cthulhu', regions: ['rlyeh'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sea', scale: 40, tentacles: 8, wings: 2, eyes: 2 },
     ...scripted('boss', phases(
-      ph(1, { tentacle_burst: 3, slam: 2, grab: 1, roar: 1, quake: 1 }, { hooks: ['camera_warp'] }),
-      ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, quake: 1, eruption: 2 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
-      ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, eruption: 1, vortex: 1, quake: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
+      ph(1, { tentacle_burst: 3, slam: 2, grab: 1, roar: 1, quake: 1, crushing_blow: 1 }, { hooks: ['camera_warp'] }),
+      ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, quake: 1, eruption: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
+      ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, eruption: 1, vortex: 1, quake: 1, crushing_blow: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(4300, 5000, 35, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives)
+    stats: st(4600, 5000, 37, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
@@ -44,11 +44,11 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     id: 'tsathoggua', name: 'Tsathoggua', source: 'The Mound', regions: ['kn_yan'], canonLooks: true,
     sprite: { silhouette: 'toad', palette: 'charcoal', scale: 6, eyes: 2 },
     ...scripted('boss', phases(
-      ph(1, { bite: 2, slam: 1, spit: 1, quake: 1 }),
-      ph(0.5, { spit: 2, pool: 2, bite: 1, eruption: 1 }, { summons: ['formless_spawn', 'formless_spawn'], hooks: ['darkness'] }),
-      ph(0.2, { slam: 2, bite: 2, roar: 1, quake: 1, vortex: 1 }, { hooks: ['darkness'] }),
+      ph(1, { bite: 2, slam: 1, spit: 1, quake: 1, crushing_blow: 1 }),
+      ph(0.5, { spit: 2, pool: 2, bite: 1, eruption: 1, crushing_blow: 1 }, { summons: ['formless_spawn', 'formless_spawn'], hooks: ['darkness'] }),
+      ph(0.2, { slam: 2, bite: 2, roar: 1, quake: 1, vortex: 1, crushing_blow: 1 }, { hooks: ['darkness'] }),
     )),
-    stats: st(3250, 1500, 30, 1.8, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 25: damage was 70; the balance table had it at 3.3 lives) (round 60: damage 52, which cost the balance bot 1.36 lives where a person first meets it)
+    stats: st(3000, 1500, 31, 1.8, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 25: damage was 70; the balance table had it at 3.3 lives) (round 60: damage 52, which cost the balance bot 1.36 lives where a person first meets it; then health 3250 and damage 30, no blow over 14% of a person's health, and a crushing blow given it)
   },
   {
     id: 'ghatanothoa', name: 'Ghatanothoa', source: 'Out of the Aeons', regions: ['rlyeh'], canonLooks: true,
