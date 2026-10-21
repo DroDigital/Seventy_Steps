@@ -10,6 +10,8 @@ import { npcEntity, npcPlace, talk } from '../src/systems/npcs';
 import { atAct } from '../src/systems/npcLife';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { changeInsight } from '../src/systems/insight';
+import { t } from '../src/core/i18n';
+import { fill } from '../src/ui/glyphs';
 import { setSanity } from '../src/systems/sanity';
 import { resolveCapsule } from '../src/world/colliders';
 import { roomPoint } from '../src/world/dungeonKit';
@@ -34,6 +36,12 @@ describe('Elder Signs', () => {
     goTo(g, dreamSign.x + WORLD.discover - 1, dreamSign.z);
     run(g, 2);
     expect(found).toEqual([{ sign: 'hub_dream', name: dreamSign.name }]);
+  });
+
+  it('the line on finding a sign names the map\'s button as the notice shows it, never the bare placeholder', () => {
+    const shown = fill(t('hud.signFound', { name: 'THE SLEEPER\'S SIGN' }), true); // the notice board fills a button's name as it shows a notice (hud.ts)
+    expect(shown).toContain('TRAVEL HERE FROM THE MAP (');
+    expect(shown).not.toMatch(/[{}]/);
   });
 
   it('resting heals, restores sanity and Laudanum, and makes the sign the respawn point', () => {
