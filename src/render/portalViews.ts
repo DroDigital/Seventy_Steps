@@ -68,17 +68,18 @@ void main() {
   float turn = uTime * (0.22 + 0.8 * uWake + 3.0 * uFlare);
   float swirl = a + 0.9 / (r + 0.3) + turn;
   float bands = 0.5 + 0.5 * sin(swirl * 3.0 + r * 8.0 - uTime * 1.2);
+  bands = bands * bands * (3.0 - 2.0 * bands); // the arms drawn sharp: the grade keeps only how bright a thing is, so the vortex is its light and dark
   float fine = 0.5 + 0.5 * sin(swirl * 7.0 - r * 17.0 + uTime * 0.6);
-  float heart = exp(-r * r * (5.5 - 2.5 * uWake - 3.0 * min(uFlare, 1.0)));
+  float heart = exp(-r * r * (7.0 - 2.0 * uWake - 4.0 * min(uFlare, 1.0)));
   vec2 q = vec2(swirl * 1.3, log(r + 0.06) * 2.6 - uTime * (0.15 + 0.5 * uWake));
   vec2 cell = floor(q * 5.0);
   float star = step(0.9, hash(cell)) * smoothstep(0.24, 0.0, length(fract(q * 5.0) - 0.5)) * (0.6 + 0.4 * sin(uTime * 3.0 + hash(cell + 7.0) * 40.0));
   float side = min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y));
   float edge = smoothstep(0.0, 0.07, side);
   float rim = 1.0 - smoothstep(0.0, 0.14, side);
-  vec3 col = mix(uSky * 0.45, uSky * 1.25, bands);
-  col = mix(col, uLamp, fine * bands * (0.25 + 0.4 * uWake));
-  col += uLamp * heart * (0.55 + 1.2 * uWake + 2.4 * uFlare);
+  vec3 col = mix(uEdge * 0.35 + uSky * 0.12, uSky * 1.1, bands); // the far sky's arms, the purple dark between the worlds between them
+  col = mix(col, uLamp, fine * bands * (0.2 + 0.3 * uWake));
+  col += uLamp * heart * (0.35 + 0.55 * uWake + 2.4 * uFlare);
   col += vec3(0.95, 0.92, 1.0) * star * (0.45 + 0.8 * uWake);
   col = mix(col, uEdge * (1.2 + uWake), rim * 0.65);
   col += vec3(1.0) * pow(heart, 3.0) * uFlare;
@@ -101,10 +102,11 @@ interface View {
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 const v3 = (c: Rgb): THREE.Vector3 => new THREE.Vector3(...c);
 
-/** The colours of the realm beyond gate `id`: its sky, brightened to read as light, and its lamps. */
+/** The colours of the realm beyond gate `id`: its sky, brought to one brightness so it reads as light and no realm's blows out, and its lamps. */
 function beyond(id: string): { sky: Rgb; lamp: Rgb } {
   const look = LOOKS[gatePlace(gatePlace(id)?.to ?? '')?.region ?? ''] ?? LOOKS.hub;
-  return { sky: scaleRgb(mixRgb(look.zenith, look.horizon, 0.55), 2.2), lamp: mixRgb(look.grade[3], look.accents[0], 0.25) };
+  const sky = mixRgb(look.zenith, look.horizon, 0.55);
+  return { sky: scaleRgb(sky, 0.8 / Math.max(sky[0], sky[1], sky[2], 0.05)), lamp: mixRgb(look.grade[3], look.accents[0], 0.25) };
 }
 
 export function createPortalViews(scene: THREE.Scene, g: Game, particles: Particles): PortalViews {
@@ -150,7 +152,7 @@ export function createPortalViews(scene: THREE.Scene, g: Game, particles: Partic
   };
   const heartOf = (v: View): { x: number; y: number; z: number } => on(v, 0, PORTAL.height * 0.46);
 
-  /** A mote drawn in to the heart from about the frame (`k`: how hard), or blown out of it (negative). */
+  /** A mote drawn in to the heart from about the frame (`k`: how hard), or blown out of it (negative): on past those come through, who stand facing away from it, into their sight. */
   function mote(v: View, k: number): void {
     const h = heartOf(v);
     const a = Math.random() * Math.PI * 2;
@@ -158,7 +160,8 @@ export function createPortalViews(scene: THREE.Scene, g: Game, particles: Partic
     const from = on(v, Math.cos(a) * r, PORTAL.height * 0.46 + Math.sin(a) * r, rand(-0.6, 0.6));
     const life = rand(0.9, 1.4) / (1 + Math.abs(k) * 0.4);
     const out = k < 0;
-    const [tx, ty, tz] = out ? [from.x + (from.x - h.x) * 6, from.y + (from.y - h.y) * 6 + rand(0, 1.5), from.z + (from.z - h.z) * 6] : [h.x, h.y, h.z];
+    const spill = on(v, Math.cos(a) * r * 4, PORTAL.height * 0.46 + Math.sin(a) * r * 3 + rand(0, 1.2), rand(5, 9));
+    const [tx, ty, tz] = out ? [spill.x, spill.y, spill.z] : [h.x, h.y, h.z];
     particles.spawn({
       ...from, vx: (tx - from.x) / life, vy: (ty - from.y) / life, vz: (tz - from.z) / life,
       life, size: rand(0.05, 0.12) * (1 + Math.abs(k) * 0.3), grow: out ? 0.8 : 0.2, color: mixRgb(v.lamp, [1, 1, 1], rand(0.2, 0.7)), colorEnd: ANOMALY.purple,

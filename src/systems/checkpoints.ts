@@ -194,6 +194,7 @@ function seems(at: { x: number; z: number }, from: { x: number; z: number }, yaw
 /** The sign, gate or person within reach of a free investigator that they face most nearly, if any. */
 export function interactable(g: Game): Interactable | null {
   if (!g.overworld || g.ecs.c.actor.get(g.player.id)!.move !== null) return null;
+  if (g.player.gatePass || g.player.fogPass) return null; // drawn on through a gate or a fog: the walk is not theirs, nor is E (round 60)
   const tr = g.ecs.c.transform.get(g.player.id)!;
   let best: Interactable | null = null;
   let bestScore = Infinity;

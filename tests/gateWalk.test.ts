@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { setArena } from '../src/systems/bossFight';
 import { spawnCreature } from '../src/systems/creatures';
-import { gatePlace } from '../src/systems/checkpoints';
+import { gatePlace, interactable } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { aboutGate, GATE_WALK } from '../src/systems/gateWalk';
@@ -44,6 +44,7 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     expect(entering).toEqual([{ gate: gate.id, x: gate.x, z: gate.z, frames: expect.any(Number) }]);
     expect(entering[0].frames).toBeGreaterThanOrEqual(GATE_WALK.frames);
     expect(outOfReach(g)).toBe(true); // the walk in is not theirs: nothing reaches them
+    expect(interactable(g)).toBeNull(); // nor is E: no prompt to pass it stands over the walk
     const at = { ...pos(g) };
     stepGame(g, { ...emptyInput(), moveX: 1 }); // nor does the stick move them
     expect(aboutGate(gate, pos(g)).ahead).toBeLessThanOrEqual(aboutGate(gate, at).ahead + 1e-6);
