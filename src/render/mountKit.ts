@@ -62,9 +62,8 @@ export class MountBuilder {
           mat3 im = mat3(instanceMatrix);
           mountNormal = normalize(im * (normal / vec3(dot(im[0], im[0]), dot(im[1], im[1]), dot(im[2], im[2]))));
         #endif`)
-        .replace('vLocal = position /', 'vLocal = mountPosition /')
-        .replace('writhe(position, normal) : position', 'writhe(mountPosition, mountNormal) : mountPosition')
-        .replace('mat3(modelMatrix) * normal', 'mat3(modelMatrix) * mountNormal');
+        .replace('vec3 transformed = position;', 'vec3 transformed = mountPosition;') // (the world shader poses a skinned model's vertices in `transformed`, render/models)
+        .replace('mat3(modelMatrix) * objectNormal', 'mat3(modelMatrix) * mountNormal');
       m.side = THREE.DoubleSide; this.cache.set(key, m); this.materials.push(m);
     }
     return m;

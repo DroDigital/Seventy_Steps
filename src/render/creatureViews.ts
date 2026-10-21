@@ -24,6 +24,8 @@ import { strikeFrame } from '../systems/realityTricks';
 import { buildAssembly, type Assembly } from './assemblies';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
+import type { ModelSource } from './models/modelLibrary';
+import { createModelViews } from './models/modelViews';
 import { MIST } from './volumetricFog';
 import { sight } from '../systems/perception';
 import { CELL, spriteKey, type SpriteAtlas } from './sprites/atlas';
@@ -99,7 +101,8 @@ export interface CreatureFrame {
   source: string; mirror: boolean; page: number; width: number; height: number;
 }
 
-export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAtlas): CreatureViews {
+export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAtlas, sources: ReadonlyMap<string, ModelSource> = new Map()): CreatureViews {
+  const models = createModelViews(scene, g, sources); // the creatures that have a 3D model are drawn by it (docs/MODELS.md); the sprites stand in for the rest
   const tex = new THREE.DataTexture(atlas.data, atlas.width, atlas.height);
   tex.magFilter = THREE.NearestFilter;
   tex.minFilter = THREE.NearestFilter;
@@ -214,6 +217,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       const model = g.ecs.c.model.get(id);
       if (!model?.startsWith(MODEL_PREFIX)) return undefined;
       const [cid, variant] = model.slice(MODEL_PREFIX.length).split('#') as [string, Variant | undefined];
+      const tall = models.height(cid, variant);
+      if (tall !== undefined) return { bottom: g.ecs.c.brain.get(id)?.def.params.hover ?? 0, top: (g.ecs.c.brain.get(id)?.def.params.hover ?? 0) + tall, rows: 0 };
       const span = spans.get(spriteKey(cid, variant));
       const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
       return span && { bottom: span.bottom + hover, top: span.top + hover, rows: span.rows };
@@ -246,6 +251,12 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
+        if (models.has(cid)) { // its model, posed from its move; a body that dies falls before it fades
+          const fade = look && (g.ecs.c.actor.get(id)?.move === 'death' ? 1 - THREE.MathUtils.smoothstep(look.sink, 0.65, 1) : look.opacity);
+          const shown = look && { opacity: fade!, flash, weird: g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0 };
+          for (const e of models.draw(id, model, cid, variant, def, { x, y, z, yaw }, shown, time, camera.position)) glow(e.x, e.y, e.z, 0.03, e.rgb, look!, camera.position, mistLook(id, time));
+          continue;
+        }
         if (entry && art && direction) {
           if (!look) continue;
           directions.set(id, direction);
@@ -320,6 +331,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       }
       pages.forEach((page, index) => page.finish(counts[index]));
       fallback.finish(n);
+      models.finish(seen);
       glows.end();
     },
   };

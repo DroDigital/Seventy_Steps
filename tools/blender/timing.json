@@ -1,0 +1,10454 @@
+{
+ "fps": 60,
+ "entities": {
+  "deep_one": {
+   "name": "Deep One",
+   "tier": "lesser",
+   "source": "The Shadow over Innsmouth",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth",
+    "rlyeh"
+   ],
+   "note": "They come up from Devil Reef in packs and keep to the dark side of every street. The old men of Innsmouth say they will not cross a fire; fire is no more than a nuisance to them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "sea",
+    "scale": 2.3,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.955,
+    "radius": 0.506,
+    "reach": 1.955,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.2,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 1.955,
+     "look": {
+      "silhouette": "hunched",
+      "palette": "sea",
+      "scale": 2.3,
+      "eyes": 4,
+      "glow": "green"
+     },
+     "name": "Deep One"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.26
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.132,
+     "height": 1.075
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.338,
+     "height": 1.173
+    }
+   }
+  },
+  "innsmouth_hybrid": {
+   "name": "Innsmouth Hybrid",
+   "tier": "lesser",
+   "source": "The Shadow over Innsmouth",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth",
+    "rlyeh"
+   ],
+   "note": "A man to the waist and something else about the eyes: the Innsmouth look, the wide unblinking stare, the skin gone rough. Quicker than they seem, and they know the lanes better than you do.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sea",
+    "scale": 2.1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 1.785,
+     "look": {
+      "silhouette": "hunched",
+      "palette": "sea",
+      "scale": 2.1,
+      "eyes": 2
+     },
+     "name": "Innsmouth Hybrid"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.134,
+     "unblockable": true
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134
+    }
+   }
+  },
+  "dagon_priest": {
+   "name": "Esoteric Order of Dagon Priest",
+   "tier": "lesser",
+   "source": "The Shadow over Innsmouth",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth",
+    "rlyeh"
+   ],
+   "note": "The Order's priests wear the tiara from the church on New Church Green and chant from behind a screen of others. Kill the singer and the song goes on.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "sea",
+    "scale": 2.3,
+    "eyes": 2
+   },
+   "body": {
+    "height": 2.07,
+    "radius": 0.46,
+    "reach": 2.07,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.8,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 2.07,
+     "look": {
+      "silhouette": "robed",
+      "palette": "sea",
+      "scale": 2.3,
+      "eyes": 2,
+      "glow": "magenta"
+     },
+     "name": "Esoteric Order of Dagon Priest"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    }
+   }
+  },
+  "cthulhu_cultist": {
+   "name": "Cthulhu Cultist",
+   "tier": "lesser",
+   "source": "The Call of Cthulhu",
+   "canonLooks": true,
+   "regions": [
+    "rlyeh",
+    "providence"
+   ],
+   "note": "A hooded man with a stone in his pocket and a chant he cannot pronounce. Brave in a crowd; the crowd is not usually far.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "charcoal",
+    "scale": 2.1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.42,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 1.04
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134
+    }
+   }
+  },
+  "ghoul": {
+   "name": "Ghoul",
+   "tier": "lesser",
+   "source": "Pickman's Model",
+   "canonLooks": true,
+   "regions": [
+    "providence",
+    "dreamlands",
+    "arkham"
+   ],
+   "note": "Pickman's friends: rubbery, doglike, crouching, fond of graveyards and good paintings. They are not mindless. They simply do not share your opinion of the dead.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "mold",
+    "scale": 2.2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.87,
+    "radius": 0.484,
+    "reach": 1.87,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 1.87,
+     "look": {
+      "silhouette": "hunched",
+      "palette": "mold",
+      "scale": 2.2,
+      "eyes": 3
+     },
+     "name": "Ghoul"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.935
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 1.029
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.122
+    }
+   }
+  },
+  "ghast": {
+   "name": "Ghast",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "A ghast hunts by the dark and dies by the sun, which is why the Dreamlands keep their lamps lit. It leaps on its hooves, and it barks when it laughs.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "pallid",
+    "scale": 2.2,
+    "eyes": 0
+   },
+   "body": {
+    "height": 1.21,
+    "radius": 0.66,
+    "reach": 1.21,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.605
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.666
+    }
+   }
+  },
+  "zoog": {
+   "name": "Zoog",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Small, brown and everywhere in the Enchanted Wood. Gentle if their mushrooms are left alone; quick, and many, if they are not.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "rust",
+    "scale": 0.9,
+    "eyes": 2
+   },
+   "body": {
+    "height": 0.495,
+    "radius": 0.27,
+    "reach": 0.495,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.2,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.3
+    }
+   }
+  },
+  "night_gaunt": {
+   "name": "Night-gaunt",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Faceless, horned, silent, with a barbed tail. They carry sleepers off through the dark, tickle them, and set them down in strange places. They do not speak. They never have.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "winged",
+    "palette": "rubber",
+    "scale": 2.8,
+    "eyes": 0,
+    "wings": 2
+   },
+   "body": {
+    "height": 1.96,
+    "radius": 0.7,
+    "reach": 1.96,
+    "hover": 2.5
+   },
+   "archetype": "flyer_swoop",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.dive": {
+     "frames": 80,
+     "strike": 30,
+     "end": 40,
+     "kind": "area",
+     "shape": "hit",
+     "lunge": [
+      24,
+      40,
+      6.094
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.032,
+     "height": 0.784
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.032,
+     "height": 1.176,
+     "unblockable": true
+    }
+   }
+  },
+  "moon_beast": {
+   "name": "Moon-beast",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Pale, slug-bodied, its blunt feelers never still: it sails its galley out of the Moon and trades slaves for rubies at Dylath-Leen. Stronger than it looks.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "toad",
+    "palette": "pallid",
+    "scale": 2.6,
+    "eyes": 0,
+    "tentacles": 6
+   },
+   "body": {
+    "height": 1.56,
+    "radius": 0.936,
+    "reach": 1.56,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.4,
+     "height": 0.624
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.2,
+     "height": 0.78
+    }
+   }
+  },
+  "man_of_leng": {
+   "name": "Man of Leng",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The Men of Leng wear a turban and keep their mouths covered, and sell what they cannot name to the things in the monastery. They pass for human, which is the worst of it.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "rust",
+    "scale": 2.2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.396,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.288
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.146,
+     "height": 1.089
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.355,
+     "height": 1.188
+    }
+   }
+  },
+  "cat_from_saturn": {
+   "name": "Cat from Saturn",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": false,
+   "regions": [
+    "dreamlands",
+    "beyond"
+   ],
+   "note": "Larger than any cat of Earth and unfriendly to a stranger who has never been kind to one. They hunt in rings, and the ring closes from behind.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "charcoal",
+    "scale": 1.2,
+    "eyes": 2,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 0.66,
+    "radius": 0.36,
+    "reach": 0.66,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.33
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.363
+    }
+   }
+  },
+  "wamp": {
+   "name": "Wamp",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": false,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "No one who describes a wamp agrees on its shape. All agree that it hunts the lanes beyond the Enchanted Wood and that it is quick.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "rust",
+    "scale": 1.3,
+    "eyes": 2,
+    "limbs": 8
+   },
+   "body": {
+    "height": 0.715,
+    "radius": 0.39,
+    "reach": 0.715,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.358
+    }
+   }
+  },
+  "gnorri": {
+   "name": "Gnorri",
+   "tier": "lesser",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": false,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The Gnorri build labyrinths under the sea and dislike the sun, and ask nothing of anyone. The ones that wander ashore want something.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "sea",
+    "scale": 2,
+    "eyes": 2,
+    "tentacles": 3
+   },
+   "body": {
+    "height": 1.7,
+    "radius": 0.44,
+    "reach": 1.7,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.02
+    }
+   }
+  },
+  "serpent_man": {
+   "name": "Serpent Man of Valusia",
+   "tier": "lesser",
+   "source": "The Haunter of the Dark",
+   "canonLooks": false,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "The serpent people ruled the Earth before there were men. The ones that remain wear human faces badly, and rule from behind the eyes of the weak.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "mold",
+    "scale": 2.2,
+    "eyes": 2,
+    "body": [
+     0.9,
+     0.12
+    ]
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.264,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 1.65,
+     "look": {
+      "silhouette": "serpent",
+      "palette": "mold",
+      "scale": 2.2,
+      "eyes": 2,
+      "body": [
+       0.75,
+       0.25
+      ]
+     },
+     "name": "Serpent Man of Valusia"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.613
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.146,
+     "height": 0.99
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "kn_yan_dweller": {
+   "name": "K'n-yan Dweller",
+   "tier": "lesser",
+   "source": "The Mound",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "The people of blue-litten K'n-yan have no use for the surface and little for each other. They are scholars of sensation, and pain is one of the arts.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sand",
+    "scale": 2.1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "ym_bhi": {
+   "name": "Y'm-bhi",
+   "tier": "lesser",
+   "source": "The Mound",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Y'm-bhi: the dead of K'n-yan, brought back from their tombs with the fire in the flesh and none of the mind. They are made to labour and they do not tire.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "pallid",
+    "scale": 2.1,
+    "eyes": 2,
+    "body": [
+     0.85,
+     0.18
+    ]
+   },
+   "body": {
+    "height": 1.785,
+    "radius": 0.378,
+    "reach": 1.785,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.2,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.071,
+     "unblockable": true
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.4,
+     "height": 0.714
+    }
+   }
+  },
+  "gyaa_yothn": {
+   "name": "Gyaa-yothn",
+   "tier": "lesser",
+   "source": "The Mound",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Hulking things bred in Yoth to carry loads: blind, strong, and loyal to nobody in particular.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "pallid",
+    "scale": 3,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.65,
+    "radius": 0.9,
+    "reach": 1.65,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.825
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      8
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.2,
+     "height": 0.825
+    }
+   }
+  },
+  "reanimated_corpse": {
+   "name": "Reanimated Corpse",
+   "tier": "lesser",
+   "source": "Herbert West—Reanimator",
+   "canonLooks": true,
+   "regions": [
+    "arkham",
+    "hub"
+   ],
+   "note": "West's work: a body made to walk by a serum that preferred fresher stock. It strikes without feeling and rots without minding. Fire ends it.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "flesh",
+    "scale": 2.1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.134,
+     "unblockable": true
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134
+    }
+   }
+  },
+  "martense_degenerate": {
+   "name": "Martense Degenerate",
+   "tier": "lesser",
+   "source": "The Lurking Fear",
+   "canonLooks": true,
+   "regions": [
+    "vermont",
+    "dunwich"
+   ],
+   "note": "The Martense line went under the mountain when the house fell and took on the habits of the place. They hunt on all fours in the dark, and thunder wakes them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "charcoal",
+    "scale": 1.7,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.445,
+    "radius": 0.374,
+    "reach": 1.445,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.722
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 0.867
+    }
+   }
+  },
+  "exham_troglodyte": {
+   "name": "Exham Priory Troglodyte",
+   "tier": "lesser",
+   "source": "The Rats in the Walls",
+   "canonLooks": true,
+   "regions": [
+    "hub"
+   ],
+   "note": "Beneath Exham Priory the cellars and the rats are one tale. These are what the rats were guarding: pale, grey-eyed, and long since unable to say what they descend from.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "pallid",
+    "scale": 1.8,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.53,
+    "radius": 0.396,
+    "reach": 1.53,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.765
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 0.918,
+     "unblockable": true
+    }
+   }
+  },
+  "rat_swarm": {
+   "name": "Rat Swarm",
+   "tier": "lesser",
+   "source": "The Rats in the Walls",
+   "canonLooks": true,
+   "regions": [
+    "hub",
+    "arkham",
+    "dunwich",
+    "vermont"
+   ],
+   "note": "A hundred small feet running toward you in a wave and a hundred small voices saying nothing at all. Fire turns them; a lantern held low parts them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "swarm",
+    "palette": "charcoal",
+    "scale": 1.4,
+    "eyes": 2
+   },
+   "body": {
+    "height": 0.49,
+    "radius": 0.56,
+    "reach": 0.49,
+    "hover": 0
+   },
+   "archetype": "swarm",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.5,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.3
+    }
+   }
+  },
+  "winged_hybrid": {
+   "name": "Winged Hybrid",
+   "tier": "lesser",
+   "source": "The Festival",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "At the Festival in Kingsport they come up out of the crypt on beaten wings in the shape of men, and nobody in the town will say why the old church bell is so slow.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "winged",
+    "palette": "rubber",
+    "scale": 2.4,
+    "eyes": 2,
+    "wings": 2
+   },
+   "body": {
+    "height": 1.68,
+    "radius": 0.6,
+    "reach": 1.68,
+    "hover": 2.5
+   },
+   "archetype": "flyer_swoop",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.dive": {
+     "frames": 80,
+     "strike": 30,
+     "end": 40,
+     "kind": "area",
+     "shape": "hit",
+     "lunge": [
+      24,
+      40,
+      6
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1,
+     "height": 0.672
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.008,
+     "unblockable": true
+    }
+   }
+  },
+  "moon_bog_wraith": {
+   "name": "Moon-Bog Wraith",
+   "tier": "lesser",
+   "source": "The Moon-Bog",
+   "canonLooks": true,
+   "regions": [
+    "arkham",
+    "vermont"
+   ],
+   "note": "The wraiths of the Moon-Bog: the shapes moonlight takes over a drowned village. Steel goes through them; light does not. They take the mind before the body.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "spectre",
+    "palette": "pallid",
+    "scale": 2.2,
+    "eyes": 0,
+    "glow": "green"
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.484,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.2,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.042,
+     "height": 1.188,
+     "unblockable": true
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    }
+   }
+  },
+  "being_of_ib": {
+   "name": "Being of Ib",
+   "tier": "lesser",
+   "source": "The Doom that Came to Sarnath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Grey, bulging-eyed, froglike and mute: the dead city of Sarnath was built where they lived. They do not remember Sarnath. They have not forgotten it.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "mold",
+    "scale": 2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.7,
+    "radius": 0.44,
+    "reach": 1.7,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.85
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "nameless_city_reptile": {
+   "name": "Nameless City Reptile",
+   "tier": "lesser",
+   "source": "The Nameless City",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus"
+   ],
+   "note": "A crawling thing of the Nameless City, scaly, patient, as old as the desert. It lies in the low passages and moves only when you have gone in too far to turn.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "sand",
+    "scale": 1.8,
+    "eyes": 2
+   },
+   "body": {
+    "height": 0.99,
+    "radius": 0.54,
+    "reach": 0.99,
+    "hover": 0
+   },
+   "archetype": "ambusher",
+   "hide": "ambush",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.495
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.545
+    }
+   }
+  },
+  "hybrid_mummy": {
+   "name": "Hybrid Mummy",
+   "tier": "lesser",
+   "source": "Under the Pyramids",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus"
+   ],
+   "note": "Under the pyramid, in the black chambers: a man's body and a beast's head, wrapped, rising from a niche. Not dead, not alive, and not stopped by a door.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sand",
+    "scale": 2.2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.396,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.042,
+     "height": 1.188,
+     "unblockable": true
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.459,
+     "height": 0.792
+    }
+   }
+  },
+  "venusian_man_lizard": {
+   "name": "Venusian Man-Lizard",
+   "tier": "lesser",
+   "source": "In the Walls of Eryx",
+   "canonLooks": true,
+   "regions": [
+    "yuggoth"
+   ],
+   "note": "A thing of Venus, if the walls of Eryx are to be believed: a reptile with a man's bearing, speaking in the mind, doing quiet harm with a cold glass look.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "mold",
+    "scale": 2.3,
+    "eyes": 2,
+    "tentacles": 4
+   },
+   "body": {
+    "height": 2.07,
+    "radius": 0.414,
+    "reach": 2.07,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.416,
+     "height": 1.242
+    }
+   }
+  },
+  "beast_in_the_cave": {
+   "name": "The Beast in the Cave",
+   "tier": "lesser",
+   "source": "The Beast in the Cave",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "What a guide led a boy toward in the dark of the great cave: white, blind, human in its gait. It is, in its way, still a man.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "pallid",
+    "scale": 2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.7,
+    "radius": 0.44,
+    "reach": 1.7,
+    "hover": 0
+   },
+   "archetype": "ambusher",
+   "hide": "ambush",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.85
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.02,
+     "unblockable": true
+    }
+   }
+  },
+  "child_of_yig": {
+   "name": "Child of Yig",
+   "tier": "lesser",
+   "source": "The Curse of Yig",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Yig's children are many, and small, and they follow the scent of anyone who has hurt a snake. They are far better than you at finding you.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "swarm",
+    "palette": "sand",
+    "scale": 1.4,
+    "eyes": 1
+   },
+   "body": {
+    "height": 0.49,
+    "radius": 0.56,
+    "reach": 0.49,
+    "hover": 0
+   },
+   "archetype": "swarm",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.3
+    }
+   }
+  },
+  "albino_penguin": {
+   "name": "Blind Albino Penguin",
+   "tier": "lesser",
+   "source": "At the Mountains of Madness",
+   "canonLooks": true,
+   "regions": [
+    "mountains"
+   ],
+   "note": "A blind white bird that wanders the dark galleries beneath the ice, going toward the sound of its own feet. Miserable things. Their ancestors were bred.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "cone",
+    "palette": "pallid",
+    "scale": 1.9,
+    "eyes": 0,
+    "limbs": 0
+   },
+   "body": {
+    "height": 1.805,
+    "radius": 0.494,
+    "reach": 1.805,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 1.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    }
+   }
+  },
+  "gnoph_keh": {
+   "name": "Gnoph-keh",
+   "tier": "lesser",
+   "source": "Polaris",
+   "canonLooks": true,
+   "regions": [
+    "mountains"
+   ],
+   "note": "The hairy, many-limbed horror of the northern ice. It came down with the glaciers and hunted men, and it has not left off.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "charcoal",
+    "scale": 2.3,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.955,
+    "radius": 0.506,
+    "reach": 1.955,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.609
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.132,
+     "height": 0.977
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.338,
+     "height": 1.173
+    }
+   }
+  },
+  "mi_go": {
+   "name": "Mi-Go",
+   "tier": "greater",
+   "source": "The Whisperer in Darkness",
+   "canonLooks": true,
+   "regions": [
+    "vermont",
+    "yuggoth",
+    "dunwich"
+   ],
+   "note": "The Fungi from Yuggoth: pinkish, crustaceous, winged, with a cluster of waving feelers where a head should be. Careful, quiet and unhurried. They take brains out and never quite finish.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "crustacean",
+    "palette": "fungus",
+    "scale": 2.6,
+    "eyes": 0,
+    "wings": 2,
+    "limbs": 6
+   },
+   "body": {
+    "height": 1.82,
+    "radius": 0.728,
+    "reach": 1.82,
+    "hover": 2
+   },
+   "archetype": "hover_ranged",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {
+    "eldritch": {
+     "height": 1.82,
+     "look": {
+      "silhouette": "crustacean",
+      "palette": "fungus",
+      "scale": 2.6,
+      "eyes": 0,
+      "wings": 2,
+      "limbs": 6,
+      "glow": "purple"
+     },
+     "name": "Mi-Go"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.092,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "elder_thing": {
+   "name": "Elder Thing",
+   "tier": "greater",
+   "source": "At the Mountains of Madness",
+   "canonLooks": true,
+   "regions": [
+    "mountains"
+   ],
+   "note": "Barrel-bodied, star-headed, with membranous wings and tubular feelers. Not our enemy by temperament: they built a world and were undone by their own servants. Sometimes they are gentle.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "barrel",
+    "palette": "sea",
+    "scale": 2.8,
+    "eyes": 5,
+    "tentacles": 5,
+    "wings": 2
+   },
+   "body": {
+    "height": 2.38,
+    "radius": 0.672,
+    "reach": 2.38,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.628,
+     "height": 1.3
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.756,
+     "height": 1.19
+    }
+   }
+  },
+  "shoggoth": {
+   "name": "Shoggoth",
+   "tier": "greater",
+   "source": "At the Mountains of Madness",
+   "canonLooks": true,
+   "regions": [
+    "mountains"
+   ],
+   "note": "A protoplasmic mass that makes eyes and mouths at will. They obeyed once. They remember obeying. They say one thing, over and over, and it is not a word you want to hear near.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "ichor",
+    "scale": 4.2,
+    "eyes": 12,
+    "glow": "green"
+   },
+   "body": {
+    "height": 2.94,
+    "radius": 1.512,
+    "reach": 2.94,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {
+    "boss": {
+     "height": 6.3,
+     "look": {
+      "silhouette": "blob",
+      "palette": "ichor",
+      "scale": 9,
+      "eyes": 16,
+      "glow": "green"
+     },
+     "name": "Elder Shoggoth"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.882
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      9.951
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.857,
+     "height": 1.3
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.547,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.166,
+     "height": 1.176
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 3.404,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.882
+    }
+   }
+  },
+  "star_spawn": {
+   "name": "Star-spawn of Cthulhu",
+   "tier": "greater",
+   "source": "At the Mountains of Madness",
+   "canonLooks": true,
+   "regions": [
+    "rlyeh"
+   ],
+   "note": "Star-spawn of Cthulhu: the ones that came down with the Great Old One. Octopus-headed, winged, and large enough to make a man think of mountains.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "cephalopod",
+    "palette": "sea",
+    "scale": 4.4,
+    "eyes": 2,
+    "tentacles": 6,
+    "wings": 2
+   },
+   "body": {
+    "height": 4.18,
+    "radius": 1.144,
+    "reach": 4.18,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 2.2,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.08,
+     "height": 1.3
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 4.84,
+     "height": 1.3
+    }
+   }
+  },
+  "yithian": {
+   "name": "Yithian",
+   "tier": "greater",
+   "source": "The Shadow out of Time",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus"
+   ],
+   "note": "The Great Race of Yith: rugose cones with claws and a trumpet-eyed head. They take what they need of other minds, and they put it back, mostly.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "cone",
+    "palette": "bone",
+    "scale": 3.4,
+    "eyes": 3
+   },
+   "body": {
+    "height": 3.23,
+    "radius": 0.884,
+    "reach": 3.23,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 2.21,
+     "height": 1.3
+    }
+   }
+  },
+  "flying_polyp": {
+   "name": "Flying Polyp",
+   "tier": "greater",
+   "source": "The Shadow out of Time",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus",
+    "beyond"
+   ],
+   "note": "Half-visible, made of whistling, they keep to windowless towers and are seen only when they wish. The wind that comes before them is what you hear first.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "ichor",
+    "scale": 3.6,
+    "eyes": 0,
+    "tentacles": 8,
+    "body": [
+     0.7,
+     0.22
+    ]
+   },
+   "body": {
+    "height": 2.52,
+    "radius": 0.792,
+    "reach": 2.52,
+    "hover": 0
+   },
+   "archetype": "invisible_stalker",
+   "hide": "invisible",
+   "mobile": true,
+   "speed": 5,
+   "boss": false,
+   "variants": {
+    "boss": {
+     "height": 5.84,
+     "look": {
+      "silhouette": "blob",
+      "palette": "ichor",
+      "scale": 8,
+      "eyes": 0,
+      "tentacles": 14,
+      "body": [
+       0.73,
+       0.25
+      ]
+     },
+     "name": "Polyp Swarm"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.756
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.326,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.918,
+     "height": 1.26
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.756
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 3.316,
+     "height": 1.26
+    }
+   }
+  },
+  "gug": {
+   "name": "Gug",
+   "tier": "greater",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The giants of the Dreamlands' under-vaults: hairy, long-armed, with a mouth that splits upward. They were put out of the upper world for an offence no one will name.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "giant",
+    "palette": "charcoal",
+    "scale": 6,
+    "eyes": 2,
+    "limbs": 4
+   },
+   "body": {
+    "height": 5.7,
+    "radius": 1.2,
+    "reach": 5.7,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.seize": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 3,
+     "height": 1.3
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 4.2,
+     "height": 1.3
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 3.9,
+     "height": 1.3
+    }
+   }
+  },
+  "dhole": {
+   "name": "Dhole",
+   "tier": "greater",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands",
+    "beyond"
+   ],
+   "note": "A worm as wide as a house out of the deeps below the Dreamlands, rising through the earth and leaving nothing standing above it.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "serpent",
+    "palette": "pallid",
+    "scale": 6,
+    "eyes": 0,
+    "body": [
+     0.65625,
+     0.25
+    ]
+   },
+   "body": {
+    "height": 3.938,
+    "radius": 1.5,
+    "reach": 3,
+    "hover": 0
+   },
+   "archetype": "burrower",
+   "hide": "burrow",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.754
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.737,
+     "height": 1.3
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.211,
+     "height": 1.2
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "shantak": {
+   "name": "Shantak",
+   "tier": "greater",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "A horse-headed, scaly, bat-winged bird the size of an elephant, ridden by the Men of Leng. Light drives it off. It does not care for a lamp.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "winged",
+    "palette": "stone",
+    "scale": 4.6,
+    "eyes": 2,
+    "wings": 2
+   },
+   "body": {
+    "height": 3.22,
+    "radius": 1.15,
+    "reach": 3.22,
+    "hover": 2.5
+   },
+   "archetype": "flyer_swoop",
+   "hide": "none",
+   "mobile": true,
+   "speed": 6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.781
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.864,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      10.415
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.034,
+     "height": 1.3
+    },
+    "atk.dive": {
+     "frames": 80,
+     "strike": 30,
+     "end": 40,
+     "kind": "area",
+     "shape": "hit",
+     "lunge": [
+      24,
+      40,
+      7.811
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.695,
+     "height": 1.288
+    }
+   }
+  },
+  "formless_spawn": {
+   "name": "Formless Spawn of Tsathoggua",
+   "tier": "greater",
+   "source": "The Mound",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Tsathoggua's spawn: a black mass that spreads and draws back, taking its shape from the last thing it ate. Fire is the one thing it prefers not to.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "ichor",
+    "scale": 3,
+    "eyes": 0,
+    "tentacles": 4
+   },
+   "body": {
+    "height": 2.1,
+    "radius": 1.08,
+    "reach": 2.1,
+    "hover": 0
+   },
+   "archetype": "ambusher",
+   "hide": "ambush",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.105,
+     "height": 1.26,
+     "unblockable": true
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.432,
+     "height": 1.05
+    }
+   }
+  },
+  "yekubian": {
+   "name": "Yekubian",
+   "tier": "greater",
+   "source": "The Challenge from Beyond",
+   "canonLooks": true,
+   "regions": [
+    "beyond",
+    "yuggoth"
+   ],
+   "note": "A being from the planet Yekub, who understood the human body better than its owner did, and spoke through the hum of the lamp.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "serpent",
+    "palette": "pallid",
+    "scale": 3.6,
+    "eyes": 1,
+    "limbs": 10,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.9,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.08,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "being_from_beyond": {
+   "name": "Being from Beyond",
+   "tier": "greater",
+   "source": "From Beyond",
+   "canonLooks": true,
+   "regions": [
+    "providence",
+    "hub",
+    "yuggoth",
+    "beyond"
+   ],
+   "note": "What Tillinghast's resonator brought into sight: a jelly in the corner of the eye that is always there and always hungry. It is seen only by a mind that cannot rest.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "orb",
+    "palette": "pallid",
+    "scale": 2.8,
+    "eyes": 0,
+    "tentacles": 6,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 1.96,
+    "radius": 0.84,
+    "reach": 1.96,
+    "hover": 0
+   },
+   "archetype": "invisible_stalker",
+   "hide": "invisible",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.032,
+     "height": 1.176,
+     "unblockable": true
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.269,
+     "height": 0.98
+    }
+   }
+  },
+  "thousand_young": {
+   "name": "Thousand Young of Shub-Niggurath",
+   "tier": "greater",
+   "source": "The Whisperer in Darkness",
+   "canonLooks": false,
+   "regions": [
+    "dunwich"
+   ],
+   "note": "The Thousand Young of the Black Goat: black, rubbery, cloven-footed, ropy with tentacles. They are the Goat's brood, and the woods' answer to the farmer who cuts a tree.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "rubber",
+    "scale": 3.2,
+    "eyes": 6,
+    "limbs": 8,
+    "tentacles": 4
+   },
+   "body": {
+    "height": 1.76,
+    "radius": 0.96,
+    "reach": 1.76,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.88
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      8
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.2,
+     "height": 0.88
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.2,
+     "height": 0.88
+    }
+   }
+  },
+  "colour_out_of_space": {
+   "name": "The Colour Out of Space",
+   "tier": "named",
+   "source": "The Colour Out of Space",
+   "canonLooks": false,
+   "regions": [
+    "arkham"
+   ],
+   "note": "Not a monster so much as a stain on the idea of colour. It drinks the life out of the land, and paints the dying in a shade that does not exist.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "orb",
+    "palette": "pallid",
+    "scale": 5,
+    "eyes": 0,
+    "glow": "magenta",
+    "outside": true
+   },
+   "body": {
+    "height": 3.5,
+    "radius": 1.5,
+    "reach": 3.5,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.05
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "wilbur_whateley": {
+   "name": "Wilbur Whateley",
+   "tier": "named",
+   "source": "The Dunwich Horror",
+   "canonLooks": true,
+   "regions": [
+    "dunwich"
+   ],
+   "note": "Wilbur Whateley came to his growth in a year and a half, stood seven feet tall at ten, and read the Necronomicon aloud in the barn in his grandfather's voice. He is not entirely his mother's son.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "giant",
+    "palette": "rust",
+    "scale": 3.2,
+    "eyes": 2,
+    "tentacles": 8,
+    "limbs": 2
+   },
+   "body": {
+    "height": 3.04,
+    "radius": 0.64,
+    "reach": 3.04,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.6,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 3.52,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.912
+    }
+   }
+  },
+  "dunwich_horror": {
+   "name": "The Dunwich Horror",
+   "tier": "named",
+   "source": "The Dunwich Horror",
+   "canonLooks": true,
+   "regions": [
+    "dunwich"
+   ],
+   "note": "Wilbur's twin brother, if the word is allowed: it grew in the farmhouse on cattle, and cannot be seen without the Powder of Ibn Ghazi. It leaves tracks like a hogshead rolled through mud.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "rubber",
+    "scale": 9,
+    "tentacles": 10,
+    "eyes": 12
+   },
+   "body": {
+    "height": 9,
+    "radius": 2.7,
+    "reach": 9,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      17.411
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 5.684,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 6.632,
+     "height": 1.3
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 10.421,
+     "height": 1.3
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 11.842,
+     "height": 1.3
+    }
+   }
+  },
+  "keziah_mason": {
+   "name": "Keziah Mason",
+   "tier": "named",
+   "source": "The Dreams in the Witch House",
+   "canonLooks": true,
+   "regions": [
+    "arkham"
+   ],
+   "note": "A witch of 1692 who passed through the wall of a Salem gaol cell, and who keeps a rat with a human face to carry her messages. She knows where the corners lead.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "charcoal",
+    "scale": 2,
+    "eyes": 2,
+    "gear": [
+     "witch"
+    ]
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.4,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "brown_jenkin": {
+   "name": "Brown Jenkin",
+   "tier": "named",
+   "source": "The Dreams in the Witch House",
+   "canonLooks": true,
+   "regions": [
+    "arkham"
+   ],
+   "note": "The rat with the little man's hands and the sharp yellow teeth. It runs between the walls of the Witch House, and it prefers the sleeping.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "rust",
+    "scale": 1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 0.55,
+    "radius": 0.3,
+    "reach": 0.55,
+    "hover": 0
+   },
+   "archetype": "skirmisher",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5.5,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.3
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 0.33,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.303,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.3
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 0.33,
+     "unblockable": true
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.303
+    }
+   }
+  },
+  "black_man": {
+   "name": "The Black Man",
+   "tier": "named",
+   "source": "The Dreams in the Witch House",
+   "canonLooks": true,
+   "regions": [
+    "arkham"
+   ],
+   "note": "The Black Man of the witches' sabbath: tall, dark, never quite the shape of a man, writing in a book with a pen of ice. One of the thousand masks of the crawling chaos.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "charcoal",
+    "scale": 2.6,
+    "eyes": 2,
+    "glow": "purple",
+    "gear": [
+     "tall",
+     "coat"
+    ]
+   },
+   "body": {
+    "height": 2.34,
+    "radius": 0.468,
+    "reach": 2.34,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.702
+    }
+   }
+  },
+  "joseph_curwen": {
+   "name": "Joseph Curwen",
+   "tier": "named",
+   "source": "The Case of Charles Dexter Ward",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "Curwen of Providence, who never aged, who sent for the Essential Saltes, and who killed the boy he had made himself resemble. He said the dead might be consulted. It was the dead who consulted him.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sand",
+    "scale": 2.1,
+    "eyes": 2,
+    "gear": [
+     "tricorn",
+     "coat"
+    ]
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "simon_orne": {
+   "name": "Simon Orne",
+   "tier": "named",
+   "source": "The Case of Charles Dexter Ward",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "Simon Orne of Salem, who lived by the Saltes a hundred and fifty years, and wrote letters to Curwen in a hand that was the same at both ends of them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "charcoal",
+    "scale": 2.1,
+    "eyes": 2,
+    "gear": [
+     "brim",
+     "coat"
+    ]
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 1.04,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.756
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "edward_hutchinson": {
+   "name": "Edward Hutchinson",
+   "tier": "named",
+   "source": "The Case of Charles Dexter Ward",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "Hutchinson, of Salem, known for his skill with a pendulum and his place at Curwen's table. Not on your side: simply the sort of man who can be reasoned with.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "charcoal",
+    "scale": 2.2,
+    "eyes": 2,
+    "gear": [
+     "cowl"
+    ]
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.44,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "curwen_pit_thing": {
+   "name": "Thing in Curwen's Pits",
+   "tier": "named",
+   "source": "The Case of Charles Dexter Ward",
+   "canonLooks": false,
+   "regions": [
+    "providence"
+   ],
+   "note": "Down in the pits beneath Pawtuxet the failed answers to Curwen's questions are kept in the dark. One of them is not a failure, which is why it is chained.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "flesh",
+    "scale": 2.4,
+    "eyes": 3,
+    "tentacles": 3
+   },
+   "body": {
+    "height": 1.68,
+    "radius": 0.864,
+    "reach": 1.68,
+    "hover": 0
+   },
+   "archetype": "stationary_horror",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.008,
+     "unblockable": true
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.2,
+     "height": 0.84
+    }
+   }
+  },
+  "ephraim_waite": {
+   "name": "Ephraim Waite",
+   "tier": "named",
+   "source": "The Thing on the Doorstep",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth",
+    "arkham"
+   ],
+   "note": "Ephraim Waite, of Innsmouth blood, who died and did not stop: he changed bodies as other men change coats, and his last was a young woman's.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sea",
+    "scale": 2,
+    "eyes": 2,
+    "gear": [
+     "coat"
+    ]
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.36,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": true,
+   "variants": {
+    "eldritch": {
+     "height": 1.8,
+     "look": {
+      "silhouette": "humanoid",
+      "palette": "mold",
+      "scale": 2,
+      "eyes": 2,
+      "gear": [
+       "coat"
+      ]
+     },
+     "name": "Ephraim Waite"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.08,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.99,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.72
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.08,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.54
+    }
+   }
+  },
+  "haunter_of_the_dark": {
+   "name": "The Haunter of the Dark",
+   "tier": "named",
+   "source": "The Haunter of the Dark",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "The thing that sleeps in the Starry Wisdom church, in the stone and the dark. It cannot abide light, and it is always in the room where the light has just gone out.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "winged",
+    "palette": "rubber",
+    "scale": 4,
+    "eyes": 3,
+    "wings": 2,
+    "glow": "magenta"
+   },
+   "body": {
+    "height": 2.8,
+    "radius": 1,
+    "reach": 2.8,
+    "hover": 2
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4.6,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.dive": {
+     "frames": 80,
+     "strike": 30,
+     "end": 40,
+     "kind": "area",
+     "shape": "hit",
+     "lunge": [
+      24,
+      40,
+      7.284
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.474,
+     "height": 1.12
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.474,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 3.684,
+     "height": 1.3
+    }
+   }
+  },
+  "whisperer": {
+   "name": "The Whisperer in Akeley's Chair",
+   "tier": "named",
+   "source": "The Whisperer in Darkness",
+   "canonLooks": true,
+   "regions": [
+    "vermont"
+   ],
+   "note": "Something has sat down in Henry Akeley's chair; its hands are wax and its face is a mask. It will talk for hours about the stars, in a voice made of buzzing.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "pallid",
+    "scale": 2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.36,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": false,
+   "speed": 1.5,
+   "boss": true,
+   "variants": {
+    "eldritch": {
+     "height": 1.4,
+     "look": {
+      "silhouette": "crustacean",
+      "palette": "fungus",
+      "scale": 2,
+      "eyes": 2,
+      "wings": 2
+     },
+     "name": "The Whisperer in Akeley's Chair"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    }
+   }
+  },
+  "the_hound": {
+   "name": "The Hound",
+   "tier": "named",
+   "source": "The Hound",
+   "canonLooks": false,
+   "regions": [
+    "arkham"
+   ],
+   "note": "The Hound of the amulet: it bays on the moor and in the mind. It will follow a thief across the sea for a stolen jade charm, and it has the patience of the grave.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "bone",
+    "scale": 2.4,
+    "eyes": 2,
+    "wings": 2,
+    "glow": "green"
+   },
+   "body": {
+    "height": 1.32,
+    "radius": 0.72,
+    "reach": 1.32,
+    "hover": 0
+   },
+   "archetype": "pack_hunter",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.66
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      8
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.2,
+     "height": 0.66
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 0.792,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.726,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.528
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.726
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    }
+   }
+  },
+  "the_unnamable": {
+   "name": "The Unnamable",
+   "tier": "named",
+   "source": "The Unnamable",
+   "canonLooks": false,
+   "regions": [
+    "arkham"
+   ],
+   "note": "A thing that cannot be named is, in Carter's phrase, only a thing nobody has dared to name. The attic in Arkham had one. Manton was wrong.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "rubber",
+    "scale": 3.2,
+    "eyes": 6,
+    "tentacles": 5
+   },
+   "body": {
+    "height": 2.24,
+    "radius": 1.152,
+    "reach": 2.24,
+    "hover": 0
+   },
+   "archetype": "invisible_stalker",
+   "hide": "invisible",
+   "mobile": true,
+   "speed": 4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      8.686
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.415,
+     "height": 1.12
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.179,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.594,
+     "height": 1.12
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.672
+    }
+   }
+  },
+  "shunned_house_entity": {
+   "name": "The Shunned House Entity",
+   "tier": "named",
+   "source": "The Shunned House",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "In the cellar of the shunned house, a yellowish vapour with a human shape, and beneath it a mass that fed on whatever lived above. Fire and acid were not wasted.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "fungus",
+    "scale": 3,
+    "eyes": 1,
+    "glow": "green",
+    "body": [
+     0.5625,
+     0.28
+    ]
+   },
+   "body": {
+    "height": 1.688,
+    "radius": 0.84,
+    "reach": 2.1,
+    "hover": 0
+   },
+   "archetype": "stationary_horror",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.105,
+     "height": 1.26,
+     "unblockable": true
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.432,
+     "height": 1.05
+    }
+   }
+  },
+  "lilith": {
+   "name": "Lilith",
+   "tier": "named",
+   "source": "The Horror at Red Hook",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "Lilith of the Red Hook ritual, bride of the Devil, in the shape of a woman who is not quite alive, whom Suydam brought from the East to marry on the night of the ceremony.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "bone",
+    "scale": 2.1,
+    "eyes": 2,
+    "glow": "magenta",
+    "gear": [
+     "horns"
+    ],
+    "body": [
+     0.9,
+     0.14
+    ]
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.294,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.8,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 1.04,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.756
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.134,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.567
+    }
+   }
+  },
+  "zann_window_thing": {
+   "name": "The Thing Beyond Erich Zann's Window",
+   "tier": "named",
+   "source": "The Music of Erich Zann",
+   "canonLooks": false,
+   "regions": [
+    "beyond"
+   ],
+   "note": "A chaos of music-fed darkness beyond a mansard window in the Rue d'Auseil, at the end of a street no one has found since. A viol held it back for years. The viol has stopped.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "orb",
+    "palette": "charcoal",
+    "scale": 4,
+    "eyes": 0,
+    "tentacles": 4,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 2.8,
+    "radius": 1.2,
+    "reach": 2.8,
+    "hover": 0
+   },
+   "archetype": "stationary_horror",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 3.684,
+     "height": 1.3
+    }
+   }
+  },
+  "voice_in_the_tomb": {
+   "name": "The Voice in the Tomb",
+   "tier": "named",
+   "source": "The Statement of Randolph Carter",
+   "canonLooks": false,
+   "regions": [
+    "arkham"
+   ],
+   "note": "At the foot of the tomb a voice says: \"I am dead, and I am here. I am down here, where it is warm.\" It is, I think, the worst voice.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "spectre",
+    "palette": "charcoal",
+    "scale": 2.6,
+    "eyes": 0
+   },
+   "body": {
+    "height": 2.34,
+    "radius": 0.572,
+    "reach": 2.34,
+    "hover": 0
+   },
+   "archetype": "stationary_horror",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.232,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    }
+   }
+  },
+  "high_priest": {
+   "name": "High Priest Not to Be Described",
+   "tier": "named",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The High Priest Not to Be Described wears a yellow silk mask over a face no one has seen, and sits in a stone monastery on the cold waste of Leng, and plays a flute. One does not look at the hands.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "sand",
+    "scale": 2.4,
+    "eyes": 0,
+    "gear": [
+     "mask"
+    ]
+   },
+   "body": {
+    "height": 2.16,
+    "radius": 0.48,
+    "reach": 2.16,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {
+    "eldritch": {
+     "height": 1.68,
+     "look": {
+      "silhouette": "blob",
+      "palette": "sand",
+      "scale": 2.4,
+      "eyes": 0,
+      "gear": [
+       "mask"
+      ],
+      "tentacles": 6,
+      "body": [
+       0.7,
+       0.23
+      ]
+     },
+     "name": "High Priest Not to Be Described"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.648
+    }
+   }
+  },
+  "colossus_pyramids": {
+   "name": "The Colossus Beneath the Pyramids",
+   "tier": "named",
+   "source": "Under the Pyramids",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus"
+   ],
+   "note": "Under the pyramids, in the shaft below the Sphinx, the many-headed colossus that the mummies serve. Houdini saw its hands and fainted; the Egyptian priests are not surprised.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "sand",
+    "scale": 14,
+    "tentacles": 5,
+    "eyes": 10
+   },
+   "body": {
+    "height": 14,
+    "radius": 4.2,
+    "reach": 14,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      1.629
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 8.105,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      21.716
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 8.842,
+     "height": 1.3
+    },
+    "atk.delayed_slam": {
+     "frames": 93,
+     "strike": 54,
+     "end": 59,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 11.053,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 7.368,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 10.316,
+     "height": 1.3
+    }
+   }
+  },
+  "martins_beach_horror": {
+   "name": "The Horror at Martin's Beach",
+   "tier": "named",
+   "source": "The Horror at Martin's Beach",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth"
+   ],
+   "note": "What was washed up on the sand at Martin's Beach: vast, dying in the sun, not quite the shape of a whale. The children who touched it dreamed of it. They still do.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "serpent",
+    "palette": "sea",
+    "scale": 7,
+    "eyes": 2,
+    "body": [
+     0.734375,
+     0.25
+    ]
+   },
+   "body": {
+    "height": 5.141,
+    "radius": 1.75,
+    "reach": 3.5,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.842,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 4.053,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.05
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 4.605,
+     "height": 1.3
+    }
+   }
+  },
+  "dr_munoz": {
+   "name": "Dr. Muñoz",
+   "tier": "named",
+   "source": "Cool Air",
+   "canonLooks": true,
+   "regions": [
+    "hub"
+   ],
+   "note": "Dr. Muñoz keeps his rooms at fifty-five degrees, and an ammonia engine to cool his own flesh, and holds that life runs on will alone. It is a very good will.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "pallid",
+    "scale": 2,
+    "eyes": 2,
+    "gear": [
+     "coat",
+     "pipes"
+    ]
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.36,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.08,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.99,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.72
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.08,
+     "unblockable": true
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "charles_le_sorcier": {
+   "name": "Charles le Sorcier",
+   "tier": "named",
+   "source": "The Alchemist",
+   "canonLooks": true,
+   "regions": [
+    "hub"
+   ],
+   "note": "Charles le Sorcier, of the house of C—, who took the elixir of Michel Mauvais and kept alive six hundred years, killing every heir who might have found him out. The last of the line.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "charcoal",
+    "scale": 2.1,
+    "eyes": 2,
+    "glow": "magenta",
+    "gear": [
+     "cowl",
+     "staff"
+    ]
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.42,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 1.04,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.756
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "medusa_gorgon": {
+   "name": "The Gorgon of Medusa's Coil",
+   "tier": "named",
+   "source": "Medusa's Coil",
+   "canonLooks": true,
+   "regions": [
+    "dunwich"
+   ],
+   "note": "A Gorgon of Medusa's Coil: a woman whose hair is a living thing and whose husband painted her. She looks at him as though from a long way back.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "charcoal",
+    "scale": 2.1,
+    "eyes": 2,
+    "tentacles": 10
+   },
+   "body": {
+    "height": 1.89,
+    "radius": 0.378,
+    "reach": 1.89,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.134,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 1.04,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.756
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.134,
+     "unblockable": true
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 1.04
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.2,
+     "height": 0.945
+    }
+   }
+  },
+  "hypnos": {
+   "name": "Hypnos",
+   "tier": "named",
+   "source": "Hypnos",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Hypnos, the god of sleep, who haunts a sculptor and his friend. The friend died of the dreams, and the sculptor will not say who he was. There is a face in the marble that is the sculptor's.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "bone",
+    "scale": 2.3,
+    "eyes": 2,
+    "glow": "purple",
+    "gear": [
+     "halo"
+    ]
+   },
+   "body": {
+    "height": 2.07,
+    "radius": 0.414,
+    "reach": 2.07,
+    "hover": 0
+   },
+   "archetype": "mind_thief",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.621
+    }
+   }
+  },
+  "the_outsider": {
+   "name": "The Outsider",
+   "tier": "named",
+   "source": "The Outsider",
+   "canonLooks": true,
+   "regions": [
+    "hub"
+   ],
+   "note": "A thing out of a vault beneath a decayed castle, rotted, ghoulish, climbed up at last to the lit world. It is what the mirror shows when the mirror is true.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "mold",
+    "scale": 2,
+    "eyes": 2,
+    "gear": [
+     "tatters"
+    ]
+   },
+   "body": {
+    "height": 1.8,
+    "radius": 0.36,
+    "reach": 1.8,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      8
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.2,
+     "height": 0.9
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.08,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.99,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.72
+    },
+    "atk.delayed_slam": {
+     "frames": 93,
+     "strike": 54,
+     "end": 59,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.72
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1,
+     "height": 1.08,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.08
+    }
+   }
+  },
+  "terrible_old_man": {
+   "name": "The Terrible Old Man",
+   "tier": "named",
+   "source": "The Terrible Old Man",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "The Terrible Old Man of Kingsport keeps a shelf of bottles with lead pendulums that swing without wind. Three burglars tried his house. The bottles had not been swinging for fun.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "bone",
+    "scale": 1.8,
+    "eyes": 2,
+    "gear": [
+     "brim",
+     "beard",
+     "cane"
+    ]
+   },
+   "body": {
+    "height": 1.62,
+    "radius": 0.324,
+    "reach": 1.62,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      0.8
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 0.972,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.6
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 1.3,
+     "height": 0.891,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.4
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.5,
+     "height": 0.648
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "zkauba": {
+   "name": "Zkauba the Wizard",
+   "tier": "named",
+   "source": "Through the Gates of the Silver Key",
+   "canonLooks": true,
+   "regions": [
+    "beyond"
+   ],
+   "note": "Zkauba of Yaddith, a wizard who has pursued Carter through a hundred bodies, and whose temper is not improved by being outwitted.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "stone",
+    "scale": 2.6,
+    "eyes": 2,
+    "glow": "purple",
+    "gear": [
+     "staff"
+    ],
+    "body": [
+     0.703125,
+     0.22
+    ]
+   },
+   "body": {
+    "height": 1.828,
+    "radius": 0.572,
+    "reach": 2.21,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "cthulhu": {
+   "name": "Cthulhu",
+   "tier": "great_old_one",
+   "source": "The Call of Cthulhu",
+   "canonLooks": true,
+   "regions": [
+    "rlyeh"
+   ],
+   "note": "Cthulhu waits in R'lyeh, in the house of the dead one. Dreaming; not dead. The stars come right every so often, and it is easier than anyone expects to wake it.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "sea",
+    "scale": 40,
+    "tentacles": 8,
+    "wings": 2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 40,
+    "radius": 12,
+    "reach": 40,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 21.053,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 29.474,
+     "height": 1.3
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 46.316,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 52.632,
+     "height": 1.3
+    }
+   }
+  },
+  "father_dagon": {
+   "name": "Father Dagon",
+   "tier": "great_old_one",
+   "source": "Dagon",
+   "canonLooks": true,
+   "regions": [
+    "innsmouth"
+   ],
+   "note": "Father Dagon: the vast thing from the deeps that the Marshes worship, who will rise out of Devil Reef when the stars are right to raise the sleepers.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "sea",
+    "scale": 16,
+    "eyes": 2,
+    "tentacles": 0
+   },
+   "body": {
+    "height": 16,
+    "radius": 4.8,
+    "reach": 16,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      23.215
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 10.105,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 11.789,
+     "height": 1.3
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 10.947,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 21.053,
+     "height": 1.3
+    }
+   }
+  },
+  "mother_hydra": {
+   "name": "Mother Hydra",
+   "tier": "great_old_one",
+   "source": "The Shadow over Innsmouth",
+   "canonLooks": false,
+   "regions": [
+    "innsmouth"
+   ],
+   "note": "Mother Hydra, Dagon's consort, who rises beside him out of the same water in a body that has not forgotten what it is to be a mother.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "sea",
+    "scale": 15,
+    "eyes": 4,
+    "tentacles": 6
+   },
+   "body": {
+    "height": 15,
+    "radius": 4.5,
+    "reach": 15,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 7.895,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 17.368,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    }
+   }
+  },
+  "hastur": {
+   "name": "Hastur",
+   "tier": "great_old_one",
+   "source": "The Whisperer in Darkness",
+   "canonLooks": false,
+   "regions": [
+    "yuggoth"
+   ],
+   "note": "Hastur the Unspeakable, He Who Is Not To Be Named, in the black lake beside Carcosa. His name must not be said three times. It is easy to hear it said twice.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "spectre",
+    "palette": "sand",
+    "scale": 8,
+    "eyes": 0,
+    "tentacles": 6
+   },
+   "body": {
+    "height": 7.2,
+    "radius": 1.76,
+    "reach": 7.2,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 8.337,
+     "height": 1.3
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 9.474,
+     "height": 1.3
+    }
+   }
+  },
+  "tsathoggua": {
+   "name": "Tsathoggua",
+   "tier": "great_old_one",
+   "source": "The Mound",
+   "canonLooks": true,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "The toad-god of Zhothaqquah, dozing in black N'kai beneath K'n-yan. He is not cruel, and he is not kind, and the ones he eats have not asked for kindness.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "toad",
+    "palette": "charcoal",
+    "scale": 6,
+    "eyes": 2
+   },
+   "body": {
+    "height": 3.6,
+    "radius": 2.16,
+    "reach": 3.6,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 1.8,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.826
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 2.084,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.653,
+     "height": 1.3
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.08
+    }
+   }
+  },
+  "ghatanothoa": {
+   "name": "Ghatanothoa",
+   "tier": "great_old_one",
+   "source": "Out of the Aeons",
+   "canonLooks": true,
+   "regions": [
+    "rlyeh"
+   ],
+   "note": "Ghatanothoa on Mount Yaddith-Gho: the thing whose sight turns flesh to stone and leaves the brain alive in it. Priests hid in the mountain's cave to cover their faces.",
+   "look": {
+    "kind": "assembly",
+    "body": "lathe",
+    "palette": "charcoal",
+    "scale": 20,
+    "tentacles": 8,
+    "eyes": 4
+   },
+   "body": {
+    "height": 20,
+    "radius": 6,
+    "reach": 20,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 1.5,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 14.737,
+     "height": 1.3
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 23.158,
+     "height": 1.3
+    }
+   }
+  },
+  "rhan_tegoth": {
+   "name": "Rhan-Tegoth",
+   "tier": "great_old_one",
+   "source": "The Horror in the Museum",
+   "canonLooks": true,
+   "regions": [
+    "yuggoth"
+   ],
+   "note": "Rhan-Tegoth, the Horror in the Museum: a pallid, six-limbed, ruffed thing on a black throne in a wax museum, fed on blood.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "toad",
+    "palette": "bone",
+    "scale": 5,
+    "eyes": 3,
+    "limbs": 6,
+    "body": [
+     0.6,
+     0.3
+    ]
+   },
+   "body": {
+    "height": 3,
+    "radius": 1.5,
+    "reach": 3,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.754
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.737,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      10.052
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.895,
+     "height": 1.3
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      1.005
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 2.053,
+     "height": 1.3,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.754
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 2.053,
+     "height": 1.3,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.759
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.368,
+     "height": 1.2
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.579,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 2.053,
+     "height": 1.3
+    }
+   }
+  },
+  "yig": {
+   "name": "Yig",
+   "tier": "great_old_one",
+   "source": "The Curse of Yig",
+   "canonLooks": false,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Yig, the Father of Serpents, merciful to snakes and unkind to those who harm them. The plains tribes say he is the god of the grass, and he does not forget.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "serpent",
+    "palette": "sand",
+    "scale": 6,
+    "eyes": 2,
+    "body": [
+     0.75,
+     0.25
+    ]
+   },
+   "body": {
+    "height": 4.5,
+    "radius": 1.5,
+    "reach": 3,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.754
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.737,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      10.052
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 1.895,
+     "height": 1.3
+    },
+    "atk.combo": {
+     "frames": 32,
+     "strike": 20,
+     "end": 26,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      14,
+      26,
+      1.005
+     ],
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 2.053,
+     "height": 1.3,
+     "then": "atk.combo_2"
+    },
+    "atk.combo_2": {
+     "frames": 28,
+     "strike": 14,
+     "end": 20,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      8,
+      20,
+      0.754
+     ],
+     "arc": [
+      -70,
+      80
+     ],
+     "reach": 2.053,
+     "height": 1.3,
+     "then": "atk.combo_3"
+    },
+    "atk.combo_3": {
+     "frames": 75,
+     "strike": 34,
+     "end": 39,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      28,
+      39,
+      1.759
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.368,
+     "height": 1.2
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      5.278
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.737,
+     "height": 1.3
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    }
+   }
+  },
+  "bokrug": {
+   "name": "Bokrug",
+   "tier": "great_old_one",
+   "source": "The Doom that Came to Sarnath",
+   "canonLooks": false,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Bokrug, the great water-lizard of Ilarnek, whom the people of Sarnath killed and mocked, and whose children took back the city on an old night of the moon.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "sea",
+    "scale": 9,
+    "eyes": 2
+   },
+   "body": {
+    "height": 4.95,
+    "radius": 2.7,
+    "reach": 4.95,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.968
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 2.866,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      12.913
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.126,
+     "height": 1.3
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    }
+   }
+  },
+  "nug": {
+   "name": "Nug",
+   "tier": "great_old_one",
+   "source": "The Mound",
+   "canonLooks": false,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Nug and Yeb, twin gods from the pits of Yoth, spawned of Yog-Sothoth. Nug wears the dark. All it asks is that its sleep go undisturbed.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "pallid",
+    "scale": 7,
+    "eyes": 3
+   },
+   "body": {
+    "height": 4.9,
+    "radius": 2.52,
+    "reach": 4.9,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.964
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 2.837,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      12.847
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.095,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.611,
+     "height": 1.3
+    }
+   }
+  },
+  "yeb": {
+   "name": "Yeb",
+   "tier": "great_old_one",
+   "source": "The Mound",
+   "canonLooks": false,
+   "regions": [
+    "kn_yan"
+   ],
+   "note": "Yeb is Nug's brother, or something larger than a brother. The people of Tsath do not pray to him. They sweep before his door.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "blob",
+    "palette": "charcoal",
+    "scale": 7,
+    "eyes": 1,
+    "tentacles": 6
+   },
+   "body": {
+    "height": 4.9,
+    "radius": 2.52,
+    "reach": 4.9,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.spit": {
+     "frames": 65,
+     "strike": 32,
+     "end": 33,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 5.674,
+     "height": 1.3
+    }
+   }
+  },
+  "great_ones": {
+   "name": "The Great Ones",
+   "tier": "great_old_one",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The gods of Earth, who dwell on Kadath: weak, and mild, and gone, who left a few strange things to guard the door.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "giant",
+    "palette": "stone",
+    "scale": 5,
+    "eyes": 2,
+    "limbs": 2,
+    "body": [
+     0.84375,
+     0.12
+    ]
+   },
+   "body": {
+    "height": 4.219,
+    "radius": 0.6,
+    "reach": 4.75,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.5,
+     "height": 1.3
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 3.25,
+     "height": 1.3
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "azathoth": {
+   "name": "Azathoth",
+   "tier": "outer_god",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": false,
+   "regions": [
+    "beyond"
+   ],
+   "note": "The blind idiot god Azathoth, at the centre of ultimate chaos in a black void. The piping of the flutes is what keeps its dreaming in time.",
+   "look": {
+    "kind": "assembly",
+    "body": "mound",
+    "palette": "charcoal",
+    "scale": 30,
+    "tentacles": 12,
+    "eyes": 0,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 30,
+    "radius": 15,
+    "reach": 30,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0.5,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    }
+   }
+  },
+  "daemon_pipers": {
+   "name": "The Daemon Pipers",
+   "tier": "outer_god",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": false,
+   "regions": [
+    "beyond"
+   ],
+   "note": "The two pipers who play for Azathoth, shapeless, flute-voiced. They are the sounds the idiot god hears.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "spectre",
+    "palette": "charcoal",
+    "scale": 2.8,
+    "eyes": 0,
+    "glow": "purple"
+   },
+   "body": {
+    "height": 2.52,
+    "radius": 0.616,
+    "reach": 2.52,
+    "hover": 0
+   },
+   "archetype": "caster",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "evade": {
+     "frames": 26
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.darkness": {
+     "frames": 67,
+     "strike": 36,
+     "end": 37,
+     "kind": "special",
+     "shape": "darkness"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    }
+   }
+  },
+  "other_gods": {
+   "name": "The Other Gods",
+   "tier": "outer_god",
+   "source": "The Other Gods",
+   "canonLooks": false,
+   "regions": [
+    "beyond",
+    "dreamlands"
+   ],
+   "note": "The Other Gods, who guard the gods of Earth on Kadath. They are above all gods; they are not at all gods.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "spectre",
+    "palette": "pallid",
+    "scale": 6,
+    "eyes": 0,
+    "tentacles": 4,
+    "glow": "magenta"
+   },
+   "body": {
+    "height": 5.4,
+    "radius": 1.32,
+    "reach": 5.4,
+    "hover": 0
+   },
+   "archetype": "brute",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      13.487
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.411,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 3.979,
+     "height": 1.3
+    }
+   }
+  },
+  "yog_sothoth": {
+   "name": "Yog-Sothoth",
+   "tier": "outer_god",
+   "source": "The Dunwich Horror",
+   "canonLooks": true,
+   "regions": [
+    "beyond"
+   ],
+   "note": "Yog-Sothoth is the gate. Yog-Sothoth is the key and the guardian of the gate. Past, present and future are one in Yog-Sothoth, which knows where the Old Ones broke through.",
+   "look": {
+    "kind": "assembly",
+    "body": "spheres",
+    "palette": "pallid",
+    "scale": 20,
+    "spheres": 14,
+    "glow": "green",
+    "hit": [
+     [
+      0.01,
+      0.718,
+      0.092
+     ],
+     [
+      -0.184,
+      0.544,
+      0.175
+     ],
+     [
+      0.199,
+      0.544,
+      0.165
+     ],
+     [
+      0.01,
+      0.398,
+      0.218
+     ],
+     [
+      -0.262,
+      0.223,
+      0.18
+     ],
+     [
+      0.248,
+      0.228,
+      0.184
+     ],
+     [
+      0,
+      0.107,
+      0.107
+     ]
+    ]
+   },
+   "body": {
+    "height": 20,
+    "radius": 7.6,
+    "reach": 20,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": false,
+   "speed": 1,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.aoe_ring": {
+     "frames": 78,
+     "strike": 36,
+     "end": 42,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    }
+   }
+  },
+  "umr_at_tawil": {
+   "name": "'Umr at-Tawil",
+   "tier": "outer_god",
+   "source": "Through the Gates of the Silver Key",
+   "canonLooks": true,
+   "regions": [
+    "beyond"
+   ],
+   "note": "'Umr at-Tawil, the Prolonged of Life, Guardian of the Gate, the one the Silver Key is for: ancient beyond comfort. He opens the last door for those who have paid.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "charcoal",
+    "scale": 4,
+    "eyes": 0,
+    "glow": "purple",
+    "gear": [
+     "cowl",
+     "staff"
+    ]
+   },
+   "body": {
+    "height": 3.6,
+    "radius": 0.8,
+    "reach": 3.6,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "ancient_ones": {
+   "name": "The Ancient Ones",
+   "tier": "outer_god",
+   "source": "Through the Gates of the Silver Key",
+   "canonLooks": true,
+   "regions": [
+    "beyond"
+   ],
+   "note": "The Ancient Ones wait beyond the last gate, at the end of the dream: those who give the key the right to be turned.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "pallid",
+    "scale": 3.2,
+    "eyes": 0,
+    "gear": [
+     "cowl"
+    ]
+   },
+   "body": {
+    "height": 2.88,
+    "radius": 0.64,
+    "reach": 2.88,
+    "hover": 0
+   },
+   "archetype": "stationary_horror",
+   "hide": "none",
+   "mobile": false,
+   "speed": 0,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    }
+   }
+  },
+  "shub_niggurath": {
+   "name": "Shub-Niggurath",
+   "tier": "outer_god",
+   "source": "The Whisperer in Darkness",
+   "canonLooks": false,
+   "regions": [
+    "dunwich"
+   ],
+   "note": "Shub-Niggurath, the Black Goat of the Woods with a Thousand Young. The cry of the cloven, the cry of the forest; she gives; she devours; she has not been seen from the front.",
+   "look": {
+    "kind": "assembly",
+    "body": "mound",
+    "palette": "rubber",
+    "scale": 18,
+    "tentacles": 12,
+    "eyes": 8
+   },
+   "body": {
+    "height": 18,
+    "radius": 9,
+    "reach": 18,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 1.2,
+   "boss": true,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "stoop": {
+     "loop": true
+    },
+    "atk.charge": {
+     "frames": 84,
+     "strike": 30,
+     "end": 48,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      24,
+      48,
+      24.623
+     ],
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 11.368,
+     "height": 1.3
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.pool": {
+     "frames": 61,
+     "strike": 30,
+     "end": 31,
+     "kind": "area",
+     "shape": "pool"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 20.842,
+     "height": 1.3
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 1.3
+    }
+   }
+  },
+  "nyarlathotep": {
+   "name": "Nyarlathotep",
+   "tier": "outer_god",
+   "source": "Nyarlathotep",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands",
+    "beyond"
+   ],
+   "note": "Nyarlathotep, the Crawling Chaos, the Soul and Messenger of the Other Gods: the tall dark man with the kind, polite voice, in every tongue and age, with a key on his watch chain.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sand",
+    "scale": 2.6,
+    "eyes": 2,
+    "glow": "purple",
+    "gear": [
+     "tall",
+     "coat",
+     "chain"
+    ]
+   },
+   "body": {
+    "height": 2.34,
+    "radius": 0.468,
+    "reach": 2.34,
+    "hover": 0
+   },
+   "archetype": "boss",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.4,
+   "boss": true,
+   "variants": {
+    "eldritch": {
+     "height": 4.2,
+     "look": {
+      "silhouette": "blob",
+      "palette": "ichor",
+      "scale": 6,
+      "eyes": 1,
+      "glow": "purple",
+      "gear": [
+       "tall",
+       "coat",
+       "chain"
+      ],
+      "tentacles": 10,
+      "body": [
+       0.7,
+       0.2
+      ]
+     },
+     "name": "Nyarlathotep, the Crawling Chaos"
+    }
+   },
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 64
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.barrage": {
+     "frames": 138,
+     "strike": 38,
+     "end": 108,
+     "kind": "ranged",
+     "shape": "barrage"
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.eruption": {
+     "frames": 73,
+     "strike": 28,
+     "end": 29,
+     "kind": "area",
+     "shape": "marks"
+    },
+    "atk.gaze": {
+     "frames": 80,
+     "strike": 30,
+     "end": 50,
+     "kind": "special",
+     "shape": "gaze"
+    },
+    "atk.grab": {
+     "frames": 74,
+     "strike": 28,
+     "end": 34,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      30,
+      -30
+     ],
+     "reach": 1.232,
+     "height": 1.3,
+     "unblockable": true
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.projectile_fan": {
+     "frames": 87,
+     "strike": 46,
+     "end": 47,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.quake": {
+     "frames": 75,
+     "strike": 32,
+     "end": 33,
+     "kind": "area",
+     "shape": "wave"
+    },
+    "atk.roar": {
+     "frames": 66,
+     "strike": 24,
+     "end": 36,
+     "kind": "special",
+     "shape": "none"
+    },
+    "atk.summon": {
+     "frames": 71,
+     "strike": 40,
+     "end": 41,
+     "kind": "special",
+     "shape": "summon"
+    },
+    "atk.sweep_beam": {
+     "frames": 124,
+     "strike": 46,
+     "end": 90,
+     "kind": "ranged",
+     "shape": "sweep"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    },
+    "atk.tentacle_burst": {
+     "frames": 72,
+     "strike": 30,
+     "end": 42,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      120,
+      -120
+     ],
+     "reach": 2.709,
+     "height": 1.17
+    },
+    "atk.vortex": {
+     "frames": 79,
+     "strike": 24,
+     "end": 78,
+     "kind": "special",
+     "shape": "none",
+     "then": "atk.vortex_burst"
+    },
+    "atk.vortex_burst": {
+     "frames": 58,
+     "strike": 8,
+     "end": 14,
+     "kind": "area",
+     "shape": "hit",
+     "arc": [
+      180,
+      -180
+     ],
+     "reach": 0,
+     "height": 0.702
+    }
+   }
+  },
+  "nodens": {
+   "name": "Nodens",
+   "tier": "ally",
+   "source": "The Strange High House in the Mist",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands",
+    "providence"
+   ],
+   "note": "Nodens, Lord of the Great Abyss, who drives a chariot of a great shell drawn by dolphins and wears a smile that is not for you. A friend of Earth's gods, and old.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "bone",
+    "scale": 3.2,
+    "eyes": 2,
+    "gear": [
+     "beard"
+    ]
+   },
+   "body": {
+    "height": 2.88,
+    "radius": 0.576,
+    "reach": 2.88,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.slam": {
+     "frames": 65,
+     "strike": 30,
+     "end": 35,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      0,
+      0
+     ],
+     "reach": 2.122,
+     "height": 1.152
+    },
+    "atk.wind_push": {
+     "frames": 68,
+     "strike": 30,
+     "end": 38,
+     "kind": "ranged",
+     "shape": "hit",
+     "arc": [
+      60,
+      -60
+     ],
+     "reach": 3.789,
+     "height": 1.3
+    }
+   }
+  },
+  "tritons": {
+   "name": "Tritons of Nodens' Court",
+   "tier": "ally",
+   "source": "The Strange High House in the Mist",
+   "canonLooks": true,
+   "regions": [
+    "providence"
+   ],
+   "note": "The tritons of Nodens' court, who blow their curled conches on the Kingsport cliffs when his chariot comes. Bearers, not warriors. It is the first time anyone has asked them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "humanoid",
+    "palette": "sea",
+    "scale": 2.2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.98,
+    "radius": 0.396,
+    "reach": 1.98,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 3.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.355,
+     "height": 1.188
+    }
+   }
+  },
+  "cats_of_ulthar": {
+   "name": "Cats of Ulthar",
+   "tier": "ally",
+   "source": "The Cats of Ulthar",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "The cats of Ulthar, who have stood between the town and its enemies since the cottager and his wife. They will not hurt you if you have not hurt them.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "quadruped",
+    "palette": "sand",
+    "scale": 1,
+    "eyes": 2
+   },
+   "body": {
+    "height": 0.55,
+    "radius": 0.3,
+    "reach": 0.55,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 5.5,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.3
+    },
+    "atk.lunge": {
+     "frames": 72,
+     "strike": 28,
+     "end": 38,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      22,
+      38,
+      4.2
+     ],
+     "arc": [
+      15,
+      -15
+     ],
+     "reach": 1.1,
+     "height": 0.303
+    }
+   }
+  },
+  "pickman": {
+   "name": "Richard Upton Pickman",
+   "tier": "ally",
+   "source": "Pickman's Model",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands",
+    "providence"
+   ],
+   "note": "Richard Upton Pickman, painter of Boston, who disappeared and came back as one of the things he painted. Good company, in his way, and keeps a fine studio.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "hunched",
+    "palette": "mold",
+    "scale": 2.2,
+    "eyes": 2
+   },
+   "body": {
+    "height": 1.87,
+    "radius": 0.484,
+    "reach": 1.87,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.bite": {
+     "frames": 43,
+     "strike": 18,
+     "end": 23,
+     "kind": "melee",
+     "shape": "hit",
+     "lunge": [
+      12,
+      23,
+      0.6
+     ],
+     "arc": [
+      10,
+      -10
+     ],
+     "reach": 1.1,
+     "height": 0.935
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 1.3,
+     "height": 1.122
+    }
+   }
+  },
+  "nasht_kaman_thah": {
+   "name": "Nasht & Kaman-Thah",
+   "tier": "ally",
+   "source": "The Dream-Quest of Unknown Kadath",
+   "canonLooks": true,
+   "regions": [
+    "dreamlands"
+   ],
+   "note": "Nasht and Kaman-Thah, priests of Ulthar's Temple of the Elder Ones, who know the way to the Onyx Castle and will say if asked politely, and in the right order.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "robed",
+    "palette": "bone",
+    "scale": 2.4,
+    "eyes": 2,
+    "gear": [
+     "cowl"
+    ]
+   },
+   "body": {
+    "height": 2.16,
+    "radius": 0.48,
+    "reach": 2.16,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.teleport": {
+     "frames": 41,
+     "strike": 20,
+     "end": 21,
+     "kind": "special",
+     "shape": "teleport"
+    }
+   }
+  },
+  "algol_light_being": {
+   "name": "The Light-Being from Algol",
+   "tier": "ally",
+   "source": "Beyond the Wall of Sleep",
+   "canonLooks": false,
+   "regions": [
+    "hub"
+   ],
+   "note": "The Light-Being from Algol comes to sleepers in their deepest dreams, a being of liquid light, with no malice. If anything it is curious about the human mind.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "orb",
+    "palette": "bone",
+    "scale": 2.6,
+    "eyes": 0,
+    "glow": "green"
+   },
+   "body": {
+    "height": 1.82,
+    "radius": 0.78,
+    "reach": 1.82,
+    "hover": 1.5
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 4,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.beam": {
+     "frames": 93,
+     "strike": 52,
+     "end": 53,
+     "kind": "ranged",
+     "shape": "shot"
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    }
+   }
+  },
+  "yithian_archivist": {
+   "name": "Yithian Archivist",
+   "tier": "ally",
+   "source": "The Shadow out of Time",
+   "canonLooks": true,
+   "regions": [
+    "pnakotus"
+   ],
+   "note": "An archivist of the Great Race, set to keep the Archives, with the gentle manner of one who has seen every age of the Earth and found them equally interesting.",
+   "look": {
+    "kind": "sprite",
+    "silhouette": "cone",
+    "palette": "bone",
+    "scale": 3.4,
+    "eyes": 3
+   },
+   "body": {
+    "height": 3.23,
+    "radius": 0.884,
+    "reach": 3.23,
+    "hover": 0
+   },
+   "archetype": "ally",
+   "hide": "none",
+   "mobile": true,
+   "speed": 2.6,
+   "boss": false,
+   "variants": {},
+   "clips": {
+    "idle": {
+     "loop": true
+    },
+    "move": {
+     "loop": true
+    },
+    "hurt": {
+     "frames": 34
+    },
+    "reel": {
+     "frames": 96
+    },
+    "death": {
+     "frames": 80
+    },
+    "atk.projectile": {
+     "frames": 79,
+     "strike": 40,
+     "end": 41,
+     "kind": "ranged",
+     "shape": "volley"
+    },
+    "atk.sweep": {
+     "frames": 50,
+     "strike": 22,
+     "end": 28,
+     "kind": "melee",
+     "shape": "hit",
+     "arc": [
+      80,
+      -60
+     ],
+     "reach": 2.21,
+     "height": 1.3
+    }
+   }
+  }
+ }
+}

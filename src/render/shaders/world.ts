@@ -41,9 +41,11 @@ varying vec2 vPaneUv;
 varying float vPane;
 #endif
 ${ELDRITCH_VERT}
+#include <skinning_pars_vertex>
 
 varying vec2 vUv;
 varying vec3 vUvw;
+varying float vGlow; // how far a vertex lights itself: a model's eyes and markings, in its colour's alpha (render/models)
 varying vec3 vLight;
 varying vec3 vMoon; // the moon's share of vLight, which a shadow takes (shaders/shadow.ts; round 34)
 varying vec3 vTint;
@@ -54,9 +56,14 @@ varying float vSplat;
 varying float vEdge;
 
 void main() {
-  vLocal = position / max(uBodyScale, 0.001);
-  vec4 wp = modelMatrix * vec4(uEldritch > 0.0 ? writhe(position, normal) : position, 1.0);
-  vec3 wn = normalize(mat3(modelMatrix) * normal);
+  vec3 transformed = position; // a skinned model's (render/models) is posed by its bones first
+  vec3 objectNormal = normal;
+  #include <skinbase_vertex>
+  #include <skinnormal_vertex>
+  #include <skinning_vertex>
+  vLocal = transformed / max(uBodyScale, 0.001);
+  vec4 wp = modelMatrix * vec4(uEldritch > 0.0 ? writhe(transformed, objectNormal) : transformed, 1.0);
+  vec3 wn = normalize(mat3(modelMatrix) * objectNormal);
   vWorld = wp.xyz;
 #ifdef PANES
   vPane = aPane;
@@ -84,12 +91,17 @@ void main() {
   float fall = clamp(1.0 - gd / uGlowRange, 0.0, 1.0);
   light += uGlowColor * fall * fall * (0.35 + 0.65 * max(dot(wn, toGlow / max(gd, 0.001)), 0.0));
   vec3 tint = vec3(1.0);
-#ifdef USE_COLOR
+  vGlow = 0.0;
+#if defined(USE_COLOR_ALPHA)
+  tint = color.rgb;
+  vGlow = color.a;
+#elif defined(USE_COLOR)
   tint = color;
 #endif
   vTint = tint;
-  vLight = mix(light, vec3(1.0), uEmissive) * tint;
-  vMoon = moon * (1.0 - uEmissive) * tint;
+  float selfLit = max(uEmissive, vGlow);
+  vLight = mix(light, vec3(1.0), selfLit) * tint;
+  vMoon = moon * (1.0 - selfLit) * tint;
   vNormal = wn;
   vSplat = aSplat;
   vEdge = aEdge;
@@ -135,6 +147,7 @@ varying vec3 vNormal;
 varying float vFog;
 varying float vSplat;
 varying float vEdge;
+varying float vGlow;
 uniform vec3 uLightDir;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
@@ -230,11 +243,12 @@ void main() {
   vec3 toEye = normalize(cameraPosition - vWorld);
   lamp += lampLightGloss(vWorld, n, 0.92 * (1.0 - character), toEye, uSheen.y, streak) * mix(1.0, uCharacterLight, character); // the world's lamps, fires and windows: a face turned from a lamp takes little of it (round 36: half, so a torch on the inside of a wall lit the wall's outside)
   if (floorish > 0.01) streak += 0.4 * uLanternColor * lanternFalloff(ld) * lanternVis * pow(max(dot(n, normalize(toLamp / max(ld, 0.001) + toEye)), 0.0), uSheen.y);
-  lamp *= (1.0 - uEmissive) * vTint;
+  float selfLit = max(uEmissive, vGlow);
+  lamp *= (1.0 - selfLit) * vTint;
   vec3 lit = vLight - vMoon * (1.0 - moonLit(vWorld, n, max(dot(n, uLightDir), 0.0))) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
   float peak = max(max(lit.r, lit.g), max(lit.b, 0.001));
   lit *= mix(1.0, min(1.0, uSelfMax / peak), self * max(1.0 - uEmissive, 0.0));
-  tex = mix(tex, vec3(1.0), 0.6 * uEmissive); // a lit thing shines through its texture
+  tex = mix(tex, vec3(1.0), 0.6 * selfLit); // a lit thing shines through its texture
   vec3 col = eldritch(tex * lit);
   if (floorish > 0.01) { // a streak of the lights across damp stone: stronger where the stone is pale and the ground wet, broken up so it glints
     float gloss = uSheen.x * (0.35 + 0.65 * vnoise(vWorld.xz * 2.3 + 4.0)) * (0.4 + 1.2 * dot(tex, vec3(0.33))) + 0.6 * uWet;

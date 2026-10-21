@@ -39,6 +39,7 @@ import { createHurtFx } from './render/hurtFx';
 import { createParticles } from './render/particles';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
+import { loadModels } from './render/models/modelLibrary';
 import { createFightViews } from './render/fightViews';
 import { placeCamera } from './render/followCamera';
 import { allEffectsOn, computeFx, lensAt, type FxState } from './render/fx';
@@ -177,7 +178,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);
   const views = createActorViews(scene, game);
-  const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
+  const [atlas, models] = await Promise.all([spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)), loadModels()]); // the creatures' models load while the sprites are drawn (docs/MODELS.md)
+  const creatures = createCreatureViews(scene, game, atlas, models);
   const hidden = createHiddenViews(scene, game);
   const fights = createFightViews(scene, game);
   const fxController = createFxController(game);

@@ -9,3 +9,7 @@ __pycache__/
 steam/build/
 steam/output/
 .butler/
+
+# the Blender kit: contact sheets and references are made on demand (docs/MODELS.md)
+tools/blender/sheets/
+tools/blender/.manifest.lock
