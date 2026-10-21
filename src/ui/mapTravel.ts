@@ -10,7 +10,7 @@ import { distXZ, type XZ } from '../core/geom';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { mapPlaces, type MapPlace } from '../world/mapData';
-import { screenX, screenY, type MapView } from './mapPainter';
+import { screenX, screenY, type MapView } from './mapView';
 
 const PICK_PX = 14; // a sign this near the pointer is picked
 export const BAR_WORDS = {
@@ -31,9 +31,9 @@ export function litSigns(g: Game, realm: readonly RegionDef[], from: XZ): MapPla
 const screenOf = (view: MapView, p: XZ): [number, number] => [screenX(view, p.x), screenY(view, p.z)];
 
 /** The lit sign nearest a point on the canvas (pixels), within PICK_PX, if any. */
-export function signAt(signs: readonly MapPlace[], view: MapView, px: number, py: number): MapPlace | null {
+export function signAt(signs: readonly MapPlace[], view: MapView, px: number, py: number, within = PICK_PX): MapPlace | null {
   let best: MapPlace | null = null;
-  let bestD = PICK_PX;
+  let bestD = within;
   for (const p of signs) {
     const [x, y] = screenOf(view, p);
     const d = Math.hypot(x - px, y - py);
@@ -42,8 +42,8 @@ export function signAt(signs: readonly MapPlace[], view: MapView, px: number, py
   return best;
 }
 
-/** A ring about a sign: breathing and glowing for the one chosen (grey when barred), faint under the pointer. */
-export function drawRing(ctx: CanvasRenderingContext2D, view: MapView, p: XZ, chosen: boolean, barred: boolean, now: number): void {
+/** A ring about a sign: breathing and glowing for the one chosen (grey when barred), faint under the pointer; `k`, the UI's scale. */
+export function drawRing(ctx: CanvasRenderingContext2D, view: MapView, p: XZ, chosen: boolean, barred: boolean, now: number, k = 1): void {
   const [x, y] = screenOf(view, p);
   const breath = 0.5 + 0.5 * Math.sin(now / 260);
   ctx.save();
@@ -52,12 +52,12 @@ export function drawRing(ctx: CanvasRenderingContext2D, view: MapView, p: XZ, ch
   ctx.shadowColor = barred ? '#000' : '#9a3cff';
   ctx.shadowBlur = chosen ? 10 + 8 * breath : 4;
   ctx.beginPath();
-  ctx.arc(x, y, chosen ? 11 + 2 * breath : 10, 0, Math.PI * 2);
+  ctx.arc(x, y, (chosen ? 12 + 2 * breath : 11) * k, 0, Math.PI * 2);
   ctx.stroke();
   if (chosen) {
     for (let i = 0; i < 4; i++) { // four ticks turning slowly about it, like a compass rose
       const a = now / 1800 + (i * Math.PI) / 2;
-      const [r0, r1] = [15 + 2 * breath, 20 + 2 * breath];
+      const [r0, r1] = [(16 + 2 * breath) * k, (21 + 2 * breath) * k];
       ctx.beginPath();
       ctx.moveTo(x + Math.cos(a) * r0, y + Math.sin(a) * r0);
       ctx.lineTo(x + Math.cos(a) * r1, y + Math.sin(a) * r1);

@@ -1,11 +1,12 @@
 /**
  * The full map (playtest round 1): M, the pad's Select, or Map in the pause menu opens it, and the
- * world stands still while it is open (main.ts). It shows the realm the investigator stands in,
- * fitted to the screen — every ground seen, the places marked there, region names, the Elder Signs
- * lit — with how much of the realm is charted. The wheel or + and − (pad triggers) zoom; dragging,
- * the arrows or WASD (left stick) pan; C (pad A) finds the investigator. A lit Elder Sign clicked, or
- * picked with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to
- * (playtest round 7, mapTravel.ts). M or Esc (pad B) closes it.
+ * world stands still while it is open (main.ts). It shows the realm the investigator stands in — every
+ * ground seen, the places marked there (mapMarks.ts, mapIcons.ts), region names, the Elder Signs lit — with
+ * how much of the realm is charted, opening on what has been seen (mapFit.ts), a key of its figures and a hover
+ * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
+ * WASD (left stick) pan; C (pad A) finds the investigator; L hides the key. A lit Elder Sign clicked, or picked
+ * with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
+ * mapTravel.ts). M or Esc (pad B) closes it.
  */
 
 import { PAD_BUTTON } from '../core/padMap';
@@ -13,14 +14,19 @@ import { signBeyondDemo, travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
 import { exploredShare } from '../systems/exploration';
-import { realmOf, realmRect, type MapPlace } from '../world/mapData';
+import { realmOf, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
 import { regionAt } from '../world/worldMap';
 import { BONE } from './hudKit';
 import { drawLead } from './leadMark';
 import { workArt } from './mapArt';
-import type { MapPainter, MapView } from './mapPainter';
+import { buildHints, buildKey, drawCompass, drawTip } from './mapChrome';
+import { chartedRect, fitScale, openingView } from './mapFit';
+import { markAt } from './mapMarks';
+import type { MapPainter } from './mapPainter';
 import { BAR_WORDS, drawRing, litSigns, signAt } from './mapTravel';
+import type { MapView } from './mapView';
+import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
 import { keyLayout, keyName } from '../core/bindings';
 import { deviceInUse } from '../core/device';
@@ -35,16 +41,6 @@ export interface MapScreen {
   show(): void;
 }
 
-const LEGEND: readonly [string, string][] = [
-  ['★', 'Elder Sign (dim until lit; click a lit one to travel)'],
-  ['◯', 'Gate'],
-  ['∩', 'Dungeon'],
-  ['◉', 'Boss (struck through once slain)'],
-  ['◆', 'Your Echoes'],
-  ['♙', 'Someone met in the dream'],
-  ['◇', 'Where the story leads'],
-];
-
 /** `go` makes a long jump under the veil (journeys.ts). */
 export function createMapScreen(g: Game, painter: MapPainter, resume: () => void, go: (words: string, jump: () => void) => void): MapScreen {
   const screen = createScreen(7, '#050506', 'inset:0', false); // its own canvas, the screen's size
@@ -55,15 +51,20 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   let fit = 1;
   let zoom = 1;
   let title: HTMLDivElement | null = null;
+  let stats: HTMLDivElement | null = null;
   let prompt: HTMLDivElement | null = null;
-  let heading = ''; // the realm and how much of it is charted
+  let key: HTMLElement | null = null;
+  let keyShown = true; // L hides the key, for the rest of the run
+  let heading = ['', '']; // the realm, and how much of it is charted
+  let pointer: { x: number; y: number } | null = null; // the mouse, in canvas pixels
+  let drag: { x: number; y: number; moved: number } | null = null;
   const held = new Set<string>();
   const padWas = new Set<number>();
   let lit: MapPlace[] = []; // the realm's lit signs, nearest first (the world stands still while the map is open)
   let chosen: MapPlace | null = null;
   /** Why no journey may be made to `p` now, or null: the state of things (travelBar), or, in the demo, a sign beyond its realms. */
   const barOf = (p: MapPlace): keyof typeof BAR_WORDS | null => travelBar(g) ?? (signBeyondDemo(g, p.id) ? 'demo' : null);
-  let hover: MapPlace | null = null;
+  let hover: MapPlace | null = null; // the lit sign under the pointer
 
   const realm = () => {
     const p = g.ecs.c.transform.get(g.player.id)!.pos;
@@ -89,10 +90,16 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     if (held.has('ArrowUp') || held.has('KeyW')) view.cz += step;
     if (held.has('ArrowDown') || held.has('KeyS')) view.cz -= step;
     workArt(ART_MS);
-    painter.paint(ctx, view, realm(), true);
-    drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), false);
-    if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now);
-    if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now);
+    const k = uiScale();
+    const marks = painter.paint(ctx, view, realm(), true);
+    drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', 7 * k);
+    hover = pointer && !drag ? signAt(lit, view, pointer.x, pointer.y, Math.max(14, 9 * k)) : null;
+    canvas.style.cursor = drag ? 'grabbing' : hover ? 'pointer' : 'grab';
+    if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now, k);
+    if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now, k);
+    drawCompass(ctx, view.w - 46 * k, 60 * k, 16 * k);
+    const tip = pointer && !drag ? markAt(marks, pointer.x, pointer.y, 4 * k) : null;
+    if (tip) drawTip(ctx, tip, view.w, view.h, k);
     requestAnimationFrame(frame);
   };
 
@@ -106,6 +113,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const bar = p ? barOf(p) : null;
     if (!prompt) return;
     const again = deviceInUse() === 'pad' ? 'PRESS A' : 'CLICK AGAIN OR ENTER';
+    prompt.style.display = p ? '' : 'none';
     prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${BAR_WORDS[bar]}` : `TRAVEL TO ${p.name.toUpperCase()}  ·  ${again}`;
     prompt.style.color = bar ? '#d80073' : BONE;
   };
@@ -129,19 +137,21 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     },
     build(panel) {
       panel.append(canvas);
-      title = el(panel, 'div', heading, `position:absolute;left:0;right:0;top:14px;text-align:center;letter-spacing:6px;font-size:calc(14px * var(--ui, 1));color:${BONE};text-shadow:0 0 4px #000`);
-      prompt = el(panel, 'div', '', 'position:absolute;left:0;right:0;top:calc(40px * var(--ui, 1));text-align:center;letter-spacing:4px;font-size:calc(12px * var(--ui, 1));text-shadow:0 0 6px #000,0 0 12px #6a0dad');
-      const legend = el(panel, 'div', '', 'position:absolute;left:16px;bottom:16px;font-size:calc(11px * var(--ui, 1));line-height:1.6;background:#050506cc;padding:6px 10px;border:1px solid #d9d0b822');
-      for (const [glyph, text] of LEGEND) el(legend, 'div', `${glyph}  ${text}`);
+      const head = el(panel, 'div', '', 'position:absolute;left:0;right:0;top:0;padding:12px 16px 22px;text-align:center;background:linear-gradient(#050506e6,#050506a0 60%,transparent);pointer-events:none;text-shadow:0 0 4px #000');
+      title = el(head, 'div', heading[0], `letter-spacing:6px;font-size:calc(16px * var(--ui, 1));color:${BONE}`);
+      stats = el(head, 'div', heading[1], 'letter-spacing:3px;font-size:calc(11px * var(--ui, 1));color:#8a8474;margin-top:2px');
+      prompt = el(head, 'div', '', 'display:none;margin:8px auto 0;width:max-content;max-width:90%;padding:4px 16px;border:1px solid #d9d0b855;background:#050506cc;letter-spacing:4px;font-size:calc(12px * var(--ui, 1));text-shadow:0 0 6px #000,0 0 12px #6a0dad');
+      key = buildKey(panel);
+      key.style.display = keyShown ? '' : 'none';
       choose(chosen); // the prompt again, drawn anew (for the device in hand)
-      const help = deviceInUse() === 'pad' ? 'LT / RT  zoom     left stick  pan     LB / RB  choose ★     A  centre or travel     B  close' : `wheel / + −  zoom     drag / WASD  pan     C  centre     click ★ / Tab  travel     ${keyName(keyLayout.map)}  close`;
-      el(panel, 'div', help, 'position:absolute;right:16px;bottom:16px;font-size:calc(10px * var(--ui, 1));letter-spacing:1px;opacity:.6;white-space:pre');
+      buildHints(panel, deviceInUse() === 'pad', keyName(keyLayout.map));
     },
     keys(e) {
       if (e.type !== 'keydown') return;
       if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1.25);
       if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(0.8);
       if (e.code === 'KeyC') centreOnPlayer();
+      if (e.code === 'KeyL' && key) key.style.display = (keyShown = !keyShown) ? '' : 'none';
       if (e.code === 'Tab') cycle(e.shiftKey ? -1 : 1);
       if (e.code === 'Enter' || e.code === 'NumpadEnter') journey();
       if (/^(Arrow|Key[WASD])/.test(e.code)) held.add(e.code);
@@ -167,27 +177,24 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     e.preventDefault();
     zoomBy(e.deltaY < 0 ? 1.15 : 0.87);
   });
-  const pick = (e: PointerEvent): MapPlace | null => {
+  const at = (e: PointerEvent): { x: number; y: number } => {
     const r = canvas.getBoundingClientRect();
-    return signAt(lit, view, ((e.clientX - r.left) * canvas.width) / r.width, ((e.clientY - r.top) * canvas.height) / r.height);
+    return { x: ((e.clientX - r.left) * canvas.width) / r.width, y: ((e.clientY - r.top) * canvas.height) / r.height };
   };
-  let drag: { x: number; y: number; moved: number } | null = null;
   canvas.addEventListener('pointerdown', (e) => void (drag = { x: e.clientX, y: e.clientY, moved: 0 }));
   addEventListener('pointerup', (e) => {
     const click = !!drag && drag.moved < CLICK_PX && screen.open;
     drag = null;
     if (!click) return;
-    const p = pick(e);
+    const q = at(e);
+    const p = signAt(lit, view, q.x, q.y, Math.max(14, 9 * uiScale()));
     if (p && p === chosen) journey();
     else choose(p);
   });
   addEventListener('pointermove', (e) => {
     if (!screen.open) return;
-    if (!drag) {
-      hover = pick(e);
-      canvas.style.cursor = hover ? 'pointer' : 'grab';
-      return;
-    }
+    pointer = at(e);
+    if (!drag) return;
     const k = canvas.width / canvas.clientWidth / view.scale;
     view.cx += (e.clientX - drag.x) * k;
     view.cz += (e.clientY - drag.y) * k;
@@ -199,20 +206,22 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const rs = realm();
     if (!rs.length) return;
     [canvas.width, canvas.height] = [innerWidth, innerHeight];
-    const r = realmRect(rs);
-    fit = Math.min(canvas.width / ((r.x1 - r.x0) * 1.1), canvas.height / ((r.z1 - r.z0) * 1.15));
-    zoom = 1;
-    view = { cx: (r.x0 + r.x1) / 2, cz: (r.z0 + r.z1) / 2, scale: fit, w: canvas.width, h: canvas.height };
+    const here = g.ecs.c.transform.get(g.player.id)!.pos;
+    fit = fitScale(rs, canvas.width, canvas.height);
+    const open = openingView(rs, chartedRect(g.overworld.explored, rs), here, canvas.width, canvas.height); // on what has been seen (round 60)
+    zoom = open.scale / fit;
+    view = { cx: open.cx, cz: open.cz, scale: open.scale, w: canvas.width, h: canvas.height };
     screen.show(page);
     lit = litSigns(g, rs, g.ecs.c.transform.get(g.player.id)!.pos);
     hover = null;
     choose(null);
     const charted = rs.reduce((s, x) => s + exploredShare(g.overworld!.explored, x) * (x.area[2] * x.area[3]), 0) / rs.reduce((s, x) => s + x.area[2] * x.area[3], 0);
-    const here = rs.find((x) => x.id === g.overworld!.region)?.name ?? '';
+    const where = rs.find((x) => x.id === g.overworld!.region)?.name ?? '';
     const places = rs.flatMap((x) => placesOf(x.id)); // round 18
     const found = places.filter((p) => g.overworld!.places.has(p.id)).length;
-    heading = `${here.toUpperCase()}   ·   ${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES`;
-    if (title) title.textContent = heading;
+    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND`];
+    if (title) title.textContent = heading[0];
+    if (stats) stats.textContent = heading[1];
     last = 0;
     requestAnimationFrame(frame);
   };

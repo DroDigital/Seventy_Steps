@@ -59,7 +59,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       ctx.rotate(yaw); // what the camera looks at, up (the round face hides the square's turned corners)
       ctx.translate(-SIZE / 2, -SIZE / 2);
       painter.paint(ctx, view, realmOf(region), false);
-      drawLead(ctx, view, currentLead(g)?.at ?? null, realmOf(region), true);
+      drawLead(ctx, view, currentLead(g)?.at ?? null, realmOf(region), 'round', 5.2);
       ctx.restore();
       const r = SIZE / 2 - 1;
       north.style.left = `${SIZE / 2 + Math.sin(yaw) * r}px`;
