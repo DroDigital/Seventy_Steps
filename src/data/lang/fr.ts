@@ -201,7 +201,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'hud.unmade': "DÉFAIT",
   'hud.sanityLoss': "−{n} RAISON",
   'hud.insightGain': "{sign}{n} DISCERNEMENT",
-  'hud.signFound': "SIGNE DES ANCIENS TROUVÉ · {name}",
+  'hud.signFound': "SIGNE DES ANCIENS TROUVÉ · {name} · VOYAGE DEPUIS LA CARTE ({map})",
   'hud.places': "{found} SUR {of} LIEUX · {region}",
   'hud.questDone': "ACCOMPLI · {title}",
   'hud.questNew': "JOURNAL · {title}",

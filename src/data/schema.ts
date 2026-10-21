@@ -60,6 +60,8 @@ export const ATTACK_IDS = [
   'combo_2',
   'combo_3',
   'delayed_slam',
+  'crushing_blow',
+  'great_mark',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 

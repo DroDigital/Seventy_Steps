@@ -192,13 +192,12 @@ function vial(): Figure {
   return f;
 }
 
-/** A gate to another realm: a stone frame banded with glowing glyphs, a dim purple veil between its jambs. */
+/** A gate to another realm: a stone frame banded with glowing glyphs (the veil between its jambs is portalViews.ts's: round 60). */
 function gate(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const { frame, glyphs, veil } = gateGeometry();
+  const { frame, glyphs } = gateGeometry();
   part(f, f.body, frame, 'stone', 0.12);
   part(f, f.body, glyphs, 'stone', 1);
-  part(f, f.body, veil, 'water', 0.8);
   return f;
 }
 

@@ -12,10 +12,24 @@ A blow is made of three things, and each has one place:
 | **colours** | `data/bossAttackTheme.ts` → `render/attackLook.ts` | four colours per horror as its author chose them (often near black), and `lookOf(id)`: the same lifted to a floor of brightness so a mark is found against any ground, plus a hot `core`, a cooling `ember` and the dark `ink` it leaves |
 | **element** | `render/aoeLook.ts` (`ASSIGN`) → `render/fxKit.ts` (`ELEMENTS`), `data/attackSounds.ts` (`TIMBRE`) | what it is made of: tide, glyph, crack, flame, spore, coil, eye, root, star, frost, ash, stain (and plain). The same twelve name the mark its ground wears, the matter of its bursts and the timbre of its sounds |
 | **path** | `render/attackFx.ts`, `meleeFx.ts`, `telegraphs.ts`, `beams.ts` | what is done with them: the same for every horror |
+| **signature** (round 60) | `data/attackSignatures.ts` → `render/fxForms.ts` | whose a blow is: a form (18: tendrils, bubbles, runes, eyes, forked arcs, fangs, feathers, a swarm, crystals, petals, voids, a prism's sparks, sand, chains, grasping hands of smoke, notes, cinders, motes), a motion (6: a fountain, a spiral, drawn in, a rain, an orbit, scattered) and an accent light, drawn over the element at every flash, burst, landing, trail, gathering and column |
 
-A new horror needs its four colours (`bossAttackTheme`) and a motif (`aoeLook` `ASSIGN`). It then has telegraphs, bolts,
-bursts, scars, beams, a summoning, an arrival and a gaze of its own, and the sounds of its element. An ordinary
-creature with no theme throws what it is made of (`MADE_OF` in `attackLook.ts`, from its palette).
+A new horror needs its four colours (`bossAttackTheme`), a motif (`aoeLook` `ASSIGN`) and a signature (`attackSignatures`).
+It then has telegraphs, bolts, bursts, scars, beams, a summoning, an arrival and a gaze of its own, and the sounds of its
+element. An ordinary creature with no theme throws what it is made of (`MADE_OF` in `attackLook.ts`, from its palette),
+in colours of its own drawn from its signature's accent and its hide (before round 60 every one of them was the shared
+magenta and green).
+
+### Distinct (round 60)
+
+Asked: "make it very distinct from each other, and also with more fidelity". An element was shared by up to six horrors,
+and every common foe of one hide threw the same matter in the same colours. Now no two creatures of one element share form,
+motion and accent all, and no two horrors of one element share a form (`tests/attackSignatures.test.ts`): Hypnos rains
+petals where the Haunter of the Dark opens voids that orbit, both of the eye. What falls (a crown of rock, a fountain's
+matter, a landing's spray, crystals, feathers, petals, sand) lands and lies on the ground a moment instead of sinking
+through it. A signature adds at most 64 particles to a burst, 24 to a landing, 36 to a column, 8 to a flash, 4 to a
+gathering's step and 1 to a bolt's step (`BUDGET` in `fxForms.ts`): a colossus's burst drawn of tendrils, seven particles
+to the stalk, had been 280 of them over the element's own.
 
 ### Legibility
 
@@ -26,9 +40,12 @@ pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own 
 
 ## The pieces
 
-- **Particles** (`render/particles.ts`): one instanced batch of 2 400 camera-facing sprites. Shapes: disc, shard, streak (lies
-  along its flight, stretched by its speed), ring, spark (four-point) and wisp. They spin, hold their brightness before they
-  fade, and change colour over a life (an ember from white to red to black). Dithered like the sprites, so no sorting.
+- **Particles** (`render/particles.ts`): one instanced batch of 4 096 camera-facing sprites (2 400 before round 60). Shapes:
+  disc, shard, streak (lies along its flight, stretched by its speed), ring, spark (four-point) and wisp, and (round 60) rune,
+  eye, fang, bubble, bolt (forked), feather, petal and note. They spin, hold their brightness before they fade, change colour
+  over a life (an ember from white to red to black), and (round 60) may have a floor: they bounce a little, skid and lie still
+  on it. The floor is the ground under the blow (`Particles.ground`, the world's; `groundUnder` in `fxForms.ts`), so what a
+  blow on a body or a wall throws down falls to the ground, not to the height it struck. Dithered like the sprites, so no sorting.
 - **Element kit** (`fxKit.ts`): `burst` (a flash, a crown of matter thrown out, a fountain, a cloud, glints, rays), `impact`
   (a bolt's landing, its spray thrown back), `trail` (a halo of light, matter shed, sparks), `charge` (matter drawn in to a
   caster before its release), `column` (a summoning's or an arrival's pillar), `flash`.
@@ -74,7 +91,8 @@ a stage that reads an undeclared uniform silently draws nothing.
 
 ## Tests
 
-- `tests/particles.test.ts`, `attackLook.test.ts`, `groundFx.test.ts`, `fxKit.test.ts`: the pieces.
+- `tests/particles.test.ts`, `attackLook.test.ts`, `groundFx.test.ts`, `fxKit.test.ts`: the pieces. `attackSignatures.test.ts`:
+  every creature has its signature, none alike within an element, each form sheds its own things within its budget.
 - `tests/attackEvents.test.ts`: the events the effects keep to. `tests/attackSounds.test.ts`: levels, and each sound where
   it belongs.
 - `tests/bossFx.test.ts`: one horror of each element fires every move with the render side running beside the simulation

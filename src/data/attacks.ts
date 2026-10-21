@@ -74,6 +74,9 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   combo_2: melee({ windup: 14, active: 6, recovery: 8, power: 0.8, poise: 0.7, range: [0, 0], reach: 1.3, radius: 0.5, height: 0.55, arc: [-70, 80], lunge: 0.6, follow: 'combo_3' }),
   combo_3: melee({ windup: 34, active: 5, recovery: 36, power: 1.5, poise: 1.6, range: [0, 0], reach: 1.5, radius: 0.8, height: 0.4, arc: [0, 0], lunge: 1.4 }),
   delayed_slam: melee({ windup: 54, active: 5, recovery: 34, power: 1.8, poise: 2, range: [0, 2.6], reach: 1.5, radius: 0.9, height: 0.4, arc: [0, 0] }),
+  // round 60: a god's one heavy blow, held a full second before it falls and slow to recover from (asked whether the gods were now too easy: their heaviest blows had come down to 14-18% of a person's health)
+  crushing_blow: melee({ windup: 60, active: 6, recovery: 30, power: 2.4, poise: 2.6, range: [0, 2.8], reach: 1.6, radius: 1, height: 0.4, arc: [0, 0] }),
+  great_mark: { kind: 'area', windup: 30, active: 1, recovery: 40, power: 2.4, poise: 2.4, range: [0, 22], marks: { count: 1, ring: [0, 0], delay: 48, stagger: 0, radius: 1.5 } }, // the same from afar: one mark under them, falling 1.3 s after the cast begins
 };
 
 /** Body size relative to a human (1.9 m); big bodies reach further. */

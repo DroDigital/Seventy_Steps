@@ -19,6 +19,8 @@ import type { Signature } from '../signatures';
 import { groundNear } from '../specials';
 
 const ID = 'nyarlathotep';
+/** What it does not borrow: a summoning, and a god's one heavy blow (round 60), which is that god's own (the Crawling Chaos has one of its own). */
+const KEPT: readonly AttackId[] = ['summon', 'crushing_blow', 'great_mark'];
 export const AVATARS: readonly string[] = ['black_man', 'haunter_of_the_dark'];
 const REGION_BOSSES = new Set(REGIONS.flatMap((r) => r.bosses));
 
@@ -30,7 +32,7 @@ export function borrowed(g: Game): AttackId[] {
   const uses = new Map<AttackId, number>();
   for (const id of slain) {
     const d = id === ID ? undefined : getEntity(id);
-    for (const p of (d?.bossScript ?? d?.bossVariant?.bossScript)?.phases ?? []) for (const a of p.attacks) if (a.id !== 'summon') uses.set(a.id, (uses.get(a.id) ?? 0) + 1);
+    for (const p of (d?.bossScript ?? d?.bossVariant?.bossScript)?.phases ?? []) for (const a of p.attacks) if (!KEPT.includes(a.id)) uses.set(a.id, (uses.get(a.id) ?? 0) + 1);
   }
   return [...uses].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, NYARLATHOTEP.copies).map(([id]) => id);
 }

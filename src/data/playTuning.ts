@@ -81,11 +81,14 @@ export const SETTINGS = {
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
-  volume: [0, 1, 0.05, 0.7], // everything
-  music: [0, 1, 0.05, 1], // the title's theme and the boss scores (round 12)
-  sfx: [0, 1, 0.05, 1], // blows, steps, voices
-  ambience: [0, 1, 0.05, 1], // the drones and the recorded ambience
-  speech: [0, 1, 0.05, 1], // the people's and the horrors' spoken lines (the voices)
+  // The sound's levels (round 60: a player found the game sounded far better at half the volume, the music, the ambience and the voices, the effects
+  // full, and asked for a mix within a tenth of that: the ambience a step under, as a bed that never stops masks the steps, the calls and the speech
+  // most, and the voices a step over, so a line stays clear over blows with the effects full; 0.7 and all four at 1 before)
+  volume: [0, 1, 0.05, 0.5], // everything
+  music: [0, 1, 0.05, 0.5], // the title's theme, the realms' tracks and the boss scores (round 12)
+  sfx: [0, 1, 0.05, 1], // blows, steps, the world's sounds
+  ambience: [0, 1, 0.05, 0.45], // the drones and the recorded ambience
+  speech: [0, 1, 0.05, 0.55], // the people's and the horrors' spoken lines (the voices)
   language: [0, LANGS.length - 1, 1, 0], // its place in data/lang (round 46); a first launch takes the browser's
 } satisfies Record<string, readonly [number, number, number, number]>;
 
@@ -116,8 +119,12 @@ export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?
 };
 export type LevelId = keyof typeof LEVELS;
 
-/** Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. */
-export const LEVEL_COST = { base: 250, step: 90, curve: 9 };
+/**
+ * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found
+ * the levels few: at level 26 one cost 35 of R'lyeh's foes): 250, 90 and 9, so a level costs about half as much from the
+ * twentieth on, and a short spell of hunting near an Elder Sign buys one (tests/levelPace.test.ts).
+ */
+export const LEVEL_COST = { base: 200, step: 60, curve: 4.5 };
 
 /** Reinforcing a weapon at an Elder Sign (round 12): the most levels, the share each adds to its blows, and the star-stones each level costs. */
 export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[] };

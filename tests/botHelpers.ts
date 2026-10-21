@@ -3,6 +3,7 @@
 import type { Entity } from '../src/core/ecs';
 import { createRng } from '../src/core/rng';
 import { emptyInput, type Button } from '../src/core/input';
+import { ARENA } from '../src/data/arena';
 import type { Variant } from '../src/data/registry';
 import type { Game } from '../src/systems/components';
 import { fightAction } from '../src/systems/fightActions';
@@ -10,6 +11,7 @@ import { callsForLaudanum } from '../src/ui/mindHud';
 import { applyLevels } from '../src/systems/levels';
 import { stepGame } from '../src/systems/game';
 import { setLock } from '../src/systems/lockOn';
+import { minionsOf } from '../src/systems/specials';
 import { bossGame } from './bossHelpers';
 import { blowIn } from './blowIn';
 
@@ -19,9 +21,10 @@ export interface BotStyle {
   reinforced?: number; // levels of star-stones set into the sword-cane
   skill?: number; // 0..1: the share of telegraphed blows it rolls away from, as they are about to land (0: it only rolls now and again)
   floor?: boolean; // stops when the foe's health is at its floor as well as when it falls (a horror no blade finishes)
-  smart?: boolean; // it keeps behind a monolith from a gaze that turns flesh to stone, and cuts down the spawning roots before the horror
+  smart?: boolean; // it keeps behind a monolith from a gaze that turns flesh to stone, cuts down the spawning roots before the horror, and a servant or a phantom at its elbow
   mind?: boolean; // it keeps its mind as a person is told to (the HUD's call, ui/mindHud.ts: Fractured, a dose left): it drinks Laudanum, which the bot never did, and so was left Unmoored by round 58's harder mind, taking more and striking less for the rest of a fight
-  waive?: readonly ('petrify' | 'roots')[]; // what it is let off, to measure the rest of a fight whose mechanic the bot plays badly: the gaze never takes hold; the roots are down at once
+  start?: number; // metres from the boss it begins (7)
+  waive?: readonly ('petrify' | 'roots' | 'void')[]; // what it is let off, to measure the rest of a fight whose mechanic the bot plays badly: the gaze never takes hold; the roots are down at once; the void under the hidden platforms never opens (a person with insight keeps to them, round 60)
 }
 
 export interface BotFight {
@@ -36,8 +39,26 @@ export interface BotFight {
 
 /** The bot against `id` (in `variant`) for up to `frames` steps, in the arena. */
 export function botFight(id: string, frames: number, variant?: Variant, style: BotStyle = {}): BotFight {
-  const { g, boss } = bossGame(id, variant, 7);
+  const { g, boss } = bossGame(id, variant, style.start ?? 7);
+  clearFor(g, boss);
   return driveBot(g, boss, frames, false, style);
+}
+
+/** A body wider than this is a colossus's (metres of radius). */
+const WIDE = 3;
+
+/**
+ * A colossus fights in a clear ring (round 60): among the Phase 1 arena's free-standing pillars, low walls, Elder Sign
+ * and training dummy a body this wide finds no place to stand, and was thrown metres to and fro between them every
+ * step, shoving the bot off its flank (Cthulhu, Shub-Niggurath, Yog-Sothoth, Ghatanothoa, Father Dagon, Mother Hydra
+ * and the Colossus). Its own arena in the world has nothing in its way (bossStand.test.ts); only the colonnade stays.
+ */
+export function clearFor(g: Game, boss: Entity): void {
+  const c = g.ecs.c;
+  if ((c.body.get(boss)?.radius ?? 0) <= WIDE) return;
+  const inner = ARENA.colonnade.radius - 1;
+  for (const k of g.world.colliders) if (k.kind !== 'cylinder' || Math.hypot(k.x, k.z) < inner) g.world.off.add(k);
+  for (const [e, m] of [...c.model]) if (m === 'dummy') g.ecs.despawn(e);
 }
 
 const dist = (a: { x: number; z: number }, b: { x: number; z: number }): number => Math.hypot(a.x - b.x, a.z - b.z);
@@ -65,6 +86,8 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   me.hp = me.max = 1e7;
   const brain = c.brain.get(boss);
   if (brain) Object.assign(brain, { state: 'engage', target: g.player.id, cooldown: 0 });
+  const fight = c.fight.get(boss);
+  if (fight && style.waive?.includes('void')) fight.script = { ...fight.script, phases: fight.script.phases.map((p) => ({ ...p, realityHooks: p.realityHooks?.filter((h) => h !== 'hidden_platforms') })) }; // this fight's own copy
   let [dealt, taken, deaths] = [0, 0, 0];
   let nearest = Infinity;
   g.events.on('Hit', (e) => {
@@ -84,8 +107,10 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
     const from = c.transform.get(g.player.id)!;
     const hp = c.health.get(boss);
     if (style.smart && c.transform.has(boss)) {
+      const nearest = (list: Entity[]): Entity => list.reduce((a, b) => (dist(c.transform.get(a)!.pos, from.pos) <= dist(c.transform.get(b)!.pos, from.pos) ? a : b));
       const roots = propsOf('root');
-      const next = roots.length ? roots.reduce((a, b) => (dist(c.transform.get(a)!.pos, from.pos) <= dist(c.transform.get(b)!.pos, from.pos) ? a : b)) : boss;
+      const inWay = [...minionsOf(g, boss), ...c.phantom.keys()].filter((m) => c.transform.has(m) && dist(c.transform.get(m)!.pos, from.pos) - (c.body.get(m)?.radius ?? 0.5) < 2); // a servant or a phantom at its elbow is struck down, as a person would (round 60: a star-spawn, then the Unmoored mind's phantoms, held it off Cthulhu for minutes)
+      const next = roots.length ? nearest(roots) : inWay.length ? nearest(inWay) : boss;
       if (next !== focus || frame === 2) setLock(g, (focus = next));
       if (g.reality.petrify > 0.3) hiding = true;
       else if (g.reality.petrify < 0.02) hiding = false;

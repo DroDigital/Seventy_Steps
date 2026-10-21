@@ -265,6 +265,7 @@ export interface Pilot {
   ask: boolean; // a screen asks where to rise when a lit candle reaches a fall (ui/riseMenu.ts); without one the candle is where they rise (round 45)
   rising: (Place & { wall: string }) | null; // the candle that reaches the fall, while the choice waits
   fogPass: { wall: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a boss's fog being walked through (round 35: fogGates.ts)
+  gatePass: { gate: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a realm's gate being walked into (round 60: gateWalk.ts)
 }
 
 /** A fall in the air (round 54): the body is let go of by the ground, and gravity takes it. */

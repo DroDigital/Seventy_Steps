@@ -45,6 +45,33 @@ afterEach(() => at(0));
 const pos = (g: ReturnType<typeof createWorldGame>) => g.ecs.c.transform.get(g.player.id)!.pos;
 
 describe('journeys (ui/journeys.ts)', () => {
+  it('a gate walked into is a journey: the veil falls over the walk in the light of the realm beyond, the world still stepping, and holds once they are through (round 60)', () => {
+    const g = createWorldGame();
+    const { veil, asked } = fakeVeil();
+    const lights: unknown[] = [];
+    const cover = veil.cover;
+    veil.cover = (words, secs, line, light) => (lights.push(light), cover(words, secs, line));
+    const j = createJourneys(g, veil);
+    const gate = gatePlace('hub_australia')!;
+    goTo(g, gate.arrive.x, gate.arrive.z);
+    stepGame(g, emptyInput());
+    for (let i = 0; i < 400 && !g.player.gatePass; i++) {
+      const p = pos(g);
+      g.camera.yaw = g.camera.prevYaw = Math.atan2(gate.x - p.x, gate.z - p.z);
+      const f = j.before({ ...emptyInput(), moveY: 1 });
+      if (f) stepGame(g, f);
+    }
+    expect(g.player.gatePass).not.toBeNull();
+    expect(asked).toEqual([`cover ${gatePlace(gate.to)!.name.toUpperCase()}`]);
+    expect(lights[0]).toHaveLength(3); // the far realm's light
+    expect(j.busy).toBe(true);
+    expect(j.still).toBe(false); // the walk on into the light goes on under it
+    while (g.player.gatePass) stepGame(g, j.before(emptyInput()) ?? emptyInput());
+    expect(pos(g)).toMatchObject({ x: gatePlace(gate.to)!.arrive.x, z: gatePlace(gate.to)!.arrive.z });
+    expect(j.before(emptyInput())).toEqual(emptyInput()); // then as any journey: one step on arrival...
+    expect(j.before(emptyInput())).toBeNull(); // ...and the world waits while the far side is made
+  });
+
   it('a jump waits under the veil: the world stands still while it covers, takes a step on arrival, waits for the chunks, then the veil lifts', async () => {
     const g = createWorldGame();
     g.overworld!.discovered.add('arkham_streets');

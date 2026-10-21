@@ -9,7 +9,7 @@ const rig = () => {
   return { out, fx: { spawn: (p: ParticleSpec) => void out.push(p), update: () => undefined } as Particles };
 };
 const at = { x: 3, y: 1, z: -2 };
-const look = lookOf('cthulhu');
+const look = { ...lookOf('cthulhu'), sig: null }; // the element alone (its signature, round 60, is tests/attackSignatures.test.ts's)
 
 function valid(list: ParticleSpec[], label: string): void {
   for (const p of list) {
