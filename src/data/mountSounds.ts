@@ -27,8 +27,7 @@ export const MOUNT_MIX = {
   snort: 1.3,
   nicker: 1.3,
   unhitch: 1.3,
-  slap: 1.1, // the reins slapped on a horse's back (round 57)
-  urge: 1.2, // the horse's answer to it
+  urge: 1.2, // the horse's answer to the reins on its back (their slap is not heard: round 60)
   halt: 1.3, // hauled up at speed: the blow through the nose
   scrape: 1.3, // hooves braking on the ground
   shake: 2.0, // the harness shaken as the head is tossed
@@ -197,15 +196,7 @@ export const ENGINE_STOP: Sound = [
  * Leather, hide, breath and wood: nothing rings (as with every sound of a ride).
  */
 
-/** The reins slapped on the horse's back: a crack of leather, the flat of it on a hide, and the thump under. */
-export const REIN_SLAP: Sound = [
-  noise('highpass', 2400, 0.045, 0.5, { attack: 0.002 }),
-  noise('bandpass', 1150, 0.12, 0.5, { to: 520, q: 0.8, attack: 0.003 }),
-  tone('sine', 165, 0.11, 0.38, { to: 78 }),
-  noise('lowpass', 520, 0.18, 0.26, { at: 0.03, to: 200 }),
-];
-
-/** A horse answering a slap: a short eager huff and a grunt in the throat as it digs in. */
+/** A horse answering the reins on its back: a short eager huff and a grunt in the throat as it digs in. */
 export const HORSE_URGE: Sound = [
   noise('bandpass', 1300, 0.16, 0.5, { to: 620, q: 0.8, attack: 0.01 }),
   tone('sawtooth', 168, 0.2, 0.22, { to: 132, vibrato: [18, 70], attack: 0.015, filter: { type: 'lowpass', hz: 820 } }),

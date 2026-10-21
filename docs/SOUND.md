@@ -123,8 +123,7 @@ stay under −12 dBFS (`tests/mountAudio.test.ts`) and above about −24 dBFS, u
 recipe: add it to `plannedSounds` once its files exist.
 
 The reins and the horse (round 57) are heard too, from state the simulation keeps (`MountState.reins`, `systems/mountReins.ts`: counters
-the sound reads once each, so nothing plays twice and nothing late): the reins slapped on a horse's back (`REIN_SLAP`) as they land, with
-the horse's huff (`HORSE_URGE`) a beat behind on three slaps of four; a hard pull (the stick let go: not the sprint let go at a gallop, which is only an easing of the hands) is the blow through the nose (`HORSE_HALT`), hooves
+the sound reads once each, so nothing plays twice and nothing late): the horse's huff (`HORSE_URGE`) a beat behind a slap of the reins on three of four (the slap itself is not heard: round 60, "annoying over time"); a hard pull (the stick let go: not the sprint let go at a gallop, which is only an easing of the hands) is the blow through the nose (`HORSE_HALT`), hooves
 braking (`hoofScrape`, by the ground) and the harness shaken a moment later (`HARNESS_SHAKE`), harder from a gallop; the skeleton team
 scrapes, shakes and whispers instead. Standing, the horse passes the time every six to fourteen seconds with one of a breath, a low
 whicker, a shake of the harness, the tail, the lips or a snort, never the same twice running (the skeletons only shake), and puts its
