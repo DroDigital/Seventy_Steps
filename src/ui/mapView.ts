@@ -15,3 +15,8 @@ export interface MapView {
  */
 export const screenX = (view: MapView, x: number): number => (view.cx - x) * view.scale + view.w / 2;
 export const screenY = (view: MapView, z: number): number => (view.cz - z) * view.scale + view.h / 2;
+
+/** The world point under a point of the view (pixels): the inverse of `screenX` and `screenY`. */
+export const worldX = (view: MapView, px: number): number => view.cx - (px - view.w / 2) / view.scale;
+export const worldZ = (view: MapView, py: number): number => view.cz - (py - view.h / 2) / view.scale;
+

@@ -36,6 +36,7 @@ import { hallucinationSystem, registerHallucinations } from './hallucinations';
 import { hazardSystem } from './hazards';
 import { registerHiddenLayer, spawnPiece } from './hiddenLayer';
 import { explorationSystem } from './exploration';
+import { markerSystem } from './marker';
 import { placeSystem } from './places';
 import { createBuffer } from './inputBuffer';
 import { insightSystem, spawnTome } from './insight';
@@ -240,6 +241,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   cameraSystem(g, input.lookX, input.lookY, dt);
   insightSystem(g);
   explorationSystem(g);
+  markerSystem(g); // the marker reached is cleared (round 60)
   placeSystem(g);
   questSystem(g);
   tallySystem(g);

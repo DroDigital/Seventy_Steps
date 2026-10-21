@@ -27,6 +27,7 @@ export interface Overworld {
   lookedFrom: number; // the cell the investigator last looked around from
   quests: Map<string, number>; // each quest begun: its open stage, or its stage count once done (quests.ts)
   tracked: string | null; // the side quest the minimap and the map lead to, in place of the main line's (lead.ts; quests.ts `track`)
+  marker: { x: number; z: number } | null; // the place the investigator marked on the map: the minimap points to it (marker.ts; round 60)
   met: Set<string>; // the people talked with (npcs.ts)
   sold: Map<string, number>; // wares bought from merchants, by ware (trade.ts; round 12)
   tally: Tally; // the run's numbers (tally.ts; round 12)

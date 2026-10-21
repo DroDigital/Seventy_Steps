@@ -20,6 +20,7 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'person', state: { met: true }, words: 'Someone you met' },
   { kind: 'echo', words: 'Your lost Echoes', hint: 'walk over them' },
   { kind: 'lead', state: { now: 0 }, words: 'Where the story leads', hint: 'an arrow at the edge points to it' },
+  { kind: 'marker', words: 'Your marker', hint: 'right-click, F or Y sets it; the minimap points to it' },
 ];
 
 const ICON = 26; // CSS pixels a key's figure is drawn in (at the UI's scale)
@@ -37,7 +38,7 @@ export function buildKey(panel: HTMLElement): HTMLElement {
     const ctx = c.getContext('2d');
     if (ctx) {
       ctx.scale(2 * dpr, 2 * dpr);
-      drawMark(ctx, row.kind, ICON / 2, ICON / 2, row.kind === 'person' ? 9 : 8, row.state);
+      drawMark(ctx, row.kind, ICON / 2, row.kind === 'marker' ? ICON / 2 - 4 : ICON / 2, row.kind === 'person' ? 9 : row.kind === 'marker' ? 6.5 : 8, row.state);
     }
     line.append(c);
     const words = el(line, 'div', row.words, `color:${BONE}`);
@@ -49,8 +50,8 @@ export function buildKey(panel: HTMLElement): HTMLElement {
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['B'], 'Close']]
-    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['L'], 'Key'], [[mapKey], 'Close']];
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker'], [['B'], 'Close']]
+    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
 /** The row of keys along the bottom edge. */
@@ -93,6 +94,22 @@ export function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.textBaseline = 'bottom';
   ctx.fillStyle = BONE;
   ctx.fillText('N', 0, -r - 3);
+  ctx.restore();
+}
+
+/** A small cross at (x, y): where the pad's button would set the marker, the pad having no pointer. */
+export function drawCrosshair(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(217,208,184,0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#000';
+  ctx.shadowBlur = 3;
+  ctx.beginPath();
+  for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+    ctx.moveTo(x + dx * r * 0.35, y + dy * r * 0.35);
+    ctx.lineTo(x + dx * r, y + dy * r);
+  }
+  ctx.stroke();
   ctx.restore();
 }
 

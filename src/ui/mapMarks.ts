@@ -12,11 +12,12 @@ import { getEntity } from '../data/registry';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { isExplored } from '../systems/exploration';
+import { markerDistance, markerHere } from '../systems/marker';
 import { npcPlace } from '../systems/npcs';
 import { mapPlaces, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
 import { regionAt } from '../world/worldMap';
-import { BONE, DIM, type MarkKind, type MarkState, reach } from './mapIcons';
+import { BONE, DIM, type MarkKind, type MarkState, PIN_TIP, reach } from './mapIcons';
 import type { MapLabel } from './mapLabels';
 import { falseStar, slip, SLIDE } from './mapWrong';
 import { screenX, screenY, type MapView } from './mapView';
@@ -128,6 +129,13 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
   for (const d of g.ecs.query('drop')) {
     const at = g.ecs.c.transform.get(d)!.pos;
     add(over, { kind: 'echo', x: screenX(view, at.x), y: screenY(view, at.z), state: {}, title: 'Your lost Echoes', name: '', note: 'Walk over them to take them back' }, 0.85, null, 'places');
+  }
+
+  const pin = full ? markerHere(g) : null; // the investigator's own marker (the minimap draws it as a beacon, upright: leadMark.ts)
+  if (pin) {
+    const r = unit * 0.95;
+    const metres = Math.round(markerDistance(g) ?? 0);
+    add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: 'Your marker', name: `${metres} m away`, note: 'Right-click it, or press F, to clear it' }, 0.95, null, 'places'); // its point on the place
   }
 
   out.marks.push(...under, ...middle, ...over);

@@ -13,7 +13,7 @@ import { isUnique } from '../world/placements';
 import type { Game, Overworld } from './components';
 
 export function createOverworld(sign: string): Overworld {
-  return { sign, discovered: new Set([sign]), slain: new Set(), killed: new Set(), posts: new Map(), wounds: new Map(), read: new Set(), named: 0, called: new Set(), watched: new Set(), candles: new Set(), ending: null, alive: new Map(), region: null, chunk: -1, dirty: true, explored: new Map(), lookedFrom: -1, quests: new Map(), tracked: null, met: new Set(), sold: new Map(), tally: newTally(), said: new Set(), heardAt: -Infinity, places: new Set(), told: new Set([HINTS_KEPT]), weather: newWeather() };
+  return { sign, discovered: new Set([sign]), slain: new Set(), killed: new Set(), posts: new Map(), wounds: new Map(), read: new Set(), named: 0, called: new Set(), watched: new Set(), candles: new Set(), ending: null, alive: new Map(), region: null, chunk: -1, dirty: true, explored: new Map(), lookedFrom: -1, quests: new Map(), tracked: null, marker: null, met: new Set(), sold: new Map(), tally: newTally(), said: new Set(), heardAt: -Infinity, places: new Set(), told: new Set([HINTS_KEPT]), weather: newWeather() };
 }
 
 /**

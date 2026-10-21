@@ -1,7 +1,7 @@
 /**
  * The minimap (playtest round 1): top right, round and centred on the investigator, showing the
  * ground they have seen within EXPLORE.minimap metres and what is marked on it, and where the story
- * leads (on the rim when it lies beyond). It turns with the camera, what lies ahead of it up (playtest
+ * leads and the marker they set on the map (each on the rim, in a pointer of its own, when it lies beyond). It turns with the camera, what lies ahead of it up (playtest
  * round 7), an N on the rim marking north. It also drives the map art's slow drawing, a little each
  * frame. Absent in the arena.
  */
@@ -10,10 +10,11 @@ import { EXPLORE, SIM } from '../data/tuning';
 import { hourName, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
+import { markerHere } from '../systems/marker';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
 import { BONE, el, setText } from './hudKit';
-import { drawLead } from './leadMark';
+import { drawBeacon } from './leadMark';
 import { workArt } from './mapArt';
 import type { MapPainter } from './mapPainter';
 
@@ -59,8 +60,9 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       ctx.rotate(yaw); // what the camera looks at, up (the round face hides the square's turned corners)
       ctx.translate(-SIZE / 2, -SIZE / 2);
       painter.paint(ctx, view, realmOf(region), false);
-      drawLead(ctx, view, currentLead(g)?.at ?? null, realmOf(region), 'round', 5.2);
       ctx.restore();
+      drawBeacon(ctx, view, currentLead(g)?.at ?? null, realmOf(region), 'round', 5.2, 'lead', yaw); // upright, set where the turned picture puts them (round 60)
+      drawBeacon(ctx, view, markerHere(g), realmOf(region), 'round', 5.2, 'marker', yaw); // the investigator's own marker, with its arrow
       const r = SIZE / 2 - 1;
       north.style.left = `${SIZE / 2 + Math.sin(yaw) * r}px`;
       north.style.top = `${SIZE / 2 - Math.cos(yaw) * r}px`;

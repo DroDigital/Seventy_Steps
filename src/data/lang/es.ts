@@ -226,6 +226,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.autoQuality': "IMAGEN AJUSTADA A ESTE ORDENADOR · AJUSTES › PANTALLA",
   'n.gateHeld': "LA PUERTA NO SE ABRIRÁ MIENTRAS UN HORROR TE RETENGA",
   'n.cache': "UN ALIJO DE ECOS · +{n}",
+  'n.markerReached': "MARCA ALCANZADA",
   'n.vial': "FRASCO DE PLATA · DOSIS DE REACTIVO {n}",
   'n.rounds': "LLEVAS TODAS LAS BALAS QUE PUEDES",
   'pad.moveStick': "el stick izquierdo",

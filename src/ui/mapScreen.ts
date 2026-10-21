@@ -4,7 +4,8 @@
  * ground seen, the places marked there (mapMarks.ts, mapIcons.ts), region names, the Elder Signs lit — with
  * how much of the realm is charted, opening on what has been seen (mapFit.ts), a key of its figures and a hover
  * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
- * WASD (left stick) pan; C (pad A) finds the investigator; L hides the key. A lit Elder Sign clicked, or picked
+ * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets the marker the
+ * minimap points to, or clears it (systems/marker.ts); L hides the key. A lit Elder Sign clicked, or picked
  * with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
  * mapTravel.ts). M or Esc (pad B) closes it.
  */
@@ -13,19 +14,20 @@ import { PAD_BUTTON } from '../core/padMap';
 import { signBeyondDemo, travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
+import { markerHere, setMarker } from '../systems/marker';
 import { exploredShare } from '../systems/exploration';
 import { realmOf, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
 import { regionAt } from '../world/worldMap';
 import { BONE } from './hudKit';
-import { drawLead } from './leadMark';
+import { drawBeacon } from './leadMark';
 import { workArt } from './mapArt';
-import { buildHints, buildKey, drawCompass, drawTip } from './mapChrome';
+import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip } from './mapChrome';
 import { chartedRect, fitScale, openingView } from './mapFit';
-import { markAt } from './mapMarks';
+import { markAt, type Mark } from './mapMarks';
 import type { MapPainter } from './mapPainter';
 import { BAR_WORDS, drawRing, litSigns, signAt } from './mapTravel';
-import type { MapView } from './mapView';
+import { worldX, worldZ, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
 import { keyLayout, keyName } from '../core/bindings';
@@ -58,6 +60,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   let heading = ['', '']; // the realm, and how much of it is charted
   let pointer: { x: number; y: number } | null = null; // the mouse, in canvas pixels
   let drag: { x: number; y: number; moved: number } | null = null;
+  let shown: readonly Mark[] = []; // the marks on show, as last painted
   const held = new Set<string>();
   const padWas = new Set<number>();
   let lit: MapPlace[] = []; // the realm's lit signs, nearest first (the world stands still while the map is open)
@@ -73,6 +76,13 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   const centreOnPlayer = (): void => {
     const p = g.ecs.c.transform.get(g.player.id)!.pos;
     [view.cx, view.cz] = [p.x, p.z];
+  };
+  /** Sets the marker at a point of the screen, or clears it if that point is on the marker (round 60). */
+  const markAtPoint = (px: number, py: number): void => {
+    const on = markAt(shown, px, py, 4 * uiScale());
+    if (on?.kind === 'marker') return void setMarker(g, null);
+    const [x, z] = [worldX(view, px), worldZ(view, py)];
+    if (realm().some((r) => r.id === regionAt(x, z)?.id)) setMarker(g, { x, z }); // on the realm's own ground
   };
   const zoomBy = (k: number): void => {
     zoom = Math.min(ZOOM[1], Math.max(ZOOM[0], zoom * k));
@@ -91,13 +101,15 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     if (held.has('ArrowDown') || held.has('KeyS')) view.cz -= step;
     workArt(ART_MS);
     const k = uiScale();
-    const marks = painter.paint(ctx, view, realm(), true);
-    drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', 7 * k);
+    const marks = (shown = painter.paint(ctx, view, realm(), true));
+    drawBeacon(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', 7 * k, 'lead');
+    drawBeacon(ctx, view, markerHere(g), realm(), 'screen', 7 * k, 'marker', 0, true); // the pin is among the marks; only its pointer, off screen
     hover = pointer && !drag ? signAt(lit, view, pointer.x, pointer.y, Math.max(14, 9 * k)) : null;
     canvas.style.cursor = drag ? 'grabbing' : hover ? 'pointer' : 'grab';
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now, k);
     if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now, k);
     drawCompass(ctx, view.w - 46 * k, 60 * k, 16 * k);
+    if (deviceInUse() === 'pad') drawCrosshair(ctx, view.w / 2, view.h / 2, 9 * k); // where Y would set the marker
     const tip = pointer && !drag ? markAt(marks, pointer.x, pointer.y, 4 * k) : null;
     if (tip) drawTip(ctx, tip, view.w, view.h, k);
     requestAnimationFrame(frame);
@@ -151,6 +163,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1.25);
       if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(0.8);
       if (e.code === 'KeyC') centreOnPlayer();
+      if (e.code === 'KeyF') markAtPoint(pointer?.x ?? view.w / 2, pointer?.y ?? view.h / 2);
       if (e.code === 'KeyL' && key) key.style.display = (keyShown = !keyShown) ? '' : 'none';
       if (e.code === 'Tab') cycle(e.shiftKey ? -1 : 1);
       if (e.code === 'Enter' || e.code === 'NumpadEnter') journey();
@@ -168,6 +181,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
         if (chosen) journey();
         else centreOnPlayer();
       }
+      if (edge(PAD_BUTTON.y)) markAtPoint(view.w / 2, view.h / 2); // the pad's mark is at the middle of the map
       padWas.clear();
       p.buttons.forEach((b, i) => b.pressed && padWas.add(i));
     },
@@ -177,10 +191,15 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     e.preventDefault();
     zoomBy(e.deltaY < 0 ? 1.15 : 0.87);
   });
-  const at = (e: PointerEvent): { x: number; y: number } => {
+  const at = (e: MouseEvent): { x: number; y: number } => {
     const r = canvas.getBoundingClientRect();
     return { x: ((e.clientX - r.left) * canvas.width) / r.width, y: ((e.clientY - r.top) * canvas.height) / r.height };
   };
+  canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const q = at(e);
+    markAtPoint(q.x, q.y);
+  });
   canvas.addEventListener('pointerdown', (e) => void (drag = { x: e.clientX, y: e.clientY, moved: 0 }));
   addEventListener('pointerup', (e) => {
     const click = !!drag && drag.moved < CLICK_PX && screen.open;
