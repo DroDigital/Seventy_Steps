@@ -248,6 +248,7 @@ export const EN = {
   'hud.talkTo': "talk to",
   'hud.restAt': "rest at",
   'hud.passThrough': "pass through",
+  'hud.gateLeads': "Leads to {name}",
   'slot.dream': "the dream",
   'slot.level': "level {n}",
   'slot.journey': "journey {n}",

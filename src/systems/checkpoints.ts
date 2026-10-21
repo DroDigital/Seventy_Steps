@@ -175,7 +175,7 @@ export function passGate(g: Game, id: string): boolean {
 }
 
 export interface Interactable {
-  kind: 'sign' | 'gate' | 'npc' | 'fog';
+  kind: 'sign' | 'npc' | 'fog';
   id: string;
   name: string;
 }
@@ -191,7 +191,7 @@ function seems(at: { x: number; z: number }, from: { x: number; z: number }, yaw
   return d * (1 + (WORLD.faceWeight * (1 - cos)) / 2);
 }
 
-/** The sign, gate or person within reach of a free investigator that they face most nearly, if any. */
+/** The sign, person or boss's fog within reach of a free investigator that they face most nearly, if any. A gate is no such thing (round 60): it is walked into (gateWalk.ts). */
 export function interactable(g: Game): Interactable | null {
   if (!g.overworld || g.ecs.c.actor.get(g.player.id)!.move !== null) return null;
   if (g.player.gatePass || g.player.fogPass) return null; // drawn on through a gate or a fog: the walk is not theirs, nor is E (round 60)
@@ -205,14 +205,13 @@ export function interactable(g: Game): Interactable | null {
   };
   const w = worldLayout();
   for (const s of w.signs) consider({ kind: 'sign', id: s.id, name: s.name }, s, WORLD.signReach);
-  for (const t of w.gates) consider({ kind: 'gate', id: t.id, name: t.name }, t, WORLD.reach);
   for (const [e, id] of g.ecs.c.npc) consider({ kind: 'npc', id, name: npcDef(id)?.name ?? id }, g.ecs.c.transform.get(e)!.pos, WORLD.reach);
   const fog = fogToPass(g); // a boss's fog, close by: E passes it (round 35)
   if (fog && best === null) return { kind: 'fog', id: fog.id, name: 'the fog' };
   return best;
 }
 
-/** One step: signs found by coming near, and the interact button (rest, or pass a gate). */
+/** One step: signs found by coming near, and the interact button (rest, talk, or pass a boss's fog). */
 export function checkpointSystem(g: Game, input: InputFrame): void {
   if (!g.overworld) return;
   const pp = g.ecs.c.transform.get(g.player.id)!.pos;
@@ -220,7 +219,6 @@ export function checkpointSystem(g: Game, input: InputFrame): void {
   if (!input.pressed.interact) return;
   const t = interactable(g);
   if (t?.kind === 'sign') rest(g, t.id);
-  else if (t?.kind === 'gate') passGate(g, t.id);
   else if (t?.kind === 'npc') talk(g, t.id);
   else if (t?.kind === 'fog') {
     const w = fogToPass(g);

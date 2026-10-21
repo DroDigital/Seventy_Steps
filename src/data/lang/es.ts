@@ -234,6 +234,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hud.talkTo': "hablar con",
   'hud.restAt': "descansar en",
   'hud.passThrough': "atravesar",
+  'hud.gateLeads': "Lleva a {name}",
   'slot.dream': "el sueño",
   'slot.level': "nivel {n}",
   'slot.journey': "viaje {n}",

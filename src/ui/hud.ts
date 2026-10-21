@@ -13,6 +13,7 @@ import { Vector3, type Camera } from 'three';
 import { GUN, HEARD, HURT } from '../data/tuning';
 import type { Game, HitOutcome } from '../systems/components';
 import { interactable } from '../systems/checkpoints';
+import { gateNear } from '../systems/gateWalk';
 import { aimPoint } from '../systems/lockOn';
 import { fightAction } from '../systems/fightActions';
 import { canLevel, LEVEL_IDS } from '../systems/levels';
@@ -190,7 +191,8 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
       const mountShown = mountKey !== '' && now < mountTipUntil;
       const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
-      setText(prompt, mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
+      const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
+      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);
