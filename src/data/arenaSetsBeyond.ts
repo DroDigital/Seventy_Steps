@@ -5,6 +5,7 @@ import { at, lane, put, ring, type ArenaSet } from './arenaSets';
 export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
   // R'lyeh: cyclopean masonry whose angles are wrong, green with the ooze of the deep, a door that opens from the inside, an eye of green fire in the floor.
   cthulhu: {
+    candle: 'votive',
     ground: { texture: 'rock', tint: [0.24, 0.34, 0.3], gain: 1.15, reach: 16, bands: [{ r0: 0.2, r1: 0.3, k: 0.6 }, { r0: 0.55, r1: 0.62, k: 0.65 }], spokes: { n: 12, width: 2.5, k: 0.6, r0: 0.1, r1: 1 } },
     puts: [
       put('inlay_eye', at(0, 0), { size: 18, glow: 'green', lit: 'sigil' }),
@@ -19,6 +20,7 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Carcosa behind the moon: a plaza of pallid stone, the Yellow Sign laid in it, tattered banners, a pallid mask fallen, towers against a black sun.
   hastur: {
+    candle: 'votive',
     ground: { texture: 'slab', tint: [0.7, 0.66, 0.5], gain: 1.25, reach: 14, bands: [{ r0: 0.55, r1: 0.62, k: 0.65 }] },
     puts: [
       put('inlay_sign', at(0, 0), { size: 15, glow: 'purple', lit: 'sigil' }),

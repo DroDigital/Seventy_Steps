@@ -60,7 +60,11 @@ export interface AirSpec {
   size?: number;
 }
 
+/** What a candle before the fog stands on, as the place has it (render/candleViews.ts; world/candlePlan.ts): a small cairn of stones, a skull, a gravestone's foot, a piece of driftwood, a votive in a dish. */
+export type CandleLook = 'cairn' | 'skull' | 'grave' | 'driftwood' | 'votive';
+
 export interface ArenaSet {
+  candle?: CandleLook;
   ground?: GroundSpec;
   puts: readonly Put[];
   air?: AirSpec;

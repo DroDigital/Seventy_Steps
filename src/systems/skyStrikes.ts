@@ -6,11 +6,10 @@
  * or on a dungeon floor. From the game's own random stream, so a replay sees the same sky. Pure: no Three.js.
  */
 
-import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
 import { SIM, SKY_STRIKE, WORLD } from '../data/tuning';
 import { roofedAt, inDungeon } from '../world/terrain';
-import { strike } from './combat';
+import { blast } from './blasts';
 import { isAbsent, type Game } from './components';
 
 interface Pending {
@@ -70,25 +69,8 @@ function aim(g: Game): V3 | null {
 
 /** The bolt falls: everything with a body in the ring is struck. */
 function land(g: Game, p: Pending): void {
-  const c = g.ecs.c;
-  const sky = g.ecs.spawn(); // a body of no kind that the blow comes from: it is gone with the blow
-  c.transform.set(sky, { pos: { ...p.at }, prev: { ...p.at }, yaw: 0, prevYaw: 0 });
   g.events.emit('StrikeLanded', { at: { ...p.at }, radius: SKY_STRIKE.radius });
-  const victims: Entity[] = [];
-  for (const [id] of c.combatant) {
-    const pos = c.transform.get(id)?.pos;
-    const body = c.body.get(id);
-    if (!pos || !c.health.has(id) || !c.actor.has(id) || c.dead.has(id) || isAbsent(g, id)) continue;
-    if (Math.hypot(pos.x - p.at.x, pos.z - p.at.z) > SKY_STRIKE.radius + (body?.radius ?? 0.4) * 0.5 || Math.abs(pos.y - p.at.y) > 4) continue;
-    if (roofedAt(pos.x, pos.z) || inDungeon(pos.x, pos.z)) continue; // stepping under a roof within the ring is as good as leaving it
-    victims.push(id);
-  }
-  for (const id of victims) {
-    const [base, share, cap] = SKY_STRIKE.foe;
-    const damage = id === g.player.id ? SKY_STRIKE.player : Math.min(cap, base + share * (c.health.get(id)?.max ?? 0));
-    strike(g, sky, id, { damage, poise: SKY_STRIKE.poise, guard: 0, hitstop: 6, parryable: false, interrupts: false, unblockable: true }, p.at);
-  }
-  g.ecs.despawn(sky);
+  blast(g, p.at, SKY_STRIKE.radius, { player: SKY_STRIKE.player, foe: SKY_STRIKE.foe, poise: SKY_STRIKE.poise });
 }
 
 export function skyStrikeSystem(g: Game): void {

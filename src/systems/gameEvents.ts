@@ -25,6 +25,13 @@ export interface GameEvents {
   Shot: { shooter: Entity; from: V3; to: V3; target: Entity | null };
   StrikeWarned: { at: V3; radius: number; frames: number }; // a ring of light marks ground where a bolt will fall (systems/skyStrikes.ts; round 52)
   StrikeLanded: { at: V3; radius: number }; // the bolt falls
+  WardWarned: { at: V3; radius: number; frames: number; look: string; mute?: boolean }; // a plate underfoot, a vent or a wave of a way wakes: its ring is marked, and it bursts in `frames` (systems/ways.ts; round 62)
+  WardLanded: { at: V3; radius: number; look: string; mute?: boolean }; // it bursts
+  WayOmen: { words: string; sound?: string; shake: number; pitch: number }; // a line said on a way, and what is heard and felt under it (round 62)
+  WayFound: { boss: string; name: string; line: string; region: string }; // the head of a trail found (round 62)
+  RiteLit: { at: V3; look: string; glow: string; rank: number; of: number }; // one of a rite's lights taken by the flame, in its turn
+  RiteFailed: { at: V3; look: string }; // the wrong light: they all go out
+  RiteDone: { boss: string; at: V3 }; // every light burns: the way is its own again
   Swung: { entity: Entity; at: V3; yaw: number }; // a blow's hit window opens (combat.ts; round 51: its flash and its sound)
   BoltLoosed: { owner: Entity; at: V3; vel: V3; fire: boolean; conjured: boolean }; // a bolt leaves its caster (projectiles.ts; round 51: the muzzle's flash)
   BoltLanded: { owner: Entity; at: V3; vel: V3; on: 'body' | 'ground' | 'wall' | 'spent'; radius: number; lob: boolean; fire: boolean; conjured: boolean }; // a bolt's end: it struck, struck the world, or gave out

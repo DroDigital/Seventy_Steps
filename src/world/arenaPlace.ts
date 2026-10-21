@@ -38,7 +38,7 @@ export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSit
   });
   for (const s of stones) collide({ kind: 'cylinder', x: s.x, z: s.z, radius: s.radius, y0: y - 0.3, y1: y + s.height });
   if (a.well) collide({ kind: 'cylinder', x: p.x, z: p.z, radius: 2.75, y0: y - 12, y1: y + 0.9 });
-  w.arenas.push({ region: region.id, x: p.x, z: p.z, y, radius: a.radius, well: !!a.well, bosses: a.bosses, stones, decor, front, ground: set?.ground, air: set?.air });
+  w.arenas.push({ region: region.id, x: p.x, z: p.z, y, radius: a.radius, well: !!a.well, bosses: a.bosses, stones, decor, front, ground: set?.ground, air: set?.air, candle: set?.candle });
   const spread = Math.min(8, a.radius / 3);
   a.bosses.forEach((id, k) => {
     const dx = (k - (a.bosses.length - 1) / 2) * spread;

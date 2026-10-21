@@ -8,7 +8,7 @@
 import { NOTE_SITES } from '../data/documents';
 import { yawOf, type XZ } from '../core/geom';
 import type { HiddenPieceDef, Place } from '../data/arena';
-import type { AirSpec, GroundSpec } from '../data/arenaSets';
+import type { AirSpec, CandleLook, GroundSpec } from '../data/arenaSets';
 import { DUNGEONS, type Dir } from '../data/dungeons';
 import { REGIONS } from '../data/regions';
 import { DREAM_DESCENT, SITES } from '../data/sites';
@@ -74,6 +74,7 @@ export interface ArenaPlace {
   front: XZ; // the unit vector toward its realm's nearest Elder Sign: the way in, where its candle burns (arenaFront.ts)
   ground?: GroundSpec; // the floor its set lays (arenaGround.ts)
   air?: AirSpec; // what drifts in it (render/arenaAir.ts)
+  candle?: CandleLook; // what its candle stands on (world/candlePlan.ts)
 }
 
 export interface SpawnPoint {
@@ -240,7 +241,7 @@ function build(): WorldLayout {
       bucket({ x0: layout.rect.x0 - b, z0: layout.rect.z0 - b, x1: layout.rect.x1 + b, z1: layout.rect.z1 + b }, (k) => k.pads.push(rp));
       bucket(layout.rect, (k) => k.dungeons.push(layout));
       const [caches, boxed] = [echoCaches(def), roundCaches(def)];
-      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, caches.get(r.def.id), boxed.get(r.def.id)));
+      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, parts, caches.get(r.def.id), boxed.get(r.def.id)));
       for (const d of decor) propCollide(d, collide);
       const first = layout.rooms[0];
       const on = first && layout.rooms.find((r) => r.def.from === first.def.id); // the way on: a sealed entrance's own axis faced its back wall (round 12)

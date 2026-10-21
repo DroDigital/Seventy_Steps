@@ -118,6 +118,9 @@ function prop(piece: Piece, spot: Spot, y: number, yaw: number, rng: Rng): Prop 
   };
 }
 
+/** A set piece by itself at (x, z) on a floor at `y`, turned `yaw`: a way's waymark (world/arenaWay.ts); null for one not known. */
+export const setPiece = (piece: Piece, x: number, z: number, y: number, yaw: number, rng: Rng): Prop | null => prop(piece, { x, z, th: 0 }, y, yaw, rng);
+
 /** Whether a solid piece stands within the fight's circle or across the way in. */
 function blocks(p: Prop, s: SetSite, heart: boolean): boolean {
   const r = reach(p);
@@ -143,8 +146,8 @@ function flank(p: Prop, spot: Spot): void {
   p.z += Math.cos(spot.th) * d;
 }
 
-/** An arena's set: its props, in the order its puts name them. */
-export function arenaSet(set: ArenaSet, s: SetSite): Prop[] {
+/** An arena's set: its props, in the order its puts name them. `taken` (a hall's: its walls, pillars and doorways) turns away a piece that would stand where something is. */
+export function arenaSet(set: ArenaSet, s: SetSite, taken?: (p: Prop) => boolean): Prop[] {
   const rng = createRng((hash2(Math.round(s.x), Math.round(s.z), WORLD.seed + 61) * 4294967296) >>> 0);
   const kept: { p: Prop; join: boolean }[] = [];
   const out: Prop[] = [];
@@ -153,6 +156,7 @@ export function arenaSet(set: ArenaSet, s: SetSite): Prop[] {
       const p = prop(piece, spot, s.y, yawOf(layoutFace(where), spot, s, rng), rng);
       if (!p) continue;
       if ('lane' in where && spot.side) flank(p, spot);
+      if (taken?.(p)) continue;
       if (propCollider(p)) {
         if (blocks(p, s, !!piece.heart)) continue;
         const join = !!piece.join;

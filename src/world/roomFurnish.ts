@@ -1,7 +1,7 @@
 /**
  * What stands in a dungeon room (split from placements.ts in playtest round 24): its Elder Sign,
  * gate, tome, Echo cache, box of cartridges, weapon, vial, bosses, ally and spawns, and the dressing
- * of a boss's ground. Pure.
+ * of a boss's ground (round 62: and a hall's set, world/hallSet.ts). Pure.
  */
 
 import type { XZ } from '../core/geom';
@@ -12,7 +12,8 @@ import { DUNGEON } from '../data/tuning';
 import { isWeapon, WEAPONS } from '../data/weapons';
 import { roomProps } from './arenaDecor';
 import { floorAt, roomPoint, type RoomLayout } from './dungeonKit';
-import { roomSpots } from './dungeonParts';
+import { roomSpots, type Part } from './dungeonParts';
+import { hallProps, hasHallSet } from './hallSet';
 import type { SpawnPoint, WorldLayout } from './placements';
 import type { Prop } from './props';
 import { DIRS, OPPOSITE, yawOfDir } from './worldMap';
@@ -21,7 +22,7 @@ export type SignFn = (region: string, x: number, z: number, y: number, id: strin
 export type GateFn = (region: string, x: number, z: number, y: number, id: string, name: string, to: string, face: Dir) => void;
 
 /** What stands in a dungeon room: its Elder Sign, gate, tome or Echo cache, a weapon, bosses, allies and spawns. */
-export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: RoomLayout, sign: SignFn, gate: GateFn, spawn: (s: SpawnPoint) => void, cache?: number, boxed?: number): Prop[] {
+export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: RoomLayout, sign: SignFn, gate: GateFn, spawn: (s: SpawnPoint) => void, parts: readonly Part[], cache?: number, boxed?: number): Prop[] {
   const s = roomSpots(r);
   const pt = ([u, v]: readonly [number, number]) => {
     const p = roomPoint(r, u, v);
@@ -71,5 +72,8 @@ export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: R
   if (!d.boss) return [];
   const ax = DIRS[r.axis];
   const away = d.gate ? { x: ax.z, z: -ax.x } : ax; // the far side, or beside it when a gate stands there
-  return roomProps(arenaStyle(d.boss[0]), r.x, r.z, r.level, r.half - DUNGEON.wall, away);
+  const style = arenaStyle(d.boss[0]);
+  const set = hasHallSet(d.boss[0]); // a hall with a set of its own (round 62) has it in place of the style's two rows of one piece
+  const dressing = roomProps(set ? { ...style, hall: undefined } : style, r.x, r.z, r.level, r.half - DUNGEON.wall, away);
+  return set ? [...dressing, ...hallProps(d.boss[0], r, parts, dressing)] : dressing;
 }

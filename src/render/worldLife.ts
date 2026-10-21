@@ -35,6 +35,8 @@ import { createWatchers } from './watchers';
 import { createDragTentacle } from './dragTentacle';
 import { createSplashFx } from './splashFx';
 import { createTentacles } from './tentacles';
+import { createWayFx } from './wayFx';
+import { createWayViews } from './wayViews';
 import { createWeatherFx } from './weather';
 import type { Skyline } from './skyline';
 import type { SpriteAtlas } from './sprites/atlas';
@@ -78,6 +80,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
   const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
+  const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
+  const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -94,6 +98,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
       air.update(camera, time, !outside);
+      ways.update(camera.position, time, !outside);
+      wayFx.update(time, camera.position);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);

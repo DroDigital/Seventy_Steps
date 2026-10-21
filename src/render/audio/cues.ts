@@ -54,6 +54,10 @@ export const CUES: Handlers = {
   InsightChanged: (e) => (e.change > 0 && e.cause !== 'load' && e.cause !== 'debug' ? inside('insight') : null),
   FirstSight: (e) => (e.sanity > 0 ? { sound: 'sight', at: null, pitch: Math.max(0.5, 1.1 - e.sanity / 40) } : null), // the greater the horror, the lower
   Discovered: () => inside('found'),
+  WayFound: () => inside('place'), // the head of a trail found (round 62)
+  RiteLit: (e) => ({ sound: 'lampLit', at: { ...e.at } }), // a rite's light taken, in its turn
+  RiteFailed: (e) => ({ sound: 'lampOut', at: { ...e.at } }),
+  RiteDone: (e) => ({ sound: 'revealed', at: { ...e.at } }),
   PlaceFound: () => inside('place'), // a named place (round 18): a gong from far off (round 20; it was the sign's chime, lower)
   Rested: () => inside('rested'),
   RestRefused: () => inside('refused'),

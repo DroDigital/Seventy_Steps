@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { at, lane, put, ring, scatter, type ArenaSet } from '../src/data/arenaSets';
 import { ARENA_SETS } from '../src/data/arenaSetsAll';
+import { ARENA_WAYS } from '../src/data/arenaWaysAll';
 import { MODEL_INFO } from '../src/data/models/index';
 import { PROP_KINDS } from '../src/data/regions';
 import { SET_KITS } from '../src/data/setKits';
@@ -87,7 +88,7 @@ describe('the sets of the open arenas', () => {
   });
 
   it('use no baked model that no arena stands, nor stand one not baked (no dead weight in the bundle)', () => {
-    const used = new Set(Object.values(ARENA_SETS).flatMap((s) => s.puts.map((p) => p.piece.of)));
+    const used = new Set([...Object.values(ARENA_SETS).flatMap((s) => s.puts.map((p) => p.piece.of)), ...Object.values(ARENA_WAYS).flatMap((w) => [w.head.of, ...w.marks.map((m) => m.piece.of)])]); // (round 62: a trail's marks stand them too)
     for (const id of Object.keys(MODEL_INFO)) expect(used.has(id), `${id} is baked but stood nowhere`).toBe(true);
   });
 

@@ -190,7 +190,7 @@ describe('what reports a light', () => {
       total += torches;
       let dressed: LightSpot[] = [];
       finish(dungeonJob(d, (_, l) => (dressed = l)));
-      expect(dressed.length - spots.length, d.layout.def.id).toBe(d.decor.filter((p) => p.kind === 'firepit').length); // and the boss room's braziers (round 13)
+      expect(dressed.length - spots.length, d.layout.def.id).toBe(d.decor.filter((p) => p.kind === 'firepit' || (p.kind === 'set' && !!p.set?.lit)).length); // and the boss room's braziers (round 13) and the lit pieces of its set (round 62: a hall's candles and lamps)
     }
     expect(total).toBeGreaterThan(10);
   }, 20_000); // every legacy dungeon built whole: seconds, more when the suite runs in parallel

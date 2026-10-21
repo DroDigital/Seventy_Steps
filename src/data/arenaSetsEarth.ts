@@ -9,6 +9,7 @@ import { at, lane, put, ring, scatter, type ArenaSet } from './arenaSets';
 export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   // The Colour Out of Space: the Gardners' blasted heath, a grey dust where nothing grows, a well, and a light in it that is of no colour a man has a name for.
   colour_out_of_space: {
+    candle: 'cairn',
     ground: { texture: 'rot', tint: [0.46, 0.46, 0.5], gain: 1.2, reach: 14, bands: [{ r0: 0, r1: 0.3, k: 0.55, tint: [0.3, 0.3, 0.36] }, { r0: 0.3, r1: 0.62, k: 1.3, tint: [0.66, 0.66, 0.68] }] },
     puts: [
       put('inlay_ring', at(0, 0), { size: 7.5, glow: 'magenta', lit: 'sigil' }),
@@ -27,6 +28,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // The witches' sabbat in the ravine: the Black Man at the book, a ring of stones, skulls on poles, a pentacle in the leaf-mould and a fire that burns red.
   black_man: {
+    candle: 'skull',
     ground: { texture: 'leaves', tint: [0.46, 0.36, 0.32], gain: 1.3, reach: 12, bands: [{ r0: 0, r1: 0.55, k: 0.75, tint: [0.3, 0.2, 0.19] }] },
     puts: [
       put('inlay_star', at(0, 0), { size: 11, glow: 'magenta', lit: 'sigil' }),
@@ -45,6 +47,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Simon Orne's burying ground at Salem: stones in their rows, a crypt, a salt circle in the dust, a ward drawn in it, lamps down the way in.
   simon_orne: {
+    candle: 'grave',
     ground: { texture: 'dirt', tint: [0.4, 0.38, 0.34], gain: 1.25, reach: 12, bands: [{ r0: 0.33, r1: 0.42, k: 1.7, tint: [0.78, 0.78, 0.74] }] },
     puts: [
       put('inlay_ring', at(0, 0), { size: 9, glow: 'purple', lit: 'sigil' }),
@@ -66,6 +69,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Edward Hutchinson's Pawtuxet manor: a garden gone to hedge and ruin, a porch of columns, a dry fountain, an obelisk to the family and lamps that still burn.
   edward_hutchinson: {
+    candle: 'grave',
     ground: { texture: 'cobble', tint: [0.4, 0.36, 0.32], gain: 1.2, reach: 12, bands: [{ r0: 0.46, r1: 0.58, k: 0.7 }] },
     puts: [
       put('fountain', at(0.58, 180, { face: 'in' }), { heart: true }),
@@ -85,6 +89,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Shub-Niggurath's black grove: trees that fork like horns, skulls on stakes, giant fungi, and an altar of stump and root; the air thick with spores.
   shub_niggurath: {
+    candle: 'skull',
     ground: { texture: 'flesh', tint: [0.4, 0.28, 0.28], gain: 1.15, reach: 14, bands: [{ r0: 0, r1: 0.45, k: 0.7, tint: [0.26, 0.16, 0.17] }, { r0: 0.75, r1: 1.0, k: 0.78 }] },
     puts: [
       put('inlay_spiral', at(0, 0), { size: 20, glow: 'magenta', lit: 'sigil' }),
@@ -100,6 +105,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Medusa's Coil: the burned plantation at Riverside, a porch of columns still standing, a stone head fallen in the court, a snake coiled in the ash.
   medusa_gorgon: {
+    candle: 'votive',
     ground: { texture: 'cobble', tint: [0.34, 0.3, 0.28], gain: 1.15, reach: 12, bands: [{ r0: 0, r1: 0.55, k: 0.8, tint: [0.22, 0.2, 0.2] }] },
     puts: [
       put('inlay_serpent', at(0, 0), { size: 9, glow: 'green', lit: 'sigil' }),
@@ -118,6 +124,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // The Horror at Martin's Beach: a shore of pale sand, a wreck the tide left, rock, barrels, lamps on poles, bonfires.
   martins_beach_horror: {
+    candle: 'driftwood',
     ground: { texture: 'sand', tint: [0.56, 0.5, 0.4], gain: 1.25, reach: 12, bands: [{ r0: 0.72, r1: 1.05, k: 0.78, tint: [0.3, 0.3, 0.28] }] },
     puts: [
       put('wreck', at(1.3, 150, { face: 'free' }), { size: 0.9 }),
@@ -135,6 +142,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Beneath the pyramids: a court of the dead's temple, a sun-wheel of paving, a colonnade, a gate of two pylons and an avenue of sphinxes.
   colossus_pyramids: {
+    candle: 'votive',
     ground: { texture: 'slab', tint: [0.62, 0.55, 0.4], gain: 1.3, reach: 14, bands: [{ r0: 0.5, r1: 0.56, k: 0.6 }], spokes: { n: 12, width: 5, k: 1.3, r0: 0.1, r1: 1 } },
     puts: [
       put('inlay_ring', at(0, 0), { size: 12, glow: 'purple', lit: 'sigil' }),
@@ -149,6 +157,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Yig's mound on the prairie: a serpent drawn in the dust, totems of his people, bones, a wagon left, the dry wind.
   yig: {
+    candle: 'skull',
     ground: { texture: 'dirt', tint: [0.52, 0.42, 0.3], gain: 1.3, reach: 12, bands: [{ r0: 0, r1: 0.4, k: 0.8 }] },
     puts: [
       put('inlay_serpent', at(0, 0), { size: 14, glow: 'green', lit: 'sigil' }),
@@ -166,6 +175,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Nug and Yeb at the Mound: black basalt, a stepped mound with a mouth, crags, a spiral of tar and a deep red coal in the dark.
   nug: {
+    candle: 'cairn',
     ground: { texture: 'rock', tint: [0.3, 0.28, 0.32], gain: 1.2, reach: 12, bands: [{ r0: 0, r1: 0.35, k: 0.6 }] },
     puts: [
       put('inlay_spiral', at(0, 0), { size: 10, glow: 'purple', lit: 'sigil' }),
@@ -180,6 +190,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // Bokrug in the lake of Ib: sea-green mud, the idol on its pedestal, lilies on black water, the carved stones of a drowned people, green fire.
   bokrug: {
+    candle: 'driftwood',
     ground: { texture: 'mud', tint: [0.3, 0.42, 0.38], gain: 1.2, reach: 12, bands: [{ r0: 0, r1: 0.5, k: 0.8, tint: [0.2, 0.32, 0.3] }, { r0: 0.8, r1: 1.0, k: 0.8 }] },
     puts: [
       put('idol', at(0.55, 180, { face: 'in' }), { heart: true, size: 1.5, lit: 'sigil', glow: 'green' }),
@@ -195,6 +206,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // The Other Gods atop Hatheg-Kla: a summit of wind-scoured snow and stone, a ring of trilithons older than men, a pale light that has no source.
   other_gods: {
+    candle: 'cairn',
     ground: { texture: 'snow', tint: [0.6, 0.62, 0.72], gain: 0.95, reach: 12, bands: [{ r0: 0, r1: 0.25, k: 0.8, tint: [0.45, 0.47, 0.58] }] }, // (snow under a lantern is the brightest ground there is: a slab of it filled a cutscene's foreground)
     puts: [
       put('inlay_ring', at(0, 0), { size: 14, glow: 'purple', lit: 'sigil' }),

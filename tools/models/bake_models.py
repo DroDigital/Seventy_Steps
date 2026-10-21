@@ -35,6 +35,13 @@ MODELS = {
     'rock_large': ('nature', 'rock_largeA', 1, 2.6), 'rock_tall': ('nature', 'rock_tallA', 1, 4.0), 'plant_bush': ('nature', 'plant_bushLargeTriangle', 1, 1.4),
     'statue_obelisk': ('nature', 'statue_obelisk', 1, 5.0), 'statue_column': ('nature', 'statue_columnDamaged', 1, 3.6), 'statue_head': ('nature', 'statue_head', 1, 3.4),
     'lily': ('nature', 'lily_large', 1, -1.4),
+    'statue_ring': ('nature', 'statue_ring', 1, 2.6), 'cliff': ('nature', 'cliff_large_rock', 0, 3.4),
+    # Survival Kit (round 62: the trails)
+    'signpost': ('survival', 'signpost', 1, 2.4), 'tent': ('survival', 'tent', 0, 2.6), 'fish': ('survival', 'fish-large', 0, -1.1), 'bedroll': ('survival', 'bedroll', 0, -1.6),
+    # Pirate Kit, Graveyard Kit (round 62)
+    'flag_pirate': ('pirate', 'flag-pirate-high', 1, 4.2), 'cannon': ('pirate', 'cannon', 0, -1.8), 'crate': ('pirate', 'crate', 0, 0.9),
+    'pumpkin_carved': ('graveyard', 'pumpkin-carved', 1, 0.7), 'lantern': ('graveyard', 'lantern-candle', 1, 0.55), 'skeleton': ('graveyard', 'character-skeleton', 1, 1.7),
+    'hay_bale': ('graveyard', 'hay-bale', 0, 1.1), 'shovel_dirt': ('graveyard', 'shovel-dirt', 1, 1.3), 'chalice': ('graveyard', 'detail-chalice', 1, 0.4), 'bowl': ('graveyard', 'detail-bowl', 1, 0.3),
     # Castle Kit
     'wall_ruin': ('castle', 'wall-half', 0, 2.6),
     # Fantasy Town Kit
