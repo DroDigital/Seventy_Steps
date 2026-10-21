@@ -267,7 +267,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hint.passage': "Para una mente como la tuya, ese muro no era un muro. El discernimiento muestra puertas y puentes que los ignorantes no ven; el marco luminoso es uno. Cruza: algo hay al otro lado.",
   'hint.passageCost': "El discernimiento gastado se pierde, y un paso que mantenía abierto vuelve a ser un muro. En un Signo Arcano, el menú dice qué cerraría una compra antes de pagar.",
   'hint.relic': "Una reliquia: un don con un precio. Se llevan dos a la vez; las demás se guardan. Descansa en un Signo Arcano y abre allí la pestaña Relics.",
-  'hint.transfer': "Un arma hallada tarde puede tomar el refuerzo del bastón-espada: en un Signo Arcano, en Arms, Move reinforcement. No se pierde nada.",
+  'hint.transfer': "Un arma hallada tarde puede tomar el refuerzo del bastón-espada: en un Signo Arcano, en Arms, Move reinforcement. No se pierde nada, pero cada nivel movido cuesta Ecos; las piedras estelares puestas en el arma misma no cuestan ninguno.",
   'hint.gun': "{shoot} dispara el revólver: seis balas, y las de reserva que llevas. {reload} lo recarga. Golpea fuerte de cerca y poco de lejos, y falla los blancos pequeños a distancia. Hay balas en cajas por el sueño y las venden los mercaderes.",
   'hint.oil': "{throw} lanza un frasco de aceite de lámpara; estalla y arde donde cae. Fija primero el objetivo para lanzarlo a un enemigo.",
   'hint.grab': "Un destello carmesí es un agarre: ninguna guardia lo detiene. Rueda para evitarlo ({dodge}).",

@@ -127,7 +127,8 @@ export type LevelId = keyof typeof LEVELS;
 export const LEVEL_COST = { base: 200, step: 60, curve: 4.5 };
 
 /** Reinforcing a weapon at an Elder Sign (round 12): the most levels, the share each adds to its blows, and the star-stones each level costs. */
-export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[] };
+export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[], moveEchoes: 600 };
+// `moveEchoes` (round 61): moving a level from one weapon to another is not free: each level moved costs this many Echoes for each star-stone it would cost to set in afresh in the weapon it goes to (so 600 for the first level, 1800 for the fifth, 5400 to move five into a bare weapon). Stones set directly into the other weapon cost no Echoes, and the stones a boss leaves are there to be set, not shuffled.
 
 /** Each new journey through the dream (NG+, round 12): what it adds to foes' health, their blows and the Echoes they leave, and the last journey counted. */
 export const NEW_GAME_PLUS = { health: 0.6, damage: 0.35, echoes: 0.5, most: 7 };

@@ -267,7 +267,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'hint.passage': "Für einen Geist wie den euren war diese Wand keine Wand. Einsicht zeigt Türen und Brücken, die den Unwissenden verborgen bleiben; der leuchtende Rahmen ist eine. Geht hindurch: dahinter liegt etwas.",
   'hint.passageCost': "Verbrauchte Einsicht ist fort, und ein Durchgang, den sie offen hielt, wird wieder zur Wand. An einem Ältesten Zeichen nennt das Menü, was ein Kauf wieder verschlösse, bevor ihr zahlt.",
   'hint.relic': "Ein Relikt: eine Gabe mit einem Preis. Zwei werden zugleich getragen, die anderen aufbewahrt. Ruht an einem Ältesten Zeichen und öffnet dort den Reiter Relics.",
-  'hint.transfer': "Eine spät gefundene Waffe kann die Verstärkung des Stockdegens übernehmen: an einem Ältesten Zeichen unter Arms, Move reinforcement. Nichts geht verloren.",
+  'hint.transfer': "Eine spät gefundene Waffe kann die Verstärkung des Stockdegens übernehmen: an einem Ältesten Zeichen unter Arms, Move reinforcement. Nichts geht verloren, aber jede verschobene Stufe kostet Echos; Sternensteine, die in die Waffe selbst gesetzt werden, kosten keine.",
   'hint.gun': "{shoot} feuert den Revolver: sechs Patronen und die Reserve, die ihr tragt. {reload} lädt ihn. Er schlägt aus der Nähe hart zu und aus der Ferne wenig, und er verfehlt kleine Ziele auf Distanz. Patronen liegen in Kisten im Traum und werden von Händlern verkauft.",
   'hint.oil': "{throw} wirft eine Flasche Lampenöl; sie platzt und brennt, wo sie landet. Visiert zuerst an, um sie auf einen Gegner zu werfen.",
   'hint.grab': "Ein purpurnes Aufblitzen bedeutet einen Griff: keine Deckung hält ihn auf. Rollt weg ({dodge}).",

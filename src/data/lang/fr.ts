@@ -267,7 +267,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'hint.passage': "Pour un esprit comme le vôtre, ce mur n’en était pas un. Le discernement montre des portes et des ponts que les ignorants ne voient pas ; le cadre lumineux en est un. Passez : quelque chose se trouve au-delà.",
   'hint.passageCost': "Le discernement dépensé est perdu, et un passage qu’il tenait ouvert redevient un mur. À un Signe des Anciens, le menu dit ce qu’un achat refermerait avant que vous payiez.",
   'hint.relic': "Une relique : un don qui a un prix. On en porte deux à la fois ; les autres sont gardées. Reposez-vous à un Signe des Anciens et ouvrez-y l’onglet Relics.",
-  'hint.transfer': "Une arme trouvée tard peut prendre le renfort de la canne-épée : à un Signe des Anciens, dans Arms, Move reinforcement. Rien n’est perdu.",
+  'hint.transfer': "Une arme trouvée tard peut prendre le renfort de la canne-épée : à un Signe des Anciens, dans Arms, Move reinforcement. Rien n’est perdu, mais chaque niveau déplacé coûte des Échos ; les pierres stellaires serties dans l’arme elle-même n’en coûtent aucun.",
   'hint.gun': "{shoot} tire au revolver : six balles, et celles de réserve que vous portez. {reload} le recharge. Il frappe fort de près et peu de loin, et manque les petites cibles à distance. Des balles gisent dans des caisses à travers le rêve et sont vendues par des marchands.",
   'hint.oil': "{throw} lance une fiole d’huile de lampe ; elle éclate et brûle là où elle tombe. Verrouillez d’abord la cible pour la lancer sur un ennemi.",
   'hint.grab': "Un éclat cramoisi annonce une saisie : aucune garde ne l’arrête. Roulez pour l’éviter ({dodge}).",
