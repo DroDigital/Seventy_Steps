@@ -49,6 +49,8 @@ export interface Particles {
   spawn(p: ParticleSpec): void;
   /** Steps and draws them; `time` is render seconds. */
   update(time: number, camera: THREE.Camera): void;
+  /** The ground's height at x, z (the world's, main.ts): where what falls from a blow comes to rest, though the blow land on a body or a wall. */
+  ground?(x: number, z: number): number;
 }
 
 const VERT = /* glsl */ `
@@ -194,7 +196,8 @@ export function land(p: Pick<Live, 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz' | 'floor
   [p.rot, p.spin] = [p.rot + p.spin * p.age, 0];
 }
 
-export function createParticles(scene: THREE.Scene): Particles {
+/** `ground`: the world's ground, where what falls comes to rest (`Particles.ground`). */
+export function createParticles(scene: THREE.Scene, ground?: (x: number, z: number) => number): Particles {
   const geo = new THREE.PlaneGeometry(1, 1);
   const colors = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY * 4), 4).setUsage(THREE.DynamicDrawUsage);
   const glows = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY), 1).setUsage(THREE.DynamicDrawUsage);
@@ -215,6 +218,7 @@ export function createParticles(scene: THREE.Scene): Particles {
   let last = -1;
 
   return {
+    ground,
     spawn(p) {
       if (live.length >= CAPACITY) live.shift();
       const { shape, colorEnd, ...rest } = p;

@@ -44,7 +44,8 @@ pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own 
   disc, shard, streak (lies along its flight, stretched by its speed), ring, spark (four-point) and wisp, and (round 60) rune,
   eye, fang, bubble, bolt (forked), feather, petal and note. They spin, hold their brightness before they fade, change colour
   over a life (an ember from white to red to black), and (round 60) may have a floor: they bounce a little, skid and lie still
-  on it. Dithered like the sprites, so no sorting.
+  on it. The floor is the ground under the blow (`Particles.ground`, the world's; `groundUnder` in `fxForms.ts`), so what a
+  blow on a body or a wall throws down falls to the ground, not to the height it struck. Dithered like the sprites, so no sorting.
 - **Element kit** (`fxKit.ts`): `burst` (a flash, a crown of matter thrown out, a fountain, a cloud, glints, rays), `impact`
   (a bolt's landing, its spray thrown back), `trail` (a halo of light, matter shed, sparks), `charge` (matter drawn in to a
   caster before its release), `column` (a summoning's or an arrival's pillar), `flash`.

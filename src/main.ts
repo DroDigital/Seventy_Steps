@@ -184,7 +184,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const fxController = createFxController(game);
   const audio = createGameAudio(shell.engine, shell.drones, game);
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
-  const particles = createParticles(scene);
+  const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls

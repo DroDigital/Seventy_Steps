@@ -106,6 +106,9 @@ const toneOf = (f: FormSpec, look: AttackLook): Rgb => (f.dark ? mixRgb(look.acc
 /** A prism's sparks turn as they fly: the accent's channels turned a third about. */
 const turned = (c: Rgb): Rgb => [c[1], c[2], c[0]];
 
+/** Where what falls from a blow at `at` comes to rest: the ground under it, though the blow land on a body or a wall (never above `at`); `at`'s own height where `fx` knows no ground. */
+export const groundUnder = (fx: Particles, at: V3): number => Math.min(at.y, fx.ground?.(at.x, at.z) ?? at.y);
+
 /**
  * The signature of `look` at a moment of a blow: `at` its heart, `radius` its size, `dir` (a landing's flight) and `vel`
  * (a trail's) where it has one, `t` how far a gathering has come. Nothing for a fighter with none.
@@ -117,7 +120,8 @@ export function signature(fx: Particles, look: AttackLook, moment: Moment, at: V
   const n = countOf(moment, radius, f.many, look.punch);
   if (!n) return;
   let left = BUDGET[moment];
-  const out: Particles = { spawn: (q) => void (left-- > 0 && fx.spawn(q)), update: fx.update };
+  const out: Particles = { spawn: (q) => void (left-- > 0 && fx.spawn(q)), update: fx.update, ground: fx.ground };
+  const base = groundUnder(fx, at);
   const scale = moment === 'trail' ? 0.5 : moment === 'gather' ? 0.45 : moment === 'land' ? 0.75 : Math.min(2.5, 0.6 + radius * 0.25);
   const motion: Motion = moment === 'gather' ? 'implode' : sig.motion;
   const r = moment === 'gather' ? radius : moment === 'trail' ? 0.2 : moment === 'flash' ? radius * 0.5 : radius;
@@ -132,11 +136,11 @@ export function signature(fx: Particles, look: AttackLook, moment: Moment, at: V
     const p = { x: at.x + o.x, y: at.y + o.y, z: at.z + o.z };
     const size = f.size * scale * rand(0.75, 1.25) * (moment === 'gather' ? 0.7 + t * 0.6 : 1);
     if (f.draw && moment !== 'trail') { // (a trail's step sheds one thing, the form's own: a bolt fires many a step)
-      drawn(out, f, look, tone, p, v, size, life, at.y, r);
+      drawn(out, f, look, tone, p, v, size, life, base, r);
       continue;
     }
     const rot = f.level ? 0 : f.shape === 'fang' ? Math.atan2(v.z, v.x) : rand(0, tau);
-    out.spawn({ ...p, vx: v.x, vy: v.y, vz: v.z, life, size, grow: f.grow, color: tone, colorEnd: f.glow ? look.line : look.ink, glow: f.glow, shape: f.shape, gravity: f.gravity, drag: f.drag, spin: f.level ? 0 : rand(-f.spin, f.spin), rot, alpha: 0.95, hold: f.hold, ...(f.rest && { floor: at.y + 0.03, bounce: 0.25 }) });
+    out.spawn({ ...p, vx: v.x, vy: v.y, vz: v.z, life, size, grow: f.grow, color: tone, colorEnd: f.glow ? look.line : look.ink, glow: f.glow, shape: f.shape, gravity: f.gravity, drag: f.drag, spin: f.level ? 0 : rand(-f.spin, f.spin), rot, alpha: 0.95, hold: f.hold, ...(f.rest && { floor: base + 0.03, bounce: 0.25 }) });
   }
 }
 

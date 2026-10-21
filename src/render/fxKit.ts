@@ -11,7 +11,7 @@
 import type { V3 } from '../core/geom';
 import type { AoeMotif } from './aoeLook';
 import type { AttackLook } from './attackLook';
-import { signature } from './fxForms';
+import { groundUnder, signature } from './fxForms';
 import type { Particles, ParticleShape } from './particles';
 import type { Rgb } from './palette';
 
@@ -74,18 +74,19 @@ export function burst(fx: Particles, e: Element, at: V3, radius: number, look: A
   const c = colorOf(e, look);
   const end = endOf(e, look, c);
   const size = chunkSize(radius);
+  const rest = groundUnder(fx, at) + 0.02; // what falls lies on the ground under it
   flash(fx, e, at, radius * 0.5, look);
   const crown = Math.round((8 + radius * 3.5) * power);
   for (let i = 0; i < crown; i++) {
     const a = (i / crown) * tau + rand(-0.2, 0.2);
     const s = radius * rand(1.3, 2.4);
-    fx.spawn({ x: at.x, y: at.y + 0.15, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(0.5, 2.5), life: rand(0.5, 1), size: size * rand(0.7, 1.3), grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: e.gravity, drag: 1.4, spin: rand(-9, 9) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2, ...(e.gravity > 0 && { floor: at.y + 0.02 }) });
+    fx.spawn({ x: at.x, y: at.y + 0.15, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(0.5, 2.5), life: rand(0.5, 1), size: size * rand(0.7, 1.3), grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: e.gravity, drag: 1.4, spin: rand(-9, 9) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2, ...(e.gravity > 0 && { floor: rest }) });
   }
   const fountain = Math.round((6 + radius * 2.2) * power);
   for (let i = 0; i < fountain; i++) {
     const a = rand(0, tau);
     const d = Math.sqrt(Math.random()) * radius * 0.6;
-    fx.spawn({ x: at.x + Math.cos(a) * d, y: at.y + 0.2, z: at.z + Math.sin(a) * d, vx: Math.cos(a) * rand(0, 2.5), vz: Math.sin(a) * rand(0, 2.5), vy: rand(3.5, 8.5), life: rand(0.7, 1.3), size: size * rand(0.6, 1.1), grow: e.glow ? 0.3 : 0.8, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 5) + (e.glow ? 2 : 0), drag: 0.6, spin: rand(-7, 7) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.25, stretch: 0.18, floor: at.y + 0.02 });
+    fx.spawn({ x: at.x + Math.cos(a) * d, y: at.y + 0.2, z: at.z + Math.sin(a) * d, vx: Math.cos(a) * rand(0, 2.5), vz: Math.sin(a) * rand(0, 2.5), vy: rand(3.5, 8.5), life: rand(0.7, 1.3), size: size * rand(0.6, 1.1), grow: e.glow ? 0.3 : 0.8, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 5) + (e.glow ? 2 : 0), drag: 0.6, spin: rand(-7, 7) * look.twist, rot: rand(0, tau), alpha: 0.95, hold: 0.25, stretch: 0.18, floor: rest });
   }
   const cloud = Math.round((5 + radius * 1.6) * power);
   const mist = e.smoke ? look.ember : look.ring;
@@ -118,12 +119,13 @@ export function impact(fx: Particles, e: Element, at: V3, dir: { x: number; z: n
   const c = colorOf(e, look);
   const end = endOf(e, look, c);
   flash(fx, e, at, size * 1.2, look, 0.3);
+  const rest = groundUnder(fx, at) + 0.02; // a wound's or a wall's spray falls to the ground under it, not to the height it struck
   const back = Math.atan2(-dir.z, -dir.x);
   const n = 8 + Math.round(size * 14);
   for (let i = 0; i < n; i++) {
     const a = back + rand(-1.1, 1.1);
     const s = rand(1.5, 5.5);
-    fx.spawn({ x: at.x, y: at.y + 0.2, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(1, 4.5), life: rand(0.35, 0.8), size: rand(0.1, 0.2) + size * 0.25, grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 6), drag: 1.2, spin: rand(-10, 10), rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2, floor: at.y + 0.02 });
+    fx.spawn({ x: at.x, y: at.y + 0.2, z: at.z, vx: Math.cos(a) * s, vz: Math.sin(a) * s, vy: rand(1, 4.5), life: rand(0.35, 0.8), size: rand(0.1, 0.2) + size * 0.25, grow: e.glow ? 0.4 : 1, color: c, colorEnd: end, glow: e.glow, shape: e.chunk, gravity: Math.max(e.gravity, 6), drag: 1.2, spin: rand(-10, 10), rot: rand(0, tau), alpha: 0.95, hold: 0.3, stretch: 0.2, floor: rest });
   }
   for (let i = 0; i < 3; i++) fx.spawn({ x: at.x, y: at.y + 0.25, z: at.z, vx: rand(-1, 1), vz: rand(-1, 1), vy: Math.abs(e.mist) * rand(0.6, 1.2) + 0.5, life: rand(0.5, 0.9), size: 0.7 + size, grow: 2.4, color: e.smoke ? look.ember : look.ring, shape: 'wisp', alpha: 0.4, drag: 1.5 });
   if (e.glint) for (let i = 0; i < 4; i++) fx.spawn({ x: at.x, y: at.y + 0.3, z: at.z, vx: rand(-3, 3), vz: rand(-3, 3), vy: rand(1, 4), life: rand(0.3, 0.7), size: 0.14, color: WHITE, glow: true, shape: e.glint, gravity: 5, spin: 8, hold: 0.4 });

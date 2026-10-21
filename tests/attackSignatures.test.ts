@@ -3,7 +3,7 @@ import { FORMS, MOTIONS, SIGNATURES, isHorrorSignature } from '../src/data/attac
 import { ENTITIES } from '../src/data/registry';
 import { LIGHT_FLOOR, lookOf } from '../src/render/attackLook';
 import { BUDGET, FORM_SPECS, signature, type Moment } from '../src/render/fxForms';
-import { burst, ELEMENTS } from '../src/render/fxKit';
+import { burst, ELEMENTS, impact } from '../src/render/fxKit';
 import { luma } from '../src/render/palette';
 import { land, type ParticleSpec, type Particles } from '../src/render/particles';
 
@@ -99,5 +99,18 @@ describe('every creature\'s attacks are its own (round 60: "make it very distinc
     p.vy = -0.5;
     land(p);
     expect([p.vy, p.gravity, p.spin]).toEqual([0, 0, 0]); // and then lies still
+  });
+
+  it('what a blow on a body or a wall throws down rests on the ground under it, not in the air where it struck', () => {
+    const got: ParticleSpec[] = [];
+    const fx: Particles = { spawn: (p) => void got.push(p), update: () => undefined, ground: () => 0.5 };
+    const look = lookOf('hypnos'); // its petals lie where they fall
+    impact(fx, ELEMENTS[look.motif], { x: 3, y: 1.8, z: -2 }, { x: 1, z: 0 }, 0.6, look); // a wound, 1.3 m over the ground
+    const floors = got.flatMap((p) => (p.floor === undefined ? [] : [p.floor]));
+    expect(floors.length).toBeGreaterThan(0);
+    for (const f of floors) expect(f).toBeCloseTo(0.5, 1);
+    got.length = 0;
+    impact({ ...fx, ground: () => 4 }, ELEMENTS[look.motif], { x: 0, y: 1, z: 0 }, { x: 1, z: 0 }, 0.6, look); // under a ledge: never above where it struck (its flash, 0.3 m over it)
+    for (const p of got) if (p.floor !== undefined) expect(p.floor).toBeLessThan(1.4);
   });
 });
