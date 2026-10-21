@@ -137,6 +137,7 @@ export interface Layer {
   minInsight?: number;
   maxSanity?: number; // a band floor (70, 40, 15): shown once the whole band is at or below it
   shown: boolean;
+  open: number; // a passage's opening (0 shut .. 1 open: systems/passages.ts, round 61): a door or bridge that is shown opens as the investigator comes near
 }
 
 /** Hidden-layer geometry: its data, the colliders it puts into the world while shown, and those of its seal while hidden. */

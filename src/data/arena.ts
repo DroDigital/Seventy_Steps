@@ -27,6 +27,10 @@ export interface HiddenPieceDef {
   boxes: readonly LayerBox[];
   /** What stands only while it is hidden: the wall a hidden door opens, the chasm a hidden bridge spans (drawn as wall, or not at all). */
   seal?: { boxes: readonly LayerBox[]; look: 'wall' | 'sealed' | 'none' }; // sealed: a slab banded with glowing glyphs
+  /** A hidden doorway's opening, for its picture and its opening (round 61): which way the wall runs, the opening's width and height, the wall's thickness, the floor it stands on. */
+  door?: { alongX: boolean; width: number; height: number; thick: number; y: number };
+  /** A hidden bridge's span: which way it runs, half its length, its width, the floor's level. */
+  bridge?: { alongX: boolean; half: number; width: number; y: number };
 }
 
 export const ARENA = {

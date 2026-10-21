@@ -3,7 +3,7 @@ import { NPCS } from '../src/data/npcs';
 import { START_SIGN } from '../src/data/sites';
 import { wrapAngle, yawOf } from '../src/core/geom';
 import { emptyInput } from '../src/core/input';
-import { CAMERA, LAUDANUM, SANITY, WORLD } from '../src/data/tuning';
+import { CAMERA, LAUDANUM, PASSAGE, SANITY, WORLD } from '../src/data/tuning';
 import { dream, gatePlace, interactable, passGate, rest, signPlace, travel } from '../src/systems/checkpoints';
 import { isAbsent } from '../src/systems/components';
 import { npcEntity, npcPlace, talk } from '../src/systems/npcs';
@@ -213,6 +213,9 @@ describe('hidden bridges', () => {
     };
     expect(probe()).toBeGreaterThan(0.5);
     changeInsight(g, 2, 'debug', 'test');
+    expect(probe()).toBeGreaterThan(0.5); // shown, but it forms as it is approached (round 61): until then the gap is a gap
+    goTo(g, ...(Object.values(roomPoint(span, 0, -span.half + 1)) as [number, number])); // at the near brink
+    run(g, PASSAGE.frames.bridge + 2);
     expect(probe()).toBe(0);
   });
 });

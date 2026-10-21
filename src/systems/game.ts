@@ -37,6 +37,7 @@ import { hazardSystem } from './hazards';
 import { registerHiddenLayer, spawnPiece } from './hiddenLayer';
 import { explorationSystem } from './exploration';
 import { markerSystem } from './marker';
+import { passageSystem } from './passages';
 import { placeSystem } from './places';
 import { createBuffer } from './inputBuffer';
 import { insightSystem, spawnTome } from './insight';
@@ -242,6 +243,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   insightSystem(g);
   explorationSystem(g);
   markerSystem(g); // the marker reached is cleared (round 60)
+  passageSystem(g); // a secret passage the investigator is near opens (round 61)
   placeSystem(g);
   questSystem(g);
   tallySystem(g);

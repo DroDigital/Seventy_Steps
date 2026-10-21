@@ -10,8 +10,10 @@
 
 import type { Entity } from '../core/ecs';
 import type { HiddenPieceDef } from '../data/arena';
+import { PASSAGE } from '../data/tuning';
 import { pieceColliders } from '../world/arena';
 import type { Game, Layer, Mind } from './components';
+import { settle } from './passages';
 import { bandCeiling } from './sanity';
 import { sealsBroken } from './sealCount';
 
@@ -32,27 +34,22 @@ function quiet(g: Game, id: Entity): void {
   if (br) Object.assign(br, { state: 'idle', target: null, lost: 0, aware: 0, last: null });
 }
 
-/** Shows or hides one layered entity to match the mind. */
+/** Shows or hides one layered entity to match the mind. A passage that is shown stays shut until it is approached (passages.ts). */
 export function applyLayer(g: Game, id: Entity): void {
   const l = g.ecs.c.layer.get(id)!;
   const shown = layerShown(g.mind, l, l.minSeals === undefined ? 0 : sealsBroken(g));
-  if (shown === l.shown) return;
-  l.shown = shown;
   const piece = g.ecs.c.piece.get(id);
-  for (const c of piece?.colliders ?? []) {
-    if (shown) g.world.off.delete(c);
-    else g.world.off.add(c);
+  if (shown !== l.shown) {
+    l.shown = shown;
+    l.open = shown && !piece?.def.seal ? 1 : 0; // a piece with no seal has nothing to open; a passage begins shut, and a hidden one is shut again
+    if (!shown) quiet(g, id);
   }
-  for (const c of piece?.seal ?? []) {
-    if (shown) g.world.off.add(c);
-    else g.world.off.delete(c);
-  }
-  if (!shown) quiet(g, id);
+  settle(g, id);
 }
 
 /** Puts an entity on a hidden layer, hiding it at once if the mind cannot see it. */
 export function addLayer(g: Game, id: Entity, hidden: { minInsight?: number; maxSanity?: number; minSeals?: number }): void {
-  g.ecs.c.layer.set(id, { ...hidden, shown: true });
+  g.ecs.c.layer.set(id, { ...hidden, shown: true, open: 1 });
   applyLayer(g, id);
 }
 
@@ -68,6 +65,12 @@ export function spawnPiece(g: Game, def: HiddenPieceDef): Entity {
   for (const c of seal) g.world.off.add(c); // a fresh layer counts as shown until addLayer settles it
   g.ecs.c.piece.set(e, { def, colliders, seal });
   addLayer(g, e, { minInsight: def.minInsight, maxSanity: def.maxSanity, minSeals: def.minSeals });
+  const me = g.ecs.c.transform.get(g.player?.id)?.pos; // one a body stands in when the world is made (a load, a respawn) is not shut on them
+  const layer = g.ecs.c.layer.get(e)!;
+  if (def.seal && layer.shown) {
+    layer.open = me && Math.hypot(me.x - def.x, me.z - def.z) < PASSAGE.stood ? 1 : 0;
+    settle(g, e);
+  }
   return e;
 }
 

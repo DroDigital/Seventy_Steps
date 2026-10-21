@@ -305,6 +305,13 @@ export const FINDS = {
 /** The map's marker (round 60, systems/marker.ts): how near the investigator must come for it to be reached, and so cleared (metres). */
 export const MARKER = { arrive: 10 };
 
+/**
+ * Secret passages (round 61, systems/passages.ts): the metres from a passage within which it wakes (a bridge's from its middle, and half
+ * its length more), the frames each kind takes to open, and how far open it must be for the way to be passable (a door's seal leaves the
+ * world, a bridge's deck stands): the picture is at that moment well on.
+ */
+export const PASSAGE = { wake: 7, frames: { door: 96, sealed: 120, bridge: 72 }, solidAt: 0.62, stood: 3 }; // stood: metres within which a passage met standing at it, when the world is made, is already open
+
 /** The seals on Kadath's door (playtest round 12, systems/seals.ts). */
 export const SEALS = {
   exempt: ['hub', 'dreamlands', 'beyond'] as readonly string[], // regions holding no seal

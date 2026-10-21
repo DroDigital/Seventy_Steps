@@ -182,12 +182,12 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (!opts.arena) watchAchievements(game, store);
   const views = createActorViews(scene, game);
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
-  const hidden = createHiddenViews(scene, game);
   const fights = createFightViews(scene, game);
   const fxController = createFxController(game);
   const audio = createGameAudio(shell.engine, shell.drones, game);
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
+  const hidden = createHiddenViews(scene, game, { audio, particles }); // the secret passages open with dust, light and the sound of stone (round 61)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
