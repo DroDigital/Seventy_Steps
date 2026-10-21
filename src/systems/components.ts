@@ -225,8 +225,20 @@ export type Stores = ReturnType<typeof createStores>;
 /** Lying in ambush or burrowed: unseen, and nothing can target it. */
 export const isConcealed = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.c.brain.get(id)?.state === 'hidden';
 
-/** Invisible and not revealed (spec §3E, the Dunwich Horror): not drawn, locked on to or beheld, though it is there. */
-export const isUnseen = (g: Pick<Game, 'ecs'>, id: Entity): boolean => (g.ecs.c.unseen.get(id)?.revealed ?? 1) <= 0;
+/**
+ * A boss of the open world not yet roused (round 60: asked, "prevent players from detecting bosses, particularly large entities such as
+ * Cthulhu and Father Dagon, from a distance while traversing the map, as this compromises immersion"): it stands in its arena behind
+ * its fog, which is a few metres high and the horror forty, so it was seen over the wall from as far as the mist let the eye reach.
+ * It wakes as the investigator steps into its ring (`BossEngaged`), and until then it is not drawn, locked on to or beheld: its arrival
+ * (ui/cinemaDirector.ts, render/bossArrival.ts) is the first sight of it. Not in the arena or the bestiary, which show every creature.
+ */
+export const isUnroused = (g: Pick<Game, 'ecs' | 'overworld'>, id: Entity): boolean => {
+  const f = g.overworld ? g.ecs.c.fight.get(id) : undefined;
+  return !!f && !f.engaged && !f.script.unseen;
+};
+
+/** Invisible and not revealed (spec §3E, the Dunwich Horror), or a boss not yet roused: not drawn, locked on to or beheld, though it is there. */
+export const isUnseen = (g: Pick<Game, 'ecs' | 'overworld'>, id: Entity): boolean => (g.ecs.c.unseen.get(id)?.revealed ?? 1) <= 0 || isUnroused(g, id);
 
 /** Not in the world at all: dead, or on a hidden layer that is not shown. It neither acts nor collides, and nothing can touch it. */
 export const isAbsent = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.c.dead.has(id) || g.ecs.c.layer.get(id)?.shown === false;
