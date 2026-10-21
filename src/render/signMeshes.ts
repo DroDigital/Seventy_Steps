@@ -164,14 +164,13 @@ export function elderSignGeometry(side: 1 | -1 = 1): { slab: THREE.BufferGeometr
   return { slab: standingStone(w, w * 0.72, h, d, 0, ROCK, 3), glyph: carved(side, 0.35, d / 2 + 0.025) };
 }
 
-/** A gate's stone frame, its glowing glyph bands, and the veil between its jambs. */
-export function gateGeometry(): { frame: THREE.BufferGeometry; glyphs: THREE.BufferGeometry; veil: THREE.BufferGeometry } {
+/** A gate's stone frame and its glowing glyph bands (the veil between its jambs is render/portalViews.ts's). */
+export function gateGeometry(): { frame: THREE.BufferGeometry; glyphs: THREE.BufferGeometry } {
   const stone = scaleRgb(BASE.seaGrey, 1.6);
   const jamb = (x: number): THREE.BufferGeometry => tileUv(box(0.5, 3.8, 0.5, x, 1.9, 0, stone, 0.5), 0.5, 3.8);
   const frame = mergeGeometries([jamb(-1.9), jamb(1.9), tileUv(box(4.3, 0.5, 0.6, 0, 4.05, 0, stone, 0.5), 4.3, 0.5)]);
   const bands: THREE.BufferGeometry[] = [];
   for (let y = 0.4; y < 3.7; y += 0.6) for (const x of [-1.9, 1.9]) bands.push(box(0.53, 0.08, 0.53, x, y, 0, ANOMALY.purple));
   bands.push(box(4.33, 0.08, 0.63, 0, 4.05, 0, ANOMALY.purple));
-  const veil = box(3.3, 3.8, 0.04, 0, 1.9, 0, scaleRgb(ANOMALY.purple, 0.35));
-  return { frame, glyphs: mergeGeometries(bands), veil };
+  return { frame, glyphs: mergeGeometries(bands) };
 }

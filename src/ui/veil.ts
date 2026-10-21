@@ -21,7 +21,7 @@ const LINE = { y: 97, half: 34, ease: 5 }; // the making's line: its row, half i
 
 export interface Veil {
   /** Draws the dark over the screen; resolves once it covers everything and has been shown. */
-  cover(words?: string, seconds?: number, line?: string): Promise<void>; // `line`: said under the words (else the next lore line: loreLine.ts)
+  cover(words?: string, seconds?: number, line?: string, light?: Light): Promise<void>; // `line`: said under the words (else the next lore line: loreLine.ts); `light`: a gate's journey (round 60): the dark wells up from the middle of the screen behind a ring of that light, wound into a vortex
   /** Draws it back; resolves once it has gone. */
   lift(seconds?: number): Promise<void>;
   /** Covers at once (over a screen that is already dark). */
@@ -33,6 +33,15 @@ export interface Veil {
   readonly fill: number; // the share last shown (0 without a line)
   readonly covered: boolean;
   readonly active: boolean; // any of it showing
+}
+
+/** The light a gate's journey falls in (0..1 a channel): the realm beyond's. */
+export type Light = readonly [number, number, number];
+
+/** A gate's journey (round 60): how far the dark has come out from the middle at a pixel, wound into a vortex that turns with `t` seconds (0 at the middle, 1 at the corners). */
+export function portalReach(u: number, v: number, t: number): number {
+  const r = Math.hypot(u * 1.4, v) / Math.hypot(1.4, 1);
+  return r - 0.08 * Math.sin(Math.atan2(v, u) * 5 + r * 11 - t * 5);
 }
 
 /** Where the ink reaches first: high at the edges and corners, low at the centre, broken into tendrils by noise. */
@@ -118,6 +127,7 @@ export function createVeil(): Veil {
   let running = false;
   let settle: (() => void) | null = null;
   let [made, shownMade, lastAt] = [-1, 0, 0]; // the making's share (-1: no line), as drawn, and the last frame's time
+  let light: Light | null = null; // a gate's journey: the dark wells up from the middle behind a ring of this light
 
   /** The line beneath the name: a dim purple track, lit bone from the middle outwards in a purple glow, its tips glinting. */
   function drawLine(px: Uint8ClampedArray, k: number): void {
@@ -145,7 +155,16 @@ export function createVeil(): Veil {
     const sign = shownAt < 0 ? 0 : Math.min(1, (now - shownAt) / 450) * (0.75 + 0.25 * Math.sin(t * 2.2));
     for (let y = 0, i = 0; y < H; y++) {
       for (let x = 0; x < W; x++, i++) {
-        const v = field[i] + 0.02 * Math.sin(t * 1.3 + phase[i] * 14) + (BAYER[(y & 3) * 4 + (x & 3)] / 16 - 0.5) * 0.05 - line;
+        const dither = (BAYER[(y & 3) * 4 + (x & 3)] / 16 - 0.5) * 0.05;
+        if (light && shownAt < 0) { // a gate's: the light runs out from the middle, the dark between the worlds behind it
+          const o = i * 4;
+          const v = 1.08 - portalReach((x / (W - 1)) * 2 - 1, (y / (H - 1)) * 2 - 1, t) + dither - line;
+          const k = v > 0 ? Math.max(0, 1 - v / 0.22) : v > -FRINGE * 2 ? 0.55 * (1 + v / (FRINGE * 2)) : 0;
+          if (v > 0 || k > 0) [px[o], px[o + 1], px[o + 2], px[o + 3]] = [255 * light[0] * k + (v > 0 ? 6 : 0), 255 * light[1] * k + (v > 0 ? 2 : 0), 255 * light[2] * k + (v > 0 ? 12 : 0), v > 0 ? 255 : 255 * k];
+          else px[o + 3] = 0;
+          continue;
+        }
+        const v = field[i] + 0.02 * Math.sin(t * 1.3 + phase[i] * 14) + dither - line;
         const o = i * 4;
         const g = Math.min(1, glyph[i] * sign * 1.6); // the sign: a bone core in a purple glow
         const k = g * g;
@@ -189,14 +208,16 @@ export function createVeil(): Veil {
   }
 
   return {
-    cover(text = '', secs = 0.9, line) {
+    cover(text = '', secs = 0.9, line, through) {
       haunting = false;
+      light = through ?? null;
       say(text, line);
       [made, shownMade] = [-1, 0];
       return go(1, secs * (1 - coverage));
     },
     lift(secs = 1.2) {
       haunting = false;
+      light = null; // it opens as any journey does, from the middle out
       made = -1;
       return go(0, secs);
     },

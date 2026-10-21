@@ -78,7 +78,7 @@ export function mountBar(g: Game): string | null {
   if (!g.overworld) return t('n.mountOpen');
   if (!mountUnlocked(g)) return t('n.mountQuest');
   if (!mountAvailable(g, p.mount.selected)) return t('n.mountDlc', { name: MOUNTS[p.mount.selected].name.toUpperCase(), free: MOUNTS.grey.name.toUpperCase() });
-  if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0) return t('n.mountStand');
+  if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || p.gatePass || g.reality.stolen > 0) return t('n.mountStand');
   if (g.frame < p.mount.cooldownUntil) return t('n.mountHurt');
   const tr = g.ecs.c.transform.get(p.id)!;
   if (!mountGroundAllowed(g, tr.pos)) return t('n.mountGround');
@@ -131,7 +131,7 @@ export function mountSystem(g: Game): void {
   const p = g.player;
   if (!p.mount.active) return;
   const tr = g.ecs.c.transform.get(p.id)!;
-  if (!mountAvailable(g, p.mount.active) || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || g.reality.stolen > 0 || (g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || !mountGroundAllowed(g, tr.pos)) dismissMount(g);
+  if (!mountAvailable(g, p.mount.active) || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || p.gatePass || g.reality.stolen > 0 || (g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || !mountGroundAllowed(g, tr.pos)) dismissMount(g);
 }
 
 export function registerMounts(g: Game): void {

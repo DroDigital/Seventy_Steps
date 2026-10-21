@@ -28,6 +28,7 @@ import { createEchoFx } from './render/echoFx';
 import { createImpactFx } from './render/impactFx';
 import { createShadows } from './render/shadows';
 import { createSignViews } from './render/signViews';
+import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
@@ -193,6 +194,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
+  const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
   const shadows = createShadows(scene, game);
@@ -302,6 +304,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         hoofFx.update(time);
         echoFx.update(time);
         signs.update(time, camera.position);
+        portals.update(time, camera.position, veil.active);
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
         pipeSmoke.update(camera, time, views.smokers);

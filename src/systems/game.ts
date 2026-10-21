@@ -59,6 +59,7 @@ import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
 import { candleSystem } from './candles';
 import { fogBlockSystem, fogPassSystem } from './fogGates';
+import { gatePassSystem, gateStepSystem } from './gateWalk';
 import { registerOmens } from './omens';
 import { registerDeathNotes } from './deathNotes';
 import { hookSystem } from './hook';
@@ -96,7 +97,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, kneeling: null, falling: null, ask: false, rising: null, fogPass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -201,10 +202,11 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
 export function stepGame(g: Game, input: InputFrame): void {
   const dt = 1 / SIM.hz;
   g.frame++;
-  if (g.player.fogPass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
+  if (g.player.fogPass || g.player.gatePass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
   mountSystem(g);
   playerControl(g, input);
   fogPassSystem(g);
+  gatePassSystem(g); // round 60: a realm's gate walked into
   candleSystem(g);
   weatherSystem(g, dt);
   easeSeaChop(g);
@@ -219,6 +221,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   movementSystem(g, dt);
   fallSystem(g);
   fogBlockSystem(g);
+  gateStepSystem(g);
   demoSystem(g); // the demo's realms kept (round 56)
   meleeSystem(g);
   shotSystem(g);

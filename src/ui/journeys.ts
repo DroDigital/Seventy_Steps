@@ -7,10 +7,14 @@
  * as they stand (playtest round 10); the shaders the world needs are made ready out of sight (`ready`:
  * nothing is drawn while the veil covers all), and the veil lifts, the world moving again as it does.
  * Dying, the veil falls as the investigator does, and the death throes wait for it before the respawn.
+ * Round 60: a gate walked into (systems/gateWalk.ts) is a journey whose veil falls over the walk on into its light, the
+ * world still stepping, in the light of the realm beyond, from the middle of the screen out (veil.ts); the gate's own
+ * `Travelled` then holds it while the far side is made.
  */
 
 import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
+import { LOOKS } from '../data/looks';
 import { WORLD } from '../data/tuning';
 import { gateBarred, gateBeyondDemo, gatePlace, interactable, passGate, signPlace } from '../systems/checkpoints';
 import { demoRefuses } from '../systems/demo';
@@ -40,7 +44,7 @@ export const DYING_MS = 2600; // the fall shows this long before the veil comes 
 
 /** `ready` makes the world ready to be seen before the veil lifts (the shaders it needs, main.ts). */
 export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>): Journeys {
-  let phase: 'idle' | 'covering' | 'dying' | 'holding' | 'readying' = 'idle';
+  let phase: 'idle' | 'covering' | 'entering' | 'dying' | 'holding' | 'readying' = 'idle'; // entering: a gate walked into, the walk still going on under the falling veil
   let since = 0;
   let then: (() => void) | undefined;
   let fallen = false; // the veil has begun to fall on a death
@@ -69,6 +73,15 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     [phase, since, fallen] = ['dying', performance.now(), false];
   });
   g.events.on('Respawned', () => void (phase === 'dying' && hold()));
+  g.events.on('GateEntering', ({ gate, frames }) => {
+    if (phase !== 'idle') return;
+    const twin = gatePlace(gatePlace(gate)?.to ?? '');
+    const look = LOOKS[twin?.region ?? ''] ?? LOOKS.hub;
+    const light = [0, 1, 2].map((k) => Math.min(1, look.grade[3][k] * 0.7 + look.accents[0][k] * 0.3 + 0.08)) as [number, number, number];
+    [phase, least] = ['entering', HOLD_MS[0]];
+    void veil.cover((twin?.name ?? '').toUpperCase(), (frames / 60) * 0.85, undefined, light); // made to close as the walk ends
+  });
+  g.events.on('Travelled', ({ via }) => void (via === 'gate' && phase === 'entering' && hold()));
 
   const self: Journeys = {
     go(words, jump, line) {
@@ -98,6 +111,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     },
     update(pending) {
       const now = performance.now();
+      if (phase === 'entering' && !g.player.gatePass) lift(); // the walk ended and no journey came of it (a fight took hold on the way): the veil draws back
       if (phase === 'dying' && !fallen && now - since > DYING_MS) {
         fallen = true;
         const asked = g.player.ask && candleFor(g, g.ecs.c.transform.get(g.player.id)!.pos) !== null; // a lit candle reaches the fall: the rise menu stands on the veil, with no place's name on it (riseMenu.ts)
