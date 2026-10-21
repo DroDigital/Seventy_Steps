@@ -170,14 +170,14 @@ describe('which scene plays', () => {
   };
 
   it('shows a horror\'s arrival once, however many times it turns on the investigator, and its fall', () => {
-    const g = createGame({ creature: 'hypnos' }) // one that arrives by its size alone;
+    const g = createGame({ creature: 'hypnos' }); // one with an arrival of its own (round 61) and a fall by its size alone
     const { play, cinema } = stub();
     createDirector(g, cinema, () => undefined);
     const [e] = [...g.ecs.c.fight.keys()];
     g.events.emit('BossEngaged', { entity: e, name: 'Hypnos' });
     g.events.emit('BossEngaged', { entity: e, name: 'Hypnos' });
     expect(play).toHaveBeenCalledTimes(1);
-    expect((play.mock.calls[0] as unknown[])[0]).toMatchObject({ id: 'arrival:person' });
+    expect((play.mock.calls[0] as unknown[])[0]).toMatchObject({ id: 'arrival:hypnos' });
     g.events.emit('Vanquished', { entity: e, name: 'Hypnos' });
     expect(play).toHaveBeenCalledTimes(2);
     expect((play.mock.calls[1] as unknown[])[0]).toMatchObject({ id: 'fall:person' });

@@ -6,8 +6,9 @@
  */
 
 import { NOTE_SITES } from '../data/documents';
-import { yawOf } from '../core/geom';
+import { yawOf, type XZ } from '../core/geom';
 import type { HiddenPieceDef, Place } from '../data/arena';
+import type { AirSpec, GroundSpec } from '../data/arenaSets';
 import { DUNGEONS, type Dir } from '../data/dungeons';
 import { REGIONS } from '../data/regions';
 import { DREAM_DESCENT, SITES } from '../data/sites';
@@ -69,7 +70,10 @@ export interface ArenaPlace {
   well: boolean;
   bosses: readonly string[];
   stones: readonly { x: number; z: number; radius: number; height: number }[]; // when its ring is standing stones
-  decor: Prop[]; // its ring of other pieces, its heart and its braziers (arenaDecor.ts; round 13)
+  decor: Prop[]; // its ring of other pieces, its heart and its braziers (arenaDecor.ts; round 13), or its set (arenaSet.ts; round 61)
+  front: XZ; // the unit vector toward its realm's nearest Elder Sign: the way in, where its candle burns (arenaFront.ts)
+  ground?: GroundSpec; // the floor its set lays (arenaGround.ts)
+  air?: AirSpec; // what drifts in it (render/arenaAir.ts)
 }
 
 export interface SpawnPoint {
@@ -114,7 +118,7 @@ export interface WorldLayout {
 }
 
 const EMPTY: ChunkStatics = { colliders: [], pads: [], dungeons: [], spawns: [] };
-const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], arena: [3, 12], dungeon: 12 } as const;
+const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], arena: [8, 14], dungeon: 12 } as const;
 
 function build(): WorldLayout {
   const w: WorldLayout = { signs: [], gates: [], tomes: [], arenas: [], dungeons: [], spawns: [], pads: [], pieces: [], dream: null, errors: [], chunk: () => EMPTY };

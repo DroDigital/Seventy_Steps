@@ -11,6 +11,7 @@ import type { Vec3 } from './tuning';
 export const PROP_KINDS = [
   'tree', 'rock', 'pillar', 'monolith', 'grave', 'ruin', 'pine', 'cross', 'obelisk', 'house', 'wall', 'fence', 'lamp', 'log', 'firepit', 'bush', 'stump', 'altar',
   'spire', 'tower', 'cone', 'pyramid', 'block', 'globe', // the realms' landmarks (round 12; render/landmarkShapes.ts)
+  'set', // a piece of an arena's set (round 61: a baked model, data/models + render/modelKit.ts, or a built one, render/setShapes.ts): never scattered or planned, only placed
 ] as const;
 export type PropKind = (typeof PROP_KINDS)[number];
 

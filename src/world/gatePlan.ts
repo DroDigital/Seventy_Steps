@@ -94,9 +94,8 @@ export function gatePlan(w: WorldLayout): GatePlan {
   w.arenas.forEach((a, i) => {
     const bosses = [...a.bosses];
     const radius = a.radius + FOG.ring;
-    const sign = w.signs.filter((s) => s.region === a.region).sort((p, q) => Math.hypot(p.x - a.x, p.z - a.z) - Math.hypot(q.x - a.x, q.z - a.z))[0] ?? w.signs[0]; // toward the nearest Elder Sign of its realm: the way a person comes
-    const [sx, sz] = sign ? [sign.x - a.x, sign.z - a.z] : [0, -1];
-    const sl = Math.hypot(sx, sz) || 1;
+    const [sx, sz] = [a.front.x, a.front.z]; // toward the nearest Elder Sign of its realm: the way a person comes (arenaFront.ts)
+    const sl = 1;
     const reach = radius + FOG.ringStake;
     const stake = { x: a.x + (sx / sl) * reach, z: a.z + (sz / sl) * reach, yaw: Math.atan2(-sx, -sz) };
     fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake });

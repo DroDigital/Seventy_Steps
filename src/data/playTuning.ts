@@ -81,14 +81,13 @@ export const SETTINGS = {
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
-  // The sound's levels (round 60: a player found the game sounded far better at half the volume, the music, the ambience and the voices, the effects
-  // full, and asked for a mix within a tenth of that: the ambience a step under, as a bed that never stops masks the steps, the calls and the speech
-  // most, and the voices a step over, so a line stays clear over blows with the effects full; 0.7 and all four at 1 before)
-  volume: [0, 1, 0.05, 0.5], // everything
-  music: [0, 1, 0.05, 0.5], // the title's theme, the realms' tracks and the boss scores (round 12)
+  // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
+  // player had found, and before it the volume was 0.7 and the others 1)
+  volume: [0, 1, 0.05, 1], // everything
+  music: [0, 1, 0.05, 1], // the title's theme, the realms' tracks and the boss scores (round 12)
   sfx: [0, 1, 0.05, 1], // blows, steps, the world's sounds
-  ambience: [0, 1, 0.05, 0.45], // the drones and the recorded ambience
-  speech: [0, 1, 0.05, 0.55], // the people's and the horrors' spoken lines (the voices)
+  ambience: [0, 1, 0.05, 1], // the drones and the recorded ambience
+  speech: [0, 1, 0.05, 1], // the people's and the horrors' spoken lines (the voices)
   language: [0, LANGS.length - 1, 1, 0], // its place in data/lang (round 46); a first launch takes the browser's
 } satisfies Record<string, readonly [number, number, number, number]>;
 

@@ -10,6 +10,7 @@ import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
 import { seaChopNow } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
+import { createArenaAir } from './arenaAir';
 import { createBeacons } from './beacons';
 import type { Beams } from './beams';
 import type { GroundFx } from './groundFx';
@@ -76,6 +77,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
   const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
+  const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -91,6 +93,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       LIGHT_NERVES.madness = madnessOf(g.mind.sanity); // the flames waver harder in a failing mind's world
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
+      air.update(camera, time, !outside);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);

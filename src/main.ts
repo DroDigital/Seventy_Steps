@@ -70,6 +70,7 @@ import { createDemoEnd } from './ui/demoEnd';
 import { createHud } from './ui/hud';
 import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
+import { loadModels } from './render/modelKit';
 import { nextFrame, spriteAtlas } from './ui/loading';
 import { installGameEvidence } from './ui/gameEvidence';
 import { installFxLab } from './ui/fxLab';
@@ -181,6 +182,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);
   const views = createActorViews(scene, game);
+  await loadModels(); // the arenas' models, read before the world is built about them
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
   const fights = createFightViews(scene, game);
   const fxController = createFxController(game);

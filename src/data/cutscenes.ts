@@ -11,7 +11,7 @@ import type { StingerId } from './sounds';
 
 export type Subject = 'target' | 'player' | 'sign'; // the horror, the investigator, the Elder Sign the scene is at
 export type Ease = 'linear' | 'in' | 'out' | 'inout' | 'glide'; // glide: slow out of rest and slow into it, with no jolt at either end
-export type Tint = 'black' | 'white' | 'red' | 'violet' | 'gold' | 'clear'; // what the screen goes to; clear lifts it
+export type Tint = 'black' | 'white' | 'red' | 'violet' | 'gold' | 'green' | 'cold' | 'clear'; // what the screen goes to (round 61: a sickly green, a pale frost); clear lifts it
 
 /** A camera that stands `dist` from `on` at `yaw` from the line between it and the other party (0 between them, 180 behind `on`), and looks. Pairs run from the shot's first frame to its last. */
 export interface Shot {
@@ -29,6 +29,9 @@ export interface Shot {
   sway?: number; // hand-held drift, 0..1
 }
 
+/** What a beat lets loose about someone (render/cinemaBursts.ts); round 61 added frost, brine, spores, smoke, runes, notes and eyes, for the entrances of the horrors that had none of their own. */
+export type BurstKind = 'ash' | 'motes' | 'embers' | 'stars' | 'frost' | 'brine' | 'spores' | 'smoke' | 'runes' | 'notes' | 'eyes';
+
 /** A moment: whatever is set here happens together. */
 export interface Beat {
   at: number; // seconds into the scene
@@ -41,7 +44,7 @@ export interface Beat {
   set?: SampleSetId; // a recording, heard whole
   gain?: number;
   pitch?: number;
-  burst?: { kind: 'ash' | 'motes' | 'embers' | 'stars'; on: Subject; count: number };
+  burst?: { kind: BurstKind; on: Subject; count: number };
   shake?: number; // the camera trembles this hard (metres) for `hold` seconds
   rise?: number; // the investigator gets up from the knee, over this many seconds (0: as fast as they would in play)
   kneel?: boolean; // the investigator goes down on one knee before the Elder Sign the scene is at; the scene's end has them up again (round 55: the herald's)

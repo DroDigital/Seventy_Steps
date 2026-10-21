@@ -97,13 +97,13 @@ a blow a good deal, a bell hardly at all. The recorded sets are drawn by take an
   They were each cut to one peak, so a set's takes could differ by up to 13 dB in loudness (a boom, a rattle, a beast, the
   investigator's own stab); `data/takeTrim.ts` brings each take to its set's mean (a boost of at most 6 dB, a cut of at most 12, never
   over −0.5 dBFS), and the set's gain keeps the level it was tuned to. Run the tool again when a file is added or changed.
-- **The settings' mix** (round 60; `SETTINGS` in `data/playTuning.ts`): a player found the game sounded far better at half the
-  volume, the music, the ambience and the voices, with the effects full, and asked for the best mix within a tenth of that. The
-  sliders are linear gains, so each step at a half is about 0.8 dB: volume 0.5, music 0.5, effects 1, ambience **0.45** (a step under:
-  a bed that never stops masks the steps, the calls and the speech most) and voices **0.55** (a step over: with the effects full, a line
-  stays clear over the blows). Against the levels asked, the voices gain 1.7 dB on the ambience (the spoken lines, about 10 dB over
-  the bed at equal levels, are about 11.7 over it) and stand 5.2 dB under the effects' slider, not 6. The defaults before were 0.7 and four at 1; a level a save of settings kept at one of those goes to the new
-  mix once (`ui/settings.ts`, version 18), and a level chosen is kept.
+- **The settings' mix** (`SETTINGS` in `data/playTuning.ts`): round 60 set the sliders to the best mix a player found within a tenth of half the
+  volume, the music, the ambience and the voices, with the effects full (volume 0.5, music 0.5, effects 1, ambience 0.45, voices 0.55; the
+  defaults before were 0.7 and four at 1). **Round 61 (asked, with a picture of Settings › Sound): all five sliders default to 100%.** The
+  sliders are linear gains and the master multiplies each class's, so against round 60's defaults the effects are 6 dB louder, the voices 11.2,
+  the music 12 and the ambience 13: the balance among the classes is that of the sliders at their ends (the effects the quietest of them, as
+  they were before round 60), not of round 60's choice of them; a player who wants that mix has only to set the sliders to it. A level a
+  save of settings kept at a default of either earlier time goes to the new one once (`ui/settings.ts`, version 19), and a level chosen is kept.
 
 ## Sound and motion
 
