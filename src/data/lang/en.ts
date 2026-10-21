@@ -281,6 +281,7 @@ export const EN = {
   'hint.insight': 'Insight is what the mind has learned. It opens what is hidden, and it is spent: at an Elder Sign it buys Resolve and Draughts.',
   'hint.passage': 'That wall was not a wall to a mind like yours. Insight shows doorways and bridges the unlearned cannot see; the glowing frame is one. Go through: something lies beyond.',
   'hint.passageCost': 'Insight spent is gone, and a passage it held open is a wall again. At an Elder Sign the menu names what a purchase would shut before you pay.',
+  'hint.lore': 'Insight beyond what the hidden passages want and the Mind\'s upgrades cost has no other use. At an Elder Sign, under Level up, it can be offered for Echoes.',
   'hint.relic': 'A relic: a gift with a price. Two are worn at a time and the rest are kept. Rest at an Elder Sign and open its Relics tab to choose.',
   'hint.transfer': 'A weapon found late can take the cane\'s reinforcement: at an Elder Sign, under Arms, Move reinforcement. Nothing is lost, but each level moved costs Echoes; star-stones set into the weapon itself cost none.',
   'hint.gun': '{shoot} fires the revolver: six rounds, and the spare ones you carry. {reload} loads it. It strikes hard up close and little from afar, and misses small things at range. Rounds lie in boxes about the dream and are sold by merchants.',

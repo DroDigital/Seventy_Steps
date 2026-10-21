@@ -204,6 +204,13 @@ export const UPGRADES: Record<'resolve' | 'draught', { cost: number; max: number
 };
 export type UpgradeId = keyof typeof UPGRADES;
 
+/**
+ * Insight no upgrade or passage asks for (round 61: a whole run brings some 170 of it, the Mind's upgrades cost 14 and no hidden passage
+ * wants more than 3): what is held beyond that can be offered at an Elder Sign for Echoes, this many for each point; `hintAt` points of it
+ * is when the Field Guide says so (systems/insight.ts `surplusInsight`).
+ */
+export const LORE = { echoes: 200, hintAt: 5 };
+
 /** Hallucinations (spec §3A, Unmoored only). Times in frames. */
 export const HALLUCINATIONS = {
   max: 3, // at once

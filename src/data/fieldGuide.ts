@@ -34,6 +34,7 @@ export const GUIDE: Readonly<Record<HintId, { group: GuideGroup; title: string }
   insight: g(MIND, 'Insight'),
   passage: g(MIND, 'Hidden passages'),
   passageCost: g(MIND, 'What insight costs'),
+  lore: g(MIND, 'Insight to spare'),
   lead: g(DREAM, 'Where the story leads'),
   sign: g(DREAM, 'Elder Signs'),
   echoes: g(DREAM, 'Echoes'),

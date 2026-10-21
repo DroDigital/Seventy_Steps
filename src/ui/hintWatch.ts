@@ -2,16 +2,18 @@
  * What to tell a new investigator before it costs them (round 46, the first hour): hints that wait to be struck, or to fall, came
  * too late for the things a first fight, a first empty breath and a first horror's mist teach hardest. These are looked at a
  * couple of times a second: a foe closing in, the breath gone, a wall of fog near, a person to talk to, a doorway that only insight
- * shows, a relic found, a weapon found late beside a reinforced one. Pure: the game is read,
+ * shows, a relic found, a weapon found late beside a reinforced one, insight to spare. Pure: the game is read,
  * nothing is changed (ui/hints.ts raises the ones not yet shown).
  */
 
 import { distXZ } from '../core/geom';
 import { fogNear } from '../systems/fogGates';
 import { isAbsent, type Game } from '../systems/components';
+import { LORE } from '../data/tuning';
+import { surplusInsight } from '../systems/insight';
 import { owned } from '../systems/relics';
 
-export type Watched = 'fight' | 'breath' | 'fog' | 'talk' | 'passage' | 'relic' | 'transfer';
+export type Watched = 'fight' | 'breath' | 'fog' | 'talk' | 'passage' | 'relic' | 'transfer' | 'lore';
 
 const NEAR = { foe: 32, fog: 14, person: 7, passage: 10 }; // metres
 
@@ -51,5 +53,6 @@ export function watch(g: Game): Watched[] {
   if (nearPassage(g, me)) out.push('passage');
   if (g.overworld && owned(g).length) out.push('relic');
   if (g.player.arms.length > 1 && Object.values(g.player.reinforced).some((n) => n > 0)) out.push('transfer');
+  if (surplusInsight(g) >= LORE.hintAt) out.push('lore'); // insight with no other use: it can be offered for Echoes (round 61)
   return out;
 }

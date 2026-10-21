@@ -47,7 +47,7 @@ export interface GameEvents {
   LockChanged: { target: Entity | null };
   SanityBandChanged: { from: Band; to: Band; sanity: number };
   SanityLost: { amount: number; sanity: number }; // a loss of at least SANITY.jolt at once (a blow, a sight, a burst), not a slow drain
-  InsightChanged: { insight: number; change: number; cause: 'sight' | 'tome' | 'upgrade' | 'debug' | 'load' | 'quest'; source: string };
+  InsightChanged: { insight: number; change: number; cause: 'sight' | 'tome' | 'upgrade' | 'debug' | 'load' | 'quest' | 'sale'; source: string };
   FirstSight: { entity: Entity; name: string; sanity: number; insight: number }; // sanity lost, insight gained
   Discovered: { sign: string; name: string }; // an Elder Sign found
   PlaceFound: { id: string; name: string; region: string; found: number; of: number }; // a named place first stepped into, and how many of its region's are found (places.ts; round 18)
