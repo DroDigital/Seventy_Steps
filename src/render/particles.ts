@@ -13,9 +13,10 @@ import type { Rgb } from './palette';
 import { LANTERN_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
-const CAPACITY = 2400;
+export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a crowd took the oldest away mid-flight)
 
-export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp'] as const;
+/** Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
+export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
 
 export interface ParticleSpec {
@@ -40,6 +41,8 @@ export interface ParticleSpec {
   stretch?: number; // a streak's length, in sizes per m/s of its speed (default 0.12), at least one size
   hold?: number; // the share of its life it keeps its full alpha before it fades (default 0)
   thick?: number; // a ring's thickness, a share of its radius (default 0.18)
+  floor?: number; // the height of the ground under it: it lands there, bounces a little and comes to rest, not falling through (round 60)
+  bounce?: number; // the share of its fall it keeps as it springs up again (default 0.3)
 }
 
 export interface Particles {
@@ -125,6 +128,48 @@ float mask(vec2 q) {
   }
   if (shape == 4) return 1.0 - smoothstep(0.55, 1.0, sqrt(abs(q.x)) + sqrt(abs(q.y))); // a four-point spark
   if (shape == 5) return exp(-3.2 * dot(q, q)); // a soft wisp
+  if (shape == 6) { // a rune: a ring, a stave and a chevron through it
+    float ring = 1.0 - smoothstep(0.07, 0.13, abs(r - 0.8));
+    float stave = (1.0 - smoothstep(0.06, 0.11, abs(q.x))) * step(abs(q.y), 0.62);
+    float chev = (1.0 - smoothstep(0.05, 0.1, abs(q.y - 0.18 - abs(q.x) * 0.7))) * step(abs(q.x), 0.48);
+    return max(ring, max(stave, chev));
+  }
+  if (shape == 7) { // an eye: an almond with a slit for its pupil
+    float w = 0.52 * (1.0 - q.x * q.x);
+    float almond = 1.0 - smoothstep(w * 0.7, w + 0.001, abs(q.y));
+    float slit = (1.0 - smoothstep(0.05, 0.1, abs(q.x))) * step(abs(q.y), w * 0.85);
+    return almond * (1.0 - slit) * step(abs(q.x), 0.98);
+  }
+  if (shape == 8) { // a fang, a claw's crescent
+    float outer = 1.0 - smoothstep(0.82, 0.95, r);
+    float inner = 1.0 - smoothstep(0.7, 0.82, length(q - vec2(0.32, 0.26)));
+    return outer * (1.0 - inner);
+  }
+  if (shape == 9) { // a bubble: a thin skin, a faint body and a bright fleck of light
+    float skin = 1.0 - smoothstep(0.05, 0.12, abs(r - 0.84));
+    float fleck = exp(-34.0 * dot(q - vec2(-0.34, 0.36), q - vec2(-0.34, 0.36)));
+    return max(max(skin, fleck), 0.18 * (1.0 - smoothstep(0.7, 0.86, r)));
+  }
+  if (shape == 10) { // a forked bolt along its length
+    float zig = (abs(fract(q.x * 1.75 + 0.25) - 0.5) * 2.0 - 0.5) * 0.42;
+    float fork = (1.0 - smoothstep(0.04, 0.09, abs(q.y + zig * 0.6 + (q.x - 0.15) * 0.55))) * step(0.15, q.x);
+    return max(1.0 - smoothstep(0.05, 0.11, abs(q.y - zig)), fork * 0.8) * (1.0 - smoothstep(0.82, 1.0, abs(q.x)));
+  }
+  if (shape == 11) { // a feather: a vane parted by its shaft, its barbs in stripes
+    float w = 0.34 * (1.0 - q.x * q.x);
+    float vane = (1.0 - smoothstep(w * 0.6, w + 0.001, abs(q.y))) * smoothstep(0.015, 0.05, abs(q.y));
+    return vane * (0.72 + 0.28 * sin(q.x * 26.0 + abs(q.y) * 18.0)) * step(abs(q.x), 0.98);
+  }
+  if (shape == 12) { // a petal, a teardrop
+    vec2 pq = vec2(q.x, q.y * 1.55);
+    return 1.0 - smoothstep(0.55 - 0.28 * q.x, 0.72 - 0.28 * q.x, length(pq));
+  }
+  if (shape == 13) { // a note: its head, its stem, its flag
+    float head = 1.0 - smoothstep(0.24, 0.32, length(vec2(q.x + 0.28, (q.y + 0.48) * 1.45)));
+    float stem = (1.0 - smoothstep(0.05, 0.09, abs(q.x + 0.02))) * step(-0.5, q.y) * step(q.y, 0.78);
+    float flag = (1.0 - smoothstep(0.06, 0.11, abs(q.y - 0.66 + q.x * 0.75))) * step(0.0, q.x) * step(q.x, 0.46);
+    return max(head, max(stem, flag));
+  }
   return 1.0 - smoothstep(0.35, 1.0, r); // a disc
 }
 void main() {
@@ -136,6 +181,18 @@ void main() {
 `;
 
 type Live = Required<Omit<ParticleSpec, 'colorEnd' | 'shape'>> & { colorEnd: Rgb | null; shape: number; age: number };
+
+/** A falling particle meets its ground: it springs up a little, skids, and once its spring is spent lies still. */
+export function land(p: Pick<Live, 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz' | 'floor' | 'bounce' | 'gravity' | 'drag' | 'spin' | 'rot' | 'age'>): void {
+  p.y = p.floor;
+  if (p.vy >= 0) return;
+  p.vy = -p.vy * p.bounce;
+  p.vx *= 0.55;
+  p.vz *= 0.55;
+  if (p.vy > 0.6) return;
+  [p.vx, p.vy, p.vz, p.gravity, p.drag] = [p.vx * 0.3, 0, p.vz * 0.3, 0, Math.max(p.drag, 6)]; // at rest
+  [p.rot, p.spin] = [p.rot + p.spin * p.age, 0];
+}
 
 export function createParticles(scene: THREE.Scene): Particles {
   const geo = new THREE.PlaneGeometry(1, 1);
@@ -162,7 +219,7 @@ export function createParticles(scene: THREE.Scene): Particles {
       if (live.length >= CAPACITY) live.shift();
       const { shape, colorEnd, ...rest } = p;
       live.push({
-        vx: 0, vy: 0, vz: 0, grow: 1, alpha: 1, glow: false, gravity: 0, drag: 0, spin: 0, rot: 0, stretch: 0.12, hold: 0, thick: 0.18,
+        vx: 0, vy: 0, vz: 0, grow: 1, alpha: 1, glow: false, gravity: 0, drag: 0, spin: 0, rot: 0, stretch: 0.12, hold: 0, thick: 0.18, floor: -Infinity, bounce: 0.3,
         ...rest, shape: shape ? PARTICLE_SHAPES.indexOf(shape) : 0, colorEnd: colorEnd ?? null, age: 0,
       });
     },
@@ -181,6 +238,7 @@ export function createParticles(scene: THREE.Scene): Particles {
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         p.z += p.vz * dt;
+        if (p.y < p.floor) land(p);
         const t = p.age / p.life;
         const size = p.size * (1 + (p.grow - 1) * t);
         batch.setMatrixAt(n, m4.makeScale(size, size, size).setPosition(p.x, p.y, p.z));

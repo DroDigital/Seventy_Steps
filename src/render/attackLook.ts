@@ -9,6 +9,7 @@
 import type { Entity } from '../core/ecs';
 import type { Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
+import { SIGNATURES, type Signature } from '../data/attackSignatures';
 import { BOSS_ATTACK_THEME, type AttackTheme } from '../data/bossAttackTheme';
 import { getEntity } from '../data/registry';
 import type { CreaturePalette } from '../data/schema';
@@ -33,6 +34,8 @@ export interface AttackLook {
   punch: number; // 0.85..1.2: how much matter its bursts throw, so two horrors of one element are not one
   twist: number; // 0.6..1.5: how fast that matter tumbles
   pitch: number; // 0.92..1.08: its sounds' pitch
+  sig: Signature | null; // its own layer over the element (round 60: data/attackSignatures.ts, render/fxForms.ts)
+  accent: Rgb; // the light that layer is drawn in (lifted)
 }
 
 const clamp1 = (c: Rgb): Rgb => [Math.min(1, c[0]), Math.min(1, c[1]), Math.min(1, c[2])];
@@ -68,11 +71,22 @@ function temper(id: string | undefined): Pick<AttackLook, 'punch' | 'twist' | 'p
   return { punch: id ? 0.85 + 0.35 * at(0) : 1, twist: id ? 0.6 + 0.9 * at(8) : 1, pitch: id ? 0.92 + 0.16 * at(16) : 1 };
 }
 
-function build(id: string | undefined, theme: AttackTheme): AttackLook {
-  const themed = !!id && theme !== DEFAULT_ATTACK_THEME;
+const rgbOf = (hex: number): Rgb => [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+
+/** A common foe's colours, from its signature's accent and its hide (round 60: every one of them was the shared magenta and green). */
+function foeTheme(accent: Rgb, id: string): AttackTheme {
+  const hide = CREATURE_COLORS[paletteOf(id)];
+  return { danger: mixRgb(accent, hide.mid, 0.3), line: mixRgb(accent, hide.light, 0.3), ring: mixRgb(hide.light, accent, 0.3), mind: [accent[1], accent[2], accent[0]] };
+}
+
+function build(id: string | undefined, given: AttackTheme): AttackLook {
+  const themed = !!id && given !== DEFAULT_ATTACK_THEME;
   const plain = !themed && !!id && !!getEntity(id);
+  const sig = (id && SIGNATURES[id]) || null;
+  const accent = lift(sig ? rgbOf(sig.accent) : given.line, LIGHT_FLOOR);
+  const theme = plain && sig ? foeTheme(accent, id) : given;
   const danger = lift(theme.danger, DANGER_FLOOR);
-  const line = lift(plain ? mixRgb(CREATURE_COLORS[paletteOf(id)].light, BASE.bone, 0.45) : theme.line, LIGHT_FLOOR);
+  const line = lift(plain && !sig ? mixRgb(CREATURE_COLORS[paletteOf(id)].light, BASE.bone, 0.45) : theme.line, LIGHT_FLOOR);
   return {
     motif: themed ? aoeLook(id).name : plain ? MADE_OF[paletteOf(id)] : 'plain',
     danger,
@@ -81,8 +95,10 @@ function build(id: string | undefined, theme: AttackTheme): AttackLook {
     mind: lift(theme.mind, DANGER_FLOOR),
     core: mixRgb(line, [1, 1, 1], 0.7),
     ember: scaleRgb(mixRgb(danger, BASE.charcoal, 0.4), 0.5),
-    ink: theme.danger,
+    ink: plain && sig ? mixRgb(accent, CREATURE_COLORS[paletteOf(id)].dark, 0.75) : theme.danger,
     ...temper(id),
+    sig,
+    accent,
   };
 }
 

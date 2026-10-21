@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { createParticles, PARTICLE_SHAPES } from '../src/render/particles';
+import { CAPACITY, createParticles, PARTICLE_SHAPES } from '../src/render/particles';
 
 function rig() {
   const scene = new THREE.Scene();
@@ -59,10 +59,10 @@ describe('particles v2 (round 51)', () => {
 
   it('keeps to its capacity, dropping the oldest', () => {
     const { fx, batch, camera } = rig();
-    for (let i = 0; i < 2600; i++) fx.spawn({ ...base, x: i, life: 5 });
+    for (let i = 0; i < CAPACITY + 200; i++) fx.spawn({ ...base, x: i, life: 5 });
     fx.update(0, camera);
     fx.update(0.01, camera);
-    expect(batch.count).toBe(2400);
+    expect(batch.count).toBe(CAPACITY);
     expect(batch.instanceMatrix.array[12]!).toBeGreaterThanOrEqual(200); // the first 200 are gone
   });
 });
