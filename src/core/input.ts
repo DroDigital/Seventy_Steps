@@ -219,9 +219,16 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
   });
   canvas.style.cursor = 'none'; // the world has no pointer; the menus draw their own (ui/cursor.ts)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+  let settleUntil = 0; // when a mouse just granted has settled (INPUT.lockSettleMs)
+  document.addEventListener('pointerlockchange', () => {
+    if (!captured()) return;
+    settleUntil = performance.now() + INPUT.lockSettleMs; // (round 60: opening the map lets the mouse go, closing it takes it again, and the first movement the browser reports with it can be the cursor's jump to the middle: the camera turned to another view)
+    mouseX = mouseY = flick = 0;
+  });
   addEventListener('mousemove', (e) => {
     reconcile(e);
     if (!captured() && !free()) return; // (not captured, and the game in play: the mouse looks about all the same, till a key or a click takes it)
+    if (performance.now() < settleUntil) return;
     mouseX += e.movementX;
     mouseY += e.movementY;
   });

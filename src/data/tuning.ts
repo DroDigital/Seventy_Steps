@@ -245,6 +245,7 @@ export const CAMERA = {
 export const INPUT = {
   deadzone: 0.2, // gamepad sticks
   mouseSensitivity: 0.0025, // rad per pixel
+  lockSettleMs: 250, // milliseconds after the browser grants the mouse in which its movement is not read (round 60: the first movement reported with a fresh lock can be the cursor's jump to the middle, which turned the camera to another view)
   stickLookSpeed: 3.2, // rad/s at full deflection
   keyLookSpeed: 2.4, // rad/s (arrow keys)
   flickPixels: 60, // mouse flick that switches lock target
