@@ -13,6 +13,7 @@ import { propCollider } from '../src/world/props';
 import { setPieces } from '../src/render/setShapes';
 import { createRng } from '../src/core/rng';
 import { propAt } from '../src/world/props';
+import { padDistance } from '../src/world/sitePads';
 import { ringOf } from './worldHelpers';
 
 const inside = (c: Collider, x: number, z: number): boolean => {
@@ -38,6 +39,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
 
   it('is closed all the way round but for its gate: no body finds another way in, from any angle', () => {
     for (const a of arenas) {
+      if (a.house!.kind !== 'ring') continue; // (a wall of any other outline is proved by a flood over every place: tests/enclosure.test.ts)
       const plan = ringOf(a);
       const cols = plan.props.map(propCollider).filter((c): c is Collider => !!c);
       const gateAt = Math.atan2(a.front.z, a.front.x);
@@ -61,7 +63,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
       expect(along * 2).toBeCloseTo(d.width + HOUSE.lap * 2, 5);
       expect(across * 2).toBeCloseTo(d.thick, 5);
       expect(seal[5] - seal[4]).toBeGreaterThanOrEqual(d.height);
-      const cols = plan.props.map(propCollider).filter((c): c is Collider => !!c);
+      const cols = plan.props.map(propCollider).filter((c): c is Collider => !!c && (c.kind === 'box' ? c.min.y : c.y0) < d.height); // (a gatehouse's span stands over the opening, clear above any body)
       for (let s = -d.width / 2 + HOUSE.lap + 0.1; s <= d.width / 2 - HOUSE.lap - 0.1; s += 0.4) {
         const [x, z] = [plan.gate.x + (d.alongX ? s : 0), plan.gate.z + (d.alongX ? 0 : s)];
         expect(cols.some((c) => inside(c, x, z)), `${a.bosses[0]}: a piece in the gate`).toBe(false);
@@ -98,9 +100,9 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
 
   it('takes its ground level a way past its wall', () => {
     for (const a of arenas) {
-      const pad = worldLayout().pads.find((p) => p.kind === 'circle' && Math.hypot(p.x - a.x, p.z - a.z) < 0.1 && p.radius > a.radius + 10);
+      const pad = worldLayout().pads.find((p) => p.level === a.y && padDistance(p, a.x, a.z) < -(a.radius + 10));
       expect(pad, a.bosses[0]).toBeTruthy();
-      expect(pad!.kind === 'circle' && pad!.radius, a.bosses[0]).toBeGreaterThanOrEqual(ringOf(a).radius + HOUSE.level - 0.01);
+      for (const p of a.house!.props) expect(padDistance(pad!, p.x, p.z), `${a.bosses[0]}: ${p.set?.id}`).toBeLessThanOrEqual(-HOUSE.level + 0.01);
     }
   });
 

@@ -7,7 +7,7 @@
  * Pure: no Three.js.
  */
 
-import type { XZ } from '../core/geom';
+import type { V3, XZ } from '../core/geom';
 import type { HiddenPieceDef } from '../data/arena';
 import { HOUSE } from '../data/arenaHouses';
 import type { Prop } from './props';
@@ -22,6 +22,15 @@ export interface Spot extends XZ {
 /** Where the fallen wake (world/gatePlan.ts): the ring's fog stands `ring` metres past the fight's radius, the stake `past` metres beyond it, and never nearer the wall than `wall`. */
 export const STAKE = { ring: 1.5, past: 9, wall: 7.5 } as const;
 
+/** Where an enclosure is to stand: the fight's centre and ring, the level of its ground, and the way its gate faces. */
+export interface EnclosureSite {
+  x: number;
+  z: number;
+  y: number;
+  radius: number; // the ring of the fight
+  front: XZ;
+}
+
 export interface Enclosure {
   readonly kind: string; // 'ring'
   readonly gate: XZ; // where the gate stands, at the wall's middle
@@ -30,6 +39,7 @@ export interface Enclosure {
   readonly props: Prop[]; // the wall, its towers
   readonly piece: HiddenPieceDef; // the gate
   readonly stake: Spot; // where the fallen wake, inside the wall and in front of the fog
+  readonly rods?: readonly V3[]; // the tips of its lightning rods, where a bolt falls (render/rodFx.ts)
   /** Metres from a point to the wall's middle line: negative within, 0 on the wall. */
   gap(p: XZ): number;
   /** The level ground the enclosure asks of the land: its wall and `HOUSE.level` metres beyond, at `level`, fading out over `blend`. */

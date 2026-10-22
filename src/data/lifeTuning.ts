@@ -60,6 +60,15 @@ export const LIGHTNING = {
   delay: [0.6, 3.2] as const, // seconds before the thunder: the farther the strike, the later and quieter
 };
 
+/** The lightning rods of a walled court (round 67; render/rodFx.ts): a bolt leaps to a rod on its own, whatever the sky, while the investigator is near and not in the fight. */
+export const ROD = {
+  near: 130, // metres from the camera to a rod within which its bolts fall (they are not seen beyond the haze)
+  every: [6, 8] as const, // seconds between bolts at one court
+  keepEvery: 3, // every third bolt falls on the keep's rod, the others on the gatehouse's
+  far: 0.1, // how far (0..1) the sky counts the strike: its flash is nearly the whole of a near one, and the thunder follows within a second
+  quiet: 5, // metres past the fight's ring within which there is no flash: the fight's picture is not lit by the court's weather
+} as const;
+
 /**
  * A strike that falls on the ground (round 52; systems/skyStrikes.ts): now and then in a thunderstorm a spot near the investigator
  * (sometimes near a foe) is marked by a ring of crackling light, and a bolt falls on it a moment after. It hurts whoever stands in it,

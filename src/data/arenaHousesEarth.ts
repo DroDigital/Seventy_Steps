@@ -38,9 +38,10 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
     tower: { kind: 'spire', every: 9, height: 8 }, gate: { width: 7, height: 5.5, flank: 9 },
   }),
   edward_hutchinson: house({
-    name: 'THE PAWTUXET MANOR', line: 'A garden wall of old brick, and a gatehouse with a rod on it that has drawn the lightning for a hundred years.',
-    wall: 'ashlar', height: 6.5, thick: 2.6, tint: [0.55, 0.38, 0.34], glow: 'purple',
-    tower: { kind: 'square', every: 8, height: 10, lit: true }, gate: { width: 8, height: 6, flank: 14 },
+    name: 'THE KEEP ON THE ROAD', line: 'A curtain of old stone, a donjon behind it, and a gatehouse with a rod on it that has drawn the lightning for a hundred years.',
+    wall: 'ashlar', height: 9, thick: 2.8, tint: [0.5, 0.42, 0.38], glow: 'purple',
+    tower: { kind: 'round', every: 7, height: 12, lit: true }, gate: { width: 8, height: 6, flank: 12 },
+    bailey: { ahead: 18, side: 16, behind: 16, keep: { width: 30, depth: 16, height: 30, rod: 12 }, gatehouse: { height: 14, rod: 9 } },
   }),
   colossus_pyramids: house({
     name: 'THE TEMENOS OF THE SPHINX', line: 'A wall as thick as a street is wide, and the pylons of a door that was not made for men.',

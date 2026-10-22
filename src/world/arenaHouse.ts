@@ -8,38 +8,14 @@
  */
 
 import type { XZ } from '../core/geom';
-import type { HiddenPieceDef } from '../data/arena';
 import { HOUSE, type House } from '../data/arenaHouses';
-import { STAKE, type RingEnclosure } from './enclosure';
-import type { Prop, SetLook } from './props';
+import { STAKE, type EnclosureSite, type RingEnclosure } from './enclosure';
+import { gatePiece, tower, towerHalf, wall } from './houseParts';
+import type { Prop } from './props';
 import { chunkOf, regionAt, walkableChunk } from './worldMap';
 
-interface Site {
-  x: number;
-  z: number;
-  y: number;
-  radius: number; // the ring of the fight
-  front: XZ;
-}
-
-/** The half breadth of a tower at its foot. */
-const towerHalf = (h: House): number => Math.max(2.2, h.thick * 0.6 + 0.8) + 0.2; // (and a little over, for the ring curves away from a tower's edge)
-
-/** The wall's piece at angle `th` about the site: its middle on the ring, its length along the ring, so turned. */
-function segment(h: House, s: Site, P: number, th: number, len: number, seed: number): Prop {
-  const look: SetLook = { id: `house_${h.wall}`, scale: 1, tint: h.tint, glow: h.glow, round: false };
-  return { kind: 'set', x: s.x + Math.cos(th) * P, y: s.y, z: s.z + Math.sin(th) * P, w: len / 2, d: h.thick / 2, h: h.height, yaw: Math.atan2(-Math.cos(th), -Math.sin(th)), seed, set: look };
-}
-
-function tower(h: House, s: Site, P: number, th: number, height: number, seed: number, lit: boolean | undefined): Prop {
-  const half = towerHalf(h);
-  const round = h.tower.kind !== 'square';
-  const look: SetLook = { id: `house_tower_${h.tower.kind}`, scale: 1, tint: h.tint, glow: h.glow, round, ...(lit && { lit: 'fire' as const }) };
-  return { kind: 'set', x: s.x + Math.cos(th) * P, y: s.y, z: s.z + Math.sin(th) * P, w: half, d: half, h: height, yaw: Math.atan2(-Math.cos(th), -Math.sin(th)), seed, set: look };
-}
-
 /** A house about the arena at `site`, its gate at the site's front: the ring kind of enclosure. */
-export function planHouse(h: House, boss: string, s: Site): RingEnclosure {
+export function planHouse(h: House, boss: string, s: EnclosureSite): RingEnclosure {
   const P = s.radius + (h.reach ?? HOUSE.reach);
   const gateAt = Math.atan2(s.front.z, s.front.x);
   const half = towerHalf(h);
@@ -50,26 +26,15 @@ export function planHouse(h: House, boss: string, s: Site): RingEnclosure {
   const step = arc / n;
   const len = 2 * P * Math.sin(step / 2) + h.thick * 0.5 + 0.5; // the chord, and enough over to the next that no corner leaves a crack
   const props: Prop[] = [];
+  const at = (th: number): [number, number, number] => [s.x + Math.cos(th) * P, s.z + Math.sin(th) * P, Math.atan2(-Math.cos(th), -Math.sin(th))]; // the ring's place at angle `th`, and the yaw that turns a piece's inward face to the centre
   for (let k = 0; k < n; k++) {
     const th = gateAt + edge + (k + 0.5) * step;
-    props.push(segment(h, s, P, th, len, 1000 + k));
-    if (k % h.tower.every === h.tower.every - 1) props.push(tower(h, s, P, th, h.tower.height, 2000 + k, h.tower.lit));
+    props.push(wall(h, s.y, ...at(th), len, 1000 + k));
+    if (k % h.tower.every === h.tower.every - 1) props.push(tower(h, s.y, ...at(th), h.tower.height, 2000 + k, h.tower.lit));
   }
-  for (const side of [-1, 1]) props.push(tower(h, s, P, gateAt + side * edge, h.gate.flank, 3000 + side, true)); // the gate's two towers, each with its fire
+  for (const side of [-1, 1]) props.push(tower(h, s.y, ...at(gateAt + side * edge), h.gate.flank, 3000 + side, true)); // the gate's two towers, each with its fire
   const gate = { x: s.x + s.front.x * P, z: s.z + s.front.z * P };
-  const alongX = Math.abs(s.front.z) > 0.5; // the wall runs along x at a gate that faces north or south
-  const open = h.gate.width / 2 + HOUSE.lap; // the seal reaches to the towers, which lap over it
-  const [hw, hd] = alongX ? [open, h.thick / 2] : [h.thick / 2, open];
-  const piece: HiddenPieceDef = {
-    name: `${boss}:house`,
-    x: gate.x,
-    z: gate.z,
-    minFound: boss,
-    glow: h.glow ?? 'purple',
-    boxes: [],
-    seal: { boxes: [[0, 0, hw, hd, s.y - 0.3, s.y + h.gate.height]], look: h.gate.sealed ? 'sealed' : 'wall' },
-    door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y: s.y },
-  };
+  const piece = gatePiece(h, boss, gate, s.y, Math.abs(s.front.z) > 0.5); // (the wall runs along x at a gate that faces north or south)
   const toStake = s.radius + STAKE.ring + STAKE.past; // the fallen wake before the fog, a pace in front of it: inside the wall, since the wall stands `HOUSE.reach` beyond the ring
   const stake = { x: s.x + s.front.x * toStake, z: s.z + s.front.z * toStake, yaw: Math.atan2(-s.front.x, -s.front.z) };
   const centre = { x: s.x, z: s.z };

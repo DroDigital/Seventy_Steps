@@ -39,6 +39,7 @@ export interface SetLook {
   walk?: boolean; // low enough to be walked over: no collider
   glow?: Glow; // a built piece's glow
   lit?: LightKind; // a flame at its top, lighting about it
+  rod?: number; // a lightning rod's mast on its top, this many metres (a keep, a gatehouse: round 67)
 }
 
 const ROUND = new Set<PropKind>(['tree', 'pine', 'rock', 'pillar', 'lamp', 'obelisk', 'cross', 'stump', 'spire', 'tower', 'cone']);
