@@ -24,6 +24,7 @@ import { absorb } from './stamina';
 import { refreshStoops, zoneGap } from './hurt';
 import { live, outOfReach, targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
+import { walled } from './walled';
 
 /** What a blow carries into resolution; melee hits and revolver shots both fit. */
 export interface Blow {
@@ -212,7 +213,7 @@ export function meleeSystem(g: Game): void {
       const tip = capsuleGap2(g, t, aimAt(g, t, tr.pos.y, s0), aimAt(g, t, tr.pos.y, s1), hit.radius);
       const swept = root ? capsuleGap2(g, t, aimAt(g, t, tr.pos.y, root), aimAt(g, t, tr.pos.y, s1), hit.radius) : tip;
       const best = swept.gap2 < tip.gap2 ? swept : tip;
-      if (best.gap2 > (hit.radius + best.radius) ** 2) continue;
+      if (best.gap2 > (hit.radius + best.radius) ** 2 || walled(g, id, t, s1.y)) continue; // (a wall stops the blow: it is tried again next frame, from where the swinger then stands)
       a.hits.add(t);
       const crit = backstab(g, id, t);
       const outcome = strike(g, id, t, { ...hit, damage: hit.damage * edge(g, id) * best.damage, parryable: !hit.unblockable, interrupts: false, ...(crit && { critical: true }) });

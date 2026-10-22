@@ -98,6 +98,31 @@ describe('melee in play', () => {
     expect(seen).toEqual([]);
   });
 
+  it('stops a claw at a wall between the foe and the investigator, as a cane is stopped (round 66)', () => {
+    const { g, deepOne: foe, seen } = clawSetup();
+    g.world.colliders.push({ kind: 'box', min: { x: -2, y: -1, z: 0.5 }, max: { x: 2, y: 3, z: 0.8 } }); // a wall between them
+    steps(g, 60);
+    expect(seen).toEqual([]);
+    expect(g.ecs.c.actor.get(foe)!.hits.size).toBe(0);
+    const { g: h, seen: seenOver } = clawSetup();
+    h.world.colliders.push({ kind: 'box', min: { x: -2, y: -1, z: 0.5 }, max: { x: 2, y: 0.4, z: 0.8 } }); // a sill, under the blow
+    steps(h, 60);
+    expect(seenOver.map((e) => e.outcome)).toEqual(['hit']);
+  });
+
+  it('keeps the investigator’s own blow from passing a wall to the foe behind it (round 66)', () => {
+    for (const [wall, lands] of [[true, false], [false, true]] as const) {
+      const { g, player, deepOne: foe } = scriptedGame();
+      place(g, player, 0, 0.3, 0);
+      place(g, foe, 0, 1.3, 0);
+      if (wall) g.world.colliders.push({ kind: 'box', min: { x: -2, y: -1, z: 0.6 }, max: { x: 2, y: 3, z: 0.8 } });
+      const hp = g.ecs.c.health.get(foe)!.hp;
+      stepGame(g, press('light'));
+      steps(g, 40);
+      expect(g.ecs.c.health.get(foe)!.hp < hp, wall ? 'a wall' : 'open ground').toBe(lands);
+    }
+  });
+
   it('parries a well-timed claw, then ripostes the parried Deep One', () => {
     const { g, player, deepOne: foe, seen } = clawSetup();
     steps(g, 14);

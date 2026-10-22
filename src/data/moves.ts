@@ -230,6 +230,6 @@ export const PLAYER_MOVES = {
   },
   scatter: { frames: 30, cancel: 22 }, // a boss fight's E actions (spec §3E): the Powder of Ibn Ghazi...
   kindle: { frames: 40, cancel: 30 }, // ...relighting a lamp...
-  chant: { frames: 180 }, // ...and the incantation, which works only if it is chanted to its end
+  chant: { frames: 180, iframes: [0, 180] }, // ...and the incantation, which works only if it is chanted to its end: nothing the Horror throws lands on the chanter while it lasts, as at the helm (round 66; it was broken off by the first blow, and the last phase has little else)
   helm: { frames: 600, iframes: [0, 600] }, // at the Alert's helm, riding the deck: the ram ends it
 } satisfies MoveSet;

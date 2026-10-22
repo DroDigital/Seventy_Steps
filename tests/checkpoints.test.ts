@@ -198,6 +198,28 @@ describe('E takes what the investigator faces (playtest round 12)', () => {
     const now = g.ecs.c.transform.get(g.player.id)!.pos;
     if (!acting) expect(Math.abs(wrapAngle(them.yaw - yawOf(now.x - them.pos.x, now.z - them.pos.z)))).toBeLessThan(0.3); // and still to whoever stands by them (round 26: the people have rounds of their own once the investigator has gone: npcLife.test.ts)
   });
+
+  it('looking about while someone talks keeps the talk, and the camera goes where the hand puts it (round 66)', () => {
+    const g = createWorldGame();
+    const n = NPCS[0];
+    const at = npcPlace(n)!;
+    goTo(g, at.x + 2, at.z, 0);
+    talk(g, n.id);
+    run(g, 90);
+    const framed = g.camera.yaw;
+    expect(g.player.glance).toBe(false);
+    for (let i = 0; i < 60; i++) stepGame(g, { ...emptyInput(), lookX: 0.02 }); // the hand turns the camera, a step at a time
+    expect(g.player.listening).not.toBeNull(); // looking away is not leaving
+    expect(g.player.glance).toBe(true);
+    const put = framed - 60 * 0.02;
+    expect(Math.abs(wrapAngle(g.camera.yaw - put))).toBeLessThan(0.05); // it goes where the hand puts it, not back to the speaker
+    run(g, 60);
+    expect(Math.abs(wrapAngle(g.camera.yaw - put))).toBeLessThan(0.05); // and stays there
+    stepGame(g, { ...emptyInput(), moveY: 1 });
+    expect(g.player.listening).toBeNull(); // moving still ends it
+    talk(g, n.id);
+    expect(g.player.glance).toBe(false); // a new talk frames its speaker again
+  });
 });
 
 describe('hidden bridges', () => {

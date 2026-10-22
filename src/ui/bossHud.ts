@@ -50,6 +50,11 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   g.events.on('Rewired', blink);
   g.events.on('GazeBurst', (e) => say(`THE GAZE  −${e.sanity} SANITY`));
   g.events.on('Revealed', (e) => say(`THE POWDER OF IBN GHAZI · ${e.doses} LEFT`));
+  g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 66: it was said only in the field guide)
+    const f = g.ecs.c.fight.get(e.entity);
+    const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);
+    if (line) say(line);
+  });
   g.events.on('LampChanged', (e) => say(e.lit ? 'THE LAMP BURNS AGAIN' : 'A LAMP GOES OUT'));
   g.events.on('Petrified', () => say('TURNED TO STONE'));
   g.events.on('Title', (e) => show(e.text));
