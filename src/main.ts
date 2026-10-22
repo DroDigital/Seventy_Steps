@@ -217,7 +217,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const finds = opts.arena ? null : createFindCard(game, () => dialogue.open || ending.open || !!intro?.open || !!demoEnd?.open || cinema.active || journeys.busy); // round 60: a weapon or a relic found says so, and what to do with it
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
-  const hud = createHud(game, canvas, painter, echoFx.pending);
+  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5);
   const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;

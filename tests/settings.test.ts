@@ -14,7 +14,7 @@ function memoryStore() {
 describe('settings', () => {
   it('defaults to full FX, sensitivity 1, 800 × 450 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, questTracker: 1, padSwap: 0,
       volume: 1, music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
     expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([800, 450]);
