@@ -19,6 +19,7 @@ import { npcPlace } from './npcs';
 import { placeKey, wayTo } from './leadWay';
 import { isDone, stageOf, UNSTARTED } from './quests';
 import { SEAL_REGIONS, sealBroken, sealsBroken } from './sealCount';
+import { wayRuns } from './ways';
 
 export interface Lead {
   text: string; // what to do, in a line
@@ -49,7 +50,8 @@ function stepGoalPlace(boss: string, i: number): XZ | null {
   const a = worldLayout().arenas.find((x) => x.bosses[0] === boss);
   const step = DISCOVERIES[boss]?.steps[i];
   if (!a?.house || !step) return null;
-  const at = stepPlace(a, step) ?? courtPoint(a.house, ARENA_WAYS[boss]?.rite?.at[0]?.d ?? 20, 0);
+  const light = ARENA_WAYS[boss]?.rite?.at[0];
+  const at = stepPlace(a, step) ?? courtPoint(a.house, light?.d ?? 20, light?.side ?? 0);
   return { x: at.x, z: at.z };
 }
 
@@ -94,8 +96,12 @@ function stageLead(g: Game, id: string, stage: number): Lead {
   const q = QUESTS[id];
   const goal = q.stages[stage].goal;
   if (goal.kind === 'seals') return sealLead(g, goal.count, q.stages[stage].note);
-  const at = goalPlace(goal);
-  return { text: q.stages[stage].note, at: at && wayTo(g, me(g), at) };
+  const rite = goal.kind === 'step' && DISCOVERIES[goal.boss]?.steps[goal.i]?.kind === 'rite';
+  const run = rite && wayRuns(g).find((r) => r.plan.boss === goal.boss);
+  const light = run && run.lights.find((l) => !l.lit && l.rank === run.progress);
+  const at = light ? { x: light.x, z: light.z } : goalPlace(goal);
+  const text = q.stages[stage].note + (rite ? ' Approach a light to kindle it, or interact when nearby. The marker follows the next light.' : '');
+  return { text, at: at && wayTo(g, me(g), at) };
 }
 
 /** The main line's next step, or null once it is done (or out of the open world). */

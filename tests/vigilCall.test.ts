@@ -9,7 +9,7 @@ import { DISCOVERIES } from '../src/data/discoveriesAll';
 import { SIM } from '../src/data/tuning';
 import { HOUR_FROM, hourOf, NIGHT, phaseOf, type Hour } from '../src/systems/clock';
 import type { Game } from '../src/systems/components';
-import { discoverySystem, holds } from '../src/systems/discovery';
+import { discoverySystem, holds, vigilShare } from '../src/systems/discovery';
 import { createWorldGame } from '../src/systems/game';
 import { bandOf, setSanity } from '../src/systems/sanity';
 import { CALL, mindTarget } from '../src/systems/vigilCall';
@@ -92,6 +92,17 @@ describe('the place answers a vigil', () => {
     expect(bandOf(mindTarget({ from: 'lucid', to: 'lucid' }))).toBe('lucid');
     expect(bandOf(mindTarget({ from: 'fractured', to: 'unmoored' }))).toBe('fractured');
     expect(['lucid', 'uneasy']).toContain(bandOf(mindTarget({ from: 'lucid', to: 'uneasy' })));
+  });
+
+  it('keeps an accepted sky instead of replacing it with the first listed one', () => {
+    const v = vigils.find((x) => (x.s.when.sky?.length ?? 0) > 1)!;
+    const g = against(v.boss, v.i, v.s);
+    const sky = v.s.when.sky![1]!;
+    g.overworld!.weather = { kind: sky, want: sky, amount: 1, until: Infinity };
+    keep(g, v.boss, v.i, CALL.after + 2);
+    expect(g.overworld!.weather.want).toBe(sky);
+    expect(vigilShare(g, v.boss, v.i)).toBeCloseTo((CALL.after + 2) / v.s.seconds);
+    expect(keep(g, v.boss, v.i, v.s.seconds)).toBeLessThan(v.s.seconds);
   });
 
   it('a new game\'s night is its own again', () => {

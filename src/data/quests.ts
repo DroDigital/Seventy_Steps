@@ -25,7 +25,7 @@ export interface QuestDef {
   main?: boolean; // the main line
   after?: string; // begins only once this one is done
   auto?: boolean; // begins by itself once `after` is done (no one need ask it)
-  lenient?: boolean; // what the world has already done is done: a later stage whose goal is met closes the ones before it (a horror slain before its quest was sought)
+  lenient?: boolean | 'last'; // a later goal closes earlier stages; 'last' only permits this for the final goal (a horror already slain)
   stages: readonly QuestStage[];
   done: string; // the journal's line once it is done
   reward: { echoes?: number; insight?: number; vial?: boolean; stones?: number; weapon?: WeaponId }; // star-stones and a weapon: round 12

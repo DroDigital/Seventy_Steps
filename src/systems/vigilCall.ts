@@ -72,7 +72,7 @@ export function answer(g: Game, key: string, when: When, holds: boolean): void {
     NIGHT.hurried = ow.hurried = (ow.hurried ?? 0) + CALL.speed * dt; // the night runs on (clock.ts: every reader of the hour follows)
     if (!st.told) words.push(HOUR_WORDS[when.hour[0]!]);
   }
-  const sky = when.sky && skyFor(g, when.sky);
+  const sky = when.sky && (when.sky.includes(ow.weather.kind) ? ow.weather.kind : skyFor(g, when.sky)); // keep any sky the vigil accepts: calling the first asked used to disperse a valid gale or storm halfway through it
   if (sky && !(ow.weather.kind === sky && ow.weather.amount >= 0.45)) {
     const w = ow.weather;
     if (w.want !== sky) {

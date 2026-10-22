@@ -106,7 +106,7 @@ describe('the discoveries are written', () => {
       expect(q!.stages.length, id).toBe(d.steps.length + 1);
       expect(q!.stages[d.steps.length]!.goal).toEqual({ kind: 'slay', boss: id });
       expect(q!.title, id).toBe(d.title);
-      expect(q!.lenient, id).toBe(true);
+      expect(q!.lenient, id).toBe('last');
     }
   });
 });
