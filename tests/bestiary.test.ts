@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { HABITS, TIER_NAMES, weaknessLine, wherever } from '../src/data/bestiaryFacts';
 import { FIELD_NOTES } from '../src/data/bestiaryNotes';
+import { DISCOVERIES } from '../src/data/discoveriesAll';
 import { DOCUMENTS, NOTE_SITES } from '../src/data/documents';
 import { ENTITIES } from '../src/data/registry';
 import { ARCHETYPE_IDS, TIERS } from '../src/data/schema';
@@ -52,9 +53,9 @@ describe('the field notes left about the world (round 34)', () => {
     expect(Object.entries(NOTE_SITES).filter(([, s]) => s.length >= 2).length).toBeGreaterThanOrEqual(12);
   });
 
-  it('puts every one of them in the world, once, on dry ground clear of any dungeon', () => {
+  it('puts every one of them in the world, once, on dry ground clear of any dungeon (the pages of the courts too)', () => {
     const placed = worldLayout().tomes.filter((t) => t.note).map((t) => t.name);
-    const wanted = Object.values(NOTE_SITES).flat().map(([n]) => n);
+    const wanted = [...Object.values(NOTE_SITES).flat().map(([n]) => n), ...Object.values(DISCOVERIES).flatMap((d) => d.leaves.map((l) => l.doc))]; // (and the pages in the courts of the horrors' houses, round 63)
     expect(placed.sort()).toEqual([...wanted].sort());
     expect(Object.keys(DOCUMENTS).filter((n) => DOCUMENTS[n].kind === 'note').sort()).toEqual([...wanted].sort()); // none written and never placed
   });

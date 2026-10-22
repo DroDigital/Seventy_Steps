@@ -1,9 +1,10 @@
 /**
- * The way to an open arena laid on the land (round 62; data/arenaWays.ts says what it is): a path from the arena's fog, straight down
- * its way in for a few paces (where the candle burns and the set's lane runs), then wandering to the nearest road it can join, and the
- * pieces stood along it. Everything on the way is placed by distance from the fog (`d`) and the side it is walked on, so a hazard, a
- * mark and an omen share one frame (`pointAt`). The trail is a road of its own, narrower than the region's, drawn in the road's texture.
- * Pure: no Three.js.
+ * The approach to an open arena's gate laid on the land (round 62's trail, round 63's court; data/arenaWays.ts says what it holds): a
+ * straight court out from the house's gate, in which the horror's own things are stood: waymarks that grow thicker and stranger toward the
+ * gate, hazards of the horror's kind, a rite of lights. It is no road (a house has its one gate, and the court leads to it, so there is no
+ * other way in to be taken). Everything on it is placed by distance from the gate (`d`) and the side it is walked on, so a hazard, a mark
+ * and an omen share one frame (`pointAt`), and `courtPoint` gives the same frame from a house alone, for the pages and altars of a
+ * discovery (world/discoveryPlan.ts), which are placed before the regions are. Pure: no Three.js.
  */
 
 import type { XZ } from '../core/geom';
@@ -11,79 +12,48 @@ import { createRng, hash2, type Rng } from '../core/rng';
 import type { Mark, Way } from '../data/arenaWays';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
+import type { HousePlan } from './arenaHouse';
 import { setPiece } from './arenaSet';
 import type { ArenaPlace } from './placements';
 import type { Prop } from './props';
-import { segmentDistance, wander, type Road } from './roads';
+import { segmentDistance } from './roads';
 import { surface } from './terrain';
 
 export const WAY = {
-  lane: 26, // metres from the fog the way runs straight down the arena's way in before it bends to the road
-  least: 120, // the shortest a way is made to be
-  fog: 1.5, // the fog's ring stands this far past the arena's radius (gatePlan.ts)
-  width: 2.6,
-  near: 8, // metres from the trailhead it is found
+  out: 3.6, // metres from the gate's middle that the court's `d = 0` stands: clear of the wall's outer face
+  length: 150, // metres of the court (what is stood past it is not made)
+  width: 2.6, // metres kept clear down its middle (the gate's way in; nothing is stood on it)
 } as const;
 
 export interface WayPlan {
   boss: string;
   region: string;
   way: Way;
-  path: XZ[]; // from the fog's outer edge out to the road it joins
+  path: XZ[]; // from the gate straight out, two points
   cum: number[]; // metres along the path at each of its points
   length: number;
   width: number;
 }
 
-const seedOf = (a: ArenaPlace): number => (hash2(Math.round(a.x), Math.round(a.z), WORLD.seed + 62) * 4294967296) >>> 0;
-
-/** The nearest point of `roads` to `p`. */
-function nearestRoadPoint(roads: readonly Road[], p: XZ): { at: XZ; dist: number } | null {
-  let best: { at: XZ; dist: number } | null = null;
-  for (const r of roads) {
-    for (let i = 1; i < r.pts.length; i++) {
-      const [a, b] = [r.pts[i - 1], r.pts[i]];
-      const [dx, dz] = [b.x - a.x, b.z - a.z];
-      const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / (dx * dx + dz * dz || 1)));
-      const at = { x: a.x + dx * t, z: a.z + dz * t };
-      const dist = Math.hypot(p.x - at.x, p.z - at.z);
-      if (!best || dist < best.dist) best = { at, dist };
-    }
-  }
-  return best;
+/** The place `d` metres out from the gate and `side` metres to the left of the court as it is walked in (negative: the right), and the way it faces (toward the gate). */
+export function courtPoint(h: Pick<HousePlan, 'gate' | 'front'>, d: number, side = 0): XZ & { yaw: number } {
+  const t = WAY.out + d;
+  return { x: h.gate.x + h.front.x * t - h.front.z * side, z: h.gate.z + h.front.z * t + h.front.x * side, yaw: Math.atan2(-h.front.x, -h.front.z) };
 }
 
-/** The path of an arena's way, from its fog to the nearest road. */
-export function planWay(a: ArenaPlace, way: Way, roads: readonly Road[]): WayPlan {
-  const rng = createRng(seedOf(a));
-  const out = a.radius + WAY.fog;
-  const start = { x: a.x + a.front.x * out, z: a.z + a.front.z * out };
-  const bend = { x: start.x + a.front.x * WAY.lane, z: start.z + a.front.z * WAY.lane };
-  const join = nearestRoadPoint(roads, bend)?.at ?? { x: bend.x + a.front.x * 60, z: bend.z + a.front.z * 60 }; // (a region with no road: a way to nowhere in particular)
-  const direct = Math.hypot(join.x - bend.x, join.z - bend.z);
-  const middle = (WAY.least - WAY.lane) / 2; // a way is walked, not glanced at: one that would be shorter than `least` bends away from the straight line and back
-  let path: XZ[];
-  if (direct < WAY.least - WAY.lane) {
-    const bow = Math.sqrt(Math.max(0, middle * middle - (direct / 2) * (direct / 2))) * (rng() < 0.5 ? 1 : -1);
-    const [nx, nz] = [-(join.z - bend.z) / (direct || 1), (join.x - bend.x) / (direct || 1)];
-    const mid = { x: (bend.x + join.x) / 2 + nx * bow, z: (bend.z + join.z) / 2 + nz * bow };
-    path = [start, ...wander(bend, mid, rng, 0.06), ...wander(mid, join, rng, 0.06).slice(1)];
-  } else path = [start, ...wander(bend, join, rng, 0.05)];
-  const cum = path.map((_, i) => path.slice(1, i + 1).reduce((n, p, k) => n + Math.hypot(p.x - path[k].x, p.z - path[k].z), 0));
-  return { boss: a.bosses[0], region: a.region, way, path, cum, length: cum[cum.length - 1], width: way.width ?? WAY.width };
+/** The court of an arena's house. */
+export function planWay(a: ArenaPlace, way: Way): WayPlan {
+  const house = a.house!;
+  const path = [courtPoint(house, 0), courtPoint(house, WAY.length)].map(({ x, z }) => ({ x, z }));
+  return { boss: a.bosses[0]!, region: a.region, way, path, cum: [0, WAY.length], length: WAY.length, width: way.width ?? WAY.width };
 }
 
-/** The place `d` metres from the fog along the way, `side` metres to the left of it (as it is walked toward the fog), and the way it runs there (toward the fog). */
+/** The place `d` metres from the gate along the court, `side` metres to the left of it (as it is walked toward the gate), and the way it runs there (toward the gate). */
 export function pointAt(plan: WayPlan, d: number, side = 0): XZ & { yaw: number } {
-  const { path, cum } = plan;
+  const [a, b] = plan.path;
   const dd = Math.min(plan.length, Math.max(0, d));
-  let i = 1;
-  while (i < path.length - 1 && cum[i] < dd) i++;
-  const [a, b] = [path[i - 1], path[i]];
-  const seg = cum[i] - cum[i - 1] || 1;
-  const t = (dd - cum[i - 1]) / seg;
-  const [wx, wz] = [(a.x - b.x) / seg, (a.z - b.z) / seg]; // toward the fog
-  const at = { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t };
+  const [wx, wz] = [(a.x - b.x) / plan.length, (a.z - b.z) / plan.length]; // toward the gate
+  const at = { x: a.x + (b.x - a.x) * (dd / plan.length), z: a.z + (b.z - a.z) * (dd / plan.length) };
   return { x: at.x + wz * side, z: at.z - wx * side, yaw: Math.atan2(wx, wz) };
 }
 
@@ -139,19 +109,11 @@ function markProps(plan: WayPlan, m: Mark, rng: Rng): Prop[] {
   return out;
 }
 
-/** Every piece of a way: its marks, and the trailhead where it leaves the road. */
+/** Every piece of a court: its marks. */
 export function wayProps(plan: WayPlan): Prop[] {
   const rng = createRng(hash2(Math.round(plan.path[0].x), Math.round(plan.path[0].z), WORLD.seed + 63) * 4294967296 >>> 0);
-  const out = plan.way.marks.flatMap((m) => markProps(plan, m, rng));
-  const side = (plan.way.headSide ?? 3.4) + plan.width / 2;
-  const at = pointAt(plan, plan.length - 1.5, side);
-  const head = setPiece(plan.way.head, at.x, at.z, surface(at.x, at.z), at.yaw + Math.PI, rng);
-  if (head && head.y >= WORLD.seaLevel + 0.6) out.push(head);
-  return out;
+  return plan.way.marks.flatMap((m) => markProps(plan, m, rng));
 }
-
-/** The trail as a road: the region's road texture, narrower. */
-export const trailRoad = (plan: WayPlan): Road => ({ pts: plan.path, width: plan.width, street: false });
 
 /** Whether a prop stands in the way's corridor and is to be cleared for it (not a house, which has its own place). */
 export const clearsFor = (plan: WayPlan, p: Prop): boolean => p.kind !== 'house' && nearPath(plan, p.x, p.z, plan.width / 2 + 0.8 + reach(p));

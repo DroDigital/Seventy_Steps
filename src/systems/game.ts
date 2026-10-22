@@ -56,6 +56,7 @@ import { npcSystem, spawnNpcs } from './npcs';
 import { populationSystem } from './population';
 import { boltSystem } from './projectiles';
 import { skyStrikeSystem } from './skyStrikes';
+import { discoverySystem } from './discovery';
 import { waySystem } from './ways';
 import { questSystem, startQuest } from './quests';
 import { npcLife } from './npcLife';
@@ -233,7 +234,8 @@ export function stepGame(g: Game, input: InputFrame): void {
   boltSystem(g);
   hazardSystem(g);
   skyStrikeSystem(g); // round 52: a thunderstorm's bolt on the ground, a ring of light before it
-  waySystem(g); // round 62: the trails to the open arenas: wards, vents, waves, blight, rites, omens
+  waySystem(g); // round 62: the courts before the open arenas' gates: wards, vents, waves, blight, rites, omens
+  discoverySystem(g); // round 63: a house seen, a page read, a vigil kept, a gate given
   vitalsSystem(g, dt);
   sanitySystem(g, dt);
   reagentSystem(g);

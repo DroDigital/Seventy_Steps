@@ -14,7 +14,9 @@ import { ARENA_WAYS } from '../data/arenaWaysAll';
 import { REGION_LAYOUTS, type RegionLayout } from '../data/regionFeatures';
 import type { PropKind, RegionDef } from '../data/regions';
 import { WORLD } from '../data/tuning';
-import { clearsFor, planWay, trailRoad, wayProps, type WayPlan } from './arenaWay';
+import { reach } from './arenaDecor';
+import { clearsFor, planWay, wayProps, type WayPlan } from './arenaWay';
+import { discoveryProps } from './discoveryPlan';
 import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
@@ -211,7 +213,7 @@ function buildPlan(region: RegionDef): RegionPlan {
   roadside(region, roads, rng, occ, (x, z) => roadClear(x, z, 0.5) && offSites(x, z, 1), props);
   scatterBiome(region, rect, rng, occ, props);
   const spawns = planSpawns(region, features, roads, towns, props, rng);
-  const ways = planWays(region, roads, props, (x, z) => offSites(x, z, 1.5) && spawns.every((s) => Math.hypot(s.at.x - x, s.at.z - z) > 3));
+  const ways = planWays(region, props, (x, z) => offSites(x, z, 1.5) && spawns.every((s) => Math.hypot(s.at.x - x, s.at.z - z) > 3));
   return bucket(layout, roads, features, props, spawns, ways);
 }
 
@@ -240,22 +242,30 @@ function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readon
 }
 
 /**
- * The trails to the region's open arenas (round 62): each a road of its own to the nearest road, what stood in its way taken away and its
- * waymarks put where it ran (none on a site's own ground or a foe's post). Planned last, so that the rest of the region is laid as it was.
+ * The courts before the gates of the region's open arenas (round 62's trails, round 63's courts): what stood in the way of each taken away
+ * and its waymarks put where it ran (none on a site's own ground or a foe's post). Planned last, so that the rest of the region is laid
+ * as it was.
  */
-function planWays(region: RegionDef, roads: Road[], props: Prop[], offSites: (x: number, z: number) => boolean): WayPlan[] {
-  const base = [...roads]; // each joins the roads as they were, not another's trail
+function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: number) => boolean): WayPlan[] {
   const out: WayPlan[] = [];
   for (const a of worldLayout().arenas) {
-    const way = a.region === region.id ? ARENA_WAYS[a.bosses[0]] : undefined;
+    const way = a.region === region.id && a.house ? ARENA_WAYS[a.bosses[0]] : undefined;
     if (!way) continue;
-    const plan = planWay(a, way, base);
+    const plan = planWay(a, way);
     for (let i = props.length - 1; i >= 0; i--) if (clearsFor(plan, props[i])) props.splice(i, 1);
     const marks = wayProps(plan);
-    for (const other of out) for (let i = marks.length - 1; i >= 0; i--) if (clearsFor(other, marks[i]!)) marks.splice(i, 1); // not across a trail already laid
+    for (const other of out) for (let i = marks.length - 1; i >= 0; i--) if (clearsFor(other, marks[i]!)) marks.splice(i, 1); // not across a court already laid
     for (let i = marks.length - 1; i >= 0; i--) if (!offSites(marks[i]!.x, marks[i]!.z)) marks.splice(i, 1); // nor on a sign's, a tome's or a door's ground, nor on a foe's post
-    props.push(...marks);
-    roads.push(trailRoad(plan));
+    const things = discoveryProps(a); // the marks of its vigils and its altars (round 63), with the ground about them cleared
+    for (const q of things) {
+      for (let i = props.length - 1; i >= 0; i--) if (props[i]!.kind !== 'house' && Math.hypot(props[i]!.x - q.x, props[i]!.z - q.z) < reach(q) + reach(props[i]!) + 1.4) props.splice(i, 1);
+      for (let i = marks.length - 1; i >= 0; i--) if (Math.hypot(marks[i]!.x - q.x, marks[i]!.z - q.z) < reach(q) + reach(marks[i]!) + 1.4) marks.splice(i, 1);
+    }
+    for (const l of a.court?.leaves ?? []) { // and about its pages (a tome is stood on, and read by touch: nothing so big stands over it)
+      for (let i = props.length - 1; i >= 0; i--) if (props[i]!.kind !== 'house' && Math.hypot(props[i]!.x - l.x, props[i]!.z - l.z) < reach(props[i]!) + 2.4) props.splice(i, 1);
+      for (let i = marks.length - 1; i >= 0; i--) if (Math.hypot(marks[i]!.x - l.x, marks[i]!.z - l.z) < reach(marks[i]!) + 2.4) marks.splice(i, 1);
+    }
+    props.push(...marks, ...things);
     out.push(plan);
   }
   return out;

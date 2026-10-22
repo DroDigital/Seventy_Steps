@@ -11,6 +11,8 @@
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import type { HiddenPieceDef } from '../data/arena';
+import { stepKey } from '../data/discoveries';
+import { DISCOVERIES } from '../data/discoveriesAll';
 import type { DoorLook } from '../data/doors';
 import { DOOR_GAIN, doorSound } from '../data/doorSounds';
 import { FEEDBACK, PASSAGE } from '../data/tuning';
@@ -89,6 +91,12 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
     return t >= 1 ? (on ? 1 : 0) : coin(Math.floor(now * 24)) < (on ? t : 1 - t) ? 1 : 0;
   };
 
+  const gate = def.minFound; // a house's gate (round 63): shut until its horror is found, and drawn as a door from the first
+  const answered = (): number => { // the share of its discovery's acts that are done
+    const d = gate === undefined ? undefined : DISCOVERIES[gate];
+    return d ? d.steps.filter((_, i) => g.overworld?.told.has(stepKey(gate!, i))).length / d.steps.length : 0;
+  };
+
   if (def.door) {
     const kit = doorKit(def);
     const [wall, stoneMat, frameGlow, slabGlow] = [createWorldMaterial({ texture: 'stone', seed: 8, vertexColors: true }), createWorldMaterial({ texture: 'stone', seed: 5, emissive: 0.2, vertexColors: true }), glowMaterial(), glowMaterial()];
@@ -105,13 +113,13 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
         const l = layer();
         k += (l.open - k) * Math.min(1, dt * 18);
         if (Math.abs(l.open - k) < 0.002) k = l.open;
-        frame.visible = flicker(now, l.shown) > 0;
-        const awake = l.shown ? 1 : 0;
+        frame.visible = gate !== undefined || flicker(now, l.shown) > 0; // a house's gate is always there to be seen (round 63)
+        const awake = gate !== undefined ? (l.shown ? 1 : 0.3 + 0.4 * answered()) : l.shown ? 1 : 0; // and the more of its acts are done, the brighter its runes burn
         const pulse = 0.5 + 0.5 * Math.sin(now * 1.7 + phase);
         const flare = k > 0 ? Math.sin(Math.PI * clamp01(k / 0.45)) : 0; // the runes flare as it wakes
         setGlow(frameGlow, awake * (0.55 + 0.12 * pulse + 0.9 * flare + 0.2 * smooth(0.4, 0.8, k)));
         setGlow(slabGlow, awake * (0.5 + 0.12 * pulse + 0.8 * flare) * (1 - smooth(0.7, 1, k)));
-        outline.visible = l.shown && k < 0.98; // the faint outline of a door on the wall: the passage awake and shut
+        outline.visible = (l.shown || gate !== undefined) && k < 0.98; // the faint outline of a door on the wall: the passage awake and shut
         const slide = smooth(0.1, 1, k) * (kit.width + 0.45); // the slab goes into the wall
         slab.position.x = slide;
         slab.scale.z = 1 - 0.1 * smooth(0, 0.08, k); // a little thinner as it goes, so it passes within the wall's faces without fighting them

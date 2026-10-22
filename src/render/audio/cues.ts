@@ -54,7 +54,10 @@ export const CUES: Handlers = {
   InsightChanged: (e) => (e.change > 0 && e.cause !== 'load' && e.cause !== 'debug' ? inside('insight') : null),
   FirstSight: (e) => (e.sanity > 0 ? { sound: 'sight', at: null, pitch: Math.max(0.5, 1.1 - e.sanity / 40) } : null), // the greater the horror, the lower
   Discovered: () => inside('found'),
-  WayFound: () => inside('place'), // the head of a trail found (round 62)
+  HouseSeen: () => inside('place'), // a horror's house come within sight (round 63)
+  VigilKept: (e) => (e.share >= 1 ? { sound: 'revealed', at: { ...e.at } } : e.share > 0 ? { sound: 'lampLit', at: { ...e.at }, gain: 0.6 } : null), // a vigil half kept, and kept
+  Offered: (e) => ({ sound: 'found', at: { ...e.at } }), // a gift laid down
+  GateOpened: (e) => ({ sound: 'revealed', at: { ...e.at } }), // the gate draws aside
   RiteLit: (e) => ({ sound: 'lampLit', at: { ...e.at } }), // a rite's light taken, in its turn
   RiteFailed: (e) => ({ sound: 'lampOut', at: { ...e.at } }),
   RiteDone: (e) => ({ sound: 'revealed', at: { ...e.at } }),

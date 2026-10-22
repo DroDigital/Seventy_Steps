@@ -10,9 +10,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The Gardners' lane through the blasted heath: grey grass that does not move, trees dead standing, the fallen star's shards giving
   // off their light, a ground that wears at the mind; four lanterns of the family to be lit, the least first, as they went.
   colour_out_of_space: {
-    name: 'The Gardner Lane',
-    line: 'The grass is grey, and does not move in the wind.',
-    head: piece('iron_gate', { size: 1.1 }),
     marks: [
       mark(piece('prop:tree', { size: [1.1, 1.5] }), 20, 190, 12, [6, 15], { mirror: true, jitter: 6, chance: 0.8 }),
       mark(piece('trunk', { size: [0.9, 1.3] }), 40, 170, 31, [4, 9], { jitter: 8, face: 'free' }),
@@ -33,9 +30,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The sabbat's path up the ravine: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
   // in the open ground; the fires are laid in a ring, and a plate wakes one; three black candles are to be lit, least first.
   black_man: {
-    name: 'The Sabbat Path',
-    line: 'Someone has been here before you. Their fires are still warm.',
-    head: piece('skull_pole', { size: 1.3 }),
     marks: [
       mark(piece('skull_pole', { size: [1, 1.3] }), 14, 120, 12, [3.8, 5], { mirror: true, jitter: 3 }),
       mark(piece('prop:monolith', { size: [0.9, 1.3] }), 30, 120, 17, [6, 12], { mirror: true, jitter: 6, chance: 0.8 }),
@@ -58,9 +52,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   },
   // The black grove's road: trees that fork like horns, skulls on stakes, fungus as tall as a man; the pods in the ground burst of themselves.
   shub_niggurath: {
-    name: 'The Black Grove Road',
-    line: 'The trees fork like horns, and something suckles in the dark.',
-    head: piece('horn_tree', { size: 0.9 }),
     marks: [
       mark(piece('horn_tree', { size: [1, 1.3] }), 22, 150, 13, [6, 12], { mirror: true, jitter: 4 }),
       mark(piece('mushroom_tall', { size: [0.9, 1.5] }), 8, 110, 9, [3.6, 8], { mirror: true, jitter: 3, chance: 0.6 }),
@@ -78,9 +69,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The plantation's drive: the people of the house, stone, in the places they stood; their eyes open. Wards in the paving that bear eyes,
   // one in each row shut: the one that matches the tablet.
   medusa_gorgon: {
-    name: 'The Plantation Drive',
-    line: 'The drive is lined with people, and none of them has moved in years.',
-    head: piece('iron_gate', { size: 1.1 }),
     marks: [
       mark(piece('statue_column', { size: [1, 1.2] }), 12, 120, 11, 4.2, { mirror: true, jitter: 1.5 }),
       mark(piece('statue_head', { size: [0.9, 1.3] }), 20, 120, 23, [5.5, 9], { mirror: true, jitter: 4, chance: 0.7 }),
@@ -98,9 +86,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   },
   // The shore the tide left: pale sand, lamps for the fishers, nets, wrecked boats, fish on the sand; and the sea draws a breath and comes in.
   martins_beach_horror: {
-    name: "The Fishers' Trail",
-    line: 'The tide is out too far, and the nets are hung to dry.',
-    head: piece('flag_pirate', { size: 1 }),
     marks: [
       mark(piece('barrel', { size: 1 }), 8, 110, 12, [3.4, 6], { mirror: true, jitter: 3, chance: 0.6 }),
       mark(piece('crate', { size: 1.1 }), 14, 110, 19, [4, 8], { jitter: 4, chance: 0.6, face: 'free' }),
@@ -110,6 +95,7 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       mark(piece('fish', { size: 1.2 }), 12, 100, 15, [2.8, 5], { mirror: true, chance: 0.5, face: 'free' }),
       mark(piece('skeleton', { size: 1 }), 30, 90, 31, [3.6, 6], { chance: 0.5, face: 'free' }),
       mark(piece('cannon', { size: 1.2 }), 52, 52, 1, 8, { face: 'free' }), // a gun off a wreck, half in the sand
+      mark(piece('flag_pirate', { size: 1 }), 7, 7, 1, 4.4, { face: 'front' }), // a flag run up at the sea wall's gate, by whoever last held it
       mark(piece('signpost', { size: 1 }), 92, 92, 1, 2.9, { face: 'front' }),
     ],
     omens: [
@@ -122,9 +108,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The burying ground's lane: lamps set for the dead and left burning, graves in clusters, the salt laid white across the path to keep
   // what is buried where it lies; the tablet shows the sign the salt forgives.
   simon_orne: {
-    name: 'The Burying Lane',
-    line: 'Lamps, set for the dead, and no one has put them out.',
-    head: piece('grave_cross', { size: 1.4 }),
     marks: [
       mark(piece('lightpost', { lit: 'lamp' }), 14, 120, 14, 3.6, { mirror: true }),
       mark(piece('grave_wide', { size: [1, 1.2] }), 20, 150, 16, [6, 13], { mirror: true, jitter: 6, chance: 0.75 }),
@@ -146,9 +129,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The manor's avenue: hedges grown to the height of a house, lamps that still burn, statues and urns gone green; the lightning
   // finds the rod on the roof, and the strikes on the way are its leavings; four lamps to be lit from the road toward the house.
   edward_hutchinson: {
-    name: 'The Pawtuxet Avenue',
-    line: 'The lamps still burn in a garden no one keeps.',
-    head: piece('iron_gate', { size: 1.1 }),
     marks: [
       mark(piece('hedge', { size: 1.1 }), 8, 118, 3.2, 6.2, { mirror: true, jitter: 0.3, face: 90 }),
       mark(piece('lightpost', { lit: 'lamp' }), 18, 110, 22, 3.9, { mirror: true }),
@@ -168,9 +148,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The avenue of the sphinxes: pairs of them, facing the way you came, obelisks and broken columns, sand that holds the heat of a sun
   // that has set and is lifted across the way in sheets; four braziers to be lit, the greatest first, as the stars set.
   colossus_pyramids: {
-    name: 'The Avenue of the Sphinxes',
-    line: 'The sand holds the heat of a sun that has set.',
-    head: piece('sphinx', { size: 0.6 }),
     marks: [
       mark(piece('sphinx', { size: [0.8, 0.9] }), 26, 160, 30, 7.2, { mirror: true, face: 'in' }),
       mark(piece('prop:obelisk', { size: 1.5 }), 34, 150, 40, 9.5, { mirror: true }),
@@ -192,9 +169,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   },
   // The serpent road: totems, shed skins that are rocks, bones of those who went before, a dry rattling; the paving wakes under a foot.
   yig: {
-    name: 'The Serpent Road',
-    line: 'A dry rattling, very soft, on every side.',
-    head: piece('skull_pole', { size: 1.2 }),
     marks: [
       mark(piece('totem', { size: [0.7, 0.9] }), 10, 120, 20, 4.2, { mirror: true, jitter: 2 }),
       mark(piece('rocks_tall', { size: [1, 1.5] }), 18, 150, 15, [6, 14], { mirror: true, jitter: 4, chance: 0.7, face: 'free' }),
@@ -212,9 +186,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The mound's stair: stone cut from the mound itself, red light from below, the ground warm; the vents on the stair erupt in turn;
   // three fires to be lit, the greatest first, to the three layers of the mound.
   nug: {
-    name: 'The Mound Stair',
-    line: 'The ground is warm, and it breathes.',
-    head: piece('prop:block', { size: 0.6 }),
     marks: [
       mark(piece('rock_tall', { size: [1, 1.6] }), 10, 160, 12, [5, 12], { mirror: true, jitter: 3 }),
       mark(piece('cliff', { size: [0.9, 1.3] }), 20, 170, 28, [10, 16], { mirror: true, jitter: 6, chance: 0.8, face: 'free' }),
@@ -232,9 +203,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The shore of Ib: lilies on black water, the carved stones of a drowned people with their faces to the lake, a canoe drawn up, reeds;
   // the water rises in swells; four green fires to be lit as the water rises, the small to the great.
   bokrug: {
-    name: 'The Shore of Ib',
-    line: 'The lake is still, and black, and looks back.',
-    head: piece('canoe', { size: 1 }),
     marks: [
       mark(piece('lily', { walk: true, size: [1, 1.4] }), 6, 130, 6, [2.6, 6], { mirror: true, jitter: 2, chance: 0.8, face: 'free' }),
       mark(piece('plant_bush', { size: [1, 1.4] }), 10, 130, 8, [4, 9], { mirror: true, jitter: 3, chance: 0.7, face: 'free' }),
@@ -253,9 +221,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // Hatheg-Kla's slope: snow pines, rings of stone, a cloud on the peak that dances to a pipe; the cold takes the breath and the storm
   // finds those who climb.
   other_gods: {
-    name: 'The Slope of Hatheg-Kla',
-    line: 'The cloud on the peak is dancing, and no god of earth dances to that pipe.',
-    head: piece('trilith', { size: 0.6 }),
     marks: [
       mark(piece('pine_crooked', { size: [1, 1.4] }), 8, 150, 10, [5, 14], { mirror: true, jitter: 3, chance: 0.8 }),
       mark(piece('rocks_tall', { size: [1, 1.5] }), 14, 150, 17, [8, 16], { mirror: true, jitter: 4, chance: 0.7, face: 'free' }),

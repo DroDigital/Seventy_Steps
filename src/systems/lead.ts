@@ -7,8 +7,12 @@
  */
 
 import { distXZ, type XZ } from '../core/geom';
+import { ARENA_WAYS } from '../data/arenaWaysAll';
+import { DISCOVERIES } from '../data/discoveriesAll';
 import { NPCS } from '../data/npcs';
 import { QUESTS, type Goal } from '../data/quests';
+import { courtPoint } from '../world/arenaWay';
+import { stepPlace } from '../world/discoveryPlan';
 import { worldLayout } from '../world/placements';
 import type { Game } from './components';
 import { npcPlace } from './npcs';
@@ -36,7 +40,17 @@ export function goalPlace(goal: Goal): XZ | null {
   }
   if (goal.kind === 'seals') return null; // it has no one place (sealLead)
   if (goal.kind === 'read') return docPlace(goal.doc);
+  if (goal.kind === 'step') return stepGoalPlace(goal.boss, goal.i);
   return bossPlace(goal.boss);
+}
+
+/** Where an act of a horror's discovery is done: its vigil's mark, its altar, or the court where its rite's lights stand (the gate, when it has no place of its own). */
+function stepGoalPlace(boss: string, i: number): XZ | null {
+  const a = worldLayout().arenas.find((x) => x.bosses[0] === boss);
+  const step = DISCOVERIES[boss]?.steps[i];
+  if (!a?.house || !step) return null;
+  const at = stepPlace(a, step) ?? courtPoint(a.house, ARENA_WAYS[boss]?.rite?.at[0]?.d ?? 20, 0);
+  return { x: at.x, z: at.z };
 }
 
 /** Where a tome or note lies: where it is set in the open, or the room of the dungeon that holds it. */

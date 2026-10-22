@@ -11,6 +11,7 @@ export type Goal =
   | { kind: 'slay'; boss: string } // a boss slain for good (its roster id)
   | { kind: 'reach'; sign: string } // an Elder Sign found
   | { kind: 'read'; doc: string } // a tome or note read (data/documents.ts), wherever it lies
+  | { kind: 'step'; boss: string; i: number } // an act of a horror's discovery done (data/discoveries.ts; systems/discovery.ts): a vigil kept, a gift laid, a rite lit
   | { kind: 'seals'; count: number }; // this many of the waking world's seals broken (systems/seals.ts)
 
 export interface QuestStage {
@@ -30,10 +31,11 @@ export interface QuestDef {
   reward: { echoes?: number; insight?: number; vial?: boolean; stones?: number; weapon?: WeaponId }; // star-stones and a weapon: round 12
 }
 
+import { discoveryQuests } from './discoveriesQuests';
 import { SEALS } from './tuning';
 import type { WeaponId } from './weapons';
 
-export const QUESTS: Readonly<Record<string, QuestDef>> = {
+const HAND: Readonly<Record<string, QuestDef>> = {
   borrowed_reins: {
     title: 'The Borrowed Reins',
     auto: true,
@@ -153,3 +155,6 @@ export const QUESTS: Readonly<Record<string, QuestDef>> = {
     reward: { stones: 2, insight: 3 },
   },
 };
+
+/** The quests of the story, and the discovery of every open horror (round 63: data/discoveriesQuests.ts). */
+export const QUESTS: Readonly<Record<string, QuestDef>> = { ...HAND, ...discoveryQuests() };

@@ -32,7 +32,6 @@ export const WAYS = {
   light: 1.6, // metres a light is taken from
   fail: { burst: 2.6, damage: 14, warn: 40, cool: 120 }, // what goes up at a wrong light
   clue: 16, // metres from a rite's lights the clue is said
-  found: 9, // metres from the trail's head it is found
   heard: 44, // metres from the investigator within which a way's omens are listened for (it is a corridor)
 } as const;
 
@@ -322,7 +321,7 @@ function rite(g: Game, run: WayRun, me: V3): void {
 
 const lookOfGlow = (glow: 'magenta' | 'purple' | 'green'): Look => (glow === 'magenta' ? 'stain' : glow === 'purple' ? 'star' : 'void');
 
-/** What the one who walks a way hears of it: the omens it says as they pass them, and its head named when it is found. */
+/** What the one who walks a court hears of it: the omens it says as they pass them. */
 function tell(g: Game, run: WayRun, me: V3): void {
   const ow = g.overworld!;
   const a = along(run.plan, me.x, me.z);
@@ -334,11 +333,6 @@ function tell(g: Game, run: WayRun, me: V3): void {
     ow.told.add(key(i));
     g.events.emit('WayOmen', { words: o.words, sound: o.sound, shake: o.shake ?? 0, pitch: o.pitch ?? 1 });
   });
-  const head = `way:${run.plan.boss}:head`;
-  if (!ow.told.has(head) && a.d >= run.plan.length - WAYS.found - 4 && a.dist < WAYS.found + 4) {
-    ow.told.add(head);
-    g.events.emit('WayFound', { boss: run.plan.boss, name: run.plan.way.name, line: run.plan.way.line, region: run.plan.region });
-  }
 }
 
 export function waySystem(g: Game): void {

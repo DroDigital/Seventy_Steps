@@ -86,18 +86,20 @@ describe('ground that wears', () => {
     const g = createWorldGame();
     const r = enter(g, 'colour_out_of_space');
     const p = r.patches[0]!;
-    const before = g.mind.sanity;
-    goTo(g, p.x + p.r + 4, p.z);
-    run(g, 120);
-    expect(g.mind.sanity).toBe(before);
-    goTo(g, p.x, p.z);
-    run(g, 120);
-    expect(g.mind.sanity).toBeLessThan(before - 1);
+    const beside = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => ({ x: p.x + Math.cos((k * Math.PI) / 4) * (p.r + 4), z: p.z + Math.sin((k * Math.PI) / 4) * (p.r + 4) })).find((q) => r.patches.every((o) => Math.hypot(q.x - o.x, q.z - o.z) > o.r + 1))!; // (clear of every patch, for they lie close together)
+    const drop = (x: number, z: number): number => { // the mind lost in two seconds standing at a place (a horror near wears at it too, so what stands there is sent away before it is measured)
+      goTo(g, x, z);
+      run(g, 60);
+      for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
+      const before = g.mind.sanity;
+      run(g, 120);
+      return before - g.mind.sanity;
+    };
+    const base = drop(beside.x, beside.z);
+    expect(drop(p.x, p.z) - base, 'the patch wears at the mind').toBeGreaterThan(2.5);
     g.overworld!.told.add('rite:colour_out_of_space');
     expect(calmed(g, r)).toBe(true);
-    const mid = g.mind.sanity;
-    run(g, 120);
-    expect(g.mind.sanity).toBeGreaterThanOrEqual(mid);
+    expect(drop(p.x, p.z) - base, 'and a rite done stills it').toBeLessThan(2.5);
   });
 });
 
@@ -172,16 +174,11 @@ describe('a rite', () => {
 });
 
 describe('a way\'s words', () => {
-  it('are said once as the way is passed coming in, and its head is named when found', () => {
+  it('are said once as the court is walked in, and again not', () => {
     const g = createWorldGame();
     const r = enter(g, 'simon_orne');
-    const [omens, found] = [record(g, 'WayOmen'), record(g, 'WayFound')];
+    const omens = record(g, 'WayOmen');
     const first = ARENA_WAYS.simon_orne!.omens[0]!;
-    const near = r.plan.length - 8;
-    goTo(g, at(r, near).x, at(r, near).z);
-    run(g, 12);
-    expect(found.length).toBe(1);
-    expect(found[0]!.name).toBe(ARENA_WAYS.simon_orne!.name);
     goTo(g, at(r, first.at - 4).x, at(r, first.at - 4).z);
     run(g, 12);
     expect(omens.map((o) => o.words)).toContain(first.words);

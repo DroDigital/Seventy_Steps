@@ -15,14 +15,16 @@ import { pieceColliders } from '../world/arena';
 import type { Game, Layer, Mind } from './components';
 import { settle } from './passages';
 import { bandCeiling } from './sanity';
+import { isFound } from './found';
 import { sealsBroken } from './sealCount';
 
-/** Whether a hidden layer shows to a mind with this insight and band, with `seals` of the waking world broken. */
-export function layerShown(m: Mind, l: Pick<Layer, 'minInsight' | 'maxSanity' | 'minSeals'>, seals = 0): boolean {
+/** Whether a hidden layer shows to a mind with this insight and band, with `seals` of the waking world broken and the horrors `found` (a house's gate, round 63) said by the predicate. */
+export function layerShown(m: Mind, l: Pick<Layer, 'minInsight' | 'maxSanity' | 'minSeals' | 'minFound'>, seals = 0, found: (boss: string) => boolean = () => false): boolean {
   return (
     (l.minInsight === undefined || m.insight >= l.minInsight) &&
     (l.maxSanity === undefined || bandCeiling(m.band) <= l.maxSanity) &&
-    (l.minSeals === undefined || seals >= l.minSeals)
+    (l.minSeals === undefined || seals >= l.minSeals) &&
+    (l.minFound === undefined || found(l.minFound))
   );
 }
 
@@ -37,7 +39,7 @@ function quiet(g: Game, id: Entity): void {
 /** Shows or hides one layered entity to match the mind. A passage that is shown stays shut until it is approached (passages.ts). */
 export function applyLayer(g: Game, id: Entity): void {
   const l = g.ecs.c.layer.get(id)!;
-  const shown = layerShown(g.mind, l, l.minSeals === undefined ? 0 : sealsBroken(g));
+  const shown = layerShown(g.mind, l, l.minSeals === undefined ? 0 : sealsBroken(g), (boss) => isFound(g, boss));
   const piece = g.ecs.c.piece.get(id);
   if (shown !== l.shown) {
     l.shown = shown;
@@ -48,7 +50,7 @@ export function applyLayer(g: Game, id: Entity): void {
 }
 
 /** Puts an entity on a hidden layer, hiding it at once if the mind cannot see it. */
-export function addLayer(g: Game, id: Entity, hidden: { minInsight?: number; maxSanity?: number; minSeals?: number }): void {
+export function addLayer(g: Game, id: Entity, hidden: { minInsight?: number; maxSanity?: number; minSeals?: number; minFound?: string }): void {
   g.ecs.c.layer.set(id, { ...hidden, shown: true, open: 1 });
   applyLayer(g, id);
 }
@@ -64,7 +66,7 @@ export function spawnPiece(g: Game, def: HiddenPieceDef): Entity {
   g.world.colliders.push(...colliders, ...seal);
   for (const c of seal) g.world.off.add(c); // a fresh layer counts as shown until addLayer settles it
   g.ecs.c.piece.set(e, { def, colliders, seal });
-  addLayer(g, e, { minInsight: def.minInsight, maxSanity: def.maxSanity, minSeals: def.minSeals });
+  addLayer(g, e, { minInsight: def.minInsight, maxSanity: def.maxSanity, minSeals: def.minSeals, minFound: def.minFound });
   const me = g.ecs.c.transform.get(g.player?.id)?.pos; // one a body stands in when the world is made (a load, a respawn) is not shut on them
   const layer = g.ecs.c.layer.get(e)!;
   if (def.seal && layer.shown) {

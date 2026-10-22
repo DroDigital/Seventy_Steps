@@ -28,7 +28,10 @@ export interface GameEvents {
   WardWarned: { at: V3; radius: number; frames: number; look: string; mute?: boolean }; // a plate underfoot, a vent or a wave of a way wakes: its ring is marked, and it bursts in `frames` (systems/ways.ts; round 62)
   WardLanded: { at: V3; radius: number; look: string; mute?: boolean }; // it bursts
   WayOmen: { words: string; sound?: string; shake: number; pitch: number }; // a line said on a way, and what is heard and felt under it (round 62)
-  WayFound: { boss: string; name: string; line: string; region: string }; // the head of a trail found (round 62)
+  HouseSeen: { boss: string; name: string; line: string }; // a horror's house come within sight (systems/discovery.ts; round 63): its name, and a line under it
+  VigilKept: { boss: string; at: V3; share: number }; // a vigil begun (0), half kept (0.5), and kept (1)
+  Offered: { boss: string; at: V3; gift: string }; // a gift laid on an altar of a house's court
+  GateOpened: { boss: string; at: V3 }; // a house's gate gives: the horror has been found
   RiteLit: { at: V3; look: string; glow: string; rank: number; of: number }; // one of a rite's lights taken by the flame, in its turn
   RiteFailed: { at: V3; look: string }; // the wrong light: they all go out
   RiteDone: { boss: string; at: V3 }; // every light burns: the way is its own again

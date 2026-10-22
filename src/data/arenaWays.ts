@@ -1,16 +1,15 @@
 /**
- * The way to each open arena (round 62, asked: "for boss arenas within the open world, a distinct, thematic discovery process featuring
- * cohesive pathways, unique visual identities, and original puzzles or hazards tailored to each encounter, rather than placing them
- * arbitrarily"): a horror's ground was a ring set down on open land with nothing leading to it. Now a trail runs from the nearest road to
- * its fog, and it is walked as a story: a trailhead where it leaves the road, waymarks that grow thicker and stranger toward the fog,
- * omens said as the places are passed, a hazard that is of the horror's own kind, and for some a rite (lights to be lit in the order the
- * place tells, a field of wards to cross by the sign that is safe). One `Way` for each horror, authored in `arenaWaysEarth.ts` and
- * `arenaWaysBeyond.ts`; `world/arenaWay.ts` lays it on the land, `systems/ways.ts` plays it. Data only.
+ * What stands in the court before each open arena's gate (round 62 made them trails to the fog; round 63, asked "not literal pathways or
+ * roads", walls each horror's ground about, so the trail became the court that leads to its one gate): waymarks that grow thicker and
+ * stranger toward the gate, omens said as the places are passed, hazards of the horror's own kind, and for some a rite (lights to be lit in
+ * the order the place tells, a field of wards to cross by the sign that is safe), which the discovery (data/discoveries.ts) may ask. One
+ * `Way` for each horror, authored in `arenaWaysEarth.ts` and `arenaWaysBeyond.ts`; `world/arenaWay.ts` lays it on the land,
+ * `systems/ways.ts` plays it. Data only.
  */
 
 import type { Face, Piece } from './arenaSets';
 
-/** A place along a way: `d` metres from the fog's outer edge back toward the road it leaves, and `side` metres to the left of the way as it is walked toward the fog (negative: to the right). */
+/** A place in the court: `d` metres out from the gate, and `side` metres to the left of the court as it is walked in toward the gate (negative: to the right). */
 export interface Spot {
   d: number;
   side: number;
@@ -19,7 +18,7 @@ export interface Spot {
 /** What a hazard is made of, and so how it looks, sounds and is coloured (render/wayFx.ts). */
 export type Look = 'flame' | 'spore' | 'coil' | 'salt' | 'bolt' | 'brine' | 'sand' | 'frost' | 'eye' | 'sign' | 'void' | 'star' | 'stain' | 'glass';
 
-/** A line of pieces down the way, from `from` to `to` metres back from the fog, one every `every` metres, `side` metres out (a range draws each one's between; `mirror`: and its twin on the other side). */
+/** A line of pieces down the court, from `from` to `to` metres out from the gate, one every `every` metres, `side` metres out (a range draws each one's between; `mirror`: and its twin on the other side). */
 export interface Mark {
   piece: Piece;
   from: number;
@@ -29,10 +28,10 @@ export interface Mark {
   mirror?: boolean;
   jitter?: number; // metres of wander along the way
   chance?: number; // 0..1: how many of them are made (default all)
-  face?: Face; // 'in': toward the way; 'out': away; 'front': toward the fog; 'free'
+  face?: Face; // 'in': toward the way; 'out': away; 'front': toward the gate; 'free'
 }
 
-/** A line said, and a sound and a tremor under it, the first time the way is walked past `at` metres from the fog toward it. */
+/** A line said, and a sound and a tremor under it, the first time the court is walked in past `at` metres from the gate. */
 export interface Omen {
   at: number;
   words: string;
@@ -57,7 +56,7 @@ export interface Rite {
   look: LightLook;
   glow: 'magenta' | 'purple' | 'green';
   at: readonly Spot[];
-  order: 'rising' | 'falling' | 'near'; // smallest first, greatest first, or the nearest the road first (by how they stand)
+  order: 'rising' | 'falling' | 'near'; // smallest first, greatest first, or the one furthest out from the gate first (by how they stand)
   clue: string; // said the first time the lights are come to
   done: string; // said when they are all lit
   reward: { echoes: number; insight?: number };
@@ -65,11 +64,7 @@ export interface Rite {
 }
 
 export interface Way {
-  name: string; // what the trail's head is called when found
-  line: string; // said under it
-  head: Piece; // what stands at the trailhead, where it leaves the road
-  headSide?: number; // metres to the road's side it stands (default: left)
-  width?: number; // metres of the trail (default 2.6)
+  width?: number; // metres of the court's way in, kept clear of what is stood (default 2.6)
   marks: readonly Mark[];
   omens: readonly Omen[];
   hazards?: readonly Hazard[];

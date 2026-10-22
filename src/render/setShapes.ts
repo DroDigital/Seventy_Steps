@@ -9,9 +9,11 @@ import { MODEL_INFO } from '../data/models/index';
 import type { Prop } from '../world/props';
 import { tint, tileUv } from './meshKit';
 import { modelPieces } from './modelKit';
+import { ashlar, colonnade, crystal, dam, cliff, grove, hedge, slabs as slabWall, terrace } from './setShapesHouse';
 import { banner, idol, meteor, pipes } from './setShapesRelic';
 import { glyph, hornTree, skullPole, totem } from './setShapesRite';
 import { hexped, pylon, slab, sphinx, trilith, ziggurat } from './setShapesStone';
+import { towerHorn, towerRound, towerSpire, towerSquare } from './setShapesTower';
 import { BASE, mixRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 
@@ -28,6 +30,8 @@ const KITS: Readonly<Record<string, (p: Prop, c: Rgb) => Piece[]>> = {
   inlay_ring: glyph, inlay_star: glyph, inlay_sign: glyph, inlay_hex: glyph, inlay_spiral: glyph, inlay_eye: glyph, inlay_serpent: glyph,
   totem, skull_pole: skullPole, horn_tree: hornTree,
   pylon, sphinx, trilith, ziggurat, slab, hexped, idol, pipes, banner, meteor,
+  house_ashlar: ashlar, house_dam: dam, house_cliff: cliff, house_grove: grove, house_colonnade: colonnade, house_hedge: hedge, house_slabs: slabWall, house_crystal: crystal, house_terrace: terrace, // round 63: the walls of a house, and its towers
+  house_tower_square: towerSquare, house_tower_round: towerRound, house_tower_spire: towerSpire, house_tower_horn: towerHorn,
 };
 
 /** A set piece's pieces in its own frame. */

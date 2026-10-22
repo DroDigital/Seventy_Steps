@@ -6,6 +6,7 @@
  * broken every half second — and the last stage's pays its reward. Pure: no Three.js.
  */
 
+import { stepKey } from '../data/discoveries';
 import { QUESTS, type Goal } from '../data/quests';
 import type { Game } from './components';
 import { changeInsight } from './insight';
@@ -121,6 +122,7 @@ function met(g: Game, goal: Goal): boolean {
   if (goal.kind === 'slay') return ow.slain.has(`boss:${goal.boss}`);
   if (goal.kind === 'reach') return ow.discovered.has(goal.sign);
   if (goal.kind === 'read') return ow.read.has(goal.doc);
+  if (goal.kind === 'step') return ow.told.has(stepKey(goal.boss, goal.i));
   return goal.kind === 'seals' && sealsBroken(g) >= goal.count;
 }
 

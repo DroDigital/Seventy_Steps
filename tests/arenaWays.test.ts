@@ -7,7 +7,7 @@ import { SET_KITS } from '../src/data/setKits';
 import { along, pointAt, WAY } from '../src/world/arenaWay';
 import { reach } from '../src/world/arenaDecor';
 import { worldLayout } from '../src/world/placements';
-import { regionPlan, roadShare } from '../src/world/regionPlan';
+import { regionPlan } from '../src/world/regionPlan';
 import { propCollider } from '../src/world/props';
 import { segmentDistance } from '../src/world/roads';
 
@@ -24,35 +24,26 @@ describe('the ways to the open arenas', () => {
 
   it('name only pieces that are there: a baked model, a built piece, a world prop', () => {
     for (const [id, way] of Object.entries(ARENA_WAYS)) {
-      for (const p of [way.head, ...way.marks.map((m) => m.piece)]) {
+      for (const p of way.marks.map((m) => m.piece)) {
         const known = p.of.startsWith('prop:') ? (PROP_KINDS as readonly string[]).includes(p.of.slice(5)) : !!MODEL_INFO[p.of] || !!SET_KITS[p.of];
         expect(known, `${id}: ${p.of}`).toBe(true);
       }
     }
   });
 
-  it('run from the arena\'s fog down its way in, and on to the road they join', () => {
+  it('run straight out from the house\'s gate, on its axis, and are no road', () => {
     expect(plans.length).toBe(Object.keys(ARENA_WAYS).length);
     for (const p of plans) {
       const a = w.arenas.find((x) => x.bosses[0] === p.boss)!;
+      const gate = a.house!.gate;
       const start = p.path[0];
-      expect(Math.hypot(start.x - a.x, start.z - a.z), `${p.boss}: begins at the fog`).toBeCloseTo(a.radius + WAY.fog, 3);
-      const lane = pointAt(p, WAY.lane - 1, 0);
-      expect(Math.hypot(lane.x - (start.x + a.front.x * (WAY.lane - 1)), lane.z - (start.z + a.front.z * (WAY.lane - 1))), `${p.boss}: straight down the way in at first`).toBeLessThan(0.5);
-      expect(p.length, `${p.boss}: long enough to be walked`).toBeGreaterThanOrEqual(WAY.least - 1);
-    }
-  });
-
-  it('are laid in the region\'s roads, so the ground shows the trail', () => {
-    for (const p of plans) {
-      const plan = plansOf(p.region);
-      const segs = new Map<number, ReturnType<typeof regionPlan>['segs'] extends Map<number, infer S> ? S : never>();
-      void segs;
+      expect(Math.hypot(start.x - gate.x, start.z - gate.z), `${p.boss}: begins outside the gate`).toBeCloseTo(WAY.out, 3);
+      const far = pointAt(p, p.length - 1, 0);
+      expect(Math.hypot(far.x - (start.x + a.front.x * (p.length - 1)), far.z - (start.z + a.front.z * (p.length - 1))), `${p.boss}: straight`).toBeLessThan(0.01);
+      expect(p.length, `${p.boss}: long enough to be walked`).toBeGreaterThanOrEqual(WAY.length - 1);
+      const roads = regionPlan(REGIONS.find((r) => r.id === p.region)!).roads;
       const mid = pointAt(p, p.length / 2, 0);
-      const road = regionPlan(REGIONS.find((r) => r.id === p.region)!).roads.some((r) => r.pts.some((q, i) => i > 0 && segmentDistance(mid.x, mid.z, r.pts[i - 1], q) < 0.01));
-      expect(road, `${p.boss}: a road runs where the way does`).toBe(true);
-      expect(plan.length).toBeGreaterThan(0);
-      expect(roadShare([{ a: p.path[0], b: p.path[1], width: p.width }], p.path[0].x, p.path[0].z)).toBeGreaterThan(0.9);
+      expect(roads.some((r) => r.width === p.width && r.pts.some((q, i) => i > 0 && segmentDistance(mid.x, mid.z, r.pts[i - 1], q) < 0.01)), `${p.boss}: it is laid as no road of its own`).toBe(false);
     }
   });
 
@@ -73,13 +64,13 @@ describe('the ways to the open arenas', () => {
     }
   });
 
-  it('keep every hazard and light on the way, outside the fight, and never on the ring', () => {
+  it('keep every hazard and light in the court, outside the house\'s wall', () => {
     for (const p of plans) {
       const a = w.arenas.find((x) => x.bosses[0] === p.boss)!;
       const spots = [...(p.way.hazards ?? []).flatMap((h) => ('plates' in h ? h.plates : 'at' in h && Array.isArray(h.at) ? (h.at as readonly { d: number; side: number }[]) : 'from' in h ? [{ d: h.from, side: 0 }, { d: h.to, side: 0 }] : [])), ...(p.way.rite?.at ?? [])];
       for (const s of spots) {
         const at = pointAt(p, s.d, s.side);
-        expect(Math.hypot(at.x - a.x, at.z - a.z), `${p.boss}: ${s.d}, ${s.side}`).toBeGreaterThan(a.radius + WAY.fog + 4);
+        expect(Math.hypot(at.x - a.x, at.z - a.z), `${p.boss}: ${s.d}, ${s.side}`).toBeGreaterThan(a.house!.radius + 3); // outside the house's wall
         expect(s.d, `${p.boss}: on the way`).toBeLessThan(p.length - 4);
       }
     }

@@ -9,9 +9,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The causeway of the drowned city: slabs leaning at wrong angles, green light in the stone, the sea coming over it in surges;
   // four lamps of the Alert to be lit, the low before the high.
   cthulhu: {
-    name: "The Causeway of R'lyeh",
-    line: 'The angles are wrong, and the stone is wet.',
-    head: piece('slab', { size: 0.5, glow: 'green' }),
     marks: [
       mark(piece('slab', { size: [0.5, 0.9], glow: 'green' }), 24, 170, 22, [8, 14], { mirror: true, jitter: 4, face: 'free' }),
       mark(piece('prop:spire', { size: 0.5 }), 30, 170, 40, [14, 22], { mirror: true, jitter: 6, chance: 0.7 }),
@@ -29,9 +26,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The road to Carcosa: tattered banners from towers no one built, lamps lit for no one, a pallid mask watching; the Yellow Sign is laid
   // in the paving and on the ground that wears at the mind.
   hastur: {
-    name: 'The Road to Carcosa',
-    line: 'The sun is black, and the banners hang from towers no one built.',
-    head: piece('banner', { size: 1 }),
     marks: [
       mark(piece('banner', { size: [0.9, 1.2] }), 12, 140, 14, 4.2, { mirror: true, jitter: 2 }),
       mark(piece('prop:tower', { size: 0.35 }), 20, 150, 36, [14, 22], { mirror: true, jitter: 5, chance: 0.8 }),
@@ -53,9 +47,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The road to the Threshold: hexagonal pedestals along it, spheres hanging in the sky and none falling, a road with no shadow;
   // stars fall on it; four lights of the Threshold to be lit from the road inward.
   yog_sothoth: {
-    name: 'The Road to the Threshold',
-    line: 'The sky is full of spheres, and none of them is falling.',
-    head: piece('hexped', { size: 0.8, glow: 'purple' }),
     marks: [
       mark(piece('hexped', { size: [0.7, 0.9], glow: 'purple' }), 14, 200, 18, 4.2, { mirror: true, jitter: 2 }),
       mark(piece('prop:globe', { size: 1 }), 16, 200, 22, [6, 12], { mirror: true, jitter: 5, chance: 0.8 }),
@@ -73,9 +64,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The road to the Court: pipes set along it, cones of the void, a piping with no tune; the ground wears at the mind, and the notes
   // come down on the way in their turn.
   azathoth: {
-    name: 'The Road to the Court',
-    line: 'Thin, monotonous piping, from nowhere, and a dancing that is not for you.',
-    head: piece('pipes', { size: 0.7 }),
     marks: [
       mark(piece('pipes', { size: [0.7, 1] }), 12, 160, 17, [5, 7], { mirror: true, jitter: 3 }),
       mark(piece('prop:cone', { size: 0.9 }), 18, 160, 30, [10, 16], { mirror: true, jitter: 5, chance: 0.8 }),
@@ -93,9 +81,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The terraces of Yaddith: pylons of metal-stone, cones that hum, pedestals glowing green; the paving is a mirror in pieces,
   // and one in each row of it is whole: the one that matches the tablet.
   zkauba: {
-    name: 'The Terraces of Yaddith',
-    line: 'The metal-stone is warm. Something here is wearing a man.',
-    head: piece('pylon', { size: 0.35 }),
     marks: [
       mark(piece('pylon', { size: 0.3 }), 24, 150, 40, [8, 11], { mirror: true, jitter: 4 }),
       mark(piece('prop:cone', { size: 0.8 }), 10, 140, 15, [5, 9], { mirror: true, jitter: 3, chance: 0.7 }),
@@ -111,9 +96,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The pipers' road: pipes set along it, hanging globes, notes that fall on the way in their turn; four lights to be lit, the great
   // before the small.
   daemon_pipers: {
-    name: "The Pipers' Road",
-    line: 'Thin piping, from nowhere, over a floor that is not there.',
-    head: piece('pipes', { size: 0.5 }),
     marks: [
       mark(piece('pipes', { size: [0.6, 0.9] }), 10, 150, 19, [3.8, 5.4], { mirror: true, jitter: 3 }),
       mark(piece('prop:globe', { size: 0.8 }), 14, 150, 28, [8, 14], { mirror: true, jitter: 5, chance: 0.8 }),
@@ -129,9 +111,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The pale hexagons: pedestals of light along a way that is itself a hexagon of light; the Gate at its far side. The paving
   // is warded, one sign in each row safe, and the ground beside it wears at the mind.
   ancient_ones: {
-    name: 'The Pale Hexagons',
-    line: 'The floor is a hexagon of light, and the Gate stands at its far side.',
-    head: piece('hexped', { size: 0.9, glow: 'purple' }),
     marks: [
       mark(piece('hexped', { size: [0.8, 1], glow: 'purple' }), 12, 150, 24, [4, 6], { mirror: true, jitter: 3 }),
       mark(piece('inlay_hex', { glow: 'purple', size: 2.4 }), 16, 140, 32, 0, { face: 'front' }),

@@ -9,10 +9,14 @@ import { NOTE_SITES } from '../data/documents';
 import { yawOf, type XZ } from '../core/geom';
 import type { HiddenPieceDef, Place } from '../data/arena';
 import type { AirSpec, CandleLook, GroundSpec } from '../data/arenaSets';
+import { ARENA_HOUSES } from '../data/arenaHousesAll';
+import { HOUSE } from '../data/arenaHouses';
+import { leafPlaces, planCourt, type Court } from './discoveryPlan';
 import { DUNGEONS, type Dir } from '../data/dungeons';
 import { REGIONS } from '../data/regions';
 import { DREAM_DESCENT, SITES } from '../data/sites';
 import { GUN, WORLD } from '../data/tuning';
+import type { HousePlan } from './arenaHouse';
 import { placeArena, propCollide } from './arenaPlace';
 import { echoCaches, roundCaches } from './caches';
 import type { Prop } from './props';
@@ -75,6 +79,8 @@ export interface ArenaPlace {
   ground?: GroundSpec; // the floor its set lays (arenaGround.ts)
   air?: AirSpec; // what drifts in it (render/arenaAir.ts)
   candle?: CandleLook; // what its candle stands on (world/candlePlan.ts)
+  house?: HousePlan; // the wall about it, closed but for a gate at its front (arenaHouse.ts; round 63)
+  court?: Court; // where its discovery's pages, vigils and altars stand in the court before the gate (discoveryPlan.ts)
 }
 
 export interface SpawnPoint {
@@ -217,7 +223,13 @@ function build(): WorldLayout {
     }
     for (const a of sites.arenas) {
       const p = at(a.at);
-      placeArena(w, region, p, a, pad(p.x, p.z, PAD.arena, a.radius), collide, spawn);
+      placeArena(w, region, p, a, pad(p.x, p.z, ARENA_HOUSES[a.bosses[0]!] ? [HOUSE.reach + HOUSE.level, PAD.arena[1]] : PAD.arena, a.radius), collide, spawn);
+      const placed = w.arenas[w.arenas.length - 1]!;
+      placed.court = planCourt(placed, (x, z) => around(x, z, 6).every((c) => { const b = colliderBounds(c); return x < b.x0 - 2.4 || x > b.x1 + 2.4 || z < b.z0 - 2.4 || z > b.z1 + 2.4; })); // round 63: clear of a sign's shrine, a stone, a door
+      for (const l of leafPlaces(placed)) { // the pages of its discovery lie in the court before its gate
+        pad(l.x, l.z, PAD.tome);
+        w.tomes.push({ name: l.doc, insight: 0, note: true, region: region.id, at: { x: l.x, z: l.z, yaw: 0 } });
+      }
     }
     for (const d of sites.dungeons) {
       const def = DUNGEONS.find((x) => x.id === d.id);

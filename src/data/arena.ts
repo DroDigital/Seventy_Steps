@@ -23,6 +23,7 @@ export interface HiddenPieceDef {
   minInsight?: number;
   maxSanity?: number; // a band floor: 70, 40 or 15
   minSeals?: number; // seals broken (systems/seals.ts): a sealed door stands until then
+  minFound?: string; // a horror found (data/discoveries*.ts; round 63): the gate of its house stands shut until its discovery is done
   glow: Glow; // the colour of its glyphs
   boxes: readonly LayerBox[];
   /** What stands only while it is hidden: the wall a hidden door opens, the chasm a hidden bridge spans (drawn as wall, or not at all). */

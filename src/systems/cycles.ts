@@ -7,11 +7,14 @@
  */
 
 import type { Entity } from '../core/ecs';
+import { foundKey } from '../data/discoveries';
+import { DISCOVERIES } from '../data/discoveriesAll';
 import { GUIDE, HINT_IDS, HINT_KEPT, hintGiven } from '../data/fieldGuide';
 import { BOSS, DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type DifficultyId, type LevelId, type UpgradeId } from '../data/tuning';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
 import type { Game } from './components';
+import { isFound } from './found';
 import { applyLevels, LEVEL_IDS } from './levels';
 
 export interface Carry {
@@ -27,6 +30,7 @@ export interface Carry {
   reagentMax: number;
   echoes: number;
   hints: string[]; // the hints given: one who has been told how to dodge is not told again (the Field Guide goes with them)
+  found: string[]; // the horrors whose houses have been opened (round 63): a second journey knows the way in, and its gates stand open
 }
 
 /** What the investigator carries into the next journey. */
@@ -43,6 +47,7 @@ export const carryOf = (g: Game): Carry => ({
   reagentMax: g.player.reagentMax,
   echoes: g.player.echoes,
   hints: HINT_IDS.filter((id) => !!g.overworld && hintGiven(g.overworld.told, id)),
+  found: Object.keys(DISCOVERIES).filter((id) => isFound(g, id)),
 });
 
 const num = (x: unknown, lo: number, hi: number): number => (typeof x === 'number' && Number.isFinite(x) ? Math.min(hi, Math.max(lo, Math.round(x))) : lo);
@@ -68,6 +73,7 @@ export function parseCarry(raw: unknown): Carry | null {
     reagentMax: num(o.reagentMax, REAGENT.doses, REAGENT.maxDoses),
     echoes: num(o.echoes, 0, 1e9),
     hints: (Array.isArray(o.hints) ? o.hints : []).filter((id): id is string => typeof id === 'string' && id in GUIDE),
+    found: (Array.isArray(o.found) ? o.found : []).filter((id): id is string => typeof id === 'string' && id in DISCOVERIES),
   };
 }
 
@@ -82,6 +88,7 @@ export function applyCarry(g: Game, c: Carry): void {
   h.hp = h.max;
   if (!equip(g, c.weapon)) equip(g, 'cane');
   for (const id of c.hints) g.overworld?.told.add(HINT_KEPT + id);
+  for (const id of c.found) g.overworld?.told.add(foundKey(id));
 }
 
 /** How much hardier this journey's foes are than the first's. */
