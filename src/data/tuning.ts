@@ -204,6 +204,13 @@ export const UPGRADES: Record<'resolve' | 'draught', { cost: number; max: number
 };
 export type UpgradeId = keyof typeof UPGRADES;
 
+/**
+ * Insight no upgrade or passage asks for (round 61: a whole run brings some 170 of it, the Mind's upgrades cost 14 and no hidden passage
+ * wants more than 3): what is held beyond that can be offered at an Elder Sign for Echoes, this many for each point; `hintAt` points of it
+ * is when the Field Guide says so (systems/insight.ts `surplusInsight`).
+ */
+export const LORE = { echoes: 200, hintAt: 5 };
+
 /** Hallucinations (spec §3A, Unmoored only). Times in frames. */
 export const HALLUCINATIONS = {
   max: 3, // at once
@@ -245,6 +252,7 @@ export const CAMERA = {
 export const INPUT = {
   deadzone: 0.2, // gamepad sticks
   mouseSensitivity: 0.0025, // rad per pixel
+  lockSettleMs: 250, // milliseconds after the browser grants the mouse in which its movement is not read (round 60: the first movement reported with a fresh lock can be the cursor's jump to the middle, which turned the camera to another view)
   stickLookSpeed: 3.2, // rad/s at full deflection
   keyLookSpeed: 2.4, // rad/s (arrow keys)
   flickPixels: 60, // mouse flick that switches lock target

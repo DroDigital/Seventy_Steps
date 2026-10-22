@@ -5,11 +5,13 @@
  * from 'Umr at-Tawil, the Outsider climbing up out of the dark, the Gorgon's gaze looked away from, Lilith by
  * candlelight, Rhan-Tegoth on his ivory throne, the window that opens on no street. Made as the others are
  * (data/cutscenesBoss.ts: shots, then beats, the director laying the horror's own line over them); those
- * that speak carry no caption of the scene's own. The rest still arrive by their size alone. Data only.
+ * that speak carry no caption of the scene's own. Round 61: the horrors that fight from a script and still arrived by their size alone have each their own now, those of the waking world in data/cutscenesRest.ts and the realms' in data/cutscenesDeep.ts (`arrivalOf` finds all of them). Data only.
  */
 
 import { shot, to, type Scene } from './cutscenes';
 import { behind, bespokeArrival, named, scene } from './cutscenesBoss';
+import { DEEP } from './cutscenesDeep';
+import { REST } from './cutscenesRest';
 
 type Maker = (name: string, epithet: string | undefined) => Scene;
 
@@ -148,4 +150,4 @@ export const MORE: Readonly<Record<string, Maker>> = {
 };
 
 /** The arrival of its own that horror `id` has, from either set of them (render/cinemaDirector.ts). */
-export const arrivalOf = (id: string, name: string, epithet: string | undefined): Scene | undefined => bespokeArrival(id, name, epithet) ?? MORE[id]?.(name, epithet);
+export const arrivalOf = (id: string, name: string, epithet: string | undefined): Scene | undefined => bespokeArrival(id, name, epithet) ?? MORE[id]?.(name, epithet) ?? REST[id]?.(name, epithet) ?? DEEP[id]?.(name, epithet);

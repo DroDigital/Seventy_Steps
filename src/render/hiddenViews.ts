@@ -3,6 +3,11 @@
  * piece's anomaly colour, shown while their layer is; a hidden door's seal is plain wall until then.
  * For a moment as a piece comes or goes it flickers between there and not there. Read-only on the
  * simulation.
+ * Round 61: the secret passages, the doorways and the bridges (render/passageShapes.ts), are drawn by what the
+ * simulation says of them (systems/passages.ts, `Layer.open`): a wall until the mind can see them, a wall with a
+ * faint outline of the door once it can, and, as the investigator comes near, the slab drawing aside into the wall
+ * in a gout of dust, or the stones of the bridge rising across the gap one after another, each lit as it forms,
+ * with the sound of stone that is heavy and old. The rest (the arena's standing stones) are as they were.
  */
 
 import * as THREE from 'three';
@@ -11,8 +16,11 @@ import type { Entity } from '../core/ecs';
 import { ARENA, type HiddenPieceDef } from '../data/arena';
 import { FEEDBACK } from '../data/tuning';
 import type { Game } from '../systems/components';
+import type { GameAudio } from './audio/gameAudio';
 import { box, tileUv } from './meshKit';
 import { ANOMALY, BASE, scaleRgb } from './palette';
+import { createPassageView, type PassageView } from './passageViews';
+import type { Particles } from './particles';
 import { createWorldMaterial } from './worldMaterial';
 
 interface View {
@@ -62,17 +70,27 @@ const coin = (tick: number): number => {
   return s - Math.floor(s);
 };
 
-export function createHiddenViews(scene: THREE.Scene, g: Game): { update(seconds: number): void } {
+export function createHiddenViews(scene: THREE.Scene, g: Game, fx?: { audio: GameAudio; particles: Particles }): { update(seconds: number): void } {
   const views = new Map<Entity, View>();
+  const passages = new Map<Entity, PassageView>(); // the doorways and bridges (round 61): drawn by what the simulation says of their opening
   for (const [id, p] of g.ecs.c.piece) {
+    if (fx && (p.def.door || p.def.bridge)) {
+      passages.set(id, createPassageView(scene, g, id, p.def, fx));
+      continue;
+    }
     const root = build(p.def);
     const seal = buildSeal(p.def);
     scene.add(root);
     if (seal) scene.add(seal);
     views.set(id, { root, seal, shown: g.ecs.c.layer.get(id)?.shown ?? false, since: -Infinity });
   }
+  g.events.on('PassageOpening', ({ id }) => passages.get(id)?.begin());
+  let last = -1;
   return {
     update(seconds) {
+      const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, seconds - last));
+      last = seconds;
+      for (const v of passages.values()) v.update(seconds, dt);
       for (const [id, v] of views) {
         const shown = g.ecs.c.layer.get(id)?.shown ?? false;
         if (shown !== v.shown) [v.shown, v.since] = [shown, seconds];

@@ -10,6 +10,7 @@
 import { t } from '../core/i18n';
 import { distXZ } from '../core/geom';
 import type { Place } from '../data/arena';
+import type { CandleLook } from '../data/arenaSets';
 import { gatePlan } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
 import type { Game } from './components';
@@ -22,9 +23,11 @@ export const CANDLE = {
 
 export interface Candle {
   id: string;
-  x: number;
+  x: number; // where the candle stands: aside the way, at its edge (world/candlePlan.ts)
   z: number;
   yaw: number; // looking at the fog
+  look: CandleLook; // what it stands on
+  rise: { x: number; z: number }; // where the fallen wake: the stake on the way in, a few paces from it
   wall: string; // the fog wall it stands before
   region: string;
 }
@@ -32,7 +35,7 @@ export interface Candle {
 let all: readonly Candle[] | null = null;
 /** Every candle of the world, one before each fog. */
 export function candlesOf(): readonly Candle[] {
-  all ??= gatePlan(worldLayout()).fogs.map((f) => ({ id: `candle:${f.id}`, x: f.stake.x, z: f.stake.z, yaw: f.stake.yaw, wall: f.id, region: f.region }));
+  all ??= gatePlan(worldLayout()).fogs.map((f) => ({ id: `candle:${f.id}`, x: f.candle.x, z: f.candle.z, yaw: f.stake.yaw, look: f.candle.look, rise: { x: f.stake.x, z: f.stake.z }, wall: f.id, region: f.region }));
   return all;
 }
 
@@ -46,7 +49,7 @@ export function candleFor(g: Game, at: { x: number; z: number }): (Place & { wal
     const d = distXZ(c, at);
     if (d <= CANDLE.reach && (!best || d < best.d)) best = { c, d };
   }
-  return best ? { x: best.c.x, z: best.c.z, yaw: best.c.yaw, wall: best.c.wall } : null;
+  return best ? { x: best.c.rise.x, z: best.c.rise.z, yaw: best.c.yaw, wall: best.c.wall } : null;
 }
 
 /** Takes the flame to any candle the investigator passes. */

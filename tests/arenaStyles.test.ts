@@ -25,7 +25,8 @@ describe('boss grounds', () => {
     const reach = (p: Prop): number => { const c = propCollider(p); if (!c) return 0; const b = colliderBounds(c); return Math.max(b.x1 - b.x0, b.z1 - b.z0) / 2; };
     const bad: string[] = [];
     for (const a of w.arenas) {
-      const ring = a.decor.filter((p) => Math.hypot(p.x - a.x, p.z - a.z) > a.radius && reach(p) > 0).sort((p, q) => Math.atan2(p.z - a.z, p.x - a.x) - Math.atan2(q.z - a.z, q.x - a.x));
+      // (a house's wall is closed all round by design: tests/arenaHouse.test.ts)
+      const ring = a.decor.filter((p) => Math.hypot(p.x - a.x, p.z - a.z) > a.radius && reach(p) > 0 && !p.set?.id.startsWith('house_')).sort((p, q) => Math.atan2(p.z - a.z, p.x - a.x) - Math.atan2(q.z - a.z, q.x - a.x));
       ring.forEach((p, k) => {
         const q = ring[(k + 1) % ring.length];
         const gap = Math.hypot(p.x - q.x, p.z - q.z) - reach(p) - reach(q);

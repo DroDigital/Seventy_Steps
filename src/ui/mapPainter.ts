@@ -1,50 +1,31 @@
 /**
  * Paints a view of the map (playtest round 1), for the minimap and the full map alike: the fog,
- * each region's art where it has been seen (its edges soft), the places marked there — Elder Signs
- * (bright once lit), gates, dungeon doors with an eye for a boss met within, an eye over each boss's
- * ring (struck through once it is slain) — the Echoes left behind, region names, and the
- * investigator's arrow. North is up.
+ * each region's art where it has been seen (its edges soft), the marks upon it (mapMarks.ts gathers them, mapIcons.ts draws each:
+ * Elder Signs, gates, dungeon doors with an eye for a horror met within, an eye over each horror's lair, the people, the places
+ * found, the Echoes left behind), the names (region, then sign, gate and dungeon, person, place) and the investigator's arrow.
+ * North is up. It hands back the marks it drew, for the screen to pick among (round 60).
  */
 
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
-import { cellsOf, isExplored } from '../systems/exploration';
-import { NPCS } from '../data/npcs';
-import { npcPlace } from '../systems/npcs';
-import { mapPlaces, type MapPlace } from '../world/mapData';
-import { placesOf } from '../world/namedPlaces';
-import { regionAt, regionRect } from '../world/worldMap';
+import { cellsOf } from '../systems/exploration';
+import { regionRect } from '../world/worldMap';
 import { artOf, type Art } from './mapArt';
+import { drawMark } from './mapIcons';
 import { drawLabels, type MapLabel } from './mapLabels';
-import { falseStar, slip, SLIDE } from './mapWrong';
+import { falseSign, gatherMarks, type Mark } from './mapMarks';
+import { slip, SLIDE } from './mapWrong';
+import { screenX, screenY, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 
-export interface MapView {
-  cx: number; // world point at the centre
-  cz: number;
-  scale: number; // pixels a metre
-  w: number;
-  h: number;
-}
-
-/**
- * Where a world point falls on a view (pixels). The world is drawn as the investigator sees it
- * (playtest round 13: the map was its mirror, so the minimap turned against the camera): facing
- * north (+z), +x lies on the left, so +x is drawn to the left.
- */
-export const screenX = (view: MapView, x: number): number => (view.cx - x) * view.scale + view.w / 2;
-export const screenY = (view: MapView, z: number): number => (view.cz - z) * view.scale + view.h / 2;
+const UNIT = { full: 7, mini: 5.2 } as const; // the radius of a mark, pixels (the full map's grows with the UI)
 
 export interface MapPainter {
-  paint(ctx: CanvasRenderingContext2D, view: MapView, realm: readonly RegionDef[], labels: boolean): void;
+  /** Paints `realm` on `view`; `full`: the full map, with its names. The marks drawn, the first underneath. */
+  paint(ctx: CanvasRenderingContext2D, view: MapView, realm: readonly RegionDef[], full: boolean): readonly Mark[];
 }
 
 const FOG = '#0b0b0d';
-const BONE = '#d9d0b8';
-const DIM = '#8a8474';
-const MAGENTA = '#d80073';
-const PURPLE = '#9a5ad0';
-const GREEN = '#c9b27a'; // a drop's mark: pale brass (round 36: the neon green was the one loud colour on the map)
 
 interface Veil {
   canvas: HTMLCanvasElement;
@@ -116,74 +97,13 @@ export function createMapPainter(g: Game): MapPainter {
     return v.canvas;
   }
 
-  const star = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, fill: string): void => {
-    ctx.beginPath();
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
-      const d = i % 2 ? r * 0.45 : r;
-      ctx.lineTo(x + Math.cos(a) * d, y + Math.sin(a) * d);
-    }
-    ctx.closePath();
-    ctx.fillStyle = fill;
-    ctx.fill();
-    ctx.stroke();
-  };
-  const eye = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, struck: boolean): void => {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(x - r, y);
-    ctx.quadraticCurveTo(x, y - r * 1.1, x + r, y);
-    ctx.quadraticCurveTo(x, y + r * 1.1, x - r, y);
-    ctx.stroke();
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, r * 0.35, 0, Math.PI * 2);
-    ctx.fill();
-    if (!struck) return;
-    ctx.beginPath();
-    ctx.moveTo(x - r, y + r * 0.8);
-    ctx.lineTo(x + r, y - r * 0.8);
-    ctx.stroke();
-  };
-
-  function place(ctx: CanvasRenderingContext2D, p: MapPlace, x: number, y: number, names: MapLabel[] | null, k: number): void {
-    const ow = g.overworld!;
-    const slain = (id: string): boolean => ow.slain.has(`boss:${id}`);
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1;
-    if (p.kind === 'sign') star(ctx, x, y, 5.5, ow.discovered.has(p.id) ? BONE : DIM);
-    else if (p.kind === 'gate') {
-      ctx.strokeStyle = PURPLE;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x, y, 4.5, 0, Math.PI * 2);
-      ctx.stroke();
-    } else if (p.kind === 'dungeon') {
-      ctx.fillStyle = '#161618';
-      ctx.strokeStyle = BONE;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(x - 4, y + 4);
-      ctx.lineTo(x - 4, y - 1);
-      ctx.arc(x, y - 1, 4, Math.PI, 0);
-      ctx.lineTo(x + 4, y + 4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      const met = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b));
-      if (met.length) eye(ctx, x + 9, y - 3, 4, met.every(slain) ? DIM : MAGENTA, met.every(slain));
-    } else eye(ctx, x, y, 6, p.bosses.every(slain) ? DIM : MAGENTA, p.bosses.every(slain));
-    if (names && p.kind === 'sign' && ow.discovered.has(p.id)) names.push({ text: p.name, x, y, size: 10 * k, color: BONE, gap: 8 });
-  }
-
   return {
-    paint(ctx, view, realm, labels) {
+    paint(ctx, view, realm, full) {
       const ow = g.overworld;
       if (typeof fog === 'string') fog = fogPattern(ctx) ?? FOG;
       ctx.fillStyle = fog;
       ctx.fillRect(0, 0, view.w, view.h);
-      if (!ow) return;
+      if (!ow) return [];
       const sx = (x: number): number => screenX(view, x);
       const sy = (z: number): number => screenY(view, z);
       ctx.imageSmoothingEnabled = view.scale < 1;
@@ -199,89 +119,27 @@ export function createMapPainter(g: Game): MapPainter {
         ctx.drawImage(img, -0.5, y0 - 0.5, x1 - x0 + 1, y1 - y0 + 1); // half a pixel over, so no seam shows between regions
         ctx.restore();
       }
-      const inRealm = new Set(realm.map((r) => r.id));
-      const [sanity, bucket] = [g.mind.sanity, Math.floor(performance.now() / 1000 / SLIDE)];
-      const off = (id: string): { dx: number; dy: number } => slip(id, sanity, bucket); // a failing mind's map slides (round 26)
-      const k = uiScale(); // the names grow with the UI (the marks keep their size)
-      const regionNames: MapLabel[] = [];
-      const names: MapLabel[] | null = labels ? [] : null; // the signs' first, then the people's
-      const people: MapLabel[] = [];
-      const marks: { x: number; y: number; r: number }[] = [];
-      for (const p of mapPlaces()) {
-        if (!inRealm.has(p.region)) continue;
-        const s0 = off(p.id);
-        const [x, y] = [sx(p.x) + s0.dx, sy(p.z) + s0.dy];
-        if (x < -20 || y < -20 || x > view.w + 20 || y > view.h + 20) continue;
-        if (!isExplored(ow.explored, p.x, p.z) && !(p.kind === 'sign' && ow.discovered.has(p.id))) continue;
-        place(ctx, p, x, y, names, k);
-        marks.push({ x, y, r: 6 });
-      }
-      for (const n of NPCS) { // the people met in the dream: a figure where they stand, named once met
-        const at = npcPlace(n);
-        if (!at || !inRealm.has(regionAt(at.x, at.z)?.id ?? '') || !isExplored(ow.explored, at.x, at.z)) continue;
-        const s1 = off(n.id);
-        const [x, y] = [sx(at.x) + s1.dx, sy(at.z) + s1.dy];
-        ctx.fillStyle = ow.met.has(n.id) ? BONE : DIM;
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(x, y - 3, 2.2, 0, Math.PI * 2);
-        ctx.moveTo(x - 3, y + 4);
-        ctx.lineTo(x, y - 1);
-        ctx.lineTo(x + 3, y + 4);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        marks.push({ x, y, r: 5 });
-        if (labels && ow.met.has(n.id)) people.push({ text: n.name, x, y, size: 10 * k, color: DIM, gap: 7 });
-      }
-      for (const d of g.ecs.query('drop')) {
-        const at = g.ecs.c.transform.get(d)!.pos;
-        const [x, y] = [sx(at.x), sy(at.z)];
-        ctx.fillStyle = GREEN;
-        ctx.beginPath();
-        ctx.moveTo(x, y - 4);
-        ctx.lineTo(x + 3, y);
-        ctx.lineTo(x, y + 4);
-        ctx.lineTo(x - 3, y);
-        ctx.fill();
-      }
-      const found: MapLabel[] = []; // the named places found, marked and named last (round 18)
-      for (const pl of realm.flatMap((r) => placesOf(r.id))) {
-        if (!ow.places.has(pl.id)) continue;
-        const [x, y] = [sx(pl.x), sy(pl.z)];
-        ctx.fillStyle = DIM;
-        ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
-        found.push({ text: pl.name, x, y, size: 8.5 * k, color: DIM, gap: 5 });
-      }
-      if (names) {
+      const k = uiScale(); // the names and the marks of the full map grow with the UI
+      const unit = full ? UNIT.full * k : UNIT.mini;
+      const { marks, labels } = gatherMarks(g, view, realm, full, unit, k);
+      for (const m of marks) drawMark(ctx, m.kind, m.x, m.y, m.r, m.state);
+      for (const m of marks) if (m.badge) drawMark(ctx, 'boss', m.x + m.r * 0.95, m.y - m.r * 0.95, m.r * 0.55, { slain: m.badge === 'slain' }); // a dungeon's horror
+      if (full) {
+        const regionNames: MapLabel[] = [];
         for (const r of realm) {
           if (!ow.explored.get(r.id)?.some((v) => v > 0)) continue;
           const rc = regionRect(r);
           regionNames.push({ text: r.name.toUpperCase(), x: sx((rc.x0 + rc.x1) / 2), y: sy(rc.z1) + 6, size: 12 * k, color: 'rgba(217,208,184,0.55)', gap: 0, centred: true });
         }
-        drawLabels(ctx, [...regionNames, ...names, ...people, ...found], marks);
+        drawLabels(ctx, [...regionNames, ...labels], marks.map((m) => ({ x: m.x, y: m.y, r: m.r * 1.2 })));
       }
       const tr = g.ecs.c.transform.get(g.player.id)!;
-      const s2 = off('you');
-      const [px, py] = [sx(tr.pos.x) + s2.dx, sy(tr.pos.z) + s2.dy];
-      const lie = falseStar(sanity, bucket, Math.min(view.w, view.h) / 2); // a star where there is none, for a moment of each slide
-      if (lie && performance.now() % (SLIDE * 1000) < 4000) star(ctx, view.w / 2 + lie.dx, view.h / 2 + lie.dy, 5.5, DIM);
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.rotate(-tr.yaw); // yaw 0 faces north (up); +x, a quarter turn of yaw, is on the left
-      ctx.beginPath();
-      ctx.moveTo(0, -7);
-      ctx.lineTo(5, 5);
-      ctx.lineTo(0, 2.5);
-      ctx.lineTo(-5, 5);
-      ctx.closePath();
-      ctx.fillStyle = BONE;
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.fill();
-      ctx.restore();
+      const [sanity, bucket] = [g.mind.sanity, Math.floor(performance.now() / 1000 / SLIDE)];
+      const s2 = slip('you', sanity, bucket);
+      const lie = falseSign(g, view); // a star where there is none, for a moment of each slide
+      if (lie) drawMark(ctx, 'sign', lie.x, lie.y, unit, { lit: false });
+      drawMark(ctx, 'you', sx(tr.pos.x) + s2.dx, sy(tr.pos.z) + s2.dy, unit * 1.05, { turn: -tr.yaw });
+      return marks;
     },
   };
 }

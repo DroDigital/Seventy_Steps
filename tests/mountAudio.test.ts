@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { V3 } from '../src/core/geom';
 import { MOUNT_IDS, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import {
-  CREAK, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, REIN_SLAP, TAIL_SWISH, TRACE_SHIFT, hoofBeat, hoofScrape, wheelThump, type Ground,
+  CREAK, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, TAIL_SWISH, TRACE_SHIFT, hoofBeat, hoofScrape, wheelThump, type Ground,
 } from '../src/data/mountSounds';
 import type { Sound } from '../src/data/sounds';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
@@ -331,11 +331,11 @@ describe('the car shifts gear and the spectral chariot breathes (round 52)', () 
 describe('the horse and the reins, heard (round 57)', () => {
   const keys = (heard: Heard[], part: string): Heard[] => heard.filter((h) => h.key.endsWith(`:${part}`));
 
-  it('each slap of the reins is heard as it lands, and the horse answers a moment after, but not every time', () => {
+  it('the slap of the reins is not heard (round 60), and the horse still answers a moment after the hands, but not every time', () => {
     const r = ride('grey');
     r.heard.length = 0;
     for (let i = 0; i < 40; i++) { r.mount.reins.struck++; r.mount.reins.begun++; r.advance(60, 0); }
-    expect(keys(r.heard, 'slap')).toHaveLength(40);
+    expect(keys(r.heard, 'slap')).toEqual([]);
     const answered = keys(r.heard, 'urge').length;
     expect(answered).toBeGreaterThan(18);
     expect(answered).toBeLessThan(39);
@@ -343,14 +343,15 @@ describe('the horse and the reins, heard (round 57)', () => {
     one.heard.length = 0;
     one.mount.reins.struck++;
     one.advance(1, 0);
-    expect(keys(one.heard, 'slap')).toHaveLength(1);
+    expect(keys(one.heard, 'slap')).toEqual([]);
     expect(keys(one.heard, 'urge')).toEqual([]); // the answer is a beat behind the hand
     expect(one.heard.every((h) => h.at == null)).toBe(true);
     const skeletons = ride('chariot');
     skeletons.heard.length = 0;
     skeletons.mount.reins.struck++;
     skeletons.advance(60, 0);
-    expect(keys(skeletons.heard, 'slap')).toHaveLength(1);
+    expect(keys(skeletons.heard, 'slap')).toEqual([]); // the chariot's reins are silent
+    expect(skeletons.heard.filter((h) => /:(slap|urge)$/.test(h.key))).toEqual([]);
     expect(keys(skeletons.heard, 'urge')).toEqual([]); // bones do not whicker
     const car = ride('automobile');
     car.heard.length = 0;
@@ -444,7 +445,7 @@ describe('the horse and the reins, heard (round 57)', () => {
 
   it('the new sounds are as present as a landed blow, the small ones softer: between -22 and -11 dBFS rms, or -30 and -11 for the asides', () => {
     const all: [name: string, sound: Sound, gain: number, aside?: true][] = [
-      ['slap', REIN_SLAP, MOUNT_MIX.slap], ['urge', HORSE_URGE, MOUNT_MIX.urge], ['halt', HORSE_HALT, MOUNT_MIX.halt],
+      ['urge', HORSE_URGE, MOUNT_MIX.urge], ['halt', HORSE_HALT, MOUNT_MIX.halt],
       ['shake', HARNESS_SHAKE, MOUNT_MIX.shake], ['blow', HORSE_BLOW, MOUNT_MIX.blow], ['whicker', HORSE_WHICKER, MOUNT_MIX.whicker],
       ['swish', TAIL_SWISH, MOUNT_MIX.swish, true], ['flutter', LIP_FLUTTER, MOUNT_MIX.flutter, true],
       ...(['dirt', 'road', 'stone', 'water'] as Ground[]).map((g): [string, Sound, number, true?] => [`scrape ${g}`, hoofScrape(g), MOUNT_MIX.scrape, g === 'water' ? true : undefined]),
@@ -459,7 +460,7 @@ describe('the horse and the reins, heard (round 57)', () => {
   });
 
   it('is leather, hide and breath: little of it is high, and none of it rings', () => {
-    for (const [name, sound] of [['slap', REIN_SLAP], ['halt', HORSE_HALT], ['shake', HARNESS_SHAKE], ['blow', HORSE_BLOW], ['whicker', HORSE_WHICKER], ['flutter', LIP_FLUTTER]] as const) {
+    for (const [name, sound] of [['halt', HORSE_HALT], ['shake', HARNESS_SHAKE], ['blow', HORSE_BLOW], ['whicker', HORSE_WHICKER], ['flutter', LIP_FLUTTER]] as const) {
       for (const layer of sound) if (layer.src !== 'noise') expect(layer.hz!, name).toBeLessThan(700); // no bell: every tone is a voice or a thump
       expect(sound.some((l) => l.src === 'sine' || l.src === 'triangle' || l.src === 'sawtooth' || l.src === 'noise'), name).toBe(true);
     }

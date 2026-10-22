@@ -46,6 +46,7 @@ import { createActFoley } from './actFoley';
 import { createFoley } from './foley';
 import { createAttackAudio } from './attackAudio';
 import { createStormAudio } from './stormAudio';
+import { createWayAudio } from './wayAudio';
 import { STORM_MIX, thunderRoll } from '../../data/stormSounds';
 import { createMountAudio } from './mountAudio';
 import { createMountBed } from './mountBed';
@@ -119,6 +120,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
+  createWayAudio(g, recipe, (set, at, o = {}) => recorded(set, at, at ? AUDIO.eventRange : 1, o)); // round 62: the wards, vents and waves of a way, and what is heard under its omens
   const attacks = createAttackAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 51: a horror's blows heard as their matter
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {

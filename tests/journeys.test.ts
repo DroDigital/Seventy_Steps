@@ -1,8 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { gatePlace, signPlace, travel } from '../src/systems/checkpoints';
-import { demoAllows } from '../src/systems/demo';
-import { t } from '../src/core/i18n';
 import { WORLD } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
 import { createWorldGame, stepGame } from '../src/systems/game';
@@ -113,34 +111,16 @@ describe('journeys (ui/journeys.ts)', () => {
     expect(asked.at(-1)).toBe('lift');
   });
 
-  it('E at a gate is a journey through it, named for where it leads', async () => {
+  it('E at a gate is not a journey: no veil falls and the key goes on to the world, which does nothing with it (round 60)', () => {
     const g = createWorldGame();
     const gate = worldLayout().gates[0];
-    const twin = worldLayout().gates.find((x) => x.id === gate.to)!;
-    const back = (WORLD.reach - 0.7) / WORLD.gateArrive; // a step or two back toward the gate: within reach (round 32: the arrival is further out, so no longer half the way)
-    goTo(g, gate.x + (gate.arrive.x - gate.x) * back, gate.z + (gate.arrive.z - gate.z) * back);
-    const { veil, asked, covers } = fakeVeil();
-    const j = createJourneys(g, veil);
-    const frame = press('interact');
-    expect(j.before(frame)?.pressed.interact).toBe(false); // the world never sees it
-    expect(asked).toEqual([`cover ${twin.name.toUpperCase()}`]);
-    await covers();
-    expect(pos(g)).toMatchObject({ x: twin.arrive.x, z: twin.arrive.z });
-  });
-
-  it('in the demo, E at a gate out of its realms is refused at once: no veil falls, and the reason is said (review of PR 142)', () => {
-    const g = createWorldGame({ demo: true });
-    const inDemo = (x: number, z: number): boolean => demoAllows(g, { x, z });
-    const gate = worldLayout().gates.find((gt) => inDemo(gt.x, gt.z) && !inDemo(gatePlace(gt.to)!.arrive.x, gatePlace(gt.to)!.arrive.z))!;
     const back = (WORLD.reach - 0.7) / WORLD.gateArrive;
     goTo(g, gate.x + (gate.arrive.x - gate.x) * back, gate.z + (gate.arrive.z - gate.z) * back);
     const before = { ...pos(g) };
-    const said = record(g, 'Notice');
     const { veil, asked } = fakeVeil();
     const j = createJourneys(g, veil);
-    expect(j.before(press('interact'))?.pressed.interact).toBe(false);
-    expect([asked, j.busy]).toEqual([[], false]); // no cover, no journey under way
-    expect(said.map((n) => n.text)).toEqual([t('demo.closed')]);
+    expect(j.before(press('interact'))?.pressed.interact).toBe(true);
+    expect([asked, j.busy]).toEqual([[], false]);
     expect(pos(g)).toMatchObject({ x: before.x, z: before.z });
   });
 

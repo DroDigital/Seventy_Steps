@@ -27,6 +27,7 @@ import { worldLayout, type SignPlace } from '../world/placements';
 import { button, createScreen, el, footer, heading, option, tabs, title, type Page } from './menuKit';
 import { chips, price, resources, type Chip } from './menuChips';
 import { keyLayout } from '../core/bindings';
+import { loreSection } from './signLore';
 import { moveSection, movePage } from './signMove';
 import { relicsTab, slotPage } from './signRelics';
 import { mountsTab, refreshMountEntitlement } from './mounts';
@@ -98,6 +99,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       chips(b, list);
       price(b, full ? 'MAX' : `${u.cost} insight`, full ? 'max' : can ? 'ok' : 'no');
     }
+    loreSection(panel, g, () => main.redraw?.()); // what insight is for once the Mind is grown (round 61)
   }
 
   /** Star-stones set into the weapons owned, and the revolver, a level at a time (round 12; round 38: a tab, no longer a page of its own). Round 52: each row says what the next level does, in green, and its cost in star-stones, boxed at the right. */

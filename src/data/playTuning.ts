@@ -81,14 +81,13 @@ export const SETTINGS = {
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
-  // The sound's levels (round 60: a player found the game sounded far better at half the volume, the music, the ambience and the voices, the effects
-  // full, and asked for a mix within a tenth of that: the ambience a step under, as a bed that never stops masks the steps, the calls and the speech
-  // most, and the voices a step over, so a line stays clear over blows with the effects full; 0.7 and all four at 1 before)
-  volume: [0, 1, 0.05, 0.5], // everything
-  music: [0, 1, 0.05, 0.5], // the title's theme, the realms' tracks and the boss scores (round 12)
+  // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
+  // player had found, and before it the volume was 0.7 and the others 1)
+  volume: [0, 1, 0.05, 1], // everything
+  music: [0, 1, 0.05, 1], // the title's theme, the realms' tracks and the boss scores (round 12)
   sfx: [0, 1, 0.05, 1], // blows, steps, the world's sounds
-  ambience: [0, 1, 0.05, 0.45], // the drones and the recorded ambience
-  speech: [0, 1, 0.05, 0.55], // the people's and the horrors' spoken lines (the voices)
+  ambience: [0, 1, 0.05, 1], // the drones and the recorded ambience
+  speech: [0, 1, 0.05, 1], // the people's and the horrors' spoken lines (the voices)
   language: [0, LANGS.length - 1, 1, 0], // its place in data/lang (round 46); a first launch takes the browser's
 } satisfies Record<string, readonly [number, number, number, number]>;
 
@@ -127,7 +126,8 @@ export type LevelId = keyof typeof LEVELS;
 export const LEVEL_COST = { base: 200, step: 60, curve: 4.5 };
 
 /** Reinforcing a weapon at an Elder Sign (round 12): the most levels, the share each adds to its blows, and the star-stones each level costs. */
-export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[] };
+export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[], moveEchoes: 600 };
+// `moveEchoes` (round 61): moving a level from one weapon to another is not free: each level moved costs this many Echoes for each star-stone it would cost to set in afresh in the weapon it goes to (so 600 for the first level, 1800 for the fifth, 5400 to move five into a bare weapon). Stones set directly into the other weapon cost no Echoes, and the stones a boss leaves are there to be set, not shuffled.
 
 /** Each new journey through the dream (NG+, round 12): what it adds to foes' health, their blows and the Echoes they leave, and the last journey counted. */
 export const NEW_GAME_PLUS = { health: 0.6, damage: 0.35, echoes: 0.5, most: 7 };
@@ -295,6 +295,21 @@ export const EXPLORE = {
   every: 8, // frames between looks around
   minimap: 110, // metres from the centre to the minimap's edge
 };
+
+/** The card for a weapon or a relic found (round 60, ui/findCard.ts): the milliseconds a find waits before it opens, once the investigator is free. A weapon's pickup is felt first; a relic's horror has fallen, and its banner and its Echoes are read. */
+export const FINDS = {
+  wait: { weapon: 900, relic: 5200 },
+};
+
+/** The map's marker (round 60, systems/marker.ts): how near the investigator must come for it to be reached, and so cleared (metres). */
+export const MARKER = { arrive: 10 };
+
+/**
+ * Secret passages (round 61, systems/passages.ts): the metres from a passage within which it wakes (a bridge's from its middle, and half
+ * its length more), the frames each kind takes to open, and how far open it must be for the way to be passable (a door's seal leaves the
+ * world, a bridge's deck stands): the picture is at that moment well on.
+ */
+export const PASSAGE = { wake: 7, frames: { door: 96, sealed: 120, bridge: 72 }, solidAt: 0.62, stood: 3 }; // stood: metres within which a passage met standing at it, when the world is made, is already open
 
 /** The seals on Kadath's door (playtest round 12, systems/seals.ts). */
 export const SEALS = {

@@ -177,6 +177,7 @@ function bridgePiece(r: RoomLayout, name: string, p: number, veil: Veil): Hidden
     name, x: r.x, z: r.z, ...veil, glow: glowOf(veil),
     boxes: [[0, 0, hw, hd, r.level - 0.4, r.level]],
     seal: { boxes: [[0, 0, sw, sd, r.level - chasm, r.level + rim]], look: 'none' },
+    bridge: { alongX, half: alongX ? hw : hd, width: deck, y: r.level },
   };
 }
 
@@ -190,6 +191,7 @@ function doorPiece(o: DoorLayout, name: string, veil: Veil): HiddenPieceDef {
     name, x: o.x, z: o.z, ...veil, glow: glowOf(veil),
     boxes: [box(-(D / 2 + 0.12), 0.12, T / 2 + 0.05, L, L + lintel), box(D / 2 + 0.12, 0.12, T / 2 + 0.05, L, L + lintel), box(0, D / 2 + 0.24, T / 2 + 0.05, L + lintel, L + lintel + 0.2)],
     seal: { boxes: [box(0, D / 2, T / 2, L - 0.3, L + lintel)], look: veil.minSeals !== undefined ? 'sealed' : 'wall' },
+    door: { alongX, width: D, height: lintel, thick: T, y: L },
   };
 }
 

@@ -13,10 +13,13 @@ import { chunkContent } from '../world/chunks';
 import { roadShare } from '../world/regionPlan';
 import { GROUND_CONTACT } from '../data/fxTuning';
 import { WORLD } from '../data/tuning';
+import { groundMark, type ArenaGround } from '../world/arenaGround';
 import { contactsNearChunkJob, markAt, type Contact } from '../world/groundContact';
+import { worldLayout } from '../world/placements';
 import { inDungeon, surface } from '../world/terrain';
 import { edgeShare, neighbourOf } from '../world/regionBlend';
 import { regionOfChunk, regionsNearChunk } from '../world/worldMap';
+import type { TextureKind } from './textures';
 import { createWorldMaterial } from './worldMaterial';
 
 const TILE = 2; // metres per ground texture repeat: 32 px/m, the arena floor's and the pillars' density
@@ -34,7 +37,7 @@ const ORGANIC = new Set<GroundTexture>(['rot', 'grass', 'mud', 'sand', 'snow', '
  */
 export interface Beside { texture: GroundTexture; road: RoadTexture; patch?: GroundTexture }
 
-export function groundMaterial(texture: GroundTexture, road: RoadTexture = 'cobble', patch?: GroundTexture, beside?: Beside): THREE.ShaderMaterial {
+export function groundMaterial(texture: GroundTexture, road: RoadTexture | TextureKind = 'cobble', patch?: GroundTexture, beside?: Beside): THREE.ShaderMaterial {
   const roadBeside = beside && beside.road !== road ? beside.road : undefined; // a road meets another road's style at a border: the two cross-fade, as the ground does
   const fade = !!beside && beside.patch !== patch; // and a patch of another ground than the one beside fades out toward the border, so its edge is not cut there
   const key = `${texture}|${road}|${patch ?? ''}|${beside?.texture ?? ''}|${roadBeside ?? ''}|${fade ? 'fade' : ''}`;
@@ -69,6 +72,9 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
   const beside = neighbourOf(cx, cz);
   const ownTint = region.biome.tint;
   let blended = false;
+  const reachOf = (a: ArenaGround): number => a.radius + (a.spec.reach ?? 10);
+  const arenas: ArenaGround[] = worldLayout().arenas.flatMap((a) => (a.ground && Math.hypot(a.x - (x0 + WORLD.chunk / 2), a.z - (z0 + WORLD.chunk / 2)) < reachOf({ ...a, front: a.front, spec: a.ground }) + WORLD.chunk * 0.71 ? [{ x: a.x, z: a.z, radius: a.radius, front: a.front, spec: a.ground }] : []));
+  const floor = roads.length === 0 ? arenas[0]?.spec.texture : undefined; // a road crossing it keeps its own ground: the arena's colour only
   let contacts: Contact[] = []; // what stands on this ground: its foot is darkened and turned to earth (world/groundContact.ts)
   yield* contactsNearChunkJob(cx, cz, (c) => (contacts = c));
   const earth = GROUND_CONTACT.earth;
@@ -84,6 +90,15 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
       uv.set([x / TILE, z / TILE], v * 2);
       let k = GAIN * (0.62 + 0.38 * fbm(x * 0.15, z * 0.15, 99, 2));
       let tint = ownTint;
+      let share = 0;
+      for (const a of arenas) { // an arena's ground: its colour and rings of dark and light over the land's, its texture in the road's place
+        const m = groundMark(a, x, z);
+        if (!m || m.share <= share) continue;
+        share = m.share;
+        k *= 1 + (m.k - 1) * m.share;
+        const t = m.tint ?? tint;
+        tint = [ownTint[0] + (t[0] - ownTint[0]) * m.share, ownTint[1] + (t[1] - ownTint[1]) * m.share, ownTint[2] + (t[2] - ownTint[2]) * m.share];
+      }
       if (beside) { // beside another region: its ground and its tint come in over the last of this one's, in a band the noise makes uneven
         const share = edgeShare(region, beside, x, z, 2 * fbm(x * 0.06, z * 0.06, 71, 2) - 1);
         if (share > 0) {
@@ -100,7 +115,7 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
         const e = GROUND_CONTACT.soil * mark.soil;
         col.set([(tint[0] + (earth[0] - tint[0]) * e) * k, (tint[1] + (earth[1] - tint[1]) * e) * k, (tint[2] + (earth[2] - tint[2]) * e) * k], v * 3);
       }
-      splat[v] = roadShare(roads, x, z);
+      splat[v] = floor ? Math.max(roadShare(roads, x, z), share) : roadShare(roads, x, z);
     }
     if (j % ROWS_PER_STEP === ROWS_PER_STEP - 1) yield;
   }
@@ -125,5 +140,5 @@ export function* terrainJob(cx: number, cz: number, done: (mesh: THREE.Mesh | nu
   geo.setAttribute('aEdge', new THREE.BufferAttribute(edge, 1));
   geo.setIndex(index);
   geo.computeBoundingSphere();
-  done(new THREE.Mesh(geo, groundMaterial(region.biome.texture, (REGION_LAYOUTS[region.id] ?? REGION_LAYOUTS.hub).road, region.biome.patch, blended ? { texture: beside!.region.biome.texture, road: (REGION_LAYOUTS[beside!.region.id] ?? REGION_LAYOUTS.hub).road, patch: beside!.region.biome.patch } : undefined)));
+  done(new THREE.Mesh(geo, groundMaterial(region.biome.texture, (floor as TextureKind | undefined) ?? (REGION_LAYOUTS[region.id] ?? REGION_LAYOUTS.hub).road, region.biome.patch, blended ? { texture: beside!.region.biome.texture, road: (REGION_LAYOUTS[beside!.region.id] ?? REGION_LAYOUTS.hub).road, patch: beside!.region.biome.patch } : undefined)));
 }

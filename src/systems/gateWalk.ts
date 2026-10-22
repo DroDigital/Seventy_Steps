@@ -3,16 +3,19 @@
  * be accessible via straightforward pedestrian movement and feature more ambitious, visually compelling animations"): a
  * free investigator who steps into a gate's veil, between its jambs, is drawn on into it a few steps, the walk no longer
  * theirs, and comes through at its twin (checkpoints.ts `passGate`). The veil falls over the walk (ui/journeys.ts), and
- * the gate's light swells and takes them (render/portalViews.ts). E at a gate still passes it; a boss fight still holds
- * every gate shut, and the demo's edge still turns them back, each said as they step in. Pure: no Three.js.
+ * the gate's light swells and takes them (render/portalViews.ts). E does nothing at a gate, and no prompt offers it (round 60,
+ * asked: "remove the option and indicator for pressing E to move through portals, except boss fogs"): nearing one says where it
+ * leads (`gateNear`, the HUD's line), and one riding who steps into it is set down and drawn on. A boss fight still holds every
+ * gate shut, and the demo's edge still turns them back, each said as they step in. Pure: no Three.js.
  */
 
 import { distXZ, type XZ } from '../core/geom';
 import { worldLayout, type GatePlace } from '../world/placements';
-import { yawOfDir } from '../world/worldMap';
-import { gateBarred, gateBeyondDemo, passGate } from './checkpoints';
+import { regionAt, yawOfDir } from '../world/worldMap';
+import { gateBarred, gateBeyondDemo, gatePlace, passGate } from './checkpoints';
 import type { Game } from './components';
 import { walkAlong } from './fogGates';
+import { dismissMount } from './mounts';
 
 /** A gate's veil, and the walk into it. */
 export const GATE_WALK = {
@@ -22,6 +25,7 @@ export const GATE_WALK = {
   pace: 1.4, // metres a second, once under way
   frames: 72, // the walk takes at least this long (1.2 s): the veil's fall is made to it
   told: 120, // frames between two sayings that the gate is shut (a body pressed to it would hear it every step)
+  notice: 9, // metres from a gate within which the HUD says where it leads
 };
 
 /** Where `p` stands about gate `t`: how far in front of its veil (the side it faces, where those coming through stand), and how far across its opening. */
@@ -46,6 +50,7 @@ const told = new WeakMap<Game, number>(); // when a shut gate was last said to b
 
 /** Sets the investigator walking on into `gate`'s veil, toward its middle. */
 export function enterGate(g: Game, gate: GatePlace): void {
+  dismissMount(g); // one riding is set down at the veil: there is no E to do it, and they come through on foot as ever
   const me = g.ecs.c.transform.get(g.player.id)!.pos;
   const at = aboutGate(gate, me);
   const [side, yaw] = [Math.sign(at.ahead) || 1, yawOfDir(gate.face)];
@@ -59,10 +64,32 @@ export function enterGate(g: Game, gate: GatePlace): void {
   g.events.emit('GateEntering', { gate: gate.id, x: gate.x, z: gate.z, frames });
 }
 
+/** Where `gate` leads, for a notice: the region beyond it, or, where its twin stands in the same region, the twin's name. */
+export function leadsTo(gate: GatePlace): string {
+  const twin = gatePlace(gate.to);
+  if (!twin) return '';
+  const [there, here] = [regionAt(twin.x, twin.z), regionAt(gate.x, gate.z)];
+  return there && here && there.id !== here.id ? there.name : twin.name;
+}
+
+/** The gate close enough for the HUD to say where it leads, and where, if a free investigator is near one (nothing while one is walking into a veil or fallen). */
+export function gateNear(g: Game): { id: string; leads: string } | null {
+  const p = g.player;
+  if (!g.overworld || g.cutscene || p.gatePass || p.fogPass || p.falling || (g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0) return null;
+  const at = g.ecs.c.transform.get(p.id)!.pos;
+  let best: GatePlace | null = null;
+  let bestD = GATE_WALK.notice;
+  for (const t of worldLayout().gates) {
+    const d = distXZ(t, at);
+    if (d < bestD) [best, bestD] = [t, d];
+  }
+  return best ? { id: best.id, leads: leadsTo(best) } : null;
+}
+
 /** One step, after movement: a free investigator on foot who has just stepped into a gate's veil is drawn on into it; one held from it is told why. */
 export function gateStepSystem(g: Game): void {
   const p = g.player;
-  if (!g.overworld || g.cutscene || p.gatePass || p.fogPass || p.falling || p.mount.active) return;
+  if (!g.overworld || g.cutscene || p.gatePass || p.fogPass || p.falling) return;
   const c = g.ecs.c;
   if (c.actor.get(p.id)?.move === 'death' || (c.health.get(p.id)?.hp ?? 0) <= 0) return;
   const tr = c.transform.get(p.id)!;

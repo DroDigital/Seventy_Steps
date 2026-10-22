@@ -4,11 +4,11 @@
  * handful of the particles the world already has.
  */
 
-import type { Beat } from '../data/cutscenes';
+import type { BurstKind } from '../data/cutscenes';
 import type { Rgb } from './palette';
-import type { Particles } from './particles';
+import type { ParticleShape, Particles } from './particles';
 
-type Kind = NonNullable<Beat['burst']>['kind'];
+type Kind = BurstKind;
 
 interface Recipe {
   color: readonly Rgb[]; // one at random for each
@@ -20,6 +20,9 @@ interface Recipe {
   gravity: number;
   drag: number;
   glow: boolean;
+  shape?: ParticleShape; // a disc unless said
+  alpha?: number; // at birth (0.9)
+  grow?: number; // × its size at death (1.4)
 }
 
 const RECIPES: Readonly<Record<Kind, Recipe>> = {
@@ -27,6 +30,14 @@ const RECIPES: Readonly<Record<Kind, Recipe>> = {
   motes: { color: [[0.96, 0.82, 0.48], [0.9, 0.7, 0.36]], size: [0.07, 0.12], life: [3, 5], rise: [0.4, 1], out: 0.35, spread: 0.9, gravity: -0.05, drag: 0.4, glow: true },
   embers: { color: [[1, 0.36, 0.12], [0.85, 0.16, 0.08], [1, 0.6, 0.2]], size: [0.06, 0.11], life: [2, 4], rise: [0.8, 2.2], out: 0.5, spread: 0.8, gravity: -0.2, drag: 0.3, glow: true },
   stars: { color: [[0.95, 0.94, 1], [0.7, 0.55, 1], [0.85, 0.8, 1]], size: [0.1, 0.18], life: [2, 3.6], rise: [-0.3, 0.5], out: 2.4, spread: 3.5, gravity: 0, drag: 0.1, glow: true },
+  // Round 61: the entrances of the horrors that arrived by their size alone.
+  frost: { color: [[0.85, 0.93, 1], [0.7, 0.82, 0.95]], size: [0.05, 0.1], life: [3, 5], rise: [-0.4, 0.2], out: 0.6, spread: 1.6, gravity: 0.25, drag: 0.6, glow: false, shape: 'shard' }, // a cold room's breath, settling
+  brine: { color: [[0.72, 0.84, 0.9], [0.86, 0.93, 0.96]], size: [0.08, 0.17], life: [2.4, 4], rise: [0.3, 1.2], out: 0.9, spread: 1.8, gravity: 0, drag: 0.5, glow: false, shape: 'bubble', alpha: 0.8 }, // the sea giving something up
+  spores: { color: [[0.66, 0.86, 0.4], [0.82, 0.92, 0.56]], size: [0.1, 0.22], life: [3.5, 5.5], rise: [0.2, 0.7], out: 0.4, spread: 1.4, gravity: -0.05, drag: 0.5, glow: true, shape: 'wisp', alpha: 0.7 }, // a pale growth breathing out
+  smoke: { color: [[0.2, 0.2, 0.22], [0.34, 0.33, 0.36]], size: [0.3, 0.6], life: [3, 5], rise: [0.3, 0.9], out: 0.5, spread: 1.2, gravity: -0.05, drag: 0.5, glow: false, shape: 'wisp', alpha: 0.5, grow: 2.2 },
+  runes: { color: [[0.86, 0.2, 0.66], [0.52, 0.2, 0.86], [0.3, 1, 0.66]], size: [0.18, 0.3], life: [3, 5], rise: [0.3, 0.9], out: 0.5, spread: 1.7, gravity: -0.05, drag: 0.4, glow: true, shape: 'rune' }, // sigils lifting off the ground, in the anomaly colours
+  notes: { color: [[0.96, 0.92, 1], [0.8, 0.7, 1]], size: [0.2, 0.32], life: [3, 5], rise: [0.4, 1.2], out: 1.4, spread: 2.8, gravity: -0.1, drag: 0.3, glow: true, shape: 'note' }, // a thin piping made visible
+  eyes: { color: [[1, 0.9, 0.7], [0.9, 0.5, 0.9]], size: [0.22, 0.36], life: [2.6, 4.2], rise: [0, 0.3], out: 1.6, spread: 3.2, gravity: 0, drag: 0.2, glow: true, shape: 'eye' }, // opening, all about
 };
 
 const between = ([lo, hi]: readonly [number, number]): number => lo + (hi - lo) * Math.random();
@@ -47,9 +58,10 @@ export function burst(particles: Particles, kind: Kind, at: { x: number; y: numb
       vz: dz * r.out * Math.random(),
       life: between(r.life),
       size: between(r.size),
-      grow: 0.4,
+      grow: r.grow ?? 0.4,
       color: r.color[Math.floor(Math.random() * r.color.length)],
-      alpha: 0.9,
+      alpha: r.alpha ?? 0.9,
+      ...(r.shape && { shape: r.shape }),
       glow: r.glow,
       gravity: r.gravity,
       drag: r.drag,

@@ -4,6 +4,9 @@
  * written it. Keyed by the name a tome or note is placed under (sites.ts, dungeons.ts, lairs.ts).
  */
 
+import { BEYOND_DOCUMENTS } from './documentsBeyond';
+import { HOUSE_DOCUMENTS } from './documentsHouses';
+
 export interface Document {
   kind: 'tome' | 'note';
   /** Burnt paper is the note default. A tome may opt in; a note may opt out with `plain`. */
@@ -237,6 +240,8 @@ export const DOCUMENTS: Readonly<Record<string, Document>> = {
     'Chalked on a stone in a wood where the stones are all friendly: do not eat the mushrooms that glow; do not follow the lights; do not tell the cats where we have been.',
     'Underneath, a smudged paw-print, and, much larger, something that is not a paw-print at all, which the zoogs have drawn a circle around and left alone.',
   ),
+  ...HOUSE_DOCUMENTS, // round 63: the pages in the courts of the horrors' houses
+  ...BEYOND_DOCUMENTS,
 };
 
 /** The notes' places, by region (metres from the region's south-west corner, like sites.ts). */
