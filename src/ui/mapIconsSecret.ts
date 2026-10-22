@@ -41,11 +41,14 @@ export function secret(ctx: CanvasRenderingContext2D, x: number, y: number, r: n
   const colour = s.rumour || s.spent ? DIM : BONE;
   token(ctx, x, y, r * 1.1, colour);
   if (s.rumour || !s.poi) {
-    ctx.font = `bold ${Math.round(r * 1.45)}px monospace`;
+    ctx.font = `bold ${Math.round(r * 1.6)}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = DIM;
+    ctx.shadowColor = '#9a5ad0';
+    ctx.shadowBlur = r * 0.8; // a faint violet breath about it, so it is found among the rest (round 66)
+    ctx.fillStyle = '#b7b09c';
     ctx.fillText('?', x, y + r * 0.06);
+    ctx.shadowBlur = 0;
     return;
   }
   ctx.lineCap = 'round';

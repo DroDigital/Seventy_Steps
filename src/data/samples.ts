@@ -205,7 +205,6 @@ const creaks: Spot = { set: 'creak', every: [18, 45] };
 export const BED_MANNER: Readonly<Record<string, { lowpass?: number; breath?: number; every?: [number, number] }>> = {
   crickets: { lowpass: 3600, breath: 0.75, every: [38, 85] },
   frogs: { lowpass: 3200, breath: 0.7, every: [30, 70] },
-  alien: { lowpass: 5000, breath: 0.4, every: [45, 90] },
   murmur: { breath: 0.35, every: [50, 100] },
   // Round 31 (the rest were too loud): the winds, the sea, the leaves and the cave soften and breathe too.
   wind: { lowpass: 2600, breath: 0.45, every: [30, 70] },
@@ -237,7 +236,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   kn_yan: { beds: [['cave', 0.8], ['drips', 0.65]], spots: [{ set: 'chains', every: [50, 110] }] },
   dreamlands: { beds: [['murmur', 0.65], ['wind', 0.4]], spots: [owls] },
   rlyeh: { beds: [['waves', 1], ['wind_ghost', 0.3]], spots: [{ set: 'gurgle', every: [25, 60] }] },
-  yuggoth: { beds: [['alien', 0.72]], spots: [{ set: 'timber', every: [40, 90] }] },
+  yuggoth: { beds: [['wind_cold', 0.5], ['wind_ghost', 0.34]], spots: [{ set: 'timber', every: [40, 90] }] }, // round 66: it was the recording of a high-pitched buzz, which wore on the ear; now the cold wind of a world at the system's edge
   beyond: { beds: [['wind_ghost', 0.72], ['cave', 0.36]], spots: [] },
 };
 

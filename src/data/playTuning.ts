@@ -240,8 +240,9 @@ export const CACHE = {
 /** Consumables: Laudanum steadies the mind (tuning.ts), West's Reagent closes wounds. */
 export const REAGENT = {
   doses: 4, // at the start; each Silver Vial found adds one
-  maxDoses: 14, // the start's four and the ten vials hidden in the lesser dungeons
-  heal: 0.45, // share of full health restored
+  maxDoses: 10, // the start's four and six vials (round 66: fourteen doses of 45% were six and a third bars of health in the pocket; a vial found past the most is Echoes)
+  heal: 0.4, // share of full health restored (round 66: it was 0.45)
+  surplus: 600, // Echoes a Silver Vial is worth to one whose kit holds no more
   mend: 8, // seconds after a shot in which lingering hurts (pools, the void) do no harm (playtest round 7)
 };
 

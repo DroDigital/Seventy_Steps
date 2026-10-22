@@ -219,7 +219,7 @@ export const PLAYER_MOVES = {
   },
   reload: { frames: 80, stamina: 6, cancel: 66, release: 56, item: 48, use: 'rounds', walk: 0.35 }, // the spare rounds go in on the item frame; walked out of after it, a blow cuts it short, and nothing loaded is lost
   drink: { frames: 60, cancel: 48, release: 44, item: 34, use: 'laudanum', walk: 0.4 }, // walking on slowly as they drink (playtest round 7)
-  inject: { frames: 64, cancel: 50, release: 46, item: 36, use: 'reagent', walk: 0.4 },
+  inject: { frames: 76, cancel: 62, release: 58, item: 44, use: 'reagent', walk: 0.4 }, // (round 66: a dose took 64 frames; the syringe is a risk taken, as the flask is in the games this is bred from)
   throw: { // a flask of lamp oil, lobbed at the foe locked on (else ahead) to burst and burn where it lands (round 12)
     frames: 40,
     stamina: 12,

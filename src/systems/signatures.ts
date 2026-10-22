@@ -14,6 +14,7 @@ import { AZATHOTH_SIGNATURE } from './signatures/azathoth';
 import { COLOUR_SIGNATURE } from './signatures/colour';
 import { CTHULHU_SIGNATURE } from './signatures/cthulhu';
 import { DUNWICH_SIGNATURE } from './signatures/dunwichHorror';
+import { HASTUR_SIGNATURE } from './signatures/hastur';
 import { HAUNTER_SIGNATURE } from './signatures/haunter';
 import { NYARLATHOTEP_SIGNATURE } from './signatures/nyarlathotep';
 import { SHUB_SIGNATURE } from './signatures/shub';
@@ -46,5 +47,6 @@ export const SIGNATURES: Readonly<Record<string, Signature>> = {
   yog_sothoth: YOG_SIGNATURE,
   nyarlathotep: NYARLATHOTEP_SIGNATURE,
   azathoth: AZATHOTH_SIGNATURE,
+  hastur: HASTUR_SIGNATURE,
   umr_at_tawil: UMR_SIGNATURE,
 };

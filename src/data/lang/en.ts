@@ -242,6 +242,7 @@ export const EN = {
   'n.cache': 'A CACHE OF ECHOES · +{n}',
   'n.markerReached': "MARKER REACHED",
   'n.vial': 'SILVER VIAL · REAGENT DOSES {n}',
+  'n.vialSold': 'SILVER VIAL · YOUR KIT HOLDS NO MORE · +{n} ECHOES',
   'n.rounds': 'YOU CARRY ALL THE ROUNDS YOU CAN',
   // the buttons' names for a device
   'pad.moveStick': 'the left stick',

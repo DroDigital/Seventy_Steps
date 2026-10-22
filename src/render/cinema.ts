@@ -18,11 +18,13 @@ import type { Beat, Scene, Subject } from '../data/cutscenes';
 import { CAMERA, SIM } from '../data/tuning';
 import { signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
+import { fogsAround } from '../systems/fogGates';
 import type { CinemaUi } from '../ui/cinemaUi';
 import { raycast } from '../world/colliders';
 import { yawOfDir } from '../world/worldMap';
 import type { GameAudio } from './audio/gameAudio';
 import { burst } from './cinemaBursts';
+import { fogKeeper } from './cinemaFog';
 import { beatsBetween, frameOf, holdOf, keepGrain, sceneLength, shotAt, tremor, type Anchor } from './cinemaPlan';
 import type { Particles } from './particles';
 
@@ -112,6 +114,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y) + lift, z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height, grain };
   };
 
+  const inFog = fogKeeper(); // the lens stays inside the fog the horror's wall made, where the scene is played in one (round 66)
   let pulled = 1; // how much of its line to the head the lens keeps: it is pulled in at once, but lets out slowly (a pop at a wall's edge is a step in the picture)
   let pulledAt = 0;
 
@@ -159,6 +162,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     g.cutscene = true;
     g.ecs.c.shove.delete(g.player.id);
     pulled = 1;
+    inFog.reset();
     ui.bars(true);
     if (scene.dark) ui.fade('black', 0);
     for (const b of beatsBetween(scene, -1, 0)) perform(r, b);
@@ -264,7 +268,10 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       for (const s of r.shakes) shake += tremor(s.amount, t - s.at, s.hold);
       const wobble = (k: number): number => Math.sin(t * k) * Math.cos(t * (k * 0.53 + 3));
       const from = shot.on === 'sign' ? anchorOf('player', alpha) ?? on : on; // (the Elder Sign is a solid: a line drawn from inside it would be stopped at once and the lens drawn in against it; it is kept clear of walls from the investigator's head instead)
-      const pos = clear({ x: from.x, y: from.y + from.height * 0.85, z: from.z }, { x: f.pos.x + wobble(71) * shake, y: f.pos.y + wobble(59) * shake, z: f.pos.z + wobble(83) * shake });
+      const head = { x: from.x, y: from.y + from.height * 0.85, z: from.z };
+      const wanted = { x: f.pos.x + wobble(71) * shake, y: f.pos.y + wobble(59) * shake, z: f.pos.z + wobble(83) * shake };
+      const inside = inFog(fogsAround(g, from), { on, head, toward: opposite, pos: wanted, turn: shot.on === 'player' });
+      const pos = clear(head, inside);
       hold = holdOf(r.scene, t, r.length);
       fov = f.fov;
       eye.set(pos.x, pos.y, pos.z);

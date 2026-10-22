@@ -17,7 +17,6 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 
 | File | Recording | By | Licence | Treatment |
 | --- | --- | --- | --- | --- |
-| `amb/alien.mp3` | [G22-16-High-Pitched Buzz with Wind.wav](https://freesound.org/people/craigsmith/sounds/438279/) | craigsmith | CC0 | 4–33 s; looped (a 2.5 s crossfade) |
 | `amb/cave.mp3` | [ambience large cave variation.ogg](https://freesound.org/people/fonografico/sounds/636124/) | fonografico | CC0 | 4–34 s; low-pass 5000 Hz; looped (a 2 s crossfade) |
 | `amb/crickets.mp3` | [R01-42-Night Time Crickets.wav](https://freesound.org/people/craigsmith/sounds/479815/) | craigsmith | CC0 | 2.5–36 s; looped (a 2 s crossfade) |
 | `amb/drips.mp3` | [Ambience INT water drip dropping cave grotto spooky (quinta da regaleira portugal).flac](https://freesound.org/people/corkob/sounds/392668/) | corkob | CC0 | 0.5–19.3 s; high-pass 120 Hz; looped (a 1.5 s crossfade) |

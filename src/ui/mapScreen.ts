@@ -26,7 +26,7 @@ import { workArt } from './mapArt';
 import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip } from './mapChrome';
 import { chartedRect, fitScale, openingView } from './mapFit';
 import { markAt, type Mark } from './mapMarks';
-import type { MapPainter } from './mapPainter';
+import { UNIT, type MapPainter } from './mapPainter';
 import { BAR_WORDS, drawRing, litSigns, signAt } from './mapTravel';
 import { worldX, worldZ, type MapView } from './mapView';
 import { uiScale } from './uiScale';
@@ -103,8 +103,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     workArt(ART_MS);
     const k = uiScale();
     const marks = (shown = painter.paint(ctx, view, realm(), true));
-    drawBeacon(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', 7 * k, 'lead');
-    drawBeacon(ctx, view, markerHere(g), realm(), 'screen', 7 * k, 'marker', 0, true); // the pin is among the marks; only its pointer, off screen
+    drawBeacon(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', UNIT.full * k, 'lead');
+    drawBeacon(ctx, view, markerHere(g), realm(), 'screen', UNIT.full * k, 'marker', 0, true); // the pin is among the marks; only its pointer, off screen
     hover = pointer && !drag ? signAt(lit, view, pointer.x, pointer.y, Math.max(14, 9 * k)) : null;
     canvas.style.cursor = drag ? 'grabbing' : hover ? 'pointer' : 'grab';
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now, k);

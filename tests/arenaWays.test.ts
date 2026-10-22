@@ -4,6 +4,7 @@ import { ARENA_WAYS } from '../src/data/arenaWaysAll';
 import { MODEL_INFO } from '../src/data/models/index';
 import { PROP_KINDS, REGIONS } from '../src/data/regions';
 import { SET_KITS } from '../src/data/setKits';
+import { WAYS } from '../src/systems/ways';
 import { along, pointAt, WAY } from '../src/world/arenaWay';
 import { reach } from '../src/world/arenaDecor';
 import { worldLayout } from '../src/world/placements';
@@ -74,6 +75,11 @@ describe('the ways to the open arenas', () => {
         expect(s.d, `${p.boss}: on the way`).toBeLessThan(p.length - 4);
       }
     }
+  });
+
+  it('lays no trap in any court: nothing in a way hurts the one who walks it, not even a wrong light (round 66)', () => {
+    for (const p of plans) expect(p.way.hazards ?? [], p.boss).toEqual([]);
+    expect(WAYS.fail.damage).toBe(0);
   });
 
   it('say two omens at the least, in capitals as the others of the game are', () => {

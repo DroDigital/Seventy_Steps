@@ -229,6 +229,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.cache': "UN ALIJO DE ECOS · +{n}",
   'n.markerReached': "MARCA ALCANZADA",
   'n.vial': "FRASCO DE PLATA · DOSIS DE REACTIVO {n}",
+  'n.vialSold': "FRASCO DE PLATA · TU ESTUCHE YA NO ADMITE MÁS · +{n} ECOS",
   'n.rounds': "LLEVAS TODAS LAS BALAS QUE PUEDES",
   'pad.moveStick': "el stick izquierdo",
   'pad.lookStick': "el stick derecho",

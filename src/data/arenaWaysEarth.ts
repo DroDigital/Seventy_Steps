@@ -1,14 +1,15 @@
 /**
  * The ways to the waking world's open arenas (data/arenaWays.ts): each a walk toward its horror told in its own things: what is set
- * along it, what is said on it, what bites on it and what is asked of the one who would pass. Distances are metres from the fog back
- * toward the road (a way is 120 m at the least); sides are to the left walking in. Data only.
+ * along it, what is said on it and what is asked of the one who would pass. None bites (round 66, asked: "remove all traps from all paths
+ * that lead to bosses": the hazards these ways had are gone; systems/ways.ts still plays one if a way is given it). Distances are metres from
+ * the fog back toward the road (a way is 120 m at the least); sides are to the left walking in. Data only.
  */
 
 import { mark, piece, spot, type Way } from './arenaWays';
 
 export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The Gardners' lane through the blasted heath: grey grass that does not move, trees dead standing, the fallen star's shards giving
-  // off their light, a ground that wears at the mind; four lanterns of the family to be lit, the least first, as they went.
+  // off their light; four lanterns of the family to be lit, the least first, as they went.
   colour_out_of_space: {
     marks: [
       mark(piece('prop:tree', { size: [1.1, 1.5] }), 20, 190, 12, [6, 15], { mirror: true, jitter: 6, chance: 0.8 }),
@@ -24,11 +25,10 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 84, words: 'NOTHING SINGS HERE. NOTHING HAS NESTED FOR YEARS', sound: 'whisper', pitch: 0.55 },
       { at: 40, words: 'THE LIGHT IN THE WELL IS OF NO COLOUR A MAN HAS A NAME FOR', sound: 'wail', shake: 0.05, pitch: 0.5 },
     ],
-    hazards: [{ kind: 'blight', look: 'stain', at: [spot(74, 0), spot(64, 6), spot(54, -5), spot(44, 1), spot(32, 5), spot(20, -4)], r: 4.6, rate: 2.6 }],
     rite: { look: 'lamp', glow: 'magenta', at: [spot(62, 4.5), spot(58, -4), spot(54, 6.5), spot(50, -6)], order: 'rising', clue: 'FOUR LANTERNS OF THE FAMILY. THEY WENT OUT ONE BY ONE, THE LEAST BEFORE THE GREATEST', done: 'THE LANTERNS BURN STEADY, AND THE GREY LETS GO OF THE GROUND', reward: { echoes: 600, insight: 1 }, stills: true },
   },
   // The sabbat's path up the ravine: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
-  // in the open ground; the fires are laid in a ring, and a plate wakes one; three black candles are to be lit, least first.
+  // in the open ground; the fires are laid in a ring; three black candles are to be lit, least first.
   black_man: {
     marks: [
       mark(piece('skull_pole', { size: [1, 1.3] }), 14, 120, 12, [3.8, 5], { mirror: true, jitter: 3 }),
@@ -47,10 +47,9 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 80, words: 'THE WOODS LISTEN. A DRUM, VERY SLOW, UNDER THE LEAVES', sound: 'chant', pitch: 0.5 },
       { at: 44, words: 'THE FIRES ARE LAID IN A RING. THE RING IS NOT EMPTY', sound: 'whisper', pitch: 0.55, shake: 0.04 },
     ],
-    hazards: [{ kind: 'ward', look: 'flame', plates: [spot(60, -1.4), spot(55, 1.5), spot(50, 0), spot(45, -1.5), spot(40, 1.3), spot(35, -0.6), spot(30, 1.4)], damage: 24 }],
     rite: { look: 'candle', glow: 'purple', at: [spot(80, 5.5), spot(76, -6), spot(72, 4)], order: 'rising', clue: 'THREE BLACK CANDLES FOR THE COVEN. LIGHT THE LEAST BEFORE THE GREATEST', done: 'THE COVEN IS SATISFIED. THE WITCH-FIRES SETTLE', reward: { echoes: 500 }, stills: true },
   },
-  // The black grove's road: trees that fork like horns, skulls on stakes, fungus as tall as a man; the pods in the ground burst of themselves.
+  // The black grove's road: trees that fork like horns, skulls on stakes, fungus as tall as a man.
   shub_niggurath: {
     marks: [
       mark(piece('horn_tree', { size: [1, 1.3] }), 22, 150, 13, [6, 12], { mirror: true, jitter: 4 }),
@@ -64,10 +63,8 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 80, words: 'THE AIR IS THICK AND WARM, AND SOMETHING IN IT IS BREATHING', sound: 'whale', shake: 0.05, pitch: 0.6 },
       { at: 44, words: 'A THOUSAND YOUNG, AND NONE OF THEM MAKES A SOUND', sound: 'whisper', pitch: 0.5 },
     ],
-    hazards: [{ kind: 'vent', look: 'spore', at: [spot(72, 3.2), spot(60, -3.2), spot(48, 3), spot(36, -3.2), spot(24, 3.2)], every: [5, 9], burst: 3.2, damage: 22, warn: 70 }],
   },
-  // The plantation's drive: the people of the house, stone, in the places they stood; their eyes open. Wards in the paving that bear eyes,
-  // one in each row shut: the one that matches the tablet.
+  // The plantation's drive: the people of the house, stone, in the places they stood; their eyes open, and eyes cut in the paving.
   medusa_gorgon: {
     marks: [
       mark(piece('statue_column', { size: [1, 1.2] }), 12, 120, 11, 4.2, { mirror: true, jitter: 1.5 }),
@@ -80,11 +77,10 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
     omens: [
       { at: 108, words: 'THE DRIVE IS LINED WITH PEOPLE. NONE OF THEM HAS MOVED IN YEARS', sound: 'whisper', pitch: 0.7 },
       { at: 76, words: 'THEIR EYES ARE OPEN. THE LOOK ON ALL THEIR FACES IS ONE LOOK', sound: 'whisper', pitch: 0.55 },
-      { at: 62, words: 'THE TABLET SHOWS THE SIGN THE PAVING FORGIVES. STEP ONLY ON ITS SIGN', sound: 'chant', pitch: 0.6 },
+      { at: 62, words: 'THE PAVING IS CUT WITH ONE EYE, OVER AND OVER, BY ONE HAND', sound: 'chant', pitch: 0.6 },
     ],
-    hazards: [{ kind: 'field', look: 'eye', from: 22, to: 50, rows: 5, cols: 3, key: 3, at: spot(58, -3.8), damage: 26 }],
   },
-  // The shore the tide left: pale sand, lamps for the fishers, nets, wrecked boats, fish on the sand; and the sea draws a breath and comes in.
+  // The shore the tide left: pale sand, lamps for the fishers, nets, wrecked boats, fish on the sand; the sea has drawn a breath.
   martins_beach_horror: {
     marks: [
       mark(piece('barrel', { size: 1 }), 8, 110, 12, [3.4, 6], { mirror: true, jitter: 3, chance: 0.6 }),
@@ -103,10 +99,9 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 74, words: 'FISH LIE ON THE SAND, ALL LOOKING THE SAME WAY', sound: 'whisper', pitch: 0.7 },
       { at: 42, words: 'THE SEA IS DRAWING A BREATH', sound: 'bellow', shake: 0.06, pitch: 0.6 },
     ],
-    hazards: [{ kind: 'tide', look: 'brine', from: 20, to: 62, width: 11, every: [12, 20], damage: 26 }],
   },
   // The burying ground's lane: lamps set for the dead and left burning, graves in clusters, the salt laid white across the path to keep
-  // what is buried where it lies; the tablet shows the sign the salt forgives.
+  // what is buried where it lies.
   simon_orne: {
     marks: [
       mark(piece('lightpost', { lit: 'lamp' }), 14, 120, 14, 3.6, { mirror: true }),
@@ -122,12 +117,11 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
     omens: [
       { at: 104, words: 'THE LAMPS ARE LIT. NO ONE LIT THEM', sound: 'whisper', pitch: 0.7 },
       { at: 66, words: 'SALT LIES WHITE ACROSS THE WAY, TO KEEP THE DEAD WHERE THEY LIE', sound: 'chant', pitch: 0.6 },
-      { at: 50, words: 'THE TABLET SHOWS WHAT THE SALT FORGIVES. STEP ONLY ON ITS SIGN', sound: 'chant', pitch: 0.55 },
+      { at: 50, words: 'THE SALT HAS BEEN WALKED THROUGH, SWEPT BACK, AND WALKED THROUGH AGAIN', sound: 'chant', pitch: 0.55 },
     ],
-    hazards: [{ kind: 'field', look: 'salt', from: 14, to: 40, rows: 5, cols: 3, key: 2, at: spot(46, -4), damage: 26 }],
   },
-  // The manor's avenue: hedges grown to the height of a house, lamps that still burn, statues and urns gone green; the lightning
-  // finds the rod on the roof, and the strikes on the way are its leavings; four lamps to be lit from the road toward the house.
+  // The manor's avenue: hedges grown to the height of a house, lamps that still burn, statues and urns gone green; a rod on the roof
+  // for the lightning; four lamps to be lit from the road toward the house.
   edward_hutchinson: {
     marks: [
       mark(piece('hedge', { size: 1.1 }), 8, 118, 3.2, 6.2, { mirror: true, jitter: 0.3, face: 90 }),
@@ -142,11 +136,10 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 66, words: 'THE AIR TASTES OF IRON, AS IT DOES BEFORE A STORM', sound: 'thunder', shake: 0.04, pitch: 0.6 },
       { at: 36, words: 'A ROD STANDS ON THE ROOF, AND IT IS NOT THERE FOR THE WEATHER', sound: 'thunder', pitch: 0.5 },
     ],
-    hazards: [{ kind: 'vent', look: 'bolt', at: [spot(64, 3), spot(54, -3.4), spot(44, 3.4), spot(34, -3), spot(24, 3.2)], every: [4, 8], burst: 2.6, damage: 30, warn: 55 }],
     rite: { look: 'lamp', glow: 'purple', at: [spot(104, 3.5), spot(96, -3.5), spot(88, 3.5), spot(80, -3.5)], order: 'near', clue: 'FOUR LAMPS THAT DO NOT BURN. LIGHT THEM FROM THE ROAD TO THE HOUSE, AS THE FAMILY CAME HOME', done: 'THE LAMPS BURN, AND THE ROD ON THE ROOF HAS NOTHING TO ANSWER', reward: { echoes: 600, insight: 1 }, stills: true },
   },
   // The avenue of the sphinxes: pairs of them, facing the way you came, obelisks and broken columns, sand that holds the heat of a sun
-  // that has set and is lifted across the way in sheets; four braziers to be lit, the greatest first, as the stars set.
+  // that has set; four braziers to be lit, the greatest first, as the stars set.
   colossus_pyramids: {
     marks: [
       mark(piece('sphinx', { size: [0.8, 0.9] }), 26, 160, 30, 7.2, { mirror: true, face: 'in' }),
@@ -164,10 +157,9 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 96, words: 'THE AVENUE WAS BUILT FOR SOMETHING THAT WALKED IT', sound: 'bellow', shake: 0.05, pitch: 0.5 },
       { at: 54, words: 'THE SPHINXES FACE THE WAY YOU CAME. NONE OF THEM FACES THE PYRAMID', sound: 'whisper', pitch: 0.55 },
     ],
-    hazards: [{ kind: 'tide', look: 'sand', from: 28, to: 80, width: 12, every: [14, 24], damage: 24 }],
     rite: { look: 'brazier', glow: 'magenta', at: [spot(100, 8.5), spot(96, -8.5), spot(92, 9.5), spot(88, -9.5)], order: 'falling', clue: 'FOUR BRAZIERS BEFORE THE AVENUE. THE STARS SET FROM THE GREATEST TO THE LEAST: LIGHT THEM SO', done: 'THE BRAZIERS BURN, AND THE WIND LAYS DOWN THE SAND', reward: { echoes: 700, insight: 1 }, stills: true },
   },
-  // The serpent road: totems, shed skins that are rocks, bones of those who went before, a dry rattling; the paving wakes under a foot.
+  // The serpent road: totems, shed skins that are rocks, bones of those who went before, a dry rattling.
   yig: {
     marks: [
       mark(piece('totem', { size: [0.7, 0.9] }), 10, 120, 20, 4.2, { mirror: true, jitter: 2 }),
@@ -181,9 +173,8 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 64, words: 'THE ROCKS ARE SHED SKINS, AND EACH ONE IS LONGER THAN A MAN', sound: 'whisper', pitch: 0.6 },
       { at: 34, words: 'NOTHING MOVES ON THE ROAD. EVERYTHING ELSE DOES', sound: 'bellow', pitch: 0.55 },
     ],
-    hazards: [{ kind: 'ward', look: 'coil', plates: [spot(72, 1.5), spot(66, -1.2), spot(60, 0), spot(54, 1.5), spot(48, -1.4), spot(42, 0), spot(36, 1.2), spot(30, -1.5)], damage: 22 }],
   },
-  // The mound's stair: stone cut from the mound itself, red light from below, the ground warm; the vents on the stair erupt in turn;
+  // The mound's stair: stone cut from the mound itself, red light from below, the ground warm;
   // three fires to be lit, the greatest first, to the three layers of the mound.
   nug: {
     marks: [
@@ -197,11 +188,10 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 80, words: 'RED LIGHT, FROM BELOW. THE STAIR GOES DOWN INTO IT', sound: 'whale', shake: 0.05, pitch: 0.55 },
       { at: 46, words: 'SOMETHING THAT WAS WORSHIPPED BEFORE THE FIRST MAN STIRS', sound: 'bellow', shake: 0.08, pitch: 0.45 },
     ],
-    hazards: [{ kind: 'vent', look: 'flame', at: [spot(80, -3.4), spot(70, 3.4), spot(60, 0), spot(50, -3.2), spot(40, 3.2), spot(30, 0)], every: [5, 9], burst: 3, damage: 28, warn: 66 }],
-    rite: { look: 'fire', glow: 'magenta', at: [spot(100, 5.5), spot(94, -6), spot(88, 5)], order: 'falling', clue: 'THREE FIRES FOR THE THREE LAYERS OF THE MOUND. THE DEEPEST BURNS FIRST', done: 'THE VENTS SETTLE. THE MOUND DRAWS A LONG BREATH', reward: { echoes: 700 }, stills: true },
+    rite: { look: 'fire', glow: 'magenta', at: [spot(100, 5.5), spot(94, -6), spot(88, 5)], order: 'falling', clue: 'THREE FIRES FOR THE THREE LAYERS OF THE MOUND. THE DEEPEST BURNS FIRST', done: 'THE FIRES SETTLE. THE MOUND DRAWS A LONG BREATH', reward: { echoes: 700 }, stills: true },
   },
   // The shore of Ib: lilies on black water, the carved stones of a drowned people with their faces to the lake, a canoe drawn up, reeds;
-  // the water rises in swells; four green fires to be lit as the water rises, the small to the great.
+  // four green fires to be lit as the water rises, the small to the great.
   bokrug: {
     marks: [
       mark(piece('lily', { walk: true, size: [1, 1.4] }), 6, 130, 6, [2.6, 6], { mirror: true, jitter: 2, chance: 0.8, face: 'free' }),
@@ -215,11 +205,9 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 72, words: 'THE STONES IN THE SHALLOWS ARE CARVED. THEIR FACES ARE ALL TURNED TO THE WATER', sound: 'chant', pitch: 0.55 },
       { at: 40, words: 'SOMETHING GREEN WAKES, UNDER THE LILIES', sound: 'whale', shake: 0.05, pitch: 0.5 },
     ],
-    hazards: [{ kind: 'tide', look: 'brine', from: 22, to: 62, width: 9, every: [16, 26], damage: 24 }],
     rite: { look: 'glow', glow: 'green', at: [spot(88, 5), spot(84, -5.5), spot(80, 6), spot(76, -6)], order: 'rising', clue: 'FOUR GREEN FIRES OF IB. LIGHT THEM AS THE WATER RISES: THE SMALL BEFORE THE GREAT', done: 'THE LAKE LAYS ITS SWELLS DOWN. IT HAS BEEN ANSWERED', reward: { echoes: 700, insight: 1 }, stills: true },
   },
-  // Hatheg-Kla's slope: snow pines, rings of stone, a cloud on the peak that dances to a pipe; the cold takes the breath and the storm
-  // finds those who climb.
+  // Hatheg-Kla's slope: snow pines, rings of stone, a cloud on the peak that dances to a pipe.
   other_gods: {
     marks: [
       mark(piece('pine_crooked', { size: [1, 1.4] }), 8, 150, 10, [5, 14], { mirror: true, jitter: 3, chance: 0.8 }),
@@ -233,10 +221,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 100, words: 'THE CLOUD ON THE PEAK IS DANCING', sound: 'choral', pitch: 0.6 },
       { at: 66, words: 'PIPES, VERY FAR OFF, AND OUT OF TIME', sound: 'choral', shake: 0.04, pitch: 0.55 },
       { at: 36, words: 'NO GOD OF EARTH DANCES TO THAT PIPE', sound: 'thunder', pitch: 0.5 },
-    ],
-    hazards: [
-      { kind: 'blight', look: 'frost', at: [spot(76, 0), spot(62, 5), spot(48, -5), spot(34, 0)], r: 5.2, rate: 2.8, of: 'stamina' },
-      { kind: 'vent', look: 'bolt', at: [spot(68, 5), spot(54, -5), spot(40, 5)], every: [6, 11], burst: 3, damage: 30, warn: 66 },
     ],
   },
 };

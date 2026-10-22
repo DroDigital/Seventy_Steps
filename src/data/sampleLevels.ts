@@ -7,7 +7,6 @@ export interface Level {
 }
 
 export const SAMPLE_LEVELS: Readonly<Record<string, Level>> = {
-  'amb/alien': { sec: 26.5, peak: -8.2, rms: -22.4 },
   'amb/cave': { sec: 28.0, peak: -10.0, rms: -22.4 },
   'amb/crickets': { sec: 31.5, peak: -6.3, rms: -22.4 },
   'amb/drips': { sec: 17.29, peak: -0.8, rms: -32.7 },

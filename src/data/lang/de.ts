@@ -229,6 +229,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'n.cache': "EIN VERSTECK VON ECHOS · +{n}",
   'n.markerReached': "ZIEL ERREICHT",
   'n.vial': "SILBERNE PHIOLE · REAGENZDOSEN {n}",
+  'n.vialSold': "SILBERNE PHIOLE · DEIN BESTECK FASST NICHTS MEHR · +{n} ECHOS",
   'n.rounds': "IHR TRAGT ALLE PATRONEN, DIE IHR KÖNNT",
   'pad.moveStick': "der linke Stick",
   'pad.lookStick': "der rechte Stick",

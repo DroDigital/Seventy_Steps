@@ -3,24 +3,18 @@
  * stone for a place found, the investigator's own arrow, and the pin of their own marker. See mapIcons.ts for the rest and mapIconKit.ts for what they share.
  */
 
-import { BONE, BRASS, DIM, TAU, VERDIGRIS, PIN_TIP } from './mapIconKit';
+import { BONE, BRASS, DIM, TAU, VERDIGRIS, PIN_TIP, token } from './mapIconKit';
 
-
+/** A person: a bust on a small medallion (round 66: bare, it was lost on pale ground), bone once met, dim until then. */
 export function person(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, met: boolean): void {
-  const [head, shoulder] = [y - r * 0.3, y + r * 0.1];
-  const bust = (): void => {
-    ctx.beginPath();
-    ctx.arc(x, head, r * 0.34, 0, TAU);
-    ctx.moveTo(x - r * 0.7, y + r * 0.7);
-    ctx.quadraticCurveTo(x - r * 0.7, shoulder, x, shoulder);
-    ctx.quadraticCurveTo(x + r * 0.7, shoulder, x + r * 0.7, y + r * 0.7);
-    ctx.closePath();
-  };
-  bust();
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = 2.6;
-  ctx.strokeStyle = 'rgba(0,0,0,0.85)';
-  ctx.stroke();
+  token(ctx, x, y, r, met ? BONE : DIM);
+  const [head, shoulder] = [y - r * 0.2, y + r * 0.2];
+  ctx.beginPath();
+  ctx.arc(x, head, r * 0.26, 0, TAU);
+  ctx.moveTo(x - r * 0.5, y + r * 0.62);
+  ctx.quadraticCurveTo(x - r * 0.5, shoulder, x, shoulder);
+  ctx.quadraticCurveTo(x + r * 0.5, shoulder, x + r * 0.5, y + r * 0.62);
+  ctx.closePath();
   ctx.fillStyle = met ? BONE : DIM;
   ctx.fill();
 }
@@ -48,6 +42,15 @@ export function echo(ctx: CanvasRenderingContext2D, x: number, y: number, r: num
   ctx.beginPath();
   ctx.arc(0, k * 0.3, k * 0.2, 0, TAU);
   ctx.fill();
+  ctx.lineCap = 'round';
+  ctx.lineWidth = Math.max(1, k * 0.12);
+  ctx.strokeStyle = '#f6ecc4';
+  ctx.beginPath(); // a glint off its upper edge
+  ctx.moveTo(k * 0.95, -k * 0.9);
+  ctx.lineTo(k * 0.95, -k * 0.5);
+  ctx.moveTo(k * 0.75, -k * 0.7);
+  ctx.lineTo(k * 1.15, -k * 0.7);
+  ctx.stroke();
   ctx.restore();
 }
 
@@ -86,21 +89,24 @@ export function lead(ctx: CanvasRenderingContext2D, x: number, y: number, r: num
   ctx.restore();
 }
 
-/** A place found, named: a small round stone. */
+/** A place found, named: a standing stone set in a small ring. */
 export function place(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-  ctx.fillStyle = DIM;
+  token(ctx, x, y, r * 0.62, DIM);
+  ctx.fillStyle = BONE;
   ctx.beginPath();
-  ctx.arc(x, y, r * 0.3, 0, TAU);
-  ctx.stroke();
+  ctx.moveTo(x - r * 0.2, y + r * 0.34);
+  ctx.lineTo(x - r * 0.14, y - r * 0.3);
+  ctx.lineTo(x, y - r * 0.4);
+  ctx.lineTo(x + r * 0.14, y - r * 0.3);
+  ctx.lineTo(x + r * 0.2, y + r * 0.34);
+  ctx.closePath();
   ctx.fill();
 }
 
 /** The investigator's arrow, `turn` radians about its centre, in a faint ring so it is found in a crowd. */
 export function you(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, turn: number): void {
   const glow = ctx.createRadialGradient(x, y, r * 0.3, x, y, r * 1.9);
-  glow.addColorStop(0, 'rgba(217,208,184,0.38)');
+  glow.addColorStop(0, 'rgba(217,208,184,0.5)');
   glow.addColorStop(1, 'rgba(217,208,184,0)');
   ctx.fillStyle = glow;
   ctx.beginPath();

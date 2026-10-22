@@ -229,6 +229,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'n.cache': "UNE RÉSERVE D’ÉCHOS · +{n}",
   'n.markerReached': "REPÈRE ATTEINT",
   'n.vial': "FIOLE D’ARGENT · DOSES DE RÉACTIF {n}",
+  'n.vialSold': "FIOLE D’ARGENT · TA TROUSSE EN TIENT PLUS · +{n} ÉCHOS",
   'n.rounds': "VOUS PORTEZ TOUTES LES BALLES QUE VOUS POUVEZ",
   'pad.moveStick': "le stick gauche",
   'pad.lookStick': "le stick droit",

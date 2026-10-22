@@ -30,26 +30,39 @@ export const VEIL = '#7b3fc4';
 export const TAU = Math.PI * 2;
 
 /** The size of a mark's token about `r`, the radius a kind is drawn at: what a name or another mark should keep clear of. */
-export const reach = (kind: MarkKind, r: number): number => (kind === 'person' || kind === 'place' ? r * 0.7 : kind === 'you' ? r * 1.1 : kind === 'marker' ? r * 0.9 : r * 1.15);
+export const reach = (kind: MarkKind, r: number): number => (kind === 'place' ? r * 0.75 : kind === 'person' ? r * 0.95 : kind === 'you' ? r * 1.1 : kind === 'marker' ? r * 0.9 : r * 1.15);
 
 /** How far below a marker's centre its pin's tip falls, in radii: the place it marks is the tip (a mark stands centred on its place; the pin does not). */
 export const PIN_TIP = 1.55;
 
-/** The dark disc a figure is set on, ringed in its colour, with a black edge about it for ground of any light. */
+/**
+ * The medallion a figure is set on (round 66: "enhance the visual design of all map icons"): a dark disc lit a little from above, ringed in its
+ * colour with a fainter ring just inside it, and a black edge about it for ground of any light. `glow` lights the ring itself.
+ */
 export function token(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, ring: string, glow = ''): void {
   ctx.save();
-  ctx.lineWidth = Math.max(1, r * 0.14) + 2;
-  ctx.strokeStyle = 'rgba(0,0,0,0.55)';
+  ctx.lineWidth = Math.max(1.4, r * 0.16) + 2.4;
+  ctx.strokeStyle = 'rgba(0,0,0,0.65)';
   ctx.beginPath();
   ctx.arc(x, y, r, 0, TAU);
   ctx.stroke();
-  if (glow) [ctx.shadowColor, ctx.shadowBlur] = [glow, r * 1.2];
-  ctx.fillStyle = 'rgba(11,10,14,0.88)';
+  if (glow) [ctx.shadowColor, ctx.shadowBlur] = [glow, r * 1.4];
+  const face = ctx.createRadialGradient(x, y - r * 0.35, r * 0.1, x, y, r);
+  face.addColorStop(0, 'rgba(40,36,48,0.96)');
+  face.addColorStop(1, 'rgba(11,10,14,0.94)');
+  ctx.fillStyle = face;
   ctx.fill();
   ctx.restore();
-  ctx.lineWidth = Math.max(1, r * 0.14);
+  ctx.lineWidth = Math.max(1.4, r * 0.16);
   ctx.strokeStyle = ring;
   ctx.beginPath();
   ctx.arc(x, y, r, 0, TAU);
   ctx.stroke();
+  ctx.save();
+  ctx.globalAlpha = 0.3;
+  ctx.lineWidth = Math.max(0.8, r * 0.07);
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.8, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
 }

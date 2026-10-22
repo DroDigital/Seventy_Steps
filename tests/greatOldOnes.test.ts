@@ -99,6 +99,25 @@ describe('the great old ones (spec §3E)', () => {
     expect(distXZ(g.ecs.c.transform.get(e)!.pos, pp)).toBeCloseTo(HASTUR.rise, 0);
   });
 
+  it('Hastur, called to the ruins, is back in his arena when the investigator falls to him (round 66)', () => {
+    const g = createWorldGame();
+    const s = hasturSpawn();
+    setSanity(g, 100);
+    goTo(g, s.at.x - 30, s.at.z);
+    run(g, 2);
+    for (const sanity of [60, 30, 10]) setSanity(g, sanity);
+    const e = g.overworld!.alive.get('boss:hastur')!;
+    const f = g.ecs.c.fight.get(e)!;
+    expect(distXZ(g.ecs.c.transform.get(e)!.pos, s.at)).toBeGreaterThan(5); // it rose where it was called
+    f.engaged = true;
+    g.events.emit('Respawned', { entity: g.player.id });
+    expect(f.engaged).toBe(false);
+    expect(distXZ(g.ecs.c.transform.get(e)!.pos, s.at)).toBeLessThan(1);
+    expect(g.ecs.c.home.get(e)).toMatchObject({ x: s.at.x, z: s.at.z });
+    expect(f.arena).toMatchObject({ x: s.arena!.x, z: s.arena!.z });
+    expect(g.overworld!.alive.get('boss:hastur')).toBe(e); // the same horror, healed as every horror is by a death
+  });
+
   it("Hastur's arena stays empty until it has been called; the calling survives a save", () => {
     const g = createWorldGame();
     const s = hasturSpawn();
