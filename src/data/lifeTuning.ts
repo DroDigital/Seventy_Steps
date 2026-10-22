@@ -159,3 +159,19 @@ export const SURVEY = {
   radius: 70, // metres of ground drawn in about it
   beacon: { see: 340, near: 30, height: 60, width: 1.6 }, // how far a column shows, how near it fades, how tall and broad it is
 };
+
+/** Points of interest (round 61; data/pois.ts, systems/pois.ts, world/poiPlan.ts, ui/poiMarks.ts, render/poiFx.ts). */
+export const POI = {
+  reach: 6, // metres past a place's own radius that the investigator is within, to find it
+  least: 18, // ...and no nearer than this to its middle
+  most: 38, // ...nor further than this: a grove is broad, but its secret is at its heart
+  range: 110, // metres: a hoard's chest is set down, and the place's foes' guard is felt, as one nears
+  hint: 140, // metres of explored ground about a place that is enough for the map to show its "?"
+  ring: 8, // directions about it that the map looks for explored ground in
+  every: 15, // frames between a place being looked for, and its dread or comfort felt (systems/pois.ts)
+  hear: 100, // seconds before a place speaks again to one who comes back into it
+  insight: 1, // what a place that is only strange gives for being found, by default
+  see: 260, // metres a phenomenon (render/poiFx.ts) is drawn from
+  walls: 2.6, // metres tall the walls of a maze stand
+  cell: 4.4, // metres a maze's passages are broad, wall to wall
+};

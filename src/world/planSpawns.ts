@@ -38,9 +38,8 @@ function pick(table: Readonly<Record<string, number>>, roll: number): string | u
   return entries.at(-1)?.[0];
 }
 
-export function planSpawns(region: RegionDef, features: readonly Feature[], roads: readonly Road[], towns: readonly (XZ & { radius: number })[], props: readonly Prop[], rng: Rng): SpawnPoint[] {
-  const table = region.spawns.table;
-  if (Object.keys(table).length === 0) return [];
+/** Where a foe or a chest may stand in a region: clear of every Elder Sign and gate, site, mound and prop, and not shut in (round 61: shared with the points of interest, world/poiPlan.ts). */
+export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x: number, z: number) => boolean; solid: (x: number, z: number) => boolean } {
   const w = worldLayout();
   const rect = regionRect(region);
   const safe = [...w.signs.filter((s) => s.region === region.id).map((s) => s.rest), ...w.gates.filter((g) => g.region === region.id).map((g) => g.arrive)];
@@ -72,6 +71,15 @@ export function planSpawns(region: RegionDef, features: readonly Feature[], road
     !solid(x, z) &&
     escapes(solid, x, z); // and not shut in by walls: a foe inside a ring of ruin walls could not come out, nor the investigator in (round 49)
 
+  return { clear, solid };
+}
+
+export function planSpawns(region: RegionDef, features: readonly Feature[], roads: readonly Road[], towns: readonly (XZ & { radius: number })[], props: readonly Prop[], rng: Rng): SpawnPoint[] {
+  const table = region.spawns.table;
+  if (Object.keys(table).length === 0) return [];
+  const w = worldLayout();
+  const rect = regionRect(region);
+  const { clear } = groundOf(region, props);
   const out: SpawnPoint[] = [];
   const start = w.signs.find((s) => s.id === START_SIGN);
   const early = (x: number, z: number): boolean => !!start && Math.hypot(start.x - x, start.z - z) < FIRST_HOUR;

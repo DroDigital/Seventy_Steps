@@ -18,6 +18,7 @@ import { placesOf } from '../world/namedPlaces';
 import { regionAt } from '../world/worldMap';
 import { BONE } from './hudKit';
 import { drawLead } from './leadMark';
+import { drawPois, poiTotals } from './poiMarks';
 import { workArt } from './mapArt';
 import type { MapPainter, MapView } from './mapPainter';
 import { BAR_WORDS, drawRing, litSigns, signAt } from './mapTravel';
@@ -43,6 +44,8 @@ const LEGEND: readonly [string, string][] = [
   ['◆', 'Your Echoes'],
   ['♙', 'Someone met in the dream'],
   ['◇', 'Where the story leads'],
+  ['?', 'Something strange, near ground you have charted (grey until you come to it)'],
+  ['※', 'A secret found: a ring a tale, a square a hoard, a triangle a rite, a star an anomaly, a cross a den (dim once its chest is taken)'],
 ];
 
 /** `go` makes a long jump under the veil (journeys.ts). */
@@ -90,6 +93,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     if (held.has('ArrowDown') || held.has('KeyS')) view.cz -= step;
     workArt(ART_MS);
     painter.paint(ctx, view, realm(), true);
+    drawPois(ctx, view, g, realm(), true);
     drawLead(ctx, view, currentLead(g)?.at ?? null, realm(), false);
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now);
     if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now);
@@ -211,7 +215,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const here = rs.find((x) => x.id === g.overworld!.region)?.name ?? '';
     const places = rs.flatMap((x) => placesOf(x.id)); // round 18
     const found = places.filter((p) => g.overworld!.places.has(p.id)).length;
-    heading = `${here.toUpperCase()}   ·   ${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES`;
+    const secrets = poiTotals(g, rs); // round 61
+    heading = `${here.toUpperCase()}   ·   ${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES${secrets.of ? `   ·   ${secrets.found} OF ${secrets.of} SECRETS` : ''}`;
     if (title) title.textContent = heading;
     last = 0;
     requestAnimationFrame(frame);

@@ -132,6 +132,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
   g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
   g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
+  g.events.on('PoiFound', (e) => great.show(e.name.toUpperCase(), 'secret', tr('hud.secrets', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }), e.line)); // round 61
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Notice', ({ text }) => say(text));

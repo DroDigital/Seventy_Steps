@@ -203,6 +203,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'hud.insightGain': "{sign}{n} DISCERNEMENT",
   'hud.signFound': "SIGNE DES ANCIENS TROUVÉ · {name} · VOYAGE DEPUIS LA CARTE ({map})",
   'hud.places': "{found} SUR {of} LIEUX · {region}",
+  'hud.secrets': "{found} SUR {of} SECRETS · {region}",
   'hud.questDone': "ACCOMPLI · {title}",
   'hud.questNew': "JOURNAL · {title}",
   'hud.questUpdated': "{title} · MIS À JOUR",

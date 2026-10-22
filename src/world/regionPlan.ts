@@ -17,6 +17,7 @@ import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
 import { planSpawns } from './planSpawns';
+import { planPois, type PoiSite } from './poiPlan';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
 import { makeProp, propCollider, type Prop } from './props';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
@@ -36,6 +37,7 @@ export interface RegionPlan {
   colliders: Map<number, Collider[]>; // by every chunk a collider touches
   spawns: Map<number, SpawnPoint[]>;
   segs: Map<number, RoadSeg[]>; // road pieces touching each chunk (for the ground's road texture)
+  pois: PoiSite[]; // the region's points of interest (round 61; world/poiPlan.ts), with their guards among `spawns` and their walls among `props`
 }
 
 const CELL = 4; // metres per occupancy cell
@@ -208,7 +210,10 @@ function buildPlan(region: RegionDef): RegionPlan {
   roadside(region, roads, rng, occ, (x, z) => roadClear(x, z, 0.5) && offSites(x, z, 1), props);
   scatterBiome(region, rect, rng, occ, props);
   const spawns = planSpawns(region, features, roads, towns, props, rng);
-  return bucket(layout, roads, features, props, spawns);
+  const pois = planPois(region, features, props, spawns); // after everything, on streams of its own: nothing earlier moves
+  props.push(...pois.props);
+  spawns.push(...pois.spawns);
+  return bucket(layout, roads, features, props, spawns, pois.sites);
 }
 
 function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: ReturnType<typeof occupancy>, props: Prop[]): Feature[] {
@@ -235,8 +240,8 @@ function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readon
   return out;
 }
 
-function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[]): RegionPlan {
-  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map() };
+function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], pois: PoiSite[]): RegionPlan {
+  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), pois };
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
   for (const p of props) {
     add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);

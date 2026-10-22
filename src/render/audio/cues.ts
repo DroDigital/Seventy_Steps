@@ -55,6 +55,7 @@ export const CUES: Handlers = {
   FirstSight: (e) => (e.sanity > 0 ? { sound: 'sight', at: null, pitch: Math.max(0.5, 1.1 - e.sanity / 40) } : null), // the greater the horror, the lower
   Discovered: () => inside('found'),
   PlaceFound: () => inside('place'), // a named place (round 18): a gong from far off (round 20; it was the sign's chime, lower)
+  PoiFound: () => inside('place'), // a secret found (round 61): the same far gong as a place
   Rested: () => inside('rested'),
   RestRefused: () => inside('refused'),
   Travelled: () => inside('travel'),

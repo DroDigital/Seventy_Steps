@@ -14,6 +14,7 @@ import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
 import { BONE, el, setText } from './hudKit';
 import { drawLead } from './leadMark';
+import { drawPois } from './poiMarks';
 import { workArt } from './mapArt';
 import type { MapPainter } from './mapPainter';
 
@@ -59,6 +60,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       ctx.rotate(yaw); // what the camera looks at, up (the round face hides the square's turned corners)
       ctx.translate(-SIZE / 2, -SIZE / 2);
       painter.paint(ctx, view, realmOf(region), false);
+      drawPois(ctx, view, g, realmOf(region), false, yaw);
       drawLead(ctx, view, currentLead(g)?.at ?? null, realmOf(region), true);
       ctx.restore();
       const r = SIZE / 2 - 1;

@@ -51,6 +51,7 @@ export interface GameEvents {
   FirstSight: { entity: Entity; name: string; sanity: number; insight: number }; // sanity lost, insight gained
   Discovered: { sign: string; name: string }; // an Elder Sign found
   PlaceFound: { id: string; name: string; region: string; found: number; of: number }; // a named place first stepped into, and how many of its region's are found (places.ts; round 18)
+  PoiFound: { id: string; name: string; region: string; kind: string; line: string; found: number; of: number }; // a point of interest first come to (systems/pois.ts; round 61), and how many of its region's are found
   Rested: { sign: string; name: string };
   RestRefused: { sign: string };
   Travelled: { via: 'sign' | 'gate' | 'dream'; to: string; name: string };

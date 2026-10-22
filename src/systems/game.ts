@@ -37,6 +37,7 @@ import { hazardSystem } from './hazards';
 import { registerHiddenLayer, spawnPiece } from './hiddenLayer';
 import { explorationSystem } from './exploration';
 import { placeSystem } from './places';
+import { poiSystem } from './pois';
 import { createBuffer } from './inputBuffer';
 import { insightSystem, spawnTome } from './insight';
 import { aimPoint, lockSystem } from './lockOn';
@@ -243,6 +244,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   insightSystem(g);
   explorationSystem(g);
   placeSystem(g);
+  poiSystem(g);
   questSystem(g);
   tallySystem(g);
   roomWordsSystem(g);
