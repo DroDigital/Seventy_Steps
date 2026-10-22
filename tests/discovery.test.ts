@@ -16,7 +16,7 @@ import { PASSAGE, SANITY, SIM } from '../src/data/tuning';
 import { phaseOf } from '../src/systems/clock';
 import type { Game } from '../src/systems/components';
 import { applyCarry, carryOf, parseCarry } from '../src/systems/cycles';
-import { currentStep, discoverySystem, holds, vigilShare } from '../src/systems/discovery';
+import { currentStep, discoverySystem, holds, vigilShare, vigilsNear } from '../src/systems/discovery';
 import { isFound } from '../src/systems/found';
 import { fightAction } from '../src/systems/fightActions';
 import { createWorldGame } from '../src/systems/game';
@@ -244,6 +244,7 @@ describe('a house is seen, shut, and given', () => {
       discoverySystem(g);
     }
     expect(vigilShare(g, 'colour_out_of_space', vig), 'its turn has not come').toBe(0);
+    expect(vigilsNear(g, 10), 'and its ring is not drawn').toEqual([]);
     expect(hushed.filter((n) => n.text.startsWith('NOTHING STIRS')), 'it says so, once in a while').toHaveLength(1);
     g.overworld!.read.add((d.steps[0] as { doc: string }).doc);
     g.overworld!.told.add('rite:colour_out_of_space');
@@ -256,7 +257,9 @@ describe('a house is seen, shut, and given', () => {
     const share = vigilShare(g, 'colour_out_of_space', vig);
     expect(share).toBeGreaterThan(0);
     expect(kept[0]).toMatchObject({ share: 0 });
+    expect(vigilsNear(g, 10), 'its ring is drawn, warm, as far as it is kept').toEqual([{ x: at.x, z: at.z, share, holds: true }]);
     goTo(g, at.x + 30, at.z);
+    expect(vigilsNear(g, 10)).toEqual([]);
     for (let k = 0; k < 60; k++) {
       g.frame++;
       discoverySystem(g);

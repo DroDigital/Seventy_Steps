@@ -36,6 +36,7 @@ import { createDragTentacle } from './dragTentacle';
 import { createSplashFx } from './splashFx';
 import { createTentacles } from './tentacles';
 import { createWayFx } from './wayFx';
+import { createVigilMarks } from './vigilMarks';
 import { createWayViews } from './wayViews';
 import { createWeatherFx } from './weather';
 import type { Skyline } from './skyline';
@@ -82,6 +83,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
   const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
   const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight
+  createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {

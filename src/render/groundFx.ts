@@ -31,6 +31,8 @@ export interface GroundFx {
   slash(at: V3, radius: number, yaw: number, arc: readonly [number, number], color: Rgb, who?: string, life?: number): void;
   /** A telegraph for a bolt that will fall on `at` in `seconds`: it fills as the time runs out, and holds full a tenth of a second more. */
   warn(at: V3, radius: number, seconds: number, color: Rgb): void;
+  /** A mark drawn every frame for as long as the game says so (`draw` lays it, or nothing): a vigil's ring (round 64). */
+  steady(draw: (decals: Decals, time: number) => void): void;
   count(): number;
   draw(decals: Decals, time: number): void;
 }
@@ -39,6 +41,7 @@ const ease = (t: number): number => 1 - (1 - t) * (1 - t);
 
 export function createGroundFx(): GroundFx {
   const items: Item[] = [];
+  const steadies: ((decals: Decals, time: number) => void)[] = [];
   let now = 0;
   const add = (it: Item): void => {
     if (items.length >= MAX) items.shift();
@@ -50,9 +53,11 @@ export function createGroundFx(): GroundFx {
     sigil: (at, r, color, who, life = 2.2) => add({ kind: 'sigil', at: { ...at }, r, life, color, mark: aoeLook(who), born: now }),
     slash: (at, r, yaw, arc, color, who, life = 0.26) => add({ kind: 'slash', at: { ...at }, r, yaw, arc, life, color, mark: aoeLook(who), born: now }),
     warn: (at, r, seconds, color) => add({ kind: 'warn', at: { ...at }, r, life: seconds + 0.12, fill: seconds / (seconds + 0.12), color, mark: aoeLook('yog_sothoth'), born: now }), // (the star: lines of light drawn on it)
+    steady: (draw) => void steadies.push(draw),
     count: () => items.length,
     draw(decals, time) {
       now = time;
+      for (const d of steadies) d(decals, time);
       for (let i = items.length - 1; i >= 0; i--) {
         const it = items[i]!;
         const t = (time - it.born) / it.life;

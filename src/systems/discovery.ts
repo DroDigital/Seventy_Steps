@@ -137,6 +137,23 @@ export function vigilShare(g: Game, boss: string, i: number): number {
   return v?.kind === 'vigil' ? Math.min(1, (stateOf.get(g)?.kept.get(`${boss}:${i}`) ?? 0) / (SIM.hz * v.seconds)) : 0;
 }
 
+/** A vigil whose turn has come, near the investigator: where its mark is, how much of it is kept and whether the hour holds now (the picture draws it, render/vigilMarks.ts; round 64). */
+export interface VigilNear { x: number; z: number; share: number; holds: boolean }
+
+export function vigilsNear(g: Game, reach: number): VigilNear[] {
+  const me = g.overworld && !g.cutscene ? g.ecs.c.transform.get(g.player.id)?.pos : undefined;
+  if (!me) return [];
+  const out: VigilNear[] = [];
+  for (const a of arenasHere(g)) {
+    const boss = a.bosses[0]!;
+    const i = isFound(g, boss) ? -1 : currentStep(g, boss);
+    const v = i < 0 ? undefined : DISCOVERIES[boss]!.steps[i];
+    const at = v?.kind === 'vigil' ? stepPlace(a, v) : null;
+    if (v?.kind === 'vigil' && at && distXZ(me, at) <= reach) out.push({ x: at.x, z: at.z, share: vigilShare(g, boss, i), holds: holds(g, v.when) });
+  }
+  return out;
+}
+
 /** Every frame: the houses in sight are seen, the pages read and the rites done are counted, the vigil being kept goes on. */
 export function discoverySystem(g: Game): void {
   const ow = g.overworld;
