@@ -19,7 +19,7 @@ import { polygonFootprint, type Footprint, type Pad } from './sitePads';
 import type { Prop } from './props';
 
 /** How far the surface of the river lies below the bed's depth: the share of the depth the water fills. */
-export const WATER = 0.55;
+export const WATER = 0.3;
 
 /** A river about the arena at `s`, its ford running out of the gate at the site's front. */
 export function planRiver(h: House, boss: string, s: EnclosureSite): Enclosure {

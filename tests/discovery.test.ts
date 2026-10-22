@@ -184,7 +184,7 @@ describe('a house is seen, shut, and given', () => {
     const g = createWorldGame();
     const a = arenaOf('colour_out_of_space');
     const seen = record(g, 'HouseSeen');
-    const far = courtPoint(a.house!, WAY.length - 4, 0);
+    const far = courtPoint(a.house!, FOUND.see + 20, 0); // (further than it is seen from, and clear of the Black Man's house, which its court nearly meets)
     goTo(g, far.x, far.z);
     run(g, 6);
     expect(seen.length, 'not from afar').toBe(0);
@@ -347,7 +347,7 @@ describe('a house is seen, shut, and given', () => {
 describe('there is no way in but the gate', () => {
   it('a body walking at the horror from the gate side and the sides and back is stopped at the wall, the shut gate included (every house: tests/houseWalk.test.ts)', () => {
     const g = createWorldGame();
-    const a = arenaOf('colour_out_of_space');
+    const a = arenaOf('shub_niggurath'); // (a ring: the Colour's is a basin and the Black Man's a river; every house, by kind, is tests/houseWalk.test.ts)
     const P = ringOf(a).radius;
     const gateAt = Math.atan2(a.front.z, a.front.x);
     for (const turn of [0, 90, 180, 270]) {

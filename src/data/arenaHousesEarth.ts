@@ -15,7 +15,7 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
   }),
   black_man: house({
     name: 'THE BLACK RIVER', line: 'The river runs black about an island of white earth, and the one ford to it has been stopped with a stone.',
-    wall: 'kerb', height: 1.5, thick: 1.8, tint: [0.34, 0.32, 0.38], glow: 'purple', reach: 30,
+    wall: 'kerb', height: 1.3, thick: 1.4, tint: [0.34, 0.32, 0.38], glow: 'purple', reach: 30,
     tower: { kind: 'round', every: 6, height: 5, lit: true }, gate: { width: 7, height: 3.4, flank: 8, sealed: true, look: 'boulder' },
     river: { island: 17, depth: 1.6, ford: 7 }, // the island in the river (Lovecraft: "the unpeopled island in the river"), its bank kerbed, a ford of flat stones, the balefires on the bank
   }),

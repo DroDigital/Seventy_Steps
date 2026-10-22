@@ -10,13 +10,13 @@ import type { V3 } from '../core/geom';
 import type { Game } from '../systems/components';
 import type { Living } from '../world/enclosure';
 import { worldLayout } from '../world/placements';
-import { tint } from './meshKit';
 import type { Rgb } from './palette';
 import type { Particles } from './particles';
 import { createWorldMaterial } from './worldMaterial';
 
 const NEAR = 120; // metres past a court's far side that its life is drawn
-const WATER: Rgb = [0.09, 0.12, 0.15]; // black water, a little cold
+const WATER: Rgb = [0.15, 0.2, 0.26]; // black water, a little cold, and paler than the dark about it: it has to be seen from the ford
+const FOAM: Rgb = [0.52, 0.58, 0.62]; // the pale of its edges, where it frets against the kerbs
 const MIST: Rgb = [0.52, 0.58, 0.68];
 const DUST: Rgb = [0.68, 0.68, 0.72];
 const SPEED = 0.9; // m/s: how fast the mists slide along the river, and the water's flow in the same sense
@@ -36,21 +36,25 @@ function riverMesh(r: River): THREE.Mesh {
   const open = Math.asin(Math.min(0.95, r.ford / 2 / mid)); // the angle the ford takes out of it, at its middle
   const [from, span] = [Math.atan2(r.front.z, r.front.x) + open, Math.PI * 2 - 2 * open];
   const around = Math.max(8, Math.ceil((span * mid) / CELL));
-  const [pos, uv, index] = [new Float32Array((rings + 1) * (around + 1) * 3), new Float32Array((rings + 1) * (around + 1) * 2), [] as number[]];
+  const [pos, uv, col, index] = [new Float32Array((rings + 1) * (around + 1) * 3), new Float32Array((rings + 1) * (around + 1) * 2), new Float32Array((rings + 1) * (around + 1) * 3), [] as number[]];
   for (let j = 0; j <= rings; j++) {
     for (let i = 0; i <= around; i++) {
       const [rad, th] = [r.inner + ((r.outer - r.inner) * j) / rings, from + (span * i) / around];
       const k = j * (around + 1) + i;
       pos.set([r.x + Math.cos(th) * rad, r.y - r.level, r.z + Math.sin(th) * rad], k * 3);
       uv.set([(i / around) * (span * mid) / 6, (j / rings) * ((r.outer - r.inner) / 6)], k * 2); // 6 m to the texture's repeat, u along the current
+      const edge = Math.max(0, 1 - Math.min(j, rings - j) / 1.5) * (0.65 + 0.35 * Math.sin(i * 0.9 + j * 1.7)); // foam at either bank, broken along its length
+      const streak = 0.85 + 0.15 * Math.sin(i * 0.37 + (j % 3) * 2.1); // and the current's own streaks across the middle
+      for (let c = 0; c < 3; c++) col[k * 3 + c] = WATER[c]! * streak * (1 - edge) + FOAM[c]! * edge;
       if (i < around && j < rings) index.push(k, k + around + 1, k + 1, k + 1, k + around + 1, k + around + 2);
     }
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setIndex(index);
-  const mesh = new THREE.Mesh(tint(geo, WATER), createWorldMaterial({ texture: 'water', uvScroll: [SPEED / 6, 0], emissive: 0.14, vertexColors: true }));
+  const mesh = new THREE.Mesh(geo, createWorldMaterial({ texture: 'water', uvScroll: [SPEED / 6, 0], emissive: 0.32, vertexColors: true }));
   mesh.frustumCulled = false;
   mesh.name = 'river';
   return mesh;
@@ -62,12 +66,12 @@ export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particle
   const rand = (lo: number, hi: number): number => lo + (hi - lo) * Math.random();
 
   function river(c: (typeof lives)[number], r: River, dt: number): void {
-    c.owed += 5 * dt; // mists a second
+    c.owed += 9 * dt; // mists a second
     for (; c.owed >= 1; c.owed--) {
       const rad = rand(r.inner + 1, r.outer - 1);
       const th = Math.atan2(r.front.z, r.front.x) + rand(0.2, Math.PI * 2 - 0.2);
       const [x, z] = [r.x + Math.cos(th) * rad, r.z + Math.sin(th) * rad];
-      particles.spawn({ x, y: r.y - r.level + rand(0.2, 1.3), z, vx: -Math.sin(th) * SPEED, vz: Math.cos(th) * SPEED, vy: 0.02, life: rand(6, 9), size: rand(1.8, 3), grow: 1.5, color: MIST, alpha: 0.22, drag: 0.05, shape: 'wisp' }); // a wraith, carried round with the current
+      particles.spawn({ x, y: r.y - r.level + rand(0.3, 2.2), z, vx: -Math.sin(th) * SPEED, vz: Math.cos(th) * SPEED, vy: 0.02, life: rand(6, 9), size: rand(2, 3.4), grow: 1.5, color: MIST, alpha: 0.3, drag: 0.05, shape: 'wisp' }); // a wraith, carried round with the current
     }
   }
 
