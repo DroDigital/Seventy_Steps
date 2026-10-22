@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { COMBAT, NEW_GAME_PLUS } from '../src/data/tuning';
 import { getEntity } from '../src/data/registry';
+import { startMove } from '../src/systems/actions';
 import { backstab, strike } from '../src/systems/combat';
 import { applyCarry, carryOf, foeBounty, parseCarry } from '../src/systems/cycles';
 import { createWorldGame } from '../src/systems/game';
@@ -16,27 +17,48 @@ const memory = () => {
 };
 
 describe('backstabs (round 12)', () => {
-  it("a blow into a foe's back lands as a riposte: much harder, and it reels", () => {
-    const hitFrom = (behind: boolean): { dealt: number; move: string | null } => {
+  it('only a heavy blow squarely into the back earns a small bonus; light attacks deal normal damage', () => {
+    const hitFrom = (behind: boolean, attack: 'light' | 'heavy'): { dealt: number; outcomes: string[] } => {
       const s = scriptedGame();
       place(s.g, s.deepOne, 0, 0, 0); // facing +z
       place(s.g, s.player, 0, behind ? -1.2 : 1.2, behind ? 0 : Math.PI);
       const h = s.g.ecs.c.health.get(s.deepOne)!;
       const before = h.hp;
-      steps(s.g, 1, press('light'));
-      steps(s.g, 12);
-      return { dealt: before - h.hp, move: s.g.ecs.c.actor.get(s.deepOne)!.move };
+      const outcomes: string[] = [];
+      s.g.events.on('Hit', (e) => { if (e.target === s.deepOne) outcomes.push(e.outcome); });
+      steps(s.g, 1, press(attack));
+      steps(s.g, 35);
+      return { dealt: before - h.hp, outcomes };
     };
-    const front = hitFrom(false);
-    const back = hitFrom(true);
+    const front = hitFrom(false, 'heavy');
+    const back = hitFrom(true, 'heavy');
+    expect(front.dealt).toBeGreaterThan(0);
     expect(back.dealt).toBeCloseTo(front.dealt * COMBAT.riposte, 5);
-    expect(back.move).toBe('stagger');
+    expect(back.dealt / front.dealt).toBeLessThanOrEqual(1.15);
+    expect(back.outcomes).toEqual(['riposte']);
+    const light = hitFrom(false, 'light');
+    const rearLight = hitFrom(true, 'light');
+    expect(light.dealt).toBeGreaterThan(0);
+    expect(rearLight.dealt).toBe(light.dealt);
+    expect(rearLight.outcomes).not.toContain('riposte');
+  });
+
+  it('a heavy blow from the rear flank no longer counts as a backstab', () => {
+    const { g, player, deepOne } = scriptedGame();
+    place(g, deepOne, 0, 0, 0);
+    startMove(g.ecs.c.actor.get(player)!, 'heavy1');
+    for (const [degrees, expected] of [[0, true], [15, true], [30, false], [45, false], [90, false]] as const) {
+      const angle = degrees * Math.PI / 180;
+      place(g, player, Math.sin(angle) * 1.2, -Math.cos(angle) * 1.2, -angle);
+      expect(backstab(g, player, deepOne), `${degrees} degrees off the back`).toBe(expected);
+    }
   });
 
   it('no boss, and nothing colossal, is backstabbed', () => {
     const g = createWorldGame();
     const boss = spawnCreature(g, 'keziah_mason', { x: 0, z: 0, yaw: 0 })!;
     const gug = spawnCreature(g, 'gug', { x: 10, z: 0, yaw: 0 })!;
+    startMove(g.ecs.c.actor.get(g.player.id)!, 'heavy1');
     place(g, g.player.id, 0, -1.5, 0);
     expect(backstab(g, g.player.id, boss)).toBe(false);
     place(g, g.player.id, 10, -3, 0);

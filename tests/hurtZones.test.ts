@@ -1,7 +1,5 @@
 /**
- * A colossus's hurt zones (playtest round 24): it was one column struck alike along its height. Its
- * legs take a blow whole, its body soaks it, and its head takes it several times over, out of a
- * blade's reach until the colossus stoops after a blow of its own.
+ * Multipart colossus hitboxes follow the picture and recovery pose, with normal damage everywhere.
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -10,11 +8,12 @@ import { globes, pictured, zoneShapes } from '../src/data/assemblyShape';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
 import { reviewedSize, type ReviewedManifest } from '../src/render/sprites/reviewed';
-import { PLAYER } from '../src/data/tuning';
+import { COMBAT, PLAYER } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { stepGame } from '../src/systems/game';
-import { refreshStoops, stooped, weakSpot, zonesOf } from '../src/systems/hurt';
+import { refreshStoops, stooped, zoneGap, zonesOf } from '../src/systems/hurt';
 import { setLock } from '../src/systems/lockOn';
+import { shotSystem } from '../src/systems/revolver';
 import { bossGame } from './bossHelpers';
 import { place, press } from './helpers';
 
@@ -55,11 +54,10 @@ describe('hurt zones (round 24)', () => {
     }
   });
 
-  it('a column is legs, torso and head, the head the weak spot; stooped, the head is down within a blade\'s reach', () => {
+  it('a column keeps its legs, torso and head hitboxes; stooped, the head follows its pose', () => {
     const [h, r] = [20, 6];
     const up = zoneShapes(recipe('ghatanothoa'), r, h, 1, false)!;
-    expect(up.map((z) => z.damage)).toEqual([ZONES.legs.damage, ZONES.torso.damage, ZONES.head.damage]);
-    expect(up[2].weak).toBe(true);
+    expect(up).toHaveLength(3);
     expect(up[2].y0).toBeGreaterThan(3); // out of a blade's reach
     const down = zoneShapes(recipe('ghatanothoa'), r, h, 1, true)!;
     expect(down[2].y1).toBeLessThanOrEqual(ZONES.head.stoop);
@@ -105,12 +103,21 @@ describe('hurt zones (round 24)', () => {
     }
   });
 
-  it('a blow at the feet of a colossus on its feet takes the legs\' share; stooped, the head\'s', () => {
+  it('a blade deals the same damage whether it touches the legs or the stooped head', () => {
     const feet = blows('ghatanothoa', false);
     const head = blows('ghatanothoa', true);
     expect(feet.length).toBeGreaterThan(0);
     expect(head.length).toBeGreaterThan(0);
-    expect(head[0] / feet[0]).toBeCloseTo(ZONES.head.damage / ZONES.legs.damage, 1);
+    expect(head[0]).toBe(feet[0]);
+  });
+
+  it.each(['ghatanothoa', 'cthulhu', 'father_dagon', 'shub_niggurath', 'yog_sothoth'])('%s takes normal damage on every body part', (id) => {
+    const { g, boss } = bossGame(id);
+    const at = g.ecs.c.transform.get(boss)!.pos;
+    for (const z of zonesOf(g, boss)!) {
+      const p = { x: at.x + z.x, y: at.y + (z.y0 + z.y1) / 2, z: at.z + z.z };
+      expect(zoneGap(g, boss, p, p, 0)).toEqual({ gap2: 0, damage: 1 });
+    }
   });
 
   it('stoops after its own blow: from its recovery on, and a little after', () => {
@@ -132,12 +139,25 @@ describe('hurt zones (round 24)', () => {
     expect(stooped(g, boss)).toBe(false);
   });
 
-  it('the revolver aims for a head it can reach, and for the body of one too tall to', () => {
-    const near = bossGame('ghatanothoa');
-    const high = weakSpot(near.g, near.boss)!;
-    expect(high).not.toBeNull();
-    expect(high.y).toBeGreaterThan(10);
-    const far = bossGame('cthulhu');
-    expect(weakSpot(far.g, far.boss)).toBeNull();
+  it('the locked revolver aims at the usual body height while a colossus stands or stoops', () => {
+    const { g, boss } = bossGame('ghatanothoa', undefined, 12);
+    g.rng = () => 0; // no random scatter: compare the actual shot line to its lock-on aim
+    setLock(g, boss);
+    const tr = g.ecs.c.transform.get(boss)!;
+    const body = g.ecs.c.body.get(boss)!;
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    const shots: { from: { x: number; y: number; z: number }; to: { x: number; y: number; z: number } }[] = [];
+    g.events.on('Shot', (e) => shots.push(e));
+    for (const stoop of [false, true]) {
+      g.ecs.c.fight.get(boss)!.stoopUntil = stoop ? g.frame + 5 : 0;
+      startMove(a, 'shoot');
+      a.frame = a.moves.shoot.shot!.frame;
+      shotSystem(g);
+      const shot = shots.at(-1)!;
+      const flat = Math.hypot(shot.to.x - shot.from.x, shot.to.z - shot.from.z);
+      const aimDistance = Math.hypot(tr.pos.x - shot.from.x, tr.pos.z - shot.from.z);
+      expect((shot.to.y - shot.from.y) / flat).toBeCloseTo((tr.pos.y + body.aimHeight - shot.from.y) / aimDistance, 8);
+      expect(shot.from.y).toBe(COMBAT.muzzleHeight);
+    }
   });
 });

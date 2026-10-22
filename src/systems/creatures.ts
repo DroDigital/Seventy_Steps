@@ -22,6 +22,8 @@ import { addLayer } from './hiddenLayer';
 import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
+import { bossHealthScale, refreshBossLevels } from './bossScaling';
+import { levelsBought } from './levels';
 
 /** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
 const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
@@ -149,6 +151,10 @@ export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant)
   if (swaps) g.ecs.c.swap.set(e, { id, eldritch: v === 'eldritch' });
   if (def.hidden) addLayer(g, e, def.hidden);
   if (def.bossScript) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
+  if (foe && def.bossScript) {
+    g.ecs.c.health.get(e)!.baseMax = def.stats.hp;
+    refreshBossLevels(g, levelsBought(g));
+  }
   if (def.bossScript?.unseen) g.ecs.c.unseen.set(e, { revealed: 0 });
   return e;
 }
@@ -163,8 +169,10 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * foeHealth(g));
+  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsBought(g), g.player.cycle) : foeHealth(g)));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
+  if (def.tier !== 'ally' && def.bossScript) h.baseMax = cd.hp;
+  else delete h.baseMax;
   const po = c.poise.get(e)!;
   [po.value, po.max] = [(po.value / po.max) * cd.poise, cd.poise];
   c.actor.get(e)!.moves = cd.moves; // a move the new form lacks simply ends

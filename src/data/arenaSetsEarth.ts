@@ -12,7 +12,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'cairn',
     ground: { texture: 'rot', tint: [0.46, 0.46, 0.5], gain: 1.2, reach: 14, bands: [{ r0: 0, r1: 0.3, k: 0.55, tint: [0.3, 0.3, 0.36] }, { r0: 0.3, r1: 0.62, k: 1.3, tint: [0.66, 0.66, 0.68] }] },
     puts: [
-      put('inlay_ring', at(0, 0), { size: 7.5, glow: 'magenta', lit: 'sigil' }),
       put('meteor', ring(0.9, 3, { arc: [320, 395], jitter: 10 }), { size: [0.9, 1.3], glow: 'magenta' }), // what is left of the stone that fell
       put('prop:tree', ring(1.0, 9, { jitter: 14 }), { size: [1.1, 1.5] }), // the grey trees, their bark ash
       put('prop:tree', ring(1.3, 8, { jitter: 18 }), { size: [1.3, 1.7] }),
@@ -31,7 +30,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'skull',
     ground: { texture: 'leaves', tint: [0.46, 0.36, 0.32], gain: 1.3, reach: 12, bands: [{ r0: 0, r1: 0.55, k: 0.75, tint: [0.3, 0.2, 0.19] }] },
     puts: [
-      put('inlay_star', at(0, 0), { size: 11, glow: 'magenta', lit: 'sigil' }),
       put('prop:firepit', at(0.24, 180), { size: 3 }), // the fire, at the Black Man's back (not at his feet, where its flame would stand across him)
       put('stump_old', ring(0.84, 9, { arc: [40, 320], face: 'in' }), { size: 1.0 }), // the witches' stools
       put('prop:monolith', ring(1.0, 11, { jitter: 8, face: 'in' }), { size: [0.95, 1.35] }),
@@ -50,7 +48,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'grave',
     ground: { texture: 'dirt', tint: [0.4, 0.38, 0.34], gain: 1.25, reach: 12, bands: [{ r0: 0.33, r1: 0.42, k: 1.7, tint: [0.78, 0.78, 0.74] }] },
     puts: [
-      put('inlay_ring', at(0, 0), { size: 9, glow: 'purple', lit: 'sigil' }),
       put('crypt', at(0.98, 180, { face: 'in' }), { size: 1.1, heart: true }),
       put('grave_cross', ring(0.95, 4, { arc: [60, 140], face: 'out' }), { size: 1.2 }),
       put('grave_round', ring(0.95, 4, { arc: [220, 300], face: 'out' })),
@@ -92,7 +89,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'skull',
     ground: { texture: 'flesh', tint: [0.4, 0.28, 0.28], gain: 1.15, reach: 14, bands: [{ r0: 0, r1: 0.45, k: 0.7, tint: [0.26, 0.16, 0.17] }, { r0: 0.75, r1: 1.0, k: 0.78 }] },
     puts: [
-      put('inlay_spiral', at(0, 0), { size: 20, glow: 'magenta', lit: 'sigil' }),
       put('horn_tree', ring(1.0, 18, { jitter: 8 }), { size: [1.0, 1.4] }),
       put('horn_tree', ring(1.32, 20, { jitter: 12 }), { size: [1.3, 1.9] }),
       put('skull_pole', ring(0.9, 16, { jitter: 6 }), { size: [1, 1.3] }),
@@ -103,12 +99,11 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     ],
     air: { kind: 'spore', color: [0.8, 0.35, 0.4], rate: 26 },
   },
-  // Medusa's Coil: the burned plantation at Riverside, a porch of columns still standing, a stone head fallen in the court, a snake coiled in the ash.
+  // Medusa's Coil: the burned plantation at Riverside, a porch of columns still standing, a stone head fallen in the court.
   medusa_gorgon: {
     candle: 'votive',
     ground: { texture: 'cobble', tint: [0.34, 0.3, 0.28], gain: 1.15, reach: 12, bands: [{ r0: 0, r1: 0.55, k: 0.8, tint: [0.22, 0.2, 0.2] }] },
     puts: [
-      put('inlay_serpent', at(0, 0), { size: 9, glow: 'green', lit: 'sigil' }),
       put('column', ring(0.95, 7, { arc: [135, 225] }), { join: true, size: 1.05 }),
       put('wall_ruin', ring(1.2, 6, { arc: [140, 220] }), { join: true, size: 1.3 }),
       put('fountain', at(0.6, 180, { face: 'in' }), { heart: true }),
@@ -145,7 +140,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'votive',
     ground: { texture: 'slab', tint: [0.62, 0.55, 0.4], gain: 1.3, reach: 14, bands: [{ r0: 0.5, r1: 0.56, k: 0.6 }], spokes: { n: 12, width: 5, k: 1.3, r0: 0.1, r1: 1 } },
     puts: [
-      put('inlay_ring', at(0, 0), { size: 12, glow: 'purple', lit: 'sigil' }),
       put('column', ring(0.97, 10, { arc: [25, 335] }), { size: 1.05 }), // the colonnade
       put('pylon', at(1.28, 0, { side: 5.5, mirror: true }), { size: 1.0, lit: 'fire' }),
       put('sphinx', lane([1.5, 2.3], 3, 4.4, 90), { size: 1.2 }),
@@ -155,12 +149,11 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     ],
     air: { kind: 'dust', color: [0.8, 0.7, 0.5], rate: 20 },
   },
-  // Yig's mound on the prairie: a serpent drawn in the dust, totems of his people, bones, a wagon left, the dry wind.
+  // Yig's mound on the prairie: totems of his people, bones, a wagon left, the dry wind.
   yig: {
     candle: 'skull',
     ground: { texture: 'dirt', tint: [0.52, 0.42, 0.3], gain: 1.3, reach: 12, bands: [{ r0: 0, r1: 0.4, k: 0.8 }] },
     puts: [
-      put('inlay_serpent', at(0, 0), { size: 14, glow: 'green', lit: 'sigil' }),
       put('totem', ring(1.0, 8, { face: 'in' }), { size: [1.0, 1.25] }),
       put('totem', ring(1.35, 5, { jitter: 12 }), { size: 1.6 }),
       put('skull_pole', ring(0.88, 10, { jitter: 8 })),
@@ -173,12 +166,11 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     ],
     air: { kind: 'dust', color: [0.72, 0.6, 0.42], rate: 24 },
   },
-  // Nug and Yeb at the Mound: black basalt, a stepped mound with a mouth, crags, a spiral of tar and a deep red coal in the dark.
+  // Nug and Yeb at the Mound: black basalt, a stepped mound with a mouth, crags and a deep red coal in the dark.
   nug: {
     candle: 'cairn',
     ground: { texture: 'rock', tint: [0.3, 0.28, 0.32], gain: 1.2, reach: 12, bands: [{ r0: 0, r1: 0.35, k: 0.6 }] },
     puts: [
-      put('inlay_spiral', at(0, 0), { size: 10, glow: 'purple', lit: 'sigil' }),
       put('ziggurat', at(0.78, 180, { face: 'in' }), { heart: true, size: 1.0 }),
       put('rock_tall', ring(1.0, 9, { jitter: 10 }), { size: [1.1, 1.7] }),
       put('rock_tall', ring(1.35, 8, { jitter: 14 }), { size: [1.8, 2.6] }),
@@ -194,7 +186,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     ground: { texture: 'mud', tint: [0.3, 0.42, 0.38], gain: 1.2, reach: 12, bands: [{ r0: 0, r1: 0.5, k: 0.8, tint: [0.2, 0.32, 0.3] }, { r0: 0.8, r1: 1.0, k: 0.8 }] },
     puts: [
       put('idol', at(0.55, 180, { face: 'in' }), { heart: true, size: 1.5, lit: 'sigil', glow: 'green' }),
-      put('inlay_ring', at(0, 0), { size: 8, glow: 'green', lit: 'sigil' }),
       put('prop:monolith', ring(1.0, 9, { jitter: 8, face: 'in' }), { size: [1.1, 1.5] }),
       put('lily', scatter(16, [0.3, 0.97]), { size: [0.8, 1.5], walk: true }),
       put('plant_bush', scatter(10, [0.85, 0.98]), { size: [1, 1.6] }),
@@ -209,7 +200,6 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     candle: 'cairn',
     ground: { texture: 'snow', tint: [0.6, 0.62, 0.72], gain: 0.95, reach: 12, bands: [{ r0: 0, r1: 0.25, k: 0.8, tint: [0.45, 0.47, 0.58] }] }, // (snow under a lantern is the brightest ground there is: a slab of it filled a cutscene's foreground)
     puts: [
-      put('inlay_ring', at(0, 0), { size: 14, glow: 'purple', lit: 'sigil' }),
       put('trilith', ring(1.0, 7, { jitter: 4, face: 'in' }), { size: 1.2 }),
       put('rocks_tall', ring(0.92, 6, { jitter: 25 }), { size: [1, 1.5] }),
       put('rock_tall', ring(1.35, 8, { jitter: 14 }), { size: [1.5, 2.4] }),

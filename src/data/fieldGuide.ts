@@ -49,7 +49,6 @@ export const GUIDE: Readonly<Record<HintId, { group: GuideGroup; title: string }
   fog: g(HORRORS, 'The mist'),
   candle: g(HORRORS, 'Candles'),
   gate: g(HORRORS, 'Shut gates'),
-  stoop: g(HORRORS, 'Colossi'),
   ship: g(HORRORS, 'Cthulhu'),
   powder: g(HORRORS, 'The Dunwich Horror'),
   cover: g(HORRORS, 'Ghatanothoa'),

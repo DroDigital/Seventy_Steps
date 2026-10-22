@@ -15,7 +15,8 @@ import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
 import type { Game } from './components';
 import { isFound } from './found';
-import { applyLevels, LEVEL_IDS } from './levels';
+import { applyLevels, LEVEL_IDS, levelsBought } from './levels';
+import { bossDamageScale } from './bossScaling';
 
 export interface Carry {
   cycle: number; // the journey it carries into (1: the second)
@@ -98,7 +99,8 @@ export const foeHealth = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.
 export function foeDamage(g: Game, attacker: Entity): number {
   if (g.ecs.c.combatant.get(attacker)?.faction !== 'enemy') return 1;
   const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
-  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle); // (round 38: the difficulty chosen at the start, and this journey's weight)
+  const level = g.ecs.c.fight.has(attacker) ? bossDamageScale(levelsBought(g)) : 1;
+  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level;
 }
 
 /** The Echoes this journey's foes leave, against the first's. */

@@ -11,7 +11,7 @@ export const BOSS = {
   rim: 2.5, // metres inside the ring's edge a boss keeps to
   wake: 45, // frames a boss holds its first blow once it wakes: the investigator has their hands again first (round 60: one struck as the fog let them go)
   opening: 64, // frames a parried or interrupted boss stays open (a common foe: 96, REACTIONS.parried), so the riposte is a punish taken at once: a heavy blow begun as the parry's recovery ends still lands (58 frames after the earliest catch)...
-  riposte: 1.25, // ...and what it weighs on a boss (a common foe: COMBAT.riposte). Round 60: any blow within 1.6 s of a parry or a shot landed at x2.5, half a human-sized horror's bar
+  riposte: 1.1, // ...and its modest damage bonus on a boss (a common foe: COMBAT.riposte)
   shot: 0.3, // the share of the investigator's shot a boss takes: the revolver breaks a horror's wind-up and chips it, the blade fells it (round 60: a full carry of rounds, alone, felled most of the human-sized ones)...
   rearm: 240, // ...and frames after a shot breaks its wind-up before another can: no holding it in place with the trigger
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
@@ -77,7 +77,7 @@ export const COLOUR = {
   drain: 1 / 75, // the world's saturation lost per second of healing
 };
 
-/** The Dunwich Horror: unseen until the Powder of Ibn Ghazi, finished by the incantation. */
+/** The Dunwich Horror: unseen until the Powder of Ibn Ghazi; the incantation is an optional finish. */
 export const DUNWICH = {
   powder: 3, // doses Armitage's sprayer holds
   reveal: 900, // frames the powder shows it
@@ -86,7 +86,7 @@ export const DUNWICH = {
   chantRange: 40, // the incantation works within this distance
 };
 
-/** Cthulhu: it cannot be killed. The Alert rams it; it bursts, reforms, and R'lyeh sinks. */
+/** Cthulhu: the Alert offers an optional finish, ramming it before it reforms and R'lyeh sinks. */
 export const CTHULHU = {
   shipShare: 0.8, // the Alert comes in at this share of the arena's radius, on its far side from Cthulhu
   helm: 5, // metres: the investigator takes the helm this close to it
@@ -138,18 +138,15 @@ export const AZATHOTH = {
 };
 
 /**
- * A colossus's hurt zones (round 24; data/assemblyShape.ts, systems/hurt.ts): it was one column struck
- * alike along its height, at the base where a blade reaches. Now its legs take a blow whole, its body
- * soaks it, and its head, the weak spot, takes it several times over: out of reach on its feet (the
- * revolver aims for it), and down within the blade's after each of its own blows, while it recovers.
+ * A colossus's hitbox geometry (data/assemblyShape.ts, systems/hurt.ts): legs, torso and head follow
+ * its silhouette and recovery pose. All parts take the same damage.
  */
 export const ZONES = {
   height: 10, // metres: only assembly bodies this tall have zones (round 61: 12, before Dagon and Hydra were made 11 and 10.5 m; the Dunwich Horror, 9, stays without)
-  legs: { top: 0.34, damage: 1 }, // the lowest third of it, and the share of a blow taken there
-  torso: { top: 0.72, reach: 0.95, damage: 0.6 }, // up to here; its breadth, of the body's; the share of a blow
-  head: { reach: 0.65, damage: 1.5, stoop: 4.5 }, // above that; breadth; the share of a blow (round 60: 2.5, and a riposte to it was six times a blow); how low it comes (metres) when it stoops
+  legs: { top: 0.34 }, // the lowest third of it
+  torso: { top: 0.72, reach: 0.95 }, // up to here; its breadth, of the body's
+  head: { reach: 0.65, stoop: 4.5 }, // above that; breadth; how low it comes (metres) when it stoops
   linger: 24, // frames it stays stooped after its recovery ends
-  aimReach: 18, // metres: a head higher than this is out of a bullet's range, and the revolver aims at the body as before
 };
 
 /** A horror's arrival (round 60: bosses are not drawn until roused, and come into view as the fight begins): how long it takes, and how deep the great bodies of earth and sea come up from. */
