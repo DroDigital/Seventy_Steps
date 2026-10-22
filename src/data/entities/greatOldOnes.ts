@@ -16,7 +16,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, quake: 1, eruption: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
       ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, eruption: 1, vortex: 1, quake: 1, crushing_blow: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(5350, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
+    stats: st(4650, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,

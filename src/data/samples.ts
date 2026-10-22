@@ -117,8 +117,10 @@ export const SAMPLE_SETS = {
   farHowl: set(['spot_howl'], 0.2, [0.9, 1]),
   hull: set(['spot_boat'], 0.3),
   creak: set(['spot_creak1', 'spot_creak2'], 0.22, [0.8, 1]),
-  thunder: set(['spot_thunder'], 0.35, [0.85, 1]),
+  thunder: set([...takes('storm_thunder', 3), 'spot_thunder'], 0.35, [0.85, 1]), // round 66: three takes of a rolling clap beside the one (the procedural roll beneath it is a bed now: STORM_MIX)
   strike: set(takes('strike', 4), 1, [0.9, 1.04]), // a bolt on the ground close by (round 59: the recipe's crack was a blip): the crack, the tearing and the crash
+  zap: set(takes('storm_zap', 3), 0.6, [0.92, 1.06]), // round 66: the electric snap of a bolt on the ground, over the strike's crash
+  charge: set(takes('storm_charge', 3), 0.5, [0.95, 1.05]), // round 66: the ring of light before it, a charging hum (the whine of its recipe plays only until it has loaded)
   gurgle: set(['spot_gurgle'], 0.3, [0.8, 1]),
   chains: set(['spot_chains'], 0.22, [0.85, 1]),
   timber: set(['spot_groan'], 0.25, [0.7, 0.95]),

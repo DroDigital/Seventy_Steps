@@ -60,11 +60,16 @@ export const PLANNED: readonly Planned[] = [
   ...atk('atkStone', 'atk_stone', 4, 0.55, ['land:crack', 'burst:crack', 'land:ash', 'burst:ash', 'land:plain', 'burst:plain'], 'A heavy stone impact on rock, cracking and a scatter of debris and gravel falling after it'),
   ...atk('atkFire', 'atk_fire', 3, 0.5, ['land:flame', 'burst:flame'], 'A ball of fire bursting against stone, a roaring whump and crackling flames dying away'),
   ...atk('atkIce', 'atk_ice', 4, 0.6, ['land:frost', 'burst:frost'], 'A shard of ice shattering against stone, a sharp crack and tinkling splinters'),
-  ...atk('atkArcane', 'atk_arcane', 3, 0.45, ['land:glyph', 'burst:glyph', 'land:eye', 'burst:eye', 'land:star', 'burst:star'], 'An eldritch bolt of energy striking, a deep magical impact with a shimmering ringing tail'),
+  ...atk('atkArcane', 'atk_arcane', 3, 0.45, ['land:glyph', 'burst:glyph'], 'An eldritch bolt of energy striking, a deep magical impact with a shimmering ringing tail'),
+  ...atk('atkStarHit', 'atk_starhit', 3, 0.5, ['land:star', 'burst:star'], 'A bolt of starlight striking, a bright ringing impact with a glassy shimmer fading after it'),
+  ...atk('atkEyeHit', 'atk_eyehit', 3, 0.5, ['land:eye', 'burst:eye'], 'A baleful gaze striking like a pulse of dark energy, a low throb and a thin rising whine'),
   ...atk('atkWhip', 'atk_whip', 3, 0.5, ['land:coil', 'burst:coil'], 'A long whip cracking hard through the air'),
-  ...atk('atkCast', 'atk_cast', 3, 0.45, ['loose:glyph', 'loose:eye', 'loose:star', 'loose:coil'], 'A spell cast and hurled, a magical whoosh rising and rushing away'),
+  ...atk('atkCast', 'atk_cast', 3, 0.45, ['loose:glyph', 'loose:coil'], 'A spell cast and hurled, a magical whoosh rising and rushing away'),
+  ...atk('atkStarCast', 'atk_starcast', 3, 0.45, ['loose:star'], 'A star-bright bolt conjured and flung, a high shimmering rush with a bell-like ring'),
+  ...atk('atkEyeCast', 'atk_eyecast', 3, 0.45, ['loose:eye'], 'A dark gaze loosed as a bolt, a low charging hum that snaps away into a thin whine'),
+  ...atk('atkFrostCast', 'atk_frostcast', 3, 0.45, ['loose:frost'], 'A shard of frost conjured and flung, a cold crystalline whoosh with a trail of tiny chimes'),
   ...atk('atkFwoosh', 'atk_fwoosh', 3, 0.5, ['loose:flame'], 'A ball of fire hurled through the air, a rushing fire whoosh'),
-  ...atk('atkThrow', 'swipe', 4, 0.5, ['loose:tide', 'loose:stain', 'loose:spore', 'loose:root', 'loose:crack', 'loose:ash', 'loose:plain', 'loose:frost'], 'A heavy limb or a thrown mass swung hard through the air, a low dark whoosh'),
+  ...atk('atkThrow', 'swipe', 4, 0.5, ['loose:tide', 'loose:stain', 'loose:spore', 'loose:root', 'loose:crack', 'loose:ash', 'loose:plain'], 'A heavy limb or a thrown mass swung hard through the air, a low dark whoosh'),
 ];
 
 /** One of a horror's blows as a planned set: what it stands in front of, by its recipes' keys (render/audio/attackAudio.ts). */

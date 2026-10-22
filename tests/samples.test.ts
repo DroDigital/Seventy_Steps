@@ -26,17 +26,17 @@ describe('the recorded sounds (data/samples.ts, public/audio)', () => {
     for (const f of [...files('sfx'), ...files('amb')]) expect(named.has(f), `${f} is played by nothing`).toBe(true);
   });
 
-  it('every file is credited, and every one is public domain (CC0) or made with Suno Sounds on a paid plan', () => {
+  it('every file is credited (found on Freesound or OpenGameArt), and every one is public domain (CC0) or made with Suno Sounds on a paid plan', () => {
     const credits = readFileSync(`${AUDIO}/CREDITS.md`, 'utf8');
-    const rows = new Map([...credits.matchAll(/^\| `([^`]+)\.mp3` \| \[[^\]]+\]\((https:\/\/freesound\.org\/people\/[^/]+\/sounds\/\d+\/)\) \| ([^|]+) \| ([^|]+) \|/gm)].map((m) => [m[1], m[4].trim()]));
+    const rows = new Map([...credits.matchAll(/^\| `([^`]+)\.mp3` \| \[[^\]]+\]\((https:\/\/(?:freesound\.org\/people\/[^/]+\/sounds\/\d+\/|opengameart\.org\/content\/[^)]+))\) \| ([^|]+) \| ([^|]+) \|/gm)].map((m) => [m[1], m[4].trim()]));
     const suno = new Map([...credits.matchAll(/^\| `([^`]+)\.mp3` \| Suno Sounds \| ([^|]+) \| (\d{4}-\d{2}-\d{2}) \| ([^|]+) \|/gm)].map((m) => [m[1], m[4].trim()])); // made, not found: a row says the day and the plan
     for (const f of [...files('sfx'), ...files('amb')]) expect(rows.get(f) ?? (suno.has(f) && /Pro|Premier/.test(suno.get(f)!) ? 'Suno' : undefined), f).toMatch(/^(CC0|Suno)$/);
   });
 
-  it('stays small: under 10 MB in all, no one-shot over 200 KB', () => {
+  it('stays small: under 11 MB in all (round 66: 10, and the casters\' and the storm\'s takes came in), no one-shot over 200 KB', () => {
     const size = (f: string): number => statSync(`${AUDIO}/${f}.mp3`).size;
     const all = [...files('sfx'), ...files('amb')];
-    expect(all.reduce((n, f) => n + size(f), 0)).toBeLessThan(10 * 2 ** 20);
+    expect(all.reduce((n, f) => n + size(f), 0)).toBeLessThan(11 * 2 ** 20);
     for (const f of files('sfx')) expect(size(f), f).toBeLessThan(200 * 1024);
   });
 

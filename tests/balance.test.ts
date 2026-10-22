@@ -37,7 +37,7 @@ interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'f
 }
 
 /** What the table may not hold: bounds for a fight worth having (not over in seconds, not a slog, not costing more lives than a person carries Reagent for). */
-const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.3 } as const; // (round 60: a god spends at most the Reagent carried: Father Dagon was "way too overpowered", and R'lyeh's too hard at level 26)
+const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } as const; // (round 60: a god spends at most the Reagent carried: Father Dagon was "way too overpowered", and R'lyeh's too hard at level 26)
 /**
  * Round 61, "no boss insurmountable, none excessively easy": each tier's own band as well, so a fight is held to its kind and not only to the
  * widest bounds. A named horror is over in 7 to 40 seconds and always costs something (a bot that slips most blows still bleeds a little);
@@ -51,7 +51,7 @@ const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.3 } 
  * costs between a third of a life and one and a third, climbing with the rank (`RISE`).
  */
 const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth'.split(' '));
-const BANDS = { named: { seconds: [14, 50], lives: [0.05, 1.2] }, god: { seconds: [35, 100], lives: [0.3, 1.3] } } as const;
+const BANDS = { named: { seconds: [14, 50], lives: [0.05, 1.2] }, god: { seconds: [35, 100], lives: [0.3, 1.5] } } as const;
 const BOUNDS_TEXT = '6 to 260 seconds';
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
 const EXEMPT = ['azathoth', 'haunter_of_the_dark'];

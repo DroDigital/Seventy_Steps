@@ -143,7 +143,7 @@ export const NAMED = tier('named', [
     id: 'colossus_pyramids', name: 'The Colossus Beneath the Pyramids', source: 'Under the Pyramids', regions: ['pnakotus'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sand', scale: 14, tentacles: 5, eyes: 10 },
     ...scripted('boss', phases(ph(1, { slam: 2, grab: 1, charge: 1, quake: 1, delayed_slam: 1 }), ph(0.5, { slam: 2, bite: 2, charge: 1, aoe_ring: 1, quake: 2, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3950, 600, 54, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2,
+    stats: st(3300, 600, 54, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2,
   },
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
@@ -173,7 +173,7 @@ export const NAMED = tier('named', [
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
     ...scripted('mind_thief', phases(ph(1, { gaze: 2, teleport: 1, roar: 1, barrage: 1 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 2, beam: 1, teleport: 1, sweep_beam: 1, vortex: 1 }, { hooks: ['time_skip', 'camera_warp'] }))),
-    stats: st(1650, 140, 48, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
+    stats: st(1300, 140, 48, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
   },
   {
     id: 'the_outsider', name: 'The Outsider', source: 'The Outsider', regions: ['hub'], canonLooks: true,
@@ -191,6 +191,6 @@ export const NAMED = tier('named', [
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
     ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, eruption: 1 }, { hooks: ['arena_reconnect'] }))),
-    stats: st(2850, 160, 64, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
+    stats: st(2250, 160, 64, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },
 ]);

@@ -23,13 +23,13 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['beyond'], canonLooks: false, voice: 'pipes',
     sprite: { silhouette: 'spectre', palette: 'charcoal', scale: 2.8, eyes: 0, glow: 'purple' },
     ...scripted('caster', phases(ph(1, { roar: 2, projectile: 1, barrage: 1 }), ph(0.5, { roar: 1, projectile_fan: 2, darkness: 1, barrage: 2 }, { hooks: ['camera_warp'] }))),
-    stats: st(3900, 300, 86, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4,
+    stats: st(3200, 300, 86, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4,
   },
   {
     id: 'other_gods', name: 'The Other Gods', source: 'The Other Gods', regions: ['beyond', 'dreamlands'], canonLooks: false,
     sprite: { silhouette: 'spectre', palette: 'pallid', scale: 6, eyes: 0, tentacles: 4, glow: 'magenta' },
     ...scripted('brute', phases(ph(1, { slam: 2, roar: 1, aoe_ring: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, aoe_ring: 1, roar: 1, quake: 1, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3700, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4,
+    stats: st(3250, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4,
   },
   {
     id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['beyond'], canonLooks: true,
@@ -42,7 +42,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { beam: 2, projectile_fan: 1, teleport: 1, summon: 1, sweep_beam: 1, barrage: 1, crushing_blow: 1 }, { summons: ['dhole'], hooks: ['arena_reconnect', 'camera_warp'] }),
       ph(0.25, { beam: 3, aoe_ring: 1, teleport: 1, sweep_beam: 2, vortex: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect', 'camera_warp', 'time_skip'] }),
     ), { mobile: false, range: [0, 40] }),
-    stats: st(5200, 5000, 46, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
+    stats: st(2700, 5000, 46, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
   },
   {
     id: 'umr_at_tawil', name: "'Umr at-Tawil", source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
@@ -52,13 +52,13 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { gaze: 2, beam: 2, teleport: 1, summon: 1, eruption: 1 }, { summons: ['ancient_ones'], hooks: ['time_skip', 'hidden_platforms'] }),
       ph(0.25, { teleport: 1 }), // it yields
     ), { range: [4, 14] }),
-    stats: st(3800, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
+    stats: st(3250, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
   },
   {
     id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'pallid', scale: 3.2, eyes: 0, gear: ['cowl'] },
     ...scripted('stationary_horror', phases(ph(1, { gaze: 2, roar: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, roar: 1, beam: 1, barrage: 1 }, { hooks: ['time_skip'] }))),
-    stats: st(4050, 1000, 80, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4,
+    stats: st(2850, 1000, 80, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4,
   },
   {
     id: 'shub_niggurath', name: 'Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['dunwich'], canonLooks: false,
