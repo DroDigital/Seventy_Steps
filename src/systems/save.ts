@@ -13,7 +13,7 @@ import { QUESTS } from '../data/quests';
 import { WARES } from '../data/wares';
 import { START_SIGN } from '../data/sites';
 import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
-import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
+import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
 import { footingSafe } from './falls';
@@ -72,7 +72,8 @@ export interface SaveData {
   explored?: Record<string, string>; // the ground seen, as base64 bits by region (exploration.ts)
   quests?: Record<string, number>; // each quest begun: its stage (quests.ts)
   tracked?: string; // the side quest followed on the minimap and the map
-  marker?: { x: number; z: number }; // the place marked on the map (round 60)
+  marker?: { x: number; z: number }; // the place marked on the map (round 60; an older save's one, read as the first of `markers`)
+  markers?: { x: number; z: number }[]; // the places marked on the map (round 68)
   met?: string[]; // the people talked with
   places?: string[]; // the named places found (round 18)
   told?: string[]; // what has been told or shown once (round 26)
@@ -133,7 +134,7 @@ export function snapshot(g: Game): SaveData {
     explored: packExplored(ow.explored),
     quests: Object.fromEntries(ow.quests),
     ...(ow.tracked && { tracked: ow.tracked }),
-    ...(ow.marker && { marker: { x: Math.round(ow.marker.x * 10) / 10, z: Math.round(ow.marker.z * 10) / 10 } }),
+    ...(ow.markers.length && { markers: ow.markers.map((m) => ({ x: Math.round(m.x * 10) / 10, z: Math.round(m.z * 10) / 10 })) }),
     met: [...ow.met],
     places: [...ow.places],
     told: [...ow.told],
@@ -168,6 +169,7 @@ export function parseSave(json: string | null): SaveData | null {
   if (o.met !== undefined && !isStrings(o.met)) return null;
   if (o.tracked !== undefined && typeof o.tracked !== 'string') return null;
   if (o.marker !== undefined && !has(o.marker, 'x', 'z')) return null;
+  if (o.markers !== undefined && (!Array.isArray(o.markers) || !o.markers.every((m) => has(m, 'x', 'z')))) return null;
   if ((o.places !== undefined && !isStrings(o.places)) || (o.told !== undefined && !isStrings(o.told))) return null;
   if ((o.sold !== undefined && !isCounts(o.sold)) || (o.tally !== undefined && !isCounts(o.tally))) return null;
   if ((o.arms !== undefined && !isStrings(o.arms)) || (o.weapon !== undefined && typeof o.weapon !== 'string')) return null;
@@ -199,7 +201,7 @@ export function applySave(g: Game, s: SaveData): void {
   ow.explored = unpackExplored(s.explored);
   ow.quests = new Map(Object.entries(s.quests ?? {}).filter(([id]) => QUESTS[id]).map(([id, n]) => [id, clampInt(n, -1, QUESTS[id].stages.length)]));
   ow.tracked = s.tracked && QUESTS[s.tracked] && !QUESTS[s.tracked].main && ow.quests.has(s.tracked) && ow.quests.get(s.tracked)! < QUESTS[s.tracked].stages.length ? s.tracked : null;
-  ow.marker = s.marker ? { x: s.marker.x, z: s.marker.z } : null;
+  ow.markers = [...(s.markers ?? (s.marker ? [s.marker] : []))].slice(0, MARKER.most).map((m) => ({ x: m.x, z: m.z }));
   ow.met = new Set(s.met ?? []);
   ow.places = new Set(s.places ?? []);
   ow.told = new Set(s.told ?? []);

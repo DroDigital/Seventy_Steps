@@ -153,7 +153,7 @@ describe('stamina recovers between attacks, and faster with each level of Endura
     expect(fill(undefined)).toBeGreaterThan(3);
     expect(fill(undefined)).toBeLessThan(3.2);
     expect(staminaRegen(0)).toBe(STAMINA.regen);
-    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(48, 6);
+    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(56, 6); // (round 68: thirty levels, not twenty)
     for (let n = 1; n <= LEVELS.endurance.max; n++) expect(staminaRegen(n)).toBeGreaterThan(staminaRegen(n - 1));
   });
 

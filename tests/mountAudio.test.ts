@@ -147,6 +147,16 @@ describe('mounts, heard (round 50)', () => {
     expect(grey.heard.some((h) => h.key.endsWith(':whisper'))).toBe(false);
   });
 
+  it('a minute at a gallop is heard in its hooves, with the horse and the harness only now and then (round 68: "way too many noises")', () => {
+    const grey = ride('grey');
+    grey.heard.length = 0;
+    grey.advance(60 * 60, MOUNT_TRAVERSAL.gallop);
+    const asides = grey.heard.filter((h) => !h.key.includes(':hoof:') && !/:(thump|settle|greet)$/.test(h.key)); // (the settling and the greeting are the arrival's)
+    expect(asides.length).toBeGreaterThan(5);
+    expect(asides.length).toBeLessThanOrEqual(18); // (it was about sixty)
+    expect(grey.heard.filter((h) => h.key.endsWith(':snort')).length).toBeLessThanOrEqual(4);
+  });
+
   it('a parked car stays quiet, but for its bed, and dismounts with one stall; a parked horse is quiet as well', () => {
     const { g, heard, advance, beds } = ride('automobile');
     heard.length = 0;
@@ -346,9 +356,9 @@ describe('the horse and the reins, heard (round 57)', () => {
     r.heard.length = 0;
     for (let i = 0; i < 40; i++) { r.mount.reins.struck++; r.mount.reins.begun++; r.advance(60, 0); }
     expect(keys(r.heard, 'slap')).toEqual([]);
-    const answered = keys(r.heard, 'urge').length;
-    expect(answered).toBeGreaterThan(18);
-    expect(answered).toBeLessThan(39);
+    const answered = keys(r.heard, 'urge').length; // (round 68: forty slaps a second apart, answered at most once in five seconds and then not always)
+    expect(answered).toBeGreaterThan(0);
+    expect(answered).toBeLessThanOrEqual(8);
     const one = ride('grey');
     one.heard.length = 0;
     one.mount.reins.struck++;
@@ -410,8 +420,8 @@ describe('the horse and the reins, heard (round 57)', () => {
     r.heard.length = 0;
     r.advance(60 * 180, 0); // three minutes at its harness
     const idle = r.heard.filter((h) => /:(blow|whicker|shake|swish|flutter|snort)$/.test(h.key));
-    expect(idle.length).toBeGreaterThan(10);
-    expect(idle.length).toBeLessThan(40);
+    expect(idle.length).toBeGreaterThan(5); // (round 68: ten to twenty-two seconds apart)
+    expect(idle.length).toBeLessThan(25);
     expect(new Set(idle.map((h) => h.key)).size).toBeGreaterThanOrEqual(3);
     for (let i = 1; i < idle.length; i++) expect(idle[i].key).not.toBe(idle[i - 1].key);
     expect(r.heard.every((h) => h.at == null)).toBe(true);

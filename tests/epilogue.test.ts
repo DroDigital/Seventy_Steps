@@ -8,7 +8,7 @@ import { spawnCreature } from '../src/systems/creatures';
 import { strike } from '../src/systems/combat';
 import { parseSave, snapshot } from '../src/systems/save';
 import { bossesSlain, playTime } from '../src/systems/tally';
-import { deathblow, run } from './worldHelpers';
+import { deathblow, run, slay } from './worldHelpers';
 
 describe("an ending's last pages (round 12)", () => {
   it('everyone who can be met has a fate, and every favour a fate for it done and undone', () => {
@@ -34,7 +34,7 @@ describe("an ending's last pages (round 12)", () => {
     const foe = spawnCreature(g, 'deep_one', { x: 3, z: 3, yaw: 0 })!;
     strike(g, g.player.id, foe, deathblow);
     g.events.emit('Echoes', { change: 'earned', amount: 40, total: 40 });
-    strike(g, foe, g.player.id, deathblow);
+    slay(g, foe);
     const t = g.overworld!.tally;
     expect(t.frames).toBe(120);
     expect(t.kills).toBe(1);

@@ -10,6 +10,7 @@ import { createGame, stepGame } from '../src/systems/game';
 import { auraShare, auraWeight, bandOf, blowWeight, loseSanity, nextBand, setSanity } from '../src/systems/sanity';
 import { callsForLaudanum } from '../src/ui/mindHud';
 import { place, press, scriptedGame, steps } from './helpers';
+import { slay } from './worldHelpers';
 
 const blow = (damage: number) => ({ damage, poise: 0, guard: 5, hitstop: 2, parryable: false, interrupts: false });
 const find = (g: Game, model: string): Entity => [...g.ecs.c.model].find(([, m]) => m === model)![0];
@@ -251,7 +252,7 @@ describe('what sanity does, and what restores it', () => {
     const { g, player, deepOne } = scriptedGame();
     setSanity(g, 20);
     g.player.laudanum = 0;
-    strike(g, deepOne, player, blow(9999));
+    slay(g, deepOne, player);
     steps(g, PLAYER_MOVES.death.frames + 5);
     expect(g.mind.sanity).toBe(SANITY.max);
     expect(g.mind.band).toBe('lucid');

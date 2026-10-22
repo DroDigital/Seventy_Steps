@@ -104,7 +104,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, glance: false, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -197,7 +197,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   g.camera.prevMountLift = g.camera.mountLift;
   g.camera.mountLift += ((g.player.mount.active ? 1.05 : 0) - g.camera.mountLift) * Math.min(1, dt * 6);
   const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
-  const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
+  const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null && !g.player.glance ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
   stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance, probe: g.player.falling ? g.player.falling.lip.y + CAMERA.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
 }
 

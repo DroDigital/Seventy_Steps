@@ -114,7 +114,7 @@ function beginFall(g: Game, lip: V3): void {
   Object.assign(a, { move: null, frame: 0, hitstop: 0, frozen: false, guard: false, idle: 0 });
   a.hits.clear();
   Object.assign(m, { vx: 0, vz: 0, face: null });
-  Object.assign(p, { buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, listening: null, kneeling: null });
+  Object.assign(p, { buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, listening: null, glance: false, kneeling: null });
   setLock(g, null);
   const [dx, dz] = [(tr.pos.x - tr.prev.x) * SIM.hz, (tr.pos.z - tr.prev.z) * SIM.hz];
   const run = Math.hypot(dx, dz);
