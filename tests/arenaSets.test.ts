@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { at, lane, put, ring, scatter, type ArenaSet } from '../src/data/arenaSets';
 import { ARENA_SETS } from '../src/data/arenaSetsAll';
 import { ARENA_WAYS } from '../src/data/arenaWaysAll';
+import { HALL_SETS } from '../src/data/hallSets';
 import { MODEL_INFO } from '../src/data/models/index';
 import { PROP_KINDS } from '../src/data/regions';
 import { SET_KITS } from '../src/data/setKits';
@@ -22,7 +23,7 @@ describe('an arena set (round 61: each horror\'s ground composed from its own st
   });
 
   it('turns each layout about the front: a piece at 0° down the way in, at 180° behind the heart', () => {
-    const set: ArenaSet = { puts: [put('inlay_ring', at(1.2, 0)), put('inlay_ring', at(0.5, 180))] }; // flat ones, which are walked over
+    const set: ArenaSet = { puts: [put('lily', at(1.2, 0), { walk: true }), put('lily', at(0.5, 180), { walk: true })] }; // flat ones, which are walked over
     const [frontPiece, back] = arenaSet(set, SITE);
     expect(apart(frontPiece, { x: SITE.x, z: SITE.z - 1.2 * 24 })).toBeLessThan(0.01); // front is toward -z
     expect(apart(back, { x: SITE.x, z: SITE.z + 0.5 * 24 })).toBeLessThan(0.01);
@@ -64,7 +65,7 @@ describe('an arena set (round 61: each horror\'s ground composed from its own st
   });
 
   it('stands what is walked over without a collider', () => {
-    const set: ArenaSet = { puts: [put('inlay_ring', at(0, 0), { size: 8 }), put('lily', scatter(6, [0.3, 0.9]), { walk: true })] };
+    const set: ArenaSet = { puts: [put('lily', at(0, 0), { size: 8, walk: true }), put('lily', scatter(6, [0.3, 0.9]), { walk: true })] };
     for (const p of arenaSet(set, SITE)) expect(propCollider(p)).toBeNull();
   });
 });
@@ -76,6 +77,13 @@ describe('the sets of the open arenas', () => {
     for (const a of w.arenas) expect(ARENA_SETS[a.bosses[0]], a.bosses[0]).toBeDefined();
     const horrors = new Set(w.arenas.map((a) => a.bosses[0]));
     for (const id of Object.keys(ARENA_SETS)) expect(horrors.has(id), id).toBe(true);
+  });
+
+  it('have no decorative floor glyphs in any arena, hall or approach', () => {
+    const pieces = [...Object.values(ARENA_SETS), ...Object.values(HALL_SETS)].flatMap((s) => s.puts.map((p) => p.piece));
+    pieces.push(...Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece)));
+    expect(pieces.some((p) => p.of.startsWith('inlay_'))).toBe(false);
+    for (const a of w.arenas) expect(a.decor.some((p) => p.set?.id.startsWith('inlay_')), a.bosses[0]).toBe(false);
   });
 
   it('name only what is there: a baked model, a built piece, a world prop', () => {

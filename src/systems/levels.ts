@@ -8,6 +8,7 @@
 import type { Entity } from '../core/ecs';
 import { LAUDANUM, LEVEL_COST, LEVELS, PLAYER, STAMINA, UPGRADES, type LevelId } from '../data/tuning';
 import type { Game } from './components';
+import { refreshBossLevels } from './bossScaling';
 
 export const LEVEL_IDS = Object.keys(LEVELS) as LevelId[];
 
@@ -37,6 +38,7 @@ export function applyLevels(g: Game): void {
   [h.hp, h.max] = [Math.max(1, h.hp + hp - h.max), hp];
   [s.value, s.max] = [Math.max(0, s.value + stamina - s.max), stamina];
   s.regen = staminaRegen(g.player.levels.endurance);
+  refreshBossLevels(g, levelsBought(g));
 }
 
 /** Spends Echoes on one level of `id`; false when short of Echoes or at the most levels. */
