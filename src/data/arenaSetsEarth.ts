@@ -83,7 +83,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
       put('bench', ring(0.9, 3, { arc: [250, 290], face: 'in' }), { join: true }),
       put('iron_gate', at(1.2, 0, { side: 5.2, mirror: true, face: 90 })),
       put('lightpost', lane([1.45, 1.95], 3, 4.6), { lit: 'lamp' }),
-      put('pine_crooked', scatter(8, [1.25, 1.7]), { size: [1, 1.4] }),
+      put('pine_crooked', scatter(4, [1.25, 1.7]), { size: [1, 1.4] }),
     ],
     air: { kind: 'drift', color: [0.7, 0.72, 0.78], rate: 4 },
   },
@@ -96,7 +96,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
       put('horn_tree', ring(1.0, 18, { jitter: 8 }), { size: [1.0, 1.4] }),
       put('horn_tree', ring(1.32, 20, { jitter: 12 }), { size: [1.3, 1.9] }),
       put('skull_pole', ring(0.9, 16, { jitter: 6 }), { size: [1, 1.3] }),
-      put('mushroom_tall', scatter(12, [0.78, 0.97]), { size: [0.9, 1.6] }),
+      put('mushroom_tall', scatter(6, [0.78, 0.97]), { size: [0.9, 1.6] }),
       put('stump_old', at(0.68, 180, { face: 'in' }), { heart: true, size: 3.4 }), // the altar
       put('prop:firepit', ring(0.85, 6), { size: 1.4 }),
       put('skull_pole', lane([1.1, 1.9], 4, 3.4), { size: 1.4 }),
@@ -166,7 +166,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
       put('skull_pole', ring(0.88, 10, { jitter: 8 })),
       put('cart', at(0.92, 140, { face: 'free' }), { size: 1.1 }), // the settlers' wagon
       put('barrel', at(0.95, 128)),
-      put('cactus', scatter(10, [1.2, 1.7]), { size: [0.9, 1.4] }),
+      put('cactus', scatter(5, [1.2, 1.7]), { size: [0.9, 1.4] }),
       put('rocks_tall', scatter(4, [1.1, 1.5]), { size: 1.3 }),
       put('prop:firepit', ring(0.85, 4, { arc: [50, 310] }), { size: 1.4 }),
       put('skull_pole', lane([1.1, 1.8], 4, 3.4), { size: 1.2 }),
@@ -196,8 +196,8 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
       put('idol', at(0.55, 180, { face: 'in' }), { heart: true, size: 1.5, lit: 'sigil', glow: 'green' }),
       put('inlay_ring', at(0, 0), { size: 8, glow: 'green', lit: 'sigil' }),
       put('prop:monolith', ring(1.0, 9, { jitter: 8, face: 'in' }), { size: [1.1, 1.5] }),
-      put('lily', scatter(16, [0.3, 0.97]), { size: [0.8, 1.5], walk: true }),
-      put('plant_bush', scatter(10, [0.85, 0.98]), { size: [1, 1.6] }),
+      put('lily', scatter(8, [0.3, 0.97]), { size: [0.8, 1.5], walk: true }),
+      put('plant_bush', scatter(5, [0.85, 0.98]), { size: [1, 1.6] }),
       put('stump_old', scatter(5, [0.8, 0.98]), { size: [1.2, 2] }),
       put('prop:monolith', ring(1.4, 6, { jitter: 12 }), { size: [1.6, 2.1] }),
       put('lightpost', lane([1.1, 1.8], 4, 3.4), { lit: 'torch' }), // green fires on the way in

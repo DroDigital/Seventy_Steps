@@ -46,7 +46,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
   joseph_curwen: {
     puts: [
       put('altar_stone', ring(0.9, 4, { arc: [70, 290], face: 'in' }), { size: 1.1 }),
-      put('urn', scatter(8, [0.82, 0.97], { face: 'free' }), { size: [1, 1.5] }),
+      put('urn', scatter(4, [0.82, 0.97], { face: 'free' }), { size: [1, 1.5] }),
       put('coffin', at(0.93, 270, { face: 90 }), { size: 1.2 }),
       put('coffin', at(0.93, 90, { face: 270 }), { size: 1.2 }),
       put('barrel', scatter(3, [0.86, 0.97], { arc: [110, 250] }), { size: 1.2 }),

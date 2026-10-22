@@ -20,7 +20,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // Charles Le Sorcier's laboratory: alchemist's vessels everywhere, a chalice and a bowl, a coffin, a skeleton, his candles.
   charles_le_sorcier: {
     puts: [
-      put('urn', scatter(9, [0.82, 0.97], { face: 'free' }), { size: [1, 1.6] }),
+      put('urn', scatter(5, [0.82, 0.97], { face: 'free' }), { size: [1, 1.6] }),
       put('altar_stone', at(0.92, 130, { face: 'in' }), { size: 1 }),
       put('altar_stone', at(0.92, 230, { face: 'in' }), { size: 1 }),
       put('barrel', scatter(3, [0.86, 0.97], { arc: [90, 270] }), { size: 1.2 }),
@@ -101,7 +101,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The old sea-captain's front hall: bottles in their dozens that hang on strings, a chest, a bench, a cannon, a flag gone grey.
   terrible_old_man: {
     puts: [
-      put('urn', scatter(10, [0.8, 0.97], { face: 'free' }), { size: [0.9, 1.4], tint: [0.5, 0.62, 0.58] }),
+      put('urn', scatter(5, [0.8, 0.97], { face: 'free' }), { size: [0.9, 1.4], tint: [0.5, 0.62, 0.58] }),
       put('chest', ring(0.93, 3, { arc: [90, 270], face: 'in' }), { size: 1.3 }),
       put('bench', at(0.93, 260, { face: 90 }), { size: 1.2 }),
       put('cannon', at(0.9, 100, { face: 'in' }), { size: 0.9 }),
