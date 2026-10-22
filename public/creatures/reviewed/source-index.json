@@ -20840,7 +20840,7 @@
       "id": "father_dagon",
       "display_name": "Father Dagon",
       "asset_group": "bosses",
-      "sprite_scale": 16,
+      "sprite_scale": 11,
       "scale_unit": "metres height",
       "directions": {
         "front": {
@@ -21209,7 +21209,7 @@
       "id": "mother_hydra",
       "display_name": "Mother Hydra",
       "asset_group": "bosses",
-      "sprite_scale": 15,
+      "sprite_scale": 10.5,
       "scale_unit": "metres height",
       "directions": {
         "front": {

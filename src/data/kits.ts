@@ -42,7 +42,7 @@ export const KITS = {
   marble: { wall: 'stone', floor: 'slab', tone: [0.9, 0.86, 0.8], mix: 0.3, trim: 'masonry', flames: 0.5, roof: 'vault', sound: 'house', shell: 'building', gloom: 0.62 },
   hill: { wall: 'rock', floor: 'mud', tone: [0.64, 0.66, 0.6], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   drowned: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'vault', sound: 'drowned', shell: 'mound', gloom: 0.9 },
-  sunken: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 }, // the drowned temple, its vault fallen (round 24: Dagon and Hydra stand fifteen metres tall, and the vault's slab, six up, pushed them out through the wall)
+  sunken: { wall: 'rot', floor: 'slab', tone: [0.52, 0.64, 0.6], mix: 0.65, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 }, // the drowned temple, its vault fallen (round 24: Dagon and Hydra stood fifteen metres tall, and the vault's slab, six up, pushed them out through the wall; round 61: they are eleven and ten and a half)
   elder: { wall: 'slab', floor: 'slab', tone: [0.84, 0.86, 0.88], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   basalt: { wall: 'rock', floor: 'slab', tone: [0.42, 0.42, 0.47], mix: 0.65, trim: 'masonry', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
   tsath: { wall: 'stone', floor: 'cobble', tone: [0.55, 0.6, 0.74], mix: 0.55, trim: 'masonry', flames: 0.5, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },

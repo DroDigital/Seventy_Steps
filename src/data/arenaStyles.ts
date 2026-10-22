@@ -45,7 +45,7 @@ export const ARENA_STYLES: Readonly<Record<string, ArenaStyle>> = {
   // Dungeons' boss rooms: a heart and fires (the room's walls ring it).
   keziah_mason: { ring: 'stones', centre: { kind: 'altar', scale: 1 }, fires: 2, hall: { kind: 'block', scale: 0.35 } }, // the garret's trunks
   dunwich_horror: { ring: 'stones', centre: { kind: 'altar', scale: 2 }, fires: 4, hall: { kind: 'monolith', scale: 1.2 } }, // the table-stone on Sentinel Hill, the hill's standing stones
-  father_dagon: { ring: 'stones', centre: { kind: 'monolith', scale: 2.4 }, fires: 0, hall: { kind: 'rock', scale: 1.8 } }, // the reef's monolith of Dagon, the fallen vault's rubble
+  father_dagon: { ring: 'stones', centre: { kind: 'monolith', scale: 1.6 }, fires: 0, hall: { kind: 'rock', scale: 1.8 } }, // the reef's monolith of Dagon, the fallen vault's rubble
   joseph_curwen: { ring: 'stones', centre: { kind: 'altar', scale: 1.2 }, fires: 4, hall: { kind: 'altar', scale: 0.7 } }, // his tables
   haunter_of_the_dark: { ring: 'stones', centre: { kind: 'pillar', scale: 1 }, fires: 0, hall: { kind: 'cross', scale: 1.3 } }, // the Trapezohedron's pillar (no fire: it lives in the dark)
   whisperer: { ring: 'stones', centre: { kind: 'block', scale: 0.4 }, fires: 2, hall: { kind: 'block', scale: 0.3 } },

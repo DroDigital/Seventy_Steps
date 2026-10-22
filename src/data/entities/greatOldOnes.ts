@@ -20,13 +20,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
-    assembly: { body: 'lathe', palette: 'sea', scale: 16, eyes: 2, tentacles: 0 },
+    assembly: { body: 'lathe', palette: 'sea', scale: 11, eyes: 2, tentacles: 0 },
     ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, wind_push: 1, quake: 1 }, { hooks: ['flood'] }), ph(0.5, { slam: 2, sweep: 1, roar: 1, charge: 1, vortex: 1, eruption: 1 }, { summons: ['deep_one', 'deep_one'], hooks: ['flood', 'darkness'] }))),
     stats: st(3250, 1200, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 80, which cost the balance bot 1.87 lives where a person first meets it)
   },
   {
     id: 'mother_hydra', name: 'Mother Hydra', source: 'The Shadow over Innsmouth', regions: ['innsmouth'], canonLooks: false,
-    assembly: { body: 'lathe', palette: 'sea', scale: 15, eyes: 4, tentacles: 6 },
+    assembly: { body: 'lathe', palette: 'sea', scale: 10.5, eyes: 4, tentacles: 6 },
     ...scripted('boss', phases(ph(1, { grab: 2, pool: 1, tentacle_burst: 2, eruption: 1 }, { hooks: ['flood'] }), ph(0.5, { tentacle_burst: 2, pool: 2, grab: 1, spit: 1, vortex: 1 }, { summons: ['innsmouth_hybrid', 'innsmouth_hybrid'], hooks: ['flood'] }))),
     stats: st(3100, 1100, 46, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 76, which cost the balance bot 1.40 lives where a person first meets it)
   },

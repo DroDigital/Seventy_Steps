@@ -9,6 +9,7 @@
 
 import type { Entity } from '../../core/ecs';
 import type { SampleSetId } from '../../data/samples';
+import { ZONES } from '../../data/tuning';
 import { engagedFights } from '../../systems/bossFight';
 import type { Game } from '../../systems/components';
 import type { AudioEngine } from './engine';
@@ -49,7 +50,7 @@ export function createDread(e: AudioEngine, g: Game, far: (set: SampleSetId, gai
         const d = Math.hypot(at.x - me.x, at.z - me.z);
         if (b.height >= 8) hush = Math.max(hush, hushOf(Math.hypot(f.arena.x - me.x, f.arena.z - me.z) - f.arena.radius, hushReach(b.height)));
         const reach = callReach(b.height);
-        if (b.height < 12 || d > reach) continue;
+        if (b.height < ZONES.height || d > reach) continue;
         const due = next.get(id) ?? seconds + callEvery(d, reach) * Math.random();
         if (seconds < due) {
           next.set(id, due);
