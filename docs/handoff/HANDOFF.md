@@ -23,7 +23,7 @@ Earlier (before this thread): "also do 1.-3." meaning PR 152's three follow-ups:
 ## Not done
 
 - **Skeptical reviews (feasibility, lore, anything alike, anything unfair, corrections) are done for all three plans:** `plan-A-open-arenas.critique.md`, `plan-B-boss-halls.critique.md`, `plan-C-outer-gods.critique.md` (each also `.json`). The drafts themselves were not rewritten: the merged document has to apply the corrections. Plan C's lore reader (`understand:lore`) failed once, so its lore section rests on the designers' own knowledge; its critique lists the points to check against the texts.
-- **No document that merges A, B and C into one plan for Dro** and no questions put to him yet (the drafts each end with `questions`).
+- **The merged plan for Dro is written:** `MERGED-PLAN.md` here (also a Claude Doc, https://claude.ai/artifact/Ls42B3o2ZXEsGmNXgM7nuA), with the reviews applied and 13 decisions put to him. **Waiting on Dro's answers (in particular decisions 1 to 4, 6 and 13).** Nothing has been built.
 - Reconcile the three plans: A's houses, B's halls and C's gods overlap (six Outer Gods are open arenas in A; Plan C should win for them). Keep the discoveries/gates/courts machinery of round 63 where a plan says keep.
 - Five turned gates and the remaining contact sheets: not examined closely.
 - Building any of it: not started, and not to be started before Dro agrees to a plan.
