@@ -22,10 +22,10 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'secret', state: { rumour: true }, words: 'Something strange', hint: 'near ground you have charted' },
   { kind: 'secret', state: { poi: 'tale' }, words: 'A secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
   { kind: 'lead', state: { now: 0 }, words: 'Where the story leads', hint: 'an arrow at the edge points to it' },
-  { kind: 'marker', words: 'Your marker', hint: 'right-click, F or Y sets it; the minimap points to it' },
+  { kind: 'marker', words: 'Your markers', hint: 'right-click, F or Y sets one, or removes the one it is on; the minimap points to each' },
 ];
 
-const ICON = 26; // CSS pixels a key's figure is drawn in (at the UI's scale)
+const ICON = 32; // CSS pixels a key's figure is drawn in (at the UI's scale; round 68: 26, for marks that were smaller)
 
 /** The key, in the panel's lower left; the returned element is shown or hidden as a whole. */
 export function buildKey(panel: HTMLElement): HTMLElement {
@@ -33,14 +33,14 @@ export function buildKey(panel: HTMLElement): HTMLElement {
   el(box, 'div', 'KEY', `letter-spacing:4px;font-size:calc(9px * var(--ui, 1));color:${DIM};margin-bottom:4px`);
   const dpr = Math.min(3, Math.max(1, globalThis.devicePixelRatio || 1));
   for (const row of KEY_ROWS) {
-    const line = el(box, 'div', '', 'display:flex;align-items:center;gap:9px;min-height:calc(26px * var(--ui, 1))');
+    const line = el(box, 'div', '', 'display:flex;align-items:center;gap:9px;min-height:calc(32px * var(--ui, 1))');
     const c = document.createElement('canvas');
     [c.width, c.height] = [ICON * 2 * dpr, ICON * 2 * dpr];
-    c.style.cssText = 'width:calc(26px * var(--ui, 1));height:calc(26px * var(--ui, 1));flex:none';
+    c.style.cssText = 'width:calc(32px * var(--ui, 1));height:calc(32px * var(--ui, 1));flex:none';
     const ctx = c.getContext('2d');
     if (ctx) {
       ctx.scale(2 * dpr, 2 * dpr);
-      drawMark(ctx, row.kind, ICON / 2, row.kind === 'marker' ? ICON / 2 - 4 : ICON / 2, row.kind === 'person' ? 9 : row.kind === 'marker' ? 6.5 : 8, row.state);
+      drawMark(ctx, row.kind, ICON / 2, row.kind === 'marker' ? ICON / 2 - 5 : ICON / 2, row.kind === 'person' ? 11 : row.kind === 'marker' ? 8 : row.kind === 'place' ? 12 : 10, row.state);
     }
     line.append(c);
     const words = el(line, 'div', row.words, `color:${BONE}`);
@@ -52,8 +52,8 @@ export function buildKey(panel: HTMLElement): HTMLElement {
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker'], [['B'], 'Close']]
-    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker'], [['L'], 'Key'], [[mapKey], 'Close']];
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['B'], 'Close']]
+    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
 /** The row of keys along the bottom edge. */

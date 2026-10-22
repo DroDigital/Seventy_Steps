@@ -11,11 +11,11 @@ import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
-import { BOSS_LEVEL_SCALING, REAGENT, SIM } from '../src/data/tuning';
+import { BOSS_LEVEL_SCALING, LEVELS, PLAYER, REAGENT, SIM } from '../src/data/tuning';
 import { botFight, type BotFight } from './botHelpers';
 import { bossDamageScale, bossHealthScale } from '../src/systems/bossScaling';
 import { levelsOf } from '../src/systems/levels';
-import { KILLED, standings, type Standing } from './balanceModel';
+import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
 
 const FRAMES = 60 * 60 * 10; // ten minutes
 const SKILL = 0.55;
@@ -28,23 +28,43 @@ const WAIVED: Record<string, { waive: readonly ('petrify' | 'roots' | 'void')[];
 };
 /** Where the bot starts, metres from the boss (round 60): a bot's path through a fight is chaos, a blow taken or slipped sending it another way, so each fight is the mean of three. */
 const STARTS = [7, 10, 13];
+const TOTAL = standings().length; // the horrors there are, for the Reagent carried
 
 interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'fell' | 'deaths'> {
   seconds: number;
+  doses: number; // the Reagent a person carries there (balanceModel.ts `dosesAt`)
   pressure: number; // damage taken, in lives: its health and the Reagent a person carries
 }
 
-/** Bounds for a fight worth having: neither over in seconds nor a slog, with a finite raw healing budget. */
-const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } as const; // modest level scaling may cost more healing at this bot's 55% dodge rate; raw lives remain bounded, never normalized away
+/** What the table may not hold: bounds for a fight worth having (not over in seconds, not a slog, not costing more lives than a person carries Reagent for). */
+const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } as const; // (round 60: a god spends at most the Reagent carried: Father Dagon was "way too overpowered", and R'lyeh's too hard at level 26)
 /**
  * Round 61, "no boss insurmountable, none excessively easy": each tier's own band as well, so a fight is held to its kind and not only to the
  * widest bounds. A named horror is over in 7 to 40 seconds and always costs something (a bot that slips most blows still bleeds a little);
  * a god of 2500 health or more takes 18 to 90 (a long tail is for the gaze and the roots, waived and added above) and costs between a third of the Reagent carried
  * and one and a half times it after level scaling. Seconds are the bot's, steady and close in: a person's are about three times as long.
  */
-const GREAT = 2500; // health: a god this hardy is a fight of its own length
-const BANDS = { named: { seconds: [7, 40], lives: [0.01, 3] }, god: { seconds: [18, 90], lives: [0.35, 1.5] } } as const; // scaling changes the deterministic bot's path; a named horror still must exert positive pressure
+/**
+ * Round 68, "restore appropriate difficulty across all levels, even on normal": the bands are raised with the numbers they hold, and a god
+ * is told by name, not by its health (the health is no longer a line between the great fights and the rest). A named horror is over in 14 to 50
+ * seconds (a person's: 40 to 150) and costs a bot between a twentieth of a life and one and a fifth; a great fight takes 35 to 100 and
+ * costs between a third of a life and one and a third, climbing with the rank (`RISE`). Raised again later in the round: a named horror costs at least a fifth of a life, a great fight at least 0.45 (the bot slips most of a gaze, which does no harm: five horrors that leaned on it were given blows in its place).
+ */
+const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth'.split(' '));
+const BANDS = { named: { seconds: [14, 50], lives: [0.2, 1.2] }, god: { seconds: [35, 100], lives: [0.45, 1.5] } } as const;
+/**
+ * Round 68, "all bosses remain demanding regardless of player level": the same fights again at the cap (every level bought, the cane set to
+ * +5), where the horror has grown past the standing it is met at (systems/bossScaling.ts `overmatch`). None may cost a bot less than this,
+ * nor be over in fewer seconds, whatever a person has farmed.
+ */
+const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5 } as const;
 const BOUNDS_TEXT = '6 to 260 seconds';
+const AT_CAP_TEXT = `
+## At the cap
+
+The same bot, the same three starts, with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
+their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} of a life; a great fight ${CAP.god.seconds} and ${CAP.god.lives}.
+`;
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
 const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
 
@@ -68,7 +88,7 @@ nothing in its way.
   ordinary enemies, summons and spawning roots keep their existing stats. **Scaled health** is the boss's actual maximum in that run.
 - **Seconds** is how long the boss took at that steady pace. A person strikes for perhaps a third of a fight, so their fight
   is about three times as long.
-- **Lives** is the damage taken against the health a person has there and the Reagent they carry (${REAGENT.doses} doses of ${Math.round(REAGENT.heal * 100)}%):
+- **Lives** is the damage taken against the health a person has there and the Reagent they carry there (${REAGENT.doses} doses of ${Math.round(REAGENT.heal * 100)}% at the start, a vial more as the horrors fall, to ${REAGENT.maxDoses}):
   1 is a fight that spends all of it, for a bot that rolls from ${Math.round(SKILL * 100)}% of blows.
   A value above 1 exceeds the carried healing at this bot's dodge rate; these raw costs are never divided by the scaling factors.
 - Ghatanothoa is fought with the gaze waived (its seconds scaled by the half of a fight in its sight), Shub-Niggurath with
@@ -80,7 +100,7 @@ nothing in its way.
 `;
 const NOTES = `
 Bounds held by the test: each boss finishes within ${BOUNDS_TEXT}, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, ${BOUNDS.godLives}), and the bot does not die.
-Each tier also keeps its time band: a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs at least ${BANDS.named.lives[0]} of a life; a god of ${GREAT} base health or more takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives. The god's upper healing budget allows the modest level scaling; the named lower bound allows deterministic path variation while still requiring positive pressure.
+Each tier has its band (round 61, raised in round 68): a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs ${BANDS.named.lives.join(' to ')} lives; one of the ${GREAT.size} great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives.
 `;
 
 const OPENING_TEXT = `
@@ -89,6 +109,18 @@ const OPENING_TEXT = `
 The same bot against the horrors of the first hours (the hub about the first Elder Sign, and Arkham), at the standing a new
 player has there: only those two realms' lesser foes (${Math.round(KILLED * 100)}% of them, in step) and their own bosses before it have
 given Echoes and star-stones. Each may cost at most 1.5 lives.
+`;
+
+/** data/bossStanding.ts: the Vigour and Might each horror is met at (round 68), for systems/bossScaling.ts. */
+const standingFile = (list: readonly Standing[]): string => `/**
+ * What a person has when they meet each horror (round 68; written by \`BALANCE_WRITE=1 npm run audit\`, tests/balance.test.ts, from the
+ * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels. The
+ * horror is made to be met there. Past it, the more the investigator's health and blows have grown, the more the horror's
+ * blows and health grow to meet them (systems/bossScaling.ts \`overmatch\`), so that one that has farmed levels still has a fight to fight.
+ */
+export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number]>> = {
+${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}],`).join('\n')}
+};
 `;
 
 const rows: Row[] = [];
@@ -105,12 +137,12 @@ function fightAt(s: Standing): Row {
   for (const r of runs) expect(r.bad).toEqual([]);
   const mean = (k: 'dealt' | 'taken' | 'frames'): number => runs.reduce((n, r) => n + r[k], 0) / runs.length;
   const taken = mean('taken');
-  return { ...s, health: runs[0].health, dealt: mean('dealt'), taken, fell: runs.every((r) => r.fell), deaths: runs.reduce((n, r) => n + r.deaths, 0), seconds: (mean('frames') / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), pressure: taken / (s.hp * (1 + REAGENT.doses * REAGENT.heal)) };
+  return { ...s, health: runs[0].health, dealt: mean('dealt'), taken, fell: runs.every((r) => r.fell), deaths: runs.reduce((n, r) => n + r.deaths, 0), seconds: (mean('frames') / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), doses: dosesAt(s.rank, TOTAL), pressure: taken / (s.hp * (1 + dosesAt(s.rank, TOTAL) * REAGENT.heal)) };
 }
 
 const tableOf = (list: Row[]): string => {
-  const lines = [...list].sort((a, b) => a.rank - b.rank).map((r) => `| ${r.rank + 1} | ${getEntity(r.id)!.name} | ${r.levels.vigour}/${r.levels.endurance}/${r.levels.might} | ${r.reinforced} | ${r.health} | ${r.fell ? r.seconds.toFixed(0) : '>' + r.seconds.toFixed(0)} | ${r.taken.toFixed(0)} | ${r.hp} | ${r.pressure.toFixed(2)} | ${r.deaths} |`);
-  return ['| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Lives | Deaths |', '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |', ...lines].join('\n');
+  const lines = [...list].sort((a, b) => a.rank - b.rank).map((r) => `| ${r.rank + 1} | ${getEntity(r.id)!.name} | ${r.levels.vigour}/${r.levels.endurance}/${r.levels.might} | ${r.reinforced} | ${r.health} | ${r.fell ? r.seconds.toFixed(0) : '>' + r.seconds.toFixed(0)} | ${r.taken.toFixed(0)} | ${r.hp} | ${r.doses} | ${r.pressure.toFixed(2)} | ${r.deaths} |`);
+  return ['| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |', '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |', ...lines].join('\n');
 };
 
 describe('the balance table (round 25)', () => {
@@ -128,7 +160,7 @@ describe('the balance table (round 25)', () => {
       const god = ['great_old_one', 'outer_god'].includes(getEntity(r.id)!.tier);
       if (r.pressure > (god ? BOUNDS.godLives : colossus ? BOUNDS.colossusLives : BOUNDS.lives)) bad.push(`${label}: ${r.pressure.toFixed(1)} lives`);
       if (r.deaths > 0) bad.push(`${label}: died ${r.deaths} times`);
-      const band = BANDS[god && getEntity(r.id)!.stats.hp >= GREAT ? 'god' : 'named']; // (the lesser Outer Gods, the Pipers, the Other Gods and the Ancient Ones, are fought as the named are)
+      const band = BANDS[GREAT.has(r.id) ? 'god' : 'named']; // (the lesser Outer Gods, the Pipers, the Other Gods and the Ancient Ones, are fought as the named are)
       if (r.seconds < band.seconds[0] || r.seconds > band.seconds[1]) bad.push(`${label}: ${r.seconds.toFixed(0)} seconds, its tier's band is ${band.seconds.join(' to ')}`);
       if (r.pressure < band.lives[0] || r.pressure > band.lives[1]) bad.push(`${label}: ${r.pressure.toFixed(2)} lives, its tier's band is ${band.lives.join(' to ')}`);
     }
@@ -137,7 +169,34 @@ describe('the balance table (round 25)', () => {
 
   it('makes its table', () => {
     mainTable = tableOf(rows);
+    if (process.env.BALANCE_WRITE) writeFileSync('src/data/bossStanding.ts', standingFile(table));
     expect(rows.length).toBe(table.length);
+  });
+});
+
+const atCap: Row[] = [];
+/** Every standing again with all the levels bought and the cane at its best: the horror has grown past the level it is met at. */
+const atCapOf = (s: Standing): Standing => {
+  const levels = { vigour: LEVELS.vigour.max, endurance: LEVELS.endurance.max, might: LEVELS.might.max } as Standing['levels'];
+  return { ...s, levels, hp: PLAYER.hp + levels.vigour * (LEVELS.vigour.hp ?? 0), reinforced: CAP.reinforced };
+};
+
+describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
+  const table = standings().map(atCapOf);
+
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s)));
+
+  it('leaves no horror a fight that costs nothing', () => {
+    const bad: string[] = [];
+    for (const r of atCap.filter((x) => !EXEMPT.includes(x.id))) {
+      const band = GREAT.has(r.id) ? CAP.god : CAP.named;
+      if (!r.fell) bad.push(`${r.id}: not finished in ${r.seconds.toFixed(0)} seconds at the cap`);
+      else if (r.seconds < band.seconds) bad.push(`${r.id}: ${r.seconds.toFixed(0)} seconds at the cap, at least ${band.seconds}`);
+      if (r.pressure < band.lives) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, at least ${band.lives}`);
+      if (r.pressure > (GREAT.has(r.id) ? BANDS.god.lives[1] : BANDS.named.lives[1]) * 1.25) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, more than a person carries`);
+      if (r.deaths > 0) bad.push(`${r.id}: died ${r.deaths} times at the cap`);
+    }
+    expect(bad).toEqual([]);
   });
 });
 
@@ -148,7 +207,7 @@ describe('the opening (round 47): the first hours, at what they give', () => {
 
   it(`costs at most ${OPENING_LIVES} lives a horror, and writes both tables`, () => {
     const bad = opening.filter((r) => !EXEMPT.includes(r.id) && (!r.fell || r.pressure > OPENING_LIVES || r.deaths > 0)).map((r) => `${r.id}: ${r.pressure.toFixed(2)} lives${r.fell ? '' : ', not finished'}`);
-    if (process.env.BALANCE_WRITE) writeFileSync('docs/BALANCE.md', `${INTRO}\n${mainTable}\n${NOTES}${OPENING_TEXT}\n${tableOf(opening)}\n`);
+    if (process.env.BALANCE_WRITE) writeFileSync('docs/BALANCE.md', `${INTRO}\n${mainTable}\n${NOTES}${AT_CAP_TEXT}\n${tableOf(atCap)}\n${OPENING_TEXT}\n${tableOf(opening)}\n`);
     expect(bad).toEqual([]);
   });
 });

@@ -9,6 +9,11 @@ import { stepGame } from '../src/systems/game';
 
 export const deathblow = { damage: 99999, poise: 0, guard: 0, hitstop: 2, parryable: false, interrupts: false };
 
+/** Kills `target` (the investigator) with blows of `attacker`: no foe's blow takes more than BOSS.blowMost of their greatest health (round 68), so it takes two. */
+export function slay(g: Game, attacker: Entity, target: Entity = g.player.id): void {
+  for (let i = 0; i < 4 && (g.ecs.c.health.get(target)?.hp ?? 0) > 0; i++) strike(g, attacker, target, deathblow);
+}
+
 /** Moves the investigator to (x, z). */
 export const goTo = (g: Game, x: number, z: number, yaw = 0): void => teleport(g, { x, z, yaw });
 

@@ -204,6 +204,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'hud.signFound': "SIGNO ARCANO ENCONTRADO · {name} · VIAJA AQUÍ DESDE EL MAPA ({map})",
   'hud.places': "{found} DE {of} LUGARES · {region}",
   'hud.secrets': "{found} DE {of} SECRETOS · {region}",
+  'n.poiGift': '{found} SECRETOS HALLADOS · UN REGALO: {echoes} ECOS{stones}', // round 68: a gift for {found} secrets found; {stones} is ' · N STAR-STONES' or nothing
+  'n.poiGiftStones': ' · {n} PIEDRAS ESTELARES',
   'hud.questDone': "HECHO · {title}",
   'hud.questNew': "DIARIO · {title}",
   'hud.questUpdated': "{title} · ACTUALIZADO",
@@ -228,7 +230,9 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.gateHeld': "LA PUERTA NO SE ABRIRÁ MIENTRAS UN HORROR TE RETENGA",
   'n.cache': "UN ALIJO DE ECOS · +{n}",
   'n.markerReached': "MARCA ALCANZADA",
+  'n.markersFull': "LÍMITE DE MARCAS · {n} · QUITA UNA PRIMERO",
   'n.vial': "FRASCO DE PLATA · DOSIS DE REACTIVO {n}",
+  'n.vialSold': "FRASCO DE PLATA · TU ESTUCHE YA NO ADMITE MÁS · +{n} ECOS",
   'n.rounds': "LLEVAS TODAS LAS BALAS QUE PUEDES",
   'pad.moveStick': "el stick izquierdo",
   'pad.lookStick': "el stick derecho",

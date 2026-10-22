@@ -87,18 +87,31 @@ describe('thunder is made to its distance (round 52)', () => {
     const at = { x: 4, y: 0, z: 9 };
     g.events.emit('StrikeWarned', { at, radius: 3.4, frames: 90 });
     g.events.emit('StrikeLanded', { at, radius: 3.4 });
-    expect(heardAt.map((h) => h.key)).toEqual(['storm:warn']); // the crack is recorded (round 59)
-    expect(heardAt.every((h) => h.at === at || (h.at && h.at.x === 4))).toBe(true);
-    expect(samples).toEqual(['strike', 'boom']);
+    expect(heardAt).toEqual([]); // the ring's hum and the crack are recorded (rounds 59, 66)
+    expect(samples).toEqual(['charge', 'strike', 'zap', 'boom']);
     expect(STORM_MIX.strike).toBeGreaterThan(0);
+    expect(STORM_MIX.charge).toBeGreaterThan(0);
+    expect(STORM_MIX.zap).toBeGreaterThan(0);
+  });
+
+  it('makes the ring itself until its recording has loaded (round 68)', () => {
+    const g = createGame();
+    const heardAt: { key: string; at: V3 | null | undefined }[] = [];
+    createStormAudio(g, (key, _s, o) => (heardAt.push({ key, at: o?.at }), true), (set) => set !== 'charge');
+    const at = { x: 4, y: 0, z: 9 };
+    g.events.emit('StrikeWarned', { at, radius: 3.4, frames: 90 });
+    expect(heardAt.map((h) => h.key)).toEqual(['storm:warn']);
+    expect(heardAt[0]!.at).toBe(at);
   });
 
   it('makes the crack itself until the recording of a strike has loaded (round 59)', () => {
     const g = createGame();
     const keys: string[] = [];
-    createStormAudio(g, (key) => (keys.push(key), true), (set) => set !== 'strike');
+    const samples: string[] = [];
+    createStormAudio(g, (key) => (keys.push(key), true), (set) => (samples.push(set), set !== 'strike'));
     g.events.emit('StrikeLanded', { at: { x: 0, y: 0, z: 0 }, radius: 3 });
     expect(keys).toEqual(['storm:crack']);
+    expect(samples).toEqual(['strike', 'boom']); // (the snap is laid over a recorded strike, not over the recipe)
     expect(STORM_MIX.crack).toBeGreaterThan(0);
   });
 });

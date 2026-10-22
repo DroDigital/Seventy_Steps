@@ -204,6 +204,8 @@ export const FR: Readonly<Record<Key, string>> = {
   'hud.signFound': "SIGNE DES ANCIENS TROUVÉ · {name} · VOYAGE DEPUIS LA CARTE ({map})",
   'hud.places': "{found} SUR {of} LIEUX · {region}",
   'hud.secrets': "{found} SUR {of} SECRETS · {region}",
+  'n.poiGift': '{found} SECRETS TROUVÉS · UN DON : {echoes} ÉCHOS{stones}', // round 68: a gift for {found} secrets found; {stones} is ' · N STAR-STONES' or nothing
+  'n.poiGiftStones': ' · {n} PIERRES-ÉTOILES',
   'hud.questDone': "ACCOMPLI · {title}",
   'hud.questNew': "JOURNAL · {title}",
   'hud.questUpdated': "{title} · MIS À JOUR",
@@ -228,7 +230,9 @@ export const FR: Readonly<Record<Key, string>> = {
   'n.gateHeld': "LA PORTE NE S’OUVRIRA PAS TANT QU’UNE HORREUR VOUS RETIENT",
   'n.cache': "UNE RÉSERVE D’ÉCHOS · +{n}",
   'n.markerReached': "REPÈRE ATTEINT",
+  'n.markersFull': "LIMITE DE REPÈRES · {n} · EN RETIRER UN D'ABORD",
   'n.vial': "FIOLE D’ARGENT · DOSES DE RÉACTIF {n}",
+  'n.vialSold': "FIOLE D’ARGENT · TA TROUSSE EN TIENT PLUS · +{n} ÉCHOS",
   'n.rounds': "VOUS PORTEZ TOUTES LES BALLES QUE VOUS POUVEZ",
   'pad.moveStick': "le stick gauche",
   'pad.lookStick': "le stick droit",

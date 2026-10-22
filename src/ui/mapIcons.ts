@@ -41,31 +41,56 @@ function elderSign(ctx: CanvasRenderingContext2D, x: number, y: number, h: numbe
 function sign(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, s: MarkState): void {
   const lit = !!s.lit;
   token(ctx, x, y, r * 1.1, lit ? BONE : DIM, lit ? PURPLE : '');
-  elderSign(ctx, x, y, r * 1.35, lit ? BONE : DIM, Math.max(1.2, r * 0.2));
+  if (lit) [ctx.shadowColor, ctx.shadowBlur] = [PURPLE, r * 0.9]; // a lit sign shines
+  elderSign(ctx, x, y, r * 1.4, lit ? BONE : DIM, Math.max(1.4, r * 0.22));
+  ctx.shadowBlur = 0;
 }
 
+/** A gate: two pillars with their capitals, a round arch over them, and the veil between, brightest at the top, with two motes in it. */
 function gate(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   token(ctx, x, y, r * 1.1, PURPLE, PURPLE);
-  const [w, top, foot] = [r * 0.46, y - r * 0.6, y + r * 0.62];
-  const veil = ctx.createLinearGradient(0, top, 0, foot);
-  veil.addColorStop(0, '#c9a8ff');
+  const [w, foot, spring] = [r * 0.5, y + r * 0.62, y - r * 0.1];
+  const veil = ctx.createLinearGradient(0, spring - w, 0, foot);
+  veil.addColorStop(0, '#e2cfff');
+  veil.addColorStop(0.5, '#a778f0');
   veil.addColorStop(1, VEIL);
   ctx.fillStyle = veil;
-  ctx.fillRect(x - w, top, w * 2, foot - top);
+  ctx.beginPath();
+  ctx.moveTo(x - w, foot);
+  ctx.lineTo(x - w, spring);
+  ctx.arc(x, spring, w, Math.PI, 0);
+  ctx.lineTo(x + w, foot);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  for (const [dx, dy] of [[-0.16, 0.05], [0.18, 0.3]]) {
+    ctx.beginPath();
+    ctx.arc(x + w * dx * 2, y + r * dy, Math.max(0.7, r * 0.07), 0, TAU);
+    ctx.fill();
+  }
   ctx.lineCap = 'square';
-  ctx.lineWidth = Math.max(1.4, r * 0.22);
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = Math.max(1.6, r * 0.24);
   ctx.strokeStyle = BONE;
   ctx.beginPath();
   ctx.moveTo(x - w, foot);
-  ctx.lineTo(x - w, top);
-  ctx.lineTo(x + w, top);
+  ctx.lineTo(x - w, spring);
+  ctx.arc(x, spring, w, Math.PI, 0);
   ctx.lineTo(x + w, foot);
+  ctx.stroke();
+  ctx.lineWidth = Math.max(1.6, r * 0.2);
+  ctx.beginPath();
+  ctx.moveTo(x - w * 1.4, foot);
+  ctx.lineTo(x - w * 0.6, foot); // the pillars' feet
+  ctx.moveTo(x + w * 0.6, foot);
+  ctx.lineTo(x + w * 1.4, foot);
   ctx.stroke();
 }
 
+/** A dungeon's door: a pointed arch of cut stone with a keystone, the dark inside, and the first steps going down. */
 function dungeon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   token(ctx, x, y, r * 1.1, BONE);
-  const [w, foot, spring] = [r * 0.56, y + r * 0.6, y - r * 0.12];
+  const [w, foot, spring] = [r * 0.6, y + r * 0.62, y - r * 0.1];
   const arch = (half: number, base: number): void => {
     ctx.beginPath();
     ctx.moveTo(x - half, base);
@@ -78,20 +103,28 @@ function dungeon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number)
   arch(w, foot);
   ctx.fill();
   ctx.fillStyle = INK;
-  arch(w * 0.55, foot);
+  arch(w * 0.58, foot);
   ctx.fill();
-  ctx.fillStyle = BONE; // steps going down into the dark
-  ctx.fillRect(x - w * 0.55, foot - r * 0.2, w * 1.1, r * 0.2);
-  ctx.fillRect(x - w * 0.55, foot - r * 0.4, w * 0.55, r * 0.14);
+  ctx.fillStyle = BONE; // the keystone
+  ctx.beginPath();
+  ctx.moveTo(x - w * 0.2, spring - w);
+  ctx.lineTo(x + w * 0.2, spring - w);
+  ctx.lineTo(x + w * 0.14, spring - w * 0.55);
+  ctx.lineTo(x - w * 0.14, spring - w * 0.55);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillRect(x - w * 0.58, foot - r * 0.2, w * 1.16, r * 0.2); // steps going down into the dark
+  ctx.fillRect(x - w * 0.58, foot - r * 0.4, w * 0.7, r * 0.14);
+  ctx.fillRect(x - w * 0.58, foot - r * 0.6, w * 0.3, r * 0.14);
 }
 
-/** An eye, open and slit-pupilled for a horror that lives, closed (its lid and lashes) for one that is slain. */
+/** An eye, open and slit-pupilled with a ringed iris and rays about it for a horror that lives, closed (its lid and lashes) for one that is slain. */
 function eye(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, slain: boolean): void {
   const colour = slain ? DIM : MAGENTA;
   token(ctx, x, y, r * 1.1, colour, slain ? '' : MAGENTA);
-  const w = r * 0.78;
+  const w = r * 0.8;
   ctx.lineCap = 'round';
-  ctx.lineWidth = Math.max(1.2, r * 0.17);
+  ctx.lineWidth = Math.max(1.4, r * 0.18);
   ctx.strokeStyle = colour;
   ctx.fillStyle = colour;
   ctx.beginPath();
@@ -108,6 +141,14 @@ function eye(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, sla
   ctx.moveTo(x - w, y);
   ctx.quadraticCurveTo(x, y - r * 0.95, x + w, y);
   ctx.quadraticCurveTo(x, y + r * 0.95, x - w, y);
+  ctx.stroke();
+  ctx.save();
+  ctx.globalAlpha = 0.45;
+  ctx.fill(); // the eye's white, lit by the horror's own colour
+  ctx.restore();
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.38, 0, TAU); // the iris
+  ctx.lineWidth = Math.max(1, r * 0.12);
   ctx.stroke();
   ctx.beginPath();
   ctx.ellipse(x, y, r * 0.1, r * 0.4, 0, 0, TAU); // the slit
