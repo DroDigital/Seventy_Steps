@@ -239,6 +239,7 @@ export const EN = {
   'n.autoQuality': 'PICTURE SET FOR THIS COMPUTER · SETTINGS › DISPLAY',
   'n.gateHeld': 'THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU',
   'n.cache': 'A CACHE OF ECHOES · +{n}',
+  'n.mercy': 'ITS GRIP LOOSENS · BLOWS −{n}%',
   'n.vial': 'SILVER VIAL · REAGENT DOSES {n}',
   'n.rounds': 'YOU CARRY ALL THE ROUNDS YOU CAN',
   // the buttons' names for a device

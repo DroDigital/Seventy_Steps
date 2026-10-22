@@ -44,38 +44,39 @@ nothing in its way.
 | 15 | Lilith | 10/5/9 | 5 | 750 | 11 | 183 | 280 | 0.23 | 0 |
 | 16 | The Shunned House Entity | 10/5/10 | 5 | 750 | 9 | 135 | 280 | 0.17 | 0 |
 | 17 | The Gorgon of Medusa's Coil | 11/5/10 | 5 | 800 | 17 | 30 | 292 | 0.04 | 0 |
-| 18 | The Whisperer in Akeley's Chair | 11/5/11 | 5 | 850 | 10 | 54 | 292 | 0.07 | 0 |
+| 18 | The Whisperer in Akeley's Chair | 11/5/11 | 5 | 850 | 10 | 60 | 292 | 0.07 | 0 |
 | 19 | Joseph Curwen | 12/5/11 | 5 | 900 | 10 | 123 | 304 | 0.14 | 0 |
 | 20 | The Haunter of the Dark | 12/6/11 | 5 | 1050 | 147 | 2715 | 304 | 3.19 | 0 |
 | 21 | The Horror at Martin's Beach | 13/6/12 | 5 | 1200 | 22 | 102 | 316 | 0.12 | 0 |
 | 22 | The Dunwich Horror | 13/6/12 | 5 | 1550 | 18 | 416 | 316 | 0.47 | 0 |
-| 23 | Mother Hydra | 11/5/11 | 5 | 3100 | 30 | 596 | 292 | 0.73 | 0 |
-| 24 | Father Dagon | 11/5/11 | 5 | 3250 | 37 | 601 | 292 | 0.74 | 0 |
-| 25 | Shub-Niggurath | 11/5/11 | 5 | 4300 | 87 | 663 | 292 | 0.81 | 0 |
-| 26 | Hypnos | 14/7/14 | 5 | 650 | 15 | 25 | 328 | 0.03 | 0 |
+| 23 | Mother Hydra | 11/5/11 | 5 | 2600 | 26 | 537 | 292 | 0.66 | 0 |
+| 24 | Father Dagon | 11/5/11 | 5 | 2700 | 30 | 529 | 292 | 0.65 | 0 |
+| 25 | Shub-Niggurath | 11/5/11 | 5 | 3100 | 72 | 427 | 292 | 0.52 | 0 |
+| 26 | Hypnos | 14/7/14 | 5 | 950 | 20 | 55 | 328 | 0.06 | 0 |
 | 27 | High Priest Not to Be Described | 16/7/15 | 5 | 1000 | 9 | 106 | 352 | 0.11 | 0 |
-| 28 | The Colossus Beneath the Pyramids | 17/8/17 | 5 | 1650 | 15 | 398 | 364 | 0.39 | 0 |
+| 28 | The Colossus Beneath the Pyramids | 17/8/17 | 5 | 1650 | 15 | 359 | 364 | 0.35 | 0 |
 | 29 | The Other Gods | 16/8/15 | 5 | 1900 | 15 | 212 | 352 | 0.22 | 0 |
 | 30 | Bokrug | 16/8/15 | 5 | 2600 | 30 | 689 | 352 | 0.70 | 0 |
-| 31 | Nug | 16/8/15 | 5 | 2600 | 29 | 828 | 352 | 0.84 | 0 |
-| 32 | Rhan-Tegoth | 16/8/15 | 5 | 2600 | 24 | 752 | 352 | 0.76 | 0 |
+| 31 | Nug | 16/8/15 | 5 | 2600 | 29 | 750 | 352 | 0.76 | 0 |
+| 32 | Rhan-Tegoth | 16/8/15 | 5 | 2600 | 24 | 677 | 352 | 0.69 | 0 |
 | 33 | Yeb | 16/8/15 | 5 | 2600 | 29 | 662 | 352 | 0.67 | 0 |
 | 34 | The Great Ones | 16/8/15 | 5 | 2950 | 34 | 706 | 352 | 0.72 | 0 |
 | 35 | Yig | 16/8/15 | 5 | 2950 | 29 | 751 | 352 | 0.76 | 0 |
 | 36 | Tsathoggua | 16/8/15 | 5 | 3000 | 35 | 764 | 352 | 0.78 | 0 |
-| 37 | Nyarlathotep | 16/8/15 | 5 | 4000 | 48 | 747 | 352 | 0.76 | 0 |
-| 38 | Hastur | 16/8/15 | 5 | 4200 | 43 | 616 | 352 | 0.62 | 0 |
-| 39 | Cthulhu | 16/8/15 | 5 | 4600 | 46 | 806 | 352 | 0.82 | 0 |
-| 40 | Ghatanothoa | 16/8/15 | 5 | 4850 | 84 | 676 | 352 | 0.69 | 0 |
-| 41 | Zkauba the Wizard | 18/9/17 | 5 | 750 | 7 | 70 | 376 | 0.07 | 0 |
-| 42 | The Thing Beyond Erich Zann's Window | 18/9/18 | 5 | 850 | 6 | 17 | 376 | 0.02 | 0 |
-| 43 | The Daemon Pipers | 18/9/18 | 5 | 1200 | 11 | 119 | 376 | 0.11 | 0 |
-| 44 | The Ancient Ones | 18/9/18 | 5 | 1550 | 13 | 20 | 376 | 0.02 | 0 |
-| 45 | 'Umr at-Tawil | 18/9/18 | 5 | 3600 | 47 | 619 | 376 | 0.59 | 0 |
-| 46 | Yog-Sothoth | 18/9/18 | 5 | 4200 | 42 | 791 | 376 | 0.75 | 0 |
+| 37 | Nyarlathotep | 16/8/15 | 5 | 3400 | 40 | 565 | 352 | 0.57 | 0 |
+| 38 | Hastur | 16/8/15 | 5 | 3500 | 36 | 557 | 352 | 0.57 | 0 |
+| 39 | Ghatanothoa | 16/8/15 | 5 | 3600 | 61 | 682 | 352 | 0.69 | 0 |
+| 40 | Cthulhu | 16/8/15 | 5 | 3700 | 40 | 758 | 352 | 0.77 | 0 |
+| 41 | Zkauba the Wizard | 18/9/17 | 5 | 1100 | 11 | 137 | 376 | 0.13 | 0 |
+| 42 | The Thing Beyond Erich Zann's Window | 18/9/18 | 5 | 1300 | 10 | 41 | 376 | 0.04 | 0 |
+| 43 | The Daemon Pipers | 18/9/18 | 5 | 1500 | 15 | 207 | 376 | 0.20 | 0 |
+| 44 | The Ancient Ones | 18/9/18 | 5 | 2200 | 25 | 205 | 376 | 0.19 | 0 |
+| 45 | 'Umr at-Tawil | 18/9/18 | 5 | 3200 | 40 | 443 | 376 | 0.42 | 0 |
+| 46 | Yog-Sothoth | 18/9/18 | 5 | 3600 | 44 | 920 | 376 | 0.87 | 0 |
 | 47 | Azathoth | 18/9/18 | 5 | 6700 | 90 | 8864 | 376 | 8.42 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1), and the bot does not die.
+Round 61 adds each tier's band: a named horror takes 7 to 40 seconds and costs at least 0.03 of a life; a god takes 18 to 90 seconds and costs 0.35 to 1 lives.
 
 ## The opening
 

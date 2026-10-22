@@ -226,6 +226,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'n.autoQuality': "BILD FÜR DIESEN COMPUTER EINGESTELLT · EINSTELLUNGEN › ANZEIGE",
   'n.gateHeld': "DAS TOR ÖFFNET SICH NICHT, SOLANGE EIN SCHRECKEN EUCH HÄLT",
   'n.cache': "EIN VERSTECK VON ECHOS · +{n}",
+  'n.mercy': "SEIN GRIFF LOCKERT SICH · SCHLÄGE −{n}%",
   'n.vial': "SILBERNE PHIOLE · REAGENZDOSEN {n}",
   'n.rounds': "IHR TRAGT ALLE PATRONEN, DIE IHR KÖNNT",
   'pad.moveStick': "der linke Stick",

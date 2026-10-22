@@ -4,6 +4,9 @@
  * frames and distances in metres unless a comment says otherwise.
  */
 
+/** Mercy (round 61; systems/mercy.ts): each fall to a horror lightens its blows by `step` in the next, for at most `falls` falls. */
+export const MERCY = { step: 0.06, falls: 4 } as const;
+
 export const BOSS = {
   arena: 20, // arena radius where the site gives none
   margin: 8, // metres past its ring's edge a boss still holds the investigator...

@@ -10,7 +10,8 @@ import { ENTITIES } from '../src/data/registry';
 import { toCombatant } from '../src/systems/creatures';
 import { standings } from './balanceModel';
 
-const MOST = 1 / 3;
+const MOST = 0.28; // (round 61: a third, before the four that stood at 30% were eased: stacked with a mind Unmoored (x1.35) and a relic that costs (x1.08), 28% is 41%, never two blows to a death)
+const LEAST = 0.12; // (round 61, "none excessively easy": a blow that does not matter is a boss that is only a wall of health; the Haunter and Azathoth are not hurt or measured like the rest)
 
 const heaviest = (id: string): { move: string; damage: number } => {
   const cd = toCombatant(ENTITIES.find((e) => e.id === id)!);
@@ -27,6 +28,13 @@ describe('a horror\'s heaviest blow (round 60)', () => {
     for (const s of standings()) {
       const { move, damage } = heaviest(s.id);
       expect(damage / s.hp, `${s.id}'s ${move}: ${damage} of ${s.hp}`).toBeLessThanOrEqual(MOST);
+    }
+  });
+
+  it('takes at least an eighth of it, or the horror is only a wall of health', () => {
+    for (const s of standings().filter((x) => !['azathoth', 'haunter_of_the_dark'].includes(x.id))) {
+      const { move, damage } = heaviest(s.id);
+      expect(damage / s.hp, `${s.id}'s ${move}: ${damage} of ${s.hp}`).toBeGreaterThanOrEqual(LEAST);
     }
   });
 });

@@ -89,7 +89,7 @@ export const NAMED = tier('named', [
     id: 'whisperer', name: "The Whisperer in Akeley's Chair", source: 'The Whisperer in Darkness', regions: ['vermont'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'pallid', scale: 2, eyes: 2 },
     ...scripted('boss', phases(ph(1, { gaze: 2, projectile: 1, summon: 1, sweep_beam: 1 }, { summons: ['mi_go'] }), ph(0.5, { gaze: 2, projectile_fan: 1, summon: 1, barrage: 1 }, { summons: ['mi_go'], hooks: ['darkness'] })), { mobile: false, range: [0, 30] }),
-    stats: st(850, 200, 32, 1.5, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
+    stats: st(850, 200, 36, 1.5, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
     eldritchVariant: { sprite: { silhouette: 'crustacean', palette: 'fungus', wings: 2 } },
   },
   {
@@ -120,7 +120,7 @@ export const NAMED = tier('named', [
     id: 'zann_window_thing', name: "The Thing Beyond Erich Zann's Window", source: 'The Music of Erich Zann', regions: ['beyond'], canonLooks: false, voice: 'viol',
     sprite: { silhouette: 'orb', palette: 'charcoal', scale: 4, eyes: 0, tentacles: 4, glow: 'purple' },
     ...scripted('stationary_horror', phases(ph(1, { wind_push: 2, darkness: 1, roar: 1, barrage: 2 }, { hooks: ['darkness'] }), ph(0.5, { wind_push: 2, roar: 2, projectile_fan: 1, barrage: 2, sweep_beam: 1 }, { hooks: ['darkness', 'camera_warp'] }))),
-    stats: st(850, 1000, 30, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2,
+    stats: st(1300, 1000, 40, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2,
   },
   {
     id: 'voice_in_the_tomb', name: 'The Voice in the Tomb', source: 'The Statement of Randolph Carter', regions: ['arkham'], canonLooks: false, voice: 'whisper',
@@ -143,7 +143,7 @@ export const NAMED = tier('named', [
     id: 'colossus_pyramids', name: 'The Colossus Beneath the Pyramids', source: 'Under the Pyramids', regions: ['pnakotus'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sand', scale: 14, tentacles: 5, eyes: 10 },
     ...scripted('boss', phases(ph(1, { slam: 2, grab: 1, charge: 1, quake: 1, delayed_slam: 1 }), ph(0.5, { slam: 2, bite: 2, charge: 1, aoe_ring: 1, quake: 2, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(1650, 600, 60, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2,
+    stats: st(1650, 600, 54, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2,
   },
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
@@ -173,7 +173,7 @@ export const NAMED = tier('named', [
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
     ...scripted('mind_thief', phases(ph(1, { gaze: 2, teleport: 1, roar: 1, barrage: 1 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 2, beam: 1, teleport: 1, sweep_beam: 1, vortex: 1 }, { hooks: ['time_skip', 'camera_warp'] }))),
-    stats: st(650, 140, 30, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
+    stats: st(950, 140, 30, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
   },
   {
     id: 'the_outsider', name: 'The Outsider', source: 'The Outsider', regions: ['hub'], canonLooks: true,
@@ -191,6 +191,6 @@ export const NAMED = tier('named', [
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
     ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, eruption: 1 }, { hooks: ['arena_reconnect'] }))),
-    stats: st(750, 160, 32, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
+    stats: st(1100, 160, 40, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },
 ]);
