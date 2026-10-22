@@ -19,6 +19,7 @@ import { blast } from './blasts';
 import type { Game } from './components';
 import { changeInsight } from './insight';
 import { loseSanity } from './sanity';
+import { spend } from './stamina';
 
 /** The numbers of the ways. */
 export const WAYS = {
@@ -279,7 +280,7 @@ function patches(g: Game, run: WayRun, me: V3, calm: boolean): void {
     if (p.of === 'sanity') loseSanity(g, p.rate / SIM.hz);
     else {
       const s = g.ecs.c.stamina.get(g.player.id);
-      if (s) s.value = Math.max(0, s.value - (p.rate / SIM.hz) * 10);
+      if (s) spend(s, (p.rate / SIM.hz) * 10); // (the spending holds recovery off: else the ordinary regen, 32 a second at the least, outruns the frost's 28 and a body stands in it untouched)
     }
   }
 }

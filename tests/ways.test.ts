@@ -103,6 +103,31 @@ describe('ground that wears', () => {
   });
 });
 
+describe('ground that takes the breath', () => {
+  it('wears the stamina of one who stands in it, however fast it would mend, and not of one beside it', () => {
+    const g = createWorldGame();
+    const r = enter(g, 'other_gods');
+    const p = r.patches.find((q) => q.of === 'stamina')!;
+    const beside = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => ({ x: p.x + Math.cos((k * Math.PI) / 4) * (p.r + 4), z: p.z + Math.sin((k * Math.PI) / 4) * (p.r + 4) })).find((q) => r.patches.every((o) => Math.hypot(q.x - o.x, q.z - o.z) > o.r + 1))!;
+    const st = g.ecs.c.stamina.get(g.player.id)!;
+    const lowest = (x: number, z: number): number => { // the least the bar reaches in two seconds on a place, begun full
+      goTo(g, x, z);
+      run(g, 4);
+      for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
+      st.value = st.max;
+      st.delay = 0;
+      let least = st.value;
+      for (let k = 0; k < 120; k++) {
+        run(g, 1);
+        least = Math.min(least, st.value);
+      }
+      return least;
+    };
+    expect(lowest(beside.x, beside.z), 'beside it the bar stays full').toBe(st.max);
+    expect(lowest(p.x, p.z), 'in it the bar is worn, the recovery held off').toBeLessThan(st.max * 0.6);
+  });
+});
+
 describe('a vent', () => {
   it('erupts of itself, in a round, after showing it, and hurts what stands in it', () => {
     const g = createWorldGame();
