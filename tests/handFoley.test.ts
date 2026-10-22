@@ -35,7 +35,7 @@ describe("the investigator's hands are heard on their moves' own frames (round 4
 
   it('the Reagent: the needle, then the plunger; a flask: the glug, then the lob; a guard: the lift at once', () => {
     const inject = rig();
-    inject.run('inject', 64);
+    inject.run('inject', 76);
     expect(inject.heard.map((h) => [h.key, h.frame])).toEqual([['hands:needle', HAND_FRAMES.inject.needle], ['hands:plunger', HAND_FRAMES.inject.plunger]]);
     const lob = rig();
     lob.run('throw', 40);

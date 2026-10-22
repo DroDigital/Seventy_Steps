@@ -96,7 +96,7 @@ export const SKY_VISITORS: Readonly<Record<string, readonly SkyVisitor[]>> = {
   innsmouth: [flock('gull', [35, 80], [4, 8])],
   providence: [flock('crow', [55, 120])],
   vermont: [flock('crow', [70, 140]), { shape: 'mi_go', size: 3.4, count: [1, 3], every: [45, 110], height: [8, 14], speed: 11, cry: 'buzz' }],
-  yuggoth: [{ shape: 'mi_go', size: 3.4, count: [2, 5], every: [25, 60], height: [8, 16], speed: 12, cry: 'buzz' }],
+  yuggoth: [{ shape: 'mi_go', size: 3.4, count: [2, 5], every: [25, 60], height: [8, 16], speed: 12 }], // (round 68: they pass unheard; their buzz every half-minute was the buzzing the ambience was complained of)
   dreamlands: [{ shape: 'night_gaunt', size: 3.6, count: [1, 3], every: [40, 90], height: [7, 13], speed: 9 }, { shape: 'shantak', size: 6.5, count: [1, 1], every: [100, 200], height: [12, 18], speed: 13, cry: 'squawk' }],
   rlyeh: [flock('gull', [60, 130], [3, 6])],
 };

@@ -88,6 +88,33 @@ export function walkAlong(u: number, seconds: number): number {
   return peak * (u - a / 2);
 }
 
+const LENS_KEEP = 0.8; // metres a cutscene's lens keeps inside a wall (round 68)
+const LENS_BAND = 4; // metres past a doorway's jambs that its wall is still the lens's to respect
+
+/**
+ * The walls the one at `at` stands inside (past, in the ring or the hall): where a cutscene's lens must stay (round 68: a big horror's
+ * arrival began with the lens behind the investigator, who stands a step inside the fog, or half a body's height from the horror, which
+ * is outside the ring: the first seconds showed the wall of fog from within it and nothing else).
+ */
+export const fogsAround = (g: Game, at: XZ): FogWall[] => fogsUp(g).filter((w) => sideOf(w, at) > 0 && (w.kind === 'ring' || Math.abs(across(w, at)) <= w.width / 2 + JAMB + LENS_BAND));
+
+/** Whether a lens at `p` is inside every one of `walls`, `margin` metres clear of each. */
+export const lensInside = (walls: readonly FogWall[], p: XZ, margin = LENS_KEEP): boolean =>
+  walls.every((w) => sideOf(w, p) >= margin || (w.kind === 'doorway' && Math.abs(across(w, p)) > w.width / 2 + JAMB + LENS_BAND));
+
+/** How much of the line `from` → `to` (0..1) is inside `walls`: the lens is drawn in along its line to the head of whoever it circles, as far as that. */
+export function insideLine(walls: readonly FogWall[], from: XZ, to: XZ): number {
+  const at = (t: number): XZ => ({ x: from.x + (to.x - from.x) * t, z: from.z + (to.z - from.z) * t });
+  if (lensInside(walls, to)) return 1;
+  let [lo, hi] = [0, 1];
+  for (let i = 0; i < 14; i++) {
+    const mid = (lo + hi) / 2;
+    if (lensInside(walls, at(mid))) lo = mid;
+    else hi = mid;
+  }
+  return lo;
+}
+
 /** Sets the investigator walking through `w`. */
 export function passFog(g: Game, w: FogWall): void {
   const me = g.ecs.c.transform.get(g.player.id)!.pos;

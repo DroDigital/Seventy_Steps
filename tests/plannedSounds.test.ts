@@ -48,6 +48,15 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
     expect(Object.keys(RECORDED_FOR).length).toBe(PLANNED.reduce((n, p) => n + p.for.length, 0)); // (no recipe has two recordings)
   });
 
+  it('the frost, star and eye casters each throw and strike with a recording of their own (round 68: they shared the generic throw and the arcane impact)', () => {
+    const own = (motif: string): string[] => ['loose', 'land', 'burst'].map((w) => RECORDED_FOR[`atk:${w}:${motif}`]!);
+    expect(own('frost')[0]).toBe('atkFrostCast');
+    expect(own('star')).toEqual(['atkStarCast', 'atkStarHit', 'atkStarHit']);
+    expect(own('eye')).toEqual(['atkEyeCast', 'atkEyeHit', 'atkEyeHit']);
+    const casts = ['loose:flame', 'loose:frost', 'loose:star', 'loose:eye', 'loose:glyph'].map((k) => RECORDED_FOR[`atk:${k}`]);
+    expect(new Set(casts).size).toBe(casts.length); // no two of these elements are thrown with the same sound
+  });
+
   it('a motion of fixed length is fit to it: every door, and the mist wall', () => {
     for (const p of PLANNED) {
       const timed = p.for.some((k) => k.startsWith('door:') || k === 'mist:pass');
@@ -95,13 +104,13 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
     expect(setFiles([{ files: ['thud1', 'nothing_here'], gain: 0.5 }])).toEqual(['sfx/thud1', 'sfx/nothing_here']);
   });
 
-  it('a file that is there is measured and credited (found on Freesound as CC0, or made with Suno Sounds with its plan)', () => {
+  it('a file that is there is measured and credited (found on Freesound or OpenGameArt as CC0, or made with Suno Sounds with its plan)', () => {
     const credits = readFileSync('public/audio/CREDITS.md', 'utf8');
     for (const p of PLANNED) for (let k = 1; k <= p.takes; k++) {
       const file = `${p.file}${k}`;
       if (!existsSync(`public/audio/sfx/${file}.mp3`)) continue;
       expect(SAMPLE_LEVELS[`sfx/${file}`], `${file} is not measured: run python3 tools/audio_levels.py`).toBeDefined();
-      expect(credits, `${file} is not credited`).toMatch(new RegExp(`\\| \`sfx/${file}\\.mp3\` \\| (Suno Sounds|\\[[^\\]]+\\]\\(https://freesound\\.org/people/[^)]+\\)) \\|`));
+      expect(credits, `${file} is not credited`).toMatch(new RegExp(`\\| \`sfx/${file}\\.mp3\` \\| (Suno Sounds|\\[[^\\]]+\\]\\(https://(freesound\\.org/people|opengameart\\.org/content)/[^)]+\\)) \\|`));
     }
   });
 

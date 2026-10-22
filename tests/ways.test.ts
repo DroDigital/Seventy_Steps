@@ -12,6 +12,7 @@ import { calmed, wayRuns, WAYS, type WayRun } from '../src/systems/ways';
 import { along, courtPoint, pointAt } from '../src/world/arenaWay';
 import { stepPlace } from '../src/world/discoveryPlan';
 import { worldLayout } from '../src/world/placements';
+import { layTraps, TRAPS } from './wayTraps';
 import { goTo, record, run } from './worldHelpers';
 
 /** Round 62: the ways played (systems/ways.ts). */
@@ -21,6 +22,8 @@ const enter = (g: Game, boss: string): WayRun => {
   run(g, 4);
   return wayRuns(g).find((r) => r.plan.boss === boss)!;
 };
+/** `enter`, with the hazards the boss's way had until round 68 laid in its court (no authored way has one now; the machinery that plays them is held to its rules all the same). */
+const trapped = (g: Game, boss: string): WayRun => layTraps(g, enter(g, boss));
 const at = (r: WayRun, d: number, side = 0): { x: number; z: number } => pointAt(r.plan, d, side);
 
 /** Approach with real input and collision; only the starting position is supplied by the test. */
@@ -36,7 +39,7 @@ function walkTo(g: Game, to: { x: number; z: number }, reached: () => boolean): 
 describe('a way\'s plates', () => {
   it('wake under a foot and burst a moment after, hurting those still in the ring; a safe one does not wake', () => {
     const g = createWorldGame();
-    const r = enter(g, 'simon_orne');
+    const r = trapped(g, 'simon_orne');
     const safe = r.plates.find((p) => p.safe)!;
     const unsafe = r.plates.find((p) => !p.safe)!;
     const [warned, landed] = [record(g, 'WardWarned'), record(g, 'WardLanded')];
@@ -56,7 +59,7 @@ describe('a way\'s plates', () => {
 
   it('is cleared by a step aside before it bursts', () => {
     const g = createWorldGame();
-    const r = enter(g, 'black_man');
+    const r = trapped(g, 'black_man');
     const p = r.plates[0]!;
     const hp = g.ecs.c.health.get(g.player.id)!.hp;
     goTo(g, p.x, p.z);
@@ -69,7 +72,7 @@ describe('a way\'s plates', () => {
 
   it('rest, once they have burst, before they wake again', () => {
     const g = createWorldGame();
-    const r = enter(g, 'black_man');
+    const r = trapped(g, 'black_man');
     const p = r.plates[0]!;
     goTo(g, p.x, p.z);
     run(g, p.warn + 3);
@@ -83,8 +86,8 @@ describe('a way\'s plates', () => {
 describe('a field of plates', () => {
   it('has one safe plate in each row, and it bears the sign on the tablet', () => {
     const g = createWorldGame();
-    const r = enter(g, 'medusa_gorgon');
-    const h = ARENA_WAYS.medusa_gorgon!.hazards![0]!;
+    const r = trapped(g, 'medusa_gorgon');
+    const h = TRAPS.medusa_gorgon![0]!;
     expect(h.kind).toBe('field');
     if (h.kind !== 'field') return;
     expect(r.plates.length).toBe(h.rows * h.cols);
@@ -100,7 +103,7 @@ describe('a field of plates', () => {
 describe('ground that wears', () => {
   it('takes the mind of one who stands on it, and not of one beside it; and a rite done stills it', () => {
     const g = createWorldGame();
-    const r = enter(g, 'colour_out_of_space');
+    const r = trapped(g, 'colour_out_of_space');
     const p = r.patches[0]!;
     const beside = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => ({ x: p.x + Math.cos((k * Math.PI) / 4) * (p.r + 4), z: p.z + Math.sin((k * Math.PI) / 4) * (p.r + 4) })).find((q) => r.patches.every((o) => Math.hypot(q.x - o.x, q.z - o.z) > o.r + 1))!; // (clear of every patch, for they lie close together)
     const drop = (x: number, z: number): number => { // the mind lost in two seconds standing at a place (a horror near wears at it too, so what stands there is sent away before it is measured)
@@ -122,7 +125,7 @@ describe('ground that wears', () => {
 describe('ground that takes the breath', () => {
   it('wears the stamina of one who stands in it, however fast it would mend, and not of one beside it', () => {
     const g = createWorldGame();
-    const r = enter(g, 'other_gods');
+    const r = trapped(g, 'other_gods');
     const p = r.patches.find((q) => q.of === 'stamina')!;
     const beside = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => ({ x: p.x + Math.cos((k * Math.PI) / 4) * (p.r + 4), z: p.z + Math.sin((k * Math.PI) / 4) * (p.r + 4) })).find((q) => r.patches.every((o) => Math.hypot(q.x - o.x, q.z - o.z) > o.r + 1))!;
     const st = g.ecs.c.stamina.get(g.player.id)!;
@@ -147,7 +150,7 @@ describe('ground that takes the breath', () => {
 describe('a vent', () => {
   it('erupts of itself, in a round, after showing it, and hurts what stands in it', () => {
     const g = createWorldGame();
-    const r = enter(g, 'shub_niggurath');
+    const r = trapped(g, 'shub_niggurath');
     const v = r.vents[0]!;
     const [warned, landed] = [record(g, 'WardWarned'), record(g, 'WardLanded')];
     goTo(g, v.x, v.z);
@@ -266,6 +269,9 @@ describe('a rite', () => {
     run(g, 3);
     expect(failed.length).toBe(1);
     expect(warned.length).toBe(1);
+    const hp = g.ecs.c.health.get(g.player.id)!.hp;
+    run(g, WAYS.fail.warn + 6);
+    expect(g.ecs.c.health.get(g.player.id)!.hp, 'the flare is a sign, and does no harm (round 68)').toBe(hp);
     expect(r.lights.every((l) => !l.lit)).toBe(true);
     expect(r.progress).toBe(0);
     expect(g.overworld!.told.has('rite:colour_out_of_space')).toBe(false);

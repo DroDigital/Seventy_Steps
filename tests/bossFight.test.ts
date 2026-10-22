@@ -8,8 +8,7 @@ import { summon } from '../src/systems/specials';
 import { worldLayout } from '../src/world/placements';
 import { bossGame, calm, engage } from './bossHelpers';
 import { press, steps } from './helpers';
-import { deathblow, kill, record } from './worldHelpers';
-import { strike } from '../src/systems/combat';
+import { kill, record, slay } from './worldHelpers';
 
 /** The Outsider fighting by a three-phase script: summons rise with the second, which also lights lamps. */
 function scripted() {
@@ -75,7 +74,7 @@ describe('boss fights (spec §3E)', () => {
     g.ecs.c.health.get(boss)!.hp *= 0.5;
     steps(g, 1);
     const minions = [...fight.minions];
-    strike(g, boss, g.player.id, deathblow);
+    slay(g, boss);
     const back = record(g, 'Respawned');
     for (let i = 0; i < 400 && back.length === 0; i++) steps(g, 1); // (the arena's investigator rises inside its ring, where it wakes again)
     expect(fight.engaged).toBe(false);

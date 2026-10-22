@@ -68,6 +68,12 @@ export const CTHULHU_SIGNATURE: Signature = {
     const ship = shipOf(g, f);
     if (f.sig.sailing && ship !== undefined) sail(g, e, f, ship);
   },
+  status(g, _e, f) {
+    if (f.sig.burst > 0) return "IT REFORMS · R'LYEH SINKS";
+    if (f.sig.sailing) return 'THE ALERT RAMS IT';
+    return shipOf(g, f) !== undefined ? "THE ALERT HAS COME · E AT HER HELM" : 'WOUND IT UNTIL THE ALERT COMES';
+  },
+  note: (g, _e, f) => (shipOf(g, f) !== undefined && !f.sig.sailing ? "THE ALERT HAS COME · TAKE HER HELM" : null),
   action(g, _e, f) {
     const ship = shipOf(g, f);
     if (ship === undefined || f.sig.sailing || f.sig.burst) return null;

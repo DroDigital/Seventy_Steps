@@ -129,7 +129,7 @@ export const DRONES = {
   kn_yan: d(32.7, [1, 1.06, 2], 'sawtooth', 220, 0.03, 0.008, 200),
   dreamlands: d(65.4, [1, 1.25, 1.5, 2], 'sine', 900, 0.028, 0.006, 1200),
   rlyeh: d(30.9, [1, 1.5, 1.587], 'sawtooth', 200, 0.03, 0.02, 220),
-  yuggoth: d(44, [1, 1.03, 1.47, 2.08], 'square', 260, 0.022, 0.005, 3000),
+  yuggoth: d(44, [1, 1.5, 2.08], 'triangle', 220, 0.02, 0.005, 700), // round 68: a square wave with a detuned twin buzzed, and its noise hissed at 3 kHz
   beyond: d(27.5, [1, 2, 2.97, 4.1], 'sine', 1200, 0.035),
   boss: d(36.7, [1, 1.06, 1.5], 'sawtooth', 180, 0.08), // under a boss fight
 } satisfies Record<string, Drone>;

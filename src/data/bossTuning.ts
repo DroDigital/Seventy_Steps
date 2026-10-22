@@ -14,6 +14,7 @@ export const BOSS = {
   riposte: 1.1, // ...and its modest damage bonus on a boss (a common foe: COMBAT.riposte)
   shot: 0.3, // the share of the investigator's shot a boss takes: the revolver breaks a horror's wind-up and chips it, the blade fells it (round 60: a full carry of rounds, alone, felled most of the human-sized ones)...
   rearm: 240, // ...and frames after a shot breaks its wind-up before another can: no holding it in place with the trigger
+  blowMost: 0.6, // the most of the investigator's greatest health any one blow of a foe takes (round 68, "bosses never one-hit kill": a horror's heaviest blow is 30% where it is met, but Nightmare (x1.5), a mind Unmoored (x1.35), a relic that costs (x1.08), the scaling of levels and a second journey (x1.35 each) stack on it; from full health it always takes two)
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)
@@ -80,7 +81,7 @@ export const COLOUR = {
 /** The Dunwich Horror: unseen until the Powder of Ibn Ghazi; the incantation is an optional finish. */
 export const DUNWICH = {
   powder: 3, // doses Armitage's sprayer holds
-  reveal: 900, // frames the powder shows it
+  reveal: 1200, // frames the powder shows it (round 68: it was 900, which three doses spent, a person's fight outlasted it, and the last of it was struck blind)
   redust: 180, // frames of showing left before another dose is offered (none is wasted on a Horror already seen)
   reach: 14, // metres: the powder carries this far
   chantRange: 40, // the incantation works within this distance
