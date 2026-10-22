@@ -228,6 +228,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'n.gateHeld': "DAS TOR ÖFFNET SICH NICHT, SOLANGE EIN SCHRECKEN EUCH HÄLT",
   'n.cache': "EIN VERSTECK VON ECHOS · +{n}",
   'n.markerReached': "ZIEL ERREICHT",
+  'n.markersFull': "ZIELLIMIT · {n} · ERST EINES ENTFERNEN",
   'n.vial': "SILBERNE PHIOLE · REAGENZDOSEN {n}",
   'n.vialSold': "SILBERNE PHIOLE · DEIN BESTECK FASST NICHTS MEHR · +{n} ECHOS",
   'n.rounds': "IHR TRAGT ALLE PATRONEN, DIE IHR KÖNNT",

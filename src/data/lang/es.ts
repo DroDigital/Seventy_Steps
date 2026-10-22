@@ -228,6 +228,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.gateHeld': "LA PUERTA NO SE ABRIRÁ MIENTRAS UN HORROR TE RETENGA",
   'n.cache': "UN ALIJO DE ECOS · +{n}",
   'n.markerReached': "MARCA ALCANZADA",
+  'n.markersFull': "LÍMITE DE MARCAS · {n} · QUITA UNA PRIMERO",
   'n.vial': "FRASCO DE PLATA · DOSIS DE REACTIVO {n}",
   'n.vialSold': "FRASCO DE PLATA · TU ESTUCHE YA NO ADMITE MÁS · +{n} ECOS",
   'n.rounds': "LLEVAS TODAS LAS BALAS QUE PUEDES",

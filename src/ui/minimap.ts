@@ -10,7 +10,7 @@ import { EXPLORE, SIM } from '../data/tuning';
 import { hourName, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
-import { markerHere } from '../systems/marker';
+import { markersHere } from '../systems/marker';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
 import { BONE, el, setText } from './hudKit';
@@ -62,7 +62,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       painter.paint(ctx, view, realmOf(region), false);
       ctx.restore();
       drawBeacon(ctx, view, currentLead(g)?.at ?? null, realmOf(region), 'round', UNIT.mini, 'lead', yaw); // upright, set where the turned picture puts them (round 60)
-      drawBeacon(ctx, view, markerHere(g), realmOf(region), 'round', UNIT.mini, 'marker', yaw); // the investigator's own marker, with its arrow
+      for (const m of markersHere(g)) drawBeacon(ctx, view, m, realmOf(region), 'round', UNIT.mini, 'marker', yaw); // the investigator's own markers, each with its arrow
       const r = SIZE / 2 - 1;
       north.style.left = `${SIZE / 2 + Math.sin(yaw) * r}px`;
       north.style.top = `${SIZE / 2 - Math.cos(yaw) * r}px`;

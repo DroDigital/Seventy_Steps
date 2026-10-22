@@ -305,8 +305,8 @@ export const FINDS = {
   wait: { weapon: 900, relic: 5200 },
 };
 
-/** The map's marker (round 60, systems/marker.ts): how near the investigator must come for it to be reached, and so cleared (metres). */
-export const MARKER = { arrive: 10 };
+/** The map's markers (round 60, systems/marker.ts): how near the investigator must come for one to be reached, and so cleared (metres), and how many may stand at once (round 68: it was one). */
+export const MARKER = { arrive: 10, most: 12 };
 
 /**
  * Secret passages (round 61, systems/passages.ts): the metres from a passage within which it wakes (a bridge's from its middle, and half

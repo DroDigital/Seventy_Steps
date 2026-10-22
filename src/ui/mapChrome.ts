@@ -22,7 +22,7 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'secret', state: { rumour: true }, words: 'Something strange', hint: 'near ground you have charted' },
   { kind: 'secret', state: { poi: 'tale' }, words: 'A secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
   { kind: 'lead', state: { now: 0 }, words: 'Where the story leads', hint: 'an arrow at the edge points to it' },
-  { kind: 'marker', words: 'Your marker', hint: 'right-click, F or Y sets it; the minimap points to it' },
+  { kind: 'marker', words: 'Your markers', hint: 'right-click, F or Y sets one, or removes the one it is on; the minimap points to each' },
 ];
 
 const ICON = 32; // CSS pixels a key's figure is drawn in (at the UI's scale; round 68: 26, for marks that were smaller)
@@ -52,8 +52,8 @@ export function buildKey(panel: HTMLElement): HTMLElement {
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker'], [['B'], 'Close']]
-    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker'], [['L'], 'Key'], [[mapKey], 'Close']];
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['B'], 'Close']]
+    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
 /** The row of keys along the bottom edge. */

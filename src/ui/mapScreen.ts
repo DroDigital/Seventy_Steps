@@ -4,17 +4,19 @@
  * ground seen, the places marked there (mapMarks.ts, mapIcons.ts), region names, the Elder Signs lit — with
  * how much of the realm is charted, opening on what has been seen (mapFit.ts), a key of its figures and a hover
  * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
- * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets the marker the
- * minimap points to, or clears it (systems/marker.ts); L hides the key. A lit Elder Sign clicked, or picked
+ * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets a marker the
+ * minimap points to, or removes the one it is on, Delete clears them all (systems/marker.ts; round 68: up to twelve); L hides the key. A lit Elder Sign clicked, or picked
  * with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
  * mapTravel.ts). M or Esc (pad B) closes it.
  */
 
 import { PAD_BUTTON } from '../core/padMap';
+import { t } from '../core/i18n';
+import { MARKER } from '../data/tuning';
 import { signBeyondDemo, travel, travelBar } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
-import { markerHere, setMarker } from '../systems/marker';
+import { addMarker, clearMarkers, markersHere, removeMarker } from '../systems/marker';
 import { exploredShare } from '../systems/exploration';
 import { poiTotals } from '../systems/pois';
 import { realmOf, type MapPlace } from '../world/mapData';
@@ -78,12 +80,13 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const p = g.ecs.c.transform.get(g.player.id)!.pos;
     [view.cx, view.cz] = [p.x, p.z];
   };
-  /** Sets the marker at a point of the screen, or clears it if that point is on the marker (round 60). */
+  /** Adds a marker at a point of the screen, or removes the one that point is on (round 60; round 68: any number, each its own). */
   const markAtPoint = (px: number, py: number): void => {
     const on = markAt(shown, px, py, 4 * uiScale());
-    if (on?.kind === 'marker') return void setMarker(g, null);
+    if (on?.kind === 'marker') return void (on.at && removeMarker(g, on.at));
     const [x, z] = [worldX(view, px), worldZ(view, py)];
-    if (realm().some((r) => r.id === regionAt(x, z)?.id)) setMarker(g, { x, z }); // on the realm's own ground
+    if (!realm().some((r) => r.id === regionAt(x, z)?.id)) return; // on the realm's own ground
+    if (addMarker(g, { x, z }) === 'full') g.events.emit('Notice', { text: t('n.markersFull', { n: MARKER.most }) });
   };
   const zoomBy = (k: number): void => {
     zoom = Math.min(ZOOM[1], Math.max(ZOOM[0], zoom * k));
@@ -104,7 +107,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const k = uiScale();
     const marks = (shown = painter.paint(ctx, view, realm(), true));
     drawBeacon(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', UNIT.full * k, 'lead');
-    drawBeacon(ctx, view, markerHere(g), realm(), 'screen', UNIT.full * k, 'marker', 0, true); // the pin is among the marks; only its pointer, off screen
+    for (const m of markersHere(g)) drawBeacon(ctx, view, m, realm(), 'screen', UNIT.full * k, 'marker', 0, true); // the pins are among the marks; only their pointers, off screen
     hover = pointer && !drag ? signAt(lit, view, pointer.x, pointer.y, Math.max(14, 9 * k)) : null;
     canvas.style.cursor = drag ? 'grabbing' : hover ? 'pointer' : 'grab';
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now, k);
@@ -165,6 +168,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(0.8);
       if (e.code === 'KeyC') centreOnPlayer();
       if (e.code === 'KeyF') markAtPoint(pointer?.x ?? view.w / 2, pointer?.y ?? view.h / 2);
+      if (e.code === 'Delete' || e.code === 'Backspace') clearMarkers(g); // every marker at once (round 68)
       if (e.code === 'KeyL' && key) key.style.display = (keyShown = !keyShown) ? '' : 'none';
       if (e.code === 'Tab') cycle(e.shiftKey ? -1 : 1);
       if (e.code === 'Enter' || e.code === 'NumpadEnter') journey();

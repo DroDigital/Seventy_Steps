@@ -241,6 +241,7 @@ export const EN = {
   'n.gateHeld': 'THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU',
   'n.cache': 'A CACHE OF ECHOES · +{n}',
   'n.markerReached': "MARKER REACHED",
+  'n.markersFull': "MARKER LIMIT · {n} · REMOVE ONE FIRST",
   'n.vial': 'SILVER VIAL · REAGENT DOSES {n}',
   'n.vialSold': 'SILVER VIAL · YOUR KIT HOLDS NO MORE · +{n} ECHOES',
   'n.rounds': 'YOU CARRY ALL THE ROUNDS YOU CAN',
