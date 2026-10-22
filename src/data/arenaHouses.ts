@@ -10,8 +10,8 @@
 import type { Glow } from './arenaSets';
 import type { Vec3 } from './tuning';
 
-/** What a house's wall is made of: the dam of the heath, the ravine's cliff, the grove's living palisade, a colonnade, a hedge, the stepped terraces of a ziggurat, R'lyeh's leaning slabs, a wall of crystal, ashlar. */
-export type WallKind = 'ashlar' | 'dam' | 'cliff' | 'grove' | 'colonnade' | 'hedge' | 'slabs' | 'crystal' | 'terrace';
+/** What a house's wall is made of: the dam of the heath, the ravine's cliff, the grove's living palisade, a colonnade, a hedge, the stepped terraces of a ziggurat, R'lyeh's leaning slabs, a wall of crystal, ashlar, and (round 68) the kerb of a river's bank. */
+export type WallKind = 'ashlar' | 'dam' | 'cliff' | 'grove' | 'colonnade' | 'hedge' | 'slabs' | 'crystal' | 'terrace' | 'kerb';
 
 /** What stands at intervals along it, and flanks its gate. */
 export type TowerKind = 'square' | 'round' | 'spire' | 'horn';
@@ -25,9 +25,38 @@ export interface House {
   tint?: Vec3; // the colour its stone leans toward
   glow?: Glow; // what burns along it
   tower: { kind: TowerKind; every: number; height: number; lit?: boolean }; // one in every `every` of the wall's pieces; `lit`: a fire on its top
-  gate: { width: number; height: number; flank: number; sealed?: boolean }; // `flank`: the height of the towers either side; `sealed`: its door is banded with glyphs
+  gate: { width: number; height: number; flank: number; sealed?: boolean; look?: GateLook }; // `flank`: the height of the towers either side; `sealed`: its door is banded with glyphs; `look`: what shuts it (round 68; a slab that draws aside, as a house's gate was)
   reach?: number; // metres from the ring of the fight to the wall's middle (HOUSE.reach)
   bailey?: Bailey; // a court walled as a rectangle, not a ring (round 67)
+  basin?: Basin; // a court walled as a reservoir: a dam across the front and a bank curving about the arena (round 68)
+  river?: River; // a court on an island in a river, crossed by one ford (round 68)
+}
+
+/** What shuts a house's gate (round 68; render/passageShapes.ts): a slab that slides into the wall, a sluice lifted into its housing, a boulder rolled aside. */
+export type GateLook = 'slab' | 'sluice' | 'boulder';
+
+/**
+ * A court walled as a reservoir (round 68; world/enclosureBasin.ts): a dam across the front, straight, the gate in its middle, and a bank
+ * that curves back from its ends about the arena like the shore of a lake held behind a dam, half an ellipse. Metres from the fight's
+ * ring, as a bailey's. A spillway can be cut in the dam (`spill`: metres to the left of the gate, and its breadth), with dust pouring down it.
+ */
+export interface Basin {
+  ahead: number; // to the dam
+  side: number; // to the dam's ends, the widest of the basin
+  behind: number; // to the bank's farthest point
+  wobble: number; // metres the bank wanders from a true curve, so it reads as a shore
+  spill?: { at: number; width: number };
+}
+
+/**
+ * A court on an island in a river (round 68; world/enclosureRiver.ts): the ring of the fight stands on an island, a river runs about it
+ * between two kerbs and one ford of flat stones, kerbed, crosses it from the gate. The river lies `depth` metres below the land. Where the
+ * outer kerb stands is the house's `reach` (the bank's), and the river lies between it and the island, `island` metres from the fight's ring.
+ */
+export interface River {
+  island: number; // from the fight's ring to the island's bank
+  depth: number; // metres the river's bed lies below the land
+  ford: number; // the ford's breadth between its kerbs
 }
 
 /**

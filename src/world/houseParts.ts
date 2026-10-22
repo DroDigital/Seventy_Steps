@@ -17,7 +17,7 @@ export const facing = (n: XZ): number => Math.atan2(n.x, n.z);
 
 /** The wall's piece with its middle at (x, z), `len` long along its own x, turned to `yaw`. */
 export function wall(h: House, y: number, x: number, z: number, yaw: number, len: number, seed: number): Prop {
-  const look: SetLook = { id: `house_${h.wall}`, scale: 1, tint: h.tint, glow: h.glow, round: false };
+  const look: SetLook = { id: `house_${h.wall}`, scale: 1, tint: h.tint, glow: h.glow, round: false, ...(h.wall === 'kerb' && h.river && { drop: h.river.depth }) }; // (a river's kerb goes down to its bed)
   return { kind: 'set', x, y, z, w: len / 2, d: h.thick / 2, h: h.height, yaw, seed, set: look };
 }
 
@@ -41,6 +41,6 @@ export function gatePiece(h: House, boss: string, gate: XZ, y: number, alongX: b
     glow: h.glow ?? 'purple',
     boxes: [],
     seal: { boxes: [[0, 0, hw, hd, y - 0.3, y + h.gate.height]], look: h.gate.sealed ? 'sealed' : 'wall' },
-    door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y },
+    door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y, look: h.gate.look },
   };
 }

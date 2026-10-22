@@ -27,7 +27,7 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
     hazards: [{ kind: 'blight', look: 'stain', at: [spot(74, 0), spot(64, 6), spot(54, -5), spot(44, 1), spot(32, 5), spot(20, -4)], r: 4.6, rate: 2.6 }],
     rite: { look: 'lamp', glow: 'magenta', at: [spot(62, 4.5), spot(58, -4), spot(54, 6.5), spot(50, -6)], order: 'rising', clue: 'FOUR LANTERNS OF THE FAMILY. THEY WENT OUT ONE BY ONE, THE LEAST BEFORE THE GREATEST', done: 'THE LANTERNS BURN STEADY, AND THE GREY LETS GO OF THE GROUND', reward: { echoes: 600, insight: 1 }, stills: true },
   },
-  // The sabbat's path up the ravine: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
+  // The sabbat's court before the ford of the black river: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
   // in the open ground; the fires are laid in a ring, and a plate wakes one; three black candles are to be lit, least first.
   black_man: {
     marks: [

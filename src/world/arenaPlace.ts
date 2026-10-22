@@ -13,7 +13,7 @@ import type { ArenaSite } from '../data/sites';
 import { WORLD } from '../data/tuning';
 import { arenaProps, reach } from './arenaDecor';
 import { within } from './enclosure';
-import { courtLand, enclosureLand, gateReach, planEnclosure } from './enclosurePlan';
+import { courtLand, enclosureLand, gateReach, hasOutline, planEnclosure } from './enclosurePlan';
 import { frontOf } from './arenaFront';
 import { arenaSet } from './arenaSet';
 import type { Collider } from './colliders';
@@ -38,11 +38,12 @@ export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSit
   const set = ARENA_SETS[a.bosses[0]]; // round 61: a horror with a set of its own has it, in the place of its style's ring and heart
   const spec = ARENA_HOUSES[a.bosses[0]!]; // round 63: a horror with a house has the wall about it, and the dressing of its court is kept within
   const site = { x: p.x, z: p.z, y, radius: a.radius };
-  const front = frontOf(w.signs, region.id, p.x, p.z, (f) => !spec || (courtLand(region.id, p.x, p.z, a.radius, f, gateReach(spec)) && (!spec.bailey || enclosureLand(region.id, planEnclosure(spec, a.bosses[0]!, { ...site, front: f }))))); // (the gate faces the Elder Sign, unless there is no land there to lay its court on, or its walls)
+  const front = frontOf(w.signs, region.id, p.x, p.z, (f) => !spec || (courtLand(region.id, p.x, p.z, a.radius, f, gateReach(spec)) && (!hasOutline(spec) || enclosureLand(region.id, planEnclosure(spec, a.bosses[0]!, { ...site, front: f }))))); // (the gate faces the Elder Sign, unless there is no land there to lay its court on, or its walls)
   const ring = a.radius + 1.5;
   const n = !set && style.ring === 'stones' ? Math.max(6, Math.round((2 * Math.PI * ring) / 5.5)) : 0; // other rings are props (arenaDecor.ts)
   const house = spec ? planEnclosure(spec, a.bosses[0]!, { ...site, front }) : undefined;
   pad(house ? house.pad(y, PLAIN.blend) : { kind: 'circle', x: p.x, z: p.z, radius: PLAIN.beyond + a.radius, blend: PLAIN.blend, level: y });
+  for (const under of house?.under?.(y) ?? []) pad(under); // (a river's bed, sunk below the level it is laid in)
   const decor = set ? arenaSet(set, { x: p.x, z: p.z, y, radius: a.radius, front, well: !!a.well }, house && ((d) => !within(house, d, reach(d)))) : arenaProps(style, p.x, p.z, y, a.radius, !!a.well);
   if (house) {
     decor.push(...house.props);

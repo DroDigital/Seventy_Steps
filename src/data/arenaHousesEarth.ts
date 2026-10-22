@@ -10,12 +10,14 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
   colour_out_of_space: house({
     name: 'THE RESERVOIR', line: 'The water was to cover the Gardner place. It never quite did.',
     wall: 'dam', height: 6, thick: 4.4, tint: [0.62, 0.63, 0.66], glow: 'magenta',
-    tower: { kind: 'square', every: 9, height: 9 }, gate: { width: 8, height: 6.5, flank: 12, sealed: true },
+    tower: { kind: 'square', every: 9, height: 9 }, gate: { width: 8, height: 6.5, flank: 12, sealed: true, look: 'sluice' },
+    basin: { ahead: 18, side: 24, behind: 16, wobble: 1.6, spill: { at: 22, width: 5 } }, // a dam across the heath, a bank about the Gardner place, a spillway, and a sluice lifted into its housing
   }),
   black_man: house({
-    name: 'THE RAVINE', line: 'The ravine closes about a cleft, and the cleft has been shut with a stone.',
-    wall: 'cliff', height: 10, thick: 5, tint: [0.38, 0.34, 0.4], glow: 'purple',
-    tower: { kind: 'spire', every: 8, height: 13 }, gate: { width: 7, height: 7, flank: 15, sealed: true },
+    name: 'THE BLACK RIVER', line: 'The river runs black about an island of white earth, and the one ford to it has been stopped with a stone.',
+    wall: 'kerb', height: 1.5, thick: 1.8, tint: [0.34, 0.32, 0.38], glow: 'purple', reach: 30,
+    tower: { kind: 'round', every: 6, height: 5, lit: true }, gate: { width: 7, height: 3.4, flank: 8, sealed: true, look: 'boulder' },
+    river: { island: 17, depth: 1.6, ford: 7 }, // the island in the river (Lovecraft: "the unpeopled island in the river"), its bank kerbed, a ford of flat stones, the balefires on the bank
   }),
   shub_niggurath: house({
     name: 'THE BLACK GROVE', line: 'The trees have grown together, and what grew them is not done.',

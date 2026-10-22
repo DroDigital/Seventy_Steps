@@ -74,13 +74,16 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
   it('has walls no body can climb or step over, and a stake, a candle and a court inside them', () => {
     for (const a of arenas) {
       const plan = a.house!;
-      for (const p of plan.props) expect(p.h, a.bosses[0]).toBeGreaterThanOrEqual(5);
+      for (const p of plan.props) expect(p.h, `${a.bosses[0]}: ${p.set?.id}`).toBeGreaterThanOrEqual(p.set?.id === 'house_kerb' ? 1.2 : 5); // (a kerb of a river's bank is five times what a mount steps up: nothing climbs it, and nothing is put in the river to be reached over it)
+      const dry = plan.dry ?? plan.gap; // (where a river runs, only the island and the ford are ground to stand a thing on)
       const fog = allFogs().find((f) => f.bosses.includes(a.bosses[0]!))!;
       expect(plan.gap(fog.stake), `${a.bosses[0]}: the stake`).toBeLessThan(-HOUSE.margin);
+      expect(dry(fog.stake), `${a.bosses[0]}: the stake, on dry ground`).toBeLessThan(-HOUSE.margin);
       expect(plan.gap(fog.candle), `${a.bosses[0]}: the candle`).toBeLessThan(-HOUSE.margin);
+      expect(dry(fog.candle), `${a.bosses[0]}: the candle, on dry ground`).toBeLessThan(-HOUSE.margin);
       for (const d of a.decor) {
         if (plan.props.includes(d) || !propCollider(d)) continue;
-        expect(plan.gap(d) + reach(d), `${a.bosses[0]}: ${d.set?.id} in the wall`).toBeLessThanOrEqual(-HOUSE.margin + 0.01);
+        expect(dry(d) + reach(d), `${a.bosses[0]}: ${d.set?.id} in the wall`).toBeLessThanOrEqual(-HOUSE.margin + 0.01);
       }
     }
   });

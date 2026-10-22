@@ -10,8 +10,9 @@
 import type { V3, XZ } from '../core/geom';
 import { HOUSE, type House } from '../data/arenaHouses';
 import { STAKE, type Enclosure, type EnclosureSite } from './enclosure';
-import { facing, gatePiece, tower, towerHalf, wall } from './houseParts';
-import type { Prop, SetLook } from './props';
+import { facing, gatePiece, tower, towerHalf } from './houseParts';
+import { runner } from './houseRuns';
+import type { SetLook } from './props';
 import { polygonFootprint } from './sitePads';
 
 /** A bailey about the arena at `s`, its gate at the site's front. */
@@ -24,22 +25,9 @@ export function planBailey(h: House, boss: string, s: EnclosureSite): Enclosure 
   const inward = { front: { x: -f.x, z: -f.z }, left: { x: -l.x, z: -l.z }, right: l, back: f }; // the way a face looks, toward the court
   const lateral = h.gate.width / 2 + towerHalf(h) - HOUSE.lap; // the gate's flanking towers' middles, to either side of its middle: they lap a little over its opening
   const keepHalf = b.keep ? b.keep.width / 2 : 0;
-  const props: Prop[] = [];
-  let [seed, count] = [1000, 0];
-
-  /** A run of wall from (a0, c0) to (a1, c1), its inward face toward `n`: pieces about HOUSE.segment long that overlap, a tower in every `tower.every`th. */
-  const run = (a0: number, c0: number, a1: number, c1: number, n: XZ): void => {
-    const length = Math.hypot(a1 - a0, c1 - c0);
-    const pieces = Math.max(1, Math.ceil(length / HOUSE.segment));
-    const step = length / pieces;
-    const len = step + h.thick * 0.5 + 0.5; // the step, and enough over to the next that no corner leaves a crack
-    for (let k = 0; k < pieces; k++) {
-      const t = (k + 0.5) / pieces;
-      const at = put(a0 + (a1 - a0) * t, c0 + (c1 - c0) * t);
-      props.push(wall(h, s.y, at.x, at.z, facing(n), len, seed++));
-      if (count++ % h.tower.every === h.tower.every - 1) props.push(tower(h, s.y, at.x, at.z, facing(n), h.tower.height, 2000 + count, h.tower.lit));
-    }
-  };
+  const runs = runner(h, s.y);
+  const props = runs.props;
+  const run = (a0: number, c0: number, a1: number, c1: number, n: XZ): void => runs.run(put(a0, c0), put(a1, c1), n); // (a run from one place of the court's frame to another)
 
   run(ahead, lateral, ahead, side, inward.front); // the front, either side of the gate
   run(ahead, -lateral, ahead, -side, inward.front);

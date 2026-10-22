@@ -26,22 +26,21 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
     ],
     air: { kind: 'spore', color: [0.86, 0.2, 0.6], rate: 22 },
   },
-  // The witches' sabbat in the ravine: the Black Man at the book, a ring of stones, skulls on poles, a pentacle in the leaf-mould and a fire that burns red.
+  // The witches' sabbat on the island in the black river (round 68; Lovecraft: "the dark valley of the white stone beyond Meadow Hill and ... the unpeopled island in the river"): white earth, thirteen standing stones each with its balefire at its foot, the old white stone, a pentacle in the earth, and the Black Man at the book.
   black_man: {
     candle: 'skull',
-    ground: { texture: 'leaves', tint: [0.46, 0.36, 0.32], gain: 1.3, reach: 12, bands: [{ r0: 0, r1: 0.55, k: 0.75, tint: [0.3, 0.2, 0.19] }] },
+    ground: { texture: 'dirt', tint: [0.8, 0.78, 0.72], gain: 1.5, reach: 18, bands: [{ r0: 0, r1: 0.5, k: 1.15, tint: [0.88, 0.86, 0.8] }, { r0: 0.5, r1: 0.72, k: 0.8, tint: [0.55, 0.52, 0.5] }] },
     puts: [
       put('inlay_star', at(0, 0), { size: 11, glow: 'magenta', lit: 'sigil' }),
-      put('prop:firepit', at(0.24, 180), { size: 3 }), // the fire, at the Black Man's back (not at his feet, where its flame would stand across him)
-      put('stump_old', ring(0.84, 9, { arc: [40, 320], face: 'in' }), { size: 1.0 }), // the witches' stools
-      put('prop:monolith', ring(1.0, 11, { jitter: 8, face: 'in' }), { size: [0.95, 1.35] }),
-      put('skull_pole', ring(0.9, 14), { size: [0.9, 1.2] }),
-      put('altar_stone', at(0.58, 180, { face: 'in' }), { heart: true, size: 1.4 }), // the Devil's table
-      put('prop:firepit', ring(0.8, 4, { arc: [60, 300] }), { size: 1.6 }),
-      put('prop:monolith', ring(1.4, 7, { jitter: 10 }), { size: [1.5, 2] }),
-      put('skull_pole', lane([1.1, 1.8], 4, 3.2), { size: 1.25 }),
-      put('prop:firepit', lane([1.25, 1.7], 2, 4.4), { size: 1.4 }),
-      put('prop:tree', scatter(8, [1.25, 1.7]), { size: [1.1, 1.5] }),
+      put('prop:monolith', ring(1.0, 13, { face: 'in' }), { size: [1.05, 1.3] }), // the thirteen, one for each of the coven
+      put('prop:firepit', ring(0.9, 13), { size: 1.5 }), // and the balefire at the foot of each, that leans toward whoever comes
+      put('altar_stone', at(0.58, 180, { face: 'in' }), { heart: true, size: 1.7, tint: [0.96, 0.95, 0.9], keep: 0.25 }), // the old white stone, where the book is laid
+      put('stump_old', ring(0.66, 9, { arc: [50, 310], face: 'in' }), { size: 1.0 }), // the witches' stools
+      put('skull_pole', ring(0.78, 7, { arc: [40, 320] }), { size: [0.9, 1.2] }),
+      put('prop:monolith', ring(1.4, 7, { jitter: 10 }), { size: [1.5, 2] }), // the stones beyond the ring, seen from the ford
+      put('prop:firepit', lane([1.15, 1.45], 3, 4.4), { size: 1.4 }),
+      put('skull_pole', lane([1.1, 1.5], 3, 3.2), { size: 1.25 }),
+      put('prop:tree', scatter(6, [1.2, 1.45]), { size: [1.1, 1.5] }),
     ],
     air: { kind: 'ember', color: [1, 0.5, 0.22], rate: 16 },
   },
