@@ -83,12 +83,26 @@ describe('cues', () => {
     expect(hit('hit', true)).toBeNull();
   });
 
-  it('the revolver’s bang is the investigator’s alone: a creature’s beam sounds as itself (round 20: a Mi-Go fired like a gun)', () => {
+  it('the revolver keeps its bang, while creature shots leave the stinger path silent', () => {
     const from = { x: 1, y: 1, z: 2 };
     const shot = (shooter: number) => cueFor(g, 'Shot', { shooter, from, to: { x: 5, y: 1, z: 2 }, target: null });
     expect(shot(player)).toEqual({ sound: 'shot', at: from });
-    expect(shot(dummy)).toEqual({ sound: 'beam', at: from });
-    expect(STINGERS.beam).not.toEqual(STINGERS.shot);
+    expect(shot(dummy)).toBeNull();
+  });
+
+  it('caster spells add no synthetic stingers alongside recorded attack audio', () => {
+    const at = { x: 1, y: 0, z: 2 };
+    expect(cueFor(g, 'Teleported', { entity: dummy, from: at, to: at })).toBeNull();
+    expect(cueFor(g, 'Summoned', { entity: dummy, by: dummy })).toBeNull();
+    expect(cueFor(g, 'GazeBurst', { sanity: 5, by: dummy })).toBeNull();
+    expect(cueFor(g, 'Darkened', { by: dummy })).toBeNull();
+    expect(cueFor(g, 'TimeSkipped', { entity: dummy })).toBeNull();
+    expect(cueFor(g, 'BodyStolen', { frames: 120 })).toBeNull();
+    expect(cueFor(g, 'Rewired', { entity: dummy })).toBeNull();
+    expect(cueFor(g, 'Marked', { at, by: dummy })).toBeNull();
+    expect(cueFor(g, 'Erupted', { at, radius: 2, by: dummy })).toBeNull();
+    expect(cueFor(g, 'Quaked', { at, by: dummy })).toBeNull();
+    expect(cueFor(g, 'Swept', { by: dummy })).toBeNull();
   });
 
   it('finding a sign tolls a bell and finding a place sounds a far gong, both low and dark (round 20: the chime was bright)', () => {

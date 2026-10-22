@@ -211,6 +211,7 @@ export function applySave(g: Game, s: SaveData): void {
   for (const k of UPGRADE_IDS) m.upgrades[k] = clampInt(s.upgrades[k] ?? 0, 0, UPGRADES[k].max);
   const was = s.levels ?? { vigour: ((s.upgrades.vigour ?? 0) * 20) / LEVELS.vigour.hp!, endurance: ((s.upgrades.endurance ?? 0) * 15) / LEVELS.endurance.stamina!, might: 0 }; // an older save's insight upgrades (20 health, 15 stamina a level) as the levels nearest them
   for (const k of LEVEL_IDS) g.player.levels[k] = clampInt(was[k] ?? 0, 0, LEVELS[k].max);
+  g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before active bosses refresh and the world fills
   applyLevels(g);
   g.player.arms = ['cane', ...new Set((s.arms ?? []).filter((id): id is WeaponId => isWeapon(id) && id !== 'cane'))];
   if (!equip(g, s.weapon ?? 'cane')) equip(g, 'cane');
@@ -232,7 +233,6 @@ export function applySave(g: Game, s: SaveData): void {
   g.player.rounds = clampInt(s.rounds ?? GUN.start, 0, GUN.carry);
   g.player.ammo = clampInt(s.ammo ?? GUN.chamber, 0, GUN.chamber); // a save from before the revolver's limits: a full cylinder
   g.player.difficulty = isDifficulty(s.difficulty) ? s.difficulty : DEFAULT_DIFFICULTY;
-  g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before the world fills: its foes are this journey's
   if (s.drop && s.drop.amount > 0) spawnDrop(g, Math.round(s.drop.amount), { x: s.drop.x, y: s.drop.y, z: s.drop.z });
   const body = c.body.get(g.player.id)!;
   openAround(g, s.at); // the passages they stood at, open as they left them, before the footing is judged

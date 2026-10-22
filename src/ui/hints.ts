@@ -1,8 +1,8 @@
 /**
  * Hints for a new investigator (playtest round 1): the first time each thing comes up — moving, where the story leads, a fight, a wound,
  * a failing mind, an Elder Sign, dropped Echoes, the map, a level within reach, a quest, a boss (and what each asks besides striking: blind
- * Azathoth, Cthulhu's ship, the Dunwich Horror's powder, Ghatanothoa's stone, Shub-Niggurath's roots, Yog-Sothoth's spheres, a colossus's
- * stoop; round 25), insight, a doorway only insight shows (and what spending the insight does to it), a relic, a flask of oil bought, a
+ * Azathoth, Cthulhu's ship, the Dunwich Horror's powder, Ghatanothoa's stone, Shub-Niggurath's roots, Yog-Sothoth's spheres;
+ * round 25), insight, a doorway only insight shows (and what spending the insight does to it), a relic, a flask of oil bought, a
  * grab, a hallucination — it is filed. Round 58: it is no longer written on the screen (the box at the lower left, with its
  * black ground, is gone, and with it the line that said where a journey taken up again had led): what has come up is kept in the save, and
  * read in the Journal's Field Guide (ui/fieldGuide.ts) by whoever wants it; a save from before took up what this browser had been told.
@@ -12,7 +12,6 @@ import { HINT_KEPT, hintGiven, takeUpBrowser, type HintId } from '../data/fieldG
 import type { Entity } from '../core/ecs';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
-import { zonesOf } from '../systems/hurt';
 import { canLevel, LEVEL_IDS } from '../systems/levels';
 import { watch } from './hintWatch';
 import { HINTS_KEY as KEY } from './loreLine';
@@ -24,10 +23,10 @@ const THEN: Readonly<Partial<Record<string, HintId>>> = { passage: 'passageCost'
 /** What a boss asks of the investigator besides striking (round 25: only Azathoth's was said before the fight). */
 const BOSS_HINTS: Readonly<Record<string, HintId>> = { azathoth: 'blind', cthulhu: 'ship', dunwich_horror: 'powder', ghatanothoa: 'cover', shub_niggurath: 'roots', yog_sothoth: 'spheres' };
 
-/** The hints that belong to a boss that has just been engaged: its own mechanic's, and the colossi's stooping. */
+/** The hint for the special mechanic of a boss that has just been engaged. */
 export function bossHints(g: Game, boss: Entity): HintId[] {
   const own = BOSS_HINTS[g.ecs.c.fight.get(boss)?.id ?? ''];
-  return [...(own ? [own] : []), ...(zonesOf(g, boss)?.some((z) => z.weak) ? (['stoop'] as const) : [])];
+  return own ? [own] : [];
 }
 
 export interface Hints {

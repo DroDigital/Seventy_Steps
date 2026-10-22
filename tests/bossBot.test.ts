@@ -1,7 +1,7 @@
 /**
  * A bot fights every scripted boss in the arena (playtest round 24): it closes to the body's edge,
  * strikes, dodges now and again, does what E offers, and cannot be killed. Nothing may throw or be
- * left not a number, and every boss it can reach falls within two and a half minutes. Two finds came
+ * left not a number, and every boss it can reach falls within four minutes with a legal build. Two finds came
  * out of this: a blow that killed a boss whose summons its fall had just cleared went on to reach
  * for them, and the colossi (Cthulhu, Ghatanothoa, Yog-Sothoth, Shub-Niggurath) could not be struck.
  */
@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { ENTITIES } from '../src/data/registry';
 import { botFight } from './botHelpers';
 
-const FRAMES = 60 * 150;
+const FRAMES = 60 * 240; // capped Might replaces the old impossible Might150; scaled Yog-Sothoth needs more than150s
 const BOSSES = Object.values(ENTITIES).filter((e) => e.bossScript).map((e) => e.id);
 /** What these ask of the investigator is more than the bot does: to take the Alert's helm, to keep behind a monolith from a gaze that turns flesh to stone, to cut down the roots. It wounds them all the same. */
 const ASKS_MORE = ['cthulhu', 'ghatanothoa', 'shub_niggurath'];

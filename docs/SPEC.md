@@ -90,6 +90,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - off-hand 1920s revolver: low damage, but a well-timed shot interrupts (Bloodborne-style)
 - Stamina: each action has a cost, regen is delayed after spending, and hitting zero causes a guard break.
 - Poise and stagger apply to both the player and enemies. Hits get 2–4 frames of hitstop.
+- Critical bonuses are modest: +15% against ordinary enemies, +10% against bosses. Backstabs require a heavy attack within the rear 40° of a small non-boss foe. Body parts have no weakspot bonuses; multipart hitboxes only follow the creature's shape.
 - Lock-on:
   - targets must be within 25 m with line of sight
   - candidates are scored by distance plus angle from the camera's forward direction
@@ -163,6 +164,8 @@ Place every other entity in the spawn tables of its best-fitting region.
 
 ### E. Bosses
 - `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?}`.
+- Boss health and damage scale with the investigator's total level: +0.75% base health and +0.3% base damage per purchased attribute level. This combines with NG+ and difficulty. Living bosses keep their health percentage when the player levels up; ordinary enemies and summoned adds keep their existing stats.
+- Arenas have no decorative neon floor symbols. Markings on arena props and functional combat or puzzle markings remain.
 - Shared attack library, about 20 parameterized attacks:
   - melee: sweep, slam, lunge, charge, grab, bite, tentacle_burst
   - ranged: projectile, projectile_fan, beam, spit, wind_push
@@ -173,9 +176,9 @@ Place every other entity in the spawn tables of its best-fitting region.
   - darkness, flood, camera_warp, hidden_platforms, decoys
   - time_skip, control_swap, petrify_buildup, light_dependency
 - Signature mechanics are the only bespoke boss logic allowed:
-  - **Cthulhu:** can't be killed. You ram it with the ship set-piece; it reforms, and R'lyeh sinks.
+  - **Cthulhu:** weapons can kill it. The optional ship set-piece rams it; it reforms, and R'lyeh sinks.
   - **Colour Out of Space:** heals by draining saturation from the world, and is rendered in a hue outside the palette.
-  - **Dunwich Horror:** invisible. Reveal it with the Powder of Ibn Ghazi, then finish it with the incantation.
+  - **Dunwich Horror:** invisible. Reveal it with the Powder of Ibn Ghazi. Weapons can kill it; the incantation is an optional finish in its last phase.
   - **Ghatanothoa:** its gaze builds up petrification, so you must break line of sight.
   - **Haunter of the Dark:** can't exist in light. It snuffs out light sources while you defend them.
   - **Great Race:** `control_swap`. Body-theft briefly hands the player's body to the AI.

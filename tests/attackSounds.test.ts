@@ -4,7 +4,6 @@ import { ATTACK_MIX, TIMBRE, arrive, burst, DARKNESS, depart, gather, GAZE_BURST
 import type { Sound } from '../src/data/sounds';
 import { AOE_MOTIFS } from '../src/render/aoeLook';
 import { createAttackAudio } from '../src/render/audio/attackAudio';
-import { lookOf } from '../src/render/attackLook';
 import { startMove } from '../src/systems/actions';
 import { bossGame, calm, engage } from './bossHelpers';
 import { steps } from './helpers';
@@ -54,91 +53,78 @@ describe('a horror\'s blows, heard (round 51)', () => {
   });
 });
 
-function listen(id: string) {
+function listen(id: string, loaded = true) {
   const b = bossGame(id, undefined, 8);
   engage(b);
   calm(b);
-  steps(b.g, 70); // the move the engagement began has ended
-  const plays: { key: string; at: V3 | null | undefined; gain: number; pitch?: number }[] = [];
-  const samples: string[] = [];
-  const audio = createAttackAudio(b.g, (key, _sound, o) => (plays.push({ key, at: o?.at, gain: o?.gain ?? 1, pitch: o?.pitch }), true), (set) => (samples.push(set), true));
+  steps(b.g, 70);
+  const samples: { set: string; at: V3 | null; gain: number }[] = [];
+  createAttackAudio(b.g, (set, at, o) => (samples.push({ set, at, gain: o?.gain ?? 1 }), loaded));
   const act = b.g.ecs.c.actor.get(b.boss)!;
-  const run = (frames: number): void => {
-    for (let i = 0; i < frames; i++) {
-      steps(b.g, 1);
-      audio.update(1 / 60);
-    }
-  };
-  plays.length = 0;
-  return { ...b, plays, samples, act, run, keys: (prefix: string) => plays.filter((p) => p.key.startsWith(prefix)) };
+  const run = (frames: number): void => { steps(b.g, frames); };
+  return { ...b, samples, act, run, heard: (set: string) => samples.filter((p) => p.set === set) };
 }
 const at: V3 = { x: 5, y: 1, z: 5 };
 
-describe('a horror\'s blows are heard where they happen (round 51)', () => {
-  it('a volley is one sound leaving and each landing is heard in the horror\'s element; a bolt that gave out is not', () => {
-    const w = listen('keziah_mason'); // fire
+describe('recorded attack cues without caster blips', () => {
+  it('a volley uses one recorded release and each real landing uses its element recording', () => {
+    const w = listen('keziah_mason');
     const emit = (n: number): void => { for (let i = 0; i < n; i++) w.g.events.emit('BoltLoosed', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, fire: false, conjured: false }); };
     emit(5);
-    expect(w.keys('atk:loose:')).toHaveLength(1);
-    expect(w.keys('atk:loose:')[0]!.key).toBe('atk:loose:flame');
+    expect(w.heard('atkFwoosh')).toHaveLength(1);
+    expect(w.heard('atkFwoosh')[0]!.at).toEqual(at);
     steps(w.g, 10);
     emit(1);
-    expect(w.keys('atk:loose:')).toHaveLength(2);
-    w.g.events.emit('BoltLoosed', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, fire: true, conjured: false }); // a flask: its own sound is elsewhere
-    expect(w.keys('atk:loose:')).toHaveLength(2);
+    expect(w.heard('atkFwoosh')).toHaveLength(2);
+    w.g.events.emit('BoltLoosed', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, fire: true, conjured: false });
+    expect(w.heard('atkFwoosh')).toHaveLength(2);
     const land = (on: 'body' | 'ground' | 'wall' | 'spent') => w.g.events.emit('BoltLanded', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, on, radius: 0.3, lob: false, fire: false, conjured: false });
     land('spent');
-    expect(w.keys('atk:land:')).toHaveLength(0);
+    expect(w.heard('atkFire')).toHaveLength(0);
     land('ground');
     land('body');
-    expect(w.keys('atk:land:').map((p) => p.key)).toEqual(['atk:land:flame', 'atk:land:flame']);
-    expect(w.keys('atk:land:')[1]!.gain).toBeLessThan(w.keys('atk:land:')[0]!.gain); // struck flesh: the wound is the loud part
+    expect(w.heard('atkFire')).toHaveLength(2);
+    expect(w.heard('atkFire')[1]!.gain).toBeLessThan(w.heard('atkFire')[0]!.gain);
   });
 
-  it('a burst is placed where it bursts and boomed; a slam of a horror is heard, an ordinary foe\'s is not', () => {
-    const w = listen('cthulhu'); // the sea
+  it('eruption and quake impacts stay recorded, and ordinary swings add no synthesized layer', () => {
+    const w = listen('cthulhu');
     w.g.events.emit('Erupted', { at, radius: 2, by: w.boss });
-    expect(w.keys('atk:burst:tide')).toHaveLength(1);
-    expect(w.keys('atk:burst:tide')[0]!.at).toEqual(at);
-    expect(w.keys('atk:burst:tide')[0]!.pitch).toBeCloseTo(lookOf('cthulhu').pitch, 5); // each horror's own pitch
-    expect(w.samples).toEqual(['boom']);
+    expect(w.samples.map((s) => s.set)).toEqual(['atkWater', 'boom']);
+    expect(w.heard('atkWater')[0]!.at).toEqual(at);
+    w.g.events.emit('Quaked', { at, by: w.boss });
+    expect(w.heard('atkWater')).toHaveLength(2);
+    const before = w.samples.length;
     w.g.events.emit('Swung', { entity: w.boss, at, yaw: 0 });
-    expect(w.plays.length).toBeGreaterThanOrEqual(2);
-    const [other] = [...w.g.ecs.c.combatant.keys()].filter((id) => id !== w.boss && id !== w.g.player.id && !w.g.ecs.c.fight.has(id));
-    const before = w.plays.length;
-    w.g.events.emit('Swung', { entity: other!, at, yaw: 0 });
-    expect(w.plays.length).toBe(before);
+    expect(w.samples).toHaveLength(before);
   });
 
-  it('a summoning, an arrival, a phase change, a gaze and the dark each sound; a teleport is two sounds in two places', () => {
+  it('teleports, summons, gaze, darkness and phase changes add no procedural attack cues', () => {
     const w = listen('keziah_mason');
-    const there: V3 = { x: 20, y: 0, z: 20 };
-    w.g.events.emit('Teleported', { entity: w.boss, from: at, to: there });
-    expect(w.keys('atk:depart:')[0]!.at).toEqual(at);
-    expect(w.keys('atk:arrive:')[0]!.at).toEqual(there);
+    w.g.events.emit('Teleported', { entity: w.boss, from: at, to: { x: 20, y: 0, z: 20 } });
+    w.g.events.emit('Summoned', { entity: w.boss, by: w.boss });
     w.g.events.emit('BossPhase', { entity: w.boss, phase: 1 });
-    w.g.events.emit('BossPhase', { entity: w.boss, phase: 0 });
-    expect(w.keys('atk:phase:')).toHaveLength(1);
     w.g.events.emit('GazeBurst', { sanity: 5, by: w.boss });
     w.g.events.emit('Darkened', { by: w.boss });
-    expect(w.keys('atk:gaze')).toHaveLength(1);
-    expect(w.keys('atk:dark')).toHaveLength(1);
-    expect(w.keys('atk:gaze')[0]!.at).toBeUndefined(); // in the head
+    expect(w.samples).toEqual([]);
   });
 
-  it('the gathering before a caster\'s blow is heard once, as it begins; a beam hums while it sweeps and not after', () => {
-    const w = listen('edward_hutchinson'); // frost
+  it('caster wind-ups and sustained beams stay free of repeated tones', () => {
+    const w = listen('edward_hutchinson');
     startMove(w.act, 'projectile');
-    w.run(120);
-    expect(w.keys('atk:gather:frost')).toHaveLength(1);
-    w.plays.length = 0;
+    w.run(15);
+    expect(w.samples).toEqual([]);
+    w.run(105);
+    expect(w.heard('atkThrow')).toHaveLength(1);
+    w.samples.length = 0;
     startMove(w.act, 'sweep_beam');
     w.run(150);
-    const breaths = w.keys('atk:hum:beam').length;
-    expect(breaths).toBeGreaterThanOrEqual(2);
-    expect(breaths).toBeLessThanOrEqual(8);
-    w.plays.length = 0;
-    w.run(120);
-    expect(w.keys('atk:hum:')).toHaveLength(0);
+    expect(w.samples).toEqual([]);
+  });
+
+  it('unloaded recordings do not trigger extra fallback cues', () => {
+    const w = listen('keziah_mason', false);
+    w.g.events.emit('BoltLoosed', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, fire: false, conjured: false });
+    expect(w.samples.map((s) => s.set)).toEqual(['atkFwoosh']);
   });
 });

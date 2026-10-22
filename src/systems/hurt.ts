@@ -1,10 +1,8 @@
 /**
- * Where a colossus may be struck (playtest round 24; data/assemblyShape.ts): its legs take a blow
- * whole, its body soaks it, and its head, the weak spot, takes it several times over. On its feet the
- * head is far above a blade (the revolver aims for it); after each blow of its own the colossus
- * recovers stooped, and the head is down within reach for a moment; a staggered or parried one is
- * stooped too. A body of spheres is struck where its spheres are. Bodies that are not colossi have
- * one capsule (combat.ts). Pure: no Three.js.
+ * Where a colossus may be struck (data/assemblyShape.ts): its hitboxes follow the legs, torso and
+ * head, including its stooped recovery pose. Every part takes the same damage. A body of spheres
+ * is struck where its spheres are. Bodies that are not colossi have one capsule (combat.ts).
+ * Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';
@@ -14,7 +12,7 @@ import { ZONES } from '../data/bossTuning';
 import { moveDef } from './actions';
 import type { Game } from './components';
 
-/** What is struck: its gap to a blade or a bullet's line, and what the place takes of the blow. */
+/** What is struck: its gap to a blade or bullet's line. Every part takes a normal blow. */
 export interface ZoneHit {
   gap2: number;
   damage: number;
@@ -59,16 +57,14 @@ function gapTo(z: ZoneShape, at: { x: number; z: number }, y0: number, p: V3): n
 const STEP = 0.4; // metres between the points a line is tried at
 
 /**
- * The best place a line from `a` to `b` touches within `reach` (the blow's own radius): the one that
- * takes most of it; else the nearest, which is out of reach. Null for a body with no zones.
+ * The nearest part to a line from `a` to `b`. Null for a body with no zones.
  */
-export function zoneGap(g: Game, e: Entity, a: V3, b: V3, reach: number): ZoneHit | null {
+export function zoneGap(g: Game, e: Entity, a: V3, b: V3, _reach: number): ZoneHit | null {
   const zones = zonesOf(g, e);
   const tr = g.ecs.c.transform.get(e);
   if (!zones || !tr) return null;
   const n = Math.min(160, Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y, b.z - a.z) / STEP)));
-  let touch: { gap: number; damage: number } | null = null; // the zone that takes most of the blow of those it reaches
-  let nearest = { gap: Infinity, damage: 0 }; // else the nearest, out of reach
+  let nearest = Infinity;
   for (const z of zones) {
     const at = place(z, tr.pos, tr.yaw);
     let gap = Infinity;
@@ -76,18 +72,8 @@ export function zoneGap(g: Game, e: Entity, a: V3, b: V3, reach: number): ZoneHi
       const t = i / n;
       gap = Math.min(gap, gapTo(z, at, tr.pos.y, { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t }));
     }
-    if (gap < nearest.gap) nearest = { gap, damage: z.damage };
-    if (gap <= reach && (!touch || z.damage > touch.damage)) touch = { gap, damage: z.damage };
+    nearest = Math.min(nearest, gap);
+    if (nearest === 0) break;
   }
-  const hit = touch ?? nearest;
-  return { gap2: hit.gap * hit.gap, damage: hit.damage };
-}
-
-/** Where a shot aims at a colossus: its head, the weak spot; null when it has none to aim for. */
-export function weakSpot(g: Game, e: Entity): V3 | null {
-  const tr = g.ecs.c.transform.get(e);
-  const z = zonesOf(g, e)?.find((x) => x.weak);
-  if (!tr || !z || (z.y0 + z.y1) / 2 > ZONES.aimReach) return null;
-  const at = place(z, tr.pos, tr.yaw);
-  return { x: at.x, y: tr.pos.y + (z.y0 + z.y1) / 2, z: at.z };
+  return { gap2: nearest * nearest, damage: 1 };
 }
