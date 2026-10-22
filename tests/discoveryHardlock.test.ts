@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { ARENA_WAYS } from '../src/data/arenaWaysAll';
 import { DISCOVERIES } from '../src/data/discoveriesAll';
+import { FOUND } from '../src/data/discoveries';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
 import { kindsOf } from '../src/systems/weather';
@@ -9,7 +10,7 @@ import { stepPlace } from '../src/world/discoveryPlan';
 import { worldLayout } from '../src/world/placements';
 import { goTo, run } from './worldHelpers';
 
-/** Round 66: a discovery's gate must be openable. Each vigil's sky comes in its region, each rite has a way that holds one, and each place stands clear of solids. */
+/** Round 66: a discovery's gate must be openable. Each vigil's sky comes in its region, each rite has a way that holds one, and each vigil or altar can be stood near: a point within its reach is clear of solids. */
 
 const inside = (c: Collider, x: number, z: number): boolean => {
   if (c.kind === 'box') return x > c.min.x && x < c.max.x && z > c.min.z && z < c.max.z;
@@ -33,7 +34,7 @@ it('every vigil sky comes in its house\'s region, and every rite step has a rite
   expect(bad).toEqual([]);
 });
 
-it('every vigil and altar stands clear of solids', () => {
+it('every vigil and altar can be stood near: some point within its reach is clear of solids', () => {
   const g: Game = createWorldGame();
   const bad: string[] = [];
   for (const a of worldLayout().arenas) {
@@ -45,7 +46,13 @@ it('every vigil and altar stands clear of solids', () => {
       if (s.kind !== 'vigil' && s.kind !== 'offer') return;
       const p = stepPlace(a, s);
       if (!p) return void bad.push(`${boss} ${i}: no place`);
-      if (g.world.colliders.some((c) => inside(c, p.x, p.z))) bad.push(`${boss} ${i}: inside a solid`);
+      const reach = s.kind === 'vigil' ? FOUND.vigil : FOUND.altar;
+      const near = [...(g.world.near?.(p.x - reach, p.z - reach, p.x + reach, p.z + reach) ?? []), ...g.world.colliders].filter((c) => !g.world.off.has(c));
+      const stood = Array.from({ length: 16 }, (_, k) => {
+        const t = (k / 16) * Math.PI * 2;
+        return [p.x + Math.cos(t) * reach * 0.7, p.z + Math.sin(t) * reach * 0.7] as const;
+      }).some(([x, z]) => !near.some((c) => inside(c, x, z)));
+      if (!stood) bad.push(`${boss} ${i}: no clear standing point within reach`);
     });
   }
   expect(bad).toEqual([]);
