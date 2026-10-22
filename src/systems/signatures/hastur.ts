@@ -1,7 +1,7 @@
 /**
  * Hastur (spec §3E): its name flickers onto the HUD as sanity falls in its realm, Yuggoth; each band
  * lost there is one appearance. The third calls it: it rises before the investigator, and from then
- * on its arena holds it too (population.ts spawns a called boss). Round 66: where it rose is no arena of its own, and the one it
+ * on its arena holds it too (population.ts spawns a called boss). Round 68: where it rose is no arena of its own, and the one it
  * killed (or who got away) finds it back in its arena, the call spent: `reset`. Pure: no Three.js.
  */
 

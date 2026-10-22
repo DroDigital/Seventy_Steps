@@ -5,7 +5,7 @@
 
 import { BONE, BRASS, DIM, TAU, VERDIGRIS, PIN_TIP, token } from './mapIconKit';
 
-/** A person: a bust on a small medallion (round 66: bare, it was lost on pale ground), bone once met, dim until then. */
+/** A person: a bust on a small medallion (round 68: bare, it was lost on pale ground), bone once met, dim until then. */
 export function person(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, met: boolean): void {
   token(ctx, x, y, r, met ? BONE : DIM);
   const [head, shoulder] = [y - r * 0.2, y + r * 0.2];

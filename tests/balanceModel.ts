@@ -19,7 +19,7 @@ import { worldLayout } from '../src/world/placements';
 import { regionPlan } from '../src/world/regionPlan';
 
 /**
- * Round 66: the Reagent a person carries at a boss. The world holds thirteen Silver Vials (ten in the lairs and dungeons, two from quests,
+ * Round 68: the Reagent a person carries at a boss. The world holds thirteen Silver Vials (ten in the lairs and dungeons, two from quests,
  * one for sale) among its forty-seven horrors, found as the bosses are, and the kit holds `REAGENT.maxDoses` of them at the most. Until
  * then every fight was weighed against the four doses of the start, which let a late god cost a bot "one life" when a person carried
  * three times the cure.

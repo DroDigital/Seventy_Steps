@@ -35,7 +35,7 @@ export interface Signature {
   action?(g: Game, e: Entity, f: Fight): FightAction | null;
   extra?(g: Game, e: Entity, f: Fight): AttackChoice[]; // attacks beyond its phase's own
   status?(g: Game, e: Entity, f: Fight): string | null; // a line under its health bar
-  note?(g: Game, e: Entity, f: Fight, phase: number): string | null; // a line said on the screen as a phase begins: what the fight now asks (round 66)
+  note?(g: Game, e: Entity, f: Fight, phase: number): string | null; // a line said on the screen as a phase begins: what the fight now asks (round 68)
 }
 
 export const SIGNATURES: Readonly<Record<string, Signature>> = {

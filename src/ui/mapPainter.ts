@@ -18,7 +18,7 @@ import { slip, SLIDE } from './mapWrong';
 import { screenX, screenY, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 
-/** The radius of a mark, pixels (the full map's grows with the UI). Round 66: 7 and 5.2 were small marks on a large map; the beacons draw at the same size. */
+/** The radius of a mark, pixels (the full map's grows with the UI). Round 68: 7 and 5.2 were small marks on a large map; the beacons draw at the same size. */
 export const UNIT = { full: 10, mini: 7.4 } as const;
 
 export interface MapPainter {

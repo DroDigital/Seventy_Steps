@@ -120,7 +120,7 @@ describe('the great old ones (spec §3E)', () => {
     expect(distXZ(g.ecs.c.transform.get(e)!.pos, pp)).toBeCloseTo(HASTUR.rise, 0);
   });
 
-  it('Hastur, called to the ruins, is back in his arena when the investigator falls to him (round 66)', () => {
+  it('Hastur, called to the ruins, is back in his arena when the investigator falls to him (round 68)', () => {
     const g = createWorldGame();
     const s = hasturSpawn();
     setSanity(g, 100);

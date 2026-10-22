@@ -1,5 +1,5 @@
 /**
- * A cutscene's lens inside the fog (round 66: "address the initial display of only the boss fog"). The investigator is walked to a step
+ * A cutscene's lens inside the fog (round 68: "address the initial display of only the boss fog"). The investigator is walked to a step
  * inside the wall before a horror and the horror wakes there; a shot that stands behind them, or a long way off its horror, stood on
  * the far side of the wall, and the opaque fog filled the picture for the first seconds. The lens is kept inside every wall the scene is
  * played in: turned about the investigator to their side, where the shot is theirs, and otherwise drawn in along its line to the head

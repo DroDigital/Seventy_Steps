@@ -1,5 +1,5 @@
 /**
- * Whether a wall stands between a blow and the body it would strike (round 66: the investigator cannot cut through a wall, nor can a
+ * Whether a wall stands between a blow and the body it would strike (round 68: the investigator cannot cut through a wall, nor can a
  * foe; asked for). A line is drawn at the height of the blow from the one who swings to the near side of the target's body, and a
  * collider that crosses it, a pillar, a closed door or a house's wall, stops the blow; a low fence or a sill under the line does not.
  * A horror's own blows are not tested: its sweeps, quakes and bursts are the "boss attacks" that pass walls (and the arena it fights in is

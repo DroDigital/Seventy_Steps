@@ -40,7 +40,7 @@ export interface Omen {
   pitch?: number;
 }
 
-/** A hazard of the way: a thing of the horror's own kind that hurts those who come the careless way. None of the authored ways has one (round 66: "remove all traps from all paths that lead to bosses"); systems/ways.ts still plays them. */
+/** A hazard of the way: a thing of the horror's own kind that hurts those who come the careless way. None of the authored ways has one (round 68: "remove all traps from all paths that lead to bosses"); systems/ways.ts still plays them. */
 export type Hazard =
   | { kind: 'ward'; look: Look; plates: readonly Spot[]; trigger?: number; burst?: number; damage?: number; warn?: number; cool?: number; pool?: number } // a plate underfoot that wakes, and bursts a moment after: a step aside or a roll clears it (`pool`: seconds of what it leaves)
   | { kind: 'field'; look: Look; from: number; to: number; rows: number; cols: number; key: number; at: Spot; damage?: number } // a field of plates of which one in each row is safe: the one that bears the rune on the tablet (`key`, 0..3) set at `at`

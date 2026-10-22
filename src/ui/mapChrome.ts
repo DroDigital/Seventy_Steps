@@ -25,7 +25,7 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'marker', words: 'Your marker', hint: 'right-click, F or Y sets it; the minimap points to it' },
 ];
 
-const ICON = 32; // CSS pixels a key's figure is drawn in (at the UI's scale; round 66: 26, for marks that were smaller)
+const ICON = 32; // CSS pixels a key's figure is drawn in (at the UI's scale; round 68: 26, for marks that were smaller)
 
 /** The key, in the panel's lower left; the returned element is shown or hidden as a whole. */
 export function buildKey(panel: HTMLElement): HTMLElement {

@@ -1,7 +1,7 @@
 /**
  * A thunderstorm's bolts on the ground, heard (round 52): the ring's crackle where it stands as it fills, and the crack where the bolt falls:
  * since round 59 a recording of a close strike (`strike`: four CC0 takes, the crack, the air tearing and the crash), with the low boom under
- * it; round 66 added the snap of the charge (`zap`) over it and made the ring a recorded hum (`charge`); the recipes of round 52, which
+ * it; round 68 added the snap of the charge (`zap`) over it and made the ring a recorded hum (`charge`); the recipes of round 52, which
  * were heard as blips, only until the recordings have loaded. (The thunder after it is the sky's own:
  * render/lightning.ts, struck by the same bolt.) Not rate-limited: they are rare.
  */

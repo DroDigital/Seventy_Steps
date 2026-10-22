@@ -1,6 +1,6 @@
 /**
  * The ways to the waking world's open arenas (data/arenaWays.ts): each a walk toward its horror told in its own things: what is set
- * along it, what is said on it and what is asked of the one who would pass. None bites (round 66, asked: "remove all traps from all paths
+ * along it, what is said on it and what is asked of the one who would pass. None bites (round 68, asked: "remove all traps from all paths
  * that lead to bosses": the hazards these ways had are gone; systems/ways.ts still plays one if a way is given it). Distances are metres from
  * the fog back toward the road (a way is 120 m at the least); sides are to the left walking in. Data only.
  */

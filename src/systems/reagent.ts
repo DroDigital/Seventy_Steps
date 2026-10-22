@@ -29,7 +29,7 @@ export function registerReagent(g: Game): void {
   });
 }
 
-/** A Silver Vial: one more dose held, and filled. Past the most, it is sold to the next who will have it: Echoes (round 66). */
+/** A Silver Vial: one more dose held, and filled. Past the most, it is sold to the next who will have it: Echoes (round 68). */
 export function addVial(g: Game): boolean {
   if (g.player.reagentMax >= REAGENT.maxDoses) {
     g.player.echoes += REAGENT.surplus;

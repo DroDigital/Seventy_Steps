@@ -70,7 +70,7 @@ export type Scale = 'person' | 'large' | 'giant' | 'colossal';
 /** The size class of a horror by its height (metres). */
 export const scaleOf = (height: number): Scale => (height < 3.2 ? 'person' : height < 8 ? 'large' : height < 18 ? 'giant' : 'colossal');
 
-/** From the investigator's flank, a step inside the fog, the lens low and lifting: the horror rising in the picture as it rises from the ground (round 66: it stood behind them, outside the wall, and showed the fog). */
+/** From the investigator's flank, a step inside the fog, the lens low and lifting: the horror rising in the picture as it rises from the ground (round 68: it stood behind them, outside the wall, and showed the fog). */
 const flank = (dur: number, yaw: readonly [number, number], dist: readonly [number, number], up: readonly [number, number], look: readonly [number, number], fov: readonly [number, number]): Shot =>
   shot({ dur, on: 'player', aim: 'other', yaw, dist, up, look, fov, sway: 0.25 });
 
@@ -83,7 +83,7 @@ const beyond = (dur: number, yaw: readonly [number, number], dist: readonly [num
   shot({ dur, on: 'target', aim: 'other', yaw, dist, up, look: to(0.5, 0.6), fov, body: true, sway: 0.3 });
 
 /**
- * How each size of horror arrives (round 66: the three shots of a small one are a stand off its line to the investigator, closing in on
+ * How each size of horror arrives (round 68: the three shots of a small one are a stand off its line to the investigator, closing in on
  * the face, and the view from their side; a giant's and a colossus's are the reveal from the investigator's flank, a push in on the face,
  * and the view from beyond its shoulder, which shows what it is against what stands before it). Distances of a body's height where `body`.
  */

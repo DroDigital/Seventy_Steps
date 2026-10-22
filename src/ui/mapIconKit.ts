@@ -36,7 +36,7 @@ export const reach = (kind: MarkKind, r: number): number => (kind === 'place' ? 
 export const PIN_TIP = 1.55;
 
 /**
- * The medallion a figure is set on (round 66: "enhance the visual design of all map icons"): a dark disc lit a little from above, ringed in its
+ * The medallion a figure is set on (round 68: "enhance the visual design of all map icons"): a dark disc lit a little from above, ringed in its
  * colour with a fainter ring just inside it, and a black edge about it for ground of any light. `glow` lights the ring itself.
  */
 export function token(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, ring: string, glow = ''): void {

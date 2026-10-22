@@ -77,7 +77,7 @@ export function talk(g: Game, id: string): void {
   talked(g, id);
   if (topic.starts) startQuest(g, topic.starts);
   g.overworld?.met.add(id);
-  g.player.listening = npcEntity(g, id) ?? null; // turned to them, the camera framing them (round 12) until the hand turns it (round 66)
+  g.player.listening = npcEntity(g, id) ?? null; // turned to them, the camera framing them (round 12) until the hand turns it (round 68)
   g.player.glance = false;
   const rumor = rumorFor(g, id); // unrecorded world news is a written note after the voiced conversation
   g.events.emit('Talked', { npc: id, name: n.name, title: n.title, lines: topic.lines, ...(rumor && { rumor }), ...(n.shop && { shop: n.shop }) });

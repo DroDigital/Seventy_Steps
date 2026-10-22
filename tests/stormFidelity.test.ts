@@ -94,7 +94,7 @@ describe('thunder is made to its distance (round 52)', () => {
     expect(STORM_MIX.zap).toBeGreaterThan(0);
   });
 
-  it('makes the ring itself until its recording has loaded (round 66)', () => {
+  it('makes the ring itself until its recording has loaded (round 68)', () => {
     const g = createGame();
     const heardAt: { key: string; at: V3 | null | undefined }[] = [];
     createStormAudio(g, (key, _s, o) => (heardAt.push({ key, at: o?.at }), true), (set) => set !== 'charge');

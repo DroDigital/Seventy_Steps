@@ -115,7 +115,7 @@ describe('recorded attack cues without caster blips', () => {
     w.run(15);
     expect(w.samples).toEqual([]);
     w.run(105);
-    expect(w.heard('atkFrostCast')).toHaveLength(1); // the frost caster's own throw (round 66)
+    expect(w.heard('atkFrostCast')).toHaveLength(1); // the frost caster's own throw (round 68)
     w.samples.length = 0;
     startMove(w.act, 'sweep_beam');
     w.run(150);

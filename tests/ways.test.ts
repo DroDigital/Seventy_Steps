@@ -22,7 +22,7 @@ const enter = (g: Game, boss: string): WayRun => {
   run(g, 4);
   return wayRuns(g).find((r) => r.plan.boss === boss)!;
 };
-/** `enter`, with the hazards the boss's way had until round 66 laid in its court (no authored way has one now; the machinery that plays them is held to its rules all the same). */
+/** `enter`, with the hazards the boss's way had until round 68 laid in its court (no authored way has one now; the machinery that plays them is held to its rules all the same). */
 const trapped = (g: Game, boss: string): WayRun => layTraps(g, enter(g, boss));
 const at = (r: WayRun, d: number, side = 0): { x: number; z: number } => pointAt(r.plan, d, side);
 
@@ -271,7 +271,7 @@ describe('a rite', () => {
     expect(warned.length).toBe(1);
     const hp = g.ecs.c.health.get(g.player.id)!.hp;
     run(g, WAYS.fail.warn + 6);
-    expect(g.ecs.c.health.get(g.player.id)!.hp, 'the flare is a sign, and does no harm (round 66)').toBe(hp);
+    expect(g.ecs.c.health.get(g.player.id)!.hp, 'the flare is a sign, and does no harm (round 68)').toBe(hp);
     expect(r.lights.every((l) => !l.lit)).toBe(true);
     expect(r.progress).toBe(0);
     expect(g.overworld!.told.has('rite:colour_out_of_space')).toBe(false);

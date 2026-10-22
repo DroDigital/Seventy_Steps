@@ -45,7 +45,7 @@ export function secret(ctx: CanvasRenderingContext2D, x: number, y: number, r: n
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.shadowColor = '#9a5ad0';
-    ctx.shadowBlur = r * 0.8; // a faint violet breath about it, so it is found among the rest (round 66)
+    ctx.shadowBlur = r * 0.8; // a faint violet breath about it, so it is found among the rest (round 68)
     ctx.fillStyle = '#b7b09c';
     ctx.fillText('?', x, y + r * 0.06);
     ctx.shadowBlur = 0;

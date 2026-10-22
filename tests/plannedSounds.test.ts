@@ -48,7 +48,7 @@ describe('the recordings the game is ready for (data/plannedSounds.ts; round 40)
     expect(Object.keys(RECORDED_FOR).length).toBe(PLANNED.reduce((n, p) => n + p.for.length, 0)); // (no recipe has two recordings)
   });
 
-  it('the frost, star and eye casters each throw and strike with a recording of their own (round 66: they shared the generic throw and the arcane impact)', () => {
+  it('the frost, star and eye casters each throw and strike with a recording of their own (round 68: they shared the generic throw and the arcane impact)', () => {
     const own = (motif: string): string[] => ['loose', 'land', 'burst'].map((w) => RECORDED_FOR[`atk:${w}:${motif}`]!);
     expect(own('frost')[0]).toBe('atkFrostCast');
     expect(own('star')).toEqual(['atkStarCast', 'atkStarHit', 'atkStarHit']);

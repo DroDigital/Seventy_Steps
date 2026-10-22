@@ -114,7 +114,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     return { x: lerp(tr.prev.x, tr.pos.x), y: lerp(tr.prev.y, tr.pos.y) + lift, z: lerp(tr.prev.z, tr.pos.z), yaw: tr.yaw, height, grain };
   };
 
-  const inFog = fogKeeper(); // the lens stays inside the fog the horror's wall made, where the scene is played in one (round 66)
+  const inFog = fogKeeper(); // the lens stays inside the fog the horror's wall made, where the scene is played in one (round 68)
   let pulled = 1; // how much of its line to the head the lens keeps: it is pulled in at once, but lets out slowly (a pop at a wall's edge is a step in the picture)
   let pulledAt = 0;
 

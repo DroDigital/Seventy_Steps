@@ -33,7 +33,7 @@ describe('the recorded sounds (data/samples.ts, public/audio)', () => {
     for (const f of [...files('sfx'), ...files('amb')]) expect(rows.get(f) ?? (suno.has(f) && /Pro|Premier/.test(suno.get(f)!) ? 'Suno' : undefined), f).toMatch(/^(CC0|Suno)$/);
   });
 
-  it('stays small: under 11 MB in all (round 66: 10, and the casters\' and the storm\'s takes came in), no one-shot over 200 KB', () => {
+  it('stays small: under 11 MB in all (round 68: 10, and the casters\' and the storm\'s takes came in), no one-shot over 200 KB', () => {
     const size = (f: string): number => statSync(`${AUDIO}/${f}.mp3`).size;
     const all = [...files('sfx'), ...files('amb')];
     expect(all.reduce((n, f) => n + size(f), 0)).toBeLessThan(11 * 2 ** 20);

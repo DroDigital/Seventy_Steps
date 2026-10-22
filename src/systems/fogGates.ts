@@ -88,11 +88,11 @@ export function walkAlong(u: number, seconds: number): number {
   return peak * (u - a / 2);
 }
 
-const LENS_KEEP = 0.8; // metres a cutscene's lens keeps inside a wall (round 66)
+const LENS_KEEP = 0.8; // metres a cutscene's lens keeps inside a wall (round 68)
 const LENS_BAND = 4; // metres past a doorway's jambs that its wall is still the lens's to respect
 
 /**
- * The walls the one at `at` stands inside (past, in the ring or the hall): where a cutscene's lens must stay (round 66: a big horror's
+ * The walls the one at `at` stands inside (past, in the ring or the hall): where a cutscene's lens must stay (round 68: a big horror's
  * arrival began with the lens behind the investigator, who stands a step inside the fog, or half a body's height from the horror, which
  * is outside the ring: the first seconds showed the wall of fog from within it and nothing else).
  */

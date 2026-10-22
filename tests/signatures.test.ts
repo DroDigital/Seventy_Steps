@@ -97,7 +97,7 @@ describe('signature mechanics (spec §3E)', () => {
     expect(g.ecs.c.unseen.has(boss)).toBe(false); // seen as it dies
   });
 
-  it('the incantation is not broken off by a blow: nothing lands on the chanter while it lasts (round 66)', () => {
+  it('the incantation is not broken off by a blow: nothing lands on the chanter while it lasts (round 68)', () => {
     const b = bossGame('dunwich_horror', undefined, 12);
     const { g, boss } = b;
     engage(b);
@@ -117,7 +117,7 @@ describe('signature mechanics (spec §3E)', () => {
     expect(deaths).toEqual([expect.objectContaining({ entity: boss, killer: g.player.id })]);
   });
 
-  it('the screen says what the Dunwich Horror and Cthulhu ask of the investigator (round 66)', () => {
+  it('the screen says what the Dunwich Horror and Cthulhu ask of the investigator (round 68)', () => {
     const d = bossGame('dunwich_horror', undefined, 12);
     engage(d);
     calm(d);
@@ -139,7 +139,7 @@ describe('signature mechanics (spec §3E)', () => {
     expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe("IT REFORMS · R'LYEH SINKS");
   });
 
-  it('the screen says that only lamplight wounds the Haunter of the Dark (round 66)', () => {
+  it('the screen says that only lamplight wounds the Haunter of the Dark (round 68)', () => {
     const b = bossGame('haunter_of_the_dark');
     const { g, boss, fight } = b;
     engage(b);

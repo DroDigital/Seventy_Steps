@@ -77,7 +77,7 @@ describe('the ways to the open arenas', () => {
     }
   });
 
-  it('lays no trap in any court: nothing in a way hurts the one who walks it, not even a wrong light (round 66)', () => {
+  it('lays no trap in any court: nothing in a way hurts the one who walks it, not even a wrong light (round 68)', () => {
     for (const p of plans) expect(p.way.hazards ?? [], p.boss).toEqual([]);
     expect(WAYS.fail.damage).toBe(0);
   });

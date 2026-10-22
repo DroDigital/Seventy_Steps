@@ -45,7 +45,7 @@ const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } 
  * and one and a half times it after level scaling. Seconds are the bot's, steady and close in: a person's are about three times as long.
  */
 /**
- * Round 66, "restore appropriate difficulty across all levels, even on normal": the bands are raised with the numbers they hold, and a god
+ * Round 68, "restore appropriate difficulty across all levels, even on normal": the bands are raised with the numbers they hold, and a god
  * is told by name, not by its health (the health is no longer a line between the great fights and the rest). A named horror is over in 14 to 50
  * seconds (a person's: 40 to 150) and costs a bot between a twentieth of a life and one and a fifth; a great fight takes 35 to 100 and
  * costs between a third of a life and one and a third, climbing with the rank (`RISE`).
@@ -88,7 +88,7 @@ nothing in its way.
 `;
 const NOTES = `
 Bounds held by the test: each boss finishes within ${BOUNDS_TEXT}, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, ${BOUNDS.godLives}), and the bot does not die.
-Each tier has its band (round 61, raised in round 66): a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs ${BANDS.named.lives.join(' to ')} lives; one of the ${GREAT.size} great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives.
+Each tier has its band (round 61, raised in round 68): a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs ${BANDS.named.lives.join(' to ')} lives; one of the ${GREAT.size} great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives.
 `;
 
 const OPENING_TEXT = `

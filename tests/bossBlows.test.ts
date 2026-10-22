@@ -10,7 +10,7 @@ import { ENTITIES } from '../src/data/registry';
 import { toCombatant } from '../src/systems/creatures';
 import { standings } from './balanceModel';
 
-const MOST = 0.3; // (round 66: 28%, before the foes were made to hit as a soulslike's do; round 61: a third, before the four that stood at 30% were eased: stacked with a mind Unmoored (x1.35) and a relic that costs (x1.08), 28% is 41%, and 30% is 44%: still never two blows to a death)
+const MOST = 0.3; // (round 68: 28%, before the foes were made to hit as a soulslike's do; round 61: a third, before the four that stood at 30% were eased: stacked with a mind Unmoored (x1.35) and a relic that costs (x1.08), 28% is 41%, and 30% is 44%: still never two blows to a death)
 const LEAST = 0.12; // (round 61, "none excessively easy": a blow that does not matter is a boss that is only a wall of health; the Haunter and Azathoth are not hurt or measured like the rest)
 
 const heaviest = (id: string): { move: string; damage: number } => {

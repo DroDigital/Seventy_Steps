@@ -1,6 +1,6 @@
 /**
  * The Haunter of the Dark (spec §3E): it is wounded only by lamplight, which the 'light_dependency' hook
- * holds (reality.ts), and has no mechanic of its own beyond that. This says so under its health bar (round 66),
+ * holds (reality.ts), and has no mechanic of its own beyond that. This says so under its health bar (round 68),
  * where a blow that does next to nothing in the dark read as a fight that could not be won. Pure: no Three.js.
  */
 

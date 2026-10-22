@@ -27,10 +27,10 @@ import type { Sampler } from './sampler';
 type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number; level?: number }) => boolean;
 
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
-const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [6, 10], road: [5, 8.5], stone: [3.8, 6], water: [99, 99] }; // metres between a wheel's thumps (round 66: asked, "way too many noises"; they came every 0.4 s at a gallop)
+const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [6, 10], road: [5, 8.5], stone: [3.8, 6], water: [99, 99] }; // metres between a wheel's thumps (round 68: asked, "way too many noises"; they came every 0.4 s at a gallop)
 const PAIR = 0.059; // the second spectral horse's gait, a share of a cycle behind the first (0.37 rad: render/mountCarriage.ts)
 const GALLOP_SNORT = 14 * gaitScale; // m/s: set for a gallop of 18, kept in step with the mounts' (round 55: a gallop of 10.5 never reached 14)
-/** How often a ride speaks (round 66: a horse that was heard every second or two was "unrealistic"; the hooves are the ride, the rest is an aside): seconds between each, and the share of the reins' slaps it answers. */
+/** How often a ride speaks (round 68: a horse that was heard every second or two was "unrealistic"; the hooves are the ride, the rest is an aside): seconds between each, and the share of the reins' slaps it answers. */
 const RIDE = {
   creak: [8, 16] as const, trace: [6, 14] as const, snort: [18, 34] as const, whisper: [8, 16] as const, idle: [10, 22] as const,
   answer: 0.4, answerGap: 5, // the eager huff after a slap, and the least time between two of them

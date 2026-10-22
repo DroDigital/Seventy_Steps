@@ -79,7 +79,7 @@ nothing in its way.
 | 47 | Azathoth | 18/9/17 | 5 | 8911 | 90 | 10055 | 376 | 10 | 5.35 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die.
-Each tier has its band (round 61, raised in round 66): a named horror takes 14 to 50 seconds and costs 0.05 to 1.2 lives; one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.3 to 1.5 lives.
+Each tier has its band (round 61, raised in round 68): a named horror takes 14 to 50 seconds and costs 0.05 to 1.2 lives; one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.3 to 1.5 lives.
 
 ## The opening
 

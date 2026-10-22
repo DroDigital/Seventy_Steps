@@ -199,7 +199,7 @@ describe('E takes what the investigator faces (playtest round 12)', () => {
     if (!acting) expect(Math.abs(wrapAngle(them.yaw - yawOf(now.x - them.pos.x, now.z - them.pos.z)))).toBeLessThan(0.3); // and still to whoever stands by them (round 26: the people have rounds of their own once the investigator has gone: npcLife.test.ts)
   });
 
-  it('looking about while someone talks keeps the talk, and the camera goes where the hand puts it (round 66)', () => {
+  it('looking about while someone talks keeps the talk, and the camera goes where the hand puts it (round 68)', () => {
     const g = createWorldGame();
     const n = NPCS[0];
     const at = npcPlace(n)!;

@@ -116,7 +116,7 @@ describe('melee in play', () => {
     expect(seen).toEqual([]);
   });
 
-  it('stops a claw at a wall between the foe and the investigator, as a cane is stopped (round 66)', () => {
+  it('stops a claw at a wall between the foe and the investigator, as a cane is stopped (round 68)', () => {
     const { g, deepOne: foe, seen } = clawSetup();
     g.world.colliders.push({ kind: 'box', min: { x: -2, y: -1, z: 0.5 }, max: { x: 2, y: 3, z: 0.8 } }); // a wall between them
     steps(g, 60);
@@ -128,7 +128,7 @@ describe('melee in play', () => {
     expect(seenOver.map((e) => e.outcome)).toEqual(['hit']);
   });
 
-  it('keeps the investigator’s own blow from passing a wall to the foe behind it (round 66)', () => {
+  it('keeps the investigator’s own blow from passing a wall to the foe behind it (round 68)', () => {
     for (const [wall, lands] of [[true, false], [false, true]] as const) {
       const { g, player, deepOne: foe } = scriptedGame();
       place(g, player, 0, 0.3, 0);

@@ -147,7 +147,7 @@ describe('mounts, heard (round 50)', () => {
     expect(grey.heard.some((h) => h.key.endsWith(':whisper'))).toBe(false);
   });
 
-  it('a minute at a gallop is heard in its hooves, with the horse and the harness only now and then (round 66: "way too many noises")', () => {
+  it('a minute at a gallop is heard in its hooves, with the horse and the harness only now and then (round 68: "way too many noises")', () => {
     const grey = ride('grey');
     grey.heard.length = 0;
     grey.advance(60 * 60, MOUNT_TRAVERSAL.gallop);
@@ -356,7 +356,7 @@ describe('the horse and the reins, heard (round 57)', () => {
     r.heard.length = 0;
     for (let i = 0; i < 40; i++) { r.mount.reins.struck++; r.mount.reins.begun++; r.advance(60, 0); }
     expect(keys(r.heard, 'slap')).toEqual([]);
-    const answered = keys(r.heard, 'urge').length; // (round 66: forty slaps a second apart, answered at most once in five seconds and then not always)
+    const answered = keys(r.heard, 'urge').length; // (round 68: forty slaps a second apart, answered at most once in five seconds and then not always)
     expect(answered).toBeGreaterThan(0);
     expect(answered).toBeLessThanOrEqual(8);
     const one = ride('grey');
@@ -420,7 +420,7 @@ describe('the horse and the reins, heard (round 57)', () => {
     r.heard.length = 0;
     r.advance(60 * 180, 0); // three minutes at its harness
     const idle = r.heard.filter((h) => /:(blow|whicker|shake|swish|flutter|snort)$/.test(h.key));
-    expect(idle.length).toBeGreaterThan(5); // (round 66: ten to twenty-two seconds apart)
+    expect(idle.length).toBeGreaterThan(5); // (round 68: ten to twenty-two seconds apart)
     expect(idle.length).toBeLessThan(25);
     expect(new Set(idle.map((h) => h.key)).size).toBeGreaterThanOrEqual(3);
     for (let i = 1; i < idle.length; i++) expect(idle[i].key).not.toBe(idle[i - 1].key);

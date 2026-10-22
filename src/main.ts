@@ -264,7 +264,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
         const held = menu?.open || shop.open || rise?.open || ending.open || cinema.active;
-        stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 66)
+        stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
         const still = pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;

@@ -44,7 +44,7 @@ describe("a way's built things, put away", () => {
     const a = worldLayout().arenas.find((x) => x.bosses[0] === 'simon_orne')!;
     goTo(g, a.x + a.front.x * (a.radius + 14), a.z + a.front.z * (a.radius + 14));
     run(g, 4);
-    layTraps(g, wayRuns(g).find((r) => r.plan.boss === 'simon_orne')!); // (no authored way has a plate since round 66: the views are held to theirs all the same)
+    layTraps(g, wayRuns(g).find((r) => r.plan.boss === 'simon_orne')!); // (no authored way has a plate since round 68: the views are held to theirs all the same)
     expect(wayRuns(g).some((r) => r.plates.length > 0)).toBe(true);
     const scene = new THREE.Scene();
     const views = createWayViews(scene, g);

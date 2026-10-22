@@ -3,7 +3,7 @@ import type { Game } from '../src/systems/components';
 import { hazard, type WayRun } from '../src/systems/ways';
 import { pointAt } from '../src/world/arenaWay';
 
-/** The hazards the authored ways had until round 66 ("remove all traps from all paths that lead to bosses" took them from the data): kept here so that the machinery that plays them (src/systems/ways.ts) is still held to its rules. */
+/** The hazards the authored ways had until round 68 ("remove all traps from all paths that lead to bosses" took them from the data): kept here so that the machinery that plays them (src/systems/ways.ts) is still held to its rules. */
 export const TRAPS: Readonly<Record<string, readonly Hazard[]>> = {
   colour_out_of_space: [
     { kind: 'blight', look: 'stain', at: [spot(74, 0), spot(64, 6), spot(54, -5), spot(44, 1), spot(32, 5), spot(20, -4)], r: 4.6, rate: 2.6 },

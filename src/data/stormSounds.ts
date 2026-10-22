@@ -9,10 +9,10 @@
 import { noise, tone, type Sound } from './sounds';
 
 export const STORM_MIX = {
-  thunder: 0.4, // the recipe beneath the recordings (round 66: it was 1.1, the whole of it, and was heard as made)
+  thunder: 0.4, // the recipe beneath the recordings (round 68: it was 1.1, the whole of it, and was heard as made)
   warn: 0.9, // the ring's crackle, made (until the recording has loaded)
-  charge: 0.9, // the ring's hum, recorded (round 66)
-  zap: 0.8, // the snap of a bolt on the ground, recorded (round 66)
+  charge: 0.9, // the ring's hum, recorded (round 68)
+  zap: 0.8, // the snap of a bolt on the ground, recorded (round 68)
   crack: 1, // the bolt on the ground, made (until the recording has loaded)
   strike: 1, // the bolt on the ground, recorded (round 59)
 } as const;

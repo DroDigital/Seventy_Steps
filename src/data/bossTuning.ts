@@ -80,7 +80,7 @@ export const COLOUR = {
 /** The Dunwich Horror: unseen until the Powder of Ibn Ghazi; the incantation is an optional finish. */
 export const DUNWICH = {
   powder: 3, // doses Armitage's sprayer holds
-  reveal: 1200, // frames the powder shows it (round 66: it was 900, which three doses spent, a person's fight outlasted it, and the last of it was struck blind)
+  reveal: 1200, // frames the powder shows it (round 68: it was 900, which three doses spent, a person's fight outlasted it, and the last of it was struck blind)
   redust: 180, // frames of showing left before another dose is offered (none is wasted on a Horror already seen)
   reach: 14, // metres: the powder carries this far
   chantRange: 40, // the incantation works within this distance

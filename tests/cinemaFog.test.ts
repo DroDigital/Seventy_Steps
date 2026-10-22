@@ -1,5 +1,5 @@
 /**
- * A cutscene's lens stays inside the fog (round 66: "address the initial display of only the boss fog"). The investigator is walked a
+ * A cutscene's lens stays inside the fog (round 68: "address the initial display of only the boss fog"). The investigator is walked a
  * step inside the wall before a horror and the horror wakes there; a lens behind them, or far from a great horror, was on the other side
  * of an opaque wall for the first seconds of its arrival.
  */
@@ -17,7 +17,7 @@ const ring = (radius: number): FogWall => wall({ kind: 'ring', radius });
 const doorway = (at: number): FogWall => wall({ kind: 'doorway', z: at, yaw: Math.PI, width: 4.4 });
 const STEP = 1.8; // metres the investigator is walked inside the wall (systems/fogGates.ts)
 
-describe('the lens keeps inside the fog (round 66)', () => {
+describe('the lens keeps inside the fog (round 68)', () => {
   it('knows the walls a point stands inside, and the lens that is clear of them', () => {
     const r = ring(20);
     expect(lensInside([r], { x: 0, z: 10 })).toBe(true);
