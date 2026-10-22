@@ -113,7 +113,7 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       mark(piece('grave_wide', { size: [1, 1.2] }), 20, 150, 16, [6, 13], { mirror: true, jitter: 6, chance: 0.75 }),
       mark(piece('grave_cross', { size: [1, 1.2] }), 25, 150, 21, [5, 11], { jitter: 8, chance: 0.7 }),
       mark(piece('iron_fence_broken'), 50, 130, 23, [7, 10], { mirror: true, face: 90, chance: 0.6 }),
-      mark(piece('candles', { lit: 'torch', walk: true, size: 1.2 }), 6, 60, 12, [2.6, 5], { mirror: true, jitter: 4, face: 'free' }),
+      mark(piece('candles', { lit: 'torch', walk: true, size: 1.2 }), 2, 60, 12, [2.6, 5], { mirror: true, jitter: 4, face: 'free' }),
       mark(piece('pine_crooked', { size: [1, 1.4] }), 30, 170, 19, [10, 18], { mirror: true, jitter: 8, chance: 0.7 }),
       mark(piece('shovel_dirt', { size: 1.1 }), 24, 110, 37, [3.4, 5], { mirror: true, chance: 0.4, face: 'free' }),
       mark(piece('lantern', { lit: 'torch', size: 1.3 }), 18, 100, 13, [2.7, 4], { mirror: true, chance: 0.5, jitter: 3, face: 'free' }),

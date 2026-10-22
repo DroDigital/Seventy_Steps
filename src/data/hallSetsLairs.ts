@@ -28,7 +28,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('skeleton', at(0.9, 180, { face: 'free' }), { size: 0.9 }),
       put('chalice', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.6 }),
       put('bowl', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The Outsider's mirror room: a ruin of a castle's hall, broken columns, a statue's head, a coffin, a gate hanging, a skeleton.
@@ -62,7 +62,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('hay_bale', scatter(3, [0.86, 0.97], { arc: [90, 270], face: 'free' }), { size: 1.2 }),
       put('barrel', scatter(3, [0.86, 0.97], { arc: [90, 270] }), { size: 1.2 }),
       put('grave_wide', at(0.95, 180, { face: 'in' }), { size: 1.3 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The vault in the tomb: niches cut in its walls with the dead in them, urns, candles and a telephone wire's end where it comes down.
@@ -73,7 +73,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('urn', scatter(5, [0.82, 0.97], { face: 'free' }), { size: 1.2 }),
       put('wall_ruin', ring(0.95, 3, { arc: [110, 250], face: 'in' }), { size: 0.9 }),
       put('grave_cross', scatter(3, [0.86, 0.97], { arc: [70, 290], face: 'free' })),
-      put('candles', scatter(7, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The cellar of the Shunned House: casks and crates, nitre fungus risen from the floor, the spade of the men who dug, the stain on the earth.
@@ -95,7 +95,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('statue_head', ring(0.95, 3, { arc: [100, 260], face: 'in' }), { size: 0.7 }),
       put('column', ring(0.97, 4, { arc: [60, 300] }), { size: 0.75 }),
       put('urn', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.2 }),
-      put('candles', scatter(9, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The old sea-captain's front hall: bottles in their dozens that hang on strings, a chest, a bench, a cannon, a flag gone grey.
@@ -130,7 +130,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('cross_wood', at(0.96, 180, { face: 'in' }), { size: 1.4 }),
       put('statue_head', at(0.95, 125, { face: 'in' }), { size: 0.55 }),
       put('urn', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.2 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The turret studio of the dreamer: a couch and pallets, a laurelled head, columns of a Greek mind, poppies, a chalice, candles.
@@ -142,7 +142,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('bench', at(0.93, 270, { face: 90 }), { size: 1.2 }),
       put('lily', scatter(6, [0.8, 0.97], { face: 'free' }), { walk: true, size: 1.4, tint: [0.78, 0.42, 0.42] }),
       put('chalice', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.6 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // Zann's garret, its window onto a street that is not there: a pallet, a chest, a viol's case, a bowl, a grille from a window, candles.
@@ -154,7 +154,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('iron_fence_broken', ring(0.97, 3, { arc: [120, 240], face: 'in' })),
       put('skeleton', at(0.9, 235, { face: 'free' }), { size: 0.9 }),
       put('bowl', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
 };

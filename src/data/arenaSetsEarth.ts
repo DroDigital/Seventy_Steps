@@ -57,7 +57,7 @@ export const EARTH_SETS: Readonly<Record<string, ArenaSet>> = {
       put('grave_wide', ring(0.88, 5, { arc: [70, 290], face: 'out', jitter: 20 })),
       put('grave_broken', scatter(5, [0.8, 0.98], { arc: [60, 300], face: 'free' })),
       put('urn', scatter(6, [0.84, 0.97], { arc: [120, 240] }), { size: 1.1 }), // the vessels of his work
-      put('candles', scatter(10, [0.3, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }), // lit for the dead
+      put('candles', scatter(3, [0.3, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }), // lit for the dead
       put('cross', scatter(4, [0.82, 0.97], { arc: [60, 300], face: 'out' }), { size: 1.1 }),
       put('coffin', at(0.5, 90, { face: 'free' }), { heart: true }),
       put('iron_fence', ring(1.12, 5, { arc: [150, 210], face: 90 })), // the burying ground's railing, behind the crypt

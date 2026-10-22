@@ -21,7 +21,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('statue_head', at(0.95, 180, { face: 'in' }), { size: 0.6, tint: [0.7, 0.62, 0.4] }),
       put('column', scatter(4, [0.88, 0.98], { arc: [60, 300] }), { size: 0.8 }),
       put('bowl', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(9, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The onyx castle's throne hall on Kadath: great columns in pairs, statues, pedestals with the glow of a dream, banners of no house.

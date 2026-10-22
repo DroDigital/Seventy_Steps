@@ -18,7 +18,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('bench', at(0.93, 125, { face: 'in' }), { size: 1.2 }),
       put('skeleton', at(0.9, 215, { face: 'free' }), { size: 0.9 }),
       put('bowl', scatter(3, [0.8, 0.95], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(9, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // Sentinel Hill's summit: the circle of the hill's own stones about the table-stone, rocks left where they fell, and skulls on poles where the people burned their fires.
@@ -53,7 +53,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('skeleton', at(0.86, 180, { face: 'free' }), { size: 0.9 }),
       put('shovel_dirt', at(0.9, 145, { face: 'free' }), { size: 1.2 }),
       put('chalice', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.6 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
+      put('candles', scatter(2, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The abandoned church's steeple room: pews in their rows gone to rot, a cross taken down, a statue, no light at all (it lives in the dark).

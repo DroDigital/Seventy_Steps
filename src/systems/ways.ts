@@ -30,7 +30,7 @@ export const WAYS = {
   wave: { burst: 2.3, damage: 24, warn: 48, step: 16, span: 4.6, lateral: 3.7, near: 48 }, // frames between its columns, metres between them and across, and how near the strip it must be to rise
   field: { cols: 2.4, plate: 0.95, burst: 2.2 }, // metres between the plates of a row, and a plate's own wake
   poise: 60,
-  light: 1.6, // metres a light is taken from
+  light: 2.2, // metres a light is taken from (round 66: from 1.6, so a candle is not missed by a step past it)
   fail: { burst: 2.6, damage: 14, warn: 40, cool: 120 }, // what goes up at a wrong light
   clue: 16, // metres from a rite's lights the clue is said
   heard: 44, // metres from the investigator within which a way's omens are listened for (it is a corridor)
