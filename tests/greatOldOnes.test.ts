@@ -10,7 +10,7 @@ import { hasLineOfSight } from '../src/world/colliders';
 import { worldLayout } from '../src/world/placements';
 import { bossGame, calm, engage } from './bossHelpers';
 import { place, press, steps } from './helpers';
-import { deathblow, goTo, record, run } from './worldHelpers';
+import { deathblow, goTo, record, run, slay } from './worldHelpers';
 
 const hasturSpawn = () => worldLayout().spawns.find((s) => s.id === 'boss:hastur')!;
 
@@ -38,7 +38,7 @@ describe('the great old ones (spec §3E)', () => {
     steps(g, 60);
     expect(g.reality.petrify).toBeGreaterThan(0.2);
     const risen = record(g, 'Respawned');
-    strike(g, boss, g.player.id, deathblow);
+    slay(g, boss);
     for (let i = 0; i < 300 && !risen.length; i++) run(g, 1);
     expect(g.world.colliders.length).toBe(walls); // down with the fight's reset (it raises them again when it re-engages)
   });

@@ -52,7 +52,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { gaze: 2, beam: 2, teleport: 1, summon: 1, eruption: 1 }, { summons: ['ancient_ones'], hooks: ['time_skip', 'hidden_platforms'] }),
       ph(0.25, { teleport: 1 }), // it yields
     ), { range: [4, 14] }),
-    stats: st(3250, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
+    stats: st(3650, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
   },
   {
     id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,

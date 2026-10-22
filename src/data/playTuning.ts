@@ -112,14 +112,21 @@ export const DECK = { uiScale: 1.15, captions: 1.2 };
 
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
 export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {
-  vigour: { max: 20, hp: 12 },
-  endurance: { max: 20, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all twenty levels reach 48 a second
-  might: { max: 20, damage: 0.04 }, // share added to the investigator's blows and shots
+  vigour: { max: 30, hp: 12 }, // round 68: thirty, not twenty: the last ten cost 100,000 Echoes apiece, which is what hunting is for, and the horrors grow to meet them (BOSS_OVERMATCH)
+  endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all thirty levels reach 56 a second
+  might: { max: 30, damage: 0.04 }, // share added to the investigator's blows and shots
 };
 export type LevelId = keyof typeof LEVELS;
 
 /** Boss health and damage gained per purchased player level; level one keeps the authored stats. */
 export const BOSS_LEVEL_SCALING = { health: 0.0075, damage: 0.003 };
+
+/**
+ * Round 68 ("all bosses remain demanding regardless of player level"): past the standing a horror is made to be met at (data/bossStanding.ts), the
+ * share of the investigator's growth in blows (Might) that its health takes up, and of their growth in health (Vigour) that its blows take up.
+ * The rest of the growth is theirs: a level farmed is still a level gained, but no longer a fight lost.
+ */
+export const BOSS_OVERMATCH = { share: 0.7 };
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found

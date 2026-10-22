@@ -157,6 +157,7 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const felt = g.ecs.c.phantom.has(attacker)
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
     : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
+  if (target === g.player.id && g.ecs.c.combatant.get(attacker)?.faction === 'enemy') felt.damage = Math.min(felt.damage, Math.floor(h.max * BOSS.blowMost)); // no blow of a foe's kills from full health (round 68)
   const fight = g.ecs.c.fight.get(target);
   if (fight && g.frame - (fight.interruptedAt ?? -Infinity) < BOSS.rearm) felt.interrupts = false; // a horror's wind-up broken is not broken again at once
   const { outcome, damage } = resolveHit(defender, felt, frontal);

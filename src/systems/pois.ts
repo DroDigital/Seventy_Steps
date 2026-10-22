@@ -15,6 +15,7 @@ import { demoAllows } from './demo';
 import { isExplored } from './exploration';
 import { changeInsight, spawnTome } from './insight';
 import { setPlaceDread } from './placeAura';
+import { giveGifts } from './poiGifts';
 import { restoreSanity } from './sanity';
 
 /** How near the investigator comes to a place to find it. */
@@ -93,6 +94,7 @@ export function poiSystem(g: Game): void {
       g.events.emit('PoiFound', { id: def.id, name: def.name, region, kind: def.kind, line: def.line, found, of });
       const gain = def.insight ?? (def.kind === 'anomaly' || def.kind === 'tale' ? POI.insight : 0);
       if (gain > 0) changeInsight(g, gain, 'tome', def.name);
+      giveGifts(g);
     } else if (came && def.again && g.frame - (at.get(def.id) ?? -Infinity) >= POI.hear * SIM.hz) {
       at.set(def.id, g.frame);
       g.events.emit('PoiAgain', { id: def.id, name: def.name, line: def.again });

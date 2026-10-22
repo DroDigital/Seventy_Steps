@@ -59,8 +59,9 @@ describe('the points of interest: what is written', () => {
       if (p.foes) expect(p.foes.n, p.id).toBeGreaterThan(0);
       if (p.hoard !== undefined) {
         expect(p.hoard, p.id).toBeGreaterThanOrEqual(60);
-        expect(p.hoard, p.id).toBeLessThanOrEqual(2500);
+        expect(p.hoard, p.id).toBeLessThanOrEqual(8000); // (round 68: hoards are rescaled to the price of a level where each realm is met; the most is a little under a level's)
       }
+      expect(p.hoard, `${p.id} leaves nothing behind it (round 68: every secret leaves a purse)`).toBeDefined();
       if (p.fx) expect(ANOMALY_HUES, p.id).toContain(p.fx.hue);
       if (p.kind === 'anomaly') expect(p.fx, `${p.id} is an anomaly with nothing to see`).toBeDefined();
       if (p.kind === 'hoard') expect(p.hoard, `${p.id} is a hoard with no chest`).toBeDefined();

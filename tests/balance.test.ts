@@ -11,7 +11,7 @@ import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
-import { BOSS_LEVEL_SCALING, REAGENT, SIM } from '../src/data/tuning';
+import { BOSS_LEVEL_SCALING, LEVELS, PLAYER, REAGENT, SIM } from '../src/data/tuning';
 import { botFight, type BotFight } from './botHelpers';
 import { bossDamageScale, bossHealthScale } from '../src/systems/bossScaling';
 import { levelsOf } from '../src/systems/levels';
@@ -48,11 +48,23 @@ const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } 
  * Round 68, "restore appropriate difficulty across all levels, even on normal": the bands are raised with the numbers they hold, and a god
  * is told by name, not by its health (the health is no longer a line between the great fights and the rest). A named horror is over in 14 to 50
  * seconds (a person's: 40 to 150) and costs a bot between a twentieth of a life and one and a fifth; a great fight takes 35 to 100 and
- * costs between a third of a life and one and a third, climbing with the rank (`RISE`).
+ * costs between a third of a life and one and a third, climbing with the rank (`RISE`). Raised again later in the round: a named horror costs at least a fifth of a life, a great fight at least 0.45 (the bot slips most of a gaze, which does no harm: five horrors that leaned on it were given blows in its place).
  */
 const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth'.split(' '));
-const BANDS = { named: { seconds: [14, 50], lives: [0.05, 1.2] }, god: { seconds: [35, 100], lives: [0.3, 1.5] } } as const;
+const BANDS = { named: { seconds: [14, 50], lives: [0.2, 1.2] }, god: { seconds: [35, 100], lives: [0.45, 1.5] } } as const;
+/**
+ * Round 68, "all bosses remain demanding regardless of player level": the same fights again at the cap (every level bought, the cane set to
+ * +5), where the horror has grown past the standing it is met at (systems/bossScaling.ts `overmatch`). None may cost a bot less than this,
+ * nor be over in fewer seconds, whatever a person has farmed.
+ */
+const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5 } as const;
 const BOUNDS_TEXT = '6 to 260 seconds';
+const AT_CAP_TEXT = `
+## At the cap
+
+The same bot, the same three starts, with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
+their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} of a life; a great fight ${CAP.god.seconds} and ${CAP.god.lives}.
+`;
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
 const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
 
@@ -97,6 +109,18 @@ const OPENING_TEXT = `
 The same bot against the horrors of the first hours (the hub about the first Elder Sign, and Arkham), at the standing a new
 player has there: only those two realms' lesser foes (${Math.round(KILLED * 100)}% of them, in step) and their own bosses before it have
 given Echoes and star-stones. Each may cost at most 1.5 lives.
+`;
+
+/** data/bossStanding.ts: the Vigour and Might each horror is met at (round 68), for systems/bossScaling.ts. */
+const standingFile = (list: readonly Standing[]): string => `/**
+ * What a person has when they meet each horror (round 68; written by \`BALANCE_WRITE=1 npm run audit\`, tests/balance.test.ts, from the
+ * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels. The
+ * horror is made to be met there. Past it, the more the investigator's health and blows have grown, the more the horror's
+ * blows and health grow to meet them (systems/bossScaling.ts \`overmatch\`), so that one that has farmed levels still has a fight to fight.
+ */
+export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number]>> = {
+${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}],`).join('\n')}
+};
 `;
 
 const rows: Row[] = [];
@@ -145,7 +169,34 @@ describe('the balance table (round 25)', () => {
 
   it('makes its table', () => {
     mainTable = tableOf(rows);
+    if (process.env.BALANCE_WRITE) writeFileSync('src/data/bossStanding.ts', standingFile(table));
     expect(rows.length).toBe(table.length);
+  });
+});
+
+const atCap: Row[] = [];
+/** Every standing again with all the levels bought and the cane at its best: the horror has grown past the level it is met at. */
+const atCapOf = (s: Standing): Standing => {
+  const levels = { vigour: LEVELS.vigour.max, endurance: LEVELS.endurance.max, might: LEVELS.might.max } as Standing['levels'];
+  return { ...s, levels, hp: PLAYER.hp + levels.vigour * (LEVELS.vigour.hp ?? 0), reinforced: CAP.reinforced };
+};
+
+describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
+  const table = standings().map(atCapOf);
+
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s)));
+
+  it('leaves no horror a fight that costs nothing', () => {
+    const bad: string[] = [];
+    for (const r of atCap.filter((x) => !EXEMPT.includes(x.id))) {
+      const band = GREAT.has(r.id) ? CAP.god : CAP.named;
+      if (!r.fell) bad.push(`${r.id}: not finished in ${r.seconds.toFixed(0)} seconds at the cap`);
+      else if (r.seconds < band.seconds) bad.push(`${r.id}: ${r.seconds.toFixed(0)} seconds at the cap, at least ${band.seconds}`);
+      if (r.pressure < band.lives) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, at least ${band.lives}`);
+      if (r.pressure > (GREAT.has(r.id) ? BANDS.god.lives[1] : BANDS.named.lives[1]) * 1.25) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, more than a person carries`);
+      if (r.deaths > 0) bad.push(`${r.id}: died ${r.deaths} times at the cap`);
+    }
+    expect(bad).toEqual([]);
   });
 });
 
@@ -156,7 +207,7 @@ describe('the opening (round 47): the first hours, at what they give', () => {
 
   it(`costs at most ${OPENING_LIVES} lives a horror, and writes both tables`, () => {
     const bad = opening.filter((r) => !EXEMPT.includes(r.id) && (!r.fell || r.pressure > OPENING_LIVES || r.deaths > 0)).map((r) => `${r.id}: ${r.pressure.toFixed(2)} lives${r.fell ? '' : ', not finished'}`);
-    if (process.env.BALANCE_WRITE) writeFileSync('docs/BALANCE.md', `${INTRO}\n${mainTable}\n${NOTES}${OPENING_TEXT}\n${tableOf(opening)}\n`);
+    if (process.env.BALANCE_WRITE) writeFileSync('docs/BALANCE.md', `${INTRO}\n${mainTable}\n${NOTES}${AT_CAP_TEXT}\n${tableOf(atCap)}\n${OPENING_TEXT}\n${tableOf(opening)}\n`);
     expect(bad).toEqual([]);
   });
 });

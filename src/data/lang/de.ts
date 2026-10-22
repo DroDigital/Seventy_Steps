@@ -204,6 +204,8 @@ export const DE: Readonly<Record<Key, string>> = {
   'hud.signFound': "ÄLTESTES ZEICHEN GEFUNDEN · {name} · ÜBER DIE KARTE ERREICHBAR ({map})",
   'hud.places': "{found} VON {of} ORTEN · {region}",
   'hud.secrets': "{found} VON {of} GEHEIMNISSEN · {region}",
+  'n.poiGift': '{found} GEHEIMNISSE GEFUNDEN · EINE GABE: {echoes} ECHOS{stones}', // round 68: a gift for {found} secrets found; {stones} is ' · N STAR-STONES' or nothing
+  'n.poiGiftStones': ' · {n} STERNSTEINE',
   'hud.questDone': "ERLEDIGT · {title}",
   'hud.questNew': "TAGEBUCH · {title}",
   'hud.questUpdated': "{title} · AKTUALISIERT",

@@ -10,7 +10,7 @@ import { lampsOf } from '../src/systems/reality';
 import { SIGNATURES } from '../src/systems/signatures';
 import { bossGame, calm, engage } from './bossHelpers';
 import { press, steps } from './helpers';
-import { deathblow, kill, record, run } from './worldHelpers';
+import { deathblow, kill, record, run, slay } from './worldHelpers';
 
 const lockable = (g: Parameters<typeof candidates>[0], id: number): boolean => candidates(g).some((c) => c.id === id);
 
@@ -42,7 +42,7 @@ describe('signature mechanics (spec §3E)', () => {
     b.g.ecs.c.health.get(b.boss)!.hp *= 0.5;
     steps(b.g, 120);
     expect(b.g.reality.saturation).toBeLessThan(1);
-    strike(b.g, b.boss, b.g.player.id, deathblow);
+    slay(b.g, b.boss);
     run(b.g, 200);
     expect(b.g.reality.saturation).toBe(1);
   });

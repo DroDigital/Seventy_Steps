@@ -41,7 +41,7 @@ export const NAMED = tier('named', [
   {
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
-    ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, barrage: 1, vortex: 1 }, { hooks: ['decoys'] }))),
+    ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, teleport: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
     stats: st(1150, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2,
   },
   {
@@ -75,7 +75,7 @@ export const NAMED = tier('named', [
   {
     id: 'ephraim_waite', name: 'Ephraim Waite', source: 'The Thing on the Doorstep', regions: ['innsmouth', 'arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'sea', scale: 2, eyes: 2, gear: ['coat'] },
-    ...scripted('mind_thief', phases(ph(1, { gaze: 2, projectile: 1, grab: 1, combo: 1 }, { hooks: ['control_swap'] }), ph(0.5, { gaze: 2, grab: 2, projectile_fan: 1, vortex: 1 }, { hooks: ['control_swap', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 1, projectile: 1, grab: 1, combo: 2 }, { hooks: ['control_swap'] }), ph(0.5, { gaze: 1, grab: 2, projectile_fan: 1, vortex: 1, combo: 1 }, { hooks: ['control_swap', 'camera_warp'] }))),
     stats: st(800, 120, 44, 3.6, 2.5, 9), drops: { echoes: 1800 }, insightOnSight: 1,
     eldritchVariant: { sprite: { palette: 'mold' } },
   },
@@ -148,7 +148,7 @@ export const NAMED = tier('named', [
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
     sprite: { silhouette: 'serpent', palette: 'sea', scale: 7, eyes: 2, body: [0.734375, 0.25] }, // the head and neck rise 5.1 m out of the coils, not a serpent's 3.5 m (round 57)
-    ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 3, grab: 1, wind_push: 1, quake: 1 }, { hooks: ['flood', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 2, grab: 1, wind_push: 1, quake: 1, vortex: 1 }, { hooks: ['flood', 'camera_warp'] }))),
     stats: st(1450, 400, 56, 2, 3, 10), drops: { echoes: 3000 }, insightOnSight: 2,
   },
   {
@@ -166,13 +166,13 @@ export const NAMED = tier('named', [
   {
     id: 'medusa_gorgon', name: "The Gorgon of Medusa's Coil", source: "Medusa's Coil", regions: ['dunwich'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.1, eyes: 2, tentacles: 10 },
-    ...scripted('mind_thief', phases(ph(1, { grab: 1, gaze: 2, lunge: 1, combo: 1 }), ph(0.5, { gaze: 2, grab: 2, tentacle_burst: 1, sweep_beam: 1 }))),
+    ...scripted('mind_thief', phases(ph(1, { grab: 1, gaze: 1, lunge: 2, combo: 1 }), ph(0.5, { gaze: 1, grab: 2, tentacle_burst: 1, sweep_beam: 1, combo: 1 }))),
     stats: st(1200, 160, 51, 4, 3, 10), drops: { echoes: 2400 }, insightOnSight: 2,
   },
   {
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
-    ...scripted('mind_thief', phases(ph(1, { gaze: 2, teleport: 1, roar: 1, barrage: 1 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 2, beam: 1, teleport: 1, sweep_beam: 1, vortex: 1 }, { hooks: ['time_skip', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, roar: 1, barrage: 2 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
     stats: st(1300, 140, 48, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
   },
   {

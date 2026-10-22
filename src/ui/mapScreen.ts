@@ -18,6 +18,7 @@ import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
 import { addMarker, clearMarkers, markersHere, removeMarker } from '../systems/marker';
 import { exploredShare } from '../systems/exploration';
+import { nextGift, secretsFound } from '../systems/poiGifts';
 import { poiTotals } from '../systems/pois';
 import { realmOf, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
@@ -245,7 +246,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const places = rs.flatMap((x) => placesOf(x.id)); // round 18
     const found = places.filter((p) => g.overworld!.places.has(p.id)).length;
     const secrets = poiTotals(g, rs); // round 61
-    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND${secrets.of ? `   ·   ${secrets.found} OF ${secrets.of} SECRETS` : ''}`];
+    const gift = nextGift(g); // round 68: the gifts for the secrets found, in all the realms
+    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND${secrets.of ? `   ·   ${secrets.found} OF ${secrets.of} SECRETS` : ''}${secrets.of && gift ? `   ·   A GIFT AT ${gift.at} OF ALL (${secretsFound(g)} FOUND)` : ''}`];
     if (title) title.textContent = heading[0];
     if (stats) stats.textContent = heading[1];
     last = 0;
