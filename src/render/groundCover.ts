@@ -13,7 +13,8 @@ import { WORLD } from '../data/tuning';
 import { worldLayout } from '../world/placements';
 import { roadShare, type RoadSeg } from '../world/regionPlan';
 import { inDungeon, surface } from '../world/terrain';
-import { chunkKey, rectDistance } from '../world/worldMap';
+import { padDistance } from '../world/sitePads';
+import { chunkKey } from '../world/worldMap';
 import type { PropMat } from './propShapes';
 
 type Rgb = readonly [number, number, number];
@@ -208,7 +209,7 @@ export function groundCover(cx: number, cz: number, region: RegionDef, roads: re
     let roll = rng();
     const kind = cover.mix.find(([, w]) => (roll -= w) < 0)?.[0] ?? 'pebble';
     if (roadShare(roads, x, z) > 0.05 || inDungeon(x, z)) continue;
-    if (pads.some((p) => (p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) < p.radius + 1 : rectDistance(p.rect, x, z) < 1))) continue;
+    if (pads.some((p) => padDistance(p, x, z) < 1)) continue;
     const y = surface(x, z);
     if (y < WORLD.seaLevel) continue;
     plantAt(kind, leaf, stone, rng, x, y, z);

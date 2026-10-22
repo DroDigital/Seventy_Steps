@@ -17,7 +17,8 @@ import type { Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
 import { propCollider, type Prop } from './props';
 import type { Road } from './roads';
-import { DIRS, rectDistance, regionRect } from './worldMap';
+import { padDistance } from './sitePads';
+import { DIRS, regionRect } from './worldMap';
 import { MOUND_BAND } from './dungeonParts';
 
 const SAFE = WORLD.signClear; // metres of peace around every Elder Sign and gate
@@ -67,7 +68,7 @@ export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x
   const clear = (x: number, z: number): boolean =>
     x > rect.x0 + 6 && x < rect.x1 - 6 && z > rect.z0 + 6 && z < rect.z1 - 6 &&
     safe.every((p) => Math.hypot(p.x - x, p.z - z) >= SAFE) &&
-    w.pads.every((p) => (p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) > p.radius + 1 : rectDistance(p.rect, x, z) > 2 + MOUND_BAND + 1)) && // clear of a mound heaped over a dungeon (round 13)
+    w.pads.every((p) => padDistance(p, x, z) > (p.kind === 'rect' ? 3 + MOUND_BAND : 1)) && // clear of a mound heaped over a dungeon (round 13)
     !solid(x, z) &&
     escapes(solid, x, z); // and not shut in by walls: a foe inside a ring of ruin walls could not come out, nor the investigator in (round 49)
 

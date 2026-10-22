@@ -9,14 +9,12 @@ import { NOTE_SITES } from '../data/documents';
 import { yawOf, type XZ } from '../core/geom';
 import type { HiddenPieceDef, Place } from '../data/arena';
 import type { AirSpec, CandleLook, GroundSpec } from '../data/arenaSets';
-import { ARENA_HOUSES } from '../data/arenaHousesAll';
-import { HOUSE } from '../data/arenaHouses';
 import { leafPlaces, planCourt, type Court } from './discoveryPlan';
 import { DUNGEONS, type Dir } from '../data/dungeons';
 import { REGIONS } from '../data/regions';
 import { DREAM_DESCENT, SITES } from '../data/sites';
 import { GUN, WORLD } from '../data/tuning';
-import type { HousePlan } from './arenaHouse';
+import type { Enclosure } from './enclosure';
 import { placeArena, propCollide } from './arenaPlace';
 import { echoCaches, roundCaches } from './caches';
 import type { Prop } from './props';
@@ -26,6 +24,7 @@ import { doorwayClear, dungeonParts, partCollider, type Part } from './dungeonPa
 import { landHeight } from './land';
 import { shrineColliders, standingStones } from './shrine';
 import { furnish, type GateFn, type SignFn } from './roomFurnish';
+import { padBounds, type Pad } from './sitePads';
 import { chunkKey, chunkOf, DIRS, toWorld, yawOfDir, type Rect } from './worldMap';
 
 export interface SignPlace {
@@ -79,7 +78,7 @@ export interface ArenaPlace {
   ground?: GroundSpec; // the floor its set lays (arenaGround.ts)
   air?: AirSpec; // what drifts in it (render/arenaAir.ts)
   candle?: CandleLook; // what its candle stands on (world/candlePlan.ts)
-  house?: HousePlan; // the wall about it, closed but for a gate at its front (arenaHouse.ts; round 63)
+  house?: Enclosure; // what stands about it, closed but for a gate at its front (enclosure.ts; arenaHouse.ts: the ring of wall, round 63)
   court?: Court; // where its discovery's pages, vigils and altars stand in the court before the gate (discoveryPlan.ts)
 }
 
@@ -93,9 +92,7 @@ export interface SpawnPoint {
   arena?: { x: number; z: number; radius: number }; // a boss's: its ring of stones or its room
 }
 
-export type Pad =
-  | { kind: 'circle'; x: number; z: number; radius: number; blend: number; level: number }
-  | { kind: 'rect'; rect: Rect; blend: number; level: number };
+export type { Pad };
 
 export interface Dungeon {
   layout: DungeonLayout;
@@ -125,7 +122,7 @@ export interface WorldLayout {
 }
 
 const EMPTY: ChunkStatics = { colliders: [], pads: [], dungeons: [], spawns: [] };
-const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], arena: [8, 14], dungeon: 12 } as const;
+const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], dungeon: 12 } as const;
 
 function build(): WorldLayout {
   const w: WorldLayout = { signs: [], gates: [], tomes: [], arenas: [], dungeons: [], spawns: [], pads: [], pieces: [], dream: null, errors: [], chunk: () => EMPTY };
@@ -142,12 +139,13 @@ function build(): WorldLayout {
     }
   };
   const collide = (c: Collider): void => bucket(colliderBounds(c), (b) => b.colliders.push(c));
-  const pad = (x: number, z: number, [radius, blend]: readonly [number, number], extra = 0): number => {
-    const level = landHeight(x, z);
-    const p: Pad = { kind: 'circle', x, z, radius: radius + extra, blend, level };
+  const addPad = (p: Pad): void => {
     w.pads.push(p);
-    const reach = p.radius + blend;
-    bucket({ x0: x - reach, z0: z - reach, x1: x + reach, z1: z + reach }, (b) => b.pads.push(p));
+    bucket(padBounds(p), (b) => b.pads.push(p));
+  };
+  const pad = (x: number, z: number, [radius, blend]: readonly [number, number]): number => {
+    const level = landHeight(x, z);
+    addPad({ kind: 'circle', x, z, radius, blend, level });
     return level;
   };
   const spawn = (s: SpawnPoint): void => {
@@ -223,7 +221,7 @@ function build(): WorldLayout {
     }
     for (const a of sites.arenas) {
       const p = at(a.at);
-      placeArena(w, region, p, a, pad(p.x, p.z, ARENA_HOUSES[a.bosses[0]!] ? [HOUSE.reach + HOUSE.level, PAD.arena[1]] : PAD.arena, a.radius), collide, spawn);
+      placeArena(w, region, p, a, collide, spawn, addPad);
       const placed = w.arenas[w.arenas.length - 1]!;
       placed.court = planCourt(placed, (x, z) => around(x, z, 6).every((c) => { const b = colliderBounds(c); return x < b.x0 - 2.4 || x > b.x1 + 2.4 || z < b.z0 - 2.4 || z > b.z1 + 2.4; })); // round 63: clear of a sign's shrine, a stone, a door
       for (const l of leafPlaces(placed)) { // the pages of its discovery lie in the court before its gate
@@ -247,10 +245,7 @@ function build(): WorldLayout {
       for (const o of layout.doors) doorways.push(doorwayClear(o));
       w.pieces.push(...pieces);
       for (const p of parts) if (p.solid) collide(partCollider(p));
-      const rp: Pad = { kind: 'rect', rect: layout.rect, blend: PAD.dungeon, level: layout.base };
-      w.pads.push(rp);
-      const b = PAD.dungeon;
-      bucket({ x0: layout.rect.x0 - b, z0: layout.rect.z0 - b, x1: layout.rect.x1 + b, z1: layout.rect.z1 + b }, (k) => k.pads.push(rp));
+      addPad({ kind: 'rect', rect: layout.rect, blend: PAD.dungeon, level: layout.base });
       bucket(layout.rect, (k) => k.dungeons.push(layout));
       const [caches, boxed] = [echoCaches(def), roundCaches(def)];
       for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, parts, caches.get(r.def.id), boxed.get(r.def.id)));

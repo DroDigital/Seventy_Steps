@@ -13,6 +13,7 @@ import { fogThemeOf, type FogThemeId } from '../data/fogThemes';
 import { DUNGEON } from '../data/tuning';
 import { kitIdOfRoom, roomAt, type DoorLayout, type DungeonLayout } from './dungeonKit';
 import type { Part } from './dungeonParts';
+import { STAKE } from './enclosure';
 import type { WorldLayout } from './placements';
 import { yawOfDir } from './worldMap';
 
@@ -47,7 +48,7 @@ export interface FogWall {
   candle: CandleSpot; // where its candle stands: aside the stake, at the way's edge (round 62: world/candlePlan.ts)
 }
 
-const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, ring: 1.5, ringMin: 6, ringMax: 16, stake: 6.5, ringStake: 9 };
+const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, ring: STAKE.ring, ringMin: 6, ringMax: 16, stake: 6.5, ringStake: STAKE.past };
 
 /** A doorway's yaw: through it, from the room `a` into the room `b` (or out). */
 const yawOf = (d: DoorLayout): number => yawOfDir(d.side);
@@ -98,10 +99,9 @@ export function gatePlan(w: WorldLayout): GatePlan {
     const bosses = [...a.bosses];
     const radius = a.radius + FOG.ring;
     const [sx, sz] = [a.front.x, a.front.z]; // toward the nearest Elder Sign of its realm: the way a person comes (arenaFront.ts)
-    const sl = 1;
     const reach = radius + FOG.ringStake;
-    const stake = { x: a.x + (sx / sl) * reach, z: a.z + (sz / sl) * reach, yaw: Math.atan2(-sx, -sz) };
-    const candle = ringCandle(a, stake, a.front);
+    const stake = a.house?.stake ?? { x: a.x + sx * reach, z: a.z + sz * reach, yaw: Math.atan2(-sx, -sz) }; // an enclosure says where the fallen wake: inside its wall
+    const candle = ringCandle(a, stake, a.front, a.house);
     fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
   });
   return { doors, fogs };

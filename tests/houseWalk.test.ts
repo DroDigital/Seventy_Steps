@@ -9,7 +9,7 @@ import { createWorldGame } from '../src/systems/game';
 import { refreshSeals } from '../src/systems/seals';
 import { courtPoint } from '../src/world/arenaWay';
 import { worldLayout } from '../src/world/placements';
-import { walkIn } from './worldHelpers';
+import { ringOf, walkIn } from './worldHelpers';
 
 const arenas = worldLayout().arenas.filter((a) => a.house);
 
@@ -17,7 +17,7 @@ describe('there is no way in but the gate', () => {
   it('a body walking at the horror from the gate side and from the sides and back is stopped at the wall, the shut gate included', () => {
     const g = createWorldGame();
     for (const a of arenas) {
-      const P = a.house!.radius;
+      const P = ringOf(a).radius;
       const gateAt = Math.atan2(a.front.z, a.front.x);
       for (const turn of [0, 45, 90, 135, 180, 225, 270, 315]) {
         const t = gateAt + (turn * Math.PI) / 180;
@@ -33,7 +33,7 @@ describe('there is no way in but the gate', () => {
       const boss = a.bosses[0]!;
       g.overworld!.told.add(foundKey(boss));
       refreshSeals(g);
-      expect(walkIn(g, a, courtPoint(a.house!, 6, 0), 420), boss).toBeLessThan(a.house!.radius - a.house!.piece.door!.thick / 2 - 1);
+      expect(walkIn(g, a, courtPoint(a.house!, 6, 0), 420), boss).toBeLessThan(ringOf(a).radius - a.house!.piece.door!.thick / 2 - 1);
     }
   }, 600_000);
 });

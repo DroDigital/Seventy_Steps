@@ -28,7 +28,7 @@ import { kindsOf } from '../src/systems/weather';
 import { courtPoint, WAY } from '../src/world/arenaWay';
 import { discoveryProps, stepPlace } from '../src/world/discoveryPlan';
 import { worldLayout, type ArenaPlace } from '../src/world/placements';
-import { goTo, record, run, walkIn } from './worldHelpers';
+import { goTo, record, ringOf, run, walkIn } from './worldHelpers';
 
 const w = worldLayout();
 const arenas = w.arenas.filter((a) => a.house);
@@ -50,7 +50,7 @@ describe('the discoveries are written', () => {
         const t = w.tomes.find((x) => x.name === l.doc);
         expect(t, `${id}: ${l.doc} is laid`).toBeTruthy();
         expect(t!.note, `${id}: ${l.doc} is a note`).toBe(true);
-        expect(Math.hypot(t!.at.x - a.x, t!.at.z - a.z), `${id}: ${l.doc} outside the wall`).toBeGreaterThan(a.house!.radius + 3);
+        expect(a.house!.gap(t!.at), `${id}: ${l.doc} outside the wall`).toBeGreaterThan(3);
         expect(l.at.d, `${id}: ${l.doc} in the court`).toBeLessThanOrEqual(FOUND.court);
         expect(d.steps.some((s) => s.kind === 'read' && s.doc === l.doc), `${id}: ${l.doc} is asked`).toBe(true);
       }
@@ -68,7 +68,7 @@ describe('the discoveries are written', () => {
         const known = s.piece.of.startsWith('prop:') ? (PROP_KINDS as readonly string[]).includes(s.piece.of.slice(5)) : !!MODEL_INFO[s.piece.of] || !!SET_KITS[s.piece.of];
         expect(known, `${id}: ${s.piece.of}`).toBe(true);
         const at = stepPlace(a, s)!;
-        expect(Math.hypot(at.x - a.x, at.z - a.z), `${id}: outside the wall`).toBeGreaterThan(a.house!.radius + 3);
+        expect(a.house!.gap(at), `${id}: outside the wall`).toBeGreaterThan(3);
         expect(s.at.d, `${id}: in the court`).toBeLessThanOrEqual(FOUND.court);
         expect(Math.abs(s.at.side), `${id}: off the way in`).toBeGreaterThanOrEqual(WAY.width / 2 + 1.5);
       }
@@ -348,7 +348,7 @@ describe('there is no way in but the gate', () => {
   it('a body walking at the horror from the gate side and the sides and back is stopped at the wall, the shut gate included (every house: tests/houseWalk.test.ts)', () => {
     const g = createWorldGame();
     const a = arenaOf('colour_out_of_space');
-    const P = a.house!.radius;
+    const P = ringOf(a).radius;
     const gateAt = Math.atan2(a.front.z, a.front.x);
     for (const turn of [0, 90, 180, 270]) {
       const t = gateAt + (turn * Math.PI) / 180;

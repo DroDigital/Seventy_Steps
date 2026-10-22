@@ -7,11 +7,12 @@
 import { floorAt, kitOfRoom, roomAt, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { landHeight, smoothstep } from './land';
 import { worldLayout, type Pad } from './placements';
-import { chunkOf, rectDistance } from './worldMap';
+import { padDistance } from './sitePads';
+import { chunkOf } from './worldMap';
 
 /** Pulls a height toward a pad's level: wholly inside it, fading out over its blend. */
 function flatten(p: Pad, h: number, x: number, z: number): number {
-  const d = p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) - p.radius : rectDistance(p.rect, x, z);
+  const d = padDistance(p, x, z);
   if (d >= p.blend) return h;
   return h + (p.level - h) * (1 - smoothstep(0, p.blend, d));
 }

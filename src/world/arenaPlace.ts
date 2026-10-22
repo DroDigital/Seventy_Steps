@@ -12,12 +12,15 @@ import type { RegionDef } from '../data/regions';
 import type { ArenaSite } from '../data/sites';
 import { WORLD } from '../data/tuning';
 import { arenaProps, reach } from './arenaDecor';
-import { courtLand, planHouse, withinHouse } from './arenaHouse';
+import { courtLand, planHouse } from './arenaHouse';
+import { within } from './enclosure';
 import { frontOf } from './arenaFront';
 import { arenaSet } from './arenaSet';
 import type { Collider } from './colliders';
+import { landHeight } from './land';
 import type { SpawnPoint, WorldLayout } from './placements';
 import { propCollider, type Prop } from './props';
+import type { Pad } from './sitePads';
 
 /** A dressing prop's collider into the world (fires have none). */
 export function propCollide(p: Prop, collide: (c: Collider) => void): void {
@@ -25,8 +28,12 @@ export function propCollide(p: Prop, collide: (c: Collider) => void): void {
   if (c) collide(c);
 }
 
-/** An arena: its ring of standing stones, the well at its heart, and its bosses. */
-export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSite, y: number, collide: (c: Collider) => void, spawn: (s: SpawnPoint) => void): void {
+/** The level ground an arena without a house asks of the land: beyond its ring, fading out over `blend`. */
+const PLAIN = { beyond: 8, blend: 14 } as const;
+
+/** An arena: its ring of standing stones, the well at its heart, its house, and its bosses. `pad` lays the level ground it asks of the land (before anything else is stood on it). */
+export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSite, collide: (c: Collider) => void, spawn: (s: SpawnPoint) => void, pad: (p: Pad) => void): void {
+  const y = landHeight(p.x, p.z); // the level of its ground: the land at the fight's centre
   const style = arenaStyle(a.bosses[0]);
   const set = ARENA_SETS[a.bosses[0]]; // round 61: a horror with a set of its own has it, in the place of its style's ring and heart
   const spec = ARENA_HOUSES[a.bosses[0]!]; // round 63: a horror with a house has the wall about it, and the dressing of its court is kept within
@@ -34,7 +41,8 @@ export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSit
   const ring = a.radius + 1.5;
   const n = !set && style.ring === 'stones' ? Math.max(6, Math.round((2 * Math.PI * ring) / 5.5)) : 0; // other rings are props (arenaDecor.ts)
   const house = spec ? planHouse(spec, a.bosses[0]!, { x: p.x, z: p.z, y, radius: a.radius, front }) : undefined;
-  const decor = set ? arenaSet(set, { x: p.x, z: p.z, y, radius: a.radius, front, well: !!a.well }, house && ((d) => !withinHouse(house, p, d, reach(d)))) : arenaProps(style, p.x, p.z, y, a.radius, !!a.well);
+  pad(house ? house.pad(y, PLAIN.blend) : { kind: 'circle', x: p.x, z: p.z, radius: PLAIN.beyond + a.radius, blend: PLAIN.blend, level: y });
+  const decor = set ? arenaSet(set, { x: p.x, z: p.z, y, radius: a.radius, front, well: !!a.well }, house && ((d) => !within(house, d, reach(d)))) : arenaProps(style, p.x, p.z, y, a.radius, !!a.well);
   if (house) {
     decor.push(...house.props);
     w.pieces.push(house.piece);

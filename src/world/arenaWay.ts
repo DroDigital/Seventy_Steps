@@ -12,7 +12,7 @@ import { createRng, hash2, type Rng } from '../core/rng';
 import type { Mark, Way } from '../data/arenaWays';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
-import type { HousePlan } from './arenaHouse';
+import type { Enclosure } from './enclosure';
 import { setPiece } from './arenaSet';
 import type { ArenaPlace } from './placements';
 import type { Prop } from './props';
@@ -36,7 +36,7 @@ export interface WayPlan {
 }
 
 /** The place `d` metres out from the gate and `side` metres to the left of the court as it is walked in (negative: the right), and the way it faces (toward the gate). */
-export function courtPoint(h: Pick<HousePlan, 'gate' | 'front'>, d: number, side = 0): XZ & { yaw: number } {
+export function courtPoint(h: Pick<Enclosure, 'gate' | 'front'>, d: number, side = 0): XZ & { yaw: number } {
   const t = WAY.out + d;
   return { x: h.gate.x + h.front.x * t - h.front.z * side, z: h.gate.z + h.front.z * t + h.front.x * side, yaw: Math.atan2(-h.front.x, -h.front.z) };
 }

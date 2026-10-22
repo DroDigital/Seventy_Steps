@@ -10,16 +10,9 @@
 import type { XZ } from '../core/geom';
 import type { HiddenPieceDef } from '../data/arena';
 import { HOUSE, type House } from '../data/arenaHouses';
+import { STAKE, type RingEnclosure } from './enclosure';
 import type { Prop, SetLook } from './props';
 import { chunkOf, regionAt, walkableChunk } from './worldMap';
-
-export interface HousePlan {
-  radius: number; // the wall's middle, from the arena's centre
-  gate: XZ; // where the gate stands, at the wall's middle
-  front: XZ; // the way out of the gate (a unit vector along an axis)
-  props: Prop[]; // the wall, its towers
-  piece: HiddenPieceDef; // the gate
-}
 
 interface Site {
   x: number;
@@ -45,8 +38,8 @@ function tower(h: House, s: Site, P: number, th: number, height: number, seed: n
   return { kind: 'set', x: s.x + Math.cos(th) * P, y: s.y, z: s.z + Math.sin(th) * P, w: half, d: half, h: height, yaw: Math.atan2(-Math.cos(th), -Math.sin(th)), seed, set: look };
 }
 
-/** A house about the arena at `site`, its gate at the site's front. */
-export function planHouse(h: House, boss: string, s: Site): HousePlan {
+/** A house about the arena at `site`, its gate at the site's front: the ring kind of enclosure. */
+export function planHouse(h: House, boss: string, s: Site): RingEnclosure {
   const P = s.radius + (h.reach ?? HOUSE.reach);
   const gateAt = Math.atan2(s.front.z, s.front.x);
   const half = towerHalf(h);
@@ -77,11 +70,23 @@ export function planHouse(h: House, boss: string, s: Site): HousePlan {
     seal: { boxes: [[0, 0, hw, hd, s.y - 0.3, s.y + h.gate.height]], look: h.gate.sealed ? 'sealed' : 'wall' },
     door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y: s.y },
   };
-  return { radius: P, gate, front: s.front, props, piece };
+  const toStake = s.radius + STAKE.ring + STAKE.past; // the fallen wake before the fog, a pace in front of it: inside the wall, since the wall stands `HOUSE.reach` beyond the ring
+  const stake = { x: s.x + s.front.x * toStake, z: s.z + s.front.z * toStake, yaw: Math.atan2(-s.front.x, -s.front.z) };
+  const centre = { x: s.x, z: s.z };
+  return {
+    kind: 'ring',
+    radius: P,
+    centre,
+    gate,
+    front: s.front,
+    rect: { x0: s.x - P, z0: s.z - P, x1: s.x + P, z1: s.z + P },
+    props,
+    piece,
+    stake,
+    gap: (p) => Math.hypot(p.x - s.x, p.z - s.z) - P,
+    pad: (level, blend) => ({ kind: 'circle', x: s.x, z: s.z, radius: (h.reach ?? HOUSE.reach) + HOUSE.level + s.radius, blend, level }), // the wall's middle and `HOUSE.level` beyond it: what the ground is levelled to
+  };
 }
-
-/** Whether a piece of the court's own set stands within the wall, clear of it by `HOUSE.margin` and its own reach. */
-export const withinHouse = (plan: HousePlan, centre: XZ, p: XZ, reach: number): boolean => Math.hypot(p.x - centre.x, p.z - centre.z) + reach <= plan.radius - HOUSE.margin;
 
 /** Whether a court laid out from the gate of a house about (`x`, `z`) with a ring of `radius`, facing `front`, has land of the realm to lie on: every place of its first stretch, and a little to either side, is in the region and walkable. */
 export function courtLand(region: string, x: number, z: number, radius: number, front: XZ, reach = 0): boolean {
