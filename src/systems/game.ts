@@ -63,7 +63,6 @@ import { fogBlockSystem, fogPassSystem } from './fogGates';
 import { gatePassSystem, gateStepSystem } from './gateWalk';
 import { registerOmens } from './omens';
 import { registerDeathNotes } from './deathNotes';
-import { registerMercy } from './mercy';
 import { hookSystem } from './hook';
 import { registerSurvey } from './survey';
 import { wanderSystem } from './wanderers';
@@ -139,7 +138,6 @@ export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty, de
   registerOmens(g);
   registerSurvey(g);
   registerDeathNotes(g);
-  registerMercy(g);
   if (save) g.overworld.read = new Set(save.read); // unread tomes only
   furnishWorld(g);
   spawnNpcs(g);

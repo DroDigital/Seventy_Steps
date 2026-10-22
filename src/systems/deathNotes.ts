@@ -8,7 +8,6 @@
 import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS } from '../data/deathLines';
 import type { AttackId } from '../data/schema';
 import type { Game } from './components';
-import { mercyLine } from './mercy';
 
 const last = new WeakMap<Game, { move: string | null; by: string }>();
 const said = new WeakMap<Game, string>();
@@ -24,13 +23,8 @@ export function registerDeathNotes(g: Game): void {
   g.events.on('Respawned', () => void last.delete(g));
 }
 
-/** The line to read under a fall: how the last blow is met, or else a fragment of the place; then, if a horror's fight unmade the investigator, that its grip loosens (mercy.ts). */
+/** The line to read under a fall: how the last blow is met, or else a fragment of the place. */
 export function deathLine(g: Game): string {
-  const mercy = mercyLine(g);
-  return mercy ? `${blowLine(g)} ${mercy}` : blowLine(g);
-}
-
-function blowLine(g: Game): string {
   const blow = last.get(g)?.move;
   if (blow === 'fell') return EDGES[Math.floor(g.rng() * EDGES.length)];
   if (blow === 'drowned') return SEAS[Math.floor(g.rng() * SEAS.length)];
