@@ -1,12 +1,13 @@
 /**
  * Population (spec §3D): the creatures of the chunks around the investigator. Spawn points in the
  * loaded 5 × 5 chunks get their creature, nearest chunks first and never more than 60 alive (the AI
- * budget), unless it was killed since the last rest or, for a boss, slain for good. A creature that
+ * budget; a horror takes a place in a full house, the lesser foe farthest away making room), unless it was killed since the last rest or, for a boss, slain for good. A creature that
  * strays beyond the 7 × 7 is let go, remembering its wounds for when it stands again (only resting
  * or dying makes a foe whole), and the dead are cleared away after their death throes. Also announces each region the
  * investigator enters. In the demo, a spawn point beyond its realms' border is never filled (systems/demo.ts). Pure: no Three.js.
  */
 
+import type { Entity } from '../core/ecs';
 import { getEntity } from '../data/registry';
 import { WORLD } from '../data/tuning';
 import { chunkContent, forgetChunks } from '../world/chunks';
@@ -38,20 +39,36 @@ export function populationSystem(g: Game): void {
       g.events.emit('RegionEntered', { region: r.id, name: r.name });
     }
   }
-  for (const [id, e] of ow.alive) {
-    const tr = c.transform.get(e);
-    if (tr && !c.dead.has(e) && chunkSpan(chunkOf(tr.pos.x), chunkOf(tr.pos.z), pcx, pcz) <= WORLD.keep) continue;
+  /** Lets a creature go, remembering its wounds for when it stands again. */
+  const release = (id: string, e: Entity): void => {
     ow.alive.delete(id);
     ow.dirty = true;
     const h = c.health.get(e);
     if (h && h.hp > 0 && h.hp < h.max && !c.dead.has(e)) ow.wounds.set(id, h.hp / h.max); // it comes back as wounded
-    if (tr) g.ecs.despawn(e);
+    if (c.transform.has(e)) g.ecs.despawn(e);
+  };
+  for (const [id, e] of [...ow.alive]) {
+    const tr = c.transform.get(e);
+    if (tr && !c.dead.has(e) && chunkSpan(chunkOf(tr.pos.x), chunkOf(tr.pos.z), pcx, pcz) <= WORLD.keep) continue;
+    release(id, e);
   }
+  /** In a full house, lets the lesser foe farthest from the investigator go; false if there is none. */
+  const makeRoom = (): boolean => {
+    let [far, gap] = [null as [string, Entity] | null, -1];
+    for (const [id, e] of ow.alive) {
+      const tr = c.transform.get(e);
+      const d = id.startsWith('boss:') ? -1 : tr ? Math.hypot(tr.pos.x - pp.x, tr.pos.z - pp.z) : Infinity;
+      if (d > gap) [far, gap] = [[id, e], d];
+    }
+    if (!far) return false;
+    release(...far);
+    return true;
+  };
   if (!ow.dirty && g.frame % RESCAN !== 0) return;
   ow.dirty = false;
   for (const ch of chunksAround(pcx, pcz, WORLD.load)) {
     for (const s of chunkContent(ch.cx, ch.cz).spawns) {
-      if (ow.alive.size >= WORLD.maxActive) return;
+      if (ow.alive.size >= WORLD.maxActive && !s.id.startsWith('boss:')) continue; // a full house keeps out the lesser foes (and the horrors further on are still looked at)
       if (ow.alive.has(s.id) || ow.killed.has(s.id) || ow.slain.has(s.id)) continue;
       if (!demoAllows(g, s.at)) continue; // at the demo's edge the loaded chunks reach beyond its border: what lives there is not brought in (it would see the investigator, and come over)
       const script = getEntity(s.entity)?.bossScript;
@@ -61,6 +78,7 @@ export function populationSystem(g: Game): void {
       }
       if (script?.called && !ow.called.has(s.entity)) continue; // not called yet: its arena waits empty
       if (!bossAwake(g, s.entity)) continue; // the one before it still stands (the Beyond's order): its arena waits empty
+      if (ow.alive.size >= WORLD.maxActive && !makeRoom()) continue; // a horror is not kept from its own arena by a full house (round 61: the world is denser): the lesser foe farthest away makes room
       const e = spawnCreature(g, s.entity, s.at, s.variant);
       if (e === undefined) continue;
       const wound = ow.wounds.get(s.id);

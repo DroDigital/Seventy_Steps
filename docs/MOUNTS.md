@@ -38,7 +38,7 @@ the wheel's turn; it was a bandpassed rattle at the wheel's rate until round 52,
 car's engine (four gears, it climbs through each with its speed, drops at the shift, and starts and stalls on summon and dismiss), the spectral chariot's
 cold drone with a breath of wind through it that rises as it quickens. Over them: the leather and timber shifting on each second stride, timber creaks, soft wheel
 thumps, a snort at the gallop and one now and then at rest (round 52 took out the brass jingle and the chain's rattle: most of their energy lay above
-2.5 kHz). Every one-shot is held between -22 and -11 dBFS rms (a landed blow is about -18) and below full scale, a walking hoofbeat
+2.5 kHz). Every one-shot is held between -28 and -17 dBFS rms since round 61 (the asides to -36; a landed blow is about -18, and the whole ride was one notch, 6 dB, down) and below full scale, a walking hoofbeat
 5 dB under a gallop's and far above a footfall: `tests/mountAudio.test.ts`. A recorded set can replace the recipes later without
 changing when they play.
 

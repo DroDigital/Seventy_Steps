@@ -10,6 +10,7 @@
  * count). Pure.
  */
 
+import { placeDread } from './placeAura';
 import { boon } from './relics';
 import type { Entity } from '../core/ecs';
 import { distXZ } from '../core/geom';
@@ -99,7 +100,7 @@ function drain(g: Game, dt: number): number {
     if (a > top) [top, rest] = [a, rest + top];
     else rest += a;
   }
-  let loss = (top + SANITY.auraStack * rest) * SANITY.auraScale * dt; // passive dread builds over a fight, with a crowd still weighing in part
+  let loss = (top + SANITY.auraStack * rest) * SANITY.auraScale * dt + placeDread(g) * dt; // passive dread builds over a fight, with a crowd still weighing in part; a place's own dread (round 61) presses on the mind too
   for (const [id, a] of actor) {
     const s = moveDef(a)?.sanity;
     if (!s || a.frozen || !inWindow(s.window, a.frame) || isAbsent(g, id) || combatant.get(id)?.faction !== 'enemy') continue;

@@ -14,7 +14,8 @@ import type { Game } from './components';
 import { demoAllows } from './demo';
 import { isExplored } from './exploration';
 import { changeInsight, spawnTome } from './insight';
-import { loseSanity, restoreSanity } from './sanity';
+import { setPlaceDread } from './placeAura';
+import { restoreSanity } from './sanity';
 
 /** How near the investigator comes to a place to find it. */
 export const reachOf = (s: Pick<PoiSite, 'r'>): number => Math.min(POI.most, Math.max(POI.least, s.r + POI.reach));
@@ -57,17 +58,19 @@ function setDown(g: Game, s: PoiSite): void {
 
 export function poiSystem(g: Game): void {
   const ow = g.overworld;
-  if (!ow || g.frame % POI.every || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return;
+  if (!ow || g.frame % POI.every) return;
   const p = g.ecs.c.transform.get(g.player.id)?.pos;
   const region = p ? regionAt(p.x, p.z)?.id : undefined;
-  if (!p || !region) {
-    within.delete(g); // off the land: in no place
+  if (!p || !region || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) {
+    within.delete(g); // off the land, or fallen: in no place
+    setPlaceDread(g, 0);
     return;
   }
   const dt = POI.every / SIM.hz;
   const was = within.get(g);
   const now = new Set<string>();
   within.set(g, now);
+  let dread = 0; // the heaviest of the dread of the places stood in (read by sanity.ts's drain until the next look)
   for (const s of poiSitesOf(region)) {
     const d = Math.hypot(s.x - p.x, s.z - p.z);
     const def = s.def;
@@ -87,12 +90,12 @@ export function poiSystem(g: Game): void {
       if (gain > 0) changeInsight(g, gain, 'tome', def.name);
     } else if (came && def.again && g.frame - (at.get(def.id) ?? -Infinity) >= POI.hear * SIM.hz) {
       at.set(def.id, g.frame);
-      g.events.emit('Title', { text: def.again });
+      g.events.emit('PoiAgain', { id: def.id, name: def.name, line: def.again });
     }
-    if (!def.aura) continue;
-    if (def.aura > 0) restoreSanity(g, def.aura * dt);
-    else if (g.player.steady <= 0) loseSanity(g, -def.aura * dt);
+    if (def.aura && def.aura > 0) restoreSanity(g, def.aura * dt);
+    else if (def.aura) dread = Math.max(dread, -def.aura);
   }
+  setPlaceDread(g, dread);
 }
 
 /** The place of a given id, resolved: for the tests and the map. */

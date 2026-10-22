@@ -16,7 +16,7 @@ import { PAW, pawAt, pawLanded } from '../src/systems/horseIdle';
 import { cyclesFor, touchdowns } from '../src/systems/mountGait';
 import { render } from './soundRender';
 
-interface Heard { key: string; sound: Sound; gain: number; pan?: number; pitch?: number; at?: V3 | null }
+interface Heard { key: string; sound: Sound; gain: number; level: number; pan?: number; pitch?: number; at?: V3 | null } // `gain` as asked for; `level` the ride's share of it, made by the audio after a recording's own clamp
 interface Layered { set: unknown; gain?: number; pan?: number; pitch?: number }
 
 function ride(id: MountId) {
@@ -27,7 +27,7 @@ function ride(id: MountId) {
   const beds: BedTargets[] = [];
   const audio = createMountAudio(
     g,
-    (key, sound, o) => (heard.push({ key, sound, gain: o?.gain ?? 1, pan: o?.pan, pitch: o?.pitch, at: o?.at }), true),
+    (key, sound, o) => (heard.push({ key, sound, gain: (o?.gain ?? 1) * (o?.level ?? 1), level: o?.level ?? 1, pan: o?.pan, pitch: o?.pitch, at: o?.at }), true),
     { play: (set: unknown, o: Layered = {} as Layered) => (layered.push({ ...o, set }), true) } as unknown as Pick<Sampler, 'play'>,
     { set: (t) => beds.push(t) },
   );
@@ -158,6 +158,16 @@ describe('mounts, heard (round 50)', () => {
     advance(120, 0);
     expect(heard.map((h) => h.key)).toEqual(['mount:automobile:dismiss']);
     expect(beds.at(-1)).toEqual(SILENT_BED);
+  });
+
+  it("every sound of a ride is asked for at the ride's one level, and its own gain left whole: the audio makes the cut after a recording's clamp at 1 (round 61)", () => {
+    const r = ride('grey');
+    r.advance(240, 9);
+    expect(r.heard.length).toBeGreaterThan(0);
+    for (const h of r.heard) {
+      expect(h.level, h.key).toBeCloseTo(MOUNT_MIX.level, 6);
+      expect(h.gain, h.key).toBeGreaterThan(0);
+    }
   });
 
   it('pausing silences the beds', () => {

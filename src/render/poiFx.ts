@@ -19,9 +19,9 @@ const HEAD = 'uniform vec3 uColor; uniform float uAlpha; uniform float uTime; va
 const FRAG: Record<'column' | 'ring' | 'sheet', string> = {
   column: HEAD + `void main() {
   float side = smoothstep(0.5, 0.08, abs(vUv.x - 0.5));
-  float rise = pow(1.0 - vUv.y, 0.9) * smoothstep(0.0, 0.03, vUv.y);
+  float rise = pow(1.0 - vUv.y, 0.7) * smoothstep(0.0, 0.03, vUv.y);
   float bands = 0.65 + 0.35 * sin(vUv.y * 48.0 - uTime * 3.2);
-  gl_FragColor = vec4(uColor, uAlpha * 0.34 * side * rise * bands);
+  gl_FragColor = vec4(uColor, uAlpha * 0.7 * side * rise * bands);
 }`,
   ring: HEAD + `void main() {
   vec2 p = vUv * 2.0 - 1.0;
@@ -31,14 +31,14 @@ const FRAG: Record<'column' | 'ring' | 'sheet', string> = {
   float inner = smoothstep(0.03, 0.0, abs(r - 0.62)) * step(0.5, fract(a * 3.6 - uTime * 0.3));
   float spokes = smoothstep(0.02, 0.0, abs(fract(a * 0.9549 + uTime * 0.05) - 0.5) - 0.48) * step(0.62, r) * step(r, 0.9);
   float pulse = 0.7 + 0.3 * sin(uTime * 1.6);
-  gl_FragColor = vec4(uColor, uAlpha * 0.55 * pulse * clamp(outer + inner + spokes * 0.6, 0.0, 1.0));
+  gl_FragColor = vec4(uColor, uAlpha * 0.85 * pulse * clamp(outer + inner + spokes * 0.6, 0.0, 1.0));
 }`,
   sheet: HEAD + `void main() {
   float x = vUv.x * 64.0;
   float streak = 0.5 + 0.5 * sin(x + sin(uTime * 0.6 + vUv.y * 5.0 + x * 0.21) * 2.0);
   float fine = 0.5 + 0.5 * sin(x * 2.7 - uTime * 1.1);
   float hem = smoothstep(0.0, 0.22, vUv.y) * smoothstep(1.0, 0.45, vUv.y);
-  gl_FragColor = vec4(uColor, uAlpha * 0.3 * hem * pow(streak, 2.0) * (0.55 + 0.45 * fine));
+  gl_FragColor = vec4(uColor, uAlpha * 0.6 * hem * pow(streak, 2.0) * (0.55 + 0.45 * fine));
 }`,
 };
 const MOTE_VERT = `attribute float aSeed; uniform float uTime; uniform float uHeight; uniform float uSize; varying float vTw;
@@ -79,7 +79,7 @@ function build(site: PoiSite, fx: Fx, uTime: { value: number }): Shown {
   const R = Math.max(5, Math.min(site.r * 0.7, 16));
   let billboard = false;
   if (fx.form === 'column') {
-    group.add(sheet(new THREE.PlaneGeometry(2.4, 48).translate(0, 24, 0), 'column'));
+    group.add(sheet(new THREE.PlaneGeometry(3.2, 52).translate(0, 26, 0), 'column'));
     billboard = true;
   } else if (fx.form === 'ring') {
     group.add(sheet(new THREE.PlaneGeometry(R * 2, R * 2).rotateX(-Math.PI / 2).translate(0, 0.2, 0), 'ring'));
@@ -96,7 +96,7 @@ function build(site: PoiSite, fx: Fx, uTime: { value: number }): Shown {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
-    const m = new THREE.Points(geo, new THREE.ShaderMaterial({ uniforms: { ...uniforms, uHeight: { value: 14 }, uSize: { value: 2.2 } }, vertexShader: MOTE_VERT, fragmentShader: MOTE_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    const m = new THREE.Points(geo, new THREE.ShaderMaterial({ uniforms: { ...uniforms, uHeight: { value: 14 }, uSize: { value: 3.4 } }, vertexShader: MOTE_VERT, fragmentShader: MOTE_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
     m.frustumCulled = false;
     group.add(m);
   }

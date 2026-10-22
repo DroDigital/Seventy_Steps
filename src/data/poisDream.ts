@@ -1,7 +1,7 @@
 /**
  * The points of interest of the Dreamlands (round 61; data/pois.ts), a realm four times the area of any other and the sparsest on the
  * map: the Zoogs' wood, Ulthar's cats, the feast of the ghouls, Barzai's ledge on Hatheg-Kla, Ngranek's carved face, the shore of Ib,
- * Celephaïs' stair, the plateau of Leng, the Moon-beasts' quay. Two of them heal rather than hurt: a cat's circle and a dreamer's gate.
+ * Celephaïs' stair, the plateau of Leng, the Moon-beasts' quay. Three of them heal rather than hurt: the cats' circle, the Onyx stair and Kuranes' hollow.
  */
 
 import type { PoiDef } from './pois';
@@ -12,7 +12,7 @@ export const POIS_DREAM: readonly PoiDef[] = [
   { id: 'dream_hatheg_ledge', region: 'dreamlands', at: { near: [110, 680], as: 'cliff' }, name: "Barzai's Last Ledge", kind: 'anomaly', story: 'The Other Gods',
     line: 'Here a philosopher stood to watch the gods of Earth dance, and learned that the others were nearer.', again: 'Nothing here casts a shadow, but the ledge has one.', fx: { form: 'column', hue: 'magenta' }, aura: -0.4, insight: 1 },
   { id: 'dream_cats_circle', region: 'dreamlands', at: { feature: 'ruin', nth: 0 }, name: "The Cats' Circle", kind: 'tale', story: 'The Cats of Ulthar',
-    line: 'Every cat in the grove has turned to face you. None of them is afraid.', again: 'They arrange themselves a little, to make you room.', aura: 0.7, hoard: 400, insight: 1 },
+    line: 'Every cat on the terrace has turned to face you. None of them is afraid.', again: 'They arrange themselves a little, to make you room.', aura: 0.7, hoard: 400, insight: 1 },
   { id: 'dream_ghoul_feast', region: 'dreamlands', at: { feature: 'circle', nth: 1 }, name: "The Ghouls' Feast Stones", kind: 'den', story: 'The Dream-Quest of Unknown Kadath',
     line: 'Bones, a lamp of corpse-fat and a painter\'s easel, all left in a hurry.', foes: { ids: ['ghoul', 'ghast'], n: 7 }, hoard: 900 },
   { id: 'dream_ngranek_face', region: 'dreamlands', at: { feature: 'outcrop', nth: 0 }, name: "Ngranek's Carved Face", kind: 'anomaly', story: 'The Dream-Quest of Unknown Kadath',

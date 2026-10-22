@@ -30,7 +30,7 @@ export const callReach = (height: number): number => 140 + height * 7;
 export const callEvery = (distance: number, reach: number): number => 30 + 60 * Math.min(1, distance / reach);
 
 /** What calls across the dream, by the horror's height: a low bellow for one of a house's size, the whale-song of the deep for the vast. */
-export const callOf = (height: number): { set: SampleSetId; pitch: number } => (height >= 25 ? { set: 'whale', pitch: 0.65 } : height >= 12 ? { set: 'bellow', pitch: 0.7 } : { set: 'roar', pitch: 0.7 });
+export const callOf = (height: number): { set: SampleSetId; pitch: number } => (height >= 25 ? { set: 'whale', pitch: 0.65 } : height >= ZONES.height ? { set: 'bellow', pitch: 0.7 } : { set: 'roar', pitch: 0.7 });
 
 export interface Dread {
   update(seconds: number, paused: boolean): void;

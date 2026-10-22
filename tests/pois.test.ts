@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../src/core/rng';
-import { POI_KINDS, POIS, hoardName, poiKey, poisOf } from '../src/data/pois';
+import { POI_KINDS, POIS, hoardName, poiKey, poisOf, type PoiDef } from '../src/data/pois';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES, getEntity } from '../src/data/registry';
 import { START_SIGN } from '../src/data/sites';
@@ -14,7 +14,7 @@ import { explore } from '../src/systems/exploration';
 import { createWorldGame } from '../src/systems/game';
 import { poiMark, reachOf } from '../src/systems/pois';
 import { parseSave, snapshot } from '../src/systems/save';
-import { CELLS, mazeWalls } from '../src/world/poiPlan';
+import { CELLS, mazeWalls, planPois } from '../src/world/poiPlan';
 import { allPoiSites, poiSitesOf } from '../src/world/poiSites';
 import { FIRST_HOUR, gentle, groundOf } from '../src/world/planSpawns';
 import { worldLayout } from '../src/world/placements';
@@ -134,14 +134,18 @@ describe('the points of interest: where they stand', () => {
     }
   });
 
-  it('the first hour is kept gentle: near the opening, only the gentle foes', () => {
+  it('the first hour is kept gentle: a place raised near the opening is guarded by none but the gentle foes', () => {
+    const hub = REGIONS.find((r) => r.id === 'hub')!;
     const start = worldLayout().signs.find((x) => x.id === START_SIGN)!;
-    let early = 0;
-    for (const s of sites.filter((x) => Math.hypot(x.x - start.x, x.z - start.z) < FIRST_HOUR)) {
-      early++;
-      const plan = regionPlan(REGIONS.find((r) => r.id === s.def.region)!);
-      for (const f of [...plan.spawns.values()].flat().filter((x) => x.id.startsWith(`poi:${s.def.id}:`))) expect(gentle(f.entity), `${f.id}: ${f.entity}`).toBe(true);
-    }
+    const plan = regionPlan(hub);
+    const def: PoiDef = { id: 'test_early', region: 'hub', at: { feature: 'grove', nth: 3 }, name: 'Test grove', kind: 'den', story: 'x', line: 'x', foes: { ids: ['ghoul', 'thousand_young', 'deep_one', 'rat_swarm'], n: 8 } };
+    const out = planPois(hub, plan.features, [...plan.props.values()].flat(), [...plan.spawns.values()].flat(), [def]);
+    expect(out.sites).toHaveLength(1);
+    expect(Math.hypot(out.sites[0].x - start.x, out.sites[0].z - start.z), 'the test place stands within the first hour').toBeLessThan(FIRST_HOUR);
+    expect(out.spawns.length).toBeGreaterThan(0);
+    for (const f of out.spawns) expect(gentle(f.entity), `${f.id}: ${f.entity}`).toBe(true);
+    const far = planPois(hub, plan.features, [...plan.props.values()].flat(), [...plan.spawns.values()].flat(), [{ ...def, at: { feature: 'graveyard', nth: 0 }, foes: { ids: ['ghoul'], n: 4 } }]);
+    expect(far.spawns.length, 'beyond the first hour any foe may stand').toBeGreaterThan(0);
   });
 
   it('they are planned after everything else: the ordinary posts keep their ids, running on from 0', () => {
@@ -179,13 +183,14 @@ describe('the points of interest: found by coming to them', () => {
     expect(again).toHaveLength(0);
   });
 
-  it('a strange place gives a little insight; one that is only a den gives none', () => {
-    const strange = POIS.find((p) => (p.kind === 'anomaly' || p.kind === 'tale') && p.region === 'arkham' && p.insight === undefined);
-    const den = POIS.find((p) => p.kind === 'den' && p.region === 'arkham' && p.insight === undefined);
-    for (const [def, want] of [[strange, POI.insight], [den, 0]] as const) {
-      if (!def) continue;
+  it('a strange place gives a little insight (its own, or POI.insight by default); one that is only a den gives none', () => {
+    const own = POIS.find((p) => p.id === 'arkham_blasted_well')!;
+    const plain = POIS.find((p) => (p.kind === 'anomaly' || p.kind === 'tale') && p.insight === undefined)!; // the default
+    const den = POIS.find((p) => p.kind === 'den' && p.insight === undefined)!;
+    expect(plain, 'one place leaves its insight to the default').toBeDefined();
+    for (const [def, want] of [[own, own.insight ?? POI.insight], [plain, POI.insight], [den, 0]] as const) {
       const g = createWorldGame();
-      const s = poiSitesOf('arkham').find((x) => x.def.id === def.id)!;
+      const s = poiSitesOf(def.region).find((x) => x.def.id === def.id)!;
       goTo(g, s.x, s.z);
       run(g, 40);
       expect(g.mind.insight, def.id).toBe(want);
@@ -196,9 +201,21 @@ describe('the points of interest: found by coming to them', () => {
     const g = createWorldGame();
     const chest = site.chest!;
     const named = (): number => [...g.ecs.c.tome.values()].filter((t) => t.name === hoardName(site.def.id)).length;
-    goTo(g, site.x + POI.range + 40, site.z);
+    const rc = regionRect(REGIONS.find((r) => r.id === 'arkham')!);
+    const inward = (d: number): [number, number] => {
+      const [mx, mz] = [(rc.x0 + rc.x1) / 2 - site.x, (rc.z0 + rc.z1) / 2 - site.z];
+      const k = d / Math.hypot(mx, mz);
+      return [site.x + mx * k, site.z + mz * k]; // toward the middle of the region, so that it stays in it
+    };
+    goTo(g, ...inward(POI.range + 15));
     run(g, 40);
-    expect(named()).toBe(0);
+    expect(g.overworld!.region).toBe('arkham');
+    expect(named(), 'just beyond the range').toBe(0);
+    goTo(g, ...inward(POI.range - 15));
+    run(g, 40);
+    expect(named(), 'just within the range').toBe(1);
+    run(g, 40);
+    expect(named()).toBe(1);
     goTo(g, site.x + 30, site.z);
     run(g, 40);
     expect(named()).toBe(1);
@@ -221,45 +238,48 @@ describe('the points of interest: found by coming to them', () => {
     expect(def).toBeDefined();
     const g = createWorldGame();
     const s = poiSitesOf(def!.region).find((x) => x.def.id === def!.id)!;
-    const titles = record(g, 'Title');
+    const heard = record(g, 'PoiAgain');
     goTo(g, s.x, s.z);
     run(g, 40);
-    expect(titles.map((t) => t.text)).not.toContain(def!.again);
+    expect(heard.map((t) => t.line)).not.toContain(def!.again);
     goTo(g, s.x + 200, s.z);
     run(g, 20);
     goTo(g, s.x, s.z);
     run(g, 40);
-    expect(titles.map((t) => t.text)).not.toContain(def!.again); // too soon
+    expect(heard.map((t) => t.line)).not.toContain(def!.again); // too soon
     goTo(g, s.x + 200, s.z);
     run(g, 20);
     g.frame += POI.hear * 60 + 60; // the minute and more passes
     goTo(g, s.x, s.z);
     run(g, 40);
-    expect(titles.map((t) => t.text)).toContain(def!.again);
+    expect(heard.map((t) => t.line)).toContain(def!.again);
   });
 
-  it('dread drains the mind and comfort mends it, unless a swallow of Laudanum holds it', () => {
-    const dread = POIS.find((p) => (p.aura ?? 0) < 0 && p.region === 'arkham');
-    expect(dread).toBeDefined();
-    const g = createWorldGame();
-    const s = poiSitesOf('arkham').find((x) => x.def.id === dread!.id)!;
-    g.mind.sanity = 90;
-    goTo(g, s.x, s.z);
-    run(g, 120);
-    expect(g.mind.sanity).toBeLessThan(90);
-    const held = createWorldGame();
-    held.mind.sanity = 90;
-    held.player.steady = 99999;
-    goTo(held, s.x, s.z);
-    run(held, 120);
-    expect(held.mind.sanity).toBeGreaterThanOrEqual(90);
-    const dream = POIS.find((p) => (p.aura ?? 0) > 0)!;
-    const d = createWorldGame();
+  it('dread presses on the mind (and stops its mending), and a swallow of Laudanum holds it off; comfort mends beyond the ordinary mending', () => {
+    const dread = POIS.find((p) => p.id === 'arkham_doorstep')!; // no guard of its own to drain with it
+    expect(dread.foes).toBeUndefined();
+    const s = poiSitesOf('arkham').find((x) => x.def.id === dread.id)!;
+    const stand = (steady: number, sanity: number, frames: number) => {
+      const g = createWorldGame();
+      g.mind.sanity = sanity;
+      g.player.steady = steady;
+      goTo(g, s.x, s.z);
+      run(g, frames);
+      return g.mind;
+    };
+    const lost = 90 - stand(0, 90, 600).sanity;
+    expect(lost, 'ten seconds of its dread, the mind not mending').toBeGreaterThan(-(dread.aura!) * 8);
+    expect(lost).toBeLessThan(-(dread.aura!) * 12);
+    expect(stand(99999, 90, 600).sanity, 'held off by the draught').toBeGreaterThanOrEqual(90);
+    const unmoored = stand(0, 10, 600).sanity; // where the mind mends its fastest in the dark, the dread still presses
+    expect(unmoored, 'a failing mind does not mend while the place presses on it').toBeLessThan(10);
+    const dream = POIS.find((p) => p.id === 'dream_cats_circle')!; // (the others lie where foes press on the mind as well)
     const ds = poiSitesOf(dream.region).find((x) => x.def.id === dream.id)!;
-    d.mind.sanity = 40;
-    goTo(d, ds.x, ds.z);
-    run(d, 120);
-    expect(d.mind.sanity).toBeGreaterThan(40);
+    const g = createWorldGame();
+    g.mind.sanity = 40;
+    goTo(g, ds.x, ds.z);
+    run(g, 600);
+    expect(g.mind.sanity - 40, 'ten seconds of its comfort, over the ordinary mending').toBeGreaterThan(dream.aura! * 10 * 0.7);
   });
 
   it('the demo keeps to its own realms: a place beyond them is not found, and no mark is shown of it', () => {
@@ -296,6 +316,9 @@ describe('the points of interest on the map', () => {
   it('the secrets are not among the named places, nor do they count toward the searcher', () => {
     for (const r of REGIONS) expect(regionPlan(r).pois.length).toBe(poisOf(r.id).length);
     const g = createWorldGame();
-    expect([...g.overworld!.places].some((x) => x.startsWith('poi'))).toBe(false);
+    goTo(g, site.x, site.z);
+    run(g, 40);
+    expect(g.overworld!.told.has(poiKey(site.def.id)), 'it is found').toBe(true);
+    expect([...g.overworld!.places].some((x) => x.startsWith('poi') || x === site.def.id)).toBe(false);
   });
 });

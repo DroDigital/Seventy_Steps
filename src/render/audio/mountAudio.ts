@@ -24,7 +24,7 @@ import { surfaceAt } from './foley';
 import { SILENT_BED, bedTargets, type MountBed } from './mountBed';
 import type { Sampler } from './sampler';
 
-type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number }) => boolean;
+type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number; level?: number }) => boolean;
 
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
 const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [3, 5], stone: [2.2, 3.6], water: [99, 99] }; // metres between a wheel's thumps
@@ -46,8 +46,8 @@ export interface MountAudio {
 }
 
 export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 'play'>, bed?: MountBed): MountAudio {
-  /** Every sound of a ride goes through the one level (round 61), after the recordings' own clamp is made: a cut that is felt in the voice as well. */
-  const recipe: Recipe = (key, sound, o = {}) => play(key, sound, { ...o, gain: (o.gain ?? 1) * MOUNT_MIX.level });
+  /** Every sound of a ride goes through the one level (round 61), which the recipe applies after a recording's own clamp at 1 is made: a true cut, the horse's voice too. */
+  const recipe: Recipe = (key, sound, o = {}) => play(key, sound, { ...o, level: (o.level ?? 1) * MOUNT_MIX.level });
   let active: MountId | null = null;
   let last: V3 | null = null;
   let phase = 0;

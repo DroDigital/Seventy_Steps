@@ -7,9 +7,10 @@
 import type { RegionDef } from '../data/regions';
 import { poiMark, poiCount } from '../systems/pois';
 import type { Game } from '../systems/components';
+import { placeAt } from '../world/namedPlaces';
 import { poiSitesOf } from '../world/poiSites';
 import type { PoiKind } from '../data/pois';
-import { BONE } from './hudKit';
+import { BONE, SERIF } from './hudKit';
 import { screenX, screenY, type MapView } from './mapPainter';
 import { slip, SLIDE } from './mapWrong';
 import { uiScale } from './uiScale';
@@ -66,7 +67,7 @@ export function drawPois(ctx: CanvasRenderingContext2D, view: MapView, g: Game, 
       ctx.translate(x, y);
       ctx.rotate(-turn);
       if (mark === 'rumour') {
-        ctx.font = `bold ${Math.round(13 * k)}px monospace`;
+        ctx.font = 'bold 13px monospace'; // (the marks keep their size, as the map's others do)
         ctx.textBaseline = 'middle';
         ctx.lineWidth = 3;
         ctx.strokeStyle = '#000';
@@ -81,14 +82,14 @@ export function drawPois(ctx: CanvasRenderingContext2D, view: MapView, g: Game, 
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = mark === 'spent' ? DIM : BONE;
         ctx.stroke();
-        if (names) {
-          ctx.font = `${Math.round(8.5 * k)}px monospace`;
+        if (names && placeAt(s.x, s.z)?.name !== s.def.name) { // (a place the map already names under the same name is not named twice)
+          ctx.font = `${Math.round(9 * k)}px ${SERIF}`; // the period face, as the map's other names are
           ctx.textBaseline = 'top';
           ctx.lineWidth = 3;
           ctx.strokeStyle = '#000';
-          ctx.strokeText(s.def.name.toUpperCase(), 0, 8);
+          ctx.strokeText(s.def.name, 0, 8);
           ctx.fillStyle = DIM;
-          ctx.fillText(s.def.name.toUpperCase(), 0, 8);
+          ctx.fillText(s.def.name, 0, 8);
         }
       }
       ctx.restore();

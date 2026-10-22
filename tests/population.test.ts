@@ -31,6 +31,24 @@ describe('population', () => {
     }
   });
 
+  it('a full house keeps out the lesser foes, never a horror from its own arena (round 61: the world is denser)', () => {
+    const w = WORLD as { maxActive: number };
+    const was = w.maxActive;
+    try {
+      w.maxActive = 3; // the house filled long before the arena's turn
+      const g = game();
+      const boss = worldLayout().spawns.find((s) => s.id.startsWith('boss:') && s.entity === 'colour_out_of_space')!;
+      goTo(g, boss.at.x, boss.at.z - 25);
+      g.overworld!.dirty = true;
+      run(g, 31);
+      const lesser = [...g.overworld!.alive.keys()].filter((k) => !k.startsWith('boss:'));
+      expect(lesser.length, 'the lesser foes are kept to the house').toBeLessThanOrEqual(w.maxActive);
+      expect(creatureOf(g, boss.id), 'the horror stands in its arena').toBeDefined();
+    } finally {
+      w.maxActive = was;
+    }
+  });
+
   it('lets creatures go beyond the 7 × 7, and brings them back on return', () => {
     const g = game();
     const [id, e] = [...g.overworld!.alive][0];

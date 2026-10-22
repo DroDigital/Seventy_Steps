@@ -1,6 +1,6 @@
 /**
  * Where the points of interest stand (round 61; data/pois.ts): each resolved to the feature of the region plan it belongs at, or to a
- * spot found on the land (a shore with water within ten metres, a cliff's flat brow over a drop, a clearing broad enough for a maze),
+ * spot found on the land (a shore with the sea within twenty-two metres, a cliff's flat brow over a drop, a clearing broad enough for a maze),
  * with the guard that stands about it (posts like any other foe's, and so kept, rested and saved as theirs are), the place its chest
  * is set down, its maze of walls, and what else is raised about it. Planned after everything else in the region, on streams of its own,
  * so that no earlier prop, post or id moves. Pure: no Three.js.
@@ -103,10 +103,12 @@ function mazeProps(cx: number, cz: number, rng: Rng): { props: Prop[]; cell: (i:
           : (line === 0 || line === CELLS ? true : right[line - 1][k])); // the lines running north
         if (solid) run++;
         else if (run) {
-          const half = (run * c) / 2;
-          const mid = (k - run) * c + half;
-          if (along === 'x') wall(x0 + mid, z0 + line * c, half, 'x');
-          else wall(x0 + line * c, z0 + mid, half, 'z');
+          for (let a = 0; a < run; a += 2) { // in pieces of two passages at most, each standing on the ground at its own middle (a long run on a slope would float at one end and sink at the other)
+            const half = (Math.min(2, run - a) * c) / 2;
+            const mid = (k - run + a) * c + half;
+            if (along === 'x') wall(x0 + mid, z0 + line * c, half, 'x');
+            else wall(x0 + line * c, z0 + mid, half, 'z');
+          }
           run = 0;
         }
       }
@@ -115,8 +117,7 @@ function mazeProps(cx: number, cz: number, rng: Rng): { props: Prop[]; cell: (i:
   return { props, cell: (i, j) => ({ x: x0 + (i + 0.5) * c, z: z0 + (j + 0.5) * c }) };
 }
 
-export function planPois(region: RegionDef, features: readonly Feature[], props: readonly Prop[], posts: readonly SpawnPoint[]): PoiPlan {
-  const defs = poisOf(region.id);
+export function planPois(region: RegionDef, features: readonly Feature[], props: readonly Prop[], posts: readonly SpawnPoint[], defs: readonly PoiDef[] = poisOf(region.id)): PoiPlan {
   const plan: PoiPlan = { sites: [], props: [], spawns: [] };
   if (!defs.length) return plan;
   const base = groundOf(region, props);

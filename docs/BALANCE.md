@@ -47,12 +47,12 @@ nothing in its way.
 | 18 | The Whisperer in Akeley's Chair | 11/5/11 | 5 | 850 | 10 | 60 | 292 | 0.07 | 0 |
 | 19 | Joseph Curwen | 12/5/11 | 5 | 900 | 10 | 123 | 304 | 0.14 | 0 |
 | 20 | The Haunter of the Dark | 12/6/11 | 5 | 1050 | 147 | 2715 | 304 | 3.19 | 0 |
-| 21 | The Horror at Martin's Beach | 12/6/12 | 5 | 1200 | 22 | 102 | 304 | 0.12 | 0 |
+| 21 | The Horror at Martin's Beach | 13/6/12 | 5 | 1200 | 22 | 102 | 316 | 0.12 | 0 |
 | 22 | The Dunwich Horror | 13/6/12 | 5 | 1550 | 18 | 416 | 316 | 0.47 | 0 |
 | 23 | Mother Hydra | 11/5/11 | 5 | 2600 | 26 | 537 | 292 | 0.66 | 0 |
 | 24 | Father Dagon | 11/5/11 | 5 | 2700 | 30 | 529 | 292 | 0.65 | 0 |
 | 25 | Shub-Niggurath | 11/5/11 | 5 | 3100 | 72 | 427 | 292 | 0.52 | 0 |
-| 26 | Hypnos | 14/7/13 | 5 | 950 | 20 | 55 | 328 | 0.06 | 0 |
+| 26 | Hypnos | 14/7/14 | 5 | 950 | 20 | 55 | 328 | 0.06 | 0 |
 | 27 | High Priest Not to Be Described | 16/7/15 | 5 | 1000 | 9 | 106 | 352 | 0.11 | 0 |
 | 28 | The Colossus Beneath the Pyramids | 17/8/17 | 5 | 1650 | 15 | 359 | 364 | 0.35 | 0 |
 | 29 | The Other Gods | 16/8/15 | 5 | 1900 | 15 | 212 | 352 | 0.22 | 0 |

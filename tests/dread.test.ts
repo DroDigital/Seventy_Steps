@@ -21,6 +21,8 @@ describe('dread by sound (round 26)', () => {
   it('what calls is by its size', () => {
     expect(callOf(40).set).toBe('whale');
     expect(callOf(16).set).toBe('bellow');
+    expect(callOf(11).set).toBe('bellow'); // Father Dagon, at 11 m since round 61, calls as a colossus does
+    expect(callOf(10.5).set).toBe('bellow');
     expect(callOf(9).set).toBe('roar');
     expect(callOf(40).pitch).toBeLessThan(callOf(9).pitch + 0.1);
   });

@@ -1,5 +1,5 @@
 /**
- * No horror's heaviest blow takes more than a third of the investigator's health where a person meets it (round 60:
+ * No horror's heaviest blow takes more than 28% of the investigator's health, nor less than 12%, where a person meets it (round 60, a third; round 61, 28%:
  * asked, "God bosses like Father Dagon and similar are way too overpowered and make way too much damage"; at the
  * standing a person has when the open world first lets them reach a god, Shub-Niggurath's charge took 51% of it,
  * Father Dagon's slam 44%, Nyarlathotep's burst 43%, so two blows were a death, against 18-24% for the named horrors).
@@ -24,14 +24,14 @@ const heaviest = (id: string): { move: string; damage: number } => {
 };
 
 describe('a horror\'s heaviest blow (round 60)', () => {
-  it('takes at most a third of the health a person has when they meet it', () => {
+  it('takes at most 28% of the health a person has when they meet it', () => {
     for (const s of standings()) {
       const { move, damage } = heaviest(s.id);
       expect(damage / s.hp, `${s.id}'s ${move}: ${damage} of ${s.hp}`).toBeLessThanOrEqual(MOST);
     }
   });
 
-  it('takes at least an eighth of it, or the horror is only a wall of health', () => {
+  it('takes at least 12% of it, or the horror is only a wall of health', () => {
     for (const s of standings().filter((x) => !['azathoth', 'haunter_of_the_dark'].includes(x.id))) {
       const { move, damage } = heaviest(s.id);
       expect(damage / s.hp, `${s.id}'s ${move}: ${damage} of ${s.hp}`).toBeGreaterThanOrEqual(LEAST);
