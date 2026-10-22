@@ -24,10 +24,10 @@ import { surfaceAt } from './foley';
 import { SILENT_BED, bedTargets, type MountBed } from './mountBed';
 import type { Sampler } from './sampler';
 
-type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number }) => boolean;
+type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number; level?: number }) => boolean;
 
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
-const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [1.4, 2.4], stone: [1.1, 1.8], water: [99, 99] }; // metres between a wheel's thumps
+const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [3, 5], stone: [2.2, 3.6], water: [99, 99] }; // metres between a wheel's thumps
 const PAIR = 0.059; // the second spectral horse's gait, a share of a cycle behind the first (0.37 rad: render/mountCarriage.ts)
 const GALLOP_SNORT = 14 * gaitScale; // m/s: set for a gallop of 18, kept in step with the mounts' (round 55: a gallop of 10.5 never reached 14)
 
@@ -45,7 +45,9 @@ export interface MountAudio {
   pause(): void;
 }
 
-export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler, 'play'>, bed?: MountBed): MountAudio {
+export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 'play'>, bed?: MountBed): MountAudio {
+  /** Every sound of a ride goes through the one level (round 61), which the recipe applies after a recording's own clamp at 1 is made: a true cut, the horse's voice too. */
+  const recipe: Recipe = (key, sound, o = {}) => play(key, sound, { ...o, level: (o.level ?? 1) * MOUNT_MIX.level });
   let active: MountId | null = null;
   let last: V3 | null = null;
   let phase = 0;
@@ -88,8 +90,8 @@ export function createMountAudio(g: Game, recipe: Recipe, sampler?: Pick<Sampler
     const hind = leg >= 2;
     const pan = (leg % 2 === 0 ? -0.3 : 0.3) * (pair ? -1 : 1);
     const shoe = id === 'chariot' ? 'bone' : 'iron';
-    recipe(`mount:${id}:hoof:${leg}${pair ? 'b' : ''}`, hoofBeat(ground, { hind, shoe, weight }), { gain: MOUNT_MIX.hoof * (0.55 + 0.45 * weight) * (pair ? 0.8 : 1), pitch: hind ? 0.94 : 1.02, vary: 0.4, pan });
-    if (id === 'grey') sampler?.play(SAMPLE_SETS[STEP_SET[ground]], { gain: MOUNT_MIX.hoofSample * weight * weight, pan, pitch: 0.7 + 0.14 * weight - (hind ? 0.05 : 0) });
+    recipe(`mount:${id}:hoof:${leg}${pair ? 'b' : ''}`, hoofBeat(ground, { hind, shoe, weight }), { gain: MOUNT_MIX.hoof * (0.55 + 0.45 * weight) * (pair ? 0.65 : 1), pitch: hind ? 0.94 : 1.02, vary: 0.4, pan });
+    if (id === 'grey') sampler?.play(SAMPLE_SETS[STEP_SET[ground]], { gain: MOUNT_MIX.hoofSample * MOUNT_MIX.level * weight * weight, pan, pitch: 0.7 + 0.14 * weight - (hind ? 0.05 : 0) });
   };
 
   const spread = (width: number): number => (Math.random() - 0.5) * width;

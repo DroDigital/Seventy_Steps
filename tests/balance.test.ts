@@ -34,6 +34,14 @@ interface Row extends Standing, Pick<BotFight, 'dealt' | 'taken' | 'fell' | 'dea
 
 /** What the table may not hold: bounds for a fight worth having (not over in seconds, not a slog, not costing more lives than a person carries Reagent for). */
 const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1 } as const; // (round 60: a god spends at most the Reagent carried: Father Dagon was "way too overpowered", and R'lyeh's too hard at level 26)
+/**
+ * Round 61, "no boss insurmountable, none excessively easy": each tier's own band as well, so a fight is held to its kind and not only to the
+ * widest bounds. A named horror is over in 7 to 40 seconds and always costs something (a bot that slips most blows still bleeds a little);
+ * a god of 2500 health or more takes 18 to 90 (a long tail is for the gaze and the roots, waived and added above) and costs between a third of the Reagent carried
+ * and all of it, the cost the round before had brought each into. Seconds are the bot's, steady and close in: a person's are about three times as long.
+ */
+const GREAT = 2500; // health: a god this hardy is a fight of its own length
+const BANDS = { named: { seconds: [7, 40], lives: [0.03, 3] }, god: { seconds: [18, 90], lives: [0.35, 1] } } as const;
 const BOUNDS_TEXT = '6 to 260 seconds';
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
 const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
@@ -67,6 +75,7 @@ nothing in its way.
 `;
 const NOTES = `
 Bounds held by the test: each boss finishes within ${BOUNDS_TEXT}, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1), and the bot does not die.
+Round 61 adds each tier's band: a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs at least ${BANDS.named.lives[0]} of a life; a god of ${GREAT} health or more takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives.
 `;
 
 const OPENING_TEXT = `
@@ -112,6 +121,9 @@ describe('the balance table (round 25)', () => {
       const god = ['great_old_one', 'outer_god'].includes(getEntity(r.id)!.tier);
       if (r.pressure > (god ? BOUNDS.godLives : colossus ? BOUNDS.colossusLives : BOUNDS.lives)) bad.push(`${r.id}: ${r.pressure.toFixed(1)} lives`);
       if (r.deaths > 0) bad.push(`${r.id}: died ${r.deaths} times`);
+      const band = BANDS[god && getEntity(r.id)!.stats.hp >= GREAT ? 'god' : 'named']; // (the lesser Outer Gods, the Pipers, the Other Gods and the Ancient Ones, are fought as the named are)
+      if (r.seconds < band.seconds[0] || r.seconds > band.seconds[1]) bad.push(`${r.id}: ${r.seconds.toFixed(0)} seconds, its tier's band is ${band.seconds.join(' to ')}`);
+      if (r.pressure < band.lives[0] || r.pressure > band.lives[1]) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives, its tier's band is ${band.lives.join(' to ')}`);
     }
     expect(bad).toEqual([]);
   });

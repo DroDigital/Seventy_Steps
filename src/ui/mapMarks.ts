@@ -8,14 +8,17 @@
  */
 
 import { NPCS } from '../data/npcs';
+import type { PoiKind } from '../data/pois';
 import { getEntity } from '../data/registry';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { isExplored } from '../systems/exploration';
 import { markerDistance, markerHere } from '../systems/marker';
 import { npcPlace } from '../systems/npcs';
+import { poiMark } from '../systems/pois';
 import { mapPlaces, type MapPlace } from '../world/mapData';
-import { placesOf } from '../world/namedPlaces';
+import { placeAt, placesOf } from '../world/namedPlaces';
+import { poiSitesOf } from '../world/poiSites';
 import { regionAt } from '../world/worldMap';
 import { BONE, DIM, type MarkKind, type MarkState, PIN_TIP, reach } from './mapIcons';
 import type { MapLabel } from './mapLabels';
@@ -35,6 +38,9 @@ export interface Mark {
   place: MapPlace | null;
   label: MapLabel | null;
 }
+
+/** What each kind of secret is called on its hover card (round 61). */
+const SECRET_TITLE: Record<PoiKind, string> = { tale: 'A place from a tale', hoard: 'A hoard', rite: 'A rite', anomaly: 'An anomaly', den: 'A den' };
 
 /** Pixels a metre, divided by the UI's scale, from which each thing is drawn on the full map, and then named. */
 export const DETAIL = { people: 0.9, peopleNames: 1.8, places: 1.2, placeNames: 2.2, doorNames: 1.0 } as const;
@@ -123,6 +129,22 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       const [x, y] = [screenX(view, pl.x), screenY(view, pl.z)];
       add(under, { kind: 'place', x, y, state: {}, title: 'A place you found', name: pl.name, note: '' }, 0.7,
         full && detail >= DETAIL.placeNames ? { text: pl.name, x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
+    }
+  }
+
+  for (const r of realm) { // the secrets of the land (round 61): a grey ? where ground near one is charted, its kind's figure once found
+    for (const site of poiSitesOf(r.id)) {
+      const mark = poiMark(g, site);
+      if (mark === 'hidden') continue;
+      const [x, y] = slid(`poi:${site.def.id}`, screenX(view, site.x), screenY(view, site.z));
+      if (!near(x, y)) continue;
+      const rumour = mark === 'rumour';
+      const named = !rumour && full && detail >= DETAIL.placeNames && placeAt(site.x, site.z)?.name !== site.def.name; // (a place the map already names under the same name is not named twice)
+      add(middle, {
+        kind: 'secret', x, y, state: rumour ? { rumour: true } : { poi: site.def.kind, spent: mark === 'spent' },
+        title: rumour ? 'Something strange' : SECRET_TITLE[site.def.kind], name: rumour ? '' : site.def.name,
+        note: rumour ? 'Near ground you have charted: go and see' : mark === 'spent' ? 'Its chest is taken' : site.def.hoard ? 'A chest of Echoes lies near' : '',
+      }, 0.9, named ? { text: site.def.name, x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
     }
   }
 

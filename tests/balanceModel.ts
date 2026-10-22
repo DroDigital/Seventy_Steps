@@ -34,13 +34,24 @@ export interface Standing {
 
 const bountyOf = (id: string): number => ENTITIES.find((e) => e.id === id)?.drops.echoes ?? 0;
 
-/** The world's lesser foes (the bosses aside) in `regions` (all of them by default): how many, and every Echo they carry. */
+/**
+ * How many lesser foes each region had before round 61 raised its density and set a guard about its points of interest. The model
+ * credits a person with exactly these (the plan's scatter is its last loop, so its first posts, `p:<region>:0..n`, are the old ones,
+ * unchanged in id, foe and place) and no more: the extra foes are the world's added challenge and the secrets' loot, a margin over the
+ * standing the bots fight at, not a fresh round of levels the bosses were never measured at (docs/DECISIONS.md, round 61).
+ */
+const CREDITED: Record<string, number> = { hub: 100, arkham: 114, dunwich: 92, innsmouth: 105, providence: 129, vermont: 82, mountains: 69, pnakotus: 80, kn_yan: 88, dreamlands: 241, rlyeh: 80, yuggoth: 76, beyond: 74 };
+
+/** The world's lesser foes (the bosses aside) in `regions` (all of them by default): how many, and every Echo they carry, as the model credits them. */
 export function lesserFoes(regions?: readonly string[]): { count: number; echoes: number } {
   const w = worldLayout();
   let [count, echoes] = [0, 0];
   for (const r of REGIONS.filter((x) => !regions || regions.includes(x.id))) {
-    const spawns = [...[...regionPlan(r).spawns.values()].flat(), ...w.spawns.filter((x) => x.region === r.id)].filter((s) => !s.id.startsWith('boss:'));
-    [count, echoes] = [count + spawns.length, echoes + spawns.reduce((n, s) => n + bountyOf(s.entity), 0)];
+    const spawns = [...[...regionPlan(r).spawns.values()].flat(), ...w.spawns.filter((x) => x.region === r.id)].filter((s) => !s.id.startsWith('boss:') && !s.id.startsWith('poi:'));
+    const scatter = spawns.filter((s) => s.id.startsWith(`p:${r.id}:`));
+    const old = Math.max(0, (CREDITED[r.id] ?? spawns.length) - (spawns.length - scatter.length)); // the scatter posts there were
+    const credited = spawns.filter((s) => !s.id.startsWith(`p:${r.id}:`) || Number(s.id.split(':')[2]) < old);
+    [count, echoes] = [count + credited.length, echoes + credited.reduce((n, s) => n + bountyOf(s.entity), 0)];
   }
   return { count, echoes };
 }

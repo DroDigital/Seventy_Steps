@@ -16,19 +16,19 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, quake: 1, eruption: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
       ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, eruption: 1, vortex: 1, quake: 1, crushing_blow: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(4600, 5000, 37, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
+    stats: st(3700, 5000, 37, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
-    assembly: { body: 'lathe', palette: 'sea', scale: 16, eyes: 2, tentacles: 0 },
+    assembly: { body: 'lathe', palette: 'sea', scale: 11, eyes: 2, tentacles: 0 },
     ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, wind_push: 1, quake: 1 }, { hooks: ['flood'] }), ph(0.5, { slam: 2, sweep: 1, roar: 1, charge: 1, vortex: 1, eruption: 1 }, { summons: ['deep_one', 'deep_one'], hooks: ['flood', 'darkness'] }))),
-    stats: st(3250, 1200, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 80, which cost the balance bot 1.87 lives where a person first meets it)
+    stats: st(2700, 1200, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 80, which cost the balance bot 1.87 lives where a person first meets it)
   },
   {
     id: 'mother_hydra', name: 'Mother Hydra', source: 'The Shadow over Innsmouth', regions: ['innsmouth'], canonLooks: false,
-    assembly: { body: 'lathe', palette: 'sea', scale: 15, eyes: 4, tentacles: 6 },
+    assembly: { body: 'lathe', palette: 'sea', scale: 10.5, eyes: 4, tentacles: 6 },
     ...scripted('boss', phases(ph(1, { grab: 2, pool: 1, tentacle_burst: 2, eruption: 1 }, { hooks: ['flood'] }), ph(0.5, { tentacle_burst: 2, pool: 2, grab: 1, spit: 1, vortex: 1 }, { summons: ['innsmouth_hybrid', 'innsmouth_hybrid'], hooks: ['flood'] }))),
-    stats: st(3100, 1100, 46, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 76, which cost the balance bot 1.40 lives where a person first meets it)
+    stats: st(2600, 1100, 46, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 76, which cost the balance bot 1.40 lives where a person first meets it)
   },
   {
     id: 'hastur', name: 'Hastur', source: 'The Whisperer in Darkness', regions: ['yuggoth'], canonLooks: false, voice: 'whisper',
@@ -38,7 +38,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.5, { darkness: 1, tentacle_burst: 2, gaze: 2, wind_push: 1, barrage: 1 }, { hooks: ['camera_warp', 'darkness'] }),
       ph(0.2, { roar: 2, gaze: 2, beam: 1, teleport: 1, eruption: 1, sweep_beam: 1 }, { hooks: ['camera_warp', 'darkness', 'time_skip'] }),
     ), called: true }),
-    stats: st(4200, 2000, 56, 3, 8, 16), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.19 lives where a person first meets it)
+    stats: st(3500, 2000, 56, 3, 8, 16), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.19 lives where a person first meets it)
   },
   {
     id: 'tsathoggua', name: 'Tsathoggua', source: 'The Mound', regions: ['kn_yan'], canonLooks: true,
@@ -57,13 +57,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(1, { gaze: 2, tentacle_burst: 2, slam: 1, quake: 1 }, { hooks: ['petrify_buildup'], arena: 'monoliths' }),
       ph(0.5, { gaze: 2, tentacle_burst: 2, slam: 1, roar: 1, eruption: 2 }, { hooks: ['petrify_buildup', 'camera_warp'] }),
     )),
-    stats: st(4850, 3000, 58, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
+    stats: st(3600, 3000, 58, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
   },
   {
     id: 'rhan_tegoth', name: 'Rhan-Tegoth', source: 'The Horror in the Museum', regions: ['yuggoth'], canonLooks: true,
     sprite: { silhouette: 'toad', palette: 'bone', scale: 5, eyes: 3, limbs: 6, body: [0.6, 0.3] }, // as wide as its crouch is drawn, not a toad's 1.8 m (round 56)
     ...scripted('boss', phases(ph(1, { grab: 2, bite: 2, sweep: 1, combo: 1 }), ph(0.5, { grab: 2, bite: 1, charge: 1, roar: 1, quake: 1 }, { hooks: ['camera_warp'] }))),
-    stats: st(2600, 1000, 70, 3, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
+    stats: st(2600, 1000, 63, 3, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
   {
     id: 'yig', name: 'Yig', source: 'The Curse of Yig', regions: ['kn_yan'], canonLooks: false,
@@ -84,7 +84,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     id: 'nug', name: 'Nug', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
     sprite: { silhouette: 'blob', palette: 'pallid', scale: 7, eyes: 3 },
     ...scripted('boss', phases(ph(1, { bite: 2, slam: 2, roar: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, roar: 1, aoe_ring: 1, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(2600, 1100, 66, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
+    stats: st(2600, 1100, 60, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
   {
     id: 'yeb', name: 'Yeb', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,

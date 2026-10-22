@@ -16,7 +16,7 @@ import { PAW, pawAt, pawLanded } from '../src/systems/horseIdle';
 import { cyclesFor, touchdowns } from '../src/systems/mountGait';
 import { render } from './soundRender';
 
-interface Heard { key: string; sound: Sound; gain: number; pan?: number; pitch?: number; at?: V3 | null }
+interface Heard { key: string; sound: Sound; gain: number; level: number; pan?: number; pitch?: number; at?: V3 | null } // `gain` as asked for; `level` the ride's share of it, made by the audio after a recording's own clamp
 interface Layered { set: unknown; gain?: number; pan?: number; pitch?: number }
 
 function ride(id: MountId) {
@@ -27,7 +27,7 @@ function ride(id: MountId) {
   const beds: BedTargets[] = [];
   const audio = createMountAudio(
     g,
-    (key, sound, o) => (heard.push({ key, sound, gain: o?.gain ?? 1, pan: o?.pan, pitch: o?.pitch, at: o?.at }), true),
+    (key, sound, o) => (heard.push({ key, sound, gain: (o?.gain ?? 1) * (o?.level ?? 1), level: o?.level ?? 1, pan: o?.pan, pitch: o?.pitch, at: o?.at }), true),
     { play: (set: unknown, o: Layered = {} as Layered) => (layered.push({ ...o, set }), true) } as unknown as Pick<Sampler, 'play'>,
     { set: (t) => beds.push(t) },
   );
@@ -160,6 +160,16 @@ describe('mounts, heard (round 50)', () => {
     expect(beds.at(-1)).toEqual(SILENT_BED);
   });
 
+  it("every sound of a ride is asked for at the ride's one level, and its own gain left whole: the audio makes the cut after a recording's clamp at 1 (round 61)", () => {
+    const r = ride('grey');
+    r.advance(240, 9);
+    expect(r.heard.length).toBeGreaterThan(0);
+    for (const h of r.heard) {
+      expect(h.level, h.key).toBeCloseTo(MOUNT_MIX.level, 6);
+      expect(h.gain, h.key).toBeGreaterThan(0);
+    }
+  });
+
   it('pausing silences the beds', () => {
     const r = ride('chariot');
     r.advance(30, MOUNT_TRAVERSAL.cruise);
@@ -172,7 +182,7 @@ describe('mounts, heard (round 50)', () => {
 describe('a ride is present in the mix, not a hush (round 50: the first set was quieter than a footfall and could not be heard)', () => {
   const rms = (sound: Sound, gain: number): { rms: number; peak: number; sec: number } => render(sound.map((l) => ({ ...l, gain: l.gain * gain })));
 
-  it('every sound a ride makes is as present as a landed blow: between -22 and -11 dBFS rms, and never over full scale at its peak', () => {
+  it('every sound a ride makes is heard in the mix, under a landed blow (round 61: a ride was 7 to 9 dB over a fight): between -28 and -17 dBFS rms, and never over full scale at its peak', () => {
     for (const id of MOUNT_IDS) {
       const r = ride(id);
       r.heard.length = 0;
@@ -184,8 +194,8 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
       expect(loudest.size).toBeGreaterThan(id === 'automobile' ? 1 : 3);
       for (const [key, h] of loudest) {
         const out = rms(h.sound, h.gain);
-        expect(out.rms, key).toBeGreaterThan(/:(trace|creak|whisper)$/.test(key) ? -30 : -22); // the harness and the breath are asides, not blows
-        expect(out.rms, key).toBeLessThan(-11);
+        expect(out.rms, key).toBeGreaterThan(/:(trace|creak|whisper)$/.test(key) ? -36 : -28); // the harness and the breath are asides, not blows
+        expect(out.rms, key).toBeLessThan(-17);
         expect(out.peak, key).toBeLessThan(0);
         expect(out.sec, key).toBeLessThan(1.3);
       }
@@ -196,10 +206,10 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
     const ground: Ground[] = ['dirt', 'road', 'stone', 'water'];
     const footfall = SAMPLE_LEVELS['sfx/step_dirt1'].rms + 20 * Math.log10(SAMPLE_SETS.stepDirt.gain); // about -35 dBFS
     for (const g of ground) {
-      const walk = rms(hoofBeat(g, { weight: 0.35 }), MOUNT_MIX.hoof * (0.55 + 0.45 * 0.35));
-      const gallop = rms(hoofBeat(g, { weight: 1 }), MOUNT_MIX.hoof);
+      const walk = rms(hoofBeat(g, { weight: 0.35 }), MOUNT_MIX.level * MOUNT_MIX.hoof * (0.55 + 0.45 * 0.35));
+      const gallop = rms(hoofBeat(g, { weight: 1 }), MOUNT_MIX.level * MOUNT_MIX.hoof);
       expect(walk.rms, g).toBeLessThan(gallop.rms - 1.5);
-      expect(walk.rms, g).toBeGreaterThan(footfall + 8);
+      expect(walk.rms, g).toBeGreaterThan(footfall + 4); // (round 61: 8, before the ride's level)
     }
   });
 
@@ -443,7 +453,7 @@ describe('the horse and the reins, heard (round 57)', () => {
     expect(moving.heard.filter((h) => h.key === 'mount:grey:hoof:paw')).toEqual([]);
   });
 
-  it('the new sounds are as present as a landed blow, the small ones softer: between -22 and -11 dBFS rms, or -30 and -11 for the asides', () => {
+  it('the new sounds sit under a landed blow, the small ones softer: between -28 and -17 dBFS rms, or -36 and -17 for the asides', () => {
     const all: [name: string, sound: Sound, gain: number, aside?: true][] = [
       ['urge', HORSE_URGE, MOUNT_MIX.urge], ['halt', HORSE_HALT, MOUNT_MIX.halt],
       ['shake', HARNESS_SHAKE, MOUNT_MIX.shake], ['blow', HORSE_BLOW, MOUNT_MIX.blow], ['whicker', HORSE_WHICKER, MOUNT_MIX.whicker],
@@ -451,9 +461,9 @@ describe('the horse and the reins, heard (round 57)', () => {
       ...(['dirt', 'road', 'stone', 'water'] as Ground[]).map((g): [string, Sound, number, true?] => [`scrape ${g}`, hoofScrape(g), MOUNT_MIX.scrape, g === 'water' ? true : undefined]),
     ];
     for (const [name, sound, gain, aside] of all) {
-      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain })));
-      expect(out.rms, name).toBeGreaterThan(aside ? -30 : -22);
-      expect(out.rms, name).toBeLessThan(-11);
+      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain * MOUNT_MIX.level })));
+      expect(out.rms, name).toBeGreaterThan(aside ? -36 : -28);
+      expect(out.rms, name).toBeLessThan(-17);
       expect(out.peak, name).toBeLessThan(0);
       expect(out.sec, name).toBeLessThan(1.3);
     }

@@ -19,6 +19,8 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'boss', words: "Horror's lair", hint: 'a closed eye: slain' },
   { kind: 'person', state: { met: true }, words: 'Someone you met' },
   { kind: 'echo', words: 'Your lost Echoes', hint: 'walk over them' },
+  { kind: 'secret', state: { rumour: true }, words: 'Something strange', hint: 'near ground you have charted' },
+  { kind: 'secret', state: { poi: 'tale' }, words: 'A secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
   { kind: 'lead', state: { now: 0 }, words: 'Where the story leads', hint: 'an arrow at the edge points to it' },
   { kind: 'marker', words: 'Your marker', hint: 'right-click, F or Y sets it; the minimap points to it' },
 ];

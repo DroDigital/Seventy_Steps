@@ -3,7 +3,13 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased: a demo
+## 1.0.6: seventy secrets, retuned bosses and a quieter ride
+
+- **Seventy secrets, charted on the map.** Places from Lovecraft's tales (the Hop Yard, Gilman's house, Zadok's slip, Johansen's landing, the pit of the Great Race, Barzai's ledge, the shore of Ib) lie in the land's graveyards, rings, ruins, groves, shores, cliffs and two mazes. A grey "?" shows where ground near one has been charted. Coming to it finds it once: its name and line, a little insight, and often a chest of Echoes and a guard of foes. The map then marks it.
+- **Bosses are retuned by tier.** Each horror and god has its time to fall and the weight of its heaviest blow kept within a band for its tier. Ghatanothoa, Shub-Niggurath, Cthulhu, Hastur, Nyarlathotep, Yog-Sothoth, Father Dagon, Mother Hydra and 'Umr at-Tawil take less time to fall. The heaviest blows of Nug, Rhan-Tegoth, the Colossus beneath the Pyramids, 'Umr at-Tawil and the Whisperer are eased, and the Thing beyond Zann's Window, Z'kauba, Hypnos, the Ancient Ones and the Daemon Pipers are made harder.
+- **Father Dagon and Mother Hydra are smaller**, so a close fight with either reads clearly.
+- **The ride is quieter.** The horse and the wheels come down in the mix, with fewer thumps and softer footfall.
+- **More foes** in Dunwich, Vermont, the Mountains, Pnakotus, K'n-yan, the Dreamlands, R'lyeh, Yuggoth and the Beyond. Some of them guard the secrets.
 
 - **Boss discovery gate fixes.** Required candles and the paths to them are cleared of scenery, including houses that could hide a candle outside its activation range. The next light pulses and is marked on the map, pale candles stay visible, and nearby lights offer an interaction prompt. The journal keeps unfinished gate requirements and repairs skipped stages in existing saves. Vigils preserve any weather they already accept instead of changing it and losing progress.
 - **Every open horror is walled in, and its gate has to be earned.** Each of the nineteen open arenas now stands inside a house built of its own story (the Colour's reservoir dam, the Black Man's ravine, a grove grown together with horned towers, the Gorgon's colonnaded porch, a sea wall with its lit towers, a burying ground's low wall, a manor's gatehouse with its lightning rod, the sphinx's temenos, a serpent's earthwork, a black ziggurat, the quay of Ib, a ring of standing slabs, R'lyeh's leaning wall with its door, Carcosa, a crystal threshold, the Court, Yaddith's terraces, the pipers' organ, the pale hexagons). The wall is closed all round; there is one gate, and it stays shut until the horror has been *found*, so there is no angle to take the fog from.

@@ -144,7 +144,7 @@ export const AZATHOTH = {
  * revolver aims for it), and down within the blade's after each of its own blows, while it recovers.
  */
 export const ZONES = {
-  height: 12, // metres: only assembly bodies this tall have zones
+  height: 10, // metres: only assembly bodies this tall have zones (round 61: 12, before Dagon and Hydra were made 11 and 10.5 m; the Dunwich Horror, 9, stays without)
   legs: { top: 0.34, damage: 1 }, // the lowest third of it, and the share of a blow taken there
   torso: { top: 0.72, reach: 0.95, damage: 0.6 }, // up to here; its breadth, of the body's; the share of a blow
   head: { reach: 0.65, damage: 1.5, stoop: 4.5 }, // above that; breadth; the share of a blow (round 60: 2.5, and a riposte to it was six times a blow); how low it comes (metres) when it stoops

@@ -3,13 +3,18 @@
  * far a mark reaches. mapIcons.ts draws the places, mapIconsLive.ts the people, the Echoes, the story's lead, the marker and the investigator.
  */
 
-export type MarkKind = 'sign' | 'gate' | 'dungeon' | 'boss' | 'person' | 'echo' | 'lead' | 'place' | 'you' | 'marker';
+import type { PoiKind } from '../data/pois';
 
-/** What a mark is like now: a sign lit, a horror slain, a person met; `now` (ms) breathes the echo and the lead; `turn`, the arrow's turn. */
+export type MarkKind = 'sign' | 'gate' | 'dungeon' | 'boss' | 'person' | 'echo' | 'lead' | 'place' | 'you' | 'marker' | 'secret';
+
+/** What a mark is like now: a sign lit, a horror slain, a person met, a secret not yet found (`rumour`) or found (`poi`: its kind) and its chest taken (`spent`); `now` (ms) breathes the echo and the lead; `turn`, the arrow's turn. */
 export interface MarkState {
   lit?: boolean;
   slain?: boolean;
   met?: boolean;
+  rumour?: boolean;
+  poi?: PoiKind;
+  spent?: boolean;
   now?: number;
   turn?: number;
 }

@@ -73,7 +73,7 @@ export interface GameAudio {
   /** A recording where `at` is (null: in the head): its level fading with the distance to `range` metres, dulled and panned (round 40: the doors). */
   sampleAt(set: SampleSetId, at: V3 | null, o?: { gain?: number; pitch?: number; range?: number; delay?: number }): boolean;
   /** A recipe where `at` is (null: in the head), a little different each time, the more by `vary` (0: as written), `key` telling one sound from another (round 40). A recording that stands in front of it (data/plannedSounds.ts) is played to last `fit` seconds, if told. */
-  recipe(key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; pitch?: number; range?: number; vary?: number; fit?: number; pan?: number }): boolean;
+  recipe(key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; pitch?: number; range?: number; vary?: number; fit?: number; pan?: number; level?: number }): boolean; // `level`: a share of the whole, made after a recording's own clamp at 1 (the ride's: audio/mountAudio.ts)
   /** Whether a recording stands in front of the recipe `key` and has loaded (the door's own recording needs no recorded thud beneath it). */
   recordedFor(key: string): boolean;
   /** Gets the realm's track ready (fetched, decoded) without sounding it: the world's sound begins when it shows (round 29). */
@@ -113,10 +113,10 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const { gain, pan } = place(at, o.range ?? AUDIO.eventRange);
     if (gain <= 0) return false;
     const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it (or none: a horse's voice, round 59)
-    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1), pan: o.pan });
+    const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) * (o.level ?? 1), pan: o.pan });
     const under = recipeShare(rec, took);
     if (under <= 0) return true;
-    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * under, pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
+    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (o.level ?? 1) * under, pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack

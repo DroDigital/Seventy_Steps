@@ -134,7 +134,20 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('HouseSeen', (e) => great.show(e.name, 'place', e.line.toUpperCase())); // a horror's house come within sight (round 63)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
   g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
-  g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
+  let [secretUntil, secretName] = [0, '']; // when a secret's words have been read, and whose: a named place found with it waits until then (round 61; both are drawn in the one banner), or is not shown again under the same name
+  const secret = (name: string, under: string, line: string): void => {
+    [secretUntil, secretName] = [performance.now() + 6200, name.toUpperCase()];
+    great.show(secretName, 'secret', under, line);
+  };
+  g.events.on('PlaceFound', (e) => {
+    const words = tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() });
+    const wait = secretUntil - performance.now();
+    if (wait > 0 && e.name.toUpperCase() === secretName) return; // the secret has named it already
+    if (wait > 0) setTimeout(() => great.show(e.name.toUpperCase(), 'place', words), wait);
+    else great.show(e.name.toUpperCase(), 'place', words); // round 18
+  });
+  g.events.on('PoiFound', (e) => secret(e.name, tr('hud.secrets', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }), e.line)); // round 61
+  g.events.on('PoiAgain', (e) => secret(e.name, '', e.line));
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Notice', ({ text }) => say(text));

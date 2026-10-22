@@ -15,12 +15,13 @@ import { REGION_LAYOUTS, type RegionLayout } from '../data/regionFeatures';
 import type { PropKind, RegionDef } from '../data/regions';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
-import { clearsFor, clearsRite, planWay, wayProps, type WayPlan } from './arenaWay';
+import { clearsFor, clearsRite, nearPath, planWay, wayProps, type WayPlan } from './arenaWay';
 import { discoveryProps } from './discoveryPlan';
 import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
 import { planSpawns } from './planSpawns';
+import { planPois, type PoiSite } from './poiPlan';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
 import { makeProp, propCollider, type Prop } from './props';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
@@ -41,6 +42,7 @@ export interface RegionPlan {
   spawns: Map<number, SpawnPoint[]>;
   segs: Map<number, RoadSeg[]>; // road pieces touching each chunk (for the ground's road texture)
   ways: WayPlan[]; // the trails to the region's open arenas (arenaWay.ts; round 62)
+  pois: PoiSite[]; // the region's points of interest (round 61; world/poiPlan.ts), with their guards among `spawns` and their walls among `props`
 }
 
 const CELL = 4; // metres per occupancy cell
@@ -214,7 +216,11 @@ function buildPlan(region: RegionDef): RegionPlan {
   scatterBiome(region, rect, rng, occ, props);
   const spawns = planSpawns(region, features, roads, towns, props, rng);
   const ways = planWays(region, props, (x, z) => offSites(x, z, 1.5) && spawns.every((s) => Math.hypot(s.at.x - x, s.at.z - z) > 3));
-  return bucket(layout, roads, features, props, spawns, ways);
+  const open = (x: number, z: number): boolean => offSites(x, z, 3) && ways.every((way) => !nearPath(way, x, z, way.width / 2 + 3)); // no secret, nor its guard, chest or walls, on a site's ground or a court's trail
+  const pois = planPois(region, features, props, spawns, undefined, open); // after everything, on streams of its own: nothing earlier moves
+  props.push(...pois.props);
+  spawns.push(...pois.spawns);
+  return bucket(layout, roads, features, props, spawns, ways, pois.sites);
 }
 
 function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: ReturnType<typeof occupancy>, props: Prop[]): Feature[] {
@@ -272,8 +278,8 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
   return out;
 }
 
-function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], ways: WayPlan[]): RegionPlan {
-  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), ways };
+function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], ways: WayPlan[], pois: PoiSite[]): RegionPlan {
+  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), ways, pois };
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
   for (const p of props) {
     add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);

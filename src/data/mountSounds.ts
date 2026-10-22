@@ -7,7 +7,7 @@
  * (a brass jingle, a clacking knock and a pulsing rattle were metallic and tiring): they roll, softly, and thump over a joint; the harness is leather
  * and wood; the skeletons' hooves knock hollow; the spectral chariot breathes and the motor car shifts gear. Procedural recipes
  * (data/sounds.ts) until recordings stand in front of them; levels in `MOUNT_MIX` are set against the impacts (a clang at
- * about -21 dBFS rms): a ride is as present as a fight, and tests/mountAudio.test.ts holds it there.
+ * about -21 dBFS rms): a ride is present in the mix, a notch under a fight (round 61), and tests/mountAudio.test.ts holds it there.
  */
 import { noise, tone, type Sound } from './sounds';
 
@@ -17,11 +17,13 @@ export type Shoe = 'iron' | 'bone';
 /**
  * Levels of what is heard of a ride, as the gain each recipe is played at, set so that a hoofbeat at the gallop is as present as
  * a landed blow (about -15 dBFS rms) and a walk's about 5 dB under it; a bed's number is the gain of its bus at a full gallop.
+ * These are the mix before `level`, which is made over all of it (round 61: -6 dB, so a gallop's hoofbeat is about -21).
  */
 export const MOUNT_MIX = {
+  level: 0.5, // round 61: the whole ride, one notch down (-6 dB) in the mix: it ran 7 to 9 dB over a boss fight's whole sound (docs/SOUND.md), and the horse's recorded voice with it
   hoof: 0.8, // a hoofbeat at its full weight
-  hoofSample: 3, // the recorded footfall laid beneath it, pitched down: its set's own gain (0.15 to 0.38) is made up here
-  thump: 1.15, // a wheel over a joint or a stone: a soft knock, not a clack
+  hoofSample: 2.2, // the recorded footfall laid beneath it, pitched down: its set's own gain (0.15 to 0.38) is made up here (round 61: 3)
+  thump: 0.85, // a wheel over a joint or a stone: a soft knock, not a clack (round 61: 1.15, and half as often on road and stone)
   trace: 1.2, // leather and wood shifting in the harness on a stride
   creak: 2.2,
   snort: 1.3,
@@ -45,7 +47,7 @@ export const MOUNT_MIX = {
   bedRoll: 0.4, // the wheels rolling: soft, low, and slower than the speed
   bedWind: 0.24, // the air rushing by, with the square of the speed
   bedEngine: 0.3,
-  bedSpectral: 0.28,
+  bedSpectral: 0.16, // (round 61: 0.28, the loudest bed by 3 dB)
 } as const;
 
 /** One hoof coming down: its thud, the hollow of the hoof, and the clack of the shoe on what is hard. `weight` 0..1 at a walk to a gallop. */

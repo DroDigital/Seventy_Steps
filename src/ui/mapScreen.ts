@@ -16,6 +16,7 @@ import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
 import { markerHere, setMarker } from '../systems/marker';
 import { exploredShare } from '../systems/exploration';
+import { poiTotals } from '../systems/pois';
 import { realmOf, type MapPlace } from '../world/mapData';
 import { placesOf } from '../world/namedPlaces';
 import { regionAt } from '../world/worldMap';
@@ -239,7 +240,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const where = rs.find((x) => x.id === g.overworld!.region)?.name ?? '';
     const places = rs.flatMap((x) => placesOf(x.id)); // round 18
     const found = places.filter((p) => g.overworld!.places.has(p.id)).length;
-    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND`];
+    const secrets = poiTotals(g, rs); // round 61
+    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND${secrets.of ? `   ·   ${secrets.found} OF ${secrets.of} SECRETS` : ''}`];
     if (title) title.textContent = heading[0];
     if (stats) stats.textContent = heading[1];
     last = 0;

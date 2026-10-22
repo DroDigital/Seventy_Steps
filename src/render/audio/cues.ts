@@ -62,6 +62,7 @@ export const CUES: Handlers = {
   RiteFailed: (e) => ({ sound: 'lampOut', at: { ...e.at } }),
   RiteDone: (e) => ({ sound: 'revealed', at: { ...e.at } }),
   PlaceFound: () => inside('place'), // a named place (round 18): a gong from far off (round 20; it was the sign's chime, lower)
+  PoiFound: () => inside('place'), // a secret found (round 61): the same far gong as a place
   Rested: () => inside('rested'),
   RestRefused: () => inside('refused'),
   Travelled: () => inside('travel'),

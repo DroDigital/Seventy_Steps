@@ -12,6 +12,7 @@ import { seaChopNow } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
 import { createArenaAir } from './arenaAir';
 import { createBeacons } from './beacons';
+import { createPoiFx } from './poiFx';
 import type { Beams } from './beams';
 import type { GroundFx } from './groundFx';
 import { createSkyStrikeFx, type SkyStrikeFx } from './skyStrikeFx';
@@ -71,6 +72,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const omens = createOmenFx(g, parts.sky, parts.post, audio);
   const presence = createPresence(g, parts.particles, audio); // round 26: what a colossus does to the ground and the air
   const beacons = createBeacons(scene, g); // round 26: pale columns over the Elder Signs not yet found
+  const poiFx = createPoiFx(scene, g); // round 61: a place's wrongness, drawn where it stands
   const night = createNightFx(g, parts.sky, parts.post); // round 26: the moon's course, and the grey of the last hour
   const weather = createWeatherFx(scene, g, parts.particles); // round 26: rain, gale and motes
   const deep = createTentacles(scene, g, parts.particles, audio); // round 30: now and then, far out, a tentacle in the water
@@ -95,6 +97,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       sky.update(camera, time, !outside);
       lightning.update(time, g.overworld?.region ?? null, !outside, g.overworld?.weather);
       beacons.update(camera, time, !outside);
+      poiFx.update(camera, time, !outside);
       night.update(time, enclosed, gloom);
       LIGHT_NERVES.madness = madnessOf(g.mind.sanity); // the flames waver harder in a failing mind's world
       weather.update(camera, time, !outside);

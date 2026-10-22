@@ -8,6 +8,7 @@
 
 import { BONE, DIM, INK, MAGENTA, PURPLE, VEIL, token, TAU, type MarkKind, type MarkState } from './mapIconKit';
 import { echo, lead, marker, person, place, you } from './mapIconsLive';
+import { secret } from './mapIconsSecret';
 
 export * from './mapIconKit';
 
@@ -126,6 +127,7 @@ export function drawMark(ctx: CanvasRenderingContext2D, kind: MarkKind, x: numbe
   else if (kind === 'lead') lead(ctx, x, y, r, s.now ?? 0);
   else if (kind === 'place') place(ctx, x, y, r);
   else if (kind === 'marker') marker(ctx, x, y, r);
+  else if (kind === 'secret') secret(ctx, x, y, r, s);
   else you(ctx, x, y, r, s.turn ?? 0);
   ctx.restore();
 }
