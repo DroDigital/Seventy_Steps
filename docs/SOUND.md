@@ -118,8 +118,11 @@ The three mounts share one scheduler (`render/audio/mountAudio.ts`). Nothing is 
 sits about eight metres back, and a sound at the hooves falls under the music. They are the rider’s own foley, as footsteps are.
 Recipes are procedural, and stand wherever a recording does not (the included horse's voice and harness are recordings, below): a nicker, breath and snort for the grey; hollow wind, paired
 hooves, harness and creak for the chariot; an engine for the motor car; wheels for both wheeled mounts; a summon and a dismiss.
-Hoof and wheel timbre follows dirt, road, stone and water. A gallop shortens the stride and lifts the pitch. Rendered peaks
-stay under −12 dBFS (`tests/mountAudio.test.ts`) and above about −24 dBFS, under combat impact. A recorded set can replace a
+Hoof and wheel timbre follows dirt, road, stone and water. A gallop shortens the stride and lifts the pitch. Round 61: a ride had come to
+sound 7 to 9 dB over a whole boss fight (about two dozen one-shots a second on the effects bus, with no distance fall-off), so the whole of it
+goes through one level, `MOUNT_MIX.level` (0.5, −6 dB; the recordings' voice included, the beds' bus too), the wheel's thump is half as frequent on road and stone
+and softer, the footfall beneath the hooves and the skeletons' drone are lower, and `tests/mountAudio.test.ts` holds each sound between −28 and −17 dBFS rms (asides to −36) with
+a gallop about as loud overall as a fight (−19 to −22). The levels were measured, not heard: a listen is still owed. A recorded set can replace a
 recipe: add it to `plannedSounds` once its files exist.
 
 The reins and the horse (round 57) are heard too, from state the simulation keeps (`MountState.reins`, `systems/mountReins.ts`: counters
@@ -129,7 +132,7 @@ braking (`hoofScrape`, by the ground) and the harness shaken a moment later (`HA
 scrapes, shakes and whispers instead. Standing, the horse passes the time every six to fourteen seconds with one of a breath, a low
 whicker, a shake of the harness, the tail, the lips or a snort, never the same twice running (the skeletons only shake), and puts its
 hoof down on the two landings of the pawing the picture draws (`systems/horseIdle.ts`, the same clock). Leather, hide and breath, no
-ring; `tests/mountAudio.test.ts` holds each between −22 and −11 dBFS rms (the tail and the lips, as asides, to −30).
+ring; `tests/mountAudio.test.ts` holds each between −28 and −17 dBFS rms since round 61 (the tail and the lips, as asides, to −36).
 
 ### The horse's voice and its arrival (round 59)
 

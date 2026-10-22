@@ -77,7 +77,7 @@ export function createMountBed(e: AudioEngine): MountBed {
     const sfx = e.sfx;
     if (!sfx) return;
     const out = ctx.createGain();
-    out.gain.value = 1;
+    out.gain.value = MOUNT_MIX.level; // round 61: the ride as a whole, one notch down
     out.connect(sfx);
     const layer = (): GainNode => {
       const g = ctx.createGain();

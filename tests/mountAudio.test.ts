@@ -172,7 +172,7 @@ describe('mounts, heard (round 50)', () => {
 describe('a ride is present in the mix, not a hush (round 50: the first set was quieter than a footfall and could not be heard)', () => {
   const rms = (sound: Sound, gain: number): { rms: number; peak: number; sec: number } => render(sound.map((l) => ({ ...l, gain: l.gain * gain })));
 
-  it('every sound a ride makes is as present as a landed blow: between -22 and -11 dBFS rms, and never over full scale at its peak', () => {
+  it('every sound a ride makes is heard in the mix, under a landed blow (round 61: a ride was 7 to 9 dB over a fight): between -28 and -17 dBFS rms, and never over full scale at its peak', () => {
     for (const id of MOUNT_IDS) {
       const r = ride(id);
       r.heard.length = 0;
@@ -184,8 +184,8 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
       expect(loudest.size).toBeGreaterThan(id === 'automobile' ? 1 : 3);
       for (const [key, h] of loudest) {
         const out = rms(h.sound, h.gain);
-        expect(out.rms, key).toBeGreaterThan(/:(trace|creak|whisper)$/.test(key) ? -30 : -22); // the harness and the breath are asides, not blows
-        expect(out.rms, key).toBeLessThan(-11);
+        expect(out.rms, key).toBeGreaterThan(/:(trace|creak|whisper)$/.test(key) ? -36 : -28); // the harness and the breath are asides, not blows
+        expect(out.rms, key).toBeLessThan(-17);
         expect(out.peak, key).toBeLessThan(0);
         expect(out.sec, key).toBeLessThan(1.3);
       }
@@ -196,10 +196,10 @@ describe('a ride is present in the mix, not a hush (round 50: the first set was 
     const ground: Ground[] = ['dirt', 'road', 'stone', 'water'];
     const footfall = SAMPLE_LEVELS['sfx/step_dirt1'].rms + 20 * Math.log10(SAMPLE_SETS.stepDirt.gain); // about -35 dBFS
     for (const g of ground) {
-      const walk = rms(hoofBeat(g, { weight: 0.35 }), MOUNT_MIX.hoof * (0.55 + 0.45 * 0.35));
-      const gallop = rms(hoofBeat(g, { weight: 1 }), MOUNT_MIX.hoof);
+      const walk = rms(hoofBeat(g, { weight: 0.35 }), MOUNT_MIX.level * MOUNT_MIX.hoof * (0.55 + 0.45 * 0.35));
+      const gallop = rms(hoofBeat(g, { weight: 1 }), MOUNT_MIX.level * MOUNT_MIX.hoof);
       expect(walk.rms, g).toBeLessThan(gallop.rms - 1.5);
-      expect(walk.rms, g).toBeGreaterThan(footfall + 8);
+      expect(walk.rms, g).toBeGreaterThan(footfall + 4); // (round 61: 8, before the ride's level)
     }
   });
 
@@ -442,7 +442,7 @@ describe('the horse and the reins, heard (round 57)', () => {
     expect(moving.heard.filter((h) => h.key === 'mount:grey:hoof:paw')).toEqual([]);
   });
 
-  it('the new sounds are as present as a landed blow, the small ones softer: between -22 and -11 dBFS rms, or -30 and -11 for the asides', () => {
+  it('the new sounds sit under a landed blow, the small ones softer: between -28 and -17 dBFS rms, or -36 and -17 for the asides', () => {
     const all: [name: string, sound: Sound, gain: number, aside?: true][] = [
       ['slap', REIN_SLAP, MOUNT_MIX.slap], ['urge', HORSE_URGE, MOUNT_MIX.urge], ['halt', HORSE_HALT, MOUNT_MIX.halt],
       ['shake', HARNESS_SHAKE, MOUNT_MIX.shake], ['blow', HORSE_BLOW, MOUNT_MIX.blow], ['whicker', HORSE_WHICKER, MOUNT_MIX.whicker],
@@ -450,9 +450,9 @@ describe('the horse and the reins, heard (round 57)', () => {
       ...(['dirt', 'road', 'stone', 'water'] as Ground[]).map((g): [string, Sound, number, true?] => [`scrape ${g}`, hoofScrape(g), MOUNT_MIX.scrape, g === 'water' ? true : undefined]),
     ];
     for (const [name, sound, gain, aside] of all) {
-      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain })));
-      expect(out.rms, name).toBeGreaterThan(aside ? -30 : -22);
-      expect(out.rms, name).toBeLessThan(-11);
+      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain * MOUNT_MIX.level })));
+      expect(out.rms, name).toBeGreaterThan(aside ? -36 : -28);
+      expect(out.rms, name).toBeLessThan(-17);
       expect(out.peak, name).toBeLessThan(0);
       expect(out.sec, name).toBeLessThan(1.3);
     }
