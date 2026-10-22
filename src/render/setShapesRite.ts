@@ -1,64 +1,18 @@
 /**
- * The built pieces of the rites (round 61; render/setShapes.ts): glyphs laid in the ground and glowing there, in an anomaly colour (a
- * ring of ticks, a star, the Yellow Sign, a hexagon, a spiral, an eye), the totem of stacked faces, the skull on its pole, the
- * horned tree of the black grove. In the piece's own frame, feet at the origin; a glyph is `w` metres across from its middle, flat,
- * 7 cm proud of the ground (any less and the PS1's snapping sinks it: round 19). Render only: geometry.
+ * The built pieces of the rites (round 61; render/setShapes.ts): the totem of stacked faces, the skull on its pole, and the
+ * horned tree of the black grove. In the piece's own frame, feet at the origin. Render only: geometry.
  */
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Prop } from '../world/props';
 import { box, tileUv, tint } from './meshKit';
-import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
+import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 
 const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeGeometries(parts);
-const PROUD = 0.07;
-const LEAST = 0.34; // metres: the thinnest a line is drawn, for the picture's low resolution loses a thinner one at twenty paces
-const SUNK = 0.15; // the prop job sets every prop 15 cm into the ground (render/propMeshes.ts): a glyph's bars stand that much higher in their own frame
 const BARK: Rgb = scaleRgb(mixRgb(BASE.charcoal, BASE.rust, 0.25), 1.5);
 const BONE: Rgb = scaleRgb(BASE.bone, 0.75);
-
-/** A flat bar from (x0, z0) to (x1, z1), `w` wide, a glyph's line. */
-function bar(x0: number, z0: number, x1: number, z1: number, width: number, c: Rgb): THREE.BufferGeometry {
-  const [dx, dz, w] = [x1 - x0, z1 - z0, Math.max(width, LEAST)];
-  return box(Math.hypot(dx, dz) + w * 0.5, PROUD, w, 0, SUNK + PROUD / 2, 0, c).rotateY(-Math.atan2(dz, dx)).translate((x0 + x1) / 2, 0, (z0 + z1) / 2);
-}
-
-/** A polyline through `pts`. */
-const line = (pts: readonly (readonly [number, number])[], w: number, c: Rgb): THREE.BufferGeometry[] => pts.slice(1).map((p, i) => bar(pts[i][0], pts[i][1], p[0], p[1], w, c));
-
-/** A circle of radius r about (cx, cz) in `n` bars, or the arc of it from a0 to a1. */
-const circle = (r: number, w: number, c: Rgb, n = 36, cx = 0, cz = 0, a0 = 0, a1 = Math.PI * 2): THREE.BufferGeometry[] =>
-  line(Array.from({ length: n + 1 }, (_, i) => [cx + Math.cos(a0 + ((a1 - a0) * i) / n) * r, cz + Math.sin(a0 + ((a1 - a0) * i) / n) * r] as const), w, c);
-
-const polar = (r: number, a: number): readonly [number, number] => [Math.cos(a) * r, Math.sin(a) * r];
-
-type Glyph = (r: number, c: Rgb) => THREE.BufferGeometry[];
-
-const GLYPHS: Record<string, Glyph> = {
-  ring: (r, c) => [...circle(r, r * 0.035, c), ...circle(r * 0.82, r * 0.02, c), ...Array.from({ length: 24 }, (_, i) => bar(...polar(r * 0.86, (i * Math.PI) / 12), ...polar(r * 0.96, (i * Math.PI) / 12), r * 0.02, c)), ...circle(r * 0.3, r * 0.02, c, 18)],
-  star: (r, c) => [...circle(r, r * 0.03, c), ...circle(r * 0.93, r * 0.016, c), ...line([0, 2, 4, 1, 3, 0].map((k) => polar(r * 0.9, -Math.PI / 2 + (k * Math.PI * 2) / 5)), r * 0.03, c)],
-  sign: (r, c) => { // the Yellow Sign: three arms turned about a ring, each a hooked curve
-    const arm = (a0: number): THREE.BufferGeometry[] => line(Array.from({ length: 13 }, (_, i) => polar(r * (0.1 + 0.8 * Math.pow(i / 12, 0.8)), a0 + (i / 12) * 2.1)), r * 0.04, c);
-    return [...circle(r, r * 0.03, c), ...[0, 1, 2].flatMap((k) => arm((k * Math.PI * 2) / 3)), ...circle(r * 0.09, r * 0.03, c, 10)];
-  },
-  hex: (r, c) => [0, 1, 2, 3, 4, 5].flatMap((k) => [bar(...polar(r, (k * Math.PI) / 3), ...polar(r, ((k + 1) * Math.PI) / 3), r * 0.03, c), bar(...polar(r * 0.55, (k * Math.PI) / 3), ...polar(r * 0.55, ((k + 1) * Math.PI) / 3), r * 0.02, c), bar(...polar(r * 0.55, (k * Math.PI) / 3), ...polar(r, (k * Math.PI) / 3), r * 0.02, c)]),
-  spiral: (r, c) => line(Array.from({ length: 64 }, (_, i) => polar(r * (0.05 + 0.95 * (i / 63)), (i / 63) * Math.PI * 5.5)), r * 0.04, c),
-  eye: (r, c) => [...line(Array.from({ length: 17 }, (_, i) => [(i / 8 - 1) * r, -Math.sin((i / 16) * Math.PI) * r * 0.42] as const), r * 0.03, c), ...line(Array.from({ length: 17 }, (_, i) => [(i / 8 - 1) * r, Math.sin((i / 16) * Math.PI) * r * 0.42] as const), r * 0.03, c), ...circle(r * 0.2, r * 0.03, c, 14), box(r * 0.07, PROUD, r * 0.3, 0, SUNK + PROUD / 2, 0, c)],
-  serpent: (r, c) => { // a snake coiled in two turns, its head a wedge at the outside
-    const body = line(Array.from({ length: 56 }, (_, i) => polar(r * (0.12 + 0.82 * Math.pow(i / 55, 0.9)), 0.4 + (i / 55) * Math.PI * 4)), r * 0.06, c);
-    const head = polar(r * 0.94, 0.4 + Math.PI * 4);
-    return [...body, bar(head[0], head[1], head[0] * 1.05 + 0.1 * r, head[1] * 1.05, r * 0.1, c), ...circle(r, r * 0.02, c)];
-  },
-};
-
-/** A glyph laid in the ground, glowing. */
-export function glyph(p: Prop): Piece[] {
-  const c = ANOMALY[p.set?.glow ?? 'purple'];
-  const make = GLYPHS[(p.set?.id ?? '').replace('inlay_', '')] ?? GLYPHS.ring;
-  return [{ mat: 'glow', geo: merged(make(p.w, c)), light: p.set?.lit, at: [0, 0.6, 0] }];
-}
 
 /** A totem: stacked blocks, each turned a little from the last, with a beak and two eyes on its face, a crest of two boards above. */
 export function totem(p: Prop): Piece[] {

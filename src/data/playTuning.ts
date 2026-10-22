@@ -118,6 +118,9 @@ export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?
 };
 export type LevelId = keyof typeof LEVELS;
 
+/** Boss health and damage gained per purchased player level; level one keeps the authored stats. */
+export const BOSS_LEVEL_SCALING = { health: 0.0075, damage: 0.003 };
+
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found
  * the levels few: at level 26 one cost 35 of R'lyeh's foes): 250, 90 and 9, so a level costs about half as much from the

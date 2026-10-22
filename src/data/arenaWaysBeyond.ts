@@ -98,7 +98,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   ancient_ones: {
     marks: [
       mark(piece('hexped', { size: [0.8, 1], glow: 'purple' }), 12, 150, 24, [4, 6], { mirror: true, jitter: 3 }),
-      mark(piece('inlay_hex', { glow: 'purple', size: 2.4 }), 16, 140, 32, 0, { face: 'front' }),
       mark(piece('trilith', { size: 0.7 }), 36, 150, 44, 9, { mirror: true, face: 'in' }),
     ],
     omens: [

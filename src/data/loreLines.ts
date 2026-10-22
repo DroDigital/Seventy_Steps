@@ -24,7 +24,7 @@ export const TIPS: readonly { topic: string; text: string }[] = [
   { topic: 'echoes', text: 'Your Echoes lie where you fell. Walk back to them and they are yours again.' },
   { topic: 'sign', text: 'Rest at an Elder Sign to be made whole, though the slain rise with you.' },
   { topic: 'fight', text: 'A parry timed as the blow lands leaves a foe open to the riposte.' },
-  { topic: 'fight', text: 'A blow to a foe’s back lands as a riposte.' },
+  { topic: 'fight', text: 'A heavy blow squarely into a foe’s back earns a small riposte bonus.' },
   { topic: 'hurt', text: 'Laudanum steadies the mind a while; West’s Reagent closes wounds.' },
   { topic: 'gun', text: 'The revolver holds six and hits hardest up close; spare cartridges lie about the world, and some merchants sell them.' },
   { topic: 'unmoored', text: 'A mind come unmoored wounds less and is wounded more. Rest, lamplight and Laudanum mend it.' },

@@ -36,7 +36,7 @@ export interface Blow {
   interrupts: boolean; // breaks a foe's wind-up (the revolver)
   unblockable?: boolean; // a grab, or a pool: no guard stops it
   lingering?: boolean; // a pool's or the void's tick: it hurts, but it is no blow on the mind
-  critical?: boolean; // struck into an unguarded back: it lands as a riposte does (round 12)
+  critical?: boolean; // a precise heavy attack into an unguarded back earns the riposte bonus
   ranged?: boolean; // a shot: it never ripostes, the opening a parry or a shot makes is the hand's to take (round 60)
 }
 
@@ -68,7 +68,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
     // Only the funded share is absorbed: a nearly empty bar cannot erase a whole boss blow.
     damage *= cost > 0 ? Math.max(0, 1 - available / cost) : 1;
   }
-  const riposte = (d.actor.move === 'parried' && !blow.ranged) || !!blow.critical;
+  const riposte = !blow.ranged && (d.actor.move === 'parried' || !!blow.critical);
   damage *= riposte ? d.riposte ?? COMBAT.riposte : 1;
   d.health.hp = Math.max(d.health.immortal ? 1 : d.health.floor ?? 0, d.health.hp - damage);
   d.health.calm = 0;
@@ -102,13 +102,12 @@ export function isFrontal(pos: V3, yaw: number, from: V3): boolean {
 }
 
 /**
- * A backstab (round 12: parry and riposte were the only criticals): the investigator's blow into the
- * back of a foe no bigger than a man and a half, not a boss, not already reeling. Such a blow lands
- * as a riposte does.
+ * A backstab requires a heavy attack squarely into the back of a foe no bigger than a man and a
+ * half, not a boss, not already reeling. Ordinary light attacks never earn the bonus by circling.
  */
 export function backstab(g: Game, attacker: Entity, target: Entity): boolean {
   const c = g.ecs.c;
-  if (attacker !== g.player.id || c.fight.has(target) || (c.body.get(target)?.height ?? 99) > COMBAT.backstab.height) return false;
+  if (attacker !== g.player.id || !c.actor.get(attacker)?.move?.startsWith('heavy') || c.fight.has(target) || (c.body.get(target)?.height ?? 99) > COMBAT.backstab.height) return false;
   const move = c.actor.get(target)?.move;
   if (move === 'stagger' || move === 'death' || move === 'parried') return false;
   const [at, from] = [c.transform.get(target)!, c.transform.get(attacker)!.pos];

@@ -1,6 +1,6 @@
 /**
- * Cthulhu (spec §3E): it cannot be killed; no blow takes its last hit point. When the Alert comes
- * (its last phase's arena change), E at her side takes the helm and she drives straight at it, the
+ * Cthulhu (spec §3E): weapons can kill it normally. When the Alert comes (its last phase's arena
+ * change), E at her side offers another way: take the helm and she drives straight at it, the
  * investigator riding her deck, untouchable. The bows strike and it bursts; then it reforms, and
  * R'lyeh sinks, taking Cthulhu down with it (its death throes are the sinking). Pure: no Three.js.
  */
@@ -48,22 +48,30 @@ function sink(g: Game, e: Entity): void {
   g.events.emit('Title', { text: "IT REFORMS · R'LYEH SINKS" });
 }
 
+/** A fight ended or reset while sailing releases the investigator before the ship disappears. */
+function leaveHelm(g: Game, _e: Entity, f: Fight): void {
+  const a = g.ecs.c.actor.get(g.player.id)!;
+  if (f.sig.sailing && a.move === 'helm') {
+    a.move = null;
+    a.frame = 0;
+  }
+  f.sig.sailing = 0;
+}
+
 export const CTHULHU_SIGNATURE: Signature = {
-  engage: (g, e) => void (g.ecs.c.health.get(e)!.floor = 1),
   step(g, e, f) {
     const h = g.ecs.c.health.get(e)!;
     if (f.sig.burst > 0) {
       if (--f.sig.burst === 0) return sink(g, e);
       h.hp = Math.min(h.max, h.hp + h.max / CTHULHU.burst / 3); // reforming
     }
-    h.floor = 1;
     const ship = shipOf(g, f);
     if (f.sig.sailing && ship !== undefined) sail(g, e, f, ship);
   },
   status(g, _e, f) {
     if (f.sig.burst > 0) return "IT REFORMS · R'LYEH SINKS";
     if (f.sig.sailing) return 'THE ALERT RAMS IT';
-    return shipOf(g, f) !== undefined ? "THE ALERT HAS COME · E AT HER HELM" : 'NO BLOW TAKES ITS LAST HIT POINT';
+    return shipOf(g, f) !== undefined ? "THE ALERT HAS COME · E AT HER HELM" : 'WOUND IT UNTIL THE ALERT COMES';
   },
   note: (g, _e, f) => (shipOf(g, f) !== undefined && !f.sig.sailing ? "THE ALERT HAS COME · TAKE HER HELM" : null),
   action(g, _e, f) {
@@ -78,4 +86,6 @@ export const CTHULHU_SIGNATURE: Signature = {
       },
     };
   },
+  reset: leaveHelm,
+  end: leaveHelm,
 };

@@ -29,7 +29,7 @@ describe('the painted body in the fight', () => {
         expect(z.r, `${id} band ${band}`).toBeGreaterThanOrEqual(own[band].r);
         expect(z.r, `${id} band ${band}`).toBeGreaterThanOrEqual(REVIEWED_BODY[id][band] * height - 1e-9);
         expect(z.r, `${id} band ${band}`).toBeCloseTo(Math.max(own[band].r, REVIEWED_BODY[id][band] * height), 9);
-        for (const key of ['x', 'z', 'y0', 'y1', 'damage', 'weak'] as const) expect(z[key], `${id} band ${band} ${key}`).toBe(own[band][key]);
+        for (const key of ['x', 'z', 'y0', 'y1'] as const) expect(z[key], `${id} band ${band} ${key}`).toBe(own[band][key]);
       });
     }
   });

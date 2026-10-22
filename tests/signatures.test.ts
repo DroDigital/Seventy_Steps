@@ -74,7 +74,7 @@ describe('signature mechanics (spec §3E)', () => {
     expect(fightAction(g)).toBeNull(); // the sprayer is empty
   });
 
-  it('no blade finishes the Dunwich Horror: only the incantation, chanted to its end', () => {
+  it('the Dunwich incantation remains an optional finish, chanted to its end', () => {
     const b = bossGame('dunwich_horror', undefined, 12);
     const { g, boss, fight } = b;
     engage(b);
@@ -83,14 +83,13 @@ describe('signature mechanics (spec §3E)', () => {
     h.hp = h.max * 0.1;
     steps(g, 1);
     expect(fight.phase).toBe(fight.script.phases.length - 1);
-    strike(g, g.player.id, boss, deathblow);
-    expect(h.hp).toBe(1);
+    const wounded = h.hp;
     expect(fightAction(g)?.label).toBe('chant the incantation');
     steps(g, 1, press('interact'));
     steps(g, 60);
     startMove(g.ecs.c.actor.get(g.player.id)!, 'stagger'); // broken off
     steps(g, 200);
-    expect(h.hp).toBe(1);
+    expect(h.hp).toBe(wounded);
     const deaths = record(g, 'Died');
     steps(g, 1, press('interact'));
     steps(g, g.ecs.c.actor.get(g.player.id)!.moves.chant.frames);
@@ -130,11 +129,11 @@ describe('signature mechanics (spec §3E)', () => {
     const h = d.g.ecs.c.health.get(d.boss)!;
     h.hp = h.max * 0.1;
     steps(d.g, 1);
-    expect(sig.status?.(d.g, d.boss, d.fight)).toBe('NO BLADE FINISHES IT · CHANT THE INCANTATION');
-    expect(sig.note?.(d.g, d.boss, d.fight, d.fight.script.phases.length - 1)).toBe('NO BLADE FINISHES IT · CHANT THE INCANTATION');
+    expect(sig.status?.(d.g, d.boss, d.fight)).toBe('CHANT THE INCANTATION · OR STRIKE IT DOWN');
+    expect(sig.note?.(d.g, d.boss, d.fight, d.fight.script.phases.length - 1)).toBe('CHANT THE INCANTATION · OR STRIKE IT DOWN');
     const c = bossGame('cthulhu');
     engage(c);
-    expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe('NO BLOW TAKES ITS LAST HIT POINT');
+    expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe('WOUND IT UNTIL THE ALERT COMES');
     expect(SIGNATURES.cthulhu.note?.(c.g, c.boss, c.fight, 0)).toBeNull(); // no Alert yet
     c.fight.sig.burst = 5;
     expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe("IT REFORMS · R'LYEH SINKS");

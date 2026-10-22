@@ -121,7 +121,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
   createWayAudio(g, recipe, (set, at, o = {}) => recorded(set, at, at ? AUDIO.eventRange : 1, o)); // round 62: the wards, vents and waves of a way, and what is heard under its omens
-  const attacks = createAttackAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 51: a horror's blows heard as their matter
+  createAttackAudio(g, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o));
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
@@ -335,7 +335,6 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       drones.update(fx, seconds);
       if (paused) return void mounts.pause();
       mounts.update(dt, seconds);
-      attacks.update(dt);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
         lastBeat = HEART.beats;
         playSound(e, STINGERS.heartbeat, { gain: 0.7 + 0.5 * HEART.need });

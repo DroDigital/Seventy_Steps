@@ -1,9 +1,9 @@
 /**
  * The Dunwich Horror (spec §3E): invisible (its script is `unseen`). Armitage's sprayer holds three
  * doses of the Powder of Ibn Ghazi: E scatters one at the Horror within reach, and it shows itself
- * for a while, to be seen, locked on to and beheld. No blade finishes it: in its last phase it
- * cannot fall below a sliver of health, and only the incantation destroys it, chanted to its end
- * (E, and not staggered out of it) within earshot.
+ * for a while, to be seen, locked on to and beheld. Weapons can kill it normally; in its last phase
+ * the incantation offers another way to destroy it, chanted to its end (E, and not staggered out
+ * of it) within earshot.
  */
 
 import { distXZ } from '../../core/geom';
@@ -33,23 +33,23 @@ export const DUNWICH_SIGNATURE: Signature = {
     const c = g.ecs.c;
     const u = c.unseen.get(e);
     if (u && u.revealed > 0) u.revealed--;
-    c.health.get(e)!.floor = lastPhase(f) ? 1 : undefined;
     const a = c.actor.get(g.player.id)!;
     if (lastPhase(f) && a.move === 'chant' && a.frame >= a.moves.chant.frames - 1 && near(g, e, DUNWICH.chantRange)) destroy(g, e);
   },
   status(g, e, f) {
     const a = g.ecs.c.actor.get(g.player.id)!;
     if (a.move === 'chant') return `THE INCANTATION · ${Math.ceil((a.moves.chant.frames - a.frame) / 60)} s`;
-    if (lastPhase(f)) return 'NO BLADE FINISHES IT · CHANT THE INCANTATION';
+    if (lastPhase(f)) return 'CHANT THE INCANTATION · OR STRIKE IT DOWN';
     const shown = Math.ceil((g.ecs.c.unseen.get(e)?.revealed ?? 0) / 60);
     return `${shown > 0 ? `SEEN · ${shown} s` : 'UNSEEN'} · POWDER ${f.sig.powder ?? 0}`;
   },
-  note: (_g, _e, f, phase) => (phase === f.script.phases.length - 1 ? 'NO BLADE FINISHES IT · CHANT THE INCANTATION' : null),
+  note: (_g, _e, f, phase) => (phase === f.script.phases.length - 1 ? 'CHANT THE INCANTATION · OR STRIKE IT DOWN' : null),
   reset(g, e) {
     const c = g.ecs.c;
     c.health.get(e)!.floor = undefined;
     if (c.unseen.has(e)) c.unseen.set(e, { revealed: 0 });
   },
+  end: (g, e) => void g.ecs.c.unseen.delete(e), // a finishing blow reveals it just as the incantation does
   action(g, e, f) {
     const c = g.ecs.c;
     const player = c.actor.get(g.player.id)!;
