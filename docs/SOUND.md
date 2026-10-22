@@ -9,7 +9,7 @@ be made: `src/data/plannedSounds.ts`. Credits and licences: `public/audio/CREDIT
 | --- | --- | --- |
 | Event stingers | `data/sounds.ts` (`STINGERS`), `render/audio/cues.ts` | recipes: oscillators and noise through filters and envelopes, played by `synth.ts`; some with a recording in front (`data/samples.ts` `STINGER_SAMPLES`) |
 | Recorded sounds | `data/samples.ts`, `public/audio/sfx` | 291 CC0 recordings (55 of them found in round 40 for the doors, hands, mist and acts: `data/plannedSounds.ts`), a few takes to a set, one drawn at random (never the last twice) at a pitch drawn from the set's range |
-| A horror's blows (round 59) | `data/plannedSounds.ts` `atk(...)`, `public/audio/sfx/atk_*`, `swipe*` | CC0 recordings by element in front of `data/attackSounds.ts`'s recipes: a bolt's landing, a burst and a throw; a foe's swing its own whoosh |
+| A horror's blows | `render/audio/attackAudio.ts`, `data/plannedSounds.ts` `atk(...)`, `public/audio/sfx/atk_*`, `swipe*` | CC0 recordings by element for a bolt's landing, a burst and a throw; a foe's swing its own whoosh. Caster attacks add no procedural tones or fallback while recordings load. |
 | Rain and a bolt on the ground (round 59) | `render/audio/weatherBed.ts`, `public/audio/amb/rain_*`, `sfx/strike*` | a light rain and a downpour recorded, each read twice and panned apart; four close strikes |
 | Ambience | `data/samples.ts` `AMBIENCE`, `public/audio/amb`, `render/audio/ambience.ts` | looped beds with spot sounds, breathing |
 | Doors | `data/doorSounds.ts`, `render/doorViews.ts` | a recipe made for each swing (below) |

@@ -11,10 +11,7 @@ export interface SetKit {
   walk?: boolean; // flat, laid on the ground: no collider
 }
 
-const INLAY: SetKit = { w: 1, d: 1, h: 0.1, round: true, walk: true }; // a glyph in the ground, 1 m from its middle at size 1
-
 export const SET_KITS: Readonly<Record<string, SetKit>> = {
-  inlay_ring: INLAY, inlay_star: INLAY, inlay_sign: INLAY, inlay_hex: INLAY, inlay_spiral: INLAY, inlay_eye: INLAY, inlay_serpent: INLAY,
   totem: { w: 0.7, d: 0.7, h: 4.5, round: true },
   skull_pole: { w: 0.25, d: 0.25, h: 2.4, round: true },
   horn_tree: { w: 0.55, d: 0.55, h: 8, round: true },

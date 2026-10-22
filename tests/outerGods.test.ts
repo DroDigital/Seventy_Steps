@@ -128,7 +128,12 @@ describe('the outer gods (spec §3E)', () => {
     const deaths = record(g, 'Died');
     const titles = record(g, 'Title');
     fight.sig.left = 2;
-    steps(g, 3);
+    steps(g, 1);
+    expect(h.hp).toBeGreaterThan(0);
+    expect(deaths).toEqual([]);
+    steps(g, 1);
+    expect(h.hp).toBe(0);
+    expect(g.ecs.c.actor.get(boss)!.move).toBe('death');
     expect(deaths).toEqual([expect.objectContaining({ entity: boss, killer: g.player.id })]);
     expect(titles.map((t) => t.text)).toEqual(['THE PIPING FADES · AZATHOTH SLUMBERS']);
   });

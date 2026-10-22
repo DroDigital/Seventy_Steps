@@ -25,12 +25,13 @@ describe('a parried or interrupted horror is a punish taken at once, not a free 
 
   it('a riposte weighs BOSS.riposte on a horror, COMBAT.riposte on a common foe (it took half of Dr. Munoz\'s bar at x2.5)', () => {
     expect(BOSS.riposte).toBeLessThan(COMBAT.riposte);
+    expect(BOSS.riposte).toBeLessThanOrEqual(1.1);
     const { g, boss } = bossGame('dr_munoz');
     const h = g.ecs.c.health.get(boss)!;
     startMove(g.ecs.c.actor.get(boss)!, 'parried');
     const before = h.hp;
     expect(strike(g, g.player.id, boss, blow)).toBe('riposte');
-    expect(before - h.hp).toBe(Math.round(blow.damage * BOSS.riposte));
+    expect(before - h.hp).toBeCloseTo(blow.damage * BOSS.riposte);
     expect(g.ecs.c.actor.get(boss)!.move).toBe('stagger'); // and it reels, as a riposted foe does
     expect(strike(g, g.player.id, boss, blow)).not.toBe('riposte'); // once
     const a = createGame();
@@ -39,7 +40,7 @@ describe('a parried or interrupted horror is a punish taken at once, not a free 
     startMove(a.ecs.c.actor.get(foe)!, 'parried');
     const was = fh.hp;
     expect(strike(a, a.player.id, foe, blow)).toBe('riposte');
-    expect(was - fh.hp).toBe(Math.min(was, Math.round(blow.damage * COMBAT.riposte)));
+    expect(was - fh.hp).toBeCloseTo(Math.min(was, blow.damage * COMBAT.riposte));
   });
 
   it('the opening is one a parry can take: a heavy blow begun as the earliest parry\'s recovery ends still lands as a riposte (review of PR 150: at 40 frames none could)', () => {

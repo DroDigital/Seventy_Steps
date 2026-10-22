@@ -75,8 +75,6 @@ export interface ZoneShape {
   y1: number;
   r: number;
   ball: boolean;
-  damage: number; // the share of a blow it takes
-  weak?: boolean; // the head: what the revolver aims for
 }
 
 /**
@@ -86,15 +84,15 @@ export interface ZoneShape {
  */
 export function zoneShapes(recipe: AssemblyRecipe | undefined, radius: number, height: number, seed: number, stooped: boolean): ZoneShape[] | null {
   if (!recipe || height < ZONES.height) return null;
-  if (recipe.body === 'spheres') return (recipe.hit ? pictured(recipe.hit, height, radius) : globes(recipe, seed)).map((g) => ({ x: g.x, z: g.z, y0: g.y, y1: g.y, r: g.r, ball: true, damage: ZONES.legs.damage }));
+  if (recipe.body === 'spheres') return (recipe.hit ? pictured(recipe.hit, height, radius) : globes(recipe, seed)).map((g) => ({ x: g.x, z: g.z, y0: g.y, y1: g.y, r: g.r, ball: true }));
   const wide = (own: number, band: number): number => Math.max(own, (recipe.painted?.[band] ?? 0) * height); // struck where the picture shows it: never narrower than the body, wider where the paint is
   const z: ZoneShape[] = [
-    { x: 0, z: 0, y0: 0, y1: ZONES.legs.top * height, r: wide(radius, 0), ball: false, damage: ZONES.legs.damage },
-    { x: 0, z: 0, y0: ZONES.legs.top * height, y1: ZONES.torso.top * height, r: wide(radius * ZONES.torso.reach, 1), ball: false, damage: ZONES.torso.damage },
+    { x: 0, z: 0, y0: 0, y1: ZONES.legs.top * height, r: wide(radius, 0), ball: false },
+    { x: 0, z: 0, y0: ZONES.legs.top * height, y1: ZONES.torso.top * height, r: wide(radius * ZONES.torso.reach, 1), ball: false },
   ];
   const r = wide(radius * ZONES.head.reach, 2);
   z.push(stooped
-    ? { x: 0, z: radius * 0.35, y0: 0, y1: ZONES.head.stoop, r, ball: false, damage: ZONES.head.damage, weak: true } // the head down, in front of the face
-    : { x: 0, z: 0, y0: ZONES.torso.top * height, y1: height, r, ball: false, damage: ZONES.head.damage, weak: true });
+    ? { x: 0, z: radius * 0.35, y0: 0, y1: ZONES.head.stoop, r, ball: false } // the head down, in front of the face
+    : { x: 0, z: 0, y0: ZONES.torso.top * height, y1: height, r, ball: false });
   return z;
 }

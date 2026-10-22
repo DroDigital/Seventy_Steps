@@ -54,6 +54,24 @@ describe('hit resolution', () => {
     expect(d.actor.move).toBe('death');
   });
 
+  it('limits the riposte bonus to 15 percent and consumes it on the first melee hit', () => {
+    const d = deepOne();
+    startMove(d.actor, 'parried');
+    const first = resolveHit(d, light, true);
+    expect(first.outcome).toBe('riposte');
+    expect(first.damage).toBeGreaterThan(light.damage);
+    expect(first.damage).toBeLessThanOrEqual(light.damage * 1.15);
+    expect(resolveHit(d, light, true)).toEqual({ outcome: 'hit', damage: light.damage });
+  });
+
+  it('never gives ranged hits a critical bonus, even during a parry opening', () => {
+    const d = deepOne();
+    startMove(d.actor, 'parried');
+    const hit = resolveHit(d, { ...light, ranged: true, critical: true }, true);
+    expect(hit).toEqual({ outcome: 'hit', damage: light.damage });
+    expect(d.actor.move).toBe('parried'); // a shot leaves the melee opening available
+  });
+
   it('keeps an immortal dummy alive', () => {
     const d = deepOne();
     d.health = { hp: 5, max: 300, immortal: true, calm: 0 };
