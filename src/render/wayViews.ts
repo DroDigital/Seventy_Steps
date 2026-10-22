@@ -19,6 +19,7 @@ import { createWorldMaterial } from './worldMaterial';
 const MAKE = 100; // metres from a way within which its things are made...
 const KEEP = 135; // ...and put away beyond
 const SEEN = 55; // a halo is drawn this far
+const RITE_SEEN = 95; // a rite's lights are drawn this far, so the candles of a court are found down its length
 const COLD = [0.5, 0.55, 0.75] as const;
 const FLAME: Rgb = [1, 0.8, 0.45];
 
@@ -127,7 +128,7 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
           view.flame.visible = l.lit;
           if (view.flame && l.lit) view.flame.scale.set(1, 0.85 + 0.3 * Math.sin(time * 9 + i * 1.7) * Math.sin(time * 5.3 + i), 1);
           const y = l.y + view.top;
-          if (Math.hypot(l.x - eye.x, l.z - eye.z) > SEEN) return;
+          if (Math.hypot(l.x - eye.x, l.z - eye.z) > (rite ? RITE_SEEN : SEEN)) return;
           const hue = rite ? ANOMALY[rite.glow] : FLAME;
           if (l.lit) halos.put(l.x, y, l.z, 2.1 + 0.2 * Math.sin(time * 7 + i), hue, 0.95);
           else if (l.rank === run.progress) halos.put(l.x, y, l.z, 1.3 + 0.35 * Math.sin(time * 3.2), hue, 0.45 + 0.25 * Math.sin(time * 3.2)); // the next light beckons from the outset, so the first candle can be found too
