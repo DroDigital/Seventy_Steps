@@ -31,3 +31,12 @@ export function record<K extends keyof import('../src/systems/components').GameE
   g.events.on(type, (e) => log.push(e));
   return log;
 }
+
+/** Walks from `from` straight at (`to.x`, `to.z`) for `frames` (the investigator's horrors sent away first), and returns how far from it they end. */
+export function walkIn(g: Game, to: { x: number; z: number }, from: { x: number; z: number }, frames: number): number {
+  goTo(g, from.x, from.z, Math.atan2(to.x - from.x, to.z - from.z));
+  for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
+  for (let k = 0; k < frames; k++) stepGame(g, { ...emptyInput(), moveY: 1 });
+  const p = g.ecs.c.transform.get(g.player.id)!.pos;
+  return Math.hypot(p.x - to.x, p.z - to.z);
+}

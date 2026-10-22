@@ -17,6 +17,8 @@ const COLOURS: Readonly<Record<Exclude<Tint, 'clear'>, string>> = {
   red: '#4a0606',
   violet: '#25093f',
   gold: '#e8cf8c',
+  green: '#0d2a1c',
+  cold: '#cfe3ee',
 };
 const BAR = 11.5; // % of the screen's height, each
 

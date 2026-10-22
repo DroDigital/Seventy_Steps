@@ -25,6 +25,16 @@ export interface GameEvents {
   Shot: { shooter: Entity; from: V3; to: V3; target: Entity | null };
   StrikeWarned: { at: V3; radius: number; frames: number }; // a ring of light marks ground where a bolt will fall (systems/skyStrikes.ts; round 52)
   StrikeLanded: { at: V3; radius: number }; // the bolt falls
+  WardWarned: { at: V3; radius: number; frames: number; look: string; mute?: boolean }; // a plate underfoot, a vent or a wave of a way wakes: its ring is marked, and it bursts in `frames` (systems/ways.ts; round 62)
+  WardLanded: { at: V3; radius: number; look: string; mute?: boolean }; // it bursts
+  WayOmen: { words: string; sound?: string; shake: number; pitch: number }; // a line said on a way, and what is heard and felt under it (round 62)
+  HouseSeen: { boss: string; name: string; line: string }; // a horror's house come within sight (systems/discovery.ts; round 63): its name, and a line under it
+  VigilKept: { boss: string; at: V3; share: number }; // a vigil begun (0), half kept (0.5), and kept (1)
+  Offered: { boss: string; at: V3; gift: string }; // a gift laid on an altar of a house's court
+  GateOpened: { boss: string; at: V3 }; // a house's gate gives: the horror has been found
+  RiteLit: { at: V3; look: string; glow: string; rank: number; of: number }; // one of a rite's lights taken by the flame, in its turn
+  RiteFailed: { at: V3; look: string }; // the wrong light: they all go out
+  RiteDone: { boss: string; at: V3 }; // every light burns: the way is its own again
   Swung: { entity: Entity; at: V3; yaw: number }; // a blow's hit window opens (combat.ts; round 51: its flash and its sound)
   BoltLoosed: { owner: Entity; at: V3; vel: V3; fire: boolean; conjured: boolean }; // a bolt leaves its caster (projectiles.ts; round 51: the muzzle's flash)
   BoltLanded: { owner: Entity; at: V3; vel: V3; on: 'body' | 'ground' | 'wall' | 'spent'; radius: number; lob: boolean; fire: boolean; conjured: boolean }; // a bolt's end: it struck, struck the world, or gave out
@@ -41,13 +51,14 @@ export interface GameEvents {
   CandleLit: { id: string; x: number; z: number }; // a candle before a horror's fog taken up (candles.ts)
   FogPassing: { wall: string; x: number; z: number; frames: number }; // frames: how long the walk through takes (the sound is made to its length) // the investigator sets out through a boss's fog (round 35)
   FogPassed: { wall: string; x: number; z: number };
+  PassageOpening: { id: Entity; kind: 'door' | 'bridge' | 'sealed'; x: number; y: number; z: number; seconds: number }; // a secret passage the investigator has come near begins to open: a door's slab draws aside, a bridge's stones rise (systems/passages.ts; round 61)
   GateEntering: { gate: string; x: number; z: number; frames: number }; // a realm's gate walked into: the walk on into its light takes `frames`, and then they are through (round 60: gateWalk.ts)
   Echoes: { change: 'earned' | 'dropped' | 'recovered' | 'lost' | 'spent'; amount: number; total: number; on?: 'ware' | 'level' }; // `on`: what spent Echoes were spent on (the coins of a ware are heard; a level has its own sound)
   LevelUp: { attribute: LevelId; level: number; total: number }; // a level bought with Echoes: the attribute's level and the investigator's
   LockChanged: { target: Entity | null };
   SanityBandChanged: { from: Band; to: Band; sanity: number };
   SanityLost: { amount: number; sanity: number }; // a loss of at least SANITY.jolt at once (a blow, a sight, a burst), not a slow drain
-  InsightChanged: { insight: number; change: number; cause: 'sight' | 'tome' | 'upgrade' | 'debug' | 'load' | 'quest'; source: string };
+  InsightChanged: { insight: number; change: number; cause: 'sight' | 'tome' | 'upgrade' | 'debug' | 'load' | 'quest' | 'sale'; source: string };
   FirstSight: { entity: Entity; name: string; sanity: number; insight: number }; // sanity lost, insight gained
   Discovered: { sign: string; name: string }; // an Elder Sign found
   PlaceFound: { id: string; name: string; region: string; found: number; of: number }; // a named place first stepped into, and how many of its region's are found (places.ts; round 18)
@@ -58,6 +69,7 @@ export interface GameEvents {
   Travelled: { via: 'sign' | 'gate' | 'dream'; to: string; name: string };
   RegionEntered: { region: string; name: string };
   Vanquished: { entity: Entity; name: string }; // a boss or optional boss, slain for good
+  Found: { kind: 'weapon' | 'relic'; id: string; from?: string; worn?: boolean }; // a weapon or a relic come into the investigator's hands: the card that says so, and what to do with it, opens when they are free (systems/finds.ts; round 60). `worn`: a relic put on at once
   Wandered: { id: string; at: V3; sound?: SampleSetId; words?: string }; // a file of creatures has come out of the dark (wanderers.ts; round 26); `words` the first time one is seen
   Foreboding: { words: string; sound: SampleSetId; shake: number; pitch: number }; // something vast is heard, far off (hook.ts; round 26)
   Exhaled: { region: string; name: string }; // the last horror of a region has fallen, and it breathes out (omens.ts; round 26)

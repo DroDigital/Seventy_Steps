@@ -20,7 +20,7 @@ const scaled = (p: Prop, k: number): Prop => ({ ...p, w: p.w * k, d: p.d * k, h:
 const GAP = 2.5; // metres the least way through a ring, between two pieces' colliders
 
 /** How far a prop's collider reaches from its centre (0 when it has none). */
-function reach(p: Prop): number {
+export function reach(p: Prop): number {
   const c = propCollider(p);
   if (!c) return 0;
   const b = colliderBounds(c);

@@ -32,8 +32,9 @@ export function paneLit(s: number, t: number): number {
 }
 
 export const PANE_GLSL = /* glsl */ `
+uniform float uHurried; // seconds a vigil's place has hurried the night on (systems/clock.ts NIGHT; round 65)
 float windowShare(float t) {
-  float p = fract(t / ${CLOCK.night.toFixed(1)} + ${CLOCK.start.toFixed(4)});
+  float p = fract((t + uHurried) / ${CLOCK.night.toFixed(1)} + ${CLOCK.start.toFixed(4)});
   if (p < 0.14) return 1.0;
   if (p < 0.7) return 1.0 - 0.3 * smoothstep(0.14, 0.7, p);
   if (p < 0.96) return 0.7 - 0.4 * smoothstep(0.7, 0.96, p);

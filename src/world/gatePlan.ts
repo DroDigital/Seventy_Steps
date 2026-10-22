@@ -7,6 +7,7 @@
  */
 
 import { hash2 } from '../core/rng';
+import { hallCandle, ringCandle, type CandleSpot } from './candlePlan';
 import { doorLook, type DoorLook } from '../data/doors';
 import { fogThemeOf, type FogThemeId } from '../data/fogThemes';
 import { DUNGEON } from '../data/tuning';
@@ -42,7 +43,8 @@ export interface FogWall {
   region: string;
   bosses: string[]; // roster ids
   spawns: string[]; // `boss:<id>`: slain for good, the wall is gone
-  stake: { x: number; z: number; yaw: number }; // where its candle stands, before the fog on the way in, looking at it (round 45: systems/candles.ts)
+  stake: { x: number; z: number; yaw: number }; // where the fallen wake, before the fog on the way in, looking at it (round 45: systems/candles.ts)
+  candle: CandleSpot; // where its candle stands: aside the stake, at the way's edge (round 62: world/candlePlan.ts)
 }
 
 const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, ring: 1.5, ringMin: 6, ringMax: 16, stake: 6.5, ringStake: 9 };
@@ -72,7 +74,8 @@ function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[
       for (const t of [FOG.stake, 5.5, 7.5, 4.5, 3.5, 2.4]) for (const s of [0, 1.8, -1.8, 3.4, -3.4]) spots.push([d.x + ux * t - uz * s, d.z + uz * t + ux * s]); // the pace back, then a pace to either side, then nearer and farther
       const [sx, sz] = spots.find(([x, z]) => roomAt(L, x, z) !== undefined && roomAt(L, x, z) !== boss && free(parts, x, z, d.level)) ?? spots[0]; // not over a pit or against a pillar
       const stake = { x: sx, z: sz, yaw: Math.atan2(-vx, -vz) };
-      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, kind: 'doorway', x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, radius: 0, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake });
+      const candle = hallCandle(L, parts, boss, { x: d.x, z: d.z }, { x: ux, z: uz }, d.level, stake);
+      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, kind: 'doorway', x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, radius: 0, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
       return;
     }
     const look = doorLook(kitIdOfRoom(L, room));
@@ -94,12 +97,12 @@ export function gatePlan(w: WorldLayout): GatePlan {
   w.arenas.forEach((a, i) => {
     const bosses = [...a.bosses];
     const radius = a.radius + FOG.ring;
-    const sign = w.signs.filter((s) => s.region === a.region).sort((p, q) => Math.hypot(p.x - a.x, p.z - a.z) - Math.hypot(q.x - a.x, q.z - a.z))[0] ?? w.signs[0]; // toward the nearest Elder Sign of its realm: the way a person comes
-    const [sx, sz] = sign ? [sign.x - a.x, sign.z - a.z] : [0, -1];
-    const sl = Math.hypot(sx, sz) || 1;
+    const [sx, sz] = [a.front.x, a.front.z]; // toward the nearest Elder Sign of its realm: the way a person comes (arenaFront.ts)
+    const sl = 1;
     const reach = radius + FOG.ringStake;
     const stake = { x: a.x + (sx / sl) * reach, z: a.z + (sz / sl) * reach, yaw: Math.atan2(-sx, -sz) };
-    fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake });
+    const candle = ringCandle(a, stake, a.front);
+    fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
   });
   return { doors, fogs };
 }

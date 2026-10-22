@@ -9,7 +9,9 @@
 
 import type { Rng } from '../core/rng';
 import type { HouseStyle } from '../data/regionFeatures';
+import type { Glow } from '../data/arenaSets';
 import type { PropKind } from '../data/regions';
+import type { LightKind } from '../data/tuning';
 import type { Collider } from './colliders';
 import { surface } from './terrain';
 
@@ -24,6 +26,19 @@ export interface Prop {
   yaw: number;
   seed: number;
   style?: HouseStyle; // houses: how they are built
+  set?: SetLook; // a piece of an arena's set: which, and how it is dressed (round 61)
+}
+
+/** A piece of an arena's set (a baked model, data/models, or a built one) placed as a prop: its scale (1: as baked), a colour it leans toward, and how much of its own it keeps (0..1). */
+export interface SetLook {
+  id: string;
+  scale?: number;
+  tint?: readonly [number, number, number];
+  keep?: number;
+  round?: boolean; // its footprint a circle (a standing thing), else a box
+  walk?: boolean; // low enough to be walked over: no collider
+  glow?: Glow; // a built piece's glow
+  lit?: LightKind; // a flame at its top, lighting about it
 }
 
 const ROUND = new Set<PropKind>(['tree', 'pine', 'rock', 'pillar', 'lamp', 'obelisk', 'cross', 'stump', 'spire', 'tower', 'cone']);
@@ -68,6 +83,7 @@ export function propAt(kind: PropKind, x: number, y: number, z: number, rng: Rng
     },
     block: () => [r(3, 5), r(2.5, 4), r(4, 7)],
     globe: () => [r(1.4, 2.8), 0, r(6, 11)], // w its radius, h how high it hangs
+    set: () => [1, 1, 1], // sized by what places it, from the piece's box (world/arenaSet.ts)
   };
   const [w, d, h] = size ?? sizes[kind]();
   const turn = yaw ?? (ROUND.has(kind) ? r(0, Math.PI * 2) : rng() < 0.5 ? 0 : Math.PI / 2);
@@ -76,7 +92,8 @@ export function propAt(kind: PropKind, x: number, y: number, z: number, rng: Rng
 
 /** The prop's collider, or null for what is walked through (bushes, fire pits). */
 export function propCollider(p: Prop): Collider | null {
-  if (OPEN.has(p.kind)) return null;
+  if (OPEN.has(p.kind) || (p.kind === 'set' && (!p.set || p.set.walk))) return null;
+  if (p.kind === 'set' && p.set?.round) return { kind: 'cylinder', x: p.x, z: p.z, radius: Math.max(p.w, p.d), y0: p.y - 0.5, y1: p.y + p.h };
   if (ROUND.has(p.kind)) {
     const radius = p.kind === 'rock' ? p.w * 0.8 : p.kind === 'lamp' || p.kind === 'cross' ? 0.18 : p.w + 0.05;
     return { kind: 'cylinder', x: p.x, z: p.z, radius, y0: p.y - 0.5, y1: p.y + p.h };

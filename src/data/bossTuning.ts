@@ -151,3 +151,11 @@ export const ZONES = {
   linger: 24, // frames it stays stooped after its recovery ends
   aimReach: 18, // metres: a head higher than this is out of a bullet's range, and the revolver aims at the body as before
 };
+
+/** A horror's arrival (round 60: bosses are not drawn until roused, and come into view as the fight begins): how long it takes, and how deep the great bodies of earth and sea come up from. */
+export const ARRIVAL = {
+  least: 1.1, // seconds, for the smallest
+  perMetre: 0.055, // and as many more for each metre of its height (Cthulhu, forty metres, takes 3.3)
+  most: 3.4, // the longest a horror takes
+  rise: 0.8, // how far down its body a great one begins, a share of the sink (death's sinking is 0.6 of its height at 1): it comes up out of the ground as it comes into view
+};

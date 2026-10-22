@@ -1,7 +1,7 @@
 /**
  * Arms (playtest round 4): the investigator's melee weapons, each a light and a heavy chain over
  * the shared swings (render/swings.ts). The sword-cane they carry from the start; the others lie in
- * the dream's houses (dungeons.ts, lairs.ts), and are taken up from the pause menu; round 12 adds
+ * the dream's houses (dungeons.ts, lairs.ts), and are taken up from the card that says they are found or from the pause menu (round 60); round 12 adds
  * Obed Marsh's cutlass (found in Y'ha-nthlei) and Zamacona's espada (his thanks, in K'n-yan). Data only.
  */
 
@@ -177,3 +177,12 @@ export function armedMoves(id: WeaponId): MoveSet {
   const rest = Object.entries(PLAYER_MOVES).filter(([k]) => !k.startsWith('light') && !k.startsWith('heavy'));
   return { ...Object.fromEntries(rest), ...WEAPONS[id].moves };
 }
+
+/** Where each weapon is to be had, as the rumour the Arms page tells of one not yet found (round 60). The sword-cane is carried from the start. */
+export const WEAPON_WHERE: Readonly<Record<Exclude<WeaponId, 'cane'>, string>> = {
+  axe: 'It lies in the kitchen of the Whateley farmhouse, in Dunwich.',
+  razor: 'It lies in the parlour of the Witch House, in Arkham.',
+  cutlass: "It lies in the cells off the Drowned Hall of Y'ha-nthlei, beneath Innsmouth.",
+  rapier: "Zamacona gives it, in K'n-yan, once Tsathoggua is stilled.",
+};
+

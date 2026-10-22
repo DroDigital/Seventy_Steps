@@ -3,11 +3,15 @@ import { emptyInput } from '../src/core/input';
 import { setArena } from '../src/systems/bossFight';
 import { spawnCreature } from '../src/systems/creatures';
 import { gatePlace, interactable } from '../src/systems/checkpoints';
+import { t } from '../src/core/i18n';
+import { press } from './helpers';
 import type { Game } from '../src/systems/components';
 import { createWorldGame, stepGame } from '../src/systems/game';
-import { aboutGate, GATE_WALK } from '../src/systems/gateWalk';
+import { aboutGate, GATE_WALK, gateNear, gateStepSystem, leadsTo } from '../src/systems/gateWalk';
 import { outOfReach } from '../src/systems/targets';
 import type { GatePlace } from '../src/world/placements';
+import { demoAllows } from '../src/systems/demo';
+import { worldLayout } from '../src/world/placements';
 import { yawOfDir } from '../src/world/worldMap';
 import { goTo, record, run } from './worldHelpers';
 
@@ -56,7 +60,7 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     expect(moved).toHaveLength(1);
   });
 
-  it('from behind as from before, but not past the jambs, nor while riding', () => {
+  it('from behind as from before, but not past the jambs', () => {
     const g = createWorldGame();
     const gate = gatePlace('hub_australia')!;
     const entering = record(g, 'GateEntering');
@@ -87,5 +91,58 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     expect(entering).toEqual([]);
     expect(moved).toEqual([]);
     expect(notices.map((n) => n.text)).toEqual(['THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU']);
+  });
+
+  it('one riding who steps into the veil is set down and drawn on: there is no E to dismount with (round 60)', () => {
+    const g = createWorldGame();
+    const gate = gatePlace('hub_australia')!;
+    const entering = record(g, 'GateEntering');
+    const [a, b] = [near(gate, 1.5, 0), near(gate, 0.3, 0)];
+    goTo(g, a.x, a.z);
+    run(g, 1);
+    g.player.mount.active = 'grey';
+    const tr = g.ecs.c.transform.get(g.player.id)!;
+    [tr.prev.x, tr.prev.z, tr.pos.x, tr.pos.z] = [a.x, a.z, b.x, b.z];
+    gateStepSystem(g);
+    expect(entering).toHaveLength(1);
+    expect(g.player.mount.active).toBeNull();
+    expect(g.player.gatePass).not.toBeNull();
+  });
+
+  it('E does nothing at a gate, nor does any prompt offer it', () => {
+    const g = createWorldGame();
+    const gate = gatePlace('hub_australia')!;
+    goTo(g, gate.arrive.x, gate.arrive.z);
+    run(g, 1);
+    const moved = record(g, 'Travelled');
+    stepGame(g, press('interact'));
+    expect([moved, g.player.gatePass, interactable(g)]).toEqual([[], null, null]);
+  });
+
+  it('the notice says where a gate leads when a free investigator is near it: the region beyond, or the twin where it is the same one', () => {
+    const g = createWorldGame();
+    const gate = gatePlace('hub_australia')!;
+    goTo(g, gate.arrive.x, gate.arrive.z);
+    expect(gateNear(g)).toEqual({ id: gate.id, leads: 'Pnakotus' });
+    expect(leadsTo(gate)).toBe('Pnakotus');
+    expect(leadsTo(gatePlace('dream_wood_gate')!)).toBe(gatePlace('dream_deeper')!.name); // its twin is in the same region: the twin is the name
+    goTo(g, gate.x + GATE_WALK.notice + 5, gate.z + 5);
+    expect(gateNear(g)).toBeNull(); // too far to be told
+    goTo(g, gate.arrive.x, gate.arrive.z);
+    g.player.gatePass = { gate: gate.id, from: { x: 0, z: 0 }, to: { x: 0, z: 0 }, frame: 0, frames: 60 };
+    expect(gateNear(g)).toBeNull(); // nothing while walking into the veil
+    expect(t('hud.gateLeads', { name: 'Pnakotus' })).toMatch(/Pnakotus/);
+  });
+
+  it('in the demo, a step into a gate out of its realms is refused and said at once, and no walk begins (review of PR 142)', () => {
+    const g = createWorldGame({ demo: true });
+    const inDemo = (x: number, z: number): boolean => demoAllows(g, { x, z });
+    const gate = worldLayout().gates.find((gt) => inDemo(gt.x, gt.z) && !inDemo(gatePlace(gt.to)!.arrive.x, gatePlace(gt.to)!.arrive.z))!;
+    goTo(g, ...(Object.values(near(gate, -4, 0)) as [number, number]));
+    run(g, 1);
+    const [entering, said] = [record(g, 'GateEntering'), record(g, 'Notice')];
+    walkTo(g, near(gate, 3, 0), () => said.length > 0, 300);
+    expect(entering).toEqual([]);
+    expect(said.map((n) => n.text)).toEqual([t('demo.closed')]);
   });
 });

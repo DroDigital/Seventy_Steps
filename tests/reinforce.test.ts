@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENTITIES, variantOf } from '../src/data/registry';
 import { LEVELS, REINFORCE, STAR_STONES } from '../src/data/tuning';
 import { WEAPONS } from '../src/data/weapons';
-import { canReinforce, edge, edgeAt, movable, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
+import { affordableMoves, canReinforce, edge, edgeAt, movable, moveCost, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
 import { createWorldGame } from '../src/systems/game';
 import { snapshot } from '../src/systems/save';
 import { spawnCreature } from '../src/systems/creatures';
@@ -87,6 +87,7 @@ describe('moving reinforcement from one weapon to another (an Elder Sign)', () =
     const { g } = scriptedGame();
     g.player.arms.push('rapier', 'axe');
     g.player.reinforced.cane = 4;
+    g.player.echoes = 100000; // (a move is paid for in Echoes, round 61: the tests below that are not about the price have plenty)
     return g;
   };
 
@@ -99,7 +100,7 @@ describe('moving reinforcement from one weapon to another (an Elder Sign)', () =
     expect(moveLevels(g, 'cane', 'rapier', 99)).toBe(3); // all that is left, and it fits
     expect([g.player.reinforced.cane, g.player.reinforced.rapier]).toEqual([0, 4]);
     expect(total()).toBe(before);
-    expect(moveLevels(g, 'rapier', 'cane', 4)).toBe(4); // and back again, for nothing
+    expect(moveLevels(g, 'rapier', 'cane', 4)).toBe(4); // and back again, for a price
     expect(g.player.reinforced.cane).toBe(4);
   });
 
@@ -131,3 +132,55 @@ describe('moving reinforcement from one weapon to another (an Elder Sign)', () =
     expect(edge(g, g.player.id)).toBeCloseTo(edgeAt(4));
   });
 });
+
+describe('moving reinforcement is paid for in Echoes (round 61)', () => {
+  const armed = (echoes: number) => {
+    const { g } = scriptedGame();
+    g.player.arms.push('rapier', 'axe');
+    g.player.reinforced.cane = 5;
+    g.player.echoes = echoes;
+    return g;
+  };
+
+  it('prices each level at the star-stones it would cost to set in afresh, in Echoes: more the further the other weapon is reinforced', () => {
+    const g = armed(0);
+    expect(REINFORCE.moveEchoes).toBeGreaterThanOrEqual(400); // substantial, set against a level's cost of about 200 to 3000
+    expect(moveCost(g, 'rapier', 1)).toBe(REINFORCE.cost[0] * REINFORCE.moveEchoes);
+    expect(moveCost(g, 'rapier', REINFORCE.max)).toBe(REINFORCE.cost.reduce((a, b) => a + b, 0) * REINFORCE.moveEchoes); // all five into a bare weapon: nine stones' worth
+    g.player.reinforced.rapier = 3;
+    expect(moveCost(g, 'rapier', 2)).toBe((REINFORCE.cost[3] + REINFORCE.cost[4]) * REINFORCE.moveEchoes);
+    expect(moveCost(g, 'rapier', 0)).toBe(0);
+  });
+
+  it('takes the Echoes and says so, and moves only as many levels as can be paid for', () => {
+    const g = armed(REINFORCE.moveEchoes * 2 + 50); // two levels' worth (1 + 1 stone), a third (2 stones) is out of reach
+    const spent = g.events;
+    const log: { amount: number; change: string }[] = [];
+    spent.on('Echoes', (e) => void log.push({ amount: e.amount, change: e.change }));
+    expect(affordableMoves(g, 'cane', 'rapier', 5)).toBe(2);
+    expect(moveLevels(g, 'cane', 'rapier', 5)).toBe(2);
+    expect([g.player.reinforced.cane, g.player.reinforced.rapier]).toEqual([3, 2]);
+    expect(g.player.echoes).toBe(50);
+    expect(log).toEqual([{ amount: REINFORCE.moveEchoes * 2, change: 'spent' }]);
+  });
+
+  it('moves nothing, and takes nothing, with Echoes for none; and moving a level back costs again', () => {
+    const g = armed(REINFORCE.moveEchoes - 1);
+    expect(moveLevels(g, 'cane', 'rapier')).toBe(0);
+    expect([g.player.echoes, g.player.reinforced.cane, g.player.reinforced.rapier]).toEqual([REINFORCE.moveEchoes - 1, 5, 0]);
+    g.player.echoes = REINFORCE.moveEchoes * 10;
+    moveLevels(g, 'cane', 'rapier');
+    const after = g.player.echoes;
+    moveLevels(g, 'rapier', 'cane'); // the cane is at four, the level it goes back to is the fifth: 3 stones' worth
+    expect(after - g.player.echoes).toBe(REINFORCE.cost[4] * REINFORCE.moveEchoes);
+  });
+
+  it('is dearer than setting the same stones into the weapon itself, which costs no Echoes', () => {
+    const g = armed(1e6);
+    g.player.stones = 99;
+    expect(reinforce(g, 'rapier')).toBe(true);
+    expect(g.player.echoes).toBe(1e6); // stones cost stones, not Echoes
+    expect(moveCost(g, 'axe', 1)).toBeGreaterThan(0);
+  });
+});
+

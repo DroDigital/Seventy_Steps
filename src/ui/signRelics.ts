@@ -6,6 +6,7 @@
 
 import { RELICS, type RelicId } from '../data/relics';
 import type { Game } from '../systems/components';
+import { clearNew } from '../systems/finds';
 import { owned, relicEffects, slotsOf, wear } from '../systems/relics';
 import { chips } from './menuChips';
 import { button, el, footer, heading, title, type Page } from './menuKit';
@@ -20,6 +21,7 @@ export const effectChips = (parent: HTMLElement, id: RelicId, style = ''): void 
 /** The tab's body: a line to choose for each slot, and what is kept besides. `pick` opens the page for a slot. */
 export function relicsTab(panel: HTMLElement, g: Game, pick: (slot: number) => void): void {
   const [found, slots] = [owned(g), slotsOf(g)];
+  clearNew(g, 'relic'); // looked at, here at the Elder Sign where they are changed (round 60)
   heading(panel, `WORN  ·  ${slots.filter(Boolean).length} OF ${slots.length}`).style.marginTop = '0';
   slots.forEach((id, slot) => {
     const b = button(panel, `Slot ${NUMERALS[slot]}  ·  ${id ? RELICS[id].name : 'empty'}  ›`, () => pick(slot), true, id ? RELICS[id].note : 'Nothing worn here.');

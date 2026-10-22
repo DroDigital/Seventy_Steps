@@ -26,6 +26,11 @@ export function poiCount(g: Game, region: string): { found: number; of: number }
   return { found: all.filter((s) => g.overworld?.told.has(poiKey(s.def.id))).length, of: all.length };
 }
 
+/** The secrets found and told of in all of `realm`'s regions (the map's heading). */
+export function poiTotals(g: Game, realm: readonly { id: string }[]): { found: number; of: number } {
+  return realm.reduce((n, r) => ((c) => ({ found: n.found + c.found, of: n.of + c.of }))(poiCount(g, r.id)), { found: 0, of: 0 });
+}
+
 export type PoiMark = 'hidden' | 'rumour' | 'found' | 'spent';
 
 /**

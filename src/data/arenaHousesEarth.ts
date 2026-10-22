@@ -1,0 +1,70 @@
+/**
+ * The houses of the waking world's and the dream-lands' open horrors (round 63; data/arenaHouses.ts): each built of what its own story
+ * leaves standing: a reservoir's dam, a ravine's cliff, a grove grown together, a plantation's porch, a sea wall, a burying ground's
+ * wall, a manor's, a temple's, a serpent's mound, a ziggurat, a lake's quay, a ring of stones. Data only.
+ */
+
+import { house, type House } from './arenaHouses';
+
+export const EARTH_HOUSES: Readonly<Record<string, House>> = {
+  colour_out_of_space: house({
+    name: 'THE RESERVOIR', line: 'The water was to cover the Gardner place. It never quite did.',
+    wall: 'dam', height: 6, thick: 4.4, tint: [0.62, 0.63, 0.66], glow: 'magenta',
+    tower: { kind: 'square', every: 9, height: 9 }, gate: { width: 8, height: 6.5, flank: 12, sealed: true },
+  }),
+  black_man: house({
+    name: 'THE RAVINE', line: 'The ravine closes about a cleft, and the cleft has been shut with a stone.',
+    wall: 'cliff', height: 10, thick: 5, tint: [0.38, 0.34, 0.4], glow: 'purple',
+    tower: { kind: 'spire', every: 8, height: 13 }, gate: { width: 7, height: 7, flank: 15, sealed: true },
+  }),
+  shub_niggurath: house({
+    name: 'THE BLACK GROVE', line: 'The trees have grown together, and what grew them is not done.',
+    wall: 'grove', height: 13, thick: 5, glow: 'magenta',
+    tower: { kind: 'horn', every: 7, height: 16 }, gate: { width: 9, height: 8, flank: 18 },
+  }),
+  medusa_gorgon: house({
+    name: 'THE PLANTATION HOUSE', line: 'The porch is all that stands of it, and on the porch people stand.',
+    wall: 'colonnade', height: 8, thick: 3.4, tint: [0.75, 0.72, 0.66], glow: 'magenta',
+    tower: { kind: 'square', every: 10, height: 11 }, gate: { width: 8, height: 7, flank: 12 },
+  }),
+  martins_beach_horror: house({
+    name: 'THE SEA WALL', line: 'It was built to keep the sea out, and the sea has been let in by someone who knew the way.',
+    wall: 'dam', height: 7, thick: 4, tint: [0.5, 0.62, 0.58], glow: 'green',
+    tower: { kind: 'round', every: 8, height: 11, lit: true }, gate: { width: 8, height: 7, flank: 13 },
+  }),
+  simon_orne: house({
+    name: 'THE BURYING GROUND', line: 'The wall is low and the gate is old, and neither was built to keep the living out.',
+    wall: 'ashlar', height: 5.5, thick: 2.4, tint: [0.42, 0.46, 0.4], glow: 'purple',
+    tower: { kind: 'spire', every: 9, height: 8 }, gate: { width: 7, height: 5.5, flank: 9 },
+  }),
+  edward_hutchinson: house({
+    name: 'THE PAWTUXET MANOR', line: 'A garden wall of old brick, and a gatehouse with a rod on it that has drawn the lightning for a hundred years.',
+    wall: 'ashlar', height: 6.5, thick: 2.6, tint: [0.55, 0.38, 0.34], glow: 'purple',
+    tower: { kind: 'square', every: 8, height: 10, lit: true }, gate: { width: 8, height: 6, flank: 14 },
+  }),
+  colossus_pyramids: house({
+    name: 'THE TEMENOS OF THE SPHINX', line: 'A wall as thick as a street is wide, and the pylons of a door that was not made for men.',
+    wall: 'ashlar', height: 11, thick: 5.5, tint: [0.85, 0.72, 0.5], glow: 'purple',
+    tower: { kind: 'spire', every: 8, height: 16 }, gate: { width: 9, height: 9, flank: 18, sealed: true },
+  }),
+  yig: house({
+    name: 'THE SERPENT MOUND', line: 'An earthwork in a ring, and a gap in it as wide as a jaw.',
+    wall: 'dam', height: 7, thick: 6, tint: [0.45, 0.4, 0.3], glow: 'green',
+    tower: { kind: 'round', every: 10, height: 9 }, gate: { width: 8, height: 6, flank: 11 },
+  }),
+  nug: house({
+    name: 'THE BLACK ZIGGURAT', line: 'Terraces of black stone, narrowing as they climb, and a mouth at the foot of them.',
+    wall: 'terrace', height: 12, thick: 6, tint: [0.3, 0.3, 0.36], glow: 'green',
+    tower: { kind: 'square', every: 8, height: 16 }, gate: { width: 8, height: 8, flank: 18, sealed: true },
+  }),
+  bokrug: house({
+    name: 'THE QUAY OF IB', line: 'The stones of the quay are green with something older than moss, and the water at their foot does not move.',
+    wall: 'dam', height: 6, thick: 4, tint: [0.45, 0.62, 0.55], glow: 'green',
+    tower: { kind: 'round', every: 9, height: 10 }, gate: { width: 8, height: 6, flank: 12 },
+  }),
+  other_gods: house({
+    name: 'THE CIRCLE OF HATHEG-KLA', line: 'Standing stones in a ring on the peak, close as teeth, and a gap where two of them were drawn apart.',
+    wall: 'slabs', height: 12, thick: 4, tint: [0.5, 0.48, 0.58], glow: 'purple',
+    tower: { kind: 'spire', every: 6, height: 17 }, gate: { width: 9, height: 9, flank: 19, sealed: true },
+  }),
+};

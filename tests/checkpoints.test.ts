@@ -3,7 +3,7 @@ import { NPCS } from '../src/data/npcs';
 import { START_SIGN } from '../src/data/sites';
 import { wrapAngle, yawOf } from '../src/core/geom';
 import { emptyInput } from '../src/core/input';
-import { CAMERA, LAUDANUM, SANITY, WORLD } from '../src/data/tuning';
+import { CAMERA, LAUDANUM, PASSAGE, SANITY, WORLD } from '../src/data/tuning';
 import { dream, gatePlace, interactable, passGate, rest, signPlace, travel } from '../src/systems/checkpoints';
 import { isAbsent } from '../src/systems/components';
 import { npcEntity, npcPlace, talk } from '../src/systems/npcs';
@@ -140,7 +140,7 @@ describe('Elder Signs', () => {
     }
   });
 
-  it('E rests at a sign within reach, or passes a gate within reach', () => {
+  it('E rests at a sign within reach, and does nothing at a gate: there is no prompt to press it at one (round 60)', () => {
     const g = createWorldGame();
     const sign = signPlace(START_SIGN)!;
     expect(interactable(g)).toMatchObject({ kind: 'sign', id: START_SIGN }); // they wake within reach: E rests at once (round 12)
@@ -150,14 +150,13 @@ describe('Elder Signs', () => {
     stepGame(g, press('interact'));
     expect(rested).toHaveLength(1);
     const gate = gatePlace('hub_australia')!;
-    goTo(g, gate.arrive.x, gate.arrive.z);
-    expect(interactable(g)).toBeNull(); // arriving, the gate is out of reach: a stray E does not send them back
-    const back = (WORLD.reach - 0.7) / WORLD.gateArrive; // a step or two back toward the gate: within reach (round 32: the arrival is further out, so no longer half way)
+    const back = (WORLD.reach - 0.7) / WORLD.gateArrive; // a step or two back toward the gate: once within reach of E
     goTo(g, gate.x + (gate.arrive.x - gate.x) * back, gate.z + (gate.arrive.z - gate.z) * back);
-    expect(interactable(g)).toMatchObject({ kind: 'gate', id: 'hub_australia' });
+    expect(interactable(g)).toBeNull(); // a gate is not something E takes
     const moved = record(g, 'Travelled');
     stepGame(g, press('interact'));
-    expect(moved).toEqual([{ via: 'gate', to: 'pnakotus_gate', name: gatePlace('pnakotus_gate')!.name }]);
+    expect(moved).toEqual([]); // and a press there passes nothing
+    expect(g.player.gatePass).toBeNull();
     goTo(g, gate.arrive.x + WORLD.reach + 5, gate.arrive.z + 30);
     expect(interactable(g)).toBeNull();
   });
@@ -214,6 +213,9 @@ describe('hidden bridges', () => {
     };
     expect(probe()).toBeGreaterThan(0.5);
     changeInsight(g, 2, 'debug', 'test');
+    expect(probe()).toBeGreaterThan(0.5); // shown, but it forms as it is approached (round 61): until then the gap is a gap
+    goTo(g, ...(Object.values(roomPoint(span, 0, -span.half + 1)) as [number, number])); // at the near brink
+    run(g, PASSAGE.frames.bridge + 2);
     expect(probe()).toBe(0);
   });
 });

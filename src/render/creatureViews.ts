@@ -17,11 +17,12 @@ import type { Variant } from '../data/registry';
 import { REVIEWED_EYES } from '../data/reviewedLook';
 import { FEEDBACK, FOG_EYES, LIGHT, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
+import { isAbsent, isUnroused, isUnseen, type Game } from '../systems/components';
 import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
 import { strikeFrame } from '../systems/realityTricks';
 import { buildAssembly, type Assembly } from './assemblies';
+import { createArrivals, risesOut, type Arrival } from './bossArrival';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
 import { MIST } from './volumetricFog';
@@ -41,10 +42,11 @@ interface Look {
   opacity: number;
   sink: number; // 0..1 through the death move
   lash: number; // 0..1 around an attack's strike
+  appear?: number; // 0..1 how far a horror just roused has come into view (render/bossArrival.ts); absent: wholly
 }
 
 /** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose). */
-export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number): Look | null {
+export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number, arrive?: Arrival): Look | null {
   const c = g.ecs.c;
   const br = c.brain.get(id);
   if (isAbsent(g, id) || br?.state === 'hidden' || isUnseen(g, id)) return null;
@@ -77,6 +79,7 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
     else look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
   }
   if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
+  if (arrive && arrive.appear < 1) [look.opacity, look.appear, look.sink] = [look.opacity * arrive.appear, arrive.appear, Math.max(look.sink, arrive.sink)]; // a horror just roused comes into view, the great ones up out of the ground
   return look;
 }
 
@@ -205,6 +208,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const at = new THREE.Vector3();
   const scale = new THREE.Vector3();
   const seen = new Set<Entity>(); // reused each frame: no garbage per frame
+  const arrivals = createArrivals(); // the bosses not yet roused, and when each came into view (round 60)
   const looking = new Map<Entity, number>(); // 0..1: how far a creature's eyes have come out of the mist (round 35)
 
   return {
@@ -234,6 +238,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const tr = g.ecs.c.transform.get(id);
         if (!def || !tr) continue;
         seen.add(id);
+        const arrival = arrivals.of(id, isUnroused(g, id), time, g.ecs.c.body.get(id)?.height ?? 2, risesOut(def.assembly?.body));
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
         const bow = entry ? stoopOf(id, key, time) : undefined;
@@ -242,7 +247,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
         const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
         const direction = entry && art ? spriteDirection(yaw, { x, z }, camera.position, directions.get(id)) : undefined;
-        const look = lookOf(g, id, time, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise);
+        const look = lookOf(g, id, time, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise, arrival);
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
@@ -251,7 +256,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
-          const pose = lookOf(g, id, time, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise)!;
+          const pose = lookOf(g, id, time, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           const frame = put(key, clip, pose, x, y, z, flash, 1, weird);
           if (!frame) continue;
@@ -261,11 +266,11 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
             ECHOES.forEach((e, i) => {
               const behind = known(bow);
               const age = bow ? Math.max(0, bow.age - e.lag) : 0;
-              const late = lookOf(g, id, time - e.lag, behind, age, bow?.rise);
+              const late = lookOf(g, id, time - e.lag, behind, age, bow?.rise, arrival);
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
+              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
             });
           }
           continue;
@@ -288,12 +293,13 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           asm.root.position.set(x, y - look.sink * h * 0.6, z);
           asm.root.rotation.y = yaw;
           asm.animate(time, look.lash, lean);
-          for (const m of asm.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
+          for (const m of asm.materials) [m.uniforms.uEmissive.value, m.uniforms.uGhost.value] = [(m.userData.emissive as number) + flash, 1 - (look.appear ?? 1)]; // (a horror just roused is dithered in)
           asm.echoes.forEach((e, i) => { // an outer god's body a moment behind itself, drifting
             const [{ lag }, d] = [ECHOES[i], echoDrift(i, time, h)];
             e.root.position.set(x + d.x, y - look.sink * h * 0.6, z + d.z);
             e.root.rotation.y = yaw + Math.sin(time * 0.4 + i) * 0.35;
             e.animate(time - lag, look.lash, lean);
+            for (const m of e.materials) m.uniforms.uGhost.value = Math.max(ECHOES[i].ghost, 1 - (look.appear ?? 1));
           });
           continue;
         }
@@ -310,6 +316,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, mistLook(id, time));
       }
+      arrivals.forget(seen);
       for (const id of looking.keys()) if (!seen.has(id)) looking.delete(id);
       for (const id of stoopSince.keys()) if (!seen.has(id)) stoopSince.delete(id);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);

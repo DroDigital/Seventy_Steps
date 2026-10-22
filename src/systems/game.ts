@@ -25,6 +25,7 @@ import { fightSystem, registerFights, setArena } from './bossFight';
 import { brainSystem } from './brain';
 import { createCameraRig, followY, stepCamera } from './camera';
 import { checkpointSystem, furnishWorld, signPlace } from './checkpoints';
+import { NIGHT } from './clock';
 import { meleeSystem } from './combat';
 import { createStores, type Game, type GameEvents } from './components';
 import { dreadOf, resolveCreature, spawnCreature } from './creatures';
@@ -36,6 +37,8 @@ import { hallucinationSystem, registerHallucinations } from './hallucinations';
 import { hazardSystem } from './hazards';
 import { registerHiddenLayer, spawnPiece } from './hiddenLayer';
 import { explorationSystem } from './exploration';
+import { markerSystem } from './marker';
+import { passageSystem } from './passages';
 import { placeSystem } from './places';
 import { poiSystem } from './pois';
 import { createBuffer } from './inputBuffer';
@@ -55,6 +58,8 @@ import { npcSystem, spawnNpcs } from './npcs';
 import { populationSystem } from './population';
 import { boltSystem } from './projectiles';
 import { skyStrikeSystem } from './skyStrikes';
+import { discoverySystem } from './discovery';
+import { waySystem } from './ways';
 import { questSystem, startQuest } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
@@ -92,6 +97,7 @@ export interface GameOptions {
 
 /** The investigator in a world, with the hooks every game shares. */
 function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
+  NIGHT.hurried = 0; // a new game's night is its own (clock.ts)
   const ecs = createEcs(createStores());
   const id = spawnPlayer({ ecs, world }, spawn);
   const g: Game = {
@@ -203,6 +209,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
 export function stepGame(g: Game, input: InputFrame): void {
   const dt = 1 / SIM.hz;
   g.frame++;
+  NIGHT.hurried = g.overworld?.hurried ?? 0; // the night as this game has it (clock.ts)
   if (g.player.fogPass || g.player.gatePass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
   mountSystem(g);
   playerControl(g, input);
@@ -231,6 +238,8 @@ export function stepGame(g: Game, input: InputFrame): void {
   boltSystem(g);
   hazardSystem(g);
   skyStrikeSystem(g); // round 52: a thunderstorm's bolt on the ground, a ring of light before it
+  waySystem(g); // round 62: the courts before the open arenas' gates: wards, vents, waves, blight, rites, omens
+  discoverySystem(g); // round 63: a house seen, a page read, a vigil kept, a gate given
   vitalsSystem(g, dt);
   sanitySystem(g, dt);
   reagentSystem(g);
@@ -241,6 +250,8 @@ export function stepGame(g: Game, input: InputFrame): void {
   cameraSystem(g, input.lookX, input.lookY, dt);
   insightSystem(g);
   explorationSystem(g);
+  markerSystem(g); // the marker reached is cleared (round 60)
+  passageSystem(g); // a secret passage the investigator is near opens (round 61)
   placeSystem(g);
   poiSystem(g);
   questSystem(g);

@@ -6,6 +6,10 @@ import { strike } from '../src/systems/combat';
 import { riseAt } from '../src/systems/death';
 import { createWorldGame } from '../src/systems/game';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
+import { reach } from '../src/world/arenaDecor';
+import { ASIDE, solidGap } from '../src/world/candlePlan';
+import { candleBody } from '../src/render/candleShapes';
+import { propCollider } from '../src/world/props';
 import { roomAt } from '../src/world/dungeonKit';
 import { gatePlan } from '../src/world/gatePlan';
 import { worldLayout } from '../src/world/placements';
@@ -39,8 +43,42 @@ describe('the candles before the fog', () => {
     }
   });
 
-  it('a ring\'s stands outside it, on the way from the nearest Elder Sign', () => {
+  it('a ring\'s stake stands outside it, on the way from the nearest Elder Sign', () => {
     for (const f of fogs.filter((w) => w.kind === 'ring')) expect(Math.hypot(f.stake.x - f.x, f.stake.z - f.z), f.id).toBeCloseTo(f.radius + 9, 3);
+  });
+
+  it('is set aside the way, not on it (round 62): a few paces from where the fallen wake, near enough that passing the stake takes its flame', () => {
+    for (const f of fogs) {
+      const away = Math.hypot(f.candle.x - f.stake.x, f.candle.z - f.stake.z);
+      expect(away, f.id).toBeLessThanOrEqual(ASIDE.far + 1e-6);
+      expect(away, `${f.id}: not on the stake`).toBeGreaterThan(0.45);
+    }
+    for (const c of candlesOf()) expect(Math.hypot(c.x - c.rise.x, c.z - c.rise.z), c.id).toBeLessThan(CANDLE.light - 1);
+  });
+
+  it('a ring\'s stands clear of the pieces of its set and of its stones', () => {
+    for (const f of fogs.filter((w) => w.kind === 'ring')) {
+      const a = worldLayout().arenas.find((x) => f.id === `ring:${worldLayout().arenas.indexOf(x)}:${x.bosses[0]}`)!;
+      for (const p of a.decor) if (propCollider(p)) expect(Math.hypot(p.x - f.candle.x, p.z - f.candle.z) - reach(p), `${f.id}: ${p.kind} ${p.set?.id ?? ''}`).toBeGreaterThanOrEqual(ASIDE.clear - 1e-6);
+    }
+  });
+
+  it('a hall\'s stands at the foot of a wall or a pillar when there is one near, in a room and in none of them', () => {
+    for (const f of fogs.filter((w) => w.kind === 'doorway')) {
+      const dungeon = worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!;
+      const bossRoom = dungeon.layout.rooms.find((r) => f.id.split(':')[1] === r.def.id)!;
+      const room = roomAt(dungeon.layout, f.candle.x, f.candle.z);
+      expect(room, `${f.id}: in a room`).toBeDefined();
+      expect(room, `${f.id}: not the boss's own`).not.toBe(bossRoom);
+      expect(solidGap(dungeon.parts, f.candle.x, f.candle.z, f.y), `${f.id}: not in a wall or a pillar`).toBeGreaterThan(0.2);
+    }
+    const against = fogs.filter((w) => w.kind === 'doorway').filter((f) => solidGap(worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!.parts, f.candle.x, f.candle.z, f.y) < 1.3);
+    expect(against.length, 'most stand against something').toBeGreaterThan(fogs.filter((w) => w.kind === 'doorway').length / 2);
+  });
+
+  it('every look of a candle is one the shapes make, and each arena\'s set names one that is', () => {
+    for (const look of ['cairn', 'skull', 'grave', 'driftwood', 'votive'] as const) expect(candleBody(look).top, look).toBeGreaterThan(0.3);
+    for (const c of candlesOf()) expect(['cairn', 'skull', 'grave', 'driftwood', 'votive'], c.id).toContain(c.look);
   });
 
   it('takes the flame when passed, once, and is kept in the save', () => {
@@ -72,10 +110,10 @@ describe('the candles before the fog', () => {
     g.overworld!.candles.add(c.id);
     goTo(g, c.x + 30, c.z);
     run(g, 1);
-    expect(candleFor(g, { x: c.x + 30, z: c.z })).toMatchObject({ x: c.x, z: c.z });
+    expect(candleFor(g, { x: c.x + 30, z: c.z })).toMatchObject({ x: c.rise.x, z: c.rise.z });
     strike(g, g.player.id, g.player.id, deathblow);
     run(g, PLAYER_MOVES.death.frames + 5);
-    expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: c.x, z: c.z });
+    expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: c.rise.x, z: c.rise.z });
     expect(g.player.kneeling).toBeNull();
 
     goTo(g, c.x + CANDLE.reach + 40, c.z);
@@ -108,7 +146,7 @@ describe('the candles before the fog', () => {
       expect(g.player.rising).not.toBeNull();
       expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('death'); // they wait
       riseAt(g, where);
-      const at = where === 'candle' ? c : signPlace(g.overworld!.sign)!.rest;
+      const at = where === 'candle' ? c.rise : signPlace(g.overworld!.sign)!.rest;
       expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: at.x, z: at.z });
       expect(g.player.rising).toBeNull();
       expect(g.ecs.c.actor.get(g.player.id)!.move).toBeNull();

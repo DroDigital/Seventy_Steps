@@ -6,12 +6,17 @@
  */
 
 import { NOTE_SITES } from '../data/documents';
-import { yawOf } from '../core/geom';
+import { yawOf, type XZ } from '../core/geom';
 import type { HiddenPieceDef, Place } from '../data/arena';
+import type { AirSpec, CandleLook, GroundSpec } from '../data/arenaSets';
+import { ARENA_HOUSES } from '../data/arenaHousesAll';
+import { HOUSE } from '../data/arenaHouses';
+import { leafPlaces, planCourt, type Court } from './discoveryPlan';
 import { DUNGEONS, type Dir } from '../data/dungeons';
 import { REGIONS } from '../data/regions';
 import { DREAM_DESCENT, SITES } from '../data/sites';
 import { GUN, WORLD } from '../data/tuning';
+import type { HousePlan } from './arenaHouse';
 import { placeArena, propCollide } from './arenaPlace';
 import { echoCaches, roundCaches } from './caches';
 import type { Prop } from './props';
@@ -69,7 +74,13 @@ export interface ArenaPlace {
   well: boolean;
   bosses: readonly string[];
   stones: readonly { x: number; z: number; radius: number; height: number }[]; // when its ring is standing stones
-  decor: Prop[]; // its ring of other pieces, its heart and its braziers (arenaDecor.ts; round 13)
+  decor: Prop[]; // its ring of other pieces, its heart and its braziers (arenaDecor.ts; round 13), or its set (arenaSet.ts; round 61)
+  front: XZ; // the unit vector toward its realm's nearest Elder Sign: the way in, where its candle burns (arenaFront.ts)
+  ground?: GroundSpec; // the floor its set lays (arenaGround.ts)
+  air?: AirSpec; // what drifts in it (render/arenaAir.ts)
+  candle?: CandleLook; // what its candle stands on (world/candlePlan.ts)
+  house?: HousePlan; // the wall about it, closed but for a gate at its front (arenaHouse.ts; round 63)
+  court?: Court; // where its discovery's pages, vigils and altars stand in the court before the gate (discoveryPlan.ts)
 }
 
 export interface SpawnPoint {
@@ -114,7 +125,7 @@ export interface WorldLayout {
 }
 
 const EMPTY: ChunkStatics = { colliders: [], pads: [], dungeons: [], spawns: [] };
-const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], arena: [3, 12], dungeon: 12 } as const;
+const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], arena: [8, 14], dungeon: 12 } as const;
 
 function build(): WorldLayout {
   const w: WorldLayout = { signs: [], gates: [], tomes: [], arenas: [], dungeons: [], spawns: [], pads: [], pieces: [], dream: null, errors: [], chunk: () => EMPTY };
@@ -212,7 +223,13 @@ function build(): WorldLayout {
     }
     for (const a of sites.arenas) {
       const p = at(a.at);
-      placeArena(w, region, p, a, pad(p.x, p.z, PAD.arena, a.radius), collide, spawn);
+      placeArena(w, region, p, a, pad(p.x, p.z, ARENA_HOUSES[a.bosses[0]!] ? [HOUSE.reach + HOUSE.level, PAD.arena[1]] : PAD.arena, a.radius), collide, spawn);
+      const placed = w.arenas[w.arenas.length - 1]!;
+      placed.court = planCourt(placed, (x, z) => around(x, z, 6).every((c) => { const b = colliderBounds(c); return x < b.x0 - 2.4 || x > b.x1 + 2.4 || z < b.z0 - 2.4 || z > b.z1 + 2.4; })); // round 63: clear of a sign's shrine, a stone, a door
+      for (const l of leafPlaces(placed)) { // the pages of its discovery lie in the court before its gate
+        pad(l.x, l.z, PAD.tome);
+        w.tomes.push({ name: l.doc, insight: 0, note: true, region: region.id, at: { x: l.x, z: l.z, yaw: 0 } });
+      }
     }
     for (const d of sites.dungeons) {
       const def = DUNGEONS.find((x) => x.id === d.id);
@@ -236,7 +253,7 @@ function build(): WorldLayout {
       bucket({ x0: layout.rect.x0 - b, z0: layout.rect.z0 - b, x1: layout.rect.x1 + b, z1: layout.rect.z1 + b }, (k) => k.pads.push(rp));
       bucket(layout.rect, (k) => k.dungeons.push(layout));
       const [caches, boxed] = [echoCaches(def), roundCaches(def)];
-      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, caches.get(r.def.id), boxed.get(r.def.id)));
+      for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, parts, caches.get(r.def.id), boxed.get(r.def.id)));
       for (const d of decor) propCollide(d, collide);
       const first = layout.rooms[0];
       const on = first && layout.rooms.find((r) => r.def.from === first.def.id); // the way on: a sealed entrance's own axis faced its back wall (round 12)

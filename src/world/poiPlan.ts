@@ -117,7 +117,8 @@ function mazeProps(cx: number, cz: number, rng: Rng): { props: Prop[]; cell: (i:
   return { props, cell: (i, j) => ({ x: x0 + (i + 0.5) * c, z: z0 + (j + 0.5) * c }) };
 }
 
-export function planPois(region: RegionDef, features: readonly Feature[], props: readonly Prop[], posts: readonly SpawnPoint[], defs: readonly PoiDef[] = poisOf(region.id)): PoiPlan {
+/** `open`: whether (x, z) may be built or stood on at all (not on a site's ground, nor on the trail to an arena's gate; regionPlan.ts). */
+export function planPois(region: RegionDef, features: readonly Feature[], props: readonly Prop[], posts: readonly SpawnPoint[], defs: readonly PoiDef[] = poisOf(region.id), open: (x: number, z: number) => boolean = () => true): PoiPlan {
   const plan: PoiPlan = { sites: [], props: [], spawns: [] };
   if (!defs.length) return plan;
   const base = groundOf(region, props);
@@ -138,13 +139,13 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
         const roomy = (x: number, z: number): boolean => {
           const h = ground(x, z);
           if (posts.some((p) => Math.hypot(p.at.x - x, p.at.z - z) < MAZE_HALF + 4) || !base.clear(x, z)) return false;
-          for (let a = -MAZE_HALF - 2; a <= MAZE_HALF + 2; a += 4) for (let b = -MAZE_HALF - 2; b <= MAZE_HALF + 2; b += 4) if (base.solid(x + a, z + b) || Math.abs(ground(x + a, z + b) - h) > 2.2) return false;
+          for (let a = -MAZE_HALF - 2; a <= MAZE_HALF + 2; a += 4) for (let b = -MAZE_HALF - 2; b <= MAZE_HALF + 2; b += 4) if (base.solid(x + a, z + b) || !open(x + a, z + b) || Math.abs(ground(x + a, z + b) - h) > 2.2) return false;
           return true;
         };
         const at = nearest(region, cx, cz, roomy);
         if (at) spot = { ...at, r: MAZE_HALF };
       } else {
-        const at = nearest(region, cx, cz, (x, z) => (as === 'shore' ? shoreAt(x, z) : cliffAt(x, z)) && base.clear(x, z), as === 'shore' ? 4 : 30);
+        const at = nearest(region, cx, cz, (x, z) => (as === 'shore' ? shoreAt(x, z) : cliffAt(x, z)) && base.clear(x, z) && open(x, z), as === 'shore' ? 4 : 30);
         if (at) spot = { ...at, r: 14 };
       }
     }
@@ -155,7 +156,7 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
       for (let k = 0, tries = 0; k < n && tries < n * 12; tries++) {
         const [a, d] = [rng() * 6.2832, 2 + rng() * Math.max(2, spot.r * 0.8)];
         const [x, z] = [spot.x + Math.sin(a) * d, spot.z + Math.cos(a) * d];
-        if (!base.clear(x, z) || posts.some((p) => Math.hypot(p.at.x - x, p.at.z - z) < 3)) continue;
+        if (!base.clear(x, z) || !open(x, z) || posts.some((p) => Math.hypot(p.at.x - x, p.at.z - z) < 3)) continue;
         plan.props.push(makeProp(kind, x, z, rng));
         k++;
       }
@@ -166,8 +167,8 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
   for (const { def, x, z, r, rng, maze } of found) {
     let chest: XZ | null = null;
     if (def.hoard) {
-      const tries = maze ? [maze.cell(CELLS >> 1, CELLS >> 1), maze.cell(CELLS >> 1, (CELLS >> 1) + 1), maze.cell((CELLS >> 1) + 1, CELLS >> 1)] : [{ x, z }, ...Array.from({ length: 30 }, (_, k) => ({ x: x + Math.sin(k * 1.9) * (1.5 + (k % 5) * r * 0.1), z: z + Math.cos(k * 1.9) * (1.5 + (k % 5) * r * 0.1) }))];
-      chest = tries.find((p) => set.clear(p.x, p.z)) ?? null;
+      const tries = maze ? [maze.cell(CELLS >> 1, CELLS >> 1), maze.cell(CELLS >> 1, (CELLS >> 1) + 1), maze.cell((CELLS >> 1) + 1, CELLS >> 1)] : [{ x, z }, ...Array.from({ length: 30 }, (_, k) => ({ x: x + Math.sin(k * 1.9) * (1.5 + (k % 5) * r * 0.1), z: z + Math.cos(k * 1.9) * (1.5 + (k % 5) * r * 0.1) })), ...Array.from({ length: 60 }, (_, k) => ({ x: x + Math.sin(k * 2.4) * (3 + (k % 6) * r * 0.12), z: z + Math.cos(k * 2.4) * (3 + (k % 6) * r * 0.12) }))]; // (and further out, only where the near ground is crowded: a landmark's pyramids)
+      chest = tries.find((p) => set.clear(p.x, p.z) && open(p.x, p.z)) ?? null;
     }
     plan.sites.push({ def, x, z, r, chest });
     const foes = def.foes;
@@ -179,7 +180,7 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
       if (!getEntity(id) || (early(x, z) && !gentle(id))) continue;
       const a = rng() * 6.2832;
       const at = cells ? cells[Math.floor(rng() * cells.length)] : { x: x + Math.sin(a) * (2.5 + rng() * Math.max(2.5, r * 0.7)), z: z + Math.cos(a) * (2.5 + rng() * Math.max(2.5, r * 0.7)) };
-      if (!set.clear(at.x, at.z) || plan.spawns.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || posts.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || (chest && Math.hypot(chest.x - at.x, chest.z - at.z) < 1.5)) continue;
+      if (!set.clear(at.x, at.z) || !open(at.x, at.z) || plan.spawns.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || posts.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || (chest && Math.hypot(chest.x - at.x, chest.z - at.z) < 1.5)) continue;
       plan.spawns.push({ id: `poi:${def.id}:${placed}`, entity: id, region: region.id, at: { x: at.x, z: at.z, yaw: a }, unique: false });
       placed++;
     }

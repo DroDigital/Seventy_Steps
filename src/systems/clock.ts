@@ -2,8 +2,9 @@
  * The night's turn (round 26: the night was one hour, always): a long night of three parts that turns and
  * begins again — the gloaming, when the windows are lit and the lamps new; the deep of the night, when the
  * lights go out one by one; and the hour before a dawn that does not come, when the sky greys and the
- * birds stir — the dream never reaches morning, and the night turns. A pure function of the game's
- * seconds, so the picture and the sound and the simulation agree. Pure: no Three.js.
+ * birds stir — the dream never reaches morning, and the night turns. A function of the game's seconds,
+ * and of how far a vigil's place has hurried the night on (`NIGHT`), so the picture and the sound and the
+ * simulation agree. Pure: no Three.js.
  */
 
 import { CLOCK } from '../data/tuning';
@@ -15,10 +16,20 @@ const smooth = (a: number, b: number, x: number): number => {
   return t * t * (3 - 2 * t);
 };
 
-/** Where in the night `seconds` of play are (0..1). */
-export const phaseOf = (seconds: number): number => (((seconds / CLOCK.night + CLOCK.start) % 1) + 1) % 1;
+/**
+ * Seconds the night has been hurried on past the game's own (round 65: a vigil's place calls the hour it asks, systems/vigilCall.ts).
+ * The game keeps it (`OverworldState.hurried`, not in a save, like the weather) and `stepGame` sets it here each step, so every reader
+ * of the hour (the moon, the windows, the people's acts, the HUD's clock, the window shader's `uHurried`) follows without being told.
+ */
+export const NIGHT = { hurried: 0 };
 
-export const hourOf = (phase: number): Hour => (phase < 0.14 ? 'gloaming' : phase < 0.7 ? 'deep' : 'waning');
+/** Where in the night `seconds` of play are (0..1). */
+export const phaseOf = (seconds: number): number => ((((seconds + NIGHT.hurried) / CLOCK.night + CLOCK.start) % 1) + 1) % 1;
+
+/** Where in the night an hour begins. */
+export const HOUR_FROM: Readonly<Record<Hour, number>> = { gloaming: 0, deep: 0.14, waning: 0.7 };
+
+export const hourOf = (phase: number): Hour => (phase < HOUR_FROM.deep ? 'gloaming' : phase < HOUR_FROM.waning ? 'deep' : 'waning');
 
 /** The share of windows that are lit at `phase`: all in the gloaming, fewer through the night, a third at its last hour, and the lamps lit anew as it turns. */
 export function windowShare(phase: number): number {

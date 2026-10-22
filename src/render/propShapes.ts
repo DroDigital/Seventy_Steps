@@ -12,6 +12,7 @@ import { createRng, type Rng } from '../core/rng';
 import type { LightKind } from '../data/tuning';
 import type { Prop } from '../world/props';
 import { landmarkPieces } from './landmarkShapes';
+import { setPieces } from './setShapes';
 import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
@@ -265,6 +266,8 @@ export function propPieces(p: Prop, c: Rgb): Piece[] {
       return altar(p, rng, c);
     case 'house':
       return [];
+    case 'set':
+      return setPieces(p, c);
     case 'spire':
     case 'tower':
     case 'cone':

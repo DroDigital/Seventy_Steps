@@ -18,6 +18,7 @@ export const AUDITS = [
   'tests/objectView.test.ts',
   'tests/roam.test.ts',
   'tests/enclosedAudit.test.ts',
+  'tests/houseWalk.test.ts',
   'tests/balance.test.ts',
 ];
 

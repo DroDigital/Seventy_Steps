@@ -16,8 +16,7 @@ import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
 import { LOOKS } from '../data/looks';
 import { WORLD } from '../data/tuning';
-import { gateBarred, gateBeyondDemo, gatePlace, interactable, passGate, signPlace } from '../systems/checkpoints';
-import { demoRefuses } from '../systems/demo';
+import { gatePlace, signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
 import { deathLine } from '../systems/deathNotes';
 import { regionAt } from '../world/worldMap';
@@ -28,7 +27,7 @@ export interface Journeys {
   go(words: string, jump: () => void, line?: string): void;
   /** The veil already covers (a game begun, even before its making is done): names the region the investigator stands in, lifts once the world stands, then calls `then`. */
   arrive(then?: () => void): void;
-  /** Before a step: the input the world steps with, or null while it stands still. E at a gate becomes a journey through it. */
+  /** Before a step: the input the world steps with, or null while it stands still. */
   before(frame: InputFrame): InputFrame | null;
   /** Each drawn frame, with the chunk jobs still pending. */
   update(pending: number): void;
@@ -100,13 +99,6 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     before(frame) {
       if (phase === 'holding') return rise-- > 0 ? emptyInput() : null;
       if (self.still) return null;
-      const t = frame.pressed.interact && phase === 'idle' ? interactable(g) : null;
-      if (t?.kind === 'gate') {
-        frame.pressed.interact = false;
-        if (gateBarred(g)) passGate(g, t.id); // refused: it says why, and no veil falls
-        else if (gateBeyondDemo(g, t.id)) demoRefuses(g); // the demo's edge: said at once, before any veil (review of PR 142)
-        else self.go((gatePlace(gatePlace(t.id)?.to ?? '')?.name ?? '').toUpperCase(), () => passGate(g, t.id));
-      }
       return frame;
     },
     update(pending) {

@@ -9,6 +9,7 @@ import { t } from '../core/i18n';
 import { keyLayout } from '../core/bindings';
 import { lockJustAsked } from '../core/mouseLock';
 import { creditsPage } from './credits';
+import { price } from './menuChips';
 import { button, createScreen, el, footer, menuOpen, onPadStart, title, type Page } from './menuKit';
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
@@ -23,6 +24,7 @@ export interface PauseOptions {
   map?: () => void; // opens the map (not in the arena)
   journal?: (back: () => void, show: (p: Page) => void) => Page; // the journal's page (not in the arena)
   arms?: (back: () => void, show: (p: Page) => void) => Page; // the weapons owned
+  news?: () => number; // how many weapons and relics found have not been looked at: a mark on Arms (round 60)
   achievements?: (back: () => void) => Page; // the achievements, earned or not (round 12)
   quit(): void;
   held?: () => boolean; // something has the screen (a cutscene, round 20): the pause menu keeps out of it
@@ -67,7 +69,10 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
       gap();
       if (o.map) button(list, t('pause.map'), () => [screen.close(true), o.map!()]);
       if (o.journal) button(list, t('pause.journal'), () => screen.show(o.journal!(() => screen.show(main), (pg) => screen.show(pg))));
-      if (o.arms) button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))));
+      if (o.arms) {
+        const b = button(list, t('pause.arms'), () => screen.show(o.arms!(() => screen.show(main), (pg) => screen.show(pg))));
+        if (o.news?.()) price(b, `${o.news()} NEW`); // a find not yet looked at
+      }
       if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))));
       gap();
       button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)));

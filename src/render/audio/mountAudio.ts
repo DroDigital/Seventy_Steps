@@ -11,7 +11,7 @@
 import type { V3 } from '../../core/geom';
 import { MOUNT_TRAVERSAL, type MountId } from '../../data/mounts';
 import {
-  CREAK, ENGINE_START, ENGINE_STOP, EXHAUST_POP, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, NICKER, REIN_SLAP, SNORT, SPECTRAL_DISMISS, SPECTRAL_SUMMON,
+  CREAK, ENGINE_START, ENGINE_STOP, EXHAUST_POP, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, NICKER, SNORT, SPECTRAL_DISMISS, SPECTRAL_SUMMON,
   SPECTRAL_WHISPER, TAIL_SWISH, TRACE_SHIFT, UNHITCH, hoofBeat, hoofScrape, wheelThump, type Ground,
 } from '../../data/mountSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
@@ -95,9 +95,8 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
   };
 
   const spread = (width: number): number => (Math.random() - 0.5) * width;
-  /** The reins slapped on its back, and the horse's eager huff a moment after (not every time: a horse that answered every slap would be a machine). */
+  /** The reins on its back: the slap itself is not heard (round 60: asked to go, "annoying over time"; the hands still show it), only the horse's eager huff a moment after (not every time: a horse that answered every slap would be a machine). */
   const slap = (id: MountId): void => {
-    recipe(`mount:${id}:slap`, REIN_SLAP, { gain: MOUNT_MIX.slap, pitch: around(0.12, 1), vary: 0.4, pan: spread(0.2) });
     if (id === 'grey' && Math.random() < 0.75) later.push({ in: between([0.26, 0.38]), play: () => recipe('mount:grey:urge', HORSE_URGE, { gain: MOUNT_MIX.urge, pitch: around(0.18, 1), vary: 0.5, pan: spread(0.3) }) });
   };
   /** A hard pull at speed: the blow through the nose, the hooves braking, and the harness shaken as the head goes up. */

@@ -1,5 +1,5 @@
 /**
- * The points of interest (round 61: data/pois.ts, world/poiPlan.ts, systems/pois.ts, ui/poiMarks.ts, render/poiFx.ts): the places the map
+ * The points of interest (round 61: data/pois.ts, world/poiPlan.ts, systems/pois.ts, ui/mapMarks.ts, render/poiFx.ts): the places the map
  * shows as a grey "?" until they are found. Each is a place Lovecraft wrote, set where the land has its like; each is found by coming
  * to it, once, and kept; a chest of Echoes is set down about it, and its foes stand at their posts.
  */
@@ -163,7 +163,10 @@ describe('the points of interest: found by coming to them', () => {
   it('coming within reach finds a place once, says its name and its line, and a save keeps it', () => {
     const g = createWorldGame();
     const found = record(g, 'PoiFound');
-    goTo(g, site.x + reachOf(site) + 30, site.z);
+    const all = allPoiSites();
+    const away = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dz]) => ({ x: site.x + dx * (reachOf(site) + 30), z: site.z + dz * (reachOf(site) + 30) })).find((p) => all.every((o) => Math.hypot(o.x - p.x, o.z - p.z) > reachOf(o) + 6));
+    expect(away, 'a spot near it that no other place reaches').toBeDefined();
+    goTo(g, away!.x, away!.z);
     run(g, 40);
     expect(found).toHaveLength(0); // near is not there
     goTo(g, site.x, site.z);
@@ -256,9 +259,13 @@ describe('the points of interest: found by coming to them', () => {
   });
 
   it('dread presses on the mind (and stops its mending), and a swallow of Laudanum holds it off; comfort mends beyond the ordinary mending', () => {
-    const dread = POIS.find((p) => p.id === 'arkham_doorstep')!; // no guard of its own to drain with it
-    expect(dread.foes).toBeUndefined();
-    const s = poiSitesOf('arkham').find((x) => x.def.id === dread.id)!;
+    const posts = (region: string): { x: number; z: number }[] => [...regionPlan(REGIONS.find((r) => r.id === region)!).spawns.values()].flat().map((p) => p.at);
+    const quiet = POIS.filter((p) => (p.aura ?? 0) < 0 && !p.foes) // the place of dread with no guard of its own, and no foe's post near to drain with it
+      .map((def) => ({ def, s: poiSitesOf(def.region).find((x) => x.def.id === def.id)! }))
+      .map((q) => ({ ...q, far: Math.min(...posts(q.def.region).map((p) => Math.hypot(p.x - q.s.x, p.z - q.s.z))) }))
+      .sort((a, b) => b.far - a.far)[0];
+    expect(quiet.far, `${quiet.def.id}: the quietest place of dread`).toBeGreaterThan(40);
+    const { def: dread, s } = quiet;
     const stand = (steady: number, sanity: number, frames: number) => {
       const g = createWorldGame();
       g.mind.sanity = sanity;

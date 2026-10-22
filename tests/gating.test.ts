@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SEALS } from '../src/data/tuning';
+import { PASSAGE, SEALS } from '../src/data/tuning';
 import { gatePlace, passGate, teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { spawnCreature } from '../src/systems/creatures';
@@ -64,6 +64,7 @@ describe('playtest round 12: the way on is earned', () => {
     breakSeals(g, SEALS.kadath);
     expect(sealsBroken(g)).toBe(SEALS.kadath);
     expect(g.ecs.c.layer.get(id)!.shown).toBe(true);
+    run(g, PASSAGE.frames.sealed + 2); // it opens as it is stood before (round 61)
     expect(door.seal.every((c) => g.world.off.has(c))).toBe(true); // the way is open
     expect(sealedHere(g)).toBeNull();
   });

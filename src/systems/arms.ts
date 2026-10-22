@@ -12,6 +12,7 @@ import { REINFORCE, STAR_STONES } from '../data/tuning';
 import { getEntity } from '../data/registry';
 import { armedMoves, isWeapon, WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
 import type { Game } from './components';
+import { markNew } from './finds';
 
 /** Puts weapon `id` in the investigator's hand; false when it is not theirs. */
 export function equip(g: Game, id: string): boolean {
@@ -21,11 +22,16 @@ export function equip(g: Game, id: string): boolean {
   return true;
 }
 
-/** A weapon found: it is theirs now, to take up from the pause menu. */
-export function takeUp(g: Game, id: string): void {
+/**
+ * A weapon found: it is theirs now, to take up from the card that says so or from the pause menu (round 60: it was picked up by
+ * walking over it, with a line that faded, and many did not know they had it or where to take it up). `from`: who gave it, if anyone.
+ */
+export function takeUp(g: Game, id: string, from?: string): void {
   if (!isWeapon(id) || g.player.arms.includes(id)) return;
   g.player.arms.push(id);
-  g.events.emit('Notice', { text: `${WEAPONS[id].name.toUpperCase()} · TAKE IT UP FROM THE MENU ({pause} · ARMS)` }); // the HUD names the button
+  markNew(g, 'weapon', id);
+  g.events.emit('Notice', { text: `${WEAPONS[id].name.toUpperCase()} · A NEW WEAPON · TAKE IT UP FROM {pause} · ARMS` }); // the HUD names the button
+  g.events.emit('Found', { kind: 'weapon', id, from });
 }
 
 /** The share a weapon reinforced `level` times adds to its blows: 1 at none. */
@@ -53,8 +59,8 @@ export function reinforce(g: Game, id: WeaponId): boolean {
 
 /**
  * Levels of reinforcement that could be moved from weapon `from` into weapon `to` now: what `from` has set in, as much as
- * `to` has room for. Both must be theirs. Nothing is lost or made in the move, so a new weapon can be tried with the
- * cane's reinforcement and the cane have it back.
+ * `to` has room for. Both must be theirs. Nothing is lost or made in the move (round 61: but it is paid for, `moveCost`), so a
+ * new weapon can be tried with the cane's reinforcement and the cane have it back, at a price.
  */
 export function movable(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId): number {
   const { arms, reinforced } = g.player;
@@ -62,11 +68,33 @@ export function movable(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId): 
   return Math.max(0, Math.min(reinforced[from], REINFORCE.max - reinforced[to]));
 }
 
-/** Moves up to `count` levels of reinforcement from `from` to `to`; how many moved. */
-export function moveLevels(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId, count = 1): number {
-  const n = Math.min(Math.max(0, Math.floor(count)), movable(g, from, to));
+/**
+ * Echoes moving `count` levels from `from` to `to` costs (round 61): each level moved is priced at the star-stones it would cost to set
+ * in afresh as the level it becomes in `to`, at `REINFORCE.moveEchoes` Echoes a stone. A move costs the more the further the weapon
+ * it goes to is already reinforced, as setting it in does, and shuffling levels about bleeds Echoes where stones set directly do not.
+ */
+export function moveCost(g: Pick<Game, 'player'>, to: WeaponId, count: number): number {
+  let cost = 0;
+  for (let i = 0; i < count; i++) cost += (REINFORCE.cost[g.player.reinforced[to] + i] ?? 0) * REINFORCE.moveEchoes;
+  return cost;
+}
+
+/** How many levels, of `count` asked for, could be moved from `from` to `to` now: as many as there are, there is room for, and the Echoes carried will pay for. */
+export function affordableMoves(g: Pick<Game, 'player'>, from: WeaponId, to: WeaponId, count = 1): number {
+  let n = Math.min(Math.max(0, Math.floor(count)), movable(g, from, to));
+  while (n > 0 && moveCost(g, to, n) > g.player.echoes) n--;
+  return n;
+}
+
+/** Moves up to `count` levels of reinforcement from `from` to `to`, paying for them in Echoes; how many moved (fewer, or none, if the Echoes fall short). */
+export function moveLevels(g: Game, from: WeaponId, to: WeaponId, count = 1): number {
+  const n = affordableMoves(g, from, to, count);
+  if (n <= 0) return 0;
+  const cost = moveCost(g, to, n);
+  g.player.echoes -= cost;
   g.player.reinforced[from] -= n;
   g.player.reinforced[to] += n;
+  if (cost > 0) g.events.emit('Echoes', { change: 'spent', amount: cost, total: g.player.echoes, on: 'level' });
   return n;
 }
 

@@ -203,7 +203,7 @@ describe('authored counts in the live creature state selector', () => {
     expect(lookOf(g, id, 0)).toBeNull();
     g.ecs.c.unseen.set(id, { revealed: 1 });
     expect(lookOf(g, id, 0)).not.toBeNull();
-    g.ecs.c.layer.set(id, { shown: false });
+    g.ecs.c.layer.set(id, { shown: false, open: 0 });
     expect(lookOf(g, id, 0)).toBeNull();
     g.ecs.c.layer.delete(id);
     g.ecs.c.dead.set(id, true);

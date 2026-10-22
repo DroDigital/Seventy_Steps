@@ -8,6 +8,8 @@
  */
 
 import { distXZ } from '../core/geom';
+import { FOUND } from '../data/discoveries';
+import { DISCOVERIES } from '../data/discoveriesAll';
 import { getEntity } from '../data/registry';
 import { SEALS } from '../data/tuning';
 import { worldLayout } from '../world/placements';
@@ -15,9 +17,9 @@ import type { Game } from './components';
 import { applyLayer } from './hiddenLayer';
 import { bossAwake, priorOf, sealsBroken } from './sealCount';
 
-/** The sealed doors look again at the seals broken (a boss's fall, a save loaded). */
+/** The sealed doors look again at the seals broken (a boss's fall, a save loaded), and the gates of the horrors' houses at those found (round 63). */
 export function refreshSeals(g: Game): void {
-  for (const [id, l] of g.ecs.c.layer) if (l.minSeals !== undefined) applyLayer(g, id);
+  for (const [id, l] of g.ecs.c.layer) if (l.minSeals !== undefined || l.minFound !== undefined) applyLayer(g, id);
 }
 
 /** A boss's fall may break a seal. */
@@ -33,6 +35,10 @@ export function sealedHere(g: Game): string | null {
     if (need !== undefined && !g.ecs.c.layer.get(id)?.shown && distXZ(p.def, me) <= SEALS.warn) {
       return `THE DOOR IS SEALED · ${sealsBroken(g)} OF ${need} GREAT HORRORS HAVE FALLEN`;
     }
+  }
+  for (const [id, p] of g.ecs.c.piece) {
+    const boss = p.def.minFound;
+    if (boss !== undefined && !g.ecs.c.layer.get(id)?.shown && distXZ(p.def, me) <= FOUND.gate) return DISCOVERIES[boss]?.shut.toUpperCase() ?? null; // a house's gate, shut until its horror is found (round 63)
   }
   for (const s of worldLayout().spawns) {
     if (!s.arena || bossAwake(g, s.entity) || distXZ(s.arena, me) > s.arena.radius) continue;

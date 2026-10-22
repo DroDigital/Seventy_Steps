@@ -2,6 +2,7 @@
 
 import * as THREE from 'three';
 import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
+import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
@@ -13,6 +14,7 @@ const v3 = (c: Vec3): THREE.Vector3 => new THREE.Vector3(c[0], c[1], c[2]);
 /** Shared by every world material (same uniform objects), so one update reaches them all. */
 export const worldUniforms = {
   uTime: { value: 0 },
+  uHurried: { value: 0 }, // the night hurried on by a vigil's place (systems/clock.ts NIGHT): the windows follow (paneLife.ts)
   uRes: { value: new THREE.Vector2(1, 1) },
   uSnap: { value: 0 },
   uAffine: { value: 0 },
@@ -162,6 +164,7 @@ export function updateWorldUniforms(
 ): void {
   const u = worldUniforms;
   u.uTime.value = time;
+  u.uHurried.value = NIGHT.hurried;
   u.uRes.value.copy(res);
   u.uSnap.value = fx.snapPixels;
   u.uAffine.value = fx.affine;

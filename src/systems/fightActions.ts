@@ -1,6 +1,7 @@
 /**
  * What E does in a boss fight (spec §3E), before resting and gates: relight a snuffed lamp within
- * reach, or whatever the boss's signature offers (the Powder of Ibn Ghazi, the incantation…).
+ * reach, or whatever the boss's signature offers (the Powder of Ibn Ghazi, the incantation…); and,
+ * outside one, lay a gift on an altar of a horror's court (systems/discovery.ts).
  * Only a free investigator acts. Pure: no Three.js.
  */
 
@@ -10,6 +11,7 @@ import { REALITY } from '../data/tuning';
 import { startMove } from './actions';
 import { engagedFights } from './bossFight';
 import type { Game } from './components';
+import { discoveryAction } from './discovery';
 import { lampsOf } from './reality';
 import { SIGNATURES, type FightAction } from './signatures';
 
@@ -34,7 +36,7 @@ export function fightAction(g: Game): FightAction | null {
     const act = SIGNATURES[f.id]?.action?.(g, e, f);
     if (act) return act;
   }
-  return null;
+  return discoveryAction(g); // (an altar before a horror's gate: round 63)
 }
 
 /** Runs the fight action E asks for; true when E was spent on one. */

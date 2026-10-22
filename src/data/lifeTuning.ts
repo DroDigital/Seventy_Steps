@@ -160,7 +160,7 @@ export const SURVEY = {
   beacon: { see: 340, near: 30, height: 60, width: 1.6 }, // how far a column shows, how near it fades, how tall and broad it is
 };
 
-/** Points of interest (round 61; data/pois.ts, systems/pois.ts, world/poiPlan.ts, ui/poiMarks.ts, render/poiFx.ts). */
+/** Points of interest (round 61; data/pois.ts, systems/pois.ts, world/poiPlan.ts, ui/mapMarks.ts, render/poiFx.ts). */
 export const POI = {
   reach: 6, // metres past a place's own radius that the investigator is within, to find it
   least: 18, // ...and no nearer than this to its middle

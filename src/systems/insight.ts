@@ -1,14 +1,15 @@
 /**
  * Insight (spec §3A): gained from the first sight of named and boss horrors and from tomes, and
  * spent on upgrades — which re-hides whatever that insight revealed, since the HiddenLayer hook
- * listens to `InsightChanged`. First sight also shocks sanity, by tier, from greater horrors up.
+ * listens to `InsightChanged`. First sight also shocks sanity, by tier, from greater horrors up. Round 61: the insight
+ * that nothing asks for (the upgrades bought, every passage kept open) can be offered at an Elder Sign for Echoes.
  * Pure: no Three.js.
  */
 
 import { t as tr } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import { dist3, distXZ } from '../core/geom';
-import { PLAYER, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
+import { LORE, PLAYER, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
 import { isAbsent, isConcealed, isUnseen, type Game, type GameEvents } from './components';
 import { aimPoint, playerEye, viewAngle } from './lockOn';
@@ -16,6 +17,7 @@ import { takeUp } from './arms';
 import { giveRounds } from './gun';
 import { addVial } from './reagent';
 import { loseSanity, tollOnce } from './sanity';
+import { PASSAGE_NEED } from './veil';
 
 const DEG = Math.PI / 180;
 
@@ -86,6 +88,35 @@ export function insightSystem(g: Game): void {
 }
 
 export const upgradeName = (id: UpgradeId): string => id[0].toUpperCase() + id.slice(1);
+
+/**
+ * The insight that is kept (round 61): what the hidden passages want, so every one stays open, and the cost of each upgrade not yet
+ * bought, so that what is offered for Echoes is never what a purchase would have taken.
+ */
+export function insightKept(g: Pick<Game, 'mind'>): number {
+  const owed = (Object.keys(UPGRADES) as UpgradeId[]).reduce((n, id) => n + (UPGRADES[id].max - g.mind.upgrades[id]) * UPGRADES[id].cost, 0);
+  return PASSAGE_NEED + owed;
+}
+
+/** The insight held beyond what is kept: all that nothing asks for, and which may be offered at an Elder Sign for Echoes. */
+export const surplusInsight = (g: Pick<Game, 'mind'>): number => Math.max(0, g.mind.insight - insightKept(g));
+
+/** The Echoes `n` points of insight are worth offered at an Elder Sign. */
+export const loreWorth = (n: number): number => n * LORE.echoes;
+
+/**
+ * Offers up to `n` points of the surplus insight (all of it by default) for Echoes; the Echoes given. Never takes what is kept, so no
+ * hidden passage shuts and no upgrade is put out of reach by it.
+ */
+export function offerInsight(g: Game, n = Infinity): number {
+  const sold = Math.min(Math.max(0, Math.floor(n)), surplusInsight(g));
+  if (sold <= 0) return 0;
+  const echoes = loreWorth(sold);
+  changeInsight(g, -sold, 'sale', 'offered');
+  g.player.echoes += echoes;
+  g.events.emit('Echoes', { change: 'earned', amount: echoes, total: g.player.echoes });
+  return echoes;
+}
 
 /** Spends insight on one level of an upgrade (spec §3A); false when short of insight or at the top level. */
 export function buyUpgrade(g: Game, id: UpgradeId): boolean {
