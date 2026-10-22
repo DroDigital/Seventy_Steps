@@ -14,6 +14,7 @@ import type { Game } from './components';
 import { discoveryAction } from './discovery';
 import { lampsOf } from './reality';
 import { SIGNATURES, type FightAction } from './signatures';
+import { riteAction } from './ways';
 
 export function fightAction(g: Game): FightAction | null {
   const c = g.ecs.c;
@@ -36,7 +37,7 @@ export function fightAction(g: Game): FightAction | null {
     const act = SIGNATURES[f.id]?.action?.(g, e, f);
     if (act) return act;
   }
-  return discoveryAction(g); // (an altar before a horror's gate: round 63)
+  return discoveryAction(g) ?? riteAction(g); // an altar or a rite's light in a horror's court
 }
 
 /** Runs the fight action E asks for; true when E was spent on one. */

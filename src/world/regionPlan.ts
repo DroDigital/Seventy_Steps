@@ -15,7 +15,7 @@ import { REGION_LAYOUTS, type RegionLayout } from '../data/regionFeatures';
 import type { PropKind, RegionDef } from '../data/regions';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
-import { clearsFor, nearPath, planWay, wayProps, type WayPlan } from './arenaWay';
+import { clearsFor, clearsRite, nearPath, planWay, wayProps, type WayPlan } from './arenaWay';
 import { discoveryProps } from './discoveryPlan';
 import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
@@ -260,6 +260,7 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
     const plan = planWay(a, way);
     for (let i = props.length - 1; i >= 0; i--) if (clearsFor(plan, props[i])) props.splice(i, 1);
     const marks = wayProps(plan);
+    for (let i = marks.length - 1; i >= 0; i--) if (clearsRite(plan, marks[i]!)) marks.splice(i, 1); // off the way too: each rite's light, and the walk from the court to it
     for (const other of out) for (let i = marks.length - 1; i >= 0; i--) if (clearsFor(other, marks[i]!)) marks.splice(i, 1); // not across a court already laid
     for (let i = marks.length - 1; i >= 0; i--) if (!offSites(marks[i]!.x, marks[i]!.z)) marks.splice(i, 1); // nor on a sign's, a tome's or a door's ground, nor on a foe's post
     const things = discoveryProps(a); // the marks of its vigils and its altars (round 63), with the ground about them cleared

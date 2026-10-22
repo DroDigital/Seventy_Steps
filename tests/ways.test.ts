@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
+import { emptyInput } from '../src/core/input';
 import { ARENA_WAYS } from '../src/data/arenaWaysAll';
+import { DISCOVERIES } from '../src/data/discoveriesAll';
+import { PASSAGE } from '../src/data/tuning';
 import type { Game } from '../src/systems/components';
-import { createWorldGame } from '../src/systems/game';
+import { fightAction } from '../src/systems/fightActions';
+import { createWorldGame, stepGame } from '../src/systems/game';
+import { isFound } from '../src/systems/found';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
 import { calmed, wayRuns, WAYS, type WayRun } from '../src/systems/ways';
-import { pointAt } from '../src/world/arenaWay';
+import { along, courtPoint, pointAt } from '../src/world/arenaWay';
+import { stepPlace } from '../src/world/discoveryPlan';
 import { worldLayout } from '../src/world/placements';
 import { goTo, record, run } from './worldHelpers';
 
@@ -16,6 +22,16 @@ const enter = (g: Game, boss: string): WayRun => {
   return wayRuns(g).find((r) => r.plan.boss === boss)!;
 };
 const at = (r: WayRun, d: number, side = 0): { x: number; z: number } => pointAt(r.plan, d, side);
+
+/** Approach with real input and collision; only the starting position is supplied by the test. */
+function walkTo(g: Game, to: { x: number; z: number }, reached: () => boolean): void {
+  for (let k = 0; k < 240 && !reached(); k++) {
+    for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
+    const me = g.ecs.c.transform.get(g.player.id)!.pos;
+    g.camera.yaw = Math.atan2(to.x - me.x, to.z - me.z);
+    stepGame(g, { ...emptyInput(), moveY: 1 });
+  }
+}
 
 describe('a way\'s plates', () => {
   it('wake under a foot and burst a moment after, hurting those still in the ring; a safe one does not wake', () => {
@@ -145,6 +161,78 @@ describe('a vent', () => {
 
 describe('a rite', () => {
   const light = (r: WayRun, rank: number) => r.lights.find((l) => l.rank === rank)!;
+
+  it.each(Object.entries(ARENA_WAYS).filter(([, way]) => way.rite).map(([boss]) => boss))('%s: every light can be reached on foot from the court and its rite completed', (boss) => {
+    const g = createWorldGame();
+    const r = enter(g, boss);
+    const hp = g.ecs.c.health.get(g.player.id)!;
+    hp.hp = hp.max = 10000; // isolate puzzle access from the court's damage
+    for (const l of r.lights) {
+      const lane = pointAt(r.plan, along(r.plan, l.x, l.z).d);
+      goTo(g, lane.x, lane.z);
+      walkTo(g, l, () => l.lit);
+      const me = g.ecs.c.transform.get(g.player.id)!.pos;
+      expect(l.lit, `${boss}: light ${l.rank + 1}, stopped ${Math.hypot(me.x - l.x, me.z - l.z).toFixed(2)} m away`).toBe(true);
+    }
+    expect(g.overworld!.told.has(`rite:${boss}`), `${boss}: the actual lights complete its rite`).toBe(true);
+  });
+
+  it.each(Object.entries(ARENA_WAYS).filter(([, way]) => way.rite).map(([boss]) => boss))('%s: its lights expose a working interaction prompt before they auto-light', (boss) => {
+    const g = createWorldGame();
+    const r = enter(g, boss);
+    const look = r.plan.way.rite!.look;
+    for (const l of r.lights) {
+      const lane = pointAt(r.plan, along(r.plan, l.x, l.z).d);
+      const distance = Math.hypot(lane.x - l.x, lane.z - l.z);
+      goTo(g, l.x + (lane.x - l.x) * 2.2 / distance, l.z + (lane.z - l.z) * 2.2 / distance);
+      expect(l.lit, 'not yet inside the automatic lighting radius').toBe(false);
+      expect(fightAction(g)?.label).toBe(look === 'glow' ? 'kindle the light' : `light the ${look}`);
+      const input = emptyInput();
+      input.pressed.interact = true;
+      stepGame(g, input);
+      expect(l.lit, 'the prompted button takes the flame').toBe(true);
+    }
+    expect(g.overworld!.told.has(`rite:${boss}`)).toBe(true);
+    expect(fightAction(g), 'completed lights stop offering the action').toBeNull();
+  });
+
+  it('the candle quest opens its gate through page pickup, real light approaches and the offering button, and stays open after reload', () => {
+    const g = createWorldGame();
+    const r = enter(g, 'black_man');
+    const a = worldLayout().arenas.find((x) => x.bosses[0] === 'black_man')!;
+    const doc = DISCOVERIES.black_man!.leaves[0]!.doc;
+    const page = worldLayout().tomes.find((x) => x.name === doc)!.at;
+    const pageLane = pointAt(r.plan, along(r.plan, page.x, page.z).d);
+    goTo(g, pageLane.x, pageLane.z);
+    walkTo(g, page, () => g.overworld!.read.has(doc));
+    expect(g.overworld!.read.has(doc), 'the actual page is collected').toBe(true);
+    for (const l of r.lights) {
+      const lane = pointAt(r.plan, along(r.plan, l.x, l.z).d);
+      goTo(g, lane.x, lane.z);
+      walkTo(g, l, () => l.lit);
+      expect(l.lit, `candle ${l.rank + 1}`).toBe(true);
+    }
+    const offer = DISCOVERIES.black_man!.steps.find((s) => s.kind === 'offer')!;
+    const altar = stepPlace(a, offer)!;
+    goTo(g, altar.x, altar.z);
+    run(g, 3);
+    const opened = record(g, 'GateOpened');
+    const input = emptyInput();
+    input.pressed.interact = true;
+    stepGame(g, input);
+    expect(isFound(g, 'black_man')).toBe(true);
+    expect(opened).toHaveLength(1);
+    const gate = courtPoint(a.house!, 2);
+    goTo(g, gate.x, gate.z);
+    run(g, PASSAGE.frames.sealed + 6);
+    const gateEntity = [...g.ecs.c.piece].find(([, p]) => p.def.minFound === 'black_man')![0];
+    expect(g.ecs.c.piece.get(gateEntity)!.seal.every((c) => g.world.off.has(c)), 'the gate collision opens').toBe(true);
+    const copy = createWorldGame({ save: parseSave(JSON.stringify(snapshot(g)))! });
+    run(copy, PASSAGE.frames.sealed + 6);
+    expect(isFound(copy, 'black_man'), 'the fix needs no new journey').toBe(true);
+    const loadedGate = [...copy.ecs.c.piece].find(([, p]) => p.def.minFound === 'black_man')![0];
+    expect(copy.ecs.c.piece.get(loadedGate)!.seal.every((c) => copy.world.off.has(c)), 'the loaded gate stays open').toBe(true);
+  });
 
   it('is done by lighting the lights in the order the place tells: the least first', () => {
     const g = createWorldGame();

@@ -115,5 +115,15 @@ export function wayProps(plan: WayPlan): Prop[] {
   return plan.way.marks.flatMap((m) => markProps(plan, m, rng));
 }
 
-/** Whether a prop stands in the way's corridor and is to be cleared for it (not a house, which has its own place). */
-export const clearsFor = (plan: WayPlan, p: Prop): boolean => p.kind !== 'house' && nearPath(plan, p.x, p.z, plan.width / 2 + 0.8 + reach(p));
+/** A rite's lights need room for a body to reach them from the court, including where they stand off its central way. */
+export function clearsRite(plan: WayPlan, p: Prop): boolean {
+  const r = reach(p);
+  return (plan.way.rite?.at ?? []).some((s) => {
+    const light = pointAt(plan, s.d, s.side);
+    const lane = pointAt(plan, s.d, 0);
+    return Math.hypot(p.x - light.x, p.z - light.z) < r + 2.4 || segmentDistance(p.x, p.z, lane, light) < r + 1.2;
+  });
+}
+
+/** Whether a prop stands in the way's corridor or a rite's approach and is to be cleared for it. A required light takes precedence over a scattered house too. */
+export const clearsFor = (plan: WayPlan, p: Prop): boolean => (p.kind !== 'house' && nearPath(plan, p.x, p.z, plan.width / 2 + 0.8 + reach(p))) || clearsRite(plan, p);

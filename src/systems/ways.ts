@@ -19,6 +19,7 @@ import { blast } from './blasts';
 import type { Game } from './components';
 import { changeInsight } from './insight';
 import { loseSanity } from './sanity';
+import type { FightAction } from './signatures';
 import { spend } from './stamina';
 
 /** The numbers of the ways. */
@@ -31,6 +32,7 @@ export const WAYS = {
   field: { cols: 2.4, plate: 0.95, burst: 2.2 }, // metres between the plates of a row, and a plate's own wake
   poise: 60,
   light: 1.6, // metres a light is taken from
+  interact: 2.6, // the E prompt appears before proximity takes its flame
   fail: { burst: 2.6, damage: 14, warn: 40, cool: 120 }, // what goes up at a wrong light
   clue: 16, // metres from a rite's lights the clue is said
   heard: 44, // metres from the investigator within which a way's omens are listened for (it is a corridor)
@@ -298,28 +300,56 @@ function rite(g: Game, run: WayRun, me: V3): void {
   if (g.frame < run.cool) return;
   for (const l of run.lights) {
     if (l.lit || Math.hypot(me.x - l.x, me.z - l.z) > WAYS.light) continue;
-    if (l.rank === run.progress) {
-      l.lit = true;
-      run.progress++;
-      g.events.emit('RiteLit', { at: { x: l.x, y: l.y, z: l.z }, look: r.look, glow: r.glow, rank: l.rank, of: run.lights.length });
-      if (run.progress === run.lights.length) {
-        ow.told.add(`rite:${run.plan.boss}`);
-        g.player.echoes += r.reward.echoes;
-        g.events.emit('Echoes', { change: 'earned', amount: r.reward.echoes, total: g.player.echoes });
-        if (r.reward.insight) changeInsight(g, r.reward.insight, 'quest', 'rite');
-        g.events.emit('RiteDone', { boss: run.plan.boss, at: { x: l.x, y: l.y, z: l.z } });
-        g.events.emit('Notice', { text: r.done });
-      }
-    } else {
-      for (const k of run.lights) k.lit = false; // the wrong one: they all go out, and a flare goes up at it
-      run.progress = 0;
-      run.missed++;
-      run.cool = g.frame + WAYS.fail.cool;
-      g.events.emit('RiteFailed', { at: { x: l.x, y: l.y, z: l.z }, look: r.look });
-      fire(g, run, l, WAYS.fail.burst, lookOfGlow(r.glow), WAYS.fail.damage, WAYS.fail.warn);
-    }
+    takeLight(g, run, l);
     return;
   }
+}
+
+/** Proximity and the interaction button take the same flame and obey the same order. */
+function takeLight(g: Game, run: WayRun, l: Light): void {
+  const r = run.plan.way.rite;
+  const ow = g.overworld;
+  if (!r || !ow || l.lit || done(g, run) || g.frame < run.cool) return;
+  if (l.rank === run.progress) {
+    l.lit = true;
+    run.progress++;
+    g.events.emit('RiteLit', { at: { x: l.x, y: l.y, z: l.z }, look: r.look, glow: r.glow, rank: l.rank, of: run.lights.length });
+    if (run.progress === run.lights.length) {
+      ow.told.add(`rite:${run.plan.boss}`);
+      g.player.echoes += r.reward.echoes;
+      g.events.emit('Echoes', { change: 'earned', amount: r.reward.echoes, total: g.player.echoes });
+      if (r.reward.insight) changeInsight(g, r.reward.insight, 'quest', 'rite');
+      g.events.emit('RiteDone', { boss: run.plan.boss, at: { x: l.x, y: l.y, z: l.z } });
+      g.events.emit('Notice', { text: r.done });
+    }
+  } else {
+    for (const k of run.lights) k.lit = false; // the wrong one: they all go out, and a flare goes up at it
+    run.progress = 0;
+    run.missed++;
+    run.cool = g.frame + WAYS.fail.cool;
+    g.events.emit('RiteFailed', { at: { x: l.x, y: l.y, z: l.z }, look: r.look });
+    fire(g, run, l, WAYS.fail.burst, lookOfGlow(r.glow), WAYS.fail.damage, WAYS.fail.warn);
+  }
+}
+
+/** A rite's unlit candle, lamp or fire offers an explicit E prompt as the investigator approaches. */
+export function riteAction(g: Game): FightAction | null {
+  if (!g.overworld || g.cutscene || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return null;
+  const me = g.ecs.c.transform.get(g.player.id)?.pos;
+  if (!me) return null;
+  let nearest: { run: WayRun; light: Light; distance: number } | null = null;
+  for (const run of wayRuns(g)) {
+    if (!run.plan.way.rite || done(g, run) || g.frame < run.cool) continue;
+    for (const light of run.lights) {
+      if (light.lit) continue;
+      const distance = Math.hypot(me.x - light.x, me.z - light.z);
+      if (distance <= WAYS.interact && (!nearest || distance < nearest.distance)) nearest = { run, light, distance };
+    }
+  }
+  if (!nearest) return null;
+  const { run, light } = nearest;
+  const look = run.plan.way.rite!.look;
+  return { label: look === 'glow' ? 'kindle the light' : `light the ${look}`, run: () => takeLight(g, run, light) };
 }
 
 const lookOfGlow = (glow: 'magenta' | 'purple' | 'green'): Look => (glow === 'magenta' ? 'stain' : glow === 'purple' ? 'star' : 'void');

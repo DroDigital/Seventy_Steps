@@ -79,13 +79,15 @@ function advance(g: Game, id: string, to = stageOf(g, id) + 1, paid = true): voi
  * A lenient quest takes the world as it finds it: a later stage whose goal is already met by the world (a boss slain, a sign found, a
  * page read) closes with every stage before it, all at once. When the last stage is met the quest is over, and what its stages
  * give is not given. Short of that a stage with a gift is not passed over: it waits for its own goal (a word with someone), so what it
- * gives is not lost, and the stages after it that are met close as soon as it does.
+ * gives is not lost, and the stages after it that are met close as soon as it does. With `lenient: 'last'`, only the final goal can
+ * skip earlier stages: a discovery's horror already slain closes it, but a later page or rite does not hide an unfinished gate requirement.
  */
 function settle(g: Game, id: string): void {
   const q = QUESTS[id];
   const open = stageOf(g, id);
   let last = -1;
   q.stages.forEach((s, k) => {
+    if (q.lenient === 'last' && k !== q.stages.length - 1) return;
     if (k > open && s.goal.kind !== 'talk' && s.goal.kind !== 'give' && met(g, s.goal)) last = k;
   });
   if (last < 0) return;
@@ -129,6 +131,15 @@ function met(g: Game, goal: Goal): boolean {
 /** Every half second: quests that begin by themselves begin, and bosses slain, Elder Signs found and seals broken close the stages waiting on them. */
 export function questSystem(g: Game): void {
   if (!g.overworld || g.frame % 30 !== 0) return;
+  // Repair journals saved by the patch that let a later page/rite skip an unfinished gate requirement.
+  for (const [id, stage] of g.overworld.quests) {
+    const q = QUESTS[id];
+    if (q?.lenient !== 'last' || met(g, q.stages[q.stages.length - 1]!.goal)) continue;
+    const first = q.stages.findIndex((s) => !met(g, s.goal));
+    if (first < 0 || first >= stage) continue;
+    g.overworld.quests.set(id, first);
+    g.events.emit('QuestChanged', { id, title: q.title, stage: first, done: false });
+  }
   for (const [id, goal] of [...openGoals(g)]) {
     if (met(g, goal)) advance(g, id);
     if (QUESTS[id].lenient) settle(g, id);
