@@ -29,15 +29,25 @@ export function mercyScale(g: Game, attacker: Entity): number {
   return 1 - MERCY.step * Math.min(MERCY.falls, fallsTo(g, boss.id));
 }
 
+const said = new WeakMap<Game, string[]>();
+
+/** What the fall just now said of mercy, to be read with what the last blow teaches (`deathLine`), or '' (a fall that no horror's fight had a hand in, or Nightmare's). */
+export function mercyLine(g: Game): string {
+  return (said.get(g) ?? []).join(' ');
+}
+
 /** Counts each fall to a horror's fight, and says so. Call once per game. */
 export function registerMercy(g: Game): void {
+  g.events.on('Respawned', () => void said.delete(g));
   g.events.on('Died', ({ entity }) => {
-    if (entity !== g.player.id || !g.overworld || g.player.difficulty === 'nightmare') return;
+    if (entity !== g.player.id) return;
+    said.delete(g);
+    if (!g.overworld || g.player.difficulty === 'nightmare') return;
     for (const [, f] of engagedFights(g)) {
       const n = fallsTo(g, f.id);
       if (n >= MERCY.falls) continue;
       g.overworld.told.add(`${PREFIX}${f.id}:${n + 1}`);
-      g.events.emit('Notice', { text: tr('n.mercy', { n: Math.round(MERCY.step * (n + 1) * 100) }) });
+      said.set(g, [...(said.get(g) ?? []), tr('death.mercy', { n: Math.round(MERCY.step * (n + 1) * 100) })]); // not a Notice: the HUD clears the screen of them at a fall, and the waking is under a veil
     }
   });
 }
