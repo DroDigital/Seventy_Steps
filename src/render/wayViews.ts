@@ -130,6 +130,7 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
           if (Math.hypot(l.x - eye.x, l.z - eye.z) > SEEN) return;
           const hue = rite ? ANOMALY[rite.glow] : FLAME;
           if (l.lit) halos.put(l.x, y, l.z, 2.1 + 0.2 * Math.sin(time * 7 + i), hue, 0.95);
+          else if (run.missed > 0 && l.rank === run.progress) halos.put(l.x, y, l.z, 1.3 + 0.35 * Math.sin(time * 3.2), hue, 0.45 + 0.25 * Math.sin(time * 3.2)); // once a wrong light has been taken, the one whose turn it is beckons (round 65)
           else halos.put(l.x, y, l.z, 0.95, COLD, 0.3 + 0.08 * Math.sin(time * 1.4 + i));
         });
       }

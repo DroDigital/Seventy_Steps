@@ -2,7 +2,7 @@
 
 (Export of the Claude Doc made for Dro, kept here so another session can pick it up. The full per-boss detail is in the plan-A, plan-B and plan-C files beside it.)
 
-Oct 22, 2026 · Dro · Draft for Dro to confirm. Nothing is built yet.
+Oct 22, 2026 · Dro · Decided: see *The answers* below (XDro handed the thirteen questions to Claude with two rules). Round 65 (the discoveries made fair) is built; the rest is not yet.
 
 ## Read this first
 
@@ -27,8 +27,8 @@ Six answers unblock the pilots; the rest I will take as recommended unless you s
 | 2 | Portals into another boss dimension. (a) A place skin: grade, mist, sky and light ease in around the structure, no new region, cheap. (b) One flagship walkable portal built from parts that exist (the veil shader, the gate walk, the ultimate\_void dungeon). (c) A new region per boss: needs a recorded track from you each, about 25 files touched. | (a) everywhere, (b) for yog\_sothoth as the showpiece, never (c). | Now |
 | 3 | Water kills by drowning. Moats and the lagoon stay lethal, but every causeway and quay is at least 7 m wide with a low kerb collider, so a dodge roll cannot drop you. | Yes. | Now |
 | 4 | cthulhu "out in the sea". (a) A platform in a lagoon inside the island's own tile. (b) Move the arena to the coast and sit it in open water: truer, needs the containment audits redone and may shift the site by tens of metres. | (a) first; (b) later if you want it. | Now |
-| 5 | hastur is a called boss: the third lost-sanity band spawns him 12 m in front of you wherever you stand, so no building can hold his first fight. Change it so the call lights the way to the theatre and he rises in the orchestra. | Yes (a small sim change, round 75). | Before hastur |
-| 6 | Free assets. Extend the bake tool for KayKit (CC0, reachable from here) with a line in CLAUDE.md, and you put unpacked Kenney kits (Castle, Pirate, Furniture) on disk as before. Every structure is code-built either way; models are dressing. | Yes to both. | Before round 66 |
+| 5 | hastur is a called boss: the third lost-sanity band spawns him 12 m in front of you wherever you stand, so no building can hold his first fight. Change it so the call lights the way to the theatre and he rises in the orchestra. | Yes (a small sim change, round 76). | Before hastur |
+| 6 | Free assets. Extend the bake tool for KayKit (CC0, reachable from here) with a line in CLAUDE.md, and you put unpacked Kenney kits (Castle, Pirate, Furniture) on disk as before. Every structure is code-built either way; models are dressing. | Yes to both. | Before round 67 |
 | 7 | Nyarlathotep stays in the Kadath hall beside the Great Ones, as the main quest and an achievement expect. The handbill-and-door Exhibition becomes an optional prelude that calls him out early. | Yes. | Later |
 | 8 | Outer Gods rules (stand still, do not look, follow a sound, wait for the hour). A "Strange places" setting with Full, Assist and Off in the Accessibility tab, default Full with a one-line first-hour notice. | Yes. | Later |
 | 9 | Mazes. Three (shub\_niggurath, simon\_orne, zkauba) is one too many for the foe AI and the camera. | Two mazes; zkauba becomes an open field of metal towers. | Later |
@@ -36,6 +36,30 @@ Six answers unblock the pilots; the rest I will take as recommended unless you s
 | 11 | The demo. Both arenas (colour\_out\_of\_space, black\_man) and the seven demo halls are the first impression and the riskiest to change. | They ship the new places, and they are the pilots. | Later |
 | 12 | Real underground. Nothing can be dug below about 1 m under the land, so colossus\_pyramids' buried hypostyle becomes a dune skirt and a colonnade. Alternative: host it as a small dungeon, which gives a true underground hall and the existing walk audits. | Dune and colonnade now; revisit after the pilots. | Later |
 | 13 | Process. Merge PR 152 first (rounds 63 and 64), then one PR per phase from round 65, each with its DECISIONS.md lines. Lore divergences in section 9 are accepted or corrected before any art. | Yes. | Now |
+
+## The answers (22 Oct 2026)
+
+XDro's word: "decide each question yourself, just make sure the game will be highly enjoyable and entertaining, without any of the new puzzles, discovery processes etc. being too hard and frustrating for any kind of player", and then "also make sure everything you decide is lore accurate and visually and mechanically entertaining and impressive". So every answer below is the recommendation, bent where needed toward those two rules, and one rule is added over all of them:
+
+**The fairness rule.** No discovery, ordeal, maze or strange rule waits on chance or punishes a wrong try with lost progress or goods. The place answers the one who keeps faith with it: a vigil's hour, sky and state of mind are called by the place when it is kept (round 65, built), a strange rule eases itself after two failed tries or ninety seconds at the court (Assist without being asked, with a line that says so), the next act is always said on screen and in the Journal, and a wrong light shows the right one. Strange in look and in story, never in difficulty.
+
+| # | Answer |
+| --- | --- |
+| 1 | All 46 places; the Outer Gods designed once, in section 5. |
+| 2 | (a) a place skin everywhere, and (b) one walkable portal, Yog-Sothoth's, since the god is the gate; never (c). |
+| 3 | Water stays lethal beyond the kerb; every causeway and quay is 7 m or wider with a low kerb collider, so no dodge roll drops anyone in. |
+| 4 | (a) Cthulhu's platform in a lagoon inside the island's tile first; (b) only if the pilots leave room. |
+| 5 | Yes: the third band's call lights the way to the theatre and he rises in the orchestra (a fight in a built place beats one sprung anywhere). |
+| 6 | Extend the bake for KayKit (CC0, reachable from here). Nothing waits on Kenney kits put on disk: every enclosing form is built in code, and the kits are used only if they arrive. |
+| 7 | Nyarlathotep stays in the Kadath hall; the handbill and door are an optional prelude. |
+| 8 | The Strange places setting (Full, Assist, Off), default Full, and Full itself eases after two failed tries or ninety seconds (the fairness rule). |
+| 9 | Two mazes, kept small and kind: lanes 6 m or wider, three choices at most to the heart, the heart's light always seen over the walls, a lit thread after a minute lost, foes only in fixed bays. zkauba is an open field of towers. |
+| 10 | Yes to the site nudges. |
+| 11 | Yes: the demo's places are the pilots. |
+| 12 | The dune and colonnade now; a true underground hall only if the pilots argue for it. |
+| 13 | Merge PR 152 first (it now holds round 65 too), then one PR per round from round 66; every round's calls in DECISIONS.md. The lore defaults of section 9 are taken as written, each checked against the text before its art. |
+
+Round numbers below are as first drafted; round 65 was spent on the fairness rule, so each later round in the plan (the groundwork, the pilots, the waves, the close-out) is one number higher.
 
 ## The 19 open-world arenas
 
@@ -126,21 +150,21 @@ Fairness rules that apply to all eight: every sense-gated rule has a second chan
 
 ## What is built once and shared
 
-The three drafts each invented their own foundation for motion, looks and doors. Merged, there are eleven shared pieces and every place uses them; none of them is a boss. Rounds are numbered from 65, since PR 152 holds 63 and 64.
+The three drafts each invented their own foundation for motion, looks and doors. Merged, there are eleven shared pieces and every place uses them; none of them is a boss. Rounds are numbered from 66, since PR 152 holds 63 to 65 (65: the discoveries made fair).
 
 | Piece | What it does | Replaces in the drafts | Round |
 | --- | --- | --- | --- |
-| Enclosure seam | The round 63 house becomes a general plan: a kind, a bound, an `inside()` test, a gate, a front, and the stake and candle spots, so a wall ring is one kind among many. Also fixes every circle-hardwired place the review found (candle and stake, foe posts, mounts, map). Behaviour-neutral, all 19 rings pass the old tests first. | The arena draft's seam; the hall draft's separate precinct code | 65 |
-| Pad and collider contract | One source of truth for pad heights (the terrain calls the same function the planner does), all pads built before any structure reads them, every gate ends on land at or above 1 m under the land, and each collider carries a vertical range that follows a sloped bank. | Both drafts' pad ideas, which disagreed | 65 |
-| Living layer | One system for motion and light: shader terms on the world material (sway, pulse, flow, droop, breathe), view modules in the wayViews pattern (made within 100 m, put away past 135 m), instanced crowds, a hall air source, light chases from halos, a sound scheduler. Per-place caps: 2 views, 600 particles, 48 halos, 1 beam, 15,000 animated triangles, 3 extra draw calls. | The arena draft's living layer, the hall draft's kinetics, the Outer Gods' Living Houses | 66 |
-| Place skin | A named look eased in by distance, like realms are: grade, mist, sky colour, a sky figure, light. No new region, so no new music track. In a roofed hall it is drawn on a dome inside the room. | The hall draft's pocket key, the arena draft's place looks, the Outer Gods' skin | 67 |
-| Hall spec and stages | One record per hall: its roof, skin profile, precinct, moving parts, and stages that follow the fight's phases. Stage is derived from the saved fight, so no save change. | The hall draft's foundation | 68 |
-| Gate looks | A registry of gate pictures (sluice, jaws, burst bronze, tilting door, iris, and so on) in place of the one uniform door. | The arena draft | 66 |
-| Ordeal | The one new discovery step type, with rules hush, follow, avert, pass and sit, told as `ord:<boss>:<rule>` and with stable step ids so old saves are not mis-credited. | Five separate step types | 69 |
-| Strange places setting | Full, Assist or Off in the Accessibility tab, read by every Outer God rule; a rule is off during a fight, a hunt, a cutscene or while mounted. | New | 65 |
-| Lying map | One table of lies that the map, minimap, lead, beacons and marker all obey, so they agree. | Five scattered tricks | 69 |
-| Planners | Outline (a polygon or curve closed with chained boxes), ground (stacked pads, raised banks, kerbed islands), wall graph (two mazes, solvability proven by search), assembly (figures on a ring, tiers or curve), precinct plans and a grave field for halls. | Per-boss one-offs | 66 to 75 |
-| Reaction to the fall | When a horror falls, its place answers: lights die, the veil closes, the moat drains, the loop stops, through the same view. The review noted this is cheap and nothing planned it. | New | 84 |
+| Enclosure seam | The round 63 house becomes a general plan: a kind, a bound, an `inside()` test, a gate, a front, and the stake and candle spots, so a wall ring is one kind among many. Also fixes every circle-hardwired place the review found (candle and stake, foe posts, mounts, map). Behaviour-neutral, all 19 rings pass the old tests first. | The arena draft's seam; the hall draft's separate precinct code | 66 |
+| Pad and collider contract | One source of truth for pad heights (the terrain calls the same function the planner does), all pads built before any structure reads them, every gate ends on land at or above 1 m under the land, and each collider carries a vertical range that follows a sloped bank. | Both drafts' pad ideas, which disagreed | 66 |
+| Living layer | One system for motion and light: shader terms on the world material (sway, pulse, flow, droop, breathe), view modules in the wayViews pattern (made within 100 m, put away past 135 m), instanced crowds, a hall air source, light chases from halos, a sound scheduler. Per-place caps: 2 views, 600 particles, 48 halos, 1 beam, 15,000 animated triangles, 3 extra draw calls. | The arena draft's living layer, the hall draft's kinetics, the Outer Gods' Living Houses | 67 |
+| Place skin | A named look eased in by distance, like realms are: grade, mist, sky colour, a sky figure, light. No new region, so no new music track. In a roofed hall it is drawn on a dome inside the room. | The hall draft's pocket key, the arena draft's place looks, the Outer Gods' skin | 68 |
+| Hall spec and stages | One record per hall: its roof, skin profile, precinct, moving parts, and stages that follow the fight's phases. Stage is derived from the saved fight, so no save change. | The hall draft's foundation | 69 |
+| Gate looks | A registry of gate pictures (sluice, jaws, burst bronze, tilting door, iris, and so on) in place of the one uniform door. | The arena draft | 67 |
+| Ordeal | The one new discovery step type, with rules hush, follow, avert, pass and sit, told as `ord:<boss>:<rule>` and with stable step ids so old saves are not mis-credited. | Five separate step types | 70 |
+| Strange places setting | Full, Assist or Off in the Accessibility tab, read by every Outer God rule; a rule is off during a fight, a hunt, a cutscene or while mounted. | New | 66 |
+| Lying map | One table of lies that the map, minimap, lead, beacons and marker all obey, so they agree. | Five scattered tricks | 70 |
+| Planners | Outline (a polygon or curve closed with chained boxes), ground (stacked pads, raised banks, kerbed islands), wall graph (two mazes, solvability proven by search), assembly (figures on a ring, tiers or curve), precinct plans and a grave field for halls. | Per-boss one-offs | 67 to 76 |
+| Reaction to the fall | When a horror falls, its place answers: lights die, the veil closes, the moat drains, the loop stops, through the same view. The review noted this is cheap and nothing planned it. | New | 85 |
 
 Cut from the drafts, on purpose: a road that teleports you (risky), Memory Plates (a save change for little), a per-god pocket region (each would need its own recorded track and touch about 40 tests), a void drop outside the Court, and the Exhibition as a separate dungeon (kept as a later option). Rift-lite, a run-time door, is built only if you pick the flagship portal in decision 2.
 
@@ -172,12 +196,12 @@ Rounds are not to scale. Each round is its own pull request with its own audit r
 
 Roadmap (rounds are not to scale; each round is its own pull request with its own audit run):
 
-1. Round 65, groundwork: enclosure seam, pad and collider contract, Strange places setting, measured-budget script. No visible change.
-2. Rounds 66 to 68, three pilots: edward_hutchinson (a keep); colour_out_of_space and black_man (reservoir and river island, both in the demo); dr_munoz and terrible_old_man (machine halls).
+1. Round 66, groundwork: enclosure seam, pad and collider contract, Strange places setting, measured-budget script. No visible change.
+2. Rounds 67 to 69, three pilots: edward_hutchinson (a keep); colour_out_of_space and black_man (reservoir and river island, both in the demo); dr_munoz and terrible_old_man (machine halls).
 3. Gate: go or no-go on measured cost per place in every render pass, a screenshot from the fight circle that reads, and Dro's yes. If no, keep the places that work and stop.
-4. Rounds 69 to 76, open arenas and Outer Gods: azathoth first, then outline buildings, earthworks, two mazes, more Outer Gods, ground, and hastur's theatre.
-5. Rounds 77 to 83, boss halls: tide, shafts, burial grounds and castles, machines, monuments, pockets, living houses; nyarlathotep's invitation last.
-6. Round 84, close-out: retire the ring planner, reactions to the fall, a measured pass of all 46, docs, and the full audit.
+4. Rounds 70 to 77, open arenas and Outer Gods: azathoth first, then outline buildings, earthworks, two mazes, more Outer Gods, ground, and hastur's theatre.
+5. Rounds 78 to 84, boss halls: tide, shafts, burial grounds and castles, machines, monuments, pockets, living houses; nyarlathotep's invitation last.
+6. Round 85, close-out: retire the ring planner, reactions to the fall, a measured pass of all 46, docs, and the full audit.
 
 **Effort, honestly.** Each draft estimated its own part and the reviewers found every one too low: the arena draft needs about 40 kits, two mazes, five ground profiles, three assemblies, 19 gate looks and about ten new test files; the hall draft's five to six months solo became nine to fourteen once the audits are counted. Together, expect well over a year of one engineer's work for all 46 places. That is why the pilots come first: if they show that fewer places at higher quality is what you want, the later waves shrink.
 
@@ -227,6 +251,6 @@ Every enclosing form (gates, keeps, columns, flutes, tiers, courses of masonry, 
 - **Not reachable from here:** kenney.nl, Quaternius, Poly Pizza, OpenGameArt, Sketchfab, itch.io. More Kenney kits (Castle, Pirate dock and pier, Furniture, Industrial) only arrive if you put them on disk as an unpacked folder, as before.
 - **Already baked and enough for most dressing:** 59 Kenney models (graveyard stones, crypt, coffin, iron fence, columns, statues, hedge, wreck, rowboat, pines, rocks, cliffs, lilies, mushrooms). KayKit gravestones and crypts would only duplicate them, so they are not re-baked.
 - **Textures and sound:** about six new textures (marble, bark, strata sandstone, bone, black glass, metal plate) are generated in code, and new sounds are synthesised; recordings of the Beyond's drum and flute, a clock and a wood's breath are optional and listed in `plannedSounds`. No new music, voices or regions are needed.
-- **Order:** the bake runs before round 66, not after, so the pilots are not re-touched.
+- **Order:** the bake runs before round 67, not after, so the pilots are not re-touched.
 
 **Where the detail lives.** On the branch `claude/relaxed-curie-w5lwve`, in `docs/handoff/`: `HANDOFF.md` (how to pick this up in another session), the three full plans (`plan-A-open-arenas`, `plan-B-boss-halls`, `plan-C-outer-gods`, each as `.md` and `.draft.json`), their three skeptical reviews (`.critique.md`), and `PERF-arenas-main-vs-pr152.md`. The 76 house stills are in the project files under `seventy-steps/house-stills`. The full plans hold the per-boss concepts, lore notes, motion lists and tests that this page only summarises.

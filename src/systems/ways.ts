@@ -119,6 +119,7 @@ export interface WayRun {
   tablet: Tablet | null;
   progress: number; // how many lights are lit, of a rite not yet done
   cool: number; // frame before which a wrong light is not taken again
+  missed: number; // wrong lights taken: after one, the light whose turn it is beckons (render/wayViews.ts; round 65)
   bursts: Burst[];
   near: boolean; // the investigator is near it (the picture makes what it holds only then)
 }
@@ -143,7 +144,7 @@ export const calmed = (g: Game, run: WayRun): boolean => !!run.plan.way.rite?.st
 const between = (g: Game, [lo, hi]: readonly [number, number]): number => Math.round((lo + (hi - lo) * g.rng()) * SIM.hz);
 
 function build(g: Game, plan: WayPlan): WayRun {
-  const run: WayRun = { plan, plates: [], vents: [], strips: [], patches: [], lights: [], tablet: null, progress: 0, cool: 0, bursts: [], near: false };
+  const run: WayRun = { plan, plates: [], vents: [], strips: [], patches: [], lights: [], tablet: null, progress: 0, cool: 0, missed: 0, bursts: [], near: false };
   const place = (s: { d: number; side: number }): V3 => {
     const p = pointAt(plan, s.d, s.side);
     return { x: p.x, y: g.world.ground(p.x, p.z), z: p.z };
@@ -312,6 +313,7 @@ function rite(g: Game, run: WayRun, me: V3): void {
     } else {
       for (const k of run.lights) k.lit = false; // the wrong one: they all go out, and a flare goes up at it
       run.progress = 0;
+      run.missed++;
       run.cool = g.frame + WAYS.fail.cool;
       g.events.emit('RiteFailed', { at: { x: l.x, y: l.y, z: l.z }, look: r.look });
       fire(g, run, l, WAYS.fail.burst, lookOfGlow(r.glow), WAYS.fail.damage, WAYS.fail.warn);

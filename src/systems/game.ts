@@ -25,6 +25,7 @@ import { fightSystem, registerFights, setArena } from './bossFight';
 import { brainSystem } from './brain';
 import { createCameraRig, followY, stepCamera } from './camera';
 import { checkpointSystem, furnishWorld, signPlace } from './checkpoints';
+import { NIGHT } from './clock';
 import { meleeSystem } from './combat';
 import { createStores, type Game, type GameEvents } from './components';
 import { dreadOf, resolveCreature, spawnCreature } from './creatures';
@@ -95,6 +96,7 @@ export interface GameOptions {
 
 /** The investigator in a world, with the hooks every game shares. */
 function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
+  NIGHT.hurried = 0; // a new game's night is its own (clock.ts)
   const ecs = createEcs(createStores());
   const id = spawnPlayer({ ecs, world }, spawn);
   const g: Game = {
@@ -206,6 +208,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
 export function stepGame(g: Game, input: InputFrame): void {
   const dt = 1 / SIM.hz;
   g.frame++;
+  NIGHT.hurried = g.overworld?.hurried ?? 0; // the night as this game has it (clock.ts)
   if (g.player.fogPass || g.player.gatePass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
   mountSystem(g);
   playerControl(g, input);

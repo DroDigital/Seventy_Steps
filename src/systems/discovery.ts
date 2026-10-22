@@ -21,6 +21,7 @@ import { startQuest, track } from './quests';
 import { bandIndex, loseSanity } from './sanity';
 import { refreshSeals } from './seals';
 import type { FightAction } from './signatures';
+import { answer, leave } from './vigilCall';
 
 /** The quest of a discovery: its id. */
 export const questOf = (boss: string): string => `discover_${boss}`;
@@ -103,8 +104,11 @@ function keep(g: Game, a: ArenaPlace, i: number, v: Vigil, me: XZ): void {
   const key = `${boss}:${i}`;
   const at = stepPlace(a, v)!;
   const [near, want] = [distXZ(me, at) <= FOUND.vigil, SIM.hz * v.seconds];
+  const held = near && holds(g, v.when);
+  if (near) answer(g, key, v.when, held); // the place calls what it asks (vigilCall.ts; round 65)
+  else leave(g, key);
   const before = st.kept.get(key) ?? 0;
-  const now = near && holds(g, v.when) ? before + 1 : Math.max(0, before - FOUND.ebb);
+  const now = held ? before + 1 : Math.max(0, before - FOUND.ebb);
   if (now === before) return;
   st.kept.set(key, now);
   const share = (n: number): number => Math.min(1, n / want);
@@ -128,8 +132,17 @@ function unready(g: Game, a: ArenaPlace, i: number, s: Vigil | Offer, me: XZ): v
   const key = `${a.bosses[0]}:${i}`;
   if (!at || distXZ(me, at) > (s.kind === 'vigil' ? FOUND.vigil : FOUND.altar) || g.frame - (st.hushed.get(key) ?? -Infinity) < FOUND.hush * SIM.hz) return;
   st.hushed.set(key, g.frame);
-  g.events.emit('Notice', { text: 'NOTHING STIRS HERE YET. SOMETHING IS ASKED FIRST' });
+  const first = DISCOVERIES[a.bosses[0]!]!.steps[currentStep(g, a.bosses[0]!)];
+  g.events.emit('Notice', { text: `NOTHING STIRS HERE YET. ${first ? FIRST[first.kind] : 'SOMETHING IS ASKED FIRST'}` }); // what is asked first (round 65: it said only that something was)
 }
+
+/** What a mark or an altar come to early says is asked first. */
+const FIRST: Readonly<Record<Step['kind'], string>> = {
+  read: 'A PAGE IN THE COURT IS STILL TO BE READ',
+  rite: 'THE LIGHTS OF THE COURT ARE STILL TO BE LIT',
+  vigil: 'A VIGIL IN THE COURT IS STILL TO BE KEPT',
+  offer: 'A GIFT IS STILL TO BE LAID',
+};
 
 /** How much of a vigil is kept, 0..1 (the picture and the sound read it). */
 export function vigilShare(g: Game, boss: string, i: number): number {

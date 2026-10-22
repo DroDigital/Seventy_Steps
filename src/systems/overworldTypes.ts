@@ -35,5 +35,6 @@ export interface Overworld {
   heardAt: number; // the frame the last line was overheard (overheard.ts; not kept in a save)
   places: Set<string>; // the named places found (places.ts; round 18)
   weather: Weather; // what the sky is doing and how much (weather.ts; round 26; not kept in a save: a load opens on clear skies)
+  hurried?: number; // seconds a vigil's place has hurried the night on (vigilCall.ts; round 65; not kept in a save, like the weather)
   told: Set<string>; // what has been told or shown once, and is not again: a rumour of a horror's fall, a wandering sight, a hint of what a second journey changes (round 26)
 }
