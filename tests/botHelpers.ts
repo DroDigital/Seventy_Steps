@@ -4,6 +4,7 @@ import type { Entity } from '../src/core/ecs';
 import { createRng } from '../src/core/rng';
 import { emptyInput, type Button } from '../src/core/input';
 import { ARENA } from '../src/data/arena';
+import { LEVELS, REINFORCE } from '../src/data/tuning';
 import type { Variant } from '../src/data/registry';
 import type { Game } from '../src/systems/components';
 import { fightAction } from '../src/systems/fightActions';
@@ -15,12 +16,12 @@ import { minionsOf } from '../src/systems/specials';
 import { bossGame } from './bossHelpers';
 import { blowIn } from './blowIn';
 
-/** How the bot plays (round 25: a balance bot at the level a person has when they reach a boss). The default is the audits': Might 150, no care in the dodging. */
+/** How the bot plays. Balance runs use the player's expected build; invariant audits default to legal maximum Might and reinforcement. */
 export interface BotStyle {
-  levels?: Partial<Record<'vigour' | 'endurance' | 'might', number>>; // Echoes spent on the curve (else Might 150 alone)
+  levels?: Partial<Record<'vigour' | 'endurance' | 'might', number>>; // Echoes spent on the curve (else capped Might alone)
   reinforced?: number; // levels of star-stones set into the sword-cane
   skill?: number; // 0..1: the share of telegraphed blows it rolls away from, as they are about to land (0: it only rolls now and again)
-  floor?: boolean; // stops when the foe's health is at its floor as well as when it falls (a horror no blade finishes)
+  floor?: boolean; // stops at the last health point as well as at death, for survival-timer balance runs
   smart?: boolean; // it keeps behind a monolith from a gaze that turns flesh to stone, cuts down the spawning roots before the horror, and a servant or a phantom at its elbow
   mind?: boolean; // it keeps its mind as a person is told to (the HUD's call, ui/mindHud.ts: Fractured, a dose left): it drinks Laudanum, which the bot never did, and so was left Unmoored by round 58's harder mind, taking more and striking less for the rest of a fight
   start?: number; // metres from the boss it begins (7)
@@ -28,6 +29,7 @@ export interface BotStyle {
 }
 
 export interface BotFight {
+  health: number; // the foe's maximum health after applying this run's player level
   frames: number; // how many it ran (fewer than asked when the foe fell)
   fell: boolean; // the foe fell within them
   dealt: number; // damage the bot did to the foe
@@ -80,9 +82,10 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   const rng = createRng(77);
   const c = g.ecs.c;
   const me = c.health.get(g.player.id)!;
-  Object.assign(g.player.levels, style.levels ?? { might: 150 });
-  if (style.levels) applyLevels(g);
-  g.player.reinforced[g.player.weapon] = style.reinforced ?? 0;
+  Object.assign(g.player.levels, style.levels ?? { vigour: 0, endurance: 0, might: LEVELS.might.max });
+  applyLevels(g); // refresh player resources and boss scaling together, including in invariant audits
+  const health = c.health.get(boss)?.max ?? 0;
+  g.player.reinforced[g.player.weapon] = style.reinforced ?? (style.levels ? 0 : REINFORCE.max);
   me.hp = me.max = 1e7;
   const brain = c.brain.get(boss);
   if (brain) Object.assign(brain, { state: 'engage', target: g.player.id, cooldown: 0 });
@@ -172,5 +175,5 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   const bad: string[] = [];
   for (const [e, t] of c.transform) if (![t.pos.x, t.pos.y, t.pos.z, t.yaw].every(Number.isFinite)) bad.push(`entity ${e} (${c.model.get(e) ?? '?'}) not a number: ${JSON.stringify(t.pos)}`);
   for (const [e, h] of c.health) if (!Number.isFinite(h.hp) || h.hp < 0 || h.hp > h.max + 1e-6) bad.push(`entity ${e} hp ${h.hp}/${h.max}`);
-  return { frames: frame, fell: frame < frames, dealt, taken, deaths, nearest, bad };
+  return { health, frames: frame, fell: frame < frames, dealt, taken, deaths, nearest, bad };
 }

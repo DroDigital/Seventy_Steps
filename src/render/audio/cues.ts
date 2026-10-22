@@ -40,7 +40,7 @@ type Handlers = { [K in keyof GameEvents]?: (e: GameEvents[K], g: Game) => Cue |
 
 export const CUES: Handlers = {
   Hit: (e, g) => (e.lingering ? null : { sound: HIT[e.outcome], at: at(g, e.target), gain: e.attacker === g.player.id || e.target === g.player.id ? 1 : 0.6 }),
-  Shot: (e, g) => ({ sound: e.shooter === g.player.id ? 'shot' : 'beam', at: { ...e.from } }), // the revolver's bang is the investigator's alone (round 20: a Mi-Go's beam went off like it)
+  Shot: (e, g) => (e.shooter === g.player.id ? { sound: 'shot', at: { ...e.from } } : null), // creature shots use recorded attack audio
   Reloading: (e, g) => ({ sound: 'reload', at: at(g, e.entity) }),
   Reloaded: (e, g) => ({ sound: 'cylinder', at: at(g, e.entity) }),
   DryFire: (e, g) => ({ sound: 'dry', at: at(g, e.entity) }),
@@ -69,13 +69,7 @@ export const CUES: Handlers = {
   Vanquished: () => inside('vanquished'),
   BossEngaged: () => inside('boss'),
   BossPhase: (e) => (e.phase > 0 ? inside('phase') : null),
-  Teleported: (e) => ({ sound: 'teleport', at: { ...e.to } }),
-  Summoned: (e, g) => ({ sound: 'summon', at: at(g, e.entity) }),
-  GazeBurst: () => inside('gaze'),
-  Darkened: () => inside('darkness'),
-  TimeSkipped: () => inside('timeSkip'),
-  BodyStolen: () => inside('stolen'),
-  Rewired: () => inside('rewired'),
+  // Caster effects use recorded attack cues only; wind-ups and mind effects add no synth stings.
   Revealed: () => inside('revealed'),
   LampChanged: (e, g) => ({ sound: e.lit ? 'lampLit' : 'lampOut', at: at(g, e.lamp) }),
   Petrified: () => inside('petrified'),
@@ -84,10 +78,6 @@ export const CUES: Handlers = {
   Title: () => inside('title'),
   Ending: () => inside('ending'),
   Healed: () => inside('healed'),
-  Marked: (e) => ({ sound: 'marked', at: { ...e.at } }),
-  Erupted: (e) => ({ sound: 'erupted', at: { ...e.at } }),
-  Quaked: (e) => ({ sound: 'quaked', at: { ...e.at } }),
-  Swept: (e, g) => ({ sound: 'swept', at: at(g, e.by) }),
   Read: () => inside('page'),
   QuestChanged: () => inside('quest'),
 };

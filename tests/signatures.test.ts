@@ -73,7 +73,7 @@ describe('signature mechanics (spec §3E)', () => {
     expect(fightAction(g)).toBeNull(); // the sprayer is empty
   });
 
-  it('no blade finishes the Dunwich Horror: only the incantation, chanted to its end', () => {
+  it('the Dunwich incantation remains an optional finish, chanted to its end', () => {
     const b = bossGame('dunwich_horror', undefined, 12);
     const { g, boss, fight } = b;
     engage(b);
@@ -82,14 +82,13 @@ describe('signature mechanics (spec §3E)', () => {
     h.hp = h.max * 0.1;
     steps(g, 1);
     expect(fight.phase).toBe(fight.script.phases.length - 1);
-    strike(g, g.player.id, boss, deathblow);
-    expect(h.hp).toBe(1);
+    const wounded = h.hp;
     expect(fightAction(g)?.label).toBe('chant the incantation');
     steps(g, 1, press('interact'));
     steps(g, 60);
     startMove(g.ecs.c.actor.get(g.player.id)!, 'stagger'); // broken off
     steps(g, 200);
-    expect(h.hp).toBe(1);
+    expect(h.hp).toBe(wounded);
     const deaths = record(g, 'Died');
     steps(g, 1, press('interact'));
     steps(g, g.ecs.c.actor.get(g.player.id)!.moves.chant.frames);

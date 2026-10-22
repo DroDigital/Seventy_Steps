@@ -43,11 +43,32 @@ describe('the great old ones (spec §3E)', () => {
     expect(g.world.colliders.length).toBe(walls); // down with the fight's reset (it raises them again when it re-engages)
   });
 
-  it('no blow kills Cthulhu', () => {
+  it('a lethal blow kills Cthulhu normally', () => {
     const b = bossGame('cthulhu', undefined, 20);
     engage(b);
-    strike(b.g, b.g.player.id, b.boss, deathblow);
-    expect(b.g.ecs.c.health.get(b.boss)!.hp).toBe(1);
+    expect(strike(b.g, b.g.player.id, b.boss, deathblow)).toBe('kill');
+    expect(b.g.ecs.c.health.get(b.boss)!.hp).toBe(0);
+    expect(b.fight.engaged).toBe(false);
+  });
+
+  it('a lethal blow while sailing releases the helm and removes the ship', () => {
+    const b = bossGame('cthulhu', undefined, 20);
+    const { g, boss, fight } = b;
+    engage(b);
+    calm(b);
+    g.ecs.c.health.get(boss)!.hp = 1000;
+    steps(g, 1);
+    const ship = fight.props.find((p) => g.ecs.c.prop.get(p)!.kind === 'ship')!;
+    const at = g.ecs.c.transform.get(ship)!.pos;
+    place(g, g.player.id, at.x + 2, at.z, 0);
+    steps(g, 1, press('interact'));
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('helm');
+    const deaths = record(g, 'Died');
+    expect(strike(g, g.player.id, boss, deathblow)).toBe('kill');
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBeNull();
+    expect(g.ecs.c.transform.has(ship)).toBe(false);
+    steps(g, CTHULHU.burst + 10);
+    expect(deaths).toEqual([expect.objectContaining({ entity: boss })]);
   });
 
   it('the Alert comes; at her helm the investigator rams Cthulhu, which bursts, reforms, and sinks with R’lyeh', () => {
