@@ -52,16 +52,27 @@ export interface VolleyDef {
   pool?: PoolDef; // left where it lands
 }
 
+/** What a burst of marked ground is made of (round 70): the picture and the sound of it, and what it leaves. */
+export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt';
+
+/** Where marked ground lies (round 70): in a ring about the target, as a shower over the whole court, in lines out from the attacker, or creeping after the target until it locks. */
+export type MarkPattern = 'ring' | 'rain' | 'spokes' | 'seek';
+
 /** Marked ground (the eruption): spots about the target that burst in turn once their delay runs out. */
 export interface MarksDef {
   frame: number; // the frame they are marked
   count: number;
-  ring: readonly [number, number]; // metres from the target the spots after the first lie (the first is under it)
+  ring: readonly [number, number]; // metres from the target the spots after the first lie (the first is under it); for spokes, from the attacker along each line; for rain, the shower's radius
   delay: number; // frames from the marking to the first burst...
   stagger: number; // ...and between one burst and the next
   radius: number;
   damage: number;
   poise: number;
+  pattern?: MarkPattern;
+  look?: MarkLook;
+  spokes?: number; // how many lines the marks run along (pattern 'spokes')
+  seek?: { speed: number; lock: number }; // m/s it creeps after the target, and the frames before its burst at which it stops (pattern 'seek')
+  leaves?: PoolDef; // what each burst leaves where it fell (flame, for the conflagration)
 }
 
 /** A ring racing out along the ground from the attacker (the quake): roll through it or guard. */
@@ -72,6 +83,20 @@ export interface WaveDef {
   reach: number; // metres before it dies away
   damage: number;
   poise: number;
+  lane?: { half: number; push: number }; // round 70 (the tidal surge): not a ring but a straight wall of water toward the target, this many metres either side of its line, that shoves what it strikes
+}
+
+/** Clouds that rise about the attacker and drift after the target (round 70): a toxic one hurts the body, a dreaming one the mind. */
+export interface CloudDef {
+  frame: number; // the frame they rise
+  count: number;
+  radius: number;
+  life: number; // frames
+  tick: number; // frames between hurts
+  damage: number; // per tick (a dreaming cloud's is none)
+  mind: number; // sanity a second it takes of one within, before the horror's weight (a toxic cloud's is none)
+  drift: number; // m/s toward the target
+  kind: 'toxic' | 'dream';
 }
 
 /** A beam swept across an arc over its window (the sweeping beam): get behind it or roll through it. */
@@ -133,6 +158,7 @@ export interface MoveDef {
   hold?: boolean; // stays on its last frame until the game ends it (death)
   marks?: MarksDef;
   wave?: WaveDef;
+  cloud?: CloudDef;
   sweep?: SweepDef;
   barrage?: BarrageDef;
   pull?: { window: Window; speed: number; range: number }; // draws hostiles in range toward the attacker (m/s)

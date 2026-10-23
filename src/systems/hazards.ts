@@ -7,6 +7,7 @@
 import type { Entity } from '../core/ecs';
 import { distXZ, type XZ } from '../core/geom';
 import type { PoolDef } from '../data/moves';
+import { drift } from './clouds';
 import { hostiles, strike } from './combat';
 import { live } from './targets';
 import type { Combatant, Game } from './components';
@@ -27,7 +28,8 @@ export function hazardSystem(g: Game): void {
       g.ecs.despawn(id);
       continue;
     }
-    if (--h.next > 0) continue;
+    if (h.drift) drift(g, id);
+    if (--h.next > 0 || h.damage <= 0) continue;
     h.next = h.tick;
     const at = transform.get(id)!.pos;
     for (const t of live(g, hostiles(g, h.faction, false, false))) {

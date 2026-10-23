@@ -15,6 +15,7 @@ import { setLock } from '../src/systems/lockOn';
 import { minionsOf } from '../src/systems/specials';
 import { bossGame } from './bossHelpers';
 import { blowIn } from './blowIn';
+import { newLeaving, wayOut } from './cloudBot';
 
 /** How the bot plays. Balance runs use the player's expected build; invariant audits default to legal maximum Might and reinforcement. */
 export interface BotStyle {
@@ -103,6 +104,7 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   let hiding = false;
   const propsOf = (kind: string): Entity[] => (c.fight.get(boss)?.props ?? []).filter((p) => c.prop.get(p)?.kind === kind && (kind !== 'root' || (c.health.get(p)?.hp ?? 0) > 0));
   let held = new Set<Button>();
+  const banks = newLeaving(); // the poison it walks out of
   let dodgeIn = 60;
   let drank = -Infinity;
   let frame = 0;
@@ -138,7 +140,13 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
       const yaw = g.camera.yaw;
       [f.moveY, f.moveX] = d < 0.3 ? [0, 0] : [(dx * Math.sin(yaw) + dz * Math.cos(yaw)) / d, (dx * -Math.cos(yaw) + dz * Math.sin(yaw)) / d];
     }
-    if (!cover && reach < 2.6) {
+    const out = style.skill !== undefined && !cover ? wayOut(g, banks, style.skill, rng) : undefined;
+    if (out) { // a person walks out of a bank of poison, straight, and does not stop to strike
+      const d = Math.hypot(out.x, out.z);
+      const yaw = g.camera.yaw;
+      [f.moveY, f.moveX] = [(out.x * Math.sin(yaw) + out.z * Math.cos(yaw)) / d, (out.x * -Math.cos(yaw) + out.z * Math.sin(yaw)) / d];
+    }
+    if (!cover && !out && reach < 2.6) {
       if (frame % 22 === 0) want.add('light');
       else if (frame % 61 === 0) want.add('heavy');
     }

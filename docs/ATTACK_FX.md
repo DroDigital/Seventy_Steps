@@ -70,6 +70,26 @@ pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own 
 - **Sound** (`data/attackSounds.ts`, `render/audio/attackAudio.ts`): see below.
 - **Camera** (`presence.ts`): `felt()` jolts the camera by distance for a burst, a slam, a phase change and a gaze.
 
+## The new attacks (round 70)
+
+Seven attacks of the tales (`data/attacks.ts`; the rules and who has them: `docs/DECISIONS.md`, round 70). Ground that has a `look` (`MarkLook`:
+`tentacle`, `star`, `flame`, `bolt`) is drawn as that matter whoever strikes it (`matterLook.ts`: a conflagration is orange under every horror, a star pale gold, a
+bolt the storm's blue; only a tentacle keeps the horror's own colours), and sounded by it (`MATTER`: a wet crack, a strike, a gust, thunder).
+
+- **Tidal surge** (`surgeView.ts`): a wall of water as wide as the lane (`wallGeometry`: a breaking wave with a ragged white crest, the world's water texture), run over
+  the ground with spray thrown off its crest. Its lane is drawn on the ground from the first frame of the wind-up (`telegraphs.ts`, a `lane` decal toward the target), and once
+  it runs, the lane stays faint and the band the water holds is bright. A roll through the band slips it; the gurgle and the rumble sound as it leaves.
+- **Tentacles** (`strikeTentacles.ts`): where a `tentacle` mark bursts, a tube of the deep's own centreline (`tentacleShape.ts`, `tentacleMesh.ts`) comes up in a fifth of a second,
+  writhes with its tip curling and sinks, in the horror's ink and light. The creeping mark is the ordinary disc, moving; when it locks it turns white-hot and takes a ring.
+- **Stars and lightning** (`matterFx.ts`): in its last half second a star's mark has a streak of gold come down on it on a slant, sparks behind; lightning is a bolt from the
+  sky (`beams.bolt`, `boltPath`) with a flash.
+- **Flame**: the marks are lines, drawn from the first frame as lanes out from the horror; each leaves a fire (a `fire` hazard), drawn by the flask's flames (`flaskFx.ts`).
+- **Clouds** (`matterFx.ts`): billows (soft, wide, slow wisps) and motes in the bank's colours (`CLOUDS`: bile green with bubbles rising; violet with pale stars adrift), a disc on the
+  ground for its reach, and a puff where it rises. A cloud is not a pool: `fightViews.ts` draws none for it. The dreaming one also raises the anomaly proximity (`fxController.ts`), so
+  the picture warps and the whispers come as they do near a glowing horror.
+- Budgets: a cloud spawns about `radius² x 0.1` billows a frame; a surge about `half x 1.4` spray; a star two streaks a frame for its last thirty. `tests/newAttacks.test.ts`
+  holds the simulation's side, and `tests/bossFx.test.ts` the picture's.
+
 ## What is heard
 
 Each of the blows below is played at its place as its element: a bolt leaving and landing, a burst (and the boom of a

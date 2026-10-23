@@ -11,6 +11,7 @@ import { moveDef } from '../../systems/actions';
 import type { Game } from '../../systems/components';
 import { creatureOf } from '../../systems/creatures';
 import { attackLook, isThemed } from '../attackLook';
+import { MATTER } from '../matterLook';
 import type { GameAudio } from './gameAudio';
 
 type Sample = (set: string, at: V3 | null, options?: Parameters<GameAudio['sampleAt']>[2]) => boolean;
@@ -37,12 +38,21 @@ export function createAttackAudio(g: Game, sampleAt: Sample): void {
   g.events.on('Shot', ({ shooter, to }) => {
     if (shooter !== g.player.id) play(shooter, 'land', to, ATTACK_MIX.landed, RANGE.bolt);
   });
-  g.events.on('Erupted', ({ at, radius, by }) => {
-    play(by, 'burst', at, ATTACK_MIX.burst, RANGE.burst);
+  g.events.on('Erupted', ({ at, radius, by, look }) => {
+    play(by, 'burst', at, ATTACK_MIX.burst * (look ? 0.7 : 1), RANGE.burst);
     sampleAt('boom', at, { gain: 0.35 + 0.08 * radius, pitch: 0.75 + 0.1 * Math.random(), range: RANGE.burst });
+    if (look) sampleAt(MATTER[look].sound, at, { gain: MATTER[look].gain, pitch: 0.85 + 0.2 * Math.random(), range: RANGE.burst }); // (round 70: a tentacle's wet crack, a star's strike, a gust of flame, thunder)
   });
-  g.events.on('Quaked', ({ at, by }) => {
+  g.events.on('Quaked', ({ at, by, lane }) => {
     play(by, 'burst', at, ATTACK_MIX.burst * 0.9, RANGE.burst);
+    if (lane) {
+      sampleAt('gurgle', at, { gain: 0.8, pitch: 0.7, range: RANGE.burst }); // the sea gathering itself, and the roar of it
+      sampleAt('rumble', at, { gain: 0.6, pitch: 0.8, range: RANGE.burst });
+    }
+  });
+  g.events.on('Clouded', ({ at, by, kind }) => {
+    play(by, 'burst', at, ATTACK_MIX.burst * 0.5, RANGE.burst);
+    sampleAt(kind === 'toxic' ? 'hiss' : 'whisper', at, { gain: 0.6, pitch: kind === 'toxic' ? 0.8 : 0.7, range: RANGE.burst });
   });
   g.events.on('Swung', ({ entity, at }) => {
     const a = c.actor.get(entity);

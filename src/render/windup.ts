@@ -18,6 +18,7 @@ export function releaseFrame(def: MoveDef): number | undefined {
   if (def.marks) return def.marks.frame;
   if (def.pool) return def.pool.frame;
   if (def.wave) return def.wave.frame;
+  if (def.cloud) return def.cloud.frame;
   if (def.effect && def.effect.kind !== 'teleport') return def.effect.window[0];
   return undefined;
 }
