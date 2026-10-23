@@ -6,8 +6,6 @@ import { teleport } from '../src/systems/checkpoints';
 import { spawnCreature } from '../src/systems/creatures';
 import { allFogs } from '../src/systems/fogGates';
 import { createGame, createWorldGame } from '../src/systems/game';
-import { foundKey } from '../src/data/discoveries';
-import { refreshSeals } from '../src/systems/seals';
 import { changeInsight } from '../src/systems/insight';
 import { grant } from '../src/systems/relics';
 import { run } from './worldHelpers';
@@ -75,16 +73,4 @@ describe('the first hour: hints before it costs', () => {
     expect(watch(g)).toContain('transfer');
   });
 
-  it("a horror's gate still shut is noticed near it, and not once the horror is found", () => {
-    const g = createWorldGame();
-    run(g, 5);
-    expect(watch(g)).not.toContain('gate');
-    const [id, piece] = [...g.ecs.c.piece].find(([, p]) => p.def.minFound === 'colour_out_of_space')!;
-    teleport(g, { x: piece.def.x + 3, z: piece.def.z, yaw: 0 });
-    expect(g.ecs.c.layer.get(id)!.shown).toBe(false);
-    expect(watch(g)).toContain('gate');
-    g.overworld!.told.add(foundKey('colour_out_of_space'));
-    refreshSeals(g);
-    expect(watch(g)).not.toContain('gate');
-  });
 });

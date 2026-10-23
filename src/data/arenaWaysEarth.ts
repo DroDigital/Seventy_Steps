@@ -5,7 +5,7 @@
  * the fog back toward the road (a way is 120 m at the least); sides are to the left walking in. Data only.
  */
 
-import { mark, piece, spot, type Way } from './arenaWays';
+import { mark, piece, type Way } from './arenaWays';
 
 export const EARTH_WAYS: Readonly<Record<string, Way>> = {
   // The Gardners' lane through the blasted heath: grey grass that does not move, trees dead standing, the fallen star's shards giving
@@ -25,7 +25,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 84, words: 'NOTHING SINGS HERE. NOTHING HAS NESTED FOR YEARS', sound: 'whisper', pitch: 0.55 },
       { at: 40, words: 'THE LIGHT IN THE WELL IS OF NO COLOUR A MAN HAS A NAME FOR', sound: 'wail', shake: 0.05, pitch: 0.5 },
     ],
-    rite: { look: 'lamp', glow: 'magenta', at: [spot(62, 4.5), spot(58, -4), spot(54, 6.5), spot(50, -6)], order: 'rising', clue: 'FOUR LANTERNS OF THE FAMILY. THEY WENT OUT ONE BY ONE, THE LEAST BEFORE THE GREATEST', done: 'THE LANTERNS BURN STEADY, AND THE GREY LETS GO OF THE GROUND', reward: { echoes: 600, insight: 1 }, stills: true },
   },
   // The sabbat's path up the ravine: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
   // in the open ground; the fires are laid in a ring; three black candles are to be lit, least first.
@@ -47,7 +46,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 80, words: 'THE WOODS LISTEN. A DRUM, VERY SLOW, UNDER THE LEAVES', sound: 'chant', pitch: 0.5 },
       { at: 44, words: 'THE FIRES ARE LAID IN A RING. THE RING IS NOT EMPTY', sound: 'whisper', pitch: 0.55, shake: 0.04 },
     ],
-    rite: { look: 'candle', glow: 'purple', at: [spot(80, 5.5), spot(76, -6), spot(72, 4)], order: 'rising', clue: 'THREE BLACK CANDLES FOR THE COVEN. LIGHT THE LEAST BEFORE THE GREATEST', done: 'THE COVEN IS SATISFIED. THE WITCH-FIRES SETTLE', reward: { echoes: 500 }, stills: true },
   },
   // The black grove's road: trees that fork like horns, skulls on stakes, fungus as tall as a man.
   shub_niggurath: {
@@ -136,7 +134,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 66, words: 'THE AIR TASTES OF IRON, AS IT DOES BEFORE A STORM', sound: 'thunder', shake: 0.04, pitch: 0.6 },
       { at: 36, words: 'A ROD STANDS ON THE ROOF, AND IT IS NOT THERE FOR THE WEATHER', sound: 'thunder', pitch: 0.5 },
     ],
-    rite: { look: 'lamp', glow: 'purple', at: [spot(104, 3.5), spot(96, -3.5), spot(88, 3.5), spot(80, -3.5)], order: 'near', clue: 'FOUR LAMPS THAT DO NOT BURN. LIGHT THEM FROM THE ROAD TO THE HOUSE, AS THE FAMILY CAME HOME', done: 'THE LAMPS BURN, AND THE ROD ON THE ROOF HAS NOTHING TO ANSWER', reward: { echoes: 600, insight: 1 }, stills: true },
   },
   // The avenue of the sphinxes: pairs of them, facing the way you came, obelisks and broken columns, sand that holds the heat of a sun
   // that has set; four braziers to be lit, the greatest first, as the stars set.
@@ -157,7 +154,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 96, words: 'THE AVENUE WAS BUILT FOR SOMETHING THAT WALKED IT', sound: 'bellow', shake: 0.05, pitch: 0.5 },
       { at: 54, words: 'THE SPHINXES FACE THE WAY YOU CAME. NONE OF THEM FACES THE PYRAMID', sound: 'whisper', pitch: 0.55 },
     ],
-    rite: { look: 'brazier', glow: 'magenta', at: [spot(100, 8.5), spot(96, -8.5), spot(92, 9.5), spot(88, -9.5)], order: 'falling', clue: 'FOUR BRAZIERS BEFORE THE AVENUE. THE STARS SET FROM THE GREATEST TO THE LEAST: LIGHT THEM SO', done: 'THE BRAZIERS BURN, AND THE WIND LAYS DOWN THE SAND', reward: { echoes: 700, insight: 1 }, stills: true },
   },
   // The serpent road: totems, shed skins that are rocks, bones of those who went before, a dry rattling.
   yig: {
@@ -188,7 +184,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 80, words: 'RED LIGHT, FROM BELOW. THE STAIR GOES DOWN INTO IT', sound: 'whale', shake: 0.05, pitch: 0.55 },
       { at: 46, words: 'SOMETHING THAT WAS WORSHIPPED BEFORE THE FIRST MAN STIRS', sound: 'bellow', shake: 0.08, pitch: 0.45 },
     ],
-    rite: { look: 'fire', glow: 'magenta', at: [spot(100, 5.5), spot(94, -6), spot(88, 5)], order: 'falling', clue: 'THREE FIRES FOR THE THREE LAYERS OF THE MOUND. THE DEEPEST BURNS FIRST', done: 'THE FIRES SETTLE. THE MOUND DRAWS A LONG BREATH', reward: { echoes: 700 }, stills: true },
   },
   // The shore of Ib: lilies on black water, the carved stones of a drowned people with their faces to the lake, a canoe drawn up, reeds;
   // four green fires to be lit as the water rises, the small to the great.
@@ -205,7 +200,6 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 72, words: 'THE STONES IN THE SHALLOWS ARE CARVED. THEIR FACES ARE ALL TURNED TO THE WATER', sound: 'chant', pitch: 0.55 },
       { at: 40, words: 'SOMETHING GREEN WAKES, UNDER THE LILIES', sound: 'whale', shake: 0.05, pitch: 0.5 },
     ],
-    rite: { look: 'glow', glow: 'green', at: [spot(88, 5), spot(84, -5.5), spot(80, 6), spot(76, -6)], order: 'rising', clue: 'FOUR GREEN FIRES OF IB. LIGHT THEM AS THE WATER RISES: THE SMALL BEFORE THE GREAT', done: 'THE LAKE LAYS ITS SWELLS DOWN. IT HAS BEEN ANSWERED', reward: { echoes: 700, insight: 1 }, stills: true },
   },
   // Hatheg-Kla's slope: snow pines, rings of stone, a cloud on the peak that dances to a pipe.
   other_gods: {

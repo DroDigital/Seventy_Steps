@@ -3,7 +3,7 @@
  * terraces of Yaddith, the pipers' and the Gate's. Distances are metres from the fog back toward the road. Data only.
  */
 
-import { mark, piece, spot, type Way } from './arenaWays';
+import { mark, piece, type Way } from './arenaWays';
 
 export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The causeway of the drowned city: slabs leaning at wrong angles, green light in the stone;
@@ -20,7 +20,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 90, words: 'GREEN LIGHT, IN THE STONE. THE STONE IS LOOKING', sound: 'wail', shake: 0.05, pitch: 0.5 },
       { at: 54, words: 'THE DOOR IS SHUT, AND IT IS NOT STONE THAT HOLDS IT SHUT', sound: 'bellow', shake: 0.07, pitch: 0.45 },
     ],
-    rite: { look: 'fire', glow: 'green', at: [spot(104, 6), spot(100, -6.5), spot(96, 7), spot(92, -7.5)], order: 'rising', clue: 'FOUR LAMPS OF THE ALERT. THE LOW BEFORE THE HIGH, AS THE SEA GIVES THEM BACK', done: 'THE LAMPS BURN GREEN, AND THE SEA DRAWS BACK FROM THE CAUSEWAY', reward: { echoes: 900, insight: 1 }, stills: true },
   },
   // The road to Carcosa: tattered banners from towers no one built, lamps lit for no one, a pallid mask watching; the Yellow Sign is laid
   // in the paving.
@@ -53,7 +52,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 100, words: 'THE KEY AND THE GATE ARE ONE THING', sound: 'choral', shake: 0.05, pitch: 0.45 },
       { at: 56, words: 'THE STARS ARE COMING DOWN TO LOOK', sound: 'thunder', shake: 0.06, pitch: 0.5 },
     ],
-    rite: { look: 'glow', glow: 'purple', at: [spot(130, 4.5), spot(122, -4.5), spot(114, 4.5), spot(106, -4.5)], order: 'near', clue: 'FOUR LIGHTS ON THE THRESHOLD. LIGHT THEM FROM THE ROAD INWARD, AS ONE COMES', done: 'THE LIGHTS HOLD, AND THE STARS STOP COMING DOWN', reward: { echoes: 1000, insight: 1 }, stills: true },
   },
   // The road to the Court: pipes set along it, cones of the void, a piping with no tune.
   azathoth: {
@@ -92,7 +90,6 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 76, words: 'THE NOTES HANG IN THE AIR, WHERE YOU CAN SEE THEM', sound: 'whisper', pitch: 0.6 },
       { at: 42, words: 'THEY PLAY FOR THE ONE AT THE CENTRE, WHO DOES NOT KNOW IT', sound: 'wail', shake: 0.04, pitch: 0.5 },
     ],
-    rite: { look: 'glow', glow: 'purple', at: [spot(98, 5), spot(94, -5.5), spot(90, 6), spot(86, -6)], order: 'falling', clue: 'FOUR LIGHTS FOR FOUR PIPES. THE GREAT NOTE BEFORE THE SMALL', done: 'THE PIPES FALL SILENT, ONE BY ONE', reward: { echoes: 900, insight: 1 }, stills: true },
   },
   // The pale hexagons: pedestals of light along a way that is itself a hexagon of light; the Gate at its far side.
   ancient_ones: {
