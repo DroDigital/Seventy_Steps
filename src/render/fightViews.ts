@@ -126,7 +126,7 @@ export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
   function sync(): void {
     const c = g.ecs.c;
     for (const [id, h] of c.hazard) {
-      if (views.has(id)) continue;
+      if (views.has(id) || h.cloud) continue; // (a cloud is billows of particles, render/matterFx.ts, not a pool)
       const p = c.transform.get(id)!.pos;
       const who = creatureOf(g, h.owner)?.id;
       const look = aoeLook(who);

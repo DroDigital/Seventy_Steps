@@ -22,6 +22,10 @@ export function nearestAnomaly(g: Game, from: V3): number {
   for (const [id, d] of dread) if (d.glow && !isAbsent(g, id)) near(id);
   for (const id of drop.keys()) near(id);
   for (const id of piece.keys()) if (layer.get(id)?.shown) near(id);
+  for (const [id, h] of g.ecs.c.hazard) { // round 70: a bank of dream (the hallucinogenic cloud) brings the wrong stars and the whispers down about whoever stands in it
+    const p = h.cloud === 'dream' ? transform.get(id)?.pos : undefined;
+    if (p) best = Math.max(best, Math.min(1, Math.max(0, 1 - Math.hypot(from.x - p.x, from.z - p.z) / (h.radius * 1.4))) * Math.min(1, h.life / 40));
+  }
   return best;
 }
 

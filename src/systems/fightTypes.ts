@@ -2,7 +2,7 @@
 
 import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
-import type { PoolDef } from '../data/moves';
+import type { MarkLook, PoolDef } from '../data/moves';
 import type { ArenaChange, BossScript, RealityHook } from '../data/schema';
 import type { Collider } from '../world/colliders';
 
@@ -65,6 +65,10 @@ export interface Hazard {
   life: number; // frames left
   next: number; // frames to the next tick
   fire?: boolean; // burning oil (round 12)
+  cloud?: 'toxic' | 'dream'; // round 70: a bank of air that drifts after its target, drawn as a cloud and not as a pool
+  drift?: number; // metres a frame it creeps toward its owner's target
+  mind?: number; // sanity a second it takes of the investigator within it (before the horror's weight)
+  total?: number; // its life when it rose (the picture swells in and thins out over it)
 }
 
 /** A marked spot on the ground (the eruption): it bursts once its delay runs out. */
@@ -76,6 +80,9 @@ export interface Mark {
   total: number; // ...out of this many (the telegraph fills over them)
   damage: number;
   poise: number;
+  look?: MarkLook; // round 70: what rises or falls here (the picture, the sound)
+  leaves?: PoolDef; // and what it leaves where it fell
+  seek?: { speed: number; lock: number; target: Entity }; // it creeps after its target until `lock` frames remain, and holds
 }
 
 /** A ring racing out along the ground from where it was loosed (the quake). */
@@ -89,6 +96,7 @@ export interface Wave {
   damage: number;
   poise: number;
   struck: Entity[]; // each body it passes it strikes once
+  lane?: { dx: number; dz: number; half: number; push: number }; // round 70 (the tidal surge): a straight wall along this line instead of a ring
 }
 
 /** The world as the bosses' reality hooks bend it (spec §3E); the renderer and HUD read it. */

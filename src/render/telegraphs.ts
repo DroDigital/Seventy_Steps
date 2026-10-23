@@ -16,6 +16,7 @@ import { targetOf } from '../systems/specials';
 import { creatureOf } from '../systems/creatures';
 import { aoeLook } from './aoeLook';
 import { attackLook } from './attackLook';
+import { CLOUDS, matterLook } from './matterLook';
 import type { Decals } from './decals';
 import type { GroundFx } from './groundFx';
 
@@ -73,10 +74,20 @@ export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Tel
     if (def.pool && frame < def.pool.frame && tp) decals.disc(tp.x, tp.y, tp.z, def.pool.radius, frame / def.pool.frame, DANGER);
     const m = def.marks;
     if (m && frame < m.frame && tp) {
-      decals.disc(tp.x, tp.y, tp.z, m.radius, frame / m.frame, DANGER);
-      decals.ring(tp.x, tp.y, tp.z, m.ring[1] + m.radius, 0.3, DANGER, 0.5);
+      const mark = m.look ? matterLook(attackLook(g, id), m.look).danger : DANGER; // (a conflagration is orange under every horror)
+      if (m.pattern === 'spokes') { // the lines the fire will run along, from the horror toward the target and round
+        const n = m.spokes ?? 3;
+        for (let s = 0; s < n; s++) decals.lane(p.x, p.y, p.z, toward + (s / n) * Math.PI * 2, body + m.ring[1] + m.radius, m.radius, frame / m.frame, mark, 0.8);
+      } else {
+        decals.disc(tp.x, tp.y, tp.z, m.radius, frame / m.frame, mark);
+        decals.ring(tp.x, tp.y, tp.z, m.ring[1] + m.radius, 0.3, mark, 0.5);
+      }
     }
-    if (def.wave && frame < def.wave.frame) decals.ring(p.x, p.y, p.z, body + 0.6 + 2.4 * (frame / def.wave.frame), 0.35, RING, 0.9);
+    const wv = def.wave;
+    if (wv?.lane && frame < wv.frame) decals.lane(p.x, p.y, p.z, toward, wv.reach, wv.lane.half, frame / wv.frame, RING, 0.9); // the lane the water will take
+    else if (wv && frame < wv.frame) decals.ring(p.x, p.y, p.z, body + 0.6 + 2.4 * (frame / wv.frame), 0.35, RING, 0.9);
+    const cl = def.cloud;
+    if (cl && frame < cl.frame) decals.swirl(p.x, p.y, p.z, body + cl.radius * 1.6, CLOUDS[cl.kind].billow[0], 0.7);
     const sw = def.sweep;
     if (sw && frame < sw.window[0]) { // the arc it will cross, and where it starts (the beam itself shows as it sweeps)
       decals.sector(p.x, p.y, p.z, yaw, sw.length, sw.arc, frame / sw.window[0], LINE, 0.6);
@@ -113,13 +124,27 @@ export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Tel
         const p = c.transform.get(e)?.pos;
         if (!p) continue;
         decals.style(aoeLook(creatureOf(g, mk.owner)?.id));
-        decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, attackLook(g, mk.owner).danger);
+        const look = matterLook(attackLook(g, mk.owner), mk.look);
+        const locked = mk.seek && mk.delay <= mk.seek.lock; // a creeping mark that has stopped: the moment to roll
+        decals.disc(p.x, p.y, p.z, mk.radius, 1 - (mk.delay - alpha) / mk.total, locked ? look.core : look.danger);
+        if (locked) decals.ring(p.x, p.y, p.z, mk.radius + 0.25, 0.3, look.core, 1);
       }
       for (const [e, w] of c.wave) {
         const p = c.transform.get(e)?.pos;
         if (!p) continue;
         decals.style(aoeLook(creatureOf(g, w.owner)?.id));
-        decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, attackLook(g, w.owner).ring);
+        const ring = attackLook(g, w.owner).ring;
+        const l = w.lane;
+        if (l) { // the lane, faint, and the band the water holds, bright
+          const yaw = Math.atan2(l.dx, l.dz);
+          const r = w.r + w.speed * alpha;
+          decals.lane(p.x, p.y, p.z, yaw, w.reach, l.half, 1, ring, 0.3);
+          decals.lane(p.x + l.dx * (r - w.width), p.y, p.z + l.dz * (r - w.width), yaw, w.width + 0.6, l.half, 1, ring, 1);
+        } else decals.ring(p.x, p.y, p.z, w.r + w.speed * alpha, w.width, ring);
+      }
+      for (const [e, h] of c.hazard) { // the reach of a cloud, faint, on the ground under it
+        const p = h.cloud && c.transform.get(e)?.pos;
+        if (p) decals.disc(p.x, p.y, p.z, h.radius, 1, CLOUDS[h.cloud!].billow[0], 0.28);
       }
       ground.draw(decals, time);
       decals.end(time);

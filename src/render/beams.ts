@@ -9,8 +9,10 @@
 
 import * as THREE from 'three';
 import type { V3 } from '../core/geom';
+import { BEAM_PATTERNS, BEAM_STYLES } from '../data/beamStyles';
 import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
+import { creatureOf } from '../systems/creatures';
 import { beamLine } from '../systems/strikes';
 import { attackLook } from './attackLook';
 import { FEEL } from './feel';
@@ -36,12 +38,12 @@ uniform float uFogFar;
 attribute vec4 aColor;
 attribute vec3 aCore;
 attribute vec2 aAcross; // x: -1..1 across the ribbon; y: metres along it from its source
-attribute vec2 aStyle; // x: how much of the fog's colour it takes at a distance (a beam a half, a bolt of lightning none); y: how much of its width is white-hot (a beam an eighth, a bolt a third)
+attribute vec3 aStyle; // z: the pattern drawn in it (data/beamStyles.ts); x: how much of the fog's colour it takes at a distance (a beam a half, a bolt of lightning none); y: how much of its width is white-hot (a beam an eighth, a bolt a third)
 varying vec4 vColor;
 varying vec3 vCore;
 varying vec2 vAcross;
 varying float vFog;
-varying vec2 vStyle;
+varying vec3 vStyle;
 void main() {
   vStyle = aStyle;
   vColor = aColor;
@@ -61,7 +63,7 @@ varying vec4 vColor;
 varying vec3 vCore;
 varying vec2 vAcross;
 varying float vFog;
-varying vec2 vStyle;
+varying vec3 vStyle;
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
@@ -69,15 +71,40 @@ float bayer4(vec2 p) {
 }
 void main() {
   float along = vAcross.y;
+  float x = vAcross.x;
+  float pat = vStyle.z;
   float rag = 0.09 * sin(along * 7.3 - uTime * 41.0) + 0.06 * sin(along * 13.1 + uTime * 57.0);
-  float d = clamp(abs(vAcross.x) + rag * abs(vAcross.x), 0.0, 1.0);
+  float beads = 1.0;
+  if (pat > 0.5 && pat < 1.5) { // braid: two strands that cross
+    float ph = along * 2.2 - uTime * 8.0;
+    x = min(abs(x - 0.55 * sin(ph)), abs(x + 0.55 * sin(ph))) * 2.1;
+  } else if (pat > 1.5 && pat < 2.5) { // beads: marks running out along it
+    beads = 0.18 + 0.82 * smoothstep(0.35, 0.85, sin(along * 2.4 - uTime * 15.0));
+  } else if (pat > 2.5 && pat < 3.5) { // arc: a crackle that jumps
+    x += 0.5 * sin(along * 5.1 + uTime * 61.0) * sin(along * 2.3 - uTime * 43.0);
+    rag *= 3.0;
+  } else if (pat > 3.5 && pat < 4.5) { // wave: one fat strand that swims
+    x = (x - 0.5 * sin(along * 0.8 - uTime * 4.5)) * 1.5;
+  } else if (pat > 5.5 && pat < 6.5) { // flame: a tongue that licks
+    rag = 0.3 * sin(along * 3.1 - uTime * 33.0) + 0.2 * sin(along * 7.7 + uTime * 47.0);
+  } else if (pat > 6.5 && pat < 7.5) { // frost: dashes of ice
+    beads = step(0.3, fract(along * 0.7 - uTime * 1.5)) * (0.7 + 0.3 * sin(along * 30.0));
+  }
+  float d = clamp(abs(x) + rag * abs(x), 0.0, 1.0);
   float run = 0.5 + 0.5 * sin(along * 1.1 - uTime * 16.0); // energy running out from the source
   float breath = 0.82 + 0.18 * sin(uTime * 23.0 + along * 0.4);
   float core = (1.0 - smoothstep(vStyle.y, vStyle.y + 0.22, d)) * breath;
   float glow = pow(1.0 - d, 1.6) * (0.65 + 0.35 * run);
-  float a = vColor.a * max(core, glow);
+  float a = vColor.a * max(core, glow) * beads;
   if (a < bayer4(gl_FragCoord.xy)) discard;
-  vec3 c = mix(vColor.rgb * (0.9 + 0.35 * run), vCore, core);
+  vec3 tint = vColor.rgb * (0.9 + 0.35 * run);
+  vec3 c = mix(tint, vCore, core);
+  if (pat > 4.5 && pat < 5.5) { // prism: bands of colour across it
+    float k = vAcross.x * 7.0 + uTime * 5.0;
+    vec3 band = 0.5 + 0.5 * vec3(sin(k), sin(k + 2.1), sin(k + 4.2));
+    c = mix(mix(tint, band, 0.55), vCore, core * 0.7);
+  } else if (pat > 5.5 && pat < 6.5) c = mix(tint * vec3(1.0, 0.62, 0.38), vCore, core); // flame: red at its edge
+  else if (pat > 7.5) c = mix(tint, vec3(0.02, 0.01, 0.04), core * 0.9); // void: a dark core
   gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount * vStyle.x), 1.0);
 }
 `;
@@ -88,7 +115,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   const col = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 4), 4).setUsage(THREE.DynamicDrawUsage);
   const core = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 3), 3).setUsage(THREE.DynamicDrawUsage);
   const across = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 2), 2).setUsage(THREE.DynamicDrawUsage);
-  const style = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 2), 2).setUsage(THREE.DynamicDrawUsage);
+  const style = new THREE.BufferAttribute(new Float32Array(CAPACITY * 4 * 3), 3).setUsage(THREE.DynamicDrawUsage);
   const index: number[] = [];
   for (let i = 0; i < CAPACITY; i++) index.push(i * 4, i * 4 + 1, i * 4 + 2, i * 4 + 2, i * 4 + 1, i * 4 + 3);
   geo.setAttribute('position', pos);
@@ -102,19 +129,21 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
   mesh.frustumCulled = false;
   scene.add(mesh);
 
-  const flashes: { from: V3; to: V3; at: number; color: Rgb; core: Rgb }[] = [];
+  const flashes: { from: V3; to: V3; at: number; color: Rgb; core: Rgb; pat: number }[] = [];
   const bolts: { path: BoltPath; at: number; life: number; width: number; color: Rgb; core: Rgb }[] = [];
   let now = 0;
   g.events.on('Shot', ({ shooter, from, to }) => {
-    if (shooter !== g.player.id) flashes.push({ from: { ...from }, to: { ...to }, at: now, color: attackLook(g, shooter).line, core: attackLook(g, shooter).core });
+    if (shooter !== g.player.id) flashes.push({ from: { ...from }, to: { ...to }, at: now, color: attackLook(g, shooter).line, core: attackLook(g, shooter).core, pat: patternOf(shooter) });
   });
+
+  const patternOf = (id: number): number => BEAM_PATTERNS.indexOf(BEAM_STYLES[creatureOf(g, id)?.id ?? ''] ?? 'plain');
 
   const eye = new THREE.Vector3();
   const dir = new THREE.Vector3();
   const side = new THREE.Vector3();
   const view = new THREE.Vector3();
   let n = 0;
-  const ribbon = (a: V3, b: V3, width: number, color: Rgb, white: Rgb, alpha: number, mix = 0.5, hot = 0.08): void => {
+  const ribbon = (a: V3, b: V3, width: number, color: Rgb, white: Rgb, alpha: number, mix = 0.5, hot = 0.08, pat = 0): void => {
     if (n >= CAPACITY) return;
     dir.set(b.x - a.x, b.y - a.y, b.z - a.z);
     const length = dir.length();
@@ -130,14 +159,14 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
       col.setXYZW(k + i, color[0], color[1], color[2], alpha);
       core.setXYZ(k + i, white[0], white[1], white[2]);
       across.setXY(k + i, i % 2 === 0 ? -1 : 1, i < 2 ? 0 : length);
-      style.setXY(k + i, mix, hot);
+      style.setXYZ(k + i, mix, hot, pat);
     }
     n++;
   };
   /** A beam's two ribbons: its aura, wide and faint, and the beam. */
-  const beam = (a: V3, b: V3, width: number, look: { line: Rgb; core: Rgb }, alpha: number, mix = 0.5, hot = 0.08): void => {
-    ribbon(a, b, width * 2.8, look.line, look.core, alpha * (hot > 0.2 ? 0.6 : 0.45), mix, hot);
-    ribbon(a, b, width, look.line, look.core, alpha, mix, hot);
+  const beam = (a: V3, b: V3, width: number, look: { line: Rgb; core: Rgb }, alpha: number, mix = 0.5, hot = 0.08, pat = 0): void => {
+    ribbon(a, b, width * 2.8, look.line, look.core, alpha * (hot > 0.2 ? 0.6 : 0.45), mix, hot, pat);
+    ribbon(a, b, width, look.line, look.core, alpha, mix, hot, pat);
   };
   /** How wide a beam is drawn: its own width, or at a distance the width that keeps it on the screen (from the nearer of its ends, and its middle). */
   const seen = (a: V3, b: V3, width: number): number => {
@@ -161,7 +190,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
         const { from, to } = beamLine(g, id, sw, a.frame + alpha);
         const flicker = 0.85 + 0.15 * Math.sin(time * 70 + id);
         const into = Math.min(1, (a.frame + alpha - sw.window[0]) / 6); // it opens over a tenth of a second, from a thread to its width
-        beam(from, to, seen(from, to, (1.05 * sw.width + 0.6) * (0.35 + 0.65 * into)), attackLook(g, id), flicker, 0.4, 0.12);
+        beam(from, to, seen(from, to, (1.05 * sw.width + 0.6) * (0.35 + 0.65 * into)), attackLook(g, id), flicker, 0.4, 0.12, patternOf(id));
       }
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i];
@@ -171,7 +200,7 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
           continue;
         }
         const thin = t < HOLD ? 0 : (t - HOLD) / (1 - HOLD); // full, then thinning to a thread as it fades
-        beam(f.from, f.to, seen(f.from, f.to, 1.5 * (1 - thin) + 0.18), { line: f.color, core: f.core }, 1 - thin * thin, 0.4, 0.14);
+        beam(f.from, f.to, seen(f.from, f.to, 1.5 * (1 - thin) + 0.18), { line: f.color, core: f.core }, 1 - thin * thin, 0.4, 0.14, f.pat);
       }
       for (let i = bolts.length - 1; i >= 0; i--) {
         const b = bolts[i]!;

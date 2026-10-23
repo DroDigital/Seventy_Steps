@@ -52,7 +52,7 @@ export const strideAt = (speed: number): number => {
 };
 
 /** The frame a creature's attack lands, its bolt leaves or its roar begins: where its own sound is heard (round 20). */
-export const strikeFrame = (def: MoveDef): number | undefined => def.hit?.window[0] ?? def.volley?.frame ?? def.pool?.frame ?? def.marks?.frame ?? def.wave?.frame ?? def.sanity?.window[0];
+export const strikeFrame = (def: MoveDef): number | undefined => def.hit?.window[0] ?? def.volley?.frame ?? def.pool?.frame ?? def.marks?.frame ?? def.wave?.frame ?? def.cloud?.frame ?? def.sanity?.window[0];
 
 /** How the attack `move` of creature `rosterId` sounds as it lands: the creature's own, else the attack library's, else nothing beyond the whoosh. */
 export function attackSound(rosterId: string | undefined, move: string): AttackSound | undefined {

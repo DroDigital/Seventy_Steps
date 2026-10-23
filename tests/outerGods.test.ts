@@ -93,7 +93,7 @@ describe('the outer gods (spec §3E)', () => {
   it('in the world Nyarlathotep borrows from the bosses slain, and watches when a region boss falls', () => {
     const g = createWorldGame();
     g.overworld!.slain = new Set(['boss:cthulhu', 'boss:ghatanothoa']);
-    expect(borrowed(g)).toEqual(expect.arrayContaining(['tentacle_burst', 'slam', 'gaze']));
+    expect(borrowed(g)).toEqual(expect.arrayContaining(['tentacle_burst', 'slam', 'tidal_surge']));
     const s = worldLayout().spawns.find((x) => x.id === 'boss:colour_out_of_space')!;
     goTo(g, s.at.x, s.at.z + 12);
     run(g, 5);

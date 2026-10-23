@@ -18,6 +18,7 @@ import { isAbsent, type Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { beamLine } from '../systems/strikes';
 import { attackLook } from './attackLook';
+import { matterLook } from './matterLook';
 import { burst, charge, column, ELEMENTS, flash, impact, trail } from './fxKit';
 import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
@@ -76,9 +77,9 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const floor = g.world.ground(to.x, to.z);
     if (to.y - floor < 2) ground.scar({ x: to.x, y: floor, z: to.z }, 1.6, look.line, whoIs(shooter), 6);
   });
-  g.events.on('Erupted', ({ at, radius, by }) => {
-    const { look, el } = style(by);
-    burst(fx, el, at, radius, look);
+  g.events.on('Erupted', ({ at, radius, by, look: kind }) => { // (round 70: ground with a look is flame, a star, a bolt or a tentacle, whoever strikes it)
+    const look = matterLook(attackLook(g, by), kind);
+    burst(fx, ELEMENTS[look.motif], at, radius, look);
     ground.scar(at, radius * 1.1, look.line, whoIs(by), 10);
     ground.shock(at, radius * 0.5, radius * 2.4, look.ring, whoIs(by), 0.5, 0.9 + radius * 0.2);
   });
@@ -206,6 +207,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         }
       }
       for (const [e, w] of c.wave) {
+        if (w.lane) continue; // a wall of water throws its own spray (surgeView.ts)
         const p = c.transform.get(e)!.pos;
         const { look, el } = style(w.owner);
         const r = w.r + w.speed * alpha;

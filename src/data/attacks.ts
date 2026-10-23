@@ -7,7 +7,7 @@
  * systems/specials.ts. The beam stays a hitscan ray.
  */
 
-import type { EffectKind, MoveDef } from './moves';
+import type { CloudDef, EffectKind, MarkLook, MarkPattern, MoveDef } from './moves';
 import type { AttackId, Stats } from './schema';
 
 export interface AttackDef {
@@ -30,8 +30,9 @@ export interface AttackDef {
   unblockable?: boolean;
   sanity?: number; // sanity damage = sanity × stats.sanityDamage, over the active frames
   effect?: EffectKind;
-  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number }; // the eruption (see MarksDef)
-  wave?: { speed: number; width: number; reach: number }; // the quake (see WaveDef)
+  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
+  wave?: { speed: number; width: number; reach: number; lane?: { half: number; push: number } }; // the quake (see WaveDef)
+  cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
   sweep?: { arc: readonly [number, number]; length: number; width: number }; // the sweeping beam, over the active frames
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
@@ -77,10 +78,22 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   // round 60: a god's one heavy blow, held a full second before it falls and slow to recover from (asked whether the gods were now too easy: their heaviest blows had come down to 14-18% of a person's health)
   crushing_blow: melee({ windup: 60, active: 6, recovery: 30, power: 2.4, poise: 2.6, range: [0, 2.8], reach: 1.6, radius: 1, height: 0.4, arc: [0, 0] }),
   great_mark: { kind: 'area', windup: 30, active: 1, recovery: 40, power: 2.4, poise: 2.4, range: [0, 22], marks: { count: 1, ring: [0, 0], delay: 48, stagger: 0, radius: 1.5 } }, // the same from afar: one mark under them, falling 1.3 s after the cast begins
+  // round 70 (asked: "numerous boss encounters exhibit repetitive and nearly identical mechanics... tidal surges, tentacular strikes, falling stars, conflagrations, toxic or hallucinogenic clouds"): the matter of the tales, each read by where it will be and by when
+  tidal_surge: { kind: 'area', windup: 52, active: 1, recovery: 46, power: 1.15, poise: 1.4, range: [0, 16], wave: { speed: 7, width: 2.2, reach: 30, lane: { half: 6.5, push: 3.5 } } }, // a wall of water, lane drawn on the ground before it comes
+  tentacle_rise: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.7, poise: 1, range: [0, 14], marks: { count: 3, ring: [2.4, 4.2], delay: 68, stagger: 26, radius: 1.45, pattern: 'seek', look: 'tentacle', seek: { speed: 4.6, lock: 24 } } }, // three tentacles creep after the feet and lock a breath before they rise
+  starfall: { kind: 'area', windup: 44, active: 1, recovery: 50, power: 0.95, poise: 1, range: [0, 18], marks: { count: 9, ring: [0, 9.5], delay: 46, stagger: 8, radius: 1.5, pattern: 'rain', look: 'star' } }, // nine stars, one after another, over the ground about the target
+  conflagration: { kind: 'area', windup: 44, active: 1, recovery: 50, power: 0.9, poise: 1, range: [0, 14], marks: { count: 12, ring: [2.2, 11], delay: 36, stagger: 7, radius: 1.35, pattern: 'spokes', spokes: 3, look: 'flame', leaves: { radius: 1.35, life: 210, tick: 24, power: 0.16 } } }, // three lines of flame run out from the horror and burn on; the gaps between are safe
+  toxic_cloud: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 2.9, life: 270, tick: 30, power: 0.14, mind: 0, drift: 1.1, kind: 'toxic' } }, // two banks of poisonous air drift after the target
+  dream_cloud: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.1, kind: 'dream' } }, // two banks of sleep take the mind, not the body
+  thunderfall: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.9, poise: 1, range: [0, 16], marks: { count: 6, ring: [0, 8.5], delay: 34, stagger: 7, radius: 1.25, pattern: 'rain', look: 'bolt' } }, // lightning calls down on the ground about the target, quick and bright
 };
 
 /** Body size relative to a human (1.9 m); big bodies reach further. */
 export const sizeFactor = (height: number): number => Math.max(1, height / 1.9);
+
+/** How much a colossus widens a tidal surge's wall and quickens it (round 70), and a cloud's bank: the body's root, but no more than this. */
+const SURGE_MOST = 1.35;
+const CLOUD_MOST = 1.35;
 
 /** The farthest a scaled minimum may stand from a colossus: its arena is no wider (round 24). */
 const LEAST_CAP = 20;
@@ -119,13 +132,21 @@ export function compileAttack(id: AttackId, stats: Stats, height: number): MoveD
   if (a.follow) move.then = a.follow;
   else if (a.kind !== 'special') move.open = a.windup + a.active; // it recovers, stooped, after the blow (hurt.ts)
   if (a.pull) move.pull = { window: [a.windup, a.windup + a.active], speed: a.pull.speed, range: a.pull.range * k };
-  if (a.kind === 'special' || stats.damage <= 0 || (damage <= 0 && !pool)) return move;
+  const cloud: CloudDef | undefined = a.cloud && { frame: a.windup, count: a.cloud.count, radius: a.cloud.radius * Math.min(Math.sqrt(k), CLOUD_MOST), life: a.cloud.life, tick: a.cloud.tick, damage: Math.round(a.cloud.power * stats.damage), mind: a.cloud.mind * stats.sanityDamage, drift: a.cloud.drift, kind: a.cloud.kind };
+  if (a.kind === 'special' || stats.damage <= 0 || (damage <= 0 && !pool && !cloud)) return move;
   move.interrupt = [Math.round(a.windup * 0.3), a.windup];
   const b = a.bolts;
   const s = Math.sqrt(k);
   const active = [a.windup, a.windup + a.active] as const;
-  if (a.marks) move.marks = { frame: a.windup, ...a.marks, ring: [a.marks.ring[0] * s, a.marks.ring[1] * s], radius: a.marks.radius * s, damage, poise };
-  else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
+  if (a.marks) {
+    const { leaves, ...marks } = a.marks;
+    const fire = marks.look === 'flame';
+    move.marks = { frame: a.windup, ...marks, ring: [a.marks.ring[0] * s, a.marks.ring[1] * s], radius: a.marks.radius * s, damage, poise, ...(leaves && { leaves: { radius: leaves.radius * s, life: leaves.life, tick: leaves.tick, damage: Math.max(1, Math.round(leaves.power * stats.damage)), ...(fire && { fire }) } }) };
+  } else if (a.wave?.lane) { // a wall of water keeps near the pace of a person: not the colossus's, which a ring may race at
+    const w = Math.min(s, SURGE_MOST);
+    move.wave = { frame: a.windup, speed: a.wave.speed * w, width: a.wave.width * w, reach: a.wave.reach, damage, poise, lane: { half: a.wave.lane.half * w, push: a.wave.lane.push } };
+  } else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
+  else if (cloud) move.cloud = cloud;
   else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise };
   else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
   else if (b) {

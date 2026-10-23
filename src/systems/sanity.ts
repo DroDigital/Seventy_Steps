@@ -87,6 +87,23 @@ export const blowWeight = (tier: Tier): number => SANITY.weigh.blow[tier];
 /** Share of an aura felt `gap` metres beyond the creature's body: whole within auraNear, none past auraFar. */
 export const auraShare = (gap: number): number => Math.min(1, Math.max(0, (SANITY.auraFar - gap) / (SANITY.auraFar - SANITY.auraNear)));
 
+/**
+ * Sanity a second that the dreaming clouds (round 70; clouds.ts) take of the investigator now: the greatest of the banks they stand in
+ * (a second bank does not double it), weighed as the horror's blows are, thickening as a bank rises and thinning as it goes.
+ */
+export function cloudDread(g: Game): number {
+  const { hazard, transform, dread } = g.ecs.c;
+  const pp = transform.get(g.player.id)?.pos;
+  let most = 0;
+  for (const [e, h] of pp ? hazard : []) {
+    const at = h.mind && h.cloud ? transform.get(e)?.pos : undefined;
+    if (!at || distXZ(at, pp!) > h.radius) continue;
+    const fade = Math.min(1, h.life / 30, ((h.total ?? h.life) - h.life + 1) / 20);
+    most = Math.max(most, h.mind! * blowWeight(dread.get(h.owner)?.tier ?? 'lesser') * fade);
+  }
+  return most;
+}
+
 /** Sanity lost this step to auras and to the roars and gazes of foes. */
 function drain(g: Game, dt: number): number {
   const { dread, transform, body, actor, combatant } = g.ecs.c;
@@ -100,7 +117,7 @@ function drain(g: Game, dt: number): number {
     if (a > top) [top, rest] = [a, rest + top];
     else rest += a;
   }
-  let loss = (top + SANITY.auraStack * rest) * SANITY.auraScale * dt + placeDread(g) * dt; // passive dread builds over a fight, with a crowd still weighing in part; a place's own dread (round 61) presses on the mind too
+  let loss = (top + SANITY.auraStack * rest) * SANITY.auraScale * dt + placeDread(g) * dt + cloudDread(g) * dt; // passive dread builds over a fight, with a crowd still weighing in part; a place's own dread (round 61) presses on the mind too
   for (const [id, a] of actor) {
     const s = moveDef(a)?.sanity;
     if (!s || a.frozen || !inWindow(s.window, a.frame) || isAbsent(g, id) || combatant.get(id)?.faction !== 'enemy') continue;

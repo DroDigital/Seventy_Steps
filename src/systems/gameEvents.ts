@@ -2,6 +2,7 @@
 
 import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
+import type { MarkLook } from '../data/moves';
 import type { SampleSetId } from '../data/samples';
 import type { LevelId } from '../data/tuning';
 
@@ -93,9 +94,10 @@ export interface GameEvents {
   Ending: { id: string }; // one of the three endings (endings.ts)
   DemoEnded: Record<string, never>; // the demo's last horror has fallen: its end is said, once a save (systems/demo.ts; round 56)
   Healed: { entity: Entity; amount: number }; // a shot of West's Reagent
-  Erupted: { at: V3; radius: number; by: Entity }; // a marked spot bursts
-  Quaked: { at: V3; by: Entity }; // a ring goes racing out
-  Marked: { at: V3; by: Entity }; // ground marked to erupt (at the first spot)
+  Erupted: { at: V3; radius: number; by: Entity; look?: MarkLook }; // a marked spot bursts
+  Quaked: { at: V3; by: Entity; lane?: boolean }; // a ring goes racing out (round 70: or a wall of water)
+  Marked: { at: V3; by: Entity; look?: MarkLook }; // ground marked to erupt (at the first spot)
+  Clouded: { at: V3; by: Entity; kind: 'toxic' | 'dream' }; // a bank of air rises (round 70)
   Swept: { by: Entity }; // a sweeping beam begins its sweep
   Explored: { region: string }; // more of a region seen (exploration.ts)
   Talked: { npc: string; name: string; title: string; lines: readonly string[]; rumor?: { boss: string; text: string }; shop?: string }; // recorded dialogue; an optional written rumour and a merchant's wares follow

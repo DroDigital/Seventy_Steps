@@ -56,6 +56,13 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   delayed_slam: 'It holds the blow a long breath. Do not roll early; roll when it falls.',
   crushing_blow: 'Its heaviest blow is lifted a full second. Roll as it falls, not as it rises; then strike while it recovers.',
   great_mark: 'The ground it marks under you will break. Leave the circle, or roll as it breaks.',
+  tidal_surge: 'A wall of water crosses the lane drawn on the ground. Roll into it as it reaches you, or leave the lane.',
+  tentacle_rise: 'The marks creep after your feet, then hold still. Keep moving, and roll the moment one stops.',
+  starfall: 'Stars fall one by one, each on a mark. Do not stand on a mark; keep moving between them.',
+  conflagration: 'Lines of flame run out and burn on. Stand in the dark between them until the fire dies.',
+  toxic_cloud: 'The air itself is turned. Walk out of the cloud and keep ahead of it: it drifts, and it is slow.',
+  dream_cloud: 'This cloud takes the mind, not the body. Step out of it, and steady yourself.',
+  thunderfall: 'Lightning is called down on the marks, quick and bright. Leave a mark as it flares, not after.',
 };
 
 /** A fragment of the place where it happened: the waking world, then the dream's realms. */

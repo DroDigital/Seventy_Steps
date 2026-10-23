@@ -62,6 +62,14 @@ export const ATTACK_IDS = [
   'delayed_slam',
   'crushing_blow',
   'great_mark',
+  // round 70: the horrors' own matter, asked ("tidal surges, tentacular strikes, falling stars, conflagrations, toxic or hallucinogenic clouds")
+  'tidal_surge',
+  'tentacle_rise',
+  'starfall',
+  'conflagration',
+  'toxic_cloud',
+  'dream_cloud',
+  'thunderfall',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 

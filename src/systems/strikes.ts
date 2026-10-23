@@ -12,7 +12,10 @@ import type { BarrageDef, MarksDef, SweepDef, WaveDef } from '../data/moves';
 import { SIM } from '../data/tuning';
 import { raycast } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
-import { capsuleGap2, hostiles, strike, targetsOf, type Blow } from './combat';
+import { capsuleGap2, hostiles, shove, strike, targetsOf, type Blow } from './combat';
+import { rise } from './clouds';
+import { spawnPool } from './hazards';
+import { planSpots } from './strikePlans';
 import { live } from './targets';
 import { isAbsent, type Actor, type Game, type Mark, type Wave } from './components';
 import { loose } from './projectiles';
@@ -30,7 +33,7 @@ function spawnAt(g: Game, at: XZ): { e: Entity; pos: V3 } {
   return { e, pos };
 }
 
-/** Marks the ground: the first spot under the target, the rest in a ring about it, each bursting in turn. */
+/** Marks the ground: the first spot under the target, the rest laid by the call's pattern (planSpots), each bursting in turn. */
 function mark(g: Game, id: Entity, m: MarksDef): void {
   const c = g.ecs.c;
   const tr = c.transform.get(id)!;
@@ -39,16 +42,29 @@ function mark(g: Game, id: Entity, m: MarksDef): void {
   const centre = tp ?? { x: tr.pos.x + Math.sin(tr.yaw) * 5, z: tr.pos.z + Math.cos(tr.yaw) * 5 };
   const arena = c.fight.get(id)?.arena;
   const faction = c.combatant.get(id)?.faction ?? 'enemy';
-  const turn = g.rng() * Math.PI * 2;
-  for (let i = 0; i < m.count; i++) {
-    const a = turn + ((i - 1) / Math.max(1, m.count - 1)) * Math.PI * 2;
-    const d = m.ring[0] + (m.ring[1] - m.ring[0]) * g.rng();
-    const spot = i === 0 ? centre : { x: centre.x + Math.sin(a) * d, z: centre.z + Math.cos(a) * d };
-    const { e, pos } = spawnAt(g, groundNear(g, spot, [0, 0], 0.3, arena));
-    const delay = m.delay + i * m.stagger;
-    c.mark.set(e, { owner: id, faction, radius: m.radius, delay, total: delay, damage: m.damage, poise: m.poise });
-    if (i === 0) g.events.emit('Marked', { at: { ...pos }, by: id });
-  }
+  const lines = m.pattern === 'spokes';
+  planSpots(m, centre, tr.pos, c.body.get(id)?.radius ?? 0.5, g.rng).forEach(({ at, order }, i) => {
+    if (lines && arena && Math.hypot(at.x - arena.x, at.z - arena.z) > arena.radius - m.radius - 0.5) return; // a line of flame stops at the wall; it does not heap against it
+    const { e, pos } = spawnAt(g, groundNear(g, at, [0, 0], 0.3, arena));
+    const delay = m.delay + order * m.stagger;
+    c.mark.set(e, { owner: id, faction, radius: m.radius, delay, total: delay, damage: m.damage, poise: m.poise, ...(m.look && { look: m.look }), ...(m.leaves && { leaves: m.leaves }), ...(m.seek && m.pattern === 'seek' && quarry !== id && { seek: { ...m.seek, target: quarry } }) });
+    if (i === 0) g.events.emit('Marked', { at: { ...pos }, by: id, ...(m.look && { look: m.look }) });
+  });
+}
+
+/** Ground that seeks creeps after its target, slower than a sprint, and holds still once its last breath has begun. */
+function creep(g: Game, e: Entity, mk: Mark): void {
+  const s = mk.seek;
+  const to = s && g.ecs.c.transform.get(s.target)?.pos;
+  const tr = g.ecs.c.transform.get(e);
+  if (!s || !to || !tr || mk.delay <= s.lock) return;
+  const d = distXZ(tr.pos, to);
+  if (d < 0.05) return;
+  const step = Math.min(s.speed / SIM.hz, d);
+  tr.prev = { ...tr.pos };
+  tr.pos.x += ((to.x - tr.pos.x) / d) * step;
+  tr.pos.z += ((to.z - tr.pos.z) / d) * step;
+  tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
 }
 
 function burst(g: Game, e: Entity, mk: Mark): void {
@@ -61,7 +77,8 @@ function burst(g: Game, e: Entity, mk: Mark): void {
       if (distXZ(p, at) > mk.radius + (c.body.get(t)?.radius ?? 0.4) * 0.5 || Math.abs(p.y - at.y) > 2) continue;
       strike(g, mk.owner, t, blow(mk.damage, mk.poise, false), at);
     }
-    g.events.emit('Erupted', { at: { ...at }, radius: mk.radius, by: mk.owner });
+    g.events.emit('Erupted', { at: { ...at }, radius: mk.radius, by: mk.owner, ...(mk.look && { look: mk.look }) });
+    if (mk.leaves) spawnPool(g, mk.owner, mk.faction, at, mk.leaves);
   }
   g.ecs.despawn(e);
 }
@@ -71,11 +88,17 @@ function quake(g: Game, id: Entity, w: WaveDef): void {
   const from = c.transform.get(id)!.pos;
   const { e, pos } = spawnAt(g, from);
   const r = c.body.get(id)?.radius ?? 0.5;
-  c.wave.set(e, { owner: id, faction: c.combatant.get(id)?.faction ?? 'enemy', r, speed: w.speed / SIM.hz, width: w.width, reach: w.reach + r, damage: w.damage, poise: w.poise, struck: [] });
-  g.events.emit('Quaked', { at: { ...pos }, by: id });
+  let lane: Wave['lane'];
+  if (w.lane) { // the tidal surge: a wall toward the target, along the line from the horror to it
+    const to = c.transform.get(targetOf(g, id))?.pos;
+    const yaw = to ? Math.atan2(to.x - from.x, to.z - from.z) : c.transform.get(id)!.yaw;
+    lane = { dx: Math.sin(yaw), dz: Math.cos(yaw), half: w.lane.half, push: w.lane.push };
+  }
+  c.wave.set(e, { owner: id, faction: c.combatant.get(id)?.faction ?? 'enemy', r, speed: w.speed / SIM.hz, width: w.width, reach: w.reach + r, damage: w.damage, poise: w.poise, struck: [], ...(lane && { lane }) });
+  g.events.emit('Quaked', { at: { ...pos }, by: id, ...(lane && { lane: true }) });
 }
 
-/** The ring runs on a step; whatever its band passes over is struck once. */
+/** The ring runs on a step; whatever its band passes over is struck once (a wall, whatever stands in its breadth). */
 function spread(g: Game, e: Entity, w: Wave): void {
   const c = g.ecs.c;
   const at = c.transform.get(e)!.pos;
@@ -83,8 +106,18 @@ function spread(g: Game, e: Entity, w: Wave): void {
   for (const t of live(g, hostiles(g, w.faction, false, false))) {
     if (w.struck.includes(t)) continue;
     const p = c.transform.get(t)!.pos;
-    const d = distXZ(p, at);
     const br = c.body.get(t)?.radius ?? 0.4;
+    const l = w.lane;
+    if (l) {
+      const [rx, rz] = [p.x - at.x, p.z - at.z];
+      const [along, side] = [rx * l.dx + rz * l.dz, Math.abs(rx * l.dz - rz * l.dx)];
+      if (side - br > l.half || along - br > w.r || along + br < w.r - w.width || Math.abs(p.y - g.world.ground(p.x, p.z)) > 1.5) continue;
+      w.struck.push(t);
+      strike(g, w.owner, t, blow(w.damage, w.poise, false), { x: at.x, y: p.y, z: at.z });
+      shove(g, t, { x: p.x - l.dx, y: p.y, z: p.z - l.dz }, l.push);
+      continue;
+    }
+    const d = distXZ(p, at);
     if (d - br > w.r || d + br < w.r - w.width || Math.abs(p.y - at.y) > 1.5) continue;
     w.struck.push(t);
     strike(g, w.owner, t, blow(w.damage, w.poise, true), { x: at.x, y: p.y, z: at.z });
@@ -148,6 +181,7 @@ export function strikeSystem(g: Game): void {
     if (!def || a.frozen || isAbsent(g, id)) continue;
     if (def.marks && a.frame === def.marks.frame) mark(g, id, def.marks);
     if (def.wave && a.frame === def.wave.frame) quake(g, id, def.wave);
+    if (def.cloud && a.frame === def.cloud.frame) rise(g, id, def.cloud);
     if (def.sweep && inWindow(def.sweep.window, a.frame)) {
       if (a.frame === def.sweep.window[0]) g.events.emit('Swept', { by: id });
       sweep(g, id, a, def.sweep);
@@ -156,7 +190,10 @@ export function strikeSystem(g: Game): void {
     if (b && inWindow(b.window, a.frame) && (a.frame - b.window[0]) % b.every === 0) barrage(g, id, a, b);
     if (def.pull && inWindow(def.pull.window, a.frame)) pull(g, id, def.pull);
   }
-  for (const [e, mk] of c.mark) if (--mk.delay <= 0) burst(g, e, mk);
+  for (const [e, mk] of c.mark) {
+    if (mk.seek) creep(g, e, mk);
+    if (--mk.delay <= 0) burst(g, e, mk);
+  }
   for (const [e, w] of c.wave) spread(g, e, w);
 }
 

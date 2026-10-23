@@ -11,19 +11,19 @@ export const NAMED = tier('named', [
   {
     id: 'colour_out_of_space', name: 'The Colour Out of Space', source: 'The Colour Out of Space', regions: ['arkham'], canonLooks: false,
     sprite: { silhouette: 'orb', palette: 'pallid', scale: 5, eyes: 0, glow: 'magenta', outside: true },
-    ...scripted('boss', phases(ph(1, { beam: 2, pool: 2, aoe_ring: 1, eruption: 1 }, { hooks: ['camera_warp'] }), ph(0.5, { beam: 2, pool: 1, aoe_ring: 2, projectile_fan: 2, teleport: 1, sweep_beam: 2, eruption: 1 }, { hooks: ['camera_warp'] }))),
+    ...scripted('boss', phases(ph(1, { beam: 2, pool: 2, aoe_ring: 1, toxic_cloud: 1 }, { hooks: ['camera_warp'] }), ph(0.5, { beam: 2, pool: 1, aoe_ring: 2, projectile_fan: 2, teleport: 1, sweep_beam: 2, toxic_cloud: 1 }, { hooks: ['camera_warp'] }))),
     stats: st(1150, 400, 40, 3, 4, 10), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 3000 }, insightOnSight: 2,
   },
   {
     id: 'wilbur_whateley', name: 'Wilbur Whateley', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,
     sprite: { silhouette: 'giant', palette: 'rust', scale: 3.2, eyes: 2, tentacles: 8, limbs: 2 },
-    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, summon: 1, eruption: 1 }, { summons: ['thousand_young'] }), ph(0.4, { grab: 2, tentacle_burst: 2, roar: 1, vortex: 1 }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, summon: 1, thunderfall: 1 }, { summons: ['thousand_young'] }), ph(0.4, { grab: 2, tentacle_burst: 2, roar: 1, vortex: 1 }))),
     stats: st(1550, 150, 54, 3.4, 2, 6), drops: { echoes: 1800 }, insightOnSight: 1,
   },
   {
     id: 'dunwich_horror', name: 'The Dunwich Horror', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'rubber', scale: 9, tentacles: 10, eyes: 12 },
-    ...scripted('boss', { ...phases(ph(1, { tentacle_burst: 2, slam: 2, charge: 1, quake: 1 }), ph(0.55, { slam: 2, charge: 2, roar: 1, wind_push: 1, quake: 2, eruption: 1 }), ph(0.12, { slam: 1, tentacle_burst: 1, roar: 2, quake: 1 }, { hooks: ['camera_warp'] })), unseen: true }),
+    ...scripted('boss', { ...phases(ph(1, { tentacle_burst: 2, slam: 2, charge: 1, quake: 1 }), ph(0.55, { slam: 2, charge: 2, roar: 1, wind_push: 1, quake: 1, thunderfall: 1, tentacle_rise: 1 }), ph(0.12, { slam: 1, tentacle_burst: 1, roar: 2, quake: 1 }, { hooks: ['camera_warp'] })), unseen: true }),
     stats: st(2950, 500, 59, 3, 4, 10), resist: ['shot'], drops: { echoes: 6000 }, insightOnSight: 2,
   },
   {
@@ -41,16 +41,16 @@ export const NAMED = tier('named', [
   {
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
-    ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, teleport: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
+    ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
     stats: st(1150, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2,
   },
   {
     id: 'joseph_curwen', name: 'Joseph Curwen', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'sand', scale: 2.1, eyes: 2, gear: ['tricorn', 'coat'] },
     ...scripted('boss', phases(
-      ph(1, { projectile: 2, summon: 1, teleport: 1, eruption: 1 }, { summons: ['reanimated_corpse'] }),
+      ph(1, { projectile: 2, summon: 1, teleport: 1, conflagration: 1 }, { summons: ['reanimated_corpse'] }),
       ph(0.5, { projectile_fan: 2, beam: 1, summon: 1, teleport: 1, barrage: 1 }, { summons: ['reanimated_corpse'] }),
-      ph(0.2, { beam: 2, projectile_fan: 1, roar: 1, sweep_beam: 2, eruption: 1 }, { hooks: ['camera_warp'] }),
+      ph(0.2, { beam: 2, projectile_fan: 1, roar: 1, sweep_beam: 2, conflagration: 1 }, { hooks: ['camera_warp'] }),
     ), { range: [5, 11], strafe: 0.4 }),
     stats: st(2200, 180, 50, 3.4, 2, 8), drops: { echoes: 4000 }, insightOnSight: 2,
   },
@@ -82,7 +82,7 @@ export const NAMED = tier('named', [
   {
     id: 'haunter_of_the_dark', name: 'The Haunter of the Dark', source: 'The Haunter of the Dark', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'winged', palette: 'rubber', scale: 4, eyes: 3, wings: 2, glow: 'magenta' },
-    ...scripted('boss', phases(ph(1, { dive: 2, grab: 1, darkness: 1, eruption: 1 }, { hooks: ['light_dependency'], arena: 'lamps' }), ph(0.5, { dive: 2, grab: 1, darkness: 2, wind_push: 1, barrage: 1 }, { hooks: ['light_dependency'] })), { hover: 2 }),
+    ...scripted('boss', phases(ph(1, { dive: 2, grab: 1, darkness: 1, thunderfall: 1 }, { hooks: ['light_dependency'], arena: 'lamps' }), ph(0.5, { dive: 2, grab: 1, darkness: 2, wind_push: 1, barrage: 1 }, { hooks: ['light_dependency'] })), { hover: 2 }),
     stats: st(1050, 260, 40, 4.6, 4, 10), weak: ['light'], drops: { echoes: 4000 }, insightOnSight: 2,
   },
   {
@@ -107,7 +107,7 @@ export const NAMED = tier('named', [
   {
     id: 'shunned_house_entity', name: 'The Shunned House Entity', source: 'The Shunned House', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'blob', palette: 'fungus', scale: 3, eyes: 1, glow: 'green', body: [0.5625, 0.28] }, // 1.6875 m at its tallest idle breath; keep the established 0.84 m radius (round 56)
-    ...scripted('stationary_horror', phases(ph(1, { tentacle_burst: 2, pool: 1, grab: 1, eruption: 1 }), ph(0.5, { pool: 2, tentacle_burst: 2, grab: 1, eruption: 2, quake: 1 }, { hooks: ['darkness'] }))),
+    ...scripted('stationary_horror', phases(ph(1, { tentacle_burst: 2, pool: 1, grab: 1, toxic_cloud: 1 }), ph(0.5, { pool: 2, tentacle_burst: 2, grab: 1, toxic_cloud: 1, eruption: 1, quake: 1 }, { hooks: ['darkness'] }))),
     stats: st(1950, 300, 48, 0, 3, 8), weak: ['fire'], drops: { echoes: 1600 }, insightOnSight: 1,
   },
   {
@@ -133,7 +133,7 @@ export const NAMED = tier('named', [
     sprite: { silhouette: 'robed', palette: 'sand', scale: 2.4, eyes: 0, gear: ['mask'] },
     ...scripted('boss', phases(
       ph(1, { projectile: 2, teleport: 1, summon: 1, gaze: 1, barrage: 1 }, { summons: ['man_of_leng'] }),
-      ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, summon: 1, eruption: 1 }, { summons: ['man_of_leng'], hooks: ['camera_warp'] }),
+      ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, summon: 1, dream_cloud: 1 }, { summons: ['man_of_leng'], hooks: ['camera_warp'] }),
       ph(0.2, { beam: 2, gaze: 2, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['darkness'] }),
     ), { range: [5, 12], strafe: 0.3 }),
     stats: st(2600, 220, 58, 3, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
@@ -148,19 +148,19 @@ export const NAMED = tier('named', [
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
     sprite: { silhouette: 'serpent', palette: 'sea', scale: 7, eyes: 2, body: [0.734375, 0.25] }, // the head and neck rise 5.1 m out of the coils, not a serpent's 3.5 m (round 57)
-    ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 2, grab: 1, wind_push: 1, quake: 1, vortex: 1 }, { hooks: ['flood', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 2, grab: 1, wind_push: 1, tidal_surge: 1, vortex: 1 }, { hooks: ['flood', 'camera_warp'] }))),
     stats: st(1450, 400, 56, 2, 3, 10), drops: { echoes: 3000 }, insightOnSight: 2,
   },
   {
     id: 'dr_munoz', name: 'Dr. Muñoz', source: 'Cool Air', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'pallid', scale: 2, eyes: 2, gear: ['coat', 'pipes'] },
-    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, combo: 1 }), ph(0.5, { grab: 2, pool: 1, projectile: 1, barrage: 1 }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, combo: 1 }), ph(0.5, { grab: 2, toxic_cloud: 1, projectile: 1, barrage: 1 }))),
     stats: st(550, 80, 22, 2.6, 2, 6), weak: ['fire'], drops: { echoes: 800 }, insightOnSight: 1,
   },
   {
     id: 'charles_le_sorcier', name: 'Charles le Sorcier', source: 'The Alchemist', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['cowl', 'staff'] },
-    ...scripted('caster', phases(ph(1, { projectile: 2, teleport: 1, combo: 1 }), ph(0.5, { projectile_fan: 2, teleport: 1, pool: 1, eruption: 1, sweep_beam: 1 }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, teleport: 1, combo: 1 }), ph(0.5, { projectile_fan: 2, teleport: 1, pool: 1, conflagration: 1, sweep_beam: 1 }))),
     stats: st(600, 120, 28, 3.4, 2, 7), drops: { echoes: 1400 }, insightOnSight: 1,
   },
   {
@@ -172,7 +172,7 @@ export const NAMED = tier('named', [
   {
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
-    ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, roar: 1, barrage: 2 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, dream_cloud: 1, barrage: 2 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
     stats: st(1300, 140, 48, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
   },
   {
@@ -190,7 +190,7 @@ export const NAMED = tier('named', [
   {
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
-    ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, eruption: 1 }, { hooks: ['arena_reconnect'] }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, starfall: 1 }, { hooks: ['arena_reconnect'] }))),
     stats: st(2250, 160, 64, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },
 ]);
