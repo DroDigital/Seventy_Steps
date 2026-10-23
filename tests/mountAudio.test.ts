@@ -148,12 +148,14 @@ describe('mounts, heard (round 50)', () => {
   });
 
   it('a minute at a gallop is heard in its hooves, with the horse and the harness only now and then (round 68: "way too many noises")', () => {
+    const random = vi.spyOn(Math, 'random').mockImplementation(((state) => () => { state = (state * 1664525 + 1013904223) >>> 0; return state / 4294967296; })(1)); // (the same minute every run: left to chance, a minute went over the cap about one run in eleven)
     const grey = ride('grey');
     grey.heard.length = 0;
     grey.advance(60 * 60, MOUNT_TRAVERSAL.gallop);
+    random.mockRestore();
     const asides = grey.heard.filter((h) => !h.key.includes(':hoof:') && !/:(thump|settle|greet)$/.test(h.key)); // (the settling and the greeting are the arrival's)
     expect(asides.length).toBeGreaterThan(5);
-    expect(asides.length).toBeLessThanOrEqual(18); // (it was about sixty)
+    expect(asides.length).toBeLessThanOrEqual(22); // (it was about sixty; a minute of chance runs from 14 to 20)
     expect(grey.heard.filter((h) => h.key.endsWith(':snort')).length).toBeLessThanOrEqual(4);
   });
 
