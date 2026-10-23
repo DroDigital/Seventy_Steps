@@ -26,7 +26,7 @@ export const EARTH_WAYS: Readonly<Record<string, Way>> = {
       { at: 40, words: 'THE LIGHT IN THE WELL IS OF NO COLOUR A MAN HAS A NAME FOR', sound: 'wail', shake: 0.05, pitch: 0.5 },
     ],
   },
-  // The sabbat's path up the ravine: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
+  // The sabbat's court before the ford of the black river: skulls on poles, standing stones, carved gourds with a light in them and the witches' fires burning
   // in the open ground; the fires are laid in a ring; three black candles are to be lit, least first.
   black_man: {
     marks: [

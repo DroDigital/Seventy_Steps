@@ -38,7 +38,7 @@ export function solidGap(parts: readonly Part[], x: number, z: number, y: number
 }
 
 /** A candle before a ring: to the way's side, a few paces from the stake, clear of the set's pieces and the ring's stones. */
-export function ringCandle(a: ArenaPlace, stake: XZ, front: XZ, enc?: Pick<Enclosure, 'gap'>): CandleSpot {
+export function ringCandle(a: ArenaPlace, stake: XZ, front: XZ, enc?: Pick<Enclosure, 'gap' | 'dry'>): CandleSpot {
   const look = a.candle ?? 'cairn';
   const lean = hash2(Math.round(a.x), Math.round(a.z), 62) < 0.5 ? 1 : -1; // which side, as the place has it
   const [px, pz] = [-front.z, front.x];
@@ -49,7 +49,7 @@ export function ringCandle(a: ArenaPlace, stake: XZ, front: XZ, enc?: Pick<Enclo
         const x = stake.x + front.x * along + px * s * aside;
         const z = stake.z + front.z * along + pz * s * aside;
         if (Math.hypot(x - stake.x, z - stake.z) > ASIDE.far) continue;
-        if (enc && enc.gap({ x, z }) > -ASIDE.wall) continue; // inside the wall, not against it
+        if (enc && (enc.dry ?? enc.gap)({ x, z }) > -ASIDE.wall) continue; // inside the wall, not against it (and on dry ground)
         if (solids.every((p) => Math.hypot(p.x - x, p.z - z) - reach(p) >= ASIDE.clear) && a.stones.every((q) => Math.hypot(q.x - x, q.z - z) - q.radius >= ASIDE.clear)) return { x, z, look };
       }
     }

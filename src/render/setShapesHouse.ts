@@ -142,3 +142,21 @@ export function terrace(p: Prop): Piece[] {
   }
   return [{ mat: 'stone', geo: merged(parts) }, { mat: 'glow', geo: merged(glow) }];
 }
+
+/** A river's kerb (round 68): fitted blocks from the bed up, a coping stone that overhangs both faces, and a faint line of light under it. */
+export function kerb(p: Prop): Piece[] {
+  const [L, T, H, D] = [p.w * 2, p.d * 2, p.h, p.set?.drop ?? 0];
+  const parts = [block(L, D + H * 0.78, T, 0, (H * 0.78 - D) / 2, 0, stone(p, 0.9)), block(L, H * 0.22, T * 1.22, 0, H * 0.89, 0, stone(p, 1.15))];
+  for (let x = -L / 2 + 1.5; x < L / 2; x += 3) parts.push(block(0.12, H * 0.78 + D * 0.15, T * 1.02, x, H * 0.39 - D * 0.07, 0, stone(p, 0.7))); // the joints between the blocks, cut deep
+  return [{ mat: 'stone', geo: merged(parts) }, { mat: 'glow', geo: crown(p, H * 0.76, T * 1.02) }];
+}
+
+/** The dam with a spillway cut in it (round 68): the embankment, a dark trough across its crest and, down the outer face (−z), a dark chute that follows its steps. Dust pours down it (render/spillFx.ts). */
+export function spill(p: Prop): Piece[] {
+  const [L, T, H] = [p.w * 2, p.d * 2, p.h];
+  const [slot, wet] = [Math.max(2, L - 1.6), scaleRgb(BASE.charcoal, 0.8)];
+  const chute: THREE.BufferGeometry[] = [box(slot, 0.16, T * 1.06, 0, H + 0.13, 0, wet)]; // the trough over the crest
+  for (const [y0, y1, out] of [[0, 0.4, 0.65], [0.4, 0.75, 0.56], [0.75, 1, 0.48]] as const) chute.push(box(slot, H * (y1 - y0) + 0.04, 0.14, 0, H * ((y0 + y1) / 2), -(T * out + 0.07), wet)); // down the steps, each a little proud of its face
+  for (const s of [-1, 1]) chute.push(block(0.5, H + 0.3, T * 1.3, s * (slot / 2 + 0.25), H / 2 + 0.1, 0, stone(p, 1.2))); // the stone cheeks on either hand
+  return [...dam(p), { mat: 'stone', geo: merged(chute) }];
+}

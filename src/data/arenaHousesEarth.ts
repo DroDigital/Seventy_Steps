@@ -10,12 +10,14 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
   colour_out_of_space: house({
     name: 'THE RESERVOIR', line: 'The water was to cover the Gardner place. It never quite did.',
     wall: 'dam', height: 6, thick: 4.4, tint: [0.62, 0.63, 0.66], glow: 'magenta',
-    tower: { kind: 'square', every: 9, height: 9 }, gate: { width: 8, height: 6.5, flank: 12, sealed: true },
+    tower: { kind: 'square', every: 9, height: 9 }, gate: { width: 8, height: 6.5, flank: 12, sealed: true, look: 'sluice' },
+    basin: { ahead: 18, side: 24, behind: 16, wobble: 1.6, spill: { at: 22, width: 5 } }, // a dam across the heath, a bank about the Gardner place, a spillway, and a sluice lifted into its housing
   }),
   black_man: house({
-    name: 'THE RAVINE', line: 'The ravine closes about a cleft, and the cleft has been shut with a stone.',
-    wall: 'cliff', height: 10, thick: 5, tint: [0.38, 0.34, 0.4], glow: 'purple',
-    tower: { kind: 'spire', every: 8, height: 13 }, gate: { width: 7, height: 7, flank: 15, sealed: true },
+    name: 'THE BLACK RIVER', line: 'The river runs black about an island of white earth, and the one ford to it has been stopped with a stone.',
+    wall: 'kerb', height: 1.3, thick: 1.4, tint: [0.34, 0.32, 0.38], glow: 'purple', reach: 30,
+    tower: { kind: 'round', every: 6, height: 5, lit: true }, gate: { width: 7, height: 3.4, flank: 8, sealed: true, look: 'boulder' },
+    river: { island: 17, depth: 1.6, ford: 7 }, // the island in the river (Lovecraft: "the unpeopled island in the river"), its bank kerbed, a ford of flat stones, the balefires on the bank
   }),
   shub_niggurath: house({
     name: 'THE BLACK GROVE', line: 'The trees have grown together, and what grew them is not done.',
@@ -38,9 +40,10 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
     tower: { kind: 'spire', every: 9, height: 8 }, gate: { width: 7, height: 5.5, flank: 9 },
   }),
   edward_hutchinson: house({
-    name: 'THE PAWTUXET MANOR', line: 'A garden wall of old brick, and a gatehouse with a rod on it that has drawn the lightning for a hundred years.',
-    wall: 'ashlar', height: 6.5, thick: 2.6, tint: [0.55, 0.38, 0.34], glow: 'purple',
-    tower: { kind: 'square', every: 8, height: 10, lit: true }, gate: { width: 8, height: 6, flank: 14 },
+    name: 'THE KEEP ON THE ROAD', line: 'A curtain of old stone, a donjon behind it, and a gatehouse with a rod on it that has drawn the lightning for a hundred years.',
+    wall: 'ashlar', height: 9, thick: 2.8, tint: [0.5, 0.42, 0.38], glow: 'purple',
+    tower: { kind: 'round', every: 7, height: 12, lit: true }, gate: { width: 8, height: 6, flank: 12 },
+    bailey: { ahead: 18, side: 16, behind: 16, keep: { width: 30, depth: 16, height: 30, rod: 12 }, gatehouse: { height: 14, rod: 9 } },
   }),
   colossus_pyramids: house({
     name: 'THE TEMENOS OF THE SPHINX', line: 'A wall as thick as a street is wide, and the pylons of a door that was not made for men.',

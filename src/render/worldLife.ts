@@ -13,6 +13,8 @@ import type { GameAudio } from './audio/gameAudio';
 import { createArenaAir } from './arenaAir';
 import { createBeacons } from './beacons';
 import { createPoiFx } from './poiFx';
+import { createCourtLife } from './courtLife';
+import { createRodFx } from './rodFx';
 import type { Beams } from './beams';
 import type { GroundFx } from './groundFx';
 import { createSkyStrikeFx, type SkyStrikeFx } from './skyStrikeFx';
@@ -86,6 +88,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
   const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight
   createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
+  const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
+  const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -105,6 +109,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       air.update(camera, time, !outside);
       ways.update(camera.position, time, !outside);
       wayFx.update(time, camera.position);
+      rods.update(camera.position, time, !outside);
+      court.update(camera.position, time, !outside);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);
