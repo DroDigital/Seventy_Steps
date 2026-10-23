@@ -17,14 +17,27 @@ export function browserStore(): SaveStore | null {
   } catch {
     // No browser storage (a private window, or refused).
   }
+  const readLocal = (key: string): string | null => {
+    try {
+      return local?.getItem(key) ?? null;
+    } catch {
+      return null; // A profile can expose localStorage while refusing its reads: the title still opens.
+    }
+  };
   const files = desktop?.store;
-  if (!files) return local;
+  if (!files) return local && { getItem: readLocal, setItem: (key, value) => local!.setItem(key, value), removeItem: (key) => local!.removeItem(key) };
   return { // the desktop shell keeps them as files (round 12); what the browser's storage held before is taken over on first reading
     getItem(key) {
       const got = files.get(key);
       if (got !== null || !local) return got;
-      const old = local.getItem(key);
-      if (old !== null) files.set(key, old);
+      const old = readLocal(key);
+      if (old !== null) {
+        try {
+          files.set(key, old);
+        } catch {
+          // The old value still works this session and stays in the browser for a later migration.
+        }
+      }
       return old;
     },
     setItem: (key, value) => void files.set(key, value),

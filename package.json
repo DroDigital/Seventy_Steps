@@ -5,7 +5,7 @@
   "private": true,
   "author": "Alessandro A. Foddis",
   "license": "SEE LICENSE IN LICENSE",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "main": "desktop/main.js",
   "scripts": {

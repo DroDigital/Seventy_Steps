@@ -58,7 +58,6 @@ import { FEEL, HEART } from './render/feel';
 import { createGame, createWorldGame, stepGame } from './systems/game';
 import { clearSave, loadSave, takeRecovery } from './systems/save';
 import { haltAutosave, saveNow, startAutosave } from './ui/autosave';
-import { installCrashLog } from './ui/crashLog';
 import { createExtras } from './ui/runExtras';
 import { showCrash } from './ui/crashScreen';
 import { startBestiary } from './ui/bestiary';
@@ -350,12 +349,18 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   );
 }
 
-installCrashLog(); // the last errors, for a crash report (ui/crashLog.ts)
+const failedStart = (error: unknown): void => {
+  console.error(error);
+  haltAutosave();
+  showCrash('error', error instanceof Error ? error.message : String(error));
+};
+const launch = (opts: StartOptions, shell: Shell): void => void startGame(opts, shell).catch(failedStart);
+
 const params = new URLSearchParams(location.search);
 const variant = params.get('variant');
-if (params.has('mounts')) void startMountGallery();
+if (params.has('mounts')) void startMountGallery().catch(failedStart);
 else if (params.has('look')) startLookTest();
-else if (params.has('bestiary')) startBestiary();
+else if (params.has('bestiary')) void startBestiary().catch(failedStart);
 else {
   const opts: StartOptions = {
     debug: params.has('debug'),
@@ -368,10 +373,10 @@ else {
     trailer: params.has('trailer'),
     hold: params.has('hold') ? Number(params.get('hold')) : undefined,
   };
-  if (opts.arena || opts.fresh) void startGame(opts, createShell());
-  else if (takeFlag(NEW_GAME_FLAG)) void startGame({ ...opts, fresh: true, intro: true }, createShell()); // begun anew from an ending
+  if (opts.arena || opts.fresh) launch(opts, createShell());
+  else if (takeFlag(NEW_GAME_FLAG)) launch({ ...opts, fresh: true, intro: true }, createShell()); // begun anew from an ending
   else {
     const shell = createShell();
-    title(shell, (fresh, difficulty) => void startGame({ ...opts, fresh, intro: fresh, difficulty }, shell));
+    title(shell, (fresh, difficulty) => launch({ ...opts, fresh, intro: fresh, difficulty }, shell));
   }
 }
