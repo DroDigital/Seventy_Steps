@@ -64,7 +64,6 @@ export function planHouse(h: House, boss: string, s: Site): RingEnclosure {
     name: `${boss}:house`,
     x: gate.x,
     z: gate.z,
-    minFound: boss,
     glow: h.glow ?? 'purple',
     boxes: [],
     seal: { boxes: [[0, 0, hw, hd, s.y - 0.3, s.y + h.gate.height]], look: h.gate.sealed ? 'sealed' : 'wall' },

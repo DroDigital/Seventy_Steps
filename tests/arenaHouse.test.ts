@@ -51,12 +51,12 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
     }
   });
 
-  it('is shut at its gate by a seal that fills the opening, and no wall piece stands in it', () => {
+  it('has a seal that fills its gate, which opens with no puzzle, and no wall piece stands in it', () => {
     for (const a of arenas) {
       const plan = a.house!;
       const d = plan.piece.door!;
       const seal = plan.piece.seal!.boxes[0]!;
-      expect(plan.piece.minFound, 'a gate that waits for the horror to be found').toBe(a.bosses[0]);
+      expect(plan.piece.minFound, 'no discovery stands between a body and the gate').toBeUndefined();
       const [along, across] = d.alongX ? [seal[2], seal[3]] : [seal[3], seal[2]];
       expect(along * 2).toBeCloseTo(d.width + HOUSE.lap * 2, 5);
       expect(across * 2).toBeCloseTo(d.thick, 5);

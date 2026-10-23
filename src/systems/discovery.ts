@@ -12,8 +12,8 @@ import { ARENA_HOUSES } from '../data/arenaHousesAll';
 import { FOUND, foundKey, stepKey, type Gift, type Offer, type Step, type Vigil, type When } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
 import { SIM } from '../data/tuning';
-import { discoveryOf, stepPlace } from '../world/discoveryPlan';
-import { worldLayout, type ArenaPlace } from '../world/placements';
+import { stepPlace } from '../world/discoveryPlan';
+import type { ArenaPlace } from '../world/placements';
 import { hourOf, phaseOf } from './clock';
 import type { Game } from './components';
 import { isFound } from './found';
@@ -28,14 +28,14 @@ export const questOf = (boss: string): string => `discover_${boss}`;
 
 const stateOf = new WeakMap<Game, { region: string | null; arenas: ArenaPlace[]; kept: Map<string, number>; hushed: Map<string, number> }>();
 
-/** The arenas of the investigator's region that have a house with a discovery. */
+/** The arenas of the investigator's region that have a house with a discovery. Round 69 (asked: no puzzles, every boss door opens): none, so no act is asked and no gate waits on one. */
 function arenasHere(g: Game): readonly ArenaPlace[] {
   const region = g.overworld?.region ?? null;
   let st = stateOf.get(g);
   if (!st) stateOf.set(g, (st = { region: null, arenas: [], kept: new Map(), hushed: new Map() }));
   if (st.region !== region) {
     st.region = region;
-    st.arenas = worldLayout().arenas.filter((a) => a.region === region && discoveryOf(a));
+    st.arenas = [];
   }
   return st.arenas;
 }
