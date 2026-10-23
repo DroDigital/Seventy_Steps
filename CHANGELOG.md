@@ -3,6 +3,10 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## 1.0.7: desktop startup recovery
+
+- The desktop title opens even when music cannot start. A refused profile-storage read no longer stops launch, and startup failures show a recovery screen and report instead of leaving the window black.
+
 ## 1.0.6: seventy secrets, retuned bosses and a quieter ride
 
 - **Seventy secrets, charted on the map.** Places from Lovecraft's tales (the Hop Yard, Gilman's house, Zadok's slip, Johansen's landing, the pit of the Great Race, Barzai's ledge, the shore of Ib) lie in the land's graveyards, rings, ruins, groves, shores, cliffs and two mazes. A grey "?" shows where ground near one has been charted. Coming to it finds it once: its name and line, a little insight, and often a chest of Echoes and a guard of foes. The map then marks it.

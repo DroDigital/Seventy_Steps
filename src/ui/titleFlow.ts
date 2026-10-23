@@ -3,7 +3,7 @@
  * out of the dark with its theme: at once where the browser lets sound play on opening, else on the
  * first key press or click, which the veil asks for (browsers refuse sound until then); after
  * THEME.wait by itself if the theme has neither sounded nor been refused (a slow line: it joins
- * when it can). Also the one-time flag a reload carries (an ending's Begin anew).
+ * when it can). The desktop menu opens independently of audio readiness. Also the one-time flag a reload carries (an ending's Begin anew).
  */
 
 import { THEME, type DifficultyId } from '../data/tuning';
@@ -11,6 +11,7 @@ import { playMenuMusic } from '../render/audio/music';
 import { activeSlot, useSlot } from '../systems/save';
 import { slotLines } from './titleSlots';
 import { makeAhead } from './loading';
+import { desktop } from './desktop';
 import type { Shell } from './shell';
 import { showTitle } from './titleScreen';
 
@@ -22,7 +23,7 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
   let [opened, refused] = [false, false];
   void music.refused.then(() => {
     refused = true;
-    if (!opened) shell.veil.darken('press any key');
+    if (!opened && !desktop) shell.veil.darken('press any key');
   });
   showTitle({
     slots: () => slotLines(shell.store),
@@ -31,7 +32,8 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
     settings: shell.settings,
     change: shell.change,
     saveKeys: shell.saveKeys,
-    byItself: new Promise((resolve) => {
+    // The desktop menu needs no audio gesture, including when a missing track or a device prevents playback.
+    byItself: desktop ? Promise.resolve() : new Promise((resolve) => {
       void music.sounding.then(resolve);
       setTimeout(() => refused || resolve(), THEME.wait * 1000);
     }),

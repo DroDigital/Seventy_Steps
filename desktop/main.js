@@ -98,7 +98,7 @@ function lastWindow() {
 }
 
 function open() {
-  const last = lastWindow();
+  const last = SMOKE ? { bounds: null, fullscreen: false, maximized: false } : lastWindow();
   const win = new BrowserWindow({
     width: 1280,
     height: 720,
@@ -244,7 +244,12 @@ function smoke(win) {
   const timer = setInterval(async () => {
     let page = null;
     try {
-      page = await win.webContents.executeJavaScript("({ title: /new game/i.test(document.body.innerText), bridge: typeof window.desktop?.quit === 'function' })");
+      page = await win.webContents.executeJavaScript(`(() => {
+        const button = [...document.querySelectorAll('button')].find((b) => /new game/i.test(b.textContent));
+        const veil = document.querySelector('canvas[data-veil]');
+        const clear = veil && (getComputedStyle(veil).display === 'none' || veil.getContext('2d').getImageData(veil.width / 2, veil.height / 2, 1, 1).data[3] < 255);
+        return { title: !!button?.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !!clear, bridge: typeof window.desktop?.quit === 'function' };
+      })()`);
     } catch {
       // the page is still loading
     }

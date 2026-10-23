@@ -98,6 +98,7 @@ const ease = (t: number): number => t * t * (3 - 2 * t);
 
 export function createVeil(): Veil {
   const canvas = document.createElement('canvas');
+  canvas.dataset.veil = '';
   [canvas.width, canvas.height] = [W, H];
   canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:8;pointer-events:none;image-rendering:pixelated;display:none';
   const words = document.createElement('div');
