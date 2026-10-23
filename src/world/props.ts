@@ -13,6 +13,7 @@ import type { Glow } from '../data/arenaSets';
 import type { PropKind } from '../data/regions';
 import type { LightKind } from '../data/tuning';
 import type { Collider } from './colliders';
+import { LANTERN_MODELS } from './lanternModels';
 import { surface } from './terrain';
 
 export interface Prop {
@@ -38,7 +39,7 @@ export interface SetLook {
   round?: boolean; // its footprint a circle (a standing thing), else a box
   walk?: boolean; // low enough to be walked over: no collider
   glow?: Glow; // a built piece's glow
-  lit?: LightKind; // a flame at its top, lighting about it
+  lit?: LightKind; // a flame in its lantern housing, or at the top of other pieces
 }
 
 const ROUND = new Set<PropKind>(['tree', 'pine', 'rock', 'pillar', 'lamp', 'obelisk', 'cross', 'stump', 'spire', 'tower', 'cone']);
@@ -93,10 +94,11 @@ export function propAt(kind: PropKind, x: number, y: number, z: number, rng: Rng
 /** The prop's collider, or null for what is walked through (bushes, fire pits). */
 export function propCollider(p: Prop): Collider | null {
   if (OPEN.has(p.kind) || (p.kind === 'set' && (!p.set || p.set.walk))) return null;
-  if (p.kind === 'set' && p.set?.round) return { kind: 'cylinder', x: p.x, z: p.z, radius: Math.max(p.w, p.d), y0: p.y - 0.5, y1: p.y + p.h };
+  const light = p.kind === 'set' && p.set && LANTERN_MODELS[p.set.id] ? { lightPass: true } : {};
+  if (p.kind === 'set' && p.set?.round) return { kind: 'cylinder', x: p.x, z: p.z, radius: Math.max(p.w, p.d), y0: p.y - 0.5, y1: p.y + p.h, ...light };
   if (ROUND.has(p.kind)) {
     const radius = p.kind === 'rock' ? p.w * 0.8 : p.kind === 'lamp' || p.kind === 'cross' ? 0.18 : p.w + 0.05;
     return { kind: 'cylinder', x: p.x, z: p.z, radius, y0: p.y - 0.5, y1: p.y + p.h };
   }
-  return { kind: 'obox', x: p.x, z: p.z, hx: p.w, hz: p.d, yaw: p.yaw, y0: p.y - 0.5, y1: p.y + p.h + (p.kind === 'house' ? p.w : 0) };
+  return { kind: 'obox', x: p.x, z: p.z, hx: p.w, hz: p.d, yaw: p.yaw, y0: p.y - 0.5, y1: p.y + p.h + (p.kind === 'house' ? p.w : 0), ...light };
 }

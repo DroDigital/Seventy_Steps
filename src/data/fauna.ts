@@ -55,7 +55,7 @@ const rats = haunt('rat', ['house', 'wall', 'ruin'], 0.3, [1, 2]);
 const moths = haunt('moth', ['lamp'], 1, [2, 3]);
 const fireflies = haunt('firefly', ['bush', 'stump', 'log'], 0.4, [5, 9]);
 
-/** Each region's critters (none on the dead plateau, in the desert, on Yuggoth or beyond the Gate: their silence is their own). */
+/** Each region's ambient critters (none on the dead plateau, in the desert, on Yuggoth or beyond the Gate). Selected oil lanterns have their own moths in world/haunts.ts. */
 export const FAUNA: Readonly<Record<string, readonly Haunt[]>> = {
   hub: [crows, bats, rats, moths],
   arkham: [crows, bats, rats, moths, fireflies],

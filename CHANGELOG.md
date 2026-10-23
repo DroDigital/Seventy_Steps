@@ -3,6 +3,11 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
+## Unreleased
+
+- Oil flames sit inside the new lantern and hanging lightpost housings, with warmer burners, dark iron, clear lightpost glass and smaller halos. Their light follows the housing when it is turned or scaled.
+- Moths circle selected outdoor lanterns and lightposts, including those along boss approaches and in open arenas.
+
 ## 1.0.7: desktop startup recovery
 
 - The desktop title opens even when music cannot start. A refused profile-storage read no longer stops launch, and startup failures show a recovery screen and report instead of leaving the window black.

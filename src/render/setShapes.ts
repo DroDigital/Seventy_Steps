@@ -1,6 +1,6 @@
 /**
  * The pieces of an arena's set drawn (round 61; data/arenaSets.ts says where each stands): a baked model (modelKit.ts), laid over
- * the prop job's colours, with a flame at its top when it is lit; a built piece from `KITS` below. In the piece's own frame, feet at the
+ * the prop job's colours, with a flame in a lantern's housing or at other models' tops when lit; a built piece from `KITS` below. Feet at the
  * origin, facing +z, as every prop's. Render only.
  */
 
@@ -9,6 +9,8 @@ import { MODEL_INFO } from '../data/models/index';
 import type { Prop } from '../world/props';
 import { tint, tileUv } from './meshKit';
 import { modelPieces } from './modelKit';
+import { modelLantern } from './modelLantern';
+import { LANTERN_MODELS } from '../world/lanternModels';
 import { ashlar, colonnade, crystal, dam, cliff, grove, hedge, slabs as slabWall, terrace } from './setShapesHouse';
 import { banner, idol, meteor, pipes } from './setShapesRelic';
 import { hornTree, skullPole, totem } from './setShapesRite';
@@ -40,7 +42,8 @@ export function setPieces(p: Prop, c: Rgb): Piece[] {
   const info = MODEL_INFO[look.id];
   if (info) {
     const out = modelPieces(p, c);
-    if (look.lit) out.push(flame(p, info.y1 * (look.scale ?? 1) * 0.98));
+    if (LANTERN_MODELS[look.id]) out.push(...modelLantern(p));
+    else if (look.lit) out.push(flame(p, info.y1 * (look.scale ?? 1) * 0.98));
     return out;
   }
   return KITS[look.id]?.(p, c) ?? [];
