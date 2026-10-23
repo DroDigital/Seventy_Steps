@@ -13,6 +13,7 @@ import { propCollider } from '../src/world/props';
 import { setPieces } from '../src/render/setShapes';
 import { createRng } from '../src/core/rng';
 import { propAt } from '../src/world/props';
+import { ringOf } from './worldHelpers';
 
 const inside = (c: Collider, x: number, z: number): boolean => {
   if (c.kind === 'cylinder') return Math.hypot(x - c.x, z - c.z) <= c.radius;
@@ -37,7 +38,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
 
   it('is closed all the way round but for its gate: no body finds another way in, from any angle', () => {
     for (const a of arenas) {
-      const plan = a.house!;
+      const plan = ringOf(a);
       const cols = plan.props.map(propCollider).filter((c): c is Collider => !!c);
       const gateAt = Math.atan2(a.front.z, a.front.x);
       for (let t = 0; t < Math.PI * 2; t += 0.2 / plan.radius) {
@@ -73,11 +74,11 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
       const plan = a.house!;
       for (const p of plan.props) expect(p.h, a.bosses[0]).toBeGreaterThanOrEqual(5);
       const fog = allFogs().find((f) => f.bosses.includes(a.bosses[0]!))!;
-      expect(Math.hypot(fog.stake.x - a.x, fog.stake.z - a.z), `${a.bosses[0]}: the stake`).toBeLessThan(plan.radius - HOUSE.margin);
-      expect(Math.hypot(fog.candle.x - a.x, fog.candle.z - a.z), `${a.bosses[0]}: the candle`).toBeLessThan(plan.radius - HOUSE.margin);
+      expect(plan.gap(fog.stake), `${a.bosses[0]}: the stake`).toBeLessThan(-HOUSE.margin);
+      expect(plan.gap(fog.candle), `${a.bosses[0]}: the candle`).toBeLessThan(-HOUSE.margin);
       for (const d of a.decor) {
         if (plan.props.includes(d) || !propCollider(d)) continue;
-        expect(Math.hypot(d.x - a.x, d.z - a.z) + reach(d), `${a.bosses[0]}: ${d.set?.id} in the wall`).toBeLessThanOrEqual(plan.radius - HOUSE.margin + 0.01);
+        expect(plan.gap(d) + reach(d), `${a.bosses[0]}: ${d.set?.id} in the wall`).toBeLessThanOrEqual(-HOUSE.margin + 0.01);
       }
     }
   });
@@ -99,7 +100,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
     for (const a of arenas) {
       const pad = worldLayout().pads.find((p) => p.kind === 'circle' && Math.hypot(p.x - a.x, p.z - a.z) < 0.1 && p.radius > a.radius + 10);
       expect(pad, a.bosses[0]).toBeTruthy();
-      expect(pad!.kind === 'circle' && pad!.radius, a.bosses[0]).toBeGreaterThanOrEqual(a.house!.radius + HOUSE.level - 0.01);
+      expect(pad!.kind === 'circle' && pad!.radius, a.bosses[0]).toBeGreaterThanOrEqual(ringOf(a).radius + HOUSE.level - 0.01);
     }
   });
 

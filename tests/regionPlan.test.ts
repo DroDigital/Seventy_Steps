@@ -6,6 +6,7 @@ import { resolveCapsule } from '../src/world/colliders';
 import { worldLayout } from '../src/world/placements';
 import { regionPlan } from '../src/world/regionPlan';
 import { segmentDistance, type Road } from '../src/world/roads';
+import { padDistance } from '../src/world/sitePads';
 import { createWorldCollision } from '../src/world/worldCollision';
 import { DIRS, rectDistance, regionAt } from '../src/world/worldMap';
 
@@ -53,7 +54,7 @@ describe('region plans', () => {
       const props = [...regionPlan(r).props.values()].flat();
       for (const p of props) {
         for (const pad of w.pads) {
-          const d = pad.kind === 'circle' ? Math.hypot(p.x - pad.x, p.z - pad.z) - pad.radius : rectDistance(pad.rect, p.x, p.z);
+          const d = padDistance(pad, p.x, p.z);
           if (d < 0) bad.push(`${r.id}: a ${p.kind} stands on a site at ${p.x.toFixed(0)},${p.z.toFixed(0)}`);
         }
       }

@@ -11,7 +11,7 @@ import type { XZ } from '../core/geom';
 import { DISCOVERIES } from '../data/discoveriesAll';
 import type { Offer, Step, Vigil } from '../data/discoveries';
 import { WORLD } from '../data/tuning';
-import type { HousePlan } from './arenaHouse';
+import type { Enclosure } from './enclosure';
 import { courtPoint } from './arenaWay';
 import { setPiece } from './arenaSet';
 import type { ArenaPlace } from './placements';
@@ -32,7 +32,7 @@ export interface Court {
 export const discoveryOf = (a: Pick<ArenaPlace, 'bosses' | 'house'>) => (a.house ? DISCOVERIES[a.bosses[0]!] : undefined);
 
 /** The nearest free place to (`d`, `side`) in the court: the spot itself, or another a few paces further in or out, on either side of the way. `free(x, z)` says whether a place is clear. */
-function settle(h: HousePlan, d: number, side: number, free: (x: number, z: number) => boolean): Place {
+function settle(h: Enclosure, d: number, side: number, free: (x: number, z: number) => boolean): Place {
   const tries: [number, number][] = [[d, side]];
   for (let k = 1; k <= 8; k++) for (const [dd, ss] of [[d + 2.5 * k, side], [d + 2.5 * k, -side], [d - 2.5 * k, side], [d - 2.5 * k, -side]] as const) if (dd >= 5) tries.push([dd, ss]);
   for (const [dd, ss] of tries) {

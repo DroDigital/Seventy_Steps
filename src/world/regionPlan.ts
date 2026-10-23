@@ -17,6 +17,7 @@ import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
 import { clearsFor, clearsRite, nearPath, planWay, wayProps, type WayPlan } from './arenaWay';
 import { discoveryProps } from './discoveryPlan';
+import { occupancy, type Occupancy } from './occupancy';
 import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
@@ -24,6 +25,7 @@ import { planSpawns } from './planSpawns';
 import { planPois, type PoiSite } from './poiPlan';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
 import { makeProp, propCollider, type Prop } from './props';
+import { padDistance } from './sitePads';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
 import { chunkKey, chunkOf, DIRS, rectDistance, regionRect, toWorld, type Rect } from './worldMap';
 
@@ -45,31 +47,7 @@ export interface RegionPlan {
   pois: PoiSite[]; // the region's points of interest (round 61; world/poiPlan.ts), with their guards among `spawns` and their walls among `props`
 }
 
-const CELL = 4; // metres per occupancy cell
 const DEFAULT: RegionLayout = { road: 'mud', width: 3.5, towns: [], groves: 0, graveyards: 0, circles: 0, ruins: 0, outcrops: 0, camps: 0, walls: false, landmarks: 0, copses: 0, waymarks: 0, farms: 0 };
-
-/** Which cells of the region are taken: sites, roads, houses and features. */
-function occupancy(rect: Rect) {
-  const taken = new Set<number>();
-  const key = (x: number, z: number): number => Math.floor((x - rect.x0) / CELL) * 4096 + Math.floor((z - rect.z0) / CELL);
-  const inside = (x: number, z: number, m: number): boolean => x > rect.x0 + m && x < rect.x1 - m && z > rect.z0 + m && z < rect.z1 - m;
-  return {
-    free: (x: number, z: number): boolean => inside(x, z, 3) && !taken.has(key(x, z)),
-    disk(x: number, z: number, r: number, mark: boolean): boolean {
-      for (let dx = -r; dx <= r; dx += CELL / 2) {
-        for (let dz = -r; dz <= r; dz += CELL / 2) {
-          if (dx * dx + dz * dz > r * r) continue;
-          if (mark) taken.add(key(x + dx, z + dz));
-          else if (!inside(x + dx, z + dz, 8) || taken.has(key(x + dx, z + dz))) return false;
-        }
-      }
-      return true;
-    },
-    rect(r: Rect, m: number): void {
-      for (let x = r.x0 - m; x <= r.x1 + m; x += CELL / 2) for (let z = r.z0 - m; z <= r.z1 + m; z += CELL / 2) taken.add(key(x, z));
-    },
-  };
-}
 
 /**
  * Where a region's roads must go: its signs, gates, towns and borders. Round 13: no longer every
@@ -88,7 +66,7 @@ function stops(region: RegionDef, layout: RegionLayout): XZ[] {
  * rocks round its heaped walls, leaving the way to its mouth open, so it is come upon, not seen
  * across a field.
  */
-function thickets(region: RegionDef, rng: Rng, occ: ReturnType<typeof occupancy>, roadClear: (x: number, z: number, m: number) => boolean, props: Prop[]): void {
+function thickets(region: RegionDef, rng: Rng, occ: Occupancy, roadClear: (x: number, z: number, m: number) => boolean, props: Prop[]): void {
   const kinds = (Object.entries(region.biome.props) as [PropKind, number][]).filter(([k]) => k === 'tree' || k === 'rock' || k === 'monolith');
   const pool: [PropKind, number][] = kinds.length ? kinds : [['rock', 1]];
   const total = pool.reduce((s, [, n]) => s + n, 0);
@@ -133,11 +111,12 @@ function buildPlan(region: RegionDef): RegionPlan {
   for (const p of w.pads) {
     if (p.kind === 'circle' && rectDistance(rect, p.x, p.z) < p.radius + 20) occ.disk(p.x, p.z, p.radius + 4, true);
     if (p.kind === 'rect') occ.rect(p.rect, 5);
+    if (p.kind === 'shape' && p.shape.bounds.x1 + 20 > rect.x0 && p.shape.bounds.x0 - 20 < rect.x1 && p.shape.bounds.z1 + 20 > rect.z0 && p.shape.bounds.z0 - 20 < rect.z1) occ.cover(p.shape, 4); // a shape of any outline: the fill keeps off it and a margin
   }
   const towns = layout.towns.map((t) => ({ ...toWorld(region, t.at), radius: t.radius, town: t }));
   const roads = planRoads(stops(region, layout), towns, layout.width, (rng() * 1e9) >>> 0);
   /** Clear of every site's pad by `m` metres (the occupancy's cells are too coarse to keep a lamp off a sign's; round 13). */
-  const offSites = (x: number, z: number, m: number): boolean => w.pads.every((p) => (p.kind === 'circle' ? Math.hypot(x - p.x, z - p.z) - p.radius : rectDistance(p.rect, x, z)) > m);
+  const offSites = (x: number, z: number, m: number): boolean => w.pads.every((p) => padDistance(p, x, z) > m);
   const roadClear = (x: number, z: number, m: number): boolean => roads.every((r) => r.pts.every((p, i) => i === 0 || segmentDistance(x, z, r.pts[i - 1], p) >= r.width / 2 + m));
 
   const props: Prop[] = [];
@@ -223,7 +202,7 @@ function buildPlan(region: RegionDef): RegionPlan {
   return bucket(layout, roads, features, props, spawns, ways, pois.sites);
 }
 
-function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: ReturnType<typeof occupancy>, props: Prop[]): Feature[] {
+function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: Occupancy, props: Prop[]): Feature[] {
   const out: Feature[] = [];
   const counts: Record<(typeof FEATURE_KINDS)[number], number> = {
     grove: layout.groves, graveyard: layout.graveyards, circle: layout.circles, ruin: layout.ruins, outcrop: layout.outcrops, camp: layout.camps, landmark: layout.landmarks,

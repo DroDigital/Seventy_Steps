@@ -71,7 +71,7 @@ describe('the ways to the open arenas', () => {
       const spots = [...(p.way.hazards ?? []).flatMap((h) => ('plates' in h ? h.plates : 'at' in h && Array.isArray(h.at) ? (h.at as readonly { d: number; side: number }[]) : 'from' in h ? [{ d: h.from, side: 0 }, { d: h.to, side: 0 }] : [])), ...(p.way.rite?.at ?? [])];
       for (const s of spots) {
         const at = pointAt(p, s.d, s.side);
-        expect(Math.hypot(at.x - a.x, at.z - a.z), `${p.boss}: ${s.d}, ${s.side}`).toBeGreaterThan(a.house!.radius + 3); // outside the house's wall
+        expect(a.house!.gap(at), `${p.boss}: ${s.d}, ${s.side}`).toBeGreaterThan(3); // outside the house's wall
         expect(s.d, `${p.boss}: on the way`).toBeLessThan(p.length - 4);
       }
     }

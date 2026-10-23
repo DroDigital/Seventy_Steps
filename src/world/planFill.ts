@@ -16,15 +16,10 @@ import type { RegionLayout } from '../data/regionFeatures';
 import type { GroundTexture, PropKind, RegionDef } from '../data/regions';
 import { WORLD } from '../data/tuning';
 import { FEATURE_RADIUS, FILLER_KINDS, featureProps, type Filler, type FillerKind } from './features';
+import type { Occ } from './occupancy';
 import { makeProp, type Prop } from './props';
 import type { Road } from './roads';
 import type { Rect } from './worldMap';
-
-/** The plan's occupancy: which ground is free, and a disk of it taken. */
-export interface Occ {
-  free(x: number, z: number): boolean;
-  disk(x: number, z: number, r: number, mark: boolean): boolean;
-}
 
 /** What each ground fills with, by weight: the kinds that grow or lie on it. */
 const FILL: Readonly<Record<GroundTexture, readonly (readonly [PropKind, number])[]>> = {

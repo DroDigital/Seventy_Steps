@@ -89,7 +89,7 @@ function see(g: Game, a: ArenaPlace, me: XZ): void {
   const boss = a.bosses[0]!;
   const ow = g.overworld!;
   const key = `seen:${boss}`;
-  if (ow.told.has(key) || distXZ(me, a) > a.house!.radius + FOUND.see) return;
+  if (ow.told.has(key) || a.house!.gap(me) > FOUND.see) return;
   ow.told.add(key);
   const h = ARENA_HOUSES[boss]!;
   g.events.emit('HouseSeen', { boss, name: h.name, line: h.line });
@@ -175,7 +175,7 @@ export function discoverySystem(g: Game): void {
   if (!me || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return;
   for (const a of arenasHere(g)) {
     const boss = a.bosses[0]!;
-    if (distXZ(me, a) > a.house!.radius + FOUND.court + 40) continue;
+    if (a.house!.gap(me) > FOUND.court + 40) continue;
     see(g, a, me);
     if (isFound(g, boss)) continue;
     const steps = DISCOVERIES[boss]!.steps;

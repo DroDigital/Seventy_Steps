@@ -6,8 +6,16 @@ import { strike } from '../src/systems/combat';
 import { teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { stepGame } from '../src/systems/game';
+import type { RingEnclosure } from '../src/world/enclosure';
+import type { ArenaPlace } from '../src/world/placements';
 
 export const deathblow = { damage: 99999, poise: 0, guard: 0, hitstop: 2, parryable: false, interrupts: false };
+
+/** An arena's wall as a ring (the walks of round 63 that go about its radius): fails for any other kind. */
+export function ringOf(a: Pick<ArenaPlace, 'bosses' | 'house'>): RingEnclosure {
+  if (a.house?.kind !== 'ring') throw new Error(`${a.bosses[0]}: not a ring`);
+  return a.house as RingEnclosure;
+}
 
 /** Kills `target` (the investigator) with blows of `attacker`: no foe's blow takes more than BOSS.blowMost of their greatest health (round 68), so it takes two. */
 export function slay(g: Game, attacker: Entity, target: Entity = g.player.id): void {
