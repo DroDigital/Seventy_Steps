@@ -117,8 +117,10 @@ export const SAMPLE_SETS = {
   farHowl: set(['spot_howl'], 0.2, [0.9, 1]),
   hull: set(['spot_boat'], 0.3),
   creak: set(['spot_creak1', 'spot_creak2'], 0.22, [0.8, 1]),
-  thunder: set(['spot_thunder'], 0.35, [0.85, 1]),
+  thunder: set([...takes('storm_thunder', 3), 'spot_thunder'], 0.35, [0.85, 1]), // round 68: three takes of a rolling clap beside the one (the procedural roll beneath it is a bed now: STORM_MIX)
   strike: set(takes('strike', 4), 1, [0.9, 1.04]), // a bolt on the ground close by (round 59: the recipe's crack was a blip): the crack, the tearing and the crash
+  zap: set(takes('storm_zap', 3), 0.6, [0.92, 1.06]), // round 68: the electric snap of a bolt on the ground, over the strike's crash
+  charge: set(takes('storm_charge', 3), 0.5, [0.95, 1.05]), // round 68: the ring of light before it, a charging hum (the whine of its recipe plays only until it has loaded)
   gurgle: set(['spot_gurgle'], 0.3, [0.8, 1]),
   chains: set(['spot_chains'], 0.22, [0.85, 1]),
   timber: set(['spot_groan'], 0.25, [0.7, 0.95]),
@@ -205,7 +207,6 @@ const creaks: Spot = { set: 'creak', every: [18, 45] };
 export const BED_MANNER: Readonly<Record<string, { lowpass?: number; breath?: number; every?: [number, number] }>> = {
   crickets: { lowpass: 3600, breath: 0.75, every: [38, 85] },
   frogs: { lowpass: 3200, breath: 0.7, every: [30, 70] },
-  alien: { lowpass: 5000, breath: 0.4, every: [45, 90] },
   murmur: { breath: 0.35, every: [50, 100] },
   // Round 31 (the rest were too loud): the winds, the sea, the leaves and the cave soften and breathe too.
   wind: { lowpass: 2600, breath: 0.45, every: [30, 70] },
@@ -237,7 +238,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   kn_yan: { beds: [['cave', 0.8], ['drips', 0.65]], spots: [{ set: 'chains', every: [50, 110] }] },
   dreamlands: { beds: [['murmur', 0.65], ['wind', 0.4]], spots: [owls] },
   rlyeh: { beds: [['waves', 1], ['wind_ghost', 0.3]], spots: [{ set: 'gurgle', every: [25, 60] }] },
-  yuggoth: { beds: [['alien', 0.72]], spots: [{ set: 'timber', every: [40, 90] }] },
+  yuggoth: { beds: [['wind_cold', 0.5], ['wind_ghost', 0.34]], spots: [{ set: 'timber', every: [40, 90] }] }, // round 68: it was the recording of a high-pitched buzz, which wore on the ear; now the cold wind of a world at the system's edge
   beyond: { beds: [['wind_ghost', 0.72], ['cave', 0.36]], spots: [] },
 };
 

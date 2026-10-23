@@ -36,6 +36,14 @@ export const DUNWICH_SIGNATURE: Signature = {
     const a = c.actor.get(g.player.id)!;
     if (lastPhase(f) && a.move === 'chant' && a.frame >= a.moves.chant.frames - 1 && near(g, e, DUNWICH.chantRange)) destroy(g, e);
   },
+  status(g, e, f) {
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    if (a.move === 'chant') return `THE INCANTATION · ${Math.ceil((a.moves.chant.frames - a.frame) / 60)} s`;
+    if (lastPhase(f)) return 'CHANT THE INCANTATION · OR STRIKE IT DOWN';
+    const shown = Math.ceil((g.ecs.c.unseen.get(e)?.revealed ?? 0) / 60);
+    return `${shown > 0 ? `SEEN · ${shown} s` : 'UNSEEN'} · POWDER ${f.sig.powder ?? 0}`;
+  },
+  note: (_g, _e, f, phase) => (phase === f.script.phases.length - 1 ? 'CHANT THE INCANTATION · OR STRIKE IT DOWN' : null),
   reset(g, e) {
     const c = g.ecs.c;
     c.health.get(e)!.floor = undefined;

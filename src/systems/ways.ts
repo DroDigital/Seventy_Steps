@@ -33,7 +33,7 @@ export const WAYS = {
   poise: 60,
   light: 1.6, // metres a light is taken from
   interact: 2.6, // the E prompt appears before proximity takes its flame
-  fail: { burst: 2.6, damage: 14, warn: 40, cool: 120 }, // what goes up at a wrong light
+  fail: { burst: 2.6, damage: 0, warn: 40, cool: 120 }, // what goes up at a wrong light: a flare, and no harm in it (round 68: "remove all traps"; it was 14)
   clue: 16, // metres from a rite's lights the clue is said
   heard: 44, // metres from the investigator within which a way's omens are listened for (it is a corridor)
 } as const;
@@ -165,7 +165,8 @@ function build(g: Game, plan: WayPlan): WayRun {
   return run;
 }
 
-function hazard(g: Game, run: WayRun, h: Hazard, place: (s: { d: number; side: number }) => V3): void {
+/** Sets one hazard on a run (the authored ways have none since round 68; tests/ways.test.ts makes the machinery's own). */
+export function hazard(g: Game, run: WayRun, h: Hazard, place: (s: { d: number; side: number }) => V3): void {
   const plan = run.plan;
   if (h.kind === 'ward') {
     for (const s of h.plates) {
@@ -231,7 +232,7 @@ function settle(g: Game, run: WayRun): void {
     if (g.frame < b.landAt) continue;
     run.bursts.splice(i, 1);
     g.events.emit('WardLanded', { at: { ...b.at }, radius: b.radius, look: b.look });
-    blast(g, b.at, b.radius, { player: b.damage, foe: [30, 0.15, 220], poise: WAYS.poise });
+    if (b.damage > 0) blast(g, b.at, b.radius, { player: b.damage, foe: [30, 0.15, 220], poise: WAYS.poise });
   }
 }
 

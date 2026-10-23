@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ENTITIES, getEntity, variantOf, type Variant } from '../src/data/registry';
-import { BOSS, BOSS_LEVEL_SCALING, DIFFICULTIES, NEW_GAME_PLUS, SHUB } from '../src/data/tuning';
+import { BOSS_STANDING } from '../src/data/bossStanding';
+import { BOSS, BOSS_LEVEL_SCALING, BOSS_OVERMATCH, DIFFICULTIES, LEVELS, NEW_GAME_PLUS, PLAYER, SHUB } from '../src/data/tuning';
 import { applyChange } from '../src/systems/arenaChanges';
 import { resetFight } from '../src/systems/bossFight';
 import { strike } from '../src/systems/combat';
 import { morph, spawnCreature } from '../src/systems/creatures';
+import { bossDamageScale, bossHealthScale, overmatch } from '../src/systems/bossScaling';
 import { foeDamage } from '../src/systems/cycles';
 import { createGame, createWorldGame } from '../src/systems/game';
 import { applyLevels, buyLevel, nextLevelCost } from '../src/systems/levels';
@@ -31,8 +33,9 @@ describe('only bosses scale with player level', () => {
         const e = spawnCreature(g, def.id, AT, variant as Variant | undefined)!;
         const boss = form.tier !== 'ally' && !!form.bossScript;
         const h = g.ecs.c.health.get(e)!;
-        expect(h.max, `${def.id} ${variant}`).toBe(Math.round(form.stats.hp * (boss ? healthAt(20) : 1)));
-        expect(foeDamage(g, e), `${def.id} ${variant}`).toBeCloseTo(boss ? damageAt(20) : 1);
+        const over = overmatch(g.player.levels, def.id); // (past a horror's standing, it grows to meet the investigator: round 68)
+        expect(h.max, `${def.id} ${variant}`).toBe(Math.round(form.stats.hp * (boss ? healthAt(20) * over.health : 1)));
+        expect(foeDamage(g, e), `${def.id} ${variant}`).toBeCloseTo(boss ? damageAt(20) * over.damage : 1);
         expect(h.baseMax).toBe(boss ? form.stats.hp : undefined);
         g.ecs.despawn(e);
       }
@@ -46,9 +49,11 @@ describe('only bosses scale with player level', () => {
     applyLevels(high.g);
     expect(low.g.ecs.c.health.get(low.boss)!.max).toBe(getEntity('dr_munoz')!.stats.hp);
     expect(foeDamage(low.g, low.boss)).toBe(1);
-    expect(high.g.ecs.c.health.get(high.boss)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * healthAt(60)));
+    const over = overmatch(high.g.player.levels, 'dr_munoz');
+    expect(over.health).toBeGreaterThan(1);
+    expect(high.g.ecs.c.health.get(high.boss)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * healthAt(60) * over.health));
     expect(high.g.ecs.c.health.get(high.boss)!.max).toBeGreaterThan(low.g.ecs.c.health.get(low.boss)!.max);
-    expect(foeDamage(high.g, high.boss)).toBe(damageAt(60));
+    expect(foeDamage(high.g, high.boss)).toBe(bossDamageScale(60, over.damage));
     expect(foeDamage(high.g, high.boss)).toBeGreaterThan(foeDamage(low.g, low.boss));
     expect(high.g.ecs.c.brain.get(high.boss)!.speed).toBe(low.g.ecs.c.brain.get(low.boss)!.speed);
     expect(high.g.ecs.c.actor.get(high.boss)!.moves).toEqual(low.g.ecs.c.actor.get(low.boss)!.moves);
@@ -101,8 +106,9 @@ describe('only bosses scale with player level', () => {
     g.player.difficulty = 'nightmare';
     applyLevels(g);
     const h = g.ecs.c.health.get(boss)!;
-    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * (1 + 2 * NEW_GAME_PLUS.health) * healthAt(20)));
-    const damage = 40 * DIFFICULTIES.nightmare.foe * (1 + 2 * NEW_GAME_PLUS.damage) * damageAt(20);
+    const over = overmatch(g.player.levels, 'dr_munoz');
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * (1 + 2 * NEW_GAME_PLUS.health) * healthAt(20) * over.health));
+    const damage = 40 * DIFFICULTIES.nightmare.foe * (1 + 2 * NEW_GAME_PLUS.damage) * damageAt(20) * over.damage;
     const me = g.ecs.c.health.get(g.player.id)!;
     const before = me.hp;
     expect(strike(g, boss, g.player.id, { damage: 40, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false })).toBe('hit');
@@ -161,5 +167,51 @@ describe('only bosses scale with player level', () => {
     applySave(loaded, { ...saved, cycle: 1, levels: { vigour: 5, endurance: 0, might: 0 } });
     expect(wounded.max).toBeLessThan(previous);
     expect(wounded.hp / wounded.max).toBeCloseTo(0.5);
+  });
+});
+
+describe('a horror grows to meet an investigator who has outgrown it (round 68: "all bosses remain demanding regardless of player level")', () => {
+  it('is as authored at the standing it is met at, or below it, and for a form with no standing', () => {
+    const [v, m] = BOSS_STANDING.dr_munoz!;
+    expect(overmatch({ vigour: v, might: m }, 'dr_munoz')).toEqual({ health: 1, damage: 1 });
+    expect(overmatch({ vigour: 0, might: 0 }, 'yog_sothoth')).toEqual({ health: 1, damage: 1 });
+    expect(overmatch({ vigour: 30, might: 30 }, 'a_form_that_is_not_there')).toEqual({ health: 1, damage: 1 });
+    expect(overmatch({ vigour: 30, might: 30 }, undefined)).toEqual({ health: 1, damage: 1 });
+  });
+
+  it('takes up a share of the growth in blows as health, and of the growth in health as blows, and only past the standing', () => {
+    const [v, m] = BOSS_STANDING.dr_munoz!;
+    const might = overmatch({ vigour: v, might: m + 10 }, 'dr_munoz');
+    const blows = (1 + LEVELS.might.damage! * (m + 10)) / (1 + LEVELS.might.damage! * m);
+    expect(might.health).toBeCloseTo(1 + BOSS_OVERMATCH.share * (blows - 1), 9);
+    expect(might.damage).toBe(1); // (more Might is more blows, not more health)
+    const vigour = overmatch({ vigour: v + 10, might: m }, 'dr_munoz');
+    expect(vigour.damage).toBeGreaterThan(1);
+    expect(vigour.health).toBe(1);
+    expect(overmatch({ vigour: 30, might: 30 }, 'dr_munoz').health).toBeGreaterThan(might.health);
+  });
+
+  it('keeps the share of the growth that is the investigator\'s: a level farmed is still a level gained', () => {
+    const [v, m] = BOSS_STANDING.dr_munoz!;
+    const o = overmatch({ vigour: 30, might: 30 }, 'dr_munoz');
+    const blows = (1 + LEVELS.might.damage! * 30) / (1 + LEVELS.might.damage! * m);
+    const body = (PLAYER.hp + LEVELS.vigour.hp! * 30) / (PLAYER.hp + LEVELS.vigour.hp! * v);
+    expect(o.health).toBeLessThan(blows);
+    expect(o.damage).toBeLessThan(body);
+  });
+
+  it('is what a spawned horror carries, and what a level bought past its standing makes of one already there', () => {
+    const b = bossGame('dr_munoz');
+    const { g, boss } = b;
+    const h = g.ecs.c.health.get(boss)!;
+    const before = h.max;
+    g.player.levels = { vigour: 30, endurance: 30, might: 30 };
+    applyLevels(g);
+    const o = overmatch(g.player.levels, 'dr_munoz');
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * bossHealthScale(90, 0, o.health)));
+    expect(h.max).toBeGreaterThan(before * 2);
+    expect(foeDamage(g, boss)).toBe(bossDamageScale(90, o.damage));
+    const fresh = spawnCreature(g, 'dr_munoz', AT)!;
+    expect(g.ecs.c.health.get(fresh)!.max).toBe(h.max);
   });
 });

@@ -216,6 +216,8 @@ export const EN = {
   'hud.signFound': 'ELDER SIGN FOUND · {name} · TRAVEL HERE FROM THE MAP ({map})', // found is enough: no rest is needed to journey to it (round 60)
   'hud.places': '{found} OF {of} PLACES · {region}',
   'hud.secrets': '{found} OF {of} SECRETS · {region}',
+  'n.poiGift': '{found} SECRETS FOUND · A GIFT: {echoes} ECHOES{stones}', // round 68: a gift for {found} secrets found; {stones} is ' · N STAR-STONES' or nothing
+  'n.poiGiftStones': ' · {n} STAR-STONES',
   'hud.questDone': 'DONE · {title}',
   'hud.questNew': 'JOURNAL · {title}',
   'hud.questUpdated': '{title} · UPDATED',
@@ -241,7 +243,9 @@ export const EN = {
   'n.gateHeld': 'THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU',
   'n.cache': 'A CACHE OF ECHOES · +{n}',
   'n.markerReached': "MARKER REACHED",
+  'n.markersFull': "MARKER LIMIT · {n} · REMOVE ONE FIRST",
   'n.vial': 'SILVER VIAL · REAGENT DOSES {n}',
+  'n.vialSold': 'SILVER VIAL · YOUR KIT HOLDS NO MORE · +{n} ECHOES',
   'n.rounds': 'YOU CARRY ALL THE ROUNDS YOU CAN',
   // the buttons' names for a device
   'pad.moveStick': 'the left stick',

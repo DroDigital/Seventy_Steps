@@ -9,7 +9,7 @@
 import { t as tr } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import { dist3, distXZ } from '../core/geom';
-import { LORE, PLAYER, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
+import { LORE, PLAYER, REAGENT, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
 import { isAbsent, isConcealed, isUnseen, type Game, type GameEvents } from './components';
 import { aimPoint, playerEye, viewAngle } from './lockOn';
@@ -80,9 +80,9 @@ export function insightSystem(g: Game): void {
       g.overworld?.read.add(t.name);
       g.events.emit('Read', { name: t.name });
     } else {
-      addVial(g);
+      const held = addVial(g);
       g.overworld?.read.add(t.name);
-      g.events.emit('Notice', { text: tr('n.vial', { n: g.player.reagentMax }) });
+      g.events.emit('Notice', { text: held ? tr('n.vial', { n: g.player.reagentMax }) : tr('n.vialSold', { n: REAGENT.surplus }) });
     }
   }
 }

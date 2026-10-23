@@ -70,11 +70,23 @@ export type Scale = 'person' | 'large' | 'giant' | 'colossal';
 /** The size class of a horror by its height (metres). */
 export const scaleOf = (height: number): Scale => (height < 3.2 ? 'person' : height < 8 ? 'large' : height < 18 ? 'giant' : 'colossal');
 
-/** Over the shoulder: behind the investigator, looking at the horror that stands before them. */
-const overShoulder = (dur: number, up: readonly [number, number], look: number, roll = to(0, 0)): Shot =>
-  shot({ dur, on: 'player', aim: 'other', yaw: to(180, 172), dist: to(3, 3.9), up, look: to(look, look), fov: to(56, 61), roll, body: false, sway: 0.5 });
+/** From the investigator's flank, a step inside the fog, the lens low and lifting: the horror rising in the picture as it rises from the ground (round 68: it stood behind them, outside the wall, and showed the fog). */
+const flank = (dur: number, yaw: readonly [number, number], dist: readonly [number, number], up: readonly [number, number], look: readonly [number, number], fov: readonly [number, number]): Shot =>
+  shot({ dur, on: 'player', aim: 'other', yaw, dist, up, look, fov, sway: 0.25 });
 
-/** How each size of horror arrives: a stand a little off its line to the investigator, closing in on the face, then the view from behind the investigator. Distances are of the horror's own height. */
+/** Beside the investigator and a little behind, looking at the horror that stands before them: close enough to the wall at their back to stay inside it. */
+const overShoulder = (dur: number, up: readonly [number, number], look: number, roll = to(0, 0)): Shot =>
+  shot({ dur, on: 'player', aim: 'other', yaw: to(106, 96), dist: to(2.4, 3), up, look: to(look, look), fov: to(56, 51), roll, body: false, sway: 0.5 });
+
+/** Round the horror's far side and high, the investigator small beyond its shoulder: its size against theirs. */
+const beyond = (dur: number, yaw: readonly [number, number], dist: readonly [number, number], up: readonly [number, number], fov: readonly [number, number]): Shot =>
+  shot({ dur, on: 'target', aim: 'other', yaw, dist, up, look: to(0.5, 0.6), fov, body: true, sway: 0.3 });
+
+/**
+ * How each size of horror arrives (round 68: the three shots of a small one are a stand off its line to the investigator, closing in on
+ * the face, and the view from their side; a giant's and a colossus's are the reveal from the investigator's flank, a push in on the face,
+ * and the view from beyond its shoulder, which shows what it is against what stands before it). Distances of a body's height where `body`.
+ */
 export const ARRIVAL: Readonly<Record<Scale, readonly Shot[]>> = {
   person: [
     shot({ dur: 2.4, yaw: to(24, 10), dist: to(3.6, 2.4), up: to(0.5, 0.75), look: to(0.85, 0.9), fov: to(54, 48), body: true, sway: 0.4 }),
@@ -87,14 +99,14 @@ export const ARRIVAL: Readonly<Record<Scale, readonly Shot[]>> = {
     overShoulder(2.6, to(1.9, 2.3), 0.65),
   ],
   giant: [
-    shot({ dur: 3.6, yaw: to(55, 35), dist: to(1.35, 1.6), up: to(0.03, 0.1), look: to(0.08, 0.85), fov: to(62, 56), body: true, ease: 'inout', sway: 0.2 }),
-    shot({ dur: 2.6, on: 'player', aim: 'other', yaw: to(180, 180), dist: to(4.2, 6), up: to(1.7, 3.5), look: to(0.55, 0.6), fov: to(60, 64), body: false, sway: 0.4 }),
-    shot({ dur: 2, yaw: to(-15, -8), dist: to(1.7, 1.4), up: to(0.75, 0.78), look: to(0.85, 0.86), fov: to(46, 42), body: true, sway: 0.3 }),
+    flank(3.2, to(94, 78), to(3.4, 4.6), to(0.35, 1.1), to(0.05, 0.8), to(72, 62)),
+    shot({ dur: 2.4, yaw: to(-18, -8), dist: to(1.5, 1.2), up: to(0.7, 0.78), look: to(0.82, 0.86), fov: to(48, 42), roll: to(1.2, -0.8), body: true, sway: 0.3 }),
+    beyond(2.4, to(126, 140), to(0.7, 0.55), to(0.45, 0.5), to(58, 54)),
   ],
   colossal: [
-    shot({ dur: 4, on: 'player', aim: 'other', yaw: to(180, 168), dist: to(2.4, 3.2), up: to(0.9, 1.1), look: to(0.03, 0.92), fov: to(68, 60), body: false, sway: 0.2 }),
-    shot({ dur: 3, yaw: to(70, 40), dist: to(1.1, 1.3), up: to(0.55, 0.62), look: to(0.8, 0.85), fov: to(54, 50), body: true, sway: 0.2 }),
-    shot({ dur: 2.4, on: 'player', aim: 'other', yaw: to(130, 150), dist: to(3.4, 4.6), up: to(2, 2.6), look: to(0.5, 0.55), fov: to(60, 64), body: false, sway: 0.4 }),
+    flank(4, to(90, 68), to(3.4, 5.2), to(0.4, 1.7), to(0.04, 0.88), to(76, 62)),
+    shot({ dur: 3, yaw: to(34, 16), dist: to(0.62, 0.5), up: to(0.36, 0.56), look: to(0.78, 0.86), fov: to(58, 50), roll: to(-1, 1), body: true, sway: 0.2 }),
+    beyond(2.6, to(124, 138), to(0.55, 0.42), to(0.3, 0.38), to(62, 56)),
   ],
 };
 

@@ -1,11 +1,12 @@
 /**
- * The marker on the map (round 60: "add the ability to set a marker on the map, that has its own minimap arrow indicator"): one place,
- * set from the full map, kept in the save, pointed to by the minimap's rim in a pointer of its own, cleared on coming to it.
+ * The markers on the map (round 60: "add the ability to set a marker on the map, that has its own minimap arrow indicator"; round 68:
+ * "more than one custom waypoint ... and the ability to delete them"): up to twelve places, set from the full map, kept in the save,
+ * pointed to by the minimap's rim in a pointer of its own each, removed one at a time or all together, cleared on coming to each.
  */
 import { describe, expect, it } from 'vitest';
 import { MARKER } from '../src/data/tuning';
 import { createWorldGame } from '../src/systems/game';
-import { markable, markerDistance, markerHere, markerSystem, setMarker } from '../src/systems/marker';
+import { addMarker, clearMarkers, markable, markerDistance, markerSystem, markersHere, removeMarker } from '../src/systems/marker';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
 import { beaconPlace } from '../src/ui/leadMark';
 import { gatherMarks, markAt } from '../src/ui/mapMarks';
@@ -18,67 +19,100 @@ import { record } from './worldHelpers';
 const pos = (g: ReturnType<typeof createWorldGame>) => g.ecs.c.transform.get(g.player.id)!.pos;
 const hubRealm = (g: ReturnType<typeof createWorldGame>) => realmOf(g.overworld!.region ?? 'hub');
 
-describe('setting the marker (round 60)', () => {
-  it('is one place on the ground, set and cleared; the black beyond the world is no place, nor are the numbers that are not', () => {
+describe('setting markers (round 68)', () => {
+  it('stands any number up to the most, each on the ground; the black beyond the world is no place, nor are the numbers that are not', () => {
     const g = createWorldGame();
-    const here = { x: pos(g).x + 40, z: pos(g).z + 10 };
-    expect(setMarker(g, here)).toBe(true);
-    expect(g.overworld!.marker).toEqual(here);
-    expect(setMarker(g, { x: here.x + 5, z: here.z })).toBe(true); // set again: it moves, there is only one
-    expect(g.overworld!.marker!.x).toBe(here.x + 5);
+    const at = (i: number) => ({ x: pos(g).x + 20 + i * 5, z: pos(g).z + 10 });
+    expect(addMarker(g, at(0))).toBe('added');
+    expect(addMarker(g, at(1))).toBe('added'); // a second does not move the first
+    expect(g.overworld!.markers).toEqual([at(0), at(1)]);
     expect(markable({ x: 1e7, z: 1e7 })).toBe(false);
-    expect(setMarker(g, { x: 1e7, z: 1e7 })).toBe(false);
-    expect(setMarker(g, { x: NaN, z: 0 })).toBe(false);
-    expect(g.overworld!.marker!.x).toBe(here.x + 5); // a refused one leaves what stood
-    expect(setMarker(g, null)).toBe(true);
-    expect(g.overworld!.marker).toBeNull();
+    expect(addMarker(g, { x: 1e7, z: 1e7 })).toBe('refused');
+    expect(addMarker(g, { x: NaN, z: 0 })).toBe('refused');
+    expect(g.overworld!.markers).toHaveLength(2); // a refused one leaves what stood
+    for (let i = 2; i < MARKER.most; i++) expect(addMarker(g, at(i))).toBe('added');
+    expect(addMarker(g, at(99))).toBe('full');
+    expect(g.overworld!.markers).toHaveLength(MARKER.most);
+  });
+
+  it('is removed one at a time, the one given and no other, and all together', () => {
+    const g = createWorldGame();
+    const [a, b, c] = [0, 1, 2].map((i) => ({ x: pos(g).x + 30 + i * 8, z: pos(g).z }));
+    for (const m of [a, b, c]) addMarker(g, m);
+    expect(removeMarker(g, markersHere(g)[1]!)).toBe(true);
+    expect(g.overworld!.markers).toEqual([a, c]);
+    expect(removeMarker(g, b)).toBe(false); // gone already
+    expect(removeMarker(g, { x: a.x, z: a.z })).toBe(true); // by place, as a click on the map finds it
+    expect(g.overworld!.markers).toEqual([c]);
+    addMarker(g, a);
+    expect(clearMarkers(g)).toBe(2);
+    expect(g.overworld!.markers).toEqual([]);
+    expect(clearMarkers(g)).toBe(0);
   });
 
   it('shows in the realm it is set in, and is kept, and not shown, in another', () => {
     const g = createWorldGame();
     const other = allRealms().find((r) => r !== hubRealm(g) && r[0].id !== hubRealm(g)[0].id)!;
     const rc = regionRect(other[0]);
-    setMarker(g, { x: (rc.x0 + rc.x1) / 2, z: (rc.z0 + rc.z1) / 2 });
-    expect(g.overworld!.marker).not.toBeNull();
-    expect(markerHere(g)).toBeNull();
-    expect(markerDistance(g)).toBeNull();
+    const far = { x: (rc.x0 + rc.x1) / 2, z: (rc.z0 + rc.z1) / 2 };
+    addMarker(g, far);
+    expect(g.overworld!.markers).toHaveLength(1);
+    expect(markersHere(g)).toEqual([]);
     const near = { x: pos(g).x + 20, z: pos(g).z };
-    setMarker(g, near);
-    expect(markerHere(g)).toEqual(near);
-    expect(markerDistance(g)).toBeCloseTo(20, 5);
+    addMarker(g, near);
+    expect(markersHere(g)).toEqual([near]); // the other realm's is kept, not shown
+    expect(g.overworld!.markers).toHaveLength(2);
+    expect(markerDistance(g, near)).toBeCloseTo(20, 5);
   });
 
-  it('is cleared, with a word, on coming within reach of it, and not before', () => {
+  it('is cleared, with a word, on coming within reach of it, and not before; the others stand', () => {
     const g = createWorldGame();
     const said = record(g, 'Notice');
-    setMarker(g, { x: pos(g).x + MARKER.arrive + 5, z: pos(g).z });
+    const [far, near] = [{ x: pos(g).x + MARKER.arrive + 5, z: pos(g).z }, { x: pos(g).x - MARKER.arrive + 1, z: pos(g).z }];
+    addMarker(g, far);
     markerSystem(g);
-    expect(g.overworld!.marker).not.toBeNull();
+    expect(g.overworld!.markers).toEqual([far]);
     expect(said).toHaveLength(0);
-    setMarker(g, { x: pos(g).x + MARKER.arrive - 1, z: pos(g).z });
+    addMarker(g, near);
     markerSystem(g);
-    expect(g.overworld!.marker).toBeNull();
+    expect(g.overworld!.markers).toEqual([far]);
     expect(said.map((n) => n.text)).toEqual(['MARKER REACHED']);
   });
 
-  it('is kept in the save, and an old save, or one with none, has none', () => {
+  it('is kept in the save, an old save keeps its one as the first, and one with none has none', () => {
     const g = createWorldGame();
-    expect(snapshot(g).marker).toBeUndefined();
-    const at = { x: pos(g).x + 60, z: pos(g).z - 30 };
-    setMarker(g, at);
+    expect(snapshot(g).markers).toBeUndefined();
+    const [a, b] = [{ x: pos(g).x + 60, z: pos(g).z - 30 }, { x: pos(g).x - 40, z: pos(g).z + 25 }];
+    addMarker(g, a);
+    addMarker(g, b);
     const json = JSON.stringify(snapshot(g));
     const back = createWorldGame();
     applySave(back, parseSave(json)!);
-    expect(back.overworld!.marker!.x).toBeCloseTo(at.x, 0);
-    expect(back.overworld!.marker!.z).toBeCloseTo(at.z, 0);
+    expect(back.overworld!.markers).toHaveLength(2);
+    expect(back.overworld!.markers[0]!.x).toBeCloseTo(a.x, 0);
+    expect(back.overworld!.markers[1]!.z).toBeCloseTo(b.z, 0);
     const bad = JSON.parse(json);
-    bad.marker = { x: 'far', z: 2 };
+    bad.markers = [{ x: 'far', z: 2 }];
     expect(parseSave(JSON.stringify(bad))).toBeNull(); // not a place: the save is not read as good
-    delete bad.marker;
+    bad.markers = 'many';
+    expect(parseSave(JSON.stringify(bad))).toBeNull();
+    const old = JSON.parse(json); // round 60's save: one place, `marker`
+    delete old.markers;
+    old.marker = { x: a.x, z: a.z };
+    const upgraded = createWorldGame();
+    applySave(upgraded, parseSave(JSON.stringify(old))!);
+    expect(upgraded.overworld!.markers).toHaveLength(1);
+    expect(upgraded.overworld!.markers[0]!.x).toBeCloseTo(a.x, 0);
+    delete old.marker;
     const plain = createWorldGame();
-    setMarker(plain, at);
-    applySave(plain, parseSave(JSON.stringify(bad))!);
-    expect(plain.overworld!.marker).toBeNull();
+    addMarker(plain, a);
+    applySave(plain, parseSave(JSON.stringify(old))!);
+    expect(plain.overworld!.markers).toEqual([]);
+    const crowded = JSON.parse(json);
+    crowded.markers = Array.from({ length: MARKER.most + 5 }, (_, i) => ({ x: a.x + i, z: a.z }));
+    const capped = createWorldGame();
+    applySave(capped, parseSave(JSON.stringify(crowded))!);
+    expect(capped.overworld!.markers).toHaveLength(MARKER.most);
   });
 });
 
@@ -123,22 +157,26 @@ describe('the pointer to it (round 60)', () => {
   });
 });
 
-describe('the marker on the full map (round 60)', () => {
-  it('is a mark of its own on the full map, its point on the place, with the way to clear it; the minimap draws none (it points)', () => {
+describe('the markers on the full map (round 68)', () => {
+  it('are marks of their own on the full map, each with its place and the way to remove it; the minimap draws none (it points)', () => {
     const g = createWorldGame();
-    const at = { x: pos(g).x + 30, z: pos(g).z };
-    setMarker(g, at);
+    const [a, b] = [{ x: pos(g).x + 30, z: pos(g).z }, { x: pos(g).x - 50, z: pos(g).z + 20 }];
+    addMarker(g, a);
+    addMarker(g, b);
     const view: MapView = { cx: pos(g).x, cz: pos(g).z, scale: 4, w: 1280, h: 720 };
-    const full = gatherMarks(g, view, hubRealm(g), true, 7, 1).marks.find((m) => m.kind === 'marker')!;
-    expect(full).toBeDefined();
-    expect(full.title).toBe('Your marker');
-    expect(full.name).toBe('30 m away');
-    expect(full.note).toMatch(/clear/i);
-    expect(full.x).toBeCloseTo(screenX(view, at.x), 5);
-    expect(full.y + PIN_TIP * full.r).toBeCloseTo(screenY(view, at.z), 5); // the pin's point is on the place
+    const pins = gatherMarks(g, view, hubRealm(g), true, 7, 1).marks.filter((m) => m.kind === 'marker');
+    expect(pins).toHaveLength(2);
+    const first = pins.find((m) => m.at === g.overworld!.markers[0])!;
+    expect(first.title).toBe('Your marker');
+    expect(first.name).toBe('30 m away');
+    expect(first.note).toMatch(/remove/i);
+    expect(first.x).toBeCloseTo(screenX(view, a.x), 5);
+    expect(first.y + PIN_TIP * first.r).toBeCloseTo(screenY(view, a.z), 5); // the pin's point is on the place
     expect(gatherMarks(g, view, hubRealm(g), false, 5, 1).marks.some((m) => m.kind === 'marker')).toBe(false);
-    expect(markAt([full], full.x + reach('marker', full.r) - 1, full.y)?.kind).toBe('marker'); // picked by its head
-    setMarker(g, null);
+    expect(markAt(pins, first.x + reach('marker', first.r) - 1, first.y)?.at).toBe(g.overworld!.markers[0]); // picked by its head: it says which of them
+    removeMarker(g, first.at!);
+    expect(gatherMarks(g, view, hubRealm(g), true, 7, 1).marks.filter((m) => m.kind === 'marker')).toHaveLength(1);
+    clearMarkers(g);
     expect(gatherMarks(g, view, hubRealm(g), true, 7, 1).marks.some((m) => m.kind === 'marker')).toBe(false);
   });
 });
