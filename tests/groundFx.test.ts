@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { INDICATOR } from '../src/data/fxTuning';
 import type { Decals } from '../src/render/decals';
 import { createGroundFx } from '../src/render/groundFx';
 
@@ -17,16 +18,26 @@ const color = [1, 0.5, 0.2] as const;
 describe('what a blow leaves on the ground (round 51)', () => {
   it('a scar is fresh, cools, and goes: age runs 0 to 1 over its life, in the horror\'s mark', () => {
     const { ground, draw } = rig();
+    const life = 10 * INDICATOR.scar; // (round 70: what a blow leaves goes in a share of the seconds it was asked)
     draw(0);
     ground.scar(at, 3, color, 'cthulhu', 10);
     const first = draw(0)[0]!;
     expect(first.kind).toBe('scar');
     expect(first.mark).toBe('tide');
     expect(first.args[4]).toBeCloseTo(0, 5); // fresh
-    expect(draw(5)[0]!.args[4]).toBeCloseTo(0.5, 5);
-    expect(draw(9.9)[0]!.args[4]).toBeGreaterThan(0.95);
-    expect(draw(10.1)).toEqual([]);
+    expect(draw(life / 2)[0]!.args[4]).toBeCloseTo(0.5, 5);
+    expect(draw(life * 0.99)[0]!.args[4]).toBeGreaterThan(0.95);
+    expect(draw(life * 1.01)).toEqual([]);
     expect(ground.count()).toBe(0);
+  });
+
+  it('what a blow leaves is gone sooner than before: the longest scar is under six seconds, a sigil under two and a half', () => {
+    expect(16 * INDICATOR.scar).toBeLessThan(6);
+    expect(2.4 * INDICATOR.sigil).toBeLessThan(2.5);
+    const { ground, draw } = rig();
+    draw(0);
+    ground.scar(at, 3, color, 'cthulhu', 14);
+    expect(draw(6)).toEqual([]);
   });
 
   it('a shock ring races outward, thinning and fading; a sigil is drawn in, held and let go', () => {
@@ -40,11 +51,12 @@ describe('what a blow leaves on the ground (round 51)', () => {
     expect(draw(0.6)).toEqual([]);
     draw(1);
     ground.sigil(at, 3, color, 'hastur', 2);
-    const s = draw(1.2)[0]!;
+    const life = 2 * INDICATOR.sigil;
+    const s = draw(1 + life * 0.15)[0]!;
     expect(s.kind).toBe('sigil');
     expect(s.args[4]).toBeLessThan(1); // not all of it yet
-    expect(draw(2)[0]!.args[4]).toBe(1);
-    expect(draw(3.1)).toEqual([]);
+    expect(draw(1 + life * 0.5)[0]!.args[4]).toBe(1);
+    expect(draw(1 + life * 1.01)).toEqual([]);
   });
 
   it('a slash lights an arc and is gone in a quarter of a second', () => {

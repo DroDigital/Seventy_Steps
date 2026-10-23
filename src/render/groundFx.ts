@@ -7,6 +7,7 @@
  */
 
 import type { V3 } from '../core/geom';
+import { INDICATOR } from '../data/fxTuning';
 import { aoeLook, type AoeStyle } from './aoeLook';
 import type { Decals } from './decals';
 import type { Rgb } from './palette';
@@ -21,11 +22,11 @@ type Item =
   | { kind: 'slash'; at: V3; r: number; yaw: number; arc: readonly [number, number]; life: number; color: Rgb; mark: AoeStyle; born: number };
 
 export interface GroundFx {
-  /** Burnt ground of `radius` that cools over `life` seconds. */
+  /** Burnt ground of `radius` that cools over `life` seconds (kept to the share `INDICATOR.scar` of them: a blow's mark does not linger). */
   scar(at: V3, radius: number, color: Rgb, who?: string, life?: number): void;
   /** A ring racing out from `from` to `to` metres across `life` seconds. */
   shock(at: V3, from: number, to: number, color: Rgb, who?: string, life?: number, width?: number): void;
-  /** A circle drawn in about `at` and held, then let go. */
+  /** A circle drawn in about `at` and held, then let go (in `INDICATOR.sigil` of `life`). */
   sigil(at: V3, radius: number, color: Rgb, who?: string, life?: number): void;
   /** The arc (degrees, as a hit's) a swing of `radius` metres has swept about `at`, facing `yaw`. */
   slash(at: V3, radius: number, yaw: number, arc: readonly [number, number], color: Rgb, who?: string, life?: number): void;
@@ -48,9 +49,9 @@ export function createGroundFx(): GroundFx {
     items.push(it);
   };
   return {
-    scar: (at, r, color, who, life = 9) => add({ kind: 'scar', at: { ...at }, r, life, color, mark: aoeLook(who), born: now }),
+    scar: (at, r, color, who, life = 9) => add({ kind: 'scar', at: { ...at }, r, life: life * INDICATOR.scar, color, mark: aoeLook(who), born: now }),
     shock: (at, from, to, color, who, life = 0.55, width = 1.4) => add({ kind: 'shock', at: { ...at }, r: from, to, width, life, color, mark: aoeLook(who), born: now }),
-    sigil: (at, r, color, who, life = 2.2) => add({ kind: 'sigil', at: { ...at }, r, life, color, mark: aoeLook(who), born: now }),
+    sigil: (at, r, color, who, life = 2.2) => add({ kind: 'sigil', at: { ...at }, r, life: life * INDICATOR.sigil, color, mark: aoeLook(who), born: now }),
     slash: (at, r, yaw, arc, color, who, life = 0.26) => add({ kind: 'slash', at: { ...at }, r, yaw, arc, life, color, mark: aoeLook(who), born: now }),
     warn: (at, r, seconds, color) => add({ kind: 'warn', at: { ...at }, r, life: seconds + 0.12, fill: seconds / (seconds + 0.12), color, mark: aoeLook('yog_sothoth'), born: now }), // (the star: lines of light drawn on it)
     steady: (draw) => void steadies.push(draw),

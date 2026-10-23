@@ -38,6 +38,13 @@ to the stalk, had been 280 of them over the element's own.
 a dark floor and was not seen at all; it is now a clear teal. The author's dark stays as `look.ink`, the scar's and the
 pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own hue, and no two alike.
 
+### Quiet marks (round 70)
+
+A telegraph says where a blow falls without covering the floor: `INDICATOR` (`data/fxTuning.ts`) sets its edge's width and how much of
+its light the edge, the fill, the flash and the outline keep, and how long a scar (30%) and a sigil (60%) of what a blow leaves
+last. The lifted colours, the whole shape from the first frame and the filling front are not touched, so a mark is still read on any
+ground. A pool, a fire and a cloud's reach are not marks but what hurts, and keep their own looks and lives.
+
 ## The pieces
 
 - **Particles** (`render/particles.ts`): one instanced batch of 4 096 camera-facing sprites (2 400 before round 60). Shapes:
