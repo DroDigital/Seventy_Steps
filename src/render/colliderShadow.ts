@@ -53,11 +53,13 @@ export function colliderShadowMesh(colliders: readonly Collider[]): THREE.Mesh |
   if (!colliders.length) return null;
   const [positions, indices]: [number[], number[]] = [[], []];
   for (const c of colliders) {
+    if (c.lightPass) continue; // a lantern's closed movement proxy must not seal its flame inside an opaque solid
     const { corners, faces } = solidOf(c);
     const base = positions.length / 3;
     positions.push(...corners);
     for (const f of faces) indices.push(base + f);
   }
+  if (!positions.length) return null;
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setIndex(indices);
