@@ -10,9 +10,11 @@ import type { V3 } from '../core/geom';
 import { createRng, type Rng } from '../core/rng';
 import { CHUNK_CRITTERS, CRITTERS, FAUNA, type CritterId } from '../data/fauna';
 import type { Prop } from './props';
+import { lanternModelFlame } from './lanternModels';
+import { worldLayout } from './placements';
 import { regionPlan } from './regionPlan';
 import { inDungeon, surface } from './terrain';
-import { chunkKey, regionOfChunk } from './worldMap';
+import { chunkKey, chunkOf, regionOfChunk } from './worldMap';
 
 /** A critter's haunt: where it perches, what it circles, or where about the ground it keeps. */
 export interface Nest extends V3 {
@@ -22,6 +24,30 @@ export interface Nest extends V3 {
 
 /** How far above the ground a perching critter sits at the least. */
 const PERCH_UP = 0.12;
+
+/** Some oil lanterns draw a few moths, even in realms without other fauna; the flame is their haunt. */
+export function lanternMoths(p: Prop): Nest[] {
+  const at = lanternModelFlame(p);
+  if (!at || inDungeon(at.x, at.z)) return [];
+  const rng = createRng(p.seed + 0x6c616d70);
+  if (rng() >= 0.5) return [];
+  return Array.from({ length: 2 + Math.floor(rng() * 2) }, () => ({ critter: 'moth', ...at, seed: Math.floor(rng() * 1e9) }));
+}
+
+let arenaLanterns: Map<number, Prop[]> | undefined;
+
+/** Arena dressing is separate from the region plan, but its lanterns share the chunk's fauna budget. */
+function arenaLamps(key: number): readonly Prop[] {
+  if (!arenaLanterns) {
+    arenaLanterns = new Map();
+    for (const a of worldLayout().arenas) for (const p of a.decor) {
+      if (!lanternModelFlame(p)) continue;
+      const k = chunkKey(chunkOf(p.x), chunkOf(p.z));
+      arenaLanterns.get(k)?.push(p) ?? arenaLanterns.set(k, [p]);
+    }
+  }
+  return arenaLanterns.get(key) ?? [];
+}
 
 /** Where on a prop a critter keeps. */
 function spot(p: Prop, critter: CritterId, rng: Rng): V3 {
@@ -54,10 +80,11 @@ function spot(p: Prop, critter: CritterId, rng: Rng): V3 {
 function place(cx: number, cz: number): Nest[] {
   const region = regionOfChunk(cx, cz);
   const haunts = region ? FAUNA[region.id] : undefined;
-  const props = region && haunts ? regionPlan(region).props.get(chunkKey(cx, cz)) : undefined;
-  if (!haunts || !props) return [];
+  const key = chunkKey(cx, cz);
+  const props = (region && regionPlan(region).props.get(key)) || [];
+  const out = [...props, ...arenaLamps(key)].flatMap(lanternMoths).slice(0, CHUNK_CRITTERS);
+  if (!haunts) return out;
   const rng = createRng(chunkKey(cx, cz) * 7919 + 13);
-  const out: Nest[] = [];
   for (const h of haunts) {
     for (const p of props) {
       if (out.length >= CHUNK_CRITTERS) return out;

@@ -80,6 +80,7 @@ export interface WorldMaterialOptions {
   uvScale?: readonly [number, number];
   uvScroll?: readonly [number, number]; // texture units per second (water)
   emissive?: number; // 0 = vertex-lit, 1 = fully self-lit
+  opacity?: number; // transparent lamp glass; defaults to an opaque surface
   vertexColors?: boolean;
   character?: 'player' | 'creature'; // takes a fixed share of the lantern without N·L, so its values hold as it turns
   vary?: number; // world-space tone variation, 0..1 (ground and walls), so repeats do not show
@@ -140,6 +141,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
       uUvScale: { value: new THREE.Vector2(su, sv) },
       uUvScroll: { value: new THREE.Vector2(du, dv) },
       uEmissive: { value: o.emissive ?? 0 },
+      uOpacity: { value: o.opacity ?? 1 },
       uCharacter: { value: o.character === 'player' ? 2 : o.character ? 1 : 0 },
       uEldritch: { value: o.eldritch ?? 0 },
       uBodyScale: { value: o.bodyScale ?? 1 },
@@ -150,6 +152,14 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
     vertexColors: o.vertexColors ?? false,
     defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }) },
   });
+  if (o.opacity !== undefined && o.opacity < 1) {
+    Object.assign(material, {
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true,
+      blending: THREE.CustomBlending, blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+      // The target's alpha marks creatures and anomaly colours for the post pass: glass must preserve it.
+      blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
+    });
+  }
   material.userData.emissive = o.emissive ?? 0;
   return material;
 }

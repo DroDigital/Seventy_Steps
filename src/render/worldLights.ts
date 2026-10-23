@@ -27,6 +27,8 @@ export interface LightSpot {
   y: number;
   z: number;
   kind: LightKind;
+  halo?: number;
+  haloGain?: number;
   /** A lit window's pane (playtest round 13: its glow hung half a metre before the window, where the light is cast from): the glow sits on the glass, and fades as the window is seen edge on. */
   glass?: { x: number; y: number; z: number };
   pane?: number; // a lit window's seed: put out now and then, dimmed as someone passes (paneLife.ts; round 18)
@@ -145,7 +147,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
           if (face > 0 && !batch.put(s.glass.x, s.glass.y, s.glass.z, LIGHTS.paneHalo, k.haloColor ?? k.color, k.haloGain * face)) break;
           continue;
         }
-        if (!batch.put(s.x, s.y, s.z, k.halo, k.haloColor ?? k.color, k.haloGain * v * waver(s, k.flicker, time))) break;
+        if (!batch.put(s.x, s.y, s.z, s.halo ?? k.halo, k.haloColor ?? k.color, (s.haloGain ?? k.haloGain) * v * waver(s, k.flicker, time))) break;
       }
       batch.end();
     },

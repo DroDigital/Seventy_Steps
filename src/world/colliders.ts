@@ -12,6 +12,7 @@ export interface BoxCollider {
   kind: 'box';
   min: V3;
   max: V3;
+  lightPass?: boolean; // a coarse movement proxy for an open lantern cage, not an opaque light blocker
   fall?: boolean; // a drop: the investigator falls through; everyone else is still pushed out
 }
 
@@ -22,6 +23,7 @@ export interface CylinderCollider {
   radius: number;
   y0: number;
   y1: number;
+  lightPass?: boolean;
   fall?: boolean;
 }
 
@@ -35,6 +37,7 @@ export interface OrientedBoxCollider {
   yaw: number; // radians, yaw 0 faces +z like everything else
   y0: number;
   y1: number;
+  lightPass?: boolean;
   fall?: boolean;
 }
 
@@ -141,9 +144,9 @@ export function resolveCapsule(w: CollisionWorld, pos: V3, r: number, h: number,
   if (!openEdge) w.contain(pos, r);
 }
 
-function firstHit(w: CollisionWorld, list: readonly Collider[], from: V3, d: V3, t: number): number {
+function firstHit(w: CollisionWorld, list: readonly Collider[], from: V3, d: V3, t: number, accept?: (c: Collider) => boolean): number {
   for (const c of list) {
-    if (w.off.has(c)) continue;
+    if (w.off.has(c) || (accept && !accept(c))) continue;
     let hit: number;
     if (c.kind === 'box') hit = segmentBox(from, d, c.min, c.max);
     else if (c.kind === 'cylinder') hit = segmentCylinder(from, d, c.x, c.z, c.radius, c.y0, c.y1);
@@ -157,12 +160,12 @@ function firstHit(w: CollisionWorld, list: readonly Collider[], from: V3, d: V3,
   return t;
 }
 
-/** Fraction along from → to where the first obstacle (collider or ground) starts; 1 when the path is clear. */
-export function raycast(w: CollisionWorld, from: V3, to: V3): number {
+/** Fraction along from → to where the first obstacle starts; 1 when clear. An optional filter is for light rays only. */
+export function raycast(w: CollisionWorld, from: V3, to: V3, accept?: (c: Collider) => boolean): number {
   const d = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z };
-  let t = firstHit(w, w.colliders, from, d, 1);
+  let t = firstHit(w, w.colliders, from, d, 1, accept);
   const near = w.near?.(Math.min(from.x, to.x), Math.min(from.z, to.z), Math.max(from.x, to.x), Math.max(from.z, to.z));
-  if (near) t = firstHit(w, near, from, d, t);
+  if (near) t = firstHit(w, near, from, d, t, accept);
   for (let i = 1; i <= GROUND_STEPS; i++) {
     const s = (i / GROUND_STEPS) * t;
     if (from.y + d.y * s < w.ground(from.x + d.x * s, from.z + d.z * s)) return ((i - 1) / GROUND_STEPS) * t;
