@@ -12,6 +12,7 @@ export type When = { quest: string; at: 'unstarted' | 'done' | number };
 export interface Topic {
   when?: readonly When[]; // every one must hold
   has?: 'laudanum'; // the investigator carries some
+  slain?: string; // a horror (its roster id) already put down: said by one who knows it (round 70: Keziah gone before Gilman was asked)
   starts?: string; // hearing it begins this quest
   lines: readonly string[];
 }
@@ -39,6 +40,13 @@ export interface NpcDef {
 
 const at = (quest: string, stage: When['at']): When => ({ quest, at: stage });
 
+/** Gilman, once Keziah is gone: the key, and the way down to Kuranes. */
+const WAY_DOWN: readonly string[] = [
+  "It's quieter in my head now. Thank you.",
+  "I've been thinking about that key. Randolph Carter had one like it, the writer from Boston. He's gone missing, the papers said. The tall man must have taken it from him.",
+  "There's a way down from here, into deeper dreams. Peaslee knows the sign. Go down the stair and ask for Kuranes. He's been dreaming longer than any of us. If anyone knows what a silver key opens, he does.",
+];
+
 const NEAR_NPCS: readonly NpcDef[] = [
   {
     id: 'peaslee', name: 'Wingate Peaslee', title: 'Professor of Psychology', sign: 'hub_quad', side: 1,
@@ -64,6 +72,7 @@ const NEAR_NPCS: readonly NpcDef[] = [
         "You're from the waking side? Then you want Professor Peaslee first. He's on the university grounds, east of here, by the carved sign on the quad.",
         'He worked out how this place goes before any of us did. Come back once you have seen him.',
       ] },
+      { when: [at('witch_house', 'unstarted')], slain: 'keziah_mason', starts: 'witch_house', lines: WAY_DOWN }, // she fell before he was asked (round 70): it is quieter in his head already, and the quest is done as it begins
       { when: [at('witch_house', 'unstarted')], starts: 'witch_house', lines: [
         "Peaslee sent you? Then he's still all right. Good.",
         'I was studying Keziah Mason. They tried her for witchcraft in 1692 and she got out of Salem gaol through the corner of a cell. She knew a way to turn a corner that isn\'t in the room. I found it too.',
@@ -84,11 +93,7 @@ const NEAR_NPCS: readonly NpcDef[] = [
       { when: [at('witch_house', 2)], lines: ["The stair landing is the last quiet place in that house. There's a sign on it. Rest there before the attic.", "Her formulae are in the closet off it. You will see the door if you are still holding what I showed you."] },
       { when: [at('witch_house', 3)], lines: ['The closet is off the landing, to the west. Read what she wrote. It will say what she is waiting for.'] },
       { when: [at('witch_house', 4)], lines: ["She is in the garret above the landing, with that thing. You know what she is doing now. Mind the ceiling."] },
-      { when: [at('witch_house', 'done'), at('descent', 0)], lines: [
-        "It's quieter in my head now. Thank you.",
-        "I've been thinking about that key. Randolph Carter had one like it, the writer from Boston. He's gone missing, the papers said. The tall man must have taken it from him.",
-        "There's a way down from here, into deeper dreams. Peaslee knows the sign. Go down the stair and ask for Kuranes. He's been dreaming longer than any of us. If anyone knows what a silver key opens, he does.",
-      ] },
+      { when: [at('witch_house', 'done'), at('descent', 0)], lines: WAY_DOWN },
       { lines: ['I keep counting the corners on this street. There are more of them than there should be.'] },
     ],
   },

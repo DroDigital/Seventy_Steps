@@ -2,8 +2,8 @@
  * Quests (playtest round 1): each quest's stage, kept in the overworld and saved. A quest begins
  * when someone asks it of the investigator (npcs.ts), or by itself once the one before it is done
  * (`auto`, round 12); its stage's goal is checked as it can be met — a talk or a gift when the
- * investigator speaks with someone, a boss slain, an Elder Sign found, a page read or the waking world's seals
- * broken every half second — and the last stage's pays its reward. Pure: no Three.js.
+ * investigator speaks with someone, a boss slain, an Elder Sign found, a page read, the waking world's seals
+ * broken or the dream's ending told every half second — and the last stage's pays its reward. Pure: no Three.js.
  */
 
 import { stepKey } from '../data/discoveries';
@@ -125,6 +125,7 @@ function met(g: Game, goal: Goal): boolean {
   if (goal.kind === 'reach') return ow.discovered.has(goal.sign);
   if (goal.kind === 'read') return ow.read.has(goal.doc);
   if (goal.kind === 'step') return ow.told.has(stepKey(goal.boss, goal.i));
+  if (goal.kind === 'ending') return !!ow.ending;
   return goal.kind === 'seals' && sealsBroken(g) >= goal.count;
 }
 

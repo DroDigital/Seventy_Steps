@@ -51,7 +51,7 @@ export const FAR_DUNGEONS: readonly DungeonDef[] = [
       room('nadir', 'hall', 'eddies', 'w', { spawns: ['cat_from_saturn', 'cat_from_saturn', 'flying_polyp'], words: 'THE NADIR' }),
       room('lattice', 'corridor', 'antechamber', 'e', { spawns: ['yekubian', 'being_from_beyond'] }),
       room('mirrors', 'hall', 'lattice', 'e', { hidden: { maxSanity: 40 }, tome: { name: "The Silver Key's Inscription", insight: 2 } }),
-      room('span', 'bridge', 'antechamber', 'n', { hidden: { minInsight: 3 } }),
+      room('span', 'bridge', 'antechamber', 'n'), // round 70: the only way to 'Umr's hall, so no insight is asked of it (it was minInsight 3, and a mind that had spent its insight could not reach any ending)
       room('ultimate', 'hall', 'span', 'n', { wide: true, boss: ['umr_at_tawil'] }),
     ],
   },

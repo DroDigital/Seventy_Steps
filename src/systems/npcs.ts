@@ -65,7 +65,7 @@ function holds(g: Game, w: When): boolean {
 
 /** What they would talk about now. */
 export function topicOf(g: Game, n: NpcDef): Topic {
-  const ok = (t: Topic): boolean => (t.when ?? []).every((w) => holds(g, w)) && (!t.has || g.player.laudanum > 0);
+  const ok = (t: Topic): boolean => (t.when ?? []).every((w) => holds(g, w)) && (!t.has || g.player.laudanum > 0) && (!t.slain || !!g.overworld?.slain.has(`boss:${t.slain}`));
   return n.topics.find(ok) ?? n.topics[n.topics.length - 1];
 }
 

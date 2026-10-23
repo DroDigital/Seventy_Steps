@@ -12,7 +12,8 @@ export type Goal =
   | { kind: 'reach'; sign: string } // an Elder Sign found
   | { kind: 'read'; doc: string } // a tome or note read (data/documents.ts), wherever it lies
   | { kind: 'step'; boss: string; i: number } // an act of a horror's discovery done (data/discoveries.ts; systems/discovery.ts): a vigil kept, a gift laid, a rite lit
-  | { kind: 'seals'; count: number }; // this many of the waking world's seals broken (systems/seals.ts)
+  | { kind: 'seals'; count: number } // this many of the waking world's seals broken (systems/seals.ts)
+  | { kind: 'ending' }; // the dream brought to one of its endings (systems/endings.ts): chosen at the Court's Elder Sign, or in the Guide's offer
 
 export interface QuestStage {
   goal: Goal;
@@ -62,7 +63,7 @@ const HAND: Readonly<Record<string, QuestDef>> = {
       { goal: { kind: 'read', doc: "Officer Riley's Report" }, note: "Gilman says the police went into the Witch House on the third of October. Officer Riley's report is lying somewhere in Arkham. Read what he found before going in." },
       { goal: { kind: 'talk', npc: 'gilman' }, note: 'Riley found a hole in the attic wall and small footprints with fingers. Take it to Gilman: he knows what it means.', gift: { insight: 1 } },
       { goal: { kind: 'reach', sign: 'arkham_witch' }, note: 'Gilman has shown you how to look at a corner until it gives. Climb the Witch House to the stair landing, where an Elder Sign stands, and rest there before the attic.' },
-      { goal: { kind: 'read', doc: "Keziah's Formulae" }, note: 'Her formulae are in a closet off the landing that only a mind that has learned to look can see. Read them: Gilman says they tell what she is doing, and when.' },
+      { goal: { kind: 'read', doc: "Keziah's Formulae" }, note: 'Her formulae are in a closet off the landing that only a mind that has learned to look can see (it wants 1 insight). Read them: Gilman says they tell what she is doing, and when. If the insight is spent, go on: the garret does not wait for them.' },
       { goal: { kind: 'slay', boss: 'keziah_mason' }, note: 'Keziah Mason is in the garret above the landing, with the rat thing with the little hands. Gilman cannot think straight while she is there.' },
     ],
     done: 'Keziah Mason is gone from the Witch House.',
@@ -82,7 +83,7 @@ const HAND: Readonly<Record<string, QuestDef>> = {
     main: true,
     stages: [
       { goal: { kind: 'seals', count: SEALS.kadath }, note: "Kadath's door is sealed by the great horrors of the waking world. Kuranes says four must fall before it opens; Keziah Mason was one." },
-      { goal: { kind: 'reach', sign: 'beyond_threshold' }, note: "Kadath's door stands open. The Silver Key opens the last gate, beyond Kadath. Cross the dream lands and find it." },
+      { goal: { kind: 'reach', sign: 'beyond_threshold' }, note: "Kadath's door stands open. The Great Ones and the Crawling Chaos hold the hall beyond it, and the Ultimate Gate will not open while a horror holds you. Put them down, and pass through to the Threshold of the Silver Key." },
     ],
     done: 'I have reached the Threshold. What happens now is my choice.',
     reward: { insight: 2 },
@@ -150,8 +151,16 @@ const HAND: Readonly<Record<string, QuestDef>> = {
   },
   silver_key: {
     title: 'The Gate and the Key',
-    stages: [{ goal: { kind: 'slay', boss: 'yog_sothoth' }, note: "Randolph Carter says Yog-Sothoth is the gate and the key and the guardian, and while it holds, the tall man's way stays open. It waits past 'Umr at-Tawil." }],
-    done: 'Yog-Sothoth is put down. Carter says what is left is the Court, and a choice.',
+    main: true, // round 70: the line did not end at the Threshold, but at one of the three endings, and the tracker fell silent there
+    after: 'kadath',
+    lenient: true, // the dream may end before every horror has fallen ('Umr offers the Gate itself): an ending closes what is left
+    stages: [
+      { goal: { kind: 'slay', boss: 'umr_at_tawil' }, note: "'Umr at-Tawil, the Guide, keeps the last gate in the Ultimate Void, across the span north of the First Gate. When his strength fails he may offer to go through the Gate with you: that is an ending. Strike him down instead, and the way goes on to Yog-Sothoth and the Court." },
+      { goal: { kind: 'slay', boss: 'yog_sothoth' }, note: "Randolph Carter says Yog-Sothoth is the gate and the key and the guardian, and while it holds, the tall man's way stays open. It waits past 'Umr at-Tawil." },
+      { goal: { kind: 'slay', boss: 'azathoth' }, note: 'Azathoth waits in its Court, blind, and hears every step. It cannot be hurt, only outlasted: keep still, or creep with the guard raised, until the piping fades.' },
+      { goal: { kind: 'ending' }, note: "The piping has faded. Rest at the Elder Sign in Azathoth's Court: there the dream asks for its end. Wake and seal the Gate, or kneel to the Crawling Chaos." },
+    ],
+    done: 'The dream is ended, and the choice was my own.',
     reward: { stones: 2, insight: 3 },
   },
 };

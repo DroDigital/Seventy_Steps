@@ -9,6 +9,10 @@ import type { NpcDef, When } from './npcs';
 
 const at = (quest: string, stage: When['at']): When => ({ quest, at: stage });
 
+/** Carter's word while 'Umr and Yog-Sothoth stand between the investigator and the Court, and once they are past. */
+const YOG: readonly string[] = ["Yog-Sothoth waits past 'Umr at-Tawil. Its spheres are gates. Step through them and you'll be somewhere else in the same place."];
+const COURT: readonly string[] = ['It is closed, then. Or as closed as it ever was.', 'Go on to the Court. Whatever you decide there, you will have decided it.'];
+
 export const FAR_NPCS: readonly NpcDef[] = [
   {
     id: 'nathaniel', name: 'Nathaniel Wingate Peaslee', title: 'Professor of Political Economy', sign: 'pnakotus_camp', side: 1,
@@ -87,8 +91,10 @@ export const FAR_NPCS: readonly NpcDef[] = [
         "Past him is Yog-Sothoth. It is the gate and the key and the guardian of the gate, all at once. While it holds, the tall man's way stays open.",
         'Put it down, and what is left is the Court, and a choice. Make it yourself.',
       ] },
-      { when: [at('silver_key', 0)], lines: ["Yog-Sothoth waits past 'Umr at-Tawil. Its spheres are gates. Step through them and you'll be somewhere else in the same place."] },
-      { when: [at('silver_key', 'done')], lines: ['It is closed, then. Or as closed as it ever was.', 'Go on to the Court. Whatever you decide there, you will have decided it.'] },
+      { when: [at('silver_key', 0)], lines: YOG },
+      { when: [at('silver_key', 1)], lines: YOG }, // (round 70: 'Umr first, then Yog-Sothoth)
+      { when: [at('silver_key', 2)], lines: COURT },
+      { when: [at('silver_key', 3)], lines: COURT }, // (the Court's sign is where it is decided: the tracker and the sign's menu say so)
       { lines: ['I have seen the other side of this more than once. It does not get easier.'] },
     ],
   },

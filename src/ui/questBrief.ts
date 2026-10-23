@@ -1,6 +1,6 @@
 /**
  * The quest tracker's words (ui/questTracker.ts): what the open stage of the quest being followed asks, in one short line, by the kind of
- * goal: whom to speak with, what to slay, which sign to find, what to read, how many seals have fallen, which act of a horror's discovery to
+ * goal: whom to speak with, what to slay, which sign to find, what to read, how many seals have fallen, where the dream's end is chosen, which act of a horror's discovery to
  * do. The journal keeps the long note (data/quests.ts); this is what fits at the side of the screen. The interface's words are the
  * language chosen (data/lang `hud.track.*`); the names are the story's own, as the rest of the story's words are.
  */
@@ -10,6 +10,7 @@ import { DISCOVERIES } from '../data/discoveriesAll';
 import { NPCS } from '../data/npcs';
 import type { Goal } from '../data/quests';
 import { getEntity } from '../data/registry';
+import { COURT_SIGN } from '../systems/endings';
 import { worldLayout } from '../world/placements';
 
 const npcName = (id: string): string => NPCS.find((n) => n.id === id)?.name ?? id;
@@ -30,6 +31,8 @@ export function briefLine(goal: Goal, seals = 0): string {
       return tr('hud.track.read', { name: goal.doc });
     case 'seals':
       return tr('hud.track.seals', { n: Math.min(seals, goal.count), of: goal.count });
+    case 'ending':
+      return tr('hud.track.ending', { name: worldLayout().signs.find((s) => s.id === COURT_SIGN)?.name ?? COURT_SIGN });
     case 'step': {
       const step = DISCOVERIES[goal.boss]?.steps[goal.i];
       if (step?.kind === 'offer') return upper(step.label); // (the altar's own words: "lay your blood on the stone")

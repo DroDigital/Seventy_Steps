@@ -229,6 +229,7 @@ export const EN = {
   'hud.track.reach': 'Find the Elder Sign at {name}',
   'hud.track.read': 'Read {name}',
   'hud.track.seals': 'Break the seals · {n} of {of}',
+  'hud.track.ending': 'Choose the dream\'s end at {name}',
   'hud.track.rite': 'Kindle the lights in their order',
   'hud.track.vigil': 'Keep a vigil at the mark',
   'hud.track.step': 'Do what the place asks',
