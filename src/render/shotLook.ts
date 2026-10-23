@@ -1,30 +1,27 @@
 /**
- * How a shot is drawn. The bolt still flies as the simulation launched it. What changed is the
- * picture: one void-green fireball was every caster's shot. That orb stays with Yog-Sothoth, whose
- * spheres are that light, and the Colour keeps an orb in its own hue. Everyone else is a shard, a
- * drop, a spark or a dart in their own colours.
+ * How a shot is drawn. The bolt still flies as the simulation launched it. What changed is the picture: one void-green fireball was
+ * every caster's shot (round 51: five stock solids, picked from the caster's name); since round 69 each creature that shoots throws
+ * a thing from its own tale (data/shotForms.ts, built in render/shotShapes*.ts), Yog-Sothoth its congeries of globes and the Colour
+ * its globule, in the light of the horror's other blows (attackLook).
  */
 
+import { SHOTS, type ShotForm } from '../data/shotForms';
 import { lookOf, paletteOf } from './attackLook';
 import { ANOMALY, type Rgb } from './palette';
 
-export const SHOT_FORMS = ['orb', 'shard', 'drop', 'spark', 'dart'] as const;
-export type ShotForm = (typeof SHOT_FORMS)[number];
+export { SHOT_FORMS, type ShotForm } from '../data/shotForms';
 
 export interface ShotLook {
   form: ShotForm;
   color: Rgb;
 }
 
-const BODIES = ['shard', 'spark', 'dart'] as const;
-
 function formOf(id: string, lob: boolean): ShotForm {
-  if (id === 'yog_sothoth' || id === 'colour_out_of_space') return 'orb';
+  const choice = SHOTS[id];
+  const own = choice && (lob ? choice.lob ?? choice.bolt : choice.bolt ?? choice.lob);
+  if (own) return own;
   const palette = paletteOf(id);
-  if (lob || palette === 'sea' || palette === 'ichor') return 'drop';
-  let n = 0;
-  for (let i = 0; i < id.length; i++) n = (n + id.charCodeAt(i) * (i + 1)) % BODIES.length;
-  return BODIES[n]!;
+  return lob || palette === 'sea' || palette === 'ichor' ? 'glob' : 'shard';
 }
 
 function colorOf(id: string): Rgb {
@@ -33,8 +30,8 @@ function colorOf(id: string): Rgb {
   return lookOf(id).line; // (lifted to a light's brightness)
 }
 
-/** The picture of a shot from roster id `id`. A lob, or a sea or ichor body, is a drop. */
+/** The picture of a shot from roster id `id`. A creature with no shot of its own throws a glob if it spits, else a shard. */
 export function shotLook(id: string | undefined, lob = false): ShotLook {
-  if (!id) return { form: 'dart', color: lookOf(undefined).line };
+  if (!id) return { form: lob ? 'glob' : 'shard', color: lookOf(undefined).line };
   return { form: formOf(id, lob), color: colorOf(id) };
 }

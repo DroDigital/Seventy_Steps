@@ -55,10 +55,16 @@ pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own 
   ground: ragged, its cracks glowing and cooling) and `sigil` (rings, ticks and turning spokes, drawn in from the centre).
 - **Ground marks** (`groundFx.ts`): the scar of a burst, slam or landed bolt; shock rings racing out; the sigil of a
   summoning or arrival; the slash a swing has just swept. Each has its own clock and the horror's own mark.
-- **Bolts** (`boltViews.ts`, `shotLook.ts`): five forms (orb, shard, drop, spark, dart) in the horror's light. The simulation
-  now says when one leaves (`BoltLoosed`) and when one ends (`BoltLanded`: on a body, the ground, a wall, or spent).
-- **Beams** (`beams.ts`): two ribbons to a beam, an aura that crawls and a ragged beam with a steady hot core; energy runs out
-  along it from its source. The flares at its ends and the scorch it draws are `attackFx`'s.
+- **Bolts** (`boltViews.ts`, `shotLook.ts`; round 69): five stock solids (a cone among them) were every caster's shot. Each creature that
+  shoots now throws a thing from its own tale (`data/shotForms.ts`, the body built in `shotShapes*.ts` from `shotKit.ts`): Dagon's
+  priests a silver fish, Keziah the crooked knife of the Walpurgis rite, Wilbur a leaf torn from the Necronomicon, the Haunter its
+  trilobed eye, Yig a diamond-backed snake, Hutchinson a rimed chain, Zkauba the Silver Key, Hastur the Yellow Sign, Yog-Sothoth its
+  congeries of globes (forty-one in all; a creature with no shot of its own throws a `shard`, or a `glob` if it spits). A body is
+  flat-shaded in four tones (the tint lit, a white-hot heart, a dark, a pale) and some parts sway, swell or flap in the vertex shader;
+  `FLIGHT` says whether it points where it goes, tumbles, flips or turns, and how large it is drawn. `tests/shotLook.test.ts` holds
+  that every creature that shoots has one, that no two horrors share one, and that no shot is a cone.
+- **Beams** (`beams.ts`, `data/beamStyles.ts`; round 69): the two ribbons carry a pattern of the caster's own: a braid, running beads,
+  a crackle, a slow wave, bands of colour, a flame's tongue, dashes of ice, a dark core with a bright rim.
 - **Melee** (`meleeFx.ts`): a blow's window opening (`Swung`) lights the arc of a swing, bursts a slam or ring, tears the ground
   behind a charge; a blow that lands on the investigator flares at the wound in the horror's own light.
 - **Sound** (`data/attackSounds.ts`, `render/audio/attackAudio.ts`): see below.
