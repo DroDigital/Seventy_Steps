@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { MODEL_INFO } from '../data/models/index';
 import type { Prop } from '../world/props';
+import { LANTERN_MODELS } from '../world/lanternModels';
 import { BASE, luma, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 
@@ -61,31 +62,36 @@ function decode(id: string): Decoded | null {
 const WOOD: Rgb = scaleRgb(mixRgb(BASE.charcoal, BASE.rust, 0.35), 1.7);
 const LEAF: Rgb = scaleRgb(mixRgb(BASE.seaGrey, BASE.charcoal, 0.55), 1.3);
 
-/** The model as pieces of the materials the prop job merges (stone, wood, leaf), in the prop's frame, scaled by the prop's look. */
+/** The model's materials in the prop's frame. Lantern iron and glass keep their own finish instead of the kit's leaf/wood labels. */
 export function modelPieces(p: Prop, stone: Rgb): Piece[] {
   const look = p.set;
   const m = look && decode(look.id);
   if (!look || !m) return [];
   const bases: readonly Rgb[] = [look.tint ? mixRgb(stone, look.tint, 0.6) : stone, WOOD, LEAF];
-  const mats = ['stone', 'wood', 'leaf'] as const;
+  const lamp = !!LANTERN_MODELS[look.id];
+  const mats = ['stone', 'wood', 'leaf', 'glass'] as const;
   const keep = look.keep ?? 0;
   const k = look.scale ?? 1;
   const out: Piece[] = [];
-  for (let kind = 0; kind < 3; kind++) {
+  for (let kind = 0; kind < (lamp ? 4 : 3); kind++) {
     const pos: number[] = [];
     const nor: number[] = [];
     const uv: number[] = [];
     const col: number[] = [];
     for (let t = 0; t < m.kind.length; t++) {
-      if (m.kind[t] !== kind) continue;
+      const glass = lamp && look.id === 'lightpost' && m.kind[t] === 1;
+      if ((glass ? 3 : lamp ? 0 : m.kind[t]) !== kind) continue;
+      // Replace the baked candle's tall wick with the oil burner's small wick and flame.
+      if (lamp && look.id === 'lantern' && m.kind[t] === 1 && m.colour[t * 3 + 1] < 150) continue;
       const v = [0, 1, 2].map((c) => m.faces[t * 3 + c]);
       const [a, b, c] = v.map((i) => new THREE.Vector3(m.points[i * 3] * k, m.points[i * 3 + 1] * k, m.points[i * 3 + 2] * k));
       const n = new THREE.Vector3().subVectors(c, b).cross(new THREE.Vector3().subVectors(a, b)).normalize();
       if (!Number.isFinite(n.x)) continue; // a sliver
       const raw: Rgb = [m.colour[t * 3] / 255, m.colour[t * 3 + 1] / 255, m.colour[t * 3 + 2] / 255];
       const shade = 0.55 + 0.9 * Math.min(1, luma(raw) * 1.3); // its light and dark, over the colour of its kind
-      const base = bases[kind];
-      const c3 = [0, 1, 2].map((i) => base[i] * shade * (1 - keep) + raw[i] * keep * 1.3);
+      const base = lamp ? (glass ? [0.34, 0.29, 0.2] : m.kind[t] === 1 ? [0.42, 0.3, 0.16] : m.kind[t] === 0 ? [0.3, 0.31, 0.3] : [0.22, 0.245, 0.235]) : bases[kind];
+      const retained = lamp ? 0 : keep;
+      const c3 = [0, 1, 2].map((i) => base[i] * shade * (1 - retained) + raw[i] * retained * 1.3);
       const [ax, ay, az] = [Math.abs(n.x), Math.abs(n.y), Math.abs(n.z)];
       for (const q of [a, b, c]) {
         pos.push(q.x, q.y, q.z);

@@ -14,10 +14,11 @@
 
 import type { V3 } from '../core/geom';
 import { LIGHTS } from '../data/tuning';
-import { raycast, type CollisionWorld } from '../world/colliders';
+import { raycast, type Collider, type CollisionWorld } from '../world/colliders';
 
 /** The lights that stand in a room or a camp, where a wall or a tent may come between them and the eye. */
 const LOOKED_AT: ReadonlySet<string> = new Set(['torch', 'fire']);
+const opaque = (c: Collider): boolean => !c.lightPass;
 
 export interface Sighted {
   s: { x: number; y: number; z: number; kind: string };
@@ -47,7 +48,7 @@ export function clearOf(w: CollisionWorld, eye: V3, s: V3, pull: number, lift: n
   const d = Math.hypot(eye.x - s.x, eye.y - s.y, eye.z - s.z);
   const k = d > 1e-6 ? Math.min(pull, d * 0.5) / d : 0;
   const to = { x: s.x + (eye.x - s.x) * k, y: s.y + (eye.y - s.y) * k + lift, z: s.z + (eye.z - s.z) * k };
-  const hit = raycast(w, eye, to);
+  const hit = raycast(w, eye, to, opaque);
   if (hit >= 1) return true;
   return hit * Math.hypot(to.x - eye.x, to.y - eye.y, to.z - eye.z) < 0.1 ? null : false;
 }

@@ -32,6 +32,7 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   brick: { texture: 'brick', seed: 3, vertexColors: true, vary: 0.5 },
   shingle: { texture: 'shingle', seed: 3, vertexColors: true, vary: 0.5 },
   glow: { texture: 'cloth', emissive: 1, vertexColors: true },
+  glass: { texture: 'cloth', emissive: 0.12, vertexColors: true, opacity: 0.14 },
   pane: { texture: 'cloth', emissive: 1, vertexColors: true, panes: true }, // lit windows (round 18)
 };
 const materials = new Map<PropMat, THREE.ShaderMaterial>();
@@ -83,7 +84,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
       if (!piece.light) continue;
       if (piece.at) {
         const place = ([x, y, z]: readonly [number, number, number]): { x: number; y: number; z: number } => ({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was (rotateY), then placed
-        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane });
+        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane, halo: piece.halo, haloGain: piece.haloGain });
       } else {
         geo.computeBoundingBox();
         const m = geo.boundingBox!.getCenter(new THREE.Vector3());

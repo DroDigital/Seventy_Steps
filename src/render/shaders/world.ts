@@ -111,6 +111,7 @@ uniform vec3 uFogColor;
 uniform float uFogAmount;
 uniform float uCharacter;
 uniform float uMarkCharacters; // 1: a character's pixels carry alpha 0.75, which the post pass keeps the colour of (round 34)
+uniform float uOpacity;
 uniform float uCharacterLight;
 uniform float uLanternSelf; // the investigator's share of their own lantern
 uniform float uSelfMax; // the brightest anything lights the investigator
@@ -267,6 +268,6 @@ void main() {
     col = mix(col, min(lit, vec3(1.2)) * vec3(0.9, 0.95, 0.93) * 1.1, clamp(foam, 0.0, 0.7));
   }
 #endif
-  gl_FragColor = vec4(mix(col, uFogColor, vFog * uFogAmount), uCharacter > 0.5 && uMarkCharacters > 0.5 ? 0.75 : 1.0);
+  gl_FragColor = vec4(mix(col, uFogColor, vFog * uFogAmount), uCharacter > 0.5 && uMarkCharacters > 0.5 ? 0.75 : uOpacity);
 }
 `;

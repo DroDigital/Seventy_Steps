@@ -16,11 +16,13 @@ import { setPieces } from './setShapes';
 import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
-export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
+export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
 export interface Piece {
   mat: PropMat;
   geo: THREE.BufferGeometry;
   light?: LightKind; // a lamp's glass, a fire, a lit window: it lights the world about it (worldLights.ts)...
+  halo?: number; // a housed oil flame has a smaller halo than an open flame
+  haloGain?: number;
   at?: readonly [number, number, number]; // ...from here in the prop's frame (else from its middle)
   glass?: readonly [number, number, number]; // a window's pane: its glow sits there, seen only from before it (worldLights.ts)
   pane?: number; // a lit window's seed: who lives behind it (paneLife.ts; round 18)
