@@ -217,7 +217,6 @@ export const EN = {
   'hud.insightGain': '{sign}{n} INSIGHT',
   'hud.signFound': 'ELDER SIGN FOUND · {name} · TRAVEL HERE FROM THE MAP ({map})', // found is enough: no rest is needed to journey to it (round 60)
   'hud.places': '{found} OF {of} PLACES · {region}',
-  'hud.secrets': '{found} OF {of} SECRETS · {region}',
   'n.poiGift': '{found} SECRETS FOUND · A GIFT: {echoes} ECHOES{stones}', // round 68: a gift for {found} secrets found; {stones} is ' · N STAR-STONES' or nothing
   'n.poiGiftStones': ' · {n} STAR-STONES',
   'hud.questDone': 'DONE · {title}',

@@ -9,7 +9,7 @@
 import { captionSize } from './captions';
 import { BONE, SERIF } from './hudKit';
 
-export type Tone = 'death' | 'victory' | 'place' | 'secret';
+export type Tone = 'death' | 'victory' | 'place';
 
 export interface Banner {
   show(text: string, tone: Tone, sub?: string, line?: string): void; // `line`: a sentence read under it (a horror's epitaph)
@@ -30,7 +30,6 @@ const LOOK: Record<Tone, Look> = {
   death: { color: '#9b2a20', size: 56, top: 44, hold: Infinity, band: 0.85, rise: 1500, z: 9 },
   victory: { color: '#c9a45c', size: 42, top: 40, hold: 5, band: 0.75, rise: 900, z: 2 },
   place: { color: BONE, size: 30, top: 20, hold: 2.6, band: 0.45, rise: 700, z: 2 },
-  secret: { color: BONE, size: 28, top: 22, hold: 6, band: 0.55, rise: 900, z: 2 }, // a point of interest found (round 61): long enough to read its line
 };
 
 export function createBanner(): Banner {
