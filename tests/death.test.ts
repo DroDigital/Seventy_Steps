@@ -7,6 +7,7 @@ import { strike } from '../src/systems/combat';
 import type { Game, GameEvents } from '../src/systems/components';
 import { stepGame } from '../src/systems/game';
 import { place, press, scriptedGame, steps } from './helpers';
+import { slay } from './worldHelpers';
 
 const deathblow = { damage: 9999, poise: 0, guard: 0, hitstop: 2, parryable: false, interrupts: false };
 
@@ -18,7 +19,7 @@ function echoLog(g: Game): GameEvents['Echoes'][] {
 
 /** Kills the player through normal hit resolution and waits for the respawn. */
 function dieAndRespawn(g: Game, killer: number): void {
-  strike(g, killer, g.player.id, deathblow);
+  slay(g, killer);
   steps(g, PLAYER_MOVES.death.frames + 5);
 }
 
@@ -48,7 +49,7 @@ describe('death and Echoes', () => {
     g.ecs.c.health.get(deepOne)!.hp = 40;
     g.ecs.c.stamina.get(player)!.value = 3;
 
-    strike(g, deepOne, player, deathblow);
+    slay(g, deepOne, player);
     expect(g.ecs.c.actor.get(player)!.move).toBe('death');
     const [drop] = g.ecs.query('drop');
     expect(g.ecs.c.drop.get(drop)!.amount).toBe(300);

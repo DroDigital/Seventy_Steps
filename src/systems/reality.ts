@@ -40,7 +40,7 @@ export const hooksOf = (f: Fight): readonly RealityHook[] => f.script.phases[f.p
 /** The lamps in a fight's arena. */
 export const lampsOf = (g: Game, f: Fight): Entity[] => f.props.filter((p) => g.ecs.c.prop.get(p)?.kind === 'lamp');
 
-const litNear = (g: Game, f: Fight, e: Entity): boolean =>
+export const litNear = (g: Game, f: Fight, e: Entity): boolean =>
   lampsOf(g, f).some((l) => g.ecs.c.prop.get(l)!.lit && distXZ(g.ecs.c.transform.get(l)!.pos, g.ecs.c.transform.get(e)!.pos) <= REALITY.lampRadius);
 
 /** Where a fight's hidden platforms stand: one at the arena's heart, the rest in a ring. */

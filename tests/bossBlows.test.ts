@@ -1,5 +1,5 @@
 /**
- * No horror's heaviest blow takes more than 28% of the investigator's health, nor less than 12%, where a person meets it (round 60, a third; round 61, 28%:
+ * No horror's heaviest blow takes more than 30% of the investigator's health, nor less than 12%, where a person meets it (round 60, a third; round 61, 28%:
  * asked, "God bosses like Father Dagon and similar are way too overpowered and make way too much damage"; at the
  * standing a person has when the open world first lets them reach a god, Shub-Niggurath's charge took 51% of it,
  * Father Dagon's slam 44%, Nyarlathotep's burst 43%, so two blows were a death, against 18-24% for the named horrors).
@@ -10,7 +10,7 @@ import { ENTITIES } from '../src/data/registry';
 import { toCombatant } from '../src/systems/creatures';
 import { standings } from './balanceModel';
 
-const MOST = 0.28; // (round 61: a third, before the four that stood at 30% were eased: stacked with a mind Unmoored (x1.35) and a relic that costs (x1.08), 28% is 41%, never two blows to a death)
+const MOST = 0.3; // (round 68: 28%, before the foes were made to hit as a soulslike's do; round 61: a third, before the four that stood at 30% were eased: stacked with a mind Unmoored (x1.35) and a relic that costs (x1.08), 28% is 41%, and 30% is 44%: still never two blows to a death)
 const LEAST = 0.12; // (round 61, "none excessively easy": a blow that does not matter is a boss that is only a wall of health; the Haunter and Azathoth are not hurt or measured like the rest)
 
 const heaviest = (id: string): { move: string; damage: number } => {
@@ -24,7 +24,7 @@ const heaviest = (id: string): { move: string; damage: number } => {
 };
 
 describe('a horror\'s heaviest blow (round 60)', () => {
-  it('takes at most 28% of the health a person has when they meet it', () => {
+  it('takes at most 30% of the health a person has when they meet it', () => {
     for (const s of standings()) {
       const { move, damage } = heaviest(s.id);
       expect(damage / s.hp, `${s.id}'s ${move}: ${damage} of ${s.hp}`).toBeLessThanOrEqual(MOST);

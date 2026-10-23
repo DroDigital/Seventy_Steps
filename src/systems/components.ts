@@ -275,7 +275,8 @@ export interface Pilot {
   steady: number; // frames left in which a swallow of Laudanum holds the mind: no sanity lost to auras, roars, gazes or the void
   tonic: number[]; // the frames of the swallows lately taken: the tonic dulls the mind that takes it again soon (sanity.ts; round 58)
   mended: number; // frames left in which a shot of Reagent holds the body: lingering hurts (pools, the void) do no harm
-  listening: Entity | null; // the person talked with: they face them and the camera frames them until they move or look away (round 12)
+  listening: Entity | null; // the person talked with: they face them and the camera frames them until they move (round 12; round 68: or until the hand takes the camera, `glance`; looking about no longer ends the talk)
+  glance: boolean; // the hand has turned the camera since this talk began: it lets go of the speaker and stays where it is put (round 68)
   kneeling: { x: number; z: number } | null; // the Elder Sign rested at: they kneel to it until they move or act (round 15)
   falling: Falling | null; // over an edge and dropping, until the death at the foot of it (systems/falls.ts; round 54)
   ask: boolean; // a screen asks where to rise when a lit candle reaches a fall (ui/riseMenu.ts); without one the candle is where they rise (round 45)

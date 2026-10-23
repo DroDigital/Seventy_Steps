@@ -2,13 +2,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { gatePlace, signPlace, travel } from '../src/systems/checkpoints';
 import { WORLD } from '../src/data/tuning';
-import { strike } from '../src/systems/combat';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { createJourneys, DYING_MS } from '../src/ui/journeys';
 import { inkLine, lineLight, veilField, type Veil } from '../src/ui/veil';
 import { worldLayout } from '../src/world/placements';
 import { press, scriptedGame } from './helpers';
-import { deathblow, goTo, record } from './worldHelpers';
+import { goTo, record, slay } from './worldHelpers';
 
 /** A veil that covers only when told to, and says what it was asked. */
 function fakeVeil() {
@@ -129,7 +128,7 @@ describe('journeys (ui/journeys.ts)', () => {
     const { veil, asked, covers } = fakeVeil();
     const j = createJourneys(g, veil);
     const respawned = record(g, 'Respawned');
-    strike(g, deepOne, g.player.id, deathblow);
+    slay(g, deepOne);
     at(DYING_MS - 100);
     j.update(0);
     expect(asked).toEqual([]); // the fall shows first, UNMADE over it (round 14)

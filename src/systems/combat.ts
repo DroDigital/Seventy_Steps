@@ -24,6 +24,7 @@ import { absorb } from './stamina';
 import { refreshStoops, zoneGap } from './hurt';
 import { live, outOfReach, targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
+import { walled } from './walled';
 
 /** What a blow carries into resolution; melee hits and revolver shots both fit. */
 export interface Blow {
@@ -156,6 +157,7 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const felt = g.ecs.c.phantom.has(attacker)
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
     : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
+  if (target === g.player.id && g.ecs.c.combatant.get(attacker)?.faction === 'enemy') felt.damage = Math.min(felt.damage, Math.floor(h.max * BOSS.blowMost)); // no blow of a foe's kills from full health (round 68)
   const fight = g.ecs.c.fight.get(target);
   if (fight && g.frame - (fight.interruptedAt ?? -Infinity) < BOSS.rearm) felt.interrupts = false; // a horror's wind-up broken is not broken again at once
   const { outcome, damage } = resolveHit(defender, felt, frontal);
@@ -211,7 +213,7 @@ export function meleeSystem(g: Game): void {
       const tip = capsuleGap2(g, t, aimAt(g, t, tr.pos.y, s0), aimAt(g, t, tr.pos.y, s1), hit.radius);
       const swept = root ? capsuleGap2(g, t, aimAt(g, t, tr.pos.y, root), aimAt(g, t, tr.pos.y, s1), hit.radius) : tip;
       const best = swept.gap2 < tip.gap2 ? swept : tip;
-      if (best.gap2 > (hit.radius + best.radius) ** 2) continue;
+      if (best.gap2 > (hit.radius + best.radius) ** 2 || walled(g, id, t, s1.y)) continue; // (a wall stops the blow: it is tried again next frame, from where the swinger then stands)
       a.hits.add(t);
       const crit = backstab(g, id, t);
       const outcome = strike(g, id, t, { ...hit, damage: hit.damage * edge(g, id) * best.damage, parryable: !hit.unblockable, interrupts: false, ...(crit && { critical: true }) });

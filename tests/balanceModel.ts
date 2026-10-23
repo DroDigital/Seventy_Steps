@@ -12,11 +12,20 @@
 import { ENTITIES, getEntity } from '../src/data/registry';
 import type { EntityDef } from '../src/data/schema';
 import { REGIONS } from '../src/data/regions';
-import { REINFORCE, LEVELS, PLAYER, type LevelId } from '../src/data/tuning';
+import { REAGENT, REINFORCE, LEVELS, PLAYER, type LevelId } from '../src/data/tuning';
 import { stonesOf } from '../src/systems/arms';
 import { levelCost } from '../src/systems/levels';
 import { worldLayout } from '../src/world/placements';
 import { regionPlan } from '../src/world/regionPlan';
+
+/**
+ * Round 68: the Reagent a person carries at a boss. The world holds thirteen Silver Vials (ten in the lairs and dungeons, two from quests,
+ * one for sale) among its forty-seven horrors, found as the bosses are, and the kit holds `REAGENT.maxDoses` of them at the most. Until
+ * then every fight was weighed against the four doses of the start, which let a late god cost a bot "one life" when a person carried
+ * three times the cure.
+ */
+export const VIALS = 13;
+export const dosesAt = (rank: number, bosses: number): number => Math.min(REAGENT.maxDoses, REAGENT.doses + Math.floor((VIALS * rank) / bosses));
 
 export const KILLED = 0.6; // the share of a ring's lesser foes a person has killed by the time they leave it
 const KEPT = 0.85; // the share of a boss's Echoes that are kept (some are lost to a death on the way)

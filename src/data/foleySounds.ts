@@ -19,7 +19,7 @@ export const CLASS_GAIN = { ui: 0.4, hands: 1, impact: 1, acts: 0.5, mist: 0.4 }
 export const HAND_FRAMES = {
   parry: { guard: 0 },
   drink: { swallow: 30 }, // the cork is at 10 (render/audio/foley.ts); the item on 34; the bottle set down as the move ends
-  inject: { needle: 14, plunger: 34 }, // the item on 36
+  inject: { needle: 22, plunger: 42 }, // the item on 44
   throw: { glug: 2, lob: 6 }, // the volley on 16
 } as const;
 
@@ -44,7 +44,7 @@ export const HANDS = {
     noise('bandpass', 480, 0.12, 0.45, { at: 0.2, q: 3, attack: 0.02 }), tone('sine', 140, 0.14, 0.17, { at: 0.2, to: 88, attack: 0.02 }),
     noise('bandpass', 3400, 0.04, 0.2, { at: 0.46, q: 5 }), tone('sine', 2700, 0.18, 0.03, { at: 0.46 }), // the bottle's foot on the stone
   ],
-  // The Reagent (inject, 64 frames, the item on frame 36): the needle's click, the skin, the plunger's hiss, and out again.
+  // The Reagent (inject, 76 frames, the item on frame 44): the needle's click, the skin, the plunger's hiss, and out again.
   needle: [noise('bandpass', 4200, 0.02, 0.5, { q: 6 }), noise('lowpass', 1500, 0.09, 0.4, { at: 0.03 }), tone('sine', 110, 0.1, 0.2, { at: 0.03, to: 70 })],
   plunger: [noise('highpass', 3500, 0.4, 0.16, { attack: 0.06 }), tone('sine', 62, 0.35, 0.1, { attack: 0.1, to: 80 }), noise('bandpass', 2800, 0.05, 0.22, { at: 0.42, q: 5 })],
   // A flask of oil lobbed (throw, 40 frames, the volley on frame 16): the arm's whoosh, the glug of the oil in it.

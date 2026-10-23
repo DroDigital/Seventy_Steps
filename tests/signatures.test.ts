@@ -7,9 +7,10 @@ import { fightAction } from '../src/systems/fightActions';
 import { inSight } from '../src/systems/insight';
 import { candidates } from '../src/systems/lockOn';
 import { lampsOf } from '../src/systems/reality';
+import { SIGNATURES } from '../src/systems/signatures';
 import { bossGame, calm, engage } from './bossHelpers';
 import { press, steps } from './helpers';
-import { deathblow, kill, record, run } from './worldHelpers';
+import { deathblow, kill, record, run, slay } from './worldHelpers';
 
 const lockable = (g: Parameters<typeof candidates>[0], id: number): boolean => candidates(g).some((c) => c.id === id);
 
@@ -41,7 +42,7 @@ describe('signature mechanics (spec §3E)', () => {
     b.g.ecs.c.health.get(b.boss)!.hp *= 0.5;
     steps(b.g, 120);
     expect(b.g.reality.saturation).toBeLessThan(1);
-    strike(b.g, b.boss, b.g.player.id, deathblow);
+    slay(b.g, b.boss);
     run(b.g, 200);
     expect(b.g.reality.saturation).toBe(1);
   });
@@ -94,6 +95,60 @@ describe('signature mechanics (spec §3E)', () => {
     steps(g, g.ecs.c.actor.get(g.player.id)!.moves.chant.frames);
     expect(deaths).toEqual([expect.objectContaining({ entity: boss, killer: g.player.id })]);
     expect(g.ecs.c.unseen.has(boss)).toBe(false); // seen as it dies
+  });
+
+  it('the incantation is not broken off by a blow: nothing lands on the chanter while it lasts (round 68)', () => {
+    const b = bossGame('dunwich_horror', undefined, 12);
+    const { g, boss } = b;
+    engage(b);
+    calm(b);
+    const h = g.ecs.c.health.get(boss)!;
+    h.hp = h.max * 0.1;
+    steps(g, 1);
+    const me = g.ecs.c.health.get(g.player.id)!;
+    steps(g, 1, press('interact'));
+    steps(g, 60);
+    const before = me.hp;
+    strike(g, boss, g.player.id, deathblow); // the Horror's worst, mid-chant
+    expect(me.hp).toBe(before);
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('chant');
+    const deaths = record(g, 'Died');
+    steps(g, g.ecs.c.actor.get(g.player.id)!.moves.chant.frames);
+    expect(deaths).toEqual([expect.objectContaining({ entity: boss, killer: g.player.id })]);
+  });
+
+  it('the screen says what the Dunwich Horror and Cthulhu ask of the investigator (round 68)', () => {
+    const d = bossGame('dunwich_horror', undefined, 12);
+    engage(d);
+    calm(d);
+    const sig = SIGNATURES.dunwich_horror;
+    expect(sig.status?.(d.g, d.boss, d.fight)).toBe(`UNSEEN · POWDER ${DUNWICH.powder}`);
+    steps(d.g, 1, press('interact'));
+    expect(sig.status?.(d.g, d.boss, d.fight)).toMatch(new RegExp(`^SEEN · \\d+ s · POWDER ${DUNWICH.powder - 1}$`));
+    expect(sig.note?.(d.g, d.boss, d.fight, 0)).toBeNull();
+    const h = d.g.ecs.c.health.get(d.boss)!;
+    h.hp = h.max * 0.1;
+    steps(d.g, 1);
+    expect(sig.status?.(d.g, d.boss, d.fight)).toBe('CHANT THE INCANTATION · OR STRIKE IT DOWN');
+    expect(sig.note?.(d.g, d.boss, d.fight, d.fight.script.phases.length - 1)).toBe('CHANT THE INCANTATION · OR STRIKE IT DOWN');
+    const c = bossGame('cthulhu');
+    engage(c);
+    expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe('WOUND IT UNTIL THE ALERT COMES');
+    expect(SIGNATURES.cthulhu.note?.(c.g, c.boss, c.fight, 0)).toBeNull(); // no Alert yet
+    c.fight.sig.burst = 5;
+    expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe("IT REFORMS · R'LYEH SINKS");
+  });
+
+  it('the screen says that only lamplight wounds the Haunter of the Dark (round 68)', () => {
+    const b = bossGame('haunter_of_the_dark');
+    const { g, boss, fight } = b;
+    engage(b);
+    const lamp = lampsOf(g, fight)[0];
+    const [at, lampAt] = [g.ecs.c.transform.get(boss)!, g.ecs.c.transform.get(lamp)!.pos];
+    at.pos = { ...lampAt, x: lampAt.x + 100 }; // far from every lamp
+    expect(SIGNATURES.haunter_of_the_dark.status?.(g, boss, fight)).toBe('ONLY LAMPLIGHT WOUNDS IT · LURE IT TO A LAMP');
+    at.pos = { ...lampAt };
+    expect(SIGNATURES.haunter_of_the_dark.status?.(g, boss, fight)).toBe('THE LAMPLIGHT WOUNDS IT');
   });
 
   it('the Haunter of the Dark fights among lamps it must snuff, which the investigator defends', () => {

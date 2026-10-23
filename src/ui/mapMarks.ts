@@ -7,13 +7,14 @@
  * and the screen picks among them. Pure: no DOM.
  */
 
+import type { XZ } from '../core/geom';
 import { NPCS } from '../data/npcs';
 import type { PoiKind } from '../data/pois';
 import { getEntity } from '../data/registry';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { isExplored } from '../systems/exploration';
-import { markerDistance, markerHere } from '../systems/marker';
+import { markerDistance, markersHere } from '../systems/marker';
 import { npcPlace } from '../systems/npcs';
 import { poiMark } from '../systems/pois';
 import { mapPlaces, type MapPlace } from '../world/mapData';
@@ -37,6 +38,7 @@ export interface Mark {
   badge: 'live' | 'slain' | null; // a dungeon's horror, once met
   place: MapPlace | null;
   label: MapLabel | null;
+  at?: XZ; // a marker's place in the world (round 68: which of the markers a click is on)
 }
 
 /** What each kind of secret is called on its hover card (round 61). */
@@ -153,11 +155,10 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
     add(over, { kind: 'echo', x: screenX(view, at.x), y: screenY(view, at.z), state: {}, title: 'Your lost Echoes', name: '', note: 'Walk over them to take them back' }, 0.85, null, 'places');
   }
 
-  const pin = full ? markerHere(g) : null; // the investigator's own marker (the minimap draws it as a beacon, upright: leadMark.ts)
-  if (pin) {
+  for (const pin of full ? markersHere(g) : []) { // the investigator's own markers (the minimap draws them as beacons, upright: leadMark.ts)
     const r = unit * 0.95;
-    const metres = Math.round(markerDistance(g) ?? 0);
-    add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: 'Your marker', name: `${metres} m away`, note: 'Right-click it, or press F, to clear it' }, 0.95, null, 'places'); // its point on the place
+    const metres = Math.round(markerDistance(g, pin));
+    add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: 'Your marker', name: `${metres} m away`, note: 'Right-click it, or press F, to remove it', at: pin }, 0.95, null, 'places'); // its point on the place
   }
 
   out.marks.push(...under, ...middle, ...over);

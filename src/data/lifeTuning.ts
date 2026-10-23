@@ -183,4 +183,16 @@ export const POI = {
   see: 260, // metres a phenomenon (render/poiFx.ts) is drawn from
   walls: 2.6, // metres tall the walls of a maze stand
   cell: 4.4, // metres a maze's passages are broad, wall to wall
+  /**
+   * Round 68, "greater incentives" to explore: when this many of the seventy secrets are found (all realms together) a gift is given, once:
+   * star-stones, and Echoes worth `levels` levels at the price of the next (so it keeps its worth from the first hour to the last). The stones
+   * come to nine, what one weapon takes to its fifth level (REINFORCE); the Echoes are not in the balance table, as the hoards are not.
+   */
+  gifts: [
+    { at: 6, stones: 1, levels: 1 },
+    { at: 15, stones: 1, levels: 2 },
+    { at: 30, stones: 2, levels: 3 },
+    { at: 50, stones: 2, levels: 4 },
+    { at: 70, stones: 3, levels: 6 },
+  ] as readonly { at: number; stones: number; levels: number }[],
 };

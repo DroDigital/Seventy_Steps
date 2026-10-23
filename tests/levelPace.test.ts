@@ -33,9 +33,11 @@ describe('the pace of the levels (round 60)', () => {
     for (let k = 1; k < first.length; k++) expect(first[k] - first[k - 1], `ring ${k}`).toBeGreaterThanOrEqual(3);
   });
 
-  it('the last ring is met short of the most levels, and the whole world can buy them', () => {
-    expect(Math.max(...rings[rings.length - 1].map(bought))).toBeLessThan(MOST);
+  it('the last ring is met short of the most levels; the whole world buys the first sixty and the last thirty are for hunting and the journeys after (round 68)', () => {
+    expect(Math.max(...rings[rings.length - 1].map(bought))).toBeLessThan(MOST - 30);
     const all = lesserFoes().echoes + ENTITIES.filter((e) => e.bossScript).reduce((n, e) => n + e.drops.echoes, 0);
-    expect(LEVEL_IDS.reduce((n, id) => n + buy(all)[id], 0)).toBeGreaterThanOrEqual(MOST - 6);
+    const first = LEVEL_IDS.reduce((n, id) => n + buy(all)[id], 0);
+    expect(first).toBeGreaterThanOrEqual(60);
+    expect(first).toBeLessThan(MOST - 10); // all of it is not to be had in one journey: that is what the hunt, the secrets and the next journey are for
   });
 });

@@ -22,7 +22,7 @@ import { addLayer } from './hiddenLayer';
 import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
-import { bossHealthScale, refreshBossLevels } from './bossScaling';
+import { bossHealthScale, overmatch, refreshBossLevels } from './bossScaling';
 import { levelsBought } from './levels';
 
 /** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
@@ -169,7 +169,7 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsBought(g), g.player.cycle) : foeHealth(g)));
+  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsBought(g), g.player.cycle, overmatch(g.player.levels, c.fight.get(e)?.id ?? id).health) : foeHealth(g)));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
   if (def.tier !== 'ally' && def.bossScript) h.baseMax = cd.hp;
   else delete h.baseMax;

@@ -13,11 +13,14 @@ The horse's calls and breaths and its harness (`sfx/horse_*`, round 59) were cut
 without a login (a 128 kbps MP3 of the original), then high-passed, faded at both ends, levelled to a peak of −1.4 dBFS like the rest, and
 encoded again as above. Only the nine recordings named in their rows were used.
 
+Round 68 (the casters' own bolts, and the storm's charge, snap and thunder: `sfx/atk_eyecast*`, `atk_eyehit*`, `atk_frostcast*`, `atk_starcast*`, `atk_starhit*`, `storm_*`)
+took its recordings from [OpenGameArt](https://opengameart.org), each page marked CC0, because Freesound was not to be reached that day; they were cut, high-passed
+at 40 Hz, faded, levelled to the rest and encoded as above, from the files named in their rows.
+
 The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 
 | File | Recording | By | Licence | Treatment |
 | --- | --- | --- | --- | --- |
-| `amb/alien.mp3` | [G22-16-High-Pitched Buzz with Wind.wav](https://freesound.org/people/craigsmith/sounds/438279/) | craigsmith | CC0 | 4–33 s; looped (a 2.5 s crossfade) |
 | `amb/cave.mp3` | [ambience large cave variation.ogg](https://freesound.org/people/fonografico/sounds/636124/) | fonografico | CC0 | 4–34 s; low-pass 5000 Hz; looped (a 2 s crossfade) |
 | `amb/crickets.mp3` | [R01-42-Night Time Crickets.wav](https://freesound.org/people/craigsmith/sounds/479815/) | craigsmith | CC0 | 2.5–36 s; looped (a 2 s crossfade) |
 | `amb/drips.mp3` | [Ambience INT water drip dropping cave grotto spooky (quinta da regaleira portugal).flac](https://freesound.org/people/corkob/sounds/392668/) | corkob | CC0 | 0.5–19.3 s; high-pass 120 Hz; looped (a 1.5 s crossfade) |
@@ -39,9 +42,18 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/atk_cast1.mp3` | [Magic - Blast or Whoosh](https://freesound.org/people/Vrymaa/sounds/802725/) | Vrymaa | CC0 | 4.35–5.9 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_cast2.mp3` | [Magic Fire Spell Movement](https://freesound.org/people/TheLittleCrow/sounds/761330/) | TheLittleCrow | CC0 | 4.5–5.8 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_cast3.mp3` | [Magical Impact with Trippy Trail FX](https://freesound.org/people/CVLTIV8R/sounds/849412/) | CVLTIV8R | CC0 | 2.15–3.4 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_eyecast1.mp3` | [3 dark magic spells](https://opengameart.org/content/3-dark-magic-spells) | qubodup | CC0 | 0–1.7 s of `dm.mp3`; high-pass 40 Hz; faded out over 0.35 s (round 68) |
+| `sfx/atk_eyecast2.mp3` | [3 dark magic spells](https://opengameart.org/content/3-dark-magic-spells) | qubodup | CC0 | 2.65–3.95 s of `dm.mp3`; high-pass 40 Hz; faded out over 0.3 s (round 68) |
+| `sfx/atk_eyecast3.mp3` | [3 dark magic spells](https://opengameart.org/content/3-dark-magic-spells) | qubodup | CC0 | 4.25–6.05 s of `dm.mp3`; high-pass 40 Hz; faded out over 0.4 s (round 68) |
+| `sfx/atk_eyehit1.mp3` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | Arcanorum | CC0 | 0–2 s of `magical_4.ogg`; high-pass 40 Hz; faded out over 0.3 s (round 68) |
+| `sfx/atk_eyehit2.mp3` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | Arcanorum | CC0 | 0–2 s of `magical_4.ogg`; tape speed ×0.88; high-pass 40 Hz; faded out over 0.3 s (round 68) |
+| `sfx/atk_eyehit3.mp3` | [3 dark magic spells](https://opengameart.org/content/3-dark-magic-spells) | qubodup | CC0 | 2.65–3.85 s of `dm.mp3`; tape speed ×0.8; high-pass 40 Hz; faded out over 0.3 s (round 68) |
 | `sfx/atk_fire1.mp3` | [fireball_impact2.wav](https://freesound.org/people/pepingrillin/sounds/252092/) | pepingrillin | CC0 | 0–1.6 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_fire2.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 2.18–3.5 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_fire3.mp3` | [Magic Fire Spell Movement](https://freesound.org/people/TheLittleCrow/sounds/761330/) | TheLittleCrow | CC0 | 23.85–25.2 s; high-pass 40 Hz; a fade (round 59) |
+| `sfx/atk_frostcast1.mp3` | [Freeze Spell](https://opengameart.org/content/freeze-spell-0) | StarNinjas | CC0 | 0.05–1.95 s of `freeze.wav`; high-pass 40 Hz; faded out over 0.3 s (round 68) |
+| `sfx/atk_frostcast2.mp3` | [Freeze Spell](https://opengameart.org/content/freeze-spell-0) | StarNinjas | CC0 | 0.05–1.95 s of `freeze.wav`; tape speed ×1.08; high-pass 40 Hz; faded out over 0.3 s (round 68) |
+| `sfx/atk_frostcast3.mp3` | [Freeze Spell](https://opengameart.org/content/freeze-spell-0) | StarNinjas | CC0 | 0.05–1.95 s of `freeze.wav`; tape speed ×0.94; high-pass 40 Hz; faded out over 0.3 s (round 68) |
 | `sfx/atk_fwoosh1.mp3` | [Basic Fire Whoosh 2](https://freesound.org/people/LookIMadeAThing/sounds/260555/) | LookIMadeAThing | CC0 | 0.05–1.3 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_fwoosh2.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 0.05–1.15 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_fwoosh3.mp3` | [fire-whoosh.wav](https://freesound.org/people/hnhnh/sounds/244926/) | hnhnh | CC0 | 1.18–2.15 s; high-pass 40 Hz; a fade (round 59) |
@@ -49,6 +61,12 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/atk_ice2.mp3` | [Break Ice](https://freesound.org/people/davilca/sounds/677230/) | davilca | CC0 | 12.24–13.3 s; high-pass 120 Hz; a fade (round 59) |
 | `sfx/atk_ice3.mp3` | [Break Ice](https://freesound.org/people/davilca/sounds/677230/) | davilca | CC0 | 2.02–3.1 s; high-pass 120 Hz; a fade (round 59) |
 | `sfx/atk_ice4.mp3` | [Ice break](https://freesound.org/people/humanoide9000/sounds/329744/) | humanoide9000 | CC0 | 4.74–5.6 s; high-pass 120 Hz; a fade (round 59) |
+| `sfx/atk_starcast1.mp3` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | Arcanorum | CC0 | 0–1.3 s of `magical_5.ogg`; high-pass 40 Hz (round 68) |
+| `sfx/atk_starcast2.mp3` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | Arcanorum | CC0 | 0.25–1.45 s of `magical_7_0.ogg`; high-pass 40 Hz (round 68) |
+| `sfx/atk_starcast3.mp3` | [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) | Arcanorum | CC0 | 0.1–1.5 s of `magical_1_0.ogg`; high-pass 40 Hz (round 68) |
+| `sfx/atk_starhit1.mp3` | [80 CC0 RPG SFX](https://opengameart.org/content/80-cc0-rpg-sfx) | NoirPhantom89 | CC0 | 0–0.59 s of `item_gem_04.ogg`; tape speed ×0.8; high-pass 40 Hz; faded out over 0.25 s (round 68) |
+| `sfx/atk_starhit2.mp3` | [80 CC0 RPG SFX](https://opengameart.org/content/80-cc0-rpg-sfx) | NoirPhantom89 | CC0 | 0–0.25 s of `item_gem_01.ogg`; tape speed ×0.7; high-pass 40 Hz; faded out over 0.1 s (round 68) |
+| `sfx/atk_starhit3.mp3` | [80 CC0 RPG SFX](https://opengameart.org/content/80-cc0-rpg-sfx) | NoirPhantom89 | CC0 | 0–0.29 s of `item_gem_03.ogg`; tape speed ×0.7; high-pass 40 Hz; faded out over 0.1 s (round 68) |
 | `sfx/atk_stone1.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 0–1.2 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_stone2.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 3.98–5.2 s; high-pass 40 Hz; a fade (round 59) |
 | `sfx/atk_stone3.mp3` | [Foley_Impact_Stones_Strong_Debris_Stereo_DS.wav](https://freesound.org/people/Nox_Sound/sounds/554148/) | Nox_Sound | CC0 | 7.97–8.82 s; high-pass 40 Hz; a fade (round 59) |
@@ -328,6 +346,15 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/step_water1.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 3–3.42 s |
 | `sfx/step_water2.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 5.5–5.92 s |
 | `sfx/step_water3.mp3` | [R10-46-Running in Water.wav](https://freesound.org/people/craigsmith/sounds/480632/) | craigsmith | CC0 | 8–8.42 s |
+| `sfx/storm_charge1.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 2.4–3.95 s of `charge.wav`; high-pass 40 Hz; faded in over 1.1 s; faded out over 0.05 s (round 68) |
+| `sfx/storm_charge2.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 0–1.55 s of `charge.wav`; tape speed ×1.04; high-pass 40 Hz; faded in over 1.1 s; faded out over 0.05 s (round 68) |
+| `sfx/storm_charge3.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 4.9–6.45 s of `recharge.wav`; high-pass 40 Hz; faded in over 1.1 s; faded out over 0.05 s (round 68) |
+| `sfx/storm_thunder1.mp3` | [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) | geekygnome | CC0 | 0.4–4.9 s of `sfx100v2_thunder_01.ogg`; high-pass 40 Hz; low-pass 2600 Hz; faded out over 0.8 s (round 68) |
+| `sfx/storm_thunder2.mp3` | [Rain + Long Thunder](https://opengameart.org/content/rain-long-thunder) | WuxiaScrub | CC0 | 21–26.6 s of `rain-thunder.ogg`; high-pass 40 Hz; low-pass 2000 Hz; faded out over 1.6 s (round 68) |
+| `sfx/storm_thunder3.mp3` | [Rain + Long Thunder](https://opengameart.org/content/rain-long-thunder) | WuxiaScrub | CC0 | 27.2–33.2 s of `rain-thunder.ogg`; high-pass 40 Hz; low-pass 1800 Hz; faded in over 0.4 s; faded out over 2.0 s (round 68) |
+| `sfx/storm_zap1.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 0–0.28 s of `groundhit.wav`; high-pass 40 Hz; faded out over 0.08 s (round 68) |
+| `sfx/storm_zap2.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 0–1.4 s of `hit.wav`; high-pass 40 Hz; faded out over 0.4 s (round 68) |
+| `sfx/storm_zap3.mp3` | [Electricity Game Sound Pack](https://opengameart.org/content/electricity-game-sound-pack) | PFNienow | CC0 | 0–1.2 s of `shieldhit.wav`; high-pass 40 Hz; faded out over 0.3 s (round 68) |
 | `sfx/strike1.mp3` | [Closeup Thunder Strike 01](https://freesound.org/people/loganzsound/sounds/840628/) | loganzsound | CC0 | 0.6–4.6 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
 | `sfx/strike2.mp3` | [210914 Thunder, crack, pretty close, bit of distortion, urban, TORONTO](https://freesound.org/people/TRP/sounds/616992/) | TRP | CC0 | 0.97–5 s; high-pass 35 Hz; a 1.4 s fade (round 59) |
 | `sfx/strike3.mp3` | [Thunderstorm lightning strike](https://freesound.org/people/foad/sounds/243614/) | foad | CC0 | 7.36–11.4 s; high-pass 35 Hz; a 1.4 s fade (round 59) |

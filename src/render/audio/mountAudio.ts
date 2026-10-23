@@ -27,9 +27,14 @@ import type { Sampler } from './sampler';
 type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; pitch?: number; vary?: number; pan?: number; level?: number }) => boolean;
 
 const STEP_SET: Record<Ground, SampleSetId> = { dirt: 'stepDirt', road: 'stepRoad', stone: 'stepStone', water: 'stepWater' };
-const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [3.5, 6], road: [3, 5], stone: [2.2, 3.6], water: [99, 99] }; // metres between a wheel's thumps
+const THUMP_EVERY: Record<Ground, readonly [number, number]> = { dirt: [6, 10], road: [5, 8.5], stone: [3.8, 6], water: [99, 99] }; // metres between a wheel's thumps (round 68: asked, "way too many noises"; they came every 0.4 s at a gallop)
 const PAIR = 0.059; // the second spectral horse's gait, a share of a cycle behind the first (0.37 rad: render/mountCarriage.ts)
 const GALLOP_SNORT = 14 * gaitScale; // m/s: set for a gallop of 18, kept in step with the mounts' (round 55: a gallop of 10.5 never reached 14)
+/** How often a ride speaks (round 68: a horse that was heard every second or two was "unrealistic"; the hooves are the ride, the rest is an aside): seconds between each, and the share of the reins' slaps it answers. */
+const RIDE = {
+  creak: [8, 16] as const, trace: [6, 14] as const, snort: [18, 34] as const, whisper: [8, 16] as const, idle: [10, 22] as const,
+  answer: 0.4, answerGap: 5, // the eager huff after a slap, and the least time between two of them
+};
 
 const between = ([a, b]: readonly [number, number]): number => a + (b - a) * Math.random();
 const around = (spread: number, middle = 1): number => middle - spread / 2 + spread * Math.random();
@@ -55,11 +60,14 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
   let frames = 0;
   let metres = 0;
   let thumpAt = 4;
-  let creakIn = 2;
-  let whisperIn = 3;
+  let creakIn = 4;
+  let traceIn = 2;
+  let whisperIn = 5;
   let lastSpeed = 0;
-  let snortIn = 6;
+  let snortIn = 12;
   let idleIn = 8;
+  let ridden = 0; // seconds of this ride
+  let answeredAt = -99; // when, in them, the horse last huffed at the reins
   let galloping = false;
   let idleLast: Idle | null = null;
   let tossed = false; // the head went up after the last noise: the harness has spoken, and the next is not a shake
@@ -71,11 +79,14 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
     phase = from;
     metres = 0;
     thumpAt = between(THUMP_EVERY[ground]);
-    creakIn = between([1.2, 3]);
-    whisperIn = between([2, 5]);
+    creakIn = between([2, RIDE.creak[0]]);
+    traceIn = between([1.5, RIDE.trace[0]]);
+    whisperIn = between([3, RIDE.whisper[0]]);
     lastSpeed = 0;
-    snortIn = between([5, 9]);
-    idleIn = between([6, 12]);
+    snortIn = between([0, 6]); // the first gallop of a ride is announced, the next ones seldom
+    idleIn = between([6, RIDE.idle[0]]);
+    answeredAt = -99;
+    ridden = 0;
     galloping = false;
     seen.struck = g.player.mount.reins.struck;
     seen.halts = g.player.mount.reins.halts;
@@ -97,7 +108,10 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
   const spread = (width: number): number => (Math.random() - 0.5) * width;
   /** The reins on its back: the slap itself is not heard (round 60: asked to go, "annoying over time"; the hands still show it), only the horse's eager huff a moment after (not every time: a horse that answered every slap would be a machine). */
   const slap = (id: MountId): void => {
-    if (id === 'grey' && Math.random() < 0.75) later.push({ in: between([0.26, 0.38]), play: () => recipe('mount:grey:urge', HORSE_URGE, { gain: MOUNT_MIX.urge, pitch: around(0.18, 1), vary: 0.5, pan: spread(0.3) }) });
+    if (id === 'grey' && ridden - answeredAt >= RIDE.answerGap && Math.random() < RIDE.answer) {
+      answeredAt = ridden;
+      later.push({ in: between([0.26, 0.38]), play: () => recipe('mount:grey:urge', HORSE_URGE, { gain: MOUNT_MIX.urge, pitch: around(0.18, 1), vary: 0.5, pan: spread(0.3) }) });
+    }
   };
   /** A hard pull at speed: the blow through the nose, the hooves braking, and the harness shaken as the head goes up. */
   const halt = (id: MountId, speed: number): void => {
@@ -163,6 +177,7 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
         reset(mount.phase);
         return;
       }
+      ridden += dt;
       if (frames++ % 6 === 0) ground = surfaceAt(g, pos.x, pos.y, pos.z);
       bed?.set(bedTargets(id, speed, ground));
       const was = phase;
@@ -173,7 +188,7 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
         if (reins.struck > seen.struck) { seen.struck = reins.struck; slap(id); }
         if (reins.halts > seen.halts) { seen.halts = reins.halts; halt(id, reins.haltSpeed); }
         for (let i = later.length - 1; i >= 0; i--) if ((later[i].in -= dt) <= 0) later.splice(i, 1)[0].play();
-        if (speed < 0.5 && (idleIn -= dt) <= 0) { idleIn = between([6, 14]); idle(id, seconds); } // standing, the small noises of a horse that is awake
+        if (speed < 0.5 && (idleIn -= dt) <= 0) { idleIn = between(RIDE.idle); idle(id, seconds); } // standing, the small noises of a horse that is awake
         const clock = id === 'grey' && speed < 0.5 ? g.seaTime?.() ?? g.frame / SIM.hz : null; // and its hoof put down in the pawing the picture draws (systems/horseIdle.ts)
         if (clock !== null && pawClock !== null && clock - pawClock < 0.25 && pawLanded(pawClock, clock) > 0) {
           recipe('mount:grey:hoof:paw', hoofBeat(ground, { hind: false, shoe: 'iron', weight: 0.85 }), { gain: MOUNT_MIX.hoof * 0.8, pitch: 1.02, vary: 0.4, pan: -0.3 });
@@ -186,26 +201,28 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
         for (const leg of touchdowns(was, phase, speed)) strike(id, leg, speed, false);
         if (id === 'chariot') for (const leg of touchdowns(was + PAIR, phase + PAIR, speed)) strike(id, leg, speed, true);
         const load = Math.min(1, speed / MOUNT_TRAVERSAL.gallop);
-        if (Math.floor(phase) > Math.floor(was) && Math.floor(phase) % 2 === 0 && speed > 2.5) { // leather and wood shifting, once in two strides
+        traceIn -= dt;
+        if (traceIn <= 0 && speed > 2.5) { // leather and wood shifting, now and then
+          traceIn = between(RIDE.trace);
           recipe(`mount:${id}:trace`, TRACE_SHIFT, { gain: MOUNT_MIX.trace * (0.4 + 0.6 * load), pitch: id === 'chariot' ? 0.85 : 1, vary: 0.5, pan: Math.random() * 0.4 - 0.2 });
         }
         if (id === 'chariot') { // a cold breath through the bones, now and then, and the violet fire crackling in it
           whisperIn -= dt * (0.5 + load);
           if (speed > 1 && whisperIn <= 0) {
-            whisperIn = between([3, 7]);
+            whisperIn = between(RIDE.whisper);
             recipe('mount:chariot:whisper', SPECTRAL_WHISPER, { gain: MOUNT_MIX.whisper * (0.5 + 0.5 * load), pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.6 - 0.3 });
           }
         }
-        creakIn -= dt * (0.4 + 1.6 * load);
+        creakIn -= dt * (0.5 + 1.1 * load);
         if (speed > 1.5 && creakIn <= 0) {
-          creakIn = between([1.2, 3]);
+          creakIn = between(RIDE.creak);
           recipe(`mount:${id}:creak`, CREAK, { gain: MOUNT_MIX.creak * (0.55 + 0.45 * load), pitch: 0.9 + 0.25 * Math.random(), vary: 0.5 });
         }
         if (id === 'grey') {
           const fast = speed >= GALLOP_SNORT && gaitAt(speed).kind === 'gallop';
           snortIn -= dt;
-          if ((fast && !galloping) || (fast && snortIn <= 0)) {
-            snortIn = between([5, 9]);
+          if ((fast && !galloping && snortIn <= 8) || (fast && snortIn <= 0)) { // breaking into a gallop, if it has not just snorted, and then seldom
+            snortIn = between(RIDE.snort);
             recipe('mount:grey:snort', SNORT, { gain: MOUNT_MIX.snort, pitch: 0.92 + 0.16 * Math.random(), vary: 0.5, pan: Math.random() * 0.3 - 0.15 });
           }
           galloping = fast;

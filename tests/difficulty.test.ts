@@ -6,16 +6,16 @@ import { createWorldGame } from '../src/systems/game';
 import { parseSave, snapshot } from '../src/systems/save';
 import { scriptedGame } from './helpers';
 
-const blow: Blow = { damage: 40, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false };
+const blow = (damage = 40): Blow => ({ damage, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false });
 
 /** What a blow of 40 does to `to` from `from`, at `difficulty`, in journey `cycle`. */
-function dealt(difficulty: DifficultyId, cycle: number, who: 'foe' | 'player'): number {
+function dealt(difficulty: DifficultyId, cycle: number, who: 'foe' | 'player', weight = 40): number {
   const { g, player, deepOne } = scriptedGame();
   g.player.difficulty = difficulty;
   g.player.cycle = cycle;
   let damage = 0;
   g.events.on('Hit', (e) => void (damage = e.damage));
-  who === 'foe' ? strike(g, deepOne, player, blow) : strike(g, player, deepOne, blow);
+  who === 'foe' ? strike(g, deepOne, player, blow(weight)) : strike(g, player, deepOne, blow(weight));
   return damage;
 }
 
@@ -29,9 +29,9 @@ describe('the difficulty chosen when a dream begins (round 38)', () => {
   });
 
   it('is laid over the journey’s own weight', () => {
-    const plain = dealt('deep', 2, 'foe');
-    expect(plain).toBeGreaterThan(40);
-    expect(dealt('nightmare', 2, 'foe')).toBe(Math.round(plain * 1.5));
+    const plain = dealt('deep', 2, 'foe', 20); // (a lighter blow: past BOSS.blowMost of their health the blow is held to it, tests/oneHit.test.ts)
+    expect(plain).toBeGreaterThan(20);
+    expect(dealt('nightmare', 2, 'foe', 20)).toBe(Math.round(plain * 1.5));
   });
 
   it('begins at the one a new dream is given, and the default for a world made without one', () => {

@@ -67,7 +67,10 @@ export function playerControl(g: Game, real: InputFrame): void {
 
   const me = transform.get(p.id)!.pos;
   const target = g.lock.target === null ? undefined : transform.get(g.lock.target)?.pos;
-  if (mag > 0.1 || input.lookX || input.lookY || Object.values(input.pressed).some(Boolean)) [p.listening, p.kneeling] = [null, null]; // done listening, or up from the knee
+  const looking = input.lookX !== 0 || input.lookY !== 0;
+  if (looking && p.listening !== null) p.glance = true; // round 68: looking about while someone talks is the hand's: the camera lets go of the speaker, and the talk goes on
+  if (mag > 0.1 || Object.values(input.pressed).some(Boolean)) [p.listening, p.kneeling] = [null, null]; // done listening, or up from the knee
+  else if (looking) p.kneeling = null;
   const heard = p.listening === null ? undefined : transform.get(p.listening)?.pos;
   if (target && !p.sprinting) m.face = yawOf(target.x - me.x, target.z - me.z);
   else if (heard) m.face = yawOf(heard.x - me.x, heard.z - me.z); // turned to the one talking
