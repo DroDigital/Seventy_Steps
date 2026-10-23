@@ -11,6 +11,7 @@
  */
 
 import * as THREE from 'three';
+import { INDICATOR } from '../data/fxTuning';
 import { PLAIN_AOE, type AoeStyle } from './aoeLook';
 import { FEEL } from './feel';
 import type { Rgb } from './palette';
@@ -19,6 +20,7 @@ import { worldUniforms } from './worldMaterial';
 const CAPACITY = 256;
 const LIFT = 0.05; // metres above the ground
 const DEG = Math.PI / 180;
+const f3 = (n: number): string => n.toFixed(3);
 const KIND = { disc: 0, sector: 1, lane: 2, ring: 3, swirl: 4, scar: 5, sigil: 6 } as const;
 
 export interface Decals {
@@ -101,7 +103,11 @@ float bayer4(vec2 p) {
   ivec2 q = ivec2(mod(p, 4.0));
   return (m[q.x + q.y * 4] + 0.5) / 16.0;
 }
-const float EDGE = 0.16; // metres
+const float EDGE = ${f3(INDICATOR.edge)}; // metres
+const float K_LINE = ${f3(INDICATOR.line)};
+const float K_BODY = ${f3(INDICATOR.body)};
+const float K_FLASH = ${f3(INDICATOR.flash)};
+const float K_OUT = ${f3(INDICATOR.outline)};
 void main() {
   int kind = int(vShape.x + 0.5);
   float fill = vShape.y;
@@ -126,7 +132,7 @@ void main() {
     float cracks = vMark.x > 0.5 ? motifMask(r, ang) : smoothstep(0.55, 0.95, sin(ang * max(vMark.w, 3.0) * 1.5 + rr * 6.0 + vMark.y));
     float warm = (1.0 - fill) * (1.0 - fill);
     glow = warm * cracks * (1.0 - smoothstep(0.35, 1.0, rr));
-    dark = (1.0 - fill) * (0.2 + 0.6 * (1.0 - smoothstep(0.5, 1.0, rr)));
+    dark = (1.0 - fill) * (0.16 + 0.44 * (1.0 - smoothstep(0.5, 1.0, rr)));
     lit = 0.0;
   } else {
     if (r > 1.0) discard;
@@ -168,17 +174,21 @@ void main() {
   float outline = outlined ? step(inside, EDGE * 2.1) * (1.0 - step(inside, EDGE)) : 0.0;
   if (vMark.x > 0.5 && solid) body *= 0.3 + 0.7 * motifMask(r, ang);
   if (solid && kind != 2) body *= 0.5 + 0.5 * smoothstep(0.0, max(fill, 0.05), r); // the light gathers toward the front
+  float quiet = kind <= 4 ? 1.0 : 0.0; // a telegraph is kept quiet; a scar and a sigil have their own light
+  float kLine = mix(1.0, K_LINE, quiet);
+  float kBody = mix(1.0, K_BODY, quiet);
+  float kFlash = mix(1.0, K_FLASH, quiet);
   float ready = solid && fill >= 0.999 ? 1.0 : 0.0; // the blow is falling
   float flash = ready * mix(0.5, 0.5 + 0.5 * sin(uTime * 38.0), uFlash);
   float pulse = mix(0.5, 0.5 + 0.5 * sin(uTime * (7.0 + 13.0 * fill)), uFlash);
-  float hatch = solid && fill < 0.999 ? 0.2 * step(0.55, fract((vP.x * vScale.x + vP.y * vScale.y) / 0.75)) : 0.0; // the whole of it, promised from the first frame
-  float cover = vColor.a * max(max(max(edge * 0.95, front * 0.95), body * (lit + 0.5 * ready + 0.3 * chev)), max(hatch, glow));
-  float shade = vColor.a * max(outline * 0.85, dark);
+  float hatch = solid && fill < 0.999 ? 0.2 * kBody * step(0.55, fract((vP.x * vScale.x + vP.y * vScale.y) / 0.75)) : 0.0; // the whole of it, promised from the first frame
+  float cover = vColor.a * max(max(max(edge * 0.95 * kLine, front * 0.95 * kLine), body * kBody * (lit + 0.5 * ready * kFlash + 0.3 * chev)), max(hatch, glow));
+  float shade = vColor.a * max(outline * 0.85 * mix(1.0, K_OUT, quiet), dark);
   float b = bayer4(gl_FragCoord.xy);
   bool hot = cover >= b;
   if (!hot && shade < b) discard;
-  vec3 c = vColor.rgb * (0.85 + 0.45 * max(edge, front) * (0.7 + 0.6 * pulse) + 0.5 * ready + 0.4 * chev);
-  c = mix(c, vec3(1.0, 0.97, 0.9), clamp(0.45 * flash + 0.3 * front + 0.25 * glow, 0.0, 0.7));
+  vec3 c = vColor.rgb * (0.85 + 0.45 * max(edge, front) * (0.7 + 0.6 * pulse * kFlash) + 0.5 * ready * kFlash + 0.4 * chev);
+  c = mix(c, vec3(1.0, 0.97, 0.9), clamp(0.45 * flash * kFlash + 0.3 * front + 0.25 * glow, 0.0, 0.7));
   c = hot ? c : vColor.rgb * 0.12;
   gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount), 1.0);
 }

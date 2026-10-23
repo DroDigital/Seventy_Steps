@@ -92,6 +92,21 @@ export const FOG_EYES = {
   fall: 0.7, // ...and go back over two
 };
 
+/**
+ * The marks a boss's blow lays on the ground (round 70, asked: "more subtle in design and fade away quicker after the attack landed";
+ * render/decals.ts, groundFx.ts). The edge is thinner and the fill, the hatching, the flash and the outline are quieter, so a mark
+ * says where the blow falls without covering the floor; what a blow leaves goes sooner. Each is a share of what it was.
+ */
+export const INDICATOR = {
+  edge: 0.1, // metres: the width of a mark's bright edge (0.16)
+  line: 0.72, // how much of its light the edge and the front of the fill keep
+  body: 0.6, // ...the fill, the ring band, the swirl and the hatching
+  flash: 0.5, // ...the flash and pulse of a mark that is full, as the blow falls
+  outline: 0.6, // ...the dark line about an edge
+  scar: 0.3, // a scar's life (seconds): burnt ground goes in a third of the time
+  sigil: 0.6, // a sigil's life, held and let go
+};
+
 /** How the picture is lit and finished (round 39, render/shaders/post.ts and world.ts): what the shadow maps cannot give. */
 export const LIGHTING = {
   ao: { strength: 0.85, radius: 0.75, reach: 55 }, // contact shadow: the share of light a crease, a foot, the base of a wall loses at most; metres it looks about; metres from the lens it fades out by
