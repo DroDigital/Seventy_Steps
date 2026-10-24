@@ -81,17 +81,6 @@ def anchor(height=2.6, **_):
 SAND = (0.76, 0.66, 0.5)
 SAND_D = (0.58, 0.48, 0.36)
 
-def pylon(width=12.0, depth=5.0, height=16.0, **_):
-    """One tower of a pylon gate: the front and back leaning in, a flared cornice, two recesses for the flagstaves on each face, a band of lighter stone at the foot."""
-    s = Shape()
-    box(s, width * 1.05, height * 0.05, depth * 1.05, col=SAND_D, cls=S.SLAB)
-    box(s, width, height * 0.89, depth, at=(0, height * 0.05, 0), col=SAND, cls=S.SLAB, taper=0.84)
-    box(s, width * 0.96, height * 0.06, depth * 1.2, at=(0, height * 0.94, 0), col=SAND_D, cls=S.SLAB, taper=1.0)
-    for face in (-1, 1):
-        for sx in (-1, 1):
-            box(s, width * 0.07, height * 0.62, depth * 0.07, at=(sx * width * 0.27, height * 0.2, face * depth * 0.47), col=(0.3, 0.24, 0.18), cls=S.SLAB, taper=0.9)
-    return s.out(37)
-
 def dune(width=12.0, height=3.0, depth=8.0, **_):
     """A drift of sand, long and low, its crest a little off the middle and a second, lesser, behind it."""
     s = Shape()
@@ -99,4 +88,4 @@ def dune(width=12.0, height=3.0, depth=8.0, **_):
     lathe(s, [(1.0, 0), (0.8, height * 0.3), (0.45, height * 0.6), (0.0, height * 0.82)], sides=10, at=(width * 0.2, 0, depth * 0.1), col=(0.8, 0.7, 0.54), cls=S.SLAB, squash=(width / 3.4, depth / 2.6))
     return s.out(39, 0.05)
 
-PROC = dict(pylon=pylon, dune=dune, well=well, hull=hull, mast=mast, derrick=derrick, anchor=anchor)
+PROC = dict(dune=dune, well=well, hull=hull, mast=mast, derrick=derrick, anchor=anchor)

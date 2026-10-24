@@ -6,14 +6,11 @@
 import { mark, piece, type Way } from './arenaWays';
 
 export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
-  // The causeway of the drowned city: slabs leaning at wrong angles, green light in the stone;
-  // four lamps of the Alert to be lit, the low before the high.
+  // The causeway of the drowned city: slabs leaning at wrong angles, green light in the stone.
   cthulhu: {
     marks: [
-      mark(piece('slab', { size: [0.5, 0.9], glow: 'green' }), 24, 170, 22, [8, 14], { mirror: true, jitter: 4, face: 'free' }),
-      mark(piece('prop:spire', { size: 0.5 }), 30, 170, 40, [14, 22], { mirror: true, jitter: 6, chance: 0.7 }),
-      mark(piece('statue_head', { size: 1.3 }), 20, 150, 50, [6, 10], { face: 'in', chance: 0.8 }),
-      mark(piece('statue_ring', { size: 1.2 }), 30, 150, 45, [9, 12], { face: 'free', chance: 0.7 }),
+      mark(piece('slab', { size: 0.7, glow: 'green' }), 24, 170, 22, 11, { mirror: true, face: 'free' }),
+      mark(piece('prop:spire', { size: 0.5 }), 30, 170, 44, 17, { mirror: true }),
     ],
     omens: [
       { at: 130, words: 'THE ANGLES ARE WRONG. THE STONE IS WET, AND FEELS FOR YOUR FOOTSTEPS', sound: 'whale', pitch: 0.6 },
@@ -21,15 +18,11 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 54, words: 'THE DOOR IS SHUT, AND IT IS NOT STONE THAT HOLDS IT SHUT', sound: 'bellow', shake: 0.07, pitch: 0.45 },
     ],
   },
-  // The road to Carcosa: tattered banners from towers no one built, lamps lit for no one, a pallid mask watching; the Yellow Sign is laid
-  // in the paving.
+  // The road to Carcosa: tattered banners and towers no one built; the Yellow Sign is laid in the paving.
   hastur: {
     marks: [
-      mark(piece('banner', { size: [0.9, 1.2] }), 12, 140, 14, 4.2, { mirror: true, jitter: 2 }),
-      mark(piece('prop:tower', { size: 0.35 }), 20, 150, 36, [14, 22], { mirror: true, jitter: 5, chance: 0.8 }),
-      mark(piece('lightpost', { lit: 'lamp' }), 16, 120, 28, 3.8, { mirror: true }),
-      mark(piece('statue_head', { size: 1.4 }), 24, 130, 55, [6, 9], { face: 'in' }),
-      mark(piece('column', { size: 1 }), 20, 140, 24, [9, 13], { mirror: true, jitter: 3, chance: 0.5 }),
+      mark(piece('banner', { size: 1.05 }), 12, 140, 14, 4.2, { mirror: true }),
+      mark(piece('prop:tower', { size: 0.35 }), 20, 150, 36, 18, { mirror: true }),
     ],
     omens: [
       { at: 120, words: 'THE SUN IS BLACK, AND THE LAKE DOES NOT REFLECT IT', sound: 'choral', pitch: 0.55 },
@@ -38,12 +31,11 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 34, words: 'HAVE YOU SEEN THE YELLOW SIGN?', sound: 'whisper', shake: 0.04, pitch: 0.5 },
     ],
   },
-  // The road to the Threshold: hexagonal pedestals along it, spheres hanging in the sky and none falling, a road with no shadow;
-  // the stars hang over it; four lights of the Threshold to be lit from the road inward.
+  // The road to the Threshold: hexagonal pedestals along it, spheres hanging in the sky and none falling, a road with no shadow.
   yog_sothoth: {
     marks: [
-      mark(piece('hexped', { size: [0.7, 0.9], glow: 'purple' }), 14, 200, 18, 4.2, { mirror: true, jitter: 2 }),
-      mark(piece('prop:globe', { size: 1 }), 16, 200, 22, [6, 12], { mirror: true, jitter: 5, chance: 0.8 }),
+      mark(piece('hexped', { size: 0.8, glow: 'purple' }), 14, 200, 18, 4.2, { mirror: true }),
+      mark(piece('prop:globe', { size: 1 }), 16, 200, 44, 9, { mirror: true }),
       mark(piece('trilith', { size: 0.8 }), 40, 200, 48, 9, { mirror: true, face: 'in' }),
     ],
     omens: [
@@ -56,8 +48,8 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The road to the Court: pipes set along it, cones of the void, a piping with no tune.
   azathoth: {
     marks: [
-      mark(piece('pipes', { size: [0.7, 1] }), 12, 160, 17, [5, 7], { mirror: true, jitter: 3 }),
-      mark(piece('prop:cone', { size: 0.9 }), 18, 160, 30, [10, 16], { mirror: true, jitter: 5, chance: 0.8 }),
+      mark(piece('pipes', { size: 0.85 }), 12, 160, 17, 6, { mirror: true }),
+      mark(piece('prop:cone', { size: 0.9 }), 18, 160, 34, 13, { mirror: true }),
     ],
     omens: [
       { at: 130, words: 'A THIN PIPING. IT HAS NO TUNE', sound: 'choral', pitch: 0.5 },
@@ -65,12 +57,11 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 50, words: 'THE DANCERS DO NOT TURN TO LOOK. THEY HAVE NOTHING TO LOOK WITH', sound: 'wail', shake: 0.06, pitch: 0.45 },
     ],
   },
-  // The terraces of Yaddith: pylons of metal-stone, cones that hum, pedestals glowing green; the paving is a mirror in pieces.
+  // The terraces of Yaddith: pylons of metal-stone, pedestals glowing green; the paving is a mirror in pieces.
   zkauba: {
     marks: [
-      mark(piece('pylon', { size: 0.3 }), 24, 150, 40, [8, 11], { mirror: true, jitter: 4 }),
-      mark(piece('prop:cone', { size: 0.8 }), 10, 140, 15, [5, 9], { mirror: true, jitter: 3, chance: 0.7 }),
-      mark(piece('hexped', { size: 0.8, glow: 'green' }), 12, 130, 21, [4, 6], { mirror: true, jitter: 3, chance: 0.8 }),
+      mark(piece('pylon', { size: 0.3 }), 24, 150, 40, 9.5, { mirror: true }),
+      mark(piece('hexped', { size: 0.8, glow: 'green' }), 12, 130, 21, 5, { mirror: true }),
     ],
     omens: [
       { at: 110, words: 'THE METAL-STONE IS WARM. NO SUN HAS WARMED IT', sound: 'whisper', pitch: 0.65 },
@@ -78,12 +69,10 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
       { at: 40, words: 'A MAN STANDS AT THE END OF THE ROAD. HIS FACE FLICKERS, AS A FLAME DOES', sound: 'wail', pitch: 0.6 },
     ],
   },
-  // The pipers' road: pipes set along it, hanging globes; four lights to be lit, the great
-  // before the small.
+  // The pipers' road: pipes set along it.
   daemon_pipers: {
     marks: [
-      mark(piece('pipes', { size: [0.6, 0.9] }), 10, 150, 19, [3.8, 5.4], { mirror: true, jitter: 3 }),
-      mark(piece('prop:globe', { size: 0.8 }), 14, 150, 28, [8, 14], { mirror: true, jitter: 5, chance: 0.8 }),
+      mark(piece('pipes', { size: 0.75 }), 10, 150, 19, 4.6, { mirror: true }),
     ],
     omens: [
       { at: 110, words: 'THE PIPING IS THIN, AND MONOTONOUS, AND VERY CLOSE', sound: 'choral', pitch: 0.55 },
@@ -94,7 +83,7 @@ export const BEYOND_WAYS: Readonly<Record<string, Way>> = {
   // The pale hexagons: pedestals of light along a way that is itself a hexagon of light; the Gate at its far side.
   ancient_ones: {
     marks: [
-      mark(piece('hexped', { size: [0.8, 1], glow: 'purple' }), 12, 150, 24, [4, 6], { mirror: true, jitter: 3 }),
+      mark(piece('hexped', { size: 0.9, glow: 'purple' }), 12, 150, 24, 5, { mirror: true }),
       mark(piece('trilith', { size: 0.7 }), 36, 150, 44, 9, { mirror: true, face: 'in' }),
     ],
     omens: [

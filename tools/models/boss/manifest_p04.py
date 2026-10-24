@@ -16,7 +16,6 @@ add(
     ms('ms_shed_b', 'Large Shed B', ['Shed A', 'Shed A Frame'], S.METAL, solids='box'),
     ms('ms_rail', 'Handrail', 'Handrail', S.METAL, fit={'scale': 2.0}, solids='none'),
     ms('ms_rail_post', 'Handrail', 'Handrail Post', S.METAL, fit={'scale': 2.0}, solids='none'),
-    ms('ms_gantry', 'Metal Gantry Floor', 'Gantry Floor A', S.METAL, fit={'scale': 2.5}, solids='none'),
     ms('ms_pallet', 'Pallet', 'instance_0', S.WOOD, fit={'scale': 1.3}, solids='none'),
     ms('ms_barrel', 'Barrel', 'Barrel', S.METAL, fit={'scale': 1.3}, solids='box', round=True),
     ms('ms_barricade', 'Concrete Barricade', 'SketchUp', S.STONE, fit={'scale': 1.6}, solids='box'),

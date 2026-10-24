@@ -9,15 +9,19 @@
 import type { XZ } from '../core/geom';
 import { hash2 } from '../core/rng';
 import type { CandleLook } from '../data/arenaSets';
-import { reach } from './arenaDecor';
 import { roomAt, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import type { Part } from './dungeonParts';
+import { colliderGap } from './colliders';
 import type { Enclosure } from './enclosure';
 import type { ArenaPlace } from './placements';
+import { propColliders, type Prop } from './props';
 
 export interface CandleSpot extends XZ {
   look: CandleLook;
 }
+
+/** The nearest a prop's solid is to a point (Infinity when it has none). */
+export const propGap = (p: Prop, x: number, z: number): number => Math.min(Infinity, ...propColliders(p).map((c) => colliderGap(c, x, z)));
 
 export const ASIDE = { far: 4.6, ring: 3.4, clear: 1.2, wall: 1.5 } as const; // metres: the most it stands from the stake, how far to the way's side before a ring, from a piece, and from an enclosure's wall
 
@@ -42,7 +46,7 @@ export function ringCandle(a: ArenaPlace, stake: XZ, front: XZ, enc?: Pick<Enclo
   const look = a.candle ?? 'cairn';
   const lean = hash2(Math.round(a.x), Math.round(a.z), 62) < 0.5 ? 1 : -1; // which side, as the place has it
   const [px, pz] = [-front.z, front.x];
-  const solids = a.decor.filter((p) => reach(p) > 0);
+  const solids = a.decor.filter((p) => propColliders(p).length > 0);
   for (const along of [0, 1.4, -1.4, 2.6]) {
     for (const aside of [ASIDE.ring, ASIDE.ring + 1, ASIDE.ring - 0.8]) {
       for (const s of [lean, -lean]) {
@@ -50,7 +54,7 @@ export function ringCandle(a: ArenaPlace, stake: XZ, front: XZ, enc?: Pick<Enclo
         const z = stake.z + front.z * along + pz * s * aside;
         if (Math.hypot(x - stake.x, z - stake.z) > ASIDE.far) continue;
         if (enc && (enc.dry ?? enc.gap)({ x, z }) > -ASIDE.wall) continue; // inside the wall, not against it (and on dry ground)
-        if (solids.every((p) => Math.hypot(p.x - x, p.z - z) - reach(p) >= ASIDE.clear) && a.stones.every((q) => Math.hypot(q.x - x, q.z - z) - q.radius >= ASIDE.clear)) return { x, z, look };
+        if (solids.every((p) => propGap(p, x, z) >= ASIDE.clear) && a.stones.every((q) => Math.hypot(q.x - x, q.z - z) - q.radius >= ASIDE.clear)) return { x, z, look };
       }
     }
   }

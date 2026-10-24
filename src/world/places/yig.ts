@@ -3,7 +3,7 @@
  * body of an enormous serpent, ridged along its back, lying in a ring that swells and tightens, its head at the gate. The head is a jaw: two arms of the
  * body flare out from the gate, a row of fangs along the inside of each, two great teeth either side of the way in, and the gate's own door is the
  * teeth of the lower jaw meeting those hung from the upper. In the coil, at the back, stands a shrine of the old sandstone: a raised floor, four columns
- * carrying a beam, a totem of masks with the serpent's colours, offerings of bone and a brazier. Dust walks the ground, drifts pile on the wall's far
+ * carrying a beam, a totem, a stone cobra coiled on its post (Animex's snake statue), with masks in the serpent's colours, offerings of bone and a brazier. Dust walks the ground, drifts pile on the wall's far
  * side. The fog is held low so the coil shows over it. Pure: no Three.js.
  */
 
@@ -44,10 +44,8 @@ export const yig: PlaceFn = (c: Court, h: House) => {
   for (const [a, cc] of [[b + 0.9, -w + 0.9], [b + 0.9, w - 0.9], [b + 5.5, -w + 0.9], [b + 5.5, w - 0.9]] as const) column(c, a, cc, 1, { ...SAND, y: 0.96, s: 0.9 });
   c.run('tp_beam', [b + 0.9, -w + 0.4], [b + 0.9, w - 0.4], { ...SAND, y: 6.0 });
   c.run('tp_beam', [b + 5.5, -w + 0.4], [b + 5.5, w - 0.4], { ...SAND, y: 6.0 });
-  for (const [i, y] of [0.96, 2.9, 4.84].entries()) {
-    c.add('tp_pil_base', b + 2.6, 0, { ...SAND, y, s: 1.2 - i * 0.12, walk: i > 0, stretch: [1, 0.8, 1] });
-    c.add('px_mask', b + 3.2, 0, { y: y + 0.2, face: 'front', s: 1.7, tint: [0.88, 0.8, 0.55], keep: 0.7, walk: true });
-  }
+  c.add('yg_snake', b + 3.2, 0, { ...SAND, y: 0.96, face: 'front', keep: 0.5, s: 0.85 }); // the totem: the stone cobra coiled on its post, its hood raised to the court
+  for (const side of [-1, 1]) c.add('px_mask', b + 1.4, side * 4.8, { y: 4.4, face: 'front', s: 1.5, tint: [0.88, 0.8, 0.55], keep: 0.7, walk: true });
   for (const side of [-1, 1]) {
     c.add('px_brazier', b + 4.6, side * 4.2, { y: 0.96, tint: [0.4, 0.34, 0.28], keep: 0.5, s: 1.3, lit: 'fire' });
     c.add('tp_flag_stars', b + 1.4, side * 3.2, { y: 3.4, face: 'front', s: 1.3, walk: true });

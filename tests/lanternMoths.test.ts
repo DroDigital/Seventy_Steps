@@ -45,19 +45,18 @@ describe('moths about the new oil lantern models', () => {
     }
   });
 
-  it('includes approach and arena lanterns in the streamed nests, including the otherwise silent Yuggoth', () => {
+  it('includes the court lanterns in the streamed nests, including the otherwise silent Yuggoth (round 72: the approaches keep no lanterns)', () => {
     const yuggoth = REGIONS.find((r) => r.id === 'yuggoth')!;
     const approaches = [...regionPlan(yuggoth).props.values()].flat().filter((p) => lanternMoths(p).length);
     const arenas = worldLayout().arenas.filter((a) => a.region === yuggoth.id).flatMap((a) => a.decor).filter((p) => lanternMoths(p).length);
-    for (const group of [approaches, arenas]) {
-      expect(group.length).toBeGreaterThan(0);
-      let present = 0;
-      for (const p of group) {
-        const nests = nestsOf(chunkOf(p.x), chunkOf(p.z));
-        expect(nests.length).toBeLessThanOrEqual(CHUNK_CRITTERS);
-        for (const expected of lanternMoths(p)) if (nests.some((n) => n.seed === expected.seed && n.x === expected.x && n.y === expected.y && n.z === expected.z)) present++;
-      }
-      expect(present).toBeGreaterThan(0);
+    expect(approaches, 'the ways to the horrors are lit by no lantern').toEqual([]);
+    expect(arenas.length).toBeGreaterThan(0);
+    let present = 0;
+    for (const p of arenas) {
+      const nests = nestsOf(chunkOf(p.x), chunkOf(p.z));
+      expect(nests.length).toBeLessThanOrEqual(CHUNK_CRITTERS);
+      for (const expected of lanternMoths(p)) if (nests.some((n) => n.seed === expected.seed && n.x === expected.x && n.y === expected.y && n.z === expected.z)) present++;
     }
+    expect(present).toBeGreaterThan(0);
   });
 });

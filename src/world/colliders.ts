@@ -50,6 +50,14 @@ export function toBoxFrame(c: OrientedBoxCollider, x: number, z: number): { x: n
   return { x: dx * k - dz * s, z: dx * s + dz * k };
 }
 
+/** Metres from a point to a collider's edge in the xz plane (0 on or in it): what a candle or a piece asks to stand clear of, truer than a circle about a wide piece. */
+export function colliderGap(c: Collider, x: number, z: number): number {
+  if (c.kind === 'cylinder') return Math.max(0, Math.hypot(x - c.x, z - c.z) - c.radius);
+  if (c.kind === 'box') return Math.hypot(Math.max(c.min.x - x, 0, x - c.max.x), Math.max(c.min.z - z, 0, z - c.max.z));
+  const q = toBoxFrame(c, x, z);
+  return Math.hypot(Math.max(Math.abs(q.x) - c.hx, 0), Math.max(Math.abs(q.z) - c.hz, 0));
+}
+
 /** The xz rectangle around a collider, for bucketing. */
 export function colliderBounds(c: Collider): { x0: number; z0: number; x1: number; z1: number } {
   if (c.kind === 'box') return { x0: c.min.x, z0: c.min.z, x1: c.max.x, z1: c.max.z };
