@@ -27,8 +27,10 @@ crash screen, and the buttons' names.
   the dialogue's chrome, achievements, weapon and ware names.
 - **The voices:** every spoken line is an English recording (`public/voice`). Subtitles in another language would need the lines
   keyed (they are named by their words) and the recordings kept; a localized cast is a separate production.
-- **Fonts:** the serif stack (`hudKit.SERIF`) covers Latin scripts. Cyrillic is in the system serifs; Chinese, Japanese and Korean fall
-  back to a system face and have not been looked at.
+- **Fonts:** the serif stack (`hudKit.SERIF`) leads with IM Fell English (round 74, `public/fonts`), which covers English, German,
+  French and Spanish (Basic Latin, Latin-1, Latin Extended-A, œ). It has no Cyrillic, Greek, arrows, minus sign, ≥, ▲ or ◇: those, and
+  Chinese, Japanese and Korean, fall back to the system serifs behind it and have not been looked at. A language that needs more
+  than Latin would need its own face added to `ui/fonts` and the stack.
 
 ## Adding a language
 

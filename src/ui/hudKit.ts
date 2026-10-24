@@ -8,10 +8,13 @@ export const BLOOD = '#96413b'; // health (round 46: a step less saturated, with
 export const LEAF = '#848a6c'; // stamina (round 35: a drab olive; the leaf green of round 32 was too much)
 export const GOLD = '#a8935f'; // the rule and the brackets of a frame, the hot edge of a choice
 export const PAPER = '#e8dec6'; // a title
-/** A period book face for the title, menus, the HUD (round 14) and what is read (system fonts: no font files). */
-export const SERIF = "'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif";
-/** A telegram's or typescript's face. */
-export const TYPEWRITER = "'Courier New',Courier,monospace";
+/**
+ * A period book face for the title, menus, the HUD (round 14) and what is read. Round 74: IM Fell English (`ui/fonts`), with the
+ * system serifs behind it for what it has no glyph for (→ ≥ − ▲ ◇) and while it loads. It has one weight and oldstyle figures only.
+ */
+export const SERIF = "'IM Fell English','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif";
+/** A telegram's or typescript's face (round 74: Special Elite, `ui/fonts`; only the intro's telegram is set in it). */
+export const TYPEWRITER = "'Special Elite','Courier New',Courier,monospace";
 
 export function el(style: string, text = '', parent?: HTMLElement): HTMLDivElement {
   const d = document.createElement('div');
