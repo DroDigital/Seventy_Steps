@@ -26,17 +26,17 @@ export const shub: PlaceFn = (c: Court, h: House) => {
   wallAbout(c, 'px_hedge', pts, gate, { ...BARK, height: 10, lap: 0.4 });
 
   // the wood beyond, standing over the wall: dead trees and living, the biggest of them either side of the way in
-  const wood = ['st_dead_6', 'st_maple_3', 'st_dead_10', 'st_dead_8'] as const;
+  const wood = ['gt_dead_4', 'st_maple_3', 'gt_dead_6', 'gt_dead_3'] as const;
   for (let i = 0; i < 26; i++) {
     const th = ((i + 0.5) * 2 * Math.PI) / 26;
     if (bearing(th) < 0.3) continue;
     const [a, cc] = at(th, 4.6 + (i % 3) * 1.6);
-    c.add(wood[i % 4]!, a, cc, { ...WOOD, face: 'front', turn: i * 37, s: 2.0 + (i % 3) * 0.25, jitter: 1.2 });
+    c.add(wood[i % 4]!, a, cc, { ...WOOD, face: 'front', turn: i * 37, s: (wood[i % 4]!.startsWith('gt') ? 1.0 : 2.0) + (i % 3) * 0.12, jitter: 1.2 });
   }
   for (const side of [-1, 1]) {
     c.add('st_maple_3', G + 4, side * 14.5, { ...WOOD, face: 'front', turn: side * 20, s: 2.5, jitter: 0.4 });
-    c.add('st_dead_8', G + 14, side * 21, { ...WOOD, face: 'front', turn: -side * 35, s: 2.2, jitter: 0.6 });
-    c.add('st_dead_10', G + 17.4, side * 12, { ...WOOD, face: 'front', turn: side * 60, s: 1.8, jitter: 0.6 });
+    c.add('gt_dead_5', G + 14, side * 21, { ...WOOD, face: 'front', turn: -side * 35, s: 1.15, jitter: 0.6 });
+    c.add('gt_dead_4', G + 17.4, side * 12, { ...WOOD, face: 'front', turn: side * 60, s: 0.95, jitter: 0.6 });
   }
 
   // the way in: three arches of root over the approach, each wider than the last, and a pod hung on every other post of them

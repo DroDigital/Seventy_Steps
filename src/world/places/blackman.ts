@@ -37,7 +37,7 @@ export const blackman: ExtraFn = (c, h) => {
   // the island's rim: dead trees where the ground is white, and a canoe drawn up on the shore, black with the river
   for (let i = 0; i < 7; i++) {
     const [a, cc] = polar(Ri - 3.2, 60 + (i * 240) / 6 + (i % 2) * 4);
-    c.add(`rn_deadtree_${(i % 3) + 1}`, a, cc, { tint: [0.4, 0.38, 0.4], keep: 0.3, face: 'front', s: 1.9, jitter: 0.5 });
+    c.add(['gt_dead_6', 'gt_dead_8', 'gt_dead_9'][i % 3]!, a, cc, { tint: [0.4, 0.38, 0.4], keep: 0.3, face: 'front', s: 0.7, jitter: 0.5 });
   }
   const [ca, cc] = polar(Ri - 2.3, 128);
   c.add('nt_canoe', ca, cc, { tint: [0.3, 0.25, 0.25], keep: 0.4, turn: 90 + 14, s: 1.5 });

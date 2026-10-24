@@ -67,13 +67,13 @@ export const colour: ExtraFn = (c, h) => {
   c.add('rn_bricks', (b0 + b1) / 2 + 2, bl + 1.2, { ...ASH, s: 1.2, walk: true });
 
   // the orchard: rows of dead trees about the bank's other side, and a pair of rows lining the way up from the gate; one gap where a tree is down
-  const trees = ['rn_deadtree_1', 'rn_deadtree_2', 'rn_deadtree_3'];
+  const trees = ['gt_dead_3', 'gt_dead_4', 'gt_dead_5'];
   let n = 0;
   for (const cc of [-30.5, -35.2]) for (let a = -14; a <= 18; a += 6.2) {
     if (cc < -35 && a === -1.6) continue;
-    c.add(trees[n++ % 3]!, a + (cc < -33 ? 3 : 0), cc, { ...WOOD, jitter: 0.8, face: 'front', s: 1.7 + (n % 3) * 0.2 });
+    c.add(trees[n++ % 3]!, a + (cc < -33 ? 3 : 0), cc, { ...WOOD, jitter: 0.8, face: 'front', s: 0.62 + (n % 3) * 0.07 });
   }
-  for (const side of [-1, 1]) for (let a = c.R + 3; a <= c.R + 13; a += 5.3) c.add(trees[n++ % 3]!, a, side * (9.5 + (n % 2) * 6.5), { ...WOOD, jitter: 0.9, face: 'front', s: 1.8 });
+  for (const side of [-1, 1]) for (let a = c.R + 3; a <= c.R + 13; a += 5.3) c.add(trees[n++ % 3]!, a, side * (9.5 + (n % 2) * 6.5), { ...WOOD, jitter: 0.9, face: 'front', s: 0.66 });
   c.add('nt_log', 16.4, -30.4, { ...WOOD, yaw: 0.4, s: 1.1 });
   c.add('nt_stump', 3.6, -33, { ...WOOD, s: 1.2 });
 

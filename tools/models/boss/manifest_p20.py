@@ -1,0 +1,21 @@
+"""Pack 20, 'alien builings extension pack' by yughues (OpenGameArt, CC0): the tapered pylons, braced curtain walls, domed towers and overhead passages of an alien base, with the
+base's own paint thrown away and its light and dark kept in a pale metal-stone (Zkauba's Yaddith: a city left in a hurry). The pack's lamps, consoles, crates and ships are not asked for."""
+from manifest import M, add
+import sources as S
+
+DIR = 'p20/'
+PALE = (0.82, 0.78, 0.74)
+DARK = (0.62, 0.56, 0.56)
+
+def ay(id, obj, fit, **kw):
+    return M(id, DIR + 'alien_buildings.blend', '^' + obj + '$', kit='p20', textures=(DIR,), cls=S.SLAB, classes={'.': S.SLAB}, fit=fit, recolour=kw.pop('recolour', PALE), **kw)
+
+add(
+    ay('ay_wall', 'alien_wall_short', {'length': 24}, solids='box'),
+    ay('ay_pylon', 'alien_tower_wall', {'height': 20}, solids='box'),
+    ay('ay_bastion', 'alien_tower2', {'height': 20}, solids='box', recolour=DARK),
+    ay('ay_passage', 'alien_corridor', {'length': 24}, solids='none'),
+    ay('ay_portal', 'alien_gate', {'width': 14}, solids='none'),
+    ay('ay_dome', 'alien_base3', {'height': 12}, solids='box'),
+    ay('ay_gantry', 'alien_base8', {'height': 14}, solids='box', recolour=DARK),
+)

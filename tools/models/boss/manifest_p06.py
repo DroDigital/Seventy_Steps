@@ -14,5 +14,4 @@ add(
     cs('cs_tower', 'Tower2', classes=STONE, solids='box', round=True),
     cs('cs_temple', 'Temple', classes=STONE, solids='box'),  # (a chapel's inside is drawn, not walked: its doorway is too narrow for a body, and a room no body can leave is what the audits forbid)
     cs('cs_temple_tower', 'Temple_Tower', classes=STONE, solids='box', round=True),
-    cs('cs_stairs_1', 'Stairs1', classes=STONE, solids='none'),
 )

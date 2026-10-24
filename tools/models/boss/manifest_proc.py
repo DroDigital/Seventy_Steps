@@ -21,7 +21,6 @@ add(
     px('px_mast', 'mast', args={'height': 9.0}, solids='box', round=True),
     px('px_derrick', 'derrick', args={'height': 8.0, 'reach': 4.5}, solids='box'),
     px('px_anchor', 'anchor', args={'height': 2.6}, solids='box', round=True),
-    px('px_pylon', 'pylon', args={'width': 12.0, 'depth': 5.0, 'height': 16.0}, solids='box'),
     px('px_dune', 'dune', args={'width': 12.0, 'height': 3.0, 'depth': 8.0}, solids='none'),
     px('px_well', 'well', args={'radius': 0.95}, solids='box', round=True),
     px('px_brazier', 'brazier', args={'height': 1.2}, solids='box', round=True, anchors=[(0.0, 1.4, 0.0)]),
@@ -32,5 +31,4 @@ add(
     px('px_slab', 'slab', args={'width': 5.0, 'height': 7.0, 'thick': 1.6, 'lean': 0.1}, solids='box'),
     px('px_prism', 'prism', args={'radius': 1.4, 'height': 6.0}, solids='box', round=True),
     px('px_collar', 'collar', args={'radius': 0.9}, solids='none'),
-    px('px_mouth', 'mouth', args={'width': 0.7, 'height': 1.1}, solids='none'),
 )

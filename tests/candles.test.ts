@@ -6,8 +6,7 @@ import { strike } from '../src/systems/combat';
 import { riseAt } from '../src/systems/death';
 import { createWorldGame } from '../src/systems/game';
 import { applySave, parseSave, snapshot } from '../src/systems/save';
-import { reach } from '../src/world/arenaDecor';
-import { ASIDE, solidGap } from '../src/world/candlePlan';
+import { ASIDE, propGap, solidGap } from '../src/world/candlePlan';
 import { candleBody } from '../src/render/candleShapes';
 import { propCollider } from '../src/world/props';
 import { roomAt } from '../src/world/dungeonKit';
@@ -59,7 +58,7 @@ describe('the candles before the fog', () => {
   it('a ring\'s stands clear of the pieces of its set and of its stones', () => {
     for (const f of fogs.filter((w) => w.kind === 'ring')) {
       const a = worldLayout().arenas.find((x) => f.id === `ring:${worldLayout().arenas.indexOf(x)}:${x.bosses[0]}`)!;
-      for (const p of a.decor) if (propCollider(p)) expect(Math.hypot(p.x - f.candle.x, p.z - f.candle.z) - reach(p), `${f.id}: ${p.kind} ${p.set?.id ?? ''}`).toBeGreaterThanOrEqual(ASIDE.clear - 1e-6);
+      for (const p of a.decor) if (propCollider(p)) expect(propGap(p, f.candle.x, f.candle.z), `${f.id}: ${p.kind} ${p.set?.id ?? ''}`).toBeGreaterThanOrEqual(ASIDE.clear - 1e-6);
     }
   });
 
