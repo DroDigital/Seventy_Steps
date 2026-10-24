@@ -6,6 +6,7 @@ import { PLAYER_MOVES } from '../src/data/moves';
 import { startMove } from '../src/systems/actions';
 import type { Stamina } from '../src/systems/components';
 import { applyLevels, staminaRegen } from '../src/systems/levels';
+import { levelWorth } from '../src/systems/levelWorth';
 import { createGame, stepGame } from '../src/systems/game';
 import { absorb, canAfford, spend, tickStamina } from '../src/systems/stamina';
 import { place, press, scriptedGame, steps } from './helpers';
@@ -153,7 +154,7 @@ describe('stamina recovers between attacks, and faster with each level of Endura
     expect(fill(undefined)).toBeGreaterThan(3);
     expect(fill(undefined)).toBeLessThan(3.2);
     expect(staminaRegen(0)).toBe(STAMINA.regen);
-    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(56, 6); // (round 68: thirty levels, not twenty)
+    expect(staminaRegen(LEVELS.endurance.max)).toBeCloseTo(STAMINA.regen + levelWorth(LEVELS.endurance.max) * LEVELS.endurance.regen!, 6); // (round 68: thirty levels, not twenty; round 71: they are worth 22.6, so 50.08 a second and not 56)
     for (let n = 1; n <= LEVELS.endurance.max; n++) expect(staminaRegen(n)).toBeGreaterThan(staminaRegen(n - 1));
   });
 

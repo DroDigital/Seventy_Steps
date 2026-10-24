@@ -11,7 +11,7 @@
 import { getRegion } from '../data/regions';
 import { DESCENT_LINE } from '../data/loreLines';
 import { PLAYER_MOVES } from '../data/moves';
-import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
+import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
 import { WEAPONS } from '../data/weapons';
 import { canReinforce, edgeAt, reinforce, reinforceCost } from '../systems/arms';
 import { ENDINGS } from '../data/endings';
@@ -23,6 +23,7 @@ import { buyUpgrade, upgradeName } from '../systems/insight';
 import { closedBy, heldOpen, listed } from '../systems/veil';
 import { currentLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
+import { levelGain, softCap } from './levelGains';
 import { worldLayout, type SignPlace } from '../world/placements';
 import { button, createScreen, el, footer, heading, option, tabs, title, type Page } from './menuKit';
 import { chips, price, resources, type Chip } from './menuChips';
@@ -34,11 +35,8 @@ import { mountsTab, refreshMountEntitlement } from './mounts';
 import { t } from '../core/i18n';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
 
-/** What one more level of each gives, in words. */
-const GAINS: Record<LevelId | UpgradeId, string> = {
-  vigour: `+${LEVELS.vigour.hp} health`,
-  endurance: `+${LEVELS.endurance.stamina} stamina, faster recovery`,
-  might: `+${Math.round(LEVELS.might.damage! * 100)}% damage`,
+/** What one more level of each of the mind's gives, in words (the body's, which fall off past a soft cap, are levelGains.ts). */
+const GAINS: Record<UpgradeId, string> = {
   resolve: `sanity losses −${Math.round(UPGRADES.resolve.resist! * 100)}%`,
   draught: `+${UPGRADES.draught.doses} Laudanum`,
 };
@@ -77,9 +75,10 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   function grow(panel: HTMLElement): void {
     heading(panel, 'BODY').style.margin = '0 0 4px';
     for (const id of LEVEL_IDS) {
-      const full = g.player.levels[id] >= LEVELS[id].max;
-      const b = option(panel, `${levelName(id)}  ${g.player.levels[id]}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
-      chips(b, [{ text: GAINS[id], tone: 'good' }]);
+      const [bought, full] = [g.player.levels[id], g.player.levels[id] >= LEVELS[id].max];
+      const soft = softCap(id, bought); // (round 71: past a soft cap the next level gives less, and the row says so)
+      const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`, soft?.hint);
+      if (!full) chips(b, [{ text: levelGain(id, bought), tone: 'good' }, ...(soft ? [{ text: soft.chip, tone: 'dim' as const }] : [])]);
       price(b, full ? 'MAX' : `${nextLevelCost(g)} Echoes`, full ? 'max' : canLevel(g, id) ? 'ok' : 'no');
     }
     heading(panel, 'MIND').style.margin = '12px 0 4px';
