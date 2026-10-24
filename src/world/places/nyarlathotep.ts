@@ -1,9 +1,9 @@
 /**
- * The hall of the Black Pharaoh (round 73; pack 08's temple stone and pack 13's stone figures, pack 14's rods, obelisks and mask, docs/BOSS_PLACES.md): the place where the
+ * The hall of the Black Pharaoh (round 73; pack 08's temple stone and pack 13's stone figures, the rods, obelisks and mask made in code, docs/BOSS_PLACES.md): the place where the
  * Crawling Chaos shows what it has seen, in the court at the centre of all. A low black wall rings the fight, columns of basalt standing from it with a fire on each, and a
- * crowd of stone runners goes round inside it, all the same way, none looking back, as the crowd went in the story and the footprints go one way. At the back a dais carries
- * the instruments of the show, rods of metal tall as towers with a cold spark running up each; over it a black arch holds a mask with no face to it. Two crouching
- * guardians and two obelisks keep the gate. Sparks climb the rods; ash goes by. The fog is held low so the columns show over it. Pure: no Three.js.
+ * audience of stone figures sits in two ranks inside it, all turned in on the middle, none looking back, as the crowd went in the story. At the back a dais carries
+ * the instruments of the show, rods of metal tall as towers with a cold spark running up each; over it a black arch holds a mask with no face to it. Two seated
+ * colossi and two obelisks keep the gate. Sparks climb the rods; ash goes by. The fog is held low so the columns show over it. Pure: no Three.js.
  */
 
 import { HOUSE, type House } from '../../data/arenaHouses';
@@ -32,17 +32,17 @@ export const nyarlathotep: PlaceFn = (c: Court, h: House) => {
     c.add('px_brazier', a, cc, { ...GILT, s: 1.6, y: top, lit: 'torch', walk: true });
   }
 
-  // the crowd: stone runners going round inside the wall, all the one way, in two ranks that do not meet the gate's way or the dais
+  // the audience: seated stone figures in two ranks inside the wall, all facing the middle, none of them at the gate's way
   const run = (rad: number, n: number, from: number, to: number, s: number): void => {
     for (let i = 0; i < n; i++) {
       const th = from + ((to - from) * (i + 0.5)) / n;
       const [a, cc] = [Math.cos(th) * rad, Math.sin(th) * rad];
       const k = (i * 5) % 7;
-      c.add('fg_stone_run', a, cc, { ...SHADOW, s: s + (k % 3) * 0.15, face: 'in', turn: 90, walk: true });
+      c.add('fg_seat', a, cc, { ...SHADOW, s: s + (k % 3) * 0.1, face: 'in', walk: true });
     }
   };
-  run(G - 8.2, 20, 0.5, 2 * Math.PI - 0.5 - 1.3, 1.5);
-  run(G - 11.6, 14, 0.7, 2 * Math.PI - 0.7 - 1.6, 1.4);
+  run(G - 8.2, 20, 0.5, 2 * Math.PI - 0.5 - 1.3, 1.1);
+  run(G - 11.6, 14, 0.7, 2 * Math.PI - 0.7 - 1.6, 1.0);
 
   // the dais: the instruments of the show, a black arch over a mask with no face
   const back = -(c.R + 5);
@@ -52,9 +52,9 @@ export const nyarlathotep: PlaceFn = (c: Court, h: House) => {
   for (const [i, cc] of [-12, -8, 8, 12].entries()) c.add('px_rod', back + 1.5, cc, { tint: [0.62, 0.64, 0.74], keep: 0.5, s: 1, y: 0.6, height: 13 + (i % 2) * 3 });
   for (const cc of [-5.2, 5.2]) c.add('px_brazier', back - 1.6, cc, { ...GILT, s: 2, y: 0.6, lit: 'torch', walk: true });
 
-  // the gate: crouching guardians that watch the way, obelisks beyond them
+  // the gate: seated colossi that watch the way, obelisks beyond them
   for (const side of [-1, 1]) {
-    c.add('fg_stone_crouch', G + 0.4, side * (gate + 3.4), { ...BASALT, s: 3.4, face: 'front' });
+    c.add('fg_seat', G + 0.4, side * (gate + 3.4), { ...BASALT, s: 3.4, face: 'front' });
     c.add('px_obelisk', G + 6, side * (gate + 7.5), { ...BASALT, s: 1.3, face: 'front' });
   }
 
