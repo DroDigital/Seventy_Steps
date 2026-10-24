@@ -12,9 +12,10 @@
 import { ENTITIES, getEntity } from '../src/data/registry';
 import type { EntityDef } from '../src/data/schema';
 import { REGIONS } from '../src/data/regions';
-import { REAGENT, REINFORCE, LEVELS, PLAYER, type LevelId } from '../src/data/tuning';
+import { REAGENT, REINFORCE, LEVELS, type LevelId } from '../src/data/tuning';
 import { stonesOf } from '../src/systems/arms';
 import { levelCost } from '../src/systems/levels';
+import { healthAt } from '../src/systems/levelWorth';
 import { worldLayout } from '../src/world/placements';
 import { regionPlan } from '../src/world/regionPlan';
 
@@ -108,7 +109,7 @@ export const isGod = (id: string): boolean => ['great_old_one', 'outer_god'].inc
 
 const standingOf = (b: EntityDef, rank: number, echoes: number, stones: number): Standing => {
   const levels = buy(Math.round(echoes));
-  return { id: b.id, rank, echoes: Math.round(echoes), levels, hp: PLAYER.hp + levels.vigour * (LEVELS.vigour.hp ?? 0), stones, reinforced: reinforceWith(stones) };
+  return { id: b.id, rank, echoes: Math.round(echoes), levels, hp: healthAt(levels.vigour), stones, reinforced: reinforceWith(stones) };
 };
 
 /**

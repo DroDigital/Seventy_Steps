@@ -3,6 +3,7 @@ import { ENTITIES, variantOf } from '../src/data/registry';
 import { LEVELS, REINFORCE, STAR_STONES } from '../src/data/tuning';
 import { WEAPONS } from '../src/data/weapons';
 import { affordableMoves, canReinforce, edge, edgeAt, movable, moveCost, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
+import { mightAt } from '../src/systems/levelWorth';
 import { createWorldGame } from '../src/systems/game';
 import { snapshot } from '../src/systems/save';
 import { spawnCreature } from '../src/systems/creatures';
@@ -73,7 +74,7 @@ describe('reinforcing arms with star-stones (round 12)', () => {
 
   it('boss health sits within a soulslike reach of the investigator\'s blows (round 12: 73 to 910 light cane blows)', () => {
     const cane = WEAPONS.cane.moves.light1!.hit!.damage;
-    const most = cane * (1 + LEVELS.might.max * LEVELS.might.damage!) * edgeAt(REINFORCE.max);
+    const most = cane * mightAt(LEVELS.might.max) * edgeAt(REINFORCE.max); // (round 71: Might's thirty levels are worth 22.6, 1.9 times the blow and not 2.2)
     const bosses = ENTITIES.flatMap((d) => [d, variantOf(d, 'boss')]).filter((d) => d?.bossScript);
     expect(bosses.length).toBeGreaterThan(40);
     for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(90);

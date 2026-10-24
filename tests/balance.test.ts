@@ -11,10 +11,11 @@ import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
-import { BOSS_LEVEL_SCALING, LEVELS, PLAYER, REAGENT, SIM } from '../src/data/tuning';
+import { BOSS_LEVEL_SCALING, LEVELS, REAGENT, SIM, SOFT_CAP } from '../src/data/tuning';
 import { botFight, type BotFight } from './botHelpers';
 import { bossDamageScale, bossHealthScale } from '../src/systems/bossScaling';
 import { levelsOf } from '../src/systems/levels';
+import { healthAt, levelsWorth, levelWorth, mightAt, staminaAt } from '../src/systems/levelWorth';
 import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
 
 const FRAMES = 60 * 60 * 10; // ten minutes
@@ -57,12 +58,12 @@ const BANDS = { named: { seconds: [14, 50], lives: [0.2, 1.2] }, god: { seconds:
  * +5), where the horror has grown past the standing it is met at (systems/bossScaling.ts `overmatch`). None may cost a bot less than this,
  * nor be over in fewer seconds, whatever a person has farmed.
  */
-const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5 } as const;
+const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const; // (round 71: nine starts, not three: 'Umr at-Tawil cost the same bot 0.28, 0.93 and 0.43 lives from three, and a floor held on three paths was a coin)
 const BOUNDS_TEXT = '6 to 260 seconds';
 const AT_CAP_TEXT = `
 ## At the cap
 
-The same bot, the same three starts, with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
+The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which the soft caps make ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
 their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} of a life; a great fight ${CAP.god.seconds} and ${CAP.god.lives}.
 `;
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
@@ -84,7 +85,7 @@ three, from ${STARTS.join(', ')} metres off (a bot's path through a fight is cha
 low walls and training dummy set aside: a body that wide finds no place to stand among them, as its own arena in the world has
 nothing in its way.
 
-- Bosses gain ${BOSS_LEVEL_SCALING.health * 100}% maximum health and ${BOSS_LEVEL_SCALING.damage * 100}% damage per purchased player level. Level one retains the authored stats;
+- Bosses gain ${BOSS_LEVEL_SCALING.health * 100}% maximum health and ${BOSS_LEVEL_SCALING.damage * 100}% damage per player level, a level counted by what it is worth (round 71, the soft caps: ${SOFT_CAP.reduce((s, t) => `${s}, ${Math.round(t.worth * 100)}% from ${t.after + 1}`, `each attribute's levels count whole to ${SOFT_CAP[0].after}`)}: thirty are worth ${levelWorth(LEVELS.vigour.max)}, so ninety bought are ${levelsWorth({ vigour: 30, endurance: 30, might: 30 }).toFixed(1)}). Level one retains the authored stats;
   ordinary enemies, summons and spawning roots keep their existing stats. **Scaled health** is the boss's actual maximum in that run.
 - **Seconds** is how long the boss took at that steady pace. A person strikes for perhaps a third of a fight, so their fight
   is about three times as long.
@@ -131,9 +132,9 @@ const OPENING = ['hub', 'arkham'];
 const OPENING_LIVES = 1.5; // a horror of the first hours costs at most this (a person carries Reagent for one, and learns it over a few tries)
 
 /** The fights at a standing, one from each start: what they took and cost, on the mean. */
-function fightAt(s: Standing): Row {
+function fightAt(s: Standing, starts: readonly number[] = STARTS): Row {
   const w = WAIVED[s.id];
-  const runs = STARTS.map((start) => botFight(s.id, FRAMES, undefined, { levels: s.levels, reinforced: s.reinforced, skill: SKILL, floor: true, smart: true, mind: true, waive: w?.waive, start }));
+  const runs = starts.map((start) => botFight(s.id, FRAMES, undefined, { levels: s.levels, reinforced: s.reinforced, skill: SKILL, floor: true, smart: true, mind: true, waive: w?.waive, start }));
   for (const r of runs) expect(r.bad).toEqual([]);
   const mean = (k: 'dealt' | 'taken' | 'frames'): number => runs.reduce((n, r) => n + r[k], 0) / runs.length;
   const taken = mean('taken');
@@ -153,8 +154,8 @@ describe('the balance table (round 25)', () => {
   it('holds every boss to a fight worth having', () => {
     const bad: string[] = [];
     for (const r of rows.filter((x) => !EXEMPT.includes(x.id))) {
-      const bought = levelsOf(r.levels);
-      const label = `${r.id} (player level ${bought + 1}, HP x${bossHealthScale(bought, 0).toFixed(2)}, damage x${bossDamageScale(bought).toFixed(2)})`;
+      const [bought, worth] = [levelsOf(r.levels), levelsWorth(r.levels)];
+      const label = `${r.id} (player level ${bought + 1}, HP x${bossHealthScale(worth, 0).toFixed(2)}, damage x${bossDamageScale(worth).toFixed(2)})`;
       const colossus = (getEntity(r.id)!.assembly?.scale ?? 0) >= ZONES.height;
       if (!r.fell || r.seconds < BOUNDS.seconds[0] || r.seconds > BOUNDS.seconds[1]) bad.push(`${label}: ${r.fell ? r.seconds.toFixed(0) : 'not finished in ' + r.seconds.toFixed(0)} seconds`);
       const god = ['great_old_one', 'outer_god'].includes(getEntity(r.id)!.tier);
@@ -178,13 +179,13 @@ const atCap: Row[] = [];
 /** Every standing again with all the levels bought and the cane at its best: the horror has grown past the level it is met at. */
 const atCapOf = (s: Standing): Standing => {
   const levels = { vigour: LEVELS.vigour.max, endurance: LEVELS.endurance.max, might: LEVELS.might.max } as Standing['levels'];
-  return { ...s, levels, hp: PLAYER.hp + levels.vigour * (LEVELS.vigour.hp ?? 0), reinforced: CAP.reinforced };
+  return { ...s, levels, hp: healthAt(levels.vigour), reinforced: CAP.reinforced };
 };
 
 describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
   const table = standings().map(atCapOf);
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s)));
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)));
 
   it('leaves no horror a fight that costs nothing', () => {
     const bad: string[] = [];

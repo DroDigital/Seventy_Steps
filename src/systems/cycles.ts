@@ -15,7 +15,8 @@ import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
 import type { Game } from './components';
 import { isFound } from './found';
-import { applyLevels, LEVEL_IDS, levelsBought } from './levels';
+import { applyLevels, LEVEL_IDS } from './levels';
+import { levelsWorth } from './levelWorth';
 import { bossDamageScale, overmatch } from './bossScaling';
 
 export interface Carry {
@@ -100,7 +101,7 @@ export function foeDamage(g: Game, attacker: Entity): number {
   if (g.ecs.c.combatant.get(attacker)?.faction !== 'enemy') return 1;
   const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
   const fight = g.ecs.c.fight.get(attacker);
-  const level = fight ? bossDamageScale(levelsBought(g), overmatch(g.player.levels, fight.id).damage) : 1;
+  const level = fight ? bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage) : 1;
   return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level;
 }
 
