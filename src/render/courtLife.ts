@@ -20,6 +20,7 @@ const FOAM: Rgb = [0.52, 0.58, 0.62]; // the pale of its edges, where it frets a
 const MIST: Rgb = [0.52, 0.58, 0.68];
 const DUST: Rgb = [0.68, 0.68, 0.72];
 const SPEED = 0.9; // m/s: how fast the mists slide along the river, and the water's flow in the same sense
+const EMIT_REACH = 70; // metres from a place's source that it lets go (round 71)
 const CELL = 1.5; // metres: the mesh's cells, small enough that the lantern's pool shows on it
 
 export interface CourtLife {
@@ -28,6 +29,7 @@ export interface CourtLife {
 
 type River = Extract<Living, { kind: 'river' }>;
 type Spill = Extract<Living, { kind: 'spill' }>;
+type Emitter = Extract<Living, { kind: 'emit' }>;
 
 /** The river's water: an annulus between `inner` and `outer`, a sheet at `level` under the land, left open at the ford (its kerbs), the texture running round it. */
 function riverMesh(r: River): THREE.Mesh {
@@ -61,7 +63,7 @@ function riverMesh(r: River): THREE.Mesh {
 }
 
 export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particles): CourtLife {
-  const lives = worldLayout().arenas.flatMap((a) => (a.house?.living ?? []).map((l) => ({ l, reach: Math.hypot(a.house!.rect.x1 - a.house!.rect.x0, a.house!.rect.z1 - a.house!.rect.z0) / 2 + NEAR, mesh: null as THREE.Mesh | null, owed: 0, last: -1 })));
+  const lives = worldLayout().arenas.flatMap((a) => (a.house?.living ?? []).map((l) => ({ l, reach: l.kind === 'emit' ? (l.reach ?? EMIT_REACH) + (l.r ?? Math.hypot((l.to?.x ?? l.x) - l.x, (l.to?.z ?? l.z) - l.z) / 2) : Math.hypot(a.house!.rect.x1 - a.house!.rect.x0, a.house!.rect.z1 - a.house!.rect.z0) / 2 + NEAR, mesh: null as THREE.Mesh | null, owed: 0, last: -1 })));
   const ground = (x: number, z: number, fallback: number): number => particles.ground?.(x, z) ?? fallback;
   const rand = (lo: number, hi: number): number => lo + (hi - lo) * Math.random();
 
@@ -87,6 +89,26 @@ export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particle
     }
   }
 
+  /** A place's source (world/placeEmit.ts): its births this frame, each at a place of its disc or line, at the height asked over the ground there. */
+  function emit(c: (typeof lives)[number], e: Emitter, dt: number): void {
+    c.owed += e.rate * dt;
+    for (; c.owed >= 1; c.owed--) {
+      const t = Math.random();
+      let [x, z] = [e.x, e.z];
+      if (e.to) [x, z] = [e.x + (e.to.x - e.x) * t, e.z + (e.to.z - e.z) * t];
+      else if (e.r) {
+        const [th, rad] = [Math.random() * Math.PI * 2, Math.sqrt(Math.random()) * e.r];
+        [x, z] = [e.x + Math.cos(th) * rad, e.z + Math.sin(th) * rad];
+      }
+      const dir = Math.random() * Math.PI * 2;
+      const [dx, dz] = [Math.cos(dir) * (e.drift ?? 0) * Math.random(), Math.sin(dir) * (e.drift ?? 0) * Math.random()];
+      particles.spawn({
+        x, y: ground(x, z, 0) + rand(e.y[0], e.y[1]), z, vx: dx + (e.flow?.x ?? 0), vy: e.rise ?? 0, vz: dz + (e.flow?.z ?? 0), life: rand(e.life[0], e.life[1]), size: rand(e.size[0], e.size[1]), grow: e.grow,
+        color: [e.colour[0], e.colour[1], e.colour[2]], ...(e.end && { colorEnd: [e.end[0], e.end[1], e.end[2]] as [number, number, number] }), alpha: e.alpha, gravity: e.gravity, drag: e.drag, shape: e.shape ?? 'wisp', glow: e.glow, spin: e.spin, hold: e.hold,
+      });
+    }
+  }
+
   return {
     update(camera, time, hidden) {
       for (const c of lives) {
@@ -104,6 +126,7 @@ export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particle
         c.last = time;
         if (!near || !g.overworld) continue;
         if (c.l.kind === 'river') river(c, c.l, dt);
+        else if (c.l.kind === 'emit') emit(c, c.l, dt);
         else spill(c, c.l, dt);
       }
     },

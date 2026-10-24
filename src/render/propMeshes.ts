@@ -34,6 +34,12 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   glow: { texture: 'cloth', emissive: 1, vertexColors: true },
   glass: { texture: 'cloth', emissive: 0.12, vertexColors: true, opacity: 0.14 },
   pane: { texture: 'cloth', emissive: 1, vertexColors: true, panes: true }, // lit windows (round 18)
+  rock: { texture: 'rock', seed: 4, vertexColors: true, vary: 0.6 }, // the boss places' models (round 71): what their class bytes are drawn as
+  slab: { texture: 'slab', seed: 5, vertexColors: true, vary: 0.5 },
+  cobble: { texture: 'cobble', seed: 5, vertexColors: true, vary: 0.5 },
+  cloth: { texture: 'cloth', seed: 2, vertexColors: true, vary: 0.3, sway: true },
+  metal: { texture: 'cloth', seed: 8, vertexColors: true, vary: 0.2 },
+  bone: { texture: 'slab', seed: 11, vertexColors: true, vary: 0.35 },
 };
 const materials = new Map<PropMat, THREE.ShaderMaterial>();
 /** What bends in the wind (round 34): the trees and bushes, from nothing at their feet to the most at the tops; the rest of a swaying material's vertices stand still. */
@@ -41,6 +47,7 @@ const BENDS: ReadonlySet<string> = new Set(['tree', 'pine', 'bush']);
 const BEND = 0.03; // metres of lean at the top of a prop at a gust's height, per metre it stands
 
 function addSway(geo: THREE.BufferGeometry, p: Prop): void {
+  if (geo.getAttribute('aSway')) return; // a model's own (a cloth blown from where it hangs)
   const at = geo.getAttribute('position');
   const sway = new Float32Array(at.count);
   if (BENDS.has(p.kind)) {
@@ -51,7 +58,7 @@ function addSway(geo: THREE.BufferGeometry, p: Prop): void {
 }
 
 /** What casts the moon's shadow (round 34): the bodies of things, not their lights, windows and trim. */
-const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard', 'brick', 'shingle']);
+const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard', 'brick', 'shingle', 'rock', 'slab', 'cobble', 'metal', 'bone']);
 /** What stands 4 to 10 cm off a wall (frames, glass, doors) is drawn nearer than it is by a pixel's slope of depth: the PS1's snapping moves a face's depth by up to that on a wall seen aslant, and the wall showed through it (round 21). */
 const RELIEF: ReadonlySet<PropMat> = new Set(['trim', 'pane']);
 const material = (m: PropMat): THREE.ShaderMaterial => {
@@ -77,7 +84,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
     for (const piece of p.kind === 'house' ? housePieces(p, c) : propPieces(p, c)) {
       if (piece.mat !== 'glow' && piece.mat !== 'pane') groundShade(piece.geo, p.kind === 'house' ? 0.62 : 0.55, p.kind === 'house' ? 2.2 : 1.6); // darker toward the ground
       const geo = piece.geo.rotateY(p.yaw).translate(p.x, p.y - 0.15, p.z);
-      if (piece.mat === 'leaf' || piece.mat === 'wood') addSway(geo, p);
+      if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
       groups.get(piece.mat)?.push(geo) ?? groups.set(piece.mat, [geo]);
       if (CASTS.has(piece.mat)) casters.push(geo);
       for (const [x, y, z] of piece.smoke ?? []) chimneys.push({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was, then placed

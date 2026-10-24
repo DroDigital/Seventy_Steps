@@ -26,7 +26,8 @@ describe('boss grounds', () => {
     const bad: string[] = [];
     for (const a of w.arenas) {
       // (a house's wall is closed all round by design: tests/arenaHouse.test.ts)
-      const ring = a.decor.filter((p) => Math.hypot(p.x - a.x, p.z - a.z) > a.radius && reach(p) > 0 && !p.set?.id.startsWith('house_')).sort((p, q) => Math.atan2(p.z - a.z, p.x - a.x) - Math.atan2(q.z - a.z, q.x - a.x));
+      const house = new Set(a.house?.props ?? []); // (round 71: and what a place is laid of, its walls and what stands against them)
+      const ring = a.decor.filter((p) => Math.hypot(p.x - a.x, p.z - a.z) > a.radius && reach(p) > 0 && !p.set?.id.startsWith('house_') && !house.has(p)).sort((p, q) => Math.atan2(p.z - a.z, p.x - a.x) - Math.atan2(q.z - a.z, q.x - a.x));
       ring.forEach((p, k) => {
         const q = ring[(k + 1) % ring.length];
         const gap = Math.hypot(p.x - q.x, p.z - q.z) - reach(p) - reach(q);

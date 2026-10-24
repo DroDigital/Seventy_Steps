@@ -10,6 +10,7 @@
 import type { V3, XZ } from '../core/geom';
 import type { HiddenPieceDef } from '../data/arena';
 import { HOUSE } from '../data/arenaHouses';
+import type { Emit } from './placeEmit';
 import type { Prop } from './props';
 import type { Pad } from './sitePads';
 import type { Rect } from './worldMap';
@@ -19,8 +20,8 @@ export interface Spot extends XZ {
   yaw: number;
 }
 
-/** Where the fallen wake (world/gatePlan.ts): the ring's fog stands `ring` metres past the fight's radius, the stake `past` metres beyond it, and never nearer the wall than `wall`. */
-export const STAKE = { ring: 1.5, past: 9, wall: 7.5 } as const;
+/** Where the fallen wake (world/gatePlan.ts): the ring's fog stands `ring` metres past the fight's radius, the stake `past` metres beyond it, and never nearer the wall than `wall` (round 71: `front`, the half-width of the straight edge a place's outline has across its gate). */
+export const STAKE = { ring: 1.5, past: 9, wall: 7.5, front: 2.5 } as const;
 
 /** Where an enclosure is to stand: the fight's centre and ring, the level of its ground, and the way its gate faces. */
 export interface EnclosureSite {
@@ -34,7 +35,8 @@ export interface EnclosureSite {
 /** What a court does that is seen from it (round 68), at world places: a spillway pouring dust down a dam, a river flowing about an island (render/spillFx.ts, riverViews.ts). */
 export type Living =
   | { kind: 'spill'; x: number; y: number; z: number; top: number; width: number; face: XZ } // the lip, `top` metres over the ground and `width` across, and the way the dust runs out of it
-  | { kind: 'river'; x: number; y: number; z: number; inner: number; outer: number; level: number; ford: number; front: XZ }; // the river's ring about (x, z), its surface `level` under the land at y, and the ford it is cut by
+  | { kind: 'river'; x: number; y: number; z: number; inner: number; outer: number; level: number; ford: number; front: XZ } // the river's ring about (x, z), its surface `level` under the land at y, and the ford it is cut by
+  | Emit; // round 71: what a place breathes (world/placeEmit.ts)
 
 export interface Enclosure {
   readonly kind: string; // 'ring'
@@ -46,6 +48,7 @@ export interface Enclosure {
   readonly stake: Spot; // where the fallen wake, inside the wall and in front of the fog
   readonly rods?: readonly V3[]; // the tips of its lightning rods, where a bolt falls (render/rodFx.ts)
   readonly living?: readonly Living[]; // what moves in it (round 68)
+  readonly fogHeight?: number; // round 71: how high the fight's ring of fog stands, where a place wants its architecture seen over it (else by the ring's size)
   /** Metres from a point to the wall's middle line: negative within, 0 on the wall. */
   gap(p: XZ): number;
   /** The level ground the enclosure asks of the land: its wall and `HOUSE.level` metres beyond, at `level`, fading out over `blend`. */

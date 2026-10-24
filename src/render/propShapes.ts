@@ -16,7 +16,7 @@ import { setPieces } from './setShapes';
 import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
-export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
+export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
 export interface Piece {
   mat: PropMat;
   geo: THREE.BufferGeometry;

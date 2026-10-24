@@ -15,7 +15,7 @@ import { colliderBounds, toBoxFrame, type Collider } from './colliders';
 import { escapes } from './escape';
 import type { Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
-import { propCollider, type Prop } from './props';
+import { propColliders, type Prop } from './props';
 import type { Road } from './roads';
 import { padDistance } from './sitePads';
 import { DIRS, regionRect } from './worldMap';
@@ -47,13 +47,13 @@ export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x
   const grid = new Map<number, Collider[]>(); // colliders by 8 m cell
   const cell = (x: number, z: number): number => Math.floor(x / 8) * 65536 + Math.floor(z / 8);
   for (const p of [...props, ...w.arenas.filter((a) => a.region === region.id).flatMap((a) => a.decor)]) { // and an arena's dressing (round 13)
-    const c = propCollider(p);
-    if (!c) continue;
-    const b = colliderBounds(c);
-    const m = MARGIN; // filed under every cell the margin reaches too: a foe just over a cell's edge from a rock was missed (round 12)
-    for (let x = Math.floor((b.x0 - m) / 8); x <= Math.floor((b.x1 + m) / 8); x++) for (let z = Math.floor((b.z0 - m) / 8); z <= Math.floor((b.z1 + m) / 8); z++) {
-      const k = x * 65536 + z;
-      grid.get(k)?.push(c) ?? grid.set(k, [c]);
+    for (const c of propColliders(p)) {
+      const b = colliderBounds(c);
+      const m = MARGIN; // filed under every cell the margin reaches too: a foe just over a cell's edge from a rock was missed (round 12)
+      for (let x = Math.floor((b.x0 - m) / 8); x <= Math.floor((b.x1 + m) / 8); x++) for (let z = Math.floor((b.z0 - m) / 8); z <= Math.floor((b.z1 + m) / 8); z++) {
+        const k = x * 65536 + z;
+        grid.get(k)?.push(c) ?? grid.set(k, [c]);
+      }
     }
   }
   const solid = (x: number, z: number): boolean =>

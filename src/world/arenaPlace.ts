@@ -19,13 +19,12 @@ import { arenaSet } from './arenaSet';
 import type { Collider } from './colliders';
 import { landHeight } from './land';
 import type { SpawnPoint, WorldLayout } from './placements';
-import { propCollider, type Prop } from './props';
+import { propColliders, type Prop } from './props';
 import type { Pad } from './sitePads';
 
 /** A dressing prop's collider into the world (fires have none). */
 export function propCollide(p: Prop, collide: (c: Collider) => void): void {
-  const c = propCollider(p);
-  if (c) collide(c);
+  for (const c of propColliders(p)) collide(c);
 }
 
 /** The level ground an arena without a house asks of the land: beyond its ring, fading out over `blend`. */

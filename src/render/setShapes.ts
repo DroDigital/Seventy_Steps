@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { MODEL_INFO } from '../data/models/index';
-import type { Prop } from '../world/props';
+import { scaleOf, type Prop } from '../world/props';
 import { tint, tileUv } from './meshKit';
 import { modelPieces } from './modelKit';
 import { modelLantern } from './modelLantern';
@@ -22,10 +22,10 @@ import type { Piece } from './propShapes';
 
 const FLAME: Rgb = mixRgb(BASE.bone, [1, 0.8, 0.5], 0.6);
 
-/** A small flame standing at (0, y, 0), lighting about it as a fire. */
-function flame(p: Prop, y: number, size = 0.3): Piece {
-  const geo = tint(tileUv(new THREE.ConeGeometry(size, size * 1.7, 6).translate(0, y + size * 0.8, 0), 1, 1), FLAME);
-  return { mat: 'glow', geo, light: p.set?.lit, at: [0, y + size, 0] };
+/** A small flame standing at (x, y, z), lighting about it as a fire. */
+function flame(p: Prop, [x, y, z]: readonly [number, number, number], size = 0.3): Piece {
+  const geo = tint(tileUv(new THREE.ConeGeometry(size, size * 1.7, 6).translate(x, y + size * 0.8, z), 1, 1), FLAME);
+  return { mat: 'glow', geo, light: p.set?.lit, at: [x, y + size, z] };
 }
 
 /** The built pieces: name → its pieces from the prop. */
@@ -46,7 +46,11 @@ export function setPieces(p: Prop, c: Rgb): Piece[] {
   if (info) {
     const out = modelPieces(p, c);
     if (LANTERN_MODELS[look.id]) out.push(...modelLantern(p));
-    else if (look.lit) out.push(flame(p, info.y1 * (look.scale ?? 1) * 0.98));
+    else if (look.lit) {
+      const [sx, sy, sz] = scaleOf(look);
+      if (info.anchors?.length) for (const [x, y, z] of info.anchors) out.push(flame(p, [x * sx, y * sy, z * sz], look.flame)); // a fixture's own flame, in its bowl (the baker's anchors)
+      else out.push(flame(p, [0, info.y1 * sy * 0.98, 0], look.flame));
+    }
     return out;
   }
   return KITS[look.id]?.(p, c) ?? [];

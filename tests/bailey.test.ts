@@ -5,7 +5,6 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 import { ARENA_HOUSES } from '../src/data/arenaHousesAll';
-import { HOUSE } from '../src/data/arenaHouses';
 import { ROD } from '../src/data/tuning';
 import type { Beams } from '../src/render/beams';
 import type { Lightning } from '../src/render/lightning';
@@ -20,32 +19,34 @@ const w = worldLayout();
 const arena = w.arenas.find((a) => a.bosses[0] === 'edward_hutchinson')!;
 const house = arena.house!;
 const spec = ARENA_HOUSES.edward_hutchinson!;
-const keep = house.props.find((p) => p.set?.id === 'house_keep')!;
-const gatehouse = house.props.find((p) => p.set?.id === 'house_gatehouse')!;
+const keep = house.props.find((p) => p.set?.id === 'rn_arch_goth')!; // the donjon's door, under its pointed arch
+const gatehouseSpan = house.props.find((p) => p.set?.id === 'cs_wall' && p.y - arena.y >= spec.gate.height && Math.hypot(p.x - house.gate.x, p.z - house.gate.z) < 6)!;
 
 describe("Hutchinson's keep", () => {
-  it('is a bailey: a curtain, a keep behind it and a gatehouse across the gate, with a rod on each', () => {
-    expect(house.kind).toBe('bailey');
+  it('is a bailey laid from the packs: a curtain, a donjon behind it and a gatehouse across the gate, with a rod on each (round 71: world/places/hutchinson.ts)', () => {
+    expect(house.kind).toBe('place');
     expect(keep).toBeDefined();
-    expect(gatehouse).toBeDefined();
+    expect(gatehouseSpan).toBeDefined();
     expect(house.rods).toHaveLength(2);
-    expect(house.props.filter((p) => p.set?.id === 'house_ashlar').length).toBeGreaterThan(20);
-    expect(house.props.filter((p) => p.set?.id?.startsWith('house_tower')).length).toBeGreaterThanOrEqual(6); // four corners, the gate's two, and those along the wall
+    expect(house.props.filter((p) => p.set?.id === 'cs_wall').length).toBeGreaterThan(20);
+    expect(house.props.filter((p) => p.set?.id?.startsWith('cs_tower')).length).toBeGreaterThanOrEqual(10); // four corners, the gate's two, and those along the wall, and the donjon's four
   });
 
-  it('the keep stands at the back with its face on the wall, and the gatehouse spans the gate high enough for a body to pass under', () => {
+  it('has the donjon at the back with its face on the wall, and the gatehouse spans the gate high enough for a body to pass under', () => {
     const along = (p: { x: number; z: number }): number => (p.x - arena.x) * house.front.x + (p.z - arena.z) * house.front.z;
-    expect(along(keep)).toBeLessThan(-spec.bailey!.behind - arena.radius); // behind the back wall, not in the court
-    expect(Math.hypot(gatehouse.x - house.gate.x, gatehouse.z - house.gate.z)).toBeLessThan(0.01);
-    const span = propCollider(gatehouse)!;
+    expect(along(keep)).toBeLessThanOrEqual(-spec.bailey!.behind - arena.radius + 0.01); // on the back wall's line, not in the court
+    const span = propCollider(gatehouseSpan)!;
     expect(span.kind).toBe('obox');
     expect((span as { y0: number }).y0 - arena.y, 'the span clears a standing body').toBeGreaterThanOrEqual(spec.gate.height);
   });
 
-  it('the rods stand above what carries them', () => {
+  it('has its rods above what carries them: each at the top of the tallest piece about it, the donjon\'s the taller', () => {
     const [over, atKeep] = [house.rods![0]!, house.rods![1]!];
-    expect(over.y).toBeCloseTo(arena.y + spec.bailey!.gatehouse!.height + HOUSE.rodTip + spec.bailey!.gatehouse!.rod, 6);
-    expect(atKeep.y).toBeCloseTo(arena.y + spec.bailey!.keep!.height + HOUSE.rodTip + spec.bailey!.keep!.rod, 6);
+    for (const rod of [over, atKeep]) {
+      const top = Math.max(...house.props.filter((p) => Math.hypot(p.x - rod.x, p.z - rod.z) < 3).map((p) => p.y + p.h));
+      expect(rod.y, 'the tip of the rod').toBeGreaterThanOrEqual(top - 0.01);
+      expect(rod.y - top, 'and not far over it').toBeLessThan(1.5);
+    }
     expect(atKeep.y).toBeGreaterThan(over.y); // the keep is the taller
   });
 });

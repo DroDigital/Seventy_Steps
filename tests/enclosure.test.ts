@@ -103,7 +103,7 @@ describe('every enclosure keeps what the world relies on', () => {
     for (const a of arenas) {
       const e = a.house!;
       const pad = e.pad(a.y, 14);
-      for (const p of e.props) expect(padDistance(pad, p.x, p.z), `${a.bosses[0]}: ${p.set?.id} on level ground`).toBeLessThanOrEqual(-HOUSE.level + 0.01);
+      for (const p of e.props) expect(padDistance(pad, p.x, p.z), `${a.bosses[0]}: ${p.set?.id} on level ground`).toBeLessThanOrEqual(p.set?.id.startsWith('house_') ? -HOUSE.level + 0.01 : 0.01); // (a wall's a margin within the level ground; a place's models stand anywhere on it)
       const b = padBounds(pad);
       expect(w.chunk(chunkOf(b.x0), chunkOf(b.z0)).pads.some((p) => p.kind === pad.kind && p.level === a.y), `${a.bosses[0]}: its pad in its corner chunk`).toBe(true);
     }

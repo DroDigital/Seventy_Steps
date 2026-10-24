@@ -11,6 +11,7 @@ import { worldLayout } from '../src/world/placements';
 import { regionPlan } from '../src/world/regionPlan';
 import { propCollider } from '../src/world/props';
 import { segmentDistance } from '../src/world/roads';
+import { padDistance } from '../src/world/sitePads';
 
 /** Round 62: the way to each open arena (data/arenaWays.ts; world/arenaWay.ts). */
 describe('the ways to the open arenas', () => {
@@ -38,7 +39,12 @@ describe('the ways to the open arenas', () => {
       const a = w.arenas.find((x) => x.bosses[0] === p.boss)!;
       const gate = a.house!.gate;
       const start = p.path[0];
-      expect(Math.hypot(start.x - gate.x, start.z - gate.z), `${p.boss}: begins outside the gate`).toBeCloseTo(WAY.out, 3);
+      const out = Math.hypot(start.x - gate.x, start.z - gate.z);
+      if (a.house!.kind === 'place') { // (round 71: a place's court begins where its levelled ground ends, on the axis, never nearer than a house's)
+        expect(out, `${p.boss}: begins outside the gate`).toBeGreaterThanOrEqual(WAY.out - 1e-3);
+        expect(Math.abs((start.x - gate.x) * a.front.z - (start.z - gate.z) * a.front.x), `${p.boss}: on the axis`).toBeLessThan(1e-3);
+        expect(padDistance(a.house!.pad(a.y, 0), start.x, start.z), `${p.boss}: off the place's ground`).toBeGreaterThanOrEqual(0);
+      } else expect(out, `${p.boss}: begins outside the gate`).toBeCloseTo(WAY.out, 3);
       const far = pointAt(p, p.length - 1, 0);
       expect(Math.hypot(far.x - (start.x + a.front.x * (p.length - 1)), far.z - (start.z + a.front.z * (p.length - 1))), `${p.boss}: straight`).toBeLessThan(0.01);
       expect(p.length, `${p.boss}: long enough to be walked`).toBeGreaterThanOrEqual(WAY.length - 1);

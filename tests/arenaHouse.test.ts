@@ -74,7 +74,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
   it('has walls no body can climb or step over, and a stake, a candle and a court inside them', () => {
     for (const a of arenas) {
       const plan = a.house!;
-      for (const p of plan.props) expect(p.h, `${a.bosses[0]}: ${p.set?.id}`).toBeGreaterThanOrEqual(p.set?.id === 'house_kerb' ? 1.2 : 5); // (a kerb of a river's bank is five times what a mount steps up: nothing climbs it, and nothing is put in the river to be reached over it)
+      for (const p of plan.props) if (p.set?.id.startsWith('house_')) expect(p.h, `${a.bosses[0]}: ${p.set?.id}`).toBeGreaterThanOrEqual(p.set?.id === 'house_kerb' ? 1.2 : 5); // (a kerb of a river's bank is five times what a mount steps up: nothing climbs it, and nothing is put in the river to be reached over it; the models of a place stand in the court and are asked by tests/bossPlaces.test.ts)
       const dry = plan.dry ?? plan.gap; // (where a river runs, only the island and the ford are ground to stand a thing on)
       const fog = allFogs().find((f) => f.bosses.includes(a.bosses[0]!))!;
       expect(plan.gap(fog.stake), `${a.bosses[0]}: the stake`).toBeLessThan(-HOUSE.margin);
@@ -105,7 +105,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
     for (const a of arenas) {
       const pad = worldLayout().pads.find((p) => p.level === a.y && padDistance(p, a.x, a.z) < -(a.radius + 10));
       expect(pad, a.bosses[0]).toBeTruthy();
-      for (const p of a.house!.props) expect(padDistance(pad!, p.x, p.z), `${a.bosses[0]}: ${p.set?.id}`).toBeLessThanOrEqual(-HOUSE.level + 0.01);
+      for (const p of a.house!.props) expect(padDistance(pad!, p.x, p.z), `${a.bosses[0]}: ${p.set?.id}`).toBeLessThanOrEqual(p.set?.id.startsWith('house_') ? -HOUSE.level + 0.01 : 0.01); // (a wall's a way within the level ground; a place's models stand anywhere on it)
     }
   });
 

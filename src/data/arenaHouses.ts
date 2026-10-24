@@ -30,10 +30,11 @@ export interface House {
   bailey?: Bailey; // a court walled as a rectangle, not a ring (round 67)
   basin?: Basin; // a court walled as a reservoir: a dam across the front and a bank curving about the arena (round 68)
   river?: River; // a court on an island in a river, crossed by one ford (round 68)
+  place?: boolean; // built of the supplied packs' models by its own planner (round 71; world/places/): the wall's kind above is then only its name for the gate's and the tests' sake
 }
 
-/** What shuts a house's gate (round 68; render/passageShapes.ts): a slab that slides into the wall, a sluice lifted into its housing, a boulder rolled aside. */
-export type GateLook = 'slab' | 'sluice' | 'boulder';
+/** What shuts a house's gate (round 68; render/passageShapes.ts): a slab that slides into the wall, a sluice lifted into its housing, a boulder rolled aside; round 71 (render/gateMetal.ts, gateWild.ts): iron bars that slide aside, a portcullis drawn up, bronze leaves, a curtain of roots that sinks, a jaw of fangs. */
+export type GateLook = 'slab' | 'sluice' | 'boulder' | 'bars' | 'portcullis' | 'leaves' | 'roots' | 'fangs';
 
 /**
  * A court walled as a reservoir (round 68; world/enclosureBasin.ts): a dam across the front, straight, the gate in its middle, and a bank

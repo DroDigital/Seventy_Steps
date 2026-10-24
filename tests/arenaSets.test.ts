@@ -97,7 +97,9 @@ describe('the sets of the open arenas', () => {
 
   it('use no baked model that no arena stands, nor stand one not baked (no dead weight in the bundle)', () => {
     const used = new Set([...Object.values(ARENA_SETS).flatMap((s) => s.puts.map((p) => p.piece.of)), ...Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece.of))]); // (round 62: a trail's marks stand them too)
-    for (const id of Object.keys(MODEL_INFO)) expect(used.has(id), `${id} is baked but stood nowhere`).toBe(true);
+    for (const a of w.arenas) for (const p of a.house?.props ?? []) if (p.set) used.add(p.set.id); // (round 71: and a place's planner, world/places)
+    const unused = Object.keys(MODEL_INFO).filter((id) => !used.has(id));
+    expect(unused, 'baked but stood nowhere').toEqual([]);
   });
 
   it('lay a ground of a texture the world has', () => {

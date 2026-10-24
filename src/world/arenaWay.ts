@@ -17,6 +17,7 @@ import { setPiece } from './arenaSet';
 import type { ArenaPlace } from './placements';
 import type { Prop } from './props';
 import { segmentDistance } from './roads';
+import { padDistance, type Pad } from './sitePads';
 import { surface } from './terrain';
 
 export const WAY = {
@@ -33,11 +34,26 @@ export interface WayPlan {
   cum: number[]; // metres along the path at each of its points
   length: number;
   width: number;
+  pad?: Pad; // the ground the house is levelled on (round 71: a place's goes far past its wall, and what is stood in the court keeps off it)
+}
+
+const starts = new WeakMap<object, number>();
+
+/** Metres from the gate's middle that the court's `d = 0` stands: clear of the wall's outer face, and (round 71) of the ground a place is levelled on, which goes further out than a ring's. */
+function courtStart(h: Pick<Enclosure, 'gate' | 'front'> & Partial<Pick<Enclosure, 'kind' | 'pad'>>): number {
+  if (h.kind !== 'place' || !h.pad) return WAY.out;
+  let t = starts.get(h);
+  if (t === undefined) {
+    const pad = h.pad(0, 0);
+    for (t = WAY.out; t < WAY.out + 60 && padDistance(pad, h.gate.x + h.front.x * t, h.gate.z + h.front.z * t) < 0.05; t += 0.5);
+    starts.set(h, t);
+  }
+  return t;
 }
 
 /** The place `d` metres out from the gate and `side` metres to the left of the court as it is walked in (negative: the right), and the way it faces (toward the gate). */
-export function courtPoint(h: Pick<Enclosure, 'gate' | 'front'>, d: number, side = 0): XZ & { yaw: number } {
-  const t = WAY.out + d;
+export function courtPoint(h: Pick<Enclosure, 'gate' | 'front'> & Partial<Pick<Enclosure, 'kind' | 'pad'>>, d: number, side = 0): XZ & { yaw: number } {
+  const t = courtStart(h) + d;
   return { x: h.gate.x + h.front.x * t - h.front.z * side, z: h.gate.z + h.front.z * t + h.front.x * side, yaw: Math.atan2(-h.front.x, -h.front.z) };
 }
 
@@ -45,7 +61,7 @@ export function courtPoint(h: Pick<Enclosure, 'gate' | 'front'>, d: number, side
 export function planWay(a: ArenaPlace, way: Way): WayPlan {
   const house = a.house!;
   const path = [courtPoint(house, 0), courtPoint(house, WAY.length)].map(({ x, z }) => ({ x, z }));
-  return { boss: a.bosses[0]!, region: a.region, way, path, cum: [0, WAY.length], length: WAY.length, width: way.width ?? WAY.width };
+  return { boss: a.bosses[0]!, region: a.region, way, path, cum: [0, WAY.length], length: WAY.length, width: way.width ?? WAY.width, pad: house.kind === 'place' ? house.pad(a.y, 0) : undefined };
 }
 
 /** The place `d` metres from the gate along the court, `side` metres to the left of it (as it is walked toward the gate), and the way it runs there (toward the gate). */
@@ -101,6 +117,7 @@ function markProps(plan: WayPlan, m: Mark, rng: Rng): Prop[] {
         p.z = at.z;
         p.y = surface(at.x, at.z);
       }
+      if (plan.pad && padDistance(plan.pad, p.x, p.z) < 0) continue; // nor on a place's ground (the pace-by-pace shift above has not been enough)
       if (p.y < WORLD.seaLevel + 0.6) continue; // not in the water
       if (along(plan, p.x, p.z).dist < plan.width / 2 + reach(p) + 0.3) continue; // nor over another reach of the path, where it bends back on itself
       out.push(p);

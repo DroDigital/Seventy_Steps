@@ -11,6 +11,8 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { HiddenPieceDef } from '../data/arena';
 import { box, tileUv, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
+import { metalKit } from './gateMetal';
+import { wildKit } from './gateWild';
 import { doorKit, rune, STONE, WALL, type DoorKit } from './passageShapes';
 
 const IRON: Rgb = scaleRgb(BASE.charcoal, 1.5);
@@ -31,7 +33,8 @@ function wheel(y: number, face: number, c: Rgb): THREE.BufferGeometry[] {
 /** The door of a gate by its look: the common framed door (render/passageShapes.ts), a sluice or a boulder. */
 export function gateKit(p: HiddenPieceDef): DoorKit {
   const base = doorKit(p);
-  return p.door!.look === 'sluice' ? sluiceKit(p, base) : p.door!.look === 'boulder' ? boulderKit(p, base) : base;
+  const look = p.door!.look;
+  return look === 'sluice' ? sluiceKit(p, base) : look === 'boulder' ? boulderKit(p, base) : look === 'bars' || look === 'portcullis' || look === 'leaves' ? metalKit(p, base) : look === 'roots' || look === 'fangs' ? wildKit(p, base) : base;
 }
 
 /** The sluice: the door's frame as a house's gate, the housing of stone over it, an iron panel that lifts into the housing. */
