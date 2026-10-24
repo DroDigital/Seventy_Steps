@@ -119,15 +119,29 @@ export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?
 };
 export type LevelId = keyof typeof LEVELS;
 
+/**
+ * Round 71 ("Souls-style soft caps ... full gains up to about level 15 to 20, roughly half after that, very little near the cap of 30"): past `after`
+ * levels of one attribute, each further level is worth `worth` of a whole one in what `LEVELS` gives (systems/levelWorth.ts): health, stamina and its
+ * recovery, the weight of blows. The first eighteen count whole, which is as far as any horror's standing goes (data/bossStanding.ts: 18 Vigour and 17
+ * Might for the last), so the journey as it is made is as it was and what the caps soften is the hunt past it: thirty levels of one attribute are
+ * worth 22.6. A level costs what it costs (`LEVEL_COST`), and the horrors grow to meet the worth, not the count (bossScaling.ts).
+ */
+export const SOFT_CAP: readonly { after: number; worth: number }[] = [
+  { after: 18, worth: 0.5 },
+  { after: 26, worth: 0.15 },
+];
+
 /** Boss health and damage gained per purchased player level; level one keeps the authored stats. */
 export const BOSS_LEVEL_SCALING = { health: 0.0075, damage: 0.003 };
 
 /**
  * Round 68 ("all bosses remain demanding regardless of player level"): past the standing a horror is made to be met at (data/bossStanding.ts), the
  * share of the investigator's growth in blows (Might) that its health takes up, and of their growth in health (Vigour) that its blows take up.
- * The rest of the growth is theirs: a level farmed is still a level gained, but no longer a fight lost.
+ * The rest of the growth is theirs: a level farmed is still a level gained, but no longer a fight lost. Round 71: 0.8, not 0.7. The soft caps
+ * (SOFT_CAP) leave less growth to meet, and the horrors' level scaling follows the worth of the levels; at 0.7 a bot at the cap fought them
+ * about 6% easier than before, and at 0.8 as before (tests/balance.test.ts: the lives of the cap table, the mean of nine starts, 1.01 of the old).
  */
-export const BOSS_OVERMATCH = { share: 0.7 };
+export const BOSS_OVERMATCH = { share: 0.8 };
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found
