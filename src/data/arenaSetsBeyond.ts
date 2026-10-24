@@ -10,9 +10,7 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     puts: [
       put('slab', at(0.88, 180, { face: 'in' }), { heart: true, size: [2.2, 2.4], glow: 'green' }), // the door
       put('slab', ring(0.98, 11, { jitter: 10, face: 'in' }), { size: [0.9, 1.4], glow: 'green' }),
-      put('slab', ring(1.3, 9, { jitter: 14, face: 'in' }), { size: [1.6, 2.3], glow: 'green' }),
-      put('prop:spire', ring(1.55, 8, { jitter: 10 }), { size: 0.9 }),
-      put('slab', lane([1.2, 1.7], 3, 4.4, 90), { size: 1.4, glow: 'green' }),
+      // (round 71: the walls, the slabs of the forecourt, the Great Door and the lagoon are laid by its place, world/places/cthulhu.ts)
     ],
     air: { kind: 'spore', color: [0.2, 0.9, 0.6], rate: 18 },
   },
@@ -25,8 +23,7 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
       put('prop:obelisk', at(0.95, 230, { face: 'in' }), { size: 2.4 }),
       put('banner', ring(0.97, 10, { jitter: 8 }), { size: [0.9, 1.2] }),
       put('statue_head', at(0.62, 180, { face: 'in' }), { heart: true, size: 2.0 }), // the pallid mask
-      put('prop:tower', ring(1.4, 7, { jitter: 8 }), { size: 0.45 }),
-      put('lightpost', lane([1.15, 1.8], 4, 3.4), { lit: 'lamp' }),
+      // (round 71: the tiers, the stage house, the audience, the towers and the passage's braziers are laid by its place, world/places/hastur.ts)
       put('column', ring(1.15, 6, { arc: [140, 220] }), { join: true, size: 1.1 }),
     ],
     air: { kind: 'flake', color: [0.92, 0.82, 0.5], rate: 26 },
@@ -37,8 +34,8 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     puts: [
       put('prop:globe', ring(0.95, 8, { jitter: 6 })),
       put('hexped', ring(0.88, 6, { jitter: 0 }), { glow: 'purple', size: 1.1 }),
-      put('trilith', at(1.25, 180), { size: 2.2 }),
-      put('hexped', lane([1.15, 1.7], 3, 3.6), { glow: 'purple', lit: 'sigil' }),
+      // (round 71: the walls of prisms, the arches, the rings and spheres of light and the void are laid by its place, world/places/yog.ts)
+      put('hexped', lane([1.15, 1.4], 2, 3.6), { glow: 'purple', lit: 'sigil' }),
     ],
     air: { kind: 'mote', color: [0.85, 0.8, 1], rate: 34 },
   },
@@ -47,9 +44,9 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     ground: { texture: 'slab', tint: [0.22, 0.2, 0.26], gain: 1.1, reach: 14, bands: [{ r0: 0.3, r1: 0.36, k: 1.6 }, { r0: 0.7, r1: 0.76, k: 1.6 }], spokes: { n: 7, width: 2.5, k: 1.5, r0: 0.1, r1: 1, twist: -90 } },
     puts: [
       put('pipes', ring(0.93, 9, { jitter: 4 }), { size: [1.0, 1.3] }),
-      put('prop:cone', ring(1.3, 9, { jitter: 8 }), { size: 1.3 }),
+      // (round 71: the wall and the thirteen blind dancers on it are laid by its place, world/places/azathoth.ts)
       put('ziggurat', at(0.82, 180, { face: 'in' }), { heart: true, size: 1.4 }), // the throne
-      put('pipes', lane([1.15, 1.7], 3, 4.2), { size: 0.9 }),
+      put('pipes', lane([1.12, 1.3], 2, 4.2), { size: 0.9 }),
     ],
     air: { kind: 'ember', color: [1, 0.92, 0.9], rate: 22 },
   },
@@ -58,7 +55,7 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     ground: { texture: 'rock', tint: [0.42, 0.5, 0.44], gain: 1.25, reach: 12, bands: [{ r0: 0.4, r1: 0.48, k: 1.5, tint: [0.7, 0.8, 0.72] }] },
     puts: [
       put('hexped', ring(0.95, 6), { glow: 'green', size: 1.0 }),
-      put('prop:cone', ring(1.25, 8, { jitter: 8 }), { size: 0.9 }),
+      put('prop:cone', ring(1.15, 8, { jitter: 8 }), { size: 0.9 }), // (round 71: inside the towers of its place, world/places/zkauba.ts)
       put('pylon', at(1.28, 0, { side: 5, mirror: true }), { size: 0.9, lit: 'torch' }),
       put('ziggurat', at(0.6, 180, { face: 'in' }), { heart: true, size: 0.9 }),
       put('prop:firepit', ring(0.8, 2, { arc: [100, 260] }), { size: 1.2 }),
@@ -71,7 +68,7 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     puts: [
       put('pipes', ring(0.97, 10, { jitter: 4 }), { size: [1.1, 1.4] }),
       put('prop:globe', ring(1.3, 8, { jitter: 6 }), { size: 0.8 }),
-      put('pipes', lane([1.15, 1.8], 3, 3.8), { size: 1.2 }),
+      put('pipes', lane([1.15, 1.45], 2, 3.8), { size: 1.2 }), // (round 71: the organ about it is laid by its place, world/places/pipers.ts)
     ],
     air: { kind: 'mote', color: [0.8, 0.7, 1], rate: 24 },
   },
@@ -81,8 +78,8 @@ export const BEYOND_SETS: Readonly<Record<string, ArenaSet>> = {
     puts: [
       put('hexped', ring(0.94, 6), { glow: 'purple', size: 1.3, lit: 'sigil' }),
       put('trilith', at(0.98, 180, { face: 'in' }), { heart: true, size: 1.6 }), // the Gate
-      put('prop:pillar', ring(1.35, 8, { jitter: 8 }), { size: 1.6 }),
-      put('hexped', lane([1.15, 1.7], 3, 3.8), { glow: 'purple', size: 0.9 }),
+      // (round 71: the hexagon of prisms, its tiles, the basalt boundary and the avenue are laid by its place, world/places/ancients.ts)
+      put('hexped', lane([1.15, 1.45], 2, 3.8), { glow: 'purple', size: 0.9 }),
     ],
     air: { kind: 'mote', color: [0.95, 0.95, 1], rate: 30 },
   },

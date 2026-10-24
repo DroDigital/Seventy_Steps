@@ -27,7 +27,7 @@ describe('resting at an Elder Sign', () => {
         ow.posts.set(id, { x: t.x, z: t.z });
         if (Math.hypot(t.x - pp.x, t.z - pp.z) >= WORLD.signClear) killed.push(id); // (those nearer stay down: the next test)
       }
-      expect(killed.length).toBeGreaterThan(5);
+      expect(killed.length, sign).toBeGreaterThan(2); // (how many stand about a sign moves as the land is laid: round 68's houses shifted the Blasted Heath's from seven to five)
       run(g, 10); // the dead are cleared, and the posts further off fill the count
       expect(rest(g, sign)).toBe(true);
       run(g, 5);

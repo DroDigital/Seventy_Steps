@@ -12,7 +12,8 @@ import type { HouseStyle } from '../data/regionFeatures';
 import type { Glow } from '../data/arenaSets';
 import type { PropKind } from '../data/regions';
 import type { LightKind } from '../data/tuning';
-import type { Collider } from './colliders';
+import { MODEL_INFO } from '../data/models/index';
+import { colliderBounds, type Collider } from './colliders';
 import { LANTERN_MODELS } from './lanternModels';
 import { surface } from './terrain';
 
@@ -40,7 +41,15 @@ export interface SetLook {
   walk?: boolean; // low enough to be walked over: no collider
   glow?: Glow; // a built piece's glow
   lit?: LightKind; // a flame in its lantern housing, or at the top of other pieces
+  rod?: number; // a lightning rod's mast on its top, this many metres (a keep, a gatehouse: round 67)
+  drop?: number; // metres it reaches below its foot (a river's kerb, down to the bed: round 68)
+  stretch?: readonly [number, number, number]; // times its scale along x, y, z in its own frame (a column made taller, a wall made longer): the boss places, round 71
+  flame?: number; // the size of the flame it carries when `lit` (metres across; the default is a brazier's)
+  dye?: Dye; // the colour of its cloth, metal, bone and glow, where it is not the region's
 }
+
+/** What a model's cloth, metal, bone and glowing faces are laid over, where the place has its own (`tint` is the stone's). */
+export type Dye = Partial<Record<'cloth' | 'metal' | 'bone' | 'glow' | 'wood', readonly [number, number, number]>>;
 
 const ROUND = new Set<PropKind>(['tree', 'pine', 'rock', 'pillar', 'lamp', 'obelisk', 'cross', 'stump', 'spire', 'tower', 'cone']);
 const OPEN = new Set<PropKind>(['bush', 'firepit', 'globe']); // no collider: walked through or over (or under: a globe hangs in the air)
@@ -89,6 +98,42 @@ export function propAt(kind: PropKind, x: number, y: number, z: number, rng: Rng
   const [w, d, h] = size ?? sizes[kind]();
   const turn = yaw ?? (ROUND.has(kind) ? r(0, Math.PI * 2) : rng() < 0.5 ? 0 : Math.PI / 2);
   return { kind, x, y, z, w, d, h, yaw: turn, seed: Math.floor(rng() * 1e6), ...(style && { style }) };
+}
+
+/** A model's scale along its own x, y and z: its uniform scale times its stretch. */
+export const scaleOf = (look: SetLook): readonly [number, number, number] => {
+  const [k, st] = [look.scale ?? 1, look.stretch ?? [1, 1, 1]];
+  return [k * st[0], k * st[1], k * st[2]];
+};
+
+/** The prop's colliders: one for most, a set of boxes for a model that has them (a doorway, an arch or a colonnade is boxes about its opening: a body is never walled into a whole building's box), none for what is walked through. */
+export function propColliders(p: Prop): Collider[] {
+  const solids = p.kind === 'set' && p.set && !p.set.walk ? MODEL_INFO[p.set.id]?.solids : undefined;
+  if (!solids || !p.set) {
+    const c = propCollider(p);
+    return c ? [c] : [];
+  }
+  const [sx, sy, sz] = scaleOf(p.set);
+  const [s, c] = [Math.sin(p.yaw), Math.cos(p.yaw)];
+  return solids.map(([cx, cz, hx, hz, y0, y1]) => ({
+    kind: 'obox' as const,
+    x: p.x + cx * sx * c + cz * sz * s,
+    z: p.z - cx * sx * s + cz * sz * c,
+    hx: hx * sx,
+    hz: hz * sz,
+    yaw: p.yaw,
+    y0: p.y + (y0 <= 0.001 ? -0.5 : y0 * sy),
+    y1: p.y + y1 * sy,
+  }));
+}
+
+/** How far a prop's colliders reach from its centre (0 when it has none): half the box that holds them. */
+export function colliderReach(p: Prop): number {
+  const cs = propColliders(p);
+  if (!cs.length) return 0;
+  const bs = cs.map(colliderBounds);
+  if (bs.length === 1) return Math.max(bs[0]!.x1 - bs[0]!.x0, bs[0]!.z1 - bs[0]!.z0) / 2;
+  return Math.max(...bs.flatMap((b) => [Math.abs(b.x0 - p.x), Math.abs(b.x1 - p.x), Math.abs(b.z0 - p.z), Math.abs(b.z1 - p.z)]));
 }
 
 /** The prop's collider, or null for what is walked through (bushes, fire pits). */

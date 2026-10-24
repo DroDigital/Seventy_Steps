@@ -9,8 +9,7 @@ import { createRng, hash2 } from '../core/rng';
 import type { ArenaStyle } from '../data/arenaStyles';
 import type { PropKind } from '../data/regions';
 import { WORLD } from '../data/tuning';
-import { colliderBounds } from './colliders';
-import { propAt, propCollider, type Prop } from './props';
+import { colliderReach, propAt, type Prop } from './props';
 
 /** Metres between ring pieces by kind, at their usual size. */
 const SPACING: Partial<Record<PropKind, number>> = { tree: 4.5, monolith: 6, pillar: 6, obelisk: 6, rock: 5, ruin: 9, spire: 14, tower: 16, cone: 11, globe: 8, block: 10 };
@@ -20,12 +19,7 @@ const scaled = (p: Prop, k: number): Prop => ({ ...p, w: p.w * k, d: p.d * k, h:
 const GAP = 2.5; // metres the least way through a ring, between two pieces' colliders
 
 /** How far a prop's collider reaches from its centre (0 when it has none). */
-export function reach(p: Prop): number {
-  const c = propCollider(p);
-  if (!c) return 0;
-  const b = colliderBounds(c);
-  return Math.max(b.x1 - b.x0, b.z1 - b.z0) / 2;
-}
+export const reach = colliderReach;
 
 /** The ring's pieces less any that would close a way through: each keeps GAP from the last kept, and the last from the first. */
 function passable(ring: Prop[]): Prop[] {

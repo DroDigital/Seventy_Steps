@@ -104,7 +104,7 @@ export function validateWorld(): string[] {
   const shapes: Shape[] = [
     ...w.signs.map((s) => ({ label: `sign ${s.id}`, region: s.region, x: s.x, z: s.z, r: 2.5 })),
     ...w.gates.map((g) => ({ label: `gate ${g.id}`, region: g.region, x: g.x, z: g.z, r: 3 })),
-    ...w.arenas.map((a) => ({ label: `arena of ${a.bosses.join(' & ')}`, region: a.region, x: a.x, z: a.z, r: a.radius + 2.5 })),
+    ...w.arenas.map((a) => (a.house && a.house.kind !== 'ring' ? { label: `arena of ${a.bosses.join(' & ')}`, region: a.region, rect: { x0: a.house.rect.x0 - 2.5, z0: a.house.rect.z0 - 2.5, x1: a.house.rect.x1 + 2.5, z1: a.house.rect.z1 + 2.5 } } : { label: `arena of ${a.bosses.join(' & ')}`, region: a.region, x: a.x, z: a.z, r: a.radius + 2.5 })), // (round 67: an enclosure that is not a ring is checked by its own box, a keep behind its wall included; the rings' walls are not, yet: daemon_pipers' strays out of its region, which the plan nudges)
     ...w.dungeons.map((d) => ({ label: `dungeon ${d.layout.def.id}`, region: d.layout.region, rect: { x0: d.layout.rect.x0 - 2, z0: d.layout.rect.z0 - 2, x1: d.layout.rect.x1 + 2, z1: d.layout.rect.z1 + 2 } })),
   ].filter((s) => !('x' in s) || !w.dungeons.some((d) => rectDistance(d.layout.rect, s.x, s.z) === 0)); // things inside dungeons are the rooms' business
   for (const [i, a] of shapes.entries()) {

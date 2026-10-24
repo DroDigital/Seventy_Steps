@@ -102,7 +102,7 @@ export function gatePlan(w: WorldLayout): GatePlan {
     const reach = radius + FOG.ringStake;
     const stake = a.house?.stake ?? { x: a.x + sx * reach, z: a.z + sz * reach, yaw: Math.atan2(-sx, -sz) }; // an enclosure says where the fallen wake: inside its wall
     const candle = ringCandle(a, stake, a.front, a.house);
-    fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
+    fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: a.house?.fogHeight ?? Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
   });
   return { doors, fogs };
 }

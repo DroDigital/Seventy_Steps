@@ -20,7 +20,8 @@ import type { Game } from '../systems/components';
 import { passageKind, secondsOf } from '../systems/passages';
 import type { GameAudio } from './audio/gameAudio';
 import { ANOMALY, type Rgb } from './palette';
-import { bridgeKit, doorKit } from './passageShapes';
+import { gateKit } from './gateLooks';
+import { bridgeKit } from './passageShapes';
 import type { Particles } from './particles';
 import { createWorldMaterial } from './worldMaterial';
 
@@ -98,7 +99,7 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
   };
 
   if (def.door) {
-    const kit = doorKit(def);
+    const kit = gateKit(def);
     const [wall, stoneMat, frameGlow, slabGlow] = [createWorldMaterial({ texture: 'stone', seed: 8, vertexColors: true }), createWorldMaterial({ texture: 'stone', seed: 5, emissive: 0.2, vertexColors: true }), glowMaterial(), glowMaterial()];
     const frame = new THREE.Group();
     frame.add(new THREE.Mesh(kit.stone, stoneMat), new THREE.Mesh(kit.glow, frameGlow));
@@ -120,15 +121,17 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
         setGlow(frameGlow, awake * (0.55 + 0.12 * pulse + 0.9 * flare + 0.2 * smooth(0.4, 0.8, k)));
         setGlow(slabGlow, awake * (0.5 + 0.12 * pulse + 0.8 * flare) * (1 - smooth(0.7, 1, k)));
         outline.visible = (l.shown || gate !== undefined) && k < 0.98; // the faint outline of a door on the wall: the passage awake and shut
-        const slide = smooth(0.1, 1, k) * (kit.width + 0.45); // the slab goes into the wall
+        const moved = smooth(0.1, 1, k);
+        const slide = kit.lift === undefined ? moved * (kit.width + 0.45) : 0; // the slab goes into the wall, or (a sluice, a boulder) up into its housing or down into the earth
         slab.position.x = slide;
-        slab.scale.z = 1 - 0.1 * smooth(0, 0.08, k); // a little thinner as it goes, so it passes within the wall's faces without fighting them
+        if (kit.lift !== undefined) slab.position.y = moved * kit.lift;
+        else slab.scale.z = 1 - 0.1 * smooth(0, 0.08, k); // a little thinner as it goes, so it passes within the wall's faces without fighting them
         slab.visible = k < 0.999;
         if (l.shown && k > 0.12 && k < 0.95) {
           grit += dt;
           while (grit > 0.05) {
             grit -= 0.05;
-            dust(slide - kit.width / 2 - 0.1, kit.height, def.door!.thick); // from the edge it clears
+            dust(kit.lift === undefined ? slide - kit.width / 2 - 0.1 : (Math.random() - 0.5) * kit.width, kit.lift === undefined ? kit.height : kit.lift < 0 ? 0.3 : kit.height, def.door!.thick); // from the edge it clears, or the foot of the stone, or the housing's mouth
           }
         }
       },

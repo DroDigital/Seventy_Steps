@@ -52,7 +52,9 @@ function sites(): Site[] {
   const out: Site[] = w.dungeons.map((d) => ({ chunks: footprint(d.layout.rect), job: (done) => dungeonJob(d, done), meshes: null }));
   for (const a of w.arenas) {
     const r = a.radius + 12; // its dressing's ring stands outside it (round 13)
-    out.push({ chunks: footprint({ x0: a.x - r, z0: a.z - r, x1: a.x + r, z1: a.z + r }), job: (done) => arenaJob(a, done), meshes: null });
+    const wall = a.house?.rect; // and its house's wall, whatever its outline (round 67: a keep stands behind the wall's line)
+    const [x0, z0, x1, z1] = [a.x - r, a.z - r, a.x + r, a.z + r];
+    out.push({ chunks: footprint({ x0: Math.min(x0, wall ? wall.x0 - 4 : x0), z0: Math.min(z0, wall ? wall.z0 - 4 : z0), x1: Math.max(x1, wall ? wall.x1 + 4 : x1), z1: Math.max(z1, wall ? wall.z1 + 4 : z1) }), job: (done) => arenaJob(a, done), meshes: null });
   }
   return out;
 }

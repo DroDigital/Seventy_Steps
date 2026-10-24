@@ -24,7 +24,7 @@ const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => (parts.l
 const line = (u: number, y: number, w: number, h: number, face: number, c: Rgb): THREE.BufferGeometry => box(w, h, PROUD, u, y, face + Math.sign(face) * (PROUD / 2 - 0.03), c);
 
 /** A rune of one of four kinds, about `s` metres high, centred at (u, y) on the face at v = `face`. */
-function rune(kind: number, u: number, y: number, s: number, face: number, c: Rgb): THREE.BufferGeometry[] {
+export function rune(kind: number, u: number, y: number, s: number, face: number, c: Rgb): THREE.BufferGeometry[] {
   const t = 0.045;
   switch (kind % 4) {
     case 0: // a stem with a branch up one side and down the other: the Elder Sign's own idea
@@ -45,6 +45,7 @@ export interface DoorKit {
   slabGlow: THREE.BufferGeometry; // an outline of the door and its eye, on the slab's faces: the passage awake but shut
   width: number; // the opening
   height: number;
+  lift?: number; // round 68: the slab goes up (or, negative, down) this many metres instead of into the wall (render/gateLooks.ts)
 }
 
 /** A hidden doorway. `sealed` (Kadath's door, shut on the seals): the slab is cut stone, not wall. */

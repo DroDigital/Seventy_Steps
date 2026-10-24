@@ -14,7 +14,7 @@ import type { PropKind } from '../data/regions';
 import { SET_KITS } from '../data/setKits';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
-import { propAt, propCollider, type Prop } from './props';
+import { propAt, propColliders, type Prop } from './props';
 
 export interface SetSite {
   x: number;
@@ -157,7 +157,7 @@ export function arenaSet(set: ArenaSet, s: SetSite, taken?: (p: Prop) => boolean
       if (!p) continue;
       if ('lane' in where && spot.side) flank(p, spot);
       if (taken?.(p)) continue;
-      if (propCollider(p)) {
+      if (propColliders(p).length) {
         if (blocks(p, s, !!piece.heart)) continue;
         const join = !!piece.join;
         if (kept.some((o) => !(join && o.join) && Math.hypot(o.p.x - p.x, o.p.z - p.z) - reach(o.p) - reach(p) < SET_RULES.gap)) continue;
