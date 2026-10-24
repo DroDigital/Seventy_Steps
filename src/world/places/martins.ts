@@ -1,5 +1,5 @@
 /**
- * The landing at Martin's Beach (round 71; pack 04, the retro shacks and gantries, Kenney's canoe, and a hull, a mast, a derrick and an anchor of code:
+ * The landing at Martin's Beach (round 71; pack 04, the retro shacks and gantries, Kenney's canoe, round 72 Poly Haven's pier for the boardwalk, and a hull, a mast, a derrick and an anchor of code:
  * docs/BOSS_PLACES.md): a fishermen's landing walled in concrete against the sea, a raised platform at each corner (a lookout shack on two, a
  * derrick over the water on one, a mast on another), board cabins gone grey along either side, a net shed at the back, a boardwalk and its rail running from the gate
  * to the sand with a lamp on every other post, a hull stranded on its ribs, a canoe, barrels and pallets where the catch was landed. Sea mist lies along the back wall and a
@@ -45,7 +45,8 @@ export const martins: PlaceFn = (c: Court, h: House) => {
   c.add('ms_shed_b', -B + 7.4, 13, { ...SALTED, face: 'front', turn: 90 });
 
   // the boardwalk and its rail, a lamp on every other post
-  for (let a = G - 2; a > c.R + 3; a -= 2.5) for (const side of [-1, 1]) c.add('ms_gantry', a, side * 1.25, { walk: true, y: 0.08, face: 'front', tint: [0.4, 0.38, 0.36], keep: 0.5 });
+  for (let a = G - 2; a > c.R + 2; a -= 1.9) for (const side of [-1, 1]) c.add('mp_deck', a, side * 1.2, { walk: true, y: 0.1, face: 'front', stretch: [1.1, 1, 1], tint: [0.4, 0.38, 0.36], keep: 0.5 }); // (the pier's planks, from Poly Haven)
+  for (let a = G - 6, n = 0; a > c.R + 2; a -= 8, n++) for (const side of [-1, 1]) c.add('mp_frame', a, side * 4.8, { y: -0.6, s: 0.8, face: 'front', turn: n * 70 + (side > 0 ? 35 : 0), walk: true, tint: [0.36, 0.34, 0.32], keep: 0.5 }); // the piles of it, where it was meant to go out over the water
   for (const side of [-1, 1]) {
     c.run('ms_rail', [G - 2, side * 3.1], [c.R + 3, side * 3.1], { y: 1.2, walk: true, face: 'front', tint: [0.44, 0.4, 0.36], keep: 0.4 });
     let n = 0;

@@ -21,10 +21,15 @@ PACKS = {
     'p03': ('Ultimate Stylized Nature', 'Quaternius', 'CC0'), 'p04': ('3D Retro Shacks Shanties Sheds & Gantries', 'chilly_durango', 'CC0'),
     'p05': ('PSX Style Modular Low Poly Graveyard (Free)', 'BlenderVoyage', 'CC BY 4.0'), 'p06': ('PSX Style Low Poly Modular Castle', 'BlenderVoyage', 'CC BY 4.0'),
     'p08': ('Modular Temple Pack', 'Fertile Soil Productions', 'CC0'), 'p09': ('Ultimate Modular Ruins', 'Quaternius', 'CC0'),
-    'p10': ('Colosseum', 'CreativeTrio', 'CC0'), 'p11': ('Space Base Bits (Free)', 'Kay Lousberg', 'CC0'),
-    'p13': ('Human Basemeshes', 'pistachio', 'CC0'), 'p14': ('LoFi3D Modular Pipes', 'Philip_Erd', 'CC0'),
+    'p13': ('Human Basemeshes', 'pistachio', 'CC0'),
     'p15': ('3D dungeon debris: skull and bones', 'Paul Wortmann', 'CC0'), 'p16': ('Hexagon Kit', 'Kenney', 'CC0'),
     'p17': ('Columnar Basalt', 'bobjh', 'CC BY 4.0'), 'p18': ('Dungeon Pack 1.1 (Free)', 'Kay Lousberg', 'CC0'),
+    'p19': ('Dead trees (Low-poly)', 'Goth Scarecrow', 'CC0'), 'p20': ('Alien buildings extension pack', 'rubberduck', 'CC0'),
+    'p21': ('Modular Wooden Pier', 'Poly Haven', 'CC0'), 'p22': ('Roman theater of Palmyra', 'Marin PETTE', 'CC BY 4.0'),
+    'p23': ('Wajia Flute', '3D Vault', 'CC BY 4.0'), 'p24': ('Egyptian Temple', 'Bruno Macchioni', 'CC BY 4.0'),
+    'p25': ('Low Poly Black Castle', 'Bl4ckGh0st', 'CC BY 4.0'), 'p26': ('Theatre stage', 'mynameismary', 'CC BY 4.0'),
+    'p27': ('Snake statue', 'Animex', 'CC BY 4.0'), 'p28': ('Temple Ruins Asset Pack', 'Bl4ckGh0st', 'CC BY 4.0'),
+    'p29': ('Ancient Ruins (Modular)', 'zacharykozak', 'CC BY 4.0'),
     'proc': ('Made in code', 'this repository', '-'),
 }
 

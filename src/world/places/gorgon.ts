@@ -1,6 +1,6 @@
 /**
- * The burned plantation house of the Gorgon (round 71; the temple pack for the manor's courses of stone, pack 01 for its rafters, the posed bodies of pack 13 for the
- * people it made into stone; docs/BOSS_PLACES.md): a house in the shape of a U about the court, its back wing with the long porch of columns still standing and
+ * The burned plantation house of the Gorgon (round 71; the temple pack for the manor's courses of stone, pack 01 for its rafters; round 72: Bl4ckGh0st's temple ruins kit for its porch's pillars, arches, broken windows and the statues of
+ * the people it made into stone; docs/BOSS_PLACES.md): a house in the shape of a U about the court, its back wing with the long porch of columns still standing and
  * the wings running forward either side, roofless, their walls black and broken, the rafters of what was above them fallen in or standing against the sky, a chimney
  * at the middle of each wing, and a low garden wall across the front with the gate between two piers. On the porch, in the doorways and down the way from the gate stand the
  * stone people, caught running, shielding their faces, crouched and pleading. Embers still lift from the wings. The fight is in the court; nothing solid stands in it.
@@ -10,12 +10,12 @@
 import { HOUSE, type House } from '../../data/arenaHouses';
 import type { PlaceFn } from '../enclosurePlace';
 import type { Court, Put } from '../placeKit';
-import { column, rectOutline } from './common';
+import { rectOutline } from './common';
 
 const CHAR: Put = { tint: [0.34, 0.31, 0.3], keep: 0.1 };
 const MARBLE: Put = { tint: [0.74, 0.7, 0.66], keep: 0.35 };
 const BURNT: Put = { tint: [0.2, 0.17, 0.16], keep: 0.1 };
-const FIGURES = ['fg_stone_run', 'fg_stone_shield', 'fg_stone_crouch', 'fg_stone_plead'] as const;
+const FIGURES = ['tr_statue_a', 'tr_statue_b', 'tr_statue_c', 'tr_statue_d', 'tr_statue_e'] as const;
 
 export const gorgon: PlaceFn = (c: Court, h: House) => {
   const G = c.R + (h.reach ?? HOUSE.reach);
@@ -36,8 +36,8 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
   c.run('tp_wall_mid', [-B, S], [-B, -S], { ...tall, height: 8.4 });
   // the gate's piers, each a base, a shaft and a capital, a lamp on each
   for (const side of [-1, 1]) {
-    const top = column(c, G, side * (gate - 0.2), 0, { ...MARBLE, s: 0.7 });
-    c.add('lantern', G, side * (gate - 0.2), { y: top + 0.1, s: 2, lit: 'lamp', round: true });
+    c.add('tr_pillar', G, side * (gate - 0.2), { ...MARBLE, stretch: [1.3, 1, 1.3] });
+    c.add('lantern', G, side * (gate - 0.2), { y: 3.6, s: 2, lit: 'lamp', round: true });
   }
 
   // the wings' inner walls: windows and collapse, with a doorway to each
@@ -45,17 +45,20 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
     let i = 0;
     for (let a = wingA - 1.3; a > porch + 1; a -= 2.4, i++) {
       const at = side * inner;
-      if (Math.abs(a + 8) < 2) { c.add('tp_doorway', a, at, { ...CHAR, face: 'front', turn: 90, s: 0.7, height: 6.4 }); continue; }
-      if (i % 4 === 2) c.add('tp_ruin_half_1', a, at, { ...CHAR, face: 'front', turn: 90, stretch: [1, 1.1, 1.2] });
-      else c.add('tp_wall_win', a, at, { ...CHAR, face: 'front', turn: 90, stretch: [1, 1.45 - (i % 3) * 0.2, 1.2] });
+      if (Math.abs(a + 8) < 2) { c.add(side > 0 ? 'tr_arch' : 'tr_arch_b', a, at, { ...CHAR, face: 'front', turn: 90, s: 1.9, height: 5.6 }); continue; }
+      if (i % 4 === 2) c.add('tr_wall_b', a, at, { ...CHAR, face: 'front', turn: 90, stretch: [1, 0.9 + (i % 3) * 0.15, 1.2] });
+      else c.add('tr_wall_win_b', a, at, { ...CHAR, face: 'front', turn: (i % 3 === 1 ? 180 : 0) + 90, stretch: [1, 1.6 - (i % 3) * 0.2, 1.2] });
     }
   }
   // the porch: nine columns of the long colonnade, the beam still across three of its bays, rafters broken above, a floor of flags
   const cols = Array.from({ length: 9 }, (_, i) => -S + 6 + (i * (2 * S - 12)) / 8);
   for (const [i, cc] of cols.entries()) {
     if (i === 4) continue; // (the middle one fell: the way in)
-    column(c, porch, cc, i % 3 === 0 ? 0 : 1, { ...MARBLE, jitter: 0.12, s: 1.05 });
+    const col: Put = { ...MARBLE, jitter: 0.12, stretch: [1.4, 1, 1.4] };
+    if (i === 7) c.add('tr_pillar_tall_b', porch, cc, col); // (this one broke where it stood, and the beam over it hangs from the next)
+    else c.add('tr_pillar_tall', porch, cc, col);
   }
+  for (const [a, cc, id] of [[porch + 2.2, cols[4]! - 3.4, 'tr_pillar_vb'], [porch + 3.4, cols[4]! + 3, 'tr_pillar_b'], [porch + 1.2, cols[7]! + 2, 'tr_pillar_vb']] as const) c.add(id, a, cc, { ...MARBLE, jitter: 0.3, stretch: [1.4, 1, 1.4], turn: a * 37, walk: true }); // the ones that fell
   c.run('tp_beam', [porch, cols[0]! - 1], [porch, cols[3]! + 1], { ...CHAR, y: 6.7 });
   c.run('tp_beam', [porch, cols[5]! - 1], [porch, cols[8]! + 1], { ...CHAR, y: 6.7, from: 0.2 });
   c.add('tp_floor', porch - 3.2, 0, { ...CHAR, stretch: [2 * S / 2.4, 1, 5], y: 0.02, walk: true, face: 'front' });
@@ -76,7 +79,7 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
 
   // the stone people: along the porch, in the doorways, a few on the way from the gate; none in the court
   const at: readonly (readonly [number, number, number])[] = [
-    [porch + 1.4, -21, 0], [porch + 1.8, -14, 1], [porch + 1.1, -6, 2], [porch + 1.6, 7, 3], [porch + 1.2, 15, 0], [porch + 1.8, 23, 1],
+    [porch + 1.4, -21, 0], [porch + 1.8, -14, 4], [porch + 1.1, -6, 2], [porch + 1.6, 7, 3], [porch + 1.2, 15, 1], [porch + 1.8, 23, 4],
     [-8, inner - 1.8, 2], [-8.8, -inner + 1.8, 3], [G - 6, 9.5, 0], [G - 9, -10.5, 1], [G - 13, 13, 3],
   ];
   for (const [i, [a, cc, k]] of at.entries()) c.add(FIGURES[k]!, a, cc, { face: i % 3 === 0 ? 'front' : 'in', turn: (i * 47) % 70 - 30, s: 1.08, tint: [0.62, 0.6, 0.58], keep: 0.4, jitter: 0.2 });

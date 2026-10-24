@@ -1,9 +1,8 @@
 /**
- * The organ of the daemon pipers (round 71; pack 14's pipes, pack 15's bones, pack 08's plinths, a bone collar and a flute's mouth made in code, docs/BOSS_PLACES.md):
- * the court is walled by its own pipes, shafts of black stone set shoulder to shoulder in a ring, graded from the shortest either side of the gate to the
- * tallest at the back, each open at the top; every other one stands on a plinth of the old temple, every other one is collared in bone, and every third has
- * a flute's mouth cut in it facing the court. Ribs brace them where they lean together. Two great pipes keep the gate. Notes rise from their open tops,
- * thin and purple, and the court's dark tiles hold a slow mote. The fog is held low so the pipes show over it. Pure: no Three.js.
+ * The organ of the daemon pipers (round 71; round 72: the pipes are 3D Vault's Wajia bone flute stood on end and darkened, its finger holes along the shaft, pack 15's bones, pack 08's plinths,
+ * docs/BOSS_PLACES.md): the court is walled by its own flutes, shafts of black bone set shoulder to shoulder in a ring, graded from the shortest either side of the gate to the
+ * tallest at the back, each open at the top; every other one stands on a plinth of the old temple. Ribs brace them where they lean together. Two great flutes keep the gate. Notes rise
+ * from their open tops, thin and purple, and the court's dark tiles hold a slow mote. The fog is held low so the pipes show over it. Pure: no Three.js.
  */
 
 import { HOUSE, type House } from '../../data/arenaHouses';
@@ -24,14 +23,9 @@ export const pipers: PlaceFn = (c: Court, h: House) => {
   const pipe = (a: number, cc: number, tall: number, k: number, s: number): void => {
     const plinth = k % 2 === 0 ? 2.3 : 0;
     if (plinth) c.add('tp_col_base', a, cc, { ...BLACK, s: 1.9, stretch: [1, 0.5, 1] });
-    c.add('dp_pipe_4', a, cc, { ...BLACK, s, y: plinth, height: tall - plinth - 3, round: true });
-    c.add('dp_pipe_open', a, cc, { ...BLACK, s, y: tall - 3, height: 3, round: true, walk: true });
-    if (k % 2 === 1) for (const f of [0.42, 0.78]) c.add('px_collar', a, cc, { ...BONE, s: s * 0.88, y: plinth + (tall - plinth) * f, walk: true });
-    if (k % 3 === 0) {
-      const d = Math.hypot(a, cc);
-      const r = 0.87 * s + 0.04;
-      c.add('px_mouth', a - (a / d) * r, cc - (cc / d) * r, { ...BONE, face: 'in', s: s * 0.8, y: plinth + 2.4, walk: true });
-    }
+    const whole = tall >= 24; // the taller shafts are the whole flute stood on end, the shorter its flared foot and the first of its holes, at the same scale
+    if (k % 3 === 1) c.add('px_collar', a, cc, { ...BONE, s: s * 0.7, y: plinth + (tall - plinth) * 0.32, walk: true }); // (the foot of the flute is the wider: a ring of bone about it)
+    c.add(whole ? 'wf_flute' : 'wf_flute_low', a, cc, { ...BLACK, s: (s / 3) * (whole ? 2.64 : 2.9) * (1 + ((k * 5) % 3) * 0.03), y: plinth, height: tall - plinth, round: true, turn: (k % 2) * 180 });
   };
 
   // the ring of pipes from either side of the gate round to the back, graded in height: their bearings at equal steps along the ring's own arc, the last of them the back's, which the two sides share
@@ -64,7 +58,10 @@ export const pipers: PlaceFn = (c: Court, h: House) => {
     });
   }
   // the gate's two great pipes
-  for (const side of [-1, 1]) pipe(G - 0.6, side * (gate + 3.2), 15, 1, 3.4);
+  for (const side of [-1, 1]) {
+    pipe(G - 0.6, side * (gate + 3.2), 15, 1, 3.4);
+    c.add('bn_pile_skull', G - 4, side * (gate + 1.4), { ...BONE, s: 1.5, jitter: 0.3, walk: true });
+  }
 
   // notes from the open tops of a few, and a slow mote over the tiles
   for (let i = 0; i < 7; i++) {

@@ -1,16 +1,16 @@
 /**
- * The gate court at the lake of Ib (round 71; pack 08's marble and bronze, Kenney's reeds and lilies, docs/BOSS_PLACES.md): where the ruin of a city on a
+ * The gate court at the lake of Ib (round 71; pack 08's marble and bronze, Kenney's reeds and lilies, docs/BOSS_PLACES.md; round 72: zacharykozak's ancient ruins for the arcade): where the ruin of a city on a
  * lake meets its water. A marble wall about the court, two towers either side of the gate carrying the moon's banners and a pair of bronze leaves that draw
- * apart for whoever comes; along both sides a colonnade carrying its beam, three of its columns broken off at the first course; at the back the wall is the
+ * apart for whoever comes; along both sides an arcade of two storeys of round arches, ruined, its first columns broken off at the foot; at the back the wall is the
  * quay, low, with a stagnant pool before it, lilies on it, flags of the old city cracked about its edge and steps going down into the water, which does
  * not move. Everything is green with what is older than moss. Reeds and lilies stand along the road in. Green fire in braziers, a mist on the water, motes
- * above it. The fog is held low so the towers and the colonnade show over it. Pure: no Three.js.
+ * above it. The fog is held low so the towers and the arcade show over it. Pure: no Three.js.
  */
 
 import { HOUSE, type House } from '../../data/arenaHouses';
 import type { PlaceFn } from '../enclosurePlace';
 import type { Court, Put } from '../placeKit';
-import { column, rectOutline, wallRect } from './common';
+import { rectOutline, wallRect } from './common';
 
 const MARBLE: Put = { tint: [0.62, 0.74, 0.68], keep: 0.4 };
 const MOSS: Put = { tint: [0.4, 0.58, 0.46], keep: 0.35 };
@@ -31,21 +31,13 @@ export const bokrug: PlaceFn = (c: Court, h: House) => {
     c.add('tp_flag_moon', G - 4.3, side * tower, { y: 3.4, face: 'in', s: 1.7, walk: true });
   }
 
-  // the colonnade down both sides: nine columns, three broken off, the beam across the rest
-  const cols = Array.from({ length: 10 }, (_, i) => -B + 5.5 + (i * (G + B - 12)) / 9);
+  // the arcade down both sides: three bays of the old city's two-storey arches, whole in places, broken in others, standing against the wall and facing the court (zacharykozak's ruin); the flags between
+  const bays = [-B + 12, -B + 12 + 20.4, -B + 12 + 40.8].filter((a) => a < G - 8);
   for (const side of [-1, 1]) {
-    for (const [i, a] of cols.entries()) {
-      const cc = side * (S - 3.2);
-      if ((i + (side > 0 ? 0 : 2)) % 4 === 3) { // broken at the first course
-        c.add('tp_col_base', a, cc, { ...MOSS, s: 1.0 });
-        c.add('tp_col_mid', a, cc, { ...MOSS, s: 1.0, y: 2.4, stretch: [1, 0.55, 1] });
-        c.add('tp_rubble_1', a + 1.2, cc - side * 1.4, { ...MOSS, s: 1.5, walk: true, jitter: 0.4 });
-        continue;
-      }
-      column(c, a, cc, 1, { ...MARBLE, s: 1.0 });
-    }
-    c.run('tp_beam', [cols[0]!, side * (S - 3.2)], [cols[2]!, side * (S - 3.2)], { ...MARBLE, y: 7.15 });
-    c.run('tp_beam', [cols[4]!, side * (S - 3.2)], [cols[9]!, side * (S - 3.2)], { ...MARBLE, y: 7.15 });
+    for (const [i, a] of bays.entries()) c.add('ar_arcade', a, side * (S - 2.7), { ...MARBLE, face: 'in', keep: 0.45, stretch: [1, 0.78 + (((i + (side > 0 ? 1 : 0)) * 5) % 4) * 0.07, 1], jitter: 0 });
+    const end = bays[bays.length - 1]! + 12.5; // a column of the old colonnade, broken at its foot, where the last bay ends
+    c.add('tp_col_base', end, side * (S - 3.2), { ...MOSS, s: 1.0 });
+    c.add('tp_rubble_1', end + 1.2, side * (S - 5.2), { ...MOSS, s: 1.5, walk: true, jitter: 0.4 });
     c.add('tp_floor', (G - B) / 2 - 0.5, side * (S - 2.4), { ...MOSS, face: 'front', stretch: [(G + B) / 2.4, 1, 6.4 / 2.4], y: 0.02, walk: true });
   }
 

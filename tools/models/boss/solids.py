@@ -110,3 +110,11 @@ def one_box(tris):
     p = np.asarray(tris).reshape(-1, 3)
     lo, hi = p.min(axis=0), p.max(axis=0)
     return [[round((lo[0] + hi[0]) / 2, 3), round((lo[2] + hi[2]) / 2, 3), round((hi[0] - lo[0]) / 2, 3), round((hi[2] - lo[2]) / 2, 3), round(lo[1], 3), round(hi[1], 3)]]
+
+
+def trunk(tris, y0=1.2, y1=3.6, top=6.0):
+    """A tree's trunk as one collider: the box about the points of its faces between `y0` and `y1` above the foot (below its limbs, above its roots), as tall as `top`."""
+    p = np.asarray(tris).reshape(-1, 3)
+    p = p[(p[:, 1] >= p[:, 1].min() + y0) & (p[:, 1] <= p[:, 1].min() + y1)]
+    lo, hi = p.min(axis=0), p.max(axis=0)
+    return [[round((lo[0] + hi[0]) / 2, 3), round((lo[2] + hi[2]) / 2, 3), round((hi[0] - lo[0]) / 2 + 0.1, 3), round((hi[2] - lo[2]) / 2 + 0.1, 3), 0.0, top]]

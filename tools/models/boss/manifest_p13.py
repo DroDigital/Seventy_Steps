@@ -1,6 +1,6 @@
 """Pack 13, pistachio's human basemeshes (CC0) and pack 12, orange juice games' PSX male base mesh (CC0): bodies posed offline on their rigs (Blender evaluates the armature,
 the pose is baked into the model's faces, nothing moves in the game) and turned to figures of stone and of the Court: the blind dancers of Azathoth's court (heads taken off at
-the neck and an eyeless egg set in their place, their proportions drawn out) and the stone people of Gorgon's porch, caught as they ran. One body, many poses."""
+the neck and an eyeless egg set in their place, their proportions drawn out) and a pale one seated for the tiers of Hastur's theatre (the stone people of Gorgon's porch were these, caught as they ran, until round 72's statues). One body, many poses."""
 from manifest import M, add
 import sources as S
 
@@ -23,15 +23,6 @@ add(
         decimate=700, blank=DANCER, squash=TALL, recolour=(0.34, 0.33, 0.46), solids='box', round=True),
     fig('fg_dance_d', {'upper_arm.L': (0, 0, 160), 'upper_arm.R': (0, 0, -160), 'forearm.L': (0, 0, -30), 'forearm.R': (0, 0, 30), 'thigh.L': (0, 0, 28), 'thigh.R': (0, 0, -28), 'spine': (-12, 0, 0), 'neck': (0, 0, -20)},
         decimate=700, blank=DANCER, squash=TALL, recolour=(0.34, 0.33, 0.46), solids='box', round=True),
-    # the stone people: running, shielding the face, crouched, pleading
-    fig('fg_stone_run', {'thigh.L': (50, 0, 0), 'shin.L': (-40, 0, 0), 'thigh.R': (-30, 0, 0), 'upper_arm.L': (-50, 0, 0), 'upper_arm.R': (55, 0, 0), 'forearm.R': (60, 0, 0), 'spine': (15, 0, 0)},
-        decimate=700, recolour=STONEFIG, solids='box', round=True),
-    fig('fg_stone_shield', {'upper_arm.L': (80, 0, 10), 'upper_arm.R': (80, 0, -10), 'forearm.L': (90, 0, 0), 'forearm.R': (90, 0, 0), 'spine': (-12, 0, 0), 'neck': (0, 0, 20), 'thigh.L': (-15, 0, 0), 'thigh.R': (10, 0, 0)},
-        decimate=700, recolour=STONEFIG, solids='box', round=True),
-    fig('fg_stone_crouch', {'thigh.L': (80, 0, 0), 'thigh.R': (80, 0, 0), 'shin.L': (-100, 0, 0), 'shin.R': (-100, 0, 0), 'spine': (45, 0, 0), 'upper_arm.L': (60, 0, 0), 'upper_arm.R': (60, 0, 0), 'forearm.L': (80, 0, 0), 'forearm.R': (80, 0, 0), 'neck': (-30, 0, 0)},
-        decimate=700, recolour=STONEFIG, solids='box', round=True),
-    fig('fg_stone_plead', {'upper_arm.L': (70, 0, 25), 'upper_arm.R': (75, 0, -25), 'forearm.L': (20, 0, 0), 'spine': (20, 0, 0), 'thigh.L': (50, 0, 0), 'shin.L': (-70, 0, 0), 'neck': (-25, 0, 0)},
-        decimate=700, recolour=STONEFIG, solids='box', round=True),
     # a pale one seated, for the tiers of a theatre
     fig('fg_seat', {'thigh.L': (90, 0, 0), 'thigh.R': (90, 0, 0), 'shin.L': (-90, 0, 0), 'shin.R': (-90, 0, 0), 'upper_arm.L': (30, 0, 0), 'upper_arm.R': (30, 0, 0), 'forearm.L': (60, 0, 0), 'forearm.R': (60, 0, 0)},
         decimate=700, recolour=(0.7, 0.66, 0.8), solids='none'),

@@ -19,7 +19,7 @@ const w = worldLayout();
 const arena = w.arenas.find((a) => a.bosses[0] === 'edward_hutchinson')!;
 const house = arena.house!;
 const spec = ARENA_HOUSES.edward_hutchinson!;
-const keep = house.props.find((p) => p.set?.id === 'rn_arch_goth')!; // the donjon's door, under its pointed arch
+const keep = house.props.find((p) => p.set?.id === 'hc_castle')!; // the donjon: the black castle (round 72; it was a doorway under a pointed arch)
 const gatehouseSpan = house.props.find((p) => p.set?.id === 'cs_wall' && p.y - arena.y >= spec.gate.height && Math.hypot(p.x - house.gate.x, p.z - house.gate.z) < 6)!;
 
 describe("Hutchinson's keep", () => {

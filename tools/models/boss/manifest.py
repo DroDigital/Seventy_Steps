@@ -6,7 +6,7 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   fit      {'height': m} | {'length': m} | {'width': m} | {'depth': m} | {'scale': k}: how it is sized (metres, or times the source)
   rot      degrees about the vertical, to face the model's front toward +z (and its long side along x, for a wall)
   cls      the class of any face a material name does not decide; `classes` {material regex: class} decides the rest
-  solids   'box' (its whole box), 'auto' (voxelised: doorways and colonnades stay open), 'none', or a list of (cx, cz, hx, hz, y0, y1)
+  solids   'box' (its whole box), 'auto' (voxelised: doorways and colonnades stay open), 'trunk' (a tree: the box about its trunk, not its roots and limbs), 'none', or a list of (cx, cz, hx, hz, y0, y1)
   anchors  [(x, y, z)]: where a flame or a light sits in the finished model (its own frame, feet at the origin); `anchor_of` finds one from the
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept

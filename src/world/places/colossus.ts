@@ -1,9 +1,9 @@
 /**
- * The temenos of the Colossus beneath the pyramids (round 71; the temple pack's sandstone, two code-made pylons and a drift of sand; docs/BOSS_PLACES.md; the licence of the Egyptian
- * pack that was meant for it keeps its models out of the game, docs/BOSS_PLACES.md): a walled court of weathered sandstone, a pylon gate of two great towers each with its fire and
- * its banners, a lintel across them, an avenue of vases and braziers down to the court, a colonnade of tall square columns with its architrave about the wall's inner face on three
- * sides, carved plaques along the back wall about the doorway of the sanctuary, obelisks outside the gate, and the desert's drifts piled in the corners and against the wall.
- * The fight is on the sun-wheel of paving in the middle; nothing solid stands in it. Pure: no Three.js.
+ * The temenos of the Colossus beneath the pyramids (round 71; the temple pack's sandstone and a drift of sand; docs/BOSS_PLACES.md; round 72: the pylon is Bruno Macchioni's Egyptian temple,
+ * its two sloping towers cut from the whole, and the court is wider by a dozen metres each way to stand before them; the licence of the first Egyptian pack that was meant for it keeps its
+ * models out of the game): a walled court of weathered sandstone, a pylon gate of two great towers each with its fire and its banners, an avenue of vases and braziers down to the court, a
+ * colonnade of tall square columns with its architrave about the wall's inner face on three sides, carved plaques along the back wall about the doorway of the sanctuary, obelisks outside the
+ * gate, and the desert's drifts piled in the corners and against the wall. The fight is on the sun-wheel of paving in the middle; nothing solid stands in it. Pure: no Three.js.
  */
 
 import { HOUSE, type House } from '../../data/arenaHouses';
@@ -18,24 +18,23 @@ const FLAGS = ['tp_flag_sun', 'tp_flag_moon', 'tp_flag_stars', 'tp_flag_eclipse'
 
 export const colossus: PlaceFn = (c: Court, h: House) => {
   const G = c.R + (h.reach ?? HOUSE.reach);
-  const [S, B] = [c.R + 14, c.R + 14];
+  const [S, B] = [c.R + 26, c.R + 26]; // (the court was 14 m about the fight's ring; the new pylon is 85 m across, and the court stands before it)
   const gate = h.gate.width / 2 + 0.7;
-  const pylon = gate + 6.3; // a pylon's middle
-  const wall: Put = { ...SAND, stretch: [1, 1, 2.6], height: 7.4 };
+  const [foot, crown] = [33, 31.4]; // the pylon's towers reach out to 33 m either side of the gate's middle, 31 m high
+  const wall: Put = { ...SAND, stretch: [1, 1, 2.6], height: 9 };
 
-  // the wall, and the pylons that stand in its front
-  c.run('tp_wall_mid', [G, -pylon - 5.6], [G, -S], wall);
-  c.run('tp_wall_mid', [G, pylon + 5.6], [G, S], wall);
+  // the wall, and the pylon that stands in its front
+  c.run('tp_wall_mid', [G, -foot + 2], [G, -S], wall);
+  c.run('tp_wall_mid', [G, foot - 2], [G, S], wall);
   c.run('tp_wall_mid', [G, S], [-B, S], wall);
   c.run('tp_wall_mid', [G, -S], [-B, -S], wall);
-  c.run('tp_wall_mid', [-B, S], [-B, -S], { ...wall, height: 8.2 });
+  c.run('tp_wall_mid', [-B, S], [-B, -S], { ...wall, height: 10 });
+  c.add('eg_pylon', G, 0, { ...SAND, face: 'front', jitter: 0 });
   for (const side of [-1, 1]) {
-    c.add('px_pylon', G, side * pylon, { ...SAND, face: 'front', jitter: 0 });
-    c.add('px_brazier', G, side * (pylon + 1), { y: 16, s: 1.6, lit: 'fire', round: true });
-    for (let i = 0; i < 2; i++) c.add(FLAGS[(i + (side > 0 ? 2 : 0)) % 4]!, G + 3.2, side * (pylon - 2.8 + i * 5.6), { y: 7.6, s: 2.3, face: 'front', walk: true });
+    c.add('px_brazier', G, side * 19, { y: crown, s: 2.6, lit: 'fire', round: true });
+    for (let i = 0; i < 2; i++) c.add(FLAGS[(i + (side > 0 ? 2 : 0)) % 4]!, G + 5.6, side * (12 + i * 14), { y: 7, s: 3.4, face: 'front', walk: true });
+    c.add('px_obelisk', G + 9, side * (gate + 9), { ...WORN, s: 1.0 });
   }
-  c.run('tp_beam', [G, -gate - 0.6], [G, gate + 0.6], { ...SAND, y: 9.4, stretch: [1, 1.1, 2.6], lap: 0.4 });
-  for (const side of [-1, 1]) c.add('px_obelisk', G + 7.5, side * 9, { ...WORN, s: 1.0 });
 
   // the avenue: vases either side, a brazier between each pair
   for (let a = G - 6; a > c.R + 4; a -= 5.2) for (const side of [-1, 1]) {
@@ -67,7 +66,7 @@ export const colossus: PlaceFn = (c: Court, h: House) => {
 
   // what moves in it: sand blown along the walls, the braziers' smoke
   for (const side of [-1, 1]) c.emit({ at: [-B + 4, side * (S - 6)], to: [G - 8, side * (S - 6)], y: [0.2, 1.8], rate: 3.2, life: [4, 7], size: [1.4, 2.4], grow: 1.4, colour: [0.78, 0.66, 0.46], alpha: 0.16, drift: 0.2, flow: { x: 0, z: side * 0.9 }, shape: 'wisp', reach: 90 });
-  for (const side of [-1, 1]) c.emit({ at: [G, side * (pylon + 1)], y: [17.5, 18], r: 0.6, rate: 3, life: [4, 7], size: [1, 1.7], grow: 2.4, colour: [0.3, 0.26, 0.22], alpha: 0.26, rise: 1, drift: 0.2, flow: { x: -0.2, z: 0.3 }, shape: 'wisp', reach: 110 });
+  for (const side of [-1, 1]) c.emit({ at: [G, side * 19], y: [crown + 1.5, crown + 2], r: 0.6, rate: 3, life: [4, 7], size: [1, 1.7], grow: 2.4, colour: [0.3, 0.26, 0.22], alpha: 0.26, rise: 1, drift: 0.2, flow: { x: -0.2, z: 0.3 }, shape: 'wisp', reach: 110 });
   c.emit({ at: [8, -S + 10], to: [8, S - 10], y: [0.4, 3], rate: 2.4, life: [3, 6], size: [0.07, 0.12], colour: [1, 0.82, 0.5], alpha: 0.6, drift: 0.5, rise: 0.15, shape: 'spark', glow: true, reach: 80 }); // grains of the court's gold catching what light there is
   return { outline: rectOutline(G, S, B), ahead: G, outer: 12, fogHeight: 4 };
 };

@@ -8,12 +8,12 @@ They were made again for the game by `tools/models/bake_models.py`: each model w
 ## Graveyard Kit 5.0
 https://kenney.nl/assets/graveyard-kit
 
-`crypt`, `crypt_small`, `grave_cross`, `grave_round`, `grave_wide`, `grave_broken`, `cross`, `cross_wood`, `coffin`, `altar_stone`, `column`, `urn`, `iron_fence`, `iron_fence_broken`, `iron_gate`, `lightpost`, `pine_crooked`, `trunk`, `rocks_tall`, `candles`, `bench`, `pumpkin_carved`, `lantern`, `skeleton`, `hay_bale`, `shovel_dirt`, `chalice`, `bowl`
+`crypt_small`, `grave_cross`, `grave_round`, `grave_wide`, `grave_broken`, `cross`, `cross_wood`, `coffin`, `altar_stone`, `column`, `urn`, `iron_fence`, `iron_fence_broken`, `iron_gate`, `lightpost`, `pine_crooked`, `rocks_tall`, `candles`, `bench`, `lantern`, `skeleton`, `hay_bale`, `shovel_dirt`, `chalice`, `bowl`
 
 ## Nature Kit
 https://kenney.nl/assets/nature-kit
 
-`cactus`, `canoe`, `log`, `stump_old`, `mushroom_tall`, `rock_large`, `rock_tall`, `plant_bush`, `statue_obelisk`, `statue_column`, `statue_head`, `lily`, `statue_ring`, `cliff`
+`log`, `stump_old`, `mushroom_tall`, `rock_tall`, `statue_obelisk`, `statue_column`, `statue_head`, `lily`, `statue_ring`
 
 ## Castle Kit
 https://kenney.nl/assets/castle-kit
@@ -42,9 +42,9 @@ https://kenney.nl/assets/fantasy-town-kit
 
 The nineteen outdoor boss places (`src/world/places/`, docs/BOSS_PLACES.md) are built of models cut from the packs below by `tools/models/bake_boss_models.py` (manifests in `tools/models/boss/`), into `bossIndex.ts` and `bossPack.ts`. Each model was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to the face's colour and a material class, decimated where heavy, welded, flattened, scaled to the metres it stands at, and given its colliders and flame anchors; the figures of Pack 13 were also posed, their heads taken off and their proportions stretched (the blind dancers). Nothing is loaded as a source file at run time. Pieces marked `proc` are built in code (`tools/models/boss/proc*.py`) and owe nothing to a pack.
 
-The packs' own licences remain authoritative. The two **CC BY 4.0** packs by BlenderVoyage (Packs 05 and 06) and the **CC BY 4.0** Columnar Basalt by bobjh (Pack 17) are credited as asked, with their licence (https://creativecommons.org/licenses/by/4.0/) and the changes above; the rest are CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/), which asks for nothing, and are credited for provenance.
+The packs' own licences remain authoritative. The two **CC BY 4.0** packs by BlenderVoyage (Packs 05 and 06), the **CC BY 4.0** Columnar Basalt by bobjh (Pack 17) and, from round 72, the eight **CC BY 4.0** Sketchfab models of Packs 22 to 29 (Marin PETTE, 3D Vault, Bruno Macchioni, Bl4ckGh0st twice, mynameismary, Animex and zacharykozak) are credited as asked, with their licence (https://creativecommons.org/licenses/by/4.0/) and the changes above; the rest are CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/), which asks for nothing, and are credited for provenance.
 
-**Pack 07, Jen Abbott's Egyptian Temple Complex (Fab Standard License), is not baked, shipped or committed**: that licence does not allow its raw assets to be republished, and a model baked from it would carry them. The Colossus's temenos is made of Pack 08's temple, Pack 09's ruins and forms built in code instead (docs/BOSS_PLACES.md).
+**Pack 07, Jen Abbott's Egyptian Temple Complex (Fab Standard License), is not baked, shipped or committed**: that licence does not allow its raw assets to be republished, and a model baked from it would carry them. The Colossus's temenos is made of Pack 08's temple, Pack 09's ruins, forms built in code and, from round 72, the pylon of Pack 24 (a different Egyptian temple, CC BY 4.0) instead (docs/BOSS_PLACES.md).
 
 ## Pack 01 — 3D Retro Medieval/Fantasy Building Kit
 By chilly_durango, https://chilly-durango.itch.io/medieval-building-parts, licensed CC0 1.0.
@@ -59,12 +59,12 @@ By Kenney, https://kenney.nl/assets/nature-kit, licensed CC0 1.0.
 ## Pack 03 — Ultimate Stylized Nature
 By Quaternius, https://quaternius.com/packs/ultimatestylizednature.html, licensed CC0 1.0.
 
-`st_dead_6`, `st_dead_8`, `st_dead_10`, `st_maple_3`, `st_rock_1`, `st_rock_3`, `st_rock_4`, `st_rock_5`
+`st_maple_3`, `st_rock_1`, `st_rock_3`, `st_rock_4`, `st_rock_5`
 
 ## Pack 04 — 3D Retro Shacks Shanties Sheds & Gantries
 By chilly_durango, https://chilly-durango.itch.io/3dretroshacks, licensed CC0 1.0.
 
-`ms_shack`, `ms_leanto`, `ms_shed_a`, `ms_shed_b`, `ms_rail`, `ms_rail_post`, `ms_gantry`, `ms_pallet`, `ms_barrel`, `ms_barricade`, `ms_platform`, `ms_pole`
+`ms_shack`, `ms_leanto`, `ms_shed_a`, `ms_shed_b`, `ms_rail`, `ms_rail_post`, `ms_pallet`, `ms_barrel`, `ms_barricade`, `ms_platform`, `ms_pole`
 
 ## Pack 05 — PSX Style Modular Low Poly Graveyard — Free Edition
 By BlenderVoyage, https://blendervoyage.itch.io/psx-style-low-poly-modular-graveyard, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); modified as above.
@@ -74,37 +74,22 @@ By BlenderVoyage, https://blendervoyage.itch.io/psx-style-low-poly-modular-grave
 ## Pack 06 — PSX Style Low Poly Modular Castle
 By BlenderVoyage, https://blendervoyage.itch.io/psx-style-modular-castle, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); modified as above.
 
-`cs_wall`, `cs_tower_corner`, `cs_tower`, `cs_temple`, `cs_temple_tower`, `cs_stairs_1`
+`cs_wall`, `cs_tower_corner`, `cs_tower`, `cs_temple`, `cs_temple_tower`
 
 ## Pack 08 — Modular Temple Pack
 By Keith at Fertile Soil Productions, https://fertile-soil-productions.itch.io/temple-modular-collection, licensed CC0 1.0.
 
-`tp_col_base`, `tp_col_mid`, `tp_col_top`, `tp_beam`, `tp_arch`, `tp_pil_base`, `tp_wall_mid`, `tp_wall_win`, `tp_ruin_half_1`, `tp_doorway`, `tp_door_leaf`, `tp_door_sun`, `tp_door_moon`, `tp_tower_bot`, `tp_tower_top`, `tp_stairs`, `tp_floor`, `tp_floor_ruin_1`, `tp_floor_ruin_2`, `tp_rubble_1`, `tp_rubble_2`, `tp_vase_1`, `tp_vase_2`, `tp_vase_3`, `tp_flag_sun`, `tp_flag_moon`, `tp_flag_stars`, `tp_flag_eclipse`
+`tp_col_base`, `tp_col_mid`, `tp_col_top`, `tp_beam`, `tp_arch`, `tp_wall_mid`, `tp_wall_win`, `tp_doorway`, `tp_door_leaf`, `tp_door_sun`, `tp_door_moon`, `tp_tower_bot`, `tp_tower_top`, `tp_stairs`, `tp_floor`, `tp_floor_ruin_1`, `tp_floor_ruin_2`, `tp_rubble_1`, `tp_rubble_2`, `tp_vase_1`, `tp_vase_2`, `tp_vase_3`, `tp_flag_sun`, `tp_flag_moon`, `tp_flag_stars`, `tp_flag_eclipse`
 
 ## Pack 09 — Ultimate Modular Ruins
 By Quaternius, https://quaternius.com/packs/ultimatemodularruins.html, licensed CC0 1.0.
 
-`rn_arch_goth`, `rn_wall_broken`, `rn_bricks`, `rn_deadtree_1`, `rn_deadtree_2`, `rn_deadtree_3`, `rn_torch`, `rn_flag`, `rn_cart`, `rn_barrel`
-
-## Pack 10 — Colosseum
-By CreativeTrio, https://poly.pizza/m/83ftBPyiSf, licensed CC0 1.0.
-
-`co_seg`
-
-## Pack 11 — Space Base Bits — FREE
-By Kay Lousberg, https://kaylousberg.itch.io/space-base-bits, licensed CC0 1.0.
-
-`yd_tower_tall`, `yd_tower_low`, `yd_drill`, `yd_tunnel`, `yd_dome_a`, `yd_dome_e`
+`rn_arch_goth`, `rn_wall_broken`, `rn_bricks`, `rn_torch`, `rn_flag`, `rn_cart`, `rn_barrel`
 
 ## Pack 13 — Human Basemeshes
 By pistachio, https://opengameart.org/content/human-basemeshes, licensed CC0 1.0.
 
-`fg_dance_a`, `fg_dance_b`, `fg_dance_c`, `fg_dance_d`, `fg_stone_run`, `fg_stone_shield`, `fg_stone_crouch`, `fg_stone_plead`, `fg_seat`
-
-## Pack 14 — LoFi3D Modular Pipes
-By Philip_Erd, https://philip-erd.itch.io/lofi3d-modular-pipes, licensed CC0 1.0.
-
-`dp_pipe_4`, `dp_pipe_open`
+`fg_dance_a`, `fg_dance_b`, `fg_dance_c`, `fg_dance_d`, `fg_seat`
 
 ## Pack 15 — 3D dungeon debris — skull and bones
 By Paul Wortmann, https://opengameart.org/content/3d-dungeon-debris-skull-and-bones, licensed CC0 1.0.
@@ -125,3 +110,58 @@ By bobjh, https://opengameart.org/content/columnar-basalt, licensed CC BY 4.0 (h
 By Kay Lousberg, https://kaylousberg.itch.io/kaykit-dungeon-pack, licensed CC0 1.0.
 
 `dg_stairs_wide`
+
+## Pack 19 — Dead trees (Low-poly)
+By Goth Scarecrow, https://goth-scarecrow.itch.io/dead-trees, licensed CC0 1.0.
+
+`gt_dead_3`, `gt_dead_4`, `gt_dead_5`, `gt_dead_6`, `gt_dead_8`, `gt_dead_9`
+
+## Pack 20 — Alien buildings extension pack
+By rubberduck, https://opengameart.org/content/alien-builings-extension-pack, licensed CC0 1.0. Its paint was thrown away and the light and dark of it kept in a pale metal-stone, its bright technological accents left out.
+
+`ay_wall`, `ay_pylon`, `ay_bastion`, `ay_passage`, `ay_portal`, `ay_dome`, `ay_gantry`
+
+## Pack 21 — Modular Wooden Pier
+From Poly Haven, https://polyhaven.com/a/modular_wooden_pier, licensed CC0 1.0.
+
+`mp_deck`, `mp_frame`
+
+## Pack 22 — Roman theater of Palmyra
+By Marin PETTE, https://sketchfab.com/3d-models/roman-theater-of-palmyra-d092d5223f424600a9dc06e295782305, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: the cavea cut into a wedge of twenty degrees (its apex and outer rows cut away), scaled, decimated and given its colliders; two of its columns cut out and stood alone.
+
+`hs_cavea`, `hs_col_tall`, `hs_col_mid`
+
+## Pack 23 — Wajia Flute
+By 3D Vault, https://sketchfab.com/3d-models/wajia-flute-e6d1c436d3bc41f99f49b5dc2c821b2f, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: stood on end, scaled up many times and stretched, darkened to black bone, decimated, and in one model cut to its foot.
+
+`wf_flute`, `wf_flute_low`
+
+## Pack 24 — Egyptian Temple
+By Bruno Macchioni, https://sketchfab.com/3d-models/egyptian-temple-5d71635d05d14a32b58cd852c16752fa, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: the whole temple cut away but its pylon, the two sloping towers and the gate between them, which was scaled to the gate of the court and given its colliders. (This is not Pack 07.)
+
+`eg_pylon`
+
+## Pack 25 — Low Poly Black Castle
+By Bl4ckGh0st, https://sketchfab.com/3d-models/low-poly-black-castle-57cd59cff9014e1abbe276457e555413, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: its ground and interior floors left out, every piece decimated and the whole joined, scaled and stretched to the keep it stands as, and given a collider.
+
+`hc_castle`
+
+## Pack 26 — Theatre stage
+By mynameismary, https://sketchfab.com/3d-models/theatre-stage-5c53624a0a334242ad04d7a11a2dcf8e, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: only its curtains and valance kept, recoloured from red to a weathered yellow.
+
+`hs_curtain`
+
+## Pack 27 — Snake statue
+By Animex, https://sketchfab.com/3d-models/snake-statue-4bb50218740942bf93153cc6910f0924, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: decimated, scaled to eight metres and given a collider about its coil.
+
+`yg_snake`
+
+## Pack 28 — Temple Ruins Asset Pack
+By Bl4ckGh0st, https://sketchfab.com/3d-models/temple-ruins-asset-pack-d1e25cdbe51e467a87baf94ead0afa63, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: the pieces taken singly, the statues (24,000 faces each) decimated, all scaled and given colliders.
+
+`tr_statue_a`, `tr_statue_b`, `tr_statue_c`, `tr_statue_d`, `tr_statue_e`, `tr_pillar_tall`, `tr_pillar_tall_b`, `tr_pillar`, `tr_pillar_b`, `tr_pillar_vb`, `tr_arch`, `tr_arch_b`, `tr_wall_win_b`, `tr_wall_b`
+
+## Pack 29 — Ancient Ruins (Modular)
+By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5acad5849bc913e76d3fdbf32a3, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: its two-storey arcade cut out of the whole (the pier and rubble removed), decimated, scaled and given a collider.
+
+`ar_arcade`

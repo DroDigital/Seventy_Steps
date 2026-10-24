@@ -53,9 +53,6 @@ By Quaternius; licence CC0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `st_dead_6` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (DeadTree_6) | 5.4 × 6.4 × 3.3 | 600 | shub |
-| `st_dead_8` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (DeadTree_8) | 8.2 × 6.3 × 4.8 | 699 | shub |
-| `st_dead_10` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (DeadTree_10) | 5.4 × 7.1 × 3.2 | 600 | shub |
 | `st_maple_3` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (MapleTree_3) | 8.3 × 7.0 × 6.5 | 899 | shub |
 | `st_rock_1` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (Rock_1) | 0.7 × 1.1 × 0.9 | 160 | othergods |
 | `st_rock_3` | Quaternius-Ultimate-Stylized-Nature-source/Ultimate Stylized Nature/AllModels.blend (Rock_3) | 0.8 × 1.3 × 0.9 | 200 | othergods |
@@ -74,7 +71,6 @@ By chilly_durango; licence CC0.
 | `ms_shed_b` | Large Shed B.blend | 8.8 × 5.5 × 14.3 | 252 | martins |
 | `ms_rail` | Handrail.blend (Handrail) | 2.0 × 0.1 × 0.1 | 6 | martins |
 | `ms_rail_post` | Handrail.blend (Handrail Post) | 0.1 × 1.5 × 0.1 | 10 | martins |
-| `ms_gantry` | Metal Gantry Floor.blend (Gantry Floor A) | 2.5 × 0.1 × 2.5 | 40 | martins |
 | `ms_pallet` | Pallet.blend (instance_0) | 1.2 × 0.1 × 1.6 | 32 | martins |
 | `ms_barrel` | Barrel.blend (Barrel) | 1.0 × 1.2 × 0.9 | 20 | martins |
 | `ms_barricade` | Concrete Barricade.blend (SketchUp) | 3.2 × 1.6 × 0.8 | 18 | martins |
@@ -111,7 +107,6 @@ By BlenderVoyage; licence CC BY 4.0.
 | `cs_tower` | gltf/PSX_Modular_Castle.glb (Tower2) | 4.4 × 6.8 × 4.4 | 378 | hutchinson |
 | `cs_temple` | gltf/PSX_Modular_Castle.glb (Temple) | 7.0 × 7.9 × 7.0 | 1349 | orne |
 | `cs_temple_tower` | gltf/PSX_Modular_Castle.glb (Temple_Tower) | 3.2 × 12.3 × 3.2 | 1136 | orne |
-| `cs_stairs_1` | gltf/PSX_Modular_Castle.glb (Stairs1) | 3.0 × 3.0 × 1.0 | 130 | hutchinson |
 
 ## Pack 08: Modular Temple Pack
 
@@ -120,15 +115,13 @@ By Fertile Soil Productions; licence CC0.
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
 | `tp_col_base` | Modular Temple/Pillar_Large_Base.obj | 2.4 × 2.4 × 2.4 | 112 | bokrug, common, pipers |
-| `tp_col_mid` | Modular Temple/Pillar_Large_Middle.obj | 1.4 × 2.4 × 1.4 | 76 | bokrug, common |
+| `tp_col_mid` | Modular Temple/Pillar_Large_Middle.obj | 1.4 × 2.4 × 1.4 | 76 | common |
 | `tp_col_top` | Modular Temple/Pillar_Large_Top.obj | 2.4 × 2.8 × 2.4 | 128 | common |
-| `tp_beam` | Modular Temple/Pillar_Large_Beam.obj | 2.4 × 1.4 × 1.4 | 76 | bokrug, colossus, gorgon, nug, yig |
+| `tp_beam` | Modular Temple/Pillar_Large_Beam.obj | 2.4 × 1.4 × 1.4 | 76 | colossus, gorgon, nug, yig |
 | `tp_arch` | Modular Temple/Pillar_Large_Arch.obj | 3.1 × 3.1 × 1.4 | 196 | hastur, nug |
-| `tp_pil_base` | Modular Temple/Pillar_Wall_Base.obj | 1.2 × 2.4 × 1.2 | 24 | yig |
-| `tp_wall_mid` | Modular Temple/Wall_Straight_Middle.obj | 2.4 × 2.4 × 0.5 | 12 | azathoth, bokrug, colossus, gorgon, hastur, nug, zkauba |
+| `tp_wall_mid` | Modular Temple/Wall_Straight_Middle.obj | 2.4 × 2.4 × 0.5 | 12 | azathoth, bokrug, colossus, gorgon, hastur, nug |
 | `tp_wall_win` | Modular Temple/Wall_Straight_Window_Tall.obj | 2.4 × 4.8 × 0.5 | 76 | gorgon |
-| `tp_ruin_half_1` | Modular Temple/Wall_Ruined_Half_1.obj | 2.4 × 1.8 × 0.5 | 164 | gorgon |
-| `tp_doorway` | Modular Temple/Wall_Straight_Doorway_Large.obj | 5.3 × 7.2 × 1.0 | 184 | colossus, cthulhu, gorgon, nug |
+| `tp_doorway` | Modular Temple/Wall_Straight_Doorway_Large.obj | 5.3 × 7.2 × 1.0 | 184 | colossus, cthulhu, nug |
 | `tp_door_leaf` | Modular Temple/Wall_Straight_Door_Large.obj | 3.8 × 6.5 × 0.4 | 552 | cthulhu |
 | `tp_door_sun` | Modular Temple/Wall_Straight_Door_Sun.obj | 1.9 × 3.8 × 0.7 | 452 | colossus, cthulhu |
 | `tp_door_moon` | Modular Temple/Wall_Straight_Door_Moon.obj | 1.9 × 3.8 × 0.7 | 448 | colossus, cthulhu |
@@ -145,7 +138,7 @@ By Fertile Soil Productions; licence CC0.
 | `tp_vase_3` | Modular Temple/Prop_Vase_3.obj | 1.0 × 1.2 × 1.0 | 332 | bokrug, colossus, gorgon |
 | `tp_flag_sun` | Modular Temple/Prop_Flag_Sun.obj | 1.3 × 2.4 × 0.2 | 286 | colossus |
 | `tp_flag_moon` | Modular Temple/Prop_Flag_Moon.obj | 1.3 × 2.4 × 0.2 | 284 | bokrug, colossus, hastur |
-| `tp_flag_stars` | Modular Temple/Prop_Flag_Stars.obj | 1.3 × 2.4 × 0.2 | 350 | bokrug, colossus, hastur, nug, yig |
+| `tp_flag_stars` | Modular Temple/Prop_Flag_Stars.obj | 1.3 × 2.4 × 0.2 | 350 | bokrug, colossus, nug, yig |
 | `tp_flag_eclipse` | Modular Temple/Prop_Flag_Eclipse.obj | 1.3 × 2.4 × 0.2 | 338 | colossus, hastur, nug |
 
 ## Pack 09: Ultimate Modular Ruins
@@ -154,37 +147,13 @@ By Quaternius; licence CC0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `rn_arch_goth` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Arch_Gothic.fbx | 3.1 × 3.8 × 0.5 | 450 | hutchinson, yog |
+| `rn_arch_goth` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Arch_Gothic.fbx | 3.1 × 3.8 × 0.5 | 450 | yog |
 | `rn_wall_broken` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Wall_Broken.fbx | 2.0 × 1.9 × 0.3 | 220 | colour |
 | `rn_bricks` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Bricks.fbx | 1.8 × 0.5 × 1.6 | 160 | colour |
-| `rn_deadtree_1` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/DeadTree_1.fbx | 1.4 × 3.0 × 0.9 | 444 | blackman, colour |
-| `rn_deadtree_2` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/DeadTree_2.fbx | 1.8 × 3.2 × 0.3 | 516 | blackman, colour |
-| `rn_deadtree_3` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/DeadTree_3.fbx | 2.6 × 3.2 × 2.6 | 499 | blackman, colour |
 | `rn_torch` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Torch.fbx | 0.3 × 0.8 × 0.4 | 344 | hutchinson |
 | `rn_flag` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Flag_Wall.fbx | 0.9 × 2.0 × 0.3 | 204 | hutchinson |
 | `rn_cart` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Cart.fbx | 3.3 × 1.4 × 2.8 | 420 | colour, hutchinson, yig |
 | `rn_barrel` | Ultimate-Modular-Ruins-Pack---Aug-2021-dev/FBX/Barrel.fbx | 0.8 × 1.1 × 0.8 | 200 | colour, hutchinson, yig |
-
-## Pack 10: Colosseum
-
-By CreativeTrio; licence CC0.
-
-| game id | source | size (m) | triangles | stood by |
-|---|---|---|---|---|
-| `co_seg` | CreativeTrio-Colosseum.glb (Coliseum) | 6.0 × 6.9 × 6.2 | 366 | hastur |
-
-## Pack 11: Space Base Bits (Free)
-
-By Kay Lousberg; licence CC0.
-
-| game id | source | size (m) | triangles | stood by |
-|---|---|---|---|---|
-| `yd_tower_tall` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/structure_tall.fbx (structure_tall) | 10.5 × 12.0 × 10.5 | 670 | zkauba |
-| `yd_tower_low` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/structure_low.fbx (structure_low) | 10.5 × 6.0 × 10.5 | 422 | zkauba |
-| `yd_drill` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/drill_structure.fbx (drill_structure) | 10.5 × 12.0 × 10.5 | 798 | zkauba |
-| `yd_tunnel` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/tunnel_straight_A.fbx (tunnel_straight_A) | 12.0 × 3.6 × 5.6 | 608 | zkauba |
-| `yd_dome_a` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/basemodule_A.fbx (basemodule_A) | 11.2 × 5.0 × 10.9 | 586 | zkauba |
-| `yd_dome_e` | KayKit_Space_Base_Bits_1.0_FREE/Assets/fbx/basemodule_E.fbx (basemodule_E) | 11.1 × 8.2 × 11.4 | 732 | zkauba |
 
 ## Pack 13: Human Basemeshes
 
@@ -196,20 +165,7 @@ By pistachio; licence CC0.
 | `fg_dance_b` | Human Basemeshes.blend (basemesh_male) | 1.1 × 2.6 × 0.8 | 621 | azathoth |
 | `fg_dance_c` | Human Basemeshes.blend (basemesh_male) | 0.7 × 2.6 × 0.8 | 620 | azathoth |
 | `fg_dance_d` | Human Basemeshes.blend (basemesh_male) | 0.3 × 2.6 × 0.3 | 501 | azathoth |
-| `fg_stone_run` | Human Basemeshes.blend (basemesh_male) | 1.1 × 2.0 × 1.4 | 700 | gorgon |
-| `fg_stone_shield` | Human Basemeshes.blend (basemesh_male) | 0.8 × 2.0 × 0.8 | 700 | gorgon |
-| `fg_stone_crouch` | Human Basemeshes.blend (basemesh_male) | 1.0 × 2.0 × 1.7 | 700 | gorgon |
-| `fg_stone_plead` | Human Basemeshes.blend (basemesh_male) | 0.8 × 2.0 × 1.4 | 700 | gorgon |
 | `fg_seat` | Human Basemeshes.blend (basemesh_male) | 1.2 × 2.0 × 1.6 | 700 | hastur |
-
-## Pack 14: LoFi3D Modular Pipes
-
-By Philip_Erd; licence CC0.
-
-| game id | source | size (m) | triangles | stood by |
-|---|---|---|---|---|
-| `dp_pipe_4` | Modular_Pipes/obj/Pipe_4m.obj | 1.7 × 6.8 × 1.7 | 396 | pipers |
-| `dp_pipe_open` | Modular_Pipes/obj/Pipe_2m_open.obj | 1.7 × 3.4 × 1.7 | 268 | pipers |
 
 ## Pack 15: 3D dungeon debris: skull and bones
 
@@ -217,7 +173,7 @@ By Paul Wortmann; licence CC0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `bn_pile_skull` | dungeon_debris_-_skull_and_bones_2/dungeon_skull_bone_debris_2.blend (bone pile with skull) | 1.3 × 0.9 × 1.3 | 420 | nug, yig |
+| `bn_pile_skull` | dungeon_debris_-_skull_and_bones_2/dungeon_skull_bone_debris_2.blend (bone pile with skull) | 1.3 × 0.9 × 1.3 | 420 | nug, pipers, yig |
 | `bn_ribcage` | dungeon_debris_-_skull_and_bones_2/dungeon_skull_bone_debris_2.blend (ribcage) | 0.8 × 0.6 × 1.1 | 900 | pipers, yig |
 | `bn_spine` | dungeon_debris_-_skull_and_bones_2/dungeon_skull_bone_debris_2.blend (spine) | 0.5 × 0.3 × 1.8 | 1099 | yig |
 | `bn_leg` | dungeon_debris_-_skull_and_bones_2/dungeon_skull_bone_debris_2.blend (leg) | 0.6 × 0.3 × 1.5 | 200 | yig |
@@ -255,14 +211,130 @@ By Kay Lousberg; licence CC0.
 |---|---|---|---|---|
 | `dg_stairs_wide` | KayKit_Dungeon_Pack_1.1_FREE/Assets/fbx/stairs_wide.fbx (stairs_wide) | 7.0 × 5.1 × 4.0 | 358 | ancients |
 
+## Pack 19: Dead trees (Low-poly)
+
+By Goth Scarecrow; licence CC0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `gt_dead_3` | Deadtrees.glb (^Deadtree3$) | 5.0 × 10.0 × 6.1 | 900 | colour, shub |
+| `gt_dead_4` | Deadtrees.glb (^Deadtree4$) | 5.6 × 10.0 × 4.0 | 900 | colour, shub |
+| `gt_dead_5` | Deadtrees.glb (^Deadtree5$) | 4.5 × 10.0 × 6.5 | 900 | colour, shub |
+| `gt_dead_6` | Deadtrees.glb (^Deadtree6$) | 3.9 × 10.0 × 6.5 | 900 | blackman, shub |
+| `gt_dead_8` | Deadtrees.glb (^DeadTree8$) | 3.0 × 10.0 × 3.3 | 540 | blackman |
+| `gt_dead_9` | Deadtrees.glb (^Deadtree9$) | 5.7 × 10.0 × 5.5 | 486 | blackman |
+
+## Pack 20: Alien buildings extension pack
+
+By rubberduck; licence CC0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `ay_wall` | alien_buildings.blend (^alien_wall_short$) | 24.0 × 14.8 × 2.6 | 1106 | zkauba |
+| `ay_pylon` | alien_buildings.blend (^alien_tower_wall$) | 4.5 × 20.0 × 4.5 | 662 | zkauba |
+| `ay_bastion` | alien_buildings.blend (^alien_tower2$) | 12.2 × 20.0 × 12.2 | 468 | zkauba |
+| `ay_passage` | alien_buildings.blend (^alien_corridor$) | 24.0 × 5.6 × 6.3 | 638 | zkauba |
+| `ay_portal` | alien_buildings.blend (^alien_gate$) | 14.0 × 13.9 × 1.2 | 604 | zkauba |
+| `ay_dome` | alien_buildings.blend (^alien_base3$) | 9.5 × 12.0 × 9.5 | 278 | zkauba |
+| `ay_gantry` | alien_buildings.blend (^alien_base8$) | 10.7 × 14.0 × 13.9 | 810 | zkauba |
+
+## Pack 21: Modular Wooden Pier
+
+By Poly Haven; licence CC0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `mp_deck` | modular_wooden_pier_1k.gltf (modular_wooden_pier_planks) | 2.2 × 0.1 × 1.9 | 420 | martins |
+| `mp_frame` | modular_wooden_pier_1k.gltf (modular_wooden_pier_poles) | 2.2 × 3.8 × 3.1 | 700 | martins |
+
+## Pack 22: Roman theater of Palmyra
+
+By Marin PETTE; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `hs_cavea` | scene.gltf (Gradins.*|Marches.*) | 18.0 × 7.5 × 21.6 | 1143 | hastur |
+| `hs_col_tall` | scene.gltf (Cylinder\.000_0) | 2.5 × 17.6 × 2.6 | 220 | hastur |
+| `hs_col_mid` | scene.gltf (Cylinder\.004_0) | 1.8 × 12.5 × 1.8 | 200 | hastur |
+
+## Pack 23: Wajia Flute
+
+By 3D Vault; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `wf_flute` | scene.gltf | 2.0 × 12.0 × 1.5 | 520 | pipers |
+| `wf_flute_low` | scene.gltf | 1.8 × 7.1 × 1.5 | 359 | pipers |
+
+## Pack 24: Egyptian Temple
+
+By Bruno Macchioni; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `eg_pylon` | scene.gltf (Material.*) | 85.0 × 40.2 × 12.4 | 1360 | colossus |
+
+## Pack 25: Low Poly Black Castle
+
+By Bl4ckGh0st; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `hc_castle` | scene.gltf ((?!Stone_Floor|Ground_Plane).*) | 30.0 × 12.3 × 18.8 | 15232 | hutchinson |
+
+## Pack 26: Theatre stage
+
+By mynameismary; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `hs_curtain` | scene.gltf | 16.0 × 11.8 × 0.1 | 376 | hastur |
+
+## Pack 27: Snake statue
+
+By Animex; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `yg_snake` | scene.gltf | 3.5 × 8.0 × 6.4 | 3013 | yig |
+
+## Pack 28: Temple Ruins Asset Pack
+
+By Bl4ckGh0st; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `tr_statue_a` | scene.gltf (Stone_Statue_PoseA_M_Stone1_0) | 1.0 × 2.1 × 1.0 | 900 | gorgon |
+| `tr_statue_b` | scene.gltf (Stone_Statue_PoseB_M_Stone1_0) | 1.5 × 2.1 × 0.6 | 899 | gorgon |
+| `tr_statue_c` | scene.gltf (Stone_Statue_PoseC_M_Stone1_0) | 0.8 × 2.1 × 0.7 | 899 | gorgon |
+| `tr_statue_d` | scene.gltf (Stone_Statue_PoseD_M_Stone1_0) | 0.6 × 2.1 × 1.1 | 900 | gorgon |
+| `tr_statue_e` | scene.gltf (Stone_Statue_M_Stone1_0) | 1.6 × 2.1 × 0.5 | 900 | gorgon |
+| `tr_pillar_tall` | scene.gltf (Stone_Pillar_Tall_M_Stone2_0) | 0.8 × 7.0 × 0.8 | 74 | gorgon |
+| `tr_pillar_tall_b` | scene.gltf (Stone_Pillar_Tall_Broken_M_Stone2_0) | 0.8 × 5.0 × 0.8 | 84 | gorgon |
+| `tr_pillar` | scene.gltf (Stone_Pillar_M_Stone2_0) | 0.8 × 3.5 × 0.8 | 122 | gorgon |
+| `tr_pillar_b` | scene.gltf (Stone_Pillar_Broken_M_Stone2_0) | 0.8 × 2.3 × 0.8 | 160 | gorgon |
+| `tr_pillar_vb` | scene.gltf (Stone_Pillar_Very_Broken_M_Stone2_0) | 0.8 × 1.6 × 0.8 | 160 | gorgon |
+| `tr_arch` | scene.gltf (Stone_Archway_M_Stone1_0) | 2.4 × 2.4 × 0.3 | 68 | gorgon |
+| `tr_arch_b` | scene.gltf (Stone_Archway_Broken_M_Stone1_0) | 1.2 × 2.4 × 0.3 | 54 | gorgon |
+| `tr_wall_win_b` | scene.gltf (Small_Stone_Wall_Window_Broken_M_Stone1_0) | 2.4 × 2.4 × 0.3 | 140 | gorgon |
+| `tr_wall_b` | scene.gltf (Small_Stone_Wall_Plain_Broken_M_Stone1_0) | 2.4 × 1.8 × 0.4 | 68 | gorgon |
+
+## Pack 29: Ancient Ruins (Modular)
+
+By zacharykozak; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `ar_arcade` | scene.gltf | 20.0 × 20.7 × 3.7 | 1499 | bokrug |
+
 ## Made in code: Made in code
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
 | `px_rod` | `proc:rod` | 0.9 × 12.0 × 0.9 | 120 | hutchinson |
 | `px_chimney` | `proc:chimney` | 2.7 × 9.1 × 2.7 | 48 | colour, gorgon, hutchinson |
-| `px_obelisk` | `proc:obelisk` | 2.6 × 12.0 × 2.6 | 42 | azathoth, colossus, cthulhu, nug, othergods, yog |
-| `px_obelisk_s` | `proc:obelisk` | 1.4 × 5.0 × 1.4 | 42 | hastur, nug |
+| `px_obelisk` | `proc:obelisk` | 2.6 × 12.0 × 2.6 | 42 | azathoth, colossus, cthulhu, nug, othergods, yog, zkauba |
+| `px_obelisk_s` | `proc:obelisk` | 1.4 × 5.0 × 1.4 | 42 | nug |
 | `px_fang` | `proc:fang` | 1.0 × 3.0 × 1.8 | 72 | yig |
 | `px_fang_big` | `proc:fang` | 2.2 × 7.1 × 4.5 | 72 | yig |
 | `px_mask` | `proc:mask` | 0.6 × 1.7 × 0.3 | 144 | hastur, yig |
@@ -274,7 +346,6 @@ By Kay Lousberg; licence CC0.
 | `px_mast` | `proc:mast` | 4.5 × 9.0 × 0.9 | 84 | martins |
 | `px_derrick` | `proc:derrick` | 2.1 × 8.0 × 6.0 | 108 | martins |
 | `px_anchor` | `proc:anchor` | 2.0 × 2.7 × 0.3 | 126 | cthulhu, martins |
-| `px_pylon` | `proc:pylon` | 12.6 × 16.0 × 6.0 | 84 | colossus |
 | `px_dune` | `proc:dune` | 12.0 × 3.0 × 8.0 | 132 | colossus, yig |
 | `px_well` | `proc:well` | 2.5 × 3.2 × 2.0 | 212 | colour |
 | `px_brazier` | `proc:brazier` | 0.9 × 1.6 × 0.9 | 152 | bokrug, colossus, hastur, nug, yig |
@@ -285,5 +356,4 @@ By Kay Lousberg; licence CC0.
 | `px_slab` | `proc:slab` | 5.0 × 7.0 × 2.4 | 108 | cthulhu |
 | `px_prism` | `proc:prism` | 3.0 × 6.0 × 2.6 | 60 | ancients, yog |
 | `px_collar` | `proc:collar` | 2.4 × 0.4 × 2.4 | 240 | pipers |
-| `px_mouth` | `proc:mouth` | 1.1 × 1.4 × 0.2 | 60 | pipers |
 

@@ -90,6 +90,8 @@ def bake_one(m, work):
         solids = SO.one_box(pos)
     elif m.solids == 'auto':
         solids = SO.decompose(pos, m.bands)
+    elif m.solids == 'trunk':
+        solids = SO.trunk(pos)
     else:
         solids = [list(b) for b in m.solids]
     solids = [[float(v) for v in b] for b in solids]

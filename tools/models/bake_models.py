@@ -17,30 +17,30 @@ OUT = os.path.join(HERE, '..', '..', 'src', 'data', 'models')
 # (a positive number: its height; a negative: its longest side along the ground), the kits being drawn to no common scale.
 MODELS = {
     # Graveyard Kit
-    'crypt': ('graveyard', 'crypt-large', 0, 3.4), 'crypt_small': ('graveyard', 'crypt-small', 0, 2.6),
+    'crypt_small': ('graveyard', 'crypt-small', 0, 2.6),
     'grave_cross': ('graveyard', 'gravestone-cross-large', 0, 1.5), 'grave_round': ('graveyard', 'gravestone-round', 0, 1.0), 'grave_wide': ('graveyard', 'gravestone-wide', 0, 0.9),
     'grave_broken': ('graveyard', 'gravestone-broken', 0, 0.7),
     'cross': ('graveyard', 'cross', 1, 1.9), 'cross_wood': ('graveyard', 'cross-wood', 1, 1.6),
     'coffin': ('graveyard', 'coffin-old', 0, -2.1), 'altar_stone': ('graveyard', 'altar-stone', 0, -2.4), 'column': ('graveyard', 'column-large', 1, 5.0),
     'urn': ('graveyard', 'urn-round', 1, 0.9), 'iron_fence': ('graveyard', 'iron-fence', 0, -2.2), 'iron_fence_broken': ('graveyard', 'iron-fence-damaged', 0, -2.2),
     'iron_gate': ('graveyard', 'iron-fence-border-gate', 0, -2.4), 'lightpost': ('graveyard', 'lightpost-single', 1, 3.8),
-    'pine_crooked': ('graveyard', 'pine-crooked', 1, 7.0), 'trunk': ('graveyard', 'trunk-long', 0, 3.6),
+    'pine_crooked': ('graveyard', 'pine-crooked', 1, 7.0),
     'rocks_tall': ('graveyard', 'rocks-tall', 1, 2.4), 'candles': ('graveyard', 'candle-multiple', 1, 0.45), 'bench': ('graveyard', 'bench-damaged', 0, -2.0),
     # Pirate Kit
     'wreck': ('pirate', 'ship-wreck', 0, -17), 'rowboat': ('pirate', 'boat-row-small', 0, -4.6), 'barrel': ('pirate', 'barrel', 1, 1.0),
     'chest': ('pirate', 'chest', 0, 0.9), 'rocks_sand_a': ('pirate', 'rocks-sand-a', 1, 4.0), 'rocks_sand_b': ('pirate', 'rocks-sand-b', 1, 4.5),
     # Nature Kit
-    'cactus': ('nature', 'cactus_tall', 1, 3.4), 'canoe': ('nature', 'canoe', 0, -4.4), 'log': ('nature', 'log', 0, -3.2),
+    'log': ('nature', 'log', 0, -3.2),
     'stump_old': ('nature', 'stump_old', 1, 1.2), 'mushroom_tall': ('nature', 'mushroom_redTall', 1, 3.2),
-    'rock_large': ('nature', 'rock_largeA', 1, 2.6), 'rock_tall': ('nature', 'rock_tallA', 1, 4.0), 'plant_bush': ('nature', 'plant_bushLargeTriangle', 1, 1.4),
+    'rock_tall': ('nature', 'rock_tallA', 1, 4.0),
     'statue_obelisk': ('nature', 'statue_obelisk', 1, 5.0), 'statue_column': ('nature', 'statue_columnDamaged', 1, 3.6), 'statue_head': ('nature', 'statue_head', 1, 3.4),
     'lily': ('nature', 'lily_large', 1, -1.4),
-    'statue_ring': ('nature', 'statue_ring', 1, 2.6), 'cliff': ('nature', 'cliff_large_rock', 0, 3.4),
+    'statue_ring': ('nature', 'statue_ring', 1, 2.6),
     # Survival Kit (round 62: the trails)
     'signpost': ('survival', 'signpost', 1, 2.4), 'tent': ('survival', 'tent', 0, 2.6), 'fish': ('survival', 'fish-large', 0, -1.1), 'bedroll': ('survival', 'bedroll', 0, -1.6),
     # Pirate Kit, Graveyard Kit (round 62)
     'flag_pirate': ('pirate', 'flag-pirate-high', 1, 4.2), 'cannon': ('pirate', 'cannon', 0, -1.8), 'crate': ('pirate', 'crate', 0, 0.9),
-    'pumpkin_carved': ('graveyard', 'pumpkin-carved', 1, 0.7), 'lantern': ('graveyard', 'lantern-candle', 1, 0.55), 'skeleton': ('graveyard', 'character-skeleton', 1, 1.7),
+    'lantern': ('graveyard', 'lantern-candle', 1, 0.55), 'skeleton': ('graveyard', 'character-skeleton', 1, 1.7),
     'hay_bale': ('graveyard', 'hay-bale', 0, 1.1), 'shovel_dirt': ('graveyard', 'shovel-dirt', 1, 1.3), 'chalice': ('graveyard', 'detail-chalice', 1, 0.4), 'bowl': ('graveyard', 'detail-bowl', 1, 0.3),
     # Castle Kit
     'wall_ruin': ('castle', 'wall-half', 0, 2.6),

@@ -23,7 +23,7 @@ describe('an arena set (round 61: each horror\'s ground composed from its own st
   });
 
   it('turns each layout about the front: a piece at 0° down the way in, at 180° behind the heart', () => {
-    const set: ArenaSet = { puts: [put('lily', at(1.2, 0), { walk: true }), put('lily', at(0.5, 180), { walk: true })] }; // flat ones, which are walked over
+    const set: ArenaSet = { puts: [put('bedroll', at(1.2, 0), { walk: true }), put('bedroll', at(0.5, 180), { walk: true })] }; // flat ones, which are walked over
     const [frontPiece, back] = arenaSet(set, SITE);
     expect(apart(frontPiece, { x: SITE.x, z: SITE.z - 1.2 * 24 })).toBeLessThan(0.01); // front is toward -z
     expect(apart(back, { x: SITE.x, z: SITE.z + 0.5 * 24 })).toBeLessThan(0.01);
@@ -60,12 +60,12 @@ describe('an arena set (round 61: each horror\'s ground composed from its own st
     const solid = arenaSet(crowded, SITE).filter((p) => propCollider(p));
     expect(solid.length).toBeGreaterThan(5);
     for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++) expect(apart(solid[i], solid[j]) - reach(solid[i]) - reach(solid[j])).toBeGreaterThanOrEqual(SET_RULES.gap);
-    const wall: ArenaSet = { puts: [put('wall_ruin', ring(1.0, 24, { arc: [30, 330] }), { join: true })] };
+    const wall: ArenaSet = { puts: [put('hedge', ring(1.0, 24, { arc: [30, 330] }), { join: true })] };
     expect(arenaSet(wall, SITE).length).toBeGreaterThan(solid.length / 2);
   });
 
   it('stands what is walked over without a collider', () => {
-    const set: ArenaSet = { puts: [put('lily', at(0, 0), { size: 8, walk: true }), put('lily', scatter(6, [0.3, 0.9]), { walk: true })] };
+    const set: ArenaSet = { puts: [put('bedroll', at(0, 0), { size: 8, walk: true }), put('bedroll', scatter(6, [0.3, 0.9]), { walk: true })] };
     for (const p of arenaSet(set, SITE)) expect(propCollider(p)).toBeNull();
   });
 });
@@ -96,7 +96,7 @@ describe('the sets of the open arenas', () => {
   });
 
   it('use no baked model that no arena stands, nor stand one not baked (no dead weight in the bundle)', () => {
-    const used = new Set([...Object.values(ARENA_SETS).flatMap((s) => s.puts.map((p) => p.piece.of)), ...Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece.of))]); // (round 62: a trail's marks stand them too)
+    const used = new Set([...Object.values(ARENA_SETS), ...Object.values(HALL_SETS)].flatMap((s) => s.puts.map((p) => p.piece.of)).concat(Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece.of)))); // (round 62: a trail's marks stand them too; round 72: and the boss halls' sets, now that the open arenas keep few)
     for (const a of w.arenas) for (const p of a.house?.props ?? []) if (p.set) used.add(p.set.id); // (round 71: and a place's planner, world/places)
     const unused = Object.keys(MODEL_INFO).filter((id) => !used.has(id));
     expect(unused, 'baked but stood nowhere').toEqual([]);

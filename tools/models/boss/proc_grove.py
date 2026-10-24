@@ -1,5 +1,5 @@
 """Forms of the places of the living, the buried and the leaning (round 71; proc.py's helpers, `M(src='proc:<name>', args={...})`): a hedge of grown-together
-trunks, a pod, an arching root, a length of serpent, a cyclopean leaning slab, a pale hexagonal prism, a bone collar and a flute's mouth. Same frame and rules as
+trunks, a pod, an arching root, a length of serpent, a cyclopean leaning slab, a pale hexagonal prism, a bone collar. Same frame and rules as
 proc.py (x right, y up, z front); offline only; their licence is this repository's."""
 import math
 import numpy as np
@@ -117,11 +117,4 @@ def collar(radius=0.9, **_):
         ellipsoid(s, (math.cos(a) * radius * 1.2, 0.21, math.sin(a) * radius * 1.2), (0.16, 0.2, 0.16), 3, 5, (0.9, 0.86, 0.74), S.BONE)
     return s.out(67)
 
-def mouth(width=0.7, height=1.1, **_):
-    """The opening of a flute cut in a pipe's side: a dark arch with a lip of bone about it, to be stood against the shaft."""
-    s = Shape()
-    box(s, width * 1.5, height * 1.25, 0.1, at=(0, 0, 0), col=BONE, cls=S.BONE, taper=0.8)
-    ellipsoid(s, (0, height * 0.55, 0.06), (width * 0.5, height * 0.52, 0.12), 4, 8, (0.06, 0.05, 0.07), S.METAL)
-    return s.out(71)
-
-PROC = dict(hedge=hedge, pod=pod, root=root, serpent=serpent, slab=slab, prism=prism, collar=collar, mouth=mouth)
+PROC = dict(hedge=hedge, pod=pod, root=root, serpent=serpent, slab=slab, prism=prism, collar=collar)

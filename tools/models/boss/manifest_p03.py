@@ -11,9 +11,6 @@ def st(id, sel, classes, decimate, **kw):
     return M(id, BLEND, sel, kit='p03', classes=classes, decimate=decimate, fit=kw.pop('fit', {'scale': 1.0}), **kw)
 
 add(
-    st('st_dead_6', 'DeadTree_6', TREE, 600, solids='box', round=True),
-    st('st_dead_8', 'DeadTree_8', TREE, 700, solids='box', round=True),
-    st('st_dead_10', 'DeadTree_10', TREE, 600, solids='box', round=True),
     st('st_maple_3', 'MapleTree_3', TREE, 900, solids='box', round=True),
     st('st_rock_1', 'Rock_1', ROCK, 160, solids='box', round=True),
     st('st_rock_3', 'Rock_3', ROCK, 200, solids='box', round=True),

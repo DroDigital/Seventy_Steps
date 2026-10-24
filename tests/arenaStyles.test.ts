@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ARENA_STYLES, MIN_ARENA } from '../src/data/arenaStyles';
 import { ENTITIES } from '../src/data/registry';
-import { propCollider, type Prop } from '../src/world/props';
+import { propCollider, propColliders, type Prop } from '../src/world/props';
 import { worldLayout } from '../src/world/placements';
 import { colliderBounds } from '../src/world/colliders';
 
@@ -45,10 +45,10 @@ describe('boss grounds', () => {
     for (const s of w.spawns.filter((x) => x.id.startsWith('boss:'))) {
       const props = [...w.dungeons.flatMap((d) => d.decor), ...w.arenas.flatMap((a) => a.decor)];
       for (const p of props) {
-        const c = propCollider(p);
-        if (!c) continue;
-        const b = colliderBounds(c);
-        if (s.at.x > b.x0 - 1.5 && s.at.x < b.x1 + 1.5 && s.at.z > b.z0 - 1.5 && s.at.z < b.z1 + 1.5) bad.push(`${s.id} stands in its ${p.kind}`);
+        for (const c of propColliders(p)) { // (round 72: a model's own solids, not the box about a pylon and the gate between its towers)
+          const b = colliderBounds(c);
+          if (s.at.x > b.x0 - 1.5 && s.at.x < b.x1 + 1.5 && s.at.z > b.z0 - 1.5 && s.at.z < b.z1 + 1.5) bad.push(`${s.id} stands in its ${p.kind}`);
+        }
       }
     }
     expect(bad).toEqual([]);

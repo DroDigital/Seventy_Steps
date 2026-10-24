@@ -9,7 +9,7 @@ import type { Collider } from '../src/world/colliders';
 import { toBoxFrame } from '../src/world/colliders';
 import { allFogs } from '../src/systems/fogGates';
 import { worldLayout } from '../src/world/placements';
-import { propCollider } from '../src/world/props';
+import { propCollider, propColliders } from '../src/world/props';
 import { setPieces } from '../src/render/setShapes';
 import { createRng } from '../src/core/rng';
 import { propAt } from '../src/world/props';
@@ -63,7 +63,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
       expect(along * 2).toBeCloseTo(d.width + HOUSE.lap * 2, 5);
       expect(across * 2).toBeCloseTo(d.thick, 5);
       expect(seal[5] - seal[4]).toBeGreaterThanOrEqual(d.height);
-      const cols = plan.props.map(propCollider).filter((c): c is Collider => !!c && (c.kind === 'box' ? c.min.y : c.y0) < d.height); // (a gatehouse's span stands over the opening, clear above any body)
+      const cols = plan.props.flatMap(propColliders).filter((c): c is Collider => (c.kind === 'box' ? c.min.y : c.y0) < d.height); // (round 72: a model's own solids, the two towers of a pylon and not the box about them and the gate between) // (a gatehouse's span stands over the opening, clear above any body)
       for (let s = -d.width / 2 + HOUSE.lap + 0.1; s <= d.width / 2 - HOUSE.lap - 0.1; s += 0.4) {
         const [x, z] = [plan.gate.x + (d.alongX ? s : 0), plan.gate.z + (d.alongX ? 0 : s)];
         expect(cols.some((c) => inside(c, x, z)), `${a.bosses[0]}: a piece in the gate`).toBe(false);
