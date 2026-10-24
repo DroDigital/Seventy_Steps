@@ -6,6 +6,7 @@
 
 import { BEYOND_DOCUMENTS } from './documentsBeyond';
 import { HOUSE_DOCUMENTS } from './documentsHouses';
+import { OUTER_DOCUMENTS } from './documentsOuter';
 
 export interface Document {
   kind: 'tome' | 'note';
@@ -242,6 +243,7 @@ export const DOCUMENTS: Readonly<Record<string, Document>> = {
   ),
   ...HOUSE_DOCUMENTS, // round 63: the pages in the courts of the horrors' houses
   ...BEYOND_DOCUMENTS,
+  ...OUTER_DOCUMENTS, // round 73: the pages in the dimensions of the Outer Dark
 };
 
 /** The notes' places, by region (metres from the region's south-west corner, like sites.ts). */
@@ -259,4 +261,10 @@ export const NOTE_SITES: Readonly<Record<string, readonly (readonly [name: strin
   rlyeh: [["A Cultist's Chalk", 128, 88], ['Notice to Mariners', 318, 172]],
   yuggoth: [['A Surgical Chart', 98, 282], ['Cylinder Labels', 300, 254]],
   beyond: [["Carter's Pocket Notebook", 224, 78], ["Erich Zann's Score", 120, 242]],
+  cloud_summit: [["Barzai's Last Page", 70, 260], ["Atal's Warning", 420, 190]],
+  black_wood: [["A Drover's Tally", 90, 210], ["Akeley's Postscript", 440, 370]],
+  pale_lattice: [["Carter's Margin", 130, 300], ['Inscription on a Prism', 400, 230]],
+  piping_dark: [["A Bandmaster's Complaint", 70, 340], ['A Finger-Chart for a Tune Without End', 280, 160]],
+  spheres: [['A Leaf of the Gate', 90, 270], ["Wilbur's Cipher", 430, 210]],
+  court_centre: [["A Night-Gaunt's Tally", 70, 210], ["The Court's Roll", 450, 200]],
 };

@@ -45,6 +45,13 @@ export const FOGS: Readonly<Record<string, FogDef>> = {
   rlyeh: fog(0.05, 2.2, 'rlyeh', 0.5, { haze: 0.004, moon: 0.6, wind: [0.9, 0.6] }), // green sea-mist over the drowned city
   yuggoth: fog(0.045, 1.8, 'yuggoth', 0.75, { haze: 0.004, moon: 0, wind: [0.2, 0.3] }), // drifting fungal spores
   beyond: fog(0.04, 2.5, 'beyond', 0.55, { haze: 0.004, moon: 0, wind: [0.15, 0.1] }), // the void's own haze
+  // The Outer Dark (round 73): the mist is each dimension's matter, low, so that the sky it is under (render/skyCosmos.ts) is clear above it
+  cloud_summit: fog(0.06, 1.2, 'cloud_summit', 0.35, { haze: 0.002, moon: 1, wind: [0.9, 0.2] }), // the cloud-sea's edge, curling at the ankle
+  black_wood: fog(0.05, 2, 'black_wood', 0.7, { haze: 0.004, moon: 0, wind: [0.1, -0.1] }), // a breath, red in the dark
+  pale_lattice: fog(0.035, 2.5, 'pale_lattice', 0.2, { haze: 0.003, moon: 0.5, wind: [0, 0] }), // a still pale air: time does not stir it
+  piping_dark: fog(0.05, 2, 'piping_dark', 0.8, { haze: 0.004, moon: 0, wind: [0.5, 0.4] }), // swirling to a tune
+  spheres: fog(0.04, 1.6, 'spheres', 0.5, { haze: 0.003, moon: 0.3, wind: [0.3, -0.3] }), // the oil-bright haze between the globes
+  court_centre: fog(0.045, 1.4, 'court_centre', 0.6, { haze: 0.004, moon: 0, wind: [0.6, 0.6] }), // hot ash and embers' smoke
 };
 
 /** A dungeon's roofed rooms: a thin crypt-mist over the floor, a dark of the realm's own colour. */

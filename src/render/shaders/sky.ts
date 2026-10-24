@@ -5,8 +5,10 @@
  * roofs, trees and hills stand against it as silhouettes), stars that twinkle, slow cloud, and the
  * moon itself with its maria and halo. Round 34: the Milky Way, a band of star-dust across it; over
  * the cold realms the aurora, curtains of pale light low in the north; and now and then a falling
- * star. The post pass grades and dithers it like everything else.
+ * star. The post pass grades and dithers it like everything else. Round 73: the Outer Dark's dimensions hang their own things in it (skyCosmos.ts).
  */
+
+import { COSMOS_GLSL } from './skyCosmos';
 
 export const SKY_VERT = /* glsl */ `
 varying vec3 vDir;
@@ -89,6 +91,8 @@ float meteor(vec3 d, float t) {
   return line * mix(0.2, 1.0, u) * sin(3.14159 * k);
 }
 
+${COSMOS_GLSL}
+
 void main() {
   vec3 d = normalize(vDir);
   float h = d.y;
@@ -98,6 +102,7 @@ void main() {
   float glow = exp(-rise * 7.0) * (0.35 + 0.65 * toward * toward);
   vec3 col = mix(uHorizon, uZenith, pow(smoothstep(0.0, 0.85, rise), 0.7));
   col += uMoonColor * (0.16 * uHaze) * glow; // the moon's quarter shines low on the sky
+  if (uNebula > 0.001) col += nebula(d, uTime) * uNebula * smoothstep(-0.02, 0.3, h); // gas behind the stars (the Outer Dark)
 
   float lift = smoothstep(0.0, 0.18, h); // cloud and stars thin out toward the horizon
   vec2 cp = d.xz / (rise + 0.12) * 0.9 + vec2(uTime * 0.006, uTime * 0.0025);
@@ -115,8 +120,12 @@ void main() {
   float a = acos(clamp(dot(d, m), -1.0, 1.0));
   float clear = lift * (1.0 - cloud) * smoothstep(0.0, 0.2, h);
   col += vec3(0.55, 0.6, 0.78) * milkyWay(d) * 0.14 * uMilky * clear * (1.0 - 0.8 * exp(-a * 2.5)); // the moon washes it out near itself
-  col += aurora(d, uTime) * 0.42 * uAurora * clear;
+  col += aurora(d, uTime) * uAuroraTint * 0.42 * uAurora * clear;
   col += vec3(1.0, 0.97, 0.9) * meteor(d, uTime) * 0.95 * clear;
+  if (uLattice > 0.001) col = mix(col, lattice(d, uTime, col), uLattice);
+  if (uStaff > 0.001) col = mix(col, staff(d, uTime, col), uStaff);
+  if (uOrbs > 0.001) col = mix(col, orbs(d, uTime, col), uOrbs);
+  if (uHole > 0.001) col = mix(col, hole(d, uTime, col), uHole);
   if (uMoon > 0.0) {
     vec3 t1 = normalize(cross(m, vec3(0.0, 1.0, 0.0)));
     vec3 t2 = cross(t1, m);
@@ -129,6 +138,8 @@ void main() {
   }
   vec3 cloudCol = mix(mix(uHorizon, uZenith, 0.4) * 0.9, uMoonColor * 0.4, exp(-a * 3.0) * step(0.001, uMoon)); // silvered near the moon
   col = mix(col, cloudCol, cloud * 0.85);
+  if (uStorm > 0.001) col = mix(col, storm(d, uTime, col), uStorm);
+  if (uCanopy > 0.001) col = mix(col, canopy(d, uTime, col), uCanopy);
   col += vec3(0.8, 0.85, 1.0) * uFlash * (0.5 + 0.5 * exp(-rise * 3.0));
   if (h < 0.0) col = uFogColor;
   gl_FragColor = vec4(mix(uFogColor, col, uOpen), 1.0);

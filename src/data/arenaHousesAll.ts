@@ -3,5 +3,6 @@
 import type { House } from './arenaHouses';
 import { BEYOND_HOUSES } from './arenaHousesBeyond';
 import { EARTH_HOUSES } from './arenaHousesEarth';
+import { OUTER_HOUSES } from './arenaOuter';
 
-export const ARENA_HOUSES: Readonly<Record<string, House>> = { ...EARTH_HOUSES, ...BEYOND_HOUSES };
+export const ARENA_HOUSES: Readonly<Record<string, House>> = { ...EARTH_HOUSES, ...BEYOND_HOUSES, ...OUTER_HOUSES };

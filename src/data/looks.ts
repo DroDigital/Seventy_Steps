@@ -133,6 +133,37 @@ export const LOOKS: Record<string, Look> = {
     grade: ['#050512', '#262654', '#7484c0', '#ffffff'], native: 0.58, accents: ['#6a6ad8', '#a0e0ea'], mist: '#3c3c88',
     sky: ['#7070a0', '#03030e'], ambient: ['#8080b0', 0.4], moon: ['#a8b0f0', 0.7], far: '#2c2c3c', glow: 0.8,
   }),
+  // The Outer Dark (round 73): six dimensions beyond the Ultimate Void, each stranger than the one before, each the colour of the god who keeps it.
+  // The Cloud Summit: a sea of cloud lit gold under a pale moon, a bruise-black sky above (the Other Gods, on Hatheg-Kla's peak taken up out of the earth).
+  cloud_summit: look({
+    grade: ['#100e04', '#58461a', '#c7b447', '#f9f1a3'], native: 0.56, accents: ['#e8c868', '#7c8ca0'], mist: '#b8aa88',
+    sky: ['#e0c890', '#101420'], ambient: ['#c0b090', 0.56], moon: ['#fff0c8', 1.1], far: '#2c2a3a', glow: 1.4,
+  }),
+  // The Black Wood: oxblood and the dark of a gullet; the light is the colour of the inside of a hand held against a lamp.
+  black_wood: look({
+    grade: ['#110202', '#500c0a', '#8b2a2b', '#f88c7e'], native: 0.6, accents: ['#c85a40', '#3a1c14'], mist: '#5c2424',
+    sky: ['#6a3428', '#0c0606'], ambient: ['#a06050', 0.5], moon: ['#c88870', 0.8], far: '#160c0a', glow: 0.8,
+  }),
+  // The Pale Lattice: bleached, lilac-white, no shadow worth the name; time stilled between the prisms.
+  pale_lattice: look({
+    grade: ['#140f15', '#735a7f', '#d9b5e1', '#fef2ff'], native: 0.5, accents: ['#e0c8f0', '#a8d8e0'], mist: '#c8c4d8',
+    sky: ['#d8d0e8', '#26242e'], ambient: ['#c8c0d8', 0.62], moon: ['#ffffff', 1.2], far: '#4a4658', glow: 1.1,
+  }),
+  // The Piping Dark: a dark with a sick lime in it, as of a thing that is heard and not seen.
+  piping_dark: look({
+    grade: ['#0b0d05', '#2a3113', '#627c35', '#bdf493'], native: 0.58, accents: ['#c8d070', '#586028'], mist: '#525428',
+    sky: ['#2a2c18', '#050604'], ambient: ['#707448', 0.4], moon: ['#d0d49c', 0.6], far: '#14160c', glow: 0.5,
+  }),
+  // The Gate of Spheres: oil on black water, pearl and teal, a light with no source.
+  spheres: look({
+    grade: ['#031316', '#04414a', '#4cacbd', '#dcf4fb'], native: 0.58, accents: ['#80e0e8', '#e8a8d0'], mist: '#2a5a68',
+    sky: ['#7fa8c8', '#08101e'], ambient: ['#70a8c0', 0.5], moon: ['#d8f0ff', 0.9], far: '#10222c', glow: 1,
+  }),
+  // The Court at the Centre: black, and a white heat in the middle of it that is not light; red where it burns the edge of things.
+  court_centre: look({
+    grade: ['#14020a', '#310515', '#bd2b66', '#f4dee2'], native: 0.5, accents: ['#ff4a58', '#f0e0d0'], mist: '#6a3038',
+    sky: ['#c8b0a0', '#040204'], ambient: ['#a88c88', 0.45], moon: ['#fff0e8', 1.0], far: '#100808', glow: 1.3,
+  }),
 };
 
 /** The look where no realm holds (the combat arena, the look test): the hub's. */

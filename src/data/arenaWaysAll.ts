@@ -3,5 +3,6 @@
 import type { Way } from './arenaWays';
 import { BEYOND_WAYS } from './arenaWaysBeyond';
 import { EARTH_WAYS } from './arenaWaysEarth';
+import { OUTER_WAYS } from './arenaOuter';
 
-export const ARENA_WAYS: Readonly<Record<string, Way>> = { ...EARTH_WAYS, ...BEYOND_WAYS };
+export const ARENA_WAYS: Readonly<Record<string, Way>> = { ...EARTH_WAYS, ...BEYOND_WAYS, ...OUTER_WAYS };

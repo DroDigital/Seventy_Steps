@@ -29,9 +29,9 @@ function near(c: Collider, x: number, z: number): number {
   return Math.hypot(Math.max(Math.abs(lx) - c.hx, 0), Math.max(Math.abs(lz) - c.hz, 0));
 }
 
-describe('the nineteen boss places', () => {
-  it('stand about every one of the nineteen open arenas, and each of them has the packs in it', () => {
-    expect(new Set(BOSSES).size).toBe(19);
+describe('the twenty boss places', () => {
+  it('stand about every one of the twenty open arenas (round 73 added the hall of Nyarlathotep), and each of them has the packs in it', () => {
+    expect(new Set(BOSSES).size).toBe(20);
     for (const boss of BOSSES) {
       const a = arenaOf(boss);
       expect(a, boss).toBeTruthy();

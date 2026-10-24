@@ -3,5 +3,6 @@
 import type { ArenaSet } from './arenaSets';
 import { BEYOND_SETS } from './arenaSetsBeyond';
 import { EARTH_SETS } from './arenaSetsEarth';
+import { OUTER_SETS } from './arenaOuter';
 
-export const ARENA_SETS: Readonly<Record<string, ArenaSet>> = { ...EARTH_SETS, ...BEYOND_SETS };
+export const ARENA_SETS: Readonly<Record<string, ArenaSet>> = { ...EARTH_SETS, ...BEYOND_SETS, ...OUTER_SETS };

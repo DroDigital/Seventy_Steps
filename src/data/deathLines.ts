@@ -101,6 +101,12 @@ export const FRAGMENTS: Readonly<Record<string, readonly string[]>> = {
   rlyeh: ['The angles of R’lyeh are wrong in a way the eye accepts, and the mind does not. It has been building a reason.', 'In his house at R’lyeh dead Cthulhu waits dreaming. You are very nearly in the dream.'],
   yuggoth: ['The towers of Yuggoth have no windows. They do not need them, for they are looking out already.', 'The spores drift up from the river. Each one, for a moment, is a small white face.'],
   beyond: ['Beyond the Gate there is no place to die in, and no way to be otherwise. You are not there, yet.', 'The piping goes on. It has been going on since before the first night, and will go on after the last.'],
+  cloud_summit: ['The cloud is a floor until it is not. You were told this by a man who has not come down.', 'The Other Gods dance, and what they dance on gives way for nobody in particular.'],
+  black_wood: ['The wood has taken you for one of its own, which is to say that it has begun to count you.', 'Something in the dark was glad of you. It is the only thing here that has ever been glad.'],
+  pale_lattice: ['An hour in this place does not pass. Yours did not. It is still the hour you fell in, and you are still falling.', 'Every facet remembers you, a little differently each time.'],
+  piping_dark: ['The piping is thin and monotonous, and you had begun to move to it. That was the last of you.', 'You hoped to live in a rest between two notes. There is none.'],
+  spheres: ['The gate does not close behind you. It was never open; you are only no longer on the near side.', 'Past, present and future are one in him. In him you have already fallen, and are falling, and will.'],
+  court_centre: ['At the centre of everything there is a sound, and a blind thing beating time to it. You gave it the one beat it lacked.', 'The Crawling Chaos shook your hand at the door. It was precisely the temperature of your own.'],
 };
 
 /** Said when nothing more particular can be. */

@@ -190,9 +190,9 @@ export const POI = {
    */
   gifts: [
     { at: 6, stones: 1, levels: 1 },
-    { at: 15, stones: 1, levels: 2 },
-    { at: 30, stones: 2, levels: 3 },
-    { at: 50, stones: 2, levels: 4 },
-    { at: 70, stones: 3, levels: 6 },
+    { at: 17, stones: 1, levels: 2 },
+    { at: 35, stones: 2, levels: 3 },
+    { at: 60, stones: 2, levels: 4 },
+    { at: 88, stones: 3, levels: 6 }, // (round 73: the Outer Dark's eighteen made it eighty-eight; the thresholds were 6, 15, 30, 50 and 70)
   ] as readonly { at: number; stones: number; levels: number }[],
 };

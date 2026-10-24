@@ -263,7 +263,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('zin_span', 'bridge', 'zin', 'e'),
       stair('kadath_climb', 'zin_span', 'e', 6),
       room('kadath', 'hall', 'kadath_climb', 'e', {
-        wide: true, boss: ['great_ones', 'nyarlathotep'], gate: { id: 'dream_ultimate', name: 'The Ultimate Gate', to: 'beyond_gate' },
+        wide: true, boss: ['great_ones'], gate: { id: 'dream_ultimate', name: 'The Ultimate Gate', to: 'beyond_gate' },
         hidden: { minSeals: SEALS.kadath }, // the Great Ones' door: sealed until the waking world's horrors fall (round 12)
       }),
     ],

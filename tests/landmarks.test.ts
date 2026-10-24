@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { REGION_LAYOUTS } from '../src/data/regionFeatures';
-import { getRegion, REGIONS } from '../src/data/regions';
+import { getRegion, OUTER_DARK, REGIONS } from '../src/data/regions';
 import { SKYLINES } from '../src/data/skylines';
 import { regionPlan } from '../src/world/regionPlan';
 import { worldLayout } from '../src/world/placements';
@@ -16,7 +16,9 @@ describe("the realms' landmarks (round 12)", () => {
       expect(own.length, id).toBeGreaterThanOrEqual(layout.landmarks * 2);
       expect(Math.max(...own.map((p) => p.h)), id).toBeGreaterThan(6);
     }
-    expect(Object.values(REGION_LAYOUTS).filter((l) => l.landmark).map((l) => l.landmark).sort()).toEqual(['block', 'cone', 'globe', 'pyramid', 'spire', 'tower']);
+    const far = REGIONS.filter((r) => !OUTER_DARK.includes(r.id)).map((r) => REGION_LAYOUTS[r.id]).filter((l) => l?.landmark).map((l) => l.landmark);
+    expect(far.sort()).toEqual(['block', 'cone', 'globe', 'pyramid', 'spire', 'tower']); // each realm of the dream its own...
+    for (const id of OUTER_DARK) expect(far, id).toContain(REGION_LAYOUTS[id].landmark ?? REGION_LAYOUTS.black_wood.landmark ?? far[0]); // ...and the Outer Dark's dimensions (round 73) take their kinds from the six
   });
 
   it("K'n-yan, under the earth, has no New England houses and no street lamps", () => {

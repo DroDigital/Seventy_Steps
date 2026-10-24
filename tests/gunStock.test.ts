@@ -107,7 +107,7 @@ describe('rounds are found and bought (round 22)', () => {
     expect(new Set(boxes.map((b) => b.name)).size).toBe(boxes.length);
     const total = boxes.reduce((n, b) => n + b.rounds!, 0);
     expect(total).toBeGreaterThan(100); // enough to be found around the map...
-    expect(total).toBeLessThan(350); // ...and few enough to be spent wisely
+    expect(total).toBeLessThan(400); // ...and few enough to be spent wisely (round 73: the Outer Dark's twelve notes each have a box beside them, 48 rounds; it was 350)
   });
 });
 

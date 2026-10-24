@@ -8,6 +8,7 @@
  */
 
 import * as THREE from 'three';
+import { cosmosOf } from '../data/cosmos';
 import { FX, LIGHT, RENDER, SKY, type SkyDef } from '../data/tuning';
 import type { RealmLook } from './realmLook';
 import { SKY_FRAG, SKY_VERT } from './shaders/sky';
@@ -38,6 +39,16 @@ export function createSky(look: RealmLook): Sky {
     uMilky: { value: start.milky },
     uAurora: { value: start.aurora },
     uMeteors: { value: start.meteors },
+    uNebula: { value: 0 },
+    uNebA: { value: new THREE.Vector3() },
+    uNebB: { value: new THREE.Vector3() },
+    uStorm: { value: 0 },
+    uCanopy: { value: 0 },
+    uLattice: { value: 0 },
+    uStaff: { value: 0 },
+    uOrbs: { value: 0 },
+    uHole: { value: 0 },
+    uAuroraTint: { value: new THREE.Vector3(1, 1, 1) },
     uOpen: { value: 1 },
     uWrong: { value: 0 },
     uFlash: { value: 0 },
@@ -47,8 +58,11 @@ export function createSky(look: RealmLook): Sky {
   mesh.renderOrder = -1000;
   mesh.frustumCulled = false;
   let last = 0;
+  let clock = 0; // the sky's own time: it runs slower where time is stopped (the Pale Lattice), and does not jump when it does
+  let still = 0;
   const was = new THREE.Vector3();
   const ease = (x: { value: number }, to: number, k: number): void => void (x.value += (to - x.value) * k);
+  const easeVec = (x: { value: THREE.Vector3 }, to: readonly [number, number, number], k: number): void => void x.value.set(x.value.x + (to[0] - x.value.x) * k, x.value.y + (to[1] - x.value.y) * k, x.value.z + (to[2] - x.value.z) * k);
   return {
     mesh,
     strange(amount) {
@@ -70,12 +84,25 @@ export function createSky(look: RealmLook): Sky {
       ease(u.uMilky, want.milky, k);
       ease(u.uAurora, want.aurora, k);
       ease(u.uMeteors, want.meteors, k);
+      const cosmos = cosmosOf(region);
+      ease(u.uNebula, cosmos.nebula, k);
+      easeVec(u.uNebA, cosmos.nebA, k);
+      easeVec(u.uNebB, cosmos.nebB, k);
+      ease(u.uStorm, cosmos.storm, k);
+      ease(u.uCanopy, cosmos.canopy, k);
+      ease(u.uLattice, cosmos.lattice, k);
+      ease(u.uStaff, cosmos.staff, k);
+      ease(u.uOrbs, cosmos.orbs, k);
+      ease(u.uHole, cosmos.hole, k);
+      easeVec(u.uAuroraTint, cosmos.aurora, k);
+      still += (cosmos.still - still) * k;
       ease(u.uOpen, enclosed ? 0 : 1, Math.min(1, dt / SKY.close));
       u.uFogColor.value.set(...look.now.haze); // the realm's, already eased (render/realmLook.ts)
       u.uHorizon.value.set(...look.now.horizon);
       u.uZenith.value.set(...look.now.zenith);
       u.uMoonColor.value.set(...look.now.moonColor);
-      u.uTime.value = time;
+      clock += dt * (1 - still);
+      u.uTime.value = clock;
     },
   };
 }

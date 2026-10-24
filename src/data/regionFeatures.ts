@@ -59,4 +59,11 @@ export const REGION_LAYOUTS: Readonly<Record<string, RegionLayout>> = {
   rlyeh: layout('slab', 5, [], { ruins: 7, circles: 3, outcrops: 3, camps: 3, landmarks: 5, landmark: 'spire', waymarks: 6 }),
   yuggoth: layout('slab', 5, [], { ruins: 5, circles: 3, outcrops: 4, camps: 4, landmarks: 5, landmark: 'tower', waymarks: 6 }),
   beyond: layout('slab', 4, [], { circles: 5, ruins: 3, outcrops: 2, camps: 2, landmarks: 6, landmark: 'globe', waymarks: 4 }),
+  // The Outer Dark (round 73): sparse, each of its own matter
+  cloud_summit: layout('snow', 3.5, [], { circles: 2, ruins: 3, outcrops: 4, camps: 2, landmarks: 3, landmark: 'cone', waymarks: 4 }),
+  black_wood: layout('mud', 3, [], { groves: 8, graveyards: 1, circles: 2, ruins: 2, outcrops: 2, camps: 3, pines: true, copses: 30, waymarks: 3 }),
+  pale_lattice: layout('slab', 4, [], { circles: 3, ruins: 4, outcrops: 3, camps: 2, landmarks: 5, landmark: 'pyramid', waymarks: 4 }),
+  piping_dark: layout('slab', 3.5, [], { circles: 3, ruins: 3, outcrops: 3, camps: 3, landmarks: 4, landmark: 'tower', waymarks: 3 }),
+  spheres: layout('slab', 4, [], { circles: 4, ruins: 3, outcrops: 2, camps: 2, landmarks: 5, landmark: 'globe', waymarks: 4 }),
+  court_centre: layout('slab', 4, [], { circles: 2, ruins: 3, outcrops: 2, camps: 2, landmarks: 4, landmark: 'block', waymarks: 3 }),
 };

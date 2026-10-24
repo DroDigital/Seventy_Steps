@@ -9,7 +9,7 @@ import { ph, phases, scripted, st, tier } from './kit';
 
 export const OUTER_GODS = tier('outer_god', [
   {
-    id: 'azathoth', name: 'Azathoth', source: 'The Dream-Quest of Unknown Kadath', regions: ['beyond'], canonLooks: false, voice: 'pipes',
+    id: 'azathoth', name: 'Azathoth', source: 'The Dream-Quest of Unknown Kadath', regions: ['court_centre'], canonLooks: false, voice: 'pipes',
     assembly: { body: 'mound', palette: 'charcoal', scale: 30, tentacles: 12, eyes: 0, glow: 'purple' },
     ...scripted('boss', phases(
       // Blind: nothing it does is aimed. The piping swells and the dark comes; its blows fall only where it hears (signatures/azathoth.ts; round 12).
@@ -20,19 +20,19 @@ export const OUTER_GODS = tier('outer_god', [
     stats: st(6700, 5000, 150, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5,
   },
   {
-    id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['beyond'], canonLooks: false, voice: 'pipes',
+    id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['piping_dark'], canonLooks: false, voice: 'pipes',
     sprite: { silhouette: 'spectre', palette: 'charcoal', scale: 2.8, eyes: 0, glow: 'purple' },
     ...scripted('caster', phases(ph(1, { roar: 2, projectile: 1, barrage: 1 }), ph(0.5, { roar: 1, projectile_fan: 2, darkness: 1, barrage: 2 }, { hooks: ['camera_warp'] }))),
     stats: st(3200, 300, 86, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4,
   },
   {
-    id: 'other_gods', name: 'The Other Gods', source: 'The Other Gods', regions: ['beyond', 'dreamlands'], canonLooks: false,
+    id: 'other_gods', name: 'The Other Gods', source: 'The Other Gods', regions: ['cloud_summit'], canonLooks: false,
     sprite: { silhouette: 'spectre', palette: 'pallid', scale: 6, eyes: 0, tentacles: 4, glow: 'magenta' },
     ...scripted('brute', phases(ph(1, { slam: 2, roar: 1, aoe_ring: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, aoe_ring: 1, roar: 1, quake: 1, eruption: 1 }, { hooks: ['darkness'] }))),
     stats: st(3250, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4,
   },
   {
-    id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['beyond'], canonLooks: true,
+    id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['spheres'], canonLooks: true,
     assembly: {
       body: 'spheres', palette: 'pallid', scale: 20, spheres: 14, glow: 'green',
       hit: [[0.01, 0.718, 0.092], [-0.184, 0.544, 0.175], [0.199, 0.544, 0.165], [0.01, 0.398, 0.218], [-0.262, 0.223, 0.18], [0.248, 0.228, 0.184], [0, 0.107, 0.107]], // fitted to the front view's painted spheres: across from the picture's middle, up from the physical sphere cluster's foot, which the renderer grounds through REVIEWED_GROUND
@@ -55,22 +55,22 @@ export const OUTER_GODS = tier('outer_god', [
     stats: st(3650, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
   },
   {
-    id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
+    id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['pale_lattice'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'pallid', scale: 3.2, eyes: 0, gear: ['cowl'] },
     ...scripted('stationary_horror', phases(ph(1, { gaze: 2, roar: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, roar: 1, beam: 1, barrage: 1 }, { hooks: ['time_skip'] }))),
     stats: st(2850, 1000, 80, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4,
   },
   {
-    id: 'shub_niggurath', name: 'Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['dunwich'], canonLooks: false,
+    id: 'shub_niggurath', name: 'Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['black_wood'], canonLooks: false,
     assembly: { body: 'mound', palette: 'rubber', scale: 18, tentacles: 12, eyes: 8 },
     ...scripted('boss', phases(
       ph(1, { tentacle_burst: 2, charge: 1, pool: 1, summon: 1, eruption: 1, toxic_cloud: 1, crushing_blow: 1 }, { summons: ['thousand_young'], arena: 'roots' }),
       ph(0.5, { tentacle_burst: 2, pool: 2, charge: 1, summon: 1, roar: 1, tentacle_rise: 1, toxic_cloud: 1, vortex: 1, crushing_blow: 1 }, { summons: ['thousand_young'], hooks: ['darkness'] }),
     )),
-    stats: st(3100, 3000, 36, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
+    stats: st(3100, 3000, 41, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 73: damage 36 to 41: she is met in the Black Wood, the last ring, so a person at the cap has outgrown her less and the bot lost 0.35 lives of her at it, under the 0.4 floor; round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
   },
   {
-    id: 'nyarlathotep', name: 'Nyarlathotep', source: 'Nyarlathotep', regions: ['dreamlands', 'beyond'], canonLooks: true,
+    id: 'nyarlathotep', name: 'Nyarlathotep', source: 'Nyarlathotep', regions: ['court_centre'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'sand', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat', 'chain'] },
     ...scripted('boss', phases(
       ph(1, { projectile: 2, teleport: 1, summon: 1, beam: 1, thunderfall: 1, great_mark: 1 }, { summons: ['night_gaunt'], hooks: ['decoys'] }),

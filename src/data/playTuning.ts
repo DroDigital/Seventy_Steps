@@ -5,6 +5,7 @@
 
 import { LANGS } from './lang';
 import type { Tier } from './schema';
+import { OUTER_DARK } from './regions';
 import type { Ramp, Vec3 } from './tuning';
 
 /** Debug orbit camera of the Phase 0 look-test scene. */
@@ -204,6 +205,13 @@ export const SKY = {
     rlyeh: { stars: 0.5, clouds: 0.8, haze: 0.7, milky: 0.3, meteors: 0.4 },
     yuggoth: { moon: 0, stars: 1.8, clouds: 0, haze: 0.3, milky: 1.5, meteors: 0.6 }, // no moon over Yuggoth: the sun a star among the rest
     beyond: { moon: 0, stars: 0.5, clouds: 0, haze: 0, milky: 0.4, aurora: 0.6, meteors: 0.3 },
+    // The Outer Dark (round 73; data/cosmos.ts has what hangs in each besides)
+    cloud_summit: { moon: 0.11, stars: 0.9, clouds: 0, haze: 1.7, milky: 0.7, aurora: 1.5, meteors: 0.8 }, // a huge gold moon over the cloud-sea, and the Other Gods' light
+    black_wood: { moon: 0.045, stars: 0.35, clouds: 0, haze: 0.7, milky: 0.15, aurora: 0, meteors: 0 }, // a small dull moon through the limbs, few stars
+    pale_lattice: { moon: 0.16, stars: 1.1, clouds: 0, haze: 1.2, milky: 0.5, aurora: 0, meteors: 0 }, // a white moon too near; nothing moves
+    piping_dark: { moon: 0, stars: 0.3, clouds: 0, haze: 0, milky: 0.15, aurora: 0, meteors: 0 }, // no moon: the dark is a sound
+    spheres: { moon: 0, stars: 1.2, clouds: 0, haze: 0.5, milky: 1.3, aurora: 0.4, meteors: 0.5 }, // the globes are the moons
+    court_centre: { moon: 0, stars: 2.2, clouds: 0, haze: 0.4, milky: 1.8, aurora: 0, meteors: 2.4 }, // the whole of the stars, falling toward the centre
   } as Readonly<Record<string, Partial<SkyDef>>>,
   fade: 3, // seconds to ease into another realm's sky...
   jump: 30, // ...unless the camera leapt this many metres at once (a journey): then at once
@@ -339,7 +347,7 @@ export const PASSAGE = { wake: 7, frames: { door: 96, sealed: 120, bridge: 72 },
 
 /** The seals on Kadath's door (playtest round 12, systems/seals.ts). */
 export const SEALS = {
-  exempt: ['hub', 'dreamlands', 'beyond'] as readonly string[], // regions holding no seal
+  exempt: ['hub', 'dreamlands', 'beyond', ...OUTER_DARK] as readonly string[], // regions holding no seal (the Outer Dark's dimensions are walked after the Gate: round 73)
   kadath: 4, // seals broken before the Great Ones' door opens (Keziah's, on the main line, is one)
   warn: 6, // metres: this close to a sealed door, the investigator is told what it waits for...
   again: 20, // ...at most every this many seconds while it stays near...

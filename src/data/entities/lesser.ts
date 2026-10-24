@@ -50,13 +50,13 @@ export const LESSER = tier('lesser', [
     stats: st(40, 8, 6, 4.2, 0.1, 1), drops: { echoes: 20 }, insightOnSight: 0,
   },
   {
-    id: 'night_gaunt', name: 'Night-gaunt', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true, voice: 'silent',
+    id: 'night_gaunt', name: 'Night-gaunt', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'cloud_summit', 'piping_dark', 'court_centre'], canonLooks: true, voice: 'silent',
     sprite: { silhouette: 'winged', palette: 'rubber', scale: 2.8, eyes: 0, wings: 2 },
     behavior: { archetype: 'flyer_swoop', attacks: ['grab', 'dive'] },
     stats: st(170, 30, 14, 5, 0.5, 3), drops: { echoes: 140 }, insightOnSight: 0,
   },
   {
-    id: 'moon_beast', name: 'Moon-beast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
+    id: 'moon_beast', name: 'Moon-beast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'cloud_summit'], canonLooks: true,
     sprite: { silhouette: 'toad', palette: 'pallid', scale: 2.6, eyes: 0, tentacles: 6 },
     behavior: { archetype: 'brute', attacks: ['tentacle_burst', 'slam'] },
     stats: st(260, 50, 20, 2.4, 0.6, 3), drops: { echoes: 200 }, insightOnSight: 0,
@@ -68,7 +68,7 @@ export const LESSER = tier('lesser', [
     stats: st(130, 24, 14, 3.8, 0.3, 2), drops: { echoes: 90 }, insightOnSight: 0,
   },
   {
-    id: 'cat_from_saturn', name: 'Cat from Saturn', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond'], canonLooks: false, voice: 'meow',
+    id: 'cat_from_saturn', name: 'Cat from Saturn', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond', 'spheres'], canonLooks: false, voice: 'meow',
     sprite: { silhouette: 'quadruped', palette: 'charcoal', scale: 1.2, eyes: 2, glow: 'purple' },
     behavior: { archetype: 'pack_hunter', attacks: ['bite', 'lunge'] },
     stats: st(80, 14, 10, 5, 0.3, 2), drops: { echoes: 60 }, insightOnSight: 0,
@@ -129,7 +129,7 @@ export const LESSER = tier('lesser', [
     stats: st(90, 16, 11, 3.8, 0.3, 2), drops: { echoes: 50 }, insightOnSight: 0,
   },
   {
-    id: 'rat_swarm', name: 'Rat Swarm', source: 'The Rats in the Walls', regions: ['hub', 'arkham', 'dunwich', 'vermont'], canonLooks: true, voice: 'scurry',
+    id: 'rat_swarm', name: 'Rat Swarm', source: 'The Rats in the Walls', regions: ['hub', 'arkham', 'dunwich', 'vermont', 'black_wood'], canonLooks: true, voice: 'scurry',
     sprite: { silhouette: 'swarm', palette: 'charcoal', scale: 1.4, eyes: 2 },
     behavior: { archetype: 'swarm', attacks: ['bite'] },
     stats: st(60, 5, 6, 4.5, 0.4, 1), weak: ['fire'], drops: { echoes: 30 }, insightOnSight: 0,

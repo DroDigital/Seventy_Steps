@@ -60,6 +60,31 @@ const LEXICONS: Readonly<Record<string, Lexicon>> = {
     adjectives: ['Nameless', 'Endless', 'Shifting', 'Ultimate', 'Crawling', 'Formless', 'Dim', 'Hollow'],
     nouns: { ruin: ['Arch', 'Throne', 'Pedestal'], outcrop: ['Shelf'], circle: ['Circle', 'Pedestals'], camp: ['Camp'], landmark: ['Orb', 'Sphere'] },
   },
+  // The Outer Dark (round 73)
+  cloud_summit: {
+    adjectives: ['Windswept', 'Gilded', 'High', 'Thin', 'Aurora-Lit', 'Listening', 'Barren', 'Unsheltered'],
+    nouns: { ruin: ['Ledge', 'Altar', 'Stair'], outcrop: ['Crag', 'Shelf', 'Tor'], circle: ['Floor', 'Ring'], camp: ['Camp'], landmark: ['Horn', 'Spire'] },
+  },
+  black_wood: {
+    adjectives: ['Black', 'Counted', 'Thousand-Footed', 'Soft', 'Breathing', 'Hoofed', 'Teeming', 'Wet', 'Many'],
+    nouns: { grove: ['Wood', 'Thicket', 'Dam', 'Brood'], graveyard: ['Fold'], circle: ['Altar', 'Stones'], ruin: ['Lodge', 'Hollow'], outcrop: ['Rock', 'Knoll'], camp: ['Camp', 'Fire'] },
+  },
+  pale_lattice: {
+    adjectives: ['Pale', 'Stilled', 'Faceted', 'Waiting', 'Clear', 'Unmoving', 'Patient', 'Bright', 'Ancient'],
+    nouns: { ruin: ['Facet', 'Court', 'Hall'], outcrop: ['Prism', 'Shard'], circle: ['Ring', 'Lattice'], camp: ['Camp'], landmark: ['Prism', 'Vertex'] },
+  },
+  piping_dark: {
+    adjectives: ['Thin', 'Monotonous', 'Reedy', 'Droning', 'Hollow', 'Ceaseless', 'Cracked', 'Muted', 'Unmeasured'],
+    nouns: { ruin: ['Stair', 'Gallery', 'Pit'], outcrop: ['Shelf', 'Ledge'], circle: ['Ring', 'Dance'], camp: ['Camp'], landmark: ['Pipe', 'Reed'] },
+  },
+  spheres: {
+    adjectives: ['Iridescent', 'Many-Faced', 'Hovering', 'Clustered', 'Shimmering', 'Open', 'Keyed', 'Glassy', 'Everywhere'],
+    nouns: { ruin: ['Threshold', 'Door', 'Arch'], outcrop: ['Shelf', 'Rim'], circle: ['Basin', 'Ring'], camp: ['Camp'], landmark: ['Globe', 'Orb', 'Sphere'] },
+  },
+  court_centre: {
+    adjectives: ['Blind', 'Blasphemous', 'Unnoticed', 'Boiling', 'Black', 'Idiot', 'Final', 'Unheard', 'Central'],
+    nouns: { ruin: ['Hall', 'Gallery', 'Gate'], outcrop: ['Step', 'Shelf'], circle: ['Dance', 'Ring'], camp: ['Camp'], landmark: ['Block', 'Throne'] },
+  },
 };
 
 /** The first names given, as the stories tell of those places, by region and kind. */

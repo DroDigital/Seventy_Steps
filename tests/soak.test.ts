@@ -36,10 +36,10 @@ function invariants(g: Game): string[] {
   const c = g.ecs.c;
   for (const [id, t] of c.transform) {
     if (![t.pos.x, t.pos.y, t.pos.z, t.yaw].every(finite)) bad.push(`entity ${id} (${c.model.get(id) ?? c.combatant.get(id)?.name ?? '?'}) transform not finite: ${JSON.stringify(t.pos)} yaw ${t.yaw}`);
-    else if (Math.abs(t.pos.x) > 6000 || Math.abs(t.pos.z) > 6000 || t.pos.y < -80 || t.pos.y > 400) bad.push(`entity ${id} (${c.combatant.get(id)?.name ?? c.model.get(id) ?? '?'}) far off: ${JSON.stringify(t.pos)}`);
+    else if (Math.abs(t.pos.x) > 9000 || Math.abs(t.pos.z) > 9000 || t.pos.y < -80 || t.pos.y > 400) bad.push(`entity ${id} (${c.combatant.get(id)?.name ?? c.model.get(id) ?? '?'}) far off: ${JSON.stringify(t.pos)}`); // (round 73: the Outer Dark runs east to 8192 m; the bound was 6000)
   }
   const [pt, pb] = [c.transform.get(g.player.id), c.body.get(g.player.id)];
-  const dying = c.actor.get(g.player.id)?.move === 'death' || (c.health.get(g.player.id)?.hp ?? 1) <= 0; // a body in its death throes is shoved about by whatever stands on it, and is up in the next breath
+  const dying = c.actor.get(g.player.id)?.move === 'death' || (c.health.get(g.player.id)?.hp ?? 1) <= 0 || !!g.player.falling; // a body in its death throes is shoved about by whatever stands on it, and is up in the next breath; one over an edge (a gap by the Elder Sign at Zin is one) is meant to be below the ground
   if (dying) embedded.set(g, 0);
   else if (pt && pb && ![pt.pos.x, pt.pos.y, pt.pos.z].some((v) => !finite(v))) {
     const ground = g.world.ground(pt.pos.x, pt.pos.z);

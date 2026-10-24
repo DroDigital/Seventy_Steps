@@ -11,7 +11,7 @@
 
 import { ENTITIES, getEntity } from '../src/data/registry';
 import type { EntityDef } from '../src/data/schema';
-import { REGIONS } from '../src/data/regions';
+import { OUTER_DARK, REGIONS } from '../src/data/regions';
 import { REAGENT, REINFORCE, LEVELS, type LevelId } from '../src/data/tuning';
 import { stonesOf } from '../src/systems/arms';
 import { levelCost } from '../src/systems/levels';
@@ -50,7 +50,7 @@ const bountyOf = (id: string): number => ENTITIES.find((e) => e.id === id)?.drop
  * unchanged in id, foe and place) and no more: the extra foes are the world's added challenge and the secrets' loot, a margin over the
  * standing the bots fight at, not a fresh round of levels the bosses were never measured at (docs/DECISIONS.md, round 61).
  */
-const CREDITED: Record<string, number> = { hub: 100, arkham: 114, dunwich: 92, innsmouth: 105, providence: 129, vermont: 82, mountains: 69, pnakotus: 80, kn_yan: 88, dreamlands: 241, rlyeh: 80, yuggoth: 76, beyond: 74 };
+const CREDITED: Record<string, number> = { hub: 100, arkham: 114, dunwich: 92, innsmouth: 105, providence: 129, vermont: 82, mountains: 69, pnakotus: 80, kn_yan: 88, dreamlands: 241, rlyeh: 80, yuggoth: 76, beyond: 74, ...Object.fromEntries(OUTER_DARK.map((r) => [r, 0])) }; // (the Outer Dark's foes are the world's added challenge, not credited: round 73)
 
 /** The world's lesser foes (the bosses aside) in `regions` (all of them by default): how many, and every Echo they carry, as the model credits them. */
 export function lesserFoes(regions?: readonly string[]): { count: number; echoes: number } {
@@ -101,7 +101,7 @@ export const RINGS: readonly (readonly string[])[] = [
   ['arkham'], // the main line's first realm
   ['vermont', 'providence', 'dunwich', 'innsmouth'], // the waking world beyond, open from the start
   ['dreamlands', 'rlyeh', 'yuggoth', 'kn_yan', 'mountains', 'pnakotus'], // down the stair and through the waking world's gates
-  ['beyond'], // past Kadath's seals
+  ['beyond', ...OUTER_DARK], // past Kadath's seals, and through the Ultimate Void into the Outer Dark's six dimensions (round 73)
 ];
 
 /** A Great Old One or an Outer God: met in any order, its Echoes never counted toward another's standing. */

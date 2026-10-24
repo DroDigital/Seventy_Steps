@@ -44,6 +44,13 @@ const BY_REGION: Readonly<Record<string, RealmTrackId>> = {
   rlyeh: 'submerged_city',
   yuggoth: 'remote_arpeggio',
   beyond: 'vazio_cosmico',
+  // The Outer Dark (round 73): no recording of its own yet; each dimension borrows the realm track nearest its mood (the horrors' own themes carry the fights)
+  cloud_summit: 'glacial_desolation',
+  black_wood: 'subterranean_drips',
+  pale_lattice: 'cold_stone_hall',
+  piping_dark: 'remote_arpeggio',
+  spheres: 'wavering_pads',
+  court_centre: 'vazio_cosmico',
 };
 
 /** The way into the Dreamlands (data/dungeons.ts `slumber`): its own two tracks, by where on the stairs the investigator is. */
