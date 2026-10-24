@@ -240,6 +240,13 @@ export const AMBIENCE: Record<string, Ambience> = {
   rlyeh: { beds: [['waves', 1], ['wind_ghost', 0.3]], spots: [{ set: 'gurgle', every: [25, 60] }] },
   yuggoth: { beds: [['wind_cold', 0.5], ['wind_ghost', 0.34]], spots: [{ set: 'timber', every: [40, 90] }] }, // round 68: it was the recording of a high-pitched buzz, which wore on the ear; now the cold wind of a world at the system's edge
   beyond: { beds: [['wind_ghost', 0.72], ['cave', 0.36]], spots: [] },
+  // The Outer Dark (round 73)
+  cloud_summit: { beds: [['wind_cold', 0.8], ['wind_ghost', 0.22]], spots: [] },
+  black_wood: { beds: [['leaves', 0.55], ['murmur', 0.4]], spots: [creaks, { set: 'gurgle', every: [40, 90] }] },
+  pale_lattice: { beds: [['wind_ghost', 0.3]], spots: [] }, // near silence: time does not stir the air
+  piping_dark: { beds: [['wind_ghost', 0.5], ['cave', 0.3]], spots: [] },
+  spheres: { beds: [['murmur', 0.5], ['wind_ghost', 0.3]], spots: [] },
+  court_centre: { beds: [['cave', 0.5], ['wind_ghost', 0.62]], spots: [] },
 };
 
 /**

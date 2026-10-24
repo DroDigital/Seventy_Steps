@@ -71,7 +71,7 @@ export const REGIONS: readonly RegionDef[] = [
     spawns: { density: 1.2, table: { reanimated_corpse: 3, rat_swarm: 2, moon_bog_wraith: 2, ghoul: 1 } },
   },
   {
-    id: 'dunwich', name: 'Dunwich & the Round Hills', dungeon: 'Sentinel Hill', bosses: ['dunwich_horror', 'shub_niggurath'], area: [-1, 1, 1, 1],
+    id: 'dunwich', name: 'Dunwich & the Round Hills', dungeon: 'Sentinel Hill', bosses: ['dunwich_horror'], area: [-1, 1, 1, 1],
     biome: biome(9, 7, 60, 'grass', [0.58, 0.5, 0.42], true, 8, { monolith: 3, tree: 3, rock: 2 }, 'dirt'),
     spawns: { density: 1.1, table: { thousand_young: 2, martense_degenerate: 3, rat_swarm: 2, mi_go: 1 } },
   },
@@ -106,7 +106,7 @@ export const REGIONS: readonly RegionDef[] = [
     spawns: { density: 1.8, table: { serpent_man: 2, kn_yan_dweller: 3, ym_bhi: 2, gyaa_yothn: 1, beast_in_the_cave: 1, child_of_yig: 2, formless_spawn: 1 } },
   },
   {
-    id: 'dreamlands', name: 'Dreamlands', dungeon: 'Ulthar → Leng → Vaults of Zin → Kadath', bosses: ['high_priest', 'bokrug', 'great_ones', 'nyarlathotep'], area: [-1, 7, 2, 2],
+    id: 'dreamlands', name: 'Dreamlands', dungeon: 'Ulthar → Leng → Vaults of Zin → Kadath', bosses: ['high_priest', 'bokrug', 'great_ones'], area: [-1, 7, 2, 2],
     biome: biome(6, 5, 55, 'grass', [0.54, 0.5, 0.58], true, 10, { tree: 4, pillar: 2, ruin: 2, rock: 1 }, 'dirt'),
     spawns: {
       density: 1.9,
@@ -124,12 +124,49 @@ export const REGIONS: readonly RegionDef[] = [
     spawns: { density: 1.8, table: { mi_go: 3, venusian_man_lizard: 2, yekubian: 1, being_from_beyond: 2 } },
   },
   {
-    id: 'beyond', name: 'Beyond the Gate', dungeon: 'The Ultimate Void', bosses: ['umr_at_tawil', 'yog_sothoth', 'azathoth'], area: [3, 7, 1, 1],
+    id: 'beyond', name: 'Beyond the Gate', dungeon: 'The Ultimate Void', bosses: ['umr_at_tawil'], area: [3, 7, 1, 1],
     biome: biome(4, 1.5, 30, 'water', [0.45, 0.45, 0.5], false, 6, { monolith: 3, pillar: 2 }),
     spawns: { density: 1.8, table: { dhole: 1, yekubian: 2, being_from_beyond: 2, cat_from_saturn: 2, flying_polyp: 1 } },
+  },
+  // The Outer Dark (round 73): the Outer Gods are gone out of the earth and the dream into the gulfs, each into a dimension of its own, six of them in a chain of
+  // gates beyond the Ultimate Void, every one stranger than the one before. They lie in a row a tile apart (so no two are joined into one realm: each is an island, as
+  // the far realms are) and last of the list (so the seed of every older region's land is as it was). Their sites and gates are in sites.ts, their looks in
+  // looks.ts, their skies in cosmos.ts.
+  {
+    id: 'cloud_summit', name: 'The Cloud Summit', dungeon: 'None: a summit above the storm', bosses: ['other_gods'], area: [5, 7, 1, 1],
+    biome: biome(8, 3, 45, 'snow', [0.64, 0.63, 0.68], false, 4, { monolith: 3, rock: 2, pillar: 1 }, 'stone'),
+    spawns: { density: 0.9, table: { night_gaunt: 3, shantak: 1, moon_beast: 1, being_from_beyond: 1 } },
+  },
+  {
+    id: 'black_wood', name: 'The Black Wood', dungeon: 'None: a wood that is a body', bosses: ['shub_niggurath'], area: [7, 7, 1, 1],
+    biome: biome(3, 4, 32, 'leaves', [0.42, 0.28, 0.24], false, 9, { tree: 4, rock: 1, grave: 1 }, 'flesh'),
+    spawns: { density: 1.1, table: { thousand_young: 1, rat_swarm: 3, mi_go: 1, being_from_beyond: 1 } },
+  },
+  {
+    id: 'pale_lattice', name: 'The Pale Lattice', dungeon: 'None: a ring of prisms in stilled time', bosses: ['ancient_ones'], area: [9, 7, 1, 1],
+    biome: biome(4, 0.8, 60, 'slab', [0.74, 0.76, 0.74], false, 4, { pillar: 3, monolith: 2, rock: 1 }),
+    spawns: { density: 0.9, table: { yithian: 2, being_from_beyond: 1, yekubian: 1 } },
+  },
+  {
+    id: 'piping_dark', name: 'The Piping Dark', dungeon: 'None: a dark that is a sound', bosses: ['daemon_pipers'], area: [11, 7, 1, 1],
+    biome: biome(4, 1.5, 35, 'gravel', [0.3, 0.28, 0.24], false, 6, { pillar: 4, obelisk: 2, monolith: 1 }, 'slab'),
+    spawns: { density: 1, table: { flying_polyp: 2, night_gaunt: 2, dhole: 1 } },
+  },
+  {
+    id: 'spheres', name: 'The Gate of Spheres', dungeon: 'None: the gate that is every gate', bosses: ['yog_sothoth'], area: [13, 7, 1, 1],
+    biome: biome(4, 1, 40, 'water', [0.42, 0.46, 0.58], false, 5, { monolith: 2, globe: 3, pillar: 1 }),
+    spawns: { density: 1, table: { dhole: 2, being_from_beyond: 2, cat_from_saturn: 1, flying_polyp: 1 } },
+  },
+  {
+    id: 'court_centre', name: 'The Court at the Centre', dungeon: 'None: the middle of all', bosses: ['azathoth', 'nyarlathotep'], area: [15, 7, 1, 1],
+    biome: biome(3, 1.2, 50, 'slab', [0.16, 0.16, 0.22], false, 3, { monolith: 3, pillar: 1 }),
+    spawns: { density: 0.7, table: { being_from_beyond: 2, night_gaunt: 1, yekubian: 1 } },
   },
 ];
 
 export const REGION_IDS: readonly string[] = REGIONS.map((r) => r.id);
+
+/** The six dimensions beyond the Ultimate Void (round 73), in the order their gates chain: where the Outer Gods are. */
+export const OUTER_DARK: readonly string[] = ['cloud_summit', 'black_wood', 'pale_lattice', 'piping_dark', 'spheres', 'court_centre'];
 
 export const getRegion = (id: string): RegionDef | undefined => REGIONS.find((r) => r.id === id);

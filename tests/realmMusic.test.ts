@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync } from 'node:fs';
 import { DUNGEONS } from '../src/data/dungeons';
 import { REALM_MUSIC, REALM_TRACKS, REALM_TRACK_IDS, realmFile, realmTrackOf } from '../src/data/realmMusic';
-import { REGIONS } from '../src/data/regions';
+import { OUTER_DARK, REGIONS } from '../src/data/regions';
 import { analyse, dB, fromDB, loopRegion, passLength } from '../src/render/audio/loudness';
 import { createRealmLoop, passTimes } from '../src/render/audio/realmLoop';
 import { realmLevel } from '../src/render/audio/realmMusic';
@@ -25,7 +25,8 @@ describe('the realms\' music (round 28)', () => {
   it('has a track for every realm, and the stairs of slumber have two of their own', () => {
     for (const r of REGIONS) expect(realmTrackOf(r.id), r.id).not.toBeNull();
     expect(REALM_TRACK_IDS.length).toBe(15);
-    expect(new Set(REGIONS.map((r) => realmTrackOf(r.id))).size).toBe(REGIONS.length); // each realm its own
+    const own = REGIONS.filter((r) => !OUTER_DARK.includes(r.id)); // (the Outer Dark's dimensions borrow the nearest track until they have their own: round 73)
+    expect(new Set(own.map((r) => realmTrackOf(r.id))).size).toBe(own.length); // each realm its own
     expect(realmTrackOf('arena')).toBeNull();
     expect(realmTrackOf(null)).toBeNull();
     const slumber = DUNGEONS.find((d) => d.id === 'slumber')!;

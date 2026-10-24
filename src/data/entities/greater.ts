@@ -4,7 +4,7 @@ import { ph, phases, st, tier } from './kit';
 
 export const GREATER = tier('greater', [
   {
-    id: 'mi_go', name: 'Mi-Go', source: 'The Whisperer in Darkness', regions: ['vermont', 'yuggoth', 'dunwich'], canonLooks: true, voice: 'buzz',
+    id: 'mi_go', name: 'Mi-Go', source: 'The Whisperer in Darkness', regions: ['vermont', 'yuggoth', 'dunwich', 'black_wood'], canonLooks: true, voice: 'buzz',
     sprite: { silhouette: 'crustacean', palette: 'fungus', scale: 2.6, eyes: 0, wings: 2, limbs: 6 },
     behavior: { archetype: 'hover_ranged', attacks: ['projectile', 'grab', 'beam'] },
     stats: st(420, 60, 24, 4, 1, 5), resist: ['shot'], drops: { echoes: 450 }, insightOnSight: 0,
@@ -34,13 +34,13 @@ export const GREATER = tier('greater', [
     stats: st(1000, 150, 40, 3, 2.5, 8), drops: { echoes: 1000 }, insightOnSight: 0,
   },
   {
-    id: 'yithian', name: 'Yithian', source: 'The Shadow out of Time', regions: ['pnakotus'], canonLooks: true,
+    id: 'yithian', name: 'Yithian', source: 'The Shadow out of Time', regions: ['pnakotus', 'pale_lattice'], canonLooks: true,
     sprite: { silhouette: 'cone', palette: 'bone', scale: 3.4, eyes: 3 },
     behavior: { archetype: 'caster', attacks: ['projectile', 'beam', 'sweep'] },
     stats: st(600, 90, 28, 2.6, 1, 4), drops: { echoes: 600 }, insightOnSight: 0,
   },
   {
-    id: 'flying_polyp', name: 'Flying Polyp', source: 'The Shadow out of Time', regions: ['pnakotus', 'beyond'], canonLooks: true, voice: 'whistle',
+    id: 'flying_polyp', name: 'Flying Polyp', source: 'The Shadow out of Time', regions: ['pnakotus', 'beyond', 'piping_dark', 'spheres'], canonLooks: true, voice: 'whistle',
     sprite: { silhouette: 'blob', palette: 'ichor', scale: 3.6, eyes: 0, tentacles: 8, body: [0.7, 0.22] }, // its drawn body, not a blob's 1.3 m: 0.8 (round 56)
     behavior: { archetype: 'invisible_stalker', attacks: ['wind_push', 'grab', 'tentacle_burst'] },
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
@@ -57,13 +57,13 @@ export const GREATER = tier('greater', [
     stats: st(900, 200, 34, 3, 1.5, 5), drops: { echoes: 900 }, insightOnSight: 0,
   },
   {
-    id: 'dhole', name: 'Dhole', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond'], canonLooks: true,
+    id: 'dhole', name: 'Dhole', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'beyond', 'piping_dark', 'spheres'], canonLooks: true,
     sprite: { silhouette: 'serpent', palette: 'pallid', scale: 6, eyes: 0, body: [0.65625, 0.25] }, // 3.9375 m painted idle height, with its established 1.5 m radius
     behavior: { archetype: 'burrower', attacks: ['bite', 'slam', 'spit'] },
     stats: st(1200, 220, 46, 3.4, 2, 6), drops: { echoes: 1000 }, insightOnSight: 0,
   },
   {
-    id: 'shantak', name: 'Shantak', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
+    id: 'shantak', name: 'Shantak', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'cloud_summit'], canonLooks: true,
     sprite: { silhouette: 'winged', palette: 'stone', scale: 4.6, eyes: 2, wings: 2 },
     behavior: { archetype: 'flyer_swoop', attacks: ['dive', 'bite', 'charge'] },
     stats: st(500, 90, 26, 6, 1, 4), weak: ['light'], drops: { echoes: 500 }, insightOnSight: 0,
@@ -75,20 +75,20 @@ export const GREATER = tier('greater', [
     stats: st(700, 100, 30, 3, 2, 6), resist: ['slash', 'blunt'], weak: ['fire'], drops: { echoes: 700 }, insightOnSight: 0,
   },
   {
-    id: 'yekubian', name: 'Yekubian', source: 'The Challenge from Beyond', regions: ['beyond', 'yuggoth'], canonLooks: true,
+    id: 'yekubian', name: 'Yekubian', source: 'The Challenge from Beyond', regions: ['beyond', 'yuggoth', 'pale_lattice', 'court_centre'], canonLooks: true,
     sprite: { silhouette: 'serpent', palette: 'pallid', scale: 3.6, eyes: 1, limbs: 10, glow: 'purple' },
     behavior: { archetype: 'mind_thief', attacks: ['projectile', 'gaze', 'grab'] },
     stats: st(650, 80, 26, 3, 2, 8), drops: { echoes: 650 }, insightOnSight: 0,
   },
   {
-    id: 'being_from_beyond', name: 'Being from Beyond', source: 'From Beyond', regions: ['providence', 'hub', 'yuggoth', 'beyond'], canonLooks: true,
+    id: 'being_from_beyond', name: 'Being from Beyond', source: 'From Beyond', regions: ['providence', 'hub', 'yuggoth', 'beyond', 'cloud_summit', 'black_wood', 'pale_lattice', 'spheres', 'court_centre'], canonLooks: true,
     sprite: { silhouette: 'orb', palette: 'pallid', scale: 2.8, eyes: 0, tentacles: 6, glow: 'purple' },
     behavior: { archetype: 'invisible_stalker', attacks: ['grab', 'tentacle_burst'] },
     stats: st(400, 40, 22, 4, 3, 8), resist: ['blunt', 'shot'], drops: { echoes: 400 }, insightOnSight: 0,
     hidden: { maxSanity: 15 },
   },
   {
-    id: 'thousand_young', name: 'Thousand Young of Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['dunwich'], canonLooks: false,
+    id: 'thousand_young', name: 'Thousand Young of Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['dunwich', 'black_wood'], canonLooks: false,
     sprite: { silhouette: 'quadruped', palette: 'rubber', scale: 3.2, eyes: 6, limbs: 8, tentacles: 4 },
     behavior: { archetype: 'pack_hunter', attacks: ['charge', 'bite', 'tentacle_burst'] },
     stats: st(600, 90, 28, 4.4, 1.5, 5), weak: ['fire'], drops: { echoes: 550 }, insightOnSight: 0,

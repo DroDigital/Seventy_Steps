@@ -80,4 +80,10 @@ export const SKYLINES: Readonly<Record<string, readonly Silhouette[]>> = {
   rlyeh: [s('city', 330, 760, 720, 190, 11), s('city', -300, 500, 520, 150, 43, { fade: 0.25 }), s('titan', 330, 1500, 900, 880, 31)], // and, risen behind its city, the one it was built for
   yuggoth: [s('towers', 300, 820, 900, 260, 5), s('range', 700, 300, 1500, 300, 44, { fade: 0.4 })],
   beyond: [s('towers', 400, 700, 600, 230, 45, { fade: 0.2 })],
+  // The Outer Dark (round 73): the sky does most of the work (data/cosmos.ts); a few far shapes stand against it
+  cloud_summit: [s('peak', 260, 900, 900, 520, 51, { fade: 0.35 }), s('peak', -300, 600, 700, 380, 52, { fade: 0.5 })],
+  black_wood: [s('hills', 250, 800, 1400, 120, 53, { fade: 0.3 })],
+  pale_lattice: [s('towers', 260, 900, 900, 380, 54, { fade: 0.4 })],
+  piping_dark: [s('minarets', 240, 800, 800, 300, 55, { fade: 0.4 })],
+  spheres: [s('towers', 250, 1000, 700, 260, 56, { fade: 0.5 })],
 };

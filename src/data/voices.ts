@@ -131,6 +131,13 @@ export const DRONES = {
   rlyeh: d(30.9, [1, 1.5, 1.587], 'sawtooth', 200, 0.03, 0.02, 220),
   yuggoth: d(44, [1, 1.5, 2.08], 'triangle', 220, 0.02, 0.005, 700), // round 68: a square wave with a detuned twin buzzed, and its noise hissed at 3 kHz
   beyond: d(27.5, [1, 2, 2.97, 4.1], 'sine', 1200, 0.035),
+  // The Outer Dark (round 73): each a lower, stranger form of the one before
+  cloud_summit: d(40, [1, 1.5, 2], 'sine', 700, 0.018, 0.01, 1500),
+  black_wood: d(34, [1, 1.06, 1.5], 'sawtooth', 180, 0.03, 0.02, 200),
+  pale_lattice: d(61.7, [1, 1.25, 1.5, 2], 'sine', 1400, 0.02, 0.004, 2000),
+  piping_dark: d(30, [1, 1.12, 1.5, 2.25], 'triangle', 500, 0.03, 0.02, 400),
+  spheres: d(52, [1, 1.5, 2.25, 3], 'sine', 1000, 0.026, 0.01, 1200),
+  court_centre: d(24.5, [1, 1.06, 1.414, 2.97], 'sawtooth', 300, 0.04, 0.03, 300),
   boss: d(36.7, [1, 1.06, 1.5], 'sawtooth', 180, 0.08), // under a boss fight
 } satisfies Record<string, Drone>;
 

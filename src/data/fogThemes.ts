@@ -67,6 +67,7 @@ const BY_BOSS: Readonly<Record<string, FogThemeId>> = {
 const BY_REGION: Readonly<Record<string, FogThemeId>> = {
   hub: 'grey', arkham: 'grey', dunwich: 'storm', innsmouth: 'brine', providence: 'grave', vermont: 'frost',
   mountains: 'frost', pnakotus: 'frost', kn_yan: 'rot', dreamlands: 'gold', rlyeh: 'deep', yuggoth: 'spore', beyond: 'stars',
+  cloud_summit: 'stars', black_wood: 'rot', pale_lattice: 'stars', piping_dark: 'stars', spheres: 'stars', court_centre: 'stars',
 };
 
 /** The theme of the fog before `bosses` (the first has the say) in `region`. */

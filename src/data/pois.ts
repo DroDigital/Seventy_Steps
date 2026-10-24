@@ -10,6 +10,7 @@
 import type { FeatureKind } from '../world/features';
 import { POIS_BEYOND } from './poisBeyond';
 import { POIS_DREAM } from './poisDream';
+import { POIS_OUTER } from './poisOuter';
 import { POIS_WAKING } from './poisWaking';
 import type { PropKind } from './regions';
 
@@ -45,7 +46,7 @@ export interface PoiDef {
   maze?: boolean; // walls of stone laid out about its middle (a clearing for it is found)
 }
 
-export const POIS: readonly PoiDef[] = [...POIS_WAKING, ...POIS_BEYOND, ...POIS_DREAM];
+export const POIS: readonly PoiDef[] = [...POIS_WAKING, ...POIS_BEYOND, ...POIS_DREAM, ...POIS_OUTER];
 export const poisOf = (region: string): readonly PoiDef[] => POIS.filter((p) => p.region === region);
 export const poiDef = (id: string): PoiDef | undefined => POIS.find((p) => p.id === id);
 

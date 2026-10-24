@@ -126,11 +126,11 @@ describe('the story walked in several orders: the next step is always told, and 
   it('in order, from Peaslee to the last choice at the Court', () => {
     const g = walk([...WAKING, ...DREAM, ...BEYOND]);
     expect(isDone(g, 'kadath')).toBe(true);
-    const threshold = worldLayout().signs.find((x) => x.id === 'beyond_threshold')!;
-    goTo(g, threshold.x + 3, threshold.z + 3);
+    const court = worldLayout().signs.find((x) => x.id === COURT_SIGN)!;
+    goTo(g, court.x + 3, court.z + 3);
     const l = lead(g, 'at the Court');
     expect(l.goal).toEqual({ kind: 'ending' });
-    expect(l.at).toEqual(goalPlace({ kind: 'ending' })); // (in the Beyond itself, so the lead is the sign itself)
+    expect(l.at).toEqual(goalPlace({ kind: 'ending' })); // (in the Court at the Centre itself, so the lead is the sign itself)
     expect(courtEndings(g, COURT_SIGN)).toEqual(['seal', 'herald']);
     expect(stageOf(g, 'silver_key')).toBe(3);
     endGame(g, 'herald');
@@ -206,7 +206,9 @@ describe('the endings are told where they are chosen', () => {
     const start = g.ecs.c.transform.get(g.player.id)!.pos;
     g.overworld!.slain.add('boss:keziah_mason');
     expect(wayTo(g, start, { x: court.x, z: court.z })).not.toBeNull();
-    expect(wayTo(g, gatePlace('beyond_gate')!.arrive, { x: court.x, z: court.z })).toEqual({ x: court.x, z: court.z }); // already in the Beyond
+    expect(wayTo(g, gatePlace('court_in')!.arrive, { x: court.x, z: court.z })).toEqual({ x: court.x, z: court.z }); // already in the Court at the Centre
+    const gulf = gatePlace('beyond_gate')!.arrive; // and from the Gate, the Court is six dimensions on: the way is the Storm Gate's, the first of the chain (round 73)
+    expect(wayTo(g, gulf, { x: court.x, z: court.z })).toEqual({ x: gatePlace('beyond_cloud')!.x, z: gatePlace('beyond_cloud')!.z });
     expect(briefLine({ kind: 'ending' })).toBe(`Choose the dream's end at ${court.name}`);
   });
 

@@ -12,6 +12,7 @@ import { gorgon } from './gorgon';
 import { hastur } from './hastur';
 import { hutchinson } from './hutchinson';
 import { martins } from './martins';
+import { nyarlathotep } from './nyarlathotep';
 import { nug } from './nug';
 import { orne } from './orne';
 import { othergods } from './othergods';
@@ -21,7 +22,7 @@ import { yig } from './yig';
 import { yog } from './yog';
 import { zkauba } from './zkauba';
 
-export const PLACES: Readonly<Record<string, PlaceFn>> = { simon_orne: orne, edward_hutchinson: hutchinson, martins_beach_horror: martins, medusa_gorgon: gorgon, colossus_pyramids: colossus, shub_niggurath: shub, yig, nug, bokrug, other_gods: othergods, cthulhu, hastur, yog_sothoth: yog, azathoth, zkauba, daemon_pipers: pipers, ancient_ones: ancients };
+export const PLACES: Readonly<Record<string, PlaceFn>> = { simon_orne: orne, edward_hutchinson: hutchinson, martins_beach_horror: martins, medusa_gorgon: gorgon, colossus_pyramids: colossus, shub_niggurath: shub, yig, nug, bokrug, other_gods: othergods, cthulhu, hastur, yog_sothoth: yog, azathoth, zkauba, daemon_pipers: pipers, ancient_ones: ancients, nyarlathotep };
 
 /** What is laid in a horror's court that keeps its own enclosure (a basin's dam, a river's island), by the first boss. */
 export const EXTRAS: Readonly<Record<string, ExtraFn>> = { colour_out_of_space: colour, black_man: blackman };
