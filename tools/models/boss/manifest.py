@@ -12,7 +12,7 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
-           out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature
+           out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature; `drop_alpha` leaves out the faces whose texture is mostly clear
 """
 from dataclasses import dataclass, field
 from typing import Any
@@ -37,6 +37,7 @@ class M:
     drop: Any = None
     cut: Any = None
     decimate: int = 0
+    drop_alpha: float = 0.0  # the faces of a texture clearer than this (the glass of a jar) are left out
     squash: tuple = (1, 1, 1)
     pose: Any = None
     textures: tuple = ()

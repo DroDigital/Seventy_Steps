@@ -57,7 +57,7 @@ export function createChimneys(particles: Particles): Chimneys {
           particles.spawn({
             x: t.x + (Math.random() - 0.5) * 0.3, y: t.y + 0.15, z: t.z + (Math.random() - 0.5) * 0.3,
             vx: wind * (0.55 + 0.3 * Math.random()), vy: 0.75 + 0.5 * Math.random(), vz: wind * 0.25 * (Math.random() - 0.3),
-            life: 5 + 2.5 * Math.random(), size: 0.4, grow: 5.5, color: SMOKE, alpha: 0.5, drag: 0.22,
+            life: 5 + 2.5 * Math.random(), size: 0.4, grow: 5.5, color: SMOKE, alpha: 0.5, drag: 0.22, shape: 'puff', thick: Math.random(), spin: 0.15 * (Math.random() - 0.5), rot: Math.random() * 6.28, // (round 74: a free smoke sprite)
           });
         }
       }

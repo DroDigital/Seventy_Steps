@@ -59,7 +59,7 @@ def bake_one(m, work):
         arm = objs[0].find_armature()
         if m.pose and arm:
             S.pose_armature(arm, m.pose)
-        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut)
+        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut, drop_alpha=m.drop_alpha)
         pos, col, cls, _ = soup.done()
         if m.recolour is not None and len(col):
             luma = col @ np.array([.299, .587, .114])

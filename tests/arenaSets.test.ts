@@ -3,6 +3,7 @@ import { at, lane, put, ring, scatter, type ArenaSet } from '../src/data/arenaSe
 import { ARENA_SETS } from '../src/data/arenaSetsAll';
 import { ARENA_WAYS } from '../src/data/arenaWaysAll';
 import { HALL_SETS } from '../src/data/hallSets';
+import { ROOM_SETS } from '../src/data/roomSets';
 import { MODEL_INFO } from '../src/data/models/index';
 import { PROP_KINDS } from '../src/data/regions';
 import { SET_KITS } from '../src/data/setKits';
@@ -96,7 +97,7 @@ describe('the sets of the open arenas', () => {
   });
 
   it('use no baked model that no arena stands, nor stand one not baked (no dead weight in the bundle)', () => {
-    const used = new Set([...Object.values(ARENA_SETS), ...Object.values(HALL_SETS)].flatMap((s) => s.puts.map((p) => p.piece.of)).concat(Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece.of)))); // (round 62: a trail's marks stand them too; round 72: and the boss halls' sets, now that the open arenas keep few)
+    const used = new Set([...Object.values(ARENA_SETS), ...Object.values(HALL_SETS), ...Object.values(ROOM_SETS)].flatMap((s) => s.puts.map((p) => p.piece.of)).concat(Object.values(ARENA_WAYS).flatMap((w) => w.marks.map((m) => m.piece.of)))); // (round 62: a trail's marks stand them too; round 72: and the boss halls' sets, now that the open arenas keep few; round 74: and the ordinary rooms')
     for (const a of w.arenas) for (const p of a.house?.props ?? []) if (p.set) used.add(p.set.id); // (round 71: and a place's planner, world/places)
     const unused = Object.keys(MODEL_INFO).filter((id) => !used.has(id));
     expect(unused, 'baked but stood nowhere').toEqual([]);

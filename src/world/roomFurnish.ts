@@ -13,7 +13,7 @@ import { isWeapon, WEAPONS } from '../data/weapons';
 import { roomProps } from './arenaDecor';
 import { floorAt, roomPoint, type RoomLayout } from './dungeonKit';
 import { roomSpots, type Part } from './dungeonParts';
-import { hallProps, hasHallSet } from './hallSet';
+import { hallProps, hasHallSet, hasRoomSet, roomSetProps } from './hallSet';
 import type { SpawnPoint, WorldLayout } from './placements';
 import type { Prop } from './props';
 import { DIRS, OPPOSITE, yawOfDir } from './worldMap';
@@ -69,7 +69,7 @@ export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: R
   const next = (): XZ => roomPoint(r, ...(ring.shift() ?? [0, 0]));
   if (d.ally) spawn({ id: `ally:${d.ally}`, entity: d.ally, region: region.id, at: { ...next(), yaw: face }, unique: false });
   (d.spawns ?? []).forEach((id, k) => spawn({ id: `room:${dungeon}:${d.id}:${k}`, entity: id, region: region.id, at: { ...next(), yaw: face }, unique: false }));
-  if (!d.boss) return [];
+  if (!d.boss) return hasRoomSet(`${dungeon}/${d.id}`) ? roomSetProps(`${dungeon}/${d.id}`, r, parts) : []; // (round 74: a room with a set of its own, data/roomSets.ts)
   const ax = DIRS[r.axis];
   const away = d.gate ? { x: ax.z, z: -ax.x } : ax; // the far side, or beside it when a gate stands there
   const style = arenaStyle(d.boss[0]);

@@ -24,16 +24,18 @@ export interface Piece {
   lift?: number; // metres off the ground (hung, floating, sunk if negative)
   heart?: boolean; // may stand in the fight's circle, as its centrepiece
   join?: boolean; // may touch the pieces beside it (a wall's, a colonnade's)
+  hung?: boolean; // hangs on a wall (a shelf, a banner): a room's set stands it against the wall, not clear of it (round 74)
   dims?: readonly [w: number, d: number, h: number]; // a built piece's own size, half extents and height
 }
 
 /** Where, as degrees clockwise from the front and shares of the arena's radius (`add`: and so many metres more). */
-export type Face = 'in' | 'out' | 'front' | 'free' | number;
+export type Face = 'in' | 'out' | 'front' | 'free' | 'wall' | number; // 'wall': square to the nearest wall of a room (turned to the axis nearest the way in), which a row of shelves along a wall wants
 export type Layout =
   | { ring: { r: number; n: number; add?: number; arc?: readonly [number, number]; jitter?: number; face?: Face } } // n about a circle, or an arc of it
   | { at: { r: number; a: number; add?: number; side?: number; mirror?: boolean; face?: Face } } // one, or a pair either side of the line, `side` metres across it
   | { scatter: { n: number; r: readonly [number, number]; arc?: readonly [number, number]; face?: Face } } // at random in a band
-  | { lane: { r: readonly [number, number]; n: number; side: number; face?: Face } }; // down the way in, a pair every step
+  | { lane: { r: readonly [number, number]; n: number; side: number; face?: Face } } // down the way in, a pair every step
+  | { wall: { r: number; step: number; walls?: readonly number[]; face?: Face } }; // a room's walls (round 74): a piece every `step` metres along each, at a share `r` of the radius, a candidate for each that the room's doors, pillars and things then refuse
 
 export interface Put {
   piece: Piece;
@@ -74,5 +76,6 @@ export interface ArenaSet {
 export const ring = (r: number, n: number, o: { add?: number; arc?: readonly [number, number]; jitter?: number; face?: Face } = {}): Layout => ({ ring: { r, n, ...o } });
 export const at = (r: number, a: number, o: { add?: number; side?: number; mirror?: boolean; face?: Face } = {}): Layout => ({ at: { r, a, ...o } });
 export const scatter = (n: number, r: readonly [number, number], o: { arc?: readonly [number, number]; face?: Face } = {}): Layout => ({ scatter: { n, r, ...o } });
+export const wall = (r: number, step: number, o: { walls?: readonly number[]; face?: Face } = {}): Layout => ({ wall: { r, step, ...o } });
 export const lane = (r: readonly [number, number], n: number, side: number, face?: Face): Layout => ({ lane: { r, n, side, face } });
 export const put = (of: string, where: Layout, o: Omit<Piece, 'of'> = {}): Put => ({ piece: { of, ...o }, where });

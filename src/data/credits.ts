@@ -17,6 +17,18 @@ export const CREDITS: readonly CreditBlock[] = [
   { heading: 'DESIGNED, WRITTEN AND DIRECTED BY', lines: ['Alessandro A. Foddis', '© 2026 Digital Dro Studios · All rights reserved'] },
   { heading: 'AFTER THE STORIES OF', lines: ['H. P. Lovecraft', 'and the tales he revised and wrote with Zealia Bishop, Hazel Heald, Sonia Greene, Harry Houdini, E. Hoffmann Price, Kenneth Sterling, and the authors of "The Challenge from Beyond"'] },
   { heading: 'RECORDED SOUNDS', lines: ['from Freesound, dedicated to the public domain (CC0 1.0), cut and treated for the game:', 'Craig Smith (craigsmith)', 'Breviceps', 'EvaMusik', 'fonografico', 'corkob', 'Lsoundaccount', 'TheKingOfGeeks360', 'waterboy920'] },
+  {
+    heading: 'MODELS, FLAMES AND SURFACES',
+    lines: [
+      'free models and animations, reduced, coloured and set for the game:',
+      'licensed CC BY 4.0: FlukierJupiter · andrewriddle · KRei · Mad_Lobster_Workshop · Jochon · rkuhlf · INGSOC1984 · carismah',
+      'Samuel Francis Johnson (Oneironauticus) · TheoClarke · Goblinatron (PSX Dungeon) · BlenderVoyage · bobjh · Marin PETTE · 3D Vault',
+      'Bruno Macchioni · Bl4ckGh0st · mynameismary · Animex · zacharykozak',
+      'dedicated to the public domain (CC0 1.0): Kenney · Quaternius · Kay Lousberg · chilly_durango · Elegant Crow · SigilsVault · RotoPoly',
+      'Kyle Fuji · Poly Haven · MilkAndBanana · rubberduck · Fertile Soil Productions · pistachio · Paul Wortmann · Goth Scarecrow · ZomBCool',
+      'bookcases by Munchkin Gaming (PSX Shelves)',
+    ],
+  },
   { heading: 'TITLE THEME', lines: ['"Subterranean Pulse"'] },
   { heading: '', lines: ['Thank you for dreaming.'] },
   {
@@ -26,7 +38,7 @@ export const CREDITS: readonly CreditBlock[] = [
       'the voices of the people and the horrors are synthesised voices, made with ElevenLabs (Eleven v4)',
       'the fifteen tracks of the realms and the forty-eight boss themes were made with Suno',
       'the code was written with the help of Claude Code, from Anthropic',
-      'every texture, sprite, mesh and effect is generated in code',
+      'the textures and effects are made in code; the models are free ones, baked for the game and credited above',
     ],
   },
   {

@@ -23,6 +23,7 @@ export interface SetSite {
   radius: number;
   front: XZ; // unit vector toward the nearest Elder Sign
   well: boolean;
+  inner?: number; // share of the radius kept clear in place of SET_RULES.inner: an ordinary room's set stands nearer its middle than a boss hall's (round 74)
 }
 
 export const SET_RULES = {
@@ -79,6 +80,13 @@ function spots(layout: Layout, s: SetSite, rng: Rng): Spot[] {
     }
     return out;
   }
+  if ('wall' in layout) {
+    const { r, step, walls = [0, 90, 180, 270] } = layout.wall;
+    const reachAlong = s.radius - 1; // to either corner, less the pillar's pace
+    const out: Spot[] = [];
+    for (const a of walls) for (let t = -reachAlong; t <= reachAlong + 1e-6; t += step) out.push(polar(r, 0, a, t));
+    return out;
+  }
   const { r, n, side } = layout.lane;
   return Array.from({ length: n }, (_, i) => {
     const share = n === 1 ? r[0] : r[0] + ((r[1] - r[0]) * i) / (n - 1);
@@ -92,6 +100,7 @@ function yawOf(face: Face | undefined, spot: Spot, s: SetSite, rng: Rng): number
   if (face === 'out') return inward + Math.PI;
   if (face === 'front') return Math.atan2(s.front.x, s.front.z);
   if (face === 'free') return rng() * Math.PI * 2;
+  if (face === 'wall') return Math.round(inward / (Math.PI / 2)) * (Math.PI / 2);
   if (typeof face === 'number') return inward + face * DEG;
   return inward; // 'in', and unsaid
 }
@@ -114,7 +123,7 @@ function prop(piece: Piece, spot: Spot, y: number, yaw: number, rng: Rng): Prop 
   const walk = piece.walk ?? kit?.walk ?? false;
   return {
     kind: 'set', x: spot.x, y: ground + lift, z: spot.z, w: w * k, d: d * k, h: h * k, yaw, seed: Math.floor(rng() * 1e6),
-    set: { id: piece.of, scale: k, tint: piece.tint, keep: piece.keep, round, walk, glow: piece.glow, lit: piece.lit },
+    set: { id: piece.of, scale: k, tint: piece.tint, keep: piece.keep, round, walk, hung: piece.hung, glow: piece.glow, lit: piece.lit },
   };
 }
 
@@ -125,7 +134,7 @@ export const setPiece = (piece: Piece, x: number, z: number, y: number, yaw: num
 function blocks(p: Prop, s: SetSite, heart: boolean): boolean {
   const r = reach(p);
   const from = Math.hypot(p.x - s.x, p.z - s.z);
-  if (!heart && from - r < SET_RULES.inner * s.radius) return true;
+  if (!heart && from - r < (s.inner ?? SET_RULES.inner) * s.radius) return true;
   const along = (p.x - s.x) * s.front.x + (p.z - s.z) * s.front.z; // down the way in
   const across = Math.abs(-(p.x - s.x) * s.front.z + (p.z - s.z) * s.front.x);
   return along > SET_RULES.laneFrom * s.radius && along < SET_RULES.laneTo * s.radius && across - r < SET_RULES.lane;
@@ -169,4 +178,4 @@ export function arenaSet(set: ArenaSet, s: SetSite, taken?: (p: Prop) => boolean
   return out;
 }
 
-const layoutFace = (l: Layout): Face | undefined => ('ring' in l ? l.ring.face : 'at' in l ? l.at.face : 'scatter' in l ? l.scatter.face : l.lane.face);
+const layoutFace = (l: Layout): Face | undefined => ('ring' in l ? l.ring.face : 'at' in l ? l.at.face : 'scatter' in l ? l.scatter.face : 'wall' in l ? l.wall.face : l.lane.face);

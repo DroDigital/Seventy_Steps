@@ -165,3 +165,113 @@ By Bl4ckGh0st, https://sketchfab.com/3d-models/temple-ruins-asset-pack-d1e25cdbe
 By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5acad5849bc913e76d3fdbf32a3, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: its two-storey arcade cut out of the whole (the pier and rubble removed), decimated, scaled and given a collider.
 
 `ar_arcade`
+
+# Credits: the dungeon models (round 74)
+
+Models for the dungeons' rooms and boss halls, from the asset brief for every dungeon (`docs/DUNGEON_MODELS.md`), baked by the same tool as the packs above (`tools/models/bake_boss_models.py`, manifests `tools/models/boss/manifest_p30.py` to `manifest_p46.py`) into `bossIndex.ts` and `bossPack.ts`. Each was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to each face's colour and a material class, decimated, welded, scaled to the metres it stands at, recoloured where noted and given its colliders; nothing is loaded as a source file at run time. The ten Sketchfab models were downloaded by the game's author (they need a sign-in) and are credited as their licence asks, with the changes made.
+
+## Pack 30 — Alembic
+This work is based on "Alembic" (https://sketchfab.com/3d-models/alembic-811618ea79ba4aac95d7f7312a2128ec) by FlukierJupiter (https://sketchfab.com/FlukierJupiter) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: scaled to a still of a metre and a half, given one collider and recoloured copper; used in Charles le Sorcier's laboratory.
+
+`al_still`
+
+## Pack 31 — American Old Barn
+This work is based on "American Old Barn" (https://sketchfab.com/3d-models/american-old-barn-1d0b768a8e2449de990b3f69f94c5db6) by andrewriddle (https://sketchfab.com/andrewriddle) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,500 faces, scaled to eleven metres across and given colliders about its timbers; stood in the Whateley loft.
+
+`wf_barn`
+
+## Pack 32 — Armillary sphere
+This work is based on "Armillary sphere" (https://sketchfab.com/3d-models/armillary-sphere-534e240ac6b0412cb526dd2b14bf8909) by KRei (https://sketchfab.com/krei1012) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated from 19,800 to 2,600 faces, scaled and given a collider; stood in the Archives of the Great Race and at the Ultimate Void.
+
+`uv_armillary`
+
+## Pack 33 — Brain in a Jar
+This work is based on "Brain in a Jar" (https://sketchfab.com/3d-models/brain-in-a-jar-b95791959dc74dc6a0d39bd4f563ab90) by Mad_Lobster_Workshop (https://sketchfab.com/Mad_Lobster_Workshop) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: the glass faces left out so that the brain shows, scaled and given a collider; tinted as a metal cylinder in the halls of the Mi-Go and at Akeley's.
+
+`mg_jar`
+
+## Pack 34 — Brazier
+This work is based on "Brazier" (https://sketchfab.com/3d-models/brazier-4240c44c853e42429fa9ac35de2300b9) by Jochon (https://sketchfab.com/jochon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: scaled and given a collider and a flame anchor at its bowl; the eternal fires of the Stairs of Slumber.
+
+`ss_brazier`
+
+## Pack 35 — Coral
+This work is based on "Coral" (https://sketchfab.com/3d-models/coral-dbf4bee13bf84396815073e5cabf8ac3) by rkuhlf (https://sketchfab.com/rkuhlf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: three of its corals taken singly, scaled, given colliders and recoloured pale; Y'ha-nthlei and the Elder City.
+
+`yh_coral_a`, `yh_coral_b`, `yh_coral_c`
+
+## Pack 36 — Gothic Cloaked Figure - Building Wall Statue
+This work is based on "Gothic Cloaked Figure - Building Wall Statue" (https://sketchfab.com/3d-models/gothic-cloaked-figure-building-wall-statue-e9c199b05aea4e88abe830be0b154195) by INGSOC1984 (https://sketchfab.com/INGSOC1984) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,400 faces, scaled to a figure of three and a half metres and given a collider; the priests of Mu in the temple of Ghatanothoa.
+
+`rl_priest`
+
+## Pack 37 — Hourglass
+This work is based on "Hourglass" (https://sketchfab.com/3d-models/hourglass-f480fadf47424bc4ae37bfa16a4de924) by carismah (https://sketchfab.com/carismah) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,200 faces, scaled and given a collider; at the Ultimate Void and in the sculptor's studio.
+
+`uv_hourglass`
+
+## Pack 38 — Museum Showcase - Die Vitrine
+This work is based on "Museum Showcase - Die Vitrine" (https://sketchfab.com/3d-models/museum-showcase-die-vitrine-8ac020233ece4deabdb308e19b1453ba) by Samuel Francis Johnson (Oneironauticus) (https://sketchfab.com/oneironauticus) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: the glass left out, scaled and given a collider; the cases of the wax museum of Rhan-Tegoth.
+
+`mg_case`
+
+## Pack 39 — Stone Altar
+This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar-3d4f2edb18e4424cabb41b60aa160cb5) by TheoClarke (https://sketchfab.com/TheoClarke) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,800 faces, scaled to four and a half metres and given a collider; the table-stone of Sentinel Hill.
+
+`sh_altar`
+
+## Pack 40 — PSX Dungeon
+By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: nine of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
+
+`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
+
+## Pack 41 — PSX Bookshelves & Food Shelves
+By Munchkin Gaming, https://munchkin-jonesy.itch.io/psx-shelves, free for commercial use and modification, not to be resold or redistributed as assets (credit is not required; the pack's own listing says it is AI-assisted: docs/STORE_PAGE.md). Changes: five of its abandoned ('Horror') wooden bookcases taken singly, scaled and given colliders where they stand in the way, built into the game's own models and sets, not offered as assets of their own.
+
+`ps_bookcase`, `ps_bookcase_low`, `ps_bookbay`, `ps_bookpile`, `ps_wallshelf`
+
+## Pack 42 — Modular Cathedral Kit
+By SigilsVault, https://sigilsvault.itch.io/modular-cathedral-kit, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/): asks for nothing, credited for provenance. Changes: two columns and a railing taken singly, scaled and given colliders.
+
+`ca_column`, `ca_column_small`, `ca_railing`
+
+## Pack 43 — Sewers Modular Assets
+By RotoPoly, https://rotopoly.itch.io/sewers-modular-assets, CC0 1.0: credited for provenance. Changes: a pipe stood upright, the huge pipe, two barred grilles, a support and brick rubble taken singly, scaled and given colliders.
+
+`sw_pipe_big`, `sw_pipe_huge`, `sw_grille`, `sw_bars`, `sw_support`, `sw_rubble`
+
+## Pack 44 — Kyle's Mushroom Pack
+By Kyle Fuji, https://kyle-fuji.itch.io/kyles-mushroom-pack, CC0 1.0: credited for provenance. Changes: five mushrooms (a turkey tail, a reishi, a blue oyster, a morel, a lantern mushroom) grown to the height of a knee and more and tinted by each place.
+
+`mu_bracket`, `mu_reishi`, `mu_oyster`, `mu_morel`, `mu_lantern`
+
+## Pack 45 — Poly Haven
+'Ornate Mirror 01', 'Modular Industrial Pipes 01', 'Wine Bottles 01' and 'Pine Roots', https://polyhaven.com, CC0 1.0: credited for provenance. Changes: each reduced hard (the mirror to 1,100 faces, the pipes to 2,500, the roots to 2,800), the bottle taken singly with its label left out, scaled and given colliders where they stand in the way.
+
+`ph_mirror`, `ph_pipes`, `ph_bottle`, `ph_roots`
+
+## Pack 46 — Lab Assets
+By MilkAndBanana, https://opengameart.org/content/lab-assets, CC0 1.0: credited for provenance. Changes: a retort, a Florence flask, a round-bottomed flask, a reagent bottle, a ring stand, a Bunsen burner and a microscope taken singly (none of the counters, electronics or safety gear), their glass tinted amber and grey, scaled.
+
+`lb_retort`, `lb_florence`, `lb_round`, `lb_reagent`, `lb_stand`, `lb_burner`, `lb_microscope`
+
+## Pack 47 — Retro Modular House Pack
+By Elegant Crow, https://elegantcrow.itch.io/retro-modular-house-pack, CC0 1.0 (the photographs that ship beside it, which have terms of their own, are not used): credited for provenance. Changes: a boarded door and window, closed shutters, a loose plank, a double window, a door and a flight of stairs taken singly and scaled; the stairs given a collider.
+
+`rh_boarded_door`, `rh_boarded_window`, `rh_shutter`, `rh_plank`, `rh_window`, `rh_door`, `rh_stair`
+
+## Pack 48 — Modular Cave Kit
+By Kenney, https://kenney.nl/assets/modular-cave-kit, CC0 1.0: credited for provenance. Changes: the rock gate and the barred gate taken singly, scaled and given colliders about their openings.
+
+`kc_gate_rock`, `kc_gate_bars`
+
+## Pack 49 — Retro Fantasy Kit
+By Kenney, https://kenney.nl/assets/retro-fantasy-kit, CC0 1.0: credited for provenance. Changes: a column, a broken column, a barrel stack and a pulley taken singly and scaled; the first three given colliders.
+
+`kf_column`, `kf_column_broken`, `kf_barrels`, `kf_pulley`
+
+## Flames, smoke and surface patterns (round 74)
+
+- **Pixel flames.** 'Fire' by ZomBCool, https://opengameart.org/content/fire-0, CC0 1.0: credited for provenance. Changes: its four frames of `fire_3.gif` reduced to a heat mask and a coverage mask (`tools/flames/bake_flames.py`, `src/data/flameAtlas.ts`) and coloured in code (`src/render/flames.ts`).
+- **Smoke puffs.** 'Smoke Particles' by Kenney (Kenney Vleugels), https://kenney.nl/assets/smoke-particles, CC0 1.0: credited for provenance. Changes: four of the white puffs reduced to 24 x 24 coverage masks, in the same atlas.
+- **PS1 surface patterns.** The 64 x 64 textures `TEX_Wall_03`, `TEX_Ground_04` and `TEX_Planks_01` of Pack 40 (Goblinatron's PSX Dungeon, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). Changes: reduced to each texel's brightness against the texture's own average (`tools/psx/bake_psx_textures.py`, `src/data/psxDetail.ts`), laid over the world's procedural stone, flagstone and plank textures (`src/render/textures.ts`) and coloured by the realms' grades.
