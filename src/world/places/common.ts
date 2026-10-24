@@ -1,5 +1,6 @@
 /** What more than one place does alike (round 71): a rectangle for an outline, and its wall in runs with a gap for the gate. */
 
+import type { V3 } from '../../core/geom';
 import { MODEL_INFO } from '../../data/models/index';
 import type { Court, Put, Run } from '../placeKit';
 
@@ -48,3 +49,6 @@ export function wallAbout(c: Court, id: string, pts: readonly (readonly [number,
 
 /** The angle about the fight's middle, in radians from the front, folded to 0..π (so a shape may be the same either side of the gate). */
 export const bearing = (th: number): number => Math.abs(Math.atan2(Math.sin(th), Math.cos(th)));
+
+/** A point in the court's air: (a, c) in its frame and `y` metres over the court's ground (where a signal's pulse or a rod's tip is). */
+export const sky = (c: Court, a: number, cc: number, y: number): V3 => ({ ...c.put(a, cc), y: c.s.y + y });

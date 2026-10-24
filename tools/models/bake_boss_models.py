@@ -16,7 +16,8 @@ import manifest as MF
 import proc as PR
 import proc_more as PR2
 import proc_grove as PR3
-PROC = {**PR.PROC, **PR2.PROC, **PR3.PROC}
+import proc_rites as PR4
+PROC = {**PR.PROC, **PR2.PROC, **PR3.PROC, **PR4.PROC}
 
 OUT = os.path.join(HERE, '..', '..', 'src', 'data', 'models')
 
