@@ -22,6 +22,7 @@ export const CREDITS: readonly CreditBlock[] = [
     lines: [
       'free models and animations, reduced, coloured and set for the game:',
       'licensed CC BY 4.0: FlukierJupiter · andrewriddle · KRei · Mad_Lobster_Workshop · Jochon · rkuhlf · INGSOC1984 · carismah',
+      'Heliona · Özlem Çandır · KIFIR · vertexgrocer · davdadams',
       'Samuel Francis Johnson (Oneironauticus) · TheoClarke · Goblinatron (PSX Dungeon) · BlenderVoyage · bobjh · Marin PETTE · 3D Vault',
       'Bruno Macchioni · Bl4ckGh0st · mynameismary · Animex · zacharykozak',
       'dedicated to the public domain (CC0 1.0): Kenney · Quaternius · Kay Lousberg · chilly_durango · Elegant Crow · SigilsVault · RotoPoly',

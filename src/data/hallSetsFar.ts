@@ -6,7 +6,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // Nkai's black hall, the cavern of the toad-god: idols of him in the stone, bones, bowls of what was offered, pale fungus, black rock.
   tsathoggua: {
     puts: [
-      put('kc_gate_rock', at(0.88, 180, { face: 'wall' }), { size: 1.2, tint: [0.16, 0.16, 0.2], keep: 0 }), // the mouth of the cavern's black
+      put('kc_gate_rock', at(0.77, 90, { face: 'wall' }), { heart: true, size: 0.95, tint: [0.16, 0.16, 0.2], keep: 0 }), // the mouth of the cavern's black
       put('mu_reishi', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [1.7, 2.6], tint: [0.4, 0.34, 0.42], keep: 0.5 }), // the fungus of Nkai, black and wet (round 74: Kyle Fuji's, CC0)
       put('mu_bracket', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [1.6, 2.4], tint: [0.34, 0.36, 0.34], keep: 0.5 }),
       put('mu_oyster', scatter(4, [0.82, 0.98], { face: 'free' }), { size: [1.6, 2.2], keep: 0.6 }),
@@ -22,8 +22,9 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The monastery of the High Priest on Leng: banners of yellow silk, monks' benches, candles, masks of stone, columns.
   high_priest: {
     puts: [
+      put('pw_wheel', scatter(5, [0.84, 0.97], { arc: [60, 300], face: 'free' }), { size: 1.2 }), // the wheels of the monastery (round 74: Özlem Çandır's, CC BY)
       put('kf_column', ring(0.95, 6, { arc: [60, 300] }), { size: 1, tint: [0.62, 0.55, 0.36], keep: 0 }), // (round 74: Kenney's Retro Fantasy Kit, CC0)
-      put('kf_column_broken', scatter(2, [0.86, 0.97], { arc: [70, 290], face: 'free' }), { size: 1.1, tint: [0.62, 0.55, 0.36], keep: 0 }),
+      put('kf_column_broken', at(0.88, 125, { mirror: true, face: 'free' }), { size: 1.1, tint: [0.62, 0.55, 0.36], keep: 0 }),
       put('banner', ring(0.97, 6, { arc: [60, 300] }), { size: 0.85 }),
       put('bench', ring(0.92, 4, { arc: [80, 280], face: 'in' }), { size: 1.2 }),
       put('statue_head', at(0.95, 180, { face: 'in' }), { size: 0.6, tint: [0.7, 0.62, 0.4] }),
@@ -69,7 +70,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The last hall at the end of the dream: columns and ring-statues of the city that was, pedestals of the old stone, a glow in each.
   umr_at_tawil: {
     puts: [
-      put('uv_armillary', at(0.94, 180, { face: 'in' }), { size: 1.4, tint: [0.62, 0.5, 0.34], keep: 0.3 }), // the armillary gate
+      put('uv_armillary', at(0.95, 150, { face: 'in' }), { heart: true, size: 1.4, tint: [0.62, 0.5, 0.34], keep: 0.3 }), // the armillary gate
       put('uv_hourglass', scatter(3, [0.82, 0.95], { face: 'free' }), { size: 1.4 }), // (round 74: maike.pos', CC BY)
       put('column', ring(0.97, 6, { arc: [50, 310] }), { size: 0.8 }),
       put('statue_ring', ring(0.9, 4, { arc: [80, 280], face: 'in' }), { size: 1.3 }),

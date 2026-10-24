@@ -270,6 +270,31 @@ By Kenney, https://kenney.nl/assets/retro-fantasy-kit, CC0 1.0: credited for pro
 
 `kf_column`, `kf_column_broken`, `kf_barrels`, `kf_pulley`
 
+## Pack 50 — Curtains
+This work is based on "Curtains" (https://sketchfab.com/3d-models/curtains-a83e1baf822a4442b0f50ed70d449198) by Heliona (https://sketchfab.com/Heliona) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated, scaled to four and a half metres across and coloured by the game's cloth and metal; hung in Lilith's shrine.
+
+`cu_curtains`
+
+## Pack 51 — Prayer Wheel
+This work is based on "Prayer Wheel" (https://sketchfab.com/3d-models/prayer-wheel-8da83b65c713447586d7e6182d78dd06) by Özlem Çandır (https://sketchfab.com/OzlemCandir) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: turned upright on its post, scaled to one and a half metres, coloured by the game's metal and given a collider on its post; the wheels of the High Priest's monastery on Leng.
+
+`pw_wheel`
+
+## Pack 52 — Old Gramophone
+This work is based on "Old Gramophone" (https://sketchfab.com/3d-models/old-gramophone-5e892fc786db4ca1b36738ab5e40e64d) by KIFIR (https://sketchfab.com/kifir) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated, scaled to a metre and a little more and given a box collider; the phonograph in Akeley's study.
+
+`og_gramophone`
+
+## Pack 53 — Old Church Bell
+This work is based on "old church bell" (https://sketchfab.com/3d-models/old-church-bell-8aa10771481c4a0d83f7a47af6fdf9e1) by vertexgrocer (https://sketchfab.com/vertexgrocer) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,500 faces, scaled to one and a half metres and coloured by the game's metal; the bell of the Starry Wisdom steeple.
+
+`cb_bell`
+
+## Pack 54 — Bust of Apollo
+This work is based on "Bust of Apollo" (https://sketchfab.com/3d-models/bust-of-apollo-fdaf490184d04e45bbd2afe8a1555a67) by davdadams (https://sketchfab.com/davdadams) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,000 faces, scaled to a metre and a tenth, coloured as stone and given a box collider. It is the bust as made, reduced and recoloured, with no laurel, crown or other change to what it shows; it stands in Hypnos' studio.
+
+`ba_bust`
+
 ## Flames, smoke and surface patterns (round 74)
 
 - **Pixel flames.** 'Fire' by ZomBCool, https://opengameart.org/content/fire-0, CC0 1.0: credited for provenance. Changes: its four frames of `fire_3.gif` reduced to a heat mask and a coverage mask (`tools/flames/bake_flames.py`, `src/data/flameAtlas.ts`) and coloured in code (`src/render/flames.ts`).

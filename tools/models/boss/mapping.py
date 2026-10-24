@@ -40,6 +40,9 @@ PACKS = {
     'p44': ("Kyle's Mushroom Pack", 'Kyle Fuji', 'CC0'), 'p45': ('Poly Haven: mirror, pipes, bottle, roots', 'Poly Haven', 'CC0'),
     'p46': ('Lab Assets', 'MilkAndBanana', 'CC0'), 'p47': ('Retro Modular House Pack', 'Elegant Crow', 'CC0'),
     'p48': ('Modular Cave Kit', 'Kenney', 'CC0'), 'p49': ('Retro Fantasy Kit', 'Kenney', 'CC0'),
+    'p50': ('Curtains', 'Heliona', 'CC BY 4.0'), 'p51': ('Prayer Wheel', 'Özlem Çandır', 'CC BY 4.0'),
+    'p52': ('Old Gramophone', 'KIFIR', 'CC BY 4.0'), 'p53': ('Old Church Bell', 'vertexgrocer', 'CC BY 4.0'),
+    'p54': ('Bust of Apollo', 'davdadams', 'CC BY 4.0'),
     'proc': ('Made in code', 'this repository', '-'),
 }
 

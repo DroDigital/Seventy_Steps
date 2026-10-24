@@ -11,7 +11,7 @@ The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`)
 3. `python3 -I tools/models/boss/mapping.py > docs/BOSS_MODELS.md` lists every model, its pack, its size and where it stands.
 4. The model is stood by a *set*: `data/hallSets*.ts` for the boss halls, **`data/roomSets.ts` (new) for the rooms that are no boss's**, by the same machinery (`world/hallSet.ts`, `world/arenaSet.ts`), so that a piece keeps off the walls, the doorways, the room's own things and the fight's circle.
 
-`tests/arenaSets.test.ts` keeps every baked model stood by some set, `tests/hallSets.test.ts` and `tests/roomSets.test.ts` keep each set inside its walls and under its roof.
+`tests/arenaSets.test.ts` keeps every baked model stood by some set, `tests/hallSets.test.ts` and `tests/roomSets.test.ts` keep each set inside its walls and under its roof, and `tests/hallSets.test.ts` keeps every model of these packs that a set names standing in some dungeon (a put can be written and never fit its hall: a great piece with no room in the fight's circle is written as a `heart` at the hall's edge, clear of the gate's side).
 
 ## What is in
 
@@ -37,6 +37,11 @@ The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`)
 | 47 Retro Modular House | Elegant Crow | CC0 | `rh_*` (7) | the lodgings and farmhouses' halls |
 | 48 Modular Cave Kit | Kenney | CC0 | `kc_gate_rock`, `kc_gate_bars` | Nkai and the Elder City's tunnel mouths, Curwen's pens |
 | 49 Retro Fantasy Kit | Kenney | CC0 | `kf_*` (4) | Leng, Kadath, the Whateley loft, the captain's house |
+| 50 Curtains | Heliona | CC BY | `cu_curtains` | Lilith's shrine |
+| 51 Prayer Wheel | Özlem Çandır | CC BY | `pw_wheel` | the High Priest's monastery on Leng |
+| 52 Old Gramophone | KIFIR | CC BY | `og_gramophone` | Akeley's study |
+| 53 Old Church Bell | vertexgrocer | CC BY | `cb_bell` | the Starry Wisdom steeple |
+| 54 Bust of Apollo | davdadams | CC BY | `ba_bust` | Hypnos' studio |
 
 Pieces are placed as render dressing with colliders only where a body would stand in them (the pieces named `solids='none'` are walked through: glass, boards, rubble, candles). Hall pieces are never in the fight's circle and never across a doorway.
 
@@ -44,7 +49,8 @@ New machinery in the set placer: `wall(r, step, {walls})` lays a row of candidat
 
 ## What is not in, and why
 
-- **Not supplied or not reachable without a sign-in:** Menhirs (DragonJojo), Old Church Bell (vertexgrocer), Crookes X-ray Tube, Old Gramophone (KIFIR), Prayer Wheel, Curtains (Heliona), Stage Curtains (daedaljs), Bust of Apollo, Victorian Gothic Hallway, Modular Props House Interior, Environment Library, Old Military Compressor. Sketchfab needs a sign-in; upload the zips and they go in through the same manifests.
+- **Not supplied or not reachable without a sign-in:** Menhirs (DragonJojo), Crookes X-ray Tube, Stage Curtains (daedaljs), Victorian Gothic Hallway, Modular Props House Interior, Environment Library, Old Military Compressor. Sketchfab needs a sign-in; upload the zips and they go in through the same manifests (the Church Bell, Gramophone, Prayer Wheel, Curtains and Bust of Apollo came in that way, packs 50 to 54).
 - **Not done, and said so by the brief itself:** the glass, liquid, reflection, wax and animated sand it asks for need renderer support that the opaque bake does not have; a mirror here is a framed dark panel, the hourglass and jars have no contents that move. The bespoke forms (Keziah's impossible angles, the Voice's telephone, Zann's viol, the Elder Things' fivefold columns, Kadath's domes, Umr's causeways) were not made.
+- **The Bust of Apollo** is the model as made, reduced and recoloured as stone; no laurel, poppy crown or other change to what it shows was made, since the licence's change notice names only what was done.
 - **Left out after baking:** the PSX Dungeon's skull wall, whose skulls are in its texture (a baked face keeps one colour, so it came out a plain slab).
 - **The PSX Shelves pack is AI-assisted** by its own listing: docs/STORE_PAGE.md lists it in the AI disclosure. Its licence forbids reselling or redistributing the assets themselves; the shelves here are modified, baked into the game's own model data and not offered on their own.

@@ -530,6 +530,46 @@ By Kenney; licence CC0.
 | `kf_barrels` | glb/barrels.glb | 1.4 × 1.2 × 0.7 | 656 | terrible_old_man, wilbur_whateley |
 | `kf_pulley` | glb/pulley.glb | 0.2 × 1.6 × 1.0 | 84 | wilbur_whateley |
 
+## Pack 50: Curtains
+
+By Heliona; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `cu_curtains` | scene.gltf | 4.4 × 3.8 × 0.6 | 2399 | lilith |
+
+## Pack 51: Prayer Wheel
+
+By Özlem Çandır; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `pw_wheel` | scene.gltf | 0.4 × 1.5 × 1.1 | 896 | high_priest |
+
+## Pack 52: Old Gramophone
+
+By KIFIR; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `og_gramophone` | scene.gltf | 0.7 × 1.1 × 0.8 | 2024 | whisperer |
+
+## Pack 53: Old Church Bell
+
+By vertexgrocer; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `cb_bell` | scene.gltf | 0.9 × 1.5 × 0.9 | 1500 | haunter_of_the_dark |
+
+## Pack 54: Bust of Apollo
+
+By davdadams; licence CC BY 4.0.
+
+| game id | source | size (m) | triangles | stood by |
+|---|---|---|---|---|
+| `ba_bust` | scene.gltf | 0.6 × 1.1 × 0.4 | 2000 | hypnos |
+
 ## Made in code: Made in code
 
 | game id | source | size (m) | triangles | stood by |
