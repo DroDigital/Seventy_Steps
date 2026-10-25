@@ -45,6 +45,11 @@ export const worldUniforms = {
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },
+  uMirrorMap: { value: null as THREE.Texture | null }, // the room drawn from behind the mirror nearest, the matrix to it, its plane, and whether it is drawn (mirrorView.ts; round 79)
+  uMirrorMat: { value: new THREE.Matrix4() },
+  uMirrorPlane: { value: new THREE.Vector4(0, 1, 0, 0) },
+  uMirrorOn: { value: 0 },
+  uMirrorGain: { value: 3 }, // a dim room is dimmer still in a mirror, and a mirror that shows nothing reads as a hole: what it shows is lifted
   uLampSlot: { value: Array.from({ length: LAMP_SLOTS }, () => -1) }, // the lamp shadow map each lamp has, or -1 (lampShadows.ts; round 35)
   uLSMap: { value: [null, null, null] as (THREE.Texture | null)[] },
   uLSView: { value: [new THREE.Matrix4(), new THREE.Matrix4(), new THREE.Matrix4()] },
@@ -109,12 +114,13 @@ export interface WorldMaterialOptions {
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
+  surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
 }
 
-/** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass, not the ground, the plants or the flesh. */
+/** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass (nor a mirror, liquid or wax: `surface`), not the ground, the plants or the flesh. */
 export function coatable(o: WorldMaterialOptions): boolean {
   const vary = o.vary ?? 0;
-  return !!o.vertexColors && vary > 0 && vary < 0.9 && !o.emissive && !o.character && !o.shore && !o.panes && (o.opacity ?? 1) >= 1 && o.texture !== 'grass' && o.texture !== 'flesh' && o.texture !== 'water';
+  return !!o.vertexColors && vary > 0 && vary < 0.9 && !o.emissive && !o.character && !o.shore && !o.panes && !o.surface && (o.opacity ?? 1) >= 1 && o.texture !== 'grass' && o.texture !== 'flesh' && o.texture !== 'water';
 }
 
 const textures = new Map<string, THREE.DataTexture>();
@@ -170,11 +176,11 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
     vertexColors: o.vertexColors ?? false,
-    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }) },
+    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
   });
   if (o.opacity !== undefined && o.opacity < 1) {
     Object.assign(material, {
-      transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true,
+      transparent: true, depthWrite: false, side: o.surface ? THREE.FrontSide : THREE.DoubleSide, forceSinglePass: true, // (a model's thin shells are baked with both faces)
       blending: THREE.CustomBlending, blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
       // The target's alpha marks creatures and anomaly colours for the post pass: glass must preserve it.
       blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,

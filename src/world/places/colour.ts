@@ -55,6 +55,12 @@ export const colour: ExtraFn = (c, h) => {
   c.add('fh_trunk', rear + 3.6, half + 1.3, { ...WOOD, face: 'out', jitter: 0.2, s: 1.3 });
   c.add('rn_barrel', rear + 5.2, -half - 1.4, { ...WOOD, jitter: 0.3, s: 1.2 });
 
+  // the meteorite and the ground it burned (web parts, docs/WEB_PARTS.md): a crater in the basin's rear corner, the stone half sunk in it, crystals of the Colour grown about it
+  const pit: readonly [number, number] = [rear + 10, -17.5];
+  c.add('wk_crater', pit[0], pit[1], { tint: [0.46, 0.44, 0.48], keep: 0.3, walk: true });
+  c.add('wk_meteor', pit[0], pit[1], { y: -1.1, yaw: 0.6, tint: [0.4, 0.37, 0.46], keep: 0.3 });
+  for (const [i, [da, dc]] of ([[3.8, 2.4], [0.8, 5.6], [-1.4, -5.4], [2.8, -5.2], [6, -1.2]] as const).entries()) c.add(i % 2 ? 'wk_crystal' : 'wk_crystals', pit[0] + da, pit[1] + dc, { dye: { glow: [0.92, 0.3, 0.8] }, s: 0.5 + (i % 3) * 0.12, jitter: 0.2, turn: i * 67 });
+
   // the barn along the bank: eight posts, its trusses (one fallen across), a back wall of thin boards and half a side
   const [b0, b1, bl, br] = [-17.5, -6.5, 27.8, 32.4];
   for (const a of [b0, (b0 + b1) / 2, b1]) for (const cc of [bl, br]) c.add('fh_post', a, cc, { ...WOOD, height: 5, jitter: 0.1 });
@@ -82,6 +88,7 @@ export const colour: ExtraFn = (c, h) => {
   c.emit({ at: well, y: [1.1, 2.4], r: 0.9, rate: 3, life: [1.6, 3], size: [0.08, 0.14], colour: [1, 0.55, 0.9], alpha: 0.9, rise: 0.5, drift: 0.5, shape: 'spark', glow: true, reach: 100 });
   c.emit({ at: [rear - 0.5, -2.2], y: [14, 14.5], r: 0.5, rate: 3, life: [4, 6.5], size: [0.8, 1.4], grow: 2.4, colour: [0.55, 0.55, 0.58], alpha: 0.28, rise: 0.9, drift: 0.2, flow: { x: 0.35, z: 0.1 }, shape: 'wisp', reach: 100 });
   c.emit({ at: [-14, -32.8], to: [18, -32.8], y: [0.2, 1.6], rate: 2.6, life: [3, 5], size: [0.1, 0.18], colour: [0.9, 0.35, 0.8], alpha: 0.6, drift: 0.35, rise: 0.12, shape: 'spark', glow: true, reach: 80 });
+  c.emit({ at: pit, y: [0.4, 3.2], r: 4, rate: 3.2, life: [2.6, 4.4], size: [0.1, 0.18], colour: [0.95, 0.4, 0.85], alpha: 0.8, rise: 0.4, drift: 0.4, shape: 'spark', glow: true, reach: 100 });
   c.emit({ at: [(b0 + b1) / 2, (bl + br) / 2], y: [0.3, 2], r: 3, rate: 2, life: [3, 5], size: [0.7, 1.2], grow: 1.4, colour: [0.5, 0.5, 0.52], alpha: 0.18, rise: 0.3, drift: 0.3, shape: 'wisp', reach: 80 });
   return { fogHeight: 3.4 };
 };

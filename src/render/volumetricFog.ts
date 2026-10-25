@@ -11,10 +11,12 @@ import * as THREE from 'three';
 import { getRegion } from '../data/regions';
 import { LIVING } from '../data/mistLight';
 import { strewn } from '../world/planFill';
+import { ARENA_MISTS } from '../data/arenaMists';
 import { dungeonFogOf, FOGS, type FogDef } from '../data/fogs';
 import { lookOf } from '../data/looks';
 import { FOG } from '../data/tuning';
 import { NIGHT_DARK } from '../data/lifeTuning';
+import type { Court } from './courtMist';
 import type { PostPass } from './postPass';
 import { wetness } from './wetness';
 import { worldUniforms } from './worldMaterial';
@@ -28,6 +30,7 @@ export interface FogFrame {
   wood?: number; // 0–1: how wooded the land underfoot is (world/planFill.ts `strewn`): the mist gathers among the trees (round 35)
   wet?: number; // 0–1: how soaked the ground is (render/wetness.ts, the weather's: read from there when it is not given; round 80)
   gust?: number; // how hard the wind blows (worldUniforms.uWind, 1 on a calm night; read from there when it is not given; round 80)
+  court?: Court | null; // round 78: the open arena's court the camera is in, and how far: its mist is the realm's thickened (data/arenaMists.ts)
   dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
 
@@ -37,9 +40,6 @@ export interface VolumetricFog {
   snap(): void;
 }
 
-/** The mist wanted where the investigator stands, in its realm's colour as it is now (data/looks.ts). */
-export const fogOf = (region: string | null, enclosed: boolean): FogDef => (enclosed ? dungeonFogOf(region) : { ...(FOGS[region ?? ''] ?? FOGS.hub), color: lookOf(region).mist });
-
 const mix = (a: number, b: number, k: number): number => a + (b - a) * k;
 
 /** How much faster than on a calm night the wind carries the mist when it blows with `gust` (1 calm; LIVING.gust more in a full gale): a full gale drives it LIVING.gale times as hard again. */
@@ -47,6 +47,15 @@ export const mistDrive = (gust: number): number => 1 + (LIVING.gale * Math.max(0
 
 /** The mist's thickness (a multiple of its place's own) with the rain just fallen: `thick` is what it was, `wet` how soaked the ground is; never past LIVING.thickMax, nor below what it was. */
 export const thickAfterRain = (thick: number, wet: number): number => Math.min(thick * (1 + LIVING.afterRain * Math.min(1, Math.max(0, wet))), Math.max(thick, LIVING.thickMax));
+
+/** The mist wanted where the investigator stands, in its realm's colour as it is now (data/looks.ts); in an open arena's court, the realm's thickened toward the court's own. */
+export function fogOf(region: string | null, enclosed: boolean, court?: Court | null): FogDef {
+  if (enclosed) return dungeonFogOf(region);
+  const base: FogDef = { ...(FOGS[region ?? ''] ?? FOGS.hub), color: lookOf(region).mist };
+  const m = court && court.share > 0 ? ARENA_MISTS[court.boss] : undefined;
+  if (!m || !court) return base;
+  return easeFog(base, { ...base, density: base.density * m.density, height: base.height * m.height, haze: base.haze * (m.haze ?? 1), patchy: m.patchy ?? base.patchy }, court.share);
+}
 
 /** `from` turned toward `to` by share `k` (0–1). */
 export function easeFog(from: FogDef, to: FogDef, k: number): FogDef {
@@ -74,7 +83,7 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
     update(camera, time, f) {
       const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, time - last));
       last = time;
-      const want = fogOf(f.region, f.enclosed);
+      const want = fogOf(f.region, f.enclosed, f.court);
       roof = now ? mix(roof, f.enclosed ? 1 : 0, Math.min(1, dt * FOG.ease)) : f.enclosed ? 1 : 0;
       now = now ? easeFog(now, want, Math.min(1, dt * FOG.ease)) : want; // the first frame takes the place's own at once
       ground = dt === 0 ? f.ground : mix(ground, f.ground, Math.min(1, dt * 2));

@@ -230,8 +230,9 @@ export const isConcealed = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.
 
 /**
  * A boss of the open world not yet roused (round 60: asked, "prevent players from detecting bosses, particularly large entities such as
- * Cthulhu and Father Dagon, from a distance while traversing the map, as this compromises immersion"): it stands in its arena behind
- * its fog, which is a few metres high and the horror forty, so it was seen over the wall from as far as the mist let the eye reach.
+ * Cthulhu and Father Dagon, from a distance while traversing the map, as this compromises immersion"): it stood in its arena behind
+ * its fog, which was a few metres high and the horror forty, so it was seen over the wall from as far as the mist let the eye reach.
+ * (Round 78: no ring of fog stands now, the mist is in the gate; the horror is still blind and deaf to whoever is beyond its ring, `wakeBetween`.)
  * It wakes as the investigator steps into its ring (`BossEngaged`), and until then it is not drawn, locked on to or beheld: its arrival
  * (ui/cinemaDirector.ts, render/bossArrival.ts) is the first sight of it. Not in the arena or the bestiary, which show every creature.
  */

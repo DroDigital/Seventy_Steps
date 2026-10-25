@@ -108,6 +108,46 @@ describe('the gates hung in the houses', () => {
     }
   });
 
+  it('stand a part by its `v` on the side the investigator comes from, whichever way its wall faces', () => {
+    for (const a of arenas) {
+      const boss = a.bosses[0]!;
+      const def = a.house!.piece;
+      const rig = gateRig(def, STONE)!;
+      rig.parts.forEach((part, i) => {
+        const v = GATE_STYLES[boss]!.parts[i]!.v ?? 0;
+        expect(Math.sign(part.pivot[2] * def.door!.out!), `${boss}: ${GATE_STYLES[boss]!.parts[i]!.model}`).toBe(Math.sign(v));
+      });
+    }
+  });
+
+  it('hang Yig\'s head in the mouth of the mound, in the opening and in the investigator\'s half of the wall, before the slab that fills it', () => {
+    const a = arenas.find((x) => x.bosses[0] === 'yig')!;
+    const def = a.house!.piece;
+    const { width, thick, height, out } = def.door!;
+    const D = width + 2 * HOUSE.lap;
+    const rig = gateRig(def, STONE)!;
+    const sides = (i: number): { s0: number; s1: number; w: number; h: number } => { // the part's extent through the wall, from the investigator's side (+), its width and its height
+      const part = rig.parts[i]!;
+      const box = { z0: Infinity, z1: -Infinity, x0: Infinity, x1: -Infinity, y1: -Infinity };
+      for (const piece of part.pieces) {
+        piece.geo.computeBoundingBox();
+        const b = piece.geo.boundingBox!;
+        box.z0 = Math.min(box.z0, b.min.z); box.z1 = Math.max(box.z1, b.max.z);
+        box.x0 = Math.min(box.x0, b.min.x); box.x1 = Math.max(box.x1, b.max.x); box.y1 = Math.max(box.y1, b.max.y);
+      }
+      const [a0, a1] = [out! * (part.pivot[2] + box.z0), out! * (part.pivot[2] + box.z1)];
+      return { s0: Math.min(a0, a1), s1: Math.max(a0, a1), w: box.x1 - box.x0, h: box.y1 + part.pivot[1] };
+    };
+    const names = GATE_STYLES.yig!.parts.map((p) => p.model);
+    const [slab, head] = [sides(names.indexOf('gate_boulder')), sides(names.indexOf('gate_yig_head'))];
+    expect(head.w, 'head within the opening').toBeLessThanOrEqual(D);
+    expect(head.w, 'a head as wide as a jaw').toBeGreaterThan(D * 0.8);
+    expect(head.h, 'its height').toBeGreaterThan(height);
+    expect(head.s1, 'its face inside the wall').toBeLessThanOrEqual(thick / 2);
+    expect((head.s0 + head.s1) / 2, 'before the slab').toBeGreaterThan((slab.s0 + slab.s1) / 2);
+    expect(slab.s1 - slab.s0, 'a slab, not a block').toBeLessThanOrEqual(thick * 0.5);
+  });
+
   it('clear the way before the seal\'s collider is lifted (a row goes one leaf after another, all within it)', () => {
     for (const s of Object.values(GATE_STYLES)) for (const p of s.parts) {
       if ((p.move ?? s.motion) === 'sink' || (p.move ?? s.motion) === 'lift') expect(GATE_TIMING.start + GATE_TIMING.stagger * (p.delay ?? 0) + GATE_TIMING.span, p.model).toBeLessThanOrEqual(PASSAGE.solidAt + 0.1);
@@ -119,11 +159,23 @@ describe('the gates\' sources', () => {
   const credits = readFileSync('src/data/models/CREDITS.md', 'utf8');
   const kits = new Set(Object.values(GATE_INFO).map((i) => i.kit));
 
-  it('are free (CC0), each credited with the changes made to it', () => {
+  it('are free (CC0, or CC BY 4.0 with its author, its source and the licence named), each credited with the changes made to it', () => {
     expect(kits.size).toBeGreaterThanOrEqual(3);
     for (const k of kits) expect(credits, `credits of ${k}`).toContain(`Gate source ${k}`);
     expect(credits).toMatch(/Poly Haven/);
     expect(credits).toMatch(/changes|modified|decimated/i);
+    const w20 = credits.slice(credits.indexOf('Gate source w20'));
+    expect(w20, 'the serpent\'s author').toContain('corentin');
+    expect(w20, 'its source').toContain('https://sketchfab.com/3d-models/aztec-double-headed-serpent-for-printing-0781a78d31914f00a1b19a61b69113d2');
+    expect(w20, 'its licence').toContain('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
+    const w21 = credits.slice(credits.indexOf('Gate source w21'));
+    expect(w21, 'the ring\'s author').toContain('Trockk');
+    expect(w21, 'its source').toContain('https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55');
+    expect(w21, 'its licence').toContain('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
+    const w22 = credits.slice(credits.indexOf('Gate source w22'));
+    expect(w22, 'the temple\'s author').toContain('Jungle Jim');
+    expect(w22, 'its source').toContain('https://sketchfab.com/3d-models/epic-alien-temple-door-animated-1b2860e267b047f38488cf3ca4d3533b');
+    expect(w22, 'its licence').toContain('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
   });
 
   it('are baked in a set of their own, and none is stood by a place as well as a gate under another name', () => {

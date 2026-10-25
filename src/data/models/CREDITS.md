@@ -170,7 +170,7 @@ By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5aca
 # Credits: the arenas' gates (round 76)
 
 The leaves of the gates of the open arenas (`gateIndex.ts` + `gatePack.ts`, hung by `src/data/gateStyles.ts`, `render/gateRig.ts`) are cut from free models,
-all **Creative Commons Zero (CC0 1.0)**, which asks for no credit; it is given. They were made again for the game by `tools/models/bake_boss_models.py`
+**Creative Commons Zero (CC0 1.0)**, which asks for no credit (it is given), but for the serpent's head of Yig's gate (w20), the spiked ring of the Court's (w21) and the temple front of the Threshold's (w22), which are **CC BY 4.0** and credited as it asks. They were made again for the game by `tools/models/bake_boss_models.py`
 from `tools/models/boss/manifest_gates.py` (`tools/models/gates/fetch.py` fetches the sources): each leaf taken singly, decimated, its colours kept only as
 light and dark (the game lays the arena's own over them) and its size fitted to the metres it hangs at. The gates also hang models of the packs credited above
 (the temple doors, the standing stones, the flutes, the basalt and the dead trees). Changes are named for each.
@@ -194,3 +194,165 @@ By Jenelle van Heerden (modelling) and Dario Barresi (photography), Poly Haven, 
 By Kenney (www.kenney.nl), https://kenney.nl/assets/castle-kit, licensed CC0 1.0. Changes: its metal gate taken singly, turned to face the court, recoloured by the arena's dye (and, for Yig's, turned over) and stretched to fit the opening.
 
 `gate_portcullis`
+
+## Gate source w20 — Aztec Double-Headed Serpent for printing
+By corentin (https://sketchfab.com/corentin), https://sketchfab.com/3d-models/aztec-double-headed-serpent-for-printing-0781a78d31914f00a1b19a61b69113d2, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: one of its two halves taken, its head cut from the neck and the coil and the cut closed, the three pieces the viewer split it into joined, decimated to about 8,000 faces, turned to face along the wall, recoloured by the arena's dye and scaled to the gate's opening.
+
+`gate_yig_head`
+
+## Gate source w21 — Demons Gate
+By Trockk (https://sketchfab.com/Timrockk), https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: decimated to about 6,000 faces, given the metal class, recoloured by the gate's dye, and stretched to the gate's opening and flattened to half the wall's thickness.
+
+`gate_demon_ring`
+
+## Gate source w22 — Epic Alien Temple Door (animated)
+By Jungle Jim (https://sketchfab.com/jungle_jim), https://sketchfab.com/3d-models/epic-alien-temple-door-animated-1b2860e267b047f38488cf3ca4d3533b, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: only the carved temple front taken (its door leaves, its three halls and its ground left out), cut in two down its doorway and the cuts closed, decimated to about 9,000 faces each, colours kept only as light and dark under the gate's dye, turned about to face the court and stretched to the gate's opening.
+
+`gate_alien_l`, `gate_alien_r`
+
+# Credits: the web parts (round 78)
+
+The `wk_*` models of the `web` set (`webIndex.ts` + `webPack.ts`, baked from `tools/models/boss/manifest_web.py`, stood in nine courts; candidates and licences: `docs/WEB_PARTS.md`) are all CC0 1.0, which asks for no credit; it is given.
+
+## Web source kenney — Kenney's kits
+https://kenney.nl/assets (Graveyard Kit, Space Kit, Nature Kit, Tower Defense Kit, Mini Arena, City Kit (Industrial)), **CC0 1.0**.
+
+`wk_coffin` (coffin-old), `wk_crypt` (crypt-large), `wk_skeleton` (character-skeleton), `wk_cross` (gravestone-cross-large), `wk_keeper` (character-keeper), `wk_meteor` (meteor_detailed), `wk_crater` (craterLarge), `wk_crystals` (rock_crystalsLargeA), `wk_crystal` (detail-crystal-large), `wk_mushroom_a`, `wk_mushroom_b` (mushroom_redTall, mushroom_tanTall), `wk_statue` (mini-arena statue), `wk_generator` (machine_generatorLarge), `wk_pipe_ring` (pipe_ringHigh), `wk_tank` (detail-tank-large). Changes: welded and flattened to the game's faces, sized in metres, a figure's separate parts made one.
+
+## Web source quaternius — Quaternius's packs on OpenGameArt
+https://opengameart.org/users/quaternius (Ultimate Space Kit, Modular Dungeon, Medieval Village Pack), **CC0 1.0**.
+
+`wk_tree_spikes`, `wk_tree_spiral` (Tree Spikes, Tree Spiral), `wk_horse` (Statue_Horse, with its pedestal), `wk_well` (Well), `wk_candelabrum` (Candelabrum_tall). Changes: decimated, welded and flattened to the game's faces, sized in metres; the candelabrum has five flame anchors.
+
+## Web source oga — single models on OpenGameArt
+**CC0** (the licence line of each page read): `wk_egg` (Strange Egg, Umplix, https://opengameart.org/content/strange-egg), `wk_knight` (Knight statue, yd, https://opengameart.org/content/knight-statue), `wk_throne` (Barbarian throne, eugeneloza, https://opengameart.org/content/opendungeons-barbarian-throne), `wk_pyramid` (Pyramid 3d, Intrix, https://opengameart.org/content/pyramid-3d). Changes: the pieces of a statue made one, decimated, welded and flattened to the game's faces, sized in metres.
+
+# Credits: the dungeon models (round 79)
+
+Models for the dungeons' rooms and boss halls, from the asset brief for every dungeon (`docs/DUNGEON_MODELS.md`), baked by the same tool as the packs above (`tools/models/bake_boss_models.py`, manifests `tools/models/boss/manifest_p30.py` to `manifest_p54.py`) into `bossIndex.ts` and `bossPack.ts`. Each was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to each face's colour and a material class, decimated, welded, scaled to the metres it stands at, recoloured where noted and given its colliders; nothing is loaded as a source file at run time. The fifteen Sketchfab models were downloaded by the game's author (they need a sign-in) and are credited as their licence asks, with the changes made.
+
+## Pack 30 — Alembic
+This work is based on "Alembic" (https://sketchfab.com/3d-models/alembic-811618ea79ba4aac95d7f7312a2128ec) by FlukierJupiter (https://sketchfab.com/FlukierJupiter) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: scaled to a still of a metre and a half, given one collider and recoloured copper; used in Charles le Sorcier's laboratory.
+
+`al_still`
+
+## Pack 31 — American Old Barn
+This work is based on "American Old Barn" (https://sketchfab.com/3d-models/american-old-barn-1d0b768a8e2449de990b3f69f94c5db6) by andrewriddle (https://sketchfab.com/andrewriddle) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,500 faces, scaled to eleven metres across and given colliders about its timbers; stood in the Whateley loft.
+
+`wf_barn`
+
+## Pack 32 — Armillary sphere
+This work is based on "Armillary sphere" (https://sketchfab.com/3d-models/armillary-sphere-534e240ac6b0412cb526dd2b14bf8909) by KRei (https://sketchfab.com/krei1012) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated from 19,800 to 2,600 faces, scaled and given a collider; stood in the Archives of the Great Race and at the Ultimate Void.
+
+`uv_armillary`
+
+## Pack 33 — Brain in a Jar
+This work is based on "Brain in a Jar" (https://sketchfab.com/3d-models/brain-in-a-jar-b95791959dc74dc6a0d39bd4f563ab90) by Mad_Lobster_Workshop (https://sketchfab.com/Mad_Lobster_Workshop) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: the glass faces left out so that the brain shows, scaled and given a collider; tinted as a metal cylinder in the halls of the Mi-Go and at Akeley's.
+
+`mg_jar`
+
+## Pack 34 — Brazier
+This work is based on "Brazier" (https://sketchfab.com/3d-models/brazier-4240c44c853e42429fa9ac35de2300b9) by Jochon (https://sketchfab.com/jochon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: scaled and given a collider and a flame anchor at its bowl; the eternal fires of the Stairs of Slumber.
+
+`ss_brazier`
+
+## Pack 35 — Coral
+This work is based on "Coral" (https://sketchfab.com/3d-models/coral-dbf4bee13bf84396815073e5cabf8ac3) by rkuhlf (https://sketchfab.com/rkuhlf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: three of its corals taken singly, scaled, given colliders and recoloured pale; Y'ha-nthlei and the Elder City.
+
+`yh_coral_a`, `yh_coral_b`, `yh_coral_c`
+
+## Pack 36 — Gothic Cloaked Figure - Building Wall Statue
+This work is based on "Gothic Cloaked Figure - Building Wall Statue" (https://sketchfab.com/3d-models/gothic-cloaked-figure-building-wall-statue-e9c199b05aea4e88abe830be0b154195) by INGSOC1984 (https://sketchfab.com/INGSOC1984) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,400 faces, scaled to a figure of three and a half metres and given a collider; the priests of Mu in the temple of Ghatanothoa.
+
+`rl_priest`
+
+## Pack 37 — Hourglass
+This work is based on "Hourglass" (https://sketchfab.com/3d-models/hourglass-f480fadf47424bc4ae37bfa16a4de924) by carismah (https://sketchfab.com/carismah) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,200 faces, scaled and given a collider; at the Ultimate Void and in the sculptor's studio.
+
+`uv_hourglass`
+
+## Pack 38 — Museum Showcase - Die Vitrine
+This work is based on "Museum Showcase - Die Vitrine" (https://sketchfab.com/3d-models/museum-showcase-die-vitrine-8ac020233ece4deabdb308e19b1453ba) by Samuel Francis Johnson (Oneironauticus) (https://sketchfab.com/oneironauticus) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: the glass left out, scaled and given a collider; the cases of the wax museum of Rhan-Tegoth.
+
+`mg_case`
+
+## Pack 39 — Stone Altar
+This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar-3d4f2edb18e4424cabb41b60aa160cb5) by TheoClarke (https://sketchfab.com/TheoClarke) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,800 faces, scaled to four and a half metres and given a collider; the table-stone of Sentinel Hill.
+
+`sh_altar`
+
+## Pack 40 — PSX Dungeon
+By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: eight of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
+
+`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
+
+## Pack 42 — Modular Cathedral Kit
+By SigilsVault, https://sigilsvault.itch.io/modular-cathedral-kit, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/): asks for nothing, credited for provenance. Changes: two columns and a railing taken singly, scaled and given colliders.
+
+`ca_column`, `ca_column_small`, `ca_railing`
+
+## Pack 43 — Sewers Modular Assets
+By RotoPoly, https://rotopoly.itch.io/sewers-modular-assets, CC0 1.0: credited for provenance. Changes: a pipe stood upright, the huge pipe, two barred grilles, a support and brick rubble taken singly, scaled and given colliders.
+
+`sw_pipe_big`, `sw_pipe_huge`, `sw_grille`, `sw_bars`, `sw_support`, `sw_rubble`
+
+## Pack 44 — Kyle's Mushroom Pack
+By Kyle Fuji, https://kyle-fuji.itch.io/kyles-mushroom-pack, CC0 1.0: credited for provenance. Changes: five mushrooms (a turkey tail, a reishi, a blue oyster, a morel, a lantern mushroom) grown to the height of a knee and more and tinted by each place.
+
+`mu_bracket`, `mu_reishi`, `mu_oyster`, `mu_morel`, `mu_lantern`
+
+## Pack 45 — Poly Haven
+'Ornate Mirror 01', 'Modular Industrial Pipes 01', 'Old Military Compressor', 'Wine Bottles 01' and 'Pine Roots', https://polyhaven.com, CC0 1.0: credited for provenance. Changes: each reduced hard (the mirror to 1,100 faces, the pipes to 2,500, the compressor to 700, the roots to 2,800), the bottle taken singly with its label left out and its glass, wine and cork given the classes of glassware, liquid and wood, the mirror's glass made a mirror, the compressor's gauge glass made glass, scaled and given colliders where they stand in the way.
+
+`ph_mirror`, `ph_pipes`, `ph_compressor`, `ph_bottle`, `ph_roots`
+
+## Pack 46 — Lab Assets
+By MilkAndBanana, https://opengameart.org/content/lab-assets, CC0 1.0: credited for provenance. Changes: a retort, a Florence flask, a round-bottomed flask, a reagent bottle, a ring stand, a Bunsen burner and a microscope taken singly (none of the counters, electronics or safety gear), their glass tinted amber and grey, scaled.
+
+`lb_retort`, `lb_florence`, `lb_round`, `lb_reagent`, `lb_stand`, `lb_burner`, `lb_microscope`
+
+## Pack 47 — Retro Modular House Pack
+By Elegant Crow, https://elegantcrow.itch.io/retro-modular-house-pack, CC0 1.0 (the photographs that ship beside it, which have terms of their own, are not used): credited for provenance. Changes: a boarded door and window, closed shutters, a loose plank, a double window, a door and a flight of stairs taken singly and scaled; the stairs given a collider.
+
+`rh_boarded_door`, `rh_boarded_window`, `rh_shutter`, `rh_plank`, `rh_window`, `rh_door`, `rh_stair`
+
+## Pack 48 — Modular Cave Kit
+By Kenney, https://kenney.nl/assets/modular-cave-kit, CC0 1.0: credited for provenance. Changes: the rock gate and the barred gate taken singly, scaled and given colliders about their openings.
+
+`kc_gate_rock`, `kc_gate_bars`
+
+## Pack 49 — Retro Fantasy Kit
+By Kenney, https://kenney.nl/assets/retro-fantasy-kit, CC0 1.0: credited for provenance. Changes: a column, a broken column, a barrel stack and a pulley taken singly and scaled; the first three given colliders.
+
+`kf_column`, `kf_column_broken`, `kf_barrels`, `kf_pulley`
+
+## Pack 50 — Curtains
+This work is based on "Curtains" (https://sketchfab.com/3d-models/curtains-a83e1baf822a4442b0f50ed70d449198) by Heliona (https://sketchfab.com/Heliona) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated, scaled to four and a half metres across and coloured by the game's cloth and metal; hung in Lilith's shrine.
+
+`cu_curtains`
+
+## Pack 51 — Prayer Wheel
+This work is based on "Prayer Wheel" (https://sketchfab.com/3d-models/prayer-wheel-8da83b65c713447586d7e6182d78dd06) by Özlem Çandır (https://sketchfab.com/OzlemCandir) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: turned upright on its post, scaled to one and a half metres, coloured by the game's metal and given a collider on its post; the wheels of the High Priest's monastery on Leng.
+
+`pw_wheel`
+
+## Pack 52 — Old Gramophone
+This work is based on "Old Gramophone" (https://sketchfab.com/3d-models/old-gramophone-5e892fc786db4ca1b36738ab5e40e64d) by KIFIR (https://sketchfab.com/kifir) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated, scaled to a metre and a little more and given a box collider; the phonograph in Akeley's study.
+
+`og_gramophone`
+
+## Pack 53 — Old Church Bell
+This work is based on "old church bell" (https://sketchfab.com/3d-models/old-church-bell-8aa10771481c4a0d83f7a47af6fdf9e1) by vertexgrocer (https://sketchfab.com/vertexgrocer) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 1,500 faces, scaled to one and a half metres and coloured by the game's metal; the bell of the Starry Wisdom steeple.
+
+`cb_bell`
+
+## Pack 54 — Bust of Apollo
+This work is based on "Bust of Apollo" (https://sketchfab.com/3d-models/bust-of-apollo-fdaf490184d04e45bbd2afe8a1555a67) by davdadams (https://sketchfab.com/davdadams) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: decimated to 2,000 faces, scaled to a metre and a tenth, coloured as stone and given a box collider. It is the bust as made, reduced and recoloured, with no laurel, crown or other change to what it shows; it stands in Hypnos' studio.
+
+`ba_bust`
+
+## Flames, smoke and surface patterns (round 79)
+
+- **Pixel flames.** 'Fire' by ZomBCool, https://opengameart.org/content/fire-0, CC0 1.0: credited for provenance. Changes: its four frames of `fire_3.gif` reduced to a heat mask and a coverage mask (`tools/flames/bake_flames.py`, `src/data/flameAtlas.ts`) and coloured in code (`src/render/flames.ts`).
+- **Smoke puffs.** 'Smoke Particles' by Kenney (Kenney Vleugels), https://kenney.nl/assets/smoke-particles, CC0 1.0: credited for provenance. Changes: four of the white puffs reduced to 24 x 24 coverage masks, in the same atlas.
+- **PS1 surface patterns.** The 64 x 64 textures `TEX_Wall_03`, `TEX_Ground_04` and `TEX_Planks_01` of Pack 40 (Goblinatron's PSX Dungeon, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). Changes: reduced to each texel's brightness against the texture's own average (`tools/psx/bake_psx_textures.py`, `src/data/psxDetail.ts`), laid over the world's procedural stone, flagstone and plank textures (`src/render/textures.ts`) and coloured by the realms' grades.

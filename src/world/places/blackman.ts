@@ -30,6 +30,12 @@ export const blackman: ExtraFn = (c, h) => {
     const [a, cc] = polar(R * 1.4 + (i % 2) * 1.5, ((i + 0.3) * 360) / 7);
     c.add(MENHIRS[(i + 1) % 4]!, a, cc, { ...STONE, face: 'in', s: 1.2 + (i % 2) * 0.15, jitter: 0.4 });
   }
+  // the sabbat, caught still (web part wk_keeper, docs/WEB_PARTS.md): keepers in their robes stand between the thirteen, all turned in, none on the ford's side
+  for (let i = 0; i < 13; i++) {
+    const deg = ((i + 1) * 360) / 13; // (the stones stand at the half-steps)
+    if (Math.abs(((deg + 180) % 360) - 180) < 40) continue;
+    c.add('wk_keeper', ...polar(R + 2.6, deg), { tint: [0.16, 0.14, 0.2], keep: 0.35, face: 'in', s: 0.95 + (i % 3) * 0.06 });
+  }
   // the ford's landing is between two tall stones, and flat stones are laid in the dust of it
   for (const side of [-1, 1]) c.add('nt_menhir_c', Ri - 3.6, side * 7.4, { ...STONE, face: 'front', s: 1.25 });
   for (let a = Ri - 6; a > R + 4; a -= 3.3) c.add('nt_stone_flat', a, (a % 2 > 1 ? 1 : -1) * 0.7, { ...STONE, face: 'front', s: 0.8, walk: true, jitter: 0.2 });

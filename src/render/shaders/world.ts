@@ -11,6 +11,7 @@ import { PANE_GLSL } from '../paneLife';
 import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
+import { SURFACE_APPLY, SURFACE_UNIFORMS } from './surfaces';
 
 export { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 
@@ -227,6 +228,7 @@ float footRings(vec2 p) {
 }
 
 uniform float uClipY;
+${SURFACE_UNIFORMS}
 void main() {
   if (vWorld.y < uClipY) discard; // under the sea's surface, in the mirrored scene (reflection.ts; round 35)
   vec2 uv = affineUv(vec2(textureSize(uMap, 0)));
@@ -344,6 +346,8 @@ void main() {
     col = mix(col, min(lit, vec3(1.2)) * vec3(0.9, 0.95, 0.93) * 1.1, clamp(foam, 0.0, 0.7));
   }
 #endif
-  gl_FragColor = vec4(mix(col, uFogColor, vFog * uFogAmount), uCharacter > 0.5 && uMarkCharacters > 0.5 ? 0.75 : uOpacity);
+  float alpha = uCharacter > 0.5 && uMarkCharacters > 0.5 ? 0.75 : uOpacity;
+${SURFACE_APPLY}
+  gl_FragColor = vec4(mix(col, uFogColor, vFog * uFogAmount), alpha);
 }
 `;

@@ -23,7 +23,7 @@ export interface Layout {
   rods?: readonly V3[]; // the tips of its lightning rods
   living?: readonly Living[];
   signals?: readonly Signal[]; // round 75: what the court does now and then (a chase of lights, an arc between pylons)
-  fogHeight?: number; // metres: the fight's fog, lower than the ring's own, so the place stands over it
+  fogHeight?: number; // unused since round 78 (see Enclosure.fogHeight)
   under?: (level: number) => Pad[]; // ground it shapes after the level: a lagoon sunk, a platform raised
   dry?: (p: XZ) => number; // where a body or a piece may stand, apart from the wall's own: negative on it (round 75: a pool's water is not)
 }
