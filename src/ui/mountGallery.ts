@@ -14,7 +14,7 @@ import { createWorldMaterial, updateWorldUniforms, worldUniforms } from '../rend
 
 const clamp = (v: number, a: number, b: number): number => Math.min(b, Math.max(a, v));
 const STYLE = `
- .mount-exhibit{position:fixed;inset:0;z-index:30;color:#e4ddd1;font:13px/1.5 Georgia,serif;pointer-events:none;background:linear-gradient(180deg,#07080ca8,transparent 20%,transparent 60%,#07080cdd)}
+ .mount-exhibit{position:fixed;inset:0;z-index:30;color:#e4ddd1;font:13px/1.5 'IM Fell English',Georgia,serif;pointer-events:none;background:linear-gradient(180deg,#07080ca8,transparent 20%,transparent 60%,#07080cdd)}
  .mount-exhibit *{box-sizing:border-box}.mount-exhibit header{position:absolute;top:28px;left:36px;right:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
  .mount-exhibit .eyebrow{font:10px/1.5 monospace;letter-spacing:.22em;text-transform:uppercase;color:#b3a590}.mount-exhibit .brand{margin:3px 0 0;font-size:21px;letter-spacing:.12em;font-weight:normal}
  .mount-exhibit a{color:#bbb4a9;pointer-events:auto;text-decoration:none;border-bottom:1px solid #777064;padding:3px 0;font:11px/1.5 monospace}
