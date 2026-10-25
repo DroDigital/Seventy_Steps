@@ -14,6 +14,8 @@ import * as THREE from 'three';
 import type { V3 } from '../core/geom';
 import { LIGHTS, SANITY, type LightDef, type LightKind } from '../data/tuning';
 import type { CollisionWorld } from '../world/colliders';
+import { HEARTH } from '../data/lightSounds';
+import { beginHeard, pushHeard } from './audio/heardLights';
 import { createHalos } from './halos';
 import { createLightSight } from './lightSight';
 import { paneLit } from './paneLife';
@@ -121,6 +123,11 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       haloSight.update(visible, eye, time);
       seen.length = 0;
       for (const n of near) if (n.v > 0.02) seen.push(n); // the lamps are for the lights that show: one in the next room takes none
+      beginHeard(); // round 78: the nearest in earshot, for the sound of them (audio/hearth.ts); one in the next room is heard dulled, so these are `near`, not `seen`
+      for (const n of near) {
+        if (n.d > HEARTH.reach) break;
+        if (n.s.kind !== 'window' && !pushHeard(n.s, n.d, n.v, waver(n.s, LIGHTS.kinds[n.s.kind].flicker, time))) break; // (a lit window is mute)
+      }
       const reach = Math.min(LIGHTS.reach, seen[LAMP_SLOTS]?.d ?? Infinity); // the next in line is at nothing
       casters.length = 0;
       const lamps = worldUniforms.uLamps.value;
