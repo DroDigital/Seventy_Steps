@@ -269,7 +269,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
         const held = menu?.open || shop.open || rise?.open || ending.open || cinema.active;
-        game.talking = dialogue.open; // a dialogue is open (a talk, a page or a note): nothing reaches the investigator, and the foes let go of them (targets.ts, brain.ts)
+        game.sheltered = dialogue.open || shop.open || !!menu?.open; // a dialogue, a trade or a sign's rest is open: nothing reaches the investigator, and the foes let go of them (targets.ts, brain.ts)
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
