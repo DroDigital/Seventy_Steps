@@ -70,7 +70,27 @@ export const orne: PlaceFn = (c: Court, h: House) => {
   c.add('gy_grave', -B + 14, 14, { yaw: 0.4, walk: true });
   c.add('gy_coffin', -B + 14.4, 14.2, { yaw: 0.4 + 0.15, walk: true, y: 0.05 });
   c.add('gy_coffin_lid', -B + 12.4, 17, { yaw: 1.2, walk: true });
-  // trees over the wall
+  // what was dug up is not what was put down: bones thrown about the open plot, a heap of skulls at the crypt's door, and before the chapel an altar with a ring of candles lit on it (the way's omen: the lamps are lit, no one lit them)
+  c.add('bn_pile_skull', -B + 11.6, 20.4, { yaw: 0.8, walk: true, s: 1.2 });
+  c.add('bn_ribcage', -B + 16.6, 17.6, { yaw: 2.2, walk: true, s: 1.4 });
+  c.add('bn_leg', -B + 12.2, 12.4, { yaw: 0.3, walk: true, s: 1.3 });
+  c.add('bn_spine', -B + 17.8, 11.6, { yaw: 1.7, walk: true, s: 1.3 });
+  c.add('bn_skull_pyramid', -B + 12.8, -S + 13.2, { face: 'in', s: 1.4, walk: true });
+  const altar = -(c.R + 3.4);
+  c.add('altar_stone', altar, 0, { face: 'in', s: 1.25 });
+  for (const cc of [-0.95, -0.45, 0.45, 0.95]) c.add('candles', altar, cc, { y: 1.4, s: 1.4, lit: 'torch', walk: true, face: 'in' });
+  c.add('chalice', altar, 0, { y: 1.4, s: 1.6, walk: true, face: 'in' });
+  // dug up and not put back (web parts, docs/WEB_PARTS.md): coffins half out of the ground, one of the dead risen at the back, crosses by the chapel's path, a candelabrum either side of the altar
+  for (const [a, cc, yaw] of [[-B + 14, -12, 0.5], [-B + 19.5, -19, 2.4], [-B + 13, 27, 1.1]] as const) c.add('wk_coffin', a, cc, { yaw, y: -0.3, tint: [0.4, 0.34, 0.3], keep: 0.5 });
+  c.add('wk_crypt', -B + 5.2, 22, { face: 'in', s: 0.85, tint: [0.55, 0.55, 0.58], keep: 0.4 }); // a mausoleum by the chapel
+  c.add('wk_skeleton', -B + 9.5, -24, { face: 'in', turn: 30, tint: [0.78, 0.74, 0.66], keep: 0.5 });
+  for (const side of [-1, 1]) {
+    c.add('wk_cross', -B + 13, side * 6, { face: 'front', turn: side * 12, tint: [0.5, 0.5, 0.52], keep: 0.4 });
+    c.add('wk_candelabrum', altar, side * 2.5, { face: 'in', lit: 'torch', flame: 0.45, s: 1.1 });
+  }
+
+  // trees over the wall, and two bare ones taller than they beyond its back corners
+  for (const side of [-1, 1]) c.add('gt_dead_5', -B - 6, side * (S + 4), { height: 10, round: true, yaw: side * 2.1 });
   for (const [a, cc, id, hgt] of [[G - 6, S - 5, 'gy_tree_2', 8], [G - 4, -S + 6, 'gy_tree_1', 6.5], [-B + 6, S - 5, 'gy_tree_1', 7.5], [-B + 5, -S + 6, 'gy_tree_2', 8.5], [0, S - 3, 'gy_tree_2', 7], [6, -S + 3, 'gy_tree_1', 6]] as const) {
     c.add(id, a, cc, { height: hgt, round: true, yaw: a * 3 });
   }

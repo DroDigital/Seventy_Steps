@@ -10,9 +10,11 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   anchors  [(x, y, z)]: where a flame or a light sits in the finished model (its own frame, feet at the origin); `anchor_of` finds one from the
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
-  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default) or 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py)
+  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default), 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py) or
+           'web' (webIndex.ts, webPack.ts: parts taken from free web sources, manifest_web.py)
   metal_luma  faces darker than this (0..1) are made `metal`, whatever the material said: the iron straps of a plank door
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
+  join     the objects it selects are made one before anything else (a model a viewer split at its vertex limit); `cap`: a `cut` is closed with triangles
   glass_alpha, fill, plane   what is clear, wet or silvered (round 79): see the fields
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
            out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature; `drop_alpha` leaves out the faces whose texture is mostly clear
@@ -56,6 +58,8 @@ class M:
     args: dict = field(default_factory=dict)  # a `proc:` form's arguments (tools/models/boss/proc.py)
     set: str = 'boss'
     metal_luma: float = 0
+    join: bool = False
+    cap: bool = False
     blank: Any = None  # a figure's head taken off at the bone of this name and an eyeless egg set in its place: {'bone': 'head', 'radii': (x, y, z)}
 
 REGISTRY: list = []

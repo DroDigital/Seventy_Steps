@@ -9,10 +9,12 @@
 import * as THREE from 'three';
 import { getRegion } from '../data/regions';
 import { strewn } from '../world/planFill';
+import { ARENA_MISTS } from '../data/arenaMists';
 import { dungeonFogOf, FOGS, type FogDef } from '../data/fogs';
 import { lookOf } from '../data/looks';
 import { FOG } from '../data/tuning';
 import { NIGHT_DARK } from '../data/lifeTuning';
+import type { Court } from './courtMist';
 import type { PostPass } from './postPass';
 
 export interface FogFrame {
@@ -22,6 +24,7 @@ export interface FogFrame {
   stress: number; // 0–1: the sanity effects' stress (capped by the FX setting)
   setting: number; // the Fog setting, 0–1
   wood?: number; // 0–1: how wooded the land underfoot is (world/planFill.ts `strewn`): the mist gathers among the trees (round 35)
+  court?: Court | null; // round 78: the open arena's court the camera is in, and how far: its mist is the realm's thickened (data/arenaMists.ts)
   dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
 
@@ -31,10 +34,16 @@ export interface VolumetricFog {
   snap(): void;
 }
 
-/** The mist wanted where the investigator stands, in its realm's colour as it is now (data/looks.ts). */
-export const fogOf = (region: string | null, enclosed: boolean): FogDef => (enclosed ? dungeonFogOf(region) : { ...(FOGS[region ?? ''] ?? FOGS.hub), color: lookOf(region).mist });
-
 const mix = (a: number, b: number, k: number): number => a + (b - a) * k;
+
+/** The mist wanted where the investigator stands, in its realm's colour as it is now (data/looks.ts); in an open arena's court, the realm's thickened toward the court's own. */
+export function fogOf(region: string | null, enclosed: boolean, court?: Court | null): FogDef {
+  if (enclosed) return dungeonFogOf(region);
+  const base: FogDef = { ...(FOGS[region ?? ''] ?? FOGS.hub), color: lookOf(region).mist };
+  const m = court && court.share > 0 ? ARENA_MISTS[court.boss] : undefined;
+  if (!m || !court) return base;
+  return easeFog(base, { ...base, density: base.density * m.density, height: base.height * m.height, haze: base.haze * (m.haze ?? 1), patchy: m.patchy ?? base.patchy }, court.share);
+}
 
 /** `from` turned toward `to` by share `k` (0–1). */
 export function easeFog(from: FogDef, to: FogDef, k: number): FogDef {
@@ -62,7 +71,7 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
     update(camera, time, f) {
       const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, time - last));
       last = time;
-      const want = fogOf(f.region, f.enclosed);
+      const want = fogOf(f.region, f.enclosed, f.court);
       roof = now ? mix(roof, f.enclosed ? 1 : 0, Math.min(1, dt * FOG.ease)) : f.enclosed ? 1 : 0;
       now = now ? easeFog(now, want, Math.min(1, dt * FOG.ease)) : want; // the first frame takes the place's own at once
       ground = dt === 0 ? f.ground : mix(ground, f.ground, Math.min(1, dt * 2));
