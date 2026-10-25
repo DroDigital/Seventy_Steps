@@ -70,7 +70,18 @@ export const orne: PlaceFn = (c: Court, h: House) => {
   c.add('gy_grave', -B + 14, 14, { yaw: 0.4, walk: true });
   c.add('gy_coffin', -B + 14.4, 14.2, { yaw: 0.4 + 0.15, walk: true, y: 0.05 });
   c.add('gy_coffin_lid', -B + 12.4, 17, { yaw: 1.2, walk: true });
-  // trees over the wall
+  // what was dug up is not what was put down: bones thrown about the open plot, a heap of skulls at the crypt's door, and before the chapel an altar with a ring of candles lit on it (the way's omen: the lamps are lit, no one lit them)
+  c.add('bn_pile_skull', -B + 11.6, 20.4, { yaw: 0.8, walk: true, s: 1.2 });
+  c.add('bn_ribcage', -B + 16.6, 17.6, { yaw: 2.2, walk: true, s: 1.4 });
+  c.add('bn_leg', -B + 12.2, 12.4, { yaw: 0.3, walk: true, s: 1.3 });
+  c.add('bn_spine', -B + 17.8, 11.6, { yaw: 1.7, walk: true, s: 1.3 });
+  c.add('bn_skull_pyramid', -B + 12.8, -S + 13.2, { face: 'in', s: 1.4, walk: true });
+  const altar = -(c.R + 3.4);
+  c.add('altar_stone', altar, 0, { face: 'in', s: 1.25 });
+  for (const cc of [-0.95, -0.45, 0.45, 0.95]) c.add('candles', altar, cc, { y: 1.4, s: 1.4, lit: 'torch', walk: true, face: 'in' });
+  c.add('chalice', altar, 0, { y: 1.4, s: 1.6, walk: true, face: 'in' });
+  // trees over the wall, and two bare ones taller than they beyond its back corners
+  for (const side of [-1, 1]) c.add('gt_dead_5', -B - 6, side * (S + 4), { height: 10, round: true, yaw: side * 2.1 });
   for (const [a, cc, id, hgt] of [[G - 6, S - 5, 'gy_tree_2', 8], [G - 4, -S + 6, 'gy_tree_1', 6.5], [-B + 6, S - 5, 'gy_tree_1', 7.5], [-B + 5, -S + 6, 'gy_tree_2', 8.5], [0, S - 3, 'gy_tree_2', 7], [6, -S + 3, 'gy_tree_1', 6]] as const) {
     c.add(id, a, cc, { height: hgt, round: true, yaw: a * 3 });
   }
