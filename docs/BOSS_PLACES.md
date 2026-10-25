@@ -83,7 +83,7 @@ beside the planners' own deliberate dressing. Now:
 - **Colliders are decomposed, never one box to a building.** Each model's `solids` are boxes about its walls and posts (`'auto'` voxelises a doorway or colonnade so it stays open; `'box'` for a solid mass such as a chapel;
   a piece with `walk: true` has none). `tests/enclosure.test.ts` floods the land to prove nothing walks in but by the gate, `tests/bossPlaces.test.ts` keeps the fight's ring clear and the way from the gate to it open,
   and `tests/enclosedAudit.test.ts` finds any room a body could enter and not leave.
-- **Drawing.** A piece is a prop of the kind `set`, drawn by the same batched instancing the arenas' sets use, in the realm's grade, with no new material. Doors are drawn by `render/gateWild.ts` and `gateMetal.ts`
+- **Drawing.** A piece is a prop of the kind `set`, drawn by the same batched instancing the arenas' sets use, in the realm's grade, with no new material. Doors are drawn by `render/gateViews.ts` from the gate set's models (round 76, docs/GATES.md; they were `gateWild.ts` and `gateMetal.ts`)
   (roots, fangs, leaves, portcullis, bronze leaves) and open as a body nears. What breathes is drawn by `render/courtLife.ts` from `Emit`s anchored at a source (`world/placeEmit.ts`).
 - **Photographs.** `node tools/boss_shots.mjs <out dir> --views approach,gate,high [--info stats.jsonl] [boss ...]` (needs Playwright and the dev server).
 
