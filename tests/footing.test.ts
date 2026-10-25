@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { COLD } from '../src/data/bodyTuning';
-import { BODY, BREATH, FOOT_GAIN, GEAR, STEP_LAYERS, BOARD_CREAK, FEEL } from '../src/data/footSounds';
+import type { Echo } from '../src/data/acoustics';
+import { BODY, BREATH, FOOT_GAIN, GEAR, STEP_LAYERS, STEP_VOICE, BOARD_CREAK, FEEL } from '../src/data/footSounds';
+import { MIND_EARS } from '../src/data/mindSounds';
 import { SAMPLE_SETS } from '../src/data/samples';
 import type { Layer, Sound } from '../src/data/sounds';
 import { createBodyFoley } from '../src/render/audio/bodyFoley';
 import { createFoley } from '../src/render/audio/foley';
-import { coldAt, footFeel, stepSetOf } from '../src/render/audio/footing';
+import { coldAt, footFeel, stepLevel, stepSetOf } from '../src/render/audio/footing';
 import type { Sampler, SampleOptions } from '../src/render/audio/sampler';
 import { HEART } from '../src/render/feel';
 import { createWorldGame } from '../src/systems/game';
@@ -92,7 +94,7 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
     const heard = new Map<string, { centroid: number }>();
     for (const [ground, s] of Object.entries(STEP_LAYERS)) {
       const r = render(scaled(s!, FOOT_GAIN.steps));
-      expect(r.rms, ground).toBeGreaterThan(-42);
+      expect(r.rms, ground).toBeGreaterThan(-48); // (round 83: sand and leaves lie under their recordings by about 3 dB A-weighted, and are not silent)
       expect(r.rms, ground).toBeLessThan(-28);
       expect(r.peak, ground).toBeLessThan(-14);
       expect(r.sec, ground).toBeLessThan(0.35);
@@ -112,6 +114,16 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
   it('every ground with a recipe or a feel has the other too (a ground with one is not left half done)', () => {
     for (const g of Object.keys(STEP_LAYERS)) expect(FEEL[g as keyof typeof FEEL], g).toBeDefined();
     for (const g of Object.keys(FEEL)) expect(STEP_LAYERS[g as keyof typeof STEP_LAYERS], g).toBeDefined();
+  });
+
+  it('the gear is cloth and leather and nothing rings: noise only, nothing above 2 kHz, no lantern bail (round 83)', () => {
+    expect(Object.keys(GEAR).sort()).toEqual(['coat', 'satchel']);
+    for (const [id, s] of Object.entries(GEAR)) {
+      for (const layer of s) {
+        expect(layer.src, id).toBe('noise'); // (a ringing is a tone; the bail and the buckle were tones)
+        expect(layer.filter?.hz ?? layer.hz ?? 0, id).toBeLessThan(2000);
+      }
+    }
   });
 
   it('the creak, the gear and the breath are quiet, and brief', () => {
@@ -143,7 +155,7 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
 interface Heard { key: string; gain: number }
 interface Played { set: unknown; o: SampleOptions }
 
-function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 'snow', rand: () => number = () => 0.99, run = 80) {
+function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 'snow', rand: () => number = () => 0.99, run = 80, room?: () => Echo | undefined) {
   const g = createWorldGame();
   const at = findGround(g, region, ground, run, 0)!;
   const tr = g.ecs.c.transform.get(g.player.id)!;
@@ -154,7 +166,7 @@ function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 's
   const played: Played[] = [];
   const sampler: Sampler = { load: async () => undefined, buffer: () => null, settled: () => true, forget: () => undefined, play: (set, o = {}) => (played.push({ set, o }), true) };
   const body = createBodyFoley(g, (key, _s, o) => (heard.push({ key, gain: o?.gain ?? 1 }), true), sampler, rand);
-  const foley = createFoley(g, sampler, () => true);
+  const foley = createFoley(g, sampler, () => true, room);
   let t = 0;
   let stress = 0.9;
   const tick = (seconds: number, metres: number, yaw = 0): void => {
@@ -166,7 +178,14 @@ function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 's
       foley.update(t, () => ({ gain: 1, pan: 0 }), () => undefined);
     }
   };
-  return { g, heard, played, tick, setStress: (s: number) => void (stress = s), tr, at: () => t, setTime: (s: number) => void (t = s) };
+  /** One frame of `dt` seconds in which the body is carried `metres` (a frame drawn faster than the simulation moves it on only some). */
+  const frame = (dt: number, metres: number, yaw = 0): void => {
+    if (metres) stride(g, metres, yaw);
+    t += dt;
+    body.update(t, stress);
+    foley.update(t, () => ({ gain: 1, pan: 0 }), () => undefined);
+  };
+  return { g, heard, played, tick, frame, setStress: (s: number) => void (stress = s), tr, at: () => t, setTime: (s: number) => void (t = s) };
 }
 const keys = (r: { heard: Heard[] }, prefix: string): number => r.heard.filter((h) => h.key.startsWith(prefix)).length;
 const recorded = (r: { played: Played[] }): Played[] => r.played.filter((p) => !p.o.delay);
@@ -190,19 +209,20 @@ describe('the body, heard', () => {
     expect(mounted.played).toEqual([]);
   });
 
-  it('coat, satchel and the lantern\'s bail: the coat as a walk begins, all three at a run, quietly', () => {
+  it('the coat as a walk begins, the coat and the pack now and then at a run, quietly, and nothing that rings: no lantern bail, no buckle (round 83)', () => {
     const r = rig();
     r.tick(2, 0);
     r.tick(5, 10);
     expect(keys(r, 'gear:coat')).toBe(1); // setting off
     expect(keys(r, 'gear:satchel')).toBe(0);
-    const bails = keys(r, 'gear:bail');
-    expect(bails).toBeGreaterThan(0);
     r.g.player.sprinting = true;
     r.tick(5, 28);
+    const strides = keys(r, 'foot:snow');
     expect(keys(r, 'gear:coat')).toBeGreaterThan(3);
+    expect(keys(r, 'gear:coat')).toBeLessThan(1 + strides / 2); // (a swing every third stride, not every one)
     expect(keys(r, 'gear:satchel')).toBeGreaterThan(0);
-    expect(keys(r, 'gear:bail')).toBeGreaterThan(bails + 2);
+    expect(keys(r, 'gear:satchel')).toBeLessThan(strides / 3);
+    expect(r.heard.some((h) => h.key === 'gear:bail')).toBe(false);
     for (const h of r.heard.filter((x) => x.key.startsWith('gear:'))) expect(h.gain).toBeLessThanOrEqual(FOOT_GAIN.gear);
   });
 
@@ -258,6 +278,126 @@ describe('the body, heard', () => {
     r.tick(10, 20);
     expect(r.heard).toEqual([]);
     expect(r.played.filter((p) => p.o.delay)).toEqual([]);
+  });
+});
+
+describe('the footsteps, understated (round 83)', () => {
+  /** The gains of the recorded footfalls of a walk of `seconds` at `speed`, over snow (the ground's feel taken out). */
+  function walk(speed: number, seconds = 10, room?: () => Echo | undefined) {
+    const r = rig('mountains', 'snow', undefined, 110, room);
+    r.tick(seconds, speed * seconds);
+    const steps = recorded(r).filter((p) => p.o.pitch === FEEL.snow!.pitch); // (a patch of other ground in the run takes its own feel)
+    return { steps, gains: steps.map((p) => p.o.gain! / FEEL.snow!.gain) };
+  }
+
+  it('each step is quieter than round 80\'s at every pace, a creep quietest and a sprint the loudest', () => {
+    const oldLevel = (speed: number): number => 0.55 + 0.45 * Math.min(1, speed / 6.4);
+    for (const speed of [1.5, 2.2, 3, 4.2, 5.5, 6.4, 8]) expect(stepLevel(speed), `${speed} m/s`).toBeLessThan(oldLevel(speed) * 0.7); // at least 3 dB under
+    expect(stepLevel(2.2)).toBeLessThan(stepLevel(4.2));
+    expect(stepLevel(4.2)).toBeLessThan(stepLevel(6.4));
+    expect(stepLevel(6.4)).toBeCloseTo(STEP_VOICE.level[1]);
+    expect(stepLevel(0)).toBeCloseTo(STEP_VOICE.level[0]);
+    expect(stepLevel(40)).toBeCloseTo(STEP_VOICE.level[1]); // (a jump or a fall is not louder than a sprint)
+  });
+
+  it('the played steps keep to that level, the second foot of a pair lands softer, and no two are alike', () => {
+    const { gains } = walk(4.2);
+    expect(gains.length).toBeGreaterThanOrEqual(30);
+    const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
+    for (const gain of gains) {
+      expect(gain).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-9);
+      expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) - 1e-9);
+    }
+    const [first, second] = [gains.filter((_, i) => i % 2 === 0), gains.filter((_, i) => i % 2 === 1)]; // (the feet take turns)
+    const [soft, firm] = [Math.min(mean(first), mean(second)), Math.max(mean(first), mean(second))];
+    expect(soft / firm).toBeGreaterThan(STEP_VOICE.offFoot - 0.07);
+    expect(soft / firm).toBeLessThan(STEP_VOICE.offFoot + 0.07);
+    expect(new Set(gains.map((x) => x.toFixed(4))).size).toBeGreaterThan(gains.length * 0.8);
+  });
+
+  it('a walk on a display faster than the simulation is a walk: the pace is the metres over the time since the body last moved, not since the last frame', () => {
+    for (const hz of [60, 144, 240]) {
+      const r = rig('mountains', 'snow', undefined, 110);
+      for (let i = 0; i < hz * 10; i++) r.frame(1 / hz, Math.floor(((i + 1) * 60) / hz) - Math.floor((i * 60) / hz) > 0 ? 4.2 / 60 : 0); // (the simulation steps 60 times a second)
+      const steps = recorded(r).filter((p) => p.o.pitch === FEEL.snow!.pitch);
+      expect(steps.length, `${hz} Hz`).toBeGreaterThanOrEqual(36); // a stride every 1.05 m: about four a second, not the sprint's stride of 1.3 m
+      expect(steps.length, `${hz} Hz`).toBeLessThanOrEqual(44);
+      for (const p of steps) expect(p.o.gain! / FEEL.snow!.gain, `${hz} Hz`).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-6);
+    }
+  });
+
+  it('the steps of a failing mind keep under the investigator\'s own, which are quieter now', () => {
+    expect(FOOT_GAIN.phantom).toBeLessThan(0.15);
+    expect(MIND_EARS.tread.gain[1]).toBeLessThanOrEqual(STEP_VOICE.level[1] * 0.45);
+    expect(MIND_EARS.tread.last.gain).toBeLessThan(MIND_EARS.tread.gain[1] * 1.3);
+  });
+
+  it('a backstep\'s scuffs are no louder than a sprint\'s step', () => {
+    expect(STEP_VOICE.backstep).toBeLessThanOrEqual(STEP_VOICE.level[1]);
+    expect(STEP_VOICE.splash).toBeLessThan(0.32);
+  });
+
+  it('the recipe laid over a step keeps under the recording at every pace, on both feet', () => {
+    const r = rig();
+    r.tick(10, 42);
+    const recipes = r.heard.filter((h) => h.key.startsWith('foot:snow'));
+    expect(recipes.length).toBeGreaterThanOrEqual(30);
+    for (const h of recipes) expect(h.gain).toBeLessThanOrEqual(FOOT_GAIN.steps * stepLevel(4.2) * (1 + 1e-9));
+  });
+});
+
+describe('a room answers the footfall (round 83)', () => {
+  const vault: Echo = { delay: 0.16, gain: 0.17, fall: 0.5, taps: 2, dark: 2300 };
+
+  it('with no room, or a dry one, a step is the one sound; in a vault each is heard again, fainter, duller and later, to either side by turns', () => {
+    const dry = rig('mountains', 'snow', undefined, 110);
+    dry.tick(6, 25);
+    expect(recorded(dry).length).toBeGreaterThan(10);
+    for (const p of recorded(dry)) expect(p.o.echoes).toBeUndefined();
+    const wet = rig('mountains', 'snow', undefined, 110, () => vault);
+    wet.tick(6, 25);
+    const steps = recorded(wet);
+    expect(steps.length).toBeGreaterThan(10);
+    steps.forEach((p, i) => {
+      const echoes = p.o.echoes!;
+      expect(echoes).toHaveLength(vault.taps);
+      expect(echoes[0]!.delay).toBeCloseTo(vault.delay);
+      expect(echoes[1]!.delay).toBeGreaterThan(echoes[0]!.delay * 1.5); // (not a flutter: each a little later than the last)
+      expect(echoes[0]!.gain).toBeCloseTo(vault.gain);
+      expect(echoes[1]!.gain).toBeLessThan(echoes[0]!.gain);
+      expect(echoes[1]!.lowpass!).toBeLessThan(echoes[0]!.lowpass!);
+      for (const e of echoes) {
+        expect(e.lowpass!).toBeLessThanOrEqual(vault.dark);
+        expect(e.lowpass!).toBeLessThanOrEqual(p.o.lowpass ?? 18000); // (never brighter than the step it gives back)
+        expect(Math.abs(e.pan!)).toBeLessThanOrEqual(0.5);
+      }
+      if (i > 0) expect(Math.sign(echoes[0]!.pan!)).toBe(-Math.sign(steps[i - 1]!.o.echoes![0]!.pan!)); // the feet take turns
+      expect(Math.sign(echoes[1]!.pan!)).toBe(-Math.sign(echoes[0]!.pan!));
+    });
+    const sides = new Set(steps.map((p) => Math.sign(p.o.echoes![0]!.pan!)));
+    expect(sides).toEqual(new Set([-1, 1]));
+  });
+
+  it('a room is asked of at every step, so a threshold crossed is heard at the next one', () => {
+    let room: Echo | undefined;
+    const r = rig('mountains', 'snow', undefined, 110, () => room);
+    r.tick(3, 12);
+    const n = recorded(r).length;
+    expect(n).toBeGreaterThan(3);
+    room = vault;
+    r.tick(3, 12);
+    const all = recorded(r);
+    expect(all.slice(0, n).every((p) => !p.o.echoes)).toBe(true);
+    expect(all.slice(n).every((p) => p.o.echoes?.length === 2)).toBe(true);
+  });
+
+  it('a phantom step has no room\'s answer of its own', () => {
+    const r = rig('mountains', 'snow', () => 0, 110, () => vault);
+    r.g.mind.band = 'unmoored';
+    r.tick(10, 20);
+    const phantoms = r.played.filter((p) => p.o.delay);
+    expect(phantoms.length).toBeGreaterThan(5);
+    for (const p of phantoms) expect(p.o.echoes).toBeUndefined();
   });
 });
 

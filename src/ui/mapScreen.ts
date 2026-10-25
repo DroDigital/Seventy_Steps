@@ -5,7 +5,7 @@
  * how much of the realm is charted, opening on what has been seen (mapFit.ts), a key of its figures and a hover
  * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
  * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets a marker the
- * minimap points to, or removes the one it is on, Delete clears them all (systems/marker.ts; round 68: up to twelve); L hides the key. A lit Elder Sign clicked, or picked
+ * minimap points to, or removes the one it is on, Delete clears them all (systems/marker.ts; round 68: up to twelve); L (the pad's X) opens or shuts the key. A lit Elder Sign clicked, or picked
  * with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
  * mapTravel.ts). M or Esc (pad B) closes it.
  */
@@ -26,7 +26,7 @@ import { regionAt } from '../world/worldMap';
 import { BONE } from './hudKit';
 import { drawBeacon } from './leadMark';
 import { workArt } from './mapArt';
-import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip } from './mapChrome';
+import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip, keyOpenPref, rememberKeyOpen, type KeyPanel } from './mapChrome';
 import { chartedRect, fitScale, openingView } from './mapFit';
 import { markAt, type Mark } from './mapMarks';
 import { UNIT, type MapPainter } from './mapPainter';
@@ -59,10 +59,11 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   let title: HTMLDivElement | null = null;
   let stats: HTMLDivElement | null = null;
   let prompt: HTMLDivElement | null = null;
-  let key: HTMLElement | null = null;
-  let keyShown = true; // L hides the key, for the rest of the run
+  let key: KeyPanel | null = null;
+  let keyOpen = keyOpenPref(); // the key is a tab, shut until asked for (L, the pad's X or a click) and left as it was last (2026-10-25)
   let heading = ['', '']; // the realm, and how much of it is charted
   let pointer: { x: number; y: number } | null = null; // the mouse, in canvas pixels
+  let onKey = false; // the mouse is on the key, not on the map beneath it
   let drag: { x: number; y: number; moved: number } | null = null;
   let shown: readonly Mark[] = []; // the marks on show, as last painted
   const held = new Set<string>();
@@ -158,8 +159,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       title = el(head, 'div', heading[0], `letter-spacing:6px;font-size:calc(16px * var(--ui, 1));color:${BONE}`);
       stats = el(head, 'div', heading[1], 'letter-spacing:3px;font-size:calc(11px * var(--ui, 1));color:#8a8474;margin-top:2px');
       prompt = el(head, 'div', '', 'display:none;margin:8px auto 0;width:max-content;max-width:90%;padding:4px 16px;border:1px solid #d9d0b855;background:#050506cc;letter-spacing:4px;font-size:calc(12px * var(--ui, 1));text-shadow:0 0 6px #000,0 0 12px #6a0dad');
-      key = buildKey(panel);
-      key.style.display = keyShown ? '' : 'none';
+      key = buildKey(panel, keyOpen, (open) => rememberKeyOpen((keyOpen = open)), deviceInUse() === 'pad');
       choose(chosen); // the prompt again, drawn anew (for the device in hand)
       buildHints(panel, deviceInUse() === 'pad', keyName(keyLayout.map));
     },
@@ -168,9 +168,9 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       if (e.code === 'Equal' || e.code === 'NumpadAdd') zoomBy(1.25);
       if (e.code === 'Minus' || e.code === 'NumpadSubtract') zoomBy(0.8);
       if (e.code === 'KeyC') centreOnPlayer();
-      if (e.code === 'KeyF') markAtPoint(pointer?.x ?? view.w / 2, pointer?.y ?? view.h / 2);
+      if (e.code === 'KeyF' && !onKey) markAtPoint(pointer?.x ?? view.w / 2, pointer?.y ?? view.h / 2);
       if (e.code === 'Delete' || e.code === 'Backspace') clearMarkers(g); // every marker at once (round 68)
-      if (e.code === 'KeyL' && key) key.style.display = (keyShown = !keyShown) ? '' : 'none';
+      if (e.code === 'KeyL' && !e.repeat) key?.toggle();
       if (e.code === 'Tab') cycle(e.shiftKey ? -1 : 1);
       if (e.code === 'Enter' || e.code === 'NumpadEnter') journey();
       if (/^(Arrow|Key[WASD])/.test(e.code)) held.add(e.code);
@@ -188,6 +188,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
         else centreOnPlayer();
       }
       if (edge(PAD_BUTTON.y)) markAtPoint(view.w / 2, view.h / 2); // the pad's mark is at the middle of the map
+      if (edge(PAD_BUTTON.x)) key?.toggle();
       padWas.clear();
       p.buttons.forEach((b, i) => b.pressed && padWas.add(i));
     },
@@ -219,7 +220,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   });
   addEventListener('pointermove', (e) => {
     if (!screen.open) return;
-    pointer = at(e);
+    onKey = !!key?.holds(e.target);
+    pointer = onKey ? null : at(e);
     if (!drag) return;
     const k = canvas.width / canvas.clientWidth / view.scale;
     view.cx += (e.clientX - drag.x) * k;
@@ -240,6 +242,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     screen.show(page);
     lit = litSigns(g, rs, g.ecs.c.transform.get(g.player.id)!.pos);
     hover = null;
+    onKey = false;
     choose(null);
     const charted = rs.reduce((s, x) => s + exploredShare(g.overworld!.explored, x) * (x.area[2] * x.area[3]), 0) / rs.reduce((s, x) => s + x.area[2] * x.area[3], 0);
     const where = rs.find((x) => x.id === g.overworld!.region)?.name ?? '';

@@ -1,107 +1,141 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { SPILL } from '../src/data/mistLight';
 import { CLOCK } from '../src/data/tuning';
+import { flashLight, putOutFlashes } from '../src/render/flashLights';
 import { paneLit } from '../src/render/paneLife';
 import { createSpillPlans, planSpill } from '../src/render/spillPlan';
+import { LAMP_SLOTS } from '../src/render/shaders/world';
 import { createWindowSpill } from '../src/render/windowSpill';
-import { createWorldLights, type LightSpot } from '../src/render/worldLights';
+import { createWorldLights, LIGHT_VIEW, type LightSpot } from '../src/render/worldLights';
+import { createWorldMaterial, worldUniforms } from '../src/render/worldMaterial';
 import type { Game } from '../src/systems/components';
 import type { Collider, CollisionWorld } from '../src/world/colliders';
 
 const flat = (colliders: Collider[] = [], ground: CollisionWorld['ground'] = () => 0): CollisionWorld => ({ colliders, off: new Set(), ground, contain: () => undefined });
-/** A lit window in the wall at z = 0 looking toward +z, `x` along the wall and `y` up it; `pane` its seed. */
 const win = (x: number, y = 2, pane = 0.05, z = 0): LightSpot & { glass: { x: number; y: number; z: number } } => ({ x, y, z: z + 0.52, kind: 'window', glass: { x, y, z }, pane });
-const night = (phase: number): number => ((phase - CLOCK.start + 1) % 1) * CLOCK.night; // the seconds of play at which the night stands at `phase`
+const night = (phase: number): number => ((phase - CLOCK.start + 1) % 1) * CLOCK.night;
 const eye = new THREE.Vector3(0, 1.7, 10);
+const windows = worldUniforms.uLampWindows.value;
 
 function rig(world: CollisionWorld | null = flat()) {
-  const scene = new THREE.Scene();
-  const spill = createWindowSpill(scene, { world } as unknown as Game);
+  const g = { world } as unknown as Game;
+  const spill = createWindowSpill(g);
   const lights = createWorldLights();
-  const mesh = scene.children[0] as THREE.Mesh;
-  const count = (): number => (mesh.geometry as THREE.InstancedBufferGeometry).instanceCount;
-  const frame = (time: number, on = true, from = eye): void => {
-    lights.update(from, time, null);
+  const frame = (time: number, on = true, from = eye, at = from): void => {
+    lights.update(from, time, null, at);
     spill.update(time, on);
   };
-  return { lights, mesh, count, frame, scene };
+  return { lights, frame, g };
 }
 
-describe('the light of a lit window on the ground before it (round 80)', () => {
-  it('runs out from the glass along the wall\'s normal, as far as the reach, on the ground it finds', () => {
-    const p = planSpill(win(0), flat())!;
-    expect(p).not.toBeNull();
-    expect([p.nx, p.nz]).toEqual([0, 1]);
-    expect(p.z).toBeCloseTo(SPILL.start, 6);
-    expect(p.y).toBe(0);
-    expect(p.length).toBeGreaterThan(SPILL.reach * 0.75);
-    expect(p.length).toBeLessThan(SPILL.reach * 1.3);
-    const high = planSpill(win(0, 4), flat())!;
-    expect(high.length).toBeGreaterThan(p.length); // a higher window throws farther
+describe('window illumination on receiving surfaces', () => {
+  it('derives the outward direction, glass offset and height from the actual pane and local ground', () => {
+    expect(planSpill(win(0), flat())).toEqual({ nx: 0, nz: 1, offset: 0.52, height: 2 });
+    expect(planSpill(win(0, 4), flat([], () => 1))!.height).toBe(3);
+    const side = { ...win(0), x: -0.52, z: 0 };
+    expect(planSpill(side, flat())).toEqual({ nx: -1, nz: 0, offset: 0.52, height: 2 });
+    expect(planSpill(win(0, 9), flat())).toBeNull();
+    expect(planSpill(win(0, 0.1), flat())).toBeNull();
+    expect(planSpill({ ...win(0), z: 0 }, flat())).toBeNull();
   });
 
-  it('follows a slope, and stops short of a wall, a fence or a tree in its way, and lays none where there is no room', () => {
-    const slope = planSpill(win(0), flat([], (_x, z) => 0.1 * z))!;
-    expect(slope.slopeAlong).toBeCloseTo(0.1, 6);
-    const fence: Collider = { kind: 'box', min: { x: -3, y: 0, z: 2.5 }, max: { x: 3, y: 1.2, z: 2.7 } };
-    const stopped = planSpill(win(0), flat([fence]))!;
-    expect(stopped.length).toBeLessThan(2.5);
-    expect(stopped.length).toBeGreaterThan(1.5);
+  it('keeps light reaching the first obstacle instead of stopping before the object it should illuminate', () => {
     const tree: Collider = { kind: 'cylinder', x: 0, z: 1.1, radius: 0.4, y0: 0, y1: 6 };
-    expect(planSpill(win(0), flat([tree]))).toBeNull(); // a trunk a metre from the glass: no ground to light
-    const cage: Collider = { kind: 'box', min: { x: -3, y: 0, z: 2.5 }, max: { x: 3, y: 1.2, z: 2.7 }, lightPass: true };
-    expect(planSpill(win(0), flat([cage]))!.length).toBeGreaterThan(SPILL.reach * 0.75); // light goes through a cage
-    expect(planSpill(win(0, 9), flat())).toBeNull(); // too high
-    expect(planSpill(win(0, 0.1), flat())).toBeNull(); // below the ground
+    const wall: Collider = { kind: 'box', min: { x: -3, y: 0, z: 2 }, max: { x: 3, y: 4, z: 2.2 } };
+    const s = win(0);
+    expect(planSpill(s, flat([tree, wall]))).toEqual(planSpill(s, flat()));
   });
 
-  it('is planned once for a window and kept', () => {
+  it('caches geometry for a pane within its world and recomputes it when the world changes', () => {
     let asks = 0;
     const world = flat([], () => (asks++, 0));
     const plans = createSpillPlans();
-    const a = plans(win(0), world);
-    const n = asks;
-    expect(plans(win(0), world)).toBe(a);
-    expect(asks).toBe(n);
-    expect(plans(win(4), world)).not.toBe(a);
+    const s = win(0);
+    const a = plans(s, world);
+    expect(plans(s, world)).toBe(a);
+    expect(asks).toBe(1);
+    expect(plans(s, flat([], () => 1))!.height).toBe(1);
   });
 
-  it('lays one instance for each lit window in reach of the eye, in one draw, and none for a window put out, behind the eye\'s reach, or a torch', () => {
-    const { lights, count, frame, mesh } = rig();
+  it('uses the surface light slots and pane intensity for ground, props and characters', () => {
+    const { lights, frame } = rig();
     const t = night(0.3);
-    expect(paneLit(0.05, t)).toBeGreaterThan(0.5);
-    lights.add(1, [win(-2), win(2), { x: 3, y: 2, z: 0.5, kind: 'torch' }, { x: 0, y: 2, z: SPILL.within + 20, kind: 'window', glass: { x: 0, y: 2, z: SPILL.within + 19.5 }, pane: 0.05 }]);
+    lights.add(1, [win(-2), win(2), { x: 3, y: 2, z: 0.5, kind: 'torch' }]);
     frame(t);
-    expect(count()).toBe(2);
-    expect(mesh.visible).toBe(true);
-    frame(t, false); // under a roof
-    expect(count()).toBe(0);
-    expect(mesh.visible).toBe(false);
+    LIGHT_VIEW.seen.forEach(({ s }, i) => expect(windows[i].w > 0).toBe(s.kind === 'window'));
+    expect(windows.filter((w) => w.w > 0)).toHaveLength(2);
+    const prop = createWorldMaterial({ texture: 'stone' });
+    const body = createWorldMaterial({ texture: 'flesh', character: 'creature' });
+    expect(prop.uniforms.uLampWindows).toBe(worldUniforms.uLampWindows);
+    expect(body.uniforms.uLampWindows).toBe(prop.uniforms.uLampWindows);
+    expect(prop.fragmentShader).toContain('windowLightAt');
+    prop.dispose();
+    body.dispose();
   });
 
-  it('goes out with the window in the waning hour, and comes back when the night turns', () => {
-    const { lights, count, frame } = rig();
-    lights.add(1, [win(0, 2, 0.95), win(3, 2, 0.05)]);
+  it('follows investigator lighting selection when the camera sees different windows, with no independent bright patches', () => {
+    const { lights, frame } = rig();
+    lights.add(1, Array.from({ length: 40 }, (_, i) => win(i * 2)));
+    frame(night(0.3), true, new THREE.Vector3(60, 1.7, 4), new THREE.Vector3(0, 1.7, 4));
+    expect(LIGHT_VIEW.visible[0].s.x).toBe(60);
+    expect(LIGHT_VIEW.seen[0].s.x).toBe(0);
+    expect(windows).toHaveLength(LAMP_SLOTS);
+    for (let i = 0; i < windows.length; i++) {
+      expect(windows[i].w > 0).toBe(worldUniforms.uLamps.value[i].w > 0);
+      expect(worldUniforms.uLamps.value[i].x).toBe(LIGHT_VIEW.seen[i].s.x);
+    }
+  });
+
+  it('goes out and returns with the source pane rather than retaining a separate glow', () => {
+    const { lights, frame } = rig();
+    lights.add(1, [win(0, 2, 0.95)]);
     const dark = night(0.9);
     expect(paneLit(0.95, dark)).toBe(0);
     frame(dark);
-    expect(count()).toBe(1); // the one whose seed the night has put out is gone
+    expect(worldUniforms.uLampColors.value[0].length()).toBe(0);
     frame(night(0.05));
-    expect(count()).toBe(2);
+    expect(windows[0].w).toBe(2);
+    expect(worldUniforms.uLampColors.value[0].length()).toBeGreaterThan(0);
   });
 
-  it('holds to its capacity however many windows there are, nearest first', () => {
-    const { lights, count, frame } = rig();
-    lights.add(1, Array.from({ length: 80 }, (_, i) => win(-20 + i * 0.5, 2, 0.05, -((i % 4) * 3))));
-    frame(night(0.3));
-    expect(count()).toBe(SPILL.count);
-  });
-
-  it('does nothing without a world, or without lights', () => {
-    const { count, frame, lights } = rig(null);
+  it('clears projection data indoors, without a world, and when slots are removed or reused', () => {
+    const { lights, frame, g } = rig();
+    const t = night(0.3);
     lights.add(1, [win(0)]);
-    frame(night(0.3));
-    expect(count()).toBe(0);
+    frame(t);
+    expect(windows[0].w).toBe(2);
+    frame(t, false);
+    expect(windows.every((w) => w.w === 0)).toBe(true);
+    frame(t);
+    (g as unknown as { world: CollisionWorld | null }).world = null;
+    frame(t);
+    expect(windows.every((w) => w.w === 0)).toBe(true);
+    g.world = flat();
+    lights.remove(1);
+    lights.add(2, [{ x: 0, y: 2, z: 1, kind: 'lamp' }]);
+    frame(t);
+    expect(windows.every((w) => w.w === 0)).toBe(true);
+    lights.remove(2);
+    frame(t);
+    expect(windows.every((w) => w.w === 0)).toBe(true);
+  });
+
+  it('gives a flash that takes a window\'s slot no window projection, so it lights all round', () => {
+    putOutFlashes();
+    const { lights, frame } = rig();
+    const t = night(0.3);
+    lights.add(1, Array.from({ length: LAMP_SLOTS + 2 }, (_, i) => win(i * 2)));
+    frame(t);
+    const last = LAMP_SLOTS - 1;
+    expect(LIGHT_VIEW.flashes).toBe(0);
+    expect(windows.every((w) => w.w > 0)).toBe(true); // (every slot a window's, with no flash)
+    flashLight({ x: 1, y: 1, z: 9 }, [1, 0.84, 0.54], 3.4, 9, 0.1);
+    frame(t + 0.01);
+    frame(t + 0.03);
+    expect(LIGHT_VIEW.flashes).toBe(1);
+    expect(worldUniforms.uLamps.value[last].w).toBe(9);
+    expect(windows[last].toArray()).toEqual([0, 0, 0, 0]);
+    expect(windows[last - 1].w).toBeGreaterThan(0); // (the rest keep theirs)
+    putOutFlashes();
   });
 });

@@ -2,6 +2,9 @@
  * What stands about the full map (round 60): its key, drawn with the very figures the map draws (it was a list of type glyphs that
  * were not the ones on the map), its row of keys (each key in a box, each word beside it), the compass, and the hover card that says
  * what a mark is, what it is called and what can be done with it. The map's picture and its choices are mapScreen.ts's.
+ * 2026-10-25 ("the large box clutters the view heavily"): the key is a small tab in the lower left, shut until it is asked for (L, the pad's
+ * X or a click) and remembered; open, it is two short columns of figure and name, the longer word of what to do with one on a card beside it
+ * while the pointer is over it.
  */
 
 import { SERIF } from './hudKit';
@@ -9,7 +12,7 @@ import { BONE, DIM, drawMark, type MarkKind, type MarkState } from './mapIcons';
 import type { Mark } from './mapMarks';
 import { el } from './menuKit';
 
-/** The key's rows: a figure and its words (the second line, dim, says what to do with it). */
+/** The key's rows: a figure and its name (the second line, dim, says what to do with it, on a card while the pointer is on the row). Read down the first column, then the second. */
 export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: string; hint?: string }[] = [
   { kind: 'you', words: 'You' },
   { kind: 'sign', state: { lit: true }, words: 'Elder Sign', hint: 'rest here; click it to travel' },
@@ -17,42 +20,101 @@ export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: stri
   { kind: 'gate', words: 'Gate', hint: 'walk through it' },
   { kind: 'dungeon', words: 'Dungeon' },
   { kind: 'boss', words: "Horror's lair", hint: 'a closed eye: slain' },
-  { kind: 'person', state: { met: true }, words: 'Someone you met' },
-  { kind: 'echo', words: 'Your lost Echoes', hint: 'walk over them' },
+  { kind: 'person', state: { met: true }, words: 'Someone met' },
+  { kind: 'echo', words: 'Lost Echoes', hint: 'walk over them' },
   { kind: 'secret', state: { rumour: true }, words: 'Something strange', hint: 'near ground you have charted' },
-  { kind: 'secret', state: { poi: 'tale' }, words: 'A secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
-  { kind: 'lead', state: { now: 0 }, words: 'Where the story leads', hint: 'an arrow at the edge points to it' },
+  { kind: 'secret', state: { poi: 'tale' }, words: 'Secret found', hint: 'ring, square, triangle, star or cross: a tale, a hoard, a rite, an anomaly or a den' },
+  { kind: 'lead', state: { now: 0 }, words: 'Story leads here', hint: 'an arrow at the edge points to it' },
   { kind: 'marker', words: 'Your markers', hint: 'right-click, F or Y sets one, or removes the one it is on; the minimap points to each' },
 ];
 
-const ICON = 32; // CSS pixels a key's figure is drawn in (at the UI's scale; round 68: 26, for marks that were smaller)
+const ICON = 24; // CSS pixels a key's figure is drawn in (at the UI's scale)
+const OPEN_KEY = 'lovecraft-souls-like/map-key';
 
-/** The key, in the panel's lower left; the returned element is shown or hidden as a whole. */
-export function buildKey(panel: HTMLElement): HTMLElement {
-  const box = el(panel, 'div', '', 'position:absolute;left:16px;bottom:calc(52px * var(--ui, 1));background:#050506d9;padding:8px 12px 6px;border:1px solid #d9d0b822;font-size:calc(11px * var(--ui, 1));line-height:1.25');
-  el(box, 'div', 'KEY', `letter-spacing:4px;font-size:calc(9px * var(--ui, 1));color:${DIM};margin-bottom:4px`);
+/** Whether the key was left open the last time the map was used (shut where nothing was kept). */
+export function keyOpenPref(): boolean {
+  try {
+    return localStorage.getItem(OPEN_KEY) === '1';
+  } catch {
+    return false; // a profile that refuses storage: the key stays shut, as it does at the first opening
+  }
+}
+
+export function rememberKeyOpen(open: boolean): void {
+  try {
+    localStorage.setItem(OPEN_KEY, open ? '1' : '0');
+  } catch {
+    // (kept for this opening only)
+  }
+}
+
+export interface KeyPanel {
+  toggle(): void;
+  /** Whether `target` is part of the key: the pointer there is on the key, not on the map beneath it. */
+  holds(target: EventTarget | null): boolean;
+}
+
+/**
+ * The key, in the panel's lower left: its tab (always shown) and, open, its two columns. `remember` is told each time it is opened or shut;
+ * `pad` names the pad's button on the tab, not the key's.
+ */
+export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open: boolean) => void, pad: boolean): KeyPanel {
+  const ui = 'var(--ui, 1)';
+  const root = el(panel, 'div', '', `position:absolute;left:16px;bottom:calc(52px * ${ui});font-size:calc(11px * ${ui});line-height:1.2;user-select:none`);
+  root.addEventListener('contextmenu', (e) => e.preventDefault());
+  const tip = el(root, 'div', '', `display:none;position:absolute;left:calc(100% + 8px);width:max-content;max-width:calc(280px * ${ui});padding:6px 10px;background:#050506f2;border:1px solid #d9d0b833;color:${DIM};font-style:italic;font-size:calc(10.5px * ${ui});line-height:1.35;pointer-events:none;z-index:1`);
+  const body = el(root, 'div', '', `display:none;grid-auto-flow:column;grid-template-rows:repeat(${KEY_ROWS.length / 2},auto);gap:0 16px;margin-bottom:4px;padding:5px 10px;background:linear-gradient(160deg,#0d0c11ee,#050506e0);border:1px solid #d9d0b83a;border-top-color:#d9d0b866;box-shadow:0 3px 14px #000b`);
   const dpr = Math.min(3, Math.max(1, globalThis.devicePixelRatio || 1));
   for (const row of KEY_ROWS) {
-    const line = el(box, 'div', '', 'display:flex;align-items:center;gap:9px;min-height:calc(32px * var(--ui, 1))');
+    const line = el(body, 'div', '', `display:flex;align-items:center;gap:6px;height:calc(26px * ${ui});padding:0 4px;border-radius:2px`);
     const c = document.createElement('canvas');
     [c.width, c.height] = [ICON * 2 * dpr, ICON * 2 * dpr];
-    c.style.cssText = 'width:calc(32px * var(--ui, 1));height:calc(32px * var(--ui, 1));flex:none';
+    c.style.cssText = `width:calc(${ICON}px * ${ui});height:calc(${ICON}px * ${ui});flex:none`;
     const ctx = c.getContext('2d');
     if (ctx) {
       ctx.scale(2 * dpr, 2 * dpr);
-      drawMark(ctx, row.kind, ICON / 2, row.kind === 'marker' ? ICON / 2 - 5 : ICON / 2, row.kind === 'person' ? 11 : row.kind === 'marker' ? 8 : row.kind === 'place' ? 12 : 10, row.state);
+      const pin = row.kind === 'marker'; // the pin's point, not its head, is its place: set the head high so the whole stands in the box
+      drawMark(ctx, row.kind, ICON / 2, pin ? ICON / 2 - 2.5 : ICON / 2, pin ? 6 : row.kind === 'person' ? 8.5 : row.kind === 'place' || row.kind === 'secret' ? 9 : 7.5, row.state);
     }
     line.append(c);
-    const words = el(line, 'div', row.words, `color:${BONE}`);
-    if (row.hint) el(words, 'div', row.hint, `color:${DIM};font-size:calc(9.5px * var(--ui, 1))`);
+    el(line, 'div', row.words, `color:${BONE};white-space:nowrap`);
+    line.addEventListener('mouseenter', () => {
+      line.style.background = '#d9d0b814';
+      tip.textContent = row.hint ?? '';
+      tip.style.top = `${body.offsetTop + line.offsetTop}px`; // beside its row, so it is never above the screen's edge
+      tip.style.display = row.hint ? 'block' : 'none';
+    });
+    line.addEventListener('mouseleave', () => {
+      line.style.background = '';
+      tip.style.display = 'none';
+    });
   }
-  return box;
+  const tab = el(root, 'div', '', `display:inline-flex;align-items:center;gap:7px;height:calc(24px * ${ui});padding:0 9px;background:#050506d0;border:1px solid #d9d0b833;cursor:pointer`);
+  tab.setAttribute('role', 'button');
+  el(tab, 'span', 'KEY', `pointer-events:none;letter-spacing:3px;font-size:calc(9px * ${ui});color:${DIM}`);
+  el(tab, 'span', pad ? 'X' : 'L', `pointer-events:none;border:1px solid ${BONE}55;border-radius:3px;padding:0 5px;font-size:calc(10px * ${ui});color:${BONE};background:#d9d0b81a`);
+  const caret = el(tab, 'span', '', `pointer-events:none;font-family:${SERIF};font-size:calc(7px * ${ui});color:${DIM}`);
+  let open = false;
+  const set = (value: boolean): void => {
+    open = value;
+    body.style.display = open ? 'grid' : 'none';
+    caret.textContent = open ? '\u25BC' : '\u25B2';
+    tab.setAttribute('aria-expanded', String(open));
+    if (!open) tip.style.display = 'none';
+  };
+  const toggle = (): void => {
+    set(!open);
+    remember(open);
+  };
+  tab.addEventListener('click', toggle);
+  set(startOpen);
+  return { toggle, holds: (target) => target instanceof Node && root.contains(target) };
 }
 
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['B'], 'Close']]
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
     : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 

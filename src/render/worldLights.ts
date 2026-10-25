@@ -60,7 +60,7 @@ export interface WorldLights {
   fires(at: V3, reach: number, fn: (s: LightSpot, d: number) => void): void;
   /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
   update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3, lanternCover?: number): void;
-  /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps), nearest first (round 35: lampShadows.ts). */
+  /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps and oriented windows), nearest first. */
   readonly casters: readonly Caster[];
 }
 
@@ -167,6 +167,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       const colors = worldUniforms.uLampColors.value;
       const planes = worldUniforms.uLampPlane.value;
       for (let i = 0; i < LAMP_SLOTS; i++) {
+        worldUniforms.uLampWindows.value[i].set(0, 0, 0, 0); // the atmosphere fills window projection data after this selection
         const n = seen[i];
         const k = n ? LIGHTS.kinds[n.s.kind] : null;
         planes[i].set(0, 0, 0, 0);
@@ -182,8 +183,14 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
           const d = Math.hypot(dx, dz);
           if (d > 1e-6) planes[i].set(dx / d, 0, dz / d, -(dx * g.x + dz * g.z) / d);
         }
+        const paneGain = n.s.pane === undefined ? 1 : paneLit(n.s.pane, time);
         if (n.s.kind === 'torch' || n.s.kind === 'fire' || n.s.kind === 'lamp') casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}` });
-        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * (n.s.pane === undefined ? 1 : paneLit(n.s.pane, time)));
+        if (n.s.kind === 'window' && n.s.glass && paneGain > 0.03) {
+          const dx = n.s.x - n.s.glass.x, dz = n.s.z - n.s.glass.z;
+          const offset = Math.hypot(dx, dz);
+          if (offset > 1e-4) casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}`, aim: { x: dx / offset, y: -0.6, z: dz / offset } });
+        }
+        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * paneGain);
       }
       const flashes = layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 83)
       for (let k = 0; k < flashes; k++) planes[LAMP_SLOTS - 1 - k].set(0, 0, 0, 0); // (all round: no window's glass to clip a flash against)

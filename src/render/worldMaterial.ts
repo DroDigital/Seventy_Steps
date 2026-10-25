@@ -42,6 +42,7 @@ export const worldUniforms = {
   uLanternDecay: { value: LANTERN.decay },
   uLanternFacing: { value: LANTERN.facing },
   uLamps: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // the world's nearest lights (worldLights.ts)
+  uLampWindows: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // outward normal (x, z), offset from glass, height over ground; w = 0: ordinary point light
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },

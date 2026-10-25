@@ -42,7 +42,7 @@ export const NAMED = tier('named', [
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
     ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
-    stats: st(1150, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2,
+    stats: st(1500, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
   },
   {
     id: 'joseph_curwen', name: 'Joseph Curwen', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,
@@ -120,7 +120,7 @@ export const NAMED = tier('named', [
     id: 'zann_window_thing', name: "The Thing Beyond Erich Zann's Window", source: 'The Music of Erich Zann', regions: ['beyond'], canonLooks: false, voice: 'viol',
     sprite: { silhouette: 'orb', palette: 'charcoal', scale: 4, eyes: 0, tentacles: 4, glow: 'purple' },
     ...scripted('stationary_horror', phases(ph(1, { wind_push: 2, darkness: 1, roar: 1, barrage: 2 }, { hooks: ['darkness'] }), ph(0.5, { wind_push: 2, roar: 2, projectile_fan: 1, barrage: 2, sweep_beam: 1 }, { hooks: ['darkness', 'camera_warp'] }))),
-    stats: st(2600, 1000, 64, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2,
+    stats: st(2600, 1000, 69, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2, // (round 83: damage 64 to 69: the last band's blows are as they were, and its pauses cost him 0.02 lives under the 0.2 floor)
   },
   {
     id: 'voice_in_the_tomb', name: 'The Voice in the Tomb', source: 'The Statement of Randolph Carter', regions: ['arkham'], canonLooks: false, voice: 'whisper',
@@ -149,7 +149,7 @@ export const NAMED = tier('named', [
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
     sprite: { silhouette: 'serpent', palette: 'sea', scale: 7, eyes: 2, body: [0.734375, 0.25] }, // the head and neck rise 5.1 m out of the coils, not a serpent's 3.5 m (round 57)
     ...scripted('mind_thief', phases(ph(1, { gaze: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['flood'] }), ph(0.5, { gaze: 2, grab: 1, wind_push: 1, tidal_surge: 1, vortex: 1 }, { hooks: ['flood', 'camera_warp'] }))),
-    stats: st(1450, 400, 56, 2, 3, 10), drops: { echoes: 3000 }, insightOnSight: 2,
+    stats: st(1850, 400, 56, 2, 3, 10), drops: { echoes: 3000 }, insightOnSight: 2, // (round 83: health 1450 to 1850, for the same reason as the Black Man's)
   },
   {
     id: 'dr_munoz', name: 'Dr. Muñoz', source: 'Cool Air', regions: ['hub'], canonLooks: true,
@@ -161,7 +161,7 @@ export const NAMED = tier('named', [
     id: 'charles_le_sorcier', name: 'Charles le Sorcier', source: 'The Alchemist', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['cowl', 'staff'] },
     ...scripted('caster', phases(ph(1, { projectile: 2, teleport: 1, combo: 1 }), ph(0.5, { projectile_fan: 2, teleport: 1, pool: 1, conflagration: 1, sweep_beam: 1 }))),
-    stats: st(600, 120, 28, 3.4, 2, 7), drops: { echoes: 1400 }, insightOnSight: 1,
+    stats: st(690, 120, 28, 3.4, 2, 7), drops: { echoes: 1400 }, insightOnSight: 1, // (round 83: health 600 to 690: he fell in 9 seconds to a person at the cap, under the 10 floor, now that his pauses are longer)
   },
   {
     id: 'medusa_gorgon', name: "The Gorgon of Medusa's Coil", source: "Medusa's Coil", regions: ['dunwich'], canonLooks: true,
@@ -173,7 +173,7 @@ export const NAMED = tier('named', [
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
     ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, dream_cloud: 1, barrage: 2 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
-    stats: st(1300, 140, 48, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2,
+    stats: st(1900, 140, 60, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2, // (round 83: health 1300 to 1900 and damage 48 to 60, as far as his vortex may go: with his skips no longer taking the time from a person he fell in 23 seconds and cost 0.13 lives, where he had cost 0.30)
   },
   {
     id: 'the_outsider', name: 'The Outsider', source: 'The Outsider', regions: ['hub'], canonLooks: true,

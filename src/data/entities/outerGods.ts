@@ -67,7 +67,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(1, { tentacle_burst: 2, charge: 1, pool: 1, summon: 1, eruption: 1, toxic_cloud: 1, crushing_blow: 1 }, { summons: ['thousand_young'], arena: 'roots' }),
       ph(0.5, { tentacle_burst: 2, pool: 2, charge: 1, summon: 1, roar: 1, tentacle_rise: 1, toxic_cloud: 1, vortex: 1, crushing_blow: 1 }, { summons: ['thousand_young'], hooks: ['darkness'] }),
     )),
-    stats: st(3100, 3000, 41, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 73: damage 36 to 41: she is met in the Black Wood, the last ring, so a person at the cap has outgrown her less and the bot lost 0.35 lives of her at it, under the 0.4 floor; round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
+    stats: st(3600, 3000, 41, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 83: health 3100 to 3600, which the longer pauses after her blows had left 0.36 lives and 0.33 at the cap; round 73: damage 36 to 41: she is met in the Black Wood, the last ring, so a person at the cap has outgrown her less and the bot lost 0.35 lives of her at it, under the 0.4 floor; round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
   },
   {
     id: 'nyarlathotep', name: 'Nyarlathotep', source: 'Nyarlathotep', regions: ['court_centre'], canonLooks: true,

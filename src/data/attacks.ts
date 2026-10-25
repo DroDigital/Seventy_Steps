@@ -7,6 +7,7 @@
  * systems/specials.ts. The beam stays a hitscan ray.
  */
 
+import { recoveryFor, type PunishBand } from './bossPunish';
 import type { CloudDef, EffectKind, MarkLook, MarkPattern, MoveDef } from './moves';
 import type { AttackId, Stats } from './schema';
 
@@ -111,11 +112,11 @@ export function attackRange(id: AttackId, height: number): readonly [number, num
   return [Math.min(lo * k, Math.max(lo, LEAST_CAP)), hi * k];
 }
 
-/** A MoveDef for this attack on a body `height` metres tall with these stats. */
-export function compileAttack(id: AttackId, stats: Stats, height: number): MoveDef {
+/** A MoveDef for this attack on a body `height` metres tall with these stats; a horror's `band` is how long it is held after the blow (data/bossPunish.ts, round 83). */
+export function compileAttack(id: AttackId, stats: Stats, height: number, band?: PunishBand): MoveDef {
   const a = ATTACKS[id];
   const k = sizeFactor(height);
-  const frames = a.windup + a.active + a.recovery;
+  const frames = a.windup + a.active + recoveryFor(a, band);
   const damage = Math.round(a.power * stats.damage);
   const poise = Math.round(a.poise * stats.damage);
   const hitstop = a.kind === 'ranged' ? 2 : a.power >= 1.4 ? 4 : 3;

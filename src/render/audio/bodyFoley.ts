@@ -1,12 +1,12 @@
 /**
  * The body, heard (round 80): the character of the ground laid over each recorded footfall (snow's crust, sand's hush, gravel, leaves, grass,
- * mud, boards that creak now and then, flesh), the coat swinging as a stride begins, a satchel's buckle and the lantern's bail at a run, the
- * breath (panting after a sprint, a gasp when the bar empties, ragged and wet near death, a slow exhale in the cold), and, in a failing mind,
+ * mud, boards that creak now and then, flesh), the coat swinging as a stride begins and now and then at a run, the pack's leather shifting at a
+ * run (round 83: no buckle, no lantern's bail; nothing metal rings as he walks), the breath (panting after a sprint, a gasp when the bar empties, ragged and wet near death, a slow exhale in the cold), and, in a failing mind,
  * a second step that follows a moment after one's own. It keeps the foley's stride (render/footfalls.ts) so the recipe falls on the recording.
  * Read-only on the simulation; nothing here is heard by the creatures.
  */
 
-import { BODY, BREATH, BOARD_CREAK, FOOT_GAIN, GEAR, STEP_LAYERS } from '../../data/footSounds';
+import { BODY, BREATH, BOARD_CREAK, FOOT_GAIN, GEAR, STEP_LAYERS, STEP_VOICE } from '../../data/footSounds';
 import { SAMPLE_SETS } from '../../data/samples';
 import type { Sound } from '../../data/sounds';
 import { darkOf, phaseOf } from '../../systems/clock';
@@ -15,7 +15,7 @@ import { fighting } from '../../systems/sanity';
 import { roofedAt } from '../../world/terrain';
 import { HEART } from '../feel';
 import { createStrideClock, followed, type Footfall } from '../footfalls';
-import { coldAt, stepSetOf } from './footing';
+import { coldAt, stepLevel, stepSetOf } from './footing';
 import type { Sampler } from './sampler';
 
 type Recipe = (key: string, sound: Sound, o?: { at?: null; gain?: number; vary?: number; pan?: number }) => boolean;
@@ -25,7 +25,6 @@ export interface BodyFoley {
   update(seconds: number, stress: number): void;
 }
 
-const PACE = 6.4; // m/s: a sprint (render/audio/foley.ts)
 const between = (r: readonly [number, number], u: number): number => r[0] + (r[1] - r[0]) * u;
 
 export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 'play'>, rand: () => number = Math.random): BodyFoley {
@@ -41,13 +40,12 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
     strides++;
     underfoot = f.ground;
     const layer = STEP_LAYERS[f.ground];
-    const pace = 0.55 + 0.45 * Math.min(1, f.speed / PACE);
+    const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot); // (the recording's level, so the recipe keeps under it)
     if (layer) soft(`foot:${f.ground}`, layer, FOOT_GAIN.steps * pace, 0.9);
     if (f.ground === 'boards' && strides % BODY.creakEvery === 0) soft('foot:creak', BOARD_CREAK, FOOT_GAIN.steps * pace);
     const sprint = clock.walking.sprint;
-    if (sprint) soft('gear:coat', GEAR.coat, FOOT_GAIN.gear);
-    if (sprint && strides % BODY.satchelEvery === 0) soft('gear:satchel', GEAR.satchel, FOOT_GAIN.gear);
-    if (strides % BODY.bailEvery[sprint ? 1 : 0] === 0) soft('gear:bail', GEAR.bail, FOOT_GAIN.gear * (sprint ? 1 : 0.6));
+    if (sprint && strides % BODY.coatEvery === 0) soft('gear:coat', GEAR.coat, FOOT_GAIN.gear * 0.8);
+    if (sprint && strides % BODY.satchelEvery === 0) soft('gear:satchel', GEAR.satchel, FOOT_GAIN.gear * 0.8);
     const p = g.mind.band === 'unmoored' ? BODY.phantom.unmoored : BODY.phantom.fractured;
     if (followed(g.mind.band, stress) && !fighting(g) && rand() < p) phantom(f.ground, between(BODY.phantom.delay, rand()));
   }

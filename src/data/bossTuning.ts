@@ -50,7 +50,8 @@ export const REALITY = {
   decoyEvery: [360, 540] as const,
   decoyLife: 900,
   skipEvery: [360, 540] as const, // a time skip...
-  skipLead: 8, // ...lands with the boss this many frames from its blow
+  skipLead: 24, // ...lands with the boss this many frames from its blow (round 83: it was 8, under a person's reaction)
+  skipRetry: 30, // a skip that would cut a recovery waits this many frames and tries again
   swapFirst: 360, // the first body theft...
   swapEvery: [600, 840] as const, // ...and the gap between the next
   swapFrames: 180, // the body is not the investigator's own this long
