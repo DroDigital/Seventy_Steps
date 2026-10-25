@@ -74,12 +74,10 @@ const held = (f: Figure, h: Held): void => {
 /** The figure standing, walking or running, the guard's arms up if it is raised. Sets the pose and returns true, or returns false (no clips). */
 export function playerStride(f: Figure, p: PlayerInput): boolean {
   if (!carried(p, A)) return false;
-  if (p.guard) {
-    const g = playerClip(`${p.weapon}.guard`);
-    if (g) overlay(A, sampleClip(g, p.time * 60, B), UPPER);
-  }
+  const g = p.guard ? playerClip(`${p.weapon}.guard`) : undefined;
+  if (g) overlay(A, sampleClip(g, p.time * 60, B), UPPER);
   applyPose(f, A);
-  f.handR.rotateX(CARRY[p.weapon] ?? 0);
+  if (!g) f.handR.rotateX(CARRY[p.weapon] ?? 0); // a guard's weapon is held as the clip made it
   held(f, { drawn: p.guard, props: [] }); // a guard raised has the sword-cane's blade out
   return true;
 }

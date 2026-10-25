@@ -112,7 +112,7 @@ spin and a death's fall are exempt as the code says). Then look at the picture: 
 * **`Clip.steps` keys frame 0 and has no `out`**: a boot that does more than one run of footwork needs `cane.steps_on` (copy it), and a flight where a boot must keep up with a long `motion`
   is keyed per frame from `Clip.root(f)`. `Foot(space=…)` is one string for a clip: a boot cannot change between the actor's frame and the world's within it.
 * **`look` clamps** the head at 40° pitch and 63° yaw, and flips sign through 180°; in a deep lean or a full spin key `head` itself.
-* **Rapier and the others' carried tilt.** The game tips a carried rapier (0.8 rad), cutlass (0.2) and axe (0.15) forward in the carried gait only (`playerPose.ts CARRY`), not in a clip:
+* **Rapier and the others' carried tilt.** The game tips a carried rapier (0.8 rad), cutlass (0.2) and axe (0.15) forward in the carried gait only (`playerPose.ts CARRY`), not in a clip and not over a guard clip (a guard's weapon is held as the clip made it):
   a clip begins and ends in the idle's hold and the 0.12 s crossfade takes up the difference. The rapier's clips begin and end with the arm raised a little so the long point clears the floor.
 * **Previews crop.** `preview.py sheet` frames a 2.15 m portrait tile, which crops a lunge or a raised blade: widen `preview.aim`'s `height` in a throwaway wrapper.
 * `__pycache__` goes stale if a clip file is edited to the same length within a second of a run: delete `tools/player/clips/__pycache__/<module>*.pyc` if numbers do not move.

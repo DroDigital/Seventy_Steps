@@ -2,7 +2,10 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { PLAYER_MOVES, type MoveDef } from '../src/data/moves';
 import { buildFigure, type Figure } from '../src/render/figures';
+import { newPose, playerClip, sampleClip } from '../src/render/playerClips';
+import { playerStride } from '../src/render/playerPose';
 import { pose, type PoseInput } from '../src/render/poses';
+import { WEAPON_IDS } from '../src/data/weapons';
 
 const STILL: PoseInput = { move: null, def: undefined, frame: 0, speed: 0, stride: 0, guard: false, flinch: 0, rollYaw: 0, time: 0 };
 const def = (move: string): MoveDef => (PLAYER_MOVES as Record<string, MoveDef>)[move];
@@ -40,6 +43,23 @@ describe('the investigator posed from his clips (render/playerPose.ts)', () => {
         expect(aside.distanceTo(want), `yaw ${yaw.toFixed(2)} @${frame}`).toBeLessThan(1e-4);
       }
     }
+  });
+
+  it('holds a guard\u2019s weapon as the guard clip made it, and tips a carried weapon only when it is not raised', () => {
+    const f = buildFigure('player');
+    const want = newPose();
+    for (const weapon of WEAPON_IDS) {
+      const input = { move: null, def: undefined, frame: 0, speed: 0, stride: 0, guard: true, time: 0.4, weapon };
+      expect(playerStride(f, input), weapon).toBe(true);
+      sampleClip(playerClip(`${weapon}.guard`)!, input.time * 60, want);
+      const [x, y, z, w] = [...want.q.subarray(5 * 4, 5 * 4 + 4)];
+      const angle = 2 * Math.acos(Math.min(1, Math.abs(f.handR.quaternion.x * x + f.handR.quaternion.y * y + f.handR.quaternion.z * z + f.handR.quaternion.w * w)));
+      expect(angle, `${weapon} guard`).toBeLessThan(2e-3);
+    }
+    playerStride(f, { move: null, def: undefined, frame: 0, speed: 0, stride: 0, guard: false, time: 0.4, weapon: 'rapier' });
+    const carried = f.handR.quaternion.clone();
+    playerStride(f, { move: null, def: undefined, frame: 0, speed: 0, stride: 0, guard: false, time: 0.4, weapon: 'cane' });
+    expect(carried.angleTo(f.handR.quaternion)).toBeGreaterThan(0.5); // the rapier is carried tipped forward
   });
 
   it('turns only the roll: a blow or a backstep takes no yaw', () => {
