@@ -12,6 +12,7 @@ import { cellsOf } from '../systems/exploration';
 import { regionRect } from '../world/worldMap';
 import { artOf, type Art } from './mapArt';
 import { drawMark } from './mapIcons';
+import { stampMark } from './markSprites';
 import { drawLabels, type MapLabel } from './mapLabels';
 import { falseSign, gatherMarks, type Mark } from './mapMarks';
 import { slip, SLIDE } from './mapWrong';
@@ -123,8 +124,8 @@ export function createMapPainter(g: Game): MapPainter {
       const k = uiScale(); // the names and the marks of the full map grow with the UI
       const unit = full ? UNIT.full * k : UNIT.mini;
       const { marks, labels } = gatherMarks(g, view, realm, full, unit, k);
-      for (const m of marks) drawMark(ctx, m.kind, m.x, m.y, m.r, m.state);
-      for (const m of marks) if (m.badge) drawMark(ctx, 'boss', m.x + m.r * 0.95, m.y - m.r * 0.95, m.r * 0.55, { slain: m.badge === 'slain' }); // a dungeon's horror
+      for (const m of marks) stampMark(ctx, m.kind, m.x, m.y, m.r, m.state);
+      for (const m of marks) if (m.badge) stampMark(ctx, 'boss', m.x + m.r * 0.95, m.y - m.r * 0.95, m.r * 0.55, { slain: m.badge === 'slain' }); // a dungeon's horror
       if (full) {
         const regionNames: MapLabel[] = [];
         for (const r of realm) {
