@@ -21,8 +21,10 @@ import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
 import { buildAssembly, type Assembly } from './assemblies';
 import { createArrivals, risesOut } from './bossArrival';
+import { createCreatureCasters } from './creatureCasters';
 import { createCreatureFx, type Gone } from './creatureFx';
 import { lookOf, phaseOf, type Look } from './creatureLook';
+import { createStoops } from './creatureStoop';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
 import { MIST } from './volumetricFog';
@@ -68,31 +70,12 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const textures = reviewedTextures(art?.pages ?? []);
   const pages = textures.map((texture) => spriteBatch(scene, texture, CAPACITY, true));
   const clips = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedClips(entity, key)]));
-  const stoops = new Map(Object.entries(art?.manifest.entities ?? {}).flatMap(([key, entity]) => (entity.directions.front.actions.stoop?.length ? [[key, entity.directions.front.actions.stoop.length] as const] : []))); // the frames of the stoop of each reviewed form that has one
-  const mids = new Set(Object.entries(art?.manifest.entities ?? {}).flatMap(([key, entity]) => (entity.directions.front.actions.stoop_mid?.length ? [key] : []))); // those that have its in-between pose too
-  const stoopSince = new Map<Entity, number>(); // when each stooped colossus began its stoop (seconds)
-  const riseSince = new Map<Entity, number>(); // when each that has stood up began to (seconds)
-  /** The stoop a reviewed colossus is in: its frames, whether it has the in-between pose, the seconds since it began (or, as it stands up, `rise` since it ended); undefined when it has none or is on its feet. */
-  const stoopOf = (id: Entity, key: string, time: number): { frames: number; mid: boolean; age: number; rise?: number } | undefined => {
-    const frames = stoops.get(key);
-    if (!frames) return undefined;
-    const mid = mids.has(key);
-    if (!stooped(g, id)) {
-      if (stoopSince.delete(id) && mid) riseSince.set(id, time);
-      const rise = riseSince.get(id);
-      if (rise === undefined || time - rise >= FEEDBACK.riseSeconds) return void riseSince.delete(id);
-      return { frames, mid, age: 0, rise: time - rise };
-    }
-    riseSince.delete(id);
-    if (!stoopSince.has(id)) stoopSince.set(id, time);
-    return { frames, mid, age: time - stoopSince.get(id)! };
-  };
-  /** The frames each state has, as `lookOf` is told, with a stoop's. */
-  const known = (bow: ReturnType<typeof stoopOf>): Partial<Record<SpriteAction, number>> => (bow ? { stoop: bow.frames, ...(bow.mid && { stoop_mid: 1 }) } : {});
+  const stoops = createStoops(g, art?.manifest);
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const glows = createHalos(CAPACITY, 0.55);
   const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 78)
+  const casters = createCreatureCasters(scene); // the bodies the moon, lantern and lamps cast shadows from (round 78)
   scene.add(glows.mesh);
   const flat = new THREE.Vector3(); // the camera's right, level
   const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
@@ -183,6 +166,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       right.setFromMatrixColumn(camera.matrixWorld, 0);
       flat.set(right.x, 0, right.z).normalize();
       glows.begin();
+      casters.begin();
+      const from = g.ecs.c.transform.get(g.player.id)?.pos ?? { x: 0, z: 0 };
       let n = 0;
       counts.fill(0);
       debug.length = 0;
@@ -197,14 +182,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const arrival = arrivals.of(id, isUnroused(g, id), time, g.ecs.c.body.get(id)?.height ?? 2, risesOut(def.assembly?.body));
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
-        const bow = entry ? stoopOf(id, key, time) : undefined;
+        const bow = entry ? stoops.of(id, key, time) : undefined;
         const beat = time + phaseOf(id); // its own place in its cycles: a pack does not step as one (round 78)
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
         const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
         const direction = entry && art ? spriteDirection(yaw, { x, z }, camera.position, directions.get(id)) : undefined;
-        const look = lookOf(g, id, beat, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise, arrival);
+        const look = lookOf(g, id, beat, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...stoops.known(bow) }, bow?.age, bow?.rise, arrival);
         const gone = fx.gone(id, def, model, look, time); // (told of every creature, hidden or not: a hidden one rises when it shows)
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
@@ -214,15 +199,17 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
-          const pose = lookOf(g, id, beat, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
+          const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time });
           if (!frame) continue;
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
+          const span = spans.get(key)!;
+          if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre') casters.put(x, y - pose.sink * sizes.get(key)!.height * 0.3 + span.bottom, z, span.across, span.top - span.bottom, 1 - gone.amount, from); // (a spectre casts none)
           if (direction === 'front' && !clip.mirror_horizontal) reviewedEyes(key, x, y, z, pose, camera.position, mistLook(id, time));
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
             ECHOES.forEach((e, i) => {
-              const behind = known(bow);
+              const behind = stoops.known(bow);
               const age = bow ? Math.max(0, bow.age - e.lag) : 0;
               const late = lookOf(g, id, beat - e.lag, behind, age, bow?.rise, arrival);
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
@@ -272,13 +259,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         fx.dress(fallback, n, { id, gone }, x, y - look.sink * def.sprite.scale * 0.3, z, def.sprite.scale, def.sprite.scale, flat, time);
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
+        if (!def.sprite.outside && def.sprite.silhouette !== 'spectre') casters.put(x, y - look.sink * size * 0.3, z, size * 0.45, size * 0.8, 1 - gone.amount, from);
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, mistLook(id, time));
       }
       arrivals.forget(seen);
       fx.forget(seen);
       for (const id of looking.keys()) if (!seen.has(id)) looking.delete(id);
-      for (const id of stoopSince.keys()) if (!seen.has(id)) stoopSince.delete(id);
+      stoops.forget(seen);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);
       for (const [id, asm] of assemblies) {
         if (seen.has(id)) continue;
@@ -287,6 +275,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       }
       pages.forEach((page, index) => page.finish(counts[index]));
       fallback.finish(n);
+      casters.end();
       glows.end();
     },
   };

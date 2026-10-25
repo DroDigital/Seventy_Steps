@@ -20,9 +20,7 @@ uniform vec2 uRes;
 uniform float uSnap;
 uniform float uFogNear;
 uniform float uFogFar;
-uniform vec3 uAmbient;
-uniform vec3 uLightColor;
-uniform float uCharacterLight;
+uniform vec3 uLightDir; // toward the moon
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
 attribute vec4 aInfo; // flash, opacity, flip, outside the palette
@@ -31,7 +29,8 @@ attribute vec4 aFx; // how far gone, in what style, how worn, a seed (spriteFx.t
 attribute vec4 aWound; // where the last blow fell, its flash, its reach
 
 varying vec2 vUv;
-varying vec3 vLight;
+varying vec3 vWorld; // where this corner is: the light is laid at each pixel (round 78: it was found at the four corners and carried across, so the lantern's pool never climbed a colossus's legs and a lamp's light was the same ramp from foot to head)
+varying vec2 vShade; // what stands between it and the moon, and the lantern, at its middle
 varying float vFog;
 varying float vDist;
 varying float vFlash;
@@ -44,7 +43,6 @@ varying vec4 vWound;
 varying vec2 vQuad;
 varying vec2 vSize;
 ${LANTERN_GLSL}
-${LAMPS_GLSL}
 ${SHADOW_GLSL}
 void main() {
   vec3 origin = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
@@ -62,9 +60,10 @@ void main() {
   gl_Position = clip;
   float u = aInfo.z > 0.5 ? 1.0 - uv.x : uv.x;
   vUv = vec2(mix(aCell.x, aCell.z, u), mix(aCell.y, aCell.w, 1.0 - uv.y));
-  float moon = mix(1.0, moonLit(origin + vec3(0.0, 0.8, 0.0), vec3(0.0, 1.0, 0.0), 1.0), uShadow.x); // what stands between it and the moon (round 34)
+  float moon = mix(1.0, moonLit(origin + vec3(0.0, 0.8, 0.0) + normalize(uLightDir) * (0.32 * w + 0.3), vec3(0.0, 1.0, 0.0), 1.0), uShadow.x); // what stands between it and the moon (round 34), at a point out toward it from the creature's middle: its own body (render/creatureCasters.ts) stands in the way of the middle itself
   float lamp = mix(1.0, lanternLit(origin + vec3(0.0, 0.8, 0.0), vec3(0.0, 1.0, 0.0)), uLShadow.x) * lanternSlab(origin + vec3(0.0, 0.8, 0.0)); // and the lantern's, the seat back of a rig among them
-  vLight = uAmbient + (uLightColor * moon + uLanternColor * lanternAt(uLanternPos - wp) * lamp + lampLight(wp, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight;
+  vWorld = wp;
+  vShade = vec2(moon, lamp);
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
   vDist = -vp.z;
   vFlash = aInfo.x;
@@ -87,9 +86,13 @@ uniform float uFogAmount;
 uniform float uMarkCharacters;
 uniform float uTime;
 uniform vec2 uEyeRange; // metres over which self-lit eyes and markings sink into the dark
+uniform vec3 uAmbient;
+uniform vec3 uLightColor;
+uniform float uCharacterLight;
 
 varying vec2 vUv;
-varying vec3 vLight;
+varying vec3 vWorld;
+varying vec2 vShade;
 varying float vFog;
 varying float vDist;
 varying float vFlash;
@@ -97,6 +100,8 @@ varying float vOpacity;
 varying float vOutside;
 varying float vWeird;
 varying vec4 vCell;
+${LANTERN_GLSL}
+${LAMPS_GLSL}
 ${NOISE_GLSL}
 ${VOID_GLSL}
 ${SPRITE_GRADE_GLSL}
@@ -131,7 +136,8 @@ void main() {
   }
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 col = glow ? t.rgb : t.rgb * vLight;
+  vec3 light = uAmbient + (uLightColor * vShade.x + uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 78)
+  vec3 col = glow ? t.rgb : t.rgb * light;
   if (uReviewed > 0.5) col = spriteGraded(col); // the realm's colours on the older art, brightness kept (round 78: spriteGrade.ts)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   col = fxWear(col, vFlash); // its wounds, and the flash of the blow about where it fell

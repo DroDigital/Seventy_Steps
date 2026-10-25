@@ -11,6 +11,8 @@
 import type { V3 } from '../core/geom';
 import type { AoeMotif } from './aoeLook';
 import type { AttackLook } from './attackLook';
+import { FLASH_LIGHTS } from '../data/fxTuning';
+import { flashLight } from './flashLights';
 import { groundUnder, signature } from './fxForms';
 import type { Particles, ParticleShape } from './particles';
 import type { Rgb } from './palette';
@@ -53,6 +55,8 @@ const tau = Math.PI * 2;
 const DARK: Rgb = [0.05, 0.05, 0.07];
 const WHITE: Rgb = [1, 0.97, 0.9];
 
+/** A light's colour from a blow's: toward white by FLASH_LIGHTS.white. */
+export const whiteOf = (c: Rgb): Rgb => [c[0] + (1 - c[0]) * FLASH_LIGHTS.white, c[1] + (1 - c[1]) * FLASH_LIGHTS.white, c[2] + (1 - c[2]) * FLASH_LIGHTS.white];
 const colorOf = (e: Element, look: AttackLook): Rgb => look[e.tint];
 const endOf = (e: Element, look: AttackLook, c: Rgb): Rgb => (e.cools ? (e.glow ? look.ember : DARK) : c);
 
@@ -62,6 +66,8 @@ const chunkSize = (radius: number): number => Math.min(0.75, 0.13 + radius * 0.0
 /** A flash at the heart of a blow: a blaze that is gone in a few frames, and the ring of light it opens. */
 export function flash(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, lift = 0.4): void {
   const y = at.y + lift;
+  const b = FLASH_LIGHTS.burst;
+  flashLight({ x: at.x, y: y + 0.3, z: at.z }, whiteOf(look.core), Math.min(b.most, b.strength + radius * b.per), Math.min(b.rangeMost, b.range + radius * b.rangePer), b.seconds); // and it lights what is about it (round 78)
   fx.spawn({ x: at.x, y, z: at.z, life: 0.18, size: Math.min(7, radius * 0.9 + 0.4), grow: 1.5, color: look.core, colorEnd: look.line, glow: true, hold: 0.35, shape: 'wisp' });
   fx.spawn({ x: at.x, y, z: at.z, life: 0.24, size: Math.min(9, radius * 1.5 + 0.5), grow: 0.5, color: look.core, glow: true, hold: 0.2, shape: 'spark', rot: rand(0, tau), spin: rand(-2, 2) });
   if (e.halo) fx.spawn({ x: at.x, y, z: at.z, life: 0.45, size: Math.min(5, radius * 0.7 + 0.3), grow: 4, color: look.line, glow: true, shape: 'ring', thick: 0.12, alpha: 0.9 });

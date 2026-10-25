@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { SHADOW } from '../data/tuning';
+import { INSTANCED_POSITION } from './colliderShadow';
 import { box } from './meshKit';
 import { moonFrame } from './moonFrame';
 import { worldUniforms } from './worldMaterial';
@@ -77,7 +78,7 @@ export interface MoonShadow {
 }
 
 const DEPTH_ONLY = new THREE.ShaderMaterial({
-  vertexShader: 'void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  vertexShader: INSTANCED_POSITION, // (round 78: the creatures' bodies are one instanced mesh)
   fragmentShader: 'void main() { gl_FragColor = vec4(1.0); }',
   side: THREE.DoubleSide,
   colorWrite: false,

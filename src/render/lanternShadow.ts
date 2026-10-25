@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { LANTERN_SHADOW } from '../data/fxTuning';
 import { LANTERN } from '../data/tuning';
-import { LANTERN_CASTER } from './colliderShadow';
+import { INSTANCED_POSITION, LANTERN_CASTER } from './colliderShadow';
 import { worldUniforms } from './worldMaterial';
 
 export interface LanternShadow {
@@ -21,7 +21,7 @@ export interface LanternShadow {
 }
 
 export const FAR_SIDE = new THREE.ShaderMaterial({
-  vertexShader: 'void main() { gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  vertexShader: INSTANCED_POSITION, // (round 78: the creatures' bodies are one instanced mesh)
   fragmentShader: 'void main() { gl_FragColor = vec4(1.0); }',
   side: THREE.BackSide,
   colorWrite: false,

@@ -8,9 +8,11 @@
  */
 
 import type * as THREE from 'three';
+import { FLASH_LIGHTS } from '../data/fxTuning';
 import { IMPACT } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { blowWeight, landedBlow, LANDS } from './audio/impact';
+import { flashLight } from './flashLights';
 import { FEEL } from './feel';
 import { BASE, mixRgb, type Rgb } from './palette';
 import type { Particles } from './particles';
@@ -36,6 +38,7 @@ export function createImpactFx(g: Game, fx: Particles): ImpactFx {
   const scaled = ([lo, hi]: readonly [number, number], w: number): number => Math.round(lo + ((hi - lo) * (w - 0.5)) / (IMPACT.weight.most - 0.5));
 
   function burst(p: { x: number; y: number; z: number }, d: { x: number; z: number }, w: number, finish: boolean): void {
+    flashLight(p, SPARK, FLASH_LIGHTS.blow.strength + w, FLASH_LIGHTS.blow.range + w * 1.5, FLASH_LIGHTS.blow.seconds); // a landed blow lights its own wound and the ground about it (round 78)
     fx.spawn({ ...p, life: 0.12, size: 0.3 + 0.45 * w, grow: 0.3, color: FLARE, glow: true, alpha: 0.95 });
     fx.spawn({ ...p, life: 0.16, size: 0.5 + 0.6 * w, grow: 0.5, color: SPARK, glow: true, alpha: 0.4 });
     const yaw = Math.atan2(d.x, d.z);

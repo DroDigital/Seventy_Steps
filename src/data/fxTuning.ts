@@ -135,3 +135,15 @@ export const GROUND_CONTACT = {
   cover: { tufts: 0.7, roots: 4 }, // the plants about a base: tufts to each metre of reach, and roots about a tree's foot (render/baseCover.ts)
 };
 
+
+/** Lights that last a moment (round 78, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
+export const FLASH_LIGHTS = {
+  slots: 3, // the most at once
+  reach: 46, // metres from the investigator: farther, none is chosen
+  attack: 0.03, // seconds a flash takes to come to its height (a fall as quick and as long as its life follows)
+  muzzle: { color: [1, 0.84, 0.54] as readonly [number, number, number], strength: 2.6, range: 8, seconds: 0.1 }, // a shot
+  blow: { strength: 1.1, range: 4.2, seconds: 0.14 }, // a landed blow of the investigator's, plus `weight` of the table's
+  burst: { strength: 1.5, per: 0.38, most: 4.2, range: 3.6, rangePer: 2.4, rangeMost: 18, seconds: 0.34 }, // the flash at the heart of a horror's blow: by its radius
+  bolt: { strength: 1.3, per: 0.5, most: 3, range: 5, rangePer: 2.2, rangeMost: 12, seconds: 0.1 }, // a bolt of light or fire in flight, kept up each frame
+  white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
+} as const;
