@@ -10,7 +10,7 @@
  */
 
 import { captionSize } from './captions';
-import { CARD, INK } from '../data/uiMood';
+import { CARD, HOUR, INK } from '../data/uiMood';
 import { BONE, SERIF } from './hudKit';
 import { inkLetters, inkSeed, playIn, playOut } from './inkTitle';
 
@@ -40,7 +40,7 @@ const LOOK: Record<Tone, Look> = {
   victory: { color: '#c9a45c', size: 42, top: 40, hold: 5, band: 0.75, rise: 900, z: 2, rank: 3 },
   realm: { color: BONE, size: 40, top: 22, hold: CARD.realmHold, band: 0.55, rise: 900, z: 2, ink: true, rank: 2 },
   place: { color: BONE, size: 30, top: 20, hold: 2.6, band: 0.45, rise: 700, z: 2, ink: true, rank: 1 },
-  hour: { color: BONE, size: 22, top: 14, hold: 3.4, band: 0, rise: 1400, z: 2, ink: true, rank: 0 },
+  hour: { color: BONE, size: 22, top: 14, hold: HOUR.hold, band: 0, rise: 1400, z: 2, ink: true, rank: 0 },
 };
 const FADE_MS = 1200; // a card's fade at its end
 

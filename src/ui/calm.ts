@@ -75,13 +75,14 @@ export function createCalm(g: Game, enabled: () => boolean): Calm {
     poke: () => void (poked = true),
     update() {
       const now = performance.now();
-      const dt = Math.min(0.1, (now - last) / 1000);
+      const elapsed = Math.max(1e-3, (now - last) / 1000);
+      const dt = Math.min(0.1, elapsed); // (a stall is not an hour of quiet)
       last = now;
       const h = g.ecs.c.health.get(me);
       const st = g.ecs.c.stamina.get(me);
       const p = g.ecs.c.transform.get(me)!.pos;
-      const moved = dt > 0 ? Math.hypot(p.x - at.x, p.z - at.z) / dt : 0;
-      const turned = dt > 0 ? (Math.abs(g.camera.yaw - at.yaw) + Math.abs(g.camera.pitch - at.pitch)) / dt : 0;
+      const moved = Math.hypot(p.x - at.x, p.z - at.z) / elapsed;
+      const turned = (Math.abs(g.camera.yaw - at.yaw) + Math.abs(g.camera.pitch - at.pitch)) / elapsed;
       at = { x: p.x, z: p.z, yaw: g.camera.yaw, pitch: g.camera.pitch };
       const whole = !!h && !!st && h.hp >= h.max && st.value >= st.max - 0.5 && g.mind.sanity >= QUIET.sanity;
       const free = enabled() && !!g.overworld && !g.cutscene && !g.player.mount.active && !g.player.falling && !g.player.fogPass && !g.player.gatePass && !g.player.kneeling && g.lock.target === null;
