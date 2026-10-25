@@ -14,10 +14,10 @@ import { emptyInput, type InputFrame } from '../core/input';
 import { attackRange } from '../data/attacks';
 import type { MoveDef } from '../data/moves';
 import type { RealityHook } from '../data/schema';
-import { REALITY } from '../data/tuning';
+import { BOSS, REALITY } from '../data/tuning';
 import { startMove } from './actions';
 import { targetsOf } from './combat';
-import type { Fight, Game } from './components';
+import type { Actor, Fight, Game } from './components';
 import { creatureOf, spawnCreature } from './creatures';
 import { groundNear } from './specials';
 
@@ -57,15 +57,27 @@ const decoys: HookStep = (g, fights) => {
 
 const REACTIONS = new Set(['stagger', 'guardBreak', 'parried', 'death']);
 
-/** The boss is elsewhere all at once, a few frames from one of its blows. */
-function skipAhead(g: Game, e: Entity, f: Fight): void {
+/**
+ * Whether a skip now would take from the investigator an opening: the boss is recovering from a blow, or reeling, or the pause it keeps
+ * after one has longer to run than the skip's lead. Free to skip are its wind-up, its blow and the last frames of its pause, where it was
+ * about to strike anyway (round 83: of 84 skips measured, 7 cut a recovery and 26 more the pause after a blow).
+ */
+function costsAnOpening(g: Game, e: Entity, a: Actor): boolean {
+  if (a.move === null) return (g.ecs.c.brain.get(e)?.cooldown ?? 0) > REALITY.skipLead;
+  const def = a.moves[a.move];
+  const over = def?.open ?? def?.effect?.window[1] ?? def?.sanity?.window[1]; // where its blow, its roar or its gaze is done
+  return REACTIONS.has(a.move) || (over !== undefined && a.frame >= over);
+}
+
+/** The boss is elsewhere all at once, a few frames from one of its blows. False when it was not: that would cost an opening, and the skip waits. */
+function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   const c = g.ecs.c;
   const a = c.actor.get(e)!;
-  if (a.move !== null && REACTIONS.has(a.move)) return;
+  if (costsAnOpening(g, e, a)) return false;
   const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null);
   let roll = g.rng() * options.reduce((s, x) => s + x.weight, 0);
   const pick = options.find((x) => (roll -= x.weight) < 0);
-  if (!pick) return;
+  if (!pick) return true;
   const body = c.body.get(e)!;
   const [lo, hi] = attackRange(pick.id, body.reach ?? body.height);
   const d = Math.min(12, Math.max(body.radius + 1, (lo + hi) / 2));
@@ -77,7 +89,10 @@ function skipAhead(g: Game, e: Entity, f: Fight): void {
   tr.yaw = tr.prevYaw = yawOf(pp.x - p.x, pp.z - p.z);
   startMove(a, pick.id);
   a.frame = Math.max(0, strikeFrame(a.moves[pick.id])! - REALITY.skipLead);
+  const br = c.brain.get(e);
+  if (br) br.cooldown = Math.max(br.cooldown, BOSS.gap[0]); // and the pause after the blow is the ordinary one: a skipped blow was followed at once by the next (round 83)
   g.events.emit('TimeSkipped', { entity: e });
+  return true;
 }
 
 const timeSkip: HookStep = (g, fights) => {
@@ -85,7 +100,7 @@ const timeSkip: HookStep = (g, fights) => {
   if (!fights.length) return void (r.skipIn = REALITY.skipEvery[0]);
   if (--r.skipIn > 0) return;
   r.skipIn = between(g, REALITY.skipEvery);
-  for (const [e, f] of fights) skipAhead(g, e, f);
+  for (const [e, f] of fights) if (!skipAhead(g, e, f)) r.skipIn = REALITY.skipRetry;
 };
 
 const bodyTheft: HookStep = (g, fights) => {

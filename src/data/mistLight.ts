@@ -26,25 +26,17 @@ export const BEAM = {
   lamp: { sharp: 0.55 }, // a street lamp's glow hangs in a cone downward
 };
 
-/** The light a lit window lays on the ground before it (render/windowSpill.ts): a trapezoid of its colour with the dark cross of its bars. */
+/** The window's soft projection on receiving surfaces (render/windowSpill.ts, shaders/windowLight.ts). */
 export const SPILL = {
-  within: 28, // metres from the eye a window's light is laid
-  count: 32, // windows at once, nearest first (one draw)
   reach: 4.8, // metres it runs out from the wall, of a window two metres up; it is three quarters of this for a window at the ground, and `tall` more of it for each metre a window stands over it...
   tall: 0.12, // ...(a higher window throws its light farther)
   highest: 5.5, // a window higher than this over the ground lays none
   near: 1.1, // the width it begins with at the wall...
   far: 3.4, // ...and ends with
-  gain: 1.05, // its strength where it begins, of the window kind's colour (data/playTuning.ts LIGHTS; the first stills, at 0.55, lay it too faint to find on a dark street)
-  fall: 1.15, // how it thins along its length (a power: 1 is even, more is a bright mouth and a long thin tail)
-  lift: 0.05, // metres over the ground
-  start: 0.12, // metres out from the glass that it begins
-  margin: 0.25, // metres it stops short of whatever stands in its way (a wall, a fence, a tree)
-  least: 0.9, // metres of room it must have to be laid at all
-  bars: [0.09, 0.45, 0.05, 0.3] as const, // the mullion's width (across), where the transom lies (along), its width, and the share of the light the bars leave
-  rays: 0.85, // metres over the ground that the lines sent out to find what stands in its way run, once for each window
-  soft: 0.08, // the fraction of its length over which it begins (so its edge at the wall is not a cut)
-  fog: 0.8, // the share of the fog it fades by (1: as much as the world)
+  gain: 0.65, // projected light added to a faint broad fill; material colour and distance falloff keep it subdued
+  fall: 1.4, // how gently the projected pattern thins along its length
+  bars: [0.09, 0.45, 0.05, 0.8] as const, // mullion width, transom position/width, light remaining in their soft shadows
+  soft: 0.2, // broad penumbra at the start of the projection
 };
 
 /** The mist that lives (volumetricFog.ts, shaders/fog.ts). */

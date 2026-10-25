@@ -16,7 +16,7 @@ import { worldUniforms } from '../worldMaterial';
 export function createMistLight(ctx: AtmContext): AtmPart {
   const shafts = createMoonShafts(ctx.parts.post);
   const aims = createLampAim(ctx.parts.post);
-  const spill = createWindowSpill(ctx.scene, ctx.g);
+  const spill = createWindowSpill(ctx.g);
   return {
     update(_camera, time, enclosed) {
       const open = !enclosed && !!ctx.g.overworld; // a roof, a dungeon or the arena keeps its own light
