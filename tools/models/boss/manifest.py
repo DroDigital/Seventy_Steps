@@ -11,6 +11,7 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
+  glass_alpha, fill, plane   what is clear, wet or silvered (round 74): see the fields
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
            out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature; `drop_alpha` leaves out the faces whose texture is mostly clear
 """
@@ -28,7 +29,7 @@ class M:
     rot: float = 0
     cls: Any = None
     classes: dict = field(default_factory=dict)
-    double: tuple = (S.CLOTH, S.LEAF)
+    double: tuple = (S.CLOTH, S.LEAF, S.GLASS, S.LIQUID)  # classes drawn on both sides (a thin shell is seen from within)
     round: bool = False
     solids: Any = 'box'
     bands: tuple = (0.9, 2.2)
@@ -38,6 +39,9 @@ class M:
     cut: Any = None
     decimate: int = 0
     drop_alpha: float = 0.0  # the faces of a texture clearer than this (the glass of a jar) are left out
+    glass_alpha: float = 0.0  # ... or kept, as glass (round 74: class GLASS, drawn clear with a sheen)
+    fill: Any = None  # a liquid the glass holds: {'level': 0.5, 'inset': 0.9, 'colour': (r, g, b)} (fill.py), class LIQUID
+    plane: Any = None  # the faces of a flat panel made a mirror: {'axis': 2, 'sign': 1, 'at': 0.007, 'tol': 0.0006} in the source's own frame, class MIRROR (fill.py)
     squash: tuple = (1, 1, 1)
     pose: Any = None
     textures: tuple = ()
@@ -46,6 +50,7 @@ class M:
     rx: float = 0  # degrees: the source tipped about x (its top toward +z) and about z (its top toward -x), before it is turned about the vertical
     rz: float = 0
     recolour: Any = None  # (r, g, b): every face's colour taken from this by its own light and dark (a colony's painted metal made a pale stone)
+    recolour_not: tuple = ()  # classes the recolour leaves as they were (the glazing of a still of copper)
     args: dict = field(default_factory=dict)  # a `proc:` form's arguments (tools/models/boss/proc.py)
     blank: Any = None  # a figure's head taken off at the bone of this name and an eyeless egg set in its place: {'bone': 'head', 'radii': (x, y, z)}
 

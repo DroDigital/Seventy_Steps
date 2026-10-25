@@ -25,6 +25,7 @@ export interface Piece {
   heart?: boolean; // may stand in the fight's circle, as its centrepiece
   join?: boolean; // may touch the pieces beside it (a wall's, a colonnade's)
   hung?: boolean; // hangs on a wall (a shelf, a banner): a room's set stands it against the wall, not clear of it (round 74)
+  wax?: boolean; // a figure of wax (round 74: the museum's effigies): drawn translucent and warm
   dims?: readonly [w: number, d: number, h: number]; // a built piece's own size, half extents and height
 }
 

@@ -3,5 +3,5 @@ from manifest import M, add
 import sources as S
 
 add(
-    M('al_still', 'p30/scene.gltf', None, kit='p30', textures=('p30/textures/',), cls=S.METAL, classes={'.': S.METAL}, fit={'height': 1.5}, solids='box', recolour=(0.8, 0.5, 0.26)),
+    M('al_still', 'p30/scene.gltf', None, kit='p30', textures=('p30/textures/',), cls=S.METAL, classes={'Glazing': S.GLASS, '.': S.METAL}, fit={'height': 1.5}, solids='box', recolour=(0.8, 0.5, 0.26), recolour_not=(S.GLASS,)),
 )

@@ -3,5 +3,5 @@ from manifest import M, add
 import sources as S
 
 add(
-    M('mg_jar', 'p33/scene.gltf', None, kit='p33', textures=('p33/textures/',), cls=S.BONE, classes={'.': S.BONE}, fit={'height': 1.2}, drop_alpha=0.62, solids='box', round=True),
+    M('mg_jar', 'p33/scene.gltf', None, kit='p33', textures=('p33/textures/',), cls=S.BONE, classes={'.': S.BONE}, fit={'height': 1.2}, glass_alpha=0.62, fill={'level': 0.86, 'inset': 0.8, 'colour': (0.42, 0.58, 0.4)}, solids='box', round=True),
 )

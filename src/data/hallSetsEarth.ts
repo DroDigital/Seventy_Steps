@@ -44,7 +44,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('sw_grille', at(0.95, 210, { face: 'wall' }), { heart: true, size: 1.05, tint: [0.34, 0.4, 0.38] }),
       put('sw_bars', at(0.95, 150, { face: 'wall' }), { heart: true, size: 1, tint: [0.34, 0.4, 0.38] }),
       put('sw_support', scatter(4, [0.88, 0.98], { arc: [60, 300], face: 'free' }), { size: 1.1, tint: [0.36, 0.42, 0.4] }),
-      put('rowboat', ring(0.92, 3, { arc: [70, 290], face: 'free' }), { size: 1.1 }),
+      put('rowboat', at(0.85, 320, { face: 'free' }), { size: 0.4 }), // a wreck washed in (round 74: it stands where the hall has room for it)
       put('rocks_sand_a', ring(0.9, 2, { arc: [95, 265] }), { size: [0.5, 0.7] }),
       put('statue_head', ring(0.93, 4, { arc: [100, 260], face: 'in' }), { size: [0.8, 1.1], tint: [0.45, 0.55, 0.5] }),
       put('fish', scatter(7, [0.8, 0.97], { face: 'free' }), { walk: true, size: 1.6 }),
@@ -84,10 +84,10 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('ca_railing', ring(0.97, 6, { arc: [110, 250], face: 'in' }), { size: 1.4, join: true, tint: [0.36, 0.36, 0.4] }),
       put('bench', ring(0.92, 6, { arc: [60, 120], face: 'in' }), { size: 1.3 }),
       put('bench', ring(0.92, 6, { arc: [240, 300], face: 'in' }), { size: 1.3 }),
-      put('cross', at(0.96, 180, { face: 'in' }), { size: 1.5 }),
+      put('cross', at(0.925, 90, { face: 'in' }), { size: 1.5 }),
       put('statue_column', ring(0.94, 4, { arc: [70, 290] }), { size: 0.9 }),
       put('urn', scatter(4, [0.82, 0.96], { face: 'free' }), { size: 1.2 }),
-      put('grave_broken', scatter(3, [0.84, 0.97], { arc: [90, 270], face: 'free' })),
+      put('grave_broken', at(0.815, 60, { mirror: true, face: 'free' })),
     ],
   },
   // Akeley's study in the farmhouse: the cylinders the Mi-Go carry brains in, crates and a chest, a lamp burning low.
@@ -111,10 +111,10 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
   shoggoth: {
     puts: [
       put('kc_gate_rock', at(0.57, 90, { face: 'wall' }), { heart: true, size: 0.95, tint: [0.14, 0.14, 0.18], keep: 0 }), // the black tunnel mouth (round 74: Kenney's Modular Cave Kit, CC0)
-      put('yh_coral_c', scatter(3, [0.86, 1], { arc: [60, 300], face: 'free' }), { size: [2, 2.6], tint: [0.18, 0.18, 0.22], keep: 0.1 }), // black growths of the city's cold (round 74)
+      put('yh_coral_c', at(0.89, 60, { mirror: true, face: 'free' }), { size: 2.3, tint: [0.18, 0.18, 0.22], keep: 0.1 }), // black growths of the city's cold (round 74)
       put('yh_coral_a', scatter(2, [0.86, 1], { arc: [60, 300], face: 'free' }), { size: [2, 2.5], tint: [0.18, 0.18, 0.22], keep: 0.1 }),
       put('column', ring(0.95, 6, { arc: [50, 310] }), { size: 0.8 }),
-      put('statue_obelisk', at(1.0, 180, { face: 'front' }), { size: 0.8 }),
+      put('statue_obelisk', at(0.95, 130, { face: 'front' }), { size: 0.8 }),
       put('statue_ring', ring(0.9, 4, { arc: [80, 280], face: 'in' }), { size: 1.3 }),
       put('hexped', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.3, glow: 'purple' }),
       put('rocks_tall', scatter(3, [0.9, 1.15], { arc: [70, 290] }), { size: 0.6 }),

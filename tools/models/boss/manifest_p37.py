@@ -3,5 +3,5 @@ from manifest import M, add
 import sources as S
 
 add(
-    M('uv_hourglass', 'p37/scene.gltf', None, kit='p37', textures=('p37/textures/',), cls=S.WOOD, classes={'.': S.WOOD}, fit={'height': 2.0}, decimate=2200, solids='box', round=True),
+    M('uv_hourglass', 'p37/scene.gltf', None, kit='p37', textures=('p37/textures/',), cls=S.WOOD, classes={'.': S.WOOD}, fit={'height': 2.0}, decimate=2200, glass_alpha=0.97, solids='box', round=True),
 )

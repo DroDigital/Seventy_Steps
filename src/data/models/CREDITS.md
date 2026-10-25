@@ -246,9 +246,9 @@ By Kyle Fuji, https://kyle-fuji.itch.io/kyles-mushroom-pack, CC0 1.0: credited f
 `mu_bracket`, `mu_reishi`, `mu_oyster`, `mu_morel`, `mu_lantern`
 
 ## Pack 45 — Poly Haven
-'Ornate Mirror 01', 'Modular Industrial Pipes 01', 'Wine Bottles 01' and 'Pine Roots', https://polyhaven.com, CC0 1.0: credited for provenance. Changes: each reduced hard (the mirror to 1,100 faces, the pipes to 2,500, the roots to 2,800), the bottle taken singly with its label left out, scaled and given colliders where they stand in the way.
+'Ornate Mirror 01', 'Modular Industrial Pipes 01', 'Old Military Compressor', 'Wine Bottles 01' and 'Pine Roots', https://polyhaven.com, CC0 1.0: credited for provenance. Changes: each reduced hard (the mirror to 1,100 faces, the pipes to 2,500, the compressor to 700, the roots to 2,800), the bottle taken singly with its label left out and its glass, wine and cork given the classes of glassware, liquid and wood, the mirror's glass made a mirror, the compressor's gauge glass made glass, scaled and given colliders where they stand in the way.
 
-`ph_mirror`, `ph_pipes`, `ph_bottle`, `ph_roots`
+`ph_mirror`, `ph_pipes`, `ph_compressor`, `ph_bottle`, `ph_roots`
 
 ## Pack 46 — Lab Assets
 By MilkAndBanana, https://opengameart.org/content/lab-assets, CC0 1.0: credited for provenance. Changes: a retort, a Florence flask, a round-bottomed flask, a reagent bottle, a ring stand, a Bunsen burner and a microscope taken singly (none of the counters, electronics or safety gear), their glass tinted amber and grey, scaled.

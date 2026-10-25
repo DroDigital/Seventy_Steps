@@ -3,5 +3,5 @@ from manifest import M, add
 import sources as S
 
 add(
-    M('mg_case', 'p38/scene.gltf', None, kit='p38', textures=('p38/textures/',), cls=S.WOOD, classes={'.': S.WOOD}, fit={'height': 2.6}, drop=['Architectural_Glass'], solids='box'),
+    M('mg_case', 'p38/scene.gltf', None, kit='p38', textures=('p38/textures/',), cls=S.WOOD, classes={'Architectural_Glass': S.GLASS, '.': S.WOOD}, fit={'height': 2.6}, solids='box'),
 )

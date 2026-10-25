@@ -39,7 +39,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('kf_column', ring(0.93, 6, { arc: [50, 310] }), { size: 1.1, tint: [0.16, 0.16, 0.2], keep: 0 }), // onyx
       put('column', ring(0.97, 8, { arc: [40, 320] }), { size: 0.85 }),
       put('statue_column', ring(0.9, 4, { arc: [70, 290] }), { size: 0.9 }),
-      put('statue_obelisk', at(1.0, 180, { face: 'front' }), { size: 0.85 }),
+      put('statue_obelisk', at(0.95, 90, { mirror: true, face: 'front' }), { size: 0.85 }),
       put('hexped', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.3, glow: 'purple' }),
       put('banner', scatter(4, [0.9, 0.99], { arc: [80, 280], face: 'in' }), { size: 0.85 }),
     ],
@@ -59,7 +59,8 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   rhan_tegoth: {
     puts: [
       put('mg_case', ring(0.92, 6, { arc: [50, 310], face: 'in' }), { size: 1.3 }), // the wax museum's cases (round 74: Oneironauticus', CC BY)
-      put('mg_jar', scatter(4, [0.8, 0.95], { face: 'free' }), { size: 1.6, keep: 0.1, tint: [0.42, 0.46, 0.5] }),
+      put('mg_jar', at(0.83, 100, { mirror: true, face: 'free' }), { size: 1.6, keep: 0.1, tint: [0.42, 0.46, 0.5] }),
+      put('rl_priest', at(0.82, 70, { mirror: true, face: 'in' }), { wax: true, size: 0.9 }), // the museum's effigies, in wax (round 74)
       put('mu_reishi', scatter(4, [0.82, 0.97], { face: 'free' }), { size: [1.4, 2.2], keep: 0.5 }), // fungus over the glass
       put('mu_oyster', scatter(3, [0.82, 0.97], { face: 'free' }), { size: [1.4, 2], keep: 0.6 }),
       put('pipes', ring(0.93, 8, { arc: [50, 310] }), { size: 0.5, glow: 'purple' }),

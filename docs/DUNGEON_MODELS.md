@@ -32,7 +32,7 @@ The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`)
 | 42 Modular Cathedral Kit | SigilsVault | CC0 | `ca_*` (3) | the steeple, the ballroom |
 | 43 Sewers Modular Assets | RotoPoly | CC0 | `sw_*` (6) | Y'ha-nthlei, Curwen's pens, the swamp tomb |
 | 44 Kyle's Mushroom Pack | Kyle Fuji | CC0 | `mu_*` (5) | Nkai, the Mi-Go cities |
-| 45 Poly Haven | Poly Haven | CC0 | `ph_mirror`, `ph_pipes`, `ph_bottle`, `ph_roots` | the ballroom, Lilith, the Waite study, the cold plant, the bottle gallery, the cellars |
+| 45 Poly Haven | Poly Haven | CC0 | `ph_mirror`, `ph_pipes`, `ph_compressor`, `ph_bottle`, `ph_roots` | the ballroom, Lilith, the Waite study, the cold plant (pipes and compressors), the bottle gallery, the cellars |
 | 46 Lab Assets | MilkAndBanana | CC0 | `lb_*` (7) | Curwen's laboratory, the alchemist's, the Shunned House's cellar |
 | 47 Retro Modular House | Elegant Crow | CC0 | `rh_*` (7) | the lodgings and farmhouses' halls |
 | 48 Modular Cave Kit | Kenney | CC0 | `kc_gate_rock`, `kc_gate_bars` | Nkai and the Elder City's tunnel mouths, Curwen's pens |
@@ -43,14 +43,27 @@ The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`)
 | 53 Old Church Bell | vertexgrocer | CC BY | `cb_bell` | the Starry Wisdom steeple |
 | 54 Bust of Apollo | davdadams | CC BY | `ba_bust` | Hypnos' studio |
 
-Pieces are placed as render dressing with colliders only where a body would stand in them (the pieces named `solids='none'` are walked through: glass, boards, rubble, candles). Hall pieces are never in the fight's circle and never across a doorway.
+Pieces are placed as render dressing with colliders only where a body would stand in them (the pieces named `solids='none'` are walked through: glass, boards, rubble, candles). Hall pieces are never in the fight's circle (but a `heart`'s: the great pieces at a hall's edge) and never across a doorway.
 
 New machinery in the set placer: `wall(r, step, {walls})` lays a row of candidates along the walls of a room, `face: 'wall'` turns each square to its wall, and `hung` stands a piece against a wall instead of clear of it (a shelf, a boarded window); an ordinary room's set draws the fight's circle smaller (`ROOM_INNER`) and keeps clear only the spots its own things use.
 
+## What is clear, wet, silvered and waxen (round 74)
+
+A face of a baked model has a class byte, and four classes beside the old ones are drawn as what they are (`GLASS` 12, `LIQUID` 13, `MIRROR` 14, `WAX` 15: tools/models/boss/sources.py, render/modelKit.ts). The bake finds them three ways: by a material's name (`classes={'Architectural_Glass': S.GLASS}`), by a texture's clearness (`glass_alpha`: a jar's wall, an hourglass's bulbs, the faces whose texture is clearer than the given share are glass and are kept), and by geometry (`plane`: the flat panel in a mirror's frame, found as the faces that face the front at the depth of the glass). `fill` builds a liquid inside a vessel as a body of revolution under its glass, from the vessel's own profile (tools/models/boss/fill.py). Each is a material of its own in propMeshes (`glassware`, `liquid`, `wax`, `mirror`), the world shader with a `SURF_*` define (shaders/surfaces.ts):
+
+- **Glass** is clear until seen aslant or when it catches a lamp; a pale band crosses it as the eye moves.
+- **Liquid** is lit from within, ripples at its top, turns slowly and has the odd bubble rising; it is drawn under its glass.
+- **Wax** takes the lamps through itself, warm at its edges (a put's `wax: true` draws a whole figure so: the museum's effigies).
+- **A mirror is a mirror**: when the eye stands before a hall's mirror and looks toward it, the scene is drawn once more from the eye's image behind the glass, small, with the mirror left out and what lies behind the wall cut away by an oblique near plane (render/mirrorView.ts, mirrorMath.ts), and the glass shows that, dimmed, cooled and a little tarnished; where none is drawn it is a dark silvered panel. One mirror at a time, the nearest; the player and the horror are in it.
+
+Models that wear them: the brain jars and museum cases (glass, fluid), the retort, flasks and bottles of the laboratories (glass, liquid), the bottle gallery (glass, wine, cork), the still, the hourglass, the compressor's gauge, the candles (wax), the ballroom's, the Waite study's and Lilith's mirrors.
+
 ## What is not in, and why
 
-- **Not supplied or not reachable without a sign-in:** Menhirs (DragonJojo), Crookes X-ray Tube, Stage Curtains (daedaljs), Victorian Gothic Hallway, Modular Props House Interior, Environment Library, Old Military Compressor. Sketchfab needs a sign-in; upload the zips and they go in through the same manifests (the Church Bell, Gramophone, Prayer Wheel, Curtains and Bust of Apollo came in that way, packs 50 to 54).
-- **Not done, and said so by the brief itself:** the glass, liquid, reflection, wax and animated sand it asks for need renderer support that the opaque bake does not have; a mirror here is a framed dark panel, the hourglass and jars have no contents that move. The bespoke forms (Keziah's impossible angles, the Voice's telephone, Zann's viol, the Elder Things' fivefold columns, Kadath's domes, Umr's causeways) were not made.
+- **Supplied, not yet in** (the Drive folder 'missing assets - seventy steps'): Menhirs (DragonJojo: Sentinel Hill's ring and Ghatanothoa's court), Victorian Gothic Hallway (BenKiplinger: Muñoz's rooms, the Waite house), Modular Props - House Interior (JordanPowell: the Witch House, the alchemist's cellars, the Waite house, Zann's garret) and Stage Curtains (daedaljs: the Kadath hall, the Outsider's ballroom). The folder is a Google Drive one, which the connector gives up only as inline text, and archives of tens of megabytes cannot go that way; attached to the chat as the first fifteen were, they go in through the same manifests.
+- **Not supplied:** Crookes X-ray Tube (Jagiellonian University Museum: the Shunned House cellar; the brief says its 842,886-triangle scan is to be rebuilt and baked, never imported raw) and Environment - Library (anaroeto: the University Library; a donor of over a million triangles to take apart).
+- **Taken from its source:** the Old Military Compressor (Poly Haven, CC0) is baked as `ph_compressor` for the cold plant, its gauge's glass made glass; the brief asks for its military markings to go, and a baked face keeps one colour, so they went with the texture.
+- **Glass, liquid, reflection and wax are drawn** (render/shaders/surfaces.ts; see below). Not done: the hourglass's sand does not run (it needs a per-grain animation the bake does not carry) and the glass does not crack. The bespoke forms the brief asks for (Keziah's impossible angles, the Voice's telephone, Zann's viol, the Elder Things' fivefold columns, Kadath's domes, Umr's causeways) were not made.
 - **The Bust of Apollo** is the model as made, reduced and recoloured as stone; no laurel, poppy crown or other change to what it shows was made, since the licence's change notice names only what was done.
 - **Left out after baking:** the PSX Dungeon's skull wall, whose skulls are in its texture (a baked face keeps one colour, so it came out a plain slab).
 - **The PSX Shelves pack is AI-assisted** by its own listing: docs/STORE_PAGE.md lists it in the AI disclosure. Its licence forbids reselling or redistributing the assets themselves; the shelves here are modified, baked into the game's own model data and not offered on their own.

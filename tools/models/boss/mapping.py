@@ -37,7 +37,7 @@ PACKS = {
     'p38': ('Museum Showcase - Die Vitrine', 'Samuel Francis Johnson (Oneironauticus)', 'CC BY 4.0'), 'p39': ('Stone Altar', 'TheoClarke', 'CC BY 4.0'),
     'p40': ('PSX Dungeon', 'Goblinatron', 'CC BY 4.0'), 'p41': ('PSX Bookshelves & Food Shelves', 'Munchkin Gaming', 'free for commercial use, no redistribution as assets'),
     'p42': ('Modular Cathedral Kit', 'SigilsVault', 'CC0'), 'p43': ('Sewers Modular Assets', 'RotoPoly', 'CC0'),
-    'p44': ("Kyle's Mushroom Pack", 'Kyle Fuji', 'CC0'), 'p45': ('Poly Haven: mirror, pipes, bottle, roots', 'Poly Haven', 'CC0'),
+    'p44': ("Kyle's Mushroom Pack", 'Kyle Fuji', 'CC0'), 'p45': ('Poly Haven: mirror, pipes, compressor, bottle, roots', 'Poly Haven', 'CC0'),
     'p46': ('Lab Assets', 'MilkAndBanana', 'CC0'), 'p47': ('Retro Modular House Pack', 'Elegant Crow', 'CC0'),
     'p48': ('Modular Cave Kit', 'Kenney', 'CC0'), 'p49': ('Retro Fantasy Kit', 'Kenney', 'CC0'),
     'p50': ('Curtains', 'Heliona', 'CC BY 4.0'), 'p51': ('Prayer Wheel', 'Özlem Çandır', 'CC BY 4.0'),

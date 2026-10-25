@@ -1,4 +1,3 @@
-import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { HALL_SETS } from '../src/data/hallSets';
 import { ROOM_SETS } from '../src/data/roomSets';
@@ -34,13 +33,11 @@ describe("a boss hall's set (round 62: the halls were a heart, braziers and two 
     }
   });
 
-  it("stands in some dungeon every model of round 74's packs that a hall or a room set names (a put can be written and never fit its hall)", () => {
-    const dir = 'tools/models/boss';
-    const made = readdirSync(dir).filter((f) => /^manifest_p(3\d|4\d|5\d)\.py$/.test(f)).flatMap((f) => [...readFileSync(`${dir}/${f}`, 'utf8').matchAll(/\w\(\s*'([a-z]{2}_[a-z0-9_]+)'/g)].map((m) => m[1])).filter((id) => !!MODEL_INFO[id]);
-    const named = new Set([...Object.values(HALL_SETS), ...Object.values(ROOM_SETS)].flatMap((s) => s.puts.map((u) => u.piece.of)));
+  it('stands in some dungeon every baked model a hall or a room set names (a put can be written and never fit its hall)', () => {
+    const named = new Set([...Object.values(HALL_SETS), ...Object.values(ROOM_SETS)].flatMap((s) => s.puts.map((u) => u.piece.of)).filter((id) => !!MODEL_INFO[id]));
     const stood = new Set(w.dungeons.flatMap((d) => d.decor.filter((p) => p.kind === 'set' && p.set).map((p) => p.set!.id)));
-    expect(made.length).toBeGreaterThan(60);
-    expect(made.filter((id) => named.has(id) && !stood.has(id)), 'named by a set and placed in no dungeon').toEqual([]);
+    expect(named.size).toBeGreaterThan(80);
+    expect([...named].filter((id) => !stood.has(id)), 'named by a set and placed in no dungeon').toEqual([]);
   });
 
   it('stands a real set in each hall: pieces enough, all inside its walls, none taller than its roof allows', () => {

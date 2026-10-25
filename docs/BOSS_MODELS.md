@@ -357,7 +357,7 @@ By Mad_Lobster_Workshop; licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `mg_jar` | scene.gltf | 0.8 × 1.2 × 1.0 | 958 | rhan_tegoth, whisperer |
+| `mg_jar` | scene.gltf | 0.8 × 1.2 × 1.0 | 1256 | rhan_tegoth, whisperer |
 
 ## Pack 34: Brazier
 
@@ -383,7 +383,7 @@ By INGSOC1984; licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `rl_priest` | scene.gltf | 0.9 × 3.4 × 0.8 | 2400 | ghatanothoa |
+| `rl_priest` | scene.gltf | 0.9 × 3.4 × 0.8 | 2400 | ghatanothoa, rhan_tegoth |
 
 ## Pack 37: Hourglass
 
@@ -399,7 +399,7 @@ By Samuel Francis Johnson (Oneironauticus); licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `mg_case` | scene.gltf | 2.1 × 2.6 × 2.1 | 696 | rhan_tegoth |
+| `mg_case` | scene.gltf | 2.1 × 2.6 × 2.1 | 724 | rhan_tegoth |
 
 ## Pack 39: Stone Altar
 
@@ -415,7 +415,7 @@ By Goblinatron; licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `pd_pillar_broken` | Models/Pillar_Collapsed_01.fbx | 2.0 × 3.4 × 2.0 | 130 | the_hound, the_outsider |
+| `pd_pillar_broken` | Models/Pillar_Collapsed_01.fbx | 2.0 × 3.4 × 2.0 | 130 | the_hound |
 | `pd_pillar_fallen` | Models/Pillar_Collapsed_02.fbx | 5.0 × 1.2 × 1.4 | 36 | the_hound |
 | `pd_chain` | Models/Chain.fbx | 0.4 × 3.6 × 0.4 | 20 | joseph_curwen |
 | `pd_chandelier` | Models/Chandelier.fbx | 2.6 × 2.2 × 3.0 | 368 | the_outsider |
@@ -471,7 +471,7 @@ By Kyle Fuji; licence CC0.
 | `mu_morel` | Models/Morels/morel_1.glb | 0.4 × 0.8 × 0.4 | 80 | tsathoggua |
 | `mu_lantern` | Models/Jack o' Lanterns/jack_o_lantern_3.glb | 0.9 × 0.7 × 1.0 | 112 | tsathoggua |
 
-## Pack 45: Poly Haven: mirror, pipes, bottle, roots
+## Pack 45: Poly Haven: mirror, pipes, compressor, bottle, roots
 
 By Poly Haven; licence CC0.
 
@@ -480,6 +480,7 @@ By Poly Haven; licence CC0.
 | `ph_mirror` | ornate_mirror_01/ornate_mirror_01_1k.gltf | 2.1 × 3.2 × 0.1 | 1100 | ephraim_waite, lilith, the_outsider |
 | `ph_pipes` | modular_industrial_pipes_01/modular_industrial_pipes_01_1k.gltf | 1.9 × 2.6 × 0.4 | 2491 | dr_munoz |
 | `ph_bottle` | wine_bottles_01/wine_bottles_01_1k.gltf (wine_bottles_01_burgundy) | 0.2 × 0.9 × 0.2 | 420 | terrible_old_man |
+| `ph_compressor` | old_military_compressor/old_military_compressor_1k.gltf | 0.9 × 1.7 × 2.4 | 1104 | dr_munoz |
 | `ph_roots` | pine_roots/pine_roots_1k.gltf | 2.6 × 0.2 × 2.8 | 2821 | shunned_house_entity, the_unnamable, voice_in_the_tomb |
 
 ## Pack 46: Lab Assets
@@ -489,9 +490,9 @@ By MilkAndBanana; licence CC0.
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
 | `lb_retort` | FBX/Tubes and Flasks/Flasks/bottle_glassware_retort_flask_large.fbx | 0.9 × 0.7 × 0.4 | 508 | charles_le_sorcier, joseph_curwen |
-| `lb_florence` | FBX/Tubes and Flasks/Flasks/bottle_glassware_florence_flask_large.fbx | 0.4 × 0.8 × 0.4 | 188 | charles_le_sorcier, joseph_curwen |
-| `lb_round` | FBX/Tubes and Flasks/Flasks/bottle_glassware_round_bottom_flask_large.fbx | 0.4 × 0.7 × 0.4 | 784 | charles_le_sorcier, joseph_curwen |
-| `lb_reagent` | FBX/Tubes and Flasks/Flasks/bottle_glassware_reagent_bottle_large.fbx | 0.4 × 0.7 × 0.4 | 364 | joseph_curwen, shunned_house_entity |
+| `lb_florence` | FBX/Tubes and Flasks/Flasks/bottle_glassware_florence_flask_large.fbx | 0.4 × 0.8 × 0.4 | 428 | charles_le_sorcier, joseph_curwen |
+| `lb_round` | FBX/Tubes and Flasks/Flasks/bottle_glassware_round_bottom_flask_large.fbx | 0.4 × 0.7 × 0.4 | 1024 | charles_le_sorcier, joseph_curwen |
+| `lb_reagent` | FBX/Tubes and Flasks/Flasks/bottle_glassware_reagent_bottle_large.fbx | 0.4 × 0.7 × 0.4 | 604 | joseph_curwen, shunned_house_entity |
 | `lb_stand` | FBX/Heating Equipment/heating_equipment_ring_stand.fbx | 0.9 × 1.1 × 1.0 | 1668 | charles_le_sorcier, joseph_curwen, shunned_house_entity |
 | `lb_burner` | FBX/Heating Equipment/heating_equipment_bunsen_burner.fbx | 0.3 × 0.6 × 0.3 | 348 | joseph_curwen |
 | `lb_microscope` | FBX/Machines/machine_microscope.fbx | 0.3 × 0.8 × 0.5 | 736 | shunned_house_entity |

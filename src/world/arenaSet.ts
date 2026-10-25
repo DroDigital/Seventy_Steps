@@ -123,7 +123,7 @@ function prop(piece: Piece, spot: Spot, y: number, yaw: number, rng: Rng): Prop 
   const walk = piece.walk ?? kit?.walk ?? false;
   return {
     kind: 'set', x: spot.x, y: ground + lift, z: spot.z, w: w * k, d: d * k, h: h * k, yaw, seed: Math.floor(rng() * 1e6),
-    set: { id: piece.of, scale: k, tint: piece.tint, keep: piece.keep, round, walk, hung: piece.hung, glow: piece.glow, lit: piece.lit },
+    set: { id: piece.of, scale: k, tint: piece.tint, keep: piece.keep, round, walk, hung: piece.hung, wax: piece.wax, glow: piece.glow, lit: piece.lit },
   };
 }
 
