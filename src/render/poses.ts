@@ -263,8 +263,8 @@ function kneel(f: Figure, k: number, weapon = ''): void {
 /**
  * A clip's boots are set for the clip's own walk; a kneel bends the legs by hand over it, and the front boot would stand tilted into the
  * floor. So the pose is settled both ways, the clip's own feet and the ground's, and the one eased into the other over the first of the
- * kneel (a kneel eased to nothing leaves the stride as it was). The ground's way bends a knee back, as the kneel's own does, so a leg
- * does not change its mind between frames about which way its shin leans as he gets up and runs.
+ * kneel (a kneel eased to nothing leaves the stride as it was). The joints are blended as quaternions: a clip's knee bent past a right
+ * angle reads as a folded Euler, which a lerp of its angles would twist.
  */
 function settleKneeling(f: Figure, ground: Ground | undefined, k: number): void {
   const joints = [f.kneeR, f.kneeL, f.footR, f.footL, f.skirt[0], f.skirt[1]];
@@ -277,7 +277,7 @@ function settleKneeling(f: Figure, ground: Ground | undefined, k: number): void 
   settle(f, ground, false);
   const clips = keep();
   put(start);
-  settle(f, ground, true, true);
+  settle(f, ground, true);
   const grounded = keep();
   const t = stage(k, 0, 0.1);
   put(clips);

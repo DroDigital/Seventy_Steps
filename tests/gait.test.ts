@@ -73,6 +73,26 @@ describe('gait (render/gait.ts)', () => {
     }
   });
 
+  it('climbs a rise at a walk without a boot in the ground or a knee flung through the vertical (round 81: a knee bent the other way ran out of bend on rising ground)', () => {
+    const ground: Ground = (_x, z) => Math.min(0.3, Math.max(-0.3, 0.3 * z)); // rising ahead, as the views lay it about the feet
+    const [at, ahead] = [new THREE.Vector3(), 96];
+    for (const who of ['player', 'npc:zebulon']) { // his clips' feet, and a person's
+      const f = buildFigure(who);
+      for (const speed of [1.6, 3]) {
+        let [last, worst] = [undefined as THREE.Quaternion[] | undefined, -1];
+        for (let i = 0; i <= ahead; i++) {
+          pose(f, { ...STILL, speed, stride: (i / ahead) * 2 * Math.PI, ground });
+          f.root.updateMatrixWorld(true);
+          for (const foot of [f.footR, f.footL]) worst = Math.max(worst, ground(foot.getWorldPosition(at).x, at.z) + f.ankle - at.y);
+          const now = [f.kneeR.quaternion.clone(), f.kneeL.quaternion.clone()];
+          if (last) now.forEach((q, k) => expect(q.angleTo(last![k]), `${who} at ${speed} m/s, step ${i}`).toBeLessThan(0.4)); // (a walk's own knee turns about 0.1 between steps)
+          last = now;
+        }
+        expect(worst, `${who} at ${speed} m/s`).toBeLessThan(0.01); // the soles lie above the ankle's own floor, so a boot in the ground is a positive number
+      }
+    }
+  });
+
   it('plants both feet on a slope', () => {
     const f = buildFigure('player');
     const ground: Ground = (x) => 0.3 * x; // falling away to the right

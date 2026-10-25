@@ -187,10 +187,11 @@ export type Ground = (x: number, z: number) => number;
  * Settles any pose on the ground (never a figure rolling or lying down): the pelvis sinks to a foot
  * whose ground lies lower than where the figure stands (down a slope or a step), a knee bends where
  * its foot would sink into the ground, a foot lies level on the ground and lets its toes drop as it
- * lifts, and each coat panel follows its thigh. A knee bent for the ground bends further the way its shin already leans, forward
- * or back (there is no way to tell which was meant when it hangs straight down), unless `back` is set, which always bends it back.
+ * lifts, and each coat panel follows its thigh. A knee bent for the ground always bends back, as a knee does, though a shin that leans
+ * forward then crosses the vertical to clear the ground (a knee bent the other way would be the smaller turn, but it runs out of bend
+ * on rising ground and leaves the boot in it: tried and withdrawn, round 81).
  */
-export function settle(f: Figure, ground?: Ground, level = true, back = false): void {
+export function settle(f: Figure, ground?: Ground, level = true): void {
   const pitch = wrapAngle(f.body.rotation.x);
   const clearance = f.hip - f.thigh - f.shin;
   const shank = f.shin - f.ankle; // knee to ankle
@@ -211,10 +212,7 @@ export function settle(f: Figure, ground?: Ground, level = true, back = false): 
       const own = level ? 0 : Math.max(0, drop - (f.body.position.y - sink - clearance - f.ankle));
       const room = f.body.position.y - clearance - under[i] - f.ankle + own; // how far below the hip the ankle may go
       const c = (room - f.thigh * Math.cos(thigh)) / shank;
-      if (c > -1 && c < 1 && drop > room) {
-        const lean = Math.acos(c); // the shin from the vertical that reaches no lower than the room: forward of it for a shin that points forward, behind it otherwise
-        bendTo(knee, !back && thigh + bent < 0 ? Math.max(-0.2, Math.min(bent, -lean - thigh)) : Math.min(2.6, Math.max(bent, lean - thigh)));
-      }
+      if (c > -1 && c < 1 && drop > room) bendTo(knee, Math.min(2.6, Math.max(bent, Math.acos(c) - thigh)));
       const knee2 = bendOf(knee);
       if (!level) bendTo(foot, bendOf(foot) - (knee2 - bent)); // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope
       const shin = thigh + knee2;
