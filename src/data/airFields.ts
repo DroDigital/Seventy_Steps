@@ -48,27 +48,27 @@ export const AIR_FIELD = {
 export const AIR_FIELDS: Readonly<Record<string, readonly AirLayer[]>> = {
   hub: [
     { kind: 'leaf', tone: 'accent0', rate: 2.2, by: 'wood', dry: true }, // October leaves over the quad, russet
-    { kind: 'drift', tone: 'mist', rate: 0.8, by: 'mist' },
+    { kind: 'drift', tone: 'mist', rate: 0.08, by: 'mist' },
     { kind: 'mote', tone: 'moon', rate: 0.8, pale: 0.4, by: 'dark' }, // a gnat's glint under the lamps
   ],
   // The Colour Out of Space: the heath crumbling to a fine grey powder, and now and then a spark of the colour itself
   arkham: [
     { kind: 'ash', tone: 'mist', rate: 6.5, pale: 0.4 },
-    { kind: 'drift', tone: 'mist', rate: 1.6, by: 'mist' },
+    { kind: 'drift', tone: 'mist', rate: 0.16, by: 'mist' },
     { kind: 'mote', tone: [0.85, 0.12, 0.5], rate: 0.4, glow: true, anomaly: true },
   ],
   dunwich: [
-    { kind: 'drift', tone: 'mist', rate: 2.2, by: 'mist' },
+    { kind: 'drift', tone: 'mist', rate: 0.22, by: 'mist' },
     { kind: 'seed', tone: 'mist', rate: 1.2, pale: 0.55, by: 'gust' },
     { kind: 'leaf', tone: 'accent0', rate: 0.6, by: 'wood', dry: true },
   ],
   innsmouth: [
     { kind: 'brine', tone: 'mist', rate: 5, pale: 0.55, sea: true, fast: true, dry: true }, // salt spray along the sea wind
-    { kind: 'drift', tone: 'mist', rate: 1.6, pale: 0.3, by: 'mist', sea: true },
+    { kind: 'drift', tone: 'mist', rate: 0.16, pale: 0.3, by: 'mist', sea: true },
   ],
   providence: [
     { kind: 'leaf', tone: 'accent1', rate: 2.6, pale: 0.25, by: 'wood', dry: true },
-    { kind: 'drift', tone: 'mist', rate: 1.2, by: 'mist' },
+    { kind: 'drift', tone: 'mist', rate: 0.12, by: 'mist' },
   ],
   vermont: [
     { kind: 'leaf', tone: 'accent1', rate: 5, by: 'wood', dry: true }, // the October woods: gold and rust in every gust
@@ -84,7 +84,7 @@ export const AIR_FIELDS: Readonly<Record<string, readonly AirLayer[]>> = {
   pnakotus: [
     { kind: 'dust', tone: 'mist', rate: 4, pale: 0.25, by: 'gust', fast: true },
     { kind: 'mote', tone: 'accent0', rate: 2, pale: 0.45 },
-    { kind: 'drift', tone: 'mist', rate: 1, by: 'mist' },
+    { kind: 'drift', tone: 'mist', rate: 0.1, by: 'mist' },
   ],
   kn_yan: [
     { kind: 'mote', tone: 'accent0', rate: 4, glow: true, pale: 0.62 }, // blue light hung in the vault's air
@@ -97,7 +97,7 @@ export const AIR_FIELDS: Readonly<Record<string, readonly AirLayer[]>> = {
   rlyeh: [
     { kind: 'brine', tone: 'accent0', rate: 2, pale: 0.55, sea: true, fast: true },
     { kind: 'bubble', tone: 'mist', rate: 0.7, pale: 0.6, sea: true },
-    { kind: 'drift', tone: 'mist', rate: 1, pale: 0.4, by: 'mist', sea: true },
+    { kind: 'drift', tone: 'mist', rate: 0.1, pale: 0.4, by: 'mist', sea: true },
   ],
   // Yuggoth: the spores of the Fungi, rose and rare violet
   yuggoth: [
@@ -111,7 +111,7 @@ export const AIR_FIELDS: Readonly<Record<string, readonly AirLayer[]>> = {
   ],
   // The Outer Dark: each dimension its own matter
   cloud_summit: [
-    { kind: 'drift', tone: 'accent0', rate: 2, pale: 0.35, by: 'mist' },
+    { kind: 'drift', tone: 'accent0', rate: 0.2, pale: 0.35, by: 'mist' },
     { kind: 'mote', tone: 'accent0', rate: 2, glow: true, pale: 0.2 },
   ],
   black_wood: [

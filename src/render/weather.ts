@@ -163,7 +163,7 @@ export function createWeatherFx(scene: THREE.Scene, g: Game, particles: Particle
           const y = g.world.ground(x, z);
           if (y <= WORLD.seaLevel + 0.1) continue;
           if (!loose) particles.spawn({ x, y: y + 0.03, z, vx: (Math.random() - 0.5) * 0.9, vy: 1.2 + Math.random() * 1.4, vz: (Math.random() - 0.5) * 0.9, life: 0.28, size: 0.05, grow: 0.5, color: DROP, alpha: 0.7, gravity: 9, shape: 'spark', glow: false });
-          if (Math.random() < 0.3) particles.spawn({ x, y: y + 0.1, z, vx: loose ? Math.min(wind.x, 4) * 0.8 : 0, vz: loose ? Math.min(wind.z, 4) * 0.8 : 0, vy: 0.2, life: 0.5, size: 0.35, grow: 2.2, color: loose ? skin.cloud : MIST, alpha: loose ? 0.2 : 0.16, shape: 'wisp', drag: 1.5 });
+          if (Math.random() < WEATHER.splashMist) particles.spawn({ x, y: y + 0.1, z, vx: loose ? Math.min(wind.x, 4) * 0.8 : 0, vz: loose ? Math.min(wind.z, 4) * 0.8 : 0, vy: 0.2, life: 0.5, size: 0.35, grow: 2.2, color: loose ? skin.cloud : MIST, alpha: loose ? 0.2 : 0.16, shape: 'wisp', drag: 1.5 });
         }
       } else seeded = false;
       if (!w || hidden || amount <= 0 || (kind !== 'gale' && kind !== 'storm' && kind !== 'motes')) return;
