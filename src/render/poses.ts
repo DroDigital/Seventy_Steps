@@ -307,7 +307,7 @@ export function pose(f: Figure, p: PoseInput): void {
   }
   if (p.drop) return p.drop.sea && p.drop.sea.since >= 0 ? thrash(f, p.drop.sea.since, p.drop.sea.held) : plunge(f, p.drop.t, p.drop.spin);
   const mine = f.character === 'player'; // his own clips (playerPose.ts) where he has them
-  const player = { move: p.move, def: d, frame: p.frame, speed: p.speed, stride: p.stride, guard: p.guard, time: p.time, weapon: p.weapon ?? 'cane' };
+  const player = { move: p.move, def: d, frame: p.frame, speed: p.speed, stride: p.stride, guard: p.guard, time: p.time, weapon: p.weapon ?? 'cane', rollYaw: p.rollYaw };
   let clipped = false;
   if (!d || p.move === null) {
     clipped = mine && playerStride(f, player);

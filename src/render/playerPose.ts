@@ -4,6 +4,7 @@
  * is posed by hand (poses.ts), as the people and the creatures are. Poses are cut from his figure's joints, so these set the same ones.
  */
 
+import * as THREE from 'three';
 import type { MoveDef } from '../data/moves';
 import type { Figure } from './figures';
 import { blendAt } from './gait';
@@ -29,6 +30,16 @@ export interface PlayerInput {
   guard: boolean;
   time: number;
   weapon: string;
+  rollYaw?: number; // the roll's direction relative to his facing (locked on, he rolls aside or back without turning)
+}
+
+const UP = new THREE.Vector3(0, 1, 0);
+const TURN = new THREE.Quaternion();
+
+/** The whole figure turned about the vertical through the root, as the hand-posed roll turns it by `rollYaw`: a clip's roll is made forward. */
+function turnAbout(f: Figure, yaw: number): void {
+  f.body.quaternion.premultiply(TURN.setFromAxisAngle(UP, yaw));
+  f.body.position.applyAxisAngle(UP, yaw);
 }
 
 /** The id of the clip a move is made as: by weapon for a blow, a parry or a guard, else by its own name. */
@@ -84,6 +95,7 @@ export function playerMove(f: Figure, p: PlayerInput): boolean {
     overlay(A, E, UPPER); // a swallow, a shot of Reagent, a reload: the legs walk on
     applyPose(f, A);
   } else applyPose(f, E);
+  if (p.rollYaw && p.def.motion?.dir === 'input') turnAbout(f, p.rollYaw);
   const until = clip.marks.props ?? Infinity; // what the hand holds goes at this frame (a flask, once thrown)
   held(f, { drawn: clip.drawn, props: t < until ? clip.props : [] });
   if (f.flash && p.def.shot) f.flash.visible = p.frame >= p.def.shot.frame && p.frame < p.def.shot.frame + 2; // the muzzle's flash as the shot leaves

@@ -76,7 +76,11 @@ export function investigator(): Figure {
     else if (kind === 'prop') f.props[name] = mesh;
     else if (kind === 'gun') f.gun = mesh;
     else if (kind === 'holstered') (f.holstered = mesh).visible = true;
-    else if (kind === 'flash') f.flash = holder;
+    else if (kind === 'flash') {
+      f.flash = holder; // the game shows and hides the holder (poses.ts, playerPose.ts); the flash inside it is always lit
+      holder.visible = false;
+      mesh.visible = true;
+    }
     else if (kind === 'flame') {
       f.flame = holder;
       f.flameMesh = mesh;
