@@ -1,5 +1,5 @@
 /**
- * Prints in soft ground (round 78; render only, read-only on the simulation): where the region's ground is snow, mud, sand, dirt, leaves
+ * Prints in soft ground (round 81; render only, read-only on the simulation): where the region's ground is snow, mud, sand, dirt, leaves
  * or soft grass, whatever walks across it on foot, the investigator, the people and the creatures near, leaves a print at each
  * stride, a pressed hollow in an ellipse set along the way it went, with a lip pushed up about it, in the colour of that ground, dithered as the blob shadows are, and
  * fading out in its own time (snow keeps it longest). A flyer, a rider, a body in the sea and what is hidden or unseen leave none; nor

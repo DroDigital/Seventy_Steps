@@ -7,11 +7,15 @@
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle, yawOf } from '../core/geom';
+import { FIGURE_LIFE, SWING_TRAIL } from '../data/fxTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
+import { applySway, newSway, stepSway, type Sway } from './figureSway';
+import { easeGaze, gazeAt, gazeTurn, newGaze, type Gaze } from './gaze';
+import { edgeOf } from './swingTrails';
 import { ACTS, type ActKind, type Post } from '../data/npcActs';
 import { pipeBeat } from './npcActs';
 import type { Smoker } from './pipeSmoke';
@@ -40,6 +44,9 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
+  sway: Sway; // the investigator's lantern and scarf tail (figureSway.ts; round 81)
+  moved: { x: number; z: number; yaw: number } | null; // their velocity (smoothed), and the yaw, as last drawn: what the sway is driven by
+  gaze: Gaze; // a person's head, turned toward the investigator (gaze.ts; round 81)
 }
 
 export interface ActorViews {
@@ -56,6 +63,8 @@ export interface ActorViews {
   flameCover(eye: THREE.Vector3): number;
   /** Where the muzzle of the investigator's revolver is this frame (posed, drawn or not), or null while they are not drawn. */
   readonly muzzle: THREE.Vector3 | null;
+  /** The edge of the investigator's weapon in the world while a blow is cutting: its point and a point back along it; null the rest of the time (swingTrails.ts). */
+  readonly swingEdge: { tip: THREE.Vector3; base: THREE.Vector3 } | null;
 }
 
 function dispose(f: Figure): void {
@@ -83,6 +92,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
   let flame: THREE.Vector3 | null = null;
   const muzzleAt = new THREE.Vector3();
   let muzzle: THREE.Vector3 | null = null;
+  const edgeAt = { tip: new THREE.Vector3(), base: new THREE.Vector3() };
+  let swingEdge: typeof edgeAt | null = null;
   let rising: { seconds: number; at: number | null } | null = null; // a cutscene's slow rise from the knee: when it began (set by the first frame drawn)
 
   g.events.on('Travelled', () => { // arriving at a sign on one knee: already down as the veil lifts (round 29)
@@ -107,7 +118,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0 });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, sway: newSway(), moved: null, gaze: newGaze() });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -211,6 +222,52 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     if (f.flame && id === g.player.id) flame = f.flame.getWorldPosition(flameAt); // posed: it tumbles with a roll
     if (f.flameMesh && id === g.player.id) lightFlame(f.flameMesh, lanternGain(g, alpha));
     if (f.flash && id === g.player.id) muzzle = f.flash.getWorldPosition(muzzleAt); // the barrel's tip, wherever the arm has it
+    if (f.loose) swayLoose(f, v, tr, dt, time); // laid on the pose, after it
+    if (person) lookAtMe(f, v, flinch, dt, tr.pos.y);
+    if (id === g.player.id && a && def?.hit) {
+      const [from, to] = def.hit.window; // a blow cutting: its edge is followed from just before the first frame it can hit to just after the last
+      const weapon = f.arms?.[g.player.weapon] as THREE.Mesh | undefined;
+      if (weapon && frame >= from - SWING_TRAIL.lead && frame < to + SWING_TRAIL.tail) {
+        f.root.updateMatrixWorld(true);
+        const { tip, base } = edgeOf(weapon);
+        swingEdge = { tip: weapon.localToWorld(edgeAt.tip.copy(tip)), base: weapon.localToWorld(edgeAt.base.copy(base)) };
+      }
+    }
+  }
+
+  /** What hangs loose on the figure: the lantern and the scarf's tail, driven by the body's own motion, let be as the body goes over. */
+  function swayLoose(f: Figure, v: View, tr: { prev: { x: number; z: number }; pos: { x: number; z: number } }, dt: number, time: number): void {
+    const [vx, vz] = [(tr.pos.x - tr.prev.x) * SIM.hz, (tr.pos.z - tr.prev.z) * SIM.hz];
+    const yaw = f.root.rotation.y;
+    const was = v.moved;
+    const upright = Math.max(0, 1 - Math.abs(f.body.rotation.x - f.hunch) / 0.5) * (1 - v.kneel);
+    if (!was || dt <= 0) {
+      v.moved = { x: vx, z: vz, yaw };
+      return;
+    }
+    const k = 1 - Math.exp(-dt / FIGURE_LIFE.lantern.smooth);
+    const [sx, sz] = [was.x + (vx - was.x) * k, was.z + (vz - was.z) * k];
+    const [ax, az] = [(sx - was.x) / dt, (sz - was.z) / dt]; // the acceleration of the smoothed velocity, in the world...
+    const [c, s] = [Math.cos(yaw), Math.sin(yaw)];
+    v.moved = { x: sx, z: sz, yaw };
+    stepSway(v.sway, {
+      dt, time, upright,
+      ax: ax * c - az * s, az: ax * s + az * c, // ...and in the figure's: its left is (cos, -sin), its front (sin, cos)
+      speed: Math.hypot(sx, sz), yawRate: wrapAngle(yaw - was.yaw) / dt, stride: v.stride,
+    });
+    if (f.loose) applySway(v.sway, upright, f.loose.lantern, f.loose.scarf);
+  }
+
+  /** One at no act, with the investigator in front of them or at their shoulder, turns their head to follow: the head only, eased. */
+  function lookAtMe(f: Figure, v: View, flinch: number, dt: number, y: number): void {
+    const me = g.ecs.c.transform.get(g.player.id);
+    const free = (1 - Math.min(1, Math.max(0, v.actK))) * (flinch > 0 ? 0 : 1) * (g.player.mount.active || g.player.falling ? 0 : 1);
+    const to = me && free > 0 ? gazeAt(f.root.rotation.y, me.pos.x - f.root.position.x, me.pos.z - f.root.position.z, me.pos.y - y) : null;
+    easeGaze(v.gaze, to, free, dt);
+    if (v.gaze.weight <= 0) return;
+    const turn = gazeTurn(v.gaze);
+    f.head.rotation.y += turn.yaw;
+    f.head.rotation.x += turn.pitch;
   }
 
   return {
@@ -229,6 +286,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     get muzzle() {
       return muzzle;
     },
+    get swingEdge() {
+      return swingEdge;
+    },
     flameCover(eye) {
       return flame ? mounts.cover(eye, flame) : 0;
     },
@@ -238,6 +298,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       glow = null;
       flame = null;
       muzzle = null;
+      swingEdge = null;
       for (const [id, v] of views) draw(id, v, alpha, time);
       tracer.visible = time < tracerUntil;
     },

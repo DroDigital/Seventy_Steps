@@ -1,5 +1,5 @@
 /**
- * A drawn creature's picture goes, forms and wears its wounds by its own texels (round 78; data/creatureFx.ts,
+ * A drawn creature's picture goes, forms and wears its wounds by its own texels (round 81; data/creatureFx.ts,
  * render/creatureFx.ts). Nothing of the recorded art is redrawn: in a death or an arrival the texels are
  * taken away (or given back) in an order, each style with its own rim and its own movement of the rest;
  * a wound is the darkness of a wet patch laid over the pixels it falls on, and the flash of a blow is a

@@ -1,5 +1,5 @@
 /**
- * What a great one gives the picture (round 78; render/bossPresence.ts, render/footfalls.ts, render/creatureAura.ts,
+ * What a great one gives the picture (round 81; render/bossPresence.ts, render/footfalls.ts, render/creatureAura.ts,
  * data/creatureAura.ts, core/pace.ts voiceLevel): how deep in its fight it is, how loud its voice is, the dust and
  * jolt of its stride, and the twelve recipes of what it lets go of, in the anomaly hues only.
  */

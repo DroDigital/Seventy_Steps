@@ -1,5 +1,5 @@
 /**
- * The drawn creatures take their realm's colours (round 78). The older art is sepia whatever the realm,
+ * The drawn creatures take their realm's colours (round 81). The older art is sepia whatever the realm,
  * and the post pass lets a character keep most of its own colours (FX.charShare), so a ghoul in the
  * cold of the Mountains of Madness stood in the colours of the Waking World. Each reviewed form is now
  * recoloured for the realm it stands in, as a script would recolour it by hand: render/spriteTone.ts

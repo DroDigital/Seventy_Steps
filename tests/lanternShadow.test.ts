@@ -108,6 +108,6 @@ describe('the lantern\'s map', () => {
     expect(WORLD_FRAG).toMatch(/uLanternColor \* lanternFalloff\(ld\) \* mix\(facing, share, character\) \* lanternVis/);
     expect(WORLD_FRAG).not.toMatch(/lampLight(Gloss)?\([^)]*\)[^;]*(lanternLit|lanternVis)/); // the lamps, fires and windows are not the lantern
     expect(SPRITE_VERT).toMatch(/vShade = vec2\(moon, lamp\)/); // the shadow of the lantern is taken at the creature's middle,
-    expect(SPRITE_FRAG).toMatch(/uLanternColor \* lanternAt\(uLanternPos - vWorld\) \* vShade\.y/); // and lays the light at each pixel (round 78)
+    expect(SPRITE_FRAG).toMatch(/uLanternColor \* lanternAt\(uLanternPos - vWorld\) \* vShade\.y/); // and lays the light at each pixel (round 81)
   });
 });

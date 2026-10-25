@@ -1,5 +1,5 @@
 /**
- * The recolour of each drawn creature to its realm (round 78), worked out for each form from its own measured
+ * The recolour of each drawn creature to its realm (round 81), worked out for each form from its own measured
  * colour (`REVIEWED_MATTER`: the mean of the middle half of its front view's solid texels, by brightness) and
  * the realm's gradient map (render/realmPalette.ts). Every pixel of a form is turned the same way, about the
  * grey axis of colour, by the arc that takes the form's own hue a share of the way to the realm's, and has its

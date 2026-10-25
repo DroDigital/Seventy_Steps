@@ -43,6 +43,7 @@ export interface Figure {
   gun?: THREE.Object3D; // the investigator's revolver in the hand, shown only while it is drawn (shot or reload)...
   holstered?: THREE.Object3D; // ...and its grip in the holster the rest of the time (actorViews.ts; round 22)
   arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts)
+  loose?: { lantern: THREE.Group; scarf: THREE.Group }; // the lantern on its strap and the scarf's tail, each a group at its own pivot (figureSway.ts; round 81)
   flame?: THREE.Object3D; // the investigator's lantern flame: its halo hangs here (worldLights.ts)
   flameMesh?: THREE.Mesh; // ...and the flame drawn there, which goes dark when the mind is Unmoored (lanternLife.ts)
   fixture?: THREE.Group; // a person's own chair and table: set where they are put and kept there as they stand and turn (npcProps.ts, actorViews.ts)

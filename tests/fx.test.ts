@@ -237,7 +237,7 @@ describe('round 58: a failing mind\'s picture is flow at the edges, a lens, a se
   });
 });
 
-describe('the creatures a failing mind sees slip (round 78: `mind`)', () => {
+describe('the creatures a failing mind sees slip (round 81: `mind`)', () => {
   it('is nothing while lucid, whole at the warp\'s cap, never past it, and gone when the warp or the cap are', () => {
     expect(computeFx(state(100)).mind).toBe(0);
     expect(computeFx(state(0)).mind).toBeCloseTo(1, 5);

@@ -136,7 +136,7 @@ export const GROUND_CONTACT = {
 };
 
 
-/** Lights that last a moment (round 78, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
+/** Lights that last a moment (round 81, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
 export const FLASH_LIGHTS = {
   slots: 3, // the most at once
   reach: 46, // metres from the investigator: farther, none is chosen
@@ -148,7 +148,7 @@ export const FLASH_LIGHTS = {
   white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
 } as const;
 
-/** The mist a moving body carves (round 78, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
+/** The mist a moving body carves (round 81, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
 export const MIST_WAKES = {
   slots: 8, // the most at once (the nearest moving bodies; the investigator's is always one)
   reach: 44, // metres from the lens: farther, none is laid
@@ -163,7 +163,7 @@ export const MIST_WAKES = {
 } as const;
 
 /**
- * Prints in soft ground and what a body's breath and feet raise (round 78; render/footprints.ts, render/creatureAir.ts). The ground a
+ * Prints in soft ground and what a body's breath and feet raise (round 81; render/footprints.ts, render/creatureAir.ts). The ground a
  * region has underfoot decides it: how dark a print is, how long it keeps, the colour it is pressed in; only soft ground keeps one.
  */
 export const PRINTS = {
@@ -207,4 +207,45 @@ export const BOSS_PRESENCE = {
   deepGlints: 0.8, // the share more its glints burn in its last phase than in its first
   bodyGlow: 0.12, // how much brighter a colossus's built body is lit in its last phase and in a loud word
   halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
+} as const;
+
+/** What a person has that moves of itself (render/figureSway.ts, gaze.ts, actorViews.ts; round 81). No run-lean and no breathing: only what hangs loose and where the eyes go. */
+export const FIGURE_LIFE = {
+  slice: 1 / 120, // seconds: the springs are stepped in slices no longer than this
+  lantern: {
+    length: 0.28, // metres of strap and cage the pendulum hangs by
+    damp: 3.4, // per second
+    gain: 0.45, // the body's acceleration, as the lantern takes it (the velocity is smoothed over `smooth` before it is read)
+    smooth: 0.1, // seconds the velocity is smoothed over
+    gait: [1.6, 1.1] as readonly [side: number, fore: number], // m/s² of the stride's own rock at a run, to the side and fore-and-aft
+    most: 0.5, // the widest swing, rad
+    inward: -0.08, // and how far it may swing in toward the leg
+  },
+  scarf: {
+    stream: 0.085, // rad of the tail's streaming back for each m/s
+    most: 0.5, // rad it streams to at the fastest, and
+    droop: 0.06, // rad it hangs back at rest
+    spring: 70, damp: 9, // the follow of the tail
+    rate: 8.5, flutter: 0.07, // radians a second of its flutter, and how far it takes the tail at a run
+    fling: 0.12, side: 0.4, // rad flung out for each rad/s of turning, and the most
+  },
+  gaze: {
+    range: 7, // metres a person sees the investigator from
+    near: 0.6, // and does not look at them closer than
+    turn: 0.9, // rad a head turns, at most; beyond it the body is the body's
+    reach: 2.4, // rad off their front at which the eyes let go, fading from `turn`
+    pitch: 0.25, // rad, up or down
+    follow: 7, release: 4, // per second: how quick the head comes round, and goes back
+  },
+  wet: [0.05, 0.09] as readonly [flat: number, up: number], // how much darker a person's cloth is in a soaking rain, and the more that surfaces facing the sky take (the world shader)
+} as const;
+
+/** The track of a blow (render/swingTrails.ts; round 81). */
+export const SWING_TRAIL = {
+  samples: 14, // the last few edges kept
+  life: 0.2, // seconds a sample lasts
+  alpha: 0.55, // its brightness when laid
+  width: 0.45, // metres of the weapon's length, back from its point, that the ribbon spans
+  color: [0.82, 0.86, 0.96] as readonly [number, number, number],
+  lead: 2, tail: 3, // frames before the blow's first active frame and after its last that the edge is followed
 } as const;

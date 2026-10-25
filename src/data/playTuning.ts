@@ -74,6 +74,7 @@ export const SETTINGS = {
   resolution: [0.8, 2, 0.4, 2], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360 and 800 × 450, the default (round 58, asked: before it was 640 × 360, which a 720p, 1080p, 1440p and 4K screen each held a whole number of times over, 2, 3, 4 and 6, so that every pixel was drawn the same size; 800 × 450 is 1.6, 2.4, 3.2 and 4.8 times over on them, so some rows and columns are drawn wider than others)
   brightness: [0.7, 1.6, 0.05, 1], // lifts the dark (a gamma, after the grade; round 12)
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
+  relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 81: shaders/sprite.ts); off, they are lit as the rest
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)

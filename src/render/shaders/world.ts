@@ -6,6 +6,7 @@
  * (shaders/eldritch.ts).
  */
 
+import { FIGURE_LIFE } from '../../data/fxTuning';
 import { PANE_GLSL } from '../paneLife';
 import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
@@ -220,6 +221,7 @@ void main() {
     pud = smoothstep(thr, thr + 0.06, pn) * smoothstep(0.86, 0.97, n.y);
     tex *= 1.0 - uWet * (0.1 + 0.16 * n.y) - 0.3 * pud;
   }
+  if (uWet > 0.01 && uEmissive < 0.5 && uCharacter > 0.5) tex *= 1.0 - uWet * (${FIGURE_LIFE.wet[0].toFixed(3)} + ${FIGURE_LIFE.wet[1].toFixed(3)} * max(n.y, 0.0)); // a person's cloth in the rain: darker, most where it faces the sky (shoulders, hat; round 81)
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);

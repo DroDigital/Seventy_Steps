@@ -1,5 +1,5 @@
 /**
- * A horror's presence in the picture (round 78; render only, read-only on the simulation). Two things the
+ * A horror's presence in the picture (round 81; render only, read-only on the simulation). Two things the
  * simulation says and the picture did not show:
  * - how deep in its fight it is: the phases of a fight were one burst of light and a shake, and then the same
  *   body; now each phase is worn (`deep`: its glints and halo burn higher, its aura gives off more);

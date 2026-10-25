@@ -93,25 +93,34 @@ export function investigator(): Figure {
     bevel(0.07, 0.1, 0.2, 0.14, 0.655, -0.01, facing, 0.012),
     bevel(0.215, 0.075, 0.215, 0, 0.64, 0.005, scarf, 0.02), // scarf about the neck...
     bevel(0.07, 0.07, 0.05, 0.05, 0.595, 0.12, shade(scarf, 1.12), 0.012), // ...tied in a knot at the front...
-    slab(0.085, 0.3, 0.032, 0.07, 0.46, -0.14, scarf, 0.12), // ...its tail down the back
     slab(0.045, 0.66, 0.022, 0, 0.33, 0.133, leather, 0.72), // satchel strap
     bevel(0.17, 0.15, 0.085, -0.2, -0.06, 0.04, leather, 0.014), // satchel, on the right hip
     bevel(0.18, 0.04, 0.095, -0.2, 0.02, 0.04, shade(leather, 0.8), 0.01), // its flap
   ]), 'cloth');
+  // The scarf's tail hangs from the neck and the lantern from the loop at the belt's end, each from a pivot of its own, so figureSway.ts can swing them (round 81).
+  const tail = new THREE.Group();
+  tail.position.set(0.07, 0.61, -0.14);
+  f.torso.add(tail);
+  part(f, tail, slab(0.085, 0.3, 0.032, 0, -0.15, 0, scarf, 0.12), 'cloth'); // ...its tail down the back
   const cage = shade(BASE.charcoal, 1.6);
   const [lx, ly, lz] = [0.29, -0.235, 0.02]; // the lantern hangs low at the left side of the belt, clear of the coat and the swinging arm
-  part(f, f.torso, mergeGeometries([ // its cage
+  const hang = new THREE.Group(); // the pivot: the clip where the strap meets the loop
+  hang.position.set(0.225, -0.06, lz);
+  f.torso.add(hang);
+  f.loose = { lantern: hang, scarf: tail };
+  const at = (g: THREE.BufferGeometry): THREE.BufferGeometry => g.translate(-hang.position.x, -hang.position.y, -hang.position.z); // (what hangs is built where it hangs, then set about its pivot)
+  part(f, f.torso, box(0.03, 0.075, 0.05, 0.225, -0.03, lz, leather), 'cloth'); // what it hangs from: a loop on the belt's end
+  part(f, hang, at(mergeGeometries([ // its cage
     box(0.13, 0.025, 0.13, lx, ly + 0.08, lz, cage),
     box(0.13, 0.025, 0.13, lx, ly - 0.08, lz, cage),
     ...[-1, 1].flatMap((sx) => [-1, 1].map((sz) => box(0.015, 0.16, 0.015, lx + sx * 0.055, ly, lz + sz * 0.055, cage))),
     tint(new THREE.TorusGeometry(0.035, 0.008, 4, 8).translate(lx, ly + 0.12, lz), cage), // the bail ring...
-    box(0.03, 0.075, 0.05, 0.225, -0.03, lz, leather), // ...and, round 22, what it hangs from: a loop on the belt's end...
     slab(0.022, 0.09, 0.024, (0.225 + lx) / 2, ly + 0.15, lz, leather, Math.atan2(lx - 0.225, 0.055)), // ...a strap down and out to the ring
     box(0.026, 0.026, 0.03, 0.225, -0.07, lz, brass), // a brass clip where they meet
-  ]), 'cloth');
+  ])), 'cloth');
   f.flame = new THREE.Object3D();
-  f.flame.position.set(lx, ly, lz);
-  f.torso.add(f.flame);
+  f.flame.position.set(lx - hang.position.x, ly - hang.position.y, lz - hang.position.z);
+  hang.add(f.flame);
   f.flameMesh = part(f, f.flame, box(0.09, 0.12, 0.09, 0, 0, 0, LANTERN.color), 'cloth', 1); // its flame (its light: lantern.ts), which gutters out with the mind (lanternLife.ts)
 
   part(f, f.head, mergeGeometries([

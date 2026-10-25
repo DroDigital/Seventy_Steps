@@ -35,7 +35,7 @@ uniform float uLanternRange;
 uniform float uLanternDecay;
 uniform vec4 uLamps[${LAMP_SLOTS}];
 uniform vec3 uLampColors[${LAMP_SLOTS}];
-uniform int uWakeCount; // how many bodies are parting the mist (round 78: render/mistWakes.ts)
+uniform int uWakeCount; // how many bodies are parting the mist (round 81: render/mistWakes.ts)
 uniform vec4 uWakeSeg[${WAKE_SLOTS}]; // each: from where it is (x, z) back along its trail to where the trail ends (x, z)
 uniform vec4 uWakeInfo[${WAKE_SLOTS}]; // each: its breadth, how much it clears, the height it clears to, how far it turns the mist
 

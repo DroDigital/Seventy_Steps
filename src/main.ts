@@ -34,6 +34,7 @@ import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
 import { createMistWakes } from './render/mistWakes';
+import { createSwingTrails } from './render/swingTrails';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
 import { weatherHaze } from './render/weather';
@@ -208,7 +209,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
-  const mistWakes = createMistWakes(game); // what moves through it parts it (round 78)
+  const mistWakes = createMistWakes(game); // what moves through it parts it (round 81)
+  const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 81)
   const skyline = createSkyline(scene, look);
   const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
@@ -310,6 +312,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
+        worldUniforms.uRelight.value = settings.relight > 0.5 ? 1 : 0; // the horrors' bodies lit over their folds (shaders/sprite.ts)
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
         creatures.update(alpha, time, camera);
         hidden.update(time);
@@ -322,6 +325,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
         pipeSmoke.update(camera, time, views.smokers);
+        swingTrails.update(views.swingEdge, time);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
         const fx = computeFx(state);

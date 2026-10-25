@@ -1,5 +1,5 @@
 /**
- * What the sprite shader is told of a creature besides its frame (round 78; render only, read-only on
+ * What the sprite shader is told of a creature besides its frame (round 81; render only, read-only on
  * the simulation): how far its body has gone or is forming and in what style (a death by the matter of
  * the body, an arrival, an ambusher rising out of the ground, a creature formed again as its other
  * self), where the last blow fell on its picture, and how much of its health its picture wears.

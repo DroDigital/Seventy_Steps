@@ -11,7 +11,7 @@ import { LOOKS } from '../src/data/looks';
 
 const tintsNow = (): number[][] => worldUniforms.uSpriteTints.value.map((v) => [v.x, v.y, v.z]);
 
-describe('the drawn creatures take their realm\'s grade (round 78: render/shaders/spriteGrade.ts)', () => {
+describe('the drawn creatures take their realm\'s grade (round 81: render/shaders/spriteGrade.ts)', () => {
   it('is published for every realm: the four stops of its own gradient map, each at brightness 1', () => {
     const look = createRealmLook(createPostPass(new THREE.Texture()));
     const seen = new Set<string>();

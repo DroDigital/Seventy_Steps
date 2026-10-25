@@ -65,7 +65,7 @@ export interface LifeParts {
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
-  creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 78: its aura and footfalls)
+  creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 81: its aura and footfalls)
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
@@ -97,7 +97,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
   const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
   const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust
-  const prints = createFootprints(scene, g); // round 78: the prints of whatever walks soft ground...
+  const prints = createFootprints(scene, g); // round 81: the prints of whatever walks soft ground...
   const bodyAir = createCreatureAir(g, parts.particles); // ...and a body's cold breath and the dust of its running
   const footfalls = createFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
   const aura = createCreatureAura(g, parts.particles, parts.creatures.figure, parts.creatures.presence); // what the great ones give off

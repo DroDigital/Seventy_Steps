@@ -28,10 +28,11 @@ attribute float aWeird; // 0..1: how far it refuses to hold its shape (eldritch.
 attribute vec4 aFx; // how far gone, in what style, how worn, a seed (spriteFx.ts)
 attribute vec4 aWound; // where the last blow fell, its flash, its reach
 attribute vec4 aGlint; // the colour of the marks of this form that keep their light in the dark, and how far
+attribute float aRelit; // 1: a horror's form, whose body the Relight setting lights over its folds (render/creatureRelight.ts)
 attribute vec4 aTone; // the form's recolour to the realm it stands in: a turn of hue (cos, sin), a lift of colour, a cast for a grey (render/spriteTone.ts)
 
 varying vec2 vUv;
-varying vec3 vWorld; // where this corner is: the light is laid at each pixel (round 78: it was found at the four corners and carried across, so the lantern's pool never climbed a colossus's legs and a lamp's light was the same ramp from foot to head)
+varying vec3 vWorld; // where this corner is: the light is laid at each pixel (round 81: it was found at the four corners and carried across, so the lantern's pool never climbed a colossus's legs and a lamp's light was the same ramp from foot to head)
 varying vec2 vShade; // what stands between it and the moon, and the lantern, at its middle
 varying float vFog;
 varying float vDist;
@@ -44,6 +45,7 @@ varying vec4 vFx;
 varying vec4 vWound;
 varying vec4 vGlint;
 varying vec4 vTone;
+varying float vRelit;
 varying vec2 vQuad;
 varying vec2 vSize;
 ${LANTERN_GLSL}
@@ -56,7 +58,7 @@ void main() {
   vec3 wp = origin + right * position.x * w + vec3(0.0, position.y * h, 0.0);
   vec4 vp = viewMatrix * vec4(wp, 1.0);
   vec4 clip = projectionMatrix * vp;
-  if (uSnap > 0.0 && clip.w > 0.0) { // the quad as a whole, by where it stands (round 78: its four corners were each snapped, so as it moved its size, and which of its texel rows were two pixels tall, crawled)
+  if (uSnap > 0.0 && clip.w > 0.0) { // the quad as a whole, by where it stands (round 81: its four corners were each snapped, so as it moved its size, and which of its texel rows were two pixels tall, crawled)
     vec4 foot = projectionMatrix * (viewMatrix * vec4(origin, 1.0));
     vec2 grid = uRes * 0.5 / uSnap;
     clip.xy += floor(foot.xy / foot.w * grid + 0.5) / grid * foot.w - foot.xy;
@@ -78,6 +80,7 @@ void main() {
   vFx = aFx;
   vWound = aWound;
   vGlint = aGlint;
+  vRelit = aRelit;
   vTone = aTone.z > 0.01 ? aTone : vec4(1.0, 0.0, 1.0, 0.0); // (a form with none is drawn as it is)
   vQuad = uv;
   vSize = vec2(w, h);
@@ -97,6 +100,8 @@ uniform vec3 uLightColor;
 uniform float uCharacterLight;
 uniform float uMind; // 0..1: how far a failing mind slips what it sees
 uniform float uWet; // how soaked the world is, 0..1 (weather.ts)
+uniform float uRelight; // 0..1: the Relight setting
+uniform vec3 uLightDir; // toward the moon
 
 varying vec2 vUv;
 varying vec3 vWorld;
@@ -110,6 +115,7 @@ varying float vWeird;
 varying vec4 vCell;
 varying vec4 vGlint;
 varying vec4 vTone;
+varying float vRelit;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
 ${NOISE_GLSL}
@@ -142,6 +148,35 @@ vec2 mindSlip(vec2 uv) {
   return vec2(clamp(uv.x + on * shift / float(textureSize(uAtlas, 0).x), vCell.x, vCell.z), uv.y);
 }
 
+float relitLuma(vec2 uv, float centre) {
+  vec4 s = texture(uAtlas, clamp(uv, vCell.xy, vCell.zw));
+  return s.a < 0.3 ? centre : dot(s.rgb, vec3(0.299, 0.587, 0.114)); // (beyond its edge it is as flat as the pixel itself: no rim)
+}
+
+/** The normal the painted light and dark make over reach screen pixels about uv: brighter is nearer, and the slope across it tilts the face. */
+vec3 relitNormal(vec2 uv, float reach, float centre) {
+  vec2 step = max(vec2(abs(dFdx(vUv.x)), abs(dFdy(vUv.y))) * reach, vec2(reach) / vec2(textureSize(uAtlas, 0)));
+  vec2 sgn = vec2(dFdx(vUv.x) < 0.0 ? -1.0 : 1.0, dFdy(vUv.y) < 0.0 ? -1.0 : 1.0); // which way on the page is right, and up, on the screen
+  float slopeX = relitLuma(uv + vec2(sgn.x * step.x, 0.0), centre) - relitLuma(uv - vec2(sgn.x * step.x, 0.0), centre);
+  float slopeY = relitLuma(uv + vec2(0.0, sgn.y * step.y), centre) - relitLuma(uv - vec2(0.0, sgn.y * step.y), centre);
+  return normalize(vec3(-slopeX * 3.0, -slopeY * 3.0, 1.0));
+}
+
+/**
+ * A horror's body relit (round 81, the Relight setting, off by default): the light of the lantern and the moon, laid where each is, on the
+ * folds the painted light and dark make, against the smooth shape they make about them. The answer is a ratio about 1, so what is painted
+ * stays as bright as it was on the whole, and only the light moves across its folds as the light, or the horror, moves.
+ */
+float relight(vec2 uv, float centre) {
+  vec3 toLamp = uLanternPos - vWorld;
+  float wLamp = dot(uLanternColor * lanternAt(toLamp) * vShade.y, vec3(0.3333));
+  float wMoon = dot(uLightColor * vShade.x, vec3(0.3333));
+  vec3 l = normalize(normalize(mat3(viewMatrix) * toLamp) * wLamp + normalize(mat3(viewMatrix) * uLightDir) * wMoon + vec3(0.0, 0.0, 0.0001));
+  float fine = 0.7 + max(dot(relitNormal(uv, 1.5, centre), l), 0.0);
+  float shape = 0.7 + max(dot(relitNormal(uv, 6.0, centre), l), 0.0);
+  return clamp(fine / shape, 0.6, 1.45);
+}
+
 void main() {
   vec2 uv = vWeird > 0.2 ? slip(vUv) : (uMind > 0.0 && uReviewed > 0.5 ? mindSlip(vUv) : vUv);
   vec3 src = fxSource(uv); // a body that is going or forming has its texels moved (spriteFx.ts)
@@ -155,13 +190,14 @@ void main() {
   }
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 light = uAmbient + (uLightColor * vShade.x + uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 78)
+  vec3 light = uAmbient + (uLightColor * vShade.x + uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 81)
+  if (vRelit > 0.5 && uRelight > 0.0 && !glow) light *= mix(1.0, relight(uv, dot(t.rgb, vec3(0.299, 0.587, 0.114))), uRelight * 0.8); // the Relight setting (round 81)
   vec3 col = glow ? t.rgb : t.rgb * light;
-  if (uReviewed > 0.5) col = spriteGraded(col, vTone); // the realm's colours on the older art, brightness kept (round 78: spriteGrade.ts)
-  if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 78)
+  if (uReviewed > 0.5) col = spriteGraded(col, vTone); // the realm's colours on the older art, brightness kept (round 81: spriteGrade.ts)
+  if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 81)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   col = fxWear(col, vFlash); // its wounds, and the flash of the blow about where it fell
-  if (vGlint.w > 0.0) { // the marks this form's eyes and lamps are drawn in keep their light in the dark, in the colour they were drawn in, until the eye can no longer pick them out (round 78: reviewedLook.ts)
+  if (vGlint.w > 0.0) { // the marks this form's eyes and lamps are drawn in keep their light in the dark, in the colour they were drawn in, until the eye can no longer pick them out (round 81: reviewedLook.ts)
     float lit = 1.0 - smoothstep(0.012, 0.05, distance(t.rgb, vGlint.rgb));
     col = mix(col, t.rgb * (1.0 + 0.25 * vGlint.w), lit * (1.0 - smoothstep(uEyeRange.x, uEyeRange.y, vDist)));
   }

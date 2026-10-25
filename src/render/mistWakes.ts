@@ -1,5 +1,5 @@
 /**
- * The low mist parts for what moves through it (round 78; render only, read-only on the simulation): the investigator,
+ * The low mist parts for what moves through it (round 81; render only, read-only on the simulation): the investigator,
  * the people and the creatures nearest the lens each carve it, a gap before and about the body and a trail that closes
  * slowly behind it, with the mist turned a little about its edge (shaders/fog.ts `wakeAt`). Things come out of the mist
  * instead of being cut from it, and a pack's path across a field is read in it. What is unseen (an unrevealed stalker,

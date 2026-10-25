@@ -138,7 +138,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         if (n.s.kind === 'torch' || n.s.kind === 'fire' || n.s.kind === 'lamp') casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}` });
         colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * (n.s.pane === undefined ? 1 : paneLit(n.s.pane, time)));
       }
-      layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 78)
+      layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 81)
       batch.begin();
       if (lantern && lanternCover < 1) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * (1 - lanternCover) * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time)); // (a seat back between the eye and it takes its halo: round 57)
       for (const { s, v } of visible) {
