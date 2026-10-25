@@ -22,7 +22,7 @@ export interface Layout {
   outer?: number; // metres beyond the wall's level ground that dressing stands on (the outline's pad is the wall's `HOUSE.level` and this more)
   rods?: readonly V3[]; // the tips of its lightning rods
   living?: readonly Living[];
-  fogHeight?: number; // metres: the fight's fog, lower than the ring's own, so the place stands over it
+  fogHeight?: number; // unused since round 78 (see Enclosure.fogHeight)
   under?: (level: number) => Pad[]; // ground it shapes after the level: a lagoon sunk, a platform raised
   dry?: (p: XZ) => number; // where a body or a piece may stand within the wall, if not all of it
 }

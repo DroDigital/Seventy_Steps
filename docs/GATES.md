@@ -78,3 +78,8 @@ The first two are the best of what is left for the courts' skylines and doors, s
 GPU frame times (the renders here are a software rasteriser's) and how a gate sounds. Pictures were taken of all twenty gates shut and at 30% open
 (a few also at 45%), in a software rasteriser with the lights raised; none of a gate fully open or in a fight, and nobody has played through them.
 `dim` (a part's colour scaled down) was tuned by eye from those pictures for the black and dark temple doors, which read as wall colour without it.
+
+## The mist is in the gate (round 78)
+
+The fog that stood in a ring about each fight is gone (it hid the house and its gate from whoever came in). The arena's fog wall is now a doorway wall at the gate (`world/gatePlan.ts`): the width and height of the opening, in it, on the court's side of the leaves and inside the wall's thickness (`FOG.behind`, at most the thickness less 0.25 m), so the leaves swing, slide, lift or sink as before and the mist is what stands in the opening they leave. A shut gate has no prompt (`fogNear` skips a wall whose gate piece has not opened). Passing it is E as at a hall's door; the walk ends 1.8 m inside, in the court, and the horror wakes when the investigator steps into its ring (`Wake`, `wakeBetween`), as before.
+

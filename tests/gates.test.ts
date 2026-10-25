@@ -33,7 +33,7 @@ describe('the doors and the fog of the dungeons (round 27)', () => {
         const at = (o: { x: number; z: number }): boolean => Math.hypot(o.x - d.x, o.z - d.z) < 0.01;
         if (boss) {
           bossDoorways++;
-          expect(plan.fogs.some((f) => f.kind === 'doorway' && at(f)), `${L.def.id} boss doorway`).toBe(true);
+          expect(plan.fogs.some((f) => !f.gate && at(f)), `${L.def.id} boss doorway`).toBe(true);
           expect(plan.doors.some(at), `${L.def.id} boss doorway has no door`).toBe(false);
         } else doorways++;
       }
@@ -49,9 +49,10 @@ describe('the doors and the fog of the dungeons (round 27)', () => {
     for (const id of ['witch_house', 'library', 'curwen_catacombs', 'risen_rlyeh', 'migo_cities']) expect(plan.doors.some((x) => x.id.startsWith(`${id}:`)), id).toBe(true);
   });
 
-  it('rings every arena in the open, outside the stones, with fog that names the spawns it keeps', () => {
-    const rings = plan.fogs.filter((f) => f.kind === 'ring');
-    expect(rings.length).toBe(worldLayout().arenas.length);
+  it('stands mist in the gate of every arena in the open, and keeps a wake line outside its stones, both naming the spawns they keep', () => {
+    const gates = plan.fogs.filter((f) => f.gate);
+    expect(gates.length).toBe(worldLayout().arenas.length);
+    expect(plan.wakes.length).toBe(worldLayout().arenas.length);
     const spawned = new Set(worldLayout().spawns.map((s) => s.id));
     for (const f of plan.fogs) {
       expect(f.spawns.length, f.id).toBeGreaterThan(0);
@@ -59,11 +60,24 @@ describe('the doors and the fog of the dungeons (round 27)', () => {
       expect(FOG_THEMES[f.theme], f.id).toBeDefined();
     }
     const a = worldLayout().arenas[0];
-    expect(rings.find((r) => r.x === a.x && r.z === a.z)!.radius).toBeGreaterThan(a.radius);
+    expect(plan.wakes.find((r) => r.x === a.x && r.z === a.z)!.radius).toBeGreaterThan(a.radius);
+  });
+
+  it('stands an arena\'s mist inside the gate\'s opening, behind the leaves and no wider than the opening asks, so there is no walking round it', () => {
+    worldLayout().arenas.forEach((a, i) => {
+      const f = plan.fogs.find((x) => x.id === `ring:${i}:${a.bosses[0]}`)!;
+      const door = a.house!.piece.door!;
+      expect(f.gate, f.id).toBe(a.house!.piece.name);
+      expect(f.width, f.id).toBeGreaterThanOrEqual(door.width);
+      expect(f.width, f.id).toBeLessThanOrEqual(door.width + 0.5);
+      expect(f.height, f.id).toBeGreaterThanOrEqual(door.height);
+      expect(Math.hypot(f.x - a.house!.gate.x, f.z - a.house!.gate.z), `${f.id}: within the wall's thickness`).toBeLessThanOrEqual(door.thick / 2);
+      expect((a.x - f.x) * Math.sin(f.yaw) + (a.z - f.z) * Math.cos(f.yaw), `${f.id}: the court is its far side`).toBeGreaterThan(0);
+    });
   });
 
   it('keeps every fog in a doorway exactly as wide as the room keeps it open, and clear of no doorway', () => {
-    for (const f of plan.fogs.filter((x) => x.kind === 'doorway')) expect(f.width).toBeGreaterThanOrEqual(DUNGEON.door);
+    for (const f of plan.fogs) expect(f.width).toBeGreaterThanOrEqual(DUNGEON.door);
     for (const d of plan.doors) expect([d.width, d.height]).toEqual([DUNGEON.door, DUNGEON.lintel]);
   });
 
@@ -97,11 +111,9 @@ describe('the doors and the fog of the dungeons (round 27)', () => {
     expect(pose(drape.look, 1, 1, 3.4, 3.2, 0).scaleX).toBeLessThan(0.2);
   });
 
-  it('a wall shows near and thins to nothing far, and is measured to its line, not its middle', () => {
+  it('a wall shows near and thins to nothing far, and is measured to its middle', () => {
     expect(fogSeen(10)).toBe(1);
     expect(fogSeen(200)).toBe(0);
-    expect(wallGap({ kind: 'ring', x: 0, z: 0, radius: 30 }, { x: 0, z: 0 })).toBe(30);
-    expect(wallGap({ kind: 'ring', x: 0, z: 0, radius: 30 }, { x: 40, z: 0 })).toBe(10);
-    expect(wallGap({ kind: 'doorway', x: 5, z: 5, radius: 0 }, { x: 8, z: 9 })).toBe(5);
+    expect(wallGap({ x: 5, z: 5 }, { x: 8, z: 9 })).toBe(5);
   });
 });

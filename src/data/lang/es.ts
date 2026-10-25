@@ -277,7 +277,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hint.candle': "Una vela tomó la llama. Cae cerca de una vela encendida y podrás levantarte a su lado, a pocos pasos del horror que te derribó, o en el Signo Arcano, como prefieras. La vela no da descanso: los niveles y las dosis son de los Signos Arcanos.",
   'hint.breath': "La barra verde es tu aliento: golpear, rodar, correr y bloquear lo gastan, y sin él estás lento y expuesto. Retrocede y deja que vuelva antes de golpear otra vez.",
   'hint.riposte': "Paraste el golpe: el enemigo está abierto. Golpea al instante para una pequeña bonificación de réplica. Un golpe fuerte justo en el centro de la espalda de un enemigo también recibe esta bonificación.",
-  'hint.fog': "La niebla de delante guarda un horror. {interact} la atraviesa, y una vez dentro no hay salida hasta que uno de los dos caiga. Descansa y hazte más fuerte antes, y enciende la vela que hay ante ella, si quieres.",
+  'hint.fog': "La niebla de delante guarda un horror. {interact} la atraviesa, y una vez dentro no hay salida hasta que uno de los dos caiga. Descansa y hazte más fuerte antes, y enciende la vela que hay cerca de ella, si quieres.",
   'hint.talk': "{interact} habla con la gente que encuentras. Algunos tienen una misión que dar, otros mercancía que vender, y todos saben algo.",
   'hint.insight': "El discernimiento es lo que la mente ha aprendido. Abre lo oculto, y también se gasta: en un Signo Arcano compra Resolve y Draught.",
   'hint.passage': "Para una mente como la tuya, ese muro no era un muro. El discernimiento muestra puertas y puentes que los ignorantes no ven; el marco luminoso es uno. Cruza: algo hay al otro lado.",

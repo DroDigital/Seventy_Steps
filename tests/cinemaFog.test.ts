@@ -11,15 +11,16 @@ import { frameOf, type Anchor } from '../src/render/cinemaPlan';
 import { fogsAround, insideLine, lensInside, sideOf } from '../src/systems/fogGates';
 import type { FogWall } from '../src/world/gatePlan';
 
-const wall = (o: Partial<FogWall>): FogWall => ({ id: 'w', kind: 'ring', x: 0, z: 0, y: 0, yaw: 0, width: 0, radius: 20, height: 4, theme: 'ash' as never, region: 'x', bosses: [], spawns: [], stake: { x: 0, z: 0, yaw: 0 }, candle: {} as never, ...o });
-const ring = (radius: number): FogWall => wall({ kind: 'ring', radius });
-/** A doorway at z = `at` with the hall on the side of smaller z. */
-const doorway = (at: number): FogWall => wall({ kind: 'doorway', z: at, yaw: Math.PI, width: 4.4 });
+const wall = (o: Partial<FogWall>): FogWall => ({ id: 'w', x: 0, z: 0, y: 0, yaw: 0, width: 0, height: 4, theme: 'ash' as never, region: 'x', bosses: [], spawns: [], stake: { x: 0, z: 0, yaw: 0 }, candle: {} as never, ...o });
+/** A doorway at z = `at` with the hall (or the court) on the side of smaller z. */
+const doorway = (at: number, width = 4.4): FogWall => wall({ z: at, yaw: Math.PI, width });
+/** An open arena's gate: wider, with the court on the side of smaller z. */
+const gate = (at: number): FogWall => doorway(at, 8);
 const STEP = 1.8; // metres the investigator is walked inside the wall (systems/fogGates.ts)
 
 describe('the lens keeps inside the fog (round 68)', () => {
   it('knows the walls a point stands inside, and the lens that is clear of them', () => {
-    const r = ring(20);
+    const r = gate(20);
     expect(lensInside([r], { x: 0, z: 10 })).toBe(true);
     expect(lensInside([r], { x: 0, z: 19.5 })).toBe(false); // inside, but not clear of it
     expect(lensInside([r], { x: 0, z: 23 })).toBe(false);
@@ -31,16 +32,16 @@ describe('the lens keeps inside the fog (round 68)', () => {
   });
 
   it('draws a lens in along its line as far as the inside goes', () => {
-    const r = ring(20);
+    const r = gate(20);
     const k = insideLine([r], { x: 0, z: 0 }, { x: 0, z: 40 });
     expect(k).toBeGreaterThan(0.45);
-    expect(k).toBeLessThan(0.5);
+    expect(k).toBeLessThan(0.5); // (the gate's plane, 20 m out, less the 0.8 m the lens keeps clear)
     expect(insideLine([r], { x: 0, z: 0 }, { x: 0, z: 10 })).toBe(1);
     expect(fogsAround({ overworld: undefined } as never, { x: 0, z: 0 })).toEqual([]); // no world, no walls
   });
 
   it('turns a lens that stood behind the investigator to their side, and not to the other, frame after frame', () => {
-    const r = ring(20);
+    const r = gate(20);
     const me = { x: 0, z: 20 - STEP };
     const keep = fogKeeper();
     const ask = (x: number, z: number) => keep([r], { on: me, head: { x: me.x, y: 1.5, z: me.z }, toward: { x: 0, z: 0 }, pos: { x, y: 2, z }, turn: true });
@@ -54,19 +55,20 @@ describe('the lens keeps inside the fog (round 68)', () => {
   });
 
   it('draws in a lens it cannot turn to, and one on the horror', () => {
-    const r = ring(20);
+    const r = gate(20);
     const horror = { x: 0, z: 0 };
     const keep = fogKeeper();
-    const pulled = keep([r], { on: horror, head: { x: 0, y: 8, z: 0 }, toward: { x: 0, z: 20 - STEP }, pos: { x: 0, y: 3, z: -40 }, turn: false });
+    const pulled = keep([r], { on: horror, head: { x: 0, y: 8, z: 0 }, toward: { x: 0, z: 20 - STEP }, pos: { x: 0, y: 3, z: 40 }, turn: false });
     expect(lensInside([r], pulled)).toBe(true);
-    expect(pulled.z).toBeLessThan(-10); // as near the wall as it may be
+    expect(pulled.z).toBeGreaterThan(10); // as near the wall as it may be
+    expect(pulled.z).toBeLessThan(19.5);
     expect(pulled.y).toBeGreaterThan(3); // along its line to the head: the picture's height follows
-    expect(keep([], { on: horror, head: { x: 0, y: 8, z: 0 }, toward: null, pos: { x: 0, y: 3, z: -40 }, turn: false })).toEqual({ x: 0, y: 3, z: -40 });
+    expect(keep([], { on: horror, head: { x: 0, y: 8, z: 0 }, toward: null, pos: { x: 0, y: 3, z: 40 }, turn: false })).toEqual({ x: 0, y: 3, z: 40 });
   });
 
   const HEIGHT: Record<Scale, number> = { person: 2.2, large: 5, giant: 12, colossal: 34 };
   const WALLS: [string, (reach: number) => FogWall, (reach: number) => Anchor][] = [
-    ['an open arena', (reach) => ring(reach + STEP), (reach) => ({ x: 0, y: 0, z: reach, yaw: Math.PI, height: 1.8 })],
+    ['an open arena', (reach) => gate(reach + STEP), (reach) => ({ x: 0, y: 0, z: reach, yaw: Math.PI, height: 1.8 })],
     ['a hall', (reach) => doorway(reach + STEP), (reach) => ({ x: 0, y: 0, z: reach, yaw: Math.PI, height: 1.8 })],
   ];
 

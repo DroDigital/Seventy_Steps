@@ -20,7 +20,7 @@ export interface Spot extends XZ {
   yaw: number;
 }
 
-/** Where the fallen wake (world/gatePlan.ts): the ring's fog stands `ring` metres past the fight's radius, the stake `past` metres beyond it, and never nearer the wall than `wall` (round 71: `front`, the half-width of the straight edge a place's outline has across its gate). */
+/** Where the fallen wake (world/gatePlan.ts): the ring a sleeping horror wakes at (round 78: no fog stands on it now; the mist is in the gate) lies `ring` metres past the fight's radius, the stake `past` metres beyond it, and never nearer the wall than `wall` (round 71: `front`, the half-width of the straight edge a place's outline has across its gate). */
 export const STAKE = { ring: 1.5, past: 9, wall: 7.5, front: 2.5 } as const;
 
 /** Where an enclosure is to stand: the fight's centre and ring, the level of its ground, and the way its gate faces. */
@@ -48,7 +48,7 @@ export interface Enclosure {
   readonly stake: Spot; // where the fallen wake, inside the wall and in front of the fog
   readonly rods?: readonly V3[]; // the tips of its lightning rods, where a bolt falls (render/rodFx.ts)
   readonly living?: readonly Living[]; // what moves in it (round 68)
-  readonly fogHeight?: number; // round 71: how high the fight's ring of fog stands, where a place wants its architecture seen over it (else by the ring's size)
+  readonly fogHeight?: number; // round 71: how high the fight's ring of fog stood, where a place wanted its architecture seen over it; unused since round 78 (no ring of fog stands: the mist is in the gate), left in the planners to spare round 75's rewrite of them
   /** Metres from a point to the wall's middle line: negative within, 0 on the wall. */
   gap(p: XZ): number;
   /** The level ground the enclosure asks of the land: its wall and `HOUSE.level` metres beyond, at `level`, fading out over `blend`. */
