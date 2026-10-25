@@ -1,14 +1,15 @@
 /**
- * Footprints (round 78): flat prints on the ground, one instanced batch of 128 quads that the ground keeps and then lets go. A print
- * does not paint its own colour: it multiplies the ground that is already drawn (twice its own grey, so a half-grey changes nothing, a
- * darker one dims it and a paler one lifts it), so it is as lit, as fogged and as graded as the ground it lies on, and snow takes a
- * dark print with a pale lip, mud a near-black wet one with a fleck of light, sand a shallow one. Its fade is ordered-dithered like
- * the shadows', and it follows the three heights it is laid on. Render only; what lays them is render/atm/steps.ts.
+ * Footprints (round 78): flat prints on the ground, one instanced batch of 128 quads that the ground keeps and then lets go. A print is a
+ * dark (or, at its lip, pale) film laid over the ground drawn beneath, lit as the particles are (the ambient, the moon and the lantern), so it
+ * is as dark by night as the land it lies on and keeps its shape in the lantern's glare: snow takes a dark print with a pale lip, mud a
+ * near-black wet one with a gleam on its far wall, sand a shallow one. Its fade is ordered-dithered like the shadows' and the fog's, and it
+ * follows the three heights it is laid on. Render only; what lays them is render/atm/steps.ts.
  */
 
 import * as THREE from 'three';
 import { STEPS } from '../data/bodyTuning';
 import type { Laid } from './footprintPlan';
+import { LANTERN_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
 const VERT = /* glsl */ `
@@ -16,14 +17,20 @@ uniform vec2 uRes;
 uniform float uSnap;
 uniform float uFogNear;
 uniform float uFogFar;
-attribute vec4 aPrint; // look, shape (0 a boot, 1 bare), alpha, side
+uniform vec3 uAmbient;
+uniform vec3 uLightColor;
+attribute vec4 aPrint; // look, shape (0 a boot, 1 bare), strength, side
 varying vec2 vP;
 varying vec4 vPrint;
+varying vec3 vLight;
 varying float vFog;
+${LANTERN_GLSL}
 void main() {
   vP = vec2(position.x * aPrint.w, position.z);
   vPrint = aPrint;
-  vec4 vp = viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vec4 vp = viewMatrix * wp;
+  vLight = uAmbient + (uLightColor + uLanternColor * lanternAt(uLanternPos - wp.xyz)) * 0.8;
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
   vec4 clip = projectionMatrix * vp;
   if (uSnap > 0.0 && clip.w > 0.0) {
@@ -38,6 +45,7 @@ const FRAG = /* glsl */ `
 uniform float uFogAmount;
 varying vec2 vP;
 varying vec4 vPrint;
+varying vec3 vLight;
 varying float vFog;
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
@@ -63,29 +71,35 @@ float bare(vec2 p) {
   }
   return max(sole, toes);
 }
-// The multiplier on the ground: its core, its lip, and whether the toe-side wall gleams. 1 changes nothing (the blend is twice the multiply).
-vec3 lookOf(int l) {
-  if (l == 0) return vec3(0.58, 1.34, 0.0); // snow: pressed dark, a pale lip of pushed snow
-  if (l == 1) return vec3(0.30, 0.62, 1.0); // mud: near black, a wet dark ring, the far wall catching the light
-  if (l == 2) return vec3(0.76, 1.12, 0.0); // sand: shallow, a soft lip
-  if (l == 3) return vec3(0.52, 0.72, 0.6); // wet: a dark film on dry ground
-  return vec3(0.44, 0.52, 1.0); // ooze
+// Each look: the colour and strength of the dark film in the print's heart, the colour and strength of its lip (pale on snow and sand, a dark ring in mud and wet ground), and how much the toe-side wall gleams.
+void lookOf(int l, out vec3 core, out vec4 lip, out float gleam, out float coreA) {
+  if (l == 0) { core = vec3(0.17, 0.2, 0.27); coreA = 0.68; lip = vec4(1.2, 1.22, 1.3, 0.6); gleam = 0.0; return; } // snow: pressed dark, a pale lip of pushed snow
+  if (l == 1) { core = vec3(0.06, 0.05, 0.04); coreA = 0.88; lip = vec4(0.1, 0.08, 0.07, 0.62); gleam = 0.5; return; } // mud: near black, a wet dark ring, the far wall catching the light
+  if (l == 2) { core = vec3(0.26, 0.21, 0.15); coreA = 0.52; lip = vec4(1.1, 1.0, 0.82, 0.4); gleam = 0.0; return; } // sand: shallow, a soft lip
+  if (l == 3) { core = vec3(0.09, 0.1, 0.13); coreA = 0.55; lip = vec4(0.12, 0.13, 0.16, 0.4); gleam = 0.35; return; } // wet: a dark film on dry ground
+  core = vec3(0.13, 0.06, 0.07); coreA = 0.7; lip = vec4(0.16, 0.08, 0.09, 0.5); gleam = 0.4; // ooze
 }
 void main() {
   int shape = int(vPrint.y + 0.5);
   float e = shape == 1 ? bare(vP) : boot(vP); // depth into the print: 1 at its heart, 0 at its edge, negative outside
-  vec3 lk = lookOf(int(vPrint.x + 0.5));
+  vec3 coreCol; vec4 lip; float gleam; float coreA;
+  lookOf(int(vPrint.x + 0.5), coreCol, lip, gleam, coreA);
   float sole = smoothstep(0.0, 0.1, e);
   float core = smoothstep(0.1, 0.36, e);
-  float lift = lk.y > 1.0 ? 1.0 : 0.0;
-  float lip = smoothstep(-0.22, -0.02, e) * (1.0 - smoothstep(0.02, 0.14, e)); // the pushed-up edge, outside the print and just within it
-  float m = mix(1.0, lk.y, mix(sole, lip, lift)); // snow and sand lift a lip; mud and a wet film darken a ring
-  m = mix(m, lk.x, core);
-  m = mix(m, 1.5, lk.z * sole * (1.0 - core) * smoothstep(0.1, 0.7, vP.y)); // the wall at the toe end faces the walker's lantern
-  if (abs(m - 1.0) < 0.012) discard;
-  float a = vPrint.z * (1.0 - vFog * uFogAmount);
-  if (a < bayer4(gl_FragCoord.xy)) discard;
-  gl_FragColor = vec4(vec3(m * 0.5), 0.5);
+  bool pale = lip.r > 0.5;
+  float ring = pale ? smoothstep(-0.22, -0.02, e) * (1.0 - smoothstep(0.02, 0.14, e)) : sole; // a lip of pushed-up snow outside the print and just within it, or a dark ring within
+  float a1 = lip.a * ring;
+  vec3 c1 = lip.rgb;
+  float a2 = coreA * core;
+  float g = gleam * sole * (1.0 - core) * smoothstep(0.1, 0.7, vP.y); // the wall at the toe end faces the walker's lantern
+  c1 = mix(c1, vec3(0.8, 0.84, 0.9), g / max(a1 / max(lip.a, 0.001) + g, 0.001));
+  a1 = max(a1, g * 0.55);
+  float a = a2 + a1 * (1.0 - a2);
+  if (a < 0.03) discard;
+  float strength = vPrint.z * (1.0 - vFog * uFogAmount);
+  if (strength < bayer4(gl_FragCoord.xy)) discard;
+  vec3 rgb = (coreCol * a2 + c1 * a1 * (1.0 - a2)) / a;
+  gl_FragColor = vec4(min(rgb * vLight, vec3(1.0)), a);
 }
 `;
 
@@ -111,10 +125,6 @@ export function createFootprints(scene: THREE.Scene, ground: GroundAt): Footprin
     vertexShader: VERT,
     fragmentShader: FRAG,
     transparent: true,
-    blending: THREE.CustomBlending,
-    blendEquation: THREE.AddEquation,
-    blendSrc: THREE.DstColorFactor,
-    blendDst: THREE.SrcColorFactor, // dst·src + src·dst: twice the multiply, so a grey of a half is neutral
     depthWrite: false,
     polygonOffset: true,
     polygonOffsetFactor: -2,

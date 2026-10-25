@@ -33,9 +33,9 @@ export const STEPS = {
   /** Out of water, boots drip: wet prints on any dry ground for this long after the last of it. */
   afterWater: { seconds: 10, alpha: 0.85 },
   lift: 0.05, // metres above the ground
-  length: 0.34, // metres, heel to toe
-  width: 0.15,
-  across: 0.11, // metres either side of the way the investigator goes
+  length: 0.42, // metres, heel to toe (a little larger than a boot: it has to read across the low-res picture)
+  width: 0.19,
+  across: 0.13, // metres either side of the way the investigator goes
   ahead: 0.16, // metres ahead of the body where the foot comes down
   fadeIn: 0.12, // seconds a print takes to show
   fadeOut: 0.4, // the share of its life it fades over
