@@ -115,11 +115,11 @@ By Fertile Soil Productions; licence CC0.
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
 | `tp_col_base` | Modular Temple/Pillar_Large_Base.obj | 2.4 × 2.4 × 2.4 | 112 | bokrug, common, pipers |
-| `tp_col_mid` | Modular Temple/Pillar_Large_Middle.obj | 1.4 × 2.4 × 1.4 | 76 | common |
+| `tp_col_mid` | Modular Temple/Pillar_Large_Middle.obj | 1.4 × 2.4 × 1.4 | 76 | bokrug, common |
 | `tp_col_top` | Modular Temple/Pillar_Large_Top.obj | 2.4 × 2.8 × 2.4 | 128 | common |
 | `tp_beam` | Modular Temple/Pillar_Large_Beam.obj | 2.4 × 1.4 × 1.4 | 76 | colossus, gorgon, nug, yig |
-| `tp_arch` | Modular Temple/Pillar_Large_Arch.obj | 3.1 × 3.1 × 1.4 | 196 | hastur, nug |
-| `tp_wall_mid` | Modular Temple/Wall_Straight_Middle.obj | 2.4 × 2.4 × 0.5 | 12 | azathoth, bokrug, colossus, gorgon, hastur, nug |
+| `tp_arch` | Modular Temple/Pillar_Large_Arch.obj | 3.1 × 3.1 × 1.4 | 196 | hastur, nug, nyarlathotep |
+| `tp_wall_mid` | Modular Temple/Wall_Straight_Middle.obj | 2.4 × 2.4 × 0.5 | 12 | azathoth, bokrug, colossus, gorgon, hastur, nug, nyarlathotep |
 | `tp_wall_win` | Modular Temple/Wall_Straight_Window_Tall.obj | 2.4 × 4.8 × 0.5 | 76 | gorgon |
 | `tp_doorway` | Modular Temple/Wall_Straight_Doorway_Large.obj | 5.3 × 7.2 × 1.0 | 184 | colossus, cthulhu, nug |
 | `tp_door_leaf` | Modular Temple/Wall_Straight_Door_Large.obj | 3.8 × 6.5 × 0.4 | 552 | cthulhu |
@@ -127,8 +127,8 @@ By Fertile Soil Productions; licence CC0.
 | `tp_door_moon` | Modular Temple/Wall_Straight_Door_Moon.obj | 1.9 × 3.8 × 0.7 | 448 | colossus, cthulhu |
 | `tp_tower_bot` | Modular Temple/Tower_Bottom.obj | 7.2 × 7.7 × 7.2 | 726 | bokrug, hastur, nug |
 | `tp_tower_top` | Modular Temple/Tower_Top.obj | 5.3 × 5.3 × 4.8 | 80 | bokrug, hastur, nug |
-| `tp_stairs` | Modular Temple/Stairs_Steps_Straight.obj | 1.9 × 2.8 × 4.8 | 132 | bokrug, cthulhu, gorgon, yig |
-| `tp_floor` | Modular Temple/Floor_Normal_Square.obj | 2.4 × 0.5 × 2.4 | 12 | bokrug, cthulhu, gorgon, hastur, nug, yig, yog |
+| `tp_stairs` | Modular Temple/Stairs_Steps_Straight.obj | 1.9 × 2.8 × 4.8 | 132 | bokrug, cthulhu, gorgon |
+| `tp_floor` | Modular Temple/Floor_Normal_Square.obj | 2.4 × 0.5 × 2.4 | 12 | bokrug, gorgon, hastur, nug, nyarlathotep, yig, yog |
 | `tp_floor_ruin_1` | Modular Temple/Floor_Ruined_Straight_1.obj | 2.4 × 0.5 × 1.6 | 242 | bokrug |
 | `tp_floor_ruin_2` | Modular Temple/Floor_Ruined_Corner_Inner_1.obj | 2.4 × 0.5 × 2.4 | 272 | bokrug |
 | `tp_rubble_1` | Modular Temple/Prop_Rubble_1.obj | 1.5 × 0.5 × 1.3 | 114 | bokrug |
@@ -165,7 +165,7 @@ By pistachio; licence CC0.
 | `fg_dance_b` | Human Basemeshes.blend (basemesh_male) | 1.1 × 2.6 × 0.8 | 621 | azathoth |
 | `fg_dance_c` | Human Basemeshes.blend (basemesh_male) | 0.7 × 2.6 × 0.8 | 620 | azathoth |
 | `fg_dance_d` | Human Basemeshes.blend (basemesh_male) | 0.3 × 2.6 × 0.3 | 501 | azathoth |
-| `fg_seat` | Human Basemeshes.blend (basemesh_male) | 1.2 × 2.0 × 1.6 | 700 | hastur |
+| `fg_seat` | Human Basemeshes.blend (basemesh_male) | 1.2 × 2.0 × 1.6 | 700 | hastur, nyarlathotep |
 
 ## Pack 15: 3D dungeon debris: skull and bones
 
@@ -237,6 +237,15 @@ By rubberduck; licence CC0.
 | `ay_portal` | alien_buildings.blend (^alien_gate$) | 14.0 × 13.9 × 1.2 | 604 | zkauba |
 | `ay_dome` | alien_buildings.blend (^alien_base3$) | 9.5 × 12.0 × 9.5 | 278 | zkauba |
 | `ay_gantry` | alien_buildings.blend (^alien_base8$) | 10.7 × 14.0 × 13.9 | 810 | zkauba |
+| `ay_tower` | alien_buildings.blend (^alien_tower$) | 12.0 × 40.0 × 10.9 | 1158 | zkauba |
+| `ay_antenna` | alien_buildings.blend (^alien_antenna$) | 9.0 × 7.3 × 8.0 | 260 | zkauba |
+| `ay_generator` | alien_buildings.blend (^alien_generator$) | 18.0 × 8.5 × 15.7 | 1332 | zkauba |
+| `ay_hangar` | alien_buildings.blend (^alien_base4$) | 22.0 × 10.0 × 21.1 | 754 | zkauba |
+| `ay_depot` | alien_buildings.blend (^alien_base7$) | 26.0 × 8.8 × 23.9 | 730 | zkauba |
+| `ay_keep` | alien_buildings.blend (^alien_base10$) | 21.3 × 20.0 × 16.1 | 1640 | zkauba |
+| `ay_stand` | alien_buildings.blend (^alien_stand2$) | 9.9 × 14.0 × 1.6 | 64 | zkauba |
+| `ay_console` | alien_buildings.blend (^alien_console_1$) | 2.5 × 6.0 × 1.6 | 283 | zkauba |
+| `ay_craft` | alien_buildings.blend (^ufo_stand$) | 36.0 × 15.4 × 36.3 | 1134 | zkauba |
 
 ## Pack 21: Modular Wooden Pier
 
@@ -263,7 +272,7 @@ By 3D Vault; licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `wf_flute` | scene.gltf | 2.0 × 12.0 × 1.5 | 520 | pipers |
+| `wf_flute` | scene.gltf | 2.0 × 12.0 × 1.5 | 520 | azathoth, pipers |
 | `wf_flute_low` | scene.gltf | 1.8 × 7.1 × 1.5 | 359 | pipers |
 
 ## Pack 24: Egyptian Temple
@@ -331,13 +340,13 @@ By zacharykozak; licence CC BY 4.0.
 
 | game id | source | size (m) | triangles | stood by |
 |---|---|---|---|---|
-| `px_rod` | `proc:rod` | 0.9 × 12.0 × 0.9 | 120 | hutchinson |
+| `px_rod` | `proc:rod` | 0.9 × 12.0 × 0.9 | 120 | hutchinson, nyarlathotep |
 | `px_chimney` | `proc:chimney` | 2.7 × 9.1 × 2.7 | 48 | colour, gorgon, hutchinson |
-| `px_obelisk` | `proc:obelisk` | 2.6 × 12.0 × 2.6 | 42 | azathoth, colossus, cthulhu, nug, othergods, yog, zkauba |
+| `px_obelisk` | `proc:obelisk` | 2.6 × 12.0 × 2.6 | 42 | azathoth, colossus, cthulhu, nug, nyarlathotep, othergods, yog, zkauba |
 | `px_obelisk_s` | `proc:obelisk` | 1.4 × 5.0 × 1.4 | 42 | nug |
 | `px_fang` | `proc:fang` | 1.0 × 3.0 × 1.8 | 72 | yig |
 | `px_fang_big` | `proc:fang` | 2.2 × 7.1 × 4.5 | 72 | yig |
-| `px_mask` | `proc:mask` | 0.6 × 1.7 × 0.3 | 144 | hastur, yig |
+| `px_mask` | `proc:mask` | 0.6 × 1.7 × 0.3 | 144 | hastur, nyarlathotep, yig |
 | `px_trough` | `proc:trough` | 4.0 × 0.5 × 1.2 | 50 | nug |
 | `px_bollard` | `proc:bollard` | 0.7 × 1.1 × 0.7 | 80 | cthulhu |
 | `px_sphere` | `proc:sphere` | 2.0 × 2.0 × 1.9 | 100 | azathoth, othergods, yig, yog |
@@ -348,7 +357,7 @@ By zacharykozak; licence CC BY 4.0.
 | `px_anchor` | `proc:anchor` | 2.0 × 2.7 × 0.3 | 126 | cthulhu, martins |
 | `px_dune` | `proc:dune` | 12.0 × 3.0 × 8.0 | 132 | colossus, yig |
 | `px_well` | `proc:well` | 2.5 × 3.2 × 2.0 | 212 | colour |
-| `px_brazier` | `proc:brazier` | 0.9 × 1.6 × 0.9 | 152 | bokrug, colossus, hastur, nug, yig |
+| `px_brazier` | `proc:brazier` | 0.9 × 1.6 × 0.9 | 152 | bokrug, colossus, hastur, nug, nyarlathotep, yig |
 | `px_hedge` | `proc:hedge` | 5.0 × 9.1 × 5.0 | 798 | shub |
 | `px_pod` | `proc:pod` | 0.9 × 1.9 × 0.9 | 104 | shub |
 | `px_root` | `proc:root` | 9.0 × 4.1 × 1.9 | 204 | shub |
@@ -356,4 +365,17 @@ By zacharykozak; licence CC BY 4.0.
 | `px_slab` | `proc:slab` | 5.0 × 7.0 × 2.4 | 108 | cthulhu |
 | `px_prism` | `proc:prism` | 3.0 × 6.0 × 2.6 | 60 | ancients, yog |
 | `px_collar` | `proc:collar` | 2.4 × 0.4 × 2.4 | 240 | pipers |
+| `px_monolith` | `proc:monolith` | 3.3 × 12.0 × 1.9 | 102 | othergods |
+| `px_cairn` | `proc:cairn` | 1.5 × 2.1 × 1.4 | 140 | othergods |
+| `px_spire` | `proc:spire` | 2.7 × 14.0 × 2.8 | 130 | othergods |
+| `px_dais` | `proc:dais` | 10.0 × 0.9 × 8.7 | 72 | othergods |
+| `px_panpipe` | `proc:panpipe` | 3.5 × 8.5 × 0.5 | 440 | pipers |
+| `px_drum` | `proc:drum` | 3.6 × 3.0 × 3.6 | 268 | azathoth, pipers |
+| `px_chimes` | `proc:chimes` | 4.5 × 6.1 × 0.3 | 296 | pipers |
+| `px_armillary` | `proc:armillary` | 6.2 × 7.0 × 5.4 | 760 | yog |
+| `px_globes` | `proc:globes` | 4.6 × 3.8 × 3.8 | 448 | azathoth, yog |
+| `px_helix` | `proc:helix` | 2.7 × 10.1 × 2.7 | 416 | yog |
+| `px_shard` | `proc:shard` | 1.5 × 6.1 × 1.0 | 180 | yog |
+| `px_barrel` | `proc:barrel` | 3.3 × 6.8 × 3.2 | 486 | ancients |
+| `px_star` | `proc:star` | 7.6 × 7.2 × 1.1 | 100 | ancients |
 
