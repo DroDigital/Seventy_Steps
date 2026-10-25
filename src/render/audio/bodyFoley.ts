@@ -93,10 +93,11 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
       if (w.moving) {
         sprintFor = w.sprint ? sprintFor + dt : 0;
         longestWalk = Math.max(longestWalk, w.for);
-      } else if (wasMoving) { // pulled up
+      } else if (wasMoving) { // pulled up (a scene, a ride, a death, a roll or a blow ends the clock's walk too, and that is not the walker stopping: no breath, no step)
         stoppedAt = seconds;
-        if (sprintFor >= BODY.sprintBreath) soft('body:pant', BREATH.pant, FOOT_GAIN.breath * Math.min(1, 0.5 + sprintFor / 8));
-        if (longestWalk >= BODY.phantom.stopAfter && followed(g.mind.band, stress) && !fighting(g) && rand() < BODY.phantom.stopChance) phantom(underfoot, BODY.phantom.stopDelay); // one more, when no one walks
+        const interrupted = g.cutscene || g.player.mount.active || g.ecs.c.dead.has(g.player.id) || g.ecs.c.actor.get(g.player.id)?.move != null;
+        if (!interrupted && sprintFor >= BODY.sprintBreath) soft('body:pant', BREATH.pant, FOOT_GAIN.breath * Math.min(1, 0.5 + sprintFor / 8));
+        if (!interrupted && longestWalk >= BODY.phantom.stopAfter && followed(g.mind.band, stress) && !fighting(g) && rand() < BODY.phantom.stopChance) phantom(underfoot, BODY.phantom.stopDelay); // one more, when no one walks
         sprintFor = longestWalk = 0;
       }
       wasMoving = w.moving;

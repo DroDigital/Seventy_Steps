@@ -1,7 +1,7 @@
 /**
  * Round 78, atmosphere: the sky answers the weather and the hours: overcast, the moon behind cloud, dusk, false dawn, wheeling stars, heat lightning, the wrong moon. One of the atmosphere hub's parts (render/atmosphere.ts):
  * made once with the world's life and updated each drawn frame, outside the simulation and read-only on it.
- * It runs after the lightning has added its flash and the night its moon, and dims what they have lit (render/overcast.ts); the debug handle is `window.sky.userData.atm`.
+ * It runs after the lightning has added its flash and the night its moon, and dims what they have lit (render/overcast.ts); the debug handle is `window.sky.mesh.userData.atm`.
  */
 
 import type { AtmContext, AtmPart } from '../atmosphere';

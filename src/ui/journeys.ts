@@ -15,7 +15,7 @@
 import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
 import { LOOKS } from '../data/looks';
-import { VEIL } from '../data/uiMood';
+import { epigraphHold } from '../data/uiMood';
 import { WORLD } from '../data/tuning';
 import { gatePlace, signPlace } from '../systems/checkpoints';
 import type { Game } from '../systems/components';
@@ -67,6 +67,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     const a = g.ecs.c.actor.get(g.player.id)!;
     return phase === 'dying' && !veil.covered && a.move === 'death' && a.frame >= a.moves.death.frames - 2;
   };
+  const met = (region: string | undefined): boolean => !!region && !!g.overworld?.told.has(`seen:${region}`); // a realm this save has been in has said its epigraph (ui/realmCards.ts)
   const restPlace = (): string => (g.overworld ? signPlace(g.overworld.sign)?.name : undefined)?.toUpperCase() ?? 'THE ELDER SIGN';
 
   g.events.on('Died', ({ entity }) => {
@@ -79,8 +80,8 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     const twin = gatePlace(gatePlace(gate)?.to ?? '');
     const look = LOOKS[twin?.region ?? ''] ?? LOOKS.hub;
     const light = [0, 1, 2].map((k) => Math.min(1, look.grade[3][k] * 0.7 + look.accents[0][k] * 0.3 + 0.08)) as [number, number, number];
-    const epigraph = firstEpigraph(twin?.region); // a realm come to for the first time says its epigraph under the veil (round 78)
-    [phase, least] = ['entering', epigraph ? VEIL.epigraphMs : HOLD_MS[0]];
+    const epigraph = firstEpigraph(twin?.region, met(twin?.region)); // a realm come to for the first time says its epigraph under the veil (round 78)
+    [phase, least] = ['entering', epigraph ? epigraphHold(epigraph) : HOLD_MS[0]];
     void veil.cover((twin?.name ?? '').toUpperCase(), (frames / 60) * 0.85, epigraph, light); // made to close as the walk ends
   });
   g.events.on('Travelled', ({ via }) => void (via === 'gate' && phase === 'entering' && hold()));
@@ -88,8 +89,8 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
   const self: Journeys = {
     go(words, jump, line, region) {
       if (phase !== 'idle') return;
-      const said = line ?? firstEpigraph(region); // (round 78: else a realm's epigraph, once; the pool of lines as before)
-      [phase, least] = ['covering', line ? READ_MS : said ? VEIL.epigraphMs : HOLD_MS[0]];
+      const said = line ?? firstEpigraph(region, met(region)); // (round 78: else a realm's epigraph, once; the pool of lines as before)
+      [phase, least] = ['covering', line ? READ_MS : said ? epigraphHold(said) : HOLD_MS[0]];
       void veil.cover(words, line ? 1.6 : 0.9, said).then(() => {
         jump();
         hold();

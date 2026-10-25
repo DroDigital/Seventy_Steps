@@ -33,12 +33,12 @@ export function nextLore(): string {
 const said = new Set<string>(); // the realms whose epigraph the veil has said this session: their title card does not say it again (ui/realmCards.ts)
 
 /**
- * Round 78: the first journey to a realm says its epigraph under the veil, once in this browser (kept with the lines said); else nothing,
- * and the usual line follows. Without storage to remember it by, nothing: it would be said at every journey there.
+ * Round 78: the first journey to a realm says its epigraph under the veil, once in this browser (kept with the lines said) and never in a
+ * realm this save has been in; else nothing, and the usual line follows. Without storage to remember it by, nothing: it would be said at every journey there.
  */
-export function firstEpigraph(region: string | undefined): string | undefined {
+export function firstEpigraph(region: string | undefined, met = false): string | undefined {
   const key = epigraphKey(region);
-  if (!key || !region) return undefined;
+  if (!key || !region || met) return undefined; // (`met`: the save has been in this realm already, its card said what it had to)
   const shown = read(SHOWN_KEY);
   const mark = `epigraph:${region}`;
   if (shown.has(mark)) return undefined;

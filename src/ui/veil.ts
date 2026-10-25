@@ -11,7 +11,7 @@
  */
 
 import { fbm } from '../core/noise';
-import { INK, VEIL } from '../data/uiMood';
+import { VEIL } from '../data/uiMood';
 import { nextLore } from './loreLine';
 import { BONE, SERIF } from './hudKit';
 import { inkLetters, inkSeed, playIn } from './inkTitle';
@@ -123,7 +123,7 @@ export function createVeil(): Veil {
   const ink = (): void => {
     for (const a of inked) a.cancel();
     inked = playIn(inkLetters(said, name), inkSeed(name));
-    if (lore.textContent && inked.length) inked.push(lore.animate([{ opacity: 0 }, { opacity: 0.6 }], { duration: VEIL.loreRise, delay: (INK.span + INK.letter) * 1000, easing: 'ease-out', fill: 'both' }));
+    if (lore.textContent && inked.length) inked.push(lore.animate([{ opacity: 0 }, { opacity: 0.6 }], { duration: VEIL.loreRise, delay: VEIL.loreDelay, easing: 'ease-out', fill: 'both' }));
   };
   document.body.append(canvas, words);
   const ctx = canvas.getContext('2d');

@@ -27,7 +27,7 @@ Verification, honestly: everything runs in a software renderer (a frame in secon
 - The horizon builder's candidate parts (glow domes, far windows following the clock) by instruction.
 - No rumble for heat lightning (the brief says silent; the candidate had a low thunder: `audio.thunder(0.08..0.18)` is one line in heatLightning.ts if wanted).
 - The Alignment's insight part is not behind the FX cap (a calm, static figure); the stress part is.
-- The mist's moon lobe is only scaled by my part; the mist builder's part runs after mine and may overwrite `uFogAir.z`: it can read `sky.userData.atm.over`/`.veil` (0..1) to keep it.
+- The mist's moon lobe is only scaled by my part; the mist builder's part runs after mine and may overwrite `uFogAir.z`: it can read `sky.mesh.userData.atm.over`/`.veil` (0..1) to keep it.
 
 
 ### Watch
@@ -228,7 +228,7 @@ Verification, honestly: everything runs in a software renderer (a frame in secon
 
 ### Watch
 
-- **Another writer of `uVig`/`uBloom`**: the ui-mood package's death "breath" also writes both (from the constants, in `hurtFx.update`, which runs before the atmosphere parts). Mine scales whatever it finds, unless it finds its own last value (then it scales `LIGHTING`), so the two compose; the integrator should keep `horizon` after any other writer in `createAtmosphere`'s list or in `hurtFx` (it is after `dread`, before `sleeper`). If a later part writes the uniforms by overwriting from the constants, mine is lost for that frame.
+- **Another writer of `uVig`/`uBloom`**: the ui-mood package's death "breath" also writes both (from the constants, in `hurtFx.update`, which runs before the atmosphere parts). Mine scales whatever it finds, unless it finds its own last value (then it scales `LIGHTING`), so the two compose; the integrator should keep `horizon` after any other writer in `createAtmosphere`'s list or in `hurtFx` (it is after `dread` and `sleeper`, the last of the list: the breath writes the corners from the base, the eye scales what it finds, and the other order wiped the eye out). If a later part writes the uniforms by overwriting from the constants, mine is lost for that frame.
 - Taste: in the open dark with the lantern kindled the corners are 10% darker than before (0.42 to 0.46); in a lamp's pool they open to 0.30. Both numbers are in `EYE.vignette`. The pool follows `lightAt` exactly, so a street between lamps breathes, and a dungeon corridor between torches breathes at 40%.
 - Perf: none measurable. One extra quad per lit silhouette (two triangles) and one for each lamp; the windows' extra GLSL runs only on lit cells. `lightAt` is read at about 8 Hz for the eye.
 - Premultiplied blend on every silhouette (the outline's output is premultiplied by its own alpha: identical result to before); the fake false landmark uses it too. GLSL compiled in the browser with no errors.
@@ -421,15 +421,17 @@ Offline measurements (real recordings through the real `ambience.ts` in Chromium
    .04 rad (ray-clamped against the world so it never enters a wall). Snaps back in 0.4 s at the first threat, blow, lock-on, fog pass,
    mount, fall, kneel, cutscene or boss fight. Setting `Settings > Play > Quiet walk` (default on).
 5. **The veil that knows where it is going** (priority 5). The journey's veil names the destination in larger, wider letters inked in
-   (`ink()` on the first full-cover frame); on a first journey into a realm it holds at least 3.6 s and says the realm's epigraph (once
-   for each realm, remembered in localStorage `lore-shown` as `epigraph:<region>`; no storage = no epigraph, so the old timing is kept).
-   The lore line beneath rises after the last letter is inked.
+   (`ink()` on the first full-cover frame); on a first journey into a realm it holds 3.6 to 8 s, by how long the epigraph wants reading
+   (`epigraphHold`, `readSeconds`: 1 s and 1/26 s a character, 3 to 7 s) and says the realm's epigraph (once for each realm,
+   remembered in localStorage `lore-shown` as `epigraph:<region>`, and never in a realm the save has already been in, `seen:<region>`;
+   no storage = no epigraph, so the old timing is kept). The lore line beneath comes 0.45 s after the dark covers all, so it is there to
+   be read when the veil is held no longer than 0.9 s. A realm's own card, when it has an epigraph, is kept up as long as the epigraph is read.
 
 
 ### Knobs
 
 `INK` (span 1.1, letter .75, out .8, jitter .025, blur 5, sink 4, rule {delay .5, draw 1.4, width 420}, epigraph {delay 1.6, rise 1.0},
-tint .45, floor .62); `CARD` (realmHold 4.8, stale 90); `VEIL` (epigraphMs 3600, loreRise 700); `HOUR` (hold 3.4, settle 3);
+tint .45, floor .62); `CARD` (realmHold 4.8, stale 90); `VEIL` (epigraphMs 3600, epigraphMost 8000, loreDelay 450, loreRise 700); `READ` (base 1, perChar 1/26, least 3, most 7); `HOUR` (hold 3.4, settle 3);
 `TIDE` (drain 2.2, grey .88, close .5, breath {vig .55, bloom .35, seconds 1.8, decay .7}); `QUIET` (hudAfter 7, hudTo .3, camAfter 5,
 back 1.1, lift .04, in 2.5, out .4, sanity 70, still .2, turn .25). Card look (size 38, letter-spacing .12 to .2 em) is the `realm` row of `LOOK` in `banner.ts`.
 
@@ -462,5 +464,5 @@ back 1.1, lift .04, in 2.5, out .4, sanity 70, still .2, turn .25). Card look (s
 - **`banner.show` gains a 5th parameter** and `Tone` two members (`banner.ts` is where a merge will conflict if another package touches the banner). The quest tracker is now parented under the `dim` wrapper (its own fade still works inside it). A `busy` getter I had added to `Banner` was removed again in the last commit (nothing read it; `hud.ts`'s `great` spread would have frozen it).
 - **`createHud` has a new 6th parameter** (`HudOptions`); `main.ts` is the only caller.
 - Perf: none measurable (a few DOM spans per card; the tide adds two uniform writes; the calm adds one `raycast` per frame while its eased value is above .001, i.e. only in the quiet walk's camera draw-back)
-- The Outer Dark epigraphs are five clauses from one poem; the German, French and Spanish lines of all the new strings are mine, not a translator's.
+- Five of the Outer Dark's six epigraphs are cut from Lovecraft's prose poem *Nyarlathotep* (1920), the black wood's two sentences long, and the sixth (the Gate of Spheres) is from *The Call of Cthulhu*; the German, French and Spanish lines of all the new strings are mine, not a translator's.
 - Narrow screens: the realm card is sized for 960 px up and shrinks for names over 22 letters; checked at 960x540 only.

@@ -26,9 +26,25 @@ export const CARD = {
 
 /** The veil that knows where it is going (ui/veil.ts, ui/journeys.ts). */
 export const VEIL = {
-  epigraphMs: 3600, // ms under the veil, at least, when it says a realm's epigraph (once for each realm; any other journey is as quick as before)
-  loreRise: 700, // ms the line beneath the name takes to come, after the last letter is inked
+  epigraphMs: 3600, // ms under the veil, at least, when it says a realm's epigraph (once for each realm; any other journey is as quick as before)...
+  epigraphMost: 8000, // ...and at most, however long the epigraph (`epigraphHold`)
+  loreDelay: 450, // ms after the dark covers all that the line beneath the name begins to come (a journey may be held no longer than 0.9 s: the line must be there to be read)
+  loreRise: 700, // ms the line beneath the name takes to come
 };
+
+/** Reading, for what is said once: a quick reader's pace, so an epigraph is up long enough to be read (the veil and the realm's card keep it for this). */
+export const READ = {
+  base: 1, // seconds before the first word is taken in
+  perChar: 1 / 26, // seconds a character takes
+  least: 3,
+  most: 7,
+};
+
+/** Seconds a line of `text` wants to be read in. */
+export const readSeconds = (text: string): number => Math.min(READ.most, Math.max(READ.least, READ.base + text.length * READ.perChar));
+
+/** Milliseconds the veil is held, once the dark covers all, to say `line` (a realm's epigraph) and have it read. */
+export const epigraphHold = (line: string): number => Math.min(VEIL.epigraphMost, Math.max(VEIL.epigraphMs, VEIL.loreDelay + VEIL.loreRise + readSeconds(line) * 1000));
 
 /** The night's turns announced (ui/hourCards.ts). */
 export const HOUR = {

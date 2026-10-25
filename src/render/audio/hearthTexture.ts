@@ -40,7 +40,7 @@ function swell(rnd: () => number, seconds: number, depth: number): (t: number) =
 export function flameTexture(spec: FlameSpec, rate: number, seconds: number, level: number): Samples {
   const n = Math.round(rate * seconds);
   const rnd = stream(spec.seed * 31 + 7);
-  const white = (): Samples => Float32Array.from({ length: n }, () => rnd() * 2 - 1);
+  const white = (length = n): Samples => Float32Array.from({ length }, () => rnd() * 2 - 1); // (a pop draws only the few samples it uses)
   const out = new Float32Array(n);
   if (spec.body > 0) {
     const body = ringLow(ringLow(white(), rate, spec.rumble), rate, spec.rumble);
@@ -59,7 +59,7 @@ export function flameTexture(spec: FlameSpec, rate: number, seconds: number, lev
     const loud = spec.pop * Math.exp(Math.log(0.12) * (1 - rnd()) ** 1.5); // 0.12 .. 1 of its level, many faint and a few not
     const life = 0.003 + 0.011 * rnd(); // seconds the burst takes to die
     const snap = rnd() < 0.14;
-    const burst = white().subarray(0, Math.round(rate * 0.06)) as Samples;
+    const burst = white(Math.round(rate * 0.06));
     const top = ringLow(burst, rate, spec.band[1] * (0.7 + 0.6 * rnd()));
     const bottom = ringLow(burst, rate, spec.band[0]);
     for (let i = 0; i < burst.length; i++) {

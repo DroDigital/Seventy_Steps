@@ -6,6 +6,7 @@
  * picture, render/sleeperBreath.ts). Every one follows `fx.stress` or the sleeper's reach, and is silent in a menu and a cutscene.
  */
 
+import { roofedAt } from '../../../world/terrain';
 import { nearestSleeper } from '../../sleepers';
 import type { AtmAudioContext, AtmAudioPart } from '../atmosphereAudio';
 import { createBreathBed } from '../breathBed';
@@ -25,7 +26,8 @@ export function createMindEars(ctx: AtmAudioContext): AtmAudioPart {
       MIND_TIDE.muffle = quiet ? 0 : tideOf(seconds, fx.stress);
       tread.update(fx.stress, seconds, quiet);
       const me = g.ecs.c.transform.get(g.player.id)?.pos;
-      breath.update(seconds, !quiet && me ? nearestSleeper(g, me) : null, quiet);
+      const roofed = !!me && roofedAt(me.x, me.z); // (the breath is of the open air: under a roof, as in the picture, it stops)
+      breath.update(seconds, !quiet && !roofed && me ? nearestSleeper(g, me) : null, quiet || roofed);
     },
   };
 }

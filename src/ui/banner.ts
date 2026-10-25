@@ -10,7 +10,7 @@
  */
 
 import { captionSize } from './captions';
-import { CARD, HOUR, INK } from '../data/uiMood';
+import { CARD, HOUR, INK, readSeconds } from '../data/uiMood';
 import { BONE, SERIF } from './hudKit';
 import { inkLetters, inkSeed, playIn, playOut } from './inkTitle';
 
@@ -99,9 +99,10 @@ export function createBanner(): Banner {
       if (L.rank >= 3) waiting = null; // (a death or a fall leaves nothing waiting)
       for (const a of [...anims, ...ink]) a.cancel();
       ink = [];
-      const hold = tone === 'realm' && !line ? CARD.realmHold - 1.2 : L.hold;
+      const hold = tone === 'realm' && !line ? CARD.realmHold - 1.2 : tone === 'realm' ? Math.max(L.hold, INK.epigraph.delay + INK.epigraph.rise + readSeconds(line)) : L.hold; // (a realm's epigraph is kept up as long as it takes to read)
       current = tone;
       liveUntil = Number.isFinite(hold) ? now + hold * 1000 : Infinity;
+      if (waiting && Number.isFinite(hold)) flushTimer = setTimeout(flush, hold * 1000 + FADE_MS + 100); // a card kept back for the one this replaces is still owed its turn
       if (L.ink) {
         seed = inkSeed(text);
         letters = inkLetters(words, text);

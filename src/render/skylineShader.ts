@@ -46,7 +46,7 @@ void main() {
     float len = abs(uLamp.y) * ${BEAM.reach.toFixed(1)};
     float shaft = step(0.0, along) * smoothstep(0.6, 3.0, along) * (1.0 - smoothstep(0.35 * len, len, along)) * smoothstep(0.0, 2.0, len) * exp(-m.y * m.y / ${(BEAM.thick * BEAM.thick).toFixed(3)});
     i += shaft * uLamp.z;
-    gl_FragColor = vec4(uLampCol * i, 0.0);
+    gl_FragColor = vec4(uLampCol * i * uAlpha, 0.0); // (the lamp comes and goes with its realm's far land, as the outline and the glow do)
     return;
   }
   if (vFx.x > 0.5) { // the glow over a town: widest and brightest at its roofs, rising and thinning, light only (an additive blend through the premultiplied one)

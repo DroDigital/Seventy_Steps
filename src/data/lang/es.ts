@@ -307,7 +307,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'epigraph.beyond': "A menudo me he preguntado si la mayoría de los hombres se detienen alguna vez a reflexionar sobre el significado a veces titánico de los sueños y sobre el oscuro mundo al que pertenecen.",
   'epigraph.cloud_summit': "…columnas entrevistas de templos impíos que descansan sobre rocas sin nombre bajo el espacio y se alzan hasta vacíos vertiginosos por encima de las esferas de la luz y de las tinieblas.",
   'epigraph.black_wood': "Gritando de conciencia, mudo de delirio, solo los dioses que fueron pueden decirlo. Una sombra enferma y sensible que se retuerce en manos que no son manos…",
-  'epigraph.pale_lattice': "…cadáveres de mundos muertos con llagas que fueron ciudades, vientos carroñeros que rozan las estrellas lívidas y las hacen vacilar.",
+  'epigraph.pale_lattice': "…cadáveres de mundos muertos con llagas que fueron ciudades, vientos sepulcrales que rozan las estrellas lívidas y las hacen vacilar.",
   'epigraph.piping_dark': "…el redoble sordo y enloquecedor de los tambores, y el quejido tenue y monótono de flautas blasfemas, desde cámaras inconcebibles y sin luz más allá del Tiempo.",
   'epigraph.spheres': "…anormal, no euclidiana y abominablemente cargada de esferas y dimensiones ajenas a las nuestras.",
   'epigraph.court_centre': "…los dioses últimos, gigantescos y tenebrosos, las gárgolas ciegas, mudas y sin mente cuya alma es Nyarlathotep.",

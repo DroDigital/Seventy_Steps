@@ -31,7 +31,7 @@ export interface AtmPart {
 }
 
 export function createAtmosphere(ctx: AtmContext): AtmPart {
-  const parts: AtmPart[] = [createSkyPass(ctx), createMistLight(ctx), createRealmAir(ctx), createFootsteps(ctx), createGroundSkin(ctx), createDreadPicture(ctx), createHorizon(ctx), createSleeper(ctx)];
+  const parts: AtmPart[] = [createSkyPass(ctx), createMistLight(ctx), createRealmAir(ctx), createFootsteps(ctx), createGroundSkin(ctx), createDreadPicture(ctx), createSleeper(ctx), createHorizon(ctx)]; // (the breath writes the corners from the base and the eye scales what it finds, so they compose: the other order wiped the eye out)
   return {
     update(camera, time, enclosed, alpha, gloom) {
       for (const p of parts) p.update(camera, time, enclosed, alpha, gloom);
