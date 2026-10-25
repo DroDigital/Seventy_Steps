@@ -143,9 +143,9 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
 interface Heard { key: string; gain: number }
 interface Played { set: unknown; o: SampleOptions }
 
-function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 'snow', rand: () => number = () => 0.99) {
+function rig(region = 'mountains', ground: Parameters<typeof findGround>[2] = 'snow', rand: () => number = () => 0.99, run = 80) {
   const g = createWorldGame();
-  const at = findGround(g, region, ground, 80, 0)!;
+  const at = findGround(g, region, ground, run, 0)!;
   const tr = g.ecs.c.transform.get(g.player.id)!;
   tr.pos = { x: at.x, y: 1, z: at.z };
   tr.prev = { ...tr.pos };
@@ -180,11 +180,11 @@ describe('the body, heard', () => {
   });
 
   it('a ground with no recipe, the sea, and a mounted ride lay nothing over the recording', () => {
-    const road = rig('arkham', 'dirt');
+    const road = rig('dunwich', 'dirt', undefined, 22);
     road.tick(10, 20);
     expect(keys(road, 'foot:')).toBe(0);
     const mounted = rig();
-    mounted.g.player.mount.active = 'horse';
+    mounted.g.player.mount.active = 'grey';
     mounted.tick(10, 20);
     expect(mounted.heard).toEqual([]);
     expect(mounted.played).toEqual([]);
@@ -263,7 +263,7 @@ describe('the body, heard', () => {
 
 describe('the breath', () => {
   it('a sprint ended is panted out; an emptied bar gasps once, and again only after it has been refilled', () => {
-    const r = rig('arkham', 'dirt');
+    const r = rig('arkham', 'grass', undefined, 0);
     r.g.player.sprinting = true;
     r.tick(4, 25);
     r.g.player.sprinting = false;
@@ -282,7 +282,7 @@ describe('the breath', () => {
   });
 
   it('near death the breath is ragged and quickens, and not kneeling at a sign', () => {
-    const r = rig('arkham', 'dirt');
+    const r = rig('arkham', 'grass', undefined, 0);
     HEART.need = 0.6;
     r.tick(10, 0);
     const slow = keys(r, 'body:ragged');

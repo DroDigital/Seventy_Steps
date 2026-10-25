@@ -65,7 +65,7 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
     if (HEART.need > BODY.nearDeath) {
       ragged -= dt;
       if (ragged <= 0) {
-        ragged = 2.8 - 1.5 * HEART.need + 0.4 * rand();
+        ragged = 2.8 - 1.7 * HEART.need + 0.3 * rand();
         soft('body:ragged', BREATH.ragged, FOOT_GAIN.breath * (0.55 + 0.45 * HEART.need));
       }
     } else ragged = 0.6;

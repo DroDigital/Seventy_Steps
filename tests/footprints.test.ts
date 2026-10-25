@@ -99,7 +99,7 @@ describe('the footfall clock keeps the foley\'s stride', () => {
     const walk = (metres = 0.2): Footfall | null => (stride(g, metres, 0), clock.step((t += 0.1)));
     const count = (n = 40): number => Array.from({ length: n }, () => walk()).filter((f) => f).length;
     expect(count()).toBeGreaterThan(5);
-    g.player.mount.active = 'horse';
+    g.player.mount.active = 'grey';
     expect(count()).toBe(0);
     g.player.mount.active = null;
     const a = g.ecs.c.actor.get(g.player.id)!;
@@ -213,7 +213,7 @@ describe('the part: it lays, kicks and follows, and writes nothing to the game',
 
   it('no print is laid mounted, and none in the arena', () => {
     const r = rig('mountains', 'snow');
-    r.g.player.mount.active = 'horse';
+    r.g.player.mount.active = 'grey';
     r.walk(12, 4);
     expect(r.mesh().count).toBe(0);
     const arena = createGame();
