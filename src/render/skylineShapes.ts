@@ -10,7 +10,8 @@
 import type { Rng } from '../core/rng';
 import type { SilhouetteKind } from '../data/skylines';
 
-export type Profile = (x: number) => number;
+/** An outline's height at x; a reef's carries where its lamp stands (round 78: it turns, render/horizonGlow.ts). */
+export type Profile = ((x: number) => number) & { lamp?: { x: number; y: number } };
 
 /** A pointed spire of half-width `w` and height `h` at `c`. */
 const spire = (x: number, c: number, w: number, h: number): number => (Math.abs(x - c) < w ? h * (1 - Math.abs(x - c) / w) ** 0.8 : 0);
@@ -100,12 +101,14 @@ export function profile(kind: SilhouetteKind, rng: Rng): Profile {
     case 'reef': { // jagged rocks standing out of the sea, one with a light on it
       const rocks = Array.from({ length: 12 }, () => ({ c: r(-0.45, 0.45), h: r(0.2, 0.7), w: r(0.02, 0.06) }));
       const light = rocks[0];
-      return (x) => {
+      const outline: Profile = (x) => {
         let y = 0;
         for (const k of rocks) y = Math.max(y, k.h * Math.max(0, 1 - Math.abs(x - k.c) / k.w) ** 0.7);
         if (Math.abs(x - light.c) < 0.004) y = Math.max(y, light.h + 0.28); // the lamp-tower
         return y;
       };
+      outline.lamp = { x: light.c, y: light.h + 0.28 }; // round 78: where its lamp turns
+      return outline;
     }
     case 'dunes': { // long slow waves with sharp crests, a few cyclopean stones among them
       const waves = Array.from({ length: 5 }, () => ({ f: r(2, 9), p: r(0, 6.28), a: r(0.08, 0.28) }));
