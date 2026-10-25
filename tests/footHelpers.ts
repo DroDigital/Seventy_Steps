@@ -1,0 +1,24 @@
+/** Helpers for the footprint and footing tests (round 78): a point on a given ground, and a walk by hand. */
+
+import { REGIONS } from '../src/data/regions';
+import type { Game } from '../src/systems/components';
+import { groundAt, type GroundKind } from '../src/world/groundKind';
+import { regionRect } from '../src/world/worldMap';
+
+/** A point of `region` whose ground is `kind` for `run` metres along `yaw` too (found on a 4 m grid). */
+export function findGround(g: Game, region: string, kind: GroundKind, run = 0, yaw = 0): { x: number; z: number } | null {
+  const r = regionRect(REGIONS.find((x) => x.id === region)!);
+  const whole = (x: number, z: number): boolean => {
+    for (let d = 0; d <= run; d += 1.5) if (groundAt(g, x + Math.sin(yaw) * d, 1, z + Math.cos(yaw) * d) !== kind) return false;
+    return true;
+  };
+  for (let z = r.z0 + 8; z < r.z1 - 8 - run; z += 4) for (let x = r.x0 + 8; x < r.x1 - 8 - run; x += 4) if (whole(x, z)) return { x, z };
+  return null;
+}
+
+/** Carries the investigator `metres` along `yaw` in one go (their body and its last place both), as a frame of a walk would. */
+export function stride(g: Game, metres: number, yaw: number): void {
+  const tr = g.ecs.c.transform.get(g.player.id)!;
+  tr.prev = { ...tr.pos };
+  tr.pos = { x: tr.pos.x + Math.sin(yaw) * metres, y: tr.pos.y, z: tr.pos.z + Math.cos(yaw) * metres };
+}

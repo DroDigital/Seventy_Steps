@@ -23,8 +23,10 @@ import { chunkContent } from '../../world/chunks';
 import { worldLayout } from '../../world/placements';
 import { segmentDistance } from '../../world/roads';
 import { chunkOf } from '../../world/worldMap';
+import { groundAt } from '../../world/groundKind';
 import { wetness } from '../wetness';
 import { dullness } from './cues';
+import { footFeel } from './footing';
 import type { Sampler } from './sampler';
 
 export type Surface = 'water' | 'stone' | 'road' | 'dirt';
@@ -81,6 +83,14 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
   const hand = (id: keyof typeof HANDS, gain = 1): boolean => recipe(`hands:${id}`, HANDS[id], { gain: CLASS_GAIN[id === 'burst' || id === 'anvil' ? 'impact' : 'hands'] * gain });
   let [arm, edge, knee]: [string, number, boolean | null] = [g.player.weapon, reinforcement(), null]; // what is in hand, how far it is reinforced, whether they kneel: heard to change
 
+  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 78: snow and sand softer, mud lower, boards hollow). */
+  function stepOn(p: V3, gain: number): Surface {
+    const surface = surfaceAt(g, p.x, p.y, p.z);
+    const feel = footFeel(surface, groundAt(g, p.x, p.y, p.z));
+    play(feel.set ?? STEPS[surface], gain * feel.gain, 0, feel.pitch, feel.lowpass);
+    return surface;
+  }
+
   function steps(seconds: number): void {
     const { transform, actor } = g.ecs.c;
     const tr = transform.get(g.player.id);
@@ -97,8 +107,7 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
     const stride = strideAt(speed);
     if (walked < stride) return;
     walked %= stride;
-    const surface = surfaceAt(g, tr.pos.x, tr.pos.y, tr.pos.z);
-    play(STEPS[surface], 0.55 + 0.45 * Math.min(1, speed / PACE[1]));
+    const surface = stepOn(tr.pos, 0.55 + 0.45 * Math.min(1, speed / PACE[1]));
     if (surface !== 'water' && wetness.value > 0.3 && Math.random() < wetness.value) play('stepWater', 0.32 * wetness.value, 0, 1.1 + 0.25 * Math.random()); // a stride on ground the rain has soaked splashes (round 34)
   }
 
@@ -112,13 +121,9 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
       const prev = was && was.move === a.move && was.frame <= a.frame ? was.frame : null; // a new move, or the same begun again
       const player = id === g.player.id;
       if (player) {
-        const surface = (): Surface => {
-          const p = transform.get(id)!.pos;
-          return surfaceAt(g, p.x, p.y, p.z);
-        };
         if (a.move === 'roll' && reached(5, a.frame, prev)) play('roll');
         if (a.move === 'roll' && reached(26, a.frame, prev)) play('roll', 0.55);
-        if (a.move === 'backstep' && (reached(2, a.frame, prev) || reached(10, a.frame, prev))) play(STEPS[surface()], 0.8);
+        if (a.move === 'backstep' && (reached(2, a.frame, prev) || reached(10, a.frame, prev))) stepOn(transform.get(id)!.pos, 0.8);
         if (a.move === 'drink' && reached(10, a.frame, prev)) play('cork');
         if (a.move === 'drink' && reached(HAND_FRAMES.drink.swallow, a.frame, prev)) hand('swallow');
         if (a.move === 'parry' && reached(HAND_FRAMES.parry.guard, a.frame, prev)) hand('guard');
