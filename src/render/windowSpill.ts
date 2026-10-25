@@ -44,6 +44,7 @@ void main() {
 const FRAG = /* glsl */ `
 uniform vec4 uBars; // the mullion's width, where the transom lies, its width, the share of the light the bars leave
 uniform float uSoft;
+uniform float uFall;
 varying vec2 vQ;
 varying vec3 vCol;
 float bar(float x, float at, float w) {
@@ -52,7 +53,7 @@ float bar(float x, float at, float w) {
 void main() {
   float across = 1.0 - smoothstep(0.5, 1.0, abs(vQ.x)); // soft at its sides...
   float onset = smoothstep(0.0, uSoft, vQ.y); // ...and where it begins
-  float fall = pow(max(1.0 - vQ.y, 0.0), 1.6); // and thinning to nothing at its end
+  float fall = pow(max(1.0 - vQ.y, 0.0), uFall); // and thinning to nothing at its end
   float shade = 1.0 - (1.0 - uBars.w) * max(bar(vQ.x, 0.0, uBars.x), bar(vQ.y, uBars.y, uBars.z));
   gl_FragColor = vec4(vCol * across * onset * fall * shade, 1.0);
 }
@@ -82,6 +83,7 @@ export function createWindowSpill(scene: THREE.Scene, g: Game): WindowSpill {
       uLift: { value: SPILL.lift },
       uBars: { value: new THREE.Vector4(...SPILL.bars) },
       uSoft: { value: SPILL.soft },
+      uFall: { value: SPILL.fall },
     },
     vertexShader: VERT,
     fragmentShader: FRAG,

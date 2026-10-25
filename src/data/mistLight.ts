@@ -35,7 +35,8 @@ export const SPILL = {
   highest: 5.5, // a window higher than this over the ground lays none
   near: 1.1, // the width it begins with at the wall...
   far: 3.4, // ...and ends with
-  gain: 0.55, // its strength where it begins, of the window kind's colour (data/playTuning.ts LIGHTS)
+  gain: 1.05, // its strength where it begins, of the window kind's colour (data/playTuning.ts LIGHTS; the first stills, at 0.55, lay it too faint to find on a dark street)
+  fall: 1.15, // how it thins along its length (a power: 1 is even, more is a bright mouth and a long thin tail)
   lift: 0.05, // metres over the ground
   start: 0.12, // metres out from the glass that it begins
   margin: 0.25, // metres it stops short of whatever stands in its way (a wall, a fence, a tree)
