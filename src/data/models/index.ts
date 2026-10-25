@@ -8,6 +8,7 @@
 import { BOSS_INFO } from './bossIndex';
 import { GATE_INFO } from './gateIndex';
 import { KENNEY_INFO } from './kenneyIndex';
+import { WEB_INFO } from './webIndex';
 
 /** A box a body cannot walk through, in a model's own frame (feet at the origin, its footprint centred): the centre (x, z), the half extents (x, z), and from which height to which. */
 export type Solid = readonly [cx: number, cz: number, hx: number, hz: number, y0: number, y1: number];
@@ -26,4 +27,4 @@ export interface ModelInfo {
   anchors?: readonly (readonly [number, number, number])[]; // where a flame or a light sits in it (a torch's bowl, a brazier's coals), in its own frame
 }
 
-export const MODEL_INFO: Readonly<Record<string, ModelInfo>> = { ...KENNEY_INFO, ...BOSS_INFO, ...GATE_INFO };
+export const MODEL_INFO: Readonly<Record<string, ModelInfo>> = { ...KENNEY_INFO, ...BOSS_INFO, ...GATE_INFO, ...WEB_INFO };

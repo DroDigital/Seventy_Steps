@@ -10,7 +10,8 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   anchors  [(x, y, z)]: where a flame or a light sits in the finished model (its own frame, feet at the origin); `anchor_of` finds one from the
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
-  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default) or 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py)
+  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default), 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py) or
+           'web' (webIndex.ts, webPack.ts: parts taken from free web sources, manifest_web.py)
   metal_luma  faces darker than this (0..1) are made `metal`, whatever the material said: the iron straps of a plank door
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
   join     the objects it selects are made one before anything else (a model a viewer split at its vertex limit); `cap`: a `cut` is closed with triangles
