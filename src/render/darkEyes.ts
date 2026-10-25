@@ -35,17 +35,19 @@ interface Slot {
   tint: readonly [number, number, number];
   blinks: boolean;
   tried: number; // seconds of the last try at a place
+  lit: number; // how well lit the ground at it was at the last look...
+  looked: number; // ...and when (the lamps and the windows turn with the hour)
 }
 
 export interface DarkEyes {
   update(camera: THREE.Camera, time: number, hidden: boolean): void;
-  /** Debug: puts a pair `metres` ahead of the lens now (null: none could be put). */
+  /** Debug: puts a pair `metres` ahead of the lens now (`metres` 0 or less: takes them all away). */
   force(metres: number, offset?: number): { x: number; y: number; z: number } | null;
   readonly out: number;
 }
 
 export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
-  const slots: Slot[] = Array.from({ length: EYES.max + 1 }, () => ({ on: false, until: 0, born: 0, life: 0, x: 0, y: 0, z: 0, stared: 0, gone: -1, blinkAt: 0, late: 0, tint: [1, 1, 1], blinks: true, tried: -1e9 }));
+  const slots: Slot[] = Array.from({ length: EYES.max + 1 }, () => ({ on: false, until: 0, born: 0, life: 0, x: 0, y: 0, z: 0, stared: 0, gone: -1, blinkAt: 0, late: 0, tint: [1, 1, 1], blinks: true, tried: -1e9, lit: 0, looked: -1e9 }));
   const halos = createHalos(slots.length * 2, 0.35);
   scene.add(halos.mesh);
   const gaze = newGaze();
@@ -73,6 +75,10 @@ export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
       return slots.filter((s) => s.on).length;
     },
     force(metres, offset = 0.5) {
+      if (metres <= 0) {
+        for (const s of slots) [s.on, s.until, s.gone] = [false, last + 60, -1];
+        return null;
+      }
       const slot = slots.find((s) => !s.on) ?? slots[0];
       slot.tried = -1e9;
       const region = g.overworld?.region ?? 'arkham';
@@ -84,7 +90,7 @@ export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
       return { x, y, z };
     },
     update(camera, time, hidden) {
-      if (last < 0) for (const [i, s] of slots.entries()) s.until = time + 8 + 12 * i + 30 * Math.random(); // (the first are not out at once, nor together)
+      if (last < 0) for (let i = 0; i < slots.length; i++) slots[i].until = time + 8 + 12 * i + 30 * Math.random(); // (the first are not out at once, nor together)
       const dt = last < 0 ? 0 : Math.min(0.1, Math.max(0, time - last));
       last = time;
       readGaze(camera, gaze);
@@ -94,12 +100,14 @@ export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
       const world = { calm, hidden: hidden || !g.overworld || !eyesIn(region) || DREAD_AIR.cap <= 0 }; // (none at FX intensity 0)
       const room = pairsFor(g.mind.sanity);
       halos.begin();
-      for (const [i, s] of slots.entries()) {
+      for (let i = 0; i < slots.length; i++) {
+        const s = slots[i];
         if (s.on) {
           const [dx, dz] = [s.x - gaze.x, s.z - gaze.z];
+          if (time - s.looked > 2) [s.lit, s.looked] = [g.lit?.({ x: s.x, y: s.y, z: s.z }) ?? 0, time];
           const off = Math.abs(offsetTo(gaze, s.x, s.z));
           s.stared = off < EYES.stare ? s.stared + dt : Math.max(0, s.stared - dt * 0.5);
-          if (s.gone < 0 && (i >= room || vanishes({ age: time - s.born, life: s.life, stared: s.stared, distance: Math.hypot(dx, dz), lit: 0 }, world))) s.gone = 0;
+          if (s.gone < 0 && (i >= room || vanishes({ age: time - s.born, life: s.life, stared: s.stared, distance: Math.hypot(dx, dz), lit: s.lit }, world))) s.gone = 0;
           else if (s.gone >= 0) s.gone += dt;
           if (s.gone > EYES.fadeOut) {
             [s.on, s.until, s.gone] = [false, time + restOf(Math.random()), -1];

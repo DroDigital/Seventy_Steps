@@ -61,7 +61,7 @@ export const EYES = {
   from: 26, // metres from the lens they are put...
   far: 52, // ...to here
   height: [0.9, 1.5] as readonly [number, number], // metres over the ground, fixed for a pair's life
-  span: 0.14, // metres either side of the middle between a pair's eyes
+  span: 0.3, // metres either side of the middle between a pair's eyes (a big beast's: at thirty metres they are four pixels apart, and read as two)
   life: [6, 20] as readonly [number, number], // seconds a pair hangs there
   rest: [30, 90] as readonly [number, number], // seconds a slot is empty after
   fadeIn: 1.5,
@@ -71,8 +71,8 @@ export const EYES = {
   stare: 0.26, // radians of the lens's axis: looked at this squarely...
   stareFor: 0.8, // ...for this long and the pair is gone
   litAt: 0.02, // ground lit more than this is not dark enough for them
-  radius: 0.075, // metres, of each eye's halo
-  gain: 0.5,
+  radius: 0.05, // metres, of each eye's halo
+  gain: 0.3,
   arc: 1.9, // radians either side of the heading they may be put (ahead and the sides, not behind)
   /** Regions they are out in (the heath and the woods), their colour (display sRGB), whether they blink. Not the towns, the mountains, the cities of the dream or the Outer Dark, but for the Black Wood. */
   regions: {

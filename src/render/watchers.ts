@@ -173,7 +173,9 @@ export function createWatchers(scene: THREE.Scene, g: Game): Watchers {
           list.splice(list.indexOf(w), 1);
         }
       }
-      WATCHING.count = list.filter((w) => w.gone < 0).length;
+      let standing = 0;
+      for (const w of list) if (w.gone < 0) standing++;
+      WATCHING.count = standing;
       dart(time, dt, want >= DARTER.from);
       if (me) maybeDart(time, want);
       if (WATCHING.call && me && want > list.length) { // (debug) one where it was asked for, old enough to step
