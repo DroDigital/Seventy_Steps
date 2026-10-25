@@ -51,7 +51,7 @@ interface Darter {
 }
 
 /** How many watchers stand now (round 78): the sound reads it, and the bed gives way while they do (atm/dread.ts). */
-export const WATCHING = { count: 0, call: null as { metres: number; offset: number } | null }; // (`call`: debug, ui/../dreadDebug.ts: one is put where asked, at an age to step)
+export const WATCHING = { count: 0, nearest: -1, call: null as { metres: number; offset: number } | null }; // (`call`: debug, ui/../dreadDebug.ts: one is put where asked, at an age to step)
 
 /** A man too tall, too thin, arms to the knee and the head a little on one side. */
 function figure(): THREE.BufferGeometry {
@@ -173,9 +173,13 @@ export function createWatchers(scene: THREE.Scene, g: Game): Watchers {
           list.splice(list.indexOf(w), 1);
         }
       }
-      let standing = 0;
-      for (const w of list) if (w.gone < 0) standing++;
-      WATCHING.count = standing;
+      let [standing, nearest] = [0, -1];
+      for (const w of list) {
+        if (w.gone >= 0) continue;
+        const d = Math.hypot(w.mesh.position.x - camera.position.x, w.mesh.position.z - camera.position.z);
+        nearest = standing++ === 0 ? d : Math.min(nearest, d);
+      }
+      [WATCHING.count, WATCHING.nearest] = [standing, nearest];
       dart(time, dt, want >= DARTER.from);
       if (me) maybeDart(time, want);
       if (WATCHING.call && me && want > list.length) { // (debug) one where it was asked for, old enough to step
