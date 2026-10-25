@@ -57,6 +57,7 @@ import { createSpeech } from './speech';
 import { HEART } from '../feel';
 import { playSound } from './synth';
 import { createAtmosphereAudio } from './atmosphereAudio';
+import { MIND_TIDE } from './mindTide';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
@@ -322,7 +323,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       e.detune = fx.detune + fx.wobble * Math.sin(seconds * 0.7);
       e.setDistortion(fx.distortion);
       hush += (hushTo - hush) * (hushTo > hush ? 0.018 : 0.012); // a few seconds to close, a few to open
-      e.setMuffle(Math.max(HEART.need, hush * 0.9)); // near death the world dulls, and the heart is heard (round 23)
+      e.setMuffle(Math.max(HEART.need, hush * 0.9, MIND_TIDE.muffle)); // near death the world dulls, and the heart is heard (round 23); Unmoored, its high end breathes (round 78)
       region = g.overworld ? (g.overworld.region ?? region) : 'arena'; // out at sea, the last shore's drone
       const scene = bossScene(g); // round 44: the fights engaged, and the horror nearest unmet
       drones.set(region, scene.fights.length > 0);
