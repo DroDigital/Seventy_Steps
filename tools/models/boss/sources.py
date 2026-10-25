@@ -11,7 +11,9 @@ import bmesh
 
 # Material classes (the baked class byte; src/render/modelKit.ts reads them).
 STONE, WOOD, LEAF, ROCK, SLAB, COBBLE, BRICK, CLOTH, METAL, BONE, GLOW = 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11
-CLASSES = {'stone': STONE, 'wood': WOOD, 'leaf': LEAF, 'rock': ROCK, 'slab': SLAB, 'cobble': COBBLE, 'brick': BRICK, 'cloth': CLOTH, 'metal': METAL, 'bone': BONE, 'glow': GLOW}
+# Round 79: what is clear, wet, silvered or waxen (drawn by render/propMeshes.ts as glassware, liquid, mirror and wax; a baked face keeps only its light and dark and the class).
+GLASS, LIQUID, MIRROR, WAX = 12, 13, 14, 15
+CLASSES = {'stone': STONE, 'wood': WOOD, 'leaf': LEAF, 'rock': ROCK, 'slab': SLAB, 'cobble': COBBLE, 'brick': BRICK, 'cloth': CLOTH, 'metal': METAL, 'bone': BONE, 'glow': GLOW, 'glass': GLASS, 'liquid': LIQUID, 'mirror': MIRROR, 'wax': WAX}
 
 # What a material's name says it is made of, before its colour does.
 NAME_RULES = [
@@ -86,6 +88,7 @@ def _load(path, textures):
         raise ValueError('unknown source ' + path)
     relink(textures, force=ext == '.fbx')
     _images.clear()
+    _alphas.clear()
 
 def relink(folders, force=False):
     """Points every image at the file of its name found in `folders` (recursively); an image that already has data is left alone unless `force`."""
@@ -120,6 +123,25 @@ def image_array(img, side=96):
     except Exception:
         arr = None
     _images[img.name] = arr
+    return arr
+
+_alphas = {}
+
+def image_alpha(img, side=96):
+    """An image's alpha as a small (h, w, 1) array, read once (None for an image with no alpha or no data): where a texture is clear, as the glass of a jar or a bulb is."""
+    if img.name in _alphas:
+        return _alphas[img.name]
+    arr = None
+    try:
+        w, h = img.size
+        if w and h and img.channels >= 4:
+            tmp = img.copy()
+            tmp.scale(min(side, w), min(side, h))
+            arr = np.array(tmp.pixels[:], dtype=np.float32).reshape(tmp.size[1], tmp.size[0], tmp.channels)[:, :, 3:4]
+            bpy.data.images.remove(tmp)
+    except Exception:
+        arr = None
+    _alphas[img.name] = arr
     return arr
 
 def material_info(mat):
@@ -228,10 +250,12 @@ def bone_point(arm, name, tail=False):
     v = arm.matrix_world @ (pb.tail if tail else pb.head)
     return to_game(np.array([v.x, v.y, v.z]))
 
-def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, planar=3.0, cut=None):
+def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, planar=3.0, cut=None, drop_alpha=0.0, glass_alpha=0.0):
     """The triangles of `objs`, as Blender evaluates them (armature posed, modifiers applied). `classes`: {material name regex: class} before the
     name rules; `drop`: material name regexes whose faces are returned apart as the second soup (a flame's anchor is read from them);
-    `decimate_to`: a triangle count to reduce each object toward; `cut`: (point, normal) bisecting planes keeping the side the normal points to."""
+    `decimate_to`: a triangle count to reduce each object toward; `cut`: (point, normal) bisecting planes keeping the side the normal points to;
+    `drop_alpha`: faces whose texture is clearer than this (a glass wall) are returned apart with the dropped ones; `glass_alpha`: faces whose texture is
+    clearer than this are kept, as glass (class GLASS: a jar's wall, an hourglass's bulbs)."""
     out, dropped = Soup(), Soup()
     classes = classes or {}
     drop = [drop] if isinstance(drop, str) else (drop or [])
@@ -285,7 +309,14 @@ def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, p
             if cls is None:
                 cls = classify_colour(col)
             tri = to_game(verts[list(t.vertices)])
-            target = dropped if any(re.search(p, name, re.I) for p in drop) else out
+            clear = False
+            if (drop_alpha or glass_alpha) and img is not None and uvs is not None:
+                alpha = image_alpha(img)
+                a = None if alpha is None else float(sample_face(alpha, uvs[list(t.loops)])[0])
+                clear = bool(drop_alpha) and a is not None and a < drop_alpha
+                if glass_alpha and a is not None and a < glass_alpha and not clear:
+                    cls = GLASS
+            target = dropped if clear or any(re.search(p, name, re.I) for p in drop) else out
             target.add(tri[None], col[None], np.array([cls], dtype=np.int32), np.array([mi], dtype=np.int32))
         bpy.data.meshes.remove(me)
     return out, dropped

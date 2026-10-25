@@ -116,6 +116,12 @@ describe('the packs\' licences (docs/BOSS_PLACES.md)', () => {
     for (const [id, info] of Object.entries(BOSS_INFO)) expect(info.kit, id).not.toBe('p07');
   });
 
+  it('bake nothing from pack 41 (PSX Shelves), which may not be redistributed as assets, nor name its models (round 79)', () => {
+    expect(manifests).not.toMatch(/p41/);
+    for (const [id, info] of Object.entries(BOSS_INFO)) expect(info.kit, id).not.toBe('p41');
+    expect(Object.keys(BOSS_INFO).filter((id) => id.startsWith('ps_'))).toEqual([]);
+  });
+
   it('credit every pack a model comes from, and name the changes the CC BY ones ask for', () => {
     const credits = readFileSync('src/data/models/CREDITS.md', 'utf8');
     const kits = new Set(Object.values(BOSS_INFO).map((i) => i.kit).filter((k) => k !== 'proc'));

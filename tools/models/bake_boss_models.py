@@ -16,6 +16,7 @@ import manifest as MF
 import proc as PR
 import proc_more as PR2
 import proc_grove as PR3
+import fill as FL
 import proc_rites as PR4
 PROC = {**PR.PROC, **PR2.PROC, **PR3.PROC, **PR4.PROC}
 
@@ -61,11 +62,16 @@ def bake_one(m, work):
         arm = objs[0].find_armature()
         if m.pose and arm:
             S.pose_armature(arm, m.pose)
-        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut)
+        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut, drop_alpha=m.drop_alpha, glass_alpha=m.glass_alpha)
         pos, col, cls, _ = soup.done()
+        if m.plane and len(pos):
+            cls = FL.panel(pos, cls, m.plane)
         if m.recolour is not None and len(col):
             luma = col @ np.array([.299, .587, .114])
-            col = np.clip(np.array(m.recolour)[None, :] * (0.55 + 0.9 * np.minimum(1, luma * 1.3))[:, None], 0, 1)
+            new = np.clip(np.array(m.recolour)[None, :] * (0.55 + 0.9 * np.minimum(1, luma * 1.3))[:, None], 0, 1)
+            col = np.where(np.isin(cls, m.recolour_not)[:, None], col, new)
+        if len(pos) and m.fill:
+            pos, col, cls = FL.liquid(pos, col, cls, m.fill)
         if len(pos) and m.blank and arm:
             pos, col, cls = blank_head(pos, col, cls, arm, m.blank)
         if m.pose and arm:
@@ -106,7 +112,8 @@ def bake_one(m, work):
 def look(pos, col, cls):
     """Colours as the game lays them (a class's base colour by the light and dark of the face), for the contact sheet."""
     base = {S.STONE: (.5, .5, .48), S.WOOD: (.36, .27, .2), S.LEAF: (.24, .3, .26), S.ROCK: (.42, .42, .4), S.SLAB: (.58, .56, .5), S.COBBLE: (.4, .4, .38),
-            S.BRICK: (.5, .34, .3), S.CLOTH: (.6, .5, .3), S.METAL: (.3, .27, .26), S.BONE: (.85, .8, .68), S.GLOW: (1, .8, .5)}
+            S.BRICK: (.5, .34, .3), S.CLOTH: (.6, .5, .3), S.METAL: (.3, .27, .26), S.BONE: (.85, .8, .68), S.GLOW: (1, .8, .5),
+            S.GLASS: (.62, .68, .66), S.LIQUID: (.3, .55, .35), S.MIRROR: (.8, .85, .9), S.WAX: (.82, .74, .56)}
     luma = col @ np.array([.299, .587, .114])
     shade = 0.55 + 0.9 * np.minimum(1, luma * 1.3)
     return np.array([np.array(base.get(int(c), base[S.STONE])) for c in cls]) * shade[:, None]
