@@ -123,10 +123,13 @@ export const GATE_STYLES: Readonly<Record<string, GateStyle>> = {
       { model: 'tp_door_moon', span: [0, 0.5], tint: [0.7, 0.58, 0.4], keep: 0.3, dim: 0.8, glyphs: true },
     ],
   },
-  // Its jaw: a portcullis of bone turned over, its points up, that sinks into the mound.
+  // Its jaw: the head of the Aztec serpent in profile, carved and fanged, set in the mouth of the mound before a slab of the mound's own earth, and the two go down together, as a serpent goes into the ground.
   yig: {
     motion: 'sink', sound: 'crypt',
-    parts: [{ model: 'gate_portcullis', span: [-0.5, 0.5], roll: 180, tall: 0.95, base: 0.1, dye: { metal: [0.62, 0.57, 0.45] }, keep: 0, dim: 0.85 }],
+    parts: [
+      { model: 'gate_boulder', span: [-0.5, 0.5], thin: 0.3, v: -1.3, base: 0.5, tint: [0.45, 0.4, 0.3], keep: 0.2, dim: 0.7 },
+      { model: 'gate_yig_head', jamb: 0, h: 6.4, y: -0.1, v: 1.2, tint: [0.82, 0.76, 0.62], keep: 0.3 },
+    ],
   },
   // The mouth at the foot of the ziggurat: two leaves of basalt, green-lit, that part like lips.
   nug: {
@@ -159,18 +162,23 @@ export const GATE_STYLES: Readonly<Record<string, GateStyle>> = {
     motion: 'swing', open: 100, sound: 'brick',
     parts: pair(IRON_L, IRON_R, { dye: { metal: [0.62, 0.5, 0.2] }, tint: [0.7, 0.62, 0.78], keep: 0.1 }),
   },
-  // The crystal wall's gate: an eclipse in two leaves that slide apart.
+  // The crystal wall's gate: an eclipse in two leaves that slide apart, and over each a half of a ring of spikes, a corona that comes apart with it.
   yog_sothoth: {
     motion: 'slide', sound: 'elder',
     parts: [
       { model: 'tp_door_sun', span: [-0.5, 0], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true },
       { model: 'tp_door_moon', span: [0, 0.5], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true },
+      { model: 'gate_demon_ring_l', span: [-0.5, 0], thin: 0.5, v: 1.0, base: 0.3, keep: 0, dye: { metal: [0.62, 0.7, 0.95] } },
+      { model: 'gate_demon_ring_r', span: [0, 0.5], thin: 0.5, v: 1.0, base: 0.3, keep: 0, dye: { metal: [0.62, 0.7, 0.95] } },
     ],
   },
-  // The Court's gate: black stone doors that go down into the floor, since nothing at the centre of all needs a hinge.
+  // The Court's gate: black stone doors that go down into the floor, since nothing at the centre of all needs a hinge, and before them a ring of spikes, the corona of a black sun, that goes down with them.
   azathoth: {
     motion: 'sink', sound: 'onyx',
-    parts: pair('tp_door_leaf', 'tp_door_leaf', { tint: [0.2, 0.2, 0.32], keep: 0, dim: 0.38, glyphs: true, base: 0.4 }),
+    parts: [
+      ...pair('tp_door_leaf', 'tp_door_leaf', { tint: [0.2, 0.2, 0.32], keep: 0, dim: 0.38, glyphs: true, base: 0.4 }),
+      { model: 'gate_demon_ring', span: [-0.5, 0.5], thin: 0.5, v: 1.2, base: 0.4, keep: 0, dye: { metal: [0.5, 0.32, 0.62] } },
+    ],
   },
   // Yaddith's door: leaves of the alien metal of its towers, that slide into the terrace wall.
   zkauba: {

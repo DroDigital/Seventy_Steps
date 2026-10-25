@@ -10,4 +10,8 @@ export const GATE_INFO: Readonly<Record<string, ModelInfo>> = {
   gate_timber_frame: { kit: 'w02', x0: -1.018, x1: 1.018, y0: 0.0, y1: 3.0, z0: -0.065, z1: 0.065, round: false, tris: 880, solids: [] },
   gate_boulder: { kit: 'w03', x0: -1.176, x1: 1.176, y0: 0.0, y1: 1.437, z0: -1.5, z1: 1.5, round: false, tris: 1260, solids: [] },
   gate_portcullis: { kit: 'w10', x0: -1.428, x1: 1.428, y0: 0.0, y1: 3.0, z0: -0.147, z1: 0.147, round: false, tris: 190, solids: [] },
+  gate_yig_head: { kit: 'w20', x0: -4.092, x1: 4.092, y0: 0.0, y1: 6.0, z0: -1.372, z1: 1.372, round: false, tris: 7999, solids: [] },
+  gate_demon_ring: { kit: 'w21', x0: -2.309, x1: 2.309, y0: 0.0, y1: 4.0, z0: -1.412, z1: 1.412, round: false, tris: 5999, solids: [] },
+  gate_demon_ring_l: { kit: 'w21', x0: -1.154, x1: 1.154, y0: 0.0, y1: 4.0, z0: -1.412, z1: 1.412, round: false, tris: 3484, solids: [] },
+  gate_demon_ring_r: { kit: 'w21', x0: -1.155, x1: 1.155, y0: 0.0, y1: 4.0, z0: -1.412, z1: 1.412, round: false, tris: 3290, solids: [] },
 };

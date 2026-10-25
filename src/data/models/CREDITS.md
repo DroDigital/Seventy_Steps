@@ -170,7 +170,7 @@ By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5aca
 # Credits: the arenas' gates (round 76)
 
 The leaves of the gates of the open arenas (`gateIndex.ts` + `gatePack.ts`, hung by `src/data/gateStyles.ts`, `render/gateRig.ts`) are cut from free models,
-all **Creative Commons Zero (CC0 1.0)**, which asks for no credit; it is given. They were made again for the game by `tools/models/bake_boss_models.py`
+**Creative Commons Zero (CC0 1.0)**, which asks for no credit (it is given), but for the serpent's head of Yig's gate (w20) and the spiked ring of the Court's (w21), which are **CC BY 4.0** and credited as it asks. They were made again for the game by `tools/models/bake_boss_models.py`
 from `tools/models/boss/manifest_gates.py` (`tools/models/gates/fetch.py` fetches the sources): each leaf taken singly, decimated, its colours kept only as
 light and dark (the game lays the arena's own over them) and its size fitted to the metres it hangs at. The gates also hang models of the packs credited above
 (the temple doors, the standing stones, the flutes, the basalt and the dead trees). Changes are named for each.
@@ -194,3 +194,13 @@ By Jenelle van Heerden (modelling) and Dario Barresi (photography), Poly Haven, 
 By Kenney (www.kenney.nl), https://kenney.nl/assets/castle-kit, licensed CC0 1.0. Changes: its metal gate taken singly, turned to face the court, recoloured by the arena's dye (and, for Yig's, turned over) and stretched to fit the opening.
 
 `gate_portcullis`
+
+## Gate source w20 — Aztec Double-Headed Serpent for printing
+By corentin (https://sketchfab.com/corentin), https://sketchfab.com/3d-models/aztec-double-headed-serpent-for-printing-0781a78d31914f00a1b19a61b69113d2, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: one of its two halves taken, its head cut from the neck and the coil and the cut closed, the three pieces the viewer split it into joined, decimated to about 8,000 faces, turned to face along the wall, recoloured by the arena's dye and scaled to the gate's opening.
+
+`gate_yig_head`
+
+## Gate source w21 — Demons Gate
+By Trockk (https://sketchfab.com/Timrockk), https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: decimated to about 6,000 faces, given the metal class, recoloured by the gate's dye, and stretched to the gate's opening and flattened to half the wall's thickness.
+
+`gate_demon_ring`

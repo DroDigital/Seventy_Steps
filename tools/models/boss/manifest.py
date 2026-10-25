@@ -13,6 +13,7 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default) or 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py)
   metal_luma  faces darker than this (0..1) are made `metal`, whatever the material said: the iron straps of a plank door
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
+  join     the objects it selects are made one before anything else (a model a viewer split at its vertex limit); `cap`: a `cut` is closed with triangles
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
            out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature
 """
@@ -50,6 +51,8 @@ class M:
     args: dict = field(default_factory=dict)  # a `proc:` form's arguments (tools/models/boss/proc.py)
     set: str = 'boss'
     metal_luma: float = 0
+    join: bool = False
+    cap: bool = False
     blank: Any = None  # a figure's head taken off at the bone of this name and an eyeless egg set in its place: {'bone': 'head', 'radii': (x, y, z)}
 
 REGISTRY: list = []

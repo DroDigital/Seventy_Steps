@@ -84,7 +84,7 @@ function hang(p: GatePart, def: HiddenPieceDef, move: GateMotion, stone: Rgb): R
   const face = (md * sz) / 2 + 0.03;
   const glow = p.glyphs ? runes(ANOMALY[def.glow], u - pivotU, tall - base, width, face) : null;
   const reach = move === 'slide' ? width + 0.45 : move === 'lift' ? H * (p.tall ?? 1) + 0.6 : move === 'sink' ? tall + 0.3 : 0;
-  return { pieces, glow, pivot: [pivotU, 0, p.v ?? 0], move, hinge, delay: p.delay ?? 0, reach, width };
+  return { pieces, glow, pivot: [pivotU, 0, (p.v ?? 0) * (door.out ?? 1)], move, hinge, delay: p.delay ?? 0, reach, width }; // (`v` is + toward the side the investigator comes from, whichever way the wall faces)
 }
 
 /** The rig of a house's gate by its style, or null where it has none (or the models are not read yet). */

@@ -228,10 +228,23 @@ def bone_point(arm, name, tail=False):
     v = arm.matrix_world @ (pb.tail if tail else pb.head)
     return to_game(np.array([v.x, v.y, v.z]))
 
-def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, planar=3.0, cut=None):
+def joined(objs):
+    """The mesh objects as one: a model a viewer split at its vertex limit into several, so that a weld, a cut and a decimation see it whole."""
+    if len(objs) < 2:
+        return objs
+    for o in list(bpy.context.selected_objects):
+        o.select_set(False)
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.join()
+    return [bpy.context.view_layer.objects.active]
+
+def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, planar=3.0, cut=None, cap=False):
     """The triangles of `objs`, as Blender evaluates them (armature posed, modifiers applied). `classes`: {material name regex: class} before the
     name rules; `drop`: material name regexes whose faces are returned apart as the second soup (a flame's anchor is read from them);
-    `decimate_to`: a triangle count to reduce each object toward; `cut`: (point, normal) bisecting planes keeping the side the normal points to."""
+    `decimate_to`: a triangle count to reduce each object toward; `cut`: (point, normal) bisecting planes keeping the side the normal points to;
+    `cap`: the mesh is welded first and each cut is closed with triangles (a solid cut apart stays a solid, not a shell open at the cut)."""
     out, dropped = Soup(), Soup()
     classes = classes or {}
     drop = [drop] if isinstance(drop, str) else (drop or [])
@@ -245,9 +258,18 @@ def soup_of(objs, classes=None, drop=None, default_cls=None, decimate_to=None, p
             mw = np.eye(4)
             bm = bmesh.new()
             bm.from_mesh(me)
+            if cap:
+                bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
             for (pt, nrm) in cut:  # blender space
                 geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
-                bmesh.ops.bisect_plane(bm, geom=geom, plane_co=pt, plane_no=nrm, clear_inner=True)
+                res = bmesh.ops.bisect_plane(bm, geom=geom, plane_co=pt, plane_no=nrm, clear_inner=True)
+                if cap:
+                    edges = [e for e in res['geom_cut'] if isinstance(e, bmesh.types.BMEdge) and e.is_valid and len(e.link_faces) == 1]
+                    if edges:
+                        out_of_the_solid = __import__('mathutils').Vector(nrm)  # (the kept side is where the normal points: the cap faces away from it)
+                        for f in bmesh.ops.triangle_fill(bm, use_beauty=True, edges=edges)['geom']:
+                            if isinstance(f, bmesh.types.BMFace) and f.normal.dot(out_of_the_solid) > 0:
+                                f.normal_flip()
             bm.to_mesh(me)
             bm.free()
         if decimate_to:
