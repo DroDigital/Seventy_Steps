@@ -277,17 +277,19 @@ void main() {
     pud = smoothstep(thr, thr + 0.06, pn) * smoothstep(0.86, 0.97, n.y);
     tex *= 1.0 - uWet * (0.1 + 0.16 * n.y) - 0.3 * pud;
   }
+  float coated = 0.0; // how much of what a pixel shows is the realm's matter: snow and salt hold the sky's light a little, as the pale things of a night do
   if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 78: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
     float cn = 0.6 * vnoise(vWorld.xz * 0.8 + vWorld.y * 0.37 + 23.0) + 0.4 * vnoise(vWorld.xz * 2.3 - vWorld.y * 0.9 + 5.0);
     float cap = uCoatA.x * smoothstep(0.4, 0.75, n.y + (cn - 0.5) * 0.7);
     float windward = max(dot(n.xz, vec2(-0.86, -0.5)), 0.0) * (1.0 - n.y); // faces turned into the wind the grass leans from
     float film = uCoatA.y * smoothstep(0.2, 0.55, windward + (cn - 0.5) * 0.8);
     float cover = clamp(max(cap, film), 0.0, 1.0) * uCoatA.w;
-    tex = mix(tex, uCoatCol * (0.78 + 0.45 * dot(tex, vec3(0.333))), cover); // (the stone's own light and dark still show through a little)
+    tex = mix(tex, uCoatCol * (0.95 + 0.7 * dot(tex, vec3(0.333))), cover); // (the stone's own light and dark still show through a little)
     float above = vWorld.y + (cn - 0.5) * uCoatLine.z - uCoatLine.x; // metres above the stain's line, wandering
     float stain = uCoatA.z * (1.0 - smoothstep(0.0, uCoatLine.y, above)) * uCoatA.w;
-    float crust = uCoatLine.w * smoothstep(-0.1, 0.12, above) * (1.0 - smoothstep(0.12, 0.5, above)) * step(0.01, uCoatA.z) * uCoatA.w; // salt dried along the line
-    tex = mix(tex * mix(vec3(1.0), uCoatStain, stain), vec3(0.62, 0.64, 0.6), crust * 0.7);
+    float crust = uCoatLine.w * smoothstep(-0.2, 0.05, above) * (1.0 - smoothstep(0.1, 0.6, above)) * step(0.01, uCoatA.z) * uCoatA.w; // salt dried along the line
+    tex = mix(tex * mix(vec3(1.0), uCoatStain, stain), vec3(0.8, 0.82, 0.78), crust * 0.85);
+    coated = max(cover, crust);
   }
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
@@ -302,6 +304,7 @@ void main() {
   if (floorish > 0.01) streak += 0.4 * uLanternColor * lanternFalloff(ld) * lanternVis * pow(max(dot(n, normalize(toLamp / max(ld, 0.001) + toEye)), 0.0), uSheen.y);
   lamp *= (1.0 - uEmissive) * vTint;
   vec3 lit = vLight - vMoon * (1.0 - moonLit(vWorld, n, max(dot(n, uLightDir), 0.0))) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
+  lit += uCoatCol * coated * 0.14;
   float peak = max(max(lit.r, lit.g), max(lit.b, 0.001));
   lit *= mix(1.0, min(1.0, uSelfMax / peak), self * max(1.0 - uEmissive, 0.0));
   tex = mix(tex, vec3(1.0), 0.6 * uEmissive); // a lit thing shines through its texture

@@ -8,7 +8,7 @@ export const BODY_PUSH = {
   slots: 4, // bodies the shader parts the grass for at once: the investigator and the nearest three (the shader's `uBodies[4]`)
   reach: 14, // metres from the camera that a foe still parts it
   foot: 0.55, // metres: the investigator's reach on foot when the body says none
-  rig: 1.4, // metres: a rig and its horses part a lane this wide
+  rig: 1.0, // metres: a rig and its horses part a lane this wide
   most: 2.2, // metres: the broadest a body parts it (a colossus does not part a field)
   least: 0.25, // and the least (a rat)
   leap: 4, // metres a body moves in a frame before it is taken for a journey (nothing is trampled between)
