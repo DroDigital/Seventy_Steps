@@ -47,6 +47,8 @@ export function createFauna(scene: THREE.Scene, g: Game, cry: (voice: VoiceId, a
   geo.setAttribute('aCell', cells);
   geo.setAttribute('aInfo', info);
   geo.setAttribute('aWeird', attr(1)); // none of them is wrong
+  geo.setAttribute('aFx', attr(4)); // none goes or wears (round 78)
+  geo.setAttribute('aWound', attr(4));
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;

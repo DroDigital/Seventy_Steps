@@ -16,72 +16,26 @@ import { wrapAngle } from '../core/geom';
 import type { Variant } from '../data/registry';
 import { REVIEWED_EYES } from '../data/reviewedLook';
 import { FEEDBACK, FOG_EYES, LIGHT, SIM } from '../data/tuning';
-import { moveDef } from '../systems/actions';
-import { isAbsent, isUnroused, isUnseen, type Game } from '../systems/components';
+import { isUnroused, type Game } from '../systems/components';
 import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
-import { strikeFrame } from '../systems/realityTricks';
 import { buildAssembly, type Assembly } from './assemblies';
-import { createArrivals, risesOut, type Arrival } from './bossArrival';
+import { createArrivals, risesOut } from './bossArrival';
+import { createCreatureFx, type Gone } from './creatureFx';
+import { lookOf, phaseOf, type Look } from './creatureLook';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { createHalos } from './halos';
 import { MIST } from './volumetricFog';
 import { sight } from '../systems/perception';
 import { CELL, spriteKey, type SpriteAtlas } from './sprites/atlas';
 import { spriteBatch, reviewedTextures } from './sprites/batch';
-import { attackFrame, clipCounts, lastFrame, loopFrame, reactionFrame, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteAction, type SpriteDirection } from './sprites/directional';
+import { clipCounts, resolveDirectionalClip, spriteDirection, type DirectionalClip, type SpriteAction, type SpriteDirection } from './sprites/directional';
 import { reviewedClips, reviewedSize, reviewedSpan, type ReviewedManifest } from './sprites/reviewed';
 
 const CAPACITY = 64;
-const REACTIONS = new Set(['stagger', 'guardBreak', 'parried']);
 const PHANTOM_WEIRD = 0.45; // how far a hallucination (or a boss's decoy) slips and glitches: it is not quite there
 
-interface Look {
-  state: SpriteAction;
-  frame: number;
-  opacity: number;
-  sink: number; // 0..1 through the death move
-  lash: number; // 0..1 around an attack's strike
-  appear?: number; // 0..1 how far a horror just roused has come into view (render/bossArrival.ts); absent: wholly
-}
-
-/** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose). */
-export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number, arrive?: Arrival): Look | null {
-  const c = g.ecs.c;
-  const br = c.brain.get(id);
-  if (isAbsent(g, id) || br?.state === 'hidden' || isUnseen(g, id)) return null;
-  const a = c.actor.get(id)!;
-  const def = moveDef(a);
-  const tr = c.transform.get(id)!;
-  const invisible = br?.def.params.hide === 'invisible';
-  let look: Look;
-  if (a.move === 'death' && def) {
-    const t = a.frame / def.frames;
-    look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1 - t, sink: t, lash: 0 };
-  } else if ((counts.stoop ?? 0) > 0 && stooped(g, id)) { // a colossus after a blow of its own, or reeling: its head is down within reach (hurt.ts), and the picture bows to match; once, then held
-    const down = (counts.stoop_mid ?? 0) > 0 ? FEEDBACK.midSeconds : 0; // the head comes down through its halfway pose, where it has one
-    look = stoopAge < down ? { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 } : { state: 'stoop', frame: stoopAge < down + FEEDBACK.bowSeconds ? 0 : counts.stoop! - 1, opacity: 1, sink: 0, lash: 0 };
-  } else if ((counts.stoop_mid ?? 0) > 0 && riseAge !== undefined && riseAge < FEEDBACK.riseSeconds && a.move === null) { // and comes up through it
-    look = { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 };
-  } else if (a.move === 'evade') {
-    look = { state: 'move', frame: loopFrame(time, counts.move ?? 2, 0.5), opacity: 1, sink: 0, lash: 0 };
-  } else if (a.move !== null && REACTIONS.has(a.move)) {
-    look = { state: 'hurt', frame: reactionFrame(a.frame, def?.frames ?? 16, counts.hurt ?? 2), opacity: 1, sink: 0, lash: 0 };
-  } else if (a.move !== null && def) {
-    const strike = strikeFrame(def) ?? Math.floor(def.frames / 3);
-    const end = def.hit?.window[1] ?? strike + 6;
-    const frame = attackFrame(a.frame, def.frames, strike, end, counts.attack ?? 3);
-    look = { state: 'attack', frame, opacity: 1, sink: 0, lash: a.frame < strike ? a.frame / Math.max(1, strike) * 0.3 : a.frame < end ? 1 : 0.3 };
-  } else {
-    const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
-    // a creature with its own flight cycle flies it (the Shantak's wing-beat, round 48); the others walk or stand as before
-    if (moving && counts.flight) look = { state: 'flight', frame: loopFrame(time, counts.flight, 1), opacity: 1, sink: 0, lash: 0 };
-    else look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
-  }
-  if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
-  if (arrive && arrive.appear < 1) [look.opacity, look.appear, look.sink] = [look.opacity * arrive.appear, arrive.appear, Math.max(look.sink, arrive.sink)]; // a horror just roused comes into view, the great ones up out of the ground
-  return look;
-}
+export { lookOf, type Look };
 
 /** An echo: the same body, part dithered away. */
 function ghost(a: Assembly, share: number): Assembly {
@@ -138,13 +92,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const glows = createHalos(CAPACITY, 0.55);
+  const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 78)
   scene.add(glows.mesh);
   const flat = new THREE.Vector3(); // the camera's right, level
   const counts = pages.map(() => 0); // billboards put in each reviewed page's batch this frame
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   const spans = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSpan(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
-  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number) => {
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number }) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
     const page = art!.manifest.pages[frame.page];
     const b = pages[frame.page];
@@ -155,6 +110,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
     b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width, size.height, 1)));
+    fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     counts[frame.page]++;
     return frame;
   };
@@ -164,7 +120,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     const [lo, hi] = LIGHT.eyes;
     const d = Math.hypot(px - eye.x, py - eye.y, pz - eye.z);
     const near = Math.max(1 - THREE.MathUtils.smoothstep(d, lo, hi), out * (1 - THREE.MathUtils.smoothstep(d, hi, hi + FOG_EYES.reach))); // in a mist, one that has seen the investigator looks out of it from far off
-    const gain = (LIGHT.eyeGlow.gain + FOG_EYES.boost * out) * near * look.opacity * (1 - look.sink);
+    const gain = (LIGHT.eyeGlow.gain + FOG_EYES.boost * out) * near * look.opacity * (1 - look.sink) * (1 - (look.dissolve ?? 0)) * (look.appear ?? 1);
     if (gain > 0.01) glows.put(px, py, pz, LIGHT.eyeGlow.radius * (1 + FOG_EYES.swell * out) + spread, rgb, gain);
   };
   /** A faint glow about the eyes of a sprite drawn at (x, y, z), `size` metres, in atlas cell `cell`. */
@@ -242,12 +198,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
         const bow = entry ? stoopOf(id, key, time) : undefined;
+        const beat = time + phaseOf(id); // its own place in its cycles: a pack does not step as one (round 78)
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
         const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
         const direction = entry && art ? spriteDirection(yaw, { x, z }, camera.position, directions.get(id)) : undefined;
-        const look = lookOf(g, id, time, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise, arrival);
+        const look = lookOf(g, id, beat, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...known(bow) }, bow?.age, bow?.rise, arrival);
+        const gone = fx.gone(id, def, model, look, time); // (told of every creature, hidden or not: a hidden one rises when it shows)
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
@@ -256,9 +214,9 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
-          const pose = lookOf(g, id, time, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
+          const pose = lookOf(g, id, beat, { ...known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
-          const frame = put(key, clip, pose, x, y, z, flash, 1, weird);
+          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time });
           if (!frame) continue;
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
           if (direction === 'front' && !clip.mirror_horizontal) reviewedEyes(key, x, y, z, pose, camera.position, mistLook(id, time));
@@ -266,11 +224,11 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
             ECHOES.forEach((e, i) => {
               const behind = known(bow);
               const age = bow ? Math.max(0, bow.age - e.lag) : 0;
-              const late = lookOf(g, id, time - e.lag, behind, age, bow?.rise, arrival);
+              const late = lookOf(g, id, beat - e.lag, behind, age, bow?.rise, arrival);
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, time - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
+              put(key, lagged, lookOf(g, id, beat - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
             });
           }
           continue;
@@ -311,12 +269,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         cells.setXYZW(n, cx / atlas.width, cy / atlas.height, (cx + CELL) / atlas.width, (cy + CELL) / atlas.height);
         const facingRight = Math.sin(tr.yaw) * right.x + Math.cos(tr.yaw) * right.z >= 0;
         info.setXYZW(n, flash, look.opacity, facingRight ? 0 : 1, def.sprite.outside ? 1 : 0);
+        fx.dress(fallback, n, { id, gone }, x, y - look.sink * def.sprite.scale * 0.3, z, def.sprite.scale, def.sprite.scale, flat, time);
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, mistLook(id, time));
       }
       arrivals.forget(seen);
+      fx.forget(seen);
       for (const id of looking.keys()) if (!seen.has(id)) looking.delete(id);
       for (const id of stoopSince.keys()) if (!seen.has(id)) stoopSince.delete(id);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);

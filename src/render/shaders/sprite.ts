@@ -12,6 +12,7 @@
 import { VOID_GLSL } from './eldritch';
 import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL } from './common';
 import { SHADOW_GLSL } from './shadow';
+import { SPRITE_FX_GLSL } from './spriteFx';
 import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
 export const SPRITE_VERT = /* glsl */ `
@@ -26,6 +27,8 @@ uniform float uCharacterLight;
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
 attribute vec4 aInfo; // flash, opacity, flip, outside the palette
 attribute float aWeird; // 0..1: how far it refuses to hold its shape (eldritch.ts)
+attribute vec4 aFx; // how far gone, in what style, how worn, a seed (spriteFx.ts)
+attribute vec4 aWound; // where the last blow fell, its flash, its reach
 
 varying vec2 vUv;
 varying vec3 vLight;
@@ -36,6 +39,10 @@ varying float vOpacity;
 varying float vOutside;
 varying float vWeird;
 varying vec4 vCell;
+varying vec4 vFx;
+varying vec4 vWound;
+varying vec2 vQuad;
+varying vec2 vSize;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
 ${SHADOW_GLSL}
@@ -47,9 +54,10 @@ void main() {
   vec3 wp = origin + right * position.x * w + vec3(0.0, position.y * h, 0.0);
   vec4 vp = viewMatrix * vec4(wp, 1.0);
   vec4 clip = projectionMatrix * vp;
-  if (uSnap > 0.0 && clip.w > 0.0) {
+  if (uSnap > 0.0 && clip.w > 0.0) { // the quad as a whole, by where it stands (round 78: its four corners were each snapped, so as it moved its size, and which of its texel rows were two pixels tall, crawled)
+    vec4 foot = projectionMatrix * (viewMatrix * vec4(origin, 1.0));
     vec2 grid = uRes * 0.5 / uSnap;
-    clip.xy = floor(clip.xy / clip.w * grid + 0.5) / grid * clip.w;
+    clip.xy += floor(foot.xy / foot.w * grid + 0.5) / grid * foot.w - foot.xy;
   }
   gl_Position = clip;
   float u = aInfo.z > 0.5 ? 1.0 - uv.x : uv.x;
@@ -64,6 +72,10 @@ void main() {
   vOutside = aInfo.w;
   vWeird = aWeird;
   vCell = aCell;
+  vFx = aFx;
+  vWound = aWound;
+  vQuad = uv;
+  vSize = vec2(w, h);
 }
 `;
 
@@ -88,6 +100,7 @@ varying vec4 vCell;
 ${NOISE_GLSL}
 ${VOID_GLSL}
 ${SPRITE_GRADE_GLSL}
+${SPRITE_FX_GLSL}
 
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
@@ -107,7 +120,9 @@ vec2 slip(vec2 uv) {
 
 void main() {
   vec2 uv = vWeird > 0.2 ? slip(vUv) : vUv;
-  vec4 t = texture(uAtlas, uv);
+  vec3 src = fxSource(uv); // a body that is going or forming has its texels moved (spriteFx.ts)
+  if (src.z < 0.5) discard;
+  vec4 t = texture(uAtlas, src.xy);
   if (vWeird >= 0.6 && t.a < 0.3) { // a faint double of it, lagging to one side
     vec2 lag = vec2(clamp(uv.x + sin(uTime * 1.3) * 0.08 * (vCell.z - vCell.x), vCell.x, vCell.z), uv.y);
     if (texture(uAtlas, lag).a < 0.3 || 0.3 * vOpacity < bayer4(gl_FragCoord.xy)) discard;
@@ -119,7 +134,8 @@ void main() {
   vec3 col = glow ? t.rgb : t.rgb * vLight;
   if (uReviewed > 0.5) col = spriteGraded(col); // the realm's colours on the older art, brightness kept (round 78: spriteGrade.ts)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
-  col = mix(col, vec3(1.0), vFlash);
+  col = fxWear(col, vFlash); // its wounds, and the flash of the blow about where it fell
+  if (!fxKeep(src.xy, col)) discard; // and the texels that are gone, with their rim
   float fog = vFog * uFogAmount;
   if (vOutside > 0.5 && uReviewed < 0.5) {
     // A colour no palette holds: every hue at once, crawling over it, bright wherever it is lit.
