@@ -7,6 +7,7 @@
  */
 
 import { SPACE } from '../../../data/acoustics';
+import { darkOf, phaseOf } from '../../../systems/clock';
 import { engagedFights } from '../../../systems/bossFight';
 import { kitIdOfRoom } from '../../../world/dungeonKit';
 import { dungeonRoomAt } from '../../../world/terrain';
@@ -28,7 +29,7 @@ export function createSpace(ctx: AtmAudioContext): AtmAudioPart {
   let [asked, last] = [-Infinity, performance.now() / 1000];
   const open = (h: HeardLight): number => (h.kind === 'torch' || h.kind === 'fire' ? h.v : 1 - ears.occludedAt(h));
   return {
-    update(_fx, _seconds, _camera, paused) {
+    update(_fx, seconds, _camera, paused) {
       const now = performance.now() / 1000;
       const on = safety.frame((now - last) * 1000, now);
       last = now;
@@ -48,7 +49,7 @@ export function createSpace(ctx: AtmAudioContext): AtmAudioPart {
           bus.set(spaceOf(input), wet);
         }
       }
-      hearth.update(g.overworld ? HEARD_LIGHTS : NONE, ctx.listener, ctx.right, open, paused);
+      hearth.update(g.overworld ? HEARD_LIGHTS : NONE, ctx.listener, ctx.right, open, paused, g.overworld ? Math.min(1, darkOf(phaseOf(seconds)) * 2) : 0); // (the street lamps hiss as the dusk shows them)
     },
   };
 }

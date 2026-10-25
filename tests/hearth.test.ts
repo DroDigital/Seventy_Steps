@@ -114,6 +114,13 @@ describe('which lights are heard (round 78)', () => {
     expect(hearthPlan([light('torch', 3, { flicker: 9 })], ear, right, () => 1)[0]!.flick).toBe(1.6);
   });
 
+  it('hisses a street lamp only as the dusk lights it, and a torch at any hour', () => {
+    expect(hearthPlan([light('lamp', 2)], ear, right, () => 1, 0)).toHaveLength(0);
+    const [dusk, night] = [hearthPlan([light('lamp', 2)], ear, right, () => 1, 0.4)[0]!.level, hearthPlan([light('lamp', 2)], ear, right, () => 1, 1)[0]!.level];
+    expect(dusk).toBeCloseTo(night * 0.4, 6);
+    expect(hearthPlan([light('torch', 2)], ear, right, () => 1, 0)).toHaveLength(1);
+  });
+
   it('knows a light by its place: the same light is the same voice from frame to frame', () => {
     expect(keyOf({ x: 3, y: 2, z: 1 })).toBe(keyOf({ x: 3.001, y: 2, z: 1 }));
     expect(keyOf({ x: 3, y: 2, z: 1 })).not.toBe(keyOf({ x: 3, y: 2, z: 1.5 }));

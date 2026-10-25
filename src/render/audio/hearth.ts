@@ -18,8 +18,8 @@ import { noiseSource } from './synth';
 export const HEARTH_NOW: { sounding: number; kind: string; d: number } = { sounding: 0, kind: '', d: Infinity };
 
 export interface Hearth {
-  /** Each frame: the lights in earshot, where the listener is, which way is right, and `open` (0..1) for how clear each is to the ear. */
-  update(heard: readonly HeardLight[], listener: V3, right: V3, open: (h: HeardLight) => number, paused: boolean): void;
+  /** Each frame: the lights in earshot, where the listener is, which way is right, `open` (0..1) for how clear each is to the ear, and `lamps` (0..1) for how far the street lamps are lit by the hour. */
+  update(heard: readonly HeardLight[], listener: V3, right: V3, open: (h: HeardLight) => number, paused: boolean, lamps?: number): void;
 }
 
 interface Voice {
@@ -131,12 +131,12 @@ export function createHearth(e: AudioEngine): Hearth {
   }
 
   return {
-    update(heard, listener, right, open, paused) {
+    update(heard, listener, right, open, paused, lamps = 1) {
       const { ctx, bed } = e;
       if (!ctx || !bed) return;
       if (!voices.length) for (let i = 0; i < HEARTH.voices; i++) voices.push(make(ctx, bed));
       const now = ctx.currentTime;
-      const plan = paused ? [] : hearthPlan(heard, listener, right, open);
+      const plan = paused ? [] : hearthPlan(heard, listener, right, open, lamps);
       [HEARTH_NOW.kind, HEARTH_NOW.d] = !paused && heard[0] ? [heard[0].kind, heard[0].d] : ['', Infinity]; // (the list is nearest first)
       for (const v of voices) v.fading = v.key !== 0; // (told otherwise below for every light in the plan)
       for (const p of plan) {

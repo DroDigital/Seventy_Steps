@@ -32,14 +32,15 @@ const plan: Voicing[] = [];
 
 /**
  * The voices to sound for `heard`, loudest first. `open`: how much of the light is in the open to the ear, 0 (stone between) to 1 (the
- * eye sees it); the lights the eye is not asked about (lamps, Signs) are asked of the occlusion instead. The array is reused.
+ * eye sees it); the lights the eye is not asked about (lamps, Signs) are asked of the occlusion instead. `lamps` (0..1): how far the street lamps are
+ * lit (they burn in the picture at every hour but are only seen at dusk; they hiss only as they are seen). The array is reused.
  */
-export function hearthPlan(heard: readonly HeardLight[], listener: V3, right: V3, open: (h: HeardLight) => number): readonly Voicing[] {
+export function hearthPlan(heard: readonly HeardLight[], listener: V3, right: V3, open: (h: HeardLight) => number, lamps = 1): readonly Voicing[] {
   plan.length = 0;
   for (const h of heard) {
     if (h.kind === 'window') continue;
     const k = HEARTH.kinds[h.kind];
-    if (h.d >= k.range) continue;
+    if (h.d >= k.range || (h.kind === 'lamp' && lamps <= 0.02)) continue;
     const hidden = 1 - Math.min(1, Math.max(0, open(h)));
     const law = lawOf(h.d, k.range);
     if (law <= 0) continue;
@@ -49,7 +50,7 @@ export function hearthPlan(heard: readonly HeardLight[], listener: V3, right: V3
     const v: Voicing = {
       key: keyOf(h),
       kind: h.kind,
-      level: k.gain * law * (HEARTH.floor + (1 - HEARTH.floor) * (1 - hidden)),
+      level: k.gain * law * (HEARTH.floor + (1 - HEARTH.floor) * (1 - hidden)) * (h.kind === 'lamp' ? lamps : 1),
       cutoff: HEARTH.dull + (k.cutoff - HEARTH.dull) * (1 - hidden) * (0.45 + 0.55 * (1 - h.d / k.range)),
       pan: flat < 1e-3 ? 0 : (AUDIO.pan * (dx * right.x + dz * right.z)) / flat,
       flick: Math.min(1.6, Math.max(0, h.flicker)),
