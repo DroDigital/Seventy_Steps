@@ -42,7 +42,7 @@ describe('where a light throws its glow in the mist (round 80)', () => {
 
   it('is read by the fog march: each lamp\'s glow is shaped by it, and the lantern\'s is not', () => {
     expect(POST_FRAG).toContain('uniform vec4 uLampAim[');
-    expect(POST_FRAG).toContain('uLampColors[i] * uFogGlow, l.w, k, uLampAim[i]');
-    expect(POST_FRAG).toContain('uLanternRange * 1.2, k, vec4(0.0))');
+    expect(POST_FRAG).toContain('uLampColors[i] * uFogGlow, l.w, k, uLampAim[i], uLampPlane[i]');
+    expect(POST_FRAG).toContain('uLanternRange * 1.2, k, vec4(0.0), vec4(0.0))');
   });
 });

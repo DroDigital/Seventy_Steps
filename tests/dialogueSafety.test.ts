@@ -21,14 +21,14 @@ describe('a dialogue keeps the investigator safe, and foes let go of them', () =
     const hp = g.ecs.c.health.get(player)!.hp;
     const sanity = g.mind.sanity;
     const blow = { damage: 40, poise: 1000, guard: 0, hitstop: 3, parryable: false, interrupts: true };
-    g.talking = true;
+    g.sheltered = true;
     expect(strike(g, foe, player, blow)).toBe('dodged');
     shove(g, player, { ...me.pos, x: me.pos.x - 1 }, 10);
     expect(g.ecs.c.shove.has(player)).toBe(false);
     loseSanity(g, 30);
     expect(g.mind.sanity).toBe(sanity);
     expect(g.ecs.c.health.get(player)!.hp).toBe(hp);
-    g.talking = false;
+    g.sheltered = false;
     expect(strike(g, foe, player, blow)).not.toBe('dodged');
     expect(g.ecs.c.health.get(player)!.hp).toBeLessThan(hp);
   });
@@ -39,7 +39,7 @@ describe('a dialogue keeps the investigator safe, and foes let go of them', () =
     const br = g.ecs.c.brain.get(foe)!;
     br.state = 'engage';
     br.target = player;
-    g.talking = true;
+    g.sheltered = true;
     let attacked = false;
     for (let i = 0; i < 120; i++) {
       brainSystem(g);
@@ -50,7 +50,7 @@ describe('a dialogue keeps the investigator safe, and foes let go of them', () =
     expect(br.state).not.toBe('engage');
     expect(attacked).toBe(false);
     expect(targetsOf(g, foe)).not.toContain(player);
-    g.talking = false;
+    g.sheltered = false;
     expect(targetsOf(g, foe)).toContain(player);
   });
 
@@ -60,10 +60,10 @@ describe('a dialogue keeps the investigator safe, and foes let go of them', () =
     g.mind.band = 'unmoored';
     h.hp = h.max * 0.8;
     const hp = h.hp;
-    g.talking = true;
+    g.sheltered = true;
     bleed(g, 1);
     expect(h.hp).toBe(hp);
-    g.talking = false;
+    g.sheltered = false;
     bleed(g, 1);
     expect(h.hp).toBeLessThan(hp);
   });

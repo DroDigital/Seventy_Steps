@@ -3,6 +3,7 @@ import { strike } from '../src/systems/combat';
 import { spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
 import { createDialogue } from '../src/ui/dialogue';
+import { createSignMenu } from '../src/ui/signMenu';
 
 // The screens are stood in for: what is under test is when a dialogue opens, not how it is drawn.
 vi.mock('../src/ui/menuKit', () => ({
@@ -12,6 +13,11 @@ vi.mock('../src/ui/menuKit', () => ({
   el: () => ({}),
   button: () => ({}),
   frame: () => '',
+}));
+// The mounts tab and its entitlement check are not under test; the sign's rest is.
+vi.mock('../src/ui/mounts', () => ({
+  mountsTab: () => {},
+  refreshMountEntitlement: () => Promise.resolve(),
 }));
 
 beforeEach(() => {
@@ -35,10 +41,10 @@ describe('a dialogue that opens within a step holds the investigator safe for th
   it('a talk is protected the moment it opens, not at the start of the next step', () => {
     const { g, foe } = foeBeside();
     const dialogue = createDialogue(g);
-    expect(g.talking).toBe(false);
+    expect(g.sheltered).toBe(false);
     g.events.emit('Talked', { npc: 'nasht', name: 'Nasht', title: 'Priest', lines: ['Hello.'] });
     expect(dialogue.talking).toBe(true);
-    expect(g.talking).toBe(true);
+    expect(g.sheltered).toBe(true);
     expect(strike(g, foe, g.player.id, blow)).toBe('dodged');
   });
 
@@ -46,7 +52,17 @@ describe('a dialogue that opens within a step holds the investigator safe for th
     const { g, foe } = foeBeside();
     createDialogue(g);
     g.events.emit('Read', { name: 'Necronomicon' });
-    expect(g.talking).toBe(true);
+    expect(g.sheltered).toBe(true);
+    expect(strike(g, foe, g.player.id, blow)).toBe('dodged');
+  });
+
+  it('a rest at an Elder Sign is protected the moment its menu opens, as the rest is made within a step', () => {
+    const { g, foe } = foeBeside();
+    const sign = createSignMenu(g, () => {});
+    expect(g.sheltered).toBe(false);
+    g.events.emit('Rested', { sign: 'arkham', name: 'Arkham' });
+    expect(sign.open).toBe(true);
+    expect(g.sheltered).toBe(true);
     expect(strike(g, foe, g.player.id, blow)).toBe('dodged');
   });
 });

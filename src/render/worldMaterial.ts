@@ -57,6 +57,7 @@ export const worldUniforms = {
   uLSInfo: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] },
   uLSBias: { value: new THREE.Vector4() },
   uLampColors: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector3()) },
+  uLampPlane: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // windows shine out from their glass; zero leaves other lights omnidirectional
   uCharacterLight: { value: LIGHT.character },
   uLanternSelf: { value: LANTERN.self },
   uSelfMax: { value: LANTERN.selfMax },

@@ -34,8 +34,16 @@ float lanternAt(vec3 toLamp) {
  * `facing` weighs N·L (0 for characters and sprites, which take the light whole).
  */
 export const LAMP_SLOTS = 12;
+/** A window emits only in front of its glass, so a lit pane cannot light the street through its house. */
+export const WINDOW_LIGHT_GLSL = /* glsl */ `
+uniform vec4 uLampPlane[${LAMP_SLOTS}]; // outward normal and plane offset; all zero for other lights
+float windowLight(int i, vec3 p) {
+  return step(0.0, dot(uLampPlane[i].xyz, p) + uLampPlane[i].w);
+}
+`;
 export const LAMPS_GLSL = /* glsl */ `
 ${LAMP_SHADOW_GLSL}
+${WINDOW_LIGHT_GLSL}
 uniform float uLampSlot[${LAMP_SLOTS}]; // which lamp shadow map a lamp has (-1: none; round 35)
 uniform vec4 uLamps[${LAMP_SLOTS}]; // position, range (0: dark)
 uniform vec3 uLampColors[${LAMP_SLOTS}]; // colour × strength
@@ -53,7 +61,7 @@ vec3 lampLight(vec3 p, vec3 n, float facing) {
     float sh = 1.0;
     float slot = uLampSlot[i];
     if (slot > -0.5) sh = lampShadowOf(int(slot + 0.5), p, n); // what stands between a point and a lamp takes its light (round 35)
-    sum += uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * face * sh; // the lantern's own falloff
+    sum += uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * face * sh * windowLight(i, p); // the lantern's own falloff
   }
   // Many lights at once (a corridor of torches, a hall's braziers) would add up past white and wash the walls to cream (round 31): the sum is eased toward a ceiling.
   float peak = max(max(sum.r, sum.g), sum.b);
@@ -82,7 +90,7 @@ vec3 lampLightGloss(vec3 p, vec3 n, float facing, vec3 eye, float power, out vec
     float sh = 1.0;
     float slot = uLampSlot[i];
     if (slot > -0.5) sh = lampShadowOf(int(slot + 0.5), p, n);
-    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh;
+    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh * windowLight(i, p);
     sum += c * face;
     streak += c * pow(max(dot(n, normalize(dir + eye)), 0.0), power);
   }

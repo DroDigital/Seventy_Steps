@@ -31,8 +31,8 @@ function run(sight: ReturnType<typeof createLightSight>, near: readonly Sighted[
 }
 
 describe('what the eye can see of a light', () => {
-  it('a light behind a wall is dark, one before it whole', () => {
-    const near = [lightAt(0, 2, 8), lightAt(2, 2, 2)];
+  it.each(['torch', 'fire', 'window'])('a %s behind a wall is dark, one before it whole', (kind) => {
+    const near = [lightAt(0, 2, 8, kind), lightAt(2, 2, 2, kind)];
     const sight = createLightSight(() => world(WALL));
     run(sight, near, eye, 0, 1);
     expect(near[0].v).toBe(0);
@@ -64,13 +64,13 @@ describe('what the eye can see of a light', () => {
     expect(near[0].v).toBe(0);
   });
 
-  it('shows a street lamp, a lit window and an Elder Sign from anywhere, without a ray: the land hides them, and the depth test knows the land', () => {
+  it('shows a street lamp and an Elder Sign from anywhere, without a ray: the land hides them, and the depth test knows the land', () => {
     const nothing = {} as CollisionWorld; // a ray on it would throw
-    const near = [lightAt(3, 2, 3, 'lamp'), lightAt(3, 2, 6, 'window'), lightAt(3, 2, 9, 'sigil')];
+    const near = [lightAt(3, 2, 3, 'lamp'), lightAt(3, 2, 9, 'sigil')];
     const sight = createLightSight(() => nothing);
     run(sight, near, { x: 40, y: 1.6, z: 40 }, 0, 0.2);
     run(sight, near, { x: -40, y: 1.6, z: 9 }, 0.2, 0.2);
-    expect(near.map((n) => n.v)).toEqual([1, 1, 1]);
+    expect(near.map((n) => n.v)).toEqual([1, 1]);
   });
 
   it('with no world to look through, every light shows', () => {

@@ -39,6 +39,7 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uLanternDecay: w.uLanternDecay,
     uLamps: w.uLamps,
     uLampColors: w.uLampColors,
+    uLampPlane: w.uLampPlane,
     uLampAim: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4(0, 0, 0, 0)) }, // where each of those lights throws its glow in the mist (render/lampAim.ts; round 80)
     uShadowMap: w.uShadowMap, // the moon's depth map, which the mist is lit by as the surfaces are (moonShadow.ts fills them; render/moonShafts.ts; round 80)
     uShadowMat: w.uShadowMat,

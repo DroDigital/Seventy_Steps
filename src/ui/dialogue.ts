@@ -89,7 +89,7 @@ export function createDialogue(g: Game): Dialogue {
   });
 
   g.events.on('Talked', ({ npc, name, title, lines, rumor, shop }) => {
-    g.talking = true; // at once: a talk may open within a step, and the rest of that step must hold the investigator safe too (main.ts syncs it again at the next)
+    g.sheltered = true; // at once: a talk may open within a step, and the rest of that step must hold the investigator safe too (main.ts syncs it again at the next)
     let i = 0;
     const line = (): void => {
       stopSaying();
@@ -157,7 +157,7 @@ export function createDialogue(g: Game): Dialogue {
   g.events.on('Read', ({ name }) => {
     const doc = DOCUMENTS[name];
     if (!doc) return;
-    g.talking = true; // at once, as for a talk: a page opened within a step holds the investigator safe for the rest of it
+    g.sheltered = true; // at once, as for a talk: a page opened within a step holds the investigator safe for the rest of it
     if (documentSkin(doc) === 'paper') showNote(name);
     else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
   });

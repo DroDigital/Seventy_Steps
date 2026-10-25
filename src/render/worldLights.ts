@@ -165,15 +165,23 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       casters.length = 0;
       const lamps = worldUniforms.uLamps.value;
       const colors = worldUniforms.uLampColors.value;
+      const planes = worldUniforms.uLampPlane.value;
       for (let i = 0; i < LAMP_SLOTS; i++) {
         const n = seen[i];
         const k = n ? LIGHTS.kinds[n.s.kind] : null;
+        planes[i].set(0, 0, 0, 0);
         const weight = n && k ? 1 - THREE.MathUtils.smoothstep(n.d, reach * 0.7, reach) : 0;
         if (!n || !k || weight <= 0) {
           lamps[i].w = 0;
           continue;
         }
         lamps[i].set(n.s.x, n.s.y, n.s.z, k.range);
+        const g = n.s.glass;
+        if (g) {
+          const [dx, dz] = [n.s.x - g.x, n.s.z - g.z];
+          const d = Math.hypot(dx, dz);
+          if (d > 1e-6) planes[i].set(dx / d, 0, dz / d, -(dx * g.x + dz * g.z) / d);
+        }
         if (n.s.kind === 'torch' || n.s.kind === 'fire' || n.s.kind === 'lamp') casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}` });
         colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * (n.s.pane === undefined ? 1 : paneLit(n.s.pane, time)));
       }
