@@ -11,11 +11,11 @@ export const BREATH = Object.freeze({
   inhale: 0.6, // the share of a breath that draws in: the rest lets go, the quicker
   /** How far the picture follows the breath at the inhale's peak, with the sleeper's whole reach on the world (shares of what was set before it). */
   swell: {
-    mist: 0.9, // the low mist's density rises by this: the ground thickens as the dream draws in (it is a thin mist, a third of what it was: a third more is not seen)...
-    haze: 0.5, // ...and the thin haze above it
-    lantern: 0.22, // the lantern's light is drawn down by this share, and returns
-    glow: 0.3, // the mist's own light is brought up by this, a pale swell of the horizon
-    vignette: 0.45, // and the picture's corners darken by this share more: the eye is drawn in with the light
+    mist: 1.1, // the low mist's density rises by this: the ground thickens as the dream draws in (it is a thin mist, a third of what it was: a third more is not seen)...
+    haze: 0.7, // ...and the thin haze above it
+    lantern: 0.25, // the lantern's light is drawn down by this share, and returns
+    glow: 0.35, // the mist's own light is brought up by this, a pale swell of the horizon
+    vignette: 0.5, // and the picture's corners darken by this share more: the eye is drawn in with the light
   },
   /** Seconds the reach is taken up as one nears, and let go as one leaves, or as the fight or a scene begins ("stops dead": quickly). */
   ease: { up: 2.5, down: 0.4 },
