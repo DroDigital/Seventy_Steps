@@ -6,10 +6,13 @@
  */
 
 import { dist3, type V3 } from '../core/geom';
+import { SHOCK } from '../data/dreadPicture';
 import { FX } from '../data/tuning';
 import { isAbsent, type Game } from '../systems/components';
 import { bandIndex } from '../systems/sanity';
 import { anomalyProximity, type FxState } from './fx';
+import { createPressure } from './pressure';
+import { DREAD_AIR } from './shock';
 
 /** anomalyProximity of the nearest anomaly-coloured thing to `from` (the camera). */
 export function nearestAnomaly(g: Game, from: V3): number {
@@ -36,11 +39,18 @@ export interface FxController {
 
 export function createFxController(g: Game): FxController {
   let worse = false;
+  let jolted = false; // round 78: a sudden large loss within a band sends a ring too, at half the strength
   let pulseAt = -Infinity;
+  let scale = 1; // the share of a full ring the pulse now is
+  const pressure = createPressure(g);
   g.events.on('SanityBandChanged', ({ from, to }) => void (worse ||= bandIndex(to) > bandIndex(from)));
+  g.events.on('SanityLost', ({ amount }) => void (jolted ||= amount >= SHOCK.from));
   return {
     update(state, camera, seconds) {
-      if (worse) [pulseAt, worse] = [seconds, false];
+      if (worse || jolted) [pulseAt, scale, worse, jolted] = [seconds, worse ? 1 : SHOCK.ringScale, false, false];
+      state.pressure = pressure.update(seconds);
+      DREAD_AIR.cap = Math.min(1, Math.max(0, state.cap)); // the sound of the dread keeps to the FX intensity too (render/shock.ts)
+      state.pulseScale = scale;
       state.sanity = g.mind.sanity;
       state.anomalyProximity = nearestAnomaly(g, camera);
       state.pulse = Math.max(0, 1 - (seconds - pulseAt) / FX.pulseSeconds);
