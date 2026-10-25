@@ -165,3 +165,32 @@ By Bl4ckGh0st, https://sketchfab.com/3d-models/temple-ruins-asset-pack-d1e25cdbe
 By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5acad5849bc913e76d3fdbf32a3, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: its two-storey arcade cut out of the whole (the pier and rubble removed), decimated, scaled and given a collider.
 
 `ar_arcade`
+
+
+# Credits: the arenas' gates (round 76)
+
+The leaves of the gates of the open arenas (`gateIndex.ts` + `gatePack.ts`, hung by `src/data/gateStyles.ts`, `render/gateRig.ts`) are cut from free models,
+all **Creative Commons Zero (CC0 1.0)**, which asks for no credit; it is given. They were made again for the game by `tools/models/bake_boss_models.py`
+from `tools/models/boss/manifest_gates.py` (`tools/models/gates/fetch.py` fetches the sources): each leaf taken singly, decimated, its colours kept only as
+light and dark (the game lays the arena's own over them) and its size fitted to the metres it hangs at. The gates also hang models of the packs credited above
+(the temple doors, the standing stones, the flutes, the basalt and the dead trees). Changes are named for each.
+
+## Gate source w01 — Large Iron Gate
+By Josh Dean, Poly Haven, https://polyhaven.com/a/large_iron_gate, licensed CC0 1.0. Changes: its two leaves taken apart, decimated to about 2,600 faces each, the frame left out, recoloured by the arena's dye and stretched to fit the opening.
+
+`gate_iron_l`, `gate_iron_r`
+
+## Gate source w02 — Large Castle Door
+By Tina, Poly Haven, https://polyhaven.com/a/large_castle_door, licensed CC0 1.0. Changes: its two leaves and its frame taken apart, the leaves decimated to about 1,600 faces each, the straps and hinges given the metal class and the planks the wood, recoloured by the arena's dye and stretched to fit the opening.
+
+`gate_timber_l`, `gate_timber_r`, `gate_timber_frame`
+
+## Gate source w03 — Namaqualand Boulder 03
+By Jenelle van Heerden (modelling) and Dario Barresi (photography), Poly Haven, https://polyhaven.com/a/namaqualand_boulder_03, licensed CC0 1.0. Changes: decimated to about 1,100 faces, given the rock class and stretched to close a ford.
+
+`gate_boulder`
+
+## Gate source w10 — Castle Kit
+By Kenney (www.kenney.nl), https://kenney.nl/assets/castle-kit, licensed CC0 1.0. Changes: its metal gate taken singly, turned to face the court, recoloured by the arena's dye (and, for Yig's, turned over) and stretched to fit the opening.
+
+`gate_portcullis`
