@@ -9,15 +9,15 @@
 import type * as THREE from 'three';
 import { EYES } from '../data/dreadPicture';
 import { WORLD } from '../data/tuning';
-import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
-import { fighting } from '../systems/sanity';
 import { dawnOf, phaseOf } from '../systems/clock';
 import { roofedAt } from '../world/terrain';
 import { hasLineOfSight } from '../world/colliders';
+import { calmOf } from './dreadCalm';
 import { blinkIn, eyesIn, heightOf, lifeOf, maySettle, pairsFor, restOf, risen, shut, vanishes } from './darkEyeRules';
 import { newGaze, offsetTo, readGaze } from './gaze';
 import { createHalos } from './halos';
+import { DREAD_AIR } from './shock';
 import { woodOf } from './volumetricFog';
 
 interface Slot {
@@ -90,8 +90,8 @@ export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
       readGaze(camera, gaze);
       const grey = 1 - 0.7 * dawnOf(phaseOf(time)); // the last hour's grey thins them
       const region = g.overworld?.region ?? null;
-      const calm = !g.cutscene && g.player.listening === null && engagedFights(g).length === 0 && !fighting(g);
-      const world = { calm, hidden: hidden || !g.overworld || !eyesIn(region) };
+      const calm = calmOf(g, time);
+      const world = { calm, hidden: hidden || !g.overworld || !eyesIn(region) || DREAD_AIR.cap <= 0 }; // (none at FX intensity 0)
       const room = pairsFor(g.mind.sanity);
       halos.begin();
       for (const [i, s] of slots.entries()) {

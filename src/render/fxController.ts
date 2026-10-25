@@ -12,6 +12,7 @@ import { isAbsent, type Game } from '../systems/components';
 import { bandIndex } from '../systems/sanity';
 import { anomalyProximity, type FxState } from './fx';
 import { createPressure } from './pressure';
+import { DREAD_AIR } from './shock';
 
 /** anomalyProximity of the nearest anomaly-coloured thing to `from` (the camera). */
 export function nearestAnomaly(g: Game, from: V3): number {
@@ -48,6 +49,7 @@ export function createFxController(g: Game): FxController {
     update(state, camera, seconds) {
       if (worse || jolted) [pulseAt, scale, worse, jolted] = [seconds, worse ? 1 : SHOCK.ringScale, false, false];
       state.pressure = pressure.update(seconds);
+      DREAD_AIR.cap = Math.min(1, Math.max(0, state.cap)); // the sound of the dread keeps to the FX intensity too (render/shock.ts)
       state.pulseScale = scale;
       state.sanity = g.mind.sanity;
       state.anomalyProximity = nearestAnomaly(g, camera);

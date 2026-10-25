@@ -9,8 +9,8 @@
  */
 
 import { PRESSURE } from '../data/dreadPicture';
-import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
+import { fightEngaged } from './dreadCalm';
 
 const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
 
@@ -61,7 +61,7 @@ export function createPressure(g: Game): Pressure {
       const want = quiet ? 0 : rateDread(lost / span);
       slow = approach(slow, want, dt, want > slow ? PRESSURE.attack : PRESSURE.release);
       hit = quiet ? 0 : hit * Math.exp(-dt / PRESSURE.shockSeconds);
-      fight = approach(fight, engagedFights(g).length > 0 ? 1 : 0, dt, PRESSURE.fightEase);
+      fight = approach(fight, fightEngaged(g) ? 1 : 0, dt, PRESSURE.fightEase);
       return PRESSURE_DEBUG.force >= 0 ? clamp01(PRESSURE_DEBUG.force) : pressureOf(slow, hit, fight);
     },
   };

@@ -9,12 +9,11 @@
 
 import * as THREE from 'three';
 import { SHADE } from '../data/dreadPicture';
-import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
-import { fighting } from '../systems/sanity';
 import { hasLineOfSight } from '../world/colliders';
 import { roofedAt } from '../world/terrain';
 import { WORLD } from '../data/tuning';
+import { calmOf } from './dreadCalm';
 import { DREAD_AIR } from './shock';
 import { newGaze, offsetTo, readGaze } from './gaze';
 import { box } from './meshKit';
@@ -87,7 +86,7 @@ export function createUnseenShade(scene: THREE.Scene, g: Game): UnseenShade {
         lay(time, called.metres, (called.left ? -1 : 1) * 1.45, true);
         [live, forced, endAt, called] = [true, true, time + 600, null];
       }
-      const calm = !g.cutscene && g.player.listening === null && engagedFights(g).length === 0 && !fighting(g);
+      const calm = calmOf(g, time);
       const fit = mayLie({ shadows: worldUniforms.uShadow.value.x > 0, hidden: hidden || !g.overworld, mind: forced || watchersFor(g.mind.sanity) >= 1, cap: DREAD_AIR.cap, calm });
       if (!live && k <= 0) { // between episodes: one begins when its time comes and a place is found
         mesh.visible = false;

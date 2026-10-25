@@ -15,12 +15,13 @@ import * as THREE from 'three';
 import { hasLineOfSight } from '../world/colliders';
 import { DARTER, STEP } from '../data/dreadPicture';
 import { SANITY } from '../data/tuning';
-import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
-import { fighting } from '../systems/sanity';
+import { calmOf } from './dreadCalm';
+import { FEEL } from './feel';
 import { createTurn, newGaze, offsetTo, readGaze } from './gaze';
 import { box } from './meshKit';
 import { darterEvery, darterGone, darterStart, mayStep, stepEvery, stepOf } from './watcherSteps';
+import { DREAD_AIR } from './shock';
 import { createWorldMaterial } from './worldMaterial';
 
 /** How many watchers a mind at `sanity` is given. */
@@ -121,7 +122,7 @@ export function createWatchers(scene: THREE.Scene, g: Game): Watchers {
     if (!Number.isFinite(nextDarter)) nextDarter = time + darterEvery(Math.random());
     if (time < nextDarter) return;
     const start = darterStart(turn.rate, gaze.half, Math.random(), Math.random());
-    if (!start || g.cutscene || engagedFights(g).length > 0 || fighting(g)) return;
+    if (!start || !calmOf(g, time) || DREAD_AIR.cap <= 0 || FEEL.flashes <= 0) return; // (nothing sudden at the corner of the eye for those who have turned the flashes or the effects off)
     const b = gaze.look + start.offset;
     const [x, z] = [gaze.x + Math.sin(b) * start.distance, gaze.z + Math.cos(b) * start.distance];
     const y = g.world.ground(x, z);
