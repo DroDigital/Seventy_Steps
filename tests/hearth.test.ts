@@ -211,3 +211,19 @@ describe('the hearth\'s voices (round 78)', () => {
     expect(log.started).toBe(HEARTH.sigil.tones.length + 1);
   });
 });
+
+describe('what worldLights lists in earshot (round 78)', () => {
+  it('lists the nearest lights, nearest first, leaves a window out, and sets what the eye sees of each', async () => {
+    const THREE = await import('three');
+    const { createWorldLights } = await import('../src/render/worldLights');
+    const lights = createWorldLights();
+    lights.add(1, [{ x: 9, y: 1, z: 0, kind: 'fire' }, { x: 3, y: 1, z: 0, kind: 'torch' }, { x: 2, y: 1, z: 0, kind: 'window' }, { x: 200, y: 1, z: 0, kind: 'lamp' }, { x: 5, y: 1, z: 0, kind: 'lamp' }]);
+    lights.update(new THREE.Vector3(0, 1, 0), 1, null);
+    expect(HEARD_LIGHTS.map((h) => h.kind)).toEqual(['torch', 'lamp', 'fire']);
+    expect(HEARD_LIGHTS.map((h) => Math.round(h.d))).toEqual([3, 5, 9]);
+    expect(HEARD_LIGHTS.every((h) => h.v === 1 && h.flicker > 0.5 && h.flicker < 1.5)).toBe(true);
+    lights.remove(1);
+    lights.update(new THREE.Vector3(0, 1, 0), 2, null);
+    expect(HEARD_LIGHTS).toHaveLength(0);
+  });
+});
