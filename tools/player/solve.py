@@ -16,6 +16,44 @@ GROUND = F.REST['footR'][1] - SOLE  # 0.017: where a standing sole is: the old f
 SIDE = {'R': -1, 'L': 1}  # which way the figure's right and left are, x
 
 
+def aimv(az, el=0.0):
+    """The unit vector `az` degrees to the right of straight ahead (the game's arcs: positive toward -x) and `el` degrees up."""
+    a, e = np.radians(az), np.radians(el)
+    return np.array([-np.sin(a) * np.cos(e), np.sin(e), np.cos(a) * np.cos(e)])
+
+
+def edge_of(aim, toward=None, roll=0.0):
+    """The edge of a weapon pointing down `aim`: the direction `toward` as near as the blade allows (the blade is turned about itself to face it), or with none the one that is forward
+    for a blade hanging and up for one held level, turned about the blade by `roll` degrees (right-hand rule about `aim`)."""
+    aim = unit(aim)
+    if toward is not None:
+        t = np.asarray(toward, float)
+        e = t - aim * np.dot(t, aim)
+        if np.linalg.norm(e) > 1e-3:
+            return unit(e)
+    up = np.array([0.0, 1.0, 0.0])
+    base = up - aim * np.dot(up, aim)
+    if np.linalg.norm(base) < 0.3:
+        fwd = np.array([0.0, 0.0, 1.0])
+        base = fwd - aim * np.dot(fwd, aim)
+    base = unit(base)
+    r = np.radians(roll)
+    return base * np.cos(r) + np.cross(aim, base) * np.sin(r)
+
+
+def corner(pitch):
+    """A boot pitched toe down by `pitch` radians: (z, y) from the ankle of its heel and of its toe."""
+    c, s = np.cos(pitch), np.sin(pitch)
+    return (-SOLE * s + HEEL * c, -SOLE * c - HEEL * s), (-SOLE * s + TOE * c, -SOLE * c - TOE * s)
+
+
+def roll_shift(pitch):
+    """How far forward of where a flat boot's ankle would be it must be carried, so the corner the boot is on (the heel when its toe is up, the toe when its heel is) stays
+    where it is on the ground as the boot rolls. A boot that is keyed to roll with its ankle still would slide a little."""
+    heel, toe = corner(pitch)
+    return HEEL - heel[0] if pitch < 0 else TOE - toe[0]
+
+
 def rot(m3):
     m = np.eye(4)
     m[:3, :3] = m3
@@ -81,6 +119,37 @@ def two_bone(root, target, l1, l2, pole):
     return mid, root + u * reach, max(0.0, dist - top)
 
 
+def ankle_target(spec, root):
+    """Where a boot placed by `Foot` puts its ankle, in the actor's frame: the lowest corner of the sole touches the floor (the toe, or the heel, as the boot is pitched), plus any lift."""
+    Rworld = ry(spec.get('yaw', 0.0) * DEG) @ rx(spec.get('pitch', 0.0) * DEG)
+    pos = np.array([spec['x'], 0.0, spec['z']])
+    if spec.get('space', 'world') == 'world':
+        pos = pos - np.asarray(root, float) * np.array([1, 0, 1])
+    low = (np.array([[0, -SOLE, HEEL], [0, -SOLE, TOE]]) @ Rworld.T)[:, 1].min()
+    return np.array([pos[0], GROUND - low + spec.get('lift', 0.0), pos[2]])
+
+
+def cap_pelvis(ch, root, margin=0.008):
+    """The channels with the pelvis no higher than both legs reach (a boot placed by `Foot` is never asked for more than a straight leg gives; a pelvis keyed lower is left), and how far it was brought down."""
+    top = None
+    pelvis = np.asarray(ch.get('pelvis', (0, F.HIP, 0)), float)
+    yaw = ch.get('pelvis_rot', (0, 0, 0))[1] * DEG
+    for side, s in (('footR', -1), ('footL', 1)):
+        spec = ch.get(side)
+        if not spec or 'x' not in spec:
+            continue
+        A = ankle_target(spec, root)
+        h = pelvis + ry(yaw) @ np.array([s * F.JOINTS['legL'][1][0], 0.0, 0.0])
+        room = (THIGH + SHANK - margin) ** 2 - (h[0] - A[0]) ** 2 - (h[2] - A[2]) ** 2
+        cap = A[1] + np.sqrt(max(room, 0.04))
+        top = cap if top is None else min(top, cap)
+    if top is None or top >= pelvis[1]:
+        return ch, 0.0
+    out = dict(ch)
+    out['pelvis'] = (pelvis[0], top, pelvis[2])
+    return out, float(pelvis[1] - top)
+
+
 def spec_vec(spec, key, default):
     return np.asarray(spec.get(key, default), float)
 
@@ -127,13 +196,17 @@ class Rig:
         shoulder = self.T @ move(F.JOINTS[names[0]][1])
         if spec is None:
             spec = {'arm': (0, 0, 0), 'elbow': 0.0, 'hand': (0, 0, 0)}
-        if 'grip' not in spec:  # forward kinematics: the angles as given
+        if 'grip' not in spec and 'reach' not in spec:  # forward kinematics: the angles as given
             Rs = euler(spec.get('arm', (0, 0, 0)))
             Re = rx(float(spec.get('elbow', 0.0)) * DEG)
             Rh = euler(spec.get('hand', (0, 0, 0)))
         else:  # the wrist at `grip`, the elbow bent toward `pole`, the hand turned so the weapon points down `aim` with its edge toward `edge`
             S = shoulder[:3, 3]
-            W = np.asarray(spec['grip'], float)
+            if 'reach' in spec:  # the wrist `dist` metres from the shoulder, `az` degrees right of ahead and `el` up (the actor's directions, not the torso's)
+                az, el, dist = spec['reach']
+                W = S + float(dist) * aimv(az, el)
+            else:
+                W = np.asarray(spec['grip'], float)
             pole = spec_vec(spec, 'pole', (s * 0.25, -0.8, -0.3))
             E, W2, over = two_bone(S, W, UPPER, FORE, pole)
             self.over['arm' + side] = over
@@ -144,7 +217,11 @@ class Rig:
             Rs = self.T[:3, :3].T @ Fs
             ang = np.arccos(np.clip(np.dot(e, f), -1, 1))
             Re = rx(-ang)
-            if 'aim' in spec:
+            if 'blade' in spec:  # the weapon pointing `az`, `el`, its edge toward `toward` or rolled
+                aim = aimv(*spec['blade'])
+                Fh = look_frame(aim, edge_of(aim, spec.get('toward'), float(spec.get('roll', 0.0))))
+                Rh = (self.T[:3, :3] @ Rs @ Re).T @ Fh
+            elif 'aim' in spec:
                 edge = spec.get('edge')
                 Fh = look_frame(unit(spec['aim']), unit(edge) if edge is not None else Fs[:, 2])
                 Rh = (self.T[:3, :3] @ Rs @ Re).T @ Fh
@@ -166,15 +243,8 @@ class Rig:
             spec = spec or {}
             Rl, Rk, Rf = euler(spec.get('thigh', (0, 0, 0))), rx(float(spec.get('knee', 0.0)) * DEG), euler(spec.get('foot', (0, 0, 0)))
         else:
-            yaw, pitch = spec.get('yaw', 0.0) * DEG, spec.get('pitch', 0.0) * DEG
-            Rworld = ry(yaw) @ rx(pitch)
-            pos = np.array([spec['x'], 0.0, spec['z']])
-            if spec.get('space', 'world') == 'world':
-                pos = pos - self.root * np.array([1, 0, 1])
-            # the ankle goes where the lowest corner of the sole touches the ground (the toe, or the heel, as the foot is pitched), plus any lift
-            corners = np.array([[0, -SOLE, HEEL], [0, -SOLE, TOE]])
-            low = (corners @ Rworld.T)[:, 1].min()
-            ankle = np.array([pos[0], GROUND - low + spec.get('lift', 0.0), pos[2]])
+            Rworld = ry(spec.get('yaw', 0.0) * DEG) @ rx(spec.get('pitch', 0.0) * DEG)
+            ankle = ankle_target(spec, self.root)
             H = hip[:3, 3]
             fwd = Rworld @ np.array([0.0, 0.0, 1.0])
             pole = fwd + np.array([s * 1.0, 0, 0]) * spec.get('out', 0.0)  # `out`: how far the knee splays outward (0 straight ahead)

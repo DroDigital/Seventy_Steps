@@ -7,6 +7,7 @@ person to read (`WARN ...`), none stops a bake: a blow may be meant to go furthe
   ground    the weapon's tip, a hand or the pelvis below the floor
   pops      a joint turning more than it can in one 60 Hz frame, or a weapon tip moving faster than a blow can
   slide     a boot meant to be planted (no lift) that moves along the ground
+  carried   a clip that does not begin or end in the pose he is carried in (the game crossfades 0.12 s between moves; tests/playerClips.test.ts holds every clip to it)
 """
 import numpy as np
 import frame as F
@@ -15,11 +16,12 @@ from clipkit import hit_path, LENGTH
 
 DEG = 180 / np.pi
 LIMITS = {  # degrees: (lowest, highest) of the joint's own angle
-    'knee': (-2, 150), 'elbow': (-2, 150), 'thigh': (-135, 45), 'head_yaw': (-85, 85), 'head_pitch': (-55, 60), 'torso_yaw': (-80, 80), 'torso_pitch': (-45, 75), 'torso_roll': (-45, 45),
+    'knee': (-2, 150), 'elbow': (-2, 150), 'thigh': (-50, 135), 'head_yaw': (-85, 85), 'head_pitch': (-55, 60), 'torso_yaw': (-80, 80), 'torso_pitch': (-45, 75), 'torso_roll': (-45, 45),
 }
 POP = 75.0  # degrees a joint may turn in one frame (a roll's whole-body spin is exempt: `spin_ok`)
-TIP_FAST = 0.9  # metres a weapon's tip may travel in one frame (54 m/s)
+TIP_FAST = 0.9  # metres a weapon's tip may travel in one frame (54 m/s), or 1.4 times the speed of the game's own hit sphere through its window, if that is more
 SLIDE = 0.02  # metres a planted boot may creep in one frame
+CARRIED = 0.65  # radians a joint may be from the idle's first pose, at a clip's first and last frame (tests/playerClips.test.ts's bound)
 
 
 def angle(q):
@@ -62,6 +64,13 @@ def reach_lines(clip):
     return out
 
 
+def capped_lines(clip):
+    worst = max(((getattr(r, 'capped', 0.0), f) for f, r in enumerate(clip.rigs)), default=(0.0, 0))
+    if worst[0] > 0.05:
+        return [f'WARN boots: the pelvis was pulled {worst[0] * 100:.0f} cm below where you keyed it at frame {worst[1]}, because the boots are too far from the hips for the legs (step sooner, or bring the pelvis toward the boots)']
+    return []
+
+
 def hit_lines(clip):
     m = clip.m
     if not m.hit or clip.loop:
@@ -87,6 +96,26 @@ def hit_lines(clip):
         out.append(f'WARN hit: the tip is {far[0] * 100:.0f} cm beyond the far side of the hit sphere at frame {far[1]}')
     out.append(f'info hit: blade to the sphere\'s centre {best[0] * 100:.0f} cm at best (frame {best[1]}), {worst[0] * 100:.0f} cm at worst (radius {rad * 100:.0f})')
     return out
+
+
+def edge_lines(clip):
+    """A one-edged weapon (the axe, the cutlass, the razor) that cuts should lead with its edge, not its back."""
+    m = clip.m
+    if clip.weapon not in ('axe', 'cutlass', 'razor') or not m.hit or clip.loop:
+        return []
+    leads = []
+    for f in range(int(m.hit0), int(m.hit1)):
+        ra, rb = clip.rigs[f], clip.rigs[f + 1]
+        (ga, ta), (gb, tb) = blade(clip, ra), blade(clip, rb)
+        v = (tb + clip.root(f + 1)) - (ta + clip.root(f))
+        a = (ta - ga) / max(np.linalg.norm(ta - ga), 1e-6)
+        vp = v - a * np.dot(v, a)
+        if np.linalg.norm(v) < 0.03 or np.linalg.norm(vp) < 0.5 * np.linalg.norm(v):
+            continue  # not moving, or a thrust
+        leads.append(float(np.dot(ra.world['handR'][:3, 2], vp / np.linalg.norm(vp))))
+    if leads and np.mean(leads) < 0.2:
+        return [f'WARN edge: the {clip.weapon}\'s edge does not lead the cut (it faces {np.mean(leads):+.2f} of the way the blade goes: roll the wrist, `edge=` of the Grip, so it is toward +1)']
+    return []
 
 
 def limb_lines(clip):
@@ -128,7 +157,7 @@ def ground_lines(clip):
         g, t = blade(clip, r)
         low_tip = min(low_tip, (float(t[1]), f))
         low_hip = min(low_hip, (float(r.pelvis[1]), f))
-    if low_tip[0] < -0.01 and not clip.m.hold:
+    if low_tip[0] < -0.01 and not clip.m.hold and not clip.loop:
         out.append(f'WARN ground: the weapon\'s tip is {-low_tip[0] * 100:.0f} cm below the floor at frame {low_tip[1]}')
     if low_hip[0] < 0.25 and clip.id not in ('roll', 'death'):
         out.append(f'WARN ground: the pelvis is only {low_hip[0] * 100:.0f} cm up at frame {low_hip[1]}')
@@ -156,7 +185,12 @@ def pop_lines(clip, spin_ok=False):
             out.append(f'WARN pops: {j} turns {ang:.0f} deg between frames {f} and {f + 1}')
         elif ang > POP and not spin_ok:
             out.append(f'WARN pops: the pelvis turns {ang:.0f} deg between frames {f} and {f + 1}')
-    if tipw[0] > TIP_FAST:
+    limit = TIP_FAST
+    if clip.m.hit and not clip.loop:  # the game's sphere crosses its arc in its window at its own pace: a blade that is to be in it goes about that fast
+        h0, h1 = clip.m.hit0, clip.m.hit1
+        sphere = max(float(np.linalg.norm(hit_path(clip.m, f + 1)[0] - hit_path(clip.m, f)[0])) for f in range(int(h0), max(int(h0) + 1, int(h1))))
+        limit = max(limit, 1.4 * sphere)
+    if tipw[0] > limit:
         out.append(f'WARN pops: the weapon\'s tip moves {tipw[0]:.2f} m in one frame at frame {tipw[1]} ({tipw[0] * 60:.0f} m/s)')
     out.append(f'info pops: fastest tip {tipw[0] * 60:.0f} m/s at frame {tipw[1]}')
     return out
@@ -167,7 +201,7 @@ def planted(clip, f, side):
     spec = clip.channels(f).get('foot' + side)
     if not spec or 'x' not in spec:
         return None
-    x, z, lift = float(spec['x']), float(spec['z']), float(spec.get('lift', 0.0))
+    x, z, lift = float(spec['x']), float(spec['z']) - S.roll_shift(float(spec.get('pitch', 0.0)) * np.pi / 180), float(spec.get('lift', 0.0))
     if spec.get('space', 'world') != 'world':
         x, z = x + clip.root(f)[0], z + clip.root(f)[2]
     return x, z, lift
@@ -189,6 +223,32 @@ def slide_lines(clip):
     return out
 
 
+_IDLE = []
+
+
+def idle_pose():
+    """The first pose of the idle clip, the pose he is carried in."""
+    if not _IDLE:
+        import clips.locomotion as L
+        c = L.idle()
+        _IDLE.append(S.solve(c.channels(0), c.root(0))[0])
+    return _IDLE[0]
+
+
+def carried_lines(clip):
+    if clip.loop:
+        return []
+    idle = idle_pose()
+    out = []
+    for where, f in (('begins', 0), ('ends', len(clip.poses) - 1)):
+        if where == 'ends' and clip.id == 'death':
+            continue
+        worst = max(((angle(F.quat_mul(F.quat_conj(idle[j]), clip.poses[f][j])) * np.pi / 180, j) for j in F.ORDER if j not in ('body', 'lantern')), key=lambda a: a[0])
+        if worst[0] > CARRIED:
+            out.append(f'WARN carried: the clip {where} with {worst[1]} {worst[0]:.2f} rad from the pose he is carried in (limit {CARRIED}): the crossfade cannot hide it (name the arm\'s `pole` and `toward` on the frame-0 key, and end on the same Swing as the carried hang)')
+    return out
+
+
 def report(clip, spin_ok=False):
-    lines = reach_lines(clip) + hit_lines(clip) + limb_lines(clip) + ground_lines(clip) + pop_lines(clip, spin_ok) + slide_lines(clip)
+    lines = reach_lines(clip) + capped_lines(clip) + hit_lines(clip) + edge_lines(clip) + limb_lines(clip) + ground_lines(clip) + pop_lines(clip, spin_ok) + slide_lines(clip) + carried_lines(clip)
     return lines

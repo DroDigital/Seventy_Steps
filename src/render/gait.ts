@@ -197,14 +197,20 @@ export function settle(f: Figure, ground?: Ground, level = true): void {
       const a = pitch + legJ.rotation.x; // the thigh from the vertical, positive with the foot behind
       return ground?.(legJ.position.x, -(f.thigh * Math.sin(a) + shank * Math.sin(a + knee.rotation.x))) ?? 0;
     });
-    f.body.position.y += Math.min(0, ...under);
+    const sink = Math.min(0, ...under);
+    f.body.position.y += sink;
     legs.forEach(([legJ, knee, foot], i) => {
       const thigh = pitch + legJ.rotation.x;
-      const room = f.body.position.y - clearance - under[i] - f.ankle; // how far below the hip the ankle may go
+      const drop = f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + knee.rotation.x); // how far below the hip the ankle is
+      // a clip's boots are on its own floor, a hair lower or higher than this reckons: only what the ground adds to that is settled, so a flat floor leaves a clip as it was made
+      const own = level ? 0 : Math.max(0, drop - (f.body.position.y - sink - clearance - f.ankle));
+      const room = f.body.position.y - clearance - under[i] - f.ankle + own; // how far below the hip the ankle may go
       const c = (room - f.thigh * Math.cos(thigh)) / shank;
-      if (c > -1 && c < 1 && f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + knee.rotation.x) > room) {
+      const bent = knee.rotation.x;
+      if (c > -1 && c < 1 && drop > room) {
         knee.rotation.x = Math.min(2.6, Math.max(knee.rotation.x, Math.acos(c) - thigh));
       }
+      if (!level) foot.rotation.x -= knee.rotation.x - bent; // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope
       const shin = thigh + knee.rotation.x;
       const lifted = room - f.thigh * Math.cos(thigh) - shank * Math.cos(shin);
       if (level) foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts (a clip has its own feet: level = false)

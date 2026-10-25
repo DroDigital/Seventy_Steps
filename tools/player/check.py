@@ -4,7 +4,9 @@ sphere through its window and the weapon tip's trail, from the side, the front a
 (The picture of the modelled figure, in Blender's own evaluation, is preview.py's `sheet`, once animate.py has keyed the clip.)
 
     python3 -I tools/player/check.py cane.light1 [--frames 0,9,13 | --every 3] [--views side,top,front] [--out f.png] [--cols 8] [--no-sheet]
-    python3 -I tools/player/check.py --all                        every clip's report, one block each (no pictures)
+    python3 -I tools/player/check.py --all [--module cane]       every clip's report, one block each (no pictures)
+
+Always pass --module <the one you are keying> (clips/<module>.py): the others may be half made.
 
 Side: his front is to the right. Front: his left is to the right of the picture. Above: his front is up, his right to the right. The lime ticks along the ground are
 half metres of the clip's world (a planted boot keeps its tick). Red: the hit window (the tip's trail and the sphere); the sphere's centre travels the dotted arc.
@@ -138,7 +140,7 @@ def sheet(clip, frames, views, out, cols=8):
 
 
 def run(cid, a, get):
-    made = C.all_clips([cid])
+    made = C.all_clips([cid], get('--module').split(',') if get('--module') else None)
     if not made:
         sys.exit(f'no clip {cid}')
     for clip in made:
@@ -163,7 +165,7 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     get = lambda k, d=None: a[a.index(k) + 1] if k in a else d
     if '--all' in a:
-        for clip in C.all_clips():
+        for clip in C.all_clips(None, get('--module').split(',') if get('--module') else None):
             clip.solve()
             warns = [l for l in qa.report(clip, spin_ok=clip.id in ('roll', 'death')) if l.startswith('WARN')]
             print(f'{clip.id:18s} {clip.frames:4d} frames  ' + (f'{len(warns)} warnings' if warns else 'clean'))

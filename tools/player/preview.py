@@ -48,7 +48,7 @@ def setup(blend, w, h, weapon='cane', drawn=False):
 
 
 def show_weapon(weapon, drawn=False, props=()):
-    want = {f'arm:{"cane_drawn" if (weapon == "cane" and drawn) else weapon}', *[f'prop:{p}' for p in props]}
+    want = {f'arm:{"cane_drawn" if (weapon == "cane" and drawn) else weapon}', *[f'prop:{p}' for p in props if p != 'gun'], 'flame', 'gun' if 'gun' in props else 'holstered'}
     for o in bpy.data.objects:
         g = o.get('game_group')
         if g and g != 'body':

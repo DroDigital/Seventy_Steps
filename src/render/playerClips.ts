@@ -1,5 +1,5 @@
 /**
- * The investigator's clips (round 77: keyed in Blender, tools/player/, docs/PLAYER.md; baked into data/player/playerClips.ts): each a pose for every 60 Hz frame of a move, read here
+ * The investigator's clips (round 78: keyed in Blender, tools/player/, docs/PLAYER.md; baked into data/player/playerClips.ts): each a pose for every 60 Hz frame of a move, read here
  * as quaternions for the figure's joints and the pelvis's place. A clip is as long as the move it was made for and has its markers where the game's data puts them (the hit
  * window's ends, the frame an item takes effect, a shot or a volley leaves, a parry's window); if the data has since moved, `clipTime` carries the game's frame to the clip's
  * through those markers, so the blade is still where the blow lands. Pure but for the figure's joints it sets.
@@ -131,7 +131,7 @@ export function mixPose(a: ClipPose, b: ClipPose, k: number, out: ClipPose = a):
 /** Sets the figure's joints (and the pelvis's place) to a pose. */
 export function applyPose(f: Figure, pose: ClipPose): void {
   const joints = [f.body, f.torso, f.head, f.armR, f.elbowR, f.handR, f.armL, f.elbowL, f.handL, f.legR, f.kneeR, f.footR, f.legL, f.kneeL, f.footL, f.skirt[0], f.skirt[1], f.lantern];
-  PLAYER_JOINTS.forEach((_, j) => joints[j]?.quaternion.fromArray(pose.q, j * 4));
+  PLAYER_JOINTS.forEach((_, j) => joints[j]?.quaternion.fromArray(pose.q, j * 4).normalize()); // (the data is whole numbers of 1/32767, a hair off unit length, which a joint that is not blended would keep)
   f.body.position.set(pose.body[0], f.hip + pose.body[1], pose.body[2]);
 }
 

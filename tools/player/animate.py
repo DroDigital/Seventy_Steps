@@ -3,7 +3,7 @@
 frame, and reads them back through Blender's own evaluation to prove the rig plays what was written. The .blend is then what clipbake.py bakes from, and
 what a person opens to see him swing: the object's own location travels with the actor's root (the game moves that itself; the bake leaves it out).
 
-    python3 -I tools/player/animate.py [--blend f.blend] [--only cane.light1,roll] [--check]          (needs `pip install bpy numpy scipy`)
+    python3 -I tools/player/animate.py [--blend f.blend] [--only cane.light1,roll] [--module cane] [--check]          (needs `pip install bpy numpy scipy`)
 
 Each Action carries custom properties the bake and the previews read: `game_frames`, `game_loop`, `game_weapon`, `game_props`, `game_markers` (JSON).
 """
@@ -92,13 +92,13 @@ def check(rig, clip, act, rest, tolerance=2e-4):
     return worst
 
 
-def build(blend=BLEND, only=None, verify=False):
+def build(blend=BLEND, only=None, verify=False, modules=None):
     import clips as C
     bpy.ops.wm.open_mainfile(filepath=blend)
     rig = bpy.data.objects['Investigator_Rig']
     rig.animation_data_create()
     rest = rest_matrices(rig)
-    made = C.all_clips(only)
+    made = C.all_clips(only, modules)
     report = []
     for clip in made:
         clip.solve()
@@ -117,4 +117,4 @@ if __name__ == '__main__':
     a = sys.argv[1:]
     get = lambda k, d=None: a[a.index(k) + 1] if k in a else d
     only = get('--only')
-    build(get('--blend', BLEND), only.split(',') if only else None, '--check' in a)
+    build(get('--blend', BLEND), only.split(',') if only else None, '--check' in a, get('--module').split(',') if get('--module') else None)

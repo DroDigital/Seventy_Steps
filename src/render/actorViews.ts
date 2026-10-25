@@ -206,7 +206,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     }
     if (f.props && id === g.player.id) for (const [name, m] of Object.entries(f.props)) m.visible = !!f.held?.props.includes(name); // what the off-hand takes up
     if (f.gun && id === g.player.id) {
-      const drawn = move === 'shoot' || move === 'reload'; // the revolver comes out of its holster for a shot or a reload, and goes back (round 22)
+      const drawn = f.held ? f.held.props.includes('gun') : move === 'shoot' || move === 'reload'; // (his clips say when: playerPose.ts) the revolver comes out of its holster for a shot or a reload, and goes back (round 22)
       f.gun.visible = drawn;
       if (f.holstered) f.holstered.visible = !drawn;
     }

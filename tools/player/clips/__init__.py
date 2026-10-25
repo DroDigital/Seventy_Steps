@@ -5,12 +5,13 @@ the carried gaits are `idle`, `walk`, `run`, `sprint` and the guard's overlay `g
 """
 import importlib
 
-MODULES = ['locomotion', 'cane', 'axe', 'razor', 'cutlass', 'rapier', 'actions', 'reactions']
+MODULES = ['locomotion', 'cane', 'axe', 'razor', 'cutlass', 'rapier', 'actions', 'rites', 'reactions']
 
 
-def all_clips(only=None):
+def all_clips(only=None, modules=None):
+    """The clips of the modules (all of MODULES, or just `modules`: what you pass while you are keying one, so another's mistake does not stop you), those whose id is in `only`."""
     out = []
-    for name in MODULES:
+    for name in (modules or MODULES):
         try:
             mod = importlib.import_module(f'clips.{name}')
         except ModuleNotFoundError as e:

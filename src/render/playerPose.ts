@@ -1,5 +1,5 @@
 /**
- * The investigator posed from his clips (round 77, playerClips.ts): the carried gaits (idle, walk, run and sprint, blended by ground speed as gait.ts blends its own, their
+ * The investigator posed from his clips (round 78, playerClips.ts): the carried gaits (idle, walk, run and sprint, blended by ground speed as gait.ts blends its own, their
  * phase the stride's), the guard's arms over them, and a clip for each move he makes, made for the weapon in his hand where the weapon changes it. Anything without a clip
  * is posed by hand (poses.ts), as the people and the creatures are. Poses are cut from his figure's joints, so these set the same ones.
  */
@@ -31,7 +31,8 @@ export interface PlayerInput {
   weapon: string;
 }
 
-const idOf = (weapon: string, move: string): string => (SPECIFIC.test(move) ? `${weapon}.${move}` : move);
+/** The id of the clip a move is made as: by weapon for a blow, a parry or a guard, else by its own name. */
+export const idOf = (weapon: string, move: string): string => (SPECIFIC.test(move) ? `${weapon}.${move}` : move);
 
 /** The gaits at this speed and stride, written into `out`; false if the clips are not there. */
 function carried(p: PlayerInput, out: ClipPose): boolean {
@@ -68,7 +69,7 @@ export function playerStride(f: Figure, p: PlayerInput): boolean {
   }
   applyPose(f, A);
   f.handR.rotateX(CARRY[p.weapon] ?? 0);
-  held(f, { drawn: false, props: [] });
+  held(f, { drawn: p.guard, props: [] }); // a guard raised has the sword-cane's blade out
   return true;
 }
 
@@ -85,5 +86,6 @@ export function playerMove(f: Figure, p: PlayerInput): boolean {
   } else applyPose(f, E);
   const until = clip.marks.props ?? Infinity; // what the hand holds goes at this frame (a flask, once thrown)
   held(f, { drawn: clip.drawn, props: t < until ? clip.props : [] });
+  if (f.flash && p.def.shot) f.flash.visible = p.frame >= p.def.shot.frame && p.frame < p.def.shot.frame + 2; // the muzzle's flash as the shot leaves
   return true;
 }
