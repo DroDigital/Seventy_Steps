@@ -165,6 +165,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const world = opts.arena ? null : createWorldScene(lights);
   const scene = world?.scene ?? createArenaScene();
   scene.add(lights.halos);
+  scene.add(lights.flames);
   const menu: SignMenu | null = opts.arena ? null : createSignMenu(game, journeys.go);
   const ending = createEndingCard(game, store, () => (shell.music = playMenuMusic(shell.engine, settings.volume))); // the title's theme again, under an ending
   let building = true; // until the loop starts
@@ -209,7 +210,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
