@@ -68,8 +68,8 @@ export const hutchinson: PlaceFn = (c: Court, h: House) => {
   c.add('fh_stove', lb + 0.8, 25.5, { face: 'front', s: 1.1 });
 
   // what he worked with (web parts, docs/WEB_PARTS.md): generators, a ring of pipe and a tank before the laboratory, crystals grown of the salt at the donjon's foot
-  for (const [a, cc, id, yaw] of [[lf + 5.4, 21, 'wk_generator', 0.2], [lf + 5.6, 31, 'wk_generator', -0.3], [lf + 6.4, 26, 'wk_pipe_ring', 0], [lf + 8, 35, 'wk_tank', 0.4]] as const) c.add(id, a, cc, { yaw, jitter: 0.1 });
-  for (const [a, cc, id] of [[-B + 5, -20, 'wk_crystals'], [-B + 9, -27, 'wk_crystal'], [-B + 4, -26, 'wk_crystal']] as const) c.add(id, a, cc, { dye: { glow: [0.55, 0.45, 0.95] }, s: 0.9, turn: a * 17 });
+  for (const [a, cc, id, yaw] of [[lf + 12.4, 21, 'wk_generator', 0.2], [lf + 12.6, 31, 'wk_generator', -0.3], [lf + 13.4, 26, 'wk_pipe_ring', 0], [lf + 15, 35, 'wk_tank', 0.4]] as const) c.add(id, a, cc, { yaw, jitter: 0.1 });
+  for (const [a, cc, id] of [[-B + 7, -18, 'wk_crystals'], [-B + 12, -26, 'wk_crystal'], [-B + 7, -24, 'wk_crystal']] as const) c.add(id, a, cc, { dye: { glow: [0.55, 0.45, 0.95] }, s: 0.9, turn: a * 17 });
 
   // the way from the gate is lit; stores stand before the laboratory; the court's own set has the rest
   for (const a of [G - 3, G - 9, G - 15]) for (const side of [-1, 1]) c.add('rn_torch', a, side * 8, { s: 2.2, lit: 'fire', jitter: 0.3 });

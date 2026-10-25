@@ -59,7 +59,7 @@ export const colour: ExtraFn = (c, h) => {
   const pit: readonly [number, number] = [rear + 10, -17.5];
   c.add('wk_crater', pit[0], pit[1], { tint: [0.46, 0.44, 0.48], keep: 0.3, walk: true });
   c.add('wk_meteor', pit[0], pit[1], { y: -1.1, yaw: 0.6, tint: [0.4, 0.37, 0.46], keep: 0.3 });
-  for (const [i, [da, dc]] of ([[3.8, 2.4], [-2.8, 4.6], [-4.6, -2.8], [2.8, -5.2], [6, -1.2]] as const).entries()) c.add(i % 2 ? 'wk_crystal' : 'wk_crystals', pit[0] + da, pit[1] + dc, { dye: { glow: [0.92, 0.3, 0.8] }, s: 0.5 + (i % 3) * 0.12, jitter: 0.2, turn: i * 67 });
+  for (const [i, [da, dc]] of ([[3.8, 2.4], [0.8, 5.6], [-1.4, -5.4], [2.8, -5.2], [6, -1.2]] as const).entries()) c.add(i % 2 ? 'wk_crystal' : 'wk_crystals', pit[0] + da, pit[1] + dc, { dye: { glow: [0.92, 0.3, 0.8] }, s: 0.5 + (i % 3) * 0.12, jitter: 0.2, turn: i * 67 });
 
   // the barn along the bank: eight posts, its trusses (one fallen across), a back wall of thin boards and half a side
   const [b0, b1, bl, br] = [-17.5, -6.5, 27.8, 32.4];
