@@ -166,10 +166,10 @@ export function computeFx(s: FxState): FxParams {
 }
 
 /** Camera FOV "breathing" and projection skew at a moment in time: an uneven drift, not a sine, and strongest as the warp surges (round 58). */
-export function lensAt(fx: FxParams, time: number): { fovDeg: number; skew: number } {
+export function lensAt(fx: FxParams, time: number, fov: number = RENDER.fovDeg): { fovDeg: number; skew: number } {
   const k = 0.35 + 0.65 * fx.surge;
   return {
-    fovDeg: RENDER.fovDeg + fx.fovBreatheDeg * driftAt(time * FX.breatheHz * 4.3) * k,
+    fovDeg: fov + fx.fovBreatheDeg * driftAt(time * FX.breatheHz * 4.3) * k,
     skew: fx.skew * driftAt(time * FX.skewHz * 9, 5) * k,
   };
 }

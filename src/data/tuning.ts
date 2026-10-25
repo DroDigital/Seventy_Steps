@@ -247,6 +247,7 @@ export const CAMERA = {
   lockLift: 0.5, // metres: looks further down on close lock targets, to see them over the player...
   lockPitchMax: 0.8, // ...but never more steeply than this: a short foe close in is seen through the dithered investigator instead (round 12)
   recenterFrames: 20, // lock pressed with no target: swing behind the player
+  near: 6.5, // metres: where the world's distortion is centred and the sounds are heard from, at most this far from the investigator along the boom (a long Cinematic boom, round 77; the classic boom is shorter)
 };
 
 export const INPUT = {

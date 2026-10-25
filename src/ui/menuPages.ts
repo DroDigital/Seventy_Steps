@@ -8,6 +8,7 @@
 import { ACTIONS, DEFAULT_KEYS, keyLayout, keyName, rebind, type Action } from '../core/bindings';
 import { padReport } from '../core/pads';
 import { t } from '../core/i18n';
+import { cameraModeOf } from '../data/cameraModes';
 import { LANGS, type Key } from '../data/lang';
 import { RENDER, SETTINGS } from '../data/tuning';
 import { desktop } from './desktop';
@@ -31,6 +32,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
   shake: pct,
   cutscenes: onOff,
   questTracker: onOff,
+  camera: (v) => t(`val.camera.${cameraModeOf(v)}` as Key),
   quietWalk: onOff,
   captions: (v) => `×${v.toFixed(1)}`,
   captionBack: onOff,
@@ -47,7 +49,7 @@ const NAME = (id: SettingId): string => t(`set.${id}` as Key);
 const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
   ['set.tab.display', ['resolution', 'brightness', 'fog', 'shadows', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
-  ['set.tab.play', ['sensitivity', 'invertY', 'cutscenes', 'questTracker', 'quietWalk']],
+  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'cutscenes', 'questTracker', 'quietWalk']],
   ['set.tab.access', ['captions', 'captionBack', 'flashes', 'shake', 'fxCap']],
 ];
 const HINT = (id: SettingId): string | undefined => {
