@@ -1,4 +1,4 @@
-"""Pack 52, 'Old Gramophone' by KIFIR (Sketchfab, CC BY 4.0): a gramophone with its horn, its turntable and a needle arm, decimated, for Akeley's study (round 77)."""
+"""Pack 52, 'Old Gramophone' by KIFIR (Sketchfab, CC BY 4.0): a gramophone with its horn, its turntable and a needle arm, decimated, for Akeley's study (round 79)."""
 from manifest import M, add
 import sources as S
 

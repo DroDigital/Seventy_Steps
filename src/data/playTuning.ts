@@ -238,7 +238,7 @@ export const LIGHTS = {
   haloReach: 120, // metres: the farthest a halo is drawn (round 32: was 75; a town's windows are seen lit from across the fields)
   haloFog: 0.55, // halos pierce the fog: they fade by only this share of it
   paneHalo: 0.55, // metres: a lit window's glow, on its glass (round 13; the window kind's halo was a ball before the wall)
-  flameReach: 70, // metres: the farthest a flame's pixels are drawn (round 77: render/flames.ts; beyond it the halo is all that is seen of a fire)
+  flameReach: 70, // metres: the farthest a flame's pixels are drawn (round 79: render/flames.ts; beyond it the halo is all that is seen of a fire)
   flames: {
     torch: { height: 0.5, base: -0.2, count: 1, spread: 0 }, // a flame: its height, how far under the light it stands, how many of them make the fire and how far about it
     lamp: { height: 0.22, base: -0.1, count: 1, spread: 0 },

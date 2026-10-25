@@ -1,5 +1,5 @@
 /**
- * Flames (round 77, asked for "better fire everywhere" from free animations): every torch, fire and lamp the world lights (worldLights.ts) wears a
+ * Flames (round 79, asked for "better fire everywhere" from free animations): every torch, fire and lamp the world lights (worldLights.ts) wears a
  * pixel flame that flickers through a four-frame flipbook, cut from the free 'Fire' animation of ZomBCool (OpenGameArt, CC0; data/flameAtlas.ts,
  * tools/flames/bake_flames.py). The picture is a heat mask, so a flame is coloured here: a ramp from its rim to its white core, warm by
  * default, cold, sickly or violet for the places that burn so. A flame stands upright and turns about to face the eye; its pixels are hard

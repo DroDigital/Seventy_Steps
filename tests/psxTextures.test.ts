@@ -5,7 +5,7 @@ import { generateTexture, TEXTURE_SIZE } from '../src/render/textures';
 const pattern = (name: string): Uint8Array => Uint8Array.from(atob(PSX_DETAIL[name]), (c) => c.charCodeAt(0));
 const luma = (px: Uint8Array, i: number): number => (0.3 * px[i * 4] + 0.59 * px[i * 4 + 1] + 0.11 * px[i * 4 + 2]) / 255;
 
-describe('the PS1 surface patterns (round 77: the PSX Dungeon of Goblinatron, baked by tools/psx/bake_psx_textures.py)', () => {
+describe('the PS1 surface patterns (round 79: the PSX Dungeon of Goblinatron, baked by tools/psx/bake_psx_textures.py)', () => {
   it.each(['stone', 'slab', 'wood'])('%s is 64 × 64 bytes of brightness about 100, with a joint, grain or grout to it', (name) => {
     const p = pattern(name);
     expect(p.length).toBe(PSX_SIZE * PSX_SIZE);

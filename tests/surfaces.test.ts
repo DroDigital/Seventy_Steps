@@ -15,7 +15,7 @@ beforeAll(loadModels);
 const prop = (id: string, look: Partial<SetLook> = {}): Prop => ({ kind: 'set', x: 0, y: 0, z: 0, w: 1, d: 1, h: 1, yaw: 0, seed: 1, set: { id, scale: 1, ...look } });
 const mats = (id: string, look: Partial<SetLook> = {}): Set<string> => new Set(setPieces(prop(id, look), [0.8, 0.8, 0.8]).map((p) => p.mat));
 
-describe('what the models are made of (round 77: glass, liquid, a mirror, wax)', () => {
+describe('what the models are made of (round 79: glass, liquid, a mirror, wax)', () => {
   it('keeps the four classes the renderer draws as their own materials', () => {
     expect([KIND.glass, KIND.liquid, KIND.mirror, KIND.wax]).toEqual([12, 13, 14, 15]);
   });

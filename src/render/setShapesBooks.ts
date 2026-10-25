@@ -1,5 +1,5 @@
 /**
- * The built furniture of a reading room (round 77, the University Library, the Archives, Zann's garret): cases and low cases of books, a shelf
+ * The built furniture of a reading room (round 79, the University Library, the Archives, Zann's garret): cases and low cases of books, a shelf
  * on a wall, a heap on the floor. Built, not baked: the shelf pack the brief names forbids its assets being redistributed, and the game's
  * own models are its data. A case is a frame of boards and rows of spines of every height and colour, some gaps; the set's `tint`
  * leans its wood (dark for the restricted room, damp for the bindery). In the piece's own frame, feet at the origin, facing +z. Render only.

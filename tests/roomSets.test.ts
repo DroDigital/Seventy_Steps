@@ -13,7 +13,7 @@ const w = worldLayout();
 const rooms = w.dungeons.flatMap((d) => d.layout.rooms.map((r) => ({ d, r, key: `${d.layout.def.id}/${r.def.id}` })));
 const setsIn = (d: (typeof w.dungeons)[number], r: (typeof rooms)[number]['r']) => d.decor.filter((p) => p.kind === 'set' && Math.abs(p.x - r.x) < r.half && Math.abs(p.z - r.z) < r.half);
 
-describe("an ordinary room's set (round 77: the library's shelves, the stair's braziers)", () => {
+describe("an ordinary room's set (round 79: the library's shelves, the stair's braziers)", () => {
   it('is written for a room that is there, a hall that is no boss\'s, and names only baked models', () => {
     for (const [key, set] of Object.entries(ROOM_SETS)) {
       const room = rooms.find((x) => x.key === key);

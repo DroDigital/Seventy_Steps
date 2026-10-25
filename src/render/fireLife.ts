@@ -1,5 +1,5 @@
 /**
- * What a fire gives off (round 77, asked for: "better fire everywhere" from free animations): every fire within sight of the eye breathes a thin dark
+ * What a fire gives off (round 79, asked for: "better fire everywhere" from free animations): every fire within sight of the eye breathes a thin dark
  * smoke, in puffs cut from a free smoke sprite (data/flameAtlas.ts: Kenney's Smoke Particles, CC0), that the wind leans over, and throws up a few
  * embers that rise, cool from white to red and go out. A torch on a wall within a few paces sends up a wisp now and then. Render only; the flames
  * themselves are flames.ts's.

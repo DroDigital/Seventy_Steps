@@ -1,4 +1,4 @@
-"""Pack 50, 'Curtains' by Heliona (Sketchfab, CC BY 4.0): a rod and its two drapes, reduced to a third of their faces and hung against a wall (the pale drapery of Lilith's bridal canopy, round 77)."""
+"""Pack 50, 'Curtains' by Heliona (Sketchfab, CC BY 4.0): a rod and its two drapes, reduced to a third of their faces and hung against a wall (the pale drapery of Lilith's bridal canopy, round 79)."""
 from manifest import M, add
 import sources as S
 

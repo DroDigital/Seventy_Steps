@@ -1,4 +1,4 @@
-"""What sits inside or on a baked model (round 77): the liquid a flask or a jar holds, built as a body of revolution under its glass, and the faces of a
+"""What sits inside or on a baked model (round 79): the liquid a flask or a jar holds, built as a body of revolution under its glass, and the faces of a
 flat panel that are a mirror. Offline only (tools/models/bake_boss_models.py)."""
 import numpy as np
 import sources as S

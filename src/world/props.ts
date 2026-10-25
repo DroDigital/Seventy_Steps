@@ -40,7 +40,7 @@ export interface SetLook {
   round?: boolean; // its footprint a circle (a standing thing), else a box
   walk?: boolean; // low enough to be walked over: no collider
   hung?: boolean; // hangs on a wall: stands against it
-  wax?: boolean; // a figure of wax: its stone, bone, cloth and wood drawn as wax (round 77)
+  wax?: boolean; // a figure of wax: its stone, bone, cloth and wood drawn as wax (round 79)
   glow?: Glow; // a built piece's glow
   lit?: LightKind; // a flame in its lantern housing, or at the top of other pieces
   rod?: number; // a lightning rod's mast on its top, this many metres (a keep, a gatehouse: round 67)

@@ -1,5 +1,5 @@
 /**
- * The mirrors' geometry (round 77): which mirror is drawn, where the room's second picture is taken from, and the matrix that lays it on the glass. A mirror
+ * The mirrors' geometry (round 79): which mirror is drawn, where the room's second picture is taken from, and the matrix that lays it on the glass. A mirror
  * is where a piece of a hall's set has faces of the mirror class (`planeOf`, from the faces as placed); the picture is the room drawn from the eye's image
  * behind that plane, its near plane laid on the glass so that nothing behind the wall is drawn (an oblique projection). Pure, no GL.
  */

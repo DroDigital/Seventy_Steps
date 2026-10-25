@@ -11,7 +11,7 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
-  glass_alpha, fill, plane   what is clear, wet or silvered (round 77): see the fields
+  glass_alpha, fill, plane   what is clear, wet or silvered (round 79): see the fields
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
            out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature; `drop_alpha` leaves out the faces whose texture is mostly clear
 """
@@ -39,7 +39,7 @@ class M:
     cut: Any = None
     decimate: int = 0
     drop_alpha: float = 0.0  # the faces of a texture clearer than this (the glass of a jar) are left out
-    glass_alpha: float = 0.0  # ... or kept, as glass (round 77: class GLASS, drawn clear with a sheen)
+    glass_alpha: float = 0.0  # ... or kept, as glass (round 79: class GLASS, drawn clear with a sheen)
     fill: Any = None  # a liquid the glass holds: {'level': 0.5, 'inset': 0.9, 'colour': (r, g, b)} (fill.py), class LIQUID
     plane: Any = None  # the faces of a flat panel made a mirror: {'axis': 2, 'sign': 1, 'at': 0.007, 'tol': 0.0006} in the source's own frame, class MIRROR (fill.py)
     squash: tuple = (1, 1, 1)

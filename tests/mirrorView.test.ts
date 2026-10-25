@@ -24,7 +24,7 @@ const renderer = (seen: boolean[]) => {
   return { r: r as unknown as THREE.WebGLRenderer, calls, render: r.render };
 };
 
-describe('the mirror view (round 77)', () => {
+describe('the mirror view (round 79)', () => {
   it('draws the room once more from behind the glass, with the glass itself out of it, and shows it', () => {
     const { scene, glass } = room();
     const view = createMirrorView();

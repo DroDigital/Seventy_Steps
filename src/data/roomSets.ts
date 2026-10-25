@@ -1,5 +1,5 @@
 /**
- * The sets of the rooms that are no boss's (round 77, the asset brief for every dungeon: "tall scholarly reading hall; ordered catalogue,
+ * The sets of the rooms that are no boss's (round 79, the asset brief for every dungeon: "tall scholarly reading hall; ordered catalogue,
  * abandoned stacks, bindery worktables" for the Library, "two eternal flame sources" for the Cavern of Flame): a few halls that a place
  * has a picture of, furnished with the models the brief names, by the same machinery as a boss hall's (data/hallSets.ts, world/hallSet.ts).
  * Keyed by the dungeon's id and the room's ('library/foyer'); what is read and kept clear is the hall's: its walls, doorways and the room's

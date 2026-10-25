@@ -7,7 +7,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   tsathoggua: {
     puts: [
       put('kc_gate_rock', at(0.77, 90, { face: 'wall' }), { heart: true, size: 0.95, tint: [0.16, 0.16, 0.2], keep: 0 }), // the mouth of the cavern's black
-      put('mu_reishi', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [1.7, 2.6], tint: [0.4, 0.34, 0.42], keep: 0.5 }), // the fungus of Nkai, black and wet (round 77: Kyle Fuji's, CC0)
+      put('mu_reishi', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [1.7, 2.6], tint: [0.4, 0.34, 0.42], keep: 0.5 }), // the fungus of Nkai, black and wet (round 79: Kyle Fuji's, CC0)
       put('mu_bracket', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [1.6, 2.4], tint: [0.34, 0.36, 0.34], keep: 0.5 }),
       put('mu_oyster', scatter(4, [0.82, 0.98], { face: 'free' }), { size: [1.6, 2.2], keep: 0.6 }),
       put('mu_lantern', scatter(4, [0.82, 0.98], { face: 'free' }), { size: [1.6, 2.2] }),
@@ -22,8 +22,8 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The monastery of the High Priest on Leng: banners of yellow silk, monks' benches, candles, masks of stone, columns.
   high_priest: {
     puts: [
-      put('pw_wheel', scatter(5, [0.84, 0.97], { arc: [60, 300], face: 'free' }), { size: 1.2 }), // the wheels of the monastery (round 77: Özlem Çandır's, CC BY)
-      put('kf_column', ring(0.95, 6, { arc: [60, 300] }), { size: 1, tint: [0.62, 0.55, 0.36], keep: 0 }), // (round 77: Kenney's Retro Fantasy Kit, CC0)
+      put('pw_wheel', scatter(5, [0.84, 0.97], { arc: [60, 300], face: 'free' }), { size: 1.2 }), // the wheels of the monastery (round 79: Özlem Çandır's, CC BY)
+      put('kf_column', ring(0.95, 6, { arc: [60, 300] }), { size: 1, tint: [0.62, 0.55, 0.36], keep: 0 }), // (round 79: Kenney's Retro Fantasy Kit, CC0)
       put('kf_column_broken', at(0.88, 125, { mirror: true, face: 'free' }), { size: 1.1, tint: [0.62, 0.55, 0.36], keep: 0 }),
       put('banner', ring(0.97, 6, { arc: [60, 300] }), { size: 0.85 }),
       put('bench', ring(0.92, 4, { arc: [80, 280], face: 'in' }), { size: 1.2 }),
@@ -47,7 +47,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The temple on Yaddith-Gho: a circle of standing stones brought indoors, skulls on poles, idols and totems of the old rite, bones.
   ghatanothoa: {
     puts: [
-      put('rl_priest', ring(0.97, 5, { arc: [50, 310], face: 'in' }), { size: 1.1, tint: [0.2, 0.2, 0.24], keep: 0.15 }), // the wrapped priests of Mu in relief (round 77: INGSOC1984's, CC BY)
+      put('rl_priest', ring(0.97, 5, { arc: [50, 310], face: 'in' }), { size: 1.1, tint: [0.2, 0.2, 0.24], keep: 0.15 }), // the wrapped priests of Mu in relief (round 79: INGSOC1984's, CC BY)
       put('trilith', ring(0.93, 5, { jitter: 5, face: 'in' }), { size: 0.8 }),
       put('skull_pole', ring(0.88, 9, { arc: [40, 320], jitter: 8 }), { size: 1.1 }),
       put('idol', at(0.96, 180, { face: 'in' }), { size: 0.55 }),
@@ -58,9 +58,9 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The cylinders' vault of Rhan-Tegoth: tall cylinders like those in which the Yuggoth things keep brains, pedestals and the idol of the god.
   rhan_tegoth: {
     puts: [
-      put('mg_case', ring(0.92, 6, { arc: [50, 310], face: 'in' }), { size: 1.3 }), // the wax museum's cases (round 77: Oneironauticus', CC BY)
+      put('mg_case', ring(0.92, 6, { arc: [50, 310], face: 'in' }), { size: 1.3 }), // the wax museum's cases (round 79: Oneironauticus', CC BY)
       put('mg_jar', at(0.83, 100, { mirror: true, face: 'free' }), { size: 1.6, keep: 0.1, tint: [0.42, 0.46, 0.5] }),
-      put('rl_priest', at(0.82, 70, { mirror: true, face: 'in' }), { wax: true, size: 0.9 }), // the museum's effigies, in wax (round 77)
+      put('rl_priest', at(0.82, 70, { mirror: true, face: 'in' }), { wax: true, size: 0.9 }), // the museum's effigies, in wax (round 79)
       put('mu_reishi', scatter(4, [0.82, 0.97], { face: 'free' }), { size: [1.4, 2.2], keep: 0.5 }), // fungus over the glass
       put('mu_oyster', scatter(3, [0.82, 0.97], { face: 'free' }), { size: [1.4, 2], keep: 0.6 }),
       put('pipes', ring(0.93, 8, { arc: [50, 310] }), { size: 0.5, glow: 'purple' }),
@@ -72,7 +72,7 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
   umr_at_tawil: {
     puts: [
       put('uv_armillary', at(0.95, 150, { face: 'in' }), { heart: true, size: 1.4, tint: [0.62, 0.5, 0.34], keep: 0.3 }), // the armillary gate
-      put('uv_hourglass', scatter(3, [0.82, 0.95], { face: 'free' }), { size: 1.4 }), // (round 77: maike.pos', CC BY)
+      put('uv_hourglass', scatter(3, [0.82, 0.95], { face: 'free' }), { size: 1.4 }), // (round 79: maike.pos', CC BY)
       put('column', ring(0.97, 6, { arc: [50, 310] }), { size: 0.8 }),
       put('statue_ring', ring(0.9, 4, { arc: [80, 280], face: 'in' }), { size: 1.3 }),
       put('hexped', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.3, glow: 'magenta' }),

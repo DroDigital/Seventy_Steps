@@ -16,7 +16,7 @@ const cover = (x0: number, y0: number, w: number, h: number): number => {
   return n;
 };
 
-describe('the flame flipbook (round 77: a free pixel animation, baked by tools/flames/bake_flames.py)', () => {
+describe('the flame flipbook (round 79: a free pixel animation, baked by tools/flames/bake_flames.py)', () => {
   it('is two bytes a texel, and its four flames and four puffs each have a body of their own', () => {
     expect(atlas().length).toBe(FLAME_ATLAS.width * FLAME_ATLAS.height * 2);
     expect(FLAME_CELLS.at).toHaveLength(4);

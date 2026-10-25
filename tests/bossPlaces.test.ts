@@ -116,7 +116,7 @@ describe('the packs\' licences (docs/BOSS_PLACES.md)', () => {
     for (const [id, info] of Object.entries(BOSS_INFO)) expect(info.kit, id).not.toBe('p07');
   });
 
-  it('bake nothing from pack 41 (PSX Shelves), which may not be redistributed as assets, nor name its models (round 77)', () => {
+  it('bake nothing from pack 41 (PSX Shelves), which may not be redistributed as assets, nor name its models (round 79)', () => {
     expect(manifests).not.toMatch(/p41/);
     for (const [id, info] of Object.entries(BOSS_INFO)) expect(info.kit, id).not.toBe('p41');
     expect(Object.keys(BOSS_INFO).filter((id) => id.startsWith('ps_'))).toEqual([]);

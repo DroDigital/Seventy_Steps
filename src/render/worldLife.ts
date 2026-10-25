@@ -59,7 +59,7 @@ export interface LifeParts {
   sheet: { atlas: SpriteAtlas; texture: THREE.Texture }; // the creatures' sprites, for the great winged things
   skyline: Skyline; // the far silhouettes, given a false one by a failing mind (round 26)
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
-  lights: WorldLights; // the fires that give off smoke and embers (round 77)
+  lights: WorldLights; // the fires that give off smoke and embers (round 79)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
 }
@@ -87,7 +87,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
   const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
-  const fires = createFireLife(parts.particles, parts.lights); // round 77: the smoke and embers of the fires
+  const fires = createFireLife(parts.particles, parts.lights); // round 79: the smoke and embers of the fires
   const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
   const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
   const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight

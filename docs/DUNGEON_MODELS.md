@@ -1,4 +1,4 @@
-# The dungeons' models (round 77)
+# The dungeons' models (round 79)
 
 The asset brief for every dungeon (*Seventy Steps: free assets for every dungeon and boss room*, 28 dungeons, 290 rooms, 43 free sources) names models for each place and says what to make of them. This is what of it is in the game, how it was brought in, and what is not.
 
@@ -46,7 +46,7 @@ Pieces are placed as render dressing with colliders only where a body would stan
 
 New machinery in the set placer: `wall(r, step, {walls})` lays a row of candidates along the walls of a room, `face: 'wall'` turns each square to its wall, and `hung` stands a piece against a wall instead of clear of it (a shelf, a boarded window); an ordinary room's set draws the fight's circle smaller (`ROOM_INNER`) and keeps clear only the spots its own things use.
 
-## What is clear, wet, silvered and waxen (round 77)
+## What is clear, wet, silvered and waxen (round 79)
 
 A face of a baked model has a class byte, and four classes beside the old ones are drawn as what they are (`GLASS` 12, `LIQUID` 13, `MIRROR` 14, `WAX` 15: tools/models/boss/sources.py, render/modelKit.ts). The bake finds them three ways: by a material's name (`classes={'Architectural_Glass': S.GLASS}`), by a texture's clearness (`glass_alpha`: a jar's wall, an hourglass's bulbs, the faces whose texture is clearer than the given share are glass and are kept), and by geometry (`plane`: the flat panel in a mirror's frame, found as the faces that face the front at the depth of the glass). `fill` builds a liquid inside a vessel as a body of revolution under its glass, from the vessel's own profile (tools/models/boss/fill.py). Each is a material of its own in propMeshes (`glassware`, `liquid`, `wax`, `mirror`), the world shader with a `SURF_*` define (shaders/surfaces.ts):
 

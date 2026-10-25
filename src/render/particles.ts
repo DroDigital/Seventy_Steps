@@ -17,7 +17,7 @@ import { worldUniforms } from './worldMaterial';
 
 export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a crowd took the oldest away mid-flight)
 
-/** Round 77 added the smoke's puff (a free smoke sprite, data/flameAtlas.ts). Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
+/** Round 79 added the smoke's puff (a free smoke sprite, data/flameAtlas.ts). Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
 export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
 

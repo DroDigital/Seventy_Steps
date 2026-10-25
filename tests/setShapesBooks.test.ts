@@ -17,7 +17,7 @@ const box = (id: string, seed = 5): THREE.Box3 => {
   return b;
 };
 
-describe("a reading room's built furniture (round 77: the shelf pack's licence forbids its assets, so the cases are made in code)", () => {
+describe("a reading room's built furniture (round 79: the shelf pack's licence forbids its assets, so the cases are made in code)", () => {
   it.each(KITS)('draws %s in wood and cloth, with a body', (id) => {
     const pieces = setPieces(prop(id), [0.8, 0.8, 0.8]);
     expect(pieces.length).toBeGreaterThan(0);

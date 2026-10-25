@@ -1,4 +1,4 @@
-"""Pack 49, 'Retro Fantasy Kit' by Kenney (kenney.nl, CC0 1.0): a column, a broken column, a barrel stack and a pulley, taken singly, for the monasteries and halls of the Dreamlands and the loft of the Whateleys (round 77)."""
+"""Pack 49, 'Retro Fantasy Kit' by Kenney (kenney.nl, CC0 1.0): a column, a broken column, a barrel stack and a pulley, taken singly, for the monasteries and halls of the Dreamlands and the loft of the Whateleys (round 79)."""
 from manifest import M, add
 import sources as S
 

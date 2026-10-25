@@ -57,7 +57,7 @@ def used_by():
             places.setdefault(m.group(1) + '*', set()).add(name)
         for m in re.finditer(r"'([a-z]{2,3}_[a-z0-9_]+)'", text):
             places.setdefault(m.group(1), set()).add(name)
-    for f in sorted(glob.glob(os.path.join(ROOT, 'src', 'data', 'hallSets*.ts')) + [os.path.join(ROOT, 'src', 'data', 'roomSets.ts')]): # (round 77: the halls' and rooms' sets stand them too)
+    for f in sorted(glob.glob(os.path.join(ROOT, 'src', 'data', 'hallSets*.ts')) + [os.path.join(ROOT, 'src', 'data', 'roomSets.ts')]): # (round 79: the halls' and rooms' sets stand them too)
         here = os.path.basename(f)[:-3]
         owner = here
         for line in open(f).read().split('\n'):

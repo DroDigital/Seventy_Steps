@@ -1,5 +1,5 @@
 /**
- * The mirrors (round 77: a mirror was a framed dark panel): when the eye stands before a hall's mirror and looks toward it, the scene is drawn once more
+ * The mirrors (round 79: a mirror was a framed dark panel): when the eye stands before a hall's mirror and looks toward it, the scene is drawn once more
  * from the eye's image behind the glass, small (the picture is low-res as it is), with the mirror itself left out, and the mirror's shader lays that on
  * its glass, dimmed and cooled (shaders/surfaces.ts). One mirror at a time, the nearest. The mirrors are found among the scene's meshes (a chunk's or a
  * site's mirror mesh carries the spots of its glass, `userData.mirrors`, from render/propMeshes.ts), looked for again every so many frames. Render only.
