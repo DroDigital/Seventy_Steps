@@ -5,6 +5,7 @@
  */
 
 import type { PoiKind } from '../data/pois';
+import { SERIF } from './hudKit';
 import { TAU, type MarkState } from './mapIconKit';
 
 const WHITE = '#ffffff';
@@ -46,13 +47,14 @@ export function secret(ctx: CanvasRenderingContext2D, x: number, y: number, r: n
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   if (s.rumour || !s.poi) {
-    ctx.font = `bold ${Math.round(r * 1.8)}px monospace`;
+    ctx.font = `bold ${Math.round(r * 1.9)}px ${SERIF}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineWidth = Math.max(2.4, r * 0.34);
     ctx.strokeStyle = EDGE;
     ctx.strokeText('?', x, y + r * 0.06);
     ctx.fillStyle = WHITE;
+    [ctx.shadowColor, ctx.shadowBlur] = ['rgba(255,244,214,0.55)', r * 0.7]; // a breath of light about it
     ctx.fillText('?', x, y + r * 0.06);
     return;
   }
