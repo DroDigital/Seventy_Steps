@@ -56,6 +56,7 @@ import { voicedCurve } from '../../core/pace';
 import { createSpeech } from './speech';
 import { HEART } from '../feel';
 import { playSound } from './synth';
+import { createAtmosphereAudio } from './atmosphereAudio';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
@@ -122,6 +123,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
   createWayAudio(g, recipe, (set, at, o = {}) => recorded(set, at, at ? AUDIO.eventRange : 1, o)); // round 62: the wards, vents and waves of a way, and what is heard under its omens
   createAttackAudio(g, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o));
+  const atmosphere = createAtmosphereAudio({ e, g, sampler, recipe, recorded, listener, right }); // round 78: the places heard, the night's voices, the ground underfoot
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan } = place(cue.at, AUDIO.eventRange);
@@ -333,6 +335,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });
       dread.update(seconds, paused);
       drones.update(fx, seconds);
+      atmosphere.update(fx, seconds, camera, paused);
       if (paused) return void mounts.pause();
       mounts.update(dt, seconds);
       if (HEART.beats !== lastBeat) { // near death, the heart (round 14; hurtFx.ts and the health bar keep to it), louder as it nears the end (round 23)
