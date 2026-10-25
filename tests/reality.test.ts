@@ -80,7 +80,9 @@ describe('reality hooks (spec §3E)', () => {
   it('time_skip: the boss is suddenly elsewhere, its blow already falling', () => {
     const { g, boss } = hookFight(['time_skip']);
     const skips = record(g, 'TimeSkipped');
-    steps(g, REALITY.skipEvery[0]);
+    steps(g, REALITY.skipEvery[0] - 4);
+    g.ecs.c.brain.get(boss)!.cooldown = REALITY.skipLead; // its pause is nearly out (round 83: a skip no longer takes the whole of it)
+    steps(g, 4);
     expect(skips).toEqual([{ entity: boss }]);
     const a = g.ecs.c.actor.get(boss)!;
     expect(a.move).toBe('sweep');
