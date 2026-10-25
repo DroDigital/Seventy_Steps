@@ -6,6 +6,7 @@
 
 import { brainOf, type AttackChoice, type BrainDef } from '../data/archetypes';
 import { attackRange } from '../data/attacks';
+import { bandOf, PUNISH } from '../data/bossPunish';
 import type { AttackId, BossScript, EntityDef } from '../data/schema';
 
 /** The weighted attacks a creature fights with in `phase` of its script (clamped); without one, its own attacks evenly. */
@@ -17,7 +18,9 @@ export function phaseAttacks(def: EntityDef, phase = 0, script = def.bossScript)
 
 export function phaseBrain(def: EntityDef, phase: number, height: number, extra: readonly AttackChoice[] = [], script = def.bossScript): BrainDef {
   const choices: AttackChoice[] = phaseAttacks(def, phase, script).map((a) => ({ move: a.id, weight: a.weight, range: attackRange(a.id, height) }));
-  return brainOf(def.behavior.archetype, def.behavior.params, [...choices, ...extra]);
+  const brain = brainOf(def.behavior.archetype, def.behavior.params, [...choices, ...extra]);
+  const band = (script ?? def.bossScript) && bandOf(def.id); // the first horrors step aside from fewer of the investigator's blows (round 83)
+  return band && brain.params.evade ? { ...brain, params: { ...brain.params, evade: brain.params.evade * PUNISH[band].evade } } : brain;
 }
 
 /** The phase a boss at this health fraction has reached: the deepest whose `hpBelow` it has fallen under. */

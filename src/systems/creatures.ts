@@ -7,6 +7,7 @@
 
 import type { Entity } from '../core/ecs';
 import { ATTACKS, compileAttack } from '../data/attacks';
+import { bandOf, blowWeight } from '../data/bossPunish';
 import { EVADE } from './bossArena';
 import type { Place } from '../data/arena';
 import { REACTIONS, type MoveDef } from '../data/moves';
@@ -83,7 +84,13 @@ export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   const { height, radius } = bodyOf(def);
   const reach = reachOf(def);
   const moves: Record<string, MoveDef> = { ...REACTIONS, death: { frames: 80, hold: true } };
-  for (const id of attacksOf(def)) moves[id] = compileAttack(id, def.stats, reach);
+  const band = def.bossScript && bandOf(def.id); // a horror is held longer after a blow, the earlier it is met, and its lighter blows strike the harder for it (round 83)
+  const ids = attacksOf(def);
+  const top = Math.max(...ids.map((id) => ATTACKS[id].power));
+  for (const id of ids) {
+    const weight = band ? blowWeight(band, ATTACKS[id].power, top) : 1; // and its lighter blows strike the harder for it, the heaviest as they were
+    moves[id] = compileAttack(id, weight === 1 ? def.stats : { ...def.stats, damage: def.stats.damage * weight }, reach, band || undefined);
+  }
   const brain = phaseBrain(def, 0, reach); // a boss starts in its script's first phase (bossFight.ts moves it on)
   if (brain.params.evade > 0) moves.evade = EVADE;
   if (def.bossScript) moves.parried = { frames: BOSS.opening }; // a horror gathers itself sooner than a common foe (round 60)
