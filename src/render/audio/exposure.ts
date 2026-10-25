@@ -70,13 +70,13 @@ export const lookAt = (height: (x: number, z: number) => number, x: number, z: n
 export interface Exposure {
   /** Looks again when it is time and eases `PLACED` toward what it sees; `sea`: whether this realm has any, `wind`: whether the wind is the land's to place (not a gallop's own). `right` is the listener's right. */
   update(seconds: number, at: V3, right: V3, o: { sea: boolean; wind: boolean }): void;
-  /** The bearing (radians from +z toward +x) to the nearest sea a long way off, or null where none lies within the reach (the foghorn's, the buoy's). */
+  /** The bearing (radians from +z toward +x) to the nearest sea a long way off, or null where none lies within the reach (600 m: a realm is 512 across) (the foghorn's, the buoy's). */
   seaward(at: V3): number | null;
   /** Takes the next look whole, at once (after a jump, or on the title). */
   reset(): void;
 }
 
-const FAR_RINGS = [120, 220, 340, 480] as const;
+const FAR_RINGS = [120, 220, 340, 480, 600] as const;
 const FAR_BEARINGS = 16;
 
 export function createExposure(height: (x: number, z: number) => number = landHeight, level: number = WORLD.seaLevel): Exposure {

@@ -47,7 +47,7 @@ describe('the places\' voices as data (data/placeSounds.ts)', () => {
         if (v.set) {
           expect(SAMPLE_SETS[v.set], name).toBeDefined();
           expect(['whale', 'ghost', 'bell', 'thunder'].includes(v.set), `${name} is a cue's sound`).toBe(false);
-          expect(v.lowpass ?? 99999, `${name}: a recording is shut in`).toBeLessThanOrEqual(1800);
+          expect(v.lowpass ?? 99999, `${name}: a recording is shut in`).toBeLessThanOrEqual(2400);
         }
         expect(v.every[0], name).toBeGreaterThanOrEqual(70);
         expect(v.every[1], name).toBeGreaterThanOrEqual(v.every[0]);
@@ -57,7 +57,7 @@ describe('the places\' voices as data (data/placeSounds.ts)', () => {
         expect(v.gain > 0.2 && v.gain <= 1, name).toBe(true);
         expect(Object.keys(v.hours).length, name).toBeGreaterThan(0);
         for (const w of Object.values(v.hours)) expect(w! > 0 && w! <= 2, name).toBe(true);
-        if (v.seaward) expect(['innsmouth', 'rlyeh'].includes(region), `${name} seaward away from the sea`).toBe(true);
+        if (v.seaward) expect(region, `${name} seaward away from the sea`).toBe('innsmouth');
       }
     }
     expect(STILL_HOWL.set in SAMPLE_SETS).toBe(true);

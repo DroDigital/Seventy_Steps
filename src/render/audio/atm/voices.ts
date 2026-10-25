@@ -22,6 +22,7 @@ export function createNightVoices(ctx: AtmAudioContext): AtmAudioPart {
   let last = -Infinity;
   let roofed = false;
   let fighting = false;
+  let [realm, sea] = ['', false]; // whether the realm the investigator is in has a sea (the rest are islands in a void)
   return {
     update(_fx, seconds, _camera, paused) {
       const ow = g.overworld;
@@ -37,7 +38,8 @@ export function createNightVoices(ctx: AtmAudioContext): AtmAudioPart {
       }
       const outdoors = !roofed;
       PLACED.on = outdoors;
-      if (!paused && outdoors) exposure.update(seconds, at, ctx.right, { sea: getRegion(ow.region ?? '')?.biome.sea ?? false, wind: !g.player.mount.active || g.player.mount.speed < 4 });
+      if ((ow.region ?? '') !== realm) [realm, sea] = [ow.region ?? '', getRegion(ow.region ?? '')?.biome.sea ?? false];
+      if (!paused && outdoors) exposure.update(seconds, at, ctx.right, { sea, wind: !g.player.mount.active || g.player.mount.speed < 4 });
       const scene: Scene = { region: ow.region ?? null, phase: phaseOf(seconds), outdoors, held: paused || g.cutscene || fighting, weather: ow.weather.amount > 0.3 ? ow.weather.kind : 'clear', hushed: ctx.e.hushed };
       voices.update(seconds, scene);
     },

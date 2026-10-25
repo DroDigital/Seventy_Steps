@@ -31,11 +31,13 @@ export const GAP = 60;
 /** How patient the places are: every voice's wait is its own interval times this, the one knob for them all (1.4: about a voice in three or four minutes in a realm that has the hour for it). */
 export const PACE = 1.4;
 export const MASKED: ReadonlySet<string> = new Set(['storm', 'gale']);
+/** A voice's range, in times its farthest (render/audio/cues.ts `placeSound`: whole within 3 m, fading squared to nothing at the range): at its farthest it is heard at about a third of the level it would be at the door. */
+export const REACH = 2.5;
 /** The most of the hush (the ground going quiet before a horror: AudioEngine.hushed) in which a voice may begin. */
 export const HUSH_MOST = 0.12;
 
 const night = { gloaming: 1, deep: 1, waning: 0.6 } as const;
-const crows = (realm: string): PlaceVoice => ({ id: `${realm}-crows`, set: 'raven', every: [110, 220], gain: 0.34, far: [90, 170], hours: { waning: 1.6 }, lowpass: 1700, pitch: [0.82, 0.95] }); // the waning's grey: they stir though no dawn comes
+const crows = (realm: string): PlaceVoice => ({ id: `${realm}-crows`, set: 'raven', every: [110, 220], gain: 0.62, far: [90, 170], hours: { waning: 1.6 }, lowpass: 2400, pitch: [0.82, 0.95] }); // the waning's grey: they stir though no dawn comes
 
 export const PLACE_VOICES: Readonly<Record<string, readonly PlaceVoice[]>> = {
   hub: [
@@ -47,7 +49,7 @@ export const PLACE_VOICES: Readonly<Record<string, readonly PlaceVoice[]>> = {
     crows('arkham'),
   ],
   dunwich: [
-    { id: 'dunwich-hill', set: 'rumble', every: [110, 200], gain: 0.5, far: [150, 260], hours: { gloaming: 0.4, deep: 1, waning: 0.5 }, lowpass: 340, pitch: [0.8, 0.95] }, // Sentinel Hill, among the whippoorwills
+    { id: 'dunwich-hill', set: 'rumble', every: [110, 200], gain: 0.8, far: [150, 260], hours: { gloaming: 0.4, deep: 1, waning: 0.5 }, lowpass: 340, pitch: [0.8, 0.95] }, // Sentinel Hill, among the whippoorwills
   ],
   innsmouth: [
     { id: 'innsmouth-horn', recipe: 'foghorn', every: [95, 170], gain: 0.9, far: [150, 260], hours: { gloaming: 1, deep: 1, waning: 1.4 }, seaward: true },
@@ -73,5 +75,5 @@ export const PLACE_VOICES: Readonly<Record<string, readonly PlaceVoice[]>> = {
     { id: 'dream-bell', recipe: 'templeBell', every: [110, 200], gain: 0.9, far: [130, 220], hours: { gloaming: 1, deep: 1.3, waning: 0.6 } },
     { id: 'leng-drum', recipe: 'drum', every: [150, 260], gain: 0.9, far: [160, 280], hours: { gloaming: 0.5, deep: 1, waning: 0.5 } },
   ],
-  rlyeh: [{ id: 'rlyeh-swell', recipe: 'deepSwell', every: [120, 220], gain: 0.9, far: [100, 200], hours: { gloaming: 1, deep: 1, waning: 1 }, seaward: true }],
+  rlyeh: [{ id: 'rlyeh-swell', recipe: 'deepSwell', every: [120, 220], gain: 0.9, far: [100, 200], hours: { gloaming: 1, deep: 1, waning: 1 } }],
 };

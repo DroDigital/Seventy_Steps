@@ -9,7 +9,7 @@
 import type { V3 } from '../../core/geom';
 import { FAR } from '../../data/ambienceSounds';
 import { STILL, STILL_HOWL, stillOf } from '../../data/ambienceHours';
-import { GAP, HUSH_MOST, MASKED, PACE, PLACE_VOICES, type PlaceVoice } from '../../data/placeSounds';
+import { GAP, HUSH_MOST, MASKED, PACE, PLACE_VOICES, REACH, type PlaceVoice } from '../../data/placeSounds';
 import { SAMPLE_SETS } from '../../data/samples';
 import { hourOf, type Hour } from '../../systems/clock';
 import type { AtmAudioContext } from './atmosphereAudio';
@@ -103,7 +103,7 @@ export function createPlaceVoices(ctx: AtmAudioContext, seaward: (at: V3) => num
     const a = bearing === null ? Math.random() * Math.PI * 2 : bearing + (Math.random() - 0.5) * 0.7; // (the water, near enough)
     const d = between(voice.far);
     const at = { x: listener.x + Math.sin(a) * d, y: listener.y, z: listener.z + Math.cos(a) * d };
-    const { gain, pan } = placeSound(listener, right, at, voice.far[1] * 2);
+    const { gain, pan } = placeSound(listener, right, at, voice.far[1] * REACH);
     const o = { gain: gain * voice.gain, pan, lowpass: Math.min(voice.lowpass ?? 20000, dullness(gain) * 0.4), bus: e.bed ?? undefined };
     if (voice.recipe) return playSound(e, vary(`far:${voice.id}`, FAR[voice.recipe], 0.7), o);
     return sampler.play(SAMPLE_SETS[voice.set!], { ...o, pitch: between(voice.pitch ?? [0.95, 1.05]) });
