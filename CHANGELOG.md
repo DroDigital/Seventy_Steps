@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **A choice of camera.** Settings › Play › Camera: Classic (the default, as it was), Low hero (a lower, wider view), Long lens (a telephoto from far back) and Tight shoulder (close over the shoulder). Low hero and Long lens also frame what you lock on to: the camera stands back and aims between you and the foe, further for a tall one, so a colossus is seen whole instead of the camera sitting under it.
 - **Soft caps on the levels.** Vigour, Endurance and Might count whole up to level 18, half from the 19th to the 26th, and a sliver (15%) from the 27th to the 30th, as in the Souls games: thirty levels of one attribute are worth 22.6. The journey itself is untouched (no horror is met past level 18); what changes is the hunt after it. At the cap you have 431 health (it was 520), 281 stamina (340), 50 stamina a second (56) and blows of 1.9 times (2.2), and the ordinary foes of the world, which do not grow with you, stay a threat. The horrors grow to meet what you have become and not the count of levels, so a soft level does not make them much harder either. The Elder Sign's rows say what the next level really gives and mark one that counts for less.
 - Oil flames sit inside the new lantern and hanging lightpost housings, with warmer burners, dark iron, clear lightpost glass and smaller halos. Their light follows the housing when it is turned or scaled.
 - Moths circle selected outdoor lanterns and lightposts, including those along boss approaches and in open arenas.

@@ -16,6 +16,7 @@ import { getEntity, type Variant } from '../data/registry';
 import { DEEP_ONE, TRAINING_DUMMY } from '../data/placeholders';
 import type { Place } from '../data/arena';
 import { START_SIGN } from '../data/sites';
+import { CAMERA_MODES } from '../data/cameraModes';
 import { CAMERA, DEFAULT_DIFFICULTY, GUN, LAUDANUM, REAGENT, SIM, WORLD, type DifficultyId } from '../data/tuning';
 import { createArenaWorld } from '../world/arena';
 import type { CollisionWorld } from '../world/colliders';
@@ -43,7 +44,7 @@ import { placeSystem } from './places';
 import { poiSystem } from './pois';
 import { createBuffer } from './inputBuffer';
 import { insightSystem, spawnTome } from './insight';
-import { aimPoint, lockSystem } from './lockOn';
+import { aimPoint, frameOf, lockSystem } from './lockOn';
 import { movementSystem } from './movement';
 import { createOverworld, registerOverworld } from './overworld';
 import { registerArms, unreinforced } from './arms';
@@ -196,9 +197,11 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   const tr = g.ecs.c.transform.get(g.player.id)!;
   g.camera.prevMountLift = g.camera.mountLift;
   g.camera.mountLift += ((g.player.mount.active ? 1.05 : 0) - g.camera.mountLift) * Math.min(1, dt * 6);
-  const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + CAMERA.pivotHeight + g.camera.mountLift, z: tr.pos.z };
+  const tune = CAMERA_MODES[g.camera.mode];
+  const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + tune.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null && !g.player.glance ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  stepCamera(g.camera, { lookX, lookY, pivot, focus, behind: tr.yaw, distance: g.player.mount.active ? 8.5 : CAMERA.distance, probe: g.player.falling ? g.player.falling.lip.y + CAMERA.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
+  const frame = g.lock.target !== null && !g.player.mount.active ? frameOf(g, g.lock.target) : null; // a foe held in the lock is framed (Low hero, Long lens); a person spoken to, or a rig driven, is not
+  stepCamera(g.camera, { lookX, lookY, pivot, focus, frame, behind: tr.yaw, distance: g.player.mount.active ? tune.mountDistance : tune.distance, probe: g.player.falling ? g.player.falling.lip.y + tune.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
 }
 
 /**
