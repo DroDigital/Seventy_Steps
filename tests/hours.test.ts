@@ -98,7 +98,8 @@ describe('the hours\' colours (round 78)', () => {
       expect(c.glow[0], `${id}: a dusk is warm`).toBeGreaterThanOrEqual(c.glow[2] - 0.05);
       expect(rgbToHsv(c.dawn)[1], `${id}: a false dawn is pale`).toBeLessThan(0.3);
     }
-    expect(HOURS.band).toBeLessThanOrEqual(0.3); // nothing brighter than a thin band: round 35 took a bright gloaming away
+    expect(HOURS.band).toBeLessThanOrEqual(0.5); // nothing brighter than a thin band (it thins to a third of itself at eleven degrees): round 35 took a bright gloaming away
+    expect(HOURS.cone.band).toBeLessThanOrEqual(0.5);
   });
 });
 
@@ -147,6 +148,17 @@ describe('the sky\'s hours as they are laid (round 78)', () => {
     arena.run(0.02, 20);
     expect(arena.u.uHour.value.x).toBe(0);
     expect(arena.u.uTurn.value).toBe(0);
+  });
+
+  it('lets the stars stand still where time is stopped (the Pale Lattice), and wheel on from where they stood', () => {
+    const wheeled = (region: string, seconds: number): number => {
+      const s = rig(region);
+      s.run(0.3, seconds);
+      return s.u.uTurn.value;
+    };
+    const free = wheeled('dunwich', 260) - wheeled('dunwich', 60);
+    expect(free).toBeGreaterThan(0.1);
+    expect(Math.abs(wheeled('pale_lattice', 260) - wheeled('pale_lattice', 60))).toBeLessThan(free * 0.1);
   });
 
   it('wheels the stars with the night', () => {

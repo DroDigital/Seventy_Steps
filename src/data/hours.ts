@@ -9,10 +9,10 @@
 import type { Vec3 } from './tuning';
 
 export const HOURS = {
-  band: 0.3, // brightness of the afterglow band, added to the sky
-  falloff: 11, // how fast the band thins upward (1/radian of height)
+  band: 0.5, // brightness of the afterglow band, added to the sky (a first try of 0.3 was not seen through the mist and the grade)
+  falloff: 5.5, // how fast the band thins upward (1/radian of height): to a third of itself at eleven degrees
   spread: 2.5, // how wide it lies along the horizon: the power of the half-angle cosine
-  cone: { spread: 6, lean: 4, band: 0.26 }, // the false dawn: its width (a power), how fast it thins upward, and its brightness
+  cone: { spread: 5, lean: 2.4, band: 0.5 }, // the false dawn: its width (a power), how fast it thins upward, and its brightness
   turn: 0.6, // radians the stars wheel in a night (a vigil's called hour, ninety times faster, shows it)
   pole: [0.2, 0.6, 0.77] as Vec3, // the axis they wheel about (normalised in the shader), raised to the north
   ease: 3, // seconds to ease from one realm's hours to another's

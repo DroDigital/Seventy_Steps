@@ -183,9 +183,9 @@ void main() {
   cloudCol += hours * 0.7; // the afterglow lights its underside
   col = mix(col, cloudCol, cloud * mix(0.85, 0.96, ov));
   if (uHeat.y > 0.001) {
-    float away = abs(atan(sin(az - uHeat.x), cos(az - uHeat.x)));
+    float away = atan(sin(az - uHeat.x), cos(az - uHeat.x)); // to either side of the bank's bearing
     float bank = (1.0 - smoothstep(0.0, 0.26, h)) * smoothstep(-0.02, 0.02, h) * exp(-away * away / (uHeat.z * uHeat.z)); // a bank low on the horizon
-    col += vec3(0.7, 0.78, 1.0) * uHeat.y * bank * (0.4 + 1.1 * smoothstep(0.3, 0.7, fbm(vec2(az * 6.0, h * 16.0) + 3.0))); // lit from within, in sheets
+    col += vec3(0.7, 0.78, 1.0) * uHeat.y * bank * (0.4 + 1.1 * smoothstep(0.3, 0.7, fbm(vec2(away * 6.0, h * 16.0) + 3.0))); // lit from within, in sheets
   }
   if (uStorm > 0.001) col = mix(col, storm(d, uTime, col), uStorm);
   if (uCanopy > 0.001) col = mix(col, canopy(d, uTime, col), uCanopy);

@@ -49,10 +49,10 @@ export const OMEN = {
   stress: [0.45, 0.9] as Pair, // the failing mind's strange (0..1) from which an episode becomes likely, to where it is as likely as it gets
   know: 0.5, // the share of the chance that a mind that has gathered all its insight has, steady as it is
   chance: 0.75, // the most chance a slot has of an episode
-  elevation: [0.45, 0.65] as Pair, // radians above the horizon
-  lean: 0.7, // radians either side of where the eye looked when it began
-  size: 0.26, // radians: the figure's radius
+  elevation: [0.38, 0.55] as Pair, // radians above the horizon
+  lean: 0.5, // radians either side of where the eye looked when it began
+  size: 0.21, // radians: the figure's radius
   swell: 0.3, // the moon's growth at its greatest and the mind at its worst
   period: 90, // seconds of its slow swelling
-  sour: 0.35, // the share of the moon's colour that goes toward the stars' wrong violet
+  sour: 0.5, // the share of the moon's colour that goes toward the stars' wrong violet
 };

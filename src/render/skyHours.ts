@@ -7,6 +7,7 @@
  */
 
 import type * as THREE from 'three';
+import { cosmosOf } from '../data/cosmos';
 import { HOURS, HOUR_COLOURS } from '../data/hours';
 import type { Game } from '../systems/components';
 import { afterglowOf, falseDawnOf, phaseOf, skyTurnOf } from '../systems/clock';
@@ -28,7 +29,7 @@ export interface SkyHours {
 export function createSkyHours(g: Game, sky: THREE.Mesh, post: PostPass, atm: SkyAtm): SkyHours {
   const u = (sky.material as THREE.ShaderMaterial).uniforms;
   const [azDusk, azDawn] = [oppositeOf(0), oppositeOf(1)];
-  let last = -1;
+  let [last, lastTurn, held, still] = [-1, NaN, 0, 0]; // `held`: the radians of wheeling the Pale Lattice, where time is stopped, did not let the stars make
   return {
     update(time, region) {
       const dt = last < 0 ? 1 : Math.min(0.1, Math.max(0, time - last));
@@ -46,7 +47,11 @@ export function createSkyHours(g: Game, sky: THREE.Mesh, post: PostPass, atm: Sk
         cd.set(cd.x + (colours.dawn[0] * HOURS.cone.band - cd.x) * k, cd.y + (colours.dawn[1] * HOURS.cone.band - cd.y) * k, cd.z + (colours.dawn[2] * HOURS.cone.band - cd.z) * k);
       }
       u.uHour.value.set(atm.afterglow, atm.dawn, azDusk, azDawn);
-      u.uTurn.value = g.overworld ? skyTurnOf(time) : 0;
+      const turn = g.overworld ? skyTurnOf(time) : 0;
+      still += ((cosmosOf(region).still) - still) * k;
+      if (!Number.isNaN(lastTurn)) held += ((((turn - lastTurn + 3 * Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) - Math.PI) * still; // (the short way round)
+      lastTurn = turn;
+      u.uTurn.value = (((turn - held) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
       if (atm.afterglow > 0.01) {
         const c = u.uHourGlow.value as THREE.Vector3;
         const w = (HOURS.tint * atm.afterglow) / HOURS.band;
