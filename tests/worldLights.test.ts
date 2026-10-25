@@ -150,6 +150,33 @@ describe("the world's lights (render/worldLights.ts)", () => {
     expect(spread(seen[1])).toBeLessThanOrEqual(flicker('fire'));
     expect(spread(seen[2])).toBeLessThanOrEqual(flicker('lamp'));
   });
+
+  it('puts out a window\'s light and halo together with its pane, then lights both again', () => {
+    const lights = createWorldLights();
+    lights.add(1, [{ x: 0, y: 2, z: 2.52, glass: { x: 0, y: 2, z: 2 }, kind: 'window', pane: 0.13 }]);
+    const at = new THREE.Vector3(0, 1.7, 4);
+    lights.update(at, 0, null);
+    expect(glow(0)).toBeGreaterThan(0.5);
+    expect(halos(lights)).toBe(1);
+    lights.update(at, 25, null); // this pane is put out for a spell
+    expect(glow(0)).toBe(0);
+    expect(halos(lights)).toBe(0);
+    lights.update(at, 60, null);
+    expect(glow(0)).toBeGreaterThan(0.5);
+    expect(halos(lights)).toBe(1);
+  });
+
+  it('clears a window\'s outward plane when a street lamp takes its shader slot', () => {
+    const lights = createWorldLights();
+    lights.add(1, [{ x: 0, y: 2, z: 2.52, glass: { x: 0, y: 2, z: 2 }, kind: 'window' }]);
+    lights.update(eye, 0, null);
+    expect(worldUniforms.uLampPlane.value[0].toArray()).toEqual([0, 0, 1, -2]);
+    lights.remove(1);
+    lights.add(2, [{ x: 0, y: 2, z: 2.52, kind: 'lamp' }]);
+    lights.update(eye, 0, null);
+    expect(worldUniforms.uLampPlane.value[0].toArray()).toEqual([0, 0, 0, 0]);
+    expect(glow(0)).toBeGreaterThan(0.5);
+  });
 });
 
 describe('what reports a light', () => {
