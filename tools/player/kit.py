@@ -173,7 +173,15 @@ def loft(rings, c, caps=(True, True), cols=None):
         idx = len(shape.v)
         base = (len(rings) - 1) * n
         shape = Shape(np.vstack([shape.v, centre]), np.vstack([shape.f, [(idx, base + (k + 1) % n, base + k) for k in range(n)]]), np.vstack([shape.c, np.tile(np.asarray(c if cols is None else cols[-1], float), (n, 1))]))
-    return shape
+    return outward(shape)
+
+
+def outward(shape):
+    """The shape wound so that its closed volume is positive (outward faces): a loft given from the top down, or a skirt on the left, comes out inside-out and is drawn as its far faces."""
+    t = shape.tris() - shape.v.mean(axis=0)
+    if np.einsum('ij,ij->i', t[:, 0], np.cross(t[:, 1], t[:, 2])).sum() >= 0:
+        return shape
+    return Shape(shape.v, np.asarray(shape.f)[:, ::-1], shape.c, shape.tag)
 
 
 def fix_winding(shape, inside=None):

@@ -212,6 +212,9 @@ function toward(j: Figure['legR'], t: number, x: number, y = 0, z = 0): void {
 /** `k` on its own stretch `[a, b]` of the way, eased: 0 at and below `a`, 1 at and above `b`. */
 const stage = (k: number, a: number, b: number): number => ease((k - a) / (b - a));
 
+/** Where a weapon points at the kneel, radians off the hanging line (the forearm lifts onto the knee and the body goes down, so the walk's carry would put a point through the ground; the rapier, long, is turned the other way). */
+const KNEEL_AIM: Readonly<Record<string, number>> = { cane: -1, axe: -1.1, cutlass: -1.1, rapier: 1.6 };
+
 /**
  * Resting at an Elder Sign: down on the right knee before the stone, head bowed, forearms on the raised
  * knee (round 15). The limbs ease toward the pose from whatever the stride left them at (round 19's
@@ -221,8 +224,10 @@ const stage = (k: number, a: number, b: number): number => ease((k - a) / (b - a
  * push on the knee until half way up and then let go, and the legs and body unfold the whole way; the
  * body and legs run together, so the feet stay on the ground.
  */
-function kneel(f: Figure, k: number): void {
+function kneel(f: Figure, k: number, weapon = ''): void {
   const [low, hands, bow] = [stage(k, 0, 0.8), stage(k, 0, 0.5), stage(k, 0.3, 1)];
+  const pitch = (): number => f.body.rotation.x + f.torso.rotation.x + f.armR.rotation.x + f.elbowR.rotation.x + f.handR.rotation.x; // which way the weapon in his hand points, off the vertical
+  const carried = pitch();
   f.body.position.y -= 0.4 * low;
   f.body.rotation.x += 0.18 * low;
   f.torso.rotation.x += 0.12 * low;
@@ -235,6 +240,26 @@ function kneel(f: Figure, k: number): void {
   toward(f.armL, hands, -0.6, 0, 0.14);
   toward(f.elbowR, hands, -0.75);
   toward(f.elbowL, hands, -0.75);
+  const aim = KNEEL_AIM[weapon];
+  if (aim !== undefined) f.handR.rotation.x += carried + (aim - carried) * hands - pitch(); // the wrist turns the weapon from where the walk carried it to where it clears the ground
+}
+
+/**
+ * A clip's boots are set for the clip's own walk; a kneel bends the legs by hand over it, and the front boot would stand tilted into the
+ * floor. So the pose is settled both ways, the clip's own feet and the ground's, and the one eased into the other over the first of the
+ * kneel (a kneel eased to nothing leaves the stride as it was).
+ */
+function settleKneeling(f: Figure, ground: Ground | undefined, k: number): void {
+  const joints = [f.kneeR, f.kneeL, f.footR, f.footL, f.skirt[0], f.skirt[1]];
+  const start = [f.body.position.y, ...joints.map((j) => j.rotation.x)];
+  settle(f, ground, false);
+  const own = [f.body.position.y, ...joints.map((j) => j.rotation.x)];
+  f.body.position.y = start[0];
+  joints.forEach((j, i) => (j.rotation.x = start[i + 1]));
+  settle(f, ground, true);
+  const t = stage(k, 0, 0.1);
+  f.body.position.y = own[0] + (f.body.position.y - own[0]) * t;
+  joints.forEach((j, i) => (j.rotation.x = own[i + 1] + (j.rotation.x - own[i + 1]) * t));
 }
 
 function fall(f: Figure, frame: number): void {
@@ -312,7 +337,7 @@ export function pose(f: Figure, p: PoseInput): void {
   if (!d || p.move === null) {
     clipped = mine && playerStride(f, player);
     if (!clipped) stride(f, p.speed, p.stride, p.time, p.guard);
-    if (p.kneel) kneel(f, p.kneel);
+    if (p.kneel) kneel(f, p.kneel, mine ? player.weapon : '');
     if (p.act) {
       actPose(f, p.act.kind, p.act.k, p.time);
       showProps(f, p.act.k > 0.02);
@@ -339,5 +364,6 @@ export function pose(f: Figure, p: PoseInput): void {
     f.body.rotation.x -= 0.18 * p.flinch;
     f.head.rotation.x -= 0.25 * p.flinch;
   }
-  settle(f, p.ground, !clipped);
+  if (clipped && p.kneel) settleKneeling(f, p.ground, p.kneel);
+  else settle(f, p.ground, !clipped); // a clip keeps its own feet
 }

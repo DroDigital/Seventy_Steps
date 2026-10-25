@@ -18,6 +18,7 @@ export interface Held {
 
 const UPPER = [1, 2, 3, 4, 5, 6, 7, 8]; // torso, head, and the arms: the joints of PLAYER_JOINTS a guard or a swallow sets while the legs walk on
 const CARRY: Readonly<Record<string, number>> = { cane: 0, axe: 0.15, razor: 0, cutlass: 0.2, rapier: 0.8 }; // how far a carried weapon is tipped forward off the hanging line, radians, so its point clears the ground
+const WALK_TIP: Readonly<Record<string, number>> = { cane: 0.45, axe: 0.6 }; // and the more of it while he walks, as the walk clip lets the hand hang lower than the idle's: the cane's point and the axe's head clear the ground at a stick's half tilt
 const [A, B, C, D, E] = [newPose(), newPose(), newPose(), newPose(), newPose()];
 const SPECIFIC = /^(light|heavy)\d|^parry$|^guard$/;
 
@@ -77,7 +78,10 @@ export function playerStride(f: Figure, p: PlayerInput): boolean {
   const g = p.guard ? playerClip(`${p.weapon}.guard`) : undefined;
   if (g) overlay(A, sampleClip(g, p.time * 60, B), UPPER);
   applyPose(f, A);
-  if (!g) f.handR.rotateX(CARRY[p.weapon] ?? 0); // a guard's weapon is held as the clip made it
+  if (!g) {
+    const w = blendAt(p.speed); // a guard's weapon is held as the clip made it
+    f.handR.rotateX((CARRY[p.weapon] ?? 0) + (WALK_TIP[p.weapon] ?? 0) * w.stride * (1 - w.run));
+  }
   held(f, { drawn: p.guard, props: [] }); // a guard raised has the sword-cane's blade out
   return true;
 }

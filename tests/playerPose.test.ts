@@ -62,6 +62,68 @@ describe('the investigator posed from his clips (render/playerPose.ts)', () => {
     expect(carried.angleTo(f.handR.quaternion)).toBeGreaterThan(0.5); // the rapier is carried tipped forward
   });
 
+  it('carries every weapon with its point above the ground at every speed of the walk and every step', () => {
+    const f = buildFigure('player');
+    const low = new THREE.Vector3();
+    for (const weapon of WEAPON_IDS) {
+      const mesh = f.arms![weapon];
+      expect(mesh, weapon).toBeTruthy();
+      for (const speed of [0, 0.3, 0.6, 1, 1.4, 2.2, 2.6, 3, 3.5, 4.2, 6.4]) {
+        let lowest = Infinity;
+        for (let i = 0; i < 48; i++) {
+          pose(f, { ...STILL, speed, stride: (i / 48) * 2 * Math.PI, time: 1.3, weapon });
+          f.root.updateMatrixWorld(true);
+          mesh.traverse((o) => {
+            const g = (o as THREE.Mesh).geometry as THREE.BufferGeometry | undefined;
+            const at = g?.getAttribute('position');
+            for (let v = 0; at && v < at.count; v++) lowest = Math.min(lowest, low.fromBufferAttribute(at, v).applyMatrix4(o.matrixWorld).y);
+          });
+        }
+        expect(lowest, `${weapon} at ${speed} m/s`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('kneels with the weapon in his hand clear of the ground', () => {
+    const f = buildFigure('player');
+    const low = new THREE.Vector3();
+    for (const weapon of WEAPON_IDS) {
+      for (let k = 0; k <= 1.0001; k += 0.0625) {
+        pose(f, { ...STILL, time: 1.3, weapon, kneel: k });
+        f.root.updateMatrixWorld(true);
+        let lowest = Infinity;
+        f.arms![weapon].traverse((o) => {
+          const at = ((o as THREE.Mesh).geometry as THREE.BufferGeometry | undefined)?.getAttribute('position');
+          for (let v = 0; at && v < at.count; v++) lowest = Math.min(lowest, low.fromBufferAttribute(at, v).applyMatrix4(o.matrixWorld).y);
+        });
+        expect(lowest, `${weapon}, kneel ${k.toFixed(4)}`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('kneels with both boots on the ground, not through it, standing or walking as he begins', () => {
+    const f = buildFigure('player');
+    for (const [speed, stride] of [[0, 0], [1.6, 1.1], [1.6, 3.4]]) {
+      for (let k = 0; k <= 1.0001; k += 0.025) {
+        pose(f, { ...STILL, speed, stride, time: 3, kneel: k });
+        f.root.updateMatrixWorld(true);
+        for (const foot of [f.footR, f.footL]) expect(new THREE.Box3().setFromObject(foot).min.y, `speed ${speed} stride ${stride} kneel ${k.toFixed(3)}`).toBeGreaterThan(-0.025);
+      }
+    }
+  });
+
+  it('rolls on a slope without his knees folding while he is upside down', () => {
+    const f = buildFigure('player');
+    const knees = (slope: number, frame: number): number[] => {
+      pose(f, { ...STILL, move: 'roll', def: def('roll'), frame, ground: (x: number, z: number) => slope * (z + 0.3 * x) });
+      return [f.kneeR.rotation.x, f.kneeL.rotation.x];
+    };
+    for (let frame = 0; frame < def('roll').frames; frame++) {
+      const [flat, tilted] = [knees(0, frame), knees(0.01, frame)];
+      expect(Math.abs(tilted[0] - flat[0]) + Math.abs(tilted[1] - flat[1]), `frame ${frame}`).toBeLessThan(0.15);
+    }
+  });
+
   it('turns only the roll: a blow or a backstep takes no yaw', () => {
     const f = buildFigure('player');
     for (const move of ['light1', 'backstep']) {

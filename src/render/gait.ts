@@ -40,6 +40,7 @@ const SPRINT: GaitDef = {
 };
 const GAITS = [WALK, RUN, SPRINT] as const;
 const DEG = Math.PI / 180;
+const COS_UPRIGHT = Math.cos(1.1); // a body tipped further than this from the vertical is not on its feet: nothing is settled to the ground
 
 /** Stride cycles per second at a ground speed (m/s), fitted so the stance foot keeps pace with the ground. */
 const CADENCE: readonly (readonly [speed: number, hz: number])[] = [[0, 0.75], [1, 0.76], [1.4, 1.03], [2.2, 1.36], [2.6, 1.5], [3, 1.62], [4.2, 1.76], [5, 1.93], [6.4, 1.99]];
@@ -191,7 +192,8 @@ export function settle(f: Figure, ground?: Ground, level = true): void {
   const pitch = wrapAngle(f.body.rotation.x);
   const clearance = f.hip - f.thigh - f.shin;
   const shank = f.shin - f.ankle; // knee to ankle
-  if (Math.abs(pitch) < 1.1) {
+  const q = f.body.quaternion;
+  if (1 - 2 * (q.x * q.x + q.z * q.z) > COS_UPRIGHT) { // upright, however the body was turned to be (a clip's roll takes it over, and the Euler pitch of that folds back to look small)
     const legs = [[f.legR, f.kneeR, f.footR], [f.legL, f.kneeL, f.footL]] as const;
     const under = legs.map(([legJ, knee]) => {
       const a = pitch + legJ.rotation.x; // the thigh from the vertical, positive with the foot behind

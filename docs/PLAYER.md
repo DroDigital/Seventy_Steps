@@ -114,6 +114,8 @@ spin and a death's fall are exempt as the code says). Then look at the picture: 
 * **`look` clamps** the head at 40° pitch and 63° yaw, and flips sign through 180°; in a deep lean or a full spin key `head` itself.
 * **Rapier and the others' carried tilt.** The game tips a carried rapier (0.8 rad), cutlass (0.2) and axe (0.15) forward in the carried gait only (`playerPose.ts CARRY`), not in a clip and not over a guard clip (a guard's weapon is held as the clip made it):
   a clip begins and ends in the idle's hold and the 0.12 s crossfade takes up the difference. The rapier's clips begin and end with the arm raised a little so the long point clears the floor.
+  Through the walk's speeds the cane and the axe are tipped a further `WALK_TIP` (the walk clip lets the hand hang lower than the idle's, and a stick half tilted walks there), and at the kneel `poses.ts KNEEL_AIM` turns the weapon in his hand to where it clears the floor; `tests/playerPose.test.ts` measures the lowest point of every weapon over every speed, stride phase and kneel.
+* **Parts are wound outward.** `kit.loft` turns a shape whose volume comes out negative inside out again (a loft given from the top down, a skirt on the left) so the faces the game draws are the outer ones; `tests/playerWinding.test.ts` checks every baked piece.
 * **Previews crop.** `preview.py sheet` frames a 2.15 m portrait tile, which crops a lunge or a raised blade: widen `preview.aim`'s `height` in a throwaway wrapper.
 * `__pycache__` goes stale if a clip file is edited to the same length within a second of a run: delete `tools/player/clips/__pycache__/<module>*.pyc` if numbers do not move.
 
