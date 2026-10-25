@@ -57,6 +57,7 @@ import { createSpeech } from './speech';
 import { HEART } from '../feel';
 import { playSound } from './synth';
 import { createAtmosphereAudio } from './atmosphereAudio';
+import { createOcclusion, heard } from './occlusion';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
@@ -101,23 +102,27 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const acts = createActFoley(g, (key, sound, o) => recipe(key, sound, o));
   const weatherBed = createWeatherBed(e, sampler); // round 59: the rain is recorded
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard
-  const place = (at: V3 | null, range: number): { gain: number; pan: number } => placeSound(listener, right, at, range);
+  const occlusion = createOcclusion(g); // round 78: a wall, a roof or a horror's fog between the investigator and a sound dulls it
+  const place = (at: V3 | null, range: number): { gain: number; pan: number; lowpass: number; occ: number } => {
+    const p = placeSound(listener, right, at, range);
+    return at && p.gain > 0 ? heard(p, occlusion.occludedAt(at)) : { ...p, lowpass: dullness(p.gain), occ: 0 }; // (`lowpass`: the distance's, or the wall's if duller)
+  };
   /** One of a set's takes where `at` is; false when none has loaded. */
   const recorded = (id: SampleSetId | string, at: V3 | null, range: number, o: { gain?: number; pitch?: number; delay?: number; fit?: number; pan?: number } = {}): boolean => {
-    const { gain, pan } = place(at, range);
-    return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? dullness(gain) : undefined });
+    const { gain, pan, lowpass } = place(at, range);
+    return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? lowpass : undefined });
   };
   const varier = createVarier(); // round 40: a recipe is drawn a little anew each time it plays, and never at the last play's pitch
   /** A recipe where `at` is: placed, dulled by the distance, varied. */
   const recipe: GameAudio['recipe'] = (key, sound, o = {}) => {
     const at = o.at ?? null;
-    const { gain, pan } = place(at, o.range ?? AUDIO.eventRange);
+    const { gain, pan, lowpass } = place(at, o.range ?? AUDIO.eventRange);
     if (gain <= 0) return false;
     const rec = RECORDED_FOR[key]; // a recording of it, once there is one (data/plannedSounds.ts), plays in front, and the recipe keeps a third beneath it (or none: a horse's voice, round 59)
     const took = !!rec && recorded(rec, at, o.range ?? AUDIO.eventRange, { fit: o.fit, gain: Math.min(1, o.gain ?? 1) * (o.level ?? 1), pan: o.pan });
     const under = recipeShare(rec, took);
     if (under <= 0) return true;
-    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (o.level ?? 1) * under, pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? dullness(gain) : undefined });
+    return playSound(e, varier(key, sound, o.vary ?? 1), { gain: gain * (o.gain ?? 1) * (o.level ?? 1) * under, pan: at ? pan : o.pan ?? pan, pitch: o.pitch, lowpass: at ? lowpass : undefined });
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
@@ -126,11 +131,11 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const atmosphere = createAtmosphereAudio({ e, g, sampler, recipe, recorded, listener, right }); // round 78: the places heard, the night's voices, the ground underfoot
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
-    const { gain, pan } = place(cue.at, AUDIO.eventRange);
+    const { gain, pan, lowpass, occ } = place(cue.at, AUDIO.eventRange);
     const level = gain * (cue.gain ?? 1);
     const [set, beneath] = STINGER_SAMPLES[cue.sound] ?? [null, 1];
     const took = set !== null && recorded(set, cue.at, AUDIO.eventRange, { gain: cue.gain, pitch: cue.pitch });
-    if (!took || beneath > 0) playSound(e, varier(`stinger:${cue.sound}`, STINGERS[cue.sound], STINGER_VARY[cue.sound] ?? 1), { gain: level * (took ? beneath : 1), pan, pitch: cue.pitch });
+    if (!took || beneath > 0) playSound(e, varier(`stinger:${cue.sound}`, STINGERS[cue.sound], STINGER_VARY[cue.sound] ?? 1), { gain: level * (took ? beneath : 1), pan, pitch: cue.pitch, lowpass: occ > 0 ? lowpass : undefined });
   };
   g.events.on('Echoes', (ev) => void (ev.change === 'spent' && ev.on === 'ware' && recipe('hands:coins', HANDS.coins, { gain: CLASS_GAIN.hands }))); // a ware bought: coins counted out (a level has its own sound)
   for (const type of Object.keys(CUES) as (keyof GameEvents)[]) {

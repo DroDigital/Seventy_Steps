@@ -6,10 +6,12 @@
  * the music, effects and ambience settings each set one bus: music the theme's and the scores',
  * effects the one-shots', ambience the drones'. WebAudio starts on the first click or key press, as browsers require (or
  * sooner, `start`, where the browser already lets sound play); until then (or without WebAudio)
- * everything stays silent and nothing fails.
+ * everything stays silent and nothing fails. Round 78: the one-shots (and a share of the bed) are also sent into a room
+ * of convolution reverb (space.ts) that follows where the investigator stands; its answer joins before the shaper.
  */
 
 import { AUDIO } from '../../data/tuning';
+import { createSpaceBus, type SpaceBus } from './space';
 
 export interface AudioEngine {
   readonly ctx: AudioContext | null;
@@ -19,6 +21,7 @@ export interface AudioEngine {
   readonly music: AudioNode | null; // the title's theme in: the volume setting only, no sanity FX
   readonly speech: AudioNode | null; // what the people and the horrors say in (the voices): the speech setting, and the volume; no sanity FX, no muffle
   readonly hushed: number; // how far the bed has given way (setHush), 0..1: the realm music follows it
+  readonly space?: SpaceBus; // round 78: the room the one-shots are heard in (audio/space.ts; absent until WebAudio runs, and where a test casts a fake engine)
   detune: number; // cents new one-shots start at: the sanity FX's sag and drift
   playing: number; // one-shots sounding now (synth.ts counts them against AUDIO.polyphony)
   setVolume(v: number): void;
@@ -69,6 +72,7 @@ interface Graph {
   shaper: WaveShaperNode;
   muffle: BiquadFilterNode;
   master: GainNode;
+  space?: SpaceBus;
 }
 
 function build(volume: number, levels: Levels, speechLevel: number): Graph {
@@ -96,7 +100,13 @@ function build(volume: number, levels: Levels, speechLevel: number): Graph {
   shaper.connect(muffle).connect(limiter).connect(master).connect(ctx.destination);
   music.connect(master);
   speech.connect(limiter);
-  const graph = { ctx, sfx, bed, score, music, speech, shaper, muffle, master };
+  let space: SpaceBus | undefined;
+  try {
+    space = createSpaceBus(ctx, sfx, bed, shaper); // round 78: the one-shots and a share of the bed are sent into the room the investigator stands in; its answer joins before the shaper
+  } catch {
+    space = undefined; // no room: the sound is as it was
+  }
+  const graph = { ctx, sfx, bed, score, music, speech, shaper, muffle, master, space };
   setBusLevels(graph, levels);
   return graph;
 }
@@ -151,6 +161,9 @@ export function createAudioEngine(volume: number, levels: Levels = { music: 1, s
     },
     get hushed() {
       return hushed;
+    },
+    get space() {
+      return graph?.space;
     },
     detune: 0,
     playing: 0,
