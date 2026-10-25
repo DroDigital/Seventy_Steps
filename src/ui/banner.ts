@@ -32,17 +32,19 @@ interface Look {
   rise: number; // ms to fade in
   z: number;
   ink?: boolean; // the words are inked in a letter at a time
+  space?: readonly [from: number, to: number]; // em of space between the letters, at the card's rise and at its end (the words slowly widen)
   rank: number; // a card waits for one of higher rank
 }
 
 const LOOK: Record<Tone, Look> = {
   death: { color: '#9b2a20', size: 56, top: 44, hold: Infinity, band: 0.85, rise: 1500, z: 9, rank: 4 },
   victory: { color: '#c9a45c', size: 42, top: 40, hold: 5, band: 0.75, rise: 900, z: 2, rank: 3 },
-  realm: { color: BONE, size: 40, top: 22, hold: CARD.realmHold, band: 0.55, rise: 900, z: 2, ink: true, rank: 2 },
+  realm: { color: BONE, size: 38, top: 22, hold: CARD.realmHold, band: 0.55, rise: 900, z: 2, ink: true, space: [0.12, 0.2], rank: 2 },
   place: { color: BONE, size: 30, top: 20, hold: 2.6, band: 0.45, rise: 700, z: 2, ink: true, rank: 1 },
   hour: { color: BONE, size: 22, top: 14, hold: HOUR.hold, band: 0, rise: 1400, z: 2, ink: true, rank: 0 },
 };
 const FADE_MS = 1200; // a card's fade at its end
+const FIT = 22; // a name of more letters than this is set a little smaller, so the longest of the realms' fits between the minimap and the vitals
 
 type Args = Parameters<Banner['show']>;
 
@@ -119,11 +121,12 @@ export function createBanner(): Banner {
       rule.style.background = `linear-gradient(90deg,#0000,${colour},#0000)`;
       Object.assign(root.style, { top: `${L.top}%`, zIndex: String(L.z), transform: 'translateY(-50%)' });
       root.style.background = L.band > 0 ? `linear-gradient(90deg,#0000,#000${Math.round(L.band * 15).toString(16)} 22%,#000${Math.round(L.band * 15).toString(16)} 78%,#0000)` : 'none';
-      Object.assign(words.style, { color: colour, fontSize: `calc(${L.size}px * var(--ui, 1))` });
+      const fit = L.ink ? Math.min(1, FIT / Math.max(1, text.length)) : 1;
+      Object.assign(words.style, { color: colour, fontSize: `calc(${(L.size * fit).toFixed(1)}px * var(--ui, 1))` });
       const life = (Number.isFinite(L.hold) ? hold + 2 : 8) * 1000;
       anims = [
         root.animate([{ opacity: 0 }, { opacity: 1 }], { duration: L.rise, easing: 'ease-out', fill: 'forwards' }),
-        words.animate([{ transform: 'scale(0.97)', letterSpacing: '0.26em' }, { transform: 'scale(1.03)', letterSpacing: '0.4em' }], { duration: life, easing: 'linear', fill: 'forwards' }),
+        words.animate([{ transform: 'scale(0.97)', letterSpacing: `${L.space?.[0] ?? 0.26}em` }, { transform: 'scale(1.03)', letterSpacing: `${L.space?.[1] ?? 0.4}em` }], { duration: life, easing: 'linear', fill: 'forwards' }),
       ];
       if (tone === 'realm') {
         anims.push(rule.animate([{ transform: 'scaleX(0)', opacity: 0 }, { transform: 'scaleX(1)', opacity: 0.85 }], { duration: INK.rule.draw * 1000, delay: INK.rule.delay * 1000, easing: 'ease-out', fill: 'both' }));
