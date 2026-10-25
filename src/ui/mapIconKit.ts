@@ -1,10 +1,13 @@
 /**
- * What the map's figures share (round 60): the kinds of mark and what state each can be in, the colours, the dark token a figure is set on and how
- * far a mark reaches. mapIcons.ts draws the places, mapIconsLive.ts the people, the Echoes, the story's lead, the marker and the investigator.
+ * What the map's figures share (round 60; overhauled 2026-10-25, "I want a complete overhaul"): the kinds of mark and what state each can be in,
+ * the colours, how far a mark reaches, and the small kit every figure is made with. The marks are no longer glyphs on a medallion: each is a small
+ * object found in the dreamlands and pinned to the map, a standing stone, a portal, a trapdoor, an idol's eye, a locket, a lamp, a key, a cairn,
+ * an arrowhead, a surveyor's stake. All are drawn in one light (from the upper left, a little above), in the same oblique view (a lit face, a
+ * shaded side on the right and a top that takes the most light), each with a soft shadow cast to the lower right and a dark halo about it, so a
+ * figure reads on ground from near-black fog to snow. A figure is drawn in units of its radius (`drawMark` translates and scales to it).
  */
 
 import type { PoiKind } from '../data/pois';
-import { blend } from './hudKit';
 
 export type MarkKind = 'sign' | 'gate' | 'dungeon' | 'boss' | 'person' | 'echo' | 'lead' | 'place' | 'you' | 'marker' | 'secret';
 
@@ -20,88 +23,129 @@ export interface MarkState {
   turn?: number;
 }
 
+export type Ctx = CanvasRenderingContext2D;
+export type Pt = readonly [number, number];
+
 export const INK = '#0b0a0e';
 export const BONE = '#d9d0b8';
 export const DIM = '#8a8474';
 export const MAGENTA = '#d80073';
 export const PURPLE = '#9a5ad0';
 export const VERDIGRIS = '#4fb3a0'; // the investigator's own marker: copper gone green, a colour no other mark has
-export const BRASS = '#c9b27a'; // lost Echoes: pale brass (round 36: the neon green was the one loud colour on the map)
-export const BRONZE = '#c8884e'; // a dungeon's door: the bronze of a torch-lit lintel
+export const BRASS = '#c9b27a'; // lost Echoes and the story's key: pale brass
+export const BRONZE = '#c8884e'; // a dungeon's iron and its torch
 export const VEIL = '#7b3fc4';
 export const TAU = Math.PI * 2;
 
-/** The size of a mark's token about `r`, the radius a kind is drawn at: what a name or another mark should keep clear of. */
-export const reach = (kind: MarkKind, r: number): number => (kind === 'place' ? r * 0.75 : kind === 'person' ? r * 0.95 : kind === 'you' ? r * 1.1 : kind === 'marker' ? r * 0.9 : r * 1.15);
+/** The halo every figure has about it, so a figure of any colour stands out from ground of any light. */
+export const EDGE = 'rgba(8,6,12,0.92)';
 
-/** How far below a marker's centre its pin's tip falls, in radii: the place it marks is the tip (a mark stands centred on its place; the pin does not). */
+/** How far each kind reaches, in radii: about its outer edge, for hit-testing and for keeping a name clear of it. */
+const REACH: Record<MarkKind, number> = { sign: 1.12, gate: 1.22, dungeon: 1.2, boss: 1.2, person: 0.95, echo: 1.08, lead: 1.15, place: 0.75, you: 1.15, marker: 1.0, secret: 0.85 };
+
+/** The size of a mark about `r`, the radius a kind is drawn at: what a name or another mark should keep clear of. */
+export const reach = (kind: MarkKind, r: number): number => r * REACH[kind];
+
+/** How far below a marker's centre its stake's foot falls, in radii: the place it marks is the foot (a mark stands centred on its place; the stake does not). */
 export const PIN_TIP = 1.55;
 
-const tinted = new Map<string, string>();
-/** `hex` ('#rrggbb') lightened toward white by `k` (0 to 1), or darkened toward black by `-k`; kept, for a frame draws hundreds of marks. */
-export function tint(hex: string, k: number): string {
-  const key = `${hex}${k}`;
-  let out = tinted.get(key);
-  if (!out) tinted.set(key, (out = k >= 0 ? blend(hex, '#ffffff', k) : blend(hex, '#000000', -k)));
-  return out;
+/** `hex` with an alpha, as a CSS colour. */
+export function rgba(hex: string, a: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`;
 }
 
-/** A vertical sheen from `y0` to `y1`: `hex` lit at the top and shaded at the foot, so a flat figure reads as a cut thing. */
-export function sheen(ctx: CanvasRenderingContext2D, y0: number, y1: number, hex: string, lift = 0.4, sink = 0.35): CanvasGradient {
-  const g = ctx.createLinearGradient(0, y0, 0, y1);
-  g.addColorStop(0, tint(hex, lift));
-  g.addColorStop(0.5, hex);
-  g.addColorStop(1, tint(hex, -sink));
+/** A width in the figure's units: `units`, but never less than `minPx` pixels, so a hairline survives the minimap. */
+export const u = (r: number, units: number, minPx: number): number => Math.max(units, minPx / r);
+
+type Stop = string | readonly [number, string];
+function stops(g: CanvasGradient, cols: readonly Stop[]): CanvasGradient {
+  cols.forEach((c, i) => (typeof c === 'string' ? g.addColorStop(cols.length < 2 ? 0 : i / (cols.length - 1), c) : g.addColorStop(c[0], c[1])));
   return g;
 }
+/** A linear gradient from (x0, y0) to (x1, y1); colours spread evenly, or at the positions given. */
+export const lin = (ctx: Ctx, x0: number, y0: number, x1: number, y1: number, ...cols: Stop[]): CanvasGradient => stops(ctx.createLinearGradient(x0, y0, x1, y1), cols);
+/** A radial gradient about (x, y) from `r0` to `r1`. */
+export const rad = (ctx: Ctx, x: number, y: number, r0: number, r1: number, ...cols: Stop[]): CanvasGradient => stops(ctx.createRadialGradient(x, y, r0, x, y, r1), cols);
 
-/**
- * The medallion a figure is set on (round 68: "enhance the visual design of all map icons"; 2026-10-25: struck like a coin, "they look cheap and
- * dull"): a face lit from above left and tinted by its own colour, a rim that is bright where the light meets it and dark where it turns away, a
- * groove cut just inside, a glint along the lit edge, and a black edge about it for ground of any light. `glow` lights the rim itself.
- */
-export function token(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, ring: string, glow = ''): void {
-  const rim = Math.max(1.5, r * 0.19);
-  ctx.save();
-  ctx.lineWidth = rim + 2.4;
-  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+/** Light spilled on the air and ground about (x, y): `hex` at alpha `a` in the middle, nothing at `radius`. */
+export function glow(ctx: Ctx, x: number, y: number, radius: number, hex: string, a: number): void {
+  ctx.fillStyle = rad(ctx, x, y, 0, radius, rgba(hex, a), rgba(hex, a * 0.4), rgba(hex, 0));
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, TAU);
-  ctx.stroke();
-  if (glow) [ctx.shadowColor, ctx.shadowBlur] = [glow, r * 1.4];
-  const face = ctx.createRadialGradient(x - r * 0.3, y - r * 0.4, r * 0.05, x, y, r);
-  face.addColorStop(0, tint(ring, -0.6));
-  face.addColorStop(0.55, tint(ring, -0.8));
-  face.addColorStop(1, tint(ring, -0.92));
-  ctx.fillStyle = face;
+  ctx.arc(x, y, radius, 0, TAU);
+  ctx.fill();
+}
+
+/** The soft shadow a figure casts on the ground: an ellipse about (x, y), darkest in the middle. */
+export function groundShadow(ctx: Ctx, x: number, y: number, rx: number, ry: number, a = 0.42): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(1, ry / rx);
+  ctx.fillStyle = rad(ctx, 0, 0, 0, rx, `rgba(4,3,8,${a})`, `rgba(4,3,8,${a * 0.7})`, 'rgba(4,3,8,0)');
+  ctx.beginPath();
+  ctx.arc(0, 0, rx, 0, TAU);
   ctx.fill();
   ctx.restore();
-  const edge = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
-  edge.addColorStop(0, tint(ring, 0.55));
-  edge.addColorStop(0.5, ring);
-  edge.addColorStop(1, tint(ring, -0.5));
-  ctx.lineWidth = rim;
-  ctx.strokeStyle = edge;
+}
+
+/** A closed path through `pts` (begun here; not filled). */
+export function poly(ctx: Ctx, pts: readonly Pt[]): void {
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, TAU);
-  ctx.stroke();
-  ctx.save();
-  ctx.beginPath(); // the groove inside the rim, and the lip beside it
-  ctx.arc(x, y, r * 0.8, 0, TAU);
-  ctx.lineWidth = Math.max(0.8, r * 0.07);
-  ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-  ctx.stroke();
+  for (const [x, y] of pts) ctx.lineTo(x, y);
+  ctx.closePath();
+}
+
+/** A face of a solid: a polygon, or a function that builds its path, and what fills it. */
+export type Face = readonly [shape: readonly Pt[] | (() => void), fill: string | CanvasGradient];
+const trace = (ctx: Ctx, shape: readonly Pt[] | (() => void)): void => (typeof shape === 'function' ? shape() : poly(ctx, shape));
+
+/**
+ * Draws a solid of several faces: first the dark halo about all of them, then each face in order, so a face drawn later covers an earlier one
+ * and only the halo outside the whole is left. `halo` is its thickness in units (at least 2.2 px), half of it outside the figure.
+ */
+export function solid(ctx: Ctx, r: number, faces: readonly Face[], halo = 0.1): void {
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = u(r, halo, 2.2);
+  ctx.strokeStyle = EDGE;
+  for (const [shape] of faces) {
+    trace(ctx, shape);
+    ctx.stroke();
+  }
+  for (const [shape, fill] of faces) {
+    trace(ctx, shape);
+    ctx.fillStyle = fill;
+    ctx.fill();
+  }
+}
+
+/** A line through `pts`, open, in `colour` `width` units wide (at least `minPx`): the lit edge of a cut face, a joint, a crack. */
+export function stroke(ctx: Ctx, r: number, pts: readonly Pt[], colour: string, width: number, minPx = 0.7): void {
   ctx.beginPath();
-  ctx.arc(x, y, r * 0.72, 0, TAU);
-  ctx.globalAlpha = 0.28;
-  ctx.strokeStyle = ring;
-  ctx.stroke();
-  ctx.beginPath(); // a glint along the rim where the light falls
-  ctx.arc(x, y, r - rim * 0.1, Math.PI * 1.08, Math.PI * 1.58);
-  ctx.globalAlpha = 0.5;
+  for (const [x, y] of pts) ctx.lineTo(x, y);
   ctx.lineCap = 'round';
-  ctx.lineWidth = Math.max(0.8, rim * 0.34);
-  ctx.strokeStyle = '#fff';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = u(r, width, minPx);
+  ctx.strokeStyle = colour;
   ctx.stroke();
-  ctx.restore();
+}
+
+/** A point `k` of the way from `p` to `q`. */
+export const mix = (p: Pt, q: Pt, k: number): Pt => [p[0] + (q[0] - p[0]) * k, p[1] + (q[1] - p[1]) * k];
+/** `p` moved by `d` scaled by `k`. */
+export const shift = (p: Pt, d: Pt, k = 1): Pt => [p[0] + d[0] * k, p[1] + d[1] * k];
+
+/** Puts a drop shadow of the next fills or strokes `px` pixels to the lower right in `colour`, which is how a cut line gets its lit lip. */
+export function lip(ctx: Ctx, colour: string, px: number): void {
+  ctx.shadowColor = colour;
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = px * 0.8;
+  ctx.shadowOffsetY = px;
+}
+
+/** Ends a shadow set by `lip` or by a glow. */
+export function unlip(ctx: Ctx): void {
+  ctx.shadowColor = 'rgba(0,0,0,0)';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
 }
