@@ -4,15 +4,19 @@
  * Near death (round 14; round 23) the edge stays a dark red that swells with each stroke of the heart the
  * audio plays, and the picture loses some of its colour (the post pass's uFaint): felt, not flashed.
  * The health bar's draining chip is the HUD's half (hud.ts). Round 25: a petrifying gaze drains the colour to stone, closes the
- * edges in grey and, past half, cracks the picture (the post pass's uStone).
+ * edges in grey and, past half, cracks the picture (the post pass's uStone). Round 78 (render/tide.ts): struck down, the colour runs
+ * out of the picture and its corners close in; rising from an Elder Sign the corners open and the light swells for a breath.
  */
 
 import * as THREE from 'three';
 import { HURT } from '../data/tuning';
+import { LIGHTING } from '../data/fxTuning';
+import { TIDE } from '../data/uiMood';
 import type { Game } from '../systems/components';
 import { fallDark } from '../systems/falls';
 import type { PostPass } from './postPass';
 import { FEEL, HEART } from './feel';
+import { createTide } from './tide';
 
 export interface HurtFx {
   /** Sets the post pass's wound and jolts the camera; `time` is render seconds. */
@@ -24,6 +28,8 @@ export function createHurtFx(g: Game): HurtFx {
   let at = -Infinity;
   const dir = new THREE.Vector2(0, -1);
   let pending = false;
+  const tide = createTide(g);
+  let breathing = false;
   g.events.on('Hit', (e) => {
     if (e.target !== g.player.id || e.damage <= 0 || e.outcome === 'blocked' || e.outcome === 'dodged') return;
     const max = g.ecs.c.health.get(g.player.id)?.max ?? 100;
@@ -50,6 +56,17 @@ export function createHurtFx(g: Game): HurtFx {
       post.uniforms.uFaint.value.set(need * HURT.lowBase + HEART.swell * HURT.lowPulse * (0.35 + 0.65 * need), need * HURT.lowDrain);
       post.uniforms.uFade.value = fallDark(g.player.falling); // over an edge: the picture closes in to black (systems/falls.ts)
       post.uniforms.uStone.value = g.reality.petrify; // turning to stone (the bar on the boss's HUD is the other half)
+      const { drain, breath } = tide.update(); // round 78: struck down, the colour drains and the corners close; risen from the stone, a breath out
+      if (drain > 0) {
+        const faint = post.uniforms.uFaint.value as THREE.Vector2;
+        faint.y = Math.max(faint.y, TIDE.grey * drain);
+        post.uniforms.uFade.value = Math.max(post.uniforms.uFade.value as number, TIDE.close * drain);
+      }
+      if (breath > 0 || breathing) { // written from the constants, never read back, so it cannot compound
+        post.uniforms.uVig.value = LIGHTING.vignette * (1 - TIDE.breath.vig * breath);
+        (post.uniforms.uBloom.value as THREE.Vector4).x = LIGHTING.bloom.strength * (1 + TIDE.breath.bloom * breath);
+        breathing = breath > 0;
+      }
       if (k > 0.01) {
         const j = HURT.shake * k * FEEL.shake;
         camera.position.x += (Math.random() - 0.5) * j;

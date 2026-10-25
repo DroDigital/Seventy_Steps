@@ -48,7 +48,7 @@ export interface MapScreen {
 }
 
 /** `go` makes a long jump under the veil (journeys.ts). */
-export function createMapScreen(g: Game, painter: MapPainter, resume: () => void, go: (words: string, jump: () => void) => void): MapScreen {
+export function createMapScreen(g: Game, painter: MapPainter, resume: () => void, go: (words: string, jump: () => void, line?: string, region?: string) => void): MapScreen {
   const screen = createScreen(7, '#050506', 'inset:0', false); // its own canvas, the screen's size
   const canvas = document.createElement('canvas');
   canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;cursor:grab';
@@ -138,7 +138,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const p = chosen;
     if (!p || barOf(p)) return; // (refused before the map closes and any veil falls)
     close();
-    go(p.name.toUpperCase(), () => travel(g, p.id));
+    go(p.name.toUpperCase(), () => travel(g, p.id), undefined, p.region);
   };
   const cycle = (by: 1 | -1): void => {
     if (!lit.length) return;
