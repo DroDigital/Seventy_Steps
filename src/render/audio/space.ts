@@ -66,6 +66,7 @@ export function createSpaceBus(ctx: AudioContext, sfx: AudioNode, bed: AudioNode
       if (!closer(Math.log(row.dark), Math.log(sent.dark), 0.03)) dull.frequency.setTargetAtTime((sent.dark = Math.min(ctx.sampleRate * 0.45, Math.max(300, row.dark))), t, SPACE.slide);
       if (!closer(row.pre, sent.pre, 0.5)) pre.delayTime.setTargetAtTime((sent.pre = row.pre) / 1000, t, SPACE.preSlide);
       Object.assign(state, row, { wet });
+      state.echo = row.echo; // (a room with none leaves no echo of the last one)
     },
     enable(on) {
       if (on === state.on) return;
