@@ -6,6 +6,7 @@
  * (shaders/eldritch.ts).
  */
 
+import { BODY_PUSH, FOOT_RINGS } from '../../data/groundSkin';
 import { PANE_GLSL } from '../paneLife';
 import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
@@ -33,6 +34,9 @@ attribute float aEdge; // the share of the region beside's ground, toward the bo
 #ifdef SWAY
 attribute float aSway; // metres this vertex is blown at the height of a gust: nothing at a trunk's foot, most at the tip of a bough or a blade (round 34)
 uniform float uWind;
+uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 78: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
+uniform sampler2D uTrample; // and the lane of stems laid down where one has gone, 64 x 64 texels wrapped (render/trample.ts)
+uniform vec4 uTrampleBox; // its centre cell, 1 / a cell's metres, the half-width in cells (0: none)
 #endif
 #ifdef PANES
 attribute float aPane; // a lit window's seed (paneLife.ts; round 18)
@@ -66,6 +70,36 @@ void main() {
   float gust = 0.5 + 0.5 * sin(uTime * 0.31 + wp.x * 0.045 - wp.z * 0.03); // gusts roll across the land...
   float flutter = 0.5 * sin(uTime * 1.7 + wp.x * 0.9 + wp.z * 0.7) + 0.25 * sin(uTime * 2.9 + wp.z * 1.3); // ...and shiver in it
   wp.xz += aSway * uWind * (0.3 + 0.7 * gust + 0.3 * flutter) * vec2(0.85, 0.5); // after vWorld: lit and shadowed where it stands, drawn where the wind has it
+  if (aSway > 0.002) { // round 78: the grass parts for a body going through it, and lies where one has gone (a trunk's foot and a stone have no sway: they stand)
+    float blade = aSway * 6.25; // the height of this vertex above its foot, near enough (a blade's tip is blown 0.16 of its length)
+    vec2 away = vec2(0.0);
+    float bent = 0.0;
+    for (int i = 0; i < ${BODY_PUSH.slots}; i++) {
+      vec4 b = uBodies[i];
+      vec2 d = wp.xz - b.xz;
+      float r = length(d);
+      float k = (1.0 - smoothstep(b.w * 0.5, b.w * 2.2 + 0.01, r)) * (1.0 - smoothstep(0.9, 1.7, wp.y - b.y)); // near the body, and low: the boughs above its head stand still
+      away += d / max(r, 0.05) * k;
+      bent = max(bent, k);
+    }
+    wp.xz += away * min(blade * 0.8, 0.55);
+    float laid = 0.0;
+    vec2 tc = wp.xz * uTrampleBox.z;
+    vec2 off = abs(floor(tc) - uTrampleBox.xy);
+    float edge = max(off.x, off.y);
+    if (edge < uTrampleBox.w) {
+      vec2 tu = tc / 64.0;
+      float f = textureLod(uTrample, tu, 0.0).r * (1.0 - smoothstep(uTrampleBox.w - 5.0, uTrampleBox.w - 1.0, edge)) * (1.0 - smoothstep(1.4, 2.4, wp.y - uBodies[0].y)); // (not a tree's crown or a banner overhead: only what grows near the ground the investigator stands on)
+      if (f > 0.02) {
+        vec2 grad = vec2(textureLod(uTrample, tu + vec2(1.0 / 64.0, 0.0), 0.0).r - textureLod(uTrample, tu - vec2(1.0 / 64.0, 0.0), 0.0).r, textureLod(uTrample, tu + vec2(0.0, 1.0 / 64.0), 0.0).r - textureLod(uTrample, tu - vec2(0.0, 1.0 / 64.0), 0.0).r);
+        float a = fract(sin(dot(position.xz, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
+        vec2 dir = normalize(-grad * 5.0 + 0.45 * vec2(cos(a), sin(a)) + 1e-4); // away from the lane's middle, and where it has none, every which way
+        wp.xz += dir * min(blade, 0.9) * 0.85 * f;
+        laid = f;
+      }
+    }
+    wp.y -= blade * min(0.5 * bent + 0.7 * laid, 0.85);
+  }
 #endif
   wp.xyz = displace(wp.xyz);
 
@@ -124,6 +158,12 @@ uniform float uSeaLevel;
 uniform float uWet; // how soaked the ground is, 0..1 (weather.ts; round 34)
 uniform vec3 uLightColor;
 uniform vec2 uSheen;
+uniform float uCoatOn; // 1: this material takes the realm's coat (render/worldMaterial.ts: what is a prop of stone, wood or cloth)
+uniform vec3 uCoatCol; // round 78: what lies on the stones of the realm (data/coats.ts, render/coat.ts): the matter on what faces up and into the wind...
+uniform vec3 uCoatStain; // ...what a stained surface's colour is multiplied by...
+uniform vec4 uCoatA; // ...how much of what faces up, what faces the wind and what lies below the line it covers; and how much of it there is now (0: none)
+uniform vec4 uCoatLine; // ...the stain's line (metres), how it thins above it, how it wanders, how pale the salt on it is
+uniform vec4 uStep[${FOOT_RINGS.slots}]; // round 78: where and when a boot last landed (x, z, the time, its strength): a ring in a puddle (render/bodyPush.ts)
 uniform float uHasMap3; uniform vec2 uPatch; // 1: uMap3 is laid over the ground in patches of the land's own noise, from uPatch.x, softly over uPatch.y (round 32: a field is not one ground)
 
 varying vec2 vUv;
@@ -167,6 +207,23 @@ vec2 affineUv(vec2 texels) {
   vec2 off = (vUvw.xy / vUvw.z - vUv) * texels;
   float len = length(off);
   return vUv + off * (min(len, uAffine) / max(len, 1e-4)) / texels;
+}
+
+// Rings spreading from where boots have landed, a double ring that thins as it widens and dies in ${FOOT_RINGS.life} s (round 78).
+float footRings(vec2 p) {
+  float sum = 0.0;
+  for (int i = 0; i < ${FOOT_RINGS.slots}; i++) {
+    vec4 s = uStep[i];
+    float age = uTime - s.z;
+    if (age > 0.0 && age < ${FOOT_RINGS.life.toFixed(2)}) {
+      float r = length(p - s.xy);
+      float rad = 0.12 + age * 0.9;
+      float w = 0.06 + 0.05 * age;
+      float fade = 1.0 - age / ${FOOT_RINGS.life.toFixed(2)};
+      sum += s.w * fade * fade * (smoothstep(w, 0.0, abs(r - rad)) + 0.55 * smoothstep(w, 0.0, abs(r - rad * 0.55)));
+    }
+  }
+  return sum;
 }
 
 uniform float uClipY;
@@ -220,6 +277,18 @@ void main() {
     pud = smoothstep(thr, thr + 0.06, pn) * smoothstep(0.86, 0.97, n.y);
     tex *= 1.0 - uWet * (0.1 + 0.16 * n.y) - 0.3 * pud;
   }
+  if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 78: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
+    float cn = 0.6 * vnoise(vWorld.xz * 0.8 + vWorld.y * 0.37 + 23.0) + 0.4 * vnoise(vWorld.xz * 2.3 - vWorld.y * 0.9 + 5.0);
+    float cap = uCoatA.x * smoothstep(0.4, 0.75, n.y + (cn - 0.5) * 0.7);
+    float windward = max(dot(n.xz, vec2(-0.86, -0.5)), 0.0) * (1.0 - n.y); // faces turned into the wind the grass leans from
+    float film = uCoatA.y * smoothstep(0.2, 0.55, windward + (cn - 0.5) * 0.8);
+    float cover = clamp(max(cap, film), 0.0, 1.0) * uCoatA.w;
+    tex = mix(tex, uCoatCol * (0.78 + 0.45 * dot(tex, vec3(0.333))), cover); // (the stone's own light and dark still show through a little)
+    float above = vWorld.y + (cn - 0.5) * uCoatLine.z - uCoatLine.x; // metres above the stain's line, wandering
+    float stain = uCoatA.z * (1.0 - smoothstep(0.0, uCoatLine.y, above)) * uCoatA.w;
+    float crust = uCoatLine.w * smoothstep(-0.1, 0.12, above) * (1.0 - smoothstep(0.12, 0.5, above)) * step(0.01, uCoatA.z) * uCoatA.w; // salt dried along the line
+    tex = mix(tex * mix(vec3(1.0), uCoatStain, stain), vec3(0.62, 0.64, 0.6), crust * 0.7);
+  }
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);
@@ -251,6 +320,10 @@ void main() {
     float ring = step(0.4, hash12(cell * 1.7 + beat * 5.1)) * smoothstep(0.1, 0.0, abs(length(vWorld.xz - drop) * 1.6 - age * 0.5)) * (1.0 - age);
     col = mix(col, uFogColor * vec3(0.8, 0.9, 1.0) + uLightColor * glint * 1.5, mirror * pud);
     col += (lamp * 1.1 + vec3(0.2, 0.22, 0.25) * ring) * pud;
+    col += (vec3(0.18, 0.2, 0.23) + lamp * 2.2) * footRings(vWorld.xz) * pud; // round 78: the puddle rings where a boot has landed, lit by the lantern it stands in
+  } else if (uWet > 0.5 && uEmissive < 0.5 && uCharacter < 0.5 && n.y > 0.86) { // and the soaked ground about a boot gives back a fainter ring of the same light
+    float ringed = footRings(vWorld.xz);
+    if (ringed > 0.01) col += (vec3(0.06, 0.07, 0.09) + lamp * 0.8) * ringed * (uWet - 0.3);
   }
 #ifdef PANES
   col *= paneLit(vPane, uTime) * paneFigure(vPane, uTime, vPaneUv); // lived behind: put out now and then, dimmed as someone passes, and now and then someone seen
