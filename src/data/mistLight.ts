@@ -9,7 +9,7 @@
 export const SHAFT = {
   steps: 16, // taps along each pixel's ray, their start dithered as the mist's is
   reach: 34, // metres from the lens the shadows are read (the moon's map covers this much about the investigator)
-  gain: 0.9, // how far the mist's light follows the share of its ray the moon reaches
+  gain: 1.4, // how far the mist's light follows the share of its ray the moon reaches (the mist in full shadow keeps a twelfth of its light; seen at 0.9, 1.8 and 3 in the round's stills: 0.9 reads as a soft wedge, 1.8 as the shafts a player would stop for, 3 as glare)
   floor: 0.8, // the share of its ray the moon is taken to reach on average: the mist's mean glow, as round 58 left it, is where the share is this
   moonLow: 0.18, // the moon's height (sine of its elevation) below which there are no shafts, and
   moonFull: 0.38, // ...from which they are whole (the course of the night keeps the moon between 0.36 and 0.9)

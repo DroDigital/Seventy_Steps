@@ -132,7 +132,7 @@ vec4 fogAlong(vec2 uv, float jitter) {
     }
     t += stepLen;
   }
-  if (shafts) light += lightNear * uShaft.x * shaftAlong(dir, len, jitter); // round 78: the moon's shafts and the shadows behind what stands in them
+  if (shafts) light += lightNear * (max(1.0 + uShaft.x * shaftAlong(dir, len, jitter), 0.08) - 1.0); // round 78: the moon's shafts and the shadows behind what stands in them (the mist in a shadow keeps a little of its light, never less than none)
   float k = uLanternDecay * 2.0;
   light += glowAlong(uCamPos, dir, len, uLanternPos, uLanternColor * uFogLantern, uLanternRange * 1.2, k, vec4(0.0));
   for (int i = 0; i < ${LAMP_SLOTS}; i++) {
