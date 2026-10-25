@@ -1,5 +1,5 @@
 """The investigator's weapons in the right hand's frame (src/render/armsMeshes.ts: the grip at the wrist on the line (0, y, 0.02), the business end down -y,
-the edge forward at +z). Lengths are the old ones, so a blow reaches as far as the hit boxes say it does. Round 78: the sword-cane has two bodies, the stick
+the edge forward at +z). Lengths are the old ones, so a blow reaches as far as the hit boxes say it does. Round 80: the sword-cane has two bodies, the stick
 it is carried as and the blade it is fought with.
 """
 import numpy as np

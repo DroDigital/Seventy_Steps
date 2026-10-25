@@ -1,5 +1,5 @@
 /**
- * The investigator (spec §3B). Round 78: modelled in Blender (tools/player/, docs/PLAYER.md) and baked into `data/player`: a 1920s field coat cinched at the waist with its
+ * The investigator (spec §3B). Round 80: modelled in Blender (tools/player/, docs/PLAYER.md) and baked into `data/player`: a 1920s field coat cinched at the waist with its
  * sloped shoulders, double row of buttons and turned-up collar, a rust scarf with its two ends, a belt with its buckle, cartridge loop and half-belt, a satchel slung over
  * the left shoulder to the right hip behind, a fedora with its band and pin over short hair and a lean face, gloves that close round what they hold, laced boots, the
  * lantern at the belt, the revolver in its holster, an oil flask on the belt; and what they take up: the sword-cane (a stick, and the blade drawn from it), the found

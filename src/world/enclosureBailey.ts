@@ -76,7 +76,7 @@ export function planBailey(h: House, boss: string, s: EnclosureSite): Enclosure 
     front: f,
     rect: { x0: Math.min(...xs), z0: Math.min(...zs), x1: Math.max(...xs), z1: Math.max(...zs) },
     props,
-    piece: gatePiece(h, boss, gate, s.y, Math.abs(f.z) > 0.5),
+    piece: gatePiece(h, boss, gate, s.y, f),
     stake: { x: s.x + f.x * toStake, z: s.z + f.z * toStake, yaw: Math.atan2(-f.x, -f.z) },
     rods,
     gap(p) {

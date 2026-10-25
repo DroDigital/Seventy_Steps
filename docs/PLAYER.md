@@ -1,9 +1,9 @@
-# The investigator, made in Blender (round 78)
+# The investigator, made in Blender (round 80)
 
 The investigator's figure and every clip he plays (the carried gaits, each weapon's blows and parry, the roll and backstep, the revolver, the swallow, the Reagent, the flask, the
 Powder, the match, the incantation, the helm, the staggers and the fall) are made in Blender from code in `tools/player/`, baked to compact data in `src/data/player/`, and played
 by the game's own figure (`src/render/playerClips.ts`, `playerPose.ts`). The game still has no skeletal animation (CLAUDE.md, out of scope): a clip is a track of **joint
-quaternions for every 60 Hz frame of the move**, sampled with slerp onto the same rigid-part `Figure` the people and the creatures use (`docs/DECISIONS.md`, round 78).
+quaternions for every 60 Hz frame of the move**, sampled with slerp onto the same rigid-part `Figure` the people and the creatures use (`docs/DECISIONS.md`, round 80).
 Nothing about a move's timing, hit sphere, motion or stamina is changed: the clips are made for the numbers in `src/data/moves.ts` and `weapons.ts`, and `tests/playerClips.test.ts`
 keeps each one to them.
 

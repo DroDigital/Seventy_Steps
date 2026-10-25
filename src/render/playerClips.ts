@@ -1,5 +1,5 @@
 /**
- * The investigator's clips (round 78: keyed in Blender, tools/player/, docs/PLAYER.md; baked into data/player/playerClips.ts): each a pose for every 60 Hz frame of a move, read here
+ * The investigator's clips (round 80: keyed in Blender, tools/player/, docs/PLAYER.md; baked into data/player/playerClips.ts): each a pose for every 60 Hz frame of a move, read here
  * as quaternions for the figure's joints and the pelvis's place. A clip is as long as the move it was made for and has its markers where the game's data puts them (the hit
  * window's ends, the frame an item takes effect, a shot or a volley leaves, a parry's window); if the data has since moved, `clipTime` carries the game's frame to the clip's
  * through those markers, so the blade is still where the blow lands. Pure but for the figure's joints it sets.
