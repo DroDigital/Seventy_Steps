@@ -112,7 +112,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     rng: createRng(seed),
     frame: 0,
     cutscene: false,
-    talking: false,
+    sheltered: false,
     reality: createReality(),
   };
   registerMounts(g);

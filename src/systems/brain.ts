@@ -207,7 +207,7 @@ export function brainSystem(g: Game): void {
     const tr = transform.get(id)!;
     m.vx = 0;
     m.vz = 0;
-    if (g.talking && br.target === g.player.id) letGo(br); // (nothing reaches the investigator while a dialogue is open: targets.ts)
+    if (g.sheltered && br.target === g.player.id) letGo(br); // (nothing reaches the investigator while they are sheltered: targets.ts)
     if (g.cutscene && br.target === g.player.id) continue;
     if (isAbsent(g, id) || a.frozen || (health.get(id)?.hp ?? 0) <= 0 || waitsToJoin(g, id, br)) continue;
     const arena = arenaOf(g, id);
