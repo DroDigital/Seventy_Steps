@@ -4,7 +4,7 @@
  * ground (then eases back out). The boom hangs slightly over the right shoulder. Pure: the renderer
  * applies it to a Three.js camera.
  *
- * Round 77: four looks (data/cameraModes.ts). The rig keeps the mode's numbers; Low hero and Long lens also frame a locked-on foe: the point the boom
+ * Round 77: three looks (data/cameraModes.ts). The rig keeps the mode's numbers; Low hero also frames a locked-on foe: the point the boom
  * hangs from (the anchor) moves toward the foe and up to the height worth looking at, and the boom lengthens with the foe's height, so
  * the lens stays on the line `yaw` looks along (the sticks, the lock and the minimap read it) but stands back far enough to see the whole.
  */
@@ -207,7 +207,6 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
   rig.dist = allowed < rig.dist ? allowed : Math.min(allowed, rig.dist + tune.easeOut * dt);
   rig.pos = lensPosition(w, base, rig.yaw, rig.pitch, rig.dist);
   const fit = fr && f && inp.frame ? fitFov(rig.pos, base, inp.frame.feet, clamp(inp.frame.height, f.height[0], f.height[1])) : 0; // where a wall or a near foe leaves less room than the framing counted on, the lens widens to keep it whole
-  const lens = Math.min(tune.keepFov ?? tune.fov, Math.max(fr?.fov ?? tune.fov, fit));
-  const want = tune.keepFov ? clamp(2 * Math.atan((Math.tan((lens * RAD) / 2) * rig.reach) / Math.max(1, rig.dist)) / RAD, lens, tune.keepFov) : lens;
-  rig.fov += (want - rig.fov) * Math.min(1, (tune.keepFov ? FOV_FOLLOW : (f?.follow ?? FOV_FOLLOW)) * dt); // (Classic's is its own, always: nothing to ease)
+  const want = Math.min(tune.fov, Math.max(fr?.fov ?? tune.fov, fit));
+  rig.fov += (want - rig.fov) * Math.min(1, (f?.follow ?? FOV_FOLLOW) * dt); // (Classic's is its own, always: nothing to ease)
 }
