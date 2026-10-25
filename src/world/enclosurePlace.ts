@@ -9,7 +9,7 @@
 
 import type { V3, XZ } from '../core/geom';
 import { HOUSE, type House } from '../data/arenaHouses';
-import { STAKE, type Enclosure, type EnclosureSite, type Living } from './enclosure';
+import { STAKE, type Enclosure, type EnclosureSite, type Living, type Signal } from './enclosure';
 import { gatePiece } from './houseParts';
 import { makeCourt, type Court } from './placeKit';
 import { PLACES } from './places';
@@ -22,9 +22,10 @@ export interface Layout {
   outer?: number; // metres beyond the wall's level ground that dressing stands on (the outline's pad is the wall's `HOUSE.level` and this more)
   rods?: readonly V3[]; // the tips of its lightning rods
   living?: readonly Living[];
+  signals?: readonly Signal[]; // round 75: what the court does now and then (a chase of lights, an arc between pylons)
   fogHeight?: number; // unused since round 78 (see Enclosure.fogHeight)
   under?: (level: number) => Pad[]; // ground it shapes after the level: a lagoon sunk, a platform raised
-  dry?: (p: XZ) => number; // where a body or a piece may stand within the wall, if not all of it
+  dry?: (p: XZ) => number; // where a body or a piece may stand, apart from the wall's own: negative on it (round 75: a pool's water is not)
 }
 
 export type PlaceFn = (court: Court, house: House) => Layout;
@@ -64,11 +65,12 @@ export function planPlace(h: House, boss: string, s: EnclosureSite): Enclosure {
     piece: gatePiece(h, boss, gate, s.y, f),
     stake: { x: s.x + f.x * toStake, z: s.z + f.z * toStake, yaw: Math.atan2(-f.x, -f.z) },
     rods: layout.rods,
+    ...(layout.signals && { signals: layout.signals }),
     living: [...(layout.living ?? []), ...court.emits],
     fogHeight: layout.fogHeight,
     gap: (p) => edge.dist(p.x, p.z),
     pad: (level, blend) => ({ kind: 'shape', shape: footprint, blend, level }),
-    ...(layout.dry && { dry: layout.dry }),
+    ...(layout.dry && { dry: (p: XZ) => Math.max(edge.dist(p.x, p.z), layout.dry!(p)) }), // (within the wall, and on what is dry)
     ...(layout.under && { under: layout.under }),
   };
 }

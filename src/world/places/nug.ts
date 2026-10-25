@@ -3,7 +3,7 @@
  * Yog-Sothoth in two halves of one house. Either side of the fight a stepped shrine of black basalt rises in three tiers to a coal burning on its top,
  * a doorway at its foot facing the court, a banner of the eclipse over the one (Nug's) and one of the stars over the other (Yeb's); a gallery of arches
  * across the back joins them; and from each door a channel of green slime runs down the court's edge toward the gate, the two drawing together to flank
- * the way in. Black obelisks stand out on the road to it. The heart of the old set, the mound with its mouth, stays at the middle of the back gallery.
+ * the way in (round 75: the channels are cut in the ground, a man's knee deep and glowing green, the slime running down them toward the gate, and a body may wade them). Black obelisks stand out on the road to it. The heart of the old set, the mound with its mouth, stays at the middle of the back gallery.
  * Embers rise from the coals and the doors; the slime breathes. The fog is held low so the shrines stand over it. Pure: no Three.js.
  */
 
@@ -11,14 +11,23 @@ import { HOUSE, type House } from '../../data/arenaHouses';
 import type { PlaceFn } from '../enclosurePlace';
 import type { Court, Put } from '../placeKit';
 import { rectOutline, wallRect } from './common';
+import { shaped, strip, SURFACE, type PoolSpec } from './water';
 
 const BASALT: Put = { tint: [0.22, 0.22, 0.28], keep: 0.25 };
 const SLIME: Put = { tint: [0.4, 0.62, 0.34], keep: 0.5 };
+
+// a channel of slime from a shrine's door along the court's edge, then in toward the way: its bed's edge a metre beyond the fight's fog, its bank 1.4 m
+const channel = (side: number): PoolSpec => ({
+  pts: strip([[-3.9, side * 28.4], [30, side * 28.4], [38.5, side * 6.9]], 1.3),
+  depth: 0.9, bank: 1.4, tint: [0.28, 0.52, 0.2], foam: [0.72, 0.95, 0.5], flow: [0.5, side * -0.1], glow: 0.9,
+});
 
 export const nug: PlaceFn = (c: Court, h: House) => {
   const G = c.R + (h.reach ?? HOUSE.reach);
   const [S, B] = [41, 36];
   const gate = h.gate.width / 2 + 0.9;
+  const ground = shaped(c, [channel(-1), channel(1)]);
+  const surfY = -0.9 * SURFACE;
   wallRect(c, 'tp_wall_mid', G, S, B, gate, { ...BASALT, stretch: [1, 1, 3.6], height: 6.4 });
 
   // a tower at each corner of the wall, a fire on its top
@@ -47,10 +56,7 @@ export const nug: PlaceFn = (c: Court, h: House) => {
   for (const cc of [-18, 0, 18]) c.add('tp_flag_stars', -30.2, cc, { y: 2.6, face: 'front', turn: 180, s: 1.5, walk: true });
 
   // the channels of slime: from each door along the court's edge toward the gate, then drawing in to run either side of the way, ending at the wall
-  for (const side of [-1, 1]) {
-    c.run('px_trough', [-6, side * 27.8], [32, side * 27.8], { ...SLIME, walk: true, s: 1.1, face: 'front' });
-    c.run('px_trough', [32, side * 27.8], [G - 4, side * 6.9], { ...SLIME, walk: true, s: 1.1, face: 'front' });
-  }
+  for (const side of [-1, 1]) c.add('px_trough', -6, side * 28.4, { ...SLIME, walk: true, s: 1.1, face: 'front' }); // (the door's own trough, the channel running on from it)
   for (const [i, side] of ([-1, 1] as const).entries()) {
     c.add('px_obelisk', G + 6, side * 9.4, { ...BASALT, s: 1.05, jitter: 0.2 });
     c.add('px_obelisk', G + 16, side * (12 + i * 1.8), { ...BASALT, s: 0.85, jitter: 0.3 });
@@ -61,8 +67,8 @@ export const nug: PlaceFn = (c: Court, h: House) => {
   for (const side of [-1, 1]) {
     c.emit({ at: [-6, side * 35.8], y: [7.6, 9.6], r: 1, rate: 4, life: [2, 3.6], size: [0.1, 0.18], colour: [1, 0.35, 0.15], end: [0.7, 0.1, 0.1], alpha: 0.9, rise: 1.1, drift: 0.3, shape: 'spark', glow: true, reach: 110 });
     c.emit({ at: [-6, side * 26.6], y: [0.6, 4], r: 1.7, rate: 3, life: [2, 3.4], size: [0.1, 0.16], colour: [1, 0.4, 0.2], alpha: 0.8, rise: 0.5, drift: 0.3, shape: 'spark', glow: true, reach: 90 });
-    c.emit({ at: [-6, side * 27.8], to: [32, side * 27.8], y: [0.3, 0.8], rate: 3.4, life: [2, 3.6], size: [0.1, 0.2], colour: [0.5, 0.95, 0.4], alpha: 0.7, rise: 0.3, drift: 0.2, shape: 'bubble', glow: true, reach: 90 });
-    c.emit({ at: [-6, side * 27.8], to: [32, side * 27.8], y: [0.3, 1.6], rate: 1.6, life: [3, 5], size: [1.4, 2.4], grow: 1.5, colour: [0.35, 0.6, 0.3], alpha: 0.14, rise: 0.15, shape: 'wisp', glow: true, reach: 90 });
+    c.emit({ at: [-3, side * 28.4], to: [30, side * 28.4], y: [surfY, surfY + 0.5], rate: 3.4, life: [2, 3.6], size: [0.1, 0.2], colour: [0.5, 0.95, 0.4], alpha: 0.7, rise: 0.3, drift: 0.2, shape: 'bubble', glow: true, reach: 90 });
+    c.emit({ at: [-3, side * 28.4], to: [30, side * 28.4], y: [surfY, surfY + 1.2], rate: 1.6, life: [3, 5], size: [1.4, 2.4], grow: 1.5, colour: [0.35, 0.6, 0.3], alpha: 0.14, rise: 0.15, shape: 'wisp', glow: true, reach: 90 });
   }
-  return { outline: rectOutline(G, S, B), ahead: G, outer: 12, fogHeight: 4 };
+  return { outline: rectOutline(G, S, B), ahead: G, outer: 12, fogHeight: 4, ...ground };
 };

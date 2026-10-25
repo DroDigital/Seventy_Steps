@@ -8,6 +8,7 @@ import type { Entity } from '../core/ecs';
 import { dist3, type V3 } from '../core/geom';
 import { CAMERA, LOCK, PLAYER } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
+import type { Frame } from './camera';
 import { isAbsent, isConcealed, isUnseen, type Game } from './components';
 
 export interface LockState {
@@ -88,6 +89,13 @@ export function aimPoint(g: Game, id: Entity): V3 | null {
   const p = g.ecs.c.transform.get(id)?.pos;
   const b = g.ecs.c.body.get(id);
   return p && b ? { x: p.x, y: p.y + b.aimHeight, z: p.z } : null;
+}
+
+/** The foe as the camera frames it: where it stands and how tall it is (the taller of its body and the height its blows are scaled by). */
+export function frameOf(g: Game, id: Entity): Frame | null {
+  const p = g.ecs.c.transform.get(id)?.pos;
+  const b = g.ecs.c.body.get(id);
+  return p && b ? { feet: p, height: Math.max(b.height, b.reach ?? 0) } : null;
 }
 
 /** Living foes of the player, with line of sight from the player's eye. */

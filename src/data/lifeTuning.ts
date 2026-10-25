@@ -69,6 +69,13 @@ export const ROD = {
   quiet: 5, // metres past the fight's ring within which there is no flash: the fight's picture is not lit by the court's weather
 } as const;
 
+/** What a court does now and then (round 75; render/signalFx.ts, world/enclosure.ts `Signal`): played while the investigator is within `near` of the court's edge, whatever the fight. */
+export const SIGNAL = {
+  near: 150, // metres from the camera to a court's middle, less its ring, within which it plays (they are not seen beyond the haze)
+  thread: 0.5, // seconds a thread of light lingers between two points of a chase
+  arc: 0.34, // seconds an arc lingers
+} as const;
+
 /**
  * A strike that falls on the ground (round 52; systems/skyStrikes.ts): now and then in a thunderstorm a spot near the investigator
  * (sometimes near a foe) is marked by a ring of crackling light, and a bolt falls on it a moment after. It hurts whoever stands in it,

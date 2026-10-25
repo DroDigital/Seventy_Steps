@@ -16,6 +16,8 @@ import { waterAbout } from './render/reflection';
 import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
+import { cameraModeOf } from './data/cameraModes';
+import { setCameraMode } from './systems/camera';
 import { createActorViews } from './render/actorViews';
 import { createGameAudio } from './render/audio/gameAudio';
 import { playMenuMusic } from './render/audio/music';
@@ -42,7 +44,7 @@ import { createParticles } from './render/particles';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
 import { createFightViews } from './render/fightViews';
-import { placeCamera } from './render/followCamera';
+import { fovOf, nearLens, placeCamera } from './render/followCamera';
 import { allEffectsOn, computeFx, lensAt, type FxState } from './render/fx';
 import { createFxController } from './render/fxController';
 import { createHiddenViews } from './render/hiddenViews';
@@ -227,6 +229,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const noGlow = new Vector3(0, -1e4, 0);
   if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures });
   if (debug) installGameEvidence(game, creatures);
+  setCameraMode(game.camera, cameraModeOf(settings.camera)); // the look chosen in Settings › Play (round 77)
   placeCamera(camera, game, 1);
   void pipeline.compile(scene, camera); // compiling while the chunks are built (in parallel, where the browser can)
   await made(0.55);
@@ -253,6 +256,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   startLoop(
     {
       step(dt) {
+        setCameraMode(game.camera, cameraModeOf(settings.camera)); // (a change in the pause menu shows behind it at once)
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
         if (pause.open && !wasPaused) input.reset(); // pausing lets go of every key and button and sets a drifted stick right: the way out of an input that has stuck (round 49)
         wasPaused = pause.open;
@@ -325,10 +329,10 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
         life.update(camera, time, enclosed, alpha, gloom); // after the night's light: the lightning adds to it
-        if (spawned) audio.update(fx, time, camera, still, cinema.active);
-        const lens = lensAt(fx, time);
+        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : nearLens(camera, game));
+        const lens = lensAt(fx, time, fovOf(game, alpha));
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
-        updateWorldUniforms(fx, time, camera.position, views.glow ?? noGlow, pipeline.size);
+        updateWorldUniforms(fx, time, cinema.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
         if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
         hud.update(camera);

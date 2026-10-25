@@ -69,6 +69,36 @@ beside the planners' own deliberate dressing. Now:
 - The planners' own braziers, torches and lamps inside the courts are untouched, as are the omens said on the ways (a way is walked past them exactly as before) and everything the fight needs.
 - Of the Kenney models only those no arena, way, place or hall now stands were pruned (`crypt`, `trunk`, `cactus`, `canoe`, `rock_large`, `plant_bush`, `cliff`, `pumpkin_carved`); the boss halls of the dungeons still stand most of the rest, so `tests/arenaSets.test.ts` counts their sets too.
 
+## Round 75: six thin places rebuilt, and ground and water for five
+
+XDro asked why only the Colour, the Black Man and Hutchinson stood well (they alone had shaped ground, water or a mechanism, from #157 and #161) and said "do 1 and 2".
+
+**1. Six places rebuilt with more kinds of model and one moving feature each.** The Gate, the Ancient Ones, the Pipers, Azathoth, the Other Gods and Yaddith were a wall and one repeated piece. Each now stands six to nine kinds,
+and does something now and then that is seen from afar, as Hutchinson's lightning is (the feature plays while the investigator is near, fight or none; a court out of sight does not count its seconds, and one the investigator comes to
+begins part way through its wait; `render/signalFx.ts`, `render/rodFx.ts`).
+
+| Place | New kinds | What it does |
+|---|---|---|
+| Zkauba (Yaddith) | the city's tower (40 m), a craft on its legs, hangar, depot, keep, generators, two dishes on the back wall, consoles and braced stands by the way in (nine more pieces of pack 20, CC0) | bolts of green fire leap from one pylon's top to another's across the court every few seconds, and slower from the tower to the dishes (`arc` signals) |
+| The Other Gods (Hatheg-Kla) | carved monoliths with a lit glyph, cairns, four twisted spires (26 m, the highest things in the court), a hexagonal dais | the storm falls on the four spires, any in turn (`rods`); a light runs from monolith to monolith about the ring and ends in a burst at the sphere (`chase`) |
+| The Daemon Pipers | rafts of reed pipes in the wall (every fourth place), drums at the foot of the pipes, a gallows of bone chimes outside the gate, rafts either side of the way in | the organ plays its scale: a note runs up each side's pipes from the gate and the two meet in a chord at the tallest; the drums ring when it passes |
+| Yog-Sothoth (the Gate) | a crystal at each corner of the walls, an armillary of turning rings either side of the way in, a helix of crystal between the arches, congeries of globes in the ring at the back | a light passes through each arch in turn, round the court, and the globes at the back flare |
+| Azathoth | three great black flutes at the back, two drums at the way in, bubbling masses of dark light in the court | the light over each dancer's head goes to the next round the whole ring and ends in white embers on the fight |
+| The Ancient Ones | the Elder Things' barrels (in the place of the short prisms), five-pointed stelae along the avenue, snow | a light runs from the top of one tall prism to the next about the hexagon and flares on the last |
+
+Thirteen new forms are made in code (`tools/models/boss/proc_rites.py`: monolith, cairn, spire, dais, panpipe, drum, chimes, armillary, globes, helix, shard, barrel, star) and nine pieces of the alien pack are added; 203 models in all, none CC BY.
+
+**2. Ground and water.** A place may now shape the land it stands on after the level: `world/places/water.ts` takes pools (sunk, with a sheet of water at the surface, `render/poolMesh.ts`), terraces (raised) and pits (a negative terrace),
+each an outline in the court's frame, and gives a layout its `living`, `under` and `dry` (so the stake, the candle and the court's own set stand on dry ground; a causeway across a pool is dry). A pool is at most 1.2 m deep, its surface 0.3 of its depth below the level: a body wades it to the knee. The fight's circle and its fog are never touched (`tests/placeGround.test.ts`).
+
+| Place | Ground |
+|---|---|
+| Martin's Beach | a tidal basin along the sea wall, the tide setting into it, green and breathing a light; a causeway of planks on piles across it to a derrick at its head; the hull stranded on its ribs in the shallows with a rowboat and a canoe afloat |
+| Cthulhu (R'lyeh) | a real lagoon in the right-hand corner with a quay of bollards, steps into it, a hull sunk to its ribs, lilies on the water; the Great Door on a platform raised 1.4 m with broad steps up to it (the block that was there is gone) |
+| Bokrug | the court is a third deeper and the lake of Ib fills the back: a still basin with steps into it, the stumps of the old colonnade standing out of the water, lilies on it |
+| Yig | the shrine on a plateau of the land itself raised 1.0 m (it was a solid block with stairs that were not walked), four pits 1.1 m deep where the coil swells with the bones thrown into them |
+| Nug and Yeb | the slime channels are cut in the ground, 0.9 m deep, glowing green, running from each door down toward the gate |
+
 ## How it is built
 
 - **Models are baked offline.** `tools/models/bake_boss_models.py <work dir>` reads each source with Blender's own importers (`pip install bpy numpy pillow`; the tool's dependency, not the game's), applies the manifest
@@ -143,10 +173,12 @@ New: `tests/bossPlaces.test.ts` (nineteen places each with their packs, each its
 Adapted, not weakened: `arenaHouse`, `enclosure`, `basinRiver`, `arenaStyles` and `bailey` (a place's models are not the plain house's pieces: the height and pad rules hold for the `house_*` walls, and the models are asked by `bossPlaces`);
 `arenaSets` (the no-dead-weight rule counts what a planner stands); `arenaWays` (a place's court begins past its levelled ground); `houseWalk` (an audit left stale by round 69: the gate side now asserted to come in, as its title says).
 Results: `npm run check:all` (typecheck, the everyday set and the audits: the soak, the bots that fight every boss and creature, `bossStand`, the dungeon, roof, outside and object glitch audits, `enclosedAudit`, `houseWalk`, `balance`): 334 files, 3,423 tests, all pass; `npm run build` passes.
+Round 75: new `tests/placeGround.test.ts` (the pools, terraces and pits of `places/water`: a pool's bed below the level and never past a wading depth, the sheet at its surface, the ground rising to a terrace, a causeway dry across water, the pits dry but empty of pieces, nothing standing in water above its bed, no pad touching the fight's ring or fog, a channel strip's breadth). No test adapted or weakened; `bossPlaces`, `arenaSets` (every baked model stood) and `validateWorld` hold the new places.
 
 ## Not verified, and limits
 
 - Real frame times and the look on a GPU: the container has none. The pictures are of a software renderer (flatter than a GPU, no bloom stalls).
 - The places were photographed in the gloaming with a little added light; their look in the full dark of the night and in weather was judged from the same scenes, not photographed for each.
 - The fights themselves were not replayed by a person in each place: the bots of `bossBot`/`bossStand` fight the bosses in them, and the tests prove the ring is clear and the way in open.
+- Round 75: the new signals (the dance, the arcs, the chases) and the pools' sheets were checked by their layout and tests and by software-rendered stills of the places, not seen running on a GPU; their timing and brightness against the night and the weather were not judged. The stills are not committed: each of the eleven was photographed from above, Martin's also from the sand and Yig's from the road; the dark of R'lyeh's lagoon and of Bokrug's lake could not be read from them, nor the signals' bolts (they fire every few seconds and none fell in a still).
 - Cutscenes: each horror's arrival and fall cameras (`cinema*`) are unchanged and were not re-reviewed for the new walls beyond the fog the cameras already keep inside (`cinemaFog`).
