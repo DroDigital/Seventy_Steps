@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { HEARTH, type HearthKind } from '../src/data/lightSounds';
 import { LIGHTS } from '../src/data/tuning';
 import { AUDIO } from '../src/data/tuning';
+import { createHearth, HEARTH_NOW } from '../src/render/audio/hearth';
 import { hearthPlan, keyOf, lawOf } from '../src/render/audio/hearthPlan';
 import { flameTexture } from '../src/render/audio/hearthTexture';
 import { beginHeard, HEARD_LIGHTS, pushHeard, type HeardLight } from '../src/render/audio/heardLights';
@@ -127,5 +128,79 @@ describe('which lights are heard (round 78)', () => {
     expect(HEARD_LIGHTS).toHaveLength(0);
     pushHeard({ x: 9, y: 0, z: 0, kind: 'fire' }, 9, 1, 1);
     expect(HEARD_LIGHTS[0]).toBe(first);
+  });
+});
+
+/** A context of nodes that remember what they were told, for the voices' bookkeeping. */
+function stage() {
+  const log = { started: 0, stopped: 0, targets: [] as number[] };
+  let now = 0;
+  const param = (track = false) => ({ value: 0, setTargetAtTime: (v: number) => void (track && log.targets.push(v)), setValueAtTime: () => undefined, cancelScheduledValues: () => undefined });
+  const node = (extra: object = {}) => ({ connect: (to: unknown) => to, ...extra });
+  const ctx = {
+    get currentTime() { return now; },
+    sampleRate: 48000,
+    createGain: () => node({ gain: param(true) }),
+    createBiquadFilter: () => node({ frequency: param(), Q: param(), type: '' }),
+    createStereoPanner: () => node({ pan: param() }),
+    createOscillator: () => node({ frequency: param(), start: () => void log.started++, stop: () => void log.stopped++ }),
+    createBufferSource: () => node({ start: () => void log.started++, stop: () => void log.stopped++, loop: false, buffer: null }),
+    createBuffer: (n: number, len: number, r: number) => ({ numberOfChannels: n, length: len, sampleRate: r, duration: len / r, getChannelData: () => new Float32Array(len) }),
+  } as unknown as AudioContext;
+  const engine = { ctx, bed: node() } as unknown as import('../src/render/audio/engine').AudioEngine;
+  return { engine, log, advance: (s: number) => void (now += s) };
+}
+
+describe('the hearth\'s voices (round 78)', () => {
+  const lights = (...xs: number[]): HeardLight[] => xs.map((x, i) => ({ x, y: 2, z: i, kind: 'torch', d: x, v: 1, flicker: 1 }));
+  const frame = (h: ReturnType<typeof createHearth>, heard: HeardLight[], paused = false): void => h.update(heard, ear, right, () => 1, paused);
+
+  it('takes a voice for each light in earshot (no more than it has), and follows it', async () => {
+    const { engine, log, advance } = stage();
+    const hearth = createHearth(engine);
+    frame(hearth, lights(2, 4, 5, 6, 7, 8));
+    expect(HEARTH_NOW.sounding).toBe(HEARTH.voices);
+    expect(log.started).toBe(HEARTH.voices);
+    advance(0.1);
+    frame(hearth, lights(2, 4, 5, 6, 7, 8));
+    expect(log.started).toBe(HEARTH.voices); // the same lights are the same voices
+    expect(HEARTH_NOW.kind).toBe('torch');
+    expect(HEARTH_NOW.d).toBe(2);
+  });
+
+  it('lets a voice fade out when its light goes, and lets it go after the release, never on the frame it is told', () => {
+    const { engine, log, advance } = stage();
+    const hearth = createHearth(engine);
+    frame(hearth, lights(2));
+    expect(HEARTH_NOW.sounding).toBe(1);
+    advance(0.1);
+    frame(hearth, []);
+    expect(HEARTH_NOW.sounding).toBe(1);
+    expect(log.stopped).toBe(0);
+    expect(log.targets.at(-1)).toBe(0); // told to glide to nothing
+    advance(HEARTH.release + 0.1);
+    frame(hearth, []);
+    expect(HEARTH_NOW.sounding).toBe(0);
+    expect(log.stopped).toBe(1);
+  });
+
+  it('fades every voice when paused, and has none to take for a light beyond its range', () => {
+    const { engine, advance } = stage();
+    const hearth = createHearth(engine);
+    frame(hearth, lights(2, 3));
+    advance(0.1);
+    frame(hearth, lights(2, 3), true);
+    advance(HEARTH.release + 0.1);
+    frame(hearth, lights(2, 3), true);
+    expect(HEARTH_NOW.sounding).toBe(0);
+    frame(hearth, lights(HEARTH.kinds.torch.range + 1));
+    expect(HEARTH_NOW.sounding).toBe(0);
+  });
+
+  it('hums a Sign with its pairs of tones and a breath of air', () => {
+    const { engine, log } = stage();
+    const hearth = createHearth(engine);
+    frame(hearth, [{ x: 3, y: 2, z: 0, kind: 'sigil', d: 3, v: 1, flicker: 1 }]);
+    expect(log.started).toBe(HEARTH.sigil.tones.length + 1);
   });
 });

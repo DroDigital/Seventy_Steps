@@ -157,13 +157,17 @@ export function createHearth(e: AudioEngine): Hearth {
       HEARTH_NOW.sounding = 0;
       for (const v of voices) {
         if (!v.key) continue;
+        if (v.fading) {
+          if (v.freeAt === 0) { // told to go: its level glides to nothing, then it is let go
+            v.level.gain.setTargetAtTime(0, now, HEARTH.ease);
+            v.sent.level = 0;
+            v.freeAt = now + HEARTH.release;
+          } else if (now >= v.freeAt) {
+            release(v, now);
+            continue;
+          }
+        }
         HEARTH_NOW.sounding++;
-        if (!v.fading) continue;
-        if (v.freeAt === 0) { // told to go: its level glides to nothing, then it is let go
-          v.level.gain.setTargetAtTime(0, now, HEARTH.ease);
-          v.sent.level = 0;
-          v.freeAt = now + HEARTH.release;
-        } else if (now >= v.freeAt) release(v, now);
       }
     },
   };

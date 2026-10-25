@@ -6,7 +6,8 @@
  * the music, effects and ambience settings each set one bus: music the theme's and the scores',
  * effects the one-shots', ambience the drones'. WebAudio starts on the first click or key press, as browsers require (or
  * sooner, `start`, where the browser already lets sound play); until then (or without WebAudio)
- * everything stays silent and nothing fails.
+ * everything stays silent and nothing fails. Round 78: the one-shots (and a share of the bed) are also sent into a room
+ * of convolution reverb (space.ts) that follows where the investigator stands; its answer joins before the shaper.
  */
 
 import { AUDIO } from '../../data/tuning';

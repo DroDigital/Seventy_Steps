@@ -49,7 +49,7 @@ export const HEARTH = {
   } satisfies Record<HearthKind, HearthSound>,
   flames: {
     fire: { body: 0.7, rumble: 120, flutter: 0.45, hiss: 0.22, pops: 7, pop: 1.5, band: [700, 2800], seed: 3 },
-    torch: { body: 0.45, rumble: 190, flutter: 0.6, hiss: 0.26, pops: 3.4, pop: 1.5, band: [1000, 4000], seed: 5 },
+    torch: { body: 0.45, rumble: 190, flutter: 0.6, hiss: 0.18, pops: 3.4, pop: 1.5, band: [1000, 4000], seed: 5 },
     lamp: { body: 0, rumble: 200, flutter: 0.1, hiss: 1, pops: 0.7, pop: 0.7, band: [2600, 6500], seed: 9 },
   } satisfies Record<'fire' | 'torch' | 'lamp', FlameSpec>,
   sigil: { tones: [[98, 0.5], [98.3, 0.5], [147, 0.3], [147.45, 0.3]] as readonly (readonly [number, number])[], air: 0.07, airHz: 1800, mix: 0.36 }, // the hum: pairs of sines a few tenths of a hertz apart (the shimmer), a breath of air above
