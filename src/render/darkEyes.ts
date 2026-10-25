@@ -115,11 +115,11 @@ export function createDarkEyes(scene: THREE.Scene, g: Game): DarkEyes {
           }
           const a = (s.gone >= 0 ? 1 - s.gone / EYES.fadeOut : risen(time - s.born)) * EYES.gain * grey;
           if (s.blinks && time > s.blinkAt + EYES.blink + s.late) s.blinkAt = time + blinkIn(Math.random());
-          const [yaw, side] = [Math.atan2(dx, dz), EYES.span];
+          const [yaw, side, size] = [Math.atan2(dx, dz), EYES.span, EYES.radius + Math.hypot(dx, dz) * EYES.grow];
           const [sx, sz] = [Math.cos(yaw) * side, -Math.sin(yaw) * side]; // the pair is turned to the lens
           for (const k of [-1, 1] as const) {
             const closed = s.blinks && shut(time, s.blinkAt, k > 0 ? s.late : 0);
-            if (!closed) halos.put(s.x + sx * k, s.y, s.z + sz * k, EYES.radius, s.tint, a);
+            if (!closed) halos.put(s.x + sx * k, s.y, s.z + sz * k, size, s.tint, a);
           }
         } else if (!world.hidden && calm && i < room && time >= s.until && time - s.tried > 0.5) {
           s.tried = time;

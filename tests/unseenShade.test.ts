@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SHADE } from '../src/data/dreadPicture';
 import { CASTER } from '../src/render/moonShadow';
 import { createUnseenShade } from '../src/render/unseenShade';
-import { facing, grown, mayLie, mayMove, placeOf, shadeEvery, shadeLasts, slideEvery, tooNear } from '../src/render/unseenShadeRules';
+import { facing, grown, heightFor, mayLie, mayMove, placeOf, shadeEvery, shadeLasts, slideEvery, tooNear } from '../src/render/unseenShadeRules';
 import { worldUniforms } from '../src/render/worldMaterial';
 import { createWorldGame } from '../src/systems/game';
 import { setSanity } from '../src/systems/sanity';
@@ -60,6 +60,17 @@ describe('the shade with no one: the rules (pure)', () => {
     expect([shadeEvery(0), shadeEvery(1)]).toEqual([...SHADE.every]);
     expect([shadeLasts(0), shadeLasts(1)]).toEqual([...SHADE.lasts]);
     expect([slideEvery(0), slideEvery(1)]).toEqual([...SHADE.slideEvery]);
+  });
+
+  it('is made taller for a high moon so that its shadow is long, and never taller than the most', () => {
+    expect(heightFor(0.05)).toBe(SHADE.height); // a low moon: its own height already throws a long shadow
+    const [low, mid, high] = [heightFor(0.3), heightFor(0.6), heightFor(0.9)];
+    expect(low).toBeGreaterThanOrEqual(SHADE.height);
+    expect(mid).toBeGreaterThan(low);
+    expect(high).toBe(SHADE.mostHeight);
+    expect((heightFor(0.6) * Math.sqrt(1 - 0.36)) / 0.6).toBeCloseTo(SHADE.reach, 5); // the shadow it throws, where it is not held to either end
+    expect(heightFor(2)).toBe(SHADE.mostHeight);
+    expect(heightFor(-1)).toBe(SHADE.height);
   });
 });
 

@@ -48,3 +48,9 @@ export function facing(mx: number, mz: number, cx: number, cz: number): number {
 
 /** A step of its growth or going toward `want` (0 or 1) over `dt` seconds. */
 export const grown = (k: number, want: number, dt: number): number => (want > k ? Math.min(want, k + dt / SHADE.grow) : Math.max(want, k - dt / SHADE.fade));
+
+/** How tall the figure is made for a moon `up` (the height of its unit direction, 0..1): tall enough that its shadow is `SHADE.reach` long, within `SHADE.height` and `SHADE.mostHeight`. */
+export function heightFor(up: number): number {
+  const y = Math.min(0.999, Math.max(0.01, up));
+  return Math.min(SHADE.mostHeight, Math.max(SHADE.height, (SHADE.reach * y) / Math.sqrt(1 - y * y)));
+}

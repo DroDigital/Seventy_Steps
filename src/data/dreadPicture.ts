@@ -71,8 +71,9 @@ export const EYES = {
   stare: 0.26, // radians of the lens's axis: looked at this squarely...
   stareFor: 0.8, // ...for this long and the pair is gone
   litAt: 0.02, // ground lit more than this is not dark enough for them
-  radius: 0.05, // metres, of each eye's halo
-  gain: 0.3,
+  radius: 0.05, // metres, of each eye's halo, and...
+  grow: 0.0035, // ...this much more for each metre off (a halo as wide as an eye is under a pixel at thirty metres: it stays a point of light, as a distant lamp does)
+  gain: 0.7,
   arc: 1.9, // radians either side of the heading they may be put (ahead and the sides, not behind)
   /** Regions they are out in (the heath and the woods), their colour (display sRGB), whether they blink. Not the towns, the mountains, the cities of the dream or the Outer Dark, but for the Black Wood. */
   regions: {
@@ -91,7 +92,9 @@ export const SHADE = {
   lasts: [25, 45] as readonly [number, number], // seconds one stays
   near: [11, 22] as readonly [number, number], // metres from the lens
   side: [1.22, 1.92] as readonly [number, number], // radians off the heading (70 to 110 degrees: the periphery)
-  height: 3.7, // metres
+  height: 3.7, // metres, at least...
+  reach: 6, // ...and tall enough that the shadow is this long (a high moon shortens a shadow: at its height the figure is taller than a man could be, which no one sees)
+  mostHeight: 8, // metres: never taller than this
   slide: [0.5, 1.2] as readonly [number, number], // metres it may move while the lens is turned away...
   turnedAway: 1.05, // ...beyond this many radians (60 degrees)
   gone: 8, // metres: within this it is gone

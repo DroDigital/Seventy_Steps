@@ -18,11 +18,12 @@ import { DREAD_AIR } from './shock';
 import { newGaze, offsetTo, readGaze } from './gaze';
 import { box } from './meshKit';
 import { shadowMesh } from './moonShadow';
-import { facing, grown, mayLie, mayMove, placeOf, shadeEvery, shadeLasts, slideEvery, tooNear } from './unseenShadeRules';
+import { facing, grown, heightFor, mayLie, mayMove, placeOf, shadeEvery, shadeLasts, slideEvery, tooNear } from './unseenShadeRules';
 import { watchersFor } from './watchers';
 import { worldUniforms } from './worldMaterial';
 
 const WHITE = [1, 1, 1] as const;
+const FIGURE = 3.11; // the figure's height as built, metres
 
 /** A man too tall and too thin, broad in the shoulder, the arms hanging to the knee a little away from the body, the head to one side: only the shape of his shadow. */
 function figure(): THREE.Mesh {
@@ -50,8 +51,7 @@ export interface UnseenShade {
 
 export function createUnseenShade(scene: THREE.Scene, g: Game): UnseenShade {
   const mesh = figure();
-  const tall = SHADE.height / 3.11; // the figure is 3.11 m tall as built
-  mesh.scale.y = tall;
+  mesh.scale.y = SHADE.height / FIGURE;
   scene.add(mesh);
   const gaze = newGaze();
   const toMoon = new THREE.Vector3();
@@ -108,8 +108,8 @@ export function createUnseenShade(scene: THREE.Scene, g: Game): UnseenShade {
       }
       k = grown(k, live ? 1 : 0, dt);
       mesh.visible = k > 0.001;
-      mesh.scale.y = tall * k;
-      toMoon.copy(worldUniforms.uLightDir.value);
+      toMoon.copy(worldUniforms.uLightDir.value).normalize();
+      mesh.scale.y = (heightFor(toMoon.y) / FIGURE) * k;
       mesh.rotation.y = facing(toMoon.x, toMoon.z, gaze.x - mesh.position.x, gaze.z - mesh.position.z);
       worldUniforms.uLightColor.value.multiplyScalar(1 + SHADE.moon * k * DREAD_AIR.cap); // so that its shadow is read at the deepest night
     },
