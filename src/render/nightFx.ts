@@ -47,6 +47,7 @@ export function createNightFx(g: Game, sky: THREE.Mesh, post: PostPass): NightFx
       const phase = phaseOf(time);
       moonDir(phase, dir).lerp(still, inside).normalize();
       (mat.uniforms.uMoonDir.value as THREE.Vector3).copy(dir);
+      post.uniforms.uMoonDir?.value.copy(dir); // round 80: the mist's own bright quarter follows the moon across the sky (it stood where the night began; optional: the test's post pass has only a colour)
       worldUniforms.uLightDir.value.copy(dir);
       worldUniforms.uLightColor.value.multiplyScalar(1 - inside * (1 - moonShare(shade, night))); // (reset each frame: realityFx.ts)
       const dawn = dawnOf(phase) * (1 - inside); // the grey of the last hour is the sky's: it is not seen under a roof

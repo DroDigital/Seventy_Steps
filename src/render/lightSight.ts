@@ -6,9 +6,10 @@
  * share, eased toward what a ray from the eye to a point a little before it and above it finds (a wall, a stone or the
  * ground in the way: none of it; clear: all), which its halo, its point light and the mist's glow of it take. A few
  * are looked at each frame, those longest unlooked first (the nearest among them), for a ray is a walk over the ground
- * and a pass over the colliders about it; one that ought to go is gone in a tenth of a second. A street lamp, a lit
- * window (which fades by the angle it is seen at) and an Elder Sign (which stands among its own stones) are hidden by
- * nothing but the land, which the depth test knows: they are not looked at. With no world to look through everything
+ * and a pass over the colliders about it; one that ought to go is gone in a tenth of a second. Windows are checked too:
+ * a lit pane behind a building must not light the street before its dark windows. A street lamp and an Elder Sign
+ * (which stands among its own stones) are hidden by nothing but the land, which the depth test knows: they are not
+ * looked at. With no world to look through everything
  * shows. Pure: no Three.js.
  */
 
@@ -16,8 +17,8 @@ import type { V3 } from '../core/geom';
 import { LIGHTS } from '../data/tuning';
 import { raycast, type Collider, type CollisionWorld } from '../world/colliders';
 
-/** The lights that stand in a room or a camp, where a wall or a tent may come between them and the eye. */
-const LOOKED_AT: ReadonlySet<string> = new Set(['torch', 'fire']);
+/** The lights where a wall, a tent or another building may come between them and the eye. */
+const LOOKED_AT: ReadonlySet<string> = new Set(['torch', 'fire', 'window']);
 const opaque = (c: Collider): boolean => !c.lightPass;
 
 export interface Sighted {

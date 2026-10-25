@@ -154,7 +154,7 @@ void main() {
     if (l.w <= 0.0) continue;
     vec3 toL = l.xyz - vWorld;
     float dl = length(toL);
-    glint += uLampColors[i] * pow(max(dot(rd, toL / max(dl, 0.001)), 0.0), 140.0) * 2.2 / (1.0 + 0.012 * dl * dl);
+    glint += uLampColors[i] * windowLight(i, vWorld) * pow(max(dot(rd, toL / max(dl, 0.001)), 0.0), 140.0) * 2.2 / (1.0 + 0.012 * dl * dl);
   }
   vec3 toLantern = uLanternPos - vWorld;
   glint += uLanternColor * pow(max(dot(rd, normalize(toLantern)), 0.0), 120.0) * 1.2 / (1.0 + 0.03 * dot(toLantern, toLantern));

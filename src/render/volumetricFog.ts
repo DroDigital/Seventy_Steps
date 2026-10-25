@@ -3,11 +3,13 @@
  * lens, so each pixel's ray can be rebuilt from the scene's depth; where the investigator's ground
  * lies (the low mist pools there, eased as they climb or descend); and the mist of the place, the
  * region's or a dungeon room's (data/fogs.ts), turning from one to the next over a few seconds. A
- * failing mind thickens it, as it closes the far fog in; the Fog setting scales it (0: none).
+ * failing mind thickens it, as it closes the far fog in; the Fog setting scales it (0: none). Round 80: it lives: it rises from ground
+ * the rain has soaked and settles as the ground dries, a gale drives it past, and its banks swell and thin as they roll (shaders/fog.ts).
  */
 
 import * as THREE from 'three';
 import { getRegion } from '../data/regions';
+import { LIVING } from '../data/mistLight';
 import { strewn } from '../world/planFill';
 import { ARENA_MISTS } from '../data/arenaMists';
 import { dungeonFogOf, FOGS, type FogDef } from '../data/fogs';
@@ -16,6 +18,8 @@ import { FOG } from '../data/tuning';
 import { NIGHT_DARK } from '../data/lifeTuning';
 import type { Court } from './courtMist';
 import type { PostPass } from './postPass';
+import { wetness } from './wetness';
+import { worldUniforms } from './worldMaterial';
 
 export interface FogFrame {
   region: string | null; // the overworld's region (null: the arena)
@@ -24,6 +28,8 @@ export interface FogFrame {
   stress: number; // 0–1: the sanity effects' stress (capped by the FX setting)
   setting: number; // the Fog setting, 0–1
   wood?: number; // 0–1: how wooded the land underfoot is (world/planFill.ts `strewn`): the mist gathers among the trees (round 35)
+  wet?: number; // 0–1: how soaked the ground is (render/wetness.ts, the weather's: read from there when it is not given; round 80)
+  gust?: number; // how hard the wind blows (worldUniforms.uWind, 1 on a calm night; read from there when it is not given; round 80)
   court?: Court | null; // round 78: the open arena's court the camera is in, and how far: its mist is the realm's thickened (data/arenaMists.ts)
   dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
@@ -35,6 +41,12 @@ export interface VolumetricFog {
 }
 
 const mix = (a: number, b: number, k: number): number => a + (b - a) * k;
+
+/** How much faster than on a calm night the wind carries the mist when it blows with `gust` (1 calm; LIVING.gust more in a full gale): a full gale drives it LIVING.gale times as hard again. */
+export const mistDrive = (gust: number): number => 1 + (LIVING.gale * Math.max(0, gust - 1)) / LIVING.gust;
+
+/** The mist's thickness (a multiple of its place's own) with the rain just fallen: `thick` is what it was, `wet` how soaked the ground is; never past LIVING.thickMax, nor below what it was. */
+export const thickAfterRain = (thick: number, wet: number): number => Math.min(thick * (1 + LIVING.afterRain * Math.min(1, Math.max(0, wet))), Math.max(thick, LIVING.thickMax));
 
 /** The mist wanted where the investigator stands, in its realm's colour as it is now (data/looks.ts); in an open arena's court, the realm's thickened toward the court's own. */
 export function fogOf(region: string | null, enclosed: boolean, court?: Court | null): FogDef {
@@ -75,16 +87,17 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       roof = now ? mix(roof, f.enclosed ? 1 : 0, Math.min(1, dt * FOG.ease)) : f.enclosed ? 1 : 0;
       now = now ? easeFog(now, want, Math.min(1, dt * FOG.ease)) : want; // the first frame takes the place's own at once
       ground = dt === 0 ? f.ground : mix(ground, f.ground, Math.min(1, dt * 2));
-      [dx, dz] = [dx + now.wind[0] * dt, dz + now.wind[1] * dt];
+      const [wet, drive] = f.enclosed ? [0, 1] : [f.wet ?? wetness.value, mistDrive(f.gust ?? worldUniforms.uWind.value)]; // (a roof has no rain, nor wind)
+      [dx, dz] = [dx + now.wind[0] * dt * drive, dz + now.wind[1] * dt * drive];
       const u = post.uniforms;
       camera.updateMatrixWorld();
       u.uProjInv.value.copy(camera.projectionMatrixInverse);
       u.uCamWorld.value.copy(camera.matrixWorld);
       u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
-      const thick = f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)); // a failing mind thickens it, and a wood
+      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet); // a failing mind thickens it, and a wood, and rain (round 80)
       u.uFog.value.set(now.density * thick, now.height, ground - 0.3, now.patchy);
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
-      u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, 0);
+      u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, f.enclosed ? 0 : LIVING.swell * now.patchy); // (w: its banks swell and thin; a crypt's mist is still)
       u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0, roof)); // (round 58: under a roof the mist is no longer the realm's own at every hour; in the open air it is, as before)
       u.uFogDrift.value.set(dx, dz, time);
     },

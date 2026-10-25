@@ -3,7 +3,8 @@
  * (mindHud.ts), carried Echoes and insight, the lock-on reticle with the target's name and health, short notices
  * (combat, bands, first sights, insight, Elder Signs), titles for regions entered, places reached and
  * bosses vanquished, the interact prompt near an Elder Sign or gate (or for a boss fight's
- * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts).
+ * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts). Round 80: a realm's first card with its epigraph
+ * (realmCards.ts), the night's hours (hourCards.ts), and the quiet walk, when nothing threatens: the bars, map and quest line sink to a third (calm.ts).
  */
 
 import { CAPTION_BAND } from './captions';
@@ -26,6 +27,10 @@ import { EPITAPHS } from '../data/epitaphs';
 import { REGIONS } from '../data/regions';
 import { creatureOf } from '../systems/creatures';
 import { createBanner } from './banner';
+import { createCalm } from './calm';
+import { createHourCards } from './hourCards';
+import { createRealmCards } from './realmCards';
+import { QUIET } from '../data/uiMood';
 import { DYING_MS } from './journeys';
 import { gauge, pipRow } from './gauges';
 import { blend, BLOOD, BONE, el, LEAF, percent, SERIF, setStyle, setText } from './hudKit';
@@ -57,15 +62,24 @@ export interface Hud {
   update(camera: Camera): void;
   /** The bars and counters fade away (a cutscene has the screen) or come back. */
   hide(on: boolean): void;
+  /** The quiet walk's drawing back of the camera, 0..1 (read by render/followCamera.ts). */
+  readonly calm: number;
+}
+
+/** Round 80: what the HUD asks of the screen besides the world: `held`, the veil, a cutscene or a journey has it (the cards wait); `quiet`, Settings › Play › Quiet walk. */
+export interface HudOptions {
+  held?: () => boolean;
+  quiet?: () => boolean;
 }
 
 /** `held`: Echoes earned but still on their way to the investigator (render/echoFx.ts): the count rises as they land. */
 /** `tracker`: whether the quest tracker is asked for (Settings › Play). */
-export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true): Hud {
+export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
-  const minimap = createMinimap(g, root, painter);
+  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 80): the bars, counters, map and quest line, which sink together
+  const minimap = createMinimap(g, dim, painter);
   const hints = createHints(g);
-  const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', root); // (the vitals at the upper left)
+  const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', dim); // (the vitals at the upper left)
   const hp = gauge(vitals, BLOOD, 7, true);
   const chip = el(`position:absolute;left:0;top:0;height:100%;width:100%;background:${BONE}aa`, '', hp.parentElement!);
   hp.parentElement!.insertBefore(chip, hp);
@@ -76,7 +90,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const mind = createMindHud(g, vitals, (text: string) => say(text));
   const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#8a8678'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
   const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#8a8678'); // the cylinder's six and the spare rounds (round 22)
-  const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', root);
+  const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', dim);
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);
   const reticle = el(`position:absolute;width:8px;height:8px;margin:-5px 0 0 -5px;border:1px solid ${BONE};transform:rotate(45deg)`, '', root);
@@ -97,9 +111,15 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const great = { ...banner, show: ((...a: Parameters<typeof banner.show>) => void (dying || banner.show(...a))) as typeof banner.show };
   const show = (text: string): void => great.show(text, 'place');
   const bosses = createBossHud(g, root, say, show);
+  let screenHeld = false; // a cutscene has the screen (hide)
+  const cardsHeld = (): boolean => screenHeld || menuOpen() || !!opts.held?.();
+  const realms = createRealmCards(g, great, cardsHeld); // a realm's name inked in, with its epigraph the first time (round 80)
+  const hours = createHourCards(g, (title, note) => great.show(title, 'hour', undefined, note), () => !dying && !cardsHeld());
+  const calm = createCalm(g, () => !dying && !screenHeld && !menuOpen() && !opts.held?.() && (opts.quiet?.() ?? true));
+  let calmNow = { hud: 0, camera: 0 };
   const foes = createFoeBars(g, root);
   const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
-  const quest = createQuestTracker(g, root, () => !dying && !menuOpen() && tracker()); // what the quest followed asks, at the right under the minimap
+  const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker()); // what the quest followed asks, at the right under the minimap
   const me = g.player.id;
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
@@ -128,8 +148,6 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('InsightChanged', (e) => {
     if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
   });
-  g.events.on('RegionEntered', (e) => show(e.name.toUpperCase()));
-  g.events.on('Travelled', (e) => show(e.name.toUpperCase()));
   g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', e.name.toUpperCase(), EPITAPHS[creatureOf(g, e.entity)?.id ?? '']));
   g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', e.name.toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
   g.events.on('Foreboding', (e) => setTimeout(() => great.show(tr('hud.stirs'), 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
@@ -155,9 +173,16 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const v = new Vector3();
   root.style.transition = 'opacity .6s';
   return {
-    hide: (on) => void (root.style.opacity = on || dying ? '0' : '1'),
+    hide: (on) => void ((screenHeld = on), (root.style.opacity = on || dying ? '0' : '1')),
+    get calm() {
+      return calmNow.camera;
+    },
     update(camera) {
       minimap.update();
+      realms.update();
+      hours.update();
+      calmNow = calm.update();
+      setStyle(dim, 'opacity', calmNow.hud > 0 ? (1 - (1 - QUIET.hudTo) * calmNow.hud).toFixed(2) : '1');
       if (!menuOpen()) hints.update();
       const busy = menuOpen() ? 'hidden' : 'visible'; // a dialogue or menu has the screen
       setStyle(prompt, 'visibility', busy);

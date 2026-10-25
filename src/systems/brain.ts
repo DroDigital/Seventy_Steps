@@ -129,6 +129,13 @@ function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   return false;
 }
 
+/** A dialogue is open (the world goes on through a talk): a foe that was on the investigator lets go of them, and goes home as if it had never seen them. The talk is no fight. */
+function letGo(br: Brain): void {
+  br.target = null;
+  br.aware = 0;
+  if (br.state === 'engage' || br.state === 'alert' || br.state === 'search') br.state = 'return';
+}
+
 /** A foe: its senses, its awareness, and what it does about them. */
 function hunt(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transform, noise: number): void {
   const c = g.ecs.c;
@@ -200,6 +207,7 @@ export function brainSystem(g: Game): void {
     const tr = transform.get(id)!;
     m.vx = 0;
     m.vz = 0;
+    if (g.sheltered && br.target === g.player.id) letGo(br); // (nothing reaches the investigator while they are sheltered: targets.ts)
     if (g.cutscene && br.target === g.player.id) continue;
     if (isAbsent(g, id) || a.frozen || (health.get(id)?.hp ?? 0) <= 0 || waitsToJoin(g, id, br)) continue;
     const arena = arenaOf(g, id);

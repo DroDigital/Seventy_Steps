@@ -9,6 +9,7 @@
 
 import * as THREE from 'three';
 import { cosmosOf } from '../data/cosmos';
+import { OMEN } from '../data/skyAir';
 import { FX, LIGHT, RENDER, SKY, type SkyDef } from '../data/tuning';
 import type { RealmLook } from './realmLook';
 import { SKY_FRAG, SKY_VERT } from './shaders/sky';
@@ -52,6 +53,19 @@ export function createSky(look: RealmLook): Sky {
     uOpen: { value: 1 },
     uWrong: { value: 0 },
     uFlash: { value: 0 },
+    // round 80 (render/atm/sky.ts writes these each frame; at rest they change nothing)
+    uOver: { value: 0 },
+    uVeil: { value: 0 },
+    uHour: { value: new THREE.Vector4() },
+    uHourGlow: { value: new THREE.Vector3() },
+    uHourDawn: { value: new THREE.Vector3() },
+    uTurn: { value: 0 },
+    uHeat: { value: new THREE.Vector4() },
+    uMoonSwell: { value: 0 },
+    uMoonSour: { value: 0 },
+    uOmen: { value: 0 },
+    uOmenAt: { value: new THREE.Vector3(0, 1, 0) },
+    uOmenSize: { value: OMEN.size },
   };
   const material = new THREE.ShaderMaterial({ uniforms: u, vertexShader: SKY_VERT, fragmentShader: SKY_FRAG, side: THREE.BackSide, depthTest: false, depthWrite: false });
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(RENDER.far * 0.8, 32, 16), material);

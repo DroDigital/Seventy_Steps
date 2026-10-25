@@ -220,7 +220,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const finds = opts.arena ? null : createFindCard(game, () => dialogue.open || ending.open || !!intro?.open || !!demoEnd?.open || cinema.active || journeys.busy); // round 60: a weapon or a relic found says so, and what to do with it
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
-  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5);
+  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
   const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
@@ -269,6 +269,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
         const held = menu?.open || shop.open || rise?.open || ending.open || cinema.active;
+        game.sheltered = dialogue.open || shop.open || !!menu?.open; // a dialogue, a trade or a sign's rest is open: nothing reaches the investigator, and the foes let go of them (targets.ts, brain.ts)
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
@@ -285,7 +286,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
           [lowRes, scale] = [state.enabled.pixelate, settings.resolution];
           resize();
         }
-        placeCamera(camera, game, alpha);
+        placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
         hud.hide(cinema.active || extras.hidesHud);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
