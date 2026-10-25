@@ -40,7 +40,7 @@ export function createRodFx(g: Game, particles: Particles, beams: Beams, lightni
         if (time < c.next) continue;
         c.next = time + between(ROD.every);
         if (away < c.radius + ROD.quiet) continue; // not in the fight
-        const tip = c.rods[c.turn++ % ROD.keepEvery === ROD.keepEvery - 1 ? c.rods.length - 1 : 0]!;
+        const tip = c.rods.length > 2 ? c.rods[Math.floor(Math.random() * c.rods.length)]! : c.rods[c.turn++ % ROD.keepEvery === ROD.keepEvery - 1 ? c.rods.length - 1 : 0]!; // (a court of many rods, a storm's: any of them)
         const top = { x: tip.x + (Math.random() - 0.5) * 8, y: tip.y + 80, z: tip.z + (Math.random() - 0.5) * 8 };
         beams.bolt(boltPath(top, tip, Math.random, { segments: 14, sway: 4, forks: 3 }), 0.4, 0.45, ARC, WHITE);
         burst(particles, RAYS, tip, 1.4, STORM_LOOK, 0.9);

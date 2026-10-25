@@ -59,7 +59,7 @@ import { playSound } from './synth';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
-  update(fx: FxParams, seconds: number, camera: THREE.Camera, paused: boolean, cinematic?: boolean): void;
+  update(fx: FxParams, seconds: number, camera: THREE.Camera, paused: boolean, cinematic?: boolean, heardAt?: V3): void;
   /** A voice where `at` is, recorded if it can be (round 18: the small lives' cries as they take fright). */
   cry(id: VoiceId, at: V3, gain?: number): void;
   /** A recording from afar: panned anywhere, duller the quieter (round 18: the thunder after lightning). */
@@ -309,13 +309,13 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       if (set && recorded(set, at, v.range, { pitch, gain })) return;
       recipe(`voice:${id}`, v.call, { at, range: v.range, gain, pitch, vary: 0.8 });
     },
-    update(fx, seconds, camera, paused, cinematic = false) {
+    update(fx, seconds, camera, paused, cinematic = false, heardAt) {
       const dt = lastSeconds === null ? 0 : seconds - lastSeconds;
       lastSeconds = seconds;
       camera.updateMatrixWorld();
       const m = camera.matrixWorld.elements;
       const len = Math.hypot(m[0], m[2]) || 1;
-      Object.assign(listener, { x: camera.position.x, y: camera.position.y, z: camera.position.z });
+      Object.assign(listener, heardAt ?? { x: camera.position.x, y: camera.position.y, z: camera.position.z }); // (round 77: a long Cinematic boom is heard from nearer the investigator)
       Object.assign(right, { x: m[0] / len, z: m[2] / len });
       e.detune = fx.detune + fx.wobble * Math.sin(seconds * 0.7);
       e.setDistortion(fx.distortion);
