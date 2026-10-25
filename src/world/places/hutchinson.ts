@@ -67,7 +67,7 @@ export const hutchinson: PlaceFn = (c: Court, h: House) => {
   c.add('fh_shelf', lb + 0.5, 22.5, { face: 'front', s: 1.3 });
   c.add('fh_stove', lb + 0.8, 25.5, { face: 'front', s: 1.1 });
 
-  // what he worked with (web parts, docs/WEB_PARTS.md): generators, a ring of pipe and a tank before the laboratory, crystals grown of the salt at the donjon's foot
+  // what he worked with (web parts, docs/WEB_PARTS.md): generators, a ring of pipe and a tank before the laboratory, crystals grown of the salt before the donjon
   for (const [a, cc, id, yaw] of [[lf + 12.4, 21, 'wk_generator', 0.2], [lf + 12.6, 31, 'wk_generator', -0.3], [lf + 13.4, 26, 'wk_pipe_ring', 0], [lf + 15, 35, 'wk_tank', 0.4]] as const) c.add(id, a, cc, { yaw, jitter: 0.1 });
   for (const [a, cc, id] of [[-B + 7, -18, 'wk_crystals'], [-B + 12, -26, 'wk_crystal'], [-B + 7, -24, 'wk_crystal']] as const) c.add(id, a, cc, { dye: { glow: [0.55, 0.45, 0.95] }, s: 0.9, turn: a * 17 });
 

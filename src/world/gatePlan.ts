@@ -45,7 +45,7 @@ export interface FogWall {
   region: string;
   bosses: string[]; // roster ids
   spawns: string[]; // `boss:<id>`: slain for good, the wall is gone
-  stake: { x: number; z: number; yaw: number }; // where the fallen wake, before the fog on the way in, looking at it (round 45: systems/candles.ts)
+  stake: { x: number; z: number; yaw: number }; // where the fallen wake: before a hall's fog on the way in, looking at it; in an open arena's court, a few steps past the gate's mist, looking at the arena (round 45: systems/candles.ts)
   candle: CandleSpot; // where its candle stands: aside the stake, at the way's edge (round 62: world/candlePlan.ts)
   gate?: string; // an open arena's: the hidden piece (the house's gate) whose opening it stands in, which E passes only once it has opened (systems/fogGates.ts)
 }

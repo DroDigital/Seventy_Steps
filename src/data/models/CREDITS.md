@@ -210,6 +210,10 @@ By Jungle Jim (https://sketchfab.com/jungle_jim), https://sketchfab.com/3d-model
 
 `gate_alien_l`, `gate_alien_r`
 
+# Credits: the web parts (round 78)
+
+The `wk_*` models of the `web` set (`webIndex.ts` + `webPack.ts`, baked from `tools/models/boss/manifest_web.py`, stood in nine courts; candidates and licences: `docs/WEB_PARTS.md`) are all CC0 1.0, which asks for no credit; it is given.
+
 ## Web source kenney — Kenney's kits
 https://kenney.nl/assets (Graveyard Kit, Space Kit, Nature Kit, Tower Defense Kit, Mini Arena, City Kit (Industrial)), **CC0 1.0**.
 
@@ -222,4 +226,3 @@ https://opengameart.org/users/quaternius (Ultimate Space Kit, Modular Dungeon, M
 
 ## Web source oga — single models on OpenGameArt
 **CC0** (the licence line of each page read): `wk_egg` (Strange Egg, Umplix, https://opengameart.org/content/strange-egg), `wk_knight` (Knight statue, yd, https://opengameart.org/content/knight-statue), `wk_throne` (Barbarian throne, eugeneloza, https://opengameart.org/content/opendungeons-barbarian-throne), `wk_pyramid` (Pyramid 3d, Intrix, https://opengameart.org/content/pyramid-3d). Changes: the pieces of a statue made one, decimated, welded and flattened to the game's faces, sized in metres.
-

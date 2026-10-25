@@ -22,7 +22,7 @@ Rigid motion only: the spec rules skeletal animation out, and a leaf that turns,
 
 ## Sources
 
-Free only: CC0, or CC BY 4.0 with attribution (two models need it, both from Sketchfab, below). Nothing was taken from the supplied zips that fits a
+Free only: CC0, or CC BY 4.0 with attribution (three models need it, all from Sketchfab, below). Nothing was taken from the supplied zips that fits a
 gate; they hold temple doors, menhirs, flutes, basalt and dead trees, which the styles reuse where the story fits.
 
 | Source | Licence | Used for |
@@ -32,11 +32,12 @@ gate; they hold temple doors, menhirs, flutes, basalt and dead trees, which the 
 | Namaqualand Boulder 03, Poly Haven (Jenelle van Heerden, Dario Barresi) | CC0 | the ford |
 | Castle Kit's metal gate, Kenney | CC0 | the keep's portcullis |
 | Aztec Double-Headed Serpent for printing, corentin (Sketchfab) | CC BY 4.0 | Yig's jaw: the carved, fanged head of one half |
-| Demons Gate, Trockk (Sketchfab) | CC BY 4.0 | the corona of ground spikes before the Court's doors and the Threshold's |
+| Demons Gate, Trockk (Sketchfab) | CC BY 4.0 | the corona of ground spikes before the Court's doors |
+| Epic Alien Temple Door, Jungle Jim (Sketchfab, `w22`) | CC BY 4.0 | the Threshold: the carved temple front, split into two sliding halves |
 | the supplied packs (already credited) | as credited | temple doors (sun, moon, leaf), menhirs, flutes, basalt, dead trunks |
 
 `python3 -I tools/models/gates/fetch.py <work dir>` fetches the first four (network, standard library only; the licences are read from the assets'
-own info and kept). The Sketchfab models (`w20`, `w21`) need a sign-in to download, so they are downloaded by hand as glTF and put in `<work dir>/w20` and `/w21`
+own info and kept). The Sketchfab models (`w20`, `w21`, `w22`) need a sign-in to download, so they are downloaded by hand as glTF and put in `<work dir>/w20`, `/w21` and `/w22`
 (`scene.gltf`, `scene.bin`, `license.txt`); the baker then reads them like the rest. `python3 -I tools/models/bake_boss_models.py <work dir> --only gate_iron_l,...` bakes them (`tools/models/boss/manifest_gates.py`,
 `set: 'gate'`) into `src/data/models/gateIndex.ts` + `gatePack.ts` (about 144 KB), beside the other sets, which the tool leaves byte for byte as they were.
 Credits: `src/data/models/CREDITS.md`.
