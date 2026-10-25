@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { mirrorCamera, MIRROR, pickMirror, planeOf, type MirrorSpot } from '../src/render/mirrorMath';
+import { inView, mirrorCamera, MIRROR, pickMirror, planeOf, type MirrorSpot } from '../src/render/mirrorMath';
 
 /** A mirror on the plane z = 0, facing +z (the room), its middle at (0, 1.5, 0). */
 const glass: MirrorSpot = { x: 0, y: 1.5, z: 0, nx: 0, ny: 0, nz: 1 };
@@ -22,6 +22,7 @@ describe('the mirror found among a mirror piece\'s faces (planeOf)', () => {
     const s = planeOf(geo)!;
     expect([s.x, s.y, s.z]).toEqual([1, 2, 4]);
     expect([s.nx, s.ny, s.nz]).toEqual([0, 0, 1]);
+    expect(s.r).toBeCloseTo(Math.hypot(2, 3) / 2, 5);
     expect(planeOf(new THREE.BufferGeometry())).toBeNull();
   });
 });
@@ -41,6 +42,20 @@ describe('which mirror is drawn (pickMirror)', () => {
     const far: MirrorSpot = { ...glass, z: -6 };
     const near: MirrorSpot = { ...glass, z: 1, x: 0.5 };
     expect(pickMirror([far, near], eye, toward)).toBe(near);
+  });
+});
+
+describe('whether the glass is in the picture (inView)', () => {
+  const spot: MirrorSpot = { ...glass, r: 1.8 };
+  it('is so when it is ahead, and not when it is behind the shoulder', () => {
+    expect(inView(spot, camera(0, 1.6, 6, [0, 1.5, 0]))).toBe(true);
+    expect(inView(spot, camera(0, 1.6, 6, [0, 1.5, 12]))).toBe(false);
+    expect(inView(spot, camera(0, 1.6, 6, [12, 1.6, 6]))).toBe(false);
+  });
+  it('counts the reach of its glass: an edge in the picture is enough', () => {
+    const cam = camera(0, 1.6, 6, [7.5, 1.6, 0]); // the middle is just off the edge; the glass is not
+    expect(inView({ ...glass, r: 0.1 }, cam)).toBe(false);
+    expect(inView({ ...glass, r: 4 }, cam)).toBe(true);
   });
 });
 

@@ -24,8 +24,8 @@ export interface Piece {
   lift?: number; // metres off the ground (hung, floating, sunk if negative)
   heart?: boolean; // may stand in the fight's circle, as its centrepiece
   join?: boolean; // may touch the pieces beside it (a wall's, a colonnade's)
-  hung?: boolean; // hangs on a wall (a shelf, a banner): a room's set stands it against the wall, not clear of it (round 74)
-  wax?: boolean; // a figure of wax (round 74: the museum's effigies): drawn translucent and warm
+  hung?: boolean; // hangs on a wall (a shelf, a banner): a room's set stands it against the wall, not clear of it (round 77)
+  wax?: boolean; // a figure of wax (round 77: the museum's effigies): drawn translucent and warm
   dims?: readonly [w: number, d: number, h: number]; // a built piece's own size, half extents and height
 }
 
@@ -36,7 +36,7 @@ export type Layout =
   | { at: { r: number; a: number; add?: number; side?: number; mirror?: boolean; face?: Face } } // one, or a pair either side of the line, `side` metres across it
   | { scatter: { n: number; r: readonly [number, number]; arc?: readonly [number, number]; face?: Face } } // at random in a band
   | { lane: { r: readonly [number, number]; n: number; side: number; face?: Face } } // down the way in, a pair every step
-  | { wall: { r: number; step: number; walls?: readonly number[]; face?: Face } }; // a room's walls (round 74): a piece every `step` metres along each, at a share `r` of the radius, a candidate for each that the room's doors, pillars and things then refuse
+  | { wall: { r: number; step: number; walls?: readonly number[]; face?: Face } }; // a room's walls (round 77): a piece every `step` metres along each, at a share `r` of the radius, a candidate for each that the room's doors, pillars and things then refuse
 
 export interface Put {
   piece: Piece;

@@ -26,7 +26,7 @@ def main(src, out):
         b = np.clip(np.round(rel * 100), 0, 255).astype(np.uint8)  # 100 is an average texel, so it can be 2.5 times as bright
         rows.append(f"  {name}: '{base64.b64encode(b.tobytes()).decode()}',")
     lines = [
-        "/** PS1 surface patterns (round 74; tools/psx/bake_psx_textures.py, render/textures.ts): each 64 x 64 bytes of brightness against the texture's own average (100 is average), from",
+        "/** PS1 surface patterns (round 77; tools/psx/bake_psx_textures.py, render/textures.ts): each 64 x 64 bytes of brightness against the texture's own average (100 is average), from",
         " * Goblinatron's 'PSX Dungeon' (CC BY 4.0, credited in src/data/models/CREDITS.md as Pack 40). Generated. */",
         '',
         'export const PSX_SIZE = 64;',

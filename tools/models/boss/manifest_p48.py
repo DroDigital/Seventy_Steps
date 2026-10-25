@@ -1,4 +1,4 @@
-"""Pack 48, 'Modular Cave Kit' by Kenney (kenney.nl, CC0 1.0): its rock gate and its barred gate, taken singly, for the mouths of Nkai and the Elder City and the pens of Curwen's catacombs (round 74)."""
+"""Pack 48, 'Modular Cave Kit' by Kenney (kenney.nl, CC0 1.0): its rock gate and its barred gate, taken singly, for the mouths of Nkai and the Elder City and the pens of Curwen's catacombs (round 77)."""
 from manifest import M, add
 import sources as S
 

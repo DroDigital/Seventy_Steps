@@ -55,7 +55,7 @@ describe("a boss hall's set (round 62: the halls were a heart, braziers and two 
   it('keeps the fight clear, the walls and pillars clear, and the doorways open', () => {
     for (const { d, r, boss } of halls) {
       const solids = setsIn(d, r).filter((p) => reach(p) > 0);
-      const hearts = new Set(HALL_SETS[boss].puts.filter((u) => u.piece.heart).map((u) => u.piece.of)); // (round 74: a great piece at a hall's edge is a heart, which the fight's circle does not bar: it stands against the wall, clear of the doors and the room's things)
+      const hearts = new Set(HALL_SETS[boss].puts.filter((u) => u.piece.heart).map((u) => u.piece.of)); // (round 77: a great piece at a hall's edge is a heart, which the fight's circle does not bar: it stands against the wall, clear of the doors and the room's things)
       for (const p of solids.filter((q) => !hearts.has(q.set!.id))) {
         expect(Math.hypot(p.x - r.x, p.z - r.z) - reach(p), `${boss}: ${p.set!.id} in the fight`).toBeGreaterThanOrEqual(SET_RULES.inner * (r.half - DUNGEON.wall) - 0.01);
         expect(solidGap(d.parts, p.x, p.z, r.level) - reach(p), `${boss}: ${p.set!.id} in a wall or a pillar`).toBeGreaterThanOrEqual(HALL.wall - 0.01);

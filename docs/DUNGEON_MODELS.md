@@ -1,4 +1,4 @@
-# The dungeons' models (round 74)
+# The dungeons' models (round 77)
 
 The asset brief for every dungeon (*Seventy Steps: free assets for every dungeon and boss room*, 28 dungeons, 290 rooms, 43 free sources) names models for each place and says what to make of them. This is what of it is in the game, how it was brought in, and what is not.
 
@@ -28,7 +28,6 @@ The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`)
 | 38 Museum Showcase | Oneironauticus | CC BY | `mg_case` | Rhan-Tegoth's wax museum |
 | 39 Stone Altar | TheoClarke | CC BY | `sh_altar` | Sentinel Hill's summit |
 | 40 PSX Dungeon | Goblinatron | CC BY | `pd_*` (8) | the Outsider's ballroom, the Hound's tombs, Lilith's shrine, Curwen's vault |
-| 41 PSX Shelves (Horror) | Munchkin Gaming | free commercial use, no redistribution as assets | `ps_*` (5) | the University Library's halls, the Archives, Zann's garret |
 | 42 Modular Cathedral Kit | SigilsVault | CC0 | `ca_*` (3) | the steeple, the ballroom |
 | 43 Sewers Modular Assets | RotoPoly | CC0 | `sw_*` (6) | Y'ha-nthlei, Curwen's pens, the swamp tomb |
 | 44 Kyle's Mushroom Pack | Kyle Fuji | CC0 | `mu_*` (5) | Nkai, the Mi-Go cities |
@@ -47,14 +46,14 @@ Pieces are placed as render dressing with colliders only where a body would stan
 
 New machinery in the set placer: `wall(r, step, {walls})` lays a row of candidates along the walls of a room, `face: 'wall'` turns each square to its wall, and `hung` stands a piece against a wall instead of clear of it (a shelf, a boarded window); an ordinary room's set draws the fight's circle smaller (`ROOM_INNER`) and keeps clear only the spots its own things use.
 
-## What is clear, wet, silvered and waxen (round 74)
+## What is clear, wet, silvered and waxen (round 77)
 
 A face of a baked model has a class byte, and four classes beside the old ones are drawn as what they are (`GLASS` 12, `LIQUID` 13, `MIRROR` 14, `WAX` 15: tools/models/boss/sources.py, render/modelKit.ts). The bake finds them three ways: by a material's name (`classes={'Architectural_Glass': S.GLASS}`), by a texture's clearness (`glass_alpha`: a jar's wall, an hourglass's bulbs, the faces whose texture is clearer than the given share are glass and are kept), and by geometry (`plane`: the flat panel in a mirror's frame, found as the faces that face the front at the depth of the glass). `fill` builds a liquid inside a vessel as a body of revolution under its glass, from the vessel's own profile (tools/models/boss/fill.py). Each is a material of its own in propMeshes (`glassware`, `liquid`, `wax`, `mirror`), the world shader with a `SURF_*` define (shaders/surfaces.ts):
 
 - **Glass** is clear until seen aslant or when it catches a lamp; a pale band crosses it as the eye moves.
 - **Liquid** is lit from within, ripples at its top, turns slowly and has the odd bubble rising; it is drawn under its glass.
 - **Wax** takes the lamps through itself, warm at its edges (a put's `wax: true` draws a whole figure so: the museum's effigies).
-- **A mirror is a mirror**: when the eye stands before a hall's mirror and looks toward it, the scene is drawn once more from the eye's image behind the glass, small, with the mirror left out and what lies behind the wall cut away by an oblique near plane (render/mirrorView.ts, mirrorMath.ts), and the glass shows that, dimmed, cooled and a little tarnished; where none is drawn it is a dark silvered panel. One mirror at a time, the nearest; the player and the horror are in it.
+- **A mirror is a mirror**: when the eye stands before a hall's mirror and looks toward it, the scene is drawn once more from the eye's image behind the glass, small, with the mirror left out and what lies behind the wall cut away by an oblique near plane (render/mirrorView.ts, mirrorMath.ts), and the glass shows that, dimmed, cooled and a little tarnished; where none is drawn it is a dark silvered panel. One mirror at a time, the nearest; it is drawn only while its glass is in the picture, and every other frame; the player and the horror are in it.
 
 Models that wear them: the brain jars and museum cases (glass, fluid), the retort, flasks and bottles of the laboratories (glass, liquid), the bottle gallery (glass, wine, cork), the still, the hourglass, the compressor's gauge, the candles (wax), the ballroom's, the Waite study's and Lilith's mirrors.
 
@@ -66,4 +65,4 @@ Models that wear them: the brain jars and museum cases (glass, fluid), the retor
 - **Glass, liquid, reflection and wax are drawn** (render/shaders/surfaces.ts; see below). Not done: the hourglass's sand does not run (it needs a per-grain animation the bake does not carry) and the glass does not crack. The bespoke forms the brief asks for (Keziah's impossible angles, the Voice's telephone, Zann's viol, the Elder Things' fivefold columns, Kadath's domes, Umr's causeways) were not made.
 - **The Bust of Apollo** is the model as made, reduced and recoloured as stone; no laurel, poppy crown or other change to what it shows was made, since the licence's change notice names only what was done.
 - **Left out after baking:** the PSX Dungeon's skull wall, whose skulls are in its texture (a baked face keeps one colour, so it came out a plain slab).
-- **The PSX Shelves pack is AI-assisted** by its own listing: docs/STORE_PAGE.md lists it in the AI disclosure. Its licence forbids reselling or redistributing the assets themselves; the shelves here are modified, baked into the game's own model data and not offered on their own.
+- **Left out for its licence:** Pack 41, Munchkin Gaming's PSX Shelves (Horror) (free for commercial use but "not to be resold or redistributed as assets", and AI-assisted by its own listing). A baked model is the game's data, shipped with every build, which is a redistribution of the asset in a different form; the repo already keeps pack 07 out for the same reason, and `tests/bossPlaces.test.ts` now keeps pack 41 out too. The University Library's cases and shelves, the Archives' record cases and the garret's book piles are built in code instead (`render/setShapesBooks.ts`).

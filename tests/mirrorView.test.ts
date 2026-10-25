@@ -24,7 +24,7 @@ const renderer = (seen: boolean[]) => {
   return { r: r as unknown as THREE.WebGLRenderer, calls, render: r.render };
 };
 
-describe('the mirror view (round 74)', () => {
+describe('the mirror view (round 77)', () => {
   it('draws the room once more from behind the glass, with the glass itself out of it, and shows it', () => {
     const { scene, glass } = room();
     const view = createMirrorView();
@@ -53,6 +53,26 @@ describe('the mirror view (round 74)', () => {
       expect(worldUniforms.uMirrorOn.value).toBe(0);
       expect(view.state.drawn).toBe(false);
     }
+  });
+
+  it('draws it every other frame while it stays in view, not every one', () => {
+    const { scene } = room();
+    const view = createMirrorView();
+    const { r, render } = renderer([]);
+    const cam = eye(0, 1.6, 6, [0, 1.5, 0]);
+    for (let i = 0; i < 6; i++) view.render(r, scene, cam);
+    expect(render).toHaveBeenCalledTimes(3);
+    expect(worldUniforms.uMirrorOn.value).toBe(1); // and the glass keeps showing the last
+  });
+
+  it('does not draw a mirror that is off the edge of the picture, however it is faced', () => {
+    const { scene, glass } = room();
+    glass.userData.mirrors = [{ x: 0, y: 1.5, z: 0, nx: 0, ny: 0, nz: 1, r: 0.5 }];
+    const view = createMirrorView();
+    const { r, render } = renderer([]);
+    view.render(r, scene, eye(0, 1.6, 6, [8.7, 1.6, 1])); // sixty degrees off the line to it: turned to it enough, but outside the picture
+    expect(render).not.toHaveBeenCalled();
+    expect(worldUniforms.uMirrorOn.value).toBe(0);
   });
 
   it('finds a mirror that comes into the scene later (a chunk is built), within a moment', () => {

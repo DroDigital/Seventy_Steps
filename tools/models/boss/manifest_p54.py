@@ -1,4 +1,4 @@
-"""Pack 54, 'Bust of Apollo' by davdadams (Sketchfab, CC BY 4.0): a scan of a marble head and shoulders (121,000 faces), reduced to two thousand, for the dreamer's studio at the top of the Sculptor's Tower (round 74)."""
+"""Pack 54, 'Bust of Apollo' by davdadams (Sketchfab, CC BY 4.0): a scan of a marble head and shoulders (121,000 faces), reduced to two thousand, for the dreamer's studio at the top of the Sculptor's Tower (round 77)."""
 from manifest import M, add
 import sources as S
 

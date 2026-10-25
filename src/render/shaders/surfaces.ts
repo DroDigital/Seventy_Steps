@@ -1,5 +1,5 @@
 /**
- * What the dungeons' models are made of when it is not stone (round 74: the brief asked for glass, liquid, reflection and wax, and a mirror was a framed dark
+ * What the dungeons' models are made of when it is not stone (round 77: the brief asked for glass, liquid, reflection and wax, and a mirror was a framed dark
  * panel): the world fragment shader's last word on a face, chosen by a define. Glass is clear until it is seen aslant or catches a lamp, and a pale band
  * crosses it as the eye moves; liquid is lit from within, rippling at its top, with bubbles rising through it; wax takes the lamps through itself in a
  * warm glow at its edges; a mirror is the room drawn again from behind it (render/mirrorView.ts), dimmed, cooled and a little tarnished, and a dark

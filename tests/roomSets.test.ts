@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ROOM_SETS } from '../src/data/roomSets';
 import { MODEL_INFO } from '../src/data/models/index';
+import { SET_KITS } from '../src/data/setKits';
 import { DUNGEON } from '../src/data/tuning';
 import { reach } from '../src/world/arenaDecor';
 import { SET_RULES } from '../src/world/arenaSet';
@@ -12,14 +13,14 @@ const w = worldLayout();
 const rooms = w.dungeons.flatMap((d) => d.layout.rooms.map((r) => ({ d, r, key: `${d.layout.def.id}/${r.def.id}` })));
 const setsIn = (d: (typeof w.dungeons)[number], r: (typeof rooms)[number]['r']) => d.decor.filter((p) => p.kind === 'set' && Math.abs(p.x - r.x) < r.half && Math.abs(p.z - r.z) < r.half);
 
-describe("an ordinary room's set (round 74: the library's shelves, the stair's braziers)", () => {
+describe("an ordinary room's set (round 77: the library's shelves, the stair's braziers)", () => {
   it('is written for a room that is there, a hall that is no boss\'s, and names only baked models', () => {
     for (const [key, set] of Object.entries(ROOM_SETS)) {
       const room = rooms.find((x) => x.key === key);
       expect(room, `${key} is no room`).toBeTruthy();
       expect(room!.r.def.kind, key).toBe('hall');
       expect(room!.r.def.boss, `${key} has a boss: its hall's set is data/hallSets.ts`).toBeUndefined();
-      for (const { piece } of set.puts) expect(!!MODEL_INFO[piece.of], `${key}: ${piece.of}`).toBe(true);
+      for (const { piece } of set.puts) expect(!!MODEL_INFO[piece.of] || !!SET_KITS[piece.of], `${key}: ${piece.of}`).toBe(true);
     }
   });
 

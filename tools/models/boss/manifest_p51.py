@@ -1,4 +1,4 @@
-"""Pack 51, 'Prayer Wheel' by Özlem Çandır (Sketchfab, CC BY 4.0): a wheel on its handle, stood upright on its handle, a drum on a post, on the floor of Leng's monastery (round 74)."""
+"""Pack 51, 'Prayer Wheel' by Özlem Çandır (Sketchfab, CC BY 4.0): a wheel on its handle, stood upright on its handle, a drum on a post, on the floor of Leng's monastery (round 77)."""
 from manifest import M, add
 import sources as S
 

@@ -1,4 +1,4 @@
-"""Pack 42, 'Modular Cathedral Kit' by SigilsVault (itch.io, CC0 1.0): its two columns and a railing, for the church, the cellars and the ballroom (round 74)."""
+"""Pack 42, 'Modular Cathedral Kit' by SigilsVault (itch.io, CC0 1.0): its two columns and a railing, for the church, the cellars and the ballroom (round 77)."""
 from manifest import M, add
 import sources as S
 

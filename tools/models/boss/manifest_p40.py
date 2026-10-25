@@ -1,5 +1,5 @@
 """Pack 40, 'PSX Dungeon' by Goblinatron (itch.io, CC BY 4.0): the crypt's furniture, the pillars broken and fallen, a chain, a chandelier, spikes, candles and
-rubble, for the vaults and halls of the dungeons (round 74; the Outsider's ballroom, the Hound's tomb, the Voice's swamp, Curwen's catacombs)."""
+rubble, for the vaults and halls of the dungeons (round 77; the Outsider's ballroom, the Hound's tomb, the Voice's swamp, Curwen's catacombs)."""
 from manifest import M, add
 import sources as S
 

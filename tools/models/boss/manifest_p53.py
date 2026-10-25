@@ -1,4 +1,4 @@
-"""Pack 53, 'old church bell' by vertexgrocer (Sketchfab, CC BY 4.0): a bronze bell, decimated, hung in the windowless steeple of the Starry Wisdom church (round 74)."""
+"""Pack 53, 'old church bell' by vertexgrocer (Sketchfab, CC BY 4.0): a bronze bell, decimated, hung in the windowless steeple of the Starry Wisdom church (round 77)."""
 from manifest import M, add
 import sources as S
 

@@ -27,7 +27,6 @@ export const CREDITS: readonly CreditBlock[] = [
       'Bruno Macchioni · Bl4ckGh0st · mynameismary · Animex · zacharykozak',
       'dedicated to the public domain (CC0 1.0): Kenney · Quaternius · Kay Lousberg · chilly_durango · Elegant Crow · SigilsVault · RotoPoly',
       'Kyle Fuji · Poly Haven · MilkAndBanana · rubberduck · Fertile Soil Productions · pistachio · Paul Wortmann · Goth Scarecrow · ZomBCool',
-      'bookcases by Munchkin Gaming (PSX Shelves)',
     ],
   },
   { heading: 'TITLE THEME', lines: ['"Subterranean Pulse"'] },

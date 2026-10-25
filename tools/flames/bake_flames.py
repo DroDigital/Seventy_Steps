@@ -57,7 +57,7 @@ def main(src, smoke, out):
         puffs.append(xy)
     data = base64.b64encode(atlas.tobytes()).decode()
     lines = [
-        '/** The flame flipbook (round 74; tools/flames/bake_flames.py, render/flames.ts): two bytes a texel, heat then coverage. Generated; credits in src/data/models/CREDITS.md. */',
+        '/** The flame flipbook (round 77; tools/flames/bake_flames.py, render/flames.ts): two bytes a texel, heat then coverage. Generated; credits in src/data/models/CREDITS.md. */',
         '',
         f"export const FLAME_ATLAS = {{ width: {SIZE[0]}, height: {SIZE[1]}, data: '{data}' }} as const;",
         '',

@@ -43,7 +43,7 @@ export const worldUniforms = {
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },
-  uMirrorMap: { value: null as THREE.Texture | null }, // the room drawn from behind the mirror nearest, the matrix to it, its plane, and whether it is drawn (mirrorView.ts; round 74)
+  uMirrorMap: { value: null as THREE.Texture | null }, // the room drawn from behind the mirror nearest, the matrix to it, its plane, and whether it is drawn (mirrorView.ts; round 77)
   uMirrorMat: { value: new THREE.Matrix4() },
   uMirrorPlane: { value: new THREE.Vector4(0, 1, 0, 0) },
   uMirrorOn: { value: 0 },
@@ -101,7 +101,7 @@ export interface WorldMaterialOptions {
   shore?: boolean; // the ground is washed by the sea where it meets it: a wet band and lace of foam, breathing with the swell (round 30)
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
-  surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 74)
+  surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 77)
 }
 
 const textures = new Map<string, THREE.DataTexture>();

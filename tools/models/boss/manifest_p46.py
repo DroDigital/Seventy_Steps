@@ -1,5 +1,5 @@
 """Pack 46, 'Lab Assets' by MilkAndBanana (OpenGameArt, CC0 1.0): a retort, a Florence flask, a round-bottomed flask, a reagent bottle, a ring stand, a Bunsen burner and a microscope,
-none of the counters, electronics or safety gear, the glass taken to a dusty amber and grey for the alchemist's cellars, Curwen's laboratory and the cellar of the Shunned House (round 74)."""
+none of the counters, electronics or safety gear, the glass taken to a dusty amber and grey for the alchemist's cellars, Curwen's laboratory and the cellar of the Shunned House (round 77)."""
 from manifest import M, add
 import sources as S
 

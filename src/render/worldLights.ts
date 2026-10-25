@@ -47,13 +47,13 @@ export function glassFacing(s: LightSpot, eye: { x: number; y: number; z: number
 
 export interface WorldLights {
   readonly halos: THREE.Mesh;
-  /** The pixel flames at the fires, torches and lamps (round 74: flames.ts). */
+  /** The pixel flames at the fires, torches and lamps (round 77: flames.ts). */
   readonly flames: THREE.Mesh;
   add(key: number, spots: readonly LightSpot[]): void;
   remove(key: number): void;
   /** How well lit the ground at a point is by lamps, fires, torches and windows (0..1) at `time`: each counts within its share of its light's range, and the Elder Signs' glow, an Echo's and the lantern's own do not. */
   lightAt(x: number, y: number, z: number, time: number): number;
-  /** Calls `fn` with each fire and torch within `reach` metres of `at` (and its distance): what a fire gives off (round 74: fireLife.ts). */
+  /** Calls `fn` with each fire and torch within `reach` metres of `at` (and its distance): what a fire gives off (round 77: fireLife.ts). */
   fires(at: V3, reach: number, fn: (s: LightSpot, d: number) => void): void;
   /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
   update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3, lanternCover?: number): void;

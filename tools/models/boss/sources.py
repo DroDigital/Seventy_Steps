@@ -11,7 +11,7 @@ import bmesh
 
 # Material classes (the baked class byte; src/render/modelKit.ts reads them).
 STONE, WOOD, LEAF, ROCK, SLAB, COBBLE, BRICK, CLOTH, METAL, BONE, GLOW = 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11
-# Round 74: what is clear, wet, silvered or waxen (drawn by render/propMeshes.ts as glassware, liquid, mirror and wax; a baked face keeps only its light and dark and the class).
+# Round 77: what is clear, wet, silvered or waxen (drawn by render/propMeshes.ts as glassware, liquid, mirror and wax; a baked face keeps only its light and dark and the class).
 GLASS, LIQUID, MIRROR, WAX = 12, 13, 14, 15
 CLASSES = {'stone': STONE, 'wood': WOOD, 'leaf': LEAF, 'rock': ROCK, 'slab': SLAB, 'cobble': COBBLE, 'brick': BRICK, 'cloth': CLOTH, 'metal': METAL, 'bone': BONE, 'glow': GLOW, 'glass': GLASS, 'liquid': LIQUID, 'mirror': MIRROR, 'wax': WAX}
 

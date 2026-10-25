@@ -23,7 +23,7 @@ export interface SetSite {
   radius: number;
   front: XZ; // unit vector toward the nearest Elder Sign
   well: boolean;
-  inner?: number; // share of the radius kept clear in place of SET_RULES.inner: an ordinary room's set stands nearer its middle than a boss hall's (round 74)
+  inner?: number; // share of the radius kept clear in place of SET_RULES.inner: an ordinary room's set stands nearer its middle than a boss hall's (round 77)
 }
 
 export const SET_RULES = {

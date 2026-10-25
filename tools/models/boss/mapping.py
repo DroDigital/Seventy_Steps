@@ -35,7 +35,7 @@ PACKS = {
     'p34': ('Brazier', 'Jochon', 'CC BY 4.0'), 'p35': ('Coral', 'rkuhlf', 'CC BY 4.0'),
     'p36': ('Gothic Cloaked Figure - Building Wall Statue', 'INGSOC1984', 'CC BY 4.0'), 'p37': ('Hourglass', 'carismah', 'CC BY 4.0'),
     'p38': ('Museum Showcase - Die Vitrine', 'Samuel Francis Johnson (Oneironauticus)', 'CC BY 4.0'), 'p39': ('Stone Altar', 'TheoClarke', 'CC BY 4.0'),
-    'p40': ('PSX Dungeon', 'Goblinatron', 'CC BY 4.0'), 'p41': ('PSX Bookshelves & Food Shelves', 'Munchkin Gaming', 'free for commercial use, no redistribution as assets'),
+    'p40': ('PSX Dungeon', 'Goblinatron', 'CC BY 4.0'),
     'p42': ('Modular Cathedral Kit', 'SigilsVault', 'CC0'), 'p43': ('Sewers Modular Assets', 'RotoPoly', 'CC0'),
     'p44': ("Kyle's Mushroom Pack", 'Kyle Fuji', 'CC0'), 'p45': ('Poly Haven: mirror, pipes, compressor, bottle, roots', 'Poly Haven', 'CC0'),
     'p46': ('Lab Assets', 'MilkAndBanana', 'CC0'), 'p47': ('Retro Modular House Pack', 'Elegant Crow', 'CC0'),
@@ -57,7 +57,7 @@ def used_by():
             places.setdefault(m.group(1) + '*', set()).add(name)
         for m in re.finditer(r"'([a-z]{2,3}_[a-z0-9_]+)'", text):
             places.setdefault(m.group(1), set()).add(name)
-    for f in sorted(glob.glob(os.path.join(ROOT, 'src', 'data', 'hallSets*.ts')) + [os.path.join(ROOT, 'src', 'data', 'roomSets.ts')]): # (round 74: the halls' and rooms' sets stand them too)
+    for f in sorted(glob.glob(os.path.join(ROOT, 'src', 'data', 'hallSets*.ts')) + [os.path.join(ROOT, 'src', 'data', 'roomSets.ts')]): # (round 77: the halls' and rooms' sets stand them too)
         here = os.path.basename(f)[:-3]
         owner = here
         for line in open(f).read().split('\n'):

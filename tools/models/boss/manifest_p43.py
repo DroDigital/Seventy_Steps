@@ -1,4 +1,4 @@
-"""Pack 43, 'Sewers Modular Assets' by RotoPoly (itch.io, CC0 1.0): pipes, barred grilles, a support, brick rubble and a stair, for the drowned vaults (round 74)."""
+"""Pack 43, 'Sewers Modular Assets' by RotoPoly (itch.io, CC0 1.0): pipes, barred grilles, a support, brick rubble and a stair, for the drowned vaults (round 77)."""
 from manifest import M, add
 import sources as S
 

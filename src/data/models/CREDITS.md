@@ -166,7 +166,7 @@ By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5aca
 
 `ar_arcade`
 
-# Credits: the dungeon models (round 74)
+# Credits: the dungeon models (round 77)
 
 Models for the dungeons' rooms and boss halls, from the asset brief for every dungeon (`docs/DUNGEON_MODELS.md`), baked by the same tool as the packs above (`tools/models/bake_boss_models.py`, manifests `tools/models/boss/manifest_p30.py` to `manifest_p46.py`) into `bossIndex.ts` and `bossPack.ts`. Each was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to each face's colour and a material class, decimated, welded, scaled to the metres it stands at, recoloured where noted and given its colliders; nothing is loaded as a source file at run time. The ten Sketchfab models were downloaded by the game's author (they need a sign-in) and are credited as their licence asks, with the changes made.
 
@@ -224,11 +224,6 @@ This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar
 By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: nine of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
 
 `pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
-
-## Pack 41 — PSX Bookshelves & Food Shelves
-By Munchkin Gaming, https://munchkin-jonesy.itch.io/psx-shelves, free for commercial use and modification, not to be resold or redistributed as assets (credit is not required; the pack's own listing says it is AI-assisted: docs/STORE_PAGE.md). Changes: five of its abandoned ('Horror') wooden bookcases taken singly, scaled and given colliders where they stand in the way, built into the game's own models and sets, not offered as assets of their own.
-
-`ps_bookcase`, `ps_bookcase_low`, `ps_bookbay`, `ps_bookpile`, `ps_wallshelf`
 
 ## Pack 42 — Modular Cathedral Kit
 By SigilsVault, https://sigilsvault.itch.io/modular-cathedral-kit, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/): asks for nothing, credited for provenance. Changes: two columns and a railing taken singly, scaled and given colliders.
@@ -295,7 +290,7 @@ This work is based on "Bust of Apollo" (https://sketchfab.com/3d-models/bust-of-
 
 `ba_bust`
 
-## Flames, smoke and surface patterns (round 74)
+## Flames, smoke and surface patterns (round 77)
 
 - **Pixel flames.** 'Fire' by ZomBCool, https://opengameart.org/content/fire-0, CC0 1.0: credited for provenance. Changes: its four frames of `fire_3.gif` reduced to a heat mask and a coverage mask (`tools/flames/bake_flames.py`, `src/data/flameAtlas.ts`) and coloured in code (`src/render/flames.ts`).
 - **Smoke puffs.** 'Smoke Particles' by Kenney (Kenney Vleugels), https://kenney.nl/assets/smoke-particles, CC0 1.0: credited for provenance. Changes: four of the white puffs reduced to 24 x 24 coverage masks, in the same atlas.

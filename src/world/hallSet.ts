@@ -32,13 +32,13 @@ export const HALL = {
 /** Whether a hall has a set of its own, by its first boss. */
 export const hasHallSet = (boss: string | undefined): boolean => !!boss && boss in HALL_SETS;
 
-/** Whether an ordinary room (a dungeon's id and its room's, 'library/foyer') has a set of its own (round 74). */
+/** Whether an ordinary room (a dungeon's id and its room's, 'library/foyer') has a set of its own (round 77). */
 export const hasRoomSet = (key: string): boolean => key in ROOM_SETS;
 
 /** A hall's set as props: its pieces, set about the hall's heart and turned from its entry. `dressing` is what its style already stands in it. */
 export const hallProps = (boss: string, r: RoomLayout, parts: readonly Part[], dressing: readonly Prop[]): Prop[] => (HALL_SETS[boss] ? setProps(HALL_SETS[boss], r, parts, dressing) : []);
 
-/** An ordinary room's set (round 74): the same machinery, the fight's circle drawn smaller so that the walls are lined, the middle left to those who cross it. */
+/** An ordinary room's set (round 77): the same machinery, the fight's circle drawn smaller so that the walls are lined, the middle left to those who cross it. */
 export const roomSetProps = (key: string, r: RoomLayout, parts: readonly Part[]): Prop[] => (ROOM_SETS[key] ? setProps(ROOM_SETS[key], r, parts, [], ROOM_INNER) : []);
 
 export const ROOM_INNER = 0.5;

@@ -1,5 +1,5 @@
 """Pack 47, 'Retro Modular House Pack' by Elegant Crow (itch.io, CC0 1.0; the photographs that ship beside it have terms of their own and are not used): a boarded door and window, a pair of closed shutters,
-a loose plank, a double window, a door and a flight of stairs, taken singly for the lodgings, farmhouses and cellars of the dungeons (round 74)."""
+a loose plank, a double window, a door and a flight of stairs, taken singly for the lodgings, farmhouses and cellars of the dungeons (round 77)."""
 from manifest import M, add
 import sources as S
 

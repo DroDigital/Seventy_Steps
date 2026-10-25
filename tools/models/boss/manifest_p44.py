@@ -1,5 +1,5 @@
 """Pack 44, "Kyle's Mushroom Pack" by Kyle Fuji (itch.io, CC0 1.0): a turkey tail, a reishi, a blue oyster, a morel and a lantern mushroom, grown to the height of a man's knee and more,
-for the black caverns of Tsath and the cities of the Mi-Go (round 74)."""
+for the black caverns of Tsath and the cities of the Mi-Go (round 77)."""
 from manifest import M, add
 import sources as S
 

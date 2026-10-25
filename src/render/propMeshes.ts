@@ -41,7 +41,7 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   cloth: { texture: 'cloth', seed: 2, vertexColors: true, vary: 0.3, sway: true },
   metal: { texture: 'cloth', seed: 8, vertexColors: true, vary: 0.2 },
   bone: { texture: 'slab', seed: 11, vertexColors: true, vary: 0.35 },
-  glassware: { texture: 'cloth', emissive: 0.1, vertexColors: true, opacity: 0.28, surface: 'glass' }, // what is clear, wet, waxen or silvered (round 74; shaders/surfaces.ts)
+  glassware: { texture: 'cloth', emissive: 0.1, vertexColors: true, opacity: 0.28, surface: 'glass' }, // what is clear, wet, waxen or silvered (round 77; shaders/surfaces.ts)
   liquid: { texture: 'cloth', emissive: 0.4, vertexColors: true, opacity: 0.55, surface: 'liquid' },
   wax: { texture: 'cloth', seed: 12, emissive: 0.1, vertexColors: true, vary: 0.2, surface: 'wax' },
   mirror: { texture: 'cloth', seed: 3, vertexColors: true, surface: 'mirror' },
@@ -83,7 +83,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   const groups = new Map<PropMat, THREE.BufferGeometry[]>();
   for (const [m, geo] of Object.entries(cover ?? {}) as [PropMat, THREE.BufferGeometry][]) groups.set(m, [geo]);
   const lights: LightSpot[] = [];
-  const mirrors: MirrorSpot[] = []; // where the glass of a mirror stands, for the one that is drawn (mirrorView.ts; round 74)
+  const mirrors: MirrorSpot[] = []; // where the glass of a mirror stands, for the one that is drawn (mirrorView.ts; round 77)
   const chimneys: Top[] = []; // where smoke goes up
   const casters: THREE.BufferGeometry[] = []; // the bodies of the props, for the moon's shadow
   let spent = 0;

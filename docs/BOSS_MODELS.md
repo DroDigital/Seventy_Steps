@@ -424,18 +424,6 @@ By Goblinatron; licence CC BY 4.0.
 | `pd_candle_b` | Models/Candle_02.fbx | 0.4 × 0.5 × 0.4 | 96 | lilith |
 | `pd_debris` | Models/Debris.fbx | 2.2 × 0.4 × 2.2 | 148 | the_hound |
 
-## Pack 41: PSX Bookshelves & Food Shelves
-
-By Munchkin Gaming; licence free for commercial use, no redistribution as assets.
-
-| game id | source | size (m) | triangles | stood by |
-|---|---|---|---|---|
-| `ps_bookcase` | Horror/Bookcase_Tall.glb | 1.3 × 2.5 × 1.2 | 1056 | library/periodicals, library/reading |
-| `ps_bookcase_low` | Horror/Bookcase_Short.glb | 1.1 × 1.5 × 1.1 | 624 | library/bindery, library/periodicals |
-| `ps_bookbay` | Horror/LibraryBay.glb | 1.3 × 2.8 × 0.5 | 1380 | flying_polyp, library/foyer, library/reading, library/restricted |
-| `ps_bookpile` | Horror/BookPile.glb | 0.9 × 0.4 × 0.3 | 192 | roomSets, zann_window_thing |
-| `ps_wallshelf` | Horror/WallShelf.glb | 1.5 × 0.8 × 0.4 | 358 | roomSets |
-
 ## Pack 42: Modular Cathedral Kit
 
 By SigilsVault; licence CC0.

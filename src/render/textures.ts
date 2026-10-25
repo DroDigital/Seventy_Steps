@@ -106,7 +106,7 @@ function quietStarts(pat: Uint8Array, alongX: boolean): number[] {
 }
 
 /**
- * A kind drawn as a PlayStation texture artist drew it (round 74, asked for: "the best and fitting PS1 era textures"): the texture keeps the average
+ * A kind drawn as a PlayStation texture artist drew it (round 77, asked for: "the best and fitting PS1 era textures"): the texture keeps the average
  * colour and light of the procedural one (so the realms' grades and the lamps see what they always saw) and takes its structure from a 64 × 64 pattern
  * of Goblinatron's 'PSX Dungeon' (CC BY 4.0), laid twice across and down so that a block or a slab is as large as it was; each material starts
  * it at its own place (the seed), and a little of the procedural grain stays so that two walls of one kit are not one picture.

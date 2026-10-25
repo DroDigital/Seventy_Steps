@@ -1,5 +1,5 @@
 /**
- * The mirrors' geometry (round 74): which mirror is drawn, where the room's second picture is taken from, and the matrix that lays it on the glass. A mirror
+ * The mirrors' geometry (round 77): which mirror is drawn, where the room's second picture is taken from, and the matrix that lays it on the glass. A mirror
  * is where a piece of a hall's set has faces of the mirror class (`planeOf`, from the faces as placed); the picture is the room drawn from the eye's image
  * behind that plane, its near plane laid on the glass so that nothing behind the wall is drawn (an oblique projection). Pure, no GL.
  */
@@ -14,6 +14,7 @@ export interface MirrorSpot {
   nx: number;
   ny: number;
   nz: number;
+  r?: number; // half the diagonal of its glass's box: how far from the middle it reaches (for what is in view)
 }
 
 export const MIRROR = {
@@ -33,7 +34,17 @@ export function planeOf(geo: THREE.BufferGeometry): MirrorSpot | null {
   if (n.lengthSq() < 1e-9) return null;
   const c = box.getCenter(new THREE.Vector3());
   n.normalize();
-  return { x: c.x, y: c.y, z: c.z, nx: n.x, ny: n.y, nz: n.z };
+  return { x: c.x, y: c.y, z: c.z, nx: n.x, ny: n.y, nz: n.z, r: box.getSize(new THREE.Vector3()).length() / 2 };
+}
+
+const frustum = new THREE.Frustum();
+const [view, sphere] = [new THREE.Matrix4(), new THREE.Sphere()];
+
+/** Whether any of the glass is in the camera's picture (its sphere against the frustum): a mirror behind the shoulder is not drawn. */
+export function inView(s: MirrorSpot, camera: THREE.Camera): boolean {
+  view.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  sphere.set(new THREE.Vector3(s.x, s.y, s.z), s.r ?? 1.5);
+  return frustum.setFromProjectionMatrix(view).intersectsSphere(sphere);
 }
 
 /** The mirror whose picture is drawn this frame: the nearest the eye stands before and looks toward, within reach; null for none. */
@@ -50,7 +61,7 @@ export function pickMirror(spots: readonly MirrorSpot[], eye: THREE.Vector3, for
   return best;
 }
 
-const [p, n, view, target, rotation, look, q, clip] = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Matrix4(), new THREE.Vector3(), new THREE.Vector4(), new THREE.Vector4()];
+const [p, n, seen, target, rotation, look, q, clip] = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Matrix4(), new THREE.Vector3(), new THREE.Vector4(), new THREE.Vector4()];
 const plane = new THREE.Plane();
 
 /**
@@ -62,11 +73,11 @@ export function mirrorCamera(virtual: THREE.PerspectiveCamera, camera: THREE.Per
   n.set(s.nx, s.ny, s.nz);
   camera.updateMatrixWorld();
   const eye = look.setFromMatrixPosition(camera.matrixWorld).clone();
-  view.subVectors(p, eye).reflect(n).negate().add(p); // the eye's image in the glass
+  seen.subVectors(p, eye).reflect(n).negate().add(p); // the eye's image in the glass
   rotation.extractRotation(camera.matrixWorld);
   target.set(0, 0, -1).applyMatrix4(rotation).add(eye);
   target.subVectors(p, target).reflect(n).negate().add(p);
-  virtual.position.copy(view);
+  virtual.position.copy(seen);
   virtual.up.set(0, 1, 0).applyMatrix4(rotation).reflect(n);
   virtual.lookAt(target);
   virtual.near = camera.near;

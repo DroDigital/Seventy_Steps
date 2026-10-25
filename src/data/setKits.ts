@@ -25,4 +25,8 @@ export const SET_KITS: Readonly<Record<string, SetKit>> = {
   pipes: { w: 1.5, d: 1.5, h: 6, round: true },
   banner: { w: 1.1, d: 0.3, h: 5.5, round: true },
   meteor: { w: 1.6, d: 1.6, h: 2, round: true },
+  bookcase: { w: 0.65, d: 0.28, h: 2.5 }, // round 77: a reading room's furniture, built (render/setShapesBooks.ts)
+  bookcase_low: { w: 0.65, d: 0.26, h: 1.1 },
+  bookshelf: { w: 0.9, d: 0.16, h: 0.4, walk: true }, // on a wall, high: no collider
+  bookpile: { w: 0.55, d: 0.45, h: 0.4, walk: true },
 };
