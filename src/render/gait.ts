@@ -213,7 +213,10 @@ export function settle(f: Figure, ground?: Ground, level = true, back = false): 
       const c = (room - f.thigh * Math.cos(thigh)) / shank;
       if (c > -1 && c < 1 && drop > room) {
         const lean = Math.acos(c); // the shin from the vertical that reaches no lower than the room: forward of it for a shin that points forward, behind it otherwise
-        bendTo(knee, !back && thigh + bent < 0 ? Math.max(-0.2, Math.min(bent, -lean - thigh)) : Math.min(2.6, Math.max(bent, lean - thigh)));
+        const forward = Math.min(bent, -lean - thigh);
+        // Keep the shin's lean only when that answer is reachable: clamping a forward bend
+        // leaves the ankle below the ground even though the backward answer clears it.
+        bendTo(knee, !back && thigh + bent < 0 && forward >= -0.2 ? forward : Math.min(2.6, Math.max(bent, lean - thigh)));
       }
       const knee2 = bendOf(knee);
       if (!level) bendTo(foot, bendOf(foot) - (knee2 - bent)); // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope

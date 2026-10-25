@@ -12,6 +12,7 @@ import type { XZ } from '../core/geom';
 import type { RegionDef } from '../data/regions';
 import { regionAt } from '../world/worldMap';
 import { BONE, drawMark, PIN_TIP, VERDIGRIS } from './mapIcons';
+import { stampMark } from './markSprites';
 import { screenX, screenY, type MapView } from './mapView';
 
 const EDGE = 26; // pixels the full map's pointer keeps from the screen's edge
@@ -63,7 +64,7 @@ export function drawBeacon(ctx: CanvasRenderingContext2D, view: MapView, at: XZ 
   if (!p.beyond) {
     if (arrowOnly) return;
     if (kind === 'lead') return drawMark(ctx, 'lead', p.x, p.y, unit, { now });
-    return drawMark(ctx, 'marker', p.x, p.y - PIN_TIP * unit, unit * 0.95, {}); // the pin's point on the place
+    return stampMark(ctx, 'marker', p.x, p.y - PIN_TIP * unit, unit * 0.95, {}); // the pin's point on the place
   }
   ctx.save();
   ctx.translate(p.x, p.y);

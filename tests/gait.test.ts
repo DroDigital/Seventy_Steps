@@ -83,4 +83,19 @@ describe('gait (render/gait.ts)', () => {
       expect(gap).toBeLessThan(0.05);
     }
   });
+
+  it.each([-0.7, 0.7])('keeps an NPC’s running ankles above a slope of %s when a forward knee bend reaches its limit', (slope) => {
+    const f = buildFigure('npc:stranger');
+    const ground: Ground = (x) => slope * x;
+    const clearance = f.hip - f.thigh - f.shin;
+    for (const stride of [0, Math.PI]) {
+      pose(f, { ...STILL, speed: 4.2, stride, ground });
+      f.root.updateMatrixWorld(true);
+      for (const [leg, foot] of [[f.legR, f.footR], [f.legL, f.footL]] as const) {
+        const ankle = foot.getWorldPosition(new THREE.Vector3());
+        const required = ground(leg.position.x, ankle.z) + clearance + f.ankle;
+        expect(ankle.y, `slope ${slope}, stride ${stride}, hip ${leg.position.x}`).toBeGreaterThanOrEqual(required - 1e-6);
+      }
+    }
+  });
 });
