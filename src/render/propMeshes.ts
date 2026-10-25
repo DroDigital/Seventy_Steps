@@ -66,9 +66,9 @@ function addSway(geo: THREE.BufferGeometry, p: Prop): void {
 
 /** What casts the moon's shadow (round 34): the bodies of things, not their lights, windows and trim. */
 const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard', 'brick', 'shingle', 'rock', 'slab', 'cobble', 'metal', 'bone', 'wax']);
-/** What stands 4 to 10 cm off a wall (frames, glass, doors) is drawn nearer than it is by a pixel's slope of depth: the PS1's snapping moves a face's depth by up to that on a wall seen aslant, and the wall showed through it (round 21). */
 /** What is not darkened toward the ground (light is not baked into it): lamps, lit windows, and what is clear or silvered. */
 const UNSHADED: ReadonlySet<PropMat> = new Set(['glow', 'pane', 'mirror', 'glassware', 'liquid']);
+/** What stands 4 to 10 cm off a wall (frames, glass, doors) is drawn nearer than it is by a pixel's slope of depth: the PS1's snapping moves a face's depth by up to that on a wall seen aslant, and the wall showed through it (round 21). */
 const RELIEF: ReadonlySet<PropMat> = new Set(['trim', 'pane']);
 export const propMaterial = (m: PropMat): THREE.ShaderMaterial => {
   let mat = materials.get(m);

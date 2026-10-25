@@ -6,7 +6,7 @@ The asset brief for every dungeon (*Seventy Steps: free assets for every dungeon
 
 The rule is the boss places' (docs/BOSS_PLACES.md, `src/data/models/CREDITS.md`): a source model is **baked**, never loaded.
 
-1. A pack is unpacked to `<work>/pNN/` (the ten Sketchfab models were downloaded by the game's author, since they need a sign-in; the itch.io, Kenney, Poly Haven and OpenGameArt packs were downloaded as the brief links them) and a manifest `tools/models/boss/manifest_pNN.py` says which piece of it is a model, how large it stands, what it is made of and what a body cannot walk through.
+1. A pack is unpacked to `<work>/pNN/` (the fifteen Sketchfab models were downloaded by the game's author, since they need a sign-in; the itch.io, Kenney, Poly Haven and OpenGameArt packs were downloaded as the brief links them) and a manifest `tools/models/boss/manifest_pNN.py` says which piece of it is a model, how large it stands, what it is made of and what a body cannot walk through.
 2. `python3 -I tools/models/bake_boss_models.py <work> --only <ids> --sheet out.png` reads it with Blender's importers and writes the model into `src/data/models/bossIndex.ts` and `bossPack.ts`. New in this round: `drop_alpha` leaves out the faces of a glass whose texture is mostly clear, so a brain shows in its jar.
 3. `python3 -I tools/models/boss/mapping.py > docs/BOSS_MODELS.md` lists every model, its pack, its size and where it stands.
 4. The model is stood by a *set*: `data/hallSets*.ts` for the boss halls, **`data/roomSets.ts` (new) for the rooms that are no boss's**, by the same machinery (`world/hallSet.ts`, `world/arenaSet.ts`), so that a piece keeps off the walls, the doorways, the room's own things and the fight's circle.

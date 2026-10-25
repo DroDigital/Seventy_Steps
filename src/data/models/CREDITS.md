@@ -197,7 +197,7 @@ By Kenney (www.kenney.nl), https://kenney.nl/assets/castle-kit, licensed CC0 1.0
 
 # Credits: the dungeon models (round 79)
 
-Models for the dungeons' rooms and boss halls, from the asset brief for every dungeon (`docs/DUNGEON_MODELS.md`), baked by the same tool as the packs above (`tools/models/bake_boss_models.py`, manifests `tools/models/boss/manifest_p30.py` to `manifest_p46.py`) into `bossIndex.ts` and `bossPack.ts`. Each was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to each face's colour and a material class, decimated, welded, scaled to the metres it stands at, recoloured where noted and given its colliders; nothing is loaded as a source file at run time. The ten Sketchfab models were downloaded by the game's author (they need a sign-in) and are credited as their licence asks, with the changes made.
+Models for the dungeons' rooms and boss halls, from the asset brief for every dungeon (`docs/DUNGEON_MODELS.md`), baked by the same tool as the packs above (`tools/models/bake_boss_models.py`, manifests `tools/models/boss/manifest_p30.py` to `manifest_p54.py`) into `bossIndex.ts` and `bossPack.ts`. Each was **modified for the game**: read from its source with Blender's importers, its meshes selected and joined, textures reduced to each face's colour and a material class, decimated, welded, scaled to the metres it stands at, recoloured where noted and given its colliders; nothing is loaded as a source file at run time. The fifteen Sketchfab models were downloaded by the game's author (they need a sign-in) and are credited as their licence asks, with the changes made.
 
 ## Pack 30 — Alembic
 This work is based on "Alembic" (https://sketchfab.com/3d-models/alembic-811618ea79ba4aac95d7f7312a2128ec) by FlukierJupiter (https://sketchfab.com/FlukierJupiter) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/). Changes: scaled to a still of a metre and a half, given one collider and recoloured copper; used in Charles le Sorcier's laboratory.
@@ -250,7 +250,7 @@ This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar
 `sh_altar`
 
 ## Pack 40 — PSX Dungeon
-By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: nine of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
+By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: eight of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
 
 `pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
 
