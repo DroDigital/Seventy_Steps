@@ -7,8 +7,10 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { FLASH_LIGHTS } from '../src/data/fxTuning';
 import { flashLight, layFlashes, level, putOutFlashes } from '../src/render/flashLights';
+import { createLampAim } from '../src/render/lampAim';
+import { createPostPass } from '../src/render/postPass';
 import { LAMP_SLOTS } from '../src/render/shaders/world';
-import { createWorldLights } from '../src/render/worldLights';
+import { createWorldLights, LIGHT_VIEW, type LightSpot } from '../src/render/worldLights';
 import { worldUniforms } from '../src/render/worldMaterial';
 
 const slots = () => ({ lamps: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()), colors: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector3()) });
@@ -74,5 +76,29 @@ describe('a flash of light', () => {
     const last = worldUniforms.uLamps.value[LAMP_SLOTS - 1];
     expect(last.w).toBe(9);
     expect(worldUniforms.uLampColors.value[LAMP_SLOTS - 1].x).toBeGreaterThan(3);
+  });
+
+  it('puts out the glass plane and the mist\'s aim of the window whose slot it takes, so it is clipped by none', () => {
+    const lights = createWorldLights();
+    const panes: LightSpot[] = Array.from({ length: LAMP_SLOTS + 2 }, (_, i) => ({ x: 2 + i * 0.4, y: 2, z: 3, kind: 'window', glass: { x: 2 + i * 0.4, y: 2, z: 2.5 }, pane: 0.9 }));
+    lights.add(1, panes);
+    const post = createPostPass(new THREE.Texture());
+    const aim = createLampAim(post);
+    const eye = new THREE.Vector3(0, 1.7, 0);
+    lights.update(eye, 5, null, at);
+    aim.update(true);
+    const last = LAMP_SLOTS - 1;
+    expect(LIGHT_VIEW.flashes).toBe(0);
+    expect(worldUniforms.uLampPlane.value[last].lengthSq()).toBeGreaterThan(0); // (a window's, with no flash)
+    expect(post.uniforms.uLampAim.value[last].w).toBeGreaterThan(0);
+    flashLight({ x: 2, y: 1, z: 2 }, [1, 0.84, 0.54], 3.4, 9, 0.1);
+    lights.update(eye, 5.01, null, at);
+    lights.update(eye, 5.03, null, at);
+    aim.update(true);
+    expect(LIGHT_VIEW.flashes).toBe(1);
+    expect(worldUniforms.uLamps.value[last].w).toBe(9);
+    expect(worldUniforms.uLampPlane.value[last].toArray()).toEqual([0, 0, 0, 0]);
+    expect(post.uniforms.uLampAim.value[last].toArray()).toEqual([0, 0, 0, 0]);
+    expect(worldUniforms.uLampPlane.value[last - 1].lengthSq()).toBeGreaterThan(0); // (the rest keep theirs)
   });
 });

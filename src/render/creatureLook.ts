@@ -24,6 +24,9 @@ export interface Look {
   dissolve?: number; // 0..1 through its death: its picture goes texel by texel (render/creatureFx.ts, shaders/spriteFx.ts); absent: not dying
 }
 
+/** How opaque an outer god's echo of its body is: its own ghostliness, less as far as the body itself has gone or is not yet formed (an echo is not dressed in a texel style of its own, so it goes with the body by opacity, as it did before round 83). */
+export const echoOpacity = (ghost: number, gone: number): number => (1 - ghost) * (1 - gone);
+
 /** Where in its cycle each creature is, in seconds (round 83): a pack's breathing and walking were all one clock, so every Deep One stepped together. Golden-ratio steps of the entity id spread them evenly over the longest cycle (2.5 s), the same for all four views of one creature. */
 export const phaseOf = (id: Entity): number => ((id * 0.6180339887) % 1) * 2.5;
 

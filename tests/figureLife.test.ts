@@ -1,6 +1,6 @@
 /**
- * What a person has that moves of itself (round 83; render/figureSway.ts, render/figureGaze.ts, render/swingTrails.ts): the
- * investigator's lantern and scarf tail, a person's head following the investigator, and the track of a blow.
+ * What a person has that moves of itself (round 83; render/figureGaze.ts, render/swingTrails.ts): a person's head following the
+ * investigator, and the track of a blow. (The cloth and the eyes are personLife.test.ts's; the investigator's lantern and scarf are the player rebuild's.)
  */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';

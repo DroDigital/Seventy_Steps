@@ -3,7 +3,7 @@
  * snow, mud, sand, dirt, leaves or soft grass, whatever walks across it on foot, the people and the creatures near, leaves a print at each
  * stride, a pressed hollow in an ellipse set along the way it went, with a lip pushed up about it, in the colour of that ground, dithered as the blob shadows are, and
  * fading out in its own time (snow keeps it longest). The investigator's own are round 80's (render/footprints.ts, laid by render/atm/steps.ts), as
- * are their breath and dust (render/coldBreath.ts, footPuffs.ts). A flyer, a body in the sea and what is hidden or unseen leave none; nor
+ * are their breath and dust (render/breath.ts, footPuffs.ts). A flyer, a spectre, a body in the sea and what is hidden or unseen leave none (render/traceless.ts); nor
  * does a room under a roof, nor ground that is not soft. A ring of the last few hundred.
  */
 
@@ -12,7 +12,8 @@ import type { Entity } from '../core/ecs';
 import { PRINTS } from '../data/fxTuning';
 import { getRegion } from '../data/regions';
 import { SIM, WORLD } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
+import type { Game } from '../systems/components';
+import { leavesNone } from './traceless';
 import { worldUniforms } from './worldMaterial';
 
 const LIFT = 0.035; // metres above the ground
@@ -109,7 +110,7 @@ export function createCreatureTracks(scene: THREE.Scene, g: Game): CreatureTrack
         for (const [id, body] of c.body) {
           const tr = c.transform.get(id);
           if (!tr) continue;
-          if (id === g.player.id || !c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden' || (c.brain.get(id)?.def.params.hover ?? 0) > 0) continue;
+          if (id === g.player.id || leavesNone(g, id)) continue;
           const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
           if (Math.hypot(x - at.x, z - at.z) > PRINTS.reach || tr.pos.y < WORLD.seaLevel + 0.25) {
             tracks.delete(id);

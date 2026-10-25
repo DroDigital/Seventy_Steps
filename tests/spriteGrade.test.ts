@@ -35,7 +35,8 @@ describe('the drawn creatures take their realm\'s grade (round 83: render/shader
   it('touches the recorded art only, after the light and before the mist; the self-lit marks and the Colour are left alone', () => {
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
     const at = (s: string): number => src.indexOf(s);
-    expect(at('if (uReviewed > 0.5) col = spriteGraded(col, vTone)')).toBeGreaterThan(at('t.rgb * vLight'));
+    expect(at('t.rgb * light')).toBeGreaterThan(-1); // (the anchor is in the shader: a stale one would be -1, and make the order below hold for any order)
+    expect(at('if (uReviewed > 0.5) col = spriteGraded(col, vTone)')).toBeGreaterThan(at('t.rgb * light'));
     expect(at('if (uReviewed > 0.5) col = spriteGraded(col, vTone)')).toBeLessThan(at('float fog = vFog * uFogAmount'));
     expect(at('if (vOutside > 0.5 && uReviewed < 0.5)')).toBeGreaterThan(at('spriteGraded(col, vTone)')); // the procedural atlas's colour out of space is not graded: it is not drawn there
   });

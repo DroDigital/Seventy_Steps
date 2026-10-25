@@ -22,7 +22,7 @@ export interface Footfalls {
 }
 
 export function createBossFootfalls(g: Game, particles: Particles, felt: (p: V3, strength: number, reach: number) => void): Footfalls {
-  const walked = new Map<Entity, { run: number; side: number }>();
+  const walked = new Map<Entity, { run: number; side: number; frame: number }>(); // (the sim tick each was last seen at: a stride is counted in the world's ticks, not in the frames drawn, which a display's rate sets)
   return {
     update(at, alpha, enclosed) {
       if (enclosed) return;
@@ -31,13 +31,16 @@ export function createBossFootfalls(g: Game, particles: Particles, felt: (p: V3,
         const tr = c.transform.get(id);
         if (!tr || id === g.player.id || !c.actor.has(id) || (body.height < BOSS_PRESENCE.height && !c.fight.has(id)) || isAbsent(g, id) || isUnseen(g, id) || (c.health.get(id)?.hp ?? 0) <= 0 || !creatureOf(g, id)) continue;
         const speed = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz;
-        const walk = walked.get(id) ?? { run: 0, side: 1 };
+        const walk = walked.get(id) ?? { run: 0, side: 1, frame: g.frame };
         walked.set(id, walk);
+        const ticks = Math.min(4, g.frame - walk.frame); // (since it was last drawn; none while the world is held: a cutscene, the pause)
+        walk.frame = g.frame;
         if (speed < BOSS_PRESENCE.minSpeed) {
           walk.run = 0;
           continue;
         }
-        walk.run += speed / SIM.hz;
+        if (ticks <= 0) continue;
+        walk.run += (speed / SIM.hz) * ticks;
         if (walk.run < BOSS_PRESENCE.stride * body.height) continue;
         walk.run = 0;
         walk.side = -walk.side;

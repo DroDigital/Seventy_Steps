@@ -38,6 +38,8 @@ export interface Presence {
 
 export function createPresence(g: Game, particles: Particles, audio: GameAudio): Presence {
   let [lastFrame, rumbleAt, jolted, at, clock] = [-1, 0, 0, -Infinity, 0];
+  /** What is left of the jolt in hand: its strength under the way it dies away (`jolt`, without its shudders). A new one is felt if it is more than this, not more than the strongest ever (round 83: a footfall after a phase's quake was muted for good). */
+  const left = (): number => (clock - at < 0 || clock - at > 1 ? 0 : jolted * (1 - (clock - at)) ** 2);
   const colossi = (): Entity[] => {
     const out: Entity[] = [];
     for (const [e, b] of g.ecs.c.body) if (b.height >= ZONES.height && !isAbsent(g, e) && (g.ecs.c.health.get(e)?.hp ?? 0) > 0 && g.ecs.c.actor.has(e)) out.push(e);
@@ -52,7 +54,7 @@ export function createPresence(g: Game, particles: Particles, audio: GameAudio):
     const [p, b] = [g.ecs.c.transform.get(e)!.pos, g.ecs.c.body.get(e)!];
     const k = presenceOf(edgeOf(e), b.height);
     if (k <= 0.02) return;
-    if (strength * k > jolted) [jolted, at] = [strength * k, time];
+    if (strength * k > left()) [jolted, at] = [strength * k, time];
     const n = Math.round(6 + 16 * k);
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -65,7 +67,7 @@ export function createPresence(g: Game, particles: Particles, audio: GameAudio):
   function felt(p: V3, strength: number, reach: number): void {
     const me = g.ecs.c.transform.get(g.player.id)?.pos;
     const k = me ? Math.max(0, 1 - Math.hypot(p.x - me.x, p.z - me.z) / reach) : 0;
-    if (strength * k > jolted) [jolted, at] = [strength * k, clock];
+    if (strength * k > left()) [jolted, at] = [strength * k, clock];
   }
   g.events.on('Erupted', ({ at: p, radius }) => felt(p, 0.09 + 0.02 * radius, 16 + 3 * radius));
   g.events.on('BossPhase', ({ entity, phase }) => void (phase > 0 && g.ecs.c.transform.has(entity) && felt(g.ecs.c.transform.get(entity)!.pos, 0.28, 70)));
@@ -74,9 +76,9 @@ export function createPresence(g: Game, particles: Particles, audio: GameAudio):
     if (h && entity !== g.player.id && isThemed(creatureOf(g, entity)?.id) && (h.reach < 0.05 || Math.abs(h.arc[0] - h.arc[1]) < 1)) felt(p, 0.07 + 0.02 * h.radius, 12 + 2 * h.radius); // a slam or a ring: the ground answers
   });
   g.events.on('StrikeLanded', ({ at: p }) => felt(p, 0.24, 55)); // a bolt on the ground shakes it
-  g.events.on('GazeBurst', () => void ([jolted, at] = [Math.max(jolted, 0.1), clock])); // the look strikes the head
-  g.events.on('Foreboding', ({ shake }) => void ([jolted, at] = [Math.max(jolted, shake), clock])); // the ground answers, far off
-  g.events.on('WayOmen', ({ shake }) => void (shake > 0 && ([jolted, at] = [Math.max(jolted, shake), clock]))); // and under a trail's omens (round 62)
+  g.events.on('GazeBurst', () => void ([jolted, at] = [Math.max(left(), 0.1), clock])); // the look strikes the head
+  g.events.on('Foreboding', ({ shake }) => void ([jolted, at] = [Math.max(left(), shake), clock])); // the ground answers, far off
+  g.events.on('WayOmen', ({ shake }) => void (shake > 0 && ([jolted, at] = [Math.max(left(), shake), clock]))); // and under a trail's omens (round 62)
   g.events.on('Quaked', ({ by }) => void (g.ecs.c.transform.has(by) && land(by, clock, 0.3)));
   return {
     felt,

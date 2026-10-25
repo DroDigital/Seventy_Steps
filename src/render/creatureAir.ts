@@ -2,7 +2,7 @@
  * What a body gives the air (round 83; render only, read-only on the simulation): in the cold (snow underfoot) every body near the
  * investigator breathes out a small pale cloud, now and then, at its mouth, and the people and creatures keep to their own beat; and
  * a body running hard over dry ground (sand, dirt, gravel) kicks up a puff of dust at its heels at each stride, unless the ground
- * is soaked. A spectre has no breath; nothing hidden or unseen gives any.
+ * is soaked. A spectre, a flyer and a form drawn outside the world have no breath or dust; nothing hidden or unseen gives any (render/traceless.ts).
  */
 
 import type * as THREE from 'three';
@@ -10,9 +10,9 @@ import type { Entity } from '../core/ecs';
 import { BODY_AIR } from '../data/fxTuning';
 import { getRegion } from '../data/regions';
 import { SIM } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
-import { defOf } from '../systems/creatures';
+import type { Game } from '../systems/components';
 import type { Particles } from './particles';
+import { leavesNone } from './traceless';
 import { wetness } from './wetness';
 
 const DUSTY = new Set(['sand', 'dirt', 'gravel']);
@@ -43,9 +43,8 @@ export function createCreatureAir(g: Game, particles: Particles): CreatureAir {
       for (const [id, body] of c.body) {
         const tr = c.transform.get(id);
         if (!tr) continue;
-        if (id === g.player.id) continue; // (the investigator's own breath and puffs are round 80's: render/atm/steps.ts, render/coldBreath.ts)
-        const def = defOf(g, id);
-        if ((!c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden' || def?.sprite?.silhouette === 'spectre' || def?.sprite?.outside)) continue;
+        if (id === g.player.id) continue; // (the investigator's own breath and puffs are round 80's: render/atm/steps.ts, render/breath.ts)
+        if (leavesNone(g, id)) continue;
         const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
         const d = Math.hypot(x - at.x, z - at.z);
         const big = Math.min(3, Math.max(0.5, body.height / 1.8));

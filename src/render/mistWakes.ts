@@ -3,15 +3,16 @@
  * the people and the creatures nearest the lens each carve it, a gap before and about the body and a trail that closes
  * slowly behind it, with the mist turned a little about its edge (shaders/fog.ts `wakeAt`). Things come out of the mist
  * instead of being cut from it, and a pack's path across a field is read in it. What is unseen (an unrevealed stalker,
- * a horror not yet roused) leaves none, so the mist tells nothing the picture does not. The Fog setting scales it, as
+ * a horror not yet roused), what is hidden, dead, a flyer (it is not on the ground) or a spectre leaves none, so the mist tells nothing the picture does not (render/traceless.ts). The Fog setting scales it, as
  * it scales the mist itself.
  */
 
 import type { Entity } from '../core/ecs';
 import { MIST_WAKES } from '../data/fxTuning';
 import { SIM } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
+import type { Game } from '../systems/components';
 import type { PostPass } from './postPass';
+import { leavesNone } from './traceless';
 
 const SLOTS = MIST_WAKES.slots;
 
@@ -47,7 +48,7 @@ export function createMistWakes(g: Game): MistWakes {
     const [tr, body] = [c.transform.get(id), c.body.get(id)];
     if (!tr || !body) return;
     const me = id === g.player.id;
-    if (!me && (!c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden')) return;
+    if (!me && leavesNone(g, id)) return;
     const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
     const d = Math.hypot(x - at.x, z - at.z);
     if (d > MIST_WAKES.reach) return;

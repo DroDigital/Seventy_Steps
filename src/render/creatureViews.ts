@@ -25,7 +25,7 @@ import { buildAssembly, type Assembly } from './assemblies';
 import { createArrivals, risesOut } from './bossArrival';
 import { createCreatureCasters } from './creatureCasters';
 import { createCreatureFx, type Gone } from './creatureFx';
-import { lookOf, phaseOf, type Look } from './creatureLook';
+import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
 import { relitOf } from './creatureRelight';
 import { toneOf } from './spriteTone';
@@ -199,7 +199,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, beat - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, 1 - e.ghost, 0);
+              put(key, lagged, lookOf(g, id, beat - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, echoOpacity(e.ghost, gone.amount), 0); // (they go with the body, and come in with it)
             });
           }
           continue;

@@ -10,6 +10,7 @@ import { casterBody, createCreatureCasters } from '../src/render/creatureCasters
 import { INSTANCED_POSITION, LANTERN_CASTER } from '../src/render/colliderShadow';
 import { FAR_SIDE } from '../src/render/lanternShadow';
 import { CASTER } from '../src/render/moonShadow';
+import { SPRITE_VERT } from '../src/render/shaders/sprite';
 
 function triangles(g: THREE.BufferGeometry): THREE.Vector3[][] {
   const pos = g.getAttribute('position');
@@ -123,5 +124,14 @@ describe('the creatures\' casters in a scene', () => {
     casters.begin();
     casters.end();
     expect(casters.mesh.count).toBe(0);
+  });
+});
+
+describe('the picture\'s own sample of the moon', () => {
+  it('is taken beside the body along the ground, so a high moon does not lead it back inside the caster', () => {
+    expect(SPRITE_VERT).toContain('uLightDir.xz');
+    expect(SPRITE_VERT).not.toContain('normalize(uLightDir)');
+    // the offset's reach (0.32 of the quad's breadth and 0.3) is past the caster's radius (at most 0.32 of the painted breadth, or its floor of 0.2)
+    for (const w of [0.4, 1, 3, 8, 30]) expect(0.32 * w + 0.3).toBeGreaterThan(Math.max(0.2, 0.32 * w));
   });
 });

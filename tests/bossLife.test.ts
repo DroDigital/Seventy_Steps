@@ -99,6 +99,7 @@ describe('a colossus\'s footfalls', () => {
     const step = (speed: number): void => {
       tr.prev = { ...tr.pos };
       tr.pos = { ...tr.pos, z: tr.pos.z + speed / SIM.hz };
+      g.frame++; // (the world's tick: stepGame does it once for each)
     };
     return { g, id, p, jolts, feet, tr, body, step, me: { x: 0, y: 0, z: 0 } as never };
   };
@@ -119,6 +120,30 @@ describe('a colossus\'s footfalls', () => {
     expect(strides).toBeLessThanOrEqual(Math.ceil((4 * 8) / length) + 1);
     expect(s.p.into.length).toBeGreaterThan(strides * 3);
     expect(s.jolts.every((j) => j > 0)).toBe(true);
+  });
+
+  it('are counted in the world\'s ticks, so a display drawing twice a tick or half as often gets the same strides, and a held world none', () => {
+    const run = (draws: number, ticks: number): number => {
+      const s = setup();
+      for (let t = 0; t < ticks; t++) {
+        s.step(8);
+        (s.me as { z: number }).z = s.tr.pos.z - 10; // (the investigator keeps pace, so it is always felt)
+        for (let d = 0; d < draws; d++) s.feet.update(s.me, 1, false);
+      }
+      return s.jolts.length;
+    };
+    const slow = run(1, SIM.hz * 10);
+    expect(slow).toBeGreaterThanOrEqual(2);
+    expect(run(2, SIM.hz * 10)).toBe(slow); // (a 120 Hz display: two draws to each tick)
+    expect(run(4, SIM.hz * 10)).toBe(slow);
+    const s = setup();
+    s.step(8);
+    for (let d = 0; d < 400; d++) s.feet.update(s.me, 1, false); // (held: a cutscene, the pause: the tick does not move)
+    expect(s.jolts.length).toBe(0);
+    const t = setup(); // a 30 Hz display: two ticks between draws
+    for (let i = 0; i < SIM.hz * 10; i += 2) { t.step(8); t.step(8); (t.me as { z: number }).z = t.tr.pos.z - 10; t.feet.update(t.me, 1, false); }
+    expect(t.jolts.length).toBeGreaterThanOrEqual(slow - 1);
+    expect(t.jolts.length).toBeLessThanOrEqual(slow + 1);
   });
 
   it('give none to a body far from the investigator, a hidden one, or a room under a roof', () => {

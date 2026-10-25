@@ -38,7 +38,7 @@ OUT = ROOT / 'src' / 'data' / 'reviewedLook.ts'
 # pixels) in which the finder looks, or None for the whole head (round 83: and, for a form whose eyes are not
 # the brightest marks in the box, their exact colour in bytes, which are then the marks). A mark that is a tooth, a gem, a spot or a
 # visor is not an eye, and the finder cannot tell: the others (the Shoggoths' green spots, the Unnamable's
-# bone, the Haunter's visor, the Wamp's and the rat swarm's dim amber) were looked at and are left out.
+# bone, the Wamp's and the rat swarm's dim amber) were looked at and are left out (round 83 took the Haunter's, below).
 EYED = {
     'black_man': None, 'charles_le_sorcier': (27, 13, 36, 19), 'cthulhu_cultist': None, 'ghoul': None, 'ghoul#eldritch': None,
     'gnoph_keh': None, 'gug': None, 'martense_degenerate': (30, 14, 37, 20), 'medusa_gorgon': None, 'winged_hybrid': None,

@@ -10,7 +10,7 @@ import { CREATURE_FX, FX_STYLE, deathStyle } from '../src/data/creatureFx';
 import { ROSTER_IDS } from '../src/data/roster';
 import { getEntity } from '../src/data/registry';
 import { createCreatureFx } from '../src/render/creatureFx';
-import { lookOf, phaseOf, type Look } from '../src/render/creatureLook';
+import { echoOpacity, lookOf, phaseOf, type Look } from '../src/render/creatureLook';
 import { SPRITE_FRAG, SPRITE_VERT } from '../src/render/shaders/sprite';
 import { SPRITE_FX_GLSL } from '../src/render/shaders/spriteFx';
 import { spawnCreature } from '../src/systems/creatures';
@@ -134,5 +134,12 @@ describe('what the shader is told (render/creatureFx.ts)', () => {
     a.move = 'death';
     a.frame = a.moves.death.frames / 2;
     expect(lookOf(g, e, 0, { hurt: 3 })).toMatchObject({ state: 'hurt', frame: 2, opacity: 1, dissolve: 0.5 });
+  });
+
+  it('draws an outer god\'s echoes as ghostly as they are while it is whole, and no more than it is while it goes or forms', () => {
+    expect(echoOpacity(0.5, 0)).toBeCloseTo(0.5, 9);
+    expect(echoOpacity(0.5, 1)).toBe(0);
+    expect(echoOpacity(0.5, 0.5)).toBeCloseTo(0.25, 9);
+    expect(echoOpacity(0.8, 0.5)).toBeLessThan(echoOpacity(0.5, 0.5));
   });
 });

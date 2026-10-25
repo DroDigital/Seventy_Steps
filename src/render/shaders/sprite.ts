@@ -66,7 +66,9 @@ void main() {
   gl_Position = clip;
   float u = aInfo.z > 0.5 ? 1.0 - uv.x : uv.x;
   vUv = vec2(mix(aCell.x, aCell.z, u), mix(aCell.y, aCell.w, 1.0 - uv.y));
-  float moon = mix(1.0, moonLit(origin + vec3(0.0, 0.8, 0.0) + normalize(uLightDir) * (0.32 * w + 0.3), vec3(0.0, 1.0, 0.0), 1.0), uShadow.x); // what stands between it and the moon (round 34), at a point out toward it from the creature's middle: its own body (render/creatureCasters.ts) stands in the way of the middle itself
+  vec2 toMoon = uLightDir.xz;
+  toMoon = length(toMoon) > 1e-3 ? normalize(toMoon) : vec2(1.0, 0.0);
+  float moon = mix(1.0, moonLit(origin + vec3(toMoon.x, 0.0, toMoon.y) * (0.32 * w + 0.3) + vec3(0.0, 0.8, 0.0), vec3(0.0, 1.0, 0.0), 1.0), uShadow.x); // what stands between it and the moon (round 34), at a point beside the creature's middle, toward it along the ground (a high moon would lead a point drawn straight at it back inside the body): its own body (render/creatureCasters.ts, of a breadth no more than 0.32 of the picture's) stands in the way of the middle itself
   float lamp = mix(1.0, lanternLit(origin + vec3(0.0, 0.8, 0.0), vec3(0.0, 1.0, 0.0)), uLShadow.x) * lanternSlab(origin + vec3(0.0, 0.8, 0.0)); // and the lantern's, the seat back of a rig among them
   vWorld = wp;
   vShade = vec2(moon, lamp);

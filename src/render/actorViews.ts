@@ -242,7 +242,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       standing.free = free;
       standing.me = me?.pos ?? null;
       standing.sheltered = sheltered;
-      standing.dozing = !post && !v.act && !!g.overworld && hourOf(phaseOf(time)) === 'waning'; // (the last hour is dozing on their feet: systems/npcLife.ts)
+      standing.dozing = !post && !v.act && !!g.overworld && hourOf(phaseOf(simTime())) === 'waning'; // (the last hour is dozing on their feet: systems/npcLife.ts)
       livePerson(f, v.life, standing);
     }
     if (id === g.player.id && a && def?.hit) {

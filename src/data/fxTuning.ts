@@ -192,7 +192,7 @@ export const BODY_AIR = {
   dustReach: 22,
 } as const;
 
-/** A horror's presence in the picture (render/bossPresence.ts, footfalls.ts, creatureViews.ts). */
+/** A horror's presence in the picture (render/bossPresence.ts, bossFootfalls.ts, creatureViews.ts). */
 export const BOSS_PRESENCE = {
   height: 4, // metres: a body this tall, or any that is fought as a horror, leaves footfalls
   minSpeed: 1.2, // metres a second it must walk at
