@@ -33,7 +33,7 @@ export const HEAT = {
   every: [45, 130] as Pair, // seconds between bursts
   pulses: [2, 4] as Pair, // flickers in a burst
   gap: [0.5, 1.6] as Pair, // seconds between them
-  strength: [0.25, 0.6] as Pair, // how bright a pulse is, before the Flashes setting
+  strength: [0.35, 0.8] as Pair, // how bright a pulse is, before the Flashes setting (a still of 0.6 was faint through the mist)
   away: 1.05, // radians (60 degrees): the least a burst is from where the eye looks
   width: 0.9, // radians: the sector of the horizon a bank lights
   clear: 0.2, // the weather's amount below which the sky counts as clear
