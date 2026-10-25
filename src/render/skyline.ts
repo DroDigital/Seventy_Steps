@@ -9,41 +9,33 @@
  * walks, no more than a far thing would), up to SKY.farAngle; a town has a few windows lit. Each
  * realm's fade in as it is entered; a dungeon's walls hide them, and the real world covers them where it stands (round 49: a
  * town walked up to is seen as itself, not cut off inside 1.5 of its distance). A failing mind sees a city of towers
- * where there is none (`wrong`). Render only.
+ * where there is none (`wrong`). Round 80: and the far horizon lives (horizonGlow.ts, skylineShader.ts): a town's windows follow the
+ * night and wink, a glow lies over its roofs while they are lit, and a lamp turns on Devil Reef and on Kingsport's head. Render only.
  */
 
 import * as THREE from 'three';
 import { createRng } from '../core/rng';
+import { BEAM, DOME, WINK, type LampDef } from '../data/horizonLife';
 import { getRegion } from '../data/regions';
 import { SKYLINES, type Silhouette } from '../data/skylines';
 import { RENDER, SKY } from '../data/tuning';
+import { phaseOf } from '../systems/clock';
 import { regionRect } from '../world/worldMap';
+import { beamAt, domeStrength, glowGeometry, glows, lampFor, lampPlace } from './horizonGlow';
 import { ANOMALY } from './palette';
 import type { RealmLook } from './realmLook';
-import { profile } from './skylineShapes';
+import { SKYLINE_FRAG, SKYLINE_VERT } from './skylineShader';
+import { profile, type Profile } from './skylineShapes';
 import { titanGlow, type TitanGlow } from './titanGlow';
+import { worldUniforms } from './worldMaterial';
 
 const R = RENDER.far * 0.7; // metres from the camera they are drawn at
 const SAMPLES = 300;
 const TALLEST = Math.tan((SKY.farAngle * Math.PI) / 180); // height over distance at the most
 const GLOWS = { amber: [1, 0.78, 0.46], cyan: [0.5, 0.95, 1], gold: [1, 0.86, 0.5] } as const;
 
-const VERT = 'varying float vUp; varying vec2 vPos; void main() { vUp = position.y; vPos = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
-const FRAG = `uniform vec3 uColor; uniform vec3 uHorizon; uniform vec3 uGlow; uniform float uFade; uniform float uAlpha; uniform float uLit; varying float vUp; varying vec2 vPos;
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void main() {
-  vec3 col = mix(uColor, uHorizon, uFade);
-  float a = uAlpha * mix(0.12, 1.0, smoothstep(-0.05, ${SKY.farFoot.toFixed(3)}, vUp));
-  if (uLit > 0.0) { // a window is a cell of the mass, lit by chance, most of them in its lower half
-    float on = step(1.0 - uLit * smoothstep(0.03, 0.14, vUp) * (1.0 - smoothstep(0.3, 0.85, vUp)), hash(floor(vec2(vPos.x * 420.0, vPos.y * 90.0))));
-    col = mix(col, uGlow, on);
-    a = mix(a, uAlpha, on);
-  }
-  gl_FragColor = vec4(col, a);
-}`;
-
-/** The silhouette's shape, a unit wide and a unit tall at most, its foot at the origin. */
-function shape(s: Silhouette): THREE.ShapeGeometry {
+/** The silhouette's outline, a unit wide and a unit tall at most, its foot at the origin, and the geometry it is drawn with (its glow and lamp, round 80). */
+function shape(s: Silhouette, lamp?: LampDef): { f: Profile; geometry: THREE.BufferGeometry; lampAt: { x: number; y: number } | null } {
   const f = profile(s.kind, createRng(s.seed));
   const outline = new THREE.Shape();
   outline.moveTo(-0.5, -0.05);
@@ -52,7 +44,8 @@ function shape(s: Silhouette): THREE.ShapeGeometry {
     outline.lineTo(x, Math.max(0, Math.min(1.1, f(x))));
   }
   outline.lineTo(0.5, -0.05);
-  return new THREE.ShapeGeometry(outline);
+  const lampAt = lamp ? lampPlace(f, lamp) : null;
+  return { f, geometry: glowGeometry(new THREE.ShapeGeometry(outline), glows(s), lampAt), lampAt };
 }
 
 interface Far {
@@ -63,29 +56,45 @@ interface Far {
   base: number;
   def: Silhouette;
   glow?: TitanGlow; // a titan's halo and eyes
+  lit: boolean; // a town of lit windows: its glow over the sky (round 80)
+  lamp?: LampDef; // and a lamp that turns on it
 }
 
 export interface Skyline {
   update(camera: THREE.Camera, time: number, region: string | null, enclosed: boolean): void;
   /** How wrong the mind is, 0..1 (round 26): past 0.6, now and then, something stands on the horizon where nothing does, and is gone when looked for. */
   wrong(amount: number): void;
+  /** What the air does to the far lights (round 80): how closed in the sky is, 0..1 (the glow lies on the cloud), and how far the mind has gone, 0..1 (the windows flicker). Set before `update`. */
+  air(overcast: number, nerves: number): void;
 }
 
 /** How much of the false landmark shows at `amount` of madness `since` seconds into its turn (it comes up slowly and goes at once). */
 export const falseShown = (amount: number, since: number): number => Math.max(0, Math.min(1, (amount - 0.55) / 0.3)) * (since < 0 ? 0 : since < 6 ? since / 6 : since < 14 ? 1 : 0);
 
-/** The shader material every silhouette is drawn with: its realm's colour, melted `fade` toward the horizon's, `lit` of its windows aglow in `glow`. */
-function silhouetteMaterial(tone: THREE.Vector3, horizon: THREE.Vector3, alpha: { value: number }, def: Pick<Silhouette, 'glow' | 'fade' | 'lit'>): THREE.ShaderMaterial {
+/** What every silhouette's windows read: the game's seconds, and how far the mind has gone (round 80). */
+interface Shared {
+  wink: { value: number };
+  nerves: { value: number };
+}
+
+/** The shader material every silhouette is drawn with: its realm's colour, melted `fade` toward the horizon's, `lit` of its windows aglow in `glow`; its glow over the sky and its lamp's light (round 80). */
+function silhouetteMaterial(tone: THREE.Vector3, horizon: THREE.Vector3, alpha: { value: number }, def: Pick<Silhouette, 'glow' | 'fade' | 'lit'>, shared: Shared, lamp?: LampDef): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
-    uniforms: { uColor: { value: tone }, uHorizon: { value: horizon }, uGlow: { value: new THREE.Vector3(...GLOWS[def.glow ?? 'amber']) }, uFade: { value: def.fade ?? 0 }, uLit: { value: def.lit ?? 0 }, uAlpha: alpha },
-    vertexShader: VERT,
-    fragmentShader: FRAG,
+    uniforms: {
+      uColor: { value: tone }, uHorizon: { value: horizon }, uGlow: { value: new THREE.Vector3(...GLOWS[def.glow ?? 'amber']) }, uFade: { value: def.fade ?? 0 }, uLit: { value: def.lit ?? 0 }, uAlpha: alpha,
+      uWink: shared.wink, uNerves: shared.nerves, uHurried: worldUniforms.uHurried,
+      uDome: { value: new THREE.Vector3(0, DOME.across, DOME.up) }, // its strength (set each frame), how far it spreads across and up
+      uLamp: { value: new THREE.Vector4() }, uLampCol: { value: new THREE.Vector3(...(lamp?.colour ?? [1, 1, 1])) }, uLampBox: { value: new THREE.Vector2(...BEAM.box).multiplyScalar(lamp?.size ?? 1) }, uPer: { value: new THREE.Vector2(1, 1) },
+    },
+    vertexShader: SKYLINE_VERT,
+    fragmentShader: SKYLINE_FRAG,
     // Drawn with the opaque, so its render order puts it after the sky and before the world (round
     // 19: as a transparent it came after the world and, testing no depth, was painted over it, the
     // investigator and all, the mist ghosting what it hid): blended over the sky by hand, the sky's
-    // alpha kept.
+    // alpha kept. Round 80: the blend is premultiplied (the outline outputs its colour already scaled by its alpha, the glow and the lamp
+    // a light with no alpha at all, which adds): the same blend for the outline, and one draw for a town, its glow and its lamp.
     blending: THREE.CustomBlending,
-    blendSrc: THREE.SrcAlphaFactor,
+    blendSrc: THREE.OneFactor,
     blendDst: THREE.OneMinusSrcAlphaFactor,
     blendSrcAlpha: THREE.ZeroFactor,
     blendDstAlpha: THREE.OneFactor,
@@ -100,22 +109,26 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
   const horizon = new THREE.Vector3(...look.now.horizon);
   const alpha = new Map<string, { value: number }>();
   const fars: Far[] = [];
+  const shared: Shared = { wink: { value: 0 }, nerves: { value: 0 } };
+  const mood = { overcast: 0 }; // what the air is doing to the far lights (round 80: `air`)
   for (const [id, list] of Object.entries(SKYLINES)) {
     const region = getRegion(id);
     if (!region) continue;
     const a = { value: 0 };
     alpha.set(id, a);
     const rc = regionRect(region);
-    for (const def of list) {
-      const material = silhouetteMaterial(tone, horizon, a, def);
-      const mesh = new THREE.Mesh(shape(def), material);
+    for (const [index, def] of list.entries()) {
+      const lamp = lampFor(id, index);
+      const outline = shape(def, lamp);
+      const material = silhouetteMaterial(tone, horizon, a, def, shared, outline.lampAt ? lamp : undefined);
+      const mesh = new THREE.Mesh(outline.geometry, material);
       mesh.renderOrder = -999; // after the sky, before the world
       mesh.frustumCulled = false;
       mesh.visible = false;
       scene.add(mesh);
       const glow = def.kind === 'titan' ? titanGlow(a, [...[ANOMALY.green, ANOMALY.purple, ANOMALY.magenta][def.seed % 3]] as [number, number, number], def.seed) : undefined;
       if (glow) mesh.add(glow.halo, glow.eyes);
-      fars.push({ mesh, region: id, x: rc.x0 + def.at[0], z: rc.z0 + def.at[1], base: region.biome.base - 2, def, glow });
+      fars.push({ mesh, region: id, x: rc.x0 + def.at[0], z: rc.z0 + def.at[1], base: region.biome.base - 2, def, glow, lit: glows(def), lamp: outline.lampAt ? lamp : undefined });
     }
   }
   const cam = new THREE.Vector3();
@@ -123,7 +136,7 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
   // The false landmark: a city of towers where there is none, risen for a while at a bearing of its own.
   const fake = { value: 0 };
   const fakeDef: Silhouette = { kind: 'towers', at: [0, 0], width: 700, height: 240, seed: 97 };
-  const fakeMesh = new THREE.Mesh(shape(fakeDef), silhouetteMaterial(tone, horizon, fake, {}));
+  const fakeMesh = new THREE.Mesh(shape(fakeDef).geometry, silhouetteMaterial(tone, horizon, fake, {}, shared));
   fakeMesh.renderOrder = -999;
   fakeMesh.frustumCulled = false;
   fakeMesh.visible = false;
@@ -133,7 +146,12 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
     wrong(amount) {
       madness = amount;
     },
+    air(overcast, nerves) {
+      mood.overcast = overcast;
+      shared.nerves.value = nerves * WINK.nerves;
+    },
     update(camera, time, region, enclosed) {
+      shared.wink.value = time;
       const dt = last < 0 ? 1 : Math.min(0.1, Math.max(0, time - last));
       last = time;
       const k = Math.min(1, dt / SKY.fade);
@@ -169,6 +187,13 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
         const breath = f.def.kind === 'titan' ? 1 + 0.012 * Math.sin(time * 0.35 + f.def.seed) : 1; // the great ones breathe: slowly, and not quite as a thing should
         f.mesh.scale.set(f.def.width * s * (2 - breath), f.def.height * s * breath, 1);
         f.mesh.rotation.set(0, Math.atan2(-ux, -uz), 0);
+        const u = (f.mesh.material as THREE.ShaderMaterial).uniforms;
+        if (f.lit) u.uDome.value.x = domeStrength(f.def, d, phaseOf(time), mood.overcast, time) * alpha.get(f.region)!.value; // the glow over its roofs, as many of its windows as are lit (round 80)
+        if (f.lamp) {
+          const b = beamAt(f.lamp, time);
+          u.uLamp.value.set(b.flash, b.sweep, b.shaft, 0);
+          u.uPer.value.set(1 / f.mesh.scale.x, 1 / f.mesh.scale.y); // its quad is a size in metres, not in the town's own units
+        }
       }
       // All are drawn at one distance with no depth test, so which lies over which is the order they are drawn in: the farthest first (round 33: a far castle was drawn over a near hill).
       shown.sort((a, b) => b.d - a.d).forEach(({ f }, i) => {

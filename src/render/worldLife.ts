@@ -12,12 +12,14 @@ import { madnessOf } from '../systems/sanity';
 import { seaChopNow } from '../systems/seaChop';
 import type { GameAudio } from './audio/gameAudio';
 import { createArenaAir } from './arenaAir';
+import { createAtmosphere } from './atmosphere';
 import { createBeacons } from './beacons';
 import { createPoiFx } from './poiFx';
 import { createCourtLife } from './courtLife';
 import { createCreatureAir } from './creatureAir';
-import { createFootprints } from './footprints';
+import { createCreatureTracks } from './creatureTracks';
 import { createRodFx } from './rodFx';
+import { createSignalFx } from './signalFx';
 import type { Beams } from './beams';
 import type { GroundFx } from './groundFx';
 import { createSkyStrikeFx, type SkyStrikeFx } from './skyStrikeFx';
@@ -25,6 +27,7 @@ import { SEA } from './sea';
 import { createBossFog } from './bossFog';
 import { createDemoMist } from './demoMist';
 import { createChimneys } from './chimneys';
+import { createFireLife } from './fireLife';
 import { createDoors } from './doorViews';
 import { createFauna, type Fauna } from './fauna';
 import { createCandleViews } from './candleViews';
@@ -34,7 +37,7 @@ import { createLightning } from './lightning';
 import type { Particles } from './particles';
 import { createNightFx } from './nightFx';
 import { createOmenFx } from './omenFx';
-import { createFootfalls } from './footfalls';
+import { createBossFootfalls } from './bossFootfalls';
 import { createCreatureAura } from './creatureAura';
 import type { BossPresence } from './bossPresence';
 import { createPresence } from './presence';
@@ -49,6 +52,7 @@ import { createVigilMarks } from './vigilMarks';
 import { createWayViews } from './wayViews';
 import { createWeatherFx } from './weather';
 import type { Skyline } from './skyline';
+import type { WorldLights } from './worldLights';
 import type { SpriteAtlas } from './sprites/atlas';
 
 export interface WorldLife {
@@ -63,6 +67,7 @@ export interface LifeParts {
   sheet: { atlas: SpriteAtlas; texture: THREE.Texture }; // the creatures' sprites, for the great winged things
   skyline: Skyline; // the far silhouettes, given a false one by a failing mind (round 26)
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
+  lights: WorldLights; // the fires that give off smoke and embers (round 79)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
   creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 81: its aura and footfalls)
@@ -91,15 +96,18 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
   const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand
+  const fires = createFireLife(parts.particles, parts.lights); // round 79: the smoke and embers of the fires
   const air = createArenaAir(g, parts.particles); // round 61: what drifts in an arena's air
   const ways = createWayViews(scene, g); // round 62: the plates, tablets and lights of the trails to the open arenas
   const wayFx = createWayFx(g, parts.particles, parts.ground); // ...and their rings, bursts and blight
   createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
   const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
-  const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust
-  const prints = createFootprints(scene, g); // round 81: the prints of whatever walks soft ground...
-  const bodyAir = createCreatureAir(g, parts.particles); // ...and a body's cold breath and the dust of its running
-  const footfalls = createFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
+  const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust (round 75: and its pools)
+  const signals = createSignalFx(g, parts.particles, parts.beams); // round 75: what a court does now and then: a pulse run from point to point, an arc between pylons
+  const atmosphere = createAtmosphere({ scene, g, audio, parts }); // round 80: the sky, the mist, the air, the ground and the horizon deepened (render/atm/)
+  const tracks = createCreatureTracks(scene, g); // round 81: the prints of the people and creatures that walk soft ground (the investigator's are round 80's, render/atm/steps.ts)...
+  const bodyAir = createCreatureAir(g, parts.particles); // ...and a creature's cold breath and the dust of its running
+  const footfalls = createBossFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
   const aura = createCreatureAura(g, parts.particles, parts.creatures.figure, parts.creatures.presence); // what the great ones give off
   return {
     fauna,
@@ -117,12 +125,14 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       LIGHT_NERVES.madness = madnessOf(g.mind.sanity); // the flames waver harder in a failing mind's world
       weather.update(camera, time, !outside);
       chimneys.update(camera, time, !outside);
+      fires.update(camera.position, time);
       air.update(camera, time, !outside);
       ways.update(camera.position, time, !outside);
       wayFx.update(time, camera.position);
       rods.update(camera.position, time, !outside);
       court.update(camera.position, time, !outside);
-      prints.update(camera.position, time, alpha, !outside);
+      signals.update(camera.position, time, !outside);
+      tracks.update(camera.position, time, alpha, !outside);
       bodyAir.update(camera.position, time, alpha, !outside);
       footfalls.update(camera.position, alpha, !outside);
       aura.update(camera.position, time, alpha);
@@ -138,6 +148,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       omens.update(time);
       parts.skyline.wrong(Math.min(1, Math.max(0, 1 - g.mind.sanity / 100)));
       watchers.update(camera, time, !outside, () => audio.sample('whisper', { gain: 0.5, pitch: 0.8 })); // round 26: what a failing mind makes of the dark
+      atmosphere.update(camera, time, enclosed, alpha, gloom); // round 80: last, over what the rest has set
     },
   };
 }

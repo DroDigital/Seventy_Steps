@@ -85,6 +85,13 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
   for (const [i, [a, cc, k]] of at.entries()) c.add(FIGURES[k]!, a, cc, { face: i % 3 === 0 ? 'front' : 'in', turn: (i * 47) % 70 - 30, s: 1.08, tint: [0.62, 0.6, 0.58], keep: 0.4, jitter: 0.2 });
   for (const [a, cc, id] of [[porch + 2.6, -3.5, 'tp_vase_3'], [porch + 3, 3.6, 'tp_vase_2'], [G - 4, 6, 'tp_vase_1'], [G - 4.4, -6.5, 'tp_vase_3']] as const) c.add(id, a, cc, { ...CHAR, s: 1.3, jitter: 0.3 });
 
+  // more of the stone people and what they left (web parts, docs/WEB_PARTS.md): a horse reared on its plinth by the way in, a knight on his knee at the porch, figures on the garden wall's piers, a well
+  const STONE_PEOPLE: Put = { tint: [0.62, 0.6, 0.58], keep: 0.4 };
+  c.add('wk_horse', G - 14, -8.6, { ...STONE_PEOPLE, face: 'in', turn: 25, s: 0.95 });
+  c.add('wk_knight', porch + 3.4, 11.5, { ...STONE_PEOPLE, face: 'in', turn: -20 });
+  for (const side of [-1, 1]) c.add('wk_statue', G - 3.4, side * (S - 3.6), { ...STONE_PEOPLE, face: 'in', turn: side * 25 });
+  c.add('wk_well', G - 19, S - 7, { tint: [0.34, 0.31, 0.3], keep: 0.2 });
+
   // what still lifts from it: embers along the wings' inner walls, the chimneys' smoke, ash drifting across the court from the porch
   for (const side of [-1, 1]) {
     c.emit({ at: [wingA - 2, side * (inner + 2)], to: [porch + 2, side * (inner + 2)], y: [0.6, 5], rate: 3.4, life: [2, 4], size: [0.1, 0.18], colour: [1, 0.55, 0.22], end: [0.8, 0.2, 0.1], alpha: 0.9, rise: 0.8, drift: 0.35, shape: 'spark', glow: true, reach: 90 });

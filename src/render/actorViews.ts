@@ -7,14 +7,13 @@
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle, yawOf } from '../core/geom';
-import { FIGURE_LIFE, SWING_TRAIL } from '../data/fxTuning';
+import { SWING_TRAIL } from '../data/fxTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
-import { applySway, newSway, stepSway, type Sway } from './figureSway';
-import { easeGaze, gazeAt, gazeTurn, newGaze, type Gaze } from './gaze';
+import { easeGaze, gazeAt, gazeTurn, newGaze, type Gaze } from './figureGaze';
 import { edgeOf } from './swingTrails';
 import { ACTS, type ActKind, type Post } from '../data/npcActs';
 import { pipeBeat } from './npcActs';
@@ -44,8 +43,6 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
-  sway: Sway; // the investigator's lantern and scarf tail (figureSway.ts; round 81)
-  moved: { x: number; z: number; yaw: number } | null; // their velocity (smoothed), and the yaw, as last drawn: what the sway is driven by
   gaze: Gaze; // a person's head, turned toward the investigator (gaze.ts; round 81)
 }
 
@@ -118,7 +115,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, sway: newSway(), moved: null, gaze: newGaze() });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, gaze: newGaze() });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -222,40 +219,16 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     if (f.flame && id === g.player.id) flame = f.flame.getWorldPosition(flameAt); // posed: it tumbles with a roll
     if (f.flameMesh && id === g.player.id) lightFlame(f.flameMesh, lanternGain(g, alpha));
     if (f.flash && id === g.player.id) muzzle = f.flash.getWorldPosition(muzzleAt); // the barrel's tip, wherever the arm has it
-    if (f.loose) swayLoose(f, v, tr, dt, time); // laid on the pose, after it
     if (person) lookAtMe(f, v, flinch, dt, tr.pos.y);
     if (id === g.player.id && a && def?.hit) {
       const [from, to] = def.hit.window; // a blow cutting: its edge is followed from just before the first frame it can hit to just after the last
-      const weapon = f.arms?.[g.player.weapon] as THREE.Mesh | undefined;
+      const weapon = f.arms && (Object.values(f.arms).find((m) => m.visible) as THREE.Mesh | undefined); // the one in hand, whichever of its forms is shown
       if (weapon && frame >= from - SWING_TRAIL.lead && frame < to + SWING_TRAIL.tail) {
         f.root.updateMatrixWorld(true);
         const { tip, base } = edgeOf(weapon);
         swingEdge = { tip: weapon.localToWorld(edgeAt.tip.copy(tip)), base: weapon.localToWorld(edgeAt.base.copy(base)) };
       }
     }
-  }
-
-  /** What hangs loose on the figure: the lantern and the scarf's tail, driven by the body's own motion, let be as the body goes over. */
-  function swayLoose(f: Figure, v: View, tr: { prev: { x: number; z: number }; pos: { x: number; z: number } }, dt: number, time: number): void {
-    const [vx, vz] = [(tr.pos.x - tr.prev.x) * SIM.hz, (tr.pos.z - tr.prev.z) * SIM.hz];
-    const yaw = f.root.rotation.y;
-    const was = v.moved;
-    const upright = Math.max(0, 1 - Math.abs(f.body.rotation.x - f.hunch) / 0.5) * (1 - v.kneel);
-    if (!was || dt <= 0) {
-      v.moved = { x: vx, z: vz, yaw };
-      return;
-    }
-    const k = 1 - Math.exp(-dt / FIGURE_LIFE.lantern.smooth);
-    const [sx, sz] = [was.x + (vx - was.x) * k, was.z + (vz - was.z) * k];
-    const [ax, az] = [(sx - was.x) / dt, (sz - was.z) / dt]; // the acceleration of the smoothed velocity, in the world...
-    const [c, s] = [Math.cos(yaw), Math.sin(yaw)];
-    v.moved = { x: sx, z: sz, yaw };
-    stepSway(v.sway, {
-      dt, time, upright,
-      ax: ax * c - az * s, az: ax * s + az * c, // ...and in the figure's: its left is (cos, -sin), its front (sin, cos)
-      speed: Math.hypot(sx, sz), yawRate: wrapAngle(yaw - was.yaw) / dt, stride: v.stride,
-    });
-    if (f.loose) applySway(v.sway, upright, f.loose.lantern, f.loose.scarf);
   }
 
   /** One at no act, with the investigator in front of them or at their shoulder, turns their head to follow: the head only, eased. */

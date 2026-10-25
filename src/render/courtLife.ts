@@ -12,6 +12,7 @@ import type { Living } from '../world/enclosure';
 import { worldLayout } from '../world/placements';
 import type { Rgb } from './palette';
 import type { Particles } from './particles';
+import { poolMesh } from './poolMesh';
 import { createWorldMaterial } from './worldMaterial';
 
 const NEAR = 120; // metres past a court's far side that its life is drawn
@@ -113,8 +114,8 @@ export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particle
     update(camera, time, hidden) {
       for (const c of lives) {
         const near = !hidden && Math.hypot(camera.x - c.l.x, camera.z - c.l.z) < c.reach;
-        if (c.l.kind === 'river') {
-          if (near && !c.mesh) scene.add((c.mesh = riverMesh(c.l)));
+        if (c.l.kind === 'river' || c.l.kind === 'pool') {
+          if (near && !c.mesh) scene.add((c.mesh = c.l.kind === 'river' ? riverMesh(c.l) : poolMesh(c.l)));
           if (!near && c.mesh) {
             scene.remove(c.mesh);
             c.mesh.geometry.dispose();
@@ -127,7 +128,7 @@ export function createCourtLife(scene: THREE.Scene, g: Game, particles: Particle
         if (!near || !g.overworld) continue;
         if (c.l.kind === 'river') river(c, c.l, dt);
         else if (c.l.kind === 'emit') emit(c, c.l, dt);
-        else spill(c, c.l, dt);
+        else if (c.l.kind === 'spill') spill(c, c.l, dt);
       }
     },
   };

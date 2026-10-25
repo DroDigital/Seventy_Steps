@@ -1,145 +1,194 @@
 /**
- * Prints in soft ground (round 81; render only, read-only on the simulation): where the region's ground is snow, mud, sand, dirt, leaves
- * or soft grass, whatever walks across it on foot, the investigator, the people and the creatures near, leaves a print at each
- * stride, a pressed hollow in an ellipse set along the way it went, with a lip pushed up about it, in the colour of that ground, dithered as the blob shadows are, and
- * fading out in its own time (snow keeps it longest). A flyer, a rider, a body in the sea and what is hidden or unseen leave none; nor
- * does a room under a roof, nor ground that is not soft. A ring of the last few hundred.
+ * Footprints (round 80): flat prints on the ground, one instanced batch of 128 quads that the ground keeps and then lets go. A print is a
+ * dark (or, at its lip, pale) film laid over the ground drawn beneath, lit as the particles are (the ambient, the moon and the lantern), so it
+ * is as dark by night as the land it lies on and keeps its shape in the lantern's glare: snow takes a dark print with a pale lip, mud a
+ * near-black wet one with a gleam on its far wall, sand a shallow one. Its fade is ordered-dithered like the shadows' and the fog's, and it
+ * follows the three heights it is laid on. Render only; what lays them is render/atm/steps.ts.
  */
 
 import * as THREE from 'three';
-import type { Entity } from '../core/ecs';
-import { PRINTS } from '../data/fxTuning';
-import { getRegion } from '../data/regions';
-import { SIM, WORLD } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
+import { STEPS } from '../data/bodyTuning';
+import type { Laid } from './footprintPlan';
+import { LANTERN_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
-const LIFT = 0.035; // metres above the ground
-
 const VERT = /* glsl */ `
+uniform vec2 uRes;
+uniform float uSnap;
 uniform float uFogNear;
 uniform float uFogFar;
-attribute float aAlpha;
-attribute vec3 aTint;
+uniform vec3 uAmbient;
+uniform vec3 uLightColor;
+attribute vec4 aPrint; // look, shape (0 a boot, 1 bare), strength, side
 varying vec2 vP;
-varying float vAlpha;
-varying vec3 vTint;
+varying vec4 vPrint;
+varying vec3 vLight;
 varying float vFog;
+${LANTERN_GLSL}
 void main() {
-  vP = position.xz;
-  vAlpha = aAlpha;
-  vTint = aTint;
-  vec4 vp = viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vP = vec2(position.x * aPrint.w, position.z);
+  vPrint = aPrint;
+  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vec4 vp = viewMatrix * wp;
+  vLight = uAmbient + (uLightColor + uLanternColor * lanternAt(uLanternPos - wp.xyz)) * 0.8;
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
-  gl_Position = projectionMatrix * vp;
+  vec4 clip = projectionMatrix * vp;
+  if (uSnap > 0.0 && clip.w > 0.0) {
+    vec2 grid = uRes * 0.5 / uSnap;
+    clip.xy = floor(clip.xy / clip.w * grid + 0.5) / grid * clip.w;
+  }
+  gl_Position = clip;
 }
 `;
 
 const FRAG = /* glsl */ `
-uniform vec3 uAmbient;
-uniform vec3 uLightColor;
+uniform float uFogAmount;
 varying vec2 vP;
-varying float vAlpha;
-varying vec3 vTint;
+varying vec4 vPrint;
+varying vec3 vLight;
 varying float vFog;
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
   return (m[q.x + q.y * 4] + 0.5) / 16.0;
 }
+// How far inside an ellipse (centre c, radii r) p is: 1 at its heart, 0 on its rim, negative outside.
+float inside(vec2 p, vec2 c, vec2 r) { return 1.0 - length((p - c) / r); }
+// The boot's sole: a heel and a ball joined by a waist, toe at +z.
+float boot(vec2 p) {
+  float heel = inside(p, vec2(0.0, -0.55), vec2(0.40, 0.34));
+  float ball = inside(p, vec2(0.0, 0.2), vec2(0.5, 0.76));
+  float waist = inside(p, vec2(-0.03, -0.2), vec2(0.34, 0.3));
+  return max(max(heel, ball), waist);
+}
+// The bare foot of what follows: long, narrow, and four toes too long, fanned.
+float bare(vec2 p) {
+  float sole = inside(p, vec2(0.0, -0.18), vec2(0.34, 0.6));
+  float toes = -1.0;
+  for (int i = 0; i < 4; i++) {
+    float k = float(i) - 1.5;
+    toes = max(toes, inside(p, vec2(k * 0.2, 0.66 + 0.04 * abs(k)), vec2(0.075, 0.2)) * 0.8 - 0.05);
+  }
+  return max(sole, toes);
+}
+// Each look: the colour and strength of the dark film in the print's heart, the colour and strength of its lip (pale on snow and sand, a dark ring in mud and wet ground), and how much the toe-side wall gleams.
+void lookOf(int l, out vec3 core, out vec4 lip, out float gleam, out float coreA) {
+  if (l == 0) { core = vec3(0.17, 0.2, 0.27); coreA = 0.68; lip = vec4(1.2, 1.22, 1.3, 0.6); gleam = 0.0; return; } // snow: pressed dark, a pale lip of pushed snow
+  if (l == 1) { core = vec3(0.06, 0.05, 0.04); coreA = 0.88; lip = vec4(0.1, 0.08, 0.07, 0.62); gleam = 0.5; return; } // mud: near black, a wet dark ring, the far wall catching the light
+  if (l == 2) { core = vec3(0.26, 0.21, 0.15); coreA = 0.52; lip = vec4(1.1, 1.0, 0.82, 0.4); gleam = 0.0; return; } // sand: shallow, a soft lip
+  if (l == 3) { core = vec3(0.09, 0.1, 0.13); coreA = 0.55; lip = vec4(0.12, 0.13, 0.16, 0.4); gleam = 0.35; return; } // wet: a dark film on dry ground
+  core = vec3(0.13, 0.06, 0.07); coreA = 0.7; lip = vec4(0.16, 0.08, 0.09, 0.5); gleam = 0.4; // ooze
+}
 void main() {
-  float r = length(vP);
-  float hollow = 1.0 - smoothstep(0.52, 0.62, r); // the pressed middle, and the lip pushed up about it
-  float a = vAlpha * (1.0 - vFog) * mix(1.0, 1.7, hollow); // (dithered, as the blob shadows are: the middle the surer)
-  if (r > 1.0 || a < bayer4(gl_FragCoord.xy)) discard;
-  vec3 ground = vTint * (uAmbient + uLightColor * 0.35);
-  gl_FragColor = vec4(mix(ground * 1.7 + 0.02, ground * 0.4, hollow), 1.0);
+  int shape = int(vPrint.y + 0.5);
+  float e = shape == 1 ? bare(vP) : boot(vP); // depth into the print: 1 at its heart, 0 at its edge, negative outside
+  vec3 coreCol; vec4 lip; float gleam; float coreA;
+  lookOf(int(vPrint.x + 0.5), coreCol, lip, gleam, coreA);
+  float sole = smoothstep(0.0, 0.1, e);
+  float core = smoothstep(0.1, 0.36, e);
+  bool pale = lip.r > 0.5;
+  float ring = pale ? smoothstep(-0.22, -0.02, e) * (1.0 - smoothstep(0.02, 0.14, e)) : sole; // a lip of pushed-up snow outside the print and just within it, or a dark ring within
+  float a1 = lip.a * ring;
+  vec3 c1 = lip.rgb;
+  float a2 = coreA * core;
+  float g = gleam * sole * (1.0 - core) * smoothstep(0.1, 0.7, vP.y); // the wall at the toe end faces the walker's lantern
+  c1 = mix(c1, vec3(0.8, 0.84, 0.9), g / max(a1 / max(lip.a, 0.001) + g, 0.001));
+  a1 = max(a1, g * 0.55);
+  float a = a2 + a1 * (1.0 - a2);
+  if (a < 0.03) discard;
+  float strength = vPrint.z * (1.0 - vFog * uFogAmount);
+  if (strength < bayer4(gl_FragCoord.xy)) discard;
+  vec3 rgb = (coreCol * a2 + c1 * a1 * (1.0 - a2)) / a;
+  gl_FragColor = vec4(min(rgb * vLight, vec3(1.0)), a);
 }
 `;
 
-/** The ground a region's land is, as a print takes it, or undefined for ground that keeps none. */
-export const softGround = (region: string | null) => PRINTS.soft[getRegion(region ?? '')?.biome.texture ?? ''];
-
-/** How much of a print is left `age` seconds after it was laid, of `life`: all of it, then fading out over the last of its life. */
-export const printAlpha = (age: number, life: number): number => (age < 0 || age >= life ? 0 : Math.min(1, (life - age) / (life * PRINTS.fade)));
+/** The ground's height at a point, as the world gives it. */
+export type GroundAt = (x: number, z: number) => number;
 
 export interface Footprints {
-  /** Each drawn frame: lays what the bodies near have stepped, and fades the rest. `time` is render seconds; `alpha` between two ticks; `enclosed`: under a roof. */
-  update(at: { x: number; z: number }, time: number, alpha: number, enclosed: boolean): void;
+  /** Lays a print at `time` (render seconds). */
+  lay(l: Laid, time: number): void;
+  /** Ages them, and draws what is left. */
+  update(time: number): void;
+  /** Prints still showing. */
+  readonly live: number;
 }
 
-export function createFootprints(scene: THREE.Scene, g: Game): Footprints {
-  const n = PRINTS.capacity;
+export function createFootprints(scene: THREE.Scene, ground: GroundAt): Footprints {
+  const cap = STEPS.capacity;
   const geo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
-  const attr = (size: number): THREE.InstancedBufferAttribute => new THREE.InstancedBufferAttribute(new Float32Array(n * size), size).setUsage(THREE.DynamicDrawUsage);
-  const [alphas, tints] = [attr(1), attr(3)];
-  geo.setAttribute('aAlpha', alphas);
-  geo.setAttribute('aTint', tints);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms }, vertexShader: VERT, fragmentShader: FRAG, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
-  const mesh = new THREE.InstancedMesh(geo, material, n);
-  mesh.frustumCulled = false;
-  mesh.count = 0;
-  scene.add(mesh);
-  const laid = Array.from({ length: n }, () => ({ born: 0, life: 0, strength: 0 }));
-  const m4 = new THREE.Matrix4();
-  const [q, pos, scale] = [new THREE.Quaternion(), new THREE.Vector3(), new THREE.Vector3()];
-  const up = new THREE.Vector3(0, 1, 0);
-  const tracks = new Map<Entity, { x: number; z: number; side: number }>();
-  let [next, used] = [0, 0];
+  const prints = new THREE.InstancedBufferAttribute(new Float32Array(cap * 4), 4).setUsage(THREE.DynamicDrawUsage);
+  geo.setAttribute('aPrint', prints);
+  const material = new THREE.ShaderMaterial({
+    uniforms: { ...worldUniforms },
+    vertexShader: VERT,
+    fragmentShader: FRAG,
+    transparent: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+  const batch = new THREE.InstancedMesh(geo, material, cap);
+  batch.frustumCulled = false;
+  batch.renderOrder = 1;
+  batch.count = 0;
+  batch.visible = false;
+  scene.add(batch);
 
-  const lay = (x: number, z: number, yaw: number, radius: number, side: number, time: number, soft: { strength: number; seconds: number; tint: readonly [number, number, number] }): void => {
-    const [along, across] = [0.26 + 0.6 * radius, 0.15 + 0.3 * radius];
-    const off = (0.06 + 0.3 * radius) * side;
-    const [px, pz] = [x - Math.cos(yaw) * off, z + Math.sin(yaw) * off]; // to the body's right (yaw 0 faces +z) is (-cos, sin)
-    q.setFromAxisAngle(up, yaw);
-    m4.compose(pos.set(px, g.world.ground(px, pz) + LIFT, pz), q, scale.set(across, 1, along));
-    mesh.setMatrixAt(next, m4);
-    tints.setXYZ(next, ...soft.tint);
-    laid[next] = { born: time, life: soft.seconds, strength: soft.strength };
-    next = (next + 1) % n;
-    used = Math.min(n, used + 1);
-  };
+  const held = { born: new Float32Array(cap), life: new Float32Array(cap), alpha: new Float32Array(cap), fadeIn: new Float32Array(cap), look: new Float32Array(cap), shape: new Float32Array(cap), side: new Float32Array(cap) };
+  let [next, filled, live] = [0, 0, 0];
+  const m4 = new THREE.Matrix4();
+  const [ex, ey, ez, at] = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+  const tf = new THREE.Vector3();
+  const tr = new THREE.Vector3();
 
   return {
-    update(at, time, alpha, enclosed) {
-      const soft = enclosed || !g.overworld ? undefined : softGround(g.overworld.region);
-      if (soft) {
-        const c = g.ecs.c;
-        for (const [id, body] of c.body) {
-          const tr = c.transform.get(id);
-          if (!tr) continue;
-          const me = id === g.player.id;
-          if (me ? g.player.mount.active !== null : !c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden' || (c.brain.get(id)?.def.params.hover ?? 0) > 0) continue;
-          const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
-          if (Math.hypot(x - at.x, z - at.z) > PRINTS.reach || tr.pos.y < WORLD.seaLevel + 0.25) {
-            tracks.delete(id);
-            continue;
-          }
-          const track = tracks.get(id);
-          if (!track) {
-            tracks.set(id, { x, z, side: 1 });
-            continue;
-          }
-          const [dx, dz] = [x - track.x, z - track.z];
-          const stride = PRINTS.stride[0] + PRINTS.stride[1] * body.radius;
-          if (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz < PRINTS.minSpeed) { // standing, or creeping: no print, and the next stride is counted from here
-            [track.x, track.z] = [x, z];
-            continue;
-          }
-          if (Math.hypot(dx, dz) < stride) continue;
-          lay(x, z, Math.atan2(dx, dz), body.radius, track.side, time, soft);
-          [track.x, track.z, track.side] = [x, z, -track.side];
-        }
+    get live() {
+      return live;
+    },
+    lay(l, time) {
+      const i = next;
+      next = (next + 1) % cap;
+      filled = Math.min(cap, filled + 1);
+      const [fx, fz] = [Math.sin(l.yaw), Math.cos(l.yaw)];
+      const [rx, rz] = [-fz, fx];
+      const h = ground(l.x, l.z);
+      tf.set(fx * 0.3, ground(l.x + fx * 0.3, l.z + fz * 0.3) - h, fz * 0.3);
+      tr.set(rx * 0.3, ground(l.x + rx * 0.3, l.z + rz * 0.3) - h, rz * 0.3);
+      ey.crossVectors(tr, tf).normalize();
+      ez.copy(tf).addScaledVector(ey, -tf.dot(ey)).normalize();
+      ex.crossVectors(ey, ez);
+      const [sx, sz] = [STEPS.width * l.scale, (STEPS.length / 1.82) * l.scale];
+      at.set(l.x, h + STEPS.lift, l.z);
+      batch.setMatrixAt(i, m4.makeBasis(ex.multiplyScalar(sx), ey, ez.multiplyScalar(sz)).setPosition(at));
+      held.born[i] = time;
+      held.life[i] = l.print.life;
+      held.alpha[i] = l.print.alpha;
+      held.fadeIn[i] = l.fadeIn;
+      held.look[i] = l.print.look;
+      held.shape[i] = l.bare ? 1 : 0;
+      held.side[i] = l.foot;
+      batch.instanceMatrix.needsUpdate = true;
+      batch.count = filled;
+      batch.visible = true;
+    },
+    update(time) {
+      live = 0;
+      for (let i = 0; i < filled; i++) {
+        const age = time - held.born[i];
+        const life = held.life[i];
+        let a = 0;
+        if (life > 0 && age >= 0 && age < life) {
+          const out = Math.min(1, (life - age) / Math.max(1e-3, life * STEPS.fadeOut));
+          a = held.alpha[i] * Math.min(1, age / Math.max(1e-3, held.fadeIn[i])) * out;
+          if (a > 0.01) live++;
+        } else if (age >= life) held.life[i] = 0;
+        prints.setXYZW(i, held.look[i], held.shape[i], a, held.side[i]);
       }
-      for (const id of tracks.keys()) if (!g.ecs.c.body.has(id)) tracks.delete(id);
-      for (let i = 0; i < used; i++) {
-        const l = laid[i];
-        const a = printAlpha(time - l.born, l.life) * l.strength;
-        alphas.setX(i, a);
-      }
-      mesh.count = used;
-      mesh.instanceMatrix.needsUpdate = true;
-      alphas.needsUpdate = tints.needsUpdate = true;
+      prints.needsUpdate = true;
+      batch.visible = live > 0;
     },
   };
 }

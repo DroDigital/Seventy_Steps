@@ -163,7 +163,7 @@ export const MIST_WAKES = {
 } as const;
 
 /**
- * Prints in soft ground and what a body's breath and feet raise (round 81; render/footprints.ts, render/creatureAir.ts). The ground a
+ * Prints in soft ground and what a body's breath and feet raise (round 81; render/creatureTracks.ts, render/creatureAir.ts). The ground a
  * region has underfoot decides it: how dark a print is, how long it keeps, the colour it is pressed in; only soft ground keeps one.
  */
 export const PRINTS = {
@@ -209,26 +209,8 @@ export const BOSS_PRESENCE = {
   halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
 } as const;
 
-/** What a person has that moves of itself (render/figureSway.ts, gaze.ts, actorViews.ts; round 81). No run-lean and no breathing: only what hangs loose and where the eyes go. */
+/** What a person has that moves of itself (render/figureGaze.ts, actorViews.ts, the world shader; round 81). No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
 export const FIGURE_LIFE = {
-  slice: 1 / 120, // seconds: the springs are stepped in slices no longer than this
-  lantern: {
-    length: 0.28, // metres of strap and cage the pendulum hangs by
-    damp: 3.4, // per second
-    gain: 0.45, // the body's acceleration, as the lantern takes it (the velocity is smoothed over `smooth` before it is read)
-    smooth: 0.1, // seconds the velocity is smoothed over
-    gait: [1.6, 1.1] as readonly [side: number, fore: number], // m/s² of the stride's own rock at a run, to the side and fore-and-aft
-    most: 0.5, // the widest swing, rad
-    inward: -0.08, // and how far it may swing in toward the leg
-  },
-  scarf: {
-    stream: 0.085, // rad of the tail's streaming back for each m/s
-    most: 0.5, // rad it streams to at the fastest, and
-    droop: 0.06, // rad it hangs back at rest
-    spring: 70, damp: 9, // the follow of the tail
-    rate: 8.5, flutter: 0.07, // radians a second of its flutter, and how far it takes the tail at a run
-    fling: 0.12, side: 0.4, // rad flung out for each rad/s of turning, and the most
-  },
   gaze: {
     range: 7, // metres a person sees the investigator from
     near: 0.6, // and does not look at them closer than

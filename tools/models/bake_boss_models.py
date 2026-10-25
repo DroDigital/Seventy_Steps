@@ -16,22 +16,25 @@ import manifest as MF
 import proc as PR
 import proc_more as PR2
 import proc_grove as PR3
-PROC = {**PR.PROC, **PR2.PROC, **PR3.PROC}
+import fill as FL
+import proc_rites as PR4
+PROC = {**PR.PROC, **PR2.PROC, **PR3.PROC, **PR4.PROC}
 
 OUT = os.path.join(HERE, '..', '..', 'src', 'data', 'models')
 
 def existing():
-    """The index and pack already written, so a run that bakes a few leaves the rest as they are."""
+    """The indexes and packs already written (the boss places' and the gates'), so a run that bakes a few leaves the rest as they are."""
     info, blobs = {}, {}
-    try:
-        text = open(os.path.join(OUT, 'bossIndex.ts')).read()
-        for m in re.finditer(r"^  (\w+): (\{.*\}),$", text, re.M):
-            body = re.sub(r'(\w+):', r'"\1":', m.group(2)).replace("'", '"').replace('true', 'True').replace('false', 'False')
-            info[m.group(1)] = ast.literal_eval(body)
-        for m in re.finditer(r"^  (\w+): '([^']*)',$", open(os.path.join(OUT, 'bossPack.ts')).read(), re.M):
-            blobs[m.group(1)] = m.group(2)
-    except FileNotFoundError:
-        pass
+    for kind in P.SETS:
+        try:
+            text = open(os.path.join(OUT, f'{kind}Index.ts')).read()
+            for m in re.finditer(r"^  (\w+): (\{.*\}),$", text, re.M):
+                body = re.sub(r'(\w+):', r'"\1":', m.group(2)).replace("'", '"').replace('true', 'True').replace('false', 'False')
+                info[m.group(1)] = ast.literal_eval(body)
+            for m in re.finditer(r"^  (\w+): '([^']*)',$", open(os.path.join(OUT, f'{kind}Pack.ts')).read(), re.M):
+                blobs[m.group(1)] = m.group(2)
+        except FileNotFoundError:
+            pass
     return info, blobs
 
 def blank_head(pos, col, cls, arm, spec):
@@ -56,20 +59,30 @@ def bake_one(m, work):
         objs = S.mesh_objects(m.select, m.exclude)
         if not objs:
             raise ValueError(f'{m.id}: nothing in {m.src} matches {m.select!r}')
+        if m.join:
+            objs = S.joined(objs)
         arm = objs[0].find_armature()
         if m.pose and arm:
             S.pose_armature(arm, m.pose)
-        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut)
+        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut, cap=m.cap, drop_alpha=m.drop_alpha, glass_alpha=m.glass_alpha)
         pos, col, cls, _ = soup.done()
+        if m.plane and len(pos):
+            cls = FL.panel(pos, cls, m.plane)
         if m.recolour is not None and len(col):
             luma = col @ np.array([.299, .587, .114])
-            col = np.clip(np.array(m.recolour)[None, :] * (0.55 + 0.9 * np.minimum(1, luma * 1.3))[:, None], 0, 1)
+            new = np.clip(np.array(m.recolour)[None, :] * (0.55 + 0.9 * np.minimum(1, luma * 1.3))[:, None], 0, 1)
+            col = np.where(np.isin(cls, m.recolour_not)[:, None], col, new)
+        if len(pos) and m.fill:
+            pos, col, cls = FL.liquid(pos, col, cls, m.fill)
         if len(pos) and m.blank and arm:
             pos, col, cls = blank_head(pos, col, cls, arm, m.blank)
         if m.pose and arm:
             S.pose_armature(arm, {b.name: (0, 0, 0) for b in arm.pose.bones})
     if len(pos) == 0:
         raise ValueError(f'{m.id}: no faces')
+    if m.metal_luma:
+        luma = col @ np.array([.299, .587, .114])
+        cls = np.where(luma < m.metal_luma, S.METAL, cls)
     if m.mirror:
         pos = pos * np.array([-1, 1, 1])[None, None, :]
         pos = pos[:, ::-1, :]
@@ -101,7 +114,8 @@ def bake_one(m, work):
 def look(pos, col, cls):
     """Colours as the game lays them (a class's base colour by the light and dark of the face), for the contact sheet."""
     base = {S.STONE: (.5, .5, .48), S.WOOD: (.36, .27, .2), S.LEAF: (.24, .3, .26), S.ROCK: (.42, .42, .4), S.SLAB: (.58, .56, .5), S.COBBLE: (.4, .4, .38),
-            S.BRICK: (.5, .34, .3), S.CLOTH: (.6, .5, .3), S.METAL: (.3, .27, .26), S.BONE: (.85, .8, .68), S.GLOW: (1, .8, .5)}
+            S.BRICK: (.5, .34, .3), S.CLOTH: (.6, .5, .3), S.METAL: (.3, .27, .26), S.BONE: (.85, .8, .68), S.GLOW: (1, .8, .5),
+            S.GLASS: (.62, .68, .66), S.LIQUID: (.3, .55, .35), S.MIRROR: (.8, .85, .9), S.WAX: (.82, .74, .56)}
     luma = col @ np.array([.299, .587, .114])
     shade = 0.55 + 0.9 * np.minimum(1, luma * 1.3)
     return np.array([np.array(base.get(int(c), base[S.STONE])) for c in cls]) * shade[:, None]
@@ -134,16 +148,20 @@ def main():
             i = info[m.id]
             print(f"{m.id:24s} {i['tris']:5d} tris  {i['x1']-i['x0']:6.2f} x {i['y1']-i['y0']:6.2f} x {i['z1']-i['z0']:6.2f}  solids={len(i['solids'])} anchors={len(i['anchors'])}  {len(blobs[m.id]) * 3 // 4} B")
             cells.append((m.id, cell[0], look(*cell)))
-    order = [m.id for m in models if m.id in info]
-    entries = {k: info[k] for k in order}
-    index_ts, pack_ts = P.ts_index(entries, None), P.ts_pack({k: blobs[k] for k in order})  # (made first: a failure leaves the files as they were)
-    with open(os.path.join(OUT, 'bossIndex.ts'), 'w') as f:
-        f.write(index_ts)
-    with open(os.path.join(OUT, 'bossPack.ts'), 'w') as f:
-        f.write(pack_ts)
+    written = {}
+    for kind in P.SETS:
+        order = [m.id for m in models if m.set == kind and m.id in info]
+        written[kind] = (P.ts_index({k: info[k] for k in order}, kind), P.ts_pack({k: blobs[k] for k in order}, kind), order)  # (made first: a failure leaves the files as they were)
+    for kind, (index_ts, pack_ts, order) in written.items():
+        if not order and not os.path.exists(os.path.join(OUT, f'{kind}Index.ts')):
+            continue
+        with open(os.path.join(OUT, f'{kind}Index.ts'), 'w') as f:
+            f.write(index_ts)
+        with open(os.path.join(OUT, f'{kind}Pack.ts'), 'w') as f:
+            f.write(pack_ts)
+        print(kind, len(order), 'models,', sum(len(blobs[k]) * 3 // 4 for k in order), 'bytes')
     if sheet and cells:
         import preview
         preview.sheet(cells, cols=6, size=200).save(sheet)
-    print(len(entries), 'models,', sum(len(b) * 3 // 4 for b in blobs.values()), 'bytes')
 
 main()

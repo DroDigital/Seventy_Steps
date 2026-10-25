@@ -1,5 +1,5 @@
 /**
- * The track of a blow (round 78; render only, read-only on the simulation): while the investigator's weapon is
+ * The track of a blow (round 81; render only, read-only on the simulation): while the investigator's weapon is
  * cutting, the line its edge draws is left in the air for a fraction of a second, a dithered ribbon from the weapon's
  * farthest point to a point back along it, brightest at the point and fading with age, so the arc a blow takes and
  * how wide it was are seen. Nothing is drawn for a weapon at rest, a shot or a guard. Its geometry is one fixed ribbon

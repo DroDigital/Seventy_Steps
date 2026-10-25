@@ -1,100 +1,13 @@
 /**
- * What a person has that moves of itself (round 78; render/figureSway.ts, render/gaze.ts, render/swingTrails.ts): the
+ * What a person has that moves of itself (round 81; render/figureSway.ts, render/figureGaze.ts, render/swingTrails.ts): the
  * investigator's lantern and scarf tail, a person's head following the investigator, and the track of a blow.
  */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { FIGURE_LIFE, SWING_TRAIL } from '../src/data/fxTuning';
-import { applySway, newSway, stepSway, type SwayInput } from '../src/render/figureSway';
-import { easeGaze, gazeAt, gazeTurn, newGaze } from '../src/render/gaze';
+import { easeGaze, gazeAt, gazeTurn, newGaze } from '../src/render/figureGaze';
 import { buildFigure } from '../src/render/figures';
 import { edgeOf, trailAlpha } from '../src/render/swingTrails';
-
-const still: SwayInput = { dt: 1 / 60, ax: 0, az: 0, speed: 0, yawRate: 0, stride: 0, time: 0, upright: 1 };
-const run = (s = newSway(), frames: number, input: Partial<SwayInput> = {}): ReturnType<typeof newSway> => {
-  for (let i = 0; i < frames; i++) stepSway(s, { ...still, time: i / 60, ...input });
-  return s;
-};
-
-describe('the lantern on its strap', () => {
-  it('hangs still when the body is still, and settles after a shove', () => {
-    const s = run(newSway(), 60);
-    expect([s.lx, s.lz]).toEqual([0, 0]);
-    run(s, 4, { az: 40 }); // a start from standing
-    expect(Math.abs(s.lz)).toBeGreaterThan(0.02);
-    run(s, 180);
-    expect(Math.abs(s.lz)).toBeLessThan(0.01);
-    expect(Math.abs(s.lvz)).toBeLessThan(0.05);
-  });
-
-  it('swings back when the body starts forward, and out to the left when it turns hard to the right', () => {
-    const s = run(newSway(), 8, { az: 20 });
-    expect(s.lz).toBeLessThan(0); // hangs behind
-    const t = run(newSway(), 8, { ax: -20 }); // (accelerating to the right)
-    expect(t.lx).toBeGreaterThan(0);
-  });
-
-  it('never goes through the body nor past its most, at any shove', () => {
-    const s = newSway();
-    for (let i = 0; i < 600; i++) {
-      stepSway(s, { ...still, ax: Math.sin(i * 0.9) * 400, az: Math.cos(i * 0.7) * 400 });
-      expect(s.lx).toBeGreaterThanOrEqual(FIGURE_LIFE.lantern.inward - 1e-9);
-      expect(s.lx).toBeLessThanOrEqual(FIGURE_LIFE.lantern.most + 1e-9);
-      expect(Math.abs(s.lz)).toBeLessThanOrEqual(FIGURE_LIFE.lantern.most + 1e-9);
-      expect(Number.isFinite(s.lx + s.lz + s.sb + s.ss)).toBe(true);
-    }
-  });
-
-  it('is the same at any frame rate: a shove of a tenth of a second, a second on, ends near the same at 30 and at 144 frames a second', () => {
-    const at = (fps: number): number => {
-      const s = newSway();
-      for (let i = 0; i < fps; i++) stepSway(s, { ...still, dt: 1 / fps, az: i / fps < 0.1 ? 8 : 0 });
-      return s.lz;
-    };
-    expect(Math.abs(at(30) - at(144))).toBeLessThan(0.03);
-  });
-});
-
-describe('the scarf\'s tail', () => {
-  it('droops a little at rest and streams back with the pace, never past its most', () => {
-    const rest = run(newSway(), 120);
-    expect(rest.sb).toBeCloseTo(FIGURE_LIFE.scarf.droop, 2);
-    const walk = run(newSway(), 120, { speed: 2 });
-    const fast = run(newSway(), 120, { speed: 6 });
-    expect(walk.sb).toBeGreaterThan(rest.sb);
-    expect(fast.sb).toBeGreaterThan(walk.sb);
-    expect(run(newSway(), 120, { speed: 50 }).sb).toBeLessThan(FIGURE_LIFE.scarf.most + FIGURE_LIFE.scarf.droop + FIGURE_LIFE.scarf.flutter + 0.1);
-  });
-
-  it('is flung to the right in a turn to the left, and comes back', () => {
-    const s = run(newSway(), 60, { yawRate: 4 });
-    expect(s.ss).toBeLessThan(-0.05);
-    run(s, 180);
-    expect(Math.abs(s.ss)).toBeLessThan(0.01);
-  });
-
-  it('is laid on the groups, and let be as the body goes over', () => {
-    const f = buildFigure('player');
-    expect(f.loose).toBeDefined();
-    const s = run(newSway(), 90, { speed: 5, az: 10 });
-    applySway(s, 1, f.loose!.lantern, f.loose!.scarf);
-    expect(f.loose!.scarf.rotation.x).toBeCloseTo(s.sb, 6);
-    expect(f.loose!.lantern.rotation.z).toBeCloseTo(s.lx, 6);
-    applySway(s, 0, f.loose!.lantern, f.loose!.scarf);
-    expect(Math.abs(f.loose!.scarf.rotation.x) + Math.abs(f.loose!.lantern.rotation.z)).toBe(0);
-  });
-});
-
-describe('the lantern and the scarf on the figure', () => {
-  it('are groups of their own: the flame is carried by the lantern, and the people have none', () => {
-    const f = buildFigure('player');
-    let up: THREE.Object3D | null = f.flame!;
-    let hung = false;
-    while (up) { hung ||= up === f.loose!.lantern; up = up.parent; }
-    expect(hung).toBe(true);
-    expect(buildFigure('npc:gilman').loose).toBeUndefined();
-  });
-});
 
 describe('a head following the investigator', () => {
   it('turns toward one in front, more for one at the side, and not at all for one behind or far away', () => {

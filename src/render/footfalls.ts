@@ -1,59 +1,87 @@
 /**
- * The footfalls of the great (round 81; render only, read-only on the simulation): a colossus, or any horror
- * that is fought, that walks leaves a ring of dust at each stride of its own length and the ground answers
- * with a small jolt in the camera, by how near the investigator is (render/presence.ts `felt`). They stand
- * still, and nothing is let go; one that is far, hidden or dead gives none, nor does a room under a roof.
+ * The investigator's footfalls (round 80), as the foley (render/audio/foley.ts) counts them: one every `strideAt(speed)` metres walked,
+ * none while mounted, in a move, after a jump of more than three metres or once fallen. Two things read them, each with a clock of its
+ * own that keeps step with the foley's: the ground's prints and puffs (render/atm/steps.ts) and the ground heard (render/audio/atm/footing.ts).
+ * Render only: reads the simulation, writes nothing to it. No Three.js.
  */
 
-import type * as THREE from 'three';
-import type { Entity } from '../core/ecs';
-import type { V3 } from '../core/geom';
-import { BOSS_PRESENCE } from '../data/fxTuning';
-import { SIM } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
-import { creatureOf } from '../systems/creatures';
-import type { Particles } from './particles';
-import { presenceOf } from './presence';
+import { STEPS } from '../data/bodyTuning';
+import type { Game } from '../systems/components';
+import { groundAt, type GroundKind } from '../world/groundKind';
+import { strideAt } from './audio/foley';
 
-const DUST = [0.42, 0.4, 0.36] as const;
+/** Seconds between the body's last step of movement and a frame that sees none that still counts as walking on (three ticks of the 60 Hz simulation). */
+const TICKS_BETWEEN = 0.05;
 
-export interface Footfalls {
-  update(at: THREE.Vector3, alpha: number, enclosed: boolean): void;
+export interface Footfall {
+  /** Where the foot came down. */
+  x: number;
+  y: number;
+  z: number;
+  /** The way the body was going, radians (0 faces +z). */
+  yaw: number;
+  /** Which foot: 1 the right, -1 the left. */
+  foot: 1 | -1;
+  /** Metres a second. */
+  speed: number;
+  /** Metres between this footfall and the last. */
+  stride: number;
+  ground: GroundKind;
+  /** The body at the footfall, for what trails it. */
+  body: { x: number; z: number };
 }
 
-export function createFootfalls(g: Game, particles: Particles, felt: (p: V3, strength: number, reach: number) => void): Footfalls {
-  const walked = new Map<Entity, { run: number; side: number }>();
+export interface StrideClock {
+  /** The footfall, if one fell, since the last look; `seconds` is render time. */
+  step(seconds: number): Footfall | null;
+  /** The seconds the body has walked without stopping, and whether it moves now. */
+  readonly walking: { for: number; moving: boolean; sprint: boolean };
+}
+
+/** The capped stress the audio last heard (render/audio/atm/footing.ts sets it each frame): -1 until it is known. The picture's haunting keeps to the FX intensity setting through it. */
+export const FOOT_MIND = { stress: -1 };
+
+/** Whether a failing mind is followed now: Fractured or Unmoored, and the FX cap not set below that. */
+export function followed(band: string, stress: number): boolean {
+  return (STEPS.haunt.bands as readonly string[]).includes(band) && (stress < 0 || stress >= STEPS.haunt.stressFrom);
+}
+
+export function createStrideClock(g: Game): StrideClock {
+  let last: { x: number; z: number } | null = null;
+  let [walked, before, foot, heading, movedAt] = [0, 0, 1 as 1 | -1, 0, 0];
+  const walking = { for: 0, moving: false, sprint: false };
   return {
-    update(at, alpha, enclosed) {
-      if (enclosed) return;
-      const c = g.ecs.c;
-      for (const [id, body] of c.body) {
-        const tr = c.transform.get(id);
-        if (!tr || id === g.player.id || !c.actor.has(id) || (body.height < BOSS_PRESENCE.height && !c.fight.has(id)) || isAbsent(g, id) || isUnseen(g, id) || (c.health.get(id)?.hp ?? 0) <= 0 || !creatureOf(g, id)) continue;
-        const speed = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz;
-        const walk = walked.get(id) ?? { run: 0, side: 1 };
-        walked.set(id, walk);
-        if (speed < BOSS_PRESENCE.minSpeed) {
-          walk.run = 0;
-          continue;
-        }
-        walk.run += speed / SIM.hz;
-        if (walk.run < BOSS_PRESENCE.stride * body.height) continue;
-        walk.run = 0;
-        walk.side = -walk.side;
-        const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
-        const k = presenceOf(Math.hypot(x - at.x, z - at.z) - body.radius, body.height);
-        if (k < BOSS_PRESENCE.least) continue;
-        const [dx, dz] = [Math.cos(tr.yaw) * body.radius * 0.45 * walk.side, -Math.sin(tr.yaw) * body.radius * 0.45 * walk.side]; // the foot to its right (yaw 0 faces +z) is (-cos, sin)
-        const n = Math.round(3 + 7 * k);
-        for (let i = 0; i < n; i++) {
-          const a = (i / n) * Math.PI * 2 + Math.random() * 0.6;
-          const out = 0.9 + body.radius * 0.25;
-          particles.spawn({ x: x + dx + Math.sin(a) * 0.4 * body.radius, y: tr.pos.y + 0.12, z: z + dz + Math.cos(a) * 0.4 * body.radius, vx: Math.sin(a) * out, vy: 0.35 + Math.random() * 0.5, vz: Math.cos(a) * out, life: 1.1 + Math.random() * 0.7, size: 0.35 + 0.08 * body.height, grow: 2.6, color: DUST, alpha: 0.3, gravity: -0.05, drag: 1.3 });
-        }
-        felt({ x: x + dx, y: tr.pos.y, z: z + dz }, BOSS_PRESENCE.shake * Math.min(1.6, body.height / 8) * k, 24 + body.height);
-      }
-      for (const id of walked.keys()) if (!c.body.has(id)) walked.delete(id);
+    walking,
+    step(seconds) {
+      const { transform, actor } = g.ecs.c;
+      const tr = transform.get(g.player.id);
+      const a = actor.get(g.player.id);
+      const dt = Math.max(1e-3, seconds - before);
+      before = seconds;
+      if (!tr || !a) return null;
+      const [dx, dz] = last ? [tr.pos.x - last.x, tr.pos.z - last.z] : [0, 0];
+      const moved = Math.hypot(dx, dz);
+      if (moved === 0 && walking.moving && seconds - movedAt < TICKS_BETWEEN && !g.player.mount.active && a.move === null && !g.cutscene && !g.ecs.c.dead.has(g.player.id)) return (walking.for += dt), null; // a frame between two simulation steps (drawn faster than 60 Hz): the body walks on
+      last = { x: tr.pos.x, z: tr.pos.z };
+      walking.moving = false;
+      if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id) || g.cutscene) return (walked = 0), (walking.for = 0), null; // mounted, a jump, a move, a fall, a scene: no stride
+      const span = moved > 0 && seconds - movedAt <= TICKS_BETWEEN ? seconds - movedAt : dt; // the time the metres took: since the body last moved, not since the last frame
+      if (moved > 0) movedAt = seconds;
+      const speed = moved / Math.max(1e-3, span);
+      if (speed < 0.3) return (walking.for = 0), null;
+      walking.moving = true;
+      walking.sprint = g.player.sprinting;
+      walking.for += dt;
+      if (moved > 0.002) heading = Math.atan2(dx, dz);
+      walked += moved;
+      const stride = strideAt(speed);
+      if (walked < stride) return null;
+      walked %= stride;
+      foot = (foot === 1 ? -1 : 1) as 1 | -1;
+      const [fx, fz] = [Math.sin(heading), Math.cos(heading)];
+      const [rx, rz] = [-fz, fx]; // the right hand (yaw 0 faces +z; its right is -x)
+      const [x, z] = [tr.pos.x + fx * STEPS.ahead + rx * STEPS.across * foot, tr.pos.z + fz * STEPS.ahead + rz * STEPS.across * foot];
+      return { x, y: tr.pos.y, z, yaw: heading, foot, speed, stride, ground: groundAt(g, tr.pos.x, tr.pos.y, tr.pos.z), body: { x: tr.pos.x, z: tr.pos.z } };
     },
   };
 }

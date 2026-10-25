@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { FX, RENDER, SETTINGS } from '../data/tuning';
 import { createLanternShadow, type LanternShadow } from './lanternShadow';
 import { createLampShadows, type LampShadows } from './lampShadows';
+import { createMirrorView, type MirrorView } from './mirrorView';
 import { createReflection, type Reflection } from './reflection';
 import { createMoonShadow, type MoonShadow } from './moonShadow';
 import { createPostPass, type PostPass } from './postPass';
@@ -26,6 +27,7 @@ export interface Pipeline {
   lamps: LampShadows;
   /** The sea's mirror (round 35): drawn before the frame when there is water about. */
   reflection: Reflection;
+  mirror: MirrorView;
   /** Internal render size in pixels (low-res target, or full canvas when pixelation is off). */
   size: THREE.Vector2;
   /** `scale` multiplies the low-res target (the settings menu's resolution scale). */
@@ -62,6 +64,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
   const lantern = createLanternShadow();
   const lamps = createLampShadows();
   const reflection = createReflection();
+  const mirror = createMirrorView();
   worldUniforms.uMarkCharacters.value = 1; // the post pass reads characters from the target's alpha
   const size = new THREE.Vector2(RENDER.width, RENDER.height);
 
@@ -75,6 +78,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
     lamps.enabled = !!shadowAt;
     lamps.render(renderer, scene, shadowAt ?? shadow.focus);
     reflection.render(renderer, scene, camera);
+    mirror.render(renderer, scene, camera);
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
     renderer.setRenderTarget(null);
@@ -97,6 +101,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
     lantern,
     lamps,
     reflection,
+    mirror,
     size,
     render,
     compile,

@@ -9,7 +9,8 @@
 
 import { fbm } from '../core/noise';
 import { hash2 } from '../core/rng';
-import { BASE, mixRgb, scaleRgb } from './palette';
+import { PSX_DETAIL, PSX_SIZE } from '../data/psxDetail';
+import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import { dirt, grass, gravel, leaves, mud, rot, sand, snow } from './textureGround';
 import { brick, clapboard, cobble, shingle, slab, stone, wood, type TexelFn } from './textureMasonry';
 
@@ -78,7 +79,65 @@ const cloth: TexelFn = (u, v, seed) => {
   return [k, k, k];
 };
 
-const TEXELS: Record<TextureKind, TexelFn> = { stone, slab, wood, rot, flesh, hide, water, cloth, grass, mud, sand, snow, cobble, brick, clapboard, shingle, rock, dirt, gravel, leaves };
+/** The PS1 patterns (data/psxDetail.ts), decoded once: each a 64 × 64 brightness against its own average (100 is average). */
+const psxPatterns = new Map<string, Uint8Array>();
+function psxPattern(name: string): Uint8Array {
+  let p = psxPatterns.get(name);
+  if (!p) {
+    const raw = atob(PSX_DETAIL[name]);
+    p = Uint8Array.from(raw, (c) => c.charCodeAt(0));
+    psxPatterns.set(name, p);
+  }
+  return p;
+}
+
+/** Where along an axis a pattern may start so that the wrap of the texture (a seam one texel wide, the same at every repeat) falls where the pattern is quiet, not on a joint: the places it changes less than it does on average. */
+function quietStarts(pat: Uint8Array, alongX: boolean): number[] {
+  const step = Array.from({ length: PSX_SIZE }, (_, i) => {
+    let sum = 0;
+    for (let k = 0; k < PSX_SIZE; k++) {
+      const [a, b] = alongX ? [pat[k * PSX_SIZE + i], pat[k * PSX_SIZE + ((i + PSX_SIZE - 1) % PSX_SIZE)]] : [pat[i * PSX_SIZE + k], pat[((i + PSX_SIZE - 1) % PSX_SIZE) * PSX_SIZE + k]];
+      sum += Math.abs(a - b);
+    }
+    return sum / PSX_SIZE;
+  });
+  const mean = step.reduce((a, b) => a + b, 0) / step.length;
+  return step.flatMap((s, i) => (s < mean * 0.8 ? [i] : []));
+}
+
+/**
+ * A kind drawn as a PlayStation texture artist drew it (round 79, asked for: "the best and fitting PS1 era textures"): the texture keeps the average
+ * colour and light of the procedural one (so the realms' grades and the lamps see what they always saw) and takes its structure from a 64 × 64 pattern
+ * of Goblinatron's 'PSX Dungeon' (CC BY 4.0), laid twice across and down so that a block or a slab is as large as it was; each material starts
+ * it at its own place (the seed), and a little of the procedural grain stays so that two walls of one kit are not one picture.
+ */
+function psx(base: TexelFn, pattern: string): TexelFn {
+  const means = new Map<number, Rgb>();
+  const meanOf = (seed: number): Rgb => {
+    let m = means.get(seed);
+    if (!m) {
+      let [r, g, b] = [0, 0, 0];
+      for (let j = 0; j < 12; j++) for (let i = 0; i < 12; i++) { const c = base((i + 0.5) / 12, (j + 0.5) / 12, seed); r += c[0]; g += c[1]; b += c[2]; }
+      m = [r / 144, g / 144, b / 144];
+      means.set(seed, m);
+    }
+    return m;
+  };
+  const quiet: { x: number[]; y: number[] } = { x: [], y: [] };
+  return (u, v, seed) => {
+    const pat = psxPattern(pattern);
+    if (!quiet.x.length) [quiet.x, quiet.y] = [quietStarts(pat, true), quietStarts(pat, false)];
+    const [ox, oy] = [quiet.x[Math.floor(hash2(seed, 5, 17) * quiet.x.length)], quiet.y[Math.floor(hash2(seed, 9, 23) * quiet.y.length)]];
+    const [x, y] = [(Math.floor(u * TEXTURE_SIZE) + ox) % PSX_SIZE, (Math.floor(v * TEXTURE_SIZE) + oy) % PSX_SIZE];
+    const grain = 0.94 + 0.12 * fbm(u * 16, v * 16, seed + 31, 2, 16);
+    return scaleRgb(meanOf(seed), (pat[y * PSX_SIZE + x] / 100) * grain);
+  };
+}
+
+const TEXELS: Record<TextureKind, TexelFn> = {
+  stone: psx(stone, 'stone'), slab: psx(slab, 'slab'), wood: psx(wood, 'wood'),
+  rot, flesh, hide, water, cloth, grass, mud, sand, snow, cobble, brick, clapboard, shingle, rock, dirt, gravel, leaves,
+};
 
 const to8 = (x: number): number => Math.round(Math.min(1, Math.max(0, x)) * 255);
 

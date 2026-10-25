@@ -35,6 +35,7 @@ import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
 import { createMistWakes } from './render/mistWakes';
 import { createSwingTrails } from './render/swingTrails';
+import { courtAt } from './render/courtMist';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
 import { weatherHaze } from './render/weather';
@@ -166,6 +167,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const world = opts.arena ? null : createWorldScene(lights);
   const scene = world?.scene ?? createArenaScene();
   scene.add(lights.halos);
+  scene.add(lights.flames);
   const menu: SignMenu | null = opts.arena ? null : createSignMenu(game, journeys.go);
   const ending = createEndingCard(game, store, () => (shell.music = playMenuMusic(shell.engine, settings.volume))); // the title's theme again, under an ending
   let building = true; // until the loop starts
@@ -212,7 +214,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const mistWakes = createMistWakes(game); // what moves through it parts it (round 81)
   const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 81)
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
@@ -222,7 +224,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const finds = opts.arena ? null : createFindCard(game, () => dialogue.open || ending.open || !!intro?.open || !!demoEnd?.open || cinema.active || journeys.busy); // round 60: a weapon or a relic found says so, and what to do with it
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
-  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5);
+  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
   const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
@@ -287,7 +289,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
           [lowRes, scale] = [state.enabled.pixelate, settings.resolution];
           resize();
         }
-        placeCamera(camera, game, alpha);
+        placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
         hud.hide(cinema.active || extras.hidesHud);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
@@ -296,7 +298,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? adapted(enclosed ? darkOf(CLOCK.start) * darkShare(gloom) : darkOf(phaseOf(time)), lantern) : 0);
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, dark: look.dark });
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
         mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);

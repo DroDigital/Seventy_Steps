@@ -1,7 +1,7 @@
 /**
- * What a walking body leaves and gives the air (round 81; render/footprints.ts, render/creatureAir.ts, data/fxTuning.ts PRINTS, BODY_AIR):
- * prints in soft ground only, at a stride, alternating the feet, by the pace and not for the hidden, the flying, the mounted or the
- * drowned; a pale breath in the cold and dust from a hard run over dry ground.
+ * What a walking body leaves and gives the air (round 81; render/creatureTracks.ts, render/creatureAir.ts, data/fxTuning.ts PRINTS, BODY_AIR):
+ * prints in soft ground only, at a stride, alternating the feet, by the pace and not for the hidden, the flying or the drowned, nor for
+ * the investigator (round 80 lays theirs); a pale breath in the cold and dust from a hard run over dry ground.
  */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
@@ -9,7 +9,7 @@ import { BODY_AIR, PRINTS } from '../src/data/fxTuning';
 import { REGIONS } from '../src/data/regions';
 import { SIM } from '../src/data/tuning';
 import { breathGap, createCreatureAir, groundOf } from '../src/render/creatureAir';
-import { createFootprints, printAlpha, softGround } from '../src/render/footprints';
+import { createCreatureTracks, printAlpha, softGround } from '../src/render/creatureTracks';
 import type { Particles, ParticleSpec } from '../src/render/particles';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
 import { spawnCreature } from '../src/systems/creatures';
@@ -21,7 +21,7 @@ const setup = (texture: string) => {
   const g = createWorldGame();
   g.overworld!.region = regionOf(texture) as never;
   const scene = new THREE.Scene();
-  const prints = createFootprints(scene, g);
+  const prints = createCreatureTracks(scene, g);
   const mesh = scene.children[0] as THREE.InstancedMesh;
   const puffs: ParticleSpec[] = [];
   const particles = { spawn: (p: ParticleSpec) => void puffs.push(p), update: () => undefined } as unknown as Particles;
@@ -34,7 +34,11 @@ const setup = (texture: string) => {
     const k = speed / SIM.hz / Math.max(1e-6, Math.hypot(x - tr.prev.x, z - tr.prev.z));
     tr.prev = { ...tr.pos, x: x - (x - tr.prev.x) * k, z: z - (z - tr.prev.z) * k };
   };
-  return { g, scene, prints, mesh, air, puffs, walk };
+  const walker = (): number => { // a ghoul set down a little way off, to walk about
+    const me = g.ecs.c.transform.get(g.player.id)!.pos;
+    return spawnCreature(g, 'ghoul', { x: me.x + 3, z: me.z, yaw: 0 })!;
+  };
+  return { g, scene, prints, mesh, air, puffs, walk, walker };
 };
 
 describe('a print', () => {
@@ -58,8 +62,8 @@ describe('a print', () => {
 
 describe('a body walking in soft ground', () => {
   it('lays a print at each stride, alternating its feet about the way it goes, and none while it stands', () => {
-    const { g, prints, mesh, walk } = setup('snow');
-    const me = g.player.id;
+    const { g, prints, mesh, walk, walker } = setup('snow');
+    const me = walker();
     const start = g.ecs.c.transform.get(me)!.pos;
     prints.update({ x: start.x, z: start.z }, 0, 1, false); // (seen first)
     expect(mesh.count).toBe(0);
@@ -81,18 +85,28 @@ describe('a body walking in soft ground', () => {
     expect(mesh.count).toBe(before); // standing leaves none
   });
 
-  it('leaves none on ground that is not soft, in a room under a roof, or when riding', () => {
-    for (const [texture, enclosed, mounted] of [['slab', false, false], ['snow', true, false], ['snow', false, true]] as const) {
-      const { g, prints, mesh, walk } = setup(texture);
-      if (mounted) g.player.mount.active = 'horse' as never;
-      const me = g.player.id;
+  it('leaves none on ground that is not soft, or in a room under a roof', () => {
+    for (const [texture, enclosed] of [['slab', false], ['snow', true]] as const) {
+      const { g, prints, mesh, walk, walker } = setup(texture);
+      const me = walker();
       const p = g.ecs.c.transform.get(me)!.pos;
       for (let step = 0; step <= 12; step++) {
         walk(me, p.x, p.z + step * 0.4, 2);
         prints.update({ x: p.x, z: p.z }, step * 0.2, 1, enclosed);
       }
-      expect(mesh.count, `${texture} ${enclosed} ${mounted}`).toBe(0);
+      expect(mesh.count, `${texture} ${enclosed}`).toBe(0);
     }
+  });
+
+  it('leaves none for the investigator: round 80 lays theirs', () => {
+    const { g, prints, mesh, walk } = setup('snow');
+    const me = g.player.id;
+    const p = g.ecs.c.transform.get(me)!.pos;
+    for (let step = 0; step <= 12; step++) {
+      walk(me, p.x, p.z + step * 0.4, 2);
+      prints.update({ x: p.x, z: p.z }, step * 0.2, 1, false);
+    }
+    expect(mesh.count).toBe(0);
   });
 
   it('leaves none from what is hidden, and a creature near leaves its own', () => {
@@ -115,8 +129,8 @@ describe('a body walking in soft ground', () => {
   });
 
   it('takes over the oldest print once the ring is full', () => {
-    const { g, prints, mesh, walk } = setup('snow');
-    const me = g.player.id;
+    const { g, prints, mesh, walk, walker } = setup('snow');
+    const me = walker();
     const p = g.ecs.c.transform.get(me)!.pos;
     prints.update({ x: p.x, z: p.z }, 0, 1, false);
     for (let step = 1; step <= PRINTS.capacity * 3; step++) {
@@ -146,8 +160,8 @@ describe('what a body gives the air', () => {
   });
 
   it('kicks up dust at a hard run over dry ground, not at a walk', () => {
-    const { g, air, puffs, walk } = setup('sand');
-    const me = g.player.id;
+    const { g, air, puffs, walk, walker } = setup('sand');
+    const me = walker();
     const p = g.ecs.c.transform.get(me)!.pos;
     let z = p.z;
     for (let t = 0; t < 4; t += 0.1) {

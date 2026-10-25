@@ -13,6 +13,7 @@ import type { RegionDef } from '../data/regions';
 import type { Prop } from '../world/props';
 import { housePieces } from './houseMesh';
 import { groundShade } from './meshKit';
+import { planeOf, type MirrorSpot } from './mirrorMath';
 import { mixRgb, type Rgb } from './palette';
 import { shadowMesh } from './moonShadow';
 import { propPieces, type PropMat } from './propShapes';
@@ -21,6 +22,8 @@ import type { LightSpot } from './worldLights';
 import { createWorldMaterial, type WorldMaterialOptions } from './worldMaterial';
 
 const STONE: Rgb = [0.86, 0.86, 0.84];
+/** The stone of a region's props: the pale stone leaned toward the ground (the arenas' gates are stood in it too, render/gateViews.ts). */
+export const regionStone = (region: RegionDef): Rgb => mixRgb(STONE, region.biome.tint, 0.5);
 const BUDGET = 8; // prop weight per slice (a house weighs 4)
 
 const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
@@ -40,6 +43,10 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   cloth: { texture: 'cloth', seed: 2, vertexColors: true, vary: 0.3, sway: true },
   metal: { texture: 'cloth', seed: 8, vertexColors: true, vary: 0.2 },
   bone: { texture: 'slab', seed: 11, vertexColors: true, vary: 0.35 },
+  glassware: { texture: 'cloth', emissive: 0.1, vertexColors: true, opacity: 0.28, surface: 'glass' }, // what is clear, wet, waxen or silvered (round 79; shaders/surfaces.ts)
+  liquid: { texture: 'cloth', emissive: 0.4, vertexColors: true, opacity: 0.55, surface: 'liquid' },
+  wax: { texture: 'cloth', seed: 12, emissive: 0.1, vertexColors: true, vary: 0.2, surface: 'wax' },
+  mirror: { texture: 'cloth', seed: 3, vertexColors: true, surface: 'mirror' },
 };
 const materials = new Map<PropMat, THREE.ShaderMaterial>();
 /** What bends in the wind (round 34): the trees and bushes, from nothing at their feet to the most at the tops; the rest of a swaying material's vertices stand still. */
@@ -58,10 +65,12 @@ function addSway(geo: THREE.BufferGeometry, p: Prop): void {
 }
 
 /** What casts the moon's shadow (round 34): the bodies of things, not their lights, windows and trim. */
-const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard', 'brick', 'shingle', 'rock', 'slab', 'cobble', 'metal', 'bone']);
+const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard', 'brick', 'shingle', 'rock', 'slab', 'cobble', 'metal', 'bone', 'wax']);
+/** What is not darkened toward the ground (light is not baked into it): lamps, lit windows, and what is clear or silvered. */
+const UNSHADED: ReadonlySet<PropMat> = new Set(['glow', 'pane', 'mirror', 'glassware', 'liquid']);
 /** What stands 4 to 10 cm off a wall (frames, glass, doors) is drawn nearer than it is by a pixel's slope of depth: the PS1's snapping moves a face's depth by up to that on a wall seen aslant, and the wall showed through it (round 21). */
 const RELIEF: ReadonlySet<PropMat> = new Set(['trim', 'pane']);
-const material = (m: PropMat): THREE.ShaderMaterial => {
+export const propMaterial = (m: PropMat): THREE.ShaderMaterial => {
   let mat = materials.get(m);
   if (!mat) {
     materials.set(m, (mat = createWorldMaterial(OPTIONS[m])));
@@ -72,19 +81,24 @@ const material = (m: PropMat): THREE.ShaderMaterial => {
 
 /** Builds the chunk's props; `done` receives one mesh per material used, and the lights among them. */
 export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshes: THREE.Mesh[], lights: LightSpot[], chimneys: Top[]) => void, cover?: Partial<Record<PropMat, THREE.BufferGeometry>>): Generator<void, void> {
-  const c = mixRgb(STONE, region.biome.tint, 0.5);
+  const c = regionStone(region);
   const groups = new Map<PropMat, THREE.BufferGeometry[]>();
   for (const [m, geo] of Object.entries(cover ?? {}) as [PropMat, THREE.BufferGeometry][]) groups.set(m, [geo]);
   const lights: LightSpot[] = [];
+  const mirrors: MirrorSpot[] = []; // where the glass of a mirror stands, for the one that is drawn (mirrorView.ts; round 79)
   const chimneys: Top[] = []; // where smoke goes up
   const casters: THREE.BufferGeometry[] = []; // the bodies of the props, for the moon's shadow
   let spent = 0;
   for (const p of props) {
     const [s, cs] = [Math.sin(p.yaw), Math.cos(p.yaw)];
     for (const piece of p.kind === 'house' ? housePieces(p, c) : propPieces(p, c)) {
-      if (piece.mat !== 'glow' && piece.mat !== 'pane') groundShade(piece.geo, p.kind === 'house' ? 0.62 : 0.55, p.kind === 'house' ? 2.2 : 1.6); // darker toward the ground
+      if (!UNSHADED.has(piece.mat)) groundShade(piece.geo, p.kind === 'house' ? 0.62 : 0.55, p.kind === 'house' ? 2.2 : 1.6); // darker toward the ground
       const geo = piece.geo.rotateY(p.yaw).translate(p.x, p.y - 0.15, p.z);
       if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
+      if (piece.mat === 'mirror') {
+        const spot = planeOf(geo);
+        if (spot) mirrors.push(spot);
+      }
       groups.get(piece.mat)?.push(geo) ?? groups.set(piece.mat, [geo]);
       if (CASTS.has(piece.mat)) casters.push(geo);
       for (const [x, y, z] of piece.smoke ?? []) chimneys.push({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was, then placed
@@ -107,7 +121,10 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   const meshes: THREE.Mesh[] = [];
   for (const [m, geos] of groups) {
     for (const g of geos) if (!g.index) g.setIndex([...Array(g.getAttribute('position').count).keys()]); // merging needs all indexed or none
-    meshes.push(new THREE.Mesh(mergeGeometries(geos), material(m)));
+    const mesh = new THREE.Mesh(mergeGeometries(geos), propMaterial(m));
+    if (m === 'mirror' && mirrors.length) mesh.userData.mirrors = mirrors;
+    if (m === 'liquid' || m === 'glassware') mesh.renderOrder = m === 'liquid' ? 1 : 2; // the glass over what it holds
+    meshes.push(mesh);
     yield;
   }
   const shadow = shadowMesh(casters);

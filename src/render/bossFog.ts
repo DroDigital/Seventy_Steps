@@ -1,9 +1,9 @@
 /**
  * The fog before a horror (round 27; data/fogThemes.ts, world/gatePlan.ts): a wall of mist across the
- * doorway of a boss's room, or rising all round its ring in the open, in the weather of that place.
- * The investigator walks through it and the fight begins a few steps beyond. It thickens while the
- * fight holds them and is gone, dissolving over a few seconds, once every horror it keeps is slain.
- * A wall is made only when the camera is near. Render only.
+ * doorway of a boss's room, or (round 78: it was an opaque ring all round the fight) across the opening of an
+ * open arena's gate, behind its leaves, in the weather of that place. The investigator walks through it
+ * and the fight begins a few steps beyond. It thickens while the fight holds them and is gone,
+ * dissolving over a few seconds, once every horror it keeps is slain. A wall is made only when the camera is near. Render only.
  */
 
 import * as THREE from 'three';
@@ -89,9 +89,8 @@ const DISSOLVE = 3.5; // seconds a slain horror's fog takes to go
 /** How much of a wall shows `distance` metres off. */
 export const fogSeen = (distance: number): number => Math.min(1, Math.max(0, (FADE[1] - distance) / (FADE[1] - FADE[0])));
 
-/** The nearest distance from `p` to a wall (the doorway's middle, or the ring's circumference). */
-export const wallGap = (w: Pick<FogWall, 'kind' | 'x' | 'z' | 'radius'>, p: { x: number; z: number }): number =>
-  w.kind === 'ring' ? Math.abs(Math.hypot(p.x - w.x, p.z - w.z) - w.radius) : Math.hypot(p.x - w.x, p.z - w.z);
+/** The distance from `p` to a wall (the doorway's middle). */
+export const wallGap = (w: Pick<FogWall, 'x' | 'z'>, p: { x: number; z: number }): number => Math.hypot(p.x - w.x, p.z - w.z);
 
 /** A fog's material in `theme`: `centre` its middle (a swirl turns about it), `foot` and `height` its wall's (the default shader's). */
 export function fogMaterial(theme: FogTheme, centre: { x: number; y: number; z: number }, foot: number, height: number, frag = FRAG): THREE.ShaderMaterial {
@@ -127,17 +126,16 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
   g.events.on('FogPassing', (e) => void audio.recipe('mist:pass', mistPass(e.frames / 60), { gain: CLASS_GAIN.mist, vary: 0.6 })); // the sound is the walk through: as long as it is
   g.events.on('FogPassed', (e) => {
     const b = walls.find((w) => w.w.id === e.wall);
-    if (b) burst(b, e); // it closes behind them
+    if (b) burst(b); // it closes behind them
   });
   let last = -1;
   const seed = { v: 11 };
   const rand = (): number => (seed.v = (seed.v * 16807) % 2147483647) / 2147483647;
   const make = (b: Wall): THREE.Mesh => {
     const { w } = b;
-    const geo = w.kind === 'ring' ? new THREE.CylinderGeometry(w.radius, w.radius, w.height, Math.max(48, Math.round(w.radius * 2)), 1, true).translate(0, w.height / 2, 0) : new THREE.PlaneGeometry(w.width, w.height).translate(0, w.height / 2, 0);
-    const mesh = new THREE.Mesh(geo, materialOf(w, b.theme));
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w.width, w.height).translate(0, w.height / 2, 0), materialOf(w, b.theme));
     mesh.position.set(w.x, w.y, w.z);
-    mesh.rotation.y = w.kind === 'ring' ? 0 : w.yaw;
+    mesh.rotation.y = w.yaw;
     mesh.frustumCulled = false;
     mesh.renderOrder = 2;
     scene.add(mesh);
@@ -173,19 +171,12 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
           u.uPart.value.set(me.x, g.world.ground(me.x, me.z) + 1.1, me.z, opening);
           if (k > 0.1 && k < 0.9) eddy(b, me, dt);
         } else u.uPart.value.w = 0;
-        if (me && engaged && !b.engaged && near < 40) burst(b, me); // it has woken: the fog is crossed
+        if (engaged && !b.engaged && near < 12) burst(b); // it has woken: the fog is crossed
         b.engaged = engaged;
-        if (b.mesh.visible && me && near < 30 && !slain && !engaged) seep(b, me, dt);
+        if (b.mesh.visible && me && near < 30 && !slain && !engaged) seep(b, dt);
       }
     },
   };
-
-  /** The point of a wall nearest `me`. */
-  function nearest(w: FogWall, me: { x: number; z: number }): [number, number] {
-    if (w.kind === 'doorway') return [w.x, w.z];
-    const a = Math.atan2(me.x - w.x, me.z - w.z);
-    return [w.x + Math.sin(a) * w.radius, w.z + Math.cos(a) * w.radius];
-  }
 
   /** A mote: mist low down, or a spark higher up, where the wall is. */
   function mote(b: Wall, x: number, z: number, spark: boolean, rise: number): void {
@@ -195,12 +186,11 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
   }
 
   /** Motes that seep off a wall near the investigator. */
-  function seep(b: Wall, me: { x: number; z: number }, dt: number): void {
+  function seep(b: Wall, dt: number): void {
     b.owed += dt * (b.theme.sparks ? 16 : 9);
     for (; b.owed >= 1; b.owed--) {
-      const [cx, cz] = nearest(b.w, me);
-      const s = (rand() - 0.5) * (b.w.kind === 'ring' ? 12 : b.w.width);
-      const [x, z] = b.w.kind === 'ring' ? [cx + Math.cos(Math.atan2(me.x - b.w.x, me.z - b.w.z)) * s, cz - Math.sin(Math.atan2(me.x - b.w.x, me.z - b.w.z)) * s] : [cx + Math.cos(b.w.yaw) * s, cz - Math.sin(b.w.yaw) * s];
+      const s = (rand() - 0.5) * b.w.width;
+      const [x, z] = [b.w.x + Math.cos(b.w.yaw) * s, b.w.z - Math.sin(b.w.yaw) * s];
       mote(b, x, z, !!b.theme.sparks && rand() < b.theme.sparks.share, 0.5);
     }
   }
@@ -216,9 +206,8 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
   }
 
   /** The fog is crossed and the horror wakes: a billow of it where the investigator came through, and a low sound. */
-  function burst(b: Wall, me: { x: number; z: number }): void {
-    const [cx, cz] = nearest(b.w, me);
-    for (let i = 0; i < 46; i++) mote(b, cx + (rand() - 0.5) * (b.w.kind === 'ring' ? 10 : b.w.width), cz + (rand() - 0.5) * 3, !!b.theme.sparks && rand() < b.theme.sparks.share * 1.4, 1.4);
+  function burst(b: Wall): void {
+    for (let i = 0; i < 46; i++) mote(b, b.w.x + (rand() - 0.5) * b.w.width, b.w.z + (rand() - 0.5) * 3, !!b.theme.sparks && rand() < b.theme.sparks.share * 1.4, 1.4);
     audio.recipe('mist:close', MIST_CLOSE, { gain: CLASS_GAIN.mist, vary: 0.6 }); // the wall closes behind them...
     audio.sample('rumble', { gain: 0.3, pitch: 0.62 }); // ...and the horror stirs
   }

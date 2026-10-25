@@ -10,9 +10,14 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   anchors  [(x, y, z)]: where a flame or a light sits in the finished model (its own frame, feet at the origin); `anchor_of` finds one from the
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
+  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default), 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py) or
+           'web' (webIndex.ts, webPack.ts: parts taken from free web sources, manifest_web.py)
+  metal_luma  faces darker than this (0..1) are made `metal`, whatever the material said: the iron straps of a plank door
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
+  join     the objects it selects are made one before anything else (a model a viewer split at its vertex limit); `cap`: a `cut` is closed with triangles
+  glass_alpha, fill, plane   what is clear, wet or silvered (round 79): see the fields
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
-           out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature
+           out the faces of the materials it names; `decimate` reduces each object toward that many triangles; `pose` {bone: (rx, ry, rz)} poses an armature; `drop_alpha` leaves out the faces whose texture is mostly clear
 """
 from dataclasses import dataclass, field
 from typing import Any
@@ -28,7 +33,7 @@ class M:
     rot: float = 0
     cls: Any = None
     classes: dict = field(default_factory=dict)
-    double: tuple = (S.CLOTH, S.LEAF)
+    double: tuple = (S.CLOTH, S.LEAF, S.GLASS, S.LIQUID)  # classes drawn on both sides (a thin shell is seen from within)
     round: bool = False
     solids: Any = 'box'
     bands: tuple = (0.9, 2.2)
@@ -37,6 +42,10 @@ class M:
     drop: Any = None
     cut: Any = None
     decimate: int = 0
+    drop_alpha: float = 0.0  # the faces of a texture clearer than this (the glass of a jar) are left out
+    glass_alpha: float = 0.0  # ... or kept, as glass (round 79: class GLASS, drawn clear with a sheen)
+    fill: Any = None  # a liquid the glass holds: {'level': 0.5, 'inset': 0.9, 'colour': (r, g, b)} (fill.py), class LIQUID
+    plane: Any = None  # the faces of a flat panel made a mirror: {'axis': 2, 'sign': 1, 'at': 0.007, 'tol': 0.0006} in the source's own frame, class MIRROR (fill.py)
     squash: tuple = (1, 1, 1)
     pose: Any = None
     textures: tuple = ()
@@ -45,7 +54,12 @@ class M:
     rx: float = 0  # degrees: the source tipped about x (its top toward +z) and about z (its top toward -x), before it is turned about the vertical
     rz: float = 0
     recolour: Any = None  # (r, g, b): every face's colour taken from this by its own light and dark (a colony's painted metal made a pale stone)
+    recolour_not: tuple = ()  # classes the recolour leaves as they were (the glazing of a still of copper)
     args: dict = field(default_factory=dict)  # a `proc:` form's arguments (tools/models/boss/proc.py)
+    set: str = 'boss'
+    metal_luma: float = 0
+    join: bool = False
+    cap: bool = False
     blank: Any = None  # a figure's head taken off at the bone of this name and an eyeless egg set in its place: {'bone': 'head', 'radii': (x, y, z)}
 
 REGISTRY: list = []

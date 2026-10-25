@@ -13,6 +13,7 @@ import { modelLantern } from './modelLantern';
 import { LANTERN_MODELS } from '../world/lanternModels';
 import { ashlar, colonnade, crystal, dam, cliff, grove, hedge, kerb, slabs as slabWall, spill, terrace } from './setShapesHouse';
 import { gatehouse, keep } from './setShapesKeep';
+import { bookcase, bookcaseLow, bookpile, bookshelf } from './setShapesBooks';
 import { banner, idol, meteor, pipes } from './setShapesRelic';
 import { hornTree, skullPole, totem } from './setShapesRite';
 import { hexped, pylon, slab, sphinx, trilith, ziggurat } from './setShapesStone';
@@ -32,6 +33,7 @@ function flame(p: Prop, [x, y, z]: readonly [number, number, number], size = 0.3
 const KITS: Readonly<Record<string, (p: Prop, c: Rgb) => Piece[]>> = {
   totem, skull_pole: skullPole, horn_tree: hornTree,
   pylon, sphinx, trilith, ziggurat, slab, hexped, idol, pipes, banner, meteor,
+  bookcase, bookcase_low: bookcaseLow, bookshelf, bookpile, // round 79: a reading room's furniture
   house_ashlar: ashlar, house_dam: dam, house_cliff: cliff, house_grove: grove, house_colonnade: colonnade, house_hedge: hedge, house_slabs: slabWall, house_crystal: crystal, house_terrace: terrace, // round 63: the walls of a house, and its towers
   house_tower_square: towerSquare, house_tower_round: towerRound, house_tower_spire: towerSpire, house_tower_horn: towerHorn,
   house_keep: keep, house_gatehouse: gatehouse, // round 67: a walled court's keep, and the span over its gate

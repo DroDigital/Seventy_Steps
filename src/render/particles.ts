@@ -9,14 +9,16 @@
  */
 
 import * as THREE from 'three';
+import { FLAME_ATLAS, PUFF_CELLS } from '../data/flameAtlas';
+import { flameAtlasTexture } from './flames';
 import type { Rgb } from './palette';
 import { LANTERN_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
 export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a crowd took the oldest away mid-flight)
 
-/** Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
-export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note'] as const;
+/** Round 79 added the smoke's puff (a free smoke sprite, data/flameAtlas.ts). Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
+export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
 
 export interface ParticleSpec {
@@ -40,7 +42,7 @@ export interface ParticleSpec {
   rot?: number; // radians at birth
   stretch?: number; // a streak's length, in sizes per m/s of its speed (default 0.12), at least one size
   hold?: number; // the share of its life it keeps its full alpha before it fades (default 0)
-  thick?: number; // a ring's thickness, a share of its radius (default 0.18)
+  thick?: number; // a ring's thickness, a share of its radius (default 0.18); a puff's, which of its four pictures (0 to just under 1)
   floor?: number; // the height of the ground under it: it lands there, bounces a little and comes to rest, not falling through (round 60)
   bounce?: number; // the share of its fall it keeps as it springs up again (default 0.3)
 }
@@ -105,6 +107,7 @@ void main() {
 const FRAG = /* glsl */ `
 uniform vec3 uFogColor;
 uniform float uFogAmount;
+uniform sampler2D uPuffs;
 varying vec2 vUv;
 varying vec4 vColor;
 varying vec3 vLight;
@@ -172,6 +175,12 @@ float mask(vec2 q) {
     float flag = (1.0 - smoothstep(0.06, 0.11, abs(q.y - 0.66 + q.x * 0.75))) * step(0.0, q.x) * step(q.x, 0.46);
     return max(head, max(stem, flag));
   }
+  if (shape == 14) { // a puff of smoke: a free sprite's ragged cloud, one of four, its coverage a dithered edge
+    float k = floor(clamp(vShape.y, 0.0, 0.999) * ${PUFF_CELLS.at.length}.0);
+    vec2 uv = clamp(q * 0.5 + 0.5, 0.0, 1.0);
+    vec2 px = vec2(k * ${PUFF_CELLS.w}.0 + uv.x * ${PUFF_CELLS.w}.0, ${PUFF_CELLS.at[0][1]}.0 + (1.0 - uv.y) * ${PUFF_CELLS.h}.0);
+    return texture2D(uPuffs, px / vec2(${FLAME_ATLAS.width}.0, ${FLAME_ATLAS.height}.0)).g * (1.0 - smoothstep(0.82, 1.0, r));
+  }
   return 1.0 - smoothstep(0.35, 1.0, r); // a disc
 }
 void main() {
@@ -207,7 +216,7 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
   geo.setAttribute('aGlow', glows);
   geo.setAttribute('aShape', shapes);
   geo.setAttribute('aVel', vels);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms }, vertexShader: VERT, fragmentShader: FRAG });
+  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() } }, vertexShader: VERT, fragmentShader: FRAG });
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;

@@ -7,6 +7,7 @@
 import type { XZ } from '../core/geom';
 import type { HiddenPieceDef } from '../data/arena';
 import { HOUSE, type House } from '../data/arenaHouses';
+import { GATE_STYLES } from '../data/gateStyles';
 import type { Prop, SetLook } from './props';
 
 /** The half breadth of a tower at its foot. */
@@ -29,8 +30,14 @@ export function tower(h: House, y: number, x: number, z: number, yaw: number, he
   return { kind: 'set', x, y, z, w: half, d: half, h: height, yaw, seed, set: look };
 }
 
-/** The gate: a hidden piece (data/arena.ts) whose seal stands until the horror has been found, and then draws aside. `alongX`: the wall runs along x at the gate. */
-export function gatePiece(h: House, boss: string, gate: XZ, y: number, alongX: boolean): HiddenPieceDef {
+/**
+ * The gate: a hidden piece (data/arena.ts) whose seal stands until the horror has been found, and then opens (round 76: its leaves are its
+ * horror's, data/gateStyles.ts). `front`: the way out of the gate, which says which way the wall runs (along x at a gate that faces north or
+ * south) and which side of it the investigator comes from.
+ */
+export function gatePiece(h: House, boss: string, gate: XZ, y: number, front: XZ): HiddenPieceDef {
+  const alongX = Math.abs(front.z) > 0.5;
+  const out = (alongX ? front.z : front.x) >= 0 ? 1 : -1; // (the door's own v runs along the world's z, or its x)
   const open = h.gate.width / 2 + HOUSE.lap; // the seal reaches to the towers, which lap over it
   const [hw, hd] = alongX ? [open, h.thick / 2] : [h.thick / 2, open];
   return {
@@ -40,6 +47,6 @@ export function gatePiece(h: House, boss: string, gate: XZ, y: number, alongX: b
     glow: h.glow ?? 'purple',
     boxes: [],
     seal: { boxes: [[0, 0, hw, hd, y - 0.3, y + h.gate.height]], look: h.gate.sealed ? 'sealed' : 'wall' },
-    door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y, look: h.gate.look },
+    door: { alongX, width: h.gate.width, height: h.gate.height, thick: h.thick, y, ...(GATE_STYLES[boss] && { style: boss, out }) },
   };
 }

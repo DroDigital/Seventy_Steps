@@ -1,12 +1,14 @@
 /** World materials: one shared uniform set (updated once per frame) + a procedural texture each. */
 
 import * as THREE from 'three';
+import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
 import { generateTexture, TEXTURE_SIZE, UV_PER_TEXTURE, type TextureKind } from './textures';
+import { trample } from './trample';
 import { wetness } from './wetness';
 
 const v3 = (c: Vec3): THREE.Vector3 => new THREE.Vector3(c[0], c[1], c[2]);
@@ -43,6 +45,11 @@ export const worldUniforms = {
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },
+  uMirrorMap: { value: null as THREE.Texture | null }, // the room drawn from behind the mirror nearest, the matrix to it, its plane, and whether it is drawn (mirrorView.ts; round 79)
+  uMirrorMat: { value: new THREE.Matrix4() },
+  uMirrorPlane: { value: new THREE.Vector4(0, 1, 0, 0) },
+  uMirrorOn: { value: 0 },
+  uMirrorGain: { value: 3 }, // a dim room is dimmer still in a mirror, and a mirror that shows nothing reads as a hole: what it shows is lifted
   uLampSlot: { value: Array.from({ length: LAMP_SLOTS }, () => -1) }, // the lamp shadow map each lamp has, or -1 (lampShadows.ts; round 35)
   uLSMap: { value: [null, null, null] as (THREE.Texture | null)[] },
   uLSView: { value: [new THREE.Matrix4(), new THREE.Matrix4(), new THREE.Matrix4()] },
@@ -79,6 +86,16 @@ export const worldUniforms = {
   uLShadow: { value: new THREE.Vector4() }, // strength (0: none), a texel, the bias, the offset
   uLSlab: { value: new THREE.Vector4() }, // the seat back that hides the driver's lantern from what lies behind it: half-width (0: none), low edge, high edge, the plane's z, in its own frame (round 57: mountViews.ts)
   uLSlabInv: { value: new THREE.Matrix4() }, // and the world to that frame
+  // Round 80, the coats of the land (data/coats.ts, render/coat.ts): what lies on the stones of the realm, in the world shader
+  uCoatCol: { value: new THREE.Vector3(1, 1, 1) }, // the matter that lies on what faces up and into the wind (snow, sand, soot, slime)
+  uCoatStain: { value: new THREE.Vector3(1, 1, 1) }, // what a stained surface's colour is multiplied by (brine, slime)
+  uCoatA: { value: new THREE.Vector4() }, // how much of what faces up, of what faces the wind and of what lies below the line it covers; and the share of the coat there now (0: none, the shader skips it)
+  uCoatLine: { value: new THREE.Vector4() }, // the stain's line (metres, absolute), how it thins above it, how the line wanders, how pale the salt on it is
+  // Round 80, the ground answers the body (render/bodyPush.ts): the bodies that part the grass, the lane laid down behind them, and the boots ringing a puddle
+  uBodies: { value: Array.from({ length: BODY_PUSH.slots }, () => new THREE.Vector4(0, -1e4, 0, 0)) }, // x, y (feet), z, radius; a far one with none parts nothing
+  uTrample: { value: trample.texture }, // the field of laid-down stems (render/trample.ts)...
+  uTrampleBox: { value: new THREE.Vector4(0, 0, 1, 0) }, // ...the cell at its centre, 1 / the cell's metres, the half-width in cells (0: none)
+  uStep: { value: Array.from({ length: FOOT_RINGS.slots }, () => new THREE.Vector4(0, 0, -100, 0)) }, // x, z, the time a boot landed, its strength
 };
 
 export interface WorldMaterialOptions {
@@ -103,6 +120,14 @@ export interface WorldMaterialOptions {
   shore?: boolean; // the ground is washed by the sea where it meets it: a wet band and lace of foam, breathing with the swell (round 30)
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
+  coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
+  surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
+}
+
+/** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass (nor a mirror, liquid or wax: `surface`), not the ground, the plants or the flesh. */
+export function coatable(o: WorldMaterialOptions): boolean {
+  const vary = o.vary ?? 0;
+  return !!o.vertexColors && vary > 0 && vary < 0.9 && !o.emissive && !o.character && !o.shore && !o.panes && !o.surface && (o.opacity ?? 1) >= 1 && o.texture !== 'grass' && o.texture !== 'flesh' && o.texture !== 'water';
 }
 
 const textures = new Map<string, THREE.DataTexture>();
@@ -153,15 +178,16 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
       uEldritch: { value: o.eldritch ?? 0 },
       uBodyScale: { value: o.bodyScale ?? 1 },
       uGhost: { value: 0 },
+      uCoatOn: { value: (o.coat ?? coatable(o)) ? 1 : 0 },
     },
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
     vertexColors: o.vertexColors ?? false,
-    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }) },
+    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
   });
   if (o.opacity !== undefined && o.opacity < 1) {
     Object.assign(material, {
-      transparent: true, depthWrite: false, side: THREE.DoubleSide, forceSinglePass: true,
+      transparent: true, depthWrite: false, side: o.surface ? THREE.FrontSide : THREE.DoubleSide, forceSinglePass: true, // (a model's thin shells are baked with both faces)
       blending: THREE.CustomBlending, blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
       // The target's alpha marks creatures and anomaly colours for the post pass: glass must preserve it.
       blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,

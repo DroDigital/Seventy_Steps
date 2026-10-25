@@ -84,6 +84,7 @@ export const SETTINGS = {
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   camera: [0, 3, 1, 0], // how the camera hangs (round 77): 0 Classic, the default; 1 Low hero; 2 Long lens; 3 Tight shoulder (data/cameraModes.ts)
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
+  quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
   // player had found, and before it the volume was 0.7 and the others 1)
@@ -240,6 +241,12 @@ export const LIGHTS = {
   haloReach: 120, // metres: the farthest a halo is drawn (round 32: was 75; a town's windows are seen lit from across the fields)
   haloFog: 0.55, // halos pierce the fog: they fade by only this share of it
   paneHalo: 0.55, // metres: a lit window's glow, on its glass (round 13; the window kind's halo was a ball before the wall)
+  flameReach: 70, // metres: the farthest a flame's pixels are drawn (round 79: render/flames.ts; beyond it the halo is all that is seen of a fire)
+  flames: {
+    torch: { height: 0.5, base: -0.2, count: 1, spread: 0 }, // a flame: its height, how far under the light it stands, how many of them make the fire and how far about it
+    lamp: { height: 0.22, base: -0.1, count: 1, spread: 0 },
+    fire: { height: 1.05, base: -0.45, count: 4, spread: 0.28 },
+  } as Partial<Record<LightKind, { height: number; base: number; count: number; spread: number }>>,
   sight: { perFrame: 10, pull: 0.1, lift: 0.4, rise: 12, fall: 16, forget: 1 }, // what the eye sees of them (render/lightSight.ts, round 37): lights looked at a frame, the metres before a light and above it that the ray is sent to, the share's ease in and out (a second), and the seconds out of reach before one starts afresh
   lantern: { color: [1, 0.82, 0.58] as Vec3, halo: 0.34, haloGain: 0.6 }, // the investigator's own, which lights by its own rules (lantern.ts)
   kinds: {

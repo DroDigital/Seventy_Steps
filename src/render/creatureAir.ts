@@ -43,9 +43,9 @@ export function createCreatureAir(g: Game, particles: Particles): CreatureAir {
       for (const [id, body] of c.body) {
         const tr = c.transform.get(id);
         if (!tr) continue;
-        const me = id === g.player.id;
-        const def = me ? undefined : defOf(g, id);
-        if (!me && (!c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden' || def?.sprite?.silhouette === 'spectre' || def?.sprite?.outside)) continue;
+        if (id === g.player.id) continue; // (the investigator's own breath and puffs are round 80's: render/atm/steps.ts, render/coldBreath.ts)
+        const def = defOf(g, id);
+        if ((!c.model.has(id) || c.model.get(id)!.startsWith('fx:') || isAbsent(g, id) || isUnseen(g, id) || c.dead.has(id) || c.brain.get(id)?.state === 'hidden' || def?.sprite?.silhouette === 'spectre' || def?.sprite?.outside)) continue;
         const [x, z] = [tr.prev.x + (tr.pos.x - tr.prev.x) * alpha, tr.prev.z + (tr.pos.z - tr.prev.z) * alpha];
         const d = Math.hypot(x - at.x, z - at.z);
         const big = Math.min(3, Math.max(0.5, body.height / 1.8));

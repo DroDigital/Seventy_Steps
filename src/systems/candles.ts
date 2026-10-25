@@ -1,6 +1,7 @@
 /**
- * The candles before the fog (round 45; Elden Ring's Stakes of Marika, in the dream's own terms): before the fog
- * of each horror, on the way in, a stub of tallow stands in a saucer ringed in chalk, left by an earlier sleeper. Pass
+ * The candles by the fog (round 45; Elden Ring's Stakes of Marika, in the dream's own terms): by the fog
+ * of each horror, on the way in (round 78: before a hall's doorway, and a few steps inside an open arena's gate, past its mist),
+ * a stub of tallow stands in a saucer ringed in chalk, left by an earlier sleeper. Pass
  * near and it takes the flame (nothing is pressed). A lit candle is a place to rise: fall within its reach and you
  * may wake there, a few steps from the fog, instead of at the Elder Sign a long way back (a screen asks which: ui/riseMenu.ts). It gives no rest (only an Elder
  * Sign does: levels, doses, the creatures come back as on any death), and the map's travel is still there to carry

@@ -1,5 +1,5 @@
 /**
- * What a great one gives the picture (round 81; render/bossPresence.ts, render/footfalls.ts, render/creatureAura.ts,
+ * What a great one gives the picture (round 81; render/bossPresence.ts, render/bossFootfalls.ts, render/creatureAura.ts,
  * data/creatureAura.ts, core/pace.ts voiceLevel): how deep in its fight it is, how loud its voice is, the dust and
  * jolt of its stride, and the twelve recipes of what it lets go of, in the anomaly hues only.
  */
@@ -11,7 +11,7 @@ import { SIM } from '../src/data/tuning';
 import { TIERS } from '../src/data/schema';
 import { createBossPresence } from '../src/render/bossPresence';
 import { auraRate, createCreatureAura } from '../src/render/creatureAura';
-import { createFootfalls } from '../src/render/footfalls';
+import { createBossFootfalls } from '../src/render/bossFootfalls';
 import { ANOMALY, scaleRgb } from '../src/render/palette';
 import type { Particles, ParticleSpec } from '../src/render/particles';
 import { spawnCreature } from '../src/systems/creatures';
@@ -93,7 +93,7 @@ describe('a colossus\'s footfalls', () => {
     g.ecs.c.fight.get(id)!.engaged = true; // roused: a horror that is not is not drawn
     const p = particles();
     const jolts: number[] = [];
-    const feet = createFootfalls(g, p.sink, (_at, strength) => void jolts.push(strength));
+    const feet = createBossFootfalls(g, p.sink, (_at, strength) => void jolts.push(strength));
     const tr = g.ecs.c.transform.get(id)!;
     const body = g.ecs.c.body.get(id)!;
     const step = (speed: number): void => {

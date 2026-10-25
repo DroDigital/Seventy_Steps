@@ -86,7 +86,8 @@ describe('the mist shader', () => {
     expect(FOG_GLSL).toMatch(/uniform vec4 uWakeInfo\[8\]/);
     expect(FOG_GLSL).toMatch(/uWakeCount > 0 && low > 1e-4 \? wakeAt\(p\)/);
     expect(FOG_GLSL).toMatch(/low \*= 1\.0 - wake\.x/);
-    expect(FOG_GLSL).toMatch(/uFogDrift\.x \+ wake\.y/);
+    expect(FOG_GLSL).toMatch(/wind\.x \+ wake\.y/); // (both layers of noise: the banks' and round 80's quicker wisps)
+    expect(FOG_GLSL).toMatch(/fast\.x \+ wake\.y/);
     expect(WAKE_SLOTS).toBe(MIST_WAKES.slots);
   });
 });

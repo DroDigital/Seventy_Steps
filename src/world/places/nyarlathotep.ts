@@ -58,6 +58,9 @@ export const nyarlathotep: PlaceFn = (c: Court, h: House) => {
     c.add('px_obelisk', G + 6, side * (gate + 7.5), { ...BASALT, s: 1.3, face: 'front' });
   }
 
+  // beyond the back of the wall, two black pyramids, on the ground levelled for it (web part wk_pyramid, docs/WEB_PARTS.md)
+  for (const deg of [152, 208]) c.add('wk_pyramid', Math.cos((deg * Math.PI) / 180) * (G + 11), Math.sin((deg * Math.PI) / 180) * (G + 11), { ...BASALT, s: 0.55, face: 'in', y: -1.5, walk: true });
+
   // sparks up the rods; ash across the floor; a small cold light at the gate
   for (const cc of [-12, -8, 8, 12]) c.emit({ at: [back + 1.5, cc], y: [1, 14], r: 0.6, rate: 5, life: [1.2, 2.4], size: [0.1, 0.2], colour: [0.78, 0.78, 1], alpha: 0.9, rise: 7, drift: 0.2, shape: 'spark', glow: true, reach: 140 });
   c.emit({ at: [0, 0], y: [0.3, 5], r: c.R + 6, rate: 5, life: [5, 9], size: [0.12, 0.22], colour: [0.5, 0.46, 0.58], alpha: 0.5, rise: -0.3, drift: 0.6, flow: { x: 0.5, z: 0.2 }, shape: 'spark', reach: 140 });

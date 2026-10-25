@@ -45,7 +45,6 @@ export interface DoorKit {
   slabGlow: THREE.BufferGeometry; // an outline of the door and its eye, on the slab's faces: the passage awake but shut
   width: number; // the opening
   height: number;
-  lift?: number; // round 68: the slab goes up (or, negative, down) this many metres instead of into the wall (render/gateLooks.ts)
 }
 
 /** A hidden doorway. `sealed` (Kadath's door, shut on the seals): the slab is cut stone, not wall. */

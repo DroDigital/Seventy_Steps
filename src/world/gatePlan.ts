@@ -1,9 +1,12 @@
 /**
  * Where the doors and the fog stand (round 27): a door in each doorway of a dungeon whose kit has
  * one (data/doors.ts), except a boss room's doorways, which are given fog instead (data/fogThemes.ts),
- * as is the ring of each arena in the open. A boss room's doors and an open ring share one list of
- * walls, each naming the spawn ids of the horrors it keeps: the fog is gone when every one is
- * slain. Hidden doors have their own seals and are left alone. Pure: no Three.js.
+ * as is the gate of each arena in the open (round 78: it was a ring of fog about the fight, an opaque
+ * wall that hid the place and the gate it stood in; now the mist stands in the gate's opening, on the
+ * court's side of the leaves, and the ring is only the line at which a sleeping horror wakes, `Wake`).
+ * A boss room's doors and an open gate share one list of walls, each naming the spawn ids of the
+ * horrors it keeps: the fog is gone when every one is slain. Hidden doors have their own seals and
+ * are left alone. Pure: no Three.js.
  */
 
 import { hash2 } from '../core/rng';
@@ -32,23 +35,32 @@ export interface DoorSpec {
 
 export interface FogWall {
   id: string;
-  kind: 'doorway' | 'ring';
-  x: number; // a doorway's centre, or a ring's
+  x: number; // the doorway's centre
   z: number;
   y: number;
-  yaw: number; // a doorway's (local +z through it)
-  width: number; // a doorway's
-  radius: number; // a ring's
+  yaw: number; // local +z runs through it, into the room or the court beyond
+  width: number;
   height: number;
   theme: FogThemeId;
   region: string;
   bosses: string[]; // roster ids
   spawns: string[]; // `boss:<id>`: slain for good, the wall is gone
-  stake: { x: number; z: number; yaw: number }; // where the fallen wake, before the fog on the way in, looking at it (round 45: systems/candles.ts)
+  stake: { x: number; z: number; yaw: number }; // where the fallen wake: before a hall's fog on the way in, looking at it; in an open arena's court, a few steps past the gate's mist, looking at the arena (round 45: systems/candles.ts)
   candle: CandleSpot; // where its candle stands: aside the stake, at the way's edge (round 62: world/candlePlan.ts)
+  gate?: string; // an open arena's: the hidden piece (the house's gate) whose opening it stands in, which E passes only once it has opened (systems/fogGates.ts)
 }
 
-const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, ring: STAKE.ring, ringMin: 6, ringMax: 16, stake: 6.5, ringStake: STAKE.past };
+/** The line at which a sleeping horror of the open world wakes (round 78: the ring the fog stood on, now unseen): nothing it keeps sees or hears across it until it is roused. */
+export interface Wake {
+  id: string;
+  x: number;
+  z: number;
+  radius: number;
+  bosses: string[];
+  spawns: string[];
+}
+
+const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, wake: STAKE.ring, stake: 6.5, past: STAKE.past, behind: 1.6, gateWidth: 9 };
 
 /** A doorway's yaw: through it, from the room `a` into the room `b` (or out). */
 const yawOf = (d: DoorLayout): number => yawOfDir(d.side);
@@ -76,7 +88,7 @@ function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[
       const [sx, sz] = spots.find(([x, z]) => roomAt(L, x, z) !== undefined && roomAt(L, x, z) !== boss && free(parts, x, z, d.level)) ?? spots[0]; // not over a pit or against a pillar
       const stake = { x: sx, z: sz, yaw: Math.atan2(-vx, -vz) };
       const candle = hallCandle(L, parts, boss, { x: d.x, z: d.z }, { x: ux, z: uz }, d.level, stake);
-      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, kind: 'doorway', x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, radius: 0, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
+      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
       return;
     }
     const look = doorLook(kitIdOfRoom(L, room));
@@ -89,20 +101,28 @@ function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[
 export interface GatePlan {
   doors: DoorSpec[];
   fogs: FogWall[];
+  wakes: Wake[];
 }
 
-/** Every door and every fog wall of the world. */
+/** Every door and every fog wall of the world, and the lines at which the horrors of the open wake. */
 export function gatePlan(w: WorldLayout): GatePlan {
-  const [doors, fogs]: [DoorSpec[], FogWall[]] = [[], []];
+  const [doors, fogs, wakes]: [DoorSpec[], FogWall[], Wake[]] = [[], [], []];
   for (const d of w.dungeons) dungeonGates(d.layout, d.parts, doors, fogs);
   w.arenas.forEach((a, i) => {
     const bosses = [...a.bosses];
-    const radius = a.radius + FOG.ring;
+    const id = `ring:${i}:${bosses[0]}`; // (the id it had as a ring of fog: lit candles are saved under it)
+    const radius = a.radius + FOG.wake;
     const [sx, sz] = [a.front.x, a.front.z]; // toward the nearest Elder Sign of its realm: the way a person comes (arenaFront.ts)
-    const reach = radius + FOG.ringStake;
+    const reach = radius + FOG.past;
     const stake = a.house?.stake ?? { x: a.x + sx * reach, z: a.z + sz * reach, yaw: Math.atan2(-sx, -sz) }; // an enclosure says where the fallen wake: inside its wall
     const candle = ringCandle(a, stake, a.front, a.house);
-    fogs.push({ id: `ring:${i}:${bosses[0]}`, kind: 'ring', x: a.x, z: a.z, y: a.y, yaw: 0, width: 0, radius, height: a.house?.fogHeight ?? Math.min(FOG.ringMax, Math.max(FOG.ringMin, radius * 0.22)), theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
+    const spawns = bosses.map((b) => `boss:${b}`);
+    wakes.push({ id, x: a.x, z: a.z, radius, bosses, spawns });
+    const door = a.house?.piece.door;
+    const into = { x: -sx, z: -sz }; // through the gate, into the court
+    const at = a.house?.gate ?? { x: a.x + sx * radius, z: a.z + sz * radius };
+    const behind = door ? Math.max(0, Math.min(FOG.behind, door.thick / 2 - 0.25)) : 0; // on the court's side of the leaves, still within the wall's thickness, so there is no walking round it
+    fogs.push({ id, x: at.x + into.x * behind, z: at.z + into.z * behind, y: door?.y ?? a.y, yaw: Math.atan2(into.x, into.z), width: (door?.width ?? FOG.gateWidth) + 0.4, height: (door?.height ?? FOG.doorHeight) + 0.1, theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns, stake, candle, ...(a.house && { gate: a.house.piece.name }) });
   });
-  return { doors, fogs };
+  return { doors, fogs, wakes };
 }
