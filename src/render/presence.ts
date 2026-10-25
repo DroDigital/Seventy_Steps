@@ -32,6 +32,8 @@ const GRIT = [0.3, 0.29, 0.27] as const;
 export interface Presence {
   /** Each drawn frame: trembles the camera, and lets loose what a landing blow throws up. */
   update(camera: THREE.Camera, time: number): void;
+  /** The camera's jolt from a blow of `strength` metres at `p`, felt within `reach` metres and less the farther (round 78: a colossus's footfall). */
+  felt(p: V3, strength: number, reach: number): void;
 }
 
 export function createPresence(g: Game, particles: Particles, audio: GameAudio): Presence {
@@ -77,6 +79,7 @@ export function createPresence(g: Game, particles: Particles, audio: GameAudio):
   g.events.on('WayOmen', ({ shake }) => void (shake > 0 && ([jolted, at] = [Math.max(jolted, shake), clock]))); // and under a trail's omens (round 62)
   g.events.on('Quaked', ({ by }) => void (g.ecs.c.transform.has(by) && land(by, clock, 0.3)));
   return {
+    felt,
     update(camera, time) {
       clock = time;
       if (!g.overworld && !g.ecs.c.fight.size) return;

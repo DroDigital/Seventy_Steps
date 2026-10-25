@@ -236,3 +236,13 @@ describe('round 58: a failing mind\'s picture is flow at the edges, a lens, a se
     expect(mad.ghost).toBeGreaterThan(0);
   });
 });
+
+describe('the creatures a failing mind sees slip (round 78: `mind`)', () => {
+  it('is nothing while lucid, whole at the warp\'s cap, never past it, and gone when the warp or the cap are', () => {
+    expect(computeFx(state(100)).mind).toBe(0);
+    expect(computeFx(state(0)).mind).toBeCloseTo(1, 5);
+    expect(computeFx(state(30)).mind).toBeGreaterThan(computeFx(state(60)).mind);
+    expect(computeFx(state(0, 0)).mind).toBe(0);
+    expect(computeFx({ ...state(0), enabled: { ...allEffectsOn(), warp: false } }).mind).toBe(0);
+  });
+});

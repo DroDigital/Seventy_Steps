@@ -65,6 +65,7 @@ export interface FxParams {
   detune: number; // cents
   wobble: number; // cents of drift around the detune
   distortion: number; // 0..1
+  mind: number; // 0..1: how far the creatures slip, a texel or two at a time, and their eyes swell (round 78: the warp's onset; shaders/sprite.ts)
 }
 
 /** The FxParams fields each effect drives (the sanity slider moves all but the STEADY ones'). */
@@ -75,7 +76,7 @@ export const EFFECT_PARAMS: Record<EffectId, readonly (keyof FxParams)[]> = {
   fog: ['fogNear', 'fogFar'],
   isolate: ['desaturate', 'anomalyStress'],
   quantize: ['ditherSpread'],
-  warp: ['ripple', 'chroma', 'ghost', 'tear', 'shock'],
+  warp: ['ripple', 'chroma', 'ghost', 'tear', 'shock', 'mind'],
   displace: ['displace'],
   lens: ['fovBreatheDeg', 'skew'],
   dread: ['blur', 'strange'],
@@ -143,6 +144,7 @@ export function computeFx(s: FxState): FxParams {
     detune: at(FX.detune, t),
     wobble: at(FX.wobble, t),
     distortion: at(FX.distortion, t),
+    mind: on.warp ? onsetOf(t) : 0,
   };
 }
 

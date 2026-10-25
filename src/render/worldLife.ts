@@ -5,6 +5,7 @@
  * in one place, so the frame loop (main.ts) holds a line for it. Read-only on the simulation.
  */
 
+import type { Entity } from '../core/ecs';
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
@@ -14,6 +15,8 @@ import { createArenaAir } from './arenaAir';
 import { createBeacons } from './beacons';
 import { createPoiFx } from './poiFx';
 import { createCourtLife } from './courtLife';
+import { createCreatureAir } from './creatureAir';
+import { createFootprints } from './footprints';
 import { createRodFx } from './rodFx';
 import type { Beams } from './beams';
 import type { GroundFx } from './groundFx';
@@ -31,6 +34,9 @@ import { createLightning } from './lightning';
 import type { Particles } from './particles';
 import { createNightFx } from './nightFx';
 import { createOmenFx } from './omenFx';
+import { createFootfalls } from './footfalls';
+import { createCreatureAura } from './creatureAura';
+import type { BossPresence } from './bossPresence';
 import { createPresence } from './presence';
 import type { PostPass } from './postPass';
 import { createSkyLife } from './skyLife';
@@ -59,6 +65,7 @@ export interface LifeParts {
   particles: Particles; // dust and grit (round 26: what a colossus throws up)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
+  creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 78: its aura and footfalls)
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
@@ -90,6 +97,10 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   createVigilMarks(g, parts.ground); // round 64: a vigil's ring, and how far it is kept
   const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
   const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust
+  const prints = createFootprints(scene, g); // round 78: the prints of whatever walks soft ground...
+  const bodyAir = createCreatureAir(g, parts.particles); // ...and a body's cold breath and the dust of its running
+  const footfalls = createFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
+  const aura = createCreatureAura(g, parts.particles, parts.creatures.figure, parts.creatures.presence); // what the great ones give off
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -111,6 +122,10 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       wayFx.update(time, camera.position);
       rods.update(camera.position, time, !outside);
       court.update(camera.position, time, !outside);
+      prints.update(camera.position, time, alpha, !outside);
+      bodyAir.update(camera.position, time, alpha, !outside);
+      footfalls.update(camera.position, alpha, !outside);
+      aura.update(camera.position, time, alpha);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);

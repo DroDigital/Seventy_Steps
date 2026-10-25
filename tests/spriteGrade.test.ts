@@ -24,18 +24,19 @@ describe('the drawn creatures take their realm\'s grade (round 78: render/shader
     expect(seen.size).toBe(Object.keys(LOOKS).length); // no two realms share one
   });
 
-  it('is a share of the grade, and the anomaly hues are kept as drawn', () => {
+  it('is a share of the way to the realm, and the anomaly hues are kept as drawn', () => {
     expect(worldUniforms.uSpriteGrade.value).toBe(FX.spriteGrade);
     expect(FX.spriteGrade).toBeGreaterThan(0.4); // below this the sepia still shows in a cold realm
-    expect(FX.spriteGrade).toBeLessThan(0.95); // above it every creature is one colour per realm
-    expect(SPRITE_GRADE_GLSL).toMatch(/mix\(c, l \* spriteTint\(l\), uSpriteGrade \* \(1\.0 - keep\)\)/);
+    expect(FX.spriteGrade).toBeLessThan(0.95); // above it every creature is the realm's one hue
+    expect(SPRITE_GRADE_GLSL).toMatch(/vec3 spriteGraded\(vec3 c, vec4 tone\)/);
+    expect(SPRITE_GRADE_GLSL).toMatch(/vec2 r = mix\(turned, own, keep\)/); // what is drawn in an anomaly hue is left alone
   });
 
   it('touches the recorded art only, after the light and before the mist; the self-lit marks and the Colour are left alone', () => {
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
     const at = (s: string): number => src.indexOf(s);
-    expect(at('if (uReviewed > 0.5) col = spriteGraded(col)')).toBeGreaterThan(at('t.rgb * vLight'));
-    expect(at('if (uReviewed > 0.5) col = spriteGraded(col)')).toBeLessThan(at('float fog = vFog * uFogAmount'));
-    expect(at('if (vOutside > 0.5 && uReviewed < 0.5)')).toBeGreaterThan(at('spriteGraded(col)')); // the procedural atlas's colour out of space is not graded: it is not drawn there
+    expect(at('if (uReviewed > 0.5) col = spriteGraded(col, vTone)')).toBeGreaterThan(at('t.rgb * vLight'));
+    expect(at('if (uReviewed > 0.5) col = spriteGraded(col, vTone)')).toBeLessThan(at('float fog = vFog * uFogAmount'));
+    expect(at('if (vOutside > 0.5 && uReviewed < 0.5)')).toBeGreaterThan(at('spriteGraded(col, vTone)')); // the procedural atlas's colour out of space is not graded: it is not drawn there
   });
 });

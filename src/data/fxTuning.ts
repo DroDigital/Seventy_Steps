@@ -147,3 +147,64 @@ export const FLASH_LIGHTS = {
   bolt: { strength: 1.3, per: 0.5, most: 3, range: 5, rangePer: 2.2, rangeMost: 12, seconds: 0.1 }, // a bolt of light or fire in flight, kept up each frame
   white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
 } as const;
+
+/** The mist a moving body carves (round 78, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
+export const MIST_WAKES = {
+  slots: 8, // the most at once (the nearest moving bodies; the investigator's is always one)
+  reach: 44, // metres from the lens: farther, none is laid
+  minSpeed: 0.7, // metres a second a body must move at to part it
+  fullSpeed: 4.5, // ...and the pace at which it parts it wholly
+  radius: [0.9, 6] as readonly [number, number], // its breadth: the body's own, at least and at most
+  trail: 1.1, // seconds of its travel the trail behind it is long...
+  trailMost: 4.5, // ...at most this many metres
+  strength: 0.72, // the share of the mist it clears at its heart, at the most
+  turn: 0.9, // how far the mist is turned about its edge: this much of its breadth
+  height: 3.2, // the height the mist is parted to
+} as const;
+
+/**
+ * Prints in soft ground and what a body's breath and feet raise (round 78; render/footprints.ts, render/creatureAir.ts). The ground a
+ * region has underfoot decides it: how dark a print is, how long it keeps, the colour it is pressed in; only soft ground keeps one.
+ */
+export const PRINTS = {
+  capacity: 220, // the most prints at once (the oldest is taken over)
+  reach: 32, // metres from the lens that bodies are tracked and prints laid
+  minSpeed: 0.5, // metres a second a body must move at to leave one
+  stride: [0.45, 1.1] as readonly [number, number], // metres between the prints of one body: this, and this much more for each metre of its radius
+  soft: {
+    snow: { strength: 0.62, seconds: 80, tint: [0.2, 0.23, 0.34] },
+    mud: { strength: 0.7, seconds: 55, tint: [0.075, 0.06, 0.05] },
+    sand: { strength: 0.4, seconds: 26, tint: [0.34, 0.26, 0.18] },
+    dirt: { strength: 0.34, seconds: 20, tint: [0.13, 0.1, 0.075] },
+    leaves: { strength: 0.26, seconds: 14, tint: [0.1, 0.07, 0.05] },
+    grass: { strength: 0.16, seconds: 9, tint: [0.06, 0.1, 0.07] },
+  } as Readonly<Record<string, { strength: number; seconds: number; tint: readonly [number, number, number] }>>,
+  fade: 0.45, // the share of a print's life it fades over at the end
+} as const;
+
+/** The cold breath and the dust of a hard run (render/creatureAir.ts). */
+export const BODY_AIR = {
+  reach: 14, // metres from the lens that a body breathes a cloud
+  breathSeconds: [2.2, 3.4] as readonly [number, number], // between one breath and the next: this, and this much more, by the body
+  breath: { color: [0.82, 0.86, 0.9] as readonly [number, number, number], alpha: 0.26, size: 0.16, grow: 3, seconds: 1.15 },
+  dustSpeed: 3.6, // metres a second a body must run at to raise dust from dry ground
+  dustSeconds: 0.5, // between its puffs
+  dustReach: 22,
+} as const;
+
+/** A horror's presence in the picture (render/bossPresence.ts, footfalls.ts, creatureViews.ts). */
+export const BOSS_PRESENCE = {
+  height: 4, // metres: a body this tall, or any that is fought as a horror, leaves footfalls
+  minSpeed: 1.2, // metres a second it must walk at
+  stride: 0.55, // a stride's length, in its heights
+  least: 0.12, // the least presence (render/presence.ts presenceOf) at which a stride is felt
+  shake: 0.035, // metres of camera jolt at a stride, for a body of eight metres at its foot
+  voiceAttack: 0.06, // seconds a voice's loudness takes to rise in the picture...
+  voiceRelease: 0.2, // ...and to fall
+  breathe: 0.016, // the share of its height a picture swells by at the loudest of its voice, its feet kept where they are
+  eyes: 1.6, // how much brighter its eyes burn at the loudest, and
+  glints: 2.4, // its glints' gain
+  deepGlints: 0.8, // the share more its glints burn in its last phase than in its first
+  bodyGlow: 0.12, // how much brighter a colossus's built body is lit in its last phase and in a loud word
+  halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
+} as const;

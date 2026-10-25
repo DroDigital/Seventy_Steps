@@ -33,6 +33,7 @@ import { createSignViews } from './render/signViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
+import { createMistWakes } from './render/mistWakes';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
 import { weatherHaze } from './render/weather';
@@ -207,8 +208,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
+  const mistWakes = createMistWakes(game); // what moves through it parts it (round 78)
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
@@ -293,6 +295,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
         mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, dark: look.dark });
+        mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)

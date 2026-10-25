@@ -6,6 +6,7 @@ import { FOG, FX, LIGHT, LIGHTING } from '../data/tuning';
 import type { FxParams } from './fx';
 import { ANOMALY_HUES } from './palette';
 import { ANOMALY_FROM, ANOMALY_TO, buildRealmPalette, gradeTints } from './realmPalette';
+import { WAKE_SLOTS } from './shaders/fog';
 import { POST_FRAG, POST_VERT } from './shaders/post';
 import { worldUniforms } from './worldMaterial';
 
@@ -27,6 +28,9 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uFogGlow: { value: FOG.glow },
     uFogLantern: { value: FOG.lantern },
     uFogStart: { value: new THREE.Vector2(FOG.start, FOG.full) },
+    uWakeCount: { value: 0 }, // the bodies parting the mist, and where (mistWakes.ts)
+    uWakeSeg: { value: Array.from({ length: WAKE_SLOTS }, () => new THREE.Vector4()) },
+    uWakeInfo: { value: Array.from({ length: WAKE_SLOTS }, () => new THREE.Vector4()) },
     uLanternPos: w.uLanternPos,
     uLanternColor: w.uLanternColor,
     uLanternRange: w.uLanternRange,
