@@ -172,6 +172,10 @@ describe('the gates\' sources', () => {
     expect(w21, 'the ring\'s author').toContain('Trockk');
     expect(w21, 'its source').toContain('https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55');
     expect(w21, 'its licence').toContain('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
+    const w22 = credits.slice(credits.indexOf('Gate source w22'));
+    expect(w22, 'the temple\'s author').toContain('Jungle Jim');
+    expect(w22, 'its source').toContain('https://sketchfab.com/3d-models/epic-alien-temple-door-animated-1b2860e267b047f38488cf3ca4d3533b');
+    expect(w22, 'its licence').toContain('CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)');
   });
 
   it('are baked in a set of their own, and none is stood by a place as well as a gate under another name', () => {

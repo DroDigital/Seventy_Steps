@@ -8,6 +8,7 @@ the `_l` of a pair has its hinge at its x0 (the left, seen from the front, +z), 
   w10  Castle Kit, Kenney (CC0): a portcullis
   w20  Aztec Double-Headed Serpent for printing, corentin (CC BY 4.0, Sketchfab): two half-arches, each ending in a carved, fanged head; Yig's gate is one head
   w21  Demons Gate, Trockk (CC BY 4.0, Sketchfab): a ring of long spikes about an open middle; the corona of a cosmic gate
+  w22  Epic Alien Temple Door, Jungle Jim (CC BY 4.0, Sketchfab): a carved biomechanical-gothic temple front, symmetric about its doorway; the Court's gate is its two halves
 """
 from manifest import M, add
 import sources as S
@@ -32,7 +33,10 @@ add(
       cut=[((0, -31.5, 0), (0, -1, 0)), ((0, 0, 8.5), (0, 0, 1)), ((5, 0, 0), (1, 0, 0))], **G),
     # a ring of spikes facing the court, its plane across the opening; the gate's own colour is laid over it
     M('gate_demon_ring', 'w21/scene.gltf', None, kit='w21', cls=S.METAL, classes={'.': S.METAL}, fit={'height': 4.0}, decimate=6000, join=True, **G),
-    # the same ring in two halves, cut down its middle (its centre, x 24.05 in the source) and closed, each to slide off with a leaf: `_l` the half on the left seen from the court
-    M('gate_demon_ring_l', 'w21/scene.gltf', None, kit='w21', cls=S.METAL, classes={'.': S.METAL}, fit={'height': 4.0}, decimate=3500, join=True, cap=True, cut=[((24.05, 0, 0), (-1, 0, 0))], **G),
-    M('gate_demon_ring_r', 'w21/scene.gltf', None, kit='w21', cls=S.METAL, classes={'.': S.METAL}, fit={'height': 4.0}, decimate=3500, join=True, cap=True, cut=[((24.05, 0, 0), (1, 0, 0))], **G),
+    # the temple front (its two big objects, not its door leaves, halls or ground) cut down its doorway and the cuts closed: the half that stands on the left of the court's
+    # gate is the source's right half (the front is turned to -z, where the Court's investigator comes from, so the cut faces swap sides with it)
+    M('gate_alien_l', 'w22/scene.gltf', r'Alien temple door.*', kit='w22', cls=S.STONE, classes={'.': S.STONE}, fit={'height': 4.0}, rot=180, decimate=9000, join=True, cap=True,
+      cut=[((0, 0, 0), (1, 0, 0))], textures=('w22/textures/',), **G),
+    M('gate_alien_r', 'w22/scene.gltf', r'Alien temple door.*', kit='w22', cls=S.STONE, classes={'.': S.STONE}, fit={'height': 4.0}, rot=180, decimate=9000, join=True, cap=True,
+      cut=[((0, 0, 0), (-1, 0, 0))], textures=('w22/textures/',), **G),
 )

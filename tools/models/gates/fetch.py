@@ -2,8 +2,8 @@
 """Fetches the free sources of the arena gates (docs/GATES.md) into a work dir, one folder a source, `w01` and on, the layout
 tools/models/boss/manifest_gates.py names. Poly Haven's models are CC0 (read from the asset's own info.json, which is kept); Kenney's kits are CC0
 (the kit's License.txt is kept). Nothing is fetched that is not CC0 or CC BY. Offline afterwards: bake_boss_models.py reads the work dir.
-The Sketchfab models (w20: the Aztec double-headed serpent, w21: the Demons Gate; both CC BY 4.0, credited in src/data/models/CREDITS.md) need a sign-in to
-download and are not fetched: download each as glTF by hand into <work dir>/w20 and /w21 (scene.gltf, scene.bin, license.txt).
+The Sketchfab models (w20: the Aztec double-headed serpent, w21: the Demons Gate, w22: the Epic Alien Temple Door; all CC BY 4.0, credited in src/data/models/CREDITS.md)
+need a sign-in to download and are not fetched: download each as glTF by hand into <work dir>/w20, /w21 and /w22 (scene.gltf, scene.bin, license.txt, textures/).
 Run: python3 -I tools/models/gates/fetch.py <work dir>   (network; standard library only)"""
 import io, json, os, re, sys, urllib.request, zipfile
 

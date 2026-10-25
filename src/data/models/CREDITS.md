@@ -170,7 +170,7 @@ By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5aca
 # Credits: the arenas' gates (round 76)
 
 The leaves of the gates of the open arenas (`gateIndex.ts` + `gatePack.ts`, hung by `src/data/gateStyles.ts`, `render/gateRig.ts`) are cut from free models,
-**Creative Commons Zero (CC0 1.0)**, which asks for no credit (it is given), but for the serpent's head of Yig's gate (w20) and the spiked ring of the Court's (w21), which are **CC BY 4.0** and credited as it asks. They were made again for the game by `tools/models/bake_boss_models.py`
+**Creative Commons Zero (CC0 1.0)**, which asks for no credit (it is given), but for the serpent's head of Yig's gate (w20), the spiked ring of the Court's (w21) and the temple front of the Threshold's (w22), which are **CC BY 4.0** and credited as it asks. They were made again for the game by `tools/models/bake_boss_models.py`
 from `tools/models/boss/manifest_gates.py` (`tools/models/gates/fetch.py` fetches the sources): each leaf taken singly, decimated, its colours kept only as
 light and dark (the game lays the arena's own over them) and its size fitted to the metres it hangs at. The gates also hang models of the packs credited above
 (the temple doors, the standing stones, the flutes, the basalt and the dead trees). Changes are named for each.
@@ -204,3 +204,8 @@ By corentin (https://sketchfab.com/corentin), https://sketchfab.com/3d-models/az
 By Trockk (https://sketchfab.com/Timrockk), https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: decimated to about 6,000 faces, given the metal class, recoloured by the gate's dye, and stretched to the gate's opening and flattened to half the wall's thickness.
 
 `gate_demon_ring`
+
+## Gate source w22 — Epic Alien Temple Door (animated)
+By Jungle Jim (https://sketchfab.com/jungle_jim), https://sketchfab.com/3d-models/epic-alien-temple-door-animated-1b2860e267b047f38488cf3ca4d3533b, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: only the carved temple front taken (its door leaves, its three halls and its ground left out), cut in two down its doorway and the cuts closed, decimated to about 9,000 faces each, colours kept only as light and dark under the gate's dye, turned about to face the court and stretched to the gate's opening.
+
+`gate_alien_l`, `gate_alien_r`

@@ -52,18 +52,22 @@ modelled ones that had to be uploaded (CC BY is accepted). The candidates upload
   kept it), and turned to face along the wall. In the gate it stands 6.4 m tall and 8.7 wide in the front of the mouth of the mound, before a slab of the mound's
   own earth that fills what the head does not, and both go down into the ground together. Not split into an upper and a lower jaw: the lower front fang rises past
   the tips of the upper ones, so no plane parts the two, and a head that opens upward would hang in the air over the passage.
-- **The cosmic doors, `gate_demon_ring`** (Demons Gate, Trockk, 7,600 faces: a ring of long spikes about an open middle). Whole, flattened to half the wall, it stands
-  before the Court's black doors as the corona of a black sun and sinks with them (violet on black, under the doors' magenta runes). In two halves
-  (`gate_demon_ring_l`, `_r`, cut down its middle and closed) it stands before the Threshold's sun and moon doors and comes apart with them (pale blue on the wall's
-  teal crystal). Both are stand-ins' betters, not the last word: see below.
+- **The Court (Azathoth), `gate_demon_ring`** (Demons Gate, Trockk, 7,600 faces: a ring of long spikes about an open middle). Flattened to half the wall, it stands
+  before the Court's black doors as the corona of a black sun and sinks with them (violet on black, under the doors' magenta runes).
+- **The Threshold (Yog-Sothoth), `gate_alien_l` and `_r`** (Epic Alien Temple Door, Jungle Jim, 75,000 faces for the front alone): a carved biomechanical-gothic temple
+  front, two obelisk towers, a rose and a doorway, and nearly the opening's proportions (17 by 17 against 11 by 12). Only the front is taken (its four door leaves, its
+  three halls and its ground are left), cut in two down its doorway (`cut` and `cap`), each half decimated to 9,000 faces, the carved side turned to -z where this gate is come
+  to from. It stands in front of the sun and moon doors, which slide apart behind it, and each half goes with its leaf, so the front comes apart down its doorway. (The
+  first try stood the ring in two halves here; the front suits a wall of crystal that "shows everything" better, and the ring suits the black sun.)
 - **`v` is now what its comment said.** A part's `v` is positive toward the side the investigator comes from; `gateRig` took it as the world's +z (or +x), which
   is that side only for the five houses whose gate faces +z or +x (`door.out` +1; the other fifteen are -1, Yig's among them). It is multiplied by `out`. Of the
   styles that had a `v`, the keep's (out +1) is as it was and the two rows of Shub-Niggurath's palisade trade places; `tests/gateStyles.test.ts` keeps the rule.
 
-**Looked at and not used.** Wyrm's Head (10 MB), the Energy gate of the northern hemisphere (32 MB), the Epic Alien Temple Door (102 MB) and the Sunken Ancient Temple
-Doorway (73 MB) were in the folder but too large to come through the connector the session reads Drive by (it passed 3.8 MB and dropped on 10), and the folder is
-not shared by link, so they were not looked at at all; they are the better candidates for both gates, and a head with a hinged jaw (the Wyrm's) would open as a mouth.
-The Blockbench Quetzalcoatl is a voxel serpent whose head is a fan of feathers: no jaw.
+**Looked at and not used.** The folder was shared by link part-way through, and the four large zips came down: Wyrm's Head is a mountain-sized low-poly hill in the
+shape of a gaping wyrm's head with a castle and pines on its back, a landmark and not a gate leaf (a head of that size would stand over a court, not in a gate); the
+Energy gate of the northern hemisphere is two obelisks, a thin ring and a plasma sheet (4,000 faces), a good frame but with no door to it; the Sunken Ancient Temple
+Doorway is 1.9 million faces of weathered doorway (no decimation keeps its carving); the Blockbench Quetzalcoatl is a voxel serpent whose head is a fan of feathers: no jaw.
+The first two are the best of what is left for the courts' skylines and doors, see `docs/ARENA_MIXES.md`.
 
 ## Where nothing was found
 

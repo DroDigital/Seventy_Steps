@@ -162,14 +162,14 @@ export const GATE_STYLES: Readonly<Record<string, GateStyle>> = {
     motion: 'swing', open: 100, sound: 'brick',
     parts: pair(IRON_L, IRON_R, { dye: { metal: [0.62, 0.5, 0.2] }, tint: [0.7, 0.62, 0.78], keep: 0.1 }),
   },
-  // The crystal wall's gate: an eclipse in two leaves that slide apart, and over each a half of a ring of spikes, a corona that comes apart with it.
+  // The crystal wall's gate: the sun and the moon in two leaves that slide apart behind the front of an alien temple, carved, with obelisks and a rose, that is split down its doorway and comes apart with them. (The front is baked turned to -z, where this gate is come to from.)
   yog_sothoth: {
     motion: 'slide', sound: 'elder',
     parts: [
-      { model: 'tp_door_sun', span: [-0.5, 0], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true },
-      { model: 'tp_door_moon', span: [0, 0.5], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true },
-      { model: 'gate_demon_ring_l', span: [-0.5, 0], thin: 0.5, v: 1.0, base: 0.3, keep: 0, dye: { metal: [0.62, 0.7, 0.95] } },
-      { model: 'gate_demon_ring_r', span: [0, 0.5], thin: 0.5, v: 1.0, base: 0.3, keep: 0, dye: { metal: [0.62, 0.7, 0.95] } },
+      { model: 'tp_door_sun', span: [-0.5, 0], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true, v: -1 },
+      { model: 'tp_door_moon', span: [0, 0.5], tint: [0.55, 0.6, 0.8], keep: 0, dim: 0.85, glyphs: true, v: -1 },
+      { model: 'gate_alien_l', span: [-0.5, 0], thin: 0.7, v: 0.4, base: 0.3, tint: [0.78, 0.88, 0.97], keep: 0 },
+      { model: 'gate_alien_r', span: [0, 0.5], thin: 0.7, v: 0.4, base: 0.3, tint: [0.78, 0.88, 0.97], keep: 0 },
     ],
   },
   // The Court's gate: black stone doors that go down into the floor, since nothing at the centre of all needs a hinge, and before them a ring of spikes, the corona of a black sun, that goes down with them.
