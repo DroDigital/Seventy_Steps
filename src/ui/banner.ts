@@ -19,8 +19,6 @@ export type Tone = 'death' | 'victory' | 'place' | 'realm' | 'hour';
 export interface Banner {
   show(text: string, tone: Tone, sub?: string, line?: string, tint?: string): void; // `line`: a sentence read under it (a horror's epitaph, a realm's epigraph); `tint`: the colour of a realm's name
   hide(): void;
-  /** A card is up, or another is waiting for it. */
-  readonly busy: boolean;
 }
 
 interface Look {
@@ -135,9 +133,6 @@ export function createBanner(): Banner {
       if (Number.isFinite(hold)) timer = setTimeout(hide, hold * 1000);
     },
     hide,
-    get busy() {
-      return waiting !== null || performance.now() < liveUntil;
-    },
   };
   return self;
 }
