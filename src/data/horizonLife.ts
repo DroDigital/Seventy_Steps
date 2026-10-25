@@ -9,9 +9,9 @@ import type { SilhouetteKind } from './skylines';
 
 /** The glow a lit far town lays over the sky above it (additive, over the haze; the post pass grades it with the rest). */
 export const DOME = {
-  strength: 0.62, // the glow's weight at the horizon over the middle of a town with a good many of its windows lit
-  across: 0.58, // how far it spreads, as the falloff's width in silhouette widths (a gaussian: a town's glow reaches past its ends)
-  up: 0.95, // how far it rises, in silhouette heights (an exponential: strongest at the roofs, gone well above the steeples)
+  strength: 1.15, // the glow's weight at the horizon over the middle of a town with a good many of its windows lit (0.6 was a warm sheen, 2.5 a sunset)
+  across: 0.5, // how far it spreads, as the falloff's width in silhouette widths (a gaussian: a town's glow reaches past its ends)
+  up: 0.8, // how far it rises, in silhouette heights (an exponential: strongest at the roofs, gone well above the steeples)
   box: { across: 1.7, below: 0.3, above: 3.6 }, // the quad that carries it, in silhouette widths either side, heights below and above the foot
   lit: 0.3, // the share of windows lit at which a town's glow is full: the few lit windows of a hamlet give less, never less than `floor`
   floor: 0.62,
