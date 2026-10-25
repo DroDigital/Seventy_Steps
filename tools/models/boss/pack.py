@@ -79,6 +79,7 @@ def bake(t, col, cls, double=()):
 SETS = {  # the baked files: the name of each, and what its models are
     'boss': ('BOSS', "The boss places' models", "The boss places' models' triangles"),
     'gate': ('GATE', "The arenas' gates' models, hung by data/gateStyles.ts", "The arenas' gates' triangles"),
+    'web': ('WEB', "The models taken from free web sources for the arenas', halls' and gates' sets (manifest_web.py)", "The web-sourced models' triangles"),
 }
 
 def ts_index(entries, kind='boss'):

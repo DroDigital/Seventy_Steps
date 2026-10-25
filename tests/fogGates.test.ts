@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { emptyInput } from '../src/core/input';
 import { strike, targetsOf } from '../src/systems/combat';
-import { allFogs, crosses, fogBlockSystem, fogBetween, fogNear, fogToPass, passFog, sideOf, walkAlong } from '../src/systems/fogGates';
+import { allFogs, allWakes, crosses, fogBlockSystem, fogBetween, fogNear, fogToPass, passFog, sideOf, wakeBetween, walkAlong } from '../src/systems/fogGates';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { interactable } from '../src/systems/checkpoints';
+import { worldLayout } from '../src/world/placements';
 import { place } from './helpers';
 
-const doorway = () => allFogs().find((w) => w.kind === 'doorway')!;
-const ring = () => allFogs().find((w) => w.kind === 'ring')!;
+const doorway = () => allFogs().find((w) => !w.gate)!;
 const beside = (w: ReturnType<typeof doorway>, d: number) => ({ x: w.x - Math.sin(w.yaw) * d, z: w.z - Math.cos(w.yaw) * d });
 
 describe('the fog before a horror is a wall (round 35)', () => {
@@ -15,9 +15,6 @@ describe('the fog before a horror is a wall (round 35)', () => {
     const w = doorway();
     expect(crosses(w, beside(w, 1), beside(w, -1))).toBe(true);
     expect(crosses(w, beside(w, 1), beside(w, 2))).toBe(false);
-    const r = ring();
-    expect(crosses(r, { x: r.x + r.radius - 1, z: r.z }, { x: r.x + r.radius + 1, z: r.z })).toBe(true);
-    expect(crosses(r, { x: r.x, z: r.z }, { x: r.x + 3, z: r.z })).toBe(false);
   });
 
   it('nothing sees across it, and the investigator cannot walk through', () => {
@@ -119,5 +116,54 @@ describe('the fog before a horror is a wall (round 35)', () => {
     expect(ended / 60, 'the walk is a few steps, not a long march').toBeLessThan(2.6);
     expect(engaged, 'woke while the fog still walked them in').toBe(ended);
     expect(hurt).toBe(-1);
+  });
+});
+
+/** Round 78: an open arena's fog stands in its gate, behind the leaves; the ring it once stood on is only the line a sleeping horror wakes at. */
+describe('the mist of an open arena stands in its gate (round 78)', () => {
+  const gateOf = (i: number) => allFogs().find((f) => f.id === `ring:${i}:${worldLayout().arenas[i]!.bosses[0]}`)!;
+
+  it('no wall of fog stands about any fight: the back of every ring is walked across freely, and the gate is the one way through', () => {
+    worldLayout().arenas.forEach((a, i) => {
+      const wake = allWakes()[i]!;
+      const [from, to] = [wake.radius - 1, wake.radius + 1];
+      const [back, past] = [{ x: a.x - a.front.x * from, z: a.z - a.front.z * from }, { x: a.x - a.front.x * to, z: a.z - a.front.z * to }];
+      for (const f of allFogs()) expect(crosses(f, back, past), `${wake.id} against ${f.id}`).toBe(false);
+      const wall = gateOf(i);
+      expect(crosses(wall, { x: wall.x - Math.sin(wall.yaw), z: wall.z - Math.cos(wall.yaw) }, { x: wall.x + Math.sin(wall.yaw), z: wall.z + Math.cos(wall.yaw) }), `${wake.id}: the gate's own mist is crossed`).toBe(true);
+    });
+  });
+
+  it('E passes the mist only once the gate has opened: a shut gate has its seal between, and no prompt', () => {
+    const g = createWorldGame();
+    const wall = gateOf(0);
+    const out = { x: wall.x - Math.sin(wall.yaw) * 1.2, z: wall.z - Math.cos(wall.yaw) * 1.2 };
+    place(g, g.player.id, out.x, out.z, 0);
+    expect(fogNear(g, out), 'a shut gate').toBeNull();
+    expect(fogToPass(g)).toBeNull();
+    const [id] = [...g.ecs.c.piece].find(([, p]) => p.def.name === wall.gate)!;
+    Object.assign(g.ecs.c.layer.get(id)!, { shown: true, open: 1 });
+    expect(fogNear(g, out)?.wall.id).toBe(wall.id);
+    expect(fogToPass(g)?.id).toBe(wall.id);
+  });
+
+  it('a sleeping horror wakes at its ring: nothing it keeps sees across it, until it is roused or slain', () => {
+    const g = createWorldGame();
+    const [a, wake] = [worldLayout().arenas[0]!, allWakes()[0]!];
+    const [inside, outside] = [{ x: a.x, z: a.z }, { x: a.x + a.front.x * (wake.radius + 5), z: a.z + a.front.z * (wake.radius + 5) }];
+    expect(wakeBetween(g, inside, outside)).toBe(true);
+    expect(fogBetween(g, inside, outside)).toBe(true);
+    expect(wakeBetween(g, outside, { x: outside.x + 3, z: outside.z }), 'both outside').toBe(false);
+    expect(wakeBetween(g, inside, { x: a.x + 3, z: a.z }), 'both inside').toBe(false);
+    place(g, g.player.id, a.x, a.z, 0);
+    for (let i = 0; i < 120; i++) stepGame(g, emptyInput()); // the horror is streamed in
+    const fight = [...g.ecs.c.fight.values()].find((f) => wake.bosses.includes(f.id))!;
+    fight.engaged = true;
+    expect(wakeBetween(g, inside, outside), 'roused: it tracks them where it will').toBe(false);
+    fight.engaged = false;
+    expect(wakeBetween(g, inside, outside)).toBe(true);
+    g.overworld!.slain.add(wake.spawns[0]!);
+    for (const s of wake.spawns) g.overworld!.slain.add(s);
+    expect(wakeBetween(g, inside, outside), 'slain').toBe(false);
   });
 });

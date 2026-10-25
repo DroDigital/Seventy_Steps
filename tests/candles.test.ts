@@ -25,7 +25,7 @@ describe('the candles before the fog', () => {
   });
 
   it('a doorway\'s stands a few paces back from it, on the side the boss\'s room is not, in a room and in no wall or pillar', () => {
-    for (const f of fogs.filter((w) => w.kind === 'doorway')) {
+    for (const f of fogs.filter((w) => !w.gate)) {
       const dungeon = worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!;
       const bossRoom = dungeon.layout.rooms.find((r) => f.id.split(':')[1] === r.def.id)!;
       const { x, z } = f.stake;
@@ -42,8 +42,12 @@ describe('the candles before the fog', () => {
     }
   });
 
-  it('a ring\'s stake stands outside it, on the way from the nearest Elder Sign', () => {
-    for (const f of fogs.filter((w) => w.kind === 'ring')) expect(Math.hypot(f.stake.x - f.x, f.stake.z - f.z), f.id).toBeCloseTo(f.radius + 9, 3);
+  it('an arena\'s stake stands in its court, a stride inside the ring a sleeping horror wakes at, on the way from the nearest Elder Sign', () => {
+    const { wakes } = gatePlan(worldLayout());
+    for (const f of fogs.filter((w) => w.gate)) {
+      const wake = wakes.find((w) => w.id === f.id)!;
+      expect(Math.hypot(f.stake.x - wake.x, f.stake.z - wake.z), f.id).toBeCloseTo(wake.radius + 9, 3);
+    }
   });
 
   it('is set aside the way, not on it (round 62): a few paces from where the fallen wake, near enough that passing the stake takes its flame', () => {
@@ -55,15 +59,15 @@ describe('the candles before the fog', () => {
     for (const c of candlesOf()) expect(Math.hypot(c.x - c.rise.x, c.z - c.rise.z), c.id).toBeLessThan(CANDLE.light - 1);
   });
 
-  it('a ring\'s stands clear of the pieces of its set and of its stones', () => {
-    for (const f of fogs.filter((w) => w.kind === 'ring')) {
+  it('an arena\'s stands clear of the pieces of its set and of its stones', () => {
+    for (const f of fogs.filter((w) => w.gate)) {
       const a = worldLayout().arenas.find((x) => f.id === `ring:${worldLayout().arenas.indexOf(x)}:${x.bosses[0]}`)!;
       for (const p of a.decor) if (propCollider(p)) expect(propGap(p, f.candle.x, f.candle.z), `${f.id}: ${p.kind} ${p.set?.id ?? ''}`).toBeGreaterThanOrEqual(ASIDE.clear - 1e-6);
     }
   });
 
   it('a hall\'s stands at the foot of a wall or a pillar when there is one near, in a room and in none of them', () => {
-    for (const f of fogs.filter((w) => w.kind === 'doorway')) {
+    for (const f of fogs.filter((w) => !w.gate)) {
       const dungeon = worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!;
       const bossRoom = dungeon.layout.rooms.find((r) => f.id.split(':')[1] === r.def.id)!;
       const room = roomAt(dungeon.layout, f.candle.x, f.candle.z);
@@ -71,8 +75,8 @@ describe('the candles before the fog', () => {
       expect(room, `${f.id}: not the boss's own`).not.toBe(bossRoom);
       expect(solidGap(dungeon.parts, f.candle.x, f.candle.z, f.y), `${f.id}: not in a wall or a pillar`).toBeGreaterThan(0.2);
     }
-    const against = fogs.filter((w) => w.kind === 'doorway').filter((f) => solidGap(worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!.parts, f.candle.x, f.candle.z, f.y) < 1.3);
-    expect(against.length, 'most stand against something').toBeGreaterThan(fogs.filter((w) => w.kind === 'doorway').length / 2);
+    const against = fogs.filter((w) => !w.gate).filter((f) => solidGap(worldLayout().dungeons.find((d) => f.id.startsWith(`${d.layout.def.id}:`))!.parts, f.candle.x, f.candle.z, f.y) < 1.3);
+    expect(against.length, 'most stand against something').toBeGreaterThan(fogs.filter((w) => !w.gate).length / 2);
   });
 
   it('every look of a candle is one the shapes make, and each arena\'s set names one that is', () => {

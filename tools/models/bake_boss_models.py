@@ -59,10 +59,12 @@ def bake_one(m, work):
         objs = S.mesh_objects(m.select, m.exclude)
         if not objs:
             raise ValueError(f'{m.id}: nothing in {m.src} matches {m.select!r}')
+        if m.join:
+            objs = S.joined(objs)
         arm = objs[0].find_armature()
         if m.pose and arm:
             S.pose_armature(arm, m.pose)
-        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut, drop_alpha=m.drop_alpha, glass_alpha=m.glass_alpha)
+        soup, dropped = S.soup_of(objs, classes=m.classes, drop=m.drop, default_cls=m.cls, decimate_to=m.decimate or None, cut=m.cut, cap=m.cap, drop_alpha=m.drop_alpha, glass_alpha=m.glass_alpha)
         pos, col, cls, _ = soup.done()
         if m.plane and len(pos):
             cls = FL.panel(pos, cls, m.plane)

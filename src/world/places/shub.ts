@@ -57,6 +57,25 @@ export const shub: PlaceFn = (c: Court, h: House) => {
     c.add('px_root', a, cc, { ...BARK, face: 'in', turn: 90 + (i % 2 ? 22 : -22), s: 0.62 + (i % 3) * 0.12, stretch: [1, 0.8, 1], walk: true });
   }
 
+  // her young (web parts, docs/WEB_PARTS.md): mushrooms along the wall's foot between the pods, a nest of eggs here and there, and strange trees among the dead ones beyond the wall
+  for (let i = 0; i < 16; i++) {
+    const th = ((i + 0.3) * 2 * Math.PI) / 16;
+    if (bearing(th) < 0.45) continue;
+    const [a, cc] = at(th, -1.9 - (i % 3) * 0.5);
+    for (let k = 0; k < 3; k++) c.add(k === 1 ? 'wk_mushroom_b' : 'wk_mushroom_a', a + (k - 1) * 0.9, cc + (k % 2 ? 0.7 : -0.5), { tint: [0.86, 0.5, 0.64], keep: 0.35, walk: true, s: 0.8 + ((i + k) % 3) * 0.25, turn: i * 41 + k * 70 });
+  }
+  for (const th of [0.9, 2.1, 3.3, 4.4, 5.4]) {
+    if (bearing(th) < 0.5) continue;
+    const [a, cc] = at(th, -4.6);
+    for (let k = 0; k < 3; k++) c.add('wk_egg', a + Math.cos(k * 2.1) * 1.3, cc + Math.sin(k * 2.1) * 1.3, { tint: [0.84, 0.68, 0.62], keep: 0.35, s: 0.8 + (k % 2) * 0.3, face: 'in' });
+  }
+  for (let i = 0; i < 8; i++) {
+    const th = ((i + 0.25) * 2 * Math.PI) / 8;
+    if (bearing(th) < 0.6) continue;
+    const [a, cc] = at(th, 8 + (i % 2) * 2.2);
+    c.add(i % 2 ? 'wk_tree_spikes' : 'wk_tree_spiral', a, cc, { tint: [0.4, 0.26, 0.3], keep: 0.35, face: 'front', turn: i * 53, s: 1.1 + (i % 3) * 0.2, jitter: 0.8 });
+  }
+
   // what the grove breathes out: spores on the air in six places, a red haze under the pods
   for (let i = 0; i < 6; i++) {
     const [a, cc] = at(((i + 0.5) * 2 * Math.PI) / 6, -4);

@@ -51,6 +51,8 @@ export const hastur: PlaceFn = (c: Court, h: House) => {
   c.add('tp_floor', -38, 0, { ...STONE, face: 'front', y: -0.25, stretch: [13.2 / 2.4, 1, 8 / 2.4] });
   c.add('tp_floor', -47, 0, { ...STONE, face: 'front', y: -0.25, stretch: [17.6 / 2.4, 1, 10 / 2.4] });
   c.add('tp_arch', -41, 0, { ...STONE, face: 'front', s: 4.2 });
+  c.add('wk_throne', -36.4, 0, { tint: [0.95, 0.8, 0.38], keep: 0.1, face: 'front', y: 0.25 }); // the King's seat, on the stage floor before the arch (web part, docs/WEB_PARTS.md)
+  c.add('px_ring', -53.6, 0, { y: 13.6, s: 2, face: 'front', tint: [0.12, 0.1, 0.16], keep: 0.3, walk: true }); // the black sun the way's omen names, risen over the stage wall
   for (const side of [-1, 1]) {
     c.add('tp_flag_eclipse', -37.6, side * 5.3, { ...GHOST, face: 'front', stretch: [3, 3.4, 1], y: 2.4, walk: true });
     c.add('hs_col_tall', -44.8, side * 6.9, { ...STONE });

@@ -170,7 +170,7 @@ By zacharykozak, https://sketchfab.com/3d-models/ancient-ruins-modular-c277e5aca
 # Credits: the arenas' gates (round 76)
 
 The leaves of the gates of the open arenas (`gateIndex.ts` + `gatePack.ts`, hung by `src/data/gateStyles.ts`, `render/gateRig.ts`) are cut from free models,
-all **Creative Commons Zero (CC0 1.0)**, which asks for no credit; it is given. They were made again for the game by `tools/models/bake_boss_models.py`
+**Creative Commons Zero (CC0 1.0)**, which asks for no credit (it is given), but for the serpent's head of Yig's gate (w20), the spiked ring of the Court's (w21) and the temple front of the Threshold's (w22), which are **CC BY 4.0** and credited as it asks. They were made again for the game by `tools/models/bake_boss_models.py`
 from `tools/models/boss/manifest_gates.py` (`tools/models/gates/fetch.py` fetches the sources): each leaf taken singly, decimated, its colours kept only as
 light and dark (the game lays the arena's own over them) and its size fitted to the metres it hangs at. The gates also hang models of the packs credited above
 (the temple doors, the standing stones, the flutes, the basalt and the dead trees). Changes are named for each.
@@ -194,6 +194,38 @@ By Jenelle van Heerden (modelling) and Dario Barresi (photography), Poly Haven, 
 By Kenney (www.kenney.nl), https://kenney.nl/assets/castle-kit, licensed CC0 1.0. Changes: its metal gate taken singly, turned to face the court, recoloured by the arena's dye (and, for Yig's, turned over) and stretched to fit the opening.
 
 `gate_portcullis`
+
+## Gate source w20 — Aztec Double-Headed Serpent for printing
+By corentin (https://sketchfab.com/corentin), https://sketchfab.com/3d-models/aztec-double-headed-serpent-for-printing-0781a78d31914f00a1b19a61b69113d2, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: one of its two halves taken, its head cut from the neck and the coil and the cut closed, the three pieces the viewer split it into joined, decimated to about 8,000 faces, turned to face along the wall, recoloured by the arena's dye and scaled to the gate's opening.
+
+`gate_yig_head`
+
+## Gate source w21 — Demons Gate
+By Trockk (https://sketchfab.com/Timrockk), https://sketchfab.com/3d-models/demons-gate-0207f4cafdfa476cb96512a899788c55, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: decimated to about 6,000 faces, given the metal class, recoloured by the gate's dye, and stretched to the gate's opening and flattened to half the wall's thickness.
+
+`gate_demon_ring`
+
+## Gate source w22 — Epic Alien Temple Door (animated)
+By Jungle Jim (https://sketchfab.com/jungle_jim), https://sketchfab.com/3d-models/epic-alien-temple-door-animated-1b2860e267b047f38488cf3ca4d3533b, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: only the carved temple front taken (its door leaves, its three halls and its ground left out), cut in two down its doorway and the cuts closed, decimated to about 9,000 faces each, colours kept only as light and dark under the gate's dye, turned about to face the court and stretched to the gate's opening.
+
+`gate_alien_l`, `gate_alien_r`
+
+# Credits: the web parts (round 78)
+
+The `wk_*` models of the `web` set (`webIndex.ts` + `webPack.ts`, baked from `tools/models/boss/manifest_web.py`, stood in nine courts; candidates and licences: `docs/WEB_PARTS.md`) are all CC0 1.0, which asks for no credit; it is given.
+
+## Web source kenney — Kenney's kits
+https://kenney.nl/assets (Graveyard Kit, Space Kit, Nature Kit, Tower Defense Kit, Mini Arena, City Kit (Industrial)), **CC0 1.0**.
+
+`wk_coffin` (coffin-old), `wk_crypt` (crypt-large), `wk_skeleton` (character-skeleton), `wk_cross` (gravestone-cross-large), `wk_keeper` (character-keeper), `wk_meteor` (meteor_detailed), `wk_crater` (craterLarge), `wk_crystals` (rock_crystalsLargeA), `wk_crystal` (detail-crystal-large), `wk_mushroom_a`, `wk_mushroom_b` (mushroom_redTall, mushroom_tanTall), `wk_statue` (mini-arena statue), `wk_generator` (machine_generatorLarge), `wk_pipe_ring` (pipe_ringHigh), `wk_tank` (detail-tank-large). Changes: welded and flattened to the game's faces, sized in metres, a figure's separate parts made one.
+
+## Web source quaternius — Quaternius's packs on OpenGameArt
+https://opengameart.org/users/quaternius (Ultimate Space Kit, Modular Dungeon, Medieval Village Pack), **CC0 1.0**.
+
+`wk_tree_spikes`, `wk_tree_spiral` (Tree Spikes, Tree Spiral), `wk_horse` (Statue_Horse, with its pedestal), `wk_well` (Well), `wk_candelabrum` (Candelabrum_tall). Changes: decimated, welded and flattened to the game's faces, sized in metres; the candelabrum has five flame anchors.
+
+## Web source oga — single models on OpenGameArt
+**CC0** (the licence line of each page read): `wk_egg` (Strange Egg, Umplix, https://opengameart.org/content/strange-egg), `wk_knight` (Knight statue, yd, https://opengameart.org/content/knight-statue), `wk_throne` (Barbarian throne, eugeneloza, https://opengameart.org/content/opendungeons-barbarian-throne), `wk_pyramid` (Pyramid 3d, Intrix, https://opengameart.org/content/pyramid-3d). Changes: the pieces of a statue made one, decimated, welded and flattened to the game's faces, sized in metres.
 
 # Credits: the dungeon models (round 79)
 
