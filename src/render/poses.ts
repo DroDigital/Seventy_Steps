@@ -11,6 +11,7 @@ import { FALL } from '../data/tuning';
 import type { MoveDef } from '../data/moves';
 import type { Figure } from './figures';
 import { settle, stride, type Ground } from './gait';
+import { playerMove, playerStride } from './playerPose';
 import { actPose } from './npcActs';
 import { showProps } from './npcProps';
 import { swing } from './swings';
@@ -28,6 +29,7 @@ export interface PoseInput {
   ground?: Ground; // the lie of the land about the feet (flat when absent)
   kneel?: number; // 0–1: kneeling before an Elder Sign, eased in and out (round 15)
   act?: { kind: ActKind; k: number }; // what a person is doing, and how far into it (0–1: they sit down, take it up; round 39)
+  weapon?: string; // the investigator's: what is in his hand (his clips are made for it)
   drop?: { t: number; spin: number; sea?: { since: number; held: number } }; // over an edge: seconds into the fall, and which way it tumbles, 1 head first (round 54); in the sea (round 55): seconds since it met the water (-1 before), and seconds the tentacle has had it
 }
 
@@ -43,6 +45,8 @@ function rest(f: Figure): void {
   f.body.rotation.set(f.hunch, 0, 0, 'YXZ');
   for (const j of [f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt]) j.rotation.set(0, 0, 0, 'YXZ');
   f.head.rotation.x = -f.hunch * 0.8; // keep a hunched head looking ahead
+  f.lantern?.rotation.set(0, 0, 0);
+  f.held = undefined;
   if (f.flash) f.flash.visible = false;
 }
 
@@ -302,14 +306,19 @@ export function pose(f: Figure, p: PoseInput): void {
     return;
   }
   if (p.drop) return p.drop.sea && p.drop.sea.since >= 0 ? thrash(f, p.drop.sea.since, p.drop.sea.held) : plunge(f, p.drop.t, p.drop.spin);
+  const mine = f.character === 'player'; // his own clips (playerPose.ts) where he has them
+  const player = { move: p.move, def: d, frame: p.frame, speed: p.speed, stride: p.stride, guard: p.guard, time: p.time, weapon: p.weapon ?? 'cane' };
+  let clipped = false;
   if (!d || p.move === null) {
-    stride(f, p.speed, p.stride, p.time, p.guard);
+    clipped = mine && playerStride(f, player);
+    if (!clipped) stride(f, p.speed, p.stride, p.time, p.guard);
     if (p.kneel) kneel(f, p.kneel);
     if (p.act) {
       actPose(f, p.act.kind, p.act.k, p.time);
       showProps(f, p.act.k > 0.02);
     }
   }
+  else if (mine && (clipped = playerMove(f, player))) { /* a clip made for this move */ }
   else if (p.move === 'death') fall(f, p.frame);
   else if (p.move === 'stagger' || p.move === 'guardBreak') reel(f, p.frame / d.frames, p.move === 'guardBreak' ? 1.6 : 1);
   else if (p.move === 'parried') recoil(f, p.frame);
@@ -323,7 +332,12 @@ export function pose(f: Figure, p: PoseInput): void {
     stride(f, p.speed, p.stride, p.time, false); // walking on beneath it
     (d.use === 'rounds' ? reload : d.use === 'reagent' ? inject : drink)(f, d, p.frame);
   }
-  f.body.rotation.x -= 0.18 * p.flinch;
-  f.head.rotation.x -= 0.25 * p.flinch;
-  settle(f, p.ground);
+  if (clipped) {
+    f.body.rotateX(-0.18 * p.flinch);
+    f.head.rotateX(-0.25 * p.flinch);
+  } else {
+    f.body.rotation.x -= 0.18 * p.flinch;
+    f.head.rotation.x -= 0.25 * p.flinch;
+  }
+  settle(f, p.ground, !clipped);
 }

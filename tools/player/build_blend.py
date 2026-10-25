@@ -37,7 +37,7 @@ def make_armature():
         head = F.to_blender(F.REST[j])
         # the bone points on to its first child's joint, else a short way along the limb (up for the trunk, down for a limb's end)
         child = next((c for c in kids.get(j, []) if F.JOINTS[c][1] != (0, 0, 0)), None)
-        tail = F.to_blender(F.REST[child]) if child else head + F.to_blender(np.array([0, -0.08 if j.startswith(('hand', 'foot')) else 0.08, 0.0]))
+        tail = F.to_blender(F.REST[child]) if child else head + F.to_blender(np.array([0, -0.08 if j.startswith(('hand', 'foot', 'lantern')) else 0.08, 0.0]))
         if np.linalg.norm(tail - head) < 1e-4:
             tail = head + np.array([0, 0, 0.06])
         if j.startswith('foot'):

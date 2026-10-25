@@ -4,29 +4,38 @@ lamp, the book of the incantation). Each is in the frame of the joint it hangs f
 business end down -y). Round 77: the props are new; the moves drew the hand empty before.
 """
 import numpy as np
-from kit import bevel, box, cylinder, hull_points, lathe, loft, merge, mix, prism, ring, shade, slab, sphere, wedge
+from kit import bevel, box, cylinder, hull_points, lathe, loft, merge, mix, prism, ring, shade, slab, sphere, torus, wedge
 from palette import BRASS, DARK, LANTERN, LEATHER, PALE, SILVER, STEEL, bone, charcoal, rust, sea
 
-LX, LY, LZ = 0.29, -0.235, 0.02  # the lantern's flame, in the torso's frame (the game's own light hangs there: src/render/investigator.ts)
+PX, PY, PZ = 0.29, -0.005, 0.02  # where the lantern hangs from the belt (the pendulum's pivot: the `lantern` joint), in the torso's frame
+LX, LY, LZ = 0.29, -0.255, 0.02  # the lantern's flame, in the torso's frame (the game's own light hangs there: src/render/investigator.ts)
+FLAME_Y = LY - PY  # and in the lantern joint's
 GREEN = np.array([0.17, 1.0, 0.63])  # Void Green, the anomaly colour: the Reagent glows it
 
 
+def lantern_mount():
+    """What the lantern hangs from, fixed on the belt (torso frame): a loop on the belt's end, a strap out to a brass clip over the lantern."""
+    return [box(0.03, 0.075, 0.05, 0.225, -0.03, PZ, LEATHER),
+            slab(0.022, 0.07, 0.024, (0.225 + PX) / 2, PY, PZ, LEATHER, rz=float(np.pi / 2)),
+            bevel(0.03, 0.03, 0.03, PX, PY, PZ, BRASS, 0.006)]
+
+
 def lantern():
-    """The lantern's cage at the belt, round the flame (the flame itself, `flame()`, is its own part: it gutters out with the mind)."""
+    """The lantern as it swings (the `lantern` joint's frame: its pivot at the origin): three links of chain, the bail ring, the cage round the flame (the flame
+    itself, `flame()`, is its own part: it gutters out with the mind)."""
     cage = shade(charcoal, 1.6)
-    x, y, z = LX, LY, LZ
+    iron = shade(charcoal, 1.9)
+    x, y, z = 0.0, FLAME_Y, 0.0
     s = [bevel(0.14, 0.022, 0.14, x, y - 0.085, z, cage, 0.006),  # the base plate
          bevel(0.12, 0.026, 0.12, x, y + 0.085, z, cage, 0.006),  # the cap's collar
-         hull_points(np.array([[-0.06, 0.098, -0.06], [0.06, 0.098, -0.06], [-0.06, 0.098, 0.06], [0.06, 0.098, 0.06], [-0.014, 0.14, -0.014], [0.014, 0.14, -0.014], [-0.014, 0.14, 0.014], [0.014, 0.14, 0.014]]) + [x, y, z], cage)]  # the hood
+         hull_points(np.array([[-0.06, 0.098, -0.06], [0.06, 0.098, -0.06], [-0.06, 0.098, 0.06], [0.06, 0.098, 0.06], [-0.014, 0.125, -0.014], [0.014, 0.125, -0.014], [-0.014, 0.125, 0.014], [0.014, 0.125, 0.014]]) + [x, y, z], cage)]  # the hood
     for sx in (-1, 1):
         for sz in (-1, 1):
             s.append(box(0.014, 0.17, 0.014, x + sx * 0.056, y, z + sz * 0.056, cage))  # the four bars
-    s.append(loft([ring(y + 0.01, 0.052, 0.052, x, z, n=8), ring(y + 0.0, 0.05, 0.05, x, z, n=8)], shade(LANTERN, 0.7)))  # (the glass is the flame's: nothing here)
-    s = s[:-1]
-    s.append(lathe([(y + 0.135, 0.032), (y + 0.15, 0.026), (y + 0.158, 0.006)], cage, n=6, cx=x, cz=z))  # the bail ring, a ball
-    s.append(box(0.03, 0.075, 0.05, 0.225, -0.03, LZ, LEATHER))  # what it hangs from: a loop on the belt's end...
-    s.append(slab(0.022, 0.1, 0.024, (0.225 + x) / 2, y + 0.155, LZ, LEATHER, rz=float(np.arctan2(x - 0.225, 0.055))))  # ...a strap down and out to the ring
-    s.append(box(0.026, 0.026, 0.03, 0.225, -0.07, LZ, BRASS))  # a brass clip where they meet
+    ring_y = y + 0.125 + 0.015
+    s.append(torus(0.026, 0.007, x, ring_y, z, iron, axis='z', n=8, m=4))  # the bail ring
+    for i, ax in enumerate(('x', 'z', 'x')):  # the chain: links turned a quarter to one another
+        s.append(torus(0.011, 0.0035, x, ring_y + 0.033 + 0.021 * (2 - i) + 0.0, z, shade(iron, 1.1), axis=ax, n=6, m=3))
     return s
 
 

@@ -15,7 +15,7 @@ def rings(spec, n=8, ch=0.4):
 
 def torso():
     """Belt at y = 0, the neck at 0.64, the shoulder joints at (+-0.28, 0.58): a coat cinched at the waist, broad in the chest, sloping to the neck."""
-    s = [loft(rings([(-0.02, 0.205, 0.140, 0, 0.005), (0.10, 0.183, 0.124), (0.27, 0.205, 0.128), (0.43, 0.236, 0.134), (0.54, 0.256, 0.130), (0.60, 0.205, 0.112), (0.645, 0.108, 0.098)]), COAT, caps=(True, True))]
+    s = [loft(rings([(-0.02, 0.205, 0.140, 0, 0.005), (0.10, 0.183, 0.124), (0.27, 0.205, 0.128), (0.43, 0.236, 0.134), (0.52, 0.248, 0.130), (0.565, 0.232, 0.118), (0.60, 0.15, 0.104), (0.64, 0.088, 0.096)]), COAT, caps=(True, True))]
     s.append(slab(0.075, 0.27, 0.022, -0.075, 0.45, 0.13, FACING, -0.32))  # lapels
     s.append(slab(0.075, 0.27, 0.022, 0.075, 0.45, 0.13, FACING, 0.32))
     s.append(slab(0.05, 0.05, 0.024, -0.115, 0.545, 0.128, shade(FACING, 1.08), -0.5))  # their notches
@@ -30,8 +30,8 @@ def torso():
     s.append(box(0.04, 0.06, 0.012, -0.145, 0.43, 0.14, SHIRT))  # a notebook's corner in the breast pocket...
     s.append(box(0.012, 0.075, 0.012, -0.125, 0.45, 0.143, BRASS))  # ...and its pencil
     s.append(bevel(0.032, 0.032, 0.014, 0.12, 0.48, 0.132, BRASS, 0.006))  # an Elder Sign on the left lapel
-    s.append(bevel(0.09, 0.018, 0.09, -0.228, 0.6, 0, LEATHER, 0.006).turn(rz=-0.22))  # epaulettes: a field coat's
-    s.append(bevel(0.09, 0.018, 0.09, 0.228, 0.6, 0, LEATHER, 0.006).turn(rz=0.22))
+    s.append(bevel(0.085, 0.014, 0.09, -0.236, 0.572, 0, LEATHER, 0.005).turn(rz=-0.2))  # epaulettes: a field coat's
+    s.append(bevel(0.085, 0.014, 0.09, 0.236, 0.572, 0, LEATHER, 0.005).turn(rz=0.2))
     s.append(bevel(0.012, 0.45, 0.012, 0, 0.32, -0.133, shade(COAT, 0.7), 0.003))  # the back seam
     s.append(bevel(0.34, 0.012, 0.01, 0, 0.5, -0.131, shade(COAT, 0.75), 0.003))  # the yoke
     s.append(bevel(0.44, 0.06, 0.275, 0, 0.0, 0.002, LEATHER, 0.014))  # belt
@@ -41,17 +41,16 @@ def torso():
     for k in range(6):  # a cartridge loop on the belt, six rounds of brass
         s.append(cylinder(0.011, 0.011, 0.036, 0.0, BRASS, n=5, cx=-0.185 + 0.027 * k * 0.78, cz=0.14 - 0.012 * k * 0.0).move(0, 0, 0))
     # the collar turned up, and the scarf at the neck
-    s.append(bevel(0.25, 0.075, 0.06, 0, 0.665, -0.108, FACING, 0.012))
-    s.append(bevel(0.06, 0.075, 0.16, -0.122, 0.655, -0.01, FACING, 0.01))
-    s.append(bevel(0.06, 0.075, 0.16, 0.122, 0.655, -0.01, FACING, 0.01))
+    s.append(bevel(0.23, 0.05, 0.055, 0, 0.652, -0.106, FACING, 0.01))
+    s.append(bevel(0.055, 0.05, 0.15, -0.118, 0.646, -0.01, FACING, 0.008))
+    s.append(bevel(0.055, 0.05, 0.15, 0.118, 0.646, -0.01, FACING, 0.008))
     s.append(loft([ring(0.597, 0.112, 0.108, n=8, ch=0.5), ring(0.64, 0.118, 0.114, n=8, ch=0.5), ring(0.685, 0.108, 0.104, n=8, ch=0.5)], SCARF))
     s.append(bevel(0.075, 0.075, 0.05, 0.06, 0.585, 0.112, shade(SCARF, 1.12), 0.012))  # the knot...
-    s.append(slab(0.06, 0.2, 0.026, 0.085, 0.49, 0.125, SCARF, 0.12))  # ...a short end down the chest
-    s.append(slab(0.085, 0.34, 0.03, 0.06, 0.45, -0.145, SCARF, 0.1))  # ...and the long tail down the back
+    s.append(slab(0.06, 0.2, 0.026, 0.085, 0.49, 0.125, SCARF, 0.12))  # ...a short end down the chest (no tail down the back)
     # the satchel's strap: over the left shoulder, across the chest and the back, to the bag at the right hip behind
     s.append(slab(0.045, 0.7, 0.02, 0, 0.31, 0.134, LEATHER, -0.74))
     s.append(slab(0.045, 0.7, 0.02, 0, 0.31, -0.136, LEATHER, -0.74))
-    s.append(bevel(0.05, 0.03, 0.026, 0.205, 0.575, 0.0, shade(LEATHER, 0.9), 0.006))  # its pad on the shoulder
+    s.append(bevel(0.05, 0.02, 0.026, 0.2, 0.572, 0.0, shade(LEATHER, 0.9), 0.005))  # its pad on the shoulder
     return s
 
 
@@ -101,8 +100,8 @@ def hat():
 
 def upper_arm():
     """The sleeve from the shoulder joint (y 0) to the elbow (y -0.30): a cap over the shoulder, a bulge, a taper."""
-    s = [loft(rings([(-0.31, 0.056, 0.062), (-0.2, 0.062, 0.07), (-0.08, 0.074, 0.08), (0.0, 0.07, 0.075), (0.05, 0.058, 0.064)], ch=0.5), SLEEVE),
-         sphere(0.072, shade(SLEEVE, 1.02), at=(0, 0.004, 0), detail=1, squash=(1.0, 0.82, 1.0)),  # the cap on the joint
+    s = [loft(rings([(-0.31, 0.056, 0.062), (-0.2, 0.062, 0.07), (-0.08, 0.074, 0.08), (0.0, 0.066, 0.07)], ch=0.5), SLEEVE),
+         sphere(0.066, shade(SLEEVE, 1.02), at=(0, -0.035, 0), detail=1, squash=(1.0, 0.75, 1.0)),  # the cap on the joint
          bevel(0.1, 0.05, 0.1, 0, -0.29, 0, FACING, 0.008)]  # the turn of the elbow's patch is on the forearm
     return s
 

@@ -44,6 +44,8 @@ export interface Figure {
   holstered?: THREE.Object3D; // ...and its grip in the holster the rest of the time (actorViews.ts; round 22)
   arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts); the sword-cane has two, `cane` and `cane_drawn`
   props?: Record<string, THREE.Object3D>; // what the off-hand takes up for a move, shown while it does (flask, laudanum, syringe, powder, match, book; poses.ts)
+  held?: { drawn: boolean; props: readonly string[] }; // what a clip has the investigator hold: the sword-cane's blade drawn, and the off-hand's prop (playerPose.ts; actorViews.ts shows them)
+  lantern?: THREE.Object3D; // the investigator's lantern, hung from the belt: a joint of its own that swings (clips baked from Blender: playerClips.ts); the flame and its cage are its children
   flame?: THREE.Object3D; // the investigator's lantern flame: its halo hangs here (worldLights.ts)
   flameMesh?: THREE.Mesh; // ...and the flame drawn there, which goes dark when the mind is Unmoored (lanternLife.ts)
   fixture?: THREE.Group; // a person's own chair and table: set where they are put and kept there as they stand and turn (npcProps.ts, actorViews.ts)

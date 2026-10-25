@@ -59,14 +59,15 @@ const stage = await page.evaluate(() => {
 });
 
 /** The camera round the point (x, z) at `yaw` from the figure's front, `d` metres off, looking at height `h`, the lens `fov` degrees. */
-async function look(yawOff, d, h, fov, centre = 0) {
-  await page.evaluate(({ s, yawOff, d, h, fov, centre }) => {
+async function look(yawOff, d, h, fov, centre = 0, follow = false) {
+  await page.evaluate(({ s, yawOff, d, h, fov, centre, follow }) => {
     const ay = s.yaw + yawOff;
     const [rx, rz] = [-Math.cos(s.yaw), Math.sin(s.yaw)]; // his right
-    const cx = s.x + rx * centre;
-    const cz = s.z + rz * centre;
+    const here = follow ? window.game.ecs.c.transform.get(window.game.player.id).pos : s;
+    const cx = here.x + rx * centre;
+    const cz = here.z + rz * centre;
     window.__cam = { pos: [cx + Math.sin(ay) * d, s.y + h + 0.25, cz + Math.cos(ay) * d], at: [cx, s.y + h, cz], fov };
-  }, { s: stage, yawOff, d, h, fov, centre });
+  }, { s: stage, yawOff, d, h, fov, centre, follow });
   await page.waitForTimeout(900);
 }
 
@@ -104,7 +105,43 @@ if (mode === 'npcs') {
 }
 
 if (mode === 'clip') {
-  console.log('clip frames are taken once the clips are keyed (tools/player/clips.py, src/render/playerClips.ts)');
+  const move = args[2];
+  const views = flag('--views', 'q34,side').split(',');
+  const frames = flag('--frames', '').split(',').filter(Boolean).map(Number);
+  const info = await page.evaluate(async ({ move, weapon, drawn }) => {
+    const g = window.game;
+    const { equip } = await import('/src/systems/arms.ts');
+    const { startMove } = await import('/src/systems/actions.ts');
+    if (weapon !== 'cane') g.player.arms.push(weapon), (g.player.reinforced[weapon] ??= 0);
+    equip(g, weapon);
+    window.fxlab.hold(true);
+    window.settings.shake = 0;
+    const a = g.ecs.c.actor.get(g.player.id);
+    startMove(a, move);
+    return { frames: a.moves[move]?.frames ?? null, weapon: g.player.weapon };
+  }, { move, weapon, drawn });
+  if (!info.frames) throw new Error(`no move ${move} with ${weapon}`);
+  await page.waitForTimeout(600); // a frame drawn, so the pose crossfade (poseBlend.ts) has its start...
+  await page.evaluate(() => window.fxlab.skip(0.14)); // ...and the held clock a little on, so it has run its course
+  const list = frames.length ? frames : Array.from({ length: 9 }, (_, i) => Math.round((i * (info.frames - 1)) / 8));
+  for (const v of views) {
+    for (const f of list) {
+      await page.evaluate(({ f, move, stage }) => { // the held game moves nothing, so the root's travel (the move's motion window) is laid by hand
+        const g = window.game;
+        const a = g.ecs.c.actor.get(g.player.id);
+        const tr = g.ecs.c.transform.get(g.player.id);
+        a.move = move;
+        a.frame = f;
+        a.hitstop = 99999; // the frame is drawn as it is, with no share of the next
+        const mo = a.moves[move].motion;
+        const d = mo ? ((mo.dir === 'back' ? -1 : 1) * mo.distance * Math.min(1, Math.max(0, (f - mo.window[0]) / (mo.window[1] - mo.window[0])))) : 0;
+        tr.pos.x = tr.prev.x = stage.x + Math.sin(stage.yaw) * d;
+        tr.pos.z = tr.prev.z = stage.z + Math.cos(stage.yaw) * d;
+      }, { f, move, stage });
+      await look(VIEWS[v], 4.4, 0.92, 30, 0, true);
+      await shot(`${move}_${weapon}_${v}_${String(f).padStart(3, '0')}`);
+    }
+  }
 }
 
 await browser.close();

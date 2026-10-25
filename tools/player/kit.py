@@ -226,3 +226,30 @@ def sphere(r, c, at=(0, 0, 0), detail=1, squash=(1, 1, 1)):
         f = nf
     pts = np.array(v) * r * np.array(squash) + np.array(at)
     return fix_winding(Shape(pts, f, np.tile(np.asarray(c, float), (len(f), 1))), at)
+
+
+def torus(R, r, x, y, z, c, axis='z', n=8, m=4):
+    """A ring of tube radius r on a circle of radius R about (x, y, z), lying in the plane perpendicular to `axis` (z: a ring seen from the front; x: from the side), n round it, m round the tube."""
+    v, f = [], []
+    for i in range(n):
+        a = 2 * np.pi * i / n
+        for j in range(m):
+            b = 2 * np.pi * j / m
+            d = R + r * np.cos(b)
+            p = [d * np.cos(a), d * np.sin(a), r * np.sin(b)]  # in the plane xy, the axis along z
+            v.append({'z': p, 'x': [p[2], p[1], -p[0]], 'y': [p[0], p[2], -p[1]]}[axis])
+    for i in range(n):
+        for j in range(m):
+            a, b = i * m + j, ((i + 1) % n) * m + j
+            a2, b2 = i * m + (j + 1) % m, ((i + 1) % n) * m + (j + 1) % m
+            f += [[a, b, b2], [a, b2, a2]]
+    s = Shape(np.array(v) + [x, y, z], f, np.tile(np.asarray(c, float), (len(f), 1)))
+    centre = np.array([x, y, z])
+    n_ = s.normals()
+    # wind outward: every face's normal away from the nearest point of the ring's centre line
+    tri = s.tris().mean(axis=1) - centre
+    ring_pt = tri - {'z': np.array([0, 0, 1.0]), 'x': np.array([1.0, 0, 0]), 'y': np.array([0, 1.0, 0])}[axis] * np.einsum('ij,j->i', tri, {'z': np.array([0, 0, 1.0]), 'x': np.array([1.0, 0, 0]), 'y': np.array([0, 1.0, 0])}[axis])[:, None]
+    ring_pt = ring_pt / np.maximum(np.linalg.norm(ring_pt, axis=1, keepdims=True), 1e-9) * R
+    out = np.einsum('ij,ij->i', n_, tri - ring_pt) < 0
+    s.f[out] = s.f[out][:, ::-1]
+    return s

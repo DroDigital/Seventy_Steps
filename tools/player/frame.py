@@ -32,6 +32,7 @@ JOINTS = {
     'footL':  ('kneeL', (0, ANKLE + THIGH - LEG, 0)),
     'skirtR': ('body',  (0, 0, 0)),
     'skirtL': ('body',  (0, 0, 0)),
+    'lantern': ('torso', (0.29, -0.005, 0.02)),  # what the lantern hangs from at the belt: it swings (clips: lantern.py), its pivot is where the strap ends
 }
 ORDER = list(JOINTS)  # parents before children
 

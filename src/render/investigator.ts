@@ -38,6 +38,7 @@ const joint = (f: Figure, p: PlayerPart): THREE.Object3D => {
   switch (p.joint) {
     case 'skirtR': return f.skirt[0];
     case 'skirtL': return f.skirt[1];
+    case 'lantern': return f.lantern!;
     default: return f[p.joint];
   }
 };
@@ -50,6 +51,9 @@ export function investigator(): Figure {
     f.body.add(panel);
     f.skirt.push(panel); // right, then left: the baked parts name them
   }
+  f.lantern = new THREE.Group(); // the pivot where the strap ends at the belt: tools/player/frame.py
+  f.lantern.position.set(0.29, -0.005, 0.02);
+  f.torso.add(f.lantern);
   f.arms = {};
   f.props = {};
   const merged = new Map<string, PlayerPart[]>(); // the body's parts on one joint and texture are one mesh

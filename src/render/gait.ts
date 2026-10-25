@@ -78,7 +78,7 @@ function track(keys: readonly Key[], t: number, c: 1 | 2): number {
 }
 
 /** How much of each gait a speed is: stride (standing 0 → striding 1), run (walk → run), sprint (run → sprint). */
-function blendAt(speed: number): { stride: number; run: number; sprint: number } {
+export function blendAt(speed: number): { stride: number; run: number; sprint: number } {
   return { stride: smooth(0, 0.9, speed), run: smooth(2.3, 3.8, speed), sprint: smooth(4.6, 6.2, speed) };
 }
 
@@ -187,7 +187,7 @@ export type Ground = (x: number, z: number) => number;
  * its foot would sink into the ground, a foot lies level on the ground and lets its toes drop as it
  * lifts, and each coat panel follows its thigh.
  */
-export function settle(f: Figure, ground?: Ground): void {
+export function settle(f: Figure, ground?: Ground, level = true): void {
   const pitch = wrapAngle(f.body.rotation.x);
   const clearance = f.hip - f.thigh - f.shin;
   const shank = f.shin - f.ankle; // knee to ankle
@@ -207,8 +207,8 @@ export function settle(f: Figure, ground?: Ground): void {
       }
       const shin = thigh + knee.rotation.x;
       const lifted = room - f.thigh * Math.cos(thigh) - shank * Math.cos(shin);
-      foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts
+      if (level) foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts (a clip has its own feet: level = false)
     });
   }
-  f.skirt.forEach((panel, i) => (panel.rotation.x = 0.9 * (i === 0 ? f.legR : f.legL).rotation.x));
+  if (level) f.skirt.forEach((panel, i) => (panel.rotation.x = 0.9 * (i === 0 ? f.legR : f.legL).rotation.x));
 }

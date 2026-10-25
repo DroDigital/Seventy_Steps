@@ -19,7 +19,7 @@ export interface PoseBlend {
 }
 
 export function createPoseBlend(f: Figure): PoseBlend {
-  const joints = [f.body, f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt];
+  const joints = [f.body, f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt, ...(f.lantern ? [f.lantern] : [])];
   const from = joints.map(() => new THREE.Quaternion());
   let [was, guarded] = [null as string | null, false];
   let [hip, at, last] = [f.hip, -Infinity, -Infinity];

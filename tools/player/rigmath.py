@@ -32,7 +32,7 @@ def game_world(pose):
         parent, off = F.JOINTS[j]
         q = pose.get(j, (1, 0, 0, 0))
         if parent is None:
-            pos = pose.get('body_pos') or off
+            pos = pose['body_pos'] if pose.get('body_pos') is not None else off
             W[j] = T(pos) @ R(q)
         else:
             W[j] = W[parent] @ T(off) @ R(q)

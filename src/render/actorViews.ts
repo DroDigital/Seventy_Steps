@@ -40,6 +40,7 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
+  drawnUntil: number; // the investigator's sword-cane stays drawn until this sim time (a blow draws it)
 }
 
 export interface ActorViews {
@@ -107,7 +108,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0 });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, drawnUntil: -Infinity });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -191,14 +192,19 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const falling = id === g.player.id && move !== 'death' ? g.player.falling : null; // over an edge, before the death at the foot of it (round 54)
     const water = falling?.water;
     const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin, sea: water ? { since: water.entered < 0 ? -1 : (falling.frame + alpha - water.entered) / SIM.hz, held: water.grab < 0 ? 0 : (falling.frame + alpha - water.grab) / SIM.hz } : undefined } : undefined;
-    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop });
+    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop, weapon: id === g.player.id ? g.player.weapon : undefined });
     if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
       f.root.updateMatrixWorld(true);
       const beat = pipeBeat(time + id * 1.7);
       smokers.push({ bowl: f.pipe.getWorldPosition(new THREE.Vector3()), mouth: f.mouth.getWorldPosition(new THREE.Vector3()), out: beat.out * v.actK, draw: beat.draw * v.actK });
     }
     v.blend.apply(time);
-    if (f.arms && id === g.player.id) for (const [w, m] of Object.entries(f.arms)) m.visible = w === g.player.weapon; // the weapon in hand
+    if (f.arms && id === g.player.id) { // the weapon in hand: the sword-cane's blade is drawn for a blow and sheathed a little after (his clips say when: playerPose.ts)
+      if (f.held?.drawn) v.drawnUntil = time + 0.7;
+      const shown = g.player.weapon === 'cane' && time < v.drawnUntil ? 'cane_drawn' : g.player.weapon;
+      for (const [w, m] of Object.entries(f.arms)) m.visible = w === shown;
+    }
+    if (f.props && id === g.player.id) for (const [name, m] of Object.entries(f.props)) m.visible = !!f.held?.props.includes(name); // what the off-hand takes up
     if (f.gun && id === g.player.id) {
       const drawn = move === 'shoot' || move === 'reload'; // the revolver comes out of its holster for a shot or a reload, and goes back (round 22)
       f.gun.visible = drawn;

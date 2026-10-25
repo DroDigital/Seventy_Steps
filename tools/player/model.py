@@ -25,9 +25,10 @@ class Part:
 def parts():
     out = []
     add = lambda *a, **k: out.append(Part(*a, **k))
-    add('torso', 'torso', 'cloth', 'body', merge([*B.torso(), *G.lantern(), *G.holster(), *G.flask_belt(), *B.satchel()]))
-    add('head', 'head', 'cloth', 'body', merge(B.head()))
-    add('hat', 'head', 'cloth', 'body', merge(B.hat()))
+    add('torso', 'torso', 'cloth', 'body', merge([*B.torso(), *G.lantern_mount(), *G.holster(), *G.flask_belt(), *B.satchel()]))
+    add('lantern', 'lantern', 'cloth', 'body', merge(G.lantern()))
+    add('head', 'head', 'cloth', 'body', merge(B.head()).move(0, 0.025, 0))  # the head sits a little higher on its neck than the old figure's, out of the shoulders
+    add('hat', 'head', 'cloth', 'body', merge(B.hat()).move(0, 0.025, 0))
     for side, arm, elbow, hand in (('R', 'armR', 'elbowR', 'handR'), ('L', 'armL', 'elbowL', 'handL')):
         add(f'sleeve{side}', arm, 'cloth', 'body', merge(B.upper_arm()))
         add(f'forearm{side}', elbow, 'cloth', 'body', merge(B.fore_arm()))
@@ -43,7 +44,7 @@ def parts():
     add('gun', 'handL', 'cloth', 'gun', merge(G.revolver()))
     add('flash', 'handL', 'flesh', 'flash', box(0.16, 0.16, 0.16, 0, 0, 0, np.array(PALE) * 0 + np.array([0.85, 0.82, 0.72])), emissive=1.0, at=(0, -0.32, 0.03))
     add('holstered', 'torso', 'cloth', 'holstered', merge(G.holstered_grip()))
-    add('flame', 'torso', 'cloth', 'flame', merge(G.flame()), emissive=1.0, at=(G.LX, G.LY, G.LZ))
+    add('flame', 'lantern', 'cloth', 'flame', merge(G.flame()), emissive=1.0, at=(0.0, G.FLAME_Y, 0.0))
     for pid, build in (('flask', G.oil_flask), ('laudanum', G.laudanum_bottle), ('syringe', G.syringe), ('powder', G.powder_packet), ('match', G.match), ('book', G.book)):
         add(f'prop_{pid}', 'handL', 'cloth', f'prop:{pid}', merge(build()), emissive=0.6 if pid in ('syringe', 'match') else 0.0)
     return out
