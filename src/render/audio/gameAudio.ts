@@ -38,6 +38,7 @@ import { realmTrackOf, type RealmTrackId } from '../../data/realmMusic';
 import { createRealmMusic } from './realmMusic';
 import { createDread } from './dread';
 import { createWeatherBed } from './weatherBed';
+import { bedKind } from '../../data/weatherSkins';
 import { CUES, cueFor, dullness, nextCall, placeSound, type Cue } from './cues';
 import { impactLayers, landedBlow } from './impact';
 import type { Drones } from './drones';
@@ -329,7 +330,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       const at = g.ecs.c.transform.get(g.player.id)?.pos;
       const roofed = (g.overworld && at && inside(at)) || null;
       ambience.set(roofed || (AMBIENCE[region ?? ''] ?? null));
-      weatherBed.set(g.overworld?.weather.kind ?? 'clear', g.overworld?.weather.amount ?? 0, !!roofed); // round 26
+      weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 78: on snow and sand a storm is the wind alone, not the wash of rain)
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });
