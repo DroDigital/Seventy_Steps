@@ -64,6 +64,9 @@ export const colossus: PlaceFn = (c: Court, h: House) => {
   ];
   for (const [i, [a, cc, w, hh, d]] of drifts.entries()) c.add('px_dune', a, cc, { tint: [0.85, 0.74, 0.54], keep: 0.35, stretch: [w / 12, hh / 3, d / 8], face: 'in', turn: i * 41 });
 
+  // pyramids beyond the back wall, on the ground levelled for it (web part wk_pyramid, docs/WEB_PARTS.md)
+  for (const side of [-1, 1]) c.add('wk_pyramid', -B - 14, side * 30, { ...SAND, s: 0.55, face: 'in', y: -1.5, walk: true, turn: side * 8 });
+
   // what moves in it: sand blown along the walls, the braziers' smoke
   for (const side of [-1, 1]) c.emit({ at: [-B + 4, side * (S - 6)], to: [G - 8, side * (S - 6)], y: [0.2, 1.8], rate: 3.2, life: [4, 7], size: [1.4, 2.4], grow: 1.4, colour: [0.78, 0.66, 0.46], alpha: 0.16, drift: 0.2, flow: { x: 0, z: side * 0.9 }, shape: 'wisp', reach: 90 });
   for (const side of [-1, 1]) c.emit({ at: [G, side * 19], y: [crown + 1.5, crown + 2], r: 0.6, rate: 3, life: [4, 7], size: [1, 1.7], grow: 2.4, colour: [0.3, 0.26, 0.22], alpha: 0.26, rise: 1, drift: 0.2, flow: { x: -0.2, z: 0.3 }, shape: 'wisp', reach: 110 });

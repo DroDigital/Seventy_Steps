@@ -80,6 +80,15 @@ export const orne: PlaceFn = (c: Court, h: House) => {
   c.add('altar_stone', altar, 0, { face: 'in', s: 1.25 });
   for (const cc of [-0.95, -0.45, 0.45, 0.95]) c.add('candles', altar, cc, { y: 1.4, s: 1.4, lit: 'torch', walk: true, face: 'in' });
   c.add('chalice', altar, 0, { y: 1.4, s: 1.6, walk: true, face: 'in' });
+  // dug up and not put back (web parts, docs/WEB_PARTS.md): coffins half out of the ground, one of the dead risen at the back, crosses by the chapel's path, a candelabrum either side of the altar
+  for (const [a, cc, yaw] of [[-B + 14, -12, 0.5], [-B + 19.5, -19, 2.4], [-B + 13, 27, 1.1]] as const) c.add('wk_coffin', a, cc, { yaw, y: -0.3, tint: [0.4, 0.34, 0.3], keep: 0.5 });
+  c.add('wk_crypt', -B + 5.2, 22, { face: 'in', s: 0.85, tint: [0.55, 0.55, 0.58], keep: 0.4 }); // a mausoleum by the chapel
+  c.add('wk_skeleton', -B + 9.5, -24, { face: 'in', turn: 30, tint: [0.78, 0.74, 0.66], keep: 0.5 });
+  for (const side of [-1, 1]) {
+    c.add('wk_cross', -B + 13, side * 6, { face: 'front', turn: side * 12, tint: [0.5, 0.5, 0.52], keep: 0.4 });
+    c.add('wk_candelabrum', altar, side * 2.5, { face: 'in', lit: 'torch', flame: 0.45, s: 1.1 });
+  }
+
   // trees over the wall, and two bare ones taller than they beyond its back corners
   for (const side of [-1, 1]) c.add('gt_dead_5', -B - 6, side * (S + 4), { height: 10, round: true, yaw: side * 2.1 });
   for (const [a, cc, id, hgt] of [[G - 6, S - 5, 'gy_tree_2', 8], [G - 4, -S + 6, 'gy_tree_1', 6.5], [-B + 6, S - 5, 'gy_tree_1', 7.5], [-B + 5, -S + 6, 'gy_tree_2', 8.5], [0, S - 3, 'gy_tree_2', 7], [6, -S + 3, 'gy_tree_1', 6]] as const) {
