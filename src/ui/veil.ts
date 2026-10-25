@@ -6,12 +6,15 @@
  * resolution and upscaled like the game, so it shares its look. Over the title it only haunts the
  * edges, breathing. While the world is made under it, a line beneath the name fills from its middle
  * outwards as the making goes (playtest round 10: a start was seconds of black with nothing to say
- * that anything was happening).
+ * that anything was happening). Round 80: the name is larger and inks in a letter at a time once the dark covers all (ui/inkTitle.ts),
+ * and the line beneath it comes a moment after the last letter.
  */
 
 import { fbm } from '../core/noise';
+import { VEIL } from '../data/uiMood';
 import { nextLore } from './loreLine';
 import { BONE, SERIF } from './hudKit';
+import { inkLetters, inkSeed, playIn } from './inkTitle';
 
 const [W, H] = [240, 135]; // pixels, upscaled nearest-neighbour
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
@@ -103,13 +106,24 @@ export function createVeil(): Veil {
   canvas.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:8;pointer-events:none;image-rendering:pixelated;display:none';
   const words = document.createElement('div');
   const lore = document.createElement('div'); // a line under the place's name (round 14)
-  words.style.cssText = `position:fixed;left:0;right:0;top:61%;z-index:8;pointer-events:none;text-align:center;font:calc(13px * var(--ui, 1)) ${SERIF};letter-spacing:calc(6px * var(--ui, 1));color:${BONE};opacity:0`;
+  words.style.cssText = `position:fixed;left:0;right:0;top:61%;z-index:8;pointer-events:none;text-align:center;font:calc(17px * var(--ui, 1)) ${SERIF};letter-spacing:calc(6px * var(--ui, 1));color:${BONE};opacity:0`;
   lore.style.cssText = `margin:calc(22px * var(--ui, 1)) auto 0;max-width:min(640px,80vw);font-style:italic;letter-spacing:.04em;font-size:calc(13px * var(--ui, 1));line-height:1.6;opacity:.6`;
   const said = document.createElement('span');
   words.append(said, lore);
+  let name = ''; // the words as said, inked in once the dark covers all
+  let inked: Animation[] = [];
   const say = (text: string, line?: string): void => {
+    for (const a of inked) a.cancel();
+    inked = [];
+    name = text;
     said.textContent = text;
     lore.textContent = text ? (line ?? nextLore()) : '';
+  };
+  /** The name comes out of the dark a letter at a time, and the line beneath it a moment after the last (round 80). */
+  const ink = (): void => {
+    for (const a of inked) a.cancel();
+    inked = playIn(inkLetters(said, name), inkSeed(name));
+    if (lore.textContent && inked.length) inked.push(lore.animate([{ opacity: 0 }, { opacity: 0.6 }], { duration: VEIL.loreRise, delay: VEIL.loreDelay, easing: 'ease-out', fill: 'both' }));
   };
   document.body.append(canvas, words);
   const ctx = canvas.getContext('2d');
@@ -184,8 +198,10 @@ export function createVeil(): Veil {
     lastAt = now;
     coverage = haunting && p >= 1 ? HAUNT + 0.03 * Math.sin(now / 900) : from + (to - from) * ease(p);
     const full = coverage >= 1;
-    if (full && shownAt < 0) shownAt = now;
-    else if (!full) shownAt = -1;
+    if (full && shownAt < 0) {
+      shownAt = now;
+      ink();
+    } else if (!full) shownAt = -1;
     words.style.opacity = full ? `${Math.min(1, (now - shownAt) / 450)}` : '0';
     canvas.style.display = coverage > 0 ? 'block' : 'none';
     if (coverage > 0) paint(now);

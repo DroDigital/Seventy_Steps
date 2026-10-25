@@ -7,13 +7,15 @@
  */
 
 import { EXPLORE, SIM } from '../data/tuning';
-import { hourName, phaseOf } from '../systems/clock';
+import { t } from '../core/i18n';
+import { hourOf, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import { currentLead } from '../systems/lead';
 import { markersHere } from '../systems/marker';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
 import { BONE, el, setText } from './hudKit';
+import { HOUR_LABEL } from './hourCards';
 import { drawBeacon } from './leadMark';
 import { workArt } from './mapArt';
 import { UNIT, type MapPainter } from './mapPainter';
@@ -46,7 +48,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       if (!g.overworld) return;
       const phase = phaseOf(g.frame / SIM.hz);
       moon.style.left = `${(phase * 100).toFixed(1)}%`;
-      setText(hour, hourName(phase));
+      setText(hour, t(HOUR_LABEL[hourOf(phase)])); // (round 80: in the language chosen)
       workArt(ART_MS);
       if (tick++ % 2) return; // thirty times a second is plenty
       const p = g.ecs.c.transform.get(g.player.id)!.pos;

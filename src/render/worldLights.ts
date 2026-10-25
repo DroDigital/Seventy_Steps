@@ -14,6 +14,8 @@ import * as THREE from 'three';
 import type { V3 } from '../core/geom';
 import { LIGHTS, SANITY, type LightDef, type LightKind } from '../data/tuning';
 import type { CollisionWorld } from '../world/colliders';
+import { HEARTH } from '../data/lightSounds';
+import { beginHeard, pushHeard } from './audio/heardLights';
 import { createFlames } from './flames';
 import { createHalos } from './halos';
 import { createLightSight } from './lightSight';
@@ -64,6 +66,19 @@ export interface WorldLights {
 const MAX_HALOS = 400;
 const MAX_FLAMES = 640;
 
+/** A light spot in reach: how far from the investigator (or the eye), and how much of it shows. */
+export interface Lit {
+  s: LightSpot;
+  d: number;
+  v: number;
+}
+
+/**
+ * What the last `update` chose, for the atmosphere's own passes to read (round 80: render/lampAim.ts, render/windowSpill.ts), refilled in place:
+ * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye.
+ */
+export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[] } = { seen: [], visible: [] };
+
 /** How far the mind has gone (0..1; set each frame by worldLife.ts, round 26): the flames of a failing mind's world waver harder, and some gutter out for a moment. */
 export const LIGHT_NERVES = { madness: 0 };
 
@@ -89,6 +104,8 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
   const visible: typeof near = []; // halo visibility belongs to the eye; lighting belongs to the investigator
   const seen: typeof near = [];
   const casters: Caster[] = [];
+  LIGHT_VIEW.seen = seen;
+  LIGHT_VIEW.visible = visible;
   return {
     halos,
     flames: flameBatch.mesh,
@@ -138,6 +155,11 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       haloSight.update(visible, eye, time);
       seen.length = 0;
       for (const n of near) if (n.v > 0.02) seen.push(n); // the lamps are for the lights that show: one in the next room takes none
+      beginHeard(); // round 80: the nearest in earshot, for the sound of them (audio/hearth.ts); one in the next room is heard dulled, so these are `near`, not `seen`
+      for (const n of near) {
+        if (n.d > HEARTH.reach) break;
+        if (n.s.kind !== 'window' && !pushHeard(n.s, n.d, n.v, waver(n.s, LIGHTS.kinds[n.s.kind].flicker, time))) break; // (a lit window is mute)
+      }
       const reach = Math.min(LIGHTS.reach, seen[LAMP_SLOTS]?.d ?? Infinity); // the next in line is at nothing
       casters.length = 0;
       const lamps = worldUniforms.uLamps.value;

@@ -11,6 +11,7 @@ import { LOOKS, lookOf, type Look } from '../data/looks';
 import { DUNGEON_LIGHT, NIGHT_DARK, SKY, type Vec3 } from '../data/tuning';
 import type { FxParams } from './fx';
 import type { PostPass } from './postPass';
+import { createCoatLayer } from './coat';
 import { buildRealmPalette, gradeTints } from './realmPalette';
 import { worldUniforms } from './worldMaterial';
 
@@ -89,6 +90,7 @@ export function createRealmLook(post: PostPass): RealmLook {
   let at: readonly [string | null, boolean] = [null, false];
   let last = -1;
   const was = new THREE.Vector3(1e9, 0, 0);
+  const coat = createCoatLayer(); // round 80: the realm's matter on its stones (data/coats.ts), eased with the rest
   const u = post.uniforms;
   const publish = (): void => {
     now = darkened(eased, dark);
@@ -121,11 +123,13 @@ export function createRealmLook(post: PostPass): RealmLook {
       eased = dt >= 1e9 ? want : easeLook(eased, want, Math.min(1, dt / SKY.fade));
       dark = dt >= 1e9 ? deep : dark + (deep - dark) * Math.min(1, dt * DUNGEON_LIGHT.ease);
       publish();
+      coat.update(region, enclosed, dt);
     },
     snap() {
       want = at[1] ? indoors(lookOf(at[0])) : lookOf(at[0]);
       eased = want;
       publish();
+      coat.update(at[0], at[1], 1e9);
     },
     apply(fx) {
       const share = 1 - eased.native; // the grade's own share, at a lucid mind
