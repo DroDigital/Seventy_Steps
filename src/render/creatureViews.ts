@@ -56,6 +56,8 @@ export interface CreatureViews {
   debugFrames(): readonly CreatureFrame[];
   /** A horror's phase and voice, as its picture wears them: the auras and the footfalls (worldLife.ts) read them too. */
   readonly presence: BossPresence;
+  /** How wide each creature is drawn this frame, in metres: its blob shadow (shadows.ts) is as wide. */
+  readonly painted: ReadonlyMap<Entity, number>;
   /** Where the creature's drawing stands, in metres above its feet (with a flyer's hover), for one drawn from the reviewed art; undefined for any other. */
   figure(id: Entity): { bottom: number; top: number; rows: number } | undefined;
 }
@@ -77,6 +79,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const pages = textures.map((texture) => spriteBatch(scene, texture, CAPACITY, true));
   const clips = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedClips(entity, key)]));
   const stoops = createStoops(g, art?.manifest);
+  const painted = new Map<Entity, number>();
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 81)
@@ -127,6 +130,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     sheet: { atlas, texture: tex, reviewed: art ? { manifest: art.manifest, textures } : undefined },
     debugFrames: () => debug,
     presence,
+    painted,
     figure(id) {
       const model = g.ecs.c.model.get(id);
       if (!model?.startsWith(MODEL_PREFIX)) return undefined;
@@ -143,6 +147,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       realm[0] = mid.x; realm[1] = mid.y; realm[2] = mid.z;
       glow.begin();
       casters.begin();
+      painted.clear();
       const from = g.ecs.c.transform.get(g.player.id)?.pos ?? { x: 0, z: 0 };
       let n = 0;
       counts.fill(0);
@@ -183,6 +188,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
           const span = spans.get(key)!;
           if (deep > 0 && gone.amount < 0.5) glow.halo(x, y + (span.top + span.bottom) / 2, z, (span.top - span.bottom) * BOSS_PRESENCE.halo.size, attackLook(g, id).line, BOSS_PRESENCE.halo.gain * deep * pose.opacity); // the colour of its blows hangs about it, deeper by phase
+          painted.set(id, span.across);
           if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre') casters.put(x, y - pose.sink * sizes.get(key)!.height * 0.3 + span.bottom, z, span.across, span.top - span.bottom, 1 - gone.amount, from); // (a spectre casts none)
           if (direction === 'front' && !clip.mirror_horizontal) glow.reviewedEyes(key, sizes.get(key)!, x, y, z, pose, camera.position, glow.mistLook(id, time), voice);
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
@@ -237,6 +243,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         fx.dress(fallback, n, { id, gone }, x, y - look.sink * def.sprite.scale * 0.3, z, def.sprite.scale, def.sprite.scale, flat, time);
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
+        painted.set(id, size * 0.45);
         if (!def.sprite.outside && def.sprite.silhouette !== 'spectre') casters.put(x, y - look.sink * size * 0.3, z, size * 0.45, size * 0.8, 1 - gone.amount, from);
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         glow.eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, glow.mistLook(id, time));

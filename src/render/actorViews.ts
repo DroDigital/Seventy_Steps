@@ -10,15 +10,17 @@ import { wrapAngle, yawOf } from '../core/geom';
 import { SWING_TRAIL } from '../data/fxTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
+import { hourOf, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
-import { easeGaze, gazeAt, gazeTurn, newGaze, type Gaze } from './figureGaze';
+import { livePerson, newLife, type Life, type Standing } from './personLife';
 import { edgeOf } from './swingTrails';
 import { ACTS, type ActKind, type Post } from '../data/npcActs';
 import { pipeBeat } from './npcActs';
 import type { Smoker } from './pipeSmoke';
 import { actOf } from '../systems/npcLife';
+import { stockLeft } from '../systems/trade';
 import { cadence, type Ground } from './gait';
 import { FX_PREFIX } from './fightViews';
 import { SHRINE_MODEL } from './signViews';
@@ -43,11 +45,12 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
-  gaze: Gaze; // a person's head, turned toward the investigator (gaze.ts; round 81)
+  life: Life; // what a person has that moves of itself: the head, the cloth, the eyes (personLife.ts; round 81)
 }
 
 export interface ActorViews {
-  update(alpha: number, time: number): void;
+  /** `sheltered`: the camera is under a roof, where there is no breeze to stir a person's cloth. */
+  update(alpha: number, time: number, sheltered?: boolean): void;
   /** The investigator, up from the knee, takes `seconds` over it (a cutscene's slow rise); otherwise they rise as fast as they move. */
   rise(seconds: number): void;
   /** The smokers at their pipes this frame (render/pipeSmoke.ts draws the smoke). */
@@ -113,9 +116,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     for (const [id, model] of g.ecs.c.model) {
       if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews
       const figure = buildFigure(model);
-      if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
+      if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip, id !== g.player.id)); // what the moon sees of them: one shape, not their twenty parts (and the lantern, for all but the one who carries it)
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, gaze: newGaze() });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, life: newLife() });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -149,6 +152,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     fx.rotation.y = wrapAngle(post.yaw - yaw);
     fx.scale.set(1 / s.x, 1 / s.y, 1 / s.z);
   }
+
+  let sheltered = false;
+  const standing: Standing = { id: 0, dt: 0, time: 0, speed: 0, y: 0, free: 0, me: null, sheltered: false, dozing: false, stock: (ware) => stockLeft(g, ware) };
 
   function draw(id: Entity, v: View, alpha: number, time: number): void {
     const tr = g.ecs.c.transform.get(id);
@@ -219,7 +225,20 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     if (f.flame && id === g.player.id) flame = f.flame.getWorldPosition(flameAt); // posed: it tumbles with a roll
     if (f.flameMesh && id === g.player.id) lightFlame(f.flameMesh, lanternGain(g, alpha));
     if (f.flash && id === g.player.id) muzzle = f.flash.getWorldPosition(muzzleAt); // the barrel's tip, wherever the arm has it
-    if (person) lookAtMe(f, v, flinch, dt, tr.pos.y);
+    if (person) {
+      const me = g.ecs.c.transform.get(g.player.id);
+      const free = (1 - Math.min(1, Math.max(0, v.actK))) * (flinch > 0 ? 0 : 1) * (g.player.mount.active || g.player.falling ? 0 : 1);
+      standing.id = id;
+      standing.dt = dt;
+      standing.time = time;
+      standing.speed = speed;
+      standing.y = tr.pos.y;
+      standing.free = free;
+      standing.me = me?.pos ?? null;
+      standing.sheltered = sheltered;
+      standing.dozing = !post && !v.act && !!g.overworld && hourOf(phaseOf(time)) === 'waning'; // (the last hour is dozing on their feet: systems/npcLife.ts)
+      livePerson(f, v.life, standing);
+    }
     if (id === g.player.id && a && def?.hit) {
       const [from, to] = def.hit.window; // a blow cutting: its edge is followed from just before the first frame it can hit to just after the last
       const weapon = f.arms && (Object.values(f.arms).find((m) => m.visible) as THREE.Mesh | undefined); // the one in hand, whichever of its forms is shown
@@ -229,18 +248,6 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
         swingEdge = { tip: weapon.localToWorld(edgeAt.tip.copy(tip)), base: weapon.localToWorld(edgeAt.base.copy(base)) };
       }
     }
-  }
-
-  /** One at no act, with the investigator in front of them or at their shoulder, turns their head to follow: the head only, eased. */
-  function lookAtMe(f: Figure, v: View, flinch: number, dt: number, y: number): void {
-    const me = g.ecs.c.transform.get(g.player.id);
-    const free = (1 - Math.min(1, Math.max(0, v.actK))) * (flinch > 0 ? 0 : 1) * (g.player.mount.active || g.player.falling ? 0 : 1);
-    const to = me && free > 0 ? gazeAt(f.root.rotation.y, me.pos.x - f.root.position.x, me.pos.z - f.root.position.z, me.pos.y - y) : null;
-    easeGaze(v.gaze, to, free, dt);
-    if (v.gaze.weight <= 0) return;
-    const turn = gazeTurn(v.gaze);
-    f.head.rotation.y += turn.yaw;
-    f.head.rotation.x += turn.pitch;
   }
 
   return {
@@ -265,7 +272,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     flameCover(eye) {
       return flame ? mounts.cover(eye, flame) : 0;
     },
-    update(alpha, time) {
+    update(alpha, time, shelter = false) {
+      sheltered = shelter;
       sync();
       smokers = [];
       glow = null;

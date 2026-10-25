@@ -207,7 +207,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
-  const shadows = createShadows(scene, game);
+  const shadows = createShadows(scene, game, creatures.painted);
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
@@ -309,7 +309,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
-        views.update(alpha, time);
+        views.update(alpha, time, enclosed);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)

@@ -10,7 +10,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { SHADOW } from '../data/tuning';
-import { INSTANCED_POSITION } from './colliderShadow';
+import { INSTANCED_POSITION, LANTERN_CASTER } from './colliderShadow';
 import { box } from './meshKit';
 import { moonFrame } from './moonFrame';
 import { worldUniforms } from './worldMaterial';
@@ -48,8 +48,11 @@ export function shadowMesh(geos: readonly THREE.BufferGeometry[]): THREE.Mesh | 
 const proxies = new Map<number, THREE.BufferGeometry>();
 const WHITE: readonly [number, number, number] = [1, 1, 1];
 
-/** A person's shape for the moon (legs, coat, arms, head, a brimmed hat), one mesh in place of the figure's twenty, `hip` metres to the pelvis. Drawn a little within the figure, so its own body never falls in the shadow of it. */
-export function personShadow(hip: number): THREE.Mesh {
+/**
+ * A person's shape for the moon (legs, coat, arms, head, a brimmed hat), one mesh in place of the figure's twenty, `hip` metres to the pelvis. Drawn a little within the figure, so its own body never falls in the shadow of it.
+ * Round 81: `lantern` puts it among the solids the investigator's lantern casts shadows from too (render/lanternShadow.ts: it is made of closed boxes, wound outward, as it wants); the investigator's own is not, for that lantern hangs at their side.
+ */
+export function personShadow(hip: number, lantern = false): THREE.Mesh {
   const key = Math.round(hip * 100);
   let geo = proxies.get(key);
   if (!geo) {
@@ -65,6 +68,7 @@ export function personShadow(hip: number): THREE.Mesh {
   }
   const mesh = new THREE.Mesh(geo, HIDDEN);
   mesh.layers.set(CASTER);
+  if (lantern) mesh.layers.enable(LANTERN_CASTER);
   return mesh;
 }
 

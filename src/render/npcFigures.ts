@@ -10,10 +10,12 @@
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { WARE_SHOWN } from '../data/fxTuning';
 import { ACTS, SEATED } from '../data/npcActs';
 import { npcDef, type NpcLook } from '../data/npcs';
+import { SHOPS, WARES, type WareId } from '../data/wares';
 import { bevel, coatForms, faceForms, fist, foreArm, prism, shin, shoe, thigh, upperArm } from './bodyKit';
-import { cylinder, part, shade, skeleton, type Figure } from './figures';
+import { cylinder, part, shade, skeleton, type Figure, type Loose } from './figures';
 import { skirtPanel } from './investigator';
 import { addProps } from './npcProps';
 import { box, tint } from './meshKit';
@@ -76,6 +78,29 @@ function hairOf(cut: Cut, c: Rgb): THREE.BufferGeometry[] {
   return [...cap, box(0.03, 0.06, 0.12, -0.108, 0.16, -0.02, c), box(0.03, 0.06, 0.12, 0.108, 0.16, -0.02, c)];
 }
 
+/** How freely each hat sits on the head in a breeze (a cap is snug; a bowler or a fedora is not). */
+const HAT_FREE: Readonly<Partial<Record<NpcLook['hat'], number>>> = { fedora: 1, bowler: 0.75, cap: 0.4, band: 0.3 };
+
+/** What a merchant shows of a ware they still hold: a star-stone pinned to the lapel (it glows a little), a silver vial in the breast pocket. */
+function wareToken(f: Figure, ware: WareId, steel: Rgb, brass: Rgb): THREE.Object3D | undefined {
+  const at = WARE_SHOWN[ware as keyof typeof WARE_SHOWN];
+  if (!at) return undefined;
+  const token = new THREE.Group();
+  token.position.set(at.x, at.y, at.z);
+  f.torso.add(token);
+  if (ware === 'star_stone') {
+    const shape = new THREE.Shape();
+    const { size } = WARE_SHOWN.star_stone;
+    for (let i = 0; i < 10; i++) {
+      const [r, a] = [i % 2 ? size * 0.45 : size, Math.PI / 2 + (i * Math.PI) / 5];
+      if (i) shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+      else shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    part(f, token, tint(new THREE.ExtrudeGeometry(shape, { depth: 0.012, bevelEnabled: false }), mixRgb(ANOMALY.green, BASE.bone, 0.35)), 'cloth', at.glow);
+  } else part(f, token, mergeGeometries([cylinder(0.014, 0.014, 0.07, 0, steel), cylinder(0.011, 0.011, 0.02, 0.045, brass)]), 'cloth', at.glow);
+  return token;
+}
+
 /** The person `id` as a figure (a plain grey stranger if the id is unknown). */
 export function npcFigure(id: string): Figure {
   const look: NpcLook = npcDef(id)?.look ?? { coat: 'grey', hat: 'none', hair: 'dark' };
@@ -100,8 +125,7 @@ export function npcFigure(id: string): Figure {
   const torso = [
     ...coatForms(coatC, { robe }),
     bevel(0.24, 0.05, 0.17, 0, 0.635, 0.01, shirt, 0.012), // the collar
-    ...(robe ? [bevel(0.46, 0.07, 0.3, 0, 0.1, 0, facing, 0.015), bevel(0.55, 0.06, 0.36, 0, -0.84, 0, facing, 0.015), bevel(0.3, 0.3, 0.02, 0, 0.1, 0.16, shade(facing, 0.85), 0.006), // hem trim, and the sash's hanging end
-       bevel(0.06, 0.55, 0.02, 0, 0.3, 0.135, facing, 0.006)] : [
+    ...(robe ? [bevel(0.46, 0.07, 0.3, 0, 0.1, 0, facing, 0.015), bevel(0.55, 0.06, 0.36, 0, -0.84, 0, facing, 0.015), bevel(0.3, 0.3, 0.02, 0, 0.1, 0.16, shade(facing, 0.85), 0.006)] : [
       slab(0.075, 0.27, 0.022, -0.075, 0.45, 0.13, facing, -0.32), slab(0.075, 0.27, 0.022, 0.075, 0.45, 0.13, facing, 0.32), // lapels
       box(0.08, 0.12, 0.02, 0, 0.53, 0.128, shirt), ...(vest ? [bevel(0.2, 0.3, 0.02, 0, 0.3, 0.128, vest, 0.006)] : []),
       ...(who.tie ? [box(0.035, 0.17, 0.02, 0, 0.47, 0.137, shade(who.tie, 1.5))] : []),
@@ -113,10 +137,12 @@ export function npcFigure(id: string): Figure {
   ];
   if (has('chain')) torso.push(slab(0.1, 0.012, 0.012, -0.05, 0.28, 0.138, brass, -0.35), box(0.03, 0.04, 0.012, -0.1, 0.25, 0.14, brass));
   if (has('braces')) torso.push(box(0.03, 0.55, 0.02, -0.09, 0.32, 0.13, leather), box(0.03, 0.55, 0.02, 0.09, 0.32, 0.13, leather));
-  if (has('scarf')) torso.push(box(0.28, 0.07, 0.26, 0, 0.63, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.6)), slab(0.07, 0.3, 0.025, 0.07, 0.46, 0.14, shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.6), 0.1));
-  if (has('shawl')) { // draped over the shoulders and down the back, its fringe at the hem
+  const scarfC = shade(mixRgb(BASE.rust, BASE.charcoal, 0.4), 1.6);
+  if (has('scarf')) torso.push(box(0.28, 0.07, 0.26, 0, 0.63, 0, scarfC)); // (its end hangs from a joint of its own, below)
+  const shawl: THREE.BufferGeometry[] = []; // draped over the shoulders and down the back, its fringe at the hem: on a joint of its own at the shoulders, below
+  if (has('shawl')) {
     const w = shade(mixRgb(BASE.rust, BASE.bone, 0.25), 1.6);
-    torso.push(prism(0, 0.55, 0, 0.62, 0.36, 0.36, 0.27, 0.17, w, 0.035), prism(0, 0.33, -0.15, 0.36, 0.05, 0.4, 0.05, 0.4, shade(w, 0.92), 0.02), bevel(0.38, 0.03, 0.06, 0, 0.12, -0.15, shade(w, 0.7), 0.01));
+    shawl.push(prism(0, 0.55, 0, 0.62, 0.36, 0.36, 0.27, 0.17, w, 0.035), prism(0, 0.33, -0.15, 0.36, 0.05, 0.4, 0.05, 0.4, shade(w, 0.92), 0.02), bevel(0.38, 0.03, 0.06, 0, 0.12, -0.15, shade(w, 0.7), 0.01));
   }
   if (has('cuirass')) { // a breastplate with its ridge and rims, and the pauldrons
     torso.push(prism(0, 0.4, 0.01, 0.4, 0.27, 0.47, 0.3, 0.4, steel, 0.03), bevel(0.04, 0.34, 0.05, 0, 0.4, 0.165, shade(steel, 1.2), 0.012), bevel(0.46, 0.03, 0.31, 0, 0.215, 0.01, shade(steel, 0.8), 0.01));
@@ -127,6 +153,22 @@ export function npcFigure(id: string): Figure {
   if (has('flask')) torso.push(box(0.06, 0.14, 0.04, -0.2, -0.05, 0.1, steel), box(0.03, 0.03, 0.03, -0.2, 0.04, 0.1, brass));
   if (has('staff')) torso.push(box(0.04, 1.5, 0.04, 0.34, -0.2, 0.1, shade(BASE.bone, 0.9)), box(0.1, 0.08, 0.08, 0.34, 0.58, 0.1, brass));
   part(f, f.torso, mergeGeometries(torso), 'cloth');
+  const loose: Loose = {};
+  const hang = (geo: THREE.BufferGeometry, pivot: readonly [x: number, y: number, z: number]): THREE.Group => { // cloth on a joint of its own, hung from `pivot` (render/personLife.ts sways it; at rest it is where it was built)
+    const joint = new THREE.Group();
+    joint.position.set(...pivot);
+    f.torso.add(joint);
+    part(f, joint, geo.translate(-pivot[0], -pivot[1], -pivot[2]), 'cloth');
+    return joint;
+  };
+  if (has('scarf')) loose.scarf = hang(slab(0.07, 0.3, 0.025, 0.07, 0.46, 0.14, scarfC, 0.1), [0.07, 0.6, 0.14]);
+  else if (robe) loose.scarf = hang(bevel(0.06, 0.55, 0.02, 0, 0.3, 0.135, facing, 0.006), [0, 0.575, 0.135]); // the sash's hanging end
+  if (shawl.length) loose.shawl = hang(mergeGeometries(shawl), [0, 0.6, -0.08]);
+  const shop = npcDef(id)?.shop;
+  for (const ware of shop ? SHOPS[shop] ?? [] : []) { // a merchant shows the rare things they still have to sell (render/personLife.ts hides what is sold)
+    const token = WARES[ware].stock === undefined ? undefined : wareToken(f, ware, steel, brass);
+    if (token) (loose.wares ??= {})[ware] = token;
+  }
   if (!robe) {
     for (const side of [-1, 1] as const) { // the coat's tails, swinging with the legs
       const panel = new THREE.Group();
@@ -140,8 +182,6 @@ export function npcFigure(id: string): Figure {
   const head = [
     ...faceForms(pale),
     bevel(0.17, 0.025, 0.03, 0, 0.172, 0.112, shade(hair, 0.9), 0.008), // brow
-    box(0.045, 0.026, 0.02, -0.05, 0.15, 0.123, shade(BASE.bone, 1.15)), box(0.045, 0.026, 0.02, 0.05, 0.15, 0.123, shade(BASE.bone, 1.15)), // eyes: the white of them,
-    box(0.02, 0.024, 0.022, -0.05, 0.15, 0.126, dark), box(0.02, 0.024, 0.022, 0.05, 0.15, 0.126, dark), // and the dark of them
     ...hairOf(look.hat === 'none' || who.cut !== 'short' ? who.cut : 'short', hair),
   ];
   if (look.beard) head.push(box(0.19, 0.12, 0.08, 0, 0.02, 0.1, hair), box(0.12, 0.1, 0.07, 0, -0.06, 0.1, shade(hair, 0.95)), box(0.1, 0.03, 0.03, 0, 0.075, 0.14, shade(hair, 1.05)));
@@ -153,8 +193,21 @@ export function npcFigure(id: string): Figure {
   }
   if (has('pipe')) head.push(box(0.025, 0.025, 0.12, 0.04, 0.05, 0.17, leather), box(0.05, 0.06, 0.05, 0.04, 0.08, 0.235, dark));
   part(f, f.head, mergeGeometries(head), 'cloth');
+  loose.eyes = new THREE.Group(); // eyes: the white of them, and the dark of them, on a joint of their own at the eye line, so they can close (figureBlink.ts)
+  loose.eyes.position.set(0, 0.15, 0.125);
+  f.head.add(loose.eyes);
+  part(f, loose.eyes, mergeGeometries([
+    box(0.045, 0.026, 0.02, -0.05, 0, -0.002, shade(BASE.bone, 1.15)), box(0.045, 0.026, 0.02, 0.05, 0, -0.002, shade(BASE.bone, 1.15)),
+    box(0.02, 0.024, 0.022, -0.05, 0, 0.001, dark), box(0.02, 0.024, 0.022, 0.05, 0, 0.001, dark),
+  ]), 'cloth');
   const h = hat(look, dark, shade(look.coat === 'black' ? BASE.rust : BASE.charcoal, 1.4));
-  if (h) part(f, f.head, h, 'cloth', look.hat === 'band' ? 0.6 : 0);
+  if (h) { // a brimmed hat sits on a joint of its own at the crown, so a gust and a turn of the head can lift and lag it
+    const crown = new THREE.Group();
+    crown.position.set(0, 0.2, 0);
+    f.head.add(crown);
+    part(f, crown, h.translate(0, -0.2, 0), 'cloth', look.hat === 'band' ? 0.6 : 0);
+    if (look.hat) loose.hat = { group: crown, k: HAT_FREE[look.hat] ?? 0 };
+  }
   if (has('morion')) part(f, f.head, mergeGeometries([tint(new THREE.SphereGeometry(0.135, 9, 6, 0, Math.PI * 2, 0, Math.PI / 2).translate(0, 0.24, 0), steel), cylinder(0.22, 0.2, 0.025, 0.245, steel), box(0.03, 0.09, 0.26, 0, 0.375, 0, shade(steel, 0.9))]), 'cloth');
   if (has('knit')) part(f, f.head, mergeGeometries([cylinder(0.125, 0.135, 0.12, 0.27, shade(mixRgb(BASE.seaGrey, BASE.charcoal, 0.5), 1.8)), cylinder(0.14, 0.14, 0.04, 0.22, shade(mixRgb(BASE.seaGrey, BASE.charcoal, 0.3), 1.6)), box(0.05, 0.05, 0.05, 0, 0.36, 0, shade(BASE.bone, 1.2))]), 'cloth');
 
@@ -174,6 +227,7 @@ export function npcFigure(id: string): Figure {
     part(f, knee, mergeGeometries(shin(cloth, robe ? facing : shade(trouser, 0.85))), 'cloth');
     part(f, foot, mergeGeometries(shoe(leather, shade(BASE.charcoal, 0.9))), 'cloth');
   }
+  f.loose = loose;
   f.root.scale.set(who.build?.[1] ?? 1, who.build?.[0] ?? 1, who.build?.[1] ?? 1); // each their own height and girth
   const act = ACTS[id];
   if (act) addProps(f, act.kind, SEATED.has(act.kind), act.post); // what they hold, and sit on, while they are at what they do (round 39)

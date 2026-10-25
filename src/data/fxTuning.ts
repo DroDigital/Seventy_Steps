@@ -209,7 +209,7 @@ export const BOSS_PRESENCE = {
   halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
 } as const;
 
-/** What a person has that moves of itself (render/figureGaze.ts, actorViews.ts, the world shader; round 81). No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
+/** What a person has that moves of itself (render/figureGaze.ts, figureSway.ts, figureBlink.ts, personLife.ts, the world shader; round 81): the people met only. No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
 export const FIGURE_LIFE = {
   gaze: {
     range: 7, // metres a person sees the investigator from
@@ -220,6 +220,34 @@ export const FIGURE_LIFE = {
     follow: 7, release: 4, // per second: how quick the head comes round, and goes back
   },
   wet: [0.05, 0.09] as readonly [flat: number, up: number], // how much darker a person's cloth is in a soaking rain, and the more that surfaces facing the sky take (the world shader)
+  dust: 0.8, // the share of the realm's matter (snow, drifted sand, soot) that lies on what faces up on a person met out of doors (the world shader)
+  /** What hangs loose, by kind: the lean (rad) a whole breeze, a walking pace and a hard turn each give it, the most it leans, its spring (per s²) and damping (per s), and how it flutters (rad, per s). A hat is carried on the head, so it leans the other way. */
+  loose: {
+    hat: { wind: 0.07, walk: 0.05, turn: 0.035, most: 0.13, spring: 120, damp: 10, flutter: [0.012, 2.3] },
+    shawl: { wind: 0.16, walk: 0.1, turn: 0.07, most: 0.3, spring: 55, damp: 6.5, flutter: [0.02, 1.7] },
+    scarf: { wind: 0.34, walk: 0.24, turn: 0.15, most: 0.55, spring: 40, damp: 4.5, flutter: [0.05, 2.9] },
+    tail: { wind: 0.1, walk: 0.0, turn: 0.1, most: 0.22, spring: 50, damp: 6, flutter: [0.015, 1.9] },
+  },
+  slice: 1 / 120, // seconds: the spring is stepped in slices this long, so it settles the same at any frame rate
+  gale: 2.2, // the world's wind (uWind) at which the cloth is blown as hard as it goes
+  blink: { cell: 4.2, shut: 0.14, doze: 0.88 }, // seconds in which each person blinks once (somewhere in it), the length of a blink, and how nearly shut the eyes of one dozing on their feet are
+} as const;
+
+/** What a merchant shows of the wares they still have to sell (render/personLife.ts; round 81): the rare ones, in their coat, while any is left. */
+export const WARE_SHOWN = {
+  star_stone: { x: 0.095, y: 0.47, z: 0.143, size: 0.05, glow: 0.55 }, // a star-stone pinned to the lapel
+  vial: { x: -0.115, y: 0.33, z: 0.14, glow: 0.12 }, // a silver vial in the breast pocket
+} as const;
+
+/** The blob shadow's shape (render/blobShape.ts; round 81). */
+export const BLOB = {
+  dark: 0.55, // how dark at its heart
+  base: 1.7, // its radius, in the radii of the body's capsule
+  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider)
+  draw: 1.0, // how much longer it is drawn out away from the moon at the horizon than from the zenith
+  most: 1.8, // and the most it is drawn out
+  shift: 0.6, // the share of what it is drawn out by that its middle moves, away from the moon
+  thin: 0.25, // how much lighter it is for each whole length drawn out
 } as const;
 
 /** The track of a blow (render/swingTrails.ts; round 81). */

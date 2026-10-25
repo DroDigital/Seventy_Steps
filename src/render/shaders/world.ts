@@ -295,6 +295,11 @@ void main() {
     coated = max(cover, crust);
   }
   if (uWet > 0.01 && uEmissive < 0.5 && uCharacter > 0.5) tex *= 1.0 - uWet * (${FIGURE_LIFE.wet[0].toFixed(3)} + ${FIGURE_LIFE.wet[1].toFixed(3)} * max(n.y, 0.0)); // a person's cloth in the rain: darker, most where it faces the sky (shoulders, hat; round 81)
+  if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter > 0.5 && uCharacter < 1.5) { // a person met out of doors wears the realm's matter on what faces up, their hat and shoulders: snow, drifted sand, soot (data/coats.ts; round 81: the people only, not the investigator, and nothing below the shoulder)
+    float dust = clamp(uCoatA.x * smoothstep(0.55, 0.9, n.y) * ${FIGURE_LIFE.dust.toFixed(2)}, 0.0, 1.0) * uCoatA.w;
+    tex = mix(tex, uCoatCol * (0.95 + 0.7 * dot(tex, vec3(0.333))), dust);
+    coated = max(coated, dust);
+  }
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);
