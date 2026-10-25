@@ -40,7 +40,7 @@ export interface CoatLook {
 
 export const COATS: Readonly<Record<string, CoatDef>> = {
   // The ice-sheathed cyclopean ruins of the plateau: a hard white cap on every top, and rime on the face the polar wind comes at.
-  mountains: { cap: [0.9, 0.93, 0.98], capShare: 0.92, wind: 0.5 },
+  mountains: { cap: [0.62, 0.67, 0.77], capShare: 0.92, wind: 0.5 }, // (a pale grey-blue snow: at white a lantern's pool on it clipped to nothing)
   // The summit above the storm: a hoar-frost thinner than the plateau's snow, on stone that is already pale.
   cloud_summit: { cap: [0.84, 0.86, 0.92], capShare: 0.65, wind: 0.3 },
   // The Pnakotic desert: sand drifted on the tops and laid thin on the faces turned to the wind.

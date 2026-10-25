@@ -23,7 +23,7 @@ float moonReaches(vec3 p) {
   return mix(1.0, lit, 1.0 - smoothstep(0.5, 0.98, e));
 }
 
-// How far the moon reaches the mist along a ray from the lens (direction dir, len metres to what it strikes), less what is taken to be average: about -0.8 behind a trunk, +0.2 in a shaft.
+// How far the moon reaches the mist along a ray from the lens (direction dir, len metres to what it strikes), less what is taken to be average: about -0.9 behind a trunk, +0.1 in a shaft.
 float shaftAlong(vec3 dir, float len, float jitter) {
   float stepLen = min(len, uShaft.z) / float(SHAFT_STEPS);
   float t = stepLen * jitter;
