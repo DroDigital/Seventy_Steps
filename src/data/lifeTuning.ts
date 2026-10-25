@@ -141,7 +141,6 @@ export const WEATHER = {
   quiet: 0.35, // how much of the investigator's noise is lost in it (a rain hushes footsteps; a gale takes them): at its fullest
   rain: 420, // streaks of rain about the lens at its fullest (a thunderstorm: rainStorm)
   rainStorm: 680,
-  splashMist: 0.03, // chance a rain splash raises a large grey wisp (was 0.3): rare accents, not a field of dithered orbs
   soak: 0.3, // per second, how fast the ground takes the wet of a rain falling (render/weather.ts; round 34)...
   dry: 0.04, // ...and how slowly it dries once it has passed: puddles are gone in about a minute
   haze: { rain: 0.32, storm: 0.5, gale: 0.12 } as Readonly<Record<string, number>>, // how much of the fog's reach a spell takes at its fullest: the rain closes the world in
