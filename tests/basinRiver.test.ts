@@ -1,12 +1,12 @@
 /**
- * The Colour's reservoir and the Black Man's river (round 68; world/enclosureBasin.ts, world/enclosureRiver.ts, render/gateLooks.ts): a court
+ * The Colour's reservoir and the Black Man's river (round 68; world/enclosureBasin.ts, world/enclosureRiver.ts): a court
  * walled as a dam and a curving bank, and a court on an island in a river kept between two kerbs, with a ford. That each is shut but for its
  * gate is for the closure flood (tests/enclosure.test.ts) and the walks (tests/houseWalk.test.ts); this holds what is particular to them.
  */
 import { describe, expect, it } from 'vitest';
 import { ARENA_HOUSES } from '../src/data/arenaHousesAll';
 import { HOUSE } from '../src/data/arenaHouses';
-import { gateKit } from '../src/render/gateLooks';
+import { GATE_STYLES } from '../src/data/gateStyles';
 import { WATER } from '../src/world/enclosureRiver';
 import { within } from '../src/world/enclosure';
 import { worldLayout } from '../src/world/placements';
@@ -66,21 +66,18 @@ describe("the Black Man's river", () => {
   });
 });
 
-describe('what shuts a gate (render/gateLooks.ts)', () => {
-  const door = (look?: 'slab' | 'sluice' | 'boulder') => gateKit({ ...river.piece, door: { ...river.piece.door!, look } });
-
-  it('a sluice lifts its panel up into the housing over the gate, a boulder sinks into the ground, a slab is drawn into the wall', () => {
-    const [sluice, boulder, slab] = [door('sluice'), door('boulder'), door('slab')];
-    expect(sluice.lift!).toBeGreaterThan(0);
-    expect(boulder.lift!).toBeLessThan(0);
-    expect(slab.lift).toBeUndefined();
-    for (const k of [sluice, boulder, slab]) expect(k.stone.getAttribute('position').count).toBeGreaterThan(0);
+describe('what shuts a gate (data/gateStyles.ts)', () => {
+  it('is the style of the horror: the Colour\'s sluice boards and the Black Man\'s boulder sink into the ground', () => {
+    expect(GATE_STYLES.colour_out_of_space!.motion).toBe('sink');
+    expect(GATE_STYLES.black_man!.motion).toBe('sink');
+    expect(basin.piece.door!.style).toBe('colour_out_of_space');
+    expect(river.piece.door!.style).toBe('black_man');
   });
 
-  it('is the look the houses say: the Colour\'s a sluice, the Black Man\'s a boulder', () => {
-    expect(ARENA_HOUSES.colour_out_of_space!.gate.look).toBe('sluice');
-    expect(spec.gate.look).toBe('boulder');
-    expect(basin.piece.door!.look).toBe('sluice');
-    expect(river.piece.door!.look).toBe('boulder');
+  it('opens away from the court it is come to from: out is the side of the wall the front is on', () => {
+    for (const [a, p] of [[dam, basin.piece], [isle, river.piece]] as const) {
+      const d = p.door!;
+      expect(d.out, a.bosses[0]).toBe((d.alongX ? a.house!.front.z : a.house!.front.x) >= 0 ? 1 : -1);
+    }
   });
 });

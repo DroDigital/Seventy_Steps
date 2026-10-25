@@ -99,10 +99,12 @@ const LAMP_GLASS: Rgb = [0.34, 0.29, 0.2];
 const CLOTH_SWAY = 0.4; // metres a hanging cloth's hem is blown at a gust's height
 
 /** The model's materials in the prop's frame. Lantern iron and glass keep their own finish instead of the kit's leaf/wood labels. */
-export function modelPieces(p: Prop, stone: Rgb): Piece[] {
-  const look = p.set;
-  const m = look && decode(look.id);
-  if (!look || !m) return [];
+export const modelPieces = (p: Prop, stone: Rgb): Piece[] => (p.set ? modelPiecesOf(p.set, stone) : []);
+
+/** The same of a look alone (a gate's leaf is hung by data/gateStyles.ts, not stood as a prop): feet at the origin, its footprint centred, scaled by the look. */
+export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): Piece[] {
+  const m = decode(look.id);
+  if (!m) return [];
   const lamp = !!LANTERN_MODELS[look.id];
   const keep = look.keep ?? 0;
   const [sx, sy, sz] = scaleOf(look);

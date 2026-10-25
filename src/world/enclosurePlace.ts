@@ -62,7 +62,7 @@ export function planPlace(h: House, boss: string, s: EnclosureSite): Enclosure {
     front: f,
     rect: { x0: Math.min(...xs) - 1, z0: Math.min(...zs) - 1, x1: Math.max(...xs) + 1, z1: Math.max(...zs) + 1 },
     props: court.props,
-    piece: gatePiece(h, boss, gate, s.y, Math.abs(f.z) > 0.5),
+    piece: gatePiece(h, boss, gate, s.y, f),
     stake: { x: s.x + f.x * toStake, z: s.z + f.z * toStake, yaw: Math.atan2(-f.x, -f.z) },
     rods: layout.rods,
     ...(layout.signals && { signals: layout.signals }),

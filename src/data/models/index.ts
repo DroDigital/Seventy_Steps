@@ -1,10 +1,12 @@
 /**
  * Every baked model the arenas stand (round 61, and the boss places of round 71): what each is, read by the simulation. The Kenney kits' models
  * come from tools/models/bake_models.py (`kenneyIndex.ts`), the places' from the supplied asset collection by tools/models/bake_boss_models.py
- * (`bossIndex.ts`); their licences are in CREDITS.md and docs/BOSS_PLACES.md. Data only.
+ * (`bossIndex.ts`) and the arenas' gates' leaves from free models by the same tool (`gateIndex.ts`, docs/GATES.md); their licences are in CREDITS.md and
+ * docs/BOSS_PLACES.md. Data only.
  */
 
 import { BOSS_INFO } from './bossIndex';
+import { GATE_INFO } from './gateIndex';
 import { KENNEY_INFO } from './kenneyIndex';
 
 /** A box a body cannot walk through, in a model's own frame (feet at the origin, its footprint centred): the centre (x, z), the half extents (x, z), and from which height to which. */
@@ -24,4 +26,4 @@ export interface ModelInfo {
   anchors?: readonly (readonly [number, number, number])[]; // where a flame or a light sits in it (a torch's bowl, a brazier's coals), in its own frame
 }
 
-export const MODEL_INFO: Readonly<Record<string, ModelInfo>> = { ...KENNEY_INFO, ...BOSS_INFO };
+export const MODEL_INFO: Readonly<Record<string, ModelInfo>> = { ...KENNEY_INFO, ...BOSS_INFO, ...GATE_INFO };

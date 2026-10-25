@@ -34,7 +34,7 @@ export function planHouse(h: House, boss: string, s: EnclosureSite): RingEnclosu
   }
   for (const side of [-1, 1]) props.push(tower(h, s.y, ...at(gateAt + side * edge), h.gate.flank, 3000 + side, true)); // the gate's two towers, each with its fire
   const gate = { x: s.x + s.front.x * P, z: s.z + s.front.z * P };
-  const piece = gatePiece(h, boss, gate, s.y, Math.abs(s.front.z) > 0.5); // (the wall runs along x at a gate that faces north or south)
+  const piece = gatePiece(h, boss, gate, s.y, s.front);
   const toStake = s.radius + STAKE.ring + STAKE.past; // the fallen wake before the fog, a pace in front of it: inside the wall, since the wall stands `HOUSE.reach` beyond the ring
   const stake = { x: s.x + s.front.x * toStake, z: s.z + s.front.z * toStake, yaw: Math.atan2(-s.front.x, -s.front.z) };
   const centre = { x: s.x, z: s.z };
