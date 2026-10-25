@@ -14,6 +14,7 @@ export interface PlayOptions {
   pan?: number; // -1 left .. 1 right
   pitch?: number; // frequency ratio
   lowpass?: number; // Hz: dulled by distance (a sound heard from far off has lost its top)
+  bus?: AudioNode; // where it joins: the one-shots' bus by default (round 78: the far voices of the night join the ambience's)
 }
 
 const noiseBuffers = new WeakMap<BaseAudioContext, AudioBuffer>();
@@ -75,8 +76,8 @@ export function playSound(e: AudioEngine, sound: Sound, o: PlayOptions = {}): bo
     const dull = ctx.createBiquadFilter();
     dull.type = 'lowpass';
     dull.frequency.value = o.lowpass;
-    out.connect(dull).connect(pan).connect(sfx);
-  } else out.connect(pan).connect(sfx);
+    out.connect(dull).connect(pan).connect(o.bus ?? sfx);
+  } else out.connect(pan).connect(o.bus ?? sfx);
   let last: AudioScheduledSourceNode | null = null;
   let end = 0;
   for (const l of sound) {
