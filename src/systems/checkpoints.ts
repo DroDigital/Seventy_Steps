@@ -12,7 +12,8 @@ import { npcDef } from '../data/npcs';
 import type { InputFrame } from '../core/input';
 import { distXZ } from '../core/geom';
 import type { Place } from '../data/arena';
-import { CAMERA, SANITY, WORLD } from '../data/tuning';
+import { SANITY, WORLD } from '../data/tuning';
+import { resetAim, resetBoom } from './camera';
 import { fogToPass, passFog } from './fogGates';
 import { worldLayout, type GatePlace, type SignPlace } from '../world/placements';
 import { yawOfDir } from '../world/worldMap';
@@ -60,7 +61,8 @@ export function teleport(g: Game, at: Place): void {
   setLock(g, null);
   g.player.listening = null;
   g.player.kneeling = null;
-  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch, mountLift: 0, prevMountLift: 0, dist: CAMERA.distance, prevDist: CAMERA.distance });
+  resetAim(g.camera, at.yaw);
+  resetBoom(g.camera);
 }
 
 /** Marks a sign found; true the first time. */
