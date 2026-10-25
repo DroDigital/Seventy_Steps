@@ -1,5 +1,5 @@
 /**
- * The investigator's parts as geometry (round 80): what tools/player/bake_player.py reads out of his .blend, `data/player/playerPack` (a part's welded points in its
+ * The investigator's parts as geometry (round 81): what tools/player/bake_player.py reads out of his .blend, `data/player/playerPack` (a part's welded points in its
  * joint's own frame, its faces, a colour for each, as the game draws them) turned into flat-shaded, vertex-coloured geometry like every other figure's. The data is a
  * module of its own that the figures import; nothing here knows what the parts are (data/player/playerIndex: which joint, which group), and render/investigator.ts
  * hangs them on the figure.

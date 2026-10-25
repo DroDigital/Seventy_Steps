@@ -1,5 +1,5 @@
 /**
- * The investigator posed from his clips (round 80, playerClips.ts): the carried gaits (idle, walk, run and sprint, blended by ground speed as gait.ts blends its own, their
+ * The investigator posed from his clips (round 81, playerClips.ts): the carried gaits (idle, walk, run and sprint, blended by ground speed as gait.ts blends its own, their
  * phase the stride's), the guard's arms over them, and a clip for each move he makes, made for the weapon in his hand where the weapon changes it. Anything without a clip
  * is posed by hand (poses.ts), as the people and the creatures are. Poses are cut from his figure's joints, so these set the same ones.
  */

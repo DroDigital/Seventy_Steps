@@ -37,7 +37,7 @@ function dataMarks(d: MoveDef): Record<string, number> {
   return m;
 }
 
-describe('the investigator’s clips (round 80, tools/player, docs/PLAYER.md)', () => {
+describe('the investigator’s clips (round 81, tools/player, docs/PLAYER.md)', () => {
   it('has a clip for every move he can make with every weapon, and for no move he cannot', () => {
     const have = Object.keys(PLAYER_CLIPS).sort();
     expect(have).toEqual([...ids].sort());

@@ -1,7 +1,7 @@
 """What the investigator carries, as the game's moves use it: the lantern at the belt, the revolver in its holster and in the hand, and the small things the
 off-hand takes up for a move (the oil flask lobbed by `throw`, the Laudanum, West's Reagent in its syringe, the Powder of Ibn Ghazi, a match for the
 lamp, the book of the incantation). Each is in the frame of the joint it hangs from or is held by (the hand's: the grip on the line (0, y, 0.02), the
-business end down -y). Round 80: the props are new; the moves drew the hand empty before.
+business end down -y). Round 81: the props are new; the moves drew the hand empty before.
 """
 import numpy as np
 from kit import bevel, box, cylinder, hull_points, lathe, loft, merge, mix, prism, ring, shade, slab, sphere, torus, wedge
