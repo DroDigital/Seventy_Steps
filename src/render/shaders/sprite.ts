@@ -12,6 +12,7 @@
 import { VOID_GLSL } from './eldritch';
 import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL } from './common';
 import { SHADOW_GLSL } from './shadow';
+import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
 export const SPRITE_VERT = /* glsl */ `
 uniform vec2 uRes;
@@ -86,6 +87,7 @@ varying float vWeird;
 varying vec4 vCell;
 ${NOISE_GLSL}
 ${VOID_GLSL}
+${SPRITE_GRADE_GLSL}
 
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
@@ -115,6 +117,7 @@ void main() {
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
   vec3 col = glow ? t.rgb : t.rgb * vLight;
+  if (uReviewed > 0.5) col = spriteGraded(col); // the realm's colours on the older art, brightness kept (round 78: spriteGrade.ts)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   col = mix(col, vec3(1.0), vFlash);
   float fog = vFog * uFogAmount;

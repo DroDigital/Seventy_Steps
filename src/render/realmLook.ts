@@ -94,6 +94,7 @@ export function createRealmLook(post: PostPass): RealmLook {
     now = darkened(eased, dark);
     const tints = gradeTints(eased);
     for (const [v, t] of [[u.uInk, tints[0]], [u.uShade, tints[1]], [u.uMid, tints[2]], [u.uHigh, tints[3]]] as const) v.value.set(t[0], t[1], t[2]);
+    tints.forEach((t, i) => worldUniforms.uSpriteTints.value[i].set(t[0], t[1], t[2])); // and the creatures drawn on take it too (round 78)
     if (!built || apart(eased, built) > 0.003) {
       u.uPalette.value.set(buildRealmPalette(eased).flat());
       built = eased;

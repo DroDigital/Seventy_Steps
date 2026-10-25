@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
-import { ANOMALY } from './palette';
+import { ANOMALY, ANOMALY_HUES } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
 import { generateTexture, TEXTURE_SIZE, UV_PER_TEXTURE, type TextureKind } from './textures';
 import { wetness } from './wetness';
@@ -54,6 +54,10 @@ export const worldUniforms = {
   uLanternSelf: { value: LANTERN.self },
   uSelfMax: { value: LANTERN.selfMax },
   uEyeRange: { value: new THREE.Vector2(...LIGHT.eyes) },
+  uSpriteTints: { value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)] }, // the realm's grade, four stops (render/realmLook.ts), and the share the drawn creatures take of it (round 78: shaders/spriteGrade.ts)
+  uSpriteGrade: { value: FX.spriteGrade },
+  uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
+  uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },
   uMarkCharacters: { value: 0 }, // 1: the Colour's sprite marks alpha for the post pass; 0 keeps direct-to-canvas renders opaque
   uFogNear: { value: 0 },
   uFogFar: { value: 1 },

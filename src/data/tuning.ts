@@ -33,6 +33,7 @@ export const FX = {
   anomalyStress: [0, 0.7] as Ramp, // added to anomalyProximity when boosting anomaly hues
   charShare: 0.3, // round 34: the share of its realm's grade a character (the investigator, the people, the creatures) takes: the rest is the colours they were drawn in
   charLevels: 9, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey)
+  spriteGrade: 0.7, // round 78: the share of its realm's grade (the gradient map of data/looks.ts) the drawn creatures are given as they are drawn on, before the light and the mist, so the sepia of the older art takes each realm's colours; the anomaly hues are left alone (render/shaders/spriteGrade.ts)
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
   ditherSpread: [0.05, 0.12] as Ramp,
