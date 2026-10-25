@@ -6,7 +6,7 @@ import { getEntity } from '../src/data/registry';
 import { teleport } from '../src/systems/checkpoints';
 import { createGame, createWorldGame } from '../src/systems/game';
 import { priorOf } from '../src/systems/sealCount';
-import { breathTargets } from '../src/render/audio/breathBed';
+import { breathTargets, createBreathBed } from '../src/render/audio/breathBed';
 import { hushOf, hushReach } from '../src/render/audio/dread';
 import type { PostPass } from '../src/render/postPass';
 import { breathAt, breathPeriod, drawing, nearestSleeper } from '../src/render/sleepers';
@@ -156,5 +156,47 @@ describe('the breath seen: it multiplies what the mist and the lantern were set 
     settle(false, 4);
     expect(p.uniforms.uFog.value.x).toBeCloseTo(0.05, 3);
     BREATH_DEBUG.phase = null;
+  });
+});
+
+describe('the breath heard, and a pause', () => {
+  /** An audio context that remembers what each gain was asked to be. */
+  function fakeEngine(): { e: Parameters<typeof createBreathBed>[0]; gains: { asked: number[] }[] } {
+    const gains: { asked: number[] }[] = [];
+    const param = (): { value: number; asked: number[]; setTargetAtTime(v: number): void } => ({ value: 0, asked: [], setTargetAtTime(v) { this.asked.push(v); } });
+    const node = (): Record<string, unknown> => ({ type: '', frequency: param(), detune: param(), gain: param(), Q: param(), buffer: null, loop: false, connect: (n: unknown) => n, disconnect: () => undefined, start: () => undefined, stop: () => undefined });
+    const ctx = {
+      currentTime: 0,
+      sampleRate: 100,
+      createBuffer: (_c: number, n: number) => ({ getChannelData: () => new Float32Array(n), length: n }),
+      createGain: () => {
+        const n = node();
+        gains.push(n.gain as { asked: number[] });
+        return n;
+      },
+      createOscillator: node,
+      createBiquadFilter: node,
+      createBufferSource: node,
+    };
+    return { e: { ctx, sfx: {}, detune: 0 } as unknown as Parameters<typeof createBreathBed>[0], gains };
+  }
+
+  it('is silenced at once by a pause, though the paused clock has not moved since the last level was asked', () => {
+    const { e, gains } = fakeEngine();
+    const bed = createBreathBed(e);
+    const sleeper = { id: 1, k: 1, height: 40, period: breathPeriod(40) };
+    const at = breathPeriod(40) * BREATH.inhale; // the top of the draw
+    bed.update(at - 0.2, sleeper, false);
+    bed.update(at, sleeper, false);
+    const master = gains[0]; // (the first gain made is the bed's)
+    expect(master.asked.at(-1)).toBeGreaterThan(0);
+    const before = master.asked.length;
+    bed.update(at + 0.05, sleeper, true); // the menu opens: the clock stops, within a tenth of a second of the last ask
+    expect(master.asked.length).toBe(before + 1);
+    expect(master.asked.at(-1)).toBe(0);
+    bed.update(at + 0.05, sleeper, true); // ...and stays silent, asking nothing more
+    expect(master.asked.length).toBe(before + 1);
+    bed.update(at + 0.05, sleeper, false); // the menu closes: heard again at once
+    expect(master.asked.at(-1)).toBeGreaterThan(0);
   });
 });

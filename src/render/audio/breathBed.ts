@@ -43,6 +43,7 @@ interface Graph {
 
 export function createBreathBed(e: AudioEngine): BreathBed {
   let [graph, idle, last, height, reach, set]: [Graph | null, number, number, number, number, number] = [null, 0, -1, 12, 0, -1];
+  let held = false; // whether the last look was quiet: a change of it is not throttled (a pause stops the clock, and the silence would never be asked)
   const B = BREATH.bed;
   const build = (ctx: AudioContext, bus: AudioNode): Graph => {
     const [master, rush] = [ctx.createGain(), ctx.createGain()];
@@ -84,7 +85,9 @@ export function createBreathBed(e: AudioEngine): BreathBed {
       idle = t.master < 1e-4 ? idle + dt : 0;
       if (idle > 20) return dispose(); // long without one: the graph is let go
       graph ??= build(ctx, bus);
-      if (seconds - set < 0.12 && seconds >= set) return; // (the levels glide: asked a few times a second)
+      const flip = quiet !== held;
+      held = quiet;
+      if (!flip && seconds - set < 0.12 && seconds >= set) return; // (the levels glide: asked a few times a second)
       set = seconds;
       const now = ctx.currentTime;
       graph.master.gain.setTargetAtTime(t.master, now, B.glide);
