@@ -1,13 +1,14 @@
 /**
  * The shadows of the lamps (round 35: only the lantern and the moon threw any, so a torch lit a pillar's
- * far side as it lit its near): the three nearest torches, braziers and street lamps each have a depth
- * map of their own, drawn from the flame toward the investigator, of the same solids the lantern's is
+ * far side as it lit its near): the three nearest torches, braziers, street lamps and windows share a depth
+ * map budget, drawn from the flame toward the investigator (from a window outward and down), of the same solids the lantern's is
  * (render/colliderShadow.ts), and take what stands behind one of them out of that lamp's share of the
  * light (shaders/shadow.ts, `lampLit`). A lamp keeps its map while it is among the nearest, and
  * a new one's shadow comes in over a third of a second, so none pops. Render only.
  */
 
 import * as THREE from 'three';
+import type { V3 } from '../core/geom';
 import { LAMP_SHADOWS } from '../data/fxTuning';
 import { FAR_SIDE } from './lanternShadow';
 import { LANTERN_CASTER } from './colliderShadow';
@@ -20,6 +21,8 @@ export interface Caster {
   y: number;
   z: number;
   key: string;
+  /** A fixed direction relative to the source, for a window's outward projection; other lights follow the investigator. */
+  aim?: V3;
 }
 
 export interface LampShadows {
@@ -48,7 +51,7 @@ export function createLampShadows(): LampShadows {
     u.uLSInfo.value[k].set(near, 12 + reach, 1 / size, 0);
   });
   u.uLSBias.value.set(strength, bias, offset, 0);
-  const held: ({ key: string; fade: number; at: THREE.Vector3 } | null)[] = Array.from({ length: count }, () => null);
+  const held: ({ key: string; fade: number; at: THREE.Vector3; aim?: V3 } | null)[] = Array.from({ length: count }, () => null);
   const self: LampShadows = {
     enabled: false,
     update(casters, dt) {
@@ -75,6 +78,7 @@ export function createLampShadows(): LampShadows {
         }
         h.fade = Math.min(1, h.fade + dt / fade);
         h.at.set(c.x, c.y, c.z);
+        h.aim = c.aim;
         slots[c.slot] = k;
         u.uLSInfo.value[k].w = h.fade;
       });
@@ -86,7 +90,8 @@ export function createLampShadows(): LampShadows {
       held.forEach((h, k) => {
         if (!h) return;
         lens[k].position.copy(h.at);
-        lens[k].lookAt(toward.x, toward.y + 0.8, toward.z);
+        if (h.aim) lens[k].lookAt(h.at.x + h.aim.x, h.at.y + h.aim.y, h.at.z + h.aim.z);
+        else lens[k].lookAt(toward.x, toward.y + 0.8, toward.z);
         lens[k].updateMatrixWorld(true);
         renderer.setRenderTarget(maps[k].target);
         renderer.render(scene, lens[k]);
