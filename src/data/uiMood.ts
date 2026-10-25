@@ -1,5 +1,5 @@
 /**
- * Round 78, the interface's mood: the numbers of the realm title cards' ink, the night's hour cards, the picture that follows the body
+ * Round 80, the interface's mood: the numbers of the realm title cards' ink, the night's hour cards, the picture that follows the body
  * (render/tide.ts) and the quiet walk (ui/calm.ts). Presentation only: nothing here reaches the simulation. Times in seconds.
  */
 

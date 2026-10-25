@@ -1,5 +1,5 @@
 /**
- * The far horizon's life and the eye (round 78: render/horizonGlow.ts, render/skyline.ts, render/eyeAdapt.ts). The far towns' windows follow the
+ * The far horizon's life and the eye (round 80: render/horizonGlow.ts, render/skyline.ts, render/eyeAdapt.ts). The far towns' windows follow the
  * night and wink as the near ones do; a lit town lays a glow over the sky above its roofs, deepest in the gloaming and faint in the waning
  * hour; a lamp on Devil Reef and on Kingsport's head turns slowly, flashing as its beam comes round. And the eye: the picture's corners open in
  * lamplight and close in the dark. Numbers only.

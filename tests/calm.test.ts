@@ -8,7 +8,7 @@ const run = (s = newCalm(), input: CalmInput, seconds: number, dt = 0.1): Return
 };
 const CALM: CalmInput = { calm: true, still: true };
 
-describe('the quiet walk (round 78)', () => {
+describe('the quiet walk (round 80)', () => {
   it('begins only after the delay, and comes on over its time', () => {
     const s = run(newCalm(), CALM, QUIET.hudAfter - 0.5);
     expect(s.hud).toBe(0);

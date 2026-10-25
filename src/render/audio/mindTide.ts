@@ -1,5 +1,5 @@
 /**
- * The tide (round 78, atmosphere): Unmoored, the world's high end breathes, closing and opening again as a slow swell of the mind's own, not
+ * The tide (round 80, atmosphere): Unmoored, the world's high end breathes, closing and opening again as a slow swell of the mind's own, not
  * louder and not a sound: only how much of the top of the world is let through. It is the engine's muffle (engine.ts `setMuffle`, which
  * near death the heart keeps closed, audio/gameAudio.ts), asked for more by up to `MIND_EARS.tide.depth` of its range, in a swell with a
  * period of seven seconds; the larger of the two wins, so a body near death is never made to hear it open. Follows `fx.stress` (the

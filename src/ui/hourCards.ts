@@ -1,5 +1,5 @@
 /**
- * Round 78, the night's turns announced: as the long night passes into its next hour a small quiet card (no band, high on the screen)
+ * Round 80, the night's turns announced: as the long night passes into its next hour a small quiet card (no band, high on the screen)
  * names it. The last hour says that the morning will not come; its end, when the grey is gone and the lamps are lit anew, that the night
  * turns (systems/clock.ts: the dream never reaches morning). Keyed on the hour only, never on the sky's own curve, so the sky can change
  * and this not. A vigil that hurries the night shows the new hour's card at once. Nothing is announced under a roof, in a fight with a horror,

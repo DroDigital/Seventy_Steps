@@ -1,5 +1,5 @@
 /**
- * Footprints (round 78): flat prints on the ground, one instanced batch of 128 quads that the ground keeps and then lets go. A print is a
+ * Footprints (round 80): flat prints on the ground, one instanced batch of 128 quads that the ground keeps and then lets go. A print is a
  * dark (or, at its lip, pale) film laid over the ground drawn beneath, lit as the particles are (the ambient, the moon and the lantern), so it
  * is as dark by night as the land it lies on and keeps its shape in the lantern's glare: snow takes a dark print with a pale lip, mud a
  * near-black wet one with a gleam on its far wall, sand a shallow one. Its fade is ordered-dithered like the shadows' and the fog's, and it

@@ -1,5 +1,5 @@
 /**
- * The room the one-shots are heard in (round 78). The engine's one-shots (and a share of its bed) are tapped into a send:
+ * The room the one-shots are heard in (round 80). The engine's one-shots (and a share of its bed) are tapped into a send:
  * a low cut, a pre-delay, a short ROOM and a long HALL (two convolvers, their impulses made in code: audio/spaceImpulse.ts),
  * and a low-pass on the answer, which returns to the sanity shaper beside the dry sound, so the failing mind's distortion, the
  * near-death muffle, the limiter and the effects and ambience settings govern it with no setting of its own. Where the

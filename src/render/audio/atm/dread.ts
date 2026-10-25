@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the failing mind heard: ringing ears, a step behind that is not the investigator's, the lantern guttering
+ * Round 80, atmosphere: the failing mind heard: ringing ears, a step behind that is not the investigator's, the lantern guttering
  * out; and the breath of a colossus that sleeps. One of the atmosphere audio hub's parts (render/audio/atmosphereAudio.ts): made once
  * with the game's audio and updated each frame, read-only on the simulation. The ringing and the lantern are audio/mindEars.ts, the
  * tide of the high end audio/mindTide.ts (read by gameAudio's muffle), the tread audio/follower.ts, the breath audio/breathBed.ts (its

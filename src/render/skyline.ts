@@ -9,7 +9,7 @@
  * walks, no more than a far thing would), up to SKY.farAngle; a town has a few windows lit. Each
  * realm's fade in as it is entered; a dungeon's walls hide them, and the real world covers them where it stands (round 49: a
  * town walked up to is seen as itself, not cut off inside 1.5 of its distance). A failing mind sees a city of towers
- * where there is none (`wrong`). Round 78: and the far horizon lives (horizonGlow.ts, skylineShader.ts): a town's windows follow the
+ * where there is none (`wrong`). Round 80: and the far horizon lives (horizonGlow.ts, skylineShader.ts): a town's windows follow the
  * night and wink, a glow lies over its roofs while they are lit, and a lamp turns on Devil Reef and on Kingsport's head. Render only.
  */
 
@@ -34,7 +34,7 @@ const SAMPLES = 300;
 const TALLEST = Math.tan((SKY.farAngle * Math.PI) / 180); // height over distance at the most
 const GLOWS = { amber: [1, 0.78, 0.46], cyan: [0.5, 0.95, 1], gold: [1, 0.86, 0.5] } as const;
 
-/** The silhouette's outline, a unit wide and a unit tall at most, its foot at the origin, and the geometry it is drawn with (its glow and lamp, round 78). */
+/** The silhouette's outline, a unit wide and a unit tall at most, its foot at the origin, and the geometry it is drawn with (its glow and lamp, round 80). */
 function shape(s: Silhouette, lamp?: LampDef): { f: Profile; geometry: THREE.BufferGeometry; lampAt: { x: number; y: number } | null } {
   const f = profile(s.kind, createRng(s.seed));
   const outline = new THREE.Shape();
@@ -56,7 +56,7 @@ interface Far {
   base: number;
   def: Silhouette;
   glow?: TitanGlow; // a titan's halo and eyes
-  lit: boolean; // a town of lit windows: its glow over the sky (round 78)
+  lit: boolean; // a town of lit windows: its glow over the sky (round 80)
   lamp?: LampDef; // and a lamp that turns on it
 }
 
@@ -64,20 +64,20 @@ export interface Skyline {
   update(camera: THREE.Camera, time: number, region: string | null, enclosed: boolean): void;
   /** How wrong the mind is, 0..1 (round 26): past 0.6, now and then, something stands on the horizon where nothing does, and is gone when looked for. */
   wrong(amount: number): void;
-  /** What the air does to the far lights (round 78): how closed in the sky is, 0..1 (the glow lies on the cloud), and how far the mind has gone, 0..1 (the windows flicker). Set before `update`. */
+  /** What the air does to the far lights (round 80): how closed in the sky is, 0..1 (the glow lies on the cloud), and how far the mind has gone, 0..1 (the windows flicker). Set before `update`. */
   air(overcast: number, nerves: number): void;
 }
 
 /** How much of the false landmark shows at `amount` of madness `since` seconds into its turn (it comes up slowly and goes at once). */
 export const falseShown = (amount: number, since: number): number => Math.max(0, Math.min(1, (amount - 0.55) / 0.3)) * (since < 0 ? 0 : since < 6 ? since / 6 : since < 14 ? 1 : 0);
 
-/** What every silhouette's windows read: the game's seconds, and how far the mind has gone (round 78). */
+/** What every silhouette's windows read: the game's seconds, and how far the mind has gone (round 80). */
 interface Shared {
   wink: { value: number };
   nerves: { value: number };
 }
 
-/** The shader material every silhouette is drawn with: its realm's colour, melted `fade` toward the horizon's, `lit` of its windows aglow in `glow`; its glow over the sky and its lamp's light (round 78). */
+/** The shader material every silhouette is drawn with: its realm's colour, melted `fade` toward the horizon's, `lit` of its windows aglow in `glow`; its glow over the sky and its lamp's light (round 80). */
 function silhouetteMaterial(tone: THREE.Vector3, horizon: THREE.Vector3, alpha: { value: number }, def: Pick<Silhouette, 'glow' | 'fade' | 'lit'>, shared: Shared, lamp?: LampDef): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     uniforms: {
@@ -91,7 +91,7 @@ function silhouetteMaterial(tone: THREE.Vector3, horizon: THREE.Vector3, alpha: 
     // Drawn with the opaque, so its render order puts it after the sky and before the world (round
     // 19: as a transparent it came after the world and, testing no depth, was painted over it, the
     // investigator and all, the mist ghosting what it hid): blended over the sky by hand, the sky's
-    // alpha kept. Round 78: the blend is premultiplied (the outline outputs its colour already scaled by its alpha, the glow and the lamp
+    // alpha kept. Round 80: the blend is premultiplied (the outline outputs its colour already scaled by its alpha, the glow and the lamp
     // a light with no alpha at all, which adds): the same blend for the outline, and one draw for a town, its glow and its lamp.
     blending: THREE.CustomBlending,
     blendSrc: THREE.OneFactor,
@@ -110,7 +110,7 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
   const alpha = new Map<string, { value: number }>();
   const fars: Far[] = [];
   const shared: Shared = { wink: { value: 0 }, nerves: { value: 0 } };
-  const mood = { overcast: 0 }; // what the air is doing to the far lights (round 78: `air`)
+  const mood = { overcast: 0 }; // what the air is doing to the far lights (round 80: `air`)
   for (const [id, list] of Object.entries(SKYLINES)) {
     const region = getRegion(id);
     if (!region) continue;
@@ -188,7 +188,7 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook): Skyline {
         f.mesh.scale.set(f.def.width * s * (2 - breath), f.def.height * s * breath, 1);
         f.mesh.rotation.set(0, Math.atan2(-ux, -uz), 0);
         const u = (f.mesh.material as THREE.ShaderMaterial).uniforms;
-        if (f.lit) u.uDome.value.x = domeStrength(f.def, d, phaseOf(time), mood.overcast, time) * alpha.get(f.region)!.value; // the glow over its roofs, as many of its windows as are lit (round 78)
+        if (f.lit) u.uDome.value.x = domeStrength(f.def, d, phaseOf(time), mood.overcast, time) * alpha.get(f.region)!.value; // the glow over its roofs, as many of its windows as are lit (round 80)
         if (f.lamp) {
           const b = beamAt(f.lamp, time);
           u.uLamp.value.set(b.flash, b.sweep, b.shaft, 0);

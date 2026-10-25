@@ -1,5 +1,5 @@
 /**
- * Round 78, the night's hours heard (systems/clock.ts gave the picture three hours and the sound none: a bed played at one
+ * Round 80, the night's hours heard (systems/clock.ts gave the picture three hours and the sound none: a bed played at one
  * level from the first minute to the last). In the gloaming the insects are full and the windows lit; they thin through the
  * deep of the night, owls and whippoorwills take the hours; at the moon's height the world holds its breath for about a minute
  * and a half, the Still, until one far dog howls and it begins again; in the waning the wind lifts and the crows stir in a grey

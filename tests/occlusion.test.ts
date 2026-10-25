@@ -17,7 +17,7 @@ function stage(colliders: Collider[]) {
   return { g, ears: createOcclusion(g) };
 }
 
-describe('sound through walls (round 78)', () => {
+describe('sound through walls (round 80)', () => {
   it('is stopped by walls and great columns, not by trees, fences or posts', () => {
     expect(stopsSound(wall)).toBe(true);
     expect(stopsSound(pillar)).toBe(true);

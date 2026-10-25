@@ -28,7 +28,7 @@ function rig(world: CollisionWorld | null = flat()) {
   return { lights, mesh, count, frame, scene };
 }
 
-describe('the light of a lit window on the ground before it (round 78)', () => {
+describe('the light of a lit window on the ground before it (round 80)', () => {
   it('runs out from the glass along the wall\'s normal, as far as the reach, on the ground it finds', () => {
     const p = planSpill(win(0), flat())!;
     expect(p).not.toBeNull();

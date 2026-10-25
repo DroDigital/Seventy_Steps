@@ -1,6 +1,6 @@
-# Atmosphere (round 78)
+# Atmosphere (round 80)
 
-What deepens the game's air without touching its rules: eleven packages built in parallel, each filling one empty part of the two hubs (`src/render/atmosphere.ts` and `src/render/audio/atmosphereAudio.ts`, parts in `src/render/atm/` and `src/render/audio/atm/`), so they touch each other's files only at a few additive seams. Presentation only: nothing here writes sanity, health, damage, drops, AI, quests or a save (one cosmetic key, `seen:<region>`, in `ow.told`). Each section says what a player now sees or hears, the file whose numbers tune it, what was left out and what to watch. The decisions are in `docs/DECISIONS.md` (Round 78).
+What deepens the game's air without touching its rules: eleven packages built in parallel, each filling one empty part of the two hubs (`src/render/atmosphere.ts` and `src/render/audio/atmosphereAudio.ts`, parts in `src/render/atm/` and `src/render/audio/atm/`), so they touch each other's files only at a few additive seams. Presentation only: nothing here writes sanity, health, damage, drops, AI, quests or a save (one cosmetic key, `seen:<region>`, in `ow.told`). Each section says what a player now sees or hears, the file whose numbers tune it, what was left out and what to watch. The decisions are in `docs/DECISIONS.md` (Round 80).
 
 Verification, honestly: everything runs in a software renderer (a frame in seconds) and nothing was heard by ear; levels and filters of the sound were measured offline. Each package's stills were looked at by its builder; where a feature was never seen in a still its section says so. No real-GPU frame time was measured.
 

@@ -1,5 +1,5 @@
 /**
- * Round 78, what the hour and the place make of a bed: its share of the level it is listed at, the cutoff it is played through, and how
+ * Round 80, what the hour and the place make of a bed: its share of the level it is listed at, the cutoff it is played through, and how
  * far its stereo is drawn toward the water. Pure: render/audio/ambience.ts applies it to the nodes of each recording it plays; the mood
  * it is given is the clock's phase (data/ambienceHours.ts) and `PLACED` (render/audio/exposure.ts).
  */

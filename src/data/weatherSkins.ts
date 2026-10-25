@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the weather in each land's own matter (render/weather.ts). The same storm, the same sight lines, the same
+ * Round 80, atmosphere: the weather in each land's own matter (render/weather.ts). The same storm, the same sight lines, the same
  * rules (systems/weather.ts is untouched: what a region has and when), but a gale on the Mountains of Madness is a ground blizzard of
  * driven snow and a storm there a full one (no rain, no puddles on the snow); Pnakotus's storm is a hissing sand-wind; Arkham's gale
  * throws the heath's grey ash and Innsmouth's the reef's salt spray, and leaves tumble only where trees stand. A realm without a row

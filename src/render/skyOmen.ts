@@ -1,5 +1,5 @@
 /**
- * The wrong moon and the Alignment (round 78; "when the stars were right": the stars as a clock of the Old Ones, and knowledge as what makes the sky
+ * The wrong moon and the Alignment (round 80; "when the stars were right": the stars as a clock of the Old Ones, and knowledge as what makes the sky
  * readable and worse): as the mind slips the moon swells and sours toward violet, slowly, a little different each night; and every few minutes, tilting
  * the camera up shows that in one patch of the sky the stars have stopped crawling and settled into the game's own Elder Sign, nine stars in dotted
  * lines (shaders/skyOmen.ts). It holds for a dozen seconds and drifts apart. The more insight the investigator has gathered, the more often it comes,

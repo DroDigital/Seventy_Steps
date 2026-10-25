@@ -1,5 +1,5 @@
 /**
- * Round 78, the places' voices: the far sounds of each realm (data/placeSounds.ts) at their own hours, and the dog that ends the Still
+ * Round 80, the places' voices: the far sounds of each realm (data/placeSounds.ts) at their own hours, and the dog that ends the Still
  * (data/ambienceHours.ts). `schedule` is the pure part (when, which, never the same twice running, never two within `GAP`, nothing in
  * a fight, a cutscene, a storm, the Still, under a roof or while the ground is going quiet before a horror) and is tested with a fake
  * clock; `createPlaceVoices` plays what it chooses on the ambience bus (so the ambience setting rules them, and the hush that comes

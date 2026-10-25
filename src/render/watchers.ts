@@ -5,7 +5,7 @@
  * Looked at squarely for a moment it is gone, and it is gone as they come near. Fewer the
  * steadier the mind; none in a dungeon, in the arena or under a cutscene. They are not creatures (nothing
  * in the simulation, nothing to strike or to fear): only what a mind makes of the dark. Render only.
- * Round 78, not where it was: one that has stood a while comes a step nearer each time the lens is turned
+ * Round 80, not where it was: one that has stood a while comes a step nearer each time the lens is turned
  * from it (never while it is seen, never to within 26 m), so that turning back finds it nearer than it was
  * left; while the lens swings a dark upright shape now and then crosses the very edge of the picture
  * (a darter) and is gone when turned to; and while any stand the bed gives way (`WATCHING`).
@@ -39,10 +39,10 @@ interface Watcher {
   life: number;
   looked: number; // seconds looked at
   gone: number; // seconds since it began to go (-1: not going)
-  step: number; // seconds of its next step (round 78)
+  step: number; // seconds of its next step (round 80)
 }
 
-/** A shape that crosses the edge of the picture while the lens swings (round 78). */
+/** A shape that crosses the edge of the picture while the lens swings (round 80). */
 interface Darter {
   mesh: THREE.Mesh;
   born: number;
@@ -50,7 +50,7 @@ interface Darter {
   vz: number;
 }
 
-/** How many watchers stand now (round 78): the sound reads it, and the bed gives way while they do (atm/dread.ts). */
+/** How many watchers stand now (round 80): the sound reads it, and the bed gives way while they do (atm/dread.ts). */
 export const WATCHING = { count: 0, nearest: -1, call: null as { metres: number; offset: number } | null }; // (`call`: debug, ui/../dreadDebug.ts: one is put where asked, at an age to step)
 
 /** A man too tall, too thin, arms to the knee and the head a little on one side. */

@@ -1,5 +1,5 @@
 /**
- * The moon's shafts in the mist (round 78): how strongly the post pass lets the mist follow the moon's shadows (shaders/fogShaft.ts).
+ * The moon's shafts in the mist (round 80): how strongly the post pass lets the mist follow the moon's shadows (shaders/fogShaft.ts).
  * Strongest while the moon is low enough for its shadows to lie long and not so low that the map is off, thinner as it climbs to
  * its height; as thick as the mist is (none at the Fog setting 0, none under a roof or in the arena, where no shadow map is drawn);
  * veiled as a spell of weather comes over the moon. Render only: it writes one uniform, `uShaft`, and nothing the simulation reads.

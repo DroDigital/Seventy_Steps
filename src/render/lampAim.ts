@@ -1,5 +1,5 @@
 /**
- * Where a light throws its glow in the mist (round 78). The mist's glow of a light (shaders/fog.ts glowAlong) was a ball, so a lit
+ * Where a light throws its glow in the mist (round 80). The mist's glow of a light (shaders/fog.ts glowAlong) was a ball, so a lit
  * window glowed as much behind its wall as before its glass and a street lamp as much above itself as below. Now each of the
  * shader's lamp slots is told a direction and how sharply the light holds to it: a lit window's is outward from its glass (the offset
  * houseMesh.ts gives its spot), a street lamp's is down; fires, torches and the rest stay all round. Render only: the world shader's

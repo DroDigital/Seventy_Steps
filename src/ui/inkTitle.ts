@@ -1,5 +1,5 @@
 /**
- * Round 78, the ink of a title: a name that comes out of the dark a letter at a time, from the middle outward, each rising out of a blur
+ * Round 80, the ink of a title: a name that comes out of the dark a letter at a time, from the middle outward, each rising out of a blur
  * and a few pixels below its place, as the people's words do on a page (ui/dialogue.ts UNSAID and SAID), and sinks away the other way. The
  * delays are pure (`inkDelays`, `realmTint`) and tested; the rest draws on the page with the Web Animations API, which the banner
  * (ui/banner.ts) and the veil (ui/veil.ts) share. With reduced motion asked for the letters are simply there and the card fades whole.

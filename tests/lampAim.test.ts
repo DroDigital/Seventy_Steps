@@ -9,7 +9,7 @@ import { createWorldLights, LIGHT_VIEW, type LightSpot } from '../src/render/wor
 
 const window_ = (x: number, z: number, nx: number, nz: number): LightSpot => ({ x, y: 2, z, kind: 'window', glass: { x: x - 0.52 * nx, y: 2, z: z - 0.52 * nz }, pane: 0.9 });
 
-describe('where a light throws its glow in the mist (round 78)', () => {
+describe('where a light throws its glow in the mist (round 80)', () => {
   it('a lit window aims outward from its glass, a street lamp down, and every other light stays all round', () => {
     const a = aimOf(window_(5, 3, 0, 1));
     expect([a.x, a.y, a.z, a.w]).toEqual([0, 0, 1, BEAM.window.sharp]);

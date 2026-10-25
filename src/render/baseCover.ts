@@ -68,7 +68,7 @@ export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: 
         if (y === null) continue;
         let roll = rng();
         const kind: Kind = cover.mix.find(([, w]) => (roll -= w) < 0)?.[0] ?? 'pebble';
-        if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 78: weed and bone lie against a wall as they do on open ground
+        if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 80: weed and bone lie against a wall as they do on open ground
         plantAt(kind, leaf, stone, rng, x, y, z);
       }
       if (ROOTED.has(p.kind) && c.round) {

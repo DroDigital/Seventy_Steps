@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: motes in the lantern's light (data/lanternMotes.ts). A few specks of dust and spore hang in the pool of the
+ * Round 80, atmosphere: motes in the lantern's light (data/lanternMotes.ts). A few specks of dust and spore hang in the pool of the
  * lantern and glint as the investigator walks through them: the lantern's light becomes a thing in the air, and the view behind has its
  * parallax. Outdoors they hang and lift a little; in a crypt they are more, and settle. Not born when the flame is out or guttering, in a
  * gale, or near the lens. They are not self-lit: the particle shader lights them by the lantern, so they show only inside its pool.

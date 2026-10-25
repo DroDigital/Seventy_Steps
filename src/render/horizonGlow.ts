@@ -1,5 +1,5 @@
 /**
- * The far horizon's life (round 78; render/skyline.ts draws it, data/horizonLife.ts holds its numbers). A far town was a silhouette with a few
+ * The far horizon's life (round 80; render/skyline.ts draws it, data/horizonLife.ts holds its numbers). A far town was a silhouette with a few
  * windows lit, the same at every hour, and the sky above it as empty as anywhere: now the lit windows of a town glow over its roofs, the glow
  * strongest in the gloaming and faint by the waning hour as the windows go out, deeper where the sky is closed in. And a lamp that turns stands
  * on Devil Reef and on Kingsport's head: its pilot light seen always, a flash as the beam comes round to the eye, and the shaft of it standing

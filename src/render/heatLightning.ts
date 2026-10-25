@@ -1,5 +1,5 @@
 /**
- * Heat lightning (round 78; The Dunwich Horror: flashes on the hilltops with no storm): on a clear night, in the regions that know thunderstorms,
+ * Heat lightning (round 80; The Dunwich Horror: flashes on the hilltops with no storm): on a clear night, in the regions that know thunderstorms,
  * now and then a bank of cloud low on the far horizon flickers silently with a sheet of light, two to four pulses, and is dark again. Never twice
  * within forty-five seconds, never in a thunderstorm's weather (lightning.ts has that), never when the Flashes setting is off (its dimmer settings
  * melt the pulses into one soft swell, as lightning's do), and never in the eye's line: at least some thirty degrees off where the camera looks.

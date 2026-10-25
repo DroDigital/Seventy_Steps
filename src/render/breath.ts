@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the breath in the cold (data/coldBreath.ts). On the Mountains of Madness, in the Vermont hills and the desert night
+ * Round 80, atmosphere: the breath in the cold (data/coldBreath.ts). On the Mountains of Madness, in the Vermont hills and the desert night
  * the investigator's breath ghosts out in front of the face at each breath: slow and pale at rest, quicker as they walk, ragged and heavy when
  * they are spent (a sprint, a low stamina bar), and it streams away down the wind. It makes the cold felt and shows the strain with no
  * bar. None on a mount, under a roof or in a close shot (nothing is born within a lens's reach). Render only; reads the body, never writes it.

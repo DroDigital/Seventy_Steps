@@ -1,5 +1,5 @@
 /**
- * Which lights are heard, and how (round 78). Pure: the nearest lights in earshot (render/audio/heardLights.ts) become at most
+ * Which lights are heard, and how (round 80). Pure: the nearest lights in earshot (render/audio/heardLights.ts) become at most
  * HEARTH.voices voices, each with its level (the sound's own law of distance: whole within AUDIO.near, fading squared to its
  * range), its top (a flame the eye cannot see is dulled toward HEARTH.dull, and heard at a share of its level: through the wall,
  * not cut), its place between the ears and its flicker. render/audio/hearth.ts plays the plan.

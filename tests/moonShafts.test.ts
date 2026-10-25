@@ -9,7 +9,7 @@ import { createPostPass } from '../src/render/postPass';
 import { POST_FRAG } from '../src/render/shaders/post';
 import { worldUniforms } from '../src/render/worldMaterial';
 
-describe('the moon\'s shafts in the mist (round 78)', () => {
+describe('the moon\'s shafts in the mist (round 80)', () => {
   const clear = { veil: 1, mist: 0.06 };
 
   it('are strongest while the moon is low enough for long shadows, thinner as it climbs, and none when it is too low for the map', () => {

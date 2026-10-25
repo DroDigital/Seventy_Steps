@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the ground keeps the steps. One of the atmosphere hub's parts (render/atmosphere.ts): made once with the world's
+ * Round 80, atmosphere: the ground keeps the steps. One of the atmosphere hub's parts (render/atmosphere.ts): made once with the world's
  * life and updated each drawn frame, outside the simulation and read-only on it. Each footfall (render/footfalls.ts, counted as the foley
  * counts them) leaves a print on the ground that takes one (snow, mud, sand, flesh; ground the rain has soaked; any ground for ten seconds
  * after the sea), kicks up the ground's own dust at a run, and, when the mind is Fractured or Unmoored, now and then a second, bare, larger

@@ -3,7 +3,7 @@ import { TIDE } from '../src/data/uiMood';
 import { createTide, tideAt } from '../src/render/tide';
 import type { Game } from '../src/systems/components';
 
-describe('the picture follows the body (round 78)', () => {
+describe('the picture follows the body (round 80)', () => {
   it('drains nothing before a death, and the whole of it when the time is up, never backward', () => {
     expect(tideAt(null, null)).toEqual({ drain: 0, breath: 0 });
     expect(tideAt(0, null).drain).toBe(0);

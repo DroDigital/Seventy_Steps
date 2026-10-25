@@ -1,5 +1,5 @@
 /**
- * The impulses of the two rooms a place is heard in (round 78): noise that dies away, brighter at first and duller as it goes
+ * The impulses of the two rooms a place is heard in (round 80): noise that dies away, brighter at first and duller as it goes
  * (the way a room's highs are soaked up sooner than its lows), a little different in each ear, with a handful of early
  * reflections laid over its start so that it reads as walls and not as a wash. Made once for each context, and made to
  * carry one unit of energy, so that the wet gains of data/acoustics.ts are a share of a sound's amplitude, whatever the

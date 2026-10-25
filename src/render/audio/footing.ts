@@ -1,5 +1,5 @@
 /**
- * What the foot is heard on (round 78): the recorded step is taken a little differently on each ground (data/footSounds.ts FEEL: snow and sand
+ * What the foot is heard on (round 80): the recorded step is taken a little differently on each ground (data/footSounds.ts FEEL: snow and sand
  * softer and duller, mud lower, boards a hollow knock, a slab or a cobble the stone's recording rather than dirt's), which of the four
  * recordings a phantom step is made from, and how cold the air is for a breath. Pure; render/audio/foley.ts and render/audio/bodyFoley.ts use it.
  */

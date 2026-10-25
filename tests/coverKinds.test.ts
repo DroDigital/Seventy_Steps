@@ -1,5 +1,5 @@
 /**
- * The ground's litter belongs to the place (round 78, data/coverKinds.ts, render/coverPieces.ts): only real regions have pieces of their own, no
+ * The ground's litter belongs to the place (round 80, data/coverKinds.ts, render/coverPieces.ts): only real regions have pieces of their own, no
  * piece is a colour the post pass would take for an anomaly, the pick is by the roll alone, and a chunk's cover is the same each time and costs
  * little more than the ground's own would.
  */

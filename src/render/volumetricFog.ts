@@ -3,7 +3,7 @@
  * lens, so each pixel's ray can be rebuilt from the scene's depth; where the investigator's ground
  * lies (the low mist pools there, eased as they climb or descend); and the mist of the place, the
  * region's or a dungeon room's (data/fogs.ts), turning from one to the next over a few seconds. A
- * failing mind thickens it, as it closes the far fog in; the Fog setting scales it (0: none). Round 78: it lives: it rises from ground
+ * failing mind thickens it, as it closes the far fog in; the Fog setting scales it (0: none). Round 80: it lives: it rises from ground
  * the rain has soaked and settles as the ground dries, a gale drives it past, and its banks swell and thin as they roll (shaders/fog.ts).
  */
 
@@ -26,8 +26,8 @@ export interface FogFrame {
   stress: number; // 0–1: the sanity effects' stress (capped by the FX setting)
   setting: number; // the Fog setting, 0–1
   wood?: number; // 0–1: how wooded the land underfoot is (world/planFill.ts `strewn`): the mist gathers among the trees (round 35)
-  wet?: number; // 0–1: how soaked the ground is (render/wetness.ts, the weather's: read from there when it is not given; round 78)
-  gust?: number; // how hard the wind blows (worldUniforms.uWind, 1 on a calm night; read from there when it is not given; round 78)
+  wet?: number; // 0–1: how soaked the ground is (render/wetness.ts, the weather's: read from there when it is not given; round 80)
+  gust?: number; // how hard the wind blows (worldUniforms.uWind, 1 on a calm night; read from there when it is not given; round 80)
   dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
 
@@ -85,7 +85,7 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       u.uProjInv.value.copy(camera.projectionMatrixInverse);
       u.uCamWorld.value.copy(camera.matrixWorld);
       u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
-      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet); // a failing mind thickens it, and a wood, and rain (round 78)
+      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet); // a failing mind thickens it, and a wood, and rain (round 80)
       u.uFog.value.set(now.density * thick, now.height, ground - 0.3, now.patchy);
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
       u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, f.enclosed ? 0 : LIVING.swell * now.patchy); // (w: its banks swell and thin; a crypt's mist is still)

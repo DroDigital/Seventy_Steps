@@ -16,7 +16,7 @@ afterEach(() => void (wetness.value = 0));
 
 const foot = (o: Partial<Footfall> = {}): Footfall => ({ x: 10, y: 1, z: 20, yaw: 0, foot: 1, speed: 4, stride: 1, ground: 'snow', body: { x: 10, z: 20 }, ...o });
 
-describe('what the ground keeps of a step (round 78)', () => {
+describe('what the ground keeps of a step (round 80)', () => {
   it('snow, mud, sand and flesh hold a print dry, longest in snow; stone, boards and the sea hold none', () => {
     const life = (k: GroundKind): number | undefined => printOn(k, 0, 0)?.life;
     expect(life('snow')).toBeGreaterThan(life('mud')!);

@@ -1,4 +1,4 @@
-/** Round 78: each realm's own air (render/ambientAir.ts, data/airFields.ts, render/airKinds.ts). */
+/** Round 80: each realm's own air (render/ambientAir.ts, data/airFields.ts, render/airKinds.ts). */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { AIR_FIELD, AIR_FIELDS, type AirKind } from '../src/data/airFields';
@@ -34,7 +34,7 @@ function breathe(region: string, seconds: number, set: (g: ReturnType<typeof cre
   return { born, air, g, me, camera };
 }
 
-describe('each realm\'s air (round 78)', () => {
+describe('each realm\'s air (round 80)', () => {
   it('gives every realm a field of its own, and no other', () => {
     for (const id of REGION_IDS) expect(AIR_FIELDS[id], id).toBeDefined();
     for (const id of Object.keys(AIR_FIELDS)) expect(REGION_IDS, id).toContain(id);

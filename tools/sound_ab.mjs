@@ -1,4 +1,4 @@
-// Round 78, dev only: renders a 12 s scripted sequence (two footfalls, a growl, a door, a cane tap) through the game's own room reverb
+// Round 80, dev only: renders a 12 s scripted sequence (two footfalls, a growl, a door, a cane tap) through the game's own room reverb
 // (src/render/audio/space.ts, in OfflineAudioContext) twice for each place, the send off and on, and writes the pairs as WAVs with what
 // the reverb adds (its level against the dry, and how long a footfall's tail stays audible). Needs Playwright and `npx vite --port <port>`:
 //   node tools/sound_ab.mjs <out dir> [port=5189] [case ...]     cases: open timber library vault cave drowned cosmos fight ruin nave

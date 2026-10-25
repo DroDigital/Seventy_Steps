@@ -6,7 +6,7 @@ import { newAtm } from '../src/render/skyForce';
 import type { Game } from '../src/systems/components';
 import { PASSAGE_NEED } from '../src/systems/veil';
 
-describe('the Alignment (round 78)', () => {
+describe('the Alignment (round 80)', () => {
   it('never comes to a steady mind that has gathered no insight', () => {
     for (let t = 0; t < 4 * 3600; t += 2) expect(omenAt(t, 0, 0).amount, String(t)).toBe(0);
     expect(chanceOf(0, 0)).toBe(0);

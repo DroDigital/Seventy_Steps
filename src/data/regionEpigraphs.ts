@@ -1,5 +1,5 @@
 /**
- * The epigraphs of the realms (round 78): a sentence of Lovecraft's, under the name of a realm as the investigator first comes to it
+ * The epigraphs of the realms (round 80): a sentence of Lovecraft's, under the name of a realm as the investigator first comes to it
  * (ui/banner.ts) and, on a first journey there, under the veil (ui/loreLine.ts). Not spoken; as for data/loreLines.ts, only of stories
  * published by 1928, and unsigned. The words are the interface's (`epigraph.<id>` in data/lang, in all four languages): this lists which realms have one.
  * Where no story of his by then is of the place (Dunwich, Vermont, the Mountains, K'n-yan, Yuggoth) the card is the name alone.

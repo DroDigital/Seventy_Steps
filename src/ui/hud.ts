@@ -3,7 +3,7 @@
  * (mindHud.ts), carried Echoes and insight, the lock-on reticle with the target's name and health, short notices
  * (combat, bands, first sights, insight, Elder Signs), titles for regions entered, places reached and
  * bosses vanquished, the interact prompt near an Elder Sign or gate (or for a boss fight's
- * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts). Round 78: a realm's first card with its epigraph
+ * action), the death banner, the boss fights' half (bossHud.ts) and the minimap (minimap.ts). Round 80: a realm's first card with its epigraph
  * (realmCards.ts), the night's hours (hourCards.ts), and the quiet walk, when nothing threatens: the bars, map and quest line sink to a third (calm.ts).
  */
 
@@ -66,7 +66,7 @@ export interface Hud {
   readonly calm: number;
 }
 
-/** Round 78: what the HUD asks of the screen besides the world: `held`, the veil, a cutscene or a journey has it (the cards wait); `quiet`, Settings › Play › Quiet walk. */
+/** Round 80: what the HUD asks of the screen besides the world: `held`, the veil, a cutscene or a journey has it (the cards wait); `quiet`, Settings › Play › Quiet walk. */
 export interface HudOptions {
   held?: () => boolean;
   quiet?: () => boolean;
@@ -76,7 +76,7 @@ export interface HudOptions {
 /** `tracker`: whether the quest tracker is asked for (Settings › Play). */
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
-  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 78): the bars, counters, map and quest line, which sink together
+  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 80): the bars, counters, map and quest line, which sink together
   const minimap = createMinimap(g, dim, painter);
   const hints = createHints(g);
   const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', dim); // (the vitals at the upper left)
@@ -113,7 +113,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const bosses = createBossHud(g, root, say, show);
   let screenHeld = false; // a cutscene has the screen (hide)
   const cardsHeld = (): boolean => screenHeld || menuOpen() || !!opts.held?.();
-  const realms = createRealmCards(g, great, cardsHeld); // a realm's name inked in, with its epigraph the first time (round 78)
+  const realms = createRealmCards(g, great, cardsHeld); // a realm's name inked in, with its epigraph the first time (round 80)
   const hours = createHourCards(g, (title, note) => great.show(title, 'hour', undefined, note), () => !dying && !cardsHeld());
   const calm = createCalm(g, () => !dying && !screenHeld && !menuOpen() && !opts.held?.() && (opts.quiet?.() ?? true));
   let calmNow = { hud: 0, camera: 0 };

@@ -1,4 +1,4 @@
-/** Round 78: motes in the lantern's light (render/lanternAir.ts, data/lanternMotes.ts). */
+/** Round 80: motes in the lantern's light (render/lanternAir.ts, data/lanternMotes.ts). */
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { LANTERN_MOTES as M } from '../src/data/lanternMotes';
@@ -21,7 +21,7 @@ function glow(seconds: number, o: { enclosed?: boolean; light?: number; wind?: n
   return { born, me, camera };
 }
 
-describe('motes in the lantern\'s light (round 78)', () => {
+describe('motes in the lantern\'s light (round 80)', () => {
   beforeEach(() => void (worldUniforms.uWind.value = 1));
 
   it('thins to nothing as the flame goes out, and in a gale', () => {

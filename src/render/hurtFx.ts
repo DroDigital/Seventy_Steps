@@ -4,7 +4,7 @@
  * Near death (round 14; round 23) the edge stays a dark red that swells with each stroke of the heart the
  * audio plays, and the picture loses some of its colour (the post pass's uFaint): felt, not flashed.
  * The health bar's draining chip is the HUD's half (hud.ts). Round 25: a petrifying gaze drains the colour to stone, closes the
- * edges in grey and, past half, cracks the picture (the post pass's uStone). Round 78 (render/tide.ts): struck down, the colour runs
+ * edges in grey and, past half, cracks the picture (the post pass's uStone). Round 80 (render/tide.ts): struck down, the colour runs
  * out of the picture and its corners close in; rising from an Elder Sign the corners open and the light swells for a breath.
  */
 
@@ -56,7 +56,7 @@ export function createHurtFx(g: Game): HurtFx {
       post.uniforms.uFaint.value.set(need * HURT.lowBase + HEART.swell * HURT.lowPulse * (0.35 + 0.65 * need), need * HURT.lowDrain);
       post.uniforms.uFade.value = fallDark(g.player.falling); // over an edge: the picture closes in to black (systems/falls.ts)
       post.uniforms.uStone.value = g.reality.petrify; // turning to stone (the bar on the boss's HUD is the other half)
-      const { drain, breath } = tide.update(); // round 78: struck down, the colour drains and the corners close; risen from the stone, a breath out
+      const { drain, breath } = tide.update(); // round 80: struck down, the colour drains and the corners close; risen from the stone, a breath out
       if (drain > 0) {
         const faint = post.uniforms.uFaint.value as THREE.Vector2;
         faint.y = Math.max(faint.y, TIDE.grey * drain);

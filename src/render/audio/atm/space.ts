@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: a room for every place, and the hearth of fires and lamps. One of the atmosphere audio hub's parts
+ * Round 80, atmosphere: a room for every place, and the hearth of fires and lamps. One of the atmosphere audio hub's parts
  * (render/audio/atmosphereAudio.ts): made once with the game's audio and updated each frame, read-only on the simulation. A few
  * times a second it reads where the investigator stands (the dungeon room's kit and shape, the region's air, a fight engaged)
  * and tells the engine's reverb (audio/space.ts) the room; every frame it hands the lights in earshot to the hearth

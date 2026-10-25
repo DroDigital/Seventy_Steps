@@ -1,5 +1,5 @@
 /**
- * The shock (round 78): the narrators' swoons and ringing ears on glimpsing the unthinkable. A sudden large loss of the mind (a first sight, a
+ * The shock (round 80): the narrators' swoons and ringing ears on glimpsing the unthinkable. A sudden large loss of the mind (a first sight, a
  * horror's roar: `SanityLost` of SHOCK.from or more) dulls the world's high end, lets the bed give way and sends a thin tone ringing in the head
  * that thins over several seconds, and the sounds creep back; the picture's own part is a ring across it (fxController.ts). The sound keeps to the
  * FX intensity setting, so none of it at intensity 0. `DREAD_AIR` is what the picture's dread asks of the sound: audio/gameAudio.ts and

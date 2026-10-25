@@ -6,7 +6,7 @@ import { HOUR_FROM, hourOf, NIGHT, phaseOf, type Hour } from '../src/systems/clo
 import type { Game } from '../src/systems/components';
 import { createHourCards, HOUR_CARDS, HOUR_LABEL, hourChange } from '../src/ui/hourCards';
 
-describe('the night\'s turns announced (round 78)', () => {
+describe('the night\'s turns announced (round 80)', () => {
   it('names a change of hour, the turn being the last hour giving way to the gloaming', () => {
     expect(hourChange('gloaming', 'deep')).toBe('deep');
     expect(hourChange('deep', 'waning')).toBe('waning');

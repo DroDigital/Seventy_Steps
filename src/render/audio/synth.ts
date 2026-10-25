@@ -14,7 +14,7 @@ export interface PlayOptions {
   pan?: number; // -1 left .. 1 right
   pitch?: number; // frequency ratio
   lowpass?: number; // Hz: dulled by distance (a sound heard from far off has lost its top)
-  bus?: AudioNode; // where it joins: the one-shots' bus by default (round 78: the far voices of the night join the ambience's)
+  bus?: AudioNode; // where it joins: the one-shots' bus by default (round 80: the far voices of the night join the ambience's)
 }
 
 const noiseBuffers = new WeakMap<BaseAudioContext, AudioBuffer>();

@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the picture of dread: pressure, the shock, watchers that step nearer unseen, eyes beyond the lantern. One of the atmosphere hub's parts (render/atmosphere.ts):
+ * Round 80, atmosphere: the picture of dread: pressure, the shock, watchers that step nearer unseen, eyes beyond the lantern. One of the atmosphere hub's parts (render/atmosphere.ts):
  * made once with the world's life and updated each drawn frame, outside the simulation and read-only on it. Pressure (render/pressure.ts, fx.ts) is the FX controller's and the watchers' steps and
  * darters are render/watchers.ts's, which worldLife already updates; this part holds what is new beside them: the shock's sound (render/shock.ts), the eyes (darkEyes.ts)
  * and the bed that gives way while the watchers stand, all asked of the sound through `DREAD_AIR`.

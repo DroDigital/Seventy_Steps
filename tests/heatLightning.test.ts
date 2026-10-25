@@ -15,7 +15,7 @@ function stream(seed = 7): () => number {
   return () => ((s = (s * 16807) % 2147483647) - 1) / 2147483646;
 }
 
-describe('heat lightning (round 78)', () => {
+describe('heat lightning (round 80)', () => {
   it('plays only in a clear sky over a region that knows thunderstorms, never with the Flashes setting off or a ceiling of cloud', () => {
     const clear = { kind: 'clear', amount: 0 };
     expect(heatWeather('dunwich', clear, 0, 1)).toBe(true);

@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the hub of what deepens the open world's air without touching its rules. Every part lives in
+ * Round 80, atmosphere: the hub of what deepens the open world's air without touching its rules. Every part lives in
  * `render/atm/` and is made once with the world's life (render/worldLife.ts), then updated each drawn frame after the rest
  * of the life has been. Parts only read the simulation (`g`) and the pictures' own state; none writes a number the game's
  * balance reads. A part that has nothing to do (a dungeon, a cutscene, a realm it does not belong to) does it cheaply.

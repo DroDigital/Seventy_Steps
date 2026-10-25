@@ -49,7 +49,7 @@ function centroid(samples: Float32Array): number {
   return sum / Math.max(weight, 1e-9);
 }
 
-describe('how the ground is heard (round 78)', () => {
+describe('how the ground is heard (round 80)', () => {
   it('the recorded step is taken softer and duller in snow and sand, lower in mud, hollow on boards; a slab or cobble is the stone, not dirt', () => {
     expect(footFeel('dirt', 'snow').gain).toBeLessThan(0.7);
     expect(footFeel('dirt', 'snow').lowpass).toBeLessThan(3000);

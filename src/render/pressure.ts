@@ -1,5 +1,5 @@
 /**
- * Pressure (round 78): dread is weather that arrives, not a bar that happens to be low. The picture's failing-mind effects were a pure
+ * Pressure (round 80): dread is weather that arrives, not a bar that happens to be low. The picture's failing-mind effects were a pure
  * function of the sanity level, so a mind at 100 that walked toward a great horror's ring saw nothing change. Pressure is a 0..1 term
  * read from the simulation without re-implementing it: the smoothed rate at which sanity is being lost (auras, roars, clouds and a
  * place's dread all take it the same way, and a swallow of Laudanum that stops the drain clears the head at once), and the jolt of a

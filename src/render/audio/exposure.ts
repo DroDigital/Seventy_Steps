@@ -1,5 +1,5 @@
 /**
- * Round 78, the sea where the sea is, the wind where it blows: what the land about the investigator says to the beds. Four rings of
+ * Round 80, the sea where the sea is, the wind where it blows: what the land about the investigator says to the beds. Four rings of
  * points (data/ambienceRoles.ts `SENSE`) are looked at every quarter second in twelve directions: where the ground lies below the
  * sea, how much of the horizon it is and which way, and whether the investigator stands above the land about (a ridge) or under it
  * (a lee). The readings are eased, up quickly and down slowly, into `PLACED`, which render/audio/ambience.ts reads for its beds and

@@ -1,5 +1,5 @@
 /**
- * The sky takes part in the weather (round 78: the stars were the same in a clear spell and a thunderstorm): rain and storm close a cloud
+ * The sky takes part in the weather (round 80: the stars were the same in a clear spell and a thunderstorm): rain and storm close a cloud
  * ceiling from the horizon, the stars go out, the moon is veiled and the moonlit ground dims, the mist loses its pale lobe on the moon's side,
  * and each flash of lightning lights the cloud's belly in its structure (shaders/sky.ts); after the spell the stars come back over some forty
  * seconds. On a clear night, now and then, a bank of cloud crosses the moon (`veilAt`), the night breathes with it, and thin cloud draws a ring

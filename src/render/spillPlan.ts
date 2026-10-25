@@ -1,5 +1,5 @@
 /**
- * Where a lit window lays its light on the ground before it (round 78; windowSpill.ts draws it): out from the glass along the wall's
+ * Where a lit window lays its light on the ground before it (round 80; windowSpill.ts draws it): out from the glass along the wall's
  * normal, as far as it runs before something stands in its way (a rule like the lights' sight, world/colliders.ts raycast, cast once
  * for each window and kept: the town does not move), on the plane the ground makes there. Pure: no Three.js.
  */

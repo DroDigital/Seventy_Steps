@@ -1,5 +1,5 @@
 /**
- * Where the lens looks (round 78): the helpers the dread of the picture shares. The watchers step nearer only while they are out of view and the
+ * Where the lens looks (round 80): the helpers the dread of the picture shares. The watchers step nearer only while they are out of view and the
  * darters cross only the edge of it; the eyes beyond the lantern go when looked at squarely; the shade with no one moves only while the lens is
  * turned away from it. All of it asks the same two things: how far a place is from the middle of the picture, and how fast the lens is turning.
  * Presentation only; reads a camera, writes nothing.

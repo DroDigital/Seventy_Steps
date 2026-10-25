@@ -1,5 +1,5 @@
 /**
- * The reverb is a flourish and gives way first (round 78): when the frames of a machine average under SPACE.safety.low for
+ * The reverb is a flourish and gives way first (round 80): when the frames of a machine average under SPACE.safety.low for
  * `hold` seconds the convolvers are let go, and when they average over `back` for `backHold` seconds they are taken up again.
  * Looked at once a second (a hitch when a chunk loads, the one slow frame in a hundred, is not a slow machine). Pure: the frame
  * times and the clock are fed in.

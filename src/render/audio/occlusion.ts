@@ -1,5 +1,5 @@
 /**
- * Sound through walls (round 78). The simulation already knows that a wall halves how far a footfall is heard and that a
+ * Sound through walls (round 80). The simulation already knows that a wall halves how far a footfall is heard and that a
  * horror's fog is a wall (systems/perception.ts), but the investigator's own ears did not: a ghoul behind a wall, a cry from
  * the next room, a horror roaring beyond its fog were as clear as ones in the room. Now a sound is shut off by what stands in
  * the line from the investigator's head to it: stone, a hill or a great column (not a tree, a fence or a post), a horror's fog,

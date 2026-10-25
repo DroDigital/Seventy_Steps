@@ -6,7 +6,7 @@
  * moon itself with its maria and halo. Round 34: the Milky Way, a band of star-dust across it; over
  * the cold realms the aurora, curtains of pale light low in the north; and now and then a falling
  * star. The post pass grades and dithers it like everything else. Round 73: the Outer Dark's dimensions hang their own things in it (skyCosmos.ts).
- * Round 78: it answers the weather and the hours (render/atm/sky.ts): a cloud ceiling that closes in rain and storm (`uOver`) and a bank over the moon on a clear night (`uVeil`) with the thin cloud's ring,
+ * Round 80: it answers the weather and the hours (render/atm/sky.ts): a cloud ceiling that closes in rain and storm (`uOver`) and a bank over the moon on a clear night (`uVeil`) with the thin cloud's ring,
  * a cloud belly lit by the lightning in its structure; an afterglow, a false dawn and stars that wheel (`uHour`, `uTurn`); heat lightning on a far horizon (`uHeat`); the moon swollen and soured by a failing mind,
  * and the Alignment, the stars fallen into the Elder Sign (`uOmen`; shaders/skyOmen.ts).
  */

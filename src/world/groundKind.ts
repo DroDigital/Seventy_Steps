@@ -1,5 +1,5 @@
 /**
- * What is under a foot (round 78): the ground the investigator walks on, named as the picture draws it, so the prints it keeps
+ * What is under a foot (round 80): the ground the investigator walks on, named as the picture draws it, so the prints it keeps
  * (render/footprints.ts) and the sound of the step (render/audio/footing.ts) say the same thing. The sea's shallows; a dungeon
  * room's floor by its kit; the floor an open arena lays; a road; else the region's ground, with the biome's patches laid over it
  * where the ground shader lays them (shaders/world.ts: the same noise, ported). `render/audio/foley.ts surfaceAt` is left as it

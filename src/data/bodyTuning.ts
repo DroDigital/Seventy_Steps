@@ -1,5 +1,5 @@
 /**
- * The body in the world (round 78): what the ground keeps of a step and what the body gives up of itself. Footprints (render/footprints.ts,
+ * The body in the world (round 80): what the ground keeps of a step and what the body gives up of itself. Footprints (render/footprints.ts,
  * laid by render/atm/steps.ts), the puffs a heel kicks up, the second set of prints that follows a failing mind, and the breath
  * and the gear heard (render/audio/bodyFoley.ts). Numbers only; the grounds are world/groundKind.ts's.
  */

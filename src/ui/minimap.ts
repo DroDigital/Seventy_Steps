@@ -48,7 +48,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       if (!g.overworld) return;
       const phase = phaseOf(g.frame / SIM.hz);
       moon.style.left = `${(phase * 100).toFixed(1)}%`;
-      setText(hour, t(HOUR_LABEL[hourOf(phase)])); // (round 78: in the language chosen)
+      setText(hour, t(HOUR_LABEL[hourOf(phase)])); // (round 80: in the language chosen)
       workArt(ART_MS);
       if (tick++ % 2) return; // thirty times a second is plenty
       const p = g.ecs.c.transform.get(g.player.id)!.pos;

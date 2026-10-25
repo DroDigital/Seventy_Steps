@@ -6,7 +6,7 @@
  * resolution and upscaled like the game, so it shares its look. Over the title it only haunts the
  * edges, breathing. While the world is made under it, a line beneath the name fills from its middle
  * outwards as the making goes (playtest round 10: a start was seconds of black with nothing to say
- * that anything was happening). Round 78: the name is larger and inks in a letter at a time once the dark covers all (ui/inkTitle.ts),
+ * that anything was happening). Round 80: the name is larger and inks in a letter at a time once the dark covers all (ui/inkTitle.ts),
  * and the line beneath it comes a moment after the last letter.
  */
 
@@ -119,7 +119,7 @@ export function createVeil(): Veil {
     said.textContent = text;
     lore.textContent = text ? (line ?? nextLore()) : '';
   };
-  /** The name comes out of the dark a letter at a time, and the line beneath it a moment after the last (round 78). */
+  /** The name comes out of the dark a letter at a time, and the line beneath it a moment after the last (round 80). */
   const ink = (): void => {
     for (const a of inked) a.cancel();
     inked = playIn(inkLetters(said, name), inkSeed(name));

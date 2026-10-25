@@ -10,7 +10,7 @@ import { createSpaceSafety } from '../src/render/audio/spaceSafety';
 
 const at = (o: Partial<SpaceInput>): SpaceInput => ({ kit: null, kind: null, wide: false, region: 'arkham', fighting: false, ...o });
 
-describe('a room for every place (round 78)', () => {
+describe('a room for every place (round 80)', () => {
   it('has a space for every kit, and every space a row', () => {
     for (const kit of Object.keys(KITS)) expect(SPACES[KIT_SPACE[kit as keyof typeof KITS]], kit).toBeDefined();
     for (const id of Object.values(KIT_SPACE)) expect(SPACES[id]).toBeDefined();
@@ -80,7 +80,7 @@ function rt60(d: Float32Array, rate: number): number {
   return (2 * (at(-35) - at(-5))) / rate;
 }
 
-describe('the impulses (round 78)', () => {
+describe('the impulses (round 80)', () => {
   const rate = 16000;
   it('carry one unit of energy each, so a wet gain is a share of amplitude', () => {
     for (const spec of [SPACE.room, SPACE.hall]) for (const ear of [0, 1]) {
@@ -144,7 +144,7 @@ function bus() {
   return { told, space: createSpaceBus(ctx, sfx!, bed!, out!) };
 }
 
-describe('the send (round 78)', () => {
+describe('the send (round 80)', () => {
   it('is told only of a change, glides to a new room, and keeps its state for the debug hooks', () => {
     const { told, space } = bus();
     space.set(SPACES.open);
@@ -173,7 +173,7 @@ describe('the send (round 78)', () => {
   });
 });
 
-describe('the reverb gives way first (round 78)', () => {
+describe('the reverb gives way first (round 80)', () => {
   it('goes off on a machine that cannot hold its frames, and comes back when it can, and not for a hitch', () => {
     const s = createSpaceSafety();
     let now = 0;

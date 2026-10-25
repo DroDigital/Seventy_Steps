@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: specks hung in the lantern's light (render/lanternAir.ts): a few of dust and spores in the pool of it outdoors,
+ * Round 80, atmosphere: specks hung in the lantern's light (render/lanternAir.ts): a few of dust and spores in the pool of it outdoors,
  * more, and falling, in a crypt's still air. They make the lantern's light a thing in the air and give the third-person view its parallax.
  * They thin out in a gale and are not born when the flame is out or guttering. Data only.
  */

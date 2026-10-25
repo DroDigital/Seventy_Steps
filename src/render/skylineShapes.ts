@@ -10,7 +10,7 @@
 import type { Rng } from '../core/rng';
 import type { SilhouetteKind } from '../data/skylines';
 
-/** An outline's height at x; a reef's carries where its lamp stands (round 78: it turns, render/horizonGlow.ts). */
+/** An outline's height at x; a reef's carries where its lamp stands (round 80: it turns, render/horizonGlow.ts). */
 export type Profile = ((x: number) => number) & { lamp?: { x: number; y: number } };
 
 /** A pointed spire of half-width `w` and height `h` at `c`. */
@@ -107,7 +107,7 @@ export function profile(kind: SilhouetteKind, rng: Rng): Profile {
         if (Math.abs(x - light.c) < 0.004) y = Math.max(y, light.h + 0.28); // the lamp-tower
         return y;
       };
-      outline.lamp = { x: light.c, y: light.h + 0.28 }; // round 78: where its lamp turns
+      outline.lamp = { x: light.c, y: light.h + 0.28 }; // round 80: where its lamp turns
       return outline;
     }
     case 'dunes': { // long slow waves with sharp crests, a few cyclopean stones among them

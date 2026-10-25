@@ -1,4 +1,4 @@
-/** Round 78: the breath in the cold (render/breath.ts, data/coldBreath.ts). */
+/** Round 80: the breath in the cold (render/breath.ts, data/coldBreath.ts). */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { BREATH, COLD } from '../src/data/coldBreath';
@@ -21,7 +21,7 @@ function breathe(region: string, seconds: number, set: (g: ReturnType<typeof cre
   return { born, me, g };
 }
 
-describe('the breath in the cold (round 78)', () => {
+describe('the breath in the cold (round 80)', () => {
   it('names real regions, and is coldest on the plateau', () => {
     for (const id of Object.keys(COLD)) expect(REGION_IDS, id).toContain(id);
     expect(Math.max(...Object.values(COLD))).toBe(COLD.mountains);

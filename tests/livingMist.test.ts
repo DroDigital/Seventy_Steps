@@ -19,7 +19,7 @@ function rig() {
   return { uniforms, fog, camera, frame };
 }
 
-describe('a mist that lives (round 78)', () => {
+describe('a mist that lives (round 80)', () => {
   it('rises after rain by the share of the ground\'s wet, and never past the thickest it was (full madness in a wood)', () => {
     expect(thickAfterRain(1, 0)).toBe(1);
     expect(thickAfterRain(1, 1)).toBeCloseTo(1 + LIVING.afterRain, 9);

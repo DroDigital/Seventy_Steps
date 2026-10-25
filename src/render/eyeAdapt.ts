@@ -1,5 +1,5 @@
 /**
- * The eye (round 78): the mind mends faster in lamplight (sanity.ts, `Game.lit`) and nothing in the picture said so. Now the picture's corners
+ * The eye (round 80): the mind mends faster in lamplight (sanity.ts, `Game.lit`) and nothing in the picture said so. Now the picture's corners
  * open where a lamp, a fire or a lit window stands about the investigator and what shines blooms a little more, as a breath let go; and in
  * the dark they close in slowly, till the lantern and its circle are all there is. The vignette and the bloom only: a change of exposure before
  * the quantiser would shift the 64 colours and flicker its bands. Asymmetric (it opens in under a second and closes over a few) and small;

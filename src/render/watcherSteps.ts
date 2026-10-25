@@ -1,5 +1,5 @@
 /**
- * Not where it was (round 78): the pure rules of the watchers' steps and the darters at the corner of the eye (render/watchers.ts).
+ * Not where it was (round 80): the pure rules of the watchers' steps and the darters at the corner of the eye (render/watchers.ts).
  * A watcher that has stood a while and is out of the picture comes a step or two nearer, never while it is seen and never to within
  * STEP.closest metres; a dark upright shape crosses the very edge of the picture while the lens swings, and is gone when it is turned to.
  * No Three.js; the numbers are data/dreadPicture.ts's.

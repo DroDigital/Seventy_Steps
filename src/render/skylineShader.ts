@@ -1,5 +1,5 @@
 /**
- * The far silhouettes' shader (render/skyline.ts; round 78 gave it its life, render/horizonGlow.ts). One mesh draws, in the order of its
+ * The far silhouettes' shader (render/skyline.ts; round 80 gave it its life, render/horizonGlow.ts). One mesh draws, in the order of its
  * triangles, the glow over a town (kind 1 of `aFx`: light added to the sky), the outline with its windows (kind 0: the realm's colour, melted
  * toward the horizon's) and a turning lamp's flash and shaft (kind 2: light added). The blend is premultiplied, so the outline covers what is
  * behind it and the glow and the lamp add to it. The windows are cells of the mass, lit by chance; they follow the night and wink as the near
@@ -62,7 +62,7 @@ void main() {
   if (uLit > 0.0) { // a window is a cell of the mass, lit by chance, most of them in its lower half
     vec2 cell = floor(vec2(vPos.x * ${WINK.cells[0].toFixed(1)}, vPos.y * ${WINK.cells[1].toFixed(1)}));
     float on = step(1.0 - uLit * smoothstep(0.03, 0.14, vUp) * (1.0 - smoothstep(0.3, 0.85, vUp)), hash(cell));
-    if (on > 0.0) { // its own life (round 78): some are put out for a spell or dim, and as the night wears on the last seeds go out
+    if (on > 0.0) { // its own life (round 80): some are put out for a spell or dim, and as the night wears on the last seeds go out
       float s = hash(cell + 17.31);
       on *= paneLit(s, uWink);
       on *= 1.0 - uNerves * smoothstep(0.35, 0.8, sin(uWink * (6.0 + 9.0 * s) + s * 61.0) * sin(uWink * 2.3 + s * 17.0 + 1.0)); // a failing mind: they strobe, a few at a time

@@ -33,7 +33,7 @@ describe('the line under the veil (round 24)', () => {
   });
 });
 
-describe('a realm\'s epigraph under the veil (round 78)', () => {
+describe('a realm\'s epigraph under the veil (round 80)', () => {
   afterEach(() => void vi.unstubAllGlobals());
   const storage = () => {
     const data = new Map<string, string>();

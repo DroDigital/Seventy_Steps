@@ -14,7 +14,7 @@ const steady = (eye: { update(t: number, e: boolean, a: number): void }, from: n
   return t;
 };
 
-describe('round 78: the eye opens in lamplight and closes in the dark (render/eyeAdapt.ts)', () => {
+describe('round 80: the eye opens in lamplight and closes in the dark (render/eyeAdapt.ts)', () => {
   it('a pool is none from a stray glow, whole at a lamp, and grows with the light', () => {
     expect(poolOf(0)).toBe(0);
     expect(poolOf(EYE.take[0])).toBe(0);

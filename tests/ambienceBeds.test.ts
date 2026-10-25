@@ -59,7 +59,7 @@ function fakeAudio() {
 const secondsAt = (phase: number): number => ((((phase - CLOCK.start) % 1) + 1) % 1) * CLOCK.night;
 const hourOfReader = (pan: Pan): Gain => pan.from[0] as Gain; // the gain between the bed's own breath and its pan
 
-describe('the beds as WebAudio plays them (render/audio/ambience.ts, round 78)', () => {
+describe('the beds as WebAudio plays them (render/audio/ambience.ts, round 80)', () => {
   let seed = 1;
   beforeEach(() => {
     seed = 1;

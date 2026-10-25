@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the numbers of the picture of dread (render/pressure.ts, shock.ts, watchers.ts, darkEyes.ts):
+ * Round 80, atmosphere: the numbers of the picture of dread (render/pressure.ts, shock.ts, watchers.ts, darkEyes.ts):
  * the pressure that leans the picture toward madness while something presses on the mind, the shock of a sudden loss, the watchers'
  * steps and the darters at the corner of the eye, the eyes beyond the lantern. All of it cosmetic and held by the
  * FX intensity setting; none writes a number the simulation reads.

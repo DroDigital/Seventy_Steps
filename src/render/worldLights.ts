@@ -68,7 +68,7 @@ export interface Lit {
 }
 
 /**
- * What the last `update` chose, for the atmosphere's own passes to read (round 78: render/lampAim.ts, render/windowSpill.ts), refilled in place:
+ * What the last `update` chose, for the atmosphere's own passes to read (round 80: render/lampAim.ts, render/windowSpill.ts), refilled in place:
  * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye.
  */
 export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[] } = { seen: [], visible: [] };
@@ -138,7 +138,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       haloSight.update(visible, eye, time);
       seen.length = 0;
       for (const n of near) if (n.v > 0.02) seen.push(n); // the lamps are for the lights that show: one in the next room takes none
-      beginHeard(); // round 78: the nearest in earshot, for the sound of them (audio/hearth.ts); one in the next room is heard dulled, so these are `near`, not `seen`
+      beginHeard(); // round 80: the nearest in earshot, for the sound of them (audio/hearth.ts); one in the next room is heard dulled, so these are `near`, not `seen`
       for (const n of near) {
         if (n.d > HEARTH.reach) break;
         if (n.s.kind !== 'window' && !pushHeard(n.s, n.d, n.v, waver(n.s, LIGHTS.kinds[n.s.kind].flicker, time))) break; // (a lit window is mute)

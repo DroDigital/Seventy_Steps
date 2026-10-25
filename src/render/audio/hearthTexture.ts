@@ -1,5 +1,5 @@
 /**
- * A flame's noise, drawn once as a loop that closes on itself (round 78; the way rainTexture.ts draws rain): a low rumble that
+ * A flame's noise, drawn once as a loop that closes on itself (round 80; the way rainTexture.ts draws rain): a low rumble that
  * swells and falls, the airy hiss of burning, and pops at random, each a short bandpassed burst with a tick at its start, a few
  * of them sharp snaps. Everything slow runs whole cycles to the loop, the filters are run twice round the ring, and the pops'
  * tails wrap, so the end meets the start. Nothing here needs the audio context; the loop is drawn to a fixed rms, so the kinds'

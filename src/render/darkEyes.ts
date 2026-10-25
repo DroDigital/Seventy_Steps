@@ -1,5 +1,5 @@
 /**
- * Eyes in the dark beyond the lantern (round 78): on the heath and among the trees, now and then a pair of faint eyes hangs in the black at the edge
+ * Eyes in the dark beyond the lantern (round 80): on the heath and among the trees, now and then a pair of faint eyes hangs in the black at the edge
  * of the lantern's reach, at the height of a hound, blinks once, and is gone when the lantern turns to them or the investigator nears. In Innsmouth
  * the pairs never blink, in the Black Wood they are red, and as the mind frays there is one more of them and the blinks go out of step. They do
  * nothing. Never in a fight or a talk, never near a light; one batch of halos, depth-tested, so the trees hide them (the Lurking Fear, the Shadow

@@ -1,5 +1,5 @@
 /**
- * Round 78, the picture that follows the body: struck down, the colour runs out of the world and the corners close in toward black, so
+ * Round 80, the picture that follows the body: struck down, the colour runs out of the world and the corners close in toward black, so
  * UNMADE rises over a grey, sinking picture (before this the muffled sound had no picture); rising from an Elder Sign after a rest, the
  * corners open and the light swells for a moment, a breath out. Render only: it reads the game's events and the investigator's kneeling
  * and drives the post pass's own uniforms (render/hurtFx.ts writes them). The drain is on the wall clock, since the world stands still

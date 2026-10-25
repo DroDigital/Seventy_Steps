@@ -1,5 +1,5 @@
 /**
- * Round 78: the three hours of the night each have a sky of their own (render/skyHours.ts): at the turn a low afterglow
+ * Round 80: the three hours of the night each have a sky of their own (render/skyHours.ts): at the turn a low afterglow
  * lies along the horizon opposite where the moon rose, through the deep the sky is the plain dark it was, and in the
  * waning hour a pale false dawn leans up on the far side from where the moon sets, and sinks back at the turn. The stars
  * wheel about the sky through the night. Colours are warm and low in saturation and none is an anomaly hue

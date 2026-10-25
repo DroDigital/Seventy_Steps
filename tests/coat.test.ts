@@ -1,5 +1,5 @@
 /**
- * The coats of the land (round 78, data/coats.ts, render/coat.ts): what lies on the stones of a realm. Only real realms wear one, none
+ * The coats of the land (round 80, data/coats.ts, render/coat.ts): what lies on the stones of a realm. Only real realms wear one, none
  * wears a colour the post pass would take for an anomaly, one coat eases into another without a jump, and the world shader lays it on props
  * only, never on the lit, the living or the ground.
  */

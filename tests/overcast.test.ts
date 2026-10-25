@@ -40,7 +40,7 @@ function rig(overworld = true) {
   return { uniforms, post, weather, atm, set, frame, run };
 }
 
-describe('the cloud ceiling of the weather (round 78)', () => {
+describe('the cloud ceiling of the weather (round 80)', () => {
   it('is closed by rain and storm, less by a gale, and by no clear sky or dream-motes', () => {
     expect(overcastOf('clear', 0)).toBe(0);
     expect(overcastOf('motes', 1)).toBe(0);
@@ -140,7 +140,7 @@ describe('the cloud ceiling of the weather (round 78)', () => {
   });
 });
 
-describe('the bank of cloud across the moon (round 78)', () => {
+describe('the bank of cloud across the moon (round 80)', () => {
   it('is a deterministic, bounded schedule: banks of 24 to 48 seconds, with clear nights between', () => {
     let [banks, inBank, len, longest, shortest] = [0, false, 0, 0, Infinity];
     for (let t = 0; t < 6 * 3600; t += 0.5) {

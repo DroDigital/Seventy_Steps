@@ -105,7 +105,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const acts = createActFoley(g, (key, sound, o) => recipe(key, sound, o));
   const weatherBed = createWeatherBed(e, sampler); // round 59: the rain is recorded
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard
-  const occlusion = createOcclusion(g); // round 78: a wall, a roof or a horror's fog between the investigator and a sound dulls it
+  const occlusion = createOcclusion(g); // round 80: a wall, a roof or a horror's fog between the investigator and a sound dulls it
   const place = (at: V3 | null, range: number): { gain: number; pan: number; lowpass: number; occ: number } => {
     const p = placeSound(listener, right, at, range);
     return at && p.gain > 0 ? heard(p, occlusion.occludedAt(at)) : { ...p, lowpass: dullness(p.gain), occ: 0 }; // (`lowpass`: the distance's, or the wall's if duller)
@@ -131,7 +131,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
   createWayAudio(g, recipe, (set, at, o = {}) => recorded(set, at, at ? AUDIO.eventRange : 1, o)); // round 62: the wards, vents and waves of a way, and what is heard under its omens
   createAttackAudio(g, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o));
-  const atmosphere = createAtmosphereAudio({ e, g, sampler, recipe, recorded, listener, right }); // round 78: the places heard, the night's voices, the ground underfoot
+  const atmosphere = createAtmosphereAudio({ e, g, sampler, recipe, recorded, listener, right }); // round 80: the places heard, the night's voices, the ground underfoot
   let lastSeconds: number | null = null;
   const play = (cue: Cue): void => {
     const { gain, pan, lowpass, occ } = place(cue.at, AUDIO.eventRange);
@@ -330,14 +330,14 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       e.detune = fx.detune + fx.wobble * Math.sin(seconds * 0.7);
       e.setDistortion(fx.distortion);
       hush += (hushTo - hush) * (hushTo > hush ? 0.018 : 0.012); // a few seconds to close, a few to open
-      e.setMuffle(Math.max(HEART.need, hush * 0.9, DREAD_AIR.muffle, MIND_TIDE.muffle)); // near death the world dulls, and the heart is heard (round 23); a sanity blow closes its high end (round 78), and Unmoored it breathes (round 78)
+      e.setMuffle(Math.max(HEART.need, hush * 0.9, DREAD_AIR.muffle, MIND_TIDE.muffle)); // near death the world dulls, and the heart is heard (round 23); a sanity blow closes its high end (round 80), and Unmoored it breathes (round 80)
       region = g.overworld ? (g.overworld.region ?? region) : 'arena'; // out at sea, the last shore's drone
       const scene = bossScene(g); // round 44: the fights engaged, and the horror nearest unmet
       drones.set(region, scene.fights.length > 0);
       const at = g.ecs.c.transform.get(g.player.id)?.pos;
       const roofed = (g.overworld && at && inside(at)) || null;
       ambience.set(roofed || (AMBIENCE[region ?? ''] ?? null));
-      weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 78: on snow and sand a storm is the wind alone, not the wash of rain)
+      weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 80: on snow and sand a storm is the wind alone, not the wash of rain)
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });
@@ -350,7 +350,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
         lastBeat = HEART.beats;
         playSound(e, STINGERS.heartbeat, { gain: 0.7 + 0.5 * HEART.need });
       }
-      whispers(fx.heard, seconds); // (round 78: the mind's pressure leans the whispers in: fx.ts)
+      whispers(fx.heard, seconds); // (round 80: the mind's pressure leans the whispers in: fx.ts)
       calls(seconds);
       foley.update(seconds, place, (at) => play({ sound: 'danger', at: { ...at } }));
       acts.update(seconds);

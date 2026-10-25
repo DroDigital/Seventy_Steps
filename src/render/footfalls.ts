@@ -1,5 +1,5 @@
 /**
- * The investigator's footfalls (round 78), as the foley (render/audio/foley.ts) counts them: one every `strideAt(speed)` metres walked,
+ * The investigator's footfalls (round 80), as the foley (render/audio/foley.ts) counts them: one every `strideAt(speed)` metres walked,
  * none while mounted, in a move, after a jump of more than three metres or once fallen. Two things read them, each with a clock of its
  * own that keeps step with the foley's: the ground's prints and puffs (render/atm/steps.ts) and the ground heard (render/audio/atm/footing.ts).
  * Render only: reads the simulation, writes nothing to it. No Three.js.

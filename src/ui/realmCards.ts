@@ -1,5 +1,5 @@
 /**
- * Round 78, the realm title cards: the first time in a save that the investigator comes into a realm, its name is inked in across the
+ * Round 80, the realm title cards: the first time in a save that the investigator comes into a realm, its name is inked in across the
  * screen, tinted toward its own colour, a hairline drawn beneath it and an epigraph of Lovecraft's a beat after (data/regionEpigraphs.ts).
  * A realm met again, a place reached by fast travel and a gate's far side get the same ink in a smaller card, with no epigraph. It is the
  * event that was always there (`RegionEntered`, `Travelled`), now waiting for the veil to lift and a cutscene to end, so it is seen from its

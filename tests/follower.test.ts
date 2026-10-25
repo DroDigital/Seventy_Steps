@@ -9,7 +9,7 @@ import { createWorldGame } from '../src/systems/game';
 const T = MIND_EARS.tread;
 const A = T.approach;
 
-describe('the tread: the scheduler (round 78)', () => {
+describe('the tread: the scheduler (round 80)', () => {
   it('never begins below the Fractured line, then every so often, sooner as the mind goes, never nearer than its gap', () => {
     expect(nextEpisodeAt(100, 0, Math.random)).toBe(Infinity);
     expect(nextEpisodeAt(100, T.from - 0.01, Math.random)).toBe(Infinity);
@@ -71,7 +71,7 @@ function rig(stress: number) {
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('the tread: followed in a real game (round 78)', () => {
+describe('the tread: followed in a real game (round 80)', () => {
   it('is never heard in a steady mind, however long they walk', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const r = rig(T.from - 0.05);

@@ -1,5 +1,5 @@
 /**
- * Which room the investigator's ears are in (round 78): the kit of the dungeon room they stand in (its stone, its roof), the
+ * Which room the investigator's ears are in (round 80): the kit of the dungeon room they stand in (its stone, its roof), the
  * room's shape (a corridor is close, a wide hall opens, a pit rings), the region's own air (the Outer Dark is an endless
  * faint hall), and a horror's fog closed about a fight. Pure: data/acoustics.ts holds the rows, audio/space.ts plays them.
  */

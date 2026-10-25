@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the rooms the investigator's ears are in, and the walls between them and what sounds (numbers only;
+ * Round 80, atmosphere: the rooms the investigator's ears are in, and the walls between them and what sounds (numbers only;
  * render/audio/spacePlan.ts reads where the investigator stands against SPACES, render/audio/space.ts plays them, and
  * render/audio/occlusion.ts reads OCCLUSION). Before this every one-shot went dry to the bus: a footfall in a vault and a
  * footfall in a field were one sound, and a ghoul behind a wall was as clear as one in the room.

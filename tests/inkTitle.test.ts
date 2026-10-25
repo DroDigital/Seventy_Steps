@@ -4,7 +4,7 @@ import { INK } from '../src/data/uiMood';
 import { BONE } from '../src/ui/hudKit';
 import { inkDelays, inkSeed, realmTint } from '../src/ui/inkTitle';
 
-describe('the ink of a title (round 78)', () => {
+describe('the ink of a title (round 80)', () => {
   it('begins at the middle and ends at the ends, the same each time', () => {
     const a = inkDelays(11, 5, 1.1, 0);
     expect(inkDelays(11, 5, 1.1, 0)).toEqual(a);

@@ -1,4 +1,4 @@
-/** Helpers for the footprint and footing tests (round 78): a point on a given ground, and a walk by hand. */
+/** Helpers for the footprint and footing tests (round 80): a point on a given ground, and a walk by hand. */
 
 import { REGIONS } from '../src/data/regions';
 import type { Game } from '../src/systems/components';

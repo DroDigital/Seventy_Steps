@@ -1,5 +1,5 @@
 /**
- * Round 78, the coats of the land: what lies on the stones of a realm and gives it away at a glance. Snow caps the ruins of the
+ * Round 80, the coats of the land: what lies on the stones of a realm and gives it away at a glance. Snow caps the ruins of the
  * Mountains of Madness, drifted sand lies on the windward side of Pnakotus, a tide-line of brine and slime stains the walls of
  * Innsmouth and sunken R'lyeh, soot on Yuggoth's pillars. Props only (the terrain has its own ground): the world shader lays the coat
  * on what faces up, what faces the wind and what stands below a line (shaders/world.ts), and render/coat.ts eases one realm's into

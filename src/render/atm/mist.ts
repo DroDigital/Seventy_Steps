@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: light in the mist: moonlight shafts, window spill and lamp beams, a living mist. One of the atmosphere hub's parts (render/atmosphere.ts):
+ * Round 80, atmosphere: light in the mist: moonlight shafts, window spill and lamp beams, a living mist. One of the atmosphere hub's parts (render/atmosphere.ts):
  * made once with the world's life and updated each drawn frame, outside the simulation and read-only on it. The moon's shafts are the post pass's
  * (moonShafts.ts, shaders/fogShaft.ts), each light's aim for the mist's glow (lampAim.ts) and the windows' light on the ground (windowSpill.ts) follow the lights the
  * world chose this frame (worldLights.ts LIGHT_VIEW), and the mist's own life (a sheared fine layer, rolling banks, the gale's drift, the rise after rain) is

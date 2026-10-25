@@ -1,5 +1,5 @@
 /**
- * The lights in earshot (round 78): render/worldLights.ts sets this list each frame, from the lights it already ranks about the
+ * The lights in earshot (round 80): render/worldLights.ts sets this list each frame, from the lights it already ranks about the
  * investigator, and render/audio/hearth.ts reads it. A module's own list (as LIGHT_NERVES is) so the sound needs no wire through
  * the game's main loop. The nearest first; windows are mute and are not listed.
  */

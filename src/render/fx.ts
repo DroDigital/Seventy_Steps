@@ -35,13 +35,13 @@ export interface FxState {
   enabled: Record<EffectId, boolean>;
   pulse?: number; // 0..1: a band change for the worse, fading (fxController.ts)
   time?: number; // seconds of render time: the waves of the warp run on it (0 if none: a test's)
-  pressure?: number; // 0..1 (round 78, pressure.ts): something presses on the mind; the picture's edges and the whispers lean toward madness by it, at any sanity
-  pulseScale?: number; // 0..1 (round 78): the share of a full band change's ring the pulse is (a sudden large loss sends half of one); 1 if none
+  pressure?: number; // 0..1 (round 80, pressure.ts): something presses on the mind; the picture's edges and the whispers lean toward madness by it, at any sanity
+  pulseScale?: number; // 0..1 (round 80): the share of a full band change's ring the pulse is (a sudden large loss sends half of one); 1 if none
 }
 
 export interface FxParams {
   stress: number;
-  felt: number; // round 78: the stress as the edges of the picture feel it: `stress`, leaned toward madness by the pressure on the mind (never past the cap)
+  felt: number; // round 80: the stress as the edges of the picture feel it: `stress`, leaned toward madness by the pressure on the mind (never past the cap)
   heard: number; // ...and as the whispers hear it, leaning further (they begin at the Fractured): `stress` when nothing presses
   lowRes: boolean;
   snapPixels: number;
@@ -112,7 +112,7 @@ export const onsetOf = (stress: number): number => smooth(FX.calm, FX.warpCap, s
 export const warpOf = (stress: number): number => onsetOf(stress) * (Math.min(stress, FX.warpCap) + Math.max(0, stress - FX.warpCap) * FX.warpSlope);
 
 /**
- * The stress leaned toward madness by `pressure` (round 78): `lean` of the way to the whole of it at a pressure of 1, never past the cap. It is what the
+ * The stress leaned toward madness by `pressure` (round 80): `lean` of the way to the whole of it at a pressure of 1, never past the cap. It is what the
  * soft edges, the second picture, the swimming of the edges and the lens take (and the whispers, leaning further: `heard`); the fog, the colour, the dither, the vertex displacement and
  * every sound's detune and grit stay on the true stress, so a horror's fight is no harder to read and its music is never made gritty by the approach.
  */

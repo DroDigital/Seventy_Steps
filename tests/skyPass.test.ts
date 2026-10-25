@@ -11,7 +11,7 @@ import { newWeather } from '../src/systems/weather';
 
 const MINE = ['uOver', 'uVeil', 'uHour', 'uHourGlow', 'uHourDawn', 'uTurn', 'uHeat', 'uMoonSwell', 'uMoonSour', 'uOmen', 'uOmenAt', 'uOmenSize'];
 
-describe('the sky pass of the atmosphere hub (round 78)', () => {
+describe('the sky pass of the atmosphere hub (round 80)', () => {
   const post = createPostPass(new THREE.Texture());
   const sky = createSky(createRealmLook(post));
   const weather = newWeather();

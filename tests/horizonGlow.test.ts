@@ -15,7 +15,7 @@ const GLOAMING = 0.05;
 const WANING = 0.88;
 const town = { lit: 0.12, seed: 21 };
 
-describe("round 78: the far towns' glow (render/horizonGlow.ts)", () => {
+describe("round 80: the far towns' glow (render/horizonGlow.ts)", () => {
   it('belongs to cities of lit windows and to no other silhouette', () => {
     for (const list of Object.values(SKYLINES)) {
       for (const s of list) expect(glows(s), `${s.kind} ${s.seed}`).toBe(GLOWING.has(s.kind) && (s.lit ?? 0) > 0);
@@ -63,7 +63,7 @@ describe("round 78: the far towns' glow (render/horizonGlow.ts)", () => {
   });
 });
 
-describe("round 78: the far lamps (data/horizonLife.ts LAMPS)", () => {
+describe("round 80: the far lamps (data/horizonLife.ts LAMPS)", () => {
   it('each stands on a silhouette of its region, and has a place on its outline', () => {
     expect(LAMPS.length).toBeGreaterThanOrEqual(2);
     for (const l of LAMPS) {
@@ -113,7 +113,7 @@ describe("round 78: the far lamps (data/horizonLife.ts LAMPS)", () => {
   });
 });
 
-describe('round 78: the silhouettes carry their glow in their own geometry, with no draw of their own', () => {
+describe('round 80: the silhouettes carry their glow in their own geometry, with no draw of their own', () => {
   const base = (): THREE.BufferGeometry => new THREE.ShapeGeometry(new THREE.Shape([new THREE.Vector2(-0.5, 0), new THREE.Vector2(0.5, 0), new THREE.Vector2(0, 1)]));
   const kinds = (g: THREE.BufferGeometry): number[] => Array.from({ length: g.getAttribute('aFx').count }, (_, i) => g.getAttribute('aFx').getX(i));
 

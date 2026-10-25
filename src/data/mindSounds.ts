@@ -1,5 +1,5 @@
 /**
- * The failing mind heard (round 78, atmosphere): the numbers and the recipes of what a mind that is going hears that nobody else does.
+ * The failing mind heard (round 80, atmosphere): the numbers and the recipes of what a mind that is going hears that nobody else does.
  * A thin ringing that comes in with the stress, and rings a moment after a heavy blow (render/audio/mindEars.ts); the world's high end
  * breathing in and out, Unmoored (audio/mindTide.ts); the lantern spitting, dying with a hiss and catching with a whump (mindEars.ts); and
  * something that walks behind, a half-stride off, and takes one step more when the investigator stops (audio/follower.ts). Round 5

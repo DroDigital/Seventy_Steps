@@ -1,5 +1,5 @@
 /**
- * The three hours of the night, seen in the sky (round 78: they changed only its brightness, and its hue was one all night): at the turn a low
+ * The three hours of the night, seen in the sky (round 80: they changed only its brightness, and its hue was one all night): at the turn a low
  * afterglow lies along the horizon opposite where the moon rose, thinning over the gloaming; the deep is the plain dark it was; in the waning hour a
  * pale false dawn leans up from the far side of where the moon sets, and sinks back at the turn. Far hills and roofs stand against these as black
  * cut-outs. And the stars wheel about the pole, steadily, so a vigil's called hour (ninety times as fast) turns them in sight. Each realm's glow has its

@@ -9,7 +9,7 @@ import { render } from './soundRender';
 
 const db = (v: number): number => 20 * Math.log10(v);
 
-describe('the ringing (round 78)', () => {
+describe('the ringing (round 80)', () => {
   it('begins at the Uneasy line, creeps up with the stress and never passes its ceiling, a good way under a whisper', () => {
     expect(ringLevel(0)).toBe(0);
     expect(ringLevel(MIND_EARS.ring.from)).toBe(0);
@@ -34,7 +34,7 @@ describe('the ringing (round 78)', () => {
   });
 });
 
-describe('the tide (round 78)', () => {
+describe('the tide (round 80)', () => {
   it('closes the high end only when Unmoored, never past its depth, and in a slow swell', () => {
     expect(tideOf(3, 0.8)).toBe(0);
     expect(tideOf(3, 0)).toBe(0);
@@ -55,7 +55,7 @@ function heard(gains: readonly number[], dark = false): LanternCue[] {
 const frames = (f: (age: number) => number, seconds: number): number[] => Array.from({ length: Math.round(seconds * 60) + 1 }, (_, i) => f(i / 60));
 const dips = (xs: number[]): number => xs.reduce((n, x, i) => n + (i > 0 && xs[i - 1] > 0.6 && x < 0.3 ? 1 : 0), 0);
 
-describe('the lantern heard (round 78)', () => {
+describe('the lantern heard (round 80)', () => {
   it('spits at each dip as it gutters, and dies once with a hiss, and nothing when it burns steady', () => {
     const xs = frames(gutterGain, LANTERN_LIFE.gutter + 0.2);
     const cues = heard(xs);

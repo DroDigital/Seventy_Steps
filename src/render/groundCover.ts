@@ -215,7 +215,7 @@ export function groundCover(cx: number, cz: number, region: RegionDef, roads: re
     if (pads.some((p) => padDistance(p, x, z) < 1)) continue;
     const y = surface(x, z);
     if (y < WORLD.seaLevel) continue;
-    if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 78: the region's own litter in place of a share of the ground's (data/coverKinds.ts)
+    if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 80: the region's own litter in place of a share of the ground's (data/coverKinds.ts)
     plantAt(kind, leaf, stone, rng, x, y, z);
   }
   const out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};

@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the small noise of the world's lights (numbers only; render/audio/hearth.ts plays them, hearthTexture.ts
+ * Round 80, atmosphere: the small noise of the world's lights (numbers only; render/audio/hearth.ts plays them, hearthTexture.ts
  * draws them, hearthPlan.ts says which are heard and how). A flame's little noise is what makes the silence about it audible, and
  * its stopping is the horror: the torches of the dungeons were mute, the fires too. A torch spits and pops at the investigator's
  * side and swells with its flicker; a brazier crackles broader and deeper; a street lamp hisses thinly; a lit Elder Sign carries a

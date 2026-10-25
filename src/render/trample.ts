@@ -1,5 +1,5 @@
 /**
- * Round 78, the lane of laid-down stems: a field of 64 x 64 texels (half a metre each) about the investigator, wrapped like a torus
+ * Round 80, the lane of laid-down stems: a field of 64 x 64 texels (half a metre each) about the investigator, wrapped like a torus
  * so it never has to be moved: a body stamps its footprint at 1, the field rises again over `TRAMPLE.hold` seconds, and the vertex shader
  * (shaders/world.ts, SWAY) reads it to lay a reed or a blade down where something has gone through it. The cells that come into the window
  * as it follows the investigator are cleared first. Render only; pure but for the texture it keeps.

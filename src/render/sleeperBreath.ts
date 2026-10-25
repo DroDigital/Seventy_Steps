@@ -1,5 +1,5 @@
 /**
- * The Sleeper's breath, seen (round 78, atmosphere): about a colossus that has not yet woken the dream draws breath. Every ten seconds or
+ * The Sleeper's breath, seen (round 80, atmosphere): about a colossus that has not yet woken the dream draws breath. Every ten seconds or
  * so, slowly in and quicker out, the low mist thickens and goes a shade paler, the haze above it rises, and the lantern's light is drawn
  * down and given back, all the more the nearer one stands to its ring (`render/sleepers.ts`; the sound beneath is audio/breathBed.ts). The
  * ground has a pulse before the horror is seen, and when the fog is crossed, the fight begins, a scene plays or one steps under a roof, it

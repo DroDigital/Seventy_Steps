@@ -1,5 +1,5 @@
 /**
- * What a footfall leaves (round 78): given the ground, how soaked it is and how lately the investigator was in the sea, whether it keeps
+ * What a footfall leaves (round 80): given the ground, how soaked it is and how lately the investigator was in the sea, whether it keeps
  * a print, how long, and how plainly. And the second set that follows a failing mind: bare, larger, a stride behind and to one side.
  * Pure: render/atm/steps.ts lays what this says.
  */

@@ -93,7 +93,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const rods = createRodFx(g, parts.particles, parts.beams, lightning); // round 67: the bolts that leap to a walled court's lightning rods
   const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust (round 75: and its pools)
   const signals = createSignalFx(g, parts.particles, parts.beams); // round 75: what a court does now and then: a pulse run from point to point, an arc between pylons
-  const atmosphere = createAtmosphere({ scene, g, audio, parts }); // round 78: the sky, the mist, the air, the ground and the horizon deepened (render/atm/)
+  const atmosphere = createAtmosphere({ scene, g, audio, parts }); // round 80: the sky, the mist, the air, the ground and the horizon deepened (render/atm/)
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -128,7 +128,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       omens.update(time);
       parts.skyline.wrong(Math.min(1, Math.max(0, 1 - g.mind.sanity / 100)));
       watchers.update(camera, time, !outside, () => audio.sample('whisper', { gain: 0.5, pitch: 0.8 })); // round 26: what a failing mind makes of the dark
-      atmosphere.update(camera, time, enclosed, alpha, gloom); // round 78: last, over what the rest has set
+      atmosphere.update(camera, time, enclosed, alpha, gloom); // round 80: last, over what the rest has set
     },
   };
 }

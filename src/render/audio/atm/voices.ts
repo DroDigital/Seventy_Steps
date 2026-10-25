@@ -1,5 +1,5 @@
 /**
- * Round 78, atmosphere: the night's own voices: far sounds by the hour and by the realm, the sea heard where the sea is, the wind where
+ * Round 80, atmosphere: the night's own voices: far sounds by the hour and by the realm, the sea heard where the sea is, the wind where
  * it blows. One of the atmosphere audio hub's parts (render/audio/atmosphereAudio.ts): made once with the game's audio and updated each
  * frame, read-only on the simulation. The beds' own shaping (the hour, the shore, the exposure) is render/audio/ambience.ts's, from what
  * this part tells it (`PLACED`, render/audio/exposure.ts, and the clock); the far voices are placeVoices.ts's.

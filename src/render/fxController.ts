@@ -39,7 +39,7 @@ export interface FxController {
 
 export function createFxController(g: Game): FxController {
   let worse = false;
-  let jolted = false; // round 78: a sudden large loss within a band sends a ring too, at half the strength
+  let jolted = false; // round 80: a sudden large loss within a band sends a ring too, at half the strength
   let pulseAt = -Infinity;
   let scale = 1; // the share of a full ring the pulse now is
   const pressure = createPressure(g);

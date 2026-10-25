@@ -1,5 +1,5 @@
 /**
- * The mind's ears (round 78, atmosphere): what a failing mind hears that nobody else does, besides the whispers (gameAudio.ts) and the
+ * The mind's ears (round 80, atmosphere): what a failing mind hears that nobody else does, besides the whispers (gameAudio.ts) and the
  * steps behind (follower.ts). The ringing (a thin high pair of sines a few Hz apart, creeping in as the stress passes the Uneasy line and
  * rising a little with it; a heavy blow taken rings the ears a moment more), and the lantern at the hip (render/lanternLife.ts: its dips as
  * it gutters out are each a spit, its going out a hiss, its catching again a soft whump). The numbers and the recipes are

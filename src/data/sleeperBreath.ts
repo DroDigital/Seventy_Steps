@@ -1,5 +1,5 @@
 /**
- * The Sleeper's breath (round 78, atmosphere): the numbers of the slow breath the dream draws about a colossus that has not yet woken.
+ * The Sleeper's breath (round 80, atmosphere): the numbers of the slow breath the dream draws about a colossus that has not yet woken.
  * `render/sleepers.ts` finds the sleeper and the waveform, `render/sleeperBreath.ts` swells the mist and draws the lantern's light dim,
  * `render/audio/breathBed.ts` is the low breath beneath. Presentation only: nothing here is read by the simulation.
  */

@@ -90,7 +90,7 @@ export function createRealmLook(post: PostPass): RealmLook {
   let at: readonly [string | null, boolean] = [null, false];
   let last = -1;
   const was = new THREE.Vector3(1e9, 0, 0);
-  const coat = createCoatLayer(); // round 78: the realm's matter on its stones (data/coats.ts), eased with the rest
+  const coat = createCoatLayer(); // round 80: the realm's matter on its stones (data/coats.ts), eased with the rest
   const u = post.uniforms;
   const publish = (): void => {
     now = darkened(eased, dark);

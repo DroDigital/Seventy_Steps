@@ -3,7 +3,7 @@
  * monospace lines, and a death's were gone under the veil within a second): drawn in the period face
  * across a dark band that fades in while the words slowly widen, as soulslikes mark their moments.
  * A death's words stand above the veil (z 9), so they stay while the dark falls; the others sit
- * under the menus. Round 78: a realm's name, a place's and the night's hours are inked in a letter at
+ * under the menus. Round 80: a realm's name, a place's and the night's hours are inked in a letter at
  * a time (ui/inkTitle.ts); a realm met for the first time is tinted toward its own colour, with a
  * hairline drawn out beneath it and an epigraph a beat after; a card of lower rank waits for one
  * of higher (a place found does not cut a realm's name short, an hour's turn cuts nothing).
@@ -51,7 +51,7 @@ export function createBanner(): Banner {
   root.style.cssText = `position:fixed;left:0;right:0;pointer-events:none;text-align:center;opacity:0;font-family:${SERIF};padding:calc(14px * var(--ui, 1)) 0`;
   const words = document.createElement('div');
   words.style.cssText = 'text-shadow:0 0 14px #000,0 0 4px #000;white-space:nowrap';
-  const rule = document.createElement('div'); // a realm's hairline (round 78), drawn out from the middle
+  const rule = document.createElement('div'); // a realm's hairline (round 80), drawn out from the middle
   rule.style.cssText = `height:1px;margin:calc(11px * var(--ui, 1)) auto 0;width:min(calc(${INK.rule.width}px * var(--ui, 1)), 70vw);display:none`;
   const sub = document.createElement('div');
   sub.style.cssText = `font-size:calc(13px * var(--ui, 1));letter-spacing:.32em;color:${BONE};opacity:.7;margin-top:calc(6px * var(--ui, 1))`;

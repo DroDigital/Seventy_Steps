@@ -25,7 +25,7 @@ import { firstEpigraph } from './loreLine';
 import type { Veil } from './veil';
 
 export interface Journeys {
-  /** Covers, makes the jump, and lifts once the world about the investigator stands; a journey with its own `line` falls slower and holds until it can be read. `region` (round 78): where it goes, whose epigraph the first journey there says. */
+  /** Covers, makes the jump, and lifts once the world about the investigator stands; a journey with its own `line` falls slower and holds until it can be read. `region` (round 80): where it goes, whose epigraph the first journey there says. */
   go(words: string, jump: () => void, line?: string, region?: string): void;
   /** The veil already covers (a game begun, even before its making is done): names the region the investigator stands in, lifts once the world stands, then calls `then`. */
   arrive(then?: () => void): void;
@@ -80,7 +80,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     const twin = gatePlace(gatePlace(gate)?.to ?? '');
     const look = LOOKS[twin?.region ?? ''] ?? LOOKS.hub;
     const light = [0, 1, 2].map((k) => Math.min(1, look.grade[3][k] * 0.7 + look.accents[0][k] * 0.3 + 0.08)) as [number, number, number];
-    const epigraph = firstEpigraph(twin?.region, met(twin?.region)); // a realm come to for the first time says its epigraph under the veil (round 78)
+    const epigraph = firstEpigraph(twin?.region, met(twin?.region)); // a realm come to for the first time says its epigraph under the veil (round 80)
     [phase, least] = ['entering', epigraph ? epigraphHold(epigraph) : HOLD_MS[0]];
     void veil.cover((twin?.name ?? '').toUpperCase(), (frames / 60) * 0.85, epigraph, light); // made to close as the walk ends
   });
@@ -89,7 +89,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
   const self: Journeys = {
     go(words, jump, line, region) {
       if (phase !== 'idle') return;
-      const said = line ?? firstEpigraph(region, met(region)); // (round 78: else a realm's epigraph, once; the pool of lines as before)
+      const said = line ?? firstEpigraph(region, met(region)); // (round 80: else a realm's epigraph, once; the pool of lines as before)
       [phase, least] = ['covering', line ? READ_MS : said ? epigraphHold(said) : HOLD_MS[0]];
       void veil.cover(words, line ? 1.6 : 0.9, said).then(() => {
         jump();

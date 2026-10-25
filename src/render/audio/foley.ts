@@ -83,7 +83,7 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
   const hand = (id: keyof typeof HANDS, gain = 1): boolean => recipe(`hands:${id}`, HANDS[id], { gain: CLASS_GAIN[id === 'burst' || id === 'anvil' ? 'impact' : 'hands'] * gain });
   let [arm, edge, knee]: [string, number, boolean | null] = [g.player.weapon, reinforcement(), null]; // what is in hand, how far it is reinforced, whether they kneel: heard to change
 
-  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 78: snow and sand softer, mud lower, boards hollow). */
+  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 80: snow and sand softer, mud lower, boards hollow). */
   function stepOn(p: V3, gain: number): Surface {
     const surface = surfaceAt(g, p.x, p.y, p.z);
     const feel = footFeel(surface, groundAt(g, p.x, p.y, p.z));

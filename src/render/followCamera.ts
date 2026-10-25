@@ -11,7 +11,7 @@ import { raycast } from '../world/colliders';
 import { roofedAt } from '../world/terrain';
 
 /**
- * `calm` (0..1, ui/calm.ts, round 78): the quiet walk draws the boom back a little and lifts the view a hair. The extra length is read
+ * `calm` (0..1, ui/calm.ts, round 80): the quiet walk draws the boom back a little and lifts the view a hair. The extra length is read
  * against the walls like the rig's own, and is not asked for under a roof, mounted, or over an edge.
  */
 export function placeCamera(camera: PerspectiveCamera, g: Game, alpha: number, calm = 0): void {

@@ -1,5 +1,5 @@
 /**
- * Round 78, the sea where the sea is and the wind where it blows (render/audio/exposure.ts reads the land about the investigator,
+ * Round 80, the sea where the sea is and the wind where it blows (render/audio/exposure.ts reads the land about the investigator,
  * render/audio/ambience.ts shapes the beds by it). The surf of Innsmouth sounded the same on the quay and a quarter mile inland,
  * centred, and the wind the same on a ridge and in a hollow. Now a sea bed is loud, bright and from the water's side on the shore,
  * and falls to a far, dull rumble inland; a wind bed rises and brightens on an exposed height and drops in a lee. Data only.

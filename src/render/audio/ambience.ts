@@ -6,7 +6,7 @@
  * decoded bed is megabytes). Spot sounds come now and then, far off: panned anywhere, dulled, each at
  * random within its interval.
  *
- * Round 78: the night is heard and the place is placed. Outdoors in the open world each reader has a gain of the hour (the insects
+ * Round 80: the night is heard and the place is placed. Outdoors in the open world each reader has a gain of the hour (the insects
  * thin as the night deepens and sink in the Still, the wind lifts toward the last grey: data/ambienceHours.ts), and, by the
  * land about the investigator (render/audio/exposure.ts), the sea beds are loud, bright and drawn toward the water on the shore and
  * far and dull inland, the wind beds rise and brighten on a height and drop in a lee (render/audio/bedShape.ts). The spots come
@@ -33,7 +33,7 @@ export interface AmbienceBeds {
 const EDGE = 0.06; // seconds of each end a loop skips: an MP3's encoder padding, where a browser keeps it
 const WIDTH = 0.6; // how far apart a bed's two readers are panned
 
-/** One reading of a bed: the nodes the hour and the place shape (round 78). */
+/** One reading of a bed: the nodes the hour and the place shape (round 80). */
 interface Reader {
   file: string;
   side: number;
@@ -132,7 +132,7 @@ export function createAmbience(e: AudioEngine, sampler: Sampler): AmbienceBeds {
         const name = file.replace(/\.\w+$/, '');
         const shaped = shapeBed(name, manner.lowpass, world);
         pan.pan.value = panOf(side, shaped.lean);
-        const hour = ctx.createGain(); // round 78: the hour's and the place's share of the bed, after its own breath
+        const hour = ctx.createGain(); // round 80: the hour's and the place's share of the bed, after its own breath
         hour.gain.value = shaped.gain;
         let soft: BiquadFilterNode | null = null;
         let chain: AudioNode = src.connect(g);

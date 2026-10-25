@@ -8,7 +8,7 @@ import { worldLayout } from '../src/world/placements';
 import { chunkOf } from '../src/world/worldMap';
 import { findGround } from './footHelpers';
 
-describe('what is under a foot (round 78)', () => {
+describe('what is under a foot (round 80)', () => {
   const g = createWorldGame();
 
   it('the arena is stone, and the sea wades', () => {

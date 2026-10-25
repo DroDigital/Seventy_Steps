@@ -1,5 +1,5 @@
 /**
- * Round 78: the Alignment (render/skyOmen.ts), drawn in the night sky's shader (shaders/sky.ts): now and then a patch of the
+ * Round 80: the Alignment (render/skyOmen.ts), drawn in the night sky's shader (shaders/sky.ts): now and then a patch of the
  * stars stops crawling and settles into the game's own Elder Sign (ui/veil.ts: a stem with two pairs of branches and a twig at its
  * crown), nine stars joined by faint dotted lines. It is drawn by direction alone and does not wheel with the rest.
  */

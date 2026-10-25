@@ -4,7 +4,7 @@
  * and where it lands, a spray of drops and a low puff of mist; a thunderstorm as a heavier rain driven harder; a gale as dust racing past in
  * long strands with leaves tumbling in it; the dream's motes as slow lights rising and drifting; and over all of them, the world drawn in: rain and
  * storm bring the fog's reach down (`weatherHaze`). None under a dungeon's roof, none in the arena. Render only.
- * Round 78: in the matter of each land (data/weatherSkins.ts): on the Mountains a gale is a ground blizzard and a storm a whiteout of driven snow, in
+ * Round 80: in the matter of each land (data/weatherSkins.ts): on the Mountains a gale is a ground blizzard and a storm a whiteout of driven snow, in
  * Pnakotus a storm is sand on the wind (neither wets the ground), Arkham's gale throws grey ash, Innsmouth's salt spray, and the dream's motes are
  * petals in the Dreamlands. The hub and every realm without a skin are drawn as ever.
  */
@@ -40,7 +40,7 @@ export function windOf(kind: string | undefined, amount: number): { slant: numbe
   return { slant: 0.2, fall: 15, sway: 1, length: 0.5 };
 }
 
-/** `windOf` in the land's own matter (round 78): snow and sand are driven harder and lie shorter than rain falls; trees and grass bend as ever. */
+/** `windOf` in the land's own matter (round 80): snow and sand are driven harder and lie shorter than rain falls; trees and grass bend as ever. */
 export function windOfSkin(skin: WeatherSkin, kind: string | undefined, amount: number): ReturnType<typeof windOf> {
   const base = windOf(kind, amount);
   if (skin.precip === 'rain') return base;
@@ -103,7 +103,7 @@ export function createWeatherFx(scene: THREE.Scene, g: Game, particles: Particle
       const w = g.overworld?.weather;
       const amount = !w || hidden ? 0 : w.amount;
       const kind = w?.kind;
-      const skin = (over.skin = skinOf(g.overworld?.region)); // (round 78: the land's own matter)
+      const skin = (over.skin = skinOf(g.overworld?.region)); // (round 80: the land's own matter)
       const blow = windOfSkin(skin, kind, amount);
       worldUniforms.uWind.value = blow.sway; // the trees and the grass bend with it (round 34)
       wind.x = blow.slant;

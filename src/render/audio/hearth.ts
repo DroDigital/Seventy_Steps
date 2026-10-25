@@ -1,5 +1,5 @@
 /**
- * The hearth (round 78): the small noise of the world's lights, placed. A pool of HEARTH.voices voices, each a looped texture of a
+ * The hearth (round 80): the small noise of the world's lights, placed. A pool of HEARTH.voices voices, each a looped texture of a
  * flame (audio/hearthTexture.ts; a Sign's hum is oscillators) through a low-pass, the flame's flicker, a level and a pan, into the
  * bed (so the ambience setting and a horror's hush govern it). The nearest lights in earshot take the voices (audio/hearthPlan.ts);
  * a voice follows its light, glides in and out, and is let go once it has faded, so none pops as another light takes its place.

@@ -1,5 +1,5 @@
 /**
- * Round 78, the ground's litter belongs to the place: what lies about on open ground in the regions that have more to say than their
+ * Round 80, the ground's litter belongs to the place: what lies about on open ground in the regions that have more to say than their
  * ground texture does. Weed and wrack strewn on the mud flats of Innsmouth, bleached ribs and potsherds in the Pnakotic sand, pale fungus
  * caps in the caverns of K'n-yan. A share of each chunk's cover (render/groundCover.ts) and of what lies about the foot of a prop
  * (render/baseCover.ts) is one of these pieces instead of a tuft or a pebble, so the count and the cost do not grow much. Colours are

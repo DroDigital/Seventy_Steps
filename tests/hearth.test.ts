@@ -14,7 +14,7 @@ const light = (kind: HeardLight['kind'], d: number, o: Partial<HeardLight> = {})
 const ear = { x: 0, y: 1.5, z: 0 };
 const right = { x: 1, y: 0, z: 0 };
 
-describe('the flames\' noise (round 78)', () => {
+describe('the flames\' noise (round 80)', () => {
   const textures = Object.fromEntries((['fire', 'torch', 'lamp'] as const).map((k) => [k, flameTexture(HEARTH.flames[k], rate, seconds, HEARTH.level)]));
 
   it('is drawn to a loop that closes: no step where the end meets the start, and no sample out of range', () => {
@@ -62,7 +62,7 @@ describe('the flames\' noise (round 78)', () => {
   });
 });
 
-describe('which lights are heard (round 78)', () => {
+describe('which lights are heard (round 80)', () => {
   it('hears no light beyond its range, and no more than the lights\' own range x 1.6', () => {
     for (const kind of Object.keys(HEARTH.kinds) as HearthKind[]) {
       expect(HEARTH.kinds[kind].range, kind).toBeLessThanOrEqual(LIGHTS.kinds[kind].range * 1.6 + 1e-9);
@@ -158,7 +158,7 @@ function stage() {
   return { engine, log, advance: (s: number) => void (now += s) };
 }
 
-describe('the hearth\'s voices (round 78)', () => {
+describe('the hearth\'s voices (round 80)', () => {
   const lights = (...xs: number[]): HeardLight[] => xs.map((x, i) => ({ x, y: 2, z: i, kind: 'torch', d: x, v: 1, flicker: 1 }));
   const frame = (h: ReturnType<typeof createHearth>, heard: HeardLight[], paused = false): void => h.update(heard, ear, right, () => 1, paused);
 
@@ -212,7 +212,7 @@ describe('the hearth\'s voices (round 78)', () => {
   });
 });
 
-describe('what worldLights lists in earshot (round 78)', () => {
+describe('what worldLights lists in earshot (round 80)', () => {
   it('lists the nearest lights, nearest first, leaves a window out, and sets what the eye sees of each', async () => {
     const THREE = await import('three');
     const { createWorldLights } = await import('../src/render/worldLights');

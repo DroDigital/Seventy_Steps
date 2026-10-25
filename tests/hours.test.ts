@@ -21,7 +21,7 @@ const reads = (c: readonly [number, number, number]): boolean => {
 };
 const at = (phase: number): number => ((phase - CLOCK.start + 1) % 1) * CLOCK.night; // the seconds of play at which the night stands at `phase`
 
-describe('the afterglow and the false dawn (round 78)', () => {
+describe('the afterglow and the false dawn (round 80)', () => {
   it('is whole at the turn of the night, thins over the gloaming, is none in the deep, and gathers again before the turn', () => {
     expect(afterglowOf(0)).toBe(1);
     expect(afterglowOf(1)).toBe(1); // (continuous across the wrap)
@@ -57,7 +57,7 @@ describe('the afterglow and the false dawn (round 78)', () => {
   });
 });
 
-describe('the wheel of the stars (round 78)', () => {
+describe('the wheel of the stars (round 80)', () => {
   it('turns steadily, and does not jump at the turn of the night or a whole circle', () => {
     let last = skyTurnOf(0);
     let total = 0;
@@ -83,7 +83,7 @@ describe('the wheel of the stars (round 78)', () => {
   });
 });
 
-describe('the hours\' colours (round 78)', () => {
+describe('the hours\' colours (round 80)', () => {
   it('belong to realms that exist, and none to the Dark: K\'n-yan, Yuggoth, the Beyond and the Outer Dark have no common night', () => {
     for (const id of Object.keys(HOUR_COLOURS)) expect(REGIONS.some((r) => r.id === id), id).toBe(true);
     for (const id of ['kn_yan', 'yuggoth', 'beyond', 'cloud_summit', 'black_wood', 'pale_lattice', 'piping_dark', 'spheres', 'court_centre']) expect(HOUR_COLOURS[id], id).toBeUndefined();
@@ -103,7 +103,7 @@ describe('the hours\' colours (round 78)', () => {
   });
 });
 
-describe('the sky\'s hours as they are laid (round 78)', () => {
+describe('the sky\'s hours as they are laid (round 80)', () => {
   function rig(region: string | null = 'dunwich', overworld = true) {
     const u = { uOpen: { value: 1 }, uHour: { value: new THREE.Vector4() }, uHourGlow: { value: new THREE.Vector3() }, uHourDawn: { value: new THREE.Vector3() }, uTurn: { value: 0 } };
     const sky = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.ShaderMaterial({ uniforms: u }));

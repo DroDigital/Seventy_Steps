@@ -53,7 +53,7 @@ export function createSky(look: RealmLook): Sky {
     uOpen: { value: 1 },
     uWrong: { value: 0 },
     uFlash: { value: 0 },
-    // round 78 (render/atm/sky.ts writes these each frame; at rest they change nothing)
+    // round 80 (render/atm/sky.ts writes these each frame; at rest they change nothing)
     uOver: { value: 0 },
     uVeil: { value: 0 },
     uHour: { value: new THREE.Vector4() },

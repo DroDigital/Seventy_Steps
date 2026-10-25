@@ -56,11 +56,11 @@ export function darkOf(phase: number): number {
 /** The hour's name for the HUD's small clock. */
 export const hourName = (phase: number): string => (phase < 0.14 ? 'GLOAMING' : phase < 0.7 ? 'THE DEEP' : 'THE WANING');
 
-/** How bright the afterglow of the dusk is (0..1; round 78): whole at the turn of the night, thinning over the gloaming, none in the deep, and gathering again just before the turn; continuous across the wrap, 1 at both ends. */
+/** How bright the afterglow of the dusk is (0..1; round 80): whole at the turn of the night, thinning over the gloaming, none in the deep, and gathering again just before the turn; continuous across the wrap, 1 at both ends. */
 export const afterglowOf = (phase: number): number => (phase >= 0.975 ? smooth(0.975, 1, phase) : 1 - smooth(0, 0.14, phase));
 
-/** How pale the false dawn is (0..1; round 78): the grey of the last hour, which the sky's wedge of light keeps to. */
+/** How pale the false dawn is (0..1; round 80): the grey of the last hour, which the sky's wedge of light keeps to. */
 export const falseDawnOf = dawnOf;
 
-/** How far the stars have wheeled (radians, 0..2π; round 78): steadily through the night and the next, so a vigil's called hour turns them in sight; a whole turn is the same sky, so there is no jump when it wraps. */
+/** How far the stars have wheeled (radians, 0..2π; round 80): steadily through the night and the next, so a vigil's called hour turns them in sight; a whole turn is the same sky, so there is no jump when it wraps. */
 export const skyTurnOf = (seconds: number): number => ((((seconds + NIGHT.hurried) / CLOCK.night) * HOURS.turn) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);

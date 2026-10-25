@@ -1,5 +1,5 @@
 /**
- * The sleepers (round 78, atmosphere): which horror the world is drawing breath about, and the breath. A boss of the open world not yet
+ * The sleepers (round 80, atmosphere): which horror the world is drawing breath about, and the breath. A boss of the open world not yet
  * roused (`isUnroused`) and a colossus in height is one; the nearer one stands to its ring the more it has the world (the same reach
  * audio/dread.ts hushes the ground by), and its breath is slower the larger it is. Pure and read-only: no Three.js, nothing written.
  */

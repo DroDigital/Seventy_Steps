@@ -34,7 +34,7 @@ attribute float aEdge; // the share of the region beside's ground, toward the bo
 #ifdef SWAY
 attribute float aSway; // metres this vertex is blown at the height of a gust: nothing at a trunk's foot, most at the tip of a bough or a blade (round 34)
 uniform float uWind;
-uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 78: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
+uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 80: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
 uniform sampler2D uTrample; // and the lane of stems laid down where one has gone, 64 x 64 texels wrapped (render/trample.ts)
 uniform vec4 uTrampleBox; // its centre cell, 1 / a cell's metres, the half-width in cells (0: none)
 #endif
@@ -70,7 +70,7 @@ void main() {
   float gust = 0.5 + 0.5 * sin(uTime * 0.31 + wp.x * 0.045 - wp.z * 0.03); // gusts roll across the land...
   float flutter = 0.5 * sin(uTime * 1.7 + wp.x * 0.9 + wp.z * 0.7) + 0.25 * sin(uTime * 2.9 + wp.z * 1.3); // ...and shiver in it
   wp.xz += aSway * uWind * (0.3 + 0.7 * gust + 0.3 * flutter) * vec2(0.85, 0.5); // after vWorld: lit and shadowed where it stands, drawn where the wind has it
-  if (aSway > 0.002) { // round 78: the grass parts for a body going through it, and lies where one has gone (a trunk's foot and a stone have no sway: they stand)
+  if (aSway > 0.002) { // round 80: the grass parts for a body going through it, and lies where one has gone (a trunk's foot and a stone have no sway: they stand)
     float blade = aSway * 6.25; // the height of this vertex above its foot, near enough (a blade's tip is blown 0.16 of its length)
     vec2 away = vec2(0.0);
     float bent = 0.0;
@@ -159,11 +159,11 @@ uniform float uWet; // how soaked the ground is, 0..1 (weather.ts; round 34)
 uniform vec3 uLightColor;
 uniform vec2 uSheen;
 uniform float uCoatOn; // 1: this material takes the realm's coat (render/worldMaterial.ts: what is a prop of stone, wood or cloth)
-uniform vec3 uCoatCol; // round 78: what lies on the stones of the realm (data/coats.ts, render/coat.ts): the matter on what faces up and into the wind...
+uniform vec3 uCoatCol; // round 80: what lies on the stones of the realm (data/coats.ts, render/coat.ts): the matter on what faces up and into the wind...
 uniform vec3 uCoatStain; // ...what a stained surface's colour is multiplied by...
 uniform vec4 uCoatA; // ...how much of what faces up, what faces the wind and what lies below the line it covers; and how much of it there is now (0: none)
 uniform vec4 uCoatLine; // ...the stain's line (metres), how it thins above it, how it wanders, how pale the salt on it is
-uniform vec4 uStep[${FOOT_RINGS.slots}]; // round 78: where and when a boot last landed (x, z, the time, its strength): a ring in a puddle (render/bodyPush.ts)
+uniform vec4 uStep[${FOOT_RINGS.slots}]; // round 80: where and when a boot last landed (x, z, the time, its strength): a ring in a puddle (render/bodyPush.ts)
 uniform float uHasMap3; uniform vec2 uPatch; // 1: uMap3 is laid over the ground in patches of the land's own noise, from uPatch.x, softly over uPatch.y (round 32: a field is not one ground)
 
 varying vec2 vUv;
@@ -209,7 +209,7 @@ vec2 affineUv(vec2 texels) {
   return vUv + off * (min(len, uAffine) / max(len, 1e-4)) / texels;
 }
 
-// Rings spreading from where boots have landed, a double ring that thins as it widens and dies in ${FOOT_RINGS.life} s (round 78).
+// Rings spreading from where boots have landed, a double ring that thins as it widens and dies in ${FOOT_RINGS.life} s (round 80).
 float footRings(vec2 p) {
   float sum = 0.0;
   for (int i = 0; i < ${FOOT_RINGS.slots}; i++) {
@@ -278,7 +278,7 @@ void main() {
     tex *= 1.0 - uWet * (0.1 + 0.16 * n.y) - 0.3 * pud;
   }
   float coated = 0.0; // how much of what a pixel shows is the realm's matter: snow and salt hold the sky's light a little, as the pale things of a night do
-  if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 78: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
+  if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 80: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
     float cn = 0.6 * vnoise(vWorld.xz * 0.8 + vWorld.y * 0.37 + 23.0) + 0.4 * vnoise(vWorld.xz * 2.3 - vWorld.y * 0.9 + 5.0);
     float cap = uCoatA.x * smoothstep(0.4, 0.75, n.y + (cn - 0.5) * 0.7);
     float windward = max(dot(n.xz, vec2(-0.86, -0.5)), 0.0) * (1.0 - n.y); // faces turned into the wind the grass leans from
@@ -323,7 +323,7 @@ void main() {
     float ring = step(0.4, hash12(cell * 1.7 + beat * 5.1)) * smoothstep(0.1, 0.0, abs(length(vWorld.xz - drop) * 1.6 - age * 0.5)) * (1.0 - age);
     col = mix(col, uFogColor * vec3(0.8, 0.9, 1.0) + uLightColor * glint * 1.5, mirror * pud);
     col += (lamp * 1.1 + vec3(0.2, 0.22, 0.25) * ring) * pud;
-    col += (vec3(0.18, 0.2, 0.23) + lamp * 2.2) * footRings(vWorld.xz) * pud; // round 78: the puddle rings where a boot has landed, lit by the lantern it stands in
+    col += (vec3(0.18, 0.2, 0.23) + lamp * 2.2) * footRings(vWorld.xz) * pud; // round 80: the puddle rings where a boot has landed, lit by the lantern it stands in
   } else if (uWet > 0.5 && uEmissive < 0.5 && uCharacter < 0.5 && n.y > 0.86) { // and the soaked ground about a boot gives back a fainter ring of the same light
     float ringed = footRings(vWorld.xz);
     if (ringed > 0.01) col += (vec3(0.06, 0.07, 0.09) + lamp * 0.8) * ringed * (uWet - 0.3);

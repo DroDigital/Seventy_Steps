@@ -1,5 +1,5 @@
 /**
- * Eyes beyond the lantern (round 78): the pure rules of render/darkEyes.ts: where a pair may hang, how long, when it blinks and what makes it go.
+ * Eyes beyond the lantern (round 80): the pure rules of render/darkEyes.ts: where a pair may hang, how long, when it blinks and what makes it go.
  * They do nothing, and they make the dark feel inhabited; so they are put only where it is dark and open, never near a light or a town, never in a
  * fight or a talk, and a pair is gone the moment it is looked at squarely, comes near, or has had its time. No Three.js.
  */

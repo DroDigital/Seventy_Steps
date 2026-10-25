@@ -1,5 +1,5 @@
 /**
- * What is under the foot, and what the body carries (round 78). Footfalls had four recordings (the sea, stone, a road, "dirt"), and dirt
+ * What is under the foot, and what the body carries (round 80). Footfalls had four recordings (the sea, stone, a road, "dirt"), and dirt
  * stood for snow, sand, mud, leaves, grass and the flesh of Yuggoth; boards a library or a townhouse is floored with played the stone's.
  * Each ground now adds a short recipe to the recorded step (the recording carries the weight, the recipe the character), the recorded step
  * itself takes the ground's `FEEL`, and the body has its coat, its satchel, its lantern's bail and its breath. Same layers as data/sounds.ts,

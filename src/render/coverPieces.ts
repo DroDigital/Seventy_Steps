@@ -1,5 +1,5 @@
 /**
- * Round 78, the pieces of a region's own litter (data/coverKinds.ts): weed lying where the tide left it, a bleached rib standing from the
+ * Round 80, the pieces of a region's own litter (data/coverKinds.ts): weed lying where the tide left it, a bleached rib standing from the
  * sand, a potsherd, a pale fungus. A few faces each, lit as the ground is (the cover builder's normals face up), drawn into the same merged
  * geometry as the rest of the ground cover, so no draw call is added. Render only, seeded by the chunk's own random stream.
  */

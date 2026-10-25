@@ -74,12 +74,12 @@ export const worldUniforms = {
   uLShadow: { value: new THREE.Vector4() }, // strength (0: none), a texel, the bias, the offset
   uLSlab: { value: new THREE.Vector4() }, // the seat back that hides the driver's lantern from what lies behind it: half-width (0: none), low edge, high edge, the plane's z, in its own frame (round 57: mountViews.ts)
   uLSlabInv: { value: new THREE.Matrix4() }, // and the world to that frame
-  // Round 78, the coats of the land (data/coats.ts, render/coat.ts): what lies on the stones of the realm, in the world shader
+  // Round 80, the coats of the land (data/coats.ts, render/coat.ts): what lies on the stones of the realm, in the world shader
   uCoatCol: { value: new THREE.Vector3(1, 1, 1) }, // the matter that lies on what faces up and into the wind (snow, sand, soot, slime)
   uCoatStain: { value: new THREE.Vector3(1, 1, 1) }, // what a stained surface's colour is multiplied by (brine, slime)
   uCoatA: { value: new THREE.Vector4() }, // how much of what faces up, of what faces the wind and of what lies below the line it covers; and the share of the coat there now (0: none, the shader skips it)
   uCoatLine: { value: new THREE.Vector4() }, // the stain's line (metres, absolute), how it thins above it, how the line wanders, how pale the salt on it is
-  // Round 78, the ground answers the body (render/bodyPush.ts): the bodies that part the grass, the lane laid down behind them, and the boots ringing a puddle
+  // Round 80, the ground answers the body (render/bodyPush.ts): the bodies that part the grass, the lane laid down behind them, and the boots ringing a puddle
   uBodies: { value: Array.from({ length: BODY_PUSH.slots }, () => new THREE.Vector4(0, -1e4, 0, 0)) }, // x, y (feet), z, radius; a far one with none parts nothing
   uTrample: { value: trample.texture }, // the field of laid-down stems (render/trample.ts)...
   uTrampleBox: { value: new THREE.Vector4(0, 0, 1, 0) }, // ...the cell at its centre, 1 / the cell's metres, the half-width in cells (0: none)

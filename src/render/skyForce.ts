@@ -1,5 +1,5 @@
 /**
- * Round 78: what the sky's parts (atm/sky.ts) can be told to show whatever the weather and the hour, for the debug panel and
+ * Round 80: what the sky's parts (atm/sky.ts) can be told to show whatever the weather and the hour, for the debug panel and
  * a photograph (`window.sky.mesh.userData.atm.force`): nothing is set in a game, and none of it is kept in a save.
  */
 

@@ -3,7 +3,7 @@ import { LANGS } from '../src/data/lang';
 import { EPIGRAPH_REGIONS, epigraphKey } from '../src/data/regionEpigraphs';
 import { REGIONS } from '../src/data/regions';
 
-describe('the realms\' epigraphs (round 78)', () => {
+describe('the realms\' epigraphs (round 80)', () => {
   it('belong to realms that exist, once each', () => {
     expect(new Set(EPIGRAPH_REGIONS).size).toBe(EPIGRAPH_REGIONS.length);
     for (const id of EPIGRAPH_REGIONS) expect(REGIONS.map((r) => r.id), id).toContain(id);

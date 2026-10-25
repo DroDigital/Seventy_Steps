@@ -1,5 +1,5 @@
 /**
- * Debug hooks for the picture of dread (round 78): with `?debug`, `window.dread` holds the pressure at a value, lays a pair of eyes
+ * Debug hooks for the picture of dread (round 80): with `?debug`, `window.dread` holds the pressure at a value, lays a pair of eyes
  * where asked and sends a shock, for photographing what is otherwise a matter of luck and of time. Nothing here is in play.
  */
 

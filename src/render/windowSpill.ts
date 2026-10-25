@@ -1,5 +1,5 @@
 /**
- * The light of a lit window on the ground before it (round 78): a soft trapezoid of the window's colour running out from the wall,
+ * The light of a lit window on the ground before it (round 80): a soft trapezoid of the window's colour running out from the wall,
  * with the dark cross of its mullion and transom across it, flickering with the pane (paneLife.ts) and gone when the window goes out in
  * the waning hour. A town at night reads as rooms of light with people at home in them, and not as amber balls on the walls. One
  * instanced additive batch (the halos' way: a draw, no depth write, a little over the ground), the nearest windows of those in reach of

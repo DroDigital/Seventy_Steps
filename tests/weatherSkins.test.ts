@@ -1,4 +1,4 @@
-/** Round 78: the weather in each land's own matter (data/weatherSkins.ts, render/weather.ts). */
+/** Round 80: the weather in each land's own matter (data/weatherSkins.ts, render/weather.ts). */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { REGION_IDS } from '../src/data/regions';
@@ -24,7 +24,7 @@ function sky(region: string, kind: 'rain' | 'storm' | 'gale' | 'motes', seconds 
 }
 const isLeaf = (p: ParticleSpec): boolean => p.shape === 'shard' && p.size === 0.11;
 
-describe('the weather in each land\'s own matter (round 78)', () => {
+describe('the weather in each land\'s own matter (round 80)', () => {
   it('names real regions, and keeps the default what the weather has always been', () => {
     for (const id of Object.keys(SKINS)) expect(REGION_IDS, id).toContain(id);
     expect(skinOf('hub')).toBe(DEFAULT_SKIN);

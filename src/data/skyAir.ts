@@ -1,5 +1,5 @@
 /**
- * Round 78: the numbers of the sky's answers (render/overcast.ts, heatLightning.ts, skyOmen.ts; render/atm/sky.ts):
+ * Round 80: the numbers of the sky's answers (render/overcast.ts, heatLightning.ts, skyOmen.ts; render/atm/sky.ts):
  * the cloud ceiling a spell of rain or a thunderstorm closes, the bank that crosses the moon on a clear night, the
  * silent lightning on a far horizon, and the wrong moon and the figure the stars now and then fall into. Render only.
  */

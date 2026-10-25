@@ -31,7 +31,7 @@ function problems(sound: Sound): string[] {
   return out;
 }
 
-describe('the night, heard by its hours (round 78)', () => {
+describe('the night, heard by its hours (round 80)', () => {
   it('a bed never steps: no more than 0.05 between a thousandth of the night and the next, and it turns without a jump at the end', () => {
     for (const file of beds) {
       let worst = 0;

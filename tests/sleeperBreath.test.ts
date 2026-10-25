@@ -31,7 +31,7 @@ function stand(s: Boss, past: number) {
   return { g, e: g.overworld!.alive.get(s.id)!, me: g.ecs.c.transform.get(g.player.id)!.pos };
 }
 
-describe('the Sleeper\'s breath (round 78)', () => {
+describe('the Sleeper\'s breath (round 80)', () => {
   it('a breath draws in slowly and lets go quickly, 0 to 1 and never outside it', () => {
     const period = 12;
     const xs = Array.from({ length: 1201 }, (_, i) => breathAt((i / 1200) * period, period));

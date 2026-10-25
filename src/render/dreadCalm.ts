@@ -1,5 +1,5 @@
 /**
- * A calm moment (round 78): the picture's dread keeps out of a fight, a talk and a cutscene, so that it never makes a foe harder to read. Asked
+ * A calm moment (round 80): the picture's dread keeps out of a fight, a talk and a cutscene, so that it never makes a foe harder to read. Asked
  * every frame by the eyes, the shade and the darters, so it allocates nothing and is worked out once a frame for all of them. Read-only.
  */
 
