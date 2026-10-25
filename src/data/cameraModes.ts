@@ -1,6 +1,6 @@
 /**
  * The gameplay camera's four looks (round 77, asked: Classic stays selectable and three more are options in Settings › Play, after pictures
- * of each: docs/DECISIONS.md; round 81, asked: Low hero is the default). Classic is the boom as it was, from `CAMERA`. Low hero hangs lower and closer behind the shoulder with a wider
+ * of each: docs/DECISIONS.md; round 82, asked: Low hero is the default). Classic is the boom as it was, from `CAMERA`. Low hero hangs lower and closer behind the shoulder with a wider
  * lens. Long lens stands far back behind a telephoto. Tight shoulder hangs close and over the shoulder. Low hero and Long lens, locked on to a
  * foe, gather the lens back and aim it between the investigator and the foe, further for a taller one, so that a colossus is seen whole instead
  * of the camera sitting under it (the player cannot turn the camera while locked on, so only the game can do this).

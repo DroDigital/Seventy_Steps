@@ -124,7 +124,7 @@ describe('settings', () => {
     expect(parseSettings(JSON.stringify({ ...round59, resolution: 1.6, v: 17 })).resolution).toBe(1.6); // 17's choice of picture is still its own
   });
 
-  it('makes Low hero the camera for a person who has the first default, Classic, kept in their settings (round 81), and keeps every other choice', () => {
+  it('makes Low hero the camera for a person who has the first default, Classic, kept in their settings (round 82), and keeps every other choice', () => {
     const camera = (o: object, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), ...o, v })).camera;
     expect(defaultSettings().camera).toBe(1);
     expect(parseSettings(null).camera).toBe(1); // a new person

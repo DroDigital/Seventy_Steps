@@ -12,7 +12,7 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 20: Low hero is the camera's default (round 81: a Classic kept by every save of settings, chosen or not, goes to it once). */
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 20: Low hero is the camera's default (round 82: a Classic kept by every save of settings, chosen or not, goes to it once). */
 const VERSION = 20;
 const OLD_DEFAULT = 1.6; // 640 × 360
 /** The sound's levels before round 60, kept by every save of settings, chosen or not. */

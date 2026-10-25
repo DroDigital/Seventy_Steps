@@ -40,7 +40,7 @@ const horizontal = (a: V3, b: V3): number => Math.hypot(a.x - b.x, a.z - b.z);
 describe('the setting', () => {
   it('names a look for each value, Low hero for the default, Classic and Tight shoulder for what is out of range', () => {
     expect(CAMERA_MODE_IDS.map((_, i) => cameraModeOf(i))).toEqual(['classic', 'hero', 'long', 'shoulder']);
-    expect(cameraModeOf(SETTINGS.camera[3])).toBe('hero'); // Low hero is the default (round 81)
+    expect(cameraModeOf(SETTINGS.camera[3])).toBe('hero'); // Low hero is the default (round 82)
     expect(cameraModeOf(-4)).toBe('classic');
     expect(cameraModeOf(99)).toBe('shoulder');
     expect(SETTINGS.camera[1]).toBe(CAMERA_MODE_IDS.length - 1);
