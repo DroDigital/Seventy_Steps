@@ -55,6 +55,7 @@ import { createSampler, setFiles } from './sampler';
 import { voicedCurve } from '../../core/pace';
 import { createSpeech } from './speech';
 import { HEART } from '../feel';
+import { DREAD_AIR } from '../shock';
 import { playSound } from './synth';
 import { createAtmosphereAudio } from './atmosphereAudio';
 
@@ -322,7 +323,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       e.detune = fx.detune + fx.wobble * Math.sin(seconds * 0.7);
       e.setDistortion(fx.distortion);
       hush += (hushTo - hush) * (hushTo > hush ? 0.018 : 0.012); // a few seconds to close, a few to open
-      e.setMuffle(Math.max(HEART.need, hush * 0.9)); // near death the world dulls, and the heart is heard (round 23)
+      e.setMuffle(Math.max(HEART.need, hush * 0.9, DREAD_AIR.muffle)); // near death the world dulls, and the heart is heard (round 23)
       region = g.overworld ? (g.overworld.region ?? region) : 'arena'; // out at sea, the last shore's drone
       const scene = bossScene(g); // round 44: the fights engaged, and the horror nearest unmet
       drones.set(region, scene.fights.length > 0);
@@ -342,7 +343,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
         lastBeat = HEART.beats;
         playSound(e, STINGERS.heartbeat, { gain: 0.7 + 0.5 * HEART.need });
       }
-      whispers(fx.stress, seconds);
+      whispers(fx.heard, seconds); // (round 78: the mind's pressure leans the whispers in: fx.ts)
       calls(seconds);
       foley.update(seconds, place, (at) => play({ sound: 'danger', at: { ...at } }));
       acts.update(seconds);

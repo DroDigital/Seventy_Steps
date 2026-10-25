@@ -12,6 +12,7 @@ import type { SampleSetId } from '../../data/samples';
 import { ZONES } from '../../data/tuning';
 import { engagedFights } from '../../systems/bossFight';
 import type { Game } from '../../systems/components';
+import { DREAD_AIR } from '../shock';
 import type { AudioEngine } from './engine';
 
 /** How far the hush reaches past a boss's ring (metres, by its height: a colossus quiets the ground further off). */
@@ -60,7 +61,7 @@ export function createDread(e: AudioEngine, g: Game, far: (set: SampleSetId, gai
         const c = callOf(b.height);
         far(c.set, 0.18 + 0.6 * (1 - d / reach), c.pitch);
       }
-      e.setHush(hush);
+      e.setHush(Math.max(hush, DREAD_AIR.hush)); // (round 78: and the shock's, and the bed that gives way while the watchers stand: render/shock.ts)
     },
   };
 }

@@ -10,6 +10,7 @@
  * at the edge of Unmoored now and then a tear, all of it in waves (`surge`, warpWaves.ts) and a ring sent out as a band is lost.
  */
 
+import { PRESSURE } from '../data/dreadPicture';
 import { FX, RENDER, type Ramp } from '../data/tuning';
 import { driftAt, ringAt, surgeAt } from './warpWaves';
 
@@ -34,10 +35,14 @@ export interface FxState {
   enabled: Record<EffectId, boolean>;
   pulse?: number; // 0..1: a band change for the worse, fading (fxController.ts)
   time?: number; // seconds of render time: the waves of the warp run on it (0 if none: a test's)
+  pressure?: number; // 0..1 (round 78, pressure.ts): something presses on the mind; the picture's edges and the whispers lean toward madness by it, at any sanity
+  pulseScale?: number; // 0..1 (round 78): the share of a full band change's ring the pulse is (a sudden large loss sends half of one); 1 if none
 }
 
 export interface FxParams {
   stress: number;
+  felt: number; // round 78: the stress as the edges of the picture feel it: `stress`, leaned toward madness by the pressure on the mind (never past the cap)
+  heard: number; // ...and as the whispers hear it, leaning further (they begin at the Fractured): `stress` when nothing presses
   lowRes: boolean;
   snapPixels: number;
   affine: number;
@@ -106,16 +111,30 @@ export const onsetOf = (stress: number): number => smooth(FX.calm, FX.warpCap, s
 /** How much the picture warps at `stress`: nothing until FX.calm, then in step with it up to FX.warpCap, past it only FX.warpSlope as fast (round 23). */
 export const warpOf = (stress: number): number => onsetOf(stress) * (Math.min(stress, FX.warpCap) + Math.max(0, stress - FX.warpCap) * FX.warpSlope);
 
+/**
+ * The stress leaned toward madness by `pressure` (round 78): `lean` of the way to the whole of it at a pressure of 1, never past the cap. It is what the
+ * soft edges, the second picture, the swimming of the edges and the lens take (and the whispers, leaning further: `heard`); the fog, the colour, the dither, the vertex displacement and
+ * every sound's detune and grit stay on the true stress, so a horror's fight is no harder to read and its music is never made gritty by the approach.
+ */
+export const leant = (t: number, pressure: number, lean: number, cap: number): number => (pressure > 0 ? Math.min(clamp01(cap), t + lean * clamp01(pressure) * (1 - t)) : t);
+
 export function computeFx(s: FxState): FxParams {
   const t = sanityStress(s.sanity, s.cap);
+  const felt = leant(t, s.pressure ?? 0, PRESSURE.lean, s.cap);
+  const feltDread = leant(t, s.pressure ?? 0, PRESSURE.leanDread, s.cap);
+  const heard = leant(t, s.pressure ?? 0, PRESSURE.leanHeard, s.cap);
   const w = warpOf(t);
+  const wf = warpOf(felt); // the warp the edges of the picture show: the true stress's, and more while the mind is pressed
   const seen = t * onsetOf(t); // the stress as the picture shows it: the fog, the colour drained, the hues boosted and the dither wait for it as the warp does
   const on = s.enabled;
-  const pulse = clamp01(s.pulse ?? 0) * clamp01(s.cap);
-  const surge = surgeAt(s.time ?? 0, t);
+  const scale = clamp01(s.pulseScale ?? 1);
+  const pulse = clamp01(s.pulse ?? 0) * clamp01(s.cap) * scale;
+  const surge = surgeAt(s.time ?? 0, felt);
   const ring = ringAt(clamp01(s.pulse ?? 0));
   return {
     stress: t,
+    felt,
+    heard,
     lowRes: on.pixelate,
     snapPixels: on.snap ? FX.snapPixels : 0,
     affine: on.affine ? at(FX.affine, w) : 0,
@@ -128,18 +147,18 @@ export function computeFx(s: FxState): FxParams {
     anomalyStress: at(FX.anomalyStress, seen),
     quantize: on.quantize,
     ditherSpread: at(FX.ditherSpread, seen),
-    ripple: on.warp ? at(FX.ripple, w) + FX.pulseRipple * pulse : 0,
-    chroma: on.warp ? at(FX.chroma, w) + FX.pulseChroma * pulse : 0,
+    ripple: on.warp ? at(FX.ripple, wf) + FX.pulseRipple * pulse : 0,
+    chroma: on.warp ? at(FX.chroma, wf) + FX.pulseChroma * pulse : 0,
     displace: on.displace ? at(FX.displace, w) : 0,
-    ghost: on.warp ? at(FX.ghost, w) : 0,
-    tear: on.warp ? smooth(FX.tearFrom, 1, t) * smooth(0.7, 1, surge) : 0,
+    ghost: on.warp ? at(FX.ghost, wf) : 0,
+    tear: on.warp ? smooth(FX.tearFrom, 1, t) * smooth(0.7, 1, surgeAt(s.time ?? 0, t)) : 0,
     surge,
-    shock: on.warp ? ring.strength * clamp01(s.cap) * FX.shock : 0,
+    shock: on.warp ? ring.strength * clamp01(s.cap) * FX.shock * scale : 0,
     shockAt: ring.radius,
-    blur: on.dread ? at(FX.blur, smooth(FX.dreadFrom, 1, t)) : 0,
-    strange: on.dread ? at(FX.strange, smooth(FX.dreadFrom, 1, t)) : 0,
-    fovBreatheDeg: on.lens ? at(FX.fovBreatheDeg, w) : 0,
-    skew: on.lens ? at(FX.skew, w) : 0,
+    blur: on.dread ? at(FX.blur, smooth(FX.dreadFrom, 1, feltDread)) : 0,
+    strange: on.dread ? at(FX.strange, smooth(FX.dreadFrom, 1, feltDread)) : 0,
+    fovBreatheDeg: on.lens ? at(FX.fovBreatheDeg, wf) : 0,
+    skew: on.lens ? at(FX.skew, wf) : 0,
     detune: at(FX.detune, t),
     wobble: at(FX.wobble, t),
     distortion: at(FX.distortion, t),
