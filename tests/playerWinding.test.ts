@@ -19,14 +19,24 @@ describe('the investigator’s baked parts are wound outward (round 81)', () => 
   it('every closed piece has a positive volume, so the faces drawn are its outer ones', () => {
     for (const [id, text] of Object.entries(PLAYER_PACK)) {
       const { points, faces } = decode(text);
-      const root = Array.from({ length: points.length / 3 }, (_, i) => i);
+      const faceCount = faces.length / 3;
+      const root = Array.from({ length: faceCount }, (_, i) => i);
       const find = (x: number): number => (root[x] === x ? x : (root[x] = find(root[x])));
-      for (let t = 0; t < faces.length; t += 3) root[find(faces[t])] = root[find(faces[t + 1])] = find(faces[t + 2]);
+      const edges = new Map<string, number>(); // pieces welded at a corner (a blade at its hilt) are still two: faces are one piece if they share an edge
+      for (let t = 0; t < faceCount; t++) {
+        for (let e = 0; e < 3; e++) {
+          const [a, b] = [faces[t * 3 + e], faces[t * 3 + ((e + 1) % 3)]];
+          const key = a < b ? `${a}/${b}` : `${b}/${a}`;
+          const other = edges.get(key);
+          if (other === undefined) edges.set(key, t);
+          else root[find(t)] = find(other);
+        }
+      }
       const volume = new Map<number, number>();
-      for (let t = 0; t < faces.length; t += 3) {
-        const [a, b, c] = [faces[t], faces[t + 1], faces[t + 2]].map((i) => [points[i * 3], points[i * 3 + 1], points[i * 3 + 2]]);
+      for (let t = 0; t < faceCount; t++) {
+        const [a, b, c] = [faces[t * 3], faces[t * 3 + 1], faces[t * 3 + 2]].map((i) => [points[i * 3], points[i * 3 + 1], points[i * 3 + 2]]);
         const six = a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0]);
-        volume.set(find(faces[t]), (volume.get(find(faces[t])) ?? 0) + six / 6);
+        volume.set(find(t), (volume.get(find(t)) ?? 0) + six / 6);
       }
       for (const v of volume.values()) expect(v, `${id}: a piece is wound inside out`).toBeGreaterThan(0);
     }

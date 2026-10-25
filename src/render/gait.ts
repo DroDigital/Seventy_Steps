@@ -10,6 +10,7 @@
 
 import { wrapAngle } from '../core/geom';
 import type { Figure } from './figures';
+import { bendOf, bendTo } from './hinge';
 
 /** A key pose of one leg: [stride fraction (0 = the heel strikes), thigh forward of vertical, knee bend] in degrees. */
 type Key = readonly [t: number, thigh: number, knee: number];
@@ -186,9 +187,10 @@ export type Ground = (x: number, z: number) => number;
  * Settles any pose on the ground (never a figure rolling or lying down): the pelvis sinks to a foot
  * whose ground lies lower than where the figure stands (down a slope or a step), a knee bends where
  * its foot would sink into the ground, a foot lies level on the ground and lets its toes drop as it
- * lifts, and each coat panel follows its thigh.
+ * lifts, and each coat panel follows its thigh. A knee bent for the ground bends further the way its shin already leans, forward
+ * or back (there is no way to tell which was meant when it hangs straight down), unless `back` is set, which always bends it back.
  */
-export function settle(f: Figure, ground?: Ground, level = true): void {
+export function settle(f: Figure, ground?: Ground, level = true, back = false): void {
   const pitch = wrapAngle(f.body.rotation.x);
   const clearance = f.hip - f.thigh - f.shin;
   const shank = f.shin - f.ankle; // knee to ankle
@@ -196,27 +198,29 @@ export function settle(f: Figure, ground?: Ground, level = true): void {
   if (1 - 2 * (q.x * q.x + q.z * q.z) > COS_UPRIGHT) { // upright, however the body was turned to be (a clip's roll takes it over, and the Euler pitch of that folds back to look small)
     const legs = [[f.legR, f.kneeR, f.footR], [f.legL, f.kneeL, f.footL]] as const;
     const under = legs.map(([legJ, knee]) => {
-      const a = pitch + legJ.rotation.x; // the thigh from the vertical, positive with the foot behind
-      return ground?.(legJ.position.x, -(f.thigh * Math.sin(a) + shank * Math.sin(a + knee.rotation.x))) ?? 0;
+      const a = pitch + bendOf(legJ); // the thigh from the vertical, positive with the foot behind
+      return ground?.(legJ.position.x, -(f.thigh * Math.sin(a) + shank * Math.sin(a + bendOf(knee)))) ?? 0;
     });
     const sink = Math.min(0, ...under);
     f.body.position.y += sink;
     legs.forEach(([legJ, knee, foot], i) => {
-      const thigh = pitch + legJ.rotation.x;
-      const drop = f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + knee.rotation.x); // how far below the hip the ankle is
+      const thigh = pitch + bendOf(legJ);
+      const bent = bendOf(knee);
+      const drop = f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + bent); // how far below the hip the ankle is
       // a clip's boots are on its own floor, a hair lower or higher than this reckons: only what the ground adds to that is settled, so a flat floor leaves a clip as it was made
       const own = level ? 0 : Math.max(0, drop - (f.body.position.y - sink - clearance - f.ankle));
       const room = f.body.position.y - clearance - under[i] - f.ankle + own; // how far below the hip the ankle may go
       const c = (room - f.thigh * Math.cos(thigh)) / shank;
-      const bent = knee.rotation.x;
       if (c > -1 && c < 1 && drop > room) {
-        knee.rotation.x = Math.min(2.6, Math.max(knee.rotation.x, Math.acos(c) - thigh));
+        const lean = Math.acos(c); // the shin from the vertical that reaches no lower than the room: forward of it for a shin that points forward, behind it otherwise
+        bendTo(knee, !back && thigh + bent < 0 ? Math.max(-0.2, Math.min(bent, -lean - thigh)) : Math.min(2.6, Math.max(bent, lean - thigh)));
       }
-      if (!level) foot.rotation.x -= knee.rotation.x - bent; // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope
-      const shin = thigh + knee.rotation.x;
+      const knee2 = bendOf(knee);
+      if (!level) bendTo(foot, bendOf(foot) - (knee2 - bent)); // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope
+      const shin = thigh + knee2;
       const lifted = room - f.thigh * Math.cos(thigh) - shank * Math.cos(shin);
-      if (level) foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts (a clip has its own feet: level = false)
+      if (level) bendTo(foot, Math.min(0.5, Math.max(0, lifted * 3)) - shin); // level, the toes dropping as it lifts (a clip has its own feet: level = false)
     });
   }
-  if (level) f.skirt.forEach((panel, i) => (panel.rotation.x = 0.9 * (i === 0 ? f.legR : f.legL).rotation.x));
+  if (level) f.skirt.forEach((panel, i) => bendTo(panel, 0.9 * bendOf(i === 0 ? f.legR : f.legL)));
 }
