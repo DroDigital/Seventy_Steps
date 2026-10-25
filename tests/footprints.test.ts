@@ -92,6 +92,42 @@ describe('the footfall clock keeps the foley\'s stride', () => {
     expect(falls[3].yaw).toBeCloseTo(0.5, 1);
   });
 
+  it('keeps step whatever the picture\'s rate: a frame between two simulation steps neither stops the walk nor doubles the speed', () => {
+    const at = (hz: number): { falls: number; for: number; moving: boolean } => {
+      const g = createWorldGame();
+      const clock = createStrideClock(g);
+      let falls = 0;
+      const frames = hz * 5; // five seconds of a 3 m/s walk, the simulation stepping at 60 Hz
+      let ticks = 0;
+      for (let i = 0; i < frames; i++) {
+        const want = Math.floor(((i + 1) / hz) * 60);
+        while (ticks < want) (stride(g, 0.05, 0), ticks++); // (3 m/s is 0.05 m a tick)
+        if (clock.step((i + 1) / hz)) falls++;
+      }
+      return { falls, for: clock.walking.for, moving: clock.walking.moving };
+    };
+    const slow = at(60);
+    for (const hz of [120, 144]) {
+      const fast = at(hz);
+      expect(fast.moving, `${hz} Hz`).toBe(true);
+      expect(fast.for, `${hz} Hz`).toBeGreaterThan(4.5); // (it was reset by every frame that saw no step)
+      expect(Math.abs(fast.falls - slow.falls), `${hz} Hz`).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('stops being walking once the body has stood still a few ticks', () => {
+    const g = createWorldGame();
+    const clock = createStrideClock(g);
+    let t = 0;
+    for (let i = 0; i < 60; i++) (stride(g, 0.05, 0), clock.step((t += 1 / 60)));
+    expect(clock.walking.moving).toBe(true);
+    clock.step((t += 1 / 120)); // between two ticks
+    expect(clock.walking.moving).toBe(true);
+    for (let i = 0; i < 6; i++) clock.step((t += 1 / 120)); // no tick moved it for 0.05 s and more
+    expect(clock.walking.moving).toBe(false);
+    expect(clock.walking.for).toBe(0);
+  });
+
   it('no footfall mounted, in a move, fallen, in a scene, or after a jump', () => {
     const g = createWorldGame();
     const clock = createStrideClock(g);

@@ -70,9 +70,10 @@ export function schedule(play: (c: Chosen) => boolean, seaward: () => number | n
         howl = Infinity;
         if (free && !MASKED.has(s.weather) && play({ voice: 'howl', bearing: null })) quiet = Math.max(quiet, seconds + GAP * 0.5);
       }
-      const clear = free && !MASKED.has(s.weather) && still < 0.01 && seconds >= quiet;
+      const open = free && !MASKED.has(s.weather) && still < 0.01;
       for (const slot of slots) {
         if (seconds < slot.next) continue;
+        const clear = open && seconds >= quiet; // (asked of each turn: a voice that has just sounded closes the way for the one due with it)
         const { voice } = slot;
         let bearing: number | null = null;
         const again = voice.id === last && slots.some((o) => o.voice.id !== voice.id && hourWeight(o.voice, hour) > 0); // (never twice running, where there is another to be heard)

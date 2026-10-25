@@ -32,6 +32,25 @@ function run(region: string, nights: number, edit: (t: number, s: Scene) => void
 
 const regions = Object.keys(PLACE_VOICES);
 
+describe('two voices due in the same update', () => {
+  it('sound one at a time: the first closes the quiet that the second is asked against', () => {
+    let tried = 0;
+    for (const region of regions) {
+      if (PLACE_VOICES[region]!.length < 2) continue;
+      const phase = [...Array(100).keys()].map((i) => i / 100).find((p) => stillOf(p) < 0.01 && PLACE_VOICES[region]!.filter((v) => hourWeight(v, hourOf(p)) > 0).length >= 2);
+      if (phase === undefined) continue;
+      tried++;
+      const heard: string[] = [];
+      const sched = schedule((c: Chosen) => (heard.push(c.voice === 'howl' ? 'howl' : c.voice.id), true), () => 1.2, seeded(3));
+      const scene: Scene = { region, phase, outdoors: true, held: false, weather: 'clear', hushed: 0 };
+      sched.update(0, scene); // the realm is entered: every voice is given its first turn, a while off
+      sched.update(1e6, scene); // ...and they all come due at once
+      expect(heard.length, region).toBe(1);
+    }
+    expect(tried).toBeGreaterThan(0);
+  });
+});
+
 describe('the places\' voices as data (data/placeSounds.ts)', () => {
   it('belong to real realms, to a recipe that exists or to a recording that is not a cue, and are rare, far, soft and unrepeated in name', () => {
     const ids = new Set<string>();

@@ -10,6 +10,9 @@ import type { Game } from '../systems/components';
 import { groundAt, type GroundKind } from '../world/groundKind';
 import { strideAt } from './audio/foley';
 
+/** Seconds between the body's last step of movement and a frame that sees none that still counts as walking on (three ticks of the 60 Hz simulation). */
+const TICKS_BETWEEN = 0.05;
+
 export interface Footfall {
   /** Where the foot came down. */
   x: number;
@@ -45,7 +48,7 @@ export function followed(band: string, stress: number): boolean {
 
 export function createStrideClock(g: Game): StrideClock {
   let last: { x: number; z: number } | null = null;
-  let [walked, before, foot, heading] = [0, 0, 1 as 1 | -1, 0];
+  let [walked, before, foot, heading, movedAt] = [0, 0, 1 as 1 | -1, 0, 0];
   const walking = { for: 0, moving: false, sprint: false };
   return {
     walking,
@@ -58,10 +61,13 @@ export function createStrideClock(g: Game): StrideClock {
       if (!tr || !a) return null;
       const [dx, dz] = last ? [tr.pos.x - last.x, tr.pos.z - last.z] : [0, 0];
       const moved = Math.hypot(dx, dz);
+      if (moved === 0 && walking.moving && seconds - movedAt < TICKS_BETWEEN && !g.player.mount.active && a.move === null && !g.cutscene && !g.ecs.c.dead.has(g.player.id)) return (walking.for += dt), null; // a frame between two simulation steps (drawn faster than 60 Hz): the body walks on
       last = { x: tr.pos.x, z: tr.pos.z };
       walking.moving = false;
       if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id) || g.cutscene) return (walked = 0), (walking.for = 0), null; // mounted, a jump, a move, a fall, a scene: no stride
-      const speed = moved / dt;
+      const span = moved > 0 && seconds - movedAt <= TICKS_BETWEEN ? seconds - movedAt : dt; // the time the metres took: since the body last moved, not since the last frame
+      if (moved > 0) movedAt = seconds;
+      const speed = moved / Math.max(1e-3, span);
       if (speed < 0.3) return (walking.for = 0), null;
       walking.moving = true;
       walking.sprint = g.player.sprinting;
