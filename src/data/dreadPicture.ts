@@ -1,7 +1,7 @@
 /**
- * Round 78, atmosphere: the numbers of the picture of dread (render/pressure.ts, shock.ts, watchers.ts, darkEyes.ts, unseenShade.ts):
+ * Round 78, atmosphere: the numbers of the picture of dread (render/pressure.ts, shock.ts, watchers.ts, darkEyes.ts):
  * the pressure that leans the picture toward madness while something presses on the mind, the shock of a sudden loss, the watchers'
- * steps and the darters at the corner of the eye, the eyes beyond the lantern, the shade with no one. All of it cosmetic and held by the
+ * steps and the darters at the corner of the eye, the eyes beyond the lantern. All of it cosmetic and held by the
  * FX intensity setting; none writes a number the simulation reads.
  */
 
@@ -84,22 +84,4 @@ export const EYES = {
     innsmouth: { rgb: [0.82, 0.86, 0.56], blinks: false }, // wide, never-blinking (the Innsmouth look)
     black_wood: { rgb: [1, 0.2, 0.16], blinks: true },
   } as Readonly<Record<string, { rgb: readonly [number, number, number]; blinks: boolean }>>,
-};
-
-/** The shade with no one (render/unseenShade.ts). */
-export const SHADE = {
-  every: [70, 170] as readonly [number, number], // seconds between episodes
-  lasts: [25, 45] as readonly [number, number], // seconds one stays
-  near: [11, 22] as readonly [number, number], // metres from the lens
-  side: [1.22, 1.92] as readonly [number, number], // radians off the heading (70 to 110 degrees: the periphery)
-  height: 3.7, // metres, at least...
-  reach: 6, // ...and tall enough that the shadow is this long (a high moon shortens a shadow: at its height the figure is taller than a man could be, which no one sees)
-  mostHeight: 8, // metres: never taller than this
-  slide: [0.5, 1.2] as readonly [number, number], // metres it may move while the lens is turned away...
-  turnedAway: 1.05, // ...beyond this many radians (60 degrees)
-  gone: 8, // metres: within this it is gone
-  grow: 0.7, // seconds it takes to rise from nothing...
-  fade: 0.5, // ...and to go
-  moon: 0.08, // the share the moon's light is lifted by while one lies (so that its shadow is read at the deepest night)
-  slideEvery: [3, 6] as readonly [number, number], // seconds between the slides it may make when turned from
 };
