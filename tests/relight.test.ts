@@ -1,5 +1,5 @@
 /**
- * The Relight setting (round 81; render/creatureRelight.ts, shaders/sprite.ts): off unless asked for, and it reaches the great ones
+ * The Relight setting (round 83; render/creatureRelight.ts, shaders/sprite.ts): off unless asked for, and it reaches the great ones
  * and the outer gods and no other form.
  */
 import { describe, expect, it } from 'vitest';

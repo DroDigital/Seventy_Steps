@@ -50,7 +50,7 @@ const WHITE: readonly [number, number, number] = [1, 1, 1];
 
 /**
  * A person's shape for the moon (legs, coat, arms, head, a brimmed hat), one mesh in place of the figure's twenty, `hip` metres to the pelvis. Drawn a little within the figure, so its own body never falls in the shadow of it.
- * Round 81: `lantern` puts it among the solids the investigator's lantern casts shadows from too (render/lanternShadow.ts: it is made of closed boxes, wound outward, as it wants); the investigator's own is not, for that lantern hangs at their side.
+ * Round 83: `lantern` puts it among the solids the investigator's lantern casts shadows from too (render/lanternShadow.ts: it is made of closed boxes, wound outward, as it wants); the investigator's own is not, for that lantern hangs at their side.
  */
 export function personShadow(hip: number, lantern = false): THREE.Mesh {
   const key = Math.round(hip * 100);
@@ -82,7 +82,7 @@ export interface MoonShadow {
 }
 
 const DEPTH_ONLY = new THREE.ShaderMaterial({
-  vertexShader: INSTANCED_POSITION, // (round 81: the creatures' bodies are one instanced mesh)
+  vertexShader: INSTANCED_POSITION, // (round 83: the creatures' bodies are one instanced mesh)
   fragmentShader: 'void main() { gl_FragColor = vec4(1.0); }',
   side: THREE.DoubleSide,
   colorWrite: false,

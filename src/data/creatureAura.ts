@@ -1,5 +1,5 @@
 /**
- * What the great ones give off (round 81; render/creatureAura.ts): twelve recipes, one for each thing a body
+ * What the great ones give off (round 83; render/creatureAura.ts): twelve recipes, one for each thing a body
  * of its tier lets go of. Only the horrors of the Mythos have them (a lesser creature and an ally have none);
  * a greater one's is faint, an outer god's is a weather of its own. Colours stay inside the anomaly hues
  * (render/palette.ts ANOMALY), dimmed or brightened and never mixed with another, and everything is slow:

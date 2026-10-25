@@ -1,5 +1,5 @@
 /**
- * The blob under every body, and the people among the lantern's shadows (round 81; render/blobShape.ts, shadows.ts, moonShadow.ts,
+ * The blob under every body, and the people among the lantern's shadows (round 83; render/blobShape.ts, shadows.ts, moonShadow.ts,
  * actorViews.ts): the blob as wide as the body is painted and drawn out from the moon, and every person but the investigator, who carries
  * the lantern, standing in the lantern's shadow map as well as the moon's.
  */

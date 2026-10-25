@@ -1,5 +1,5 @@
 /**
- * The bodies the creatures cast shadows from (round 81; render/creatureCasters.ts): closed and wound outward,
+ * The bodies the creatures cast shadows from (round 83; render/creatureCasters.ts): closed and wound outward,
  * so the lantern's map (which draws far faces) and the moon's (depth only) both find them; on the shadow
  * layers alone; sized from the painted figure, capped, shrinking as a picture goes; none far from the
  * investigator.

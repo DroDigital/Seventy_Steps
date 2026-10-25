@@ -70,7 +70,7 @@ export interface FxParams {
   detune: number; // cents
   wobble: number; // cents of drift around the detune
   distortion: number; // 0..1
-  mind: number; // 0..1: how far the creatures slip, a texel or two at a time, and their eyes swell (round 81: the warp's onset; shaders/sprite.ts)
+  mind: number; // 0..1: how far the creatures slip, a texel or two at a time, and their eyes swell (round 83: the warp's onset; shaders/sprite.ts)
 }
 
 /** The FxParams fields each effect drives (the sanity slider moves all but the STEADY ones'). */

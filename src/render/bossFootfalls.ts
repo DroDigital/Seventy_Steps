@@ -1,5 +1,5 @@
 /**
- * The footfalls of the great (round 81; render only, read-only on the simulation): a colossus, or any horror
+ * The footfalls of the great (round 83; render only, read-only on the simulation): a colossus, or any horror
  * that is fought, that walks leaves a ring of dust at each stride of its own length and the ground answers
  * with a small jolt in the camera, by how near the investigator is (render/presence.ts `felt`). They stand
  * still, and nothing is let go; one that is far, hidden or dead gives none, nor does a room under a roof.

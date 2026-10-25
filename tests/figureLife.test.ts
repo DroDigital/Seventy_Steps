@@ -1,5 +1,5 @@
 /**
- * What a person has that moves of itself (round 81; render/figureSway.ts, render/figureGaze.ts, render/swingTrails.ts): the
+ * What a person has that moves of itself (round 83; render/figureSway.ts, render/figureGaze.ts, render/swingTrails.ts): the
  * investigator's lantern and scarf tail, a person's head following the investigator, and the track of a blow.
  */
 import * as THREE from 'three';

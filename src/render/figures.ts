@@ -43,7 +43,10 @@ export interface Figure {
   flash: THREE.Object3D | null; // muzzle flash
   gun?: THREE.Object3D; // the investigator's revolver in the hand, shown only while it is drawn (shot or reload)...
   holstered?: THREE.Object3D; // ...and its grip in the holster the rest of the time (actorViews.ts; round 22)
-  arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts)
+  arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts); the sword-cane has two, `cane` and `cane_drawn`
+  props?: Record<string, THREE.Object3D>; // what the off-hand takes up for a move, shown while it does (flask, laudanum, syringe, powder, match, book; poses.ts)
+  held?: { drawn: boolean; props: readonly string[] }; // what a clip has the investigator hold: the sword-cane's blade drawn, and the off-hand's prop (playerPose.ts; actorViews.ts shows them)
+  lantern?: THREE.Object3D; // the investigator's lantern, hung from the belt: a joint of its own that swings (clips baked from Blender: playerClips.ts); the flame and its cage are its children
   flame?: THREE.Object3D; // the investigator's lantern flame: its halo hangs here (worldLights.ts)
   flameMesh?: THREE.Mesh; // ...and the flame drawn there, which goes dark when the mind is Unmoored (lanternLife.ts)
   fixture?: THREE.Group; // a person's own chair and table: set where they are put and kept there as they stand and turn (npcProps.ts, actorViews.ts)
@@ -59,7 +62,7 @@ export interface Figure {
   materials: THREE.ShaderMaterial[];
 }
 
-/** What a person has on a joint of its own (round 81): hung from `group`'s pivot; `k` is how freely a hat sits; `wares`, what a merchant shows while any is left. */
+/** What a person has on a joint of its own (round 83): hung from `group`'s pivot; `k` is how freely a hat sits; `wares`, what a merchant shows while any is left. */
 export interface Loose {
   hat?: { group: THREE.Group; k: number };
   shawl?: THREE.Group;
@@ -132,7 +135,7 @@ export function skeleton(rig: Rig, f: Frame): Figure {
 
 /** Adds a mesh with its own world material, so a hit flash lights only this figure. */
 export function part(fig: Figure, parent: THREE.Object3D, geo: THREE.BufferGeometry, texture: TextureKind, emissive = 0): THREE.Mesh {
-  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character, coat: fig.character === 'creature' ? true : undefined }); // (the people take the realm's matter on what faces up, in the world shader: round 81)
+  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character, coat: fig.character === 'creature' ? true : undefined }); // (the people take the realm's matter on what faces up, in the world shader: round 83)
   fig.materials.push(material);
   const mesh = new THREE.Mesh(geo, material);
   parent.add(mesh);

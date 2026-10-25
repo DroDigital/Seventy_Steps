@@ -32,9 +32,9 @@ export const FX = {
   desaturate: [0, 0.8] as Ramp, // the further share of the picture a failing mind has graded away, over the realm's own (render/realmLook.ts)
   anomalyStress: [0, 0.7] as Ramp, // added to anomalyProximity when boosting anomaly hues
   charShare: 0.3, // round 34: the share of its realm's grade a character (the investigator, the people, the creatures) takes: the rest is the colours they were drawn in
-  charLevels: 14, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey; round 81: 9 before, which folded a painted ramp of 18 to 30 colours into 8 to 12)
-  spriteVivid: [1.22, 0.28] as readonly [number, number], // round 81: ...and how much more colour (a share) and how much more light in its high lights (a share) the drawn creatures are given on the way to the screen, so no realm's grade leaves them one dim colour: each stands apart from the next (render/shaders/spriteGrade.ts)
-  spriteGrade: 0.7, // round 81: how far each drawn creature's form is recoloured to its realm (render/spriteTone.ts: its own measured tone swung this share of the way to the realm's mid-tone, its inner colours kept; 0.7 of a per-pixel cast made them one dim colour per realm, XDro asked for the recolour per sprite), before the light and the mist; the anomaly hues are left alone (render/shaders/spriteGrade.ts)
+  charLevels: 14, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey; round 83: 9 before, which folded a painted ramp of 18 to 30 colours into 8 to 12)
+  spriteVivid: [1.22, 0.28] as readonly [number, number], // round 83: ...and how much more colour (a share) and how much more light in its high lights (a share) the drawn creatures are given on the way to the screen, so no realm's grade leaves them one dim colour: each stands apart from the next (render/shaders/spriteGrade.ts)
+  spriteGrade: 0.7, // round 83: how far each drawn creature's form is recoloured to its realm (render/spriteTone.ts: its own measured tone swung this share of the way to the realm's mid-tone, its inner colours kept; 0.7 of a per-pixel cast made them one dim colour per realm, XDro asked for the recolour per sprite), before the light and the mist; the anomaly hues are left alone (render/shaders/spriteGrade.ts)
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
   ditherSpread: [0.05, 0.12] as Ramp,

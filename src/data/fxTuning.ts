@@ -136,7 +136,7 @@ export const GROUND_CONTACT = {
 };
 
 
-/** Lights that last a moment (round 81, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
+/** Lights that last a moment (round 83, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
 export const FLASH_LIGHTS = {
   slots: 3, // the most at once
   reach: 46, // metres from the investigator: farther, none is chosen
@@ -148,7 +148,7 @@ export const FLASH_LIGHTS = {
   white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
 } as const;
 
-/** The mist a moving body carves (round 81, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
+/** The mist a moving body carves (round 83, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
 export const MIST_WAKES = {
   slots: 8, // the most at once (the nearest moving bodies; the investigator's is always one)
   reach: 44, // metres from the lens: farther, none is laid
@@ -163,7 +163,7 @@ export const MIST_WAKES = {
 } as const;
 
 /**
- * Prints in soft ground and what a body's breath and feet raise (round 81; render/creatureTracks.ts, render/creatureAir.ts). The ground a
+ * Prints in soft ground and what a body's breath and feet raise (round 83; render/creatureTracks.ts, render/creatureAir.ts). The ground a
  * region has underfoot decides it: how dark a print is, how long it keeps, the colour it is pressed in; only soft ground keeps one.
  */
 export const PRINTS = {
@@ -209,7 +209,7 @@ export const BOSS_PRESENCE = {
   halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
 } as const;
 
-/** What a person has that moves of itself (render/figureGaze.ts, figureSway.ts, figureBlink.ts, personLife.ts, the world shader; round 81): the people met only. No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
+/** What a person has that moves of itself (render/figureGaze.ts, figureSway.ts, figureBlink.ts, personLife.ts, the world shader; round 83): the people met only. No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
 export const FIGURE_LIFE = {
   gaze: {
     range: 7, // metres a person sees the investigator from
@@ -233,13 +233,13 @@ export const FIGURE_LIFE = {
   blink: { cell: 4.2, shut: 0.14, doze: 0.88 }, // seconds in which each person blinks once (somewhere in it), the length of a blink, and how nearly shut the eyes of one dozing on their feet are
 } as const;
 
-/** What a merchant shows of the wares they still have to sell (render/personLife.ts; round 81): the rare ones, in their coat, while any is left. */
+/** What a merchant shows of the wares they still have to sell (render/personLife.ts; round 83): the rare ones, in their coat, while any is left. */
 export const WARE_SHOWN = {
   star_stone: { x: 0.095, y: 0.47, z: 0.143, size: 0.05, glow: 0.55 }, // a star-stone pinned to the lapel
   vial: { x: -0.115, y: 0.33, z: 0.14, glow: 0.12 }, // a silver vial in the breast pocket
 } as const;
 
-/** The blob shadow's shape (render/blobShape.ts; round 81). */
+/** The blob shadow's shape (render/blobShape.ts; round 83). */
 export const BLOB = {
   dark: 0.55, // how dark at its heart
   base: 1.7, // its radius, in the radii of the body's capsule
@@ -250,7 +250,7 @@ export const BLOB = {
   thin: 0.25, // how much lighter it is for each whole length drawn out
 } as const;
 
-/** The track of a blow (render/swingTrails.ts; round 81). */
+/** The track of a blow (render/swingTrails.ts; round 83). */
 export const SWING_TRAIL = {
   samples: 14, // the last few edges kept
   life: 0.2, // seconds a sample lasts

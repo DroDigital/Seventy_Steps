@@ -1,5 +1,5 @@
 /**
- * The auras of the great ones (round 81; render only, read-only on the simulation): what each horror of the
+ * The auras of the great ones (round 83; render only, read-only on the simulation): what each horror of the
  * Mythos lets go of, a recipe for each thing a body of its tier gives off (data/creatureAura.ts), slow motes,
  * a ring that turns, a haze at the feet, in the anomaly hues only. Each is laid from the painted body's own
  * bounds (the reviewed art's span above its feet, or an assembly's height), so it keeps to the picture and

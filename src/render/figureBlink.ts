@@ -1,5 +1,5 @@
 /**
- * A person's blink (round 81; render only, pure): once in every few seconds, at an instant of its own for each person, the eyes
+ * A person's blink (round 83; render only, pure): once in every few seconds, at an instant of its own for each person, the eyes
  * close and open again in a fraction of a second; and one dozing on their feet (the waning hour, at no act) has them nearly shut.
  * It is a function of the time and the person alone, so it needs no clock of its own and two people never blink together.
  */

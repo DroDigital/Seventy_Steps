@@ -32,7 +32,7 @@ const GRIT = [0.3, 0.29, 0.27] as const;
 export interface Presence {
   /** Each drawn frame: trembles the camera, and lets loose what a landing blow throws up. */
   update(camera: THREE.Camera, time: number): void;
-  /** The camera's jolt from a blow of `strength` metres at `p`, felt within `reach` metres and less the farther (round 81: a colossus's footfall). */
+  /** The camera's jolt from a blow of `strength` metres at `p`, felt within `reach` metres and less the farther (round 83: a colossus's footfall). */
   felt(p: V3, strength: number, reach: number): void;
 }
 

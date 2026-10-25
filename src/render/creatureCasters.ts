@@ -1,5 +1,5 @@
 /**
- * What the moon, the lantern and the lamps see of a creature (round 81; render only). The drawn creatures
+ * What the moon, the lantern and the lamps see of a creature (round 83; render only). The drawn creatures
  * were only billboards, which cast nothing: the investigator's own shadow and the people's fell across
  * the ground and the walls, and a Deep One that stood in the lantern's way left the ground behind it lit.
  * Each creature near the investigator now stands in the shadow passes as one closed, rounded body of its

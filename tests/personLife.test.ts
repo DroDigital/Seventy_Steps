@@ -1,5 +1,5 @@
 /**
- * The people met (round 81; render/personLife.ts, figureSway.ts, figureBlink.ts, npcFigures.ts): cloth and hats that take the breeze,
+ * The people met (round 83; render/personLife.ts, figureSway.ts, figureBlink.ts, npcFigures.ts): cloth and hats that take the breeze,
  * the pace and a turn; eyes that blink and, in the waning hour, close; a merchant who shows the rare wares they still hold; the realm's
  * snow on a hat. The people only: neither a creature nor the investigator. (The blob and the lantern's shadows: blobShadow.test.ts.)
  */

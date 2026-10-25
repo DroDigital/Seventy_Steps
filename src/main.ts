@@ -211,8 +211,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
-  const mistWakes = createMistWakes(game); // what moves through it parts it (round 81)
-  const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 81)
+  const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
+  const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
   const skyline = createSkyline(scene, look);
   const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);

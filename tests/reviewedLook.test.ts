@@ -49,7 +49,7 @@ describe('the painted body of a boss form (tools/reviewed_look.py)', () => {
   });
 });
 
-describe('the marks that keep their light in the dark (round 81: tools/reviewed_look.py, shaders/sprite.ts)', () => {
+describe('the marks that keep their light in the dark (round 83: tools/reviewed_look.py, shaders/sprite.ts)', () => {
   const pages = new Map<number, ReturnType<typeof pngRgba>>();
   const pageOf = (n: number) => {
     if (!pages.has(n)) pages.set(n, pngRgba(readFileSync(`public/creatures/reviewed/${manifest.pages[n].file}`)));

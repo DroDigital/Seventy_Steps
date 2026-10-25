@@ -1,5 +1,5 @@
 /**
- * What a creature's sprite shows this frame (split from creatureViews.ts, round 81): the state and
+ * What a creature's sprite shows this frame (split from creatureViews.ts, round 83): the state and
  * frame of its clip from its move and speed, how opaque, how far it has sunk, how hard it is lashing.
  * Pure but for reading the simulation.
  */
@@ -24,7 +24,7 @@ export interface Look {
   dissolve?: number; // 0..1 through its death: its picture goes texel by texel (render/creatureFx.ts, shaders/spriteFx.ts); absent: not dying
 }
 
-/** Where in its cycle each creature is, in seconds (round 81): a pack's breathing and walking were all one clock, so every Deep One stepped together. Golden-ratio steps of the entity id spread them evenly over the longest cycle (2.5 s), the same for all four views of one creature. */
+/** Where in its cycle each creature is, in seconds (round 83): a pack's breathing and walking were all one clock, so every Deep One stepped together. Golden-ratio steps of the entity id spread them evenly over the longest cycle (2.5 s), the same for all four views of one creature. */
 export const phaseOf = (id: Entity): number => ((id * 0.6180339887) % 1) * 2.5;
 
 /** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose). */
@@ -39,7 +39,7 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
   let look: Look;
   if (a.move === 'death' && def) {
     const t = a.frame / def.frames;
-    look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1, sink: t * 0.4, lash: 0, dissolve: t }; // (round 81: its texels go, in the style of its matter; it faded whole and sank a third of its height)
+    look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1, sink: t * 0.4, lash: 0, dissolve: t }; // (round 83: its texels go, in the style of its matter; it faded whole and sank a third of its height)
   } else if ((counts.stoop ?? 0) > 0 && stooped(g, id)) { // a colossus after a blow of its own, or reeling: its head is down within reach (hurt.ts), and the picture bows to match; once, then held
     const down = (counts.stoop_mid ?? 0) > 0 ? FEEDBACK.midSeconds : 0; // the head comes down through its halfway pose, where it has one
     look = stoopAge < down ? { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 } : { state: 'stoop', frame: stoopAge < down + FEEDBACK.bowSeconds ? 0 : counts.stoop! - 1, opacity: 1, sink: 0, lash: 0 };

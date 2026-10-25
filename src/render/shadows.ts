@@ -2,7 +2,7 @@
  * Blob shadows (render only): a soft dark disc on the ground under every body that stands in the
  * world — the investigator, the people met, creatures and colossi — so nothing floats. Ordered-
  * dithered like the particles; a hovering creature's shadow shrinks and fades with its height.
- * Round 81: it is as wide as the body is painted (a colossus's is not hidden under its picture) and,
+ * Round 83: it is as wide as the body is painted (a colossus's is not hidden under its picture) and,
  * where the moon casts shadows, drawn out away from the moon (render/blobShape.ts), the way the
  * body's real shadow lies. Read-only on the simulation.
  */

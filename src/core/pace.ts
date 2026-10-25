@@ -26,7 +26,7 @@ export function voicedCurve(samples: Float32Array, rate: number, window = 0.04):
   return curve;
 }
 
-/** How loudly the voice sounds `since` seconds into a recording played at `rate` (0..1): how fast the curve of speech rises about that moment against how fast it would if the speech were even, so a pause is 0 and a stressed word is near 1 (round 81: a horror's picture follows its voice). */
+/** How loudly the voice sounds `since` seconds into a recording played at `rate` (0..1): how fast the curve of speech rises about that moment against how fast it would if the speech were even, so a pause is 0 and a stressed word is near 1 (round 83: a horror's picture follows its voice). */
 export function voiceLevel(curve: Float32Array, since: number, rate = 1, window = 0.04): number {
   const at = Math.floor((since * rate) / window);
   if (since < 0 || at < 0 || at >= curve.length || curve.length < 2) return 0;

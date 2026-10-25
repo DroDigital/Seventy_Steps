@@ -1,5 +1,5 @@
 /**
- * A person's eyes on the investigator (round 81; render only, read-only on the simulation): one who is not at an act
+ * A person's eyes on the investigator (round 83; render only, read-only on the simulation): one who is not at an act
  * and has the investigator in front of them, or just off their shoulder, turns their head to follow them as they pass,
  * the head only, to a limit, eased in and out, looking a little up or down at the height they meet. Nothing behind them.
  * It is laid over the pose after it is made, so a reader at a book, a sleeper or a flinch is never turned from it.

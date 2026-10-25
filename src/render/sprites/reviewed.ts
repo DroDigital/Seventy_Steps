@@ -79,7 +79,7 @@ export function reviewedSize(entity: ReviewedEntity, manifest: ReviewedManifest)
   };
 }
 
-/** Where the painted figure stands, in metres above its feet: the lowest and highest painted row of the frame `reviewedSize` is scaled by (a cutscene frames this, not the capsule it is struck by), and how many rows it is painted in, and how broad it is painted, in metres (round 81: what a creature's shadow is cast from). */
+/** Where the painted figure stands, in metres above its feet: the lowest and highest painted row of the frame `reviewedSize` is scaled by (a cutscene frames this, not the capsule it is struck by), and how many rows it is painted in, and how broad it is painted, in metres (round 83: what a creature's shadow is cast from). */
 export function reviewedSpan(entity: ReviewedEntity, manifest: ReviewedManifest): { bottom: number; top: number; rows: number; across: number } {
   const reference = manifest.frames[entity.directions.front.actions.idle![0]];
   const { width, height, groundOffset } = reviewedSize(entity, manifest);

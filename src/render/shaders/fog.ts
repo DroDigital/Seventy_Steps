@@ -39,7 +39,7 @@ uniform float uLanternRange;
 uniform float uLanternDecay;
 uniform vec4 uLamps[${LAMP_SLOTS}];
 uniform vec3 uLampColors[${LAMP_SLOTS}];
-uniform int uWakeCount; // how many bodies are parting the mist (round 81: render/mistWakes.ts)
+uniform int uWakeCount; // how many bodies are parting the mist (round 83: render/mistWakes.ts)
 uniform vec4 uWakeSeg[${WAKE_SLOTS}]; // each: from where it is (x, z) back along its trail to where the trail ends (x, z)
 uniform vec4 uWakeInfo[${WAKE_SLOTS}]; // each: its breadth, how much it clears, the height it clears to, how far it turns the mist
 ${WINDOW_LIGHT_GLSL}
@@ -90,7 +90,7 @@ float fogDensity(vec3 p) {
   low *= 1.0 - wake.x;
   if (low > 1e-4) {
     vec2 wind = vec2(uFogDrift.x, uFogDrift.y);
-    vec3 q = (p - vec3(wind.x + wake.y, 0.0, wind.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0); // (a body turns the mist about it: its wake, round 81)
+    vec3 q = (p - vec3(wind.x + wake.y, 0.0, wind.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0); // (a body turns the mist about it: its wake, round 83)
     // Round 80: the fine wisps are carried quicker than the banks and a little across them, so the mist shears and flows and is not one sheet sliding.
     vec2 fast = vec2(wind.x * ${FINE.c} - wind.y * ${FINE.s}, wind.x * ${FINE.s} + wind.y * ${FINE.c}) * ${FINE.speed};
     vec3 q2 = ((p - vec3(fast.x + wake.y, 0.0, fast.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0)) * 2.6 + 7.3;

@@ -1,5 +1,5 @@
 /**
- * What a person met has that moves of itself (round 81; render only, read-only on the simulation), laid over their pose after it is made:
+ * What a person met has that moves of itself (round 83; render only, read-only on the simulation), laid over their pose after it is made:
  * the head follows the investigator (figureGaze.ts), a hat, a shawl, a scarf's end and the coat's tails take the breeze and the pace
  * and a turn (figureSway.ts), the eyes blink and, in the waning hour, close (figureBlink.ts), and a merchant shows the rare things
  * they still have to sell. The people only: no creature, and not the investigator, whose lantern and scarf are the player rebuild's.

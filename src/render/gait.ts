@@ -40,6 +40,7 @@ const SPRINT: GaitDef = {
 };
 const GAITS = [WALK, RUN, SPRINT] as const;
 const DEG = Math.PI / 180;
+const COS_UPRIGHT = Math.cos(1.1); // a body tipped further than this from the vertical is not on its feet: nothing is settled to the ground
 
 /** Stride cycles per second at a ground speed (m/s), fitted so the stance foot keeps pace with the ground. */
 const CADENCE: readonly (readonly [speed: number, hz: number])[] = [[0, 0.75], [1, 0.76], [1.4, 1.03], [2.2, 1.36], [2.6, 1.5], [3, 1.62], [4.2, 1.76], [5, 1.93], [6.4, 1.99]];
@@ -78,7 +79,7 @@ function track(keys: readonly Key[], t: number, c: 1 | 2): number {
 }
 
 /** How much of each gait a speed is: stride (standing 0 → striding 1), run (walk → run), sprint (run → sprint). */
-function blendAt(speed: number): { stride: number; run: number; sprint: number } {
+export function blendAt(speed: number): { stride: number; run: number; sprint: number } {
   return { stride: smooth(0, 0.9, speed), run: smooth(2.3, 3.8, speed), sprint: smooth(4.6, 6.2, speed) };
 }
 
@@ -187,28 +188,35 @@ export type Ground = (x: number, z: number) => number;
  * its foot would sink into the ground, a foot lies level on the ground and lets its toes drop as it
  * lifts, and each coat panel follows its thigh.
  */
-export function settle(f: Figure, ground?: Ground): void {
+export function settle(f: Figure, ground?: Ground, level = true): void {
   const pitch = wrapAngle(f.body.rotation.x);
   const clearance = f.hip - f.thigh - f.shin;
   const shank = f.shin - f.ankle; // knee to ankle
-  if (Math.abs(pitch) < 1.1) {
+  const q = f.body.quaternion;
+  if (1 - 2 * (q.x * q.x + q.z * q.z) > COS_UPRIGHT) { // upright, however the body was turned to be (a clip's roll takes it over, and the Euler pitch of that folds back to look small)
     const legs = [[f.legR, f.kneeR, f.footR], [f.legL, f.kneeL, f.footL]] as const;
     const under = legs.map(([legJ, knee]) => {
       const a = pitch + legJ.rotation.x; // the thigh from the vertical, positive with the foot behind
       return ground?.(legJ.position.x, -(f.thigh * Math.sin(a) + shank * Math.sin(a + knee.rotation.x))) ?? 0;
     });
-    f.body.position.y += Math.min(0, ...under);
+    const sink = Math.min(0, ...under);
+    f.body.position.y += sink;
     legs.forEach(([legJ, knee, foot], i) => {
       const thigh = pitch + legJ.rotation.x;
-      const room = f.body.position.y - clearance - under[i] - f.ankle; // how far below the hip the ankle may go
+      const drop = f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + knee.rotation.x); // how far below the hip the ankle is
+      // a clip's boots are on its own floor, a hair lower or higher than this reckons: only what the ground adds to that is settled, so a flat floor leaves a clip as it was made
+      const own = level ? 0 : Math.max(0, drop - (f.body.position.y - sink - clearance - f.ankle));
+      const room = f.body.position.y - clearance - under[i] - f.ankle + own; // how far below the hip the ankle may go
       const c = (room - f.thigh * Math.cos(thigh)) / shank;
-      if (c > -1 && c < 1 && f.thigh * Math.cos(thigh) + shank * Math.cos(thigh + knee.rotation.x) > room) {
+      const bent = knee.rotation.x;
+      if (c > -1 && c < 1 && drop > room) {
         knee.rotation.x = Math.min(2.6, Math.max(knee.rotation.x, Math.acos(c) - thigh));
       }
+      if (!level) foot.rotation.x -= knee.rotation.x - bent; // a clip's boot keeps the pitch to the ground it was made with when the knee is bent for a slope
       const shin = thigh + knee.rotation.x;
       const lifted = room - f.thigh * Math.cos(thigh) - shank * Math.cos(shin);
-      foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts
+      if (level) foot.rotation.x = Math.min(0.5, Math.max(0, lifted * 3)) - shin; // level, the toes dropping as it lifts (a clip has its own feet: level = false)
     });
   }
-  f.skirt.forEach((panel, i) => (panel.rotation.x = 0.9 * (i === 0 ? f.legR : f.legL).rotation.x));
+  if (level) f.skirt.forEach((panel, i) => (panel.rotation.x = 0.9 * (i === 0 ? f.legR : f.legL).rotation.x));
 }

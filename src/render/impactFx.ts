@@ -39,7 +39,7 @@ export function createImpactFx(g: Game, fx: Particles): ImpactFx {
   const scaled = ([lo, hi]: readonly [number, number], w: number): number => Math.round(lo + ((hi - lo) * (w - 0.5)) / (IMPACT.weight.most - 0.5));
 
   function burst(p: { x: number; y: number; z: number }, d: { x: number; z: number }, w: number, finish: boolean, matter: Rgb = ICHOR): void {
-    flashLight(p, SPARK, FLASH_LIGHTS.blow.strength + w, FLASH_LIGHTS.blow.range + w * 1.5, FLASH_LIGHTS.blow.seconds); // a landed blow lights its own wound and the ground about it (round 81)
+    flashLight(p, SPARK, FLASH_LIGHTS.blow.strength + w, FLASH_LIGHTS.blow.range + w * 1.5, FLASH_LIGHTS.blow.seconds); // a landed blow lights its own wound and the ground about it (round 83)
     fx.spawn({ ...p, life: 0.12, size: 0.3 + 0.45 * w, grow: 0.3, color: FLARE, glow: true, alpha: 0.95 });
     fx.spawn({ ...p, life: 0.16, size: 0.5 + 0.6 * w, grow: 0.5, color: SPARK, glow: true, alpha: 0.4 });
     const yaw = Math.atan2(d.x, d.z);
@@ -54,7 +54,7 @@ export function createImpactFx(g: Game, fx: Particles): ImpactFx {
     for (let i = 0; i < scaled(IMPACT.chunks, w); i++) {
       fx.spawn({
         ...p, vx: d.x * rand(1, 4) + rand(-1.5, 1.5), vy: rand(1, 4.5), vz: d.z * rand(1, 4) + rand(-1.5, 1.5),
-        life: rand(0.5, 0.9), size: rand(0.1, 0.2), grow: 0.7, color: i % 3 === 0 ? mixRgb(matter, BASE.charcoal, 0.45) : matter, gravity: 9, drag: 0.8, // (round 81: of what the body is made, the clots darker among it)
+        life: rand(0.5, 0.9), size: rand(0.1, 0.2), grow: 0.7, color: i % 3 === 0 ? mixRgb(matter, BASE.charcoal, 0.45) : matter, gravity: 9, drag: 0.8, // (round 83: of what the body is made, the clots darker among it)
       });
     }
     if (!finish) return;

@@ -1,5 +1,5 @@
 /**
- * What hangs loose on the people met (round 81; render only, pure): a hat on the head, a shawl over the shoulders, a scarf's end and
+ * What hangs loose on the people met (round 83; render only, pure): a hat on the head, a shawl over the shoulders, a scarf's end and
  * a robe's sash, the tails of a coat. Each is a second-order spring on two lean angles (forward and to the side), driven by the breeze
  * on it, by the pace its wearer walks at and by a turn they make, stepped in small slices so it settles the same at any frame rate.
  * A hat is carried and leans the other way from cloth that hangs. Nothing moves the body: no lean, no breathing; the investigator's

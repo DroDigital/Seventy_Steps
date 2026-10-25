@@ -1,5 +1,5 @@
 /**
- * A drawn creature goes, forms and wears its wounds by its own texels (round 81; render/creatureFx.ts,
+ * A drawn creature goes, forms and wears its wounds by its own texels (round 83; render/creatureFx.ts,
  * data/creatureFx.ts, shaders/spriteFx.ts): its death by the matter of its body, an ambusher rising
  * out of the ground, a creature formed again as its other self, the dark patches of its wounds and
  * the pool of light where the last blow fell. The recorded art is not touched.

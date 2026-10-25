@@ -1,5 +1,5 @@
 /**
- * What a creature is made of, as a colour (round 81; render only): the flesh, hide, shell or stone of its drawing
+ * What a creature is made of, as a colour (round 83; render only): the flesh, hide, shell or stone of its drawing
  * (data/reviewedLook.ts, measured from the art), lifted so a clot of a dark body shows on dark ground. A blow
  * throws it off as chunks and spray; every form threw the same grey before. A form with no drawing of its own
  * (the drawn fallback sprites, a colossus built in code) has none, and its blows keep the grey.

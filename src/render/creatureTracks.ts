@@ -1,5 +1,5 @@
 /**
- * Prints of the people and the creatures in soft ground (round 81; render only, read-only on the simulation): where the region's ground is
+ * Prints of the people and the creatures in soft ground (round 83; render only, read-only on the simulation): where the region's ground is
  * snow, mud, sand, dirt, leaves or soft grass, whatever walks across it on foot, the people and the creatures near, leaves a print at each
  * stride, a pressed hollow in an ellipse set along the way it went, with a lip pushed up about it, in the colour of that ground, dithered as the blob shadows are, and
  * fading out in its own time (snow keeps it longest). The investigator's own are round 80's (render/footprints.ts, laid by render/atm/steps.ts), as

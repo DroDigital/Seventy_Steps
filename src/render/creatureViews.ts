@@ -82,8 +82,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const painted = new Map<Entity, number>();
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
-  const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 81)
-  const casters = createCreatureCasters(scene); // the bodies the moon, lantern and lamps cast shadows from (round 81)
+  const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 83)
+  const casters = createCreatureCasters(scene); // the bodies the moon, lantern and lamps cast shadows from (round 83)
   const flat = new THREE.Vector3(); // the camera's right, level
   const realm: [number, number, number] = [1, 1, 1]; // the realm's mid-tone this frame, at brightness 1
   const glow = createCreatureGlow(g, atlas, flat, CAPACITY); // the faint halos about eyes and marks, and a horror's body
@@ -107,7 +107,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     const glint = REVIEWED_GLINTS[key];
     b.glint.setXYZW(index, glint?.[0] ?? 0, glint?.[1] ?? 0, glint?.[2] ?? 0, glint ? 1 + fire : 0);
-    const tone = toneOf(REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 81)
+    const tone = toneOf(REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 83)
     b.tone.setXYZW(index, tone.cos, tone.sin, tone.boost, tone.fill);
     b.relit.setX(index, relitOf(key));
     counts[frame.page]++;
@@ -164,7 +164,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const key = spriteKey(cid, variant);
         const entry = art?.manifest.entities[key];
         const bow = entry ? stoops.of(id, key, time) : undefined;
-        const beat = time + phaseOf(id); // its own place in its cycles: a pack does not step as one (round 81)
+        const beat = time + phaseOf(id); // its own place in its cycles: a pack does not step as one (round 83)
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
@@ -175,7 +175,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
         const flash = FEEDBACK.flashLevel * Math.max(0, 1 - (time - (hitAt.get(id) ?? -Infinity)) / FEEDBACK.flashSeconds);
-        const [voice, deep] = [presence.voice(id, time), presence.deep(id)]; // a horror's voice and how far into its fight it is, worn by its picture (round 81)
+        const [voice, deep] = [presence.voice(id, time), presence.deep(id)]; // a horror's voice and how far into its fight it is, worn by its picture (round 83)
         if (entry && art && direction) {
           if (!look) continue;
           directions.set(id, direction);

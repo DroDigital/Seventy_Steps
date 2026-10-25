@@ -74,7 +74,7 @@ export const SETTINGS = {
   resolution: [0.8, 2, 0.4, 2], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360 and 800 × 450, the default (round 58, asked: before it was 640 × 360, which a 720p, 1080p, 1440p and 4K screen each held a whole number of times over, 2, 3, 4 and 6, so that every pixel was drawn the same size; 800 × 450 is 1.6, 2.4, 3.2 and 4.8 times over on them, so some rows and columns are drawn wider than others)
   brightness: [0.7, 1.6, 0.05, 1], // lifts the dark (a gamma, after the grade; round 12)
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
-  relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 81: shaders/sprite.ts); off, they are lit as the rest
+  relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 83: shaders/sprite.ts); off, they are lit as the rest
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
@@ -82,7 +82,7 @@ export const SETTINGS = {
   captionBack: [0, 1, 1, 0], // 1: a dark band behind them
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
-  camera: [0, 3, 1, 0], // how the camera hangs (round 77): 0 Classic, the default; 1 Low hero; 2 Long lens; 3 Tight shoulder (data/cameraModes.ts)
+  camera: [0, 3, 1, 1], // how the camera hangs (round 77): 0 Classic; 1 Low hero, the default (since round 82); 2 Long lens; 3 Tight shoulder (data/cameraModes.ts)
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
   quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)

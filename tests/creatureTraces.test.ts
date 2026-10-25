@@ -1,5 +1,5 @@
 /**
- * What a walking body leaves and gives the air (round 81; render/creatureTracks.ts, render/creatureAir.ts, data/fxTuning.ts PRINTS, BODY_AIR):
+ * What a walking body leaves and gives the air (round 83; render/creatureTracks.ts, render/creatureAir.ts, data/fxTuning.ts PRINTS, BODY_AIR):
  * prints in soft ground only, at a stride, alternating the feet, by the pace and not for the hidden, the flying or the drowned, nor for
  * the investigator (round 80 lays theirs); a pale breath in the cold and dust from a hard run over dry ground.
  */

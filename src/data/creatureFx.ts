@@ -1,5 +1,5 @@
 /**
- * How a drawn creature comes and goes and wears its wounds (round 81; render/creatureFx.ts,
+ * How a drawn creature comes and goes and wears its wounds (round 83; render/creatureFx.ts,
  * shaders/spriteFx.ts). Nothing in the recorded art is changed: its own texels are taken away, in an
  * order and a style, and a wound is a dark wet patch laid over the pixels it falls on. Data only.
  */

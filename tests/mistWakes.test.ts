@@ -1,5 +1,5 @@
 /**
- * The low mist parts for what moves through it (round 81; render/mistWakes.ts, shaders/fog.ts, data/fxTuning.ts MIST_WAKES): the
+ * The low mist parts for what moves through it (round 83; render/mistWakes.ts, shaders/fog.ts, data/fxTuning.ts MIST_WAKES): the
  * investigator's body first, then the nearest bodies in sight; none that is still, hidden, unseen or far; the shader carves the mist
  * along each trail and turns it about the edge.
  */

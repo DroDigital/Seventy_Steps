@@ -21,7 +21,7 @@ export interface LanternShadow {
 }
 
 export const FAR_SIDE = new THREE.ShaderMaterial({
-  vertexShader: INSTANCED_POSITION, // (round 81: the creatures' bodies are one instanced mesh)
+  vertexShader: INSTANCED_POSITION, // (round 83: the creatures' bodies are one instanced mesh)
   fragmentShader: 'void main() { gl_FragColor = vec4(1.0); }',
   side: THREE.BackSide,
   colorWrite: false,

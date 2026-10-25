@@ -1,6 +1,6 @@
 /**
  * A short crossfade between poses (render only: poses.ts stays a pure function of the move). When a
- * figure's move or guard changes, its joints ease from the pose last drawn into the new one over a
+ * figure's move or guard changes, its joints (and the pelvis's place) ease from the pose last drawn into the new one over a
  * moment, so a swing called off by the guard, a blow cut short by a stagger, a chain's next strike
  * or a guard raised mid-stride turns into the next pose instead of jumping to it.
  */
@@ -19,15 +19,17 @@ export interface PoseBlend {
 }
 
 export function createPoseBlend(f: Figure): PoseBlend {
-  const joints = [f.body, f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt];
+  const joints = [f.body, f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt, ...(f.lantern ? [f.lantern] : [])];
   const from = joints.map(() => new THREE.Quaternion());
   let [was, guarded] = [null as string | null, false];
   let [hip, at, last] = [f.hip, -Infinity, -Infinity];
+  const aside = new THREE.Vector2(); // where the pelvis was off the root (a clip moves it fore and aft and sideways as well as in height)
   return {
     watch(move, guard, time) {
       if (move !== was || guard !== guarded) {
         joints.forEach((j, i) => from[i].copy(j.quaternion));
         [hip, at] = [f.body.position.y, last]; // from the frame last drawn, so the change shows at once
+        aside.set(f.body.position.x, f.body.position.z);
       }
       [was, guarded, last] = [move, guard, time];
     },
@@ -40,6 +42,8 @@ export function createPoseBlend(f: Figure): PoseBlend {
         j.quaternion.copy(from[i]).slerp(target, k); // the shorter way round, a roll's full turn included
       });
       f.body.position.y = hip + (f.body.position.y - hip) * k;
+      f.body.position.x = aside.x + (f.body.position.x - aside.x) * k;
+      f.body.position.z = aside.y + (f.body.position.z - aside.y) * k;
     },
   };
 }

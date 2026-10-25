@@ -1,5 +1,5 @@
 /**
- * What a body gives the air (round 81; render only, read-only on the simulation): in the cold (snow underfoot) every body near the
+ * What a body gives the air (round 83; render only, read-only on the simulation): in the cold (snow underfoot) every body near the
  * investigator breathes out a small pale cloud, now and then, at its mouth, and the people and creatures keep to their own beat; and
  * a body running hard over dry ground (sand, dirt, gravel) kicks up a puff of dust at its heels at each stride, unless the ground
  * is soaked. A spectre has no breath; nothing hidden or unseen gives any.

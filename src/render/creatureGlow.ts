@@ -1,5 +1,5 @@
 /**
- * What glows about a creature's picture (split from creatureViews.ts, round 81): the faint halo about the eyes (and the
+ * What glows about a creature's picture (split from creatureViews.ts, round 83): the faint halo about the eyes (and the
  * marks that glow) of a sprite, which comes out of the dark as the investigator nears and out of a mist once the creature
  * has seen them; a failing mind sees them swell and burn; and a horror's voice and its phase make them flare. The atlas
  * knows where the eyes are in each frame of the generated sprites, `REVIEWED_EYES` in each reviewed form's front view.

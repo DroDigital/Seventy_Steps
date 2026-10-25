@@ -15,7 +15,7 @@ export function spriteBatch(scene: THREE.Scene, texture: THREE.Texture, capacity
   geo.setAttribute('aCell', cells);
   geo.setAttribute('aInfo', info);
   geo.setAttribute('aWeird', weird);
-  geo.setAttribute('aFx', fx); // how far gone, in what style, how worn, a seed (shaders/spriteFx.ts; round 81)
+  geo.setAttribute('aFx', fx); // how far gone, in what style, how worn, a seed (shaders/spriteFx.ts; round 83)
   geo.setAttribute('aWound', wound); // where the last blow fell, its flash, its reach
   geo.setAttribute('aGlint', glint); // the colour of its marks that keep their light in the dark, and how much (reviewedLook.ts)
   geo.setAttribute('aTone', tone); // how its form is recoloured to the realm (spriteTone.ts)

@@ -1,5 +1,5 @@
 /**
- * Each drawn creature's recolour to its realm (round 81; render/spriteTone.ts, shaders/spriteGrade.ts): a turn of hue the same for every
+ * Each drawn creature's recolour to its realm (round 83; render/spriteTone.ts, shaders/spriteGrade.ts): a turn of hue the same for every
  * pixel of a form, so what it holds inside itself is kept, a lift of colour that never takes any away, a cast for a grey; and a reading
  * of it that is the same for every one of the 105 forms in every realm.
  */

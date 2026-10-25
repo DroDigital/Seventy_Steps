@@ -13,7 +13,7 @@ Needs `pip install pillow numpy`. Run it when the pack in public/creatures/revie
          marks, so the sprite shader can keep the texels of that colour alight in the dark, in every view and
          every frame (render/shaders/sprite.ts). Found as the colour that shows in most of a view's frames, a few
          texels at a time, bright or saturated; for the forms named in GLINTED, which were looked at one by one.
-  matter the colour of each form's own flesh, hide, shell or stone (round 81): the mean of the middle half of its
+  matter the colour of each form's own flesh, hide, shell or stone (round 83): the mean of the middle half of its
          front idle's texels by brightness, not its outline or its glints. What a blow throws off it, and what
          the form crumbles to, is this colour (render/impactFx.ts), where every form threw the same grey.
   body   how wide the painted body of a boss form is in the three bands its hurt zones are (legs, torso,
@@ -35,17 +35,17 @@ PACK = ROOT / 'public' / 'creatures' / 'reviewed'
 OUT = ROOT / 'src' / 'data' / 'reviewedLook.ts'
 
 # Forms whose front idle was looked at and has eyes (or marks that glow like them): the box (x0, y0, x1, y1, in
-# pixels) in which the finder looks, or None for the whole head (round 81: and, for a form whose eyes are not
+# pixels) in which the finder looks, or None for the whole head (round 83: and, for a form whose eyes are not
 # the brightest marks in the box, their exact colour in bytes, which are then the marks). A mark that is a tooth, a gem, a spot or a
 # visor is not an eye, and the finder cannot tell: the others (the Shoggoths' green spots, the Unnamable's
 # bone, the Haunter's visor, the Wamp's and the rat swarm's dim amber) were looked at and are left out.
 EYED = {
     'black_man': None, 'charles_le_sorcier': (27, 13, 36, 19), 'cthulhu_cultist': None, 'ghoul': None, 'ghoul#eldritch': None,
     'gnoph_keh': None, 'gug': None, 'martense_degenerate': (30, 14, 37, 20), 'medusa_gorgon': None, 'winged_hybrid': None,
-    'the_hound': ((24, 26, 40, 33), (43, 255, 160)), 'haunter_of_the_dark': (26, 25, 38, 34), 'serpent_man': (26, 10, 40, 18), 'the_outsider': (26, 5, 38, 13),  # round 81
+    'the_hound': ((24, 26, 40, 33), (43, 255, 160)), 'haunter_of_the_dark': (26, 25, 38, 34), 'serpent_man': (26, 10, 40, 18), 'the_outsider': (26, 5, 38, 13),  # round 83
 }
 
-# Forms whose marks keep their light in the dark (round 81): the eyes above and these, looked at on a sheet of
+# Forms whose marks keep their light in the dark (round 83): the eyes above and these, looked at on a sheet of
 # the texels the colour takes. A form's key is the colour that shows, a few texels at a time, in most of the
 # frames of one of its views; the others (a robe's gold, a pyramid's sand) hold too many texels of theirs.
 GLINTED = [
