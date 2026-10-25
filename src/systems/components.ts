@@ -339,6 +339,7 @@ export interface Game {
   rng: Rng;
   frame: number;
   cutscene: boolean; // transient: the camera holds control, so the investigator cannot be targeted or hurt
+  talking: boolean; // transient: a dialogue is open (main.ts sets it each step): the world goes on, but nothing reaches the investigator and foes let go of them (targets.ts, brain.ts)
   reality: Reality;
   overworld?: Overworld;
   /** How well lit the ground at a point is by the world's lamps, fires and torches, 0..1 (handed in by the renderer, which knows where they are; the dark when absent: sanity.ts mends faster in it). */
