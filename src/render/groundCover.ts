@@ -15,6 +15,8 @@ import { roadShare, type RoadSeg } from '../world/regionPlan';
 import { inDungeon, surface } from '../world/terrain';
 import { padDistance } from '../world/sitePads';
 import { chunkKey } from '../world/worldMap';
+import { REGION_COVER } from '../data/coverKinds';
+import { regionPiece } from './coverPieces';
 import type { PropMat } from './propShapes';
 
 type Rgb = readonly [number, number, number];
@@ -204,6 +206,7 @@ export function groundCover(cx: number, cz: number, region: RegionDef, roads: re
   const rng = createRng(chunkKey(cx, cz) * 7919 + 17);
   const pads = worldLayout().chunk(cx, cz).pads;
   const [leaf, stone] = [new Builder(true), new Builder()];
+  const own = region.id in REGION_COVER;
   for (let k = 0; k < cover.count; k++) {
     const [x, z] = [(cx + rng()) * WORLD.chunk, (cz + rng()) * WORLD.chunk];
     let roll = rng();
@@ -212,6 +215,7 @@ export function groundCover(cx: number, cz: number, region: RegionDef, roads: re
     if (pads.some((p) => padDistance(p, x, z) < 1)) continue;
     const y = surface(x, z);
     if (y < WORLD.seaLevel) continue;
+    if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 78: the region's own litter in place of a share of the ground's (data/coverKinds.ts)
     plantAt(kind, leaf, stone, rng, x, y, z);
   }
   const out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
