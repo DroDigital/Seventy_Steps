@@ -93,7 +93,7 @@ const platforms: HookStep = (g, fights) => {
 };
 
 const petrify: HookStep = (g, fights) => {
-  if (g.cutscene) return;
+  if (g.cutscene || g.talking) return; // (a gaze builds nothing while someone talks to the investigator: it cannot petrify them then)
   const r = g.reality;
   const c = g.ecs.c;
   const eye = playerEye(g);
