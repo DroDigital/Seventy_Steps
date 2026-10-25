@@ -13,8 +13,10 @@ import { BOSS, REALITY } from '../src/data/tuning';
 import { startMove } from '../src/systems/actions';
 import { attacksOf, reachOf, toCombatant } from '../src/systems/creatures';
 import { phaseBrain } from '../src/systems/fightPhase';
+import { createWorldGame } from '../src/systems/game';
 import { REALITY_TRICKS } from '../src/systems/realityTricks';
-import { hookFight } from './bossHelpers';
+import { NYARLATHOTEP_SIGNATURE } from '../src/systems/signatures/nyarlathotep';
+import { bossGame, hookFight } from './bossHelpers';
 import { record } from './worldHelpers';
 
 const BANDS: readonly PunishBand[] = ['first', 'middle', 'deep', 'last'];
@@ -89,6 +91,27 @@ describe('the punish windows (round 83)', () => {
         expect(moves[id], `${def.id} ${id}`).toEqual(compileAttack(id, def.stats, reachOf(def)));
       }
     }
+  });
+
+  it('gives Nyarlathotep\'s borrowed attacks its own band, including moves absent from its native moveset', () => {
+    const { g, boss, fight } = bossGame('nyarlathotep');
+    g.overworld = createWorldGame().overworld;
+    g.overworld!.slain = new Set(['boss:cthulhu']);
+    fight.phase = fight.script.phases.length - 1;
+    NYARLATHOTEP_SIGNATURE.step!(g, boss, fight); // the true form rebuilds the native moveset before it borrows
+    const actor = g.ecs.c.actor.get(boss)!;
+    expect(actor.moves.slam).toBeUndefined();
+    const extra = NYARLATHOTEP_SIGNATURE.extra!(g, boss, fight);
+    expect(extra.map((a) => a.move)).toContain('slam');
+    const slam = ATTACKS.slam;
+    expect(actor.moves.slam.frames - slam.windup - slam.active).toBe(38); // Cthulhu's band is deep; the borrower's is last
+    for (const { move } of extra) {
+      const attack = ATTACKS[move as keyof typeof ATTACKS];
+      expect(actor.moves[move].frames - attack.windup - attack.active, move).toBe(recoveryFor(attack, bandOf(fight.id)));
+    }
+    const cached = actor.moves.slam;
+    NYARLATHOTEP_SIGNATURE.extra!(g, boss, fight);
+    expect(actor.moves.slam).toBe(cached);
   });
 
   it('takes the weight of its lighter blows and its evasion from the band, a horror at a time, and leaves the heaviest blow as it was', () => {
