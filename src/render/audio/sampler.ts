@@ -6,6 +6,7 @@
  * loaded plays nothing, and says so: the caller falls back to the recipe.
  */
 
+import { ECHO_VOICES } from '../../data/acoustics';
 import { SAMPLE_PITCH, type SampleSet } from '../../data/samples';
 import { SAMPLE_LEVELS } from '../../data/sampleLevels';
 import { takeTrims } from '../../data/takeTrim';
@@ -15,11 +16,20 @@ import type { PlayOptions } from './synth';
 
 export const AUDIO_BASE = 'audio/'; // served from public/, beside the page
 
+/** The same take heard again (round 83: a footfall in a vault): `delay` seconds after the first, at `gain` of its level, dulled to `lowpass` Hz if that is duller than the first's, `pan` further to one side. */
+export interface SampleEcho {
+  delay: number;
+  gain: number;
+  lowpass?: number;
+  pan?: number;
+}
+
 export interface SampleOptions extends PlayOptions {
   lowpass?: number; // Hz: dulled by distance
   bus?: AudioNode; // the one-shots bus by default
   delay?: number; // seconds after now it starts (round 20: a blow's layers land a moment apart)
   fit?: number; // seconds: played faster or slower to last exactly this long (round 40: a door's swing), within a third either way
+  echoes?: readonly SampleEcho[]; // the take again, fainter, after each (a room's answer; let go when the sounds at once are many: `ECHO_VOICES`)
 }
 
 export interface Sampler {
@@ -79,31 +89,38 @@ export function createSampler(e: AudioEngine, base = AUDIO_BASE): Sampler {
       if (!file) return false;
       last.set(set, file);
       const [lo, hi] = set.pitch ?? SAMPLE_PITCH;
-      const src = ctx.createBufferSource();
-      src.buffer = buffers.get(`sfx/${file}`)!;
-      const rate = o.fit && src.buffer.duration > 0 ? Math.min(1.33, Math.max(0.75, src.buffer.duration / o.fit)) : (lo + (hi - lo) * Math.random()) * (o.pitch ?? 1);
-      src.playbackRate.value = rate;
-      src.detune.value = e.detune; // the sanity FX's sag, as the recipes take it
-      const out = ctx.createGain();
+      const buffer = buffers.get(`sfx/${file}`)!;
+      const rate = o.fit && buffer.duration > 0 ? Math.min(1.33, Math.max(0.75, buffer.duration / o.fit)) : (lo + (hi - lo) * Math.random()) * (o.pitch ?? 1);
       let trim = trims.get(set);
       if (!trim) trims.set(set, (trim = takeTrims(set)));
-      out.gain.value = set.gain * 10 ** ((trim[file] ?? 0) / 20) * (o.gain ?? 1);
-      const pan = ctx.createStereoPanner();
-      pan.pan.value = Math.max(-1, Math.min(1, o.pan ?? 0));
-      let node: AudioNode = src;
-      if (o.lowpass && o.lowpass < 18000) {
-        const dull = ctx.createBiquadFilter();
-        dull.type = 'lowpass';
-        dull.frequency.value = o.lowpass;
-        node = node.connect(dull);
-      }
-      node.connect(out).connect(pan).connect(o.bus ?? sfx);
-      e.playing++;
-      src.onended = () => {
-        e.playing--;
-        pan.disconnect();
+      const level = set.gain * 10 ** ((trim[file] ?? 0) / 20) * (o.gain ?? 1);
+      /** One hearing of the take: now (or `after` seconds on), at `k` of its level, dulled to `lowpass`, panned to `aside`. */
+      const hear = (after: number, k: number, lowpass: number | undefined, aside: number): void => {
+        const src = ctx.createBufferSource();
+        src.buffer = buffer;
+        src.playbackRate.value = rate;
+        src.detune.value = e.detune; // the sanity FX's sag, as the recipes take it
+        const out = ctx.createGain();
+        out.gain.value = level * k;
+        const pan = ctx.createStereoPanner();
+        pan.pan.value = Math.max(-1, Math.min(1, aside));
+        let node: AudioNode = src;
+        if (lowpass && lowpass < 18000) {
+          const dull = ctx.createBiquadFilter();
+          dull.type = 'lowpass';
+          dull.frequency.value = lowpass;
+          node = node.connect(dull);
+        }
+        node.connect(out).connect(pan).connect(o.bus ?? sfx);
+        e.playing++;
+        src.onended = () => {
+          e.playing--;
+          pan.disconnect();
+        };
+        src.start(after ? ctx.currentTime + after : 0);
       };
-      src.start(o.delay ? ctx.currentTime + o.delay : 0);
+      hear(o.delay ?? 0, 1, o.lowpass, o.pan ?? 0);
+      for (const r of o.echoes ?? []) if (e.playing < AUDIO.polyphony * ECHO_VOICES) hear((o.delay ?? 0) + r.delay, r.gain, Math.min(o.lowpass ?? 18000, r.lowpass ?? 18000), (o.pan ?? 0) + (r.pan ?? 0));
       return true;
     },
   };
