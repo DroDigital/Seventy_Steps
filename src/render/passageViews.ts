@@ -15,13 +15,14 @@ import { stepKey } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
 import type { DoorLook } from '../data/doors';
 import { DOOR_GAIN, doorSound } from '../data/doorSounds';
+import { GATE_STYLES } from '../data/gateStyles';
 import { FEEDBACK, PASSAGE } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { passageKind, secondsOf } from '../systems/passages';
 import type { GameAudio } from './audio/gameAudio';
 import { ANOMALY, type Rgb } from './palette';
-import { gateKit } from './gateLooks';
-import { bridgeKit } from './passageShapes';
+import { createGateView } from './gateViews';
+import { bridgeKit, doorKit } from './passageShapes';
 import type { Particles } from './particles';
 import { createWorldMaterial } from './worldMaterial';
 
@@ -52,6 +53,7 @@ const glowMaterial = (): THREE.ShaderMaterial => createWorldMaterial({ texture: 
 const setGlow = (m: THREE.ShaderMaterial, v: number): void => void (m.uniforms.uEmissive.value = v);
 
 export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: HiddenPieceDef, fx: { audio: GameAudio; particles: Particles }): PassageView {
+  if (def.door?.style && GATE_STYLES[def.door.style]) return createGateView(scene, g, id, def, fx); // a house's gate (round 76): hung from baked leaves by its style
   const kind = passageKind(def);
   const spot = def.door ?? def.bridge!;
   const group = new THREE.Group();
@@ -99,7 +101,7 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
   };
 
   if (def.door) {
-    const kit = gateKit(def);
+    const kit = doorKit(def);
     const [wall, stoneMat, frameGlow, slabGlow] = [createWorldMaterial({ texture: 'stone', seed: 8, vertexColors: true }), createWorldMaterial({ texture: 'stone', seed: 5, emissive: 0.2, vertexColors: true }), glowMaterial(), glowMaterial()];
     const frame = new THREE.Group();
     frame.add(new THREE.Mesh(kit.stone, stoneMat), new THREE.Mesh(kit.glow, frameGlow));
@@ -122,16 +124,15 @@ export function createPassageView(scene: THREE.Scene, g: Game, id: Entity, def: 
         setGlow(slabGlow, awake * (0.5 + 0.12 * pulse + 0.8 * flare) * (1 - smooth(0.7, 1, k)));
         outline.visible = (l.shown || gate !== undefined) && k < 0.98; // the faint outline of a door on the wall: the passage awake and shut
         const moved = smooth(0.1, 1, k);
-        const slide = kit.lift === undefined ? moved * (kit.width + 0.45) : 0; // the slab goes into the wall, or (a sluice, a boulder) up into its housing or down into the earth
+        const slide = moved * (kit.width + 0.45); // the slab goes into the wall
         slab.position.x = slide;
-        if (kit.lift !== undefined) slab.position.y = moved * kit.lift;
-        else slab.scale.z = 1 - 0.1 * smooth(0, 0.08, k); // a little thinner as it goes, so it passes within the wall's faces without fighting them
+        slab.scale.z = 1 - 0.1 * smooth(0, 0.08, k); // a little thinner as it goes, so it passes within the wall's faces without fighting them
         slab.visible = k < 0.999;
         if (l.shown && k > 0.12 && k < 0.95) {
           grit += dt;
           while (grit > 0.05) {
             grit -= 0.05;
-            dust(kit.lift === undefined ? slide - kit.width / 2 - 0.1 : (Math.random() - 0.5) * kit.width, kit.lift === undefined ? kit.height : kit.lift < 0 ? 0.3 : kit.height, def.door!.thick); // from the edge it clears, or the foot of the stone, or the housing's mouth
+            dust(slide - kit.width / 2 - 0.1, kit.height, def.door!.thick); // from the edge it clears
           }
         }
       },

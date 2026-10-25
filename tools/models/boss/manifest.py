@@ -10,6 +10,8 @@ src/data/models/CREDITS.md. A model's id is the one the places' planners (src/wo
   anchors  [(x, y, z)]: where a flame or a light sits in the finished model (its own frame, feet at the origin); `anchor_of` finds one from the
            faces of a material (regex) that are left out of the model: their middle
   recolour (r, g, b): the colours of the source thrown away, its light and dark kept
+  set      which baked file it goes to: 'boss' (bossIndex.ts, bossPack.ts: the default) or 'gate' (gateIndex.ts, gatePack.ts: the arenas' gates, manifest_gates.py)
+  metal_luma  faces darker than this (0..1) are made `metal`, whatever the material said: the iron straps of a plank door
   src       `proc:<name>` makes the form in code (proc.py) from `args`; `rx`, `rz` tip a source over (a pipe laid on its side stood up)
   glass_alpha, fill, plane   what is clear, wet or silvered (round 79): see the fields
   select   a regex or a list for the objects of the scene that make it; `cut` bisects it (blender-space planes: (point, normal)); `drop` leaves
@@ -52,6 +54,8 @@ class M:
     recolour: Any = None  # (r, g, b): every face's colour taken from this by its own light and dark (a colony's painted metal made a pale stone)
     recolour_not: tuple = ()  # classes the recolour leaves as they were (the glazing of a still of copper)
     args: dict = field(default_factory=dict)  # a `proc:` form's arguments (tools/models/boss/proc.py)
+    set: str = 'boss'
+    metal_luma: float = 0
     blank: Any = None  # a figure's head taken off at the bone of this name and an eyeless egg set in its place: {'bone': 'head', 'radii': (x, y, z)}
 
 REGISTRY: list = []

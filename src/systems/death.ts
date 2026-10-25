@@ -11,7 +11,8 @@ import { bountyOf } from './relics';
 import type { Entity } from '../core/ecs';
 import { distXZ, type V3 } from '../core/geom';
 import type { Place } from '../data/arena';
-import { CAMERA, PLAYER } from '../data/tuning';
+import { PLAYER } from '../data/tuning';
+import { resetAim, resetBoom } from './camera';
 import type { Game, GameEvents } from './components';
 import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
@@ -51,7 +52,7 @@ export function restore(g: Game, id: Entity, at: Place): void {
   if (id === g.player.id) {
     dismissMount(g);
     g.player.falling = null; // up from a fall (falls.ts)
-    Object.assign(g.camera, { mountLift: 0, prevMountLift: 0, dist: CAMERA.distance, prevDist: CAMERA.distance });
+    resetBoom(g.camera);
   }
   const { transform, health, poise, stamina, actor, mover, dead } = g.ecs.c;
   const tr = transform.get(id)!;
@@ -93,7 +94,7 @@ function respawn(g: Game, candle: Place | null): void {
   setLock(g, null);
   const sign = g.overworld ? signPlace(g.overworld.sign) : undefined;
   p.kneeling = !candle && sign && distXZ(sign, p.checkpoint) < 8 ? { x: sign.x, z: sign.z } : null; // up from the stone on one knee, as after fast travel (round 31)
-  Object.assign(g.camera, { yaw: at.yaw, prevYaw: at.yaw, pitch: CAMERA.pitch, prevPitch: CAMERA.pitch });
+  resetAim(g.camera, at.yaw);
   g.events.emit('Respawned', { entity: p.id });
 }
 

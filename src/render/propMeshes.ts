@@ -22,6 +22,8 @@ import type { LightSpot } from './worldLights';
 import { createWorldMaterial, type WorldMaterialOptions } from './worldMaterial';
 
 const STONE: Rgb = [0.86, 0.86, 0.84];
+/** The stone of a region's props: the pale stone leaned toward the ground (the arenas' gates are stood in it too, render/gateViews.ts). */
+export const regionStone = (region: RegionDef): Rgb => mixRgb(STONE, region.biome.tint, 0.5);
 const BUDGET = 8; // prop weight per slice (a house weighs 4)
 
 const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
@@ -68,7 +70,7 @@ const CASTS: ReadonlySet<PropMat> = new Set(['stone', 'wood', 'leaf', 'clapboard
 /** What is not darkened toward the ground (light is not baked into it): lamps, lit windows, and what is clear or silvered. */
 const UNSHADED: ReadonlySet<PropMat> = new Set(['glow', 'pane', 'mirror', 'glassware', 'liquid']);
 const RELIEF: ReadonlySet<PropMat> = new Set(['trim', 'pane']);
-const material = (m: PropMat): THREE.ShaderMaterial => {
+export const propMaterial = (m: PropMat): THREE.ShaderMaterial => {
   let mat = materials.get(m);
   if (!mat) {
     materials.set(m, (mat = createWorldMaterial(OPTIONS[m])));
@@ -79,7 +81,7 @@ const material = (m: PropMat): THREE.ShaderMaterial => {
 
 /** Builds the chunk's props; `done` receives one mesh per material used, and the lights among them. */
 export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshes: THREE.Mesh[], lights: LightSpot[], chimneys: Top[]) => void, cover?: Partial<Record<PropMat, THREE.BufferGeometry>>): Generator<void, void> {
-  const c = mixRgb(STONE, region.biome.tint, 0.5);
+  const c = regionStone(region);
   const groups = new Map<PropMat, THREE.BufferGeometry[]>();
   for (const [m, geo] of Object.entries(cover ?? {}) as [PropMat, THREE.BufferGeometry][]) groups.set(m, [geo]);
   const lights: LightSpot[] = [];
@@ -119,7 +121,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   const meshes: THREE.Mesh[] = [];
   for (const [m, geos] of groups) {
     for (const g of geos) if (!g.index) g.setIndex([...Array(g.getAttribute('position').count).keys()]); // merging needs all indexed or none
-    const mesh = new THREE.Mesh(mergeGeometries(geos), material(m));
+    const mesh = new THREE.Mesh(mergeGeometries(geos), propMaterial(m));
     if (m === 'mirror' && mirrors.length) mesh.userData.mirrors = mirrors;
     if (m === 'liquid' || m === 'glassware') mesh.renderOrder = m === 'liquid' ? 1 : 2; // the glass over what it holds
     meshes.push(mesh);

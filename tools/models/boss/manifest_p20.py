@@ -18,4 +18,14 @@ add(
     ay('ay_portal', 'alien_gate', {'width': 14}, solids='none'),
     ay('ay_dome', 'alien_base3', {'height': 12}, solids='box'),
     ay('ay_gantry', 'alien_base8', {'height': 14}, solids='box', recolour=DARK),
+    # round 75: the rest of what Yaddith's city is built of, for a court with engines in it
+    ay('ay_tower', 'alien_tower', {'height': 40}, solids='box'),
+    ay('ay_antenna', 'alien_antenna', {'width': 9}, solids='box', recolour=DARK),
+    ay('ay_generator', 'alien_generator', {'width': 18}, solids='box', recolour=DARK),
+    ay('ay_hangar', 'alien_base4', {'width': 22}, solids='box'),
+    ay('ay_depot', 'alien_base7', {'width': 26}, solids='box', recolour=DARK),
+    ay('ay_keep', 'alien_base10', {'height': 20}, solids='box'),
+    ay('ay_stand', 'alien_stand2', {'height': 14}, solids='box', recolour=DARK),
+    ay('ay_console', 'alien_console_1', {'height': 6}, solids='box'),
+    ay('ay_craft', 'ufo_stand', {'width': 36}, solids='box'),
 )
