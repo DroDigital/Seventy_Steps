@@ -26,8 +26,8 @@ export async function loadModels(): Promise<void> {
 }
 
 /** The face classes a model's bytes carry, and what each is drawn as. */
-export const KIND = { stone: 0, wood: 1, leaf: 2, rock: 4, slab: 5, cobble: 6, brick: 7, cloth: 8, metal: 9, bone: 10, glow: 11 } as const;
-const MATS: Readonly<Record<number, PropMat>> = { 0: 'stone', 1: 'wood', 2: 'leaf', 4: 'rock', 5: 'slab', 6: 'cobble', 7: 'brick', 8: 'cloth', 9: 'metal', 10: 'bone', 11: 'glow' };
+export const KIND = { stone: 0, wood: 1, leaf: 2, rock: 4, slab: 5, cobble: 6, brick: 7, cloth: 8, metal: 9, bone: 10, glow: 11, glass: 12, liquid: 13, mirror: 14, wax: 15 } as const;
+const MATS: Readonly<Record<number, PropMat>> = { 0: 'stone', 1: 'wood', 2: 'leaf', 4: 'rock', 5: 'slab', 6: 'cobble', 7: 'brick', 8: 'cloth', 9: 'metal', 10: 'bone', 11: 'glow', 12: 'glassware', 13: 'liquid', 14: 'mirror', 15: 'wax' };
 const DOUBLE = 0x80;
 
 interface Decoded {
@@ -75,6 +75,14 @@ const CLOTH: Rgb = scaleRgb(mixRgb(BASE.bone, BASE.rust, 0.5), 0.5); // faded
 const METAL: Rgb = [0.26, 0.22, 0.21];
 const BONE: Rgb = scaleRgb(BASE.bone, 0.82);
 const FLAME: Rgb = mixRgb(BASE.bone, [1, 0.8, 0.5], 0.6);
+const GLASS: Rgb = [0.6, 0.66, 0.64]; // (round 79) what is clear, wet, silvered or waxen keeps most of the colour it was baked in, over these
+const LIQUID: Rgb = [0.3, 0.52, 0.34];
+const MIRROR: Rgb = [0.34, 0.38, 0.4];
+const WAX: Rgb = [0.84, 0.76, 0.58];
+/** How much of its own colour each of those keeps whatever the piece says: a liquid is the colour it is, a glass a pale cast of its own. */
+const RETAIN: Readonly<Record<number, number>> = { [KIND.glass]: 0.6, [KIND.liquid]: 0.92, [KIND.wax]: 0.5 };
+/** What a wax figure's faces are drawn as: all but what is lit, metal or already clear. */
+const WAXEN: ReadonlySet<number> = new Set([KIND.stone, KIND.wood, KIND.rock, KIND.slab, KIND.bone, KIND.cloth, KIND.brick, KIND.cobble]);
 
 /** The colour a kind of face is laid over, for this prop. */
 function baseOf(kind: number, look: NonNullable<Prop['set']>, stone: Rgb): Rgb {
@@ -90,6 +98,10 @@ function baseOf(kind: number, look: NonNullable<Prop['set']>, stone: Rgb): Rgb {
     case KIND.metal: return look.dye?.metal ?? METAL;
     case KIND.bone: return look.dye?.bone ?? BONE;
     case KIND.glow: return look.dye?.glow ?? FLAME;
+    case KIND.glass: return GLASS;
+    case KIND.liquid: return LIQUID;
+    case KIND.mirror: return MIRROR;
+    case KIND.wax: return WAX;
     default: return st;
   }
 }
@@ -113,7 +125,7 @@ export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): Piece
     const glass = lamp && look.id === 'lightpost' && m.kind[t] === 1;
     // Replace the baked candle's tall wick with the oil burner's small wick and flame.
     if (lamp && look.id === 'lantern' && m.kind[t] === 1 && m.colour[t * 3 + 1] < 150) continue;
-    const mat = glass ? 'glass' : lamp ? 'stone' : MATS[m.kind[t]] ?? 'stone';
+    const mat = glass ? 'glass' : lamp ? 'stone' : MATS[look.wax && WAXEN.has(m.kind[t]!) ? KIND.wax : m.kind[t]!] ?? 'stone';
     groups.get(mat)?.push(t) ?? groups.set(mat, [t]);
   }
   const out: Piece[] = [];
@@ -148,9 +160,10 @@ export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): Piece
       [nx, ny, nz] = [nx / len, ny / len, nz / len];
       const raw: Rgb = [m.colour[t * 3]! / 255, m.colour[t * 3 + 1]! / 255, m.colour[t * 3 + 2]! / 255];
       const shade = 0.55 + 0.9 * Math.min(1, luma(raw) * 1.3); // its light and dark, over the colour of its kind
-      const base = lamp ? (mat === 'glass' ? LAMP_GLASS : m.kind[t] === 1 ? LAMP_BASE[1]! : m.kind[t] === 0 ? LAMP_BASE[0]! : LAMP_BASE[2]!) : baseOf(m.kind[t]!, look, stone);
-      const retained = lamp ? 0 : keep;
-      const lit = m.kind[t] === KIND.glow ? 1 : shade;
+      const kind = look.wax && WAXEN.has(m.kind[t]!) ? KIND.wax : m.kind[t]!;
+      const base = lamp ? (mat === 'glass' ? LAMP_GLASS : m.kind[t] === 1 ? LAMP_BASE[1]! : m.kind[t] === 0 ? LAMP_BASE[0]! : LAMP_BASE[2]!) : baseOf(kind, look, stone);
+      const retained = lamp ? 0 : Math.max(keep, RETAIN[kind] ?? 0);
+      const lit = kind === KIND.glow ? 1 : shade;
       const [r, g, bl] = [0, 1, 2].map((i) => base[i]! * lit * (1 - retained) + raw[i]! * retained * 1.3);
       put(ia, ib, ic, nx, ny, nz, r!, g!, bl!);
       if (m.both[t]) put(ia, ic, ib, -nx, -ny, -nz, r!, g!, bl!);

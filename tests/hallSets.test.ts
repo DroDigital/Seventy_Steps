@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HALL_SETS } from '../src/data/hallSets';
+import { ROOM_SETS } from '../src/data/roomSets';
 import { MODEL_INFO } from '../src/data/models/index';
 import { PROP_KINDS } from '../src/data/regions';
 import { SET_KITS } from '../src/data/setKits';
@@ -32,6 +33,13 @@ describe("a boss hall's set (round 62: the halls were a heart, braziers and two 
     }
   });
 
+  it('stands in some dungeon every baked model a hall or a room set names (a put can be written and never fit its hall)', () => {
+    const named = new Set([...Object.values(HALL_SETS), ...Object.values(ROOM_SETS)].flatMap((s) => s.puts.map((u) => u.piece.of)).filter((id) => !!MODEL_INFO[id]));
+    const stood = new Set(w.dungeons.flatMap((d) => d.decor.filter((p) => p.kind === 'set' && p.set).map((p) => p.set!.id)));
+    expect(named.size).toBeGreaterThan(80);
+    expect([...named].filter((id) => !stood.has(id)), 'named by a set and placed in no dungeon').toEqual([]);
+  });
+
   it('stands a real set in each hall: pieces enough, all inside its walls, none taller than its roof allows', () => {
     for (const { d, r, boss } of halls) {
       const placed = setsIn(d, r);
@@ -47,7 +55,8 @@ describe("a boss hall's set (round 62: the halls were a heart, braziers and two 
   it('keeps the fight clear, the walls and pillars clear, and the doorways open', () => {
     for (const { d, r, boss } of halls) {
       const solids = setsIn(d, r).filter((p) => reach(p) > 0);
-      for (const p of solids) {
+      const hearts = new Set(HALL_SETS[boss].puts.filter((u) => u.piece.heart).map((u) => u.piece.of)); // (round 79: a great piece at a hall's edge is a heart, which the fight's circle does not bar: it stands against the wall, clear of the doors and the room's things)
+      for (const p of solids.filter((q) => !hearts.has(q.set!.id))) {
         expect(Math.hypot(p.x - r.x, p.z - r.z) - reach(p), `${boss}: ${p.set!.id} in the fight`).toBeGreaterThanOrEqual(SET_RULES.inner * (r.half - DUNGEON.wall) - 0.01);
         expect(solidGap(d.parts, p.x, p.z, r.level) - reach(p), `${boss}: ${p.set!.id} in a wall or a pillar`).toBeGreaterThanOrEqual(HALL.wall - 0.01);
       }

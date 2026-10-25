@@ -14,6 +14,7 @@ import * as THREE from 'three';
 import type { V3 } from '../core/geom';
 import { LIGHTS, SANITY, type LightDef, type LightKind } from '../data/tuning';
 import type { CollisionWorld } from '../world/colliders';
+import { createFlames } from './flames';
 import { createHalos } from './halos';
 import { createLightSight } from './lightSight';
 import { paneLit } from './paneLife';
@@ -46,10 +47,14 @@ export function glassFacing(s: LightSpot, eye: { x: number; y: number; z: number
 
 export interface WorldLights {
   readonly halos: THREE.Mesh;
+  /** The pixel flames at the fires, torches and lamps (round 79: flames.ts). */
+  readonly flames: THREE.Mesh;
   add(key: number, spots: readonly LightSpot[]): void;
   remove(key: number): void;
   /** How well lit the ground at a point is by lamps, fires, torches and windows (0..1) at `time`: each counts within its share of its light's range, and the Elder Signs' glow, an Echo's and the lantern's own do not. */
   lightAt(x: number, y: number, z: number, time: number): number;
+  /** Calls `fn` with each fire and torch within `reach` metres of `at` (and its distance): what a fire gives off (round 79: fireLife.ts). */
+  fires(at: V3, reach: number, fn: (s: LightSpot, d: number) => void): void;
   /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
   update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3, lanternCover?: number): void;
   /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps), nearest first (round 35: lampShadows.ts). */
@@ -57,6 +62,7 @@ export interface WorldLights {
 }
 
 const MAX_HALOS = 400;
+const MAX_FLAMES = 640;
 
 /** How far the mind has gone (0..1; set each frame by worldLife.ts, round 26): the flames of a failing mind's world waver harder, and some gutter out for a moment. */
 export const LIGHT_NERVES = { madness: 0 };
@@ -76,6 +82,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
   const spots = new Map<number, readonly LightSpot[]>();
   const batch = createHalos(MAX_HALOS, LIGHTS.haloFog);
   const halos = batch.mesh;
+  const flameBatch = createFlames(MAX_FLAMES);
   const sight = createLightSight(world);
   const haloSight = createLightSight(world);
   const near: { s: LightSpot; d: number; v: number }[] = []; // in reach of the investigator, nearest first
@@ -84,12 +91,22 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
   const casters: Caster[] = [];
   return {
     halos,
+    flames: flameBatch.mesh,
     casters,
     add(key, list) {
       if (list.length) spots.set(key, list);
     },
     remove(key) {
       spots.delete(key);
+    },
+    fires(at, reach, fn) {
+      for (const list of spots.values()) {
+        for (const s of list) {
+          if (s.kind !== 'fire' && s.kind !== 'torch') continue;
+          const d = Math.hypot(s.x - at.x, s.y - at.y, s.z - at.z);
+          if (d < reach) fn(s, d);
+        }
+      }
     },
     lightAt(x, y, z, time) {
       let sum = 0;
@@ -150,6 +167,22 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         if (!batch.put(s.x, s.y, s.z, s.halo ?? k.halo, k.haloColor ?? k.color, (s.haloGain ?? k.haloGain) * v * waver(s, k.flicker, time))) break;
       }
       batch.end();
+      flameBatch.begin();
+      for (const { s, d, v } of visible) {
+        const f = LIGHTS.flames[s.kind];
+        if (!f || v <= 0.02 || d > LIGHTS.flameReach) continue;
+        const seed = (Math.abs(Math.sin(s.x * 12.9898 + s.z * 78.233 + s.y * 4.1414)) * 43758.5453) % 1; // its own beat, turn and ground
+        const gain = v * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time)));
+        let full = false;
+        for (let i = 0; i < f.count && !full; i++) {
+          const a = (seed + i / f.count) * Math.PI * 2;
+          const spread = f.count > 1 ? f.spread : 0;
+          const h = f.height * (f.count > 1 ? 0.7 + 0.3 * ((seed * 7 + i * 0.37) % 1) : 1);
+          full = !flameBatch.put(s.x + Math.cos(a) * spread, s.y + f.base, s.z + Math.sin(a) * spread, h, (seed * 3 + i * 0.27) % 1, (seed * 11 + i) % 2 < 1 ? 1 : -1, 'warm', gain);
+        }
+        if (full) break;
+      }
+      flameBatch.end();
     },
   };
 }

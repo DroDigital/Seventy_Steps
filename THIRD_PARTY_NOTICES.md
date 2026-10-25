@@ -69,6 +69,13 @@ The recorded sounds in `public/audio` are from Freesound, every one dedicated to
 under Creative Commons 0 (CC0 1.0 Universal). No notice is required; each file is credited anyway, with
 its source recording and treatment, in [`public/audio/CREDITS.md`](public/audio/CREDITS.md).
 
+## Baked models, flames, smoke and surface patterns
+
+The 3D models stood in the arenas, boss places and dungeons are baked from free models into the game's own data (nothing is loaded as a source file at run
+time); the pixel flames and the smoke are cut from two free animations and the stone, flagstone and plank patterns from a PS1 dungeon pack. Each source, its author,
+its licence (CC0 1.0 or Creative Commons Attribution 4.0, with the credit text the licence asks for) and what was changed are in
+[`src/data/models/CREDITS.md`](src/data/models/CREDITS.md).
+
 ## Title theme
 
 `public/music/subterranean-pulse.mp3`. Its author and licence are not yet recorded; they must be
