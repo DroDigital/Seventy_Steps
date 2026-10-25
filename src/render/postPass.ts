@@ -2,11 +2,13 @@
 
 import * as THREE from 'three';
 import { LOOKS } from '../data/looks';
+import { SHAFT } from '../data/mistLight';
 import { FOG, FX, LIGHT, LIGHTING } from '../data/tuning';
 import type { FxParams } from './fx';
 import { ANOMALY_HUES } from './palette';
 import { ANOMALY_FROM, ANOMALY_TO, buildRealmPalette, gradeTints } from './realmPalette';
 import { POST_FRAG, POST_VERT } from './shaders/post';
+import { LAMP_SLOTS } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
 function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, palette: Float32Array) {
@@ -33,6 +35,11 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uLanternDecay: w.uLanternDecay,
     uLamps: w.uLamps,
     uLampColors: w.uLampColors,
+    uLampAim: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4(0, 0, 0, 0)) }, // where each of those lights throws its glow in the mist (render/lampAim.ts; round 80)
+    uShadowMap: w.uShadowMap, // the moon's depth map, which the mist is lit by as the surfaces are (moonShadow.ts fills them; render/moonShafts.ts; round 80)
+    uShadowMat: w.uShadowMat,
+    uShadow: w.uShadow,
+    uShaft: { value: new THREE.Vector4(0, SHAFT.floor, SHAFT.reach, 0) }, // none until a frame sets it
     uRes: { value: new THREE.Vector2(1, 1) },
     uTime: { value: 0 },
     uRipple: { value: 0 },
@@ -78,7 +85,7 @@ export function createPostPass(source: THREE.Texture, depth: THREE.Texture | nul
   const palette = buildRealmPalette(LOOKS.hub);
   const uniforms = createUniforms(source, depth, new Float32Array(palette.flat()));
   const material = new THREE.ShaderMaterial({
-    defines: { PALETTE_SIZE: palette.length, ANOMALY_FROM, ANOMALY_TO, FOG_STEPS: FOG.steps },
+    defines: { PALETTE_SIZE: palette.length, ANOMALY_FROM, ANOMALY_TO, FOG_STEPS: FOG.steps, SHAFT_STEPS: SHAFT.steps },
     uniforms,
     vertexShader: POST_VERT,
     fragmentShader: POST_FRAG,

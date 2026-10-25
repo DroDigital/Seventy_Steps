@@ -14,6 +14,8 @@ import { contactsOf, type Contact } from '../world/groundContact';
 import type { Prop } from '../world/props';
 import { roadShare, type RoadSeg } from '../world/regionPlan';
 import { inDungeon, surface } from '../world/terrain';
+import { REGION_COVER } from '../data/coverKinds';
+import { regionPiece } from './coverPieces';
 import { Builder, COVER, GAIN, plantAt, shade, type Kind } from './groundCover';
 import type { PropMat } from './propShapes';
 
@@ -47,6 +49,7 @@ function root(b: Builder, x: number, y: number, z: number, a: number, r0: number
 export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: readonly RoadSeg[], done: (cover: Partial<Record<PropMat, THREE.BufferGeometry>>) => void): Generator<void, void> {
   const cover = COVER[region.biome.texture];
   const [leaf, stone, wood] = [new Builder(true), new Builder(), new Builder(true)];
+  const own = region.id in REGION_COVER;
   if (cover.mix.length) {
     let spent = 0;
     for (const p of props) {
@@ -65,6 +68,7 @@ export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: 
         if (y === null) continue;
         let roll = rng();
         const kind: Kind = cover.mix.find(([, w]) => (roll -= w) < 0)?.[0] ?? 'pebble';
+        if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 80: weed and bone lie against a wall as they do on open ground
         plantAt(kind, leaf, stone, rng, x, y, z);
       }
       if (ROOTED.has(p.kind) && c.round) {
