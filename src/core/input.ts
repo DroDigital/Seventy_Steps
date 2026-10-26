@@ -136,7 +136,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     held[b] = false;
   };
   const captured = (): boolean => document.pointerLockElement === canvas;
-  /** The request alone: a key held down asks again with each repeat, and a repeat must not keep the mouse held back (round 87). */
+  /** The request alone: a key held down asks again with each repeat, and a repeat must not keep the mouse held back (round 89). */
   const request = (): void => {
     try {
       const r: unknown = canvas.requestPointerLock();
