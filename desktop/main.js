@@ -159,7 +159,7 @@ ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
 // Cosmetic mount DLC; only Steam ownership and installation, or (an itch.io full game only, round 84: mountUnlock.js) a signed code the buyer
-// pasted, can unlock either appearance. The code is kept as a file and read again at every ask; the page never sees the clipboard's text.
+// pasted, can unlock either appearance. The codes (one a line, a code for each purchase) are kept as a file and read again at every ask; the page never sees the clipboard's text.
 const unlockFile = () => join(app.getPath('userData'), 'mount-unlock.txt');
 const storedCode = () => {
   try {
@@ -171,7 +171,7 @@ const storedCode = () => {
 ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc() || mountsUnlockedHere(storedCode()).includes('automobile'));
 ipcMain.handle('desktop:chariot-dlc', () => steamOwnsChariotDlc() || mountsUnlockedHere(storedCode()).includes('chariot'));
 ipcMain.handle('desktop:mount-unlock', () => {
-  const got = redeem(clipboard.readText());
+  const got = redeem(clipboard.readText(), undefined, undefined, storedCode());
   if (!got.ok) return { ok: false, reason: got.reason };
   try {
     writeWhole(unlockFile(), `${got.code}\n`);

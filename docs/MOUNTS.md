@@ -97,7 +97,7 @@ download, `UNLOCK.txt`, holds a code. The buyer copies the code, opens the Mount
 - **Who honours it:** only an itch.io pack of the full game (`channel` "itch", `edition` "full"). A Steam build never reads one (it has its own
   check, above) and the demo lists the plain chariot alone.
 - **How it is kept:** the shell reads the clipboard itself (`desktop:mount-unlock`; the page receives only ok or the reason: none, invalid, keep,
-  store), writes the code to `mount-unlock.txt` in the user's data folder, and reads it again at every ownership check (start, each window
+  store), writes the code to `mount-unlock.txt` in the user's data folder (a second code, for the other mount, is added to the first, one a line, up to eight, the newest last; a stale one that no longer verifies is dropped on the next paste), and reads it again at every ownership check (start, each window
   focus), as Steam's is read. Nothing about it goes into a save, so the saves stay in format 3 and older builds read them. It works offline.
 - **An honour system, said plainly:** one code opens the game for every buyer, and the source is public, so it keeps honest buyers honest and
   nothing more, as the Steam check does (the art is code in the base build either way). A leaked code is retired by a new key pair, a new

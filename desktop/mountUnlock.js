@@ -20,18 +20,21 @@ export const UNLOCK_MOUNTS = Object.freeze(['chariot', 'automobile']);
 export const UNLOCK_PUBLIC_KEY = '5Eg9HLt56eztsnFPpiZxzPQMk3Sr+jbb1H7hpSHAFpo=';
 
 const SPKI_ED25519 = Buffer.from('302a300506032b6570032100', 'hex'); // what DER puts before a raw Ed25519 key
-const SHAPE = /SS-MOUNTS\.([A-Za-z0-9_-]{16,2048})\.([A-Za-z0-9_-]{86})/; // 86 characters: a 64-byte signature, unpadded
+const SHAPE = /SS-MOUNTS\.([A-Za-z0-9_-]{16,2048})\.([A-Za-z0-9_-]{86})/g; // 86 characters: a 64-byte signature, unpadded
+/** How many codes a pack keeps: one for each purchase it was given (a code for one mount, then another for the other), the newest last. */
+export const UNLOCK_KEEP = 8;
 
-/** The code in a text (a clipboard holding the whole unlock file, a line wrapped on the way, stray words): null when there is none. */
-export function findCode(text) {
-  const m = SHAPE.exec(String(text ?? '').replace(/\s+/g, ''));
-  return m ? `${UNLOCK_TAG}.${m[1]}.${m[2]}` : null;
+/** Every code in a text (a clipboard holding the whole unlock file, a line wrapped on the way, stray words, several codes), once each, in order. */
+export function findCodes(text) {
+  const flat = String(text ?? '').replace(/\s+/g, '');
+  return [...new Set([...flat.matchAll(SHAPE)].map((m) => `${UNLOCK_TAG}.${m[1]}.${m[2]}`))];
 }
 
-/** What a code opens: `{ mounts, id }` when its signature is the key's and its payload is ours, else null. Never throws. */
-export function unlockedMounts(text, publicKey = UNLOCK_PUBLIC_KEY) {
-  const code = findCode(text);
-  if (!code) return null;
+/** The first code in a text: null when there is none. */
+export const findCode = (text) => findCodes(text)[0] ?? null;
+
+/** What one code opens: `{ mounts, id }` when its signature is the key's and its payload is ours, else null. Never throws. */
+function opens(code, publicKey) {
   const [tag, payload, signature] = code.split('.');
   try {
     const key = createPublicKey({ key: Buffer.concat([SPKI_ED25519, Buffer.from(publicKey, 'base64')]), format: 'der', type: 'spki' });
@@ -46,6 +49,13 @@ export function unlockedMounts(text, publicKey = UNLOCK_PUBLIC_KEY) {
   }
 }
 
+/** What the codes in a text open together (a code for each mount adds up): `{ mounts, id }` of the first valid, else null. Never throws. */
+export function unlockedMounts(text, publicKey = UNLOCK_PUBLIC_KEY) {
+  const got = findCodes(text).map((code) => opens(code, publicKey)).filter(Boolean);
+  if (!got.length) return null;
+  return { mounts: UNLOCK_MOUNTS.filter((id) => got.some((g) => g.mounts.includes(id))), id: got[0].id };
+}
+
 /** Whether this pack may honour a code at all: the itch.io full game. `pkg` as steam.js takes it (the program's own package.json when omitted). */
 export const honoursCode = (pkg) => channel(pkg) === 'itch' && edition(pkg) === 'full';
 
@@ -55,13 +65,18 @@ export function mountsUnlockedHere(stored, pkg, publicKey) {
 }
 
 /**
- * The player pressed "Paste unlock code": what the clipboard's text comes to. `ok` with the `code` to keep and the `mounts` it opens;
- * else `reason`: `store` (this pack takes no code), `none` (no code in the text) or `invalid` (a code, but not one this game's key signed).
+ * The player pressed "Paste unlock code": what the clipboard's text comes to, with the codes kept from before (`stored`, which a code for
+ * the other mount must not replace). `ok` with the `code` to keep (every valid code, one a line, the newest last) and the `mounts` they
+ * open together; else `reason`: `store` (this pack takes no code), `none` (no code in the text) or `invalid` (a code, but not one this
+ * game's key signed).
  */
-export function redeem(clipboard, pkg, publicKey) {
+export function redeem(clipboard, pkg, publicKey, stored = '') {
   if (!honoursCode(pkg)) return { ok: false, reason: 'store' };
-  const code = findCode(clipboard);
-  if (!code) return { ok: false, reason: 'none' };
-  const opens = unlockedMounts(code, publicKey);
-  return opens ? { ok: true, mounts: opens.mounts, code } : { ok: false, reason: 'invalid' };
+  const pasted = findCodes(clipboard);
+  if (!pasted.length) return { ok: false, reason: 'none' };
+  const fresh = pasted.filter((code) => opens(code, publicKey));
+  if (!fresh.length) return { ok: false, reason: 'invalid' };
+  const kept = findCodes(stored).filter((code) => opens(code, publicKey));
+  const code = [...new Set([...kept, ...fresh])].slice(-UNLOCK_KEEP).join('\n');
+  return { ok: true, mounts: unlockedMounts(code, publicKey).mounts, code };
 }

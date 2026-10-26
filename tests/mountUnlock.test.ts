@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { describe, expect, it, vi } from 'vitest';
-import { UNLOCK_MOUNTS, UNLOCK_PUBLIC_KEY, findCode, honoursCode, mountsUnlockedHere, redeem, unlockedMounts } from '../desktop/mountUnlock.js';
+import { UNLOCK_KEEP, UNLOCK_MOUNTS, UNLOCK_PUBLIC_KEY, findCode, findCodes, honoursCode, mountsUnlockedHere, redeem, unlockedMounts } from '../desktop/mountUnlock.js';
 import { newKeyPair, signCode } from '../tools/mount_unlock.mjs';
 
 const pair = newKeyPair();
@@ -67,6 +67,34 @@ describe('the signed unlock code of the itch.io Mounts pack (round 84)', () => {
     expect(redeem(both, { channel: 'itch', edition: 'demo' }, pair.publicKey)).toEqual({ ok: false, reason: 'store' });
   });
 
+  it('adds up a code for each mount: the second paste keeps the first, a repeat adds nothing, a stale code is dropped (Codex, PR 194)', () => {
+    const chariot = signCode(pair.privatePem, { mounts: ['chariot'], id: 'a' });
+    const motor = signCode(pair.privatePem, { mounts: ['automobile'], id: 'b' });
+    const first = redeem(chariot, itch, pair.publicKey, '');
+    expect(first).toEqual({ ok: true, mounts: ['chariot'], code: chariot });
+    const second = redeem(motor, itch, pair.publicKey, first.ok ? first.code : '');
+    expect(second).toEqual({ ok: true, mounts: ['chariot', 'automobile'], code: `${chariot}\n${motor}` });
+    const kept = second.ok ? second.code : '';
+    expect(mountsUnlockedHere(kept, itch, pair.publicKey)).toEqual(['chariot', 'automobile']); // what a restart reads back
+    expect(unlockedMounts(kept, pair.publicKey)).toEqual({ mounts: ['chariot', 'automobile'], id: 'a' });
+    expect(findCodes(`${chariot}\r\n  ${motor.slice(0, 30)}\n${motor.slice(30)}\r\n${chariot}`)).toEqual([chariot, motor]);
+    expect(redeem(chariot, itch, pair.publicKey, kept)).toEqual({ ok: true, mounts: ['chariot', 'automobile'], code: kept });
+    const stale = signCode(other.privatePem, { mounts: ['automobile'] });
+    expect(redeem(chariot, itch, pair.publicKey, stale)).toEqual({ ok: true, mounts: ['chariot'], code: chariot });
+    expect(redeem(stale, itch, pair.publicKey, kept)).toEqual({ ok: false, reason: 'invalid' }); // nothing kept is touched by a bad paste
+    expect(mountsUnlockedHere(`${stale}\n${motor}`, itch, pair.publicKey)).toEqual(['automobile']); // a bad code does not mask a good one
+  });
+
+  it('keeps no more than a few codes, the newest', () => {
+    let kept = '';
+    const made = Array.from({ length: UNLOCK_KEEP + 3 }, (_, i) => signCode(pair.privatePem, { mounts: ['chariot'], id: `n${i}` }));
+    for (const code of made) {
+      const got = redeem(code, itch, pair.publicKey, kept);
+      kept = got.ok ? got.code : kept;
+    }
+    expect(findCodes(kept)).toEqual(made.slice(-UNLOCK_KEEP));
+  });
+
   it('holds the public key alone: 32 bytes, and no code made with a key of this test opens the shipped one', () => {
     expect(atob(UNLOCK_PUBLIC_KEY)).toHaveLength(32);
     expect(UNLOCK_PUBLIC_KEY).not.toBe(pair.publicKey);
@@ -96,6 +124,7 @@ describe('the signed unlock code of the itch.io Mounts pack (round 84)', () => {
     expect(main).toContain("steamOwnsAutomobileDlc() || mountsUnlockedHere(storedCode()).includes('automobile')");
     expect(main).toContain("steamOwnsChariotDlc() || mountsUnlockedHere(storedCode()).includes('chariot')");
     expect(main).toContain("ipcMain.handle('desktop:mount-unlock'");
+    expect(main).toContain('redeem(clipboard.readText(), undefined, undefined, storedCode())'); // a second code is added to the first
     expect(main).toContain('`--channel=${channel()}`');
   });
 
