@@ -11,7 +11,7 @@ import { createRng, type Rng } from '../core/rng';
 import type { Prop } from '../world/props';
 import { box } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
-import type { Piece } from './propShapes';
+import type { SolidPiece } from './propShapes';
 
 const WOOD: Rgb = scaleRgb(mixRgb(BASE.charcoal, BASE.rust, 0.35), 1.6);
 const SPINES: readonly Rgb[] = [[0.42, 0.16, 0.14], [0.2, 0.24, 0.34], [0.3, 0.34, 0.2], [0.48, 0.38, 0.22], [0.26, 0.2, 0.3], [0.5, 0.46, 0.4]];
@@ -29,7 +29,7 @@ function spines(parts: THREE.BufferGeometry[], rng: Rng, x0: number, x1: number,
 }
 
 /** A case: two sides, a back, a top and a plinth, and `rows` shelves, each filled with books. */
-function cased(p: Prop, rows: number): Piece[] {
+function cased(p: Prop, rows: number): SolidPiece[] {
   const [rng, c, plinth] = [createRng(p.seed), woodOf(p), 0.12];
   const [w2, d2] = [p.w * 2, p.d * 2];
   const frame: THREE.BufferGeometry[] = [
@@ -48,12 +48,12 @@ function cased(p: Prop, rows: number): Piece[] {
 }
 
 /** A tall case of books, five shelves. */
-export const bookcase = (p: Prop): Piece[] => cased(p, Math.max(3, Math.round(p.h / 0.5)));
+export const bookcase = (p: Prop): SolidPiece[] => cased(p, Math.max(3, Math.round(p.h / 0.5)));
 /** A low case, two or three shelves. */
-export const bookcaseLow = (p: Prop): Piece[] => cased(p, Math.max(2, Math.round(p.h / 0.4)));
+export const bookcaseLow = (p: Prop): SolidPiece[] => cased(p, Math.max(2, Math.round(p.h / 0.4)));
 
 /** A shelf on a wall: a plank on two brackets, a row of books on it. */
-export function bookshelf(p: Prop): Piece[] {
+export function bookshelf(p: Prop): SolidPiece[] {
   const [rng, c] = [createRng(p.seed), woodOf(p)];
   const frame = [box(p.w * 2, 0.04, p.d * 2, 0, 0.02, 0, c), ...[-1, 1].map((e) => box(0.04, 0.12, p.d * 1.6, e * (p.w - 0.15), -0.06, 0, scaleRgb(c, 0.8)))];
   const books: THREE.BufferGeometry[] = [];
@@ -62,7 +62,7 @@ export function bookshelf(p: Prop): Piece[] {
 }
 
 /** A heap of books on the floor, each turned its own way. */
-export function bookpile(p: Prop): Piece[] {
+export function bookpile(p: Prop): SolidPiece[] {
   const [rng, n] = [createRng(p.seed), 5 + (p.seed % 3)];
   const books: THREE.BufferGeometry[] = [];
   for (let i = 0; i < n; i++) {

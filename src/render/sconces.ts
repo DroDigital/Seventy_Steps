@@ -4,19 +4,17 @@
  * fixed height above a wall's lowest point, which on stairs buried some and hung some in the air):
  * now they stand evenly along each stretch of wall, a spacing of the kit's own (`flames`, the share
  * of a four-metre pilaster that bears one), on the faces that look into a room, at a height above the
- * floor of that room, each an iron bracket and cup with a tapering flame and a brighter core, and
- * every one a light. Pure but for the geometry it makes.
+ * floor of that room, each an iron bracket and cup, and every one a light (round 87: its flame is the
+ * pixel flame's, flames.ts, and no cone of one is built). Pure but for the geometry it makes.
  */
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { box, tint } from './meshKit';
+import { box } from './meshKit';
 import type { Rgb } from './palette';
 import type { LightSpot } from './worldLights';
 
 const IRON: Rgb = [0.3, 0.29, 0.3];
-const FLAME: Rgb = [1, 0.78, 0.5];
-const CORE: Rgb = [1, 0.96, 0.8];
 const HEIGHT = 1.95; // metres above the floor: the flame stands a little over a man's head
 const SPAN = [4, 14] as const; // the nearest and the farthest apart two torches stand along a wall
 export const EDGE = 1.2; // metres from the end of a stretch of wall (a doorway's jamb, a corner) that a torch keeps
@@ -33,9 +31,6 @@ export function torchStops(len: number, flames: number): number[] {
   });
 }
 
-/** How many vertices one torch's flame is drawn with (a tapering cone and a brighter core): meshes of flames are counted by it. */
-export const FLAME_VERTICES = sconce({ x: 0, z: 0, across: 1, alongX: true, floor: 0 }, 1).flame.getAttribute('position').count;
-
 /** Which faces of a wall a torch may stand on: `+1`, `−1` (the sides of its across axis), or both for a wall with a room on each side; `inner` is the one side an outer wall has a room on (0: both). */
 export const facesOf = (inner: number, index: number): number => (inner !== 0 ? inner : index % 2 ? 1 : -1);
 
@@ -47,8 +42,8 @@ export interface SconceSite {
   floor: number; // the floor of the room it lights
 }
 
-/** The bracket and flame of one torch, and its light. */
-export function sconce(s: SconceSite, thick: number): { iron: THREE.BufferGeometry; flame: THREE.BufferGeometry; light: LightSpot } {
+/** The bracket of one torch, and its light (the flame in its cup is the pixel flame's). */
+export function sconce(s: SconceSite, thick: number): { iron: THREE.BufferGeometry; light: LightSpot } {
   const off = s.across * (thick / 2 + 0.13); // the plate's centre: on the face of the wall
   const [px, pz] = s.alongX ? [s.x, s.z + off] : [s.x + off, s.z];
   const y = s.floor + HEIGHT;
@@ -58,12 +53,9 @@ export function sconce(s: SconceSite, thick: number): { iron: THREE.BufferGeomet
   const arm = box(s.alongX ? 0.05 : 0.2, 0.05, s.alongX ? 0.2 : 0.05, px + ox, y - 0.1, pz + oz, IRON);
   const cup = box(0.15, 0.09, 0.15, px + ox * 2, y - 0.04, pz + oz * 2, IRON);
   const [fx, fz] = [px + ox * 2, pz + oz * 2];
-  const body = tint(new THREE.ConeGeometry(0.085, 0.34, 5).translate(fx, y + 0.17, fz), FLAME);
-  const core = tint(new THREE.ConeGeometry(0.045, 0.2, 5).translate(fx, y + 0.12, fz), CORE);
   for (const g of [plate, arm, cup]) if (!g.index) g.setIndex([...Array(g.getAttribute('position').count).keys()]);
   return {
     iron: mergeGeometries([plate, arm, cup]),
-    flame: mergeGeometries([body, core]),
     light: { x: fx, y: y + 0.22, z: fz, kind: 'torch' },
   };
 }

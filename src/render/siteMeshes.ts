@@ -34,7 +34,7 @@ const PER_STEP = 12;
 const SLAB = 0.3; // a floor slab's depth (world/dungeonParts.ts)
 
 type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31)
-type Built = { kind: Kind; geo: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts)
+type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 87: the pixel flame, flames.ts, is its picture)
 /** What a piece is drawn with: a kit's texture, or (marked `+`) the same drawn a little nearer than it is, for relief that stands 6 to 15 cm off a wall's face. */
 export type Group = KitTexture | 'glow' | 'cloth+' | `${KitTexture}+`;
 type Origin = { x: number; z: number }; // where a dungeon's world-space UVs count from
@@ -59,7 +59,7 @@ const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall 
 function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], w: Parameters<typeof hangTorches>[1], ctx: WallContext): void {
   for (const s of hangTorches(stops, w, ctx)) {
     stone.push(s.iron);
-    glow.push({ kind: 'glow', geo: s.flame, light: s.light });
+    glow.push({ kind: 'glow', light: s.light });
   }
 }
 
@@ -236,14 +236,16 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
     const kit = kitOfRoom(d.layout, d.layout.rooms[part.room]); // each room its own kit (round 13)
     const ctx = wallContext(d.layout, part, solids);
     for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx)) {
-      geo.userData.part = index; // which of the dungeon's parts it is (the depth audit names its finds by it)
-      add(textureOf(kind, kit), geo);
+      if (geo) {
+        geo.userData.part = index; // which of the dungeon's parts it is (the depth audit names its finds by it)
+        add(textureOf(kind, kit), geo);
+      }
       if (light) lights.push(light);
     }
     if (k % PER_STEP === PER_STEP - 1) yield;
   }
   for (const { kind, kit, geo, light } of dressing(d.layout, colour, at, lights)) {
-    add(textureOf(kind, kit), geo);
+    if (geo) add(textureOf(kind, kit), geo);
     if (light) lights.push(light);
   }
   for (const s of dungeonShell(d.layout, d.parts, colour)) add(s.texture, s.geo);

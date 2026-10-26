@@ -1,5 +1,5 @@
 /**
- * Lights that last a moment (round 83; render/flashLights.ts): a shot, a blow, a bolt in flight take
+ * Lights that last a moment (round 83; render/flashLights.ts): a foe's blow, a foe's bolt in flight take
  * the slots of the farthest of the world's own lamps, so the world, the creatures and the mist light up
  * with no shader loop made longer.
  */
