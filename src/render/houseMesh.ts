@@ -12,7 +12,7 @@ import { createRng, type Rng } from '../core/rng';
 import type { Prop } from '../world/props';
 import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
-import type { Piece, PropMat } from './propShapes';
+import type { PropMat, SolidPiece } from './propShapes';
 
 const TRIM: Rgb = scaleRgb(BASE.bone, 1.1);
 const PANE: Rgb = scaleRgb(BASE.charcoal, 0.5);
@@ -185,7 +185,7 @@ function wing(side: 1 | -1, wx: number, wd: number, h: number, tone: Rgb, rng: R
 }
 
 /** A house's pieces. */
-export function housePieces(p: Prop, c: Rgb): Piece[] {
+export function housePieces(p: Prop, c: Rgb): SolidPiece[] {
   const rng = createRng(p.seed);
   const style = p.style ?? 'clapboard';
   const { w, d } = p;
@@ -263,7 +263,7 @@ export function housePieces(p: Prop, c: Rgb): Piece[] {
     if (rng() < 0.3) glowing.push({ geo: paneBox(0.06, 0.56, 0.56, gx, y, 0, seed), at: [gx + side * 0.52, y, 0], glass: [gx, y, 0], pane: seed });
     else extras.push(box(0.06, 0.56, 0.56, gx, y, 0, PANE));
   }
-  const pieces: Piece[] = [
+  const pieces: SolidPiece[] = [
     { mat: wallMat, geo: mergeGeometries([...body, ...gabs]) },
     { mat: 'stone', geo: mergeGeometries([footing, tileUv(step, 1, 1)]) },
     { mat: style === 'stone' ? 'stone' : 'shingle', geo: tint(mergeGeometries(roofs), roofTint) },

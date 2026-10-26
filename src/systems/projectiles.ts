@@ -70,7 +70,7 @@ export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyD
 function land(g: Game, e: Entity, at: V3, on: 'body' | 'ground' | 'wall' | 'spent'): void {
   const b = g.ecs.c.bolt.get(e)!;
   if (b.pool && !b.conjured) spawnPool(g, b.owner, b.faction, at, b.pool);
-  g.events.emit('BoltLanded', { owner: b.owner, at: { ...at }, vel: { ...b.vel }, on, radius: b.radius, lob: b.lob, fire: !!b.pool?.fire, conjured: b.conjured });
+  g.events.emit('BoltLanded', { owner: b.owner, faction: b.faction, at: { ...at }, vel: { ...b.vel }, on, radius: b.radius, lob: b.lob, fire: !!b.pool?.fire, conjured: b.conjured });
   g.ecs.despawn(e);
 }
 
