@@ -18,8 +18,14 @@ import { worldUniforms } from './worldMaterial';
 export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a crowd took the oldest away mid-flight)
 
 /** Round 79 added the smoke's puff (a free smoke sprite, data/flameAtlas.ts). Round 60 added the signatures' shapes (render/fxForms.ts): a rune, an eye, a fang's crescent, a bubble, a forked bolt, a feather, a petal, a note. */
-export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff'] as const;
+export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff', 'crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
+
+/** Round 87 (the quiet blows, data/foeBlows.ts): a tapering crescent, an S-curve lash, a thin cross of light, a row of ticks and an open ring ('crescent', 'lash', 'cross', 'dash', 'arc': drawn in the shader), and six free masks, cut from Kenney's CC0 Particle Pack (data/markAtlas.ts), that a 'mark' (turns about its centre) or a 'trace' (lies along its flight, as a streak does) draws, by its `thick`: `markCell(name)`. */
+export const MARK_NAMES = ['scratch', 'splat', 'dust', 'twirl', 'wisp', 'smear'] as const;
+export type MarkName = (typeof MARK_NAMES)[number];
+/** The `thick` of a 'mark' or a 'trace' particle that draws the mask `name`. */
+export const markCell = (name: MarkName): number => (MARK_NAMES.indexOf(name) + 0.5) / MARK_NAMES.length;
 
 export interface ParticleSpec {
   x: number;
@@ -38,6 +44,7 @@ export interface ParticleSpec {
   drag?: number; // per second
   shape?: ParticleShape; // default: a disc
   colorEnd?: Rgb; // the colour at death (default: its own)
+  colorMid?: Rgb; // the colour half way through its life (round 87): with `colorEnd`, a hue that drifts through a third and does not pass through grey (default: the straight blend of the two)
   spin?: number; // rad/s about the view axis (not for a streak, which lies along its flight)
   rot?: number; // radians at birth
   stretch?: number; // a streak's length, in sizes per m/s of its speed (default 0.12), at least one size
@@ -191,7 +198,7 @@ void main() {
 }
 `;
 
-type Live = Required<Omit<ParticleSpec, 'colorEnd' | 'shape'>> & { colorEnd: Rgb | null; shape: number; age: number };
+type Live = Required<Omit<ParticleSpec, 'colorEnd' | 'colorMid' | 'shape'>> & { colorEnd: Rgb | null; colorMid: Rgb | null; shape: number; age: number };
 
 /** A falling particle meets its ground: it springs up a little, skids, and once its spring is spent lies still. */
 export function land(p: Pick<Live, 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz' | 'floor' | 'bounce' | 'gravity' | 'drag' | 'spin' | 'rot' | 'age'>): void {
@@ -230,10 +237,10 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
     ground,
     spawn(p) {
       if (live.length >= CAPACITY) live.shift();
-      const { shape, colorEnd, ...rest } = p;
+      const { shape, colorEnd, colorMid, ...rest } = p;
       live.push({
         vx: 0, vy: 0, vz: 0, grow: 1, alpha: 1, glow: false, gravity: 0, drag: 0, spin: 0, rot: 0, stretch: 0.12, hold: 0, thick: 0.18, floor: -Infinity, bounce: 0.3,
-        ...rest, shape: shape ? PARTICLE_SHAPES.indexOf(shape) : 0, colorEnd: colorEnd ?? null, age: 0,
+        ...rest, shape: shape ? PARTICLE_SHAPES.indexOf(shape) : 0, colorEnd: colorEnd ?? null, colorMid: colorMid ?? null, age: 0,
       });
     },
     update(time) {
@@ -256,8 +263,10 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
         const size = p.size * (1 + (p.grow - 1) * t);
         batch.setMatrixAt(n, m4.makeScale(size, size, size).setPosition(p.x, p.y, p.z));
         const e = p.colorEnd;
+        const m = p.colorMid;
         const fade = t < p.hold ? 1 : 1 - (t - p.hold) / Math.max(1e-3, 1 - p.hold);
-        colors.setXYZW(n, e ? p.color[0] + (e[0] - p.color[0]) * t : p.color[0], e ? p.color[1] + (e[1] - p.color[1]) * t : p.color[1], e ? p.color[2] + (e[2] - p.color[2]) * t : p.color[2], p.alpha * fade);
+        const ch = (i: number): number => (!e ? p.color[i] : m ? (t < 0.5 ? p.color[i] + (m[i] - p.color[i]) * t * 2 : m[i] + (e[i] - m[i]) * (t - 0.5) * 2) : p.color[i] + (e[i] - p.color[i]) * t);
+        colors.setXYZW(n, ch(0), ch(1), ch(2), p.alpha * fade);
         glows.setX(n, p.glow ? 1 : 0);
         const speed = Math.hypot(p.vx, p.vy, p.vz);
         shapes.setXYZW(n, p.shape, p.rot + p.spin * p.age, p.shape === 2 ? Math.max(1, 1 + p.stretch * speed) : 1, p.thick);
