@@ -8,7 +8,9 @@
  *   matter (the weight, the camera's kick and the sound are impactFx's and the audio's).
  * The horrors with colours of their own at full strength; since round 59 every other foe too, more lightly and by its size (`strengthOf`:
  * a rat's bite throws a few sparks, a shoggoth's slam a burst; before, an ordinary foe's blow showed nothing at all), in the colours
- * and matter of what it is made of (`attackLook`), with no scar on the ground but under the largest.
+ * and matter of what it is made of (`attackLook`), with no scar on the ground but under the largest. Round 87: that was too much for a crowd of
+ * them (asked: "overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere"): every creature that is
+ * not a horror (`isQuiet`) now draws its blow as one mark of its own and a few specks (`foeFx.ts`), and every path here returns early for it.
  */
 
 import type { V3 } from '../core/geom';
@@ -17,7 +19,7 @@ import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { LANDS } from './audio/impact';
-import { attackLook, isThemed, type AttackLook } from './attackLook';
+import { attackLook, isQuiet, isThemed, type AttackLook } from './attackLook';
 import { burst, ELEMENTS, flash, impact, type Element } from './fxKit';
 import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
@@ -33,7 +35,7 @@ export const TELL = { windup: 26, poise: 30, lead: 15 } as const;
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 const FAR = 80;
 
-/** How much of a blow's light and matter a creature of this body throws, 0..1: a horror with colours of its own all of it, any other foe by its size. */
+/** How much of a blow's light and matter a creature of this body throws, 0..1: a horror with colours of its own all of it (round 87: no other creature reaches here: they draw quietly, `foeFx.ts`; kept for them as it was). */
 export function strengthOf(themed: boolean, radius: number): number {
   return themed ? 1 : Math.min(0.8, 0.3 + 0.35 * radius);
 }
@@ -109,7 +111,7 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
   }
 
   g.events.on('Hit', (e) => {
-    if (e.lingering || !foe(e.attacker) || !LANDS.includes(e.outcome)) return;
+    if (e.lingering || !foe(e.attacker) || isQuiet(g, e.attacker) || !LANDS.includes(e.outcome)) return; // (a creature that is not a horror draws its own: foeFx.ts)
     const wound = woundPoint(g, e.target, e.attacker, 0.25);
     if (!wound) return;
     const { look, el, k } = style(e.attacker);
@@ -119,7 +121,7 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
   g.events.on('Swung', ({ entity, at, yaw }) => {
     const a = c.actor.get(entity);
     const def = a && moveDef(a);
-    if (!def?.hit || !foe(entity) || isAbsent(g, entity)) return;
+    if (!def?.hit || !foe(entity) || isQuiet(g, entity) || isAbsent(g, entity)) return;
     const me = c.transform.get(g.player.id)?.pos;
     if (me && Math.hypot(at.x - me.x, at.z - me.z) > FAR) return;
     open(entity, def, { x: at.x, y: g.world.ground(at.x, at.z), z: at.z }, yaw);
@@ -134,7 +136,7 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
         if (id === g.player.id) continue;
         const def = moveDef(a);
         const h = def?.hit;
-        if (!h || !foe(id) || isAbsent(g, id) || c.dead.has(id)) continue;
+        if (!h || !foe(id) || isQuiet(g, id) || isAbsent(g, id) || c.dead.has(id)) continue;
         const tr = c.transform.get(id)!;
         if (me && Math.hypot(tr.pos.x - me.x, tr.pos.z - me.z) > FAR) continue;
         const told = h.window[0] >= TELL.windup && h.poise >= TELL.poise ? h.window[0] - TELL.lead : -1; // only a blow that winds up long and lands heavy

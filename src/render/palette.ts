@@ -50,6 +50,19 @@ export function rgbToHsv(c: Rgb): Rgb {
   return [h, max > 0 ? d / max : 0, max];
 }
 
+/** A colour from hue, saturation and value, each in 0..1 (the hue wraps round). */
+export function hsvToRgb(h: number, s: number, v: number): Rgb {
+  const k = (n: number): number => (n + (((h % 1) + 1) % 1) * 6) % 6;
+  const f = (n: number): number => v - v * s * Math.max(0, Math.min(k(n), 4 - k(n), 1));
+  return [f(5), f(3), f(1)];
+}
+
+/** `c` with its hue turned `turns` of a full circle (a grey stays grey), its saturation and brightness kept (round 87: a blow's neighbouring hue). */
+export function rotateHue(c: Rgb, turns: number): Rgb {
+  const [h, s, v] = rgbToHsv(c);
+  return hsvToRgb(h + turns, s, v);
+}
+
 /** Hues of the three anomaly colours, for colour isolation. */
 export const ANOMALY_HUES: Rgb = [
   rgbToHsv(ANOMALY.magenta)[0],

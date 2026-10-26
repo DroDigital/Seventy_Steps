@@ -17,7 +17,7 @@ import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { beamLine } from '../systems/strikes';
-import { attackLook } from './attackLook';
+import { attackLook, isQuiet } from './attackLook';
 import { matterLook } from './matterLook';
 import { FLASH_LIGHTS } from '../data/fxTuning';
 import { flashLight } from './flashLights';
@@ -50,14 +50,14 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
   };
 
   g.events.on('BoltLoosed', ({ owner, at, vel, fire, conjured }) => {
-    if (fire || !near(at)) return;
+    if (fire || !near(at) || isQuiet(g, owner)) return; // (a creature that is not a horror draws its own: foeFx.ts)
     const { look, el } = style(owner);
     flash(fx, el, { ...at, y: at.y - 0.4 }, 0.5, look, 0.4);
     const sp = Math.hypot(vel.x, vel.z) || 1;
     for (let i = 0; i < 5; i++) fx.spawn({ x: at.x, y: at.y, z: at.z, vx: (vel.x / sp) * rand(4, 9) + rand(-1.5, 1.5), vy: rand(-0.5, 1), vz: (vel.z / sp) * rand(4, 9) + rand(-1.5, 1.5), life: 0.25, size: 0.2, color: conjured ? look.mind : look.core, colorEnd: look.line, glow: true, shape: 'streak', stretch: 0.14, hold: 0.3 });
   });
   g.events.on('BoltLanded', ({ owner, at, vel, on, radius, fire, conjured }) => {
-    if (fire || !near(at)) return;
+    if (fire || !near(at) || isQuiet(g, owner)) return;
     const { look, el } = style(owner);
     const sp = Math.hypot(vel.x, vel.z) || 1;
     const dir = { x: vel.x / sp, z: vel.z / sp };
@@ -70,7 +70,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
   });
 
   g.events.on('Shot', ({ shooter, from, to }) => { // a horror's beam: a flare at its source, a burst where it ends
-    if (shooter === g.player.id || !near(from)) return;
+    if (shooter === g.player.id || !near(from) || isQuiet(g, shooter)) return;
     const { look, el } = style(shooter);
     const [dx, dz] = [to.x - from.x, to.z - from.z];
     const len = Math.hypot(dx, dz) || 1;
@@ -92,6 +92,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     ground.scar(at, r + 1, look.line, whoIs(by), 8);
   });
   g.events.on('Teleported', ({ entity, from, to }) => {
+    if (isQuiet(g, entity)) return;
     const { look, el } = style(entity);
     const r = (c.body.get(entity)?.radius ?? 0.6) + 0.6;
     for (let i = 0; i < 18; i++) { // the place it leaves collapses into it
@@ -107,7 +108,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
   });
   g.events.on('Summoned', ({ entity, by }) => {
     const p = c.transform.get(entity)?.pos;
-    if (!p) return;
+    if (!p || isQuiet(g, by)) return;
     const { look, el } = style(by);
     const r = c.body.get(entity)?.radius ?? 0.6;
     column(fx, el, p, r + 0.4, 3 + r * 2, look);
@@ -129,7 +130,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
   g.events.on('GazeBurst', ({ by }) => {
     const to = bodyAt(g.player.id);
     const from = bodyAt(by, 0.95);
-    if (!to) return;
+    if (!to || isQuiet(g, by)) return;
     const { look, el } = style(by);
     flash(fx, el, { ...to, y: to.y - 0.4 }, 0.9, { ...look, core: look.mind, line: look.mind }, 0.4);
     fx.spawn({ x: to.x, y: to.y, z: to.z, life: 0.4, size: 1.2, grow: 4, color: look.mind, glow: true, shape: 'ring', thick: 0.1 });
@@ -193,7 +194,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         const p = c.transform.get(e)!;
         const at = { x: p.prev.x + (p.pos.x - p.prev.x) * alpha, y: p.prev.y + (p.pos.y - p.prev.y) * alpha, z: p.prev.z + (p.pos.z - p.prev.z) * alpha };
         if (b.pool?.fire && b.faction === 'player') continue;
-        if (!near(at)) continue;
+        if (!near(at) || isQuiet(g, b.owner)) continue;
         const { look, el } = style(b.owner);
         trail(fx, el, at, b.vel, b.radius, b.conjured ? { ...look, line: look.mind } : look, el.glow || look.motif === 'plain');
         if (el.glow) flashLight(at, whiteOf(b.conjured ? look.mind : look.line), Math.min(FLASH_LIGHTS.bolt.most, FLASH_LIGHTS.bolt.strength + b.radius * FLASH_LIGHTS.bolt.per), Math.min(FLASH_LIGHTS.bolt.rangeMost, FLASH_LIGHTS.bolt.range + b.radius * FLASH_LIGHTS.bolt.rangePer), FLASH_LIGHTS.bolt.seconds, e); // a bolt of light or fire lights the ground it crosses (round 83)
@@ -226,7 +227,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
       }
       for (const [id, a] of c.actor) {
         const def = moveDef(a);
-        if (!def || isAbsent(g, id) || c.dead.has(id)) continue;
+        if (!def || isAbsent(g, id) || c.dead.has(id) || isQuiet(g, id)) continue;
         const body = bodyAt(id, 0.7);
         if (!body || !near(body)) continue;
         const rel = releaseFrame(def);

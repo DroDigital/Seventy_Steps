@@ -44,7 +44,8 @@ describe('every creature\'s attacks are its own (round 60: "make it very distinc
     const [deep, ghoul, miGo] = ['deep_one', 'ghoul', 'mi_go'].map(lookOf);
     expect(deep.danger).not.toEqual(ghoul.danger);
     expect(deep.line).not.toEqual(miGo.line);
-    expect(lookOf('deep_one').sig?.form).toBe('bubbles');
+    expect(lookOf('deep_one').sig, 'round 87: a creature drawn as a mark (data/foeBlows.ts) throws no signature').toBeNull();
+    expect(lookOf('hastur').sig?.form, 'a horror still has its own').toBeDefined();
     expect(lookOf(undefined).sig).toBeNull(); // the arena's dummy and the like draw no signature
   });
 
