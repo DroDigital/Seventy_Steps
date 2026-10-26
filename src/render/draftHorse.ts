@@ -9,7 +9,8 @@
 import * as THREE from 'three';
 import { pawAt, tossAt, type HorseToss } from '../systems/horseIdle';
 import { footAt, gaitAt, legPhase } from '../systems/mountGait';
-import { BODY_Y, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
+import { createDraftEyes } from './draftEyes';
+import { BODY_Y, EYE_AT, HEAD_DROP, NECK_AT, NECK_LENGTH, NECK_RISE, barrel, bridle, ear, harness, head, neck, tail } from './horseBody';
 import { CANNON, FETLOCK, LEGS, LEG_NAMES, cannonBone, hoofOf, upperBone } from './horseLegs';
 import { MountBuilder, group, swingAbout, type HorseCue } from './mountKit';
 
@@ -53,6 +54,9 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
   const face = head();
   part(headG, face.skin, hide, 'draft-head');
   part(headG, face.eyes, b.material('hide', 0.5), 'draft-eyes');
+  const eyeAt = [-1, 1].map((s) => group(headG, s * EYE_AT.x, EYE_AT.y, EYE_AT.z)); // the glow and the trail are drawn about the eyes (draftEyes.ts)
+  const eyes = createDraftEyes();
+  parent.add(eyes.mesh); // beside the horse, not in its bounds: a halo batch is a unit square at its origin
   part(headG, bridle(), cloth, 'draft-bridle');
   const bit = group(headG, 0, -0.1, 0.57);
   bit.name = 'draft-bit';
@@ -146,5 +150,6 @@ export function draftHorse(b: MountBuilder, parent: THREE.Object3D, x: number, z
       leg.knee.rotation.x = upperAngle - lowerAngle;
       leg.fetlock.rotation.x = lowerAngle - body.rotation.x + 0.55 * foot.lift * moving; // flat on the ground, toe dropping as it lifts
     }
+    eyes.update(eyeAt, time, speed, 1 - (hide.uniforms.uGhost?.value ?? 0)); // where the head is now: the eyes glow and trail as the horse goes, fading with the body
   } };
 }

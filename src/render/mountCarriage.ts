@@ -16,7 +16,7 @@ export interface CarriageArt {
   lamps: SideLamp[]; // the plain chariot's lanterns, swinging on their hooks
 }
 export function carriageArt(b: MountBuilder, root: THREE.Group, plain = false): CarriageArt {
-  const paint = plain ? C.wood : C.black;
+  const paint = plain ? C.plainWood : C.black;
   const body = group(root), wheels = [-1, 1].flatMap(side => [wheel(b, root, side * 0.96, -1.16, 0.72, false), wheel(b, root, side * 0.91, 0.52, 0.51, false, true)]);
   body.name = plain ? 'plain-chariot' : 'gothic-mourning-coach';
   const wood: THREE.BufferGeometry[] = [
@@ -32,7 +32,7 @@ export function carriageArt(b: MountBuilder, root: THREE.Group, plain = false): 
       panel(0.045, 0.07, 1.37, side * 0.79, 0.98, -0.94, C.trim),
       panel(0.04, 0.05, 1.37, side * 0.79, plain ? 1.2 : 1.41, -0.94, C.trim),
       panel(0.38, 0.065, 0.55, side * 0.89, 0.57, 0.02, C.iron),
-      ...(plain ? [rod([side * 0.57, 0.64, 0.39], [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], 0.05, scaleRgb(C.wood, 0.8)), orb(0.06, [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], C.brass)] : [rod([side * 0.57, 0.64, 0.39], [side * 0.57, 0.83, 2.43], 0.042, C.iron)]),
+      ...(plain ? [rod([side * 0.57, 0.64, 0.39], [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], 0.05, scaleRgb(C.plainWood, 0.8)), orb(0.06, [side * DRAFT_HITCH.x, DRAFT_HITCH.y, DRAFT_HITCH.z], C.brass)] : [rod([side * 0.57, 0.64, 0.39], [side * 0.57, 0.83, 2.43], 0.042, C.iron)]),
       ...leafSpring(side * 0.6, -1.05), ...leafSpring(side * 0.6, 0.48));
     if (!plain) for (const zz of [-1.72, -0.44]) { // (the plain chariot has no posts or roof: they hid the rider)
       wood.push(panel(0.095, 1.28, 0.095, side * 0.71, 2.03, zz, paint),
