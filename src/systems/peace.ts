@@ -1,5 +1,5 @@
 /**
- * The investigator's peace on arriving (round 86; asked by XDro: "when respawning or fast traveling to an elder sign, the player should
+ * The investigator's peace on arriving (round 88; asked by XDro: "when respawning or fast traveling to an elder sign, the player should
  * never be immediately attacked by enemies"). The dungeons' Elder Signs have their halls' foes seven to thirteen metres from the stone, awake
  * to anything within a dozen, so a rising or a journey there met a blow as the veil lifted. Now every arrival is sheltered (`isSheltered`: no blow
  * lands, nothing is pushed or worn away, no foe notices them, and any that were on them let go): in the open world the foes are posted well

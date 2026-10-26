@@ -229,7 +229,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   npcSystem(g, dt);
   npcLife(g, dt);
   actionSystem(g);
-  peaceSystem(g, input); // round 86: an arrival's peace ends on their own blow or the seconds after they rise, before the foes' turn
+  peaceSystem(g, input); // round 88: an arrival's peace ends on their own blow or the seconds after they rise, before the foes' turn
   brainSystem(g);
   wanderSystem(g);
   hookSystem(g);

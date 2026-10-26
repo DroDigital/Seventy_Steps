@@ -249,7 +249,7 @@ export const isUnseen = (g: Pick<Game, 'ecs' | 'overworld'>, id: Entity): boolea
 export const isAbsent = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.c.dead.has(id) || g.ecs.c.layer.get(id)?.shown === false;
 
 /**
- * The investigator's peace on arriving (round 86, systems/peace.ts): after a rising, a journey to an Elder Sign, a rest at one, a gate or the
+ * The investigator's peace on arriving (round 88, systems/peace.ts): after a rising, a journey to an Elder Sign, a rest at one, a gate or the
  * descent, or a game continued, nothing notices or reaches them until they have risen (moved or acted) and a few seconds more have passed.
  */
 export interface Peace {
@@ -258,7 +258,7 @@ export interface Peace {
   left: number; // steps of it left once risen (it waits while a talk, a trade or a sign's menu is open)
 }
 
-/** Whether the investigator is sheltered now: a dialogue, a trade or a sign's menu is open (`Game.sheltered`), or they are at peace on arriving (round 86). Nothing reaches them, foes let go of them, and no mind or body is worn away. */
+/** Whether the investigator is sheltered now: a dialogue, a trade or a sign's menu is open (`Game.sheltered`), or they are at peace on arriving (round 88). Nothing reaches them, foes let go of them, and no mind or body is worn away. */
 export const isSheltered = (g: Pick<Game, 'sheltered' | 'player'>): boolean => g.sheltered || g.player.peace !== null;
 
 /** Player-only state that is not a component. */
@@ -297,7 +297,7 @@ export interface Pilot {
   rising: (Place & { wall: string }) | null; // the candle that reaches the fall, while the choice waits
   fogPass: { wall: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a boss's fog being walked through (round 35: fogGates.ts)
   gatePass: { gate: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a realm's gate being walked into (round 60: gateWalk.ts)
-  peace: Peace | null; // just arrived, and at peace: sheltered, so no foe notices them and nothing reaches them (round 86: peace.ts)
+  peace: Peace | null; // just arrived, and at peace: sheltered, so no foe notices them and nothing reaches them (round 88: peace.ts)
 }
 
 /** A fall in the air (round 54): the body is let go of by the ground, and gravity takes it. */

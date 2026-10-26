@@ -43,7 +43,7 @@ describe('a respawn kneels too (round 31)', () => {
     place(g, g.player.id, s.x, s.z + 2, 0);
     expect(rest(g, s.id)).toBe(true);
     g.player.kneeling = null;
-    g.player.peace = null; // (the rest's peace would hold off the blow: round 86)
+    g.player.peace = null; // (the rest's peace would hold off the blow: round 88)
     strike(g, g.player.id, g.player.id, { damage: 9999, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false });
     for (let i = 0; i < PLAYER_MOVES.death.frames + 5; i++) stepGame(g, emptyInput());
     expect(g.player.kneeling).toEqual({ x: s.x, z: s.z });

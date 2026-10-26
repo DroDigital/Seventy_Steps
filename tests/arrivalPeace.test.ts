@@ -64,7 +64,7 @@ function arrive(away = 4): { g: Game; foe: number; hp: number } {
 
 const hunting = (g: Game): boolean => [...g.ecs.c.brain.values()].some((b) => b.target === g.player.id);
 
-describe('an arrival is at peace (round 86)', () => {
+describe('an arrival is at peace (round 88)', () => {
   it('is begun by fast travel, a rest and a game continued at its stone, and is not there before', () => {
     const g = createWorldGame();
     expect(g.player.peace).toBeNull();
@@ -219,7 +219,7 @@ describe('an arrival is at peace (round 86)', () => {
   });
 });
 
-describe('what an arrival carries over, and what waits for them (round 86)', () => {
+describe('what an arrival carries over, and what waits for them (round 88)', () => {
   it('a swing in progress or a press queued as they set out is left behind: neither breaks the peace of the arrival', () => {
     for (const queued of [false, true]) {
       const g = createWorldGame();
@@ -279,7 +279,7 @@ describe('what an arrival carries over, and what waits for them (round 86)', () 
   });
 });
 
-describe('a sleeping horror\'s ring (review of round 86: a rising at an open arena\'s stake ran the court at peace)', () => {
+describe('a sleeping horror\'s ring (review of round 88: a rising at an open arena\'s stake ran the court at peace)', () => {
   it('ends it where the horror wakes by its own senses, as it always did, and not before', () => {
     const g = createWorldGame();
     const w = allWakes().find((x) => x.spawns.length > 0)!;

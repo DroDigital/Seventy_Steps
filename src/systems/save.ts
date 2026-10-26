@@ -243,7 +243,7 @@ export function applySave(g: Game, s: SaveData): void {
   const standing = regionAt(s.at.x, s.at.z) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // (a save taken in the middle of a fall must not load inside it)
   const at = standing ? s.at : g.player.checkpoint;
   teleport(g, at);
-  if (distXZ(at, g.player.checkpoint) <= WORLD.signReach) beginPeace(g); // a game continued at its stone begins at peace, as every arrival does; one left out in the world, a fight or a hall is continued as it was (round 86: peace.ts)
+  if (distXZ(at, g.player.checkpoint) <= WORLD.signReach) beginPeace(g); // a game continued at its stone begins at peace, as every arrival does; one left out in the world, a fight or a hall is continued as it was (round 88: peace.ts)
 }
 
 /** Save slots (round 12): three, the first under the old key so a save from before slots is its. */

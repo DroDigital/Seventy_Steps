@@ -62,7 +62,7 @@ export function setSanity(g: Pick<Game, 'mind' | 'events'>, value: number): void
   g.events.emit('SanityBandChanged', { from, to, sanity: m.sanity });
 }
 
-/** Takes sanity; each level of the Resolve upgrade lessens every loss. A loss of SANITY.jolt or more at once is announced. Nothing is taken in a cutscene or while the investigator is sheltered (a dialogue, a trade, a sign's rest, or the peace of an arrival: round 86). */
+/** Takes sanity; each level of the Resolve upgrade lessens every loss. A loss of SANITY.jolt or more at once is announced. Nothing is taken in a cutscene or while the investigator is sheltered (a dialogue, a trade, a sign's rest, or the peace of an arrival: round 88). */
 export function loseSanity(g: Pick<Game, 'mind' | 'events' | 'cutscene' | 'sheltered' | 'player'>, amount: number): void {
   if (amount <= 0 || g.cutscene || isSheltered(g)) return;
   const resist = g.mind.upgrades.resolve * (UPGRADES.resolve.resist ?? 0);

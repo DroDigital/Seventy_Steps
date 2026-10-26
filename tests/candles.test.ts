@@ -119,7 +119,7 @@ describe('the candles before the fog', () => {
     expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: c.rise.x, z: c.rise.z });
     expect(g.player.kneeling).toBeNull();
 
-    g.player.peace = null; // (the rising's peace would hold off the blow: round 86)
+    g.player.peace = null; // (the rising's peace would hold off the blow: round 88)
     goTo(g, c.x + CANDLE.reach + 40, c.z);
     run(g, 1);
     strike(g, g.player.id, g.player.id, deathblow);

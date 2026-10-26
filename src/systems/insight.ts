@@ -50,7 +50,7 @@ export function inSight(g: Game, id: Entity): boolean {
 /** One step: the first sight of each horror not yet beheld, and tomes read by touch. */
 export function insightSystem(g: Game): void {
   const { dread, tome, transform, combatant, actor } = g.ecs.c;
-  const calm = isSheltered(g); // a horror beheld in a talk or at peace on arriving is beheld once they are free: the shock of it is not forfeited (round 86)
+  const calm = isSheltered(g); // a horror beheld in a talk or at peace on arriving is beheld once they are free: the shock of it is not forfeited (round 88)
   for (const [id, d] of dread) {
     if (calm || g.mind.seen.has(d.id) || !inSight(g, id)) continue;
     g.mind.seen.add(d.id);

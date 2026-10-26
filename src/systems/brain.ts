@@ -123,13 +123,13 @@ function mayJoin(g: Game, j: { with: string; below: number }): boolean {
 function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   const joins = g.ecs.c.fight.get(id)?.script.joins;
   if (!joins || br.state === 'engage') return false;
-  if (!mayJoin(g, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 86)
+  if (!mayJoin(g, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 88)
   [br.state, br.cooldown, br.target] = ['engage', BOSS.wake, g.player.id]; // it gathers itself before its first blow, as one woken does (round 60)
   g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} JOINS THE FIGHT` });
   return false;
 }
 
-/** The investigator is sheltered (a dialogue is open and the world goes on through the talk, or they are at peace on arriving: round 86): a foe that was on them lets go, and goes home as if it had never seen them. A talk is no fight, nor is an arrival. */
+/** The investigator is sheltered (a dialogue is open and the world goes on through the talk, or they are at peace on arriving: round 88): a foe that was on them lets go, and goes home as if it had never seen them. A talk is no fight, nor is an arrival. */
 function letGo(br: Brain): void {
   br.target = null;
   br.aware = 0;
