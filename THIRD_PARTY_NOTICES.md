@@ -1,9 +1,14 @@
 # Third-party notices
 
-This file lists third-party material only. The project's own licence is in `LICENSE`.
+This file lists third-party material only. The project's own licence is in `LICENSE`: Seventy Steps is
+© 2026 Alessandro A. Foddis (DigitalDro), all rights reserved. The Creative Commons and other licences
+named below apply to the third-party material they are listed against, never to the game.
 
-Seventy Steps draws its textures, sprites, meshes and synthesised sounds in code. What it ships from
-others is listed here, with each licence as its authors require.
+Its textures, effects, synthesised sounds and the investigator's model and animations are made in code.
+Other parts are made with generative AI tools: the pictures of the creatures (`public/creatures`: ChatGPT's
+image generation, and ElevenLabs' image model for some walks, with frames the author drew afterwards), the
+voices (ElevenLabs, Eleven v4) and the music (Suno), and the code and the text were written with the help of
+Claude (Anthropic). What it ships from others is listed here, with each licence as its authors require.
 
 ## three.js
 
