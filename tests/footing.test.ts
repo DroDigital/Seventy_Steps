@@ -6,14 +6,14 @@ import { MIND_EARS } from '../src/data/mindSounds';
 import { SAMPLE_SETS } from '../src/data/samples';
 import type { Layer, Sound } from '../src/data/sounds';
 import { createBodyFoley } from '../src/render/audio/bodyFoley';
-import { createFoley } from '../src/render/audio/foley';
+import { createFoley, indoorsAt, surfaceAt } from '../src/render/audio/foley';
 import { coldAt, footFeel, indoorLift, stepGain, stepLevel, stepSetOf } from '../src/render/audio/footing';
 import type { Sampler, SampleOptions } from '../src/render/audio/sampler';
 import { HEART } from '../src/render/feel';
 import { createWorldGame } from '../src/systems/game';
 import { kitOfRoom } from '../src/world/dungeonKit';
 import { worldLayout } from '../src/world/placements';
-import { findGround, findRoom, stride } from './footHelpers';
+import { findGap, findGround, findRoom, stride } from './footHelpers';
 import { RATE, render } from './soundRender';
 
 const scaled = (sound: Sound, k: number): Sound => sound.map((l): Layer => ({ ...l, gain: l.gain * k }));
@@ -413,15 +413,33 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
     return r;
   }
 
-  it('only a dungeon\'s room is lifted: the open air, the road and the shallows keep what they had', () => {
+  it('only a dungeon room\'s floor is lifted: the open air, the road and the shallows keep what they had', () => {
     expect(STEP_VOICE.indoors).toBeGreaterThan(1);
-    expect(indoorLift('stone')).toBe(STEP_VOICE.indoors);
-    for (const open of ['dirt', 'road', 'water'] as const) expect(indoorLift(open), open).toBe(1);
-    expect(stepGain('dirt')).toBe(1);
+    expect(indoorLift(true)).toBe(STEP_VOICE.indoors);
+    expect(indoorLift(false)).toBe(1);
+    for (const open of ['dirt', 'road', 'water', 'stone'] as const) expect(stepGain(open), open).toBe(STEP_VOICE.surface[open]?.gain ?? 1); // (the recording's own softening, as round 83 had it, lifted or not by where the body stands)
+    expect(stepGain('stone', true)).toBe(STEP_VOICE.indoors);
+    expect(stepGain('dirt', true)).toBe(STEP_VOICE.indoors); // (a lift is a lift: only indoorsAt decides where it is asked for)
     expect(stepGain('road')).toBe(STEP_VOICE.surface.road!.gain);
     expect(stepGain('water')).toBe(STEP_VOICE.surface.water!.gain);
-    expect(stepGain('stone')).toBe(STEP_VOICE.indoors);
-    expect(STEP_VOICE.level).toEqual([0.26, 0.58]); // (the pace curve is round 83\'s, for the open air and the room alike)
+    expect(STEP_VOICE.level).toEqual([0.26, 0.58]); // (the pace curve is round 83's, for the open air and the room alike)
+  });
+
+  it('the ground inside a dungeon\'s bounding rectangle but off its floors is the open air\'s: not lifted, though its recording is the stone\'s', () => {
+    const gap = findGap(14);
+    expect(gap).not.toBeNull();
+    const g = createWorldGame();
+    const [y, room] = [g.ecs.c.transform.get(g.player.id)!.pos.y, findRoom(['slab', 'stone', 'rock'])!];
+    expect(surfaceAt(g, gap!.x + 7, y, gap!.z)).toBe('stone'); // (the recording is the stone's...)
+    expect(indoorsAt(g, gap!.x + 7, y, gap!.z)).toBe(false); // (...but the body is out under the sky)
+    expect(indoorsAt(g, room.x, y, room.z)).toBe(true);
+    const r = rig('mountains', 'snow', undefined, 80);
+    r.tr.pos = { x: gap!.x, y: r.tr.pos.y, z: gap!.z };
+    r.tr.prev = { ...r.tr.pos };
+    r.tick(12 / 4.2, 12, Math.PI / 2);
+    const steps = recorded(r).filter((p) => p.set === SAMPLE_SETS.stepStone);
+    expect(steps.length).toBeGreaterThanOrEqual(9);
+    for (const p of steps) expect(p.o.gain!).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-6); // (the open air's bound, no lift)
   });
 
   it('a walk through a room of stone is back at round 80\'s level, each step within the lift of the open air\'s bounds, the second foot softer', () => {

@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ECHO_MOST, ECHO_PACE, ECHO_VOICES, KIT_SPACE, ROOM_SHAPE, SPACES, type Echo, type SpaceRow } from '../src/data/acoustics';
 import { ROOM_KINDS } from '../src/data/dungeons';
-import { STEP_VOICE } from '../src/data/footSounds';
 import { KITS } from '../src/data/kits';
 import { AUDIO } from '../src/data/tuning';
 import type { AudioEngine } from '../src/render/audio/engine';
@@ -144,7 +143,7 @@ describe('the returns of a step (round 83)', () => {
     expect(ECHO_PACE.none).toBeLessThan(6.4);
   });
 
-  it('the recorded steps of the bright ground are dulled and brought down, and the dark left as they were (the dungeon\'s stone is lifted, round 86: tests/footing.test.ts)', () => {
+  it('the recorded steps of the bright ground are dulled and brought down, and the dark left as they were', () => {
     expect(stepLowpass('road')).toBeLessThanOrEqual(2200);
     expect(stepLowpass('water')).toBeLessThanOrEqual(2400);
     expect(stepLowpass('dirt')).toBeUndefined();
@@ -152,7 +151,7 @@ describe('the returns of a step (round 83)', () => {
     expect(stepGain('road')).toBeLessThan(1);
     expect(stepGain('water')).toBeLessThan(1);
     expect(stepGain('dirt')).toBe(1);
-    expect(stepGain('stone')).toBe(STEP_VOICE.indoors); // (its recording is left dark and whole, and raised)
+    expect(stepGain('stone')).toBe(1); // (its recording is left dark and whole; a dungeon room's floor lifts it, round 86: tests/footing.test.ts)
     expect(stepLowpass('dirt', 1800)).toBe(1800); // (the ground's own, where it has one)
     expect(stepLowpass('road', 1500)).toBe(1500); // (the duller of the two)
     expect(stepLowpass('road', 5000)).toBe(stepLowpass('road'));

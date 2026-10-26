@@ -15,7 +15,7 @@ import { fighting } from '../../systems/sanity';
 import { roofedAt } from '../../world/terrain';
 import { HEART } from '../feel';
 import { createStrideClock, followed, type Footfall } from '../footfalls';
-import { surfaceAt } from './foley';
+import { indoorsAt } from './foley';
 import { coldAt, indoorLift, stepLevel, stepSetOf } from './footing';
 import type { Sampler } from './sampler';
 
@@ -41,7 +41,7 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
   function stride(f: Footfall, stress: number): void {
     strides++;
     underfoot = f.ground;
-    lifted = indoorLift(surfaceAt(g, f.body.x, f.y, f.body.z));
+    lifted = indoorLift(indoorsAt(g, f.body.x, f.y, f.body.z));
     const layer = STEP_LAYERS[f.ground];
     const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot) * lifted; // (the recording's level, so the recipe keeps under it; in a dungeon's room lifted with it, round 86)
     if (layer) soft(`foot:${f.ground}`, layer, FOOT_GAIN.steps * pace, 0.9);
