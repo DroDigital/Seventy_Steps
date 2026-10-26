@@ -189,7 +189,7 @@ describe('authored counts in the live creature state selector', () => {
     actor.move = 'death';
     for (const share of [0, 0.5, 1]) {
       actor.frame = actor.moves.death.frames * share;
-      expect(lookOf(g, id, 0, { hurt: count })).toMatchObject({ state: 'hurt', frame: count - 1, sink: share, opacity: 1 - share });
+      expect(lookOf(g, id, 0, { hurt: count })).toMatchObject({ state: 'hurt', frame: count - 1, sink: share * 0.4, opacity: 1, dissolve: share });
     }
   });
 

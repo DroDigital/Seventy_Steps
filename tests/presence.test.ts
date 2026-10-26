@@ -1,6 +1,10 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { arrival } from '../src/data/cutscenes';
-import { jolt, presenceOf } from '../src/render/presence';
+import type { GameAudio } from '../src/render/audio/gameAudio';
+import type { Particles } from '../src/render/particles';
+import { createPresence, jolt, presenceOf } from '../src/render/presence';
+import { createWorldGame } from '../src/systems/game';
 
 describe('what a colossus does to the ground (round 26)', () => {
   it('is felt the nearer one stands, to nothing at a height and a half away', () => {
@@ -23,5 +27,31 @@ describe('what a colossus does to the ground (round 26)', () => {
     expect(sets('person')).toEqual([]);
     expect(sets('giant')).toEqual(['boom']);
     expect(sets('colossal')).toEqual(['boom', 'whale']);
+  });
+});
+
+describe('the camera\'s jolts (round 83: a footfall is felt after a bigger blow too)', () => {
+  it('feels a small jolt once an earlier, stronger one has died away, and not while it is still ringing', () => {
+    const g = createWorldGame();
+    const presence = createPresence(g, { spawn: () => undefined } as unknown as Particles, { sample: () => undefined } as unknown as GameAudio);
+    const me = g.ecs.c.transform.get(g.player.id)!.pos;
+    const camera = new THREE.PerspectiveCamera();
+    const shakeAt = (time: number): number => {
+      camera.position.set(0, 0, 0);
+      presence.update(camera, time);
+      return Math.hypot(camera.position.x, camera.position.y);
+    };
+    presence.update(camera, 0);
+    presence.felt({ x: me.x, y: 0, z: me.z }, 0.28, 70); // a phase's quake, at the investigator's feet
+    expect(shakeAt(0.05)).toBeGreaterThan(0.01);
+    presence.update(camera, 5);
+    presence.felt({ x: me.x, y: 0, z: me.z }, 0.05, 24); // a footfall five seconds on
+    expect(shakeAt(5.02)).toBeGreaterThan(0.0005);
+    presence.update(camera, 6);
+    presence.felt({ x: me.x, y: 0, z: me.z }, 0.28, 70);
+    presence.update(camera, 6.1);
+    presence.felt({ x: me.x, y: 0, z: me.z }, 0.05, 24); // while the big one rings, a small one is no more than it
+    expect(shakeAt(6.15)).toBeGreaterThan(0.01);
+    expect(shakeAt(7.5)).toBeLessThan(1e-9); // and all is still after a second
   });
 });

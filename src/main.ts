@@ -33,6 +33,8 @@ import { createSignViews } from './render/signViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
+import { createMistWakes } from './render/mistWakes';
+import { createSwingTrails } from './render/swingTrails';
 import { courtAt } from './render/courtMist';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
@@ -205,12 +207,14 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
-  const shadows = createShadows(scene, game);
+  const shadows = createShadows(scene, game, creatures.painted);
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
+  const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
+  const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
@@ -296,6 +300,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
         mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
@@ -304,12 +309,13 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
-        views.update(alpha, time);
+        views.update(alpha, time, enclosed);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
+        worldUniforms.uRelight.value = settings.relight > 0.5 ? 1 : 0; // the horrors' bodies lit over their folds (shaders/sprite.ts)
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
         creatures.update(alpha, time, camera);
         hidden.update(time);
@@ -322,6 +328,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
         pipeSmoke.update(camera, time, views.smokers);
+        swingTrails.update(views.swingEdge, time);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
         const fx = computeFx(state);

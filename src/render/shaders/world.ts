@@ -6,6 +6,7 @@
  * (shaders/eldritch.ts).
  */
 
+import { FIGURE_LIFE } from '../../data/fxTuning';
 import { BODY_PUSH, FOOT_RINGS } from '../../data/groundSkin';
 import { PANE_GLSL } from '../paneLife';
 import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
@@ -292,6 +293,12 @@ void main() {
     float crust = uCoatLine.w * smoothstep(-0.2, 0.05, above) * (1.0 - smoothstep(0.1, 0.6, above)) * step(0.01, uCoatA.z) * uCoatA.w; // salt dried along the line
     tex = mix(tex * mix(vec3(1.0), uCoatStain, stain), vec3(0.8, 0.82, 0.78), crust * 0.85);
     coated = max(cover, crust);
+  }
+  if (uWet > 0.01 && uEmissive < 0.5 && uCharacter > 0.5) tex *= 1.0 - uWet * (${FIGURE_LIFE.wet[0].toFixed(3)} + ${FIGURE_LIFE.wet[1].toFixed(3)} * max(n.y, 0.0)); // a character's cloth in the rain (the people's, the investigator's, a mount's, a built colossus's): darker, most where it faces the sky (shoulders, hat; round 83, as the sprites are darker wet)
+  if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter > 0.5 && uCharacter < 1.5) { // a person met out of doors wears the realm's matter on whatever of them faces up (their hat, shoulders, the tops of their boots): snow, drifted sand, soot (data/coats.ts; round 83: the people only, not the investigator; there is no height cut)
+    float dust = clamp(uCoatA.x * smoothstep(0.55, 0.9, n.y) * ${FIGURE_LIFE.dust.toFixed(2)}, 0.0, 1.0) * uCoatA.w;
+    tex = mix(tex, uCoatCol * (0.95 + 0.7 * dot(tex, vec3(0.333))), dust);
+    coated = max(coated, dust);
   }
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
   float self = uCharacter > 1.5 ? 1.0 : 0.0;

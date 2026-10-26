@@ -79,12 +79,12 @@ export function reviewedSize(entity: ReviewedEntity, manifest: ReviewedManifest)
   };
 }
 
-/** Where the painted figure stands, in metres above its feet: the lowest and highest painted row of the frame `reviewedSize` is scaled by (a cutscene frames this, not the capsule it is struck by), and how many rows it is painted in. */
-export function reviewedSpan(entity: ReviewedEntity, manifest: ReviewedManifest): { bottom: number; top: number; rows: number } {
+/** Where the painted figure stands, in metres above its feet: the lowest and highest painted row of the frame `reviewedSize` is scaled by (a cutscene frames this, not the capsule it is struck by), and how many rows it is painted in, and how broad it is painted, in metres (round 83: what a creature's shadow is cast from). */
+export function reviewedSpan(entity: ReviewedEntity, manifest: ReviewedManifest): { bottom: number; top: number; rows: number; across: number } {
   const reference = manifest.frames[entity.directions.front.actions.idle![0]];
-  const { height, groundOffset } = reviewedSize(entity, manifest);
+  const { width, height, groundOffset } = reviewedSize(entity, manifest);
   const row = (r: number): number => height * (1 - r / reference.height) - groundOffset;
-  return { bottom: Math.max(0, row(reference.bounds[3])), top: row(reference.bounds[1]), rows: reference.bounds[3] - reference.bounds[1] };
+  return { bottom: Math.max(0, row(reference.bounds[3])), top: row(reference.bounds[1]), rows: reference.bounds[3] - reference.bounds[1], across: (width * (reference.bounds[2] - reference.bounds[0])) / reference.width };
 }
 
 /** Assets resolve under both a hosted subdirectory and Electron's app:// package. */

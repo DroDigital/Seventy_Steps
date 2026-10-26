@@ -15,6 +15,8 @@ import { LIVING } from '../../data/mistLight';
 import { SHAFT_GLSL } from './fogShaft';
 import { LAMP_SLOTS, WINDOW_LIGHT_GLSL } from './common';
 
+/** The most bodies that part the mist at once (data/fxTuning.ts MIST_WAKES.slots). */
+export const WAKE_SLOTS = 8;
 const FINE = { c: Math.cos(LIVING.fine.turn).toFixed(4), s: Math.sin(LIVING.fine.turn).toFixed(4), speed: LIVING.fine.speed.toFixed(3) };
 
 export const FOG_GLSL = /* glsl */ `
@@ -37,6 +39,9 @@ uniform float uLanternRange;
 uniform float uLanternDecay;
 uniform vec4 uLamps[${LAMP_SLOTS}];
 uniform vec3 uLampColors[${LAMP_SLOTS}];
+uniform int uWakeCount; // how many bodies are parting the mist (round 83: render/mistWakes.ts)
+uniform vec4 uWakeSeg[${WAKE_SLOTS}]; // each: from where it is (x, z) back along its trail to where the trail ends (x, z)
+uniform vec4 uWakeInfo[${WAKE_SLOTS}]; // each: its breadth, how much it clears, the height it clears to, how far it turns the mist
 ${WINDOW_LIGHT_GLSL}
 uniform vec4 uLampAim[${LAMP_SLOTS}]; // where each light throws its glow (round 80): a unit direction, and how sharply it holds to it (0: all round)
 ${SHAFT_GLSL}
@@ -57,15 +62,38 @@ float fogNoise(vec3 p) {
   return mix(mix(a, b, f.y), mix(c, d, f.y), f.z);
 }
 
+// What the bodies moving through the mist do to it at p: x, the share of it cleared; yz, how far it is carried round the edge (metres).
+vec3 wakeAt(vec3 p) {
+  vec3 w = vec3(0.0);
+  float up = max(p.y - uFog.z, 0.0);
+  for (int i = 0; i < ${WAKE_SLOTS}; i++) {
+    if (i >= uWakeCount) break;
+    vec4 s = uWakeSeg[i];
+    vec4 f = uWakeInfo[i];
+    vec2 pa = p.xz - s.xy;
+    vec2 ba = s.zw - s.xy;
+    float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-4), 0.0, 1.0); // 0 at the body, 1 at the end of its trail
+    vec2 off = pa - ba * h;
+    float d = length(off);
+    float k = (1.0 - smoothstep(0.0, f.x * (1.0 + 0.7 * h), d)) * f.y * (1.0 - 0.7 * h) * (1.0 - smoothstep(0.35 * f.z, f.z, up));
+    w.x += k;
+    w.yz += vec2(-off.y, off.x) / max(d, 0.05) * k * f.w * f.x;
+  }
+  w.x = min(w.x, 0.88);
+  return w;
+}
+
 float fogDensity(vec3 p) {
   float up = max(p.y - uFog.z, 0.0);
   float low = uFog.x * exp(-up / uFog.y);
+  vec3 wake = uWakeCount > 0 && low > 1e-4 ? wakeAt(p) : vec3(0.0);
+  low *= 1.0 - wake.x;
   if (low > 1e-4) {
     vec2 wind = vec2(uFogDrift.x, uFogDrift.y);
-    vec3 q = (p - vec3(wind.x, 0.0, wind.y)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0);
+    vec3 q = (p - vec3(wind.x + wake.y, 0.0, wind.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0); // (a body turns the mist about it: its wake, round 83)
     // Round 80: the fine wisps are carried quicker than the banks and a little across them, so the mist shears and flows and is not one sheet sliding.
     vec2 fast = vec2(wind.x * ${FINE.c} - wind.y * ${FINE.s}, wind.x * ${FINE.s} + wind.y * ${FINE.c}) * ${FINE.speed};
-    vec3 q2 = ((p - vec3(fast.x, 0.0, fast.y)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0)) * 2.6 + 7.3;
+    vec3 q2 = ((p - vec3(fast.x + wake.y, 0.0, fast.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0)) * 2.6 + 7.3;
     float n = fogNoise(q) * 0.62 + fogNoise(q2) * 0.38;
     low *= mix(1.0, smoothstep(0.28, 0.78, n) * 1.8, uFog.w);
     // ...and over minutes whole banks thicken and thin as they roll across the land (a few sines, no noise to pay for).

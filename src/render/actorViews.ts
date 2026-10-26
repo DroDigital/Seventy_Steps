@@ -7,15 +7,20 @@
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle, yawOf } from '../core/geom';
+import { SWING_TRAIL } from '../data/fxTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
+import { hourOf, phaseOf } from '../systems/clock';
 import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
+import { livePerson, newLife, type Life, type Standing } from './personLife';
+import { edgeOf } from './swingTrails';
 import { ACTS, type ActKind, type Post } from '../data/npcActs';
 import { pipeBeat } from './npcActs';
 import type { Smoker } from './pipeSmoke';
 import { actOf } from '../systems/npcLife';
+import { stockLeft } from '../systems/trade';
 import { cadence, type Ground } from './gait';
 import { FX_PREFIX } from './fightViews';
 import { SHRINE_MODEL } from './signViews';
@@ -40,11 +45,13 @@ interface View {
   kneel: number; // 0–1, easing toward kneeling while the investigator rests (round 15)
   act: ActKind | null; // what a person was last doing, and how far into it they are (round 39)
   actK: number;
+  life: Life; // what a person has that moves of itself: the head, the cloth, the eyes (personLife.ts; round 83)
   drawnUntil: number; // the investigator's sword-cane stays drawn until this sim time (a blow draws it)
 }
 
 export interface ActorViews {
-  update(alpha: number, time: number): void;
+  /** `sheltered`: the camera is under a roof, where there is no breeze to stir a person's cloth. */
+  update(alpha: number, time: number, sheltered?: boolean): void;
   /** The investigator, up from the knee, takes `seconds` over it (a cutscene's slow rise); otherwise they rise as fast as they move. */
   rise(seconds: number): void;
   /** The smokers at their pipes this frame (render/pipeSmoke.ts draws the smoke). */
@@ -57,6 +64,8 @@ export interface ActorViews {
   flameCover(eye: THREE.Vector3): number;
   /** Where the muzzle of the investigator's revolver is this frame (posed, drawn or not), or null while they are not drawn. */
   readonly muzzle: THREE.Vector3 | null;
+  /** The edge of the investigator's weapon in the world while a blow is cutting: its point and a point back along it; null the rest of the time (swingTrails.ts). */
+  readonly swingEdge: { tip: THREE.Vector3; base: THREE.Vector3 } | null;
 }
 
 function dispose(f: Figure): void {
@@ -84,6 +93,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
   let flame: THREE.Vector3 | null = null;
   const muzzleAt = new THREE.Vector3();
   let muzzle: THREE.Vector3 | null = null;
+  const edgeAt = { tip: new THREE.Vector3(), base: new THREE.Vector3() };
+  let swingEdge: typeof edgeAt | null = null;
   let rising: { seconds: number; at: number | null } | null = null; // a cutscene's slow rise from the knee: when it began (set by the first frame drawn)
 
   g.events.on('Travelled', () => { // arriving at a sign on one knee: already down as the veil lifts (round 29)
@@ -106,9 +117,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     for (const [id, model] of g.ecs.c.model) {
       if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews
       const figure = buildFigure(model);
-      if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip)); // what the moon sees of them: one shape, not their twenty parts
+      if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip, id !== g.player.id)); // what the moon sees of them: one shape, not their twenty parts (and the lantern, for all but the one who carries it)
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, drawnUntil: -Infinity });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, life: newLife(), drawnUntil: -Infinity });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -142,6 +153,9 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     fx.rotation.y = wrapAngle(post.yaw - yaw);
     fx.scale.set(1 / s.x, 1 / s.y, 1 / s.z);
   }
+
+  let sheltered = false;
+  const standing: Standing = { id: 0, dt: 0, time: 0, speed: 0, y: 0, free: 0, me: null, sheltered: false, dozing: false, stock: (ware) => stockLeft(g, ware) };
 
   function draw(id: Entity, v: View, alpha: number, time: number): void {
     const tr = g.ecs.c.transform.get(id);
@@ -217,6 +231,29 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     if (f.flame && id === g.player.id) flame = f.flame.getWorldPosition(flameAt); // posed: it tumbles with a roll
     if (f.flameMesh && id === g.player.id) lightFlame(f.flameMesh, lanternGain(g, alpha));
     if (f.flash && id === g.player.id) muzzle = f.flash.getWorldPosition(muzzleAt); // the barrel's tip, wherever the arm has it
+    if (person) {
+      const me = g.ecs.c.transform.get(g.player.id);
+      const free = (1 - Math.min(1, Math.max(0, v.actK))) * (flinch > 0 ? 0 : 1) * (g.player.mount.active || g.player.falling ? 0 : 1);
+      standing.id = id;
+      standing.dt = dt;
+      standing.time = time;
+      standing.speed = speed;
+      standing.y = tr.pos.y;
+      standing.free = free;
+      standing.me = me?.pos ?? null;
+      standing.sheltered = sheltered;
+      standing.dozing = !post && !v.act && !!g.overworld && hourOf(phaseOf(simTime())) === 'waning'; // (the last hour is dozing on their feet: systems/npcLife.ts)
+      livePerson(f, v.life, standing);
+    }
+    if (id === g.player.id && a && def?.hit) {
+      const [from, to] = def.hit.window; // a blow cutting: its edge is followed from just before the first frame it can hit to just after the last
+      const weapon = f.arms && (Object.values(f.arms).find((m) => m.visible) as THREE.Mesh | undefined); // the one in hand, whichever of its forms is shown
+      if (weapon && frame >= from - SWING_TRAIL.lead && frame < to + SWING_TRAIL.tail) {
+        f.root.updateMatrixWorld(true);
+        const { tip, base } = edgeOf(weapon);
+        swingEdge = { tip: weapon.localToWorld(edgeAt.tip.copy(tip)), base: weapon.localToWorld(edgeAt.base.copy(base)) };
+      }
+    }
   }
 
   return {
@@ -235,15 +272,20 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     get muzzle() {
       return muzzle;
     },
+    get swingEdge() {
+      return swingEdge;
+    },
     flameCover(eye) {
       return flame ? mounts.cover(eye, flame) : 0;
     },
-    update(alpha, time) {
+    update(alpha, time, shelter = false) {
+      sheltered = shelter;
       sync();
       smokers = [];
       glow = null;
       flame = null;
       muzzle = null;
+      swingEdge = null;
       for (const [id, v] of views) draw(id, v, alpha, time);
       tracer.visible = time < tracerUntil;
     },

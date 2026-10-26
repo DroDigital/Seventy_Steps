@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { CLOCK } from '../src/data/tuning';
+import { flashLight, putOutFlashes } from '../src/render/flashLights';
 import { paneLit } from '../src/render/paneLife';
 import { createSpillPlans, planSpill } from '../src/render/spillPlan';
 import { LAMP_SLOTS } from '../src/render/shaders/world';
@@ -117,5 +118,24 @@ describe('window illumination on receiving surfaces', () => {
     lights.remove(2);
     frame(t);
     expect(windows.every((w) => w.w === 0)).toBe(true);
+  });
+
+  it('gives a flash that takes a window\'s slot no window projection, so it lights all round', () => {
+    putOutFlashes();
+    const { lights, frame } = rig();
+    const t = night(0.3);
+    lights.add(1, Array.from({ length: LAMP_SLOTS + 2 }, (_, i) => win(i * 2)));
+    frame(t);
+    const last = LAMP_SLOTS - 1;
+    expect(LIGHT_VIEW.flashes).toBe(0);
+    expect(windows.every((w) => w.w > 0)).toBe(true); // (every slot a window's, with no flash)
+    flashLight({ x: 1, y: 1, z: 9 }, [1, 0.84, 0.54], 3.4, 9, 0.1);
+    frame(t + 0.01);
+    frame(t + 0.03);
+    expect(LIGHT_VIEW.flashes).toBe(1);
+    expect(worldUniforms.uLamps.value[last].w).toBe(9);
+    expect(windows[last].toArray()).toEqual([0, 0, 0, 0]);
+    expect(windows[last - 1].w).toBeGreaterThan(0); // (the rest keep theirs)
+    putOutFlashes();
   });
 });

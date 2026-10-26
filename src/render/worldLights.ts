@@ -18,6 +18,7 @@ import { HEARTH } from '../data/lightSounds';
 import { beginHeard, pushHeard } from './audio/heardLights';
 import { createFlames } from './flames';
 import { createHalos } from './halos';
+import { layFlashes } from './flashLights';
 import { createLightSight } from './lightSight';
 import { paneLit } from './paneLife';
 import { LAMP_SLOTS } from './shaders/world';
@@ -75,9 +76,9 @@ export interface Lit {
 
 /**
  * What the last `update` chose, for the atmosphere's own passes to read (round 80: render/lampAim.ts, render/windowSpill.ts), refilled in place:
- * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye.
+ * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye; `flashes`, how many of the farthest slots a flash holds for its moment (they are not `seen`'s).
  */
-export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[] } = { seen: [], visible: [] };
+export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[]; flashes: number } = { seen: [], visible: [], flashes: 0 };
 
 /** How far the mind has gone (0..1; set each frame by worldLife.ts, round 26): the flames of a failing mind's world waver harder, and some gutter out for a moment. */
 export const LIGHT_NERVES = { madness: 0 };
@@ -191,6 +192,9 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         }
         colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * paneGain);
       }
+      const flashes = layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 83)
+      for (let k = 0; k < flashes; k++) planes[LAMP_SLOTS - 1 - k].set(0, 0, 0, 0); // (all round: no window's glass to clip a flash against)
+      LIGHT_VIEW.flashes = flashes; // (and none of the mist's aim of the light it displaced: lampAim.ts)
       batch.begin();
       if (lantern && lanternCover < 1) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * (1 - lanternCover) * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time)); // (a seat back between the eye and it takes its halo: round 57)
       for (const { s, v } of visible) {

@@ -5,7 +5,7 @@ import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
-import { ANOMALY } from './palette';
+import { ANOMALY, ANOMALY_HUES } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
 import { generateTexture, TEXTURE_SIZE, UV_PER_TEXTURE, type TextureKind } from './textures';
 import { trample } from './trample';
@@ -63,6 +63,13 @@ export const worldUniforms = {
   uLanternSelf: { value: LANTERN.self },
   uSelfMax: { value: LANTERN.selfMax },
   uEyeRange: { value: new THREE.Vector2(...LIGHT.eyes) },
+  uSpriteTints: { value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)] }, // the realm's grade, four stops (render/realmLook.ts), and the share the drawn creatures take of it (round 83: shaders/spriteGrade.ts)
+  uSpriteGrade: { value: FX.spriteGrade },
+  uRelight: { value: 0 }, // the Relight setting: the horrors' bodies lit over their folds (shaders/sprite.ts; main.ts sets it)
+  uSpriteVivid: { value: new THREE.Vector2(...FX.spriteVivid) },
+  uMind: { value: 0 }, // 0..1: a failing mind's hold on what it sees of the creatures (fx.ts `mind`)
+  uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
+  uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },
   uMarkCharacters: { value: 0 }, // 1: the Colour's sprite marks alpha for the post pass; 0 keeps direct-to-canvas renders opaque
   uFogNear: { value: 0 },
   uFogFar: { value: 1 },
@@ -212,4 +219,5 @@ export function updateWorldUniforms(
   u.uFogNear.value = fx.fogNear;
   u.uFogFar.value = fx.fogFar;
   u.uFogAmount.value = fx.fogAmount;
+  u.uMind.value = fx.mind;
 }
