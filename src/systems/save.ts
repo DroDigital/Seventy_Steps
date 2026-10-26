@@ -7,15 +7,17 @@
  * is handed in.
  */
 
+import { distXZ } from '../core/geom';
 import type { Place } from '../data/arena';
 import { ENDING_IDS } from '../data/endings';
 import { QUESTS } from '../data/quests';
 import { WARES } from '../data/wares';
 import { START_SIGN } from '../data/sites';
 import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
-import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
+import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, WORLD, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
+import { beginPeace } from './peace';
 import { footingSafe } from './falls';
 import { openAround } from './passages';
 import type { Game } from './components';
@@ -239,7 +241,9 @@ export function applySave(g: Game, s: SaveData): void {
   const body = c.body.get(g.player.id)!;
   openAround(g, s.at); // the passages they stood at, open as they left them, before the footing is judged
   const standing = regionAt(s.at.x, s.at.z) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // (a save taken in the middle of a fall must not load inside it)
-  teleport(g, standing ? s.at : g.player.checkpoint);
+  const at = standing ? s.at : g.player.checkpoint;
+  teleport(g, at);
+  if (distXZ(at, g.player.checkpoint) <= WORLD.signReach) beginPeace(g); // a game continued at its stone begins at peace, as every arrival does; one left out in the world, a fight or a hall is continued as it was (round 86: peace.ts)
 }
 
 /** Save slots (round 12): three, the first under the old key so a save from before slots is its. */

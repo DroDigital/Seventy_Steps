@@ -344,6 +344,9 @@ export const FINDS = {
   wait: { weapon: 900, relic: 5200 },
 };
 
+/** The investigator's peace on arriving (round 86, systems/peace.ts): the seconds it holds once they have risen (moved or acted). A blow, a shot or a flask of their own ends it at once. */
+export const PEACE = { after: 4 };
+
 /** The map's markers (round 60, systems/marker.ts): how near the investigator must come for one to be reached, and so cleared (metres), and how many may stand at once (round 68: it was one). */
 export const MARKER = { arrive: 10, most: 12 };
 

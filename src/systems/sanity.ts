@@ -19,7 +19,7 @@ import type { Tier } from '../data/schema';
 import { LAUDANUM, SANITY, SIM, UPGRADES } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
-import { BANDS, isAbsent, type Band, type Game, type Mind, type Toll } from './components';
+import { BANDS, isAbsent, isSheltered, type Band, type Game, type Mind, type Toll } from './components';
 import { laudanumMax } from './levels';
 import { aimPoint, playerEye } from './lockOn';
 
@@ -62,9 +62,9 @@ export function setSanity(g: Pick<Game, 'mind' | 'events'>, value: number): void
   g.events.emit('SanityBandChanged', { from, to, sanity: m.sanity });
 }
 
-/** Takes sanity; each level of the Resolve upgrade lessens every loss. A loss of SANITY.jolt or more at once is announced. Nothing is taken in a cutscene or while the investigator is sheltered (a dialogue, a trade or a sign's rest). */
-export function loseSanity(g: Pick<Game, 'mind' | 'events' | 'cutscene' | 'sheltered'>, amount: number): void {
-  if (amount <= 0 || g.cutscene || g.sheltered) return;
+/** Takes sanity; each level of the Resolve upgrade lessens every loss. A loss of SANITY.jolt or more at once is announced. Nothing is taken in a cutscene or while the investigator is sheltered (a dialogue, a trade, a sign's rest, or the peace of an arrival: round 86). */
+export function loseSanity(g: Pick<Game, 'mind' | 'events' | 'cutscene' | 'sheltered' | 'player'>, amount: number): void {
+  if (amount <= 0 || g.cutscene || isSheltered(g)) return;
   const resist = g.mind.upgrades.resolve * (UPGRADES.resolve.resist ?? 0);
   const before = g.mind.sanity;
   setSanity(g, before - amount * (1 - resist));
@@ -159,7 +159,7 @@ export function mendRate(g: Game): number {
 /** Unmoored, the body wears away as well (round 23): a little of full health a second, never to death, and none while a shot of Reagent holds the body, nor while the investigator is sheltered. */
 export function bleed(g: Game, dt: number): void {
   const h = g.ecs.c.health.get(g.player.id);
-  if (!h || g.cutscene || g.sheltered || g.mind.band !== 'unmoored' || h.hp <= 1 || g.player.mended > 0) return; // (a fallen body, at 0, has nothing to lose)
+  if (!h || g.cutscene || isSheltered(g) || g.mind.band !== 'unmoored' || h.hp <= 1 || g.player.mended > 0) return; // (a fallen body, at 0, has nothing to lose)
   h.hp = Math.max(1, h.hp - h.max * SANITY.unmoored.bleed * dt);
 }
 

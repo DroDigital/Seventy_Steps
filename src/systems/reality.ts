@@ -24,7 +24,7 @@ import { startMove } from './actions';
 import { ring } from './arenaChanges';
 import { engagedFights } from './bossFight';
 import { strike } from './combat';
-import type { Fight, Game, Reality } from './components';
+import { isSheltered, type Fight, type Game, type Reality } from './components';
 import { playerEye } from './lockOn';
 import { REALITY_TRICKS, type HookStep } from './realityTricks';
 import { loseSanity } from './sanity';
@@ -93,7 +93,7 @@ const platforms: HookStep = (g, fights) => {
 };
 
 const petrify: HookStep = (g, fights) => {
-  if (g.cutscene || g.sheltered) return; // (a gaze builds nothing while the investigator is sheltered: it cannot petrify them then)
+  if (g.cutscene || isSheltered(g)) return; // (a gaze builds nothing while the investigator is sheltered: it cannot petrify them then)
   const r = g.reality;
   const c = g.ecs.c;
   const eye = playerEye(g);

@@ -25,6 +25,7 @@ describe('the death and Echo loop in the open world', () => {
     kill(g, creatureOf(g, 'boss:black_man')!);
 
     g.player.echoes = 700;
+    g.player.peace = null; // (the rest's peace would hold off the blow: round 86)
     const fell = { ...g.ecs.c.transform.get(g.player.id)!.pos };
     strike(g, g.player.id, g.player.id, deathblow); // the foe is gone; any death will do
     run(g, PLAYER_MOVES.death.frames + 5);

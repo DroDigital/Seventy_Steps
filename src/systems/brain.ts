@@ -23,7 +23,7 @@ import type { Entity } from '../core/ecs';
 import { distXZ, yawOf, type XZ } from '../core/geom';
 import { AI, BOSS, SIM } from '../data/tuning';
 import { arenaOf, within } from './bossArena';
-import { isAbsent, type Actor, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
+import { isAbsent, isSheltered, type Actor, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
 import { callPack, hears, noiseOf, perceive, sight, tracks } from './perception';
 import { roam } from './roam';
 import { assignTokens, fight, walk } from './tactics';
@@ -123,13 +123,13 @@ function mayJoin(g: Game, j: { with: string; below: number }): boolean {
 function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   const joins = g.ecs.c.fight.get(id)?.script.joins;
   if (!joins || br.state === 'engage') return false;
-  if (!mayJoin(g, joins)) return (br.state = 'hidden'), true;
+  if (!mayJoin(g, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 86)
   [br.state, br.cooldown, br.target] = ['engage', BOSS.wake, g.player.id]; // it gathers itself before its first blow, as one woken does (round 60)
   g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} JOINS THE FIGHT` });
   return false;
 }
 
-/** A dialogue is open (the world goes on through a talk): a foe that was on the investigator lets go of them, and goes home as if it had never seen them. The talk is no fight. */
+/** The investigator is sheltered (a dialogue is open and the world goes on through the talk, or they are at peace on arriving: round 86): a foe that was on them lets go, and goes home as if it had never seen them. A talk is no fight, nor is an arrival. */
 function letGo(br: Brain): void {
   br.target = null;
   br.aware = 0;
@@ -207,7 +207,7 @@ export function brainSystem(g: Game): void {
     const tr = transform.get(id)!;
     m.vx = 0;
     m.vz = 0;
-    if (g.sheltered && br.target === g.player.id) letGo(br); // (nothing reaches the investigator while they are sheltered: targets.ts)
+    if (isSheltered(g) && br.target === g.player.id) letGo(br); // (nothing reaches the investigator while they are sheltered: targets.ts)
     if (g.cutscene && br.target === g.player.id) continue;
     if (isAbsent(g, id) || a.frozen || (health.get(id)?.hp ?? 0) <= 0 || waitsToJoin(g, id, br)) continue;
     const arena = arenaOf(g, id);
