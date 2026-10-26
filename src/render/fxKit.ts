@@ -63,7 +63,7 @@ const endOf = (e: Element, look: AttackLook, c: Rgb): Rgb => (e.cools ? (e.glow 
 /** The size of a chunk for a burst of this radius: coarse for a colossus's, fine for a bolt's. */
 const chunkSize = (radius: number): number => Math.min(0.75, 0.13 + radius * 0.045);
 
-/** A flash at the heart of a blow: a blaze that is gone in a few frames, and the ring of light it opens; `lit` (round 84): whether it also lights the world about it, as a foe's blows do (render/attackFx.ts) and the investigator's, an ally's do not. */
+/** A flash at the heart of a blow: a blaze that is gone in a few frames, and the ring of light it opens; `lit` (round 87): whether it also lights the world about it, as a foe's blows do (render/attackFx.ts) and the investigator's, an ally's do not. */
 export function flash(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, lift = 0.4, lit = true): void {
   const y = at.y + lift;
   const b = FLASH_LIGHTS.burst;

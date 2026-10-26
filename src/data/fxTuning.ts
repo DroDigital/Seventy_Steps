@@ -138,7 +138,7 @@ export const GROUND_CONTACT = {
 
 /**
  * Lights that last a moment (round 83, render/flashLights.ts): the flash at the heart of a foe's blow and a foe's bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer.
- * Round 84 (XDro: the hit flashes were too much, and a blow of the investigator's already lights the creature it lands on): the investigator's shot and blow lay no light, only a foe's blows, shots and bolts do, and the lights are small and short: the strongest is about a torch's (1.1; a fire is 1.8, a street lamp 2.6), the usual about half of it.
+ * Round 87 (XDro: the hit flashes were too much, and a blow of the investigator's already lights the creature it lands on): the investigator's shot and blow lay no light, only a foe's blows, shots and bolts do, and the lights are small and short: the strongest is about a torch's (1.1; a fire is 1.8, a street lamp 2.6), the usual about half of it.
  */
 export const FLASH_LIGHTS = {
   slots: 2, // the most at once

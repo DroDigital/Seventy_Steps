@@ -34,7 +34,7 @@ const PER_STEP = 12;
 const SLAB = 0.3; // a floor slab's depth (world/dungeonParts.ts)
 
 type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31)
-type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 84: the pixel flame, flames.ts, is its picture)
+type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 87: the pixel flame, flames.ts, is its picture)
 /** What a piece is drawn with: a kit's texture, or (marked `+`) the same drawn a little nearer than it is, for relief that stands 6 to 15 cm off a wall's face. */
 export type Group = KitTexture | 'glow' | 'cloth+' | `${KitTexture}+`;
 type Origin = { x: number; z: number }; // where a dungeon's world-space UVs count from

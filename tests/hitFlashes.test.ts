@@ -1,5 +1,5 @@
 /**
- * Who lights the world as they strike (round 84; render/flashLights.ts, fxKit.ts `lit`, attackFx.ts `foe`): only a foe's blow, shot and bolt do,
+ * Who lights the world as they strike (round 87; render/flashLights.ts, fxKit.ts `lit`, attackFx.ts `foe`): only a foe's blow, shot and bolt do,
  * and softly. The investigator's blow already lights the creature it lands on (the sprite's own wound flash), so neither his blow nor his shot
  * lays a lamp, nor does an ally's, nor the lantern-lit creature's own: XDro, the hit flashes were too much and for the player's own strikes
  * not needed.
@@ -39,7 +39,7 @@ function lit(): { n: number; peak: number } {
 
 afterEach(putOutFlashes);
 
-describe('who lights the world as they strike (round 84)', () => {
+describe('who lights the world as they strike (round 87)', () => {
   it('the investigator’s landed blow throws sparks and ichor but lays no light', () => {
     const { g, player, deepOne } = scriptedGame();
     place(g, player, 0, 0, 0);
@@ -85,7 +85,7 @@ describe('who lights the world as they strike (round 84)', () => {
     createAttackFx(g, fresh(), createGroundFx());
     const land = (owner: number): number => {
       putOutFlashes();
-      g.events.emit('BoltLanded', { owner, at: { x: 0, y: 1, z: 3 }, vel: { x: 0, y: 0, z: 1 }, on: 'body', radius: 0.5, lob: false, fire: false, conjured: false });
+      g.events.emit('BoltLanded', { owner, faction: g.ecs.c.combatant.get(owner)?.faction ?? 'enemy', at: { x: 0, y: 1, z: 3 }, vel: { x: 0, y: 0, z: 1 }, on: 'body', radius: 0.5, lob: false, fire: false, conjured: false });
       return lit().n;
     };
     const erupt = (by: number): number => {
@@ -100,6 +100,24 @@ describe('who lights the world as they strike (round 84)', () => {
     g.ecs.c.combatant.get(deepOne)!.faction = 'player'; // (an ally: a conjured thing on the investigator’s side)
     expect(land(deepOne)).toBe(0);
     expect(erupt(deepOne)).toBe(0);
+  });
+
+  it('a foe already gone when its effect lands (a minion cleared with the fight) still lights it; an ally\'s bolt, by the faction it carries, does not', () => {
+    const { g, player, deepOne } = scriptedGame();
+    place(g, player, 0, 0, 0);
+    createAttackFx(g, fresh(), createGroundFx());
+    const gone = deepOne;
+    g.ecs.despawn(gone);
+    const bolt = (faction: 'enemy' | 'player'): number => {
+      putOutFlashes();
+      g.events.emit('BoltLanded', { owner: gone, faction, at: { x: 0, y: 1, z: 3 }, vel: { x: 0, y: 0, z: 1 }, on: 'body', radius: 0.5, lob: false, fire: false, conjured: false });
+      return lit().n;
+    };
+    expect(bolt('enemy')).toBe(1);
+    expect(bolt('player')).toBe(0);
+    putOutFlashes();
+    g.events.emit('Erupted', { at: { x: 0, y: 0, z: 3 }, radius: 3, by: gone });
+    expect(lit().n).toBe(1);
   });
 
   it('a kit flash or impact asked to be unlit lays none, and the lit ones are small', () => {

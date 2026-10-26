@@ -1,6 +1,6 @@
 /**
  * Lights that last a moment (round 83; data/fxTuning.ts FLASH_LIGHTS): the flash at the heart of a foe's
- * blow, a foe's bolt in flight (round 84: the investigator's shot and blow lay none; the creature they
+ * blow, a foe's bolt in flight (round 87: the investigator's shot and blow lay none; the creature they
  * strike lights up of itself). The world, the creatures and the mist all read the same twelve lamps
  * (shaders/common.ts LAMPS_GLSL, shaders/fog.ts), so a flash takes the slot of one of the farthest of the
  * lamps for its moment: no shader loop gets longer, and the mist lights up with the rest. Whatever the

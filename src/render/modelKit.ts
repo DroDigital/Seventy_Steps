@@ -121,8 +121,10 @@ export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): Solid
   const keep = look.keep ?? 0;
   const [sx, sy, sz] = scaleOf(look);
   const groups = new Map<string, number[]>(); // material → the faces drawn in it
+  const flamed = !!look.lit && !!MODEL_INFO[look.id]?.anchors?.length;
   for (let t = 0; t < m.kind.length; t++) {
     const glass = lamp && look.id === 'lightpost' && m.kind[t] === 1;
+    if (flamed && m.kind[t] === KIND.glow) continue; // a lit fixture's own baked cone of flame (the brazier's): the pixel flame at its anchor is its fire (round 87)
     // Replace the baked candle's tall wick with the oil burner's small wick and flame.
     if (lamp && look.id === 'lantern' && m.kind[t] === 1 && m.colour[t * 3 + 1] < 150) continue;
     const mat = glass ? 'glass' : lamp ? 'stone' : MATS[look.wax && WAXEN.has(m.kind[t]!) ? KIND.wax : m.kind[t]!] ?? 'stone';

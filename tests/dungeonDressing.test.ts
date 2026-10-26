@@ -24,7 +24,7 @@ describe('the dressing of the dungeons (round 30)', () => {
     expect(pieces).toBeGreaterThan(100);
   }, 60_000);
 
-  it('braziers are fires, one flame to each (the pixel flame of worldLights: no cone of their own, round 84), and only where the kit keeps flames', () => {
+  it('braziers are fires, one flame to each (the pixel flame of worldLights: no cone of their own, round 87), and only where the kit keeps flames', () => {
     let fires = 0;
     for (const d of worldLayout().dungeons) {
       for (const p of dress(d)) {

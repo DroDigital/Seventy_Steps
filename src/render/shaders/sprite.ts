@@ -182,7 +182,7 @@ float relight(vec2 uv, float centre) {
 }
 
 /**
- * A light as a drawn creature takes it (round 84): all of its brightness and a share of its hue. The lantern is a strong orange (red to blue
+ * A light as a drawn creature takes it (round 87): all of its brightness and a share of its hue. The lantern is a strong orange (red to blue
  * 1.7) and, within a few metres, most of what lights a creature, so laid on whole it replaced the creature's colours with its own, and the
  * recolour that follows (spriteGrade.ts) multiplies a cast's colour again. The luma is the one that recolour keeps.
  */
@@ -203,7 +203,7 @@ void main() {
   }
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 light = uAmbient + uLightColor * vShade.x * uCharacterLight + creatureWarmth(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 84)
+  vec3 light = uAmbient + uLightColor * vShade.x * uCharacterLight + creatureWarmth(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 87)
   if (vRelit > 0.5 && uRelight > 0.0 && !glow) light *= mix(1.0, relight(uv, dot(t.rgb, vec3(0.299, 0.587, 0.114))), uRelight * 0.8); // the Relight setting (round 83)
   vec3 col = glow ? t.rgb : t.rgb * light;
   if (uReviewed > 0.5) col = spriteGraded(col, vTone); // the realm's colours on the older art, brightness kept (round 83: spriteGrade.ts)

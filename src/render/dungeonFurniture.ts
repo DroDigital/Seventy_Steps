@@ -154,7 +154,7 @@ export const place = (item: Item, f: Frame): void => BUILD[item](f);
 /** How far an item stands off its wall at most (the walls' inner faces are solid; nothing is set deeper into a room than this). */
 export const DEPTH = 1.1;
 
-/** A brazier's iron stand and bowl, and where its fire burns (the pixel flame, flames.ts: round 84, no cone of it is built), at (x, z) on a floor at `y`. */
+/** A brazier's iron stand and bowl, and where its fire burns (the pixel flame, flames.ts: round 87, no cone of it is built), at (x, z) on a floor at `y`. */
 export function brazier(x: number, z: number, y: number): { iron: THREE.BufferGeometry[]; at: { x: number; y: number; z: number } } {
   const iron = [
     tint(new THREE.CylinderGeometry(0.14, 0.3, 0.9, 6).translate(x, y + 0.45, z), IRON),

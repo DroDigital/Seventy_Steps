@@ -4,7 +4,7 @@
  * fixed height above a wall's lowest point, which on stairs buried some and hung some in the air):
  * now they stand evenly along each stretch of wall, a spacing of the kit's own (`flames`, the share
  * of a four-metre pilaster that bears one), on the faces that look into a room, at a height above the
- * floor of that room, each an iron bracket and cup, and every one a light (round 84: its flame is the
+ * floor of that room, each an iron bracket and cup, and every one a light (round 87: its flame is the
  * pixel flame's, flames.ts, and no cone of one is built). Pure but for the geometry it makes.
  */
 

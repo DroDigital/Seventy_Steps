@@ -3,7 +3,7 @@
  * turned and placed, then merged per chunk into one mesh per material (stone, wood, needles and
  * leaves, clapboard, brick, shingles, and the self-lit glow of lamps, fires and lit windows), tinted
  * toward the region's ground and darkened toward it (light baked into the vertices, playtest round
- * 7); the lamps, fires and windows are reported as lights (worldLights.ts; round 84: a fire is a light and its
+ * 7); the lamps, fires and windows are reported as lights (worldLights.ts; round 87: a fire is a light and its
  * pixel flame, flames.ts, with no cone of embers built for it). Built a few props at a time (a sliced job).
  */
 
@@ -112,11 +112,11 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
       if (!piece.light) continue;
       if (piece.at) {
         const place = ([x, y, z]: readonly [number, number, number]): { x: number; y: number; z: number } => ({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was (rotateY), then placed
-        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane, halo: piece.halo, haloGain: piece.haloGain, flame: piece.flame });
+        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane, halo: piece.halo, haloGain: piece.haloGain, flame: piece.flame, seat: piece.seat });
       } else if (geo) {
         geo.computeBoundingBox();
         const m = geo.boundingBox!.getCenter(new THREE.Vector3());
-        lights.push({ x: m.x, y: m.y, z: m.z, kind: piece.light, flame: piece.flame });
+        lights.push({ x: m.x, y: m.y, z: m.z, kind: piece.light, flame: piece.flame, seat: piece.seat });
       }
     }
     spent += p.kind === 'house' ? 4 : 1;

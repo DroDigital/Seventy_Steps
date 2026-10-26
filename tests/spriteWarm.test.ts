@@ -1,5 +1,5 @@
 /**
- * Creatures in lamplight keep their own colour (round 84; render/shaders/sprite.ts `creatureWarmth`, `FX.spriteWarm`): the lantern's and the
+ * Creatures in lamplight keep their own colour (round 87; render/shaders/sprite.ts `creatureWarmth`, `FX.spriteWarm`): the lantern's and the
  * lamps' light gives a creature all of its brightness and only a share of its hue, so a creature near the lantern is lit, not painted orange
  * (before: the full hue went through the realm's recolour, which multiplies chroma up to 2.5 times, and every form near the player went amber).
  */
@@ -14,7 +14,7 @@ const luma = (c: readonly number[]): number => 0.2126 * c[0] + 0.7152 * c[1] + 0
 const warmth = (c: readonly number[], k: number): number[] => c.map((v) => luma(c) + (v - luma(c)) * k);
 const chroma = (c: readonly number[]): number => Math.max(...c) - Math.min(...c);
 
-describe('a creature near the lantern keeps its colour (round 84)', () => {
+describe('a creature near the lantern keeps its colour (round 87)', () => {
   it('takes a small share of the light’s hue, and the shader and its uniform say so', () => {
     expect(FX.spriteWarm).toBeGreaterThan(0); // (some warmth: the lantern is seen on them)
     expect(FX.spriteWarm).toBeLessThanOrEqual(0.35); // (not the amber they had: 1)

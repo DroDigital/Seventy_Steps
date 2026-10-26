@@ -17,18 +17,19 @@ import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
 export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
-/** A piece that has its geometry: all but the light of a fire, which has none (round 84). */
+/** A piece that has its geometry: all but the light of a fire, which has none (round 87). */
 export type SolidPiece = Piece & { geo: THREE.BufferGeometry };
 /** The pieces of `pieces` that have geometry. */
 export const solids = (pieces: readonly Piece[]): SolidPiece[] => pieces.filter((q): q is SolidPiece => q.geo !== undefined);
 export interface Piece {
   mat: PropMat;
-  geo?: THREE.BufferGeometry; // none (round 84): a light alone, at `at`; a fire or a flame is the pixel flame's (flames.ts), no cone of embers is built for it
+  geo?: THREE.BufferGeometry; // none (round 87): a light alone, at `at`; a fire or a flame is the pixel flame's (flames.ts), no cone of embers is built for it
   light?: LightKind; // a lamp's glass, a fire, a lit window: it lights the world about it (worldLights.ts)...
   halo?: number; // a housed oil flame has a smaller halo than an open flame
   haloGain?: number;
   at?: readonly [number, number, number]; // ...from here in the prop's frame (else from its middle: a piece with no geometry must say)
   flame?: number; // the pixel flame of a fire, torch or lamp here, this many times the size its kind has (render/worldLights.ts; default 1)
+  seat?: number; // and its foot this far from the light (under it, negative), where its kind's `base` does not say
   glass?: readonly [number, number, number]; // a window's pane: its glow sits there, seen only from before it (worldLights.ts)
   pane?: number; // a lit window's seed: who lives behind it (paneLife.ts; round 18)
   smoke?: readonly (readonly [number, number, number])[]; // the tops of the chimneys this piece is, in the prop's frame: smoke goes up from them (chimneys.ts; round 34)

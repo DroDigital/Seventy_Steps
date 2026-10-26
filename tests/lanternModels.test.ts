@@ -23,15 +23,20 @@ const bounds = (g: THREE.BufferGeometry): THREE.Box3 => {
 describe('oil flames remain within their baked lantern housings', () => {
   it.each([0.65, 1, 1.8])('fits both lanterns at scale %s, below their caps and clear of the frame', (k) => {
     for (const id of ['lightpost', 'lantern']) {
-      const pieces = solids(setPieces(prop(id, k), [1, 1, 1]));
-      const flames = pieces.filter((p) => p.light);
+      const all = setPieces(prop(id, k), [1, 1, 1]);
+      const pieces = solids(all);
+      const flames = all.filter((p) => p.light);
       expect(flames).toHaveLength(1);
-      const flame = bounds(flames[0].geo);
+      expect(flames[0].geo).toBeUndefined(); // (round 87: the housing holds the pixel flame of a lamp, not a teardrop of its own)
+      const [at, seat, size] = [flames[0].at!, flames[0].seat!, flames[0].flame!];
+      expect(seat).toBeLessThan(0); // its foot on the wick, under its light
+      const tall = 0.22 * size; // (a lamp's pixel flame is 0.22 m tall at size 1)
+      const flame = new THREE.Box3(new THREE.Vector3(at[0], at[1] + seat, at[2]), new THREE.Vector3(at[0], at[1] + seat + tall, at[2]));
       // The post's actual baked glass supplies the enclosure, rather than a second copy of the flame offsets.
       const cage = id === 'lightpost' ? bounds(pieces.find((p) => p.mat === 'glass')!.geo) :
         new THREE.Box3(new THREE.Vector3(-0.09, 0.195, -0.09).multiplyScalar(k), new THREE.Vector3(0.09, 0.312, 0.09).multiplyScalar(k));
       expect(cage.containsBox(flame)).toBe(true);
-      expect(flame.containsPoint(new THREE.Vector3(...flames[0].at!))).toBe(true);
+      expect(flame.containsPoint(new THREE.Vector3(...at))).toBe(true);
       expect(pieces.some((p) => p.mat === 'leaf')).toBe(false);
       for (const piece of pieces) piece.geo.dispose();
     }

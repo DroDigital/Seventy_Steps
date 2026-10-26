@@ -44,7 +44,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const p = c.transform.get(id)?.pos;
     return p && { x: p.x, y: p.y + (c.body.get(id)?.aimHeight ?? 1.2) * k, z: p.z };
   };
-  const foe = (id: number): boolean => id !== g.player.id && c.combatant.get(id)?.faction === 'enemy'; // (round 84: only a foe's effects light the world about them, as meleeFx's do; not the investigator's, an ally's or the world's)
+  const foe = (id: number): boolean => id !== g.player.id && c.combatant.get(id)?.faction !== 'player'; // (round 87: only a foe's effects light the world about them, as meleeFx's do; not the investigator's or an ally's. One already gone when its effect lands, a minion cleared with the fight, was a foe's: bolts carry their faction)
   const style = (id: number) => {
     const look = attackLook(g, id);
     return { look, el: ELEMENTS[look.motif], lit: foe(id) };
@@ -57,9 +57,10 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const sp = Math.hypot(vel.x, vel.z) || 1;
     for (let i = 0; i < 5; i++) fx.spawn({ x: at.x, y: at.y, z: at.z, vx: (vel.x / sp) * rand(4, 9) + rand(-1.5, 1.5), vy: rand(-0.5, 1), vz: (vel.z / sp) * rand(4, 9) + rand(-1.5, 1.5), life: 0.25, size: 0.2, color: conjured ? look.mind : look.core, colorEnd: look.line, glow: true, shape: 'streak', stretch: 0.14, hold: 0.3 });
   });
-  g.events.on('BoltLanded', ({ owner, at, vel, on, radius, fire, conjured }) => {
+  g.events.on('BoltLanded', ({ owner, faction, at, vel, on, radius, fire, conjured }) => {
     if (fire || !near(at)) return;
-    const { look, el, lit } = style(owner);
+    const { look, el } = style(owner);
+    const lit = faction === 'enemy' && owner !== g.player.id; // (the bolt's own faction: its owner may be gone by now)
     const sp = Math.hypot(vel.x, vel.z) || 1;
     const dir = { x: vel.x / sp, z: vel.z / sp };
     if (on === 'spent') {
@@ -197,7 +198,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         if (!near(at)) continue;
         const { look, el } = style(b.owner);
         trail(fx, el, at, b.vel, b.radius, b.conjured ? { ...look, line: look.mind } : look, el.glow || look.motif === 'plain');
-        if (el.glow && b.faction === 'enemy') flashLight(at, whiteOf(b.conjured ? look.mind : look.line), Math.min(FLASH_LIGHTS.bolt.most, FLASH_LIGHTS.bolt.strength + b.radius * FLASH_LIGHTS.bolt.per), Math.min(FLASH_LIGHTS.bolt.rangeMost, FLASH_LIGHTS.bolt.range + b.radius * FLASH_LIGHTS.bolt.rangePer), FLASH_LIGHTS.bolt.seconds, e); // a foe's bolt of light or fire lights the ground it crosses (round 83; round 84: not an ally's, which the investigator's own are not either)
+        if (el.glow && b.faction === 'enemy') flashLight(at, whiteOf(b.conjured ? look.mind : look.line), Math.min(FLASH_LIGHTS.bolt.most, FLASH_LIGHTS.bolt.strength + b.radius * FLASH_LIGHTS.bolt.per), Math.min(FLASH_LIGHTS.bolt.rangeMost, FLASH_LIGHTS.bolt.range + b.radius * FLASH_LIGHTS.bolt.rangePer), FLASH_LIGHTS.bolt.seconds, e); // a foe's bolt of light or fire lights the ground it crosses (round 83; round 87: not an ally's, which the investigator's own are not either)
       }
       for (const [e, mk] of c.mark) {
         const p = c.transform.get(e)!.pos;

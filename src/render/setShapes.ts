@@ -21,9 +21,9 @@ import { towerHorn, towerRound, towerSpire, towerSquare } from './setShapesTower
 import type { Rgb } from './palette';
 import type { Piece } from './propShapes';
 
-/** A flame standing at (x, y, z): a light alone, and the pixel flame its picture (round 84: a cone was built here), as large as `flame` says. */
-function flame(kind: LightKind, at: readonly [number, number, number], size?: number): Piece {
-  return { mat: 'glow', ...fireSpot(kind, at, flameSize(size)) };
+/** A flame standing at (x, y, z): a light alone, where the cone's was (its width over the foot), and the pixel flame its picture (round 87: a cone was built here), as large as `flame` says, standing on the foot. */
+function flame(kind: LightKind, at: readonly [number, number, number], size = 0.3): Piece {
+  return { mat: 'glow', ...fireSpot(kind, at, flameSize(size), at[1] + size) };
 }
 
 /** The built pieces: name → its pieces from the prop. */

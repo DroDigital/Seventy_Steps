@@ -23,7 +23,7 @@ import { box, worldUv } from './meshKit';
 import { scaleRgb, type Rgb } from './palette';
 import type { LightSpot } from './worldLights';
 
-export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 84)
+export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
 type Origin = { x: number; z: number };
 
 const AWAY = { door: 2.8, torch: 1.5, spot: 2.2 }; // metres furniture keeps from a doorway, a torch, and what stands in a room
