@@ -95,6 +95,26 @@ describe('the signed unlock code of the itch.io Mounts pack (round 84)', () => {
     expect(findCodes(kept)).toEqual(made.slice(-UNLOCK_KEEP));
   });
 
+  it('checks against the shipped key when none is named, as the shell calls it (Codex, PR 194: a paste was always "invalid")', async () => {
+    const seen: string[] = [];
+    vi.resetModules();
+    vi.doMock('node:crypto', async (original: () => Promise<Record<string, unknown>>) => {
+      const real = (await original()) as { createPublicKey(o: { key: Uint8Array }): unknown };
+      return { ...real, createPublicKey: (o: { key: Uint8Array }) => { seen.push(btoa(String.fromCharCode(...o.key.slice(-32)))); return real.createPublicKey(o); } };
+    });
+    try {
+      const shell = await import('../desktop/mountUnlock.js');
+      expect(shell.redeem(both, itch, undefined, undefined)).toEqual({ ok: false, reason: 'invalid' }); // (a code of this test's key, not the shipped one)
+      expect(shell.unlockedMounts(both)).toBeNull();
+      expect(shell.mountsUnlockedHere(both, itch)).toEqual([]);
+      expect(seen.length).toBeGreaterThanOrEqual(3);
+      expect(new Set(seen)).toEqual(new Set([shell.UNLOCK_PUBLIC_KEY]));
+    } finally {
+      vi.doUnmock('node:crypto');
+      vi.resetModules();
+    }
+  });
+
   it('holds the public key alone: 32 bytes, and no code made with a key of this test opens the shipped one', () => {
     expect(atob(UNLOCK_PUBLIC_KEY)).toHaveLength(32);
     expect(UNLOCK_PUBLIC_KEY).not.toBe(pair.publicKey);

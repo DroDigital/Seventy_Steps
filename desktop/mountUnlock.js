@@ -34,7 +34,7 @@ export function findCodes(text) {
 export const findCode = (text) => findCodes(text)[0] ?? null;
 
 /** What one code opens: `{ mounts, id }` when its signature is the key's and its payload is ours, else null. Never throws. */
-function opens(code, publicKey) {
+function opens(code, publicKey = UNLOCK_PUBLIC_KEY) {
   const [tag, payload, signature] = code.split('.');
   try {
     const key = createPublicKey({ key: Buffer.concat([SPKI_ED25519, Buffer.from(publicKey, 'base64')]), format: 'der', type: 'spki' });
