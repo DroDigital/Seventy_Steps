@@ -10,7 +10,7 @@
  *   place({ ... })       puts the investigator `dist` metres from it, on the bearing `bearing` (radians, 0 = in front of it)
  *   look({ ... })        the camera: at `yaw` (about the creature), `dist`, `up` metres up, looking at `aim` metres up, at the point `mix`
  *                        of the way from the creature to the investigator (default 0); `look(null)`: the game's
- *   spawn(spec)          pushes one particle into the game's batch (round 87: to lay out the shapes and judge them by eye)
+ *   spawn(spec)          pushes one particle into the game's batch (round 88: to lay out the shapes and judge them by eye)
  */
 import * as THREE from 'three';
 import type { ParticleSpec } from '../render/particles';

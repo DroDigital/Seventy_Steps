@@ -6,7 +6,7 @@
  * how it moves (`motion`) and the light it is drawn in (`accent`). No two creatures of one element share all three,
  * and no two horrors of one element share a form (tests/attackSignatures.test.ts). Data only: no Three.js.
  *
- * Since round 87 (asked: the lower tiers' blows were acceptable but overly elaborate, and their colours clustered) this table is the
+ * Since round 88 (asked: the lower tiers' blows were acceptable but overly elaborate, and their colours clustered) this table is the
  * horrors' alone, and shoggoth's and the flying polyp's: every other creature's blow, lesser, greater, ally and plain named, is
  * `data/foeBlows.ts`, one quiet graphic mark and its three hues. A creature has a signature or a blow here, never both.
  */

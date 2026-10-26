@@ -1,5 +1,5 @@
 /**
- * What the quiet blows' parts share (round 87, render only): which entities are drawn this way, each one's blow, look, size and tier, the
+ * What the quiet blows' parts share (round 88, render only): which entities are drawn this way, each one's blow, look, size and tier, the
  * clock, the crowd's answer to "may I draw this", and the little each creature remembers of the move it is in. `foeStrike.ts` (blows at close
  * quarters) and `foeCast.ts` (casters' bolts, beams, gazes and summonings) are made on it, `foeFx.ts` wires them to the game.
  */

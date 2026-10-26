@@ -1,5 +1,5 @@
 /**
- * The mark atlas as a texture (round 87, the quiet blows): the six coverage masks of data/markAtlas.ts (tools/marks/bake_marks.py), side by side in
+ * The mark atlas as a texture (round 88, the quiet blows): the six coverage masks of data/markAtlas.ts (tools/marks/bake_marks.py), side by side in
  * one row, hard edged like the flame flipbook (render/flames.ts `flameAtlasTexture`). One shared texture; render/particles.ts binds it as
  * `uMarks` and draws a cell by a 'mark' or 'trace' particle's `thick` (`markCell`).
  */

@@ -17,7 +17,7 @@ const at = { x: 0, y: 0, z: 0 };
 const key = (id: string): string => `${lookOf(id).motif}/${SIGNATURES[id].form}/${SIGNATURES[id].motion}`;
 
 describe('every creature\'s attacks are its own (round 60: "make it very distinct from each other, and also with more fidelity")', () => {
-  it('every creature has a signature (the horrors, and shoggoth and the flying polyp) or a blow (round 87: data/foeBlows.ts), never both and never neither', () => {
+  it('every creature has a signature (the horrors, and shoggoth and the flying polyp) or a blow (round 88: data/foeBlows.ts), never both and never neither', () => {
     const ids = ENTITIES.map((e) => e.id).sort();
     const signed = Object.keys(SIGNATURES);
     const blown = Object.keys(FOE_BLOWS);
@@ -47,7 +47,7 @@ describe('every creature\'s attacks are its own (round 60: "make it very distinc
     for (const id of Object.keys(SIGNATURES)) expect(luma(lookOf(id).accent), id).toBeGreaterThanOrEqual(LIGHT_FLOOR - 1e-6);
   });
 
-  it('a common foe is drawn in its own colours, not the shared magenta of round 51: its blow\'s hues (round 87), not a signature', () => {
+  it('a common foe is drawn in its own colours, not the shared magenta of round 51: its blow\'s hues (round 88), not a signature', () => {
     const [deep, ghoul, miGo] = ['deep_one', 'ghoul', 'mi_go'].map((id) => FOE_BLOWS[id].hues);
     expect(deep[1]).not.toBe(ghoul[1]);
     expect(deep[1]).not.toBe(miGo[1]);

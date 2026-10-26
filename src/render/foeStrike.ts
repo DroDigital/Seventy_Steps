@@ -1,5 +1,5 @@
 /**
- * A creature's blow at close quarters, drawn quietly (round 87, render only; data/foeTuning.ts `FOE_FX`, the vocabulary `blowKit.ts`):
+ * A creature's blow at close quarters, drawn quietly (round 88, render only; data/foeTuning.ts `FOE_FX`, the vocabulary `blowKit.ts`):
  *   a slam or a ring lays a thin ripple on the ground and its creature's mark where it falls;
  *   a sweep lays that mark along its tip as it goes round, a few strokes (a mark that is not a stroke, a sigil or an eye, is stamped once);
  *   a bite, a grab, a thrust stamps it at its tip; a lunge or a charge leaves a faint smear behind it;

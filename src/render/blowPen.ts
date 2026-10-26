@@ -1,5 +1,5 @@
 /**
- * What every particle of a quiet blow is drawn with (round 87, render only): the colour, and the one way particles are spawned. A blow has three
+ * What every particle of a quiet blow is drawn with (round 88, render only): the colour, and the one way particles are spawned. A blow has three
  * hues (data/foeBlows.ts): a particle is born in the first, passes through the second and dies in the third (`ParticleSpec.colorMid`), each turned
  * a few percent of a circle and a little lighter or darker by its own throw of the dice, so no two marks are alike. The `Pen` is what the
  * recipes of `blowMarks.ts` and `blowMatter.ts` draw with; `blowKit.ts` builds it.

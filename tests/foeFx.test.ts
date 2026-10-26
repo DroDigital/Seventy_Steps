@@ -1,5 +1,5 @@
 /**
- * The quiet blows, in the game (round 87; render/foeFx.ts, foeStrike.ts, foeCast.ts; asked: "many of the lower-tier creatures' attack animations
+ * The quiet blows, in the game (round 88; render/foeFx.ts, foeStrike.ts, foeCast.ts; asked: "many of the lower-tier creatures' attack animations
  * and telegraphs appear acceptable but overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere").
  * A horror's blows are the machinery of round 51 and 59 (meleeFx, attackFx) as they were; every other creature draws one graphic mark of its own
  * and a few specks, no crown, fountain, cloud, scar, lit arc, camera-facing flash or light; a crowd is thinned. Round 59's test of what a foe's
@@ -73,7 +73,7 @@ function rig(creature: string, blow?: FoeBlow) {
 
 beforeEach(() => vi.mocked(flashLight).mockClear());
 
-describe('a horror\'s blows are as they were, and every other creature\'s are quiet (round 87)', () => {
+describe('a horror\'s blows are as they were, and every other creature\'s are quiet (round 88)', () => {
   it('a horror\'s slam still bursts, scars the ground, sends a ring out and lights it; the quiet kit draws nothing for it', () => {
     const horror = Object.keys(BOSS_ATTACK_THEME).find((id) => {
       const g = createGame({ creature: id });
@@ -255,7 +255,7 @@ describe('a slow heavy blow glints once before it falls (round 59, now the mark 
   });
 });
 
-describe('a caster draws a few motes and a mark, not a storm (round 87)', () => {
+describe('a caster draws a few motes and a mark, not a storm (round 88)', () => {
     it('a projectile, whole, is a third of what it was or less, with no scar, no flash and no light, and a bolt\'s trail leaves a smear every third frame at most', () => {
     const g = createGame({ creature: 'dagon_priest' });
     const c = g.ecs.c;
@@ -323,7 +323,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 87)', () => 
   });
 });
 
-describe('a crowd is thinned (round 87)', () => {
+describe('a crowd is thinned (round 88)', () => {
   function crowd(n: number) {
     const g = createGame({ creature: 'ghoul' });
     const c = g.ecs.c;
@@ -385,7 +385,7 @@ describe('a crowd is thinned (round 87)', () => {
   });
 });
 
-describe('every move of the creatures that are not horrors is drawn quietly (round 87)', () => {
+describe('every move of the creatures that are not horrors is drawn quietly (round 88)', () => {
   const IDS = Object.values(ENTITIES).filter((e) => (e.bossScript || e.sprite || e.assembly) && !isThemed(e.id)).map((e) => e.id);
 
   it('there are fifty-one of them', () => expect(IDS.length).toBeGreaterThanOrEqual(51));

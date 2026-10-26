@@ -6,7 +6,7 @@ import { markAtlasBytes, markAtlasTexture } from '../src/render/markAtlas';
 import { lifeColor, MARK_NAMES, markCell, PARTICLE_SHAPES } from '../src/render/particles';
 import { particleMasksGlsl, shapeDefines } from '../src/render/shaders/particleMasks';
 
-describe('the particle shapes (round 87, the quiet blows)', () => {
+describe('the particle shapes (round 88, the quiet blows)', () => {
   it('keep the index of every shape that existed before, so no recorded spec draws another thing', () => {
     expect(PARTICLE_SHAPES.slice(0, 15)).toEqual(['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff']);
     expect(PARTICLE_SHAPES.slice(15)).toEqual(['crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace']);

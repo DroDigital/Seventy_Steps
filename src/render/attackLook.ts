@@ -81,7 +81,7 @@ function foeTheme(accent: Rgb, id: string): AttackTheme {
 }
 
 /**
- * The look of a creature that draws its blow as a mark (round 87, data/foeBlows.ts): its three hues, lifted where the eye must find them. A mark
+ * The look of a creature that draws its blow as a mark (round 88, data/foeBlows.ts): its three hues, lifted where the eye must find them. A mark
  * starts in the first and drifts through the second to the third as it fades; the gap between the hues is what tells two creatures apart.
  * No signature: nothing of it throws what the horrors' blows throw. Its element (`motif`, which the sounds follow) and temper are what they were.
  */
@@ -146,7 +146,7 @@ export function attackLook(g: Game, id: Entity): AttackLook {
 /** Whether roster id `id` is one of the horrors with colours of its own. */
 export const isThemed = (id: string | undefined): boolean => !!id && !!BOSS_ATTACK_THEME[id];
 
-/** Whether entity `id` is a creature of the roster that is not one of the horrors (round 87): its blows are the quiet ones of `render/foeFx.ts`, and the horrors' machinery (`meleeFx`, `attackFx`) leaves it be. */
+/** Whether entity `id` is a creature of the roster that is not one of the horrors (round 88): its blows are the quiet ones of `render/foeFx.ts`, and the horrors' machinery (`meleeFx`, `attackFx`) leaves it be. */
 export const isQuiet = (g: Game, id: Entity): boolean => {
   const model = g.ecs.c.model.get(id);
   if (!model) return false;

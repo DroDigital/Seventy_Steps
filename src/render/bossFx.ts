@@ -34,7 +34,7 @@ export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles, 
   const tentacles = createStrikeTentacles(scene, g); // the tentacles that rise from marked ground
   const surge = createSurgeView(scene, g, particles); // the wall of water of a tidal surge
   const melee = createMeleeFx(g, particles, ground);
-  const foes = createFoeFx(g, particles, ground); // round 87: every creature that is not a horror draws its blow quietly, in a mark of its own
+  const foes = createFoeFx(g, particles, ground); // round 88: every creature that is not a horror draws its blow quietly, in a mark of its own
   const fog = createFogGates(g, particles);
   const flasks = createFlaskFx(scene, g, particles); // round 29: a flask of lamp oil, in flight and burning
   return {
