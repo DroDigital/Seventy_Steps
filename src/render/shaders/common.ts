@@ -1,4 +1,5 @@
 import { LAMP_SHADOW_GLSL } from './lampShadow';
+import { WINDOW_LIGHT_GLSL as WINDOW_SPILL_GLSL } from './windowLight';
 
 /**
  * The pieces of GLSL the world, sprite, sea and sign shaders share (split from world.ts, round 34): the
@@ -47,6 +48,8 @@ ${WINDOW_LIGHT_GLSL}
 uniform float uLampSlot[${LAMP_SLOTS}]; // which lamp shadow map a lamp has (-1: none; round 35)
 uniform vec4 uLamps[${LAMP_SLOTS}]; // position, range (0: dark)
 uniform vec3 uLampColors[${LAMP_SLOTS}]; // colour × strength
+uniform vec4 uLampWindows[${LAMP_SLOTS}]; // outward normal (xz), source offset from glass, pane height over ground (0: not a window)
+${WINDOW_SPILL_GLSL}
 vec3 lampLight(vec3 p, vec3 n, float facing) {
   vec3 sum = vec3(0.0);
   for (int i = 0; i < ${LAMP_SLOTS}; i++) {
@@ -61,7 +64,7 @@ vec3 lampLight(vec3 p, vec3 n, float facing) {
     float sh = 1.0;
     float slot = uLampSlot[i];
     if (slot > -0.5) sh = lampShadowOf(int(slot + 0.5), p, n); // what stands between a point and a lamp takes its light (round 35)
-    sum += uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * face * sh * windowLight(i, p); // the lantern's own falloff
+    sum += uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * face * sh * windowLight(i, p) * windowLightAt(p, l.xyz, uLampWindows[i]); // the lantern's own falloff, shaped by a window's opening
   }
   // Many lights at once (a corridor of torches, a hall's braziers) would add up past white and wash the walls to cream (round 31): the sum is eased toward a ceiling.
   float peak = max(max(sum.r, sum.g), sum.b);
@@ -90,7 +93,7 @@ vec3 lampLightGloss(vec3 p, vec3 n, float facing, vec3 eye, float power, out vec
     float sh = 1.0;
     float slot = uLampSlot[i];
     if (slot > -0.5) sh = lampShadowOf(int(slot + 0.5), p, n);
-    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh * windowLight(i, p);
+    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh * windowLight(i, p) * windowLightAt(p, l.xyz, uLampWindows[i]);
     sum += c * face;
     streak += c * pow(max(dot(n, normalize(dir + eye)), 0.0), power);
   }

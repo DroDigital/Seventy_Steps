@@ -101,7 +101,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const sampler = createSampler(e);
   void sampler.load(setFiles([...Object.values(SAMPLE_SETS), ...Object.values(PLANNED_SETS)]));
   const ambience = createAmbience(e, sampler);
-  const foley = createFoley(g, sampler, (key, sound, o) => recipe(key, sound, o));
+  const foley = createFoley(g, sampler, (key, sound, o) => recipe(key, sound, o), () => (e.space?.state.on ? e.space.state.echo : undefined)); // round 83: the room answers a footfall
   const acts = createActFoley(g, (key, sound, o) => recipe(key, sound, o));
   const weatherBed = createWeatherBed(e, sampler); // round 59: the rain is recorded
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard

@@ -73,7 +73,7 @@ describe('gait (render/gait.ts)', () => {
     }
   });
 
-  it('climbs a rise at a walk without a boot in the ground or a knee flung through the vertical (round 81: a knee bent the other way ran out of bend on rising ground)', () => {
+  it('climbs a steep rise at a walk without a boot in the ground or a knee flung through the vertical (round 81: a knee bent the other way ran out of bend on rising ground; gentler rises still snap a knee once, and downhill still sinks a boot, as before)', () => {
     const ground: Ground = (_x, z) => Math.min(0.3, Math.max(-0.3, 0.3 * z)); // rising ahead, as the views lay it about the feet
     const [at, ahead] = [new THREE.Vector3(), 96];
     for (const who of ['player', 'npc:zebulon']) { // his clips' feet, and a person's
@@ -101,6 +101,21 @@ describe('gait (render/gait.ts)', () => {
       const gap = lowest(f, knee) - ground(x, 0);
       expect(gap).toBeGreaterThan(-0.03);
       expect(gap).toBeLessThan(0.05);
+    }
+  });
+
+  it.each([-0.7, 0.7])('keeps an NPC’s running ankles above a slope of %s when a forward knee bend reaches its limit', (slope) => {
+    const f = buildFigure('npc:stranger');
+    const ground: Ground = (x) => slope * x;
+    const clearance = f.hip - f.thigh - f.shin;
+    for (const stride of [0, Math.PI]) {
+      pose(f, { ...STILL, speed: 4.2, stride, ground });
+      f.root.updateMatrixWorld(true);
+      for (const [leg, foot] of [[f.legR, f.footR], [f.legL, f.footL]] as const) {
+        const ankle = foot.getWorldPosition(new THREE.Vector3());
+        const required = ground(leg.position.x, ankle.z) + clearance + f.ankle;
+        expect(ankle.y, `slope ${slope}, stride ${stride}, hip ${leg.position.x}`).toBeGreaterThanOrEqual(required - 1e-6);
+      }
     }
   });
 });
