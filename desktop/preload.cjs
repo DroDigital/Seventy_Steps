@@ -15,7 +15,7 @@ void ipcRenderer.invoke('desktop:pads-get').then(take, () => undefined);
 contextBridge.exposeInMainWorld('desktop', {
   deck: process.argv.includes('--steam-deck'), // running on a Steam Deck (round 47)
   edition: process.argv.includes('--edition=demo') ? 'demo' : 'full', // the demo's pack (round 56: data/edition.ts)
-  channel: process.argv.includes('--channel=itch') ? 'itch' : 'steam', // the store the pack is for (round 84: the Mounts tab says its words)
+  channel: process.argv.includes('--channel=itch') ? 'itch' : 'steam', // the store the pack is for (round 85: the Mounts tab says its words)
   pads: () => pads, // as navigator.getGamepads() lists them, for the page to read when the browser lists none (core/pads.ts)
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),
@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('desktop', {
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
   ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; never purchases or accepts an app id from the page
   ownsChariotDlc: () => ipcRenderer.invoke('desktop:chariot-dlc'),
-  unlockMounts: () => ipcRenderer.invoke('desktop:mount-unlock'), // an itch.io pack: the code on the clipboard, checked and kept by the shell (round 84); nothing from the page is trusted
+  unlockMounts: () => ipcRenderer.invoke('desktop:mount-unlock'), // an itch.io pack: the code on the clipboard, checked and kept by the shell (round 85); nothing from the page is trusted
   store: { // saves, settings and records as files in the user's data folder (round 12)
     get: (key) => ipcRenderer.sendSync('desktop:store-get', String(key)),
     set: (key, value) => ipcRenderer.sendSync('desktop:store-set', String(key), String(value)),

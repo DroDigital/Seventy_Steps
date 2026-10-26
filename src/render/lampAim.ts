@@ -35,7 +35,8 @@ export function createLampAim(post: PostPass): LampAim {
     update(on) {
       const seen = LIGHT_VIEW.seen;
       let n = 0;
-      if (on) for (; n < LAMP_SLOTS && n < seen.length; n++) aimOf(seen[n].s, aims[n]);
+      const lights = LAMP_SLOTS - LIGHT_VIEW.flashes; // (the farthest slots are a flash's for its moment: worldLights.ts, flashLights.ts)
+      if (on) for (; n < lights && n < seen.length; n++) aimOf(seen[n].s, aims[n]);
       for (let i = n; i < kept; i++) aims[i].set(0, 0, 0, 0);
       kept = n;
     },

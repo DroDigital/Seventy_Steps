@@ -20,7 +20,7 @@ Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 7 m
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.
 The rider keeps the ordinary hurtbox; mounting gives no healing, stamina refill, invulnerability or combat bonus.
 Only the preferred appearance is saved. Mount use resets on load; ownership is checked from Steam again.
-Removal or failed ownership verification falls back to the included chariot for the ride; the choice stays in the save (`MountState.preferred`, round 84), so a check that failed once (Steam closed, offline) does not forget it and the next one that succeeds gives it back.
+Removal or failed ownership verification falls back to the included chariot for the ride; the choice stays in the save (`MountState.preferred`, round 85), so a check that failed once (Steam closed, offline) does not forget it and the next one that succeeds gives it back.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–3) with orbit, rest/cruise/gallop, pause and inspection
 resolution controls. It never opens a save or grants DLC access. The included chariot is the spectral coach's body and
@@ -86,7 +86,7 @@ the spectral chariot stays locked and the plain chariot is what a finished quest
 The game never starts a purchase or changes a Steam subscription. Unit tests use fake read-only Steam clients;
 live account entitlement, checkout, regional pricing and refund behavior require the configured Steam test branch.
 
-## itch.io unlock (round 84)
+## itch.io unlock (round 85)
 
 itch.io has no DLC a game can ask about, so the two appearances are sold there as one separate project, "Mounts": a paid project whose one small
 download, `UNLOCK.txt`, holds a code. The buyer copies the code, opens the Mounts tab at an Elder Sign and chooses *Paste unlock code*.

@@ -1,5 +1,8 @@
 # Sound credits
 
+> Seventy Steps itself is © 2026 Alessandro A. Foddis (DigitalDro), all rights reserved (see `LICENSE`). This file credits the work of others:
+> the licences named here (CC0, CC BY, OFL, Apache and the like) apply to that work only, never to the game.
+
 The game's recorded sounds (playtest round 6) are all from [Freesound](https://freesound.org), every one
 dedicated to the public domain under [Creative Commons 0](https://creativecommons.org/publicdomain/zero/1.0/)
 (CC0 1.0 Universal): free to use, change and share, for any purpose, with no attribution required. They

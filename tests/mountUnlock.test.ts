@@ -11,7 +11,7 @@ const both = signCode(pair.privatePem, { id: 'test-pack' });
 const itch = { channel: 'itch' };
 const b64url = (text: string): string => btoa(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); // (the node typings are not carried: tests/nodeFs.d.ts)
 
-describe('the signed unlock code of the itch.io Mounts pack (round 84)', () => {
+describe('the signed unlock code of the itch.io Mounts pack (round 85)', () => {
   it('opens what its payload names when the key signed it, and says who made it', () => {
     expect(unlockedMounts(both, pair.publicKey)).toEqual({ mounts: ['chariot', 'automobile'], id: 'test-pack' });
     expect(unlockedMounts(signCode(pair.privatePem, { mounts: ['automobile'] }), pair.publicKey)?.mounts).toEqual(['automobile']);

@@ -12,6 +12,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { box, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { TextureKind } from './textures';
+import type { WareId } from '../data/wares';
 import { ARMS } from './armsMeshes';
 import { investigator } from './investigator';
 import { npcFigure } from './npcFigures';
@@ -57,7 +58,17 @@ export interface Figure {
   ankle: number; // sole to ankle
   hunch: number; // resting forward lean (radians)
   character?: 'player' | 'creature'; // rim-lit in the post pass (Echo drops and props are not characters)
+  loose?: Loose; // a person's hat, shawl, scarf and eyes, each on a joint of its own (npcFigures.ts), laid by personLife.ts
   materials: THREE.ShaderMaterial[];
+}
+
+/** What a person has on a joint of its own (round 83): hung from `group`'s pivot; `k` is how freely a hat sits; `wares`, what a merchant shows while any is left. */
+export interface Loose {
+  hat?: { group: THREE.Group; k: number };
+  shawl?: THREE.Group;
+  scarf?: THREE.Group;
+  eyes?: THREE.Group;
+  wares?: Partial<Record<WareId, THREE.Object3D>>;
 }
 
 interface Frame {
@@ -124,7 +135,7 @@ export function skeleton(rig: Rig, f: Frame): Figure {
 
 /** Adds a mesh with its own world material, so a hit flash lights only this figure. */
 export function part(fig: Figure, parent: THREE.Object3D, geo: THREE.BufferGeometry, texture: TextureKind, emissive = 0): THREE.Mesh {
-  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character });
+  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character, coat: fig.character === 'creature' ? true : undefined }); // (the people take the realm's matter on what faces up, in the world shader: round 83)
   fig.materials.push(material);
   const mesh = new THREE.Mesh(geo, material);
   parent.add(mesh);

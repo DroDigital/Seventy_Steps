@@ -46,7 +46,7 @@ const NOTE = 'font-size:12px;opacity:.5;line-height:1.5;padding:12px 14px 0';
 /** Says `text` in the page's foot, where an option says why it cannot be taken. */
 const sayInFoot = (from: HTMLElement, text: string): void => void (from.closest('[data-menu]')?.querySelector('.hint') as HTMLElement | null)?.replaceChildren(text);
 
-/** An itch.io pack (round 84): the buyer copies the code from the Mounts pack's unlock file and the shell reads, checks and keeps it (desktop/mountUnlock.js). */
+/** An itch.io pack (round 85): the buyer copies the code from the Mounts pack's unlock file and the shell reads, checks and keeps it (desktop/mountUnlock.js). */
 function unlockSection(panel: HTMLElement, g: Game, redraw: () => void): void {
   if (owned(g, 'chariot') && owned(g, 'automobile')) {
     el(panel, 'div', t('mounts.unlocked'), NOTE);

@@ -9,7 +9,7 @@ import { GAME_PAGE } from '../data/links';
 export interface Desktop {
   deck?: boolean; // on a Steam Deck (round 47): a first launch takes larger text
   edition?: 'full' | 'demo'; // the pack's edition (round 56: data/edition.ts reads it)
-  channel?: 'itch' | 'steam'; // the store the pack is for (round 84)
+  channel?: 'itch' | 'steam'; // the store the pack is for (round 85)
   quit(): Promise<void>;
   setFullscreen(on: boolean): Promise<void>;
   isFullscreen(): Promise<boolean>;
@@ -20,7 +20,7 @@ export interface Desktop {
   achieve?(id: string): Promise<boolean>; // an achievement earned, for Steam's (round 12)
   ownsAutomobileDlc?(): Promise<boolean>; // current Steam ownership + installation of the cosmetic automobile; absent on web
   ownsChariotDlc?(): Promise<boolean>; // the spectral chariot, read the same way
-  unlockMounts?(): Promise<{ ok: boolean; mounts?: string[]; reason?: 'store' | 'none' | 'invalid' | 'keep' }>; // itch.io (round 84): keeps the unlock code on the clipboard, if it is ours
+  unlockMounts?(): Promise<{ ok: boolean; mounts?: string[]; reason?: 'store' | 'none' | 'invalid' | 'keep' }>; // itch.io (round 85): keeps the unlock code on the clipboard, if it is ours
 }
 
 export const desktop: Desktop | undefined = (globalThis as { desktop?: Desktop }).desktop;

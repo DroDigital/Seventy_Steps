@@ -119,7 +119,7 @@ function open() {
       nodeIntegration: false,
       devTools: DEV || process.argv.includes('--devtools'), // a release has none to open (Ctrl+Shift+I, the View menu); `--devtools` is for a tester who is asked for one
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
-      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`, `--channel=${channel()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56); the page is told which store it is from (round 84: the Mounts tab's words)
+      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`, `--channel=${channel()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56); the page is told which store it is from (round 85: the Mounts tab's words)
     },
   });
   win.once('ready-to-show', () => {
@@ -158,7 +158,7 @@ function open() {
 ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
-// Cosmetic mount DLC; only Steam ownership and installation, or (an itch.io full game only, round 84: mountUnlock.js) a signed code the buyer
+// Cosmetic mount DLC; only Steam ownership and installation, or (an itch.io full game only, round 85: mountUnlock.js) a signed code the buyer
 // pasted, can unlock either appearance. The codes (one a line, a code for each purchase) are kept as a file and read again at every ask; the page never sees the clipboard's text.
 const unlockFile = () => join(app.getPath('userData'), 'mount-unlock.txt');
 const storedCode = () => {

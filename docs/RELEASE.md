@@ -107,7 +107,7 @@ because a Steam build started outside Steam would relaunch itself through it.
   place and flatter than a GPU's: pictures of your own (photo mode, P) go through `pack` just as well. The icon of the .exe and the .app is the
   Elder Sign too (`npm run icon`: `desktop/icon.js`; the Mac's is set in from the edge with a shadow, as macOS draws them), and CI prints what each
   shipped file carries. There is no .dmg: the Mac build is the `.app` (itch's app runs it; a browser download gets it zipped).
-- **The Mounts project (round 84: the two optional mounts, docs/MOUNTS.md).** The check lives in the shell, so a build with it must be live on
+- **The Mounts project (round 85: the two optional mounts, docs/MOUNTS.md).** The check lives in the shell, so a build with it must be live on
   all three channels (`windows`, `osx`, `linux`) before the project is sold: 1.0.7 has no paste button. Then, on itch.io: (1) a new project, *Paid*,
   its price (the in-game words name none), visibility Public with *Unlisted in search & browse* (or Draft until ready); (2) upload `UNLOCK.txt`
   (the code from `tools/mount_unlock.mjs sign`, with a line of how to use it) and tick no platform; (3) say on the page that the mounts are

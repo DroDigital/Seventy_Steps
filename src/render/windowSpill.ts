@@ -20,8 +20,9 @@ export function createWindowSpill(g: Game): WindowSpill {
   return {
     update(_time, on) {
       const world = g.world;
+      const lights = windows.length - LIGHT_VIEW.flashes; // (the farthest slots are a flash's for its moment, no window's: worldLights.ts, flashLights.ts)
       for (let i = 0; i < windows.length; i++) {
-        const s = LIGHT_VIEW.seen[i]?.s;
+        const s = i < lights ? LIGHT_VIEW.seen[i]?.s : undefined;
         if (on && world && s?.kind === 'window' && s.glass && worldUniforms.uLamps.value[i].w > 0) {
           const p = plan(s as Pane, world);
           if (p) {

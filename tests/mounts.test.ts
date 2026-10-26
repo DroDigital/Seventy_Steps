@@ -326,7 +326,7 @@ describe('the borrowed reins', () => {
     expect(parseSave(JSON.stringify({ ...s, mount: 'forged' }))).toBe(null);
   });
 
-  it('a check that fails, or says no once, lowers the ride to the plain chariot and leaves the chosen appearance in the save (round 84)', () => {
+  it('a check that fails, or says no once, lowers the ride to the plain chariot and leaves the chosen appearance in the save (round 85)', () => {
     const g = openGame();
     setAutomobileEntitlement(g, true);
     selectMount(g, 'automobile');

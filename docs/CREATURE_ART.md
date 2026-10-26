@@ -39,14 +39,14 @@ Mended afterwards, on the author's asking (none of it redraws a frame):
 - Reviewed creatures and bosses keep their authored colours under the world's light. The added pale rims and shading floor have been removed at the author's request.
 - The five lathed colossi (Cthulhu, Father Dagon, Mother Hydra, Ghatanothoa, the Colossus) are struck where their picture shows them: `tools/reviewed_look.py` measures the half-width of each boss form's front idle in the three bands its hurt zones are (legs, torso, head; `ZONES` in `data/bossTuning.ts`) as the 75th percentile of its rows, into `REVIEWED_BODY`; `toCombatant` gives it to a lathed body as `assembly.painted`, and `zoneShapes` makes each band at least that wide (never narrower than before). A mound (Azathoth, Shub-Niggurath: a low mass under motes that fill the picture) and a body of spheres (Yog-Sothoth: `hit`) keep their own.
 - Yog-Sothoth is struck where its spheres are painted: its recipe carries seven spheres fitted to the front art (`hit`), ringed about the body so they stand as seen from any side, none past a blade's reach of its body, the lowest on the ground (`pictured` in `data/assemblyShape.ts`; `tests/hurtZones.test.ts` ties them to the art's own scale).
-- Eyes glow in the dark as the investigator nears, and look out of a mist, for ten forms whose eyes were found and looked at (`REVIEWED_EYES`, same tool; a mark that is a tooth, a gem, a visor or a dim amber was not taken). Front view only: the art holds them nowhere else.
+- Eyes glow in the dark as the investigator nears, and look out of a mist, for fourteen forms whose eyes were found and looked at (`REVIEWED_EYES`, same tool; round 83 added the Hound, the Haunter of the Dark, the serpent man and the Outsider; a mark that is a tooth, a gem or a dim amber was not taken). The same tool measures the exact colour of eighteen forms' lit marks (`REVIEWED_GLINTS`) and each form's own matter (`REVIEWED_MATTER`), which the per-form recolour reads. Front view only: the art holds them nowhere else.
 
 Left as they are, for the author:
 
 - Attack and hurt art exist only from the front, for all 105 forms: seen from the side or behind, a creature that strikes or is struck shows its front. Side and back art for those two states would end it.
 - The seven colossi whose weak head comes down after each blow of their own no longer showed it: the stoop hint and the head zone worked, but the picture stood straight. (Mended since: see "The stoop" below.)
 - The eight colossi are painted 1.3 to 1.65 times wider than their combat radius, so the investigator can stand inside the painted body; widening the capsules is a balance change, and was not made.
-- Eyes of the forms not in `REVIEWED_EYES` (the Shoggoths' green spots, the rat swarm's and Wamp's amber, the Haunter's visor, and any seen from the side) are not given a glow.
+- Eyes of the forms not in `REVIEWED_EYES` (the Shoggoths' green spots, the rat swarm's and Wamp's amber, and any seen from the side) are not given a glow.
 
 ## The stoop
 

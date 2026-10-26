@@ -10,7 +10,7 @@ import { LANTERN_SHADOW } from '../src/data/fxTuning';
 import { LANTERN } from '../src/data/tuning';
 import { colliderShadowMesh, LANTERN_CASTER, solidOf } from '../src/render/colliderShadow';
 import { SHADOW_GLSL } from '../src/render/shaders/shadow';
-import { SPRITE_VERT } from '../src/render/shaders/sprite';
+import { SPRITE_FRAG, SPRITE_VERT } from '../src/render/shaders/sprite';
 import { WORLD_FRAG } from '../src/render/shaders/world';
 import { toBoxFrame, type Collider } from '../src/world/colliders';
 
@@ -107,6 +107,7 @@ describe('the lantern\'s map', () => {
     expect(WORLD_FRAG).toMatch(/float lanternVis = mix\(1\.0, lanternLit\(vWorld, n\), uLShadow\.x \* \(1\.0 - self\)\)/);
     expect(WORLD_FRAG).toMatch(/uLanternColor \* lanternFalloff\(ld\) \* mix\(facing, share, character\) \* lanternVis/);
     expect(WORLD_FRAG).not.toMatch(/lampLight(Gloss)?\([^)]*\)[^;]*(lanternLit|lanternVis)/); // the lamps, fires and windows are not the lantern
-    expect(SPRITE_VERT).toMatch(/uLanternColor \* lanternAt\(uLanternPos - wp\) \* lamp/);
+    expect(SPRITE_VERT).toMatch(/vShade = vec2\(moon, lamp\)/); // the shadow of the lantern is taken at the creature's middle,
+    expect(SPRITE_FRAG).toMatch(/uLanternColor \* lanternAt\(uLanternPos - vWorld\) \* vShade\.y/); // and lays the light at each pixel (round 83)
   });
 });

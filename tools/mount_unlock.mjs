@@ -1,4 +1,4 @@
-// Makes and checks the unlock codes of the itch.io "Mounts" project (round 84: desktop/mountUnlock.js, docs/MOUNTS.md).
+// Makes and checks the unlock codes of the itch.io "Mounts" project (round 85: desktop/mountUnlock.js, docs/MOUNTS.md).
 //   node tools/mount_unlock.mjs keygen <private key file>                makes the key pair: the private key (PEM) is written to the file (it must be OUTSIDE the
 //                                                                        repository: the tool refuses a path inside it) and the public key is printed for UNLOCK_PUBLIC_KEY
 //   node tools/mount_unlock.mjs sign <private key file> [--mounts chariot,automobile] [--id halloween-2026]    prints a code (put it in the unlock file the buyers download)
