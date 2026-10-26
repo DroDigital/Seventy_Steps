@@ -1,11 +1,11 @@
 /** Who can be struck (spec §3B): the bodies a blow, a shot or a pool from one side may touch. Pure: no Three.js. */
 
 import type { Entity } from '../core/ecs';
-import { isAbsent, isConcealed, type Combatant, type Game } from './components';
+import { isAbsent, isConcealed, isSheltered, type Combatant, type Game } from './components';
 import { awaitsIntroduction } from './npcIntroduction';
 
-/** Whether nothing may reach the investigator now: in a cutscene, over an edge (round 54), walked through a boss's fog (round 60: the walk is the fog's, so it is no time to be struck), or sheltered (a dialogue, a trade or a sign's rest is open: the world goes on, but no blow lands and no foe keeps its quarrel). */
-export const outOfReach = (g: Game): boolean => g.cutscene || g.sheltered || !!g.player.falling || !!g.player.fogPass || !!g.player.gatePass;
+/** Whether nothing may reach the investigator now: in a cutscene, over an edge (round 54), walked through a boss's fog (round 60: the walk is the fog's, so it is no time to be struck), or sheltered (a dialogue, a trade or a sign's rest is open, or the investigator has just arrived and is at peace, round 88: the world goes on, but no blow lands and no foe keeps its quarrel). */
+export const outOfReach = (g: Game): boolean => g.cutscene || isSheltered(g) || !!g.player.falling || !!g.player.fogPass || !!g.player.gatePass;
 
 /** Who a blow from `faction` can touch: living, present, unconcealed combatants of the other side with a body. Hallucinations and the investigator touch only each other. */
 export function hostiles(g: Game, faction: Combatant['faction'] | undefined, conjured: boolean, byPlayer: boolean): Entity[] {
