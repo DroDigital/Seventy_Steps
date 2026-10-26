@@ -9,3 +9,7 @@ __pycache__/
 steam/build/
 steam/output/
 .butler/
+
+# a mount-unlock private key (tools/mount_unlock.mjs keygen) must never be committed
+*.private.pem
+mount-unlock*.pem

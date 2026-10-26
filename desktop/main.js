@@ -15,12 +15,13 @@
  * reaches its title, reports what it found (the Steam binding, the controllers' worker) and quits (tools/smoke_packaged.mjs).
  */
 
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, nativeImage, protocol, screen, shell, utilityProcess } from 'electron';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
+import { mountsUnlockedHere, redeem } from './mountUnlock.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
 import { channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
@@ -118,7 +119,7 @@ function open() {
       nodeIntegration: false,
       devTools: DEV || process.argv.includes('--devtools'), // a release has none to open (Ctrl+Shift+I, the View menu); `--devtools` is for a tester who is asked for one
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
-      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56)
+      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`, `--channel=${channel()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56); the page is told which store it is from (round 84: the Mounts tab's words)
     },
   });
   win.once('ready-to-show', () => {
@@ -157,9 +158,28 @@ function open() {
 ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
-// Cosmetic mount DLC; only Steam ownership and installation can unlock either appearance.
-ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc());
-ipcMain.handle('desktop:chariot-dlc', () => steamOwnsChariotDlc());
+// Cosmetic mount DLC; only Steam ownership and installation, or (an itch.io full game only, round 84: mountUnlock.js) a signed code the buyer
+// pasted, can unlock either appearance. The code is kept as a file and read again at every ask; the page never sees the clipboard's text.
+const unlockFile = () => join(app.getPath('userData'), 'mount-unlock.txt');
+const storedCode = () => {
+  try {
+    return readFileSync(unlockFile(), 'utf8');
+  } catch {
+    return '';
+  }
+};
+ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc() || mountsUnlockedHere(storedCode()).includes('automobile'));
+ipcMain.handle('desktop:chariot-dlc', () => steamOwnsChariotDlc() || mountsUnlockedHere(storedCode()).includes('chariot'));
+ipcMain.handle('desktop:mount-unlock', () => {
+  const got = redeem(clipboard.readText());
+  if (!got.ok) return { ok: false, reason: got.reason };
+  try {
+    writeWhole(unlockFile(), `${got.code}\n`);
+  } catch {
+    return { ok: false, reason: 'keep' };
+  }
+  return { ok: true, mounts: got.mounts };
+});
 
 // The game's storage as files, one a key (sync, as the Web Storage API it stands in for is).
 const keyFile = (key) => join(app.getPath('userData'), 'saves', `${String(key).replace(/[^A-Za-z0-9_-]+/g, '_')}.json`);

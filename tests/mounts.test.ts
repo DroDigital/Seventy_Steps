@@ -325,4 +325,31 @@ describe('the borrowed reins', () => {
     expect(createWorldGame({ save: s }).player.mount.selected).toBe('grey');
     expect(parseSave(JSON.stringify({ ...s, mount: 'forged' }))).toBe(null);
   });
+
+  it('a check that fails, or says no once, lowers the ride to the plain chariot and leaves the chosen appearance in the save (round 84)', () => {
+    const g = openGame();
+    setAutomobileEntitlement(g, true);
+    selectMount(g, 'automobile');
+    for (const read of [false, false]) { // a window's focus with Steam closed, then a bridge that threw: both read "not owned"
+      setAutomobileEntitlement(g, read);
+      expect(g.player.mount.selected).toBe('grey');
+      expect(snapshot(g).mount).toBe('automobile');
+    }
+    setAutomobileEntitlement(g, true); // the next check says yes: the owner's choice comes back with no click
+    expect(g.player.mount.selected).toBe('automobile');
+    expect(mountAvailable(g, 'automobile')).toBe(true);
+    selectMount(g, 'grey'); // a deliberate choice of the plain chariot is the choice that is kept
+    setAutomobileEntitlement(g, false);
+    setAutomobileEntitlement(g, true);
+    expect(g.player.mount.selected).toBe('grey');
+    expect(snapshot(g).mount).toBe('grey');
+    const saved = { ...snapshot(g), mount: 'chariot' as const }; // a save made by an owner, loaded before any check has read
+    const loaded = createWorldGame({ save: parseSave(JSON.stringify(saved))! });
+    expect(loaded.player.mount.selected).toBe('chariot');
+    setChariotEntitlement(loaded, false);
+    expect(loaded.player.mount.selected).toBe('grey');
+    expect(snapshot(loaded).mount).toBe('chariot');
+    setChariotEntitlement(loaded, true);
+    expect(loaded.player.mount.selected).toBe('chariot');
+  });
 });
