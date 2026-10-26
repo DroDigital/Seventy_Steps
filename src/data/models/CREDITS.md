@@ -1,5 +1,8 @@
 # Credits: the arena models
 
+> Seventy Steps itself is © 2026 Alessandro A. Foddis (DigitalDro), all rights reserved (see `LICENSE`). This file credits the work of others:
+> the licences named here (CC0, CC BY, OFL, Apache and the like) apply to that work only, never to the game.
+
 The pieces of the arenas that are models (`pack.ts`, drawn by `src/render/modelKit.ts`) are cut from the kits of **Kenney** (www.kenney.nl),
 released under **Creative Commons Zero (CC0 1.0)**, http://creativecommons.org/publicdomain/zero/1.0/ , which asks for no credit; it is given.
 They were made again for the game by `tools/models/bake_models.py`: each model welded and flattened, its colours kept only as light and dark

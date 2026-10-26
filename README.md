@@ -2,8 +2,10 @@
 
 A Lovecraftian open-world soulslike in retro 3D: Doom-style billboarded sprites in PS1-era low-poly
 worlds, from Miskatonic University and Arkham down the Seventy Steps into the Dreamlands and out past
-the Ultimate Gate. Everything you see and most of what you hear is generated in code; the spec is
-[`docs/SPEC.md`](docs/SPEC.md) and every judgment call is logged in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+the Ultimate Gate. Its textures, effects and most sounds are generated in code; the creatures' pictures, the
+music and the voices are made with generative AI tools, and the code and text were written with Claude (see
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)). The spec is [`docs/SPEC.md`](docs/SPEC.md) and every
+judgment call is logged in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Run it
 

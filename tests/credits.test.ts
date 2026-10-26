@@ -10,7 +10,13 @@ describe('the credits', () => {
 
   it("carry the notice under the maker's name, and set one title only", () => {
     const notice = CREDITS[1].lines.join(' ');
-    expect(notice).toContain('© 2026 Digital Dro Studios');
+    expect(notice).toContain('© 2026 Alessandro A. Foddis (DigitalDro) · All rights reserved'); // the rights holder LICENSE names, not a studio or a Creative Commons licence
+    expect(notice).not.toMatch(/Creative Commons|CC[ -]?(0|BY)/);
     expect(CREDITS.filter((b) => b.title)).toHaveLength(1);
+  });
+
+  it('say what the generative tools made, as the itch.io and Steam disclosures do', () => {
+    const quiet = CREDITS.filter((b) => b.quiet).flatMap((b) => b.lines).join(' ');
+    for (const made of ['voices', 'Suno', 'Claude Code', 'text and dialogue', 'pictures of the creatures']) expect(quiet, made).toContain(made);
   });
 });
