@@ -8,12 +8,15 @@ import { createWorldMaterial } from './worldMaterial';
 import type { TextureKind } from './textures';
 
 export type Point = readonly [number, number, number];
+const WOOD = mixRgb(BASE.rust, BASE.bone, 0.26);
 export const MOUNT_COLORS = {
   black: scaleRgb(BASE.charcoal, 1.75), iron: mixRgb(BASE.charcoal, BASE.seaGrey, 0.48),
   trim: scaleRgb(BASE.seaGrey, 1.45), leather: mixRgb(BASE.charcoal, BASE.rust, 0.38),
   brass: scaleRgb(mixRgb(BASE.bone, BASE.rust, 0.36), 1.2),
   bone: scaleRgb(mixRgb(BASE.bone, BASE.seaGrey, 0.16), 1.35),
-  wood: mixRgb(BASE.rust, BASE.bone, 0.26), pale: scaleRgb(BASE.bone, 1.3),
+  wood: WOOD, pale: scaleRgb(BASE.bone, 1.3),
+  // The plain chariot's wood: a little darker, and a breath greyer. The Motor Car keeps `wood` for its spokes.
+  plainWood: mixRgb(scaleRgb(WOOD, 0.8), BASE.seaGrey, 0.12),
 };
 
 /** What the reins do to a horse at the bit: `check` 0 to 1 a haul (the head comes up and in, the weight sits back); `urge` 0 to 1 a ripple arriving (the nose pops up, the ears go back). */

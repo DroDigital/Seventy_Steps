@@ -8,11 +8,12 @@ import * as THREE from 'three';
 import { hash2 } from '../core/rng';
 import { prism } from './bodyKit';
 import { blob, join, lit, loft, mixC, paintOf, type Paint, type Station } from './horseLoft';
-import type { Rgb } from './palette';
+import { ANOMALY, scaleRgb, type Rgb } from './palette';
 
-export const COAT: Rgb = [0.5, 0.255, 0.125];
-export const COAT_DEEP: Rgb = [0.28, 0.13, 0.065];
-export const COAT_HI: Rgb = [0.64, 0.34, 0.17];
+// The chestnut, a little darker than it was: the barrel, the legs and the mottle of the hide all take these.
+export const COAT: Rgb = [0.43, 0.22, 0.11];
+export const COAT_DEEP: Rgb = [0.24, 0.11, 0.06];
+export const COAT_HI: Rgb = [0.55, 0.29, 0.15];
 export const FLAX: Rgb = [0.92, 0.74, 0.45];
 export const FLAX_DEEP: Rgb = [0.66, 0.48, 0.28];
 export const CREAM: Rgb = [0.97, 0.9, 0.76];
@@ -106,10 +107,13 @@ export function head(): { skin: THREE.BufferGeometry; eyes: THREE.BufferGeometry
   return { skin: join([loft(HEAD, 8, face), forelock, ...nostrils]), eyes: eyesOf() };
 }
 
+/** Where each eye stands in the head's frame: its glow is drawn there (draftEyes.ts). */
+export const EYE_AT = { x: 0.108, y: 0.05, z: 0.19 } as const;
+
 function eyesOf(): THREE.BufferGeometry {
   const pieces: THREE.BufferGeometry[] = [];
   for (const s of [-1, 1]) pieces.push(
-    blob(0.03, 0.026, 0.03, s * 0.108, 0.05, 0.19, () => [0.02, 0.014, 0.012], 6),
+    blob(0.03, 0.026, 0.03, s * EYE_AT.x, EYE_AT.y, EYE_AT.z, () => scaleRgb(ANOMALY.magenta, 0.2), 6), // a dark magenta; the glow is the halo
     blob(0.01, 0.009, 0.01, s * 0.128, 0.064, 0.2, () => [0.9, 0.82, 0.62], 4),
   );
   return join(pieces);
