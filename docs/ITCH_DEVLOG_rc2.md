@@ -39,8 +39,8 @@ effects. 5. The Weapons tab with star-stones lit in the strip. `node tools/itch_
 - **Mounts.** The included mount is called the Chariot, and the quest for it (The Borrowed Reins) gives it. A mount drops when the ride reaches a dungeon or a
   boss arena and cannot be summoned in either. Prompts and the Mounts tab are in English, German, French and Spanish.
 
-> The spectral chariot and the motor car are optional appearances sold through Steam; they change nothing about speed or handling. **The itch.io build has the plain
-> chariot only**, as there is no Steam to check them against. [[Keep or change this line when you know what you will do about it.]]
+> The spectral chariot and the motor car are optional appearances; they change nothing about speed or handling. On itch.io they come in a separate **Mounts** project
+> whose download holds a code: paste it in the Mounts tab at an Elder Sign (docs/MOUNTS.md). Without it, the itch.io build has the plain chariot.
 
 ## Weather
 

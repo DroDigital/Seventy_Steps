@@ -41,8 +41,9 @@ used last.
 
 Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the plain chariot,
 one horse drawing a wooden coach of the spectral chariot's pattern. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.
-The spectral chariot and the $0.99 automobile are optional appearances with the same traversal. Their Steam DLCs need
-release configuration before either can be owned: [`docs/MOUNTS.md`](docs/MOUNTS.md).
+The spectral chariot and the automobile are optional appearances with the same traversal. On Steam they are DLCs, which need
+release configuration before either can be owned; on itch.io the separate Mounts project holds a code to paste in the Mounts tab:
+[`docs/MOUNTS.md`](docs/MOUNTS.md).
 Inspect the three animated models in the read-only coach house at `?mounts`. The automobile follows a researched
 circa-1914 touring design within the requested 1890–1940 range: [`reference research`](docs/MOUNT_CAR_REFERENCES.md).
 

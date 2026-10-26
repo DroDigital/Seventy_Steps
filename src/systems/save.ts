@@ -62,7 +62,7 @@ export interface SaveData {
   rounds?: number;
   gun?: number;
   cycle?: number; // the journey through the dream (NG+; round 12)
-  mount?: MountId; // preferred appearance only: active mounts and verified DLC ownership are never saved
+  mount?: MountId; // the appearance last chosen (`MountState.preferred`) only: active mounts and verified DLC ownership are never saved
   difficulty?: string; // chosen when the dream began (round 38; none: the default)
   named?: number; // times Hastur's name has appeared
   called?: string[]; // bosses called into the world
@@ -125,7 +125,7 @@ export function snapshot(g: Game): SaveData {
     gun: g.player.gun,
     cycle: g.player.cycle,
     difficulty: g.player.difficulty,
-    mount: g.player.mount.selected,
+    mount: g.player.mount.preferred,
     named: ow.named,
     called: [...ow.called],
     watched: [...ow.watched],
@@ -187,7 +187,7 @@ export function applySave(g: Game, s: SaveData): void {
   const ow = g.overworld!;
   const c = g.ecs.c;
   const m = g.mind;
-  g.player.mount.selected = isMount(s.mount) ? s.mount : FREE_MOUNT;
+  g.player.mount.selected = g.player.mount.preferred = isMount(s.mount) ? s.mount : FREE_MOUNT;
   ow.sign = signPlace(s.sign) ? s.sign : START_SIGN;
   ow.discovered = new Set([...s.discovered.filter((id) => signPlace(id)), ow.sign]);
   g.player.checkpoint = { ...signPlace(ow.sign)!.rest };

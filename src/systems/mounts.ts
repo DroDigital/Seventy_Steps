@@ -16,6 +16,7 @@ export { moveMounted } from './mountMotion';
 
 export interface MountState {
   selected: MountId;
+  preferred: MountId; // the appearance last chosen, which is what a save keeps: a failed or late ownership check lowers `selected` to the plain chariot and never this
   active: MountId | null;
   automobileOwned: boolean;
   chariotOwned: boolean;
@@ -28,7 +29,7 @@ export interface MountState {
   idleToss: HorseToss | null; // transient presentation cue shared by the horse's head and its harness sound; never saved
 }
 
-export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins(), idleToss: null });
+export const createMountState = (): MountState => ({ selected: FREE_MOUNT, preferred: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins(), idleToss: null });
 export const mountUnlocked = (g: Game): boolean => isDone(g, MOUNT_QUEST);
 
 function dlcOwned(g: Game, id: MountId): boolean {
@@ -39,10 +40,15 @@ function dlcOwned(g: Game, id: MountId): boolean {
 
 export const mountAvailable = (g: Game, id: MountId): boolean => mountUnlocked(g) && (!MOUNTS[id].dlc || dlcOwned(g, id));
 
+/** A check that finds an appearance lost rides the plain chariot for now and keeps the choice (`preferred`); one that finds it owned again gives the choice back. */
 function releaseIfLost(g: Game, id: MountId, owned: boolean): void {
-  if (owned) return;
-  if (g.player.mount.active === id) dismissMount(g);
-  if (g.player.mount.selected === id) g.player.mount.selected = FREE_MOUNT;
+  const m = g.player.mount;
+  if (owned) {
+    if (m.preferred === id && m.selected === FREE_MOUNT) m.selected = id;
+    return;
+  }
+  if (m.active === id) dismissMount(g);
+  if (m.selected === id) m.selected = FREE_MOUNT;
 }
 
 /** Only a verified runtime platform query should call these; they are deliberately absent from saves. */
@@ -59,7 +65,7 @@ export function setChariotEntitlement(g: Game, owned: boolean): void {
 export function selectMount(g: Game, id: MountId): boolean {
   if (!mountAvailable(g, id)) return false;
   dismissMount(g);
-  g.player.mount.selected = id;
+  g.player.mount.selected = g.player.mount.preferred = id;
   return true;
 }
 
