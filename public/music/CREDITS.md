@@ -1,5 +1,8 @@
 # Music credits
 
+> Seventy Steps itself is © 2026 Alessandro A. Foddis (DigitalDro), all rights reserved (see `LICENSE`). This file credits the work of others:
+> the licences named here (CC0, CC BY, OFL, Apache and the like) apply to that work only, never to the game.
+
 - `subterranean-pulse.mp3`: the title theme, "Subterranean Pulse" (author and licence unknown at the time of writing; see `docs/DECISIONS.md`).
 - `bosses/*.mp3` (round 44): the fight themes, forty-eight, one for each horror or pair (below), from the "Boss themes" folder, made with Suno (D Phrygian for the named horrors, B Locrian for the Great Old Ones, A whole-tone for the Outer Gods). Synthetic music: the game's credits say so. The files are the MP3s as they were made, untouched; their level, loop points and hot stretches are found offline (`tools/boss_music.py`, `src/data/bossMusicMap.ts`). **The same warning as the realms': check Suno's terms for the plan the tracks were made on before the game is sold.**
 - `realms/*.mp3` (round 28): the background music of the realms, one track for each, made with Suno from the prompts of `seventy-steps-suno-prompts.md` (a sheet kept with the music, outside the repository). Synthetic music: the game's credits say so, and Steam asks for AI-generated content to be disclosed. **Check Suno's terms for the plan the tracks were made on** before the game is sold (as far as is known, commercial use is granted only to tracks made on a paid plan).
