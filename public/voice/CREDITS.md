@@ -1,5 +1,8 @@
 # The voices
 
+> Seventy Steps itself is © 2026 Alessandro A. Foddis (DigitalDro), all rights reserved (see `LICENSE`). This file credits the work of others:
+> the licences named here (CC0, CC BY, OFL, Apache and the like) apply to that work only, never to the game.
+
 Every recording in this folder is one line of the game, spoken by a synthetic voice made with
 [ElevenLabs](https://elevenlabs.io) Text to Speech, model **Eleven v4** (`eleven_v4`). The people of the
 realms (`npc:<id>`) and the horrors that speak (`boss:<roster id>`) each have either one of ElevenLabs' own

@@ -1,5 +1,8 @@
 # Font credits
 
+> Seventy Steps itself is © 2026 Alessandro A. Foddis (DigitalDro), all rights reserved (see `LICENSE`). This file credits the work of others:
+> the licences named here (CC0, CC BY, OFL, Apache and the like) apply to that work only, never to the game.
+
 The interface's two typefaces (round 74), set in `src/ui/hudKit.ts` and loaded by `src/ui/fonts.ts`. Both licences allow the fonts to be
 embedded in a game and sold with it; the licence texts are beside the files. The files here are the fonts with their outlines and
 features left as released, **cut down** to the Latin letters, punctuation and symbols the game prints (Basic Latin, Latin-1, Latin
