@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { FLASH_LIGHTS } from '../src/data/fxTuning';
+import { FEEL } from '../src/render/feel';
 import { flashLight, layFlashes, level, putOutFlashes } from '../src/render/flashLights';
 import { createLampAim } from '../src/render/lampAim';
 import { createPostPass } from '../src/render/postPass';
@@ -16,7 +17,10 @@ import { worldUniforms } from '../src/render/worldMaterial';
 const slots = () => ({ lamps: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()), colors: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector3()) });
 const at = { x: 0, y: 1, z: 0 };
 
-afterEach(putOutFlashes);
+afterEach(() => {
+  putOutFlashes();
+  FEEL.flashes = 1;
+});
 
 describe('a flash of light', () => {
   it('comes to its height in a moment, and dies away within its life, never negative', () => {
@@ -55,6 +59,31 @@ describe('a flash of light', () => {
     const far = lamps.filter((l) => l.x >= 400);
     expect(far.length).toBe(0);
     expect(layFlashes(lamps, colors, [], 1.5, at)).toBe(0); // all out
+  });
+
+  it('obeys the Flashes setting: dimmed by it, and none at nought (a strike\'s new light is the sky\'s flash too)', () => {
+    const lit = (flashes: number): number => {
+      FEEL.flashes = flashes;
+      const { lamps, colors } = slots();
+      putOutFlashes();
+      flashLight({ x: 2, y: 1, z: 0 }, [1, 0.8, 0.5], 3, 6, 0.3);
+      layFlashes(lamps, colors, [], 5, at);
+      layFlashes(lamps, colors, [], 5.05, at);
+      return colors[LAMP_SLOTS - 1].x;
+    };
+    const full = lit(1);
+    expect(full).toBeGreaterThan(0);
+    expect(lit(0.5)).toBeCloseTo(full * 0.5, 5);
+    expect(lit(2)).toBeCloseTo(full, 5); // (above 1 is the sky's alone: a flash is never brighter)
+    FEEL.flashes = 0;
+    const { lamps, colors } = slots();
+    putOutFlashes();
+    flashLight({ x: 2, y: 1, z: 0 }, [1, 1, 1], 6, 8, 0.2);
+    expect(layFlashes(lamps, colors, [], 9, at)).toBe(0);
+    expect(layFlashes(lamps, colors, [], 9.05, at)).toBe(0);
+    expect(colors.every((c) => c.lengthSq() === 0)).toBe(true);
+    FEEL.flashes = 1;
+    expect(layFlashes(lamps, colors, [], 9.25, at)).toBe(0); // (it ran out meanwhile: a flash left unseen is still spent, not kept for later)
   });
 
   it('is one light, moved, when its source calls it each frame, and dies only when the calls stop', () => {

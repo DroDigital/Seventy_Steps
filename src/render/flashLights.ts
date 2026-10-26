@@ -10,6 +10,7 @@
 import type * as THREE from 'three';
 import type { V3 } from '../core/geom';
 import { FLASH_LIGHTS } from '../data/fxTuning';
+import { FEEL } from './feel';
 import type { Caster } from './lampShadows';
 import type { Rgb } from './palette';
 
@@ -52,9 +53,11 @@ const picked: { f: Flash; v: number }[] = [];
 /**
  * Lays the flashes alive at `time` over the farthest slots of the lamps (`lamps`, `colors`, the shader's), choosing the strongest
  * about `at` (the investigator), and takes from `casters` any lamp whose slot it has taken (its shadow map is the lamp's, not the flash's).
+ * The Flashes setting (round 47, `FEEL.flashes`) governs them as it does the sky's own flash: all of them dimmed by it, none at nought.
  */
 export function layFlashes(lamps: readonly THREE.Vector4[], colors: readonly THREE.Vector3[], casters: Caster[], time: number, at: V3): number {
   picked.length = 0;
+  const kind = Math.min(1, FEEL.flashes);
   for (let i = live.length - 1; i >= 0; i--) {
     const f = live[i];
     if (Number.isNaN(f.born)) f.born = f.key === undefined ? time : time - FLASH_LIGHTS.attack;
@@ -64,7 +67,7 @@ export function layFlashes(lamps: readonly THREE.Vector4[], colors: readonly THR
       continue;
     }
     const d = Math.hypot(f.x - at.x, f.y - at.y, f.z - at.z);
-    if (d > FLASH_LIGHTS.reach) continue;
+    if (d > FLASH_LIGHTS.reach || kind <= 0) continue;
     picked.push({ f, v: (v * f.strength) / (1 + (d * d) / (f.range * f.range + 1)) });
   }
   if (!picked.length) return 0;
@@ -74,7 +77,7 @@ export function layFlashes(lamps: readonly THREE.Vector4[], colors: readonly THR
     const { f } = picked[k];
     const slot = lamps.length - 1 - k;
     lamps[slot].set(f.x, f.y, f.z, f.range);
-    const s = level(time - f.born, f.seconds) * f.strength;
+    const s = level(time - f.born, f.seconds) * f.strength * kind;
     colors[slot].set(f.rgb[0] * s, f.rgb[1] * s, f.rgb[2] * s);
     for (let c = casters.length - 1; c >= 0; c--) if (casters[c].slot === slot) casters.splice(c, 1);
   }

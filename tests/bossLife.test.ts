@@ -14,6 +14,7 @@ import { auraRate, createCreatureAura } from '../src/render/creatureAura';
 import { createBossFootfalls } from '../src/render/bossFootfalls';
 import { ANOMALY, scaleRgb } from '../src/render/palette';
 import type { Particles, ParticleSpec } from '../src/render/particles';
+import { isUnseen } from '../src/systems/components';
 import { spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
 import { worldUniforms } from '../src/render/worldMaterial';
@@ -87,9 +88,9 @@ describe('a horror\'s depth and voice', () => {
 });
 
 describe('a colossus\'s footfalls', () => {
-  const setup = () => {
+  const setup = (who = 'cthulhu') => {
     const g = createWorldGame();
-    const id = spawnCreature(g, 'cthulhu', { x: 0, z: 10, yaw: 0 })!;
+    const id = spawnCreature(g, who, { x: 0, z: 10, yaw: 0 })!;
     g.ecs.c.fight.get(id)!.engaged = true; // roused: a horror that is not is not drawn
     const p = particles();
     const jolts: number[] = [];
@@ -144,6 +145,24 @@ describe('a colossus\'s footfalls', () => {
     for (let i = 0; i < SIM.hz * 10; i += 2) { t.step(8); t.step(8); (t.me as { z: number }).z = t.tr.pos.z - 10; t.feet.update(t.me, 1, false); }
     expect(t.jolts.length).toBeGreaterThanOrEqual(slow - 1);
     expect(t.jolts.length).toBeLessThanOrEqual(slow + 1);
+  });
+
+  it('give none to a horror that hovers: its body is in the air, and stamps on nothing', () => {
+    const run = (who: string, near: number) => {
+      const s = setup(who);
+      for (let i = 0; i < SIM.hz * 8; i++) {
+        s.step(4);
+        (s.me as { z: number }).z = s.tr.pos.z - near; // (the investigator keeps pace, close: it is felt if anything is)
+        s.feet.update(s.me, 1, false);
+      }
+      return s;
+    };
+    const flier = run('haunter_of_the_dark', 2);
+    expect(flier.g.ecs.c.brain.get(flier.id)?.def.params.hover ?? 0).toBeGreaterThan(0);
+    expect(isUnseen(flier.g, flier.id)).toBe(false);
+    expect(flier.jolts.length).toBe(0);
+    expect(flier.p.into.length).toBe(0);
+    expect(run('cthulhu', 2).jolts.length).toBeGreaterThan(0); // (the same drive on the ground is felt: the test is not empty)
   });
 
   it('give none to a body far from the investigator, a hidden one, or a room under a roof', () => {

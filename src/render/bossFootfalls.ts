@@ -2,7 +2,7 @@
  * The footfalls of the great (round 83; render only, read-only on the simulation): a colossus, or any horror
  * that is fought, that walks leaves a ring of dust at each stride of its own length and the ground answers
  * with a small jolt in the camera, by how near the investigator is (render/presence.ts `felt`). They stand
- * still, and nothing is let go; one that is far, hidden or dead gives none, nor does a room under a roof.
+ * still, and nothing is let go; one that is far, hidden, dead or in the air gives none (`traceless.ts`), nor does a room under a roof.
  */
 
 import type * as THREE from 'three';
@@ -10,10 +10,11 @@ import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
 import { BOSS_PRESENCE } from '../data/fxTuning';
 import { SIM } from '../data/tuning';
-import { isAbsent, isUnseen, type Game } from '../systems/components';
+import type { Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import type { Particles } from './particles';
 import { presenceOf } from './presence';
+import { leavesNone } from './traceless';
 
 const DUST = [0.42, 0.4, 0.36] as const;
 
@@ -29,7 +30,7 @@ export function createBossFootfalls(g: Game, particles: Particles, felt: (p: V3,
       const c = g.ecs.c;
       for (const [id, body] of c.body) {
         const tr = c.transform.get(id);
-        if (!tr || id === g.player.id || !c.actor.has(id) || (body.height < BOSS_PRESENCE.height && !c.fight.has(id)) || isAbsent(g, id) || isUnseen(g, id) || (c.health.get(id)?.hp ?? 0) <= 0 || !creatureOf(g, id)) continue;
+        if (!tr || id === g.player.id || !c.actor.has(id) || (body.height < BOSS_PRESENCE.height && !c.fight.has(id)) || leavesNone(g, id) || (c.health.get(id)?.hp ?? 0) <= 0 || !creatureOf(g, id)) continue; // (leavesNone: one that hovers, a spectre or a form drawn outside the world has no ground to stamp on)
         const speed = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz;
         const walk = walked.get(id) ?? { run: 0, side: 1, frame: g.frame };
         walked.set(id, walk);
