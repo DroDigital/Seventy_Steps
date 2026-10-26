@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { MODEL_INFO } from '../src/data/models/index';
 import { KIND, loadModels } from '../src/render/modelKit';
 import { planeOf } from '../src/render/mirrorMath';
-import type { PropMat } from '../src/render/propShapes';
+import { solids, type PropMat } from '../src/render/propShapes';
 import { setPieces } from '../src/render/setShapes';
 import { SURFACE_APPLY, SURFACE_UNIFORMS } from '../src/render/shaders/surfaces';
 import { WORLD_FRAG } from '../src/render/shaders/world';
@@ -48,7 +48,7 @@ describe('what the models are made of (round 79: glass, liquid, a mirror, wax)',
   });
 
   it('has a mirror whose glass is one flat panel that faces the front of the piece', () => {
-    const glass = setPieces(prop('ph_mirror'), [0.8, 0.8, 0.8]).find((p) => p.mat === 'mirror')!;
+    const glass = solids(setPieces(prop('ph_mirror'), [0.8, 0.8, 0.8])).find((p) => p.mat === 'mirror')!;
     const s = planeOf(glass.geo)!;
     expect(s.nz).toBeGreaterThan(0.99); // toward +z, the way a hung piece faces its room
     const pos = glass.geo.getAttribute('position');
@@ -62,7 +62,7 @@ describe('what the models are made of (round 79: glass, liquid, a mirror, wax)',
 
   it('holds each liquid inside its glass', () => {
     for (const id of ['mg_jar', 'lb_florence', 'lb_round', 'lb_reagent']) {
-      const pieces = setPieces(prop(id), [0.8, 0.8, 0.8]);
+      const pieces = solids(setPieces(prop(id), [0.8, 0.8, 0.8]));
       const box = (m: PropMat): THREE.Box3 => new THREE.Box3().setFromBufferAttribute(pieces.find((p) => p.mat === m)!.geo.getAttribute('position') as THREE.BufferAttribute);
       const [glass, liquid] = [box('glassware'), box('liquid')];
       expect(glass.clone().expandByScalar(0.001).containsBox(liquid), id).toBe(true);

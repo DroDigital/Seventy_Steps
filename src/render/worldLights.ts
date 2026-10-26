@@ -36,6 +36,7 @@ export interface LightSpot {
   /** A lit window's pane (playtest round 13: its glow hung half a metre before the window, where the light is cast from): the glow sits on the glass, and fades as the window is seen edge on. */
   glass?: { x: number; y: number; z: number };
   pane?: number; // a lit window's seed: put out now and then, dimmed as someone passes (paneLife.ts; round 18)
+  flame?: number; // the size of its pixel flame, as a multiple of its kind's (`LIGHTS.flames`; round 84, from the cone it replaced: a great brazier burns higher than a candle)
 }
 
 /** How much of a window's glow shows from `eye`: all of it square on, nothing edge on or from behind. */
@@ -215,11 +216,12 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         const seed = (Math.abs(Math.sin(s.x * 12.9898 + s.z * 78.233 + s.y * 4.1414)) * 43758.5453) % 1; // its own beat, turn and ground
         const gain = v * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time)));
         let full = false;
+        const size = s.flame ?? 1;
         for (let i = 0; i < f.count && !full; i++) {
           const a = (seed + i / f.count) * Math.PI * 2;
-          const spread = f.count > 1 ? f.spread : 0;
-          const h = f.height * (f.count > 1 ? 0.7 + 0.3 * ((seed * 7 + i * 0.37) % 1) : 1);
-          full = !flameBatch.put(s.x + Math.cos(a) * spread, s.y + f.base, s.z + Math.sin(a) * spread, h, (seed * 3 + i * 0.27) % 1, (seed * 11 + i) % 2 < 1 ? 1 : -1, 'warm', gain);
+          const spread = f.count > 1 ? f.spread * size : 0;
+          const h = f.height * size * (f.count > 1 ? 0.7 + 0.3 * ((seed * 7 + i * 0.37) % 1) : 1);
+          full = !flameBatch.put(s.x + Math.cos(a) * spread, s.y + f.base * size, s.z + Math.sin(a) * spread, h, (seed * 3 + i * 0.27) % 1, (seed * 11 + i) % 2 < 1 ? 1 : -1, 'warm', gain);
         }
         if (full) break;
       }

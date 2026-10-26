@@ -7,6 +7,7 @@ import { setPieces } from '../src/render/setShapes';
 import { createWorldLights, type LightSpot } from '../src/render/worldLights';
 import { lanternModelFlame } from '../src/world/lanternModels';
 import type { Prop } from '../src/world/props';
+import { solids } from '../src/render/propShapes';
 
 beforeAll(loadModels);
 
@@ -22,7 +23,7 @@ const bounds = (g: THREE.BufferGeometry): THREE.Box3 => {
 describe('oil flames remain within their baked lantern housings', () => {
   it.each([0.65, 1, 1.8])('fits both lanterns at scale %s, below their caps and clear of the frame', (k) => {
     for (const id of ['lightpost', 'lantern']) {
-      const pieces = setPieces(prop(id, k), [1, 1, 1]);
+      const pieces = solids(setPieces(prop(id, k), [1, 1, 1]));
       const flames = pieces.filter((p) => p.light);
       expect(flames).toHaveLength(1);
       const flame = bounds(flames[0].geo);

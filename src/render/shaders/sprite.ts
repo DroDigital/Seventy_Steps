@@ -1,7 +1,8 @@
 /**
  * Creature billboards (spec §2): instanced quads that turn about the vertical axis to face the
  * camera, Doom-style, sampling the sprite atlas. They share the world's vertex snapping, light
- * (ambient, moon and lantern, without normals) and fog. Atlas alpha marks lit pixels (1) and
+ * (ambient, moon and lantern, without normals; the lantern's and the lamps' light as a creature takes it:
+ * its own colour with a little of theirs, `creatureWarmth`) and fog. Atlas alpha marks lit pixels (1) and
  * self-lit pixels (glow markings ~0.63, eye glints ~0.82); transparency is dithered. Self-lit eyes and
  * markings fade into the dark beyond a short distance, so a creature is not spotted from afar by its
  * eyes. Output alpha can mark (the Colour Out of Space) a hue outside the palette that the post pass
@@ -100,6 +101,7 @@ uniform vec2 uEyeRange; // metres over which self-lit eyes and markings sink int
 uniform vec3 uAmbient;
 uniform vec3 uLightColor;
 uniform float uCharacterLight;
+uniform float uSpriteWarm; // how much of the hue of the lantern's and the lamps' light a creature takes: 0 their brightness only, 1 the whole colour (FX.spriteWarm)
 uniform float uMind; // 0..1: how far a failing mind slips what it sees
 uniform float uWet; // how soaked the world is, 0..1 (weather.ts)
 uniform float uRelight; // 0..1: the Relight setting
@@ -179,6 +181,15 @@ float relight(vec2 uv, float centre) {
   return clamp(fine / shape, 0.6, 1.45);
 }
 
+/**
+ * A light as a drawn creature takes it (round 84): all of its brightness and a share of its hue. The lantern is a strong orange (red to blue
+ * 1.7) and, within a few metres, most of what lights a creature, so laid on whole it replaced the creature's colours with its own, and the
+ * recolour that follows (spriteGrade.ts) multiplies a cast's colour again. The luma is the one that recolour keeps.
+ */
+vec3 creatureWarmth(vec3 c) {
+  return mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, uSpriteWarm);
+}
+
 void main() {
   vec2 uv = vWeird > 0.2 ? slip(vUv) : (uMind > 0.0 && uReviewed > 0.5 ? mindSlip(vUv) : vUv);
   vec3 src = fxSource(uv); // a body that is going or forming has its texels moved (spriteFx.ts)
@@ -192,7 +203,7 @@ void main() {
   }
   if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 light = uAmbient + (uLightColor * vShade.x + uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83)
+  vec3 light = uAmbient + uLightColor * vShade.x * uCharacterLight + creatureWarmth(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 84)
   if (vRelit > 0.5 && uRelight > 0.0 && !glow) light *= mix(1.0, relight(uv, dot(t.rgb, vec3(0.299, 0.587, 0.114))), uRelight * 0.8); // the Relight setting (round 83)
   vec3 col = glow ? t.rgb : t.rgb * light;
   if (uReviewed > 0.5) col = spriteGraded(col, vTone); // the realm's colours on the older art, brightness kept (round 83: spriteGrade.ts)

@@ -46,7 +46,7 @@ export interface SetLook {
   rod?: number; // a lightning rod's mast on its top, this many metres (a keep, a gatehouse: round 67)
   drop?: number; // metres it reaches below its foot (a river's kerb, down to the bed: round 68)
   stretch?: readonly [number, number, number]; // times its scale along x, y, z in its own frame (a column made taller, a wall made longer): the boss places, round 71
-  flame?: number; // the size of the flame it carries when `lit` (metres across; the default is a brazier's)
+  flame?: number; // the size of the flame it carries when `lit` (metres across, 0.3 the default; round 84: read as a multiple of the pixel flame's own size, between half and twice, `flameSize` in render/fireSpot.ts)
   dye?: Dye; // the colour of its cloth, metal, bone and glow, where it is not the region's
 }
 

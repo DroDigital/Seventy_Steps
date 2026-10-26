@@ -3,10 +3,10 @@ import * as THREE from 'three';
 import { LANTERN_MODELS } from '../world/lanternModels';
 import type { Prop } from '../world/props';
 import { box, tint } from './meshKit';
-import type { Piece } from './propShapes';
+import type { SolidPiece } from './propShapes';
 
 /** Geometry stays in the model's local frame until propJob turns and places all of its pieces together. */
-export function modelLantern(p: Prop): Piece[] {
+export function modelLantern(p: Prop): SolidPiece[] {
   const look = p.set;
   const l = look && LANTERN_MODELS[look.id];
   if (!look || !l || !look.lit) return [];
@@ -25,7 +25,7 @@ export function modelLantern(p: Prop): Piece[] {
   flame.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   flame.translate(x, foot, z).scale(k, k, k);
   const wick = box(l.radius * 0.45, l.height * 0.2, l.radius * 0.45, x, foot - l.height * 0.05, z, [0.09, 0.065, 0.045]).scale(k, k, k);
-  const out: Piece[] = [
+  const out: SolidPiece[] = [
     { mat: 'stone', geo: wick },
     { mat: 'glow', geo: flame, light: look.lit, at: [x * k, y * k, z * k], halo: l.halo * k, haloGain: 0.36 },
   ];

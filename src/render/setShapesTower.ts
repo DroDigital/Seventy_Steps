@@ -7,22 +7,20 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Prop } from '../world/props';
+import { fireSpot } from './fireSpot';
 import { box, tileUv, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 import { hornTree } from './setShapesRite';
 
 const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeGeometries(parts.map((g) => (g.index ? g.toNonIndexed() : g)));
-const FLAME: Rgb = mixRgb(BASE.bone, [1, 0.8, 0.5], 0.6);
 const stone = (p: Prop, k = 1): Rgb => scaleRgb(p.set?.tint ? mixRgb(scaleRgb(BASE.seaGrey, 1.7), p.set.tint, 0.65) : scaleRgb(BASE.seaGrey, 1.7), k);
 const block = (w: number, h: number, d: number, x: number, y: number, z: number, c: Rgb): THREE.BufferGeometry => tileUv(box(w, h, d, x, y, z, c, Math.max(1.8, Math.max(w, h, d) / 6)), Math.max(w, d), h); // (its faces in cells 1.8 m wide at the least, and six across at the most: a wall of twenty metres is not cut into a thousand)
 
-/** A brazier on a tower's top: a flame, lighting about it, when the piece is lit. */
+/** A brazier on a tower's top: a fire, lighting about it, when the piece is lit (the pixel flame is its picture: no cone of it is built; round 84). */
 function brazier(p: Prop, top: number): Piece[] {
   if (!p.set?.lit) return [];
-  const size = Math.max(0.5, p.w * 0.3);
-  const geo = tint(tileUv(new THREE.ConeGeometry(size, size * 1.8, 6).translate(0, top + size * 0.9 + 0.3, 0), 1, 1), FLAME);
-  return [{ mat: 'glow', geo, light: p.set.lit, at: [0, top + size + 0.4, 0] }];
+  return [{ mat: 'glow', ...fireSpot(p.set.lit, [0, top + 0.3, 0], Math.min(2, Math.max(0.6, p.w * 0.3))) }];
 }
 
 /** The square tower: a battered shaft, a machicolated head wider than it, merlons about the top. */

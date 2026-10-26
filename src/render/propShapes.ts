@@ -17,13 +17,18 @@ import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
 export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
+/** A piece that has its geometry: all but the light of a fire, which has none (round 84). */
+export type SolidPiece = Piece & { geo: THREE.BufferGeometry };
+/** The pieces of `pieces` that have geometry. */
+export const solids = (pieces: readonly Piece[]): SolidPiece[] => pieces.filter((q): q is SolidPiece => q.geo !== undefined);
 export interface Piece {
   mat: PropMat;
-  geo: THREE.BufferGeometry;
+  geo?: THREE.BufferGeometry; // none (round 84): a light alone, at `at`; a fire or a flame is the pixel flame's (flames.ts), no cone of embers is built for it
   light?: LightKind; // a lamp's glass, a fire, a lit window: it lights the world about it (worldLights.ts)...
   halo?: number; // a housed oil flame has a smaller halo than an open flame
   haloGain?: number;
-  at?: readonly [number, number, number]; // ...from here in the prop's frame (else from its middle)
+  at?: readonly [number, number, number]; // ...from here in the prop's frame (else from its middle: a piece with no geometry must say)
+  flame?: number; // the pixel flame of a fire, torch or lamp here, this many times the size its kind has (render/worldLights.ts; default 1)
   glass?: readonly [number, number, number]; // a window's pane: its glow sits there, seen only from before it (worldLights.ts)
   pane?: number; // a lit window's seed: who lives behind it (paneLife.ts; round 18)
   smoke?: readonly (readonly [number, number, number])[]; // the tops of the chimneys this piece is, in the prop's frame: smoke goes up from them (chimneys.ts; round 34)
@@ -205,8 +210,7 @@ function firepit(p: Prop, rng: Rng, c: Rgb): Piece[] {
     stones.push(box(0.3, 0.22, 0.24, Math.sin(a) * p.w, 0.11, Math.cos(a) * p.w, scaleRgb(c, 0.7 + 0.3 * rng())).rotateY(-a));
   }
   const wood = [0, 1.2, 2.4].map((a) => cyl(0.07, 0.06, 1.1, 5, scaleRgb(BARK, 0.6)).translate(0, -0.55, 0).rotateZ(Math.PI / 2).rotateY(a).translate(0, 0.12, 0));
-  const embers = tint(new THREE.ConeGeometry(0.4, 0.5, 6).translate(0, 0.25, 0), FLAME);
-  return [{ mat: 'stone', geo: tileUv(mergeGeometries(stones), 1, 1) }, { mat: 'wood', geo: mergeGeometries(wood) }, { mat: 'glow', geo: tileUv(embers, 1, 1), light: 'fire', at: [0, 0.6, 0] }];
+  return [{ mat: 'stone', geo: tileUv(mergeGeometries(stones), 1, 1) }, { mat: 'wood', geo: mergeGeometries(wood) }, { mat: 'glow', light: 'fire', at: [0, 0.6, 0] }];
 }
 
 function bush(p: Prop, rng: Rng): Piece[] {

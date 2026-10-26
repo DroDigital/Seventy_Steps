@@ -8,7 +8,6 @@
  */
 
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { KitId } from '../data/kits';
@@ -155,17 +154,11 @@ export const place = (item: Item, f: Frame): void => BUILD[item](f);
 /** How far an item stands off its wall at most (the walls' inner faces are solid; nothing is set deeper into a room than this). */
 export const DEPTH = 1.1;
 
-/** A brazier's iron stand and bowl, and its flame (a stout cone with a brighter core), at (x, z) on a floor at `y`. */
-export function brazier(x: number, z: number, y: number): { iron: THREE.BufferGeometry[]; flame: THREE.BufferGeometry; at: { x: number; y: number; z: number } } {
+/** A brazier's iron stand and bowl, and where its fire burns (the pixel flame, flames.ts: round 84, no cone of it is built), at (x, z) on a floor at `y`. */
+export function brazier(x: number, z: number, y: number): { iron: THREE.BufferGeometry[]; at: { x: number; y: number; z: number } } {
   const iron = [
     tint(new THREE.CylinderGeometry(0.14, 0.3, 0.9, 6).translate(x, y + 0.45, z), IRON),
     tint(new THREE.CylinderGeometry(0.42, 0.22, 0.28, 8).translate(x, y + 1.04, z), scaleRgb(IRON, 1.15)),
   ];
-  const body = tint(new THREE.ConeGeometry(0.26, 0.75, 6).translate(x, y + 1.55, z), [1, 0.72, 0.4]);
-  const core = tint(new THREE.ConeGeometry(0.13, 0.45, 6).translate(x, y + 1.38, z), [1, 0.95, 0.75]);
-  const flame = mergeGeometries([body, core]);
-  return { iron, flame, at: { x, y: y + 1.7, z } };
+  return { iron, at: { x, y: y + 1.7, z } };
 }
-
-/** How many vertices one brazier's flame is drawn with (counted by the lights test). */
-export const BRAZIER_VERTICES = brazier(0, 0, 0).flame.getAttribute('position').count;
