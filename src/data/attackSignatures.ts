@@ -5,6 +5,10 @@
  * the element in every flash, burst, landing, trail, gathering and column (render/fxForms.ts): what it is (`form`),
  * how it moves (`motion`) and the light it is drawn in (`accent`). No two creatures of one element share all three,
  * and no two horrors of one element share a form (tests/attackSignatures.test.ts). Data only: no Three.js.
+ *
+ * Since round 87 (asked: the lower tiers' blows were acceptable but overly elaborate, and their colours clustered) this table is the
+ * horrors' alone, and shoggoth's and the flying polyp's: every other creature's blow, lesser, greater, ally and plain named, is
+ * `data/foeBlows.ts`, one quiet graphic mark and its three hues. A creature has a signature or a blow here, never both.
  */
 
 export const FORMS = ['tendrils', 'bubbles', 'runes', 'eyes', 'arcs', 'fangs', 'feathers', 'swarm', 'crystals', 'petals', 'void', 'prism', 'sand', 'chains', 'hands', 'notes', 'cinders', 'motes'] as const;
@@ -49,28 +53,12 @@ const HORRORS: Readonly<Record<string, Signature>> = {
   dunwich_horror: sig('tendrils', 'scatter', 0xa8c878), colossus_pyramids: sig('sand', 'fountain', 0xffdc98),
 };
 
-/** The common foes and the allies (by the element their hide makes them: attackLook.ts `MADE_OF`). */
-const FOES: Readonly<Record<string, Signature>> = {
-  // tide (sea)
-  deep_one: sig('bubbles', 'scatter', 0x7fd8c8), innsmouth_hybrid: sig('fangs', 'spiral', 0x9ac8b0), dagon_priest: sig('runes', 'orbit', 0x80d0e8), gnorri: sig('crystals', 'fountain', 0x90e0d0), elder_thing: sig('motes', 'spiral', 0xa0f0e0), star_spawn: sig('tendrils', 'fountain', 0x60e0b0), tritons: sig('notes', 'rain', 0xb0e8ff),
-  // ash (charcoal, bone)
-  cthulhu_cultist: sig('cinders', 'spiral', 0xff9c50), cat_from_saturn: sig('prism', 'scatter', 0xd0a0ff), martense_degenerate: sig('fangs', 'scatter', 0xd8c8a0), rat_swarm: sig('swarm', 'scatter', 0xc0a890), gnoph_keh: sig('crystals', 'rain', 0xd8f0ff), gug: sig('hands', 'fountain', 0xd8b090), voice_in_the_tomb: sig('notes', 'implode', 0xc8c0e0),
-  yithian: sig('arcs', 'orbit', 0xc0f0ff), nodens: sig('motes', 'rain', 0xe8f0ff), nasht_kaman_thah: sig('runes', 'implode', 0xffe8b0), algol_light_being: sig('prism', 'fountain', 0xfff8d0), yithian_archivist: sig('arcs', 'spiral', 0xd0f0ff), flying_polyp: sig('void', 'rain', 0xb8a0e0),
-  // spore (mold, fungus)
-  ghoul: sig('fangs', 'spiral', 0xb8d098), serpent_man: sig('eyes', 'spiral', 0xc8e070), being_of_ib: sig('bubbles', 'rain', 0x98e8a8), venusian_man_lizard: sig('arcs', 'scatter', 0xa8ff90), pickman: sig('hands', 'orbit', 0xc8d8a8), mi_go: sig('arcs', 'implode', 0xe0a0ff),
-  // frost (pallid)
-  ghast: sig('fangs', 'fountain', 0xe8e0c8), moon_beast: sig('tendrils', 'implode', 0xe0d8f0), ym_bhi: sig('crystals', 'scatter', 0xe0f0e8), gyaa_yothn: sig('sand', 'fountain', 0xf0e0c0), exham_troglodyte: sig('swarm', 'implode', 0xe8e4d0), moon_bog_wraith: sig('hands', 'spiral', 0xc8e8ff),
-  beast_in_the_cave: sig('eyes', 'rain', 0xf0f0e0), albino_penguin: sig('feathers', 'scatter', 0xf0f8ff), dhole: sig('bubbles', 'fountain', 0xe8e8d0), yekubian: sig('prism', 'orbit', 0xd0f0ff), being_from_beyond: sig('void', 'orbit', 0xe0d0ff),
-  // crack (rust, sand, stone)
-  zoog: sig('swarm', 'spiral', 0xffb080), man_of_leng: sig('fangs', 'rain', 0xe0a070), wamp: sig('tendrils', 'rain', 0xd89878), kn_yan_dweller: sig('runes', 'fountain', 0xf0d890), nameless_city_reptile: sig('fangs', 'implode', 0xe0c878), hybrid_mummy: sig('sand', 'spiral', 0xf0d8a0),
-  child_of_yig: sig('swarm', 'fountain', 0xd8e088), cats_of_ulthar: sig('motes', 'spiral', 0xffe0a0), shantak: sig('feathers', 'spiral', 0xd8d0c0),
-  // root (flesh)
-  reanimated_corpse: sig('arcs', 'fountain', 0x98ffd0), curwen_pit_thing: sig('tendrils', 'spiral', 0xd09878),
-  // stain (rubber, ichor)
-  night_gaunt: sig('void', 'spiral', 0x9890c0), winged_hybrid: sig('feathers', 'rain', 0xa0a8c8), thousand_young: sig('hands', 'implode', 0xb0c070), shoggoth: sig('bubbles', 'spiral', 0x9ae890), formless_spawn: sig('tendrils', 'implode', 0x8878a8),
+/** The two themed greater creatures (shoggoth and flying polyp: they have colours of their own in `bossAttackTheme` but no horror's entry above). Every other creature's blow is `data/foeBlows.ts`. */
+const THEMED_GREATER: Readonly<Record<string, Signature>> = {
+  shoggoth: sig('bubbles', 'spiral', 0x9ae890), flying_polyp: sig('void', 'rain', 0xb8a0e0),
 };
 
-export const SIGNATURES: Readonly<Record<string, Signature>> = { ...HORRORS, ...FOES };
+export const SIGNATURES: Readonly<Record<string, Signature>> = { ...HORRORS, ...THEMED_GREATER };
 
 /** Whether roster id `id` is one of the horrors (a boss): its signature is checked against the other horrors of its element. */
 export const isHorrorSignature = (id: string): boolean => id in HORRORS;

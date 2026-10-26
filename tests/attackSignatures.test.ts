@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FORMS, MOTIONS, SIGNATURES, isHorrorSignature } from '../src/data/attackSignatures';
+import { BOSS_ATTACK_THEME } from '../src/data/bossAttackTheme';
+import { FOE_BLOWS } from '../src/data/foeBlows';
 import { ENTITIES } from '../src/data/registry';
 import { LIGHT_FLOOR, lookOf } from '../src/render/attackLook';
 import { BUDGET, FORM_SPECS, signature, type Moment } from '../src/render/fxForms';
@@ -15,9 +17,14 @@ const at = { x: 0, y: 0, z: 0 };
 const key = (id: string): string => `${lookOf(id).motif}/${SIGNATURES[id].form}/${SIGNATURES[id].motion}`;
 
 describe('every creature\'s attacks are its own (round 60: "make it very distinct from each other, and also with more fidelity")', () => {
-  it('every creature of the roster has a signature, and nothing else does', () => {
+  it('every creature has a signature (the horrors, and shoggoth and the flying polyp) or a blow (round 87: data/foeBlows.ts), never both and never neither', () => {
     const ids = ENTITIES.map((e) => e.id).sort();
-    expect(Object.keys(SIGNATURES).sort()).toEqual(ids);
+    const signed = Object.keys(SIGNATURES);
+    const blown = Object.keys(FOE_BLOWS);
+    expect([...signed, ...blown].sort()).toEqual(ids); // all of them, each once
+    for (const id of signed) expect(blown, id).not.toContain(id);
+    for (const id of ids) expect(id in BOSS_ATTACK_THEME, `${id}: a signature goes with colours of its own, a blow with none`).toBe(id in SIGNATURES);
+    expect(signed.filter((id) => !isHorrorSignature(id)).sort()).toEqual(['flying_polyp', 'shoggoth']); // the horrors, and the two themed greater creatures
   });
 
   it('no two creatures of one element share form, motion and all; no two horrors of one element share a form', () => {
@@ -40,11 +47,13 @@ describe('every creature\'s attacks are its own (round 60: "make it very distinc
     for (const id of Object.keys(SIGNATURES)) expect(luma(lookOf(id).accent), id).toBeGreaterThanOrEqual(LIGHT_FLOOR - 1e-6);
   });
 
-  it('a common foe is drawn in its own colours, not the shared magenta of round 51', () => {
-    const [deep, ghoul, miGo] = ['deep_one', 'ghoul', 'mi_go'].map(lookOf);
-    expect(deep.danger).not.toEqual(ghoul.danger);
-    expect(deep.line).not.toEqual(miGo.line);
-    expect(lookOf('deep_one').sig?.form).toBe('bubbles');
+  it('a common foe is drawn in its own colours, not the shared magenta of round 51: its blow\'s hues (round 87), not a signature', () => {
+    const [deep, ghoul, miGo] = ['deep_one', 'ghoul', 'mi_go'].map((id) => FOE_BLOWS[id].hues);
+    expect(deep[1]).not.toBe(ghoul[1]);
+    expect(deep[1]).not.toBe(miGo[1]);
+    expect(ghoul[1]).not.toBe(miGo[1]);
+    expect(lookOf('deep_one').sig).toBeNull(); // a blow, not a signature
+    expect(lookOf('shoggoth').sig?.form).toBe('bubbles'); // the two themed greater creatures keep theirs
     expect(lookOf(undefined).sig).toBeNull(); // the arena's dummy and the like draw no signature
   });
 
