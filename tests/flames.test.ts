@@ -137,8 +137,8 @@ describe('what a fire gives off', () => {
     expect(run(['torch'], 30, { x: 40, y: 1.5, z: 0 })).toHaveLength(0);
   });
 
-  it('adds the puff to the particle shapes, last', () => {
-    expect(PARTICLE_SHAPES[PARTICLE_SHAPES.length - 1]).toBe('puff');
+  it('adds the puff to the particle shapes, after the first fourteen (round 87 added seven after it)', () => {
+    expect(PARTICLE_SHAPES[14]).toBe('puff');
     expect(PARTICLE_SHAPES.indexOf('puff')).toBe(14);
   });
 });

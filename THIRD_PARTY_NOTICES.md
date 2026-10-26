@@ -77,7 +77,7 @@ its source recording and treatment, in [`public/audio/CREDITS.md`](public/audio/
 ## Baked models, flames, smoke and surface patterns
 
 The 3D models stood in the arenas, boss places and dungeons are baked from free models into the game's own data (nothing is loaded as a source file at run
-time); the pixel flames and the smoke are cut from two free animations and the stone, flagstone and plank patterns from a PS1 dungeon pack. Each source, its author,
+time); the pixel flames and the smoke are cut from two free animations, the quiet blows' six small marks (scratch, dust, wisp and the mottle of a smear) from Kenney's CC0 Particle Pack, and the stone, flagstone and plank patterns from a PS1 dungeon pack. Each source, its author,
 its licence (CC0 1.0 or Creative Commons Attribution 4.0, with the credit text the licence asks for) and what was changed are in
 [`src/data/models/CREDITS.md`](src/data/models/CREDITS.md).
 

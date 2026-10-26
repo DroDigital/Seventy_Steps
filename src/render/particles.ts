@@ -9,9 +9,10 @@
  */
 
 import * as THREE from 'three';
-import { FLAME_ATLAS, PUFF_CELLS } from '../data/flameAtlas';
 import { flameAtlasTexture } from './flames';
+import { markAtlasTexture } from './markAtlas';
 import type { Rgb } from './palette';
+import { particleMasksGlsl, shapeDefines } from './shaders/particleMasks';
 import { LANTERN_GLSL } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 
@@ -21,7 +22,7 @@ export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a cr
 export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff', 'crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
 
-/** Round 87 (the quiet blows, data/foeBlows.ts): a tapering crescent, an S-curve lash, a thin cross of light, a row of ticks and an open ring ('crescent', 'lash', 'cross', 'dash', 'arc': drawn in the shader), and six free masks, cut from Kenney's CC0 Particle Pack (data/markAtlas.ts), that a 'mark' (turns about its centre) or a 'trace' (lies along its flight, as a streak does) draws, by its `thick`: `markCell(name)`. */
+/** Round 87 (the quiet blows, data/foeBlows.ts): a tapering crescent, an S-curve lash, a thin cross of light, a row of ticks and an open ring ('crescent', 'lash', 'cross', 'dash', 'arc': drawn in the shader), and six masks (data/markAtlas.ts: four cut from, or textured by, Kenney's CC0 Particle Pack, two made in code) that a 'mark' (turns about its centre) or a 'trace' (lies along its flight, as a streak does) draws, by its `thick`: `markCell(name)`. */
 export const MARK_NAMES = ['scratch', 'splat', 'dust', 'twirl', 'wisp', 'smear'] as const;
 export type MarkName = (typeof MARK_NAMES)[number];
 /** The `thick` of a 'mark' or a 'trace' particle that draws the mask `name`. */
@@ -45,11 +46,11 @@ export interface ParticleSpec {
   shape?: ParticleShape; // default: a disc
   colorEnd?: Rgb; // the colour at death (default: its own)
   colorMid?: Rgb; // the colour half way through its life (round 87): with `colorEnd`, a hue that drifts through a third and does not pass through grey (default: the straight blend of the two)
-  spin?: number; // rad/s about the view axis (not for a streak, which lies along its flight)
-  rot?: number; // radians at birth
+  spin?: number; // rad/s about the view axis (not for a streak, which lies along its flight; for the other aligned shapes it turns them off their flight)
+  rot?: number; // radians at birth (for a crescent, lash, dash or trace: the angle off its flight, which is all there is while it moves under 0.02 m/s)
   stretch?: number; // a streak's length, in sizes per m/s of its speed (default 0.12), at least one size
   hold?: number; // the share of its life it keeps its full alpha before it fades (default 0)
-  thick?: number; // a ring's thickness, a share of its radius (default 0.18); a puff's, which of its four pictures (0 to just under 1)
+  thick?: number; // a ring's or an arc's thickness, a share of its radius (default 0.18); a puff's, which of its four pictures, a mark's or a trace's, which of the six masks (`markCell`) (0 to just under 1)
   floor?: number; // the height of the ground under it: it lands there, bounces a little and comes to rest, not falling through (round 60)
   bounce?: number; // the share of its fall it keeps as it springs up again (default 0.3)
 }
@@ -63,6 +64,7 @@ export interface Particles {
 }
 
 const VERT = /* glsl */ `
+${shapeDefines(PARTICLE_SHAPES)}
 uniform vec2 uRes;
 uniform float uSnap;
 uniform float uFogNear;
@@ -84,12 +86,16 @@ void main() {
   float s = length(instanceMatrix[0].xyz);
   vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
   vec3 up = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+  int shape = int(aShape.x + 0.5);
   float angle = aShape.y;
   float len = 1.0;
-  if (aShape.x > 1.5 && aShape.x < 2.5) { // a streak lies along its flight as the screen sees it
+  if (shape == SH_STREAK) { // a streak lies along its flight as the screen sees it
     vec3 vv = (viewMatrix * vec4(aVel, 0.0)).xyz;
     angle = atan(vv.y, vv.x + 1e-5);
     len = aShape.z;
+  } else if (shape == SH_CRESCENT || shape == SH_LASH || shape == SH_DASH || shape == SH_TRACE) { // these lie along it too, turned by rot, and by only rot when hardly moving (round 87)
+    vec3 vv = (viewMatrix * vec4(aVel, 0.0)).xyz;
+    if (dot(aVel, aVel) > 0.0004) angle += atan(vv.y, vv.x + 1e-5);
   }
   float cs = cos(angle);
   float sn = sin(angle);
@@ -114,91 +120,33 @@ void main() {
 const FRAG = /* glsl */ `
 uniform vec3 uFogColor;
 uniform float uFogAmount;
-uniform sampler2D uPuffs;
 varying vec2 vUv;
 varying vec4 vColor;
 varying vec3 vLight;
 varying float vFog;
 varying vec2 vShape;
+${particleMasksGlsl(PARTICLE_SHAPES)}
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
   return (m[q.x + q.y * 4] + 0.5) / 16.0;
 }
-float mask(vec2 q) {
-  int shape = int(vShape.x + 0.5);
-  float r = length(q);
-  if (shape == 1) return 1.0 - smoothstep(0.5, 1.0, abs(q.x) + abs(q.y)); // a diamond shard
-  if (shape == 2) { // a streak: thin and faint at its tail, bright and full at its head
-    float t = q.x * 0.5 + 0.5;
-    float half_ = mix(0.1, 0.5, t);
-    return (1.0 - smoothstep(half_ * 0.55, half_, abs(q.y))) * smoothstep(0.0, 0.55, t) * (1.0 - smoothstep(0.93, 1.0, t));
-  }
-  if (shape == 3) { // a ring
-    float th = max(vShape.y, 0.04);
-    return 1.0 - smoothstep(th * 0.45, th, abs(r - (1.0 - th)));
-  }
-  if (shape == 4) return 1.0 - smoothstep(0.55, 1.0, sqrt(abs(q.x)) + sqrt(abs(q.y))); // a four-point spark
-  if (shape == 5) return exp(-3.2 * dot(q, q)); // a soft wisp
-  if (shape == 6) { // a rune: a ring, a stave and a chevron through it
-    float ring = 1.0 - smoothstep(0.07, 0.13, abs(r - 0.8));
-    float stave = (1.0 - smoothstep(0.06, 0.11, abs(q.x))) * step(abs(q.y), 0.62);
-    float chev = (1.0 - smoothstep(0.05, 0.1, abs(q.y - 0.18 - abs(q.x) * 0.7))) * step(abs(q.x), 0.48);
-    return max(ring, max(stave, chev));
-  }
-  if (shape == 7) { // an eye: an almond with a slit for its pupil
-    float w = 0.52 * (1.0 - q.x * q.x);
-    float almond = 1.0 - smoothstep(w * 0.7, w + 0.001, abs(q.y));
-    float slit = (1.0 - smoothstep(0.05, 0.1, abs(q.x))) * step(abs(q.y), w * 0.85);
-    return almond * (1.0 - slit) * step(abs(q.x), 0.98);
-  }
-  if (shape == 8) { // a fang, a claw's crescent
-    float outer = 1.0 - smoothstep(0.82, 0.95, r);
-    float inner = 1.0 - smoothstep(0.7, 0.82, length(q - vec2(0.32, 0.26)));
-    return outer * (1.0 - inner);
-  }
-  if (shape == 9) { // a bubble: a thin skin, a faint body and a bright fleck of light
-    float skin = 1.0 - smoothstep(0.05, 0.12, abs(r - 0.84));
-    float fleck = exp(-34.0 * dot(q - vec2(-0.34, 0.36), q - vec2(-0.34, 0.36)));
-    return max(max(skin, fleck), 0.18 * (1.0 - smoothstep(0.7, 0.86, r)));
-  }
-  if (shape == 10) { // a forked bolt along its length
-    float zig = (abs(fract(q.x * 1.75 + 0.25) - 0.5) * 2.0 - 0.5) * 0.42;
-    float fork = (1.0 - smoothstep(0.04, 0.09, abs(q.y + zig * 0.6 + (q.x - 0.15) * 0.55))) * step(0.15, q.x);
-    return max(1.0 - smoothstep(0.05, 0.11, abs(q.y - zig)), fork * 0.8) * (1.0 - smoothstep(0.82, 1.0, abs(q.x)));
-  }
-  if (shape == 11) { // a feather: a vane parted by its shaft, its barbs in stripes
-    float w = 0.34 * (1.0 - q.x * q.x);
-    float vane = (1.0 - smoothstep(w * 0.6, w + 0.001, abs(q.y))) * smoothstep(0.015, 0.05, abs(q.y));
-    return vane * (0.72 + 0.28 * sin(q.x * 26.0 + abs(q.y) * 18.0)) * step(abs(q.x), 0.98);
-  }
-  if (shape == 12) { // a petal, a teardrop
-    vec2 pq = vec2(q.x, q.y * 1.55);
-    return 1.0 - smoothstep(0.55 - 0.28 * q.x, 0.72 - 0.28 * q.x, length(pq));
-  }
-  if (shape == 13) { // a note: its head, its stem, its flag
-    float head = 1.0 - smoothstep(0.24, 0.32, length(vec2(q.x + 0.28, (q.y + 0.48) * 1.45)));
-    float stem = (1.0 - smoothstep(0.05, 0.09, abs(q.x + 0.02))) * step(-0.5, q.y) * step(q.y, 0.78);
-    float flag = (1.0 - smoothstep(0.06, 0.11, abs(q.y - 0.66 + q.x * 0.75))) * step(0.0, q.x) * step(q.x, 0.46);
-    return max(head, max(stem, flag));
-  }
-  if (shape == 14) { // a puff of smoke: a free sprite's ragged cloud, one of four, its coverage a dithered edge
-    float k = floor(clamp(vShape.y, 0.0, 0.999) * ${PUFF_CELLS.at.length}.0);
-    vec2 uv = clamp(q * 0.5 + 0.5, 0.0, 1.0);
-    vec2 px = vec2(k * ${PUFF_CELLS.w}.0 + uv.x * ${PUFF_CELLS.w}.0, ${PUFF_CELLS.at[0][1]}.0 + (1.0 - uv.y) * ${PUFF_CELLS.h}.0);
-    return texture2D(uPuffs, px / vec2(${FLAME_ATLAS.width}.0, ${FLAME_ATLAS.height}.0)).g * (1.0 - smoothstep(0.82, 1.0, r));
-  }
-  return 1.0 - smoothstep(0.35, 1.0, r); // a disc
-}
 void main() {
   vec2 q = (vUv - 0.5) * 2.0;
-  float a = vColor.a * mask(q);
+  float a = vColor.a * mask(q, int(vShape.x + 0.5), vShape.y);
   if (a < bayer4(gl_FragCoord.xy)) discard;
   gl_FragColor = vec4(mix(vColor.rgb * vLight, uFogColor, vFog * uFogAmount), 1.0);
 }
 `;
 
 type Live = Required<Omit<ParticleSpec, 'colorEnd' | 'colorMid' | 'shape'>> & { colorEnd: Rgb | null; colorMid: Rgb | null; shape: number; age: number };
+
+/** One channel `i` of a particle's colour at `t` (0 at birth, 1 at death): `color`, with an `end` the straight blend to it, with a `mid` as well the blend through it at half life (a hue that drifts through a third, not through grey). */
+export function lifeColor(color: Rgb, mid: Rgb | null, end: Rgb | null, t: number, i: 0 | 1 | 2): number {
+  if (!end) return color[i];
+  if (!mid) return color[i] + (end[i] - color[i]) * t;
+  return t < 0.5 ? color[i] + (mid[i] - color[i]) * t * 2 : mid[i] + (end[i] - mid[i]) * (t - 0.5) * 2;
+}
 
 /** A falling particle meets its ground: it springs up a little, skids, and once its spring is spent lies still. */
 export function land(p: Pick<Live, 'x' | 'y' | 'z' | 'vx' | 'vy' | 'vz' | 'floor' | 'bounce' | 'gravity' | 'drag' | 'spin' | 'rot' | 'age'>): void {
@@ -223,7 +171,7 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
   geo.setAttribute('aGlow', glows);
   geo.setAttribute('aShape', shapes);
   geo.setAttribute('aVel', vels);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() } }, vertexShader: VERT, fragmentShader: FRAG });
+  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() }, uMarks: { value: markAtlasTexture() } }, vertexShader: VERT, fragmentShader: FRAG });
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;
@@ -262,11 +210,8 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
         const t = p.age / p.life;
         const size = p.size * (1 + (p.grow - 1) * t);
         batch.setMatrixAt(n, m4.makeScale(size, size, size).setPosition(p.x, p.y, p.z));
-        const e = p.colorEnd;
-        const m = p.colorMid;
         const fade = t < p.hold ? 1 : 1 - (t - p.hold) / Math.max(1e-3, 1 - p.hold);
-        const ch = (i: number): number => (!e ? p.color[i] : m ? (t < 0.5 ? p.color[i] + (m[i] - p.color[i]) * t * 2 : m[i] + (e[i] - m[i]) * (t - 0.5) * 2) : p.color[i] + (e[i] - p.color[i]) * t);
-        colors.setXYZW(n, ch(0), ch(1), ch(2), p.alpha * fade);
+        colors.setXYZW(n, lifeColor(p.color, p.colorMid, p.colorEnd, t, 0), lifeColor(p.color, p.colorMid, p.colorEnd, t, 1), lifeColor(p.color, p.colorMid, p.colorEnd, t, 2), p.alpha * fade);
         glows.setX(n, p.glow ? 1 : 0);
         const speed = Math.hypot(p.vx, p.vy, p.vz);
         shapes.setXYZW(n, p.shape, p.rot + p.spin * p.age, p.shape === 2 ? Math.max(1, 1 + p.stretch * speed) : 1, p.thick);
