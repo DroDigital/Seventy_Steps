@@ -54,6 +54,7 @@ describe('every creature\'s attacks are its own (round 60: "make it very distinc
     expect(ghoul[1]).not.toBe(miGo[1]);
     expect(lookOf('deep_one').sig).toBeNull(); // a blow, not a signature
     expect(lookOf('shoggoth').sig?.form).toBe('bubbles'); // the two themed greater creatures keep theirs
+    expect(lookOf('hastur').sig?.form, 'a horror still has its own').toBeDefined();
     expect(lookOf(undefined).sig).toBeNull(); // the arena's dummy and the like draw no signature
   });
 

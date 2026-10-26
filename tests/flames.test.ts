@@ -140,5 +140,6 @@ describe('what a fire gives off', () => {
   it('adds the puff to the particle shapes, after the first fourteen (round 87 added seven after it)', () => {
     expect(PARTICLE_SHAPES[14]).toBe('puff');
     expect(PARTICLE_SHAPES.indexOf('puff')).toBe(14);
+    expect(PARTICLE_SHAPES.slice(15)).toEqual(['crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace']);
   });
 });

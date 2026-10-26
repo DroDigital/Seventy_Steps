@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { createAttackFx } from '../src/render/attackFx';
 import { createBeams } from '../src/render/beams';
+import { createFoeFx } from '../src/render/foeFx';
 import type { Decals } from '../src/render/decals';
 import { createGroundFx } from '../src/render/groundFx';
 import { createMeleeFx } from '../src/render/meleeFx';
@@ -48,7 +49,7 @@ export function fxAudit(id: string): FxAudit {
       finite('particle', p.x, p.y, p.z, p.vx, p.vy, p.vz, p.life, p.size, p.alpha, p.grow, p.spin, p.rot);
       if (!(p.life > 0 && p.life < 4 && p.size > 0 && p.size < 10)) bad.push(`${current}: particle life ${p.life} size ${p.size}`);
       if (p.shape && !PARTICLE_SHAPES.includes(p.shape)) bad.push(`${current}: shape ${p.shape}`);
-      if ([...p.color, ...(p.colorEnd ?? [])].some((n) => !Number.isFinite(n) || n < 0)) bad.push(`${current}: particle colour`);
+      if ([...p.color, ...(p.colorMid ?? []), ...(p.colorEnd ?? [])].some((n) => !Number.isFinite(n) || n < 0)) bad.push(`${current}: particle colour`);
       audit.shapes.add(p.shape ?? 'disc');
       alive.push(time + p.life);
     },
@@ -64,6 +65,7 @@ export function fxAudit(id: string): FxAudit {
   const ground = createGroundFx();
   const attack = createAttackFx(g, particles, ground);
   const melee = createMeleeFx(g, particles, ground);
+  const foes = createFoeFx(g, particles, ground); // (round 87: bossFx.ts builds it beside the other two; every creature that is not a horror is drawn by it)
   const telegraphs = createTelegraphs(g, decals, ground);
   const scene = new THREE.Scene();
   const beams = createBeams(scene, g);
@@ -84,6 +86,7 @@ export function fxAudit(id: string): FxAudit {
       telegraphs.update(1, time);
       attack.update(1);
       melee.update(1);
+      foes.update(1);
       beams.update(1, time, camera);
       audit.peakLive = Math.max(audit.peakLive, alive.length);
       audit.peakDecals = Math.max(audit.peakDecals, frameDecals);
