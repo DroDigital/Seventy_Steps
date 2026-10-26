@@ -15,6 +15,7 @@ import { createRng } from '../src/core/rng';
 import { propAt } from '../src/world/props';
 import { padDistance } from '../src/world/sitePads';
 import { ringOf } from './worldHelpers';
+import { solids } from '../src/render/propShapes';
 
 const inside = (c: Collider, x: number, z: number): boolean => {
   if (c.kind === 'cylinder') return Math.hypot(x - c.x, z - c.z) <= c.radius;
@@ -117,7 +118,7 @@ describe("a horror's house (round 63: the walls that house an open arena)", () =
   it('costs the picture little: a house is under 60,000 triangles whole (it is all drawn whenever its chunks are)', () => {
     for (const a of arenas) {
       let tris = 0;
-      for (const p of a.house!.props) for (const q of setPieces(p, [0.5, 0.5, 0.5])) tris += q.geo.index ? q.geo.index.count / 3 : q.geo.attributes.position.count / 3;
+      for (const p of a.house!.props) for (const q of solids(setPieces(p, [0.5, 0.5, 0.5]))) tris += q.geo.index ? q.geo.index.count / 3 : q.geo.attributes.position.count / 3;
       expect(tris, a.bosses[0]).toBeLessThan(60_000);
     }
   });

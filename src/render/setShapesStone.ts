@@ -7,12 +7,12 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Prop } from '../world/props';
+import { fireSpot } from './fireSpot';
 import { box, tileUv, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 
 const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeGeometries(parts);
-const FLAME: Rgb = mixRgb(BASE.bone, [1, 0.8, 0.5], 0.6);
 const stone = (p: Prop): Rgb => p.set?.tint ? mixRgb(scaleRgb(BASE.seaGrey, 1.7), p.set.tint, 0.6) : scaleRgb(BASE.seaGrey, 1.7);
 
 /** A tapered tower of stepped blocks, `w` from the middle at its foot and `h` high, a brazier burning on its top. */
@@ -28,8 +28,7 @@ export function pylon(p: Prop): Piece[] {
   const top = (p.h * 0.9);
   parts.push(box(p.w * 2.3 * 0.62, p.h * 0.05, p.d * 2.3 * 0.62, 0, top + p.h * 0.025, 0, scaleRgb(c, 1.1)));
   for (const s of [-1, 1]) for (const t of [-1, 1]) parts.push(box(0.3, p.h * 0.06, 0.3, s * p.w * 0.55, top + p.h * 0.08, t * p.d * 0.55, c)); // the brazier's horns
-  const flame = tint(tileUv(new THREE.ConeGeometry(p.w * 0.38, p.w * 0.9, 6).translate(0, top + p.h * 0.1 + p.w * 0.4, 0), 1, 1), FLAME);
-  return [{ mat: 'stone', geo: merged(parts) }, { mat: 'glow', geo: flame, light: p.set?.lit ?? 'fire', at: [0, top + p.h * 0.1 + p.w * 0.5, 0] }];
+  return [{ mat: 'stone', geo: merged(parts) }, { mat: 'glow', ...fireSpot(p.set?.lit ?? 'fire', [0, top + p.h * 0.05, 0], Math.min(2, Math.max(0.6, p.w / 1.2)), top + p.h * 0.1 + p.w * 0.5) }]; // (its fire burns on the cap, between the horns: the pixel flame, no cone of it is built; its light stays where the cone's stood, above the pylon's collider, that the eye may see it)
 }
 
 /** A sphinx lying along its z, `w` half its width and `h` its height: a lion's body, forepaws out, a head in a headdress. */
