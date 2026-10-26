@@ -9,7 +9,7 @@
  * be inverted (playtest round 12).
  */
 
-import { noteLockAsked } from './mouseLock';
+import { lockJustAsked, noteLockAsked, noteLockRefused } from './mouseLock';
 import { INPUT, SIM } from '../data/tuning';
 import { keyLayout, type Action } from './bindings';
 import { useDevice } from './device';
@@ -136,8 +136,8 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     held[b] = false;
   };
   const captured = (): boolean => document.pointerLockElement === canvas;
-  const capture = (): void => {
-    noteLockAsked();
+  /** The request alone: a key held down asks again with each repeat, and a repeat must not keep the mouse held back (round 87). */
+  const request = (): void => {
     try {
       const r: unknown = canvas.requestPointerLock();
       if (r instanceof Promise) r.catch(() => undefined);
@@ -145,11 +145,16 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
       // Pointer lock unavailable: mouse look stays off, arrows and pads still work.
     }
   };
+  /** Asks the browser for the mouse, and marks the ask: the movement reported before the grant is no look (the mousemove handler). */
+  const capture = (): void => {
+    noteLockAsked();
+    request();
+  };
 
   addEventListener('keydown', (e) => {
     if (e.metaKey && !isMeta(e.code)) return; // a Command shortcut (on macOS a key pressed with Command is never heard to rise, so one taken for the game stays down): not the game's
     if (e.code === 'Space' || e.code.startsWith('Arrow')) e.preventDefault();
-    if (e.code !== 'Escape' && !captured()) capture(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
+    if (e.code !== 'Escape' && !captured()) (e.repeat ? request : capture)(); // a key is a gesture the browser takes as leave to capture the mouse: coming back from a menu, the first key press takes it (round 39)
     keys.set(e.code, performance.now()); // held, even by a repeat: a key held down through a menu or a talk walks on once it closes (round 17)
     if (e.repeat) return void repeats.add(e.code);
     repeats.clear(); // a key newly pressed takes the system's repeating from the rest: they are silent now, and still held (round 53)
@@ -225,9 +230,11 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
     settleUntil = performance.now() + INPUT.lockSettleMs; // (round 60: opening the map lets the mouse go, closing it takes it again, and the first movement the browser reports with it can be the cursor's jump to the middle: the camera turned to another view)
     mouseX = mouseY = flick = 0;
   });
+  document.addEventListener('pointerlockerror', () => noteLockRefused()); // a request the browser refuses ends its wait at once: the mouse looks about free as it did (round 87)
   addEventListener('mousemove', (e) => {
     reconcile(e);
     if (!captured() && !free()) return; // (not captured, and the game in play: the mouse looks about all the same, till a key or a click takes it)
+    if (!captured() && lockJustAsked(INPUT.lockAskMs)) return; // (asked for and not yet granted: a move reported then, such as the cursor's warp to the middle on the grant, is no look; the wait ends at the grant, at a refusal, or after lockAskMs; round 87)
     if (performance.now() < settleUntil) return;
     mouseX += e.movementX;
     mouseY += e.movementY;
