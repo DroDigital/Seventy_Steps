@@ -15,7 +15,8 @@ import { fighting } from '../../systems/sanity';
 import { roofedAt } from '../../world/terrain';
 import { HEART } from '../feel';
 import { createStrideClock, followed, type Footfall } from '../footfalls';
-import { coldAt, stepLevel, stepSetOf } from './footing';
+import { surfaceAt } from './foley';
+import { coldAt, indoorLift, stepLevel, stepSetOf } from './footing';
 import type { Sampler } from './sampler';
 
 type Recipe = (key: string, sound: Sound, o?: { at?: null; gain?: number; vary?: number; pan?: number }) => boolean;
@@ -31,23 +32,25 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
   const clock = createStrideClock(g);
   let [strides, wasMoving, stoppedAt, sprintFor, longestWalk] = [0, false, -1e9, 0, 0];
   let underfoot: Footfall['ground'] = 'dirt';
+  let lifted = 1; // the lift of the room underfoot (round 86)
   let [lastSeconds, ragged, cold, coldCheck, coldNext, gasped] = [-1, 0, 0, -1e9, 0, false];
   const soft = (key: string, sound: Sound, gain: number, vary = 1): boolean => recipe(key, sound, { at: null, gain, vary });
   /** The step of a mind that is followed: duller, to one side, a moment late. */
-  const phantom = (ground: Footfall['ground'], delay: number): void => void sampler.play(SAMPLE_SETS[stepSetOf(ground)], { gain: FOOT_GAIN.phantom, pan: (rand() < 0.5 ? -1 : 1) * BODY.phantom.pan, pitch: BODY.phantom.pitch, lowpass: BODY.phantom.lowpass, delay });
+  const phantom = (ground: Footfall['ground'], delay: number, lift: number): void => void sampler.play(SAMPLE_SETS[stepSetOf(ground)], { gain: FOOT_GAIN.phantom * lift, pan: (rand() < 0.5 ? -1 : 1) * BODY.phantom.pan, pitch: BODY.phantom.pitch, lowpass: BODY.phantom.lowpass, delay });
 
   function stride(f: Footfall, stress: number): void {
     strides++;
     underfoot = f.ground;
+    lifted = indoorLift(surfaceAt(g, f.body.x, f.y, f.body.z));
     const layer = STEP_LAYERS[f.ground];
-    const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot); // (the recording's level, so the recipe keeps under it)
+    const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot) * lifted; // (the recording's level, so the recipe keeps under it; in a dungeon's room lifted with it, round 86)
     if (layer) soft(`foot:${f.ground}`, layer, FOOT_GAIN.steps * pace, 0.9);
     if (f.ground === 'boards' && strides % BODY.creakEvery === 0) soft('foot:creak', BOARD_CREAK, FOOT_GAIN.steps * pace);
     const sprint = clock.walking.sprint;
     if (sprint && strides % BODY.coatEvery === 0) soft('gear:coat', GEAR.coat, FOOT_GAIN.gear * 0.8);
     if (sprint && strides % BODY.satchelEvery === 0) soft('gear:satchel', GEAR.satchel, FOOT_GAIN.gear * 0.8);
     const p = g.mind.band === 'unmoored' ? BODY.phantom.unmoored : BODY.phantom.fractured;
-    if (followed(g.mind.band, stress) && !fighting(g) && rand() < p) phantom(f.ground, between(BODY.phantom.delay, rand()));
+    if (followed(g.mind.band, stress) && !fighting(g) && rand() < p) phantom(f.ground, between(BODY.phantom.delay, rand()), lifted);
   }
 
   /** The breath: what the body does of itself, never in a scene, a rest or a talk. */
@@ -95,7 +98,7 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
         stoppedAt = seconds;
         const interrupted = g.cutscene || g.player.mount.active || g.ecs.c.dead.has(g.player.id) || g.ecs.c.actor.get(g.player.id)?.move != null;
         if (!interrupted && sprintFor >= BODY.sprintBreath) soft('body:pant', BREATH.pant, FOOT_GAIN.breath * Math.min(1, 0.5 + sprintFor / 8));
-        if (!interrupted && longestWalk >= BODY.phantom.stopAfter && followed(g.mind.band, stress) && !fighting(g) && rand() < BODY.phantom.stopChance) phantom(underfoot, BODY.phantom.stopDelay); // one more, when no one walks
+        if (!interrupted && longestWalk >= BODY.phantom.stopAfter && followed(g.mind.band, stress) && !fighting(g) && rand() < BODY.phantom.stopChance) phantom(underfoot, BODY.phantom.stopDelay, lifted); // one more, when no one walks
         sprintFor = longestWalk = 0;
       }
       wasMoving = w.moving;

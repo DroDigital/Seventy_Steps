@@ -45,8 +45,11 @@ export function coldAt(region: string | null, dark: number, raining: boolean, ro
 /** How loud a footfall at `speed` (m/s) is against its set's own level: quiet creeping, a little more at a walk, the most at a sprint; the recipe laid over it keeps to the same. */
 export const stepLevel = (speed: number): number => STEP_VOICE.level[0] + (STEP_VOICE.level[1] - STEP_VOICE.level[0]) * Math.min(1, Math.max(0, speed / PLAYER.sprintSpeed));
 
-/** What the surface's recording is given to sit with the others (`STEP_VOICE.surface`): its level against the set's own, and the low-pass (Hz) it is dulled to. */
-export const stepGain = (surface: Surface): number => STEP_VOICE.surface[surface]?.gain ?? 1;
+/** How much louder a footfall is inside a dungeon's rooms (`surface` 'stone': render/audio/foley.ts surfaceAt) than the same one in the open (`STEP_VOICE.indoors`, round 86); 1 anywhere else. The recipe laid over the step and a failing mind's followers keep to it. */
+export const indoorLift = (surface: Surface): number => (surface === 'stone' ? STEP_VOICE.indoors : 1);
+
+/** What the surface's recording is given to sit with the others (`STEP_VOICE.surface`): its level against the set's own (the dungeon's, lifted), and the low-pass (Hz) it is dulled to. */
+export const stepGain = (surface: Surface): number => (STEP_VOICE.surface[surface]?.gain ?? 1) * indoorLift(surface);
 
 /** The low-pass (Hz) a footfall on `surface` is played with, the ground's own (`FEEL`) or the surface's, whichever is duller: undefined when neither closes anything. */
 export function stepLowpass(surface: Surface, feelLowpass?: number): number | undefined {

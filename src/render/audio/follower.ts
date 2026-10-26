@@ -16,6 +16,7 @@ import { fighting } from '../../systems/sanity';
 import { HEART } from '../feel';
 import type { AtmAudioContext } from './atmosphereAudio';
 import { strideAt, surfaceAt } from './foley';
+import { indoorLift } from './footing';
 
 const T = MIND_EARS.tread;
 const A = T.approach;
@@ -91,8 +92,9 @@ export function createFollower(ctx: AtmAudioContext): Follower {
   function step(stress: number, delay: number, o: { gain?: number; lowpass?: number; pitch?: number; pan?: number } = {}): void {
     const p = g.ecs.c.transform.get(g.player.id)!.pos;
     side = -side;
-    sampler.play(SAMPLE_SETS[TREAD_SETS[surfaceAt(g, p.x, p.y, p.z)]], {
-      gain: o.gain ?? between(T.gain, stress),
+    const surface = surfaceAt(g, p.x, p.y, p.z);
+    sampler.play(SAMPLE_SETS[TREAD_SETS[surface]], {
+      gain: (o.gain ?? between(T.gain, stress)) * indoorLift(surface), // (in a dungeon's room as much louder as the investigator's own steps are, round 86)
       pan: o.pan ?? T.pan * side,
       pitch: o.pitch ?? between(T.pitch, Math.random()),
       lowpass: o.lowpass ?? T.lowpass,

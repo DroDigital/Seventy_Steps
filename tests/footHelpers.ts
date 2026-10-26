@@ -2,7 +2,9 @@
 
 import { REGIONS } from '../src/data/regions';
 import type { Game } from '../src/systems/components';
+import { kitOfRoom } from '../src/world/dungeonKit';
 import { groundAt, type GroundKind } from '../src/world/groundKind';
+import { worldLayout } from '../src/world/placements';
 import { regionRect } from '../src/world/worldMap';
 
 /** A point of `region` whose ground is `kind` for `run` metres along `yaw` too (found on a 4 m grid). */
@@ -21,4 +23,10 @@ export function stride(g: Game, metres: number, yaw: number): void {
   const tr = g.ecs.c.transform.get(g.player.id)!;
   tr.prev = { ...tr.pos };
   tr.pos = { x: tr.pos.x + Math.sin(yaw) * metres, y: tr.pos.y, z: tr.pos.z + Math.cos(yaw) * metres };
+}
+
+/** The middle of a dungeon room whose floor (`kitOfRoom`'s) is one of `floors` and which is `half` metres or more to a side: where a body is put to walk or stand indoors (round 86). */
+export function findRoom(floors: readonly string[], half = 8): { x: number; z: number } | null {
+  for (const { layout } of worldLayout().dungeons) for (const room of layout.rooms) if (floors.includes(kitOfRoom(layout, room).floor) && room.half >= half) return { x: room.x, z: room.z };
+  return null;
 }

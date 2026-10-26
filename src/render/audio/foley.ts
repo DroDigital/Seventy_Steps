@@ -7,7 +7,7 @@
  * up, an arm reinforced, a knee bent and risen from (round 40: each placed on its move's own frames, data/foleySounds.ts
  * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation. Round 83: the footsteps are understated (quieter at every
  * pace, a lilt between the feet, no two alike, the bright recordings dulled: data/footSounds.ts `STEP_VOICE`) and a room that answers a
- * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly.
+ * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly. Round 86: a step in a dungeon's room is lifted back (`STEP_VOICE.indoors`, footing.ts `indoorLift`): round 83 had left it almost unheard there.
  */
 
 import type { Entity } from '../../core/ecs';
