@@ -11,7 +11,7 @@ import type { Entity } from '../core/ecs';
 import { dist3, distXZ } from '../core/geom';
 import { LORE, PLAYER, REAGENT, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
-import { isAbsent, isConcealed, isUnseen, type Game, type GameEvents } from './components';
+import { isAbsent, isConcealed, isSheltered, isUnseen, type Game, type GameEvents } from './components';
 import { aimPoint, playerEye, viewAngle } from './lockOn';
 import { takeUp } from './arms';
 import { giveRounds } from './gun';
@@ -50,8 +50,9 @@ export function inSight(g: Game, id: Entity): boolean {
 /** One step: the first sight of each horror not yet beheld, and tomes read by touch. */
 export function insightSystem(g: Game): void {
   const { dread, tome, transform, combatant, actor } = g.ecs.c;
+  const calm = isSheltered(g); // a horror beheld in a talk or at peace on arriving is beheld once they are free: the shock of it is not forfeited (round 88)
   for (const [id, d] of dread) {
-    if (g.mind.seen.has(d.id) || !inSight(g, id)) continue;
+    if (calm || g.mind.seen.has(d.id) || !inSight(g, id)) continue;
     g.mind.seen.add(d.id);
     const name = combatant.get(id)?.name ?? d.id;
     const sanity = tollOnce(g.mind.beheld, g.frame, SANITY.firstSight[d.tier], SANITY.together); // horrors beheld together: the greatest counts
