@@ -1,5 +1,5 @@
 /**
- * A crowd of creatures draws no more than a few would (round 88; render/foeCrowd.ts, data/foeTuning.ts `FOE_FX.crowd`): the nearest draw all, the
+ * A crowd of creatures draws no more than a few would (round 89; render/foeCrowd.ts, data/foeTuning.ts `FOE_FX.crowd`): the nearest draw all, the
  * next only their marks, the rest little or nothing, and one rolling budget of particles in half a second is shared by all of them.
  */
 
@@ -11,7 +11,7 @@ const C = FOE_FX.crowd;
 const pack = (...d: number[]): Foe[] => d.map((x, i) => ({ id: i + 1, d: x }));
 const rank = (t: Tier): number => (t === 'full' ? 0 : t === 'marks' ? 1 : 2);
 
-describe('who draws how much (round 88)', () => {
+describe('who draws how much (round 89)', () => {
   it('the nearest few draw all, the next few their marks, the rest only when close, and every tier has its range', () => {
     const foes = pack(2, 3, 4, 5, 6, 7, 8, 9, 9.5, 12, 20, 26);
     const t = tiersOf(foes);
@@ -44,7 +44,7 @@ describe('who draws how much (round 88)', () => {
   });
 });
 
-describe('the rolling budget (round 88)', () => {
+describe('the rolling budget (round 89)', () => {
   it('only the full tier draws what is optional, and the marks-only tier a part of the budget', () => {
     const crowd = createCrowd();
     crowd.rank(pack(1, 2, 3, 4, 5));

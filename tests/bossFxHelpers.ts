@@ -65,7 +65,7 @@ export function fxAudit(id: string): FxAudit {
   const ground = createGroundFx();
   const attack = createAttackFx(g, particles, ground);
   const melee = createMeleeFx(g, particles, ground);
-  const foes = createFoeFx(g, particles, ground); // (round 88: bossFx.ts builds it beside the other two; every creature that is not a horror is drawn by it)
+  const foes = createFoeFx(g, particles, ground); // (round 89: bossFx.ts builds it beside the other two; every creature that is not a horror is drawn by it)
   const telegraphs = createTelegraphs(g, decals, ground);
   const scene = new THREE.Scene();
   const beams = createBeams(scene, g);

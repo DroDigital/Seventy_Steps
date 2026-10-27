@@ -22,7 +22,7 @@ export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a cr
 export const PARTICLE_SHAPES = ['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff', 'crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace'] as const;
 export type ParticleShape = (typeof PARTICLE_SHAPES)[number];
 
-/** Round 88 (the quiet blows, data/foeBlows.ts): a tapering crescent, an S-curve lash, a thin cross of light, a row of ticks and an open ring ('crescent', 'lash', 'cross', 'dash', 'arc': drawn in the shader), and six masks (data/markAtlas.ts: four cut from, or textured by, Kenney's CC0 Particle Pack, two made in code) that a 'mark' (turns about its centre) or a 'trace' (lies along its flight, as a streak does) draws, by its `thick`: `markCell(name)`. */
+/** Round 89 (the quiet blows, data/foeBlows.ts): a tapering crescent, an S-curve lash, a thin cross of light, a row of ticks and an open ring ('crescent', 'lash', 'cross', 'dash', 'arc': drawn in the shader), and six masks (data/markAtlas.ts: four cut from, or textured by, Kenney's CC0 Particle Pack, two made in code) that a 'mark' (turns about its centre) or a 'trace' (lies along its flight, as a streak does) draws, by its `thick`: `markCell(name)`. */
 export const MARK_NAMES = ['scratch', 'splat', 'dust', 'twirl', 'wisp', 'smear'] as const;
 export type MarkName = (typeof MARK_NAMES)[number];
 /** The `thick` of a 'mark' or a 'trace' particle that draws the mask `name`. */
@@ -45,7 +45,7 @@ export interface ParticleSpec {
   drag?: number; // per second
   shape?: ParticleShape; // default: a disc
   colorEnd?: Rgb; // the colour at death (default: its own)
-  colorMid?: Rgb; // the colour half way through its life (round 88): with `colorEnd`, a hue that drifts through a third and does not pass through grey (default: the straight blend of the two)
+  colorMid?: Rgb; // the colour half way through its life (round 89): with `colorEnd`, a hue that drifts through a third and does not pass through grey (default: the straight blend of the two)
   spin?: number; // rad/s about the view axis (not for a streak, which lies along its flight; for the other aligned shapes it turns them off their flight)
   rot?: number; // radians at birth (for a crescent, lash, dash or trace: the angle off its flight, which is all there is while it moves under 0.02 m/s)
   stretch?: number; // a streak's length, in sizes per m/s of its speed (default 0.12), at least one size
@@ -93,7 +93,7 @@ void main() {
     vec3 vv = (viewMatrix * vec4(aVel, 0.0)).xyz;
     angle = atan(vv.y, vv.x + 1e-5);
     len = aShape.z;
-  } else if (shape == SH_CRESCENT || shape == SH_LASH || shape == SH_DASH || shape == SH_TRACE) { // these lie along it too, turned by rot, and by only rot when hardly moving (round 88)
+  } else if (shape == SH_CRESCENT || shape == SH_LASH || shape == SH_DASH || shape == SH_TRACE) { // these lie along it too, turned by rot, and by only rot when hardly moving (round 89)
     vec3 vv = (viewMatrix * vec4(aVel, 0.0)).xyz;
     if (dot(aVel, aVel) > 0.0004) angle += atan(vv.y, vv.x + 1e-5);
   }

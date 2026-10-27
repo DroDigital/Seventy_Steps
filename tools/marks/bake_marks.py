@@ -2,7 +2,7 @@
 """Bakes the mark atlas (src/data/markAtlas.ts) that render/markAtlas.ts lays under render/particles.ts's 'mark' and 'trace' shapes: six 32 x 32
 masks of 8-bit coverage side by side in one row (a 1 px margin of nothing about each, so Nearest sampling never bleeds a neighbour), in the order
 of MARK_NAMES (render/particles.ts): scratch, splat, dust, twirl, wisp, smear. Coverage only: the game tints each blow its own hues.
-Where they come from (round 88, the quiet blows, data/foeBlows.ts; credits in src/data/models/CREDITS.md):
+Where they come from (round 89, the quiet blows, data/foeBlows.ts; credits in src/data/models/CREDITS.md):
   scratch  Kenney's Particle Pack (CC0), scratch_01: its three claw lines, turned to run along +x, thickened to survive 32 px, spaced further apart.
   dust     Kenney's Particle Pack (CC0), dirt_01: its fine grit, thinned toward its rim into a spray.
   wisp     Kenney's Particle Pack (CC0), trace_04: its thin wavering tendril, turned along +x and waved into an S, bright at the head and fading behind.
@@ -150,7 +150,7 @@ def bake(folder, out, preview):
         assert atlas[:, i * CELL:(i + 1) * CELL].max() > 0, NAMES[i]
     data = base64.b64encode(atlas.tobytes()).decode()
     lines = [
-        "/** The mark atlas (round 88; tools/marks/bake_marks.py, render/markAtlas.ts): six 32 x 32 masks of coverage, one byte a texel, side by side in one row (a texel of nothing about each), in the order of `names` (= MARK_NAMES, render/particles.ts). Scratch, dust and wisp cut from Kenney's CC0 Particle Pack, smear from its smoke's mottle, splat and twirl made in the baker; credits in src/data/models/CREDITS.md. Generated. */",
+        "/** The mark atlas (round 89; tools/marks/bake_marks.py, render/markAtlas.ts): six 32 x 32 masks of coverage, one byte a texel, side by side in one row (a texel of nothing about each), in the order of `names` (= MARK_NAMES, render/particles.ts). Scratch, dust and wisp cut from Kenney's CC0 Particle Pack, smear from its smoke's mottle, splat and twirl made in the baker; credits in src/data/models/CREDITS.md. Generated. */",
         '',
         f"export const MARK_ATLAS = {{ width: {CELL * len(cells)}, height: {CELL}, cell: {CELL}, names: {NAMES!r}, data: '{data}' }} as const;",
         '',

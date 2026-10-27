@@ -1,5 +1,5 @@
 /**
- * How much of its blow a creature in a crowd draws (round 88; data/foeTuning.ts `FOE_FX.crowd`). A pack of twelve is not twelve times the
+ * How much of its blow a creature in a crowd draws (round 89; data/foeTuning.ts `FOE_FX.crowd`). A pack of twelve is not twelve times the
  * eeriness of a pack of four: the creatures nearest the investigator draw all of theirs (`full`), the next few only their marks, the rest only
  * what is within a short range, and nothing farther than each tier's range; and the whole crowd shares one rolling budget of particles, of
  * which what is optional (specks, trails, tells, motes) may spend only a share, and the marks-only tier a share too, so the nearest foes'

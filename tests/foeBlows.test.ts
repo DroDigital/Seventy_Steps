@@ -1,5 +1,5 @@
 /**
- * The 51 quiet blows (round 88; asked: the lower tiers' blows were overly elaborate and their colours clustered, a third of them amber).
+ * The 51 quiet blows (round 89; asked: the lower tiers' blows were overly elaborate and their colours clustered, a third of them amber).
  * Every creature that is not a horror (not in `BOSS_ATTACK_THEME`) has one entry in `data/foeBlows.ts`: this holds that the table covers them,
  * that each colour path is a real drift, and that the blows are told apart: no two the same mark, tempo and hue, no hue crowded, and no two
  * creatures that can be met together drawn alike. A failure prints the whole table.
@@ -120,7 +120,7 @@ function report(table: Table): string {
 const mine = audit(FOE_BLOWS);
 const roster = ENTITIES.filter((e) => !(e.id in BOSS_ATTACK_THEME)).map((e) => e.id);
 
-describe('the quiet blows: every creature that is not a horror has its own (round 88)', () => {
+describe('the quiet blows: every creature that is not a horror has its own (round 89)', () => {
   it('has an entry for exactly the creatures that are not themed: lesser, greater, allies and the plain named, no horror', () => {
     expect(Object.keys(FOE_BLOWS).sort()).toEqual([...roster].sort());
     expect(roster.length).toBeGreaterThanOrEqual(51);

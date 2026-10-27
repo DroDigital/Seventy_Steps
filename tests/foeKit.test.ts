@@ -1,5 +1,5 @@
 /**
- * The vocabulary of a quiet blow (round 88; render/blowKit.ts, blowMarks.ts, blowMatter.ts, blowPen.ts; data/foeBlows.ts, data/foeTuning.ts): each of
+ * The vocabulary of a quiet blow (round 89; render/blowKit.ts, blowMarks.ts, blowMatter.ts, blowPen.ts; data/foeBlows.ts, data/foeTuning.ts): each of
  * the twelve marks draws its own shapes in the blow's three hues, each tempo moves a mark as it says, each matter's specks fall, rise or hang, and
  * nothing spends more than it is allowed. Judged by the particles SPAWNED (shape, size, life, colour, count, velocity), not by pixels: the shapes
  * the shader draws are render/particles.ts's.
@@ -59,7 +59,7 @@ function valid(list: ParticleSpec[], label: string): void {
   }
 }
 
-describe('every mark draws its own shapes, in the blow\'s three hues (round 88)', () => {
+describe('every mark draws its own shapes, in the blow\'s three hues (round 89)', () => {
   it('has a recipe for every mark, and the table of what each is drawn in names them all', () => {
     expect(Object.keys(SHAPE_OF).sort()).toEqual([...MARKS].sort());
     expect(Object.keys(FOE_FX.marks).sort()).toEqual([...MARKS].sort());
@@ -142,7 +142,7 @@ describe('every mark draws its own shapes, in the blow\'s three hues (round 88)'
   });
 });
 
-describe('each tempo moves a mark as it says (round 88)', () => {
+describe('each tempo moves a mark as it says (round 89)', () => {
   const lives = (tempo: Tempo, mark: Mark = 'rake'): number => {
     const { out, kit, wait } = rig();
     lay(kit, blow(mark, tempo), mark, 3);
@@ -232,7 +232,7 @@ describe('each tempo moves a mark as it says (round 88)', () => {
   });
 });
 
-describe('the specks of matter fall, rise or hang as what they are (round 88)', () => {
+describe('the specks of matter fall, rise or hang as what they are (round 89)', () => {
   const GRAVITY: Readonly<Record<Exclude<Matter, 'none'>, 'falls' | 'rises' | 'hangs' | 'drifts'>> = {
     brine: 'falls', ash: 'drifts', dust: 'falls', spore: 'rises', frost: 'hangs', ichor: 'falls', ember: 'rises', mote: 'hangs', down: 'drifts',
   };

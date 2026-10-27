@@ -1,5 +1,5 @@
 /**
- * The vocabulary of a quiet blow (round 88, render only; data/foeBlows.ts, data/foeTuning.ts `FOE_FX`): what a creature that is not one of the
+ * The vocabulary of a quiet blow (round 89, render only; data/foeBlows.ts, data/foeTuning.ts `FOE_FX`): what a creature that is not one of the
  * horrors draws where its blow falls. A graphic `mark` (twelve of them, `blowMarks.ts`), moved by its `tempo` (snap, drag, bloom, settle, flutter,
  * pulse: how long it lives, how it grows, whether its strokes come one after another, whether it comes twice a beat apart) in the blow's three
  * hues, and at most a few specks of `matter` (`blowMatter.ts`). Nothing here knows the game: a kit takes the particles, the ground's decals and

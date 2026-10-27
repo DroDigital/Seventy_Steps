@@ -260,6 +260,6 @@ export const SWING_TRAIL = {
   lead: 2, tail: 3, // frames before the blow's first active frame and after its last that the edge is followed
 } as const;
 
-/** The quiet blows of every creature that is not one of the horrors (round 88): kept in data/foeTuning.ts, which holds this file past its share of lines. */
+/** The quiet blows of every creature that is not one of the horrors (round 89): kept in data/foeTuning.ts, which holds this file past its share of lines. */
 export { FOE_FX } from './foeTuning';
 export type { MatterSpec, SpeckShape } from './foeTuning';

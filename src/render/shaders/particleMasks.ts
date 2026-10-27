@@ -2,7 +2,7 @@
  * The particles' shapes (render/particles.ts), as GLSL: `float mask(vec2 q, int shape, float thick)`, q in -1..1 across the sprite, its coverage 0..1
  * (the batch dithers it, so a thin or dim shape is a sparser one, never a blur). `shapeDefines` gives each name of PARTICLE_SHAPES its index as
  * `SH_<NAME>`, so no number here can drift from the list. Round 51 drew the first thirteen, round 79 the puff (a free smoke sprite of
- * data/flameAtlas.ts); round 88 (the quiet blows, data/foeBlows.ts) the crescent, lash, cross, dash and arc, drawn here, and the 'mark' and 'trace'
+ * data/flameAtlas.ts); round 89 (the quiet blows, data/foeBlows.ts) the crescent, lash, cross, dash and arc, drawn here, and the 'mark' and 'trace'
  * that take one of six masks of data/markAtlas.ts (`uMarks`, one row of N cells; `thick` chooses it). Local +x of the aligned shapes (streak,
  * crescent, lash, dash, trace) is the way the particle flies, set in the vertex shader. Sprites must stay readable at 20 to 60 pixels: no
  * stroke has a half-width under about 0.05 where it is meant to be seen, and a taper to a point is the one place it may.

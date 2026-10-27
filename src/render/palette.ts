@@ -57,7 +57,7 @@ export function hsvToRgb(h: number, s: number, v: number): Rgb {
   return [f(5), f(3), f(1)];
 }
 
-/** `c` with its hue turned `turns` of a full circle (a grey stays grey), its saturation and brightness kept (round 88: a blow's neighbouring hue). */
+/** `c` with its hue turned `turns` of a full circle (a grey stays grey), its saturation and brightness kept (round 89: a blow's neighbouring hue). */
 export function rotateHue(c: Rgb, turns: number): Rgb {
   const [h, s, v] = rgbToHsv(c);
   return hsvToRgb(h + turns, s, v);

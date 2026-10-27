@@ -1,5 +1,5 @@
 /**
- * The twelve marks a quiet blow can leave (round 88, render only; data/foeBlows.ts `Mark`): one recipe each, in particles of the shapes the
+ * The twelve marks a quiet blow can leave (round 89, render only; data/foeBlows.ts `Mark`): one recipe each, in particles of the shapes the
  * shader draws for them (`render/particles.ts`: a crescent, a lash, a cross, a row of ticks and an open ring are drawn in the shader, a mark and
  * a trace from a small free atlas of masks) and, for the one that lies on the ground, a decal. A stroke, a lash, a row of ticks lies along the way
  * it travels (the shader turns it along its flight); the rest face the eye. How a mark moves (`tempo`) and what it passes through (the blow's three

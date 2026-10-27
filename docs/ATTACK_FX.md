@@ -17,7 +17,7 @@ A blow is made of three things, and each has one place:
 A new horror needs its four colours (`bossAttackTheme`), a motif (`aoeLook` `ASSIGN`) and a signature (`attackSignatures`).
 It then has telegraphs, bolts, bursts, scars, beams, a summoning, an arrival and a gaze of its own, and the sounds of its
 element. Every other creature (the lesser and greater creatures, the allies and the two plain named ones: 51 in all) has no
-theme and no signature: since round 88 it draws a **quiet blow** of its own, below.
+theme and no signature: since round 89 it draws a **quiet blow** of its own, below.
 
 ### Distinct (round 60)
 
@@ -44,7 +44,7 @@ its light the edge, the fill, the flash and the outline keep, and how long a sca
 last. The lifted colours, the whole shape from the first frame and the filling front are not touched, so a mark is still read on any
 ground. A pool, a fire and a cloud's reach are not marks but what hurts, and keep their own looks and lives.
 
-### Quiet blows (round 88)
+### Quiet blows (round 89)
 
 Asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly elaborate; in high-density
 combat scenarios, this detracts from the intended eerie atmosphere. Several animations are visually redundant; each creature should
@@ -100,7 +100,7 @@ are the knobs if the marks are too quiet or too loud.
 
 - **Particles** (`render/particles.ts`): one instanced batch of 4 096 camera-facing sprites (2 400 before round 60). Shapes:
   disc, shard, streak (lies along its flight, stretched by its speed), ring, spark (four-point) and wisp, and (round 60) rune,
-  eye, fang, bubble, bolt (forked), feather, petal and note, and (round 88) crescent, lash, cross, dash, arc, and mark and trace
+  eye, fang, bubble, bolt (forked), feather, petal and note, and (round 89) crescent, lash, cross, dash, arc, and mark and trace
   (a cell of the Kenney-derived mask atlas). They spin, hold their brightness before they fade, change colour
   over a life (an ember from white to red to black), and (round 60) may have a floor: they bounce a little, skid and lie still
   on it. The floor is the ground under the blow (`Particles.ground`, the world's; `groundUnder` in `fxForms.ts`), so what a
@@ -183,7 +183,7 @@ a stage that reads an undeclared uniform silently draws nothing.
 - `tests/bossFx.test.ts`: one horror of each element fires every move with the render side running beside the simulation
   (stand-ins for the batches): nothing throws or is left not a number, and the particle and decal budgets hold.
   `tests/bossFxAudit.test.ts` (`npm run audit`) does it for every creature.
-- Round 88: `tests/foeBlows.test.ts` (the table: coverage, vocabulary, the spread of hues and marks), `foeKit.test.ts` (what each mark, tempo and
+- Round 89: `tests/foeBlows.test.ts` (the table: coverage, vocabulary, the spread of hues and marks), `foeKit.test.ts` (what each mark, tempo and
   matter draws, within its budget, never a crown, a scar or a light), `foeFx.test.ts` (the events: a blow, a wound, a bolt, a beam, a
   summoning, a gaze; a horror's path untouched), `foeCrowd.test.ts` (the tiers and the rolling budget), `particleShapes.test.ts` (the new
   shapes and the atlas: every cell has a zero border, GLSL and the names cannot drift) and `attackLook.test.ts` (a blow's look from its hues).

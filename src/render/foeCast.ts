@@ -1,5 +1,5 @@
 /**
- * What a caster does, drawn quietly (round 88, render only; data/foeTuning.ts `FOE_FX`): a few motes drawn in over its wind-up (`GATHER`
+ * What a caster does, drawn quietly (round 89, render only; data/foeTuning.ts `FOE_FX`): a few motes drawn in over its wind-up (`GATHER`
  * frames before the frame it looses what it winds toward, `windup.ts`), a small mark at the muzzle as a bolt leaves, a faint smear every few
  * frames along its flight, the mark and a few specks where it lands, a mark at each end of a beam, a faint sigil and a few rising motes where
  * something is summoned, two swirls for a teleport, an eye and a few motes for a gaze and a few motes thrown up by a roar's front. No scar, no

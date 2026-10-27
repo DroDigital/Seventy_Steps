@@ -1,5 +1,5 @@
 /**
- * The quiet blows' numbers (round 88; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly
+ * The quiet blows' numbers (round 89; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly
  * elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere"). Every creature that is not one of the
  * horrors draws its blow as ONE graphic mark (data/foeBlows.ts: render/blowKit.ts) and at most a few specks of matter, never a crown, a
  * fountain, a cloud, a scar, a lit arc, a flash or a light; `render/foeFx.ts` lays them on the game's events and `render/foeCrowd.ts` thins what
