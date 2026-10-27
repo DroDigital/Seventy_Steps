@@ -7,6 +7,7 @@ import { ARENA } from '../src/data/arena';
 import { LEVELS, REINFORCE } from '../src/data/tuning';
 import type { Variant } from '../src/data/registry';
 import type { Game } from '../src/systems/components';
+import { foeHealth } from '../src/systems/cycles';
 import { fightAction } from '../src/systems/fightActions';
 import { callsForLaudanum } from '../src/ui/mindHud';
 import { applyLevels } from '../src/systems/levels';
@@ -26,6 +27,7 @@ export interface BotStyle {
   smart?: boolean; // it keeps behind a monolith from a gaze that turns flesh to stone, cuts down the spawning roots before the horror, and a servant or a phantom at its elbow
   mind?: boolean; // it keeps its mind as a person is told to (the HUD's call, ui/mindHud.ts: Fractured, a dose left): it drinks Laudanum, which the bot never did, and so was left Unmoored by round 58's harder mind, taking more and striking less for the rest of a fight
   start?: number; // metres from the boss it begins (7)
+  cycle?: number; // the journey it is fought on (round 95: NG+, the ladder of systems/ngPlus.ts; 0, the first, when not said)
   waive?: readonly ('petrify' | 'roots' | 'void')[]; // what it is let off, to measure the rest of a fight whose mechanic the bot plays badly: the gaze never takes hold; the roots are down at once; the void under the hidden platforms never opens (a person with insight keeps to them, round 60)
 }
 
@@ -83,6 +85,11 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   const rng = createRng(77);
   const c = g.ecs.c;
   const me = c.health.get(g.player.id)!;
+  if (style.cycle !== undefined) { // before the levels are applied: a horror's health is refreshed with them; an ordinary foe was made on the first journey, and is made hardier as a later journey's is
+    g.player.cycle = style.cycle;
+    const foe = c.health.get(boss);
+    if (foe && !c.fight.has(boss)) foe.hp = foe.max = Math.round(foe.max * foeHealth(g));
+  }
   Object.assign(g.player.levels, style.levels ?? { vigour: 0, endurance: 0, might: LEVELS.might.max });
   applyLevels(g); // refresh player resources and boss scaling together, including in invariant audits
   const health = c.health.get(boss)?.max ?? 0;

@@ -15,7 +15,7 @@ English where it is none of these.
 
 ## What is translated
 
-The menus (title, difficulty, slots, pause, settings, controls, rise), the hints, the HUD's labels and notices, the mind's bands, the
+The menus (title, slots, pause, settings, controls, rise), the hints, the HUD's labels and notices, the mind's bands, the
 crash screen, and the buttons' names.
 
 ## What is not (yet), and stays English in every language

@@ -22,7 +22,7 @@
 ## What it is, in numbers (counted from the data)
 
 100 creatures · 47 horrors, each with an arena, a theme and a mechanic · 13 regions and 28 dungeons · 41 Elder Signs to rest at ·
-5 weapons and a revolver · 28 achievements · 15 realm tracks and 48 boss themes · 3 difficulties · 3 endings and a second journey · 3 save slots.
+5 weapons and a revolver · 28 achievements · 15 realm tracks and 48 boss themes · 3 endings and up to eight journeys · 3 save slots.
 
 ## Descriptions
 

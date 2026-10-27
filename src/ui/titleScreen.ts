@@ -9,8 +9,6 @@
 
 import { slotParts, type SlotLine } from './titleSlots';
 import { t } from '../core/i18n';
-import type { Key } from '../data/lang';
-import { DIFFICULTY_IDS, type DifficultyId } from '../data/tuning';
 import { BONE, SERIF } from './hudKit';
 import { SCALED_LAYER } from './uiScale';
 import { creditsPage } from './credits';
@@ -33,7 +31,7 @@ export interface TitleOptions {
   byItself: Promise<void>;
   /** The title opens: its first key press or click, or by itself. */
   open(): void;
-  start(fresh: boolean, close: () => void, difficulty?: DifficultyId): void;
+  start(fresh: boolean, close: () => void): void;
 }
 
 export function showTitle(o: TitleOptions): void {
@@ -75,10 +73,10 @@ export function showTitle(o: TitleOptions): void {
     return page;
   };
   let begun = false;
-  const begin = (fresh: boolean, difficulty?: DifficultyId): void => {
+  const begin = (fresh: boolean): void => {
     if (begun) return;
     begun = true;
-    o.start(fresh, () => screen.close(true), difficulty);
+    o.start(fresh, () => screen.close(true));
   };
   let awake = false;
   const wake = (): void => {
@@ -121,25 +119,7 @@ export function showTitle(o: TitleOptions): void {
       }
     },
   }, '66%', true);
-  const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));
-  /** How hard the dream is: chosen here, once, as a new one begins, and never after (round 38). */
-  const difficultyPage = (slot: number): Page => placed({
-    focus: DIFFICULTY_IDS.indexOf('deep'), // the dream as made
-    back: () => screen.show(slotPage('new')),
-    build(p) {
-      heading(p, t('title.deep'));
-      const menu = el(p, 'div', '', 'width:420px;margin:0 auto;text-align:left');
-      for (const id of DIFFICULTY_IDS) {
-        button(menu, t(`diff.${id}.name` as Key), () => into(slot, true, id), true, t(`diff.${id}.note` as Key));
-      }
-      el(p, 'div', t('title.deepNote'), 'opacity:.5;font-size:12px;line-height:1.5;margin:14px auto 0;max-width:420px');
-      const note = el(p, 'div', t('diff.deep.note'), 'opacity:.75;font-size:13px;line-height:1.5;margin:10px auto 0;max-width:420px;min-height:3em');
-      note.className = 'hint';
-      note.dataset.def = t('diff.deep.note');
-      const back = button(menu, t('title.back'), () => screen.show(slotPage('new')));
-      back.style.marginTop = '8px';
-    },
-  }, '66%', true);
+  const into = (slot: number, fresh: boolean): void => (o.useSlot(slot), begin(fresh)); // (round 95: there is one difficulty, so a new game begins as the slot is chosen)
   /** The slots: to load one, or to begin a new game in one (a full one is asked about first). */
   const slotPage = (to: 'new' | 'load'): Page => placed({
     back: () => screen.show(main),
@@ -150,7 +130,7 @@ export function showTitle(o: TitleOptions): void {
         const slot = k + 1;
         const [label, sub] = slotParts(t('title.slot', { n: slot, line: line?.line ?? t('title.empty') }), !!line);
         if (to === 'load') button(menu, label, () => into(slot, false), !!line?.loads, '', sub);
-        else button(menu, label, () => (line ? screen.show(confirm(slot)) : screen.show(difficultyPage(slot))), true, '', sub);
+        else button(menu, label, () => (line ? screen.show(confirm(slot)) : into(slot, true)), true, '', sub);
       });
       button(menu, t('title.back'), () => screen.show(main));
     },
@@ -162,7 +142,7 @@ export function showTitle(o: TitleOptions): void {
       el(p, 'div', t('title.anewNote', { slot }), 'opacity:.6;margin-bottom:14px');
       const menu = el(p, 'div', '', 'width:260px;margin:0 auto;text-align:left');
       button(menu, t('title.no'), () => screen.show(slotPage('new')));
-      button(menu, t('title.yes'), () => screen.show(difficultyPage(slot)));
+      button(menu, t('title.yes'), () => into(slot, true));
     },
   }, '66%', true);
   screen.show(gate);

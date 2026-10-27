@@ -30,8 +30,8 @@ and the gate beyond, with the court at the centre of everything.
   them back), and travel between the signs. A candle before each horror's fog lets you rise beside it after a fall, or at the sign.
 - **A hundred creatures, a hundred ways to die.** Packs that take turns, things that cannot be seen, things that wait in the ground.
 - **People and what they know.** Quests, tomes and notes, and strangers who tell you a little, if you listen.
-- **Three difficulties**, chosen once as a dream begins: Light Slumber, Deep Slumber, Nightmare. A second journey with harder
-  horrors. Three endings.
+- **One dream, dreamed again.** Up to eight journeys, each a rung harder than the last: every horror climbs a ladder of its own,
+  measured so that none is ever impossible. Three endings.
 - **Made to be read.** Rebindable keys, pad support with the prompts of the device in your hand, a cap on every effect of a failing
   mind, screen-shake and brightness settings, cutscenes you may skip, photo mode (P).
 

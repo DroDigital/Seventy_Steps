@@ -96,20 +96,6 @@ export const SETTINGS = {
   language: [0, LANGS.length - 1, 1, 0], // its place in data/lang (round 46); a first launch takes the browser's
 } satisfies Record<string, readonly [number, number, number, number]>;
 
-/**
- * How hard the dream is (round 38), chosen once, when a new dream begins, and never after (it is kept in the save and carried into
- * a second journey): the weight on every enemy's blow. Health, Echoes and everything else are the same at every difficulty.
- */
-export const DIFFICULTIES = {
-  light: { name: 'Light Slumber', foe: 0.6, note: 'For the story and the dream\u2019s places. Its creatures strike gently; everything else is as it is.' },
-  deep: { name: 'Deep Slumber', foe: 1, note: 'The dream as it was made.' },
-  nightmare: { name: 'Nightmare', foe: 1.5, note: 'Every blow lands half as hard again. For those who have died here before.' },
-} as const;
-export type DifficultyId = keyof typeof DIFFICULTIES;
-export const DIFFICULTY_IDS = Object.keys(DIFFICULTIES) as DifficultyId[];
-export const DEFAULT_DIFFICULTY: DifficultyId = 'deep';
-export const isDifficulty = (v: unknown): v is DifficultyId => typeof v === 'string' && v in DIFFICULTIES;
-
 /** The UI's scale (ui/uiScale.ts): 1 at a window this tall, and never below or above these. */
 export const UI = { baseHeight: 720, least: 1, most: 2.5 };
 /** A first launch on a Steam Deck (round 47): its 1280 × 800 seven inches show the picture at 720 lines, the UI at ×1; larger text and captions. */
@@ -158,8 +144,15 @@ export const LEVEL_COST = { base: 200, step: 60, curve: 4.5 };
 export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[], moveEchoes: 600 };
 // `moveEchoes` (round 61): moving a level from one weapon to another is not free: each level moved costs this many Echoes for each star-stone it would cost to set in afresh in the weapon it goes to (so 600 for the first level, 1800 for the fifth, 5400 to move five into a bare weapon). Stones set directly into the other weapon cost no Echoes, and the stones a boss leaves are there to be set, not shuffled.
 
-/** Each new journey through the dream (NG+, round 12): what it adds to foes' health, their blows and the Echoes they leave, and the last journey counted. */
-export const NEW_GAME_PLUS = { health: 0.6, damage: 0.35, echoes: 0.5, most: 7 };
+/**
+ * Each new journey through the dream (NG+, round 12; round 95: a ladder, one rung a journey, where it had compounded without end, and the
+ * three difficulties gone: there is the one dream, and it grows harder as it is dreamed again). `most` is the last journey counted (the eighth);
+ * `echoes` what a journey adds to the Echoes foes leave. Foes grow by a share of the first journey's own health and blows at the top of the ladder,
+ * the rungs between at equal steps (systems/ngPlus.ts): an ordinary foe by `foes`; a horror by its own entry of `BOSS_NG_PLUS` (data/bossNgPlus.ts:
+ * fitted by the balance bot, at the least a second journey begins with and at the cap, tests/ngPlus.test.ts, so that on every journey it stays within its tier's band, docs/NGPLUS.md),
+ * or by `boss` where it has none (Azathoth and the Haunter of the Dark, which the bot cannot measure, and the Elder Shoggoth and the Polyp Swarm, hall bosses it does not table).
+ */
+export const NEW_GAME_PLUS = { echoes: 0.5, most: 7, foes: { health: 1, damage: 0.5 }, boss: { health: 0.25, damage: 0.25 } };
 
 /** Flasks of lamp oil (round 12): the most carried. What one does is its move (data/moves.ts `throw`). */
 export const OIL = { carry: 5 };

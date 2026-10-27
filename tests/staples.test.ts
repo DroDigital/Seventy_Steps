@@ -5,6 +5,7 @@ import { startMove } from '../src/systems/actions';
 import { backstab, strike } from '../src/systems/combat';
 import { applyCarry, carryOf, foeBounty, parseCarry } from '../src/systems/cycles';
 import { createWorldGame } from '../src/systems/game';
+import { foeRung } from '../src/systems/ngPlus';
 import { spawnCreature } from '../src/systems/creatures';
 import { CARRY_KEY, storeCarry, takeCarry } from '../src/systems/records';
 import { parseSave, snapshot } from '../src/systems/save';
@@ -92,12 +93,12 @@ describe('a new journey (NG+, round 12)', () => {
     applyCarry(g, parseCarry({ cycle: 2 })!);
     const e = spawnCreature(g, 'deep_one', { x: 0, z: 0, yaw: 0 })!;
     const def = getEntity('deep_one')!;
-    expect(g.ecs.c.health.get(e)!.max).toBe(Math.round(def.stats.hp * (1 + 2 * NEW_GAME_PLUS.health)));
+    expect(g.ecs.c.health.get(e)!.max).toBe(Math.round(def.stats.hp * foeRung(2).health)); // (round 95: a rung of the ladder, ngPlus.ts)
     expect(g.ecs.c.combatant.get(e)!.bounty).toBe(Math.round(def.drops.echoes * foeBounty(g)));
     const h = g.ecs.c.health.get(g.player.id)!;
     const before = h.hp;
     strike(g, e, g.player.id, { damage: 20, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false });
-    expect(before - h.hp).toBe(Math.round(20 * (1 + 2 * NEW_GAME_PLUS.damage)));
+    expect(before - h.hp).toBe(Math.round(20 * foeRung(2).damage));
   });
 
   it('a damaged carry is mended, not trusted', () => {

@@ -14,7 +14,7 @@ export const BOSS = {
   riposte: 1.1, // ...and its modest damage bonus on a boss (a common foe: COMBAT.riposte)
   shot: 0.3, // the share of the investigator's shot a boss takes: the revolver breaks a horror's wind-up and chips it, the blade fells it (round 60: a full carry of rounds, alone, felled most of the human-sized ones)...
   rearm: 240, // ...and frames after a shot breaks its wind-up before another can: no holding it in place with the trigger
-  blowMost: 0.6, // the most of the investigator's greatest health any one blow of a foe takes (round 68, "bosses never one-hit kill": a horror's heaviest blow is 30% where it is met, but Nightmare (x1.5), a mind Unmoored (x1.35), a relic that costs (x1.08), the scaling of levels and a second journey (x1.35 each) stack on it; from full health it always takes two)
+  blowMost: 0.6, // the most of the investigator's greatest health any one blow of a foe takes (round 68, "bosses never one-hit kill": a horror's heaviest blow is 30% where it is met, but a mind Unmoored (x1.35), a relic that costs (x1.08), the scaling of levels and a later journey's rung (round 95: up to x1.7, data/bossNgPlus.ts) stack on it; from full health it always takes two)
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)

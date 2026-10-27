@@ -6,7 +6,7 @@
  * when it can). The desktop menu opens independently of audio readiness. Also the one-time flag a reload carries (an ending's Begin anew).
  */
 
-import { THEME, type DifficultyId } from '../data/tuning';
+import { THEME } from '../data/tuning';
 import { playMenuMusic } from '../render/audio/music';
 import { activeSlot, useSlot } from '../systems/save';
 import { slotLines } from './titleSlots';
@@ -16,7 +16,7 @@ import type { Shell } from './shell';
 import { showTitle } from './titleScreen';
 
 /** Shows the title; `start` makes the world once a choice is made (fresh: a new game, with its opening). */
-export function title(shell: Shell, start: (fresh: boolean, difficulty?: DifficultyId) => void): void {
+export function title(shell: Shell, start: (fresh: boolean) => void): void {
   const music = (shell.music = playMenuMusic(shell.engine, shell.settings.volume));
   makeAhead(); // the sprites are drawn while the title waits
   shell.veil.darken();
@@ -41,10 +41,10 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
       opened = true;
       shell.veil.haunt(true); // the dark draws back, to haunt the edges in Cosmic Purple
     },
-    start(fresh, close, difficulty) {
+    start(fresh, close) {
       void shell.veil.cover('', 1.1).then(() => {
         close();
-        start(fresh, difficulty);
+        start(fresh);
       });
     },
   });

@@ -152,7 +152,7 @@ export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant)
   if (!def) return undefined;
   const cd = toCombatant(def, v);
   const foe = def.tier !== 'ally';
-  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: Math.round(cd.hp * foeHealth(g)), bounty: Math.round(cd.bounty * foeBounty(g)) }); // a later journey's (cycles.ts)
+  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g)), bounty: Math.round(cd.bounty * foeBounty(g)) }); // a later journey's (cycles.ts; a horror's health is its own rung, bossScaling.ts)
   const e = spawnCombatant(g, cd, at, foe ? 'enemy' : 'player');
   g.ecs.c.dread.set(e, dreadOf(def));
   if (swaps) g.ecs.c.swap.set(e, { id, eldritch: v === 'eldritch' });
@@ -176,7 +176,8 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, c.fight.get(e)?.id ?? id).health) : foeHealth(g)));
+  const fightId = c.fight.get(e)?.id ?? id;
+  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, fightId).health, fightId) : foeHealth(g)));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
   if (def.tier !== 'ally' && def.bossScript) h.baseMax = cd.hp;
   else delete h.baseMax;
