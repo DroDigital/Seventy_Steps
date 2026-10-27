@@ -21,7 +21,7 @@ import { attackLook, isQuiet } from './attackLook';
 import { matterLook } from './matterLook';
 import { FLASH_LIGHTS } from '../data/fxTuning';
 import { flashLight } from './flashLights';
-import { burst, charge, column, ELEMENTS, flash, impact, trail, whiteOf } from './fxKit';
+import { burst, charge, column, ELEMENTS, flash, glow, impact, trail, whiteOf } from './fxKit';
 import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
 import { GATHER, releaseFrame } from './windup';
@@ -58,9 +58,13 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     for (let i = 0; i < 5; i++) fx.spawn({ x: at.x, y: at.y, z: at.z, vx: (vel.x / sp) * rand(4, 9) + rand(-1.5, 1.5), vy: rand(-0.5, 1), vz: (vel.z / sp) * rand(4, 9) + rand(-1.5, 1.5), life: 0.25, size: 0.2, color: conjured ? look.mind : look.core, colorEnd: look.line, glow: true, shape: 'streak', stretch: 0.14, hold: 0.3 });
   });
   g.events.on('BoltLanded', ({ owner, faction, at, vel, on, radius, fire, conjured }) => {
-    if (fire || !near(at) || isQuiet(g, owner)) return;
-    const { look, el } = style(owner);
+    if (fire || !near(at)) return;
     const lit = faction === 'enemy' && owner !== g.player.id; // (the bolt's own faction: its owner may be gone by now)
+    if (isQuiet(g, owner)) { // (a creature that is not a horror draws its own: foeFx.ts; its bolt still lights what it lands on, as a foe's does)
+      if (lit && on !== 'spent') glow(at, (conjured ? radius * 0.6 : radius) * 1.2, attackLook(g, owner), 0.3);
+      return;
+    }
+    const { look, el } = style(owner);
     const sp = Math.hypot(vel.x, vel.z) || 1;
     const dir = { x: vel.x / sp, z: vel.z / sp };
     if (on === 'spent') {

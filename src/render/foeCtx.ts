@@ -1,5 +1,5 @@
 /**
- * What the quiet blows' parts share (round 89, render only): which entities are drawn this way, each one's blow, look, size and tier, the
+ * What the quiet blows' parts share (round 90, render only): which entities are drawn this way, each one's blow, look, size and tier, the
  * clock, the crowd's answer to "may I draw this", and the little each creature remembers of the move it is in. `foeStrike.ts` (blows at close
  * quarters) and `foeCast.ts` (casters' bolts, beams, gazes and summonings) are made on it, `foeFx.ts` wires them to the game.
  */
@@ -7,6 +7,7 @@
 import type { V3 } from '../core/geom';
 import { blowOf, type FoeBlow, type Matter } from '../data/foeBlows';
 import { FOE_FX } from '../data/fxTuning';
+import type { MoveSet } from '../data/moves';
 import type { CreaturePalette } from '../data/schema';
 import type { Game } from '../systems/components';
 import { isAbsent } from '../systems/components';
@@ -33,6 +34,14 @@ export function blowFor(who: string): FoeBlow {
   const look = lookOf(who);
   return { mark: 'crescent', tempo: 'snap', matter: MATTER_OF[paletteOf(who)], hues: [pack(look.line), pack(look.danger), pack(mixRgb(look.ring, look.ember, 0.5))] };
 }
+
+const armed = new WeakMap<MoveSet, boolean>(); // (asked of every body every step: the answer is its move set's)
+/** Whether a creature of this move set has a blow to draw at all, at close quarters or at a distance (a penguin that only waddles takes no place in the crowd). */
+const hasBlow = (moves: MoveSet): boolean => {
+  let has = armed.get(moves);
+  if (has === undefined) armed.set(moves, (has = Object.values(moves).some((m) => !!(m.hit || m.shot || m.volley || m.effect || m.sanity || m.pool))));
+  return has;
+};
 
 /** A mark's length at full for a body of `radius` metres. */
 export const scaleOf = (radius: number): number => Math.min(FOE_FX.size.most, Math.max(FOE_FX.size.min, FOE_FX.size.base + FOE_FX.size.perRadius * radius));
@@ -90,8 +99,8 @@ export function createFoeCtx(g: Game, fx: Particles, ground: GroundFx, kit: Blow
       rankedAt = g.frame;
       const me = c.transform.get(g.player.id)?.pos;
       const foes: Foe[] = [];
-      for (const id of c.actor.keys()) {
-        if (id === g.player.id || !isQuiet(g, id) || isAbsent(g, id)) continue;
+      for (const [id, a] of c.actor) {
+        if (id === g.player.id || !isQuiet(g, id) || isAbsent(g, id) || c.combatant.get(id)?.faction !== 'enemy' || !hasBlow(a.moves)) continue; // (an ally, or a body with no blow, is no one the crowd need ration)
         const p = c.transform.get(id)?.pos;
         if (p) foes.push({ id, d: me ? Math.hypot(p.x - me.x, p.z - me.z) : 0 });
       }
@@ -106,7 +115,7 @@ export function createFoeCtx(g: Game, fx: Particles, ground: GroundFx, kit: Blow
       const radius = c.body.get(id)?.radius ?? 0.5;
       return { who, blow: s.blow, look: s.look, radius, scale: scaleOf(radius) };
     },
-    ask: (id, want, n) => crowd.ask(id, want, n, now()),
+    ask: (id, want, n) => (want === 'speck' && ctx.style(id)?.blow.matter === 'none' ? 0 : crowd.ask(id, want, n, now())), // (a body that sheds nothing is granted no specks to spend the budget on)
     near(p, range = 40) {
       const me = c.transform.get(g.player.id)?.pos;
       return !me || Math.hypot(p.x - me.x, p.z - me.z) < range;

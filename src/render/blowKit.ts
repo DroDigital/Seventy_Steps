@@ -1,5 +1,5 @@
 /**
- * The vocabulary of a quiet blow (round 89, render only; data/foeBlows.ts, data/foeTuning.ts `FOE_FX`): what a creature that is not one of the
+ * The vocabulary of a quiet blow (round 90, render only; data/foeBlows.ts, data/foeTuning.ts `FOE_FX`): what a creature that is not one of the
  * horrors draws where its blow falls. A graphic `mark` (twelve of them, `blowMarks.ts`), moved by its `tempo` (snap, drag, bloom, settle, flutter,
  * pulse: how long it lives, how it grows, whether its strokes come one after another, whether it comes twice a beat apart) in the blow's three
  * hues, and at most a few specks of `matter` (`blowMatter.ts`). Nothing here knows the game: a kit takes the particles, the ground's decals and
@@ -39,6 +39,9 @@ export interface BlowKit {
 
 /** How many particles a full drawing of `mark` spends. */
 export const partsOf = (mark: Mark): number => FOE_FX.marks[mark].parts;
+
+/** ...and in `blow`'s tempo: a mark that comes twice (a pulse) needs a particle for each beat, so a mark of one part asks for two. */
+export const costOf = (blow: FoeBlow, mark: Mark): number => Math.max(partsOf(mark), FOE_FX.tempo[blow.tempo].beats);
 
 export function createBlowKit(fx: Particles, ground: GroundFx, o: { rng?: () => number; now?: () => number } = {}): BlowKit {
   const rng = o.rng ?? Math.random;

@@ -1,18 +1,19 @@
 /**
- * A creature's blow at close quarters, drawn quietly (round 89, render only; data/foeTuning.ts `FOE_FX`, the vocabulary `blowKit.ts`):
+ * A creature's blow at close quarters, drawn quietly (round 90, render only; data/foeTuning.ts `FOE_FX`, the vocabulary `blowKit.ts`):
  *   a slam or a ring lays a thin ripple on the ground and its creature's mark where it falls;
- *   a sweep lays that mark along its tip as it goes round, a few strokes (a mark that is not a stroke, a sigil or an eye, is stamped once);
+ *   a sweep lays that mark along its tip as it goes round: a stroke (a rake, crescent, lash or dash) in a few pieces, any other mark stamped once, midway;
  *   a bite, a grab, a thrust stamps it at its tip; a lunge or a charge leaves a faint smear behind it;
  *   a slow, heavy blow glints before it falls (the mark in miniature, once); a blow that lands leaves the mark and the accent at the wound
  *   and throws back a few specks of the creature's matter.
- * No crown, fountain, cloud, scar, lit arc, camera-facing flash or light: the horrors' machinery (`meleeFx.ts`) is not used here.
+ * No crown, fountain, cloud, scar, lit arc or camera-facing flash: the horrors' machinery (`meleeFx.ts`) is not used here, and a blow keeps the
+ * small, short light every foe's has (round 87: `fxKit.glow`, laid by `meleeFx.ts`'s `light`).
  */
 
 import { FOE_FX } from '../data/fxTuning';
 import type { V3 } from '../core/geom';
 import type { Entity } from '../core/ecs';
 import type { MoveDef } from '../data/moves';
-import { partsOf } from './blowKit';
+import { costOf } from './blowKit';
 import type { FoeCtx, Track } from './foeCtx';
 import { woundPoint } from './wound';
 import type { Mark } from '../data/foeBlows';
@@ -53,7 +54,7 @@ export function createStrikes(c: FoeCtx): Strikes {
       const floor = groundAt(heart);
       const ripple = { at: { x: heart.x, y: floor, z: heart.z }, dir, size: (h.radius + 0.4) / S.slam.to, who: s.who, floor }; // (a slam's ring runs out to the blow's own radius)
       if (slam && s.blow.mark !== 'ripple' && c.ask(id, 'mark', 1)) kit.mark(s.blow, 'ripple', ripple);
-      const parts = c.ask(id, 'mark', Math.min(S.marks, partsOf(s.blow.mark)));
+      const parts = c.ask(id, 'mark', Math.min(S.marks, costOf(s.blow, s.blow.mark)));
       if (parts) {
         const at3 = { x: heart.x, y: slam ? floor + 0.3 : at.y + h.height, z: heart.z };
         kit.mark(s.blow, s.blow.mark, s.blow.mark === 'ripple' && slam ? { ...ripple, parts } : { at: at3, dir, size: s.scale * S.sizeK, parts, who: s.who, floor });
@@ -103,6 +104,7 @@ export function createStrikes(c: FoeCtx): Strikes {
       const pieces = Math.max(1, Math.min(S.pieces, h.window[1] - h.window[0]));
       const idx = Math.min(pieces - 1, Math.floor(((frame - h.window[0]) / (h.window[1] - h.window[0])) * pieces));
       if (idx <= st.piece) return;
+      const was = st.piece;
       st.piece = idx;
       const s = c.style(id);
       if (!s) return;
@@ -114,8 +116,8 @@ export function createStrikes(c: FoeCtx): Strikes {
       if (STROKES.has(s.blow.mark)) {
         const long = Math.min(S.piece[1] * s.scale, Math.max(S.piece[0] * s.scale, ((tip * Math.abs(h.arc[1] - h.arc[0]) * DEG) / pieces) * 0.75));
         if (c.ask(id, 'mark', 1)) kit.mark(s.blow, s.blow.mark, { at, dir, size: long, parts: 1, who: s.who, floor: p.y });
-      } else if (idx === Math.floor(pieces / 2)) {
-        const parts = c.ask(id, 'mark', Math.min(S.marks, partsOf(s.blow.mark)));
+      } else if (was < Math.floor(pieces / 2) && idx >= Math.floor(pieces / 2)) { // (the middle one, even if the picture skipped it)
+        const parts = c.ask(id, 'mark', Math.min(S.marks, costOf(s.blow, s.blow.mark)));
         if (parts) kit.mark(s.blow, s.blow.mark, { at, dir, size: s.scale * S.sizeK, parts, who: s.who, floor: p.y });
       }
       if (idx === pieces - 1) {

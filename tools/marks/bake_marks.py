@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
-"""Bakes the mark atlas (src/data/markAtlas.ts) that render/markAtlas.ts lays under render/particles.ts's 'mark' and 'trace' shapes: six 32 x 32
+"""Bakes the mark atlas (src/data/markAtlas.ts) that render/markAtlas.ts lays under render/particles.ts's 'mark' and 'trace' shapes: two 32 x 32
 masks of 8-bit coverage side by side in one row (a 1 px margin of nothing about each, so Nearest sampling never bleeds a neighbour), in the order
-of MARK_NAMES (render/particles.ts): scratch, splat, dust, twirl, wisp, smear. Coverage only: the game tints each blow its own hues.
-Where they come from (round 89, the quiet blows, data/foeBlows.ts; credits in src/data/models/CREDITS.md):
-  scratch  Kenney's Particle Pack (CC0), scratch_01: its three claw lines, turned to run along +x, thickened to survive 32 px, spaced further apart.
-  dust     Kenney's Particle Pack (CC0), dirt_01: its fine grit, thinned toward its rim into a spray.
-  wisp     Kenney's Particle Pack (CC0), trace_04: its thin wavering tendril, turned along +x and waved into an S, bright at the head and fading behind.
-  smear    made here, the mottle of Kenney's smoke_05 (CC0) giving its fray: a wet drag that swells to a round head at +x and comes apart into hairs.
-  splat    made here with numpy: a blot of joined lobes, droplets about it and tapering flicks. Seeded, so a rerun is byte for byte the same.
-  twirl    made here with numpy: a spiral arm of one and a half turns. Kenney's twirl_01 to _03 were tried and read, at 32 px, as one hooked crescent
-           (the 'crescent' shape's twin), their inner arcs lost; no sprite of the pack is an ink blot either (its scorch and dirt are scorch marks and rubble).
-A directional mask (scratch, wisp, smear) has its long axis along +x, the way 'trace' lays it along a flight.
+of MARK_NAMES (render/particles.ts): splat, smear. Coverage only: the game tints each blow its own hues.
+Where they come from (round 90, the quiet blows, data/foeBlows.ts; credits in src/data/models/CREDITS.md):
+  splat    made here with numpy, from no sprite: a blot of joined lobes, droplets about it and tapering flicks. Seeded, so a rerun is byte for byte the same.
+  smear    made here, the mottle of Kenney's Particle Pack (CC0) smoke_05 giving its fray: a wet drag that swells to a round head at +x and comes
+           apart into hairs. Its long axis lies along +x, the way 'trace' lays it along a flight.
+(Four more were baked and tried first, cut from the pack's scratch_01, dirt_01 and trace_04 and a spiral made here; no recipe drew them, so they were left out.)
 Run: python3 -I tools/marks/bake_marks.py <the pack's 'PNG (Transparent)' folder> [src/data/markAtlas.ts] [--preview sheet.png]   (needs `pip install pillow numpy`)"""
 import base64, os, sys
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
 CELL = 32
-NAMES = ['scratch', 'splat', 'dust', 'twirl', 'wisp', 'smear']  # = MARK_NAMES in render/particles.ts
+NAMES = ['splat', 'smear']  # = MARK_NAMES in render/particles.ts
 X = np.linspace(-1, 1, CELL)[None, :]
 Y = np.linspace(-1, 1, CELL)[:, None]
 
@@ -36,64 +32,6 @@ def to_img(a):
     return Image.fromarray(np.round(np.clip(a, 0, 1) * 255).astype(np.uint8))
 
 
-def turn_along_x(a):
-    """Rotates a picture so that the long axis of its light lies along +x (second moments, image rows down)."""
-    ys, xs = np.mgrid[0:a.shape[0], 0:a.shape[1]]
-    w = a.sum()
-    cx, cy = (a * xs).sum() / w, (a * ys).sum() / w
-    ang = 0.5 * np.arctan2(2 * (a * (xs - cx) * (ys - cy)).sum() / w, (a * (xs - cx) ** 2).sum() / w - (a * (ys - cy) ** 2).sum() / w)
-    return np.asarray(to_img(a).rotate(np.degrees(ang), expand=True, resample=Image.BICUBIC)).astype(np.float64) / 255.0
-
-
-def thicken(a, size):
-    return np.asarray(to_img(a).filter(ImageFilter.MaxFilter(size))).astype(np.float64) / 255.0
-
-
-def fitted(a, thresh, box=CELL - 2, tall=1.0):
-    """The light of `a` above `thresh` cropped, scaled to fit the cell's inner box (its height stretched `tall` times) and centred."""
-    ys, xs = np.where(a > thresh)
-    a = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-    h, w = a.shape
-    s = box / max(w, h * tall)
-    nw, nh = max(1, round(w * s)), max(1, min(box, round(h * s * tall)))
-    small = np.asarray(to_img(a).resize((nw, nh), Image.BOX if s < 1 else Image.BICUBIC)).astype(np.float64) / 255.0
-    out = np.zeros((CELL, CELL))
-    out[(CELL - nh) // 2:(CELL - nh) // 2 + nh, (CELL - nw) // 2:(CELL - nw) // 2 + nw] = small
-    return out
-
-
-
-
-
-def scratch(folder):
-    """Three claw lines, tapered at their ends, the head end a little brighter."""
-    a = turn_along_x(thicken(load(folder, 'scratch_01'), 5))
-    return smoothstep(0.1, 0.8, fitted(smoothstep(0.1, 0.6, a), 0.2, tall=1.9)) * (0.7 + 0.3 * smoothstep(-1, 0.8, X))
-
-
-def dust(folder):
-    a = fitted(load(folder, 'dirt_01'), 0.1)
-    return a * np.clip(0.3 + 1.0 - smoothstep(0.5, 1.05, np.hypot(X, Y)), 0, 1)
-
-
-
-
-
-def waved(a, amp, cycles):
-    """Each column slid up or down (a fraction of a texel, by linear blending) along a sine of `cycles` waves across the cell, `amp` texels at most: a straight line into a tendril."""
-    rows = np.arange(CELL, dtype=np.float64)
-    out = np.zeros_like(a)
-    for i in range(CELL):
-        shift = amp * np.sin((i / (CELL - 1)) * 2 * np.pi * cycles) * (0.35 + 0.65 * i / (CELL - 1))
-        out[:, i] = np.interp(rows - shift, rows, a[:, i], left=0, right=0)
-    return out
-
-
-def wisp(folder):
-    a = turn_along_x(thicken(load(folder, 'trace_04'), 9))
-    return waved(fitted(smoothstep(0.08, 0.5, a), 0.2), 4.2, 1.25) * (0.35 + 0.65 * smoothstep(-1.0, 0.7, X))
-
-
 def smear(folder):
     """A wet drag, a stroke of a loaded brush: its body swells toward +x (the head, rounded), and its tail comes apart into hairs, row on row
     (the mottle of a cloud, smoke_05, and a seeded roll), so the drag frays where it ends."""
@@ -104,19 +42,6 @@ def smear(folder):
     edge = half - np.abs(Y - 0.05 * np.sin((X + 1) * 3.4))
     body = smoothstep(-0.02, 0.07, edge + (hair - 0.5) * 0.9 * (1 - smoothstep(-0.8, 0.45, X)) + (cloud - 0.5) * 0.1)
     return body * smoothstep(-1.0, -0.82, X) * (0.5 + 0.5 * smoothstep(-1.0, 0.4, X))
-
-
-def twirl():
-    """A spiral arm of one and a half turns, thick toward its head and tapering at both ends, the head brightest."""
-    r, phi = np.hypot(X, Y), np.arctan2(Y, X + 1e-9)
-    out = np.zeros((CELL, CELL))
-    for n in (0, 1):
-        t = (phi + np.pi + 2 * np.pi * n) / (2 * np.pi * 1.5)
-        rs = 0.14 + 0.8 * t
-        w = 0.07 + 0.1 * np.sin(np.pi * np.clip(t, 0, 1)) ** 0.6
-        c = (1 - smoothstep(w * 0.4, w, np.abs(r - rs))) * ((t >= 0) & (t <= 1))
-        out = np.maximum(out, c * (0.45 + 0.55 * np.clip(t, 0, 1)))
-    return out
 
 
 def splat(seed=3):
@@ -140,7 +65,7 @@ def splat(seed=3):
 
 
 def bake(folder, out, preview):
-    cells = [scratch(folder), splat(), dust(folder), twirl(), wisp(folder), smear(folder)]
+    cells = [splat(), smear(folder)]
     atlas = np.zeros((CELL, CELL * len(cells)), dtype=np.uint8)
     for i, c in enumerate(cells):
         c = np.clip(c, 0, 1).copy()
@@ -150,7 +75,7 @@ def bake(folder, out, preview):
         assert atlas[:, i * CELL:(i + 1) * CELL].max() > 0, NAMES[i]
     data = base64.b64encode(atlas.tobytes()).decode()
     lines = [
-        "/** The mark atlas (round 89; tools/marks/bake_marks.py, render/markAtlas.ts): six 32 x 32 masks of coverage, one byte a texel, side by side in one row (a texel of nothing about each), in the order of `names` (= MARK_NAMES, render/particles.ts). Scratch, dust and wisp cut from Kenney's CC0 Particle Pack, smear from its smoke's mottle, splat and twirl made in the baker; credits in src/data/models/CREDITS.md. Generated. */",
+        "/** The mark atlas (round 90; tools/marks/bake_marks.py, render/markAtlas.ts): two 32 x 32 masks of coverage, one byte a texel, side by side in one row (a texel of nothing about each), in the order of `names` (= MARK_NAMES, render/particles.ts). Splat is made in the baker; smear is made there too, its fray from the mottle of Kenney's CC0 Particle Pack smoke_05; credits in src/data/models/CREDITS.md. Generated. */",
         '',
         f"export const MARK_ATLAS = {{ width: {CELL * len(cells)}, height: {CELL}, cell: {CELL}, names: {NAMES!r}, data: '{data}' }} as const;",
         '',

@@ -1,8 +1,8 @@
 /**
- * The quiet blows' numbers (round 89; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly
+ * The quiet blows' numbers (round 90; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly
  * elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere"). Every creature that is not one of the
  * horrors draws its blow as ONE graphic mark (data/foeBlows.ts: render/blowKit.ts) and at most a few specks of matter, never a crown, a
- * fountain, a cloud, a scar, a lit arc, a flash or a light; `render/foeFx.ts` lays them on the game's events and `render/foeCrowd.ts` thins what
+ * fountain, a cloud, a scar, a lit arc or a flash (a blow keeps the small light of a foe's, round 87); `render/foeFx.ts` lays them on the game's events and `render/foeCrowd.ts` thins what
  * a crowd draws. Re-exported by `fxTuning.ts`. Metres, seconds and counts of particles; a share is 0..1. To make blows quieter again, lower
  * `marks.*.alpha`, `size` and the counts; to thin a crowd, lower `crowd.budget`.
  */
@@ -41,7 +41,7 @@ export const FOE_FX = {
     pieces: 3, // strokes along a sweep
     stampBelow: 45, // degrees: a blow that sweeps less is stamped where its tip is
     piece: [0.5, 1.6] as readonly [number, number], // a stroke's length along a sweep, in `size`s, between these
-    slam: { from: 0.18, to: 0.8, width: 0.16, life: 0.42, floor: 0.9 }, // a slam's ripple: its radius runs from a share of the blow's to a share, its width (m), its seconds; the least radius
+    slam: { from: 0.18, to: 0.8, width: 0.16, floor: 0.9 }, // a slam's ripple: its radius runs from a share of the blow's to a share, its width (m); the least radius
     sizeK: 1.0, // a stamp's length, in `size`s
   },
   /** A blow that lands on the investigator: the mark and the accent at the wound, and the matter it throws back. */
@@ -52,7 +52,7 @@ export const FOE_FX = {
   wake: { pieces: 3, size: 0.8, alpha: 0.3, life: 0.4, speed: 0.6 },
 
   /** A caster: its gather (motes drawn in over the wind-up), the bolt it looses, where it lands, a beam, a summoning, a teleport, a gaze, a roar. */
-  gather: { motes: 9, size: 0.07, range: [0.55, 2.2] as readonly [number, number], life: [0.28, 0.42] as readonly [number, number], alpha: 0.7 },
+  gather: { motes: 9, size: 0.07, range: [0.55, 2.2] as readonly [number, number], life: [0.28, 0.42] as readonly [number, number] },
   bolt: {
     muzzle: 0.45, // the mark at the muzzle, in `size`s
     trailEvery: 3, // sim frames between a bolt's trail particles
@@ -75,7 +75,7 @@ export const FOE_FX = {
     swirl: { life: 0.42, alpha: 0.75, speed: 0, parts: 2, thick: 0.14, spin: 5 },
     glint: { life: 0.26, alpha: 0.9, speed: 0, parts: 2 },
     dash: { life: 0.2, alpha: 0.8, speed: 3, parts: 2 },
-    ripple: { life: 0.45, alpha: 0.6, speed: 0, parts: 1 }, // (laid on the ground: its life and width are `strike.slam`'s)
+    ripple: { life: 0.45, alpha: 0.6, speed: 0, parts: 1 }, // (laid on the ground: its radius and width are `strike.slam`'s)
     sigil: { life: 0.75, alpha: 0.75, speed: 0, parts: 1 },
     eye: { life: 0.6, alpha: 0.8, speed: 0, parts: 1 },
     plume: { life: 0.9, alpha: 0.4, speed: 0.7, parts: 2 },

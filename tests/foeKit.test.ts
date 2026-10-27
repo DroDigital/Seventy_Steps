@@ -1,5 +1,5 @@
 /**
- * The vocabulary of a quiet blow (round 89; render/blowKit.ts, blowMarks.ts, blowMatter.ts, blowPen.ts; data/foeBlows.ts, data/foeTuning.ts): each of
+ * The vocabulary of a quiet blow (round 90; render/blowKit.ts, blowMarks.ts, blowMatter.ts, blowPen.ts; data/foeBlows.ts, data/foeTuning.ts): each of
  * the twelve marks draws its own shapes in the blow's three hues, each tempo moves a mark as it says, each matter's specks fall, rise or hang, and
  * nothing spends more than it is allowed. Judged by the particles SPAWNED (shape, size, life, colour, count, velocity), not by pixels: the shapes
  * the shader draws are render/particles.ts's.
@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { createRng } from '../src/core/rng';
 import { MARKS, MATTERS, TEMPOS, type FoeBlow, type Mark, type Matter, type Tempo } from '../src/data/foeBlows';
 import { FOE_FX } from '../src/data/fxTuning';
-import { createBlowKit, partsOf, type BlowKit } from '../src/render/blowKit';
+import { costOf, createBlowKit, partsOf, type BlowKit } from '../src/render/blowKit';
 import { hexRgb } from '../src/render/blowPen';
 import type { GroundFx } from '../src/render/groundFx';
 import { luma, rgbToHsv, type Rgb } from '../src/render/palette';
@@ -59,7 +59,7 @@ function valid(list: ParticleSpec[], label: string): void {
   }
 }
 
-describe('every mark draws its own shapes, in the blow\'s three hues (round 89)', () => {
+describe('every mark draws its own shapes, in the blow\'s three hues (round 90)', () => {
   it('has a recipe for every mark, and the table of what each is drawn in names them all', () => {
     expect(Object.keys(SHAPE_OF).sort()).toEqual([...MARKS].sort());
     expect(Object.keys(FOE_FX.marks).sort()).toEqual([...MARKS].sort());
@@ -83,7 +83,7 @@ describe('every mark draws its own shapes, in the blow\'s three hues (round 89)'
       expect(decals, mark).toHaveLength(0);
       expect(out.every((p) => p.glow), `${mark} is a light`).toBe(true);
     }
-    if (mark === 'splat') expect(out[0]!.thick).toBeCloseTo(markCell('splat'), 5); // the blot, of the free atlas's masks
+    if (mark === 'splat') expect(out[0]!.thick).toBeCloseTo(markCell('splat'), 5); // the blot, one of the atlas's two masks
     if (mark === 'swirl') expect(out[0]!.thick).toBeGreaterThan(0.05); // an open ring has a thickness
   });
 
@@ -142,7 +142,7 @@ describe('every mark draws its own shapes, in the blow\'s three hues (round 89)'
   });
 });
 
-describe('each tempo moves a mark as it says (round 89)', () => {
+describe('each tempo moves a mark as it says (round 90)', () => {
   const lives = (tempo: Tempo, mark: Mark = 'rake'): number => {
     const { out, kit, wait } = rig();
     lay(kit, blow(mark, tempo), mark, 3);
@@ -225,6 +225,31 @@ describe('each tempo moves a mark as it says (round 89)', () => {
     expect(out).toHaveLength(1);
   });
 
+  it('what a pulse asks for is a particle for each beat, so a mark of one part comes twice when it is given that much', () => {
+    for (const mark of MARKS) {
+      expect(costOf(blow(mark, 'snap'), mark), `${mark} at a snap`).toBe(partsOf(mark));
+      expect(costOf(blow(mark, 'pulse'), mark), `${mark} at a pulse`).toBe(Math.max(partsOf(mark), 2));
+    }
+    const { out, kit, wait } = rig();
+    const asks = costOf(blow('sigil', 'pulse'), 'sigil');
+    expect(lay(kit, blow('sigil', 'pulse'), 'sigil', asks)).toBe(2);
+    wait(1);
+    expect(out.filter((p) => p.shape === 'rune')).toHaveLength(2);
+  });
+
+  it('jaws are two crescents that bulge away from the point they close on: one turned half a turn from the other, flying toward each other', () => {
+    const { out, kit } = rig();
+    lay(kit, blow('jaws'), 'jaws');
+    const jaws = out.filter((p) => p.shape === 'crescent');
+    expect(jaws).toHaveLength(2);
+    const [up, down] = jaws.sort((a, b) => b.y - a.y);
+    expect(up!.vy!).toBeLessThan(0);
+    expect(down!.vy!).toBeGreaterThan(0);
+    // a crescent lies along its flight plus its `rot`: the two flights are half a turn apart, so equal turns put the crescents half a turn apart
+    expect(up!.rot ?? 0).toBeCloseTo(down!.rot ?? 0, 9);
+    expect(Math.abs(up!.rot ?? 0) % (2 * Math.PI)).toBeCloseTo(Math.PI, 9);
+  });
+
   it('a few strokes at most wait for their turn', () => {
     const { kit } = rig();
     for (let i = 0; i < 500; i++) kit.later(10, () => undefined);
@@ -232,7 +257,7 @@ describe('each tempo moves a mark as it says (round 89)', () => {
   });
 });
 
-describe('the specks of matter fall, rise or hang as what they are (round 89)', () => {
+describe('the specks of matter fall, rise or hang as what they are (round 90)', () => {
   const GRAVITY: Readonly<Record<Exclude<Matter, 'none'>, 'falls' | 'rises' | 'hangs' | 'drifts'>> = {
     brine: 'falls', ash: 'drifts', dust: 'falls', spore: 'rises', frost: 'hangs', ichor: 'falls', ember: 'rises', mote: 'hangs', down: 'drifts',
   };

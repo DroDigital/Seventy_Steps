@@ -1,5 +1,5 @@
 /**
- * The few specks a quiet blow sheds (round 89, render only; data/foeBlows.ts `Matter`, the numbers FOE_FX.matter): drops of brine and beads
+ * The few specks a quiet blow sheds (round 90, render only; data/foeBlows.ts `Matter`, the numbers FOE_FX.matter): drops of brine and beads
  * of ichor fall, ash and down drift down, grit falls, spores and embers rise, frost and soft lights hang. Their colour is what they are made of
  * with the blow's own hues come a share of the way into it, so a ghoul's spores and a mi-go's are not one pale green. Never more than the
  * caller asks for: the crowd (`foeCrowd.ts`) decides how many that is.

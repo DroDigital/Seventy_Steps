@@ -1,8 +1,8 @@
 /**
- * The quiet blows, in the game (round 89; render/foeFx.ts, foeStrike.ts, foeCast.ts; asked: "many of the lower-tier creatures' attack animations
+ * The quiet blows, in the game (round 90; render/foeFx.ts, foeStrike.ts, foeCast.ts; asked: "many of the lower-tier creatures' attack animations
  * and telegraphs appear acceptable but overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere").
  * A horror's blows are the machinery of round 51 and 59 (meleeFx, attackFx) as they were; every other creature draws one graphic mark of its own
- * and a few specks, no crown, fountain, cloud, scar, lit arc, camera-facing flash or light; a crowd is thinned. Round 59's test of what a foe's
+ * and a few specks, no crown, fountain, cloud, scar, lit arc or camera-facing flash, and only a foe's small short light; a crowd is thinned. Round 59's test of what a foe's
  * blow throws is replaced: it protected the busy behaviour (more than eight particles and a scar for the large) this round removes.
  */
 
@@ -11,7 +11,7 @@ import { createRng } from '../src/core/rng';
 import { emptyInput } from '../src/core/input';
 import { BOSS_ATTACK_THEME } from '../src/data/bossAttackTheme';
 import { MARKS, type FoeBlow, type Mark } from '../src/data/foeBlows';
-import { FOE_FX } from '../src/data/fxTuning';
+import { FLASH_LIGHTS, FOE_FX } from '../src/data/fxTuning';
 import { ENTITIES } from '../src/data/registry';
 import { isQuiet, isThemed } from '../src/render/attackLook';
 import { createAttackFx } from '../src/render/attackFx';
@@ -73,7 +73,17 @@ function rig(creature: string, blow?: FoeBlow) {
 
 beforeEach(() => vi.mocked(flashLight).mockClear());
 
-describe('a horror\'s blows are as they were, and every other creature\'s are quiet (round 89)', () => {
+/** The lights laid since the mock was cleared were all as small and short as a foe's blow's (round 87), and how many: a quiet blow draws no flash but keeps its light. */
+const lightsAreSmall = (): number => {
+  for (const [, , strength, range, seconds] of vi.mocked(flashLight).mock.calls) {
+    expect(strength).toBeLessThanOrEqual(FLASH_LIGHTS.burst.most + 1e-9);
+    expect(range).toBeLessThanOrEqual(FLASH_LIGHTS.burst.rangeMost + 1e-9);
+    expect(seconds).toBeLessThanOrEqual(FLASH_LIGHTS.burst.seconds + 1e-9);
+  }
+  return vi.mocked(flashLight).mock.calls.length;
+};
+
+describe('a horror\'s blows are as they were, and every other creature\'s are quiet (round 90)', () => {
   it('a horror\'s slam still bursts, scars the ground, sends a ring out and lights it; the quiet kit draws nothing for it', () => {
     const horror = Object.keys(BOSS_ATTACK_THEME).find((id) => {
       const g = createGame({ creature: id });
@@ -101,8 +111,9 @@ describe('a horror\'s blows are as they were, and every other creature\'s are qu
     expect(strengthOf(false, 9)).toBeLessThan(1);
   });
 
-  it('a lower-tier foe\'s slam draws a thin ripple and its own mark, at most the budget, with no scar, no lit arc, no flash and no light', () => {
+  it('a lower-tier foe\'s slam draws a thin ripple and its own mark, at most the budget, with no scar, no lit arc and no flash, and the one small, short light of a foe\'s blow', () => {
     for (const creature of ['hybrid_mummy', 'gug', 'moon_beast']) {
+      vi.mocked(flashLight).mockClear();
       const { c, foe, spawned, decals, swing, update, settle } = rig(creature, blowOf('rake'));
       const slam = Object.keys(c.actor.get(foe)!.moves).includes('slam') ? 'slam' : 'tentacle_burst';
       swing(foe, slam);
@@ -113,12 +124,13 @@ describe('a horror\'s blows are as they were, and every other creature\'s are qu
       expect(spawned.every((p) => p.shape === 'crescent'), `${creature}: a rake is crescents`).toBe(true);
       expect(decals.filter((d) => d === 'scar' || d === 'slash' || d === 'sigil'), creature).toEqual([]);
       if (slam === 'slam') expect(decals, creature).toEqual(['shock']);
-      expect(vi.mocked(flashLight), creature).not.toHaveBeenCalled();
+      expect(lightsAreSmall(), `${creature}: one light`).toBe(1);
     }
   });
 
   it('every mark is what its blow draws where it falls, in the blow\'s hues', () => {
     for (const mark of MARKS) {
+      vi.mocked(flashLight).mockClear();
       const { foe, spawned, decals, swing, update, settle } = rig('gug', blowOf(mark));
       swing(foe, 'slam');
       update();
@@ -128,7 +140,7 @@ describe('a horror\'s blows are as they were, and every other creature\'s are qu
       else expect(decals.length, 'a ripple lies on the ground').toBeGreaterThanOrEqual(1);
       expect(decals.filter((d) => d !== 'shock'), mark).toEqual([]);
       for (const p of spawned.filter((q) => q.shape === want)) expect(p.colorMid, mark).toBeDefined();
-      expect(vi.mocked(flashLight), mark).not.toHaveBeenCalled();
+      expect(lightsAreSmall(), `${mark}: one small light`).toBe(1);
     }
   });
 
@@ -200,6 +212,53 @@ describe('a horror\'s blows are as they were, and every other creature\'s are qu
   });
 });
 
+describe('the faults the review found (round 90)', () => {
+  it('a blow that comes in two beats is given a particle for each, even a mark of one part', () => {
+    const { foe, spawned, swing, update, settle } = rig('gug', { mark: 'sigil', tempo: 'pulse', matter: 'none', hues: HUES });
+    swing(foe, 'slam');
+    update();
+    expect(spawned.filter((p) => p.shape === 'rune')).toHaveLength(1);
+    settle();
+    expect(spawned.filter((p) => p.shape === 'rune'), 'and again a beat later').toHaveLength(2);
+  });
+
+  it('a body that sheds nothing is charged no specks against the crowd\'s budget', () => {
+    const { g, foe, foes, spawned, decals, swing, update, settle } = rig('gug', blowOf('rake')); // (its matter is none)
+    const t = g.frame / 60;
+    swing(foe, 'slam');
+    update();
+    settle();
+    expect(foes.crowd.spent(t)).toBe(spawned.length + decals.length);
+  });
+
+  it('a sweep that is not a stroke stamps its mark once even if the picture never saw the middle of the blow', () => {
+    const { g, c, foe, spawned, swing, update, settle } = rig('deep_one', blowOf('swirl'));
+    swing(foe, 'sweep');
+    update();
+    const a = c.actor.get(foe)!;
+    const h = moveDef(a)!.hit!;
+    a.frame = h.window[1] - 1; // (from the first piece to the last)
+    g.frame++;
+    update();
+    settle();
+    expect(spawned.filter((p) => p.shape === 'arc').length).toBeGreaterThan(0);
+  });
+
+  it('a quiet caster\'s bolt lands with one small light and none of the horrors\' machinery; an ally\'s lands with none', () => {
+    const { g, c, foe, spawned, decals, update } = rig('dagon_priest');
+    const at = { ...c.transform.get(g.player.id)!.pos, y: 1 };
+    const land = (owner: number, faction: 'enemy' | 'player'): void => g.events.emit('BoltLanded', { owner, faction, at, vel: { x: 0, y: 0, z: 1 }, on: 'ground', radius: 0.3, lob: false, fire: false, conjured: false });
+    land(foe, 'enemy');
+    update();
+    expect(lightsAreSmall()).toBe(1);
+    expect(decals.filter((d) => d === 'scar' || d === 'slash')).toEqual([]);
+    expect(spawned.filter((p) => p.shape === 'streak' || p.shape === 'wisp' || p.shape === 'spark' || p.shape === 'ring'), 'no spray, no flash').toEqual([]);
+    land(foe, 'player');
+    update();
+    expect(vi.mocked(flashLight), 'the bolt of an ally lights nothing').toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('a slow heavy blow glints once before it falls (round 59, now the mark in miniature)', () => {
   const tellsOf = (spawned: ParticleSpec[]): ParticleSpec[] => spawned.filter((p) => p.shape === 'crescent' || p.shape === 'rune');
 
@@ -255,8 +314,8 @@ describe('a slow heavy blow glints once before it falls (round 59, now the mark 
   });
 });
 
-describe('a caster draws a few motes and a mark, not a storm (round 89)', () => {
-    it('a projectile, whole, is a third of what it was or less, with no scar, no flash and no light, and a bolt\'s trail leaves a smear every third frame at most', () => {
+describe('a caster draws a few motes and a mark, not a storm (round 90)', () => {
+    it('a projectile, whole, is a third of what it was or less, with no scar and no flash, only small short lights, and a bolt\'s trail leaves a smear every third frame at most', () => {
     const g = createGame({ creature: 'dagon_priest' });
     const c = g.ecs.c;
     const foe = [...c.actor.keys()].find((k) => k !== g.player.id && c.dread.has(k))!;
@@ -282,7 +341,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 89)', () => 
     expect(spawned.length).toBeGreaterThan(5);
     expect(spawned.length).toBeLessThanOrEqual(OLD_PROJECTILE / 3);
     expect(decals.filter((d) => d !== 'sigil' && d !== 'shock')).toEqual([]);
-    expect(vi.mocked(flashLight)).not.toHaveBeenCalled();
+    expect(lightsAreSmall(), 'one for each bolt that landed').toBeLessThanOrEqual(Math.max(1, bolts));
     const traces = spawned.filter((s) => s.p.shape === 'trace');
     const frames = new Set(traces.map((s) => s.frame));
     expect(frames.size, 'a smear every third step at most, for each bolt').toBeLessThanOrEqual(Math.ceil(length / FOE_FX.bolt.trailEvery));
@@ -307,7 +366,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 89)', () => 
       if (move === 'summon') expect(decals).toContain('sigil');
       if (move === 'teleport') expect(spawned.filter((p) => p.shape === 'arc').length).toBe(2);
       expect(decals.filter((d) => d === 'scar' || d === 'slash'), move).toEqual([]);
-      expect(vi.mocked(flashLight), move).not.toHaveBeenCalled();
+      lightsAreSmall();
     }
   });
 
@@ -323,7 +382,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 89)', () => 
   });
 });
 
-describe('a crowd is thinned (round 89)', () => {
+describe('a crowd is thinned (round 90)', () => {
   function crowd(n: number) {
     const g = createGame({ creature: 'ghoul' });
     const c = g.ecs.c;
@@ -375,6 +434,18 @@ describe('a crowd is thinned (round 89)', () => {
     expect(ranks, 'tiers follow distance').toEqual([...ranks].sort((a, b) => a - b));
   });
 
+  it('an ally and a body with no blow to draw take no place in the crowd', () => {
+    const t = crowd(3);
+    const near = spawnCreature(t.g, 'pickman', { x: 0, z: 0, yaw: 0 })!; // (an ally)
+    const mute = spawnCreature(t.g, 'albino_penguin', { x: 0, z: 0, yaw: 0 })!; // (it has no blow at all)
+    for (const [i, e] of [near, mute].entries()) {
+      t.c.brain.delete(e);
+      place(t.g, e, 0.1 + i * 0.1, 0.4, 0); // nearer than any of the three
+    }
+    strike(t);
+    expect(t.foes.map((f) => t.fx.crowd.tierOf(f))).toEqual(['full', 'full', 'full']);
+  });
+
   it('the budget is spent per half second, not per game: a second pack, later, draws again', () => {
     const t = crowd(12);
     strike(t);
@@ -385,12 +456,12 @@ describe('a crowd is thinned (round 89)', () => {
   });
 });
 
-describe('every move of the creatures that are not horrors is drawn quietly (round 89)', () => {
+describe('every move of the creatures that are not horrors is drawn quietly (round 90)', () => {
   const IDS = Object.values(ENTITIES).filter((e) => (e.bossScript || e.sprite || e.assembly) && !isThemed(e.id)).map((e) => e.id);
 
   it('there are fifty-one of them', () => expect(IDS.length).toBeGreaterThanOrEqual(51));
 
-  it('each, move by move, with the render side running: finite, within the batches\' budgets, no light, and a median of under forty particles a creature (it was 86; the casters 200 to 525)', () => {
+  it('each, move by move, with the render side running: finite, within the batches\' budgets, only small short lights, and a median of under forty particles a creature (it was 86; the casters 200 to 525)', () => {
     const totals: number[] = [];
     for (const id of IDS) {
       const r = fxAudit(id);
@@ -403,7 +474,7 @@ describe('every move of the creatures that are not horrors is drawn quietly (rou
     }
     totals.sort((a, b) => a - b);
     expect(totals[Math.floor(totals.length / 2)]).toBeLessThan(40);
-    expect(vi.mocked(flashLight)).not.toHaveBeenCalled();
+    lightsAreSmall();
   }, 120_000);
 
   it('a caster\'s moves are as quiet as a brawler\'s', () => {

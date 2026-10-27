@@ -6,7 +6,7 @@ import { markAtlasBytes, markAtlasTexture } from '../src/render/markAtlas';
 import { lifeColor, MARK_NAMES, markCell, PARTICLE_SHAPES } from '../src/render/particles';
 import { particleMasksGlsl, shapeDefines } from '../src/render/shaders/particleMasks';
 
-describe('the particle shapes (round 89, the quiet blows)', () => {
+describe('the particle shapes (round 90, the quiet blows)', () => {
   it('keep the index of every shape that existed before, so no recorded spec draws another thing', () => {
     expect(PARTICLE_SHAPES.slice(0, 15)).toEqual(['disc', 'shard', 'streak', 'ring', 'spark', 'wisp', 'rune', 'eye', 'fang', 'bubble', 'bolt', 'feather', 'petal', 'note', 'puff']);
     expect(PARTICLE_SHAPES.slice(15)).toEqual(['crescent', 'lash', 'cross', 'dash', 'arc', 'mark', 'trace']);
@@ -31,11 +31,11 @@ describe('the particle shapes (round 89, the quiet blows)', () => {
     expect(src).toContain('angle = atan(vv.y, vv.x + 1e-5);\n    len = aShape.z;'); // the streak, untouched
   });
 
-  it('name the six marks in order and find the centre of a cell', () => {
-    expect(MARK_NAMES).toEqual(['scratch', 'splat', 'dust', 'twirl', 'wisp', 'smear']);
+  it('name the marks in order and find the centre of a cell', () => {
+    expect(MARK_NAMES).toEqual(['splat', 'smear']);
     MARK_NAMES.forEach((n, i) => {
       const t = markCell(n);
-      expect(t).toBeCloseTo((i + 0.5) / 6, 12);
+      expect(t).toBeCloseTo((i + 0.5) / MARK_NAMES.length, 12);
       expect(Math.floor(Math.min(Math.max(t, 0), 0.999) * MARK_NAMES.length)).toBe(i); // the shader's choice of cell
     });
   });
@@ -72,8 +72,8 @@ describe('the mark atlas', () => {
     });
   });
 
-  it('lays the directional masks (scratch, wisp, smear) along +x', () => {
-    for (const name of ['scratch', 'wisp', 'smear'] as const) {
+  it('lays the directional mask (the smear) along +x', () => {
+    for (const name of ['smear'] as const) {
       const c = MARK_NAMES.indexOf(name);
       let [x0, x1, y0, y1]: number[] = [cell, 0, cell, 0];
       for (let y = 0; y < cell; y++) for (let x = 0; x < cell; x++) if (texel(c, x, y) > 40) [x0, x1, y0, y1] = [Math.min(x0, x), Math.max(x1, x), Math.min(y0, y), Math.max(y1, y)];
@@ -84,10 +84,10 @@ describe('the mark atlas', () => {
   it('credits every sprite it was made from, by name, with its licence', () => {
     const credits = readFileSync('src/data/models/CREDITS.md', 'utf8');
     const part = credits.slice(credits.indexOf('## Particle marks'));
-    for (const file of ['scratch_01.png', 'dirt_01.png', 'trace_04.png', 'smoke_05.png']) expect(part, file).toContain(file);
+    expect(part).toContain('smoke_05.png');
     expect(part).toContain('Kenney');
     expect(part).toContain('CC0 1.0');
-    expect(readFileSync('tools/marks/bake_marks.py', 'utf8')).toContain("scratch_01");
+    expect(readFileSync('tools/marks/bake_marks.py', 'utf8')).toContain("smoke_05");
   });
 
   it('is one shared, hard-edged red texture with no mipmaps', () => {

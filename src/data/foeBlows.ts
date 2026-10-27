@@ -1,5 +1,5 @@
 /**
- * What an ordinary creature's blow looks like (round 89; asked: "many of the lower-tier creatures' attack animations and telegraphs appear
+ * What an ordinary creature's blow looks like (round 90; asked: "many of the lower-tier creatures' attack animations and telegraphs appear
  * acceptable but overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere ... each creature should
  * instead feature a distinct, high-fidelity, subtle animation with optional graphic accents ... reevaluate overused color palettes and consider
  * blending or animating varied hues"). The horrors keep their own look (`bossAttackTheme`, `attackSignatures`); every other creature

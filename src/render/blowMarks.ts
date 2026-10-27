@@ -1,5 +1,5 @@
 /**
- * The twelve marks a quiet blow can leave (round 89, render only; data/foeBlows.ts `Mark`): one recipe each, in particles of the shapes the
+ * The twelve marks a quiet blow can leave (round 90, render only; data/foeBlows.ts `Mark`): one recipe each, in particles of the shapes the
  * shader draws for them (`render/particles.ts`: a crescent, a lash, a cross, a row of ticks and an open ring are drawn in the shader, a mark and
  * a trace from a small free atlas of masks) and, for the one that lies on the ground, a decal. A stroke, a lash, a row of ticks lies along the way
  * it travels (the shader turns it along its flight); the rest face the eye. How a mark moves (`tempo`) and what it passes through (the blow's three
@@ -85,7 +85,7 @@ const jaws: Recipe = (pen, blow, b, n, beat) => {
   const { M, T, L, lay } = laying(pen, 'jaws', blow, b, beat);
   const gap = L * 0.38;
   const speed = (gap / (M.life * T.life)) * 0.85;
-  for (const s of n > 1 ? [1, -1] : [1]) lay({ shape: 'crescent', up: s * gap, vy: -s * speed, speed: 0, size: L * 0.9, rot: (s * Math.PI) / 2 });
+  for (const s of n > 1 ? [1, -1] : [1]) lay({ shape: 'crescent', up: s * gap, vy: -s * speed, speed: 0, size: L * 0.9, rot: Math.PI }); // (a crescent bulges the way it flies: turned about, each bulges away from the point it closes on)
 };
 
 /** A tapering arc that goes on along the way the blow runs. */

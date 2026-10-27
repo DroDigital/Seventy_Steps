@@ -84,7 +84,7 @@ describe('a horror\'s marks are found against any ground (round 51)', () => {
 
 const rgbOf = (hex: number): Rgb => [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
 
-describe('a creature drawn as a mark has the colours of its blow (round 89)', () => {
+describe('a creature drawn as a mark has the colours of its blow (round 90)', () => {
   it('turns a hue about the wheel, keeping its saturation and brightness, and leaves a grey alone', () => {
     expect(hsvToRgb(0, 1, 1)).toEqual([1, 0, 0]);
     expect(hsvToRgb(1 / 3, 1, 1)[1]).toBeCloseTo(1, 6);

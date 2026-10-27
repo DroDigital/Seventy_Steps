@@ -8,9 +8,9 @@
  *   matter (the weight, the camera's kick and the sound are impactFx's and the audio's).
  * The horrors with colours of their own at full strength; since round 59 every other foe too, more lightly and by its size (`strengthOf`:
  * a rat's bite throws a few sparks, a shoggoth's slam a burst; before, an ordinary foe's blow showed nothing at all), in the colours
- * and matter of what it is made of (`attackLook`), with no scar on the ground but under the largest. Round 89: that was too much for a crowd of
+ * and matter of what it is made of (`attackLook`), with no scar on the ground but under the largest. Round 90: that was too much for a crowd of
  * them (asked: "overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere"): every creature that is
- * not a horror (`isQuiet`) now draws its blow as one mark of its own and a few specks (`foeFx.ts`), and every path here returns early for it.
+ * not a horror (`isQuiet`) now draws its blow as one mark of its own and a few specks (`foeFx.ts`), and every path here but the light of its blow (`light`) returns early for it.
  */
 
 import type { V3 } from '../core/geom';
@@ -20,7 +20,7 @@ import { isAbsent, type Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { LANDS } from './audio/impact';
 import { attackLook, isQuiet, isThemed, type AttackLook } from './attackLook';
-import { burst, ELEMENTS, flash, impact, type Element } from './fxKit';
+import { burst, ELEMENTS, flash, glow, impact, type Element } from './fxKit';
 import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
 import { woundPoint } from './wound';
@@ -35,7 +35,7 @@ export const TELL = { windup: 26, poise: 30, lead: 15 } as const;
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 const FAR = 80;
 
-/** How much of a blow's light and matter a creature of this body throws, 0..1: a horror with colours of its own all of it (round 89: no other creature reaches here: they draw quietly, `foeFx.ts`; kept for them as it was). */
+/** How much of a blow's light and matter a creature of this body throws, 0..1: a horror with colours of its own all of it (round 90: no other creature reaches here: they draw quietly, `foeFx.ts`; kept for them as it was). */
 export function strengthOf(themed: boolean, radius: number): number {
   return themed ? 1 : Math.min(0.8, 0.3 + 0.35 * radius);
 }
@@ -68,6 +68,17 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
       if (big) ground.slash(p, h.reach + h.radius, yaw, h.arc, look.line, who);
       flash(fx, el, { x: p.x + Math.sin(yaw) * h.reach, y: p.y + h.height, z: p.z + Math.cos(yaw) * h.reach }, h.radius * 0.8 * (0.5 + 0.5 * k), look, 0);
     }
+  }
+
+  /** A quiet foe's blow (`foeFx.ts` draws it) lays no flash, but it still lights the ground it falls on, as every foe's does (round 87): `open`'s one small, short light, and nothing else. */
+  function light(id: number, def: MoveDef, p: V3, yaw: number): void {
+    const h = def.hit!;
+    const { look, k } = style(id);
+    if (h.reach < 0.05 || Math.abs(h.arc[0] - h.arc[1]) < 1) {
+      const a = yaw - h.arc[0] * DEG;
+      const at = h.reach < 0.05 ? p : { x: p.x + Math.sin(a) * h.reach, y: g.world.ground(p.x + Math.sin(a) * h.reach, p.z + Math.cos(a) * h.reach), z: p.z + Math.cos(a) * h.reach };
+      glow(at, (h.radius + 0.4) * 0.5, look);
+    } else glow({ x: p.x + Math.sin(yaw) * h.reach, y: p.y + h.height, z: p.z + Math.cos(yaw) * h.reach }, h.radius * 0.8 * (0.5 + 0.5 * k), look, 0);
   }
 
   /** A slow, heavy blow's tell (round 59): a glint where it will come from, a quarter second before it falls, so a body that winds up long is read by more than its pose. */
@@ -121,10 +132,10 @@ export function createMeleeFx(g: Game, fx: Particles, ground: GroundFx): MeleeFx
   g.events.on('Swung', ({ entity, at, yaw }) => {
     const a = c.actor.get(entity);
     const def = a && moveDef(a);
-    if (!def?.hit || !foe(entity) || isQuiet(g, entity) || isAbsent(g, entity)) return;
+    if (!def?.hit || !foe(entity) || isAbsent(g, entity)) return;
     const me = c.transform.get(g.player.id)?.pos;
     if (me && Math.hypot(at.x - me.x, at.z - me.z) > FAR) return;
-    open(entity, def, { x: at.x, y: g.world.ground(at.x, at.z), z: at.z }, yaw);
+    (isQuiet(g, entity) ? light : open)(entity, def, { x: at.x, y: g.world.ground(at.x, at.z), z: at.z }, yaw); // (a creature that is not a horror draws its own: foeFx.ts)
   });
 
   const last = new Map<number, { move: string | null; frame: number }>(); // each actor's move and frame when last drawn

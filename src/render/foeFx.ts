@@ -1,5 +1,5 @@
 /**
- * The quiet blows (round 89, render only; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but
+ * The quiet blows (round 90, render only; asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but
  * overly elaborate; in high-density combat scenarios, this detracts from the intended eerie atmosphere ... each creature should instead feature a
  * distinct, high-fidelity, subtle animation with optional graphic accents"). Every creature that is not one of the horrors (`isQuiet`: lesser,
  * greater, ally and the plain named) draws its blow as ONE graphic mark of its own (data/foeBlows.ts, `blowKit.ts`) and at most a few specks of
