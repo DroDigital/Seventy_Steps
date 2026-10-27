@@ -39,6 +39,14 @@ describe('a creature in the lantern\'s light shows its own colours (round 93)', 
     expect(at('SPRITE_DRAWN')).toBeLessThan(at('float fog = vFog * uFogAmount'));
   });
 
+  it('shows a share of the drawn colours at the most, so a lit creature keeps part of its realm\'s tint and the light\'s colour (round 95)', () => {
+    expect(worldUniforms.uSpriteRevealMost.value).toBe(FX.spriteRevealMost);
+    expect(FX.spriteRevealMost).toBeGreaterThan(0.25); // its own colours still read in the light
+    expect(FX.spriteRevealMost).toBeLessThan(1); // and the realm's are not all taken away
+    expect(SPRITE_FRAG).toMatch(/uniform float uSpriteRevealMost;/);
+    expect(SPRITE_FRAG).toContain('SPRITE_DRAWN), shown * uSpriteRevealMost)');
+  });
+
   it('is whole within a few metres of the lantern, partial toward the edge of its light, and the realm\'s again beyond it', () => {
     expect(shown(0)).toBe(1);
     expect(shown(2)).toBe(1);
