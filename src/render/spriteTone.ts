@@ -6,8 +6,8 @@
  * colour strength lifted toward the realm's, so what the form's palette holds inside itself (its red against
  * its green, its pale against its dark) is kept whole while the form as a whole takes the realm's colour; a form
  * with no hue of its own (a grey) is given the realm's. A form drawn in a strong colour of its own (round 93: the
- * Zoog's rust orange, the Wamp's, Wilbur's, Brown Jenkin's, Hastur's gold, the purples of Shub-Niggurath and
- * Azathoth) is not turned at all: its colour is what the author drew it in, and the realm reaches it through the
+ * Zoog's rust orange, the Wamp's, Wilbur's, Brown Jenkin's, Hastur's gold, the purples of Azathoth and
+ * Ghatanothoa) is not turned at all: its colour is what the author drew it in, and the realm reaches it through the
  * light and the mist instead; only the dull, sepia forms the older art is made of take the realm's hue. The picture
  * is changed on the way to the screen only (shaders/spriteGrade.ts); the CPU's part is this one small, pure
  * calculation for each form drawn. No Three.js.
