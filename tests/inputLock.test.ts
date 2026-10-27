@@ -116,7 +116,7 @@ describe('a mouse just taken again (round 60)', () => {
   });
 });
 
-describe('a lock asked for and not yet granted (round 89)', () => {
+describe('a lock asked for and not yet granted (round 91)', () => {
   it('reads nothing the browser reports between the ask and the grant: the cursor warped to the middle', async () => {
     const pg = await page(true); // the menus are closed and the lock is not granted: a free look would read this move
     pg.ask(); // the map closes and asks for the mouse back

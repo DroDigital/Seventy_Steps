@@ -8,7 +8,7 @@ let askedAt = -1e9;
 
 export const noteLockAsked = (): void => void (askedAt = performance.now());
 
-/** The browser refused the ask (its pointerlockerror): nothing is waited on any more, and the look is read at once (round 89). */
+/** The browser refused the ask (its pointerlockerror): nothing is waited on any more, and the look is read at once (round 91). */
 export const noteLockRefused = (): void => void (askedAt = -1e9);
 
 /** The mouse was asked for within the last `ms`. */
