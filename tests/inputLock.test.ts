@@ -27,7 +27,7 @@ interface Page {
   asks(): number;
 }
 
-async function page(free = false, refuse = false): Promise<Page> {
+async function page(free = false, refuse = false, throws = false): Promise<Page> {
   vi.resetModules();
   vi.useFakeTimers({ toFake: ['performance'] });
   const [win, doc, cv] = [new Map<string, Handler[]>(), new Map<string, Handler[]>(), new Map<string, Handler[]>()];
@@ -36,6 +36,7 @@ async function page(free = false, refuse = false): Promise<Page> {
   let requests = 0;
   const request = (): void => {
     requests += 1;
+    if (throws) throw new TypeError('requestPointerLock is not a function'); // no pointer lock in this browser: the call throws, and no event says so
     if (refuse) fire(doc, 'pointerlockerror', {}); // the browser refuses the request, and says so (the Pointer Lock API's error event)
   };
   const canvas = { style: {}, addEventListener: on(cv), requestPointerLock: request };
@@ -167,6 +168,25 @@ describe('a lock asked for and not yet granted (round 91)', () => {
       pg.move(10, 0);
       turned += pg.input.poll().lookX;
       pg.wait(300);
+    }
+    expect(turned).toBeCloseTo(10 * 10 * INPUT.mouseSensitivity, 6);
+  });
+
+  it('a request that throws (no pointer lock here) ends its wait at once, as a refusal does: no event follows a throw', async () => {
+    const pg = await page(true, false, true); // the call throws, and nothing is reported
+    pg.press('KeyW'); // a key asks for the mouse, and the request throws
+    pg.move(40, 0);
+    expect(pg.input.poll().lookX).toBeGreaterThan(0);
+  });
+
+  it('with every request throwing, a key every 50 ms does not hold the look back', async () => {
+    const pg = await page(true, false, true);
+    let turned = 0;
+    for (let i = 0; i < 10; i++) {
+      pg.press('KeyW');
+      pg.move(10, 0);
+      turned += pg.input.poll().lookX;
+      pg.wait(50);
     }
     expect(turned).toBeCloseTo(10 * 10 * INPUT.mouseSensitivity, 6);
   });

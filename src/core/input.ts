@@ -143,6 +143,7 @@ export function createInput(canvas: HTMLCanvasElement, free: () => boolean = () 
       if (r instanceof Promise) r.catch(() => undefined);
     } catch {
       // Pointer lock unavailable: mouse look stays off, arrows and pads still work.
+      noteLockRefused(); // a throw brings no pointerlockerror, so the ask ends here, as a refusal ends it in the listener below
     }
   };
   /** Asks the browser for the mouse, and marks the ask: the movement reported before the grant is no look (the mousemove handler). */
