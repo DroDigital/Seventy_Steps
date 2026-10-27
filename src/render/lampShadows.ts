@@ -96,7 +96,7 @@ export function createLampShadows(): LampShadows {
         lens[k].updateMatrixWorld(true);
         renderer.setRenderTarget(maps[k].target);
         renderer.render(scene, lens[k]);
-        castSilhouettes.draw(renderer, lens[k], { x: h.at.x, y: h.at.y, z: h.at.z, point: true }); // (round 93: the foes' own shapes, across the lamp)
+        castSilhouettes.draw(renderer, lens[k], { x: h.at.x, y: h.at.y, z: h.at.z, point: true }); // (round 94: the foes' own shapes, across the lamp)
       });
       scene.overrideMaterial = material;
       renderer.setRenderTarget(was);

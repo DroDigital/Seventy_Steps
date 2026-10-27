@@ -1,5 +1,5 @@
 /**
- * The foes' own shapes in the shadow maps (round 93; render only). Round 83 stood each creature in the moon's, the lantern's and the
+ * The foes' own shapes in the shadow maps (round 94; render only). Round 83 stood each creature in the moon's, the lantern's and the
  * lamps' shadows as a rounded stand-in body of one shape for all, capped in height, so a shadow was the same wedge for a Deep One
  * and a colossus. Each creature drawn from the sprite batches now casts its own picture instead: one more mesh for each batch,
  * sharing its geometry, instance matrices and texels (a claw raised in a blow is raised in the shadow, a body that crumbles
@@ -11,7 +11,7 @@
 
 import * as THREE from 'three';
 import { CAST } from '../data/fxTuning';
-import { loomOf } from './castPlan';
+import { loomOf, reachOf } from './castPlan';
 import { CAST_FRAG, CAST_VERT } from './shaders/castSprite';
 import { worldUniforms } from './worldMaterial';
 
@@ -32,12 +32,13 @@ export interface SilhouetteCasters {
   begin(right: { x: number; z: number }): void;
   /**
    * Instance `index` of batch `slot` (in the order adopted) casts its picture: it stands at (x, z) and is `height` metres painted tall with its feet
-   * `feet` metres above the bottom of its picture, in the last phase `deep` (0..1) of its fight, `keep` (0..1) of it left; `from` is the investigator, whom it is too far from to matter.
+   * `feet` metres above the bottom of its picture, in the last phase `deep` (0..1) of its fight, `keep` (0..1) of it left; `from` is the investigator, whom it is too far from to matter
+   * (`reachOf`: as far as the moon's map, and as far again as the longest shadow it could throw).
    */
   put(slot: number, index: number, x: number, z: number, height: number, feet: number, deep: number, keep: number, from: { x: number; z: number }): void;
   /** The frame's bodies are told. */
   end(): void;
-  /** Draws the bodies into the map being made, as `camera` sees it (the light's own), after its solids; `back` is how far behind a body its cut-out stands (a map drawn from a point: round 93's `CAST.back`). */
+  /** Draws the bodies into the map being made, as `camera` sees it (the light's own), after its solids. */
   draw(renderer: THREE.WebGLRenderer, camera: THREE.Camera, light: CastLight): void;
 }
 
@@ -46,6 +47,9 @@ interface Cast {
   mesh: THREE.InstancedMesh;
   info: THREE.InstancedBufferAttribute;
 }
+
+/** What a cast shares with the sprite batch it is drawn from: the batch's own buffers. */
+const SHARED = ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx'] as const;
 
 export function createSilhouetteCasters(): SilhouetteCasters {
   const scene = new THREE.Scene();
@@ -57,7 +61,10 @@ export function createSilhouetteCasters(): SilhouetteCasters {
   const forget = (): void => {
     for (const c of casts) {
       scene.remove(c.mesh);
-      c.mesh.geometry.dispose();
+      const geo = c.mesh.geometry;
+      for (const name of SHARED) geo.deleteAttribute(name); // (a batch that is still drawn keeps its buffers: only the cast's own are freed)
+      geo.setIndex(null);
+      geo.dispose();
       (c.mesh.material as THREE.Material).dispose();
     }
     casts = [];
@@ -71,7 +78,7 @@ export function createSilhouetteCasters(): SilhouetteCasters {
         const from = source.geometry;
         const geo = new THREE.BufferGeometry(); // the batch's own buffers, shared, and one more
         geo.setIndex(from.getIndex());
-        for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx']) geo.setAttribute(name, from.getAttribute(name));
+        for (const name of SHARED) geo.setAttribute(name, from.getAttribute(name));
         const capacity = source.instanceMatrix.count;
         const info = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 4), 4).setUsage(THREE.DynamicDrawUsage);
         geo.setAttribute('aCast', info);
@@ -101,8 +108,9 @@ export function createSilhouetteCasters(): SilhouetteCasters {
     },
     put(slot, index, x, z, height, feet, deep, keep, from) {
       const c = casts[slot];
-      if (!c || index < 0 || index >= c.info.count || keep <= CAST.keep || Math.hypot(x - from.x, z - from.z) > CAST.reach) return;
+      if (!c || index < 0 || index >= c.info.count || keep <= CAST.keep) return;
       loomOf(height, deep, loom);
+      if (Math.hypot(x - from.x, z - from.z) > reachOf(height, loom)) return;
       c.info.setXYZW(index, 1, loom.tall, loom.wide, feet);
       any = true;
     },

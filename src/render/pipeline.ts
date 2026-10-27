@@ -87,7 +87,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
   };
   /** Every program is also taken into use (its uniforms read) once compiled: that waits on the GPU, and would stall the first frame that draws it. */
   const compile = async (scene: THREE.Scene, camera: THREE.Camera): Promise<void> => {
-    await Promise.all([renderer.compileAsync(scene, camera), renderer.compileAsync(post.scene, post.camera), renderer.compileAsync(castSilhouettes.scene, camera)]); // (round 93: the foes' shapes in the shadow maps too)
+    await Promise.all([renderer.compileAsync(scene, camera), renderer.compileAsync(post.scene, post.camera), renderer.compileAsync(castSilhouettes.scene, camera)]); // (round 94: the foes' shapes in the shadow maps too)
     for (const root of [scene, post.scene, castSilhouettes.scene]) {
       root.traverse((o) => {
         for (const m of [(o as Partial<THREE.Mesh>).material ?? []].flat()) (renderer.properties.get(m) as { currentProgram?: THREE.WebGLProgram }).currentProgram?.getUniforms();

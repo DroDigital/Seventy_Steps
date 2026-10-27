@@ -83,7 +83,7 @@ export interface MoonShadow {
 }
 
 const DEPTH_ONLY = new THREE.ShaderMaterial({
-  vertexShader: INSTANCED_POSITION, // (round 83: the creatures' bodies are one instanced mesh)
+  vertexShader: INSTANCED_POSITION, // (whatever is instanced and stands on a caster layer: the creatures are not, since round 94 they cast from a scene of their own: render/silhouetteCasters.ts)
   fragmentShader: 'void main() { gl_FragColor = vec4(1.0); }',
   side: THREE.DoubleSide,
   colorWrite: false,
@@ -125,7 +125,7 @@ export function createMoonShadow(): MoonShadow {
       renderer.setRenderTarget(target);
       renderer.render(scene, camera);
       scene.overrideMaterial = material;
-      castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 93: the foes' own shapes, across the moon)
+      castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 94: the foes' own shapes, across the moon)
       renderer.setRenderTarget(was);
     },
   };

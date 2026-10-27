@@ -1,10 +1,11 @@
 /**
- * A foe's picture as a shadow (round 93; render/silhouetteCasters.ts draws it into the moon's, the lantern's and the lamps' depth
+ * A foe's picture as a shadow (round 94; render/silhouetteCasters.ts draws it into the moon's, the lantern's and the lamps' depth
  * maps, after the solids). The picture's own billboard shares its instance buffers (the cell, the flip, the death's texels), but is
- * stood across the light and not across the camera, and leans back from the light until its shadow is as long as the body is tall
- * (render/castPlan.ts: `leanOf`); a texel of the body is written to the map, a texel of nothing is not, so the shadow is the body's
+ * stood across the light and not across the camera, and leans back from the light until its shadow is `CAST.stretch` of the body's height
+ * long, or as long as the light can make it (render/castPlan.ts: `leanOf`); a texel of the body is written to the map, a texel of nothing is not, so the shadow is the body's
  * own shape, a claw raised in a blow is raised in it, and a body that crumbles crumbles in it. The picture is turned about, left
- * for right, where the light is across the camera's view, through the shape the two have in common (so it never jumps).
+ * for right, where the light is across the camera's view: over the middle of the turn the cut rises (`CAST.merge`) so that only the
+ * shape the picture and its mirror have in common is left, and the one or the other comes back whole as the turn ends (`bodyKept`).
  * Round 83's rows that slip, texels that go and double that lags are all kept. Depth only: `colorWrite` is off.
  */
 
@@ -17,7 +18,7 @@ const f = (n: number): string => n.toFixed(4);
 export const CAST_VERT = /* glsl */ `
 uniform vec4 uCastLight; // xyz: toward the light (w = 0: the moon), or where it burns (w = 1: the lantern, a lamp)
 uniform vec3 uCastRight; // the camera's right, level
-uniform float uCastBack; // metres the cut-out stands behind the body, away from the light
+uniform float uCastBack; // metres a point light's cut-out stands behind the body at the least, away from the light (castPlan.ts: standOff)
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
 attribute vec4 aInfo; // flash, opacity, flip, outside
@@ -37,7 +38,8 @@ varying float vWeird;
 
 void main() {
   vec3 origin = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-  float w = length(instanceMatrix[0].xyz) * aCast.z;
+  float wBody = length(instanceMatrix[0].xyz); // the picture's own breadth
+  float w = wBody * aCast.z;
   float h = length(instanceMatrix[1].xyz) * aCast.y;
   vec3 feet = origin + vec3(0.0, aCast.w, 0.0); // the shadow is larger than the body about its feet, which stay on the ground
   vec3 to = uCastLight.w > 0.5 ? uCastLight.xyz - (feet + vec3(0.0, 0.5 * h, 0.0)) : uCastLight.xyz;
@@ -47,10 +49,11 @@ void main() {
   vec2 f = fl > 1e-3 ? flat2 / fl : vec2(-uCastRight.z, uCastRight.x); // a light overhead stands the cut-out across the camera
   vec3 away = vec3(-f.x, 0.0, -f.y); // level, away from the light
   vec3 side = vec3(f.y, 0.0, -f.x); // level, across it
+  float stand = uCastLight.w > 0.5 ? uCastBack + 0.5 * wBody * abs(dot(f, uCastRight.xz)) : 0.0; // castPlan.ts: standOff
   float sy = clamp(dir.y, 0.0, 0.999);
   float lean = clamp(asin(sy) - acos(min(1.0, ${f(CAST.stretch)} * sy)), 0.0, ${f(CAST.lean)}); // castPlan.ts: leanOf
   vec3 up = vec3(0.0, cos(lean), 0.0) + away * sin(lean);
-  vec3 p = feet + away * uCastBack + side * (position.x * w) + up * (position.y * h - aCast.w * aCast.y);
+  vec3 p = feet + away * stand + side * (position.x * w) + up * (position.y * h - aCast.w * aCast.y);
   p = mix(origin, p, aCast.x); // a body that casts none is a point
   gl_Position = projectionMatrix * viewMatrix * vec4(p, 1.0);
   float u = aInfo.z > 0.5 ? 1.0 - uv.x : uv.x;
@@ -106,7 +109,9 @@ float bodyAt(vec2 uv) {
 }
 
 void main() {
-  if (mix(bodyAt(vUvB), bodyAt(vUv), vTurn) < uCastMin) discard;
+  float a = vTurn > 0.999 ? bodyAt(vUv) : vTurn < 0.001 ? bodyAt(vUvB) : mix(bodyAt(vUvB), bodyAt(vUv), vTurn);
+  float k = 1.0 - abs(2.0 * vTurn - 1.0); // castPlan.ts: bodyKept
+  if (a < mix(uCastMin, ${f(CAST.merge)}, k)) discard;
   gl_FragColor = vec4(1.0);
 }
 `;

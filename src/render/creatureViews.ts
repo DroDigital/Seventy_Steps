@@ -83,7 +83,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 83)
-  castSilhouettes.adopt([batch, ...pages.map((p) => p.mesh)]); // and each one's own picture, cast as well (round 93)
+  castSilhouettes.adopt([batch, ...pages.map((p) => p.mesh)]); // and each one's own picture, cast as well (round 94)
   const flat = new THREE.Vector3(); // the camera's right, level
   const realm: [number, number, number] = [1, 1, 1]; // the realm's mid-tone this frame, at brightness 1
   const glow = createCreatureGlow(g, atlas, flat, CAPACITY); // the faint halos about eyes and marks, and a horror's body
@@ -189,7 +189,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const span = spans.get(key)!;
           if (deep > 0 && gone.amount < 0.5) glow.halo(x, y + (span.top + span.bottom) / 2, z, (span.top - span.bottom) * BOSS_PRESENCE.halo.size, attackLook(g, id).line, BOSS_PRESENCE.halo.gain * deep * pose.opacity); // the colour of its blows hangs about it, deeper by phase
           painted.set(id, span.across);
-          if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre' && pose.opacity >= CAST.least) castSilhouettes.put(frame.page + 1, counts[frame.page] - 1, x, z, span.top - span.bottom, sizes.get(key)!.groundOffset, deep, 1 - gone.amount, from); // its own picture, cast as a shadow, larger by what it is and how deep in its fight (round 93; a spectre casts none, nor a shimmer in the air)
+          if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre' && pose.opacity >= CAST.least) castSilhouettes.put(frame.page + 1, counts[frame.page] - 1, x, z, span.top - span.bottom, sizes.get(key)!.groundOffset, deep, 1 - gone.amount, from); // its own picture, cast as a shadow, larger by what it is and how deep in its fight (round 94; a spectre casts none, nor a shimmer in the air)
           if (direction === 'front' && !clip.mirror_horizontal) glow.reviewedEyes(key, sizes.get(key)!, x, y, z, pose, camera.position, glow.mistLook(id, time), voice);
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
             ECHOES.forEach((e, i) => {
