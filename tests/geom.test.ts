@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { segmentBox, segmentCylinder, segSegDist2, turnToward, v3, wrapAngle } from '../src/core/geom';
 import { ARENA } from '../src/data/arena';
+import { CAMERA_MODES } from '../src/data/cameraModes';
 import { CAMERA } from '../src/data/tuning';
 import { createCameraRig, stepCamera } from '../src/systems/camera';
 import { createArenaWorld } from '../src/world/arena';
@@ -55,12 +56,13 @@ describe('third-person camera', () => {
 
   it('pulls in when the boom hits a pillar, then eases back out', () => {
     const rig = createCameraRig(0); // looks +z, so the boom reaches back toward -z
+    const tune = CAMERA_MODES[rig.mode];
     stepCamera(rig, { ...still, pivot: v3(-8, 1.55, 3.5) }, w, 1 / 60); // pillar at (-8, 1), radius 0.8
-    const face = 1 + Math.sqrt(0.8 ** 2 - CAMERA.shoulder ** 2); // where the boom, off to the right, meets it
-    const pulled = (3.5 - face) / Math.cos(CAMERA.pitch) - CAMERA.margin;
+    const face = 1 + Math.sqrt(0.8 ** 2 - tune.shoulder ** 2); // where the boom, off to the right, meets it
+    const pulled = (3.5 - face) / Math.cos(tune.pitch) - CAMERA.margin;
     expect(rig.dist).toBeCloseTo(pulled, 2);
     stepCamera(rig, { ...still, pivot: v3(0, 1.55, 10) }, w, 1 / 60);
-    expect(rig.dist).toBeCloseTo(pulled + CAMERA.easeOut / 60, 5);
+    expect(rig.dist).toBeCloseTo(pulled + tune.easeOut / 60, 5);
   });
 
   it('swings toward the lock-on target instead of following look input', () => {
