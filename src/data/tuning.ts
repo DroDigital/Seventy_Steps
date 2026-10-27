@@ -257,6 +257,7 @@ export const INPUT = {
   deadzone: 0.2, // gamepad sticks
   mouseSensitivity: 0.0025, // rad per pixel
   lockSettleMs: 250, // milliseconds after the browser grants the mouse in which its movement is not read (round 60: the first movement reported with a fresh lock can be the cursor's jump to the middle, which turned the camera to another view)
+  lockAskMs: 250, // milliseconds after the mouse is asked for, before it is granted, in which its movement is not read (round 91: a move reported between the ask and the grant, such as the cursor's warp to the middle, is no look; a refusal ends the wait at once, and with neither a grant nor a refusal the hand is read again once this has passed)
   stickLookSpeed: 3.2, // rad/s at full deflection
   keyLookSpeed: 2.4, // rad/s (arrow keys)
   flickPixels: 60, // mouse flick that switches lock target
