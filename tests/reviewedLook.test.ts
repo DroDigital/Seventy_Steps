@@ -37,7 +37,7 @@ describe('the painted body of a boss form (tools/reviewed_look.py)', () => {
       expect(bands, key).toHaveLength(3);
       for (const half of bands) {
         expect(half, key).toBeGreaterThan(0);
-        expect(half, key).toBeLessThan(0.6);
+        expect(half, key).toBeLessThan(key === 'azathoth' ? 0.7 : 0.6); // the newly drawn formless mass is wider than it is tall
       }
     }
   });

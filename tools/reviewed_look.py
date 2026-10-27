@@ -50,8 +50,9 @@ EYED = {
 # frames of one of its views; the others (a robe's gold, a pyramid's sand) hold too many texels of theirs.
 # (round 92: 'yeb' went out of the list when it was drawn again whole: the new Yeb has no eye, and the one colour that shows a few texels at a
 # time in most of its frames is a highlight scattered along its limbs, which would sparkle all over it in the dark.)
+# The redrawn Azathoth has no consistently isolated glint colour either; treating a fold colour as a spark would light whole patches.
 GLINTED = [
-    'azathoth', 'deep_one#eldritch', 'elder_thing', 'ghatanothoa', 'ghoul#eldritch', 'shoggoth', 'shoggoth#boss', 'the_hound',
+    'deep_one#eldritch', 'elder_thing', 'ghatanothoa', 'ghoul#eldritch', 'shoggoth', 'shoggoth#boss', 'the_hound',
 ]
 GLINT_SHARE = 0.7  # the share of a view's frames a colour shows in
 GLINT_MOST = 14  # texels of it in a frame, at most

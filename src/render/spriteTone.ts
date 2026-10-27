@@ -69,3 +69,8 @@ export function toneOf(form: Rgb, realm: Rgb, share: number): Tone {
   const boost = 1 + (Math.min(BOOST_MOST, Math.max(1, 1 + (relRealm / Math.max(0.02, relForm) - 1) * share)) - 1) * (1 - held);
   return { cos: Math.cos(turn), sin: Math.sin(turn), boost, fill: relRealm * share * (1 - own) * FILL };
 }
+
+/** The newly drawn Azathoth keeps its approved palette in every realm; other forms use the usual measured grading. */
+export function toneForForm(key: string, form: Rgb, realm: Rgb, share: number): Tone {
+  return key === 'azathoth' ? PLAIN : toneOf(form, realm, share);
+}

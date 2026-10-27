@@ -4,13 +4,20 @@
  * of it that is the same for every one of the 105 forms in every realm.
  */
 import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
 import { LOOKS } from '../src/data/looks';
 import { REVIEWED_MATTER } from '../src/data/reviewedLook';
 import { FX } from '../src/data/tuning';
 import type { Rgb } from '../src/render/palette';
 import { gradeTints } from '../src/render/realmPalette';
-import { arc, BOOST_MOST, chromaOf, OWN_FROM, OWN_TO, PLAIN, toneOf, type Tone } from '../src/render/spriteTone';
+import { arc, BOOST_MOST, chromaOf, OWN_FROM, OWN_TO, PLAIN, toneForForm, toneOf, type Tone } from '../src/render/spriteTone';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
+import { createCreatureViews } from '../src/render/creatureViews';
+import type { SpriteAtlas } from '../src/render/sprites/atlas';
+import type { ReviewedEntity, ReviewedManifest } from '../src/render/sprites/reviewed';
+import { worldUniforms } from '../src/render/worldMaterial';
+import { spawnCreature } from '../src/systems/creatures';
+import { createGame } from '../src/systems/game';
 
 /** What the shader does to a colour's chroma. */
 const apply = (c: Rgb, t: Tone): { angle: number; length: number } => {
@@ -81,6 +88,46 @@ describe('a form turned to its realm', () => {
 
 const strength = (c: Rgb): number => chromaOf(c).length / Math.max(0.05, 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]);
 
+it('renders the new Azathoth palette unchanged in every realm, while other creatures keep their existing grading', () => {
+  const matter = REVIEWED_MATTER as Record<string, Rgb>;
+  const originalMatter = matter.azathoth;
+  const tint = worldUniforms.uSpriteTints.value[2] as THREE.Vector3;
+  const originalTint = tint.clone();
+  const originalGrade = worldUniforms.uSpriteGrade.value;
+  const view = (): ReviewedEntity['directions']['front'] => ({ sourceDirection: 'front', mirror: false, actions: { idle: [0], move: [0], attack: [0], hurt: [0] } });
+  const sampler = (key: 'azathoth' | 'deep_one'): (() => number[]) => {
+    const entity: ReviewedEntity = { id: key, name: key, assetGroup: key === 'azathoth' ? 'bosses' : 'sprites', scale: 2, scaleUnit: 'metres', page: 0, directions: { front: view(), back: view(), left: view(), right: view() } };
+    const manifest: ReviewedManifest = { format: 'seventy-steps-reviewed-atlas-v1', entityCount: 1, frameCount: 1, pages: [{ file: 'p.png', width: 128, height: 128, sha256: '' }], frames: [{ source: 'frame.png', sourceSha256: '', pixelSha256: '', width: 64, height: 64, bounds: [8, 4, 56, 62], page: 0, x: 0, y: 0 }], entities: { [key]: entity } };
+    const atlas: SpriteAtlas = { width: 64, height: 64, data: new Uint8Array(64 * 64 * 4), frames: new Map(), eyes: new Float32Array(4), eyeColors: new Float32Array(3), reviewed: { manifest, pages: [{} as HTMLImageElement] } };
+    const game = createGame(), scene = new THREE.Scene(), views = createCreatureViews(scene, game, atlas);
+    spawnCreature(game, key, { x: 0, z: -9, yaw: 0 });
+    const mesh = scene.children.find(child => (child as THREE.InstancedMesh<THREE.PlaneGeometry, THREE.ShaderMaterial>).material?.uniforms?.uReviewed?.value === 1) as THREE.InstancedMesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
+    return () => {
+      views.update(1, 1, new THREE.PerspectiveCamera());
+      expect(views.debugFrames().map(frame => frame.key)).toEqual([key]);
+      const a = mesh.geometry.getAttribute('aTone');
+      return [a.getX(0), a.getY(0), a.getZ(0), a.getW(0)];
+    };
+  };
+  try {
+    matter.azathoth = [0.252, 0.151, 0.282]; // measured from the delivered front idle, whose strength is in the automatic partial-hold band
+    worldUniforms.uSpriteGrade.value = 1;
+    const azathothTone = sampler('azathoth'), deepOneTone = sampler('deep_one');
+    for (const id of Object.keys(LOOKS)) {
+      const mid = gradeTints(LOOKS[id])[2] as Rgb;
+      tint.set(...mid);
+      expect(azathothTone(), id).toEqual([1, 0, 1, 0]);
+      const expected = toneOf(matter.deep_one, mid, 1);
+      const actual = deepOneTone();
+      [expected.cos, expected.sin, expected.boost, expected.fill].forEach((v, i) => expect(actual[i], `${id} deep_one component ${i}`).toBeCloseTo(v, 6));
+    }
+  } finally {
+    matter.azathoth = originalMatter;
+    tint.copy(originalTint);
+    worldUniforms.uSpriteGrade.value = originalGrade;
+  }
+});
+
 describe('a form drawn in a strong colour keeps it (round 93: the Zoog was turned purple in the Dreamlands)', () => {
   const STRONG = ['zoog', 'wamp', 'man_of_leng', 'wilbur_whateley', 'brown_jenkin', 'hastur', 'azathoth', 'ghatanothoa']; // the rust, orange and gold forms and the purples: what the author drew them in (a table to review when the art is redrawn: round 92 left Shub-Niggurath grey)
   const vivid: Rgb = [0.5, 0.2, 0.18];
@@ -100,9 +147,9 @@ describe('a form drawn in a strong colour keeps it (round 93: the Zoog was turne
   it('holds the named forms in every realm: no turn, no lift, no cast', () => {
     for (const key of STRONG) {
       const form = REVIEWED_MATTER[key] as Rgb;
-      expect(strength(form), key).toBeGreaterThan(OWN_TO);
+      if (key !== 'azathoth') expect(strength(form), key).toBeGreaterThan(OWN_TO);
       for (const id of Object.keys(LOOKS)) {
-        const t = toneOf(form, gradeTints(LOOKS[id])[2] as Rgb, FX.spriteGrade);
+        const t = toneForForm(key, form, gradeTints(LOOKS[id])[2] as Rgb, FX.spriteGrade);
         expect(Math.abs(t.sin), `${key} in ${id}`).toBeLessThan(0.02);
         expect(t.boost, `${key} in ${id}`).toBe(1);
         expect(t.fill, `${key} in ${id}`).toBe(0);
@@ -111,11 +158,11 @@ describe('a form drawn in a strong colour keeps it (round 93: the Zoog was turne
   });
 
   it('holds exactly those forms, and no form is part held: every form is dull enough to be turned, or strong enough to be held', () => {
-    const held = Object.keys(REVIEWED_MATTER).filter((k) => strength(REVIEWED_MATTER[k] as Rgb) >= OWN_TO);
+    const held = Object.keys(REVIEWED_MATTER).filter((k) => k === 'azathoth' || strength(REVIEWED_MATTER[k] as Rgb) >= OWN_TO);
     expect(held.sort()).toEqual([...STRONG].sort()); // (a form redrawn into the band, or across it, is a decision: say whether it keeps its colour)
     for (const key of Object.keys(REVIEWED_MATTER)) {
       const k = strength(REVIEWED_MATTER[key] as Rgb);
-      expect(k <= OWN_FROM || k >= OWN_TO, `${key} (${k.toFixed(3)}) is in the band ${OWN_FROM} to ${OWN_TO}`).toBe(true);
+      expect(key === 'azathoth' || k <= OWN_FROM || k >= OWN_TO, `${key} (${k.toFixed(3)}) is in the band ${OWN_FROM} to ${OWN_TO}`).toBe(true);
     }
   });
 

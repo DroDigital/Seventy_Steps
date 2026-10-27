@@ -86,14 +86,14 @@ describe('reviewed creature artwork imported into the game', () => {
         }
       }
     }
-    expect(scopes).toBe(1096); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the other seven bosses' left and back attack and hurt (28), and the Shantak's flight in its four views (4); Yog-Sothoth's and Shub-Niggurath's, drawn again whole with front combat only (rounds 56 and 92), are no more
-    expect(mirrors).toBe(88); // October 27's Curwen rework adds one mirrored right; 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do), and so has round 57's Horror at Martin's Beach (its own before); round 92's Yeb and Shub-Niggurath, which drew theirs, have theirs turned round too (Nug's always was)
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2824);
+    expect(scopes).toBe(1092); // Azathoth's four old left/back combat scopes are removed with its old design.
+    expect(mirrors).toBe(89); // Its right idle and movement now mirror the new left exactly once.
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2816);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2824); // October 27: the three reworks replace 95 unique frames with 69 (2850 - 26); mirrored right views render all 87 delivered poses.
+    expect(pack.frameCount).toBe(2816); // Azathoth's new poses replace its old art and drop eight unique frames overall.
   });
 
-  it('preserves all 2824 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
+  it('preserves all 2816 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
     expect(pack.filter).toBe('nearest');
     expect(pack.mipmaps).toBe(false);
     const pages = pack.pages.map((page) => {
@@ -118,7 +118,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2452, '128x128': 330, '128x160': 42 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2452, '128x128': 322, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');
