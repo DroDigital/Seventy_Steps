@@ -81,7 +81,7 @@ import { installGameEvidence } from './ui/gameEvidence';
 import { installFxLab } from './ui/fxLab';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
-import { noteLockAsked } from './core/mouseLock';
+import { noteLockAsked, noteLockRefused } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
 import { createDialogue } from './ui/dialogue';
@@ -150,6 +150,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       if (r instanceof Promise) r.catch(() => undefined);
     } catch {
       // No pointer lock: a click on the canvas captures the mouse, as ever.
+      noteLockRefused(); // a throw brings no pointerlockerror: the ask ends here, as input.ts's request ends it
     }
   };
   onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
