@@ -36,6 +36,20 @@ describe('settings', () => {
     expect(clampSetting('volume', '0.5')).toBe(SETTINGS.volume[3]);
   });
 
+  it('moves a camera look saved before the Long lens was taken out: Long lens to Classic, Tight shoulder to its new place, the rest kept', () => {
+    const saved = (camera: number, v: number) => JSON.stringify({ camera, v });
+    expect(parseSettings(saved(2, 19)).camera).toBe(0); // Long lens: Classic
+    expect(parseSettings(saved(3, 19)).camera).toBe(2); // Tight shoulder
+    expect(parseSettings(saved(1, 19)).camera).toBe(1); // Low hero
+    expect(parseSettings(saved(0, 18)).camera).toBe(1); // the first default, Classic, kept by every save: Low hero (round 82)
+    expect(parseSettings(saved(2, 20)).camera).toBe(0); // round 82's numbering: 2 was the Long lens
+    expect(parseSettings(saved(2, 21)).camera).toBe(2); // this version's own 2 is Tight shoulder
+    expect(SETTINGS.camera[1]).toBe(2);
+    const store = memoryStore();
+    storeSettings(store, { ...defaultSettings(), camera: 2 });
+    expect(loadSettings(store).camera).toBe(2); // kept as it was stored
+  });
+
   it('a broken, partial or hostile entry parses to sane settings', () => {
     expect(parseSettings(null)).toEqual(defaultSettings());
     expect(parseSettings('{not json')).toEqual(defaultSettings());
@@ -79,7 +93,7 @@ describe('settings', () => {
     for (const resolution of HIGH_RESOLUTIONS) {
       expect(clampSetting('resolution', resolution)).toBe(resolution);
       storeSettings(store, { ...defaultSettings(), resolution });
-      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(20);
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(21);
       expect(loadSettings(store).resolution).toBe(resolution);
     }
     expect(clampSetting('resolution', 99)).toBe(2.4);
@@ -130,8 +144,8 @@ describe('settings', () => {
     expect(parseSettings(null).camera).toBe(1); // a new person
     expect(parseSettings(JSON.stringify({ volume: 0.5, v: 19 })).camera).toBe(1); // settings kept before the camera had a choice
     expect(camera({ camera: 0 }, 19)).toBe(1); // Classic kept by every save since round 77, chosen or not: moved once
-    expect(camera({ camera: 2 }, 19)).toBe(2); // another look: a choice
-    expect(camera({ camera: 3 }, 19)).toBe(3);
+    expect(camera({ camera: 2 }, 19)).toBe(0); // another look, the Long lens, since taken out: Classic
+    expect(camera({ camera: 3 }, 19)).toBe(2); // Tight shoulder, in its new place
     expect(camera({ camera: 0 }, 20)).toBe(0); // Classic chosen since: kept
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), camera: 0 });

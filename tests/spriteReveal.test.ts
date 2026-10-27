@@ -5,7 +5,12 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { LOOKS } from '../src/data/looks';
+import { REVIEWED_MATTER } from '../src/data/reviewedLook';
 import { FX, LANTERN } from '../src/data/tuning';
+import type { Rgb } from '../src/render/palette';
+import { gradeTints } from '../src/render/realmPalette';
+import { toneOf, type Tone } from '../src/render/spriteTone';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
 import { SPRITE_GRADE_GLSL } from '../src/render/shaders/spriteGrade';
 import { worldUniforms } from '../src/render/worldMaterial';
@@ -31,12 +36,40 @@ describe('a creature in the lantern\'s light shows its own colours (round 93)', 
     expect(FX.spriteReveal[0]).toBeGreaterThan(0);
     expect(FX.spriteReveal[1]).toBeGreaterThan(FX.spriteReveal[0]);
     expect(SPRITE_FRAG).toMatch(/uniform vec2 uSpriteReveal;/);
-    expect(SPRITE_GRADE_GLSL).toMatch(/const vec4 SPRITE_DRAWN = vec4\(1\.0, 0\.0, 1\.0, 0\.0\)/); // no turn, no lift, no cast: spriteTone's PLAIN
+    expect(SPRITE_GRADE_GLSL).toMatch(/vec4 spriteToneBack\(vec4 tone, float k\)/); // the tone of a smaller share (round 95)
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
     const at = (s: string): number => src.indexOf(s);
     expect(at('smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y,')).toBeGreaterThan(at('t.rgb * light')); // the lantern's own light on it, as the light sums it
-    expect(at('spriteGraded(t.rgb * dot(light, vec3(0.2126, 0.7152, 0.0722)), SPRITE_DRAWN)')).toBeGreaterThan(-1); // its own colours, in all the light's brightness and none of its colour
-    expect(at('SPRITE_DRAWN')).toBeLessThan(at('float fog = vFog * uFogAmount'));
+    expect(at('col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost))')).toBeGreaterThan(at('vec3 col = glow ? t.rgb : t.rgb * light')); // the lit colour, the light's own colour on it
+    expect(at('spriteToneBack(vTone,')).toBeLessThan(at('float fog = vFog * uFogAmount'));
+  });
+
+  it('takes back most of the realm\'s tint, not all of it, so a lit creature is mostly its own colour with a trace of its realm (round 95)', () => {
+    expect(worldUniforms.uSpriteRevealMost.value).toBe(FX.spriteRevealMost);
+    expect(FX.spriteRevealMost).toBeGreaterThan(0.4); // its own colours read in the light
+    expect(FX.spriteRevealMost).toBeLessThan(1); // and the realm is not all taken away
+    expect(FX.spriteGrade * (1 - FX.spriteRevealMost)).toBeCloseTo(0.2, 6); // the share left in full light
+    expect(SPRITE_FRAG).toMatch(/uniform float uSpriteRevealMost;/);
+  });
+
+  it('gives in the light the tone of a smaller share: the same turn, lift and fill, scaled, so the hue goes back along the wheel and the colour stays whole (round 95)', () => {
+    const back = (t: Tone, k: number): Tone => { const a = Math.atan2(t.sin, t.cos) * k; return { cos: Math.cos(a), sin: Math.sin(a), boost: 1 + (t.boost - 1) * k, fill: t.fill * k }; }; // spriteToneBack, as the shader has it
+    let turned = 0;
+    for (const id of Object.keys(LOOKS)) {
+      const mid = gradeTints(LOOKS[id])[2] as Rgb;
+      for (const key of Object.keys(REVIEWED_MATTER)) {
+        const form = REVIEWED_MATTER[key] as Rgb;
+        for (const k of [1, 0.7, 1 - FX.spriteRevealMost]) {
+          const got = back(toneOf(form, mid, FX.spriteGrade), k), want = toneOf(form, mid, FX.spriteGrade * k);
+          expect(Math.atan2(got.sin, got.cos), `${key} in ${id}`).toBeCloseTo(Math.atan2(want.sin, want.cos), 9);
+          expect(got.fill, `${key} in ${id}`).toBeCloseTo(want.fill, 9);
+          expect(got.boost).toBeGreaterThanOrEqual(1);
+          expect(got.boost, `${key} in ${id}`).toBeLessThanOrEqual(want.boost + 1e-9); // (where the lift is held at its most, a little less lift than the smaller share's own)
+        }
+        if (Math.abs(toneOf(form, mid, FX.spriteGrade).sin) > 0.05) turned++;
+      }
+    }
+    expect(turned).toBeGreaterThan(100); // (the test has dull forms to turn)
   });
 
   it('is whole within a few metres of the lantern, partial toward the edge of its light, and the realm\'s again beyond it', () => {

@@ -214,6 +214,6 @@ describe('every form in every realm', () => {
 describe('the shader\'s side of it', () => {
   it('is handed the form\'s tone at each pixel, and a form with none is drawn as it is', () => {
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
-    expect(src).toContain('spriteGraded(col, vTone)');
+    expect(src).toContain('spriteGraded(col, spriteToneBack(vTone,'); // (round 95: in the lantern's light, the tone of a smaller share)
   });
 });

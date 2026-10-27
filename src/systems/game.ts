@@ -203,7 +203,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   const tune = CAMERA_MODES[g.camera.mode];
   const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + tune.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null && !g.player.glance ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  const frame = g.lock.target !== null && !g.player.mount.active ? frameOf(g, g.lock.target) : null; // a foe held in the lock is framed (Low hero, Long lens); a person spoken to, or a rig driven, is not
+  const frame = g.lock.target !== null && !g.player.mount.active ? frameOf(g, g.lock.target) : null; // a foe held in the lock is framed (Low hero); a person spoken to, or a rig driven, is not
   stepCamera(g.camera, { lookX, lookY, pivot, focus, frame, behind: tr.yaw, distance: g.player.mount.active ? tune.mountDistance : tune.distance, probe: g.player.falling ? g.player.falling.lip.y + tune.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
 }
 

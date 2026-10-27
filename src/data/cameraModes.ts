@@ -1,17 +1,17 @@
 /**
- * The gameplay camera's four looks (round 77, asked: Classic stays selectable and three more are options in Settings › Play, after pictures
- * of each: docs/DECISIONS.md; round 82, asked: Low hero is the default). Classic is the boom as it was, from `CAMERA`. Low hero hangs lower and closer behind the shoulder with a wider
- * lens. Long lens stands far back behind a telephoto. Tight shoulder hangs close and over the shoulder. Low hero and Long lens, locked on to a
- * foe, gather the lens back and aim it between the investigator and the foe, further for a taller one, so that a colossus is seen whole instead
+ * The gameplay camera's three looks (round 77, asked: Classic stays selectable and others are options in Settings › Play, after pictures
+ * of each: docs/DECISIONS.md; round 82, asked: Low hero is the default; the Long lens, a telephoto from far back, was taken out again at the owner's word). Classic is the boom as it was, from `CAMERA`.
+ * Low hero hangs lower and closer behind the shoulder with a wider lens. Tight shoulder hangs close and over the shoulder. Low hero, locked on to a
+ * foe, gathers the lens back and aims it between the investigator and the foe, further for a taller one, so that a colossus is seen whole instead
  * of the camera sitting under it (the player cannot turn the camera while locked on, so only the game can do this).
  * Every boom stays on the line the picture looks along (`rig.yaw`), which the sticks, the lock, the hurt edge and the minimap read.
  */
 
 import { CAMERA, RENDER } from './tuning';
 
-export type CameraMode = 'classic' | 'hero' | 'long' | 'shoulder';
+export type CameraMode = 'classic' | 'hero' | 'shoulder';
 /** In the order of the setting's values: 0 is Classic, 1 Low hero, the default (`SETTINGS.camera`). `createCameraRig` still starts from Classic, so the simulation and its tests do not depend on the setting. */
-export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'long', 'shoulder'];
+export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'shoulder'];
 
 /** How a locked-on foe is framed: its height `H` in metres (clamped to `height`) sets everything. */
 export interface FrameTuning {
@@ -40,8 +40,6 @@ export interface CameraTuning {
   lockPitchMax: number;
   easeOut: number; // m/s the boom grows back after a pull-in
   fov: number; // degrees, vertical
-  /** A narrow lens needs its boom: where a wall cuts the boom short the lens widens, as far as this many degrees, to keep the figure the size it was (Long lens). */
-  keepFov?: number;
   frame: FrameTuning | null; // null: a lock only turns the boom toward the foe
 }
 
@@ -86,30 +84,6 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
       pitchMost: 0.35,
       tall: [3, 14],
       fovTall: 62,
-    },
-  },
-  long: {
-    ...CLASSIC,
-    pivotHeight: 1.5,
-    distance: 11,
-    mountDistance: 14,
-    shoulder: 0.4,
-    pitch: 0.17,
-    pitchMax: 0.8,
-    easeOut: 8,
-    fov: 32,
-    keepFov: 68,
-    frame: {
-      follow: 2.5,
-      height: [1.6, 24],
-      lead: 0.5,
-      leadMax: 9,
-      back: [6, 0.95, 7, 22],
-      aim: [0.46, 1.5, 9],
-      lensUp: [0.4, 0.14, 0.5, 2.4],
-      pitchMost: 0.3,
-      tall: [3, 14],
-      fovTall: 34,
     },
   },
   shoulder: {
