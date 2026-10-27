@@ -1,5 +1,5 @@
 /**
- * The foes' own shapes in the shadow maps (round 92; render/silhouetteCasters.ts, castPlan.ts, shaders/castSprite.ts): a picture's
+ * The foes' own shapes in the shadow maps (round 93; render/silhouetteCasters.ts, castPlan.ts, shaders/castSprite.ts): a picture's
  * cut-out stands across the light and leans back from it until its shadow is as long as the body is tall, is larger for a horror,
  * shares the sprite batch's buffers, is told by the creature views, and is drawn into the moon's, the lantern's and the lamps' maps
  * after their solids and in nothing the investigator's camera draws.
@@ -8,10 +8,11 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { CAST } from '../src/data/fxTuning';
 import { castCorner, leanOf, loomOf, shadowReach, turnOf } from '../src/render/castPlan';
+import { LANTERN_CASTER } from '../src/render/colliderShadow';
 import { createCreatureViews } from '../src/render/creatureViews';
 import { createLampShadows } from '../src/render/lampShadows';
 import { createLanternShadow } from '../src/render/lanternShadow';
-import { createMoonShadow } from '../src/render/moonShadow';
+import { CASTER, createMoonShadow } from '../src/render/moonShadow';
 import { createSilhouetteCasters, castSilhouettes } from '../src/render/silhouetteCasters';
 import { CAST_FRAG, CAST_VERT } from '../src/render/shaders/castSprite';
 import { spriteBatch } from '../src/render/sprites/batch';
@@ -287,21 +288,24 @@ function entity(id: string, assetGroup: ReviewedEntity['assetGroup'], scale: num
   return { id, name: id, assetGroup, scale, scaleUnit: 'metres', page: 0, directions: { front: view(), back: view(), left: view(), right: view() } };
 }
 
+const HEIGHT: Record<string, number> = { azathoth: 14, shub_niggurath: 18 }; // the painted horrors of the library, by their height in metres (the others are sprites, drawn by the side)
+
 function viewsOver(ids: string[]) {
   const g = createGame();
   const manifest: ReviewedManifest = {
     format: 'seventy-steps-reviewed-atlas-v1', entityCount: ids.length, frameCount: 1,
     pages: [{ file: 'page.png', width: 128, height: 128, sha256: '' }],
     frames: [{ source: 'f.png', sourceSha256: '', pixelSha256: '', width: 64, height: 64, bounds: [8, 4, 56, 62], page: 0, x: 0, y: 0 }],
-    entities: Object.fromEntries(ids.map((id) => [id, entity(id, id === 'azathoth' ? 'bosses' : 'sprites', id === 'azathoth' ? 14 : 2)])),
+    entities: Object.fromEntries(ids.map((id) => [id, entity(id, id in HEIGHT ? 'bosses' : 'sprites', HEIGHT[id] ?? 2)])),
   };
   const atlas: SpriteAtlas = {
     width: 64, height: 64, data: new Uint8Array(64 * 64 * 4), frames: new Map(), eyes: new Float32Array(4), eyeColors: new Float32Array(3),
     reviewed: { manifest, pages: [{} as HTMLImageElement] },
   };
-  const views = createCreatureViews(new THREE.Scene(), g, atlas);
+  const scene = new THREE.Scene();
+  const views = createCreatureViews(scene, g, atlas);
   const info = (): Float32Array => ((castSilhouettes.scene.children[1] as THREE.InstancedMesh).geometry.getAttribute('aCast') as THREE.InstancedBufferAttribute).array as Float32Array;
-  return { g, views, info };
+  return { g, views, info, scene };
 }
 
 describe('the creatures\' own shapes, told by the creature views', () => {
@@ -327,6 +331,30 @@ describe('the creatures\' own shapes, told by the creature views', () => {
     spawnCreature(none.g, 'moon_bog_wraith', { x: 0, z: 6, yaw: 0 });
     none.views.update(1, 1, new THREE.PerspectiveCamera());
     expect(none.info()[0]).toBe(0);
+  });
+
+  it('cast for every creature that has a picture in the library, the three horrors whose pictures are being drawn again (Shub-Niggurath, Nug, Yeb) among them: a new picture of the same name casts with no change here', () => {
+    for (const id of ['shub_niggurath', 'nug', 'yeb']) {
+      const { g, views, info } = viewsOver([id]);
+      spawnCreature(g, id, { x: 0, z: 8, yaw: 0 });
+      views.update(1, 1, new THREE.PerspectiveCamera());
+      expect(info()[0], id).toBe(1);
+      expect(info()[1], id).toBeGreaterThan(1);
+    }
+  });
+
+  it('are all a creature stands in the shadow passes as: no rounded stand-in body is put in the world\'s scene any more', () => {
+    const { g, views, scene } = viewsOver(['deep_one']);
+    spawnCreature(g, 'deep_one', { x: 0, z: 6, yaw: 0 });
+    views.update(1, 1, new THREE.PerspectiveCamera());
+    const moon = new THREE.Layers();
+    moon.set(CASTER);
+    const lantern = new THREE.Layers();
+    lantern.set(LANTERN_CASTER);
+    scene.traverse((o) => {
+      expect(o.layers.test(moon)).toBe(false);
+      expect(o.layers.test(lantern)).toBe(false);
+    });
   });
 
   it('are collected every frame, and forgotten when no creature is drawn', () => {

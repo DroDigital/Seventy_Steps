@@ -1,5 +1,5 @@
 /**
- * A foe's picture as a shadow (round 92; render/silhouetteCasters.ts draws it into the moon's, the lantern's and the lamps' depth
+ * A foe's picture as a shadow (round 93; render/silhouetteCasters.ts draws it into the moon's, the lantern's and the lamps' depth
  * maps, after the solids). The picture's own billboard shares its instance buffers (the cell, the flip, the death's texels), but is
  * stood across the light and not across the camera, and leans back from the light until its shadow is as long as the body is tall
  * (render/castPlan.ts: `leanOf`); a texel of the body is written to the map, a texel of nothing is not, so the shadow is the body's

@@ -1,12 +1,12 @@
 /**
- * The foes' own shapes in the shadow maps (round 92; render only). Until now a creature stood in the moon's, the lantern's and the
- * lamps' shadows as a rounded stand-in body (render/creatureCasters.ts) of one shape for all, capped in height, so a shadow was a
- * wedge the same for a Deep One and a colossus. Each creature drawn from the sprite batches now also casts its picture: one
- * more mesh for each batch, sharing its geometry, instance matrices and texels (a claw raised in a blow is raised in the shadow, a
- * body that crumbles crumbles in it), stood across the light and leaned back from it (render/castPlan.ts, shaders/castSprite.ts),
- * larger than the body for a horror, and drawn into whichever depth map a pass is making, after the solids, from the light's own
- * camera. The meshes live in a scene of their own, so the passes' override materials (which have no texture to cut a shape out of)
- * do not reach them, and no camera of the player's ever draws them.
+ * The foes' own shapes in the shadow maps (round 93; render only). Round 83 stood each creature in the moon's, the lantern's and the
+ * lamps' shadows as a rounded stand-in body of one shape for all, capped in height, so a shadow was the same wedge for a Deep One
+ * and a colossus. Each creature drawn from the sprite batches now casts its own picture instead: one more mesh for each batch,
+ * sharing its geometry, instance matrices and texels (a claw raised in a blow is raised in the shadow, a body that crumbles
+ * crumbles in it), stood across the light and leaned back from it (render/castPlan.ts, shaders/castSprite.ts), larger than the
+ * body for a horror, and drawn into whichever depth map a pass is making, after the solids, from the light's own camera. The
+ * meshes live in a scene of their own, so the passes' override materials (which have no texture to cut a shape out of) do not
+ * reach them, and no camera of the player's ever draws them.
  */
 
 import * as THREE from 'three';
@@ -37,7 +37,7 @@ export interface SilhouetteCasters {
   put(slot: number, index: number, x: number, z: number, height: number, feet: number, deep: number, keep: number, from: { x: number; z: number }): void;
   /** The frame's bodies are told. */
   end(): void;
-  /** Draws the bodies into the map being made, as `camera` sees it (the light's own), after its solids; `back` is how far behind a body its cut-out stands (a map drawn from a point: round 92's `CAST.back`). */
+  /** Draws the bodies into the map being made, as `camera` sees it (the light's own), after its solids; `back` is how far behind a body its cut-out stands (a map drawn from a point: round 93's `CAST.back`). */
   draw(renderer: THREE.WebGLRenderer, camera: THREE.Camera, light: CastLight): void;
 }
 

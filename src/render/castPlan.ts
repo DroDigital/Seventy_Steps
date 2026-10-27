@@ -1,5 +1,5 @@
 /**
- * How a foe's cut-out stands for a light (round 92; render only, pure): the arithmetic the shadow vertex shader
+ * How a foe's cut-out stands for a light (round 93; render only, pure): the arithmetic the shadow vertex shader
  * (shaders/castSprite.ts) does, written once here where it can be tested, and the size of the shadow a body casts.
  */
 

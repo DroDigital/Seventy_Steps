@@ -125,7 +125,7 @@ export function createMoonShadow(): MoonShadow {
       renderer.setRenderTarget(target);
       renderer.render(scene, camera);
       scene.overrideMaterial = material;
-      castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 92: the foes' own shapes, across the moon)
+      castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 93: the foes' own shapes, across the moon)
       renderer.setRenderTarget(was);
     },
   };

@@ -252,7 +252,7 @@ export const BLOB = {
 } as const;
 
 /**
- * What a foe's own picture casts into the moon's, the lantern's and the lamps' shadow maps (round 92; render/silhouetteCasters.ts,
+ * What a foe's own picture casts into the moon's, the lantern's and the lamps' shadow maps (round 93; render/silhouetteCasters.ts,
  * shaders/castSprite.ts, castPlan.ts): its animated outline, stood across the light and leaned back, so its shadow is its own
  * shape (a claw raised in the blow is raised in the shadow) and always as long as it is tall; the horrors' are larger than they are.
  */
@@ -265,7 +265,7 @@ export const CAST = {
   reach: 48, // metres from the investigator beyond which a foe casts none
   least: 0.4, // the least opacity of a picture that casts: a shimmer in the air (an invisible stalker) casts none
   keep: 0.05, // the share of a picture left, below which it casts none (a creature dying)
-  loom: { base: 0.12, size: 0.3, from: 3, to: 12, deep: 0.28, wide: 0.5 }, // how much larger its shadow is than the body: every foe's by `base`; by `size` more for a body 3 to 12 metres tall; by `deep` more for a horror in the last phase of its fight; and `wide` the share of that it is broader by
+  loom: { base: 0.15, size: 0.4, from: 3, to: 12, deep: 0.28, wide: 0.5 }, // how much larger its shadow is than the body: every foe's by `base`; by `size` more for a body 3 to 12 metres tall; by `deep` more for a horror in the last phase of its fight; and `wide` the share of that it is broader by
 } as const;
 
 /** The track of a blow (render/swingTrails.ts; round 83). */
