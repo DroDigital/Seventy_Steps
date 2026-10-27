@@ -1,6 +1,6 @@
-/** The camera's four looks (round 77): Classic is the boom as it was; the others hang differently, and two of them frame a locked-on foe. */
+/** The camera's four looks, including size-aware framing for Classic's locks. */
 
-import { PerspectiveCamera } from 'three';
+import { PerspectiveCamera, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { v3, type V3 } from '../src/core/geom';
 import { CAMERA_MODES, CAMERA_MODE_IDS, cameraModeOf, type CameraMode } from '../src/data/cameraModes';
@@ -38,33 +38,74 @@ const sub = (a: V3, b: V3): V3 => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z })
 const horizontal = (a: V3, b: V3): number => Math.hypot(a.x - b.x, a.z - b.z);
 
 describe('the setting', () => {
-  it('names a look for each value, Low hero for the default, Classic and Tight shoulder for what is out of range', () => {
+  it('names a look for each value, Classic for the default and Tight shoulder for what is out of range', () => {
     expect(CAMERA_MODE_IDS.map((_, i) => cameraModeOf(i))).toEqual(['classic', 'hero', 'long', 'shoulder']);
-    expect(cameraModeOf(SETTINGS.camera[3])).toBe('hero'); // Low hero is the default (round 82)
+    expect(cameraModeOf(SETTINGS.camera[3])).toBe('classic');
     expect(cameraModeOf(-4)).toBe('classic');
     expect(cameraModeOf(99)).toBe('shoulder');
     expect(SETTINGS.camera[1]).toBe(CAMERA_MODE_IDS.length - 1);
   });
 
-  it('keeps Classic as the numbers it always had', () => {
+  it('keeps Classic close to its original free camera and frames locks', () => {
     const c = CAMERA_MODES.classic;
-    expect([c.pivotHeight, c.distance, c.shoulder, c.pitch, c.fov, c.frame]).toEqual([CAMERA.pivotHeight, CAMERA.distance, CAMERA.shoulder, CAMERA.pitch, RENDER.fovDeg, null]);
+    expect([c.pivotHeight, c.distance, c.shoulder, c.fov]).toEqual([CAMERA.pivotHeight, CAMERA.distance, CAMERA.shoulder, RENDER.fovDeg]);
+    expect(Math.abs(c.pitch - CAMERA.pitch)).toBeLessThan(0.1);
+    expect(c.frame).not.toBeNull();
     expect(createCameraRig(0).mode).toBe('classic');
   });
 });
 
 describe('Classic', () => {
-  it('is not moved by a foe held in the lock: the same camera with or without a frame', () => {
-    const [a, b] = [createCameraRig(0), createCameraRig(0)];
-    const foe: Frame = { feet: v3(0, 0, 8), height: 14 };
-    run(a, 240, v3(0, CAMERA.pivotHeight, 0), foe);
-    for (let i = 0; i < 240; i++) stepCamera(b, { ...still, pivot: v3(0, CAMERA.pivotHeight, 0), focus: { x: 0, y: 6, z: 8 } }, open, 1 / 60); // (the same lock, the frame left out)
-    expect(a.lead).toBe(0);
-    expect(a.rise).toBe(0);
-    expect(a.reach).toBe(CAMERA.distance);
-    expect(a.fov).toBe(RENDER.fovDeg);
-    expect(a.pos).toEqual(b.pos);
-    expect(a.pitch).toBe(b.pitch);
+  it('keeps a small locked foe visible above the investigator at combat distance', () => {
+    const pivot = v3(0, CAMERA_MODES.classic.pivotHeight, 0);
+    const rig = createCameraRig(0, 'classic');
+    run(rig, 400, pivot, { feet: v3(0, 0, 5), height: 1.6 });
+    const { base } = hangPoint(open, anchorPoint(pivot, rig.yaw, rig.lead, rig.rise), rig.yaw, undefined, CAMERA_MODES.classic.shoulder);
+    const camera = new PerspectiveCamera(rig.fov, 16 / 9, 0.1, 100);
+    camera.position.set(rig.pos.x, rig.pos.y, rig.pos.z);
+    camera.lookAt(base.x, base.y, base.z);
+    camera.updateMatrixWorld();
+    const head = new Vector3(0, 1.8, 0).project(camera);
+    const foe = new Vector3(0, 0.8, 5).project(camera);
+    expect(foe.y).toBeGreaterThan(head.y);
+  });
+
+  it('adapts its framing to each locked foe while retaining a close view of a person', () => {
+    const tune = CAMERA_MODES.classic;
+    const pivot = v3(0, tune.pivotHeight, 0);
+    const rigs = [1.8, 6, 14].map((height) => {
+      const rig = createCameraRig(0, 'classic');
+      run(rig, 400, pivot, { feet: v3(0, 0, 8), height });
+      return rig;
+    });
+    expect(horizontal(rigs[0].pos, pivot)).toBeLessThan(CAMERA.distance + 2);
+    expect(rigs[1].reach).toBeGreaterThan(rigs[0].reach);
+    expect(rigs[2].reach).toBeGreaterThan(rigs[1].reach);
+    expect(rigs[2].rise).toBeGreaterThan(rigs[0].rise);
+    for (const [i, height] of [1.8, 6, 14].entries()) {
+      expect(seen(rigs[i], pivot, v3(0, height, 8)), `top of ${height}m foe`).toBe(true);
+      expect(seen(rigs[i], pivot, v3(0, 0, 8)), `feet of ${height}m foe`).toBe(true);
+    }
+  });
+
+  it('eases when switching target size and when releasing the lock', () => {
+    const pivot = v3(0, CAMERA_MODES.classic.pivotHeight, 0);
+    const rig = createCameraRig(0, 'classic');
+    run(rig, 400, pivot, { feet: v3(0, 0, 8), height: 1.8 });
+    let last = { ...rig.pos }, worst = 0;
+    for (let i = 0; i < 300; i++) {
+      run(rig, 1, pivot, { feet: v3(0, 0, 8), height: 14 });
+      worst = Math.max(worst, Math.hypot(rig.pos.x - last.x, rig.pos.y - last.y, rig.pos.z - last.z));
+      last = { ...rig.pos };
+    }
+    expect(worst).toBeLessThan(0.6);
+    const reach = rig.reach;
+    run(rig, 20, pivot, null);
+    expect(rig.reach).toBeLessThan(reach);
+    expect(rig.reach).toBeGreaterThan(CAMERA_MODES.classic.distance);
+    run(rig, 600, pivot, null);
+    expect(rig.reach).toBeCloseTo(CAMERA_MODES.classic.distance, 1);
+    expect(rig.lead).toBeLessThan(0.05);
   });
 });
 
@@ -140,10 +181,10 @@ describe('the looks that frame a foe', () => {
     expect([rig.lead, rig.rise]).toEqual([0, 0]);
   });
 
-  it('a wall stops the anchor short, as it stops the boom', () => {
+  it.each(['classic', 'hero'] as const)('%s: a wall stops the anchor short, as it stops the boom', (mode) => {
     const w = createArenaWorld();
-    const rig = createCameraRig(0, 'hero');
-    const pivot = v3(-8, 1.05, -2); // the pillar at (-8, 1) is between it and a foe beyond
+    const rig = createCameraRig(0, mode);
+    const pivot = v3(-8, CAMERA_MODES[mode].pivotHeight, -2); // the pillar at (-8, 1) is between it and a foe beyond
     run(rig, 300, pivot, { feet: v3(-8, 0, 6), height: 14 }, w);
     expect(rig.lead).toBeLessThan(2.2);
   });
@@ -217,13 +258,13 @@ describe('what the game gives the camera', () => {
     expect(size('edward_hutchinson')).toBeLessThan(3);
   });
 
-  it('a lock held in the game is framed in Low hero and not in Classic', () => {
-    for (const [mode, framed] of [['hero', true], ['classic', false]] as const) {
+  it('a lock held in the game is framed in Low hero and Classic', () => {
+    for (const mode of ['hero', 'classic'] as const) {
       const { g, deepOne } = scriptedGame();
       setCameraMode(g.camera, mode);
       setLock(g, deepOne);
       steps(g, 240);
-      expect(g.camera.lead > 0.5, mode).toBe(framed);
+      expect(g.camera.lead, mode).toBeGreaterThan(0.5);
     }
   });
 

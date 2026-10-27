@@ -14,7 +14,7 @@ function memoryStore() {
 describe('settings', () => {
   it('defaults to full FX, sensitivity 1, 800 × 450 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, relight: 0, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, questTracker: 1, quietWalk: 1, camera: 1, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, relight: 0, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, questTracker: 1, quietWalk: 1, camera: 0, padSwap: 0,
       volume: 1, music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
     expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([800, 450]);
@@ -124,17 +124,17 @@ describe('settings', () => {
     expect(parseSettings(JSON.stringify({ ...round59, resolution: 1.6, v: 17 })).resolution).toBe(1.6); // 17's choice of picture is still its own
   });
 
-  it('makes Low hero the camera for a person who has the first default, Classic, kept in their settings (round 82), and keeps every other choice', () => {
+  it('defaults to Classic while preserving saved camera choices', () => {
     const camera = (o: object, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), ...o, v })).camera;
-    expect(defaultSettings().camera).toBe(1);
-    expect(parseSettings(null).camera).toBe(1); // a new person
-    expect(parseSettings(JSON.stringify({ volume: 0.5, v: 19 })).camera).toBe(1); // settings kept before the camera had a choice
-    expect(camera({ camera: 0 }, 19)).toBe(1); // Classic kept by every save since round 77, chosen or not: moved once
-    expect(camera({ camera: 2 }, 19)).toBe(2); // another look: a choice
-    expect(camera({ camera: 3 }, 19)).toBe(3);
-    expect(camera({ camera: 0 }, 20)).toBe(0); // Classic chosen since: kept
+    expect(defaultSettings().camera).toBe(0);
+    expect(parseSettings(null).camera).toBe(0);
+    expect(parseSettings(JSON.stringify({ volume: 0.5, v: 19 })).camera).toBe(0);
+    for (const choice of [0, 1, 2, 3]) {
+      expect(camera({ camera: choice }, 20)).toBe(choice);
+      expect(camera({ camera: choice }, 19)).toBe(choice);
+    }
     const store = memoryStore();
-    storeSettings(store, { ...defaultSettings(), camera: 0 });
-    expect(loadSettings(store).camera).toBe(0); // and a save of it keeps it
+    storeSettings(store, { ...defaultSettings(), camera: 1 });
+    expect(loadSettings(store).camera).toBe(1);
   });
 });
