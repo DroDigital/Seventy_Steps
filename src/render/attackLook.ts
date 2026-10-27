@@ -11,11 +11,12 @@ import type { Game } from '../systems/components';
 import { creatureOf } from '../systems/creatures';
 import { SIGNATURES, type Signature } from '../data/attackSignatures';
 import { BOSS_ATTACK_THEME, type AttackTheme } from '../data/bossAttackTheme';
+import { blowOf, type FoeBlow } from '../data/foeBlows';
 import { getEntity } from '../data/registry';
 import type { CreaturePalette } from '../data/schema';
 import { aoeLook, type AoeMotif } from './aoeLook';
 import { DEFAULT_ATTACK_THEME } from './attackTheme';
-import { BASE, CREATURE_COLORS, luma, mixRgb, rgbToHsv, scaleRgb, type Rgb } from './palette';
+import { BASE, CREATURE_COLORS, luma, mixRgb, rgbToHsv, rotateHue, scaleRgb, type Rgb } from './palette';
 
 /** The least brightness (Rec. 709 luma, 0..1) of a colour that marks where a blow will fall. */
 export const DANGER_FLOOR = 0.42;
@@ -79,7 +80,34 @@ function foeTheme(accent: Rgb, id: string): AttackTheme {
   return { danger: mixRgb(accent, hide.mid, 0.3), line: mixRgb(accent, hide.light, 0.3), ring: mixRgb(hide.light, accent, 0.3), mind: [accent[1], accent[2], accent[0]] };
 }
 
+/**
+ * The look of a creature that draws its blow as a mark (round 90, data/foeBlows.ts): its three hues, lifted where the eye must find them. A mark
+ * starts in the first and drifts through the second to the third as it fades; the gap between the hues is what tells two creatures apart.
+ * No signature: nothing of it throws what the horrors' blows throw. Its element (`motif`, which the sounds follow) and temper are what they were.
+ */
+function blowLook(id: string, blow: FoeBlow): AttackLook {
+  const [h0, h1, h2] = blow.hues.map(rgbOf) as [Rgb, Rgb, Rgb];
+  const accent = lift(h0, LIGHT_FLOOR);
+  const line = lift(mixRgb(h0, h1, 0.35), LIGHT_FLOOR);
+  const danger = lift(h1, DANGER_FLOOR);
+  return {
+    motif: MADE_OF[paletteOf(id)],
+    danger,
+    line,
+    ring: lift(mixRgb(h1, h2, 0.4), DANGER_FLOOR),
+    mind: lift(rotateHue(h1, 40 / 360), DANGER_FLOOR),
+    core: mixRgb(line, [1, 1, 1], 0.7),
+    ember: scaleRgb(mixRgb(danger, BASE.charcoal, 0.4), 0.5),
+    ink: mixRgb(accent, CREATURE_COLORS[paletteOf(id)].dark, 0.75),
+    ...temper(id),
+    sig: null,
+    accent,
+  };
+}
+
 function build(id: string | undefined, given: AttackTheme): AttackLook {
+  const blow = id && !BOSS_ATTACK_THEME[id] && getEntity(id) ? blowOf(id) : undefined;
+  if (id && blow) return blowLook(id, blow);
   const themed = !!id && given !== DEFAULT_ATTACK_THEME;
   const plain = !themed && !!id && !!getEntity(id);
   const sig = (id && SIGNATURES[id]) || null;
@@ -117,3 +145,16 @@ export function attackLook(g: Game, id: Entity): AttackLook {
 
 /** Whether roster id `id` is one of the horrors with colours of its own. */
 export const isThemed = (id: string | undefined): boolean => !!id && !!BOSS_ATTACK_THEME[id];
+
+/** Whether entity `id` is a creature of the roster that is not one of the horrors (round 90): its blows are the quiet ones of `render/foeFx.ts`, and the horrors' machinery (`meleeFx`, `attackFx`) leaves it be. */
+export const isQuiet = (g: Game, id: Entity): boolean => {
+  const model = g.ecs.c.model.get(id);
+  if (!model) return false;
+  let quiet = quietModels.get(model);
+  if (quiet === undefined) {
+    const who = creatureOf(g, id)?.id;
+    quietModels.set(model, (quiet = !!who && !isThemed(who)));
+  }
+  return quiet;
+};
+const quietModels = new Map<string, boolean>(); // (asked of every body every frame: the answer is the model's)

@@ -20,7 +20,7 @@ export const CREDITS: readonly CreditBlock[] = [
   {
     heading: 'MODELS, FLAMES AND SURFACES',
     lines: [
-      'free models and animations, reduced, coloured and set for the game:',
+      'free models, animations and particle sprites, reduced, coloured and set for the game:',
       'licensed CC BY 4.0: FlukierJupiter · andrewriddle · KRei · Mad_Lobster_Workshop · Jochon · rkuhlf · INGSOC1984 · carismah',
       'Heliona · Özlem Çandır · KIFIR · vertexgrocer · davdadams',
       'Samuel Francis Johnson (Oneironauticus) · TheoClarke · Goblinatron (PSX Dungeon) · BlenderVoyage · bobjh · Marin PETTE · 3D Vault',
