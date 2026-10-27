@@ -27,7 +27,7 @@ export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, tors
   'father_dagon': [0.315, 0.371, 0.24],
   'ghatanothoa': [0.321, 0.288, 0.21],
   'mother_hydra': [0.401, 0.413, 0.205],
-  'shub_niggurath': [0.54, 0.322, 0.023],
+  'shub_niggurath': [0.38, 0.372, 0.297],
   'yog_sothoth': [0.431, 0.374, 0.204],
 };
 
@@ -55,7 +55,6 @@ export const REVIEWED_GLINTS: Readonly<Record<string, readonly [r: number, g: nu
   'the_hound': [0.169, 1.0, 0.627],
   'the_outsider': [0.929, 0.902, 0.8],
   'winged_hybrid': [0.667, 0.663, 0.663],
-  'yeb': [0.929, 0.902, 0.8],
 };
 
 /** By form: the colour (0..1) of its own flesh, hide, shell or stone: what a blow throws off it. */
@@ -126,7 +125,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'mother_hydra': [0.299, 0.286, 0.24],
   'nameless_city_reptile': [0.291, 0.244, 0.177],
   'night_gaunt': [0.106, 0.107, 0.113],
-  'nug': [0.25, 0.215, 0.201],
+  'nug': [0.419, 0.301, 0.235],
   'nyarlathotep': [0.135, 0.1, 0.125],
   'nyarlathotep#eldritch': [0.2, 0.145, 0.162],
   'other_gods': [0.231, 0.185, 0.228],
@@ -138,7 +137,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'shantak': [0.171, 0.17, 0.177],
   'shoggoth': [0.069, 0.079, 0.093],
   'shoggoth#boss': [0.079, 0.076, 0.097],
-  'shub_niggurath': [0.078, 0.026, 0.087],
+  'shub_niggurath': [0.182, 0.157, 0.153],
   'shunned_house_entity': [0.396, 0.344, 0.242],
   'simon_orne': [0.082, 0.079, 0.09],
   'star_spawn': [0.169, 0.215, 0.197],
@@ -156,7 +155,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'whisperer#eldritch': [0.232, 0.179, 0.196],
   'wilbur_whateley': [0.31, 0.182, 0.124],
   'winged_hybrid': [0.068, 0.066, 0.078],
-  'yeb': [0.124, 0.119, 0.133],
+  'yeb': [0.254, 0.191, 0.165],
   'yekubian': [0.313, 0.306, 0.304],
   'yig': [0.278, 0.222, 0.145],
   'yithian': [0.457, 0.438, 0.372],

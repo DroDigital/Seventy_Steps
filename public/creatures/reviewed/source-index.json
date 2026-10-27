@@ -4,7 +4,7 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2856,
+  "unique_png_count": 2850,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
@@ -42,7 +42,10 @@
     "flying_polyp#boss: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
     "zkauba: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
     "ghoul: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
-    "ghoul#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored."
+    "ghoul#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
+    "nug: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
+    "yeb: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 0 old frames dropped, right mirrored.",
+    "shub_niggurath: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 26 frames drawn (20 in place, 4 into places the old drawing left, 2 on a shelf), 16 old frames dropped, right mirrored, its 3 stoop frames (stoop, stoop_mid) drawn in place."
   ],
   "entities": [
     {
@@ -23195,27 +23198,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/front/idle_0.png",
-                  "sha256": "b4d611fb49855583b26c33e82c00ff50c06ad7c1e1000cdf0804951d650c388d"
+                  "sha256": "c75b7d8bf40c94107a3601396a5ecfd1227fb4f9cfe08da199c8289541ccd7bc"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/front/idle_1.png",
-                  "sha256": "aa359eb0fd6d55bb632641f74a777b698c4151a019ae7b8a4209860da8dcb7b6"
+                  "sha256": "13880b49704fe3a8ad1435266d98b32fe0baccdcbfbc363aa3856265b51d0027"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/front/move_0.png",
-                  "sha256": "c95fddf792a4f3caa2f97d52585ef959f22c293423acaf3154a65c832709d6f5"
+                  "sha256": "d02d238a9c07ef682857f682f861ebab4152268775f50b5137b966e32f2e4b4e"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/front/move_1.png",
-                  "sha256": "b8fe38baa100de7e62e5729261301abd18487c018e108396a52e09d0649510df"
+                  "sha256": "514f487cb45ebae7d374b9860b8c762bf6c8cefd7fd106c5db7674a6263973df"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/front/move_2.png",
+                  "sha256": "ef17c1baa53f04b38d7da889e528c3406d39403e1e2396f2ea5ca2e8f34d914a"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/front/move_3.png",
+                  "sha256": "21459be326b1dade0e67677bf831d9ac4f099ead945029d859e853b7ccf79da7"
                 }
               ]
             },
@@ -23225,17 +23238,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/nug/64x64/front/attack_0.png",
-                  "sha256": "13aed8083fb1087e61b9e9571bc9244a4f17b1cfee609b660a5d16a7ad147f7a"
+                  "sha256": "540b4b85329b76ce21a56960dc69c76292b630158f8b585b2ba7ac61a0ce059a"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/nug/64x64/front/attack_1.png",
-                  "sha256": "4c64ac8611ebf430ee9e3868bf3ffc0f27f6bbdff9f328ecd8d464c55b201221"
+                  "sha256": "653d52286122748cdf4dc4af5c18ccc7b30fe62ae2de120525824eaaa0711404"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/nug/64x64/front/attack_2.png",
-                  "sha256": "b81431412d125b7d8f4699666ffc7a88e4528c27a1e11b3b24c9b03a560ef940"
+                  "sha256": "f256afeda78a253ee4e81dd78617620218ad20a912bbba1636e3db3453f39160"
                 }
               ]
             },
@@ -23245,12 +23258,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/nug/64x64/front/hurt_0.png",
-                  "sha256": "2aaca0d8a76c802f91b17f26bbb9a58fa17d5f69cc8119c7c1344a2fba609bbd"
+                  "sha256": "949754cf24cf0e1fee02e07e87e134b8eef9e747f29e597d25f1bbc8120ecff7"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/nug/64x64/front/hurt_1.png",
-                  "sha256": "7022323782a156d778959010a64a8356eeadc6bdacbc2f141fbd4ff6b5c654b9"
+                  "sha256": "48e49c745f885372213c2aaf9a4a7d74320400f9a6acb259e0fa24a81a18b6cd"
                 }
               ]
             }
@@ -23266,27 +23279,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/back/idle_0.png",
-                  "sha256": "d09fbd1e83c3959e212fb71acc219a80b19bfc8ac20cb557d095cc6c299dbb67"
+                  "sha256": "4e18e3172ac1872e6529eed9d6ea9fda881a120aa011e963a59e00e70ce5b5ef"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/back/idle_1.png",
-                  "sha256": "9221734c8dada3a9a7fc8f9c500caa2c27e86dfb4055b75fcc0b3c504a165893"
+                  "sha256": "12e9714ea48a5de0a3c7deff030ea97a2534a0df985cde63b6050f643cb43d1c"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/back/move_0.png",
-                  "sha256": "bbf3b9759be6ffa7b8009fd478075af96978995b624ef123a4d1f91b6f3d462b"
+                  "sha256": "7852ba45a997515ea86fa2d3f0b12b3740b4f2e071d79393164c02c5b2670bc6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/back/move_1.png",
-                  "sha256": "2444b5fad99d43310e9fbdf2199055dbd22c2de7804de2fd367e4c5123bf34e9"
+                  "sha256": "44b102821e54216ab71e3aa28d22ba141bee25238c4eccbb5dfedb75f5ba90b7"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/back/move_2.png",
+                  "sha256": "abcb8bb18979203706dae5a19f2f4e053051754d05b5aea1150444999ee209c6"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/back/move_3.png",
+                  "sha256": "26cafa286cb77659b5daebadba270ebc2d33fb088cea5c3d3e25fd76ac800281"
                 }
               ]
             }
@@ -23302,27 +23325,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/left/idle_0.png",
-                  "sha256": "83f6b7238f25e203f26d8c90bfb459fc757fbbdc8c4aa32b9541998204eba05c"
+                  "sha256": "70a922bbbbf48d43c5a1a717455af5853e835631c4318da7cf41bfa03a023b7c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/left/idle_1.png",
-                  "sha256": "c195ae841f235e6c277e70b8fd1a5bc734e983288478d4751116e2d9a3c0f4c0"
+                  "sha256": "26cfc4670bb31e6db303ecda927d608e58ff5b18436bd340c1bc83b23ea45116"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/left/move_0.png",
-                  "sha256": "cd3f54a2aac3ac88daec5c7ca36889cde126df5778ce4808cb9fa530622f9868"
+                  "sha256": "81bdae03a93cedddd8aae366e4e6452a0e86b86df2172f059b9921d8f2c333bc"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/left/move_1.png",
-                  "sha256": "1f49bdbb99fa2512a267dd0795c21800775fe6e467b54ae7a53fc16283799142"
+                  "sha256": "ae6f361560c306ddc64d8166f75a564d76ef33b4a5c9fc4832d7fd6e5c57ef25"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/left/move_2.png",
+                  "sha256": "3c28ebb1843970da0789da0f05ca02f45c3e4cef892267f9f99a64cce61fe9a4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/left/move_3.png",
+                  "sha256": "03bfd56818d896497509c36845a98bb671babbfb2db45d1bef80bdb0be3c7855"
                 }
               ]
             }
@@ -23338,27 +23371,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/left/idle_0.png",
-                  "sha256": "83f6b7238f25e203f26d8c90bfb459fc757fbbdc8c4aa32b9541998204eba05c"
+                  "sha256": "70a922bbbbf48d43c5a1a717455af5853e835631c4318da7cf41bfa03a023b7c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/left/idle_1.png",
-                  "sha256": "c195ae841f235e6c277e70b8fd1a5bc734e983288478d4751116e2d9a3c0f4c0"
+                  "sha256": "26cfc4670bb31e6db303ecda927d608e58ff5b18436bd340c1bc83b23ea45116"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/left/move_0.png",
-                  "sha256": "cd3f54a2aac3ac88daec5c7ca36889cde126df5778ce4808cb9fa530622f9868"
+                  "sha256": "81bdae03a93cedddd8aae366e4e6452a0e86b86df2172f059b9921d8f2c333bc"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/left/move_1.png",
-                  "sha256": "1f49bdbb99fa2512a267dd0795c21800775fe6e467b54ae7a53fc16283799142"
+                  "sha256": "ae6f361560c306ddc64d8166f75a564d76ef33b4a5c9fc4832d7fd6e5c57ef25"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/left/move_2.png",
+                  "sha256": "3c28ebb1843970da0789da0f05ca02f45c3e4cef892267f9f99a64cce61fe9a4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/left/move_3.png",
+                  "sha256": "03bfd56818d896497509c36845a98bb671babbfb2db45d1bef80bdb0be3c7855"
                 }
               ]
             }
@@ -23384,27 +23427,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/front/idle_0.png",
-                  "sha256": "2e81fa240b42f06cef463004f3d6bdaad2b7de5caa595a2d0af92551392f9645"
+                  "sha256": "32991ff3f56ac8094ffd525b32fe49594b7b3da89063ada535a20829ff1fa576"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/front/idle_1.png",
-                  "sha256": "a699719f7df750291e4c4a20a4627e5b51935248b89f4468c5b948c86b3f5c64"
+                  "sha256": "fb37cd5e8809b5e16acdc71768a6a1f20ea3e62728f3b0b0991035029ac4005a"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/front/move_0.png",
-                  "sha256": "fb2f214f7accfc2341b26f62c7dc7783985c10df2c9efcf7c7d2cf6ff8a98c84"
+                  "sha256": "3e09d5346fbac149dfe354392b18dc18e363063a3085e15cdae00f4c8420f2b9"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/front/move_1.png",
-                  "sha256": "7c59a5f235ec0cc9feed5e8bb4e085cdaefa6d78ce8ce913d36078165c599726"
+                  "sha256": "44aa3acae0c565a56f2650bfc1d6f6c8eaf83f383f2e9a9243bf234c30456914"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/front/move_2.png",
+                  "sha256": "889fd93a48d9c72e921087339c062dbaa634e26ee4b925cb6245d76309e0c9d4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/front/move_3.png",
+                  "sha256": "69d18779db5c6711e98f55223ee949074bb7d7f6f35ba4b8c5eb3dc091037a11"
                 }
               ]
             },
@@ -23414,17 +23467,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/yeb/64x64/front/attack_0.png",
-                  "sha256": "0aa94ba3a7915b66aabaf20c9692e4e133b783fa0ebc624efdaccf948c7290c4"
+                  "sha256": "bcfc22e37c4775e667e0fc3376f24a4ddcb40d0ee84cef4494c56e6010fee5db"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/yeb/64x64/front/attack_1.png",
-                  "sha256": "323818bf230195933ce4cb231a987ca4d3b73e45557942aae07c0f0242f652fe"
+                  "sha256": "d8c2c2153e3a717407987160603ccebe357513ea15435213bf00db082b829e0d"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/yeb/64x64/front/attack_2.png",
-                  "sha256": "c423b2c42ff70fc8c5fa045b23db751bb01a0d68f5dab2cc1fb5fb722c64e432"
+                  "sha256": "69f5da72beb5bb7eae719fc250137d04943e188430494cdf99a897bcac160f27"
                 }
               ]
             },
@@ -23434,12 +23487,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/yeb/64x64/front/hurt_0.png",
-                  "sha256": "e32e24f6c3a2a5bf50503119ebc545ca5ee23a2ea01e3926cb94009f1cc583bd"
+                  "sha256": "2ef18fd69f512e3f7c2356ac4a0b62a33683e023cca939fa32e80a20e8c25665"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/yeb/64x64/front/hurt_1.png",
-                  "sha256": "2c4ca788a0aafbc79f3aeebcc442ce913cc11e27207be95999b70f4f2c66208c"
+                  "sha256": "56311f4d827f01802e5820c7bd5a396b08e33b1c1f4f546393d9b6aede7dd233"
                 }
               ]
             }
@@ -23455,27 +23508,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/back/idle_0.png",
-                  "sha256": "a5522b131f74ac39bb30308a9b62efab5c1019f0b616108598e7c4ef3bb99aec"
+                  "sha256": "6ff10c618493f2eda12aae1a614d1dde6a03e26265a30fa8097bbe6db37d0ff2"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/back/idle_1.png",
-                  "sha256": "affa6fa2eb12f18438cb36fcce11057db0b74c052d5c4c02d72432ad25094da1"
+                  "sha256": "0c6b75f75f6def2a1aa6af017401bc419717a26a7666e2c616c92f8549764c60"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/back/move_0.png",
-                  "sha256": "4e145f793ac4ab927aad44ba18c78b8c185424b1c5605b96d155166d8e108553"
+                  "sha256": "a913634326f4201632fd4e811922e5b7a6cd9fefcbbcb33a080b0f27d3ba0039"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/back/move_1.png",
-                  "sha256": "f859fa532b1f8fd32f7e37a8666504d7bbd66780557c448bfda4a3dd71fb0208"
+                  "sha256": "c92a02ccab20d05deeccdc3e6a941550eb856bcedd413045915f94de832e492e"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/back/move_2.png",
+                  "sha256": "47c11a5efaf45e8a330d9ec4889a630546c34ef8dd876ae726000d6f2ac2e6bb"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/back/move_3.png",
+                  "sha256": "db533405706076d4b36130d9a57f69df03356172ebabd138fc601918c75d39ce"
                 }
               ]
             }
@@ -23491,63 +23554,83 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/left/idle_0.png",
-                  "sha256": "816ecb03171c786cb96c31c802744169accfecdf142f75539c53cbbf9e8a996e"
+                  "sha256": "4afce6f7718be670e6564bf15c629df33c451f31339e9a2d1207c05cdba9c70c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/left/idle_1.png",
-                  "sha256": "9eaf946c53a201470d4dfe5c43202e5294ab17e5737246ebf5a13444b87075c1"
+                  "sha256": "7ae1a1bcbad6946eb75fc4f1347da3e36efe55ed1b74da863f1e95e3257de9db"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/left/move_0.png",
-                  "sha256": "9871f73f30c05e00b34b081f863a342bd46be813b150b9d56cb0066e279c29ac"
+                  "sha256": "e3cadd8789bef5f8b096397692c4f95706148058dd4f02aff62ec26a31207e40"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/left/move_1.png",
-                  "sha256": "58d3fec543f2a67779a9efcf1c7180054c01258d57d099578e5f6cd1d7d07cfd"
+                  "sha256": "0a583350e2173af75245ef70aa26f51315394099ff5e59fc80983e4c9658df7c"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/left/move_2.png",
+                  "sha256": "b491a636c1644dcb1ccf1a38031148eac4eb8db0c3c86d2a8e958b9436cdbdef"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/left/move_3.png",
+                  "sha256": "e43c971f45df46a0aa44de2ab08109189dd09f520892d54cfaed9fc5852a0d29"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "sprites/yeb/64x64/right/idle_0.png",
-                  "sha256": "3cd45fa48b1e900c873525ac45ff0047c9f4181c589e76ffda5196859ce1fcfb"
+                  "path": "sprites/yeb/64x64/left/idle_0.png",
+                  "sha256": "4afce6f7718be670e6564bf15c629df33c451f31339e9a2d1207c05cdba9c70c"
                 },
                 {
                   "name": "idle_1",
-                  "path": "sprites/yeb/64x64/right/idle_1.png",
-                  "sha256": "35ebd50da07cf94111a19d1a59b1c94511f8fe2e2462ef13c65a06f7540a6c19"
+                  "path": "sprites/yeb/64x64/left/idle_1.png",
+                  "sha256": "7ae1a1bcbad6946eb75fc4f1347da3e36efe55ed1b74da863f1e95e3257de9db"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "sprites/yeb/64x64/right/move_0.png",
-                  "sha256": "51baf3b8ca187bcf9e0762997e57cdea30dd07e38e728dabd38f2606e3fd87ef"
+                  "path": "sprites/yeb/64x64/left/move_0.png",
+                  "sha256": "e3cadd8789bef5f8b096397692c4f95706148058dd4f02aff62ec26a31207e40"
                 },
                 {
                   "name": "move_1",
-                  "path": "sprites/yeb/64x64/right/move_1.png",
-                  "sha256": "10a3cb0d45aeb0fc47c27e09ac202758642f3102d4b56f88a047fb775d693b96"
+                  "path": "sprites/yeb/64x64/left/move_1.png",
+                  "sha256": "0a583350e2173af75245ef70aa26f51315394099ff5e59fc80983e4c9658df7c"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/left/move_2.png",
+                  "sha256": "b491a636c1644dcb1ccf1a38031148eac4eb8db0c3c86d2a8e958b9436cdbdef"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/left/move_3.png",
+                  "sha256": "e43c971f45df46a0aa44de2ab08109189dd09f520892d54cfaed9fc5852a0d29"
                 }
               ]
             }
@@ -25271,27 +25354,37 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/front/idle_0.png",
-                  "sha256": "1db5e7a6ae93b5ed4ae6b30611ed9fcc53087a7d946b733004eb831a4902f5cb"
+                  "sha256": "d6249cbf3cb07621a10ac3fabad98d03b537de8f4bdad60a24aaa9586fbe2885"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/front/idle_1.png",
-                  "sha256": "7ff732739d1f5604b7d0b88d316472b5e259600c05d283bd68b48536ccabff04"
+                  "sha256": "6b55b55de331a4a8123d26ee8f208aecd7cdb5c77cf8027e2bd01bbfbc3e9c32"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/front/move_0.png",
-                  "sha256": "4e4dc9a4b12413aeb5afc3bb7b69059439e1fec0293b1274956909a33d58de8c"
+                  "sha256": "f1b390705081fb2ceedbfcaec43b78450f14044d97bbc3b532a4be3610a3aa77"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/front/move_1.png",
-                  "sha256": "d15789517a3abe3aef73b4ca7d23bbafdc025885ce5163e1af9969058656d61a"
+                  "sha256": "c7548aa9ef68e385cbe62f292ab05fc1093fe1e89a522839152923c49ca9365b"
+                },
+                {
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/front/move_2.png",
+                  "sha256": "afbd3cfb9691dcdae06410cd5886411fb3d3e4cef206fc082d090164d04358c9"
+                },
+                {
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/front/move_3.png",
+                  "sha256": "b71a29dd3aba7cac262d0227ea94d1e561591cb2b94a258f813397dda29133e8"
                 }
               ]
             },
@@ -25301,22 +25394,22 @@
                 {
                   "name": "attack_0",
                   "path": "bosses/shub_niggurath/movement/front/attack_0.png",
-                  "sha256": "17d746b6a60994348ae19a7b2e15fe8cbfdc9840c41cdec86a9975dbc9ced106"
+                  "sha256": "5bad6179253589eb30d05232907d264e638da7883acf65c8b50d8bd0b596a4a7"
                 },
                 {
                   "name": "attack_1",
                   "path": "bosses/shub_niggurath/movement/front/attack_1.png",
-                  "sha256": "aaf2ad6773d34c1170bf8ae8cd18587a8a030fe4a10ecb820b3c04f43b21a7ce"
+                  "sha256": "5a5a7d9e182b8feae56119e23de5db5d604f8d5ed3ce469e82ef21bdaa1c19e3"
                 },
                 {
                   "name": "attack_2",
                   "path": "bosses/shub_niggurath/movement/front/attack_2.png",
-                  "sha256": "68966d24b866b2859095865ce10c983158104d02fb79e653fc5837d739125ae4"
+                  "sha256": "ad136c54f1df7e039d6596c221b1730d914d9bda14dee2f29772000a860fb842"
                 },
                 {
                   "name": "attack_3",
                   "path": "bosses/shub_niggurath/movement/front/attack_3.png",
-                  "sha256": "d3b183069f029ce33fe3654bc6307f895906b1c425449f108b2cf460f28e627a"
+                  "sha256": "90456b9dfefecd95ca5414120c952665a613c11b362cf98c1fbe8dec1ea3fedc"
                 }
               ]
             },
@@ -25326,22 +25419,22 @@
                 {
                   "name": "hurt_0",
                   "path": "bosses/shub_niggurath/movement/front/hurt_0.png",
-                  "sha256": "72e0fcaf105b052e7f9d1b542015e000844e02e0dc91b2a99d0285954b200191"
+                  "sha256": "d87fd8d26d108ab5db8236fa1b6ccf0292e49ff7593bd23842508c0fd7b42ac1"
                 },
                 {
                   "name": "hurt_1",
                   "path": "bosses/shub_niggurath/movement/front/hurt_1.png",
-                  "sha256": "7b025cad4cad9208901034c68d5fec9623cc5b590da489f4d1e455f291e1b732"
+                  "sha256": "180b08f30ddab836e399a47be18bfa64797f38e2762cdd786049e98ec3d06cfd"
                 },
                 {
                   "name": "hurt_2",
                   "path": "bosses/shub_niggurath/movement/front/hurt_2.png",
-                  "sha256": "e53b8fcdfda2853d8affb6dc50533258f3ce2e7f0a51c0bfcd07a685519e13be"
+                  "sha256": "dcb778bb6f863a48e00b916112e461a27b258ee6884f91a223854d247694990d"
                 },
                 {
                   "name": "hurt_3",
                   "path": "bosses/shub_niggurath/movement/front/hurt_3.png",
-                  "sha256": "a888a47c3db09aefd27ee4d5d114969862f3ae51876494839c1ccbd828159c23"
+                  "sha256": "fa5b0dfcf86cb8d96be1116c861b0c9145fe36e187c88a5e1c1e86ff43fae45f"
                 }
               ]
             },
@@ -25351,12 +25444,12 @@
                 {
                   "name": "stoop_0",
                   "path": "bosses/shub_niggurath/movement/front/stoop_0.png",
-                  "sha256": "b58d815729967a6d4b4d34c11e0ad3d5415f118fa48a61b8271dc7680a6fca77"
+                  "sha256": "cf9059ad5733d93101f292ac2e02f63e5f6872122fb05d98e23d2f7b0222bfc4"
                 },
                 {
                   "name": "stoop_1",
                   "path": "bosses/shub_niggurath/movement/front/stoop_1.png",
-                  "sha256": "0c1d4119902662b3706ccc2db0802cd0e736f89eddd1fe9854f600d2a63eef17"
+                  "sha256": "fd05487d9212edc7b0a0e6edc1e03d188c5924e88251fec42edbb689ebbe4aa8"
                 }
               ]
             },
@@ -25366,7 +25459,7 @@
                 {
                   "name": "stoop_mid_0",
                   "path": "bosses/shub_niggurath/movement/front/stoop_mid_0.png",
-                  "sha256": "f2d22212ea45ff45edad95c1611172c664937f8575540443eedb55909a2b5fef"
+                  "sha256": "ad136c54f1df7e039d6596c221b1730d914d9bda14dee2f29772000a860fb842"
                 }
               ]
             }
@@ -25382,77 +25475,37 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/back/idle_0.png",
-                  "sha256": "25548e29ae9195a44bbbbedfcd9d08708de6273827db4ffb906c1cd578f20002"
+                  "sha256": "43d6523165fbc450fd8acf10200401a5de09dd44745c7a53d08711fccbf8c0d8"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/back/idle_1.png",
-                  "sha256": "df9bcc1be86697f13cdf493bd9003cc36ebe52ff6fdb10f29f5cc1652133cb5d"
+                  "sha256": "acc7fd2a8b17355c46ec9328cb547b06aded878acb9fe7fc12a6ccfd062bf7c2"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/back/move_0.png",
-                  "sha256": "510d2900995a61e942b5be4a2bc600bb88a86d6771fbda36ad3868879e3b769f"
+                  "sha256": "3b8cb8eecc1b6de08dbbd934438840a6d8ad18fff6145750b69b7b9b6d0660a2"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/back/move_1.png",
-                  "sha256": "1fbdafaadfe7c32f8363532326f7793e543546535f6183b0c46db7336dafa22d"
-                }
-              ]
-            },
-            "attack": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "attack_0",
-                  "path": "bosses/shub_niggurath/movement/back/attack_0.png",
-                  "sha256": "a0735244468667c398781e7adef3daa52686eb1bec6ee129b4cb4852acef6b94"
+                  "sha256": "6ed93f5bb7828cb4bf4710c53dcd7048a063f6fb6f36f6d3a74723edf95aeffb"
                 },
                 {
-                  "name": "attack_1",
-                  "path": "bosses/shub_niggurath/movement/back/attack_1.png",
-                  "sha256": "77ebfce4bd43d997e3ed17a46705eb3d9f5f608f39d701aaa1cd9362abd2a7bf"
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/back/move_2.png",
+                  "sha256": "23d435aa847eff4b6507839511706802e89cb2837da74fb5a5d776039bf19e82"
                 },
                 {
-                  "name": "attack_2",
-                  "path": "bosses/shub_niggurath/movement/back/attack_2.png",
-                  "sha256": "7d9a994a6cea49023a336207e96b42521f5224cdc78e15ec70e53a60f116ceca"
-                },
-                {
-                  "name": "attack_3",
-                  "path": "bosses/shub_niggurath/movement/back/attack_3.png",
-                  "sha256": "7195476e19467652009accb9446ffde38d4ae79d2f8f3342f52e4a356f3f92eb"
-                }
-              ]
-            },
-            "hurt": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "hurt_0",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_0.png",
-                  "sha256": "06c7fe2afc4702efa720533b60e4e162de4103d5a465b6ababa96ab3a0142163"
-                },
-                {
-                  "name": "hurt_1",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_1.png",
-                  "sha256": "dd4df51d83a95bf575c7dc1bdfc57d203a49a746da9b27b2a5a5ec0a5481addb"
-                },
-                {
-                  "name": "hurt_2",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_2.png",
-                  "sha256": "86acfcb20542df77e9010b5bddbe753e9b18e14c303422a5c52e2c5513cfe70b"
-                },
-                {
-                  "name": "hurt_3",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_3.png",
-                  "sha256": "86b8d2c4ad8087ea89ffb6c35be3cafa9161153a110e4758167f8eef9507462e"
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/back/move_3.png",
+                  "sha256": "8d5c442893323d720ed08b6a900f0ceda4267e727ffb8832b9fa951c855332ce"
                 }
               ]
             }
@@ -25468,113 +25521,83 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/left/idle_0.png",
-                  "sha256": "e235dd2589b222970c879e77b624396b034e871c6c8fa2fb43cfea2d255f73a3"
+                  "sha256": "013f3e9e339d3b404edc286f5d48b3ddd79d0140ebc8828d9d025cbd24692cac"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/left/idle_1.png",
-                  "sha256": "abc4f96543f894269aad45a1af58a87817c1cc4e41a747228047a38a9c9e55b4"
+                  "sha256": "a3a1489968a1708a0041de2880f4d99fa060d72dd95e36188e2d6e5afd58cf6f"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/left/move_0.png",
-                  "sha256": "4f27ab96bcf760c9047e1a45c2430f9f05ea84541d15e0619c0ed01d84b16fdf"
+                  "sha256": "41e9bf1a2a6bcc1a3fc62c4d7bb0c4b431022cf17efac5792e09f37b2d695177"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/left/move_1.png",
-                  "sha256": "4631267ddbe9f8d4f27e99c743710a2709c7abc3dd7918f7af452e1e6e5451ce"
-                }
-              ]
-            },
-            "attack": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "attack_0",
-                  "path": "bosses/shub_niggurath/movement/left/attack_0.png",
-                  "sha256": "f9df91cdcbb20ba5972582f782a54db91a07e17f11c42f46a6143b5a2d8a206e"
+                  "sha256": "3c8855f23505220e9c5a9991712b6b841a66d6c13f9fdcd0d2e91cb83a07c614"
                 },
                 {
-                  "name": "attack_1",
-                  "path": "bosses/shub_niggurath/movement/left/attack_1.png",
-                  "sha256": "7002f824418bd8ea0847966273e01dc96221804f8b225af3678bff2a06080c30"
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/left/move_2.png",
+                  "sha256": "6318492f721a3f213ad33adb4da0f9d1425c5876b5937ff83645e5a0a5cd6f36"
                 },
                 {
-                  "name": "attack_2",
-                  "path": "bosses/shub_niggurath/movement/left/attack_2.png",
-                  "sha256": "d711d792894de7ea7eda4944aa867f915984957623678a725427aa4a35b48263"
-                },
-                {
-                  "name": "attack_3",
-                  "path": "bosses/shub_niggurath/movement/left/attack_3.png",
-                  "sha256": "aa2ce4f7375a96672eeaed1159afc8000f512cf5de6b31a6c9dd32fcd142a60d"
-                }
-              ]
-            },
-            "hurt": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "hurt_0",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_0.png",
-                  "sha256": "91c52b08d963dc233b66f04e3468d6e8c3a72d1cd00184f46a2e5801f64000e3"
-                },
-                {
-                  "name": "hurt_1",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_1.png",
-                  "sha256": "f888ff98469883119fc822c6eb897cca931f8ca26e38d24a65855832e168d480"
-                },
-                {
-                  "name": "hurt_2",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_2.png",
-                  "sha256": "8d368ca1af988ffd4b819c00486d3a590bfc850544cf5ba67fc071d7a9afe6bf"
-                },
-                {
-                  "name": "hurt_3",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_3.png",
-                  "sha256": "4ae5ab361bd460620cd78ff5198f8b54b5bcd2d0b9e9ab164d0f10bb2b9ed1d9"
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/left/move_3.png",
+                  "sha256": "c35018ee66a638f6b2da5527358cb931a777184e185244f712f9ef9913f81feb"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "bosses/shub_niggurath/movement/right/idle_0.png",
-                  "sha256": "f6cf8d7ac47a926e793fb776130139592c863825fb8f91a3360d9fbcc0e2acc4"
+                  "path": "bosses/shub_niggurath/movement/left/idle_0.png",
+                  "sha256": "013f3e9e339d3b404edc286f5d48b3ddd79d0140ebc8828d9d025cbd24692cac"
                 },
                 {
                   "name": "idle_1",
-                  "path": "bosses/shub_niggurath/movement/right/idle_1.png",
-                  "sha256": "1a7b5cf600610ecbb89f23453f83a3abeb0ef55a5c080ed8f45d2373193273e6"
+                  "path": "bosses/shub_niggurath/movement/left/idle_1.png",
+                  "sha256": "a3a1489968a1708a0041de2880f4d99fa060d72dd95e36188e2d6e5afd58cf6f"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "bosses/shub_niggurath/movement/right/move_0.png",
-                  "sha256": "f6ffa6c4b604d72c8700f876dd588d8cafa9cace90339b3fb6e15d7fbb87abf9"
+                  "path": "bosses/shub_niggurath/movement/left/move_0.png",
+                  "sha256": "41e9bf1a2a6bcc1a3fc62c4d7bb0c4b431022cf17efac5792e09f37b2d695177"
                 },
                 {
                   "name": "move_1",
-                  "path": "bosses/shub_niggurath/movement/right/move_1.png",
-                  "sha256": "7b748959e75ffaa05b9f531b75e2abba967fbecc622a39350f50c4650db6df01"
+                  "path": "bosses/shub_niggurath/movement/left/move_1.png",
+                  "sha256": "3c8855f23505220e9c5a9991712b6b841a66d6c13f9fdcd0d2e91cb83a07c614"
+                },
+                {
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/left/move_2.png",
+                  "sha256": "6318492f721a3f213ad33adb4da0f9d1425c5876b5937ff83645e5a0a5cd6f36"
+                },
+                {
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/left/move_3.png",
+                  "sha256": "c35018ee66a638f6b2da5527358cb931a777184e185244f712f9ef9913f81feb"
                 }
               ]
             }
