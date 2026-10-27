@@ -82,13 +82,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   },
   {
     id: 'nug', name: 'Nug', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
-    sprite: { silhouette: 'blob', palette: 'pallid', scale: 7, eyes: 3 },
+    sprite: { silhouette: 'blob', palette: 'pallid', scale: 7, eyes: 3, body: [0.83, 0.28] }, // drawn again in round 92: a hulking form 5.8 m high and 4 m across (the heap it was stood 3.3 m), struck as high as its crown and 2.0 m either side of its middle (a blob's capsule is 4.9 m by 2.5), its blows still scaled by a blob's 4.9 m
     ...scripted('boss', phases(ph(1, { bite: 2, slam: 2, roar: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, roar: 1, aoe_ring: 1, eruption: 1 }, { hooks: ['darkness'] }))),
     stats: st(3750, 1100, 65, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
   {
     id: 'yeb', name: 'Yeb', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
-    sprite: { silhouette: 'blob', palette: 'charcoal', scale: 7, eyes: 1, tentacles: 6 },
+    sprite: { silhouette: 'blob', palette: 'charcoal', scale: 7, eyes: 1, tentacles: 6, body: [0.78, 0.24] }, // drawn again in round 92: a narrow form on long legs, 5.5 m high and 3.4 m across, struck as high as its crest and 1.7 m either side of its middle (a blob's capsule is 4.9 m by 2.5), its blows still scaled by a blob's 4.9 m
     ...scripted('boss', phases(ph(1, { tentacle_burst: 2, spit: 2, darkness: 1, conflagration: 1 }), ph(0.5, { tentacle_burst: 2, pool: 1, conflagration: 1, spit: 1, barrage: 1 }, { hooks: ['darkness'] }))),
     stats: st(3750, 1100, 81, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
