@@ -97,7 +97,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - the player can switch targets left/right
   - lock breaks automatically on range or LOS loss
 - Animation is procedural (tweened primitives and sprite frames). No skeletal assets.
-- Death: the player drops currency ("Echoes") where they fell and respawns at the last Elder Sign (checkpoint). Non-boss enemies reset. Touching the drop recovers it.
+- Death: the player drops currency ("Echoes") where they fell and respawns at the last Elder Sign (checkpoint). Non-boss enemies reset. Touching the drop recovers it. Every arrival (round 88: a rising, fast travel, a rest, a game continued at its stone) is at peace: nothing notices or reaches the investigator until they have moved or acted and a few seconds more have passed, or at once if they strike, shoot or throw first, or come to a sleeping horror's ring, which they then wake as ever.
 
 ### C. Entity registry
 - `src/data/roster.ts` holds every id from §4 and is the source of truth.
