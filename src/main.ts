@@ -50,6 +50,7 @@ import { fovOf, nearLens, placeCamera } from './render/followCamera';
 import { allEffectsOn, computeFx, lensAt, type FxState } from './render/fx';
 import { createFxController } from './render/fxController';
 import { createHiddenViews } from './render/hiddenViews';
+import { createPaperViews } from './render/paperViews';
 import { createWorldScene } from './render/worldScene';
 import { lightNight, placeLantern } from './render/lantern';
 import { lanternGain } from './render/lanternLife';
@@ -195,6 +196,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   const hidden = createHiddenViews(scene, game, { audio, particles }); // the secret passages open with dust, light and the sound of stone (round 61)
+  const notes = createPaperViews(scene, game, { audio, particles }); // a note is a leaf of burning paper; it burns away when its page is put away (round 89)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
@@ -232,7 +234,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   worldUniforms.uGlowColor.value.set(...ANOMALY.green).multiplyScalar(LIGHT.echoGlowIntensity); // Echo drops glow
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
   const noGlow = new Vector3(0, -1e4, 0);
-  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures });
+  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures, notes });
   if (debug) installGameEvidence(game, creatures);
   setCameraMode(game.camera, cameraModeOf(settings.camera)); // the look chosen in Settings › Play (round 77)
   placeCamera(camera, game, 1);
@@ -310,6 +312,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
+        notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)

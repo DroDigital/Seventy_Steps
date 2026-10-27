@@ -1,7 +1,7 @@
 /**
  * Procedural low-poly figures (spec §3B: tweened primitives, no skeletal assets): the investigator,
- * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, a note on its
- * crate, the world's gates (its Elder Signs are signViews.ts's), and the people met in the dream
+ * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, the world's gates
+ * (its Elder Signs are signViews.ts's; a note is burning paper, paperViews.ts's), and the people met in the dream
  * (npcFigures.ts). Each is a small joint hierarchy that poses.ts drives: shoulders, elbows and wrists;
  * hips and knees. Arms and legs hang along -y from their pivots; forward is +z, the figure's right is
  * -x. Phase 2 replaces the enemies with generated sprites.
@@ -215,20 +215,6 @@ function gate(): Figure {
   return f;
 }
 
-/** A note left on a crate: burnt paper, a charred rim and two small embers, so every placed note shares the look. */
-function note(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  part(f, f.body, box(0.6, 0.5, 0.45, 0, 0.25, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.3), 1.7)), 'wood');
-  const yaw = 0.3;
-  const ember = mixRgb(BASE.rust, ANOMALY.purple, 0.28);
-  const sheet = box(0.24, 0.016, 0.3, 0.05, 0.522, 0, shade(BASE.bone, 1.02)).rotateY(yaw);
-  const char = box(0.28, 0.01, 0.36, 0.05, 0.508, 0, shade(BASE.charcoal, 0.45)).rotateY(yaw);
-  const spark = box(0.04, 0.014, 0.035, 0.14, 0.532, 0.1, shade(ember, 1.25)).rotateY(yaw);
-  const mote = box(0.02, 0.012, 0.018, -0.04, 0.53, -0.1, shade(ember, 0.85)).rotateY(yaw);
-  part(f, f.body, mergeGeometries([char, sheet, spark, mote]), 'cloth', 0.72);
-  return f;
-}
-
 /** An Echo cache: an iron-bound casket, its lid thrown back on Void Green shards (Echoes are wrong), so it reads in the dark. */
 function cache(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
@@ -263,7 +249,7 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo, tome, vial, gate, note, cache, ammo,
+  player: investigator, deepOne, dummy, echo, tome, vial, gate, cache, ammo,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 

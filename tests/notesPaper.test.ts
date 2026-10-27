@@ -1,7 +1,6 @@
-import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { DOCUMENTS, documentSkin, type Document } from '../src/data/documents';
-import { buildFigure } from '../src/render/figures';
+import { buildLeaf, place } from '../src/render/paperStand';
 
 describe('burning paper on notes', () => {
   it('defaults every note to burnt paper and leaves tomes plain unless a skin is set', () => {
@@ -15,19 +14,18 @@ describe('burning paper on notes', () => {
     expect(documentSkin({ kind: 'tome', text: ['Loose leaves.'], skin: 'paper' })).toBe('paper');
   });
 
-  it('chars the world note and sets two embers on the sheet', () => {
-    const figure = buildFigure('note');
-    const colors: number[] = [];
-    figure.root.traverse(o => {
-      if (!(o instanceof THREE.Mesh)) return;
-      const color = o.geometry.getAttribute('color');
-      if (!color) return;
-      for (let i = 0; i < color.count; i++) colors.push(color.getX(i), color.getY(i), color.getZ(i));
-    });
-    const dark = colors.some((_, i) => i % 3 === 0 && colors[i] < 0.12 && colors[i + 1] < 0.12 && colors[i + 2] < 0.12);
-    const ember = colors.some((_, i) => i % 3 === 0 && colors[i] > colors[i + 1] + 0.08 && colors[i] > 0.25 && colors[i + 2] > colors[i + 1]);
-    expect(dark).toBe(true);
+  it('chars the world note and sets embers along the rim of its leaf', () => {
+    const leaf = buildLeaf('Arkham Advertiser, October 2nd', { x: 0, y: 0, z: 0 }, 0, 0);
+    place(leaf, 2, 0);
+    const at = (i: number) => leaf.col.slice(i, i + 3);
+    const verts = Array.from({ length: leaf.col.length / 3 }, (_, v) => at(v * 3));
+    const paper = verts.some((c) => c[0] > 0.6 && c[1] > 0.55 && c[2] > 0.4);
+    const scorched = verts.some((c) => c[0] + c[1] + c[2] < 1);
+    const ember = verts.some((c) => c[0] > c[1] + 0.3 && c[0] > 0.9 && c[2] > 0.2);
+    expect(paper).toBe(true);
+    expect(scorched).toBe(true);
     expect(ember).toBe(true);
-    figure.root.traverse(o => { if (o instanceof THREE.Mesh) o.geometry.dispose(); });
+    leaf.geo.dispose();
+    leaf.mat.dispose();
   });
 });
