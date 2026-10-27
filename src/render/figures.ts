@@ -18,6 +18,7 @@ import { investigator } from './investigator';
 import { npcFigure } from './npcFigures';
 import { gateGeometry } from './signMeshes';
 import { createWorldMaterial } from './worldMaterial';
+import { echoFigure } from './echoFigure';
 
 export type Rig = 'humanoid' | 'dummy' | 'echo' | 'prop';
 
@@ -176,14 +177,6 @@ function dummy(): Figure {
   return f;
 }
 
-/** Dropped Echoes: a small spinning Void Green shard (anomaly colour: Echoes are wrong). */
-function echo(): Figure {
-  const f = skeleton('echo', { hip: 0.55, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const shard = (r: number, y: number): THREE.BufferGeometry => tint(new THREE.OctahedronGeometry(r, 0).translate(0, y, 0), ANOMALY.green);
-  part(f, f.body, mergeGeometries([shard(0.2, 0), shard(0.08, 0.34), shard(0.06, -0.3)]), 'flesh', 0.9);
-  return f;
-}
-
 /** A tome lying open on a lectern: a post, a slanted desk, and pale pages that glow faintly, so it reads in the dark. */
 function tome(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
@@ -249,7 +242,7 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo, tome, vial, gate, cache, ammo,
+  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate, cache, ammo,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 
