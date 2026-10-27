@@ -14,6 +14,7 @@ import { createMirrorView, type MirrorView } from './mirrorView';
 import { createReflection, type Reflection } from './reflection';
 import { createMoonShadow, type MoonShadow } from './moonShadow';
 import { createPostPass, type PostPass } from './postPass';
+import { castSilhouettes } from './silhouetteCasters';
 import { worldUniforms } from './worldMaterial';
 
 export interface Pipeline {
@@ -86,8 +87,8 @@ export function createPipeline(parent: HTMLElement): Pipeline {
   };
   /** Every program is also taken into use (its uniforms read) once compiled: that waits on the GPU, and would stall the first frame that draws it. */
   const compile = async (scene: THREE.Scene, camera: THREE.Camera): Promise<void> => {
-    await Promise.all([renderer.compileAsync(scene, camera), renderer.compileAsync(post.scene, post.camera)]);
-    for (const root of [scene, post.scene]) {
+    await Promise.all([renderer.compileAsync(scene, camera), renderer.compileAsync(post.scene, post.camera), renderer.compileAsync(castSilhouettes.scene, camera)]); // (round 92: the foes' shapes in the shadow maps too)
+    for (const root of [scene, post.scene, castSilhouettes.scene]) {
       root.traverse((o) => {
         for (const m of [(o as Partial<THREE.Mesh>).material ?? []].flat()) (renderer.properties.get(m) as { currentProgram?: THREE.WebGLProgram }).currentProgram?.getUniforms();
       });

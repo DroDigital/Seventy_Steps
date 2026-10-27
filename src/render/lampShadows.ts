@@ -12,6 +12,7 @@ import type { V3 } from '../core/geom';
 import { LAMP_SHADOWS } from '../data/fxTuning';
 import { FAR_SIDE } from './lanternShadow';
 import { LANTERN_CASTER } from './colliderShadow';
+import { castSilhouettes } from './silhouetteCasters';
 import { worldUniforms } from './worldMaterial';
 
 /** A lamp that may cast: the slot it has among the shader's lamps, where it burns, and a key that is the same from frame to frame. */
@@ -95,6 +96,7 @@ export function createLampShadows(): LampShadows {
         lens[k].updateMatrixWorld(true);
         renderer.setRenderTarget(maps[k].target);
         renderer.render(scene, lens[k]);
+        castSilhouettes.draw(renderer, lens[k], { x: h.at.x, y: h.at.y, z: h.at.z, point: true }); // (round 92: the foes' own shapes, across the lamp)
       });
       scene.overrideMaterial = material;
       renderer.setRenderTarget(was);

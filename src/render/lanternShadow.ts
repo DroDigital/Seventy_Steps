@@ -11,6 +11,7 @@ import * as THREE from 'three';
 import { LANTERN_SHADOW } from '../data/fxTuning';
 import { LANTERN } from '../data/tuning';
 import { INSTANCED_POSITION, LANTERN_CASTER } from './colliderShadow';
+import { castSilhouettes } from './silhouetteCasters';
 import { worldUniforms } from './worldMaterial';
 
 export interface LanternShadow {
@@ -63,6 +64,7 @@ export function createLanternShadow(): LanternShadow {
       renderer.setRenderTarget(target);
       renderer.render(scene, lens);
       scene.overrideMaterial = material;
+      castSilhouettes.draw(renderer, lens, { x: lens.position.x, y: lens.position.y, z: lens.position.z, point: true }); // (round 92: the foes' own shapes, across the lantern)
       renderer.setRenderTarget(was);
     },
   };

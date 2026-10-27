@@ -250,6 +250,23 @@ export const BLOB = {
   thin: 0.25, // how much lighter it is for each whole length drawn out
 } as const;
 
+/**
+ * What a foe's own picture casts into the moon's, the lantern's and the lamps' shadow maps (round 92; render/silhouetteCasters.ts,
+ * shaders/castSprite.ts, castPlan.ts): its animated outline, stood across the light and leaned back, so its shadow is its own
+ * shape (a claw raised in the blow is raised in the shadow) and always as long as it is tall; the horrors' are larger than they are.
+ */
+export const CAST = {
+  alpha: { reviewed: 0.5, drawn: 0.3 }, // the least opacity of a texel that is body: the authored art's, and the procedural atlas's (whose glow marks are 0.63 and 0.82)
+  stretch: 1.15, // the shortest a shadow is, in the heights of the body that casts it: under a high light the cut-out leans back until it reaches this
+  lean: 1.1, // radians: the most it leans back (63 degrees), so that it never lies flat on the ground it is cast on
+  back: 0.25, // metres a lantern's or a lamp's cut-out stands behind the body, so the body that is lit by it is never in its own shadow
+  turn: 0.3, // how far across the light (the cosine of the angle to the camera's right) the cut-out is turned about, over which it passes through the shape common to both
+  reach: 48, // metres from the investigator beyond which a foe casts none
+  least: 0.4, // the least opacity of a picture that casts: a shimmer in the air (an invisible stalker) casts none
+  keep: 0.05, // the share of a picture left, below which it casts none (a creature dying)
+  loom: { base: 0.12, size: 0.3, from: 3, to: 12, deep: 0.28, wide: 0.5 }, // how much larger its shadow is than the body: every foe's by `base`; by `size` more for a body 3 to 12 metres tall; by `deep` more for a horror in the last phase of its fight; and `wide` the share of that it is broader by
+} as const;
+
 /** The track of a blow (render/swingTrails.ts; round 83). */
 export const SWING_TRAIL = {
   samples: 14, // the last few edges kept

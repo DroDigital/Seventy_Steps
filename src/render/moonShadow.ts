@@ -13,6 +13,7 @@ import { SHADOW } from '../data/tuning';
 import { INSTANCED_POSITION, LANTERN_CASTER } from './colliderShadow';
 import { box } from './meshKit';
 import { moonFrame } from './moonFrame';
+import { castSilhouettes } from './silhouetteCasters';
 import { worldUniforms } from './worldMaterial';
 
 /** The layer a body that casts a shadow is on (the camera sees layer 0, which it keeps). */
@@ -124,6 +125,7 @@ export function createMoonShadow(): MoonShadow {
       renderer.setRenderTarget(target);
       renderer.render(scene, camera);
       scene.overrideMaterial = material;
+      castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 92: the foes' own shapes, across the moon)
       renderer.setRenderTarget(was);
     },
   };
