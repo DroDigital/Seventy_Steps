@@ -244,7 +244,7 @@ export const WARE_SHOWN = {
 export const BLOB = {
   dark: 0.55, // how dark at its heart
   base: 1.7, // its radius, in the radii of the body's capsule
-  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider)
+  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider, but Shub-Niggurath since round 92: as wide as her capsule)
   draw: 1.0, // how much longer it is drawn out away from the moon at the horizon than from the zenith
   most: 1.8, // and the most it is drawn out
   shift: 0.6, // the share of what it is drawn out by that its middle moves, away from the moon
