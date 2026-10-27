@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle, yawOf } from '../core/geom';
 import { SWING_TRAIL } from '../data/fxTuning';
+import { PAPER_MODELS } from '../data/paperTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import { hourOf, phaseOf } from '../systems/clock';
@@ -115,7 +116,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
 
   function sync(): void {
     for (const [id, model] of g.ecs.c.model) {
-      if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews
+      if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL || PAPER_MODELS.has(model)) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews; notes: paperViews
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip, id !== g.player.id)); // what the moon sees of them: one shape, not their twenty parts (and the lantern, for all but the one who carries it)
       scene.add(figure.root);
