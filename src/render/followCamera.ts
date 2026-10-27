@@ -42,7 +42,7 @@ export function placeCamera(camera: PerspectiveCamera, g: Game, alpha: number, c
   camera.lookAt(base.x, base.y, base.z);
 }
 
-/** The lens's vertical field of view as the rig has it (Low hero narrows it for a tall foe), before the mind's breathing of it (render/fx.ts). */
+/** The lens's vertical field of view as the rig has it while framing a tall foe, before the mind's breathing of it (render/fx.ts). */
 export function fovOf(g: Game, alpha: number): number {
   return g.camera.prevFov + (g.camera.fov - g.camera.prevFov) * alpha;
 }
