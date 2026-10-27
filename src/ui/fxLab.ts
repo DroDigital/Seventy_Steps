@@ -10,8 +10,10 @@
  *   place({ ... })       puts the investigator `dist` metres from it, on the bearing `bearing` (radians, 0 = in front of it)
  *   look({ ... })        the camera: at `yaw` (about the creature), `dist`, `up` metres up, looking at `aim` metres up, at the point `mix`
  *                        of the way from the creature to the investigator (default 0); `look(null)`: the game's
+ *   spawn(spec)          pushes one particle into the game's batch (round 90: to lay out the shapes and judge them by eye)
  */
 import * as THREE from 'three';
+import type { ParticleSpec } from '../render/particles';
 import { startMove } from '../systems/actions';
 import type { Game } from '../systems/components';
 
@@ -24,6 +26,7 @@ export interface FxLab {
   fire(name: string): void;
   place(o: { dist: number; bearing?: number }): void;
   look(o: { yaw: number; dist: number; up: number; aim: number; fov?: number; mix?: number } | null): void;
+  spawn(spec: ParticleSpec): void;
 }
 
 declare global {
@@ -36,6 +39,8 @@ export interface LabHooks {
   /** Steps the simulation `n` frames and the clock with it. */
   step(n: number): void;
   hold: { on: boolean };
+  /** The game's particle batch (`spawn` only). */
+  particles: { spawn(p: ParticleSpec): void };
 }
 
 const frames = (n: number): Promise<void> => new Promise((done) => (n <= 0 ? done() : requestAnimationFrame(() => void frames(n - 1).then(done))));
@@ -107,5 +112,6 @@ export function installFxLab(game: Game, camera: THREE.PerspectiveCamera, hooks:
     look(o) {
       view = o && { fov: 50, mix: 0, ...o };
     },
+    spawn: (spec) => hooks.particles.spawn(spec),
   };
 }
