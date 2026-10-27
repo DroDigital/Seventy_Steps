@@ -9,7 +9,7 @@ import { REVIEWED_MATTER } from '../src/data/reviewedLook';
 import { FX } from '../src/data/tuning';
 import type { Rgb } from '../src/render/palette';
 import { gradeTints } from '../src/render/realmPalette';
-import { arc, BOOST_MOST, chromaOf, PLAIN, toneOf, type Tone } from '../src/render/spriteTone';
+import { arc, BOOST_MOST, chromaOf, OWN_FROM, OWN_TO, PLAIN, toneOf, type Tone } from '../src/render/spriteTone';
 import { SPRITE_FRAG } from '../src/render/shaders/sprite';
 
 /** What the shader does to a colour's chroma. */
@@ -50,12 +50,13 @@ describe('a form turned to its realm', () => {
     expect(arc(tb, ta)).toBeCloseTo(arc(b.angle, a.angle), 5);
   });
 
-  it('keeps different forms apart: red and green stay as far from one another as the share left them', () => {
-    const share = 0.6;
-    const [r, g] = [apply(red, toneOf(red, realm(), share)).angle, apply(green, toneOf(green, realm(), share)).angle];
-    const before = Math.abs(arc(chromaOf(green).angle, chromaOf(red).angle));
-    expect(Math.abs(arc(g, r))).toBeGreaterThan(0.25 * before); // never one colour
-    expect(Math.abs(arc(g, r))).toBeLessThan(before + 1e-9); // and never farther apart than they were drawn
+  it('keeps different forms apart: a sepia and a slate stay as far from one another as the share left them', () => {
+    const share = 0.6; // (a strong red would be held as drawn: below)
+    const slate: Rgb = [0.3, 0.4, 0.5]; // (not the sepia's exact opposite about the greys, where the arc is no longer a test)
+    const [a, b] = [apply(sepia, toneOf(sepia, realm(), share)).angle, apply(slate, toneOf(slate, realm(), share)).angle];
+    const before = Math.abs(arc(chromaOf(slate).angle, chromaOf(sepia).angle));
+    expect(Math.abs(arc(b, a))).toBeGreaterThan(0.25 * before); // never one colour
+    expect(Math.abs(arc(b, a))).toBeLessThan(before + 1e-9); // and never farther apart than they were drawn
   });
 
   it('lifts a dull form\'s colour toward the realm\'s, never past the cap, and never takes any from a vivid one', () => {
@@ -75,6 +76,56 @@ describe('a form turned to its realm', () => {
     expect(grey.sin).toBeCloseTo(0, 6);
     expect(grey.fill).toBeGreaterThan(0.05);
     expect(toneOf(red, realm(), 0.7).fill).toBe(0);
+  });
+});
+
+const strength = (c: Rgb): number => chromaOf(c).length / Math.max(0.05, 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]);
+
+describe('a form drawn in a strong colour keeps it (round 93: the Zoog was turned purple in the Dreamlands)', () => {
+  const STRONG = ['zoog', 'wamp', 'man_of_leng', 'wilbur_whateley', 'brown_jenkin', 'hastur', 'azathoth', 'ghatanothoa']; // the rust, orange and gold forms and the purples: what the author drew them in (a table to review when the art is redrawn: round 92 left Shub-Niggurath grey)
+  const vivid: Rgb = [0.5, 0.2, 0.18];
+
+  it('is not turned toward any realm at any share, and a dull form still is', () => {
+    expect(strength(vivid)).toBeGreaterThan(OWN_TO);
+    for (const share of [0.3, 0.7, 1]) {
+      const held = toneOf(vivid, realm(), share);
+      expect(held.sin).toBeCloseTo(0, 6);
+      expect(held.cos).toBeCloseTo(1, 6);
+    }
+    const sepia: Rgb = [0.5, 0.42, 0.3];
+    expect(strength(sepia)).toBeLessThan(OWN_FROM);
+    expect(Math.abs(toneOf(sepia, realm(), 0.7).sin)).toBeGreaterThan(0.2);
+  });
+
+  it('holds the named forms in every realm: no turn, no lift, no cast', () => {
+    for (const key of STRONG) {
+      const form = REVIEWED_MATTER[key] as Rgb;
+      expect(strength(form), key).toBeGreaterThan(OWN_TO);
+      for (const id of Object.keys(LOOKS)) {
+        const t = toneOf(form, gradeTints(LOOKS[id])[2] as Rgb, FX.spriteGrade);
+        expect(Math.abs(t.sin), `${key} in ${id}`).toBeLessThan(0.02);
+        expect(t.boost, `${key} in ${id}`).toBe(1);
+        expect(t.fill, `${key} in ${id}`).toBe(0);
+      }
+    }
+  });
+
+  it('holds exactly those forms, and no form is part held: every form is dull enough to be turned, or strong enough to be held', () => {
+    const held = Object.keys(REVIEWED_MATTER).filter((k) => strength(REVIEWED_MATTER[k] as Rgb) >= OWN_TO);
+    expect(held.sort()).toEqual([...STRONG].sort()); // (a form redrawn into the band, or across it, is a decision: say whether it keeps its colour)
+    for (const key of Object.keys(REVIEWED_MATTER)) {
+      const k = strength(REVIEWED_MATTER[key] as Rgb);
+      expect(k <= OWN_FROM || k >= OWN_TO, `${key} (${k.toFixed(3)}) is in the band ${OWN_FROM} to ${OWN_TO}`).toBe(true);
+    }
+  });
+
+  it('leaves the older art\'s sepia forms to take their realm, in the realm the Zoog stands in as in the rest', () => {
+    const mid = gradeTints(LOOKS.dreamlands)[2] as Rgb;
+    for (const key of ['ghoul', 'moon_beast', 'ghast', 'hypnos']) {
+      const form = REVIEWED_MATTER[key] as Rgb;
+      expect(strength(form), key).toBeLessThan(OWN_FROM);
+      expect(Math.abs(toneOf(form, mid, FX.spriteGrade).sin), key).toBeGreaterThan(0.3);
+    }
   });
 });
 
