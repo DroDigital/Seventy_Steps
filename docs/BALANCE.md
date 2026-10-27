@@ -47,7 +47,7 @@ nothing in its way.
 | 15 | The Whisperer in Akeley's Chair | 10/5/9 | 5 | 1888 | 27 | 309 | 280 | 7 | 0.29 | 0 |
 | 16 | Edward Hutchinson | 11/5/10 | 5 | 2032 | 35 | 532 | 292 | 8 | 0.43 | 0 |
 | 17 | Simon Orne | 11/5/10 | 5 | 2032 | 30 | 642 | 292 | 8 | 0.52 | 0 |
-| 18 | The Horror at Martin's Beach | 11/5/11 | 5 | 2329 | 34 | 332 | 292 | 8 | 0.27 | 0 |
+| 18 | The Horror at Martin's Beach | 11/5/11 | 5 | 2225 | 34 | 254 | 292 | 8 | 0.21 | 0 |
 | 19 | Lilith | 12/5/11 | 5 | 2299 | 34 | 743 | 304 | 8 | 0.58 | 0 |
 | 20 | The Shunned House Entity | 12/6/11 | 5 | 2374 | 28 | 826 | 304 | 9 | 0.59 | 0 |
 | 21 | Joseph Curwen | 12/6/12 | 5 | 2695 | 33 | 424 | 304 | 9 | 0.30 | 0 |
@@ -59,9 +59,9 @@ nothing in its way.
 | 27 | The Colossus Beneath the Pyramids | 17/8/16 | 5 | 4315 | 43 | 1358 | 364 | 10 | 0.75 | 0 |
 | 28 | Ghatanothoa | 16/7/15 | 5 | 4626 | 85 | 796 | 352 | 10 | 0.45 | 0 |
 | 29 | Bokrug | 16/7/15 | 5 | 4819 | 54 | 1735 | 352 | 10 | 0.99 | 0 |
-| 30 | Nug | 16/7/15 | 5 | 4819 | 58 | 1668 | 352 | 10 | 0.95 | 0 |
+| 30 | Nug | 16/7/15 | 5 | 4819 | 54 | 1624 | 352 | 10 | 0.92 | 0 |
 | 31 | Rhan-Tegoth | 16/7/15 | 5 | 4819 | 59 | 2044 | 352 | 10 | 1.16 | 0 |
-| 32 | Yeb | 16/7/15 | 5 | 4819 | 54 | 1240 | 352 | 10 | 0.70 | 0 |
+| 32 | Yeb | 16/7/15 | 5 | 4819 | 49 | 1130 | 352 | 10 | 0.64 | 0 |
 | 33 | The Great Ones | 16/7/15 | 5 | 5526 | 62 | 2122 | 352 | 10 | 1.21 | 0 |
 | 34 | Yig | 16/7/15 | 5 | 5526 | 59 | 1659 | 352 | 10 | 0.94 | 0 |
 | 35 | Tsathoggua | 16/7/15 | 5 | 5590 | 70 | 1837 | 352 | 10 | 1.04 | 0 |
@@ -75,7 +75,7 @@ nothing in its way.
 | 43 | The Other Gods | 18/9/17 | 5 | 4323 | 45 | 1247 | 376 | 10 | 0.66 | 0 |
 | 44 | Shub-Niggurath | 18/9/17 | 5 | 4788 | 84 | 859 | 376 | 10 | 0.46 | 0 |
 | 45 | 'Umr at-Tawil | 18/9/17 | 5 | 4855 | 65 | 1025 | 376 | 10 | 0.55 | 0 |
-| 46 | Nyarlathotep | 18/9/17 | 5 | 5719 | 82 | 1538 | 376 | 10 | 0.82 | 0 |
+| 46 | Nyarlathotep | 18/9/17 | 5 | 5719 | 83 | 1558 | 376 | 10 | 0.83 | 0 |
 | 47 | Azathoth | 18/9/17 | 5 | 8911 | 90 | 10055 | 376 | 10 | 5.35 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die.
@@ -101,11 +101,11 @@ their health by the Might the investigator has beyond the standing above, and th
 | 11 | The Haunter of the Dark | 30/30/30 | 5 | 2202 | 206 | 5668 | 431 | 6 | 3.87 | 0 |
 | 12 | The Terrible Old Man | 30/30/30 | 5 | 2349 | 20 | 368 | 431 | 7 | 0.22 | 0 |
 | 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 2389 | 23 | 444 | 431 | 7 | 0.27 | 0 |
-| 14 | Wilbur Whateley | 30/30/30 | 5 | 3012 | 24 | 532 | 431 | 7 | 0.33 | 0 |
-| 15 | The Whisperer in Akeley's Chair | 30/30/30 | 5 | 3109 | 27 | 389 | 431 | 7 | 0.24 | 0 |
-| 16 | Edward Hutchinson | 30/30/30 | 5 | 3226 | 28 | 569 | 431 | 8 | 0.31 | 0 |
-| 17 | Simon Orne | 30/30/30 | 5 | 3226 | 29 | 747 | 431 | 8 | 0.41 | 0 |
-| 18 | The Horror at Martin's Beach | 30/30/30 | 5 | 3684 | 33 | 319 | 431 | 8 | 0.18 | 0 |
+| 14 | Wilbur Whateley | 30/30/30 | 5 | 3086 | 25 | 562 | 431 | 7 | 0.34 | 0 |
+| 15 | The Whisperer in Akeley's Chair | 30/30/30 | 5 | 3186 | 28 | 406 | 431 | 7 | 0.25 | 0 |
+| 16 | Edward Hutchinson | 30/30/30 | 5 | 3303 | 28 | 582 | 431 | 8 | 0.32 | 0 |
+| 17 | Simon Orne | 30/30/30 | 5 | 3303 | 30 | 789 | 431 | 8 | 0.44 | 0 |
+| 18 | The Horror at Martin's Beach | 30/30/30 | 5 | 3510 | 32 | 313 | 431 | 8 | 0.17 | 0 |
 | 19 | Lilith | 30/30/30 | 5 | 3605 | 40 | 1079 | 431 | 8 | 0.60 | 0 |
 | 20 | The Shunned House Entity | 30/30/30 | 5 | 3700 | 27 | 1168 | 431 | 9 | 0.59 | 0 |
 | 21 | Joseph Curwen | 30/30/30 | 5 | 4079 | 33 | 476 | 431 | 9 | 0.24 | 0 |
@@ -117,7 +117,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 27 | The Colossus Beneath the Pyramids | 30/30/30 | 5 | 5619 | 45 | 1579 | 431 | 10 | 0.73 | 0 |
 | 28 | Ghatanothoa | 30/30/30 | 5 | 6256 | 80 | 1104 | 431 | 10 | 0.51 | 0 |
 | 29 | Bokrug | 30/30/30 | 5 | 6517 | 49 | 1849 | 431 | 10 | 0.86 | 0 |
-| 30 | Nug | 30/30/30 | 5 | 6517 | 50 | 1823 | 431 | 10 | 0.85 | 0 |
+| 30 | Nug | 30/30/30 | 5 | 6517 | 50 | 1807 | 431 | 10 | 0.84 | 0 |
 | 31 | Rhan-Tegoth | 30/30/30 | 5 | 6517 | 49 | 1846 | 431 | 10 | 0.86 | 0 |
 | 32 | Yeb | 30/30/30 | 5 | 6517 | 50 | 1407 | 431 | 10 | 0.65 | 0 |
 | 33 | The Great Ones | 30/30/30 | 5 | 7473 | 59 | 2425 | 431 | 10 | 1.13 | 0 |
@@ -133,7 +133,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 43 | The Other Gods | 30/30/30 | 5 | 5426 | 39 | 1181 | 431 | 10 | 0.55 | 0 |
 | 44 | Shub-Niggurath | 30/30/30 | 5 | 6010 | 85 | 992 | 431 | 10 | 0.46 | 0 |
 | 45 | 'Umr at-Tawil | 30/30/30 | 5 | 6093 | 69 | 906 | 431 | 10 | 0.42 | 0 |
-| 46 | Nyarlathotep | 30/30/30 | 5 | 7178 | 79 | 1431 | 431 | 10 | 0.66 | 0 |
+| 46 | Nyarlathotep | 30/30/30 | 5 | 7178 | 79 | 1475 | 431 | 10 | 0.68 | 0 |
 | 47 | Azathoth | 30/30/30 | 5 | 11185 | 90 | 11986 | 431 | 10 | 5.56 | 0 |
 
 ## The opening
