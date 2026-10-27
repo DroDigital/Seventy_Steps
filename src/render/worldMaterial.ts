@@ -68,6 +68,7 @@ export const worldUniforms = {
   uRelight: { value: 0 }, // the Relight setting: the horrors' bodies lit over their folds (shaders/sprite.ts; main.ts sets it)
   uSpriteVivid: { value: new THREE.Vector2(...FX.spriteVivid) },
   uSpriteWarm: { value: FX.spriteWarm }, // how much of the lantern's and the lamps' hue a creature takes (shaders/sprite.ts)
+  uSpriteReveal: { value: new THREE.Vector2(...FX.spriteReveal) }, // how much of the lantern's light shows a creature's own colours (shaders/sprite.ts)
   uMind: { value: 0 }, // 0..1: a failing mind's hold on what it sees of the creatures (fx.ts `mind`)
   uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
   uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },
