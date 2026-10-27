@@ -1,4 +1,4 @@
-/** The camera's four looks, including size-aware framing for Classic's locks. */
+/** The camera's three looks, including size-aware framing for Classic's locks. */
 
 import { PerspectiveCamera, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
@@ -39,7 +39,7 @@ const horizontal = (a: V3, b: V3): number => Math.hypot(a.x - b.x, a.z - b.z);
 
 describe('the setting', () => {
   it('names a look for each value, Classic for the default and Tight shoulder for what is out of range', () => {
-    expect(CAMERA_MODE_IDS.map((_, i) => cameraModeOf(i))).toEqual(['classic', 'hero', 'long', 'shoulder']);
+    expect(CAMERA_MODE_IDS.map((_, i) => cameraModeOf(i))).toEqual(['classic', 'hero', 'shoulder']);
     expect(cameraModeOf(SETTINGS.camera[3])).toBe('classic');
     expect(cameraModeOf(-4)).toBe('classic');
     expect(cameraModeOf(99)).toBe('shoulder');
@@ -112,13 +112,13 @@ describe('Classic', () => {
 describe('the looks that frame a foe', () => {
   const colossus: Frame = { feet: v3(0, 0, 8), height: 14 };
   const person: Frame = { feet: v3(0, 0, 5), height: 1.8 };
-  const looks: CameraMode[] = ['hero', 'long'];
+  const looks: CameraMode[] = ['hero'];
 
   for (const mode of looks) {
     const tune = CAMERA_MODES[mode];
     const pivot = v3(0, tune.pivotHeight, 0);
 
-    it(`${mode}: stands back and takes in all of a colossus, which Classic's boom does not`, () => {
+    it(`${mode}: stands back and takes in all of a colossus`, () => {
       const rig = createCameraRig(0, mode);
       run(rig, 400, pivot, colossus);
       expect(rig.lead).toBeCloseTo(4, 0); // half the way to it
@@ -199,28 +199,15 @@ describe('fitting a foe in the lens', () => {
   });
 
   it('widens the lens as a framed foe comes near, so the whole of it stays in the picture', () => {
-    const tune = CAMERA_MODES.long;
+    const tune = CAMERA_MODES.hero;
     const pivot = v3(0, tune.pivotHeight, 0);
     for (const gap of [10, 5, 3]) {
-      const rig = createCameraRig(0, 'long');
+      const rig = createCameraRig(0, 'hero');
       const foe: Frame = { feet: v3(0, 0, gap), height: 14 };
       run(rig, 500, pivot, foe);
       expect(seen(rig, pivot, v3(0, 14, gap), 1), `${gap} m`).toBe(true);
       expect(seen(rig, pivot, v3(0, 0, gap), 1), `${gap} m`).toBe(true);
     }
-  });
-});
-
-describe('Long lens', () => {
-  it('is a narrow lens in the open and widens where a wall cuts its boom short', () => {
-    const rig = createCameraRig(0, 'long');
-    run(rig, 120, v3(0, 1.5, 0), null);
-    expect(rig.fov).toBeCloseTo(32, 0);
-    const walled = createCameraRig(0, 'long');
-    run(walled, 240, v3(-8, 1.5, 3.5), null, createArenaWorld()); // the pillar at (-8, 1) stands behind it
-    expect(walled.dist).toBeLessThan(5);
-    expect(walled.fov).toBeGreaterThan(45);
-    expect(walled.fov).toBeLessThanOrEqual(CAMERA_MODES.long.keepFov!);
   });
 });
 

@@ -45,7 +45,11 @@ vec2 spriteChroma(vec3 c) {
   return vec2(dot(v, SPRITE_E1), dot(v, SPRITE_E2));
 }
 
-const vec4 SPRITE_DRAWN = vec4(1.0, 0.0, 1.0, 0.0); // the tone that leaves a form as drawn: no turn, no lift, no cast (render/spriteTone.ts PLAIN); its colours then go through the rest of the grade alone, for a creature in the lantern's light
+/** A form's tone at \`k\` of its share (round 95): the turn, the lift and the fill are linear in the share (render/spriteTone.ts toneOf), so the tone of a smaller share is the same turn, lift and fill scaled by \`k\`. In the lantern's light a creature takes the tone of less of its realm: its hue turned back toward the one it was drawn in along the wheel, its colour as strong as ever (a cross-fade of the two colours greyed a form drawn far from its realm's hue). k = 1 leaves the tone as it is; a form held as drawn (PLAIN) stays so. */
+vec4 spriteToneBack(vec4 tone, float k) {
+  float a = atan(tone.y, tone.x) * k;
+  return vec4(cos(a), sin(a), 1.0 + (tone.z - 1.0) * k, tone.w * k);
+}
 
 /** A lit creature's colour recoloured to its realm, its anomaly hues kept. \`tone\` is its form's own (render/spriteTone.ts): the turn (cos, sin) that takes the form's hue toward the realm's, the lift of its colour and the realm's colour given to a grey, the same for every pixel of the form, so the form's own colours keep their order and their distances from one another and the form takes the realm's. Its brightness is the one it was drawn in (its volume and shading). */
 vec3 spriteGraded(vec3 c, vec4 tone) {
