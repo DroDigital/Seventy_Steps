@@ -1,6 +1,6 @@
 /**
  * Nug, Yeb and Shub-Niggurath drawn again whole (round 92: the author's `Seventy-Steps-Nug-Yeb-Shub-Lore-Overhauls-Full` zip, 93 PNGs),
- * put in by `tools/replace_reviewed_sprite.py --all`: what is registered for each, each frame the delivery's own (its manifest's hashes),
+ * put in by `tools/replace_reviewed_sprite.py --all`: what is registered for each, each frame the delivery's own (its manifest's hashes: the zip's bytes, for a copy kept in the project's file store carries a C2PA chunk and hashes otherwise),
  * the standing rule that attack and hurt are front art only (Shub-Niggurath's left and back combat went with the old drawing), her stoop
  * and its halfway pose drawn in place, what the renderer adds to the art (no eye for Yeb: the old one had), and the hurtboxes fitted to the bodies.
  */

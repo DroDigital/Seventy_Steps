@@ -11,7 +11,7 @@ The folder holds the library's tree: sprites/<id>[/<variant>]/64x64/<direction>/
 bosses/<id>/movement/... (the key of a variant is <id>#<variant>). Each frame must be the canvas of the creature's front idle
 and, for a creature registered on the ground line, stand within GROUND pixels of its ground line (one the delivery's MANIFEST.json
 registers by its central body, a flier or a levitating thing, is left to move). What the delivery brings is the creature's
-idle and move in all four views and its attack and hurt from the front: that is the whole of it.
+idle and move in all four views and its attack and hurt from the front (and a colossus's stoop, below): that is the whole of it.
 
   * Attack and hurt are front art only. A left, right or back attack or hurt in a delivery is never packed, and the old drawing's
     own (a boss's left and back combat) is dropped with it, for it would no longer match: seen from the side, a creature that
@@ -21,9 +21,10 @@ idle and move in all four views and its attack and hurt from the front: that is 
     own first), and what nothing uses is cleared and taken out of the index (the frames after it move up a number).
   * Its right is registered as its left turned round (the delivery's right being that, pixel for pixel), else as drawn; a view
     is one or the other whole.
-  * A colossus's stoop (the bow and the hold, `stoop_<n>`, and the halfway pose, `stoop_mid_0`) is front art too: when the delivery
-    brings it, each frame is pasted over the old one's rectangle on its page (the count is the old count: a stoop the creature has not
-    got is added by tools/add_reviewed_frames.py), on the very ground line of the delivery's front idle, and no taller than it.
+  * A colossus's stoop (the bow and the hold, `stoop_<n>`, and the halfway pose, `stoop_mid_0`) is front art too, and a creature that
+    has one must come with one: each frame is pasted over the old one's rectangle on its page (the count is the old count; a delivery
+    without it, or with one the creature has not got, is refused: tools/add_reviewed_frames.py adds a stoop), on the very ground line
+    of the delivery's front idle, the bow and the hold no more than 1% taller than it and the halfway pose no taller.
   * Any other action it has (a flight) is left as it was.
 
 The pixels go over the old rectangles, and the frame's hashes and bounds, the pages' and both indexes are brought in line, so the
@@ -216,7 +217,7 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
                     sys.exit(f'{path}: nothing painted')
                 if bounds[3] != stands:
                     sys.exit(f'{path}: stands on row {bounds[3]}, the idle it is drawn from on {stands} (a stoop stands on the very ground line)')
-                if bounds[3] - bounds[1] > high * 1.01:
+                if bounds[3] - bounds[1] > (high if action == 'stoop_mid' else high * 1.01):  # (the halfway pose is never the taller)
                     sys.exit(f'{path}: {bounds[3] - bounds[1]} rows high, taller than the idle it comes down from ({high})')
                 drawn[(action, n)] = (rgba, data, bounds)
         for (action, n), (rgba, data, bounds) in sorted(drawn.items()):
