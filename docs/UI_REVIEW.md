@@ -106,7 +106,7 @@ Each line: what was seen → what it did to the player → the fix → how it wa
   Hover on a tab only lights it; the open tab keeps its underline, and a hover never changes the page.
 - **Navigation.** Resume, Map, Journal, Arms, Achievements | Settings, Credits | Quit to title (it saves first; no question is
   asked, and none was added). Back paths: a document opened from the Journal returns to Documents; an entry to the Bestiary.
-- **Title.** "Begin anew?" defaults to "No, go back"; "How deep do you sleep?" defaults to Deep Slumber, says it is chosen once;
+- **Title.** "Begin anew?" defaults to "No, go back" (round 95: the page after it, "How deep do you sleep?", is gone with the three difficulties);
   the retained-endings line stands.
 - **The dark framed reading leaf** (a tome picked up in the world), against the mist page a document has from the Journal: two
   interfaces, two looks, as designed. Documents are short (the longest 383 characters): none scrolls.
@@ -161,7 +161,7 @@ Refined and checked in the game: Settings (all tabs), Controls, Credits (title, 
 (Journal › Under way and Documents, Bestiary, Achievements), Elder Sign menu (Grow, Arms, Travel, Sleeper's Sign, Court), Title
 slots (New game, Load), Ending card, Opening cards' hints.
 
-Reviewed, retained, and checked in the game: Title main, Begin anew, difficulty, Pause main, Map, Arms, Bestiary entry, a document
+Reviewed, retained, and checked in the game: Title main, Begin anew, Pause main, Map, Arms, Bestiary entry, a document
 (Journal and world), merchants, talk, where to rise, UNMADE, crash screen, loading veil.
 
 Reviewed in source, not opened: the title gate, the place banner, cutscene bars, the desktop shell's pages.

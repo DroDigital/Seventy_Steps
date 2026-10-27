@@ -14,7 +14,7 @@ import { QUESTS } from '../data/quests';
 import { WARES } from '../data/wares';
 import { START_SIGN } from '../data/sites';
 import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
-import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, WORLD, type LevelId, type UpgradeId } from '../data/tuning';
+import { GUN, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, WORLD, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import { signPlace, teleport } from './checkpoints';
 import { beginPeace } from './peace';
@@ -65,7 +65,6 @@ export interface SaveData {
   gun?: number;
   cycle?: number; // the journey through the dream (NG+; round 12)
   mount?: MountId; // preferred appearance only: active mounts and verified DLC ownership are never saved
-  difficulty?: string; // chosen when the dream began (round 38; none: the default)
   named?: number; // times Hastur's name has appeared
   called?: string[]; // bosses called into the world
   watched?: string[]; // horrors whose arrival has been shown (round 20)
@@ -126,7 +125,6 @@ export function snapshot(g: Game): SaveData {
     rounds: g.player.rounds,
     gun: g.player.gun,
     cycle: g.player.cycle,
-    difficulty: g.player.difficulty,
     mount: g.player.mount.selected,
     named: ow.named,
     called: [...ow.called],
@@ -236,7 +234,6 @@ export function applySave(g: Game, s: SaveData): void {
   g.player.gun = clampInt(s.gun ?? 0, 0, GUN.level.max);
   g.player.rounds = clampInt(s.rounds ?? GUN.start, 0, GUN.carry);
   g.player.ammo = clampInt(s.ammo ?? GUN.chamber, 0, GUN.chamber); // a save from before the revolver's limits: a full cylinder
-  g.player.difficulty = isDifficulty(s.difficulty) ? s.difficulty : DEFAULT_DIFFICULTY;
   if (s.drop && s.drop.amount > 0) spawnDrop(g, Math.round(s.drop.amount), { x: s.drop.x, y: s.drop.y, z: s.drop.z });
   const body = c.body.get(g.player.id)!;
   openAround(g, s.at); // the passages they stood at, open as they left them, before the footing is judged

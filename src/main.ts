@@ -13,7 +13,7 @@ import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
-import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
+import { CLOCK, LIGHT, RENDER, SIM } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
 import { cameraModeOf } from './data/cameraModes';
@@ -112,7 +112,6 @@ interface StartOptions {
   arena: boolean; // the combat arena instead of the open world
   fresh?: boolean; // the open world: forget the save and start anew
   intro?: boolean; // show the new game's opening first (not with ?fresh, which is for testing)
-  difficulty?: DifficultyId; // a new game's, chosen at the title (round 38)
   creature?: string;
   variant?: Variant;
   bench?: boolean; // the benchmark (ui/bench.ts): the busiest places, measured
@@ -138,7 +137,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const store = opts.arena ? null : shell.store;
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
-  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
+  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, demo: EDITION === 'demo' });
   void refreshMountEntitlement(game);
   addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
@@ -395,6 +394,6 @@ else {
   else if (takeFlag(NEW_GAME_FLAG)) launch({ ...opts, fresh: true, intro: true }, createShell()); // begun anew from an ending
   else {
     const shell = createShell();
-    title(shell, (fresh, difficulty) => launch({ ...opts, fresh, intro: fresh, difficulty }, shell));
+    title(shell, (fresh) => launch({ ...opts, fresh, intro: fresh }, shell));
   }
 }

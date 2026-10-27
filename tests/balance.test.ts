@@ -11,54 +11,16 @@ import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ZONES } from '../src/data/bossTuning';
 import { getEntity } from '../src/data/registry';
-import { BOSS_LEVEL_SCALING, LEVELS, REAGENT, SIM, SOFT_CAP } from '../src/data/tuning';
-import { botFight, type BotFight } from './botHelpers';
+import { BOSS_LEVEL_SCALING, LEVELS, REAGENT, SOFT_CAP } from '../src/data/tuning';
 import { bossDamageScale, bossHealthScale } from '../src/systems/bossScaling';
 import { levelsOf } from '../src/systems/levels';
 import { healthAt, levelsWorth, levelWorth, mightAt, staminaAt } from '../src/systems/levelWorth';
-import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
-
-const FRAMES = 60 * 60 * 10; // ten minutes
-const SKILL = 0.55;
-/** What the bot plays badly, and is let off: the gaze that turns flesh to stone (it is in sight of it for about half of a fight at best, so its seconds are scaled by the share in view), and the roots (which a person cuts down first, and so spends some seconds more). */
-const WAIVED: Record<string, { waive: readonly ('petrify' | 'roots' | 'void')[]; scale: number; add: number }> = {
-  ghatanothoa: { waive: ['petrify'], scale: 1 / 0.56, add: 0 },
-  shub_niggurath: { waive: ['roots'], scale: 1, add: 40 },
-  great_ones: { waive: ['void'], scale: 1, add: 0 }, // round 60: a person with insight keeps to the hidden platforms; the bot stood in the void, most of what those fights cost it
-  umr_at_tawil: { waive: ['void'], scale: 1, add: 0 },
-};
-/** Where the bot starts, metres from the boss (round 60): a bot's path through a fight is chaos, a blow taken or slipped sending it another way, so each fight is the mean of three. */
-const STARTS = [7, 10, 13];
-const TOTAL = standings().length; // the horrors there are, for the Reagent carried
-
-interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'fell' | 'deaths'> {
-  seconds: number;
-  doses: number; // the Reagent a person carries there (balanceModel.ts `dosesAt`)
-  pressure: number; // damage taken, in lives: its health and the Reagent a person carries
-}
+import { BANDS, CAP, EXEMPT, GREAT } from './balanceBands';
+import { atCapOf, fightAt, SKILL, STARTS, tableOf, type Row } from './balanceFight';
+import { KILLED, standings, type Standing } from './balanceModel';
 
 /** What the table may not hold: bounds for a fight worth having (not over in seconds, not a slog, not costing more lives than a person carries Reagent for). */
 const BOUNDS = { seconds: [6, 260], lives: 3, colossusLives: 6, godLives: 1.5 } as const; // (round 60: a god spends at most the Reagent carried: Father Dagon was "way too overpowered", and R'lyeh's too hard at level 26)
-/**
- * Round 61, "no boss insurmountable, none excessively easy": each tier's own band as well, so a fight is held to its kind and not only to the
- * widest bounds. A named horror is over in 7 to 40 seconds and always costs something (a bot that slips most blows still bleeds a little);
- * a god of 2500 health or more takes 18 to 90 (a long tail is for the gaze and the roots, waived and added above) and costs between a third of the Reagent carried
- * and one and a half times it after level scaling. Seconds are the bot's, steady and close in: a person's are about three times as long.
- */
-/**
- * Round 68, "restore appropriate difficulty across all levels, even on normal": the bands are raised with the numbers they hold, and a god
- * is told by name, not by its health (the health is no longer a line between the great fights and the rest). A named horror is over in 14 to 50
- * seconds (a person's: 40 to 150) and costs a bot between a twentieth of a life and one and a fifth; a great fight takes 35 to 100 and
- * costs between a third of a life and one and a third, climbing with the rank (`RISE`). Raised again later in the round: a named horror costs at least a fifth of a life, a great fight at least 0.45 (the bot slips most of a gaze, which does no harm: five horrors that leaned on it were given blows in its place).
- */
-const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth'.split(' '));
-const BANDS = { named: { seconds: [14, 50], lives: [0.2, 1.2] }, god: { seconds: [35, 100], lives: [0.45, 1.5] } } as const;
-/**
- * Round 68, "all bosses remain demanding regardless of player level": the same fights again at the cap (every level bought, the cane set to
- * +5), where the horror has grown past the standing it is met at (systems/bossScaling.ts `overmatch`). None may cost a bot less than this,
- * nor be over in fewer seconds, whatever a person has farmed.
- */
-const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const; // (round 71: nine starts, not three: 'Umr at-Tawil cost the same bot 0.28, 0.93 and 0.43 lives from three, and a floor held on three paths was a coin)
 const BOUNDS_TEXT = '6 to 260 seconds';
 const AT_CAP_TEXT = `
 ## At the cap
@@ -66,9 +28,6 @@ const AT_CAP_TEXT = `
 The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which the soft caps make ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
 their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} of a life; a great fight ${CAP.god.seconds} and ${CAP.god.lives}.
 `;
-/** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
-const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
-
 const INTRO = `# The balance table
 
 Written by \`tests/balance.test.ts\` (\`BALANCE_WRITE=1 npm run audit\`; round 25, playtest note 8). A bot fights each scripted boss
@@ -131,21 +90,6 @@ let mainTable = '';
 const OPENING = ['hub', 'arkham'];
 const OPENING_LIVES = 1.5; // a horror of the first hours costs at most this (a person carries Reagent for one, and learns it over a few tries)
 
-/** The fights at a standing, one from each start: what they took and cost, on the mean. */
-function fightAt(s: Standing, starts: readonly number[] = STARTS): Row {
-  const w = WAIVED[s.id];
-  const runs = starts.map((start) => botFight(s.id, FRAMES, undefined, { levels: s.levels, reinforced: s.reinforced, skill: SKILL, floor: true, smart: true, mind: true, waive: w?.waive, start }));
-  for (const r of runs) expect(r.bad).toEqual([]);
-  const mean = (k: 'dealt' | 'taken' | 'frames'): number => runs.reduce((n, r) => n + r[k], 0) / runs.length;
-  const taken = mean('taken');
-  return { ...s, health: runs[0].health, dealt: mean('dealt'), taken, fell: runs.every((r) => r.fell), deaths: runs.reduce((n, r) => n + r.deaths, 0), seconds: (mean('frames') / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), doses: dosesAt(s.rank, TOTAL), pressure: taken / (s.hp * (1 + dosesAt(s.rank, TOTAL) * REAGENT.heal)) };
-}
-
-const tableOf = (list: Row[]): string => {
-  const lines = [...list].sort((a, b) => a.rank - b.rank).map((r) => `| ${r.rank + 1} | ${getEntity(r.id)!.name} | ${r.levels.vigour}/${r.levels.endurance}/${r.levels.might} | ${r.reinforced} | ${r.health} | ${r.fell ? r.seconds.toFixed(0) : '>' + r.seconds.toFixed(0)} | ${r.taken.toFixed(0)} | ${r.hp} | ${r.doses} | ${r.pressure.toFixed(2)} | ${r.deaths} |`);
-  return ['| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |', '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |', ...lines].join('\n');
-};
-
 describe('the balance table (round 25)', () => {
   const table = standings();
 
@@ -176,12 +120,6 @@ describe('the balance table (round 25)', () => {
 });
 
 const atCap: Row[] = [];
-/** Every standing again with all the levels bought and the cane at its best: the horror has grown past the level it is met at. */
-const atCapOf = (s: Standing): Standing => {
-  const levels = { vigour: LEVELS.vigour.max, endurance: LEVELS.endurance.max, might: LEVELS.might.max } as Standing['levels'];
-  return { ...s, levels, hp: healthAt(levels.vigour), reinforced: CAP.reinforced };
-};
-
 describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
   const table = standings().map(atCapOf);
 

@@ -14,6 +14,7 @@ import { fateOf } from '../data/epilogues';
 import { NPCS } from '../data/npcs';
 import { QUESTS } from '../data/quests';
 import { REGIONS } from '../data/regions';
+import { NEW_GAME_PLUS } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { carryOf } from '../systems/cycles';
 import { levelsBought } from '../systems/levels';
@@ -143,7 +144,8 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
         const buttons = el('', '', page);
         boxed(button(buttons, 'No, go back', () => screen.show(end)));
         boxed(button(buttons, 'Begin anew', beginAnew));
-        boxed(button(buttons, `Begin journey ${g.player.cycle + 2}, carrying your strength`, () => (storeCarry(store, carryOf(g)), beginAnew())));
+        boxed(button(buttons, `Begin journey ${Math.min(g.player.cycle + 1, NEW_GAME_PLUS.most) + 1}, carrying your strength`, // (round 95: the ladder ends at the eighth, which is begun again)
+          () => (storeCarry(store, carryOf(g)), beginAnew())));
       },
     };
     screen.show(card);

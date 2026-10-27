@@ -3,14 +3,14 @@
  * anew may carry the investigator's strength into a new dream: levels, arms and how far each is
  * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels, Echoes and the hints given. Everything else (the
  * world, its quests and bosses) begins again, and each journey's foes are hardier, strike harder
- * and leave more Echoes (NEW_GAME_PLUS). Pure: no Three.js.
+ * and leave more Echoes (NEW_GAME_PLUS; round 95: along a ladder of rungs, ngPlus.ts). Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';
 import { foundKey } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
 import { GUIDE, HINT_IDS, HINT_KEPT, hintGiven } from '../data/fieldGuide';
-import { BOSS, DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, isDifficulty, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type DifficultyId, type LevelId, type UpgradeId } from '../data/tuning';
+import { BOSS, GUN, LEVELS, NEW_GAME_PLUS, REAGENT, REINFORCE, UPGRADES, type LevelId, type UpgradeId } from '../data/tuning';
 import { isWeapon, WEAPON_IDS, type WeaponId } from '../data/weapons';
 import { equip } from './arms';
 import type { Game } from './components';
@@ -18,10 +18,10 @@ import { isFound } from './found';
 import { applyLevels, LEVEL_IDS } from './levels';
 import { levelsWorth } from './levelWorth';
 import { bossDamageScale, overmatch } from './bossScaling';
+import { bossRung, foeRung } from './ngPlus';
 
 export interface Carry {
   cycle: number; // the journey it carries into (1: the second)
-  difficulty: DifficultyId; // the difficulty goes with it: it is chosen once
   levels: Record<LevelId, number>;
   arms: WeaponId[];
   weapon: WeaponId;
@@ -38,7 +38,6 @@ export interface Carry {
 /** What the investigator carries into the next journey. */
 export const carryOf = (g: Game): Carry => ({
   cycle: Math.min(NEW_GAME_PLUS.most, g.player.cycle + 1),
-  difficulty: g.player.difficulty,
   levels: { ...g.player.levels },
   arms: [...g.player.arms],
   weapon: g.player.weapon,
@@ -64,7 +63,6 @@ export function parseCarry(raw: unknown): Carry | null {
   const weapon = typeof o.weapon === 'string' && isWeapon(o.weapon) && arms.includes(o.weapon) ? o.weapon : 'cane';
   return {
     cycle: num(o.cycle, 1, NEW_GAME_PLUS.most),
-    difficulty: isDifficulty(o.difficulty) ? o.difficulty : DEFAULT_DIFFICULTY,
     levels: counts(o.levels, LEVEL_IDS, (k) => LEVELS[k].max),
     arms,
     weapon,
@@ -82,7 +80,7 @@ export function parseCarry(raw: unknown): Carry | null {
 /** Puts a carried strength into a new dream's investigator. */
 export function applyCarry(g: Game, c: Carry): void {
   const p = g.player;
-  Object.assign(p, { cycle: c.cycle, difficulty: c.difficulty, levels: { ...c.levels }, arms: [...c.arms], reinforced: { ...c.reinforced }, stones: c.stones, gun: c.gun, echoes: c.echoes });
+  Object.assign(p, { cycle: c.cycle, levels: { ...c.levels }, arms: [...c.arms], reinforced: { ...c.reinforced }, stones: c.stones, gun: c.gun, echoes: c.echoes });
   Object.assign(g.mind.upgrades, c.upgrades);
   [p.reagentMax, p.reagent] = [c.reagentMax, c.reagentMax];
   applyLevels(g);
@@ -93,16 +91,16 @@ export function applyCarry(g: Game, c: Carry): void {
   for (const id of c.found) g.overworld?.told.add(foundKey(id));
 }
 
-/** How much hardier this journey's foes are than the first's. */
-export const foeHealth = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.health * g.player.cycle;
+/** How much hardier an ordinary foe of this journey is than the first's: its rung of the ladder (ngPlus.ts). A horror's is its own (bossScaling.ts). */
+export const foeHealth = (g: Pick<Game, 'player'>): number => foeRung(g.player.cycle).health;
 
-/** The weight this journey, and the difficulty chosen, put on a blow from `attacker` (1 for the investigator and their allies). */
+/** The weight this journey puts on a blow from `attacker` (1 for the investigator and their allies): its rung of the ladder, and a horror's levels grown to meet the investigator's (bossScaling.ts). */
 export function foeDamage(g: Game, attacker: Entity): number {
   if (g.ecs.c.combatant.get(attacker)?.faction !== 'enemy') return 1;
   const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
   const fight = g.ecs.c.fight.get(attacker);
-  const level = fight ? bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage) : 1;
-  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level;
+  if (!fight) return servant * foeRung(g.player.cycle).damage;
+  return servant * bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage) * bossRung(fight.id, g.player.cycle).damage;
 }
 
 /** The Echoes this journey's foes leave, against the first's. */

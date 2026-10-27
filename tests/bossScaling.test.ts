@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ENTITIES, getEntity, variantOf, type Variant } from '../src/data/registry';
 import { BOSS_STANDING } from '../src/data/bossStanding';
-import { BOSS, BOSS_LEVEL_SCALING, BOSS_OVERMATCH, DIFFICULTIES, NEW_GAME_PLUS, SHUB } from '../src/data/tuning';
+import { BOSS, BOSS_LEVEL_SCALING, BOSS_OVERMATCH, SHUB } from '../src/data/tuning';
 import { applyChange } from '../src/systems/arenaChanges';
 import { resetFight } from '../src/systems/bossFight';
 import { strike } from '../src/systems/combat';
@@ -9,6 +9,7 @@ import { morph, spawnCreature } from '../src/systems/creatures';
 import { bossDamageScale, bossHealthScale, overmatch } from '../src/systems/bossScaling';
 import { healthAt as bodyAt, levelsWorth, mightAt } from '../src/systems/levelWorth';
 import { foeDamage } from '../src/systems/cycles';
+import { bossRung } from '../src/systems/ngPlus';
 import { createGame, createWorldGame } from '../src/systems/game';
 import { applyLevels, buyLevel, nextLevelCost } from '../src/systems/levels';
 import { applySave, snapshot } from '../src/systems/save';
@@ -102,16 +103,17 @@ describe('only bosses scale with player level', () => {
     expect(foeDamage(g, boss)).toBe(damageAt(30));
   });
 
-  it('composes with difficulty and NG+ for real boss blows, while allies retain their damage', () => {
+  it('composes with NG+ for real boss blows, while allies retain their damage', () => {
     const { g, boss } = bossGame('dr_munoz');
     g.player.levels = { vigour: 10, endurance: 5, might: 5 };
     g.player.cycle = 2;
-    g.player.difficulty = 'nightmare';
     applyLevels(g);
     const h = g.ecs.c.health.get(boss)!;
     const over = overmatch(g.player.levels, 'dr_munoz');
-    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * (1 + 2 * NEW_GAME_PLUS.health) * healthAt(20) * over.health));
-    const damage = 40 * DIFFICULTIES.nightmare.foe * (1 + 2 * NEW_GAME_PLUS.damage) * damageAt(20) * over.damage;
+    const rung = bossRung('dr_munoz', 2); // (round 95: the horror's own rung of the ladder, ngPlus.ts)
+    expect(rung.health).toBeGreaterThan(1);
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * rung.health * healthAt(20) * over.health));
+    const damage = 40 * rung.damage * damageAt(20) * over.damage;
     const me = g.ecs.c.health.get(g.player.id)!;
     const before = me.hp;
     expect(strike(g, boss, g.player.id, { damage: 40, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false })).toBe('hit');
@@ -129,10 +131,11 @@ describe('only bosses scale with player level', () => {
     h.hp = h.max * 0.4;
     morph(g, boss, 'nyarlathotep', 'eldritch');
     const def = variantOf(getEntity('nyarlathotep')!, 'eldritch')!;
-    expect(h.max).toBe(Math.round(def.stats.hp * 1.6 * healthAt(10)));
+    const rung = bossRung('nyarlathotep', 1).health;
+    expect(h.max).toBe(Math.round(def.stats.hp * rung * healthAt(10)));
     expect(h.hp / h.max).toBeCloseTo(0.4);
     applyLevels(g);
-    expect(h.max).toBe(Math.round(def.stats.hp * 1.6 * healthAt(10)));
+    expect(h.max).toBe(Math.round(def.stats.hp * rung * healthAt(10)));
     expect(h.hp / h.max).toBeCloseTo(0.4);
   });
 

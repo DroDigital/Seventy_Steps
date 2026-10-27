@@ -11,7 +11,7 @@
 import { getRegion } from '../data/regions';
 import { DESCENT_LINE } from '../data/loreLines';
 import { PLAYER_MOVES } from '../data/moves';
-import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
+import { GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
 import { WEAPONS } from '../data/weapons';
 import { canReinforce, edgeAt, reinforce, reinforceCost } from '../systems/arms';
 import { ENDINGS } from '../data/endings';
@@ -142,7 +142,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     const here = signPlace(ow.sign);
     panel.dataset.body = '366';
     title(panel, (here?.name ?? 'Elder Sign').toUpperCase());
-    const lead = [g.player.cycle ? `JOURNEY ${g.player.cycle + 1}` : '', g.player.difficulty === DEFAULT_DIFFICULTY ? '' : DIFFICULTIES[g.player.difficulty].name.toUpperCase()].filter(Boolean).join('  ·  ');
+    const lead = g.player.cycle ? `JOURNEY ${g.player.cycle + 1}` : '';
     resources(panel, [
       { label: 'LEVEL', value: levelsBought(g) + 1 },
       { label: 'ECHOES', value: g.player.echoes, hot: tab === 0 },
