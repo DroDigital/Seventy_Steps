@@ -103,7 +103,7 @@ uniform vec3 uLightColor;
 uniform float uCharacterLight;
 uniform float uSpriteWarm; // how much of the hue of the lantern's and the lamps' light a creature takes: 0 their brightness only, 1 the whole colour (FX.spriteWarm)
 uniform vec2 uSpriteReveal; // the lantern's light on a creature (its luma) at which its own colours begin to show, and at which they are whole (FX.spriteReveal)
-uniform float uSpriteRevealMost; // the most of them it shows: the rest stays its realm's tint in the light's colour (FX.spriteRevealMost, round 95)
+uniform float uSpriteRevealMost; // the most of its realm's tint the lantern's light takes back (FX.spriteRevealMost, round 95)
 uniform float uMind; // 0..1: how far a failing mind slips what it sees
 uniform float uWet; // how soaked the world is, 0..1 (weather.ts)
 uniform float uRelight; // 0..1: the Relight setting
@@ -208,10 +208,9 @@ void main() {
   vec3 light = uAmbient + uLightColor * vShade.x * uCharacterLight + creatureWarmth(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 87)
   if (vRelit > 0.5 && uRelight > 0.0 && !glow) light *= mix(1.0, relight(uv, dot(t.rgb, vec3(0.299, 0.587, 0.114))), uRelight * 0.8); // the Relight setting (round 83)
   vec3 col = glow ? t.rgb : t.rgb * light;
-  if (uReviewed > 0.5) { // the realm's colours on the older art, brightness kept (round 83: spriteGrade.ts); in the lantern's light a creature shows the colours it was drawn in (round 93)
+  if (uReviewed > 0.5) { // the realm's colours on the older art, brightness kept (round 83: spriteGrade.ts); in the lantern's light a creature shows the colours it was drawn in (round 93), most of the way (round 95)
     float shown = smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y, vec3(0.2126, 0.7152, 0.0722)));
-    col = spriteGraded(col, vTone);
-    if (shown > 0.0) col = mix(col, spriteGraded(t.rgb * dot(light, vec3(0.2126, 0.7152, 0.0722)), SPRITE_DRAWN), shown * uSpriteRevealMost); // its own, in all the brightness of the light and none of its colour, up to a share of it (round 95: the realm's tint and the light's colour keep the rest)
+    col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost)); // in the light the realm's tint is taken back along the wheel, up to a share of it (round 95): its own hue, its colour whole, the light's colour on it
   }
   if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 83)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
