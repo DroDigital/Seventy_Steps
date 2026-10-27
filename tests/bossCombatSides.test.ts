@@ -3,7 +3,7 @@
  * a boss that swings or reels while the investigator circles it is drawn from the side they see, not facing the camera;
  * its right is its left mirrored once; a creature without such art is drawn as before. Yog-Sothoth, drawn again whole in
  * round 56, and Shub-Niggurath, in round 92, under the rule that attack and hurt are front art only, have none: from the
- * side they show their front.
+ * side they show their front. Azathoth's redraw follows the same front-only rule.
  */
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
@@ -15,7 +15,7 @@ import { reviewedClips, type ReviewedManifest } from '../src/render/sprites/revi
 import { spawnCreature } from '../src/systems/creatures';
 import { createGame } from '../src/systems/game';
 
-const BOSSES = ['cthulhu', 'father_dagon', 'mother_hydra', 'ghatanothoa', 'colossus_pyramids', 'azathoth', 'dunwich_horror'];
+const BOSSES = ['cthulhu', 'father_dagon', 'mother_hydra', 'ghatanothoa', 'colossus_pyramids', 'dunwich_horror'];
 const pack = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as ReviewedManifest;
 
 describe('the bosses\' left and back combat art in the pack', () => {
@@ -96,8 +96,8 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
     expect(seen('dunwich_horror', 'stagger', [-12, 0])).toMatchObject({ state: 'hurt', mirror: true });
   });
 
-  it('is front art only for Yog-Sothoth and Shub-Niggurath, whatever the side they are seen from: no left, right or back attack or hurt is in the pack for them', () => {
-    for (const [key, move] of [['yog_sothoth', 'beam'], ['shub_niggurath', 'tentacle_burst']] as const) {
+  it('is front art only for Yog-Sothoth, Shub-Niggurath and Azathoth, whatever the side they are seen from', () => {
+    for (const [key, move] of [['yog_sothoth', 'beam'], ['shub_niggurath', 'tentacle_burst'], ['azathoth', 'roar']] as const) {
       const views = pack.entities[key].directions;
       for (const direction of ['left', 'back', 'right'] as const) expect(Object.keys(views[direction].actions).sort(), `${key}/${direction}`).toEqual(['idle', 'move']);
       for (const at of [[12, 0], [0, -12], [-12, 0]] as [number, number][]) {

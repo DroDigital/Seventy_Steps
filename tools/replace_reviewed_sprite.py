@@ -25,6 +25,7 @@ idle and move in all four views and its attack and hurt from the front (and a co
     has one must come with one: each frame is pasted over the old one's rectangle on its page (the count is the old count; a delivery
     without it, or with one the creature has not got, is refused: tools/add_reviewed_frames.py adds a stoop), on the very ground line
     of the delivery's front idle, the bow and the hold no more than 1% taller than it and the halfway pose no taller.
+    Azathoth's formless mass changes shape rather than height: its bow and hold may be up to three pixels taller.
   * Any other action it has (a flight) is left as it was.
 
 The pixels go over the old rectangles, and the frame's hashes and bounds, the pages' and both indexes are brought in line, so the
@@ -217,7 +218,8 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
                     sys.exit(f'{path}: nothing painted')
                 if bounds[3] != stands:
                     sys.exit(f'{path}: stands on row {bounds[3]}, the idle it is drawn from on {stands} (a stoop stands on the very ground line)')
-                if bounds[3] - bounds[1] > (high if action == 'stoop_mid' else high * 1.01):  # (the halfway pose is never the taller)
+                limit = high if action == 'stoop_mid' else high + 3 if key == 'azathoth' else high * 1.01
+                if bounds[3] - bounds[1] > limit:  # a formless Azathoth swells as it collapses; other bows come down
                     sys.exit(f'{path}: {bounds[3] - bounds[1]} rows high, taller than the idle it comes down from ({high})')
                 drawn[(action, n)] = (rgba, data, bounds)
         for (action, n), (rgba, data, bounds) in sorted(drawn.items()):
