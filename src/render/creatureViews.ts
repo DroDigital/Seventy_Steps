@@ -28,7 +28,7 @@ import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
 import { castSilhouettes } from './silhouetteCasters';
 import { relitOf } from './creatureRelight';
-import { toneOf } from './spriteTone';
+import { toneForForm } from './spriteTone';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { worldUniforms } from './worldMaterial';
 import { createCreatureGlow } from './creatureGlow';
@@ -107,7 +107,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     const glint = REVIEWED_GLINTS[key];
     b.glint.setXYZW(index, glint?.[0] ?? 0, glint?.[1] ?? 0, glint?.[2] ?? 0, glint ? 1 + fire : 0);
-    const tone = toneOf(REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 83)
+    const tone = toneForForm(key, REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 83)
     b.tone.setXYZW(index, tone.cos, tone.sin, tone.boost, tone.fill);
     b.relit.setX(index, relitOf(key));
     counts[frame.page]++;

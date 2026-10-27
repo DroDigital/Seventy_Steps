@@ -147,10 +147,10 @@ describe('the approved Curwen and High Priest reworks', () => {
     expect(packedSources).toHaveLength(69);
   });
 
-  it('preserves all 102 other source registrations, atlas metadata and decoded frame pixels through index remapping', () => {
-    const keys = Object.keys(pack.entities).filter(key => !TARGETS.includes(key)).sort();
-    expect(keys).toEqual(Object.keys(fixture.nonTargetEntities).sort());
-    expect(keys).toHaveLength(102);
+  it('preserves the other 101 source registrations and pixels through index remapping, excluding the later Azathoth rework', () => {
+    const keys = Object.keys(pack.entities).filter(key => !TARGETS.includes(key) && key !== 'azathoth').sort();
+    expect(keys).toEqual(Object.keys(fixture.nonTargetEntities).filter(key => key !== 'azathoth').sort());
+    expect(keys).toHaveLength(101);
     const pixelHashes = new Map<number, string>();
     for (const key of keys) {
       const entity = pack.entities[key];

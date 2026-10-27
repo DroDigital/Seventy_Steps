@@ -20,7 +20,7 @@ export const REVIEWED_EYES: Readonly<Record<string, readonly [x: number, y: numb
 
 /** By boss form: the painted body's half-width in its legs, torso and head bands, as fractions of its height (what the fight's hurt zones are never narrower than: data/assemblyShape.ts). */
 export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, torso: number, head: number]>> = {
-  'azathoth': [0.479, 0.34, 0.01],
+  'azathoth': [0.638, 0.551, 0.304],
   'colossus_pyramids': [0.314, 0.289, 0.205],
   'cthulhu': [0.307, 0.372, 0.255],
   'dunwich_horror': [0.374, 0.388, 0.22],
@@ -38,7 +38,6 @@ export const REVIEWED_GROUND: Readonly<Record<string, number>> = {
 
 /** By form: the exact colour (0..1) of the marks that stay lit in the dark in every view and frame (its eyes, its lamps): the sprite shader keeps the texels of this colour alight. */
 export const REVIEWED_GLINTS: Readonly<Record<string, readonly [r: number, g: number, b: number]>> = {
-  'azathoth': [1.0, 1.0, 1.0],
   'charles_le_sorcier': [0.937, 0.247, 0.569],
   'deep_one#eldritch': [0.169, 1.0, 0.627],
   'elder_thing': [0.843, 0.859, 0.792],
@@ -61,7 +60,7 @@ export const REVIEWED_GLINTS: Readonly<Record<string, readonly [r: number, g: nu
 export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: number, b: number]>> = {
   'albino_penguin': [0.385, 0.374, 0.346],
   'ancient_ones': [0.487, 0.452, 0.411],
-  'azathoth': [0.188, 0.079, 0.191],
+  'azathoth': [0.252, 0.151, 0.282],
   'beast_in_the_cave': [0.405, 0.359, 0.337],
   'being_from_beyond': [0.328, 0.308, 0.324],
   'being_of_ib': [0.329, 0.293, 0.171],
