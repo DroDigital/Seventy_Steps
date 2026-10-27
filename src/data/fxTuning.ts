@@ -136,15 +136,16 @@ export const GROUND_CONTACT = {
 };
 
 
-/** Lights that last a moment (round 83, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
+/**
+ * Lights that last a moment (round 83, render/flashLights.ts): the flash at the heart of a foe's blow and a foe's bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer.
+ * Round 87 (XDro: the hit flashes were too much, and a blow of the investigator's already lights the creature it lands on): the investigator's shot and blow lay no light, only a foe's blows, shots and bolts do, and the lights are small and short: the strongest is about a torch's (1.1; a fire is 1.8, a street lamp 2.6), the usual about half of it.
+ */
 export const FLASH_LIGHTS = {
-  slots: 3, // the most at once
+  slots: 2, // the most at once
   reach: 46, // metres from the investigator: farther, none is chosen
   attack: 0.03, // seconds a flash takes to come to its height (a fall as quick and as long as its life follows)
-  muzzle: { color: [1, 0.84, 0.54] as readonly [number, number, number], strength: 2.6, range: 8, seconds: 0.1 }, // a shot
-  blow: { strength: 1.1, range: 4.2, seconds: 0.14 }, // a landed blow of the investigator's, plus `weight` of the table's
-  burst: { strength: 1.5, per: 0.38, most: 4.2, range: 3.6, rangePer: 2.4, rangeMost: 18, seconds: 0.34 }, // the flash at the heart of a horror's blow: by its radius
-  bolt: { strength: 1.3, per: 0.5, most: 3, range: 5, rangePer: 2.2, rangeMost: 12, seconds: 0.1 }, // a bolt of light or fire in flight, kept up each frame
+  burst: { strength: 0.7, per: 0.12, most: 1.2, range: 3, rangePer: 1.2, rangeMost: 10, seconds: 0.2 }, // the flash at the heart of a foe's blow: by its radius
+  bolt: { strength: 0.5, per: 0.25, most: 1, range: 3, rangePer: 1.2, rangeMost: 6.5, seconds: 0.1 }, // a foe's bolt of light or fire in flight, kept up each frame
   white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
 } as const;
 
@@ -276,3 +277,7 @@ export const SWING_TRAIL = {
   color: [0.82, 0.86, 0.96] as readonly [number, number, number],
   lead: 2, tail: 3, // frames before the blow's first active frame and after its last that the edge is followed
 } as const;
+
+/** The quiet blows of every creature that is not one of the horrors (round 90): kept in data/foeTuning.ts, which holds this file past its share of lines. */
+export { FOE_FX } from './foeTuning';
+export type { MatterSpec, SpeckShape } from './foeTuning';

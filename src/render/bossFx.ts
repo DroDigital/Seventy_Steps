@@ -11,6 +11,7 @@ import { createBeams, type Beams } from './beams';
 import { createDecals } from './decals';
 import { createFlaskFx } from './flaskFx';
 import { createFogGates } from './fogGates';
+import { createFoeFx } from './foeFx';
 import type { GroundFx } from './groundFx';
 import { createMatterFx } from './matterFx';
 import { createMeleeFx } from './meleeFx';
@@ -33,6 +34,7 @@ export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles, 
   const tentacles = createStrikeTentacles(scene, g); // the tentacles that rise from marked ground
   const surge = createSurgeView(scene, g, particles); // the wall of water of a tidal surge
   const melee = createMeleeFx(g, particles, ground);
+  const foes = createFoeFx(g, particles, ground); // round 90: every creature that is not a horror draws its blow quietly, in a mark of its own
   const fog = createFogGates(g, particles);
   const flasks = createFlaskFx(scene, g, particles); // round 29: a flask of lamp oil, in flight and burning
   return {
@@ -45,6 +47,7 @@ export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles, 
       tentacles.update(time);
       surge.update(alpha);
       melee.update(alpha);
+      foes.update(alpha);
       fog.update(time);
       flasks.update(alpha, time);
     },

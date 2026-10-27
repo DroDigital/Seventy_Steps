@@ -3,8 +3,8 @@
  * turned and placed, then merged per chunk into one mesh per material (stone, wood, needles and
  * leaves, clapboard, brick, shingles, and the self-lit glow of lamps, fires and lit windows), tinted
  * toward the region's ground and darkened toward it (light baked into the vertices, playtest round
- * 7); the lamps, fires and windows are reported as lights (worldLights.ts). Built a few props at a
- * time (a sliced job).
+ * 7); the lamps, fires and windows are reported as lights (worldLights.ts; round 87: a fire is a light and its
+ * pixel flame, flames.ts, with no cone of embers built for it). Built a few props at a time (a sliced job).
  */
 
 import * as THREE from 'three';
@@ -16,7 +16,7 @@ import { groundShade } from './meshKit';
 import { planeOf, type MirrorSpot } from './mirrorMath';
 import { mixRgb, type Rgb } from './palette';
 import { shadowMesh } from './moonShadow';
-import { propPieces, type PropMat } from './propShapes';
+import { propPieces, type Piece, type PropMat } from './propShapes';
 import type { Top } from './chimneys';
 import type { LightSpot } from './worldLights';
 import { createWorldMaterial, type WorldMaterialOptions } from './worldMaterial';
@@ -79,6 +79,12 @@ export const propMaterial = (m: PropMat): THREE.ShaderMaterial => {
   return mat;
 };
 
+/** A piece's geometry darkened toward the ground, turned as its prop is and set down where it stands. */
+function placed(geo: THREE.BufferGeometry, piece: Piece, p: Prop): THREE.BufferGeometry {
+  if (!UNSHADED.has(piece.mat)) groundShade(geo, p.kind === 'house' ? 0.62 : 0.55, p.kind === 'house' ? 2.2 : 1.6); // darker toward the ground
+  return geo.rotateY(p.yaw).translate(p.x, p.y - 0.15, p.z);
+}
+
 /** Builds the chunk's props; `done` receives one mesh per material used, and the lights among them. */
 export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshes: THREE.Mesh[], lights: LightSpot[], chimneys: Top[]) => void, cover?: Partial<Record<PropMat, THREE.BufferGeometry>>): Generator<void, void> {
   const c = regionStone(region);
@@ -92,24 +98,25 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   for (const p of props) {
     const [s, cs] = [Math.sin(p.yaw), Math.cos(p.yaw)];
     for (const piece of p.kind === 'house' ? housePieces(p, c) : propPieces(p, c)) {
-      if (!UNSHADED.has(piece.mat)) groundShade(piece.geo, p.kind === 'house' ? 0.62 : 0.55, p.kind === 'house' ? 2.2 : 1.6); // darker toward the ground
-      const geo = piece.geo.rotateY(p.yaw).translate(p.x, p.y - 0.15, p.z);
-      if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
-      if (piece.mat === 'mirror') {
-        const spot = planeOf(geo);
-        if (spot) mirrors.push(spot);
+      const geo = piece.geo && placed(piece.geo, piece, p);
+      if (geo) {
+        if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
+        if (piece.mat === 'mirror') {
+          const spot = planeOf(geo);
+          if (spot) mirrors.push(spot);
+        }
+        groups.get(piece.mat)?.push(geo) ?? groups.set(piece.mat, [geo]);
+        if (CASTS.has(piece.mat)) casters.push(geo);
       }
-      groups.get(piece.mat)?.push(geo) ?? groups.set(piece.mat, [geo]);
-      if (CASTS.has(piece.mat)) casters.push(geo);
       for (const [x, y, z] of piece.smoke ?? []) chimneys.push({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was, then placed
       if (!piece.light) continue;
       if (piece.at) {
         const place = ([x, y, z]: readonly [number, number, number]): { x: number; y: number; z: number } => ({ x: p.x + x * cs + z * s, y: p.y - 0.15 + y, z: p.z - x * s + z * cs }); // turned as the piece was (rotateY), then placed
-        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane, halo: piece.halo, haloGain: piece.haloGain });
-      } else {
+        lights.push({ ...place(piece.at), kind: piece.light, glass: piece.glass && place(piece.glass), pane: piece.pane, halo: piece.halo, haloGain: piece.haloGain, flame: piece.flame, seat: piece.seat });
+      } else if (geo) {
         geo.computeBoundingBox();
         const m = geo.boundingBox!.getCenter(new THREE.Vector3());
-        lights.push({ x: m.x, y: m.y, z: m.z, kind: piece.light });
+        lights.push({ x: m.x, y: m.y, z: m.z, kind: piece.light, flame: piece.flame, seat: piece.seat });
       }
     }
     spent += p.kind === 'house' ? 4 : 1;
