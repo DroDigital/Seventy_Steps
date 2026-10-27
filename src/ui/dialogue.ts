@@ -89,7 +89,7 @@ export function createDialogue(g: Game): Dialogue {
   });
 
   g.events.on('Talked', ({ npc, name, title, lines, rumor, shop }) => {
-    g.talking = true; // at once: a talk may open within a step, and the rest of that step must hold the investigator safe too (main.ts syncs it again at the next)
+    g.sheltered = true; // at once: a talk may open within a step, and the rest of that step must hold the investigator safe too (main.ts syncs it again at the next)
     let i = 0;
     const line = (): void => {
       stopSaying();
@@ -157,7 +157,7 @@ export function createDialogue(g: Game): Dialogue {
   g.events.on('Read', ({ name }) => {
     const doc = DOCUMENTS[name];
     if (!doc) return;
-    g.talking = true; // at once, as for a talk: a page opened within a step holds the investigator safe for the rest of it
+    g.sheltered = true; // at once, as for a talk: a page opened within a step holds the investigator safe for the rest of it
     if (documentSkin(doc) === 'paper') showNote(name);
     else read.show(documentPage(name, () => read.close(), `${glyph('interact')} · Put it away`));
   });
@@ -175,12 +175,23 @@ export function createDialogue(g: Game): Dialogue {
   };
 }
 
+/**
+ * The keys that put a page away: E, and Space or Enter, which would otherwise press its focused button. A held key is no press:
+ * a Space held to sprint as the investigator walks onto a note opens it with Space still down, and the button took that Space on
+ * its release, so the note closed the moment the key was let go. Such keys are taken here, and only a fresh press closes.
+ */
+const putsAway = (code: string): boolean => advances(code) || code === 'Space' || code === 'Enter';
+
 /** A tome's or note's text on a page; `back` closes it. */
 export function documentPage(name: string, back: () => void, label = t('keys.back')): Page {
   const doc = DOCUMENTS[name];
   return {
     back,
-    keys: (e) => void (advances(e.code) && !e.repeat && back()),
+    keys: (e) => {
+      if (!putsAway(e.code)) return;
+      e.preventDefault(); // the focused button must not take the key as its press
+      if (!e.repeat) back(); // a repeat is a key still held (one down from before the page opened repeats too): it closes nothing
+    },
     build(p) {
       el(p, 'div', name.toUpperCase(), `letter-spacing:3px;color:${BONE};margin-bottom:4px`);
       el(p, 'div', doc?.kind === 'tome' ? 'a tome' : 'a note', 'opacity:.45;font-size:11px;margin-bottom:14px');

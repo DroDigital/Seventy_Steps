@@ -202,6 +202,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
   };
 
   g.events.on('Rested', () => {
+    g.sheltered = true; // at once: this menu opens within the step that rests here, so the rest of that step holds the investigator safe too
     tab = 0;
     screen.show(main);
     void refreshMountEntitlement(g).then(() => { if (screen.open) main.redraw?.(); });

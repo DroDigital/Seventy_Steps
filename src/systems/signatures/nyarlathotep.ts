@@ -9,6 +9,7 @@
 import type { Entity } from '../../core/ecs';
 import { yawOf } from '../../core/geom';
 import { attackRange, compileAttack } from '../../data/attacks';
+import { bandOf } from '../../data/bossPunish';
 import { getEntity } from '../../data/registry';
 import { REGIONS } from '../../data/regions';
 import type { AttackId } from '../../data/schema';
@@ -73,7 +74,7 @@ export const NYARLATHOTEP_SIGNATURE: Signature = {
     return borrowed(g)
       .filter((id) => !own.has(id))
       .map((id) => {
-        if (!a.moves[id]) a.moves = { ...a.moves, [id]: compileAttack(id, stats, reach ?? height) };
+        if (!a.moves[id]) a.moves = { ...a.moves, [id]: compileAttack(id, stats, reach ?? height, bandOf(f.id)) };
         return { move: id, weight: 1, range: attackRange(id, reach ?? height) };
       });
   },

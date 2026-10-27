@@ -4,7 +4,7 @@
   "source": "previews/library.html current pack-data registrations",
   "path_base": "This folder; paths are relative to the folder containing this index.",
   "entity_count": 105,
-  "unique_png_count": 2856,
+  "unique_png_count": 2824,
   "import_rules": [
     "Use the listed PNGs in numerical frame order. Folder contents include historical files that are not in the current animation registrations.",
     "Use each action frame_count; accepted cycles vary by creature and direction.",
@@ -42,7 +42,13 @@
     "flying_polyp#boss: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
     "zkauba: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
     "ghoul: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
-    "ghoul#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored."
+    "ghoul#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 27 frames drawn (23 in place, 0 into places the old drawing left, 4 on a shelf), 0 old frames dropped, right mirrored.",
+    "nug: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 0 into places the old drawing left, 6 on a shelf), 0 old frames dropped, right mirrored.",
+    "yeb: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 0 old frames dropped, right mirrored.",
+    "shub_niggurath: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 26 frames drawn (20 in place, 4 into places the old drawing left, 2 on a shelf), 16 old frames dropped, right mirrored, its 3 stoop frames (stoop, stoop_mid) drawn in place.",
+    "joseph_curwen: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 18 old frames dropped, right mirrored.",
+    "high_priest: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 2 old frames dropped, right mirrored.",
+    "high_priest#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 6 old frames dropped, right mirrored."
   ],
   "entities": [
     {
@@ -14295,57 +14301,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/joseph_curwen/64x64/front/idle_0.png",
-                  "sha256": "64399338391c4b3ea3565820795a6ba36d3212414954d0bdba8c6f2b89e57702"
+                  "sha256": "599e18bf6f0f5b806d92aedcbf7ef7d3e289743cbf2349cf768cf531a4909b9d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/joseph_curwen/64x64/front/idle_1.png",
-                  "sha256": "c4ccdedc050f8955d49c7907d9a0b5ca8e203cb2195037b99ec4d41e21b94796"
+                  "sha256": "546708efaf008bd0f2b9a408ae802561a95e6edb14a1f71c0c7dbaf1b746b417"
                 }
               ]
             },
             "move": {
-              "frame_count": 8,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/joseph_curwen/64x64/front/move_0.png",
-                  "sha256": "0c2c53df57d5076768ea29c5b6bcc15648c544a66ad93bd99b3dac381c797463"
+                  "sha256": "47a2c5b728696bd8327007cd09332ee857809dd964fd6ed4b785f4f605bac75c"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/joseph_curwen/64x64/front/move_1.png",
-                  "sha256": "050dd6f82f76eda76e42f51c6113730719e813fb828b1bb1302a517b286f0ad2"
+                  "sha256": "497fb4b5340f3e464c7c984205c42a656621f175301998a85ede7ef63426b461"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/joseph_curwen/64x64/front/move_2.png",
-                  "sha256": "bed42e3266ec5e5b601282db1d1ac6395f33670c432a6bd81641b7dc19d2dbf0"
+                  "sha256": "16107d49a678ebe7e2126f4f7715f4417357e05907cb8d5ce2ada240e68fb132"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/joseph_curwen/64x64/front/move_3.png",
-                  "sha256": "64d5a857041a025e8715931d9f530a591d32a5bcb8a2030d895cb445669be9be"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/joseph_curwen/64x64/front/move_4.png",
-                  "sha256": "33598b4e93cb6769a35afab72b73a3fdffe440c938ae124577e801d6246f9a85"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/joseph_curwen/64x64/front/move_5.png",
-                  "sha256": "f3fee2d37a16cc34165b1be8016b5b2017b7e5d319cf9583db6f781e752ab417"
-                },
-                {
-                  "name": "move_6",
-                  "path": "sprites/joseph_curwen/64x64/front/move_6.png",
-                  "sha256": "829a4cba52d323e4df8dad795493208cbfb7ec03372c63b166064a7e24da2a3c"
-                },
-                {
-                  "name": "move_7",
-                  "path": "sprites/joseph_curwen/64x64/front/move_7.png",
-                  "sha256": "9f4cc062f9d787de74a5e12e87cbd5fa9500682664c917b4d975a6b97b8673f2"
+                  "sha256": "ee147f4d91c8d396b117a4e04683b80077494d7826b4a80704a478d732d8ce85"
                 }
               ]
             },
@@ -14355,17 +14341,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/joseph_curwen/64x64/front/attack_0.png",
-                  "sha256": "6cac4ec0db459c6b2f3eaf4d2f31c9777028c49949423553cd1cb64c2e4734e0"
+                  "sha256": "3fb43eed7cbed93624f87afbb03c7ab9967070701c64ef51fece7311ad106724"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/joseph_curwen/64x64/front/attack_1.png",
-                  "sha256": "996d74bba52eb15661002869e4f9b0872b2b9d4fa6575b7fd7bc5b40023c9d77"
+                  "sha256": "d04430d6133c0ae385d01f274af29f0be200036d28079a0383a58e978a2596cb"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/joseph_curwen/64x64/front/attack_2.png",
-                  "sha256": "3dff4c39b192ab4a9bd54bb3bc0372ca6ab8b28329e60b41d735b352a5dcf2e8"
+                  "sha256": "5cb7e95530c150836521f63216cb9bf17d707ff97227860ce3f0b0335c8358d0"
                 }
               ]
             },
@@ -14375,12 +14361,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/joseph_curwen/64x64/front/hurt_0.png",
-                  "sha256": "66d5d63b32eca89b78a43c2706867921b902e2546eed67a369ccff2b0785ab0c"
+                  "sha256": "80dd434d7782bc212200be9adb61ea7fd45b9815a3c967a1ba1af4e13442abe0"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/joseph_curwen/64x64/front/hurt_1.png",
-                  "sha256": "f273174d55d79d5b627e13dea8cc47f342943c1c67dcffca580ab133fa6f4180"
+                  "sha256": "ee17de1d675a80e517b823b40d6c61b31b8f8b9a5bc7622f76d1d2ca611677b9"
                 }
               ]
             }
@@ -14396,57 +14382,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/joseph_curwen/64x64/back/idle_0.png",
-                  "sha256": "e283ac2b29750300a3fbe02db9d1a2d0bf6ac430c4436f7ffd9b685b8928665f"
+                  "sha256": "cc8bb595de421f5955f6f47a967de2e82f9a50a8975fedc4043b341f3c87017f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/joseph_curwen/64x64/back/idle_1.png",
-                  "sha256": "c5cb189993400dc05c73a12c8a7c2fb0d9399f1f3d41bfeed79cc588c02f28ea"
+                  "sha256": "caa7e9856c093a6b28cbbf9d356dae66e52e67a3c22290f6bc19d05e3a7b5e44"
                 }
               ]
             },
             "move": {
-              "frame_count": 8,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/joseph_curwen/64x64/back/move_0.png",
-                  "sha256": "4be67ae9a7082d1b8fa40a916465defb17bf447535364f00aea4ee85aec532f4"
+                  "sha256": "cec807482d98a7f968e6a6a34760b0b7e86c6a9421862a2a35bd71c125bf1f24"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/joseph_curwen/64x64/back/move_1.png",
-                  "sha256": "a9a1a650b2438fec5b25c441f9f1cc7a857375ceef5648872b11e4936a32a410"
+                  "sha256": "dc3b71677cdfb43f3f6805d310b521bcbdf9bdc46f4339f66f6dcda5f9dfb8ac"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/joseph_curwen/64x64/back/move_2.png",
-                  "sha256": "578e41a72c70d98ddbf7323d756d871a2ae12a1187a5cdaf5ff4a7c6052e59c5"
+                  "sha256": "965c2d50f09f6dcda0c89fa56923748d39fde94577ce6c84fdd8f8f62102dc82"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/joseph_curwen/64x64/back/move_3.png",
-                  "sha256": "87fa3c3efe6ba0943fa1011bd10541c39691b795691c0185c0f204a26af2db61"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/joseph_curwen/64x64/back/move_4.png",
-                  "sha256": "82c3c7441c29da27dbab003d3fb328fb902070f3a3a56e57750bbfc9aac78776"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/joseph_curwen/64x64/back/move_5.png",
-                  "sha256": "b36bae700468f3b1a8acc9a2c32f798d26dc34d636252425ccdee08e434f7aba"
-                },
-                {
-                  "name": "move_6",
-                  "path": "sprites/joseph_curwen/64x64/back/move_6.png",
-                  "sha256": "c4ccfb7902395c4deee9848a3dbc875d8d5df518b0c7baab99dd3eff78cbfe24"
-                },
-                {
-                  "name": "move_7",
-                  "path": "sprites/joseph_curwen/64x64/back/move_7.png",
-                  "sha256": "675b5a97f82f0a6d8fd3ff19742e1cba7308c05a55a9eaab8abfc0e98afe8c89"
+                  "sha256": "8c29ebe9313a4d647d5a50d8243e6310511cc24ca72e1d4306dfb38cd93aa396"
                 }
               ]
             }
@@ -14462,103 +14428,83 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/joseph_curwen/64x64/left/idle_0.png",
-                  "sha256": "8f2c15cd0abb5d0888e2c466b4fd9158f35318b1bef6c55e5eaf082dab3b0f94"
+                  "sha256": "affbb9441c9777cfbbef26a3d17f7d871fb69c9d558791cca495aa6f90334fbd"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/joseph_curwen/64x64/left/idle_1.png",
-                  "sha256": "396edc601d9517724e6a486c85ea6cd6b8e2cea16d4a2db0a36d561d049de46e"
+                  "sha256": "1f236d6235239d9baa53f988ca728080bdea19ceae48ca65953514485a0d2aae"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/joseph_curwen/64x64/left/move_0.png",
-                  "sha256": "b0ddb58a94ac33b1e7c9a851f616151b0cf21ab0102deaf3cbb7af6f29f97ed4"
+                  "sha256": "08abd1e69db1da04522570b1477f1a2218b9c6ad060a9de30c4a287f8139137a"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/joseph_curwen/64x64/left/move_1.png",
-                  "sha256": "e41bf68e1e61f91fb95e2c12f9a360afa85c597342e86d4766091d5f85b6d94d"
+                  "sha256": "114968efde63f7b85768eb3bafa3019113905f29d81e494722d86a2300a2fcf4"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/joseph_curwen/64x64/left/move_2.png",
-                  "sha256": "b5cc9d0b779ed63b55f3b1d59a18a1f75ef710738ee71bb1e521bb6cea4de4b2"
+                  "sha256": "51e82d4b16098bde330d73fa034ae33856458f92387f4b5c32e6d02be5a9f92e"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/joseph_curwen/64x64/left/move_3.png",
-                  "sha256": "08b73cf001b2d4bfe4a54990b0f35c4907ab3a8808ffd19236690da76f180775"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/joseph_curwen/64x64/left/move_4.png",
-                  "sha256": "e8853f7518c8cf0c1bf6e6558798b5d1a50e23326501418227ae9917b9d196c2"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/joseph_curwen/64x64/left/move_5.png",
-                  "sha256": "a9c2b4ede0dc5883ab77d4659c4be73cf2e1769015796105d51673c1f5d8a9d4"
+                  "sha256": "73d7ec4287dd49d094469c2fece93343b3e519beb9984a0497e6e8e8d95c0945"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "sprites/joseph_curwen/64x64/right/idle_0.png",
-                  "sha256": "eb992c0aa995013c4154f3c4d668137bc3372427f25e7d75602def8be9794bd5"
+                  "path": "sprites/joseph_curwen/64x64/left/idle_0.png",
+                  "sha256": "affbb9441c9777cfbbef26a3d17f7d871fb69c9d558791cca495aa6f90334fbd"
                 },
                 {
                   "name": "idle_1",
-                  "path": "sprites/joseph_curwen/64x64/right/idle_1.png",
-                  "sha256": "a840b3c04b2e963627f6ede1d593ca332ff4e1e1ddd37e57dc3295dbf9fb9c2a"
+                  "path": "sprites/joseph_curwen/64x64/left/idle_1.png",
+                  "sha256": "1f236d6235239d9baa53f988ca728080bdea19ceae48ca65953514485a0d2aae"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "sprites/joseph_curwen/64x64/right/move_0.png",
-                  "sha256": "32af98537ac8c1c3c658ffb2cc42c078685c03a857f08f19ddbd5e6a1ea5cf09"
+                  "path": "sprites/joseph_curwen/64x64/left/move_0.png",
+                  "sha256": "08abd1e69db1da04522570b1477f1a2218b9c6ad060a9de30c4a287f8139137a"
                 },
                 {
                   "name": "move_1",
-                  "path": "sprites/joseph_curwen/64x64/right/move_1.png",
-                  "sha256": "4a98c76212f8c000424e876832223ecff3eda3aafe0b8d6fb1963b7d047bbe0e"
+                  "path": "sprites/joseph_curwen/64x64/left/move_1.png",
+                  "sha256": "114968efde63f7b85768eb3bafa3019113905f29d81e494722d86a2300a2fcf4"
                 },
                 {
                   "name": "move_2",
-                  "path": "sprites/joseph_curwen/64x64/right/move_2.png",
-                  "sha256": "b65f7601a339f59035a0b7d927b0d2d7d8d481326cda3d0dc495780b3c92d7cd"
+                  "path": "sprites/joseph_curwen/64x64/left/move_2.png",
+                  "sha256": "51e82d4b16098bde330d73fa034ae33856458f92387f4b5c32e6d02be5a9f92e"
                 },
                 {
                   "name": "move_3",
-                  "path": "sprites/joseph_curwen/64x64/right/move_3.png",
-                  "sha256": "c25c7ba91dffd0c641d5a1f31b1b10e7d18b2f2f14aa172b8ed61dfc99a31c4a"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/joseph_curwen/64x64/right/move_4.png",
-                  "sha256": "0ec9ee53ed162702c9ee096ad4ebc02089a5863a831693718e4fd84e7b6f13d7"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/joseph_curwen/64x64/right/move_5.png",
-                  "sha256": "8df88c91a26ab6212f7c7faf194e46f753712d9d6b726902bf8e5393cf1b6310"
+                  "path": "sprites/joseph_curwen/64x64/left/move_3.png",
+                  "sha256": "73d7ec4287dd49d094469c2fece93343b3e519beb9984a0497e6e8e8d95c0945"
                 }
               ]
             }
@@ -17770,12 +17716,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/64x64/front/idle_0.png",
-                  "sha256": "eea5985069834b9ca5e973edaf09ff83887e259ef7f59608dceb2f36794e5875"
+                  "sha256": "998a03558561905a93004b241c03f5331394af38dff4ce6a1c1b67f2a97e577e"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/64x64/front/idle_1.png",
-                  "sha256": "45957a29203ae283b21872fba2529e351890a1cc4f31eda9331fe67e59c1554d"
+                  "sha256": "cb3e712d03b55951cfc8df7c37b6ef39ad975bc8efae67094691e93145812f68"
                 }
               ]
             },
@@ -17785,22 +17731,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/64x64/front/move_0.png",
-                  "sha256": "d648b2995837e6501ad15cc5ea3cdc7b2b2cf249a4cc0b06ab2ff3df129136b4"
+                  "sha256": "4f9e7b22bcc04c285646e982c88db99fb0f13c6be8314bc64877f7c04bd69eda"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/64x64/front/move_1.png",
-                  "sha256": "01f35593ac42c063a54bd862c6f7ffeb5cde08ec6df10f90470dc0d37baf5eb1"
+                  "sha256": "d007e8c87cd05153885c65e94970b0420d0efbe4c3f007360484a574f6624ab3"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/64x64/front/move_2.png",
-                  "sha256": "eb272952bed9890d3f7b425a96ac9f05479d33066d9c9650d205025056751fd4"
+                  "sha256": "aa5f6622aa948807a4ca4fb88c92e1befdaf0973f54d0acc2369939fe7436985"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/64x64/front/move_3.png",
-                  "sha256": "aad039c94cebed014ace915ee7e9185865cec9cc740f6509f2c33609df980a4a"
+                  "sha256": "f81239e2a4753742a502517cd24920b37675c62d3e96f60766ef13fe70eeed82"
                 }
               ]
             },
@@ -17810,17 +17756,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/high_priest/64x64/front/attack_0.png",
-                  "sha256": "b6abfa4e92a1c95ef7dba258916e949e50246e70fa5c49f590af96622f833fdb"
+                  "sha256": "5480d9ed6a281a606d0f07c142a3cd1b00306569057ba759973aed30956fcea0"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/high_priest/64x64/front/attack_1.png",
-                  "sha256": "6e7f1c5a743d264a12ec210c905bb8110ee61e6b9a7366e4ae864bc8c50b2f1a"
+                  "sha256": "f526765c261a338a8fd78517b04ee0f14b36ac94c24ed424356aa4fae36c5d4f"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/high_priest/64x64/front/attack_2.png",
-                  "sha256": "71ffa3f47d31fe28a9a03d29da44046e33803583bd4163dc7f56f9a6bf7f94b1"
+                  "sha256": "5531be52d0540c11313b0667fcfee1077c05817b1d1d2415f01e07ca5255b441"
                 }
               ]
             },
@@ -17830,12 +17776,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/high_priest/64x64/front/hurt_0.png",
-                  "sha256": "a65f0765a23fa44f607561bca57a5f9fdf3dd1303a8b99bab3860f34fe2a7347"
+                  "sha256": "6e108baa803908408fcc8365f7320e177192b1f19c24ac7a31814fc731808748"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/high_priest/64x64/front/hurt_1.png",
-                  "sha256": "73b39a1da160aa421d64a5fe14089cad941f024ad07c25fb80f63d7d3d4a78b4"
+                  "sha256": "1d55b05622fa06941ba6eadfc56d6f97679705ccc0862c96dd8868f0fc0c1daf"
                 }
               ]
             }
@@ -17851,12 +17797,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/64x64/back/idle_0.png",
-                  "sha256": "4208d19b7683c5b91c51dd693f7c368778cd5244332143bc6c230ae3c077a66d"
+                  "sha256": "236b6ce492eec40413783d6d22f4f8f7446a853b7a6b00fe9a4e73318f00c68f"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/64x64/back/idle_1.png",
-                  "sha256": "0de1330194738e40795345f19be1fb5693e42e4aa60f0c97288f4f4e623aa5f8"
+                  "sha256": "2f4fd9432a36e8f9e72203710516b7cd1f90b1144d176f2afba504418af71b94"
                 }
               ]
             },
@@ -17866,22 +17812,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/64x64/back/move_0.png",
-                  "sha256": "4ee6e6f46beae8d29830ae7b38661637a84abe805bb5cabe440d74f44cc4b8c0"
+                  "sha256": "497c0605b5e5cf7befb4c2ffe35d178afcec0e6d05ed4242f37554c9d1435978"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/64x64/back/move_1.png",
-                  "sha256": "59c5c7aa1afca223a4e6b1dd3ff975173cbb729426b38fc61e029192e392cabf"
+                  "sha256": "a5fafcb5e4dda8018392c5a46df78ddd759ab28d74bfdf2ada2d085311a02a58"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/64x64/back/move_2.png",
-                  "sha256": "abac32230a1db2404ff8c877f90828875d82051dd9cf08cde9a19fb7fd37234b"
+                  "sha256": "a202f72fbecc0cc8bfb68ff3ef83940d9d669f9088122bd85ffc1cd697af2f26"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/64x64/back/move_3.png",
-                  "sha256": "f254f4c785bf8d57d1d4db430ae69b498c3b0cdb8bc8cd783241984e26580e06"
+                  "sha256": "f13d7298abb3158482c285acbd99cd06473d04ff1da3a109fff2cabf13db6f79"
                 }
               ]
             }
@@ -17897,47 +17843,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/64x64/left/idle_0.png",
-                  "sha256": "36835cb60357ac4f3e7c84ec1036da880da70f34aa003f4bc0d8995d3c79efe9"
+                  "sha256": "2d9bf8972f6ab4e39f4d576393c90c57a43ec01cdc06b21be44b156e47ae832d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/64x64/left/idle_1.png",
-                  "sha256": "180a2207e418ab5fd5c08d1ed06d928110eee63e454d4e688f57480d7ffae064"
+                  "sha256": "561b5ee0868a52d037b7a29bb5824050bad9ccff057ee9f0a559081820972a27"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/64x64/left/move_0.png",
-                  "sha256": "e69dd636716a0989fa370f2ea926e8ed0865cd14e3e0f8df1fd9aea55384b966"
+                  "sha256": "7f5a66331783cf1c5dba0f54e01f273bef51adbafb23475567080ccef6a97c45"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/64x64/left/move_1.png",
-                  "sha256": "a501a53f18b1912f072c9ca03c528c57a8f94abb4995882589f58cebcee76060"
+                  "sha256": "eb508bdaa3a9ef1ccad8c7a2f79b1b3eecf33b7152389e0192171407425413aa"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/64x64/left/move_2.png",
-                  "sha256": "b6ea92ab3cababa70fe679e3b961324b5e072e595924ec195fb80fa736d7fcb9"
+                  "sha256": "93a8ea553dc14bd71e8ebc93328ec13526350b5f4217935092691d5ccba35f4a"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/64x64/left/move_3.png",
-                  "sha256": "153f71c4fbafdcee70d8f907a21cc3375304a554fc86ad342c6149d163a2c8aa"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/64x64/left/move_4.png",
-                  "sha256": "7f60b3dd0264a23f93f2eefccea662037e240a8f947ffdf23aac107dd9772a8a"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/64x64/left/move_5.png",
-                  "sha256": "3a126dc7d5745c1bf4144c93b4725383515c0c22cce98b8a1ecd071cbe97ba25"
+                  "sha256": "f3fa789dff4d258d095c1bfa9258afce004863ac273ea14962efdb3daf189718"
                 }
               ]
             }
@@ -17953,47 +17889,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/64x64/left/idle_0.png",
-                  "sha256": "36835cb60357ac4f3e7c84ec1036da880da70f34aa003f4bc0d8995d3c79efe9"
+                  "sha256": "2d9bf8972f6ab4e39f4d576393c90c57a43ec01cdc06b21be44b156e47ae832d"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/64x64/left/idle_1.png",
-                  "sha256": "180a2207e418ab5fd5c08d1ed06d928110eee63e454d4e688f57480d7ffae064"
+                  "sha256": "561b5ee0868a52d037b7a29bb5824050bad9ccff057ee9f0a559081820972a27"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/64x64/left/move_0.png",
-                  "sha256": "e69dd636716a0989fa370f2ea926e8ed0865cd14e3e0f8df1fd9aea55384b966"
+                  "sha256": "7f5a66331783cf1c5dba0f54e01f273bef51adbafb23475567080ccef6a97c45"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/64x64/left/move_1.png",
-                  "sha256": "a501a53f18b1912f072c9ca03c528c57a8f94abb4995882589f58cebcee76060"
+                  "sha256": "eb508bdaa3a9ef1ccad8c7a2f79b1b3eecf33b7152389e0192171407425413aa"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/64x64/left/move_2.png",
-                  "sha256": "b6ea92ab3cababa70fe679e3b961324b5e072e595924ec195fb80fa736d7fcb9"
+                  "sha256": "93a8ea553dc14bd71e8ebc93328ec13526350b5f4217935092691d5ccba35f4a"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/64x64/left/move_3.png",
-                  "sha256": "153f71c4fbafdcee70d8f907a21cc3375304a554fc86ad342c6149d163a2c8aa"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/64x64/left/move_4.png",
-                  "sha256": "7f60b3dd0264a23f93f2eefccea662037e240a8f947ffdf23aac107dd9772a8a"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/64x64/left/move_5.png",
-                  "sha256": "3a126dc7d5745c1bf4144c93b4725383515c0c22cce98b8a1ecd071cbe97ba25"
+                  "sha256": "f3fa789dff4d258d095c1bfa9258afce004863ac273ea14962efdb3daf189718"
                 }
               ]
             }
@@ -18019,47 +17945,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/eldritch/64x64/front/idle_0.png",
-                  "sha256": "53af28d4e09f9159a36675f28109cafa82ce0f4307e9bee92291ac1006aba9c4"
+                  "sha256": "c48c8fafa7223672586128d6c03ee59585776b85a710a83a210942ae7bfb9f69"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/eldritch/64x64/front/idle_1.png",
-                  "sha256": "77b29051eb0c63fabbe48fbb6529d82ecc847452fb24df4cbbad4d99415d3918"
+                  "sha256": "c6829f868d8911cd9b6b8de19566793e1938eef1f68947d7ee151c0e70f25729"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/eldritch/64x64/front/move_0.png",
-                  "sha256": "e5a976ab98259bd4de20cf5969b6e02e4a6efa8251de08f18b0362a3d910ad0a"
+                  "sha256": "4345ce63110c0ef244c2dbb812748959ddc6a3164a06e52470db0ff3795b17c7"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/eldritch/64x64/front/move_1.png",
-                  "sha256": "b2dcaaf1f0614a5e2f95296ed03ff4aba68fde3c0ada22345605b2d78b422aad"
+                  "sha256": "af35bdd9008df1a7b5f86f01e82b8c680f00ee2c875c4f9e1ce06a0c5e242341"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/eldritch/64x64/front/move_2.png",
-                  "sha256": "96342f88107c9afef7998bd7689ca256a70e9088ae83da88ebef71b2293cb22f"
+                  "sha256": "e31d3ecc71c1641a83e4cef7d80fccb60419bd50fcb651e6378bd545eb9d2ee5"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/eldritch/64x64/front/move_3.png",
-                  "sha256": "76078046f4667b9704f6e0fb413bf401453450728696798fe3a916b895454539"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/eldritch/64x64/front/move_4.png",
-                  "sha256": "4d3bcd3a574ac5ff4ca2668ccb847911f87bccfe012f388243af6b96044619bc"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/eldritch/64x64/front/move_5.png",
-                  "sha256": "7e5aea7f088ae893a121eddacd91391279434867c7e96c3fa2979c0a3204fe0c"
+                  "sha256": "8ca10e9c338972cc89d3240d9434830aea797e401fc6d13a685f2588cb5e4f18"
                 }
               ]
             },
@@ -18069,17 +17985,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/high_priest/eldritch/64x64/front/attack_0.png",
-                  "sha256": "e0414bba8ea6fff2d3984262686e214b035941f46fdb8dd827608a536025609e"
+                  "sha256": "81b60cae547c067a4ccaf1e5fcf42513adb8ccd2e25187cf0d2527ce8a49e15d"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/high_priest/eldritch/64x64/front/attack_1.png",
-                  "sha256": "f9c3ca2b0c8c4404706460448809a447d8ad08168ac433beb8de79831dad88a5"
+                  "sha256": "36e4690ff484171e70846a280d432c399aaae2eaab2f0a1132813a988b5c4b25"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/high_priest/eldritch/64x64/front/attack_2.png",
-                  "sha256": "661825a5f587f7337ede056269b289e67fb252fc43199773df99ef0f7cdb277c"
+                  "sha256": "f2e2fca8ef5bc96052e22471d5e14a3562ea7375801267ef2bd1a2d64cf9d9f2"
                 }
               ]
             },
@@ -18089,12 +18005,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/high_priest/eldritch/64x64/front/hurt_0.png",
-                  "sha256": "b9f63495bbf00c6e2785c695f14566011bce83504ac45e6c18393f5632ec6d90"
+                  "sha256": "c2031c79e27ad87fddd51a8b9d0cf3fc9d41a46c96135183e4c6bfcb1eaabb20"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/high_priest/eldritch/64x64/front/hurt_1.png",
-                  "sha256": "feed2a4c961228982818dab76e60436b711d87a4d233dcaa607380892cf9e426"
+                  "sha256": "27558c53452eff794083a69f60fc62d7ded2db07b196bf66bb317597e7ee7a7b"
                 }
               ]
             }
@@ -18110,47 +18026,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/eldritch/64x64/back/idle_0.png",
-                  "sha256": "26f7f43fc6f2b5ca0ce436f0f3fd57d7e2270add83a8ea0adf00203c76768bea"
+                  "sha256": "13967eef0249277759bda5ea4a214ef8e14c6b656a49f5c87f19137ee39d136b"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/eldritch/64x64/back/idle_1.png",
-                  "sha256": "459e996f4797b5bc963323d12471bb36d9825326fe8677862b362f900b0b471f"
+                  "sha256": "d5b87dcfb03e04430e78463a2c53b8a2cd9ff7b4d8f92452212065cf8bb0eb6d"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/eldritch/64x64/back/move_0.png",
-                  "sha256": "97eb8854f2a469fa9516fae316a773a7a6e70a8ec7ad687315bce960ff35f05e"
+                  "sha256": "5b4fe8888c413284909b0816571aaff8217c3afaa48d88f1b681f2a5b990fbb0"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/eldritch/64x64/back/move_1.png",
-                  "sha256": "e45a6042a0cf5557d0328223c738fc1ba258d21a84463e8a891fd96fe615c4c7"
+                  "sha256": "41d127b085aa2c47959ba3ff7d70e173ba8ab92973c02d00ae4e20e87096ef1e"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/eldritch/64x64/back/move_2.png",
-                  "sha256": "05c257dea9679df78b0e44010daa153061b63d963b9c92360efc20470d0d8e06"
+                  "sha256": "6dc2406424613b714ff029d6e73308b96f7c7fb4a5c3566de5dbae000dc0fbd7"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/eldritch/64x64/back/move_3.png",
-                  "sha256": "e8cb4c85bc8811880973adc8da811817c98b98d2c6e53aa2d967309446420153"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/eldritch/64x64/back/move_4.png",
-                  "sha256": "33b4a549f5f1b92ce34c9e147218a8d2f2a20b847308832c379d03aabedb5749"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/eldritch/64x64/back/move_5.png",
-                  "sha256": "b57f145f9c3ca9bb7ed7cc43321dd522db8d2f732cfb69c3e46242d4eacd89b4"
+                  "sha256": "cacb5a47c43e7ef2870bd2da0e610f190a232a1407f07edfcaa9421df180a218"
                 }
               ]
             }
@@ -18166,47 +18072,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/eldritch/64x64/left/idle_0.png",
-                  "sha256": "20a1336d6f14b41585a21711c57450a2ebbc1dbad7ddd4ada0ad6d39abf95f43"
+                  "sha256": "4ecd3ac341211a1773b4e2e0c8de2921fbe52879e225a64c404621696b178b3e"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/eldritch/64x64/left/idle_1.png",
-                  "sha256": "121f4d8c48ee4264b15201b49519422fc4378b98c0d53e746fe53b9d60d5c9db"
+                  "sha256": "3f6c3494b7f184e1effc200751d1a9652ee1f0d32555949cae88b2f725d9613d"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_0.png",
-                  "sha256": "36d554dd5b0655b8466a6961a0a4ba3f394fc4fbf44021867b1f01db66dcbb8b"
+                  "sha256": "c5b3e2ea9e8515b9786f8fdc1c719a26393524b93df6c4cda325b44aff07d827"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_1.png",
-                  "sha256": "a6ef7738cb045f95838f315496dc133e1a9b4d421c326508c96ac7b58d042402"
+                  "sha256": "3dadbde2519e4d358d31f02f439231e4d0fb5bf8235fcd061b84c5915549468c"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_2.png",
-                  "sha256": "1a07cd5b00243db28e2e2a34bb52206b3df1b5c04ce04be3b13ead3e1f886f90"
+                  "sha256": "ad752c60f608e2f6c1a7b9e2ca86fec514fe679652f418be4eac0586ec5ffc33"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_3.png",
-                  "sha256": "2115255fc16fabde9d49bc042cf5436040f680cb84465fc65355404350be906f"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/eldritch/64x64/left/move_4.png",
-                  "sha256": "967ac29136114cc81dd85efd4db4a496e8109a816ce30351a71852708063692c"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/eldritch/64x64/left/move_5.png",
-                  "sha256": "47c6ee7e9e1141ec4368a9532748532c14267214b5740c4dbc161c8c3ce216f9"
+                  "sha256": "b52e1c457e67f57886f1c6d838295eba1723a963a5e5ca367a4c9f627d4901b3"
                 }
               ]
             }
@@ -18222,47 +18118,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/high_priest/eldritch/64x64/left/idle_0.png",
-                  "sha256": "20a1336d6f14b41585a21711c57450a2ebbc1dbad7ddd4ada0ad6d39abf95f43"
+                  "sha256": "4ecd3ac341211a1773b4e2e0c8de2921fbe52879e225a64c404621696b178b3e"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/high_priest/eldritch/64x64/left/idle_1.png",
-                  "sha256": "121f4d8c48ee4264b15201b49519422fc4378b98c0d53e746fe53b9d60d5c9db"
+                  "sha256": "3f6c3494b7f184e1effc200751d1a9652ee1f0d32555949cae88b2f725d9613d"
                 }
               ]
             },
             "move": {
-              "frame_count": 6,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_0.png",
-                  "sha256": "36d554dd5b0655b8466a6961a0a4ba3f394fc4fbf44021867b1f01db66dcbb8b"
+                  "sha256": "c5b3e2ea9e8515b9786f8fdc1c719a26393524b93df6c4cda325b44aff07d827"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_1.png",
-                  "sha256": "a6ef7738cb045f95838f315496dc133e1a9b4d421c326508c96ac7b58d042402"
+                  "sha256": "3dadbde2519e4d358d31f02f439231e4d0fb5bf8235fcd061b84c5915549468c"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_2.png",
-                  "sha256": "1a07cd5b00243db28e2e2a34bb52206b3df1b5c04ce04be3b13ead3e1f886f90"
+                  "sha256": "ad752c60f608e2f6c1a7b9e2ca86fec514fe679652f418be4eac0586ec5ffc33"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/high_priest/eldritch/64x64/left/move_3.png",
-                  "sha256": "2115255fc16fabde9d49bc042cf5436040f680cb84465fc65355404350be906f"
-                },
-                {
-                  "name": "move_4",
-                  "path": "sprites/high_priest/eldritch/64x64/left/move_4.png",
-                  "sha256": "967ac29136114cc81dd85efd4db4a496e8109a816ce30351a71852708063692c"
-                },
-                {
-                  "name": "move_5",
-                  "path": "sprites/high_priest/eldritch/64x64/left/move_5.png",
-                  "sha256": "47c6ee7e9e1141ec4368a9532748532c14267214b5740c4dbc161c8c3ce216f9"
+                  "sha256": "b52e1c457e67f57886f1c6d838295eba1723a963a5e5ca367a4c9f627d4901b3"
                 }
               ]
             }
@@ -23195,27 +23081,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/front/idle_0.png",
-                  "sha256": "b4d611fb49855583b26c33e82c00ff50c06ad7c1e1000cdf0804951d650c388d"
+                  "sha256": "c75b7d8bf40c94107a3601396a5ecfd1227fb4f9cfe08da199c8289541ccd7bc"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/front/idle_1.png",
-                  "sha256": "aa359eb0fd6d55bb632641f74a777b698c4151a019ae7b8a4209860da8dcb7b6"
+                  "sha256": "13880b49704fe3a8ad1435266d98b32fe0baccdcbfbc363aa3856265b51d0027"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/front/move_0.png",
-                  "sha256": "c95fddf792a4f3caa2f97d52585ef959f22c293423acaf3154a65c832709d6f5"
+                  "sha256": "d02d238a9c07ef682857f682f861ebab4152268775f50b5137b966e32f2e4b4e"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/front/move_1.png",
-                  "sha256": "b8fe38baa100de7e62e5729261301abd18487c018e108396a52e09d0649510df"
+                  "sha256": "514f487cb45ebae7d374b9860b8c762bf6c8cefd7fd106c5db7674a6263973df"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/front/move_2.png",
+                  "sha256": "ef17c1baa53f04b38d7da889e528c3406d39403e1e2396f2ea5ca2e8f34d914a"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/front/move_3.png",
+                  "sha256": "21459be326b1dade0e67677bf831d9ac4f099ead945029d859e853b7ccf79da7"
                 }
               ]
             },
@@ -23225,17 +23121,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/nug/64x64/front/attack_0.png",
-                  "sha256": "13aed8083fb1087e61b9e9571bc9244a4f17b1cfee609b660a5d16a7ad147f7a"
+                  "sha256": "540b4b85329b76ce21a56960dc69c76292b630158f8b585b2ba7ac61a0ce059a"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/nug/64x64/front/attack_1.png",
-                  "sha256": "4c64ac8611ebf430ee9e3868bf3ffc0f27f6bbdff9f328ecd8d464c55b201221"
+                  "sha256": "653d52286122748cdf4dc4af5c18ccc7b30fe62ae2de120525824eaaa0711404"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/nug/64x64/front/attack_2.png",
-                  "sha256": "b81431412d125b7d8f4699666ffc7a88e4528c27a1e11b3b24c9b03a560ef940"
+                  "sha256": "f256afeda78a253ee4e81dd78617620218ad20a912bbba1636e3db3453f39160"
                 }
               ]
             },
@@ -23245,12 +23141,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/nug/64x64/front/hurt_0.png",
-                  "sha256": "2aaca0d8a76c802f91b17f26bbb9a58fa17d5f69cc8119c7c1344a2fba609bbd"
+                  "sha256": "949754cf24cf0e1fee02e07e87e134b8eef9e747f29e597d25f1bbc8120ecff7"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/nug/64x64/front/hurt_1.png",
-                  "sha256": "7022323782a156d778959010a64a8356eeadc6bdacbc2f141fbd4ff6b5c654b9"
+                  "sha256": "48e49c745f885372213c2aaf9a4a7d74320400f9a6acb259e0fa24a81a18b6cd"
                 }
               ]
             }
@@ -23266,27 +23162,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/back/idle_0.png",
-                  "sha256": "d09fbd1e83c3959e212fb71acc219a80b19bfc8ac20cb557d095cc6c299dbb67"
+                  "sha256": "4e18e3172ac1872e6529eed9d6ea9fda881a120aa011e963a59e00e70ce5b5ef"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/back/idle_1.png",
-                  "sha256": "9221734c8dada3a9a7fc8f9c500caa2c27e86dfb4055b75fcc0b3c504a165893"
+                  "sha256": "12e9714ea48a5de0a3c7deff030ea97a2534a0df985cde63b6050f643cb43d1c"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/back/move_0.png",
-                  "sha256": "bbf3b9759be6ffa7b8009fd478075af96978995b624ef123a4d1f91b6f3d462b"
+                  "sha256": "7852ba45a997515ea86fa2d3f0b12b3740b4f2e071d79393164c02c5b2670bc6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/back/move_1.png",
-                  "sha256": "2444b5fad99d43310e9fbdf2199055dbd22c2de7804de2fd367e4c5123bf34e9"
+                  "sha256": "44b102821e54216ab71e3aa28d22ba141bee25238c4eccbb5dfedb75f5ba90b7"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/back/move_2.png",
+                  "sha256": "abcb8bb18979203706dae5a19f2f4e053051754d05b5aea1150444999ee209c6"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/back/move_3.png",
+                  "sha256": "26cafa286cb77659b5daebadba270ebc2d33fb088cea5c3d3e25fd76ac800281"
                 }
               ]
             }
@@ -23302,27 +23208,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/left/idle_0.png",
-                  "sha256": "83f6b7238f25e203f26d8c90bfb459fc757fbbdc8c4aa32b9541998204eba05c"
+                  "sha256": "70a922bbbbf48d43c5a1a717455af5853e835631c4318da7cf41bfa03a023b7c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/left/idle_1.png",
-                  "sha256": "c195ae841f235e6c277e70b8fd1a5bc734e983288478d4751116e2d9a3c0f4c0"
+                  "sha256": "26cfc4670bb31e6db303ecda927d608e58ff5b18436bd340c1bc83b23ea45116"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/left/move_0.png",
-                  "sha256": "cd3f54a2aac3ac88daec5c7ca36889cde126df5778ce4808cb9fa530622f9868"
+                  "sha256": "81bdae03a93cedddd8aae366e4e6452a0e86b86df2172f059b9921d8f2c333bc"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/left/move_1.png",
-                  "sha256": "1f49bdbb99fa2512a267dd0795c21800775fe6e467b54ae7a53fc16283799142"
+                  "sha256": "ae6f361560c306ddc64d8166f75a564d76ef33b4a5c9fc4832d7fd6e5c57ef25"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/left/move_2.png",
+                  "sha256": "3c28ebb1843970da0789da0f05ca02f45c3e4cef892267f9f99a64cce61fe9a4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/left/move_3.png",
+                  "sha256": "03bfd56818d896497509c36845a98bb671babbfb2db45d1bef80bdb0be3c7855"
                 }
               ]
             }
@@ -23338,27 +23254,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/nug/64x64/left/idle_0.png",
-                  "sha256": "83f6b7238f25e203f26d8c90bfb459fc757fbbdc8c4aa32b9541998204eba05c"
+                  "sha256": "70a922bbbbf48d43c5a1a717455af5853e835631c4318da7cf41bfa03a023b7c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/nug/64x64/left/idle_1.png",
-                  "sha256": "c195ae841f235e6c277e70b8fd1a5bc734e983288478d4751116e2d9a3c0f4c0"
+                  "sha256": "26cfc4670bb31e6db303ecda927d608e58ff5b18436bd340c1bc83b23ea45116"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/nug/64x64/left/move_0.png",
-                  "sha256": "cd3f54a2aac3ac88daec5c7ca36889cde126df5778ce4808cb9fa530622f9868"
+                  "sha256": "81bdae03a93cedddd8aae366e4e6452a0e86b86df2172f059b9921d8f2c333bc"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/nug/64x64/left/move_1.png",
-                  "sha256": "1f49bdbb99fa2512a267dd0795c21800775fe6e467b54ae7a53fc16283799142"
+                  "sha256": "ae6f361560c306ddc64d8166f75a564d76ef33b4a5c9fc4832d7fd6e5c57ef25"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/nug/64x64/left/move_2.png",
+                  "sha256": "3c28ebb1843970da0789da0f05ca02f45c3e4cef892267f9f99a64cce61fe9a4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/nug/64x64/left/move_3.png",
+                  "sha256": "03bfd56818d896497509c36845a98bb671babbfb2db45d1bef80bdb0be3c7855"
                 }
               ]
             }
@@ -23384,27 +23310,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/front/idle_0.png",
-                  "sha256": "2e81fa240b42f06cef463004f3d6bdaad2b7de5caa595a2d0af92551392f9645"
+                  "sha256": "32991ff3f56ac8094ffd525b32fe49594b7b3da89063ada535a20829ff1fa576"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/front/idle_1.png",
-                  "sha256": "a699719f7df750291e4c4a20a4627e5b51935248b89f4468c5b948c86b3f5c64"
+                  "sha256": "fb37cd5e8809b5e16acdc71768a6a1f20ea3e62728f3b0b0991035029ac4005a"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/front/move_0.png",
-                  "sha256": "fb2f214f7accfc2341b26f62c7dc7783985c10df2c9efcf7c7d2cf6ff8a98c84"
+                  "sha256": "3e09d5346fbac149dfe354392b18dc18e363063a3085e15cdae00f4c8420f2b9"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/front/move_1.png",
-                  "sha256": "7c59a5f235ec0cc9feed5e8bb4e085cdaefa6d78ce8ce913d36078165c599726"
+                  "sha256": "44aa3acae0c565a56f2650bfc1d6f6c8eaf83f383f2e9a9243bf234c30456914"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/front/move_2.png",
+                  "sha256": "889fd93a48d9c72e921087339c062dbaa634e26ee4b925cb6245d76309e0c9d4"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/front/move_3.png",
+                  "sha256": "69d18779db5c6711e98f55223ee949074bb7d7f6f35ba4b8c5eb3dc091037a11"
                 }
               ]
             },
@@ -23414,17 +23350,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/yeb/64x64/front/attack_0.png",
-                  "sha256": "0aa94ba3a7915b66aabaf20c9692e4e133b783fa0ebc624efdaccf948c7290c4"
+                  "sha256": "bcfc22e37c4775e667e0fc3376f24a4ddcb40d0ee84cef4494c56e6010fee5db"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/yeb/64x64/front/attack_1.png",
-                  "sha256": "323818bf230195933ce4cb231a987ca4d3b73e45557942aae07c0f0242f652fe"
+                  "sha256": "d8c2c2153e3a717407987160603ccebe357513ea15435213bf00db082b829e0d"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/yeb/64x64/front/attack_2.png",
-                  "sha256": "c423b2c42ff70fc8c5fa045b23db751bb01a0d68f5dab2cc1fb5fb722c64e432"
+                  "sha256": "69f5da72beb5bb7eae719fc250137d04943e188430494cdf99a897bcac160f27"
                 }
               ]
             },
@@ -23434,12 +23370,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/yeb/64x64/front/hurt_0.png",
-                  "sha256": "e32e24f6c3a2a5bf50503119ebc545ca5ee23a2ea01e3926cb94009f1cc583bd"
+                  "sha256": "2ef18fd69f512e3f7c2356ac4a0b62a33683e023cca939fa32e80a20e8c25665"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/yeb/64x64/front/hurt_1.png",
-                  "sha256": "2c4ca788a0aafbc79f3aeebcc442ce913cc11e27207be95999b70f4f2c66208c"
+                  "sha256": "56311f4d827f01802e5820c7bd5a396b08e33b1c1f4f546393d9b6aede7dd233"
                 }
               ]
             }
@@ -23455,27 +23391,37 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/back/idle_0.png",
-                  "sha256": "a5522b131f74ac39bb30308a9b62efab5c1019f0b616108598e7c4ef3bb99aec"
+                  "sha256": "6ff10c618493f2eda12aae1a614d1dde6a03e26265a30fa8097bbe6db37d0ff2"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/back/idle_1.png",
-                  "sha256": "affa6fa2eb12f18438cb36fcce11057db0b74c052d5c4c02d72432ad25094da1"
+                  "sha256": "0c6b75f75f6def2a1aa6af017401bc419717a26a7666e2c616c92f8549764c60"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/back/move_0.png",
-                  "sha256": "4e145f793ac4ab927aad44ba18c78b8c185424b1c5605b96d155166d8e108553"
+                  "sha256": "a913634326f4201632fd4e811922e5b7a6cd9fefcbbcb33a080b0f27d3ba0039"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/back/move_1.png",
-                  "sha256": "f859fa532b1f8fd32f7e37a8666504d7bbd66780557c448bfda4a3dd71fb0208"
+                  "sha256": "c92a02ccab20d05deeccdc3e6a941550eb856bcedd413045915f94de832e492e"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/back/move_2.png",
+                  "sha256": "47c11a5efaf45e8a330d9ec4889a630546c34ef8dd876ae726000d6f2ac2e6bb"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/back/move_3.png",
+                  "sha256": "db533405706076d4b36130d9a57f69df03356172ebabd138fc601918c75d39ce"
                 }
               ]
             }
@@ -23491,63 +23437,83 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/yeb/64x64/left/idle_0.png",
-                  "sha256": "816ecb03171c786cb96c31c802744169accfecdf142f75539c53cbbf9e8a996e"
+                  "sha256": "4afce6f7718be670e6564bf15c629df33c451f31339e9a2d1207c05cdba9c70c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/yeb/64x64/left/idle_1.png",
-                  "sha256": "9eaf946c53a201470d4dfe5c43202e5294ab17e5737246ebf5a13444b87075c1"
+                  "sha256": "7ae1a1bcbad6946eb75fc4f1347da3e36efe55ed1b74da863f1e95e3257de9db"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "sprites/yeb/64x64/left/move_0.png",
-                  "sha256": "9871f73f30c05e00b34b081f863a342bd46be813b150b9d56cb0066e279c29ac"
+                  "sha256": "e3cadd8789bef5f8b096397692c4f95706148058dd4f02aff62ec26a31207e40"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/yeb/64x64/left/move_1.png",
-                  "sha256": "58d3fec543f2a67779a9efcf1c7180054c01258d57d099578e5f6cd1d7d07cfd"
+                  "sha256": "0a583350e2173af75245ef70aa26f51315394099ff5e59fc80983e4c9658df7c"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/left/move_2.png",
+                  "sha256": "b491a636c1644dcb1ccf1a38031148eac4eb8db0c3c86d2a8e958b9436cdbdef"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/left/move_3.png",
+                  "sha256": "e43c971f45df46a0aa44de2ab08109189dd09f520892d54cfaed9fc5852a0d29"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "sprites/yeb/64x64/right/idle_0.png",
-                  "sha256": "3cd45fa48b1e900c873525ac45ff0047c9f4181c589e76ffda5196859ce1fcfb"
+                  "path": "sprites/yeb/64x64/left/idle_0.png",
+                  "sha256": "4afce6f7718be670e6564bf15c629df33c451f31339e9a2d1207c05cdba9c70c"
                 },
                 {
                   "name": "idle_1",
-                  "path": "sprites/yeb/64x64/right/idle_1.png",
-                  "sha256": "35ebd50da07cf94111a19d1a59b1c94511f8fe2e2462ef13c65a06f7540a6c19"
+                  "path": "sprites/yeb/64x64/left/idle_1.png",
+                  "sha256": "7ae1a1bcbad6946eb75fc4f1347da3e36efe55ed1b74da863f1e95e3257de9db"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "sprites/yeb/64x64/right/move_0.png",
-                  "sha256": "51baf3b8ca187bcf9e0762997e57cdea30dd07e38e728dabd38f2606e3fd87ef"
+                  "path": "sprites/yeb/64x64/left/move_0.png",
+                  "sha256": "e3cadd8789bef5f8b096397692c4f95706148058dd4f02aff62ec26a31207e40"
                 },
                 {
                   "name": "move_1",
-                  "path": "sprites/yeb/64x64/right/move_1.png",
-                  "sha256": "10a3cb0d45aeb0fc47c27e09ac202758642f3102d4b56f88a047fb775d693b96"
+                  "path": "sprites/yeb/64x64/left/move_1.png",
+                  "sha256": "0a583350e2173af75245ef70aa26f51315394099ff5e59fc80983e4c9658df7c"
+                },
+                {
+                  "name": "move_2",
+                  "path": "sprites/yeb/64x64/left/move_2.png",
+                  "sha256": "b491a636c1644dcb1ccf1a38031148eac4eb8db0c3c86d2a8e958b9436cdbdef"
+                },
+                {
+                  "name": "move_3",
+                  "path": "sprites/yeb/64x64/left/move_3.png",
+                  "sha256": "e43c971f45df46a0aa44de2ab08109189dd09f520892d54cfaed9fc5852a0d29"
                 }
               ]
             }
@@ -25271,27 +25237,37 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/front/idle_0.png",
-                  "sha256": "1db5e7a6ae93b5ed4ae6b30611ed9fcc53087a7d946b733004eb831a4902f5cb"
+                  "sha256": "d6249cbf3cb07621a10ac3fabad98d03b537de8f4bdad60a24aaa9586fbe2885"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/front/idle_1.png",
-                  "sha256": "7ff732739d1f5604b7d0b88d316472b5e259600c05d283bd68b48536ccabff04"
+                  "sha256": "6b55b55de331a4a8123d26ee8f208aecd7cdb5c77cf8027e2bd01bbfbc3e9c32"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/front/move_0.png",
-                  "sha256": "4e4dc9a4b12413aeb5afc3bb7b69059439e1fec0293b1274956909a33d58de8c"
+                  "sha256": "f1b390705081fb2ceedbfcaec43b78450f14044d97bbc3b532a4be3610a3aa77"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/front/move_1.png",
-                  "sha256": "d15789517a3abe3aef73b4ca7d23bbafdc025885ce5163e1af9969058656d61a"
+                  "sha256": "c7548aa9ef68e385cbe62f292ab05fc1093fe1e89a522839152923c49ca9365b"
+                },
+                {
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/front/move_2.png",
+                  "sha256": "afbd3cfb9691dcdae06410cd5886411fb3d3e4cef206fc082d090164d04358c9"
+                },
+                {
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/front/move_3.png",
+                  "sha256": "b71a29dd3aba7cac262d0227ea94d1e561591cb2b94a258f813397dda29133e8"
                 }
               ]
             },
@@ -25301,22 +25277,22 @@
                 {
                   "name": "attack_0",
                   "path": "bosses/shub_niggurath/movement/front/attack_0.png",
-                  "sha256": "17d746b6a60994348ae19a7b2e15fe8cbfdc9840c41cdec86a9975dbc9ced106"
+                  "sha256": "5bad6179253589eb30d05232907d264e638da7883acf65c8b50d8bd0b596a4a7"
                 },
                 {
                   "name": "attack_1",
                   "path": "bosses/shub_niggurath/movement/front/attack_1.png",
-                  "sha256": "aaf2ad6773d34c1170bf8ae8cd18587a8a030fe4a10ecb820b3c04f43b21a7ce"
+                  "sha256": "5a5a7d9e182b8feae56119e23de5db5d604f8d5ed3ce469e82ef21bdaa1c19e3"
                 },
                 {
                   "name": "attack_2",
                   "path": "bosses/shub_niggurath/movement/front/attack_2.png",
-                  "sha256": "68966d24b866b2859095865ce10c983158104d02fb79e653fc5837d739125ae4"
+                  "sha256": "ad136c54f1df7e039d6596c221b1730d914d9bda14dee2f29772000a860fb842"
                 },
                 {
                   "name": "attack_3",
                   "path": "bosses/shub_niggurath/movement/front/attack_3.png",
-                  "sha256": "d3b183069f029ce33fe3654bc6307f895906b1c425449f108b2cf460f28e627a"
+                  "sha256": "90456b9dfefecd95ca5414120c952665a613c11b362cf98c1fbe8dec1ea3fedc"
                 }
               ]
             },
@@ -25326,22 +25302,22 @@
                 {
                   "name": "hurt_0",
                   "path": "bosses/shub_niggurath/movement/front/hurt_0.png",
-                  "sha256": "72e0fcaf105b052e7f9d1b542015e000844e02e0dc91b2a99d0285954b200191"
+                  "sha256": "d87fd8d26d108ab5db8236fa1b6ccf0292e49ff7593bd23842508c0fd7b42ac1"
                 },
                 {
                   "name": "hurt_1",
                   "path": "bosses/shub_niggurath/movement/front/hurt_1.png",
-                  "sha256": "7b025cad4cad9208901034c68d5fec9623cc5b590da489f4d1e455f291e1b732"
+                  "sha256": "180b08f30ddab836e399a47be18bfa64797f38e2762cdd786049e98ec3d06cfd"
                 },
                 {
                   "name": "hurt_2",
                   "path": "bosses/shub_niggurath/movement/front/hurt_2.png",
-                  "sha256": "e53b8fcdfda2853d8affb6dc50533258f3ce2e7f0a51c0bfcd07a685519e13be"
+                  "sha256": "dcb778bb6f863a48e00b916112e461a27b258ee6884f91a223854d247694990d"
                 },
                 {
                   "name": "hurt_3",
                   "path": "bosses/shub_niggurath/movement/front/hurt_3.png",
-                  "sha256": "a888a47c3db09aefd27ee4d5d114969862f3ae51876494839c1ccbd828159c23"
+                  "sha256": "fa5b0dfcf86cb8d96be1116c861b0c9145fe36e187c88a5e1c1e86ff43fae45f"
                 }
               ]
             },
@@ -25351,12 +25327,12 @@
                 {
                   "name": "stoop_0",
                   "path": "bosses/shub_niggurath/movement/front/stoop_0.png",
-                  "sha256": "b58d815729967a6d4b4d34c11e0ad3d5415f118fa48a61b8271dc7680a6fca77"
+                  "sha256": "cf9059ad5733d93101f292ac2e02f63e5f6872122fb05d98e23d2f7b0222bfc4"
                 },
                 {
                   "name": "stoop_1",
                   "path": "bosses/shub_niggurath/movement/front/stoop_1.png",
-                  "sha256": "0c1d4119902662b3706ccc2db0802cd0e736f89eddd1fe9854f600d2a63eef17"
+                  "sha256": "fd05487d9212edc7b0a0e6edc1e03d188c5924e88251fec42edbb689ebbe4aa8"
                 }
               ]
             },
@@ -25366,7 +25342,7 @@
                 {
                   "name": "stoop_mid_0",
                   "path": "bosses/shub_niggurath/movement/front/stoop_mid_0.png",
-                  "sha256": "f2d22212ea45ff45edad95c1611172c664937f8575540443eedb55909a2b5fef"
+                  "sha256": "ad136c54f1df7e039d6596c221b1730d914d9bda14dee2f29772000a860fb842"
                 }
               ]
             }
@@ -25382,77 +25358,37 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/back/idle_0.png",
-                  "sha256": "25548e29ae9195a44bbbbedfcd9d08708de6273827db4ffb906c1cd578f20002"
+                  "sha256": "43d6523165fbc450fd8acf10200401a5de09dd44745c7a53d08711fccbf8c0d8"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/back/idle_1.png",
-                  "sha256": "df9bcc1be86697f13cdf493bd9003cc36ebe52ff6fdb10f29f5cc1652133cb5d"
+                  "sha256": "acc7fd2a8b17355c46ec9328cb547b06aded878acb9fe7fc12a6ccfd062bf7c2"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/back/move_0.png",
-                  "sha256": "510d2900995a61e942b5be4a2bc600bb88a86d6771fbda36ad3868879e3b769f"
+                  "sha256": "3b8cb8eecc1b6de08dbbd934438840a6d8ad18fff6145750b69b7b9b6d0660a2"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/back/move_1.png",
-                  "sha256": "1fbdafaadfe7c32f8363532326f7793e543546535f6183b0c46db7336dafa22d"
-                }
-              ]
-            },
-            "attack": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "attack_0",
-                  "path": "bosses/shub_niggurath/movement/back/attack_0.png",
-                  "sha256": "a0735244468667c398781e7adef3daa52686eb1bec6ee129b4cb4852acef6b94"
+                  "sha256": "6ed93f5bb7828cb4bf4710c53dcd7048a063f6fb6f36f6d3a74723edf95aeffb"
                 },
                 {
-                  "name": "attack_1",
-                  "path": "bosses/shub_niggurath/movement/back/attack_1.png",
-                  "sha256": "77ebfce4bd43d997e3ed17a46705eb3d9f5f608f39d701aaa1cd9362abd2a7bf"
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/back/move_2.png",
+                  "sha256": "23d435aa847eff4b6507839511706802e89cb2837da74fb5a5d776039bf19e82"
                 },
                 {
-                  "name": "attack_2",
-                  "path": "bosses/shub_niggurath/movement/back/attack_2.png",
-                  "sha256": "7d9a994a6cea49023a336207e96b42521f5224cdc78e15ec70e53a60f116ceca"
-                },
-                {
-                  "name": "attack_3",
-                  "path": "bosses/shub_niggurath/movement/back/attack_3.png",
-                  "sha256": "7195476e19467652009accb9446ffde38d4ae79d2f8f3342f52e4a356f3f92eb"
-                }
-              ]
-            },
-            "hurt": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "hurt_0",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_0.png",
-                  "sha256": "06c7fe2afc4702efa720533b60e4e162de4103d5a465b6ababa96ab3a0142163"
-                },
-                {
-                  "name": "hurt_1",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_1.png",
-                  "sha256": "dd4df51d83a95bf575c7dc1bdfc57d203a49a746da9b27b2a5a5ec0a5481addb"
-                },
-                {
-                  "name": "hurt_2",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_2.png",
-                  "sha256": "86acfcb20542df77e9010b5bddbe753e9b18e14c303422a5c52e2c5513cfe70b"
-                },
-                {
-                  "name": "hurt_3",
-                  "path": "bosses/shub_niggurath/movement/back/hurt_3.png",
-                  "sha256": "86b8d2c4ad8087ea89ffb6c35be3cafa9161153a110e4758167f8eef9507462e"
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/back/move_3.png",
+                  "sha256": "8d5c442893323d720ed08b6a900f0ceda4267e727ffb8832b9fa951c855332ce"
                 }
               ]
             }
@@ -25468,113 +25404,83 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/shub_niggurath/movement/left/idle_0.png",
-                  "sha256": "e235dd2589b222970c879e77b624396b034e871c6c8fa2fb43cfea2d255f73a3"
+                  "sha256": "013f3e9e339d3b404edc286f5d48b3ddd79d0140ebc8828d9d025cbd24692cac"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/shub_niggurath/movement/left/idle_1.png",
-                  "sha256": "abc4f96543f894269aad45a1af58a87817c1cc4e41a747228047a38a9c9e55b4"
+                  "sha256": "a3a1489968a1708a0041de2880f4d99fa060d72dd95e36188e2d6e5afd58cf6f"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
                   "path": "bosses/shub_niggurath/movement/left/move_0.png",
-                  "sha256": "4f27ab96bcf760c9047e1a45c2430f9f05ea84541d15e0619c0ed01d84b16fdf"
+                  "sha256": "41e9bf1a2a6bcc1a3fc62c4d7bb0c4b431022cf17efac5792e09f37b2d695177"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/shub_niggurath/movement/left/move_1.png",
-                  "sha256": "4631267ddbe9f8d4f27e99c743710a2709c7abc3dd7918f7af452e1e6e5451ce"
-                }
-              ]
-            },
-            "attack": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "attack_0",
-                  "path": "bosses/shub_niggurath/movement/left/attack_0.png",
-                  "sha256": "f9df91cdcbb20ba5972582f782a54db91a07e17f11c42f46a6143b5a2d8a206e"
+                  "sha256": "3c8855f23505220e9c5a9991712b6b841a66d6c13f9fdcd0d2e91cb83a07c614"
                 },
                 {
-                  "name": "attack_1",
-                  "path": "bosses/shub_niggurath/movement/left/attack_1.png",
-                  "sha256": "7002f824418bd8ea0847966273e01dc96221804f8b225af3678bff2a06080c30"
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/left/move_2.png",
+                  "sha256": "6318492f721a3f213ad33adb4da0f9d1425c5876b5937ff83645e5a0a5cd6f36"
                 },
                 {
-                  "name": "attack_2",
-                  "path": "bosses/shub_niggurath/movement/left/attack_2.png",
-                  "sha256": "d711d792894de7ea7eda4944aa867f915984957623678a725427aa4a35b48263"
-                },
-                {
-                  "name": "attack_3",
-                  "path": "bosses/shub_niggurath/movement/left/attack_3.png",
-                  "sha256": "aa2ce4f7375a96672eeaed1159afc8000f512cf5de6b31a6c9dd32fcd142a60d"
-                }
-              ]
-            },
-            "hurt": {
-              "frame_count": 4,
-              "frames": [
-                {
-                  "name": "hurt_0",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_0.png",
-                  "sha256": "91c52b08d963dc233b66f04e3468d6e8c3a72d1cd00184f46a2e5801f64000e3"
-                },
-                {
-                  "name": "hurt_1",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_1.png",
-                  "sha256": "f888ff98469883119fc822c6eb897cca931f8ca26e38d24a65855832e168d480"
-                },
-                {
-                  "name": "hurt_2",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_2.png",
-                  "sha256": "8d368ca1af988ffd4b819c00486d3a590bfc850544cf5ba67fc071d7a9afe6bf"
-                },
-                {
-                  "name": "hurt_3",
-                  "path": "bosses/shub_niggurath/movement/left/hurt_3.png",
-                  "sha256": "4ae5ab361bd460620cd78ff5198f8b54b5bcd2d0b9e9ab164d0f10bb2b9ed1d9"
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/left/move_3.png",
+                  "sha256": "c35018ee66a638f6b2da5527358cb931a777184e185244f712f9ef9913f81feb"
                 }
               ]
             }
           }
         },
         "right": {
-          "source_direction": "right",
-          "mirror_horizontal": false,
+          "source_direction": "left",
+          "mirror_horizontal": true,
           "actions": {
             "idle": {
               "frame_count": 2,
               "frames": [
                 {
                   "name": "idle_0",
-                  "path": "bosses/shub_niggurath/movement/right/idle_0.png",
-                  "sha256": "f6cf8d7ac47a926e793fb776130139592c863825fb8f91a3360d9fbcc0e2acc4"
+                  "path": "bosses/shub_niggurath/movement/left/idle_0.png",
+                  "sha256": "013f3e9e339d3b404edc286f5d48b3ddd79d0140ebc8828d9d025cbd24692cac"
                 },
                 {
                   "name": "idle_1",
-                  "path": "bosses/shub_niggurath/movement/right/idle_1.png",
-                  "sha256": "1a7b5cf600610ecbb89f23453f83a3abeb0ef55a5c080ed8f45d2373193273e6"
+                  "path": "bosses/shub_niggurath/movement/left/idle_1.png",
+                  "sha256": "a3a1489968a1708a0041de2880f4d99fa060d72dd95e36188e2d6e5afd58cf6f"
                 }
               ]
             },
             "move": {
-              "frame_count": 2,
+              "frame_count": 4,
               "frames": [
                 {
                   "name": "move_0",
-                  "path": "bosses/shub_niggurath/movement/right/move_0.png",
-                  "sha256": "f6ffa6c4b604d72c8700f876dd588d8cafa9cace90339b3fb6e15d7fbb87abf9"
+                  "path": "bosses/shub_niggurath/movement/left/move_0.png",
+                  "sha256": "41e9bf1a2a6bcc1a3fc62c4d7bb0c4b431022cf17efac5792e09f37b2d695177"
                 },
                 {
                   "name": "move_1",
-                  "path": "bosses/shub_niggurath/movement/right/move_1.png",
-                  "sha256": "7b748959e75ffaa05b9f531b75e2abba967fbecc622a39350f50c4650db6df01"
+                  "path": "bosses/shub_niggurath/movement/left/move_1.png",
+                  "sha256": "3c8855f23505220e9c5a9991712b6b841a66d6c13f9fdcd0d2e91cb83a07c614"
+                },
+                {
+                  "name": "move_2",
+                  "path": "bosses/shub_niggurath/movement/left/move_2.png",
+                  "sha256": "6318492f721a3f213ad33adb4da0f9d1425c5876b5937ff83645e5a0a5cd6f36"
+                },
+                {
+                  "name": "move_3",
+                  "path": "bosses/shub_niggurath/movement/left/move_3.png",
+                  "sha256": "c35018ee66a638f6b2da5527358cb931a777184e185244f712f9ef9913f81feb"
                 }
               ]
             }

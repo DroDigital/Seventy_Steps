@@ -248,6 +248,19 @@ export const isUnseen = (g: Pick<Game, 'ecs' | 'overworld'>, id: Entity): boolea
 /** Not in the world at all: dead, or on a hidden layer that is not shown. It neither acts nor collides, and nothing can touch it. */
 export const isAbsent = (g: Pick<Game, 'ecs'>, id: Entity): boolean => g.ecs.c.dead.has(id) || g.ecs.c.layer.get(id)?.shown === false;
 
+/**
+ * The investigator's peace on arriving (round 88, systems/peace.ts): after a rising, a journey to an Elder Sign, a rest at one, a gate or the
+ * descent, or a game continued, nothing notices or reaches them until they have risen (moved or acted) and a few seconds more have passed.
+ */
+export interface Peace {
+  since: number; // the step it began on: the input of that step began it, and does not end it
+  risen: boolean; // they have moved or acted since: `left` counts down
+  left: number; // steps of it left once risen (it waits while a talk, a trade or a sign's menu is open)
+}
+
+/** Whether the investigator is sheltered now: a dialogue, a trade or a sign's menu is open (`Game.sheltered`), or they are at peace on arriving (round 88). Nothing reaches them, foes let go of them, and no mind or body is worn away. */
+export const isSheltered = (g: Pick<Game, 'sheltered' | 'player'>): boolean => g.sheltered || g.player.peace !== null;
+
 /** Player-only state that is not a component. */
 export interface Pilot {
   id: Entity;
@@ -284,6 +297,7 @@ export interface Pilot {
   rising: (Place & { wall: string }) | null; // the candle that reaches the fall, while the choice waits
   fogPass: { wall: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a boss's fog being walked through (round 35: fogGates.ts)
   gatePass: { gate: string; from: { x: number; z: number }; to: { x: number; z: number }; frame: number; frames: number } | null; // a realm's gate being walked into (round 60: gateWalk.ts)
+  peace: Peace | null; // just arrived, and at peace: sheltered, so no foe notices them and nothing reaches them (round 88: peace.ts)
 }
 
 /** A fall in the air (round 54): the body is let go of by the ground, and gravity takes it. */
@@ -339,7 +353,7 @@ export interface Game {
   rng: Rng;
   frame: number;
   cutscene: boolean; // transient: the camera holds control, so the investigator cannot be targeted or hurt
-  talking: boolean; // transient: a dialogue is open (main.ts sets it each step): the world goes on, but nothing reaches the investigator and foes let go of them (targets.ts, brain.ts)
+  sheltered: boolean; // transient: a dialogue, a trade or a sign's rest is open (main.ts sets it each step; the openers set it at once): the world goes on, but nothing reaches the investigator and foes let go of them (targets.ts, brain.ts). Read it through `isSheltered`, which adds the peace of an arrival
   reality: Reality;
   overworld?: Overworld;
   /** How well lit the ground at a point is by the world's lamps, fires and torches, 0..1 (handed in by the renderer, which knows where they are; the dark when absent: sanity.ts mends faster in it). */

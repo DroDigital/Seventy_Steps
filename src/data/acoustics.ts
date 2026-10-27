@@ -19,6 +19,20 @@ export interface SpaceRow {
   dark: number; // Hz at which the answer is low-passed
   pre: number; // ms before the room answers
   bed: number; // how much of the bed (drones, ambience, far calls) is sent
+  echo?: Echo; // round 83: what a footfall is answered with, apart from the wash (none: the step is left dry)
+}
+
+/**
+ * A place's answer to a footfall (round 83): a few faint, dull returns of the step itself, a moment after it, as a vault or a cave gives
+ * back a heel. Played by the sampler as the same take again (render/audio/sampler.ts `echoes`, laid out by render/audio/footing.ts
+ * `echoesOf`), beside the reverb's wash and under it: it is meant to be noticed only when it is missing.
+ */
+export interface Echo {
+  delay: number; // seconds to the first return
+  gain: number; // the first return's level against the step's own
+  fall: number; // each return's share of the one before
+  taps: number; // how many returns
+  dark: number; // Hz the first return is dulled to (each later one is duller still)
 }
 
 /** The places a sound can be heard in. */
@@ -26,12 +40,12 @@ export const SPACES = {
   open: { room: 0.025, hall: 0.055, dark: 6500, pre: 12, bed: 0.08 }, // the fields: nearly dry, a thin far slap
   ruin: { room: 0.07, hall: 0.15, dark: 5000, pre: 16, bed: 0.14 }, // walls but no roof: a ruin's courts
   timber: { room: 0.22, hall: 0.035, dark: 5000, pre: 8, bed: 0.15 }, // a house of boards: short and woody
-  library: { room: 0.16, hall: 0.05, dark: 4200, pre: 9, bed: 0.12 }, // books drink the tail
-  nave: { room: 0.09, hall: 0.34, dark: 4800, pre: 26, bed: 0.22 }, // a church or a marble hall: high, hard, long
-  vault: { room: 0.08, hall: 0.36, dark: 3400, pre: 22, bed: 0.25 }, // dressed stone under a roof of stone: the dark tail
-  cave: { room: 0.06, hall: 0.42, dark: 2600, pre: 30, bed: 0.28 }, // rock all round, and an end nowhere
-  drowned: { room: 0, hall: 0.5, dark: 1500, pre: 34, bed: 0.3 }, // everything held long and dull, as under water
-  cosmos: { room: 0, hall: 0.28, dark: 2400, pre: 44, bed: 0.3 }, // the Outer Dark and the Beyond: an endless faint hall
+  library: { room: 0.16, hall: 0.05, dark: 4200, pre: 9, bed: 0.12, echo: { delay: 0.09, gain: 0.05, fall: 0.5, taps: 1, dark: 2200 } }, // books drink the tail: one faint, near return
+  nave: { room: 0.09, hall: 0.34, dark: 4800, pre: 26, bed: 0.22, echo: { delay: 0.2, gain: 0.1, fall: 0.5, taps: 1, dark: 1700 } }, // a church or a marble hall: high, hard, long
+  vault: { room: 0.08, hall: 0.36, dark: 3400, pre: 22, bed: 0.25, echo: { delay: 0.16, gain: 0.11, fall: 0.5, taps: 1, dark: 1500 } }, // dressed stone under a roof of stone: the dark tail
+  cave: { room: 0.06, hall: 0.42, dark: 2600, pre: 30, bed: 0.28, echo: { delay: 0.22, gain: 0.12, fall: 0.55, taps: 2, dark: 1200 } }, // rock all round, and an end nowhere
+  drowned: { room: 0, hall: 0.5, dark: 1500, pre: 34, bed: 0.3, echo: { delay: 0.3, gain: 0.12, fall: 0.6, taps: 2, dark: 900 } }, // everything held long and dull, as under water
+  cosmos: { room: 0, hall: 0.28, dark: 2400, pre: 44, bed: 0.3 }, // the Outer Dark and the Beyond: an endless faint hall (no echo of a step: the open air of seven realms, walked for hours)
   fight: { room: 0.04, hall: 0.24, dark: 4200, pre: 20, bed: 0.2 }, // a horror's fog closed behind: one sealed hall of its own
 } satisfies Record<string, SpaceRow>;
 
@@ -83,6 +97,9 @@ export const ROOM_SHAPE: Readonly<Record<RoomKind, { room: number; hall: number;
   well: { room: 0.8, hall: 1.6, dark: 0.8 },
 };
 export const WIDE_HALL = 1.4; // a great hall of three cells to a side: its long reverb x this
+export const ECHO_MOST = 0.25; // no return of a step is ever louder than this share of the step
+export const ECHO_PACE = { full: 4.4, none: 5.8 } as const; // m/s: a walk is answered in full, a run less and less, and a sprint not at all (the returns would pile on the next footfalls, 0.2 s apart)
+export const ECHO_VOICES = 0.6; // a return is let go when this share of the one-shot voices (AUDIO.polyphony) is already in use: the blows and cries come first
 
 /** The reverbs and how they are played. */
 export const SPACE = {

@@ -37,6 +37,22 @@ describe('pose crossfade (render/poseBlend.ts)', () => {
     expect(f.armR.quaternion.angleTo(up)).toBeLessThan(1e-6);
   });
 
+  it("eases the pelvis a clip had moved fore and aft back to the new pose's, rather than jumping", () => {
+    const f = buildFigure('player');
+    const blend = createPoseBlend(f);
+    const heavy = PLAYER_MOVES.heavy1 as MoveDef;
+    const lunge: PoseInput = { ...STILL, move: 'heavy1', def: heavy, frame: Math.floor(heavy.frames * 0.45), weapon: 'rapier' };
+    draw(f, blend, lunge, 0);
+    const off = f.body.position.z;
+    expect(Math.abs(off)).toBeGreaterThan(0.1); // the lunge leans the pelvis well off the root
+    draw(f, blend, { ...STILL, weapon: 'rapier' }, 1 / 60);
+    const [first, ...later] = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (draw(f, blend, { ...STILL, weapon: 'rapier' }, (1 + i) / 60), f.body.position.z));
+    expect(Math.abs(first)).toBeGreaterThan(0.2 * Math.abs(off)); // still most of the way from where it was
+    for (let i = 1; i < later.length; i++) expect(Math.abs(later[i])).toBeLessThanOrEqual(Math.abs(later[i - 1]) + 1e-9);
+    draw(f, blend, { ...STILL, weapon: 'rapier' }, 0.3);
+    expect(Math.abs(f.body.position.z)).toBeLessThan(0.05);
+  });
+
   it('leaves a pose alone while its move goes on', () => {
     const f = buildFigure('player');
     const blend = createPoseBlend(f);

@@ -53,6 +53,7 @@ import { applyCarry, type Carry } from './cycles';
 import { registerTally, tallySystem } from './tally';
 import { overheardSystem } from './overheard';
 import { registerRoomWords, roomWordsSystem } from './roomWords';
+import { registerPeace, peaceSystem } from './peace';
 import { registerPerception } from './perception';
 import { playerControl } from './playerControl';
 import { npcSystem, spawnNpcs } from './npcs';
@@ -105,14 +106,14 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, glance: false, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, glance: false, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null, peace: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
     rng: createRng(seed),
     frame: 0,
     cutscene: false,
-    talking: false,
+    sheltered: false,
     reality: createReality(),
   };
   registerMounts(g);
@@ -126,6 +127,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
   registerReagent(g);
   registerGun(g);
   registerPerception(g);
+  registerPeace(g);
   return g;
 }
 
@@ -207,7 +209,7 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
 
 /**
  * One fixed 60 Hz step. The order matters: intent → a boss fight's E, then signs, gates and talk → moves →
- * AI → motion → falls → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
+ * AI (the peace of an arrival first) → motion → falls → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
  * their reality hooks → lock → camera → sight → the words of rooms and people → hallucinations → death → population.
  */
 export function stepGame(g: Game, input: InputFrame): void {
@@ -227,6 +229,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   npcSystem(g, dt);
   npcLife(g, dt);
   actionSystem(g);
+  peaceSystem(g, input); // round 88: an arrival's peace ends on their own blow or the seconds after they rise, before the foes' turn
   brainSystem(g);
   wanderSystem(g);
   hookSystem(g);

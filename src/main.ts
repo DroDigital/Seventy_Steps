@@ -33,6 +33,8 @@ import { createSignViews } from './render/signViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
+import { createMistWakes } from './render/mistWakes';
+import { createSwingTrails } from './render/swingTrails';
 import { courtAt } from './render/courtMist';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
 import { createWorldLife } from './render/worldLife';
@@ -48,6 +50,7 @@ import { fovOf, nearLens, placeCamera } from './render/followCamera';
 import { allEffectsOn, computeFx, lensAt, type FxState } from './render/fx';
 import { createFxController } from './render/fxController';
 import { createHiddenViews } from './render/hiddenViews';
+import { createPaperViews } from './render/paperViews';
 import { createWorldScene } from './render/worldScene';
 import { lightNight, placeLantern } from './render/lantern';
 import { lanternGain } from './render/lanternLife';
@@ -78,7 +81,7 @@ import { installGameEvidence } from './ui/gameEvidence';
 import { installFxLab } from './ui/fxLab';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
-import { noteLockAsked } from './core/mouseLock';
+import { noteLockAsked, noteLockRefused } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
 import { createDialogue } from './ui/dialogue';
@@ -147,6 +150,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       if (r instanceof Promise) r.catch(() => undefined);
     } catch {
       // No pointer lock: a click on the canvas captures the mouse, as ever.
+      noteLockRefused(); // a throw brings no pointerlockerror: the ask ends here, as input.ts's request ends it
     }
   };
   onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
@@ -193,6 +197,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   const hidden = createHiddenViews(scene, game, { audio, particles }); // the secret passages open with dust, light and the sound of stone (round 61)
+  const notes = createPaperViews(scene, game, { audio, particles }); // a note is a leaf of burning paper; it burns away when its page is put away (round 89)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
@@ -205,12 +210,14 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
-  const shadows = createShadows(scene, game);
+  const shadows = createShadows(scene, game, creatures.painted);
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
+  const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
+  const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
   const skyline = createSkyline(scene, look);
-  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams }); // round 18: the world's own life
+  const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
@@ -228,7 +235,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   worldUniforms.uGlowColor.value.set(...ANOMALY.green).multiplyScalar(LIGHT.echoGlowIntensity); // Echo drops glow
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
   const noGlow = new Vector3(0, -1e4, 0);
-  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures });
+  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures, notes });
   if (debug) installGameEvidence(game, creatures);
   setCameraMode(game.camera, cameraModeOf(settings.camera)); // the look chosen in Settings › Play (round 77)
   placeCamera(camera, game, 1);
@@ -244,7 +251,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const extras = createExtras(game, shell, store, opts, () => input.describe()); // the frame meter (with what the input hears), the first launch's picture, the benchmark, the trailer (round 46)
   let simTime = 0;
   const labHold = { on: false }; // the effects lab (?debug, ui/fxLab.ts) holds the world still and steps it by hand
-  installFxLab(game, camera, { hold: labHold, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
+  installFxLab(game, camera, { hold: labHold, particles, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   game.seaTime = () => simTime; // a body that falls into the sea meets the wave that is drawn (round 55: waterFall.ts)
   let frames = 0;
@@ -269,7 +276,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         simTime += dt;
         if (!cinema.step(dt)) return; // a cutscene: the world stands still, or takes only some of its steps
         const held = menu?.open || shop.open || rise?.open || ending.open || cinema.active;
-        game.talking = dialogue.open; // a dialogue is open (a talk, a page or a note): nothing reaches the investigator, and the foes let go of them (targets.ts, brain.ts)
+        game.sheltered = dialogue.open || shop.open || !!menu?.open; // a dialogue, a trade or a sign's rest is open: nothing reaches the investigator, and the foes let go of them (targets.ts, brain.ts)
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
@@ -296,6 +303,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
         mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
@@ -304,12 +312,14 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
-        views.update(alpha, time);
+        views.update(alpha, time, enclosed);
+        notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
+        worldUniforms.uRelight.value = settings.relight > 0.5 ? 1 : 0; // the horrors' bodies lit over their folds (shaders/sprite.ts)
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
         creatures.update(alpha, time, camera);
         hidden.update(time);
@@ -322,6 +332,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
         pipeSmoke.update(camera, time, views.smokers);
+        swingTrails.update(views.swingEdge, time);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
         const fx = computeFx(state);

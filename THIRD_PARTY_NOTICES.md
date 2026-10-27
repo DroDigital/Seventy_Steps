@@ -1,9 +1,14 @@
 # Third-party notices
 
-This file lists third-party material only. The project's own licence is in `LICENSE`.
+This file lists third-party material only. The project's own licence is in `LICENSE`: Seventy Steps is
+© 2026 Alessandro A. Foddis (DigitalDro), all rights reserved. The Creative Commons and other licences
+named below apply to the third-party material they are listed against, never to the game.
 
-Seventy Steps draws its textures, sprites, meshes and synthesised sounds in code. What it ships from
-others is listed here, with each licence as its authors require.
+Its textures, effects, synthesised sounds and the investigator's model and animations are made in code.
+Other parts are made with generative AI tools: the pictures of the creatures (`public/creatures`: ChatGPT's
+image generation, and ElevenLabs' image model for some walks, with frames the author drew afterwards), the
+voices (ElevenLabs, Eleven v4) and the music (Suno), and the code and the text were written with the help of
+Claude (Anthropic). What it ships from others is listed here, with each licence as its authors require.
 
 ## three.js
 
@@ -72,7 +77,7 @@ its source recording and treatment, in [`public/audio/CREDITS.md`](public/audio/
 ## Baked models, flames, smoke and surface patterns
 
 The 3D models stood in the arenas, boss places and dungeons are baked from free models into the game's own data (nothing is loaded as a source file at run
-time); the pixel flames and the smoke are cut from two free animations and the stone, flagstone and plank patterns from a PS1 dungeon pack. Each source, its author,
+time); the pixel flames and the smoke are cut from two free animations, the quiet blows' small smear mark takes its fray from the mottle of a smoke of Kenney's CC0 Particle Pack, and the stone, flagstone and plank patterns from a PS1 dungeon pack. Each source, its author,
 its licence (CC0 1.0 or Creative Commons Attribution 4.0, with the credit text the licence asks for) and what was changed are in
 [`src/data/models/CREDITS.md`](src/data/models/CREDITS.md).
 

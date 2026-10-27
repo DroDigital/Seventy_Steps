@@ -5,14 +5,18 @@
  * and swings, a creature's lower the bigger it is); a roll's tumble and a backstep's scuffs; the
  * Laudanum's cork and its swallow, the Reagent's needle, a flask lobbed and burst, a guard taken up, an arm taken
  * up, an arm reinforced, a knee bent and risen from (round 40: each placed on its move's own frames, data/foleySounds.ts
- * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation.
+ * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation. Round 83: the footsteps are understated (quieter at every
+ * pace, a lilt between the feet, no two alike, the bright recordings dulled: data/footSounds.ts `STEP_VOICE`) and a room that answers a
+ * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly. Round 86: a step on a dungeon room's floor is lifted back (`STEP_VOICE.indoors`, footing.ts `indoorLift`, foley.ts `indoorsAt`): round 83 had left it almost unheard there.
  */
 
 import type { Entity } from '../../core/ecs';
 import type { V3 } from '../../core/geom';
+import type { Echo } from '../../data/acoustics';
 import { ATTACK_SOUNDS, soundOf, type AttackSound } from '../../data/creatureSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import { CLASS_GAIN, HAND_FRAMES, HANDS } from '../../data/foleySounds';
+import { STEP_VOICE } from '../../data/footSounds';
 import type { Sound } from '../../data/sounds';
 import type { AttackId } from '../../data/schema';
 import { WORLD } from '../../data/tuning';
@@ -22,12 +26,13 @@ import { isAbsent, type Game } from '../../systems/components';
 import { chunkContent } from '../../world/chunks';
 import { worldLayout } from '../../world/placements';
 import { segmentDistance } from '../../world/roads';
+import { dungeonRoomAt } from '../../world/terrain';
 import { chunkOf } from '../../world/worldMap';
 import { groundAt } from '../../world/groundKind';
 import { wetness } from '../wetness';
 import { dullness } from './cues';
-import { footFeel } from './footing';
-import type { Sampler } from './sampler';
+import { echoesOf, footFeel, stepGain, stepLevel, stepLowpass } from './footing';
+import type { Sampler, SampleEcho } from './sampler';
 
 export type Surface = 'water' | 'stone' | 'road' | 'dirt';
 
@@ -35,6 +40,7 @@ const STEPS: Record<Surface, SampleSetId> = { water: 'stepWater', stone: 'stepSt
 const STRIDE = [0.75, 1.3] as const; // metres a step at a walk, and at a sprint
 const PACE = [1.5, 6.4] as const; // m/s: a walk, a sprint
 const SWING_LEAD = 4; // frames before a blow lands that its whoosh is heard
+const TICK = 0.05; // seconds: a frame this soon after the body last moved is a frame between two simulation steps, drawn faster than 60 Hz (render/footfalls.ts TICKS_BETWEEN)
 const SWING_RANGE = 26; // metres a creature's swing carries
 
 /** What the ground is at (x, y, z): the arena's flags are stone. */
@@ -46,6 +52,13 @@ export function surfaceAt(g: Game, x: number, y: number, z: number): Surface {
   if (chunkContent(cx, cz).roads.some((s) => segmentDistance(x, z, s.a, s.b) < s.width / 2)) return 'road';
   return 'dirt';
 }
+
+/**
+ * Whether (x, y, z) is on the floor of one of a dungeon's rooms, which is what lifts a step (`STEP_VOICE.indoors`, round 86). `surfaceAt` says 'stone'
+ * all through the rectangle round a dungeon, and a branching one's holds open ground between its branches: that selects a recording, it does not
+ * say the body is indoors.
+ */
+export const indoorsAt = (g: Game, x: number, y: number, z: number): boolean => !!g.overworld && surfaceAt(g, x, y, z) === 'stone' && dungeonRoomAt(x, z) !== null;
 
 /** Metres between footfalls at `speed`. */
 export const strideAt = (speed: number): number => {
@@ -74,20 +87,25 @@ export interface Foley {
 /** Plays a recipe where `at` is (null: in the head): gameAudio's. */
 export type Recipe = (key: string, sound: Sound, o?: { at?: V3 | null; gain?: number; range?: number; vary?: number }) => boolean;
 
-export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
+/** `room` says how the place the investigator stands in answers a footfall (none: dry); gameAudio's reads it from the engine's reverb. */
+export function createFoley(g: Game, sampler: Sampler, recipe: Recipe, room: () => Echo | undefined = () => undefined): Foley {
   const seen = new Map<Entity, { move: string | null; frame: number }>();
   let last: V3 | null = null;
   let walked = 0;
   let before = 0;
-  const play = (id: SampleSetId, gain = 1, pan = 0, pitch = 1, lowpass?: number): boolean => sampler.play(SAMPLE_SETS[id], { gain, pan, pitch, lowpass });
+  let movedAt = -1e9; // the render second the body last moved
+  let foot: 1 | -1 = 1; // the feet take turns (a returned step is heard to the side of the foot that fell)
+  const play = (id: SampleSetId, gain = 1, pan = 0, pitch = 1, lowpass?: number, echoes?: SampleEcho[]): boolean => sampler.play(SAMPLE_SETS[id], { gain, pan, pitch, lowpass, echoes });
   const hand = (id: keyof typeof HANDS, gain = 1): boolean => recipe(`hands:${id}`, HANDS[id], { gain: CLASS_GAIN[id === 'burst' || id === 'anvil' ? 'impact' : 'hands'] * gain });
   let [arm, edge, knee]: [string, number, boolean | null] = [g.player.weapon, reinforcement(), null]; // what is in hand, how far it is reinforced, whether they kneel: heard to change
 
-  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 80: snow and sand softer, mud lower, boards hollow). */
-  function stepOn(p: V3, gain: number): Surface {
+  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 80: snow and sand softer, mud lower, boards hollow; round 83: the bright ones dulled, and a room's faint answer). */
+  function stepOn(p: V3, gain: number, speed = 0): Surface {
     const surface = surfaceAt(g, p.x, p.y, p.z);
     const feel = footFeel(surface, groundAt(g, p.x, p.y, p.z));
-    play(feel.set ?? STEPS[surface], gain * feel.gain, 0, feel.pitch, feel.lowpass);
+    const lowpass = stepLowpass(surface, feel.lowpass);
+    const answer = room();
+    play(feel.set ?? STEPS[surface], gain * feel.gain * stepGain(surface, indoorsAt(g, p.x, p.y, p.z)), 0, feel.pitch, lowpass, answer && echoesOf(answer, foot, lowpass, speed));
     return surface;
   }
 
@@ -101,14 +119,18 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
     const moved = last ? Math.hypot(tr.pos.x - last.x, tr.pos.z - last.z) : 0;
     last = { ...tr.pos };
     if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id)) return (walked = 0), undefined; // mounted, a jump, a move or a fall: no stride
-    const speed = moved / dt;
+    const span = moved > 0 && seconds - movedAt <= TICK ? seconds - movedAt : dt; // (the metres took the time since the body last moved, not since the last frame: a frame drawn faster than the simulation sees it move on some frames only)
+    if (moved > 0) movedAt = seconds;
+    const speed = moved / Math.max(1e-3, span);
     if (speed < 0.3) return;
     walked += moved;
     const stride = strideAt(speed);
     if (walked < stride) return;
     walked %= stride;
-    const surface = stepOn(tr.pos, 0.55 + 0.45 * Math.min(1, speed / PACE[1]));
-    if (surface !== 'water' && wetness.value > 0.3 && Math.random() < wetness.value) play('stepWater', 0.32 * wetness.value, 0, 1.1 + 0.25 * Math.random()); // a stride on ground the rain has soaked splashes (round 34)
+    foot = foot === 1 ? -1 : 1;
+    const lilt = foot === 1 ? 1 : STEP_VOICE.offFoot;
+    const surface = stepOn(tr.pos, stepLevel(speed) * lilt * (1 + STEP_VOICE.jitter * (2 * Math.random() - 1)), speed);
+    if (surface !== 'water' && wetness.value > 0.3 && Math.random() < wetness.value) play('stepWater', STEP_VOICE.splash * wetness.value * stepGain('water'), 0, 1.1 + 0.25 * Math.random(), stepLowpass('water')); // a stride on ground the rain has soaked splashes (round 34; round 83: fainter and duller)
   }
 
   function moves(place: (at: V3, range: number) => { gain: number; pan: number }, warn: (at: V3) => void): void {
@@ -123,7 +145,10 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe): Foley {
       if (player) {
         if (a.move === 'roll' && reached(5, a.frame, prev)) play('roll');
         if (a.move === 'roll' && reached(26, a.frame, prev)) play('roll', 0.55);
-        if (a.move === 'backstep' && (reached(2, a.frame, prev) || reached(10, a.frame, prev))) stepOn(transform.get(id)!.pos, 0.8);
+        if (a.move === 'backstep' && (reached(2, a.frame, prev) || reached(10, a.frame, prev))) {
+          foot = foot === 1 ? -1 : 1; // (two scuffs, one foot then the other)
+          stepOn(transform.get(id)!.pos, STEP_VOICE.backstep);
+        }
         if (a.move === 'drink' && reached(10, a.frame, prev)) play('cork');
         if (a.move === 'drink' && reached(HAND_FRAMES.drink.swallow, a.frame, prev)) hand('swallow');
         if (a.move === 'parry' && reached(HAND_FRAMES.parry.guard, a.frame, prev)) hand('guard');

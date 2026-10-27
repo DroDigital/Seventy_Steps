@@ -18,6 +18,7 @@ import { HEARTH } from '../data/lightSounds';
 import { beginHeard, pushHeard } from './audio/heardLights';
 import { createFlames } from './flames';
 import { createHalos } from './halos';
+import { layFlashes } from './flashLights';
 import { createLightSight } from './lightSight';
 import { paneLit } from './paneLife';
 import { LAMP_SLOTS } from './shaders/world';
@@ -35,6 +36,8 @@ export interface LightSpot {
   /** A lit window's pane (playtest round 13: its glow hung half a metre before the window, where the light is cast from): the glow sits on the glass, and fades as the window is seen edge on. */
   glass?: { x: number; y: number; z: number };
   pane?: number; // a lit window's seed: put out now and then, dimmed as someone passes (paneLife.ts; round 18)
+  seat?: number; // the distance of its pixel flame's foot from the light (negative, under it), where its kind's `base` does not say
+  flame?: number; // the size of its pixel flame, as a multiple of its kind's (`LIGHTS.flames`; round 87, from the cone it replaced: a great brazier burns higher than a candle)
 }
 
 /** How much of a window's glow shows from `eye`: all of it square on, nothing edge on or from behind. */
@@ -59,7 +62,7 @@ export interface WorldLights {
   fires(at: V3, reach: number, fn: (s: LightSpot, d: number) => void): void;
   /** Lights the world about `at` (the investigator's chest); the eye controls halos only, so orbiting the camera never puts out a room's light. Defaults to the eye for scenes without an investigator. */
   update(eye: THREE.Vector3, time: number, lantern: THREE.Vector3 | null, at?: V3, lanternCover?: number): void;
-  /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps), nearest first (round 35: lampShadows.ts). */
+  /** The lamps among the shader's nearest that may cast a shadow (torches, fires, street lamps and oriented windows), nearest first. */
   readonly casters: readonly Caster[];
 }
 
@@ -75,9 +78,9 @@ export interface Lit {
 
 /**
  * What the last `update` chose, for the atmosphere's own passes to read (round 80: render/lampAim.ts, render/windowSpill.ts), refilled in place:
- * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye.
+ * `seen`, the spots lighting the world about the investigator, nearest first, whose first `LAMP_SLOTS` are the shader's lamps slot for slot; `visible`, those within the halos' reach of the eye; `flashes`, how many of the farthest slots a flash holds for its moment (they are not `seen`'s).
  */
-export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[] } = { seen: [], visible: [] };
+export const LIGHT_VIEW: { seen: readonly Lit[]; visible: readonly Lit[]; flashes: number } = { seen: [], visible: [], flashes: 0 };
 
 /** How far the mind has gone (0..1; set each frame by worldLife.ts, round 26): the flames of a failing mind's world waver harder, and some gutter out for a moment. */
 export const LIGHT_NERVES = { madness: 0 };
@@ -166,6 +169,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
       const colors = worldUniforms.uLampColors.value;
       const planes = worldUniforms.uLampPlane.value;
       for (let i = 0; i < LAMP_SLOTS; i++) {
+        worldUniforms.uLampWindows.value[i].set(0, 0, 0, 0); // the atmosphere fills window projection data after this selection
         const n = seen[i];
         const k = n ? LIGHTS.kinds[n.s.kind] : null;
         planes[i].set(0, 0, 0, 0);
@@ -181,9 +185,18 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
           const d = Math.hypot(dx, dz);
           if (d > 1e-6) planes[i].set(dx / d, 0, dz / d, -(dx * g.x + dz * g.z) / d);
         }
+        const paneGain = n.s.pane === undefined ? 1 : paneLit(n.s.pane, time);
         if (n.s.kind === 'torch' || n.s.kind === 'fire' || n.s.kind === 'lamp') casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}` });
-        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * (n.s.pane === undefined ? 1 : paneLit(n.s.pane, time)));
+        if (n.s.kind === 'window' && n.s.glass && paneGain > 0.03) {
+          const dx = n.s.x - n.s.glass.x, dz = n.s.z - n.s.glass.z;
+          const offset = Math.hypot(dx, dz);
+          if (offset > 1e-4) casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}`, aim: { x: dx / offset, y: -0.6, z: dz / offset } });
+        }
+        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * paneGain);
       }
+      const flashes = layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 83)
+      for (let k = 0; k < flashes; k++) planes[LAMP_SLOTS - 1 - k].set(0, 0, 0, 0); // (all round: no window's glass to clip a flash against)
+      LIGHT_VIEW.flashes = flashes; // (and none of the mist's aim of the light it displaced: lampAim.ts)
       batch.begin();
       if (lantern && lanternCover < 1) batch.put(lantern.x, lantern.y, lantern.z, LIGHTS.lantern.halo, LIGHTS.lantern.color, LIGHTS.lantern.haloGain * (1 - lanternCover) * waver({ x: 0, y: 0, z: 0, kind: 'torch' }, 0.05, time)); // (a seat back between the eye and it takes its halo: round 57)
       for (const { s, v } of visible) {
@@ -204,11 +217,12 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         const seed = (Math.abs(Math.sin(s.x * 12.9898 + s.z * 78.233 + s.y * 4.1414)) * 43758.5453) % 1; // its own beat, turn and ground
         const gain = v * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time)));
         let full = false;
+        const size = s.flame ?? 1;
         for (let i = 0; i < f.count && !full; i++) {
           const a = (seed + i / f.count) * Math.PI * 2;
-          const spread = f.count > 1 ? f.spread : 0;
-          const h = f.height * (f.count > 1 ? 0.7 + 0.3 * ((seed * 7 + i * 0.37) % 1) : 1);
-          full = !flameBatch.put(s.x + Math.cos(a) * spread, s.y + f.base, s.z + Math.sin(a) * spread, h, (seed * 3 + i * 0.27) % 1, (seed * 11 + i) % 2 < 1 ? 1 : -1, 'warm', gain);
+          const spread = f.count > 1 ? f.spread * size : 0;
+          const h = f.height * size * (f.count > 1 ? 0.7 + 0.3 * ((seed * 7 + i * 0.37) % 1) : 1);
+          full = !flameBatch.put(s.x + Math.cos(a) * spread, s.y + (s.seat ?? f.base * size), s.z + Math.sin(a) * spread, h, (seed * 3 + i * 0.27) % 1, (seed * 11 + i) % 2 < 1 ? 1 : -1, 'warm', gain);
         }
         if (full) break;
       }

@@ -1,6 +1,6 @@
 /**
- * The gameplay camera's three looks (round 77, asked: Classic stays the default and others are options in Settings › Play, after pictures
- * of each: docs/DECISIONS.md; the Long lens, a telephoto from far back, was taken out again at the owner's word). Classic is the boom as it was, from `CAMERA`.
+ * The gameplay camera's three looks (round 77, asked: Classic stays selectable and others are options in Settings › Play, after pictures
+ * of each: docs/DECISIONS.md; round 82, asked: Low hero is the default; the Long lens, a telephoto from far back, was taken out again at the owner's word). Classic is the boom as it was, from `CAMERA`.
  * Low hero hangs lower and closer behind the shoulder with a wider lens. Tight shoulder hangs close and over the shoulder. Low hero, locked on to a
  * foe, gathers the lens back and aims it between the investigator and the foe, further for a taller one, so that a colossus is seen whole instead
  * of the camera sitting under it (the player cannot turn the camera while locked on, so only the game can do this).
@@ -10,7 +10,7 @@
 import { CAMERA, RENDER } from './tuning';
 
 export type CameraMode = 'classic' | 'hero' | 'shoulder';
-/** In the order of the setting's values: 0 is Classic, the default. */
+/** In the order of the setting's values: 0 is Classic, 1 Low hero, the default (`SETTINGS.camera`). `createCameraRig` still starts from Classic, so the simulation and its tests do not depend on the setting. */
 export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'shoulder'];
 
 /** How a locked-on foe is framed: its height `H` in metres (clamped to `height`) sets everything. */
@@ -101,5 +101,5 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
   },
 };
 
-/** The look a setting's value names (0: Classic, the default). */
+/** The look a setting's value names (0: Classic; the default, 1, is Low hero). */
 export const cameraModeOf = (setting: number): CameraMode => CAMERA_MODE_IDS[Math.min(CAMERA_MODE_IDS.length - 1, Math.max(0, Math.round(setting)))]!;

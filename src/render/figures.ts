@@ -1,7 +1,7 @@
 /**
  * Procedural low-poly figures (spec §3B: tweened primitives, no skeletal assets): the investigator,
- * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, a note on its
- * crate, the world's gates (its Elder Signs are signViews.ts's), and the people met in the dream
+ * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, the world's gates
+ * (its Elder Signs are signViews.ts's; a note is burning paper, paperViews.ts's), and the people met in the dream
  * (npcFigures.ts). Each is a small joint hierarchy that poses.ts drives: shoulders, elbows and wrists;
  * hips and knees. Arms and legs hang along -y from their pivots; forward is +z, the figure's right is
  * -x. Phase 2 replaces the enemies with generated sprites.
@@ -12,6 +12,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { box, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { TextureKind } from './textures';
+import type { WareId } from '../data/wares';
 import { ARMS } from './armsMeshes';
 import { investigator } from './investigator';
 import { npcFigure } from './npcFigures';
@@ -42,7 +43,10 @@ export interface Figure {
   flash: THREE.Object3D | null; // muzzle flash
   gun?: THREE.Object3D; // the investigator's revolver in the hand, shown only while it is drawn (shot or reload)...
   holstered?: THREE.Object3D; // ...and its grip in the holster the rest of the time (actorViews.ts; round 22)
-  arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts)
+  arms?: Record<string, THREE.Object3D>; // the investigator's weapons in hand, one shown at a time (actorViews.ts); the sword-cane has two, `cane` and `cane_drawn`
+  props?: Record<string, THREE.Object3D>; // what the off-hand takes up for a move, shown while it does (flask, laudanum, syringe, powder, match, book; poses.ts)
+  held?: { drawn: boolean; props: readonly string[] }; // what a clip has the investigator hold: the sword-cane's blade drawn, and the off-hand's prop (playerPose.ts; actorViews.ts shows them)
+  lantern?: THREE.Object3D; // the investigator's lantern, hung from the belt: a joint of its own that swings (clips baked from Blender: playerClips.ts); the flame and its cage are its children
   flame?: THREE.Object3D; // the investigator's lantern flame: its halo hangs here (worldLights.ts)
   flameMesh?: THREE.Mesh; // ...and the flame drawn there, which goes dark when the mind is Unmoored (lanternLife.ts)
   fixture?: THREE.Group; // a person's own chair and table: set where they are put and kept there as they stand and turn (npcProps.ts, actorViews.ts)
@@ -54,7 +58,17 @@ export interface Figure {
   ankle: number; // sole to ankle
   hunch: number; // resting forward lean (radians)
   character?: 'player' | 'creature'; // rim-lit in the post pass (Echo drops and props are not characters)
+  loose?: Loose; // a person's hat, shawl, scarf and eyes, each on a joint of its own (npcFigures.ts), laid by personLife.ts
   materials: THREE.ShaderMaterial[];
+}
+
+/** What a person has on a joint of its own (round 83): hung from `group`'s pivot; `k` is how freely a hat sits; `wares`, what a merchant shows while any is left. */
+export interface Loose {
+  hat?: { group: THREE.Group; k: number };
+  shawl?: THREE.Group;
+  scarf?: THREE.Group;
+  eyes?: THREE.Group;
+  wares?: Partial<Record<WareId, THREE.Object3D>>;
 }
 
 interface Frame {
@@ -121,7 +135,7 @@ export function skeleton(rig: Rig, f: Frame): Figure {
 
 /** Adds a mesh with its own world material, so a hit flash lights only this figure. */
 export function part(fig: Figure, parent: THREE.Object3D, geo: THREE.BufferGeometry, texture: TextureKind, emissive = 0): THREE.Mesh {
-  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character });
+  const material = createWorldMaterial({ texture, uvScale: [0.5, 0.5], emissive, vertexColors: true, character: fig.character, coat: fig.character === 'creature' ? true : undefined }); // (the people take the realm's matter on what faces up, in the world shader: round 83)
   fig.materials.push(material);
   const mesh = new THREE.Mesh(geo, material);
   parent.add(mesh);
@@ -201,20 +215,6 @@ function gate(): Figure {
   return f;
 }
 
-/** A note left on a crate: burnt paper, a charred rim and two small embers, so every placed note shares the look. */
-function note(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  part(f, f.body, box(0.6, 0.5, 0.45, 0, 0.25, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.3), 1.7)), 'wood');
-  const yaw = 0.3;
-  const ember = mixRgb(BASE.rust, ANOMALY.purple, 0.28);
-  const sheet = box(0.24, 0.016, 0.3, 0.05, 0.522, 0, shade(BASE.bone, 1.02)).rotateY(yaw);
-  const char = box(0.28, 0.01, 0.36, 0.05, 0.508, 0, shade(BASE.charcoal, 0.45)).rotateY(yaw);
-  const spark = box(0.04, 0.014, 0.035, 0.14, 0.532, 0.1, shade(ember, 1.25)).rotateY(yaw);
-  const mote = box(0.02, 0.012, 0.018, -0.04, 0.53, -0.1, shade(ember, 0.85)).rotateY(yaw);
-  part(f, f.body, mergeGeometries([char, sheet, spark, mote]), 'cloth', 0.72);
-  return f;
-}
-
 /** An Echo cache: an iron-bound casket, its lid thrown back on Void Green shards (Echoes are wrong), so it reads in the dark. */
 function cache(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
@@ -249,7 +249,7 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo, tome, vial, gate, note, cache, ammo,
+  player: investigator, deepOne, dummy, echo, tome, vial, gate, cache, ammo,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 

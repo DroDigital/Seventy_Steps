@@ -14,13 +14,13 @@ export interface CreditBlock {
 
 export const CREDITS: readonly CreditBlock[] = [
   { heading: 'A GAME BY', lines: ['Digital Dro Studios'], title: true },
-  { heading: 'DESIGNED, WRITTEN AND DIRECTED BY', lines: ['Alessandro A. Foddis', '© 2026 Digital Dro Studios · All rights reserved'] },
+  { heading: 'DESIGNED, WRITTEN AND DIRECTED BY', lines: ['Alessandro A. Foddis', '© 2026 Alessandro A. Foddis (DigitalDro) · All rights reserved'] },
   { heading: 'AFTER THE STORIES OF', lines: ['H. P. Lovecraft', 'and the tales he revised and wrote with Zealia Bishop, Hazel Heald, Sonia Greene, Harry Houdini, E. Hoffmann Price, Kenneth Sterling, and the authors of "The Challenge from Beyond"'] },
   { heading: 'RECORDED SOUNDS', lines: ['from Freesound, dedicated to the public domain (CC0 1.0), cut and treated for the game:', 'Craig Smith (craigsmith)', 'Breviceps', 'EvaMusik', 'fonografico', 'corkob', 'Lsoundaccount', 'TheKingOfGeeks360', 'waterboy920'] },
   {
     heading: 'MODELS, FLAMES AND SURFACES',
     lines: [
-      'free models and animations, reduced, coloured and set for the game:',
+      'free models, animations and particle sprites, reduced, coloured and set for the game:',
       'licensed CC BY 4.0: FlukierJupiter · andrewriddle · KRei · Mad_Lobster_Workshop · Jochon · rkuhlf · INGSOC1984 · carismah',
       'Heliona · Özlem Çandır · KIFIR · vertexgrocer · davdadams',
       'Samuel Francis Johnson (Oneironauticus) · TheoClarke · Goblinatron (PSX Dungeon) · BlenderVoyage · bobjh · Marin PETTE · 3D Vault',
@@ -37,7 +37,8 @@ export const CREDITS: readonly CreditBlock[] = [
     lines: [
       'the voices of the people and the horrors are synthesised voices, made with ElevenLabs (Eleven v4)',
       'the fifteen tracks of the realms and the forty-eight boss themes were made with Suno',
-      'the code was written with the help of Claude Code, from Anthropic',
+      'the code was written with the help of Claude Code, from Anthropic; the text and dialogue with the help of Claude',
+      'the pictures of the creatures were made with image-generation tools (ChatGPT, ElevenLabs), with frames the author drew afterwards',
       'the textures and effects are made in code; the models are free ones, baked for the game and credited above',
     ],
   },

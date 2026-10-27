@@ -19,6 +19,8 @@ import { run } from './worldHelpers';
 const BOSSES = worldLayout().spawns.filter((s): s is SpawnPoint & { arena: NonNullable<SpawnPoint['arena']> } => s.id.startsWith('boss:') && !!s.arena);
 /** The wide ones are met by a bot for twenty seconds (the small ones are in bossBot.test.ts): all but Azathoth, warded whole, and Ghatanothoa, whose gaze turns the bot to stone on its way in. */
 const NOT_MET = ['boss:azathoth', 'boss:ghatanothoa'];
+/** Nug and Yeb, drawn again in round 92 narrower than the 2 m a wide one is (their capsules' radii are 1.96 and 1.68 m, where they were 2.52): they are still met by the bot, as they were. */
+const KEPT_WIDE = ['boss:nug', 'boss:yeb'];
 
 /** A fresh world with the investigator `dx, dz` metres from the boss's spawn point (the Beyond's order kept, Hastur called), and the boss, a second on. */
 function meet(s: (typeof BOSSES)[number], dx: number, dz: number) {
@@ -64,7 +66,7 @@ describe('every boss stands in its arena and can be reached (playtest round 24)'
     const at = g.ecs.c.transform.get(e!)!.pos;
     const out = Math.hypot(at.x - s.arena.x, at.z - s.arena.z) - s.arena.radius;
     expect(out, `${name} stands ${out.toFixed(1)} m outside its arena`).toBeLessThanOrEqual(0);
-    if (g.ecs.c.body.get(e!)!.radius < 2 || NOT_MET.includes(s.id)) return;
+    if ((g.ecs.c.body.get(e!)!.radius < 2 && !KEPT_WIDE.includes(s.id)) || NOT_MET.includes(s.id)) return;
     // From the side it is first met; failing that from the others (a room's dressing may stand in a straight walk).
     const reach = Math.min(s.arena.radius - 2, 14);
     let best = { dealt: 0, nearest: Infinity };

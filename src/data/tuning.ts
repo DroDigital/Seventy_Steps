@@ -32,7 +32,11 @@ export const FX = {
   desaturate: [0, 0.8] as Ramp, // the further share of the picture a failing mind has graded away, over the realm's own (render/realmLook.ts)
   anomalyStress: [0, 0.7] as Ramp, // added to anomalyProximity when boosting anomaly hues
   charShare: 0.3, // round 34: the share of its realm's grade a character (the investigator, the people, the creatures) takes: the rest is the colours they were drawn in
-  charLevels: 9, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey)
+  charLevels: 14, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey; round 83: 9 before, which folded a painted ramp of 18 to 30 colours into 8 to 12)
+  spriteVivid: [1.22, 0.28] as readonly [number, number], // round 83: ...and how much more colour (a share) and how much more light in its high lights (a share) the drawn creatures are given on the way to the screen, so no realm's grade leaves them one dim colour: each stands apart from the next (render/shaders/spriteGrade.ts)
+  spriteGrade: 0.7, // round 83: how far each drawn creature's form is recoloured to its realm (render/spriteTone.ts: its own measured tone swung this share of the way to the realm's mid-tone, its inner colours kept; 0.7 of a per-pixel cast made them one dim colour per realm, XDro asked for the recolour per sprite), before the light and the mist; the anomaly hues are left alone (render/shaders/spriteGrade.ts); round 93: a form drawn in a strong colour of its own is held as drawn (OWN_FROM, OWN_TO in render/spriteTone.ts)
+  spriteWarm: 0.2, // round 87: how much of the hue of the lantern's and the world's lamps' light (fires, torches, windows, a flash) a drawn creature takes: all of their brightness, this share of their colour (0: none, 1: all, as before round 87), so a creature beside the lantern stays its own colour with a little warmth on it; the moon's and the realm's cast are left as they were (render/shaders/sprite.ts creatureWarmth)
+  spriteReveal: [0.03, 0.28] as readonly [number, number], // round 93: the lantern's light on a drawn creature (its luma: the lantern's colour and strength through its falloff and the creature's facing, about 0.9 at the lamp, 0.3 at 4 m, 0.1 at 6 m) at which the creature's own colours begin to show instead of its realm's recolour, and at which they are whole: so every enemy within about 4.5 m of the lantern is as it was drawn (in the light's brightness only, no colour of it), and takes its realm's colours back by about 7 m, or as the lantern gutters (render/shaders/sprite.ts)
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
   ditherSpread: [0.05, 0.12] as Ramp,
@@ -254,6 +258,7 @@ export const INPUT = {
   deadzone: 0.2, // gamepad sticks
   mouseSensitivity: 0.0025, // rad per pixel
   lockSettleMs: 250, // milliseconds after the browser grants the mouse in which its movement is not read (round 60: the first movement reported with a fresh lock can be the cursor's jump to the middle, which turned the camera to another view)
+  lockAskMs: 250, // milliseconds after the mouse is asked for, before it is granted, in which its movement is not read (round 91: a move reported between the ask and the grant, such as the cursor's warp to the middle, is no look; a refusal ends the wait at once, and with neither a grant nor a refusal the hand is read again once this has passed)
   stickLookSpeed: 3.2, // rad/s at full deflection
   keyLookSpeed: 2.4, // rad/s (arrow keys)
   flickPixels: 60, // mouse flick that switches lock target

@@ -5,6 +5,7 @@
  * in one place, so the frame loop (main.ts) holds a line for it. Read-only on the simulation.
  */
 
+import type { Entity } from '../core/ecs';
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { madnessOf } from '../systems/sanity';
@@ -15,6 +16,8 @@ import { createAtmosphere } from './atmosphere';
 import { createBeacons } from './beacons';
 import { createPoiFx } from './poiFx';
 import { createCourtLife } from './courtLife';
+import { createCreatureAir } from './creatureAir';
+import { createCreatureTracks } from './creatureTracks';
 import { createRodFx } from './rodFx';
 import { createSignalFx } from './signalFx';
 import type { Beams } from './beams';
@@ -34,6 +37,9 @@ import { createLightning } from './lightning';
 import type { Particles } from './particles';
 import { createNightFx } from './nightFx';
 import { createOmenFx } from './omenFx';
+import { createBossFootfalls } from './bossFootfalls';
+import { createCreatureAura } from './creatureAura';
+import type { BossPresence } from './bossPresence';
 import { createPresence } from './presence';
 import type { PostPass } from './postPass';
 import { createSkyLife } from './skyLife';
@@ -64,6 +70,7 @@ export interface LifeParts {
   lights: WorldLights; // the fires that give off smoke and embers (round 79)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
+  creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 83: its aura and footfalls)
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
@@ -98,6 +105,10 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const court = createCourtLife(scene, g, parts.particles); // round 68: a court's river and its mists, a dam's spillway and its dust (round 75: and its pools)
   const signals = createSignalFx(g, parts.particles, parts.beams); // round 75: what a court does now and then: a pulse run from point to point, an arc between pylons
   const atmosphere = createAtmosphere({ scene, g, audio, parts }); // round 80: the sky, the mist, the air, the ground and the horizon deepened (render/atm/)
+  const tracks = createCreatureTracks(scene, g); // round 83: the prints of the people and creatures that walk soft ground (the investigator's are round 80's, render/atm/steps.ts)...
+  const bodyAir = createCreatureAir(g, parts.particles); // ...and a creature's cold breath and the dust of its running
+  const footfalls = createBossFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
+  const aura = createCreatureAura(g, parts.particles, parts.creatures.figure, parts.creatures.presence); // what the great ones give off
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -121,6 +132,10 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       rods.update(camera.position, time, !outside);
       court.update(camera.position, time, !outside);
       signals.update(camera.position, time, !outside);
+      tracks.update(camera.position, time, alpha, !outside);
+      bodyAir.update(camera.position, time, alpha, !outside);
+      footfalls.update(camera.position, alpha, !outside);
+      aura.update(camera.position, time, alpha);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);

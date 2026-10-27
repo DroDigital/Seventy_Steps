@@ -6,11 +6,14 @@
  * thigh; positive bends a knee back), y turns. Every pose ends settled on the ground (gait.ts).
  */
 
+import * as THREE from 'three';
+import { wrapAngle } from '../core/geom';
 import type { ActKind } from '../data/npcActs';
 import { FALL } from '../data/tuning';
 import type { MoveDef } from '../data/moves';
 import type { Figure } from './figures';
 import { settle, stride, type Ground } from './gait';
+import { playerMove, playerStride } from './playerPose';
 import { actPose } from './npcActs';
 import { showProps } from './npcProps';
 import { swing } from './swings';
@@ -28,6 +31,7 @@ export interface PoseInput {
   ground?: Ground; // the lie of the land about the feet (flat when absent)
   kneel?: number; // 0–1: kneeling before an Elder Sign, eased in and out (round 15)
   act?: { kind: ActKind; k: number }; // what a person is doing, and how far into it (0–1: they sit down, take it up; round 39)
+  weapon?: string; // the investigator's: what is in his hand (his clips are made for it)
   drop?: { t: number; spin: number; sea?: { since: number; held: number } }; // over an edge: seconds into the fall, and which way it tumbles, 1 head first (round 54); in the sea (round 55): seconds since it met the water (-1 before), and seconds the tentacle has had it
 }
 
@@ -43,6 +47,8 @@ function rest(f: Figure): void {
   f.body.rotation.set(f.hunch, 0, 0, 'YXZ');
   for (const j of [f.torso, f.head, f.armR, f.armL, f.elbowR, f.elbowL, f.handR, f.handL, f.legR, f.legL, f.kneeR, f.kneeL, f.footR, f.footL, ...f.skirt]) j.rotation.set(0, 0, 0, 'YXZ');
   f.head.rotation.x = -f.hunch * 0.8; // keep a hunched head looking ahead
+  f.lantern?.rotation.set(0, 0, 0);
+  f.held = undefined;
   if (f.flash) f.flash.visible = false;
 }
 
@@ -198,15 +204,33 @@ function recoil(f: Figure, frame: number): void {
   f.kneeL.rotation.x = 0.3 * knock + 0.3 * dazed;
 }
 
-/** Eases a joint toward a rotation by `t` (1: all the way there; 0: it stays as the walk left it). */
+/** Eases a joint toward a rotation by `t` (1: all the way there; 0: it stays as the walk left it): through the quaternion, as a clip's joint reads as a folded Euler once it is bent past a right angle. */
 function toward(j: Figure['legR'], t: number, x: number, y = 0, z = 0): void {
-  j.rotation.x += (x - j.rotation.x) * t;
-  j.rotation.y += (y - j.rotation.y) * t;
-  j.rotation.z += (z - j.rotation.z) * t;
+  j.quaternion.slerp(AIM.setFromEuler(EULER.set(x, y, z, 'YXZ')), t);
 }
 
 /** `k` on its own stretch `[a, b]` of the way, eased: 0 at and below `a`, 1 at and above `b`. */
 const stage = (k: number, a: number, b: number): number => ease((k - a) / (b - a));
+
+/** Where a weapon points at the kneel, radians off the hanging line (the forearm lifts onto the knee and the body goes down, so the walk's carry would put a point through the ground; the rapier, long, is turned the other way). */
+const KNEEL_AIM: Readonly<Record<string, number>> = { cane: 1.4, axe: 1.5, cutlass: 1.2, rapier: 1.6 };
+const [AIM, EULER, FRAME, SAGITTAL] = [new THREE.Quaternion(), new THREE.Euler(), new THREE.Quaternion(), new THREE.Vector3()];
+
+/** Which way the weapon in his right hand points, off the hanging line, radians: its direction in the figure's own frame, from the quaternions of the chain that holds it. */
+function aimOf(f: Figure): number {
+  FRAME.identity();
+  for (let o: THREE.Object3D | null = f.handR; o && o !== f.root; o = o.parent) FRAME.premultiply(o.quaternion);
+  SAGITTAL.set(0, -1, 0).applyQuaternion(FRAME);
+  return Math.atan2(-SAGITTAL.z, -SAGITTAL.y);
+}
+
+/** Turns the weapon in his right hand `by` radians, as seen from the side, about the figure's own x axis (not the hand's: that one is turned by the clip). */
+function turnAim(f: Figure, by: number): void {
+  FRAME.identity();
+  for (let o = f.handR.parent; o && o !== f.root; o = o.parent) FRAME.premultiply(o.quaternion); // F: the hand's parent in the figure's frame
+  AIM.setFromAxisAngle(SAGITTAL.set(1, 0, 0), by).premultiply(FRAME.clone().invert()).multiply(FRAME); // F⁻¹ · Rx · F
+  f.handR.quaternion.premultiply(AIM);
+}
 
 /**
  * Resting at an Elder Sign: down on the right knee before the stone, head bowed, forearms on the raised
@@ -217,12 +241,14 @@ const stage = (k: number, a: number, b: number): number => ease((k - a) / (b - a
  * push on the knee until half way up and then let go, and the legs and body unfold the whole way; the
  * body and legs run together, so the feet stay on the ground.
  */
-function kneel(f: Figure, k: number): void {
+function kneel(f: Figure, k: number, weapon = ''): void {
   const [low, hands, bow] = [stage(k, 0, 0.8), stage(k, 0, 0.5), stage(k, 0.3, 1)];
+  const aim = KNEEL_AIM[weapon];
+  const carried = aim === undefined ? 0 : aimOf(f);
   f.body.position.y -= 0.4 * low;
-  f.body.rotation.x += 0.18 * low;
-  f.torso.rotation.x += 0.12 * low;
-  f.head.rotation.x += 0.45 * bow; // bowed
+  f.body.rotateX(0.18 * low);
+  f.torso.rotateX(0.12 * low);
+  f.head.rotateX(0.45 * bow); // bowed
   toward(f.legL, low, -1.3); // the front leg: thigh forward, shin straight down
   toward(f.kneeL, low, 1.35);
   toward(f.legR, low, 0.2); // the back leg: its knee to the ground
@@ -231,6 +257,32 @@ function kneel(f: Figure, k: number): void {
   toward(f.armL, hands, -0.6, 0, 0.14);
   toward(f.elbowR, hands, -0.75);
   toward(f.elbowL, hands, -0.75);
+  if (aim !== undefined) turnAim(f, wrapAngle(carried + (aim - carried) * hands - aimOf(f))); // the wrist turns the weapon from where the walk carried it to where it clears the ground
+}
+
+/**
+ * A clip's boots are set for the clip's own walk; a kneel bends the legs by hand over it, and the front boot would stand tilted into the
+ * floor. So the pose is settled both ways, the clip's own feet and the ground's, and the one eased into the other over the first of the
+ * kneel (a kneel eased to nothing leaves the stride as it was). The joints are blended as quaternions: a clip's knee bent past a right
+ * angle reads as a folded Euler, which a lerp of its angles would twist.
+ */
+function settleKneeling(f: Figure, ground: Ground | undefined, k: number): void {
+  const joints = [f.kneeR, f.kneeL, f.footR, f.footL, f.skirt[0], f.skirt[1]];
+  const keep = (): { y: number; q: THREE.Quaternion[] } => ({ y: f.body.position.y, q: joints.map((j) => j.quaternion.clone()) });
+  const put = (at: { y: number; q: THREE.Quaternion[] }): void => {
+    f.body.position.y = at.y;
+    joints.forEach((j, i) => j.quaternion.copy(at.q[i]));
+  };
+  const start = keep();
+  settle(f, ground, false);
+  const clips = keep();
+  put(start);
+  settle(f, ground, true);
+  const grounded = keep();
+  const t = stage(k, 0, 0.1);
+  put(clips);
+  f.body.position.y += (grounded.y - clips.y) * t;
+  joints.forEach((j, i) => j.quaternion.slerp(grounded.q[i], t));
 }
 
 function fall(f: Figure, frame: number): void {
@@ -302,14 +354,20 @@ export function pose(f: Figure, p: PoseInput): void {
     return;
   }
   if (p.drop) return p.drop.sea && p.drop.sea.since >= 0 ? thrash(f, p.drop.sea.since, p.drop.sea.held) : plunge(f, p.drop.t, p.drop.spin);
+  const mine = f.character === 'player'; // his own clips (playerPose.ts) where he has them
+  const player = { move: p.move, def: d, frame: p.frame, speed: p.speed, stride: p.stride, guard: p.guard, time: p.time, weapon: p.weapon ?? 'cane', rollYaw: p.rollYaw };
+  let [clipped, kneeling] = [false, false];
   if (!d || p.move === null) {
-    stride(f, p.speed, p.stride, p.time, p.guard);
-    if (p.kneel) kneel(f, p.kneel);
+    clipped = mine && playerStride(f, player);
+    if (!clipped) stride(f, p.speed, p.stride, p.time, p.guard);
+    if (p.kneel) kneel(f, p.kneel, mine ? player.weapon : '');
+    kneeling = clipped && !!p.kneel;
     if (p.act) {
       actPose(f, p.act.kind, p.act.k, p.time);
       showProps(f, p.act.k > 0.02);
     }
   }
+  else if (mine && (clipped = playerMove(f, player))) { /* a clip made for this move */ }
   else if (p.move === 'death') fall(f, p.frame);
   else if (p.move === 'stagger' || p.move === 'guardBreak') reel(f, p.frame / d.frames, p.move === 'guardBreak' ? 1.6 : 1);
   else if (p.move === 'parried') recoil(f, p.frame);
@@ -323,7 +381,13 @@ export function pose(f: Figure, p: PoseInput): void {
     stride(f, p.speed, p.stride, p.time, false); // walking on beneath it
     (d.use === 'rounds' ? reload : d.use === 'reagent' ? inject : drink)(f, d, p.frame);
   }
-  f.body.rotation.x -= 0.18 * p.flinch;
-  f.head.rotation.x -= 0.25 * p.flinch;
-  settle(f, p.ground);
+  if (clipped) {
+    f.body.rotateX(-0.18 * p.flinch);
+    f.head.rotateX(-0.25 * p.flinch);
+  } else {
+    f.body.rotation.x -= 0.18 * p.flinch;
+    f.head.rotation.x -= 0.25 * p.flinch;
+  }
+  if (kneeling) settleKneeling(f, p.ground, p.kneel!); // (a move in the hands of the clip keeps its own feet, kneel or none)
+  else settle(f, p.ground, !clipped); // a clip keeps its own feet
 }

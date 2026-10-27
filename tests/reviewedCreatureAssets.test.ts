@@ -18,7 +18,7 @@ const text = (bytes: Uint8Array): string => new TextDecoder().decode(bytes);
 const DIRECTIONS = ['front', 'back', 'left', 'right'] as const;
 const FIRST_LATER_PAGE = 4; // the library's four pages, then a page for each later delivery (tools/add_reviewed_frames.py)
 /** What the author drew after the library: the colossi's stoop and its in-between pose, the bosses' left and back attack and hurt, and the Shantak's flight cycle (round 48). */
-const later = (assetGroup: string, direction: string, action: string): boolean => // (Yog-Sothoth, drawn again whole in round 56, has front combat only: the standing rule)
+const later = (assetGroup: string, direction: string, action: string): boolean => // (Yog-Sothoth, drawn again whole in round 56, and Shub-Niggurath, in round 92, have front combat only: the standing rule)
   action === 'stoop' || action === 'stoop_mid' || action === 'flight' || (assetGroup === 'bosses' && (direction === 'left' || direction === 'back') && (action === 'attack' || action === 'hurt'));
 
 interface Frame {
@@ -86,14 +86,14 @@ describe('reviewed creature artwork imported into the game', () => {
         }
       }
     }
-    expect(scopes).toBe(1100); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the other eight bosses' left and back attack and hurt (32), and the Shantak's flight in its four views (4); Yog-Sothoth's, drawn again whole with front combat only, are no more
-    expect(mirrors).toBe(85); // 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do), and so has round 57's Horror at Martin's Beach (its own before)
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2856);
+    expect(scopes).toBe(1096); // 1,050 of the library, the stoop and its in-between pose of seven colossi (14), the other seven bosses' left and back attack and hurt (28), and the Shantak's flight in its four views (4); Yog-Sothoth's and Shub-Niggurath's, drawn again whole with front combat only (rounds 56 and 92), are no more
+    expect(mirrors).toBe(88); // October 27's Curwen rework adds one mirrored right; 82 of the library; 'Umr at-Tawil was drawn again whole, and his right is his own; the sixteen of round 56 have every right the left turned round (Rhan-Tegoth, the Shunned House and Yog-Sothoth, which drew theirs, no longer do), and so has round 57's Horror at Martin's Beach (its own before); round 92's Yeb and Shub-Niggurath, which drew theirs, have theirs turned round too (Nug's always was)
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2824);
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2856); // (2844 before round 57's nine, which brought twelve frames more: the Ghouls' four more left walk frames each and the Polyp Swarm's six more, less the Dhole's two fewer in its back walk (the Horror at Martin's Beach's longer walks took the places its own right had); 2768 before round 56's sixteen: their ninety frames beyond the old places, less the 14 dropped, Rhan-Tegoth's own right and Yog-Sothoth's left and back combat); 2,577 of the library, the stoop's fourteen and the seven in-between frames, the bosses' 126, 'Umr at-Tawil's four right-hand frames, the Shantak's 32 flight frames, and the four more walk frames each of the Crawling Chaos's left and right
+    expect(pack.frameCount).toBe(2824); // October 27: the three reworks replace 95 unique frames with 69 (2850 - 26); mirrored right views render all 87 delivered poses.
   });
 
-  it('preserves all 2856 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
+  it('preserves all 2824 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {
     expect(pack.filter).toBe('nearest');
     expect(pack.mipmaps).toBe(false);
     const pages = pack.pages.map((page) => {
@@ -118,7 +118,7 @@ describe('reviewed creature artwork imported into the game', () => {
       const size = `${frame.width}x${frame.height}`;
       sizes.set(size, (sizes.get(size) ?? 0) + 1);
     }
-    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2470, '128x128': 344, '128x160': 42 });
+    expect(Object.fromEntries(sizes)).toEqual({ '64x64': 2452, '128x128': 330, '128x160': 42 });
     const winged = pack.entities.winged_hybrid.directions.left.actions.move;
     expect(winged).toHaveLength(6);
     expect(pack.frames[winged[3]].sourceSha256).toBe('6910daf44dc5bb1f72a39f8d0e033bf4f8f1832dc81fe487c0d290ae182b476f');
@@ -126,7 +126,7 @@ describe('reviewed creature artwork imported into the game', () => {
     expect(pack.entities.winged_hybrid.directions.right.mirror).toBe(true);
     expect(pack.entities.innsmouth_hybrid.directions.right.mirror).toBe(false);
     expect(pack.entities.rhan_tegoth.directions.right.mirror).toBe(true); // drawn again whole in round 56: its right is its left turned round, as its picture now is
-    expect(pack.entities.yeb.directions.right.mirror).toBe(false);
+    expect(pack.entities.yeb.directions.right.mirror).toBe(true); // drawn again whole in round 92: its right is its left turned round, as its picture now is
     expect(pack.entities.umr_at_tawil.directions.right.mirror).toBe(false); // drawn again whole: his right is no longer his left turned round
     expect(pack.entities.umr_at_tawil.directions.right.actions.move).not.toEqual(pack.entities.umr_at_tawil.directions.left.actions.move);
   });

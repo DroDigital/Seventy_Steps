@@ -36,14 +36,14 @@ export const MIND_EARS = Object.freeze({
     from: 0.6, // stress: the whispers' line, sanity 40
     every: [110, 50] as readonly [number, number],
     steps: [6, 14] as readonly [number, number], // footfalls it shadows
-    gain: [0.28, 0.4] as readonly [number, number], // by the stress; the set's own level beneath (the investigator's own steps are 0.55 to 1)
+    gain: [0.15, 0.22] as readonly [number, number], // by the stress; the set's own level beneath (the investigator's own steps are 0.26 to 0.58 since round 83, and these were 0.28 to 0.4 beside 0.55 to 1; in a dungeon's room lifted with them, `STEP_VOICE.indoors`, round 86)
     pitch: [0.82, 0.9] as readonly [number, number], // heavier
     lowpass: 1100, // duller
     pan: 0.25, // alternately to either side
     delay: [0.45, 0.55] as readonly [number, number], // the share of the investigator's own stride it is behind
     stop: 0.45, // seconds without a footfall of the investigator's (or this many times the last stride's own, if that is longer: a walk's are half a second apart) that end it...
     stopBy: 1.6,
-    last: { wait: [0.4, 0.7] as readonly [number, number], gain: 0.45, lowpass: 2600, pitch: 0.8 }, // ...and the one step more, nearer, a moment after
+    last: { wait: [0.4, 0.7] as readonly [number, number], gain: 0.25, lowpass: 2600, pitch: 0.8 }, // ...and the one step more, nearer, a moment after
     /** Stood still, the same moment instead: `steps` slow steps from behind the listener, closing from `from` to `to` metres, `gap` seconds apart, the first after `lead`. */
     approach: { still: 1.5, steps: [4, 7] as readonly [number, number], from: 6, to: 3.5, gap: [0.6, 0.75] as readonly [number, number], lead: 1.2, gain: [0.12, 0.3] as readonly [number, number], lowpass: [1400, 2400] as readonly [number, number], turned: Math.cos(0.87), breath: 0.5 },
     gap: 40, // seconds at the least between one episode and the next

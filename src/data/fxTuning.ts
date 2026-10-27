@@ -135,3 +135,151 @@ export const GROUND_CONTACT = {
   cover: { tufts: 0.7, roots: 4 }, // the plants about a base: tufts to each metre of reach, and roots about a tree's foot (render/baseCover.ts)
 };
 
+
+/**
+ * Lights that last a moment (round 83, render/flashLights.ts): the flash at the heart of a foe's blow and a foe's bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer.
+ * Round 87 (XDro: the hit flashes were too much, and a blow of the investigator's already lights the creature it lands on): the investigator's shot and blow lay no light, only a foe's blows, shots and bolts do, and the lights are small and short: the strongest is about a torch's (1.1; a fire is 1.8, a street lamp 2.6), the usual about half of it.
+ */
+export const FLASH_LIGHTS = {
+  slots: 2, // the most at once
+  reach: 46, // metres from the investigator: farther, none is chosen
+  attack: 0.03, // seconds a flash takes to come to its height (a fall as quick and as long as its life follows)
+  burst: { strength: 0.7, per: 0.12, most: 1.2, range: 3, rangePer: 1.2, rangeMost: 10, seconds: 0.2 }, // the flash at the heart of a foe's blow: by its radius
+  bolt: { strength: 0.5, per: 0.25, most: 1, range: 3, rangePer: 1.2, rangeMost: 6.5, seconds: 0.1 }, // a foe's bolt of light or fire in flight, kept up each frame
+  white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
+} as const;
+
+/** The mist a moving body carves (round 83, render/mistWakes.ts, shaders/fog.ts): the low mist parts before and about whatever moves through it, closes slowly behind it in a trail, and turns about its edge. Metres. */
+export const MIST_WAKES = {
+  slots: 8, // the most at once (the nearest moving bodies; the investigator's is always one)
+  reach: 44, // metres from the lens: farther, none is laid
+  minSpeed: 0.7, // metres a second a body must move at to part it
+  fullSpeed: 4.5, // ...and the pace at which it parts it wholly
+  radius: [0.9, 6] as readonly [number, number], // its breadth: the body's own, at least and at most
+  trail: 1.1, // seconds of its travel the trail behind it is long...
+  trailMost: 4.5, // ...at most this many metres
+  strength: 0.72, // the share of the mist it clears at its heart, at the most
+  turn: 0.9, // how far the mist is turned about its edge: this much of its breadth
+  height: 3.2, // the height the mist is parted to
+} as const;
+
+/**
+ * Prints in soft ground and what a body's breath and feet raise (round 83; render/creatureTracks.ts, render/creatureAir.ts). The ground a
+ * region has underfoot decides it: how dark a print is, how long it keeps, the colour it is pressed in; only soft ground keeps one.
+ */
+export const PRINTS = {
+  capacity: 220, // the most prints at once (the oldest is taken over)
+  reach: 32, // metres from the lens that bodies are tracked and prints laid
+  minSpeed: 0.5, // metres a second a body must move at to leave one
+  stride: [0.45, 1.1] as readonly [number, number], // metres between the prints of one body: this, and this much more for each metre of its radius
+  soft: {
+    snow: { strength: 0.62, seconds: 80, tint: [0.2, 0.23, 0.34] },
+    mud: { strength: 0.7, seconds: 55, tint: [0.075, 0.06, 0.05] },
+    sand: { strength: 0.4, seconds: 26, tint: [0.34, 0.26, 0.18] },
+    dirt: { strength: 0.34, seconds: 20, tint: [0.13, 0.1, 0.075] },
+    leaves: { strength: 0.26, seconds: 14, tint: [0.1, 0.07, 0.05] },
+    grass: { strength: 0.16, seconds: 9, tint: [0.06, 0.1, 0.07] },
+  } as Readonly<Record<string, { strength: number; seconds: number; tint: readonly [number, number, number] }>>,
+  fade: 0.45, // the share of a print's life it fades over at the end
+} as const;
+
+/** The cold breath and the dust of a hard run (render/creatureAir.ts). */
+export const BODY_AIR = {
+  reach: 14, // metres from the lens that a body breathes a cloud
+  breathSeconds: [2.2, 3.4] as readonly [number, number], // between one breath and the next: this, and this much more, by the body
+  breath: { color: [0.82, 0.86, 0.9] as readonly [number, number, number], alpha: 0.26, size: 0.16, grow: 3, seconds: 1.15 },
+  dustSpeed: 3.6, // metres a second a body must run at to raise dust from dry ground
+  dustSeconds: 0.5, // between its puffs
+  dustReach: 22,
+} as const;
+
+/** A horror's presence in the picture (render/bossPresence.ts, bossFootfalls.ts, creatureViews.ts). */
+export const BOSS_PRESENCE = {
+  height: 4, // metres: a body this tall, or any that is fought as a horror, leaves footfalls
+  minSpeed: 1.2, // metres a second it must walk at
+  stride: 0.55, // a stride's length, in its heights
+  least: 0.12, // the least presence (render/presence.ts presenceOf) at which a stride is felt
+  shake: 0.035, // metres of camera jolt at a stride, for a body of eight metres at its foot
+  voiceAttack: 0.06, // seconds a voice's loudness takes to rise in the picture...
+  voiceRelease: 0.2, // ...and to fall
+  breathe: 0.016, // the share of its height a picture swells by at the loudest of its voice, its feet kept where they are
+  eyes: 1.6, // how much brighter its eyes burn at the loudest, and
+  glints: 2.4, // its glints' gain
+  deepGlints: 0.8, // the share more its glints burn in its last phase than in its first
+  bodyGlow: 0.12, // how much brighter a colossus's built body is lit in its last phase and in a loud word
+  halo: { size: 0.9, gain: 0.34 }, // the halo about its body in the colour of its blows, in its heights, and how bright in its last phase
+} as const;
+
+/** What a person has that moves of itself (render/figureGaze.ts, figureSway.ts, figureBlink.ts, personLife.ts, the world shader; round 83): the people met only. No run-lean, no breathing, no sway of the body. The investigator's lantern and scarf are the player rebuild's. */
+export const FIGURE_LIFE = {
+  gaze: {
+    range: 7, // metres a person sees the investigator from
+    near: 0.6, // and does not look at them closer than
+    turn: 0.9, // rad a head turns, at most; beyond it the body is the body's
+    reach: 2.4, // rad off their front at which the eyes let go, fading from `turn`
+    pitch: 0.25, // rad, up or down
+    follow: 7, release: 4, // per second: how quick the head comes round, and goes back
+  },
+  wet: [0.05, 0.09] as readonly [flat: number, up: number], // how much darker a person's cloth is in a soaking rain, and the more that surfaces facing the sky take (the world shader)
+  dust: 0.8, // the share of the realm's matter (snow, drifted sand, soot) that lies on what faces up on a person met out of doors (the world shader)
+  /** What hangs loose, by kind: the lean (rad) a whole breeze, a walking pace and a hard turn each give it, the most it leans, its spring (per s²) and damping (per s), and how it flutters (rad, per s). A hat is carried on the head, so it leans the other way. */
+  loose: {
+    hat: { wind: 0.07, walk: 0.05, turn: 0.035, most: 0.13, spring: 120, damp: 10, flutter: [0.012, 2.3] },
+    shawl: { wind: 0.16, walk: 0.1, turn: 0.07, most: 0.3, spring: 55, damp: 6.5, flutter: [0.02, 1.7] },
+    scarf: { wind: 0.34, walk: 0.24, turn: 0.15, most: 0.55, spring: 40, damp: 4.5, flutter: [0.05, 2.9] },
+    tail: { wind: 0.1, walk: 0.0, turn: 0.1, most: 0.22, spring: 50, damp: 6, flutter: [0.015, 1.9] },
+  },
+  slice: 1 / 120, // seconds: the spring is stepped in slices this long, so it settles the same at any frame rate
+  gale: 2.2, // the world's wind (uWind) at which the cloth is blown as hard as it goes
+  blink: { cell: 4.2, shut: 0.14, doze: 0.88 }, // seconds in which each person blinks once (somewhere in it), the length of a blink, and how nearly shut the eyes of one dozing on their feet are
+} as const;
+
+/** What a merchant shows of the wares they still have to sell (render/personLife.ts; round 83): the rare ones, in their coat, while any is left. */
+export const WARE_SHOWN = {
+  star_stone: { x: 0.095, y: 0.47, z: 0.143, size: 0.05, glow: 0.55 }, // a star-stone pinned to the lapel
+  vial: { x: -0.115, y: 0.33, z: 0.14, glow: 0.12 }, // a silver vial in the breast pocket
+} as const;
+
+/** The blob shadow's shape (render/blobShape.ts; round 83). */
+export const BLOB = {
+  dark: 0.55, // how dark at its heart
+  base: 1.7, // its radius, in the radii of the body's capsule
+  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider, but Shub-Niggurath since round 92: as wide as her capsule)
+  draw: 1.0, // how much longer it is drawn out away from the moon at the horizon than from the zenith
+  most: 1.8, // and the most it is drawn out
+  shift: 0.6, // the share of what it is drawn out by that its middle moves, away from the moon
+  thin: 0.25, // how much lighter it is for each whole length drawn out
+} as const;
+
+/**
+ * What a foe's own picture casts into the moon's, the lantern's and the lamps' shadow maps (round 94; render/silhouetteCasters.ts,
+ * shaders/castSprite.ts, castPlan.ts): its animated outline, stood across the light and leaned back, so its shadow is its own
+ * shape (a claw raised in the blow is raised in the shadow) and always as long as it is tall; the horrors' are larger than they are.
+ */
+export const CAST = {
+  alpha: { reviewed: 0.5, drawn: 0.3 }, // the least opacity of a texel that is body: the authored art's, and the procedural atlas's (whose glow marks are 0.63 and 0.82)
+  stretch: 1.15, // the shortest a shadow is, in the heights of the body that casts it: under a high light the cut-out leans back until it reaches this (a light over 60 degrees cannot give it: there the shadow is as long as it can be, 1 / sin of the light's height)
+  lean: 1.1, // radians: the most it leans back (63 degrees), so that it never lies flat on the ground it is cast on
+  back: 0.25, // metres a lantern's or a lamp's cut-out stands behind the body, and half the breadth of its picture along the light's ray besides (a lamp's light is read at every pixel of the picture, and none may lie deeper than the cut-out): the body that is lit is never in its own shadow
+  turn: 0.3, // how far across the light (the cosine of the angle to the camera's right) the cut-out is turned about
+  merge: 0.97, // over that turn the picture's cut rises to this opacity at the middle of it, where a texel is kept only if the picture and its mirror both have it: the shadow narrows to the shape they share and widens again as the picture or its mirror returns, and never swaps one for the other at once
+  reach: 48, // metres from the investigator at which a foe casts none: the corners of the moon's map (34 m about it, a square) are 48 m off; but see `longest`
+  longest: 2.6, // the longest a shadow is, in the heights of the sheet that casts it (the lowest moon of the night, 21 degrees, 1 / tan): added to `reach`, so that no shadow that could reach the map is dropped with its body
+  least: 0.4, // the least opacity of a picture that casts: a shimmer in the air (an invisible stalker) casts none
+  keep: 0.05, // the share of a picture left, below which it casts none (a creature dying)
+  loom: { base: 0.15, size: 0.4, from: 3, to: 12, deep: 0.28, wide: 0.5 }, // how much larger its shadow is than the body: every foe's by `base`; by `size` more for a body 3 to 12 metres tall; by `deep` more for a horror in the last phase of its fight; and `wide` the share of that it is broader by
+} as const;
+
+/** The track of a blow (render/swingTrails.ts; round 83). */
+export const SWING_TRAIL = {
+  samples: 14, // the last few edges kept
+  life: 0.2, // seconds a sample lasts
+  alpha: 0.55, // its brightness when laid
+  width: 0.45, // metres of the weapon's length, back from its point, that the ribbon spans
+  color: [0.82, 0.86, 0.96] as readonly [number, number, number],
+  lead: 2, tail: 3, // frames before the blow's first active frame and after its last that the edge is followed
+} as const;
+
+/** The quiet blows of every creature that is not one of the horrors (round 90): kept in data/foeTuning.ts, which holds this file past its share of lines. */
+export { FOE_FX } from './foeTuning';
+export type { MatterSpec, SpeckShape } from './foeTuning';

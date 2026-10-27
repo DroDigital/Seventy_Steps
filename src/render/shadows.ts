@@ -2,17 +2,19 @@
  * Blob shadows (render only): a soft dark disc on the ground under every body that stands in the
  * world — the investigator, the people met, creatures and colossi — so nothing floats. Ordered-
  * dithered like the particles; a hovering creature's shadow shrinks and fades with its height.
- * Read-only on the simulation.
+ * Round 83: it is as wide as the body is painted (a colossus's is not hidden under its picture) and,
+ * where the moon casts shadows, drawn out away from the moon (render/blobShape.ts), the way the
+ * body's real shadow lies. Read-only on the simulation.
  */
 
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { isAbsent, isUnseen, type Game } from '../systems/components';
+import { blobShape, type Blob } from './blobShape';
 import { worldUniforms } from './worldMaterial';
 
 const CAPACITY = 96;
 const LIFT = 0.04; // metres above the ground
-const DARK = 0.55; // how dark at its heart
 
 const VERT = /* glsl */ `
 uniform float uFogNear;
@@ -51,7 +53,8 @@ export interface Shadows {
   update(alpha: number): void;
 }
 
-export function createShadows(scene: THREE.Scene, g: Game): Shadows {
+/** `painted`: how wide each creature is drawn this frame, in metres (render/creatureViews.ts); those not in it are as wide as their capsule. */
+export function createShadows(scene: THREE.Scene, g: Game, painted: ReadonlyMap<Entity, number> = new Map()): Shadows {
   const geo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
   const alphas = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY), 1).setUsage(THREE.DynamicDrawUsage);
   geo.setAttribute('aAlpha', alphas);
@@ -61,6 +64,8 @@ export function createShadows(scene: THREE.Scene, g: Game): Shadows {
   batch.count = 0;
   scene.add(batch);
   const m4 = new THREE.Matrix4();
+  const [q, at, scale, up] = [new THREE.Quaternion(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(0, 1, 0)];
+  const [toMoon, blob] = [new THREE.Vector3(), { across: 0, along: 0, yaw: 0, shift: 0, alpha: 0 } as Blob];
   const c = g.ecs.c;
 
   /** Whether a body casts one: standing in the world, not hidden, not a prop. */
@@ -71,6 +76,7 @@ export function createShadows(scene: THREE.Scene, g: Game): Shadows {
 
   return {
     update(alpha) {
+      const moon = worldUniforms.uShadow.value.x > 0 ? toMoon.copy(worldUniforms.uLightDir.value).normalize() : null; // where the moon casts shadows (moonShadow.ts), the blob lies the same way
       let n = 0;
       for (const [id, body] of c.body) {
         if (n >= CAPACITY || !casts(id)) continue;
@@ -79,10 +85,11 @@ export function createShadows(scene: THREE.Scene, g: Game): Shadows {
         const x = tr.prev.x + (tr.pos.x - tr.prev.x) * alpha;
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         const hover = c.brain.get(id)?.def.params.hover ?? 0;
-        const k = 1 / (1 + hover * 0.5);
-        const r = body.radius * 1.7 * k;
-        batch.setMatrixAt(n, m4.makeScale(r, 1, r).setPosition(x, g.world.ground(x, z) + LIFT, z));
-        alphas.setX(n++, DARK * k);
+        blobShape(body.radius, painted.get(id), hover, moon, blob);
+        q.setFromAxisAngle(up, blob.yaw);
+        at.set(x + Math.sin(blob.yaw) * blob.shift, g.world.ground(x, z) + LIFT, z + Math.cos(blob.yaw) * blob.shift);
+        batch.setMatrixAt(n, m4.compose(at, q, scale.set(blob.across, 1, blob.along)));
+        alphas.setX(n++, blob.alpha);
       }
       batch.count = n;
       batch.instanceMatrix.needsUpdate = true;

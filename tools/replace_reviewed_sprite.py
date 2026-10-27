@@ -11,7 +11,7 @@ The folder holds the library's tree: sprites/<id>[/<variant>]/64x64/<direction>/
 bosses/<id>/movement/... (the key of a variant is <id>#<variant>). Each frame must be the canvas of the creature's front idle
 and, for a creature registered on the ground line, stand within GROUND pixels of its ground line (one the delivery's MANIFEST.json
 registers by its central body, a flier or a levitating thing, is left to move). What the delivery brings is the creature's
-idle and move in all four views and its attack and hurt from the front: that is the whole of it.
+idle and move in all four views and its attack and hurt from the front (and a colossus's stoop, below): that is the whole of it.
 
   * Attack and hurt are front art only. A left, right or back attack or hurt in a delivery is never packed, and the old drawing's
     own (a boss's left and back combat) is dropped with it, for it would no longer match: seen from the side, a creature that
@@ -21,7 +21,11 @@ idle and move in all four views and its attack and hurt from the front: that is 
     own first), and what nothing uses is cleared and taken out of the index (the frames after it move up a number).
   * Its right is registered as its left turned round (the delivery's right being that, pixel for pixel), else as drawn; a view
     is one or the other whole.
-  * Any other action it has (a colossus's stoop, a flight) is left as it was.
+  * A colossus's stoop (the bow and the hold, `stoop_<n>`, and the halfway pose, `stoop_mid_0`) is front art too, and a creature that
+    has one must come with one: each frame is pasted over the old one's rectangle on its page (the count is the old count; a delivery
+    without it, or with one the creature has not got, is refused: tools/add_reviewed_frames.py adds a stoop), on the very ground line
+    of the delivery's front idle, the bow and the hold no more than 1% taller than it and the halfway pose no taller.
+  * Any other action it has (a flight) is left as it was.
 
 The pixels go over the old rectangles, and the frame's hashes and bounds, the pages' and both indexes are brought in line, so the
 integrity test holds the new art to the same account as the old. `--dry` does all of it in memory and writes nothing.
@@ -43,6 +47,7 @@ GUTTER = 1
 GROUND = 2
 LIBRARY_PAGES = 4  # the library's own pages: the shelf of a redrawn creature is on one of them
 ACTIONS = ('idle', 'move', 'attack', 'hurt')
+STOOPS = ('stoop', 'stoop_mid')  # a colossus's bow and hold, and the pose halfway down to it: front only, in place on the pages of their own
 DIRECTIONS = ('front', 'back', 'left', 'right')
 
 
@@ -104,12 +109,17 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     prefix = idle['source'].rsplit('/', 2)[0]  # sprites/<id>[/<variant>]/64x64, or bosses/<id>/movement
     canvas = (idle['width'], idle['height'])
 
-    brought, skipped = {}, []
+    brought, skipped, stooped = {}, [], {}
     for path in sorted((delivery / prefix).glob('*/*.png')):
-        match = re.fullmatch(r'(idle|move|attack|hurt)_(\d+)\.png', path.name)
+        match = re.fullmatch(r'(idle|move|attack|hurt|stoop_mid|stoop)_(\d+)\.png', path.name)
         if not match or path.parent.name not in DIRECTIONS:
             sys.exit(f'{path}: not a frame of a view')
         action, direction = match.group(1), path.parent.name
+        if action in STOOPS:
+            if direction != 'front':
+                sys.exit(f'{path}: a stoop is front art')
+            stooped.setdefault(action, {})[int(match.group(2))] = path
+            continue
         if direction != 'front' and action in ('attack', 'hurt'):
             skipped.append(path)  # front art only: never packed
             continue
@@ -126,6 +136,15 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     for action in entity['directions']['front']['actions']:
         if action in ACTIONS and ('front', action) not in brought:
             sys.exit(f'{key}: the delivery has no front/{action}, which it had')
+        if action in STOOPS and action not in stooped:
+            sys.exit(f'{key}: the delivery has no front/{action}, which it had')
+    for action, by_n in stooped.items():
+        if sorted(by_n) != list(range(len(by_n))):
+            sys.exit(f'{key} front/{action}: frames are not numbered from 0 in a run')
+        if action not in entity['directions']['front']['actions']:
+            sys.exit(f'{key}: the delivery has a front/{action}, which it has not (tools/add_reviewed_frames.py adds one)')
+        if len(by_n) != len(entity['directions']['front']['actions'][action]):
+            sys.exit(f"{key} front/{action}: {len(by_n)} frames, it had {len(entity['directions']['front']['actions'][action])}")
 
     pixels = {path: load(path) for by_n in brought.values() for path in by_n.values()}
     mirrored = all(
@@ -184,6 +203,32 @@ def replace(pack: Pack, key: str, delivery: Path, central: bool) -> str:
     for i in dead:
         pack.clear(frames[i])
         pack.dead.add(i)
+
+    if stooped:
+        front, registered = entity['directions']['front'], original['directions']['front']
+        stands, high = new[('front', 'idle', 0)][3][3], new[('front', 'idle', 0)][3][3] - new[('front', 'idle', 0)][3][1]  # the delivery's own front idle
+        drawn = {}
+        for action, by_n in sorted(stooped.items()):
+            for n, path in sorted(by_n.items()):
+                rgba, data, bounds = load(path)
+                if (rgba.width, rgba.height) != canvas:
+                    sys.exit(f'{path}: {rgba.width}x{rgba.height}, the canvas is {canvas[0]}x{canvas[1]}')
+                if bounds is None:
+                    sys.exit(f'{path}: nothing painted')
+                if bounds[3] != stands:
+                    sys.exit(f'{path}: stands on row {bounds[3]}, the idle it is drawn from on {stands} (a stoop stands on the very ground line)')
+                if bounds[3] - bounds[1] > (high if action == 'stoop_mid' else high * 1.01):  # (the halfway pose is never the taller)
+                    sys.exit(f'{path}: {bounds[3] - bounds[1]} rows high, taller than the idle it comes down from ({high})')
+                drawn[(action, n)] = (rgba, data, bounds)
+        for (action, n), (rgba, data, bounds) in sorted(drawn.items()):
+            f = frames[front['actions'][action][n]]
+            f.update(source=f'{prefix}/front/{action}_{n}.png', sourceSha256=sha256(data), pixelSha256=sha256(rgba.tobytes()), bounds=list(bounds))
+            pack.page(f['page']).paste(rgba, (f['x'], f['y']))  # in place, every channel, no mask
+            pack.touched.add(f['page'])
+        for action, ids in sorted((a, front['actions'][a]) for a in stooped):
+            registered['actions'][action] = {'frame_count': len(ids), 'frames': [
+                {'name': f'{action}_{n}', 'path': f'{prefix}/front/{action}_{n}.png', 'sha256': frames[i]['sourceSha256']} for n, i in enumerate(ids)]}
+        note += f', its {len(drawn)} stoop frames ({", ".join(sorted(stooped))}) drawn in place'
 
     for d in DIRECTIONS:
         view, registered = entity['directions'][d], original['directions'][d]

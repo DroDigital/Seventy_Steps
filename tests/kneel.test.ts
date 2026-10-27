@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { buildFigure, type Figure } from '../src/render/figures';
 import { pose, type PoseInput } from '../src/render/poses';
@@ -58,11 +59,12 @@ describe('getting up from the knee (round 22: a slow rise stages its parts)', ()
 
   it('moves every part smoothly through the rise, none of them jumping between one frame and the next', () => {
     const f = buildFigure('player');
-    let last: number[] | undefined;
+    const turns = (): THREE.Quaternion[] => { const out: THREE.Quaternion[] = []; f.root.traverse((o) => void (o !== f.root && out.push(o.quaternion.clone()))); return out; }; // (turned, not as Euler angles: a joint bent past a right angle reads as a folded Euler that changes fast for a small turn)
+    let last: { turned: THREE.Quaternion[]; y: number } | undefined;
     for (let k = 1; k >= 0.1; k -= 0.01) { // (the last hair of it, a knee giving where the foot would sink, is settle's: a sharp bend for a millimetre)
       pose(f, walking(k));
-      const now = joints(f);
-      if (last) expect(Math.max(...now.map((v, i) => Math.abs(v - last![i]))), `at ${k.toFixed(2)}`).toBeLessThan(0.08);
+      const now = { turned: turns(), y: f.body.position.y };
+      if (last) expect(Math.max(Math.abs(now.y - last.y), ...now.turned.map((q, i) => q.angleTo(last!.turned[i]))), `at ${k.toFixed(2)}`).toBeLessThan(0.08);
       last = now;
     }
   });
