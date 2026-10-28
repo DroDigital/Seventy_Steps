@@ -12,7 +12,16 @@ export const PAPER = '#e8dec6'; // a title
  * A period book face for the title, menus, the HUD (round 14) and what is read. Round 74: IM Fell English (`ui/fonts`), with the
  * system serifs behind it for what it has no glyph for (→ ≥ − ▲ ◇) and while it loads. It has one weight and oldstyle figures only.
  */
-export const SERIF = "'IM Fell English','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif";
+export const DEFAULT_SERIF = "'IM Fell English','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif";
+export const GARAMOND_SERIF = "'EB Garamond','Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif";
+/** CSS variable updates existing DOM controls immediately; canvas draws use canvasSerif(). */
+export const SERIF = `var(--ui-serif, ${DEFAULT_SERIF})`;
+let canvasFace = DEFAULT_SERIF;
+export const canvasSerif = (): string => canvasFace;
+export function applySerif(garamond: boolean): void {
+  canvasFace = garamond ? GARAMOND_SERIF : DEFAULT_SERIF;
+  if (typeof document !== 'undefined') document.documentElement.style.setProperty('--ui-serif', canvasFace);
+}
 /** A telegram's or typescript's face (round 74: Special Elite, `ui/fonts`; only the intro's telegram is set in it). */
 export const TYPEWRITER = "'Special Elite','Courier New',Courier,monospace";
 

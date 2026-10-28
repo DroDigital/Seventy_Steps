@@ -96,14 +96,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   const spans = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSpan(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
-  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number }, say = 0, fire = 0) => {
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number }, say = 0, fire = 0, outside = false) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
     const page = art!.manifest.pages[frame.page];
     const b = pages[frame.page];
     const index = counts[frame.page];
     if (index >= CAPACITY) return null;
     b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
-    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, 0);
+    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, outside ? 1 : 0);
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
     b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width * (1 + 0.4 * say), size.height * (1 + say), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height)
@@ -190,7 +190,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           sky = roofs.sky(id, roofedAt(x, z), time); // under a dungeon's roof a creature keeps the colours it was drawn in (round 96)
-          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints);
+          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside);
           if (!frame) continue;
           roofSeen.add(id);
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });

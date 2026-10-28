@@ -99,7 +99,7 @@ describe('stamina against the Other Gods', () => {
     expect(g.ecs.c.health.get(player)!.hp).toBeCloseTo(PLAYER.hp - hits.at(-1)!.damage, 6);
   });
 
-  it('still exhausts stamina and refuses a roll when full-duration rolls run straight on', () => {
+  it('refuses another full-duration roll when the remaining stamina cannot cover its cost', () => {
     const { g, player, stamina } = otherGods();
     const actor = g.ecs.c.actor.get(player)!;
     const down = press('dodge');
@@ -121,8 +121,11 @@ describe('stamina against the Other Gods', () => {
       expect(actor.frame).toBe(0);
     }
 
-    expect(rolls).toBe(6);
+    expect(rolls).toBe(5);
     expect(actor.move).toBeNull();
-    expect(stamina.value).toBeLessThanOrEqual(STAMINA.regen / SIM.hz); // recovery can begin after the refused action
+    const remaining = PLAYER.stamina - rolls * PLAYER_MOVES.roll.stamina;
+    expect(stamina.value).toBeGreaterThanOrEqual(remaining);
+    expect(stamina.value).toBeLessThanOrEqual(remaining + STAMINA.regen / SIM.hz); // recovery can begin after the refused action
+    expect(stamina.value).toBeLessThan(PLAYER_MOVES.roll.stamina);
   });
 });

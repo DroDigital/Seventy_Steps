@@ -8,7 +8,7 @@
 import { at, put, ring, scatter, wall, type ArenaSet } from './arenaSets';
 
 export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
-  // The Witch House's garret: the crooked room under the roof, a hag's litter, a pallet, trunks, a skeleton gnawed clean, a bowl and her candles.
+  // The Witch House's garret: the crooked room under the roof, a hag's litter, a pallet, trunks, a skeleton gnawed clean and a bowl.
   keziah_mason: {
     puts: [
       put('rh_plank', scatter(8, [0.8, 0.96], { face: 'free' }), { walk: true, size: 1.4 }), // boards off the walls (round 79: Elegant Crow's Retro Modular House, CC0)
@@ -21,7 +21,6 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('bench', at(0.93, 125, { face: 'in' }), { size: 1.2 }),
       put('skeleton', at(0.9, 215, { face: 'free' }), { size: 0.9 }),
       put('bowl', scatter(3, [0.8, 0.95], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(9, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // Sentinel Hill's summit: the circle of the hill's own stones about the table-stone, rocks left where they fell, and skulls on poles where the people burned their fires.
@@ -53,7 +52,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('column', ring(0.97, 4, { arc: [60, 300] }), { size: 0.8 }),
     ],
   },
-  // Curwen's laboratory: the tables of his work, vessels and a chalice, sealed coffins, a spade, a skeleton on a slab, his candles.
+  // Curwen's laboratory: the tables of his work, vessels and a chalice, sealed coffins, a spade and a skeleton on a slab.
   joseph_curwen: {
     puts: [
       put('kc_gate_bars', at(0.95, 150, { face: 'wall' }), { heart: true, size: 1, tint: [0.34, 0.34, 0.36], keep: 0 }), // the barred pens (round 79: Kenney's Modular Cave Kit, CC0)
@@ -73,7 +72,6 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('skeleton', at(0.86, 180, { face: 'free' }), { size: 0.9 }),
       put('shovel_dirt', at(0.9, 145, { face: 'free' }), { size: 1.2 }),
       put('chalice', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.6 }),
-      put('candles', scatter(8, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The abandoned church's steeple room: pews in their rows gone to rot, a cross taken down, a statue, no light at all (it lives in the dark).
@@ -90,7 +88,7 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('grave_broken', at(0.815, 60, { mirror: true, face: 'free' })),
     ],
   },
-  // Akeley's study in the farmhouse: the cylinders the Mi-Go carry brains in, crates and a chest, a lamp burning low.
+  // Akeley's study in the farmhouse: the cylinders the Mi-Go carry brains in, crates and a chest.
   whisperer: {
     puts: [
       put('og_gramophone', at(0.9, 120, { face: 'in' }), { size: 1.5 }), // the sound apparatus of the study (round 79: KIFIR's, CC BY)
@@ -103,7 +101,6 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('crate', scatter(5, [0.82, 0.97], { arc: [50, 310], face: 'free' }), { size: [1, 1.4] }),
       put('chest', at(0.94, 130, { face: 'in' }), { size: 1.3 }),
       put('barrel', scatter(3, [0.86, 0.97], { arc: [90, 270] }), { size: 1.2 }),
-      put('lantern', scatter(4, [0.8, 0.96], { face: 'free' }), { lit: 'lamp', walk: true, size: 1.5 }),
       put('bench', at(0.93, 235, { face: 'in' }), { size: 1.2 }),
     ],
   },

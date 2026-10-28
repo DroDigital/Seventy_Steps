@@ -76,6 +76,7 @@ export const SETTINGS = {
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
   relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 83: shaders/sprite.ts); off, they are lit as the rest
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
+  font: [0, 1, 1, 0], // 0: IM Fell English; 1: EB Garamond
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
   captions: [0.8, 1.6, 0.1, 1], // the size of what is said aloud and shown: cutscene lines, a talk, what is overheard (round 47)

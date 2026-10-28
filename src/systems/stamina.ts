@@ -1,6 +1,6 @@
 /**
- * Stamina rules (spec §3B): every action has a cost, regen waits after any spending, and a blocked
- * hit that empties the bar breaks the guard. As in Dark Souls, any stamina left lets an action start.
+ * Stamina rules (spec §3B): regen waits after spending, and a blocked
+ * hit that empties the bar breaks the guard. Actions require their full cost before they start.
  */
 
 import { STAMINA } from '../data/tuning';
@@ -9,7 +9,7 @@ import type { Stamina } from './components';
 export type StaminaMode = 'idle' | 'guard' | 'broken' | 'sprint';
 
 /** Entities without stamina (enemies) can always act. */
-export const canAfford = (s: Stamina | undefined): boolean => !s || s.value > 0;
+export const canAfford = (s: Stamina | undefined, cost: number): boolean => !s || s.value >= cost;
 
 export function spend(s: Stamina, cost: number): void {
   s.value = Math.max(0, s.value - cost);

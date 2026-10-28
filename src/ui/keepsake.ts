@@ -5,7 +5,7 @@
  * card, its numbers drawn on a plate. Both are saved as PNGs (a download; the desktop shell too).
  */
 
-import { BONE, SERIF } from './hudKit';
+import { BONE, canvasSerif } from './hudKit';
 
 /** Offers `canvas` as a PNG named `name`. */
 export function savePng(canvas: HTMLCanvasElement, name: string): void {
@@ -41,9 +41,9 @@ export function runCard(title: string, rows: readonly [string, string][]): HTMLC
   c.strokeRect(14, 14, w - 28, h - 28);
   c.fillStyle = BONE;
   c.textAlign = 'center';
-  c.font = `34px ${SERIF}`;
+  c.font = `34px ${canvasSerif()}`;
   c.fillText(title.split('').join(' '), w / 2, 84);
-  c.font = `22px ${SERIF}`;
+  c.font = `22px ${canvasSerif()}`;
   rows.forEach(([k, v], i) => {
     const y = 140 + i * 44;
     c.textAlign = 'left';
@@ -55,7 +55,7 @@ export function runCard(title: string, rows: readonly [string, string][]): HTMLC
   });
   c.globalAlpha = 0.35;
   c.textAlign = 'center';
-  c.font = `16px ${SERIF}`;
+  c.font = `16px ${canvasSerif()}`;
   c.fillText('LOVECRAFT SOULS-LIKE', w / 2, h - 34);
   return cv;
 }

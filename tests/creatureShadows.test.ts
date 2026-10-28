@@ -111,6 +111,22 @@ describe('the creatures\' own shapes, told by the creature views', () => {
     expect(drawn().filter((on) => on === 1)).toHaveLength(1); // (the ghoul alone)
   });
 
+  it('marks the Colour for its animated outside-palette effect on both reviewed and fallback sprites', () => {
+    for (const reviewed of [false, true]) {
+      const { g, views, scene } = viewsOver(reviewed ? ['deep_one', 'colour_out_of_space'] : [], undefined, reviewed ? [] : ['deep_one', 'colour_out_of_space']);
+      spawnCreature(g, 'deep_one', { x: 0, z: 6, yaw: 0 });
+      spawnCreature(g, 'colour_out_of_space', { x: 3, z: 9, yaw: 0 });
+      views.update(1, 1, new THREE.PerspectiveCamera());
+      const batch = scene.children.find((o) => {
+        const m = o as THREE.InstancedMesh;
+        return m.isInstancedMesh && (m.material as THREE.ShaderMaterial).uniforms?.uReviewed?.value === Number(reviewed);
+      }) as THREE.InstancedMesh;
+      const info = batch.geometry.getAttribute('aInfo') as THREE.InstancedBufferAttribute;
+      expect(batch.count).toBe(2);
+      expect([info.getW(0), info.getW(1)].sort()).toEqual([0, 1]);
+    }
+  });
+
   it('are all a creature stands in the shadow passes as: no rounded stand-in body is put in the world\'s scene any more', () => {
     const { g, views, scene } = viewsOver(['deep_one']);
     spawnCreature(g, 'deep_one', { x: 0, z: 6, yaw: 0 });

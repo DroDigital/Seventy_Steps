@@ -5,7 +5,7 @@
  * Marks are kept clear as well.
  */
 
-import { SERIF } from './hudKit';
+import { canvasSerif } from './hudKit';
 
 export interface MapLabel {
   text: string;
@@ -35,7 +35,7 @@ export function drawLabels(ctx: CanvasRenderingContext2D, labels: readonly MapLa
   ctx.lineWidth = 3;
   ctx.strokeStyle = 'rgba(5,5,6,0.8)';
   for (const l of labels) {
-    ctx.font = `${l.size}px ${SERIF}`; // the period face, as an old chart's (round 14)
+    ctx.font = `${l.size}px ${canvasSerif()}`; // the period face, as an old chart's (round 14)
     const [w, h] = [ctx.measureText(l.text).width, l.size];
     const spots: readonly [number, number][] = l.centred
       ? [[l.x - w / 2, l.y]]

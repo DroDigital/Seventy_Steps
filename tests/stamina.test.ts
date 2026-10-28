@@ -7,6 +7,7 @@ import { startMove } from '../src/systems/actions';
 import type { Stamina } from '../src/systems/components';
 import { applyLevels, staminaRegen } from '../src/systems/levels';
 import { levelWorth } from '../src/systems/levelWorth';
+import { controlMount } from '../src/systems/mounts';
 import { createGame, stepGame } from '../src/systems/game';
 import { absorb, canAfford, spend, tickStamina } from '../src/systems/stamina';
 import { place, press, scriptedGame, steps } from './helpers';
@@ -57,9 +58,9 @@ describe('stamina rules', () => {
   it('a run that empties the bar can act again after the beat', () => {
     const s = bar(5);
     for (let i = 0; i < SIM.hz; i++) tickStamina(s, 'sprint', dt);
-    expect(canAfford(s)).toBe(false);
+    expect(canAfford(s, STAMINA.sprintDrain * dt)).toBe(false);
     for (let i = 0; i <= STAMINA.sprintDelay; i++) tickStamina(s, 'idle', dt);
-    expect(canAfford(s)).toBe(true);
+    expect(canAfford(s, STAMINA.sprintDrain * dt)).toBe(true);
   });
 
   it('a sprint does not cut short the delay of an action just taken', () => {
@@ -69,10 +70,11 @@ describe('stamina rules', () => {
     expect(s.delay).toBe(STAMINA.regenDelay);
   });
 
-  it('lets any positive stamina start an action; zero cannot', () => {
-    expect(canAfford(bar(0.1))).toBe(true);
-    expect(canAfford(bar(0))).toBe(false);
-    expect(canAfford(undefined)).toBe(true); // enemies have no stamina bar
+  it('requires the full cost, while free actions and entities without stamina can act', () => {
+    expect(canAfford(bar(13.9), 14)).toBe(false);
+    expect(canAfford(bar(14), 14)).toBe(true);
+    expect(canAfford(bar(0), 0)).toBe(true);
+    expect(canAfford(undefined, 14)).toBe(true);
   });
 
   it('breaks the guard exactly when a blocked hit empties the bar', () => {
@@ -107,6 +109,108 @@ describe('stamina in play', () => {
     stepGame(g, press('light'));
     expect(a.move).toBeNull();
     expect(s.value).toBe(0);
+  });
+
+  it.each([
+    ['light', 'light1'], ['heavy', 'heavy1'], ['parry', 'parry'], ['throw', 'throw'],
+  ] as const)('requires the full cost of %s, including at the exact threshold', (button, move) => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    const cost = a.moves[move].stamina!;
+    g.player.oil = 1;
+    s.value = cost - 0.01;
+    s.delay = STAMINA.regenDelay;
+    stepGame(g, press(button));
+    expect(a.move).toBeNull();
+    expect(s.value).toBeCloseTo(cost - 0.01);
+    s.value = cost;
+    stepGame(g, press(button));
+    expect(a.move).toBe(move);
+    expect(s.value).toBe(0);
+  });
+
+  it.each([[0, 'backstep'], [1, 'roll']] as const)('requires the full dodge cost when movement is %s', (movement, move) => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    const cost = a.moves[move].stamina!;
+    s.value = cost - 0.01;
+    s.delay = STAMINA.regenDelay;
+    const down = press('dodge');
+    down.moveY = movement;
+    stepGame(g, down);
+    const up = emptyInput();
+    up.moveY = movement;
+    up.released.dodge = true;
+    stepGame(g, up);
+    expect(a.move).toBeNull();
+    expect(s.value).toBeCloseTo(cost - 0.01);
+    s.value = cost;
+    stepGame(g, down);
+    stepGame(g, up);
+    expect(a.move).toBe(move);
+    expect(s.value).toBe(0);
+  });
+
+  it('fires a loaded revolver at zero stamina without spending or delaying recovery', () => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    s.value = 0;
+    s.delay = STAMINA.regenDelay;
+    stepGame(g, press('shoot'));
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('shoot');
+    expect(s.value).toBe(0);
+    expect(s.delay).toBe(STAMINA.regenDelay - 1);
+    const ammo = g.player.ammo;
+    steps(g, PLAYER_MOVES.shoot.shot.frame);
+    expect(g.player.ammo).toBe(ammo - 1);
+    expect(s.value).toBe(0);
+  });
+
+  it('does not sprint without enough stamina for the next simulation step', () => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    s.value = STAMINA.sprintDrain * dt / 2;
+    s.delay = STAMINA.regenDelay;
+    g.player.dodgeHeld = PLAYER.dodgeTapFrames + 1;
+    const input = emptyInput();
+    input.held.dodge = true;
+    input.moveY = 1;
+    stepGame(g, input);
+    expect(g.player.sprinting).toBe(false);
+    expect(s.value).toBeCloseTo(STAMINA.sprintDrain * dt / 2);
+    s.value = STAMINA.sprintDrain * dt;
+    stepGame(g, input);
+    expect(g.player.sprinting).toBe(true);
+    expect(s.value).toBeCloseTo(0);
+  });
+
+  it('applies the same sprint threshold to mounted galloping', () => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    const input = emptyInput();
+    input.held.dodge = true;
+    input.moveY = 1;
+    g.player.dodgeHeld = PLAYER.dodgeTapFrames + 1;
+    s.value = STAMINA.sprintDrain * dt / 2;
+    controlMount(g, input);
+    expect(g.player.sprinting).toBe(false);
+    s.value = STAMINA.sprintDrain * dt;
+    controlMount(g, input);
+    expect(g.player.sprinting).toBe(true);
+  });
+
+  it('does not turn an empty-cylinder trigger pull into an unaffordable reload', () => {
+    const { g } = scriptedGame();
+    const s = g.ecs.c.stamina.get(g.player.id)!;
+    g.player.ammo = 0;
+    g.player.rounds = 1;
+    s.value = PLAYER_MOVES.reload.stamina - 0.01;
+    s.delay = STAMINA.regenDelay;
+    stepGame(g, press('shoot'));
+    expect(g.ecs.c.actor.get(g.player.id)!.move).toBeNull();
+    expect(s.value).toBeCloseTo(PLAYER_MOVES.reload.stamina - 0.01);
   });
 
   it('blocks frontal hits with stamina, and guard-breaks when a hit empties it', () => {
