@@ -38,7 +38,7 @@ nothing in its way.
 | 6 | The Hound | 6/2/5 | 3 | 1591 | 28 | 390 | 232 | 5 | 0.56 | 0 |
 | 7 | Keziah Mason | 6/3/5 | 4 | 1768 | 26 | 379 | 232 | 5 | 0.54 | 0 |
 | 8 | The Unnamable | 6/3/6 | 4 | 2225 | 34 | 450 | 232 | 5 | 0.65 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 54 | 617 | 244 | 6 | 0.74 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 65 | 755 | 244 | 6 | 0.91 | 0 |
 | 10 | The Black Man | 7/3/7 | 5 | 3044 | 48 | 365 | 244 | 6 | 0.44 | 0 |
 | 11 | The Haunter of the Dark | 8/4/7 | 5 | 1200 | 196 | 3281 | 256 | 6 | 3.77 | 0 |
 | 12 | Wilbur Whateley | 9/4/8 | 5 | 1794 | 21 | 335 | 268 | 7 | 0.33 | 0 |
@@ -79,7 +79,7 @@ nothing in its way.
 | 47 | Azathoth | 18/9/17 | 5 | 8911 | 90 | 10055 | 376 | 10 | 5.35 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die.
-Each tier has its band (round 61, raised in round 68): a named horror takes 14 to 50 seconds and costs 0.2 to 1.2 lives; one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.45 to 1.5 lives.
+Each tier has its band (round 61, raised in round 68): a named horror takes 14 to 50 seconds and costs 0.2 to 1.2 lives (the Colour Out of Space may cost up to 1.5 with its restored healing); one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.45 to 1.5 lives.
 
 ## At the cap
 
@@ -96,7 +96,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 6 | The Hound | 30/30/30 | 5 | 3214 | 23 | 529 | 431 | 5 | 0.41 | 0 |
 | 7 | Keziah Mason | 30/30/30 | 5 | 3546 | 25 | 665 | 431 | 5 | 0.51 | 0 |
 | 8 | The Unnamable | 30/30/30 | 5 | 4309 | 29 | 702 | 431 | 5 | 0.54 | 0 |
-| 9 | The Colour Out of Space | 30/30/30 | 5 | 5171 | 43 | 850 | 431 | 6 | 0.58 | 0 |
+| 9 | The Colour Out of Space | 30/30/30 | 5 | 5171 | 49 | 959 | 431 | 6 | 0.65 | 0 |
 | 10 | The Black Man | 30/30/30 | 5 | 5661 | 53 | 698 | 431 | 6 | 0.48 | 0 |
 | 11 | The Haunter of the Dark | 30/30/30 | 5 | 2202 | 206 | 5668 | 431 | 6 | 3.87 | 0 |
 | 12 | Wilbur Whateley | 30/30/30 | 5 | 3166 | 24 | 560 | 431 | 7 | 0.34 | 0 |
@@ -152,5 +152,5 @@ given Echoes and star-stones. Each may cost at most 1.5 lives.
 | 6 | The Hound | 6/2/5 | 3 | 1591 | 28 | 390 | 232 | 5 | 0.56 | 0 |
 | 7 | Keziah Mason | 6/3/5 | 4 | 1768 | 26 | 379 | 232 | 5 | 0.54 | 0 |
 | 8 | The Unnamable | 6/3/6 | 4 | 2225 | 34 | 450 | 232 | 5 | 0.65 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 54 | 617 | 244 | 6 | 0.74 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 65 | 755 | 244 | 6 | 0.91 | 0 |
 | 10 | The Black Man | 7/3/7 | 5 | 3044 | 48 | 365 | 244 | 6 | 0.44 | 0 |

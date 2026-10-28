@@ -161,6 +161,16 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     run = r;
     g.cutscene = true;
     g.ecs.c.shove.delete(g.player.id);
+    const mover = g.ecs.c.mover.get(g.player.id);
+    if (mover) Object.assign(mover, { vx: 0, vz: 0, face: null });
+    const tr = g.ecs.c.transform.get(g.player.id);
+    if (tr) {
+      Object.assign(tr.prev, tr.pos);
+      tr.prevYaw = tr.yaw;
+    }
+    Object.assign(g.player.mount, { speed: 0, yawRate: 0, jam: 0 });
+    Object.assign(g.player, { sprinting: false, dodgeHeld: -1, blockHeld: false, blockRaised: false });
+    g.player.buffer.action = null;
     pulled = 1;
     inFog.reset();
     ui.bars(true);

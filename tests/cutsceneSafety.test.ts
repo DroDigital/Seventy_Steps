@@ -1,15 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as THREE from 'three';
 import { arrival, fall, shot, WAKE, type Scene } from '../src/data/cutscenes';
 import { ENDING_SCENES } from '../src/data/cutscenesEndings';
 import { BOSS, REALITY, SIM } from '../src/data/tuning';
+import { emptyInput } from '../src/core/input';
 import { createCinema } from '../src/render/cinema';
+import { createActorViews } from '../src/render/actorViews';
 import { sceneLength } from '../src/render/cinemaPlan';
 import { startMove } from '../src/systems/actions';
 import { brainSystem } from '../src/systems/brain';
 import { meleeSystem, shove, strike, targetsOf, type Blow } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
-import { createGame } from '../src/systems/game';
+import { createGame, createWorldGame, stepGame } from '../src/systems/game';
+import { allFogs, passFog } from '../src/systems/fogGates';
 import { hazardSystem, spawnPool } from '../src/systems/hazards';
+import { movementSystem } from '../src/systems/movement';
+import { playerControl } from '../src/systems/playerControl';
 import { boltSystem, loose } from '../src/systems/projectiles';
 import { HOOKS } from '../src/systems/reality';
 import { bleed, loseSanity, sanitySystem } from '../src/systems/sanity';
@@ -142,6 +148,67 @@ describe('cutscene protection', () => {
     shove(g, player, { x: 10, y: 0, z: 0 }, 5);
     expect(g.ecs.c.actor.get(deepOne)!.move).toBeNull();
     expect(g.ecs.c.shove.has(player)).toBe(false);
+  });
+
+  it('stops the player immediately and holds them through slowed steps, even during a roll or body possession', () => {
+    const { g, player, deepOne } = scriptedGame();
+    place(g, player, 0, 0, 0);
+    place(g, deepOne, 0, 0.1, 0); // overlapping bodies must not push the player
+    const tr = g.ecs.c.transform.get(player)!;
+    const mover = g.ecs.c.mover.get(player)!;
+    Object.assign(mover, { vx: 4, vz: 2, face: 1 });
+    Object.assign(tr.prev, { x: -1, y: tr.pos.y, z: -1 });
+    startMove(g.ecs.c.actor.get(player)!, 'roll');
+    g.player.buffer.action = 'dodge';
+    g.player.mount.speed = 4;
+    g.reality.stolen = 100;
+    const cinema = cinemaFor(g);
+    void cinema.play(scene('slow'));
+    const at = { ...tr.pos };
+    expect(tr.prev).toEqual(at);
+    expect(mover).toMatchObject({ vx: 0, vz: 0, face: null });
+    expect(g.player.mount.speed).toBe(0);
+    expect(g.player.buffer.action).toBeNull();
+    for (let i = 0; i < 30; i++) {
+      if (!cinema.step(DT)) continue;
+      const input = emptyInput();
+      input.moveY = 1;
+      playerControl(g, input);
+      movementSystem(g, DT);
+      expect(tr.pos).toEqual(at);
+    }
+    cinema.step(1);
+    g.reality.stolen = 0;
+    const input = emptyInput();
+    input.moveY = 1;
+    playerControl(g, input);
+    expect(mover.vz).not.toBe(0);
+  });
+
+  it('draws a standing gait as soon as a cutscene begins during the walk through fog', () => {
+    const g = createWorldGame();
+    for (const id of g.ecs.c.model.keys()) if (id !== g.player.id) g.ecs.c.model.delete(id);
+    const w = allFogs().find((wall) => !wall.gate)!;
+    place(g, g.player.id, w.x - Math.sin(w.yaw) * 1.6, w.z - Math.cos(w.yaw) * 1.6, 0);
+    const scene3d = new THREE.Scene();
+    const views = createActorViews(scene3d, g);
+    passFog(g, w);
+    for (let i = 1; i <= 45; i++) {
+      stepGame(g, emptyInput());
+      views.update(1, i * DT);
+    }
+    expect(g.player.fogPass).not.toBeNull();
+    void cinemaFor(g).play(scene('frozen'));
+    const time = 46 * DT;
+    views.update(1, time);
+
+    const idle = createWorldGame();
+    for (const id of idle.ecs.c.model.keys()) if (id !== idle.player.id) idle.ecs.c.model.delete(id);
+    const idleScene = new THREE.Scene();
+    createActorViews(idleScene, idle).update(1, time);
+    const leg = scene3d.children[1].children[0].children[1];
+    const idleLeg = idleScene.children[1].children[0].children[1];
+    expect(leg.quaternion.angleTo(idleLeg.quaternion)).toBeLessThan(1e-5);
   });
 
   it('blocks sanity attacks, Unmoored bleeding, gaze bursts and lethal petrification', () => {
