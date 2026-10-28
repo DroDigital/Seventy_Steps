@@ -4,6 +4,18 @@ import { buildFigure } from '../src/render/figures';
 import { poseGroundPickup } from '../src/render/groundPickups';
 
 describe('ground pickup figures', () => {
+  it('leaves the Echo casket open down to its wooden bottom', () => {
+    const cache = buildFigure('cache');
+    const shell = cache.body.children.find((object) => object instanceof THREE.Mesh)!;
+    cache.root.updateMatrixWorld(true);
+    for (const x of [-0.2, 0, 0.2]) for (const z of [-0.1, 0, 0.1]) {
+      const ray = new THREE.Raycaster(new THREE.Vector3(x, 0.31, z), new THREE.Vector3(0, -1, 0));
+      const hit = ray.intersectObject(shell)[0];
+      expect(hit, `opening at ${x}, ${z}`).toBeDefined();
+      expect(hit.point.y, `opening at ${x}, ${z}`).toBeCloseTo(0.0625, 4);
+    }
+  });
+
   it('builds finite geometry for the Echo casket and cartridge box', () => {
     for (const model of ['cache', 'ammo']) {
       const figure = buildFigure(model);

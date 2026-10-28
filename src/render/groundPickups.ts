@@ -29,13 +29,15 @@ export function cacheFigure(): Figure {
     box(0.62, 0.29, 0.045, 0, 0.18, -0.19, plank),
     box(0.045, 0.29, 0.34, -0.287, 0.18, 0, wood),
     box(0.045, 0.29, 0.34, 0.287, 0.18, 0, wood),
-    box(0.63, 0.025, 0.43, 0, 0.085, 0, edge),
-    box(0.63, 0.025, 0.43, 0, 0.265, 0, edge),
-    box(0.04, 0.31, 0.435, -0.2, 0.18, 0, edge),
-    box(0.04, 0.31, 0.435, 0.2, 0.18, 0, edge),
     box(0.11, 0.1, 0.025, 0, 0.22, 0.224, brass),
     box(0.025, 0.045, 0.03, 0, 0.22, 0.24, edge),
   ];
+  // The iron lies on the outside of the walls, leaving the opening unobstructed.
+  for (const y of [0.085, 0.265]) {
+    for (const z of [-0.21, 0.21]) shell.push(box(0.63, 0.025, 0.01, 0, y, z, edge));
+    for (const x of [-0.31, 0.31]) shell.push(box(0.01, 0.025, 0.41, x, y, 0, edge));
+  }
+  for (const x of [-0.2, 0.2]) for (const z of [-0.215, 0.215]) shell.push(box(0.04, 0.31, 0.005, x, 0.18, z, edge));
   // Lid and its straps share the same hinge and open back behind the chest.
   for (const g of [box(0.62, 0.065, 0.42, 0, 0, 0.21, plank), box(0.04, 0.075, 0.42, -0.2, 0, 0.21, edge), box(0.04, 0.075, 0.42, 0.2, 0, 0.21, edge)]) {
     shell.push(g.rotateX(-2.05).translate(0, 0.32, -0.19));
