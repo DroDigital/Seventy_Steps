@@ -7,6 +7,10 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 - **Stamina must cover an action.** Attacks and dodges now require their full stamina cost, and sprinting and galloping stop when the next step cannot be paid for. Revolver shots cost no stamina and can be fired with an empty bar.
 
+## 1.0.8
+
+- **Linux starts on Ubuntu 24.04 and 26.04.** Ubuntu's AppArmor was stopping Chromium's sandbox before any window opened. The Linux build now starts without that sandbox (a short launcher beside the binary), so a double-click, Steam or the itch app opens the title with no launch option to set.
+
 - **The lantern's reveal keeps colour.** In the lantern's light a creature's hue now turns back toward the colours it was drawn in along the colour wheel, most of the way, so it reads as itself with a trace of its realm, at full strength and warmed by the lantern, instead of greying out where its colours and the realm's are far apart.
 - **The realm's tint on its creatures is gentler.** Out of the lantern's light every drawn creature is swung toward its realm's colours; it was swung most of the way (70%), and is now swung half the way, so a creature keeps more of the colours it was drawn in while still belonging to the place it stands in.
 - **Every foe casts its own shadow.** A creature's shadow used to be a rounded lump, the same for a Deep One as for a colossus. Now each foe throws its own shape (a ghoul's hunch, a claw raised in a blow, a body crumbling as it dies) into the moon's light, the lantern's and the lamps': long across the ground even under a high moon, climbing the walls of a crypt, and larger than the body that casts it, so a horror's shadow is the court's, deepest in the last phase of its fight. Shadows fall on the ground, the walls and the creatures and the investigator they cross. A spectre, the Colour and anything half seen cast none, and a telegraph is drawn as bright in shadow as out of it.
