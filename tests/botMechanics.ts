@@ -73,7 +73,8 @@ export function aroundBoss(g: Game, boss: Entity, to: { x: number; z: number }):
   const dx = to.x - me.x, dz = to.z - me.z;
   const length = dx * dx + dz * dz;
   const t = length ? Math.max(0, Math.min(1, ((at.x - me.x) * dx + (at.z - me.z) * dz) / length)) : 0;
-  if (distXZ(to, at) < radius || Math.hypot(me.x + dx * t - at.x, me.z + dz * t - at.z) >= radius) return to;
+  // If the closest point is where we stand, the path moves away from the body even if we are inside the safety margin.
+  if (t === 0 || distXZ(to, at) < radius || Math.hypot(me.x + dx * t - at.x, me.z + dz * t - at.z) >= radius) return to;
   const angle = Math.atan2(me.x - at.x, me.z - at.z);
   const choices = [-1, 1].map((sign) => ({ x: at.x + Math.sin(angle + sign * 0.7) * (radius + 1), z: at.z + Math.cos(angle + sign * 0.7) * (radius + 1) }));
   return choices.reduce((a, b) => distXZ(a, to) < distXZ(b, to) ? a : b);
