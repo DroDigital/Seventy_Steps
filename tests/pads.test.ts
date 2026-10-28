@@ -127,7 +127,7 @@ describe('the pad in hand (round 31)', () => {
         () => [null],
         () => [{ index: 0, id, connected: true, mapping: 'standard', timestamp: 1, axes: [0, 0, 0, 0, axis4], buttons: buttons(lt, rt) }],
       );
-      expect(activePad()).toBeNull(); // resting at −0.5 is not a pull, and the rest is learned before any use
+      for (let i = 0; i < 12; i++) expect(activePad()).toBeNull(); // resting at −0.5 sits there: that is its rest, not a hold
       lt = 0;
       expect(activePad()!.buttons[6].pressed).toBe(true); // it rises toward 0 when pulled
       lt = -0.5;
@@ -141,6 +141,20 @@ describe('the pad in hand (round 31)', () => {
       expect(activePad()).toBeNull(); // the other report: rest at 0
       lt = -0.48;
       expect(activePad()!.buttons[6].pressed).toBe(true); // a pull goes negative
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      id = 'held';
+      lt = -0.48;
+      expect(activePad()!.buttons[6].pressed).toBe(true); // first seen while held: the hold is a pull, not the rest
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false); // letting go does not zoom, and does not hold a parry
+      lt = -0.48;
+      expect(activePad()!.buttons[6].pressed).toBe(true);
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      id = 'deep';
+      lt = -0.8;
+      for (let i = 0; i < 20; i++) expect(activePad()!.buttons[6].pressed).toBe(true); // held from the first sample, for as long as the game has been up
       lt = 0;
       expect(activePad()!.buttons[6].pressed).toBe(false);
       id = 'axis';

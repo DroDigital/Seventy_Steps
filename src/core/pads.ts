@@ -47,11 +47,17 @@ interface Seen {
   still: { at: number; v: number }[]; // for each axis, where it has lain and since when (a stick that has drifted lies quite still, a thumb does not)
   trig: Trig[]; // the two triggers' rest, learned apart from a stick's (macOS, below)
 }
-/** Where a trigger rests. A macOS one may rest below zero, or fall when pulled (see mendTrigger). */
+/**
+ * Where a trigger rests, once that is known. `mode` 0 is not yet known, 1 an ordinary pull (the value
+ * rises through a half), 2 a rest below zero (a pull rises toward 0), −1 a rest near zero (a pull falls).
+ */
 interface Trig {
   rest: number;
-  seen: boolean;
+  mode: -1 | 0 | 1 | 2;
+  still: number; // frames a reading near −0.5 has sat, before that may be believed to be its rest
+  calm: boolean; // a near-zero sample was seen while the trigger was still unknown
 }
+const SIT = 12; // long enough that one held sample is not a rest, short of a player reaching for the trigger
 const seen = new Map<string, Seen>();
 const PUSH = 0.5; // how far off its rest an axis must be to count as used
 const DRIFT_MAX = 0.4; // a stick lying still this far or less off its rest has drifted: that is its rest now (further off, it is held)
@@ -90,39 +96,58 @@ const downOf = (p: PadLike): number[] => p.buttons.flatMap((b, i) => (b.pressed 
 
 /**
  * A trigger as a pull of 0..1. An ordinary one already says so (`pressed`, or a value past a half).
- * macOS does not. SDL recenters a trigger on the joystick axis's initial state, so the left one may
- * rest near −0.5 and only reach 0 when pulled, or rest at 0 and fall below it, and `.pressed`
- * (value > 0.6) never trips. Safari leaves the button at 0 and puts that trigger on axis 4, at −1
- * until it is pulled toward 1. A pull is the reading leaving the rest it was first seen at.
+ * macOS does not. SDL recenters a trigger on the joystick axis's initial state, so one may rest near
+ * −0.5 and only reach 0 when pulled, or rest at 0 and fall below it, and `.pressed` (value > 0.6)
+ * never trips. The first negative sample is not that rest: a trigger that falls may be seen first
+ * while it is held, and taking the hold as the rest inverts it from then on. A negative value is a
+ * pull from zero, unless it sits near −0.5, the recentered rest. Safari leaves the button at 0 and
+ * puts the trigger on axis 4, at −1 until it is pulled toward 1.
  */
 function mendTrigger(t: Trig, b: { pressed: boolean; value: number }, axis: number | undefined, axisRest: number): { pressed: boolean; value: number } {
   const value = Number.isFinite(b.value) ? b.value : 0;
   const axisN = axis !== undefined && Number.isFinite(axis) ? axis : undefined;
   const fromAxis = axisN !== undefined && axisRest < -0.4 ? Math.max(0, (axisN - axisRest) / (1 - axisRest)) : 0;
   if (fromAxis >= 0.12) return { pressed: true, value: Math.min(1, fromAxis) };
-  const pulled = (travel: number): { pressed: boolean; value: number } => {
-    const down = travel > 0.18;
-    return { pressed: down, value: down ? Math.min(1, travel / Math.max(0.45, travel)) : 0 };
-  };
-  if (!t.seen) {
-    const ordinary = b.pressed || value > 0.5;
-    t.seen = true;
-    t.rest = ordinary ? 0 : value;
-    return ordinary ? { pressed: true, value: value > 0 ? value : 1 } : { pressed: false, value: 0 };
-  }
-  if (t.rest < -0.12) {
+  const up = { pressed: false, value: 0 };
+  const pulled = (travel: number) => (travel > 0.18 ? { pressed: true, value: Math.min(1, travel / Math.max(0.45, travel)) } : up);
+  const ordinary = b.pressed || value > 0.5;
+  if (t.mode === 1) return ordinary ? { pressed: true, value: value > 0 ? value : 1 } : up;
+  if (t.mode === 2) {
     if (value < t.rest) t.rest = value;
     return pulled(value - t.rest);
   }
-  if (value < -0.12) return pulled(t.rest - value);
-  return b.pressed || value > 0.5 ? { pressed: true, value: value > 0 ? value : 1 } : { pressed: false, value: 0 };
+  if (t.mode === -1) return value < -0.12 ? pulled(-value) : up;
+  if (ordinary) {
+    t.mode = 1;
+    t.rest = 0;
+    return { pressed: true, value: value > 0 ? value : 1 };
+  }
+  if (value >= -0.05) {
+    if (t.still > 0 && t.still < SIT) {
+      t.mode = -1;
+      t.rest = 0;
+    }
+    t.calm = true;
+    return up;
+  }
+  if (value > -0.12) return up;
+  // Near −0.5 may be the recentered rest. Anything further from it, or a fall after a real zero, is a pull.
+  if (t.calm || Math.abs(value + 0.5) > 0.012) {
+    t.mode = -1;
+    t.rest = 0;
+    return pulled(-value);
+  }
+  t.rest = t.still === 0 ? value : Math.min(t.rest, value);
+  t.still++;
+  if (t.still >= SIT) t.mode = 2;
+  return up;
 }
 
 function read(p: PadLike, from: Source, now = performance.now()): { reading: PadReading; used: number } {
   const key = `${from}:${p.index}:${p.id}`;
   let s = seen.get(key);
   if (!s) {
-    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })), trig: [{ rest: 0, seen: false }, { rest: 0, seen: false }] };
+    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })), trig: [{ rest: 0, mode: 0, still: 0, calm: false }, { rest: 0, mode: 0, still: 0, calm: false }] };
     seen.set(key, s);
   }
   [s.raw, s.down] = [[...p.axes], downOf(p)];
