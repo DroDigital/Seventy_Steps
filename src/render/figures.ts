@@ -19,6 +19,7 @@ import { npcFigure } from './npcFigures';
 import { gateGeometry } from './signMeshes';
 import { createWorldMaterial } from './worldMaterial';
 import { echoFigure } from './echoFigure';
+import { ammoFigure, cacheFigure } from './groundPickups';
 
 export type Rig = 'humanoid' | 'dummy' | 'echo' | 'prop';
 
@@ -208,30 +209,6 @@ function gate(): Figure {
   return f;
 }
 
-/** An Echo cache: an iron-bound casket, its lid thrown back on Void Green shards (Echoes are wrong), so it reads in the dark. */
-function cache(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const wood = shade(mixRgb(BASE.rust, BASE.charcoal, 0.5), 1.6);
-  const iron = shade(BASE.charcoal, 1.3);
-  const lid = box(0.56, 0.05, 0.38, 0, 0, 0.19, wood).rotateX(-2.1).translate(0, 0.3, -0.19); // hinged at the back, thrown open
-  part(f, f.body, mergeGeometries([box(0.56, 0.3, 0.38, 0, 0.15, 0, wood), box(0.58, 0.04, 0.4, 0, 0.07, 0, iron), box(0.58, 0.04, 0.4, 0, 0.23, 0, iron), lid]), 'wood');
-  const shard = (r: number, x: number, z: number): THREE.BufferGeometry => tint(new THREE.OctahedronGeometry(r, 0).translate(x, 0.32, z), ANOMALY.green);
-  part(f, f.body, mergeGeometries([shard(0.07, -0.13, 0.03), shard(0.09, 0.03, -0.04), shard(0.06, 0.15, 0.06)]), 'flesh', 0.9);
-  return f;
-}
-
-/** A box of cartridges on the ground (round 22): a paper-labelled box, its lid up on two rows of brass rounds that catch the light, so it reads in the dark. */
-function ammo(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const card = shade(mixRgb(BASE.rust, BASE.bone, 0.35), 1.3);
-  const brass = shade(mixRgb(BASE.bone, BASE.rust, 0.4), 1.9);
-  const lid = box(0.34, 0.03, 0.22, 0, 0, 0.11, shade(card, 0.85)).rotateX(-1.9).translate(0, 0.12, -0.11); // hinged at the back, thrown up
-  part(f, f.body, mergeGeometries([box(0.34, 0.12, 0.22, 0, 0.06, 0, card), box(0.26, 0.06, 0.02, 0, 0.09, 0.115, shade(BASE.charcoal, 1.4)), lid]), 'cloth');
-  const rounds = [-1, 1].flatMap((row) => [0, 1, 2, 3, 4].map((k) => tint(new THREE.CylinderGeometry(0.02, 0.02, 0.07, 6).translate(-0.12 + k * 0.06, 0.155, row * 0.045), brass)));
-  part(f, f.body, mergeGeometries(rounds), 'cloth', 0.6);
-  return f;
-}
-
 /** A found weapon on a low trestle, its steel catching the light so it reads in the dark. */
 function armRack(geo: () => THREE.BufferGeometry): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
@@ -242,7 +219,7 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate, cache, ammo,
+  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate, cache: cacheFigure, ammo: ammoFigure,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 
