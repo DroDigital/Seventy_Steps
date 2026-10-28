@@ -103,18 +103,22 @@ describe('the itch.io release (round 51)', () => {
     expect(itch).toMatch(/args = \["--no-sandbox"\]/);
   });
 
-  it('the Linux afterPack wraps the binary so a start without Steam launch options still passes --no-sandbox', async () => {
-    const { default: afterPack } = await import('../packaging/linuxLaunch.mjs');
+  it('the Linux afterPack wraps the binary so a start without Steam launch options still passes --no-sandbox', () => {
     const out = mkdtempSync(`${tmpdir()}/linux-launch-`);
     writeFileSync(`${out}/seventy-steps`, 'ELF-fake');
     chmodSync(`${out}/seventy-steps`, 0o755);
-    await afterPack({ electronPlatformName: 'linux', appOutDir: out });
+    const run = (platform: string) =>
+      spawnSync(process.execPath, ['--input-type=module', '-e', `import afterPack from './packaging/linuxLaunch.mjs'; await afterPack({ electronPlatformName: ${JSON.stringify(platform)}, appOutDir: ${JSON.stringify(out)} });`], {
+        env: { PATH: process.env.PATH ?? '' },
+        encoding: 'utf8',
+      });
+    expect(run('linux').status).toBe(0);
     expect(existsSync(`${out}/seventy-steps.bin`)).toBe(true);
     expect(readFileSync(`${out}/seventy-steps.bin`, 'utf8')).toBe('ELF-fake');
     const sh = readFileSync(`${out}/seventy-steps`, 'utf8');
     expect(sh.startsWith('#!/bin/sh')).toBe(true);
     expect(sh).toMatch(/exec \.\/seventy-steps\.bin --no-sandbox "\$@"/);
-    await afterPack({ electronPlatformName: 'darwin', appOutDir: out }); // other platforms leave the folder alone
+    expect(run('darwin').status).toBe(0); // other platforms leave the folder alone
     expect(readFileSync(`${out}/seventy-steps`, 'utf8')).toBe(sh);
   });
 
