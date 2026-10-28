@@ -11,7 +11,7 @@ import type { Fight, Game } from '../systems/components';
 import { courtPlaces } from '../data/finale';
 import type { SetLook } from '../world/props';
 import { worldLayout } from '../world/placements';
-import { tallMan } from './finaleMan';
+import { tallMan, type TallMan } from './finaleMan';
 import { crumbleOf, finaleHand, finaleScene, graspOf, stepHand } from './finalePose';
 import { modelPiecesOf, modelsReady } from './modelKit';
 import type { Rgb } from './palette';
@@ -52,7 +52,8 @@ export function createFinaleLook(scene: THREE.Scene): FinaleLook {
   let key!: THREE.Group;
   let arch!: THREE.Group;
   let clock!: THREE.Group;
-  let man!: THREE.Group;
+  let man!: TallMan;
+  let grown = 0;
   let last = 0;
   const hover = new THREE.Vector3();
 
@@ -61,7 +62,7 @@ export function createFinaleLook(scene: THREE.Scene): FinaleLook {
     arch = model({ id: 'fn_arch', keep: 0.4 }, false);
     clock = model({ id: 'fn_clock', keep: 0.45 }, false);
     man = tallMan();
-    root.add(key, arch, clock, man);
+    root.add(key, arch, clock, man.root);
     built = true;
   };
 
@@ -74,12 +75,15 @@ export function createFinaleLook(scene: THREE.Scene): FinaleLook {
       if (!built) return;
       const sign = g.overworld && worldLayout().signs.find((s) => s.id === COURT_SIGN);
       const show = !!sign && courtOpen(g) && (!ended(g) || g.cutscene);
-      man.visible = clock.visible = show;
+      clock.visible = show;
+      grown += ((show ? 1 : 0) - grown) * Math.min(1, dt * 0.55);
+      man.root.visible = show;
+      man.writhe(time, grown);
       const at = sign && show ? courtPlaces(sign) : null;
       if (at) {
         hover.set(at.key.x, at.key.y + Math.sin(time * 1.5) * 0.05, at.key.z);
-        man.position.set(at.man.x, at.man.y, at.man.z);
-        man.rotation.set(Math.sin(time * 0.7) * 0.012, at.man.yaw + Math.sin(time * 0.45) * 0.04, 0);
+        man.root.position.set(at.man.x, at.man.y, at.man.z);
+        man.root.rotation.set(Math.sin(time * 0.7) * 0.012, at.man.yaw + Math.sin(time * 0.45) * 0.04, 0);
         clock.position.set(at.clock.x, at.clock.y, at.clock.z);
         clock.rotation.y = at.clock.yaw;
       }
