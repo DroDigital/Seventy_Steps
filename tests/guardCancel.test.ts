@@ -142,12 +142,12 @@ describe('raising the guard calls off an attack', () => {
     expect(a.move).toBe('parry');
   });
 
-  it('but not without the full stamina cost to parry: the blow goes on', () => {
+  it('but not from an empty bar to parry: the blow goes on', () => {
     const { g, player } = squaredUp();
     const a = g.ecs.c.actor.get(player)!;
     stepGame(g, press('heavy'));
     until(g, 5);
-    g.ecs.c.stamina.get(player)!.value = PLAYER_MOVES.parry.stamina! - 0.01;
+    g.ecs.c.stamina.get(player)!.value = 0;
     stepGame(g, press('parry'));
     expect(a.move).toBe('heavy1');
   });

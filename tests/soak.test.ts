@@ -28,7 +28,7 @@ const say = (s: string): void => void out.push(s);
 const summaries: string[] = [];
 
 const finite = (n: unknown): boolean => typeof n === 'number' && Number.isFinite(n);
-const LIGHT_DEBT = Math.max(...Object.values(WEAPONS).flatMap((weapon) => Object.entries(weapon.moves).filter(([id]) => id.startsWith('light')).map(([, move]) => move.stamina ?? 0)));
+const DEBT = Math.max(...Object.values(WEAPONS).flatMap((weapon) => Object.values(weapon.moves).map((move) => move.stamina ?? 0))); // the largest cost of any action: any of them may overdraw the bar
 
 /** How many looks running the investigator has been found inside something solid. */
 const embedded = new WeakMap<Game, number>();
@@ -57,7 +57,7 @@ function invariants(g: Game): string[] {
     else if (h.hp > h.max + 1e-6) bad.push(`entity ${id} hp ${h.hp} > max ${h.max}`);
     else if (h.hp < 0) bad.push(`entity ${id} hp ${h.hp} < 0`);
   }
-  for (const [id, s] of c.stamina) if (!finite(s.value) || s.value < (id === g.player.id ? -LIGHT_DEBT : 0) - 1e-6 || s.value > s.max + 1e-6) bad.push(`entity ${id} stamina ${s.value}/${s.max}`);
+  for (const [id, s] of c.stamina) if (!finite(s.value) || s.value < (id === g.player.id ? -DEBT : 0) - 1e-6 || s.value > s.max + 1e-6) bad.push(`entity ${id} stamina ${s.value}/${s.max}`);
   const m = g.mind;
   if (!finite(m.sanity) || m.sanity < 0 || m.sanity > SANITY.max) bad.push(`sanity ${m.sanity}`);
   const p = g.player;

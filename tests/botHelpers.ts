@@ -152,8 +152,8 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
       const yaw = g.camera.yaw;
       [f.moveY, f.moveX] = [(out.x * Math.sin(yaw) + out.z * Math.cos(yaw)) / d, (out.x * -Math.cos(yaw) + out.z * Math.sin(yaw)) / d];
     }
+    const stamina = c.stamina.get(g.player.id)?.value ?? Infinity;
     if (!cover && !out && reach < 2.6) {
-      const stamina = c.stamina.get(g.player.id)?.value ?? Infinity;
       // A player who intends to dodge must leave a roll funded, even after a queued combo move.
       const canStrike = (cost: number): boolean => style.skill === undefined || stamina >= cost + reserve;
       if (frame % 22 === 0 && canStrike(lightCost)) want.add('light');
@@ -168,7 +168,8 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
       const key = blowIn(g);
       if (key && !rolled.has(key)) {
         rolled.add(key);
-        if (rng() < style.skill) {
+        // The game lets a dodge start on any bar above empty; this bot still rolls only with a full roll funded, as the balance table was measured.
+        if (rng() < style.skill && stamina >= reserve) {
           want.add('dodge');
           f.moveX = dodgeDirection = rng() < 0.5 ? -1 : 1;
         }

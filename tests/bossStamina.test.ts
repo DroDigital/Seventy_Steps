@@ -121,7 +121,7 @@ describe('stamina against the Other Gods', () => {
       expect(actor.frame).toBe(0);
     }
 
-    expect(rolls).toBe(5);
+    expect(rolls).toBe(6); // the sixth roll starts on the ten left and overdraws the bar; no seventh starts from the debt
     expect(actor.move).toBeNull();
     const remaining = PLAYER.stamina - rolls * PLAYER_MOVES.roll.stamina;
     expect(stamina.value).toBeGreaterThanOrEqual(remaining);
