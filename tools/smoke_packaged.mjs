@@ -26,7 +26,7 @@ const arch = flag('--arch'); // macOS: `--arch x86_64` starts the Intel app unde
 const shell = ['--smoke-test', ...(process.platform === 'linux' ? ['--no-sandbox'] : [])];
 const verbose = args.includes('--verbose');
 const limit = Number(flag('--timeout') ?? 240);
-const child = spawn(arch ? 'arch' : exe, arch ? [`-${arch}`, exe, ...shell] : shell, { env: { ...process.env, SMOKE_REQUIRE: need, ...(verbose ? { ELECTRON_ENABLE_LOGGING: '1' } : {}) }, stdio: ['ignore', 'pipe', 'pipe'] });
+const child = spawn(arch ? 'arch' : exe, arch ? [`-${arch}`, exe, ...shell] : shell, { env: { ...process.env, SMOKE_REQUIRE: need, SMOKE_LATE: String(Math.max(30, limit - 30)), ...(verbose ? { ELECTRON_ENABLE_LOGGING: '1' } : {}) }, stdio: ['ignore', 'pipe', 'pipe'] });
 let ok = false;
 let said = ''; // the channel the build reports
 let edition = ''; // and its edition
