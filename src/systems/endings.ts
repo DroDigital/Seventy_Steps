@@ -1,9 +1,9 @@
 /**
  * The three endings (spec §5, Phase 5): wake and seal the Gate · pass through with 'Umr at-Tawil ·
- * become Nyarlathotep's herald. 'Umr at-Tawil offers the second when it yields (signatures/umr.ts);
- * the other two are chosen at the Court's Elder Sign once Azathoth slumbers (ui/signMenu.ts). An
- * ending closes the dream: the world remembers which (it is saved), and the investigator may walk
- * on in it. Pure: no Three.js.
+ * become Nyarlathotep's herald. 'Umr at-Tawil offers the second when it yields, in two steps
+ * (signatures/umr.ts). The other two are done in the world before the Court's Elder Sign once
+ * Azathoth slumbers: the silver key, and the tall man aside (systems/finale.ts). An ending closes
+ * the dream: the world remembers which (it is saved), and the investigator may walk on in it. Pure.
  */
 
 import type { EndingId } from '../data/endings';

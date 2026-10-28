@@ -363,3 +363,10 @@ This work is based on "Bust of Apollo" (https://sketchfab.com/3d-models/bust-of-
 ## Particle marks (round 90, the quiet blows)
 
 - **Marks of a blow.** 'Particle Pack' (1.1) by Kenney (Kenney Vleugels), https://kenney.nl/assets/particle-pack, CC0 1.0: credited for provenance (its `License.txt` reads: Creative Commons Zero, CC0). Changes: the mottle of `smoke_05.png`, reduced to 32 x 32, gives the fray of the 'smear' mark, a 32 x 32 coverage mask made in the baker (`tools/marks/bake_marks.py`, `src/data/markAtlas.ts`, drawn by `src/render/particles.ts` and `src/render/markAtlas.ts`, coloured in code). The 'splat' mark beside it is made in the baker and is not from any sprite.
+
+## The endings (round 98)
+
+These are not stood in any arena (`MODEL_INFO` does not name them). `tools/finale/bake_finale.py` welds them, classes each face, sets the foot on the ground and centres the footprint. `src/data/models/finalePack.ts`, `finaleIndex.ts`.
+
+- **The silver key.** 'Antique Key' by Savino, https://opengameart.org/content/antique-key, CC0 1.0 (`low.obj`). Changes: hung upright, silvered, thickened, and scaled to 0.28 m. `fn_key`.
+- **The Ultimate Gate and the court's clock.** 'Castle Kit' by Kenney (Kenney Vleugels), https://kenney.nl/assets/castle-kit, CC0 1.0. Changes: `tower-square-arch` scaled to 6.4 m (`fn_arch`); the tower's base, windowed middle, middle and roof stacked, with a dial and hands made in the baker (`fn_clock`). The tall man is the investigator's own figure, hued in the game, with the growth drawn in the game, and is not from this kit.

@@ -24,6 +24,8 @@ export interface Speech {
   ahead(speaker: string, texts: readonly string[]): void;
   /** Stops whoever is speaking, quickly but not with a click. */
   stop(): void;
+  /** Holds the line where it is, or lets it go on from there, including while it is loading. */
+  hold(on: boolean): void;
   /** Someone is speaking. */
   readonly speaking: boolean;
 }
@@ -44,6 +46,11 @@ interface Voice {
   out: GainNode;
   hall: AudioNode[]; // what the echo or the room is made of, to be let go after its tail
   tail: number; // seconds it sounds on
+  buf: AudioBuffer;
+  rate: number;
+  offset: number; // seconds into the recording the voice is at
+  startedAt: number; // the context's time the current source began
+  held: boolean;
 }
 
 export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker: string, text: string, buf: AudioBuffer, rate: number) => void): Speech {
@@ -53,6 +60,8 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
   const pending = new Map<string, Promise<AudioBuffer | null>>();
   let request = 0; // each request is distinct, even when two ask for the same recording before it loads
   let voice: Voice | null = null;
+  let holding = false;
+  let ready: { speaker: string; text: string; buf: AudioBuffer } | null = null;
 
   /** Reads which recordings exist, once. A missing or broken list means none: the game is silent, not broken. */
   const known = (): Promise<void> =>
@@ -87,10 +96,16 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
 
   const stop = (): void => {
     request++;
+    holding = false;
+    ready = null;
     const v = voice;
     const ctx = e.ctx;
     voice = null;
     if (!v || !ctx) return;
+    if (v.held) {
+      release(v); // the source is already stopped: starting it again would say the word twice
+      return;
+    }
     try {
       v.out.gain.cancelScheduledValues(ctx.currentTime);
       v.out.gain.setTargetAtTime(0, ctx.currentTime, FADE / 3);
@@ -127,10 +142,11 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
       delay.connect(wet).connect(speech);
       hall.push(delay, feedback, wet);
     }
-    const v: Voice = { src, out, hall, tail: room ? ROOM_TAIL : HALL.tail };
+    const v: Voice = { src, out, hall, tail: room ? ROOM_TAIL : HALL.tail, buf, rate: m.rate, offset: 0, startedAt: ctx.currentTime, held: false };
     voice = v;
     src.onended = () => {
-      if (voice === v) voice = null;
+      if (v.held || voice !== v) return;
+      voice = null;
       release(v);
     };
     src.start();
@@ -144,13 +160,65 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
       const wanted = request;
       void known().then(() => {
         if (request !== wanted || !index?.has(id)) return undefined;
-        return load(id).then((buf) => void (buf && request === wanted && play(speaker, text, buf)));
+        return load(id).then((buf) => {
+          if (!buf || request !== wanted) return;
+          if (holding) ready = { speaker, text, buf };
+          else play(speaker, text, buf);
+        });
       });
     },
     ahead(speaker, texts) {
       void known().then(() => texts.forEach((t) => index?.has(clipOf(speaker, t)) && void load(clipOf(speaker, t))));
     },
     stop,
+    hold(on) {
+      holding = on;
+      if (!on && ready) {
+        const line = ready;
+        ready = null;
+        play(line.speaker, line.text, line.buf);
+        return;
+      }
+      const ctx = e.ctx;
+      const v = voice;
+      if (!v || !ctx) return;
+      if (on) {
+        if (v.held) return;
+        v.offset = Math.min(v.buf.duration, v.offset + Math.max(0, ctx.currentTime - v.startedAt) * v.rate);
+        v.held = true;
+        v.src.onended = null;
+        try {
+          v.src.stop();
+        } catch {
+          // Already over.
+        }
+        return;
+      }
+      if (!v.held) return;
+      if (v.offset >= v.buf.duration - 0.03) {
+        voice = null;
+        release(v);
+        return;
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = v.buf;
+      src.playbackRate.value = v.rate;
+      src.connect(v.out);
+      v.src = src;
+      v.held = false;
+      v.startedAt = ctx.currentTime;
+      src.onended = () => {
+        if (v.held || voice !== v) return;
+        voice = null;
+        release(v);
+      };
+      try {
+        src.start(0, v.offset);
+      } catch {
+        voice = null;
+        release(v);
+      }
+    },
     get speaking() {
       return voice !== null;
     },

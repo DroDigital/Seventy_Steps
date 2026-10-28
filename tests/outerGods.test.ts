@@ -175,7 +175,12 @@ describe('the outer gods (spec §3E)', () => {
     expect(g.ecs.c.brain.get(boss)!.cooldown).toBe(Infinity);
     place(g, g.player.id, g.ecs.c.transform.get(boss)!.pos.x, g.ecs.c.transform.get(boss)!.pos.z + 4, Math.PI);
     const endings = record(g, 'Ending');
-    expect(fightAction(g)?.label).toBe("pass through the Gate with 'Umr at-Tawil");
+    expect(fightAction(g)?.label).toBe('follow the Guide');
+    steps(g, 1, press('interact'));
+    expect(endings).toEqual([]);
+    expect(b.fight.sig.gate).toBe(1);
+    place(g, g.player.id, b.fight.sig.gx!, b.fight.sig.gz!, Math.PI);
+    expect(fightAction(g)?.label).toBe('step through the Gate');
     steps(g, 1, press('interact'));
     expect(endings).toEqual([{ id: 'silver_key' }]);
   });
@@ -194,6 +199,9 @@ describe('the outer gods (spec §3E)', () => {
     expect(distXZ(me(), fight.arena)).toBeLessThanOrEqual(fight.arena.radius); // while it is engaged, the fog sets them back at the rim
     const at = g.ecs.c.transform.get(boss)!.pos;
     place(g, g.player.id, at.x, at.z + 4, Math.PI);
+    steps(g, 1, press('interact'));
+    expect(g.overworld!.ending).toBeNull();
+    place(g, g.player.id, fight.sig.gx!, fight.sig.gz!, Math.PI);
     steps(g, 1, press('interact'));
     expect(g.overworld!.ending).toBe('silver_key');
     const health = g.ecs.c.health.get(g.player.id)!.hp;
