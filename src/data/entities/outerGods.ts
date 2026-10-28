@@ -23,13 +23,13 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['piping_dark'], canonLooks: false, voice: 'pipes',
     sprite: { silhouette: 'spectre', palette: 'charcoal', scale: 2.8, eyes: 0, glow: 'purple' },
     ...scripted('caster', phases(ph(1, { roar: 2, projectile: 1, barrage: 1 }), ph(0.5, { roar: 1, projectile_fan: 2, darkness: 1, barrage: 2 }, { hooks: ['camera_warp'] }))),
-    stats: st(3200, 300, 86, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4,
+    stats: st(3900, 300, 86, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4, // (round 97: health 3200 to 3900, its highest in the tables)
   },
   {
     id: 'other_gods', name: 'The Other Gods', source: 'The Other Gods', regions: ['cloud_summit'], canonLooks: false,
     sprite: { silhouette: 'spectre', palette: 'pallid', scale: 6, eyes: 0, tentacles: 4, glow: 'magenta' },
     ...scripted('brute', phases(ph(1, { slam: 2, roar: 1, aoe_ring: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, aoe_ring: 1, roar: 1, quake: 1, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3250, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4,
+    stats: st(3700, 800, 60, 2.6, 7, 16), drops: { echoes: 6000 }, insightOnSight: 4, // (round 97: health 3250 to 3700, its highest in the tables)
   },
   {
     id: 'yog_sothoth', name: 'Yog-Sothoth', source: 'The Dunwich Horror', regions: ['spheres'], canonLooks: true,
@@ -41,8 +41,8 @@ export const OUTER_GODS = tier('outer_god', [
       ph(1, { beam: 2, teleport: 1, aoe_ring: 1, barrage: 1, thunderfall: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect'], arena: 'spheres' }),
       ph(0.6, { beam: 2, projectile_fan: 1, teleport: 1, summon: 1, sweep_beam: 1, barrage: 1, crushing_blow: 1 }, { summons: ['dhole'], hooks: ['arena_reconnect', 'camera_warp'] }),
       ph(0.25, { beam: 3, starfall: 1, teleport: 1, sweep_beam: 2, vortex: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect', 'camera_warp', 'time_skip'] }),
-    ), { mobile: false, range: [0, 40] }),
-    stats: st(2700, 5000, 46, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
+    ), { mobile: false, range: [0, 40], cooldown: [120, 180] }),
+    stats: st(6100, 5000, 30, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 97: health 2700 to 6100, its highest in the tables) (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
   },
   {
     id: 'umr_at_tawil', name: "'Umr at-Tawil", source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
@@ -52,13 +52,13 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { gaze: 2, beam: 2, teleport: 1, summon: 1, eruption: 1 }, { summons: ['ancient_ones'], hooks: ['time_skip', 'hidden_platforms'] }),
       ph(0.25, { teleport: 1 }), // it yields
     ), { range: [4, 14] }),
-    stats: st(3650, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5,
+    stats: st(3800, 2000, 80, 3, 8, 18), drops: { echoes: 25000 }, insightOnSight: 5, // (round 97: health 3650 to 3800, its highest in the tables)
   },
   {
     id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['pale_lattice'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'pallid', scale: 3.2, eyes: 0, gear: ['cowl'] },
     ...scripted('stationary_horror', phases(ph(1, { gaze: 2, roar: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, roar: 1, beam: 1, barrage: 1 }, { hooks: ['time_skip'] }))),
-    stats: st(2850, 1000, 80, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4,
+    stats: st(4050, 1000, 80, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4, // (round 97: health 2850 to 4050, its highest in the tables)
   },
   {
     id: 'shub_niggurath', name: 'Shub-Niggurath', source: 'The Whisperer in Darkness', regions: ['black_wood'], canonLooks: false,
@@ -67,7 +67,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(1, { tentacle_burst: 2, charge: 1, pool: 1, summon: 1, eruption: 1, toxic_cloud: 1, crushing_blow: 1 }, { summons: ['thousand_young'], arena: 'roots' }),
       ph(0.5, { tentacle_burst: 2, pool: 2, charge: 1, summon: 1, roar: 1, tentacle_rise: 1, toxic_cloud: 1, vortex: 1, crushing_blow: 1 }, { summons: ['thousand_young'], hooks: ['darkness'] }),
     )),
-    stats: st(3600, 3000, 41, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 83: health 3100 to 3600, which the longer pauses after her blows had left 0.36 lives and 0.33 at the cap; round 73: damage 36 to 41: she is met in the Black Wood, the last ring, so a person at the cap has outgrown her less and the bot lost 0.35 lives of her at it, under the 0.4 floor; round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
+    stats: st(5450, 3000, 41, 1.2, 9, 20), drops: { echoes: 30000 }, insightOnSight: 5, // (round 97: health 3600 to 5450, its highest in the tables) (round 83: health 3100 to 3600, which the longer pauses after her blows had left 0.36 lives and 0.33 at the cap; round 73: damage 36 to 41: she is met in the Black Wood, the last ring, so a person at the cap has outgrown her less and the bot lost 0.35 lives of her at it, under the 0.4 floor; round 60: health 5450 and damage 100, which cost the balance bot 4.13 lives where a person first meets it; then 3800 and 34, no blow over 17% of a person's health, and a crushing blow given it)
   },
   {
     id: 'nyarlathotep', name: 'Nyarlathotep', source: 'Nyarlathotep', regions: ['court_centre'], canonLooks: true,
@@ -77,7 +77,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.6, { projectile_fan: 2, beam: 2, teleport: 1, gaze: 1, sweep_beam: 1, dream_cloud: 1, great_mark: 1 }, { hooks: ['decoys', 'camera_warp'] }),
       ph(0.3, { tentacle_burst: 2, grab: 1, roar: 1, vortex: 1, starfall: 1, crushing_blow: 1 }, { hooks: ['darkness', 'camera_warp'] }), // the Crawling Chaos: it borrows the slain bosses' attacks too
     ), { range: [3, 10], strafe: 0.4 }),
-    stats: st(4300, 3000, 43, 3.4, 8, 20), drops: { echoes: 35000 }, insightOnSight: 5, // (round 60: health 5150 and damage 100, which cost the balance bot 2.01 lives where a person first meets it; then damage 42, no blow over 18% of a person's health: a great mark from afar, a crushing blow in its last form)
+    stats: st(5150, 3000, 43, 3.4, 8, 20), drops: { echoes: 35000 }, insightOnSight: 5, // (round 97: health 4300 to 5150, its highest in the tables) (round 60: health 5150 and damage 100, which cost the balance bot 2.01 lives where a person first meets it; then damage 42, no blow over 18% of a person's health: a great mark from afar, a crushing blow in its last form)
     // its true form is drawn a lanky figure five metres tall, not a mass: struck at its legs' stance, its body and upper arms (1.2 m either side; the long hands hang out of it), up to its shoulders and neck; the curl over them is out of reach
     eldritchVariant: { name: 'Nyarlathotep, the Crawling Chaos', sprite: { silhouette: 'blob', palette: 'ichor', scale: 6, tentacles: 10, eyes: 1, body: [0.7, 0.2] } },
   },

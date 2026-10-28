@@ -16,7 +16,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, tidal_surge: 1, tentacle_rise: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
       ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, tentacle_rise: 1, vortex: 1, tidal_surge: 1, crushing_blow: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(4650, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
+    stats: st(5350, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 97: health 4650 to 5350, its highest in the tables) (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
@@ -57,7 +57,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(1, { gaze: 2, tentacle_burst: 2, slam: 1, quake: 1, conflagration: 1 }, { hooks: ['petrify_buildup'], arena: 'monoliths' }),
       ph(0.5, { gaze: 2, tentacle_burst: 1, tentacle_rise: 1, slam: 1, roar: 1, conflagration: 1, eruption: 1 }, { hooks: ['petrify_buildup', 'camera_warp'] }),
     )),
-    stats: st(3600, 3000, 65, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
+    stats: st(4850, 3000, 65, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 97: health 3600 to 4850, its highest in the tables) (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
   },
   {
     id: 'rhan_tegoth', name: 'Rhan-Tegoth', source: 'The Horror in the Museum', regions: ['yuggoth'], canonLooks: true,

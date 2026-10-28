@@ -79,7 +79,7 @@ describe('reinforcing arms with star-stones (round 12)', () => {
     expect(bosses.length).toBeGreaterThan(40);
     for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(90);
     const keziah = ENTITIES.find((d) => d.id === 'keziah_mason')!;
-    expect(keziah.stats.hp / cane).toBeLessThanOrEqual(55); // the first boss on the main line, with nothing bought (round 68: 35, before the bosses were made the fight a soulslike's are)
+    expect(keziah.stats.hp / cane).toBeLessThanOrEqual(75); // the first boss on the main line, with nothing bought (round 68: 35, before the bosses were made the fight a soulslike's are; round 97, asked back to its pre-history 1600: 73 blows)
   });
 });
 
