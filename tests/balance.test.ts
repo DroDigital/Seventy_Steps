@@ -53,10 +53,9 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
   zkauba: { seconds: [14, 130] },
   mother_hydra: { lives: [0.45, 2.1] },
   ghatanothoa: { seconds: [35, 280] },
-  nyarlathotep: { seconds: [35, 500], lives: [0.45, 3] },
+  nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
   shub_niggurath: { seconds: [35, 250] },
-  yig: { lives: [0.45, 1.6] },
-  yog_sothoth: { seconds: [35, 440], lives: [0.45, 3] },
+  yog_sothoth: { seconds: [35, 400], lives: [0.45, 2.5] },
   umr_at_tawil: { lives: [0.25, 1.5] },
   colour_out_of_space: { seconds: [14, 135] },
 };
@@ -68,7 +67,7 @@ const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDE
  */
 const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const; // (round 71: nine starts, not three: 'Umr at-Tawil cost the same bot 0.28, 0.93 and 0.43 lives from three, and a floor held on three paths was a coin)
 const CAP_LIVES_FLOOR: Partial<Record<string, number>> = { umr_at_tawil: 0.18 };
-const YOG_STANDING_MAX = 3;
+const YOG_STANDING_MAX = 2.5;
 const YOG_CAP_MAX = 2.2;
 const COLOUR_OPENING_MAX = 1.3;
 const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX };
