@@ -20,12 +20,14 @@ import { FEEDBACK, SIM } from '../data/tuning';
 import { isUnroused, type Game } from '../systems/components';
 import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
+import { roofedAt } from '../world/terrain';
 import { attackLook } from './attackLook';
 import { buildAssembly, type Assembly } from './assemblies';
 import { createArrivals, risesOut } from './bossArrival';
 import { createCreatureFx, type Gone } from './creatureFx';
 import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
+import { createCreatureRoof } from './creatureRoof';
 import { castSilhouettes } from './silhouetteCasters';
 import { relitOf } from './creatureRelight';
 import { toneForForm } from './spriteTone';
@@ -86,6 +88,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   castSilhouettes.adopt([batch, ...pages.map((p) => p.mesh)]); // and each one's own picture, cast as well (round 94)
   const flat = new THREE.Vector3(); // the camera's right, level
   const realm: [number, number, number] = [1, 1, 1]; // the realm's mid-tone this frame, at brightness 1
+  let sky = 1; // the share of the open sky the creature drawn stands in (creatureRoof.ts), set before its pictures are put
   const glow = createCreatureGlow(g, atlas, flat, CAPACITY); // the faint halos about eyes and marks, and a horror's body
   const presence = createBossPresence(g); // how deep in its fight a horror is, and how loud its voice
   scene.add(glow.mesh);
@@ -107,7 +110,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     const glint = REVIEWED_GLINTS[key];
     b.glint.setXYZW(index, glint?.[0] ?? 0, glint?.[1] ?? 0, glint?.[2] ?? 0, glint ? 1 + fire : 0);
-    const tone = toneForForm(key, REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 83)
+    const tone = toneForForm(key, REVIEWED_MATTER[key] ?? realm, realm, (worldUniforms.uSpriteGrade.value as number) * sky); // this form's own recolour to the realm it stands in (round 83), kept to the open sky's share of it (round 96)
     b.tone.setXYZW(index, tone.cos, tone.sin, tone.boost, tone.fill);
     b.relit.setX(index, relitOf(key));
     counts[frame.page]++;
@@ -124,7 +127,9 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const at = new THREE.Vector3();
   const scale = new THREE.Vector3();
   const seen = new Set<Entity>(); // reused each frame: no garbage per frame
+  const roofSeen = new Set<Entity>(); // reviewed sprites actually drawn this frame
   const arrivals = createArrivals(); // the bosses not yet roused, and when each came into view (round 60)
+  const roofs = createCreatureRoof(); // how far each creature stands under a dungeon's roof, eased (round 96)
 
   return {
     sheet: { atlas, texture: tex, reviewed: art ? { manifest: art.manifest, textures } : undefined },
@@ -153,6 +158,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       counts.fill(0);
       debug.length = 0;
       seen.clear();
+      roofSeen.clear();
       for (const [id, model] of g.ecs.c.model) {
         if (!model.startsWith(MODEL_PREFIX)) continue;
         const [cid, variant] = model.slice(MODEL_PREFIX.length).split('#') as [string, Variant | undefined];
@@ -183,8 +189,10 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           if (!clip) continue;
           const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
+          sky = roofs.sky(id, roofedAt(x, z), time); // under a dungeon's roof a creature keeps the colours it was drawn in (round 96)
           const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints);
           if (!frame) continue;
+          roofSeen.add(id);
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
           const span = spans.get(key)!;
           if (deep > 0 && gone.amount < 0.5) glow.halo(x, y + (span.top + span.bottom) / 2, z, (span.top - span.bottom) * BOSS_PRESENCE.halo.size, attackLook(g, id).line, BOSS_PRESENCE.halo.gain * deep * pose.opacity); // the colour of its blows hangs about it, deeper by phase
@@ -252,6 +260,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       fx.forget(seen);
       glow.forget(seen);
       stoops.forget(seen);
+      roofs.forget(roofSeen);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);
       for (const [id, asm] of assemblies) {
         if (seen.has(id)) continue;
