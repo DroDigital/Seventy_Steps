@@ -4,15 +4,14 @@
  * drains after a moment (as a wound does on health's bar), and a sudden loss (SanityLost) jolts the
  * bar and lights its frame. Once the mind has Fractured, the Laudanum count becomes the call to drink
  * it, and the band's notice says so too (or to rest, when none is left). No new screen effect: the
- * sanity FX say enough already. Round 22: an arrow after the band says the mind is mending by itself
- * (▲), two of them in the light of a lamp or a fire (▲▲).
+ * sanity FX say enough already. An arrow appears while the mind is restoring in light.
  */
 
 import { t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { MIND_HUD, SANITY } from '../data/tuning';
 import type { Band, Game } from '../systems/components';
-import { atOrBelow, bandIndex, darkRate } from '../systems/sanity';
+import { atOrBelow, bandIndex } from '../systems/sanity';
 import { glyph } from './glyphs';
 import { gauge } from './gauges';
 import { BONE, el, setStyle, setText } from './hudKit';
@@ -28,6 +27,12 @@ export interface MindHud {
 /** Whether the investigator should be told to drink: the mind has Fractured, a dose is left, and none is being drunk. */
 export const callsForLaudanum = (g: Game): boolean =>
   atOrBelow(g.mind, 'fractured') && g.player.laudanum > 0 && g.ecs.c.actor.get(g.player.id)?.move !== 'drink';
+
+/** The indicator represents ongoing recovery at a real light source, not passive recovery in darkness. */
+export function mendingInLight(g: Game): boolean {
+  const pos = g.ecs.c.transform.get(g.player.id)?.pos;
+  return g.mind.mending > 0 && g.mind.sanity < SANITY.max && !!pos && (g.lit?.(pos) ?? 0) > 0;
+}
 
 /** Builds the sanity bar and the band line into `vitals`; `say` shows a short notice. */
 export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) => void): MindHud {
@@ -71,7 +76,7 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
         frame.style.boxShadow = jolt > 0 ? `0 0 ${Math.round(8 * jolt)}px ${MAGENTA}` : '';
         jolted = jolt > 0;
       }
-      setText(band, `${t(`mind.${m.band}` as Key)} ${Math.ceil(m.sanity)}${m.mending > darkRate(m) * 1.5 ? ' ▲▲' : m.mending > 0 ? ' ▲' : ''}`);
+      setText(band, `${t(`mind.${m.band}` as Key)} ${Math.ceil(m.sanity)}${mendingInLight(g) ? ' ▲' : ''}`);
       setStyle(band, 'color', BAND_COLOURS[m.band]);
       const call = callsForLaudanum(g);
       setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}${t('mind.laudanum', { n: g.player.laudanum })}`);

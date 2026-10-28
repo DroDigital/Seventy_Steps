@@ -237,7 +237,6 @@ export const PLAYER_MOVES = {
   parry: { frames: 36, stamina: 10, parry: [3, 11] },
   shoot: { // the revolver (round 22): one round, a shot that strikes like a heavy blow up close, and a beat before the next (systems/gun.ts: the cylinder, the fall-off with distance)
     frames: 32,
-    stamina: 10,
     cancel: 24,
     release: 24,
     track: { window: [0, 6], rate: 10 },

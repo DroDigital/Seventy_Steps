@@ -14,7 +14,5 @@ add(
     pd('pd_chain', 'Chain', cls=S.METAL, fit={'height': 3.6}, solids='none'),
     pd('pd_chandelier', 'Chandelier', cls=S.METAL, fit={'width': 2.6}, solids='none'),
     pd('pd_spikes', 'Spikes', cls=S.METAL, fit={'width': 2.2}, solids='none'),
-    pd('pd_candle_a', 'Candle_01', cls=S.WAX, fit={'height': 0.4}, solids='none', anchors=[(0.0, 0.42, 0.0)]),
-    pd('pd_candle_b', 'Candle_02', cls=S.WAX, fit={'height': 0.5}, solids='none', anchors=[(0.0, 0.52, 0.0)]),
     pd('pd_debris', 'Debris', cls=S.ROCK, fit={'width': 2.2}, solids='none'),
 )

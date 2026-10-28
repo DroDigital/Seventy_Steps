@@ -2,7 +2,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { serveFrom } from '../desktop/serve.js';
 import { FONT_FILES } from '../src/ui/fonts';
-import { SERIF, TYPEWRITER } from '../src/ui/hudKit';
+import { applySerif, canvasSerif, DEFAULT_SERIF, GARAMOND_SERIF, TYPEWRITER } from '../src/ui/hudKit';
 
 const families = [...new Set(FONT_FILES.map((f) => f.family))];
 const first = (stack: string): string => stack.split(',')[0]!.replace(/'/g, '');
@@ -24,10 +24,18 @@ describe('the interface typefaces (round 74)', () => {
   });
 
   it('puts a loaded family first in each stack, with a system face behind it', () => {
-    expect(families).toContain(first(SERIF));
+    expect(families).toContain(first(DEFAULT_SERIF));
+    expect(families).toContain(first(GARAMOND_SERIF));
     expect(families).toContain(first(TYPEWRITER));
-    expect(SERIF).toMatch(/,serif$/);
+    expect(DEFAULT_SERIF).toMatch(/,serif$/);
     expect(TYPEWRITER).toMatch(/,monospace$/);
+  });
+
+  it('switches the canvas face along with the setting', () => {
+    applySerif(true);
+    expect(canvasSerif()).toBe(GARAMOND_SERIF);
+    applySerif(false);
+    expect(canvasSerif()).toBe(DEFAULT_SERIF);
   });
 
   it('is served as a font by the desktop shell', async () => {

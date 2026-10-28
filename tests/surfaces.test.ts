@@ -30,8 +30,6 @@ describe('what the models are made of (round 79: glass, liquid, a mirror, wax)',
     ['al_still', ['glassware']],
     ['uv_hourglass', ['glassware']],
     ['ph_mirror', ['mirror']],
-    ['pd_candle_a', ['wax']],
-    ['pd_candle_b', ['wax']],
   ])('%s is drawn in %j', (id, want) => {
     expect(MODEL_INFO[id], id).toBeTruthy();
     const got = mats(id);

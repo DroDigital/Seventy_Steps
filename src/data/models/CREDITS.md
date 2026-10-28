@@ -285,9 +285,9 @@ This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar
 `sh_altar`
 
 ## Pack 40 — PSX Dungeon
-By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: eight of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
+By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: six of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
 
-`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
+`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_debris`
 
 ## Pack 42 — Modular Cathedral Kit
 By SigilsVault, https://sigilsvault.itch.io/modular-cathedral-kit, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/): asks for nothing, credited for provenance. Changes: two columns and a railing taken singly, scaled and given colliders.

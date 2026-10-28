@@ -88,7 +88,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - block, which takes stamina damage on hit
   - parry window
   - off-hand 1920s revolver: low damage, but a well-timed shot interrupts (Bloodborne-style)
-- Stamina: each action has a cost, regen is delayed after spending, and hitting zero causes a guard break.
+- Stamina: actions with a cost require the full amount to start; sprinting requires the next step of its drain. Revolver shots cost no stamina. Regen is delayed after spending, and a blocked hit that empties stamina causes a guard break.
 - Poise and stagger apply to both the player and enemies. Hits get 2–4 frames of hitstop.
 - Critical bonuses are modest: +15% against ordinary enemies, +10% against bosses. Backstabs require a heavy attack within the rear 40° of a small non-boss foe. Body parts have no weakspot bonuses; multipart hitboxes only follow the creature's shape.
 - Lock-on:

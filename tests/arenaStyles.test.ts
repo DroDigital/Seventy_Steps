@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ARENA_STYLES, MIN_ARENA } from '../src/data/arenaStyles';
+import { HALL_SETS } from '../src/data/hallSets';
+import { DUNGEON } from '../src/data/tuning';
 import { ENTITIES } from '../src/data/registry';
 import { propCollider, propColliders, type Prop } from '../src/world/props';
 import { worldLayout } from '../src/world/placements';
@@ -52,5 +54,20 @@ describe('boss grounds', () => {
       }
     }
     expect(bad).toEqual([]);
+  });
+
+  it('keeps boss hall fires in at most two corners and removes scattered ground lights', () => {
+    for (const [boss, set] of Object.entries(HALL_SETS)) {
+      expect(set.puts.filter((p) => 'scatter' in p.where && p.piece.lit), boss).toEqual([]);
+    }
+    for (const d of w.dungeons) for (const r of d.layout.rooms.filter((room) => room.def.boss)) {
+      const fires = d.decor.filter((p) => p.kind === 'firepit' && Math.abs(p.x - r.x) < r.half && Math.abs(p.z - r.z) < r.half);
+      expect(fires.length, r.def.id).toBeLessThanOrEqual(2);
+      for (const p of fires) {
+        const corner = r.half - DUNGEON.wall - 2.5;
+        expect(Math.abs(p.x - r.x), r.def.id).toBeCloseTo(corner);
+        expect(Math.abs(p.z - r.z), r.def.id).toBeCloseTo(corner);
+      }
+    }
   });
 });

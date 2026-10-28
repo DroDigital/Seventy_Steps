@@ -9,7 +9,7 @@
 
 import type { InputFrame } from '../core/input';
 import { yawOf } from '../core/geom';
-import { PLAYER } from '../data/tuning';
+import { PLAYER, SIM, STAMINA } from '../data/tuning';
 import type { Game } from './components';
 import { bufferPress } from './inputBuffer';
 import { possessed } from './realityTricks';
@@ -60,7 +60,7 @@ export function playerControl(g: Game, real: InputFrame): void {
   const wz = fz * input.moveY + fx * input.moveX;
   const len = Math.hypot(wx, wz);
   const mag = Math.min(1, len);
-  p.sprinting = a.move === null && !p.blockHeld && mag > 0.1 && p.dodgeHeld > PLAYER.dodgeTapFrames && canAfford(stamina.get(p.id));
+  p.sprinting = a.move === null && !p.blockHeld && mag > 0.1 && p.dodgeHeld > PLAYER.dodgeTapFrames && canAfford(stamina.get(p.id), STAMINA.sprintDrain / SIM.hz);
   const speed = (p.blockHeld ? PLAYER.guardSpeed : p.sprinting ? PLAYER.sprintSpeed : PLAYER.walkSpeed) * mag;
   m.vx = len > 1e-6 ? (wx / len) * speed : 0;
   m.vz = len > 1e-6 ? (wz / len) * speed : 0;

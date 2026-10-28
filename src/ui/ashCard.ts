@@ -5,7 +5,7 @@
  */
 
 import { INK, goneAt, makeAsh, paintAsh, soften, type Ash } from './ashFx';
-import { SERIF, TYPEWRITER } from './hudKit';
+import { canvasSerif, TYPEWRITER } from './hudKit';
 
 export interface CardWords {
   heading: string;
@@ -37,7 +37,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
   stage.append(canvas);
   const g = canvas.getContext('2d')!;
   const size = words.telegram ? 16 : 18;
-  const face = words.telegram ? TYPEWRITER : SERIF;
+  const face = words.telegram ? TYPEWRITER : canvasSerif();
   let p = 0; // progress through the dissolve: 0 whole, 1 gone
   let raf = 0;
   let run = 0;
@@ -47,7 +47,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
   function layout(c: CanvasRenderingContext2D, width: number, alpha = 1): void {
     c.fillStyle = `rgb(${INK.join(',')})`;
     c.textBaseline = 'top';
-    c.font = `12px ${SERIF}`;
+    c.font = `12px ${canvasSerif()}`;
     (c as unknown as { letterSpacing: string }).letterSpacing = '2px';
     c.globalAlpha = alpha * 0.7;
     c.fillText(words.heading, 0, 0);

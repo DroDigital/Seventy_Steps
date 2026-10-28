@@ -1,6 +1,7 @@
 // The mind's mending apart from a fight (round 22) and what Unmoored costs the body (round 23); split from sanity.test.ts in round 24.
 import { describe, expect, it } from 'vitest';
 import { SANITY, SIM } from '../src/data/tuning';
+import { mendingInLight } from '../src/ui/mindHud';
 import { startMove } from '../src/systems/actions';
 import { strike } from '../src/systems/combat';
 import type { Band, Game } from '../src/systems/components';
@@ -41,6 +42,25 @@ describe('the mind mends by itself, apart from a fight (round 22)', () => {
     }
     expect(g.mind.band).toBe('fractured');
     expect(mendRate(g)).toBe(SANITY.mend.rate); // and from there the dark's own rate
+  });
+
+  it('shows the recovery indicator only while mending in light', () => {
+    const { g } = scriptedGame();
+    setSanity(g, 50);
+    g.lit = () => 0;
+    sanitySystem(g, 1 / SIM.hz);
+    expect(g.mind.mending).toBeGreaterThan(0);
+    expect(mendingInLight(g)).toBe(false);
+    g.lit = () => 0.25;
+    sanitySystem(g, 1 / SIM.hz);
+    expect(mendingInLight(g)).toBe(true);
+    g.mind.fought = g.frame;
+    sanitySystem(g, 1 / SIM.hz);
+    expect(mendingInLight(g)).toBe(false);
+    g.mind.fought = -Infinity;
+    setSanity(g, SANITY.max);
+    sanitySystem(g, 1 / SIM.hz);
+    expect(mendingInLight(g)).toBe(false);
   });
 
   it('faster the better lit the ground: a lamp, a fire, a torch, never past the light at its foot', () => {

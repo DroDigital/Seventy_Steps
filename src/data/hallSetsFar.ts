@@ -19,18 +19,17 @@ export const FAR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('mushroom_tall', scatter(5, [0.82, 0.98], { face: 'free' }), { size: [0.5, 0.8], tint: [0.62, 0.7, 0.66] }),
     ],
   },
-  // The monastery of the High Priest on Leng: banners of yellow silk, monks' benches, candles, masks of stone, columns.
+  // The monastery of the High Priest on Leng: banners of yellow silk, monks' benches, masks of stone and columns.
   high_priest: {
     puts: [
       put('pw_wheel', scatter(5, [0.84, 0.97], { arc: [60, 300], face: 'free' }), { size: 1.2 }), // the wheels of the monastery (round 79: Özlem Çandır's, CC BY)
       put('kf_column', ring(0.95, 6, { arc: [60, 300] }), { size: 1, tint: [0.62, 0.55, 0.36], keep: 0 }), // (round 79: Kenney's Retro Fantasy Kit, CC0)
-      put('kf_column_broken', at(0.88, 125, { mirror: true, face: 'free' }), { size: 1.1, tint: [0.62, 0.55, 0.36], keep: 0 }),
+      put('kf_column_broken', at(0.9, 165, { face: 'in' }), { size: 1.1, tint: [0.62, 0.55, 0.36], keep: 0 }),
       put('banner', ring(0.97, 6, { arc: [60, 300] }), { size: 0.85 }),
       put('bench', ring(0.92, 4, { arc: [80, 280], face: 'in' }), { size: 1.2 }),
       put('statue_head', at(0.95, 180, { face: 'in' }), { size: 0.6, tint: [0.7, 0.62, 0.4] }),
       put('column', scatter(4, [0.88, 0.98], { arc: [60, 300] }), { size: 0.8 }),
       put('bowl', scatter(3, [0.8, 0.94], { face: 'free' }), { walk: true, size: 1.5 }),
-      put('candles', scatter(9, [0.8, 0.97], { face: 'free' }), { lit: 'torch', walk: true, size: 1.3 }),
     ],
   },
   // The onyx castle's throne hall on Kadath: great columns in pairs, statues, pedestals with the glow of a dream, banners of no house.

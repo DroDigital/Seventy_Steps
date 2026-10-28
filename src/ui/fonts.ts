@@ -14,6 +14,8 @@ export interface FontFile {
 export const FONT_FILES: readonly FontFile[] = [
   { family: 'IM Fell English', file: 'IMFellEnglish-Regular.woff2', style: 'normal' },
   { family: 'IM Fell English', file: 'IMFellEnglish-Italic.woff2', style: 'italic' },
+  { family: 'EB Garamond', file: 'EBGaramond-Regular.woff2', style: 'normal' },
+  { family: 'EB Garamond', file: 'EBGaramond-Italic.woff2', style: 'italic' },
   { family: 'Special Elite', file: 'SpecialElite-Regular.woff2', style: 'normal' },
 ];
 
