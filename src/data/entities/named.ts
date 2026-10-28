@@ -18,7 +18,7 @@ export const NAMED = tier('named', [
     id: 'wilbur_whateley', name: 'Wilbur Whateley', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,
     sprite: { silhouette: 'giant', palette: 'rust', scale: 3.2, eyes: 2, tentacles: 8, limbs: 2 },
     ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, summon: 1, thunderfall: 1 }, { summons: ['thousand_young'] }), ph(0.4, { grab: 2, tentacle_burst: 2, roar: 1, vortex: 1 }))),
-    stats: st(1550, 150, 54, 3.4, 2, 6), drops: { echoes: 1800 }, insightOnSight: 1,
+    stats: st(1550, 150, 52, 3.4, 2, 6), drops: { echoes: 1800 }, insightOnSight: 1, // (round 97: damage 54 to 52, so his vortex takes at most 30% of a person's health where he is met: his new place in the first band, after the Terrible Old Man's health moved him earlier, has him met at a standing where the blow was 30.2%)
   },
   {
     id: 'dunwich_horror', name: 'The Dunwich Horror', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,
@@ -36,13 +36,13 @@ export const NAMED = tier('named', [
     id: 'brown_jenkin', name: 'Brown Jenkin', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'quadruped', palette: 'rust', scale: 1, eyes: 2 },
     ...scripted('skirmisher', { ...phases(ph(1, { bite: 2, grab: 1, combo: 1 }), ph(0.4, { bite: 3, lunge: 1, combo: 2 })), joins: { with: 'keziah_mason', below: 0.5 } }), // in the walls until she is half spent
-    stats: st(650, 40, 18, 5.5, 1.5, 5), drops: { echoes: 800 }, insightOnSight: 1,
+    stats: st(700, 40, 18, 5.5, 1.5, 5), drops: { echoes: 800 }, insightOnSight: 1, // (round 97: health 650 to 700, a buff: the bot took 0.39 lives of him, under the early horrors' 0.4)
   },
   {
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
     ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
-    stats: st(1500, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
+    stats: st(2700, 200, 46, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 97: health 1500 to 2700, a buff: the bot took 0.28 lives of him, under the early horrors' 0.4) (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
   },
   {
     id: 'joseph_curwen', name: 'Joseph Curwen', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,
@@ -143,7 +143,7 @@ export const NAMED = tier('named', [
     id: 'colossus_pyramids', name: 'The Colossus Beneath the Pyramids', source: 'Under the Pyramids', regions: ['pnakotus'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sand', scale: 14, tentacles: 5, eyes: 10 },
     ...scripted('boss', phases(ph(1, { slam: 2, grab: 1, charge: 1, quake: 1, delayed_slam: 1 }), ph(0.5, { slam: 2, bite: 2, charge: 1, aoe_ring: 1, quake: 2, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3300, 600, 54, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2,
+    stats: st(3950, 600, 54, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2, // (round 97: health 3300 to 3950, its highest in the tables)
   },
   {
     id: 'martins_beach_horror', name: "The Horror at Martin's Beach", source: "The Horror at Martin's Beach", regions: ['innsmouth'], canonLooks: true,
@@ -155,7 +155,7 @@ export const NAMED = tier('named', [
     id: 'dr_munoz', name: 'Dr. Muñoz', source: 'Cool Air', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'pallid', scale: 2, eyes: 2, gear: ['coat', 'pipes'] },
     ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, combo: 1 }), ph(0.5, { grab: 2, toxic_cloud: 1, projectile: 1, barrage: 1 }))),
-    stats: st(550, 80, 22, 2.6, 2, 6), weak: ['fire'], drops: { echoes: 800 }, insightOnSight: 1,
+    stats: st(600, 80, 22, 2.6, 2, 6), weak: ['fire'], drops: { echoes: 800 }, insightOnSight: 1, // (round 97: health 550 to 600, a buff: the bot took 0.36 lives of him, under the early horrors' 0.4)
   },
   {
     id: 'charles_le_sorcier', name: 'Charles le Sorcier', source: 'The Alchemist', regions: ['hub'], canonLooks: true,
@@ -167,7 +167,7 @@ export const NAMED = tier('named', [
     id: 'medusa_gorgon', name: "The Gorgon of Medusa's Coil", source: "Medusa's Coil", regions: ['dunwich'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.1, eyes: 2, tentacles: 10 },
     ...scripted('mind_thief', phases(ph(1, { grab: 1, gaze: 1, lunge: 2, combo: 1 }), ph(0.5, { gaze: 1, grab: 2, tentacle_burst: 1, sweep_beam: 1, combo: 1 }))),
-    stats: st(1200, 160, 51, 4, 3, 10), drops: { echoes: 2400 }, insightOnSight: 2,
+    stats: st(1600, 160, 51, 4, 3, 10), drops: { echoes: 2400 }, insightOnSight: 2, // (round 97: health 1200 to 1600, a buff: the bot took 0.38 lives of her, under the early horrors' 0.4)
   },
   {
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
@@ -185,12 +185,12 @@ export const NAMED = tier('named', [
     id: 'terrible_old_man', name: 'The Terrible Old Man', source: 'The Terrible Old Man', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 1.8, eyes: 2, gear: ['brim', 'beard', 'cane'] },
     ...scripted('caster', phases(ph(1, { summon: 2, projectile: 1, combo: 1 }, { summons: ['moon_bog_wraith'] }), ph(0.5, { summon: 1, projectile_fan: 1, teleport: 1, eruption: 1 }, { summons: ['moon_bog_wraith'] }))),
-    stats: st(1150, 80, 38, 2.4, 1.5, 6), drops: { echoes: 1500 }, insightOnSight: 1,
+    stats: st(1850, 80, 38, 2.4, 1.5, 6), drops: { echoes: 1500 }, insightOnSight: 1, // (round 97: health 1150 to 1850, a buff: the bot took 0.25 lives of him, the least of any early horror)
   },
   {
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
     ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, starfall: 1 }, { hooks: ['arena_reconnect'] }))),
-    stats: st(2250, 160, 64, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2,
+    stats: st(2850, 160, 64, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2, // (round 97: health 2250 to 2850, its highest in the tables)
   },
 ]);

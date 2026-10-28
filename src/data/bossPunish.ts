@@ -37,8 +37,8 @@ export const PUNISH: Readonly<Record<PunishBand, Punish>> = {
  */
 export const BOSS_BAND: Readonly<Record<string, PunishBand>> = {
   dr_munoz: 'first', charles_le_sorcier: 'first', the_outsider: 'first', brown_jenkin: 'first', ephraim_waite: 'first', keziah_mason: 'first', black_man: 'first',
-  colour_out_of_space: 'first', the_hound: 'first', the_unnamable: 'first', haunter_of_the_dark: 'first', terrible_old_man: 'first', medusa_gorgon: 'first',
-  martins_beach_horror: 'middle', wilbur_whateley: 'middle', whisperer: 'middle', edward_hutchinson: 'middle', simon_orne: 'middle', lilith: 'middle',
+  colour_out_of_space: 'first', the_hound: 'first', the_unnamable: 'first', haunter_of_the_dark: 'first', wilbur_whateley: 'first', medusa_gorgon: 'first',
+  martins_beach_horror: 'middle', terrible_old_man: 'middle', whisperer: 'middle', edward_hutchinson: 'middle', simon_orne: 'middle', lilith: 'middle',
   shunned_house_entity: 'middle', joseph_curwen: 'middle', dunwich_horror: 'middle', mother_hydra: 'middle', father_dagon: 'middle', hypnos: 'middle',
   high_priest: 'middle', colossus_pyramids: 'middle', shoggoth: 'middle', flying_polyp: 'middle',
   ghatanothoa: 'deep', bokrug: 'deep', nug: 'deep', rhan_tegoth: 'deep', yeb: 'deep', great_ones: 'deep', yig: 'deep', tsathoggua: 'deep', cthulhu: 'deep', hastur: 'deep',
