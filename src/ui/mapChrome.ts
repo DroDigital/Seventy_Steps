@@ -114,7 +114,7 @@ export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['D-pad'], 'Pick a sign'], [['A'], 'Choose / travel'], [['LB', 'RB'], 'Next sign'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
     : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
@@ -161,7 +161,7 @@ export function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.restore();
 }
 
-/** A small cross at (x, y): where the pad's button would set the marker, the pad having no pointer. */
+/** A small cross at (x, y): where the pad sets a marker, and where a lit sign under it is chosen. */
 export function drawCrosshair(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   ctx.save();
   ctx.strokeStyle = 'rgba(217,208,184,0.7)';

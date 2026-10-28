@@ -1,9 +1,10 @@
 /**
  * Fast travel from the full map (playtest round 7): a lit Elder Sign of the realm on show is picked
- * under the pointer, or in turn (nearest the investigator first) with Tab or the pad's shoulders.
- * The one chosen glows in a breathing ring, bone in Cosmic Purple like the veil's sign; choosing it
- * again (a second click, Enter, the pad's A) makes the journey, unless the words say why not
- * (checkpoints.ts's travelBar: a boss fight on, a foe hunting close by).
+ * under the pointer, or under the pad's mark at the middle of the map, or in a direction from where
+ * the map is centred (the pad's d-pad), or in turn (nearest the investigator first) with Tab or the
+ * pad's shoulders. The one chosen glows in a breathing ring, bone in Cosmic Purple like the veil's
+ * sign; choosing it again (a second click, Enter, the pad's A) makes the journey, unless the words
+ * say why not (checkpoints.ts's travelBar: a boss fight on, a foe hunting close by).
  */
 
 import { distXZ, type XZ } from '../core/geom';
@@ -29,6 +30,36 @@ export function litSigns(g: Game, realm: readonly RegionDef[], from: XZ): MapPla
 }
 
 const screenOf = (view: MapView, p: XZ): [number, number] => [screenX(view, p.x), screenY(view, p.z)];
+
+/** What the pad's A does: a sign under the mark is chosen, and the one already chosen is the journey; with neither, the view finds the investigator. */
+export function padTravel(under: MapPlace | null, chosen: MapPlace | null): 'choose' | 'journey' | 'find' {
+  if (under && under !== chosen) return 'choose';
+  if (chosen) return 'journey';
+  return 'find';
+}
+
+/**
+ * The lit sign most nearly in a screen direction from `from` (y grows down the canvas), other than
+ * the one already there. A press that points at nothing in that quarter returns null.
+ */
+export function signToward(signs: readonly MapPlace[], view: MapView, from: XZ, dir: { x: number; y: number }): MapPlace | null {
+  const [fx, fy] = screenOf(view, from);
+  const len = Math.hypot(dir.x, dir.y) || 1;
+  const [dx, dy] = [dir.x / len, dir.y / len];
+  let best: MapPlace | null = null;
+  let bestScore = Infinity;
+  for (const p of signs) {
+    const [x, y] = screenOf(view, p);
+    const [ox, oy] = [x - fx, y - fy];
+    const d = Math.hypot(ox, oy);
+    if (d < 8) continue; // the sign the view is already on
+    const dot = (ox * dx + oy * dy) / d;
+    if (dot < 0.5) continue; // outside a quarter turned a little past the diagonals
+    const score = d / (dot * dot); // nearer, and more nearly straight, wins
+    if (score < bestScore) [best, bestScore] = [p, score];
+  }
+  return best;
+}
 
 /** The lit sign nearest a point on the canvas (pixels), within PICK_PX, if any. */
 export function signAt(signs: readonly MapPlace[], view: MapView, px: number, py: number, within = PICK_PX): MapPlace | null {
