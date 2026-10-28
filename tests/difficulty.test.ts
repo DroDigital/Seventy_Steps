@@ -46,8 +46,11 @@ describe('the difficulty chosen when a dream begins (round 38)', () => {
     const old = JSON.parse(json) as Record<string, unknown>;
     delete old.difficulty;
     expect(createWorldGame({ save: parseSave(JSON.stringify(old))!, difficulty: 'light' }).player.difficulty).toBe(DEFAULT_DIFFICULTY); // what is not in the save is not the title's choice either
-    old.difficulty = 'impossible';
-    expect(createWorldGame({ save: parseSave(JSON.stringify(old))! }).player.difficulty).toBe(DEFAULT_DIFFICULTY);
+    for (const invalid of ['impossible', '__proto__', 'constructor', 'toString']) {
+      old.difficulty = invalid;
+      expect(createWorldGame({ save: parseSave(JSON.stringify(old))! }).player.difficulty).toBe(DEFAULT_DIFFICULTY);
+      expect(parseCarry({ cycle: 1, difficulty: invalid })!.difficulty).toBe(DEFAULT_DIFFICULTY);
+    }
   });
 
   it('goes with the strength carried into a second journey, which cannot choose again', () => {

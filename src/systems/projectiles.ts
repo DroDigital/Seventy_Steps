@@ -16,6 +16,7 @@ import { capsuleGap2, hostiles, strike } from './combat';
 import { live } from './targets';
 import { isAbsent, type Game } from './components';
 import { spawnPool } from './hazards';
+import { foeDamage } from './cycles';
 import { targetOf } from './specials';
 
 const DEG = Math.PI / 180;
@@ -62,14 +63,14 @@ export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyD
   c.transform.set(e, { pos: { ...from }, prev: { ...from }, yaw, prevYaw: yaw });
   const life = Math.min(BOSS.boltLife, Math.ceil((v.range / v.speed) * SIM.hz) + (v.lob ? 60 : 0));
   const faction = c.combatant.get(owner)?.faction ?? 'enemy';
-  c.bolt.set(e, { owner, faction, vel, radius: v.radius, damage: conjured ? 0 : v.damage, poise: conjured ? 0 : v.poise, life, lob: v.lob, conjured, passed: [], pool: v.pool });
+  c.bolt.set(e, { owner, faction, enemyScale: faction === 'enemy' ? foeDamage(g, owner) : undefined, vel, radius: v.radius, damage: conjured ? 0 : v.damage, poise: conjured ? 0 : v.poise, life, lob: v.lob, conjured, passed: [], pool: v.pool });
   c.model.set(e, 'fx:bolt');
   g.events.emit('BoltLoosed', { owner, at: { ...from }, vel: { ...vel }, fire: !!v.pool?.fire, conjured });
 }
 
 function land(g: Game, e: Entity, at: V3, on: 'body' | 'ground' | 'wall' | 'spent'): void {
   const b = g.ecs.c.bolt.get(e)!;
-  if (b.pool && !b.conjured) spawnPool(g, b.owner, b.faction, at, b.pool);
+  if (b.pool && !b.conjured) spawnPool(g, b.owner, b.faction, at, b.pool, b.enemyScale);
   g.events.emit('BoltLanded', { owner: b.owner, faction: b.faction, at: { ...at }, vel: { ...b.vel }, on, radius: b.radius, lob: b.lob, fire: !!b.pool?.fire, conjured: b.conjured });
   g.ecs.despawn(e);
 }
@@ -100,7 +101,7 @@ export function boltSystem(g: Game): void {
         b.passed.push(t); // hard on the last from the same hand: it passes by
         continue;
       }
-      const outcome = strike(g, b.owner, t, { damage: b.damage, poise: b.poise, guard: b.damage, hitstop: 2, parryable: false, interrupts: false }, from);
+      const outcome = strike(g, b.owner, t, { damage: b.damage, enemyScale: b.enemyScale, poise: b.poise, guard: b.damage, hitstop: 2, parryable: false, interrupts: false }, from);
       if (outcome === 'dodged') {
         b.passed.push(t); // it flies on through the roll
         continue;

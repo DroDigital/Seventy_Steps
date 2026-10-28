@@ -11,6 +11,7 @@ import type { CloudDef } from '../data/moves';
 import { SIM } from '../data/tuning';
 import { targetOf, groundNear } from './specials';
 import type { Game } from './components';
+import { foeDamage } from './cycles';
 
 /** The banks rise about the horror, on the side of its prey and spread across it; a blind horror's (`blind`) rise at even bearings about its body and spread outward, after no one. */
 export function rise(g: Game, id: Entity, d: CloudDef): void {
@@ -28,7 +29,7 @@ export function rise(g: Game, id: Entity, d: CloudDef): void {
     const e = g.ecs.spawn();
     const pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };
     c.transform.set(e, { pos, prev: { ...pos }, yaw: 0, prevYaw: 0 });
-    c.hazard.set(e, { owner: id, faction, radius: d.radius, damage: d.damage, tick: d.tick, life: d.life, next: d.tick, cloud: d.kind, drift: d.drift / SIM.hz, total: d.life, ...(d.mind > 0 && { mind: d.mind }), ...(d.blind && { heading: a }) });
+    c.hazard.set(e, { owner: id, faction, enemyScale: faction === 'enemy' ? (c.phantom.has(id) ? 0 : foeDamage(g, id)) : undefined, radius: d.radius, damage: d.damage, tick: d.tick, life: d.life, next: d.tick, cloud: d.kind, drift: d.drift / SIM.hz, total: d.life, ...(d.mind > 0 && { mind: d.mind }), ...(d.blind && { heading: a }) });
     if (i === 0) g.events.emit('Clouded', { at: { ...pos }, by: id, kind: d.kind });
   }
 }

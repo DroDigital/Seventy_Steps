@@ -1,15 +1,11 @@
-/**
- * Boss damage scaling. Boss health remains at the authored value for each form.
- */
-
+/** Boss damage scaling. Boss health remains at the authored value for each form. */
 import { BOSS_STANDING } from '../data/bossStanding';
+import { JOURNEY_REFERENCE, type JourneyProfile } from '../data/ngPlusTuning';
 import { BOSS_LEVEL_SCALING, BOSS_OVERMATCH } from '../data/tuning';
-import { healthAt } from './levelWorth';
+import { healthAt, levelsWorth } from './levelWorth';
+import { bossRung } from './ngPlus';
 
-/**
- * How much harder a horror strikes when the investigator's health exceeds the standing it was made to be met at.
- * 1 at or below the standing, or for a form with none.
- */
+/** How much harder a horror strikes when the investigator's health exceeds its expected standing. */
 export function overmatch(levels: { vigour: number }, id: string | undefined): { damage: number } {
   const standing = id ? BOSS_STANDING[id] : undefined;
   if (!standing) return { damage: 1 };
@@ -18,3 +14,7 @@ export function overmatch(levels: { vigour: number }, id: string | undefined): {
 }
 
 export const bossDamageScale = (levels: number, over = 1): number => (1 + BOSS_LEVEL_SCALING.damage * levels) * over;
+
+/** Later journeys use a fixed reference: buying another level does not strengthen their bosses. */
+export const journeyBossDamage = (id: string, cycle: number, profile?: JourneyProfile): number =>
+  bossDamageScale(levelsWorth(JOURNEY_REFERENCE), overmatch(JOURNEY_REFERENCE, id).damage) * bossRung(id, cycle, profile).damage;

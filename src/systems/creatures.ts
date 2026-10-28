@@ -25,6 +25,7 @@ import { addLayer } from './hiddenLayer';
 import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
+import { homeProfile } from './ngPlus';
 
 /** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
 const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
@@ -150,22 +151,25 @@ export const dreadOf = (def: EntityDef, land = 1): Dread => ({
  * swapped if the mind is already Fractured or lower); a `hidden` entry goes on its hidden layer; one
  * with a boss script holds a fight over the arena around where it stands (bossFight.ts).
  */
-export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant): Entity | undefined {
+export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant, owner?: Entity, placedRegion?: string): Entity | undefined {
   const swaps = variant === undefined && getEntity(id)?.eldritchVariant !== undefined;
   const v = swaps && atOrBelow(g.mind, 'fractured') ? 'eldritch' : variant;
   const def = resolveCreature(id, v);
   if (!def) return undefined;
   const cd = toCombatant(def, v);
   const foe = def.tier !== 'ally';
-  const land = landOf(def, at);
-  if (foe && !def.bossScript) cd.hp = Math.round(cd.hp * foeHealth(g) * land); // ordinary enemies still grow in later journeys and harder regions
+  const inherited = owner === undefined ? undefined : g.ecs.c.journey.get(owner);
+  const home = { profile: inherited?.profile ?? homeProfile(at, id, !!g.overworld, placedRegion), encounter: inherited?.encounter ?? (owner === undefined && def.bossScript ? id : undefined), servant: owner !== undefined, creature: id };
+  const land = inherited?.encounter ? 1 : landOf(def, at);
+  if (foe && !def.bossScript) cd.hp = Math.round(cd.hp * foeHealth(g, home) * land);
   if (foe && g.player.cycle > 0) cd.bounty = Math.round(cd.bounty * foeBounty(g));
   const e = spawnCombatant(g, cd, at, foe ? 'enemy' : 'player');
+  if (foe) g.ecs.c.journey.set(e, home);
   g.ecs.c.dread.set(e, dreadOf(def, land));
   if (swaps) g.ecs.c.swap.set(e, { id, eldritch: v === 'eldritch' });
   if (def.hidden) addLayer(g, e, def.hidden);
-  if (def.bossScript) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
-  if (def.bossScript?.unseen) g.ecs.c.unseen.set(e, { revealed: 0 });
+  if (def.bossScript && owner === undefined) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
+  if (def.bossScript?.unseen && owner === undefined) g.ecs.c.unseen.set(e, { revealed: 0 });
   return e;
 }
 
@@ -175,12 +179,15 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   if (!def) return;
   const cd = toCombatant(def, variant);
   const c = g.ecs.c;
+  const home = c.journey.get(e);
+  if (home) c.journey.set(e, { ...home, creature: id });
   c.model.set(e, cd.model);
-  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) || c.combatant.get(e)?.showcase ? 0 : cd.bounty });
+  const bounty = c.phantom.has(e) || c.minion.has(e) || home?.servant || c.combatant.get(e)?.showcase ? 0 : Math.round(cd.bounty * (def.tier === 'ally' ? 1 : foeBounty(g)));
+  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const land = landOf(def, c.transform.get(e)!.pos);
-  const hp = def.tier === 'ally' || def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g) * land);
+  const land = c.dread.get(e)?.land ?? landOf(def, c.transform.get(e)!.pos);
+  const hp = def.tier === 'ally' || def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g, c.journey.get(e)) * land);
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
   const po = c.poise.get(e)!;
   [po.value, po.max] = [(po.value / po.max) * cd.poise, cd.poise];

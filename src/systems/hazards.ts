@@ -10,13 +10,14 @@ import type { PoolDef } from '../data/moves';
 import { drift } from './clouds';
 import { hostiles, strike } from './combat';
 import { live } from './targets';
+import { foeDamage } from './cycles';
 import type { Combatant, Game } from './components';
 
-export function spawnPool(g: Game, owner: Entity, faction: Combatant['faction'], at: XZ, pool: PoolDef): Entity {
+export function spawnPool(g: Game, owner: Entity, faction: Combatant['faction'], at: XZ, pool: PoolDef, capturedScale?: number): Entity {
   const e = g.ecs.spawn();
   const pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };
   g.ecs.c.transform.set(e, { pos, prev: { ...pos }, yaw: 0, prevYaw: 0 });
-  g.ecs.c.hazard.set(e, { owner, faction, radius: pool.radius, damage: pool.damage, tick: pool.tick, life: pool.life, next: 0, ...(pool.fire && { fire: true }) });
+  g.ecs.c.hazard.set(e, { owner, faction, enemyScale: faction === 'enemy' ? capturedScale ?? (g.ecs.c.phantom.has(owner) ? 0 : foeDamage(g, owner)) : undefined, radius: pool.radius, damage: pool.damage, tick: pool.tick, life: pool.life, next: 0, ...(pool.fire && { fire: true }) });
   g.ecs.c.model.set(e, 'fx:pool');
   return e;
 }
@@ -35,7 +36,7 @@ export function hazardSystem(g: Game): void {
     for (const t of live(g, hostiles(g, h.faction, false, false))) {
       const p = transform.get(t)!.pos;
       if (distXZ(p, at) > h.radius + (body.get(t)?.radius ?? 0) * 0.5 || Math.abs(p.y - at.y) > 1.5) continue;
-      strike(g, h.owner, t, { damage: h.damage, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false, unblockable: true, lingering: true }, at);
+      strike(g, h.owner, t, { damage: h.damage, enemyScale: h.enemyScale, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false, unblockable: true, lingering: true }, at);
     }
   }
 }
