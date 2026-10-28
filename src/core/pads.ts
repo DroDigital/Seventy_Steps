@@ -7,7 +7,7 @@
  * Gamepad API's own shape; those are read as the browser's are, the browser's list first.
  */
 
-import { faceSwapped } from './padMap';
+import { faceSwapped, PAD_BUTTON } from './padMap';
 
 /** A pad as the Gamepad API gives it, and as the desktop shell's bridge does. */
 interface PadLike {
@@ -118,7 +118,7 @@ function read(p: PadLike, from: Source, now = performance.now()): { reading: Pad
     seen.set(key, s);
   }
   [s.raw, s.down] = [[...p.axes], downOf(p)];
-  s.triggerValues = [p.buttons[6]?.value ?? 0, p.buttons[7]?.value ?? 0];
+  s.triggerValues = [p.buttons[PAD_BUTTON.lt]?.value ?? 0, p.buttons[PAD_BUTTON.rt]?.value ?? 0];
   const axes = p.axes.map((v, i) => {
     if (p.mapping === 'standard' && i < 4 && Math.abs(v) < 0.1) s.rest[i] = 0; // a stick seen at centre rests at centre
     const lay = (s.still[i] ??= { at: now, v });
@@ -204,7 +204,7 @@ export function calibratePadTriggers(): boolean {
   s.trig.forEach((trigger, i) => {
     trigger.rest = s.triggerValues[i];
     trigger.mode = 'calibrated';
-    s.stuck.delete(i + 6);
+    s.stuck.delete(i === 0 ? PAD_BUTTON.lt : PAD_BUTTON.rt);
   });
   return true;
 }
