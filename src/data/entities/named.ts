@@ -12,7 +12,7 @@ export const NAMED = tier('named', [
     id: 'colour_out_of_space', name: 'The Colour Out of Space', source: 'The Colour Out of Space', regions: ['arkham'], canonLooks: false,
     sprite: { silhouette: 'orb', palette: 'pallid', scale: 5, eyes: 0, glow: 'magenta', outside: true },
     ...scripted('boss', phases(ph(1, { beam: 2, pool: 2, aoe_ring: 1, toxic_cloud: 1 }, { hooks: ['camera_warp'] }), ph(0.5, { beam: 2, pool: 1, aoe_ring: 2, projectile_fan: 2, teleport: 1, sweep_beam: 2, toxic_cloud: 1 }, { hooks: ['camera_warp'] }))),
-    stats: st(2400, 400, 40, 3, 4, 10), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 3000 }, insightOnSight: 2, // (round 97, asked back: health 1150 to 2400, its pre-history value; round 12 had it at 2400 before the 0.9 × hp^0.9 compression to 1000)
+    stats: st(2400, 400, 23, 3, 4, 10), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 3000 }, insightOnSight: 2, // (round 97, asked back: health 1150 to 2400, its pre-history value; round 12 had it at 2400 before the 0.9 × hp^0.9 compression to 1000)
   },
   {
     id: 'wilbur_whateley', name: 'Wilbur Whateley', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,

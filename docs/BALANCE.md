@@ -38,7 +38,7 @@ nothing in its way.
 | 6 | The Hound | 6/2/5 | 3 | 1591 | 28 | 390 | 232 | 5 | 0.56 | 0 |
 | 7 | Keziah Mason | 6/3/5 | 4 | 1768 | 26 | 379 | 232 | 5 | 0.54 | 0 |
 | 8 | The Unnamable | 6/3/6 | 4 | 2225 | 34 | 450 | 232 | 5 | 0.65 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 64 | 1263 | 244 | 6 | 1.52 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 54 | 617 | 244 | 6 | 0.74 | 0 |
 | 10 | The Black Man | 7/3/7 | 5 | 3044 | 48 | 365 | 244 | 6 | 0.44 | 0 |
 | 11 | The Haunter of the Dark | 8/4/7 | 5 | 1200 | 196 | 3281 | 256 | 6 | 3.77 | 0 |
 | 12 | Wilbur Whateley | 9/4/8 | 5 | 1794 | 21 | 335 | 268 | 7 | 0.33 | 0 |
@@ -75,7 +75,7 @@ nothing in its way.
 | 43 | The Ancient Ones | 18/9/17 | 5 | 5387 | 63 | 826 | 376 | 10 | 0.44 | 0 |
 | 44 | Nyarlathotep | 18/9/17 | 5 | 6850 | 103 | 1833 | 376 | 10 | 0.98 | 0 |
 | 45 | Shub-Niggurath | 18/9/17 | 5 | 7249 | 120 | 1571 | 376 | 10 | 0.84 | 0 |
-| 46 | Yog-Sothoth | 18/9/17 | 5 | 8113 | 147 | 4296 | 376 | 10 | 2.29 | 0 |
+| 46 | Yog-Sothoth | 18/9/17 | 5 | 8113 | 125 | 1715 | 376 | 10 | 0.91 | 0 |
 | 47 | Azathoth | 18/9/17 | 5 | 8911 | 90 | 10055 | 376 | 10 | 5.35 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die.
@@ -96,7 +96,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 6 | The Hound | 30/30/30 | 5 | 3214 | 23 | 529 | 431 | 5 | 0.41 | 0 |
 | 7 | Keziah Mason | 30/30/30 | 5 | 3546 | 25 | 665 | 431 | 5 | 0.51 | 0 |
 | 8 | The Unnamable | 30/30/30 | 5 | 4309 | 29 | 702 | 431 | 5 | 0.54 | 0 |
-| 9 | The Colour Out of Space | 30/30/30 | 5 | 5171 | 46 | 1604 | 431 | 6 | 1.09 | 0 |
+| 9 | The Colour Out of Space | 30/30/30 | 5 | 5171 | 43 | 850 | 431 | 6 | 0.58 | 0 |
 | 10 | The Black Man | 30/30/30 | 5 | 5661 | 53 | 698 | 431 | 6 | 0.48 | 0 |
 | 11 | The Haunter of the Dark | 30/30/30 | 5 | 2202 | 206 | 5668 | 431 | 6 | 3.87 | 0 |
 | 12 | Wilbur Whateley | 30/30/30 | 5 | 3166 | 24 | 560 | 431 | 7 | 0.34 | 0 |
@@ -133,7 +133,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 43 | The Ancient Ones | 30/30/30 | 5 | 6761 | 61 | 951 | 431 | 10 | 0.44 | 0 |
 | 44 | Nyarlathotep | 30/30/30 | 5 | 8597 | 102 | 2170 | 431 | 10 | 1.01 | 0 |
 | 45 | Shub-Niggurath | 30/30/30 | 5 | 9098 | 111 | 1701 | 431 | 10 | 0.79 | 0 |
-| 46 | Yog-Sothoth | 30/30/30 | 5 | 10183 | 140 | 4471 | 431 | 10 | 2.07 | 0 |
+| 46 | Yog-Sothoth | 30/30/30 | 5 | 10183 | 100 | 1471 | 431 | 10 | 0.68 | 0 |
 | 47 | Azathoth | 30/30/30 | 5 | 11185 | 90 | 11986 | 431 | 10 | 5.56 | 0 |
 
 ## The opening
@@ -152,5 +152,5 @@ given Echoes and star-stones. Each may cost at most 1.5 lives.
 | 6 | The Hound | 6/2/5 | 3 | 1591 | 28 | 390 | 232 | 5 | 0.56 | 0 |
 | 7 | Keziah Mason | 6/3/5 | 4 | 1768 | 26 | 379 | 232 | 5 | 0.54 | 0 |
 | 8 | The Unnamable | 6/3/6 | 4 | 2225 | 34 | 450 | 232 | 5 | 0.65 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 64 | 1263 | 244 | 6 | 1.52 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 2688 | 54 | 617 | 244 | 6 | 0.74 | 0 |
 | 10 | The Black Man | 7/3/7 | 5 | 3044 | 48 | 365 | 244 | 6 | 0.44 | 0 |

@@ -41,8 +41,8 @@ export const OUTER_GODS = tier('outer_god', [
       ph(1, { beam: 2, teleport: 1, aoe_ring: 1, barrage: 1, thunderfall: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect'], arena: 'spheres' }),
       ph(0.6, { beam: 2, projectile_fan: 1, teleport: 1, summon: 1, sweep_beam: 1, barrage: 1, crushing_blow: 1 }, { summons: ['dhole'], hooks: ['arena_reconnect', 'camera_warp'] }),
       ph(0.25, { beam: 3, starfall: 1, teleport: 1, sweep_beam: 2, vortex: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect', 'camera_warp', 'time_skip'] }),
-    ), { mobile: false, range: [0, 40] }),
-    stats: st(6100, 5000, 46, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 97: health 2700 to 6100, its highest in the tables) (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
+    ), { mobile: false, range: [0, 40], cooldown: [120, 180] }),
+    stats: st(6100, 5000, 30, 1, 10, 25), drops: { echoes: 40000 }, insightOnSight: 5, // (round 97: health 2700 to 6100, its highest in the tables) (round 25: damage was 120; the balance table had it at 7.6 lives) (round 60: health 6100 and damage 62, which cost the balance bot 2.56 lives where a person first meets it; then 4400 and 38, no blow over 15% of a person's health: a crushing blow on any who stand at its edge)
   },
   {
     id: 'umr_at_tawil', name: "'Umr at-Tawil", source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,

@@ -55,7 +55,7 @@ const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_
 const BANDS = { named: { seconds: [14, 50], lives: [0.2, 1.2] }, god: { seconds: [35, 100], lives: [0.45, 1.5] } } as const;
 /**
  * Round 97, the horrors reverted to the highest health each had in the tables (asked): these fights run past their tier's band, and each is
- * widened by name to the ceiling it now takes, with the band's floors kept. A god's Reagent rule is not widened beyond Yog-Sothoth's 2.5 lives.
+ * widened by name to the ceiling it now takes, with the band's floors and healing limits kept.
  */
 const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives?: readonly [number, number] }>> = {
   colossus_pyramids: { seconds: [14, 60] },
@@ -64,8 +64,8 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
   ghatanothoa: { seconds: [35, 125] },
   nyarlathotep: { seconds: [35, 110] },
   shub_niggurath: { seconds: [35, 130] },
-  yog_sothoth: { seconds: [35, 160], lives: [0.45, 2.5] },
-  colour_out_of_space: { seconds: [14, 70], lives: [0.2, 1.7] }, // (round 97, asked back to its pre-history 2400: the opening's 1.5 is widened to 1.7 for it alone)
+  yog_sothoth: { seconds: [35, 160] },
+  colour_out_of_space: { seconds: [14, 70] },
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**
@@ -183,6 +183,10 @@ describe('the balance table (round 25)', () => {
     expect(bad).toEqual([]);
   });
 
+  it('keeps Yog-Sothoth within the carried healing at its expected standing', () => {
+    expect(rows.find((r) => r.id === 'yog_sothoth')!.pressure).toBeLessThanOrEqual(1);
+  });
+
   it('makes its table', () => {
     mainTable = tableOf(rows);
     if (process.env.BALANCE_WRITE) writeFileSync('src/data/bossStanding.ts', standingFile(table));
@@ -202,6 +206,10 @@ describe('at the cap (round 68): every level bought, and the horrors still deman
 
   it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)));
 
+  it('keeps Yog-Sothoth within the carried healing at the level cap', () => {
+    expect(atCap.find((r) => r.id === 'yog_sothoth')!.pressure).toBeLessThanOrEqual(1);
+  });
+
   it('leaves no horror a fight that costs nothing', () => {
     const bad: string[] = [];
     for (const r of atCap.filter((x) => !EXEMPT.includes(x.id))) {
@@ -220,6 +228,10 @@ describe('the opening (round 47): the first hours, at what they give', () => {
   const table = standings(OPENING);
 
   it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void opening.push(fightAt(s)));
+
+  it('keeps the Colour within the carried healing in the opening', () => {
+    expect(opening.find((r) => r.id === 'colour_out_of_space')!.pressure).toBeLessThanOrEqual(1);
+  });
 
   it(`costs at most ${OPENING_LIVES} lives a horror, and writes both tables`, () => {
     const bad = opening.filter((r) => !EXEMPT.includes(r.id) && (!r.fell || r.pressure > (WIDER[r.id]?.lives?.[1] ?? OPENING_LIVES) || r.deaths > 0)).map((r) => `${r.id}: ${r.pressure.toFixed(2)} lives${r.fell ? '' : ', not finished'}`);
