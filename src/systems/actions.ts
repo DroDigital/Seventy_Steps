@@ -15,7 +15,7 @@ import { COMBAT } from '../data/tuning';
 import { isAbsent, type Actor, type Game } from './components';
 import { ageBuffer, takeBuffered, type ActionId } from './inputBuffer';
 import { gunAction } from './gun';
-import { canAfford, spend } from './stamina';
+import { canStart, spend } from './stamina';
 import { targetsOf } from './targets';
 
 export const inWindow = (w: Window | undefined, frame: number): boolean =>
@@ -131,8 +131,7 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
   const def = a.moves[move];
   if (!def) return;
   const cost = def.stamina ?? 0;
-  // A funded light attack can overdraw; a debt must recover before any action can start.
-  if (action === 'light' && cost > 0 ? !!st && st.value <= 0 : !canAfford(st, cost)) return;
+  if (!canStart(st, cost)) return; // a funded action may overdraw the bar; a debt must recover before the next starts
   if (def.rest !== undefined && (a.move === move || (a.move === null && a.last === move && a.idle < def.rest))) return; // not again until it has rested
   if (action === 'item') {
     if (g.player.laudanum <= 0) return;
@@ -146,7 +145,7 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
     if (g.player.oil <= 0) return;
     g.player.oil--; // and a flask of oil (round 12)
   }
-  if (st && cost) spend(st, cost, action === 'light');
+  if (st && cost) spend(st, cost, true);
   startMove(a, move);
   if (move === 'reload') g.events.emit('Reloading', { entity: id });
   g.player.blockRaised = false; // a blow struck from behind a raised guard plays out
@@ -169,7 +168,7 @@ export function actionSystem(g: Game): void {
   for (const [id, a] of actor) if (!isAbsent(g, id)) advance(a);
   const p = g.player;
   const a = actor.get(p.id)!;
-  const parrying = p.buffer.action === 'parry' && canAfford(g.ecs.c.stamina.get(p.id), a.moves.parry?.stamina ?? 0); // a parry that cannot start calls nothing off
+  const parrying = p.buffer.action === 'parry' && canStart(g.ecs.c.stamina.get(p.id), a.moves.parry?.stamina ?? 0); // a parry that cannot start calls nothing off
   if (!a.frozen && guardCancels(a) && (p.blockRaised || parrying)) callOff(a); // raising the guard cuts an attack short
   const release = moveDef(a)?.release;
   if (!a.frozen && release !== undefined && a.frame >= release && walking(g)) finish(a); // walked out of a dodge's recovery

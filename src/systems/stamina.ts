@@ -1,7 +1,8 @@
 /**
  * Stamina rules (spec §3B): regen waits after spending, and a blocked
- * hit that empties the bar breaks the guard. A light attack may spend beyond the bar; other
- * actions require their full cost before they start.
+ * hit that empties the bar breaks the guard. Every action that costs stamina may spend beyond
+ * the bar, but only while the bar is above empty: a debt must recover before the next one starts,
+ * so debts never stack.
  */
 
 import { STAMINA } from '../data/tuning';
@@ -11,6 +12,9 @@ export type StaminaMode = 'idle' | 'guard' | 'broken' | 'sprint';
 
 /** Entities without stamina (enemies) can always act. */
 export const canAfford = (s: Stamina | undefined, cost: number): boolean => !s || s.value >= cost;
+
+/** Whether an action may start: a costing one needs a bar above empty (it may overdraw it), a free one needs no debt. */
+export const canStart = (s: Stamina | undefined, cost: number): boolean => (cost > 0 ? !s || s.value > 0 : canAfford(s, 0));
 
 export function spend(s: Stamina, cost: number, allowDebt = false): void {
   // Other drains cannot erase a debt or send it further below zero.
