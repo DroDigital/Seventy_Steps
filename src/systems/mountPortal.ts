@@ -3,9 +3,11 @@
  * veil and the teleport beyond it used to set the rider down and zero the pace, so the far side was always begun from
  * a standstill. The mount, its gait and its pace now stay through the crossing. The veil's walk owns the body (the
  * stick is emptied while it does), and the step after is the journey's one empty step, so neither is read as the
- * reins being given up. For a moment after that the ride is kept: while the stick stays taken the pace cannot fall
- * below what it was at the veil, and when the moment ends a held stick leaves an ordinary ride at that pace. Letting
- * the stick go ends the ride. A blow, a rest, a fast travel and a gate that does not open still dismiss, as before.
+ * reins being given up. A gallop held on the way in is not read as let go either: the dodge counter only starts on a
+ * press, so those emptied steps would otherwise leave a sprint still held as a cruise once the moment ended. For a
+ * moment after that the ride is kept: while the stick stays taken the pace cannot fall below what it was at the veil,
+ * and when the moment ends a held stick leaves an ordinary ride at that pace, a held gallop included. Letting the
+ * stick go ends the ride. A blow, a rest, a fast travel and a gate that does not open still dismiss, as before.
  * Every appearance, not only the plain chariot: the three share one traversal, and a paid one is not a worse gate.
  * Pure: no Three.js.
  */
@@ -25,6 +27,7 @@ interface Carry {
   left: number; // hold frames still to come
   pin: boolean; // this step the pace is kept
   closing: boolean; // the hold has been read; the next step leaves it
+  quiet: boolean; // this step the stick is emptied: a gallop held on the way in is not a release
 }
 
 const rides = new WeakMap<Game, Carry>();
@@ -35,6 +38,9 @@ export const portalVeil = (g: Game): boolean => rides.get(g)?.mode === 'veil';
 /** True while a carried ride should keep the driver's camera (the boom the teleport would otherwise put on foot). */
 export const portalCamera = (g: Game): boolean => rides.has(g) && !!g.player.mount.active;
 
+/** This step the stick is not the rider's. A gallop already held stays held (`controlMount`). */
+export const portalQuiet = (g: Game): boolean => rides.get(g)?.quiet === true;
+
 /** Steps into a gate's veil. A rider is noted and kept; one on foot leaves nothing to carry. */
 export function notePortalRide(g: Game): void {
   const m = g.player.mount;
@@ -42,7 +48,7 @@ export function notePortalRide(g: Game): void {
     rides.delete(g);
     return;
   }
-  rides.set(g, { speed: m.speed, mode: 'veil', left: 0, pin: true, closing: false });
+  rides.set(g, { speed: m.speed, mode: 'veil', left: 0, pin: true, closing: false, quiet: true });
 }
 
 /** The gate did not open: nothing is owed on the far side. */
@@ -68,11 +74,13 @@ export function stepPortalRide(g: Game, input: InputFrame): boolean {
   }
   if (carry.mode === 'veil') {
     carry.pin = true;
+    carry.quiet = true;
     if (g.player.gatePass) return false;
     carry.mode = 'hold';
     carry.left = PORTAL_RIDE.hold;
     return false; // the journey's empty step, or the first step a test takes after the teleport: not yet the rider's hand
   }
+  carry.quiet = false;
   carry.pin = Math.hypot(input.moveX, input.moveY) > 0.1;
   if (--carry.left <= 0) carry.closing = true;
   return false;

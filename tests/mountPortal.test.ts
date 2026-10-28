@@ -3,6 +3,7 @@ import { emptyInput, type InputFrame } from '../src/core/input';
 import { CAMERA_MODES } from '../src/data/cameraModes';
 import { MOUNT_IDS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import { QUESTS } from '../src/data/quests';
+import { PLAYER } from '../src/data/tuning';
 import { gatePlace, travel } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { createWorldGame, stepGame } from '../src/systems/game';
@@ -20,9 +21,10 @@ function near(t: GatePlace, ahead: number, across: number): { x: number; z: numb
   return { x: t.x + Math.sin(yaw) * ahead + Math.cos(yaw) * across, z: t.z + Math.cos(yaw) * ahead - Math.sin(yaw) * across };
 }
 
-function held(move = true): InputFrame {
+function held(move = true, dodge = false): InputFrame {
   const input = emptyInput();
   if (move) input.moveY = 1;
+  if (dodge) input.held.dodge = true; // still down: no new press
   return input;
 }
 
@@ -139,5 +141,38 @@ describe('a chariot taken through a gate', () => {
     const at = { ...pos(h) };
     run(h, 30); // the abandoned walk does not pull them through the gate afterwards
     expect(pos(h)).toMatchObject({ x: at.x, z: at.z });
+  });
+
+  it('keeps a gallop that stayed held through the emptied crossing, once the moment ends', () => {
+    const g = createWorldGame();
+    const gate = gatePlace('hub_australia')!;
+    const speed = MOUNT_TRAVERSAL.gallop;
+    breach(g, gate, 'grey', speed);
+    g.player.dodgeHeld = PLAYER.dodgeTapFrames + 1; // held past a tap on the way in; the walk's emptied stick must not let it go
+    arrive(g);
+    expect(g.player.dodgeHeld).toBeGreaterThan(PLAYER.dodgeTapFrames);
+    stepGame(g, emptyInput()); // the journey's empty step
+    expect(g.player.dodgeHeld).toBeGreaterThan(PLAYER.dodgeTapFrames);
+    for (let i = 0; i < PORTAL_RIDE.hold + 1; i++) stepGame(g, held(true, true)); // the moment, then the step that leaves it
+    expect(g.player.mount.active).toBe('grey');
+    expect(g.player.sprinting).toBe(true);
+    for (let i = 0; i < 30; i++) stepGame(g, held(true, true)); // an ordinary ride: the floor is gone, the gallop is the button still held
+    expect(g.player.sprinting).toBe(true);
+    expect(g.player.mount.speed).toBeCloseTo(speed, 5);
+  });
+
+  it('lets that gallop go when the button is up once the hand is back', () => {
+    const g = createWorldGame();
+    const gate = gatePlace('hub_australia')!;
+    breach(g, gate, 'grey', MOUNT_TRAVERSAL.gallop);
+    g.player.dodgeHeld = PLAYER.dodgeTapFrames + 1;
+    arrive(g);
+    stepGame(g, emptyInput());
+    for (let i = 0; i < PORTAL_RIDE.hold + 1; i++) stepGame(g, held()); // the stick stays taken; the gallop button does not
+    expect(g.player.dodgeHeld).toBe(-1);
+    expect(g.player.sprinting).toBe(false);
+    for (let i = 0; i < 30; i++) stepGame(g, held());
+    expect(g.player.mount.active).toBe('grey');
+    expect(g.player.mount.speed).toBeCloseTo(MOUNT_TRAVERSAL.cruise, 5);
   });
 });
