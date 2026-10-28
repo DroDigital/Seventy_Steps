@@ -5,7 +5,8 @@
  * theirs, and comes through at its twin (checkpoints.ts `passGate`). The veil falls over the walk (ui/journeys.ts), and
  * the gate's light swells and takes them (render/portalViews.ts). E does nothing at a gate, and no prompt offers it (round 60,
  * asked: "remove the option and indicator for pressing E to move through portals, except boss fogs"): nearing one says where it
- * leads (`gateNear`, the HUD's line), and one riding who steps into it is set down and drawn on. A boss fight still holds every
+ * leads (`gateNear`, the HUD's line). One riding is kept in the saddle through it (`mountPortal.ts`): the pace they
+ * had is the pace they come out at, for a moment, and longer if the stick stays taken. A boss fight still holds every
  * gate shut, and the demo's edge still turns them back, each said as they step in. Pure: no Three.js.
  */
 
@@ -15,7 +16,7 @@ import { regionAt, yawOfDir } from '../world/worldMap';
 import { gateBarred, gateBeyondDemo, gatePlace, passGate } from './checkpoints';
 import type { Game } from './components';
 import { walkAlong } from './fogGates';
-import { dismissMount } from './mounts';
+import { clearPortalRide, notePortalRide } from './mountPortal';
 
 /** A gate's veil, and the walk into it. */
 export const GATE_WALK = {
@@ -50,7 +51,7 @@ const told = new WeakMap<Game, number>(); // when a shut gate was last said to b
 
 /** Sets the investigator walking on into `gate`'s veil, toward its middle. */
 export function enterGate(g: Game, gate: GatePlace): void {
-  dismissMount(g); // one riding is set down at the veil: there is no E to do it, and they come through on foot as ever
+  notePortalRide(g); // one riding is kept: the veil's walk has the body, and the pace comes through with them (mountPortal.ts)
   const me = g.ecs.c.transform.get(g.player.id)!.pos;
   const at = aboutGate(gate, me);
   const [side, yaw] = [Math.sign(at.ahead) || 1, yawOfDir(gate.face)];
@@ -111,6 +112,7 @@ export function gatePassSystem(g: Game): void {
   const [tr, m, a] = [c.transform.get(p.id)!, c.mover.get(p.id), c.actor.get(p.id)];
   if (!a || a.move === 'death' || (c.health.get(p.id)?.hp ?? 0) <= 0) {
     p.gatePass = null;
+    clearPortalRide(g); // a fall on the way through leaves no ride waiting
     return;
   }
   [tr.prev.x, tr.prev.y, tr.prev.z, tr.prevYaw] = [tr.pos.x, tr.pos.y, tr.pos.z, tr.yaw]; // the step is from here: the legs read the ground going by (movement.ts leaves it)
@@ -126,5 +128,5 @@ export function gatePassSystem(g: Game): void {
   tr.yaw = m?.face ?? tr.yaw;
   if (u < 1) return;
   p.gatePass = null;
-  passGate(g, pass.gate);
+  if (!passGate(g, pass.gate)) clearPortalRide(g); // a gate that does not open leaves no ride waiting on its far side
 }

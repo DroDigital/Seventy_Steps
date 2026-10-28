@@ -11,6 +11,7 @@ import { canAfford } from './stamina';
 import { isDone } from './quests';
 import { mountGroundAllowed, footprintClear } from './mountGround';
 import { createReins, type ReinState } from './mountReins';
+import { portalQuiet, portalVeil } from './mountPortal';
 import type { HorseToss } from './horseIdle';
 
 export { moveMounted } from './mountMotion';
@@ -112,9 +113,12 @@ export function toggleMount(g: Game): boolean {
 export function controlMount(g: Game, input: InputFrame): void {
   const p = g.player;
   const m = g.ecs.c.mover.get(p.id)!;
-  if (input.pressed.dodge) p.dodgeHeld = 0;
-  else if (p.dodgeHeld >= 0 && input.held.dodge) p.dodgeHeld++;
-  if (!input.held.dodge) p.dodgeHeld = -1;
+  // The veil and the journey's empty step empty the stick. That is not the gallop let go: the counter only starts on a press.
+  if (!portalQuiet(g)) {
+    if (input.pressed.dodge) p.dodgeHeld = 0;
+    else if (p.dodgeHeld >= 0 && input.held.dodge) p.dodgeHeld++;
+    if (!input.held.dodge) p.dodgeHeld = -1;
+  }
   const [s, c] = [Math.sin(g.camera.yaw), Math.cos(g.camera.yaw)];
   const [x, z] = [s * input.moveY - c * input.moveX, c * input.moveY + s * input.moveX];
   const len = Math.hypot(x, z);
@@ -132,7 +136,8 @@ export function mountSystem(g: Game): void {
   const p = g.player;
   if (!p.mount.active) return;
   const tr = g.ecs.c.transform.get(p.id)!;
-  if (!mountAvailable(g, p.mount.active) || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || p.gatePass || g.reality.stolen > 0 || (g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || !mountGroundAllowed(g, tr.pos)) dismissMount(g);
+  const crossing = !!p.gatePass && portalVeil(g); // the veil's walk has the body: the gate itself is not a reason to set them down
+  if (!mountAvailable(g, p.mount.active) || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || (p.gatePass && !crossing) || g.reality.stolen > 0 || (g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || (!crossing && !mountGroundAllowed(g, tr.pos))) dismissMount(g);
 }
 
 export function registerMounts(g: Game): void {
@@ -142,8 +147,9 @@ export function registerMounts(g: Game): void {
     g.player.mount.cooldownUntil = g.frame + MOUNT_TRAVERSAL.damageCooldown;
   });
   g.events.on('Died', ({ entity }) => { if (entity === g.player.id) dismissMount(g); });
-  g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id) dismissMount(g); });
-  for (const event of ['Rested', 'Travelled', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
+  g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id && !portalVeil(g)) dismissMount(g); });
+  g.events.on('Travelled', () => { if (!portalVeil(g)) dismissMount(g); }); // a gate keeps a ride that was taken through it (mountPortal.ts)
+  for (const event of ['Rested', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
   g.events.on('QuestChanged', ({ id, done }) => {
     if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: t('n.mountYours') });
   });
