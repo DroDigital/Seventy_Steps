@@ -12,7 +12,9 @@ import { EVADE } from './bossArena';
 import type { Place } from '../data/arena';
 import { REACTIONS, type MoveDef } from '../data/moves';
 import { REVIEWED_BODY } from '../data/reviewedLook';
+import { capFor, landScale } from '../data/regionPress';
 import { BOSS } from '../data/tuning';
+import { regionAt } from '../world/worldMap';
 import type { CombatantDef } from '../data/placeholders';
 import { getEntity, variantOf, type Variant } from '../data/registry';
 import type { AssemblyRecipe, AttackId, EntityDef, Silhouette } from '../data/schema';
@@ -130,13 +132,18 @@ export function resolveCreature(id: string, variant?: Variant): EntityDef | unde
   return def && variant ? variantOf(def, variant) : def;
 }
 
-export const dreadOf = (def: EntityDef): Dread => ({
+/** The land's press on this body: 1 for a boss, and for anything stood off the land or in no harder place than its home. */
+const landOf = (def: EntityDef, at: { x: number; z: number }): number =>
+  def.bossScript ? 1 : landScale(def.regions, regionAt(at.x, at.z)?.id, def.tier, capFor(def.id, def.tier));
+
+export const dreadOf = (def: EntityDef, land = 1): Dread => ({
   id: def.id,
   tier: def.tier,
   aura: def.stats.sanityAura,
   blow: def.stats.sanityDamage,
   insight: def.insightOnSight,
   glow: (def.sprite?.glow ?? def.assembly?.glow) !== undefined,
+  land,
 });
 
 /**
@@ -152,9 +159,11 @@ export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant)
   if (!def) return undefined;
   const cd = toCombatant(def, v);
   const foe = def.tier !== 'ally';
-  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: Math.round(cd.hp * foeHealth(g)), bounty: Math.round(cd.bounty * foeBounty(g)) }); // a later journey's (cycles.ts)
+  const land = landOf(def, at);
+  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: Math.round(cd.hp * foeHealth(g) * land), bounty: Math.round(cd.bounty * foeBounty(g)) }); // a later journey's (cycles.ts); the land presses health, not the Echoes
+  else if (foe && land !== 1) cd.hp = Math.round(cd.hp * land);
   const e = spawnCombatant(g, cd, at, foe ? 'enemy' : 'player');
-  g.ecs.c.dread.set(e, dreadOf(def));
+  g.ecs.c.dread.set(e, dreadOf(def, land));
   if (swaps) g.ecs.c.swap.set(e, { id, eldritch: v === 'eldritch' });
   if (def.hidden) addLayer(g, e, def.hidden);
   if (def.bossScript) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
@@ -176,7 +185,8 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, c.fight.get(e)?.id ?? id).health) : foeHealth(g)));
+  const land = landOf(def, c.transform.get(e)!.pos);
+  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, c.fight.get(e)?.id ?? id).health) : foeHealth(g) * land));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
   if (def.tier !== 'ally' && def.bossScript) h.baseMax = cd.hp;
   else delete h.baseMax;
@@ -189,5 +199,5 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   if (br && cd.brain) [br.def, br.speed] = [cd.brain, cd.speed];
   const m = c.mover.get(e);
   if (m && cd.brain) m.turnRate = cd.brain.params.turnRate;
-  if (c.dread.has(e)) c.dread.set(e, dreadOf(def));
+  if (c.dread.has(e)) c.dread.set(e, dreadOf(def, land));
 }

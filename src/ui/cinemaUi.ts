@@ -28,6 +28,8 @@ export interface CinemaUi {
   /** The screen goes to `tint` (or, for clear, lifts) over `seconds`; a `seconds` of 0 is at once. */
   fade(tint: Tint, seconds: number): void;
   caption(text: string, hold: number): void;
+  /** Pause or resume the current caption while an action holds the scene. */
+  holdCaption?(on: boolean): void;
   title(name: string, line: string | undefined, hold: number): void;
   /** Shows or hides the skip hint. */
   hint(on: boolean): void;
@@ -103,6 +105,9 @@ export function createCinemaUi(): CinemaUi {
       words.textContent = text;
       caption.replaceChildren(words);
       shown(caption, hold, 900);
+    },
+    holdCaption(on) {
+      caption.getAnimations().forEach((a) => (on ? a.pause() : a.play()));
     },
     title(words, under, hold) {
       name.textContent = words;

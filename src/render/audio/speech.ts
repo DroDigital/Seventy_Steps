@@ -24,7 +24,7 @@ export interface Speech {
   ahead(speaker: string, texts: readonly string[]): void;
   /** Stops whoever is speaking, quickly but not with a click. */
   stop(): void;
-  /** Holds the line where it is, or lets it go on from there. A line not yet sounding is left alone. */
+  /** Holds the line where it is, or lets it go on from there, including while it is loading. */
   hold(on: boolean): void;
   /** Someone is speaking. */
   readonly speaking: boolean;
@@ -60,6 +60,8 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
   const pending = new Map<string, Promise<AudioBuffer | null>>();
   let request = 0; // each request is distinct, even when two ask for the same recording before it loads
   let voice: Voice | null = null;
+  let holding = false;
+  let ready: { speaker: string; text: string; buf: AudioBuffer } | null = null;
 
   /** Reads which recordings exist, once. A missing or broken list means none: the game is silent, not broken. */
   const known = (): Promise<void> =>
@@ -94,6 +96,8 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
 
   const stop = (): void => {
     request++;
+    holding = false;
+    ready = null;
     const v = voice;
     const ctx = e.ctx;
     voice = null;
@@ -156,7 +160,11 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
       const wanted = request;
       void known().then(() => {
         if (request !== wanted || !index?.has(id)) return undefined;
-        return load(id).then((buf) => void (buf && request === wanted && play(speaker, text, buf)));
+        return load(id).then((buf) => {
+          if (!buf || request !== wanted) return;
+          if (holding) ready = { speaker, text, buf };
+          else play(speaker, text, buf);
+        });
       });
     },
     ahead(speaker, texts) {
@@ -164,6 +172,13 @@ export function createSpeech(e: AudioEngine, base = VOICE_BASE, began?: (speaker
     },
     stop,
     hold(on) {
+      holding = on;
+      if (!on && ready) {
+        const line = ready;
+        ready = null;
+        play(line.speaker, line.text, line.buf);
+        return;
+      }
       const ctx = e.ctx;
       const v = voice;
       if (!v || !ctx) return;

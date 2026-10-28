@@ -41,6 +41,8 @@ const PAD = PAD_BUTTON;
 /** Who the scene is about, besides the investigator: the horror. */
 export interface Cast {
   target?: Entity;
+  /** A scene's sign, when it is not the player's current checkpoint. */
+  sign?: string;
 }
 
 export interface Cinema {
@@ -108,7 +110,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   const anchorOf = (who: Subject, alpha: number): Anchor | null => {
     const c = g.ecs.c;
     if (who === 'sign') {
-      const s = g.overworld && signPlace(g.overworld.sign);
+      const s = g.overworld && signPlace(run?.cast.sign ?? g.overworld.sign);
       return s ? { x: s.x, y: s.y, z: s.z, yaw: yawOfDir(s.face), height: SIGN_HEIGHT } : null;
     }
     const e = who === 'player' ? g.player.id : run?.cast.target;
@@ -155,7 +157,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       o.rise?.(b.rise);
     }
     if (b.kneel) {
-      const s = g.overworld && signPlace(g.overworld.sign);
+      const s = g.overworld && signPlace(r.cast.sign ?? g.overworld.sign);
       if (s) g.player.kneeling = { x: s.x, z: s.z };
     }
     if (b.hand === 'close') closeHand();
@@ -217,6 +219,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     run.wait = null;
     ui.ask?.(null);
     audio.holdVoice?.(false);
+    ui.holdCaption?.(false);
     perform(run, b);
   };
 
@@ -237,7 +240,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       e.preventDefault();
       e.stopImmediatePropagation(); // the pause menu never hears this Esc
       if (e.repeat) return;
-      if (run.wait && e.code === keyLayout.interact && !SKIP_KEYS.has(e.code)) act();
+      if (run.wait && e.code === keyLayout.interact) act();
       else skip();
     },
     true,
@@ -282,6 +285,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
           r.wait = moved.act;
           ui.ask?.(moved.act.act ?? null);
           audio.holdVoice?.(true);
+          ui.holdCaption?.(true);
         }
       }
       if (!r.hinted && r.t > HINT_AT && r.skipAt === null) {
