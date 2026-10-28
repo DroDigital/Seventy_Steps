@@ -4,6 +4,7 @@
  */
 
 import * as THREE from 'three';
+import type { Figure } from './figures';
 import { box, tint } from './meshKit';
 import type { Rgb } from './palette';
 import { createTubeGeometry } from './tentacleMesh';
@@ -17,7 +18,10 @@ const EYE: Rgb = [0.93, 0.78, 0.72];
 const PIT: Rgb = [0.05, 0.01, 0.03];
 const TOOTH: Rgb = [0.75, 0.68, 0.58];
 
-/** Where a limb erupts, which way it grows, and how long and thick it is. */
+/** Which joint a limb is grown from, in the same order as `LIMBS`: it stays on the coat when he flinches. */
+const JOINT = ['torso', 'torso', 'torso', 'torso', 'armR', 'armL', 'armR', 'armL', 'body', 'body', 'body', 'head', 'head', 'head'] as const;
+
+/** Where a limb erupts, in the figure's space, which way it grows, and how long and thick it is. */
 const LIMBS: readonly (readonly [number, number, number, number, number, number, number, number, number, number])[] = [
   [0, 1.32, -0.12, -0.35, 0.85, 0.55, 1.75, 0.055, 1.2, 1.3],
   [0.04, 1.26, -0.14, 0.42, 0.78, 0.55, 1.55, 0.048, 2.4, 1.1],
@@ -62,37 +66,44 @@ const ease = (x: number): number => {
   return t * t * (3 - 2 * t);
 };
 
-/** Tentacles, spare eyes and a mouth, parented to the figure. `grown` is 0 shut in the coat, 1 out. */
-export function attachGrowth(root: THREE.Group): Growth {
+/** Tentacles, spare eyes and a mouth, hung on the joints they break out of. `grown` is 0 shut in the coat, 1 out. */
+export function attachGrowth(f: Figure): Growth {
   const flesh = createWorldMaterial({ texture: 'flesh', uvScale: [1.2, 2.2], vertexColors: true, vary: 0.4, seed: 4, character: 'creature' });
   const eyeMat = createWorldMaterial({ texture: 'cloth', vertexColors: true, emissive: 0.75, character: 'creature' });
   const mawMat = createWorldMaterial({ texture: 'flesh', vertexColors: true, vary: 0.15, seed: 11, character: 'creature' });
   const up = new THREE.Vector3(0, 1, 0);
   const dir = new THREE.Vector3();
-  const limbs: Limb[] = LIMBS.map((spec) => {
+  const at = new THREE.Vector3();
+  const inv = new THREE.Matrix4();
+  f.root.updateMatrixWorld(true);
+  const pin = (joint: THREE.Object3D, x: number, y: number, z: number): THREE.Vector3 => at.set(x, y, z).applyMatrix4(inv.copy(joint.matrixWorld).invert());
+  const limbs: Limb[] = LIMBS.map((spec, i) => {
     const [x, y, z, dx, dy, dz, length, thick, seed, rate] = spec;
+    const joint = f[JOINT[i]];
     const anchor = new THREE.Group();
-    anchor.position.set(x, y, z);
+    anchor.position.copy(pin(joint, x, y, z));
     anchor.quaternion.setFromUnitVectors(up, dir.set(dx, dy, dz).normalize());
     const mesh = new THREE.Mesh(createTubeGeometry(STEPS, SIDES), flesh);
     mesh.frustumCulled = false;
     anchor.add(mesh);
-    root.add(anchor);
+    joint.add(anchor);
     return { mesh, length, thick, seed, rate };
   });
+  const eyeJoint = ['head', 'head', 'torso', 'torso', 'torso', 'torso', 'torso'] as const;
   const eyes = EYES.map(([x, y, z, size], i) => {
+    const joint = f[eyeJoint[i]];
     const g = new THREE.Group();
-    g.position.set(x, y, z);
+    g.position.copy(pin(joint, x, y, z));
     g.userData.blink = i * 0.37;
     const white = new THREE.Mesh(tint(new THREE.IcosahedronGeometry(size, 0), EYE), eyeMat);
     const pupil = new THREE.Mesh(tint(new THREE.IcosahedronGeometry(size * 0.42, 0), PIT), eyeMat);
     pupil.position.z = size * 0.7;
     g.add(white, pupil);
-    root.add(g);
+    joint.add(g);
     return g;
   });
   const maw = new THREE.Group();
-  maw.position.set(0.01, 1.16, 0.155);
+  maw.position.copy(pin(f.torso, 0.01, 1.16, 0.155));
   maw.add(new THREE.Mesh(tint(new THREE.SphereGeometry(0.05, 7, 5).scale(1.35, 0.5, 0.4), PIT), mawMat));
   const upper = new THREE.Group();
   const lower = new THREE.Group();
@@ -102,7 +113,7 @@ export function attachGrowth(root: THREE.Group): Growth {
     lower.add(new THREE.Mesh(box(0.01, 0.022, 0.01, x + 0.006, -0.016, 0.01, TOOTH), mawMat));
   }
   maw.add(upper, lower);
-  root.add(maw);
+  f.torso.add(maw);
 
   const pose = (limb: Limb, time: number, out: number): void => {
     const pos = limb.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;

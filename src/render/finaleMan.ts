@@ -5,6 +5,7 @@
  */
 
 import * as THREE from 'three';
+import { dread } from './finaleDread';
 import { attachGrowth, type Growth } from './finaleGrowth';
 import { investigator } from './investigator';
 import { rotateHue } from './palette';
@@ -34,6 +35,12 @@ export function tallMan(): TallMan {
     const mesh = o as THREE.Mesh;
     if (mesh.isMesh) hue(mesh);
   });
-  const growth = attachGrowth(f.root);
-  return { root: f.root, writhe: (time, grown) => growth.writhe(time, grown) };
+  const growth = attachGrowth(f);
+  return {
+    root: f.root,
+    writhe: (time, grown) => {
+      dread(f, time, grown);
+      growth.writhe(time, grown);
+    },
+  };
 }
