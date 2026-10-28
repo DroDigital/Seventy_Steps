@@ -18,6 +18,7 @@ import { actPose } from './npcActs';
 import { showProps } from './npcProps';
 import { swing } from './swings';
 import { poseEcho } from './echoPose';
+import { poseGroundPickup } from './groundPickups';
 
 export interface PoseInput {
   move: string | null;
@@ -342,7 +343,10 @@ function thrash(f: Figure, t: number, held: number): void {
 
 export function pose(f: Figure, p: PoseInput): void {
   rest(f);
-  if (f.rig === 'prop') return;
+  if (f.rig === 'prop') {
+    poseGroundPickup(f, p.time);
+    return;
+  }
   if (f.rig === 'echo') {
     poseEcho(f, p.time);
     return;

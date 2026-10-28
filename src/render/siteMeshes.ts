@@ -55,9 +55,16 @@ const material = (group: Group): THREE.ShaderMaterial => {
 /** The group of each kind in this kit. */
 const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall : k === 'floor' ? kit.floor : k === 'trim' ? `${kit.wall}+` : k === 'beam' ? 'wood+' : k === 'cloth' ? 'cloth+' : k);
 
-/** Hangs a torch at each of `stops` along a wall (wallTorches.ts). */
-function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], w: Parameters<typeof hangTorches>[1], ctx: WallContext): void {
+const TORCH_SEPARATION = 12; // keep distinct pools of firelight, even across adjacent wall sections
+
+/** Hangs torches at clear, well-spaced stops along a wall (wallTorches.ts). */
+function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], w: Parameters<typeof hangTorches>[1], ctx: WallContext, placed: LightSpot[]): void {
   for (const s of hangTorches(stops, w, ctx)) {
+    if (placed.some((l) => Math.hypot(l.x - s.light.x, l.y - s.light.y, l.z - s.light.z) < TORCH_SEPARATION)) {
+      s.iron.dispose();
+      continue;
+    }
+    placed.push(s.light);
     stone.push(s.iron);
     glow.push({ kind: 'glow', light: s.light });
   }
@@ -68,7 +75,7 @@ function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], 
  * skirting, a beam and posts of dark wood (timber), or none; on some of them an iron sconce with its
  * flame (the kit's share); and rubble at its foot.
  */
-function wallDetail(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext): Built[] {
+function wallDetail(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext, placed: LightSpot[]): Built[] {
   const [w, h, d] = [max.x - min.x, max.y - min.y, max.z - min.z];
   if (h < 2 || Math.max(w, d) < 2) return [];
   const alongX = w >= d;
@@ -92,7 +99,7 @@ function wallDetail(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: 
     const t = -len / 2 + (k * len) / n;
     trim.push(trimSlab(kit.trim === 'timber' ? 0.3 : 0.5, thick + 0.3, h - 0.3, min.y + (h - 0.3) / 2, t, 0.92));
   }
-  torches(glow, stone, torchStops(len, kit.flames), { along, thick, alongX, base: min.y + 0.3, len }, ctx);
+  torches(glow, stone, torchStops(len, kit.flames), { along, thick, alongX, base: min.y + 0.3, len }, ctx, placed);
   for (let k = 0; k < Math.floor(len / 3); k++) { // rubble fallen from it
     const r = 0.12 + ((seed * (k + 3)) % 7) * 0.03;
     const t = -len / 2 + ((seed * (k + 1) * 37) % 100) / 100 * len;
@@ -166,7 +173,7 @@ export function well(x: number, z: number, radius: number, top: number, c: Rgb, 
  * A ruin's wall (round 13: the roofless dungeons stood whole to the brim): in lengths of two to four
  * metres, each broken off at its own height, the lowest a little over a man's head.
  */
-function ruin(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext): Built[] {
+function ruin(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext, placed: LightSpot[]): Built[] {
   const [w, h, d] = [max.x - min.x, max.y - min.y, max.z - min.z];
   const alongX = w >= d;
   const len = alongX ? w : d;
@@ -181,10 +188,10 @@ function ruin(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCo
     pieces.push(worldUv(box(alongX ? l : w, hh, alongX ? d : l, cx, min.y + hh / 2, cz, c, 1), at));
     t += l;
   }
-  return [{ kind: 'wall', geo: mergeGeometries(pieces) }, ...wallDetail(min, { ...max, y: min.y + Math.min(h, 3.4) }, c, { ...kit, trim: 'none' }, at, ctx)];
+  return [{ kind: 'wall', geo: mergeGeometries(pieces) }, ...wallDetail(min, { ...max, y: min.y + Math.min(h, 3.4) }, c, { ...kit, trim: 'none' }, at, ctx, placed)];
 }
 
-function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext): Built[] {
+function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext, placed: LightSpot[]): Built[] {
   if (p.look === 'inlay') return [floorInlay(p, c, kit, at)];
   if (p.shape === 'cyl') {
     if (p.look === 'rim') return well(p.x, p.z, p.radius, p.y1, c, p.y0).map((geo) => ({ kind: 'wall', geo }));
@@ -209,8 +216,8 @@ function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCon
     case 'ceiling':
       return [{ kind: kit.roof === 'beams' ? 'wood' : 'wall', geo: worldUv(box(w, h, d, x, y, z, scaleRgb(c, 0.6), 2), at, kit.roof === 'beams' ? 4 : 2) }];
     case 'wall':
-      if (kit.roof === 'open' && h > 3) return ruin(p.min, p.max, c, kit, at, ctx);
-      return [{ kind: 'wall', geo: worldUv(box(w, h, d, x, y, z, c, 1), at) }, ...wallDetail(p.min, p.max, c, kit, at, ctx)];
+      if (kit.roof === 'open' && h > 3) return ruin(p.min, p.max, c, kit, at, ctx, placed);
+      return [{ kind: 'wall', geo: worldUv(box(w, h, d, x, y, z, c, 1), at) }, ...wallDetail(p.min, p.max, c, kit, at, ctx, placed)];
     default:
       return [{ kind: 'wall', geo: worldUv(box(w, h, d, x, y, z, c, 1), at) }];
   }
@@ -231,11 +238,12 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
   const at: Origin = { x: Math.round(d.layout.origin.x / 2) * 2, z: Math.round(d.layout.origin.z / 2) * 2 }; // on the texture's grid, so the bricks keep their places
   const seen = drawn(d.layout, d.parts); // walls cut back where two kits meet (round 21: world/wallJoins.ts)
   const solids = d.parts.filter((q) => q.solid && q.look !== 'ceiling'); // what a torch must not hang inside
+  const placed: LightSpot[] = []; // shared across wall sections, not the decorative fires in rooms
   for (let k = 0; k < seen.length; k++) {
     const { part, index } = seen[k];
     const kit = kitOfRoom(d.layout, d.layout.rooms[part.room]); // each room its own kit (round 13)
     const ctx = wallContext(d.layout, part, solids);
-    for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx)) {
+    for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx, placed)) {
       if (geo) {
         geo.userData.part = index; // which of the dungeon's parts it is (the depth audit names its finds by it)
         add(textureOf(kind, kit), geo);

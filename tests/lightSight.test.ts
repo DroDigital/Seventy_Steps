@@ -160,6 +160,6 @@ describe('what a street sees of a dungeon (the torches that glowed through the l
     const { lights, rect, shut } = dungeon('library');
     const room = worldLayout().dungeons.find((x) => x.layout.def.id === 'library')!.layout.rooms[0];
     stand(shut, lights, room.x, ground(room.x, room.z) + 1.7, room.z);
-    expect(lampsLit(rect)).toBeGreaterThan(1);
+    expect(lampsLit(rect)).toBeGreaterThan(0); // a sparser room still has a visible light
   }, 30000);
 });

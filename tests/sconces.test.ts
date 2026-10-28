@@ -49,12 +49,15 @@ describe('the torches of the dungeons (round 30)', () => {
       for (const _ of dungeonPieces(d, lights)) void _;
       const mine = lights.filter((x) => x.kind === 'torch');
       torches += mine.length;
-      for (const l of mine) {
+      for (const [index, l] of mine.entries()) {
+        for (const other of mine.slice(0, index)) expect(Math.hypot(l.x - other.x, l.y - other.y, l.z - other.z), `${d.layout.def.id}: torch spacing`).toBeGreaterThanOrEqual(12 - 1e-9);
         const inside = d.parts.filter((q) => q.shape === 'box' && q.solid && q.look !== 'ceiling' && l.x > q.min.x && l.x < q.max.x && l.z > q.min.z && l.z < q.max.z && l.y > q.min.y && l.y < q.max.y);
         expect(inside.length, `${d.layout.def.id}: a torch at ${l.x.toFixed(1)}, ${l.y.toFixed(1)}, ${l.z.toFixed(1)}`).toBe(0);
       }
-      if (kitOf(d.layout.def.id).flames >= 0.2 && kitOf(d.layout.def.id).shell !== 'none') expect(mine.length, `${d.layout.def.id} keeps its torches`).toBeGreaterThanOrEqual(12);
+      if (d.layout.def.id === 'slumber') expect(mine.length).toBeLessThan(25); // the Seventy Steps no longer form a continuous row of light
+      if (kitOf(d.layout.def.id).flames >= 0.2 && kitOf(d.layout.def.id).shell !== 'none') expect(mine.length, `${d.layout.def.id} keeps its torches`).toBeGreaterThanOrEqual(8);
     }
-    expect(torches).toBeGreaterThan(900); // the ones that were buried moved along the wall or to its other face where there was room
+    expect(torches).toBeGreaterThan(100); // dungeons still have pools of firelight
+    expect(torches).toBeLessThan(600); // fewer overlapping sconces and more darkness between them
   }, 30000);
 });
