@@ -12,7 +12,7 @@ export const NAMED = tier('named', [
     id: 'colour_out_of_space', name: 'The Colour Out of Space', source: 'The Colour Out of Space', regions: ['arkham'], canonLooks: false,
     sprite: { silhouette: 'orb', palette: 'pallid', scale: 5, eyes: 0, glow: 'magenta', outside: true },
     ...scripted('boss', phases(ph(1, { beam: 2, pool: 2, aoe_ring: 1, toxic_cloud: 1 }, { hooks: ['camera_warp'] }), ph(0.5, { beam: 2, pool: 1, aoe_ring: 2, projectile_fan: 2, teleport: 1, sweep_beam: 2, toxic_cloud: 1 }, { hooks: ['camera_warp'] }))),
-    stats: st(1150, 400, 40, 3, 4, 10), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 3000 }, insightOnSight: 2,
+    stats: st(2400, 400, 40, 3, 4, 10), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 3000 }, insightOnSight: 2, // (round 97, asked back: health 1150 to 2400, its pre-history value; round 12 had it at 2400 before the 0.9 × hp^0.9 compression to 1000)
   },
   {
     id: 'wilbur_whateley', name: 'Wilbur Whateley', source: 'The Dunwich Horror', regions: ['dunwich'], canonLooks: true,
@@ -30,7 +30,7 @@ export const NAMED = tier('named', [
     id: 'keziah_mason', name: 'Keziah Mason', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2, eyes: 2, gear: ['witch'] },
     ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }),
-    stats: st(1100, 120, 38, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1,
+    stats: st(1600, 120, 38, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700)
   },
   {
     id: 'brown_jenkin', name: 'Brown Jenkin', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
