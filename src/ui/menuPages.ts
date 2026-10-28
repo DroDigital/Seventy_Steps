@@ -6,7 +6,7 @@
  */
 
 import { ACTIONS, DEFAULT_KEYS, keyLayout, keyName, rebind, type Action } from '../core/bindings';
-import { padReport } from '../core/pads';
+import { calibratePadTriggers, padReport } from '../core/pads';
 import { t } from '../core/i18n';
 import { cameraModeOf } from '../data/cameraModes';
 import { LANGS, type Key } from '../data/lang';
@@ -73,6 +73,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
   let open = at;
   let waiting: Action | null = null;
   let refused = false; // the last key pressed was one that cannot be taken
+  let triggerCalibration: boolean | null = null;
   const page: Page = {
     back: () => {
       if (waiting) return void ((waiting = null), page.redraw?.()); // Esc while a key is awaited cancels the wait; the next goes back
@@ -90,7 +91,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
     build(panel) {
       title(panel, t('set.title'));
       tabs(panel, [...TABS.map(([n]) => t(n)), t('set.tab.controls')], open, (i) => ((open = i), (waiting = null), (refused = false), page.redraw?.()), page);
-      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0));
+      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0), triggerCalibration, () => (triggerCalibration = calibratePadTriggers()));
       const body = el(panel, 'div', '', 'min-height:226px');
       if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
       for (const id of TABS[open][1]) {
@@ -122,7 +123,7 @@ export const fixedControls = (): readonly (readonly [string, string, string])[] 
 ];
 
 /** The controls tab: the actions with their keys (choose one, then press its new key) beside the pad's, and what is fixed. */
-function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void): void {
+function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void, calibration: boolean | null, calibrate: () => void): void {
   const grid = el(panel, 'div', '', 'display:grid;grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr) auto auto;gap:0 10px;align-items:center;margin:0 -16px;padding:0 10px'); // (the labels give way: a longer word wraps rather than pushing the pad's columns out of the panel)
   for (const cell of ['', t('ctl.key'), t('ctl.pad'), '', t('ctl.key'), t('ctl.pad')]) el(grid, 'div', cell, 'opacity:.5;letter-spacing:3px;font-size:10px;padding-bottom:2px');
   const half = Math.ceil(ACTIONS.length / 2);
@@ -140,6 +141,10 @@ function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | nul
   button(row, t('ctl.reset'), () => (Object.assign(keyLayout, DEFAULT_KEYS), save(), page.redraw?.())).classList.add('tag');
   button(row, t('ctl.swap', { state: t(swapped ? 'val.onLc' : 'val.offLc') }), () => (swap(!swapped), page.redraw?.()), true, t('ctl.swapHint')).classList.add('tag');
   el(row, 'div', t('ctl.padReport', { report: padReport() || t('ctl.padNone') }), 'opacity:.55;font-size:11px');
+  const triggers = el(panel, 'div', '', 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0 14px;margin-top:8px');
+  button(triggers, t('ctl.calibrateTriggers'), () => (calibrate(), page.redraw?.())).classList.add('tag');
+  el(triggers, 'div', t('ctl.calibrateTriggersHint'), 'opacity:.7;font-size:11px;line-height:1.4');
+  if (calibration !== null) el(panel, 'div', t(calibration ? 'ctl.calibrateTriggersDone' : 'ctl.calibrateTriggersNone'), 'opacity:.7;font-size:11px;line-height:1.4;padding:2px 14px 0');
   const on = waiting();
   footer(panel, refused() ? t('ctl.refused') : on ? t('ctl.waiting', { action: KEYED(on) }) : t('ctl.choose'), page.back);
 }
