@@ -9,7 +9,7 @@
 
 import { FOG_GLSL } from './fog';
 import { LIGHTING_GLSL } from './lighting';
-import { PLATE_GLSL } from './plate';
+import { PORTRAY_GLSL } from './portray';
 
 export const POST_VERT = /* glsl */ `
 void main() {
@@ -47,7 +47,6 @@ uniform vec2 uChar; // a character (alpha 0.75: render/shaders/world.ts and spri
 uniform float uQuantize;
 uniform float uDither;
 uniform float uGamma; // 1 / the brightness setting: below 1 lifts the dark
-uniform float uPlate; // a last plate over the picture, off until one is chosen (?plate=, shaders/plate.ts)
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
 ${LIGHTING_GLSL}
@@ -184,7 +183,7 @@ vec3 posterize(vec3 c, vec2 cell) {
   return pow(floor(s * n + 0.5) / n, vec3(2.0));
 }
 
-${PLATE_GLSL}
+${PORTRAY_GLSL}
 
 void main() {
   vec2 cell = floor(gl_FragCoord.xy);
@@ -223,7 +222,7 @@ void main() {
 
   vec4 centre = texture(tScene, uv);
   if (centre.a < 0.5) {
-    gl_FragColor = vec4(plateOf(pow(plunge(centre.rgb, uv), vec3(uGamma)), uv, cell), 1.0); // outside the palette: no grade, no quantising
+    gl_FragColor = vec4(pow(plunge(centre.rgb, uv), vec3(uGamma)), 1.0); // outside the palette: no grade, no quantising
     return;
   }
   bool person = centre.a < 0.9; // marked 0.75; the Colour's own mark (0.31) was dealt with above
@@ -253,9 +252,9 @@ void main() {
   }
   vec4 fog = fogAlong(uv, bayer4(cell) + 0.5); // the mist between the lens and the scene (round 16)
   float crease = mix(contactAo(uv, bayer4(cell) + 0.5), 1.0, person ? 0.6 : 0.0); // the corners of the world take less light (round 39); a person only a little less
-  vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
+  vec3 lit = portray(vec3(a.r, b.g, e.b) * crease + bloomAt(uv), uv, person ? 1.0 : 0.0); // the paint's relief, lit by the lights already placed, before the mist and the palette (shaders/portray.ts)
   vec3 col = pow(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
-  gl_FragColor = vec4(plateOf(col, uv, cell), 1.0);
+  gl_FragColor = vec4(col, 1.0);
 }
 `;

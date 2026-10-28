@@ -115,6 +115,7 @@ export const LIGHTING = {
   sky: 1.05, // the ambient on a surface facing straight up (the sky's), against... (round 54: 1.3 and 0.55, which left shade too bright against what the light reaches)
   ground: 0.38, // ...one facing straight down (what the dark ground gives back)
   sheen: { stone: 0.35, power: 30 }, // stone catches a restrained glint; rain adds its own wet sheen
+  portray: { form: 1, bounce: 0.85, glint: 0.22, reach: 5 }, // paint relief, how hard the lantern and the lamps catch it, the glint, pixels of broad light taken out of the relief (render/shaders/portray.ts)
   flicker: { lantern: 0.045, speed: 7 }, // how much the lantern's light breathes, and how fast
 };
 

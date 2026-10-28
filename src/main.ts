@@ -13,7 +13,7 @@ import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
-import { plateFrom } from './data/plates';
+import { portrayOn } from './render/portray';
 import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
@@ -131,7 +131,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   let pipeline: ReturnType<typeof createPipeline>;
   try {
     pipeline = createPipeline(document.body);
-    pipeline.post.uniforms.uPlate.value = plateFrom(new URLSearchParams(location.search).get('plate'));
+    pipeline.post.uniforms.uPortray.value.multiplyScalar(portrayOn(new URLSearchParams(location.search).get('portray')));
   } catch (e) {
     return showCrash('webgl', e instanceof Error ? e.message : String(e)); // no WebGL 2: say so, rather than black
   }
