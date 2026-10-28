@@ -45,6 +45,12 @@ interface Seen {
   raw: number[]; // the axes as last read, and the buttons then down: what a recalibration takes as the pad's rest
   down: number[];
   still: { at: number; v: number }[]; // for each axis, where it has lain and since when (a stick that has drifted lies quite still, a thumb does not)
+  trig: Trig[]; // the two triggers' rest, learned apart from a stick's (macOS, below)
+}
+/** Where a trigger rests. A macOS one may rest below zero, or fall when pulled (see mendTrigger). */
+interface Trig {
+  rest: number;
+  seen: boolean;
 }
 const seen = new Map<string, Seen>();
 const PUSH = 0.5; // how far off its rest an axis must be to count as used
@@ -82,11 +88,41 @@ export const padFacts = (): string => [blocked ? `the browser refused: ${blocked
 
 const downOf = (p: PadLike): number[] => p.buttons.flatMap((b, i) => (b.pressed || b.value > 0.5 ? [i] : []));
 
+/**
+ * A trigger as a pull of 0..1. An ordinary one already says so (`pressed`, or a value past a half).
+ * macOS does not. SDL recenters a trigger on the joystick axis's initial state, so the left one may
+ * rest near −0.5 and only reach 0 when pulled, or rest at 0 and fall below it, and `.pressed`
+ * (value > 0.6) never trips. Safari leaves the button at 0 and puts that trigger on axis 4, at −1
+ * until it is pulled toward 1. A pull is the reading leaving the rest it was first seen at.
+ */
+function mendTrigger(t: Trig, b: { pressed: boolean; value: number }, axis: number | undefined, axisRest: number): { pressed: boolean; value: number } {
+  const value = Number.isFinite(b.value) ? b.value : 0;
+  const axisN = axis !== undefined && Number.isFinite(axis) ? axis : undefined;
+  const fromAxis = axisN !== undefined && axisRest < -0.4 ? Math.max(0, (axisN - axisRest) / (1 - axisRest)) : 0;
+  if (fromAxis >= 0.12) return { pressed: true, value: Math.min(1, fromAxis) };
+  const pulled = (travel: number): { pressed: boolean; value: number } => {
+    const down = travel > 0.18;
+    return { pressed: down, value: down ? Math.min(1, travel / Math.max(0.45, travel)) : 0 };
+  };
+  if (!t.seen) {
+    const ordinary = b.pressed || value > 0.5;
+    t.seen = true;
+    t.rest = ordinary ? 0 : value;
+    return ordinary ? { pressed: true, value: value > 0 ? value : 1 } : { pressed: false, value: 0 };
+  }
+  if (t.rest < -0.12) {
+    if (value < t.rest) t.rest = value;
+    return pulled(value - t.rest);
+  }
+  if (value < -0.12) return pulled(t.rest - value);
+  return b.pressed || value > 0.5 ? { pressed: true, value: value > 0 ? value : 1 } : { pressed: false, value: 0 };
+}
+
 function read(p: PadLike, from: Source, now = performance.now()): { reading: PadReading; used: number } {
   const key = `${from}:${p.index}:${p.id}`;
   let s = seen.get(key);
   if (!s) {
-    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })) };
+    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })), trig: [{ rest: 0, seen: false }, { rest: 0, seen: false }] };
     seen.set(key, s);
   }
   [s.raw, s.down] = [[...p.axes], downOf(p)];
@@ -100,12 +136,14 @@ function read(p: PadLike, from: Source, now = performance.now()): { reading: Pad
     return Math.abs(r) > 0.3 ? (Math.abs(d) > 0.2 ? d : 0) : Math.abs(r) > 0.02 ? d : v; // an axis that lay off centre is read from where it lay
   });
   const buttons = p.buttons.map((b, i) => {
-    const down = b.pressed || b.value > 0.5;
+    const trig = i === 6 ? s.trig[0] : i === 7 ? s.trig[1] : undefined;
+    const src = trig ? mendTrigger(trig, b, p.axes[i === 6 ? 4 : 5], s.rest[i === 6 ? 4 : 5] ?? 0) : b;
+    const down = src.pressed || src.value > 0.5;
     if (s.stuck.has(i)) {
       if (!down) s.stuck.delete(i);
       return { pressed: false, value: 0 };
     }
-    return { pressed: b.pressed, value: b.value };
+    return { pressed: src.pressed, value: src.value };
   });
   const used = buttons.some((b) => b.pressed || b.value > 0.5) || p.axes.some((v, i) => Math.abs(v - (s.rest[i] ?? 0)) > PUSH) ? p.timestamp : 0;
   if (used) s.armedAt = Math.max(s.armedAt, used);

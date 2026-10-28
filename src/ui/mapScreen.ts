@@ -4,11 +4,11 @@
  * ground seen, the places marked there (mapMarks.ts, mapIcons.ts), region names, the Elder Signs lit — with
  * how much of the realm is charted, opening on what has been seen (mapFit.ts), a key of its figures and a hover
  * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
- * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets a marker the
+ * WASD pan, and the left stick pans while no sign is locked (by the clock, so a 120 Hz Mac does not race); C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets a marker the
  * minimap points to, or removes the one it is on, Delete clears them all (systems/marker.ts; round 68: up to twelve); L (the pad's X) opens or shuts the key. A lit Elder Sign clicked, or picked
- * with Tab (the pad's shoulders) or the pad's d-pad (the sign that way from the middle), or by resting the pad's
+ * with Tab (the pad's shoulders) or the pad's d-pad (the sign that way from the middle), or by R3 locking the nearest and the stick then flicking to the next, or by resting the pad's
  * mark on it, is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
- * mapTravel.ts). M or Esc (pad B) closes it.
+ * mapTravel.ts). M or Esc (pad B) closes it. R3 again lets the stick pan.
  */
 
 import { PAD_BUTTON } from '../core/padMap';
@@ -31,7 +31,7 @@ import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip, keyOpenPref,
 import { chartedRect, fitScale, openingView } from './mapFit';
 import { markAt, type Mark } from './mapMarks';
 import { UNIT, type MapPainter } from './mapPainter';
-import { BAR_WORDS, drawRing, litSigns, padTravel, signAt, signToward } from './mapTravel';
+import { BAR_WORDS, drawRing, litSigns, padTravel, signAt, steerPad, triggerHeld } from './mapTravel';
 import { worldX, worldZ, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
@@ -69,6 +69,9 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   let shown: readonly Mark[] = []; // the marks on show, as last painted
   const held = new Set<string>();
   const padWas = new Set<number>();
+  let locked = false; // R3: the stick flicks from sign to sign, and the chart stays on the one it holds
+  let armed = true; // the stick has come back from a flick, so the next push may switch
+  let padAt = 0; // when the pad was last read, so a zoom and a pan take the time and not the frame rate
   let lit: MapPlace[] = []; // the realm's lit signs, nearest first (the world stands still while the map is open)
   let chosen: MapPlace | null = null;
   /** Why no journey may be made to `p` now, or null: the state of things (travelBar), or, in the demo, a sign beyond its realms. */
@@ -178,21 +181,16 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       if (/^(Arrow|Key[WASD])/.test(e.code)) held.add(e.code);
     },
     pad(p) {
-      const [x, y] = [p.axes[0] ?? 0, p.axes[1] ?? 0];
-      const step = (0.02 * view.w) / view.scale;
-      if (Math.hypot(x, y) > 0.2) [view.cx, view.cz] = [view.cx - x * step, view.cz - y * step];
-      if (p.buttons[PAD_BUTTON.rt]?.pressed) zoomBy(1.03);
-      if (p.buttons[PAD_BUTTON.lt]?.pressed) zoomBy(0.97);
+      const now = performance.now();
+      const dt = padAt ? Math.min(0.05, (now - padAt) / 1000) : 1 / 60;
+      padAt = now;
       const edge = (i: number): boolean => !!p.buttons[i]?.pressed && !padWas.has(i);
-      if (edge(PAD_BUTTON.lb) || edge(PAD_BUTTON.rb)) cycle(edge(PAD_BUTTON.lb) ? -1 : 1);
       const dir = edge(PAD_BUTTON.left) ? { x: -1, y: 0 } : edge(PAD_BUTTON.right) ? { x: 1, y: 0 } : edge(PAD_BUTTON.up) ? { x: 0, y: -1 } : edge(PAD_BUTTON.down) ? { x: 0, y: 1 } : null;
-      if (dir) {
-        const next = signToward(lit, view, { x: view.cx, z: view.cz }, dir);
-        if (next) {
-          choose(next);
-          [view.cx, view.cz] = [next.x, next.z];
-        }
-      }
+      const steered = steerPad({ locked, armed, cx: view.cx, cz: view.cz, w: view.w, h: view.h, scale: view.scale }, { x: p.axes[0] ?? 0, y: p.axes[1] ?? 0 }, dt, lit, edge(PAD_BUTTON.r3), dir, triggerHeld(p.buttons[PAD_BUTTON.rt]), triggerHeld(p.buttons[PAD_BUTTON.lt]), Math.max(36, 22 * uiScale()));
+      [locked, armed, view.cx, view.cz] = [steered.locked, steered.armed, steered.cx, steered.cz];
+      if (steered.zoom !== 1) zoomBy(steered.zoom);
+      if (steered.focus) choose(steered.focus);
+      if (edge(PAD_BUTTON.lb) || edge(PAD_BUTTON.rb)) cycle(edge(PAD_BUTTON.lb) ? -1 : 1);
       if (edge(PAD_BUTTON.a)) {
         const under = signAt(lit, view, view.w / 2, view.h / 2, Math.max(14, 9 * uiScale()));
         const act = padTravel(under, chosen);
@@ -254,6 +252,9 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     view = { cx: open.cx, cz: open.cz, scale: open.scale, w: canvas.width, h: canvas.height };
     screen.show(page);
     lit = litSigns(g, rs, g.ecs.c.transform.get(g.player.id)!.pos);
+    locked = false;
+    armed = true;
+    padAt = 0;
     hover = null;
     onKey = false;
     choose(null);

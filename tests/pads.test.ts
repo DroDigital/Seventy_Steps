@@ -113,6 +113,44 @@ describe('the pad in hand (round 31)', () => {
       expect(activePad()?.mapping).toBe('standard');
     });
 
+    it('hears a macOS left trigger that rests below zero, or on an axis resting at −1', async () => {
+      const buttons = (lt: number, rt = 0) => Array.from({ length: 17 }, (_, i) => {
+        if (i === 6) return { pressed: false, value: lt };
+        if (i === 7) return { pressed: rt > 0.6, value: rt };
+        return { pressed: false, value: 0 };
+      });
+      let id = 'rise';
+      let lt = -0.5;
+      let rt = 0;
+      let axis4 = 0;
+      const { activePad } = await withShell(
+        () => [null],
+        () => [{ index: 0, id, connected: true, mapping: 'standard', timestamp: 1, axes: [0, 0, 0, 0, axis4], buttons: buttons(lt, rt) }],
+      );
+      expect(activePad()).toBeNull(); // resting at −0.5 is not a pull, and the rest is learned before any use
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(true); // it rises toward 0 when pulled
+      lt = -0.5;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      rt = 1;
+      expect(activePad()!.buttons[7].pressed).toBe(true); // the right trigger, which already reads as a pull, still does
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      rt = 0;
+      id = 'fall';
+      lt = 0;
+      expect(activePad()).toBeNull(); // the other report: rest at 0
+      lt = -0.48;
+      expect(activePad()!.buttons[6].pressed).toBe(true); // a pull goes negative
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      id = 'axis';
+      axis4 = -1;
+      expect(activePad()).toBeNull(); // Safari: button 6 stays 0, axis 4 rests at −1
+      axis4 = 1;
+      expect(activePad()!.buttons[6].pressed).toBe(true);
+      expect(activePad()!.buttons[7].pressed).toBe(false);
+    });
+
     it('is as before on the web, where there is no bridge', async () => {
       let down: number[] = [];
       vi.resetModules();
