@@ -29,6 +29,8 @@ import { createHoofFx } from './render/hoofFx';
 import { createEchoFx } from './render/echoFx';
 import { createImpactFx } from './render/impactFx';
 import { createShadows } from './render/shadows';
+import { createFinaleLook } from './render/finaleLook';
+import { endingSanity } from './render/finaleMind';
 import { createSignViews } from './render/signViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
@@ -207,6 +209,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
+  const finale = createFinaleLook(scene);
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
@@ -302,7 +305,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? adapted(enclosed ? darkOf(CLOCK.start) * darkShare(gloom) : darkOf(phaseOf(time)), lantern) : 0);
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        const fallen = endingSanity(cinema.sceneId, cinema.time, game.mind.sanity); // an ending: the picture goes, and stays gone through the last fade
+        const mind = fallen ?? game.mind.sanity;
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - mind / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
         mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
@@ -313,6 +318,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
+        finale.update(time, game);
         notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
@@ -335,6 +341,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         swingTrails.update(views.swingEdge, time);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
+        if (fallen !== null) state.sanity = fallen; // drawn, not saved; the cap is applied in computeFx
         const fx = computeFx(state);
         sky.strange(fx.strange);
         look.apply(fx);

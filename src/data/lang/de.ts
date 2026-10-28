@@ -226,7 +226,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'hud.track.reach': "Findet das Älteste Zeichen bei {name}",
   'hud.track.read': "Lest {name}",
   'hud.track.seals': "Brecht die Siegel · {n} von {of}",
-  'hud.track.ending': "Wählt das Ende des Traums bei {name}",
+  'hud.track.ending': "Der silberne Schlüssel und der hohe Mann warten bei {name}",
   'hud.track.rite': "Entzündet die Lichter der Reihe nach",
   'hud.track.vigil': "Haltet Wache am Mal",
   'hud.track.step': "Tut, was der Ort verlangt",

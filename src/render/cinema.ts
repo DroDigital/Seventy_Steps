@@ -3,9 +3,10 @@
  * cinemaPlan.ts) takes the lens over from the follow camera, blending in and out; the world stands
  * still under it or runs slowed (`step` says whether it takes its step); its beats set off lines,
  * fades, sounds and bursts (ui/cinemaUi.ts, audio, particles). One plays at a time, the rest wait.
- * A key or the pad's A, B or Start skips it (fading to black first); Esc is heard here rather than
- * by the pause menu, and so is the mouse being let go. A scene refused (the setting off) resolves at
- * once, so what follows it, an ending's card, never waits on it.
+ * A key or the pad's A, B or Start skips it (fading to black first), except while it waits on an
+ * act: then E or A does the act and the line resumes on that word; B, Start and Esc still skip.
+ * Esc is heard here rather than by the pause menu, and so is the mouse being let go. A scene
+ * refused (the setting off) resolves at once, so what follows it, an ending's card, never waits.
  */
 
 import { Matrix4, Quaternion, Vector3, type PerspectiveCamera } from 'three';
@@ -25,7 +26,8 @@ import { yawOfDir } from '../world/worldMap';
 import type { GameAudio } from './audio/gameAudio';
 import { burst } from './cinemaBursts';
 import { fogKeeper } from './cinemaFog';
-import { beatsBetween, frameOf, holdOf, keepGrain, sceneLength, shotAt, tremor, type Anchor } from './cinemaPlan';
+import { advanceScene, beatsBetween, frameOf, holdOf, keepGrain, sceneLength, shotAt, tremor, type Anchor } from './cinemaPlan';
+import { closeHand, noteScene, openHand, resetHand } from './finalePose';
 import type { Particles } from './particles';
 
 const GRACE = 0.6; // seconds before a key skips (the one that began it is not a skip)
@@ -39,6 +41,8 @@ const PAD = PAD_BUTTON;
 /** Who the scene is about, besides the investigator: the horror. */
 export interface Cast {
   target?: Entity;
+  /** A scene's sign, when it is not the player's current checkpoint. */
+  sign?: string;
 }
 
 export interface Cinema {
@@ -57,6 +61,10 @@ export interface Cinema {
   readonly time: number;
   /** One fixed step's time: moves the scene on; whether the world takes its step. */
   step(dt: number): boolean;
+  /** Waiting on an act (E or the pad's A). */
+  readonly waiting: boolean;
+  /** Does the act the scene is waiting on. */
+  act(): void;
   /** How far between steps the world is drawn this frame (`blend` when no scene runs). */
   alpha(blend: number): number;
   /** Over the follow camera the frame has placed: the scene's lens, held as firmly as it holds. `blend` is how far into the next step, 0 while the world is held. */
@@ -75,6 +83,8 @@ interface Run {
   hinted: boolean;
   credit: number; // slowed time owed to the world
   shakes: { at: number; amount: number; hold: number }[];
+  wait: Beat | null;
+  done: Set<number>;
 }
 
 export interface CinemaOptions {
@@ -100,7 +110,7 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   const anchorOf = (who: Subject, alpha: number): Anchor | null => {
     const c = g.ecs.c;
     if (who === 'sign') {
-      const s = g.overworld && signPlace(g.overworld.sign);
+      const s = g.overworld && signPlace(run?.cast.sign ?? g.overworld.sign);
       return s ? { x: s.x, y: s.y, z: s.z, yaw: yawOfDir(s.face), height: SIGN_HEIGHT } : null;
     }
     const e = who === 'player' ? g.player.id : run?.cast.target;
@@ -147,9 +157,11 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       o.rise?.(b.rise);
     }
     if (b.kneel) {
-      const s = g.overworld && signPlace(g.overworld.sign);
+      const s = g.overworld && signPlace(r.cast.sign ?? g.overworld.sign);
       if (s) g.player.kneeling = { x: s.x, z: s.z };
     }
+    if (b.hand === 'close') closeHand();
+    else if (b.hand === 'open') openHand();
     if (b.burst) {
       const at = anchorOf(b.burst.on, 1);
       if (at) burst(particles, b.burst.kind, at, at.height, b.burst.count);
@@ -157,7 +169,9 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
   };
 
   const begin = (scene: Scene, cast: Cast, resolve: () => void): void => {
-    const r: Run = { scene, cast, length: sceneLength(scene), t: 0, resolve, skipAt: null, hinted: false, credit: 0, shakes: [] };
+    resetHand();
+    noteScene(scene.id);
+    const r: Run = { scene, cast, length: sceneLength(scene), t: 0, resolve, skipAt: null, hinted: false, credit: 0, shakes: [], wait: null, done: new Set() };
     run = r;
     g.cutscene = true;
     g.ecs.c.shove.delete(g.player.id);
@@ -186,6 +200,8 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     if (skipped && r.scene.beats.some((b) => b.rise !== undefined && b.at > r.t)) g.player.kneeling = null; // skipped before they got up: up now, under the fade
     if (r.scene.beats.some((b) => b.kneel)) g.player.kneeling = null; // knelt in the scene: up when it is over (its end is black, and the card that follows is read standing)
     if (skipped && r.scene.beats.some((b) => b.voice)) g.events.emit('Silenced', {}); // and a line being said is cut off with it
+    audio.holdVoice?.(false); // after the stop, so a paused line is not started again
+    resetHand();
     ui.hint(false);
     ui.clear(0.8);
     if (skipped && !r.scene.shut) ui.fade('clear', 0.5);
@@ -196,8 +212,22 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     else g.cutscene = false;
   };
 
+  const act = (): void => {
+    const b = run?.wait;
+    if (!run || !b) return;
+    run.done.add(b.at);
+    run.wait = null;
+    ui.ask?.(null);
+    audio.holdVoice?.(false);
+    ui.holdCaption?.(false);
+    perform(run, b);
+  };
+
   const skip = (): void => {
     if (!run || run.skipAt !== null || run.t < GRACE) return;
+    for (const b of run.scene.beats) if (b.act) run.done.add(b.at); // the fade must not stop on another act
+    run.wait = null;
+    ui.ask?.(null);
     run.skipAt = run.t;
     ui.hint(false);
     ui.fade('black', SKIP_FADE);
@@ -209,7 +239,9 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       if (!run || !(SKIP_KEYS.has(e.code) || e.code === keyLayout.interact)) return;
       e.preventDefault();
       e.stopImmediatePropagation(); // the pause menu never hears this Esc
-      if (!e.repeat) skip();
+      if (e.repeat) return;
+      if (run.wait && e.code === keyLayout.interact) act();
+      else skip();
     },
     true,
   );
@@ -237,12 +269,25 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
     get time() {
       return run?.t ?? 0;
     },
+    get waiting() {
+      return !!run?.wait;
+    },
+    act,
     step(dt) {
       const r = run;
       if (!r) return true;
-      const before = r.t;
-      r.t += dt;
-      for (const b of beatsBetween(r.scene, before, r.t)) perform(r, b);
+      const held = r.wait;
+      if (!held || r.skipAt !== null) {
+        const moved = advanceScene(r.scene, r.t, dt, r.done);
+        r.t = moved.t;
+        for (const b of moved.beats) perform(r, b);
+        if (moved.act && r.skipAt === null) {
+          r.wait = moved.act;
+          ui.ask?.(moved.act.act ?? null);
+          audio.holdVoice?.(true);
+          ui.holdCaption?.(true);
+        }
+      }
       if (!r.hinted && r.t > HINT_AT && r.skipAt === null) {
         r.hinted = true;
         ui.hint(true);
@@ -250,7 +295,9 @@ export function createCinema(g: Game, ui: CinemaUi, audio: GameAudio, particles:
       const pad = activePad();
       const down = new Set<number>();
       pad?.buttons.forEach((b, i) => (b.pressed || b.value > 0.5) && down.add(i));
-      if ([PAD.a, PAD.b, PAD.start].some((i) => down.has(i) && !padDown.has(i))) skip();
+      const hit = (i: number): boolean => down.has(i) && !padDown.has(i);
+      if (held && r.skipAt === null && hit(PAD.a) && !hit(PAD.b) && !hit(PAD.start)) act();
+      else if ([PAD.a, PAD.b, PAD.start].some(hit)) skip();
       padDown = down;
       if ((r.skipAt !== null && r.t >= r.skipAt + SKIP_FADE) || r.t >= r.length) {
         finish(r.skipAt !== null);

@@ -30,6 +30,7 @@ import { personShadow } from './moonShadow';
 import { BASE } from './palette';
 import { createPoseBlend, type PoseBlend } from './poseBlend';
 import { pose } from './poses';
+import { applyGrasp, setFinaleHand } from './finalePose';
 import { createWorldMaterial } from './worldMaterial';
 import { FEEL } from './feel';
 import { createMountViews } from './mountViews';
@@ -209,6 +210,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const water = falling?.water;
     const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin, sea: water ? { since: water.entered < 0 ? -1 : (falling.frame + alpha - water.entered) / SIM.hz, held: water.grab < 0 ? 0 : (falling.frame + alpha - water.grab) / SIM.hz } : undefined } : undefined;
     pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop, weapon: id === g.player.id ? g.player.weapon : undefined });
+    if (id === g.player.id) (applyGrasp(f.handR), setFinaleHand(f.handR));
     if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
       f.root.updateMatrixWorld(true);
       const beat = pipeBeat(time + id * 1.7);
