@@ -83,6 +83,8 @@ export interface GameAudio {
   recordedFor(key: string): boolean;
   /** Gets the realm's track ready (fetched, decoded) without sounding it: the world's sound begins when it shows (round 29). */
   warm(): void;
+  /** Holds the narrator's line, or lets it go on, at the word an ending's gesture answers (round 98). */
+  holdVoice(on: boolean): void;
 }
 
 interface Caller {
@@ -296,6 +298,9 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   return {
     warm() {
       realm.warm(trackHere(g.ecs.c.transform.get(g.player.id)?.pos));
+    },
+    holdVoice(on) {
+      speech.hold(on);
     },
     far(set, gain = 1, pitch) {
       sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.7, lowpass: 900 + 4000 * gain, pitch, bus: e.bed ?? undefined });

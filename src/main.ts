@@ -29,6 +29,7 @@ import { createHoofFx } from './render/hoofFx';
 import { createEchoFx } from './render/echoFx';
 import { createImpactFx } from './render/impactFx';
 import { createShadows } from './render/shadows';
+import { createFinaleLook } from './render/finaleLook';
 import { createSignViews } from './render/signViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
@@ -207,6 +208,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
+  const finale = createFinaleLook(scene);
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
@@ -313,6 +315,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         world?.update(at.x, at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
+        finale.update(time, game);
         notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);

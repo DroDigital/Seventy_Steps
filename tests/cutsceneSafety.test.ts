@@ -52,7 +52,10 @@ describe('cutscene protection', () => {
     expect(strike(g, deepOne, player, BLOW)).toBe('dodged');
     expect(g.ecs.c.health.get(player)!.hp).toBe(hp);
     expect(hits).not.toHaveBeenCalled();
-    cinema.step(sceneLength(s));
+    for (let n = 0; cinema.active && n < 8; n++) {
+      if (cinema.waiting) cinema.act();
+      cinema.step(sceneLength(s));
+    }
     await done;
     expect(cinema.active).toBe(false);
     expect(g.cutscene).toBe(false);
