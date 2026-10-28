@@ -18,7 +18,7 @@ machine of each platform; the second half is what only the author can do, becaus
   | macOS, Apple Silicon | `mac-arm64` | `Seventy Steps.app` |
   | macOS, Intel | `mac` | `Seventy Steps.app` |
   | macOS, both in one | `mac-universal` (`npm run package:mac -- --universal`) | `Seventy Steps.app` |
-  | Linux (x64) | `linux-unpacked` | `seventy-steps` |
+  | Linux (x64) | `linux-unpacked` | `seventy-steps` (a shell that starts `seventy-steps.bin` with `--no-sandbox`) |
 
   A Mac build makes each architecture with its own copy of the controllers' SDL library (`@kmamal/sdl` downloads the one of the
   machine it is installed on; `tools/package_mac.mjs` fetches the other), so **a Mac build is made on a Mac**; Windows on Windows.

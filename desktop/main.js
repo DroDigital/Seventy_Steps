@@ -33,6 +33,10 @@ const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
+// Ubuntu 23.10+ AppArmor blocks Chromium's userns sandbox (electron#41066). Steam/itch ship a folder,
+// not a .deb with an AppArmor profile, so Linux starts without the sandbox. The packed launcher
+// (packaging/linuxLaunch.mjs) also passes --no-sandbox before JS runs; this covers `npm run desktop`.
+if (process.platform === 'linux') app.commandLine.appendSwitch('no-sandbox');
 if (SMOKE) {
   app.setPath('userData', mkdtempSync(join(tmpdir(), 'seventy-steps-smoke-'))); // a check never touches a player's saves, window or logs
   if (process.env.SMOKE_SOFTWARE_GL) for (const [k, v] of [['use-gl', 'angle'], ['use-angle', 'swiftshader'], ['enable-unsafe-swiftshader', ''], ['ignore-gpu-blocklist', '']]) app.commandLine.appendSwitch(k, v || undefined); // a machine with no GPU (CI on Linux)
