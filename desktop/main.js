@@ -28,6 +28,7 @@ import { channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, s
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
 const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the title, reports, quits: a packed build's own check
+const SMOKE_LATE = Number(process.env.SMOKE_LATE) || 150; // seconds a smoke test waits for its title before it gives up (tools/smoke_packaged.mjs sets it under its own timeout: Rosetta starts slowly)
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
 
@@ -255,7 +256,7 @@ function smoke(win) {
     }
     const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
-    const late = report.seconds > 150;
+    const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;
     clearInterval(timer);
     const missing = [!report.title && 'the title never appeared', !report.bridge && "the shell's bridge is missing", needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load', needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`].filter(Boolean);
