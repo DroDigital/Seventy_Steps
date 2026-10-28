@@ -93,7 +93,7 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     expect(notices.map((n) => n.text)).toEqual(['THE GATE WILL NOT OPEN WHILE A HORROR HOLDS YOU']);
   });
 
-  it('one riding who steps into the veil is set down and drawn on: there is no E to dismount with (round 60)', () => {
+  it('one riding who steps into the veil is kept in the saddle and drawn on: there is no E, and the pace stays (mountPortal.ts)', () => {
     const g = createWorldGame();
     const gate = gatePlace('hub_australia')!;
     const entering = record(g, 'GateEntering');
@@ -101,11 +101,13 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     goTo(g, a.x, a.z);
     run(g, 1);
     g.player.mount.active = 'grey';
+    g.player.mount.speed = 10.5;
     const tr = g.ecs.c.transform.get(g.player.id)!;
     [tr.prev.x, tr.prev.z, tr.pos.x, tr.pos.z] = [a.x, a.z, b.x, b.z];
     gateStepSystem(g);
     expect(entering).toHaveLength(1);
-    expect(g.player.mount.active).toBeNull();
+    expect(g.player.mount.active).toBe('grey');
+    expect(g.player.mount.speed).toBe(10.5);
     expect(g.player.gatePass).not.toBeNull();
   });
 

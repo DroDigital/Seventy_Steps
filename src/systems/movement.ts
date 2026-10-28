@@ -13,6 +13,7 @@ import { isAbsent, type Game } from './components';
 import { managed } from './npcLife';
 import { awaitsIntroduction } from './npcIntroduction';
 import { dismissMount, moveMounted } from './mounts';
+import { portalVeil } from './mountPortal';
 import { footprintClear } from './mountGround';
 
 export function movementSystem(g: Game, dt: number): void {
@@ -76,7 +77,7 @@ export function movementSystem(g: Game, dt: number): void {
   }
   separate(g);
   const rider = transform.get(g.player.id)!;
-  if (g.player.mount.active && !footprintClear(g, rider.pos, rider.yaw)) dismissMount(g);
+  if (g.player.mount.active && !(g.player.gatePass && portalVeil(g)) && !footprintClear(g, rider.pos, rider.yaw)) dismissMount(g); // the veil's walk may clip the gate; the far side is checked as any other step
 }
 
 /** What a body weighs in a shove (round 24): by its footprint, so a colossus is not pushed about at half the pace of the man who bumps it. */
