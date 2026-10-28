@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { ENTITIES, getEntity, variantOf, type Variant } from '../src/data/registry';
 import { BOSS_STANDING } from '../src/data/bossStanding';
-import { BOSS, BOSS_LEVEL_SCALING, BOSS_OVERMATCH, DIFFICULTIES, NEW_GAME_PLUS, SHUB } from '../src/data/tuning';
+import { BOSS, BOSS_LEVEL_SCALING, BOSS_OVERMATCH, DIFFICULTIES, SHUB } from '../src/data/tuning';
 import { applyChange } from '../src/systems/arenaChanges';
 import { resetFight } from '../src/systems/bossFight';
 import { strike } from '../src/systems/combat';
 import { morph, spawnCreature } from '../src/systems/creatures';
-import { bossDamageScale, bossHealthScale, overmatch } from '../src/systems/bossScaling';
+import { bossDamageScale, bossHealthScale, journeyBossDamage, overmatch } from '../src/systems/bossScaling';
 import { healthAt as bodyAt, levelsWorth, mightAt } from '../src/systems/levelWorth';
 import { foeDamage } from '../src/systems/cycles';
 import { createGame, createWorldGame } from '../src/systems/game';
@@ -110,11 +110,11 @@ describe('only bosses scale with player level', () => {
     applyLevels(g);
     const h = g.ecs.c.health.get(boss)!;
     const over = overmatch(g.player.levels, 'dr_munoz');
-    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * (1 + 2 * NEW_GAME_PLUS.health) * healthAt(20) * over.health));
-    const damage = 40 * DIFFICULTIES.nightmare.foe * (1 + 2 * NEW_GAME_PLUS.damage) * damageAt(20) * over.damage;
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * bossHealthScale(20, 2, over.health, 'dr_munoz')));
+    const damage = 20 * DIFFICULTIES.nightmare.foe * journeyBossDamage('dr_munoz', 2);
     const me = g.ecs.c.health.get(g.player.id)!;
     const before = me.hp;
-    expect(strike(g, boss, g.player.id, { damage: 40, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false })).toBe('hit');
+    expect(strike(g, boss, g.player.id, { damage: 20, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false })).toBe('hit');
     expect(before - me.hp).toBe(Math.round(damage));
     const ally = spawnCreature(g, 'nodens', AT)!;
     expect(foeDamage(g, ally)).toBe(1);
@@ -129,10 +129,10 @@ describe('only bosses scale with player level', () => {
     h.hp = h.max * 0.4;
     morph(g, boss, 'nyarlathotep', 'eldritch');
     const def = variantOf(getEntity('nyarlathotep')!, 'eldritch')!;
-    expect(h.max).toBe(Math.round(def.stats.hp * 1.6 * healthAt(10)));
+    expect(h.max).toBe(Math.round(def.stats.hp * bossHealthScale(10, 1, 1, 'nyarlathotep')));
     expect(h.hp / h.max).toBeCloseTo(0.4);
     applyLevels(g);
-    expect(h.max).toBe(Math.round(def.stats.hp * 1.6 * healthAt(10)));
+    expect(h.max).toBe(Math.round(def.stats.hp * bossHealthScale(10, 1, 1, 'nyarlathotep')));
     expect(h.hp / h.max).toBeCloseTo(0.4);
   });
 

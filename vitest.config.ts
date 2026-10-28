@@ -20,6 +20,7 @@ export const AUDITS = [
   'tests/enclosedAudit.test.ts',
   'tests/houseWalk.test.ts',
   'tests/balance.test.ts',
+  'tests/ngPlus.test.ts',
 ];
 
 // Round 38: several tests build a whole world (npcLife, worldDeath, worldLights, nightWeather, outerGods, wanderers, overheard) and

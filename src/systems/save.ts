@@ -32,6 +32,8 @@ import { settleRelics } from './relics';
 import { setSanity } from './sanity';
 import { spawnDrop } from './spawn';
 import { carryForward, GAME_VERSION, newerSave, SAVE_VERSION } from './saveVersion';
+import { JOURNEY_BALANCE_VERSION } from '../data/ngPlusTuning';
+import { balanceBackupKey, keepBalanceBackup } from './balanceMigration';
 
 export const SAVE_KEY = 'lovecraft-souls-like/save';
 const VERSION = SAVE_VERSION; // 2: the world doubled in size (playtest round 1), so a version 1 position means nothing now; 3: the Witch House's stages; older and newer: saveVersion.ts
@@ -39,6 +41,7 @@ const VERSION = SAVE_VERSION; // 2: the world doubled in size (playtest round 1)
 export interface SaveData {
   version: typeof VERSION;
   made?: string; // the game's version that wrote it (round 47)
+  balance?: number; // journey tuning revision, independent of the structural save version
   at: Place;
   sign: string;
   discovered: string[];
@@ -101,6 +104,7 @@ export function snapshot(g: Game): SaveData {
   return {
     version: VERSION,
     made: GAME_VERSION,
+    balance: JOURNEY_BALANCE_VERSION,
     at: { x: tr.pos.x, z: tr.pos.z, yaw: tr.yaw },
     sign: ow.sign,
     discovered: [...ow.discovered],
@@ -161,6 +165,7 @@ export function parseSave(json: string | null): SaveData | null {
     return null;
   }
   if (!has(o, 'version', 'echoes', 'hp', 'sanity', 'insight', 'laudanum') || o.version !== VERSION) return null;
+  if (o.balance !== undefined && (!isNum(o.balance) || o.balance < 0 || !Number.isInteger(o.balance))) return null;
   if (!has(o.at, 'x', 'z', 'yaw') || typeof o.sign !== 'string' || !isCounts(o.upgrades) || (o.levels !== undefined && !isCounts(o.levels))) return null;
   if (![o.discovered, o.slain, o.read, o.seen].every(isStrings)) return null;
   if (o.drop !== null && !has(o.drop, 'x', 'y', 'z', 'amount')) return null;
@@ -284,6 +289,8 @@ let recovered = false;
 export function saveGame(g: Game, store: SaveStore, slot = active, now = Date.now()): void {
   const key = slotKey(slot);
   const json = JSON.stringify(snapshot(g));
+  const previous = store.getItem(key);
+  keepBalanceBackup(store, key, previous, parseSave(previous));
   if (now - backedAt >= BACKUP_EVERY) {
     const prev = store.getItem(key);
     if (prev && parseSave(prev)) {
@@ -326,5 +333,6 @@ export function takeRecovery(): boolean {
 export const clearSave = (store: SaveStore, slot = active): void => {
   store.removeItem(slotKey(slot));
   store.removeItem(backupKey(slotKey(slot)));
+  store.removeItem(balanceBackupKey(slotKey(slot)));
   backedAt = -Infinity;
 };

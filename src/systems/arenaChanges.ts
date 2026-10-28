@@ -20,6 +20,8 @@ import { BOSS, CTHULHU, REALITY, SHUB, YOG } from '../data/tuning';
 import type { Collider } from '../world/colliders';
 import { createActor } from './actions';
 import type { Fight, Game, Prop } from './components';
+import { ROOT_JOURNEY_HEALTH } from '../data/ngPlusTuning';
+import { homeRung } from './ngPlus';
 
 /** `n` points evenly round the arena at `share` of its radius, the first toward +z. */
 export function ring(f: Fight, n: number, share: number): XZ[] {
@@ -52,7 +54,8 @@ function root(g: Game, e: Entity, p: XZ): Entity {
   const r = spawnProp(g, e, 'root', p);
   const c = g.ecs.c;
   c.body.set(r, { radius: 1.1, height: 4, aimHeight: 2, fixed: true });
-  c.health.set(r, { hp: SHUB.hp, max: SHUB.hp, immortal: false, calm: 0 });
+  const hp = Math.round(SHUB.hp * (1 + ROOT_JOURNEY_HEALTH * (homeRung(c.journey.get(e), g.player.cycle).health - 1)));
+  c.health.set(r, { hp, max: hp, immortal: false, calm: 0 });
   c.poise.set(r, { value: 1e4, max: 1e4, calm: 0 });
   c.actor.set(r, createActor(REACTIONS));
   c.combatant.set(r, { name: 'Spawning Root', faction: 'enemy', bounty: 0 });

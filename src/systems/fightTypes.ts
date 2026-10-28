@@ -42,6 +42,7 @@ export interface Prop {
 
 /** A bolt in flight (spec §3E). */
 export interface Bolt {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   vel: V3; // m/s
@@ -57,6 +58,7 @@ export interface Bolt {
 
 /** A lingering pool on the ground (spec §3E): it hurts each hostile inside it, one tick at a time. */
 export interface Hazard {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   radius: number;
@@ -87,6 +89,7 @@ export interface Mark {
 
 /** A ring racing out along the ground from where it was loosed (the quake). */
 export interface Wave {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   r: number; // metres out its leading edge has come

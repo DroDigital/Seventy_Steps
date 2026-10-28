@@ -63,6 +63,7 @@ import { updateWorldUniforms, worldUniforms } from './render/worldMaterial';
 import { FEEL, HEART } from './render/feel';
 import { createGame, createWorldGame, stepGame } from './systems/game';
 import { clearSave, loadSave, takeRecovery } from './systems/save';
+import { JOURNEY_BALANCE_VERSION } from './data/ngPlusTuning';
 import { haltAutosave, saveNow, startAutosave } from './ui/autosave';
 import { createExtras } from './ui/runExtras';
 import { showCrash } from './ui/crashScreen';
@@ -138,10 +139,12 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const store = opts.arena ? null : shell.store;
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
-  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
+  const saved = store ? loadSave(store) : null;
+  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: saved ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
   void refreshMountEntitlement(game);
   addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
+  if (saved?.cycle && (saved.balance ?? 0) < JOURNEY_BALANCE_VERSION) setTimeout(() => game.events.emit('Notice', { text: t('n.journeyBalance') }), 6500);
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
     noteLockAsked();

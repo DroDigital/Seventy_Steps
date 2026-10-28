@@ -23,6 +23,7 @@ import { addLayer } from './hiddenLayer';
 import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
+import { homeProfile } from './ngPlus';
 import { bossHealthScale, overmatch, refreshBossLevels } from './bossScaling';
 import { levelsWorth } from './levelWorth';
 
@@ -145,24 +146,29 @@ export const dreadOf = (def: EntityDef): Dread => ({
  * swapped if the mind is already Fractured or lower); a `hidden` entry goes on its hidden layer; one
  * with a boss script holds a fight over the arena around where it stands (bossFight.ts).
  */
-export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant): Entity | undefined {
+export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant, owner?: Entity, placedRegion?: string): Entity | undefined {
   const swaps = variant === undefined && getEntity(id)?.eldritchVariant !== undefined;
   const v = swaps && atOrBelow(g.mind, 'fractured') ? 'eldritch' : variant;
   const def = resolveCreature(id, v);
   if (!def) return undefined;
   const cd = toCombatant(def, v);
   const foe = def.tier !== 'ally';
-  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: Math.round(cd.hp * foeHealth(g)), bounty: Math.round(cd.bounty * foeBounty(g)) }); // a later journey's (cycles.ts)
+  const inherited = owner === undefined ? undefined : g.ecs.c.journey.get(owner);
+  const home = { profile: inherited?.profile ?? homeProfile(at, id, !!g.overworld, placedRegion), encounter: inherited?.encounter ?? (owner === undefined && def.bossScript ? id : undefined), servant: owner !== undefined, creature: id };
+  // Scripted servants (the Guide's Ancient Ones) previously received level-scaled health before their fight was removed.
+  if (foe && owner !== undefined && def.bossScript && g.player.cycle === 0) cd.hp = Math.round(cd.hp * bossHealthScale(levelsWorth(g.player.levels), 0, overmatch(g.player.levels, id).health));
+  if (foe && g.player.cycle > 0) Object.assign(cd, { hp: def.bossScript && owner === undefined ? cd.hp : Math.round(cd.hp * foeHealth(g, home)), bounty: Math.round(cd.bounty * foeBounty(g)) });
   const e = spawnCombatant(g, cd, at, foe ? 'enemy' : 'player');
+  if (foe) g.ecs.c.journey.set(e, home);
   g.ecs.c.dread.set(e, dreadOf(def));
   if (swaps) g.ecs.c.swap.set(e, { id, eldritch: v === 'eldritch' });
   if (def.hidden) addLayer(g, e, def.hidden);
-  if (def.bossScript) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
-  if (foe && def.bossScript) {
+  if (def.bossScript && owner === undefined) g.ecs.c.fight.set(e, newFight(id, def.bossScript, { x: at.x, z: at.z, radius: BOSS.arena }));
+  if (foe && def.bossScript && owner === undefined) {
     g.ecs.c.health.get(e)!.baseMax = def.stats.hp;
     refreshBossLevels(g, levelsWorth(g.player.levels));
   }
-  if (def.bossScript?.unseen) g.ecs.c.unseen.set(e, { revealed: 0 });
+  if (def.bossScript?.unseen && owner === undefined) g.ecs.c.unseen.set(e, { revealed: 0 });
   return e;
 }
 
@@ -172,13 +178,18 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   if (!def) return;
   const cd = toCombatant(def, variant);
   const c = g.ecs.c;
+  const home = c.journey.get(e);
+  if (home) c.journey.set(e, { ...home, creature: id });
   c.model.set(e, cd.model);
-  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
+  const bounty = c.phantom.has(e) || c.minion.has(e) || home?.servant ? 0 : Math.round(cd.bounty * (def.tier === 'ally' ? 1 : foeBounty(g)));
+  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
-  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (def.bossScript ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, c.fight.get(e)?.id ?? id).health) : foeHealth(g)));
+  const fightId = c.fight.get(e)?.id ?? id;
+  const boss = def.bossScript && (!c.journey.get(e)?.servant || g.player.cycle === 0);
+  const hp = def.tier === 'ally' ? cd.hp : Math.round(cd.hp * (boss ? bossHealthScale(levelsWorth(g.player.levels), g.player.cycle, overmatch(g.player.levels, fightId).health, fightId, c.journey.get(e)?.profile) : foeHealth(g, c.journey.get(e))));
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
-  if (def.tier !== 'ally' && def.bossScript) h.baseMax = cd.hp;
+  if (def.tier !== 'ally' && boss) h.baseMax = cd.hp;
   else delete h.baseMax;
   const po = c.poise.get(e)!;
   [po.value, po.max] = [(po.value / po.max) * cd.poise, cd.poise];

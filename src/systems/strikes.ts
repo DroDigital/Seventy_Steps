@@ -19,6 +19,7 @@ import { planSpots } from './strikePlans';
 import { live } from './targets';
 import { isAbsent, type Actor, type Game, type Mark, type Wave } from './components';
 import { loose } from './projectiles';
+import { foeDamage } from './cycles';
 import { groundNear, targetOf } from './specials';
 
 const DEG = Math.PI / 180;
@@ -94,7 +95,8 @@ function quake(g: Game, id: Entity, w: WaveDef): void {
     const yaw = to ? Math.atan2(to.x - from.x, to.z - from.z) : c.transform.get(id)!.yaw;
     lane = { dx: Math.sin(yaw), dz: Math.cos(yaw), half: w.lane.half, push: w.lane.push };
   }
-  c.wave.set(e, { owner: id, faction: c.combatant.get(id)?.faction ?? 'enemy', r, speed: w.speed / SIM.hz, width: w.width, reach: w.reach + r, damage: w.damage, poise: w.poise, struck: [], ...(lane && { lane }) });
+  const faction = c.combatant.get(id)?.faction ?? 'enemy';
+  c.wave.set(e, { owner: id, faction, enemyScale: faction === 'enemy' ? (c.phantom.has(id) ? 0 : foeDamage(g, id)) : undefined, r, speed: w.speed / SIM.hz, width: w.width, reach: w.reach + r, damage: w.damage, poise: w.poise, struck: [], ...(lane && { lane }) });
   g.events.emit('Quaked', { at: { ...pos }, by: id, ...(lane && { lane: true }) });
 }
 
@@ -113,14 +115,14 @@ function spread(g: Game, e: Entity, w: Wave): void {
       const [along, side] = [rx * l.dx + rz * l.dz, Math.abs(rx * l.dz - rz * l.dx)];
       if (side - br > l.half || along - br > w.r || along + br < w.r - w.width || Math.abs(p.y - g.world.ground(p.x, p.z)) > 1.5) continue;
       w.struck.push(t);
-      strike(g, w.owner, t, blow(w.damage, w.poise, false), { x: at.x, y: p.y, z: at.z });
+      strike(g, w.owner, t, { ...blow(w.damage, w.poise, false), enemyScale: w.enemyScale }, { x: at.x, y: p.y, z: at.z });
       shove(g, t, { x: p.x - l.dx, y: p.y, z: p.z - l.dz }, l.push);
       continue;
     }
     const d = distXZ(p, at);
     if (d - br > w.r || d + br < w.r - w.width || Math.abs(p.y - at.y) > 1.5) continue;
     w.struck.push(t);
-    strike(g, w.owner, t, blow(w.damage, w.poise, true), { x: at.x, y: p.y, z: at.z });
+    strike(g, w.owner, t, { ...blow(w.damage, w.poise, true), enemyScale: w.enemyScale }, { x: at.x, y: p.y, z: at.z });
   }
   if (w.r >= w.reach) g.ecs.despawn(e);
 }

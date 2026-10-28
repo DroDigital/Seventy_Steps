@@ -243,6 +243,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'n.candle': "UNE BOUGIE PREND LA FLAMME",
   'n.pictureKept': "UNE IMAGE DU RÊVE EST CONSERVÉE",
   'n.pictureFail': "L’IMAGE N’A PU ÊTRE CONSERVÉE",
+  'n.journeyBalance': 'LES VOYAGES SUIVANTS SE RENFORCENT PAR RÉGION · VOTRE FORCE ET VOTRE DIFFICULTÉ SONT CONSERVÉES',
   'n.recovered': "UNE SAUVEGARDE ENDOMMAGÉE A ÉTÉ RÉPARÉE À PARTIR DE SA COPIE",
   'n.tonicDull': "LE TONIQUE S’ÉMOUSSE · UNE DOSE PLUS FAIBLE, PRISE SI TÔT",
   'n.autoQuality': "IMAGE RÉGLÉE POUR CET ORDINATEUR · RÉGLAGES › AFFICHAGE",

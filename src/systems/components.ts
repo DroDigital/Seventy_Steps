@@ -15,6 +15,7 @@ import type { CameraRig } from './camera';
 import type { Bolt, Fight, Hazard, Mark, Prop, Reality, Wave } from './fightTypes';
 import type { Band, GameEvents } from './gameEvents';
 import type { Overworld } from './overworldTypes';
+import type { JourneyHome } from './ngPlus';
 
 export type { ArenaCircle, Bolt, Fight, Hazard, Mark, Prop, Reality, Wave } from './fightTypes';
 export type { Overworld } from './overworldTypes';
@@ -212,6 +213,7 @@ export function createStores() {
     origin: new Map<Entity, string>(), // the world spawn point a creature came from (population.ts)
     fight: new Map<Entity, Fight>(), // bosses (bossFight.ts)
     minion: new Map<Entity, Entity>(), // a summon or decoy → its summoner
+    journey: new Map<Entity, JourneyHome>(), // captured home/encounter; independent of current position and player levels
     prop: new Map<Entity, Prop>(),
     bolt: new Map<Entity, Bolt>(),
     hazard: new Map<Entity, Hazard>(),

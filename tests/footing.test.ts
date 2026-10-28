@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { createRng } from '../src/core/rng';
 import { COLD } from '../src/data/bodyTuning';
 import type { Echo } from '../src/data/acoustics';
 import { BODY, BREATH, FOOT_GAIN, GEAR, STEP_LAYERS, STEP_VOICE, BOARD_CREAK, FEEL } from '../src/data/footSounds';
@@ -301,18 +302,23 @@ describe('the footsteps, understated (round 83)', () => {
   });
 
   it('the played steps keep to that level, the second foot of a pair lands softer, and no two are alike', () => {
-    const { gains } = walk(4.2);
-    expect(gains.length).toBeGreaterThanOrEqual(30);
-    const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
-    for (const gain of gains) {
-      expect(gain).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-9);
-      expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) - 1e-9);
+    const random = vi.spyOn(Math, 'random').mockImplementation(createRng(83));
+    try {
+      const { gains } = walk(4.2);
+      expect(gains.length).toBeGreaterThanOrEqual(30);
+      const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
+      for (const gain of gains) {
+        expect(gain).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-9);
+        expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) - 1e-9);
+      }
+      const [first, second] = [gains.filter((_, i) => i % 2 === 0), gains.filter((_, i) => i % 2 === 1)]; // (the feet take turns)
+      const [soft, firm] = [Math.min(mean(first), mean(second)), Math.max(mean(first), mean(second))];
+      expect(soft / firm).toBeGreaterThan(STEP_VOICE.offFoot - 0.07);
+      expect(soft / firm).toBeLessThan(STEP_VOICE.offFoot + 0.07);
+      expect(new Set(gains.map((x) => x.toFixed(4))).size).toBeGreaterThan(gains.length * 0.8);
+    } finally {
+      random.mockRestore();
     }
-    const [first, second] = [gains.filter((_, i) => i % 2 === 0), gains.filter((_, i) => i % 2 === 1)]; // (the feet take turns)
-    const [soft, firm] = [Math.min(mean(first), mean(second)), Math.max(mean(first), mean(second))];
-    expect(soft / firm).toBeGreaterThan(STEP_VOICE.offFoot - 0.07);
-    expect(soft / firm).toBeLessThan(STEP_VOICE.offFoot + 0.07);
-    expect(new Set(gains.map((x) => x.toFixed(4))).size).toBeGreaterThan(gains.length * 0.8);
   });
 
   it('a walk on a display faster than the simulation is a walk: the pace is the metres over the time since the body last moved, not since the last frame', () => {

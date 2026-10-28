@@ -185,7 +185,8 @@ const atCapOf = (s: Standing): Standing => {
 describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
   const table = standings().map(atCapOf);
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)));
+  // Nine deterministic starts (including the long light-bound fight) need CPU time when audits share a runner.
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)), 90_000);
 
   it('leaves no horror a fight that costs nothing', () => {
     const bad: string[] = [];
