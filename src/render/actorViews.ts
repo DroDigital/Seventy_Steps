@@ -175,7 +175,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const post = person ? ACTS[g.ecs.c.npc.get(id) ?? '']?.post : undefined; // one with a chair or a post of their own
     if (post) placeAt(f, v, post);
     const dt = Math.min(0.1, Math.max(0, time - v.lastTime));
-    v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
+    if (id === g.player.id && g.cutscene) v.speed = 0; // stop the carried gait immediately, even when the last fog-walk step was still being eased
+    else v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
     v.stride += 2 * Math.PI * cadence(v.speed) * dt;
     v.lastTime = time;
     const speed = v.speed;

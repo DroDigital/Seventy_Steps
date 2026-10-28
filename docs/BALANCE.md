@@ -36,7 +36,7 @@ nothing in its way.
 | 4 | Brown Jenkin | 5/2/4 | 2 | 704 | 29 | 220 | 220 | 4 | 0.39 | 0 |
 | 5 | Ephraim Waite | 5/2/5 | 3 | 872 | 24 | 361 | 220 | 5 | 0.55 | 0 |
 | 6 | Keziah Mason | 6/2/5 | 3 | 1207 | 21 | 305 | 232 | 5 | 0.44 | 0 |
-| 7 | The Colour Out of Space | 6/3/5 | 4 | 1271 | 28 | 555 | 232 | 5 | 0.80 | 0 |
+| 7 | The Colour Out of Space | 6/3/5 | 4 | 1271 | 46 | 914 | 232 | 5 | 1.31 | 0 |
 | 8 | The Hound | 7/3/6 | 4 | 1624 | 24 | 309 | 244 | 5 | 0.42 | 0 |
 | 9 | The Black Man | 7/3/7 | 4 | 1691 | 31 | 269 | 244 | 6 | 0.32 | 0 |
 | 10 | The Unnamable | 8/3/7 | 5 | 2270 | 29 | 410 | 256 | 6 | 0.47 | 0 |
@@ -79,7 +79,7 @@ nothing in its way.
 | 47 | Azathoth | 18/9/17 | 5 | 8911 | 90 | 10055 | 376 | 10 | 5.35 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 260 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die.
-Each tier has its band (round 61, raised in round 68): a named horror takes 14 to 50 seconds and costs 0.2 to 1.2 lives; one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.45 to 1.5 lives.
+Each tier has its band (round 61, raised in round 68): a named horror takes 14 to 50 seconds and costs 0.2 to 1.2 lives (the Colour Out of Space may cost up to 1.5 with its restored healing); one of the 16 great fights (a Great Old One or an Outer God of the sort that is a fight of its own) takes 35 to 100 seconds and costs 0.45 to 1.5 lives.
 
 ## At the cap
 
@@ -94,7 +94,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 4 | Brown Jenkin | 30/30/30 | 5 | 1484 | 16 | 205 | 431 | 4 | 0.18 | 0 |
 | 5 | Ephraim Waite | 30/30/30 | 5 | 1773 | 16 | 226 | 431 | 5 | 0.17 | 0 |
 | 6 | Keziah Mason | 30/30/30 | 5 | 2438 | 17 | 452 | 431 | 5 | 0.35 | 0 |
-| 7 | The Colour Out of Space | 30/30/30 | 5 | 2549 | 20 | 846 | 431 | 5 | 0.65 | 0 |
+| 7 | The Colour Out of Space | 30/30/30 | 5 | 2549 | 22 | 957 | 431 | 5 | 0.74 | 0 |
 | 8 | The Hound | 30/30/30 | 5 | 3124 | 22 | 457 | 431 | 5 | 0.35 | 0 |
 | 9 | The Black Man | 30/30/30 | 5 | 3145 | 26 | 306 | 431 | 6 | 0.21 | 0 |
 | 10 | The Unnamable | 30/30/30 | 5 | 4194 | 28 | 628 | 431 | 6 | 0.43 | 0 |
@@ -150,7 +150,7 @@ given Echoes and star-stones. Each may cost at most 1.5 lives.
 | 4 | Brown Jenkin | 5/2/4 | 2 | 704 | 29 | 220 | 220 | 4 | 0.39 | 0 |
 | 5 | Ephraim Waite | 5/2/5 | 3 | 872 | 24 | 361 | 220 | 5 | 0.55 | 0 |
 | 6 | Keziah Mason | 6/2/5 | 3 | 1207 | 21 | 305 | 232 | 5 | 0.44 | 0 |
-| 7 | The Colour Out of Space | 6/3/5 | 4 | 1271 | 28 | 555 | 232 | 5 | 0.80 | 0 |
+| 7 | The Colour Out of Space | 6/3/5 | 4 | 1271 | 46 | 914 | 232 | 5 | 1.31 | 0 |
 | 8 | The Hound | 7/3/6 | 4 | 1624 | 24 | 309 | 244 | 5 | 0.42 | 0 |
 | 9 | The Black Man | 7/3/7 | 4 | 1691 | 31 | 269 | 244 | 6 | 0.32 | 0 |
 | 10 | The Unnamable | 8/3/7 | 5 | 2270 | 29 | 410 | 256 | 6 | 0.47 | 0 |

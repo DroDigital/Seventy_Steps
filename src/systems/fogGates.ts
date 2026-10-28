@@ -156,6 +156,7 @@ export function passFog(g: Game, w: FogWall): void {
 
 /** One step of a pass: the walk, and its end. Runs before the movement system, which it leaves nothing to move. */
 export function fogPassSystem(g: Game): void {
+  if (g.cutscene) return;
   const p = g.player;
   const pass = p.fogPass;
   if (!pass) return;

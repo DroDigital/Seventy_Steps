@@ -20,16 +20,16 @@ import { controlMount, dismissMount, toggleMount } from './mounts';
 const BUFFERED = ['light', 'heavy', 'parry', 'shoot', 'reload', 'item', 'heal', 'throw'] as const;
 
 export function playerControl(g: Game, real: InputFrame): void {
-  const input = g.reality.stolen > 0 ? possessed(g, real) : real;
   const p = g.player;
   const { actor, mover, stamina, transform } = g.ecs.c;
   const a = actor.get(p.id)!;
   const m = mover.get(p.id)!;
-  if (a.move === 'death' || p.falling) {
+  if (g.cutscene || a.move === 'death' || p.falling) {
     Object.assign(m, { vx: 0, vz: 0, face: null });
     p.sprinting = false;
     return;
   }
+  const input = g.reality.stolen > 0 ? possessed(g, real) : real;
 
   if (input.pressed.mount) toggleMount(g);
   if (p.mount.active) {

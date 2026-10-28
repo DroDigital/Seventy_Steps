@@ -103,6 +103,7 @@ export function gateStepSystem(g: Game): void {
 
 /** One step of the walk in, before movement (which it leaves nothing to move); at its end they are through. */
 export function gatePassSystem(g: Game): void {
+  if (g.cutscene) return;
   const p = g.player;
   const pass = p.gatePass;
   if (!pass) return;
