@@ -7,7 +7,8 @@
 import { createEcs, type Entity } from '../core/ecs';
 import { createEventBus } from '../core/events';
 import type { InputFrame } from '../core/input';
-import { createMountState, mountSystem, registerMounts } from './mounts';
+import { createMountState, dismissMount, mountSystem, registerMounts } from './mounts';
+import { stepPortalRide } from './mountPortal';
 import { MOUNT_QUEST } from '../data/mounts';
 import { yawOf, type V3 } from '../core/geom';
 import { createRng } from '../core/rng';
@@ -217,6 +218,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   g.frame++;
   NIGHT.hurried = g.overworld?.hurried ?? 0; // the night as this game has it (clock.ts)
   if (g.player.fogPass || g.player.gatePass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
+  if (stepPortalRide(g, input)) dismissMount(g); // a gate's ride, kept for a moment: the stick let go sets them down (mountPortal.ts)
   mountSystem(g);
   playerControl(g, input);
   fogPassSystem(g);
