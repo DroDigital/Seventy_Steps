@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { COLD } from '../src/data/bodyTuning';
 import type { Echo } from '../src/data/acoustics';
 import { BODY, BREATH, FOOT_GAIN, GEAR, STEP_LAYERS, STEP_VOICE, BOARD_CREAK, FEEL } from '../src/data/footSounds';
@@ -301,7 +301,17 @@ describe('the footsteps, understated (round 83)', () => {
   });
 
   it('the played steps keep to that level, the second foot of a pair lands softer, and no two are alike', () => {
-    const { gains } = walk(4.2);
+    let seed = 12345;
+    const random = vi.spyOn(Math, 'random').mockImplementation(() => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    });
+    let gains: number[];
+    try {
+      ({ gains } = walk(4.2));
+    } finally {
+      random.mockRestore();
+    }
     expect(gains.length).toBeGreaterThanOrEqual(30);
     const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
     for (const gain of gains) {

@@ -17,6 +17,7 @@ const lockable = (g: Parameters<typeof candidates>[0], id: number): boolean => c
 describe('signature mechanics (spec §3E)', () => {
   it('the Colour Out of Space heals by draining the world of colour, until the world has none left', () => {
     expect(getEntity('colour_out_of_space')!.sprite!.outside).toBe(true); // drawn in a hue outside the palette
+    expect(COLOUR.heal).toBe(30);
     const b = bossGame('colour_out_of_space');
     const { g, boss } = b;
     engage(b);

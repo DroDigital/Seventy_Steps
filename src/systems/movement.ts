@@ -32,6 +32,7 @@ export function movementSystem(g: Game, dt: number): void {
       shove.delete(id);
       continue;
     }
+    if (id === g.player.id && g.cutscene) continue; // a slow scene lets the world move, but holds the investigator in place
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
     if (id === g.player.id && g.player.falling) continue; // over an edge: gravity has it (falls.ts), not the ground it was snapped to (round 54)
     if (id === g.player.id) {
@@ -89,8 +90,8 @@ function separate(g: Game): void {
     for (let j = i + 1; j < ids.length; j++) {
       const ba = body.get(ids[i])!;
       const bb = body.get(ids[j])!;
-      const fixedA = ba.fixed || awaitsIntroduction(g, ids[i]);
-      const fixedB = bb.fixed || awaitsIntroduction(g, ids[j]);
+      const fixedA = ba.fixed || (g.cutscene && ids[i] === g.player.id) || awaitsIntroduction(g, ids[i]);
+      const fixedB = bb.fixed || (g.cutscene && ids[j] === g.player.id) || awaitsIntroduction(g, ids[j]);
       if (fixedA && fixedB) continue;
       const pa = transform.get(ids[i])!.pos;
       const pb = transform.get(ids[j])!.pos;
