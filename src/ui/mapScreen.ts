@@ -6,7 +6,8 @@
  * card for any mark (mapChrome.ts; round 60). The wheel or + and − (pad triggers) zoom; dragging, the arrows or
  * WASD (left stick) pan; C (pad A) finds the investigator; right-click or F (pad Y, at the middle) sets a marker the
  * minimap points to, or removes the one it is on, Delete clears them all (systems/marker.ts; round 68: up to twelve); L (the pad's X) opens or shuts the key. A lit Elder Sign clicked, or picked
- * with Tab (the pad's shoulders), is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
+ * with Tab (the pad's shoulders) or the pad's d-pad (the sign that way from the middle), or by resting the pad's
+ * mark on it, is chosen, and chosen again (Enter, pad A) is travelled to (playtest round 7,
  * mapTravel.ts). M or Esc (pad B) closes it.
  */
 
@@ -30,7 +31,7 @@ import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip, keyOpenPref,
 import { chartedRect, fitScale, openingView } from './mapFit';
 import { markAt, type Mark } from './mapMarks';
 import { UNIT, type MapPainter } from './mapPainter';
-import { BAR_WORDS, drawRing, litSigns, signAt } from './mapTravel';
+import { BAR_WORDS, drawRing, litSigns, padTravel, signAt, signToward } from './mapTravel';
 import { worldX, worldZ, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
@@ -110,7 +111,8 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const marks = (shown = painter.paint(ctx, view, realm(), true));
     drawBeacon(ctx, view, currentLead(g)?.at ?? null, realm(), 'screen', UNIT.full * k, 'lead');
     for (const m of markersHere(g)) drawBeacon(ctx, view, m, realm(), 'screen', UNIT.full * k, 'marker', 0, true); // the pins are among the marks; only their pointers, off screen
-    hover = pointer && !drag ? signAt(lit, view, pointer.x, pointer.y, Math.max(14, 9 * k)) : null;
+    const aim = deviceInUse() === 'pad' ? { x: view.w / 2, y: view.h / 2 } : pointer; // the pad's mark, at the middle, picks a sign as the pointer does
+    hover = aim && !drag ? signAt(lit, view, aim.x, aim.y, Math.max(14, 9 * k)) : null;
     canvas.style.cursor = drag ? 'grabbing' : hover ? 'pointer' : 'grab';
     if (hover && hover !== chosen) drawRing(ctx, view, hover, false, false, now, k);
     if (chosen) drawRing(ctx, view, chosen, true, !!barOf(chosen), now, k);
@@ -183,8 +185,19 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
       if (p.buttons[PAD_BUTTON.lt]?.pressed) zoomBy(0.97);
       const edge = (i: number): boolean => !!p.buttons[i]?.pressed && !padWas.has(i);
       if (edge(PAD_BUTTON.lb) || edge(PAD_BUTTON.rb)) cycle(edge(PAD_BUTTON.lb) ? -1 : 1);
+      const dir = edge(PAD_BUTTON.left) ? { x: -1, y: 0 } : edge(PAD_BUTTON.right) ? { x: 1, y: 0 } : edge(PAD_BUTTON.up) ? { x: 0, y: -1 } : edge(PAD_BUTTON.down) ? { x: 0, y: 1 } : null;
+      if (dir) {
+        const next = signToward(lit, view, { x: view.cx, z: view.cz }, dir);
+        if (next) {
+          choose(next);
+          [view.cx, view.cz] = [next.x, next.z];
+        }
+      }
       if (edge(PAD_BUTTON.a)) {
-        if (chosen) journey();
+        const under = signAt(lit, view, view.w / 2, view.h / 2, Math.max(14, 9 * uiScale()));
+        const act = padTravel(under, chosen);
+        if (act === 'choose' && under) choose(under);
+        else if (act === 'journey') journey();
         else centreOnPlayer();
       }
       if (edge(PAD_BUTTON.y)) markAtPoint(view.w / 2, view.h / 2); // the pad's mark is at the middle of the map
