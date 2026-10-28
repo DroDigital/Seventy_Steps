@@ -39,7 +39,7 @@ export function applyLevels(g: Game): void {
   const hp = healthAt(g.player.levels.vigour);
   const stamina = staminaAt(g.player.levels.endurance);
   [h.hp, h.max] = [Math.max(1, h.hp + hp - h.max), hp];
-  [s.value, s.max] = [Math.max(0, s.value + stamina - s.max), stamina];
+  [s.value, s.max] = [s.value < 0 ? s.value : Math.max(0, s.value + stamina - s.max), stamina];
   s.regen = staminaRegen(g.player.levels.endurance);
   refreshBossLevels(g, levelsWorth(g.player.levels));
 }

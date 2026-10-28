@@ -129,7 +129,10 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
   if (gun === null) return;
   const move = action === 'light' || action === 'heavy' ? comboMove(a, action) : action === 'dodge' ? dodge : action === 'item' ? 'drink' : action === 'heal' ? 'inject' : gun ?? action;
   const def = a.moves[move];
-  if (!def || !canAfford(st, def.stamina ?? 0)) return;
+  if (!def) return;
+  const cost = def.stamina ?? 0;
+  // A funded light attack can overdraw; a debt must recover before any action can start.
+  if (action === 'light' && cost > 0 ? !!st && st.value <= 0 : !canAfford(st, cost)) return;
   if (def.rest !== undefined && (a.move === move || (a.move === null && a.last === move && a.idle < def.rest))) return; // not again until it has rested
   if (action === 'item') {
     if (g.player.laudanum <= 0) return;
@@ -143,7 +146,7 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
     if (g.player.oil <= 0) return;
     g.player.oil--; // and a flask of oil (round 12)
   }
-  if (st && def.stamina) spend(st, def.stamina);
+  if (st && cost) spend(st, cost, action === 'light');
   startMove(a, move);
   if (move === 'reload') g.events.emit('Reloading', { entity: id });
   g.player.blockRaised = false; // a blow struck from behind a raised guard plays out

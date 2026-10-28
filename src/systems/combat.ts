@@ -61,7 +61,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
   let broken = false;
   if (frontal && d.actor.guard && !blow.unblockable) {
     const cost = blow.guard * STAMINA.guardCost;
-    const available = d.stamina?.value ?? 0;
+    const available = Math.max(0, d.stamina?.value ?? 0);
     if (!d.stamina || !absorb(d.stamina, cost)) return { outcome: 'blocked', damage: 0 };
     startMove(d.actor, 'guardBreak');
     broken = true;
