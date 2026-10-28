@@ -7,7 +7,7 @@
  * Gamepad API's own shape; those are read as the browser's are, the browser's list first.
  */
 
-import { faceSwapped } from './padMap';
+import { faceSwapped, PAD_BUTTON } from './padMap';
 
 /** A pad as the Gamepad API gives it, and as the desktop shell's bridge does. */
 interface PadLike {
@@ -44,7 +44,14 @@ interface Seen {
   armedAt: number; // timestamp of the last real use (0: not yet used)
   raw: number[]; // the axes as last read, and the buttons then down: what a recalibration takes as the pad's rest
   down: number[];
+  triggerValues: number[]; // last raw trigger readings for an explicit released-position calibration
   still: { at: number; v: number }[]; // for each axis, where it has lain and since when (a stick that has drifted lies quite still, a thumb does not)
+  trig: Trig[]; // the two triggers' rest, learned apart from a stick's (macOS, below)
+}
+/** A trigger is ordinary, uncalibrated, or has an explicitly recorded released position. */
+interface Trig {
+  rest: number;
+  mode: 'unknown' | 'ordinary' | 'calibrated';
 }
 const seen = new Map<string, Seen>();
 const PUSH = 0.5; // how far off its rest an axis must be to count as used
@@ -82,14 +89,36 @@ export const padFacts = (): string => [blocked ? `the browser refused: ${blocked
 
 const downOf = (p: PadLike): number[] => p.buttons.flatMap((b, i) => (b.pressed || b.value > 0.5 ? [i] : []));
 
-function read(p: PadLike, from: Source, now = performance.now()): { reading: PadReading; used: number } {
+/**
+ * A trigger as a pull of 0..1. A negative reading is ambiguous: −0.5 can be a released trigger
+ * that rises, or a held trigger that falls from zero. Never infer its rest from timing or the first
+ * reading; wait for an explicit released-position calibration. Safari's trigger axis is separate.
+ */
+function mendTrigger(t: Trig, b: { pressed: boolean; value: number }, axis: number | undefined, axisRest: number): { pressed: boolean; value: number } {
+  const value = Number.isFinite(b.value) ? b.value : 0;
+  const axisN = axis !== undefined && Number.isFinite(axis) ? axis : undefined;
+  const fromAxis = axisN !== undefined && axisRest < -0.4 ? Math.max(0, (axisN - axisRest) / (1 - axisRest)) : 0;
+  if (fromAxis >= 0.12) return { pressed: true, value: Math.min(1, fromAxis) };
+  const up = { pressed: false, value: 0 };
+  const pulled = (travel: number) => (travel > 0.18 ? { pressed: true, value: Math.min(1, travel / Math.max(0.45, travel)) } : up);
+  if (t.mode === 'calibrated') return b.pressed && value === 0 && t.rest === 0 ? { pressed: true, value: 1 } : pulled(Math.abs(value - t.rest));
+  if (b.pressed || value > 0.5) {
+    t.mode = 'ordinary';
+    return { pressed: true, value: value > 0 ? value : 1 };
+  }
+  // The negative channel is deliberately silent until the player records the released position.
+  return up;
+}
+
+function read(p: PadLike, from: Source, now = performance.now()): { reading: PadReading; used: number; key: string } {
   const key = `${from}:${p.index}:${p.id}`;
   let s = seen.get(key);
   if (!s) {
-    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], still: p.axes.map((v) => ({ at: now, v })) };
+    s = { rest: [...p.axes], stuck: new Set(downOf(p)), armedAt: 0, raw: [...p.axes], down: [], triggerValues: [0, 0], still: p.axes.map((v) => ({ at: now, v })), trig: [{ rest: 0, mode: 'unknown' }, { rest: 0, mode: 'unknown' }] };
     seen.set(key, s);
   }
   [s.raw, s.down] = [[...p.axes], downOf(p)];
+  s.triggerValues = [p.buttons[PAD_BUTTON.lt]?.value ?? 0, p.buttons[PAD_BUTTON.rt]?.value ?? 0];
   const axes = p.axes.map((v, i) => {
     if (p.mapping === 'standard' && i < 4 && Math.abs(v) < 0.1) s.rest[i] = 0; // a stick seen at centre rests at centre
     const lay = (s.still[i] ??= { at: now, v });
@@ -100,20 +129,22 @@ function read(p: PadLike, from: Source, now = performance.now()): { reading: Pad
     return Math.abs(r) > 0.3 ? (Math.abs(d) > 0.2 ? d : 0) : Math.abs(r) > 0.02 ? d : v; // an axis that lay off centre is read from where it lay
   });
   const buttons = p.buttons.map((b, i) => {
-    const down = b.pressed || b.value > 0.5;
+    const trig = i === 6 ? s.trig[0] : i === 7 ? s.trig[1] : undefined;
+    const src = trig ? mendTrigger(trig, b, p.axes[i === 6 ? 4 : 5], s.rest[i === 6 ? 4 : 5] ?? 0) : b;
+    const down = src.pressed || src.value > 0.5;
     if (s.stuck.has(i)) {
       if (!down) s.stuck.delete(i);
       return { pressed: false, value: 0 };
     }
-    return { pressed: b.pressed, value: b.value };
+    return { pressed: src.pressed, value: src.value };
   });
   const used = buttons.some((b) => b.pressed || b.value > 0.5) || p.axes.some((v, i) => Math.abs(v - (s.rest[i] ?? 0)) > PUSH) ? p.timestamp : 0;
   if (used) s.armedAt = Math.max(s.armedAt, used);
-  return { reading: { id: p.id, mapping: p.mapping, axes, buttons }, used: s.armedAt };
+  return { reading: { id: p.id, mapping: p.mapping, axes, buttons }, used: s.armedAt, key };
 }
 
 /** The best of a list's pads: of those used, the standard-mapped one used most recently, else any used most recently. */
-type Used = { reading: PadReading; used: number };
+type Used = { reading: PadReading; used: number; key: string };
 function bestOf(list: readonly (PadLike | null)[], from: Source): { best: Used | null; heard: number } {
   let best: Used | null = null;
   let heard = 0;
@@ -143,6 +174,9 @@ export function activePad(): PadReading | null {
   }
   const shell = shellList(); // (a page not allowed pads hears none of the browser's, and the shell's still)
   shellPads = shell.length;
+  // A reconnected pad must be calibrated anew: SDL's initial state can have changed.
+  const present = new Set([...list.filter((p): p is Gamepad => !!p && p.connected).map((p) => `browser:${p.index}:${p.id}`), ...shell.map((p) => `shell:${p.index}:${p.id}`)]);
+  for (const key of seen.keys()) if (!present.has(key)) seen.delete(key);
   const [web, native] = [bestOf(list, 'browser'), bestOf(shell, 'shell')];
   const [webUsed, nativeUsed] = [web.best, native.best];
   const now = performance.now();
@@ -155,10 +189,24 @@ export function activePad(): PadReading | null {
     if (stdWeb !== stdNative) best = stdWeb ? webUsed : nativeUsed; // a pad the browser lists in its own raw order (not 'standard') and the shell reads in the standard one: the standard one, or A and B are the wrong buttons (round 39)
   }
   source = best ? (best === nativeUsed ? 'shell' : 'browser') : null;
+  activeKey = best?.key ?? '';
   if (best) inHand = best.reading.id;
   const heard = Math.max(web.heard, native.heard); // (the same pad may be in both lists)
   report = best ? `${best.reading.id}${best.reading.mapping === 'standard' ? '' : ' (not a standard layout: some buttons may differ)'}` : heard ? `${heard} controller${heard > 1 ? 's' : ''} found: press a button on the one to use` : '';
   return best ? { ...best.reading, buttons: faceSwapped(best.reading.buttons) as PadReading['buttons'] } : null; // (A and B exchanged when the player's switch is on: core/padMap.ts)
+}
+
+let activeKey = '';
+/** Record the active pad's trigger positions after the player releases both triggers. */
+export function calibratePadTriggers(): boolean {
+  const s = seen.get(activeKey);
+  if (!s || s.triggerValues.some((v) => !Number.isFinite(v))) return false;
+  s.trig.forEach((trigger, i) => {
+    trigger.rest = s.triggerValues[i];
+    trigger.mode = 'calibrated';
+    s.stuck.delete(i === 0 ? PAD_BUTTON.lt : PAD_BUTTON.rt);
+  });
+  return true;
 }
 
 /** Takes every pad's sticks, where they lie now, for where they rest (one off by up to `DRIFT_MAX`), and ignores the buttons held now until they are let go: what pausing does, so that a pad that has drifted, or has a button that stuck, is set right by it. */

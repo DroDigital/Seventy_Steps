@@ -35,6 +35,7 @@ describe('the map key (2026-10-25)', () => {
 
   it('gives the pad a button for it, and the keyboard its letter', () => {
     expect(hintsFor(true, 'M').some(([keys, words]) => keys.includes('X') && words === 'Key')).toBe(true);
+    expect(hintsFor(true, 'M').some(([keys, words]) => keys.includes('R3') && words === 'Lock a sign')).toBe(true);
     expect(hintsFor(false, 'M').some(([keys, words]) => keys.includes('L') && words === 'Key')).toBe(true);
   });
 

@@ -114,7 +114,7 @@ export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['D-pad'], 'Pick a sign'], [['A'], 'Choose / travel'], [['LB', 'RB'], 'Next sign'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['R3'], 'Lock a sign'], [['Stick'], 'Switch'], [['D-pad'], 'Pick a sign'], [['A'], 'Choose / travel'], [['LB', 'RB'], 'Next sign'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
     : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
