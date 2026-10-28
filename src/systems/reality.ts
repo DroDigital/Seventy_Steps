@@ -28,6 +28,7 @@ import { isSheltered, type Fight, type Game, type Reality } from './components';
 import { playerEye } from './lockOn';
 import { REALITY_TRICKS, type HookStep } from './realityTricks';
 import { loseSanity } from './sanity';
+import { homeRung } from './ngPlus';
 
 export function createReality(): Reality {
   return { hooks: new Set(), darkness: 0, dark: 0, flood: 0, floodAt: null, warp: 0, gaze: 0, petrify: 0, stolen: 0, swapIn: REALITY.swapFirst, skipIn: REALITY.skipEvery[0], saturation: 1 };
@@ -118,7 +119,7 @@ const lightBound: HookStep = (g, fights) => {
     const h = g.ecs.c.health.get(e)!;
     const lit = litNear(g, f, e);
     h.ward = (h.ward ?? 1) * (lit ? REALITY.inLight : REALITY.inDark); // on top of any signature's (bossFight.ts clears it each step)
-    if (lit) h.hp = Math.max(1, h.hp - REALITY.lightBurn / SIM.hz);
+    if (lit) h.hp = Math.max(1, h.hp - (REALITY.lightBurn / SIM.hz) * homeRung(g.ecs.c.journey.get(e), g.player.cycle).health);
   }
 };
 

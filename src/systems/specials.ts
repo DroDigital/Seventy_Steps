@@ -70,7 +70,7 @@ export function summon(g: Game, by: Entity, what: string, near?: XZ, cap: number
   const p = groundNear(g, at, BOSS.summonRing, 0.6, c.fight.get(by)?.arena);
   const quarry = targetOf(g, by);
   const qp = c.transform.get(quarry)?.pos ?? at;
-  const e = spawnCreature(g, what, { ...p, yaw: yawOf(qp.x - p.x, qp.z - p.z) });
+  const e = spawnCreature(g, what, { ...p, yaw: yawOf(qp.x - p.x, qp.z - p.z) }, undefined, by);
   if (e === undefined) return undefined;
   c.minion.set(e, by);
   c.home.delete(e); // it does not go home: it goes with its summoner

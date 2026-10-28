@@ -243,6 +243,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.candle': "UNA VELA TOMA LA LLAMA",
   'n.pictureKept': "SE GUARDÓ UNA IMAGEN DEL SUEÑO",
   'n.pictureFail': "NO SE PUDO GUARDAR LA IMAGEN",
+  'n.journeyBalance': 'LOS VIAJES POSTERIORES SE ENDURECEN POR REGIÓN · CONSERVAS TU FUERZA Y DIFICULTAD',
   'n.recovered': "UNA PARTIDA DAÑADA SE REPARÓ DESDE SU COPIA",
   'n.tonicDull': "EL TÓNICO SE EMBOTA · UNA DOSIS MÁS DÉBIL, TOMADA TAN PRONTO",
   'n.autoQuality': "IMAGEN AJUSTADA A ESTE ORDENADOR · AJUSTES › PANTALLA",

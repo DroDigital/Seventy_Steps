@@ -79,7 +79,7 @@ export function populationSystem(g: Game): void {
       if (script?.called && !ow.called.has(s.entity)) continue; // not called yet: its arena waits empty
       if (!bossAwake(g, s.entity)) continue; // the one before it still stands (the Beyond's order): its arena waits empty
       if (ow.alive.size >= WORLD.maxActive && !makeRoom()) continue; // a horror is not kept from its own arena by a full house (round 61: the world is denser): the lesser foe farthest away makes room
-      const e = spawnCreature(g, s.entity, s.at, s.variant);
+      const e = spawnCreature(g, s.entity, s.at, s.variant, undefined, s.region);
       if (e === undefined) continue;
       const wound = ow.wounds.get(s.id);
       if (wound !== undefined) {

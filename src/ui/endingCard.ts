@@ -139,7 +139,7 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
       build(page) {
         heading(page, 'BEGIN ANEW?');
         el('opacity:.6;margin-bottom:14px', 'This dream is forgotten and a new one begins. The endings you have reached are remembered.', page);
-        el('opacity:.5;font-size:13px;margin-bottom:10px', "You may carry your strength into it: your levels, arms and their stones, the mind's upgrades, vials and Echoes. Its horrors will be hardier for it.", page);
+        el('opacity:.5;font-size:13px;margin-bottom:10px', "You may carry your strength into it: your levels, arms and their stones, the mind's upgrades, vials and Echoes. Every journey is substantially harder; familiar lands grow most. The eighth journey is the final difficulty ceiling.", page);
         const buttons = el('', '', page);
         boxed(button(buttons, 'No, go back', () => screen.show(end)));
         boxed(button(buttons, 'Begin anew', beginAnew));

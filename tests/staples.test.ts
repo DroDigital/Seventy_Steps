@@ -1,3 +1,4 @@
+import { foeRung } from '../src/systems/ngPlus';
 import { describe, expect, it } from 'vitest';
 import { COMBAT, NEW_GAME_PLUS } from '../src/data/tuning';
 import { getEntity } from '../src/data/registry';
@@ -92,12 +93,12 @@ describe('a new journey (NG+, round 12)', () => {
     applyCarry(g, parseCarry({ cycle: 2 })!);
     const e = spawnCreature(g, 'deep_one', { x: 0, z: 0, yaw: 0 })!;
     const def = getEntity('deep_one')!;
-    expect(g.ecs.c.health.get(e)!.max).toBe(Math.round(def.stats.hp * (1 + 2 * NEW_GAME_PLUS.health)));
+    expect(g.ecs.c.health.get(e)!.max).toBe(Math.round(def.stats.hp * foeRung(2, 'early').health));
     expect(g.ecs.c.combatant.get(e)!.bounty).toBe(Math.round(def.drops.echoes * foeBounty(g)));
     const h = g.ecs.c.health.get(g.player.id)!;
     const before = h.hp;
     strike(g, e, g.player.id, { damage: 20, poise: 0, guard: 0, hitstop: 0, parryable: false, interrupts: false });
-    expect(before - h.hp).toBe(Math.round(20 * (1 + 2 * NEW_GAME_PLUS.damage)));
+    expect(before - h.hp).toBe(Math.round(20 * foeRung(2, 'early').damage));
   });
 
   it('a damaged carry is mended, not trusted', () => {
