@@ -106,7 +106,13 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   let held = new Set<Button>();
   const banks = newLeaving(); // the poison it walks out of
   let dodgeIn = 60;
+  let dodgeDirection = 0;
   let drank = -Infinity;
+  const moves = c.actor.get(g.player.id)!.moves;
+  const reserve = moves.roll?.stamina ?? 0;
+  const strikeCost = (prefix: 'light' | 'heavy'): number => Math.max(0, ...Object.entries(moves).filter(([id]) => id.startsWith(prefix)).map(([, move]) => move.stamina ?? 0));
+  const lightCost = strikeCost('light');
+  const heavyCost = strikeCost('heavy');
   let frame = 0;
   for (; frame < frames; frame++) {
     const from = c.transform.get(g.player.id)!;
@@ -147,13 +153,15 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
       [f.moveY, f.moveX] = [(out.x * Math.sin(yaw) + out.z * Math.cos(yaw)) / d, (out.x * -Math.cos(yaw) + out.z * Math.sin(yaw)) / d];
     }
     if (!cover && !out && reach < 2.6) {
-      if (frame % 22 === 0) want.add('light');
-      else if (frame % 61 === 0) want.add('heavy');
+      const stamina = c.stamina.get(g.player.id)?.value ?? Infinity;
+      // A player who intends to dodge must leave a roll funded, even after a queued combo move.
+      const canStrike = (cost: number): boolean => style.skill === undefined || stamina >= cost + reserve;
+      if (frame % 22 === 0 && canStrike(lightCost)) want.add('light');
+      else if (frame % 61 === 0 && canStrike(heavyCost)) want.add('heavy');
     }
     if (reach > 4 && frame % 90 === 45) want.add('shoot'); // and, from afar, the revolver
     if (fightAction(g)) want.add('interact'); // the helm, the powder, the incantation
     if (style.mind && callsForLaudanum(g) && frame - drank > 60) {
-      drank = frame; // the HUD says to drink: so it does, and not twice in a second
       want.add('item');
     }
     if (style.skill !== undefined) { // it reads the wind-ups of what is about to strike it, and rolls away from some
@@ -162,14 +170,18 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
         rolled.add(key);
         if (rng() < style.skill) {
           want.add('dodge');
-          f.moveX = rng() < 0.5 ? -1 : 1;
+          f.moveX = dodgeDirection = rng() < 0.5 ? -1 : 1;
         }
       }
     } else if (--dodgeIn <= 0) {
       want.add('dodge');
-      f.moveX = rng() < 0.5 ? -1 : 1;
+      f.moveX = dodgeDirection = rng() < 0.5 ? -1 : 1;
       dodgeIn = 70 + Math.floor(rng() * 60);
     }
+    // A tap queues the dodge on release; another action must not overwrite it while it waits to start.
+    if (held.has('dodge')) f.moveX = dodgeDirection;
+    if (want.has('dodge') || held.has('dodge') || g.player.buffer.action === 'dodge') for (const b of ['light', 'heavy', 'shoot', 'item'] as const) want.delete(b);
+    if (want.has('item') && !held.has('item')) drank = frame; // retry if the dodge prevented the press
     for (const b of ['light', 'heavy', 'dodge', 'shoot', 'interact', 'item'] as const) {
       f.held[b] = want.has(b);
       f.pressed[b] = want.has(b) && !held.has(b);
