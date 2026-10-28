@@ -76,6 +76,7 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uQuantize: { value: 0 },
     uDither: { value: 0 },
     uGamma: { value: 1 }, // 1 / the brightness setting (round 12)
+    uPlate: { value: 0 }, // a last plate, off until ?plate= names one (shaders/plate.ts)
     uPalette: { value: palette },
   };
 }

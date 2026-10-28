@@ -9,6 +9,7 @@
 
 import { FOG_GLSL } from './fog';
 import { LIGHTING_GLSL } from './lighting';
+import { PLATE_GLSL } from './plate';
 
 export const POST_VERT = /* glsl */ `
 void main() {
@@ -46,6 +47,7 @@ uniform vec2 uChar; // a character (alpha 0.75: render/shaders/world.ts and spri
 uniform float uQuantize;
 uniform float uDither;
 uniform float uGamma; // 1 / the brightness setting: below 1 lifts the dark
+uniform float uPlate; // a last plate over the picture, off until one is chosen (?plate=, shaders/plate.ts)
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
 ${LIGHTING_GLSL}
@@ -182,6 +184,8 @@ vec3 posterize(vec3 c, vec2 cell) {
   return pow(floor(s * n + 0.5) / n, vec3(2.0));
 }
 
+${PLATE_GLSL}
+
 void main() {
   vec2 cell = floor(gl_FragCoord.xy);
   vec2 uv = (cell + 0.5) / uRes;
@@ -219,7 +223,7 @@ void main() {
 
   vec4 centre = texture(tScene, uv);
   if (centre.a < 0.5) {
-    gl_FragColor = vec4(pow(plunge(centre.rgb, uv), vec3(uGamma)), 1.0); // outside the palette: no grade, no quantising
+    gl_FragColor = vec4(plateOf(pow(plunge(centre.rgb, uv), vec3(uGamma)), uv, cell), 1.0); // outside the palette: no grade, no quantising
     return;
   }
   bool person = centre.a < 0.9; // marked 0.75; the Colour's own mark (0.31) was dealt with above
@@ -252,6 +256,6 @@ void main() {
   vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
   vec3 col = pow(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
-  gl_FragColor = vec4(col, 1.0);
+  gl_FragColor = vec4(plateOf(col, uv, cell), 1.0);
 }
 `;

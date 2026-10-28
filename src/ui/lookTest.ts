@@ -2,6 +2,7 @@
 
 import { PerspectiveCamera } from 'three';
 import { startLoop } from '../core/loop';
+import { plateFrom } from '../data/plates';
 import { FX, ORBIT, RENDER, SIM } from '../data/tuning';
 import { allEffectsOn, anomalyProximity, computeFx, lensAt, type FxState } from '../render/fx';
 import { applyLens } from '../render/lens';
@@ -15,6 +16,7 @@ import { createOrbitRig } from './orbitRig';
 export function startLookTest(): void {
   const state: FxState = { sanity: 100, cap: FX.capDefault, anomalyProximity: 0, enabled: allEffectsOn() };
   const pipeline = createPipeline(document.body);
+  pipeline.post.uniforms.uPlate.value = plateFrom(new URLSearchParams(location.search).get('plate'));
   const world = createTestScene();
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
   const rig = createOrbitRig(pipeline.renderer.domElement);
