@@ -102,7 +102,8 @@ export function foeDamage(g: Game, attacker: Entity): number {
   const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
   const fight = g.ecs.c.fight.get(attacker);
   const level = fight ? bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage) : 1;
-  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level;
+  const land = fight ? 1 : g.ecs.c.dread.get(attacker)?.land ?? 1; // a region's press (data/regionPress); a horror keeps its own scaling
+  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level * land;
 }
 
 /** The Echoes this journey's foes leave, against the first's. */

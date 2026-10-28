@@ -14,7 +14,7 @@ import type { Entity } from '../core/ecs';
 import { distXZ, yawOf, type XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { BrainDef } from '../data/archetypes';
-import { AI, BOSS, SIM } from '../data/tuning';
+import { AI, BOSS, RANK, SIM } from '../data/tuning';
 import { ATTACKS } from '../data/attacks';
 import { moveDef, startMove } from './actions';
 import { evade, holdInside, rimGap } from './bossArena';
@@ -143,8 +143,17 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
   if (evade(g, id, br)) return;
   const waiting = !arena && target === g.player.id && !br.token && p.mobile && p.range[1] <= AI.wait;
   const servant = c.minion.has(id);
-  const [lo, hi] = servant ? [Math.max(p.cooldown[0] * 1.4, BOSS.servantGap[0]), Math.max(p.cooldown[1] * 1.4, BOSS.servantGap[1])] : arena ? [Math.max(p.cooldown[0], BOSS.gap[0]), Math.max(p.cooldown[1], BOSS.gap[1])] : p.cooldown; // (round 46)
-  const ready = br.cooldown === 0 || (!arena && target === g.player.id && br.cooldown <= hi * (1 - AI.punish) && opening(g));
+  const pressed = !servant && c.dread.get(id)?.tier === 'lesser' && (RANK.tempers as readonly string[]).includes(br.def.archetype);
+  const [lo, hi] = servant
+    ? [Math.max(p.cooldown[0] * 1.4, BOSS.servantGap[0]), Math.max(p.cooldown[1] * 1.4, BOSS.servantGap[1])]
+    : pressed
+      ? RANK.cooldown
+      : arena
+        ? [Math.max(p.cooldown[0], BOSS.gap[0]), Math.max(p.cooldown[1], BOSS.gap[1])]
+        : p.cooldown; // (round 46; a lesser hunter's own wait is RANK)
+  const punish = pressed ? RANK.punish : AI.punish;
+  const into = (pressed || !arena) && target === g.player.id && br.cooldown <= hi * (1 - punish) && opening(g);
+  const ready = br.cooldown === 0 || into;
   let [dart, held] = [false, false];
   if (ready && !(waiting && d > p.range[1] + 1)) { // one waiting its turn strikes only what comes to it
     let attack = chooseAttack(br.def, d, g.rng, p.mobile);

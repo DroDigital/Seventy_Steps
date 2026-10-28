@@ -130,6 +130,7 @@ export interface Dread {
   blow: number; // sanity per landed hit
   insight: number; // insight on first sight
   glow: boolean; // carries anomaly colour (the FX controller's anomaly proximity)
+  land: number; // the region's press on this body (1 off the land, and for a boss): health was multiplied by it, and blows are too
 }
 
 /** HiddenLayer (spec §3A): there only while insight ≥ minInsight and the sanity band lies at or below maxSanity. */
