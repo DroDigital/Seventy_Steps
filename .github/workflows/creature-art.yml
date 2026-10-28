@@ -24,11 +24,5 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts
-      # PR 219 explicitly defers the boss-balance audit while the stamina rules change.
-      - name: Check without boss-balance audit (PR 219)
-        if: github.event_name == 'pull_request' && github.event.pull_request.number == 219
-        run: npm run check:all -- --exclude tests/balance.test.ts
-      - name: Check all tests
-        if: github.event_name != 'pull_request' || github.event.pull_request.number != 219
-        run: npm run check:all
+      - run: npm run check:all
       - run: npm run build
