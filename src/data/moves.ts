@@ -103,6 +103,7 @@ export interface CloudDef {
   mind: number; // sanity a second it takes of one within, before the horror's weight (a toxic cloud's is none)
   drift: number; // m/s toward the target
   kind: 'toxic' | 'dream';
+  blind?: boolean; // 2026-10-29, a blind horror's: the banks rise about its body at even bearings and spread outward, after no one
 }
 
 /** A beam swept across an arc over its window (the sweeping beam): get behind it or roll through it. */

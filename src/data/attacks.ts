@@ -33,7 +33,7 @@ export interface AttackDef {
   effect?: EffectKind;
   marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; rings?: number; turns?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
   wave?: { speed: number; width: number; reach: number; lane?: { half: number; push: number } }; // the quake (see WaveDef)
-  cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
+  cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind' | 'blind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
   sweep?: { arc: readonly [number, number]; length: number; width: number }; // the sweeping beam, over the active frames
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
@@ -98,6 +98,7 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   seethe: { kind: 'area', windup: 40, active: 1, recovery: 44, power: 0.7, poise: 1, range: [0, 30], marks: { count: 12, ring: [0.4, 6.8], delay: 36, stagger: 5, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } } }, // it blasphemes and bubbles: boils over the whole court where it hears nothing, each leaving a pool of the formless to keep off
   maelstrom: { kind: 'special', windup: 36, active: 90, recovery: 1, power: 0, poise: 0, range: [3, 12], pull: { speed: 4.6, range: 12 }, follow: 'maelstrom_burst' }, // the centre of all draws the court in (a sprint gains a little on it, a walk none)...
   maelstrom_burst: { kind: 'area', windup: 10, active: 6, recovery: 50, power: 2, poise: 2.2, range: [0, 0], reach: 0, radius: 6.1, height: 0.3, arc: [180, -180], tight: true }, // ...and breaks about it, out past where the body stands: its heaviest blow, rolled through as it breaks
+  miasma: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 30], cloud: { count: 4, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.2, kind: 'dream', blind: true } }, // the nothing the court is full of boils up about the body and spreads outward, after no one, taking the mind, not the body
   crescendo: { kind: 'area', windup: 40, active: 1, recovery: 4, power: 0.7, poise: 1, range: [0, 30], marks: { count: 8, ring: [0.4, 6.8], delay: 56, stagger: 8, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } }, follow: 'dirge' }, // its last phase's own: the whole orchestra at once, boils laid over the court and, before they have all burst, the three rings of the dirge
 };
 
@@ -145,7 +146,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   if (a.follow) move.then = a.follow;
   else if (a.kind !== 'special') move.open = a.windup + a.active; // it recovers, stooped, after the blow (hurt.ts)
   if (a.pull) move.pull = { window: [a.windup, a.windup + a.active], speed: a.pull.speed, range: a.pull.range * k };
-  const cloud: CloudDef | undefined = a.cloud && { frame: a.windup, count: a.cloud.count, radius: a.cloud.radius * Math.min(Math.sqrt(k), CLOUD_MOST), life: a.cloud.life, tick: a.cloud.tick, damage: Math.round(a.cloud.power * stats.damage), mind: a.cloud.mind * stats.sanityDamage, drift: a.cloud.drift, kind: a.cloud.kind };
+  const cloud: CloudDef | undefined = a.cloud && { frame: a.windup, count: a.cloud.count, radius: a.cloud.radius * Math.min(Math.sqrt(k), CLOUD_MOST), life: a.cloud.life, tick: a.cloud.tick, damage: Math.round(a.cloud.power * stats.damage), mind: a.cloud.mind * stats.sanityDamage, drift: a.cloud.drift, kind: a.cloud.kind, ...(a.cloud.blind && { blind: true }) };
   if (a.kind === 'special' || stats.damage <= 0 || (damage <= 0 && !pool && !cloud)) return move;
   move.interrupt = [Math.round(a.windup * 0.3), a.windup];
   const b = a.bolts;

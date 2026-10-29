@@ -76,7 +76,7 @@ nothing in its way.
 | 44 | Nyarlathotep | 18/9/17 | 5 | 6850 | 328 | 3481 | 448 | 10 | 1.55 | 0 |
 | 45 | Shub-Niggurath | 18/9/17 | 5 | 7249 | 221 | 2436 | 448 | 10 | 1.09 | 0 |
 | 46 | Yog-Sothoth | 18/9/17 | 5 | 8113 | 321 | 3732 | 448 | 10 | 1.67 | 0 |
-| 47 | Azathoth | 18/9/17 | 5 | 8911 | 221 | 4730 | 448 | 10 | 2.11 | 0 |
+| 47 | Azathoth | 18/9/17 | 5 | 8911 | 224 | 5193 | 448 | 10 | 2.32 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 450 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die, subject to the named pressure exceptions below.
 Each tier has its band: a named horror takes 14 to 90 seconds and costs 0.2 to 1.2 lives (the Colour may cost up to 1.5); one of the 17 great fights takes 35 to 170 seconds and costs 0.45 to 1.5 lives. Named exceptions are brown jenkin 14–120 seconds; colossus pyramids 14–110 seconds; daemon pipers 14–145 seconds 0.2–1.6 lives; zkauba 14–130 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–280 seconds; nyarlathotep 35–430 seconds 0.45–3 lives; azathoth 90–430 seconds 1.7–3 lives; shub niggurath 35–250 seconds; yog sothoth 35–400 seconds 0.45–2.5 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–135 seconds. Yog-Sothoth is additionally capped at 2.5 lives at its expected standing.
@@ -134,7 +134,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 44 | Nyarlathotep | 30/30/30 | 5 | 8548 | 248 | 3642 | 541 | 10 | 1.35 | 0 |
 | 45 | Shub-Niggurath | 30/30/30 | 5 | 9046 | 179 | 2472 | 541 | 10 | 0.91 | 0 |
 | 46 | Yog-Sothoth | 30/30/30 | 5 | 10125 | 236 | 3258 | 541 | 10 | 1.20 | 0 |
-| 47 | Azathoth | 30/30/30 | 5 | 11121 | 159 | 4214 | 541 | 10 | 1.56 | 0 |
+| 47 | Azathoth | 30/30/30 | 5 | 11121 | 165 | 5303 | 541 | 10 | 1.96 | 0 |
 
 ## The opening
 

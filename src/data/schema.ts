@@ -80,6 +80,7 @@ export const ATTACK_IDS = [
   'maelstrom',
   'maelstrom_burst',
   'crescendo',
+  'miasma',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 

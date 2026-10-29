@@ -2,7 +2,7 @@
  * Azathoth's attacks (2026-10-29; asked: "implement different and unique boss attacks to make this the most challenging boss fight of all", and to take away the timer
  * and the drain of its health): it is blind, so none of its blows is aimed at the investigator. The dirge is three rings of sound, each quicker than the last; the
  * drumbeat is rings of boils that burst outward a beat at a time; the dance is thirteen stamps winding out of its flank; the seething is boils over the whole court that
- * leave pools; the maelstrom draws the court in and breaks about the body. Each is read by where it will fall and when, in the Court it fights in (44 m across).
+ * leave pools; the miasma spreads outward and takes the mind; the maelstrom draws the court in and breaks about the body. Each is read by where it will fall and when, in the Court it fights in (44 m across).
  */
 import { describe, expect, it } from 'vitest';
 import type { Entity } from '../src/core/ecs';
@@ -25,7 +25,7 @@ import { worldLayout } from '../src/world/placements';
 import { steps } from './helpers';
 import { kill, record, run } from './worldHelpers';
 
-const OWN: readonly AttackId[] = ['dirge', 'dirge_2', 'dirge_3', 'drumbeat', 'dance', 'seethe', 'maelstrom', 'maelstrom_burst', 'crescendo'];
+const OWN: readonly AttackId[] = ['dirge', 'dirge_2', 'dirge_3', 'drumbeat', 'dance', 'seethe', 'maelstrom', 'maelstrom_burst', 'crescendo', 'miasma'];
 const azathoth = getEntity('azathoth')!;
 const moves = toCombatant(azathoth).moves;
 const body = toCombatant(azathoth).radius;
@@ -98,6 +98,20 @@ describe('Azathoth\'s attacks, as data', () => {
     expect(outermost('dance')).toBeLessThan(court);
     const small = compileAttack('dirge', azathoth.stats, 1.9); // and for a body of a man's height, the same rings, small
     expect(small.wave!.speed).toBeLessThan(moves.dirge.wave!.speed / 3);
+  });
+});
+
+describe('Azathoth\'s attacks are aimed at no one', () => {
+  it('nothing it does is laid on the investigator: no bolt, beam or pool is thrown at them, no mark, lane or cloud is laid to find them', () => {
+    for (const id of attacksOf(azathoth)) {
+      const m = moves[id];
+      expect(m.volley, id).toBeUndefined();
+      expect(m.shot, id).toBeUndefined();
+      expect(m.pool, id).toBeUndefined();
+      if (m.marks) expect(['beats', 'spiral', 'scatter'], id).toContain(m.marks.pattern);
+      if (m.wave) expect(m.wave.lane, id).toBeUndefined();
+      if (m.cloud) expect(m.cloud.blind, `${id}: a cloud of its own does not seek`).toBe(true);
+    }
   });
 });
 
@@ -218,6 +232,29 @@ describe('Azathoth\'s attacks, played in its Court', () => {
     perform(far.g, far.boss, 'maelstrom', () => far.g.ecs.c.actor.get(far.boss)!.move === 'maelstrom_burst', 200);
     steps(far.g, 30);
     expect(missed.filter((h) => h.attacker === far.boss && h.target === far.g.player.id)).toEqual([]);
+  });
+
+  it('the miasma rises about the body at even bearings and spreads outward after no one: it is laid and goes the same wherever the investigator stands', () => {
+    const laid = (gap: number) => {
+      const { g, boss } = court(gap);
+      g.rng = seeded(11);
+      expect(perform(g, boss, 'miasma', () => g.ecs.c.hazard.size >= 4)).toBe(true);
+      const centre = g.ecs.c.transform.get(boss)!.pos;
+      const banks = [...g.ecs.c.hazard].filter(([, h]) => h.cloud);
+      const where = () => banks.map(([e]) => g.ecs.c.transform.get(e)!.pos).map((p) => ({ x: +(p.x - centre.x).toFixed(3), z: +(p.z - centre.z).toFixed(3) }));
+      const first = where();
+      steps(g, 120);
+      return { banks, first, later: where() };
+    };
+    const [near, far] = [laid(20), laid(38)];
+    expect(near.banks).toHaveLength(4);
+    expect(near.first).toEqual(far.first);
+    expect(near.later).toEqual(far.later);
+    const out = (p: { x: number; z: number }): number => Math.hypot(p.x, p.z);
+    near.later.forEach((p, i) => expect(out(p)).toBeGreaterThan(out(near.first[i]) + 1.5)); // spreading outward
+    const bearings = near.first.map((p) => Math.atan2(p.x, p.z)).sort((a, b) => a - b);
+    for (let i = 1; i < bearings.length; i++) expect(bearings[i] - bearings[i - 1]).toBeCloseTo(Math.PI / 2, 1); // a quarter of the circle apart
+    expect(near.banks.every(([, h]) => h.cloud === 'dream' && h.damage === 0 && (h.mind ?? 0) > 0)).toBe(true); // it takes the mind, not the body
   });
 
   it('the crescendo, its last phase\'s own, lays boils over the court and runs on into the dirge before the last of them has burst', () => {

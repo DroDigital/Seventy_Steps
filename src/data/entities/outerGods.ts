@@ -16,9 +16,9 @@ export const OUTER_GODS = tier('outer_god', [
       // centre draws all in: rhythms over the whole court, read by where they fall and when. What it does aim is an answer to a noise (signatures/azathoth.ts). 2026-10-29: it had
       // been an ordeal of silence, invulnerable, its health bar a song that drained; it is the hardest fight there is (the pauses shrink with each phase, the last hears everything).
       ph(1, { dirge: 3, drumbeat: 2, seethe: 2, roar: 1 }),
-      ph(0.72, { dirge: 2, drumbeat: 2, dance: 3, seethe: 1, dream_cloud: 1, roar: 1 }, { hooks: ['darkness'] }),
-      ph(0.45, { dirge: 2, drumbeat: 2, dance: 2, seethe: 2, maelstrom: 3, dream_cloud: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp'] }),
-      ph(0.2, { dirge: 3, drumbeat: 2, dance: 3, seethe: 2, maelstrom: 3, crescendo: 3, dream_cloud: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
+      ph(0.72, { dirge: 2, drumbeat: 2, dance: 3, seethe: 1, miasma: 1, roar: 1 }, { hooks: ['darkness'] }),
+      ph(0.45, { dirge: 2, drumbeat: 2, dance: 2, seethe: 2, maelstrom: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp'] }),
+      ph(0.2, { dirge: 3, drumbeat: 2, dance: 3, seethe: 2, maelstrom: 3, crescendo: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
     ), { mobile: false, range: [0, 60], aggro: 0, fov: 0, cooldown: [60, 110] }),
     stats: st(6700, 5000, 56, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // (2026-10-29: damage 150 to 56, which the library's powers now multiply: its heaviest blow, the maelstrom's burst, is a quarter of a person's health where it is met)
   },

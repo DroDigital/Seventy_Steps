@@ -72,6 +72,7 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   maelstrom: 'The centre draws all in, then breaks. Running gains little: roll as it breaks.',
   maelstrom_burst: 'The burst fills the ground about the god. Roll as it breaks, not before.',
   crescendo: 'Boils on the ground and the three rings behind them. Leave the boils, then roll each ring.',
+  miasma: 'The nothing about the god spreads outward and takes the mind. Step out of it and steady yourself.',
 };
 
 /** A fragment of the place where it happened: the waking world, then the dream's realms. */

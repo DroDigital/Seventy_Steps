@@ -67,6 +67,7 @@ export interface Hazard {
   fire?: boolean; // burning oil (round 12)
   cloud?: 'toxic' | 'dream'; // round 70: a bank of air that drifts after its target, drawn as a cloud and not as a pool
   drift?: number; // metres a frame it creeps toward its owner's target
+  heading?: number; // 2026-10-29: a blind horror's bank creeps this way instead (radians, yaw 0 = +z), after no one
   mind?: number; // sanity a second it takes of the investigator within it (before the horror's weight)
   total?: number; // its life when it rose (the picture swells in and thins out over it)
 }
