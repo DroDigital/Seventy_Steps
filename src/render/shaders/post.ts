@@ -45,7 +45,7 @@ uniform vec3 uAnomalyHues;
 uniform vec2 uChar; // a character (alpha 0.75: render/shaders/world.ts and sprite.ts; round 34) keeps its own colours: x the share of the realm's grade it takes, y the levels each colour is quantised to
 uniform float uQuantize;
 uniform float uDither;
-uniform float uGamma; // 1 / the brightness setting: below 1 lifts the dark
+uniform float uGamma; // inverse of the scaled brightness setting: below 1 lifts the dark
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
 ${LIGHTING_GLSL}

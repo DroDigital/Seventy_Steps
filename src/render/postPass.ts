@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { LOOKS } from '../data/looks';
 import { SHAFT } from '../data/mistLight';
-import { FOG, FX, LIGHT, LIGHTING } from '../data/tuning';
+import { brightnessGamma, FOG, FX, LIGHT, LIGHTING } from '../data/tuning';
 import type { FxParams } from './fx';
 import { ANOMALY_HUES } from './palette';
 import { ANOMALY_FROM, ANOMALY_TO, buildRealmPalette, gradeTints } from './realmPalette';
@@ -75,7 +75,7 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uVig: { value: LIGHTING.vignette },
     uQuantize: { value: 0 },
     uDither: { value: 0 },
-    uGamma: { value: 1 }, // 1 / the brightness setting (round 12)
+    uGamma: { value: brightnessGamma(1) }, // the default brightness until the first frame
     uPalette: { value: palette },
   };
 }

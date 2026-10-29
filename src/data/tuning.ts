@@ -93,7 +93,7 @@ export const LIGHT = {
 /** The investigator's lantern: a warm point light at the hip, the night's only real light. */
 export const LANTERN = {
   color: [1, 0.82, 0.58] as Vec3,
-  intensity: 1.15, // (round 58: 1.5; the lantern lit a whole corridor and the road about it, and the dark it was to be walked through was not there)
+  intensity: 1.3, // +13% over 1.15: a stronger warm pool against the 85% brightness baseline, with the same falloff and reach
   range: 8.5, // metres: the light fades smoothly to nothing here (no hard edge) (round 58: 11)
   decay: 0.12, // inverse-square falloff, per m², so the pool is brightest at the player
   facing: 0.5, // weight of N·L: surfaces turned away keep 1 - facing of the light

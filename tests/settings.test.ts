@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
+import { brightnessGamma, HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
 import { clampSetting, defaultSettings, loadSettings, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
 
 function memoryStore() {
@@ -22,6 +22,21 @@ describe('settings', () => {
     expect([0.8, 1.2, 1.6, 2].map((scale) => clampSetting('resolution', scale))).toEqual([0.8, 1.2, 1.6, 2]);
     expect(SETTINGS.resolution[1]).toBe(defaultSettings().resolution);
     for (const screen of [720, 1080, 1440, 2160]) expect((screen / (RENDER.height * 1.6)) % 1).toBe(0); // 640 × 360 still is
+  });
+
+  it('makes the old 85% look the new 100% baseline and lets the player brighten it', () => {
+    expect(SETTINGS.brightness).toEqual([0.9, 1.9, 0.05, 1]);
+    expect(brightnessGamma(defaultSettings().brightness)).toBeCloseTo(1 / 0.85);
+    expect(brightnessGamma(1.5)).toBeLessThan(brightnessGamma(1));
+    const old = (brightness: number) => parseSettings(JSON.stringify({ brightness, v: 21 })).brightness;
+    expect(old(1)).toBe(1); // the former default follows the new default
+    expect(old(0.9)).toBe(1.05);
+    expect(old(0.85)).toBe(1);
+    expect(old(1.25)).toBe(1.45); // a brighter choice is retained approximately
+    expect(old(0.7)).toBe(0.9); // the new slider starts at 90%
+    const store = memoryStore();
+    storeSettings(store, { ...defaultSettings(), brightness: 1.5 });
+    expect(loadSettings(store).brightness).toBe(1.5);
   });
 
   it('clamps into range and snaps to the step', () => {
@@ -79,7 +94,7 @@ describe('settings', () => {
     for (const version of [13, 14]) {
       for (const resolution of HIGH_RESOLUTIONS) {
         const chosen = { ...defaultSettings(), resolution, fxCap: 0.4, brightness: 1.25, fog: 0.5 };
-        expect(parseSettings(JSON.stringify({ ...chosen, v: version }))).toEqual({ ...chosen, resolution: defaultSettings().resolution });
+        expect(parseSettings(JSON.stringify({ ...chosen, v: version }))).toEqual({ ...chosen, brightness: 1.45, resolution: defaultSettings().resolution });
       }
     }
     const store = memoryStore();
@@ -93,7 +108,7 @@ describe('settings', () => {
     for (const resolution of HIGH_RESOLUTIONS) {
       expect(clampSetting('resolution', resolution)).toBe(resolution);
       storeSettings(store, { ...defaultSettings(), resolution });
-      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(21);
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(22);
       expect(loadSettings(store).resolution).toBe(resolution);
     }
     expect(clampSetting('resolution', 99)).toBe(2.4);
