@@ -22,7 +22,7 @@ export const GREATER = tier('greater', [
     behavior: { archetype: 'brute', attacks: ['tentacle_burst', 'grab', 'slam', 'aoe_ring'] },
     stats: st(900, 160, 36, 3.6, 2, 8), resist: ['slash', 'shot'], weak: ['fire'], drops: { echoes: 900 }, insightOnSight: 0,
     bossVariant: {
-      name: 'Elder Shoggoth', sprite: { scale: 9, eyes: 16 }, stats: { hp: 2000, poise: 900, damage: 60 },
+      name: 'Elder Shoggoth', sprite: { scale: 9, eyes: 16 }, stats: { hp: 3000, poise: 900, damage: 60 }, // (round 100, 50% more: health 2000 to 3000)
       drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
       bossScript: phases(ph(1, { tentacle_burst: 2, grab: 1, slam: 1, aoe_ring: 1, vortex: 1 }, { hooks: ['darkness'] }), ph(0.5, { tentacle_burst: 2, charge: 2, aoe_ring: 1, roar: 1, quake: 1 }, { hooks: ['darkness'] })),
     },
@@ -45,7 +45,7 @@ export const GREATER = tier('greater', [
     behavior: { archetype: 'invisible_stalker', attacks: ['wind_push', 'grab', 'tentacle_burst'] },
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
     bossVariant: {
-      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.73, 0.25] }, stats: { hp: 1900, poise: 800, damage: 55 }, // its redrawn body: a mass 3 m across under 6.25 m of tentacle; struck up to 5.84 m, for its hall's roof is at 6 and a capsule that reaches it is pushed out through the wall (round 57)
+      name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.73, 0.25] }, stats: { hp: 2850, poise: 800, damage: 55 }, // (round 100, 50% more: health 1900 to 2850) its redrawn body: a mass 3 m across under 6.25 m of tentacle; struck up to 5.84 m, for its hall's roof is at 6 and a capsule that reaches it is pushed out through the wall (round 57)
       drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
       bossScript: phases(ph(1, { wind_push: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['decoys'] }), ph(0.5, { wind_push: 2, aoe_ring: 1, tentacle_burst: 1, grab: 1, barrage: 1 }, { hooks: ['decoys', 'control_swap'] })),
     },

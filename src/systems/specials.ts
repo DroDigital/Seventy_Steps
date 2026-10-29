@@ -1,7 +1,7 @@
 /**
  * The attack library's special effects (spec §3E), on the frames their moves name: a teleport
  * lands near the target, a summon calls up one of its summoner's servants (a boss's phase decides
- * which; never more than BOSS.minions at once), a gaze in sight builds up on the investigator until
+ * which; never more than BOSS.minions of one summoner at once, nor BOSS.summonCap in a boss fight), a gaze in sight builds up on the investigator until
  * the mind reels, darkness snuffs the light for a while, and the pool attack spreads a pool under
  * its target. Pure: no Three.js.
  */
@@ -62,9 +62,13 @@ export function summonsOf(g: Game, id: Entity): readonly string[] {
 export const minionsOf = (g: Game, id: Entity): Entity[] =>
   [...g.ecs.c.minion].filter(([m, by]) => by === id && (g.ecs.c.health.get(m)?.hp ?? 0) > 0).map(([m]) => m);
 
+/** The summons a boss fight has standing: its servants, not its decoys, which are illusions (round 100). */
+export const summonsAlive = (g: Game, id: Entity): number => minionsOf(g, id).filter((m) => !g.ecs.c.phantom.get(m)?.decoy).length;
+
 /** Calls up `what` beside its summoner (or `near`), already on the summoner's quarry. Undefined at the cap. */
 export function summon(g: Game, by: Entity, what: string, near?: XZ, cap: number = BOSS.minions): Entity | undefined {
   if (minionsOf(g, by).length >= cap) return undefined;
+  if (g.ecs.c.fight.has(by) && summonsAlive(g, by) >= BOSS.summonCap) return undefined; // a boss fight holds this many at most, from every source (round 100)
   const c = g.ecs.c;
   const at = near ?? c.transform.get(by)!.pos;
   const p = groundNear(g, at, BOSS.summonRing, 0.6, c.fight.get(by)?.arena);

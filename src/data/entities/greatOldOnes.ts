@@ -16,7 +16,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, tidal_surge: 1, tentacle_rise: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),
       ph(0.33, { slam: 2, tentacle_burst: 2, grab: 2, wind_push: 1, roar: 1, tentacle_rise: 1, vortex: 1, tidal_surge: 1, crushing_blow: 1 }, { hooks: ['flood', 'camera_warp'], arena: 'ship' }),
     )),
-    stats: st(5350, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 97: health 4650 to 5350, its highest in the tables) (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
+    stats: st(8025, 5000, 43, 2, 10, 20), drops: { echoes: 30000 }, insightOnSight: 4, // (round 100, 50% more: health 5350 to 8025) (round 97: health 4650 to 5350, its highest in the tables) (round 25: health 6700 and damage 120; the balance table had it at 188 s and 9.3 lives) (round 60: health 4300 and damage 35, no blow over 16% of a person's health where they meet it; a crushing blow restored, held a second)
   },
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
@@ -24,13 +24,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     // Both sea gods share the temple: keep the flood and their own attacks, with no darkness
     // hiding Hydra's ground cues and no extra servants crowding the two-boss fight.
     ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, wind_push: 1, tidal_surge: 1 }, { hooks: ['flood'] }), ph(0.5, { slam: 2, sweep: 1, roar: 1, charge: 1, vortex: 1, tidal_surge: 1 }, { hooks: ['flood'] }))),
-    stats: st(2550, 1200, 35, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // balanced with Hydra as one encounter, rather than two full solo god fights
+    stats: st(3825, 1200, 35, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 100, 50% more: health 2550 to 3825) balanced with Hydra as one encounter, rather than two full solo god fights
   },
   {
     id: 'mother_hydra', name: 'Mother Hydra', source: 'The Shadow over Innsmouth', regions: ['innsmouth'], canonLooks: false,
     assembly: { body: 'lathe', palette: 'sea', scale: 10.5, eyes: 4, tentacles: 6 },
     ...scripted('boss', phases(ph(1, { grab: 2, pool: 1, tentacle_burst: 2, tentacle_rise: 1 }, { hooks: ['flood'] }), ph(0.5, { tentacle_burst: 1, tentacle_rise: 1, pool: 2, grab: 1, spit: 1, vortex: 1 }, { hooks: ['flood'] }))),
-    stats: st(2450, 1100, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // the pair retains 5000 authored health and its separate tides and tentacles
+    stats: st(3675, 1100, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 100, 50% more: health 2450 to 3675) the pair retains 7500 authored health and its separate tides and tentacles
   },
   {
     id: 'hastur', name: 'Hastur', source: 'The Whisperer in Darkness', regions: ['yuggoth'], canonLooks: false, voice: 'whisper',
@@ -40,7 +40,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.5, { darkness: 1, tentacle_burst: 2, gaze: 2, dream_cloud: 1, barrage: 1 }, { hooks: ['camera_warp', 'darkness'] }),
       ph(0.2, { roar: 2, gaze: 2, beam: 1, teleport: 1, dream_cloud: 1, sweep_beam: 1 }, { hooks: ['camera_warp', 'darkness', 'time_skip'] }),
     ), called: true }),
-    stats: st(5100, 2000, 75, 3, 8, 16), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.19 lives where a person first meets it)
+    stats: st(7650, 2000, 75, 3, 8, 16), drops: { echoes: 20000 }, insightOnSight: 4, // (round 100, 50% more: health 5100 to 7650) (round 60: damage 90, which cost the balance bot 1.19 lives where a person first meets it)
   },
   {
     id: 'tsathoggua', name: 'Tsathoggua', source: 'The Mound', regions: ['kn_yan'], canonLooks: true,
@@ -50,7 +50,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(0.5, { spit: 2, pool: 2, bite: 1, toxic_cloud: 1, crushing_blow: 1 }, { summons: ['formless_spawn', 'formless_spawn'], hooks: ['darkness'] }),
       ph(0.2, { slam: 2, bite: 2, roar: 1, quake: 1, vortex: 1, crushing_blow: 1 }, { hooks: ['darkness'] }),
     )),
-    stats: st(4350, 1500, 42, 1.8, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 25: damage was 70; the balance table had it at 3.3 lives) (round 60: damage 52, which cost the balance bot 1.36 lives where a person first meets it; then health 3250 and damage 30, no blow over 14% of a person's health, and a crushing blow given it)
+    stats: st(6525, 1500, 42, 1.8, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 100, 50% more: health 4350 to 6525) (round 25: damage was 70; the balance table had it at 3.3 lives) (round 60: damage 52, which cost the balance bot 1.36 lives where a person first meets it; then health 3250 and damage 30, no blow over 14% of a person's health, and a crushing blow given it)
   },
   {
     id: 'ghatanothoa', name: 'Ghatanothoa', source: 'Out of the Aeons', regions: ['rlyeh'], canonLooks: true,
@@ -59,19 +59,19 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
       ph(1, { gaze: 2, tentacle_burst: 2, slam: 1, quake: 1, conflagration: 1 }, { hooks: ['petrify_buildup'], arena: 'monoliths' }),
       ph(0.5, { gaze: 2, tentacle_burst: 1, tentacle_rise: 1, slam: 1, roar: 1, conflagration: 1, eruption: 1 }, { hooks: ['petrify_buildup', 'camera_warp'] }),
     )),
-    stats: st(4850, 3000, 65, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 97: health 3600 to 4850, its highest in the tables) (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
+    stats: st(7275, 3000, 65, 1.5, 9, 18), drops: { echoes: 20000 }, insightOnSight: 4, // (round 100, 50% more: health 4850 to 7275) (round 97: health 3600 to 4850, its highest in the tables) (round 60: damage 90, which cost the balance bot 1.29 lives where a person first meets it)
   },
   {
     id: 'rhan_tegoth', name: 'Rhan-Tegoth', source: 'The Horror in the Museum', regions: ['yuggoth'], canonLooks: true,
     sprite: { silhouette: 'toad', palette: 'bone', scale: 5, eyes: 3, limbs: 6, body: [0.6, 0.3] }, // as wide as its crouch is drawn, not a toad's 1.8 m (round 56)
     ...scripted('boss', phases(ph(1, { grab: 2, bite: 2, sweep: 1, combo: 1 }), ph(0.5, { grab: 2, bite: 1, charge: 1, roar: 1, quake: 1 }, { hooks: ['camera_warp'] }))),
-    stats: st(3750, 1000, 70, 3, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
+    stats: st(5625, 1000, 70, 3, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3, // (round 100, 50% more: health 3750 to 5625)
   },
   {
     id: 'yig', name: 'Yig', source: 'The Curse of Yig', regions: ['kn_yan'], canonLooks: false,
     sprite: { silhouette: 'serpent', palette: 'sand', scale: 6, eyes: 2, body: [0.75, 0.25] }, // 4.5 m painted idle height, with its established 1.5 m radius
     ...scripted('boss', phases(ph(1, { bite: 2, lunge: 2, spit: 1, combo: 1 }), ph(0.5, { bite: 2, lunge: 1, summon: 1, spit: 1, charge: 1, toxic_cloud: 1 }, { summons: ['child_of_yig'] }))),
-    stats: st(4300, 1200, 57, 4, 5, 12), drops: { echoes: 10000 }, insightOnSight: 3, // (round 60: damage 70, which cost the balance bot 1.12 lives where a person first meets it)
+    stats: st(6450, 1200, 57, 4, 5, 12), drops: { echoes: 10000 }, insightOnSight: 3, // (round 100, 50% more: health 4300 to 6450) (round 60: damage 70, which cost the balance bot 1.12 lives where a person first meets it)
   },
   {
     id: 'bokrug', name: 'Bokrug', source: 'The Doom that Came to Sarnath', regions: ['dreamlands'], canonLooks: false,
@@ -80,24 +80,24 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     // summoning and no camera warp (the view swaying over its charges). Health, damage and the sanity it drains come down into the band of
     // Rhan-Tegoth and Nug.
     ...scripted('boss', phases(ph(1, { bite: 2, charge: 1, pool: 1, tidal_surge: 1 }), ph(0.5, { charge: 1, bite: 2, tidal_surge: 1, vortex: 1 }, { hooks: ['flood'] }))),
-    stats: st(3750, 1400, 70, 3, 5, 8), drops: { echoes: 12000 }, insightOnSight: 3,
+    stats: st(5625, 1400, 70, 3, 5, 8), drops: { echoes: 12000 }, insightOnSight: 3, // (round 100, 50% more: health 3750 to 5625)
   },
   {
     id: 'nug', name: 'Nug', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
     sprite: { silhouette: 'blob', palette: 'pallid', scale: 7, eyes: 3, body: [0.83, 0.28] }, // drawn again in round 92: a hulking form 5.8 m high and 4 m across (the heap it was stood 3.3 m), struck as high as its crown and 2.0 m either side of its middle (a blob's capsule is 4.9 m by 2.5), its blows still scaled by a blob's 4.9 m
     ...scripted('boss', phases(ph(1, { bite: 2, slam: 2, roar: 1, quake: 1 }), ph(0.5, { slam: 2, charge: 1, roar: 1, aoe_ring: 1, eruption: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3750, 1100, 65, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
+    stats: st(5625, 1100, 65, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3, // (round 100, 50% more: health 3750 to 5625)
   },
   {
     id: 'yeb', name: 'Yeb', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
     sprite: { silhouette: 'blob', palette: 'charcoal', scale: 7, eyes: 1, tentacles: 6, body: [0.78, 0.24] }, // drawn again in round 92: a narrow form on long legs, 5.5 m high and 3.4 m across, struck as high as its crest and 1.7 m either side of its middle (a blob's capsule is 4.9 m by 2.5), its blows still scaled by a blob's 4.9 m
     ...scripted('boss', phases(ph(1, { tentacle_burst: 2, spit: 2, darkness: 1, conflagration: 1 }), ph(0.5, { tentacle_burst: 2, pool: 1, conflagration: 1, spit: 1, barrage: 1 }, { hooks: ['darkness'] }))),
-    stats: st(3750, 1100, 81, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
+    stats: st(5625, 1100, 81, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3, // (round 100, 50% more: health 3750 to 5625)
   },
   {
     id: 'great_ones', name: 'The Great Ones', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'giant', palette: 'stone', scale: 5, eyes: 2, limbs: 2, body: [0.84375, 0.12] }, // a tall slim figure, 0.6 across, not a giant's 1.0 (round 56), struck no higher than the crown is drawn: 4.2 m (round 57)
     ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, teleport: 1, barrage: 1 }), ph(0.5, { slam: 2, sweep: 1, teleport: 1, starfall: 1, sweep_beam: 1 }, { hooks: ['hidden_platforms'] }))),
-    stats: st(4300, 1200, 64, 3.4, 4, 10), drops: { echoes: 10000 }, insightOnSight: 3, // (round 60: damage 70, which cost the balance bot 1.00 lives where a person first meets it)
+    stats: st(6450, 1200, 64, 3.4, 4, 10), drops: { echoes: 10000 }, insightOnSight: 3, // (round 100, 50% more: health 4300 to 6450) (round 60: damage 70, which cost the balance bot 1.00 lives where a person first meets it)
   },
 ]);
