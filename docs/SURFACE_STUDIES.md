@@ -30,7 +30,7 @@ node tools/surface_studies.mjs http://127.0.0.1:5173 --scenes 0,3,4
 node tools/surface_probe.mjs http://127.0.0.1:5173
 ```
 
-The script requires Playwright and Chromium; `PLAYWRIGHT_MODULE` and `CHROMIUM` select installed copies. Each scene loads once. The existing effects lab holds the simulation, animation and light clocks, and the script switches the shared mode uniform to photograph the original plus all three treatments from the same view. Untouched browser screenshots and shader/runtime diagnostics go to `store/surface-studies/` (ignored by Git).
+The script requires Playwright and Chromium; `PLAYWRIGHT_MODULE` and `CHROMIUM` select installed copies. Each scene loads once. The existing effects lab holds the simulation, animation and light clocks; the script completes remaining streaming jobs and switches the shared mode uniform to photograph the original plus all three treatments from the same view. Untouched browser screenshots and shader/runtime diagnostics go to `store/surface-studies/` (ignored by Git).
 
 The probe renders the actual shaders on a small controlled scene and checks that the three outputs differ, excluded materials and runtime hit flashes stay unchanged, float colors remain finite, complete darkness and fall fades remain black, and comparison buttons leave saved settings untouched.
 

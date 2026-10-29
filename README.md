@@ -22,7 +22,7 @@ Routes for testing: `?fresh` (a new game, no title), `?arena` (the combat arena)
 creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 
 Optional material experiments: `?fresh&study=carved`, `ceramic` or `facets`;
-add `&studies` for live comparison buttons. [Techniques and matching screenshots](docs/SURFACE_STUDIES.md).
+add `&studies` for live comparison buttons. [Techniques and capture instructions](docs/SURFACE_STUDIES.md).
 
 ## Play it
 
