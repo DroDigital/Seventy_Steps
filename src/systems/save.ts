@@ -16,6 +16,7 @@ import { START_SIGN } from '../data/sites';
 import { FREE_MOUNT, isMount, type MountId } from '../data/mounts';
 import { DEFAULT_DIFFICULTY, GUN, isDifficulty, LEVELS, MARKER, NEW_GAME_PLUS, OIL, REAGENT, REINFORCE, UPGRADES, WORLD, type LevelId, type UpgradeId } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
+import { dungeonRoomAt } from '../world/terrain';
 import { signPlace, teleport } from './checkpoints';
 import { beginPeace } from './peace';
 import { footingSafe } from './falls';
@@ -184,6 +185,19 @@ export function parseSave(json: string | null): SaveData | null {
 
 const clampInt = (x: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Math.round(x)));
 
+/** A raised Insight threshold must not strand an older save inside a side branch, including rooms beyond its first door or bridge. */
+function insightExitOpen(insight: number, at: Place): boolean {
+  const here = dungeonRoomAt(at.x, at.z);
+  if (!here) return true;
+  for (let room = here.room.def; ; ) {
+    if (room.hidden?.minInsight !== undefined && insight < room.hidden.minInsight) return false;
+    if (!room.from) return true;
+    const parent = here.layout.def.rooms.find((r) => r.id === room.from);
+    if (!parent) return true;
+    room = parent;
+  }
+}
+
 /** Puts a freshly built world game into the saved state. */
 export function applySave(g: Game, s: SaveData): void {
   const ow = g.overworld!;
@@ -240,7 +254,7 @@ export function applySave(g: Game, s: SaveData): void {
   if (s.drop && s.drop.amount > 0) spawnDrop(g, Math.round(s.drop.amount), { x: s.drop.x, y: s.drop.y, z: s.drop.z });
   const body = c.body.get(g.player.id)!;
   openAround(g, s.at); // the passages they stood at, open as they left them, before the footing is judged
-  const standing = regionAt(s.at.x, s.at.z) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // (a save taken in the middle of a fall must not load inside it)
+  const standing = regionAt(s.at.x, s.at.z) && insightExitOpen(m.insight, s.at) && footingSafe(g, { x: s.at.x, y: g.world.ground(s.at.x, s.at.z), z: s.at.z }, body.radius, body.height); // unsafe footing or a newly closed secret branch returns to the checkpoint
   const at = standing ? s.at : g.player.checkpoint;
   teleport(g, at);
   if (distXZ(at, g.player.checkpoint) <= WORLD.signReach) beginPeace(g); // a game continued at its stone begins at peace, as every arrival does; one left out in the world, a fight or a hall is continued as it was (round 88: peace.ts)

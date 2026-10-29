@@ -21,14 +21,16 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   {
     id: 'father_dagon', name: 'Father Dagon', source: 'Dagon', regions: ['innsmouth'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sea', scale: 11, eyes: 2, tentacles: 0 },
-    ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, wind_push: 1, tidal_surge: 1 }, { hooks: ['flood'] }), ph(0.5, { slam: 2, sweep: 1, roar: 1, charge: 1, vortex: 1, tidal_surge: 1 }, { summons: ['deep_one', 'deep_one'], hooks: ['flood', 'darkness'] }))),
-    stats: st(3900, 1200, 53, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 80, which cost the balance bot 1.87 lives where a person first meets it)
+    // Both sea gods share the temple: keep the flood and their own attacks, with no darkness
+    // hiding Hydra's ground cues and no extra servants crowding the two-boss fight.
+    ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, wind_push: 1, tidal_surge: 1 }, { hooks: ['flood'] }), ph(0.5, { slam: 2, sweep: 1, roar: 1, charge: 1, vortex: 1, tidal_surge: 1 }, { hooks: ['flood'] }))),
+    stats: st(2550, 1200, 35, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // balanced with Hydra as one encounter, rather than two full solo god fights
   },
   {
     id: 'mother_hydra', name: 'Mother Hydra', source: 'The Shadow over Innsmouth', regions: ['innsmouth'], canonLooks: false,
     assembly: { body: 'lathe', palette: 'sea', scale: 10.5, eyes: 4, tentacles: 6 },
-    ...scripted('boss', phases(ph(1, { grab: 2, pool: 1, tentacle_burst: 2, tentacle_rise: 1 }, { hooks: ['flood'] }), ph(0.5, { tentacle_burst: 1, tentacle_rise: 1, pool: 2, grab: 1, spit: 1, vortex: 1 }, { summons: ['innsmouth_hybrid', 'innsmouth_hybrid'], hooks: ['flood'] }))),
-    stats: st(3750, 1100, 58, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // (round 60: damage 76, which cost the balance bot 1.40 lives where a person first meets it)
+    ...scripted('boss', phases(ph(1, { grab: 2, pool: 1, tentacle_burst: 2, tentacle_rise: 1 }, { hooks: ['flood'] }), ph(0.5, { tentacle_burst: 1, tentacle_rise: 1, pool: 2, grab: 1, spit: 1, vortex: 1 }, { hooks: ['flood'] }))),
+    stats: st(2450, 1100, 38, 2.6, 6, 12), drops: { echoes: 12000 }, insightOnSight: 3, // the pair retains 5000 authored health and its separate tides and tentacles
   },
   {
     id: 'hastur', name: 'Hastur', source: 'The Whisperer in Darkness', regions: ['yuggoth'], canonLooks: false, voice: 'whisper',

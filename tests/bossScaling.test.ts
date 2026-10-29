@@ -46,10 +46,10 @@ describe('only bosses scale with player level', () => {
   it('level one retains the original boss stats, speeds and attack timing', () => {
     const low = bossGame('dr_munoz');
     const high = bossGame('dr_munoz');
-    high.g.player.levels = { vigour: 20, endurance: 20, might: 20 };
+    high.g.player.levels = { vigour: 22, endurance: 22, might: 22 };
     applyLevels(high.g);
-    const worth = levelsWorth(high.g.player.levels); // (round 71: two levels past the first soft cap are worth one: 57 of the 60 bought)
-    expect(worth).toBeLessThan(60);
+    const worth = levelsWorth(high.g.player.levels); // (round 71: two levels past the first soft cap are worth one: 63 of the 66 bought)
+    expect(worth).toBeLessThan(66);
     expect(low.g.ecs.c.health.get(low.boss)!.max).toBe(getEntity('dr_munoz')!.stats.hp);
     expect(foeDamage(low.g, low.boss)).toBe(1);
     const over = overmatch(high.g.player.levels, 'dr_munoz');
@@ -211,8 +211,8 @@ describe('a horror grows to meet an investigator who has outgrown it (round 68: 
     g.player.levels = { vigour: 30, endurance: 30, might: 30 };
     applyLevels(g);
     const o = overmatch(g.player.levels, 'dr_munoz');
-    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * bossHealthScale(levelsWorth(g.player.levels), 0, o.health))); // (round 71: ninety levels bought are worth 67.8)
-    expect(h.max).toBeGreaterThan(before * 2);
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * bossHealthScale(levelsWorth(g.player.levels), 0, o.health))); // (round 71: ninety levels bought are worth 71.4)
+    expect(h.max).toBeGreaterThan(before * 1.5); // early bosses remain substantial at the cap
     expect(foeDamage(g, boss)).toBe(bossDamageScale(levelsWorth(g.player.levels), o.damage));
     const fresh = spawnCreature(g, 'dr_munoz', AT)!;
     expect(g.ecs.c.health.get(fresh)!.max).toBe(h.max);

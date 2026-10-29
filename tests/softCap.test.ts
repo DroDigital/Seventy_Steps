@@ -46,13 +46,13 @@ describe('what a level is worth (systems/levelWorth.ts)', () => {
       last = nextWorth(n);
     }
     expect(levelWorth(FIRST + 0.5)).toBeCloseTo(FIRST + 0.5 * SOFT_CAP[0].worth, 9); // (continuous: a part of a level is a part of its worth)
-    expect(levelWorth(MOST)).toBeCloseTo(18 + 8 * 0.5 + 4 * 0.15, 9); // thirty levels are worth 22.6
+    expect(levelWorth(MOST)).toBeCloseTo(20 + 6 * 0.5 + 4 * 0.2, 9); // thirty levels are worth 23.8
   });
 
-  it('counts a record of levels by the worth of each attribute, and a person at the cap has not ninety levels but 67.8', () => {
+  it('counts a record of levels by the worth of each attribute, and a person at the cap has not ninety levels but 71.4', () => {
     expect(levelsWorth({ vigour: 10, endurance: 5, might: 5 })).toBe(20);
-    expect(levelsWorth({ vigour: 20, endurance: 0, might: 0 })).toBe(19);
-    expect(levelsWorth({ vigour: MOST, endurance: MOST, might: MOST })).toBeCloseTo(67.8, 9);
+    expect(levelsWorth({ vigour: 22, endurance: 0, might: 0 })).toBe(21);
+    expect(levelsWorth({ vigour: MOST, endurance: MOST, might: MOST })).toBeCloseTo(71.4, 9);
     expect(levelsWorth({})).toBe(0);
   });
 
@@ -74,12 +74,12 @@ describe('what the levels give', () => {
     }
   });
 
-  it('is less than a level a time past it, at the cap 431 health, 281 stamina, 50.08 stamina a second and blows of 1.904', () => {
-    expect(healthAt(FIRST + 1)).toBe(healthAt(FIRST) + 6);
-    expect(healthAt(MOST)).toBe(431); // (it was 520)
-    expect(staminaAt(MOST)).toBe(281); // (340)
-    expect(staminaRegen(MOST)).toBeCloseTo(50.08, 9); // (56)
-    expect(mightAt(MOST)).toBeCloseTo(1.904, 9); // (2.2)
+  it('is less than a level a time past it, at the cap 541 health, 290 stamina, 51.04 stamina a second and blows of 1.952', () => {
+    expect(healthAt(FIRST + 1)).toBe(healthAt(FIRST) + 8);
+    expect(healthAt(MOST)).toBe(541); // previous balance: 431
+    expect(staminaAt(MOST)).toBe(290); // previous balance: 281
+    expect(staminaRegen(MOST)).toBeCloseTo(51.04, 9); // previous balance: 50.08
+    expect(mightAt(MOST)).toBeCloseTo(1.952, 9); // previous balance: 1.904
     for (const n of [FIRST + 1, 22, 26, 28, MOST]) {
       expect(healthAt(n)).toBeLessThan(PLAYER.hp + n * LEVELS.vigour.hp!);
       expect(healthAt(n)).toBeGreaterThan(healthAt(n - 1) - 1); // (rounded to a whole point of health, and never falling)
@@ -97,31 +97,31 @@ describe('what the levels give', () => {
     g.player.levels.vigour++;
     g.player.levels.endurance++;
     applyLevels(g);
-    expect(h).toMatchObject({ max: healthAt(FIRST) + 6, hp: 106 });
+    expect(h).toMatchObject({ max: healthAt(FIRST) + 8, hp: 108 });
     expect(s.max).toBe(staminaAt(FIRST) + 4);
     g.player.levels = { vigour: MOST, endurance: MOST, might: MOST };
     applyLevels(g);
-    expect(h.max).toBe(431);
-    expect(s.max).toBe(281);
-    expect(s.regen).toBeCloseTo(50.08, 9);
-    expect(might(g, me)).toBeCloseTo(1.904, 9);
+    expect(h.max).toBe(541);
+    expect(s.max).toBe(290);
+    expect(s.regen).toBeCloseTo(51.04, 9);
+    expect(might(g, me)).toBeCloseTo(1.952, 9);
     expect(might(g, me + 999)).toBe(1); // (and no one else's blows)
   });
 
-  it('loads a save made before the caps at the lower health, wounds clipped to it', () => {
+  it('loads a save from the previous balance while retaining purchased levels and current health', () => {
     const g = createWorldGame();
     g.player.levels = { vigour: MOST, endurance: MOST, might: MOST };
     applyLevels(g);
-    const old = { ...snapshot(g), hp: PLAYER.hp + MOST * LEVELS.vigour.hp! }; // a person who was whole at thirty levels of Vigour, at 520
+    const old = { ...snapshot(g), hp: 431 }; // full health under the previous 12 HP / 18-26 soft-cap balance
     const loaded = createWorldGame();
     applySave(loaded, old);
-    expect(loaded.ecs.c.health.get(loaded.player.id)).toMatchObject({ max: 431, hp: 431 });
-    expect(loaded.player.levels).toEqual({ vigour: MOST, endurance: MOST, might: MOST }); // (the levels bought are kept; only what they give is softer)
+    expect(loaded.ecs.c.health.get(loaded.player.id)).toMatchObject({ max: 541, hp: 431 });
+    expect(loaded.player.levels).toEqual({ vigour: MOST, endurance: MOST, might: MOST }); // purchased levels survive the balance update
   });
 });
 
 describe('the horrors grow to meet the worth, not the count', () => {
-  it('give no more for a soft level than it is worth: the 19th level of Vigour makes a horror half as much harder as the 18th', () => {
+  it('give no more for a soft level than it is worth: the 21st level of Vigour makes a horror half as much harder as the 20th', () => {
     const scale = (vigour: number): number => bossHealthScale(levelsWorth({ vigour, endurance: 0, might: 0 }), 0);
     const [whole, half] = [scale(FIRST) - scale(FIRST - 1), scale(FIRST + 1) - scale(FIRST)];
     expect(half / whole).toBeCloseTo(SOFT_CAP[0].worth, 9);
@@ -139,21 +139,21 @@ describe('the horrors grow to meet the worth, not the count', () => {
 
 describe('the Elder Sign says what the next level gives (ui/levelGains.ts)', () => {
   it('says the whole gain before the first mark, then the real one', () => {
-    expect(levelGain('vigour', 0)).toBe('+12 health');
-    expect(levelGain('vigour', FIRST)).toBe('+6 health');
-    expect(levelGain('vigour', 26)).toBe('+2 health');
+    expect(levelGain('vigour', 0)).toBe('+16 health');
+    expect(levelGain('vigour', FIRST)).toBe('+8 health');
+    expect(levelGain('vigour', 26)).toBe('+3 health');
     expect(levelGain('endurance', 0)).toBe('+8 stamina, faster recovery');
     expect(levelGain('endurance', FIRST)).toBe('+4 stamina, faster recovery');
     expect(levelGain('might', 0)).toBe('+4% damage');
     expect(levelGain('might', FIRST)).toBe('+2% damage');
-    expect(levelGain('might', 26)).toBe('+0.6% damage');
+    expect(levelGain('might', 26)).toBe('+0.8% damage');
   });
 
   it('marks a level that counts for less, and none before the first mark or past the last level', () => {
     expect(softCap('vigour', FIRST - 1)).toBeUndefined();
     expect(softCap('vigour', FIRST)!.chip).toBe('soft cap: 50%');
-    expect(softCap('might', 26)!.chip).toBe('soft cap: 15%');
-    expect(softCap('might', 26)!.hint).toContain('whole to 18, then 50% to 26, then 15%');
+    expect(softCap('might', 26)!.chip).toBe('soft cap: 20%');
+    expect(softCap('might', 26)!.hint).toContain('whole to 20, then 50% to 26, then 20%');
     expect(softCap('endurance', MOST)).toBeUndefined(); // (nothing more to buy)
   });
 });

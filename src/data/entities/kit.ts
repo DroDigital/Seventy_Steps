@@ -21,6 +21,7 @@ interface PhaseExtras {
   summons?: readonly string[];
   hooks?: readonly RealityHook[];
   arena?: ArenaChange;
+  eldritch?: boolean;
 }
 
 type Weights = Partial<Record<AttackId, number>>;
@@ -33,6 +34,7 @@ export function ph(hpBelow: number, weights: Weights, x: PhaseExtras = {}): Boss
     ...(x.summons && { summons: x.summons }),
     ...(x.hooks && { realityHooks: x.hooks }),
     ...(x.arena && { arenaChange: x.arena }),
+    ...(x.eldritch && { eldritch: true }),
   };
 }
 

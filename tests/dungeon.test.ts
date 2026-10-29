@@ -85,7 +85,7 @@ describe('the dungeon kit', () => {
   it('hidden bridges and doors become hidden-layer pieces with seals', () => {
     const pieces = worldLayout().pieces;
     const bridge = pieces.find((p) => p.name === 'Akeley Farmhouse: span')!;
-    expect(bridge.minInsight).toBe(2);
+    expect(bridge.minInsight).toBe(4);
     expect(bridge.seal?.look).toBe('none');
     const door = pieces.find((p) => p.name === 'University Library: restricted')!;
     expect(door.seal?.look).toBe('wall');
