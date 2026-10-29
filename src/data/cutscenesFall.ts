@@ -107,7 +107,7 @@ export const FALLS: Readonly<Record<string, Scene>> = {
     { at: 2.6, set: 'choral', gain: 0.7, pitch: 0.6 },
   ]),
 
-  // No blow lands on it that it feels. The piping thins, and the dark takes the flutes one by one.
+  // It does not feel the blows that bring it down; it slumbers. The piping thins, and the dark takes the flutes one by one.
   azathoth: fell('azathoth', 0.16, [
     shot({ dur: 4.4, yaw: to(100, 70), dist: to(1.3, 1.5), up: to(0.05, 0.12), look: to(0.2, 0.15), fov: to(66, 58), body: true, sway: 0.1 }),
     behind(3.2, to(180, 174), to(2.2, 3.4), to(0.6, 0.9), to(0.1, 0.3), to(72, 64), { sway: 0.1 }),

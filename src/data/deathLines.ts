@@ -63,6 +63,16 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   toxic_cloud: 'The air itself is turned. Walk out of the cloud and keep ahead of it: it drifts, and it is slow.',
   dream_cloud: 'This cloud takes the mind, not the body. Step out of it, and steady yourself.',
   thunderfall: 'Lightning is called down on the marks, quick and bright. Leave a mark as it flares, not after.',
+  dirge: 'Three rings of sound, each quicker than the last. Roll or guard each as it reaches you.',
+  dirge_2: 'The second note is quicker than the first. Keep a roll for it.',
+  dirge_3: 'The last note is the quickest. Meet it, then strike while the god is bowed.',
+  drumbeat: 'The ground boils in rings, the near ring first. Step along it into a gap; out is the next ring.',
+  dance: 'Thirteen stamps wind out from its flank. The ground that fills first falls first: leave it.',
+  seethe: 'It boils where it hears nothing, and leaves pools that burn on. Keep to clean ground.',
+  maelstrom: 'The centre draws all in, then breaks. Running gains little: roll as it breaks.',
+  maelstrom_burst: 'The burst fills the ground about the god. Roll as it breaks, not before.',
+  crescendo: 'Boils on the ground and the three rings behind them. Leave the boils, then roll each ring.',
+  miasma: 'The nothing about the god spreads outward and takes the mind. Step out of it and steady yourself.',
 };
 
 /** A fragment of the place where it happened: the waking world, then the dream's realms. */

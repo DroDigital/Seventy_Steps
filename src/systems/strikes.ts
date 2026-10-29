@@ -8,7 +8,7 @@
 
 import type { Entity } from '../core/ecs';
 import { distXZ, type V3, type XZ } from '../core/geom';
-import type { BarrageDef, MarksDef, SweepDef, WaveDef } from '../data/moves';
+import type { BarrageDef, MarkLook, MarkPattern, MarksDef, PoolDef, SweepDef, WaveDef } from '../data/moves';
 import { SIM } from '../data/tuning';
 import { raycast } from '../world/colliders';
 import { inWindow, moveDef } from './actions';
@@ -33,6 +33,29 @@ function spawnAt(g: Game, at: XZ): { e: Entity; pos: V3 } {
   return { e, pos };
 }
 
+/** What lies on a spot of marked ground: how big, when it bursts, what it does, and what it leaves. */
+export interface MarkSpec {
+  radius: number;
+  delay: number; // frames to its burst
+  damage: number;
+  poise: number;
+  look?: MarkLook;
+  leaves?: PoolDef;
+  seek?: Mark['seek'];
+}
+
+/** One spot of marked ground at `at`, kept out of walls and inside its owner's arena; `first` says the call has begun (its sound, its picture). */
+export function layMark(g: Game, owner: Entity, at: XZ, m: MarkSpec, first = true): Entity {
+  const c = g.ecs.c;
+  const { e, pos } = spawnAt(g, groundNear(g, at, [0, 0], 0.3, c.fight.get(owner)?.arena));
+  c.mark.set(e, { owner, faction: c.combatant.get(owner)?.faction ?? 'enemy', radius: m.radius, delay: m.delay, total: m.delay, damage: m.damage, poise: m.poise, ...(m.look && { look: m.look }), ...(m.leaves && { leaves: m.leaves }), ...(m.seek && { seek: m.seek }) });
+  if (first) g.events.emit('Marked', { at: { ...pos }, by: owner, ...(m.look && { look: m.look }) });
+  return e;
+}
+
+/** The patterns laid about the attacker, whoever stands where (a line of flame, and a blind horror's rings, spiral and boils): none is heaped against the wall. */
+const ABOUT_THE_ATTACKER: readonly (MarkPattern | undefined)[] = ['spokes', 'beats', 'spiral', 'scatter'];
+
 /** Marks the ground: the first spot under the target, the rest laid by the call's pattern (planSpots), each bursting in turn. */
 function mark(g: Game, id: Entity, m: MarksDef): void {
   const c = g.ecs.c;
@@ -41,14 +64,13 @@ function mark(g: Game, id: Entity, m: MarksDef): void {
   const tp = quarry !== id ? c.transform.get(quarry)?.pos : undefined;
   const centre = tp ?? { x: tr.pos.x + Math.sin(tr.yaw) * 5, z: tr.pos.z + Math.cos(tr.yaw) * 5 };
   const arena = c.fight.get(id)?.arena;
-  const faction = c.combatant.get(id)?.faction ?? 'enemy';
-  const lines = m.pattern === 'spokes';
-  planSpots(m, centre, tr.pos, c.body.get(id)?.radius ?? 0.5, g.rng).forEach(({ at, order }, i) => {
-    if (lines && arena && Math.hypot(at.x - arena.x, at.z - arena.z) > arena.radius - m.radius - 0.5) return; // a line of flame stops at the wall; it does not heap against it
-    const { e, pos } = spawnAt(g, groundNear(g, at, [0, 0], 0.3, arena));
-    const delay = m.delay + order * m.stagger;
-    c.mark.set(e, { owner: id, faction, radius: m.radius, delay, total: delay, damage: m.damage, poise: m.poise, ...(m.look && { look: m.look }), ...(m.leaves && { leaves: m.leaves }), ...(m.seek && m.pattern === 'seek' && quarry !== id && { seek: { ...m.seek, target: quarry } }) });
-    if (i === 0) g.events.emit('Marked', { at: { ...pos }, by: id, ...(m.look && { look: m.look }) });
+  const wall = arena && ABOUT_THE_ATTACKER.includes(m.pattern) ? arena : undefined; // it stops at the wall; it does not heap against it
+  const reach = wall ? Math.max(0, wall.radius - Math.hypot(tr.pos.x - wall.x, tr.pos.z - wall.z) - m.radius - 0.5) : undefined;
+  let first = true;
+  planSpots(m, centre, tr.pos, c.body.get(id)?.radius ?? 0.5, g.rng, reach).forEach(({ at, order }) => {
+    if (wall && Math.hypot(at.x - wall.x, at.z - wall.z) > wall.radius - m.radius - 0.5) return;
+    layMark(g, id, at, { radius: m.radius, delay: m.delay + order * m.stagger, damage: m.damage, poise: m.poise, look: m.look, leaves: m.leaves, ...(m.seek && m.pattern === 'seek' && quarry !== id && { seek: { ...m.seek, target: quarry } }) }, first);
+    first = false;
   });
 }
 

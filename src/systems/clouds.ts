@@ -12,27 +12,28 @@ import { SIM } from '../data/tuning';
 import { targetOf, groundNear } from './specials';
 import type { Game } from './components';
 
-/** The banks rise about the horror, on the side of its prey and spread across it. */
+/** The banks rise about the horror, on the side of its prey and spread across it; a blind horror's (`blind`) rise at even bearings about its body and spread outward, after no one. */
 export function rise(g: Game, id: Entity, d: CloudDef): void {
   const c = g.ecs.c;
   const tr = c.transform.get(id)!;
   const quarry = c.transform.get(targetOf(g, id))?.pos;
   const faced = quarry ? Math.atan2(quarry.x - tr.pos.x, quarry.z - tr.pos.z) : tr.yaw;
+  const turn = d.blind ? g.rng() * Math.PI * 2 : 0; // (only a blind horror's draws one: the others' banks lie as they did)
   const out = (c.body.get(id)?.radius ?? 0.5) + d.radius * 0.6;
   const faction = c.combatant.get(id)?.faction ?? 'enemy';
   const arena = c.fight.get(id)?.arena;
   for (let i = 0; i < d.count; i++) {
-    const a = faced + (d.count > 1 ? (i / (d.count - 1) - 0.5) * 1.3 : 0);
+    const a = d.blind ? turn + (i / d.count) * Math.PI * 2 : faced + (d.count > 1 ? (i / (d.count - 1) - 0.5) * 1.3 : 0);
     const at = groundNear(g, { x: tr.pos.x + Math.sin(a) * out, z: tr.pos.z + Math.cos(a) * out }, [0, 0], 0.3, arena);
     const e = g.ecs.spawn();
     const pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };
     c.transform.set(e, { pos, prev: { ...pos }, yaw: 0, prevYaw: 0 });
-    c.hazard.set(e, { owner: id, faction, radius: d.radius, damage: d.damage, tick: d.tick, life: d.life, next: d.tick, cloud: d.kind, drift: d.drift / SIM.hz, total: d.life, ...(d.mind > 0 && { mind: d.mind }) });
+    c.hazard.set(e, { owner: id, faction, radius: d.radius, damage: d.damage, tick: d.tick, life: d.life, next: d.tick, cloud: d.kind, drift: d.drift / SIM.hz, total: d.life, ...(d.mind > 0 && { mind: d.mind }), ...(d.blind && { heading: a }) });
     if (i === 0) g.events.emit('Clouded', { at: { ...pos }, by: id, kind: d.kind });
   }
 }
 
-/** A bank creeps toward its owner's prey, and does not sit on it: it keeps a little off, so that the investigator who stands still is in it but one who walks is not. */
+/** A bank creeps toward its owner's prey, and does not sit on it: it keeps a little off, so that the investigator who stands still is in it but one who walks is not. A blind horror's goes the way it was sent. */
 export function drift(g: Game, e: Entity): void {
   const c = g.ecs.c;
   const h = c.hazard.get(e);
@@ -41,6 +42,13 @@ export function drift(g: Game, e: Entity): void {
   const owner = h.owner;
   if (!c.transform.has(owner) || c.dead.has(owner) || (c.health.get(owner)?.hp ?? 0) <= 0) {
     h.life = Math.min(h.life, 40); // its horror is gone: it thins
+    return;
+  }
+  if (h.heading !== undefined) {
+    tr.prev = { ...tr.pos };
+    tr.pos.x += Math.sin(h.heading) * h.drift;
+    tr.pos.z += Math.cos(h.heading) * h.drift;
+    tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
     return;
   }
   const to = c.transform.get(targetOf(g, owner))?.pos;

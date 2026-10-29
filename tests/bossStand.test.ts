@@ -17,8 +17,8 @@ import { driveBot } from './botHelpers';
 import { run } from './worldHelpers';
 
 const BOSSES = worldLayout().spawns.filter((s): s is SpawnPoint & { arena: NonNullable<SpawnPoint['arena']> } => s.id.startsWith('boss:') && !!s.arena);
-/** The wide ones are met by a bot for twenty seconds (the small ones are in bossBot.test.ts): all but Azathoth, warded whole, and Ghatanothoa, whose gaze turns the bot to stone on its way in. */
-const NOT_MET = ['boss:azathoth', 'boss:ghatanothoa'];
+/** The wide ones are met by a bot for twenty seconds (the small ones are in bossBot.test.ts): all but Ghatanothoa, whose gaze turns the bot to stone on its way in (Azathoth is met since 2026-10-29: it is no longer warded whole). */
+const NOT_MET = ['boss:ghatanothoa'];
 /** Nug and Yeb, drawn again in round 92 narrower than the 2 m a wide one is (their capsules' radii are 1.96 and 1.68 m, where they were 2.52): they are still met by the bot, as they were. */
 const KEPT_WIDE = ['boss:nug', 'boss:yeb'];
 

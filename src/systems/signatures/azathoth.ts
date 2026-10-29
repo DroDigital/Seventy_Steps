@@ -1,67 +1,78 @@
 /**
- * Azathoth (spec §3E): blind and invulnerable. It hears: each noise the investigator makes carries
- * so far (a shot furthest, then sprinting, dodging, striking, walking; standing still or creeping
- * behind a guard, nothing), and where it was heard, a moment later, the court erupts. The fight is
- * not won by damage but by outlasting the piping: its health bar is the song, draining, and when the
- * song ends it slumbers; the Court's Elder Sign then offers two of the endings (endings.ts). Round 12:
- * its script aims at nothing (it had barrages, beams and adds that found a silent investigator), and
- * engaging it says so, since nothing else taught the creeping.
+ * Azathoth (spec §3E): blind, and a fight like any horror's, the hardest of them. (2026-10-29: it had been blind and invulnerable, its health bar a song that drained with the
+ * minutes, and the fight an ordeal of silence. The timer, the drain and the ward are gone; it is struck and it falls, and when it does it slumbers.) Nothing it does is aimed at
+ * the investigator: its blows are rhythms laid over the whole court (data/attacks.ts: the dirge, the drumbeat, the dance, the seething, the maelstrom), read by where they fall
+ * and when. What it does aim is an answer. It hears what is loud, a shot and a sprint, and in its last phase a roll and a swing too; its attention fills, and where the
+ * investigator stood when it was full the ground is marked, to burst a moment later and leave a pool (the old fight's blast, made a thing that can be read and left).
+ * Its pauses shrink with each phase (`AZATHOTH.pace`). Pure: no Three.js.
  */
 
 import type { Entity } from '../../core/ecs';
-import { distXZ } from '../../core/geom';
-import { AZATHOTH } from '../../data/tuning';
-import { startMove } from '../actions';
+import { AZATHOTH, BOSS } from '../../data/tuning';
 import type { Fight, Game } from '../components';
-import { spawnPool } from '../hazards';
+import { defOf } from '../creatures';
 import type { Signature } from '../signatures';
+import { layMark } from '../strikes';
 
-/** How far the investigator's noise carries this step, in metres. */
-export function noise(g: Game): number {
+const MOVEMENTS = ['THE DIRGE', 'THE DANCE', 'THE SEETHING', 'THE LAST NOTE'] as const;
+const lastPhase = (f: Fight): boolean => f.phase === f.script.phases.length - 1;
+
+/** What this frame of the investigator's noise adds to its attention: a shot, a sprint, and in its last phase a roll or a swing; nothing else carries. */
+export function noise(g: Game, last: boolean): number {
   const a = g.ecs.c.actor.get(g.player.id)!;
-  const m = g.ecs.c.mover.get(g.player.id)!;
-  const hear = AZATHOTH.hear;
-  if (a.move === 'shoot') return hear.shot;
-  if (g.player.sprinting) return hear.sprint;
-  if (a.move === 'roll' || a.move === 'backstep') return hear.dodge;
-  if (a.move?.startsWith('light') || a.move?.startsWith('heavy')) return hear.attack;
-  return Math.hypot(m.vx, m.vz) > 0.5 && !g.player.blockHeld ? hear.walk : 0;
+  const heed = AZATHOTH.heed;
+  if (a.move === 'shoot') return heed.shot;
+  if (g.player.sprinting) return heed.sprint;
+  if (!last) return 0;
+  if (a.move === 'roll' || a.move === 'backstep') return heed.dodge;
+  return a.move?.startsWith('light') || a.move?.startsWith('heavy') ? heed.swing : 0;
 }
 
-function blast(g: Game, e: Entity, f: Fight): void {
-  const b = AZATHOTH.blast;
-  spawnPool(g, e, 'enemy', { x: f.sig.bx, z: f.sig.bz }, { radius: b.radius, life: b.life, tick: b.tick, damage: b.damage });
+/** Where it heard them, it answers: the ground there is marked, and bursts in a moment. */
+function answer(g: Game, e: Entity, f: Fight): void {
+  const a = AZATHOTH.answer;
+  const damage = defOf(g, e)!.stats.damage;
+  const pp = g.ecs.c.transform.get(g.player.id)!.pos;
+  f.sig.heed = 0;
+  f.sig.rest = a.rest;
+  layMark(g, e, { x: pp.x, z: pp.z }, {
+    radius: a.radius,
+    delay: a.delay,
+    damage: Math.round(a.power * damage),
+    poise: Math.round(a.poise * damage),
+    leaves: { radius: a.pool.radius, life: a.pool.life, tick: a.pool.tick, damage: Math.max(1, Math.round(a.pool.power * damage)) },
+  });
+  if (f.sig.told) return;
+  f.sig.told = 1;
+  g.events.emit('Notice', { text: 'IT HEARS YOU' });
 }
 
-/** The piping ends, and it slumbers. */
-function slumber(g: Game, e: Entity): void {
-  const h = g.ecs.c.health.get(e)!;
-  [h.floor, h.hp] = [undefined, 0];
-  startMove(g.ecs.c.actor.get(e)!, 'death');
-  g.events.emit('Died', { entity: e, killer: g.player.id, at: { ...g.ecs.c.transform.get(e)!.pos } });
-  g.events.emit('Title', { text: 'THE PIPING FADES · AZATHOTH SLUMBERS' });
+/** What it left on the ground (the seething's pools, an answer's) goes when its fight ends or breaks off. */
+function clearPools(g: Game, e: Entity): void {
+  for (const [pool, h] of [...g.ecs.c.hazard]) if (h.owner === e) g.ecs.despawn(pool);
 }
 
 export const AZATHOTH_SIGNATURE: Signature = {
-  engage(g, e, f) {
-    const h = g.ecs.c.health.get(e)!;
-    f.sig.left = Math.round((AZATHOTH.survive * h.hp) / h.max); // the song takes up where it broke off
-    g.events.emit('Notice', { text: 'IT IS BLIND, AND HEARS · STAND STILL, OR CREEP WITH {block} HELD, UNTIL THE PIPING ENDS' });
+  engage(g, _e, f) {
+    f.sig.rest = Math.round(AZATHOTH.answer.rest / 2); // it does not answer in the first breath
+    g.events.emit('Notice', { text: 'IT IS BLIND, AND HEARS · IT ANSWERS A SHOT OR A SPRINT WHERE IT WAS MADE' });
   },
   step(g, e, f) {
-    const h = g.ecs.c.health.get(e)!;
-    [h.ward, h.floor] = [0, 1];
-    f.sig.left = Math.max(0, f.sig.left - 1);
-    h.hp = Math.max(1, (h.max * f.sig.left) / AZATHOTH.survive);
-    if (f.sig.left === 0) return slumber(g, e);
-    if (f.sig.blastIn > 0 && --f.sig.blastIn === 0) blast(g, e, f);
-    if (f.sig.rest > 0) return void f.sig.rest--;
-    const pp = g.ecs.c.transform.get(g.player.id)!.pos;
-    const gap = distXZ(g.ecs.c.transform.get(e)!.pos, pp) - (g.ecs.c.body.get(e)?.radius ?? 0);
-    if (gap > noise(g)) return;
-    Object.assign(f.sig, { blastIn: AZATHOTH.windup, bx: pp.x, bz: pp.z, rest: AZATHOTH.windup + AZATHOTH.rest });
-    g.events.emit('Notice', { text: 'IT HEARS YOU' });
+    const br = g.ecs.c.brain.get(e);
+    if (br && br.cooldown <= BOSS.gap[1]) br.cooldown = Math.min(br.cooldown, AZATHOTH.pace[Math.min(f.phase, AZATHOTH.pace.length - 1)]); // (its own pause; one set on purpose, a long one, is left alone)
+    if (f.sig.rest > 0) f.sig.rest--;
+    if (g.ecs.c.actor.get(g.player.id)!.move === 'death') return;
+    const gain = noise(g, lastPhase(f));
+    f.sig.heed = Math.max(0, (f.sig.heed ?? 0) + (gain || -AZATHOTH.heed.fade));
+    if (f.sig.heed >= 1 && !(f.sig.rest > 0)) answer(g, e, f);
   },
-  reset: (g, e) => void (g.ecs.c.health.get(e)!.floor = undefined),
-  status: (_g, _e, f) => `THE PIPING · ${Math.ceil(f.sig.left / 60)} s`,
+  reset: clearPools,
+  end(g, e) {
+    clearPools(g, e);
+    g.events.emit('Title', { text: 'THE PIPING FADES · AZATHOTH SLUMBERS' });
+  },
+  status: (_g, _e, f) => `${MOVEMENTS[Math.min(f.phase, MOVEMENTS.length - 1)]}${(f.sig.heed ?? 0) >= AZATHOTH.listens ? ' · IT LISTENS' : ''}`,
+  note(_g, _e, _f, phase) {
+    return [null, 'THE THIRTEEN BEGIN TO DANCE · LEAVE THE GROUND THAT FILLS FIRST', 'THE CENTRE DRAWS ALL IN · ROLL AS IT BREAKS', 'IT HEARS EVERYTHING NOW · A ROLL AND A BLOW ARE ANSWERED TOO'][phase] ?? null;
+  },
 };

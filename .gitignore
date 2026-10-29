@@ -9,3 +9,6 @@ __pycache__/
 steam/build/
 steam/output/
 .butler/
+
+# The Recall plugin's session log: written locally every turn, not part of the project
+.recall/
