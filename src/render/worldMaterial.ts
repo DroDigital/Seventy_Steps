@@ -20,6 +20,7 @@ export const worldUniforms = {
   uRes: { value: new THREE.Vector2(1, 1) },
   uSnap: { value: 0 },
   uAffine: { value: 0 },
+  uStudy: { value: 0 }, // optional ?study=carved|ceramic|facets, set once by the pipeline
   uDisplace: { value: 0 },
   uCamPos: { value: new THREE.Vector3() },
   uDispAmp: { value: FX.displaceAmp },
@@ -135,6 +136,13 @@ export function coatable(o: WorldMaterialOptions): boolean {
   return !!o.vertexColors && vary > 0 && vary < 0.9 && !o.emissive && !o.character && !o.shore && !o.panes && !o.surface && (o.opacity ?? 1) >= 1 && o.texture !== 'grass' && o.texture !== 'flesh' && o.texture !== 'water';
 }
 
+/** Solid terrain, mineral and timber surfaces: keep bodies, swaying foliage and special materials intact.
+ * Ground chunks share one material across grass, cobbled roads and patches, so include every ground base. */
+export function studySurface(o: WorldMaterialOptions): boolean {
+  return !o.character && !o.emissive && !o.panes && !o.surface && !o.sway && (o.opacity ?? 1) >= 1
+    && ['stone', 'slab', 'cobble', 'brick', 'rock', 'wood', 'clapboard', 'shingle', 'dirt', 'gravel', 'sand', 'snow', 'mud', 'grass', 'leaves', 'rot'].includes(o.texture);
+}
+
 const textures = new Map<string, THREE.DataTexture>();
 
 /** One shared texture per (kind, seed). Nearest mip of nearest texel: crisp up close, no moiré far away. */
@@ -162,6 +170,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...worldUniforms,
+      uStudyOn: { value: studySurface(o) ? 1 : 0 },
       uMap: { value: createTexture(o.texture, o.seed ?? 1) },
       uMap2: { value: createTexture(o.texture2 ?? o.texture, o.seed ?? 1) },
       uHasMap2: { value: o.texture2 ? 1 : 0 },

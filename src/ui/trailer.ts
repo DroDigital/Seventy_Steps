@@ -20,6 +20,7 @@ export function startTrailer(g: Game, hold?: number): Trailer {
   let at = -1;
   let from = 0;
   let toward = 0; // the way the camera looks: at the Elder Sign, which is lit, and what lies beyond it
+  const still = new URLSearchParams(location.search).has('still');
   const go = (now: number): void => {
     at = hold !== undefined ? Math.min(SCENES.length - 1, Math.max(0, hold)) : (at + 1) % SCENES.length;
     from = now;
@@ -31,7 +32,7 @@ export function startTrailer(g: Game, hold?: number): Trailer {
   go(performance.now());
   return {
     tick(now) {
-      g.camera.yaw = toward + 0.5 * Math.sin(((now - from) / 1000) * 0.22); // a slow sway about the sign, to one side and the other
+      g.camera.yaw = toward + (still ? 0 : 0.5 * Math.sin(((now - from) / 1000) * 0.22));
       if (hold === undefined && (now - from) / 1000 >= SPAN) go(now);
     },
   };

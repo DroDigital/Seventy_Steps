@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import { FX, RENDER, SETTINGS } from '../data/tuning';
+import { installSurfaceStudies } from '../ui/surfaceStudies';
 import { createLanternShadow, type LanternShadow } from './lanternShadow';
 import { createLampShadows, type LampShadows } from './lampShadows';
 import { createMirrorView, type MirrorView } from './mirrorView';
@@ -44,6 +45,7 @@ export interface Pipeline {
 }
 
 export function createPipeline(parent: HTMLElement): Pipeline {
+  installSurfaceStudies((mode) => (worldUniforms.uStudy.value = mode));
   // Shaders work directly in display sRGB, so no colour-space conversions anywhere.
   THREE.ColorManagement.enabled = false;
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
