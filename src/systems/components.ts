@@ -90,6 +90,7 @@ export interface Combatant {
   name: string;
   faction: 'player' | 'enemy';
   bounty: number;
+  showcase?: boolean; // a developer-console creature: no progression or rewards
 }
 
 /** Archetype state machine (systems/brain.ts). `hidden`: lying in ambush or burrowed, unseen and untouchable. */

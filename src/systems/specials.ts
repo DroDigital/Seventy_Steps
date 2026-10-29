@@ -76,6 +76,7 @@ export function summon(g: Game, by: Entity, what: string, near?: XZ, cap: number
   c.home.delete(e); // it does not go home: it goes with its summoner
   c.fight.delete(e); // a summoned boss fights as a servant, not a fight of its own
   c.combatant.get(e)!.bounty = 0;
+  if (c.combatant.get(by)?.showcase) c.combatant.get(e)!.showcase = true;
   const br = c.brain.get(e);
   if (br && quarry !== by) Object.assign(br, { state: 'engage', target: quarry });
   c.fight.get(by)?.minions.push(e);

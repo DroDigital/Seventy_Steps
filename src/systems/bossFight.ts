@@ -122,15 +122,16 @@ export function fightSystem(g: Game): void {
   }
 }
 
-/** A boss's death ends its fight and takes any joining bosses with it; the investigator's resets them all. */
+/** A boss's death ends its fight and takes any joining bosses with it; the investigator's resets them all. (A developer showcase boss takes showcase joiners with it, and a real one real joiners: the two never mix.) */
 export function registerFights(g: Game): void {
   g.events.on('Died', ({ entity, killer }) => {
     const c = g.ecs.c;
     const f = c.fight.get(entity);
     if (f?.engaged) endFight(g, entity, f);
     if (!f) return;
+    const showcase = !!c.combatant.get(entity)?.showcase;
     for (const [e, joining] of c.fight) {
-      if (joining.script.joins?.with !== f.id) continue;
+      if (!!c.combatant.get(e)?.showcase !== showcase || joining.script.joins?.with !== f.id) continue;
       const [h, a, tr] = [c.health.get(e), c.actor.get(e), c.transform.get(e)];
       if (!h || h.hp <= 0 || !a || !tr || c.dead.has(e)) continue;
       h.hp = 0;
