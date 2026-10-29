@@ -9,10 +9,11 @@
 import { FIGURE_LIFE } from '../../data/fxTuning';
 import { BODY_PUSH, FOOT_RINGS } from '../../data/groundSkin';
 import { PANE_GLSL } from '../paneLife';
-import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
+import { LAMP_SLOTS, LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
 import { SURFACE_APPLY, SURFACE_UNIFORMS } from './surfaces';
+import { STUDY_GLSL } from './study';
 
 export { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 
@@ -159,6 +160,12 @@ uniform float uHasMap2; // 1: uMap2 blends in by vSplat (roads)
 uniform float uSeaLevel;
 uniform float uWet; // how soaked the ground is, 0..1 (weather.ts; round 34)
 uniform vec3 uLightColor;
+uniform vec3 uAmbient;
+uniform vec2 uHemi;
+uniform vec3 uGlowPos;
+uniform vec3 uGlowColor;
+uniform float uGlowRange;
+uniform float uStudyOn;
 uniform vec2 uSheen;
 uniform float uCoatOn; // 1: this material takes the realm's coat (render/worldMaterial.ts: what is a prop of stone, wood or cloth)
 uniform vec3 uCoatCol; // round 80: what lies on the stones of the realm (data/coats.ts, render/coat.ts): the matter on what faces up and into the wind...
@@ -230,11 +237,10 @@ float footRings(vec2 p) {
 
 uniform float uClipY;
 ${SURFACE_UNIFORMS}
-void main() {
-  if (vWorld.y < uClipY) discard; // under the sea's surface, in the mirrored scene (reflection.ts; round 35)
-  vec2 uv = affineUv(vec2(textureSize(uMap, 0)));
-  vec2 gx = dFdx(vUv);
-  vec2 gy = dFdy(vUv);
+
+// Also sampled by the optional material relief: exactly the same road/patch/border mixture,
+// before illumination, wetness or coats. A shadow painted by a lamp never becomes height.
+vec3 sampleWorldTexture(vec2 uv, vec2 gx, vec2 gy) {
   vec3 tex = sampleMap(uMap, uv, gx, gy);
   if (uHasMap4 > 0.5 && vEdge > 0.003) tex = mix(tex, sampleMap(uMap4, uv, gx, gy), vEdge);
   if (uHasMap2 > 0.5 && vSplat > 0.01) {
@@ -246,6 +252,46 @@ void main() {
   if (uHasMap3 > 0.5) {
     float pn = 0.5 * vnoise(vWorld.xz * 0.045 + 17.0) + 0.3 * vnoise(vWorld.xz * 0.13 + 3.0) + 0.2 * vnoise(vWorld.xz * 0.5), pm = smoothstep(uPatch.x, uPatch.x + uPatch.y, pn) * (1.0 - smoothstep(0.1, 0.5, vSplat)) * (1.0 - uPatchFade * 4.0 * vEdge * (1.0 - vEdge)); // never over a road; and fading out toward a border (the same in whichever region's chunk: vEdge and its complement give one 4e(1-e))
     if (pm > 0.01) tex = mix(tex, textureGrad(uMap3, uv * 0.9 + vec2(0.31, 0.57), gx * 0.9, gy * 0.9).rgb, pm);
+  }
+  return tex;
+}
+
+${STUDY_GLSL}
+
+// Reuse each real lamp's occlusion, window opening, falloff and overlap ceiling.
+vec3 studyLamps(vec3 n, vec3 shape, vec3 eye, out vec3 specular) {
+  vec3 sum = vec3(0.0);
+  specular = vec3(0.0);
+  for (int i = 0; i < ${LAMP_SLOTS}; i++) {
+    vec4 l = uLamps[i];
+    if (l.w <= 0.0) continue;
+    vec3 to = l.xyz - vWorld;
+    float d = length(to);
+    float x = clamp(d / l.w, 0.0, 1.0);
+    float win = 1.0 - x * x * x * x;
+    vec3 dir = to / max(d, 0.001);
+    float sh = 1.0;
+    if (uLampSlot[i] > -0.5) sh = lampShadowOf(int(uLampSlot[i] + 0.5), vWorld, shape);
+    vec3 c = uLampColors[i] * win * win / (1.0 + uLanternDecay * d * d) * sh * windowLight(i, vWorld) * windowLightAt(vWorld, l.xyz, uLampWindows[i]);
+    sum += c * studyDiffuse(dot(n, dir));
+    specular += c * studySpec(n, dir, eye);
+  }
+  float peak = max(max(sum.r, sum.g), sum.b);
+  specular /= 1.0 + 0.55 * peak;
+  return sum / (1.0 + 0.55 * peak);
+}
+
+void main() {
+  if (vWorld.y < uClipY) discard; // under the sea's surface, in the mirrored scene (reflection.ts; round 35)
+  vec2 uv = affineUv(vec2(textureSize(uMap, 0)));
+  vec2 gx = dFdx(vUv);
+  vec2 gy = dFdy(vUv);
+  vec3 tex = sampleWorldTexture(uv, gx, gy);
+  bool studying = uStudy > 0.5 && uStudyOn > 0.5 && uEmissive < 0.01 && uCharacter < 0.5;
+  vec3 studyN = normalize(vNormal);
+  if (studying) {
+    studyN = studyNormal(tex, uv, gx, gy, studyN);
+    tex = studyAlbedo(tex, uv, gx, gy);
   }
   if (uVary > 0.0) {
     float n = 0.45 * vnoise(vWorld.xz * 0.018 + 2.0) + 0.35 * vnoise(vWorld.xz * 0.06) + 0.2 * vnoise(vWorld.xz * 0.3 + 5.0);
@@ -309,16 +355,36 @@ void main() {
   float floorish = smoothstep(0.55, 0.9, n.y) * (1.0 - uEmissive) * (1.0 - character); // damp stone, up where the light falls on it, catches it in a streak (round 39)
   vec3 streak = vec3(0.0);
   vec3 toEye = normalize(cameraPosition - vWorld);
-  lamp += lampLightGloss(vWorld, n, 0.92 * (1.0 - character), toEye, uSheen.y, streak) * mix(1.0, uCharacterLight, character); // the world's lamps, fires and windows: a face turned from a lamp takes little of it (round 36: half, so a torch on the inside of a wall lit the wall's outside)
-  if (floorish > 0.01) streak += 0.4 * uLanternColor * lanternFalloff(ld) * lanternVis * pow(max(dot(n, normalize(toLamp / max(ld, 0.001) + toEye)), 0.0), uSheen.y);
+  if (!studying) lamp += lampLightGloss(vWorld, n, 0.92 * (1.0 - character), toEye, uSheen.y, streak) * mix(1.0, uCharacterLight, character); // the world's lamps, fires and windows: a face turned from a lamp takes little of it (round 36: half, so a torch on the inside of a wall lit the wall's outside)
+  if (floorish > 0.01 && !studying) streak += 0.4 * uLanternColor * lanternFalloff(ld) * lanternVis * pow(max(dot(n, normalize(toLamp / max(ld, 0.001) + toEye)), 0.0), uSheen.y);
   lamp *= (1.0 - uEmissive) * vTint;
-  vec3 lit = vLight - vMoon * (1.0 - moonLit(vWorld, n, max(dot(n, uLightDir), 0.0))) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
+  float moonVisibility = moonLit(vWorld, n, max(dot(n, uLightDir), 0.0));
+  vec3 lit = vLight - vMoon * (1.0 - moonVisibility) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
+  vec3 studyShine = vec3(0.0);
+  if (studying) {
+    // Relight the material itself, ahead of fog, bloom, sanity effects and the final fade.
+    // Shadow-map offsets use the unperturbed geometry normal to avoid self-shadow acne.
+    float moonVis = mix(1.0, moonVisibility, uShadow.x);
+    vec3 direct = uLightColor * moonVis;
+    vec3 ambient = uAmbient * mix(uHemi.x, uHemi.y, 0.5 + 0.5 * studyN.y);
+    vec3 glowTo = uGlowPos - vWorld;
+    float glowDist = length(glowTo);
+    float glowFall = max(0.0, 1.0 - glowDist / max(uGlowRange, 0.001));
+    ambient += uGlowColor * glowFall * glowFall * (0.35 + 0.65 * studyDiffuse(dot(studyN, glowTo / max(glowDist, 0.001))));
+    vec3 lanternColor = uLanternColor * lanternFalloff(ld) * lanternVis;
+    vec3 lampShine;
+    vec3 local = studyLamps(studyN, n, toEye, lampShine);
+    local += lanternColor * studyDiffuse(dot(studyN, toLamp / max(ld, 0.001)));
+    lamp = local * vTint;
+    lit = (ambient + direct * studyDiffuse(dot(studyN, uLightDir)) + local) * vTint;
+    studyShine = (direct * studySpec(studyN, uLightDir, toEye) + lanternColor * studySpec(studyN, toLamp / max(ld, 0.001), toEye) + lampShine) * min(vTint, vec3(1.0));
+  }
   lit += uCoatCol * coated * 0.14;
   float peak = max(max(lit.r, lit.g), max(lit.b, 0.001));
   lit *= mix(1.0, min(1.0, uSelfMax / peak), self * max(1.0 - uEmissive, 0.0));
   tex = mix(tex, vec3(1.0), 0.6 * uEmissive); // a lit thing shines through its texture
-  vec3 col = eldritch(tex * lit);
-  if (floorish > 0.01) { // a streak of the lights across damp stone: stronger where the stone is pale and the ground wet, broken up so it glints
+  vec3 col = eldritch(tex * lit + studyShine);
+  if (floorish > 0.01 && !studying) { // a streak of the lights across damp stone: stronger where the stone is pale and the ground wet, broken up so it glints
     float gloss = uSheen.x * (0.35 + 0.65 * vnoise(vWorld.xz * 2.3 + 4.0)) * (0.4 + 1.2 * dot(tex, vec3(0.33))) + 0.6 * uWet;
     col += streak * gloss * floorish * min(vTint.r + vTint.g + vTint.b, 1.5) * 0.45;
   }

@@ -21,6 +21,9 @@ npm run icon       # write the icon, drawn in code, to build/icon.png for packag
 Routes for testing: `?fresh` (a new game, no title), `?arena` (the combat arena), `?bestiary` (every
 creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 
+Optional material experiments: `?fresh&study=carved`, `ceramic` or `facets`;
+add `&studies` for live comparison buttons. [Techniques and capture instructions](docs/SURFACE_STUDIES.md).
+
 ## Play it
 
 | | Keyboard and mouse | Pad |
