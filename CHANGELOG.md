@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **Azathoth is a fight, and the hardest there is.** It is no longer invulnerable, and there is no timer to outlast: the song that drained its health is gone, and it is struck down like any horror. It is blind, so none of its blows is aimed at you. They are rhythms laid over its whole court: three rings of sound, each quicker than the last (the dirge); rings of boils that burst outward a beat at a time (the drumbeat); thirteen stamps winding out of its flank (the dance); boils over the court that leave pools (the seething); a cloud of nothing that spreads outward and takes the mind (the miasma); and the court drawn in toward a burst about its body (the maelstrom). In its last phase they come together. It still hears: a shot or a sprint draws a blow to the place it was made, and in its last phase so do a roll and a swing. Its pauses shrink as it weakens.
 - **Stamina must cover an action.** Attacks and dodges now require their full stamina cost, and sprinting and galloping stop when the next step cannot be paid for. Revolver shots cost no stamina and can be fired with an empty bar.
 
 ## 1.0.8

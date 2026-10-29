@@ -55,7 +55,7 @@ export interface Health {
   immortal: boolean;
   calm: number; // frames since the last damage
   ward?: number; // damage taken is scaled by this: a boss's hooks and signature set it each step
-  floor?: number; // minimum health while a survival encounter runs (Azathoth's signature sets it)
+  floor?: number; // minimum health while a survival encounter runs (none does now: Azathoth's was one until 2026-10-29; the signatures that set it lift it as they die)
 }
 
 export interface Poise {
@@ -90,6 +90,7 @@ export interface Combatant {
   name: string;
   faction: 'player' | 'enemy';
   bounty: number;
+  showcase?: boolean; // a developer-console creature: no progression or rewards
 }
 
 /** Archetype state machine (systems/brain.ts). `hidden`: lying in ambush or burrowed, unseen and untouchable. */

@@ -12,7 +12,7 @@ import type { Game } from './components';
 /** The Elder Sign in Azathoth's Court, where the court's two endings are chosen. */
 export const COURT_SIGN = 'beyond_court';
 
-/** Azathoth slumbers: its piping has been outlasted. */
+/** Azathoth slumbers: it has been brought down, and the piping fades. */
 export const courtOpen = (g: Game): boolean => !!g.overworld?.slain.has('boss:azathoth');
 
 /** The dream has been brought to an ending (it is saved: the world remembers which). */

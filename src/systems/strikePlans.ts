@@ -15,10 +15,51 @@ export interface Spot {
 
 const TAU = Math.PI * 2;
 
-/** The spots for `m`, about `centre` (the target) or out from `from` (the attacker, whose body reaches `body` metres). */
-export function planSpots(m: MarksDef, centre: XZ, from: XZ, body: number, rng: () => number): Spot[] {
+/**
+ * The spots for `m`, about `centre` (the target) or out from `from` (the attacker, whose body reaches `body` metres). The patterns of a blind horror (2026-10-29: `beats`,
+ * `spiral` and `scatter`) are laid about the attacker alone, whoever stands where; `reach` is the farthest from it a spot may lie (its court's wall), which `scatter` keeps to.
+ */
+export function planSpots(m: MarksDef, centre: XZ, from: XZ, body: number, rng: () => number, reach = Infinity): Spot[] {
   const [lo, hi] = m.ring;
   const spots: Spot[] = [];
+  if (m.pattern === 'beats') { // rings out from the body, each bursting a beat after the one within it
+    const rings = Math.max(1, m.rings ?? 2);
+    const near = body + lo;
+    const turn = rng() * TAU;
+    for (let i = 0; i < rings; i++) {
+      const d = near + (rings > 1 ? ((hi - lo) * i) / (rings - 1) : 0);
+      const n = Math.max(3, Math.round((m.count * d) / near)); // the wider rings hold more, so the spots stand as far apart on every ring
+      for (let j = 0; j < n; j++) {
+        const a = turn + ((j + 0.5 * (i % 2)) / n) * TAU; // every other ring between the one within it
+        spots.push({ at: { x: from.x + Math.sin(a) * d, z: from.z + Math.cos(a) * d }, order: i });
+      }
+    }
+    return spots;
+  }
+  if (m.pattern === 'spiral') { // one spot after another winding out from the body, the first burst the nearest
+    const turn = rng() * TAU;
+    const way = rng() < 0.5 ? -1 : 1;
+    for (let k = 0; k < m.count; k++) {
+      const a = turn + way * (k / m.count) * (m.turns ?? 1) * TAU;
+      const d = body + lo + (m.count > 1 ? ((hi - lo) * k) / (m.count - 1) : 0);
+      spots.push({ at: { x: from.x + Math.sin(a) * d, z: from.z + Math.cos(a) * d }, order: k });
+    }
+    return spots;
+  }
+  if (m.pattern === 'scatter') { // anywhere on the ground about the body, as far apart as it can be, in no order
+    const apart = m.radius * 2.2;
+    const [r0, r1] = [body + lo, Math.max(body + lo, Math.min(body + hi, reach))];
+    for (let i = 0; i < m.count; i++) {
+      let at = from;
+      for (let tries = 0; tries < 16; tries++) {
+        const [a, d] = [rng() * TAU, Math.sqrt(r0 * r0 + rng() * (r1 * r1 - r0 * r0))]; // even over the ground, not over the radius
+        at = { x: from.x + Math.sin(a) * d, z: from.z + Math.cos(a) * d };
+        if (spots.every((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) >= apart)) break;
+      }
+      spots.push({ at, order: i });
+    }
+    return spots;
+  }
   if (m.pattern === 'spokes') {
     const lines = Math.max(1, m.spokes ?? 3);
     const per = Math.max(1, Math.ceil(m.count / lines));

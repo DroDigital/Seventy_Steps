@@ -2,7 +2,7 @@
  * Outer Gods (spec §4): the court of Azathoth and the powers beyond the Gate. Each fights by a phase
  * script (spec §3E); the region's four have signature mechanics (systems/signatures/): Shub-Niggurath's
  * spawning roots, Yog-Sothoth's sphere gates, Nyarlathotep's avatars and borrowed movesets, and
- * blind Azathoth, outlasted rather than slain. 'Umr at-Tawil yields, offering one of the endings.
+ * blind Azathoth, whose blows are rhythms over the court and who answers a noise. 'Umr at-Tawil yields, offering one of the endings.
  */
 
 import { ph, phases, scripted, st, tier } from './kit';
@@ -12,12 +12,15 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'azathoth', name: 'Azathoth', source: 'The Dream-Quest of Unknown Kadath', regions: ['court_centre'], canonLooks: false, voice: 'pipes',
     assembly: { body: 'mound', palette: 'charcoal', scale: 30, tentacles: 12, eyes: 0, glow: 'purple' },
     ...scripted('boss', phases(
-      // Blind: nothing it does is aimed. The piping swells and the dark comes; its blows fall only where it hears (signatures/azathoth.ts; round 12).
-      ph(1, { roar: 1, darkness: 1 }, { hooks: ['darkness'] }),
-      ph(0.66, { roar: 1, darkness: 1 }, { hooks: ['darkness', 'camera_warp'] }),
-      ph(0.33, { roar: 2, darkness: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
-    ), { mobile: false, range: [0, 60], aggro: 0, fov: 0, cooldown: [240, 360] }), // slow, vast swells: the song took a still mind whole in 15 s
-    stats: st(10050, 5000, 150, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // (round 100, 50% more: health 6700 to 10050)
+      // Blind: nothing it does is aimed at the investigator. The piping swells in rings of sound, the drums beat the ground to boils, the thirteen dance, the chaos seethes and the
+      // centre draws all in: rhythms over the whole court, read by where they fall and when. What it does aim is an answer to a noise (signatures/azathoth.ts). 2026-10-29: it had
+      // been an ordeal of silence, invulnerable, its health bar a song that drained; it is the hardest fight there is (the pauses shrink with each phase, the last hears everything).
+      ph(1, { dirge: 3, drumbeat: 2, seethe: 2, roar: 1 }),
+      ph(0.72, { dirge: 2, drumbeat: 2, dance: 3, seethe: 1, miasma: 1, roar: 1 }, { hooks: ['darkness'] }),
+      ph(0.45, { dirge: 2, drumbeat: 2, dance: 2, seethe: 2, maelstrom: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp'] }),
+      ph(0.2, { dirge: 3, drumbeat: 2, dance: 3, seethe: 2, maelstrom: 3, crescendo: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
+    ), { mobile: false, range: [0, 60], aggro: 0, fov: 0, cooldown: [60, 110] }),
+    stats: st(10050, 5000, 56, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // (round 100, 50% more: health 6700 to 10050) (2026-10-29: damage 150 to 56, which the library's powers now multiply: its heaviest blow, the maelstrom's burst, is a quarter of a person's health where it is met)
   },
   {
     id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['piping_dark'], canonLooks: false, voice: 'pipes',

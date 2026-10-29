@@ -22,9 +22,9 @@ nothing in its way.
   in this simulation; these raw costs are never divided by the scaling factors.
 - Ghatanothoa is fought with the gaze waived (its seconds scaled by the half of a fight in its sight), Shub-Niggurath with
   its roots down (forty seconds more, to cut them), and the Great Ones and 'Umr at-Tawil with the void under their hidden
-  platforms shut (a person with insight keeps to the platforms): the bot plays those badly. Azathoth and the Haunter of the Dark are not held
-  to the bounds: Azathoth is blind and cannot be wounded (the piping is outlasted, and what it costs the bot is the noise the bot
-  makes), the Haunter is hurt only by lamplight (a person lures it to a lamp).
+  platforms shut (a person with insight keeps to the platforms): the bot plays those badly. The Haunter of the Dark is not held
+  to the bounds: it is hurt only by lamplight (a person lures it to a lamp). Azathoth is held to bounds of its own and must cost the bot more than
+  any other horror (2026-10-29): its blows are rhythms over the whole court, which the bot reads badly, and its fight is the hardest there is.
 - Dagon and Hydra share one encounter. Their individual rows are supplemental; `tests/seaBosses.test.ts` also checks both together at the expected standing, including combined time and damage against one healing inventory. Solo pressure floors are lower for these two members, while their upper limits remain in force.
 
 
@@ -76,10 +76,10 @@ nothing in its way.
 | 44 | Nyarlathotep | 18/9/17 | 5 | 10274 | 610 | 8557 | 448 | 10 | 3.82 | 0 |
 | 45 | Shub-Niggurath | 18/9/17 | 5 | 10873 | 368 | 5618 | 448 | 10 | 2.51 | 0 |
 | 46 | Yog-Sothoth | 18/9/17 | 5 | 12170 | 580 | 7607 | 448 | 10 | 3.40 | 0 |
-| 47 | Azathoth | 18/9/17 | 5 | 13367 | 90 | 9839 | 448 | 10 | 4.39 | 0 |
+| 47 | Azathoth | 18/9/17 | 5 | 13367 | 477 | 11900 | 448 | 10 | 5.31 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 800 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 3.4), and the bot does not die, subject to the named pressure exceptions below.
-Each tier has its band: a named horror takes 14 to 200 seconds and costs 0.2 to 2.4 lives (the Colour may cost up to 1.5); one of the 16 great fights takes 35 to 340 seconds and costs 0.45 to 3.4 lives. Named exceptions are colossus pyramids 14–240 seconds; daemon pipers 14–280 seconds 0.2–2.6 lives; zkauba 14–280 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–580 seconds; nyarlathotep 35–740 seconds 0.45–4.5 lives; shub niggurath 35–440 seconds; yog sothoth 35–700 seconds 0.45–3.8 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–170 seconds. Yog-Sothoth is additionally capped at 3.8 lives at its expected standing.
+Each tier has its band: a named horror takes 14 to 200 seconds and costs 0.2 to 2.4 lives (the Colour may cost up to 1.5); one of the 17 great fights takes 35 to 340 seconds and costs 0.45 to 3.4 lives. Named exceptions are colossus pyramids 14–240 seconds; daemon pipers 14–280 seconds 0.2–2.6 lives; zkauba 14–280 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–580 seconds; nyarlathotep 35–740 seconds 0.45–4.5 lives; azathoth 90–580 seconds 1.7–6.4 lives; shub niggurath 35–440 seconds; yog sothoth 35–700 seconds 0.45–3.8 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–170 seconds. Yog-Sothoth is additionally capped at 3.8 lives at its expected standing.
 
 ## At the cap
 
@@ -134,7 +134,7 @@ their health by the Might the investigator has beyond the standing above, and th
 | 44 | Nyarlathotep | 30/30/30 | 5 | 12822 | 466 | 6946 | 541 | 10 | 2.57 | 0 |
 | 45 | Shub-Niggurath | 30/30/30 | 5 | 13569 | 294 | 4906 | 541 | 10 | 1.81 | 0 |
 | 46 | Yog-Sothoth | 30/30/30 | 5 | 15187 | 413 | 5823 | 541 | 10 | 2.15 | 0 |
-| 47 | Azathoth | 30/30/30 | 5 | 16681 | 90 | 11646 | 541 | 10 | 4.31 | 0 |
+| 47 | Azathoth | 30/30/30 | 5 | 16681 | 346 | 10506 | 541 | 10 | 3.88 | 0 |
 
 ## The opening
 

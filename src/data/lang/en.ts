@@ -301,7 +301,7 @@ export const EN = {
   'hint.cover': "Ghatanothoa's gaze turns flesh to stone: four seconds in its sight and you are lost, the colour draining and the picture cracking as it takes hold. Stand behind a monolith and it wears off.",
   'hint.roots': 'While the spawning roots stand, Shub-Niggurath takes only a fifth of each blow, and they bring forth its young. Cut the roots down.',
   'hint.spheres': 'The iridescent spheres are gates: touch one and you come out of the next, and now and then the whole arena leaps. Yog-Sothoth is struck where its own spheres rest.',
-  'hint.blind': 'Azathoth cannot see you, and nothing you strike it with matters. It hears: running, rolling, swinging and shots carry far, walking less, and walking with {block} held or standing still not at all. Outlast the piping.',
+  'hint.blind': 'Azathoth cannot see you, and its blows are aimed at no one: they fall over the whole court, in rings, in beats and in boils, and each is read by where it will fall and when. It does hear, though: a shot or a sprint draws a blow to the place it was made. Strike it at its flank between the blows, and make no more noise than you must.',
   'hint.candle': 'A candle took the flame. Fall near a lit candle and you may rise beside it, a few steps from the horror that felled you, or at the Elder Sign, as you choose. The candle gives no rest: levels and doses are the Elder Signs\u2019.',
   'hint.breath': 'The green bar is your breath: strikes, rolls, running and blocking spend it, and with it gone you are slow and open. Back off, and let it come back before you swing again.',
   'hint.riposte': "You parried: the foe is open. Strike at once for a small riposte bonus. A heavy blow squarely into a foe’s back also earns this bonus.",

@@ -137,13 +137,15 @@ export const NYARLATHOTEP = {
   watchAt: 9, // ...this far from the investigator
 };
 
-/** Azathoth: blind and invulnerable, it hears; the fight is outlasting the piping. */
+/**
+ * Azathoth (2026-10-29): blind, and a fight like any horror's, the hardest of them. It had been an ordeal of silence: invulnerable, its health bar a song that drained with the
+ * minutes (docs/DECISIONS.md). Its blows are rhythms laid over the whole court, aimed at no one (data/attacks.ts); what it does aim is an answer to a loud noise.
+ */
 export const AZATHOTH = {
-  survive: 5400, // frames of piping to outlast (its health bar is the song, draining)
-  hear: { shot: 45, sprint: 28, dodge: 20, attack: 16, walk: 7 }, // metres each noise carries
-  windup: 45, // frames from the sound to the blast where it was heard
-  rest: 60, // frames after a blast before it can hear again
-  blast: { radius: 3.5, life: 70, tick: 20, damage: 40 },
+  pace: [110, 96, 82, 68] as const, // the most frames it waits after a blow, by phase: the pauses shrink as the piping quickens (never under BOSS.gap's 60)
+  heed: { shot: 0.05, sprint: 0.008, dodge: 0.012, swing: 0.006, fade: 0.004 }, // what each frame of a loud noise adds to its attention (an answer at 1) and what a quiet one takes off: a shot is an answer and a half, a sprint answers each two seconds; in its last phase it hears a roll and a swing too
+  listens: 0.4, // the attention at which its health bar says it listens
+  answer: { power: 0.8, poise: 1, radius: 3.4, delay: 48, rest: 150, pool: { radius: 3.4, life: 80, tick: 20, power: 0.12 } }, // the mark laid where the noise was made: its blow (a share of its damage), its radius (m), the frames to its burst and before another, and the pool it leaves
 };
 
 /**
