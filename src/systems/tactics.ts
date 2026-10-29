@@ -14,11 +14,12 @@ import type { Entity } from '../core/ecs';
 import { distXZ, yawOf, type XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { BrainDef } from '../data/archetypes';
-import { AI, BOSS, RANK, SIM } from '../data/tuning';
+import { AI, BOSS, RANK, SEA_BOSSES, SIM } from '../data/tuning';
 import { ATTACKS } from '../data/attacks';
 import { moveDef, startMove } from './actions';
 import { evade, holdInside, rimGap } from './bossArena';
 import { isAbsent, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
+import { seaPartnerBusy } from './seaBosses';
 
 /**
  * Weighted pick among the attacks whose range bracket contains `d`; null when none fits. One that
@@ -153,7 +154,8 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
         : p.cooldown; // (round 46; a lesser hunter's own wait is RANK)
   const punish = pressed ? RANK.punish : AI.punish;
   const into = (pressed || !arena) && target === g.player.id && br.cooldown <= hi * (1 - punish) && opening(g);
-  const ready = br.cooldown === 0 || into;
+  const seaWaiting = seaPartnerBusy(g, id, target);
+  const ready = (br.cooldown === 0 || into) && !seaWaiting;
   let [dart, held] = [false, false];
   if (ready && !(waiting && d > p.range[1] + 1)) { // one waiting its turn strikes only what comes to it
     let attack = chooseAttack(br.def, d, g.rng, p.mobile);
@@ -176,6 +178,13 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
   }
   if (!p.mobile) return;
   if (arena) {
+    if (seaWaiting) { // the waiting sea god yields a lane instead of body-shoving the investigator into its partner's blow
+      const lane = (c.body.get(id)?.radius ?? 0.5) + (c.body.get(target)?.radius ?? 0.4) + SEA_BOSSES.clearance;
+      if (d < lane && rimGap(arena, pos) >= BOSS.rim + 2) walk(m, pos, tp, br.speed * 0.6, true);
+      else circle(m, pos, tp, br.speed * 0.5, br.strafe);
+      holdInside(arena, pos, m, br.speed);
+      return;
+    }
     const [near, far] = fleeing ? [Math.min(p.range[1], 5), p.range[1] + 1] : [Math.min(p.range[0], 4), p.range[1]];
     const cornered = rimGap(arena, pos) < BOSS.rim + 2;
     if (d > far || dart) walk(m, pos, tp, br.speed);

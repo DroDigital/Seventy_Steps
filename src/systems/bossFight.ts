@@ -20,6 +20,7 @@ import { phaseAt, phaseBrain } from './fightPhase';
 import { SIGNATURES } from './signatures';
 import { summon } from './specials';
 import { clearStrikes } from './strikes';
+import { syncVariant } from './variantSwap';
 
 /** Fights under way: engaged, with their boss alive. */
 export const engagedFights = (g: Game): [Entity, Fight][] =>
@@ -42,6 +43,7 @@ export function refreshBrain(g: Game, e: Entity, f: Fight): void {
 
 function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {
   f.phase = i;
+  syncVariant(g, e);
   refreshBrain(g, e, f);
   const po = g.ecs.c.poise.get(e);
   if (po && i > 0) po.value = po.max; // a new phase shrugs off the stagger
@@ -76,6 +78,7 @@ export function resetFight(g: Game, e: Entity, f: Fight): void {
   if (f.engaged) SIGNATURES[f.id]?.reset?.(g, e, f);
   clearArena(g, f);
   Object.assign(f, { engaged: false, frames: 0, phase: 0, sig: {}, veiled: false });
+  syncVariant(g, e);
   refreshBrain(g, e, f);
   const h = g.ecs.c.health.get(e);
   if (h) h.ward = undefined;

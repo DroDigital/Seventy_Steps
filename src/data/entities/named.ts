@@ -133,8 +133,8 @@ export const NAMED = tier('named', [
     sprite: { silhouette: 'robed', palette: 'sand', scale: 2.4, eyes: 0, gear: ['mask'] },
     ...scripted('boss', phases(
       ph(1, { projectile: 2, teleport: 1, summon: 1, gaze: 1, barrage: 1 }, { summons: ['man_of_leng'] }),
-      ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, summon: 1, dream_cloud: 1 }, { summons: ['man_of_leng'], hooks: ['camera_warp'] }),
-      ph(0.2, { beam: 2, gaze: 2, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['darkness'] }),
+      ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, summon: 1, dream_cloud: 1 }, { summons: ['man_of_leng'], hooks: ['camera_warp'], eldritch: true }),
+      ph(0.2, { beam: 2, gaze: 2, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['darkness'], eldritch: true }),
     ), { range: [5, 12], strafe: 0.3 }),
     stats: st(2600, 220, 58, 3, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
     eldritchVariant: { sprite: { silhouette: 'blob', tentacles: 6, body: [0.7, 0.23] } }, // its true form stands as tall as a blob does and half as wide: a metre of air either side of the drawn body (round 56)
@@ -161,7 +161,7 @@ export const NAMED = tier('named', [
     id: 'charles_le_sorcier', name: 'Charles le Sorcier', source: 'The Alchemist', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['cowl', 'staff'] },
     ...scripted('caster', phases(ph(1, { projectile: 2, teleport: 1, combo: 1 }), ph(0.5, { projectile_fan: 2, teleport: 1, pool: 1, conflagration: 1, sweep_beam: 1 }))),
-    stats: st(690, 120, 28, 3.4, 2, 7), drops: { echoes: 1400 }, insightOnSight: 1, // (round 83: health 600 to 690: he fell in 9 seconds to a person at the cap, under the 10 floor, now that his pauses are longer)
+    stats: st(699, 120, 28, 3.4, 2, 7), drops: { echoes: 1400 }, insightOnSight: 1, // 690 to 699 keeps the ten-second cap fight after the progression rebalance, below Brown Jenkin in meet order
   },
   {
     id: 'medusa_gorgon', name: "The Gorgon of Medusa's Coil", source: "Medusa's Coil", regions: ['dunwich'], canonLooks: true,

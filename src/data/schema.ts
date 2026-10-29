@@ -212,6 +212,7 @@ export interface BossPhase {
   summons?: readonly string[]; // entity ids
   realityHooks?: readonly RealityHook[];
   arenaChange?: ArenaChange;
+  eldritch?: boolean; // this phase reveals the eldritch variant regardless of the investigator's sanity
 }
 
 export interface BossScript {

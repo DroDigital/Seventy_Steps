@@ -36,6 +36,12 @@ export const BOSS = {
   monolith: [1.8, 7] as const, // ...each this wide and tall: cover from a gaze
 };
 
+/** Dagon and Hydra share a temple: one attacks while the other yields room, with a counterattack window between turns. */
+export const SEA_BOSSES = {
+  rest: 24, // frames after the partner's complete recovery before the next wind-up may begin
+  clearance: 0.75, // metres beyond both collision radii: room to move while the waiting partner stays within a blade's reach
+};
+
 /** The reality hooks (spec §3E), live while an engaged boss's phase lists them. */
 export const REALITY = {
   ease: 1 / 90, // darkness, flood and warp move toward their targets by this much a frame

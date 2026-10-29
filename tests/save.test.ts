@@ -77,9 +77,10 @@ describe('save and load', () => {
     const old: SaveData = { ...snapshot(createWorldGame()), upgrades: { vigour: 3, endurance: 2, resolve: 1 } };
     delete old.levels;
     const loaded = createWorldGame({ save: parseSave(JSON.stringify(old))! });
-    expect(loaded.player.levels).toEqual({ vigour: 5, endurance: 4, might: 0 }); // 60 health and 30 stamina, as before
+    expect(loaded.player.levels).toEqual({ vigour: 4, endurance: 4, might: 0 }); // nearest to the old 60 health and 30 stamina
     expect(loaded.mind.upgrades).toEqual({ resolve: 1, draught: 0 });
-    expect(loaded.ecs.c.health.get(loaded.player.id)!.max).toBe(PLAYER.hp + 5 * LEVELS.vigour.hp!);
+    expect(loaded.ecs.c.health.get(loaded.player.id)!.max).toBe(PLAYER.hp + 4 * LEVELS.vigour.hp!);
+    expect(Math.abs(loaded.ecs.c.health.get(loaded.player.id)!.max - (PLAYER.hp + 60))).toBeLessThanOrEqual(LEVELS.vigour.hp! / 2);
   });
 
   it('wounded foes stay wounded through a reload', () => {

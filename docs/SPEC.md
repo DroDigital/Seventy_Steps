@@ -71,7 +71,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - specific attacks
   - the first sight of any greater-tier or higher entity
 - Sanity is restored at checkpoints and by consumables, and (round 22) mends by itself away from a fight, faster by lamplight. Falling sanity raises both damage dealt and damage taken, until the mind is Unmoored (round 23): then the body suffers, with weaker blows, more damage taken, slower stamina and a slow bleed that never kills.
-- Insight is gained from the first sight of named or boss entities, and from tomes. It can be spent on upgrades, but spending it re-hides whatever it revealed.
+- Insight is gained from the first sight of named or boss entities, and from tomes. It can be spent on upgrades, but spending it re-hides whatever it revealed. Secret paths require retained Insight rather than charging on entry: 1 for introductory doors, 2 for lesser waking secrets, 3 for major waking branches, 4 for deep-world branches, and 5 for far-realm secrets. Required boss routes remain accessible without Insight.
 - World hooks are components that listen to the event bus:
   1. `HiddenLayer {minInsight?, maxSanity?}`: eldritch geometry, bridges, and doors that exist only for the enlightened.
   2. `VariantSwap`: at Fractured or lower, entities switch to their `eldritchVariant` overrides.
@@ -163,8 +163,9 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
 Place every other entity in the spawn tables of its best-fitting region.
 
 ### E. Bosses
-- `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?}`.
-- Boss health and damage scale with the investigator's total level: +0.75% base health and +0.3% base damage per purchased attribute level. This combines with NG+ and difficulty. Round 71: a level counts by its worth past the soft caps that also set what Vigour, Endurance and Might give the investigator (`SOFT_CAP`: the first 18 levels of an attribute count whole, the next 8 half, the last 4 fifteen in a hundred), so a level the body gains little from does not make the horrors much harder either. Living bosses keep their health percentage when the player levels up; ordinary enemies and summoned adds keep their existing stats.
+- `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?, eldritch?}`.
+- Boss health and damage scale with the investigator's total level: +0.75% base health and +0.3% base damage per purchased attribute level. This combines with NG+ and difficulty. Round 71: a level counts by its worth past the soft caps that also set what Vigour, Endurance and Might give the investigator (`SOFT_CAP`: the first 20 levels of an attribute count whole, the next 6 half, the last 4 at 20%), so a level the body gains little from does not make the horrors much harder either. Vigour adds 16 health per full level. Past a boss's expected standing, its health and damage absorb half of the extra Might and Vigour growth, so further purchases still improve effective damage and survival. Living bosses keep their health percentage when the player levels up; ordinary enemies and summoned adds keep their existing stats.
+- The High Priest reveals its eldritch form in phases two and three regardless of sanity. Dagon and Hydra coordinate attacks while engaged together in the same arena, waiting through the partner's complete recovery plus 24 rest frames before another wind-up. The waiting boss yields 0.75 m beyond the two collision radii, leaving room to dodge while remaining within blade reach. Their authored health is 2550/2450 and damage 35/38, balanced as one combined encounter. Their flood remains, while second-phase darkness and servant packs are removed to preserve visible ground cues and space to counterattack.
 - Arenas have no decorative neon floor symbols. Markings on arena props and functional combat or puzzle markings remain.
 - Shared attack library, about 20 parameterized attacks:
   - melee: sweep, slam, lunge, charge, grab, bite, tentacle_burst

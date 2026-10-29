@@ -234,7 +234,7 @@ describe('hidden bridges', () => {
       return Math.hypot(p.x - onDeck.x, p.z - onDeck.z);
     };
     expect(probe()).toBeGreaterThan(0.5);
-    changeInsight(g, 2, 'debug', 'test');
+    changeInsight(g, span.def.hidden!.minInsight!, 'debug', 'test');
     expect(probe()).toBeGreaterThan(0.5); // shown, but it forms as it is approached (round 61): until then the gap is a gap
     goTo(g, ...(Object.values(roomPoint(span, 0, -span.half + 1)) as [number, number])); // at the near brink
     run(g, PASSAGE.frames.bridge + 2);

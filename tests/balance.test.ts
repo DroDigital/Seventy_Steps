@@ -51,7 +51,10 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
   colossus_pyramids: { seconds: [14, 110] },
   daemon_pipers: { seconds: [14, 145], lives: [0.2, 1.6] },
   zkauba: { seconds: [14, 130] },
-  mother_hydra: { lives: [0.45, 2.1] },
+  // These are members of one encounter. seaBosses.test.ts bounds the combined fight;
+  // the solo rows retain god-duration and upper-pressure limits with a member's floor.
+  mother_hydra: { lives: [0.2, 1.5] },
+  father_dagon: { lives: [0.2, 1.5] },
   ghatanothoa: { seconds: [35, 280] },
   nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
   shub_niggurath: { seconds: [35, 250] },
@@ -66,7 +69,7 @@ const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDE
  * nor be over in fewer seconds, whatever a person has farmed.
  */
 const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const; // (round 71: nine starts, not three: 'Umr at-Tawil cost the same bot 0.28, 0.93 and 0.43 lives from three, and a floor held on three paths was a coin)
-const CAP_LIVES_FLOOR: Partial<Record<string, number>> = { umr_at_tawil: 0.18 };
+const CAP_LIVES_FLOOR: Partial<Record<string, number>> = { umr_at_tawil: 0.18, father_dagon: 0.2, mother_hydra: 0.2 };
 const YOG_STANDING_MAX = 2.5;
 const YOG_CAP_MAX = 2.2;
 const COLOUR_OPENING_MAX = 1.3;
@@ -76,7 +79,7 @@ const AT_CAP_TEXT = `
 ## At the cap
 
 The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which the soft caps make ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
-their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} to ${BANDS.named.lives[1] * 1.25} lives; a great fight ${CAP.god.seconds} and ${CAP.god.lives} to ${BANDS.god.lives[1] * 1.25} lives, except 'Umr at-Tawil's ${CAP_LIVES_FLOOR.umr_at_tawil} life floor and Yog-Sothoth's ${YOG_CAP_MAX} life ceiling.
+their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} to ${BANDS.named.lives[1] * 1.25} lives; a great fight ${CAP.god.seconds} and ${CAP.god.lives} to ${BANDS.god.lives[1] * 1.25} lives, except 'Umr at-Tawil's ${CAP_LIVES_FLOOR.umr_at_tawil} life floor, Dagon and Hydra's ${CAP_LIVES_FLOOR.father_dagon} life floor per member, and Yog-Sothoth's ${YOG_CAP_MAX} life ceiling. Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
 `;
 /** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
 const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
@@ -108,6 +111,7 @@ nothing in its way.
   platforms shut (a person with insight keeps to the platforms): the bot plays those badly. Azathoth and the Haunter of the Dark are not held
   to the bounds: Azathoth is blind and cannot be wounded (the piping is outlasted, and what it costs the bot is the noise the bot
   makes), the Haunter is hurt only by lamplight (a person lures it to a lamp).
+- Dagon and Hydra share one encounter. Their individual rows are supplemental; \`tests/seaBosses.test.ts\` also checks both together at the expected standing, including combined time and damage against one healing inventory. Solo pressure floors are lower for these two members, while their upper limits remain in force.
 
 `;
 const NOTES = `

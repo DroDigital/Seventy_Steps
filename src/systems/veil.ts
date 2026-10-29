@@ -18,7 +18,7 @@ export const PASSAGES: readonly Passage[] = DUNGEONS.flatMap((d) =>
   d.rooms.flatMap((r) => (r.hidden?.minInsight === undefined ? [] : [{ dungeon: d.name, room: r.id.replaceAll('_', ' '), need: r.hidden.minInsight, tome: r.tome?.name }])),
 );
 
-/** The most insight any passage wants: a mind with this much sees every one (round 61: it was 3 when the Mind's upgrades cost 14 and a run brought 170). */
+/** The most insight any passage wants; also reserved when surplus insight is offered, so later secrets remain affordable. */
 export const PASSAGE_NEED = Math.max(0, ...PASSAGES.map((p) => p.need));
 
 /** What is still to be found beyond a passage: a bridge always, a room until its tome has been read (`read`: given, only those unread count). */
