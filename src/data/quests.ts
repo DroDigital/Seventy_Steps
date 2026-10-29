@@ -157,7 +157,7 @@ const HAND: Readonly<Record<string, QuestDef>> = {
     stages: [
       { goal: { kind: 'slay', boss: 'umr_at_tawil' }, note: "'Umr at-Tawil, the Guide, keeps the last gate in the Ultimate Void, across the span north of the First Gate. When his strength fails he may offer to go through the Gate with you: that is an ending. Strike him down instead, and the way goes on to Yog-Sothoth and the Court." },
       { goal: { kind: 'slay', boss: 'yog_sothoth' }, note: "Randolph Carter says Yog-Sothoth is the gate and the key and the guardian, and while it holds, the tall man's way stays open. It waits in the Gate of Spheres, past 'Umr at-Tawil and four dimensions of the Outer Dark: take the storm gate on the Last Shore." },
-      { goal: { kind: 'slay', boss: 'azathoth' }, note: 'Azathoth waits in its Court at the centre of all, past the Gate of Spheres, blind, and hears every step. It cannot be hurt, only outlasted: keep still, or creep with the guard raised, until the piping fades.' },
+      { goal: { kind: 'slay', boss: 'azathoth' }, note: 'Azathoth waits in its Court at the centre of all, past the Gate of Spheres, blind, and answers every shot and every sprint. Its blows are aimed at no one but fall over the whole court, in rings, beats and boils: read each by where it will fall and when, and strike it at the flank between them until the piping fades.' },
       { goal: { kind: 'ending' }, note: "The piping has faded. The silver key hangs before the Elder Sign in Azathoth's Court: close your hand on it to wake and seal the Gate. The tall man waits aside: attend him, and the knee bends." },
     ],
     done: 'The dream is ended, and the choice was my own.',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
-import { emptyInput, type InputFrame } from '../src/core/input';
+import { emptyInput } from '../src/core/input';
 import { getEntity, variantOf } from '../src/data/registry';
 import { AZATHOTH, SHUB, YOG } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
@@ -8,6 +8,7 @@ import { bodyOf } from '../src/systems/creatures';
 import { fightAction } from '../src/systems/fightActions';
 import { createWorldGame } from '../src/systems/game';
 import { setSanity } from '../src/systems/sanity';
+import { AZATHOTH_SIGNATURE, noise } from '../src/systems/signatures/azathoth';
 import { rootsOf } from '../src/systems/signatures/shub';
 import { borrowed } from '../src/systems/signatures/nyarlathotep';
 import { spheresOf } from '../src/systems/signatures/yogSothoth';
@@ -108,62 +109,76 @@ describe('the outer gods (spec §3E)', () => {
     expect(g.ecs.c.transform.has(apparition!)).toBe(false); // gone
   });
 
-  it('Azathoth takes no harm; it hears the investigator and the court erupts where it heard them; outlasting it, it slumbers', () => {
-    const b = bossGame('azathoth', undefined, 20); // 5 m from its bulk: footsteps carry that far
-    const { g, boss, fight } = b;
+  it('Azathoth is struck and falls like any horror: its health is no song, nothing drains it, and when it falls it slumbers (2026-10-29)', () => {
+    const b = bossGame('azathoth', undefined, 20);
+    const { g, boss } = b;
     engage(b);
     calm(b);
     const h = g.ecs.c.health.get(boss)!;
-    strike(g, g.player.id, boss, deathblow);
-    expect(h.hp).toBeGreaterThan(1);
-    const heard = record(g, 'Notice');
-    steps(g, 90); // standing still: silence
-    expect(heard).toEqual([]);
-    const walk: InputFrame = { ...emptyInput(), moveX: 1 };
-    const pp = { ...g.ecs.c.transform.get(g.player.id)!.pos };
-    steps(g, 5, walk);
-    expect(heard.map((n) => n.text)).toEqual(['IT HEARS YOU']);
-    steps(g, AZATHOTH.windup);
-    expect([...g.ecs.c.hazard.keys()].map((z) => distXZ(g.ecs.c.transform.get(z)!.pos, pp)).some((d) => d < 1)).toBe(true);
+    steps(g, 60 * 90); // ninety seconds, the length of the old song, with nothing struck
+    expect(h.hp).toBe(h.max);
+    expect([h.floor, h.ward]).toEqual([undefined, undefined]); // not invulnerable
+    setSanity(g, 100); // (a mind at its edge would sharpen the blow)
+    strike(g, g.player.id, boss, blow(100));
+    expect(h.max - h.hp).toBe(100);
     const deaths = record(g, 'Died');
     const titles = record(g, 'Title');
-    fight.sig.left = 2;
-    steps(g, 1);
-    expect(h.hp).toBeGreaterThan(0);
-    expect(deaths).toEqual([]);
-    steps(g, 1);
+    expect(strike(g, g.player.id, boss, deathblow)).toBe('kill');
     expect(h.hp).toBe(0);
     expect(g.ecs.c.actor.get(boss)!.move).toBe('death');
     expect(deaths).toEqual([expect.objectContaining({ entity: boss, killer: g.player.id })]);
     expect(titles.map((t) => t.text)).toEqual(['THE PIPING FADES · AZATHOTH SLUMBERS']);
   });
 
-  it('standing silent through the whole song, nothing of Azathoth finds the investigator (round 12: 29 blows did)', () => {
-    const b = bossGame('azathoth', undefined, 40);
-    const { g } = b;
-    const notices = record(g, 'Notice');
-    const foes = (): number => [...g.ecs.c.combatant].filter(([e, c]) => c.faction === 'enemy' && !g.ecs.c.phantom.has(e)).length; // a mind at its edge conjures phantoms
-    const before = foes();
-    engage(b); // and not calmed: it pipes, darkens and strikes as it will
-    const blows = record(g, 'Hit');
-    steps(g, AZATHOTH.survive + 10);
-    expect(blows.filter((e) => e.target === g.player.id && e.damage > 0)).toEqual([]);
-    expect(foes()).toBe(before); // no court summoned about it
-    expect(notices.map((n) => n.text).some((t) => t.startsWith('IT IS BLIND'))).toBe(true);
-  });
-
-  it("Azathoth's health bar is the song, draining as the piping goes on", () => {
+  it('Azathoth has no timer: its phases follow its health, whatever the minutes, and a fight broken off takes up where it was', () => {
     const b = bossGame('azathoth', undefined, 40);
     engage(b);
     calm(b);
     const h = b.g.ecs.c.health.get(b.boss)!;
-    steps(b.g, AZATHOTH.survive / 2);
-    expect(h.hp / h.max).toBeCloseTo(0.5, 1);
-    expect(b.fight.phase).toBe(1);
-    b.g.ecs.c.brain.get(b.boss)!.state = 'return'; // the investigator fled its court: the song breaks off
+    steps(b.g, 60 * 180);
+    expect([b.fight.phase, h.hp]).toEqual([0, h.max]); // three minutes, and not a step of the song
+    for (const [i, share] of [0.7, 0.4, 0.15].entries()) {
+      h.hp = h.max * share;
+      steps(b.g, 2);
+      expect(b.fight.phase, `at ${share}`).toBe(i + 1);
+    }
+    b.g.ecs.c.brain.get(b.boss)!.state = 'return'; // the investigator fled its court
     steps(b.g, 1);
     engage(b);
-    expect(b.fight.sig.left / AZATHOTH.survive).toBeCloseTo(0.5, 1); // and takes up where it was
+    expect(h.hp).toBeCloseTo(h.max * 0.15, 0); // and it keeps its wounds
+    expect(b.fight.phase).toBe(3);
+  });
+
+  it('Azathoth hears the loud and answers where it was made (a shot, a sprint; in its last phase a roll and a swing), and not a step', () => {
+    const b = bossGame('azathoth', undefined, 20);
+    const { g, boss, fight } = b;
+    engage(b);
+    calm(b);
+    const marks = () => [...g.ecs.c.mark.values()].filter((m) => m.owner === boss);
+    fight.sig.rest = 0;
+    steps(g, 600, { ...emptyInput(), moveX: 1 }); // walking: nothing
+    expect([fight.sig.heed, marks()]).toEqual([0, []]);
+    const told = record(g, 'Notice');
+    g.player.sprinting = true;
+    const step = (): void => void AZATHOTH_SIGNATURE.step!(g, boss, fight);
+    for (let i = 0; i < 1 / AZATHOTH.heed.sprint + 2; i++) step(); // held long enough: it answers
+    expect(marks()).toHaveLength(1);
+    const pp = g.ecs.c.transform.get(g.player.id)!.pos;
+    const at = g.ecs.c.transform.get([...g.ecs.c.mark.keys()][0])!.pos;
+    expect(distXZ(at, pp)).toBeLessThan(1); // where the investigator stood
+    expect(told.map((n) => n.text)).toContain('IT HEARS YOU');
+    for (let i = 0; i < 1 / AZATHOTH.heed.sprint + 2; i++) step(); // and rests before it answers again
+    expect(marks()).toHaveLength(1);
+    g.player.sprinting = false;
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    a.move = 'roll';
+    expect(noise(g, false)).toBe(0); // a roll is not heard...
+    expect(noise(g, true)).toBe(AZATHOTH.heed.dodge); // ...until its last phase
+    a.move = 'light1';
+    expect([noise(g, false), noise(g, true)]).toEqual([0, AZATHOTH.heed.swing]);
+    a.move = 'shoot';
+    expect(noise(g, false)).toBe(AZATHOTH.heed.shot);
+    expect(AZATHOTH.heed.shot * 32).toBeGreaterThan(1); // one shot is an answer, whole
   });
 
   it("'Umr at-Tawil yields in its last phase and offers passage through the Gate", () => {

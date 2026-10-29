@@ -31,7 +31,7 @@ export interface AttackDef {
   unblockable?: boolean;
   sanity?: number; // sanity damage = sanity × stats.sanityDamage, over the active frames
   effect?: EffectKind;
-  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
+  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; rings?: number; turns?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
   wave?: { speed: number; width: number; reach: number; lane?: { half: number; push: number } }; // the quake (see WaveDef)
   cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
   sweep?: { arc: readonly [number, number]; length: number; width: number }; // the sweeping beam, over the active frames
@@ -87,6 +87,18 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   toxic_cloud: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 2.9, life: 270, tick: 30, power: 0.14, mind: 0, drift: 1.1, kind: 'toxic' } }, // two banks of poisonous air drift after the target
   dream_cloud: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.1, kind: 'dream' } }, // two banks of sleep take the mind, not the body
   thunderfall: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.9, poise: 1, range: [0, 16], marks: { count: 6, ring: [0, 8.5], delay: 34, stagger: 7, radius: 1.25, pattern: 'rain', look: 'bolt' } }, // lightning calls down on the ground about the target, quick and bright
+  // 2026-10-29, Azathoth (asked: "implement different and unique boss attacks to make this the most challenging boss fight of all"). It is blind and aims at nothing, so none of these
+  // is laid on the investigator: each is a rhythm over the whole court (the piping, the drumming, the dance of the thirteen, the seething of the chaos, the centre drawing all in),
+  // read by where it will fall and when. Their numbers are for a body thirty metres tall (a root of 15.8 scales them: its court is 44 m across its heart).
+  dirge: { kind: 'area', windup: 48, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 30], wave: { speed: 3.9, width: 0.5, reach: 7.6 }, follow: 'dirge_2' }, // the piping swells: a ring of sound runs out of the body...
+  dirge_2: { kind: 'area', windup: 14, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 4.6, width: 0.5, reach: 7.6 }, follow: 'dirge_3' }, // ...a quicker one a beat behind it...
+  dirge_3: { kind: 'area', windup: 14, active: 1, recovery: 36, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 5.6, width: 0.5, reach: 7.6 } }, // ...and the quickest: three notes, a roll or a guard for each, and the stamina of three rolls to find
+  drumbeat: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0.85, poise: 1.2, range: [0, 30], marks: { count: 5, rings: 2, ring: [0.8, 3.6], delay: 46, stagger: 22, radius: 1.06, pattern: 'beats' } }, // the drumming: a ring of the ground boils about the body, and the next ring out a beat after, its spots between the first's (out is not the way)
+  dance: { kind: 'area', windup: 46, active: 1, recovery: 50, power: 0.9, poise: 1.2, range: [0, 30], marks: { count: 13, ring: [0.5, 2.9], delay: 36, stagger: 6, radius: 0.9, pattern: 'spiral', turns: 1 } }, // the thirteen turn: a stamp for each, winding out from the flank, falling in the order of the dance
+  seethe: { kind: 'area', windup: 40, active: 1, recovery: 44, power: 0.7, poise: 1, range: [0, 30], marks: { count: 12, ring: [0.4, 6.8], delay: 36, stagger: 5, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } } }, // it blasphemes and bubbles: boils over the whole court where it hears nothing, each leaving a pool of the formless to keep off
+  maelstrom: { kind: 'special', windup: 36, active: 90, recovery: 1, power: 0, poise: 0, range: [3, 12], pull: { speed: 4.6, range: 12 }, follow: 'maelstrom_burst' }, // the centre of all draws the court in (a sprint gains a little on it, a walk none)...
+  maelstrom_burst: { kind: 'area', windup: 10, active: 6, recovery: 50, power: 2, poise: 2.2, range: [0, 0], reach: 0, radius: 6.1, height: 0.3, arc: [180, -180], tight: true }, // ...and breaks about it, out past where the body stands: its heaviest blow, rolled through as it breaks
+  crescendo: { kind: 'area', windup: 40, active: 1, recovery: 4, power: 0.7, poise: 1, range: [0, 30], marks: { count: 8, ring: [0.4, 6.8], delay: 56, stagger: 8, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } }, follow: 'dirge' }, // its last phase's own: the whole orchestra at once, boils laid over the court and, before they have all burst, the three rings of the dirge
 };
 
 /** Body size relative to a human (1.9 m); big bodies reach further. */

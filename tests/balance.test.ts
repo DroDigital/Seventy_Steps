@@ -39,7 +39,7 @@ interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'f
 /** Absolute bounds, with explicit exceptions for fights whose measured pressure exceeds their tier. */
 const BOUNDS = { seconds: [6, 450], lives: 3, colossusLives: 6, godLives: 1.5 } as const;
 /** Each tier has a band so a fight is held to its kind as well as the absolute limits. */
-const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth'.split(' '));
+const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth azathoth'.split(' '));
 // The stamina-aware bot keeps a roll in reserve and attacks less often; retain the pressure floors and cap the longer fights.
 const BANDS = { named: { seconds: [14, 90], lives: [0.2, 1.2] }, god: { seconds: [35, 170], lives: [0.45, 1.5] } } as const;
 /**
@@ -57,6 +57,7 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
   father_dagon: { lives: [0.2, 1.5] },
   ghatanothoa: { seconds: [35, 280] },
   nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
+  azathoth: { seconds: [90, 430], lives: [1.7, 3] }, // (2026-10-29) the hardest fight there is: it costs the bot more than any other horror (tested below), and takes longer than the lesser gods
   shub_niggurath: { seconds: [35, 250] },
   yog_sothoth: { seconds: [35, 400], lives: [0.45, 2.5] },
   umr_at_tawil: { lives: [0.25, 1.5] },
@@ -73,7 +74,8 @@ const CAP_LIVES_FLOOR: Partial<Record<string, number>> = { umr_at_tawil: 0.18, f
 const YOG_STANDING_MAX = 2.5;
 const YOG_CAP_MAX = 2.2;
 const COLOUR_OPENING_MAX = 1.3;
-const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX };
+const AZATHOTH_CAP_MAX = 2.6;
+const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX, azathoth: AZATHOTH_CAP_MAX };
 const BOUNDS_TEXT = `${BOUNDS.seconds[0]} to ${BOUNDS.seconds[1]} seconds`;
 const AT_CAP_TEXT = `
 ## At the cap
@@ -81,8 +83,8 @@ const AT_CAP_TEXT = `
 The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which the soft caps make ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
 their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} to ${BANDS.named.lives[1] * 1.25} lives; a great fight ${CAP.god.seconds} and ${CAP.god.lives} to ${BANDS.god.lives[1] * 1.25} lives, except 'Umr at-Tawil's ${CAP_LIVES_FLOOR.umr_at_tawil} life floor, Dagon and Hydra's ${CAP_LIVES_FLOOR.father_dagon} life floor per member, and Yog-Sothoth's ${YOG_CAP_MAX} life ceiling. Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
 `;
-/** Azathoth is blind and cannot be wounded (its fight is outlasting the piping; what it costs the bot is the noise the bot makes), and the Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). */
-const EXEMPT = ['azathoth', 'haunter_of_the_dark'];
+/** The Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). Azathoth was once exempt too, blind and unwounded, its fight a timer (until 2026-10-29). */
+const EXEMPT = ['haunter_of_the_dark'];
 
 const INTRO = `# The balance table
 
@@ -108,9 +110,9 @@ nothing in its way.
   in this simulation; these raw costs are never divided by the scaling factors.
 - Ghatanothoa is fought with the gaze waived (its seconds scaled by the half of a fight in its sight), Shub-Niggurath with
   its roots down (forty seconds more, to cut them), and the Great Ones and 'Umr at-Tawil with the void under their hidden
-  platforms shut (a person with insight keeps to the platforms): the bot plays those badly. Azathoth and the Haunter of the Dark are not held
-  to the bounds: Azathoth is blind and cannot be wounded (the piping is outlasted, and what it costs the bot is the noise the bot
-  makes), the Haunter is hurt only by lamplight (a person lures it to a lamp).
+  platforms shut (a person with insight keeps to the platforms): the bot plays those badly. The Haunter of the Dark is not held
+  to the bounds: it is hurt only by lamplight (a person lures it to a lamp). Azathoth is held to bounds of its own and must cost the bot more than
+  any other horror (2026-10-29): its blows are rhythms over the whole court, which the bot reads badly, and its fight is the hardest there is.
 - Dagon and Hydra share one encounter. Their individual rows are supplemental; \`tests/seaBosses.test.ts\` also checks both together at the expected standing, including combined time and damage against one healing inventory. Solo pressure floors are lower for these two members, while their upper limits remain in force.
 
 `;
@@ -186,6 +188,13 @@ describe('the balance table (round 25)', () => {
 
   it('bounds Yog-Sothoth pressure at its expected standing', () => {
     expect(rows.find((r) => r.id === 'yog_sothoth')!.pressure).toBeLessThanOrEqual(YOG_STANDING_MAX);
+  });
+
+  it('makes Azathoth the hardest fight there is (2026-10-29): it costs the bot more lives than any other horror, and takes it longer than any lesser god', () => {
+    const azathoth = rows.find((r) => r.id === 'azathoth')!;
+    const next = rows.filter((r) => r.id !== 'azathoth' && !EXEMPT.includes(r.id)).reduce((a, b) => (b.pressure > a.pressure ? b : a)); // (the Haunter, which the bot plays badly, is not measured)
+    expect(azathoth.pressure, `${next.id} costs ${next.pressure.toFixed(2)} lives`).toBeGreaterThan(next.pressure);
+    expect(azathoth.seconds).toBeGreaterThan(BANDS.god.seconds[1]);
   });
 
   it('makes its table', () => {

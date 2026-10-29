@@ -187,7 +187,7 @@ Place every other entity in the spawn tables of its best-fitting region.
   - **Shub-Niggurath:** endlessly spawns the Thousand Young until you destroy the spawning roots.
   - **Yog-Sothoth:** its iridescent spheres are gates, and the arena teleports between them.
   - **Nyarlathotep:** appears as avatars throughout the game. Its final form copies earlier bosses' movesets. Nodens can be summoned as an ally for this fight.
-  - **Azathoth:** blind and invulnerable. It tracks sound, so the fight is stealth and survival, not damage.
+  - **Azathoth:** blind, and the hardest fight in the game (it was once invulnerable, a fight of silence against a timer; 2026-10-29). It aims nothing: its blows are rhythms laid over the whole court (rings of sound, beats of boils, a dance of thirteen, a seething that leaves pools, a centre that draws all in), read by where and when they fall. It hears the loud, a shot and a sprint (in its last phase a roll and a swing too), and answers where it was made.
 
 Every other boss is composed from the shared library.
 

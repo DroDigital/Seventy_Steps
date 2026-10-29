@@ -8,10 +8,10 @@ import { bossGame, calm, engage } from './bossHelpers';
 import { steps } from './helpers';
 import { creatureOf, deathblow, goTo, record, run } from './worldHelpers';
 
-/** Azathoth's bar counts down a survival encounter; every other scripted boss can be slain by damage. */
+/** Every scripted boss can be slain by damage (Azathoth's bar counted down a survival encounter until 2026-10-29). */
 const DAMAGE_BOSSES: [string, Variant | undefined][] = ENTITIES.flatMap((d) =>
   ([undefined, 'eldritch', 'boss'] as const)
-    .filter((v) => d.id !== 'azathoth' && !!(v ? variantOf(d, v) : d)?.bossScript)
+    .filter((v) => !!(v ? variantOf(d, v) : d)?.bossScript)
     .map((v) => [d.id, v] as [string, Variant | undefined]),
 );
 

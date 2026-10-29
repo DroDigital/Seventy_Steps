@@ -61,6 +61,8 @@ export const FORM_SPECS: Readonly<Record<Form, FormSpec>> = {
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 const tau = Math.PI * 2;
 const INK: Rgb = [0.03, 0.025, 0.05];
+/** How far a forked bolt grows with the blow it is drawn for: a colossus's (a ring of sound out of a body fifteen metres across, 2026-10-29) drew it thirteen metres wide, and no sprite is ten (`tests/bossFxAudit.test.ts`). */
+const ARC_MOST = 3.3;
 
 /** How many of the signature's things a moment sheds, for a blow `radius` metres across. */
 /** The most particles a signature adds at a moment (a colossus's burst drawn of tendrils, seven to the stalk, was 280 of them over the element's own). */
@@ -148,7 +150,7 @@ export function signature(fx: Particles, look: AttackLook, moment: Moment, at: V
 function drawn(fx: Particles, f: FormSpec, look: AttackLook, tone: Rgb, p: V3, v: V3, size: number, life: number, ground: number, r: number): void {
   switch (f.draw) {
     case 'arc': { // a forked bolt that cracks and is gone, and the sparks it throws
-      fx.spawn({ ...p, y: p.y + rand(0.3, 0.9), life: rand(0.1, 0.2), size: size * (1 + r * 0.25), color: look.core, colorEnd: tone, glow: true, shape: 'bolt', rot: rand(0, tau), alpha: 1, hold: 0.5 });
+      fx.spawn({ ...p, y: p.y + rand(0.3, 0.9), life: rand(0.1, 0.2), size: size * Math.min(1 + r * 0.25, ARC_MOST), color: look.core, colorEnd: tone, glow: true, shape: 'bolt', rot: rand(0, tau), alpha: 1, hold: 0.5 });
       for (let k = 0; k < 2; k++) fx.spawn({ ...p, y: p.y + 0.5, vx: rand(-3, 3), vy: rand(0.5, 3), vz: rand(-3, 3), life: rand(0.2, 0.4), size: 0.1, color: look.core, colorEnd: tone, glow: true, shape: 'spark', gravity: 6, hold: 0.3 });
       return;
     }

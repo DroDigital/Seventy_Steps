@@ -63,7 +63,7 @@ describe('progression equity against bosses', () => {
   });
 
   it('compiled high-tier blows stay within 30% of expected health after level scaling', () => {
-    const highTier = standings().filter((s) => ['great_old_one', 'outer_god'].includes(getEntity(s.id)!.tier) && s.id !== 'azathoth');
+    const highTier = standings().filter((s) => ['great_old_one', 'outer_god'].includes(getEntity(s.id)!.tier));
     expect(highTier.length).toBeGreaterThan(10);
     for (const s of highTier) {
       const scaled = Math.round(heaviestAt(s.id) * damageAt(s.id, s.levels));

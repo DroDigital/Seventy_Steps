@@ -70,6 +70,16 @@ export const ATTACK_IDS = [
   'toxic_cloud',
   'dream_cloud',
   'thunderfall',
+  // 2026-10-29: Azathoth's own. It is blind, so none is aimed: each is a rhythm laid over the court, read by where it falls and when
+  'dirge',
+  'dirge_2',
+  'dirge_3',
+  'drumbeat',
+  'dance',
+  'seethe',
+  'maelstrom',
+  'maelstrom_burst',
+  'crescendo',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 
