@@ -13,7 +13,7 @@ import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
-import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
+import { brightnessGamma, CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
 import { cameraModeOf } from './data/cameraModes';
@@ -290,7 +290,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         input.sensitivity = settings.sensitivity;
         input.invertY = settings.invertY > 0.5;
         [FEEL.shake, FEEL.flashes] = [settings.shake, settings.flashes];
-        pipeline.post.uniforms.uGamma.value = 1 / settings.brightness;
+        pipeline.post.uniforms.uGamma.value = brightnessGamma(settings.brightness);
         state.cap = settings.fxCap;
         if (lowRes !== state.enabled.pixelate || scale !== settings.resolution) {
           [lowRes, scale] = [state.enabled.pixelate, settings.resolution];

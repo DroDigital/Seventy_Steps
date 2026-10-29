@@ -4,7 +4,7 @@
  * optional higher resolutions) and snapped to its step; a missing or bad value takes its default. Pure: no DOM.
  */
 
-import { HIGH_RESOLUTIONS, SETTINGS } from '../data/tuning';
+import { BRIGHTNESS_BASE, HIGH_RESOLUTIONS, SETTINGS } from '../data/tuning';
 import type { SaveStore } from '../systems/save';
 
 export type SettingId = keyof typeof SETTINGS;
@@ -12,8 +12,8 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 21: the Long lens is gone from the camera's looks, so a choice of it goes to Classic and Tight shoulder (3) is 2 now. */
-const VERSION = 21;
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 21: the Long lens is gone from the camera's looks, so a choice of it goes to Classic and Tight shoulder (3) is 2 now. 22: the brightness baseline is the old 85%. */
+const VERSION = 22;
 const OLD_DEFAULT = 1.6; // 640 × 360
 /** The sound's levels before round 60, kept by every save of settings, chosen or not. */
 const OLD_MIX: Partial<Settings> = { volume: 0.7, music: 1, ambience: 1, speech: 1 };
@@ -53,6 +53,8 @@ export function parseSettings(json: string | null): Settings {
   if (v < 18) for (const [id, old] of Object.entries(OLD_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // the same of the sound's levels
   if (v < 19) for (const [id, old] of Object.entries(ROUND_60_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // and again, to the full levels of round 61
   if (v < 21 && typeof r.camera === 'number') s.camera = Math.round(r.camera) === 2 ? 0 : Math.round(r.camera) === 3 ? 2 : s.camera; // the Long lens (2) was taken out: its choice is Classic now, and Tight shoulder, 3, is 2
+  // The old default was saved even when untouched; move it to the new default. Other choices retain their look as closely as the new slider permits.
+  if (v < 22 && typeof r.brightness === 'number' && Number.isFinite(r.brightness)) s.brightness = r.brightness === 1 ? 1 : clampSetting('brightness', r.brightness / BRIGHTNESS_BASE);
   return s;
 }
 
