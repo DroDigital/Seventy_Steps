@@ -73,18 +73,18 @@ nothing in its way.
 | 41 | 'Umr at-Tawil | 18/9/17 | 5 | 7581 | 183 | 1814 | 448 | 10 | 0.81 | 0 |
 | 42 | The Daemon Pipers | 18/9/17 | 5 | 7781 | 244 | 5140 | 448 | 10 | 2.29 | 0 |
 | 43 | The Ancient Ones | 18/9/17 | 5 | 8080 | 136 | 1346 | 448 | 10 | 0.60 | 0 |
-| 44 | Nyarlathotep | 18/9/17 | 5 | 10274 | >599 | 8443 | 448 | 10 | 3.77 | 0 |
+| 44 | Nyarlathotep | 18/9/17 | 5 | 10274 | 610 | 8557 | 448 | 10 | 3.82 | 0 |
 | 45 | Shub-Niggurath | 18/9/17 | 5 | 10873 | 368 | 5618 | 448 | 10 | 2.51 | 0 |
-| 46 | Yog-Sothoth | 18/9/17 | 5 | 12170 | >548 | 7176 | 448 | 10 | 3.20 | 0 |
+| 46 | Yog-Sothoth | 18/9/17 | 5 | 12170 | 580 | 7607 | 448 | 10 | 3.40 | 0 |
 | 47 | Azathoth | 18/9/17 | 5 | 13367 | 90 | 9839 | 448 | 10 | 4.39 | 0 |
 
-Bounds held by the test: each boss finishes within 6 to 450 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die, subject to the named pressure exceptions below.
-Each tier has its band: a named horror takes 14 to 90 seconds and costs 0.2 to 1.2 lives (the Colour may cost up to 1.5); one of the 16 great fights takes 35 to 170 seconds and costs 0.45 to 1.5 lives. Named exceptions are brown jenkin 14–120 seconds; colossus pyramids 14–110 seconds; daemon pipers 14–145 seconds 0.2–1.6 lives; zkauba 14–130 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–280 seconds; nyarlathotep 35–430 seconds 0.45–3 lives; shub niggurath 35–250 seconds; yog sothoth 35–400 seconds 0.45–2.5 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–135 seconds. Yog-Sothoth is additionally capped at 2.5 lives at its expected standing.
+Bounds held by the test: each boss finishes within 6 to 800 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 3.4), and the bot does not die, subject to the named pressure exceptions below.
+Each tier has its band: a named horror takes 14 to 200 seconds and costs 0.2 to 2.4 lives (the Colour may cost up to 1.5); one of the 16 great fights takes 35 to 340 seconds and costs 0.45 to 3.4 lives. Named exceptions are colossus pyramids 14–240 seconds; daemon pipers 14–280 seconds 0.2–2.6 lives; zkauba 14–280 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–580 seconds; nyarlathotep 35–740 seconds 0.45–4.5 lives; shub niggurath 35–440 seconds; yog sothoth 35–700 seconds 0.45–3.8 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–170 seconds. Yog-Sothoth is additionally capped at 3.8 lives at its expected standing.
 
 ## At the cap
 
 The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vigour, 30 Endurance, 30 Might, which the soft caps make 541 health, 290 stamina and blows of 1.95) and the cane at +5. The horrors have grown past what a person has when they meet them:
-their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (`overmatch` in `systems/bossScaling.ts`, `BOSS_OVERMATCH`). A named horror still takes at least 10 seconds and costs a bot 0.1 to 1.5 lives; a great fight 30 and 0.4 to 1.875 lives, except 'Umr at-Tawil's 0.18 life floor, Dagon and Hydra's 0.2 life floor per member, and Yog-Sothoth's 2.2 life ceiling. Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
+their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (`overmatch` in `systems/bossScaling.ts`, `BOSS_OVERMATCH`). A named horror still takes at least 10 seconds and costs a bot 0.1 to 1.5 lives; a great fight 30 and 0.4 to 1.875 lives, except 'Umr at-Tawil's 0.18 life floor, Dagon and Hydra's 0.2 life floor per member, and the ceilings of Yog-Sothoth (2.2), the Daemon Pipers (2) and Nyarlathotep (3.1). Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
 
 | # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

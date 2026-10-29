@@ -17,7 +17,8 @@ const ASKS_MORE = ['cthulhu', 'ghatanothoa', 'shub_niggurath'];
 // With full-cost stamina gating, this simple bot (which never drinks Laudanum) takes about 710 seconds to fell Yog's restored 6100 health.
 // Give it 780 seconds while still requiring a kill; the separate balance audit measures fight time and survival.
 // The Pipers take this bot about 260 seconds after it stops overwriting queued dodges; allow five minutes and still require a kill.
-const SLOW: Record<string, number> = { haunter_of_the_dark: 60 * 360, yog_sothoth: 60 * 780, daemon_pipers: 60 * 300 };
+// Round 100, the horrors' health up by half: Hastur takes this bot about 242 seconds and the Other Gods 251, a little over the four minutes; five minutes each, a fifth or so over, and still a kill.
+const SLOW: Record<string, number> = { haunter_of_the_dark: 60 * 360, yog_sothoth: 60 * 780, daemon_pipers: 60 * 300, hastur: 60 * 300, other_gods: 60 * 300 };
 
 describe('a bot fights every boss (playtest round 24)', () => {
   it('has bosses to fight', () => expect(BOSSES.length).toBeGreaterThan(40));
