@@ -128,9 +128,9 @@ export function registerFights(g: Game): void {
     const c = g.ecs.c;
     const f = c.fight.get(entity);
     if (f?.engaged) endFight(g, entity, f);
-    if (!f) return;
+    if (!f || c.combatant.get(entity)?.showcase) return;
     for (const [e, joining] of c.fight) {
-      if (joining.script.joins?.with !== f.id) continue;
+      if (c.combatant.get(e)?.showcase || joining.script.joins?.with !== f.id) continue;
       const [h, a, tr] = [c.health.get(e), c.actor.get(e), c.transform.get(e)];
       if (!h || h.hp <= 0 || !a || !tr || c.dead.has(e)) continue;
       h.hp = 0;

@@ -52,7 +52,7 @@ export function insightSystem(g: Game): void {
   const { dread, tome, transform, combatant, actor } = g.ecs.c;
   const calm = isSheltered(g); // a horror beheld in a talk or at peace on arriving is beheld once they are free: the shock of it is not forfeited (round 88)
   for (const [id, d] of dread) {
-    if (calm || g.mind.seen.has(d.id) || !inSight(g, id)) continue;
+    if (calm || combatant.get(id)?.showcase || g.mind.seen.has(d.id) || !inSight(g, id)) continue;
     g.mind.seen.add(d.id);
     const name = combatant.get(id)?.name ?? d.id;
     const sanity = tollOnce(g.mind.beheld, g.frame, SANITY.firstSight[d.tier], SANITY.together); // horrors beheld together: the greatest counts

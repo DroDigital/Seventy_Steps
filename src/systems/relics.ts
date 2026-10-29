@@ -102,7 +102,7 @@ export function registerRelics(g: Game): void {
     g.events.emit('Found', { kind: 'relic', id, from: name, worn: on });
   });
   g.events.on('Died', ({ entity, killer }) => {
-    if (killer !== g.player.id || entity === g.player.id) return;
+    if (killer !== g.player.id || entity === g.player.id || g.ecs.c.combatant.get(entity)?.showcase) return;
     const t = TEMPERS[g.player.weapon as keyof typeof TEMPERS];
     if (t?.sanity) restoreSanity(g, t.sanity);
   });

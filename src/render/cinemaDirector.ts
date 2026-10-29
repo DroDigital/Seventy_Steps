@@ -77,7 +77,7 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
 
   g.events.on('BossEngaged', ({ entity, name }) => {
     const f = g.ecs.c.fight.get(entity);
-    const seen = g.overworld?.watched ?? memory;
+    const seen = g.ecs.c.combatant.get(entity)?.showcase ? memory : g.overworld?.watched ?? memory;
     if (!f || !worth(entity) || seen.has(f.id) || cinema.active) return;
     seen.add(f.id);
     void cinema.play(speaking(arrivalOf(f.id, name, EPITHETS[f.id]) ?? arrival(scaleOf(height(entity)), name, EPITHETS[f.id]), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)

@@ -106,6 +106,9 @@ import { adapted, darkShare, gloomAt } from './world/gloom';
 import { roofedAt } from './world/terrain';
 import { refreshMountEntitlement } from './ui/mounts';
 import { startMountGallery } from './ui/mountGallery';
+import { createFreeCamera } from './ui/freeCamera';
+import { createDeveloperConsole } from './ui/developerConsole';
+import { createDeveloperCommands } from './systems/developerCommands';
 
 const INTERACT_GRACE_MS = 350; // after a talk or a menu closes, E is held back this long
 
@@ -234,6 +237,17 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
+  const flight = createFreeCamera();
+  const developerCommands = createDeveloperCommands(game, {
+    setFlight: (on) => on ? flight.enable(camera) : flight.disable(),
+    flightEnabled: () => flight.active,
+  });
+  const developerConsole = createDeveloperConsole({
+    commands: developerCommands.commands,
+    execute: developerCommands.execute,
+    available: () => !building && !menuOpen() && !cinema.active && !journeys.busy && !veil.active && !game.player.falling && !game.player.fogPass && !game.player.gatePass,
+    onOpen: () => input.reset(),
+  });
   lightNight();
   worldUniforms.uGlowColor.value.set(...ANOMALY.green).multiplyScalar(LIGHT.echoGlowIntensity); // Echo drops glow
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
@@ -269,6 +283,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       step(dt) {
         setCameraMode(game.camera, cameraModeOf(settings.camera)); // (a change in the pause menu shows behind it at once)
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
+        if (developerConsole.open) return;
+        if (flight.active) {
+          if (!menuOpen() && !cinema.active && !journeys.busy && !veil.active) flight.step(frame, dt);
+          return; // the investigator and the world wait while the camera flies
+        }
         if (pause.open && !wasPaused) input.reset(); // pausing lets go of every key and button and sets a drifted stick right: the way out of an input that has stuck (round 49)
         wasPaused = pause.open;
         finds?.update();
@@ -283,7 +302,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
-        const still = pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
+        const still = developerConsole.open || flight.active || pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         extras.tick();
@@ -298,6 +317,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         }
         placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
+        flight.apply(camera);
         hud.hide(cinema.active || extras.hidesHud);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
         const lantern = lanternGain(game, alpha); // (the eye widens where it has gone out: world/gloom.ts)
@@ -315,7 +335,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         hurt.update(pipeline.post, camera, time);
         impactFx.update(camera, time);
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
-        world?.update(at.x, at.z, journeys.budget);
+        world?.update(flight.active ? camera.position.x : at.x, flight.active ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
         finale.update(time, game);
@@ -349,10 +369,10 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
         life.update(camera, time, enclosed, alpha, gloom); // after the night's light: the lightning adds to it
-        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : nearLens(camera, game));
+        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : flight.active ? camera.position : nearLens(camera, game));
         const lens = lensAt(fx, time, fovOf(game, alpha));
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
-        updateWorldUniforms(fx, time, cinema.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
+        updateWorldUniforms(fx, time, cinema.active || flight.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
         if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
         hud.update(camera);

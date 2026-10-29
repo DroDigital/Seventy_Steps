@@ -73,7 +73,7 @@ export { muteMenus, setMenuSound } from './menuSounds';
 const scroller = (panel: HTMLElement): HTMLElement => panel.querySelector<HTMLElement>(':scope > .scroll') ?? panel;
 
 /** What the arrows step through: the tab row is one stop (the open tab), the others reached by left and right, or by the mouse. */
-const items = (panel: HTMLElement): HTMLElement[] => [...panel.querySelectorAll<HTMLElement>('button:not(:disabled), input')].filter((e) => !e.classList.contains('tab') || e.classList.contains('on'));
+const items = (panel: HTMLElement): HTMLElement[] => [...panel.querySelectorAll<HTMLElement>('button:not(:disabled), input')].filter((e) => !e.hidden && (!e.classList.contains('tab') || e.classList.contains('on')));
 
 function focusAt(panel: HTMLElement, i: number, preventScroll = false): void {
   const list = items(panel);
@@ -168,6 +168,9 @@ function onKey(e: KeyboardEvent): void {
   const top = stack.at(-1);
   if (!top) return;
   useDevice('keys');
+  // A text field opts into native editing. It stops bubbling at the field, so the
+  // game never hears the keys, while the browser can still handle input and IME.
+  if (e.target instanceof HTMLInputElement && e.target.dataset.menuText !== undefined && e.code !== 'Escape' && !top.page.backKeys?.includes(e.code)) return;
   e.stopImmediatePropagation();
   top.page.keys?.(e);
   if (e.code === 'Escape' || top.page.backKeys?.includes(e.code)) {
