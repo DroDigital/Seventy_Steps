@@ -182,7 +182,7 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   const cd = toCombatant(def, variant);
   const c = g.ecs.c;
   c.model.set(e, cd.model);
-  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) ? 0 : cd.bounty });
+  Object.assign(c.combatant.get(e)!, { name: cd.name, bounty: c.phantom.has(e) || c.combatant.get(e)?.showcase ? 0 : cd.bounty });
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
   const land = landOf(def, c.transform.get(e)!.pos);

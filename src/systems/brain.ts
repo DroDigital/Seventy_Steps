@@ -109,10 +109,16 @@ function announce(g: Game, id: Entity, br: Brain): void {
   g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} · AT YOUR SIDE` });
 }
 
-/** Whether a boss that joins another may come out: that one has fallen below the share, or is gone. */
-function mayJoin(g: Game, j: { with: string; below: number }): boolean {
+/**
+ * Whether a boss that joins another may come out: that one has fallen below the share, or is gone. A developer showcase creature
+ * (systems/developerCommands.ts) is joined to showcase creatures alone, and a real boss to real ones: a Brown Jenkin shown beside a
+ * living Keziah is not held back by her, nor a real one let out by a showcase Keziah wounded for the look of it. With no master of its
+ * own kind about, a showcase joiner is let out at once.
+ */
+function mayJoin(g: Game, id: Entity, j: { with: string; below: number }): boolean {
+  const showcase = !!g.ecs.c.combatant.get(id)?.showcase;
   for (const [e, f] of g.ecs.c.fight) {
-    if (f.id !== j.with) continue;
+    if (f.id !== j.with || !!g.ecs.c.combatant.get(e)?.showcase !== showcase) continue;
     const h = g.ecs.c.health.get(e);
     return !h || g.ecs.c.dead.has(e) || h.hp / h.max < j.below;
   }
@@ -123,7 +129,7 @@ function mayJoin(g: Game, j: { with: string; below: number }): boolean {
 function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   const joins = g.ecs.c.fight.get(id)?.script.joins;
   if (!joins || br.state === 'engage') return false;
-  if (!mayJoin(g, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 88)
+  if (!mayJoin(g, id, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 88)
   [br.state, br.cooldown, br.target] = ['engage', BOSS.wake, g.player.id]; // it gathers itself before its first blow, as one woken does (round 60)
   g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} JOINS THE FIGHT` });
   return false;

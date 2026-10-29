@@ -23,6 +23,7 @@ import type { Page } from './menuKit';
 export const CSS = `
 [data-menu] button{position:relative;display:block;width:100%;margin:0;padding:7px 14px 7px 30px;text-align:left;font:15px ${SERIF};letter-spacing:.8px;color:${INK}c0;background:none;border:none;border-top:1px solid transparent;border-bottom:1px solid transparent;cursor:pointer;transition:color .15s,background .15s,border-color .15s}
 [data-menu] button::before{content:'';position:absolute;left:12px;top:50%;width:5px;height:5px;margin-top:-3px;border:1px solid ${ACCENT};transform:rotate(45deg) scale(.3);opacity:0;transition:opacity .15s,transform .15s}
+[data-menu] button[hidden]{display:none}
 [data-menu] button:disabled{opacity:.5;cursor:default}
 [data-menu] button .sub{display:block;margin-top:1px;font-size:12px;line-height:1.35;letter-spacing:.4px;opacity:.62}
 [data-menu] button .chips{display:flex;flex-wrap:wrap;gap:0 12px;margin-top:2px;font-size:12px;line-height:1.35;letter-spacing:.4px;font-variant-numeric:lining-nums tabular-nums}
