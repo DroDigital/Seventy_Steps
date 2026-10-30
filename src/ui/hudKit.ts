@@ -22,7 +22,7 @@ export function applySerif(garamond: boolean): void {
   canvasFace = garamond ? GARAMOND_SERIF : DEFAULT_SERIF;
   if (typeof document !== 'undefined') document.documentElement.style.setProperty('--ui-serif', canvasFace);
 }
-/** A telegram's or typescript's face (round 74: Special Elite, `ui/fonts`; only the intro's telegram is set in it). */
+/** A typewriter's face (round 74: Special Elite, `ui/fonts`). Round 101: no card is set in it any more (the intro's telegram is IM Fell English). */
 export const TYPEWRITER = "'Special Elite','Courier New',Courier,monospace";
 
 export function el(style: string, text = '', parent?: HTMLElement): HTMLDivElement {

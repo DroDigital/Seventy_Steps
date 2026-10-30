@@ -1,6 +1,6 @@
 /**
  * The interface's two typefaces (round 74, asked for): IM Fell English for what is read (SIL Open Font License) and Special Elite
- * for the intro's telegram (Apache 2.0); their licences and credits are in public/fonts. They are loaded before the game's
+ * (Apache 2.0, unused by any card since round 101); their licences and credits are in public/fonts. They are loaded before the game's
  * module (boot.ts), so a canvas card, which draws once and is never repainted, is never set in the fallback. One that
  * does not arrive leaves the system stack behind it in `hudKit` (which also sets what the fonts have no glyph for).
  */

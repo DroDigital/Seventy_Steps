@@ -5,7 +5,7 @@
  */
 
 import { INK, goneAt, makeAsh, paintAsh, soften, type Ash } from './ashFx';
-import { canvasSerif, TYPEWRITER } from './hudKit';
+import { DEFAULT_SERIF } from './hudKit';
 
 export interface CardWords {
   heading: string;
@@ -36,8 +36,7 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
   stage.style.position = 'relative';
   stage.append(canvas);
   const g = canvas.getContext('2d')!;
-  const size = words.telegram ? 16 : 18;
-  const face = words.telegram ? TYPEWRITER : canvasSerif();
+  const size = words.telegram ? 16 : 18; // every card is set in IM Fell English, the telegram too (not Special Elite)
   let p = 0; // progress through the dissolve: 0 whole, 1 gone
   let raf = 0;
   let run = 0;
@@ -47,12 +46,12 @@ export function createAshCard(stage: HTMLElement, words: CardWords, seed: number
   function layout(c: CanvasRenderingContext2D, width: number, alpha = 1): void {
     c.fillStyle = `rgb(${INK.join(',')})`;
     c.textBaseline = 'top';
-    c.font = `12px ${canvasSerif()}`;
+    c.font = `12px ${DEFAULT_SERIF}`;
     (c as unknown as { letterSpacing: string }).letterSpacing = '2px';
     c.globalAlpha = alpha * 0.7;
     c.fillText(words.heading, 0, 0);
     c.globalAlpha = alpha;
-    c.font = `${size}px ${face}`;
+    c.font = `${size}px ${DEFAULT_SERIF}`;
     (c as unknown as { letterSpacing: string }).letterSpacing = words.telegram ? '1px' : '0px';
     let [y, line] = [32, ''];
     const out: string[] = [];
