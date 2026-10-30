@@ -77,9 +77,9 @@ describe('reinforcing arms with star-stones (round 12)', () => {
     const most = cane * mightAt(LEVELS.might.max) * edgeAt(REINFORCE.max); // (round 71: Might's thirty levels are worth 22.6, 1.9 times the blow and not 2.2)
     const bosses = ENTITIES.flatMap((d) => [d, variantOf(d, 'boss')]).filter((d) => d?.bossScript);
     expect(bosses.length).toBeGreaterThan(40);
-    for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(90);
+    for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(135); // (round 100: 90 before every boss's health rose by half; the same slack)
     const keziah = ENTITIES.find((d) => d.id === 'keziah_mason')!;
-    expect(keziah.stats.hp / cane).toBeLessThanOrEqual(75); // the first boss on the main line, with nothing bought (round 68: 35, before the bosses were made the fight a soulslike's are; round 97, asked back to its pre-history 1600: 73 blows)
+    expect(keziah.stats.hp / cane).toBeLessThanOrEqual(113); // the first boss on the main line, with nothing bought (round 68: 35, before the bosses were made the fight a soulslike's are; round 97, asked back to its pre-history 1600: 73 blows; round 100, 50% more: 110)
   });
 });
 

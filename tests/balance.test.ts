@@ -17,7 +17,8 @@ import { levelsOf } from '../src/systems/levels';
 import { healthAt, levelsWorth, levelWorth, mightAt, staminaAt } from '../src/systems/levelWorth';
 import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
 
-const FRAMES = 60 * 60 * 10; // ten minutes
+const FRAMES = 60 * 60 * 20; // twenty minutes (round 100: ten, before the horrors' health rose by half; Nyarlathotep and Yog-Sothoth were not finished in ten)
+const FIGHT_TIMEOUT = 180_000; // ms one horror's fights may take (round 100: the default 30 s was already close on CI, Nyarlathotep's three starts 26 s, and the fights are half again as long: its nine starts at the cap passed it)
 const SKILL = 0.55;
 /** What the bot plays badly, and is let off: the gaze that turns flesh to stone (it is in sight of it for about half of a fight at best, so its seconds are scaled by the share in view), and the roots (which a person cuts down first, and so spends some seconds more). */
 const WAIVED: Record<string, { waive: readonly ('petrify' | 'roots' | 'void')[]; scale: number; add: number }> = {
@@ -37,31 +38,31 @@ interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'f
 }
 
 /** Absolute bounds, with explicit exceptions for fights whose measured pressure exceeds their tier. */
-const BOUNDS = { seconds: [6, 450], lives: 3, colossusLives: 6, godLives: 1.5 } as const;
+const BOUNDS = { seconds: [6, 800], lives: 3, colossusLives: 6, godLives: 3.4 } as const; // (round 100: the seconds' limit was 450 and a great fight's lives 1.5 before the horrors' health rose by half)
 /** Each tier has a band so a fight is held to its kind as well as the absolute limits. */
 const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth azathoth'.split(' '));
 // The stamina-aware bot keeps a roll in reserve and attacks less often; retain the pressure floors and cap the longer fights.
-const BANDS = { named: { seconds: [14, 90], lives: [0.2, 1.2] }, god: { seconds: [35, 170], lives: [0.45, 1.5] } } as const;
+const BANDS = { named: { seconds: [14, 200], lives: [0.2, 2.4] }, god: { seconds: [35, 340], lives: [0.45, 3.4] } } as const; // (round 100: the upper limits were 90, 1.2, 170 and 1.5 before the horrors' health rose by half)
 /**
  * Fights outside those tiers have fixed named bounds, including 'Umr's lower pressure with the bot avoiding the void.
  * They are limits on measured bot outcomes, not a promise that a person can finish within one inventory of healing.
  */
 const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives?: readonly [number, number] }>> = {
-  brown_jenkin: { seconds: [14, 120] },
-  colossus_pyramids: { seconds: [14, 110] },
-  daemon_pipers: { seconds: [14, 145], lives: [0.2, 1.6] },
-  zkauba: { seconds: [14, 130] },
+  // (Round 100, the horrors' health up by half: Brown Jenkin's exception is gone, the named band holds him; the upper limits below moved to what the bot now measures, a fifth or so over.)
+  colossus_pyramids: { seconds: [14, 240] },
+  daemon_pipers: { seconds: [14, 280], lives: [0.2, 2.6] },
+  zkauba: { seconds: [14, 280] },
   // These are members of one encounter. seaBosses.test.ts bounds the combined fight;
   // the solo rows retain god-duration and upper-pressure limits with a member's floor.
   mother_hydra: { lives: [0.2, 1.5] },
   father_dagon: { lives: [0.2, 1.5] },
-  ghatanothoa: { seconds: [35, 280] },
-  nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
-  azathoth: { seconds: [90, 430], lives: [1.7, 3] }, // (2026-10-29) the hardest fight there is: it costs the bot more than any other horror (tested below), and takes longer than the lesser gods
-  shub_niggurath: { seconds: [35, 250] },
-  yog_sothoth: { seconds: [35, 400], lives: [0.45, 2.5] },
+  ghatanothoa: { seconds: [35, 580] },
+  nyarlathotep: { seconds: [35, 740], lives: [0.45, 4.5] },
+  azathoth: { seconds: [90, 580], lives: [1.7, 6.4] }, // (2026-10-29) the hardest fight there is: it costs the bot more than any other horror (tested below), and takes longer than the lesser gods (round 100: 430 s and 3 lives before its health rose by half with the others'; 477 s and 5.3 lives now)
+  shub_niggurath: { seconds: [35, 440] },
+  yog_sothoth: { seconds: [35, 700], lives: [0.45, 3.8] },
   umr_at_tawil: { lives: [0.25, 1.5] },
-  colour_out_of_space: { seconds: [14, 135] },
+  colour_out_of_space: { seconds: [14, 170] },
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**
@@ -71,17 +72,19 @@ const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDE
  */
 const CAP = { named: { seconds: 10, lives: 0.1 }, god: { seconds: 30, lives: 0.4 }, reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const; // (round 71: nine starts, not three: 'Umr at-Tawil cost the same bot 0.28, 0.93 and 0.43 lives from three, and a floor held on three paths was a coin)
 const CAP_LIVES_FLOOR: Partial<Record<string, number>> = { umr_at_tawil: 0.18, father_dagon: 0.2, mother_hydra: 0.2 };
-const YOG_STANDING_MAX = 2.5;
+const YOG_STANDING_MAX = 3.8; // (round 100: 2.5 before the horrors' health rose by half; 3.20 measured)
 const YOG_CAP_MAX = 2.2;
 const COLOUR_OPENING_MAX = 1.3;
-const AZATHOTH_CAP_MAX = 2.6;
-const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX, azathoth: AZATHOTH_CAP_MAX };
+/** At the cap a fight may cost at most this much (round 68: 1.25 times the tier bands' upper limits then, which round 100 does not widen with them). */
+const CAP_CEILING = { named: 1.5, god: 1.875 } as const;
+const AZATHOTH_CAP_MAX = 4.7; // (round 100: 2.6 before its health rose by half; 3.88 measured)
+const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX, azathoth: AZATHOTH_CAP_MAX, daemon_pipers: 2, nyarlathotep: 3.1 }; // (round 100: the Pipers' and Nyarlathotep's, which the tier's ceiling no longer holds at +50% health: 1.65 and 2.57 lives)
 const BOUNDS_TEXT = `${BOUNDS.seconds[0]} to ${BOUNDS.seconds[1]} seconds`;
 const AT_CAP_TEXT = `
 ## At the cap
 
 The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which the soft caps make ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. The horrors have grown past what a person has when they meet them:
-their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} to ${BANDS.named.lives[1] * 1.25} lives; a great fight ${CAP.god.seconds} and ${CAP.god.lives} to ${BANDS.god.lives[1] * 1.25} lives, except 'Umr at-Tawil's ${CAP_LIVES_FLOOR.umr_at_tawil} life floor, Dagon and Hydra's ${CAP_LIVES_FLOOR.father_dagon} life floor per member, and Yog-Sothoth's ${YOG_CAP_MAX} life ceiling. Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
+their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (\`overmatch\` in \`systems/bossScaling.ts\`, \`BOSS_OVERMATCH\`). A named horror still takes at least ${CAP.named.seconds} seconds and costs a bot ${CAP.named.lives} to ${CAP_CEILING.named} lives; a great fight ${CAP.god.seconds} and ${CAP.god.lives} to ${CAP_CEILING.god} lives, except 'Umr at-Tawil's ${CAP_LIVES_FLOOR.umr_at_tawil} life floor, Dagon and Hydra's ${CAP_LIVES_FLOOR.father_dagon} life floor per member, and the ceilings of Yog-Sothoth (${YOG_CAP_MAX}), the Daemon Pipers (${CAP_LIVES_CEILING.daemon_pipers}) and Nyarlathotep (${CAP_LIVES_CEILING.nyarlathotep}). Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
 `;
 /** The Haunter is hurt only by lamplight (a person lures it to a lamp; the bot stands where it is). Azathoth was once exempt too, blind and unwounded, its fight a timer (until 2026-10-29). */
 const EXEMPT = ['haunter_of_the_dark'];
@@ -166,7 +169,7 @@ const tableOf = (list: Row[]): string => {
 describe('the balance table (round 25)', () => {
   const table = standings();
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void rows.push(fightAt(s)));
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void rows.push(fightAt(s)), FIGHT_TIMEOUT);
 
   it('holds every boss to a fight worth having', () => {
     const bad: string[] = [];
@@ -214,7 +217,7 @@ const atCapOf = (s: Standing): Standing => {
 describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
   const table = standings().map(atCapOf);
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)));
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)), FIGHT_TIMEOUT);
 
   it('bounds Yog-Sothoth pressure at the level cap', () => {
     expect(atCap.find((r) => r.id === 'yog_sothoth')!.pressure).toBeLessThanOrEqual(YOG_CAP_MAX);
@@ -228,7 +231,7 @@ describe('at the cap (round 68): every level bought, and the horrors still deman
       if (!r.fell) bad.push(`${r.id}: not finished in ${r.seconds.toFixed(0)} seconds at the cap`);
       else if (r.seconds < band.seconds) bad.push(`${r.id}: ${r.seconds.toFixed(0)} seconds at the cap, at least ${band.seconds}`);
       const floor = CAP_LIVES_FLOOR[r.id] ?? band.lives;
-      const ceiling = CAP_LIVES_CEILING[r.id] ?? BANDS[tier].lives[1] * 1.25;
+      const ceiling = CAP_LIVES_CEILING[r.id] ?? CAP_CEILING[tier];
       if (r.pressure < floor) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, at least ${floor}`);
       if (r.pressure > ceiling) bad.push(`${r.id}: ${r.pressure.toFixed(2)} lives at the cap, above ${ceiling}`);
       if (r.deaths > 0) bad.push(`${r.id}: died ${r.deaths} times at the cap`);

@@ -18,7 +18,8 @@ export const BOSS = {
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)
-  summonEvery: 540, // frames before a summoner calls again (round 46)
+  summonCap: 3, // (round 100) summons alive at once in a boss fight, from every source together: its phases', its attack's, Shub-Niggurath's roots'; decoys are illusions and are not counted
+  summonEvery: 810, // frames before a summoner calls again (round 46; round 100: 540, now one and a half times as long)
   gap: [60, 110] as const, // frames between a boss's blows are never fewer than these (round 46: the hound struck every half-second)
   servantGap: [60, 110] as const, // and a summon's, whose own pace is longer still by 1.4x: the boss is the fight, its servants the weather
   servantDamage: 0.7, // what a summon's blow weighs against its kind's own
@@ -115,8 +116,8 @@ export const SHUB = {
   roots: 4,
   share: 0.55, // on a ring at this share of the arena's radius
   hp: 700, // each root's
-  every: 360, // frames between births at each root
-  young: 6, // alive at once, the most the roots bear
+  every: 540, // frames between births at each root (round 100: 360, one and a half times as long)
+  young: 3, // alive at once, the most the roots bear (round 100: six, held to the fight's cap of three)
   shielded: 0.2, // what it takes of each blow while any root stands
 };
 

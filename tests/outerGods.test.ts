@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
 import { emptyInput } from '../src/core/input';
 import { getEntity, variantOf } from '../src/data/registry';
-import { AZATHOTH, SHUB, YOG } from '../src/data/tuning';
+import { AZATHOTH, BOSS, SHUB, YOG } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
 import { bodyOf } from '../src/systems/creatures';
 import { fightAction } from '../src/systems/fightActions';
@@ -34,7 +34,7 @@ describe('the outer gods (spec §3E)', () => {
     expect(hp - h.hp).toBeCloseTo(100 * SHUB.shielded, 0);
     steps(g, SHUB.every);
     const young = fight.minions.filter((m) => g.ecs.c.model.get(m) === 'creature:thousand_young');
-    expect(young.length).toBe(SHUB.roots);
+    expect(young.length).toBe(Math.min(SHUB.roots, SHUB.young, BOSS.summonCap)); // (round 100: the fight holds three at most, so the fourth root's birth waits)
     for (const r of roots) kill(g, r);
     expect(rootsOf(g, fight)).toEqual([]);
     const born = fight.minions.length;
