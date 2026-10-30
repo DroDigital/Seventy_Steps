@@ -18,6 +18,7 @@ import { healthAt, levelsWorth, levelWorth, mightAt, staminaAt } from '../src/sy
 import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
 
 const FRAMES = 60 * 60 * 20; // twenty minutes (round 100: ten, before the horrors' health rose by half; Nyarlathotep and Yog-Sothoth were not finished in ten)
+const FIGHT_TIMEOUT = 180_000; // ms one horror's fights may take (round 100: the default 30 s was already close on CI, Nyarlathotep's three starts 26 s, and the fights are half again as long: its nine starts at the cap passed it)
 const SKILL = 0.55;
 /** What the bot plays badly, and is let off: the gaze that turns flesh to stone (it is in sight of it for about half of a fight at best, so its seconds are scaled by the share in view), and the roots (which a person cuts down first, and so spends some seconds more). */
 const WAIVED: Record<string, { waive: readonly ('petrify' | 'roots' | 'void')[]; scale: number; add: number }> = {
@@ -168,7 +169,7 @@ const tableOf = (list: Row[]): string => {
 describe('the balance table (round 25)', () => {
   const table = standings();
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void rows.push(fightAt(s)));
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void rows.push(fightAt(s)), FIGHT_TIMEOUT);
 
   it('holds every boss to a fight worth having', () => {
     const bad: string[] = [];
@@ -216,7 +217,7 @@ const atCapOf = (s: Standing): Standing => {
 describe('at the cap (round 68): every level bought, and the horrors still demanding', () => {
   const table = standings().map(atCapOf);
 
-  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)));
+  it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)), FIGHT_TIMEOUT);
 
   it('bounds Yog-Sothoth pressure at the level cap', () => {
     expect(atCap.find((r) => r.id === 'yog_sothoth')!.pressure).toBeLessThanOrEqual(YOG_CAP_MAX);
