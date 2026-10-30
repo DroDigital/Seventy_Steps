@@ -1,14 +1,13 @@
 /**
- * The brightness card (round 103): a sign and a strip of steps drawn through the picture's own tone curve
- * (render/toneCurve.ts), so the brightness is set to the screen in front of the player. It is adjusted until the sign is
+ * The brightness card (round 103): a sign and a strip of steps drawn through the picture's own gamma
+ * (shaders/post.ts), so the brightness is set to the screen in front of the player. It is adjusted until the sign is
  * only just visible against the black and the first bars of the strip part from it: a dim screen takes it up, a bright
  * one down. Shown once after the title first opens (ui/titleScreen.ts) and from Settings › Display. Every change is
  * applied at once and kept, as each setting is.
  */
 
 import { t } from '../core/i18n';
-import { BRIGHTNESS_TOE, brightnessGamma, CALIBRATION, SETTINGS } from '../data/tuning';
-import { toneCurve } from '../render/toneCurve';
+import { brightnessGamma, CALIBRATION, SETTINGS } from '../data/tuning';
 import { button, el, footer, heading, slider, type Page } from './menuKit';
 import type { SettingId, Settings } from './settings';
 
@@ -52,11 +51,11 @@ export function brightnessPage(s: Settings, change: (id: SettingId, v: number) =
   const lum = levels();
   let picture: CanvasRenderingContext2D | null = null;
   let frame: ImageData | null = null;
-  /** The picture at brightness `v`, through the game's curve (shaders/post.ts `tone`). */
+  /** The picture at brightness `v`, through the game's gamma (shaders/post.ts). */
   const paint = (v: number): void => {
     if (!picture || !frame) return;
     const gamma = brightnessGamma(v);
-    const shown = Array.from({ length: 256 }, (_, k) => Math.round(toneCurve(k / 255, gamma, BRIGHTNESS_TOE) * 255));
+    const shown = Array.from({ length: 256 }, (_, k) => Math.round(Math.pow(k / 255, gamma) * 255));
     const out = frame.data;
     for (let i = 0; i < lum.length; i++) {
       const o = shown[lum[i]];
