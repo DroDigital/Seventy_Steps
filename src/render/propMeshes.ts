@@ -41,7 +41,7 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   slab: { texture: 'slab', seed: 5, vertexColors: true, vary: 0.5 },
   cobble: { texture: 'cobble', seed: 5, vertexColors: true, vary: 0.5 },
   cloth: { texture: 'cloth', seed: 2, vertexColors: true, vary: 0.3, sway: true },
-  metal: { texture: 'cloth', seed: 8, vertexColors: true, vary: 0.2 },
+  metal: { texture: 'cloth', seed: 8, vertexColors: true, vary: 0.2, neutralCloth: true },
   bone: { texture: 'slab', seed: 11, vertexColors: true, vary: 0.35 },
   glassware: { texture: 'cloth', emissive: 0.1, vertexColors: true, opacity: 0.28, surface: 'glass' }, // what is clear, wet, waxen or silvered (round 79; shaders/surfaces.ts)
   liquid: { texture: 'cloth', emissive: 0.4, vertexColors: true, opacity: 0.55, surface: 'liquid' },

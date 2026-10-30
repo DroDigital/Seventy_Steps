@@ -127,6 +127,7 @@ export interface WorldMaterialOptions {
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
   surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
+  neutralCloth?: boolean; // this use of the neutral cloth texture represents metal, wax, or other non-fabric
 }
 
 /** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass (nor a mirror, liquid or wax: `surface`), not the ground, the plants or the flesh. */
@@ -137,12 +138,12 @@ export function coatable(o: WorldMaterialOptions): boolean {
 
 const textures = new Map<string, THREE.DataTexture>();
 
-/** One shared texture per (kind, seed). Nearest mip of nearest texel: crisp up close, no moiré far away. */
-export function createTexture(kind: TextureKind, seed: number): THREE.DataTexture {
-  const key = `${kind}:${seed}`;
+/** Shared by kind, seed and treatment. Nearest mip of nearest texel: crisp up close, no moiré far away. */
+export function createTexture(kind: TextureKind, seed: number, detail = true): THREE.DataTexture {
+  const key = `${kind}:${seed}${detail ? '' : ':plain'}`;
   const cached = textures.get(key);
   if (cached) return cached;
-  const tex = new THREE.DataTexture(generateTexture(kind, seed), TEXTURE_SIZE, TEXTURE_SIZE);
+  const tex = new THREE.DataTexture(generateTexture(kind, seed, detail), TEXTURE_SIZE, TEXTURE_SIZE);
   tex.name = key; // the glitch hunts name what they find by it
   tex.magFilter = THREE.NearestFilter;
   tex.minFilter = THREE.NearestMipmapNearestFilter;
@@ -159,17 +160,21 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
   const k = 1 / UV_PER_TEXTURE; // geometry UVs count 64 texels to the unit
   const [su, sv] = (o.uvScale ?? [1, 1]).map((x) => x * k);
   const [du, dv] = (o.uvScroll ?? [0, 0]).map((x) => x * k);
+  // Cloth is also the neutral base for glass and self-lit effects. Those uses
+  // retain the unpatterned version, while other uses take its soft relief.
+  const neutralCloth = !!o.neutralCloth || !!o.surface || !!o.emissive || !!o.panes || (o.opacity ?? 1) < 1;
+  const map = (kind: TextureKind): THREE.DataTexture => createTexture(kind, o.seed ?? 1, kind !== 'cloth' || !neutralCloth);
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...worldUniforms,
-      uMap: { value: createTexture(o.texture, o.seed ?? 1) },
-      uMap2: { value: createTexture(o.texture2 ?? o.texture, o.seed ?? 1) },
+      uMap: { value: map(o.texture) },
+      uMap2: { value: map(o.texture2 ?? o.texture) },
       uHasMap2: { value: o.texture2 ? 1 : 0 },
-      uMap3: { value: createTexture(o.texture3 ?? o.texture, o.seed ?? 1) },
+      uMap3: { value: map(o.texture3 ?? o.texture) },
       uHasMap3: { value: o.texture3 ? 1 : 0 },
-      uMap4: { value: createTexture(o.texture4 ?? o.texture, o.seed ?? 1) },
+      uMap4: { value: map(o.texture4 ?? o.texture) },
       uHasMap4: { value: o.texture4 ? 1 : 0 },
-      uMap5: { value: createTexture(o.texture5 ?? o.texture2 ?? o.texture, o.seed ?? 1) },
+      uMap5: { value: map(o.texture5 ?? o.texture2 ?? o.texture) },
       uHasMap5: { value: o.texture5 ? 1 : 0 },
       uPatchFade: { value: o.patchFade ? 1 : 0 },
       uPatch: { value: new THREE.Vector2(...(o.patch ?? [0.54, 0.08])) },
