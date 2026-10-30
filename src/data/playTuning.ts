@@ -69,6 +69,8 @@ export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1
 /** The old 85% brightness is the new 100% baseline. */
 export const BRIGHTNESS_BASE = 0.85;
 export const brightnessGamma = (brightness: number): number => 1 / (BRIGHTNESS_BASE * brightness);
+/** The brightness card (ui/brightnessCalibration.ts): the sign's level and the strip's steps, as the picture's levels before its gamma. */
+export const CALIBRATION = { sign: 0.14, strip: [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16] } as const;
 
 /** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {

@@ -73,3 +73,23 @@ export function storeSettings(store: Pick<SaveStore, 'setItem'> | null, s: Setti
     // Storage refused: the settings last until the page closes.
   }
 }
+
+/** The brightness card has been kept once (round 103): the title shows it once, after its first opening. */
+export const CALIBRATED_KEY = 'lovecraft-souls-like/brightnessCalibrated';
+
+/** Kept, or no storage to keep it in (no card on every launch); a store that refuses reads counts as kept too. */
+export function isCalibrated(store: Pick<SaveStore, 'getItem'> | null): boolean {
+  try {
+    return !store || store.getItem(CALIBRATED_KEY) !== null;
+  } catch {
+    return true;
+  }
+}
+
+export function markCalibrated(store: Pick<SaveStore, 'setItem'> | null): void {
+  try {
+    store?.setItem(CALIBRATED_KEY, '1');
+  } catch {
+    // Storage refused: the card comes back on the next launch.
+  }
+}

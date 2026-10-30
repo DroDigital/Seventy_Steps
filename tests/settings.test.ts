@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { brightnessGamma, HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
-import { clampSetting, defaultSettings, loadSettings, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
+import { CALIBRATED_KEY, clampSetting, defaultSettings, isCalibrated, loadSettings, markCalibrated, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
 
 function memoryStore() {
   const data = new Map<string, string>();
@@ -37,6 +37,18 @@ describe('settings', () => {
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), brightness: 1.5 });
     expect(loadSettings(store).brightness).toBe(1.5);
+  });
+
+  it('shows the brightness card once: kept in the store, and never on a launch with no store to keep it in', () => {
+    const store = memoryStore();
+    expect(isCalibrated(store)).toBe(false);
+    markCalibrated(store);
+    expect(isCalibrated(store)).toBe(true);
+    expect(store.getItem(CALIBRATED_KEY)).not.toBeNull();
+    expect(isCalibrated(null)).toBe(true);
+    const refusing = { getItem: () => { throw new Error('denied'); }, setItem: () => { throw new Error('full'); } };
+    expect(isCalibrated(refusing)).toBe(true);
+    expect(() => markCalibrated(refusing)).not.toThrow();
   });
 
   it('clamps into range and snaps to the step', () => {

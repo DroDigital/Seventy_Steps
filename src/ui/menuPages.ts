@@ -68,7 +68,7 @@ async function fullscreen(on: boolean): Promise<void> {
 const isFullscreen = async (): Promise<boolean> => (desktop ? desktop.isFullscreen() : !!document.fullscreenElement);
 
 /** Every change goes to `change` (which applies and keeps it); `back` leaves. `at`: the tab it opens on. Controls is the last tab (the keys' table: controlsTab). */
-export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0): Page {
+export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0, calibrate?: () => void): Page {
   const resolution = createResolutionSetting();
   let open = at;
   let waiting: Action | null = null;
@@ -97,6 +97,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
       for (const id of TABS[open][1]) {
         if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
         else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+        if (id === 'brightness' && open === 0 && calibrate) button(body, t('cal.open'), calibrate, true, t('cal.openHint')); // the brightness card (ui/brightnessCalibration.ts), beside the slider it sets
       }
       if (open === 0) {
         const b = button(body, t('set.fullscreen'), () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), true, t('set.fullscreenHint'));
