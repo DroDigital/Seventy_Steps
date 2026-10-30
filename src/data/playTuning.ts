@@ -69,6 +69,10 @@ export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1
 /** The old 85% brightness is the new 100% baseline. */
 export const BRIGHTNESS_BASE = 0.85;
 export const brightnessGamma = (brightness: number): number => 1 / (BRIGHTNESS_BASE * brightness);
+/** The toe under the gamma (round 103): below this level of the picture the curve rises from black with a slope of one, so the deepest shadows keep their own contrast (shaders/post.ts `tone`, render/toneCurve.ts). */
+export const BRIGHTNESS_TOE = 0.12;
+/** The brightness card (ui/brightnessCalibration.ts): the sign's level and the strip's steps, as the picture's levels before its curve. */
+export const CALIBRATION = { sign: 0.14, strip: [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16] } as const;
 
 /** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {

@@ -45,7 +45,8 @@ uniform vec3 uAnomalyHues;
 uniform vec2 uChar; // a character (alpha 0.75: render/shaders/world.ts and sprite.ts; round 34) keeps its own colours: x the share of the realm's grade it takes, y the levels each colour is quantised to
 uniform float uQuantize;
 uniform float uDither;
-uniform float uGamma; // inverse of the scaled brightness setting: below 1 lifts the dark
+uniform float uGamma; // 1 / (0.85 × the brightness setting): the midtones' gamma (below 1 lifts the dark)
+uniform float uToe; // the toe under it (BRIGHTNESS_TOE): the picture's deepest shadows keep their own contrast (round 103)
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
 ${LIGHTING_GLSL}
@@ -124,6 +125,13 @@ vec3 plunge(vec3 col, vec2 uv) {
   float edge = length(uv - 0.5) * 1.6; // 0 at the middle, a little over 1 in the corners
   float dark = clamp(uFade * 1.35 - (1.0 - edge) * 0.35, 0.0, 1.0);
   return col * (1.0 - dark * dark * (3.0 - 2.0 * dark));
+}
+
+// The picture's tone (render/toneCurve.ts mirrors it; the brightness card draws it): the brightness gamma above the toe, and
+// below it a rise from black with a slope of one, so the darkest detail is not crushed (round 103).
+vec3 tone(vec3 col) {
+  vec3 toe = vec3(max(uToe, 1e-4));
+  return mix(col, pow(col, vec3(uGamma)), smoothstep(vec3(0.0), toe, col));
 }
 
 vec3 stone(vec3 col, vec2 uv) {
@@ -219,7 +227,7 @@ void main() {
 
   vec4 centre = texture(tScene, uv);
   if (centre.a < 0.5) {
-    gl_FragColor = vec4(pow(plunge(centre.rgb, uv), vec3(uGamma)), 1.0); // outside the palette: no grade, no quantising
+    gl_FragColor = vec4(tone(plunge(centre.rgb, uv)), 1.0); // outside the palette: no grade, no quantising
     return;
   }
   bool person = centre.a < 0.9; // marked 0.75; the Colour's own mark (0.31) was dealt with above
@@ -250,7 +258,7 @@ void main() {
   vec4 fog = fogAlong(uv, bayer4(cell) + 0.5); // the mist between the lens and the scene (round 16)
   float crease = mix(contactAo(uv, bayer4(cell) + 0.5), 1.0, person ? 0.6 : 0.0); // the corners of the world take less light (round 39); a person only a little less
   vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
-  vec3 col = pow(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
+  vec3 col = tone(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
   gl_FragColor = vec4(col, 1.0);
 }
