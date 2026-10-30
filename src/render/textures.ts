@@ -13,6 +13,7 @@ import { PSX_DETAIL, PSX_SIZE } from '../data/psxDetail';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import { dirt, grass, gravel, leaves, mud, rot, sand, snow } from './textureGround';
 import { brick, clapboard, cobble, shingle, slab, stone, wood, type TexelFn } from './textureMasonry';
+import { applySurfaceDetail, type SurfaceDetailProfile } from './surfaceDetail';
 
 export const TEXTURE_SIZE = 128;
 /** UV units per texture repeat: geometry UVs count 64 texels to the unit, as they always have. */
@@ -141,8 +142,14 @@ const TEXELS: Record<TextureKind, TexelFn> = {
 
 const to8 = (x: number): number => Math.round(Math.min(1, Math.max(0, x)) * 255);
 
-/** RGBA8 pixels, TEXTURE_SIZE × TEXTURE_SIZE, row-major. */
-export function generateTexture(kind: TextureKind, seed: number): Uint8Array {
+/** A material's grain follows its own structure; everything else retains the general treatment. */
+const DETAIL_PROFILE: Partial<Record<TextureKind, SurfaceDetailProfile>> = {
+  stone: 'stone', slab: 'stone', rock: 'stone', cobble: 'stone', brick: 'stone', shingle: 'stone', gravel: 'stone',
+  wood: 'wood', clapboard: 'woodAcross', snow: 'snow', cloth: 'cloth', hide: 'hide', water: 'water',
+};
+
+/** RGBA8 pixels, TEXTURE_SIZE × TEXTURE_SIZE, row-major. Detail is baked before mipmaps are made. */
+export function generateTexture(kind: TextureKind, seed: number, detail = true): Uint8Array {
   const s = TEXTURE_SIZE;
   const out = new Uint8Array(s * s * 4);
   const texel = TEXELS[kind];
@@ -156,5 +163,6 @@ export function generateTexture(kind: TextureKind, seed: number): Uint8Array {
       out[i + 3] = 255;
     }
   }
+  if (detail) applySurfaceDetail(out, s, s, seed, 1, DETAIL_PROFILE[kind] ?? 'organic');
   return out;
 }

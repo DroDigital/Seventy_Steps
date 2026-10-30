@@ -38,7 +38,7 @@ export function createWayViews(scene: THREE.Scene, g: Game): WayViews {
   const halos = createHalos(48, 0.5);
   scene.add(halos.mesh);
   const stone = createWorldMaterial({ texture: 'stone', seed: 5, vertexColors: true, vary: 0.3 });
-  const body = createWorldMaterial({ texture: 'cloth', seed: 7, vertexColors: true, vary: 0.3 });
+  const body = createWorldMaterial({ texture: 'cloth', seed: 7, vertexColors: true, vary: 0.3, neutralCloth: true });
   const shine = (): THREE.ShaderMaterial => createWorldMaterial({ texture: 'cloth', seed: 5, vertexColors: true, emissive: 1 });
   const flameMat = createWorldMaterial({ texture: 'cloth', seed: 5, vertexColors: true, emissive: 1 });
   const made = new Map<WayRun, Made>();

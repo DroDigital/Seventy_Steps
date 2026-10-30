@@ -134,7 +134,7 @@ const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 
 export function createSignViews(scene: THREE.Scene, g: Game, particles: Particles, lights: WorldLights): SignViews {
   const stone = createWorldMaterial({ texture: 'rock', seed: 5, vertexColors: true, vary: 0.4 });
-  const wax = createWorldMaterial({ texture: 'cloth', vertexColors: true });
+  const wax = createWorldMaterial({ texture: 'cloth', vertexColors: true, neutralCloth: true });
   const views = new Map<Entity, View>();
   const bySign = new Map<string, View>();
   let [last, litCount] = [0, -1];
