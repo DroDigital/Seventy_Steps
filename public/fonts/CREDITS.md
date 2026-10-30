@@ -13,7 +13,7 @@ for Special Elite.
   Fell collection, cut in the seventeenth century. Copyright (c) 2010, Igino Marini. Licence: SIL Open Font License 1.1,
   `OFL-IMFellEnglish.txt`. It has one weight, oldstyle figures and no arrows, minus sign, ≥, ▲ or ◇, which the system serif behind it
   in `SERIF` supplies. Source: https://github.com/google/fonts/tree/main/ofl/imfellenglish
-- `SpecialElite-Regular.woff2`: **Special Elite**, a worn typewriter face, set in the intro's telegram. Copyright (c) 2010 by Brian J.
+- `SpecialElite-Regular.woff2`: **Special Elite**, a worn typewriter face, set in the intro's telegram until round 101 (no card uses it now; the file stays loaded). Copyright (c) 2010 by Brian J.
   Bonislawsky DBA Astigmatic (AOETI). Licence: Apache License 2.0, `LICENSE-SpecialElite.txt`. It has no arrows, ≥, ▲ or ◇. Source:
   https://github.com/google/fonts/tree/main/apache/specialelite
 
