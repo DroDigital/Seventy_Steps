@@ -49,6 +49,7 @@ export const REALITY = {
   darkLantern: 0.45, // full darkness shrinks the lantern's reach by this fraction and puts out the moon
   floodSlow: 0.35, // full flood slows the investigator by this fraction
   floodDepth: 0.7, // metres the water rises
+  floodOpacity: 0.5, // the water's cover of what lies beneath it (1 is opaque, and hides a telegraph on the ground)
   warpDrift: 0.3, // rad/s the camera drifts at full warp
   warpHz: 0.13,
   reconnectEdge: 0.8, // metres inside the arena's edge where the room rewires...
