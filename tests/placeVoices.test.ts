@@ -107,6 +107,23 @@ describe('the places\' voices as data (data/placeSounds.ts)', () => {
 });
 
 describe('the places\' voices played out (render/audio/placeVoices.ts schedule)', () => {
+  it('stops K’n-yan’s far drip in the temple and schedules it again on leaving', () => {
+    const heard: string[] = [];
+    const scheduler = schedule((c) => (heard.push(c.voice === 'howl' ? 'howl' : c.voice.id), true), () => null, () => 0.5);
+    const scene: Scene = { region: 'kn_yan', phase: 0.3, outdoors: true, held: false, weather: 'clear', hushed: 0 };
+    scheduler.update(0, scene);
+    scheduler.update(1000, scene);
+    expect(heard).toEqual(['knyan-drip']);
+    scene.region = 'serpent_temple';
+    scheduler.update(1001, scene);
+    scheduler.update(2001, scene);
+    expect(heard).toEqual(['knyan-drip']);
+    scene.region = 'kn_yan';
+    scheduler.update(2002, scene);
+    scheduler.update(3002, scene);
+    expect(heard).toEqual(['knyan-drip', 'knyan-drip']);
+  });
+
   for (const region of regions) {
     it(`${region}: nights of it are far apart, never the same twice running, never in the Still but for the dog that ends it, and only in an hour that likes them`, () => {
       const heard = run(region, 4);

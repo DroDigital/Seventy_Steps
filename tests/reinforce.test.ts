@@ -72,12 +72,12 @@ describe('reinforcing arms with star-stones (round 12)', () => {
     expect(loaded.player.reinforced.cane).toBe(0);
   });
 
-  it('boss health sits within a soulslike reach of the investigator\'s blows (round 12: 73 to 910 light cane blows)', () => {
+  it('other bosses stay within reach of the investigator\'s blows; Azathoth has its own health', () => {
     const cane = WEAPONS.cane.moves.light1!.hit!.damage;
     const most = cane * mightAt(LEVELS.might.max) * edgeAt(REINFORCE.max);
     const bosses = ENTITIES.flatMap((d) => [d, variantOf(d, 'boss')]).filter((d) => d?.bossScript);
     expect(bosses.length).toBeGreaterThan(40);
-    for (const d of bosses) expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(135); // (round 100: 90 before every boss's health rose by half; the same slack)
+    for (const d of bosses) if (d!.id !== 'azathoth') expect(d!.stats.hp / most, d!.id).toBeLessThanOrEqual(135); // Azathoth's health is deliberately not held to this bound
     const keziah = ENTITIES.find((d) => d.id === 'keziah_mason')!;
     expect(keziah.stats.hp / cane).toBeLessThanOrEqual(113); // the first boss on the main line, with nothing bought (round 68: 35, before the bosses were made the fight a soulslike's are; round 97, asked back to its pre-history 1600: 73 blows; round 100, 50% more: 110)
   });

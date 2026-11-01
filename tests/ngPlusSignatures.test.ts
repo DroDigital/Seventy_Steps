@@ -57,7 +57,7 @@ describe('special encounter objectives on every important journey', () => {
       calm(b);
       const deaths = record(g, 'Died');
       const h = g.ecs.c.health.get(boss)!;
-      expect(h.max).toBe(Math.round(getEntity('azathoth')!.stats.hp * (cycle ? 1.1 + 0.05 * cycle : 1)));
+      expect(h.max).toBe(Math.round(15075 * (cycle ? 1.1 + 0.05 * cycle : 1)));
       steps(g, 600);
       expect(h.hp).toBe(h.max); // the old survival timer must not return
       expect(strike(g, g.player.id, boss, deathblow)).toBe('kill');

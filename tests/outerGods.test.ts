@@ -117,10 +117,11 @@ describe('the outer gods (spec §3E)', () => {
     const h = g.ecs.c.health.get(boss)!;
     steps(g, 60 * 90); // ninety seconds, the length of the old song, with nothing struck
     expect(h.hp).toBe(h.max);
+    expect(h.max).toBe(15075);
     expect([h.floor, h.ward]).toEqual([undefined, undefined]); // not invulnerable
     setSanity(g, 100); // (a mind at its edge would sharpen the blow)
-    strike(g, g.player.id, boss, blow(100));
-    expect(h.max - h.hp).toBe(100);
+    strike(g, g.player.id, boss, blow(10050)); // the previous maximum no longer takes its full health
+    expect(h.hp).toBe(5025);
     const deaths = record(g, 'Died');
     const titles = record(g, 'Title');
     expect(strike(g, g.player.id, boss, deathblow)).toBe('kill');

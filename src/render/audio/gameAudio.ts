@@ -61,6 +61,7 @@ import { playSound } from './synth';
 import { createAtmosphereAudio } from './atmosphereAudio';
 import { createOcclusion, heard } from './occlusion';
 import { MIND_TIDE } from './mindTide';
+import { soundscapeAt } from './soundscape';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
@@ -341,7 +342,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       drones.set(region, scene.fights.length > 0);
       const at = g.ecs.c.transform.get(g.player.id)?.pos;
       const roofed = (g.overworld && at && inside(at)) || null;
-      ambience.set(roofed || (AMBIENCE[region ?? ''] ?? null));
+      ambience.set(roofed || (AMBIENCE[soundscapeAt(region, at) ?? ''] ?? null));
       weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 80: on snow and sand a storm is the wind alone, not the wash of rain)
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });

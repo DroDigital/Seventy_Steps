@@ -12,6 +12,7 @@ import { roofedAt } from '../../../world/terrain';
 import type { AtmAudioContext, AtmAudioPart } from '../atmosphereAudio';
 import { PLACED, createExposure } from '../exposure';
 import { createPlaceVoices, type Scene } from '../placeVoices';
+import { soundscapeAt } from '../soundscape';
 
 const LOOK = 0.25; // seconds between looks at the ground and at the fights (the picture is not asked every frame)
 
@@ -40,7 +41,7 @@ export function createNightVoices(ctx: AtmAudioContext): AtmAudioPart {
       PLACED.on = outdoors;
       if ((ow.region ?? '') !== realm) [realm, sea] = [ow.region ?? '', getRegion(ow.region ?? '')?.biome.sea ?? false];
       if (!paused && outdoors) exposure.update(seconds, at, ctx.right, { sea, wind: !g.player.mount.active || g.player.mount.speed < 4 });
-      const scene: Scene = { region: ow.region ?? null, phase: phaseOf(seconds), outdoors, held: paused || g.cutscene || fighting, weather: ow.weather.amount > 0.3 ? ow.weather.kind : 'clear', hushed: ctx.e.hushed };
+      const scene: Scene = { region: soundscapeAt(ow.region, at), phase: phaseOf(seconds), outdoors, held: paused || g.cutscene || fighting, weather: ow.weather.amount > 0.3 ? ow.weather.kind : 'clear', hushed: ctx.e.hushed };
       voices.update(seconds, scene);
     },
   };

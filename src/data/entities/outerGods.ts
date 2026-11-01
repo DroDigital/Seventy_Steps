@@ -18,7 +18,7 @@ export const OUTER_GODS = tier('outer_god', [
       ph(0.45, { chaos_rays: 3, rift_cascade: 2, dance: 2, seethe: 1, maelstrom: 2, miasma: 1 }, { hooks: ['darkness', 'camera_warp'] }),
       ph(0.2, { blind_rays: 1, chaos_rays: 3, rift_cascade: 3, dance: 2, maelstrom: 2, crescendo: 2, miasma: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
     ), { mobile: false, range: [0, 60], aggro: 0, fov: 0, cooldown: [60, 110] }),
-    stats: st(10050, 5000, 56, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // (round 100, 50% more: health 6700 to 10050) (2026-10-29: damage 150 to 56, which the library's powers now multiply: its heaviest blow, the maelstrom's burst, is a quarter of a person's health where it is met)
+    stats: st(15075, 5000, 56, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // health increased 50% from 10050; damage remains 56
   },
   {
     id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['piping_dark'], canonLooks: false, voice: 'pipes',
