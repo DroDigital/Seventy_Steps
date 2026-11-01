@@ -6,11 +6,11 @@ Failures remain visible. A fixed bot is a regression benchmark, not a success-ra
 
 | Journey | Wins / runs | Median successful seconds | Median successful healing doses |
 | --- | --- | --- | --- |
-| NG+1, reference | 50/98 | 99 | 2 |
-| NG+2, reference | 45/98 | 98 | 2 |
+| NG+1, reference | 52/98 | 107 | 2 |
+| NG+2, reference | 46/98 | 98 | 2 |
 | NG+3, reference | 44/98 | 103 | 2 |
-| NG+7, reference | 35/98 | 106 | 3 |
-| NG+7, cap | 63/98 | 118 | 3 |
+| NG+7, reference | 36/98 | 107 | 3 |
+| NG+7, cap | 61/98 | 108 | 3 |
 
 Cells: wins out of two; median successful seconds (— if neither won).
 
@@ -18,13 +18,13 @@ Cells: wins out of two; median successful seconds (— if neither won).
 | --- | --- | --- | --- | --- | --- |
 | Shoggoth | 2/2; 92 | 2/2; 93 | 2/2; 98 | 2/2; 106 | 2/2; 87 |
 | Flying Polyp | 2/2; 87 | 2/2; 98 | 2/2; 105 | 2/2; 131 | 2/2; 83 |
-| The Colour Out of Space | 1/2; 236 | 2/2; 236 | 1/2; 228 | 1/2; 207 | 2/2; 227 |
+| The Colour Out of Space | 2/2; 210 | 2/2; 224 | 1/2; 213 | 1/2; 207 | 2/2; 227 |
 | Wilbur Whateley | 2/2; 108 | 2/2; 109 | 2/2; 126 | 2/2; 155 | 2/2; 99 |
 | The Dunwich Horror | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 2/2; 152 |
-| Keziah Mason | 2/2; 126 | 2/2; 128 | 2/2; 140 | 2/2; 141 | 2/2; 132 |
+| Keziah Mason | 2/2; 126 | 2/2; 128 | 2/2; 140 | 2/2; 151 | 2/2; 132 |
 | Brown Jenkin | 2/2; 133 | 2/2; 131 | 2/2; 144 | 2/2; 140 | 2/2; 167 |
 | The Black Man | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
-| Joseph Curwen | 1/2; 134 | 1/2; 126 | 1/2; 175 | 0/2; — | 1/2; 120 |
+| Joseph Curwen | 1/2; 134 | 1/2; 126 | 1/2; 235 | 1/2; 212 | 1/2; 120 |
 | Simon Orne | 1/2; 138 | 2/2; 211 | 2/2; 186 | 0/2; — | 1/2; 149 |
 | Edward Hutchinson | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | Ephraim Waite | 2/2; 38 | 2/2; 40 | 1/2; 40 | 1/2; 66 | 2/2; 57 |
@@ -32,18 +32,18 @@ Cells: wins out of two; median successful seconds (— if neither won).
 | The Whisperer in Akeley's Chair | 1/2; 85 | 1/2; 92 | 2/2; 90 | 1/2; 107 | 2/2; 77 |
 | The Hound | 2/2; 67 | 2/2; 71 | 2/2; 71 | 2/2; 88 | 2/2; 71 |
 | The Unnamable | 2/2; 70 | 2/2; 73 | 2/2; 77 | 2/2; 95 | 2/2; 67 |
-| The Shunned House Entity | 1/2; 99 | 1/2; 108 | 1/2; 140 | 1/2; 129 | 1/2; 229 |
+| The Shunned House Entity | 1/2; 113 | 2/2; 215 | 1/2; 111 | 2/2; 157 | 1/2; 121 |
 | Lilith | 0/2; — | 0/2; — | 1/2; 166 | 0/2; — | 1/2; 236 |
 | The Thing Beyond Erich Zann's Window | 0/2; — | 1/2; 150 | 1/2; 131 | 0/2; — | 2/2; 118 |
-| High Priest Not to Be Described | 2/2; 166 | 1/2; 213 | 0/2; — | 0/2; — | 1/2; 100 |
+| High Priest Not to Be Described | 2/2; 166 | 1/2; 219 | 0/2; — | 0/2; — | 1/2; 100 |
 | The Colossus Beneath the Pyramids | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 1/2; 132 |
 | The Horror at Martin's Beach | 2/2; 67 | 2/2; 81 | 2/2; 81 | 2/2; 95 | 2/2; 81 |
 | Dr. Muñoz | 2/2; 65 | 2/2; 67 | 2/2; 68 | 2/2; 67 | 2/2; 64 |
 | Charles le Sorcier | 2/2; 65 | 2/2; 65 | 2/2; 62 | 2/2; 78 | 2/2; 80 |
-| The Gorgon of Medusa's Coil | 2/2; 112 | 2/2; 115 | 2/2; 117 | 2/2; 220 | 2/2; 146 |
-| Hypnos | 1/2; 142 | 1/2; 140 | 0/2; — | 0/2; — | 2/2; 239 |
+| The Gorgon of Medusa's Coil | 2/2; 112 | 2/2; 115 | 2/2; 117 | 1/2; 162 | 2/2; 162 |
+| Hypnos | 1/2; 177 | 1/2; 140 | 0/2; — | 0/2; — | 0/2; — |
 | The Outsider | 2/2; 42 | 2/2; 42 | 2/2; 45 | 2/2; 50 | 2/2; 43 |
-| The Terrible Old Man | 1/2; 169 | 0/2; — | 0/2; — | 0/2; — | 2/2; 229 |
+| The Terrible Old Man | 1/2; 169 | 0/2; — | 0/2; — | 0/2; — | 1/2; 128 |
 | Zkauba the Wizard | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | Cthulhu | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | Father Dagon | 2/2; 99 | 2/2; 102 | 2/2; 108 | 2/2; 122 | 2/2; 87 |
@@ -62,6 +62,6 @@ Cells: wins out of two; median successful seconds (— if neither won).
 | The Other Gods | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | Yog-Sothoth | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | 'Umr at-Tawil | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
-| The Ancient Ones | 1/2; 197 | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
+| The Ancient Ones | 2/2; 199 | 0/2; — | 0/2; — | 0/2; — | 1/2; 234 |
 | Shub-Niggurath | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | Nyarlathotep | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |

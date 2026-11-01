@@ -2,12 +2,14 @@
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { JOURNEY_REFERENCE } from '../src/data/ngPlusTuning';
+import { GUN } from '../src/data/playTuning';
 import { ENTITIES } from '../src/data/registry';
 import { WEAPON_IDS } from '../src/data/weapons';
 import { botFight, type BotFight, type BotStyle } from './botHelpers';
 
 const BOSSES = ENTITIES.filter((e) => e.bossScript || e.bossVariant?.bossScript);
 const FRAMES = 60 * 240;
+const SHOTS = GUN.chamber + GUN.carry; // a full carry: the cylinder and the spare rounds (the bot starts with them all)
 const SCENARIOS = [[1, false], [2, false], [3, false], [7, false], [7, true]] as const;
 interface Result { id: string; cycle: number; seed: number; build: string; won: boolean; seconds: number; doses: number; damage: number; healed: number; deaths: number; phases: number[] }
 const rows: Result[] = [];
@@ -27,7 +29,7 @@ function measure(cycle: number, capped: boolean): Result[] {
       expect(r.doses, e.id).toBeGreaterThanOrEqual(0);
       expect(r.doses, e.id).toBeLessThanOrEqual(10);
       expect(r.shots, e.id).toBeGreaterThanOrEqual(0);
-      expect(r.shots, e.id).toBeLessThanOrEqual(18);
+      expect(r.shots, e.id).toBeLessThanOrEqual(SHOTS);
       expect(r.remaining, e.id).toBeGreaterThanOrEqual(0);
       if (r.deaths) expect(r.fell, e.id).toBe(false);
       const row = { id: e.id, cycle, seed, build: capped ? 'cap' : 'reference', won: r.fell, seconds: r.frames / 60, doses: r.doses, damage: r.taken, healed: r.healed, deaths: r.deaths, phases: r.phases };
@@ -76,7 +78,7 @@ describe('finite journeys', () => {
       const r = botFight('dr_munoz', FRAMES, undefined, { ...style(1), weapon, reinforced: 3, reagentMax: 6, levels: { vigour: 12, endurance: 6, might: 10 } });
       expect(r.bad, weapon).toEqual([]);
       expect(r.fell, weapon).toBe(true);
-      expect(r.shots, weapon).toBeLessThanOrEqual(18);
+      expect(r.shots, weapon).toBeLessThanOrEqual(SHOTS);
       expect(r.doses, weapon).toBeLessThanOrEqual(6);
     }
   }, 30_000);
