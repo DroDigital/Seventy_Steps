@@ -3,7 +3,7 @@
  * anew may carry the investigator's strength into a new dream: levels, arms and how far each is
  * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels, Echoes and the hints given. Everything else (the
  * world, its quests and bosses) begins again. Ordinary foes become hardier; enemies strike harder
- * and leave more Echoes (NEW_GAME_PLUS). Boss health stays as authored. Pure: no Three.js.
+ * and leave more Echoes (NEW_GAME_PLUS). Boss health rises by journey. Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';

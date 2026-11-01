@@ -80,7 +80,7 @@ describe('ending choices', () => {
     click('New Game+ · Journey 2');
     expect(textOf(ui.panel)).toContain('levels, weapons and upgrades');
     expect(textOf(ui.panel)).toContain('current save slot and its backups are cleared');
-    expect(textOf(ui.panel)).toContain('boss health stays fixed');
+    expect(textOf(ui.panel)).toContain('Boss health and damage grow on later journeys');
     expect(s.store.getItem(CARRY_KEY)).toBeNull();
     expect(s.session.getItem(NEW_GAME_FLAG)).toBeNull();
     expect(s.location.href).toBe('/ending');

@@ -1,6 +1,6 @@
 /** Pure journey profiles. The caller captures a creature's home profile at spawn, so chasing across borders never changes it. */
 import type { XZ } from '../core/geom';
-import { BOSS_JOURNEY_DAMAGE, CREATURE_JOURNEY, JOURNEY_CURVES, REGION_JOURNEYS, type JourneyProfile } from '../data/ngPlusTuning';
+import { BOSS_JOURNEY_DAMAGE, BOSS_JOURNEY_HEALTH, CREATURE_JOURNEY, JOURNEY_CURVES, REGION_JOURNEYS, type JourneyProfile } from '../data/ngPlusTuning';
 import { getEntity } from '../data/registry';
 import { REGIONS } from '../data/regions';
 import { NEW_GAME_PLUS } from '../data/tuning';
@@ -34,11 +34,11 @@ export function foeRung(cycle: number, profile: JourneyProfile = 'late'): Journe
 
 export function bossRung(id: string | undefined, cycle: number, profile?: JourneyProfile): JourneyScale {
   const r = foeRung(cycle, profile ?? regionProfile(id ? getEntity(id)?.regions[0] : undefined));
-  return { health: 1, damage: 1 + BOSS_JOURNEY_DAMAGE * (r.damage - 1) };
+  return { health: BOSS_JOURNEY_HEALTH[journeyIndex(cycle)], damage: 1 + BOSS_JOURNEY_DAMAGE * (r.damage - 1) };
 }
 
 export function homeRung(home: JourneyHome | undefined, cycle: number): JourneyScale {
-  if (home?.encounter) return bossRung(home.encounter, cycle, home.profile);
+  if (home?.encounter) return { ...bossRung(home.encounter, cycle, home.profile), health: 1 }; // servants keep authored health
   const r = foeRung(cycle, home?.profile);
   const weight = CREATURE_JOURNEY[home?.creature ?? ''];
   return weight ? { health: 1 + weight[0] * (r.health - 1), damage: 1 + weight[1] * (r.damage - 1) } : r;

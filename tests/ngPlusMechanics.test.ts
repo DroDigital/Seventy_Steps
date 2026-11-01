@@ -13,7 +13,7 @@ import { hazardSystem, spawnPool } from '../src/systems/hazards';
 import { applyLevels, buyLevel, nextLevelCost } from '../src/systems/levels';
 import { bossRung, foeRung, homeRung, journeyIndex } from '../src/systems/ngPlus';
 import { loose } from '../src/systems/projectiles';
-import { parseSave, SAVE_KEY, saveGame, snapshot } from '../src/systems/save';
+import { clearSave, parseSave, SAVE_KEY, saveGame, snapshot } from '../src/systems/save';
 import { summon } from '../src/systems/specials';
 import { regionRect } from '../src/world/worldMap';
 import { bossGame } from './bossHelpers';
@@ -76,12 +76,14 @@ describe('regional journeys', () => {
     expect(g.ecs.c.journey.get(at(800))?.profile).toBe('late');
   });
 
-  it('keeps NG+ bosses fixed while player investment improves the investigator', () => {
-    const { g, boss } = bossGame('dr_munoz');
+  it('keeps NG+ boss health fixed within a journey while player investment improves the investigator', () => {
+    const { g } = bossGame('dr_munoz');
     g.player.cycle = 2;
+    const boss = spawnCreature(g, 'dr_munoz', { x: 0, z: 0, yaw: 0 })!;
     Object.assign(g.player.levels, JOURNEY_REFERENCE);
     applyLevels(g);
     const h = g.ecs.c.health.get(boss)!;
+    expect(h.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * 1.2));
     const before = { max: h.max, damage: foeDamage(g, boss) };
     h.hp = h.max * 0.3;
     for (const attribute of ['vigour', 'endurance', 'might'] as const) {
@@ -100,7 +102,7 @@ describe('regional journeys', () => {
     }
   });
 
-  it('gives every scripted form growing damage and fixed health', () => {
+  it('gives every scripted form modest journey health and damage growth capped at NG+7', () => {
     for (const e of ENTITIES.filter((e) => e.bossScript || e.bossVariant?.bossScript)) {
       const a = bossRung(e.id, 1);
       const b = bossRung(e.id, 3);
@@ -108,9 +110,12 @@ describe('regional journeys', () => {
       expect(a.damage, e.id).toBeGreaterThan(1);
       expect(b.damage, e.id).toBeGreaterThan(a.damage);
       expect(c.damage, e.id).toBeGreaterThan(b.damage);
-      expect([a.health, b.health, c.health], e.id).toEqual([1, 1, 1]);
+      expect(bossRung(e.id, 0).health, e.id).toBe(1);
+      for (let cycle = 1; cycle <= 7; cycle++) {
+        expect(bossRung(e.id, cycle).health, `${e.id}, NG+${cycle}`).toBeCloseTo(1.1 + 0.05 * cycle);
+      }
+      expect(bossRung(e.id, 100).health, e.id).toBeCloseTo(1.45);
     }
-    expect(bossRung('azathoth', 7).health).toBe(1);
   });
 
   it('inherits only encounter growth for servants, including a summoned boss and a morph', () => {
@@ -120,7 +125,7 @@ describe('regional journeys', () => {
     const home = g.ecs.c.journey.get(boss)!;
     const rung = homeRung(home, 3);
     const add = summon(g, boss, 'formless_spawn')!;
-    expect(g.ecs.c.health.get(add)!.max).toBe(Math.round(getEntity('formless_spawn')!.stats.hp * rung.health));
+    expect(g.ecs.c.health.get(add)!.max).toBe(getEntity('formless_spawn')!.stats.hp);
     expect(foeDamage(g, add)).toBeCloseTo(BOSS.servantDamage * rung.damage);
     const h = g.ecs.c.health.get(add)!;
     h.hp = h.max / 2;
@@ -129,7 +134,7 @@ describe('regional journeys', () => {
     expect(g.ecs.c.combatant.get(add)!.bounty).toBe(0);
     const other = summon(g, boss, 'dr_munoz')!;
     expect(g.ecs.c.fight.has(other)).toBe(false);
-    expect(g.ecs.c.health.get(other)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * rung.health));
+    expect(g.ecs.c.health.get(other)!.max).toBe(getEntity('dr_munoz')!.stats.hp);
     g.ecs.despawn(other);
     const unseenBoss = summon(g, boss, 'dunwich_horror')!;
     expect(g.ecs.c.fight.has(unseenBoss)).toBe(false);
@@ -209,20 +214,25 @@ describe('lasting attacks and migration', () => {
   it('preserves old choices and wounds, and keeps the original NG+ save exactly once', () => {
     const g = createWorldGame({ difficulty: 'light' });
     g.player.cycle = 3;
-    const old = { ...snapshot(g), balance: undefined, wounds: { 'p:arkham:0': 0.4 } };
+    const old = { ...snapshot(g), balance: 1, wounds: { 'p:arkham:0': 0.4 } };
     const raw = JSON.stringify(old);
     const loaded = createWorldGame({ save: parseSave(raw)! });
     expect(loaded.player.difficulty).toBe('light');
     expect(loaded.overworld!.wounds.get('p:arkham:0')).toBe(0.4);
-    const values = new Map([[SAVE_KEY, raw]]);
+    const historical = 'the original pre-balance save';
+    const values = new Map([[SAVE_KEY, raw], [balanceBackupKey(SAVE_KEY, 1), historical]]);
     const store = { getItem: (k: string) => values.get(k) ?? null, setItem: (k: string, v: string) => { values.set(k, v); }, removeItem: (k: string) => { values.delete(k); } };
     saveGame(loaded, store, 1);
     expect(values.get(balanceBackupKey(SAVE_KEY))).toBe(raw);
+    expect(values.get(balanceBackupKey(SAVE_KEY, 1))).toBe(historical);
     loaded.player.echoes++;
     saveGame(loaded, store, 1);
     expect(values.get(balanceBackupKey(SAVE_KEY))).toBe(raw);
-    expect(parseSave(values.get(SAVE_KEY)!)!.balance).toBe(1);
+    expect(parseSave(values.get(SAVE_KEY)!)!.balance).toBe(2);
     expect(DIFFICULTIES.light.foe).toBe(0.6);
+    clearSave(store, 1);
+    expect(values.has(balanceBackupKey(SAVE_KEY, 1))).toBe(false);
+    expect(values.has(balanceBackupKey(SAVE_KEY, 2))).toBe(false);
   });
 
   it('leaves the first journey’s ordinary stats and player damage unchanged', () => {

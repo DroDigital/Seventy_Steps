@@ -17,6 +17,7 @@ import { minionsOf } from '../src/systems/specials';
 import { setSanity } from '../src/systems/sanity';
 import { equip } from '../src/systems/arms';
 import { foeHealth } from '../src/systems/cycles';
+import { bossRung } from '../src/systems/ngPlus';
 import { bossGame } from './bossHelpers';
 import { blowIn } from './blowIn';
 import { newLeaving, wayOut } from './cloudBot';
@@ -115,12 +116,19 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   const c = g.ecs.c;
   const me = c.health.get(g.player.id)!;
   if (style.cycle !== undefined) {
+    const previousCycle = g.player.cycle;
     g.player.cycle = style.cycle;
     const hp = c.health.get(boss);
-    if (hp && !c.fight.has(boss)) hp.hp = hp.max = Math.round(hp.max * foeHealth(g, c.journey.get(boss)));
+    const fight = c.fight.get(boss);
+    if (hp && fight) {
+      const fraction = hp.hp / hp.max;
+      const previous = bossRung(fight.id, previousCycle).health;
+      hp.max = Math.round(hp.max / previous * bossRung(fight.id, style.cycle).health);
+      hp.hp = hp.max * fraction;
+    } else if (hp) hp.hp = hp.max = Math.round(hp.max * foeHealth(g, c.journey.get(boss)));
   }
   Object.assign(g.player.levels, style.levels ?? { vigour: 0, endurance: 0, might: LEVELS.might.max });
-  applyLevels(g); // refresh the investigator’s resources; boss health stays authored
+  applyLevels(g); // refresh the investigator’s resources without changing boss health
   if (style.sanity !== undefined) setSanity(g, style.sanity);
   const health = c.health.get(boss)?.max ?? 0;
   if (style.weapon) {

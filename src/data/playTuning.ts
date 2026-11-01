@@ -135,7 +135,7 @@ export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
  * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
- * that its blows take up. Boss health always stays at the value authored for its current form.
+ * that its blows take up. Boss health does not scale with the investigator's level.
  */
 export const BOSS_OVERMATCH = { share: 0.45 };
 

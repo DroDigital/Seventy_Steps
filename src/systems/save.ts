@@ -347,6 +347,6 @@ export function takeRecovery(): boolean {
 export const clearSave = (store: SaveStore, slot = active): void => {
   store.removeItem(slotKey(slot));
   store.removeItem(backupKey(slotKey(slot)));
-  store.removeItem(balanceBackupKey(slotKey(slot)));
+  for (let version = 1; version <= JOURNEY_BALANCE_VERSION; version++) store.removeItem(balanceBackupKey(slotKey(slot), version));
   backedAt = -Infinity;
 };

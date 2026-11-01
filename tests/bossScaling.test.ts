@@ -41,7 +41,7 @@ describe('boss health is fixed while damage scales with player level', () => {
     }
   });
 
-  it('keeps every hostile scripted form at authored health in the first and last journeys at maximum level', () => {
+  it('uses journey-scaled health for every hostile scripted form at maximum level', () => {
     for (const cycle of [0, NEW_GAME_PLUS.most]) {
       const g = createGame();
       g.player.levels = { vigour: 30, endurance: 30, might: 30 };
@@ -51,7 +51,7 @@ describe('boss health is fixed while damage scales with player level', () => {
         const form = variant ? variantOf(def, variant) : def;
         if (!form || form.tier === 'ally' || !form.bossScript) continue;
         const e = spawnCreature(g, def.id, AT, variant)!;
-        expect(g.ecs.c.health.get(e)!.max, `${def.id} ${variant} cycle ${cycle}`).toBe(form.stats.hp);
+        expect(g.ecs.c.health.get(e)!.max, `${def.id} ${variant} cycle ${cycle}`).toBe(Math.round(form.stats.hp * (cycle ? 1.45 : 1)));
         g.ecs.despawn(e);
       }
     }
@@ -123,7 +123,7 @@ describe('boss health is fixed while damage scales with player level', () => {
     const h = g.ecs.c.health.get(boss)!;
     expect(h.max).toBe(getEntity('dr_munoz')!.stats.hp);
     const fresh = spawnCreature(g, 'dr_munoz', AT)!;
-    expect(g.ecs.c.health.get(fresh)!.max).toBe(getEntity('dr_munoz')!.stats.hp);
+    expect(g.ecs.c.health.get(fresh)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * 1.2));
     const damage = 40 * DIFFICULTIES.nightmare.foe * journeyBossDamage('dr_munoz', 2, g.ecs.c.journey.get(boss)?.profile);
     const me = g.ecs.c.health.get(g.player.id)!;
     const before = me.hp;
@@ -133,7 +133,7 @@ describe('boss health is fixed while damage scales with player level', () => {
     expect(foeDamage(g, ally)).toBe(1);
   });
 
-  it('morphing a boss uses the new form’s authored health and keeps its wound fraction', () => {
+  it('morphing a boss uses the new form’s journey-scaled health and keeps its wound fraction', () => {
     const { g, boss } = bossGame('nyarlathotep');
     g.player.levels.might = 10;
     g.player.cycle = 1;
@@ -142,10 +142,10 @@ describe('boss health is fixed while damage scales with player level', () => {
     h.hp = h.max * 0.4;
     morph(g, boss, 'nyarlathotep', 'eldritch');
     const def = variantOf(getEntity('nyarlathotep')!, 'eldritch')!;
-    expect(h.max).toBe(def.stats.hp);
+    expect(h.max).toBe(Math.round(def.stats.hp * 1.15));
     expect(h.hp / h.max).toBeCloseTo(0.4);
     applyLevels(g);
-    expect(h.max).toBe(def.stats.hp);
+    expect(h.max).toBe(Math.round(def.stats.hp * 1.15));
     expect(h.hp / h.max).toBeCloseTo(0.4);
   });
 

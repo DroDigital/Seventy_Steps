@@ -1,6 +1,6 @@
 # New Game Plus
 
-New Game+ restarts the story while carrying the investigator's strength forward. The difficulty selected for the save remains in effect. Journey scaling and Echo rewards stop increasing at NG+7 (journey eight). Boss health is always the authored health of its current form, including in later journeys.
+New Game+ restarts the story while carrying the investigator's strength forward. The difficulty selected for the save remains in effect. Journey scaling and Echo rewards stop increasing at NG+7 (journey eight). Boss health grows by journey, independently of the investigator’s level.
 
 ## Regional progression
 
@@ -21,20 +21,20 @@ The university and Arkham are early; the rest of the waking world is middle; dis
 
 ## Bosses and encounters
 
-Bosses retain their authored maximum health at every level and journey. On the first journey, their damage uses the existing per-level and Vigour overmatch rules. On later journeys, their damage uses a fixed 18 Vigour / 9 Endurance / 17 Might reference, then 80% of the region's added damage. This reference is a tuning point, not a minimum required carry: further purchases improve the investigator without strengthening those bosses.
+Bosses use their current form’s authored maximum health on the first journey. Their health increases to 115% of that value on NG+1, then by five percentage points per journey, reaching 145% at NG+7 and beyond. This health multiplier depends only on the journey, not the investigator’s level. On the first journey, their damage uses the existing per-level and Vigour overmatch rules. On later journeys, their damage uses a fixed 18 Vigour / 9 Endurance / 17 Might reference, then 80% of the region's added damage. This reference is a tuning point, not a minimum required carry: further purchases improve the investigator without strengthening those bosses.
 
-Servants inherit their encounter's journey damage growth and retain the existing servant damage reduction. They do not receive a second ordinary-region multiplier. Their health, like the boss's, stays at its authored value. A scripted creature summoned as a servant does not start an independent boss fight. Morphs retain the fraction of health remaining and preserve servant status. Shub-Niggurath's roots keep their authored health; the Haunter's lamplight damage remains effective at the same rate. Cthulhu's Alert finish remains available. Azathoth is defeated in combat; it has no survival timer.
+Servants inherit their encounter's journey damage growth and retain the existing servant damage reduction. They do not receive a second ordinary-region multiplier. Their health stays at its authored value. A scripted creature summoned as a servant does not start an independent boss fight. Morphs retain the fraction of health remaining and preserve servant status. Shub-Niggurath's roots keep their authored health; the Haunter's lamplight damage remains the same absolute amount, so its increased health takes longer to wear down. Cthulhu's Alert finish remains available. Azathoth is defeated in combat; it has no survival timer.
 
 Persistent enemy projectiles, waves, clouds and pools capture their caster's outgoing scale when created, so they retain that scale and the enemy single-hit limit if the caster disappears. A projectile's pool inherits the captured value once. Phantom attacks remain physically harmless after their source vanishes. The single-blow limit is a backstop; it does not prevent death from successive hits, damage over time, petrification or falls.
 
 ## Saves and rewards
 
-Echo rewards gain 50% of base per journey, capped at NG+7. Existing consumable prices, the three difficulty choices and their saved settings remain. Existing later-journey saves receive a localized notice about the changed regional scaling. The first older NG+ save overwritten is preserved under `<slot-key>-before-journey-balance-1`, separately from the rolling recovery backup; clearing the slot clears both backups. Inventory, levels, quests, difficulty and enemy wound fractions remain in the save.
+Echo rewards gain 50% of base per journey, capped at NG+7. Existing consumable prices, the three difficulty choices and their saved settings remain. Older later-journey saves receive a localized notice about the balance changes. The first older NG+ save overwritten is preserved under `<slot-key>-before-journey-balance-2`, separately from the rolling recovery backup and any earlier balance backup; clearing the slot clears all of these backups. Inventory, levels, quests, difficulty and enemy wound fractions remain in the save.
 
 The ending card shows New Game+ as a distinct choice and explains what carries, what resets and which save slot is cleared. Each ending-card action has its own confirmation. If the carry or reload flag cannot be stored, the current journey remains open.
 
 ## Verification and limits
 
-`tests/ngPlusMechanics.test.ts` checks the regional ladder, the ceiling, captured home profiles, fixed boss health, encounter servants, lingering attacks and save migration. `tests/ngPlusSignatures.test.ts` checks Cthulhu, Azathoth and the Haunter across journeys. `tests/ngPlusWorld.test.ts` checks the Alert route against the streamed R'lyeh collision with attacks disabled; it is not a combat survival test.
+`tests/ngPlusMechanics.test.ts` checks the regional ladder, the ceiling, captured home profiles, journey-based boss health, encounter servants, lingering attacks and save migration. `tests/ngPlusSignatures.test.ts` checks Cthulhu, Azathoth and the Haunter across journeys. `tests/ngPlusWorld.test.ts` checks the Alert route against the streamed R'lyeh collision with attacks disabled; it is not a combat survival test.
 
 `tests/ngPlus.test.ts` runs finite-resource boss fights with real health, finite ammunition, healing and deaths, including both the reference and a fully leveled build at NG+7. `NGPLUS_WRITE=1 npm run audit -- tests/ngPlus.test.ts` regenerates [the results](NGPLUS_RESULTS.md). The synthetic arenas and deterministic bot do not predict human completion rates, and some strategies cannot solve every special mechanic. Human playtesting and further real-world routes are needed to judge the tuning.
