@@ -53,7 +53,7 @@ export interface VolleyDef {
 }
 
 /** What a burst of marked ground is made of (round 70): the picture and the sound of it, and what it leaves. */
-export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt';
+export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt' | 'rift';
 
 /**
  * Where marked ground lies (round 70): in a ring about the target, as a shower over the whole court, in lines out from the attacker, or creeping after the target until it locks.
@@ -114,6 +114,7 @@ export interface SweepDef {
   width: number; // metres either side of the beam's line
   damage: number;
   poise: number;
+  arms?: number; // simultaneous evenly spaced rays; each target can be hit only once per sweep
 }
 
 /** Bolts loosed every few frames in several directions at once, the pattern turning as it goes (the barrage). */

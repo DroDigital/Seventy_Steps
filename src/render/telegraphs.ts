@@ -100,8 +100,11 @@ export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Tel
     if (cl && frame < cl.frame) decals.swirl(p.x, p.y, p.z, body + cl.radius * 1.6, CLOUDS[cl.kind].billow[0], 0.7);
     const sw = def.sweep;
     if (sw && frame < sw.window[0]) { // the arc it will cross, and where it starts (the beam itself shows as it sweeps)
-      decals.sector(p.x, p.y, p.z, yaw, sw.length, sw.arc, frame / sw.window[0], LINE, 0.6);
-      decals.lane(p.x, p.y, p.z, yaw - (sw.arc[0] * Math.PI) / 180, sw.length, 0.12, 1, LINE);
+      for (let arm = 0; arm < (sw.arms ?? 1); arm++) {
+        const bearing = yaw + arm * Math.PI * 2 / (sw.arms ?? 1);
+        decals.sector(p.x, p.y, p.z, bearing, sw.length, sw.arc, frame / sw.window[0], LINE, 0.6);
+        decals.lane(p.x, p.y, p.z, bearing - (sw.arc[0] * Math.PI) / 180, sw.length, sw.width, 1, LINE);
+      }
     }
     const b = def.barrage;
     if (b && frame < b.window[0]) decals.disc(p.x, p.y, p.z, body + 1.5, frame / b.window[0], LINE, 0.8);
