@@ -97,7 +97,7 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
   });
 
   it('is front art only for Yog-Sothoth, Shub-Niggurath and Azathoth, whatever the side they are seen from', () => {
-    for (const [key, move] of [['yog_sothoth', 'beam'], ['shub_niggurath', 'tentacle_burst'], ['azathoth', 'roar']] as const) {
+    for (const [key, move] of [['yog_sothoth', 'beam'], ['shub_niggurath', 'tentacle_burst'], ['azathoth', 'blind_rays']] as const) {
       const views = pack.entities[key].directions;
       for (const direction of ['left', 'back', 'right'] as const) expect(Object.keys(views[direction].actions).sort(), `${key}/${direction}`).toEqual(['idle', 'move']);
       for (const at of [[12, 0], [0, -12], [-12, 0]] as [number, number][]) {
