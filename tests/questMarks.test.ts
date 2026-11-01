@@ -6,9 +6,9 @@ import { questMarks } from '../src/systems/questMarks';
 import { talk } from '../src/systems/npcs';
 
 describe('who has something for the investigator', () => {
-  it('the first talk answers the carriage errand and begins the main line, whose next person answers', () => {
+  it('the first talk begins the main line (no carriage errand: the chariot is had from the start), whose next person answers', () => {
     const g = createWorldGame();
-    expect(questMarks(g).get('peaslee')).toBe('answer');
+    expect(questMarks(g).get('peaslee')).toBe('ask');
     talk(g, 'peaslee');
     const marks = questMarks(g);
     expect(marks.get('gilman')).toBe('answer');

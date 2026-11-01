@@ -2,8 +2,7 @@
 export const MOUNT_IDS = ['grey', 'chariot', 'automobile'] as const;
 export type MountId = (typeof MOUNT_IDS)[number];
 export const isMount = (id: unknown): id is MountId => MOUNT_IDS.includes(id as MountId);
-export const MOUNT_QUEST = 'borrowed_reins';
-/** The plain chariot the quest gives. The spectral chariot and the motor car are optional appearances. The id stays `grey` so older saves still load. */
+/** The plain chariot, the investigator's from the start (round 102: no quest gives it). The spectral chariot and the motor car are optional appearances. The id stays `grey` so older saves still load. */
 export const FREE_MOUNT: MountId = 'grey';
 
 /** Metres and seconds; every mount shares this exact frozen object. */

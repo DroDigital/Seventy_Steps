@@ -37,6 +37,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
   minimap: (v) => t(v > 0.5 ? 'val.minimap.north' : 'val.minimap.turn'),
   camera: (v) => t(`val.camera.${cameraModeOf(v)}` as Key),
   quietWalk: onOff,
+  controlTips: onOff,
   captions: (v) => `×${v.toFixed(1)}`,
   captionBack: onOff,
   flashes: pct,
@@ -52,7 +53,7 @@ const NAME = (id: SettingId): string => t(`set.${id}` as Key);
 const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
   ['set.tab.display', ['resolution', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
-  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk']],
+  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
   ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'shake', 'fxCap']],
 ];
 const HINT = (id: SettingId): string | undefined => {

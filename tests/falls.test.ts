@@ -1,6 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { MOUNT_QUEST } from '../src/data/mounts';
-import { QUESTS } from '../src/data/quests';
 import { FALL, PLAYER, SIM, WORLD } from '../src/data/tuning';
 import { shove, strike } from '../src/systems/combat';
 import { fallDark, fallSystem } from '../src/systems/falls';
@@ -107,7 +105,6 @@ describe('fatal edges', () => {
   it('lets a mount take one step off the land, then stops', () => {
     const g = createWorldGame();
     g.world = { ground: () => 0, colliders: [], off: new Set(), contain: () => {} };
-    g.overworld!.quests.set(MOUNT_QUEST, QUESTS[MOUNT_QUEST].stages.length);
     // South edge of the university. z < 0 is owned by no region; east of the hub is still Providence.
     teleport(g, { x: 256, z: 4, yaw: Math.PI });
     expect(regionAt(256, 4)?.id).toBe('hub');

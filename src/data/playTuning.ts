@@ -92,6 +92,7 @@ export const SETTINGS = {
   camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
   minimap: [0, 1, 1, 0], // 0: the minimap turns with the camera, what lies ahead up; 1: north up, the investigator's arrow turning instead (a first public playthrough: "I don't know anyone who likes spinning maps")
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
+  controlTips: [0, 1, 1, 1], // 0: the first steps' controls are not written on the screen as each is first needed (round 102: ui/firstSteps.ts)
   quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
@@ -397,4 +398,20 @@ export const WATER = {
   follow: 0.92, // the camera follows the body this far down: it sees the surface close over it
   lookPitch: 0.95, // radians: and looks down at it, not straight down (the water is not a hole)
   dark: [34, 90] as readonly [from: number, to: number], // frames held between which the picture goes to black
+};
+
+/** The first steps' card (round 102, ui/firstSteps.ts): metres, radians and 60 Hz frames. */
+export const FIRST_STEPS = {
+  walked: 3, // metres walked before Walk is ticked
+  turned: 0.6, // radians the camera has been turned before Look is
+  sprint: 45, // frames run before Run is
+  jump: 5, // metres in one look that are a journey or a rising, not a walk
+  foe: 32, // a foe closing within this calls up the blows (as the Field Guide's fight hint does: ui/hintWatch.ts)
+  close: 10, // once the blows are learned, a foe this near calls up the roll
+  swing: 6, // and a foe this near with a blow under way calls it up at once
+  hurt: 0.6, // health below this share calls up West's Reagent
+  mountAfter: 240, // frames after Run is learned before the chariot's card may come, on open ground and with no foe near
+  minShow: 150, // a card stays at least this long before a more urgent one takes its place
+  lapse: 120, // a card whose reason has gone stays this long before it goes
+  linger: 72, // a card finished stays, ticked, this long
 };

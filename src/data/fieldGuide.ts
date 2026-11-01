@@ -40,7 +40,7 @@ export const GUIDE: Readonly<Record<HintId, { group: GuideGroup; title: string }
   echoes: g(DREAM, 'Echoes'),
   level: g(DREAM, 'Levels'),
   map: g(DREAM, 'The map'),
-  mount: g(DREAM, 'Mounts and the Borrowed Reins'),
+  mount: g(DREAM, 'Mounts'),
   quest: g(DREAM, 'Quests'),
   talk: g(DREAM, 'People'),
   relic: g(DREAM, 'Relics'),

@@ -78,6 +78,21 @@ describe('the beds as WebAudio plays them (render/audio/ambience.ts, round 80)',
     for (const p of made.pans) expect(hourOfReader(p)).toBeInstanceOf(Gain);
   });
 
+  it('stops the cavern spots at the temple and restores them on leaving', () => {
+    const { e, sampler, plays } = fakeAudio();
+    const beds = createAmbience(e, sampler);
+    const start = secondsAt(0.3);
+    beds.set(AMBIENCE.kn_yan);
+    beds.update(start);
+    plays.length = 0;
+    beds.set(AMBIENCE.serpent_temple);
+    beds.update(start + CLOCK.night);
+    expect(plays).toEqual([]);
+    beds.set(AMBIENCE.kn_yan);
+    beds.update(start + 2 * CLOCK.night);
+    expect(plays.map((p) => p.set)).toContain(SAMPLE_SETS.chains);
+  });
+
   it('the hour moves the insects: full at the gloaming, thinned in the deep, nearly gone in the Still; the sea beds do not hear it', () => {
     const { made, e, sampler } = fakeAudio();
     const beds = createAmbience(e, sampler);
