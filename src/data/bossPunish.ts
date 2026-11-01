@@ -19,15 +19,16 @@ export interface Punish {
   scale: number; // the library's recovery, times this...
   least: number; // ...but no blow of the band leaves its horror with fewer frames than this (the ninth frame of a light blow, after a roll read late: 38; a god's, read early: 33)...
   heavy: number; // ...and each point of the blow's power past 1 adds this many frames to the least: the heavier the blow, the more it costs
+  gap: readonly [number, number]; // frames between this band's blows (`BOSS.gap` for the rest): the early horrors wait longer, the last strike oftener, never under 60 (2026-11-01)
   evade: number; // the share kept of the horror's chance to slip the investigator's blow (bossArena.ts): the first horrors do not step aside from every counter
   blow: number; // and its blows lighter than its heaviest weigh this much more: the longer pauses cost it a share of its blows (measured on the timeline of every boss), the heaviest is held where the 30% rule has it (`blowWeight`), so the lighter carry what is made up, and what it deals in a minute is what the balance table was fitted to
 }
 
 export const PUNISH: Readonly<Record<PunishBand, Punish>> = {
-  first: { scale: 1.25, least: 44, heavy: 14, evade: 0.5, blow: 1.07 },
-  middle: { scale: 1.15, least: 40, heavy: 12, evade: 0.75, blow: 1.05 },
-  deep: { scale: 1.08, least: 38, heavy: 10, evade: 1, blow: 1.12 },
-  last: { scale: 1, least: 33, heavy: 8, evade: 1, blow: 1 }, // the blows of the last weigh as they did: the pauses cost them about 2%, and their guard costs (tests/bossStamina.test.ts) are the very figures of their damage
+  first: { scale: 1.25, least: 44, heavy: 14, gap: [72, 124], evade: 0.5, blow: 1.07 },
+  middle: { scale: 1.15, least: 40, heavy: 12, gap: [62, 108], evade: 0.75, blow: 1.05 },
+  deep: { scale: 1.08, least: 38, heavy: 10, gap: [60, 96], evade: 1, blow: 1.12 },
+  last: { scale: 1, least: 33, heavy: 8, gap: [60, 86], evade: 1, blow: 1 }, // the blows of the last weigh as they did: the pauses cost them about 2%, and their guard costs (tests/bossStamina.test.ts) are the very figures of their damage
 };
 
 /**
@@ -36,14 +37,10 @@ export const PUNISH: Readonly<Record<PunishBand, Punish>> = {
  * Swarm, which have no place in that order, stand with the middle.
  */
 export const BOSS_BAND: Readonly<Record<string, PunishBand>> = {
-  dr_munoz: 'first', charles_le_sorcier: 'first', the_outsider: 'first', brown_jenkin: 'first', ephraim_waite: 'first', keziah_mason: 'first', black_man: 'first',
-  colour_out_of_space: 'first', the_hound: 'first', the_unnamable: 'first', haunter_of_the_dark: 'first', wilbur_whateley: 'first', medusa_gorgon: 'first',
-  martins_beach_horror: 'middle', terrible_old_man: 'middle', whisperer: 'middle', edward_hutchinson: 'middle', simon_orne: 'middle', lilith: 'middle',
-  shunned_house_entity: 'middle', joseph_curwen: 'middle', dunwich_horror: 'middle', mother_hydra: 'middle', father_dagon: 'middle', hypnos: 'middle',
-  high_priest: 'middle', colossus_pyramids: 'middle', shoggoth: 'middle', flying_polyp: 'middle',
-  ghatanothoa: 'deep', bokrug: 'deep', nug: 'deep', rhan_tegoth: 'deep', yeb: 'deep', great_ones: 'deep', yig: 'deep', tsathoggua: 'deep', cthulhu: 'deep', hastur: 'deep',
-  zkauba: 'last', zann_window_thing: 'last', yog_sothoth: 'last', ancient_ones: 'last', shub_niggurath: 'last', daemon_pipers: 'last', other_gods: 'last',
-  umr_at_tawil: 'last', nyarlathotep: 'last', azathoth: 'last',
+  dr_munoz: 'first', charles_le_sorcier: 'first', the_outsider: 'first', brown_jenkin: 'first', ephraim_waite: 'first', colour_out_of_space: 'first', keziah_mason: 'first', the_hound: 'first', the_unnamable: 'first', black_man: 'first', haunter_of_the_dark: 'first', terrible_old_man: 'first', medusa_gorgon: 'first',
+  edward_hutchinson: 'middle', simon_orne: 'middle', lilith: 'middle', shunned_house_entity: 'middle', joseph_curwen: 'middle', wilbur_whateley: 'middle', dunwich_horror: 'middle', whisperer: 'middle', martins_beach_horror: 'middle', mother_hydra: 'middle', father_dagon: 'middle', hypnos: 'middle', colossus_pyramids: 'middle', high_priest: 'middle', shoggoth: 'middle', flying_polyp: 'middle',
+  yeb: 'deep', yig: 'deep', tsathoggua: 'deep', nug: 'deep', bokrug: 'deep', great_ones: 'deep', rhan_tegoth: 'deep', cthulhu: 'deep', ghatanothoa: 'deep', hastur: 'deep',
+  zkauba: 'last', zann_window_thing: 'last', daemon_pipers: 'last', nyarlathotep: 'last', other_gods: 'last', ancient_ones: 'last', umr_at_tawil: 'last', yog_sothoth: 'last', shub_niggurath: 'last', azathoth: 'last',
 };
 
 /** The band of a horror by its roster id, if it fights by a script. */

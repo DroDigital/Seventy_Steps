@@ -60,16 +60,8 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
   nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
   shub_niggurath: { seconds: [35, 250] },
   yog_sothoth: { seconds: [35, 400], lives: [0.45, 2.5] },
-  umr_at_tawil: { lives: [0.15, 1.5] }, // (2026-11-01: 0.23 lives against 0.25, after the barrage's longer opening)
+  umr_at_tawil: { lives: [0.25, 1.5] },
   colour_out_of_space: { seconds: [14, 135] },
-  // (2026-11-01: with the horrors' health back to its earlier values, these six cost the bot a little less than their tier's floor at their standing: 0.18, 0.15, 0.13, 0.11 and 0.14 lives against 0.2, and the great fight 0.36 against 0.45; the floors sit under what the bot measures)
-  black_man: { lives: [0.1, 1.2] },
-  martins_beach_horror: { lives: [0.1, 1.2] },
-  high_priest: { lives: [0.1, 1.2] },
-  zann_window_thing: { lives: [0.1, 1.2] },
-  ancient_ones: { lives: [0.1, 1.2] },
-  hastur: { lives: [0.3, 1.5] },
-  hypnos: { lives: [0.1, 1.2] }, // (2026-11-01: the barrage's longer opening makes it cost a little less: 0.16 lives against 0.2)
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**

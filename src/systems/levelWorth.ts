@@ -21,4 +21,7 @@ export const staminaAt = (endurance: number): number => Math.round(PLAYER.stamin
 export const staminaRegen = (endurance: number): number => STAMINA.regen + levelWorth(endurance) * (LEVELS.endurance.regen ?? 0);
 
 /** The weight their blows and shots have at `might` levels: 1 with none. */
-export const mightAt = (might: number): number => 1 + levelWorth(might) * (LEVELS.might.damage ?? 0);
+export const mightAt = (might: number): number => {
+  const m = levelWorth(might), { damage = 0, knee = Infinity, past = damage } = LEVELS.might;
+  return 1 + Math.min(m, knee) * damage + Math.max(0, m - knee) * past; // (2026-11-01: half a level's worth past the knee)
+};
