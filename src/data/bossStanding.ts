@@ -1,8 +1,8 @@
 /**
  * What a person has when they meet each horror (round 68; written by `BALANCE_WRITE=1 npm run audit`, tests/balance.test.ts, from the
- * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels. The
- * horror is made to be met there. Past it, the more the investigator's health and blows have grown, the more the horror's
- * blows and health grow to meet them (systems/bossScaling.ts `overmatch`), so that one that has farmed levels still has a fight to fight.
+ * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels.
+ * Past the expected Vigour, a horror's blows grow with the investigator's health (systems/bossScaling.ts `overmatch`).
+ * Boss health stays as authored.
  */
 export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number]>> = {
   dr_munoz: [1, 1],

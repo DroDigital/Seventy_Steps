@@ -1,23 +1,14 @@
 /**
- * What levels are worth (round 71, Souls-style soft caps): the first levels of an attribute count whole, and past each of `SOFT_CAP`'s marks a
- * level counts for less, so that the health, stamina, recovery and blows the last levels buy are a fraction of what the first did. Everything the
- * levels give is read through here: the investigator's own (levels.ts) and what the horrors grow to meet (bossScaling.ts). Pure: no Three.js.
+ * The full value of purchased levels, shared by the investigator's stats and boss scaling.
+ * Pure: no Three.js.
  */
 
-import { LEVELS, PLAYER, SOFT_CAP, STAMINA, type LevelId } from '../data/tuning';
+import { LEVELS, PLAYER, STAMINA, type LevelId } from '../data/tuning';
 
-/** The marks the worth of a level changes at: from `after` levels on, each further one counts for `worth`. */
-const STEPS: readonly { after: number; worth: number }[] = [{ after: 0, worth: 1 }, ...SOFT_CAP];
+/** Every purchased level counts in full; negative input cannot subtract from a base stat. */
+export const levelWorth = (levels: number): number => Math.max(0, levels);
 
-/** `levels` of one attribute, counted in whole levels: as many as there are up to the first mark, a fraction of each beyond. Continuous and never falling. */
-export function levelWorth(levels: number): number {
-  return STEPS.reduce((sum, step, i) => sum + Math.max(0, Math.min(levels, STEPS[i + 1]?.after ?? Infinity) - step.after) * step.worth, 0);
-}
-
-/** What the next level is worth once `levels` of the attribute are bought: 1 before the first mark. */
-export const nextWorth = (levels: number): number => levelWorth(levels + 1) - levelWorth(levels);
-
-/** The levels bought in a record of them, as they count: each attribute's by its worth (what the horrors grow to meet; bossScaling.ts). */
+/** The levels bought in a record of them (used for first-journey boss damage; bossScaling.ts). */
 export const levelsWorth = (levels: Partial<Record<LevelId, number>>): number => (Object.keys(LEVELS) as LevelId[]).reduce((n, id) => n + levelWorth(levels[id] ?? 0), 0);
 
 /** The investigator's most health at `vigour` levels. */

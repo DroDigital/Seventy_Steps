@@ -59,13 +59,29 @@ export function noteAchievements(store: SaveStore | null, ids: readonly string[]
   return keep(store, r);
 }
 
-/** Keeps the strength to carry into the next journey, for the reload that begins it. */
-export function storeCarry(store: SaveStore | null, carry: Carry): void {
+/** Removes a pending carry, including one from an interrupted transition. */
+export function clearCarry(store: SaveStore | null): boolean {
+  if (!store) return true;
   try {
-    store?.setItem(CARRY_KEY, JSON.stringify(carry));
+    store.removeItem(CARRY_KEY);
+    return store.getItem(CARRY_KEY) === null;
   } catch {
-    // Storage refused: the new dream begins as a first journey.
+    return false;
   }
+}
+
+/** Keeps the strength for the next journey and verifies it can be read back before replacing a save. */
+export function storeCarry(store: SaveStore | null, carry: Carry): boolean {
+  if (!store) return false;
+  try {
+    const data = JSON.stringify(carry);
+    store.setItem(CARRY_KEY, data);
+    if (store.getItem(CARRY_KEY) === data) return true;
+  } catch {
+    // A refused or unreadable write cannot safely carry the investigator forward.
+  }
+  clearCarry(store);
+  return false;
 }
 
 /** The strength carried into this new journey, taken once (null when none waits). */

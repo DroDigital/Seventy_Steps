@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { BOSS_STANDING } from '../src/data/bossStanding';
 import { getEntity } from '../src/data/registry';
 import { LEVELS } from '../src/data/tuning';
-import { bossDamageScale, bossHealthScale, overmatch } from '../src/systems/bossScaling';
+import { bossDamageScale, overmatch } from '../src/systems/bossScaling';
 import { toCombatant } from '../src/systems/creatures';
 import { healthAt, levelsWorth, mightAt } from '../src/systems/levelWorth';
 import { standings } from './balanceModel';
@@ -10,13 +10,12 @@ import { standings } from './balanceModel';
 type Build = { vigour: number; endurance: number; might: number };
 
 const damageAt = (id: string, levels: Build): number => bossDamageScale(levelsWorth(levels), overmatch(levels, id).damage);
-const bossHealthAt = (id: string, levels: Build): number => getEntity(id)!.stats.hp * bossHealthScale(levelsWorth(levels), 0, overmatch(levels, id).health);
 const survivalAt = (id: string, levels: Build): number => healthAt(levels.vigour) / damageAt(id, levels);
-const damageDealtAt = (id: string, levels: Build): number => mightAt(levels.might) / bossHealthAt(id, levels);
+const damageDealtAt = (id: string, levels: Build): number => mightAt(levels.might) / getEntity(id)!.stats.hp;
 const heaviestAt = (id: string): number => Math.max(0, ...Object.values(toCombatant(getEntity(id)!).moves).flatMap((m) => [m.hit?.damage, m.shot?.damage, m.volley?.damage, m.volley?.pool?.damage, m.pool?.damage, m.marks?.damage, m.marks?.leaves?.damage, m.wave?.damage, m.cloud?.damage, m.sweep?.damage, m.barrage?.damage].filter((damage): damage is number => damage !== undefined)));
 
 describe('progression equity against bosses', () => {
-  it('every Vigour purchase improves survival, including focused builds and the final soft levels', () => {
+  it('every Vigour purchase improves survival, including focused builds and the final levels', () => {
     const bad: string[] = [];
     // Other attributes contribute only to the shared linear scaling. Checking every Might
     // level and both Endurance extrema covers the full range without spawning fight bots.
@@ -34,7 +33,7 @@ describe('progression equity against bosses', () => {
     expect(bad).toEqual([]);
   });
 
-  it('every Might purchase outgains boss health scaling, allowing at most one health point of rounding', () => {
+  it('every Might purchase improves damage against each boss’s fixed health', () => {
     const bad: string[] = [];
     for (const id of Object.keys(BOSS_STANDING)) {
       for (let might = 0; might < LEVELS.might.max; might++) {
@@ -43,11 +42,6 @@ describe('progression equity against bosses', () => {
             const before = { vigour, endurance, might };
             const after = { ...before, might: might + 1 };
             if (damageDealtAt(id, after) <= damageDealtAt(id, before)) bad.push(`${id}: ${vigour}/${endurance}/${might} + Might`);
-            // Integer boss maxima can hide a sub-point gain on an early boss. They
-            // may consume at most one extra HP, not reverse the scaling itself.
-            const roundedAfter = mightAt(after.might) / Math.round(bossHealthAt(id, after));
-            const roundingFloor = mightAt(before.might) / (Math.round(bossHealthAt(id, before)) + 1);
-            if (roundedAfter < roundingFloor) bad.push(`${id}: ${vigour}/${endurance}/${might} + Might exceeds rounding allowance`);
           }
         }
       }
