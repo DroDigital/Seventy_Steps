@@ -19,7 +19,7 @@ import { createVarier } from './vary';
 
 /** What the scheduler is told each time it looks. */
 export interface Scene {
-  region: string | null;
+  region: string | null; // the realm, or a place's own outdoor soundscape
   phase: number;
   outdoors: boolean; // in the open world and under the sky
   held: boolean; // a fight, a cutscene, a pause
