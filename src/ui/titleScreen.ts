@@ -113,7 +113,7 @@ export function showTitle(o: TitleOptions): void {
         button(menu, t('title.continue'), () => begin(false));
         el(menu, 'div', here.line, 'margin:-2px auto 8px;max-width:420px;font-size:12px;line-height:1.35;opacity:.5;letter-spacing:.5px;text-align:center'); // where that dream was left (round 38)
       }
-      button(menu, t('title.new'), () => screen.show(slotPage('new')));
+      button(menu, t('title.new'), () => screen.show(slotPage('new'))).dataset.titleNewGame = '';
       if (lines.some((l) => l?.loads)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
       gap();
       button(menu, t('menu.settings'), () => screen.show(settingsHere()));

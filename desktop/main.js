@@ -246,19 +246,27 @@ ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) a
 function smoke(win) {
   const needs = (process.env.SMOKE_REQUIRE ?? '').split(',').map((s) => s.trim()).filter(Boolean);
   const began = Date.now();
+  let calibrationKept = false;
   const timer = setInterval(async () => {
     let page = null;
     try {
       page = await win.webContents.executeJavaScript(`(() => {
-        const button = [...document.querySelectorAll('button')].find((b) => /new game/i.test(b.textContent));
+        const visible = (el) => !!el?.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+        // The first launch presents brightness calibration before the title menu. Keep its default,
+        // as a player would, then still require the actual New Game button and an unveiled screen.
+        const keep = document.querySelector('[data-menu]:not([data-ghost]) button[data-calibration-keep]');
+        const calibrationKept = visible(keep);
+        if (calibrationKept) keep.click();
+        const button = document.querySelector('[data-menu]:not([data-ghost]) button[data-title-new-game]');
         const veil = document.querySelector('canvas[data-veil]');
         const clear = veil && (getComputedStyle(veil).display === 'none' || veil.getContext('2d').getImageData(veil.width / 2, veil.height / 2, 1, 1).data[3] < 255);
-        return { title: !!button?.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !!clear, bridge: typeof window.desktop?.quit === 'function' };
+        return { title: visible(button) && !!clear, bridge: typeof window.desktop?.quit === 'function', calibrationKept };
       })()`);
     } catch {
       // the page is still loading
     }
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
+    calibrationKept ||= !!page?.calibrationKept;
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, calibrationKept, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;

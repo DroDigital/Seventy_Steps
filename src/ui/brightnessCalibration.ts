@@ -79,7 +79,7 @@ export function brightnessPage(s: Settings, change: (id: SettingId, v: number) =
       slider(panel, t('set.brightness'), SETTINGS.brightness, s.brightness, (v) => (change('brightness', v), paint(v)), pct, t('set.hint.brightness'));
       const row = el(panel, 'div', '', 'display:flex;justify-content:center;gap:12px;margin-top:8px');
       button(row, t('cal.reset'), () => (change('brightness', SETTINGS.brightness[3]), page.redraw?.())).classList.add('tag');
-      button(row, t('cal.keep'), keep);
+      button(row, t('cal.keep'), keep).dataset.calibrationKeep = ''; // the first-launch smoke check keeps the default and continues
       footer(panel, t('set.footer'), keep);
     },
   };

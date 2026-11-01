@@ -2,7 +2,7 @@ name: Release builds
 
 # The game packed for Steam, on a machine of each platform (the controllers' SDL library is downloaded for the machine it is installed on:
 # docs/STEAM.md), and started once (`--smoke-test`: it must reach its title, find the Steam binding and start the controllers' worker).
-# Runs when the shell or the packaging changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
+# Runs when the shell, packaging, or first-launch title flow changes, by hand, and on a tag (v*). The depots are the artifacts; uploading them is docs/RELEASE.md.
 # By hand with "itch" ticked it packs for itch.io instead (Steam off in the build) and pushes each platform with butler: it needs the
 # BUTLER_API_KEY secret (without it, only what would be sent is shown); with "demo" ticked too it packs the demo and pushes it to the
 # windows-demo, osx-demo and linux-demo channels (round 56: tools/itch_push.mjs). A Mac signed with a Developer ID, and notarised, needs the
@@ -15,6 +15,10 @@ on:
       - 'packaging/**'
       - 'package.json'
       - 'package-lock.json'
+      - 'src/ui/titleFlow.ts'
+      - 'src/ui/titleScreen.ts'
+      - 'src/ui/brightnessCalibration.ts'
+      - 'src/ui/settings.ts'
       - 'tools/package_mac.mjs'
       - 'tools/smoke_packaged.mjs'
       - 'tools/steam_upload.mjs'
