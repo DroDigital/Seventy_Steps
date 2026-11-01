@@ -3,6 +3,7 @@ import { DEFAULT_DIFFICULTY, DIFFICULTIES, DIFFICULTY_IDS, type DifficultyId } f
 import { strike, type Blow } from '../src/systems/combat';
 import { applyCarry, carryOf, parseCarry } from '../src/systems/cycles';
 import { createWorldGame } from '../src/systems/game';
+import { foeRung } from '../src/systems/ngPlus';
 import { parseSave, snapshot } from '../src/systems/save';
 import { scriptedGame } from './helpers';
 
@@ -31,7 +32,8 @@ describe('the difficulty chosen when a dream begins (round 38)', () => {
   it('is laid over the journey’s own weight', () => {
     const plain = dealt('deep', 2, 'foe', 20); // (a lighter blow: past BOSS.blowMost of their health the blow is held to it, tests/oneHit.test.ts)
     expect(plain).toBeGreaterThan(20);
-    expect(dealt('nightmare', 2, 'foe', 20)).toBe(Math.round(plain * 1.5));
+    // The difficulty multiplies the unrounded journey damage; rounding an intermediate result can lose a point.
+    expect(dealt('nightmare', 2, 'foe', 20)).toBe(Math.round(20 * foeRung(2, 'late').damage * DIFFICULTIES.nightmare.foe));
   });
 
   it('begins at the one a new dream is given, and the default for a world made without one', () => {

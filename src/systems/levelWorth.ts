@@ -8,7 +8,7 @@ import { LEVELS, PLAYER, STAMINA, type LevelId } from '../data/tuning';
 /** Every purchased level counts in full; negative input cannot subtract from a base stat. */
 export const levelWorth = (levels: number): number => Math.max(0, levels);
 
-/** The levels bought in a record of them (what the horrors grow to meet; bossScaling.ts). */
+/** The levels bought in a record of them (used for first-journey boss damage; bossScaling.ts). */
 export const levelsWorth = (levels: Partial<Record<LevelId, number>>): number => (Object.keys(LEVELS) as LevelId[]).reduce((n, id) => n + levelWorth(levels[id] ?? 0), 0);
 
 /** The investigator's most health at `vigour` levels. */

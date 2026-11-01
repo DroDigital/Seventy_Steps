@@ -79,7 +79,8 @@ describe('ending choices', () => {
     expect(ui.buttons.map(b => b.textContent)).toEqual(['New Game+ · Journey 2', 'Continue this journey', 'New Game · Fresh start', 'Save the ending card']);
     click('New Game+ · Journey 2');
     expect(textOf(ui.panel)).toContain('levels, weapons and upgrades');
-    expect(textOf(ui.panel)).toContain('current save slot and its backup are cleared');
+    expect(textOf(ui.panel)).toContain('current save slot and its backups are cleared');
+    expect(textOf(ui.panel)).toContain('boss health stays fixed');
     expect(s.store.getItem(CARRY_KEY)).toBeNull();
     expect(s.session.getItem(NEW_GAME_FLAG)).toBeNull();
     expect(s.location.href).toBe('/ending');
@@ -111,7 +112,7 @@ describe('ending choices', () => {
     const s = setup();
     expect(storeCarry(s.store, carryOf(s.game))).toBe(true);
     click('New Game · Fresh start');
-    expect(textOf(ui.panel)).toContain('current save slot and its backup will be cleared');
+    expect(textOf(ui.panel)).toContain('current save slot and its backups will be cleared');
     click('Cancel');
     expect(s.store.getItem(CARRY_KEY)).not.toBeNull();
     click('New Game · Fresh start');
