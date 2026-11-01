@@ -23,6 +23,7 @@ import { buyUpgrade, upgradeName } from '../systems/insight';
 import { closedBy, heldOpen, listed } from '../systems/veil';
 import { currentLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
+import { boon } from '../systems/relicLoadout';
 import { levelGain } from './levelGains';
 import { worldLayout, type SignPlace } from '../world/placements';
 import { button, createScreen, el, footer, heading, option, tabs, title, type Page } from './menuKit';
@@ -77,7 +78,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     for (const id of LEVEL_IDS) {
       const [bought, full] = [g.player.levels[id], g.player.levels[id] >= LEVELS[id].max];
       const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
-      if (!full) chips(b, [{ text: levelGain(id, bought), tone: 'good' }]);
+      if (!full) chips(b, [{ text: levelGain(id, bought, boon(g, 'health'), boon(g, 'stamina')), tone: 'good' }]);
       price(b, full ? 'MAX' : `${nextLevelCost(g)} Echoes`, full ? 'max' : canLevel(g, id) ? 'ok' : 'no');
     }
     heading(panel, 'MIND').style.margin = '12px 0 4px';

@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **New health and stamina relics.** Horrors can leave four more relics: the Heartwood Reliquary trades stamina for health, the Lung of the Drowned does the reverse, the Knot of the Dreamer improves stamina recovery at the cost of Echoes, and Blood in Amber grants health and recovery at the cost of damage. They use the existing two relic slots and are found as other relics are. Switching relics preserves the share of health and stamina remaining.
 - **New Game+ grows by region.** Early lands gain more than distant realms, with scaling and Echo rewards capped at NG+7. Boss health stays fixed; bosses and their servants gain damage together, while levels bought on later journeys improve the investigator. Difficulty choices and older saves are retained.
 - **New Game+ is clear on the ending card.** Start the next journey with your character, continue the current one, start fresh, or save the card. Each choice has its own confirmation, including what a new journey carries and resets.
 - **Boss health no longer scales.** Each boss keeps the health authored for its current form at every player level and in New Game Plus. Boss damage can still scale, and ordinary enemies still gain health in later journeys.

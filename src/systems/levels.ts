@@ -9,6 +9,7 @@ import type { Entity } from '../core/ecs';
 import { LAUDANUM, LEVEL_COST, LEVELS, UPGRADES, type LevelId } from '../data/tuning';
 import type { Game } from './components';
 import { healthAt, mightAt, staminaAt, staminaRegen } from './levelWorth';
+import { boon } from './relicLoadout';
 
 export { staminaRegen };
 
@@ -32,15 +33,22 @@ export const canLevel = (g: Pick<Game, 'player'>, id: LevelId): boolean => g.pla
  * Sets maximum health, stamina and recovery from the full value of the purchased levels.
  * A rise is felt at once; existing bosses keep their health and wounds.
  */
-export function applyLevels(g: Game): void {
+function applyVitals(g: Game, preserveFraction: boolean): void {
   const h = g.ecs.c.health.get(g.player.id)!;
   const s = g.ecs.c.stamina.get(g.player.id)!;
-  const hp = healthAt(g.player.levels.vigour);
-  const stamina = staminaAt(g.player.levels.endurance);
-  [h.hp, h.max] = [Math.max(1, h.hp + hp - h.max), hp];
-  [s.value, s.max] = [s.value < 0 ? s.value : Math.max(0, s.value + stamina - s.max), stamina];
-  s.regen = staminaRegen(g.player.levels.endurance);
+  const hp = Math.round(healthAt(g.player.levels.vigour) * boon(g, 'health'));
+  const stamina = Math.round(staminaAt(g.player.levels.endurance) * boon(g, 'stamina'));
+  const nextHp = preserveFraction ? (h.hp <= 0 ? h.hp : h.hp * hp / h.max) : Math.max(1, h.hp + hp - h.max);
+  const nextStamina = s.value < 0 ? s.value : preserveFraction ? s.value * stamina / s.max : Math.max(0, s.value + stamina - s.max);
+  [h.hp, h.max] = [nextHp, hp];
+  [s.value, s.max] = [nextStamina, stamina];
+  s.regen = staminaRegen(g.player.levels.endurance) * boon(g, 'recovery');
 }
+
+export function applyLevels(g: Game): void { applyVitals(g, false); }
+
+/** Changing relics preserves wound and stamina fractions, and never clears a stamina debt or revives a corpse. */
+export function refreshRelicVitals(g: Game): void { applyVitals(g, true); }
 
 /** Spends Echoes on one level of `id`; false when short of Echoes or at the most levels. */
 export function buyLevel(g: Game, id: LevelId): boolean {
