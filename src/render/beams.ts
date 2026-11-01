@@ -89,6 +89,9 @@ void main() {
     rag = 0.3 * sin(along * 3.1 - uTime * 33.0) + 0.2 * sin(along * 7.7 + uTime * 47.0);
   } else if (pat > 6.5 && pat < 7.5) { // frost: dashes of ice
     beads = step(0.3, fract(along * 0.7 - uTime * 1.5)) * (0.7 + 0.3 * sin(along * 30.0));
+  } else if (pat > 8.5) { // fracture: broken strands shift in and out of registration
+    x += 0.16 * sin(floor(along * 1.8) * 2.7 + floor(uTime * 3.0));
+    beads = 0.45 + 0.55 * step(0.32, fract(along * 0.75 - uTime * 0.8 + abs(x) * 0.65));
   }
   float d = clamp(abs(x) + rag * abs(x), 0.0, 1.0);
   float run = 0.5 + 0.5 * sin(along * 1.1 - uTime * 16.0); // energy running out from the source
@@ -104,7 +107,8 @@ void main() {
     vec3 band = 0.5 + 0.5 * vec3(sin(k), sin(k + 2.1), sin(k + 4.2));
     c = mix(mix(tint, band, 0.55), vCore, core * 0.7);
   } else if (pat > 5.5 && pat < 6.5) c = mix(tint * vec3(1.0, 0.62, 0.38), vCore, core); // flame: red at its edge
-  else if (pat > 7.5) c = mix(tint, vec3(0.02, 0.01, 0.04), core * 0.9); // void: a dark core
+  else if (pat > 7.5 && pat < 8.5) c = mix(tint, vec3(0.02, 0.01, 0.04), core * 0.9); // void: a dark core
+  else if (pat > 8.5) c = mix(tint * vec3(0.85, 0.55, 1.0), vCore, core * 0.8);
   gl_FragColor = vec4(mix(c, uFogColor, vFog * uFogAmount * vStyle.x), 1.0);
 }
 `;
@@ -187,10 +191,12 @@ export function createBeams(scene: THREE.Scene, g: Game): Beams {
       for (const [id, a] of g.ecs.c.actor) {
         const sw = moveDef(a)?.sweep;
         if (!sw || a.frame < sw.window[0] || a.frame >= sw.window[1] || isAbsent(g, id)) continue;
-        const { from, to } = beamLine(g, id, sw, a.frame + alpha);
         const flicker = 0.85 + 0.15 * Math.sin(time * 70 + id);
         const into = Math.min(1, (a.frame + alpha - sw.window[0]) / 6); // it opens over a tenth of a second, from a thread to its width
-        beam(from, to, seen(from, to, (1.05 * sw.width + 0.6) * (0.35 + 0.65 * into)), attackLook(g, id), flicker, 0.4, 0.12, patternOf(id));
+        for (let arm = 0; arm < (sw.arms ?? 1); arm++) {
+          const { from, to } = beamLine(g, id, sw, a.frame + alpha, arm);
+          beam(from, to, seen(from, to, (1.05 * sw.width + 0.6) * (0.35 + 0.65 * into)), attackLook(g, id), flicker, 0.4, 0.12, patternOf(id));
+        }
       }
       for (let i = flashes.length - 1; i >= 0; i--) {
         const f = flashes[i];

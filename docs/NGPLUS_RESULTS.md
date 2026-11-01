@@ -10,7 +10,7 @@ Failures remain visible. A fixed bot is a regression benchmark, not a success-ra
 | NG+2, reference | 59/98 | 90 | 3 |
 | NG+3, reference | 54/98 | 88 | 3 |
 | NG+7, reference | 51/98 | 87 | 3 |
-| NG+7, cap | 74/98 | 92 | 2 |
+| NG+7, cap | 73/98 | 90 | 2 |
 
 Cells: wins out of two; median successful seconds (— if neither won).
 
@@ -57,7 +57,7 @@ Cells: wins out of two; median successful seconds (— if neither won).
 | Nug | 2/2; 147 | 2/2; 145 | 1/2; 125 | 2/2; 136 | 2/2; 102 |
 | Yeb | 2/2; 121 | 2/2; 132 | 2/2; 132 | 2/2; 125 | 1/2; 85 |
 | The Great Ones | 1/2; 153 | 1/2; 152 | 1/2; 152 | 0/2; — | 2/2; 103 |
-| Azathoth | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 1/2; 133 |
+| Azathoth | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | The Daemon Pipers | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |
 | The Other Gods | 2/2; 174 | 0/2; — | 1/2; 121 | 1/2; 165 | 2/2; 103 |
 | Yog-Sothoth | 0/2; — | 0/2; — | 0/2; — | 0/2; — | 0/2; — |

@@ -5,11 +5,12 @@
  * tongue, dashes of ice, a dark core with a bright rim. Data only: no Three.js.
  */
 
-export const BEAM_PATTERNS = ['plain', 'braid', 'beads', 'arc', 'wave', 'prism', 'flame', 'frost', 'void'] as const;
+export const BEAM_PATTERNS = ['plain', 'braid', 'beads', 'arc', 'wave', 'prism', 'flame', 'frost', 'void', 'fracture'] as const;
 export type BeamPattern = (typeof BEAM_PATTERNS)[number];
 
 /** By roster id (a beam, a sweeping beam). A creature not named keeps the plain ribbon. */
 export const BEAM_STYLES: Readonly<Record<string, BeamPattern>> = {
+  azathoth: 'fracture', // the blind god's rays break into shifting, dithered facets
   colour_out_of_space: 'prism', // the colour that was not of this earth, in its bands
   algol_light_being: 'prism',
   nodens: 'prism',

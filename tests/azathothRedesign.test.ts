@@ -134,7 +134,7 @@ describe('the game renderer using the redesigned Azathoth', () => {
       const { g, views } = viewsOver();
       const boss = spawnCreature(g, 'azathoth', { x: 0, z: 0, yaw: 0 })!;
       const actor = g.ecs.c.actor.get(boss)!;
-      actor.move = 'roar'; actor.frame = 10;
+      actor.move = 'blind_rays'; actor.frame = 10;
       views.update(1, 5, camera(x, z));
       expect(views.debugFrames().find(f => f.key === 'azathoth')).toMatchObject({ direction, state: 'attack', mirror: false, source: expect.stringMatching(/azathoth\/movement\/front\/attack_\d\.png$/) });
     },

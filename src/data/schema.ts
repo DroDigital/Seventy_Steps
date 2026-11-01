@@ -72,6 +72,10 @@ export const ATTACK_IDS = [
   'thunderfall',
   // 2026-10-29: Azathoth's own. It is blind, so none is aimed: each is a rhythm laid over the court, read by where it falls and when
   'dirge',
+  'blind_rays',
+  'chaos_rays',
+  'rift_tentacles',
+  'rift_cascade',
   'dirge_2',
   'dirge_3',
   'drumbeat',

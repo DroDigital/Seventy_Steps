@@ -13,6 +13,22 @@ export interface ArenaCircle {
   radius: number;
 }
 
+export interface ArenaTile {
+  x: number;
+  z: number;
+  strain: number; // 0..1: increasingly visible damage
+  seed: number;
+  warning: number; // frames of tremor before collapse
+  collapsed: boolean;
+  protected: boolean;
+}
+
+export interface ArenaFloor {
+  tiles: ArenaTile[];
+  size: number;
+  lastTremor: number;
+}
+
 /** A boss fight (spec §3E): the script its boss follows, the phase it has reached and the arena it holds. */
 export interface Fight {
   id: string; // roster id; a signature mechanic is keyed by it
@@ -30,6 +46,7 @@ export interface Fight {
   form: string; // the model its brain was built for: a variant swap rebuilds it
   stoopUntil: number; // a colossus is stooped, its head within reach, until this frame (hurt.ts; round 24)
   interruptedAt?: number; // the frame a shot last broke its wind-up (round 60: BOSS.rearm)
+  arenaFloor?: ArenaFloor; // Azathoth's transient, encounter-owned floor
 }
 
 /** What a boss's arena change puts up (spec §3E): its colliders stand in the world while it does. */

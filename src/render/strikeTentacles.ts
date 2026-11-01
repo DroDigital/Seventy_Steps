@@ -1,6 +1,6 @@
 /**
  * The tentacles that rise from marked ground (round 70; the attack `tentacle_rise`): where a mark with the look `tentacle` bursts, one
- * comes up out of the ground in a fifth of a second, writhes there a moment with its tip curling, and sinks away. Drawn as the deep's
+ * comes up in a fifth of a second, writhes there a moment with its tip curling, and sinks away. Azathoth's emerge through a suspended rift. Drawn as the deep's
  * far tentacles are (render/tentacleShape.ts: the same centreline and tube), in the horror's own dark and light. Render only.
  */
 
@@ -59,7 +59,7 @@ export function createStrikeTentacles(scene: THREE.Scene, g: Game): StrikeTentac
   };
 
   g.events.on('Erupted', ({ at, radius: r, by, look }) => {
-    if (look !== 'tentacle') return;
+    if (look !== 'tentacle' && look !== 'rift') return;
     const mesh = meshFor();
     if (!mesh) return;
     const l = attackLook(g, by);
@@ -67,8 +67,8 @@ export function createStrikeTentacles(scene: THREE.Scene, g: Game): StrikeTentac
     const seed = Math.random() * 10;
     mesh.visible = true;
     live.push({
-      x: at.x, y: at.y, z: at.z,
-      yaw: (me ? Math.atan2(me.x - at.x, me.z - at.z) : 0) + (Math.random() - 0.5) * 1.6, // it leans toward where the investigator stood, not exactly
+      x: at.x, y: at.y + (look === 'rift' ? 1.1 : 0), z: at.z,
+      yaw: look === 'rift' ? Math.random() * Math.PI * 2 : (me ? Math.atan2(me.x - at.x, me.z - at.z) : 0) + (Math.random() - 0.5) * 1.6,
       born: NaN,
       length: 3.2 + r * 2.6,
       thick: 0.34 + r * 0.26,

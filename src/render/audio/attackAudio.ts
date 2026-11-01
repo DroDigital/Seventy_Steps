@@ -38,6 +38,9 @@ export function createAttackAudio(g: Game, sampleAt: Sample): void {
   g.events.on('Shot', ({ shooter, to }) => {
     if (shooter !== g.player.id) play(shooter, 'land', to, ATTACK_MIX.landed, RANGE.bolt);
   });
+  g.events.on('FloorTremor', ({ at, strength }) => {
+    sampleAt('rumble', at, { gain: Math.min(0.75, strength * 2.5), pitch: 0.7, range: 18 });
+  });
   g.events.on('Erupted', ({ at, radius, by, look }) => {
     play(by, 'burst', at, ATTACK_MIX.burst * (look ? 0.7 : 1), RANGE.burst);
     sampleAt('boom', at, { gain: 0.35 + 0.08 * radius, pitch: 0.75 + 0.1 * Math.random(), range: RANGE.burst });

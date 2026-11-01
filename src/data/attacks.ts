@@ -34,7 +34,7 @@ export interface AttackDef {
   marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; rings?: number; turns?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
   wave?: { speed: number; width: number; reach: number; lane?: { half: number; push: number } }; // the quake (see WaveDef)
   cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind' | 'blind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
-  sweep?: { arc: readonly [number, number]; length: number; width: number }; // the sweeping beam, over the active frames
+  sweep?: { arc: readonly [number, number]; length: number; width: number; arms?: number; blind?: boolean }; // a sweeping beam; a blind sweep does not track its target
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
   follow?: AttackId; // runs straight on into this attack as it ends (a chain)
@@ -91,6 +91,10 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   // is laid on the investigator: each is a rhythm over the whole court (the piping, the drumming, the dance of the thirteen, the seething of the chaos, the centre drawing all in),
   // read by where it will fall and when. Their numbers are for a body thirty metres tall (a root of 15.8 scales them: its court is 44 m across its heart).
   dirge: { kind: 'area', windup: 48, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 30], wave: { speed: 3.9, width: 0.5, reach: 7.6 }, follow: 'dirge_2' }, // the piping swells: a ring of sound runs out of the body...
+  blind_rays: { kind: 'ranged', windup: 96, active: 100, recovery: 80, power: 1.85, poise: 1.6, range: [0, 30], sweep: { arc: [0, 72], length: 9, width: 0.18, arms: 4, blind: true }, follow: 'dirge' },
+  chaos_rays: { kind: 'ranged', windup: 100, active: 125, recovery: 85, power: 1.9, poise: 1.8, range: [0, 30], sweep: { arc: [60, -35], length: 9, width: 0.16, arms: 3, blind: true }, follow: 'drumbeat' },
+  rift_tentacles: { kind: 'area', windup: 78, active: 1, recovery: 95, power: 1.95, poise: 1.8, range: [0, 30], marks: { count: 10, rings: 1, ring: [0.4, 0.4], delay: 80, stagger: 0, radius: 0.65, pattern: 'beats', look: 'rift' }, follow: 'dance' },
+  rift_cascade: { kind: 'area', windup: 84, active: 1, recovery: 160, power: 1.85, poise: 1.8, range: [0, 30], marks: { count: 7, ring: [0.4, 6], delay: 80, stagger: 12, radius: 0.65, pattern: 'scatter', look: 'rift' }, follow: 'dirge' },
   dirge_2: { kind: 'area', windup: 14, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 4.6, width: 0.5, reach: 7.6 }, follow: 'dirge_3' }, // ...a quicker one a beat behind it...
   dirge_3: { kind: 'area', windup: 14, active: 1, recovery: 36, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 5.6, width: 0.5, reach: 7.6 } }, // ...and the quickest: three notes, a roll or a guard for each, and the stamina of three rolls to find
   drumbeat: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0.85, poise: 1.2, range: [0, 30], marks: { count: 5, rings: 2, ring: [0.8, 3.6], delay: 46, stagger: 22, radius: 1.06, pattern: 'beats' } }, // the drumming: a ring of the ground boils about the body, and the next ring out a beat after, its spots between the first's (out is not the way)
@@ -138,6 +142,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
     ? { window: [Math.max(0, a.windup - 6), a.windup + a.active] as const, distance: a.lunge * Math.sqrt(k), dir: 'facing' as const }
     : undefined;
   const move: MoveDef = { frames, track: { window: [0, Math.max(1, a.windup - 4)], rate: 3 }, motion };
+  if (a.sweep?.blind) delete move.track;
   if (a.sanity && stats.sanityDamage > 0) {
     const range = a.range[1] * k;
     move.sanity = { window: [a.windup, a.windup + a.active], amount: a.sanity * stats.sanityDamage, range, sight: a.effect === 'gaze' };
@@ -161,7 +166,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
     move.wave = { frame: a.windup, speed: a.wave.speed * w, width: a.wave.width * w, reach: a.wave.reach, damage, poise, lane: { half: a.wave.lane.half * w, push: a.wave.lane.push } };
   } else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
   else if (cloud) move.cloud = cloud;
-  else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise };
+  else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise, ...(a.sweep.arms && { arms: a.sweep.arms }) };
   else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
   else if (b) {
     const range = a.range[1] * k * 1.5;
