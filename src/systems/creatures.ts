@@ -25,7 +25,7 @@ import { addLayer } from './hiddenLayer';
 import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
-import { homeProfile } from './ngPlus';
+import { bossRung, homeProfile } from './ngPlus';
 
 /** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
 const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
@@ -161,7 +161,8 @@ export function spawnCreature(g: Game, id: string, at: Place, variant?: Variant,
   const inherited = owner === undefined ? undefined : g.ecs.c.journey.get(owner);
   const home = { profile: inherited?.profile ?? homeProfile(at, id, !!g.overworld, placedRegion), encounter: inherited?.encounter ?? (owner === undefined && def.bossScript ? id : undefined), servant: owner !== undefined, creature: id };
   const land = inherited?.encounter ? 1 : landOf(def, at);
-  if (foe && !def.bossScript) cd.hp = Math.round(cd.hp * foeHealth(g, home) * land);
+  if (foe && def.bossScript && owner === undefined) cd.hp = Math.round(cd.hp * bossRung(id, g.player.cycle, home.profile).health);
+  else if (foe && !def.bossScript) cd.hp = Math.round(cd.hp * foeHealth(g, home) * land);
   if (foe && g.player.cycle > 0) cd.bounty = Math.round(cd.bounty * foeBounty(g));
   const e = spawnCombatant(g, cd, at, foe ? 'enemy' : 'player');
   if (foe) g.ecs.c.journey.set(e, home);
@@ -187,7 +188,9 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   Object.assign(c.body.get(e)!, { radius: cd.radius, height: cd.height, reach: cd.reach, aimHeight: cd.aimHeight, assembly: cd.assembly });
   const h = c.health.get(e)!;
   const land = c.dread.get(e)?.land ?? landOf(def, c.transform.get(e)!.pos);
-  const hp = def.tier === 'ally' || def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g, c.journey.get(e)) * land);
+  const hp = def.tier === 'ally' ? cd.hp
+    : c.fight.has(e) ? Math.round(cd.hp * bossRung(home?.encounter ?? id, g.player.cycle, home?.profile).health)
+      : def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g, home) * land);
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
   const po = c.poise.get(e)!;
   [po.value, po.max] = [(po.value / po.max) * cd.poise, cd.poise];

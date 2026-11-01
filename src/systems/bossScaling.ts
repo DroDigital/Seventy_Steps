@@ -1,4 +1,4 @@
-/** Boss damage scaling. Boss health remains at the authored value for each form. */
+/** Boss damage scaling. Health instead depends only on the journey (ngPlus.ts). */
 import { BOSS_STANDING } from '../data/bossStanding';
 import { JOURNEY_REFERENCE, type JourneyProfile } from '../data/ngPlusTuning';
 import { BOSS_LEVEL_SCALING, BOSS_OVERMATCH } from '../data/tuning';

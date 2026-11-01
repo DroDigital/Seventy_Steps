@@ -3,6 +3,7 @@ import { JOURNEY_REFERENCE } from '../src/data/ngPlusTuning';
 import { CTHULHU, REALITY } from '../src/data/tuning';
 import { getEntity } from '../src/data/registry';
 import { strike } from '../src/systems/combat';
+import { spawnCreature } from '../src/systems/creatures';
 import { fightAction } from '../src/systems/fightActions';
 import { applyLevels } from '../src/systems/levels';
 import { lampsOf } from '../src/systems/reality';
@@ -10,17 +11,29 @@ import { bossGame, calm, engage } from './bossHelpers';
 import { place, steps } from './helpers';
 import { deathblow, record } from './worldHelpers';
 
+/** Spawn after choosing the journey, as in the actual world. */
+function journeyBoss(id: string, cycle: number) {
+  const b = bossGame(id);
+  const { g } = b;
+  const pos = g.ecs.c.transform.get(b.boss)!.pos;
+  const at = { x: pos.x, z: pos.z, yaw: 0 };
+  g.ecs.despawn(b.boss);
+  g.player.cycle = cycle;
+  const boss = spawnCreature(g, id, at)!;
+  return { g, boss, fight: g.ecs.c.fight.get(boss)! };
+}
+
 describe('special encounter objectives on every important journey', () => {
   for (const cycle of [0, 1, 2, 3, 7]) {
     it(`Cthulhu’s Alert finishes the encounter on NG+${cycle}`, () => {
-      const b = bossGame('cthulhu');
+      const b = journeyBoss('cthulhu', cycle);
       const { g, boss, fight } = b;
-      g.player.cycle = cycle;
       Object.assign(g.player.levels, JOURNEY_REFERENCE);
       applyLevels(g);
       engage(b);
       calm(b);
       const h = g.ecs.c.health.get(boss)!;
+      expect(h.max).toBe(Math.round(getEntity('cthulhu')!.stats.hp * (cycle ? 1.1 + 0.05 * cycle : 1)));
       h.hp = h.max * 0.32;
       steps(g, 1);
       const ship = fight.props.find((e) => g.ecs.c.prop.get(e)?.kind === 'ship')!;
@@ -36,16 +49,15 @@ describe('special encounter objectives on every important journey', () => {
       expect(h.hp).toBe(0);
     });
 
-    it(`Azathoth retains authored health and can be defeated normally on NG+${cycle}`, () => {
-      const b = bossGame('azathoth');
+    it(`Azathoth has journey-scaled health and can be defeated normally on NG+${cycle}`, () => {
+      const b = journeyBoss('azathoth', cycle);
       const { g, boss } = b;
-      g.player.cycle = cycle;
       applyLevels(g);
       engage(b);
       calm(b);
       const deaths = record(g, 'Died');
       const h = g.ecs.c.health.get(boss)!;
-      expect(h.max).toBe(getEntity('azathoth')!.stats.hp);
+      expect(h.max).toBe(Math.round(getEntity('azathoth')!.stats.hp * (cycle ? 1.1 + 0.05 * cycle : 1)));
       steps(g, 600);
       expect(h.hp).toBe(h.max); // the old survival timer must not return
       expect(strike(g, g.player.id, boss, deathblow)).toBe('kill');
@@ -53,11 +65,10 @@ describe('special encounter objectives on every important journey', () => {
     });
   }
 
-  it('keeps the Haunter’s passive lamplight damage proportional to its journey health growth', () => {
+  it('keeps the Haunter’s passive lamplight damage effective on later journeys', () => {
     const rates = [0, 7].map((cycle) => {
-      const b = bossGame('haunter_of_the_dark');
+      const b = journeyBoss('haunter_of_the_dark', cycle);
       const { g, boss, fight } = b;
-      g.player.cycle = cycle;
       Object.assign(g.player.levels, JOURNEY_REFERENCE);
       applyLevels(g);
       engage(b);
@@ -71,7 +82,7 @@ describe('special encounter objectives on every important journey', () => {
       const before = h.hp;
       steps(g, 60);
       expect(before - h.hp).toBeGreaterThanOrEqual(REALITY.lightBurn - 0.01);
-      return (before - h.hp) / h.max;
+      return before - h.hp;
     });
     expect(rates[1]).toBeCloseTo(rates[0], 4);
   });

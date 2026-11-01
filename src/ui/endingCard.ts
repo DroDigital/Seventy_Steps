@@ -161,7 +161,7 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
     const continueJourney = confirmation('CONTINUE THIS JOURNEY?', ['Return to the current world with your progress as it is.'], 'Continue journey', walkOn);
     const newGamePlus = confirmation('START NEW GAME+?', [
       `${capped ? 'The next journey is at the maximum New Game+ difficulty.' : `Begin journey ${nextJourney}.`} Restart the story with your levels, weapons and upgrades, gun, stones, mind upgrades, Reagent capacity, Echoes and difficulty.`,
-      'Ordinary foes grow stronger by region, and later-journey boss damage grows too; boss health stays fixed. NG+ scaling and rewards stop increasing at NG+7.',
+      'Ordinary foes grow stronger by region. Boss health and damage grow on later journeys; boss health does not scale with your level. NG+ scaling and rewards stop increasing at NG+7.',
       'The world, quests and bosses reset. Previously opened boss entrances, hints, endings and achievements remain. The current save slot and its backups are cleared to begin the new journey.',
     ], 'Start New Game+', () => {
       if (!storeCarry(store, carryOf(g))) return storageError;

@@ -102,7 +102,7 @@ three, from ${STARTS.join(', ')} metres off (a bot's path through a fight is cha
 low walls and training dummy set aside: a body that wide finds no place to stand among them, as its own arena in the world has
 nothing in its way.
 
-- Bosses keep their authored maximum health at every level and New Game Plus cycle. Their damage gains ${BOSS_LEVEL_SCALING.damage * 100}% per purchased player level; ordinary enemies, summons and spawning roots keep their existing rules. **Boss health** is the maximum in that run.
+- On the first journey bosses keep their authored maximum health at every level. Boss health rises on later journeys, capped at NG+7; it does not scale with player level. On the first journey their damage gains ${BOSS_LEVEL_SCALING.damage * 100}% per purchased player level. **Boss health** is the maximum in that run.
 - **Seconds** is how long the boss took with this bot's choices; actual players' fight times will differ.
 - **Lives** is the damage taken against the health a person has there and the Reagent they carry there (${REAGENT.doses} doses of ${Math.round(REAGENT.heal * 100)}% at the start, a vial more as the horrors fall, to ${REAGENT.maxDoses}):
   1 is the equivalent of all of it. A selected dodge can fail to start or avoid damage, and a value above 1 exceeds the carried healing

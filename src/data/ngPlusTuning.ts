@@ -17,10 +17,13 @@ export const REGION_JOURNEYS: Readonly<Record<string, JourneyProfile>> = {
 /** Fixed tuning reference, never the current player's build or a minimum required carry. */
 export const JOURNEY_REFERENCE = { vigour: 18, endurance: 9, might: 17 } as const;
 
-/** Bosses and their servants receive this share of the region's damage growth; boss health never grows. */
+/** Boss health rises by journey, independently of the investigator's level and region. */
+export const BOSS_JOURNEY_HEALTH = [1, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45] as const;
+
+/** Bosses and their servants receive this share of the region's damage growth. */
 export const BOSS_JOURNEY_DAMAGE = 0.8;
 
-export const JOURNEY_BALANCE_VERSION = 1;
+export const JOURNEY_BALANCE_VERSION = 2;
 
 /** Colossal roaming foes already demand an encounter's worth of stamina and time. */
 export const CREATURE_JOURNEY: Readonly<Record<string, readonly [health: number, damage: number]>> = {
