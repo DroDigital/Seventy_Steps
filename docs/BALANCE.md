@@ -14,8 +14,7 @@ three, from 7, 10, 13 metres off (a bot's path through a fight is chaos), and a 
 low walls and training dummy set aside: a body that wide finds no place to stand among them, as its own arena in the world has
 nothing in its way.
 
-- Bosses gain 0.75% maximum health and 0.3% damage per player level, a level counted by what it is worth (round 71, the soft caps: each attribute's levels count whole to 20, 50% from 21, 20% from 27: thirty are worth 23.8, so ninety bought are 71.4). Level one retains the authored stats;
-  ordinary enemies, summons and spawning roots keep their existing stats. **Scaled health** is the boss's actual maximum in that run.
+- Bosses keep their authored maximum health at every level and New Game Plus cycle. Their damage gains 0.3% per purchased player level; ordinary enemies, summons and spawning roots keep their existing rules. **Boss health** is the maximum in that run.
 - **Seconds** is how long the boss took with this bot's choices; actual players' fight times will differ.
 - **Lives** is the damage taken against the health a person has there and the Reagent they carry there (4 doses of 40% at the start, a vial more as the horrors fall, to 10):
   1 is the equivalent of all of it. A selected dodge can fail to start or avoid damage, and a value above 1 exceeds the carried healing
@@ -28,113 +27,112 @@ nothing in its way.
 - Dagon and Hydra share one encounter. Their individual rows are supplemental; `tests/seaBosses.test.ts` also checks both together at the expected standing, including combined time and damage against one healing inventory. Solo pressure floors are lower for these two members, while their upper limits remain in force.
 
 
-| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |
+| # | Boss | Vig/End/Might | Cane + | Boss health | Seconds | Taken | Our health | Doses | Lives | Deaths |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Dr. Muñoz | 1/0/1 | 0 | 913 | 64 | 385 | 176 | 4 | 0.84 | 0 |
-| 2 | Charles le Sorcier | 3/1/2 | 1 | 1096 | 64 | 520 | 208 | 4 | 0.96 | 0 |
-| 3 | The Outsider | 4/2/3 | 2 | 1521 | 56 | 370 | 224 | 4 | 0.63 | 0 |
-| 4 | Brown Jenkin | 5/2/4 | 2 | 1137 | 139 | 771 | 240 | 4 | 1.24 | 0 |
-| 5 | Ephraim Waite | 5/2/5 | 3 | 1308 | 44 | 472 | 240 | 5 | 0.66 | 0 |
-| 6 | The Hound | 6/2/5 | 3 | 2387 | 89 | 749 | 256 | 5 | 0.97 | 0 |
-| 7 | Keziah Mason | 6/3/5 | 4 | 2652 | 71 | 805 | 256 | 5 | 1.05 | 0 |
-| 8 | The Unnamable | 6/3/6 | 4 | 3338 | 86 | 662 | 256 | 5 | 0.86 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 4032 | 143 | 1195 | 272 | 6 | 1.29 | 0 |
-| 10 | The Black Man | 7/3/7 | 5 | 4566 | 168 | 1166 | 272 | 6 | 1.26 | 0 |
-| 11 | The Haunter of the Dark | 8/4/7 | 5 | 1799 | 390 | 4255 | 288 | 6 | 4.35 | 0 |
-| 12 | Wilbur Whateley | 9/4/8 | 5 | 2691 | 59 | 619 | 304 | 7 | 0.54 | 0 |
-| 13 | The Gorgon of Medusa's Coil | 9/4/9 | 5 | 2796 | 100 | 883 | 304 | 7 | 0.76 | 0 |
-| 14 | The Whisperer in Akeley's Chair | 10/4/9 | 5 | 2814 | 66 | 675 | 320 | 7 | 0.56 | 0 |
-| 15 | Edward Hutchinson | 10/5/10 | 5 | 3028 | 77 | 941 | 320 | 7 | 0.77 | 0 |
-| 16 | Simon Orne | 11/5/10 | 5 | 3047 | 105 | 1256 | 336 | 8 | 0.89 | 0 |
-| 17 | The Horror at Martin's Beach | 11/5/11 | 5 | 3337 | 68 | 495 | 336 | 8 | 0.35 | 0 |
-| 18 | The Terrible Old Man | 12/5/11 | 5 | 3358 | 130 | 1593 | 352 | 8 | 1.08 | 0 |
-| 19 | Lilith | 12/5/11 | 5 | 3449 | 95 | 1318 | 352 | 8 | 0.89 | 0 |
-| 20 | The Shunned House Entity | 12/6/11 | 5 | 3561 | 69 | 1210 | 352 | 9 | 0.75 | 0 |
-| 21 | Joseph Curwen | 12/6/12 | 5 | 4043 | 93 | 1121 | 352 | 9 | 0.69 | 0 |
-| 22 | The Dunwich Horror | 13/6/12 | 5 | 5454 | 148 | 3012 | 368 | 9 | 1.78 | 0 |
-| 23 | Mother Hydra | 11/5/11 | 5 | 4419 | 92 | 1399 | 336 | 10 | 0.83 | 0 |
-| 24 | Father Dagon | 11/5/11 | 5 | 4600 | 103 | 870 | 336 | 10 | 0.52 | 0 |
-| 25 | Hypnos | 14/7/13 | 5 | 3577 | 92 | 948 | 384 | 10 | 0.49 | 0 |
-| 26 | High Priest Not to Be Described | 16/7/15 | 5 | 5012 | 88 | 632 | 416 | 10 | 0.30 | 0 |
-| 27 | The Colossus Beneath the Pyramids | 17/8/16 | 5 | 7747 | 200 | 4661 | 432 | 10 | 2.16 | 0 |
-| 28 | Bokrug | 16/7/15 | 5 | 7228 | 170 | 2629 | 416 | 10 | 1.26 | 0 |
-| 29 | Nug | 16/7/15 | 5 | 7228 | 173 | 3638 | 416 | 10 | 1.75 | 0 |
-| 30 | Rhan-Tegoth | 16/7/15 | 5 | 7228 | 201 | 3785 | 416 | 10 | 1.82 | 0 |
-| 31 | Yeb | 16/7/15 | 5 | 7228 | 153 | 3308 | 416 | 10 | 1.59 | 0 |
-| 32 | The Great Ones | 16/7/15 | 5 | 8288 | 167 | 3090 | 416 | 10 | 1.49 | 0 |
-| 33 | Yig | 16/7/15 | 5 | 8288 | 215 | 6060 | 416 | 10 | 2.91 | 0 |
-| 34 | Tsathoggua | 16/7/15 | 5 | 8385 | 258 | 5302 | 416 | 10 | 2.55 | 0 |
-| 35 | Ghatanothoa | 16/7/15 | 5 | 9348 | 489 | 4764 | 416 | 10 | 2.29 | 0 |
-| 36 | Hastur | 16/7/15 | 5 | 9830 | 268 | 2625 | 416 | 10 | 1.26 | 0 |
-| 37 | Cthulhu | 16/7/15 | 5 | 10312 | 261 | 5184 | 416 | 10 | 2.49 | 0 |
-| 38 | The Thing Beyond Erich Zann's Window | 18/8/17 | 5 | 5158 | 76 | 715 | 448 | 10 | 0.32 | 0 |
-| 39 | Zkauba the Wizard | 18/9/18 | 5 | 5718 | 232 | 4108 | 448 | 10 | 1.83 | 0 |
-| 40 | The Other Gods | 18/9/17 | 5 | 7382 | 174 | 3755 | 448 | 10 | 1.68 | 0 |
-| 41 | 'Umr at-Tawil | 18/9/17 | 5 | 7581 | 183 | 1814 | 448 | 10 | 0.81 | 0 |
-| 42 | The Daemon Pipers | 18/9/17 | 5 | 7781 | 244 | 5140 | 448 | 10 | 2.29 | 0 |
-| 43 | The Ancient Ones | 18/9/17 | 5 | 8080 | 136 | 1346 | 448 | 10 | 0.60 | 0 |
-| 44 | Nyarlathotep | 18/9/17 | 5 | 10274 | 610 | 8557 | 448 | 10 | 3.82 | 0 |
-| 45 | Shub-Niggurath | 18/9/17 | 5 | 10873 | 368 | 5618 | 448 | 10 | 2.51 | 0 |
-| 46 | Yog-Sothoth | 18/9/17 | 5 | 12170 | 580 | 7607 | 448 | 10 | 3.40 | 0 |
-| 47 | Azathoth | 18/9/17 | 5 | 13367 | 477 | 11900 | 448 | 10 | 5.31 | 0 |
+| 1 | Dr. Muñoz | 1/0/1 | 0 | 900 | 65 | 388 | 176 | 4 | 0.85 | 0 |
+| 2 | Charles le Sorcier | 3/1/2 | 1 | 1049 | 64 | 535 | 208 | 4 | 0.99 | 0 |
+| 3 | The Outsider | 4/2/3 | 2 | 1425 | 51 | 317 | 224 | 4 | 0.54 | 0 |
+| 4 | Brown Jenkin | 5/2/4 | 2 | 1050 | 118 | 650 | 240 | 4 | 1.04 | 0 |
+| 5 | Ephraim Waite | 5/2/5 | 3 | 1200 | 40 | 432 | 240 | 5 | 0.60 | 0 |
+| 6 | The Hound | 6/2/5 | 3 | 2175 | 79 | 690 | 256 | 5 | 0.90 | 0 |
+| 7 | Keziah Mason | 6/3/5 | 4 | 2400 | 63 | 673 | 256 | 5 | 0.88 | 0 |
+| 8 | The Unnamable | 6/3/6 | 4 | 3000 | 73 | 564 | 256 | 5 | 0.73 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 3600 | 135 | 1098 | 272 | 6 | 1.19 | 0 |
+| 10 | The Black Man | 7/3/7 | 5 | 4050 | 133 | 842 | 272 | 6 | 0.91 | 0 |
+| 11 | The Haunter of the Dark | 8/4/7 | 5 | 1575 | 305 | 3123 | 288 | 6 | 3.19 | 0 |
+| 12 | Wilbur Whateley | 9/4/8 | 5 | 2325 | 57 | 592 | 304 | 7 | 0.51 | 0 |
+| 13 | The Gorgon of Medusa's Coil | 9/4/9 | 5 | 2400 | 77 | 827 | 304 | 7 | 0.72 | 0 |
+| 14 | The Whisperer in Akeley's Chair | 10/4/9 | 5 | 2400 | 58 | 575 | 320 | 7 | 0.47 | 0 |
+| 15 | Edward Hutchinson | 10/5/10 | 5 | 2550 | 67 | 829 | 320 | 7 | 0.68 | 0 |
+| 16 | Simon Orne | 11/5/10 | 5 | 2550 | 80 | 985 | 336 | 8 | 0.70 | 0 |
+| 17 | The Horror at Martin's Beach | 11/5/11 | 5 | 2775 | 49 | 490 | 336 | 8 | 0.35 | 0 |
+| 18 | The Terrible Old Man | 12/5/11 | 5 | 2775 | 75 | 786 | 352 | 8 | 0.53 | 0 |
+| 19 | Lilith | 12/5/11 | 5 | 2850 | 72 | 968 | 352 | 8 | 0.65 | 0 |
+| 20 | The Shunned House Entity | 12/6/11 | 5 | 2925 | 55 | 1084 | 352 | 9 | 0.67 | 0 |
+| 21 | Joseph Curwen | 12/6/12 | 5 | 3300 | 67 | 790 | 352 | 9 | 0.49 | 0 |
+| 22 | The Dunwich Horror | 13/6/12 | 5 | 4425 | 102 | 1847 | 368 | 9 | 1.09 | 0 |
+| 23 | Mother Hydra | 11/5/11 | 5 | 3675 | 74 | 1276 | 336 | 10 | 0.76 | 0 |
+| 24 | Father Dagon | 11/5/11 | 5 | 3825 | 79 | 742 | 336 | 10 | 0.44 | 0 |
+| 25 | Hypnos | 14/7/13 | 5 | 2850 | 78 | 807 | 384 | 10 | 0.42 | 0 |
+| 26 | High Priest Not to Be Described | 16/7/15 | 5 | 3900 | 59 | 448 | 416 | 10 | 0.22 | 0 |
+| 27 | The Colossus Beneath the Pyramids | 17/8/16 | 5 | 5925 | 116 | 2770 | 432 | 10 | 1.28 | 0 |
+| 28 | Bokrug | 16/7/15 | 5 | 5625 | 126 | 1761 | 416 | 10 | 0.85 | 0 |
+| 29 | Nug | 16/7/15 | 5 | 5625 | 99 | 1888 | 416 | 10 | 0.91 | 0 |
+| 30 | Rhan-Tegoth | 16/7/15 | 5 | 5625 | 112 | 2299 | 416 | 10 | 1.11 | 0 |
+| 31 | Yeb | 16/7/15 | 5 | 5625 | 102 | 2272 | 416 | 10 | 1.09 | 0 |
+| 32 | The Great Ones | 16/7/15 | 5 | 6450 | 117 | 2083 | 416 | 10 | 1.00 | 0 |
+| 33 | Yig | 16/7/15 | 5 | 6450 | 111 | 2947 | 416 | 10 | 1.42 | 0 |
+| 34 | Tsathoggua | 16/7/15 | 5 | 6525 | 164 | 3367 | 416 | 10 | 1.62 | 0 |
+| 35 | Ghatanothoa | 16/7/15 | 5 | 7275 | 327 | 2986 | 416 | 10 | 1.44 | 0 |
+| 36 | Hastur | 16/7/15 | 5 | 7650 | 199 | 2044 | 416 | 10 | 0.98 | 0 |
+| 37 | Cthulhu | 16/7/15 | 5 | 8025 | 185 | 3402 | 416 | 10 | 1.64 | 0 |
+| 38 | The Thing Beyond Erich Zann's Window | 18/8/17 | 5 | 3900 | 55 | 613 | 448 | 10 | 0.27 | 0 |
+| 39 | Zkauba the Wizard | 18/9/18 | 5 | 4275 | 140 | 2013 | 448 | 10 | 0.90 | 0 |
+| 40 | The Other Gods | 18/9/17 | 5 | 5550 | 89 | 1558 | 448 | 10 | 0.70 | 0 |
+| 41 | 'Umr at-Tawil | 18/9/17 | 5 | 5700 | 86 | 620 | 448 | 10 | 0.28 | 0 |
+| 42 | The Daemon Pipers | 18/9/17 | 5 | 5850 | 160 | 3189 | 448 | 10 | 1.42 | 0 |
+| 43 | The Ancient Ones | 18/9/17 | 5 | 6075 | 80 | 982 | 448 | 10 | 0.44 | 0 |
+| 44 | Nyarlathotep | 18/9/17 | 5 | 7725 | 356 | 4389 | 448 | 10 | 1.96 | 0 |
+| 45 | Shub-Niggurath | 18/9/17 | 5 | 8175 | 265 | 3760 | 448 | 10 | 1.68 | 0 |
+| 46 | Yog-Sothoth | 18/9/17 | 5 | 9150 | 376 | 4403 | 448 | 10 | 1.97 | 0 |
+| 47 | Azathoth | 18/9/17 | 5 | 10050 | 282 | 6666 | 448 | 10 | 2.98 | 0 |
 
 Bounds held by the test: each boss finishes within 6 to 800 seconds, and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 3.4), and the bot does not die, subject to the named pressure exceptions below.
 Each tier has its band: a named horror takes 14 to 200 seconds and costs 0.2 to 2.4 lives (the Colour may cost up to 1.5); one of the 17 great fights takes 35 to 340 seconds and costs 0.45 to 3.4 lives. Named exceptions are colossus pyramids 14–240 seconds; daemon pipers 14–280 seconds 0.2–2.6 lives; zkauba 14–280 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–580 seconds; nyarlathotep 35–740 seconds 0.45–4.5 lives; azathoth 90–580 seconds 1.7–6.4 lives; shub niggurath 35–440 seconds; yog sothoth 35–700 seconds 0.45–3.8 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–170 seconds. Yog-Sothoth is additionally capped at 3.8 lives at its expected standing.
 
 ## At the cap
 
-The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vigour, 30 Endurance, 30 Might, which the soft caps make 541 health, 290 stamina and blows of 1.95) and the cane at +5. The horrors have grown past what a person has when they meet them:
-their health by the Might the investigator has beyond the standing above, and their blows by the Vigour (`overmatch` in `systems/bossScaling.ts`, `BOSS_OVERMATCH`). A named horror still takes at least 10 seconds and costs a bot 0.1 to 1.5 lives; a great fight 30 and 0.4 to 1.875 lives, except 'Umr at-Tawil's 0.18 life floor, Dagon and Hydra's 0.2 life floor per member, and the ceilings of Yog-Sothoth (2.2), the Daemon Pipers (2) and Nyarlathotep (3.1). Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
+The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vigour, 30 Endurance, 30 Might, which give 640 health, 340 stamina and blows of 2.20) and the cane at +5. Boss health remains at its authored value; their blows still grow with levels and with Vigour beyond their expected standing (`overmatch` in `systems/bossScaling.ts`). These fights can become shorter as the investigator grows. Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
 
-| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |
+| # | Boss | Vig/End/Might | Cane + | Boss health | Seconds | Taken | Our health | Doses | Lives | Deaths |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Dr. Muñoz | 30/30/30 | 5 | 1988 | 19 | 393 | 541 | 4 | 0.28 | 0 |
-| 2 | Charles le Sorcier | 30/30/30 | 5 | 2261 | 19 | 336 | 541 | 4 | 0.24 | 0 |
-| 3 | The Outsider | 30/30/30 | 5 | 3001 | 31 | 557 | 541 | 4 | 0.40 | 0 |
-| 4 | Brown Jenkin | 30/30/30 | 5 | 2163 | 42 | 441 | 541 | 4 | 0.31 | 0 |
-| 5 | Ephraim Waite | 30/30/30 | 5 | 2420 | 28 | 628 | 541 | 5 | 0.39 | 0 |
-| 6 | The Hound | 30/30/30 | 5 | 4386 | 47 | 695 | 541 | 5 | 0.43 | 0 |
-| 7 | Keziah Mason | 30/30/30 | 5 | 4840 | 49 | 943 | 541 | 5 | 0.58 | 0 |
-| 8 | The Unnamable | 30/30/30 | 5 | 5929 | 65 | 989 | 541 | 5 | 0.61 | 0 |
-| 9 | The Colour Out of Space | 30/30/30 | 5 | 7115 | 89 | 1398 | 541 | 6 | 0.76 | 0 |
-| 10 | The Black Man | 30/30/30 | 5 | 7851 | 131 | 1482 | 541 | 6 | 0.81 | 0 |
-| 11 | The Haunter of the Dark | 30/30/30 | 5 | 3053 | 251 | 4007 | 541 | 6 | 2.18 | 0 |
-| 12 | Wilbur Whateley | 30/30/30 | 5 | 4425 | 50 | 850 | 541 | 7 | 0.41 | 0 |
-| 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 4487 | 70 | 1254 | 541 | 7 | 0.61 | 0 |
-| 14 | The Whisperer in Akeley's Chair | 30/30/30 | 5 | 4487 | 56 | 652 | 541 | 7 | 0.32 | 0 |
-| 15 | Edward Hutchinson | 30/30/30 | 5 | 4687 | 67 | 1120 | 541 | 7 | 0.54 | 0 |
-| 16 | Simon Orne | 30/30/30 | 5 | 4687 | 64 | 1138 | 541 | 8 | 0.50 | 0 |
-| 17 | The Horror at Martin's Beach | 30/30/30 | 5 | 5019 | 52 | 570 | 541 | 8 | 0.25 | 0 |
-| 18 | The Terrible Old Man | 30/30/30 | 5 | 5019 | 85 | 1374 | 541 | 8 | 0.60 | 0 |
-| 19 | Lilith | 30/30/30 | 5 | 5154 | 80 | 1447 | 541 | 8 | 0.64 | 0 |
-| 20 | The Shunned House Entity | 30/30/30 | 5 | 5290 | 54 | 1622 | 541 | 9 | 0.65 | 0 |
-| 21 | Joseph Curwen | 30/30/30 | 5 | 5875 | 76 | 1207 | 541 | 9 | 0.48 | 0 |
-| 22 | The Dunwich Horror | 30/30/30 | 5 | 7878 | 105 | 2645 | 541 | 9 | 1.06 | 0 |
-| 23 | Mother Hydra | 30/30/30 | 5 | 6646 | 75 | 2025 | 541 | 10 | 0.75 | 0 |
-| 24 | Father Dagon | 30/30/30 | 5 | 6917 | 79 | 883 | 541 | 10 | 0.33 | 0 |
-| 25 | Hypnos | 30/30/30 | 5 | 4998 | 63 | 820 | 541 | 10 | 0.30 | 0 |
-| 26 | High Priest Not to Be Described | 30/30/30 | 5 | 6647 | 71 | 603 | 541 | 10 | 0.22 | 0 |
-| 27 | The Colossus Beneath the Pyramids | 30/30/30 | 5 | 9963 | 145 | 3574 | 541 | 10 | 1.32 | 0 |
-| 28 | Bokrug | 30/30/30 | 5 | 9587 | 145 | 2472 | 541 | 10 | 0.91 | 0 |
-| 29 | Nug | 30/30/30 | 5 | 9587 | 134 | 3704 | 541 | 10 | 1.37 | 0 |
-| 30 | Rhan-Tegoth | 30/30/30 | 5 | 9587 | 175 | 4254 | 541 | 10 | 1.57 | 0 |
-| 31 | Yeb | 30/30/30 | 5 | 9587 | 124 | 3691 | 541 | 10 | 1.36 | 0 |
-| 32 | The Great Ones | 30/30/30 | 5 | 10993 | 138 | 3184 | 541 | 10 | 1.18 | 0 |
-| 33 | Yig | 30/30/30 | 5 | 10993 | 150 | 4589 | 541 | 10 | 1.70 | 0 |
-| 34 | Tsathoggua | 30/30/30 | 5 | 11121 | 182 | 4135 | 541 | 10 | 1.53 | 0 |
-| 35 | Ghatanothoa | 30/30/30 | 5 | 12400 | 381 | 4693 | 541 | 10 | 1.73 | 0 |
-| 36 | Hastur | 30/30/30 | 5 | 13039 | 228 | 2937 | 541 | 10 | 1.09 | 0 |
-| 37 | Cthulhu | 30/30/30 | 5 | 13678 | 175 | 4813 | 541 | 10 | 1.78 | 0 |
-| 38 | The Thing Beyond Erich Zann's Window | 30/30/30 | 5 | 6473 | 61 | 741 | 541 | 10 | 0.27 | 0 |
-| 39 | Zkauba the Wizard | 30/30/30 | 5 | 7007 | 136 | 2439 | 541 | 10 | 0.90 | 0 |
-| 40 | The Other Gods | 30/30/30 | 5 | 9212 | 129 | 2972 | 541 | 10 | 1.10 | 0 |
-| 41 | 'Umr at-Tawil | 30/30/30 | 5 | 9461 | 139 | 1332 | 541 | 10 | 0.49 | 0 |
-| 42 | The Daemon Pipers | 30/30/30 | 5 | 9710 | 187 | 4464 | 541 | 10 | 1.65 | 0 |
-| 43 | The Ancient Ones | 30/30/30 | 5 | 10083 | 103 | 1240 | 541 | 10 | 0.46 | 0 |
-| 44 | Nyarlathotep | 30/30/30 | 5 | 12822 | 466 | 6946 | 541 | 10 | 2.57 | 0 |
-| 45 | Shub-Niggurath | 30/30/30 | 5 | 13569 | 294 | 4906 | 541 | 10 | 1.81 | 0 |
-| 46 | Yog-Sothoth | 30/30/30 | 5 | 15187 | 413 | 5823 | 541 | 10 | 2.15 | 0 |
-| 47 | Azathoth | 30/30/30 | 5 | 16681 | 346 | 10506 | 541 | 10 | 3.88 | 0 |
+| 1 | Dr. Muñoz | 30/30/30 | 5 | 900 | 8 | 152 | 640 | 4 | 0.09 | 0 |
+| 2 | Charles le Sorcier | 30/30/30 | 5 | 1049 | 8 | 212 | 640 | 4 | 0.13 | 0 |
+| 3 | The Outsider | 30/30/30 | 5 | 1425 | 10 | 117 | 640 | 4 | 0.07 | 0 |
+| 4 | Brown Jenkin | 30/30/30 | 5 | 1050 | 10 | 136 | 640 | 4 | 0.08 | 0 |
+| 5 | Ephraim Waite | 30/30/30 | 5 | 1200 | 11 | 224 | 640 | 5 | 0.12 | 0 |
+| 6 | The Hound | 30/30/30 | 5 | 2175 | 12 | 249 | 640 | 5 | 0.13 | 0 |
+| 7 | Keziah Mason | 30/30/30 | 5 | 2400 | 15 | 280 | 640 | 5 | 0.15 | 0 |
+| 8 | The Unnamable | 30/30/30 | 5 | 3000 | 17 | 321 | 640 | 5 | 0.17 | 0 |
+| 9 | The Colour Out of Space | 30/30/30 | 5 | 3600 | 35 | 458 | 640 | 6 | 0.21 | 0 |
+| 10 | The Black Man | 30/30/30 | 5 | 4050 | 33 | 413 | 640 | 6 | 0.19 | 0 |
+| 11 | The Haunter of the Dark | 30/30/30 | 5 | 1575 | 153 | 2891 | 640 | 6 | 1.33 | 0 |
+| 12 | Wilbur Whateley | 30/30/30 | 5 | 2325 | 16 | 355 | 640 | 7 | 0.15 | 0 |
+| 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 2400 | 23 | 396 | 640 | 7 | 0.16 | 0 |
+| 14 | The Whisperer in Akeley's Chair | 30/30/30 | 5 | 2400 | 20 | 332 | 640 | 7 | 0.14 | 0 |
+| 15 | Edward Hutchinson | 30/30/30 | 5 | 2550 | 21 | 489 | 640 | 7 | 0.20 | 0 |
+| 16 | Simon Orne | 30/30/30 | 5 | 2550 | 24 | 604 | 640 | 8 | 0.22 | 0 |
+| 17 | The Horror at Martin's Beach | 30/30/30 | 5 | 2775 | 21 | 236 | 640 | 8 | 0.09 | 0 |
+| 18 | The Terrible Old Man | 30/30/30 | 5 | 2775 | 28 | 483 | 640 | 8 | 0.18 | 0 |
+| 19 | Lilith | 30/30/30 | 5 | 2850 | 29 | 741 | 640 | 8 | 0.28 | 0 |
+| 20 | The Shunned House Entity | 30/30/30 | 5 | 2925 | 19 | 753 | 640 | 9 | 0.26 | 0 |
+| 21 | Joseph Curwen | 30/30/30 | 5 | 3300 | 26 | 370 | 640 | 9 | 0.13 | 0 |
+| 22 | The Dunwich Horror | 30/30/30 | 5 | 4425 | 35 | 1047 | 640 | 9 | 0.36 | 0 |
+| 23 | Mother Hydra | 30/30/30 | 5 | 3675 | 24 | 701 | 640 | 10 | 0.22 | 0 |
+| 24 | Father Dagon | 30/30/30 | 5 | 3825 | 26 | 630 | 640 | 10 | 0.20 | 0 |
+| 25 | Hypnos | 30/30/30 | 5 | 2850 | 29 | 561 | 640 | 10 | 0.18 | 0 |
+| 26 | High Priest Not to Be Described | 30/30/30 | 5 | 3900 | 26 | 223 | 640 | 10 | 0.07 | 0 |
+| 27 | The Colossus Beneath the Pyramids | 30/30/30 | 5 | 5925 | 55 | 1297 | 640 | 10 | 0.41 | 0 |
+| 28 | Bokrug | 30/30/30 | 5 | 5625 | 60 | 1496 | 640 | 10 | 0.47 | 0 |
+| 29 | Nug | 30/30/30 | 5 | 5625 | 47 | 1372 | 640 | 10 | 0.43 | 0 |
+| 30 | Rhan-Tegoth | 30/30/30 | 5 | 5625 | 53 | 1397 | 640 | 10 | 0.44 | 0 |
+| 31 | Yeb | 30/30/30 | 5 | 5625 | 50 | 1408 | 640 | 10 | 0.44 | 0 |
+| 32 | The Great Ones | 30/30/30 | 5 | 6450 | 58 | 1620 | 640 | 10 | 0.51 | 0 |
+| 33 | Yig | 30/30/30 | 5 | 6450 | 63 | 2180 | 640 | 10 | 0.68 | 0 |
+| 34 | Tsathoggua | 30/30/30 | 5 | 6525 | 68 | 1747 | 640 | 10 | 0.55 | 0 |
+| 35 | Ghatanothoa | 30/30/30 | 5 | 7275 | 99 | 1146 | 640 | 10 | 0.36 | 0 |
+| 36 | Hastur | 30/30/30 | 5 | 7650 | 60 | 1023 | 640 | 10 | 0.32 | 0 |
+| 37 | Cthulhu | 30/30/30 | 5 | 8025 | 98 | 2929 | 640 | 10 | 0.92 | 0 |
+| 38 | The Thing Beyond Erich Zann's Window | 30/30/30 | 5 | 3900 | 26 | 293 | 640 | 10 | 0.09 | 0 |
+| 39 | Zkauba the Wizard | 30/30/30 | 5 | 4275 | 41 | 951 | 640 | 10 | 0.30 | 0 |
+| 40 | The Other Gods | 30/30/30 | 5 | 5550 | 50 | 1362 | 640 | 10 | 0.43 | 0 |
+| 41 | 'Umr at-Tawil | 30/30/30 | 5 | 5700 | 67 | 941 | 640 | 10 | 0.29 | 0 |
+| 42 | The Daemon Pipers | 30/30/30 | 5 | 5850 | 48 | 1576 | 640 | 10 | 0.49 | 0 |
+| 43 | The Ancient Ones | 30/30/30 | 5 | 6075 | 46 | 578 | 640 | 10 | 0.18 | 0 |
+| 44 | Nyarlathotep | 30/30/30 | 5 | 7725 | 120 | 1455 | 640 | 10 | 0.45 | 0 |
+| 45 | Shub-Niggurath | 30/30/30 | 5 | 8175 | 128 | 1831 | 640 | 10 | 0.57 | 0 |
+| 46 | Yog-Sothoth | 30/30/30 | 5 | 9150 | 94 | 993 | 640 | 10 | 0.31 | 0 |
+| 47 | Azathoth | 30/30/30 | 5 | 10050 | 125 | 3253 | 640 | 10 | 1.02 | 0 |
 
 ## The opening
 
@@ -142,15 +140,15 @@ The same bot against the horrors of the first hours (the hub about the first Eld
 player has there: only those two realms' lesser foes (60% of them, in step) and their own bosses before it have
 given Echoes and star-stones. Each may cost at most 1.5 lives; the Colour is capped at 1.3 lives.
 
-| # | Boss | Vig/End/Might | Cane + | Scaled health | Seconds | Taken | Our health | Doses | Lives | Deaths |
+| # | Boss | Vig/End/Might | Cane + | Boss health | Seconds | Taken | Our health | Doses | Lives | Deaths |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Dr. Muñoz | 1/0/1 | 0 | 913 | 64 | 385 | 176 | 4 | 0.84 | 0 |
-| 2 | Charles le Sorcier | 3/1/2 | 1 | 1096 | 64 | 520 | 208 | 4 | 0.96 | 0 |
-| 3 | The Outsider | 4/2/3 | 2 | 1521 | 56 | 370 | 224 | 4 | 0.63 | 0 |
-| 4 | Brown Jenkin | 5/2/4 | 2 | 1137 | 139 | 771 | 240 | 4 | 1.24 | 0 |
-| 5 | Ephraim Waite | 5/2/5 | 3 | 1308 | 44 | 472 | 240 | 5 | 0.66 | 0 |
-| 6 | The Hound | 6/2/5 | 3 | 2387 | 89 | 749 | 256 | 5 | 0.97 | 0 |
-| 7 | Keziah Mason | 6/3/5 | 4 | 2652 | 71 | 805 | 256 | 5 | 1.05 | 0 |
-| 8 | The Unnamable | 6/3/6 | 4 | 3338 | 86 | 662 | 256 | 5 | 0.86 | 0 |
-| 9 | The Colour Out of Space | 7/3/6 | 4 | 4032 | 143 | 1195 | 272 | 6 | 1.29 | 0 |
-| 10 | The Black Man | 7/3/7 | 5 | 4566 | 168 | 1166 | 272 | 6 | 1.26 | 0 |
+| 1 | Dr. Muñoz | 1/0/1 | 0 | 900 | 65 | 388 | 176 | 4 | 0.85 | 0 |
+| 2 | Charles le Sorcier | 3/1/2 | 1 | 1049 | 64 | 535 | 208 | 4 | 0.99 | 0 |
+| 3 | The Outsider | 4/2/3 | 2 | 1425 | 51 | 317 | 224 | 4 | 0.54 | 0 |
+| 4 | Brown Jenkin | 5/2/4 | 2 | 1050 | 118 | 650 | 240 | 4 | 1.04 | 0 |
+| 5 | Ephraim Waite | 5/2/5 | 3 | 1200 | 40 | 432 | 240 | 5 | 0.60 | 0 |
+| 6 | The Hound | 6/2/5 | 3 | 2175 | 79 | 690 | 256 | 5 | 0.90 | 0 |
+| 7 | Keziah Mason | 6/3/5 | 4 | 2400 | 63 | 673 | 256 | 5 | 0.88 | 0 |
+| 8 | The Unnamable | 6/3/6 | 4 | 3000 | 73 | 564 | 256 | 5 | 0.73 | 0 |
+| 9 | The Colour Out of Space | 7/3/6 | 4 | 3600 | 135 | 1098 | 272 | 6 | 1.19 | 0 |
+| 10 | The Black Man | 7/3/7 | 5 | 4050 | 133 | 842 | 272 | 6 | 0.91 | 0 |

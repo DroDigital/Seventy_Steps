@@ -124,34 +124,20 @@ export const DECK = { uiScale: 1.15, captions: 1.2 };
 
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
 export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {
-  vigour: { max: 30, hp: 16 }, // health investments keep pace with the longer late-game fights; soft caps reduce the last ten gains
-  endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all thirty levels reach 51.04 a second after soft caps
+  vigour: { max: 30, hp: 16 },
+  endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second)
   might: { max: 30, damage: 0.04 }, // share added to the investigator's blows and shots
 };
 export type LevelId = keyof typeof LEVELS;
 
-/**
- * Souls-style soft caps: past `after`
- * levels of one attribute, each further level is worth `worth` of a whole one in what `LEVELS` gives (systems/levelWorth.ts): health, stamina and its
- * recovery, the weight of blows. Full gains through twenty leave room beyond the last bosses' expected standing. Six half-strength levels
- * follow, then four at a fifth: thirty levels are worth 23.8. A level costs what it costs (`LEVEL_COST`), and the horrors grow to meet the
- * worth, not the count (bossScaling.ts). Even the final purchases must improve effective health or damage against a scaling boss.
- */
-export const SOFT_CAP: readonly { after: number; worth: number }[] = [
-  { after: 20, worth: 0.5 },
-  { after: 26, worth: 0.2 },
-];
-
-/** Boss health and damage gained per purchased player level; level one keeps the authored stats. */
-export const BOSS_LEVEL_SCALING = { health: 0.0075, damage: 0.003 };
+/** Boss damage gained per purchased player level; level one keeps the authored damage. */
+export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
- * Round 68 ("all bosses remain demanding regardless of player level"): past the standing a horror is made to be met at (data/bossStanding.ts), the
- * share of the investigator's growth in blows (Might) that its health takes up, and of their growth in health (Vigour) that its blows take up.
- * Half of that growth remains the investigator's, before generic level scaling. A larger share combined with generic scaling could make a
- * final Might purchase reduce effective damage, or leave a fully levelled investigator less durable than at a late boss's standing.
+ * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
+ * that its blows take up. Boss health always stays at the value authored for its current form.
  */
-export const BOSS_OVERMATCH = { share: 0.5 };
+export const BOSS_OVERMATCH = { share: 0.45 };
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found

@@ -39,6 +39,7 @@ import { createNightFx } from './nightFx';
 import { createOmenFx } from './omenFx';
 import { createBossFootfalls } from './bossFootfalls';
 import { createCreatureAura } from './creatureAura';
+import { createBossAuras } from './bossAuras';
 import type { BossPresence } from './bossPresence';
 import { createPresence } from './presence';
 import type { PostPass } from './postPass';
@@ -70,7 +71,7 @@ export interface LifeParts {
   lights: WorldLights; // the fires that give off smoke and embers (round 79)
   ground: GroundFx; // the marks on the ground, where a bolt of lightning leaves its scar and a ring of light warns of it (round 52)
   beams: Beams; // whose ribbons draw a bolt of lightning
-  creatures: { presence: BossPresence; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 83: its aura and footfalls)
+  creatures: { presence: BossPresence; painted: ReadonlyMap<Entity, number>; figure(id: Entity): { bottom: number; top: number } | undefined }; // a horror's phase and voice, and where its painted body stands (round 83: its aura and footfalls)
 }
 
 export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, parts: LifeParts): WorldLife {
@@ -109,6 +110,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const bodyAir = createCreatureAir(g, parts.particles); // ...and a creature's cold breath and the dust of its running
   const footfalls = createBossFootfalls(g, parts.particles, presence.felt); // a colossus's stride: dust, and the ground answering
   const aura = createCreatureAura(g, parts.particles, parts.creatures.figure, parts.creatures.presence); // what the great ones give off
+  const bossAuras = createBossAuras(scene, g, parts.creatures.figure, parts.creatures.painted, parts.creatures.presence);
   return {
     fauna,
     update(camera, time, enclosed, alpha, gloom) {
@@ -136,6 +138,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
       bodyAir.update(camera.position, time, alpha, !outside);
       footfalls.update(camera.position, alpha, !outside);
       aura.update(camera.position, time, alpha);
+      bossAuras.update(camera, time, alpha);
       deep.update(camera, time, !outside);
       drag.update(time, alpha);
       splash.update(time);

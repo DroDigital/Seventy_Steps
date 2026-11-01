@@ -2,8 +2,8 @@
  * A new journey through the dream (playtest round 12: there was no NG+). After an ending, beginning
  * anew may carry the investigator's strength into a new dream: levels, arms and how far each is
  * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels, Echoes and the hints given. Everything else (the
- * world, its quests and bosses) begins again, and each journey's foes are hardier, strike harder
- * and leave more Echoes (NEW_GAME_PLUS). Pure: no Three.js.
+ * world, its quests and bosses) begins again. Ordinary foes become hardier; enemies strike harder
+ * and leave more Echoes (NEW_GAME_PLUS). Boss health stays as authored. Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';
@@ -93,7 +93,7 @@ export function applyCarry(g: Game, c: Carry): void {
   for (const id of c.found) g.overworld?.told.add(foundKey(id));
 }
 
-/** How much hardier this journey's foes are than the first's. */
+/** How much hardier this journey's ordinary foes are than the first's. */
 export const foeHealth = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.health * g.player.cycle;
 
 /** The weight this journey, and the difficulty chosen, put on a blow from `attacker` (1 for the investigator and their allies). */

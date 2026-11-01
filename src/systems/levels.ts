@@ -8,8 +8,7 @@
 import type { Entity } from '../core/ecs';
 import { LAUDANUM, LEVEL_COST, LEVELS, UPGRADES, type LevelId } from '../data/tuning';
 import type { Game } from './components';
-import { refreshBossLevels } from './bossScaling';
-import { healthAt, levelsWorth, mightAt, staminaAt, staminaRegen } from './levelWorth';
+import { healthAt, mightAt, staminaAt, staminaRegen } from './levelWorth';
 
 export { staminaRegen };
 
@@ -30,8 +29,8 @@ export const nextLevelCost = (g: Pick<Game, 'player'>): number => levelCost(leve
 export const canLevel = (g: Pick<Game, 'player'>, id: LevelId): boolean => g.player.levels[id] < LEVELS[id].max && g.player.echoes >= nextLevelCost(g);
 
 /**
- * Sets the investigator's most health and stamina, and how fast the stamina returns, from their levels as they are worth (levelWorth.ts: round 71,
- * the soft caps); a rise is felt at once. The horrors grow to meet the same worth.
+ * Sets maximum health, stamina and recovery from the full value of the purchased levels.
+ * A rise is felt at once; existing bosses keep their health and wounds.
  */
 export function applyLevels(g: Game): void {
   const h = g.ecs.c.health.get(g.player.id)!;
@@ -41,7 +40,6 @@ export function applyLevels(g: Game): void {
   [h.hp, h.max] = [Math.max(1, h.hp + hp - h.max), hp];
   [s.value, s.max] = [s.value < 0 ? s.value : Math.max(0, s.value + stamina - s.max), stamina];
   s.regen = staminaRegen(g.player.levels.endurance);
-  refreshBossLevels(g, levelsWorth(g.player.levels));
 }
 
 /** Spends Echoes on one level of `id`; false when short of Echoes or at the most levels. */

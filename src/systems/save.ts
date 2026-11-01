@@ -229,7 +229,7 @@ export function applySave(g: Game, s: SaveData): void {
   for (const k of UPGRADE_IDS) m.upgrades[k] = clampInt(s.upgrades[k] ?? 0, 0, UPGRADES[k].max);
   const was = s.levels ?? { vigour: ((s.upgrades.vigour ?? 0) * 20) / LEVELS.vigour.hp!, endurance: ((s.upgrades.endurance ?? 0) * 15) / LEVELS.endurance.stamina!, might: 0 }; // an older save's insight upgrades (20 health, 15 stamina a level) as the levels nearest them
   for (const k of LEVEL_IDS) g.player.levels[k] = clampInt(was[k] ?? 0, 0, LEVELS[k].max);
-  g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before active bosses refresh and the world fills
+  g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before the world fills
   applyLevels(g);
   g.player.arms = ['cane', ...new Set((s.arms ?? []).filter((id): id is WeaponId => isWeapon(id) && id !== 'cane'))];
   if (!equip(g, s.weapon ?? 'cane')) equip(g, 'cane');

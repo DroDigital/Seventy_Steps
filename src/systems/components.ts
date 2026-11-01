@@ -51,7 +51,6 @@ export interface Mover {
 export interface Health {
   hp: number;
   max: number;
-  baseMax?: number; // boss health before player-level and NG+ scaling, so updates never compound
   immortal: boolean;
   calm: number; // frames since the last damage
   ward?: number; // damage taken is scaled by this: a boss's hooks and signature set it each step
