@@ -9,6 +9,8 @@ export const EN = {
   // keys at the foot of a page
   'keys.back': 'Back',
   'val.on': 'On',
+  'val.minimap.turn': 'Turns',
+  'val.minimap.north': 'North up',
   'val.off': 'Off',
   'val.onLc': 'on',
   'val.offLc': 'off',
@@ -78,6 +80,7 @@ export const EN = {
   'val.camera.classic': 'Classic',
   'val.camera.hero': 'Low hero',
   'val.camera.shoulder': 'Tight shoulder',
+  'set.minimap': 'Minimap',
   'set.questTracker': 'Quest tracker',
   'set.captions': 'Caption size',
   'set.captionBack': 'Caption backdrop',
@@ -113,6 +116,7 @@ export const EN = {
   'set.hint.fxCap': 'Caps every effect of a failing mind (warping, whispers, wrong stars), for comfort.',
   'set.hint.cutscenes': 'The camera-led scenes: a horror’s arrival and fall, the endings. Esc skips one either way.',
   'set.hint.camera': 'How the camera hangs. Classic: as it was. Low hero: lower and wider, and, locked on, it stands back to show you and the foe together, further for a tall one. Tight shoulder: close behind your shoulder.',
+  'set.hint.minimap': 'The minimap turns with the camera, what lies ahead at the top, or keeps north at the top and turns your arrow instead.',
   'set.hint.questTracker': 'The quest being followed, in a line at the right of the screen, with the way to it. The journal keeps the rest.',
   'set.hint.captions': 'The size of the words said aloud: cutscene lines, a talk, what is overheard.',
   'set.hint.captionBack': 'A dark band behind those words, to read them against a bright picture.',
@@ -259,6 +263,8 @@ export const EN = {
   'mind.laudanum': 'LAUDANUM ×{n}',
   'mind.laudanumCall': '{key}  LAUDANUM',
   'mind.restCall': 'REST AT AN ELDER SIGN',
+  'mind.unmooredWhat': 'Unmoored: weaker blows, slower breath, and the body wears away. Laudanum, lamplight or rest brings you back.',
+  'mind.phantomWhat': 'It was never there: phantoms vanish when struck, and wound only the mind.',
   // notices
   'n.candle': 'A CANDLE TAKES THE FLAME',
   'n.pictureKept': 'A PICTURE OF THE DREAM IS KEPT',

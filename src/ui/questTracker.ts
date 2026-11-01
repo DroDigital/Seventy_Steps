@@ -32,7 +32,8 @@ export function pointerAngle(from: XZ, to: XZ, yaw: number): number {
 }
 
 /** `shown`: whether the HUD has the screen for it (no menu, not dying, the setting on). */
-export function createQuestTracker(g: Game, root: HTMLElement, shown: () => boolean): QuestTracker {
+/** `yaw`: how far the minimap's picture is turned (ui/minimap.ts `minimapYaw`), so the pointer agrees with it. */
+export function createQuestTracker(g: Game, root: HTMLElement, shown: () => boolean, yaw: () => number = () => g.camera.yaw): QuestTracker {
   const box = el('position:absolute;right:16px;top:216px;width:220px;text-align:right;opacity:0;transition:opacity .7s', '', root);
   const title = el(`font-size:11px;letter-spacing:3px;color:${GOLD};text-transform:uppercase;transition:color 1.2s`, '', box);
   const rule = el(`height:1px;margin:4px 0 5px;transform-origin:right;transition:transform 1.2s;background:linear-gradient(270deg,${GOLD}cc,${GOLD}00)`, '', box);
@@ -70,7 +71,7 @@ export function createQuestTracker(g: Game, root: HTMLElement, shown: () => bool
       const far = at ? Math.hypot(p.x - at.x, p.z - at.z) : 0;
       where.style.display = at ? 'flex' : 'none';
       arrow.style.display = at && far > HERE ? 'block' : 'none';
-      if (at && far > HERE) arrow.style.transform = `rotate(${pointerAngle(p, at, g.camera.yaw).toFixed(3)}rad)`;
+      if (at && far > HERE) arrow.style.transform = `rotate(${pointerAngle(p, at, yaw()).toFixed(3)}rad)`;
       setText(away, at ? (far > HERE ? distanceWords(far) : tr('hud.track.here')) : '');
     },
   };
