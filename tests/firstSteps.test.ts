@@ -6,6 +6,8 @@ import type { Game } from '../src/systems/components';
 import { spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
 import { parseSave, snapshot } from '../src/systems/save';
+import { cardKey } from '../src/ui/tipCard';
+import { locale, setLocale } from '../src/core/i18n';
 import { createSteps, stepTips, TIP_KEPT, TIP_ROWS, TIPS_KEPT, type Steps } from '../src/ui/firstSteps';
 
 function open(g = createWorldGame()): Game {
@@ -115,5 +117,18 @@ describe('the first steps', () => {
     g.ecs.c.health.get(g.player.id)!.hp = 0;
     expect(stepTips(g, s)).toBe(null);
     for (const rows of Object.values(TIP_ROWS)) expect(rows.length).toBeGreaterThan(0);
+  });
+
+  it('redraws the card when the language changes, though nothing else has', () => {
+    const view = { id: 'run' as const, rows: [false] };
+    const was = locale();
+    try {
+      setLocale(0);
+      const en = cardKey(view);
+      setLocale(1);
+      expect(cardKey(view)).not.toBe(en);
+    } finally {
+      setLocale(was);
+    }
   });
 });

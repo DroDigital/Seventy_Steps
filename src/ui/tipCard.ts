@@ -4,7 +4,7 @@
  * Drawn only when what it says changes.
  */
 
-import { t } from '../core/i18n';
+import { localeId, t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { glyph } from './glyphs';
 import { BONE, el, GOLD, LEAF, setStyle } from './hudKit';
@@ -12,6 +12,10 @@ import { TIP_ROWS, type TipView } from './firstSteps';
 
 /** 'the mouse', 'the left stick': a key's face begins with a capital. */
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** What the card shows, as one string: the card, its ticks, the buttons in hand and the language (a change of any redraws it). */
+export const cardKey = (view: TipView | null): string =>
+  view ? `${localeId()}|${view.id}|${view.rows.join()}|${TIP_ROWS[view.id].map((row) => glyph(row.act)).join()}` : '';
 
 export interface TipCard {
   show(view: TipView | null): void;
@@ -26,7 +30,7 @@ export function createTipCard(parent: HTMLElement): TipCard {
   let drawn = '';
   return {
     show(view) {
-      const key = view ? `${view.id}|${view.rows.join()}|${view.rows.map((_, i) => glyph(TIP_ROWS[view.id][i].act)).join()}` : '';
+      const key = cardKey(view);
       setStyle(card, 'opacity', view ? '1' : '0');
       card.style.transform = view ? 'none' : 'translateY(6px)';
       if (!view || key === drawn) return;
