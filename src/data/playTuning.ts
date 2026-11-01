@@ -90,6 +90,7 @@ export const SETTINGS = {
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
+  minimap: [0, 1, 1, 0], // 0: the minimap turns with the camera, what lies ahead up; 1: north up, the investigator's arrow turning instead (a first public playthrough: "I don't know anyone who likes spinning maps")
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
   quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
@@ -165,8 +166,8 @@ export const OIL = { carry: 5 };
  */
 export const GUN = {
   chamber: 6, // rounds the cylinder holds
-  carry: 12, // two spare cylinders carried, beyond the six already loaded
-  start: 6, // spare rounds a new investigator carries (and the cylinder starts full)
+  carry: 18, // three spare cylinders carried, beyond the six already loaded (it was two: a first public playthrough ran dry again and again, "why is it so difficult to find bullets?")
+  start: 12, // spare rounds a new investigator carries (and the cylinder starts full; it was 6)
   box: 6, // rounds in a box bought
   find: 4, // rounds in a box lying about the open world...
   cache: 4, // ...and in each dungeon's caches

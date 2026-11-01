@@ -29,7 +29,7 @@ export const NAMED = tier('named', [
   {
     id: 'keziah_mason', name: 'Keziah Mason', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2, eyes: 2, gear: ['witch'] },
-    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }),
+    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }),
     stats: st(2400, 120, 38, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 100, 50% more: health 1600 to 2400) (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700)
   },
   {

@@ -34,13 +34,14 @@ import { QUIET } from '../data/uiMood';
 import { DYING_MS } from './journeys';
 import { gauge, pipRow } from './gauges';
 import { blend, BLOOD, BONE, el, LEAF, percent, SERIF, setStyle, setText } from './hudKit';
+import { bleeding } from '../systems/sanity';
 import { HEART } from '../render/feel';
 import type { MapPainter } from './mapPainter';
 import { menuOpen } from './menuKit';
 import { createHints } from './hints';
 import { createNoticeBoard } from './noticeFade';
-import { createMindHud } from './mindHud';
-import { createMinimap } from './minimap';
+import { createMindHud, MAGENTA } from './mindHud';
+import { createMinimap, minimapYaw } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
 import { MOUNTS } from '../data/mounts';
 import { mountUnlocked } from '../systems/mounts';
@@ -70,6 +71,8 @@ export interface Hud {
 export interface HudOptions {
   held?: () => boolean;
   quiet?: () => boolean;
+  /** Settings › Play › Minimap: north kept up. */
+  northUp?: () => boolean;
 }
 
 /** `held`: Echoes earned but still on their way to the investigator (render/echoFx.ts): the count rises as they land. */
@@ -77,7 +80,8 @@ export interface HudOptions {
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
   const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 80): the bars, counters, map and quest line, which sink together
-  const minimap = createMinimap(g, dim, painter);
+  const northUp = opts.northUp ?? (() => false);
+  const minimap = createMinimap(g, dim, painter, northUp);
   const hints = createHints(g);
   const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', dim); // (the vitals at the upper left)
   const hp = gauge(vitals, BLOOD, 7, true);
@@ -119,7 +123,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   let calmNow = { hud: 0, camera: 0 };
   const foes = createFoeBars(g, root);
   const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
-  const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker()); // what the quest followed asks, at the right under the minimap
+  const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker(), () => minimapYaw(g, northUp())); // what the quest followed asks, at the right under the minimap
   const me = g.player.id;
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
@@ -200,6 +204,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       else if (now0 > chipHold) chipPct = Math.max(pct, chipPct - HURT.chipRate / 60);
       if (chipPct <= pct) chipHold = 0;
       setStyle(chip, 'width', `${chipPct.toFixed(1)}%`);
+      setStyle(hp.parentElement!, 'boxShadow', `0 0 0 1px #000d,inset 0 0 3px #000${bleeding(g) ? `,0 0 ${(3 + 3 * Math.sin(now0 / 320)).toFixed(0)}px ${MAGENTA}` : ''}`); // the Unmoored mind wearing the body away, shown where it is felt
       setStyle(stamina, 'width', percent(s.value, s.max));
       mind.update(now0);
       reagent.set(g.player.reagent, g.player.reagentMax);

@@ -16,7 +16,7 @@ import { glyph } from './glyphs';
 import { gauge } from './gauges';
 import { BONE, el, setStyle, setText } from './hudKit';
 
-const MAGENTA = '#b04a82';
+export const MAGENTA = '#b04a82'; // (the HUD's health bar glows in it while the Unmoored mind wears the body away)
 /** The bar and the band's name, from clear water to magenta (round 32: they were bone, bone, purple and magenta, and the bar was one of three of a colour). */
 const BAND_COLOURS: Record<Band, string> = { lucid: '#6a98b2', uneasy: '#8d98c0', fractured: '#9468b6', unmoored: MAGENTA };
 
@@ -49,13 +49,23 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
   let chipHold = 0;
   let joltAt = -Infinity;
   let jolted = false; // the frame shows a jolt that has not been cleared yet
+  /** What a failing mind costs, said on the screen once a save (a first public playthrough asked "Unmoored, what does that mean?" and "what's hurting me?"; the Field Guide keeps the whole of it). */
+  const once = (id: string, key: Key): void => {
+    const told = g.overworld?.told;
+    if (!told || told.has(`said:${id}`)) return;
+    told.add(`said:${id}`);
+    say(t(key));
+  };
 
   g.events.on('SanityLost', () => (joltAt = performance.now()));
   g.events.on('SanityBandChanged', (e) => {
     const worse = bandIndex(e.to) > bandIndex(e.from);
     const call = !worse || bandIndex(e.to) < bandIndex('fractured') ? '' : g.player.laudanum > 0 ? `  ·  ${t('mind.laudanumCall', { key: glyph('item').toUpperCase() })}` : `  ·  ${t('mind.restCall')}`;
     say(`${worse ? '▼' : '▲'} ${t(`mind.${e.to}` as Key)}${call}`);
+    if (e.to === 'unmoored') once('unmoored', 'mind.unmooredWhat');
   });
+  g.events.on('Vanished', (e) => e.struck && once('phantom', 'mind.phantomWhat'));
+  g.events.on('Hit', (e) => e.target === g.player.id && g.ecs.c.phantom.has(e.attacker) && once('phantom', 'mind.phantomWhat'));
 
   return {
     update(now) {
