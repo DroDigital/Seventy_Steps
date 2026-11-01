@@ -5,13 +5,15 @@
  * applies it to a Three.js camera.
  *
  * Three looks (data/cameraModes.ts). The rig keeps the mode's numbers; Classic and Low hero frame a locked-on foe: the point the boom
- * hangs from (the anchor) moves toward the foe and up to the height worth looking at, and the boom lengthens with the foe's height, so
+ * hangs from (the anchor) moves toward the foe and up to where the lens should look, and the boom lengthens with the foe's height, so
  * the lens stays on the line `yaw` looks along (the sticks, the lock and the minimap read it) but stands back far enough to see the whole.
+ * For a tall foe the lens looks at the middle of the band from the investigator's feet to the foe's top (round 104), so a giant's head
+ * and the investigator are in the picture together, rather than the foe's middle with its top cut off.
  */
 
 import { clamp, wrapAngle, yawOf, type V3 } from '../core/geom';
 import { CAMERA_MODES, type CameraMode, type FrameTuning, type CameraTuning } from '../data/cameraModes';
-import { CAMERA, FALL, WATER } from '../data/tuning';
+import { CAMERA, FALL, PLAYER, WATER } from '../data/tuning';
 import { raycast, type CollisionWorld } from '../world/colliders';
 
 export interface CameraRig {
@@ -133,17 +135,23 @@ const FOV_FOLLOW = 6; // 1/s: how fast the lens widens where a wall cuts the boo
 /** What a lock on `foe` asks of the camera, in the looks that frame one: where the anchor stands, how long the boom, how wide the lens, and the pitch that puts the lens at a low height below what it looks at. */
 export function framing(f: FrameTuning, tune: CameraTuning, foe: Frame, pivot: V3): { lead: number; rise: number; reach: number; fov: number; pitch: number } {
   const h = clamp(foe.height, f.height[0], f.height[1]);
-  const lead = Math.min(f.leadMax, Math.hypot(foe.feet.x - pivot.x, foe.feet.z - pivot.z) * f.lead);
+  const away = Math.hypot(foe.feet.x - pivot.x, foe.feet.z - pivot.z); // how far the foe stands from the investigator
+  const lead = Math.min(f.leadMax, away * f.lead);
   const back = clamp(f.back[0] + f.back[1] * h, f.back[2], f.back[3]);
-  const aimY = foe.feet.y + clamp(f.aim[0] * h, f.aim[1], f.aim[2]);
-  const reach = Math.max(tune.distance, back) + lead;
+  const behind = Math.max(tune.distance, back); // the lens's distance behind the investigator
+  const reach = behind + lead;
   const lensY = pivot.y + clamp(f.lensUp[0] + f.lensUp[1] * h, f.lensUp[2], f.lensUp[3]);
+  const tall = smooth(clamp((h - f.tall[0]) / (f.tall[1] - f.tall[0]), 0, 1));
+  const fixed = foe.feet.y + clamp(f.aim[0] * h, f.aim[1], f.aim[2]);
+  const top = Math.atan2(foe.feet.y + h - lensY, behind + away); // the foe's top, as the lens sees it
+  const ground = Math.atan2(pivot.y - tune.pivotHeight - lensY, behind); // the investigator's feet, as the lens sees them
+  const aimY = fixed + (lensY + reach * Math.sin((top + ground) / 2) - fixed) * tall; // a tall foe: the middle of that band
   const sin = Math.sin(f.pitchMost);
   return {
     lead,
     rise: aimY - pivot.y,
     reach,
-    fov: tune.fov + (f.fovTall - tune.fov) * smooth(clamp((h - f.tall[0]) / (f.tall[1] - f.tall[0]), 0, 1)),
+    fov: tune.fov + (f.fovTall - tune.fov) * tall,
     pitch: Math.asin(clamp((lensY - aimY) / reach, -sin, sin)),
   };
 }
@@ -206,7 +214,9 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
   const allowed = Math.max(CAMERA.minDistance, raycast(w, read, end) * reach - CAMERA.margin);
   rig.dist = allowed < rig.dist ? allowed : Math.min(allowed, rig.dist + tune.easeOut * dt);
   rig.pos = lensPosition(w, base, rig.yaw, rig.pitch, rig.dist);
-  const fit = fr && f && inp.frame ? fitFov(rig.pos, base, inp.frame.feet, clamp(inp.frame.height, f.height[0], f.height[1])) : 0; // where a wall or a near foe leaves less room than the framing counted on, the lens widens to keep it whole
-  const want = Math.min(tune.fov, Math.max(fr?.fov ?? tune.fov, fit));
+  // where a wall or a near foe leaves less room than the framing counted on, the lens widens to keep it whole: the foe, and the investigator too
+  const ground = { x: inp.pivot.x, y: inp.pivot.y - tune.pivotHeight, z: inp.pivot.z };
+  const fit = fr && f && inp.frame ? Math.max(fitFov(rig.pos, base, inp.frame.feet, clamp(inp.frame.height, f.height[0], f.height[1])), fitFov(rig.pos, base, ground, PLAYER.height)) : 0;
+  const want = Math.min(f?.fovMost ?? tune.fov, Math.max(fr?.fov ?? tune.fov, fit)); // a framed foe's lens may widen past the look's own, where a wall leaves a giant's top out
   rig.fov += (want - rig.fov) * Math.min(1, (f?.follow ?? FOV_FOLLOW) * dt);
 }
