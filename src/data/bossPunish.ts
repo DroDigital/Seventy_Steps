@@ -70,7 +70,8 @@ interface Blow {
  * vortex's pull) and a special that harms nothing (a teleport, a summons, the dark) recover as the library has them; the rest take the band's.
  */
 export function recoveryFor(a: Blow, band?: PunishBand): number {
-  if (!band || a.follow || (a.kind === 'special' && !a.sanity)) return a.recovery;
+  if (!band || a.follow) return a.recovery; // a link that runs on keeps the library's number: the last link of a chain is the one a horror is held for
   const p = PUNISH[band];
+  if (a.kind === 'special' && !a.sanity) return Math.max(a.recovery, p.least); // a summon, darkness or teleport harms no one, but a horror still rests at least its band's least after it (2026-11-01: summons and darkness had 30)
   return Math.max(Math.round(a.recovery * p.scale), p.least + Math.round(p.heavy * Math.max(0, a.power - 1)));
 }

@@ -5,6 +5,8 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **Keziah Mason's dagger barrage leaves a longer opening, and summons and darkness rest a horror longer.** The 360-degree volley of Keziah Mason and every horror that fires it now leaves its horror open for longer afterwards: a first-band horror for a second, where it left three-quarters of one. A summon, a darkness or a teleport also holds a horror at least as long as its tier's shortest pause after a blow, where a summon or a darkness held it for half a second.
+- **Cthulhu's and Keziah Mason's auras are subtler.** Cthulhu's ring-shaped bubbles and Keziah Mason's veil of sparks are dimmer and calmer, so they no longer draw the eye in a fight. The other horrors' auras are unchanged.
 - **Azathoth has 50% more health.** Its first-journey maximum rises from 10,050 to 15,075, with New Game+ scaling applied on top.
 - **The Serpent Temple has its own ambience.** Dry wind replaces the cavern drips and chains around the temple and Yig's approach.
 - **New health and stamina relics.** Horrors can leave four more relics: the Heartwood Reliquary trades stamina for health, the Lung of the Drowned does the reverse, the Knot of the Dreamer improves stamina recovery at the cost of Echoes, and Blood in Amber grants health and recovery at the cost of damage. They use the existing two relic slots and are found as other relics are. Switching relics preserves the share of health and stamina remaining.
