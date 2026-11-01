@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { JOURNEY_REFERENCE } from '../src/data/ngPlusTuning';
+import { BOSS_JOURNEY_HEALTH, JOURNEY_REFERENCE } from '../src/data/ngPlusTuning';
 import { CTHULHU, REALITY } from '../src/data/tuning';
 import { getEntity } from '../src/data/registry';
 import { strike } from '../src/systems/combat';
@@ -33,7 +33,7 @@ describe('special encounter objectives on every important journey', () => {
       engage(b);
       calm(b);
       const h = g.ecs.c.health.get(boss)!;
-      expect(h.max).toBe(Math.round(getEntity('cthulhu')!.stats.hp * (cycle ? 1.1 + 0.05 * cycle : 1)));
+      expect(h.max).toBe(Math.round(getEntity('cthulhu')!.stats.hp * BOSS_JOURNEY_HEALTH[cycle])); // the journey's table, not a formula that rounds 6152.5 differently
       h.hp = h.max * 0.32;
       steps(g, 1);
       const ship = fight.props.find((e) => g.ecs.c.prop.get(e)?.kind === 'ship')!;
