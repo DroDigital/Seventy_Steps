@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { emptyInput, type InputFrame } from '../src/core/input';
 import { CAMERA_MODES } from '../src/data/cameraModes';
-import { MOUNT_IDS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
-import { QUESTS } from '../src/data/quests';
+import { MOUNT_IDS, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import { PLAYER } from '../src/data/tuning';
 import { gatePlace, travel } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
@@ -30,7 +29,6 @@ function held(move = true, dodge = false): InputFrame {
 
 /** Unlocks the reins and sits the investigator on `id` at `speed`, just across `gate`'s veil, the walk begun. */
 function breach(g: Game, gate: GatePlace, id: MountId, speed: number): void {
-  g.overworld!.quests.set(MOUNT_QUEST, QUESTS[MOUNT_QUEST].stages.length);
   if (id === 'chariot') setChariotEntitlement(g, true);
   if (id === 'automobile') setAutomobileEntitlement(g, true);
   const [a, b] = [near(gate, 1.5, 0), near(gate, 0.3, 0)];

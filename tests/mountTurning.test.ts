@@ -2,8 +2,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { wrapAngle } from '../src/core/geom';
 import { emptyInput } from '../src/core/input';
-import { MOUNT_QUEST, MOUNT_TRAVERSAL as T, MOUNT_TURNING } from '../src/data/mounts';
-import { QUESTS } from '../src/data/quests';
+import { MOUNT_TRAVERSAL as T, MOUNT_TURNING } from '../src/data/mounts';
 import { SIM } from '../src/data/tuning';
 import { teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
@@ -131,7 +130,6 @@ function openGame(): Game {
   const g = createWorldGame();
   g.world = { ground: () => 0, colliders: [], off: new Set(), contain: () => {} };
   teleport(g, { x: 256, z: 240, yaw: 0 });
-  g.overworld!.quests.set(MOUNT_QUEST, QUESTS[MOUNT_QUEST].stages.length);
   return g;
 }
 

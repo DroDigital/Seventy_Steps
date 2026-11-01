@@ -1,19 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { t } from '../src/core/i18n';
 import { emptyInput } from '../src/core/input';
-import { MOUNT_IDS, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL } from '../src/data/mounts';
-import { QUESTS } from '../src/data/quests';
+import { MOUNT_IDS, MOUNTS, MOUNT_TRAVERSAL } from '../src/data/mounts';
 import { CAMERA, PLAYER, SIM } from '../src/data/tuning';
-import { discover, rest, teleport, travel } from '../src/systems/checkpoints';
+import { rest, teleport, travel } from '../src/systems/checkpoints';
 import { strike } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
 import { mountFootprintForbidden } from '../src/systems/mountGround';
 import { mountAvailable, mountBar, controlMount, dismissMount, mountSystem, selectMount, setAutomobileEntitlement, setChariotEntitlement, toggleMount } from '../src/systems/mounts';
 import { movementSystem } from '../src/systems/movement';
-import { talk } from '../src/systems/npcs';
 import { playerControl } from '../src/systems/playerControl';
-import { isDone, questSystem, stageOf } from '../src/systems/quests';
 import { parseSave, snapshot } from '../src/systems/save';
 import { vitalsSystem } from '../src/systems/vitals';
 import { restore } from '../src/systems/death';
@@ -24,7 +21,6 @@ function openGame(): Game {
   const g = createWorldGame();
   g.world = { ground: () => 0, colliders: [], off: new Set(), contain: () => {} };
   teleport(g, { x: 256, z: 240, yaw: 0 });
-  g.overworld!.quests.set(MOUNT_QUEST, QUESTS[MOUNT_QUEST].stages.length);
   return g;
 }
 
@@ -41,17 +37,10 @@ function ride(g: Game, frames: number, gallop = false, dt = 1 / SIM.hz): void {
   }
 }
 
-describe('the borrowed reins', () => {
-  it('offers an early quest and unlocks the free grey without a kill, purchase or consumable', () => {
+describe('the mount from the first night', () => {
+  it('is the investigator\'s from the start, with no quest, kill, purchase or consumable; the DLC appearances still want their entitlement', () => {
     const g = createWorldGame();
-    expect(stageOf(g, MOUNT_QUEST)).toBe(0);
-    expect(mountAvailable(g, 'grey')).toBe(false);
-    talk(g, 'peaslee');
-    expect(stageOf(g, MOUNT_QUEST)).toBe(1);
-    discover(g, 'hub_dream');
-    g.frame = 30;
-    questSystem(g);
-    expect(isDone(g, MOUNT_QUEST)).toBe(true);
+    expect(g.overworld!.quests.has('borrowed_reins')).toBe(false);
     expect(g.overworld!.slain.size).toBe(0);
     expect(mountAvailable(g, 'grey')).toBe(true);
     expect(mountAvailable(g, 'chariot')).toBe(false);
@@ -64,13 +53,20 @@ describe('the borrowed reins', () => {
     expect(mountAvailable(g, 'automobile')).toBe(true);
   });
 
-  it('does not unlock any appearance merely because optional DLC is owned', () => {
+  it('can be called on open ground at once on a new game', () => {
+    const g = openGame();
+    expect(mountBar(g)).toBe(null);
+    expect(toggleMount(g)).toBe(true);
+    expect(g.player.mount.active).toBe('grey');
+  });
+
+  it('loads a save that had the old quest begun, and drops it', () => {
     const g = createWorldGame();
-    setAutomobileEntitlement(g, true);
-    setChariotEntitlement(g, true);
-    expect(mountAvailable(g, 'grey')).toBe(false);
-    expect(mountAvailable(g, 'chariot')).toBe(false);
-    expect(mountAvailable(g, 'automobile')).toBe(false);
+    const s = snapshot(g);
+    const loaded = createWorldGame({ save: parseSave(JSON.stringify({ ...s, quests: { ...s.quests, borrowed_reins: 1 }, tracked: 'borrowed_reins' }))! });
+    expect(loaded.overworld!.quests.has('borrowed_reins')).toBe(false);
+    expect(loaded.overworld!.tracked).toBe(null);
+    expect(mountAvailable(loaded, 'grey')).toBe(true);
   });
 
   it('uses the identical immutable traversal model and produces the same motion and stamina for every appearance', () => {
