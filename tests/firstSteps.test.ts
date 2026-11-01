@@ -101,7 +101,12 @@ describe('the first steps', () => {
     const s = createSteps(g);
     expect([...s.skip].sort()).toEqual(['dodge', 'run', 'strike', 'walk']);
     expect(told.has(TIPS_KEPT)).toBe(true);
-    expect(createSteps(g).skip.has('walk')).toBe(false); // once it keeps its cards, only a card done is skipped
+    for (const id of ['walk', 'run', 'strike', 'dodge']) expect(told.has(TIP_KEPT + id)).toBe(true); // the migration's skips are kept...
+    const again = createWorldGame({ save: parseSave(JSON.stringify(snapshot(g)))! });
+    expect([...createSteps(again).skip].sort()).toEqual(['dodge', 'run', 'strike', 'walk']); // ...so a later load still skips them
+    told.delete(HINT_KEPT + 'fight');
+    told.add(HINT_KEPT + 'hurt');
+    expect(createSteps(g).skip.has('heal')).toBe(false); // once it keeps its cards, a hint given later skips nothing
   });
 
   it('shows nothing in the arena, nor to the fallen', () => {

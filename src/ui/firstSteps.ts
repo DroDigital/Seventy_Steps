@@ -58,6 +58,7 @@ export function createSteps(g: Game): Steps {
   const told = g.overworld?.told;
   const before = !!told && !told.has(TIPS_KEPT); // a new game, or a save from before the cards: its hints say what it already knows
   const skip = new Set<TipId>(TIP_IDS.filter((id) => !!told && (told.has(TIP_KEPT + id) || (before && hintGiven(told, KNOWN[id])))));
+  if (told) for (const id of skip) told.add(TIP_KEPT + id); // what the hints said it knows is kept as done, so a later load (no longer `before`) skips it too
   told?.add(TIPS_KEPT);
   return { rows: new Set(), skip, shown: null, since: 0, lapsed: Infinity, doneAt: {}, walked: 0, turned: 0, sprint: 0, last: null };
 }
