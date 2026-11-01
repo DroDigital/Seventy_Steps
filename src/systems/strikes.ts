@@ -150,10 +150,10 @@ function spread(g: Game, e: Entity, w: Wave): void {
 }
 
 /** Where a swept beam runs on this frame of its move: from the body out along its turning line, cut short by walls. */
-export function beamLine(g: Game, id: Entity, sw: SweepDef, frame: number): { from: V3; to: V3 } {
+export function beamLine(g: Game, id: Entity, sw: SweepDef, frame: number, arm = 0): { from: V3; to: V3 } {
   const tr = g.ecs.c.transform.get(id)!;
   const t = (frame - sw.window[0] + 0.5) / (sw.window[1] - sw.window[0]);
-  const yaw = tr.yaw - (sw.arc[0] + (sw.arc[1] - sw.arc[0]) * Math.min(1, Math.max(0, t))) * DEG;
+  const yaw = tr.yaw + arm * Math.PI * 2 / (sw.arms ?? 1) - (sw.arc[0] + (sw.arc[1] - sw.arc[0]) * Math.min(1, Math.max(0, t))) * DEG;
   const from = { x: tr.pos.x, y: tr.pos.y + BEAM_HEIGHT, z: tr.pos.z };
   const far = { x: from.x + Math.sin(yaw) * sw.length, y: from.y, z: from.z + Math.cos(yaw) * sw.length };
   const k = raycast(g.world, from, far);
@@ -161,13 +161,15 @@ export function beamLine(g: Game, id: Entity, sw: SweepDef, frame: number): { fr
 }
 
 function sweep(g: Game, id: Entity, a: Actor, sw: SweepDef): void {
-  const { from, to } = beamLine(g, id, sw, a.frame);
-  for (const t of live(g, targetsOf(g, id))) {
-    if (a.hits.has(t)) continue;
-    const { gap2, radius } = capsuleGap2(g, t, from, to);
-    if (gap2 > (sw.width + radius) ** 2) continue;
-    a.hits.add(t);
-    strike(g, id, t, blow(sw.damage, sw.poise, false), from);
+  for (let arm = 0; arm < (sw.arms ?? 1); arm++) {
+    const { from, to } = beamLine(g, id, sw, a.frame, arm);
+    for (const t of live(g, targetsOf(g, id))) {
+      if (a.hits.has(t)) continue;
+      const { gap2, radius } = capsuleGap2(g, t, from, to);
+      if (gap2 > (sw.width + radius) ** 2) continue;
+      a.hits.add(t);
+      strike(g, id, t, blow(sw.damage, sw.poise, false), from);
+    }
   }
 }
 

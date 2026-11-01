@@ -25,6 +25,7 @@ import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { dismissMount } from './mounts';
 import { seaChopNow } from './seaChop';
+import { collapsedFloorAt } from './azathothFloor';
 
 const SEA = WORLD.seaLevel + 0.4;
 const LIP = new WeakMap<Game, V3>();
@@ -90,7 +91,7 @@ function holdOf(w: CollisionWorld, pos: V3, h: number): 'floor' | 'edge' | 'air'
 
 /** Feet that can stand: on a region's ground, clear of a drop, and above the sea outside a dungeon. */
 export function footingSafe(g: Game, pos: V3, r: number, h: number): boolean {
-  if (!regionAt(pos.x, pos.z) || inFall(g.world, pos, r, h)) return false;
+  if (!regionAt(pos.x, pos.z) || inFall(g.world, pos, r, h) || collapsedFloorAt(g, pos.x, pos.z)) return false;
   return inDungeon(pos.x, pos.z) || pos.y > SEA;
 }
 
@@ -164,7 +165,13 @@ export function fallSystem(g: Game): void {
   if (!a || !tr || !b) return;
   if (g.player.falling) return dropStep(g, g.player.falling);
   if (a.move === 'death') return;
-  const hold = holdOf(g.world, tr.pos, b.height);
+  let hold = holdOf(g.world, tr.pos, b.height);
+  if (hold !== 'air' && collapsedFloorAt(g, tr.pos.x, tr.pos.z)) {
+    hold = RING.some(([dx, dz]) => {
+      const [x, z] = [tr.pos.x + dx * FALL.foot, tr.pos.z + dz * FALL.foot];
+      return !collapsedFloorAt(g, x, z) && holds(g.world, x, z, Math.max(tr.pos.y, g.world.ground(x, z)), b.height);
+    }) ? 'edge' : 'air';
+  }
   if (hold === 'floor') LIP.set(g, { ...tr.pos }); // the last feet on the floor: the Echoes will lie here
   if (hold !== 'air') return; // on the floor, or balanced on the very edge of it, and free to step back
   beginFall(g, LIP.get(g) ?? tr.prev); // no contact with the floor left: past saving by stepping back, and the drop is the death

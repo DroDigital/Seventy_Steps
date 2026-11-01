@@ -25,7 +25,7 @@ import { worldLayout } from '../src/world/placements';
 import { steps } from './helpers';
 import { kill, record, run } from './worldHelpers';
 
-const OWN: readonly AttackId[] = ['dirge', 'dirge_2', 'dirge_3', 'drumbeat', 'dance', 'seethe', 'maelstrom', 'maelstrom_burst', 'crescendo', 'miasma'];
+const OWN: readonly AttackId[] = ['dirge', 'dirge_2', 'dirge_3', 'drumbeat', 'dance', 'seethe', 'maelstrom', 'maelstrom_burst', 'crescendo', 'miasma', 'blind_rays', 'chaos_rays', 'rift_tentacles', 'rift_cascade'];
 const azathoth = getEntity('azathoth')!;
 const moves = toCombatant(azathoth).moves;
 const body = toCombatant(azathoth).radius;

@@ -44,6 +44,7 @@ export interface GameEvents {
   DryFire: { entity: Entity }; // the trigger pulled on an empty cylinder with nothing to load it from
   Died: { entity: Entity; killer: Entity | null; at: V3 };
   Fell: { entity: Entity; at: V3; frames: number; sea?: boolean }; // the investigator goes over an edge: the fall begins, and ends in Died `frames` later (systems/falls.ts; round 54)
+  FloorTremor: { at: V3; strength: number }; // a weakened section of Azathoth's floor shudders locally
   Splash: { at: V3; speed: number; size: number }; // a body meets the sea: its speed (m/s) and the splash's size, 0..1 (systems/waterFall.ts; round 55)
   Seized: { entity: Entity; at: V3; root: V3 }; // the tentacle has hold of the investigator in the water (systems/waterFall.ts)
   Vanished: { entity: Entity; at: V3; struck: boolean }; // a hallucination gone: struck, or faded

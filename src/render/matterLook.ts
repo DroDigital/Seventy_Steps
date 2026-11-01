@@ -22,6 +22,7 @@ const GOLD: Rgb = [1, 0.86, 0.5];
 
 export const MATTER: Readonly<Record<MarkLook, Matter>> = {
   tentacle: { motif: 'root', sound: 'slime', gain: 0.55 },
+  rift: { motif: 'root', colours: { danger: [0.88, 0.55, 0.95], line: [0.83, 0.52, 1], ring: [0.75, 0.4, 0.86], core: [1, 0.85, 1] }, sound: 'slime', gain: 0.65 },
   star: { motif: 'star', colours: { danger: GOLD, line: GOLD, ring: [1, 0.95, 0.75], core: [1, 1, 0.92], ember: [0.5, 0.3, 0.1] }, sound: 'strike', gain: 0.5 },
   flame: { motif: 'flame', colours: { danger: FLAME, line: [1, 0.78, 0.3], ring: [1, 0.62, 0.2], core: [1, 0.96, 0.75], ember: [0.5, 0.1, 0.02] }, sound: 'gust', gain: 0.5 },
   bolt: { motif: 'star', colours: { danger: STORM_LOOK.danger, line: STORM_LOOK.line, ring: STORM_LOOK.ring, core: STORM_LOOK.core, ember: STORM_LOOK.ember }, sound: 'thunder', gain: 0.6 },

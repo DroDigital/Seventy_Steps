@@ -259,12 +259,14 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         }
         const sw = def.sweep;
         if (sw && a.frame >= sw.window[0] && a.frame < sw.window[1]) {
-          const { to, from } = beamLine(g, id, sw, a.frame + alpha);
           const { look, el } = style(id);
-          fx.spawn({ x: to.x, y: to.y + 0.3, z: to.z, life: 0.12, size: 1 + sw.width, grow: 1.3, color: look.core, glow: true, shape: 'wisp', alpha: 0.9 });
-          for (let i = 0; i < 3; i++) fx.spawn({ x: to.x, y: to.y + 0.2, z: to.z, vx: rand(-3, 3), vy: rand(1.5, 5), vz: rand(-3, 3), life: rand(0.3, 0.7), size: rand(0.1, 0.2), color: look.core, colorEnd: look.line, glow: true, shape: el.glint ?? 'spark', gravity: 7, spin: 8, hold: 0.3 });
-          fx.spawn({ x: from.x, y: from.y, z: from.z, life: 0.1, size: 0.9 + sw.width, grow: 1.2, color: look.core, glow: true, shape: 'wisp', alpha: 0.8 });
-          if ((a.frame - sw.window[0]) % 5 === 0) ground.scar({ x: to.x, y: g.world.ground(to.x, to.z), z: to.z }, 0.9 + sw.width, look.line, whoIs(id), 1.6);
+          for (let arm = 0; arm < (sw.arms ?? 1); arm++) {
+            const { to, from } = beamLine(g, id, sw, a.frame + alpha, arm);
+            fx.spawn({ x: to.x, y: to.y + 0.3, z: to.z, life: 0.12, size: 1 + sw.width, grow: 1.3, color: look.core, glow: true, shape: 'wisp', alpha: 0.9 });
+            for (let i = 0; i < 3; i++) fx.spawn({ x: to.x, y: to.y + 0.2, z: to.z, vx: rand(-3, 3), vy: rand(1.5, 5), vz: rand(-3, 3), life: rand(0.3, 0.7), size: rand(0.1, 0.2), color: look.core, colorEnd: look.line, glow: true, shape: el.glint ?? 'spark', gravity: 7, spin: 8, hold: 0.3 });
+            if (arm === 0) fx.spawn({ x: from.x, y: from.y, z: from.z, life: 0.1, size: 0.9 + sw.width, grow: 1.2, color: look.core, glow: true, shape: 'wisp', alpha: 0.8 });
+            if ((a.frame - sw.window[0]) % 5 === 0) ground.scar({ x: to.x, y: g.world.ground(to.x, to.z), z: to.z }, 0.9 + sw.width, look.line, whoIs(id), 1.6);
+          }
         }
       }
     },

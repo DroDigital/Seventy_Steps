@@ -12,13 +12,11 @@ export const OUTER_GODS = tier('outer_god', [
     id: 'azathoth', name: 'Azathoth', source: 'The Dream-Quest of Unknown Kadath', regions: ['court_centre'], canonLooks: false, voice: 'pipes',
     assembly: { body: 'mound', palette: 'charcoal', scale: 30, tentacles: 12, eyes: 0, glow: 'purple' },
     ...scripted('boss', phases(
-      // Blind: nothing it does is aimed at the investigator. The piping swells in rings of sound, the drums beat the ground to boils, the thirteen dance, the chaos seethes and the
-      // centre draws all in: rhythms over the whole court, read by where they fall and when. What it does aim is an answer to a noise (signatures/azathoth.ts). 2026-10-29: it had
-      // been an ordeal of silence, invulnerable, its health bar a song that drained; it is the hardest fight there is (the pauses shrink with each phase, the last hears everything).
-      ph(1, { dirge: 3, drumbeat: 2, seethe: 2, roar: 1 }),
-      ph(0.72, { dirge: 2, drumbeat: 2, dance: 3, seethe: 1, miasma: 1, roar: 1 }, { hooks: ['darkness'] }),
-      ph(0.45, { dirge: 2, drumbeat: 2, dance: 2, seethe: 2, maelstrom: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp'] }),
-      ph(0.2, { dirge: 3, drumbeat: 2, dance: 3, seethe: 2, maelstrom: 3, crescendo: 3, miasma: 1, roar: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
+      // Blind, it lays its rays, rifts and rhythms across the court rather than tracking the investigator. It answers loud sounds; the court deteriorates while the fight lasts.
+      ph(1, { blind_rays: 3, rift_tentacles: 3, dirge: 2, dance: 1, drumbeat: 1 }),
+      ph(0.72, { blind_rays: 2, rift_tentacles: 2, dance: 2, dirge: 1, seethe: 1, miasma: 1 }, { hooks: ['darkness'] }),
+      ph(0.45, { chaos_rays: 3, rift_cascade: 2, dance: 2, seethe: 1, maelstrom: 2, miasma: 1 }, { hooks: ['darkness', 'camera_warp'] }),
+      ph(0.2, { blind_rays: 1, chaos_rays: 3, rift_cascade: 3, dance: 2, maelstrom: 2, crescendo: 2, miasma: 1 }, { hooks: ['darkness', 'camera_warp', 'arena_reconnect'] }),
     ), { mobile: false, range: [0, 60], aggro: 0, fov: 0, cooldown: [60, 110] }),
     stats: st(10050, 5000, 56, 0.5, 10, 5), drops: { echoes: 50000 }, insightOnSight: 5, // (round 100, 50% more: health 6700 to 10050) (2026-10-29: damage 150 to 56, which the library's powers now multiply: its heaviest blow, the maelstrom's burst, is a quarter of a person's health where it is met)
   },
