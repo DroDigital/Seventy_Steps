@@ -9,7 +9,6 @@ import { createEventBus } from '../core/events';
 import type { InputFrame } from '../core/input';
 import { createMountState, dismissMount, mountSystem, registerMounts } from './mounts';
 import { stepPortalRide } from './mountPortal';
-import { MOUNT_QUEST } from '../data/mounts';
 import { yawOf, type V3 } from '../core/geom';
 import { createRng } from '../core/rng';
 import { ARENA } from '../data/arena';
@@ -63,7 +62,7 @@ import { boltSystem } from './projectiles';
 import { skyStrikeSystem } from './skyStrikes';
 import { discoverySystem } from './discovery';
 import { waySystem } from './ways';
-import { questSystem, startQuest } from './quests';
+import { questSystem } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
 import { candleSystem } from './candles';
@@ -154,7 +153,6 @@ export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty, de
   spawnNpcs(g);
   if (save) applySave(g, save);
   else if (carry) applyCarry(g, carry); // a new journey (NG+): before the world fills, so its foes are that journey's
-  startQuest(g, MOUNT_QUEST); // offered on new and older saves; no boss or purchase is required
   refreshSeals(g); // bosses slain in the save break their seals
   populationSystem(g);
   cameraSystem(g, 0, 0, 0);
