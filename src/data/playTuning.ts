@@ -135,9 +135,9 @@ export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
  * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
- * that its blows take up. Boss health does not scale with the investigator's level.
+ * that its blows take up, and of their growth in damage (Might and the weapon's edge) that its health takes up, on the first journey.
  */
-export const BOSS_OVERMATCH = { share: 0.45 };
+export const BOSS_OVERMATCH = { share: 0.55, health: 0.75 }; // (2026-11-01: blows 0.45 to 0.55 of (0.7 broke the rule that every Vigour level helps) the growth in health; and health, again, 0.75 of the growth in damage, Might and the weapon's edge, past the standing: in an open world a horror met late is still a fight)
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found

@@ -26,6 +26,7 @@ import { atOrBelow } from './sanity';
 import { spawnCombatant } from './spawn';
 import { foeBounty, foeHealth } from './cycles';
 import { bossRung, homeProfile } from './ngPlus';
+import { meet } from './bossScaling';
 
 /** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
 const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
@@ -191,7 +192,9 @@ export function morph(g: Game, e: Entity, id: string, variant: Variant | undefin
   const hp = def.tier === 'ally' ? cd.hp
     : c.fight.has(e) ? Math.round(cd.hp * bossRung(home?.encounter ?? id, g.player.cycle, home?.profile).health)
       : def.bossScript ? cd.hp : Math.round(cd.hp * foeHealth(g, home) * land);
+  const met = c.fight.get(e);
   [h.hp, h.max] = [(h.hp / h.max) * hp, hp];
+  if (met?.base !== undefined) { met.base = hp; meet(g, e, met); } // the new form grows to meet the investigator as the old one had
   const po = c.poise.get(e)!;
   [po.value, po.max] = [(po.value / po.max) * cd.poise, cd.poise];
   c.actor.get(e)!.moves = cd.moves; // a move the new form lacks simply ends

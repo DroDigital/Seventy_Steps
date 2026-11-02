@@ -129,12 +129,12 @@ given Echoes and star-stones. Each may cost at most 1.5 lives; the Colour is cap
 /** data/bossStanding.ts: the Vigour and Might each horror is met at (round 68), for systems/bossScaling.ts. */
 const standingFile = (list: readonly Standing[]): string => `/**
  * What a person has when they meet each horror (round 68; written by \`BALANCE_WRITE=1 npm run audit\`, tests/balance.test.ts, from the
- * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels.
+ * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels and the weapon's edge.
  * Past the expected Vigour, a horror's blows grow with the investigator's health (systems/bossScaling.ts \`overmatch\`).
- * Boss health stays as authored.
+ * Past the expected Might and edge, its health grows with their damage (\`overmatchHealth\`), on the first journey.
  */
-export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number]>> = {
-${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}],`).join('\n')}
+export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number, edge?: number]>> = {
+${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}, ${s.reinforced}],`).join('\n')}
 };
 `;
 
