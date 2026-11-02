@@ -158,9 +158,15 @@ export function mendRate(g: Game): number {
 
 /** Unmoored, the body wears away as well (round 23): a little of full health a second, never to death, and none while a shot of Reagent holds the body, nor while the investigator is sheltered. */
 export function bleed(g: Game, dt: number): void {
-  const h = g.ecs.c.health.get(g.player.id);
-  if (!h || g.cutscene || isSheltered(g) || g.mind.band !== 'unmoored' || h.hp <= 1 || g.player.mended > 0) return; // (a fallen body, at 0, has nothing to lose)
+  if (!bleeding(g)) return;
+  const h = g.ecs.c.health.get(g.player.id)!;
   h.hp = Math.max(1, h.hp - h.max * SANITY.unmoored.bleed * dt);
+}
+
+/** Whether the Unmoored mind is wearing the body away now (the HUD shows it on the health bar). */
+export function bleeding(g: Game): boolean {
+  const h = g.ecs.c.health.get(g.player.id);
+  return !!h && !g.cutscene && !isSheltered(g) && g.mind.band === 'unmoored' && h.hp > 1 && g.player.mended <= 0; // (a fallen body, at 0, has nothing to lose)
 }
 
 /**

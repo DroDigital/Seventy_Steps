@@ -1,7 +1,8 @@
 /**
  * The gameplay camera's three looks (Settings › Play). Classic is the default, with a slight refinement to its original angle.
  * Low hero hangs lower and closer behind the shoulder with a wider lens. Tight shoulder hangs close and over the shoulder.
- * Classic and Low hero frame locked foes by size, moving the lens back and aiming between the investigator and the foe.
+ * Classic and Low hero frame locked foes by size, moving the lens back and aiming between the investigator and the foe (a tall one at the
+ * middle of the band from the investigator's feet to its top, round 104).
  * Every boom stays on the line the picture looks along (`rig.yaw`), which the sticks, the lock, the hurt edge and the minimap read.
  */
 
@@ -14,7 +15,7 @@ export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'shoul
 /** How a locked-on foe is framed: its height `H` in metres (clamped to `height`) sets everything. */
 export interface FrameTuning {
   follow: number; // 1/s: how fast the framing comes in and goes out (a lock lost, a lock switched)
-  height: readonly [least: number, most: number]; // the foe heights the framing scales between (a colossus of 40 m is framed as 24)
+  height: readonly [least: number, most: number]; // the foe heights the framing scales between (the tallest horror, Cthulhu, is 40 m; round 104 lifted this from 24)
   lead: number; // the share of the way to the foe the lens looks at...
   leadMax: number; // ...at most this many metres
   back: readonly [base: number, perMetre: number, least: number, most: number]; // metres the lens hangs behind the investigator
@@ -23,6 +24,7 @@ export interface FrameTuning {
   pitchMost: number; // rad: the boom never tilts further than this to get there
   tall: readonly [from: number, to: number]; // the heights between which the lens narrows...
   fovTall: number; // ...to this
+  fovMost: number; // degrees: the widest the lens goes to hold a foe that a wall or a near foe leaves little room for (round 104: was the look's own)
 }
 
 export interface CameraTuning {
@@ -64,15 +66,16 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
     pitch: 0.23, // a little less downward than the original 0.25, with the same boom and lens
     frame: {
       follow: 2.5,
-      height: [1.6, 24],
+      height: [1.6, 40],
       lead: 0.4,
       leadMax: 8,
-      back: [4.8, 0.38, 5.6, 14],
+      back: [4.8, 0.38, 5.6, 20], // round 104: a giant's lens stands back to take in its top with the investigator (was 14)
       aim: [0.42, 1.5, 9],
       lensUp: [2.6, 0.05, 2.65, 3.8], // keep a view down over the investigator when a short foe is close
       pitchMost: 0.48,
       tall: [3, 14],
       fovTall: 64,
+      fovMost: 72,
     },
   },
   hero: {
@@ -89,15 +92,16 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
     fov: 76,
     frame: {
       follow: 2.5,
-      height: [1.6, 24],
+      height: [1.6, 40],
       lead: 0.5,
       leadMax: 9,
-      back: [2.4, 0.6, 4.4, 12],
+      back: [2.4, 0.6, 4.4, 20], // round 104: as Classic's, for a giant (was 12)
       aim: [0.42, 1.5, 9],
       lensUp: [0.65, 0.22, 0.75, 3.45],
       pitchMost: 0.35,
       tall: [3, 14],
       fovTall: 62,
+      fovMost: 80,
     },
   },
   shoulder: {

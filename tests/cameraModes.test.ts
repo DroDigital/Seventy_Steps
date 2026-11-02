@@ -7,7 +7,7 @@ import { CAMERA_MODES, CAMERA_MODE_IDS, cameraModeOf, type CameraMode } from '..
 import { getEntity } from '../src/data/registry';
 import { CAMERA, RENDER, SETTINGS } from '../src/data/tuning';
 import { fovOf, nearLens } from '../src/render/followCamera';
-import { anchorPoint, createCameraRig, fitFov, hangPoint, resetAim, resetBoom, setCameraMode, stepCamera, type CameraRig, type Frame } from '../src/systems/camera';
+import { anchorPoint, createCameraRig, fitFov, framing, hangPoint, resetAim, resetBoom, setCameraMode, stepCamera, type CameraRig, type Frame } from '../src/systems/camera';
 import { toCombatant } from '../src/systems/creatures';
 import { setLock } from '../src/systems/lockOn';
 import { steps, scriptedGame } from './helpers';
@@ -36,6 +36,14 @@ function seen(rig: CameraRig, pivot: V3, p: V3, room = 1): boolean {
 }
 const sub = (a: V3, b: V3): V3 => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
 const horizontal = (a: V3, b: V3): number => Math.hypot(a.x - b.x, a.z - b.z);
+
+/** How far up the picture `p` is: 0 at its centre, 1 at the top edge, -1 at the bottom (the vertical field, as the lens holds it). */
+function up(rig: CameraRig, pivot: V3, p: V3): number {
+  const { base } = hangPoint(open, anchorPoint(pivot, rig.yaw, rig.lead, rig.rise), rig.yaw, undefined, CAMERA_MODES[rig.mode].shoulder);
+  const [look, to] = [sub(base, rig.pos), sub(p, rig.pos)];
+  const [lp, tp] = [Math.atan2(look.y, Math.hypot(look.x, look.z)), Math.atan2(to.y, Math.hypot(to.x, to.z))];
+  return (tp - lp) / ((rig.fov * RAD) / 2);
+}
 
 describe('the setting', () => {
   it('names a look for each value, Classic for the default and Tight shoulder for what is out of range', () => {
@@ -187,6 +195,40 @@ describe('the looks that frame a foe', () => {
     const pivot = v3(-8, CAMERA_MODES[mode].pivotHeight, -2); // the pillar at (-8, 1) is between it and a foe beyond
     run(rig, 300, pivot, { feet: v3(-8, 0, 6), height: 14 }, w);
     expect(rig.lead).toBeLessThan(2.2);
+  });
+});
+
+describe('a giant: its top and the investigator in the picture together (round 104)', () => {
+  // Framed as 24 m before, Cthulhu's (40 m) top fell out of the picture, and the investigator's feet with it. The investigator
+  // stands at a giant's body's edge, about 12 m off or more, so the cases are 14 m off.
+  for (const mode of ['classic', 'hero'] as const) {
+    for (const height of [24, 30, 40]) {
+      it(`${mode}: a ${height} m horror is seen whole, with the investigator's feet and head`, () => {
+        const pivot = v3(0, CAMERA_MODES[mode].pivotHeight, 0);
+        const rig = createCameraRig(0, mode);
+        run(rig, 400, pivot, { feet: v3(0, 0, 14), height });
+        expect(seen(rig, pivot, v3(0, height, 14), 0.97), 'top').toBe(true);
+        expect(seen(rig, pivot, v3(0, 0, 14), 0.97), 'feet of the horror').toBe(true);
+        expect(seen(rig, pivot, v3(0, 0, 0), 0.97), 'investigator feet').toBe(true);
+        expect(seen(rig, pivot, v3(0, 1.8, 0), 0.97), 'investigator head').toBe(true);
+      });
+    }
+
+    it(`${mode}: the lens looks at the middle of the band from the investigator's feet to a giant's top`, () => {
+      const pivot = v3(0, CAMERA_MODES[mode].pivotHeight, 0);
+      const rig = createCameraRig(0, mode);
+      run(rig, 400, pivot, { feet: v3(0, 0, 14), height: 40 });
+      expect(Math.abs(up(rig, pivot, v3(0, 40, 14)) + up(rig, pivot, v3(0, 0, 0)))).toBeLessThan(0.15);
+    });
+  }
+
+  it('a person is framed as before: the look stays at the fixed aim, not the band', () => {
+    const tune = CAMERA_MODES.classic;
+    const pivot = v3(0, tune.pivotHeight, 0);
+    const rig = createCameraRig(0, 'classic');
+    run(rig, 400, pivot, { feet: v3(0, 0, 6), height: 1.8 });
+    expect(rig.rise).toBeCloseTo(framing(tune.frame!, tune, { feet: v3(0, 0, 6), height: 1.8 }, pivot).rise, 6);
+    expect(rig.rise).toBeCloseTo(1.5 - tune.pivotHeight, 1); // the lens looks at a person's chest, 1.5 m, from the pivot
   });
 });
 

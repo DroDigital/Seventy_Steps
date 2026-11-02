@@ -2,7 +2,7 @@
  * The minimap (playtest round 1): top right, round and centred on the investigator, showing the
  * ground they have seen within EXPLORE.minimap metres and what is marked on it, and where the story
  * leads and the marker they set on the map (each on the rim, in a pointer of its own, when it lies beyond). It turns with the camera, what lies ahead of it up (playtest
- * round 7), an N on the rim marking north. It also drives the map art's slow drawing, a little each
+ * round 7), an N on the rim marking north; or north up, the investigator's arrow turning instead (Settings › Play › Minimap). It also drives the map art's slow drawing, a little each
  * frame. Absent in the arena.
  */
 
@@ -27,7 +27,11 @@ export interface Minimap {
   update(): void;
 }
 
-export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): Minimap {
+/** How far the minimap's picture is turned: the camera's yaw, or 0 when north is kept up. The quest tracker's pointer turns with it. */
+export const minimapYaw = (g: Game, northUp: boolean): number => (northUp ? 0 : g.camera.yaw);
+
+/** `northUp`: whether Settings › Play › Minimap keeps north at the top. */
+export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter, northUp: () => boolean = () => false): Minimap {
   const frame = el(`position:absolute;right:16px;top:16px;width:${SIZE}px;height:${SIZE}px`, '', root);
   const canvas = document.createElement('canvas');
   [canvas.width, canvas.height] = [SIZE, SIZE];
@@ -55,7 +59,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter): 
       const region = g.overworld.region ?? regionAt(p.x, p.z)?.id;
       if (!region) return;
       const view = { cx: p.x, cz: p.z, scale: SIZE / 2 / EXPLORE.minimap, w: SIZE, h: SIZE };
-      const yaw = g.camera.yaw; // yaw 0 looks north; turning right lessens it
+      const yaw = minimapYaw(g, northUp()); // yaw 0 looks north; turning right lessens it
       ctx.clearRect(0, 0, SIZE, SIZE);
       ctx.save();
       ctx.translate(SIZE / 2, SIZE / 2);
