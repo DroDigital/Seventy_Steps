@@ -17,7 +17,7 @@ import { levelsOf } from '../src/systems/levels';
 import { healthAt, levelsWorth, mightAt, staminaAt } from '../src/systems/levelWorth';
 import { dosesAt, KILLED, standings, type Standing } from './balanceModel';
 
-const FRAMES = 60 * 60 * 20; // twenty minutes (round 100: ten, before the horrors' health rose by half; Nyarlathotep and Yog-Sothoth were not finished in ten)
+const FRAMES = 60 * 60 * 10; // ten minutes
 const FIGHT_TIMEOUT = 180_000; // ms one horror's fights may take (round 100: the default 30 s was already close on CI, Nyarlathotep's three starts 26 s, and the fights are half again as long: its nine starts at the cap passed it)
 const SKILL = 0.55;
 /** What the bot plays badly, and is let off: the gaze that turns flesh to stone (it is in sight of it for about half of a fight at best, so its seconds are scaled by the share in view), and the roots (which a person cuts down first, and so spends some seconds more). */
@@ -38,30 +38,30 @@ interface Row extends Standing, Pick<BotFight, 'health' | 'dealt' | 'taken' | 'f
 }
 
 /** Absolute bounds, with explicit exceptions for fights whose measured pressure exceeds their tier. */
-const BOUNDS = { seconds: [6, 800], lives: 3, colossusLives: 6, godLives: 3.4 } as const; // (round 100: the seconds' limit was 450 and a great fight's lives 1.5 before the horrors' health rose by half)
+const BOUNDS = { seconds: [6, 450], lives: 3, colossusLives: 6, godLives: 1.5 } as const;
 /** Each tier has a band so a fight is held to its kind as well as the absolute limits. */
 const GREAT = new Set('mother_hydra father_dagon shub_niggurath bokrug nug rhan_tegoth yeb great_ones yig tsathoggua nyarlathotep hastur ghatanothoa cthulhu umr_at_tawil yog_sothoth azathoth'.split(' '));
 // The stamina-aware bot keeps a roll in reserve and attacks less often; retain the pressure floors and cap the longer fights.
-const BANDS = { named: { seconds: [14, 200], lives: [0.2, 2.4] }, god: { seconds: [35, 340], lives: [0.45, 3.4] } } as const; // (round 100: the upper limits were 90, 1.2, 170 and 1.5 before the horrors' health rose by half)
+const BANDS = { named: { seconds: [14, 90], lives: [0.2, 1.2] }, god: { seconds: [35, 170], lives: [0.45, 1.5] } } as const;
 /**
  * Fights outside those tiers have fixed named bounds, including 'Umr's lower pressure with the bot avoiding the void.
  * They are limits on measured bot outcomes, not a promise that a person can finish within one inventory of healing.
  */
 const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives?: readonly [number, number] }>> = {
-  // (Round 100, the horrors' health up by half: Brown Jenkin's exception is gone, the named band holds him; the upper limits below moved to what the bot now measures, a fifth or so over.)
-  colossus_pyramids: { seconds: [14, 240] },
-  daemon_pipers: { seconds: [14, 280], lives: [0.2, 2.6] },
-  zkauba: { seconds: [14, 280] },
+  brown_jenkin: { seconds: [14, 120] },
+  colossus_pyramids: { seconds: [14, 110] },
+  daemon_pipers: { seconds: [14, 145], lives: [0.2, 1.6] },
+  zkauba: { seconds: [14, 130] },
   // These are members of one encounter. seaBosses.test.ts bounds the combined fight;
   // the solo rows retain god-duration and upper-pressure limits with a member's floor.
   mother_hydra: { lives: [0.2, 1.5] },
   father_dagon: { lives: [0.2, 1.5] },
-  ghatanothoa: { seconds: [35, 580] },
-  nyarlathotep: { seconds: [35, 740], lives: [0.45, 4.5] },
-  shub_niggurath: { seconds: [35, 440] },
-  yog_sothoth: { seconds: [35, 700], lives: [0.45, 3.8] },
+  ghatanothoa: { seconds: [35, 280] },
+  nyarlathotep: { seconds: [35, 430], lives: [0.45, 3] },
+  shub_niggurath: { seconds: [35, 250] },
+  yog_sothoth: { seconds: [35, 400], lives: [0.45, 2.5] },
   umr_at_tawil: { lives: [0.25, 1.5] },
-  colour_out_of_space: { seconds: [14, 170] },
+  colour_out_of_space: { seconds: [14, 135] },
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**
@@ -69,12 +69,12 @@ const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDE
  * so these runs can be much shorter than at their expected standing; upper pressure and completion remain checked for non-exempt fights.
  */
 const CAP = { reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const;
-const YOG_STANDING_MAX = 3.8; // (round 100: 2.5 before the horrors' health rose by half; 3.20 measured)
+const YOG_STANDING_MAX = 2.5;
 const YOG_CAP_MAX = 2.2;
 const COLOUR_OPENING_MAX = 1.3;
 /** At the cap a fight may cost at most this much (round 68: 1.25 times the tier bands' upper limits then, which round 100 does not widen with them). */
 const CAP_CEILING = { named: 1.5, god: 1.875 } as const;
-const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX, daemon_pipers: 2, nyarlathotep: 3.1 }; // the Pipers and Nyarlathotep exceed their tier's ceiling
+const CAP_LIVES_CEILING: Partial<Record<string, number>> = { yog_sothoth: YOG_CAP_MAX };
 const BOUNDS_TEXT = `${BOUNDS.seconds[0]} to ${BOUNDS.seconds[1]} seconds`;
 const AT_CAP_TEXT = `
 ## At the cap
@@ -129,12 +129,12 @@ given Echoes and star-stones. Each may cost at most 1.5 lives; the Colour is cap
 /** data/bossStanding.ts: the Vigour and Might each horror is met at (round 68), for systems/bossScaling.ts. */
 const standingFile = (list: readonly Standing[]): string => `/**
  * What a person has when they meet each horror (round 68; written by \`BALANCE_WRITE=1 npm run audit\`, tests/balance.test.ts, from the
- * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels.
+ * balance model's standings, tests/balanceModel.ts, and held fresh by tests/bossStanding.test.ts): its Vigour and Might levels and the weapon's edge.
  * Past the expected Vigour, a horror's blows grow with the investigator's health (systems/bossScaling.ts \`overmatch\`).
- * Boss health stays as authored.
+ * Past the expected Might and edge, its health grows with their damage (\`overmatchHealth\`), on the first journey.
  */
-export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number]>> = {
-${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}],`).join('\n')}
+export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, might: number, edge?: number]>> = {
+${[...list].sort((a, b) => a.rank - b.rank).map((s) => `  ${s.id}: [${s.levels.vigour}, ${s.levels.might}, ${s.reinforced}],`).join('\n')}
 };
 `;
 

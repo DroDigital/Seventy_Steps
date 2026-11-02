@@ -8,17 +8,17 @@ import { applySave, snapshot } from '../src/systems/save';
 import { levelGain } from '../src/ui/levelGains';
 
 describe('full level gains', () => {
-  it('gives the same health, stamina, recovery and damage per level through the maximum', () => {
+  it('gives the same health, stamina and recovery per level through the maximum, and damage halved past the Might knee', () => {
     for (let n = 0; n <= LEVELS.vigour.max; n++) {
       expect(levelWorth(n)).toBe(n);
       expect(healthAt(n)).toBe(PLAYER.hp + n * LEVELS.vigour.hp!);
       expect(staminaAt(n)).toBe(PLAYER.stamina + n * LEVELS.endurance.stamina!);
       expect(staminaRegen(n)).toBeCloseTo(STAMINA.regen + n * LEVELS.endurance.regen!, 9);
-      expect(mightAt(n)).toBeCloseTo(1 + n * LEVELS.might.damage!, 9);
+      expect(mightAt(n)).toBeCloseTo(1 + Math.min(n, LEVELS.might.knee!) * LEVELS.might.damage! + Math.max(0, n - LEVELS.might.knee!) * LEVELS.might.past!, 9); // (2026-11-01: half a level's worth past the knee)
       if (n < LEVELS.vigour.max) {
         expect(levelGain('vigour', n)).toBe('+16 health');
         expect(levelGain('endurance', n)).toBe('+8 stamina, faster recovery');
-        expect(levelGain('might', n)).toBe('+4% damage');
+        expect(levelGain('might', n)).toBe(n < LEVELS.might.knee! ? '+4% damage' : '+2% damage');
       }
     }
     expect(levelWorth(20.5)).toBe(20.5);

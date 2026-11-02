@@ -15,6 +15,7 @@ import { applyChange, clearProps, removeProp } from './arenaChanges';
 import { startMove } from './actions';
 import { holdInVeil } from './bossArena';
 import type { ArenaCircle, Fight, Game } from './components';
+import { meet } from './bossScaling';
 import { defOf } from './creatures';
 import { phaseAt, phaseBrain } from './fightPhase';
 import { SIGNATURES } from './signatures';
@@ -58,6 +59,7 @@ function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {
 
 function engage(g: Game, e: Entity, f: Fight): void {
   Object.assign(f, { engaged: true, frames: 0, sig: {}, veiled: false });
+  meet(g, e, f);
   const br = g.ecs.c.brain.get(e);
   if (br) br.cooldown = Math.max(br.cooldown, BOSS.wake); // it gathers itself before its first blow (round 60)
   g.events.emit('BossEngaged', { entity: e, name: g.ecs.c.combatant.get(e)?.name ?? f.id });

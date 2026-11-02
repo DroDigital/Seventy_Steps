@@ -38,6 +38,7 @@ export interface Fight {
   veiled?: boolean; // the fog has closed about the ring behind the investigator (round 12): no leaving until one of them falls
   arena: ArenaCircle;
   frames: number; // since it was engaged
+  base?: number; // its most health before it grew to meet the investigator (bossFight.ts `meet`)
   minions: Entity[]; // its summons and decoys
   props: Entity[]; // what its arena changes put up
   changes: Set<ArenaChange>; // applied since it was engaged

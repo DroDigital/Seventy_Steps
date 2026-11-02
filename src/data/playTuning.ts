@@ -125,10 +125,10 @@ export const UI = { baseHeight: 720, least: 1, most: 2.5 };
 export const DECK = { uiScale: 1.15, captions: 1.2 };
 
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
-export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {
+export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number; knee?: number; past?: number }> = {
   vigour: { max: 30, hp: 16 },
   endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second)
-  might: { max: 30, damage: 0.04 }, // share added to the investigator's blows and shots
+  might: { max: 30, damage: 0.04, knee: 18, past: 0.02 }, // (2026-11-01: past the knee, the Might every boss's expected standing stays within, a level gives half: the cap's blows are x1.96, not x2.2) // share added to the investigator's blows and shots
 };
 export type LevelId = keyof typeof LEVELS;
 
@@ -137,9 +137,9 @@ export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
  * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
- * that its blows take up. Boss health does not scale with the investigator's level.
+ * that its blows take up, and of their growth in damage (Might and the weapon's edge) that its health takes up, on the first journey.
  */
-export const BOSS_OVERMATCH = { share: 0.45 };
+export const BOSS_OVERMATCH = { share: 0.55, health: 0.75 }; // (2026-11-01: blows 0.45 to 0.55 of (0.7 broke the rule that every Vigour level helps) the growth in health; and health, again, 0.75 of the growth in damage, Might and the weapon's edge, past the standing: in an open world a horror met late is still a fight)
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found
@@ -276,7 +276,7 @@ export const CACHE = {
 /** Consumables: Laudanum steadies the mind (tuning.ts), West's Reagent closes wounds. */
 export const REAGENT = {
   doses: 4, // at the start; each Silver Vial found adds one
-  maxDoses: 10, // the start's four and six vials (round 68: fourteen doses of 45% were six and a third bars of health in the pocket; a vial found past the most is Echoes)
+  maxDoses: 8, // (2026-11-01: ten, which made a late fight's health five bars deep and its pressure a fifth lighter) // the start's four and six vials (round 68: fourteen doses of 45% were six and a third bars of health in the pocket; a vial found past the most is Echoes)
   heal: 0.4, // share of full health restored (round 68: it was 0.45)
   surplus: 600, // Echoes a Silver Vial is worth to one whose kit holds no more
   mend: 8, // seconds after a shot in which lingering hurts (pools, the void) do no harm (playtest round 7)

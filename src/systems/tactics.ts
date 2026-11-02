@@ -16,6 +16,7 @@ import type { Rng } from '../core/rng';
 import type { BrainDef } from '../data/archetypes';
 import { AI, BOSS, RANK, SEA_BOSSES, SIM } from '../data/tuning';
 import { ATTACKS } from '../data/attacks';
+import { PUNISH, bandOf } from '../data/bossPunish';
 import { moveDef, startMove } from './actions';
 import { evade, holdInside, rimGap } from './bossArena';
 import { isAbsent, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
@@ -132,6 +133,12 @@ function volleyBusy(g: Game, id: Entity): boolean {
   return g.frame < (volleyFree.get(g) ?? 0);
 }
 
+/** A horror's wait between blows in its arena: its band's gap (data/bossPunish.ts), else `BOSS.gap`, never under its own pace. */
+const gapFor = (own: readonly [number, number], boss: string | undefined): [number, number] => {
+  const gap = (boss && bandOf(boss) && PUNISH[bandOf(boss)!].gap) || BOSS.gap;
+  return [Math.max(own[0], gap[0]), Math.max(own[1], gap[1])];
+};
+
 export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, arena: ArenaCircle | undefined): void {
   const c = g.ecs.c;
   const p = br.def.params;
@@ -150,7 +157,7 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
     : pressed
       ? RANK.cooldown
       : arena
-        ? [Math.max(p.cooldown[0], BOSS.gap[0]), Math.max(p.cooldown[1], BOSS.gap[1])]
+        ? gapFor(p.cooldown, c.fight.get(id)?.id)
         : p.cooldown; // (round 46; a lesser hunter's own wait is RANK)
   const punish = pressed ? RANK.punish : AI.punish;
   const into = (pressed || !arena) && target === g.player.id && br.cooldown <= hi * (1 - punish) && opening(g);
