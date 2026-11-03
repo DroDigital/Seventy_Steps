@@ -3,6 +3,8 @@ import { QUESTS } from '../src/data/quests';
 import { discover, teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
+import { COURT_SIGN } from '../src/systems/endings';
+import { currentLead } from '../src/systems/lead';
 import { markNew } from '../src/systems/finds';
 import { nextLevelCost } from '../src/systems/levels';
 import { startQuest } from '../src/systems/quests';
@@ -32,6 +34,19 @@ describe('why an Elder Sign is worth resting at', () => {
     ow.slain.add('boss:keziah_mason');
     startQuest(g, 'descent');
     expect(signCalls(g).get(sleeper().id)).toContain('descend');
+  });
+
+  it('marks the Court’s sign with the ending alone when the ending is the lead, not a travel waypoint too', () => {
+    const g = createWorldGame();
+    const ow = g.overworld!;
+    for (const [id, q] of Object.entries(QUESTS)) if (q.main && id !== 'silver_key') ow.quests.set(id, q.stages.length);
+    ow.quests.set('silver_key', 3);
+    ow.slain.add('boss:azathoth');
+    const court = worldLayout().signs.find((s) => s.id === COURT_SIGN)!;
+    teleport(g, { x: court.x + 3, z: court.z, yaw: 0 });
+    discover(g, court.id);
+    expect(currentLead(g)?.goal.kind).toBe('ending');
+    expect(signCalls(g).get(court.id)).toEqual(['ending']);
   });
 
   it('hangs a level, star-stones and a new relic on the nearest lit sign only', () => {

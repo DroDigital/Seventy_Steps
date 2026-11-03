@@ -4,6 +4,7 @@
  *
  * - `descend`: the lead's way runs down the Seventy Steps at the Sleeper's Sign (leadWay.ts).
  * - `travel`: the lead lies in a realm no gate reaches from here, so its way begins with travel from this sign.
+ *   Both only where the sign is a waypoint on the way: never where the lead's own goal is the sign (a sign to reach, the Court's ending).
  * - `ending`: the Court's sign, once Azathoth slumbers: the endings wait (endings.ts).
  * - `level`: Echoes enough for a level (levels.ts), at the nearest lit sign only.
  * - `stones`: star-stones enough to reinforce a weapon owned or the revolver (arms.ts, gun.ts), nearest lit sign only.
@@ -20,7 +21,7 @@ import { descentOpen } from './checkpoints';
 import type { Game } from './components';
 import { courtEndings } from './endings';
 import { canUpgradeGun } from './gun';
-import { currentLead } from './lead';
+import { currentLead, goalPlace } from './lead';
 import { placeKey } from './leadWay';
 import { canLevel, LEVEL_IDS } from './levels';
 
@@ -46,8 +47,9 @@ export function signCalls(g: Game): Map<string, SignCall[]> {
   if (lead?.at) {
     const at = lead.at;
     const s = signs.find((x) => distXZ(x, at) < SAME);
-    const reaching = goal?.kind === 'reach' && goal.sign === s?.id; // the lead is the sign itself: come to it, no rest asked
-    if (s && !reaching) add(s.id, s.dream && descentOpen(g) && !g.demo ? 'descend' : 'travel');
+    const dest = goal ? goalPlace(goal) : null;
+    const isGoal = !!dest && !!s && distXZ(dest, s) < SAME; // the lead ends at this sign (a sign reached, the Court's ending): not a waypoint, so no descend or travel
+    if (s && !isGoal) add(s.id, s.dream && descentOpen(g) && !g.demo ? 'descend' : 'travel');
   }
   for (const s of signs) if (courtEndings(g, s.id).length) add(s.id, 'ending');
   const me = g.ecs.c.transform.get(g.player.id)?.pos;
