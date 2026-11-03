@@ -2,7 +2,7 @@
  * First steps (round 102, asked): the core controls written on the screen as the waking investigator first needs each, not in a list
  * before play. Walking and looking at once, on waking; running once they are walking; the light and the heavy blow when a foe first
  * closes in; the roll when one is near and swinging (or once the blows are learned); West's Reagent when the body is first badly hurt;
- * calling the chariot on open ground once running is learned. One card at a time, its rows ticked off as each is done; a card done is
+ * calling the chariot on open ground once running is learned and The Borrowed Reins have given it (not before: the HUD's summon line waits too). One card at a time, its rows ticked off as each is done; a card done is
  * kept in the save (`tip:<id>` in `ow.told`) and never shown again. A save loaded that had already been told the Field Guide's hint a
  * card teaches (`move`, `fight`, `hurt`, `mount`), before it kept its cards (`tips:kept`), is not shown it. Pure: the game is read, only `told` is written (ui/tipCard.ts draws it).
  */
@@ -13,7 +13,7 @@ import { hintGiven, type HintId } from '../data/fieldGuide';
 import type { Key } from '../data/lang';
 import { moveDef } from '../systems/actions';
 import { isAbsent, type Game } from '../systems/components';
-import { mountBar } from '../systems/mounts';
+import { mountBar, mountUnlocked } from '../systems/mounts';
 import type { Act } from './glyphs';
 
 export type TipId = 'walk' | 'run' | 'strike' | 'dodge' | 'heal' | 'mount';
@@ -123,7 +123,7 @@ function due(g: Game, s: Steps, id: TipId, me: { x: number; z: number }): boolea
       return h.hp < h.max * F.hurt && g.player.reagent > 0;
     case 'mount': {
       const ran = s.doneAt.run ?? (s.skip.has('run') ? -Infinity : undefined);
-      return ran !== undefined && g.frame - ran >= F.mountAfter && !foeNear(g, me, F.foe) && (!!g.player.mount.active || mountBar(g) === null);
+      return mountUnlocked(g) && ran !== undefined && g.frame - ran >= F.mountAfter && !foeNear(g, me, F.foe) && (!!g.player.mount.active || mountBar(g) === null);
     }
   }
 }

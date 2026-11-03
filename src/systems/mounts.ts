@@ -2,12 +2,13 @@
 import { yawOf } from '../core/geom';
 import { t } from '../core/i18n';
 import type { InputFrame } from '../core/input';
-import { FREE_MOUNT, MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import { FREE_MOUNT, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
 import { PLAYER, SIM, STAMINA } from '../data/tuning';
 import type { Game } from './components';
 import { createBuffer } from './inputBuffer';
 import { setLock } from './lockOn';
 import { canAfford } from './stamina';
+import { isDone } from './quests';
 import { mountGroundAllowed, footprintClear } from './mountGround';
 import { createReins, type ReinState } from './mountReins';
 import { portalQuiet, portalVeil } from './mountPortal';
@@ -30,8 +31,7 @@ export interface MountState {
 }
 
 export const createMountState = (): MountState => ({ selected: FREE_MOUNT, active: null, automobileOwned: false, chariotOwned: false, speed: 0, yawRate: 0, jam: 0, phase: 0, cooldownUntil: 0, reins: createReins(), idleToss: null });
-/** Round 102 (asked): the chariot is the investigator's from the first night, anywhere in the open world; no quest gives it (The Borrowed Reins is gone). */
-export const mountUnlocked = (g: Game): boolean => !!g.overworld;
+export const mountUnlocked = (g: Game): boolean => isDone(g, MOUNT_QUEST);
 
 function dlcOwned(g: Game, id: MountId): boolean {
   if (id === 'automobile') return g.player.mount.automobileOwned;
@@ -78,6 +78,7 @@ export function dismissMount(g: Game): void {
 export function mountBar(g: Game): string | null {
   const p = g.player;
   if (!g.overworld) return t('n.mountOpen');
+  if (!mountUnlocked(g)) return t('n.mountQuest');
   if (!mountAvailable(g, p.mount.selected)) return t('n.mountDlc', { name: MOUNTS[p.mount.selected].name.toUpperCase(), free: MOUNTS.grey.name.toUpperCase() });
   if ((g.ecs.c.health.get(p.id)?.hp ?? 0) <= 0 || g.ecs.c.actor.get(p.id)?.move !== null || p.fogPass || p.gatePass || g.reality.stolen > 0) return t('n.mountStand');
   if (g.frame < p.mount.cooldownUntil) return t('n.mountHurt');
@@ -149,4 +150,7 @@ export function registerMounts(g: Game): void {
   g.events.on('Teleported', ({ entity }) => { if (entity === g.player.id && !portalVeil(g)) dismissMount(g); });
   g.events.on('Travelled', () => { if (!portalVeil(g)) dismissMount(g); }); // a gate keeps a ride that was taken through it (mountPortal.ts)
   for (const event of ['Rested', 'Respawned', 'BossEngaged', 'FogPassing', 'BodyStolen'] as const) g.events.on(event, () => dismissMount(g));
+  g.events.on('QuestChanged', ({ id, done }) => {
+    if (id === MOUNT_QUEST && done) g.events.emit('Notice', { text: t('n.mountYours') });
+  });
 }
