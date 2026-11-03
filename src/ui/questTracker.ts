@@ -34,7 +34,7 @@ export function pointerAngle(from: XZ, to: XZ, yaw: number): number {
 /** `shown`: whether the HUD has the screen for it (no menu, not dying, the setting on). */
 /** `yaw`: how far the minimap's picture is turned (ui/minimap.ts `minimapYaw`), so the pointer agrees with it. */
 export function createQuestTracker(g: Game, root: HTMLElement, shown: () => boolean, yaw: () => number = () => g.camera.yaw): QuestTracker {
-  const box = el('position:absolute;right:16px;top:216px;width:220px;text-align:right;opacity:0;transition:opacity .7s', '', root);
+  const box = el('position:absolute;right:16px;top:216px;width:220px;box-sizing:border-box;padding:5px 6px 5px 28px;text-align:right;opacity:0;transition:opacity .7s;background:linear-gradient(90deg,transparent,#08080bcc)', '', root);
   const title = el(`font-size:11px;letter-spacing:3px;color:${GOLD};text-transform:uppercase;transition:color 1.2s`, '', box);
   const rule = el(`height:1px;margin:4px 0 5px;transform-origin:right;transition:transform 1.2s;background:linear-gradient(270deg,${GOLD}cc,${GOLD}00)`, '', box);
   const line = el('font-size:13px;line-height:1.35;letter-spacing:.3px', '', box);

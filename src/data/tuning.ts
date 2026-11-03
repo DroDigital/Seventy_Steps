@@ -41,7 +41,7 @@ export const FX = {
   spriteRoof: [0.35, 3] as readonly [number, number], // round 96: the time constants, in seconds, with which a drawn creature's realm tint comes off at a roof's door (the first) and comes back under the open sky (the second), as the realm's coat eases (data/coats.ts COAT_EASE); under a roof the creature is drawn as it was drawn (render/creatureRoof.ts)
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
-  ditherSpread: [0.05, 0.12] as Ramp,
+  ditherSpread: [0.04, 0.1] as Ramp, // restrained ordered grain, growing as the mind fails (render/shaders/post.ts)
   ripple: [0, 0.016] as Ramp, // UV units: how far the flow of the picture's edge carries it (round 58: the amplitude of a sine laid over the whole screen, 0.012)
   chroma: [0, 0.009] as Ramp, // UV units: the lens's split of the colours at the edge of the picture (round 58: it turned about, whole)
   ghost: [0, 0.34] as Ramp, // round 58: the share of a second picture, a little to one side, that a failing mind sees double with, at the surge's height (a fraction of that, as the warp is)

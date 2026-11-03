@@ -83,7 +83,8 @@ export interface HudOptions {
 /** `tracker`: whether the quest tracker is asked for (Settings › Play). */
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
-  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 80): the bars, counters, map and quest line, which sink together
+  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer: the bars, counters and map sink together
+  const questLayer = el('position:absolute;inset:0', '', root); // the objective stays readable when the other HUD recedes
   const northUp = opts.northUp ?? (() => false);
   const minimap = createMinimap(g, dim, painter, northUp);
   const steps = createSteps(g); // before the hints: what a save loaded had been told already
@@ -95,7 +96,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   hp.style.position = 'relative';
   let chipPct = 100;
   let chipHold = 0;
-  const stamina = gauge(vitals, LEAF, 3);
+  const stamina = gauge(vitals, LEAF, 4);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
   const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#8a8678'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
   const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#8a8678'); // the cylinder's six and the spare rounds (round 22)
@@ -130,7 +131,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const tipCard = createTipCard(root); // the first steps' controls, as each is first needed (round 102)
   const tipsOn = (): boolean => opts.tips?.() ?? true;
   const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
-  const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker(), () => minimapYaw(g, northUp())); // what the quest followed asks, at the right under the minimap
+  const quest = createQuestTracker(g, questLayer, () => !dying && !menuOpen() && tracker(), () => minimapYaw(g, northUp())); // what the quest followed asks, at the right under the minimap
   const me = g.player.id;
   let calls = { at: -Infinity, of: new Map<string, SignCall[]>() };
   /** What resting at this sign is for now, after its name (systems/signCalls.ts; render/signCallViews.ts hangs the marks). */
@@ -201,6 +202,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       hours.update();
       calmNow = calm.update();
       setStyle(dim, 'opacity', calmNow.hud > 0 ? (1 - (1 - QUIET.hudTo) * calmNow.hud).toFixed(2) : '1');
+      setStyle(questLayer, 'opacity', calmNow.hud > 0 ? (1 - 0.15 * calmNow.hud).toFixed(2) : '1');
       if (!menuOpen()) hints.update();
       tipCard.show(tipsOn() && !dying && !screenHeld && !menuOpen() && !opts.held?.() ? stepTips(g, steps) : null);
       const busy = menuOpen() ? 'hidden' : 'visible'; // a dialogue or menu has the screen
