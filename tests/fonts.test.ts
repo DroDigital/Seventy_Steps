@@ -17,9 +17,9 @@ describe('the interface typefaces (round 74)', () => {
       expect(statSync(path).size, `${path} is large for a subset`).toBeLessThan(120_000);
       expect(credits, `${f.file} is not credited`).toContain(f.file);
     }
-    for (const family of families) {
-      const name = family.replace(/ /g, '');
-      expect(existsSync(`public/fonts/OFL-${name}.txt`) || existsSync(`public/fonts/LICENSE-${name}.txt`), `${family} licence`).toBe(true);
+    for (const f of FONT_FILES) {
+      const name = f.file.split('-')[0]; // the licence goes with the file, whatever family a face of it is registered as
+      expect(existsSync(`public/fonts/OFL-${name}.txt`) || existsSync(`public/fonts/LICENSE-${name}.txt`), `${f.file} licence`).toBe(true);
     }
   });
 
@@ -29,6 +29,14 @@ describe('the interface typefaces (round 74)', () => {
     expect(families).toContain(first(TYPEWRITER));
     expect(DEFAULT_SERIF).toMatch(/,serif$/);
     expect(TYPEWRITER).toMatch(/,monospace$/);
+  });
+
+  it('sets figures in lining digits from EB Garamond, ahead of IM Fell English (whose figures are oldstyle)', () => {
+    const figures = FONT_FILES.filter((f) => f.family === first(DEFAULT_SERIF));
+    expect(figures.map((f) => f.file).every((file) => file.startsWith('EBGaramond-'))).toBe(true);
+    expect(figures.map((f) => f.style).sort()).toEqual(['italic', 'normal']);
+    for (const f of figures) expect(f.range).toBe('U+0025, U+0030-0039');
+    expect(DEFAULT_SERIF.split(',')[1]).toBe("'IM Fell English'");
   });
 
   it('switches the canvas face along with the setting', () => {
