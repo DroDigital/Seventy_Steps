@@ -9,8 +9,8 @@
  * - stones: a five-pointed star, amber, wheeling slowly and twinkling (star-stones enough to reinforce).
  * - relic: a lozenge about a dot, rose, breathing (a relic found and not yet looked at).
  *
- * Several are hung side by side, facing the eye; they grow with distance so the lead's mark reads from afar, and fade in
- * and out as the calls change. Additive light, one small mesh each; read-only on the simulation.
+ * Several are hung in a shallow arc over the stone, facing the eye; they grow modestly with distance and fade in
+ * and out as the calls change. Dithered additive light, one small mesh each; read-only on the simulation.
  */
 
 import * as THREE from 'three';
@@ -27,10 +27,11 @@ export interface SignCallViews {
 type Pt = readonly [number, number];
 interface Look { color: readonly [number, number, number]; flow: number; shape: () => Pt[] }
 
-const HIGH = PLINTH + 3.3; // metres above the sign's foot: over the carved stone
-const GAP = 1.2; // between marks side by side
-const SIZE = 0.85; // a mark's height near to
-const GROW = [22, 3.2] as const; // beyond this many metres a mark grows with distance, up to this many times
+const HIGH = PLINTH + 3.15; // metres above the sign's foot: over the carved stone
+const GAP = 0.72; // between marks side by side
+const SIZE = 0.55; // a mark's height near to
+const ARC = 0.035; // drop per squared slot, making a shallow arch over the stone
+const GROW = [26, 2.2] as const; // beyond this many metres a mark grows with distance, up to this many times
 const EVERY = 0.4; // seconds between asking the simulation again
 const FADE = 0.35; // seconds to come or go
 
@@ -102,9 +103,15 @@ uniform float uAlpha;
 uniform float uFlow;
 uniform float uTime;
 varying float vY;
+float bayer4(vec2 p) {
+  const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+  ivec2 q = ivec2(mod(p, 4.0));
+  return (m[q.x + q.y * 4] + 0.5) / 16.0;
+}
 void main() {
   float run = uFlow == 0.0 ? 1.0 : 0.55 + 0.45 * sin((vY / ${SIZE.toFixed(2)} - uFlow * uTime * 1.6) * 6.2832 * 1.2);
-  gl_FragColor = vec4(uColor * uAlpha * run * 1.25, 1.0);
+  if (uAlpha * run * 0.6 < bayer4(gl_FragCoord.xy)) discard;
+  gl_FragColor = vec4(uColor * 0.55, 1.0);
 }
 `;
 
@@ -167,8 +174,9 @@ export function createSignCallViews(scene: THREE.Scene, g: Game): SignCallViews 
         const face = Math.atan2(eye.x - foot.x, eye.z - foot.z);
         const d = Math.hypot(eye.x - foot.x, eye.z - foot.z);
         const k = Math.min(GROW[1], Math.max(1, d / GROW[0]));
-        const bob = Math.sin(time * 1.7 + m.slot) * 0.1;
-        m.mesh.position.set(foot.x + Math.cos(face) * m.slot * GAP * k, foot.y + HIGH + (k - 1) * SIZE * 0.6 + bob, foot.z - Math.sin(face) * m.slot * GAP * k); // left to right as the eye sees them
+        const bob = Math.sin(time * 1.2 + m.slot * 0.35) * 0.035;
+        const arc = ARC * m.slot * m.slot * k;
+        m.mesh.position.set(foot.x + Math.cos(face) * m.slot * GAP * k, foot.y + HIGH + (k - 1) * SIZE * 0.6 - arc + bob, foot.z - Math.sin(face) * m.slot * GAP * k); // shallow arch, left to right as the eye sees it
         m.mesh.scale.setScalar(k);
         m.mesh.rotation.set(0, face, m.call === 'ending' ? Math.sin(time * 1.3) * 0.25 : 0);
         if (m.call === 'stones') m.mesh.rotation.set(0, face, time * 0.5);
