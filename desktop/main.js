@@ -240,6 +240,11 @@ function startPads() {
     if (code !== 0 && padStarts++ < 3) setTimeout(startPads, 1000); // a fault in the native module stops the pads for a moment, not the game. A look for controllers does not exit this process.
   });
 }
+/** The pad's motors (2026-11-03: core/rumble.ts): handed to the SDL worker, numbers only, clamped. */
+ipcMain.on('desktop:rumble', (_e, m) => {
+  const n = (v, hi) => (Number.isFinite(v) ? Math.min(hi, Math.max(0, v)) : 0);
+  worker?.postMessage({ type: 'rumble', index: Math.floor(n(m?.index, 16)), strong: n(m?.strong, 1), weak: n(m?.weak, 1), ms: Math.round(n(m?.ms, 2000)) });
+});
 ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) after the pads were found asks for them once
 
 /** What `--smoke-test` checks: the page reached its title and found the shell's bridge, and (as SMOKE_REQUIRE names them) the Steam binding loaded and the controllers' worker started. Prints one line and quits with 0 or 1. */

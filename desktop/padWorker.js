@@ -45,9 +45,17 @@ try {
   };
   port.on('message', (event) => {
     const data = event?.data ?? event;
+    if (data?.type === 'rumble') return void rumble(data);
     if (data?.type !== 'rescan') return;
     try { rescan(); } catch { /* a failed look leaves the pads as they are; the process stays */ }
   });
+  // The pad's motors (2026-11-03: core/rumble.ts): the page numbers the pads as the snapshot lists them, the connected ones in order, so the same list is read here.
+  const rumble = ({ index, strong, weak, ms }) => {
+    try {
+      const pad = Array.from(manager.getGamepads() ?? []).filter((p) => p && p.connected !== false)[index];
+      void pad?.vibrationActuator?.playEffect('dual-rumble', { startDelay: 0, duration: ms, strongMagnitude: strong, weakMagnitude: weak })?.catch?.(() => undefined);
+    } catch { /* a pad that cannot rumble is still a pad */ }
+  };
   setInterval(send, EVERY_MS);
   port.postMessage({ type: 'ready' });
 } catch (e) {

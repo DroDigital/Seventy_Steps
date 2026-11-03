@@ -32,6 +32,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
   font: (v) => v > 0.5 ? 'EB Garamond' : 'IM Fell English',
   uiScale: (v) => `×${v.toFixed(2)}`,
   shake: pct,
+  rumble: pct,
   cutscenes: onOff,
   questTracker: onOff,
   minimap: (v) => t(v > 0.5 ? 'val.minimap.north' : 'val.minimap.turn'),
@@ -54,7 +55,7 @@ const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
   ['set.tab.display', ['resolution', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
   ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
-  ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'shake', 'fxCap']],
+  ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'shake', 'rumble', 'fxCap']],
 ];
 const HINT = (id: SettingId): string | undefined => {
   const k = `set.hint.${id}` as Key;

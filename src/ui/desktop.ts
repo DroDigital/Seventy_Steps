@@ -9,6 +9,7 @@ import { GAME_PAGE } from '../data/links';
 export interface Desktop {
   deck?: boolean; // on a Steam Deck (round 47): a first launch takes larger text
   edition?: 'full' | 'demo'; // the pack's edition (round 56: data/edition.ts reads it)
+  rumble?(index: number, strong: number, weak: number, ms: number): void; // the natively read pad's motors (2026-11-03: core/rumble.ts)
   quit(): Promise<void>;
   setFullscreen(on: boolean): Promise<void>;
   isFullscreen(): Promise<boolean>;

@@ -45,6 +45,7 @@ import { weatherHaze } from './render/weather';
 import { createGroundFx } from './render/groundFx';
 import { createWorldLights } from './render/worldLights';
 import { createHurtFx } from './render/hurtFx';
+import { createRumbleFx } from './render/rumbleFx';
 import { createParticles } from './render/particles';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
@@ -231,6 +232,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
+  const rumble = createRumbleFx(game); // the game felt in the hands: a pad's motors (2026-11-03)
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
   const input = createInput(canvas, () => !menuOpen());
   const dialogue = createDialogue(game);
@@ -339,6 +341,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
         hurt.update(pipeline.post, camera, time);
         impactFx.update(camera, time);
+        rumble.update(settings.rumble, still || dialogue.open || shop.open || !!menu?.open || !!rise?.open || ending.open); // (a talk, a trade, a sign's rest, the rise and an ending leave the world running, but the hands are at rest)
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
         world?.update(flight.active ? camera.position.x : at.x, flight.active ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
