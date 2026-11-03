@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FIRST_STEPS as F } from '../src/data/tuning';
+import { MOUNT_QUEST } from '../src/data/mounts';
+import { QUESTS } from '../src/data/quests';
 import { HINT_KEPT } from '../src/data/fieldGuide';
 import { teleport } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
@@ -83,14 +85,15 @@ describe('the first steps', () => {
     expect(run(g, s, 1)?.rows).toEqual([true]);
   });
 
-  it('offers the chariot on open ground once running is learned, and no foe is near', () => {
+  it('offers the chariot on open ground once running is learned, The Borrowed Reins are done, and no foe is near', () => {
     const g = open();
     const s = createSteps(g);
     s.skip.add('walk');
     s.rows.add('run:0');
     run(g, s, 1);
-    expect(run(g, s, F.mountAfter - 2)).toBe(null);
-    expect(run(g, s, 2)?.id).toBe('mount');
+    expect(run(g, s, F.mountAfter + 30)).toBe(null); // the reins not yet had: no card for a call that cannot be made
+    g.overworld!.quests.set(MOUNT_QUEST, QUESTS[MOUNT_QUEST].stages.length);
+    expect(run(g, s, 1)?.id).toBe('mount');
     g.player.mount.active = 'grey';
     expect(run(g, s, 1)?.rows).toEqual([true]);
   });
