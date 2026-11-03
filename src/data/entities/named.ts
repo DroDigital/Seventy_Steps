@@ -29,7 +29,7 @@ export const NAMED = tier('named', [
   {
     id: 'keziah_mason', name: 'Keziah Mason', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2, eyes: 2, gear: ['witch'] },
-    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }),
+    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1, wind_push: 2 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1, wind_push: 1, sweep: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }), // 2026-11-03: a gust that shoves the investigator off (and, past half, one slash of her knife) at close quarters, where the 360-degree volley was all she had within 4 m
     stats: st(1350, 120, 28, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700)
   },
   {
