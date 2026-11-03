@@ -18,3 +18,5 @@ for Special Elite.
   https://github.com/google/fonts/tree/main/apache/specialelite
 
 - `EBGaramond-Regular.woff2`, `EBGaramond-Italic.woff2`: **EB Garamond**, by Georg Duffner and Octavio Pardo. Licence: SIL Open Font License 1.1, `OFL-EBGaramond.txt`. The variable originals were instantiated at weight 400, subset to Latin letters and the game's symbols, and packed as WOFF2. Source: https://github.com/google/fonts/tree/main/ofl/ebgaramond
+  The same two files are registered a second time as `Fell Figures` for the digits and % alone (`src/ui/fonts.ts`), set ahead of IM
+  Fell English, whose figures are oldstyle; the files are unchanged.

@@ -241,7 +241,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
   const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5, northUp: () => settings.minimap > 0.5, tips: () => settings.controlTips > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
-  const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
+  const photo = createPhoto(game, () => pipeline.shot(), () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture (the low-res one, before it is spread over the screen)
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
   const flight = createFreeCamera();
@@ -268,7 +268,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
 
   let lowRes = state.enabled.pixelate;
   let scale = settings.resolution;
-  const resize = (): void => pipeline.resize(lowRes, scale);
+  let even = settings.evenPixels > 0.5; // every picture pixel the same size on the screen (2026-11-03: render/evenPixels.ts)
+  const resize = (): void => pipeline.resize(lowRes, scale, even);
   resize();
   addEventListener('resize', resize);
 
@@ -318,9 +319,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         [FEEL.shake, FEEL.flashes] = [settings.shake, settings.flashes];
         pipeline.post.uniforms.uGamma.value = brightnessGamma(settings.brightness);
         state.cap = settings.fxCap;
-        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution) {
-          [lowRes, scale] = [state.enabled.pixelate, settings.resolution];
-          resize();
+        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution || even !== settings.evenPixels > 0.5 || pipeline.dpr !== (devicePixelRatio || 1)) {
+          [lowRes, scale, even] = [state.enabled.pixelate, settings.resolution, settings.evenPixels > 0.5];
+          resize(); // (and when the window has moved to a screen of another pixel ratio, which need not fire a resize)
         }
         placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose

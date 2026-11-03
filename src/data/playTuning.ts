@@ -64,7 +64,7 @@ export const MUSIC = {
 };
 
 /** Extra resolution scales offered only after opening the optional higher resolutions and their immersion warning. */
-export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1080p screen; 800 × 450 is a standard step and the default since round 58)
+export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1080p screen; 800 × 450 is a standard step, 640 × 360 the default)
 
 /** The old 85% brightness is the new 100% baseline. */
 export const BRIGHTNESS_BASE = 0.85;
@@ -77,11 +77,12 @@ export const SETTINGS = {
   fxCap: [0, 1, 0.05, 1], // caps every sanity effect (accessibility); the default is FX.capDefault's
   sensitivity: [0.25, 3, 0.05, 1], // look speed: mouse, stick and arrows
   invertY: [0, 1, 1, 0], // 1: up looks down (round 12)
-  resolution: [0.8, 2, 0.4, 2], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360 and 800 × 450, the default (round 58, asked: before it was 640 × 360, which a 720p, 1080p, 1440p and 4K screen each held a whole number of times over, 2, 3, 4 and 6, so that every pixel was drawn the same size; 800 × 450 is 1.6, 2.4, 3.2 and 4.8 times over on them, so some rows and columns are drawn wider than others)
+  resolution: [0.8, 2, 0.4, 1.6], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360, the default, and 800 × 450 (2026-11-03, asked: 640 × 360 again, as in round 56, which a 720p, 1080p, 1440p and 4K screen each holds a whole number of times over, 2, 3, 4 and 6; round 58 had made it 800 × 450, which is 1.6, 2.4, 3.2 and 4.8 times over on them; even pixels draw every pixel the same size at either)
   brightness: [0.9, 1.9, 0.05, 1], // 100% is the old 85% look; higher values lift the dark
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
   relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 83: shaders/sprite.ts); off, they are lit as the rest
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
+  evenPixels: [0, 1, 1, 1], // 1: every pixel of the picture drawn the same size on any screen (2026-11-03: render/evenPixels.ts); 0: blown up nearest-neighbour, some rows and columns wider than others where the screen does not hold the picture a whole number of times
   font: [0, 1, 1, 0], // 0: IM Fell English; 1: EB Garamond
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
