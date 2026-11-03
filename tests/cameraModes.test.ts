@@ -6,7 +6,7 @@ import { v3, type V3 } from '../src/core/geom';
 import { CAMERA_MODES, CAMERA_MODE_IDS, cameraModeOf, type CameraMode } from '../src/data/cameraModes';
 import { getEntity } from '../src/data/registry';
 import { CAMERA, RENDER, SETTINGS } from '../src/data/tuning';
-import { fovOf, nearLens } from '../src/render/followCamera';
+import { fovOf, nearLens, placeCamera } from '../src/render/followCamera';
 import { anchorPoint, createCameraRig, fitFov, framing, hangPoint, resetAim, resetBoom, setCameraMode, stepCamera, type CameraRig, type Frame } from '../src/systems/camera';
 import { toCombatant } from '../src/systems/creatures';
 import { setLock } from '../src/systems/lockOn';
@@ -36,6 +36,43 @@ function seen(rig: CameraRig, pivot: V3, p: V3, room = 1): boolean {
 }
 const sub = (a: V3, b: V3): V3 => ({ x: a.x - b.x, y: a.y - b.y, z: a.z - b.z });
 const horizontal = (a: V3, b: V3): number => Math.hypot(a.x - b.x, a.z - b.z);
+
+describe('camera clearance beneath a ceiling', () => {
+  const room = (height: number): CollisionWorld => ({
+    ...open,
+    colliders: [{ kind: 'box', min: v3(-10, height, -10), max: v3(10, height + 1, 10) }],
+  });
+
+  it('keeps the interpolated lens below a ceiling as the boom pulls in', () => {
+    const { g, player } = scriptedGame();
+    (g as { world: CollisionWorld }).world = room(2.5);
+    const tr = g.ecs.c.transform.get(player)!;
+    tr.pos = v3(0, 0, 0);
+    tr.prev = v3(0, 0, 0);
+    Object.assign(g.camera, { yaw: 0, prevYaw: 0, pitch: 0.9, prevPitch: 0.9, prevDist: 5.6, dist: 0.5 });
+    const camera = new PerspectiveCamera();
+    placeCamera(camera, g, 0.5);
+    expect(camera.position.y).toBeLessThan(2.5 - 0.1);
+    expect(camera.position.y).toBeGreaterThan(CAMERA.pivotHeight);
+  });
+
+  it('pulls in closer than the old minimum when the ceiling is near', () => {
+    const rig = createCameraRig(0);
+    rig.pitch = 0.9;
+    stepCamera(rig, { ...still, pivot: v3(0, CAMERA.pivotHeight, 0), focus: null }, room(2), 1 / 60);
+    expect(rig.dist).toBeLessThan(0.5);
+    expect(rig.pos.y).toBeLessThan(2);
+  });
+
+  it('preserves the full boom and its position in an unobstructed space', () => {
+    const rig = createCameraRig(0);
+    rig.pitch = 0.9;
+    stepCamera(rig, { ...still, pivot: v3(0, CAMERA.pivotHeight, 0), focus: null }, open, 1 / 60);
+    expect(rig.dist).toBeCloseTo(CAMERA_MODES.classic.distance);
+    expect(rig.pos.y).toBeCloseTo(CAMERA.pivotHeight + Math.sin(0.9) * rig.dist);
+    expect(rig.pos.z).toBeCloseTo(-Math.cos(0.9) * rig.dist);
+  });
+});
 
 /** How far up the picture `p` is: 0 at its centre, 1 at the top edge, -1 at the bottom (the vertical field, as the lens holds it). */
 function up(rig: CameraRig, pivot: V3, p: V3): number {

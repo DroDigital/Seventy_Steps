@@ -239,7 +239,6 @@ export const LOCK = {
 export const CAMERA = {
   pivotHeight: 1.7,
   distance: 5.6, // round 32: was 4.2: the investigator stands about a quarter of the picture's height, the land about them seen
-  minDistance: 0.5,
   shoulder: 0.45, // metres the boom hangs to the right of the player, so a lock target is not hidden behind them
   margin: 0.3, // keeps the lens this far off walls
   clearance: 0.25, // metres above the ground
