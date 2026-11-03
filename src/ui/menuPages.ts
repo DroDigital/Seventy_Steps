@@ -28,6 +28,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
   brightness: pct,
   fog: (v) => (v > 0 ? pct(v) : t('val.off')),
   shadows: onOff,
+  evenPixels: onOff,
   relight: onOff,
   font: (v) => v > 0.5 ? 'EB Garamond' : 'IM Fell English',
   uiScale: (v) => `×${v.toFixed(2)}`,
@@ -52,7 +53,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
 const NAME = (id: SettingId): string => t(`set.${id}` as Key);
 /** The settings' tabs, each a few lines that fit the panel, and what each line does (said under the list as it is chosen). */
 const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
-  ['set.tab.display', ['resolution', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
+  ['set.tab.display', ['resolution', 'evenPixels', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
   ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
   ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'shake', 'rumble', 'fxCap']],

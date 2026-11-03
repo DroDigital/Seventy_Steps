@@ -37,7 +37,7 @@ Built with Claude Code, one phase per session. At the start of each session, rea
 ## 2. Art direction: retro 3D
 The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a third-person soulslike camera. The world is oppressive, foggy, and nearly colorless. Color means something is wrong.
 
-- **Resolution:** render to a low-res target (600×338 by default and at the standard maximum) and upscale with nearest-neighbor filtering. Lower resolutions remain configurable; optional higher resolutions (700×394 and 800×450) sit behind a collapsed choice with an immersion warning.
+- **Resolution:** render to a low-res target (640×360 by default, 800×450 at the standard maximum) and upscale it so every low-res pixel is drawn the same size (sharp bilinear; nearest-neighbor where the screen holds it a whole number of times, or when Even pixels is off). Lower resolutions remain configurable; an optional higher resolution (960×540) sits behind a collapsed choice with an immersion warning.
 - **World geometry:**
   - low-poly and vertex-lit
   - procedural 64×64 textures: stone, wood, rot, wet flesh, water

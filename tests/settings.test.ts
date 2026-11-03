@@ -12,16 +12,16 @@ function memoryStore() {
 }
 
 describe('settings', () => {
-  it('defaults to full FX, sensitivity 1, 800 × 450 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
+  it('defaults to full FX, sensitivity 1, 640 × 360 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, relight: 0, shadows: 1, font: 0, uiScale: 1, shake: 1, rumble: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, minimap: 0, questTracker: 1, quietWalk: 1, controlTips: 1, camera: 0, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.6, brightness: 1, fog: 1, relight: 0, shadows: 1, evenPixels: 1, font: 0, uiScale: 1, shake: 1, rumble: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, minimap: 0, questTracker: 1, quietWalk: 1, controlTips: 1, camera: 0, padSwap: 0,
       volume: 1, music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
-    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([800, 450]);
-    // the standard steps are 320 × 180 to 800 × 450, the default the sharpest of them (round 58, asked; it was 640 × 360, which is drawn a whole number of times over on a 720p, 1080p, 1440p and 4K screen: 800 × 450 is not on any of them)
+    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([640, 360]);
+    // the standard steps are 320 × 180 to 800 × 450; the default is 640 × 360 (2026-11-03, asked, as in round 56), drawn a whole number of times over on a 720p, 1080p, 1440p and 4K screen
     expect([0.8, 1.2, 1.6, 2].map((scale) => clampSetting('resolution', scale))).toEqual([0.8, 1.2, 1.6, 2]);
-    expect(SETTINGS.resolution[1]).toBe(defaultSettings().resolution);
-    for (const screen of [720, 1080, 1440, 2160]) expect((screen / (RENDER.height * 1.6)) % 1).toBe(0); // 640 × 360 still is
+    expect(SETTINGS.resolution[1]).toBe(2);
+    for (const screen of [720, 1080, 1440, 2160]) expect((screen / (RENDER.height * defaultSettings().resolution)) % 1).toBe(0);
   });
 
   it('makes the old 85% look the new 100% baseline and lets the player brighten it', () => {
@@ -100,7 +100,7 @@ describe('settings', () => {
     expect(parseSettings('{"resolution":1}').resolution).toBe(defaultSettings().resolution);
     for (const version of [13, 14, 15]) {
       // a lower choice is kept, at the nearest of today's steps (the one that snaps to 640 × 360, the old default, goes to the new: round 58)
-      for (const [resolution, now] of [[0.5, 0.8], [0.75, 0.8], [1, 1.2], [1.25, 1.2], [1.5, 2]]) expect(parseSettings(JSON.stringify({ resolution, v: version })).resolution).toBe(now);
+      for (const [resolution, now] of [[0.5, 0.8], [0.75, 0.8], [1, 1.2], [1.25, 1.2], [1.5, 1.6]]) expect(parseSettings(JSON.stringify({ resolution, v: version })).resolution).toBe(now);
     }
     expect(parseSettings(JSON.stringify({ resolution: 2, v: 15 })).resolution).toBe(2); // made after the warning: kept
     for (const version of [13, 14]) {
@@ -120,16 +120,16 @@ describe('settings', () => {
     for (const resolution of HIGH_RESOLUTIONS) {
       expect(clampSetting('resolution', resolution)).toBe(resolution);
       storeSettings(store, { ...defaultSettings(), resolution });
-      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(22);
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(23);
       expect(loadSettings(store).resolution).toBe(resolution);
     }
     expect(clampSetting('resolution', 99)).toBe(2.4);
   });
 
-  it('moves a picture kept at 640 × 360, the old default, to 800 × 450 once, and keeps every other choice (round 58)', () => {
+  it('kept 640 × 360 where round 58 moved it to 800 × 450, which is the default again (2026-11-03)', () => {
     const kept = (resolution: number, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), resolution, v })).resolution;
-    expect(kept(1.6, 16)).toBe(2); // the old default, kept by every save
-    expect(kept(1.6, 15)).toBe(2);
+    expect(kept(1.6, 16)).toBe(1.6); // the default of round 56, kept by every save: the default again (2026-11-03)
+    expect(kept(1.6, 15)).toBe(1.6);
     expect(kept(1.2, 16)).toBe(1.2); // a slow machine's choice, or the first launch's
     expect(kept(0.8, 16)).toBe(0.8);
     expect(kept(2.4, 16)).toBe(2.4); // a sharper choice
@@ -141,12 +141,22 @@ describe('settings', () => {
       expect(tuned({ shadows: 0 }, v), `shadows off, v${v}`).toBe(1.6);
       expect(tuned({ shadows: 0, fog: 0.75 }, v), `shadows off, thinner fog, v${v}`).toBe(1.6);
       expect(tuned({ fog: 0.5 }, v), `fog thinned, v${v}`).toBe(1.6);
-      expect(tuned({}, v), `untouched, v${v}`).toBe(2);
+      expect(tuned({}, v), `untouched, v${v}`).toBe(1.6);
     }
     expect(tuned({ shadows: 0, fxCap: 0.4, brightness: 1.25 }, 16)).toBe(1.6); // the rest of the profile is what it was
     // (and a save from before the warning took the default of the day; a marked one still takes the old one, as it did)
     expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, shadows: 0, v: 12 })).resolution).toBe(1.6);
-    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, v: 12 })).resolution).toBe(2);
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, v: 12 })).resolution).toBe(1.6);
+  });
+
+  it('moves 800 × 450, the default of versions 17 to 22, to 640 × 360 once, and keeps a choice made before or since (2026-11-03)', () => {
+    const kept = (resolution: number, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), resolution, v })).resolution;
+    for (const v of [17, 18, 19, 20, 21, 22]) expect(kept(2, v), `v${v}`).toBe(1.6); // kept by every save then, chosen or not
+    expect(kept(2, 16)).toBe(2); // chosen when 640 × 360 was the default
+    expect(kept(2, 23)).toBe(2); // chosen since
+    expect(kept(1.2, 22)).toBe(1.2); // a lower choice
+    expect(kept(2.4, 22)).toBe(2.4); // a sharper one, after the warning
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 2, shadows: 0, v: 22 })).resolution).toBe(1.6); // (and a tuned machine's)
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), resolution: 1.6 });
     expect(loadSettings(store).resolution).toBe(1.6);
