@@ -229,9 +229,17 @@ float footRings(vec2 p) {
 }
 
 uniform float uClipY;
+uniform vec3 uNearFade; // within .y metres of the eye a freestanding prop dithers away, gone within .x; nothing facing up more than .z (2026-11-03)
+uniform float uNearOn;
+const float BAYER4[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
 ${SURFACE_UNIFORMS}
 void main() {
   if (vWorld.y < uClipY) discard; // under the sea's surface, in the mirrored scene (reflection.ts; round 35)
+  if (uNearOn > 0.5 && vNormal.y < uNearFade.z) { // a prop right before the lens: an ordered dither, thinner the nearer (NEAR_FADE)
+    float keep = (distance(cameraPosition, vWorld) - uNearFade.x) / (uNearFade.y - uNearFade.x);
+    ivec2 cell = ivec2(mod(gl_FragCoord.xy, 4.0));
+    if (keep < 1.0 && keep < (BAYER4[cell.x + cell.y * 4] + 0.5) / 16.0) discard;
+  }
   vec2 uv = affineUv(vec2(textureSize(uMap, 0)));
   vec2 gx = dFdx(vUv);
   vec2 gy = dFdy(vUv);

@@ -25,6 +25,14 @@ export const ECHO_FX = {
 };
 
 /** The weight of the investigator's blows as they land (playtest round 20: render/audio/impact.ts and render/impactFx.ts). */
+/**
+ * A prop right before the lens dissolves (2026-11-03): within `from` metres of the eye a freestanding thing (a stone, a tree,
+ * a fence, a house's corner, an Elder Sign's stones) is drawn through an ordered dither, thinner the nearer, and gone within
+ * `gone`, so a trunk or a shrine at the frame's edge no longer fills half the picture. Never the ground, a floor or anything
+ * facing up more than `flat` (its normal's height), a body, glass, or a dungeon's walls (render/worldMaterial.ts `nearFade`).
+ */
+export const NEAR_FADE = { gone: 0.35, from: 1.25, flat: 0.6 } as const;
+
 export const IMPACT = {
   weight: { base: 0.5, damage: 0.35, full: 50, heavy: 0.2, stagger: 0.1, riposte: 0.25, kill: 0.3, most: 1.4 }, // a blow's weight: where it starts, what its damage adds (up to `full` of it), what each kind of blow adds; never past `most`
   big: 0.9, // metres of body radius from which a foe is big: a kill of one booms

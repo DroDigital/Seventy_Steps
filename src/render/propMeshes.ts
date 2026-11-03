@@ -73,7 +73,7 @@ const RELIEF: ReadonlySet<PropMat> = new Set(['trim', 'pane']);
 export const propMaterial = (m: PropMat): THREE.ShaderMaterial => {
   let mat = materials.get(m);
   if (!mat) {
-    materials.set(m, (mat = createWorldMaterial(OPTIONS[m])));
+    materials.set(m, (mat = createWorldMaterial({ ...OPTIONS[m], nearFade: true }))); // (glass, liquid, mirrors and lights are left whole by createWorldMaterial)
     if (RELIEF.has(m)) Object.assign(mat, { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4 });
   }
   return mat;
