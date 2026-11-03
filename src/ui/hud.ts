@@ -46,6 +46,8 @@ import { createMindHud, MAGENTA } from './mindHud';
 import { createMinimap, minimapYaw } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
 import { MOUNTS } from '../data/mounts';
+import { mountUnlocked } from '../systems/mounts';
+import { signCalls, type SignCall } from '../systems/signCalls';
 
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
 const MOUNT_TIP_MS = 5000; // the summon and ride lines leave; they are not a permanent prompt
@@ -130,6 +132,13 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
   const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker(), () => minimapYaw(g, northUp())); // what the quest followed asks, at the right under the minimap
   const me = g.player.id;
+  let calls = { at: -Infinity, of: new Map<string, SignCall[]>() };
+  /** What resting at this sign is for now, after its name (systems/signCalls.ts; render/signCallViews.ts hangs the marks). */
+  const restWhy = (sign: string): string => {
+    if (g.frame - calls.at >= 20) calls = { at: g.frame, of: signCalls(g) };
+    const list = calls.of.get(sign);
+    return list?.length ? ` · ${list.map((c) => tr(`sign.call.${c}` as Key)).join(' · ')}` : '';
+  };
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
     if (n && e.attacker === me) say(n[0] && tr(n[0]));
@@ -231,13 +240,13 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
       const mounted = g.player.mount.active;
-      const mountKey = mounted ? mounted : g.overworld && !(tipsOn() && tipWaiting(steps, 'mount')) ? `summon:${g.player.mount.selected}` : ''; // the first steps' card teaches the summons first
+      const mountKey = mounted ? mounted : mountUnlocked(g) && !(tipsOn() && tipWaiting(steps, 'mount')) ? `summon:${g.player.mount.selected}` : ''; // the first steps' card teaches the summons first
       if (mountKey !== mountTip) { mountTip = mountKey; mountTipUntil = 0; }
       if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
       const mountShown = mountKey !== '' && now < mountTipUntil;
       const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
       const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
-      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
+      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);

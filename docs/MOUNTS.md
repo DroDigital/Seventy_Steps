@@ -2,15 +2,14 @@
 
 The plain chariot, one horse drawing a wooden coach, is included in the base game. The spectral chariot and the
 automobile are optional cosmetic DLCs, each with a target US price of **$0.99**. Traversal, handling and every other
-gameplay characteristic match the free chariot: all three share one frozen `MOUNT_TRAVERSAL` object. The plain chariot is
-the investigator's from the first night (2026-11-01: the early-game quest that unlocked it is gone), and neither paid appearance is faster. The save id of the
+gameplay characteristic match the free chariot: all three share one frozen `MOUNT_TRAVERSAL` object. The early-game quest
+unlocks mount use; owning either DLC does not skip the quest, and neither paid appearance is faster. The save id of the
 included mount is still `grey`, so a journey saved before this change keeps it.
 
 ## Play and inspect
 
-The plain chariot can be called anywhere in the open world from the start of a new or resumed journey; no quest, boss,
-consumable or payment is required (a save that had The Borrowed Reins begun drops it on load). A new investigator is shown
-the call on the first steps' card once running is learned (`ui/firstSteps.ts`).
+The Borrowed Reins is offered at the start of a new or resumed journey. Speak with Peaslee on the Miskatonic Quad,
+then discover the Sleeper’s Sign (`hub_dream`); no boss, consumable or payment is required. The quest grants the plain chariot.
 At any Elder Sign, the Mounts tab selects an available appearance. B (rebindable) or the pad’s L3 summons/dismisses it on clear,
 dry open ground. Hold the dodge/sprint button while moving to gallop. Acting or taking damage dismisses it;
 resting, travelling, death, forced movement and entering a boss fight also dismiss it. Riding into a dungeon
