@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld('desktop', {
   deck: process.argv.includes('--steam-deck'), // running on a Steam Deck (round 47)
   edition: process.argv.includes('--edition=demo') ? 'demo' : 'full', // the demo's pack (round 56: data/edition.ts)
   pads: () => pads, // as navigator.getGamepads() lists them, for the page to read when the browser lists none (core/pads.ts)
+  rumble: (index, strong, weak, ms) => ipcRenderer.send('desktop:rumble', { index: Number(index), strong: Number(strong), weak: Number(weak), ms: Number(ms) }), // the pad's motors (2026-11-03: core/rumble.ts)
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),
   isFullscreen: () => ipcRenderer.invoke('desktop:is-fullscreen'),

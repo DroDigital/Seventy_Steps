@@ -197,6 +197,11 @@ export function activePad(): PadReading | null {
 }
 
 let activeKey = '';
+/** Where the pad in hand is read from and its index in that list (core/rumble.ts sends to it); null before any is used. */
+export function padTarget(): { source: Source; index: number } | null {
+  const [from, index] = activeKey.split(':');
+  return (from === 'browser' || from === 'shell') && Number.isInteger(Number(index)) ? { source: from, index: Number(index) } : null;
+}
 /** Record the active pad's trigger positions after the player releases both triggers. */
 export function calibratePadTriggers(): boolean {
   const s = seen.get(activeKey);

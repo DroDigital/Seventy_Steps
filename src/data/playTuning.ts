@@ -85,6 +85,7 @@ export const SETTINGS = {
   font: [0, 1, 1, 0], // 0: IM Fell English; 1: EB Garamond
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
+  rumble: [0, 1, 0.25, 1], // the controller's rumble (2026-11-03: render/rumbleFx.ts); 0: the motors are never driven
   captions: [0.8, 1.6, 0.1, 1], // the size of what is said aloud and shown: cutscene lines, a talk, what is overheard (round 47)
   captionBack: [0, 1, 1, 0], // 1: a dark band behind them
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)

@@ -133,7 +133,7 @@ interface View {
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 
 export function createSignViews(scene: THREE.Scene, g: Game, particles: Particles, lights: WorldLights): SignViews {
-  const stone = createWorldMaterial({ texture: 'rock', seed: 5, vertexColors: true, vary: 0.4 });
+  const stone = createWorldMaterial({ texture: 'rock', seed: 5, vertexColors: true, vary: 0.4, nearFade: true });
   const wax = createWorldMaterial({ texture: 'cloth', vertexColors: true, neutralCloth: true });
   const views = new Map<Entity, View>();
   const bySign = new Map<string, View>();
@@ -145,7 +145,7 @@ export function createSignViews(scene: THREE.Scene, g: Game, particles: Particle
     root.position.set(tr.pos.x, tr.pos.y, tr.pos.z);
     root.rotation.y = tr.yaw;
     const geo = shrineGeometry(signPlace(sign)?.stones); // the lesser stones its room leaves standing
-    const glyph = createWorldMaterial({ texture: 'rock', seed: 5, vertexColors: true });
+    const glyph = createWorldMaterial({ texture: 'rock', seed: 5, vertexColors: true, nearFade: true });
     const glow = glowMaterial(0);
     const flameMat = createWorldMaterial({ texture: 'cloth', emissive: 1, vertexColors: true });
     const [runes, wave, flames] = [new THREE.Mesh(geo.runes, glowMaterial(1)), new THREE.Mesh(geo.runes, glowMaterial(2)), new THREE.Mesh(geo.flames, flameMat)];

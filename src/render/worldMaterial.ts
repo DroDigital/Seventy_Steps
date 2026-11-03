@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
-import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
+import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
@@ -43,6 +43,7 @@ export const worldUniforms = {
   uLanternFacing: { value: LANTERN.facing },
   uLamps: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // the world's nearest lights (worldLights.ts)
   uLampWindows: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // outward normal (x, z), offset from glass, height over ground; w = 0: ordinary point light
+  uNearFade: { value: new THREE.Vector3(NEAR_FADE.gone, NEAR_FADE.from, NEAR_FADE.flat) }, // a freestanding prop before the lens dithers away (2026-11-03: `nearFade`)
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },
@@ -128,6 +129,7 @@ export interface WorldMaterialOptions {
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
   surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
   neutralCloth?: boolean; // this use of the neutral cloth texture represents metal, wax, or other non-fabric
+  nearFade?: boolean; // a freestanding thing: dithered away right before the lens (NEAR_FADE; 2026-11-03). Never the ground, a dungeon's shell, a body or glass
 }
 
 /** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass (nor a mirror, liquid or wax: `surface`), not the ground, the plants or the flesh. */
@@ -189,6 +191,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
       uBodyScale: { value: o.bodyScale ?? 1 },
       uGhost: { value: 0 },
       uCoatOn: { value: (o.coat ?? coatable(o)) ? 1 : 0 },
+      uNearOn: { value: o.nearFade && !o.character && (o.opacity ?? 1) >= 1 && !o.surface ? 1 : 0 },
     },
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
