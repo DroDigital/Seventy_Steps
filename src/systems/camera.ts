@@ -127,6 +127,14 @@ export function lensPosition(w: CollisionWorld, base: V3, yaw: number, pitch: nu
   return p;
 }
 
+/** The furthest a boom can reach without putting its lens against an obstacle. */
+export function clearBoom(w: CollisionWorld, read: V3, yaw: number, pitch: number, distance: number): number {
+  const d = boomDir(yaw, pitch);
+  const reach = distance + CAMERA.margin;
+  const end = { x: read.x + d.x * reach, y: read.y + d.y * reach, z: read.z + d.z * reach };
+  return clamp(raycast(w, read, end) * reach - CAMERA.margin, 0, distance);
+}
+
 const smooth = (t: number): number => t * t * (3 - 2 * t);
 const RAD = Math.PI / 180;
 const FIT = 1.15; // the room left about a foe the lens widens to fit
@@ -208,10 +216,7 @@ export function stepCamera(rig: CameraRig, inp: CameraInput, w: CollisionWorld, 
     rig.rise *= free;
   }
   const { read, base } = hangPoint(w, anchorPoint(inp.pivot, rig.yaw, rig.lead, rig.rise), rig.yaw, inp.probe, tune.shoulder);
-  const d = boomDir(rig.yaw, rig.pitch);
-  const reach = rig.reach + CAMERA.margin;
-  const end = { x: read.x + d.x * reach, y: read.y + d.y * reach, z: read.z + d.z * reach };
-  const allowed = Math.max(CAMERA.minDistance, raycast(w, read, end) * reach - CAMERA.margin);
+  const allowed = clearBoom(w, read, rig.yaw, rig.pitch, rig.reach);
   rig.dist = allowed < rig.dist ? allowed : Math.min(allowed, rig.dist + tune.easeOut * dt);
   rig.pos = lensPosition(w, base, rig.yaw, rig.pitch, rig.dist);
   // where a wall or a near foe leaves less room than the framing counted on, the lens widens to keep it whole: the foe, and the investigator too
