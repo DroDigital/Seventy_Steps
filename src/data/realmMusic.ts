@@ -54,14 +54,12 @@ const BY_REGION: Readonly<Record<string, RealmTrackId>> = {
 };
 
 /** The way into the Dreamlands (data/dungeons.ts `slumber`): its own two tracks, by where on the stairs the investigator is. */
-const STAIRS: Readonly<Record<string, RealmTrackId>> = {
-  threshold: 'descente_hypnotique', light_1: 'descente_hypnotique', light_2: 'descente_hypnotique',
-  cavern: 'cavernous_tail', deep_1: 'cavernous_tail', deep_2: 'cavernous_tail', deep_3: 'cavernous_tail', deep_4: 'cavernous_tail', deep_5: 'cavernous_tail', deep_6: 'cavernous_tail', deeper: 'cavernous_tail',
-};
+const LIGHT_ROOMS = new Set(['threshold', 'light_1', 'light_2']);
+const stairsTrack = (room: string): RealmTrackId => (LIGHT_ROOMS.has(room) ? 'descente_hypnotique' : 'cavernous_tail'); // the seventy steps, then the cavern and the seven hundred
 
 /** The track of the realm the investigator is in, or of the stairs if they are on them; none in the arena or at sea. */
 export function realmTrackOf(region: string | null | undefined, dungeon?: string, room?: string): RealmTrackId | null {
-  if (dungeon === 'slumber' && room && STAIRS[room]) return STAIRS[room];
+  if (dungeon === 'slumber' && room) return stairsTrack(room);
   return (region && BY_REGION[region]) || null;
 }
 

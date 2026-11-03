@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { DungeonDef } from '../src/data/dungeons';
+import { SLUMBER_STEPS, type DungeonDef } from '../src/data/dungeons';
 import { DUNGEON } from '../src/data/tuning';
 import { hasLineOfSight, resolveCapsule } from '../src/world/colliders';
 import { floorAt, layoutDungeon, roomAt, type DungeonLayout } from '../src/world/dungeonKit';
 import { worldLayout } from '../src/world/placements';
 import { createWorldCollision } from '../src/world/worldCollision';
+import { stepsOf } from '../src/world/dungeonParts';
 import { DIRS } from '../src/world/worldMap';
 
 const placed = (id: string): DungeonLayout => worldLayout().dungeons.find((d) => d.layout.def.id === id)!.layout;
@@ -72,10 +73,14 @@ describe('the dungeon kit', () => {
     const d = placed('slumber');
     expect(d.def.sealed).toBe(true);
     expect(d.doors.some((o) => o.b === null)).toBe(false);
-    expect(room(d, 'cavern').level - d.base).toBe(-8);
-    expect(room(d, 'deeper').level - room(d, 'cavern').level).toBe(-30); // six flights since round 12 (four before)
-    expect(d.rooms.filter((r) => r.def.words).map((r) => r.def.id)).toEqual(['light_1', 'cavern', 'deep_1', 'deep_3', 'deep_5', 'deep_6', 'deeper']);
-    expect(d.rooms.filter((r) => r.def.spawns?.length).length).toBeGreaterThanOrEqual(5); // no longer an empty walk
+    const stairs = (from: string, to: string) => d.rooms.slice(d.rooms.findIndex((r) => r.def.id === from), d.rooms.findIndex((r) => r.def.id === to)).filter((r) => r.def.kind === 'stair');
+    const steps = (from: string, to: string) => stairs(from, to).reduce((n, r) => n + stepsOf(r), 0);
+    expect(steps('threshold', 'cavern')).toBe(70); // round 104: the steps are as many as the tale says
+    expect(steps('cavern', 'deeper')).toBe(700);
+    expect(room(d, 'cavern').level - d.base).toBeCloseTo(-70 * SLUMBER_STEPS.riser);
+    expect(room(d, 'deeper').level - room(d, 'cavern').level).toBeCloseTo(-700 * SLUMBER_STEPS.riser);
+    expect(stairs('threshold', 'deeper').every((r) => r.def.spawns?.length)).toBe(true); // something waits on every flight, all the way down
+    expect(d.errors).toEqual([]);
     expect(roomAt(d, worldLayout().dream!.x, worldLayout().dream!.z)?.def.id).toBe('threshold');
     const on = room(d, 'light_1');
     const dream = worldLayout().dream!;

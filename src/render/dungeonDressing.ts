@@ -16,6 +16,8 @@ import { KITS, type DungeonKit, type KitId } from '../data/kits';
 import { DUNGEON } from '../data/tuning';
 import { floorRange, kitIdOfRoom, roomPoint, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
 import { standing } from '../world/dungeonParts';
+import { isAbyss } from '../world/abyssStair';
+import { stairNewels } from './stairNewels';
 import { baysOf, cornersOf, pillarsOf, roomStyle } from '../world/roomStyle';
 import { DIRS } from '../world/worldMap';
 import { brazier, DEPTH, ITEMS, place, type Out, type Wall } from './dungeonFurniture';
@@ -132,7 +134,7 @@ export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at:
     const kit = KITS[kitId] as DungeonKit;
     const c = colour(kit);
     if (kit.roof !== 'open') roof(r, kit, c, at, out);
-    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : [];
+    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : isAbyss(r) ? stairNewels(r, kit, c, at) : []; // (round 104: a flight over the void, its newels and their fires)
     result.push(...grouped(kit, out, at), ...lit);
   }
   return result;

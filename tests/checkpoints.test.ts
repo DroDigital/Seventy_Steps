@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SLUMBER_STEPS } from '../src/data/dungeons';
 import { NPCS } from '../src/data/npcs';
 import { START_SIGN } from '../src/data/sites';
 import { wrapAngle, yawOf } from '../src/core/geom';
@@ -119,7 +120,7 @@ describe('Elder Signs', () => {
     goTo(g, cavern.x, cavern.z - 4);
     run(g, 1);
     expect(found.map((f) => f.sign)).toEqual(['dream_cavern']);
-    expect(pos(g).y).toBeCloseTo(slumber.base - 8);
+    expect(pos(g).y).toBeCloseTo(slumber.base - 70 * SLUMBER_STEPS.riser); // seventy steps down (round 104)
   });
 
   it('gates lead to their twins, both ways', () => {

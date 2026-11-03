@@ -24,6 +24,8 @@ export interface RoomDef {
   dir: Dir; // the entrance: the side that opens outside; others: the side of `from` they lie on
   wide?: boolean; // hall only: a great hall of 3 × 3 cells
   rise?: number; // stair only: metres climbed toward the far side (negative descends)
+  abyss?: boolean; // stair only: a monumental flight over the void, parapets for walls (round 104: the Stairs of Slumber's; world/abyssStair.ts)
+  steps?: number; // stair only: how many steps it is cut into (round 104: the Stairs of Slumber count theirs); else one for every 25 cm of rise
   hidden?: Veil;
   boss?: readonly string[]; // a boss arena
   variant?: 'boss';
@@ -51,6 +53,12 @@ import { FAR_DUNGEONS } from './dungeonsFar';
 import { LAIRS } from './lairs';
 import { room, stair } from './roomBuild';
 import { SEALS } from './tuning';
+
+/** The Stairs of Slumber's flights (round 104): risers of 16 cm, seventy steps of light slumber in two flights, seven hundred of deeper slumber in fourteen. */
+export const SLUMBER_STEPS = { riser: 0.16, light: 35, deep: 50 } as const;
+const LIGHT_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.light;
+const DEEP_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.deep;
+const deep = (id: string, from: string, dir: Dir, spawns: readonly string[], words?: string, kit: KitId = 'dreamdeep'): RoomDef => stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit, spawns, ...(words && { words }) });
 
 
 export const DUNGEONS: readonly DungeonDef[] = [
@@ -233,18 +241,33 @@ export const DUNGEONS: readonly DungeonDef[] = [
   {
     id: 'slumber', name: 'Stairs of Slumber', region: 'dreamlands', sealed: true, rooms: [
       // Round 12: the descent was a 30-second walk through nine empty rooms. Now it is said as it goes,
-      // the dream's lesser things wait on the flights, and the seven hundred steps are longer.
+      // and the dream's lesser things wait on the flights. Round 104: the steps are as many as the tale says, each one cut:
+      // seventy (two flights of 35, risers of 16 cm) to the Cavern of Flame, then seven hundred (fourteen flights of 50) down a
+      // switchback, across a span over the dreamless dark, to the Gate of Deeper Slumber; something waits on every flight.
       room('threshold', 'hall', undefined, 'n'),
-      stair('light_1', 'threshold', 'n', -4, { words: 'THE SEVENTY STEPS OF LIGHT SLUMBER' }),
-      stair('light_2', 'light_1', 'n', -4, { spawns: ['zoog', 'zoog'] }),
-      room('cavern', 'hall', 'light_2', 'n', { sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', words: 'THE CAVERN OF FLAME' }),
-      stair('deep_1', 'cavern', 'n', -5, { words: 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER' }),
-      stair('deep_2', 'deep_1', 'n', -5, { spawns: ['night_gaunt'] }),
-      stair('deep_3', 'deep_2', 'n', -5, { words: 'TWO HUNDRED STEPS', spawns: ['zoog', 'zoog', 'zoog'] }),
-      stair('deep_4', 'deep_3', 'n', -5, { spawns: ['ghast'] }),
-      stair('deep_5', 'deep_4', 'n', -5, { words: 'FOUR HUNDRED STEPS', spawns: ['night_gaunt', 'ghast'] }),
-      stair('deep_6', 'deep_5', 'n', -5, { words: 'SIX HUNDRED STEPS', spawns: ['ghast', 'ghast'] }),
-      room('deeper', 'hall', 'deep_6', 'n', { gate: { id: 'dream_deeper', name: 'Gate of Deeper Slumber', to: 'dream_wood_gate' }, words: 'THE GATE OF DEEPER SLUMBER' }),
+      stair('light_1', 'threshold', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THE SEVENTY STEPS OF LIGHT SLUMBER', spawns: ['zoog'] }),
+      stair('light_2', 'light_1', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THIRTY-FIVE STEPS', spawns: ['zoog', 'zoog'] }),
+      room('cavern', 'hall', 'light_2', 'n', { sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', words: 'THE CAVERN OF FLAME', kit: 'dreamflame' }),
+      deep('deep_1', 'cavern', 'n', ['night_gaunt'], 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER'),
+      deep('deep_2', 'deep_1', 'n', ['zoog', 'zoog', 'zoog'], 'FIFTY STEPS'),
+      deep('deep_3', 'deep_2', 'n', ['ghoul', 'ghoul'], 'ONE HUNDRED STEPS'),
+      deep('deep_4', 'deep_3', 'n', ['night_gaunt', 'ghast'], 'ONE HUNDRED AND FIFTY STEPS'),
+      room('landing_1', 'hall', 'deep_4', 'n', { kit: 'dreamdeep', words: 'TWO HUNDRED STEPS', spawns: ['ghast', 'ghoul', 'zoog'] }),
+      deep('deep_5', 'landing_1', 'n', ['wamp', 'wamp']),
+      deep('deep_6', 'deep_5', 'n', ['being_of_ib', 'ghoul'], 'TWO HUNDRED AND FIFTY STEPS'),
+      deep('deep_7', 'deep_6', 'n', ['ghast', 'night_gaunt'], 'THREE HUNDRED STEPS'),
+      room('turn_1', 'hall', 'deep_7', 'n', { kit: 'dreamdeep', words: 'THREE HUNDRED AND FIFTY STEPS: HALF THE WAY', spawns: ['man_of_leng', 'zoog', 'zoog'] }),
+      room('span', 'bridge', 'turn_1', 'e', { kit: 'dreamabyss', words: 'THE SPAN OVER THE DREAMLESS DARK', spawns: ['night_gaunt'] }),
+      room('turn_2', 'hall', 'span', 'e', { kit: 'dreamabyss', spawns: ['gnorri', 'ghast'] }),
+      deep('deep_8', 'turn_2', 's', ['ghoul', 'ghoul', 'ghoul'], undefined, 'dreamabyss'),
+      deep('deep_9', 'deep_8', 's', ['man_of_leng', 'night_gaunt'], 'FOUR HUNDRED STEPS', 'dreamabyss'),
+      deep('deep_10', 'deep_9', 's', ['moon_beast'], 'FOUR HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      room('landing_2', 'hall', 'deep_10', 's', { kit: 'dreamabyss', words: 'FIVE HUNDRED STEPS', spawns: ['moon_beast', 'ghast', 'ghast'] }),
+      deep('deep_11', 'landing_2', 's', ['being_of_ib', 'being_of_ib'], undefined, 'dreamabyss'),
+      deep('deep_12', 'deep_11', 's', ['man_of_leng', 'man_of_leng'], 'FIVE HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      deep('deep_13', 'deep_12', 's', ['ghast', 'night_gaunt', 'ghoul'], 'SIX HUNDRED STEPS', 'dreamabyss'),
+      deep('deep_14', 'deep_13', 's', ['moon_beast', 'night_gaunt'], 'SIX HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      room('deeper', 'hall', 'deep_14', 's', { kit: 'dreamabyss', gate: { id: 'dream_deeper', name: 'Gate of Deeper Slumber', to: 'dream_wood_gate' }, words: 'SEVEN HUNDRED STEPS: THE GATE OF DEEPER SLUMBER' }),
     ],
   },
   {
