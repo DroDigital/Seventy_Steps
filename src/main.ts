@@ -341,7 +341,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
         hurt.update(pipeline.post, camera, time);
         impactFx.update(camera, time);
-        rumble.update(settings.rumble, still);
+        rumble.update(settings.rumble, still || dialogue.open || shop.open || !!menu?.open || !!rise?.open || ending.open); // (a talk, a trade, a sign's rest, the rise and an ending leave the world running, but the hands are at rest)
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
         world?.update(flight.active ? camera.position.x : at.x, flight.active ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
