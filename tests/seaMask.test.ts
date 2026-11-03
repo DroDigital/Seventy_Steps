@@ -71,7 +71,7 @@ describe('the sea stays outside dungeon rooms', () => {
         }
       }
     }
-    expect(stairs).toHaveLength(8);
+    expect(stairs).toHaveLength(16); // two flights of light slumber, fourteen of deeper (round 104)
     expect(floodedWithoutMask).toBeGreaterThan(50);
   });
 });

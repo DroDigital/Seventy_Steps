@@ -12,10 +12,11 @@ import type { Collider } from './colliders';
 import { floorRange, kitOfRoom, roomAt, roomPoint, type DoorLayout, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { baysOf, cornersOf, inlaysOf, pillarsOf, roomStyle, type Tone } from './roomStyle';
 import { bankEnds, grounded } from './moundBanks';
+import { ABYSS, abyssOpening, abyssSides, isAbyss, stepTop, wallFoot } from './abyssStair';
 import { DIRS } from './worldMap';
 
 /** How a part is drawn: 'none' is an invisible collider (a chasm's edge), 'chasm' a dark hole. */
-export type Look = 'wall' | 'floor' | 'step' | 'pillar' | 'rim' | 'deck' | 'chasm' | 'ceiling' | 'inlay' | 'none';
+export type Look = 'wall' | 'floor' | 'step' | 'pillar' | 'rim' | 'deck' | 'chasm' | 'ceiling' | 'inlay' | 'rail' | 'none'; // 'rail': a parapet (abyssStair.ts)
 
 export interface BoxPart {
   shape: 'box';
@@ -102,13 +103,15 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
       break;
     }
     case 'stair': {
-      block(S / 2, h, -h, h);
-      block(-h, -S / 2, -h, h);
-      const n = Math.max(2, Math.ceil(Math.abs(r.rise) / 0.25));
-      for (let k = 0; k < n; k++) {
-        const top = L + (r.rise * (k + 0.5)) / n;
-        out.push(local(r, -S / 2, S / 2, -h + (2 * h * k) / n, -h + (2 * h * (k + 1)) / n, lo - 0.3, top, 'step', false));
+      const n = stepsOf(r);
+      const abyss = isAbyss(r); // round 104: a flight over the void, parapets for walls
+      if (abyss) abyssSides(r, n, lo, (u0, u1, v0, v1, y0, y1, look, solid) => void out.push(local(r, u0, u1, v0, v1, y0, y1, look, solid)));
+      else {
+        block(S / 2, h, -h, h);
+        block(-h, -S / 2, -h, h);
       }
+      const foot = abyss ? ABYSS.foot : 0.3; // (over the void, the parapets are the stair's sides from the pit's lip up)
+      for (let k = 0; k < n; k++) out.push(local(r, -S / 2, S / 2, -h + (2 * h * k) / n, -h + (2 * h * (k + 1)) / n, lo - foot, stepTop(r, k, n), 'step', false));
       break;
     }
     case 'pit': {
@@ -158,6 +161,9 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
     }
   }
 }
+
+/** How many steps a stair is cut into: its own count (the Stairs of Slumber's), else one for every 25 cm of rise. */
+export const stepsOf = (r: RoomLayout): number => r.def.steps ?? Math.max(2, Math.ceil(Math.abs(r.rise) / 0.25));
 
 /** Where things are put in a hall, in its own frame: a pillar keeps a pace from each (roomStyle.ts). */
 export function standing(r: RoomLayout): readonly (readonly [number, number])[] {
@@ -217,7 +223,7 @@ function wallParts(d: DungeonLayout, out: Part[], pieces: HiddenPieceDef[]): voi
         if (nb === r || (nb && nb.index < r.index)) continue;
         const [lo, hi] = floorRange(r);
         const [nlo, nhi] = nb ? floorRange(nb) : [d.base, d.base];
-        const y0 = Math.min(lo, nlo) - 0.3;
+        const y0 = Math.min(lo - wallFoot(r), nlo - wallFoot(nb)); // (round 104: down the void beside a flight over it)
         const y1 = Math.max(hi + H, nb ? nhi + H : d.base + 1.2);
         const seg = (a0: number, a1: number, b0: number, b1: number): void => {
           const ax = [mx + p.x * a0 - n.x * (T / 2), mx + p.x * a1 + n.x * (T / 2)];
@@ -230,9 +236,12 @@ function wallParts(d: DungeonLayout, out: Part[], pieces: HiddenPieceDef[]): voi
           seg(-L, L, y0, y1);
           continue;
         }
-        seg(-L, -D / 2, y0, y1);
-        seg(D / 2, L, y0, y1);
-        if (y1 > door.level + lintel) seg(-D / 2, D / 2, door.level + lintel, y1);
+        const arch = abyssOpening(r, nb); // between two flights over the void, an arch over the whole stair
+        const [wide, high] = arch ? [arch.width, arch.lintel] : [D, lintel];
+        seg(-L, -wide / 2, y0, y1);
+        seg(wide / 2, L, y0, y1);
+        if (arch) seg(-wide / 2, wide / 2, y0, door.level - ABYSS.foot); // under the steps' mass, the cross wall closes the void's ends
+        if (y1 > door.level + high) seg(-wide / 2, wide / 2, door.level + high, y1);
         if (door.hidden) pieces.push(doorPiece(door, `${d.def.name}: ${door.b?.def.id ?? 'door'}`, door.hidden));
       }
     }

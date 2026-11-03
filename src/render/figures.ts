@@ -16,7 +16,8 @@ import type { WareId } from '../data/wares';
 import { ARMS } from './armsMeshes';
 import { investigator } from './investigator';
 import { npcFigure } from './npcFigures';
-import { gateGeometry } from './signMeshes';
+import { isGateFrame } from '../data/gateFrames';
+import { gateFrame } from './gateFrames';
 import { createWorldMaterial } from './worldMaterial';
 import { echoFigure } from './echoFigure';
 import { ammoFigure, cacheFigure } from './groundPickups';
@@ -200,12 +201,10 @@ function vial(): Figure {
   return f;
 }
 
-/** A gate to another realm: a stone frame banded with glowing glyphs (the veil between its jambs is portalViews.ts's: round 60). */
-function gate(): Figure {
+/** A gate to another realm: a frame in the look of where it leads (round 104: gateFrames.ts; the veil between its jambs is portalViews.ts's: round 60). */
+function gate(theme: string): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const { frame, glyphs } = gateGeometry();
-  part(f, f.body, frame, 'stone', 0.12);
-  part(f, f.body, glyphs, 'stone', 1);
+  for (const p of gateFrame(isGateFrame(theme) ? theme : 'miskatonic')) part(f, f.body, p.geo.clone(), p.texture, p.emissive);
   return f;
 }
 
@@ -219,11 +218,12 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate, cache: cacheFigure, ammo: ammoFigure,
+  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate: () => gate('miskatonic'), cache: cacheFigure, ammo: ammoFigure,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 
 export function buildFigure(model: string): Figure {
   if (model.startsWith('npc:')) return npcFigure(model.slice(4));
+  if (model.startsWith('gate:')) return gate(model.slice(5));
   return (BUILDERS[model] ?? dummy)();
 }

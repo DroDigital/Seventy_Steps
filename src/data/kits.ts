@@ -47,6 +47,11 @@ export const KITS = {
   basalt: { wall: 'rock', floor: 'slab', tone: [0.42, 0.42, 0.47], mix: 0.65, trim: 'masonry', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
   tsath: { wall: 'stone', floor: 'cobble', tone: [0.55, 0.6, 0.74], mix: 0.55, trim: 'masonry', flames: 0.5, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   dream: { wall: 'stone', floor: 'slab', tone: [0.92, 0.82, 0.66], mix: 0.4, trim: 'masonry', flames: 0.7, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.5 },
+  // Round 104, the Stairs of Slumber by depth: the light slumber's warm stone, the Cavern of Flame's fire-reddened rock, then the seven
+  // hundred steps going grey and violet, and below the span bluer and darker still, their walls' torches fewer as the newels' fires take over.
+  dreamflame: { wall: 'rock', floor: 'slab', tone: [0.98, 0.74, 0.56], mix: 0.45, trim: 'masonry', flames: 0.9, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.4 },
+  dreamdeep: { wall: 'stone', floor: 'slab', tone: [0.72, 0.66, 0.82], mix: 0.5, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.6 },
+  dreamabyss: { wall: 'rock', floor: 'slab', tone: [0.54, 0.58, 0.76], mix: 0.6, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.7 },
   onyx: { wall: 'slab', floor: 'cobble', tone: [0.4, 0.4, 0.46], mix: 0.65, trim: 'masonry', flames: 0.35, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   cyclopean: { wall: 'slab', floor: 'rock', tone: [0.44, 0.54, 0.5], mix: 0.7, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   fungoid: { wall: 'flesh', floor: 'rot', tone: [0.56, 0.5, 0.56], mix: 0.6, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
