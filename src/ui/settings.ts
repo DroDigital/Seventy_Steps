@@ -12,9 +12,10 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 21: the Long lens is gone from the camera's looks, so a choice of it goes to Classic and Tight shoulder (3) is 2 now. 22: the brightness baseline is the old 85%. */
-const VERSION = 22;
-const OLD_DEFAULT = 1.6; // 640 × 360
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 21: the Long lens is gone from the camera's looks, so a choice of it goes to Classic and Tight shoulder (3) is 2 now. 22: the brightness baseline is the old 85%. 23: 640 × 360 is the default again (800 × 450, kept by every save of 17 to 22, chosen or not, goes to it once). */
+const VERSION = 23;
+const OLD_DEFAULT = 1.6; // 640 × 360 (the default again since version 23)
+const ROUND_58_DEFAULT = 2; // 800 × 450, the default of versions 17 to 22
 /** The sound's levels before round 60, kept by every save of settings, chosen or not. */
 const OLD_MIX: Partial<Settings> = { volume: 0.7, music: 1, ambience: 1, speech: 1 };
 /** Round 60's (the best mix a player found): kept by every save of version 18, chosen or not, and moved to the full levels of round 61 once. */
@@ -50,6 +51,7 @@ export function parseSettings(json: string | null): Settings {
   const tuned = s.fog < SETTINGS.fog[3] || s.shadows < SETTINGS.shadows[3];
   if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = tuned && s.resolution <= OLD_DEFAULT ? OLD_DEFAULT : SETTINGS.resolution[3];
   if (v < 17 && !tuned && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
+  if (v >= 17 && v < 23 && s.resolution === ROUND_58_DEFAULT) s.resolution = SETTINGS.resolution[3]; // 800 × 450 was kept by every save of 17 to 22, chosen or not: to 640 × 360 once
   if (v < 18) for (const [id, old] of Object.entries(OLD_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // the same of the sound's levels
   if (v < 19) for (const [id, old] of Object.entries(ROUND_60_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // and again, to the full levels of round 61
   if (v < 21 && typeof r.camera === 'number') s.camera = Math.round(r.camera) === 2 ? 0 : Math.round(r.camera) === 3 ? 2 : s.camera; // the Long lens (2) was taken out: its choice is Classic now, and Tight shoulder, 3, is 2

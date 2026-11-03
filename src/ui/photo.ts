@@ -1,7 +1,7 @@
 /**
- * Photo mode (round 26): P takes a picture of the dream as drawn. The game's canvas is only readable
- * in the frame it is drawn, so a press asks, and `after()` (called straight after the render) takes
- * it. A white flash, a shutter, and a line on the HUD say it is done.
+ * Photo mode (round 26): P takes a picture of the dream as drawn. A press asks, and `after()` (called
+ * straight after the render) takes the frame's low-res picture (`shot`: the pipeline's, before the last
+ * pass spreads it over the screen; 2026-11-03), enlarged with hard edges. A white flash, a shutter, and a line on the HUD say it is done.
  */
 
 import { t } from '../core/i18n';
@@ -13,7 +13,7 @@ export interface Photo {
   after(): void;
 }
 
-export function createPhoto(g: Game, canvas: HTMLCanvasElement, shutter: () => void): Photo {
+export function createPhoto(g: Game, shot: () => HTMLCanvasElement, shutter: () => void): Photo {
   let asked = false;
   const flash = Object.assign(document.createElement('div'), { style: 'position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .5s;z-index:30' });
   document.body.append(flash);
@@ -26,6 +26,7 @@ export function createPhoto(g: Game, canvas: HTMLCanvasElement, shutter: () => v
       asked = false;
       try {
         const name = `dream-${Date.now().toString(36)}`;
+        const canvas = shot();
         savePng(enlarge(canvas, canvas.width >= 1200 ? 1 : scaleFor(canvas.width)), name);
         flash.style.transition = 'none';
         flash.style.opacity = '0.8';

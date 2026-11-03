@@ -20,7 +20,7 @@ export function createResolutionSetting(): (parent: HTMLElement, settings: Setti
       redraw();
     };
     if (higher) {
-      button(parent, t('set.resolutionActive', { resolution: picture(settings.resolution) }), () => choose(standard), true, t('set.resolutionRestore'), t('set.resolutionRestore'));
+      button(parent, t('set.resolutionActive', { resolution: picture(settings.resolution) }), () => choose(SETTINGS.resolution[3]), true, t('set.resolutionRestore'), t('set.resolutionRestore'));
     } else {
       slider(parent, t('set.resolution'), SETTINGS.resolution, settings.resolution, (value) => change('resolution', value), picture, t('set.hint.resolution'));
     }

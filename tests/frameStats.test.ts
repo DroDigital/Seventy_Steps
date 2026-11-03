@@ -40,14 +40,15 @@ describe('frame statistics', () => {
 
 describe('the quality ladder', () => {
   it('starts at the default picture and every rung is no sharper than the one above', () => {
-    expect(LADDER[0]).toEqual({ resolution: 2, fog: 1, shadows: 1 });
+    expect(LADDER[0]).toEqual({ resolution: 1.6, fog: 1, shadows: 1 });
     for (let i = 1; i < LADDER.length; i++) {
       expect(LADDER[i].resolution).toBeLessThanOrEqual(LADDER[i - 1].resolution);
       expect(LADDER[i].fog).toBeLessThanOrEqual(LADDER[i - 1].fog);
       expect(LADDER[i].shadows).toBeLessThanOrEqual(LADDER[i - 1].shadows);
     }
     expect(rungOf(LADDER[3])).toBe(3);
-    expect(rungOf({ resolution: 2, fog: 1, shadows: 1 })).toBe(0);
+    expect(rungOf({ resolution: 1.6, fog: 1, shadows: 1 })).toBe(0);
+    expect(rungOf({ resolution: 2, fog: 1, shadows: 1 })).toBe(0); // 800 × 450, a player's choice
     expect(rungOf({ resolution: 2.4, fog: 1, shadows: 1 })).toBe(0); // a sharper choice is not below the default
   });
 
