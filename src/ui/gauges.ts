@@ -22,11 +22,11 @@ export interface Pips {
 
 /** A row of `shape` pips after a small `label`; `after` is a text that follows them. */
 export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'round', fill: string): Pips & { after: HTMLSpanElement } {
-  const row = el('display:flex;align-items:center;gap:6px;height:11px;margin-top:3px;opacity:.85;font-size:10px;letter-spacing:2px', '', parent);
-  el('opacity:.5;width:78px;flex:none', label, row); // round 74: IM Fell English's REVOLVER is 73 px at this size and spacing
-  const holder = el('display:flex;gap:4px;align-items:center', '', row);
+  const row = el('display:flex;align-items:center;gap:6px;height:12px;margin-top:3px;font-size:10px;letter-spacing:2px', '', parent);
+  el('opacity:.8;width:78px;flex:none', label, row); // IM Fell English's REVOLVER is 73 px at this size and spacing
+  const holder = el('display:flex;gap:3px;align-items:center', '', row);
   const after = document.createElement('span');
-  after.style.cssText = 'opacity:.7;font-size:10px;letter-spacing:1px';
+  after.style.cssText = 'opacity:.85;font-size:10px;letter-spacing:1px';
   row.append(after);
   let made = -1;
   let marks: HTMLElement[] = [];
@@ -36,12 +36,12 @@ export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'r
       if (max !== made) {
         made = max;
         holder.replaceChildren();
-        marks = Array.from({ length: max }, () => el(`width:5px;height:5px;${shape === 'diamond' ? 'transform:rotate(45deg);' : 'border-radius:50%;'}box-shadow:0 0 0 1px #000`, '', holder));
+        marks = Array.from({ length: max }, () => el(`width:6px;height:6px;${shape === 'diamond' ? 'transform:rotate(45deg);' : 'border-radius:50%;'}box-shadow:0 0 0 1px #000`, '', holder));
       }
       marks.forEach((m, i) => {
         const full = i < on;
         m.style.background = full ? fill : 'transparent';
-        m.style.border = `1px solid ${full ? fill : `${BONE}3a`}`;
+        m.style.border = `1px solid ${full ? fill : `${BONE}77`}`;
         m.style.boxSizing = 'border-box';
       });
     },

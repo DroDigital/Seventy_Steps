@@ -44,7 +44,7 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
   for (const floor of SANITY.bands) el(`position:absolute;left:${floor}%;top:-2px;bottom:-2px;width:1px;background:${BONE}99`, '', frame);
   const line = el('display:flex;justify-content:space-between;letter-spacing:2px;font-size:10px;margin-top:1px', '', vitals);
   const band = el('', '', line);
-  const laudanum = el('opacity:.7', '', line);
+  const laudanum = el('opacity:.85', '', line);
   let chipPct = 100;
   let chipHold = 0;
   let joltAt = -Infinity;
@@ -91,7 +91,7 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
       const call = callsForLaudanum(g);
       setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}${t('mind.laudanum', { n: g.player.laudanum })}`);
       setStyle(laudanum, 'color', call ? '#d26a9d' : BONE);
-      setStyle(laudanum, 'opacity', call ? (0.7 + 0.3 * Math.sin(now / 260)).toFixed(2) : '0.7');
+      setStyle(laudanum, 'opacity', call ? (0.85 + 0.15 * Math.sin(now / 260)).toFixed(2) : '0.85');
     },
   };
 }

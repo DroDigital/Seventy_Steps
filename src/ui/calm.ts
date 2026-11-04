@@ -1,6 +1,6 @@
 /**
  * Round 80, the quiet walk: some seconds after the last blow, wound, lock-on or hunt, with the body and the mind whole and nothing
- * afoot, the bars, counters, map and quest line sink to a third of their strength (never gone), and if the investigator then stands
+ * afoot, the bars, counters and map sink to a third of their strength (the quest line recedes less), and if the investigator then stands
  * still and leaves the view alone the camera draws back and a hair higher, as if taking breath (render/followCamera.ts). Any blow, hunt,
  * lock-on, step or turn of the view snaps it back in under half a second. Read-only on the simulation; the setting is Settings › Play ›
  * Quiet walk. `stepCalm` is the pure part (tests/calm.test.ts); `createCalm` reads the game for what it needs.
