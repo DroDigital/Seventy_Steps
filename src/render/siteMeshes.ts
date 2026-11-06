@@ -265,9 +265,9 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
 export function* dungeonJob(d: Dungeon, done: (meshes: THREE.Mesh[], lights: LightSpot[]) => void): Generator<void, void> {
   const lights: LightSpot[] = [];
   const built = meshes(yield* dungeonPieces(d, lights));
-  markStairLights(d.layout, lights); // (round 105: the Stairs of Slumber's lights are dimmed, and gutter as the mind fails)
   const region = getRegion(d.layout.region);
   if (d.decor.length && region) yield* propJob(d.decor, region, (m, l) => void (built.push(...m), lights.push(...l))); // the boss room's heart and braziers (round 13)
+  markStairLights(d.layout, lights); // (round 105, after the decorative lights too: the Stairs of Slumber's braziers in its cavern and at its gate are dimmed, and gutter as the mind fails)
   done(built, lights);
 }
 

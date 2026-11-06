@@ -12,6 +12,7 @@ import { descentAt, descentGain, descentSpan } from '../src/world/descent';
 import { gatePlan } from '../src/world/gatePlan';
 import { worldLayout } from '../src/world/placements';
 import type { RoomLayout } from '../src/world/dungeonKit';
+import { dungeonJob } from '../src/render/siteMeshes';
 
 const slumber = () => {
   const L = worldLayout().dungeons.map((d) => d.layout).find((l) => l.def.id === 'slumber');
@@ -103,5 +104,21 @@ describe("the stairs' lights", () => {
   it("wavers steadily between its gutters", () => {
     const lamp: LightSpot = { x: 3, y: 1, z: -2, kind: 'torch', stairs: true };
     for (let t = 0; t < 30; t += 0.1) expect(Number.isFinite(stairWaver(lamp, 0.1, t, 0.5))).toBe(true);
+  });
+
+  it("marks the decorative lights of the descent too: the braziers of its cavern and gate are dimmed as the stairs are", () => {
+    const d = worldLayout().dungeons.find((x) => x.layout.def.id === 'slumber');
+    if (!d) throw new Error('no Stairs of Slumber in the world');
+    let lights: LightSpot[] = [];
+    const job = dungeonJob(d, (_meshes, out) => {
+      lights = out;
+    });
+    let step = job.next();
+    while (!step.done) step = job.next();
+    const { top } = descentSpan(d.layout);
+    const below = lights.filter((l) => l.y < top + 1);
+    expect(below.length).toBeGreaterThan(0);
+    expect(below.every((l) => l.stairs === true)).toBe(true);
+    expect(lights.filter((l) => l.y >= top + 1).some((l) => l.stairs)).toBe(false);
   });
 });
