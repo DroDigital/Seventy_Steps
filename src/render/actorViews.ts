@@ -17,7 +17,8 @@ import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
 import { livePerson, newLife, type Life, type Standing } from './personLife';
 import { edgeOf } from './swingTrails';
-import { ACTS, type ActKind, type Post } from '../data/npcActs';
+import type { ActKind, Post } from '../data/npcActs';
+import { actFor } from '../systems/actFor';
 import { pipeBeat } from './npcActs';
 import type { Smoker } from './pipeSmoke';
 import { actOf } from '../systems/npcLife';
@@ -173,7 +174,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       f.root.position.x += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
       f.root.position.z += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
     }
-    const post = person ? ACTS[g.ecs.c.npc.get(id) ?? '']?.post : undefined; // one with a chair or a post of their own
+    const post = person ? actFor(g.ecs.c.npc.get(id) ?? '')?.post : undefined; // one with a chair or a post of their own
     if (post) placeAt(f, v, post);
     const dt = Math.min(0.1, Math.max(0, time - v.lastTime));
     if (id === g.player.id && g.cutscene) v.speed = 0; // stop the carried gait immediately, even when the last fog-walk step was still being eased

@@ -26,6 +26,7 @@ export interface PoiSite {
   z: number;
   r: number; // metres: how far its influence reaches (its feature's footprint, or a maze's half-width)
   chest: XZ | null; // where the hoard is set down, if it has one
+  flask: XZ | null; // where its flasks of lamp oil lie, if it has any (round 105)
 }
 
 export interface PoiPlan {
@@ -170,7 +171,12 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
       const tries = maze ? [maze.cell(CELLS >> 1, CELLS >> 1), maze.cell(CELLS >> 1, (CELLS >> 1) + 1), maze.cell((CELLS >> 1) + 1, CELLS >> 1)] : [{ x, z }, ...Array.from({ length: 30 }, (_, k) => ({ x: x + Math.sin(k * 1.9) * (1.5 + (k % 5) * r * 0.1), z: z + Math.cos(k * 1.9) * (1.5 + (k % 5) * r * 0.1) })), ...Array.from({ length: 60 }, (_, k) => ({ x: x + Math.sin(k * 2.4) * (3 + (k % 6) * r * 0.12), z: z + Math.cos(k * 2.4) * (3 + (k % 6) * r * 0.12) }))]; // (and further out, only where the near ground is crowded: a landmark's pyramids)
       chest = tries.find((p) => set.clear(p.x, p.z) && open(p.x, p.z)) ?? null;
     }
-    plan.sites.push({ def, x, z, r, chest });
+    let flask: XZ | null = null;
+    if (def.flasks) { // a flask or two of lamp oil lie about the heart, clear of the chest (round 105)
+      const spots = Array.from({ length: 48 }, (_, k) => ({ x: x + Math.cos(k * 2.3 + 0.7) * (2.5 + (k % 6) * r * 0.1), z: z + Math.sin(k * 2.3 + 0.7) * (2.5 + (k % 6) * r * 0.1) }));
+      flask = spots.find((p) => set.clear(p.x, p.z) && open(p.x, p.z) && (!chest || Math.hypot(p.x - chest.x, p.z - chest.z) > 2)) ?? null;
+    }
+    plan.sites.push({ def, x, z, r, chest, flask });
     const foes = def.foes;
     if (!foes) continue;
     const cells = maze ? Array.from({ length: CELLS * CELLS }, (_, k) => maze.cell(k % CELLS, Math.floor(k / CELLS))).filter((p) => Math.hypot(p.x - x, p.z - (z - MAZE_HALF)) > 6) : null;
@@ -180,7 +186,7 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
       if (!getEntity(id) || (early(x, z) && !gentle(id))) continue;
       const a = rng() * 6.2832;
       const at = cells ? cells[Math.floor(rng() * cells.length)] : { x: x + Math.sin(a) * (2.5 + rng() * Math.max(2.5, r * 0.7)), z: z + Math.cos(a) * (2.5 + rng() * Math.max(2.5, r * 0.7)) };
-      if (!set.clear(at.x, at.z) || !open(at.x, at.z) || plan.spawns.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || posts.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || (chest && Math.hypot(chest.x - at.x, chest.z - at.z) < 1.5)) continue;
+      if (!set.clear(at.x, at.z) || !open(at.x, at.z) || plan.spawns.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || posts.some((s) => Math.hypot(s.at.x - at.x, s.at.z - at.z) < 1.6) || (chest && Math.hypot(chest.x - at.x, chest.z - at.z) < 1.5) || (flask && Math.hypot(flask.x - at.x, flask.z - at.z) < 1.5)) continue;
       plan.spawns.push({ id: `poi:${def.id}:${placed}`, entity: id, region: region.id, at: { x: at.x, z: at.z, yaw: a }, unique: false });
       placed++;
     }

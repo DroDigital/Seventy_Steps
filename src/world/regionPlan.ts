@@ -23,6 +23,8 @@ import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './fea
 import { worldLayout, type SpawnPoint } from './placements';
 import { planSpawns } from './planSpawns';
 import { planPois, type PoiSite } from './poiPlan';
+import { planTraderLamps } from './traderPlan';
+import type { TraderSpot } from '../data/traders';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
 import { makeProp, propCollider, type Prop } from './props';
 import { padDistance } from './sitePads';
@@ -45,6 +47,7 @@ export interface RegionPlan {
   segs: Map<number, RoadSeg[]>; // road pieces touching each chunk (for the ground's road texture)
   ways: WayPlan[]; // the trails to the region's open arenas (arenaWay.ts; round 62)
   pois: PoiSite[]; // the region's points of interest (round 61; world/poiPlan.ts), with their guards among `spawns` and their walls among `props`
+  traders: TraderSpot[]; // where the trader at the lamps stands in it, his street lamp among `props` (world/traderPlan.ts; 2026-11-06)
 }
 
 const DEFAULT: RegionLayout = { road: 'mud', width: 3.5, towns: [], groves: 0, graveyards: 0, circles: 0, ruins: 0, outcrops: 0, camps: 0, walls: false, landmarks: 0, copses: 0, waymarks: 0, farms: 0 };
@@ -199,7 +202,8 @@ function buildPlan(region: RegionDef): RegionPlan {
   const pois = planPois(region, features, props, spawns, undefined, open); // after everything, on streams of its own: nothing earlier moves
   props.push(...pois.props);
   spawns.push(...pois.spawns);
-  return bucket(layout, roads, features, props, spawns, ways, pois.sites);
+  const traders = planTraderLamps(region, props, roadClear, (x, z, m) => offSites(x, z, m), spawns); // and the trader's lamps, the very last (2026-11-06)
+  return bucket(layout, roads, features, props, spawns, ways, pois.sites, traders);
 }
 
 function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: Occupancy, props: Prop[]): Feature[] {
@@ -257,8 +261,8 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
   return out;
 }
 
-function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], ways: WayPlan[], pois: PoiSite[]): RegionPlan {
-  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), ways, pois };
+function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], ways: WayPlan[], pois: PoiSite[], traders: TraderSpot[]): RegionPlan {
+  const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), ways, pois, traders };
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
   for (const p of props) {
     add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);

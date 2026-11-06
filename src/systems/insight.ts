@@ -9,7 +9,7 @@
 import { t as tr } from '../core/i18n';
 import type { Entity } from '../core/ecs';
 import { dist3, distXZ } from '../core/geom';
-import { LORE, PLAYER, REAGENT, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
+import { LORE, OIL, PLAYER, REAGENT, SANITY, SIM, UPGRADES, type UpgradeId } from '../data/tuning';
 import { hasLineOfSight } from '../world/colliders';
 import { isAbsent, isConcealed, isSheltered, isUnseen, type Game, type GameEvents } from './components';
 import { aimPoint, playerEye, viewAngle } from './lockOn';
@@ -65,6 +65,12 @@ export function insightSystem(g: Game): void {
   for (const [id, t] of tome) {
     if (distXZ(transform.get(id)!.pos, pp) > PLAYER.pickupRadius) continue;
     if (t.rounds && !takeRounds(g, t)) continue; // more than they can carry: it lies where it is
+    if (t.oil !== undefined) { // lamp oil: taken as far as the pockets hold, the rest lying where it is (round 105)
+      if (!takeOil(g, t)) continue;
+      g.ecs.despawn(id);
+      g.overworld?.read.add(t.name); // taken for good
+      continue;
+    }
     g.ecs.despawn(id);
     if (t.weapon) {
       takeUp(g, t.weapon);
@@ -130,6 +136,22 @@ export function buyUpgrade(g: Game, id: UpgradeId): boolean {
   return true;
 }
 
+/** Lamp oil taken up as far as the flasks fit the pockets; the rest stays where it lies, and is said of now and then (round 105). True once all of it is taken. */
+function takeOil(g: Game, t: { oil?: number; warned?: number }): boolean {
+  const fit = Math.max(0, Math.min(t.oil ?? 0, OIL.carry - g.player.oil));
+  g.player.oil += fit;
+  t.oil = (t.oil ?? 0) - fit;
+  if (t.oil <= 0) {
+    g.events.emit('Notice', { text: tr('n.oil', { n: g.player.oil, most: OIL.carry }) });
+    return true;
+  }
+  if (g.frame - (t.warned ?? -Infinity) > 3 * SIM.hz) {
+    t.warned = g.frame;
+    g.events.emit('Notice', { text: tr('n.oilFull') });
+  }
+  return false;
+}
+
 /** A box of cartridges taken up if all its rounds can be carried; else it stays, and says so now and then. */
 function takeRounds(g: Game, t: { rounds?: number; warned?: number }): boolean {
   if (giveRounds(g, t.rounds ?? 0)) return true;
@@ -141,11 +163,11 @@ function takeRounds(g: Game, t: { rounds?: number; warned?: number }): boolean {
 }
 
 /** Puts a tome in the world. */
-export function spawnTome(g: Pick<Game, 'ecs' | 'world'>, t: { x: number; z: number; yaw: number; name: string; insight: number; vial?: boolean; note?: boolean; echoes?: number; weapon?: string; rounds?: number }): Entity {
+export function spawnTome(g: Pick<Game, 'ecs' | 'world'>, t: { x: number; z: number; yaw: number; name: string; insight: number; vial?: boolean; note?: boolean; echoes?: number; weapon?: string; rounds?: number; oil?: number }): Entity {
   const e = g.ecs.spawn();
   const pos = { x: t.x, y: g.world.ground(t.x, t.z), z: t.z };
   g.ecs.c.transform.set(e, { pos, prev: { ...pos }, yaw: t.yaw, prevYaw: t.yaw });
-  g.ecs.c.tome.set(e, { name: t.name, insight: t.insight, vial: t.vial, note: t.note, echoes: t.echoes, weapon: t.weapon, rounds: t.rounds });
-  g.ecs.c.model.set(e, t.vial ? 'vial' : t.echoes ? 'cache' : t.rounds ? 'ammo' : t.weapon ? `arm:${t.weapon}` : t.note ? 'note' : 'tome');
+  g.ecs.c.tome.set(e, { name: t.name, insight: t.insight, vial: t.vial, note: t.note, echoes: t.echoes, weapon: t.weapon, rounds: t.rounds, oil: t.oil });
+  g.ecs.c.model.set(e, t.vial ? 'vial' : t.echoes ? 'cache' : t.rounds ? 'ammo' : t.oil !== undefined ? 'flask' : t.weapon ? `arm:${t.weapon}` : t.note ? 'note' : 'tome');
   return e;
 }

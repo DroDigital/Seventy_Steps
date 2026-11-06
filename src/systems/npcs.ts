@@ -9,10 +9,10 @@
 
 import type { Entity } from '../core/ecs';
 import { turnToward, yawOf } from '../core/geom';
-import { NPCS, npcDef, type NpcDef, type Topic, type When } from '../data/npcs';
+import { NPCS, TRADERS, npcDef, type NpcDef, type Topic, type When } from '../data/npcs';
 import { worldLayout } from '../world/placements';
 import { DIRS } from '../world/worldMap';
-import { ACTS } from '../data/npcActs';
+import { actFor } from './actFor';
 import type { Game } from './components';
 import { atAct, managed } from './npcLife';
 import { rumorFor } from './omens';
@@ -26,7 +26,7 @@ const TURN = 4; // radians a second they turn to the one talking with them
 
 /** Where an NPC stands: beside their sign's rising point, facing it; or at the place the story gives them (data/npcActs.ts `post`). */
 export function npcPlace(n: NpcDef): { x: number; z: number; yaw: number } | undefined {
-  const post = ACTS[n.id]?.post; // a place of their own, not by the sign
+  const post = actFor(n.id)?.post; // a place of their own, not by the sign
   if (post) return { x: post.x, z: post.z, yaw: post.yaw };
   const s = worldLayout().signs.find((x) => x.id === n.sign);
   if (!s) return undefined;
@@ -38,7 +38,7 @@ export function npcPlace(n: NpcDef): { x: number; z: number; yaw: number } | und
 /** Puts everyone in the world (those a roster ally speaks for come with the ally: `voice`). */
 export function spawnNpcs(g: Game): void {
   const c = g.ecs.c;
-  for (const n of NPCS) {
+  for (const n of [...NPCS, ...TRADERS]) { // and the trader at every second sign (data/traders.ts)
     if (n.creature) continue;
     const at = npcPlace(n);
     if (!at) continue;
@@ -79,8 +79,8 @@ export function talk(g: Game, id: string): void {
   g.overworld?.met.add(id);
   g.player.listening = npcEntity(g, id) ?? null; // turned to them, the camera framing them (round 12) until the hand turns it (round 68)
   g.player.glance = false;
-  const rumor = rumorFor(g, id); // unrecorded world news is a written note after the voiced conversation
-  g.events.emit('Talked', { npc: id, name: n.name, title: n.title, lines: topic.lines, ...(rumor && { rumor }), ...(n.shop && { shop: n.shop }) });
+  const rumor = n.voice ? undefined : rumorFor(g, id); // unrecorded world news is a written note after the voiced conversation (the trader at the lamps brings none: Morgan has told it)
+  g.events.emit('Talked', { npc: id, name: n.name, title: n.title, lines: topic.lines, ...(n.voice && { voice: n.voice }), ...(rumor && { rumor }), ...(n.shop && { shop: n.shop }) });
 }
 
 /** Each step: the one talked with turns to the investigator, the others back toward where they rise (round 12). */
