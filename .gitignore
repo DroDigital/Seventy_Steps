@@ -10,5 +10,8 @@ steam/build/
 steam/output/
 .butler/
 
+# a mount-unlock private key (tools/mount_unlock.mjs keygen) must never be committed
+*.private.pem
+mount-unlock*.pem
 # The Recall plugin's session log: written locally every turn, not part of the project
 .recall/

@@ -16,11 +16,11 @@ resting, travelling, death, forced movement and entering a boss fight also dismi
 or a boss arena dismisses it at the threshold, and it cannot be summoned again until the investigator is outside.
 Buildings, water and steep terrain still stop the ride where it stands.
 
-Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 11 m/s, gallop 18 m/s, shared
+Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 7 m/s, gallop 10.5 m/s (round 55; they were 11 and 18), shared
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.
 The rider keeps the ordinary hurtbox; mounting gives no healing, stamina refill, invulnerability or combat bonus.
 Only the preferred appearance is saved. Mount use resets on load; ownership is checked from Steam again.
-Removal or failed ownership verification falls back to the included chariot.
+Removal or failed ownership verification falls back to the included chariot for the ride; the choice stays in the save (`MountState.preferred`, round 85), so a check that failed once (Steam closed, offline) does not forget it and the next one that succeeds gives it back.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–3) with orbit, rest/cruise/gallop, pause and inspection
 resolution controls. It never opens a save or grants DLC access. The included chariot is the spectral coach's body and
@@ -81,10 +81,31 @@ the spectral chariot stays locked and the plain chariot is what a finished quest
    there is no separate asset download in this implementation.
 5. In a Steam test branch, verify an owner with each DLC installed, a non-owner, an owner with it disabled, offline
    startup, and refund/removal followed by an ownership refresh. Confirm the early quest grants only the plain chariot, and that
-   all three appearances handle identically once owned. A non-Steam build offers only the plain chariot.
+   all three appearances handle identically once owned. A build that is not Steam's and holds no unlock code (below) offers only the plain chariot.
 
 The game never starts a purchase or changes a Steam subscription. Unit tests use fake read-only Steam clients;
 live account entitlement, checkout, regional pricing and refund behavior require the configured Steam test branch.
+
+## itch.io unlock (round 85)
+
+itch.io has no DLC a game can ask about, so the two appearances are sold there as one separate project, "Mounts": a paid project whose one small
+download, `UNLOCK.txt`, holds a code. The buyer copies the code, opens the Mounts tab at an Elder Sign and chooses *Paste unlock code*.
+
+- **The code** is `SS-MOUNTS.<payload>.<signature>`: the payload (base64url JSON `{v:1, for:'seventy-steps-mounts', mounts:[...], id}`) names the
+  appearances it opens; the signature is Ed25519 over `SS-MOUNTS.<payload>`. The game holds the public key only (`UNLOCK_PUBLIC_KEY`,
+  `desktop/mountUnlock.js`), so a made-up or touched code fails. Any text with the code in it is taken (the whole file, a wrapped line).
+- **Who honours it:** only an itch.io pack of the full game (`channel` "itch", `edition` "full"). A Steam build never reads one (it has its own
+  check, above) and the demo lists the plain chariot alone.
+- **How it is kept:** the shell reads the clipboard itself (`desktop:mount-unlock`; the page receives only ok or the reason: none, invalid, keep,
+  store), writes the code to `mount-unlock.txt` in the user's data folder (a second code, for the other mount, is added to the first, one a line, up to eight, the newest last; a stale one that no longer verifies is dropped on the next paste), and reads it again at every ownership check (start, each window
+  focus), as Steam's is read. Nothing about it goes into a save, so the saves stay in format 3 and older builds read them. It works offline.
+- **An honour system, said plainly:** one code opens the game for every buyer, and the source is public, so it keeps honest buyers honest and
+  nothing more, as the Steam check does (the art is code in the base build either way). A leaked code is retired by a new key pair, a new
+  `UNLOCK_PUBLIC_KEY`, a new build and a new code in the file. The private key and the code live outside the repository (`*.private.pem` is
+  ignored and `tools/mount_unlock.mjs` refuses a key path inside it).
+- **Making a code:** `node tools/mount_unlock.mjs keygen <private key file>` once (prints the public key for `desktop/mountUnlock.js`), then
+  `node tools/mount_unlock.mjs sign <private key file> [--mounts chariot,automobile] [--id name]`; `check <code or file>` says what the shipped key makes of it.
+- **The page's side** (the Mounts project, its sale and bundle with the base game, and what is not yet verified on itch's dashboard): docs/RELEASE.md.
 
 ## Notes
 
