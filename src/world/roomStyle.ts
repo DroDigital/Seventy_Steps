@@ -11,11 +11,12 @@
 
 import { hash2 } from '../core/rng';
 import { DUNGEON } from '../data/tuning';
+import { HALL_LORE } from '../data/hallLore';
 import { kitOfRoom, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { DIRS } from './worldMap';
 
-export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring';
-export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands';
+export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring' | 'five' | 'six' | 'seven';
+export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands' | 'sigil';
 
 export interface RoomStyle {
   pillars: Pillars;
@@ -69,7 +70,9 @@ export function roomStyle(d: DungeonLayout, r: RoomLayout): RoomStyle {
   const start = unit(d.def.id);
   const organic = ORGANIC.has(kitOfRoom(d, r).floor);
   let s: RoomStyle;
-  if (kind === 'hall' && r.def.boss) {
+  const lore = r.def.boss ? HALL_LORE[r.def.boss[0]] : undefined;
+  if (kind === 'hall' && lore) s = style(lore.pillars, 'sigil', 0, true); // (round 108: its own pillars, and its sigil, render/hallSigils.ts, for an emblem)
+  else if (kind === 'hall' && r.def.boss) {
     const k = unit(`${d.def.id}:${r.def.id}`);
     s = style(BOSS[Math.floor(k * BOSS.length)], EMBLEMS[Math.floor(unit(`${r.def.id}:${d.def.id}`) * EMBLEMS.length)], 0, true);
   }
@@ -109,6 +112,16 @@ export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly
     case 'colonnade':
       for (const u of wide ? [-16, 16] : [-5.2, 5.2]) for (const v of wide ? [-18, -9, 0, 9, 18] : [-5.5, -1.8, 1.8, 5.5]) at.push([u, v]);
       break;
+    case 'five': // (round 108: in a ring about the fight, none across the way in: the first at the far wall, or two either side of it)
+    case 'six':
+    case 'seven': {
+      const n = s.pillars === 'five' ? 5 : s.pillars === 'six' ? 6 : 7;
+      for (let k = 0; k < n; k++) {
+        const a = ((k + (n === 6 ? 0.5 : 0)) * 2 * Math.PI) / n;
+        at.push([18 * Math.sin(a), 18 * Math.cos(a)]);
+      }
+      break;
+    }
     case 'none':
       break;
   }
@@ -227,6 +240,9 @@ export function inlaysOf(s: RoomStyle, r: RoomLayout, boards: boolean): Inlay[] 
       out.push(...approach(r, 15.4 * k));
       break;
     }
+    case 'sigil': // its lore's own figure is drawn over the floor (render/hallSigils.ts); laid here, only the carpet in to its rim
+      out.push(...approach(r, r.def.boss ? (HALL_LORE[r.def.boss[0]]?.reach ?? 14.5) : 14.5));
+      break;
     case 'bands': // corridor: thresholds laid across at every four metres
       for (let v = -h + 3.5; v < h - 3; v += 4) out.push({ tone: pale, box: [-DUNGEON.lane / 2 + 0.3, DUNGEON.lane / 2 - 0.3, v, v + 0.5] });
       break;

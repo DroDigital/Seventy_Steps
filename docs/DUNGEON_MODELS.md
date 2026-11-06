@@ -57,6 +57,14 @@ A face of a baked model has a class byte, and four classes beside the old ones a
 
 Models that wear them: the brain jars and museum cases (glass, fluid), the retort, flasks and bottles of the laboratories (glass, liquid), the bottle gallery (glass, wine, cork), the still, the hourglass, the compressor's gauge, the candles (wax), the ballroom's, the Waite study's and Lilith's mirrors.
 
+## Round 108: each dungeon's own build, each boss hall's lore
+
+Built in code over the kits and the baked pieces above, render only (docs/DECISIONS.md round 108):
+
+- **A dungeon's look** (`src/data/dungeonLooks.ts`): for the rooms of its own kit, its pillars' form (`render/pillarForms.ts`), its halls' frieze (`render/dungeonFriezes.ts`), its ceilings' dressing (`render/dungeonRoofs.ts`), what stands along its halls' walls (`render/dungeonFurniture.ts` and `render/loreItems.ts`) and its stone's tint (`render/dungeonLook.ts`).
+- **A boss hall's lore** (`src/data/hallLore.ts`, `hallLoreLairs.ts`, by the hall's first boss): its pillars' plan (`world/roomStyle.ts`: 'five', 'six', 'seven' beside the old) and form, its floor's sigil (`render/hallSigils.ts`; the plan's floor is 'sigil', which lays only the carpet in to its rim), its walls (`render/hallWalls.ts`), its roof (`render/hallRoof.ts`), its light and its far wall's piece; `render/hallLore.ts` draws them. A boss hall's set (`data/hallSets*.ts`) stands as before, and the lore keeps its wall pieces clear of it and of the torches.
+- **Groups:** a sigil's ink is the floor's stone as relief (`carve`, `${floor}+`), cloth (`cloth+`) or light as relief (`shine`, `glow+`); a light set on a surface is `shine` too. `tests/hallLore.test.ts` holds every hall to its lore, its sigil off the carpet and inside its room, its light out of the anomaly hues, and every pillar form within its collider at an eye's height.
+
 ## What is not in, and why
 
 - **Supplied, not yet in** (the Drive folder 'missing assets - seventy steps'): Menhirs (DragonJojo: Sentinel Hill's ring and Ghatanothoa's court), Victorian Gothic Hallway (BenKiplinger: Muñoz's rooms, the Waite house), Modular Props - House Interior (JordanPowell: the Witch House, the alchemist's cellars, the Waite house, Zann's garret) and Stage Curtains (daedaljs: the Kadath hall, the Outsider's ballroom). The folder is a Google Drive one, which the connector gives up only as inline text, and archives of tens of megabytes cannot go that way; attached to the chat as the first fifteen were, they go in through the same manifests.
