@@ -15,6 +15,7 @@ import { getRegion } from '../data/regions';
 import { DUNGEON } from '../data/tuning';
 import { kitOfRoom } from '../world/dungeonKit';
 import { torchStops } from './sconces';
+import { markStairLights } from './stairLights';
 import { propJob } from './propMeshes';
 import type { BoxPart, Part } from '../world/dungeonParts';
 import { drawn } from '../world/wallJoins';
@@ -264,6 +265,7 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
 export function* dungeonJob(d: Dungeon, done: (meshes: THREE.Mesh[], lights: LightSpot[]) => void): Generator<void, void> {
   const lights: LightSpot[] = [];
   const built = meshes(yield* dungeonPieces(d, lights));
+  markStairLights(d.layout, lights); // (round 105: the Stairs of Slumber's lights are dimmed, and gutter as the mind fails)
   const region = getRegion(d.layout.region);
   if (d.decor.length && region) yield* propJob(d.decor, region, (m, l) => void (built.push(...m), lights.push(...l))); // the boss room's heart and braziers (round 13)
   done(built, lights);
