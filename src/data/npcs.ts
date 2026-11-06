@@ -6,6 +6,7 @@
  */
 
 import { FAR_NPCS } from './npcsFar';
+import { planTraders } from './traders';
 
 export type When = { quest: string; at: 'unstarted' | 'done' | number };
 
@@ -36,6 +37,8 @@ export interface NpcDef {
   topics: readonly Topic[];
   shop?: string; // a merchant: their wares (data/wares.ts) follow the talk (round 12)
   creature?: string; // a roster ally who speaks for them: no figure of their own (round 12, Nasht & Kaman-Thah)
+  voice?: string; // another person's recordings carry their words (the trader at the lamps speaks as Morgan: data/traders.ts)
+  figure?: string; // and their figure is built as that person's (render/npcFigures.ts)
 }
 
 const at = (quest: string, stage: When['at']): When => ({ quest, at: stage });
@@ -46,6 +49,10 @@ const WAY_DOWN: readonly string[] = [
   "I've been thinking about that key. Randolph Carter had one like it, the writer from Boston. He's gone missing, the papers said. The tall man must have taken it from him.",
   "There's a way down from here, into deeper dreams. Peaslee knows the sign. Go down the stair and ask for Kuranes. He's been dreaming longer than any of us. If anyone knows what a silver key opens, he does.",
 ];
+
+/** What Morgan says at his stall, shared with the trader at the lamps, who has no words of his own (a line changed in a word has no recording: speech.test.ts). */
+const MORGAN_SHOWS = 'Here, see what I have. It all costs something, even here.';
+const MORGAN_LOOK: NpcLook = { coat: 'grey', hat: 'bowler', hair: 'dark', glasses: true };
 
 const NEAR_NPCS: readonly NpcDef[] = [
   {
@@ -99,9 +106,9 @@ const NEAR_NPCS: readonly NpcDef[] = [
   },
   {
     id: 'morgan', name: 'Dr. Francis Morgan', title: 'Professor of Medicine and Comparative Anatomy', sign: 'hub_quad', side: -1, shop: 'morgan',
-    look: { coat: 'grey', hat: 'bowler', hair: 'dark', glasses: true },
+    look: MORGAN_LOOK,
     topics: [
-      { when: [at('dunwich', 'done')], lines: ["Armitage will want to hear the Horror's gone. I carried the sprayer that night, you know. The powder worked then too.", 'Here, see what I have. It all costs something, even here.'] },
+      { when: [at('dunwich', 'done')], lines: ["Armitage will want to hear the Horror's gone. I carried the sprayer that night, you know. The powder worked then too.", MORGAN_SHOWS] },
       { lines: [
         "Morgan. Medicine, and comparative anatomy. I was at Dunwich with Armitage and Rice, before all this. I've been making myself useful.",
         "Lamp oil in medicine bottles, mostly. Thrown, they burn. And a few odd things from the Exhibition Hall's drawers. I'll trade for those Echoes of yours; don't ask me what I do with them.",
@@ -211,4 +218,11 @@ const NEAR_NPCS: readonly NpcDef[] = [
 
 export const NPCS: readonly NpcDef[] = [...NEAR_NPCS, ...FAR_NPCS]; // and the far realms' people (npcsFar.ts, round 12)
 
-export const npcDef = (id: string): NpcDef | undefined => NPCS.find((n) => n.id === id);
+/** Where the trader at the lamps may stand at each second sign (data/traders.ts), and he as a person: not among the people met (NPCS: the achievement, the epilogues and the map count those). */
+export const TRADER_SITES = planTraders(NPCS);
+export const TRADERS: readonly NpcDef[] = TRADER_SITES.map((t) => ({
+  id: t.id, name: 'Dr. Francis Morgan', title: 'Trading by the lamps', sign: t.sign, side: t.tries[0]?.side ?? 1, look: MORGAN_LOOK, shop: 'wayside', voice: 'morgan', figure: 'morgan',
+  topics: [{ lines: [MORGAN_SHOWS] }],
+}));
+
+export const npcDef = (id: string): NpcDef | undefined => NPCS.find((n) => n.id === id) ?? TRADERS.find((n) => n.id === id);

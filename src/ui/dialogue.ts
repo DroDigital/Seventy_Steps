@@ -88,7 +88,7 @@ export function createDialogue(g: Game): Dialogue {
     begin(wordMoments(spans.map((s) => s.textContent ?? ''), curve, rate)); // by where the voice sounds in the recording: as it is said
   });
 
-  g.events.on('Talked', ({ npc, name, title, lines, rumor, shop }) => {
+  g.events.on('Talked', ({ npc, name, title, lines, voice, rumor, shop }) => {
     g.sheltered = true; // at once: a talk may open within a step, and the rest of that step must hold the investigator safe too (main.ts syncs it again at the next)
     let i = 0;
     const line = (): void => {
@@ -96,9 +96,9 @@ export function createDialogue(g: Game): Dialogue {
       current = lines[i];
     };
     const say = (): void => {
-      g.events.emit('Said', { speaker: `npc:${npc}`, text: lines[i] });
+      g.events.emit('Said', { speaker: `npc:${voice ?? npc}`, text: lines[i] });
       const text = lines[i];
-      timer = window.setTimeout(() => text === current && begin(wordMoments(words(text), null, 1, spokenFor(`npc:${npc}`, text))), LATE); // no voice came: said by the clock
+      timer = window.setTimeout(() => text === current && begin(wordMoments(words(text), null, 1, spokenFor(`npc:${voice ?? npc}`, text))), LATE); // no voice came: said by the clock
     };
     const page: Page = {
       back: leave,

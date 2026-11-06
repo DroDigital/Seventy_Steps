@@ -22,7 +22,7 @@ import { colliderBounds, type Collider } from './colliders';
 import { layoutDungeon, type DungeonLayout } from './dungeonKit';
 import { doorwayClear, dungeonParts, partCollider, type Part } from './dungeonParts';
 import { landHeight } from './land';
-import { shrineColliders, standingStones } from './shrine';
+import { restPoint, shrineColliders, standingStones } from './shrine';
 import { furnish, type GateFn, type SignFn } from './roomFurnish';
 import { padBounds, type Pad } from './sitePads';
 import { chunkKey, chunkOf, DIRS, toWorld, yawOfDir, type Rect } from './worldMap';
@@ -164,9 +164,7 @@ function build(): WorldLayout {
 
   /** An Elder Sign; the investigator rises well in front of it and to one side, so the camera behind them clears the slab, or at `at`. */
   const sign: SignFn = (region, x, z, y, id, name, face, dream = false, at) => {
-    const f = DIRS[face];
-    const s = side(face);
-    const rest = { ...(at ?? { x: x + f.x * 4.6 + s.x * 1.2, z: z + f.z * 4.6 + s.z * 1.2 }), yaw: yawOfDir(face) };
+    const rest = { ...(at ?? restPoint(x, z, face)), yaw: yawOfDir(face) };
     const stones = standingStones(x, y, z, yawOfDir(face), around(x, z, 5));
     w.signs.push({ id, name, region, x, z, y, face, dream, rest, stones });
     for (const c of shrineColliders(x, y, z, yawOfDir(face), stones)) collide(c); // its shrine (shrine.ts)

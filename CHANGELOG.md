@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **A trader waits by the lamps.** Dr. Morgan sells lamp oil and cartridges at every second Elder Sign of the land, leaning on a street lamp beside it. Flasks of lamp oil also lie about the world, at the Burned Laboratory, the Ghoul-Warren, the Old Bishop Farm, the Marsh Refinery, the Curwen Vault, the Martense Mansion and the Wrecked Camp, for whoever does not buy them.
 - **The Borrowed Reins are back.** The chariot is again earned by Peaslee's early errand (speak with him, then find the Sleeper's Sign); no horror need fall. The control tip for calling it now appears only once it can be called.
 - **An Elder Sign shows why to rest at it.** A mark of light hangs over a sign when resting there does something for you, each with its own shape, colour and motion: blue chevrons sinking (descend the Seventy Steps), a turning green ring with an arrow (travel on from here), a silver key (the endings), a rising gold chevron (a level to buy), an amber star (star-stones to set) and a rose lozenge (a new relic to wear). The rest prompt names the reason too.
 - **Horrors rise to meet a stronger investigator.** Fight a horror after outgrowing it and it grows to meet you: its health follows your damage and its blows follow your health, past what it was made for. You still feel stronger, but no horror falls in a few swings, whatever order you take them in. New Game+ keeps its own scaling.

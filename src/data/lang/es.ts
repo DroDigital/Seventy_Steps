@@ -276,6 +276,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.vial': "FRASCO DE PLATA · DOSIS DE REACTIVO {n}",
   'n.vialSold': "FRASCO DE PLATA · TU ESTUCHE YA NO ADMITE MÁS · +{n} ECOS",
   'n.rounds': "LLEVAS TODAS LAS BALAS QUE PUEDES",
+  'n.oil': "UN FRASCO DE ACEITE DE LÁMPARA · {n} DE {most}",
+  'n.oilFull': "LLEVAS TODOS LOS FRASCOS QUE PUEDES",
   'pad.moveStick': "el stick izquierdo",
   'pad.lookStick': "el stick derecho",
   'key.mouse': "el ratón",

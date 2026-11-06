@@ -5,7 +5,8 @@
 
 import { hash2 } from '../core/rng';
 import type { XZ } from '../core/geom';
-import { ACTS, type ActKind } from '../data/npcActs';
+import type { ActKind } from '../data/npcActs';
+import { actFor } from './actFor';
 import { raycast } from '../world/colliders';
 import type { Game } from './components';
 
@@ -22,7 +23,7 @@ export function clearStep(g: Game, a: XZ, b: XZ): boolean {
 
 /** What `id` does here, and where. */
 export function placeFor(id: string, home: Spot): { kind: ActKind; spot: Spot } | null {
-  const act = ACTS[id];
+  const act = actFor(id);
   if (!act) return null;
   if (act.post) return { kind: act.kind, spot: { x: act.post.x, z: act.post.z, yaw: act.post.yaw } }; // exactly where they are put
   const turn = (hash2(id.length, [...id].reduce((h, c) => h + c.charCodeAt(0), 0), 3) - 0.5) * 1.1; // a little turned from the sign, each their own way

@@ -6,7 +6,7 @@
  * its second line when one comes back. Looked for a few times a second. Pure: no Three.js.
  */
 
-import { hoardName, poiDef, poiKey } from '../data/pois';
+import { flaskName, hoardName, poiDef, poiKey } from '../data/pois';
 import { POI, SIM } from '../data/tuning';
 import { poiSitesOf, type PoiSite } from '../world/poiSites';
 import { regionAt } from '../world/worldMap';
@@ -57,9 +57,15 @@ const within = new WeakMap<Game, Set<string>>(); // the places the investigator 
 function setDown(g: Game, s: PoiSite): void {
   const mine = chests.get(g) ?? chests.set(g, new Set()).get(g)!;
   const id = s.def.id;
-  if (!s.chest || !s.def.hoard || mine.has(id) || g.overworld?.read.has(hoardName(id))) return;
-  mine.add(id);
-  spawnTome(g, { x: s.chest.x, z: s.chest.z, yaw: (s.chest.x * 7.3 + s.chest.z) % 6.28, name: hoardName(id), insight: 0, echoes: s.def.hoard });
+  if (s.chest && s.def.hoard && !mine.has(id) && !g.overworld?.read.has(hoardName(id))) {
+    mine.add(id);
+    spawnTome(g, { x: s.chest.x, z: s.chest.z, yaw: (s.chest.x * 7.3 + s.chest.z) % 6.28, name: hoardName(id), insight: 0, echoes: s.def.hoard });
+  }
+  const key = `flask:${id}`; // the flasks of lamp oil lying here (round 106), once, unless taken
+  if (s.flask && s.def.flasks && !mine.has(key) && !g.overworld?.read.has(flaskName(id))) {
+    mine.add(key);
+    spawnTome(g, { x: s.flask.x, z: s.flask.z, yaw: (s.flask.x * 3.1 + s.flask.z) % 6.28, name: flaskName(id), insight: 0, oil: s.def.flasks });
+  }
 }
 
 export function poiSystem(g: Game): void {

@@ -4,7 +4,7 @@ import type { ActKind } from '../src/data/npcActs';
 import { ACTS } from '../src/data/foleySounds';
 import { createActFoley } from '../src/render/audio/actFoley';
 import { npcEntity } from '../src/systems/npcs';
-import { NPCS } from '../src/data/npcs';
+import { NPCS, TRADERS } from '../src/data/npcs';
 import { createWorldGame } from '../src/systems/game';
 import { actOf, npcLife } from '../src/systems/npcLife';
 
@@ -47,7 +47,7 @@ describe('the acts, heard (round 40)', () => {
       g.frame++;
       npcLife(g, 1 / 60);
     }
-    const at = NPCS.map((n) => ({ n, e: npcEntity(g, n.id)! })).filter(({ e }) => actOf(g, e) !== null);
+    const at = [...NPCS, ...TRADERS].map((n) => ({ n, e: npcEntity(g, n.id)! })).filter(({ e }) => actOf(g, e) !== null); // (the traders at the lamps act too: data/traders.ts)
     expect(at.length).toBeGreaterThan(3);
     let t = 100;
     foley.update(t);

@@ -20,7 +20,8 @@ import { hourOf, phaseOf, type Hour } from './clock';
 import type { Game } from './components';
 import { npcPlace } from './npcs';
 import { clearStep, placeFor, type Spot } from './npcSpots';
-import { ACTS, type ActKind } from '../data/npcActs';
+import type { ActKind } from '../data/npcActs';
+import { actFor } from './actFor';
 
 const SPEED = 1.1; // m/s: an unhurried walk
 const ACCEL = 1.8; // m/s²: they get up to it, and ease off as they near a turn
@@ -94,7 +95,7 @@ export const managed = (g: Game, e: Entity): boolean => !!walkers.get(g)?.has(e)
 /** Where `e` does what they do, and what, if they have a place of their own (the view stands their chair or post there). */
 export const postOf = (g: Game, e: Entity): Spot | null => {
   const w = walkers.get(g)?.get(e);
-  return w && w.kind !== null && ACTS[g.ecs.c.npc.get(e) ?? '']?.post ? w.spot : null;
+  return w && w.kind !== null && actFor(g.ecs.c.npc.get(e) ?? '')?.post ? w.spot : null;
 };
 
 /** What `e` is doing now, if they are at it (the view sits them down, or lifts the book). */
@@ -127,7 +128,7 @@ export function npcLife(g: Game, dt: number): void {
       }
       table.set(e, (w = { home: place, spot, kind: doing?.kind ?? null, doing: false, breather: false, left: between(g, SPELL), goal: null, wait: doing ? 0 : between(g, [1, 6]), look: spot.yaw, pace: 0 }));
     }
-    const posted = !!ACTS[id]?.post; // one with a place of their own keeps to it all night, and never strolls off
+    const posted = !!actFor(id)?.post; // one with a place of their own keeps to it all night, and never strolls off
     const busy = (hour !== 'waning' || posted) && w.kind !== null; // the last hour is dozing on their feet, whatever they do
     const at = busy && !w.breather && distXZ(tr.pos, w.spot) <= ARRIVE + 0.1;
     const near = !at && (g.player.listening === e || distXZ(tr.pos, me) < HOLD); // one at their act stays at it: no turning to the one beside them, nor to the one talking with them

@@ -276,6 +276,8 @@ export const DE: Readonly<Record<Key, string>> = {
   'n.vial': "SILBERNE PHIOLE · REAGENZDOSEN {n}",
   'n.vialSold': "SILBERNE PHIOLE · DEIN BESTECK FASST NICHTS MEHR · +{n} ECHOS",
   'n.rounds': "IHR TRAGT ALLE PATRONEN, DIE IHR KÖNNT",
+  'n.oil': "EINE FLASCHE LAMPENÖL · {n} VON {most}",
+  'n.oilFull': "IHR TRAGT ALLE FLASCHEN, DIE IHR KÖNNT",
   'pad.moveStick': "der linke Stick",
   'pad.lookStick': "der rechte Stick",
   'key.mouse': "die Maus",

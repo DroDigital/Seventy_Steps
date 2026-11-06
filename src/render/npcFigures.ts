@@ -104,7 +104,7 @@ function wareToken(f: Figure, ware: WareId, steel: Rgb, brass: Rgb): THREE.Objec
 /** The person `id` as a figure (a plain grey stranger if the id is unknown). */
 export function npcFigure(id: string): Figure {
   const look: NpcLook = npcDef(id)?.look ?? { coat: 'grey', hat: 'none', hair: 'dark' };
-  const who = WHO[id] ?? { cut: 'short' as Cut, items: [] as readonly Item[] };
+  const who = WHO[npcDef(id)?.figure ?? id] ?? { cut: 'short' as Cut, items: [] as readonly Item[] }; // (the trader at the lamps is built as Morgan)
   const has = (i: Item): boolean => who.items.includes(i);
   const robe = look.coat === 'robe';
   const f = skeleton('humanoid', { hip: 0.9, hunch: look.stoop ?? 0, shoulder: [0.27, 0.57], hipX: 0.11, neck: [0.63, 0], leg: 0.88, thigh: 0.42, upper: 0.3, fore: 0.28 });
@@ -229,7 +229,7 @@ export function npcFigure(id: string): Figure {
   }
   f.loose = loose;
   f.root.scale.set(who.build?.[1] ?? 1, who.build?.[0] ?? 1, who.build?.[1] ?? 1); // each their own height and girth
-  const act = ACTS[id];
+  const act = ACTS[id] ?? ACTS[npcDef(id)?.figure ?? '']; // (the trader at the lamps leans and smokes as Morgan does)
   if (act) addProps(f, act.kind, SEATED.has(act.kind), act.post); // what they hold, and sit on, while they are at what they do (round 39)
   return f;
 }

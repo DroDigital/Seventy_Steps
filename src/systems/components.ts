@@ -172,7 +172,8 @@ export interface Tome {
   echoes?: number; // an Echo cache (world/caches.ts), not a tome
   weapon?: string; // a weapon lying where it was left (arms.ts), not a tome
   rounds?: number; // a box of cartridges (data/ammoSites.ts, world/caches.ts): rounds for the revolver, not a tome (gun.ts)
-  warned?: number; // the frame it last said they carry all the rounds they can
+  warned?: number; // the frame it last said they carry all the rounds they can (and the flasks of oil, round 106)
+  oil?: number; // flasks of lamp oil lying here (round 106: data/pois.ts; taken whole, or left where they lie)
 }
 
 /** An Elder Sign (spec §3D): a checkpoint to rest at, found by coming near. */
