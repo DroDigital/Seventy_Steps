@@ -14,7 +14,8 @@ import { strewn } from '../world/planFill';
 import { ARENA_MISTS } from '../data/arenaMists';
 import { dungeonFogOf, FOGS, type FogDef } from '../data/fogs';
 import { lookOf } from '../data/looks';
-import { FOG } from '../data/tuning';
+import { FOG, SLUMBER } from '../data/tuning';
+import { descentGain } from '../world/descent';
 import { NIGHT_DARK } from '../data/lifeTuning';
 import type { Court } from './courtMist';
 import type { PostPass } from './postPass';
@@ -31,6 +32,7 @@ export interface FogFrame {
   wet?: number; // 0–1: how soaked the ground is (render/wetness.ts, the weather's: read from there when it is not given; round 80)
   gust?: number; // how hard the wind blows (worldUniforms.uWind, 1 on a calm night; read from there when it is not given; round 80)
   court?: Court | null; // round 78: the open arena's court the camera is in, and how far: its mist is the realm's thickened (data/arenaMists.ts)
+  descent?: number; // how far down the Stairs of Slumber the investigator is, 0 at their head and 1 on their deepest floor (world/descent.ts; round 105)
   dark?: number; // 0–1: how deep the night is laid (render/realmLook.ts): under a roof, the mist has no light of its own to speak of in the deep of it (round 58)
 }
 
@@ -94,8 +96,8 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       u.uProjInv.value.copy(camera.projectionMatrixInverse);
       u.uCamWorld.value.copy(camera.matrixWorld);
       u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
-      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet); // a failing mind thickens it, and a wood, and rain (round 80)
-      u.uFog.value.set(now.density * thick, now.height, ground - 0.3, now.patchy);
+      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet) * descentGain(f.descent ?? 0); // a failing mind thickens it, and a wood, and rain (round 80)
+      u.uFog.value.set(now.density * thick, now.height + SLUMBER.mist.height * (f.descent ?? 0), ground - 0.3, now.patchy * (1 - SLUMBER.mist.patchy * (f.descent ?? 0)));
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
       u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, f.enclosed ? 0 : LIVING.swell * now.patchy); // (w: its banks swell and thin; a crypt's mist is still)
       u.uFogColor.value.set(...now.color).multiplyScalar(mistTone(f.dark ?? 0, roof)); // (round 58: under a roof the mist is no longer the realm's own at every hour; in the open air it is, as before)
