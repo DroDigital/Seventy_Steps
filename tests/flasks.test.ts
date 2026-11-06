@@ -1,4 +1,4 @@
-// Lamp oil lies about the world, at fitting places, for whoever does not buy it (2026-11-06, asked; round 105).
+// Lamp oil lies about the world, at fitting places, for whoever does not buy it (2026-11-06, asked; round 106).
 import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
 import { POIS, flaskName } from '../src/data/pois';
@@ -26,7 +26,7 @@ function inside(c: Collider, x: number, z: number, m: number): boolean {
 const flasksOf = (g: ReturnType<typeof createWorldGame>, id: string) => [...g.ecs.c.tome].filter(([, t]) => t.name === flaskName(id));
 const spotOf = (g: ReturnType<typeof createWorldGame>, e: number) => g.ecs.c.transform.get(e)!.pos;
 
-describe('lamp oil lies about the world (round 105)', () => {
+describe('lamp oil lies about the world (round 106)', () => {
   it('lies only at places it fits, a flask or two each; the shop sells it too', () => {
     expect(POIS.filter((p) => p.flasks).map((p) => p.id).sort()).toEqual(FITTING);
     expect(POIS.filter((p) => p.flasks).every((p) => p.flasks! >= 1 && p.flasks! <= 2)).toBe(true);
@@ -64,23 +64,22 @@ describe('lamp oil lies about the world (round 105)', () => {
     expect(read, 'a flask is not read as a tome').toHaveLength(0);
   });
 
-  it('when the pockets cannot hold them all, the rest lie where they are and are taken once there is room', () => {
+  it('when the pockets cannot hold all of it, none is taken: the cache stays whole where it lies, and is taken once all of it fits', () => {
     const g = createWorldGame();
     const site = poiSite('mountains_wrecked_camp')!;
     goTo(g, site.x, site.z);
     run(g, 40);
-    const [[e]] = flasksOf(g, site.def.id);
+    const [[e, t]] = flasksOf(g, site.def.id);
     const at = spotOf(g, e);
     g.player.oil = OIL.carry - 1;
     goTo(g, at.x, at.z);
     run(g, 5);
-    expect(g.player.oil).toBe(OIL.carry);
-    const [[, left]] = flasksOf(g, site.def.id);
-    expect(left.oil).toBe(1);
+    expect(g.player.oil).toBe(OIL.carry - 1);
+    expect(t.oil).toBe(site.def.flasks);
     expect(g.overworld!.read.has(flaskName(site.def.id))).toBe(false);
     g.player.oil = 0;
     run(g, 5);
-    expect(g.player.oil).toBe(1);
+    expect(g.player.oil).toBe(site.def.flasks);
     expect(flasksOf(g, site.def.id)).toHaveLength(0);
   });
 
@@ -97,5 +96,24 @@ describe('lamp oil lies about the world (round 105)', () => {
     goTo(loaded, site.x, site.z);
     run(loaded, 40);
     expect(flasksOf(loaded, site.def.id)).toHaveLength(0);
+  });
+
+  it('a cache left whole when the pockets are short is still whole after a load: no flask is doubled', () => {
+    const g = createWorldGame();
+    const site = poiSite('mountains_wrecked_camp')!;
+    goTo(g, site.x, site.z);
+    run(g, 40);
+    const [[e]] = flasksOf(g, site.def.id);
+    const at = spotOf(g, e);
+    g.player.oil = OIL.carry - 1;
+    goTo(g, at.x, at.z);
+    run(g, 5);
+    const loaded = createWorldGame({ save: parseSave(JSON.stringify(snapshot(g)))! });
+    expect(loaded.player.oil).toBe(OIL.carry - 1);
+    goTo(loaded, site.x, site.z);
+    run(loaded, 40);
+    const [[, t]] = flasksOf(loaded, site.def.id);
+    expect(t.oil).toBe(site.def.flasks);
+    expect(flasksOf(loaded, site.def.id)).toHaveLength(1);
   });
 });

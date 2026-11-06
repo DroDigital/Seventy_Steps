@@ -61,7 +61,7 @@ function setDown(g: Game, s: PoiSite): void {
     mine.add(id);
     spawnTome(g, { x: s.chest.x, z: s.chest.z, yaw: (s.chest.x * 7.3 + s.chest.z) % 6.28, name: hoardName(id), insight: 0, echoes: s.def.hoard });
   }
-  const key = `flask:${id}`; // the flasks of lamp oil lying here (round 105), once, unless taken
+  const key = `flask:${id}`; // the flasks of lamp oil lying here (round 106), once, unless taken
   if (s.flask && s.def.flasks && !mine.has(key) && !g.overworld?.read.has(flaskName(id))) {
     mine.add(key);
     spawnTome(g, { x: s.flask.x, z: s.flask.z, yaw: (s.flask.x * 3.1 + s.flask.z) % 6.28, name: flaskName(id), insight: 0, oil: s.def.flasks });

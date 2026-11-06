@@ -1,4 +1,4 @@
-/** Ground pickups: a weathered Echo casket with escaping light, a box of revolver cartridges, and flasks of lamp oil (round 105). */
+/** Ground pickups: a weathered Echo casket with escaping light, a box of revolver cartridges, and flasks of lamp oil (round 106). */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { part, skeleton, type Figure } from './figures';
@@ -102,7 +102,7 @@ export function ammoFigure(): Figure {
   return f;
 }
 
-/** A flask of lamp oil: a medicine bottle stoppered with rag, standing, and another lying by it (round 105). */
+/** A flask of lamp oil: a medicine bottle stoppered with rag, standing, and another lying by it (round 106). */
 export function oilFigure(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
   const oil: Rgb = [0.62, 0.4, 0.13];

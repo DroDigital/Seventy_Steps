@@ -65,7 +65,7 @@ export function insightSystem(g: Game): void {
   for (const [id, t] of tome) {
     if (distXZ(transform.get(id)!.pos, pp) > PLAYER.pickupRadius) continue;
     if (t.rounds && !takeRounds(g, t)) continue; // more than they can carry: it lies where it is
-    if (t.oil !== undefined) { // lamp oil: taken as far as the pockets hold, the rest lying where it is (round 105)
+    if (t.oil !== undefined) { // lamp oil: taken whole when the pockets hold all of it, else left where it lies (round 106)
       if (!takeOil(g, t)) continue;
       g.ecs.despawn(id);
       g.overworld?.read.add(t.name); // taken for good
@@ -136,12 +136,15 @@ export function buyUpgrade(g: Game, id: UpgradeId): boolean {
   return true;
 }
 
-/** Lamp oil taken up as far as the flasks fit the pockets; the rest stays where it lies, and is said of now and then (round 105). True once all of it is taken. */
+/**
+ * Lamp oil taken up whole, if all its flasks fit the pockets, as the rounds are (round 106): a cache the pockets cannot hold all of stays where
+ * it lies and is said of now and then. Never part-taken: a save keeps the oil carried but not a remainder, so a part would come back doubled on a
+ * load (Codex's review of PR #264). True once taken.
+ */
 function takeOil(g: Game, t: { oil?: number; warned?: number }): boolean {
-  const fit = Math.max(0, Math.min(t.oil ?? 0, OIL.carry - g.player.oil));
-  g.player.oil += fit;
-  t.oil = (t.oil ?? 0) - fit;
-  if (t.oil <= 0) {
+  const n = t.oil ?? 0;
+  if (n <= OIL.carry - g.player.oil) {
+    g.player.oil += n;
     g.events.emit('Notice', { text: tr('n.oil', { n: g.player.oil, most: OIL.carry }) });
     return true;
   }
