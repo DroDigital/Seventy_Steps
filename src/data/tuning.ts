@@ -329,3 +329,4 @@ export * from './bossTuning';
 export * from './fxTuning';
 export * from './lifeTuning';
 export * from './playTuning';
+export * from './slumberTuning';

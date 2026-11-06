@@ -40,6 +40,7 @@ import { createMistWakes } from './render/mistWakes';
 import { createSwingTrails } from './render/swingTrails';
 import { courtAt } from './render/courtMist';
 import { createVolumetricFog, woodOf } from './render/volumetricFog';
+import { descentAt } from './world/descent';
 import { createWorldLife } from './render/worldLife';
 import { weatherHaze } from './render/weather';
 import { createGroundFx } from './render/groundFx';
@@ -332,10 +333,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const gloom = enclosed ? gloomAt(camera.position.x, camera.position.z) : 0; // how dark the room under a roof is kept: the lantern is what is walked by (round 58)
         look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? adapted(enclosed ? darkOf(CLOCK.start) * darkShare(gloom) : darkOf(phaseOf(time)), lantern) : 0);
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
-        const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
+        const playerAt = game.ecs.c.transform.get(game.player.id)!.pos;
+        const feet = playerAt.y;
         const fallen = endingSanity(cinema.sceneId, cinema.time, game.mind.sanity); // an ending: the picture goes, and stays gone through the last fade
         const mind = fallen ?? game.mind.sanity;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - mind / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, descent: descentAt(playerAt.x, feet, playerAt.z), stress: Math.min(1 - mind / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
         mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);

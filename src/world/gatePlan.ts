@@ -12,6 +12,7 @@
 import { hash2 } from '../core/rng';
 import { hallCandle, ringCandle, type CandleSpot } from './candlePlan';
 import { doorLook, type DoorLook } from '../data/doors';
+import { isAbyss } from './abyssStair';
 import { fogThemeOf, type FogThemeId } from '../data/fogThemes';
 import { DUNGEON } from '../data/tuning';
 import { kitIdOfRoom, roomAt, type DoorLayout, type DungeonLayout } from './dungeonKit';
@@ -91,6 +92,7 @@ function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[
       fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
       return;
     }
+    if (isAbyss(d.a) && isAbyss(d.b)) return; // an arch between two flights over the void has nothing to hang a door from: no curtain stands in it (round 105)
     const look = doorLook(kitIdOfRoom(L, room));
     if (!look) return;
     const id = `${L.def.id}:${i}`;
