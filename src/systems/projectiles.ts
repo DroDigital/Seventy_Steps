@@ -14,7 +14,7 @@ import { raycast } from '../world/colliders';
 import { moveDef } from './actions';
 import { capsuleGap2, hostiles, strike } from './combat';
 import { live } from './targets';
-import { isAbsent, type Game } from './components';
+import { isAbsent, type Bolt, type Game } from './components';
 import { spawnPool } from './hazards';
 import { foeDamage } from './cycles';
 import { targetOf } from './specials';
@@ -55,7 +55,7 @@ export function launch(g: Game, id: Entity, v: VolleyDef): void {
 }
 
 /** One bolt from `owner`, leaving `from` at `vel`. */
-export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyDef, 'speed' | 'radius' | 'range' | 'damage' | 'poise' | 'lob' | 'pool'>): void {
+export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyDef, 'speed' | 'radius' | 'range' | 'damage' | 'poise' | 'lob' | 'pool' | 'bounces'>): void {
   const c = g.ecs.c;
   const conjured = c.phantom.has(owner);
   const yaw = Math.atan2(vel.x, vel.z);
@@ -63,7 +63,7 @@ export function loose(g: Game, owner: Entity, from: V3, vel: V3, v: Pick<VolleyD
   c.transform.set(e, { pos: { ...from }, prev: { ...from }, yaw, prevYaw: yaw });
   const life = Math.min(BOSS.boltLife, Math.ceil((v.range / v.speed) * SIM.hz) + (v.lob ? 60 : 0));
   const faction = c.combatant.get(owner)?.faction ?? 'enemy';
-  c.bolt.set(e, { owner, faction, enemyScale: faction === 'enemy' ? foeDamage(g, owner) : undefined, vel, radius: v.radius, damage: conjured ? 0 : v.damage, poise: conjured ? 0 : v.poise, life, lob: v.lob, conjured, passed: [], pool: v.pool });
+  c.bolt.set(e, { owner, faction, enemyScale: faction === 'enemy' ? foeDamage(g, owner) : undefined, vel, radius: v.radius, damage: conjured ? 0 : v.damage, poise: conjured ? 0 : v.poise, life, lob: v.lob, conjured, passed: [], pool: v.pool, ...(v.bounces && { bounces: v.bounces }) });
   c.model.set(e, 'fx:bolt');
   g.events.emit('BoltLoosed', { owner, at: { ...from }, vel: { ...vel }, fire: !!v.pool?.fire, conjured });
 }
@@ -74,6 +74,49 @@ function land(g: Game, e: Entity, at: V3, on: 'body' | 'ground' | 'wall' | 'spen
   g.events.emit('BoltLanded', { owner: b.owner, faction: b.faction, at: { ...at }, vel: { ...b.vel }, on, radius: b.radius, lob: b.lob, fire: !!b.pool?.fire, conjured: b.conjured });
   g.ecs.despawn(e);
 }
+
+/**
+ * A bolt that may glance (round 105, the rebound) comes off what it struck: of its course turned back across x, across z or across both, the first
+ * that leaves the wall clear. A box's face turns it truly; a pillar's round side near enough. The spark and the knock are a landing's, the bolt flies on.
+ */
+function glance(g: Game, e: Entity, b: Bolt, from: V3, to: V3, hit: number): boolean {
+  const k = Math.max(0, hit - 0.05);
+  const at = { x: from.x + (to.x - from.x) * k, y: from.y + (to.y - from.y) * k, z: from.z + (to.z - from.z) * k };
+  for (const [sx, sz] of FLIPS) {
+    const vel = { x: b.vel.x * sx, y: b.vel.y, z: b.vel.z * sz };
+    if (raycast(g.world, at, { x: at.x + vel.x * 0.1, y: at.y + vel.y * 0.1, z: at.z + vel.z * 0.1 }) < 1) continue;
+    bounce(g, e, b, at, vel);
+    return true;
+  }
+  return false;
+}
+
+/** A bolt that may glance comes back off the rim of its caster's court too, where no wall is built (round 105). */
+function rim(g: Game, e: Entity, b: Bolt, to: V3): boolean {
+  const court = g.ecs.c.fight.get(b.owner)?.arena;
+  if (!court) return false;
+  const [dx, dz] = [to.x - court.x, to.z - court.z];
+  const d = Math.hypot(dx, dz);
+  if (d < court.radius - b.radius || d < 1e-6) return false;
+  const [nx, nz] = [dx / d, dz / d];
+  const along = b.vel.x * nx + b.vel.z * nz;
+  if (along <= 0) return false;
+  const inside = (court.radius - b.radius - 0.05) / d;
+  bounce(g, e, b, { x: court.x + dx * inside, y: to.y, z: court.z + dz * inside }, { x: b.vel.x - 2 * along * nx, y: b.vel.y, z: b.vel.z - 2 * along * nz });
+  return true;
+}
+
+function bounce(g: Game, e: Entity, b: Bolt, at: V3, vel: V3): void {
+  const tr = g.ecs.c.transform.get(e)!;
+  g.events.emit('BoltLanded', { owner: b.owner, faction: b.faction, at: { ...at }, vel: { ...b.vel }, on: 'wall', radius: b.radius, lob: b.lob, fire: false, conjured: b.conjured });
+  b.vel = vel;
+  b.bounces = (b.bounces ?? 1) - 1;
+  b.passed = []; // what it flew past before may meet it on the way back
+  tr.prev = { ...tr.pos };
+  tr.pos = at;
+}
+
+const FLIPS = [[-1, 1], [1, -1], [-1, -1]] as const;
 
 /** When each caster's bolt last landed on the investigator, per game (round 17). */
 const landedAt = new WeakMap<Game, Map<Entity, number>>();
@@ -115,6 +158,8 @@ export function boltSystem(g: Game): void {
     if (struck) continue;
     const wall = raycast(g.world, from, to);
     const ground = g.world.ground(to.x, to.z);
+    if (b.bounces && wall < 1 && glance(g, e, b, from, to, wall)) continue;
+    if (b.bounces && wall >= 1 && to.y > ground && rim(g, e, b, to)) continue;
     if (wall < 1) land(g, e, { x: from.x + (to.x - from.x) * wall, y: from.y + (to.y - from.y) * wall, z: from.z + (to.z - from.z) * wall }, 'wall');
     else if (to.y <= ground) land(g, e, { x: to.x, y: ground, z: to.z }, 'ground');
     else if (--b.life <= 0) land(g, e, { ...from }, 'spent');

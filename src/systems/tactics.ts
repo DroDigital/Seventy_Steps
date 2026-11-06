@@ -12,7 +12,6 @@
 
 import type { Entity } from '../core/ecs';
 import { distXZ, yawOf, type XZ } from '../core/geom';
-import type { Rng } from '../core/rng';
 import type { BrainDef } from '../data/archetypes';
 import { AI, BOSS, RANK, SEA_BOSSES, SIM } from '../data/tuning';
 import { ATTACKS } from '../data/attacks';
@@ -21,19 +20,10 @@ import { moveDef, startMove } from './actions';
 import { evade, holdInside, rimGap } from './bossArena';
 import { isAbsent, type ArenaCircle, type Brain, type Game, type Mover, type Transform } from './components';
 import { seaPartnerBusy } from './seaBosses';
+import { chooseAttack, remember, type Situation } from './attackChoice';
+import { hasLineOfSight } from '../world/colliders';
 
-/**
- * Weighted pick among the attacks whose range bracket contains `d`; null when none fits. One that
- * cannot move (`mobile` false) cannot get to the range of its blows, so what stands nearer than
- * they like is in reach of them as much as what stands at it (round 24: the Whisperer, who sits, had
- * nothing that wounds within three metres of its chair, and could be cut down to half untouched).
- */
-export function chooseAttack(def: BrainDef, d: number, rng: Rng, mobile = true): string | null {
-  const fits = def.attacks.filter((a) => (!mobile || d >= a.range[0]) && d <= a.range[1]);
-  let roll = rng() * fits.reduce((sum, a) => sum + a.weight, 0);
-  for (const a of fits) if ((roll -= a.weight) < 0) return a.move;
-  return null;
-}
+export { chooseAttack } from './attackChoice';
 
 /** Whether a blow of its own would reach were it nearer: one falls short from `d` (a follow-up's none: it is only ever chained). */
 export const reachesNearer = (def: BrainDef, d: number): boolean => def.attacks.some((a) => a.range[1] > 0 && a.range[1] < d);
@@ -139,6 +129,15 @@ const gapFor = (own: readonly [number, number], boss: string | undefined): [numb
   return [Math.max(own[0], gap[0]), Math.max(own[1], gap[1])];
 };
 
+/** What a horror in its fight sees as it chooses its blow (round 105, attackChoice.ts). */
+function situation(g: Game, id: Entity, br: Brain, target: Entity): Situation {
+  const c = g.ecs.c;
+  const [from, to] = [c.transform.get(id)!.pos, c.transform.get(target)!.pos];
+  const eye = (p: { x: number; y: number; z: number }, e: Entity) => ({ x: p.x, y: p.y + Math.min(c.body.get(e)?.aimHeight ?? 1.2, 4), z: p.z });
+  const move = c.actor.get(target)?.move;
+  return { recent: br.recent ?? [], usedAt: br.usedAt ?? {}, now: g.frame, hidden: !hasLineOfSight(g.world, eye(from, id), eye(to, target)), healing: move === 'drink' || move === 'inject', learnt: br.learnt };
+}
+
 export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, arena: ArenaCircle | undefined): void {
   const c = g.ecs.c;
   const p = br.def.params;
@@ -165,11 +164,12 @@ export function fight(g: Game, id: Entity, br: Brain, m: Mover, target: Entity, 
   const ready = (br.cooldown === 0 || into) && !seaWaiting;
   let [dart, held] = [false, false];
   if (ready && !(waiting && d > p.range[1] + 1)) { // one waiting its turn strikes only what comes to it
-    let attack = chooseAttack(br.def, d, g.rng, p.mobile);
+    let attack = chooseAttack(br.def, d, g.rng, p.mobile, arena && situation(g, id, br, target));
     const shooting = attack !== null && isRanged(attack) && !arena && target === g.player.id;
     if (shooting && (br.cooldown > 0 || volleyBusy(g, id))) [attack, held] = [null, true]; // a ranged blow is never struck into an opening, and waits its turn behind another's
     if (attack) {
       startMove(c.actor.get(id)!, attack);
+      if (arena) Object.assign(br, remember(br.recent, br.usedAt, attack, g.frame));
       br.cooldown = lo + Math.floor(g.rng() * (hi - lo + 1));
       if (shooting) {
         br.cooldown = Math.max(br.cooldown, AI.rangedGap);

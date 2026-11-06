@@ -37,6 +37,22 @@ export const BOSS = {
   monolith: [1.8, 7] as const, // ...each this wide and tall: cover from a gaze
 };
 
+/**
+ * How a horror in its fight weighs its next blow (round 105, systems/attackChoice.ts): the roll stays, but leans. One struck from the middle share
+ * `sweet` of its range bracket weighs `sweet[2]` more; behind cover a blow that needs a clear line weighs `hidden.sight` and one that comes round
+ * it `hidden.round`; a dose swallowed draws blows of `quick` frames' wind-up or less, `healing` times. It remembers its last `keep` blows. (No lean
+ * away from its last blows: the balance bot found it took the weight off each horror's heaviest blows and halved the longest fights; the `once`
+ * and `rest` of attacks.ts keep the strong blows from coming back to back.)
+ */
+export const CHOICE = {
+  sweet: [0.2, 0.8, 1.2] as const,
+  hidden: { sight: 0.4, round: 1.5 },
+  quick: 32,
+  healing: 2,
+  keep: 3,
+  learn: { step: 0.25, most: 0.3 }, // in one fight, each blow that lands on the investigator moves its lean `step` toward +1, each dodged, guarded or parried toward -1; at either end it weighs 1 ± `most`
+};
+
 /** Dagon and Hydra share a temple: one attacks while the other yields room, with a counterattack window between turns. */
 export const SEA_BOSSES = {
   rest: 24, // frames after the partner's complete recovery before the next wind-up may begin

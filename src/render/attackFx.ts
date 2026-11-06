@@ -19,12 +19,16 @@ import { creatureOf } from '../systems/creatures';
 import { beamLine } from '../systems/strikes';
 import { attackLook, isQuiet } from './attackLook';
 import { matterLook } from './matterLook';
+
 import { FLASH_LIGHTS } from '../data/fxTuning';
 import { flashLight } from './flashLights';
 import { burst, charge, column, ELEMENTS, flash, glow, impact, trail, whiteOf } from './fxKit';
 import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
 import { GATHER, releaseFrame } from './windup';
+
+const MARKS_WHOLE = 6; // one horror's marks in waiting that each glint and burst whole (round 105)...
+const MARKS_LEAST = 0.3; // ...and the least share of a burst a crowd of them draws
 
 export interface AttackFx {
   update(alpha: number): void;
@@ -85,9 +89,14 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const floor = g.world.ground(to.x, to.z);
     if (to.y - floor < 2) ground.scar({ x: to.x, y: floor, z: to.z }, 1.6, look.line, whoIs(shooter), 6);
   });
+  const crowd = (by: number): number => { // a court's worth of marks bursting one after another is drawn thinner, each (round 105)
+    let n = 1;
+    for (const mk of c.mark.values()) if (mk.owner === by) n++;
+    return Math.max(MARKS_LEAST, Math.min(1, MARKS_WHOLE / n));
+  };
   g.events.on('Erupted', ({ at, radius, by, look: kind }) => { // (round 70: ground with a look is flame, a star, a bolt or a tentacle, whoever strikes it)
     const look = matterLook(attackLook(g, by), kind);
-    burst(fx, ELEMENTS[look.motif], at, radius, look, 1, foe(by));
+    burst(fx, ELEMENTS[look.motif], at, radius, look, crowd(by), foe(by));
     ground.scar(at, radius * 1.1, look.line, whoIs(by), 10);
     ground.shock(at, radius * 0.5, radius * 2.4, look.ring, whoIs(by), 0.5, 0.9 + radius * 0.2);
   });
@@ -205,11 +214,13 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         trail(fx, el, at, b.vel, b.radius, b.conjured ? { ...look, line: look.mind } : look, el.glow || look.motif === 'plain');
         if (el.glow && b.faction === 'enemy') flashLight(at, whiteOf(b.conjured ? look.mind : look.line), Math.min(FLASH_LIGHTS.bolt.most, FLASH_LIGHTS.bolt.strength + b.radius * FLASH_LIGHTS.bolt.per), Math.min(FLASH_LIGHTS.bolt.rangeMost, FLASH_LIGHTS.bolt.range + b.radius * FLASH_LIGHTS.bolt.rangePer), FLASH_LIGHTS.bolt.seconds, e); // a foe's bolt of light or fire lights the ground it crosses (round 83; round 87: not an ally's, which the investigator's own are not either)
       }
+      const marks = new Map<number, number>();
+      for (const mk of c.mark.values()) marks.set(mk.owner, (marks.get(mk.owner) ?? 0) + 1);
       for (const [e, mk] of c.mark) {
         const p = c.transform.get(e)!.pos;
         const k = 1 - mk.delay / mk.total; // 0 just marked ... 1 about to burst
         const { look, el } = style(mk.owner);
-        if (Math.random() > 0.35 + 0.9 * k) continue;
+        if (Math.random() > (0.35 + 0.9 * k) * Math.min(1, MARKS_WHOLE / marks.get(mk.owner)!)) continue; // a court's worth of marks each glints thinner (round 105)
         for (let i = 0; i < 1 + Math.round(k * 2); i++) {
           const a = rand(0, Math.PI * 2);
           const d = Math.sqrt(Math.random()) * mk.radius;

@@ -11,7 +11,7 @@
 import type { Entity } from '../core/ecs';
 import { distXZ, yawOf } from '../core/geom';
 import { emptyInput, type InputFrame } from '../core/input';
-import { attackRange } from '../data/attacks';
+import { ATTACKS, attackRange } from '../data/attacks';
 import type { MoveDef } from '../data/moves';
 import type { RealityHook } from '../data/schema';
 import { BOSS, REALITY } from '../data/tuning';
@@ -20,6 +20,7 @@ import { targetsOf } from './combat';
 import type { Actor, Fight, Game } from './components';
 import { creatureOf, spawnCreature } from './creatures';
 import { groundNear } from './specials';
+import { remember } from './attackChoice';
 
 export type HookStep = (g: Game, fights: readonly [Entity, Fight][]) => void;
 
@@ -74,7 +75,8 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   const c = g.ecs.c;
   const a = c.actor.get(e)!;
   if (costsAnOpening(g, e, a)) return false;
-  const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null);
+  const last = c.brain.get(e)?.recent?.[0];
+  const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null && !(x.id === last && ATTACKS[x.id].once)); // never a `once` blow twice running (round 105)
   let roll = g.rng() * options.reduce((s, x) => s + x.weight, 0);
   const pick = options.find((x) => (roll -= x.weight) < 0);
   if (!pick) return true;
@@ -90,6 +92,7 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   startMove(a, pick.id);
   a.frame = Math.max(0, strikeFrame(a.moves[pick.id])! - REALITY.skipLead);
   const br = c.brain.get(e);
+  if (br) Object.assign(br, remember(br.recent, br.usedAt, pick.id, g.frame));
   if (br) br.cooldown = Math.max(br.cooldown, BOSS.gap[0]); // and the pause after the blow is the ordinary one: a skipped blow was followed at once by the next (round 83)
   g.events.emit('TimeSkipped', { entity: e });
   return true;

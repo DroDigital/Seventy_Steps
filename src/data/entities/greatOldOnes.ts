@@ -37,7 +37,7 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
     sprite: { silhouette: 'spectre', palette: 'sand', scale: 8, eyes: 0, tentacles: 6 },
     ...scripted('boss', { ...phases(
       ph(1, { roar: 2, tentacle_burst: 2, gaze: 1, sweep_beam: 1 }, { hooks: ['camera_warp'] }),
-      ph(0.5, { darkness: 1, tentacle_burst: 2, gaze: 2, dream_cloud: 1, barrage: 1 }, { hooks: ['camera_warp', 'darkness'] }),
+      ph(0.5, { darkness: 1, tentacle_burst: 2, gaze: 2, dream_cloud: 1, closing_walls: 1 }, { hooks: ['camera_warp', 'darkness'] }),
       ph(0.2, { roar: 2, gaze: 2, beam: 1, teleport: 1, dream_cloud: 1, sweep_beam: 1 }, { hooks: ['camera_warp', 'darkness', 'time_skip'] }),
     ), called: true }),
     stats: st(7200, 2000, 78, 3, 8, 16), drops: { echoes: 20000 }, insightOnSight: 4, // (round 60: damage 90, which cost the balance bot 1.19 lives where a person first meets it)
@@ -91,13 +91,13 @@ export const GREAT_OLD_ONES = tier('great_old_one', [
   {
     id: 'yeb', name: 'Yeb', source: 'The Mound', regions: ['kn_yan'], canonLooks: false,
     sprite: { silhouette: 'blob', palette: 'charcoal', scale: 7, eyes: 1, tentacles: 6, body: [0.78, 0.24] }, // drawn again in round 92: a narrow form on long legs, 5.5 m high and 3.4 m across, struck as high as its crest and 1.7 m either side of its middle (a blob's capsule is 4.9 m by 2.5), its blows still scaled by a blob's 4.9 m
-    ...scripted('boss', phases(ph(1, { tentacle_burst: 2, spit: 2, darkness: 1, conflagration: 1 }), ph(0.5, { tentacle_burst: 2, pool: 1, conflagration: 1, spit: 1, barrage: 1 }, { hooks: ['darkness'] }))),
+    ...scripted('boss', phases(ph(1, { tentacle_burst: 2, spit: 2, darkness: 1, conflagration: 1 }), ph(0.5, { tentacle_burst: 2, pool: 1, conflagration: 1, spit: 1, mortar: 1 }, { hooks: ['darkness'] }))),
     stats: st(4200, 1100, 84, 2.4, 5, 12), drops: { echoes: 9000 }, insightOnSight: 3,
   },
   {
     id: 'great_ones', name: 'The Great Ones', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'giant', palette: 'stone', scale: 5, eyes: 2, limbs: 2, body: [0.84375, 0.12] }, // a tall slim figure, 0.6 across, not a giant's 1.0 (round 56), struck no higher than the crown is drawn: 4.2 m (round 57)
-    ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, teleport: 1, barrage: 1 }), ph(0.5, { slam: 2, sweep: 1, teleport: 1, starfall: 1, sweep_beam: 1 }, { hooks: ['hidden_platforms'] }))),
+    ...scripted('boss', phases(ph(1, { slam: 2, sweep: 2, teleport: 1, procession: 1 }), ph(0.5, { slam: 2, sweep: 1, teleport: 1, starfall: 1, sweep_beam: 1 }, { hooks: ['hidden_platforms'] }))),
     stats: st(4650, 1200, 68, 3.4, 4, 10), drops: { echoes: 10000 }, insightOnSight: 3, // (round 60: damage 70, which cost the balance bot 1.00 lives where a person first meets it)
   },
 ]);
