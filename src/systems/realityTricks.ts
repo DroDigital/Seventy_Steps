@@ -76,7 +76,7 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   const a = c.actor.get(e)!;
   if (costsAnOpening(g, e, a)) return false;
   const last = c.brain.get(e)?.recent?.[0];
-  const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null && !(x.id === last && ATTACKS[x.id].once)); // never a `once` blow twice running (round 105)
+  const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null && !(x.id === last && ATTACKS[x.id].once)); // never a `once` blow twice running (round 107)
   let roll = g.rng() * options.reduce((s, x) => s + x.weight, 0);
   const pick = options.find((x) => (roll -= x.weight) < 0);
   if (!pick) return true;

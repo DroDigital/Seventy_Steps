@@ -86,7 +86,7 @@ export function resetFight(g: Game, e: Entity, f: Fight): void {
   const h = g.ecs.c.health.get(e);
   if (h) h.ward = undefined;
   const br = g.ecs.c.brain.get(e);
-  if (br) Object.assign(br, { recent: undefined, usedAt: undefined, learnt: undefined }); // a retry is met fresh (round 105)
+  if (br) Object.assign(br, { recent: undefined, usedAt: undefined, learnt: undefined }); // a retry is met fresh (round 107)
 }
 
 function endFight(g: Game, e: Entity, f: Fight): void {
@@ -144,7 +144,7 @@ export function registerFights(g: Game): void {
       g.events.emit('Died', { entity: e, killer, at: { ...tr.pos } });
     }
   });
-  g.events.on('Hit', ({ attacker, target, outcome, lingering }) => { // it learns, within this fight, which of its blows find the investigator (round 105)
+  g.events.on('Hit', ({ attacker, target, outcome, lingering }) => { // it learns, within this fight, which of its blows find the investigator (round 107)
     const br = g.ecs.c.brain.get(attacker);
     const move = br?.recent?.[0];
     if (!br || !move || lingering || target !== g.player.id || !g.ecs.c.fight.get(attacker)?.engaged) return;

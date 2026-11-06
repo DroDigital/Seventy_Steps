@@ -1,5 +1,5 @@
 /**
- * Marked ground laid by the court itself (round 105; asked: the spinning barrage was on almost every horror, "make it more variable between bosses and
+ * Marked ground laid by the court itself (round 107; asked: the spinning barrage was on almost every horror, "make it more variable between bosses and
  * integrate the full 3D room"). Where strikePlans.ts lays spots about the target or the attacker, these lay them by the court: rows that march out
  * from the attacker across the whole breadth with one gap each (`rows`), the floor split into sectors about the court's middle, half bursting and
  * then the other half (`wedges`), a fuse that runs round the rim by the wall and then round a ring within it (`rim`), and stone falling at the

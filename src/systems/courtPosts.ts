@@ -1,5 +1,5 @@
 /**
- * The pillars standing in a court (round 105: the cave-in falls about their feet): every collider in it that stands up taller than a body and is
+ * The pillars standing in a court (round 107: the cave-in falls about their feet): every collider in it that stands up taller than a body and is
  * no wider than a pillar or a monolith, not a wall or a house; hidden geometry that is not there and a drop are left out. Pure: no Three.js.
  */
 

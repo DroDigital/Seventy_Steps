@@ -1,5 +1,5 @@
 /**
- * Which blow a creature strikes (spec §3E): a weighted roll among the attacks whose range bracket holds the distance. Round 105 (asked: the
+ * Which blow a creature strikes (spec §3E): a weighted roll among the attacks whose range bracket holds the distance. Round 107 (asked: the
  * spinning barrage "should never be 2 times in a row", then "add a rule to all boss attacks that could be too OP with a short cooldown ... make it
  * fair but challenging with selected attacks instead of fully random ones, but still leave a few random ones"): a horror in its fight weighs the
  * roll by what it sees. An attack marked `once` never comes twice running, and one with a `rest` waits that long after it was last struck (unless

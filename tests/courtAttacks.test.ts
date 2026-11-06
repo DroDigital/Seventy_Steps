@@ -1,5 +1,5 @@
 /**
- * Round 105 (asked: the spinning barrage "should never be 2 times in a row", "not almost every boss should have this attack, make it more variable
+ * Round 107 (asked: the spinning barrage "should never be 2 times in a row", "not almost every boss should have this attack, make it more variable
  * between bosses and integrate the full 3D room"; then a cooldown on the strong blows, chosen attacks over random ones, and a horror that learns):
  * the court patterns, the bolts that glance off walls, how a horror in its fight chooses, and that none of it leaves a horror standing idle.
  */

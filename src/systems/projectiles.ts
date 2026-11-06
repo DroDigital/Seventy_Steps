@@ -76,7 +76,7 @@ function land(g: Game, e: Entity, at: V3, on: 'body' | 'ground' | 'wall' | 'spen
 }
 
 /**
- * A bolt that may glance (round 105, the rebound) comes off what it struck: of its course turned back across x, across z or across both, the first
+ * A bolt that may glance (round 107, the rebound) comes off what it struck: of its course turned back across x, across z or across both, the first
  * that leaves the wall clear. A box's face turns it truly; a pillar's round side near enough. The spark and the knock are a landing's, the bolt flies on.
  */
 function glance(g: Game, e: Entity, b: Bolt, from: V3, to: V3, hit: number): boolean {
@@ -91,7 +91,7 @@ function glance(g: Game, e: Entity, b: Bolt, from: V3, to: V3, hit: number): boo
   return false;
 }
 
-/** A bolt that may glance comes back off the rim of its caster's court too, where no wall is built (round 105). */
+/** A bolt that may glance comes back off the rim of its caster's court too, where no wall is built (round 107). */
 function rim(g: Game, e: Entity, b: Bolt, to: V3): boolean {
   const court = g.ecs.c.fight.get(b.owner)?.arena;
   if (!court) return false;

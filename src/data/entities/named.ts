@@ -30,7 +30,7 @@ export const NAMED = tier('named', [
     id: 'keziah_mason', name: 'Keziah Mason', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2, eyes: 2, gear: ['witch'] },
     ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, rebound: 2, wind_push: 2 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, quartering: 1, barrage: 1, eruption: 1, wind_push: 1, sweep: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }), // 2026-11-03: a gust that shoves the investigator off (and, past half, one slash of her knife) at close quarters, where the 360-degree volley was all she had within 4 m
-    stats: st(1600, 120, 28, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700) (round 105: health 1350 to 1600: her first barrage gone, the bot took 0.11 lives of her)
+    stats: st(1600, 120, 28, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700) (round 107: health 1350 to 1600: her first barrage gone, the bot took 0.11 lives of her)
   },
   {
     id: 'brown_jenkin', name: 'Brown Jenkin', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
@@ -42,7 +42,7 @@ export const NAMED = tier('named', [
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
     ...scripted('mind_thief', phases(ph(1, { projectile: 1, rebound: 1, gaze: 1, teleport: 1, sweep_beam: 1, procession: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, procession: 2, quartering: 1, rebound: 2, vortex: 1 }, { hooks: ['decoys'] }))),
-    stats: st(2500, 200, 45, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 105: health 3100 to 2500: with the barrage gone his court patterns are dodged slowly and the bot's fight ran 122 s) (round 97: health 1500 to 2700, a buff: the bot took 0.28 lives of him, under the early horrors' 0.4) (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
+    stats: st(2500, 200, 45, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 107: health 3100 to 2500: with the barrage gone his court patterns are dodged slowly and the bot's fight ran 122 s) (round 97: health 1500 to 2700, a buff: the bot took 0.28 lives of him, under the early horrors' 0.4) (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
   },
   {
     id: 'joseph_curwen', name: 'Joseph Curwen', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,

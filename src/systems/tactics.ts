@@ -129,7 +129,7 @@ const gapFor = (own: readonly [number, number], boss: string | undefined): [numb
   return [Math.max(own[0], gap[0]), Math.max(own[1], gap[1])];
 };
 
-/** What a horror in its fight sees as it chooses its blow (round 105, attackChoice.ts). */
+/** What a horror in its fight sees as it chooses its blow (round 107, attackChoice.ts). */
 function situation(g: Game, id: Entity, br: Brain, target: Entity): Situation {
   const c = g.ecs.c;
   const [from, to] = [c.transform.get(id)!.pos, c.transform.get(target)!.pos];

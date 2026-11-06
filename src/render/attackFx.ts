@@ -27,7 +27,7 @@ import type { GroundFx } from './groundFx';
 import type { Particles } from './particles';
 import { GATHER, releaseFrame } from './windup';
 
-const MARKS_WHOLE = 6; // one horror's marks in waiting that each glint and burst whole (round 105)...
+const MARKS_WHOLE = 6; // one horror's marks in waiting that each glint and burst whole (round 107)...
 const MARKS_LEAST = 0.3; // ...and the least share of a burst a crowd of them draws
 
 export interface AttackFx {
@@ -89,7 +89,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const floor = g.world.ground(to.x, to.z);
     if (to.y - floor < 2) ground.scar({ x: to.x, y: floor, z: to.z }, 1.6, look.line, whoIs(shooter), 6);
   });
-  const crowd = (by: number): number => { // a court's worth of marks bursting one after another is drawn thinner, each (round 105)
+  const crowd = (by: number): number => { // a court's worth of marks bursting one after another is drawn thinner, each (round 107)
     let n = 1;
     for (const mk of c.mark.values()) if (mk.owner === by) n++;
     return Math.max(MARKS_LEAST, Math.min(1, MARKS_WHOLE / n));
@@ -220,7 +220,7 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
         const p = c.transform.get(e)!.pos;
         const k = 1 - mk.delay / mk.total; // 0 just marked ... 1 about to burst
         const { look, el } = style(mk.owner);
-        if (Math.random() > (0.35 + 0.9 * k) * Math.min(1, MARKS_WHOLE / marks.get(mk.owner)!)) continue; // a court's worth of marks each glints thinner (round 105)
+        if (Math.random() > (0.35 + 0.9 * k) * Math.min(1, MARKS_WHOLE / marks.get(mk.owner)!)) continue; // a court's worth of marks each glints thinner (round 107)
         for (let i = 0; i < 1 + Math.round(k * 2); i++) {
           const a = rand(0, Math.PI * 2);
           const d = Math.sqrt(Math.random()) * mk.radius;

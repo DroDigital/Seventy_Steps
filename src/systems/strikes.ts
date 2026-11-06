@@ -71,7 +71,7 @@ function mark(g: Game, id: Entity, m: MarksDef): void {
   const reach = wall ? Math.max(0, wall.radius - Math.hypot(tr.pos.x - wall.x, tr.pos.z - wall.z) - m.radius - 0.5) : undefined;
   let first = true;
   const body = c.body.get(id)?.radius ?? 0.5;
-  const court = arena ?? { x: tr.pos.x, z: tr.pos.z, radius: m.ring[1] + body }; // round 105: the court a court pattern is laid over
+  const court = arena ?? { x: tr.pos.x, z: tr.pos.z, radius: m.ring[1] + body }; // round 107: the court a court pattern is laid over
   const spots = courtSpots(m, centre, tr.pos, body, g.rng, court, m.pattern === 'pillars' ? postsIn(g.world, court) : [])
     ?? planSpots(m.pattern === 'pillars' ? { ...m, pattern: 'rain', count: m.count * 3 } : m, centre, tr.pos, body, g.rng, reach); // no pillar stands: the stone falls about the target
   spots.forEach(({ at, order }) => {

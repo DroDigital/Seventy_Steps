@@ -50,7 +50,7 @@ export interface VolleyDef {
   poise: number;
   lob: boolean; // arcs to land where the target stood (spit)
   pool?: PoolDef; // left where it lands
-  bounces?: number; // round 105: walls and pillars (and the court's rim) it glances off before a wall stops it
+  bounces?: number; // round 107: walls and pillars (and the court's rim) it glances off before a wall stops it
 }
 
 /** What a burst of marked ground is made of (round 70): the picture and the sound of it, and what it leaves. */
@@ -61,7 +61,7 @@ export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt' | 'rift';
  * 2026-10-29, for a horror that is blind and aims at nothing, three laid about the attacker: rings that burst outward a beat at a time (`beats`), a line of spots winding out
  * from its flank (`spiral`), and spots scattered over the whole court (`scatter`).
  */
-export type MarkPattern = 'ring' | 'rain' | 'spokes' | 'seek' | 'beats' | 'spiral' | 'scatter' | 'rows' | 'wedges' | 'rim' | 'pillars'; // round 105: rows marching out with a gap each, the court's floor in quarters, its rim, the feet of its pillars (courtPlans.ts)
+export type MarkPattern = 'ring' | 'rain' | 'spokes' | 'seek' | 'beats' | 'spiral' | 'scatter' | 'rows' | 'wedges' | 'rim' | 'pillars'; // round 107: rows marching out with a gap each, the court's floor in quarters, its rim, the feet of its pillars (courtPlans.ts)
 
 /** Marked ground (the eruption): spots about the target that burst in turn once their delay runs out. */
 export interface MarksDef {

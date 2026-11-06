@@ -38,7 +38,7 @@ export const BOSS = {
 };
 
 /**
- * How a horror in its fight weighs its next blow (round 105, systems/attackChoice.ts): the roll stays, but leans. One struck from the middle share
+ * How a horror in its fight weighs its next blow (round 107, systems/attackChoice.ts): the roll stays, but leans. One struck from the middle share
  * `sweet` of its range bracket weighs `sweet[2]` more; behind cover a blow that needs a clear line weighs `hidden.sight` and one that comes round
  * it `hidden.round`; a dose swallowed draws blows of `quick` frames' wind-up or less, `healing` times. It remembers its last `keep` blows. (No lean
  * away from its last blows: the balance bot found it took the weight off each horror's heaviest blows and halved the longest fights; the `once`

@@ -72,7 +72,7 @@ export interface Bolt {
   conjured: boolean; // loosed by a hallucination or decoy: it touches only the investigator's mind
   passed: Entity[]; // bodies it flew through (a roll's i-frames)
   pool?: PoolDef; // spreads where it lands
-  bounces?: number; // round 105: walls, pillars and its court's rim it may yet glance off
+  bounces?: number; // round 107: walls, pillars and its court's rim it may yet glance off
 }
 
 /** A lingering pool on the ground (spec §3E): it hurts each hostile inside it, one tick at a time. */

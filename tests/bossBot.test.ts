@@ -18,7 +18,7 @@ const ASKS_MORE = ['cthulhu', 'ghatanothoa', 'shub_niggurath'];
 // Give it 780 seconds while still requiring a kill; the separate balance audit measures fight time and survival.
 // The Pipers take this bot about 260 seconds after it stops overwriting queued dodges; allow five minutes and still require a kill.
 // Round 100, the horrors' health up by half: Hastur takes this bot about 242 seconds, the Other Gods 251 and Azathoth 249, a little over the four minutes; five minutes each, a fifth or so over, and still a kill.
-// Round 105: Zkauba's first barrage, through which he stood still for seconds, is now a rebound; this bot, which follows him through his
+// Round 107: Zkauba's first barrage, through which he stood still for seconds, is now a rebound; this bot, which follows him through his
 // teleports, takes about 310 seconds (the balance audit's bot, which dodges and keeps its distance, 91); six minutes, and still a kill.
 const SLOW: Record<string, number> = { haunter_of_the_dark: 60 * 360, yog_sothoth: 60 * 780, daemon_pipers: 60 * 300, hastur: 60 * 300, other_gods: 60 * 300, azathoth: 60 * 300, ancient_ones: 60 * 300, zkauba: 60 * 360 }; // (2026-11-01: the Ancient Ones grow to meet this bot's capped build, overmatchHealth)
 

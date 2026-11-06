@@ -25,7 +25,7 @@ export interface AttackDef {
   arc?: readonly [from: number, to: number];
   lunge?: number; // metres travelled while striking
   shot?: number; // metres: hitscan range (the beam)
-  bolts?: { count: number; spread: number; speed: number; radius: number; lob?: boolean; bounces?: number }; // a volley (spread in degrees, speed m/s); round 105: `bounces`, the walls and pillars it glances off before it is spent
+  bolts?: { count: number; spread: number; speed: number; radius: number; lob?: boolean; bounces?: number }; // a volley (spread in degrees, speed m/s); round 107: `bounces`, the walls and pillars it glances off before it is spent
   pool?: { radius: number; life: number; tick: number; power: number }; // lingering: frames, frames per tick, damage per tick = power × stats.damage
   push?: number; // metres a blow shoves its victim, guarded or not
   unblockable?: boolean;
@@ -38,8 +38,8 @@ export interface AttackDef {
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
   follow?: AttackId; // runs straight on into this attack as it ends (a chain)
-  once?: boolean; // round 105: never chosen twice running (attackChoice.ts); the spinning barrage, the court-wide patterns and the heaviest of the rest, which two in a row made a wall of
-  rest?: number; // round 105: frames after it is struck before a horror strikes it again (unless nothing else would fit)
+  once?: boolean; // round 107: never chosen twice running (attackChoice.ts); the spinning barrage, the court-wide patterns and the heaviest of the rest, which two in a row made a wall of
+  rest?: number; // round 107: frames after it is struck before a horror strikes it again (unless nothing else would fit)
   tight?: boolean; // its hit grows only with the root of the body's size (a burst at a colossus's heart stays dodgeable)
 }
 
@@ -106,7 +106,7 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   maelstrom_burst: { kind: 'area', windup: 10, active: 6, recovery: 50, power: 2, poise: 2.2, range: [0, 0], reach: 0, radius: 6.1, height: 0.3, arc: [180, -180], tight: true }, // ...and breaks about it, out past where the body stands: its heaviest blow, rolled through as it breaks
   miasma: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 30], cloud: { count: 4, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.2, kind: 'dream', blind: true } }, // the nothing the court is full of boils up about the body and spreads outward, after no one, taking the mind, not the body
   crescendo: { kind: 'area', windup: 40, active: 1, recovery: 4, power: 0.7, poise: 1, range: [0, 30], marks: { count: 8, ring: [0.4, 6.8], delay: 56, stagger: 8, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } }, follow: 'dirge' }, // its last phase's own: the whole orchestra at once, boils laid over the court and, before they have all burst, the three rings of the dirge
-  // round 105 (asked: the spinning barrage "should never be 2 times in a row, its too OP" and "not almost every boss should have this attack, make it more variable between bosses and
+  // round 107 (asked: the spinning barrage "should never be 2 times in a row, its too OP" and "not almost every boss should have this attack, make it more variable between bosses and
   // integrate the full 3D room"): patterns that use the court itself, its walls, its pillars, its floor and the air over it. None is chosen twice running, none is heavier than the barrage it
   // replaces on most horrors, and each is read by where it will be and when.
   rebound: { kind: 'ranged', once: true, rest: 360, windup: 42, active: 1, recovery: 46, power: 0.75, poise: 0.5, range: [3, 15], bolts: { count: 3, spread: 38, speed: 9, radius: 0.32, bounces: 2 } }, // three bolts that glance off the court's walls and pillars: the angle they come back at is the one to read

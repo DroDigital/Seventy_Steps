@@ -85,7 +85,7 @@ export const ATTACK_IDS = [
   'maelstrom_burst',
   'crescendo',
   'miasma',
-  // round 105: the court itself: bolts off its walls and pillars, shells over its cover, rows, quarters, its rim, its pillars' feet
+  // round 107: the court itself: bolts off its walls and pillars, shells over its cover, rows, quarters, its rim, its pillars' feet
   'rebound',
   'mortar',
   'procession',
