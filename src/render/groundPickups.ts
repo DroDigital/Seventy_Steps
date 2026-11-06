@@ -1,4 +1,4 @@
-/** Ground pickups: a weathered Echo casket with escaping light, and a box of revolver cartridges. */
+/** Ground pickups: a weathered Echo casket with escaping light, a box of revolver cartridges, and flasks of lamp oil (round 106). */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { part, skeleton, type Figure } from './figures';
@@ -99,6 +99,19 @@ export function ammoFigure(): Figure {
   gleam.position.set(0, 0.23, 0);
   const glints = [color(new THREE.OctahedronGeometry(0.018, 0).scale(0.5, 2.2, 0.5).translate(-0.15, 0.04, -0.065), paper), color(new THREE.OctahedronGeometry(0.012, 0).scale(0.5, 2, 0.5).translate(0.15, 0.08, 0.065), paper)];
   part(f, gleam, mergeGeometries(glints), 'cloth', 0.85);
+  return f;
+}
+
+/** A flask of lamp oil: a medicine bottle stoppered with rag, standing, and another lying by it (round 106). */
+export function oilFigure(): Figure {
+  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
+  const oil: Rgb = [0.62, 0.4, 0.13];
+  const neck: Rgb = [0.42, 0.26, 0.08];
+  const rag: Rgb = [0.72, 0.64, 0.5];
+  const cyl = (r: number, h: number, y: number, c: Rgb, x: number, z: number): THREE.BufferGeometry => color(new THREE.CylinderGeometry(r, r, h, 9).translate(x, y, z), c);
+  const bottle = (x: number, z: number): THREE.BufferGeometry[] => [cyl(0.045, 0.12, 0.06, oil, x, z), cyl(0.016, 0.05, 0.145, neck, x, z), cyl(0.021, 0.035, 0.185, rag, x, z)];
+  const lying = bottle(0, 0).map((geo) => geo.rotateZ(Math.PI / 2).translate(0.11, 0.045, 0)); // on its side, its neck toward the other
+  part(f, f.body, mergeGeometries([...bottle(-0.1, -0.02), ...lying.map((geo) => geo.translate(0.02, 0, 0.13))]), 'cloth');
   return f;
 }
 

@@ -6,6 +6,15 @@
  */
 
 import type { Collider } from './colliders';
+import type { Dir } from '../data/dungeons';
+import { DIRS } from './worldMap';
+
+/** Where the investigator rises before a sign at (x, z) facing `face`: this far in front of it and this far to one side (the side vector is (face.z, -face.x)). */
+export const REST = { ahead: 4.6, abreast: 1.2 } as const;
+export const restPoint = (x: number, z: number, face: Dir): { x: number; z: number } => {
+  const f = DIRS[face];
+  return { x: x + f.x * REST.ahead + f.z * REST.abreast, z: z + f.z * REST.ahead - f.x * REST.abreast };
+};
 
 export const SHRINE = {
   steps: [[2.4, 0.18, 1.7], [1.8, 0.18, 1.2]] as const, // the plinth's steps, bottom first: width, height, depth

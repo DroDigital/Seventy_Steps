@@ -9,7 +9,7 @@ import type { PoiDef } from './pois';
 export const POIS_BEYOND: readonly PoiDef[] = [
   // The Mountains of Madness.
   { id: 'mountains_wrecked_camp', region: 'mountains', at: { feature: 'ruin', nth: 2 }, name: "The Wrecked Camp", kind: 'den', story: 'At the Mountains of Madness',
-    line: 'Tents flattened from within. Dogs opened with surgical care, and five stars of snow set in a neat row.', foes: { ids: ['gnoph_keh', 'elder_thing'], n: 5 }, hoard: 4400 },
+    line: 'Tents flattened from within. Dogs opened with surgical care, and five stars of snow set in a neat row.', foes: { ids: ['gnoph_keh', 'elder_thing'], n: 5 }, hoard: 4400, flasks: 2 },
   { id: 'mountains_piping_peaks', region: 'mountains', at: { feature: 'landmark', nth: 1 }, name: 'The Piping Peaks', kind: 'anomaly', story: 'At the Mountains of Madness',
     line: 'The peaks rise sheer, and across them runs a regularity no frost ever drew.', again: 'A piping, high above: musical, wide-ranged, and furious.', fx: { form: 'sheet', hue: 'green' }, aura: -0.4, insight: 1, hoard: 1200 },
   { id: 'mountains_sculptured_hall', region: 'mountains', at: { feature: 'ruin', nth: 0 }, name: 'The Sculptured Hall', kind: 'tale', story: 'At the Mountains of Madness',

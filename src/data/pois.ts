@@ -39,6 +39,7 @@ export interface PoiDef {
   again?: string; // said when one comes back into it (the places that speak twice)
   foes?: { ids: readonly string[]; n: number }; // the guard that stands about it, drawn from these
   hoard?: number; // Echoes in the chest set down near its heart
+  flasks?: number; // flasks of lamp oil lying about its heart, for whoever does not buy them (round 106: data/wares.ts; taken whole, or left where they lie)
   fx?: PoiFx;
   aura?: number; // sanity a second while within it: below nothing drains, above mends
   insight?: number; // insight for finding it (default POI.insight for an anomaly or a tale, none for the rest)
@@ -54,3 +55,5 @@ export const poiDef = (id: string): PoiDef | undefined => POIS.find((p) => p.id 
 export const poiKey = (id: string): string => `poi:${id}`;
 /** A chest's name among the things taken: `Hoard: <id>`. */
 export const hoardName = (id: string): string => `Hoard: ${id}`;
+/** The pickup of a place's flasks of lamp oil, among the things taken (round 106). */
+export const flaskName = (id: string): string => `Flask: ${id}`;

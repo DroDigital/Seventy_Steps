@@ -26,4 +26,5 @@ export const SHOPS: Readonly<Record<string, readonly WareId[]>> = {
   morgan: ['oil', 'rounds', 'star_stone', 'vial'],
   curtis: ['rounds'],
   dyer: ['rounds', 'oil'],
+  wayside: ['oil', 'rounds'], // the trader at the lamps (data/traders.ts): what is sold without limit, none of the rare things Morgan keeps
 };

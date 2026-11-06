@@ -289,6 +289,8 @@ export const EN = {
   'n.vial': 'SILVER VIAL · REAGENT DOSES {n}',
   'n.vialSold': 'SILVER VIAL · YOUR KIT HOLDS NO MORE · +{n} ECHOES',
   'n.rounds': 'YOU CARRY ALL THE ROUNDS YOU CAN',
+  'n.oil': 'A FLASK OF LAMP OIL · {n} OF {most}',
+  'n.oilFull': 'YOU CARRY ALL THE FLASKS YOU CAN',
   // the buttons' names for a device
   'pad.moveStick': 'the left stick',
   'pad.lookStick': 'the right stick',

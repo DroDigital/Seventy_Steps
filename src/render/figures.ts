@@ -20,7 +20,7 @@ import { isGateFrame } from '../data/gateFrames';
 import { gateFrame } from './gateFrames';
 import { createWorldMaterial } from './worldMaterial';
 import { echoFigure } from './echoFigure';
-import { ammoFigure, cacheFigure } from './groundPickups';
+import { ammoFigure, cacheFigure, oilFigure } from './groundPickups';
 
 export type Rig = 'humanoid' | 'dummy' | 'echo' | 'prop';
 
@@ -218,7 +218,7 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate: () => gate('miskatonic'), cache: cacheFigure, ammo: ammoFigure,
+  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate: () => gate('miskatonic'), cache: cacheFigure, ammo: ammoFigure, flask: oilFigure,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 
