@@ -112,9 +112,11 @@ because a Steam build started outside Steam would relaunch itself through it.
   its price (the in-game words name none), visibility Public with *Unlisted in search & browse* (or Draft until ready); (2) upload `UNLOCK.txt`
   (the code from `tools/mount_unlock.mjs sign`, with a line of how to use it) and tick no platform; (3) say on the page that the mounts are
   cosmetic, ride exactly like the plain chariot, are unlocked by pasting a code in the Mounts tab of the desktop game, and need the full game;
-  (4) Dashboard › Sales & bundles: a sale with both projects, an optional buy-all price, and its dates. Buy it once yourself (a 100% sale makes
-  a free test purchase) and paste the code into a packed itch build before announcing. Not verified on itch's side: the price floor for a $0.99
-  list price, whether an unlisted project can join a sale, and what a bundle buyer who already owns the game pays.
+  (4) Dashboard › Sales & bundles: a sale with both projects, an optional buy-all price, and its dates. itch's sales page
+  (itch.io/docs/creators/sales) lets a sale require ownership of one of your items (Add condition), so base-game owners can get the mounts at a
+  discount; such a sale is not listed on the public Sales pages. Buy it once yourself (a 100% sale is "temporarily free") and paste the code into
+  a packed itch build before announcing. Not stated in itch's docs, so check on the dashboard: the price floor for a $0.99 list price, and whether
+  an unlisted project can join a sale (the docs say only that a sale is made of projects from one account).
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
 
