@@ -20,6 +20,7 @@ import { targetsOf } from './combat';
 import type { Actor, Fight, Game } from './components';
 import { creatureOf, spawnCreature } from './creatures';
 import { groundNear } from './specials';
+import { allowed, remember } from './attackChoice';
 
 export type HookStep = (g: Game, fights: readonly [Entity, Fight][]) => void;
 
@@ -74,7 +75,11 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   const c = g.ecs.c;
   const a = c.actor.get(e)!;
   if (costsAnOpening(g, e, a)) return false;
-  const options = f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null);
+  const br = c.brain.get(e);
+  const s = { recent: br?.recent ?? [], usedAt: br?.usedAt ?? {}, now: g.frame, hidden: false, healing: false };
+  const fit = (rested: boolean) => f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null && allowed(x.id, s, rested)); // the same `once` and rest rules as a chosen blow (round 107)
+  let options = fit(true);
+  if (!options.length) options = fit(false); // every one resting: the rest gives way, never the `once`
   let roll = g.rng() * options.reduce((s, x) => s + x.weight, 0);
   const pick = options.find((x) => (roll -= x.weight) < 0);
   if (!pick) return true;
@@ -89,7 +94,7 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   tr.yaw = tr.prevYaw = yawOf(pp.x - p.x, pp.z - p.z);
   startMove(a, pick.id);
   a.frame = Math.max(0, strikeFrame(a.moves[pick.id])! - REALITY.skipLead);
-  const br = c.brain.get(e);
+  if (br) Object.assign(br, remember(br.recent, br.usedAt, pick.id, g.frame));
   if (br) br.cooldown = Math.max(br.cooldown, BOSS.gap[0]); // and the pause after the blow is the ordinary one: a skipped blow was followed at once by the next (round 83)
   g.events.emit('TimeSkipped', { entity: e });
   return true;

@@ -25,7 +25,7 @@ export interface AttackDef {
   arc?: readonly [from: number, to: number];
   lunge?: number; // metres travelled while striking
   shot?: number; // metres: hitscan range (the beam)
-  bolts?: { count: number; spread: number; speed: number; radius: number; lob?: boolean }; // a volley (spread in degrees, speed m/s)
+  bolts?: { count: number; spread: number; speed: number; radius: number; lob?: boolean; bounces?: number }; // a volley (spread in degrees, speed m/s); round 107: `bounces`, the walls and pillars it glances off before it is spent
   pool?: { radius: number; life: number; tick: number; power: number }; // lingering: frames, frames per tick, damage per tick = power × stats.damage
   push?: number; // metres a blow shoves its victim, guarded or not
   unblockable?: boolean;
@@ -38,6 +38,8 @@ export interface AttackDef {
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
   follow?: AttackId; // runs straight on into this attack as it ends (a chain)
+  once?: boolean; // round 107: never chosen twice running (attackChoice.ts); the spinning barrage, the court-wide patterns and the heaviest of the rest, which two in a row made a wall of
+  rest?: number; // round 107: frames after it is struck before a horror strikes it again (unless nothing else would fit)
   tight?: boolean; // its hit grows only with the root of the body's size (a burst at a colossus's heart stays dodgeable)
 }
 
@@ -68,9 +70,9 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   // The dodging game: marked ground, rings and beams to roll through, patterns to weave between, chains to read.
   eruption: { kind: 'area', windup: 28, active: 1, recovery: 44, power: 1.3, poise: 1.6, range: [0, 16], marks: { count: 5, ring: [2.5, 5.5], delay: 42, stagger: 7, radius: 1.7 } },
   quake: { kind: 'area', windup: 32, active: 1, recovery: 42, power: 1.1, poise: 1.4, range: [0, 11], wave: { speed: 8, width: 1.1, reach: 15 } },
-  sweep_beam: { kind: 'ranged', windup: 46, active: 44, recovery: 34, power: 1.2, poise: 1.2, range: [3, 15], sweep: { arc: [75, -75], length: 17, width: 0.7 } },
-  barrage: { kind: 'ranged', windup: 38, active: 70, recovery: 48, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17; 2026-11-01: recovery 30 to 48, since its 108 frames of windup and firing used up the whole pause, leaving a first-band horror open for 44 frames after its 360-degree volley)
-  vortex: { kind: 'special', windup: 24, active: 54, recovery: 1, power: 0, poise: 0, range: [3, 11], pull: { speed: 3, range: 12 }, follow: 'vortex_burst' },
+  sweep_beam: { kind: 'ranged', once: true, rest: 300, windup: 46, active: 44, recovery: 34, power: 1.2, poise: 1.2, range: [3, 15], sweep: { arc: [75, -75], length: 17, width: 0.7 } },
+  barrage: { kind: 'ranged', once: true, rest: 480, windup: 38, active: 70, recovery: 48, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17; 2026-11-01: recovery 30 to 48, since its 108 frames of windup and firing used up the whole pause, leaving a first-band horror open for 44 frames after its 360-degree volley)
+  vortex: { kind: 'special', once: true, rest: 420, windup: 24, active: 54, recovery: 1, power: 0, poise: 0, range: [3, 11], pull: { speed: 3, range: 12 }, follow: 'vortex_burst' },
   vortex_burst: { kind: 'area', windup: 8, active: 6, recovery: 44, power: 1.5, poise: 2, range: [0, 0], reach: 0, radius: 4.2, height: 0.3, arc: [180, -180], tight: true },
   combo: melee({ windup: 20, active: 6, recovery: 6, power: 0.8, poise: 0.7, range: [0, 2.4], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60], lunge: 0.8, follow: 'combo_2' }),
   combo_2: melee({ windup: 14, active: 6, recovery: 8, power: 0.8, poise: 0.7, range: [0, 0], reach: 1.3, radius: 0.5, height: 0.55, arc: [-70, 80], lunge: 0.6, follow: 'combo_3' }),
@@ -80,13 +82,13 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   crushing_blow: melee({ windup: 60, active: 6, recovery: 30, power: 2.4, poise: 2.6, range: [0, 2.8], reach: 1.6, radius: 1, height: 0.4, arc: [0, 0] }),
   great_mark: { kind: 'area', windup: 30, active: 1, recovery: 40, power: 2.4, poise: 2.4, range: [0, 22], marks: { count: 1, ring: [0, 0], delay: 48, stagger: 0, radius: 1.5 } }, // the same from afar: one mark under them, falling 1.3 s after the cast begins
   // round 70 (asked: "numerous boss encounters exhibit repetitive and nearly identical mechanics... tidal surges, tentacular strikes, falling stars, conflagrations, toxic or hallucinogenic clouds"): the matter of the tales, each read by where it will be and by when
-  tidal_surge: { kind: 'area', windup: 52, active: 1, recovery: 46, power: 1.15, poise: 1.4, range: [0, 16], wave: { speed: 7, width: 2.2, reach: 30, lane: { half: 6.5, push: 3.5 } } }, // a wall of water, lane drawn on the ground before it comes
+  tidal_surge: { kind: 'area', once: true, rest: 360, windup: 52, active: 1, recovery: 46, power: 1.15, poise: 1.4, range: [0, 16], wave: { speed: 7, width: 2.2, reach: 30, lane: { half: 6.5, push: 3.5 } } }, // a wall of water, lane drawn on the ground before it comes
   tentacle_rise: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.7, poise: 1, range: [0, 14], marks: { count: 3, ring: [2.4, 4.2], delay: 68, stagger: 26, radius: 1.45, pattern: 'seek', look: 'tentacle', seek: { speed: 4.6, lock: 24 } } }, // three tentacles creep after the feet and lock a breath before they rise
-  starfall: { kind: 'area', windup: 44, active: 1, recovery: 50, power: 0.95, poise: 1, range: [0, 18], marks: { count: 9, ring: [0, 9.5], delay: 46, stagger: 8, radius: 1.5, pattern: 'rain', look: 'star' } }, // nine stars, one after another, over the ground about the target
-  conflagration: { kind: 'area', windup: 44, active: 1, recovery: 50, power: 0.9, poise: 1, range: [0, 14], marks: { count: 12, ring: [2.2, 11], delay: 36, stagger: 7, radius: 1.35, pattern: 'spokes', spokes: 3, look: 'flame', leaves: { radius: 1.35, life: 210, tick: 24, power: 0.16 } } }, // three lines of flame run out from the horror and burn on; the gaps between are safe
-  toxic_cloud: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 2.9, life: 270, tick: 30, power: 0.14, mind: 0, drift: 1.1, kind: 'toxic' } }, // two banks of poisonous air drift after the target
-  dream_cloud: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.1, kind: 'dream' } }, // two banks of sleep take the mind, not the body
-  thunderfall: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.9, poise: 1, range: [0, 16], marks: { count: 6, ring: [0, 8.5], delay: 34, stagger: 7, radius: 1.25, pattern: 'rain', look: 'bolt' } }, // lightning calls down on the ground about the target, quick and bright
+  starfall: { kind: 'area', once: true, rest: 360, windup: 44, active: 1, recovery: 50, power: 0.95, poise: 1, range: [0, 18], marks: { count: 9, ring: [0, 9.5], delay: 46, stagger: 8, radius: 1.5, pattern: 'rain', look: 'star' } }, // nine stars, one after another, over the ground about the target
+  conflagration: { kind: 'area', once: true, rest: 420, windup: 44, active: 1, recovery: 50, power: 0.9, poise: 1, range: [0, 14], marks: { count: 12, ring: [2.2, 11], delay: 36, stagger: 7, radius: 1.35, pattern: 'spokes', spokes: 3, look: 'flame', leaves: { radius: 1.35, life: 210, tick: 24, power: 0.16 } } }, // three lines of flame run out from the horror and burn on; the gaps between are safe
+  toxic_cloud: { kind: 'area', rest: 480, windup: 44, active: 1, recovery: 46, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 2.9, life: 270, tick: 30, power: 0.14, mind: 0, drift: 1.1, kind: 'toxic' } }, // two banks of poisonous air drift after the target
+  dream_cloud: { kind: 'area', rest: 480, windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.1, kind: 'dream' } }, // two banks of sleep take the mind, not the body
+  thunderfall: { kind: 'area', once: true, rest: 300, windup: 40, active: 1, recovery: 46, power: 0.9, poise: 1, range: [0, 16], marks: { count: 6, ring: [0, 8.5], delay: 34, stagger: 7, radius: 1.25, pattern: 'rain', look: 'bolt' } }, // lightning calls down on the ground about the target, quick and bright
   // 2026-10-29, Azathoth (asked: "implement different and unique boss attacks to make this the most challenging boss fight of all"). It is blind and aims at nothing, so none of these
   // is laid on the investigator: each is a rhythm over the whole court (the piping, the drumming, the dance of the thirteen, the seething of the chaos, the centre drawing all in),
   // read by where it will fall and when. Their numbers are for a body thirty metres tall (a root of 15.8 scales them: its court is 44 m across its heart).
@@ -104,6 +106,15 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   maelstrom_burst: { kind: 'area', windup: 10, active: 6, recovery: 50, power: 2, poise: 2.2, range: [0, 0], reach: 0, radius: 6.1, height: 0.3, arc: [180, -180], tight: true }, // ...and breaks about it, out past where the body stands: its heaviest blow, rolled through as it breaks
   miasma: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 30], cloud: { count: 4, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.2, kind: 'dream', blind: true } }, // the nothing the court is full of boils up about the body and spreads outward, after no one, taking the mind, not the body
   crescendo: { kind: 'area', windup: 40, active: 1, recovery: 4, power: 0.7, poise: 1, range: [0, 30], marks: { count: 8, ring: [0.4, 6.8], delay: 56, stagger: 8, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } }, follow: 'dirge' }, // its last phase's own: the whole orchestra at once, boils laid over the court and, before they have all burst, the three rings of the dirge
+  // round 107 (asked: the spinning barrage "should never be 2 times in a row, its too OP" and "not almost every boss should have this attack, make it more variable between bosses and
+  // integrate the full 3D room"): patterns that use the court itself, its walls, its pillars, its floor and the air over it. None is chosen twice running, none is heavier than the barrage it
+  // replaces on most horrors, and each is read by where it will be and when.
+  rebound: { kind: 'ranged', once: true, rest: 360, windup: 42, active: 1, recovery: 46, power: 0.75, poise: 0.5, range: [3, 15], bolts: { count: 3, spread: 38, speed: 9, radius: 0.32, bounces: 2 } }, // three bolts that glance off the court's walls and pillars: the angle they come back at is the one to read
+  mortar: { kind: 'ranged', once: true, rest: 360, windup: 46, active: 1, recovery: 48, power: 0.8, poise: 0.6, range: [4, 16], bolts: { count: 4, spread: 64, speed: 8, radius: 0.4, lob: true }, pool: { radius: 1.1, life: 150, tick: 30, power: 0.12 } }, // shells thrown high over any cover, landing in a fan at the target's distance and burning a moment where they fall
+  procession: { kind: 'area', once: true, rest: 360, windup: 44, active: 1, recovery: 50, power: 0.85, poise: 1, range: [0, 14], marks: { count: 7, rings: 4, ring: [1.5, 9.5], delay: 40, stagger: 16, radius: 1.25, pattern: 'rows' } }, // rows of marks march out from the horror one after another, each with one gap, never where the last row's was
+  quartering: { kind: 'area', once: true, rest: 420, windup: 46, active: 1, recovery: 50, power: 0.9, poise: 1.1, range: [0, 18], marks: { count: 4, ring: [2.4, 14], delay: 46, stagger: 50, radius: 1.35, pattern: 'wedges', spokes: 4, look: 'rift' } }, // the court's floor splits in quarters: two opposite burst, then the other two; cross into the burnt ones between
+  closing_walls: { kind: 'area', once: true, rest: 420, windup: 44, active: 1, recovery: 48, power: 0.85, poise: 1, range: [0, 20], marks: { count: 1, rings: 1, ring: [0, 22], delay: 44, stagger: 3, radius: 1.3, pattern: 'rim' } }, // the wall comes alive: a fuse runs round the rim of the court; come in toward the horror
+  cave_in: { kind: 'area', once: true, rest: 360, windup: 46, active: 1, recovery: 50, power: 0.95, poise: 1.1, range: [0, 20], marks: { count: 3, ring: [0, 8], delay: 50, stagger: 14, radius: 1.3, pattern: 'pillars' } }, // stone falls from the pillars nearest the target, about their feet: cover is no place to stand (a shower about the target where none stands)
 };
 
 /** Body size relative to a human (1.9 m); big bodies reach further. */
@@ -169,8 +180,8 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise, ...(a.sweep.arms && { arms: a.sweep.arms }) };
   else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
   else if (b) {
-    const range = a.range[1] * k * 1.5;
-    move.volley = { frame: a.windup, count: b.count, spread: b.spread, speed: b.speed, radius: b.radius * Math.sqrt(k), range, damage, poise, lob: !!b.lob, pool };
+    const range = a.range[1] * k * 1.5 * (1 + (b.bounces ?? 0)); // a bolt that glances off walls flies the farther for each
+    move.volley = { frame: a.windup, count: b.count, spread: b.spread, speed: b.speed, radius: b.radius * Math.sqrt(k), range, damage, poise, lob: !!b.lob, pool, ...(b.bounces && { bounces: b.bounces }) };
   } else if (pool) move.pool = { frame: a.windup, ...pool };
   else if (a.shot) move.shot = { frame: a.windup, damage, poise, range: a.shot * Math.sqrt(k), hitstop };
   else {

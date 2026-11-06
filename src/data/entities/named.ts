@@ -29,8 +29,8 @@ export const NAMED = tier('named', [
   {
     id: 'keziah_mason', name: 'Keziah Mason', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2, eyes: 2, gear: ['witch'] },
-    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, barrage: 1, wind_push: 2 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, barrage: 1, eruption: 1, wind_push: 1, sweep: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }), // 2026-11-03: a gust that shoves the investigator off (and, past half, one slash of her knife) at close quarters, where the 360-degree volley was all she had within 4 m
-    stats: st(1350, 120, 28, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700)
+    ...scripted('boss', phases(ph(1, { projectile: 2, teleport: 1, summon: 1, rebound: 2, wind_push: 2 }, { summons: ['rat_swarm'] }), ph(0.5, { projectile_fan: 2, teleport: 2, gaze: 1, summon: 1, quartering: 1, barrage: 1, eruption: 1, wind_push: 1, sweep: 1 }, { summons: ['rat_swarm'], hooks: ['arena_reconnect', 'camera_warp'] })), { range: [6, 12], strafe: 0.5 }), // 2026-11-03: a gust that shoves the investigator off (and, past half, one slash of her knife) at close quarters, where the 360-degree volley was all she had within 4 m
+    stats: st(1600, 120, 28, 3.4, 2, 8), drops: { echoes: 2500 }, insightOnSight: 1, // (round 97, asked back: health 1100 to 1600, its pre-history value; round 12 had it at 1600 before the compression to 700) (round 107: health 1350 to 1600: her first barrage gone, the bot took 0.11 lives of her)
   },
   {
     id: 'brown_jenkin', name: 'Brown Jenkin', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
@@ -41,23 +41,23 @@ export const NAMED = tier('named', [
   {
     id: 'black_man', name: 'The Black Man', source: 'The Dreams in the Witch House', regions: ['arkham'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.6, eyes: 2, glow: 'purple', gear: ['tall', 'coat'] },
-    ...scripted('mind_thief', phases(ph(1, { projectile: 2, gaze: 1, teleport: 1, sweep_beam: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, barrage: 2, vortex: 1 }, { hooks: ['decoys'] }))),
-    stats: st(3100, 200, 45, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 97: health 1500 to 2700, a buff: the bot took 0.28 lives of him, under the early horrors' 0.4) (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
+    ...scripted('mind_thief', phases(ph(1, { projectile: 1, rebound: 1, gaze: 1, teleport: 1, sweep_beam: 1, procession: 1 }), ph(0.5, { gaze: 1, projectile_fan: 1, dream_cloud: 1, procession: 2, quartering: 1, rebound: 2, vortex: 1 }, { hooks: ['decoys'] }))),
+    stats: st(2500, 200, 45, 3.8, 3, 10), drops: { echoes: 2500 }, insightOnSight: 2, // (round 107: health 3100 to 2500: with the barrage gone his court patterns are dodged slowly and the bot's fight ran 122 s) (round 97: health 1500 to 2700, a buff: the bot took 0.28 lives of him, under the early horrors' 0.4) (round 83: health 1150 to 1500: the longer pauses after his blows left the bot 0.12 lives of him, under the 0.2 floor, and his vortex is already the 30% a heaviest blow may take)
   },
   {
     id: 'joseph_curwen', name: 'Joseph Curwen', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'sand', scale: 2.1, eyes: 2, gear: ['tricorn', 'coat'] },
     ...scripted('boss', phases(
-      ph(1, { projectile: 2, summon: 1, teleport: 1, conflagration: 1 }, { summons: ['reanimated_corpse'] }),
-      ph(0.5, { projectile_fan: 2, beam: 1, summon: 1, teleport: 1, barrage: 1 }, { summons: ['reanimated_corpse'] }),
-      ph(0.2, { beam: 2, projectile_fan: 1, roar: 1, sweep_beam: 2, conflagration: 1 }, { hooks: ['camera_warp'] }),
+      ph(1, { projectile: 1, mortar: 1, summon: 1, teleport: 1, conflagration: 3 }, { summons: ['reanimated_corpse'] }),
+      ph(0.5, { projectile_fan: 2, beam: 1, summon: 1, teleport: 1, cave_in: 2, mortar: 1, rebound: 2 }, { summons: ['reanimated_corpse'] }),
+      ph(0.2, { beam: 2, projectile_fan: 1, roar: 1, sweep_beam: 2, conflagration: 2 }, { hooks: ['camera_warp'] }),
     ), { range: [5, 11], strafe: 0.4 }),
     stats: st(2200, 180, 68, 3.4, 2, 8), drops: { echoes: 4000 }, insightOnSight: 2,
   },
   {
     id: 'simon_orne', name: 'Simon Orne', source: 'The Case of Charles Dexter Ward', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'charcoal', scale: 2.1, eyes: 2, gear: ['brim', 'coat'] },
-    ...scripted('caster', phases(ph(1, { projectile: 2, sweep: 1, summon: 1, combo: 1 }, { summons: ['reanimated_corpse'] }), ph(0.4, { projectile_fan: 2, sweep: 1, teleport: 1, eruption: 1, barrage: 1 }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, sweep: 1, summon: 1, combo: 1 }, { summons: ['reanimated_corpse'] }), ph(0.4, { projectile_fan: 2, sweep: 1, teleport: 1, eruption: 1, mortar: 1 }))),
     stats: st(1700, 140, 33, 3.4, 1.5, 6), drops: { echoes: 1600 }, insightOnSight: 1,
   },
   {
@@ -82,13 +82,13 @@ export const NAMED = tier('named', [
   {
     id: 'haunter_of_the_dark', name: 'The Haunter of the Dark', source: 'The Haunter of the Dark', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'winged', palette: 'rubber', scale: 4, eyes: 3, wings: 2, glow: 'magenta' },
-    ...scripted('boss', phases(ph(1, { dive: 2, grab: 1, darkness: 1, thunderfall: 1 }, { hooks: ['light_dependency'], arena: 'lamps' }), ph(0.5, { dive: 2, grab: 1, darkness: 2, wind_push: 1, barrage: 1 }, { hooks: ['light_dependency'] })), { hover: 2 }),
+    ...scripted('boss', phases(ph(1, { dive: 2, grab: 1, darkness: 1, thunderfall: 1 }, { hooks: ['light_dependency'], arena: 'lamps' }), ph(0.5, { dive: 2, grab: 1, darkness: 2, wind_push: 1, closing_walls: 1 }, { hooks: ['light_dependency'] })), { hover: 2 }),
     stats: st(1050, 260, 40, 4.6, 4, 10), weak: ['light'], drops: { echoes: 4000 }, insightOnSight: 2,
   },
   {
     id: 'whisperer', name: "The Whisperer in Akeley's Chair", source: 'The Whisperer in Darkness', regions: ['vermont'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'pallid', scale: 2, eyes: 2 },
-    ...scripted('boss', phases(ph(1, { gaze: 2, projectile: 1, summon: 1, sweep_beam: 1 }, { summons: ['mi_go'] }), ph(0.5, { gaze: 2, projectile_fan: 1, summon: 1, barrage: 1 }, { summons: ['mi_go'], hooks: ['darkness'] })), { mobile: false, range: [0, 30] }),
+    ...scripted('boss', phases(ph(1, { gaze: 2, projectile: 1, summon: 1, sweep_beam: 1 }, { summons: ['mi_go'] }), ph(0.5, { gaze: 2, projectile_fan: 1, summon: 1, rebound: 1 }, { summons: ['mi_go'], hooks: ['darkness'] })), { mobile: false, range: [0, 30] }),
     stats: st(2950, 200, 79, 1.5, 3, 10), drops: { echoes: 3500 }, insightOnSight: 2,
     eldritchVariant: { sprite: { silhouette: 'crustacean', palette: 'fungus', wings: 2 } },
   },
@@ -113,13 +113,13 @@ export const NAMED = tier('named', [
   {
     id: 'lilith', name: 'Lilith', source: 'The Horror at Red Hook', regions: ['providence'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.1, eyes: 2, glow: 'magenta', gear: ['horns'], body: [0.9, 0.14] }, // 0.29, a slender woman (round 56)
-    ...scripted('caster', phases(ph(1, { grab: 1, projectile: 2, summon: 1, combo: 1 }, { summons: ['cthulhu_cultist'] }), ph(0.5, { projectile_fan: 2, grab: 1, summon: 1, teleport: 1, barrage: 1, vortex: 1 }, { summons: ['cthulhu_cultist'] }))),
+    ...scripted('caster', phases(ph(1, { grab: 1, projectile: 2, summon: 1, combo: 1 }, { summons: ['cthulhu_cultist'] }), ph(0.5, { projectile_fan: 2, grab: 1, summon: 1, teleport: 1, procession: 1, vortex: 1 }, { summons: ['cthulhu_cultist'] }))),
     stats: st(1900, 160, 42, 3.8, 3, 9), drops: { echoes: 2200 }, insightOnSight: 2,
   },
   {
     id: 'zann_window_thing', name: "The Thing Beyond Erich Zann's Window", source: 'The Music of Erich Zann', regions: ['beyond'], canonLooks: false, voice: 'viol',
     sprite: { silhouette: 'orb', palette: 'charcoal', scale: 4, eyes: 0, tentacles: 4, glow: 'purple' },
-    ...scripted('stationary_horror', phases(ph(1, { wind_push: 2, darkness: 1, roar: 1, barrage: 2 }, { hooks: ['darkness'] }), ph(0.5, { wind_push: 2, roar: 2, projectile_fan: 1, barrage: 2, sweep_beam: 1 }, { hooks: ['darkness', 'camera_warp'] }))),
+    ...scripted('stationary_horror', phases(ph(1, { wind_push: 2, darkness: 1, roar: 1, rebound: 2 }, { hooks: ['darkness'] }), ph(0.5, { wind_push: 2, roar: 2, projectile_fan: 1, barrage: 1, rebound: 1, sweep_beam: 1 }, { hooks: ['darkness', 'camera_warp'] }))),
     stats: st(4750, 1000, 97, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2, // (round 83: damage 64 to 69: the last band's blows are as they were, and its pauses cost him 0.02 lives under the 0.2 floor)
   },
   {
@@ -132,7 +132,7 @@ export const NAMED = tier('named', [
     id: 'high_priest', name: 'High Priest Not to Be Described', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'sand', scale: 2.4, eyes: 0, gear: ['mask'] },
     ...scripted('boss', phases(
-      ph(1, { projectile: 2, teleport: 1, summon: 1, gaze: 1, barrage: 1 }, { summons: ['man_of_leng'] }),
+      ph(1, { projectile: 2, teleport: 1, summon: 1, gaze: 1, cave_in: 1 }, { summons: ['man_of_leng'] }),
       ph(0.5, { gaze: 2, projectile_fan: 1, teleport: 1, summon: 1, dream_cloud: 1 }, { summons: ['man_of_leng'], hooks: ['camera_warp'], eldritch: true }),
       ph(0.2, { beam: 2, gaze: 2, teleport: 1, sweep_beam: 2, vortex: 1 }, { hooks: ['darkness'], eldritch: true }),
     ), { range: [5, 12], strafe: 0.3 }),
@@ -142,7 +142,7 @@ export const NAMED = tier('named', [
   {
     id: 'colossus_pyramids', name: 'The Colossus Beneath the Pyramids', source: 'Under the Pyramids', regions: ['pnakotus'], canonLooks: true,
     assembly: { body: 'lathe', palette: 'sand', scale: 14, tentacles: 5, eyes: 10 },
-    ...scripted('boss', phases(ph(1, { slam: 2, grab: 1, charge: 1, quake: 1, delayed_slam: 1 }), ph(0.5, { slam: 2, bite: 2, charge: 1, aoe_ring: 1, quake: 2, eruption: 1 }, { hooks: ['darkness'] }))),
+    ...scripted('boss', phases(ph(1, { slam: 2, grab: 1, charge: 1, quake: 1, delayed_slam: 1 }), ph(0.5, { slam: 2, bite: 2, charge: 1, aoe_ring: 1, quake: 2, eruption: 1, cave_in: 1 }, { hooks: ['darkness'] }))),
     stats: st(3950, 600, 51, 2.4, 4, 10), drops: { echoes: 5000 }, insightOnSight: 2, // (round 97: health 3300 to 3950, its highest in the tables)
   },
   {
@@ -154,7 +154,7 @@ export const NAMED = tier('named', [
   {
     id: 'dr_munoz', name: 'Dr. Muñoz', source: 'Cool Air', regions: ['hub'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'pallid', scale: 2, eyes: 2, gear: ['coat', 'pipes'] },
-    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, combo: 1 }), ph(0.5, { grab: 2, toxic_cloud: 1, projectile: 1, barrage: 1 }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, grab: 1, combo: 1 }), ph(0.5, { grab: 2, toxic_cloud: 1, projectile: 1, closing_walls: 1 }))),
     stats: st(500, 80, 15, 2.6, 2, 6), weak: ['fire'], drops: { echoes: 800 }, insightOnSight: 1, // (round 97: health 550 to 600, a buff: the bot took 0.36 lives of him, under the early horrors' 0.4)
   },
   {
@@ -172,7 +172,7 @@ export const NAMED = tier('named', [
   {
     id: 'hypnos', name: 'Hypnos', source: 'Hypnos', regions: ['dreamlands'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'bone', scale: 2.3, eyes: 2, glow: 'purple', gear: ['halo'] },
-    ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, dream_cloud: 1, barrage: 2 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
+    ...scripted('mind_thief', phases(ph(1, { gaze: 1, teleport: 1, dream_cloud: 1, starfall: 1, quartering: 1 }, { hooks: ['time_skip'] }), ph(0.5, { gaze: 1, beam: 1, teleport: 1, sweep_beam: 1, vortex: 2 }, { hooks: ['time_skip', 'camera_warp'] }))),
     stats: st(3450, 140, 68, 3.4, 3, 10), drops: { echoes: 2000 }, insightOnSight: 2, // (round 83: health 1300 to 1900 and damage 48 to 60, as far as his vortex may go: with his skips no longer taking the time from a person he fell in 23 seconds and cost 0.13 lives, where he had cost 0.30)
   },
   {
@@ -190,7 +190,7 @@ export const NAMED = tier('named', [
   {
     id: 'zkauba', name: 'Zkauba the Wizard', source: 'Through the Gates of the Silver Key', regions: ['beyond'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'stone', scale: 2.6, eyes: 2, glow: 'purple', gear: ['staff'], body: [0.703125, 0.22] }, // 1.83 m to the crown, not a hunched figure's 2.2 (round 57)
-    ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, barrage: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, starfall: 1 }, { hooks: ['arena_reconnect'] }))),
+    ...scripted('caster', phases(ph(1, { projectile: 2, beam: 1, teleport: 1, rebound: 1 }), ph(0.5, { beam: 2, projectile_fan: 1, teleport: 1, sweep_beam: 1, starfall: 1 }, { hooks: ['arena_reconnect'] }))),
     stats: st(4150, 160, 84, 3.4, 2.5, 9), drops: { echoes: 2200 }, insightOnSight: 2, // (round 97: health 2250 to 2850, its highest in the tables)
   },
 ]);

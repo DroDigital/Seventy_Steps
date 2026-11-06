@@ -116,6 +116,9 @@ export interface Brain {
   stuck?: number; // frames it has pushed without getting anywhere
   detour?: number; // frames it steps aside round what blocks it (the sign: which way)
   fallBack?: number; // frames it gives ground after its blow
+  recent?: string[]; // round 107 (attackChoice.ts): its last few blows, the newest first...
+  usedAt?: Record<string, number>; // ...the frame each was struck...
+  learnt?: Record<string, number>; // ...and how each has fared on the investigator in this fight, -1..1; all three forgotten when its fight resets
   joined?: boolean; // an ally that has fallen in beside the investigator (its notice said once: round 19)
 }
 

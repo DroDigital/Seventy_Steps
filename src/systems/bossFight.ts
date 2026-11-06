@@ -22,6 +22,7 @@ import { SIGNATURES } from './signatures';
 import { summon } from './specials';
 import { clearStrikes } from './strikes';
 import { syncVariant } from './variantSwap';
+import { learnFrom } from './attackChoice';
 
 /** Fights under way: engaged, with their boss alive. */
 export const engagedFights = (g: Game): [Entity, Fight][] =>
@@ -84,6 +85,8 @@ export function resetFight(g: Game, e: Entity, f: Fight): void {
   refreshBrain(g, e, f);
   const h = g.ecs.c.health.get(e);
   if (h) h.ward = undefined;
+  const br = g.ecs.c.brain.get(e);
+  if (br) Object.assign(br, { recent: undefined, usedAt: undefined, learnt: undefined }); // a retry is met fresh (round 107)
 }
 
 function endFight(g: Game, e: Entity, f: Fight): void {
@@ -140,6 +143,13 @@ export function registerFights(g: Game): void {
       startMove(a, 'death');
       g.events.emit('Died', { entity: e, killer, at: { ...tr.pos } });
     }
+  });
+  g.events.on('Hit', ({ attacker, target, outcome, lingering }) => { // it learns, within this fight, which of its blows find the investigator (round 107)
+    const br = g.ecs.c.brain.get(attacker);
+    const move = br?.recent?.[0];
+    // Only a hit of the blow it is still in: a bolt that lands after the horror has begun another blow is not that blow's, so it is not learnt (Codex)
+    if (!br || !move || g.ecs.c.actor.get(attacker)?.move !== move || lingering || target !== g.player.id || !g.ecs.c.fight.get(attacker)?.engaged) return;
+    br.learnt = learnFrom(br.learnt, move, outcome);
   });
   g.events.on('Respawned', () => {
     for (const [e, f] of g.ecs.c.fight) resetFight(g, e, f);

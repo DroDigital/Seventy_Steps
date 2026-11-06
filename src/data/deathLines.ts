@@ -77,6 +77,12 @@ export const TIPS: Readonly<Record<AttackId, string>> = {
   maelstrom_burst: 'The burst fills the ground about the god. Roll as it breaks, not before.',
   crescendo: 'Boils on the ground and the three rings behind them. Leave the boils, then roll each ring.',
   miasma: 'The nothing about the god spreads outward and takes the mind. Step out of it and steady yourself.',
+  rebound: 'The bolts come off the walls and the pillars. Watch where each glances, not where it was thrown.',
+  mortar: 'What it throws goes over any cover. Leave the ground it falls toward, and keep off the embers.',
+  procession: 'Rows of marks march out, each with one gap. Find the gap; it moves with every row.',
+  quartering: 'The floor breaks in quarters, half and then the other half. Step into the burnt ground once it has burst.',
+  closing_walls: 'The wall comes alive and runs round the court. Come in from the rim, toward the horror, until it passes.',
+  cave_in: 'Stone falls about the pillars nearest you. Cover is no place to stand; step out into the open.',
 };
 
 /** A fragment of the place where it happened: the waking world, then the dream's realms. */

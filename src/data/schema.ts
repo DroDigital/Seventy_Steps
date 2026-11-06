@@ -85,6 +85,13 @@ export const ATTACK_IDS = [
   'maelstrom_burst',
   'crescendo',
   'miasma',
+  // round 107: the court itself: bolts off its walls and pillars, shells over its cover, rows, quarters, its rim, its pillars' feet
+  'rebound',
+  'mortar',
+  'procession',
+  'quartering',
+  'closing_walls',
+  'cave_in',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 

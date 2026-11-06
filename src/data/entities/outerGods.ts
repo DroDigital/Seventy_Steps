@@ -23,7 +23,7 @@ export const OUTER_GODS = tier('outer_god', [
   {
     id: 'daemon_pipers', name: 'The Daemon Pipers', source: 'The Dream-Quest of Unknown Kadath', regions: ['piping_dark'], canonLooks: false, voice: 'pipes',
     sprite: { silhouette: 'spectre', palette: 'charcoal', scale: 2.8, eyes: 0, glow: 'purple' },
-    ...scripted('caster', phases(ph(1, { roar: 2, projectile: 1, barrage: 1 }), ph(0.5, { roar: 1, projectile_fan: 2, darkness: 1, barrage: 2 }, { hooks: ['camera_warp'] }))),
+    ...scripted('caster', phases(ph(1, { roar: 2, projectile: 1, barrage: 1 }), ph(0.5, { roar: 1, projectile_fan: 2, darkness: 1, barrage: 1, rebound: 1 }, { hooks: ['camera_warp'] }))),
     stats: st(3900, 300, 89, 2, 6, 14), drops: { echoes: 4000 }, insightOnSight: 4, // (round 97: health 3200 to 3900, its highest in the tables)
   },
   {
@@ -39,7 +39,7 @@ export const OUTER_GODS = tier('outer_god', [
       hit: [[0.01, 0.718, 0.092], [-0.184, 0.544, 0.175], [0.199, 0.544, 0.165], [0.01, 0.398, 0.218], [-0.262, 0.223, 0.18], [0.248, 0.228, 0.184], [0, 0.107, 0.107]], // fitted to the front view's painted spheres: across from the picture's middle, up from the physical sphere cluster's foot, which the renderer grounds through REVIEWED_GROUND
     },
     ...scripted('boss', phases(
-      ph(1, { beam: 2, teleport: 1, aoe_ring: 1, barrage: 1, thunderfall: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect'], arena: 'spheres' }),
+      ph(1, { beam: 2, teleport: 1, aoe_ring: 1, quartering: 1, thunderfall: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect'], arena: 'spheres' }),
       ph(0.6, { beam: 2, projectile_fan: 1, teleport: 1, summon: 1, sweep_beam: 1, barrage: 1, crushing_blow: 1 }, { summons: ['dhole'], hooks: ['arena_reconnect', 'camera_warp'] }),
       ph(0.25, { beam: 3, starfall: 1, teleport: 1, sweep_beam: 2, vortex: 1, crushing_blow: 1 }, { hooks: ['arena_reconnect', 'camera_warp', 'time_skip'] }),
     ), { mobile: false, range: [0, 40], cooldown: [120, 180] }),
@@ -58,7 +58,7 @@ export const OUTER_GODS = tier('outer_god', [
   {
     id: 'ancient_ones', name: 'The Ancient Ones', source: 'Through the Gates of the Silver Key', regions: ['pale_lattice'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'pallid', scale: 3.2, eyes: 0, gear: ['cowl'] },
-    ...scripted('stationary_horror', phases(ph(1, { gaze: 2, roar: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, roar: 1, beam: 1, barrage: 1 }, { hooks: ['time_skip'] }))),
+    ...scripted('stationary_horror', phases(ph(1, { gaze: 2, roar: 1, sweep_beam: 1 }), ph(0.5, { gaze: 2, roar: 1, beam: 1, cave_in: 1 }, { hooks: ['time_skip'] }))),
     stats: st(5550, 1000, 84, 0, 6, 14), drops: { echoes: 5000 }, insightOnSight: 4, // (round 97: health 2850 to 4050, its highest in the tables)
   },
   {

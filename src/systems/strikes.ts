@@ -15,6 +15,8 @@ import { inWindow, moveDef } from './actions';
 import { capsuleGap2, hostiles, shove, strike, targetsOf, type Blow } from './combat';
 import { rise } from './clouds';
 import { spawnPool } from './hazards';
+import { courtSpots } from './courtPlans';
+import { postsIn } from './courtPosts';
 import { planSpots } from './strikePlans';
 import { live } from './targets';
 import { isAbsent, type Actor, type Game, type Mark, type Wave } from './components';
@@ -55,7 +57,7 @@ export function layMark(g: Game, owner: Entity, at: XZ, m: MarkSpec, first = tru
 }
 
 /** The patterns laid about the attacker, whoever stands where (a line of flame, and a blind horror's rings, spiral and boils): none is heaped against the wall. */
-const ABOUT_THE_ATTACKER: readonly (MarkPattern | undefined)[] = ['spokes', 'beats', 'spiral', 'scatter'];
+const ABOUT_THE_ATTACKER: readonly (MarkPattern | undefined)[] = ['spokes', 'beats', 'spiral', 'scatter', 'rows', 'wedges', 'rim'];
 
 /** Marks the ground: the first spot under the target, the rest laid by the call's pattern (planSpots), each bursting in turn. */
 function mark(g: Game, id: Entity, m: MarksDef): void {
@@ -68,7 +70,11 @@ function mark(g: Game, id: Entity, m: MarksDef): void {
   const wall = arena && ABOUT_THE_ATTACKER.includes(m.pattern) ? arena : undefined; // it stops at the wall; it does not heap against it
   const reach = wall ? Math.max(0, wall.radius - Math.hypot(tr.pos.x - wall.x, tr.pos.z - wall.z) - m.radius - 0.5) : undefined;
   let first = true;
-  planSpots(m, centre, tr.pos, c.body.get(id)?.radius ?? 0.5, g.rng, reach).forEach(({ at, order }) => {
+  const body = c.body.get(id)?.radius ?? 0.5;
+  const court = arena ?? { x: tr.pos.x, z: tr.pos.z, radius: m.ring[1] + body }; // round 107: the court a court pattern is laid over
+  const spots = courtSpots(m, centre, tr.pos, body, g.rng, court, m.pattern === 'pillars' ? postsIn(g.world, court) : [])
+    ?? planSpots(m.pattern === 'pillars' ? { ...m, pattern: 'rain', count: m.count * 3 } : m, centre, tr.pos, body, g.rng, reach); // no pillar stands: the stone falls about the target
+  spots.forEach(({ at, order }) => {
     if (wall && Math.hypot(at.x - wall.x, at.z - wall.z) > wall.radius - m.radius - 0.5) return;
     layMark(g, id, at, { radius: m.radius, delay: m.delay + order * m.stagger, damage: m.damage, poise: m.poise, look: m.look, leaves: m.leaves, ...(m.seek && m.pattern === 'seek' && quarry !== id && { seek: { ...m.seek, target: quarry } }) }, first);
     first = false;
