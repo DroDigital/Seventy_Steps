@@ -64,26 +64,37 @@ export const MUSIC = {
 };
 
 /** Extra resolution scales offered only after opening the optional higher resolutions and their immersion warning. */
-export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1080p screen; 800 × 450 is a standard step and the default since round 58)
+export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1080p screen; 800 × 450 is a standard step, 640 × 360 the default)
+
+/** The old 85% brightness is the new 100% baseline. */
+export const BRIGHTNESS_BASE = 0.85;
+export const brightnessGamma = (brightness: number): number => 1 / (BRIGHTNESS_BASE * brightness);
+/** The brightness card (ui/brightnessCalibration.ts): the sign's level and the strip's steps, as the picture's levels before its gamma. */
+export const CALIBRATION = { sign: 0.14, strip: [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16] } as const;
 
 /** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {
   fxCap: [0, 1, 0.05, 1], // caps every sanity effect (accessibility); the default is FX.capDefault's
   sensitivity: [0.25, 3, 0.05, 1], // look speed: mouse, stick and arrows
   invertY: [0, 1, 1, 0], // 1: up looks down (round 12)
-  resolution: [0.8, 2, 0.4, 2], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360 and 800 × 450, the default (round 58, asked: before it was 640 × 360, which a 720p, 1080p, 1440p and 4K screen each held a whole number of times over, 2, 3, 4 and 6, so that every pixel was drawn the same size; 800 × 450 is 1.6, 2.4, 3.2 and 4.8 times over on them, so some rows and columns are drawn wider than others)
-  brightness: [0.7, 1.6, 0.05, 1], // lifts the dark (a gamma, after the grade; round 12)
+  resolution: [0.8, 2, 0.4, 1.6], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360, the default, and 800 × 450 (2026-11-03, asked: 640 × 360 again, as in round 56, which a 720p, 1080p, 1440p and 4K screen each holds a whole number of times over, 2, 3, 4 and 6; round 58 had made it 800 × 450, which is 1.6, 2.4, 3.2 and 4.8 times over on them; even pixels draw every pixel the same size at either)
+  brightness: [0.9, 1.9, 0.05, 1], // 100% is the old 85% look; higher values lift the dark
   fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
   relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 83: shaders/sprite.ts); off, they are lit as the rest
   shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
+  evenPixels: [0, 1, 1, 1], // 1: every pixel of the picture drawn the same size on any screen (2026-11-03: render/evenPixels.ts); 0: blown up nearest-neighbour, some rows and columns wider than others where the screen does not hold the picture a whole number of times
+  font: [0, 1, 1, 0], // 0: IM Fell English; 1: EB Garamond
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
+  rumble: [0, 1, 0.25, 1], // the controller's rumble (2026-11-03: render/rumbleFx.ts); 0: the motors are never driven
   captions: [0.8, 1.6, 0.1, 1], // the size of what is said aloud and shown: cutscene lines, a talk, what is overheard (round 47)
   captionBack: [0, 1, 1, 0], // 1: a dark band behind them
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
-  camera: [0, 3, 1, 1], // how the camera hangs (round 77): 0 Classic; 1 Low hero, the default (since round 82); 2 Long lens; 3 Tight shoulder (data/cameraModes.ts)
+  camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
+  minimap: [0, 1, 1, 0], // 0: the minimap turns with the camera, what lies ahead up; 1: north up, the investigator's arrow turning instead (a first public playthrough: "I don't know anyone who likes spinning maps")
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
+  controlTips: [0, 1, 1, 1], // 0: the first steps' controls are not written on the screen as each is first needed (round 102: ui/firstSteps.ts)
   quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
@@ -108,7 +119,7 @@ export const DIFFICULTIES = {
 export type DifficultyId = keyof typeof DIFFICULTIES;
 export const DIFFICULTY_IDS = Object.keys(DIFFICULTIES) as DifficultyId[];
 export const DEFAULT_DIFFICULTY: DifficultyId = 'deep';
-export const isDifficulty = (v: unknown): v is DifficultyId => typeof v === 'string' && v in DIFFICULTIES;
+export const isDifficulty = (v: unknown): v is DifficultyId => typeof v === 'string' && Object.hasOwn(DIFFICULTIES, v);
 
 /** The UI's scale (ui/uiScale.ts): 1 at a window this tall, and never below or above these. */
 export const UI = { baseHeight: 720, least: 1, most: 2.5 };
@@ -116,36 +127,21 @@ export const UI = { baseHeight: 720, least: 1, most: 2.5 };
 export const DECK = { uiScale: 1.15, captions: 1.2 };
 
 /** Levels bought with Echoes at an Elder Sign (playtest round 4): what one level of each attribute adds, and the most levels. */
-export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number }> = {
-  vigour: { max: 30, hp: 12 }, // round 68: thirty, not twenty: the last ten cost 100,000 Echoes apiece, which is what hunting is for, and the horrors grow to meet them (BOSS_OVERMATCH)
-  endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second): all thirty levels reach 56 a second
-  might: { max: 30, damage: 0.04 }, // share added to the investigator's blows and shots
+export const LEVELS: Record<'vigour' | 'endurance' | 'might', { max: number; hp?: number; stamina?: number; regen?: number; damage?: number; knee?: number; past?: number }> = {
+  vigour: { max: 30, hp: 16 },
+  endurance: { max: 30, stamina: 8, regen: 0.8 }, // a bigger bar, and stamina regained faster (per second)
+  might: { max: 30, damage: 0.04, knee: 18, past: 0.02 }, // (2026-11-01: past the knee, the Might every boss's expected standing stays within, a level gives half: the cap's blows are x1.96, not x2.2) // share added to the investigator's blows and shots
 };
 export type LevelId = keyof typeof LEVELS;
 
-/**
- * Round 71 ("Souls-style soft caps ... full gains up to about level 15 to 20, roughly half after that, very little near the cap of 30"): past `after`
- * levels of one attribute, each further level is worth `worth` of a whole one in what `LEVELS` gives (systems/levelWorth.ts): health, stamina and its
- * recovery, the weight of blows. The first eighteen count whole, which is as far as any horror's standing goes (data/bossStanding.ts: 18 Vigour and 17
- * Might for the last), so the journey as it is made is as it was and what the caps soften is the hunt past it: thirty levels of one attribute are
- * worth 22.6. A level costs what it costs (`LEVEL_COST`), and the horrors grow to meet the worth, not the count (bossScaling.ts).
- */
-export const SOFT_CAP: readonly { after: number; worth: number }[] = [
-  { after: 18, worth: 0.5 },
-  { after: 26, worth: 0.15 },
-];
-
-/** Boss health and damage gained per purchased player level; level one keeps the authored stats. */
-export const BOSS_LEVEL_SCALING = { health: 0.0075, damage: 0.003 };
+/** Boss damage gained per purchased player level; level one keeps the authored damage. */
+export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
- * Round 68 ("all bosses remain demanding regardless of player level"): past the standing a horror is made to be met at (data/bossStanding.ts), the
- * share of the investigator's growth in blows (Might) that its health takes up, and of their growth in health (Vigour) that its blows take up.
- * The rest of the growth is theirs: a level farmed is still a level gained, but no longer a fight lost. Round 71: 0.8, not 0.7. The soft caps
- * (SOFT_CAP) leave less growth to meet, and the horrors' level scaling follows the worth of the levels; at 0.7 a bot at the cap fought them
- * about 6% easier than before, and at 0.8 as before (tests/balance.test.ts: the lives of the cap table, the mean of nine starts, 1.01 of the old).
+ * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
+ * that its blows take up, and of their growth in damage (Might and the weapon's edge) that its health takes up, on the first journey.
  */
-export const BOSS_OVERMATCH = { share: 0.8 };
+export const BOSS_OVERMATCH = { share: 0.55, health: 0.75 }; // (2026-11-01: blows 0.45 to 0.55 of (0.7 broke the rule that every Vigour level helps) the growth in health; and health, again, 0.75 of the growth in damage, Might and the weapon's edge, past the standing: in an open world a horror met late is still a fight)
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found
@@ -158,8 +154,8 @@ export const LEVEL_COST = { base: 200, step: 60, curve: 4.5 };
 export const REINFORCE = { max: 5, damage: 0.2, cost: [1, 1, 2, 2, 3] as readonly number[], moveEchoes: 600 };
 // `moveEchoes` (round 61): moving a level from one weapon to another is not free: each level moved costs this many Echoes for each star-stone it would cost to set in afresh in the weapon it goes to (so 600 for the first level, 1800 for the fifth, 5400 to move five into a bare weapon). Stones set directly into the other weapon cost no Echoes, and the stones a boss leaves are there to be set, not shuffled.
 
-/** Each new journey through the dream (NG+, round 12): what it adds to foes' health, their blows and the Echoes they leave, and the last journey counted. */
-export const NEW_GAME_PLUS = { health: 0.6, damage: 0.35, echoes: 0.5, most: 7 };
+/** NG+7 is the final scaling rung. Regional health/damage curves live in ngPlusTuning.ts; rewards share the same ceiling. */
+export const NEW_GAME_PLUS = { echoes: 0.5, most: 7 };
 
 /** Flasks of lamp oil (round 12): the most carried. What one does is its move (data/moves.ts `throw`). */
 export const OIL = { carry: 5 };
@@ -173,8 +169,8 @@ export const OIL = { carry: 5 };
  */
 export const GUN = {
   chamber: 6, // rounds the cylinder holds
-  carry: 12, // two spare cylinders carried, beyond the six already loaded
-  start: 6, // spare rounds a new investigator carries (and the cylinder starts full)
+  carry: 18, // three spare cylinders carried, beyond the six already loaded (it was two: a first public playthrough ran dry again and again, "why is it so difficult to find bullets?")
+  start: 12, // spare rounds a new investigator carries (and the cylinder starts full; it was 6)
   box: 6, // rounds in a box bought
   find: 4, // rounds in a box lying about the open world...
   cache: 4, // ...and in each dungeon's caches
@@ -282,7 +278,7 @@ export const CACHE = {
 /** Consumables: Laudanum steadies the mind (tuning.ts), West's Reagent closes wounds. */
 export const REAGENT = {
   doses: 4, // at the start; each Silver Vial found adds one
-  maxDoses: 10, // the start's four and six vials (round 68: fourteen doses of 45% were six and a third bars of health in the pocket; a vial found past the most is Echoes)
+  maxDoses: 8, // (2026-11-01: ten, which made a late fight's health five bars deep and its pressure a fifth lighter) // the start's four and six vials (round 68: fourteen doses of 45% were six and a third bars of health in the pocket; a vial found past the most is Echoes)
   heal: 0.4, // share of full health restored (round 68: it was 0.45)
   surplus: 600, // Echoes a Silver Vial is worth to one whose kit holds no more
   mend: 8, // seconds after a shot in which lingering hurts (pools, the void) do no harm (playtest round 7)
@@ -344,6 +340,9 @@ export const FINDS = {
   wait: { weapon: 900, relic: 5200 },
 };
 
+/** The investigator's peace on arriving (round 88, systems/peace.ts): the seconds it holds once they have risen (moved or acted). A blow, a shot or a flask of their own ends it at once. */
+export const PEACE = { after: 4 };
+
 /** The map's markers (round 60, systems/marker.ts): how near the investigator must come for one to be reached, and so cleared (metres), and how many may stand at once (round 68: it was one). */
 export const MARKER = { arrive: 10, most: 12 };
 
@@ -401,4 +400,20 @@ export const WATER = {
   follow: 0.92, // the camera follows the body this far down: it sees the surface close over it
   lookPitch: 0.95, // radians: and looks down at it, not straight down (the water is not a hole)
   dark: [34, 90] as readonly [from: number, to: number], // frames held between which the picture goes to black
+};
+
+/** The first steps' card (round 102, ui/firstSteps.ts): metres, radians and 60 Hz frames. */
+export const FIRST_STEPS = {
+  walked: 3, // metres walked before Walk is ticked
+  turned: 0.6, // radians the camera has been turned before Look is
+  sprint: 45, // frames run before Run is
+  jump: 5, // metres in one look that are a journey or a rising, not a walk
+  foe: 32, // a foe closing within this calls up the blows (as the Field Guide's fight hint does: ui/hintWatch.ts)
+  close: 10, // once the blows are learned, a foe this near calls up the roll
+  swing: 6, // and a foe this near with a blow under way calls it up at once
+  hurt: 0.6, // health below this share calls up West's Reagent
+  mountAfter: 240, // frames after Run is learned before the chariot's card may come, on open ground and with no foe near
+  minShow: 150, // a card stays at least this long before a more urgent one takes its place
+  lapse: 120, // a card whose reason has gone stays this long before it goes
+  linger: 72, // a card finished stays, ticked, this long
 };

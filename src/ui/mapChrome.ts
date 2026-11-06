@@ -7,7 +7,7 @@
  * while the pointer is over it.
  */
 
-import { SERIF } from './hudKit';
+import { canvasSerif, SERIF } from './hudKit';
 import { BONE, DIM, drawMark, type MarkKind, type MarkState } from './mapIcons';
 import type { Mark } from './mapMarks';
 import { el } from './menuKit';
@@ -114,7 +114,7 @@ export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open
 /** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
 export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['LB', 'RB'], 'Pick a sign'], [['A'], 'Find me / travel'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
+    ? [[['LT', 'RT'], 'Zoom'], [['Stick'], 'Pan'], [['R3'], 'Lock a sign'], [['Stick'], 'Switch'], [['D-pad'], 'Pick a sign'], [['A'], 'Choose / travel'], [['LB', 'RB'], 'Next sign'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
     : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
@@ -153,7 +153,7 @@ export function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.lineTo(-r * 0.24, 0);
   ctx.closePath();
   ctx.fill();
-  ctx.font = `${Math.round(r * 0.62)}px ${SERIF}`;
+  ctx.font = `${Math.round(r * 0.62)}px ${canvasSerif()}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
   ctx.fillStyle = BONE;
@@ -161,7 +161,7 @@ export function drawCompass(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.restore();
 }
 
-/** A small cross at (x, y): where the pad's button would set the marker, the pad having no pointer. */
+/** A small cross at (x, y): where the pad sets a marker, and where a lit sign under it is chosen. */
 export function drawCrosshair(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   ctx.save();
   ctx.strokeStyle = 'rgba(217,208,184,0.7)';
@@ -186,7 +186,7 @@ export function drawTip(ctx: CanvasRenderingContext2D, m: Mark, w: number, h: nu
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
   const sized = lines.map(([text, size, colour]) => {
-    ctx.font = `${size} ${SERIF}`;
+    ctx.font = `${size} ${canvasSerif()}`;
     return { text, size, colour, width: ctx.measureText(text).width + (text === lines[0][0] ? text.length * 1.6 * k : 0) };
   });
   const lineH = (s: string): number => parseFloat(s.replace('italic ', '')) * 1.35;
@@ -202,7 +202,7 @@ export function drawTip(ctx: CanvasRenderingContext2D, m: Mark, w: number, h: nu
   ctx.strokeRect(x + 0.5, y + 0.5, boxW - 1, boxH - 1);
   let cy = y + pad;
   for (const l of sized) {
-    ctx.font = `${l.size} ${SERIF}`;
+    ctx.font = `${l.size} ${canvasSerif()}`;
     if (l === sized[0]) ctx.letterSpacing = `${1.6 * k}px`;
     ctx.fillStyle = l.colour;
     ctx.fillText(l.text, x + pad, cy);

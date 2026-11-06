@@ -9,6 +9,7 @@ declare module 'node:fs' {
   export function writeFileSync(path: string, data: string): void;
   export function mkdirSync(path: string, options: { recursive: boolean }): void;
   export function mkdtempSync(prefix: string): string;
+  export function chmodSync(path: string, mode: number): void;
 }
 declare module 'node:os' {
   export function tmpdir(): string;

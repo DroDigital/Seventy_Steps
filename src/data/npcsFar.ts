@@ -94,7 +94,7 @@ export const FAR_NPCS: readonly NpcDef[] = [
       { when: [at('silver_key', 0)], lines: YOG },
       { when: [at('silver_key', 1)], lines: YOG }, // (round 70: 'Umr first, then Yog-Sothoth)
       { when: [at('silver_key', 2)], lines: COURT },
-      { when: [at('silver_key', 3)], lines: COURT }, // (the Court's sign is where it is decided: the tracker and the sign's menu say so)
+      { when: [at('silver_key', 3)], lines: COURT }, // (the key and the tall man wait at the Court's sign)
       { lines: ['I have seen the other side of this more than once. It does not get easier.'] },
     ],
   },

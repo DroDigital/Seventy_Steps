@@ -29,10 +29,15 @@ import { channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, s
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
 const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the title, reports, quits: a packed build's own check
+const SMOKE_LATE = Number(process.env.SMOKE_LATE) || 150; // seconds a smoke test waits for its title before it gives up (tools/smoke_packaged.mjs sets it under its own timeout: Rosetta starts slowly)
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
+// Ubuntu 23.10+ AppArmor blocks Chromium's userns sandbox (electron#41066). Steam/itch ship a folder,
+// not a .deb with an AppArmor profile, so Linux starts without the sandbox. The packed launcher
+// (packaging/linuxLaunch.mjs) also passes --no-sandbox before JS runs; this covers `npm run desktop`.
+if (process.platform === 'linux') app.commandLine.appendSwitch('no-sandbox');
 if (SMOKE) {
   app.setPath('userData', mkdtempSync(join(tmpdir(), 'seventy-steps-smoke-'))); // a check never touches a player's saves, window or logs
   if (process.env.SMOKE_SOFTWARE_GL) for (const [k, v] of [['use-gl', 'angle'], ['use-angle', 'swiftshader'], ['enable-unsafe-swiftshader', ''], ['ignore-gpu-blocklist', '']]) app.commandLine.appendSwitch(k, v || undefined); // a machine with no GPU (CI on Linux)
@@ -255,27 +260,40 @@ function startPads() {
     if (code !== 0 && padStarts++ < 3) setTimeout(startPads, 1000); // a fault in the native module stops the pads for a moment, not the game. A look for controllers does not exit this process.
   });
 }
+/** The pad's motors (2026-11-03: core/rumble.ts): handed to the SDL worker, numbers only, clamped. */
+ipcMain.on('desktop:rumble', (_e, m) => {
+  const n = (v, hi) => (Number.isFinite(v) ? Math.min(hi, Math.max(0, v)) : 0);
+  worker?.postMessage({ type: 'rumble', index: Math.floor(n(m?.index, 16)), strong: n(m?.strong, 1), weak: n(m?.weak, 1), ms: Math.round(n(m?.ms, 2000)) });
+});
 ipcMain.handle('desktop:pads-get', () => pads); // a page loaded (or reloaded) after the pads were found asks for them once
 
 /** What `--smoke-test` checks: the page reached its title and found the shell's bridge, and (as SMOKE_REQUIRE names them) the Steam binding loaded and the controllers' worker started. Prints one line and quits with 0 or 1. */
 function smoke(win) {
   const needs = (process.env.SMOKE_REQUIRE ?? '').split(',').map((s) => s.trim()).filter(Boolean);
   const began = Date.now();
+  let calibrationKept = false;
   const timer = setInterval(async () => {
     let page = null;
     try {
       page = await win.webContents.executeJavaScript(`(() => {
-        const button = [...document.querySelectorAll('button')].find((b) => /new game/i.test(b.textContent));
+        const visible = (el) => !!el?.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+        // The first launch presents brightness calibration before the title menu. Keep its default,
+        // as a player would, then still require the actual New Game button and an unveiled screen.
+        const keep = document.querySelector('[data-menu]:not([data-ghost]) button[data-calibration-keep]');
+        const calibrationKept = visible(keep);
+        if (calibrationKept) keep.click();
+        const button = document.querySelector('[data-menu]:not([data-ghost]) button[data-title-new-game]');
         const veil = document.querySelector('canvas[data-veil]');
         const clear = veil && (getComputedStyle(veil).display === 'none' || veil.getContext('2d').getImageData(veil.width / 2, veil.height / 2, 1, 1).data[3] < 255);
-        return { title: !!button?.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && !!clear, bridge: typeof window.desktop?.quit === 'function' };
+        return { title: visible(button) && !!clear, bridge: typeof window.desktop?.quit === 'function', calibrationKept };
       })()`);
     } catch {
       // the page is still loading
     }
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, steamBinding: steamBinding(), controllers: padState };
+    calibrationKept ||= !!page?.calibrationKept;
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, calibrationKept, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
-    const late = report.seconds > 150;
+    const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;
     clearInterval(timer);
     const missing = [!report.title && 'the title never appeared', !report.bridge && "the shell's bridge is missing", needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load', needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`].filter(Boolean);

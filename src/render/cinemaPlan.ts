@@ -119,5 +119,14 @@ export function holdOf(s: Scene, t: number, length = sceneLength(s)): number {
 /** The beats that fall after `from` and up to `to` (seconds into the scene), in order. */
 export const beatsBetween = (s: Scene, from: number, to: number): Beat[] => s.beats.filter((b) => b.at > from && b.at <= to);
 
+/** Moves the scene `dt` seconds on, stopping at the next act not yet in `done`. That beat is not among `beats`. */
+export function advanceScene(scene: Scene, t: number, dt: number, done: ReadonlySet<number>): { t: number; beats: Beat[]; act: Beat | null } {
+  const end = t + dt;
+  let act: Beat | null = null;
+  for (const b of scene.beats) if (b.act && !done.has(b.at) && b.at > t && b.at <= end && (!act || b.at < act.at)) act = b;
+  const to = act ? act.at : end;
+  return { t: to, beats: scene.beats.filter((b) => b !== act && b.at > t && b.at <= to), act };
+}
+
 /** The trembling of the camera `since` seconds after a beat set it off, for `hold` seconds: `amount` metres dying away. */
 export const tremor = (amount: number, since: number, hold: number): number => (since < 0 || since > hold ? 0 : amount * (1 - since / hold) ** 2);

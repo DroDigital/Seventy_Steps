@@ -25,6 +25,14 @@ export const ECHO_FX = {
 };
 
 /** The weight of the investigator's blows as they land (playtest round 20: render/audio/impact.ts and render/impactFx.ts). */
+/**
+ * A prop right before the lens dissolves (2026-11-03): within `from` metres of the eye a freestanding thing (a stone, a tree,
+ * a fence, a house's corner, an Elder Sign's stones) is drawn through an ordered dither, thinner the nearer, and gone within
+ * `gone`, so a trunk or a shrine at the frame's edge no longer fills half the picture. Never the ground, a floor or anything
+ * facing up more than `flat` (its normal's height), a body, glass, or a dungeon's walls (render/worldMaterial.ts `nearFade`).
+ */
+export const NEAR_FADE = { gone: 0.35, from: 1.25, flat: 0.6 } as const;
+
 export const IMPACT = {
   weight: { base: 0.5, damage: 0.35, full: 50, heavy: 0.2, stagger: 0.1, riposte: 0.25, kill: 0.3, most: 1.4 }, // a blow's weight: where it starts, what its damage adds (up to `full` of it), what each kind of blow adds; never past `most`
   big: 0.9, // metres of body radius from which a foe is big: a kill of one booms
@@ -136,15 +144,16 @@ export const GROUND_CONTACT = {
 };
 
 
-/** Lights that last a moment (round 83, render/flashLights.ts): a shot, a blow's flash, a bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer. */
+/**
+ * Lights that last a moment (round 83, render/flashLights.ts): the flash at the heart of a foe's blow and a foe's bolt in flight light the ground, the bodies and the mist about them. They take the slots of the farthest of the world's own lamps, so no shader gets a loop longer.
+ * Round 87 (XDro: the hit flashes were too much, and a blow of the investigator's already lights the creature it lands on): the investigator's shot and blow lay no light, only a foe's blows, shots and bolts do, and the lights are small and short: the strongest is about a torch's (1.1; a fire is 1.8, a street lamp 2.6), the usual about half of it.
+ */
 export const FLASH_LIGHTS = {
-  slots: 3, // the most at once
+  slots: 2, // the most at once
   reach: 46, // metres from the investigator: farther, none is chosen
   attack: 0.03, // seconds a flash takes to come to its height (a fall as quick and as long as its life follows)
-  muzzle: { color: [1, 0.84, 0.54] as readonly [number, number, number], strength: 2.6, range: 8, seconds: 0.1 }, // a shot
-  blow: { strength: 1.1, range: 4.2, seconds: 0.14 }, // a landed blow of the investigator's, plus `weight` of the table's
-  burst: { strength: 1.5, per: 0.38, most: 4.2, range: 3.6, rangePer: 2.4, rangeMost: 18, seconds: 0.34 }, // the flash at the heart of a horror's blow: by its radius
-  bolt: { strength: 1.3, per: 0.5, most: 3, range: 5, rangePer: 2.2, rangeMost: 12, seconds: 0.1 }, // a bolt of light or fire in flight, kept up each frame
+  burst: { strength: 0.7, per: 0.12, most: 1.2, range: 3, rangePer: 1.2, rangeMost: 10, seconds: 0.2 }, // the flash at the heart of a foe's blow: by its radius
+  bolt: { strength: 0.5, per: 0.25, most: 1, range: 3, rangePer: 1.2, rangeMost: 6.5, seconds: 0.1 }, // a foe's bolt of light or fire in flight, kept up each frame
   white: 0.35, // how much of white is mixed into a blow's colour (a light is not a hue: nothing it falls on reads as an anomaly)
 } as const;
 
@@ -243,11 +252,30 @@ export const WARE_SHOWN = {
 export const BLOB = {
   dark: 0.55, // how dark at its heart
   base: 1.7, // its radius, in the radii of the body's capsule
-  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider)
+  grow: 1.8, // the most a body painted wider than its capsule widens it (the colossi are painted 1.3 to 1.65 times wider, but Shub-Niggurath since round 92: as wide as her capsule)
   draw: 1.0, // how much longer it is drawn out away from the moon at the horizon than from the zenith
   most: 1.8, // and the most it is drawn out
   shift: 0.6, // the share of what it is drawn out by that its middle moves, away from the moon
   thin: 0.25, // how much lighter it is for each whole length drawn out
+} as const;
+
+/**
+ * What a foe's own picture casts into the moon's, the lantern's and the lamps' shadow maps (round 94; render/silhouetteCasters.ts,
+ * shaders/castSprite.ts, castPlan.ts): its animated outline, stood across the light and leaned back, so its shadow is its own
+ * shape (a claw raised in the blow is raised in the shadow) and always as long as it is tall; the horrors' are larger than they are.
+ */
+export const CAST = {
+  alpha: { reviewed: 0.5, drawn: 0.3 }, // the least opacity of a texel that is body: the authored art's, and the procedural atlas's (whose glow marks are 0.63 and 0.82)
+  stretch: 1.15, // the shortest a shadow is, in the heights of the body that casts it: under a high light the cut-out leans back until it reaches this (a light over 60 degrees cannot give it: there the shadow is as long as it can be, 1 / sin of the light's height)
+  lean: 1.1, // radians: the most it leans back (63 degrees), so that it never lies flat on the ground it is cast on
+  back: 0.25, // metres a lantern's or a lamp's cut-out stands behind the body, and half the breadth of its picture along the light's ray besides (a lamp's light is read at every pixel of the picture, and none may lie deeper than the cut-out): the body that is lit is never in its own shadow
+  turn: 0.3, // how far across the light (the cosine of the angle to the camera's right) the cut-out is turned about
+  merge: 0.97, // over that turn the picture's cut rises to this opacity at the middle of it, where a texel is kept only if the picture and its mirror both have it: the shadow narrows to the shape they share and widens again as the picture or its mirror returns, and never swaps one for the other at once
+  reach: 48, // metres from the investigator at which a foe casts none: the corners of the moon's map (34 m about it, a square) are 48 m off; but see `longest`
+  longest: 2.6, // the longest a shadow is, in the heights of the sheet that casts it (the lowest moon of the night, 21 degrees, 1 / tan): added to `reach`, so that no shadow that could reach the map is dropped with its body
+  least: 0.4, // the least opacity of a picture that casts: a shimmer in the air (an invisible stalker) casts none
+  keep: 0.05, // the share of a picture left, below which it casts none (a creature dying)
+  loom: { base: 0.15, size: 0.4, from: 3, to: 12, deep: 0.28, wide: 0.5 }, // how much larger its shadow is than the body: every foe's by `base`; by `size` more for a body 3 to 12 metres tall; by `deep` more for a horror in the last phase of its fight; and `wide` the share of that it is broader by
 } as const;
 
 /** The track of a blow (render/swingTrails.ts; round 83). */
@@ -259,3 +287,7 @@ export const SWING_TRAIL = {
   color: [0.82, 0.86, 0.96] as readonly [number, number, number],
   lead: 2, tail: 3, // frames before the blow's first active frame and after its last that the edge is followed
 } as const;
+
+/** The quiet blows of every creature that is not one of the horrors (round 90): kept in data/foeTuning.ts, which holds this file past its share of lines. */
+export { FOE_FX } from './foeTuning';
+export type { MatterSpec, SpeckShape } from './foeTuning';

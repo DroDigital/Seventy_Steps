@@ -310,7 +310,7 @@ Risk: the bell is kept out of the fight only by its 3.3 m lift, so any heavier r
 
 ```
 HALL lilith (Lilith, The Vaults under Red Hook) -- richness 4
-Now: cu_curtains, ph_mirror x2, pd_candle_a, pd_candle_b, fountain, lily, statue_head, column, urn, candles (10 kinds). A drapery wall and dark mirrors at the back, torchlight about; it reads as a shrine, but the water is a dry town fountain.
+Now: cu_curtains, ph_mirror x2, fountain, lily, statue_head, column, urn (7 kinds). A drapery wall and dark mirrors at the back, torchlight about; it reads as a shrine, but the water is a dry town fountain.
 Weak in use: fountain -> sunken stone basin of black water, 3 m (G5); statue_head (shared with three other halls) -> veiled basalt head, 1 m (G7); column -> lotus-capped column, 4 m (G9).
 Mix 1 (best): tp_col_base + tp_col_mid (mid lifted 2.4 m, 4.8 m total, under the roof's 5 m) at ring 0.92, arc 60-300, replacing column: a half-Eastern colonnade (0 deg = entry, r a share of 23 m).
 Mix 2: pd_chandelier, size 0.8, lift 3, walk, at(0.45, 200): candles in rows over the water, no collider.

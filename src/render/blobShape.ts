@@ -1,7 +1,7 @@
 /**
  * The shape of a body's blob shadow (round 83; render only, pure): its breadth follows how wide the body is painted, and
  * under a moon that casts shadows it is drawn out away from the moon, longer the lower the moon, so the contact shadow lies
- * the way the real one (render/moonShadow.ts, render/creatureCasters.ts) falls and not as a plain disc under the feet.
+ * the way the real one (render/moonShadow.ts, render/silhouetteCasters.ts) falls and not as a plain disc under the feet.
  */
 
 import { BLOB } from '../data/fxTuning';

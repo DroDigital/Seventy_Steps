@@ -116,6 +116,7 @@ function checkDef(report: Report, d: EntityDef, ids: ReadonlySet<string>, varian
   num(report, 'drops.echoes', d.drops.echoes, 0, 50000, true);
   num(report, 'insightOnSight', d.insightOnSight, 0, 5, true);
   if (!variant) {
+    if (d.bossScript?.phases.some((ph) => ph.eldritch) && !d.eldritchVariant) report('an eldritch boss phase needs an eldritch variant');
     const rank: Record<Tier, boolean | null> = { lesser: false, greater: false, named: true, great_old_one: true, outer_god: true, ally: null };
     const gives = rank[d.tier];
     if (gives !== null && gives !== d.insightOnSight > 0) report(`${d.tier} entities ${gives ? 'must' : 'must not'} grant insight on sight`);

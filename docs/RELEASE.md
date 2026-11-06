@@ -18,7 +18,7 @@ machine of each platform; the second half is what only the author can do, becaus
   | macOS, Apple Silicon | `mac-arm64` | `Seventy Steps.app` |
   | macOS, Intel | `mac` | `Seventy Steps.app` |
   | macOS, both in one | `mac-universal` (`npm run package:mac -- --universal`) | `Seventy Steps.app` |
-  | Linux (x64) | `linux-unpacked` | `seventy-steps` |
+  | Linux (x64) | `linux-unpacked` | `seventy-steps` (a shell that starts `seventy-steps.bin` with `--no-sandbox`) |
 
   A Mac build makes each architecture with its own copy of the controllers' SDL library (`@kmamal/sdl` downloads the one of the
   machine it is installed on; `tools/package_mac.mjs` fetches the other), so **a Mac build is made on a Mac**; Windows on Windows.
@@ -108,7 +108,7 @@ because a Steam build started outside Steam would relaunch itself through it.
   Elder Sign too (`npm run icon`: `desktop/icon.js`; the Mac's is set in from the edge with a shadow, as macOS draws them), and CI prints what each
   shipped file carries. There is no .dmg: the Mac build is the `.app` (itch's app runs it; a browser download gets it zipped).
 - **The Mounts project (round 85: the two optional mounts, docs/MOUNTS.md).** The check lives in the shell, so a build with it must be live on
-  all three channels (`windows`, `osx`, `linux`) before the project is sold: 1.0.7 has no paste button. Then, on itch.io: (1) a new project, *Paid*,
+  all three channels (`windows`, `osx`, `linux`) before the project is sold: an itch build packed before this change has no paste button. Then, on itch.io: (1) a new project, *Paid*,
   its price (the in-game words name none), visibility Public with *Unlisted in search & browse* (or Draft until ready); (2) upload `UNLOCK.txt`
   (the code from `tools/mount_unlock.mjs sign`, with a line of how to use it) and tick no platform; (3) say on the page that the mounts are
   cosmetic, ride exactly like the plain chariot, are unlocked by pasting a code in the Mounts tab of the desktop game, and need the full game;

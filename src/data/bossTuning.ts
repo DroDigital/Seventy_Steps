@@ -18,7 +18,8 @@ export const BOSS = {
   evadeRange: 3.5, // metres (past its body) inside which a quick foe may slip a blow...
   evadeEvery: 75, // ...and frames between its tries
   minions: 2, // summons alive at once per summoner (round 46: three with the boss's own blows was a crowd no one could read)
-  summonEvery: 540, // frames before a summoner calls again (round 46)
+  summonCap: 3, // (round 100) summons alive at once in a boss fight, from every source together: its phases', its attack's, Shub-Niggurath's roots'; decoys are illusions and are not counted
+  summonEvery: 810, // frames before a summoner calls again (round 46; round 100: 540, now one and a half times as long)
   gap: [60, 110] as const, // frames between a boss's blows are never fewer than these (round 46: the hound struck every half-second)
   servantGap: [60, 110] as const, // and a summon's, whose own pace is longer still by 1.4x: the boss is the fight, its servants the weather
   servantDamage: 0.7, // what a summon's blow weighs against its kind's own
@@ -36,12 +37,19 @@ export const BOSS = {
   monolith: [1.8, 7] as const, // ...each this wide and tall: cover from a gaze
 };
 
+/** Dagon and Hydra share a temple: one attacks while the other yields room, with a counterattack window between turns. */
+export const SEA_BOSSES = {
+  rest: 24, // frames after the partner's complete recovery before the next wind-up may begin
+  clearance: 0.75, // metres beyond both collision radii: room to move while the waiting partner stays within a blade's reach
+};
+
 /** The reality hooks (spec §3E), live while an engaged boss's phase lists them. */
 export const REALITY = {
   ease: 1 / 90, // darkness, flood and warp move toward their targets by this much a frame
   darkLantern: 0.45, // full darkness shrinks the lantern's reach by this fraction and puts out the moon
   floodSlow: 0.35, // full flood slows the investigator by this fraction
   floodDepth: 0.7, // metres the water rises
+  floodOpacity: 0.5, // the water's cover of what lies beneath it (1 is opaque, and hides a telegraph on the ground)
   warpDrift: 0.3, // rad/s the camera drifts at full warp
   warpHz: 0.13,
   reconnectEdge: 0.8, // metres inside the arena's edge where the room rewires...
@@ -75,7 +83,7 @@ export const REALITY = {
 
 /** The Colour Out of Space: it heals by draining the world's colour. */
 export const COLOUR = {
-  heal: 18, // hp/s while the world still has colour to give (round 47: it was 30, a wall at the standing a new player has in Arkham: 2.5 lives; docs/BALANCE.md, The opening)
+  heal: 30, // hp/s while the world still has colour to give
   drain: 1 / 75, // the world's saturation lost per second of healing
 };
 
@@ -109,8 +117,8 @@ export const SHUB = {
   roots: 4,
   share: 0.55, // on a ring at this share of the arena's radius
   hp: 700, // each root's
-  every: 360, // frames between births at each root
-  young: 6, // alive at once, the most the roots bear
+  every: 540, // frames between births at each root (round 100: 360, one and a half times as long)
+  young: 3, // alive at once, the most the roots bear (round 100: six, held to the fight's cap of three)
   shielded: 0.2, // what it takes of each blow while any root stands
 };
 
@@ -130,13 +138,15 @@ export const NYARLATHOTEP = {
   watchAt: 9, // ...this far from the investigator
 };
 
-/** Azathoth: blind and invulnerable, it hears; the fight is outlasting the piping. */
+/**
+ * Azathoth (2026-10-29): blind, and a fight like any horror's, the hardest of them. It had been an ordeal of silence: invulnerable, its health bar a song that drained with the
+ * minutes (docs/DECISIONS.md). Its blows are rhythms laid over the whole court, aimed at no one (data/attacks.ts); what it does aim is an answer to a loud noise.
+ */
 export const AZATHOTH = {
-  survive: 5400, // frames of piping to outlast (its health bar is the song, draining)
-  hear: { shot: 45, sprint: 28, dodge: 20, attack: 16, walk: 7 }, // metres each noise carries
-  windup: 45, // frames from the sound to the blast where it was heard
-  rest: 60, // frames after a blast before it can hear again
-  blast: { radius: 3.5, life: 70, tick: 20, damage: 40 },
+  pace: [110, 96, 82, 68] as const, // the most frames it waits after a blow, by phase: the pauses shrink as the piping quickens (never under BOSS.gap's 60)
+  heed: { shot: 0.05, sprint: 0.008, dodge: 0.012, swing: 0.006, fade: 0.004 }, // what each frame of a loud noise adds to its attention (an answer at 1) and what a quiet one takes off: a shot is an answer and a half, a sprint answers each two seconds; in its last phase it hears a roll and a swing too
+  listens: 0.4, // the attention at which its health bar says it listens
+  answer: { power: 0.8, poise: 1, radius: 3.4, delay: 48, rest: 150, pool: { radius: 3.4, life: 80, tick: 20, power: 0.12 } }, // the mark laid where the noise was made: its blow (a share of its damage), its radius (m), the frames to its burst and before another, and the pool it leaves
 };
 
 /**

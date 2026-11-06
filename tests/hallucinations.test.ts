@@ -38,6 +38,18 @@ describe('hallucinations', () => {
     expect(g.ecs.c.phantom.size).toBe(HALLUCINATIONS.max);
   });
 
+  it('flinches to one cane-light and does not finish a chain', () => {
+    const { g, player } = scriptedGame();
+    place(g, player, 0, 0, 0);
+    setSanity(g, 10);
+    const e = conjure(g)!;
+    const poise = g.ecs.c.poise.get(e)!;
+    expect(poise.max).toBeLessThanOrEqual(14);
+    expect(poise.value).toBeLessThanOrEqual(14);
+    for (const m of Object.values(g.ecs.c.actor.get(e)!.moves)) expect(m.then).toBeUndefined();
+    for (const a of g.ecs.c.brain.get(e)!.def.attacks) expect(a.move.startsWith('combo')).toBe(false);
+  });
+
   it("a hallucination's blow takes sanity, not health", () => {
     const { g, player } = scriptedGame();
     place(g, player, 0, 0, 0);

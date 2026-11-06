@@ -14,21 +14,23 @@ import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle } from '../core/geom';
 import type { Variant } from '../data/registry';
-import { BOSS_PRESENCE } from '../data/fxTuning';
+import { BOSS_PRESENCE, CAST } from '../data/fxTuning';
 import { REVIEWED_GLINTS, REVIEWED_MATTER } from '../data/reviewedLook';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { isUnroused, type Game } from '../systems/components';
 import { MODEL_PREFIX, resolveCreature } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
+import { roofedAt } from '../world/terrain';
 import { attackLook } from './attackLook';
 import { buildAssembly, type Assembly } from './assemblies';
 import { createArrivals, risesOut } from './bossArrival';
-import { createCreatureCasters } from './creatureCasters';
 import { createCreatureFx, type Gone } from './creatureFx';
 import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
+import { createCreatureRoof } from './creatureRoof';
+import { castSilhouettes } from './silhouetteCasters';
 import { relitOf } from './creatureRelight';
-import { toneOf } from './spriteTone';
+import { toneForForm } from './spriteTone';
 import { beyond, echoDrift, ECHOES, WRONGNESS } from './eldritch';
 import { worldUniforms } from './worldMaterial';
 import { createCreatureGlow } from './creatureGlow';
@@ -83,9 +85,10 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const directions = new Map<Entity, SpriteDirection>();
   const debug: CreatureFrame[] = [];
   const fx = createCreatureFx(g); // how far gone each picture is, how worn, where it was struck (round 83)
-  const casters = createCreatureCasters(scene); // the bodies the moon, lantern and lamps cast shadows from (round 83)
+  castSilhouettes.adopt([batch, ...pages.map((p) => p.mesh)]); // and each one's own picture, cast as well (round 94)
   const flat = new THREE.Vector3(); // the camera's right, level
   const realm: [number, number, number] = [1, 1, 1]; // the realm's mid-tone this frame, at brightness 1
+  let sky = 1; // the share of the open sky the creature drawn stands in (creatureRoof.ts), set before its pictures are put
   const glow = createCreatureGlow(g, atlas, flat, CAPACITY); // the faint halos about eyes and marks, and a horror's body
   const presence = createBossPresence(g); // how deep in its fight a horror is, and how loud its voice
   scene.add(glow.mesh);
@@ -93,21 +96,21 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   const spans = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSpan(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
-  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number }, say = 0, fire = 0) => {
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number }, say = 0, fire = 0, outside = false) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
     const page = art!.manifest.pages[frame.page];
     const b = pages[frame.page];
     const index = counts[frame.page];
     if (index >= CAPACITY) return null;
     b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
-    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, 0);
+    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, outside ? 1 : 0);
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
     b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width * (1 + 0.4 * say), size.height * (1 + say), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height)
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     const glint = REVIEWED_GLINTS[key];
     b.glint.setXYZW(index, glint?.[0] ?? 0, glint?.[1] ?? 0, glint?.[2] ?? 0, glint ? 1 + fire : 0);
-    const tone = toneOf(REVIEWED_MATTER[key] ?? realm, realm, worldUniforms.uSpriteGrade.value as number); // this form's own recolour to the realm it stands in (round 83)
+    const tone = toneForForm(key, REVIEWED_MATTER[key] ?? realm, realm, (worldUniforms.uSpriteGrade.value as number) * sky); // this form's own recolour to the realm it stands in (round 83), kept to the open sky's share of it (round 96)
     b.tone.setXYZW(index, tone.cos, tone.sin, tone.boost, tone.fill);
     b.relit.setX(index, relitOf(key));
     counts[frame.page]++;
@@ -124,7 +127,9 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const at = new THREE.Vector3();
   const scale = new THREE.Vector3();
   const seen = new Set<Entity>(); // reused each frame: no garbage per frame
+  const roofSeen = new Set<Entity>(); // reviewed sprites actually drawn this frame
   const arrivals = createArrivals(); // the bosses not yet roused, and when each came into view (round 60)
+  const roofs = createCreatureRoof(); // how far each creature stands under a dungeon's roof, eased (round 96)
 
   return {
     sheet: { atlas, texture: tex, reviewed: art ? { manifest: art.manifest, textures } : undefined },
@@ -146,13 +151,14 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       const mid = worldUniforms.uSpriteTints.value[2] as THREE.Vector3;
       realm[0] = mid.x; realm[1] = mid.y; realm[2] = mid.z;
       glow.begin();
-      casters.begin();
+      castSilhouettes.begin(flat);
       painted.clear();
       const from = g.ecs.c.transform.get(g.player.id)?.pos ?? { x: 0, z: 0 };
       let n = 0;
       counts.fill(0);
       debug.length = 0;
       seen.clear();
+      roofSeen.clear();
       for (const [id, model] of g.ecs.c.model) {
         if (!model.startsWith(MODEL_PREFIX)) continue;
         const [cid, variant] = model.slice(MODEL_PREFIX.length).split('#') as [string, Variant | undefined];
@@ -183,13 +189,15 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           if (!clip) continue;
           const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
-          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints);
+          sky = roofs.sky(id, roofedAt(x, z), time); // under a dungeon's roof a creature keeps the colours it was drawn in (round 96)
+          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside);
           if (!frame) continue;
+          roofSeen.add(id);
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
           const span = spans.get(key)!;
           if (deep > 0 && gone.amount < 0.5) glow.halo(x, y + (span.top + span.bottom) / 2, z, (span.top - span.bottom) * BOSS_PRESENCE.halo.size, attackLook(g, id).line, BOSS_PRESENCE.halo.gain * deep * pose.opacity); // the colour of its blows hangs about it, deeper by phase
           painted.set(id, span.across);
-          if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre') casters.put(x, y - pose.sink * sizes.get(key)!.height * 0.3 + span.bottom, z, span.across, span.top - span.bottom, 1 - gone.amount, from); // (a spectre casts none)
+          if (!def.sprite?.outside && def.sprite?.silhouette !== 'spectre' && pose.opacity >= CAST.least) castSilhouettes.put(frame.page + 1, counts[frame.page] - 1, x, z, span.top - span.bottom, sizes.get(key)!.groundOffset, deep, 1 - gone.amount, from); // its own picture, cast as a shadow, larger by what it is and how deep in its fight (round 94; a spectre casts none, nor a shimmer in the air)
           if (direction === 'front' && !clip.mirror_horizontal) glow.reviewedEyes(key, sizes.get(key)!, x, y, z, pose, camera.position, glow.mistLook(id, time), voice);
           if (def.assembly && beyond(WRONGNESS[def.tier])) { // an outer god's body a moment behind itself, drifting, half dithered away
             ECHOES.forEach((e, i) => {
@@ -244,7 +252,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
         painted.set(id, size * 0.45);
-        if (!def.sprite.outside && def.sprite.silhouette !== 'spectre') casters.put(x, y - look.sink * size * 0.3, z, size * 0.45, size * 0.8, 1 - gone.amount, from);
+        if (!def.sprite.outside && def.sprite.silhouette !== 'spectre' && look.opacity >= CAST.least) castSilhouettes.put(0, n, x, z, size * 0.8, 0, 0, 1 - gone.amount, from);
         batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
         glow.eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, glow.mistLook(id, time));
       }
@@ -252,6 +260,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       fx.forget(seen);
       glow.forget(seen);
       stoops.forget(seen);
+      roofs.forget(roofSeen);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);
       for (const [id, asm] of assemblies) {
         if (seen.has(id)) continue;
@@ -260,7 +269,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       }
       pages.forEach((page, index) => page.finish(counts[index]));
       fallback.finish(n);
-      casters.end();
+      castSilhouettes.end();
       glow.end();
     },
   };

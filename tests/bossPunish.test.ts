@@ -72,8 +72,12 @@ describe('the punish windows (round 83)', () => {
       for (const id of attacksOf(def)) {
         const a = ATTACKS[id];
         const recovery = moves[id].frames - a.windup - a.active;
-        if (a.follow || (a.kind === 'special' && !a.sanity)) {
-          expect(recovery, `${def.id} ${id}`).toBe(a.recovery); // a link that runs on, and a special that harms nothing, as the library has them
+        if (a.follow) {
+          expect(recovery, `${def.id} ${id}`).toBe(a.recovery); // a link that runs on, as the library has it
+          continue;
+        }
+        if (a.kind === 'special' && !a.sanity) {
+          expect(recovery, `${def.id} ${id}`).toBe(Math.max(a.recovery, p.least)); // a special that harms nothing still rests at least its band's least
           continue;
         }
         expect(recovery, `${def.id} ${id}`).toBe(recoveryFor(a, band));

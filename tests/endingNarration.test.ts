@@ -10,6 +10,7 @@ import { speechLines } from '../src/data/speechLines';
 import { sceneLength } from '../src/render/cinemaPlan';
 import { createDirector } from '../src/render/cinemaDirector';
 import { createGame } from '../src/systems/game';
+import { COURT_SIGN } from '../src/systems/endings';
 
 /** The seconds of an MPEG-1 layer III file, from its frames (the length as the player hears it). */
 function seconds(file: string): number {
@@ -88,7 +89,7 @@ describe('the narrator over the endings (round 55)', () => {
     for (const id of ['seal', 'silver_key']) expect(ENDING_SCENES[id]!.beats.some((b) => b.kneel)).toBe(false);
   });
 
-  it('puts the camera on the Guide for the passage through the Gate, and on no one for the other two', () => {
+  it('anchors the passage to the Guide and the other endings to the Court', () => {
     const play = vi.fn(() => Promise.resolve());
     const g = createGame({ creature: 'umr_at_tawil' });
     createDirector(g, { play, active: false } as never, () => undefined);
@@ -96,8 +97,8 @@ describe('the narrator over the endings (round 55)', () => {
     g.events.emit('Ending', { id: 'silver_key' });
     expect(play).toHaveBeenLastCalledWith(ENDING_SCENES.silver_key, { target: guide });
     g.events.emit('Ending', { id: 'seal' });
-    expect(play).toHaveBeenLastCalledWith(ENDING_SCENES.seal, {});
+    expect(play).toHaveBeenLastCalledWith(ENDING_SCENES.seal, { sign: COURT_SIGN });
     g.events.emit('Ending', { id: 'herald' });
-    expect(play).toHaveBeenLastCalledWith(ENDING_SCENES.herald, {});
+    expect(play).toHaveBeenLastCalledWith(ENDING_SCENES.herald, { sign: COURT_SIGN });
   });
 });

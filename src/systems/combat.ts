@@ -28,6 +28,7 @@ import { walled } from './walled';
 
 /** What a blow carries into resolution; melee hits and revolver shots both fit. */
 export interface Blow {
+  enemyScale?: number; // captured by persistent enemy attacks, including the faction when their caster is gone
   damage: number;
   poise: number;
   guard: number; // stamina damage when blocked
@@ -61,7 +62,7 @@ export function resolveHit(d: Defender, blow: Blow, frontal: boolean): { outcome
   let broken = false;
   if (frontal && d.actor.guard && !blow.unblockable) {
     const cost = blow.guard * STAMINA.guardCost;
-    const available = d.stamina?.value ?? 0;
+    const available = Math.max(0, d.stamina?.value ?? 0);
     if (!d.stamina || !absorb(d.stamina, cost)) return { outcome: 'blocked', damage: 0 };
     startMove(d.actor, 'guardBreak');
     broken = true;
@@ -154,10 +155,10 @@ export function strike(g: Game, attacker: Entity, target: Entity, blow: Blow, fr
   const frontal = isFrontal(tt.pos, tt.yaw, from ?? transform.get(attacker)?.pos ?? tt.pos);
   const h = health.get(target)!;
   const defender = { actor: ta, health: h, poise: poise.get(target)!, stamina: stamina.get(target), ...(g.ecs.c.fight.has(target) && { riposte: BOSS.riposte }) };
-  const felt = g.ecs.c.phantom.has(attacker)
+  const felt = g.ecs.c.phantom.has(attacker) || blow.enemyScale === 0
     ? { ...blow, damage: 0, poise: 0, guard: 0 }
-    : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * foeDamage(g, attacker) * (h.ward ?? 1)) };
-  if (target === g.player.id && g.ecs.c.combatant.get(attacker)?.faction === 'enemy') felt.damage = Math.min(felt.damage, Math.floor(h.max * BOSS.blowMost)); // no blow of a foe's kills from full health (round 68)
+    : { ...blow, damage: Math.round(blow.damage * damageScale(g, attacker, target) * relicScale(g, attacker, target) * might(g, attacker) * (blow.enemyScale ?? foeDamage(g, attacker)) * (h.ward ?? 1)) };
+  if (target === g.player.id && (blow.enemyScale !== undefined || g.ecs.c.combatant.get(attacker)?.faction === 'enemy')) felt.damage = Math.min(felt.damage, Math.floor(h.max * BOSS.blowMost));
   const fight = g.ecs.c.fight.get(target);
   if (fight && g.frame - (fight.interruptedAt ?? -Infinity) < BOSS.rearm) felt.interrupts = false; // a horror's wind-up broken is not broken again at once
   const { outcome, damage } = resolveHit(defender, felt, frontal);

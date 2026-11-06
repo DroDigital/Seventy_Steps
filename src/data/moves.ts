@@ -53,10 +53,14 @@ export interface VolleyDef {
 }
 
 /** What a burst of marked ground is made of (round 70): the picture and the sound of it, and what it leaves. */
-export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt';
+export type MarkLook = 'tentacle' | 'star' | 'flame' | 'bolt' | 'rift';
 
-/** Where marked ground lies (round 70): in a ring about the target, as a shower over the whole court, in lines out from the attacker, or creeping after the target until it locks. */
-export type MarkPattern = 'ring' | 'rain' | 'spokes' | 'seek';
+/**
+ * Where marked ground lies (round 70): in a ring about the target, as a shower over the whole court, in lines out from the attacker, or creeping after the target until it locks.
+ * 2026-10-29, for a horror that is blind and aims at nothing, three laid about the attacker: rings that burst outward a beat at a time (`beats`), a line of spots winding out
+ * from its flank (`spiral`), and spots scattered over the whole court (`scatter`).
+ */
+export type MarkPattern = 'ring' | 'rain' | 'spokes' | 'seek' | 'beats' | 'spiral' | 'scatter';
 
 /** Marked ground (the eruption): spots about the target that burst in turn once their delay runs out. */
 export interface MarksDef {
@@ -71,6 +75,8 @@ export interface MarksDef {
   pattern?: MarkPattern;
   look?: MarkLook;
   spokes?: number; // how many lines the marks run along (pattern 'spokes')
+  rings?: number; // how many rings burst outward, one a beat, `count` being the spots of the nearest and the wider ones holding more so that they stand as far apart (pattern 'beats')
+  turns?: number; // how many times about the attacker the line of spots winds as it goes out (pattern 'spiral')
   seek?: { speed: number; lock: number }; // m/s it creeps after the target, and the frames before its burst at which it stops (pattern 'seek')
   leaves?: PoolDef; // what each burst leaves where it fell (flame, for the conflagration)
 }
@@ -97,6 +103,7 @@ export interface CloudDef {
   mind: number; // sanity a second it takes of one within, before the horror's weight (a toxic cloud's is none)
   drift: number; // m/s toward the target
   kind: 'toxic' | 'dream';
+  blind?: boolean; // 2026-10-29, a blind horror's: the banks rise about its body at even bearings and spread outward, after no one
 }
 
 /** A beam swept across an arc over its window (the sweeping beam): get behind it or roll through it. */
@@ -107,6 +114,7 @@ export interface SweepDef {
   width: number; // metres either side of the beam's line
   damage: number;
   poise: number;
+  arms?: number; // simultaneous evenly spaced rays; each target can be hit only once per sweep
 }
 
 /** Bolts loosed every few frames in several directions at once, the pattern turning as it goes (the barrage). */
@@ -237,7 +245,6 @@ export const PLAYER_MOVES = {
   parry: { frames: 36, stamina: 10, parry: [3, 11] },
   shoot: { // the revolver (round 22): one round, a shot that strikes like a heavy blow up close, and a beat before the next (systems/gun.ts: the cylinder, the fall-off with distance)
     frames: 32,
-    stamina: 10,
     cancel: 24,
     release: 24,
     track: { window: [0, 6], rate: 10 },

@@ -113,6 +113,64 @@ describe('the pad in hand (round 31)', () => {
       expect(activePad()?.mapping).toBe('standard');
     });
 
+    it('calibrates both negative trigger shapes without assuming an initial sample is rest', async () => {
+      let lt = -0.5; // a zero-rest trigger first seen held
+      let rt = 0;
+      let a = false;
+      let connected = true;
+      const buttons = () => Array.from({ length: 17 }, (_, i) => {
+        if (i === 6) return { pressed: false, value: lt };
+        if (i === 7) return { pressed: rt > 0.6, value: rt };
+        return { pressed: i === 0 && a, value: i === 0 && a ? 1 : 0 };
+      });
+      const { activePad, calibratePadTriggers } = await withShell(() => [], () => connected ? [{ index: 0, id: 'pad', connected: true, mapping: 'standard', timestamp: 1, axes: [0, 0, 0, 0], buttons: buttons() }] : []);
+      expect(calibratePadTriggers()).toBe(false);
+      for (let i = 0; i < 20; i++) expect(activePad()).toBeNull(); // held longer than the old heuristic: no false rest
+      a = true;
+      expect(activePad()!.buttons[6].pressed).toBe(false); // ambiguous input is silent until calibration
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false); // release cannot invert input
+      expect(calibratePadTriggers()).toBe(true); // both triggers are released
+      lt = -0.5;
+      expect(activePad()!.buttons[6].pressed).toBe(true);
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      lt = -0.48;
+      expect(activePad()!.buttons[6].pressed).toBe(true);
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      rt = 1;
+      expect(activePad()!.buttons[7].pressed).toBe(true); // ordinary positive trigger remains usable
+      rt = 0;
+      expect(activePad()!.buttons[7].pressed).toBe(false);
+      connected = false;
+      expect(activePad()).toBeNull();
+      connected = true;
+      lt = -0.5; // same id reconnected: this controller's rest is negative
+      a = false;
+      expect(activePad()).toBeNull();
+      a = true;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      expect(calibratePadTriggers()).toBe(true);
+      lt = 0;
+      expect(activePad()!.buttons[6].pressed).toBe(true); // rises from its calibrated rest
+      lt = -0.5;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+    });
+
+    it('hears a Safari trigger on an axis and ordinary positive triggers without calibration', async () => {
+      let axis4 = -1;
+      let rt = 0;
+      const { activePad } = await withShell(() => [], () => [{ index: 0, id: 'axis', connected: true, mapping: 'standard', timestamp: 1, axes: [0, 0, 0, 0, axis4], buttons: Array.from({ length: 17 }, (_, i) => i === 7 ? { pressed: rt > 0.6, value: rt } : { pressed: false, value: 0 }) }]);
+      expect(activePad()).toBeNull();
+      axis4 = 1;
+      expect(activePad()!.buttons[6].pressed).toBe(true);
+      axis4 = -1;
+      rt = 1;
+      expect(activePad()!.buttons[6].pressed).toBe(false);
+      expect(activePad()!.buttons[7].pressed).toBe(true);
+    });
+
     it('is as before on the web, where there is no bridge', async () => {
       let down: number[] = [];
       vi.resetModules();

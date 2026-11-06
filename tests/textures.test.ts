@@ -65,15 +65,28 @@ describe('floor slab texture', () => {
 });
 
 describe('cloth texture', () => {
-  it('is flat value blocks: no detail inside a 4-texel column or an 8-texel row band', () => {
+  it('keeps its broad folds while gaining fine surface detail', () => {
     const px = generateTexture('cloth', 1);
-    const bad: string[] = [];
-    for (let y = 0; y < S; y++) {
-      for (let x = 0; x < S; x++) {
-        if (x % 4 !== 3 && lumaAt(px, x + 1, y) !== lumaAt(px, x, y)) bad.push(`${x},${y} → x+1`);
-        if (y % 8 !== 7 && lumaAt(px, x, y + 1) !== lumaAt(px, x, y)) bad.push(`${x},${y} → y+1`);
+    const base = generateTexture('cloth', 1, false);
+    let change = 0;
+    for (let i = 0; i < px.length; i += 4) change += Math.abs(px[i] - base[i]);
+    expect(change / (S * S)).toBeGreaterThan(1);
+    expect(change / (S * S)).toBeLessThan(12);
+    // The four-by-eight blocks carry the authored folds; keep their value
+    // relationships even though the new relief varies within each block.
+    const blocks: [number, number][] = [];
+    for (let y = 0; y < S; y += 8) for (let x = 0; x < S; x += 4) {
+      let b = 0, d = 0;
+      for (let dy = 0; dy < 8; dy++) for (let dx = 0; dx < 4; dx++) {
+        b += lumaAt(base, x + dx, y + dy); d += lumaAt(px, x + dx, y + dy);
       }
+      blocks.push([b / 32, d / 32]);
     }
-    expect(bad).toEqual([]);
+    const mean = (j: number): number => blocks.reduce((sum, a) => sum + a[j], 0) / blocks.length;
+    const a = mean(0), b = mean(1);
+    const covariance = blocks.reduce((sum, p) => sum + (p[0] - a) * (p[1] - b), 0);
+    const va = blocks.reduce((sum, p) => sum + (p[0] - a) ** 2, 0);
+    const vb = blocks.reduce((sum, p) => sum + (p[1] - b) ** 2, 0);
+    expect(covariance / Math.sqrt(va * vb)).toBeGreaterThan(0.9);
   });
 });

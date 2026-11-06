@@ -20,14 +20,14 @@ export const REVIEWED_EYES: Readonly<Record<string, readonly [x: number, y: numb
 
 /** By boss form: the painted body's half-width in its legs, torso and head bands, as fractions of its height (what the fight's hurt zones are never narrower than: data/assemblyShape.ts). */
 export const REVIEWED_BODY: Readonly<Record<string, readonly [legs: number, torso: number, head: number]>> = {
-  'azathoth': [0.479, 0.34, 0.01],
+  'azathoth': [0.638, 0.551, 0.304],
   'colossus_pyramids': [0.314, 0.289, 0.205],
   'cthulhu': [0.307, 0.372, 0.255],
   'dunwich_horror': [0.374, 0.388, 0.22],
   'father_dagon': [0.315, 0.371, 0.24],
   'ghatanothoa': [0.321, 0.288, 0.21],
   'mother_hydra': [0.401, 0.413, 0.205],
-  'shub_niggurath': [0.54, 0.322, 0.023],
+  'shub_niggurath': [0.38, 0.372, 0.297],
   'yog_sothoth': [0.431, 0.374, 0.204],
 };
 
@@ -38,7 +38,6 @@ export const REVIEWED_GROUND: Readonly<Record<string, number>> = {
 
 /** By form: the exact colour (0..1) of the marks that stay lit in the dark in every view and frame (its eyes, its lamps): the sprite shader keeps the texels of this colour alight. */
 export const REVIEWED_GLINTS: Readonly<Record<string, readonly [r: number, g: number, b: number]>> = {
-  'azathoth': [1.0, 1.0, 1.0],
   'charles_le_sorcier': [0.937, 0.247, 0.569],
   'deep_one#eldritch': [0.169, 1.0, 0.627],
   'elder_thing': [0.843, 0.859, 0.792],
@@ -55,14 +54,13 @@ export const REVIEWED_GLINTS: Readonly<Record<string, readonly [r: number, g: nu
   'the_hound': [0.169, 1.0, 0.627],
   'the_outsider': [0.929, 0.902, 0.8],
   'winged_hybrid': [0.667, 0.663, 0.663],
-  'yeb': [0.929, 0.902, 0.8],
 };
 
 /** By form: the colour (0..1) of its own flesh, hide, shell or stone: what a blow throws off it. */
 export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: number, b: number]>> = {
   'albino_penguin': [0.385, 0.374, 0.346],
   'ancient_ones': [0.487, 0.452, 0.411],
-  'azathoth': [0.188, 0.079, 0.191],
+  'azathoth': [0.252, 0.151, 0.282],
   'beast_in_the_cave': [0.405, 0.359, 0.337],
   'being_from_beyond': [0.328, 0.308, 0.324],
   'being_of_ib': [0.329, 0.293, 0.171],
@@ -105,13 +103,13 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'gyaa_yothn': [0.395, 0.373, 0.346],
   'hastur': [0.402, 0.281, 0.17],
   'haunter_of_the_dark': [0.105, 0.104, 0.136],
-  'high_priest': [0.434, 0.354, 0.243],
-  'high_priest#eldritch': [0.356, 0.285, 0.18],
+  'high_priest': [0.212, 0.222, 0.288],
+  'high_priest#eldritch': [0.166, 0.159, 0.165],
   'hybrid_mummy': [0.264, 0.22, 0.179],
   'hypnos': [0.431, 0.407, 0.347],
   'innsmouth_hybrid': [0.209, 0.221, 0.156],
   'innsmouth_hybrid#eldritch': [0.204, 0.209, 0.177],
-  'joseph_curwen': [0.211, 0.183, 0.131],
+  'joseph_curwen': [0.169, 0.158, 0.16],
   'keziah_mason': [0.121, 0.112, 0.11],
   'kn_yan_dweller': [0.213, 0.19, 0.154],
   'lilith': [0.309, 0.26, 0.205],
@@ -126,7 +124,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'mother_hydra': [0.299, 0.286, 0.24],
   'nameless_city_reptile': [0.291, 0.244, 0.177],
   'night_gaunt': [0.106, 0.107, 0.113],
-  'nug': [0.25, 0.215, 0.201],
+  'nug': [0.419, 0.301, 0.235],
   'nyarlathotep': [0.135, 0.1, 0.125],
   'nyarlathotep#eldritch': [0.2, 0.145, 0.162],
   'other_gods': [0.231, 0.185, 0.228],
@@ -138,7 +136,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'shantak': [0.171, 0.17, 0.177],
   'shoggoth': [0.069, 0.079, 0.093],
   'shoggoth#boss': [0.079, 0.076, 0.097],
-  'shub_niggurath': [0.078, 0.026, 0.087],
+  'shub_niggurath': [0.182, 0.157, 0.153],
   'shunned_house_entity': [0.396, 0.344, 0.242],
   'simon_orne': [0.082, 0.079, 0.09],
   'star_spawn': [0.169, 0.215, 0.197],
@@ -156,7 +154,7 @@ export const REVIEWED_MATTER: Readonly<Record<string, readonly [r: number, g: nu
   'whisperer#eldritch': [0.232, 0.179, 0.196],
   'wilbur_whateley': [0.31, 0.182, 0.124],
   'winged_hybrid': [0.068, 0.066, 0.078],
-  'yeb': [0.124, 0.119, 0.133],
+  'yeb': [0.254, 0.191, 0.165],
   'yekubian': [0.313, 0.306, 0.304],
   'yig': [0.278, 0.222, 0.145],
   'yithian': [0.457, 0.438, 0.372],

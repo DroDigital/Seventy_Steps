@@ -12,6 +12,7 @@ import { startMove } from './actions';
 import { engagedFights } from './bossFight';
 import type { Game } from './components';
 import { discoveryAction } from './discovery';
+import { finaleAction } from './finale';
 import { lampsOf } from './reality';
 import { SIGNATURES, type FightAction } from './signatures';
 import { riteAction } from './ways';
@@ -20,6 +21,8 @@ export function fightAction(g: Game): FightAction | null {
   const c = g.ecs.c;
   const a = c.actor.get(g.player.id)!;
   if (a.move !== null) return null;
+  const finale = finaleAction(g); // the key and the tall man, before a fight's own offer
+  if (finale) return finale;
   const pp = c.transform.get(g.player.id)!.pos;
   for (const [e, f] of engagedFights(g)) {
     for (const l of lampsOf(g, f)) {

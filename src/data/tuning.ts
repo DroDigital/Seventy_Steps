@@ -34,10 +34,14 @@ export const FX = {
   charShare: 0.3, // round 34: the share of its realm's grade a character (the investigator, the people, the creatures) takes: the rest is the colours they were drawn in
   charLevels: 14, // ...and the levels each of their colours is held to (not the realm's 64: that left every horror grey; round 83: 9 before, which folded a painted ramp of 18 to 30 colours into 8 to 12)
   spriteVivid: [1.22, 0.28] as readonly [number, number], // round 83: ...and how much more colour (a share) and how much more light in its high lights (a share) the drawn creatures are given on the way to the screen, so no realm's grade leaves them one dim colour: each stands apart from the next (render/shaders/spriteGrade.ts)
-  spriteGrade: 0.7, // round 83: how far each drawn creature's form is recoloured to its realm (render/spriteTone.ts: its own measured tone swung this share of the way to the realm's mid-tone, its inner colours kept; 0.7 of a per-pixel cast made them one dim colour per realm, XDro asked for the recolour per sprite), before the light and the mist; the anomaly hues are left alone (render/shaders/spriteGrade.ts)
+  spriteGrade: 0.5, // round 83: how far each drawn creature's form is recoloured to its realm (render/spriteTone.ts: its own measured tone swung this share of the way to the realm's mid-tone, its inner colours kept; 0.7 of a per-pixel cast made them one dim colour per realm, XDro asked for the recolour per sprite), before the light and the mist; the anomaly hues are left alone (render/shaders/spriteGrade.ts); round 93: a form drawn in a strong colour of its own is held as drawn (OWN_FROM, OWN_TO in render/spriteTone.ts); round 95: 0.5, it was 0.7 (XDro: "tinting a bit too much"): the turn, the lift and the fill are linear in the share, so half the way errs least both ways, a form's hue as far from its drawn one as from the realm's (above 0.4, under which the sepia shows in a cold realm: tests/spriteGrade.test.ts)
+  spriteWarm: 0.2, // round 87: how much of the hue of the lantern's and the world's lamps' light (fires, torches, windows, a flash) a drawn creature takes: all of their brightness, this share of their colour (0: none, 1: all, as before round 87), so a creature beside the lantern stays its own colour with a little warmth on it; the moon's and the realm's cast are left as they were (render/shaders/sprite.ts creatureWarmth)
+  spriteReveal: [0.03, 0.28] as readonly [number, number], // round 93: the lantern's light on a drawn creature (its luma: the lantern's colour and strength through its falloff and the creature's facing, about 0.9 at the lamp, 0.3 at 4 m, 0.1 at 6 m) at which the creature's own colours begin to show instead of its realm's recolour, and at which they are whole: so every enemy within about 4.5 m of the lantern is as it was drawn (in the light's brightness only, no colour of it), and takes its realm's colours back by about 7 m, or as the lantern gutters (render/shaders/sprite.ts)
+  spriteRevealMost: 0.6, // round 95: the most of a creature's realm tint (spriteGrade) the lantern's light takes back, turning its hue toward the one it was drawn in along the wheel, its colour whole (render/shaders/spriteGrade.ts spriteToneBack): 0.6, so a creature in full light keeps 0.2 of the way to its realm (0.5 x 0.4) and shows its own colour with a trace of the place; round 93 gave it all, and a cross-fade of half (XDro: "soften this with a partial reveal i want both effects") greyed the forms drawn far from their realm's hue
+  spriteRoof: [0.35, 3] as readonly [number, number], // round 96: the time constants, in seconds, with which a drawn creature's realm tint comes off at a roof's door (the first) and comes back under the open sky (the second), as the realm's coat eases (data/coats.ts COAT_EASE); under a roof the creature is drawn as it was drawn (render/creatureRoof.ts)
   hueWidth: 0.1, // anomaly hue window, in 0..1 hue units
   minSaturation: 0.3, // below this a pixel never counts as an anomaly hue
-  ditherSpread: [0.05, 0.12] as Ramp,
+  ditherSpread: [0.04, 0.1] as Ramp, // restrained ordered grain, growing as the mind fails (render/shaders/post.ts)
   ripple: [0, 0.016] as Ramp, // UV units: how far the flow of the picture's edge carries it (round 58: the amplitude of a sine laid over the whole screen, 0.012)
   chroma: [0, 0.009] as Ramp, // UV units: the lens's split of the colours at the edge of the picture (round 58: it turned about, whole)
   ghost: [0, 0.34] as Ramp, // round 58: the share of a second picture, a little to one side, that a failing mind sees double with, at the surge's height (a fraction of that, as the warp is)
@@ -89,7 +93,7 @@ export const LIGHT = {
 /** The investigator's lantern: a warm point light at the hip, the night's only real light. */
 export const LANTERN = {
   color: [1, 0.82, 0.58] as Vec3,
-  intensity: 1.15, // (round 58: 1.5; the lantern lit a whole corridor and the road about it, and the dark it was to be walked through was not there)
+  intensity: 1.3, // +13% over 1.15: a stronger warm pool against the 85% brightness baseline, with the same falloff and reach
   range: 8.5, // metres: the light fades smoothly to nothing here (no hard edge) (round 58: 11)
   decay: 0.12, // inverse-square falloff, per m², so the pool is brightest at the player
   facing: 0.5, // weight of N·L: surfaces turned away keep 1 - facing of the light
@@ -235,7 +239,6 @@ export const LOCK = {
 export const CAMERA = {
   pivotHeight: 1.7,
   distance: 5.6, // round 32: was 4.2: the investigator stands about a quarter of the picture's height, the land about them seen
-  minDistance: 0.5,
   shoulder: 0.45, // metres the boom hangs to the right of the player, so a lock target is not hidden behind them
   margin: 0.3, // keeps the lens this far off walls
   clearance: 0.25, // metres above the ground
@@ -256,6 +259,7 @@ export const INPUT = {
   deadzone: 0.2, // gamepad sticks
   mouseSensitivity: 0.0025, // rad per pixel
   lockSettleMs: 250, // milliseconds after the browser grants the mouse in which its movement is not read (round 60: the first movement reported with a fresh lock can be the cursor's jump to the middle, which turned the camera to another view)
+  lockAskMs: 250, // milliseconds after the mouse is asked for, before it is granted, in which its movement is not read (round 91: a move reported between the ask and the grant, such as the cursor's warp to the middle, is no look; a refusal ends the wait at once, and with neither a grant nor a refusal the hand is read again once this has passed)
   stickLookSpeed: 3.2, // rad/s at full deflection
   keyLookSpeed: 2.4, // rad/s (arrow keys)
   flickPixels: 60, // mouse flick that switches lock target

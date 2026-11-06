@@ -10,55 +10,41 @@ import { hash2 } from '../core/rng';
 import { RELICS, RELIC_IDS, RELIC_SLOTS, TEMPERS, type Relic, type RelicId } from '../data/relics';
 import type { Game } from './components';
 import { markNew } from './finds';
+import { refreshRelicVitals } from './levels';
+import { boon, isRelic, KEY, SLOT, slotsOf } from './relicLoadout';
 import { restoreSanity } from './sanity';
 
-const KEY = 'relic:'; // owned: `relic:<id>`, in the order found
-const SLOT = 'slot:'; // worn: `slot:<n>:<id>`, one at most for each slot
+export { boon, owned, slotsOf, worn } from './relicLoadout';
 
 type Told = Set<string>;
-const isRelic = (id: string): id is RelicId => (RELIC_IDS as readonly string[]).includes(id);
-
-/** The relics found, in the order they were. */
-export const owned = (g: Pick<Game, 'overworld'>): RelicId[] =>
-  [...(g.overworld?.told ?? [])].filter((k) => k.startsWith(KEY)).map((k) => k.slice(KEY.length)).filter(isRelic);
-
-/** What each slot holds (null: empty). */
-export function slotsOf(g: Pick<Game, 'overworld'>): (RelicId | null)[] {
-  const told = g.overworld?.told ?? new Set<string>();
-  return Array.from({ length: RELIC_SLOTS }, (_, n) => {
-    const k = [...told].find((x) => x.startsWith(`${SLOT}${n}:`));
-    const id = k?.slice(`${SLOT}${n}:`.length);
-    return id && isRelic(id) && told.has(KEY + id) ? id : null;
-  });
-}
-
-/** The relics worn now. */
-export const worn = (g: Pick<Game, 'overworld'>): RelicId[] => slotsOf(g).filter((id): id is RelicId => id !== null);
-
+const LOADOUT = 'relic-loadout:1'; // distinguishes deliberately empty slots from a save made before slots existed
 function put(told: Told, slot: number, id: RelicId | null): void {
+  told.add(LOADOUT);
   for (const k of [...told]) if (k.startsWith(`${SLOT}${slot}:`)) told.delete(k);
   if (id) told.add(`${SLOT}${slot}:${id}`);
 }
 
 /** Wears `id` in `slot` (or with null, takes that slot's off). One already worn in the other slot changes places with it; false for a relic not found or a slot there is not. */
-export function wear(g: Pick<Game, 'overworld'>, slot: number, id: RelicId | null): boolean {
+export function wear(g: Game, slot: number, id: RelicId | null): boolean {
   const told = g.overworld?.told;
   if (!told || !Number.isInteger(slot) || slot < 0 || slot >= RELIC_SLOTS || (id && !told.has(KEY + id))) return false;
   const now = slotsOf(g);
   const other = id ? now.indexOf(id) : -1;
   if (other >= 0 && other !== slot) put(told, other, now[slot]);
   put(told, slot, id);
+  refreshRelicVitals(g);
   return true;
 }
 
 /** A relic found: it is theirs, and worn at once if a slot is free. True when it is worn. */
-export function grant(g: Pick<Game, 'overworld'>, id: RelicId): boolean {
+export function grant(g: Game, id: RelicId): boolean {
   const told = g.overworld?.told;
   if (!told) return false;
   told.add(KEY + id);
   const free = slotsOf(g).indexOf(null);
   if (free < 0) return false;
   put(told, free, id);
+  refreshRelicVitals(g);
   return true;
 }
 
@@ -67,14 +53,13 @@ export function grant(g: Pick<Game, 'overworld'>, id: RelicId): boolean {
  * chosen. A save with slots (or with none found) is left as it is.
  */
 export function settleRelics(told: Told): void {
-  if ([...told].some((k) => k.startsWith(SLOT))) return;
+  if (told.has(LOADOUT)) return;
+  if ([...told].some((k) => k.startsWith(SLOT))) {
+    told.add(LOADOUT);
+    return;
+  }
   const found = [...told].filter((k) => k.startsWith(KEY)).map((k) => k.slice(KEY.length)).filter(isRelic);
   found.slice(0, RELIC_SLOTS).forEach((id, n) => put(told, n, id));
-}
-
-/** The product of one gift across the worn relics. */
-export function boon(g: Pick<Game, 'overworld'>, k: keyof Omit<Relic, 'name' | 'note'>): number {
-  return worn(g).reduce((n, id) => n * ((RELICS[id] as Relic)[k] ?? 1), 1);
 }
 
 /** Which relic a horror of this name leaves: the first not yet found, from a start of its own. */
@@ -102,7 +87,7 @@ export function registerRelics(g: Game): void {
     g.events.emit('Found', { kind: 'relic', id, from: name, worn: on });
   });
   g.events.on('Died', ({ entity, killer }) => {
-    if (killer !== g.player.id || entity === g.player.id) return;
+    if (killer !== g.player.id || entity === g.player.id || g.ecs.c.combatant.get(entity)?.showcase) return;
     const t = TEMPERS[g.player.weapon as keyof typeof TEMPERS];
     if (t?.sanity) restoreSanity(g, t.sanity);
   });
@@ -118,6 +103,6 @@ export interface Effect {
 export function relicEffects(id: RelicId): Effect[] {
   const r = RELICS[id] as Relic;
   const pct = (v: number): string => `${v >= 1 ? '+' : '−'}${Math.round(Math.abs(v - 1) * 100)}%`;
-  const rows: [number | undefined, string, boolean][] = [[r.dealt, 'Damage', true], [r.taken, 'Damage taken', false], [r.echoes, 'Echoes', true], [r.mend, 'Mending', true]]; // the last: whether more of it is a gift
+  const rows: [number | undefined, string, boolean][] = [[r.dealt, 'Damage', true], [r.taken, 'Damage taken', false], [r.health, 'Max health', true], [r.stamina, 'Max stamina', true], [r.recovery, 'Stamina recovery', true], [r.echoes, 'Echoes', true], [r.mend, 'Mending', true]];
   return rows.filter(([v]) => v !== undefined && v !== 1).map(([v, what, more]) => ({ text: `${what} ${pct(v!)}`, good: (v! > 1) === more }));
 }

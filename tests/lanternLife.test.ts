@@ -8,7 +8,56 @@ import { setSanity } from '../src/systems/sanity';
 const sample = (f: (age: number) => number, seconds: number): number[] => Array.from({ length: Math.round(seconds * 60) + 1 }, (_, i) => f(i / 60));
 const dips = (xs: number[]): number => xs.reduce((n, x, i) => n + (i > 0 && xs[i - 1] > 0.6 && x < 0.3 ? 1 : 0), 0);
 
-describe('round 58: the lantern gutters out when the mind comes Unmoored, and catches again above it', () => {
+describe('the lantern dims with sanity, gutters out when Unmoored, and catches again above it', () => {
+  it('dims smoothly within and across the lit bands, and brightens again with recovery', () => {
+    const g = createWorldGame();
+    let last = lanternGain(g);
+    expect(last).toBe(1);
+    for (let sanity = 99; sanity >= 15; sanity--) {
+      setSanity(g, sanity);
+      const gain = lanternGain(g);
+      expect(gain).toBeLessThan(last);
+      expect(last - gain).toBeLessThan(0.03); // no steps at the band boundaries
+      expect(lanternGain(g)).toBe(gain); // rendering twice does not advance it
+      last = gain;
+    }
+    expect(last).toBeCloseTo(gutterGain(0.5)); // the dimming reaches the first low flicker dip
+    for (let sanity = 16; sanity <= 100; sanity++) {
+      setSanity(g, sanity);
+      const gain = lanternGain(g);
+      expect(gain).toBeGreaterThan(last);
+      last = gain;
+    }
+    expect(last).toBe(1);
+  });
+
+  it('keeps useful light early and approaches the first flicker brightness late in the decline', () => {
+    const g = createWorldGame();
+    setSanity(g, 70);
+    expect(lanternGain(g)).toBeGreaterThan(0.9);
+    setSanity(g, 40);
+    expect(lanternGain(g)).toBeGreaterThan(0.5);
+    setSanity(g, 25);
+    expect(lanternGain(g)).toBeLessThan(0.35);
+    setSanity(g, 15);
+    expect(lanternGain(g)).toBeCloseTo(gutterGain(0.5));
+    expect(lanternGain(g)).toBeGreaterThan(0);
+  });
+
+  it('begins dim when loaded at low sanity, and enters the gutter without flaring brighter', () => {
+    const g = createWorldGame();
+    setSanity(g, 15);
+    const dim = lanternGain(g);
+    expect(dim).toBeCloseTo(LANTERN_LIFE.minGain);
+    setSanity(g, 14);
+    expect(lanternGain(g)).toBeCloseTo(dim);
+    for (let frame = 1; frame <= Math.ceil(LANTERN_LIFE.gutter * 60); frame++) {
+      g.frame = frame;
+      expect(lanternGain(g)).toBeLessThanOrEqual(dim);
+    }
+    expect(lanternGain(g)).toBe(0);
+  });
+
   it('gutters: up at first, stuttering lower and lower, then out', () => {
     const xs = sample(gutterGain, LANTERN_LIFE.gutter);
     expect(xs[0]).toBeGreaterThan(0.95);
@@ -36,11 +85,11 @@ describe('round 58: the lantern gutters out when the mind comes Unmoored, and ca
     expect(lanternGain(g)).toBe(1);
     setSanity(g, 10);
     expect(g.mind.band).toBe('unmoored');
-    expect(lanternGain(g)).toBeGreaterThan(0.95); // the instant it falls: still burning
+    expect(lanternGain(g)).toBeCloseTo(LANTERN_LIFE.minGain); // still burning, at the dim end of the sanity curve
     g.frame += 35;
     const seen: number[] = [];
     for (let i = 0; i < 54; i++) { g.frame += 1; seen.push(lanternGain(g)); }
-    expect(seen.some((x) => x < 0.3) && seen.some((x) => x > 0.6)).toBe(true); // guttering
+    expect(seen.some((x) => x < 0.3 * LANTERN_LIFE.minGain) && seen.some((x) => x > 0.6 * LANTERN_LIFE.minGain)).toBe(true); // the same gutter, from a dimmer flame
     g.frame += 120;
     expect(lanternGain(g)).toBe(0); // out
     g.frame += 60 * 600;
@@ -52,6 +101,9 @@ describe('round 58: the lantern gutters out when the mind comes Unmoored, and ca
     expect(g.mind.band).toBe('fractured'); // one band above
     expect(lanternGain(g)).toBeLessThan(0.1);
     g.frame += Math.ceil(LANTERN_LIFE.kindle * 60) + 1;
+    expect(lanternGain(g)).toBeGreaterThanOrEqual(LANTERN_LIFE.minGain);
+    expect(lanternGain(g)).toBeLessThan(0.45); // kindles at low sanity's brightness
+    setSanity(g, 100);
     expect(lanternGain(g)).toBe(1);
 
     const loaded = createWorldGame();

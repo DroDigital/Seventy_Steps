@@ -1,6 +1,6 @@
 /**
  * The interface's two typefaces (round 74, asked for): IM Fell English for what is read (SIL Open Font License) and Special Elite
- * for the intro's telegram (Apache 2.0); their licences and credits are in public/fonts. They are loaded before the game's
+ * (Apache 2.0, unused by any card since round 101); their licences and credits are in public/fonts. They are loaded before the game's
  * module (boot.ts), so a canvas card, which draws once and is never repainted, is never set in the fallback. One that
  * does not arrive leaves the system stack behind it in `hudKit` (which also sets what the fonts have no glyph for).
  */
@@ -9,11 +9,19 @@ export interface FontFile {
   family: string;
   file: string; // under public/fonts
   style: 'normal' | 'italic';
+  range?: string; // the characters this face is used for (CSS unicode-range); all it has, if none
 }
 
 export const FONT_FILES: readonly FontFile[] = [
   { family: 'IM Fell English', file: 'IMFellEnglish-Regular.woff2', style: 'normal' },
   { family: 'IM Fell English', file: 'IMFellEnglish-Italic.woff2', style: 'italic' },
+  { family: 'EB Garamond', file: 'EBGaramond-Regular.woff2', style: 'normal' },
+  { family: 'EB Garamond', file: 'EBGaramond-Italic.woff2', style: 'italic' },
+  // IM Fell English has oldstyle figures only, so "100" read "ıoo" and "0" an "o" on the HUD, whose root asks for lining, tabular
+  // figures it could not give. Its digits and percent sign are taken from EB Garamond (already shipped; lining by default, with tnum):
+  // `Fell Figures` stands first in `DEFAULT_SERIF` for those characters alone, and IM Fell English sets the rest.
+  { family: 'Fell Figures', file: 'EBGaramond-Regular.woff2', style: 'normal', range: 'U+0025, U+0030-0039' },
+  { family: 'Fell Figures', file: 'EBGaramond-Italic.woff2', style: 'italic', range: 'U+0025, U+0030-0039' },
   { family: 'Special Elite', file: 'SpecialElite-Regular.woff2', style: 'normal' },
 ];
 
@@ -24,7 +32,7 @@ export async function loadFonts(): Promise<void> {
   if (typeof document === 'undefined' || !document.fonts) return;
   const loads = FONT_FILES.map(async (f) => {
     try {
-      const face = new FontFace(f.family, `url(${import.meta.env.BASE_URL}fonts/${f.file}) format('woff2')`, { style: f.style, weight: '400' });
+      const face = new FontFace(f.family, `url(${import.meta.env.BASE_URL}fonts/${f.file}) format('woff2')`, { style: f.style, weight: '400', ...(f.range && { unicodeRange: f.range }) });
       document.fonts.add(await face.load());
     } catch (error) {
       console.warn(`font ${f.file} did not load; the system face stands in`, error);

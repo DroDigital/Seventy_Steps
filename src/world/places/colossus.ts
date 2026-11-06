@@ -20,7 +20,9 @@ export const colossus: PlaceFn = (c: Court, h: House) => {
   const G = c.R + (h.reach ?? HOUSE.reach);
   const [S, B] = [c.R + 26, c.R + 26]; // (the court was 14 m about the fight's ring; the new pylon is 85 m across, and the court stands before it)
   const gate = h.gate.width / 2 + 0.7;
-  const [foot, crown] = [33, 31.4]; // the pylon's towers reach out to 33 m either side of the gate's middle, 31 m high
+  // The doorway's threshold is 6.3 m up the mesh and the lintel 18.74 m (the middle under the threshold is empty). A set piece is drawn 0.15 m into the ground, so this lands the threshold on the court the gate stands on. The fires and banners come down with the mesh.
+  const DROP = 6.3 - 0.15;
+  const [foot, crown] = [33, 31.4 - DROP]; // the towers reach 33 m either side of the gate's middle; the fires sit 31.4 m up the mesh
   const wall: Put = { ...SAND, stretch: [1, 1, 2.6], height: 9 };
 
   // the wall, and the pylon that stands in its front
@@ -29,10 +31,10 @@ export const colossus: PlaceFn = (c: Court, h: House) => {
   c.run('tp_wall_mid', [G, S], [-B, S], wall);
   c.run('tp_wall_mid', [G, -S], [-B, -S], wall);
   c.run('tp_wall_mid', [-B, S], [-B, -S], { ...wall, height: 10 });
-  c.add('eg_pylon', G, 0, { ...SAND, face: 'front', jitter: 0 });
+  c.add('eg_pylon', G, 0, { ...SAND, face: 'front', jitter: 0, y: -DROP });
   for (const side of [-1, 1]) {
     c.add('px_brazier', G, side * 19, { y: crown, s: 2.6, lit: 'fire', round: true });
-    for (let i = 0; i < 2; i++) c.add(FLAGS[(i + (side > 0 ? 2 : 0)) % 4]!, G + 5.6, side * (12 + i * 14), { y: 7, s: 3.4, face: 'front', walk: true });
+    for (let i = 0; i < 2; i++) c.add(FLAGS[(i + (side > 0 ? 2 : 0)) % 4]!, G + 5.6, side * (12 + i * 14), { y: 7 - DROP, s: 3.4, face: 'front', walk: true });
     c.add('px_obelisk', G + 9, side * (gate + 9), { ...WORN, s: 1.0 });
   }
 

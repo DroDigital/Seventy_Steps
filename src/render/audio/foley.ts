@@ -7,7 +7,7 @@
  * up, an arm reinforced, a knee bent and risen from (round 40: each placed on its move's own frames, data/foleySounds.ts
  * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation. Round 83: the footsteps are understated (quieter at every
  * pace, a lilt between the feet, no two alike, the bright recordings dulled: data/footSounds.ts `STEP_VOICE`) and a room that answers a
- * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly.
+ * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly. Round 86: a step on a dungeon room's floor is lifted back (`STEP_VOICE.indoors`, footing.ts `indoorLift`, foley.ts `indoorsAt`): round 83 had left it almost unheard there.
  */
 
 import type { Entity } from '../../core/ecs';
@@ -26,6 +26,7 @@ import { isAbsent, type Game } from '../../systems/components';
 import { chunkContent } from '../../world/chunks';
 import { worldLayout } from '../../world/placements';
 import { segmentDistance } from '../../world/roads';
+import { dungeonRoomAt } from '../../world/terrain';
 import { chunkOf } from '../../world/worldMap';
 import { groundAt } from '../../world/groundKind';
 import { wetness } from '../wetness';
@@ -51,6 +52,13 @@ export function surfaceAt(g: Game, x: number, y: number, z: number): Surface {
   if (chunkContent(cx, cz).roads.some((s) => segmentDistance(x, z, s.a, s.b) < s.width / 2)) return 'road';
   return 'dirt';
 }
+
+/**
+ * Whether (x, y, z) is on the floor of one of a dungeon's rooms, which is what lifts a step (`STEP_VOICE.indoors`, round 86). `surfaceAt` says 'stone'
+ * all through the rectangle round a dungeon, and a branching one's holds open ground between its branches: that selects a recording, it does not
+ * say the body is indoors.
+ */
+export const indoorsAt = (g: Game, x: number, y: number, z: number): boolean => !!g.overworld && surfaceAt(g, x, y, z) === 'stone' && dungeonRoomAt(x, z) !== null;
 
 /** Metres between footfalls at `speed`. */
 export const strideAt = (speed: number): number => {
@@ -97,7 +105,7 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe, room: () 
     const feel = footFeel(surface, groundAt(g, p.x, p.y, p.z));
     const lowpass = stepLowpass(surface, feel.lowpass);
     const answer = room();
-    play(feel.set ?? STEPS[surface], gain * feel.gain * stepGain(surface), 0, feel.pitch, lowpass, answer && echoesOf(answer, foot, lowpass, speed));
+    play(feel.set ?? STEPS[surface], gain * feel.gain * stepGain(surface, indoorsAt(g, p.x, p.y, p.z)), 0, feel.pitch, lowpass, answer && echoesOf(answer, foot, lowpass, speed));
     return surface;
   }
 

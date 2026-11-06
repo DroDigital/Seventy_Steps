@@ -35,9 +35,16 @@ creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 | Rest, talk, act | E | A |
 | Summon / dismiss mount | B | L3 |
 | Map / pause | M / Esc | View / Menu |
+| Developer console | ` (backquote) | D-pad Right twice |
 
 Every keyboard action can be rebound under Controls. Prompts name the buttons of whichever device you
 used last.
+
+The developer console provides searchable commands and a controller-navigable list for visiting boss
+entrances and rooms, spawning creatures, clearing showcase spawns, and toggling free flight. Enter
+`help` for command syntax. In flight, move and look with the usual controls; hold Space / B to rise
+and right mouse / LB to descend. The world pauses while the console or free camera is active. A
+teleport moves the investigator in the current game and can be saved; demo boundaries still apply.
 
 Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the plain chariot,
 one horse drawing a wooden coach of the spectral chariot's pattern. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.

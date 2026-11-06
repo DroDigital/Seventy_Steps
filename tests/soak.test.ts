@@ -9,6 +9,7 @@ import { createRng } from '../src/core/rng';
 import { BUTTONS, emptyInput, type Button, type InputFrame } from '../src/core/input';
 import { GUN, SANITY } from '../src/data/tuning';
 import { ROSTER_IDS } from '../src/data/roster';
+import { WEAPONS } from '../src/data/weapons';
 import { createWorldGame, stepGame } from '../src/systems/game';
 import { rest, teleport, travelBar } from '../src/systems/checkpoints';
 import { spawnCreature } from '../src/systems/creatures';
@@ -27,6 +28,9 @@ const say = (s: string): void => void out.push(s);
 const summaries: string[] = [];
 
 const finite = (n: unknown): boolean => typeof n === 'number' && Number.isFinite(n);
+/** The lowest a body may stand: the deepest dungeon floor (round 104: the Stairs of Slumber's Gate, 123 m under their head), less a chasm's fall. */
+const LOWEST = Math.min(-80, ...worldLayout().dungeons.flatMap((d) => d.layout.rooms.map((r) => Math.min(r.level, r.level + r.rise)))) - 40;
+const DEBT = Math.max(...Object.values(WEAPONS).flatMap((weapon) => Object.values(weapon.moves).map((move) => move.stamina ?? 0))); // the largest cost of any action: any of them may overdraw the bar
 
 /** How many looks running the investigator has been found inside something solid. */
 const embedded = new WeakMap<Game, number>();
@@ -36,7 +40,7 @@ function invariants(g: Game): string[] {
   const c = g.ecs.c;
   for (const [id, t] of c.transform) {
     if (![t.pos.x, t.pos.y, t.pos.z, t.yaw].every(finite)) bad.push(`entity ${id} (${c.model.get(id) ?? c.combatant.get(id)?.name ?? '?'}) transform not finite: ${JSON.stringify(t.pos)} yaw ${t.yaw}`);
-    else if (Math.abs(t.pos.x) > 9000 || Math.abs(t.pos.z) > 9000 || t.pos.y < -80 || t.pos.y > 400) bad.push(`entity ${id} (${c.combatant.get(id)?.name ?? c.model.get(id) ?? '?'}) far off: ${JSON.stringify(t.pos)}`); // (round 73: the Outer Dark runs east to 8192 m; the bound was 6000)
+    else if (Math.abs(t.pos.x) > 9000 || Math.abs(t.pos.z) > 9000 || t.pos.y < LOWEST || t.pos.y > 400) bad.push(`entity ${id} (${c.combatant.get(id)?.name ?? c.model.get(id) ?? '?'}) far off: ${JSON.stringify(t.pos)}`); // (round 73: the Outer Dark runs east to 8192 m; the bound was 6000)
   }
   const [pt, pb] = [c.transform.get(g.player.id), c.body.get(g.player.id)];
   const dying = c.actor.get(g.player.id)?.move === 'death' || (c.health.get(g.player.id)?.hp ?? 1) <= 0 || !!g.player.falling; // a body in its death throes is shoved about by whatever stands on it, and is up in the next breath; one over an edge (a gap by the Elder Sign at Zin is one) is meant to be below the ground
@@ -55,7 +59,7 @@ function invariants(g: Game): string[] {
     else if (h.hp > h.max + 1e-6) bad.push(`entity ${id} hp ${h.hp} > max ${h.max}`);
     else if (h.hp < 0) bad.push(`entity ${id} hp ${h.hp} < 0`);
   }
-  for (const [id, s] of c.stamina) if (!finite(s.value) || s.value < -1e-6 || s.value > s.max + 1e-6) bad.push(`entity ${id} stamina ${s.value}/${s.max}`);
+  for (const [id, s] of c.stamina) if (!finite(s.value) || s.value < (id === g.player.id ? -DEBT : 0) - 1e-6 || s.value > s.max + 1e-6) bad.push(`entity ${id} stamina ${s.value}/${s.max}`);
   const m = g.mind;
   if (!finite(m.sanity) || m.sanity < 0 || m.sanity > SANITY.max) bad.push(`sanity ${m.sanity}`);
   const p = g.player;

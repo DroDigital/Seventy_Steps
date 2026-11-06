@@ -45,11 +45,24 @@ export function record<K extends keyof import('../src/systems/components').GameE
   return log;
 }
 
+/** Sends every horror away and keeps it from streaming back: the walk is of the walls, and a body beside them can shove the investigator through. */
+function sendAway(g: Game): void {
+  const ow = g.overworld;
+  if (ow) {
+    for (const id of ow.alive.keys()) ow.killed.add(id);
+    ow.alive.clear();
+  }
+  for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
+}
+
 /** Walks from `from` straight at (`to.x`, `to.z`) for `frames` (the investigator's horrors sent away first), and returns where they end. */
 export function walkEnd(g: Game, to: { x: number; z: number }, from: { x: number; z: number }, frames: number): { x: number; z: number } {
   goTo(g, from.x, from.z, Math.atan2(to.x - from.x, to.z - from.z));
-  for (const id of [...g.ecs.c.dread.keys()]) g.ecs.despawn(id);
-  for (let k = 0; k < frames; k++) stepGame(g, { ...emptyInput(), moveY: 1 });
+  sendAway(g);
+  for (let k = 0; k < frames; k++) {
+    stepGame(g, { ...emptyInput(), moveY: 1 });
+    sendAway(g); // population fills at the end of the step: gone again before the next one moves
+  }
   return g.ecs.c.transform.get(g.player.id)!.pos;
 }
 

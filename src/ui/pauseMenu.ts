@@ -14,6 +14,7 @@ import { button, createScreen, el, footer, menuOpen, onPadStart, title, type Pag
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { settingsPage } from './menuPages';
+import { brightnessPage } from './brightnessCalibration';
 import type { SettingId, Settings } from './settings';
 
 export interface PauseOptions {
@@ -58,6 +59,9 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     screen.close();
     o.resume();
   };
+  /** Settings; from its Display tab the brightness card, which returns to them. */
+  const settingsHere = (): Page => settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0, () => screen.show(cardHere()));
+  const cardHere = (): Page => brightnessPage(o.settings, o.change, () => screen.show(settingsHere()));
   const main: Page = {
     back: resume,
     build(p) {
@@ -75,7 +79,7 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
       }
       if (o.achievements) button(list, t('pause.achievements'), () => screen.show(o.achievements!(() => screen.show(main))));
       gap();
-      button(list, t('menu.settings'), () => screen.show(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys)));
+      button(list, t('menu.settings'), () => screen.show(settingsHere()));
       button(list, t('menu.credits'), () => screen.show(creditsPage(() => screen.show(main))));
       gap();
       button(list, t('pause.quitTitle'), o.quit).classList.add('exit'); // the ways out are dimmer, and light ash-red when chosen

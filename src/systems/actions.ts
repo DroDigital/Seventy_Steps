@@ -15,7 +15,7 @@ import { COMBAT } from '../data/tuning';
 import { isAbsent, type Actor, type Game } from './components';
 import { ageBuffer, takeBuffered, type ActionId } from './inputBuffer';
 import { gunAction } from './gun';
-import { canAfford, spend } from './stamina';
+import { canStart, spend } from './stamina';
 import { targetsOf } from './targets';
 
 export const inWindow = (w: Window | undefined, frame: number): boolean =>
@@ -116,12 +116,11 @@ function callOff(a: Actor): void {
   a.hits.clear();
 }
 
-/** Starts the player's action if any stamina is left: faces the lock target or the stick, rolls along the stick. */
+/** Starts an affordable action: faces the lock target or the stick, rolls along the stick. */
 function startAction(g: Game, a: Actor, action: ActionId): void {
   const { stamina, transform, mover } = g.ecs.c;
   const id = g.player.id;
   const st = stamina.get(id);
-  if (!canAfford(st)) return;
   const m = mover.get(id)!;
   const speed = Math.hypot(m.vx, m.vz);
   const moving = speed > 0.1;
@@ -131,6 +130,8 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
   const move = action === 'light' || action === 'heavy' ? comboMove(a, action) : action === 'dodge' ? dodge : action === 'item' ? 'drink' : action === 'heal' ? 'inject' : gun ?? action;
   const def = a.moves[move];
   if (!def) return;
+  const cost = def.stamina ?? 0;
+  if (!canStart(st, cost)) return; // a funded action may overdraw the bar; a debt must recover before the next starts
   if (def.rest !== undefined && (a.move === move || (a.move === null && a.last === move && a.idle < def.rest))) return; // not again until it has rested
   if (action === 'item') {
     if (g.player.laudanum <= 0) return;
@@ -144,7 +145,7 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
     if (g.player.oil <= 0) return;
     g.player.oil--; // and a flask of oil (round 12)
   }
-  if (st && def.stamina) spend(st, def.stamina);
+  if (st && cost) spend(st, cost, true);
   startMove(a, move);
   if (move === 'reload') g.events.emit('Reloading', { entity: id });
   g.player.blockRaised = false; // a blow struck from behind a raised guard plays out
@@ -167,7 +168,7 @@ export function actionSystem(g: Game): void {
   for (const [id, a] of actor) if (!isAbsent(g, id)) advance(a);
   const p = g.player;
   const a = actor.get(p.id)!;
-  const parrying = p.buffer.action === 'parry' && canAfford(g.ecs.c.stamina.get(p.id)); // a parry that cannot start calls nothing off
+  const parrying = p.buffer.action === 'parry' && canStart(g.ecs.c.stamina.get(p.id), a.moves.parry?.stamina ?? 0); // a parry that cannot start calls nothing off
   if (!a.frozen && guardCancels(a) && (p.blockRaised || parrying)) callOff(a); // raising the guard cuts an attack short
   const release = moveDef(a)?.release;
   if (!a.frozen && release !== undefined && a.frame >= release && walking(g)) finish(a); // walked out of a dodge's recovery

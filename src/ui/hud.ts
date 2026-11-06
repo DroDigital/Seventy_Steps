@@ -34,16 +34,20 @@ import { QUIET } from '../data/uiMood';
 import { DYING_MS } from './journeys';
 import { gauge, pipRow } from './gauges';
 import { blend, BLOOD, BONE, el, LEAF, percent, SERIF, setStyle, setText } from './hudKit';
+import { bleeding } from '../systems/sanity';
 import { HEART } from '../render/feel';
 import type { MapPainter } from './mapPainter';
 import { menuOpen } from './menuKit';
 import { createHints } from './hints';
+import { createSteps, stepTips, tipWaiting } from './firstSteps';
+import { createTipCard } from './tipCard';
 import { createNoticeBoard } from './noticeFade';
-import { createMindHud } from './mindHud';
-import { createMinimap } from './minimap';
+import { createMindHud, MAGENTA } from './mindHud';
+import { createMinimap, minimapYaw } from './minimap';
 import { PICTURE_LAYER, uiScale } from './uiScale';
 import { MOUNTS } from '../data/mounts';
 import { mountUnlocked } from '../systems/mounts';
+import { signCalls, type SignCall } from '../systems/signCalls';
 
 const HOT = '#d2674f'; // the health bar at a stroke of the heart
 const MOUNT_TIP_MS = 5000; // the summon and ride lines leave; they are not a permanent prompt
@@ -70,14 +74,20 @@ export interface Hud {
 export interface HudOptions {
   held?: () => boolean;
   quiet?: () => boolean;
+  /** Settings › Play › Minimap: north kept up. */
+  northUp?: () => boolean;
+  tips?: () => boolean; // round 102: Settings › Play › Control tips (ui/firstSteps.ts)
 }
 
 /** `held`: Echoes earned but still on their way to the investigator (render/echoFx.ts): the count rises as they land. */
 /** `tracker`: whether the quest tracker is asked for (Settings › Play). */
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
-  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer (round 80): the bars, counters, map and quest line, which sink together
-  const minimap = createMinimap(g, dim, painter);
+  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer: the bars, counters and map sink together
+  const questLayer = el('position:absolute;inset:0', '', root); // the objective stays readable when the other HUD recedes
+  const northUp = opts.northUp ?? (() => false);
+  const minimap = createMinimap(g, dim, painter, northUp);
+  const steps = createSteps(g); // before the hints: what a save loaded had been told already
   const hints = createHints(g);
   const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', dim); // (the vitals at the upper left)
   const hp = gauge(vitals, BLOOD, 7, true);
@@ -86,7 +96,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   hp.style.position = 'relative';
   let chipPct = 100;
   let chipHold = 0;
-  const stamina = gauge(vitals, LEAF, 3);
+  const stamina = gauge(vitals, LEAF, 4);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
   const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#8a8678'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
   const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#8a8678'); // the cylinder's six and the spare rounds (round 22)
@@ -118,9 +128,18 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   const calm = createCalm(g, () => !dying && !screenHeld && !menuOpen() && !opts.held?.() && (opts.quiet?.() ?? true));
   let calmNow = { hud: 0, camera: 0 };
   const foes = createFoeBars(g, root);
+  const tipCard = createTipCard(root); // the first steps' controls, as each is first needed (round 102)
+  const tipsOn = (): boolean => opts.tips?.() ?? true;
   const questSigns = createQuestMarks(g, root); // the sign over someone with a quest for the investigator (round 39)
-  const quest = createQuestTracker(g, dim, () => !dying && !menuOpen() && tracker()); // what the quest followed asks, at the right under the minimap
+  const quest = createQuestTracker(g, questLayer, () => !dying && !menuOpen() && tracker(), () => minimapYaw(g, northUp())); // what the quest followed asks, at the right under the minimap
   const me = g.player.id;
+  let calls = { at: -Infinity, of: new Map<string, SignCall[]>() };
+  /** What resting at this sign is for now, after its name (systems/signCalls.ts; render/signCallViews.ts hangs the marks). */
+  const restWhy = (sign: string): string => {
+    if (g.frame - calls.at >= 20) calls = { at: g.frame, of: signCalls(g) };
+    const list = calls.of.get(sign);
+    return list?.length ? ` · ${list.map((c) => tr(`sign.call.${c}` as Key)).join(' · ')}` : '';
+  };
   g.events.on('Hit', (e) => {
     const n = NOTICES[e.outcome];
     if (n && e.attacker === me) say(n[0] && tr(n[0]));
@@ -183,7 +202,9 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       hours.update();
       calmNow = calm.update();
       setStyle(dim, 'opacity', calmNow.hud > 0 ? (1 - (1 - QUIET.hudTo) * calmNow.hud).toFixed(2) : '1');
+      setStyle(questLayer, 'opacity', calmNow.hud > 0 ? (1 - 0.15 * calmNow.hud).toFixed(2) : '1');
       if (!menuOpen()) hints.update();
+      tipCard.show(tipsOn() && !dying && !screenHeld && !menuOpen() && !opts.held?.() ? stepTips(g, steps) : null);
       const busy = menuOpen() ? 'hidden' : 'visible'; // a dialogue or menu has the screen
       setStyle(prompt, 'visibility', busy);
       setStyle(notice, 'visibility', busy);
@@ -200,6 +221,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       else if (now0 > chipHold) chipPct = Math.max(pct, chipPct - HURT.chipRate / 60);
       if (chipPct <= pct) chipHold = 0;
       setStyle(chip, 'width', `${chipPct.toFixed(1)}%`);
+      setStyle(hp.parentElement!, 'boxShadow', `0 0 0 1px #000d,inset 0 0 3px #000${bleeding(g) ? `,0 0 ${(3 + 3 * Math.sin(now0 / 320)).toFixed(0)}px ${MAGENTA}` : ''}`); // the Unmoored mind wearing the body away, shown where it is felt
       setStyle(stamina, 'width', percent(s.value, s.max));
       mind.update(now0);
       reagent.set(g.player.reagent, g.player.reagentMax);
@@ -220,13 +242,13 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const verb = tr(near?.kind === 'npc' ? 'hud.talkTo' : near?.kind === 'sign' ? 'hud.restAt' : 'hud.passThrough');
       const e = glyph('interact');
       const mounted = g.player.mount.active;
-      const mountKey = mounted ? mounted : mountUnlocked(g) ? `summon:${g.player.mount.selected}` : '';
+      const mountKey = mounted ? mounted : mountUnlocked(g) && !(tipsOn() && tipWaiting(steps, 'mount')) ? `summon:${g.player.mount.selected}` : ''; // the first steps' card teaches the summons first
       if (mountKey !== mountTip) { mountTip = mountKey; mountTipUntil = 0; }
       if (mountKey && busy === 'visible' && mountTipUntil === 0) mountTipUntil = now + MOUNT_TIP_MS;
       const mountShown = mountKey !== '' && now < mountTipUntil;
       const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
       const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
-      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}` : '');
+      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);

@@ -9,7 +9,10 @@
  * and distances, its volume and shading, is kept whole, so no creature goes one dim colour (the first
  * versions turned each pixel to the realm's by itself, and they did); and the anomaly hues (the eyes, the
  * markings, the Colour) are left as drawn. The sprite is changed on the way to the screen only; no
- * recording of it is touched.
+ * recording of it is touched. A form drawn in a strong colour of its own comes to the shader with the tone that
+ * leaves it as it is (render/spriteTone.ts: round 93), so only the dull forms of the older art are turned. Inside the player's lantern light (round 93) the realm's colours give way: a
+ * creature there shows the colours it was drawn in (shaders/sprite.ts), and takes the realm's again as it
+ * leaves the light.
  */
 
 export const SPRITE_GRADE_GLSL = /* glsl */ `
@@ -40,6 +43,12 @@ const vec3 SPRITE_E2 = vec3(0.4082, 0.4082, -0.8165);
 vec2 spriteChroma(vec3 c) {
   vec3 v = c - dot(c, vec3(1.0 / 3.0));
   return vec2(dot(v, SPRITE_E1), dot(v, SPRITE_E2));
+}
+
+/** A form's tone at \`k\` of its share (round 95): the turn, the lift and the fill are linear in the share (render/spriteTone.ts toneOf), so the tone of a smaller share is the same turn, lift and fill scaled by \`k\`. In the lantern's light a creature takes the tone of less of its realm: its hue turned back toward the one it was drawn in along the wheel, its colour as strong as ever (a cross-fade of the two colours greyed a form drawn far from its realm's hue). k = 1 leaves the tone as it is; a form held as drawn (PLAIN) stays so. */
+vec4 spriteToneBack(vec4 tone, float k) {
+  float a = atan(tone.y, tone.x) * k;
+  return vec4(cos(a), sin(a), 1.0 + (tone.z - 1.0) * k, tone.w * k);
 }
 
 /** A lit creature's colour recoloured to its realm, its anomaly hues kept. \`tone\` is its form's own (render/spriteTone.ts): the turn (cos, sin) that takes the form's hue toward the realm's, the lift of its colour and the realm's colour given to a grey, the same for every pixel of the form, so the form's own colours keep their order and their distances from one another and the form takes the realm's. Its brightness is the one it was drawn in (its volume and shading). */

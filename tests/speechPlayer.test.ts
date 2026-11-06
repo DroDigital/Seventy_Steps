@@ -170,6 +170,71 @@ describe('a line said', () => {
     expect(sources).toHaveLength(1);
   });
 
+  it('holds a recording that finishes loading at an action prompt until the prompt is answered', async () => {
+    const id = clip('npc:peaslee', LINE);
+    files['v/index.json'] = JSON.stringify([id]);
+    files[`v/${id}.mp3`] = new ArrayBuffer(64);
+    const { engine, sources } = fakeEngine();
+    let decoded!: (buf: AudioBuffer) => void;
+    engine.ctx!.decodeAudioData = () => new Promise<AudioBuffer>((resolve) => { decoded = resolve; });
+    const began = vi.fn();
+    const speech = createSpeech(engine, 'v/', began);
+    speech.say('npc:peaslee', LINE);
+    await flush(); // decoding is still pending
+    speech.hold(true);
+    decoded({ duration: 10 } as AudioBuffer);
+    await flush();
+    expect(sources).toHaveLength(0);
+    expect(began).not.toHaveBeenCalled();
+    speech.hold(false);
+    expect(sources).toHaveLength(1);
+    expect(sources[0].start).toHaveBeenCalledOnce();
+    expect(began).toHaveBeenCalledOnce();
+  });
+
+  it('forgets a held recording when stopped before or after loading', async () => {
+    const id = clip('npc:peaslee', LINE);
+    files['v/index.json'] = JSON.stringify([id]);
+    files[`v/${id}.mp3`] = new ArrayBuffer(64);
+    const { engine, sources } = fakeEngine();
+    let decoded!: (buf: AudioBuffer) => void;
+    engine.ctx!.decodeAudioData = () => new Promise<AudioBuffer>((resolve) => { decoded = resolve; });
+    const speech = createSpeech(engine, 'v/');
+    speech.say('npc:peaslee', LINE);
+    await flush();
+    speech.hold(true);
+    speech.stop();
+    decoded({ duration: 10 } as AudioBuffer);
+    await flush();
+    speech.hold(false);
+    expect(sources).toHaveLength(0);
+
+    speech.say('npc:peaslee', LINE);
+    speech.hold(true);
+    await flush(); // the cached recording is now ready, but still held
+    speech.stop();
+    speech.hold(false);
+    expect(sources).toHaveLength(0);
+  });
+
+  it('plays a pending recording when the prompt is answered before it finishes loading', async () => {
+    const id = clip('npc:peaslee', LINE);
+    files['v/index.json'] = JSON.stringify([id]);
+    files[`v/${id}.mp3`] = new ArrayBuffer(64);
+    const { engine, sources } = fakeEngine();
+    let decoded!: (buf: AudioBuffer) => void;
+    engine.ctx!.decodeAudioData = () => new Promise<AudioBuffer>((resolve) => { decoded = resolve; });
+    const speech = createSpeech(engine, 'v/');
+    speech.say('npc:peaslee', LINE);
+    await flush();
+    speech.hold(true);
+    speech.hold(false);
+    decoded({ duration: 10 } as AudioBuffer);
+    await flush();
+    expect(sources).toHaveLength(1);
+    expect(sources[0].start).toHaveBeenCalledOnce();
+  });
+
   it('plays a repeated line only once when both requests are still loading', async () => {
     const id = clip('boss:cthulhu', LINE);
     files['v/index.json'] = JSON.stringify([id]);

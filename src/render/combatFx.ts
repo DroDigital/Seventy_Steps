@@ -10,8 +10,6 @@ import type { Entity } from '../core/ecs';
 import type { V3 } from '../core/geom';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
-import { FLASH_LIGHTS } from '../data/fxTuning';
-import { flashLight } from './flashLights';
 import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Particles } from './particles';
 import { woundPoint } from './wound';
@@ -69,8 +67,6 @@ export function createCombatFx(g: Game, fx: Particles, muzzle: () => V3 | null =
   g.events.on('Shot', ({ shooter, from, to }) => {
     const [dx, dz] = [to.x - from.x, to.z - from.z];
     const len = Math.hypot(dx, dz) || 1;
-    const m = FLASH_LIGHTS.muzzle;
-    flashLight({ x: from.x + (dx / len) * 0.6, y: from.y + 0.1, z: from.z + (dz / len) * 0.6 }, m.color, m.strength, m.range, m.seconds); // the flash of the shot lights the ground, the walls and the mist ahead of it (round 83)
     if (shooter === g.player.id) smoke = { dx: dx / len, dz: dz / len, tail: true };
     else for (let i = 0; i < 5; i++) fx.spawn({ x: from.x + (dx / len) * 0.6, y: from.y, z: from.z + (dz / len) * 0.6, vy: rand(0.2, 0.7), vx: rand(-0.3, 0.3), vz: rand(-0.3, 0.3), life: rand(0.5, 1), size: 0.12, grow: 3, color: DUST, alpha: 0.5, drag: 2 }); // a creature's, out ahead of it
   });

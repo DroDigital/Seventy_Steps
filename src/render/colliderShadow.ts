@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import type { Collider } from '../world/colliders';
 
-/** The vertex shader of the shadow passes' own materials: a body's position in the light's clip, and, for an instanced mesh (the creatures' bodies: render/creatureCasters.ts), by its instance's matrix. */
+/** The vertex shader of the shadow passes' own materials: a body's position in the light's clip, and, for an instanced mesh, by its instance's matrix. */
 export const INSTANCED_POSITION = /* glsl */ `
 void main() {
   vec4 p = vec4(position, 1.0);

@@ -118,8 +118,9 @@ const PROPS: Record<Prop['kind'], () => THREE.Group> = { lamp, monolith, ship, r
 export function createFightViews(scene: THREE.Scene, g: Game): FightViews {
   const voids = new Map<Fight, THREE.Group>();
   const bolts = createBoltViews(scene, g);
-  const water = new THREE.Mesh(flat(1, 64), createWorldMaterial({ texture: 'water', uvScale: [12, 12], uvScroll: [0.03, 0.02], emissive: 0.1 }));
+  const water = new THREE.Mesh(flat(1, 64), createWorldMaterial({ texture: 'water', uvScale: [12, 12], uvScroll: [0.03, 0.02], emissive: 0.1, opacity: REALITY.floodOpacity })); // (see-through: the telegraphs on the ground beneath show in it, where an opaque sheet hid them)
   water.visible = false;
+  water.name = 'flood';
   scene.add(water);
   const views = new Map<Entity, THREE.Object3D>();
 

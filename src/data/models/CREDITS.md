@@ -285,9 +285,9 @@ This work is based on "Stone Altar" (https://sketchfab.com/3d-models/stone-altar
 `sh_altar`
 
 ## Pack 40 — PSX Dungeon
-By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: eight of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, two candles, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
+By Goblinatron, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). Changes: six of its crypt pieces taken singly (the broken and fallen pillars, a chain, a chandelier, spikes, rubble), their textures reduced to a colour for each face, scaled and given colliders where they stand in the way.
 
-`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_candle_a`, `pd_candle_b`, `pd_debris`
+`pd_pillar_broken`, `pd_pillar_fallen`, `pd_chain`, `pd_chandelier`, `pd_spikes`, `pd_debris`
 
 ## Pack 42 — Modular Cathedral Kit
 By SigilsVault, https://sigilsvault.itch.io/modular-cathedral-kit, CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/): asks for nothing, credited for provenance. Changes: two columns and a railing taken singly, scaled and given colliders.
@@ -359,3 +359,14 @@ This work is based on "Bust of Apollo" (https://sketchfab.com/3d-models/bust-of-
 - **Pixel flames.** 'Fire' by ZomBCool, https://opengameart.org/content/fire-0, CC0 1.0: credited for provenance. Changes: its four frames of `fire_3.gif` reduced to a heat mask and a coverage mask (`tools/flames/bake_flames.py`, `src/data/flameAtlas.ts`) and coloured in code (`src/render/flames.ts`).
 - **Smoke puffs.** 'Smoke Particles' by Kenney (Kenney Vleugels), https://kenney.nl/assets/smoke-particles, CC0 1.0: credited for provenance. Changes: four of the white puffs reduced to 24 x 24 coverage masks, in the same atlas.
 - **PS1 surface patterns.** The 64 x 64 textures `TEX_Wall_03`, `TEX_Ground_04` and `TEX_Planks_01` of Pack 40 (Goblinatron's PSX Dungeon, https://goblinatron.itch.io/psx-dungeon, licensed CC BY 4.0, https://creativecommons.org/licenses/by/4.0/). Changes: reduced to each texel's brightness against the texture's own average (`tools/psx/bake_psx_textures.py`, `src/data/psxDetail.ts`), laid over the world's procedural stone, flagstone and plank textures (`src/render/textures.ts`) and coloured by the realms' grades.
+
+## Particle marks (round 90, the quiet blows)
+
+- **Marks of a blow.** 'Particle Pack' (1.1) by Kenney (Kenney Vleugels), https://kenney.nl/assets/particle-pack, CC0 1.0: credited for provenance (its `License.txt` reads: Creative Commons Zero, CC0). Changes: the mottle of `smoke_05.png`, reduced to 32 x 32, gives the fray of the 'smear' mark, a 32 x 32 coverage mask made in the baker (`tools/marks/bake_marks.py`, `src/data/markAtlas.ts`, drawn by `src/render/particles.ts` and `src/render/markAtlas.ts`, coloured in code). The 'splat' mark beside it is made in the baker and is not from any sprite.
+
+## The endings (round 98)
+
+These are not stood in any arena (`MODEL_INFO` does not name them). `tools/finale/bake_finale.py` welds them, classes each face, sets the foot on the ground and centres the footprint. `src/data/models/finalePack.ts`, `finaleIndex.ts`.
+
+- **The silver key.** 'Antique Key' by Savino, https://opengameart.org/content/antique-key, CC0 1.0 (`low.obj`). Changes: hung upright, silvered, thickened, and scaled to 0.28 m. `fn_key`.
+- **The Ultimate Gate and the court's clock.** 'Castle Kit' by Kenney (Kenney Vleugels), https://kenney.nl/assets/castle-kit, CC0 1.0. Changes: `tower-square-arch` scaled to 6.4 m (`fn_arch`); the tower's base, windowed middle, middle and roof stacked, with a dial and hands made in the baker (`fn_clock`). The tall man is the investigator's own figure, hued in the game, with the growth drawn in the game, and is not from this kit.

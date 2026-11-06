@@ -151,7 +151,7 @@ describe('the returns of a step (round 83)', () => {
     expect(stepGain('road')).toBeLessThan(1);
     expect(stepGain('water')).toBeLessThan(1);
     expect(stepGain('dirt')).toBe(1);
-    expect(stepGain('stone')).toBe(1);
+    expect(stepGain('stone')).toBe(1); // (its recording is left dark and whole; a dungeon room's floor lifts it, round 86: tests/footing.test.ts)
     expect(stepLowpass('dirt', 1800)).toBe(1800); // (the ground's own, where it has one)
     expect(stepLowpass('road', 1500)).toBe(1500); // (the duller of the two)
     expect(stepLowpass('road', 5000)).toBe(stepLowpass('road'));

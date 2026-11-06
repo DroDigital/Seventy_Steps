@@ -63,11 +63,16 @@ const endOf = (e: Element, look: AttackLook, c: Rgb): Rgb => (e.cools ? (e.glow 
 /** The size of a chunk for a burst of this radius: coarse for a colossus's, fine for a bolt's. */
 const chunkSize = (radius: number): number => Math.min(0.75, 0.13 + radius * 0.045);
 
-/** A flash at the heart of a blow: a blaze that is gone in a few frames, and the ring of light it opens. */
-export function flash(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, lift = 0.4): void {
-  const y = at.y + lift;
+/** The light of a flash alone, small and short (`FLASH_LIGHTS.burst`): a quiet blow (round 90) draws no flash, and keeps this, as every foe's blow lights what it falls on (round 87). */
+export function glow(at: V3, radius: number, look: AttackLook, lift = 0.4): void {
   const b = FLASH_LIGHTS.burst;
-  flashLight({ x: at.x, y: y + 0.3, z: at.z }, whiteOf(look.core), Math.min(b.most, b.strength + radius * b.per), Math.min(b.rangeMost, b.range + radius * b.rangePer), b.seconds); // and it lights what is about it (round 83)
+  flashLight({ x: at.x, y: at.y + lift + 0.3, z: at.z }, whiteOf(look.core), Math.min(b.most, b.strength + radius * b.per), Math.min(b.rangeMost, b.range + radius * b.rangePer), b.seconds);
+}
+
+/** A flash at the heart of a blow: a blaze that is gone in a few frames, and the ring of light it opens; `lit` (round 87): whether it also lights the world about it, as a foe's blows do (render/attackFx.ts) and the investigator's, an ally's do not. */
+export function flash(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, lift = 0.4, lit = true): void {
+  const y = at.y + lift;
+  if (lit) glow(at, radius, look, lift); // and it lights what is about it (round 83)
   fx.spawn({ x: at.x, y, z: at.z, life: 0.18, size: Math.min(7, radius * 0.9 + 0.4), grow: 1.5, color: look.core, colorEnd: look.line, glow: true, hold: 0.35, shape: 'wisp' });
   fx.spawn({ x: at.x, y, z: at.z, life: 0.24, size: Math.min(9, radius * 1.5 + 0.5), grow: 0.5, color: look.core, glow: true, hold: 0.2, shape: 'spark', rot: rand(0, tau), spin: rand(-2, 2) });
   if (e.halo) fx.spawn({ x: at.x, y, z: at.z, life: 0.45, size: Math.min(5, radius * 0.7 + 0.3), grow: 4, color: look.line, glow: true, shape: 'ring', thick: 0.12, alpha: 0.9 });
@@ -75,13 +80,13 @@ export function flash(fx: Particles, e: Element, at: V3, radius: number, look: A
 }
 
 /** A burst of the element's matter flung out of `at`, from a few metres' radius to a colossus's. */
-export function burst(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, strength = 1): void {
+export function burst(fx: Particles, e: Element, at: V3, radius: number, look: AttackLook, strength = 1, lit = true): void {
   const power = strength * look.punch;
   const c = colorOf(e, look);
   const end = endOf(e, look, c);
   const size = chunkSize(radius);
   const rest = groundUnder(fx, at) + 0.02; // what falls lies on the ground under it
-  flash(fx, e, at, radius * 0.5, look);
+  flash(fx, e, at, radius * 0.5, look, 0.4, lit);
   const crown = Math.round((8 + radius * 3.5) * power);
   for (let i = 0; i < crown; i++) {
     const a = (i / crown) * tau + rand(-0.2, 0.2);
@@ -121,10 +126,10 @@ export function burst(fx: Particles, e: Element, at: V3, radius: number, look: A
 }
 
 /** A bolt landing at `at` travelling `dir` (a unit vector in the ground plane): a spray thrown back, a stain, a flash. */
-export function impact(fx: Particles, e: Element, at: V3, dir: { x: number; z: number }, size: number, look: AttackLook): void {
+export function impact(fx: Particles, e: Element, at: V3, dir: { x: number; z: number }, size: number, look: AttackLook, lit = true): void {
   const c = colorOf(e, look);
   const end = endOf(e, look, c);
-  flash(fx, e, at, size * 1.2, look, 0.3);
+  flash(fx, e, at, size * 1.2, look, 0.3, lit);
   const rest = groundUnder(fx, at) + 0.02; // a wound's or a wall's spray falls to the ground under it, not to the height it struck
   const back = Math.atan2(-dir.z, -dir.x);
   const n = 8 + Math.round(size * 14);

@@ -28,9 +28,13 @@ export interface CinemaUi {
   /** The screen goes to `tint` (or, for clear, lifts) over `seconds`; a `seconds` of 0 is at once. */
   fade(tint: Tint, seconds: number): void;
   caption(text: string, hold: number): void;
+  /** Pause or resume the current caption while an action holds the scene. */
+  holdCaption?(on: boolean): void;
   title(name: string, line: string | undefined, hold: number): void;
   /** Shows or hides the skip hint. */
   hint(on: boolean): void;
+  /** The act the scene is waiting on, or nothing. */
+  ask?(text: string | null): void;
   /** The bars slide away over `seconds`, and the words and the hint go; the fade is left as it stands. */
   clear(seconds?: number): void;
   /** Everything gone at once, the fade too. */
@@ -55,6 +59,7 @@ export function createCinemaUi(): CinemaUi {
   const name = div(`font-family:${SERIF};font-size:calc(44px * var(--ui, 1));letter-spacing:.32em;color:#c9a45c;text-shadow:0 0 16px #000,0 0 4px #000;white-space:nowrap`, card);
   const line = div(`font:italic calc(16px * var(--ui, 1))/1.5 ${SERIF};letter-spacing:.12em;color:${BONE};opacity:.75;margin-top:calc(8px * var(--ui, 1));text-shadow:0 0 8px #000`, card);
   const hint = div(`position:absolute;right:3vw;top:${BAR / 2 - 1}%;font:calc(11px * var(--ui, 1)) ${SERIF};letter-spacing:.2em;color:${BONE};opacity:0`, root);
+  const prompt = div(`position:absolute;left:0;right:0;top:${BAR + 3}%;text-align:center;font:calc(18px * var(--ui, 1)) ${SERIF};letter-spacing:.16em;color:#c9a45c;text-shadow:0 0 12px #000,0 0 3px #000;opacity:0`, root);
   let veilAnim: Animation | undefined;
   let scene = 0; // which scene's bars these are: a scene begun since a clear keeps the layer
 
@@ -101,6 +106,9 @@ export function createCinemaUi(): CinemaUi {
       caption.replaceChildren(words);
       shown(caption, hold, 900);
     },
+    holdCaption(on) {
+      caption.getAnimations().forEach((a) => (on ? a.pause() : a.play()));
+    },
     title(words, under, hold) {
       name.textContent = words;
       line.textContent = under ?? '';
@@ -113,7 +121,12 @@ export function createCinemaUi(): CinemaUi {
       hint.textContent = on ? `${glyph('back')} · skip` : '';
       hint.style.opacity = on ? '.45' : '0';
     },
+    ask(text) {
+      prompt.textContent = text ? `${glyph('interact')}  ${text}` : '';
+      prompt.style.opacity = text ? '1' : '0';
+    },
     clear(seconds = 0.8) {
+      prompt.style.opacity = '0';
       for (const n of [caption, card]) n.getAnimations().forEach((a) => a.cancel());
       caption.style.opacity = card.style.opacity = '0';
       hint.style.opacity = '0';
@@ -125,7 +138,7 @@ export function createCinemaUi(): CinemaUi {
     wipe() {
       for (const n of [caption, card, veil, top, bottom]) n.getAnimations().forEach((a) => a.cancel());
       veilAnim = undefined;
-      veil.style.opacity = caption.style.opacity = card.style.opacity = hint.style.opacity = '0';
+      veil.style.opacity = caption.style.opacity = card.style.opacity = hint.style.opacity = prompt.style.opacity = '0';
       top.style.transform = 'translateY(-100%)';
       bottom.style.transform = 'translateY(100%)';
       root.style.display = 'none';

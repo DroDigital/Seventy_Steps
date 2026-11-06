@@ -44,11 +44,18 @@ export function conjure(g: Game): Entity | undefined {
   if (e === undefined) return undefined;
   const c = g.ecs.c;
   c.phantom.set(e, { life: HALLUCINATIONS.life });
+  const moves = c.actor.get(e)!.moves;
+  for (const m of Object.values(moves)) delete m.then; // a vision does not finish a chain
+  const poise = c.poise.get(e);
+  if (poise) [poise.value, poise.max] = [Math.min(poise.value, 14), Math.min(poise.max, 14)]; // one cane-light staggers it: the real body's poise is not the mind's
+  const br = c.brain.get(e);
+  if (br) {
+    br.def = { ...br.def, attacks: br.def.attacks.filter((a) => !a.move.startsWith('combo')) };
+    Object.assign(br, { state: 'engage', target: g.player.id });
+  }
   c.dread.delete(e); // no aura, no first sight: it is not there
   c.home.delete(e); // it never resets
   c.combatant.get(e)!.bounty = 0;
-  const br = c.brain.get(e);
-  if (br) Object.assign(br, { state: 'engage', target: g.player.id });
   return e;
 }
 

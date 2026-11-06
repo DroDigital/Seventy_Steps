@@ -95,7 +95,7 @@ describe('two relics are worn at a time, chosen at an Elder Sign', () => {
       wear(g, 1, null);
       wear(g, 0, a);
       wear(g, 1, b);
-      return { dealt: boon(g, 'dealt'), taken: boon(g, 'taken'), echoes: boon(g, 'echoes'), mend: boon(g, 'mend') };
+      return { dealt: boon(g, 'dealt'), taken: boon(g, 'taken'), echoes: boon(g, 'echoes'), mend: boon(g, 'mend'), health: boon(g, 'health'), stamina: boon(g, 'stamina'), recovery: boon(g, 'recovery') };
     };
     const distinct = new Set<string>();
     for (const a of RELIC_IDS) for (const b of RELIC_IDS) if (a < b) distinct.add(JSON.stringify(build(a, b)));

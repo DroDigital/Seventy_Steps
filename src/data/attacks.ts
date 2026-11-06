@@ -31,10 +31,10 @@ export interface AttackDef {
   unblockable?: boolean;
   sanity?: number; // sanity damage = sanity × stats.sanityDamage, over the active frames
   effect?: EffectKind;
-  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
+  marks?: { count: number; ring: readonly [number, number]; delay: number; stagger: number; radius: number; pattern?: MarkPattern; look?: MarkLook; spokes?: number; rings?: number; turns?: number; seek?: { speed: number; lock: number }; leaves?: { radius: number; life: number; tick: number; power: number } }; // the eruption (see MarksDef)
   wave?: { speed: number; width: number; reach: number; lane?: { half: number; push: number } }; // the quake (see WaveDef)
-  cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
-  sweep?: { arc: readonly [number, number]; length: number; width: number }; // the sweeping beam, over the active frames
+  cloud?: Pick<CloudDef, 'count' | 'radius' | 'life' | 'tick' | 'mind' | 'drift' | 'kind' | 'blind'> & { power: number }; // round 70: clouds that rise and drift after the target (see CloudDef)
+  sweep?: { arc: readonly [number, number]; length: number; width: number; arms?: number; blind?: boolean }; // a sweeping beam; a blind sweep does not track its target
   barrage?: { arms: number; every: number; spin: number; speed: number; radius: number }; // over the active frames
   pull?: { speed: number; range: number }; // the vortex draws its prey in over the active frames
   follow?: AttackId; // runs straight on into this attack as it ends (a chain)
@@ -69,7 +69,7 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   eruption: { kind: 'area', windup: 28, active: 1, recovery: 44, power: 1.3, poise: 1.6, range: [0, 16], marks: { count: 5, ring: [2.5, 5.5], delay: 42, stagger: 7, radius: 1.7 } },
   quake: { kind: 'area', windup: 32, active: 1, recovery: 42, power: 1.1, poise: 1.4, range: [0, 11], wave: { speed: 8, width: 1.1, reach: 15 } },
   sweep_beam: { kind: 'ranged', windup: 46, active: 44, recovery: 34, power: 1.2, poise: 1.2, range: [3, 15], sweep: { arc: [75, -75], length: 17, width: 0.7 } },
-  barrage: { kind: 'ranged', windup: 38, active: 70, recovery: 30, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17)
+  barrage: { kind: 'ranged', windup: 38, active: 70, recovery: 48, power: 0.55, poise: 0.4, range: [0, 14], barrage: { arms: 4, every: 9, spin: 17, speed: 7.5, radius: 0.35 } }, // its arms sweep on past (round 17; 2026-11-01: recovery 30 to 48, since its 108 frames of windup and firing used up the whole pause, leaving a first-band horror open for 44 frames after its 360-degree volley)
   vortex: { kind: 'special', windup: 24, active: 54, recovery: 1, power: 0, poise: 0, range: [3, 11], pull: { speed: 3, range: 12 }, follow: 'vortex_burst' },
   vortex_burst: { kind: 'area', windup: 8, active: 6, recovery: 44, power: 1.5, poise: 2, range: [0, 0], reach: 0, radius: 4.2, height: 0.3, arc: [180, -180], tight: true },
   combo: melee({ windup: 20, active: 6, recovery: 6, power: 0.8, poise: 0.7, range: [0, 2.4], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60], lunge: 0.8, follow: 'combo_2' }),
@@ -87,6 +87,23 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   toxic_cloud: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 2.9, life: 270, tick: 30, power: 0.14, mind: 0, drift: 1.1, kind: 'toxic' } }, // two banks of poisonous air drift after the target
   dream_cloud: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 16], cloud: { count: 2, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.1, kind: 'dream' } }, // two banks of sleep take the mind, not the body
   thunderfall: { kind: 'area', windup: 40, active: 1, recovery: 46, power: 0.9, poise: 1, range: [0, 16], marks: { count: 6, ring: [0, 8.5], delay: 34, stagger: 7, radius: 1.25, pattern: 'rain', look: 'bolt' } }, // lightning calls down on the ground about the target, quick and bright
+  // 2026-10-29, Azathoth (asked: "implement different and unique boss attacks to make this the most challenging boss fight of all"). It is blind and aims at nothing, so none of these
+  // is laid on the investigator: each is a rhythm over the whole court (the piping, the drumming, the dance of the thirteen, the seething of the chaos, the centre drawing all in),
+  // read by where it will fall and when. Their numbers are for a body thirty metres tall (a root of 15.8 scales them: its court is 44 m across its heart).
+  dirge: { kind: 'area', windup: 48, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 30], wave: { speed: 3.9, width: 0.5, reach: 7.6 }, follow: 'dirge_2' }, // the piping swells: a ring of sound runs out of the body...
+  blind_rays: { kind: 'ranged', windup: 96, active: 100, recovery: 80, power: 1.85, poise: 1.6, range: [0, 30], sweep: { arc: [0, 72], length: 9, width: 0.18, arms: 4, blind: true }, follow: 'dirge' },
+  chaos_rays: { kind: 'ranged', windup: 100, active: 125, recovery: 85, power: 1.9, poise: 1.8, range: [0, 30], sweep: { arc: [60, -35], length: 9, width: 0.16, arms: 3, blind: true }, follow: 'drumbeat' },
+  rift_tentacles: { kind: 'area', windup: 78, active: 1, recovery: 95, power: 1.95, poise: 1.8, range: [0, 30], marks: { count: 10, rings: 1, ring: [0.4, 0.4], delay: 80, stagger: 0, radius: 0.65, pattern: 'beats', look: 'rift' }, follow: 'dance' },
+  rift_cascade: { kind: 'area', windup: 84, active: 1, recovery: 160, power: 1.85, poise: 1.8, range: [0, 30], marks: { count: 7, ring: [0.4, 6], delay: 80, stagger: 12, radius: 0.65, pattern: 'scatter', look: 'rift' }, follow: 'dirge' },
+  dirge_2: { kind: 'area', windup: 14, active: 1, recovery: 22, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 4.6, width: 0.5, reach: 7.6 }, follow: 'dirge_3' }, // ...a quicker one a beat behind it...
+  dirge_3: { kind: 'area', windup: 14, active: 1, recovery: 36, power: 0.8, poise: 1.2, range: [0, 0], wave: { speed: 5.6, width: 0.5, reach: 7.6 } }, // ...and the quickest: three notes, a roll or a guard for each, and the stamina of three rolls to find
+  drumbeat: { kind: 'area', windup: 44, active: 1, recovery: 46, power: 0.85, poise: 1.2, range: [0, 30], marks: { count: 5, rings: 2, ring: [0.8, 3.6], delay: 46, stagger: 22, radius: 1.06, pattern: 'beats' } }, // the drumming: a ring of the ground boils about the body, and the next ring out a beat after, its spots between the first's (out is not the way)
+  dance: { kind: 'area', windup: 46, active: 1, recovery: 50, power: 0.9, poise: 1.2, range: [0, 30], marks: { count: 13, ring: [0.5, 2.9], delay: 36, stagger: 6, radius: 0.9, pattern: 'spiral', turns: 1 } }, // the thirteen turn: a stamp for each, winding out from the flank, falling in the order of the dance
+  seethe: { kind: 'area', windup: 40, active: 1, recovery: 44, power: 0.7, poise: 1, range: [0, 30], marks: { count: 12, ring: [0.4, 6.8], delay: 36, stagger: 5, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } } }, // it blasphemes and bubbles: boils over the whole court where it hears nothing, each leaving a pool of the formless to keep off
+  maelstrom: { kind: 'special', windup: 36, active: 90, recovery: 1, power: 0, poise: 0, range: [3, 12], pull: { speed: 4.6, range: 12 }, follow: 'maelstrom_burst' }, // the centre of all draws the court in (a sprint gains a little on it, a walk none)...
+  maelstrom_burst: { kind: 'area', windup: 10, active: 6, recovery: 50, power: 2, poise: 2.2, range: [0, 0], reach: 0, radius: 6.1, height: 0.3, arc: [180, -180], tight: true }, // ...and breaks about it, out past where the body stands: its heaviest blow, rolled through as it breaks
+  miasma: { kind: 'area', windup: 46, active: 1, recovery: 48, power: 0, poise: 0, range: [0, 30], cloud: { count: 4, radius: 3.2, life: 420, tick: 30, power: 0, mind: 0.3, drift: 1.2, kind: 'dream', blind: true } }, // the nothing the court is full of boils up about the body and spreads outward, after no one, taking the mind, not the body
+  crescendo: { kind: 'area', windup: 40, active: 1, recovery: 4, power: 0.7, poise: 1, range: [0, 30], marks: { count: 8, ring: [0.4, 6.8], delay: 56, stagger: 8, radius: 0.8, pattern: 'scatter', leaves: { radius: 0.8, life: 300, tick: 24, power: 0.1 } }, follow: 'dirge' }, // its last phase's own: the whole orchestra at once, boils laid over the court and, before they have all burst, the three rings of the dirge
 };
 
 /** Body size relative to a human (1.9 m); big bodies reach further. */
@@ -125,6 +142,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
     ? { window: [Math.max(0, a.windup - 6), a.windup + a.active] as const, distance: a.lunge * Math.sqrt(k), dir: 'facing' as const }
     : undefined;
   const move: MoveDef = { frames, track: { window: [0, Math.max(1, a.windup - 4)], rate: 3 }, motion };
+  if (a.sweep?.blind) delete move.track;
   if (a.sanity && stats.sanityDamage > 0) {
     const range = a.range[1] * k;
     move.sanity = { window: [a.windup, a.windup + a.active], amount: a.sanity * stats.sanityDamage, range, sight: a.effect === 'gaze' };
@@ -133,7 +151,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   if (a.follow) move.then = a.follow;
   else if (a.kind !== 'special') move.open = a.windup + a.active; // it recovers, stooped, after the blow (hurt.ts)
   if (a.pull) move.pull = { window: [a.windup, a.windup + a.active], speed: a.pull.speed, range: a.pull.range * k };
-  const cloud: CloudDef | undefined = a.cloud && { frame: a.windup, count: a.cloud.count, radius: a.cloud.radius * Math.min(Math.sqrt(k), CLOUD_MOST), life: a.cloud.life, tick: a.cloud.tick, damage: Math.round(a.cloud.power * stats.damage), mind: a.cloud.mind * stats.sanityDamage, drift: a.cloud.drift, kind: a.cloud.kind };
+  const cloud: CloudDef | undefined = a.cloud && { frame: a.windup, count: a.cloud.count, radius: a.cloud.radius * Math.min(Math.sqrt(k), CLOUD_MOST), life: a.cloud.life, tick: a.cloud.tick, damage: Math.round(a.cloud.power * stats.damage), mind: a.cloud.mind * stats.sanityDamage, drift: a.cloud.drift, kind: a.cloud.kind, ...(a.cloud.blind && { blind: true }) };
   if (a.kind === 'special' || stats.damage <= 0 || (damage <= 0 && !pool && !cloud)) return move;
   move.interrupt = [Math.round(a.windup * 0.3), a.windup];
   const b = a.bolts;
@@ -148,7 +166,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
     move.wave = { frame: a.windup, speed: a.wave.speed * w, width: a.wave.width * w, reach: a.wave.reach, damage, poise, lane: { half: a.wave.lane.half * w, push: a.wave.lane.push } };
   } else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
   else if (cloud) move.cloud = cloud;
-  else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise };
+  else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise, ...(a.sweep.arms && { arms: a.sweep.arms }) };
   else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
   else if (b) {
     const range = a.range[1] * k * 1.5;

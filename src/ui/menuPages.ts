@@ -6,7 +6,7 @@
  */
 
 import { ACTIONS, DEFAULT_KEYS, keyLayout, keyName, rebind, type Action } from '../core/bindings';
-import { padReport } from '../core/pads';
+import { calibratePadTriggers, padReport } from '../core/pads';
 import { t } from '../core/i18n';
 import { cameraModeOf } from '../data/cameraModes';
 import { LANGS, type Key } from '../data/lang';
@@ -28,13 +28,18 @@ const SHOW: Record<Slid, (v: number) => string> = {
   brightness: pct,
   fog: (v) => (v > 0 ? pct(v) : t('val.off')),
   shadows: onOff,
+  evenPixels: onOff,
   relight: onOff,
+  font: (v) => v > 0.5 ? 'EB Garamond' : 'IM Fell English',
   uiScale: (v) => `×${v.toFixed(2)}`,
   shake: pct,
+  rumble: pct,
   cutscenes: onOff,
   questTracker: onOff,
+  minimap: (v) => t(v > 0.5 ? 'val.minimap.north' : 'val.minimap.turn'),
   camera: (v) => t(`val.camera.${cameraModeOf(v)}` as Key),
   quietWalk: onOff,
+  controlTips: onOff,
   captions: (v) => `×${v.toFixed(1)}`,
   captionBack: onOff,
   flashes: pct,
@@ -48,10 +53,10 @@ const SHOW: Record<Slid, (v: number) => string> = {
 const NAME = (id: SettingId): string => t(`set.${id}` as Key);
 /** The settings' tabs, each a few lines that fit the panel, and what each line does (said under the list as it is chosen). */
 const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
-  ['set.tab.display', ['resolution', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
+  ['set.tab.display', ['resolution', 'evenPixels', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
-  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'cutscenes', 'questTracker', 'quietWalk']],
-  ['set.tab.access', ['captions', 'captionBack', 'flashes', 'shake', 'fxCap']],
+  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
+  ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'shake', 'rumble', 'fxCap']],
 ];
 const HINT = (id: SettingId): string | undefined => {
   const k = `set.hint.${id}` as Key;
@@ -67,11 +72,12 @@ async function fullscreen(on: boolean): Promise<void> {
 const isFullscreen = async (): Promise<boolean> => (desktop ? desktop.isFullscreen() : !!document.fullscreenElement);
 
 /** Every change goes to `change` (which applies and keeps it); `back` leaves. `at`: the tab it opens on. Controls is the last tab (the keys' table: controlsTab). */
-export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0): Page {
+export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0, calibrate?: () => void): Page {
   const resolution = createResolutionSetting();
   let open = at;
   let waiting: Action | null = null;
   let refused = false; // the last key pressed was one that cannot be taken
+  let triggerCalibration: boolean | null = null;
   const page: Page = {
     back: () => {
       if (waiting) return void ((waiting = null), page.redraw?.()); // Esc while a key is awaited cancels the wait; the next goes back
@@ -89,12 +95,13 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
     build(panel) {
       title(panel, t('set.title'));
       tabs(panel, [...TABS.map(([n]) => t(n)), t('set.tab.controls')], open, (i) => ((open = i), (waiting = null), (refused = false), page.redraw?.()), page);
-      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0));
+      if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0), triggerCalibration, () => (triggerCalibration = calibratePadTriggers()));
       const body = el(panel, 'div', '', 'min-height:226px');
       if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
       for (const id of TABS[open][1]) {
         if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
         else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
+        if (id === 'brightness' && open === 0 && calibrate) button(body, t('cal.open'), calibrate, true, t('cal.openHint')); // the brightness card (ui/brightnessCalibration.ts), beside the slider it sets
       }
       if (open === 0) {
         const b = button(body, t('set.fullscreen'), () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), true, t('set.fullscreenHint'));
@@ -121,7 +128,7 @@ export const fixedControls = (): readonly (readonly [string, string, string])[] 
 ];
 
 /** The controls tab: the actions with their keys (choose one, then press its new key) beside the pad's, and what is fixed. */
-function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void): void {
+function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | null, wait: (a: Action) => void, refused: () => boolean, save: () => void, swapped: boolean, swap: (on: boolean) => void, calibration: boolean | null, calibrate: () => void): void {
   const grid = el(panel, 'div', '', 'display:grid;grid-template-columns:minmax(0,1fr) auto auto minmax(0,1fr) auto auto;gap:0 10px;align-items:center;margin:0 -16px;padding:0 10px'); // (the labels give way: a longer word wraps rather than pushing the pad's columns out of the panel)
   for (const cell of ['', t('ctl.key'), t('ctl.pad'), '', t('ctl.key'), t('ctl.pad')]) el(grid, 'div', cell, 'opacity:.5;letter-spacing:3px;font-size:10px;padding-bottom:2px');
   const half = Math.ceil(ACTIONS.length / 2);
@@ -139,6 +146,10 @@ function controlsTab(panel: HTMLElement, page: Page, waiting: () => Action | nul
   button(row, t('ctl.reset'), () => (Object.assign(keyLayout, DEFAULT_KEYS), save(), page.redraw?.())).classList.add('tag');
   button(row, t('ctl.swap', { state: t(swapped ? 'val.onLc' : 'val.offLc') }), () => (swap(!swapped), page.redraw?.()), true, t('ctl.swapHint')).classList.add('tag');
   el(row, 'div', t('ctl.padReport', { report: padReport() || t('ctl.padNone') }), 'opacity:.55;font-size:11px');
+  const triggers = el(panel, 'div', '', 'display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0 14px;margin-top:8px');
+  button(triggers, t('ctl.calibrateTriggers'), () => (calibrate(), page.redraw?.())).classList.add('tag');
+  el(triggers, 'div', t('ctl.calibrateTriggersHint'), 'opacity:.7;font-size:11px;line-height:1.4');
+  if (calibration !== null) el(panel, 'div', t(calibration ? 'ctl.calibrateTriggersDone' : 'ctl.calibrateTriggersNone'), 'opacity:.7;font-size:11px;line-height:1.4;padding:2px 14px 0');
   const on = waiting();
   footer(panel, refused() ? t('ctl.refused') : on ? t('ctl.waiting', { action: KEYED(on) }) : t('ctl.choose'), page.back);
 }

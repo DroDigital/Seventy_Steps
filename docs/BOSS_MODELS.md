@@ -429,8 +429,6 @@ By Goblinatron; licence CC BY 4.0.
 | `pd_chain` | Models/Chain.fbx | 0.4 × 3.6 × 0.4 | 20 | joseph_curwen |
 | `pd_chandelier` | Models/Chandelier.fbx | 2.6 × 2.2 × 3.0 | 368 | the_outsider |
 | `pd_spikes` | Models/Spikes.fbx | 2.2 × 1.3 × 2.8 | 78 | the_hound |
-| `pd_candle_a` | Models/Candle_01.fbx | 0.2 × 0.4 × 0.3 | 32 | lilith |
-| `pd_candle_b` | Models/Candle_02.fbx | 0.4 × 0.5 × 0.4 | 96 | lilith |
 | `pd_debris` | Models/Debris.fbx | 2.2 × 0.4 × 2.2 | 148 | the_hound |
 
 ## Pack 42: Modular Cathedral Kit

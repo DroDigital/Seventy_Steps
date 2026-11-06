@@ -36,7 +36,7 @@ export const MIND_EARS = Object.freeze({
     from: 0.6, // stress: the whispers' line, sanity 40
     every: [110, 50] as readonly [number, number],
     steps: [6, 14] as readonly [number, number], // footfalls it shadows
-    gain: [0.15, 0.22] as readonly [number, number], // by the stress; the set's own level beneath (the investigator's own steps are 0.26 to 0.58 since round 83, and these were 0.28 to 0.4 beside 0.55 to 1)
+    gain: [0.15, 0.22] as readonly [number, number], // by the stress; the set's own level beneath (the investigator's own steps are 0.26 to 0.58 since round 83, and these were 0.28 to 0.4 beside 0.55 to 1; in a dungeon's room lifted with them, `STEP_VOICE.indoors`, round 86)
     pitch: [0.82, 0.9] as readonly [number, number], // heavier
     lowpass: 1100, // duller
     pan: 0.25, // alternately to either side

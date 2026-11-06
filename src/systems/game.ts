@@ -7,7 +7,8 @@
 import { createEcs, type Entity } from '../core/ecs';
 import { createEventBus } from '../core/events';
 import type { InputFrame } from '../core/input';
-import { createMountState, mountSystem, registerMounts } from './mounts';
+import { createMountState, dismissMount, mountSystem, registerMounts } from './mounts';
+import { stepPortalRide } from './mountPortal';
 import { MOUNT_QUEST } from '../data/mounts';
 import { yawOf, type V3 } from '../core/geom';
 import { createRng } from '../core/rng';
@@ -53,6 +54,7 @@ import { applyCarry, type Carry } from './cycles';
 import { registerTally, tallySystem } from './tally';
 import { overheardSystem } from './overheard';
 import { registerRoomWords, roomWordsSystem } from './roomWords';
+import { registerPeace, peaceSystem } from './peace';
 import { registerPerception } from './perception';
 import { playerControl } from './playerControl';
 import { npcSystem, spawnNpcs } from './npcs';
@@ -105,7 +107,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
     ecs,
     world,
     events: createEventBus<GameEvents>(),
-    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, glance: false, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null },
+    player: { id, mount: createMountState(), buffer: createBuffer(), dodgeHeld: -1, sprinting: false, blockHeld: false, blockRaised: false, echoes: 0, levels: { vigour: 0, endurance: 0, might: 0 }, arms: ['cane'], weapon: 'cane', stones: 0, reinforced: unreinforced(), checkpoint: { ...spawn }, laudanum: LAUDANUM.doses, reagent: REAGENT.doses, reagentMax: REAGENT.doses, oil: 0, ammo: GUN.chamber, rounds: GUN.start, gun: 0, difficulty: DEFAULT_DIFFICULTY, cycle: 0, steady: 0, tonic: [], mended: 0, listening: null, glance: false, kneeling: null, falling: null, ask: false, rising: null, fogPass: null, gatePass: null, peace: null },
     mind: createMind(),
     camera: createCameraRig(spawn.yaw),
     lock: { target: null, unseen: 0 },
@@ -126,6 +128,7 @@ function baseGame(world: CollisionWorld, spawn: Place, seed: number): Game {
   registerReagent(g);
   registerGun(g);
   registerPerception(g);
+  registerPeace(g);
   return g;
 }
 
@@ -201,13 +204,13 @@ function cameraSystem(g: Game, lookX: number, lookY: number, dt: number): void {
   const tune = CAMERA_MODES[g.camera.mode];
   const pivot = { x: tr.pos.x, y: followY(g.player.falling, tr.pos.y) + tune.pivotHeight + g.camera.mountLift, z: tr.pos.z };
   const focus = g.lock.target !== null ? aimPoint(g, g.lock.target) : g.player.listening !== null && !g.player.glance ? talkFocus(pivot, aimPoint(g, g.player.listening)) : null;
-  const frame = g.lock.target !== null && !g.player.mount.active ? frameOf(g, g.lock.target) : null; // a foe held in the lock is framed (Low hero, Long lens); a person spoken to, or a rig driven, is not
+  const frame = g.lock.target !== null && !g.player.mount.active ? frameOf(g, g.lock.target) : null; // a foe held in the lock is framed; a person spoken to, or a rig driven, is not
   stepCamera(g.camera, { lookX, lookY, pivot, focus, frame, behind: tr.yaw, distance: g.player.mount.active ? tune.mountDistance : tune.distance, probe: g.player.falling ? g.player.falling.lip.y + tune.pivotHeight : undefined, sea: !!g.player.falling?.water }, g.world, dt);
 }
 
 /**
  * One fixed 60 Hz step. The order matters: intent → a boss fight's E, then signs, gates and talk → moves →
- * AI → motion → falls → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
+ * AI (the peace of an arrival first) → motion → falls → hits, shots, special effects, bolts and pools → recovery → sanity → boss fights and
  * their reality hooks → lock → camera → sight → the words of rooms and people → hallucinations → death → population.
  */
 export function stepGame(g: Game, input: InputFrame): void {
@@ -215,6 +218,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   g.frame++;
   NIGHT.hurried = g.overworld?.hurried ?? 0; // the night as this game has it (clock.ts)
   if (g.player.fogPass || g.player.gatePass) input = { ...emptyInput(), lookX: input.lookX, lookY: input.lookY }; // walked through a boss's fog: looking about is theirs, the rest is the fog's (round 35)
+  if (stepPortalRide(g, input)) dismissMount(g); // a gate's ride, kept for a moment: the stick let go sets them down (mountPortal.ts)
   mountSystem(g);
   playerControl(g, input);
   fogPassSystem(g);
@@ -227,6 +231,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   npcSystem(g, dt);
   npcLife(g, dt);
   actionSystem(g);
+  peaceSystem(g, input); // round 88: an arrival's peace ends on their own blow or the seconds after they rise, before the foes' turn
   brainSystem(g);
   wanderSystem(g);
   hookSystem(g);

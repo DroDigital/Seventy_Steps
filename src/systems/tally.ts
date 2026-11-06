@@ -22,7 +22,7 @@ export function registerTally(g: Game): void {
   if (!t) return;
   g.events.on('Died', ({ entity, killer }) => {
     if (entity === g.player.id) t.deaths++;
-    else if (killer === g.player.id && !g.ecs.c.phantom.has(entity)) t.kills++;
+    else if (killer === g.player.id && !g.ecs.c.phantom.has(entity) && !g.ecs.c.combatant.get(entity)?.showcase) t.kills++;
   });
   g.events.on('Echoes', ({ change, amount }) => void (change === 'earned' && (t.echoes += amount)));
 }

@@ -1,7 +1,6 @@
 /**
  * The world's markers as geometry around their own origin: an Elder Sign's shrine (playtest round 7,
- * laid out by world/shrine.ts) and a gate (two jambs and a lintel banded with glowing glyphs, a dim
- * veil of Cosmic Purple between them). The shrine is its weathered stones; Lovecraft's branch-like
+ * laid out by world/shrine.ts; a gate's frame is gateFrames.ts's since round 104). The shrine is its weathered stones; Lovecraft's branch-like
  * sign carved on both faces of the standing stone; the soft glow about each stroke and the ring of
  * runes on the ground, drawn by signViews.ts's glow shader (an `aQ` attribute says where a point lies
  * against its stroke, or around and across the ring); and candles on the plinth with their flames.
@@ -14,7 +13,7 @@ import { hash2 } from '../core/rng';
 import { ELDER_SIGN_SIZE } from '../world/arena';
 import { ALL_STONES, PLINTH, SHRINE } from '../world/shrine';
 import { box, tileUv, tint } from './meshKit';
-import { ANOMALY, BASE, mixRgb, scaleRgb, type Rgb } from './palette';
+import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
 /** The sign's strokes, after the veil's (veil.ts): start x and y above the stem's foot, lean from upright (radians), length. */
 const STROKES: readonly (readonly [number, number, number, number])[] = [
@@ -162,15 +161,4 @@ export function shrineGeometry(raised: readonly number[] = ALL_STONES): ShrineGe
 export function elderSignGeometry(side: 1 | -1 = 1): { slab: THREE.BufferGeometry; glyph: THREE.BufferGeometry } {
   const [w, h, d] = ELDER_SIGN_SIZE;
   return { slab: standingStone(w, w * 0.72, h, d, 0, ROCK, 3), glyph: carved(side, 0.35, d / 2 + 0.025) };
-}
-
-/** A gate's stone frame and its glowing glyph bands (the veil between its jambs is render/portalViews.ts's). */
-export function gateGeometry(): { frame: THREE.BufferGeometry; glyphs: THREE.BufferGeometry } {
-  const stone = scaleRgb(BASE.seaGrey, 1.6);
-  const jamb = (x: number): THREE.BufferGeometry => tileUv(box(0.5, 3.8, 0.5, x, 1.9, 0, stone, 0.5), 0.5, 3.8);
-  const frame = mergeGeometries([jamb(-1.9), jamb(1.9), tileUv(box(4.3, 0.5, 0.6, 0, 4.05, 0, stone, 0.5), 4.3, 0.5)]);
-  const bands: THREE.BufferGeometry[] = [];
-  for (let y = 0.4; y < 3.7; y += 0.6) for (const x of [-1.9, 1.9]) bands.push(box(0.53, 0.08, 0.53, x, y, 0, ANOMALY.purple));
-  bands.push(box(4.33, 0.08, 0.63, 0, 4.05, 0, ANOMALY.purple));
-  return { frame, glyphs: mergeGeometries(bands) };
 }

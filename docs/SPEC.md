@@ -37,7 +37,7 @@ Built with Claude Code, one phase per session. At the start of each session, rea
 ## 2. Art direction: retro 3D
 The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a third-person soulslike camera. The world is oppressive, foggy, and nearly colorless. Color means something is wrong.
 
-- **Resolution:** render to a low-res target (600×338 by default and at the standard maximum) and upscale with nearest-neighbor filtering. Lower resolutions remain configurable; optional higher resolutions (700×394 and 800×450) sit behind a collapsed choice with an immersion warning.
+- **Resolution:** render to a low-res target (640×360 by default, 800×450 at the standard maximum) and upscale it so every low-res pixel is drawn the same size (sharp bilinear; nearest-neighbor where the screen holds it a whole number of times, or when Even pixels is off). Lower resolutions remain configurable; an optional higher resolution (960×540) sits behind a collapsed choice with an immersion warning.
 - **World geometry:**
   - low-poly and vertex-lit
   - procedural 64×64 textures: stone, wood, rot, wet flesh, water
@@ -71,7 +71,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - specific attacks
   - the first sight of any greater-tier or higher entity
 - Sanity is restored at checkpoints and by consumables, and (round 22) mends by itself away from a fight, faster by lamplight. Falling sanity raises both damage dealt and damage taken, until the mind is Unmoored (round 23): then the body suffers, with weaker blows, more damage taken, slower stamina and a slow bleed that never kills.
-- Insight is gained from the first sight of named or boss entities, and from tomes. It can be spent on upgrades, but spending it re-hides whatever it revealed.
+- Insight is gained from the first sight of named or boss entities, and from tomes. It can be spent on upgrades, but spending it re-hides whatever it revealed. Secret paths require retained Insight rather than charging on entry: 1 for introductory doors, 2 for lesser waking secrets, 3 for major waking branches, 4 for deep-world branches, and 5 for far-realm secrets. Required boss routes remain accessible without Insight.
 - World hooks are components that listen to the event bus:
   1. `HiddenLayer {minInsight?, maxSanity?}`: eldritch geometry, bridges, and doors that exist only for the enlightened.
   2. `VariantSwap`: at Fractured or lower, entities switch to their `eldritchVariant` overrides.
@@ -88,7 +88,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - block, which takes stamina damage on hit
   - parry window
   - off-hand 1920s revolver: low damage, but a well-timed shot interrupts (Bloodborne-style)
-- Stamina: each action has a cost, regen is delayed after spending, and hitting zero causes a guard break.
+- Stamina: actions with a cost require the full amount to start; sprinting requires the next step of its drain. Revolver shots cost no stamina. Regen is delayed after spending, and a blocked hit that empties stamina causes a guard break.
 - Poise and stagger apply to both the player and enemies. Hits get 2–4 frames of hitstop.
 - Critical bonuses are modest: +15% against ordinary enemies, +10% against bosses. Backstabs require a heavy attack within the rear 40° of a small non-boss foe. Body parts have no weakspot bonuses; multipart hitboxes only follow the creature's shape.
 - Lock-on:
@@ -97,7 +97,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - the player can switch targets left/right
   - lock breaks automatically on range or LOS loss
 - Animation is procedural (tweened primitives and sprite frames). No skeletal assets.
-- Death: the player drops currency ("Echoes") where they fell and respawns at the last Elder Sign (checkpoint). Non-boss enemies reset. Touching the drop recovers it.
+- Death: the player drops currency ("Echoes") where they fell and respawns at the last Elder Sign (checkpoint). Non-boss enemies reset. Touching the drop recovers it. Every arrival (round 88: a rising, fast travel, a rest, a game continued at its stone) is at peace: nothing notices or reaches the investigator until they have moved or acted and a few seconds more have passed, or at once if they strike, shoot or throw first, or come to a sleeping horror's ring, which they then wake as ever.
 
 ### C. Entity registry
 - `src/data/roster.ts` holds every id from §4 and is the source of truth.
@@ -163,8 +163,9 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
 Place every other entity in the spawn tables of its best-fitting region.
 
 ### E. Bosses
-- `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?}`.
-- Boss health and damage scale with the investigator's total level: +0.75% base health and +0.3% base damage per purchased attribute level. This combines with NG+ and difficulty. Round 71: a level counts by its worth past the soft caps that also set what Vigour, Endurance and Might give the investigator (`SOFT_CAP`: the first 18 levels of an attribute count whole, the next 8 half, the last 4 fifteen in a hundred), so a level the body gains little from does not make the horrors much harder either. Living bosses keep their health percentage when the player levels up; ordinary enemies and summoned adds keep their existing stats.
+- `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?, eldritch?}`.
+- Boss health is independent of investigator level: it starts at the authored maximum for its current form, grows to 115% on NG+1, then by five percentage points per journey to 145% at NG+7 and beyond. On the first journey a boss's damage gains +0.3% per purchased attribute level and, past its expected standing, absorbs 45% of the investigator's extra health growth. Later journeys use a fixed reference and regional damage progression through NG+7 (`docs/NGPLUS.md`); the chosen difficulty still applies. Every attribute level grants its full benefit. Leveling leaves a living boss's health and wounds unchanged. Ordinary enemies receive regional journey scaling; encounter servants keep authored health and inherit the encounter's journey damage growth.
+- The High Priest reveals its eldritch form in phases two and three regardless of sanity. Dagon and Hydra coordinate attacks while engaged together in the same arena, waiting through the partner's complete recovery plus 24 rest frames before another wind-up. The waiting boss yields 0.75 m beyond the two collision radii, leaving room to dodge while remaining within blade reach. Their authored health is 2550/2450 and damage 35/38, balanced as one combined encounter. Their flood remains, while second-phase darkness and servant packs are removed to preserve visible ground cues and space to counterattack.
 - Arenas have no decorative neon floor symbols. Markings on arena props and functional combat or puzzle markings remain.
 - Shared attack library, about 20 parameterized attacks:
   - melee: sweep, slam, lunge, charge, grab, bite, tentacle_burst
@@ -186,7 +187,7 @@ Place every other entity in the spawn tables of its best-fitting region.
   - **Shub-Niggurath:** endlessly spawns the Thousand Young until you destroy the spawning roots.
   - **Yog-Sothoth:** its iridescent spheres are gates, and the arena teleports between them.
   - **Nyarlathotep:** appears as avatars throughout the game. Its final form copies earlier bosses' movesets. Nodens can be summoned as an ally for this fight.
-  - **Azathoth:** blind and invulnerable. It tracks sound, so the fight is stealth and survival, not damage.
+  - **Azathoth:** blind, and the hardest fight in the game (it was once invulnerable, a fight of silence against a timer; 2026-10-29). It aims nothing: its blows are rhythms laid over the whole court (rings of sound, beats of boils, a dance of thirteen, a seething that leaves pools, a miasma that spreads outward and takes the mind, a centre that draws all in), read by where and when they fall. It hears the loud, a shot and a sprint (in its last phase a roll and a swing too), and answers where it was made.
 
 Every other boss is composed from the shared library.
 

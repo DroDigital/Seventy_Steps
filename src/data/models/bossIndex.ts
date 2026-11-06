@@ -185,8 +185,6 @@ export const BOSS_INFO: Readonly<Record<string, ModelInfo>> = {
   pd_chain: { kit: 'p40', x0: -0.18, x1: 0.18, y0: 0.0, y1: 3.6, z0: -0.18, z1: 0.18, round: false, tris: 20, solids: [] },
   pd_chandelier: { kit: 'p40', x0: -1.3, x1: 1.3, y0: 0.0, y1: 2.172, z0: -1.498, z1: 1.498, round: false, tris: 368, solids: [] },
   pd_spikes: { kit: 'p40', x0: -1.1, x1: 1.1, y0: 0.0, y1: 1.257, z0: -1.414, z1: 1.414, round: false, tris: 78, solids: [] },
-  pd_candle_a: { kit: 'p40', x0: -0.124, x1: 0.124, y0: 0.0, y1: 0.4, z0: -0.143, z1: 0.143, round: false, tris: 32, solids: [], anchors: [[0.0,0.42,0.0]] },
-  pd_candle_b: { kit: 'p40', x0: -0.224, x1: 0.224, y0: 0.0, y1: 0.5, z0: -0.184, z1: 0.184, round: false, tris: 96, solids: [], anchors: [[0.0,0.52,0.0]] },
   pd_debris: { kit: 'p40', x0: -1.1, x1: 1.1, y0: 0.0, y1: 0.39, z0: -1.1, z1: 1.1, round: false, tris: 148, solids: [] },
   ca_column: { kit: 'p42', x0: -0.205, x1: 0.205, y0: 0.0, y1: 5.4, z0: -0.205, z1: 0.205, round: true, tris: 290, solids: [[0.0,0.0,0.205,0.205,0.0,5.4]] },
   ca_column_small: { kit: 'p42', x0: -0.29, x1: 0.29, y0: 0.0, y1: 3.0, z0: -0.29, z1: 0.29, round: true, tris: 242, solids: [[0.0,0.0,0.29,0.29,0.0,3.0]] },

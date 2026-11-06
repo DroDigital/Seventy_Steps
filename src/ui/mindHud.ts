@@ -4,20 +4,19 @@
  * drains after a moment (as a wound does on health's bar), and a sudden loss (SanityLost) jolts the
  * bar and lights its frame. Once the mind has Fractured, the Laudanum count becomes the call to drink
  * it, and the band's notice says so too (or to rest, when none is left). No new screen effect: the
- * sanity FX say enough already. Round 22: an arrow after the band says the mind is mending by itself
- * (▲), two of them in the light of a lamp or a fire (▲▲).
+ * sanity FX say enough already. An arrow appears while the mind is restoring in light.
  */
 
 import { t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { MIND_HUD, SANITY } from '../data/tuning';
 import type { Band, Game } from '../systems/components';
-import { atOrBelow, bandIndex, darkRate } from '../systems/sanity';
+import { atOrBelow, bandIndex } from '../systems/sanity';
 import { glyph } from './glyphs';
 import { gauge } from './gauges';
 import { BONE, el, setStyle, setText } from './hudKit';
 
-const MAGENTA = '#b04a82';
+export const MAGENTA = '#b04a82'; // (the HUD's health bar glows in it while the Unmoored mind wears the body away)
 /** The bar and the band's name, from clear water to magenta (round 32: they were bone, bone, purple and magenta, and the bar was one of three of a colour). */
 const BAND_COLOURS: Record<Band, string> = { lucid: '#6a98b2', uneasy: '#8d98c0', fractured: '#9468b6', unmoored: MAGENTA };
 
@@ -29,6 +28,12 @@ export interface MindHud {
 export const callsForLaudanum = (g: Game): boolean =>
   atOrBelow(g.mind, 'fractured') && g.player.laudanum > 0 && g.ecs.c.actor.get(g.player.id)?.move !== 'drink';
 
+/** The indicator represents ongoing recovery at a real light source, not passive recovery in darkness. */
+export function mendingInLight(g: Game): boolean {
+  const pos = g.ecs.c.transform.get(g.player.id)?.pos;
+  return g.mind.mending > 0 && g.mind.sanity < SANITY.max && !!pos && (g.lit?.(pos) ?? 0) > 0;
+}
+
 /** Builds the sanity bar and the band line into `vitals`; `say` shows a short notice. */
 export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) => void): MindHud {
   const fill = gauge(vitals, BAND_COLOURS.lucid, 5);
@@ -39,18 +44,28 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
   for (const floor of SANITY.bands) el(`position:absolute;left:${floor}%;top:-2px;bottom:-2px;width:1px;background:${BONE}99`, '', frame);
   const line = el('display:flex;justify-content:space-between;letter-spacing:2px;font-size:10px;margin-top:1px', '', vitals);
   const band = el('', '', line);
-  const laudanum = el('opacity:.7', '', line);
+  const laudanum = el('opacity:.85', '', line);
   let chipPct = 100;
   let chipHold = 0;
   let joltAt = -Infinity;
   let jolted = false; // the frame shows a jolt that has not been cleared yet
+  /** What a failing mind costs, said on the screen once a save (a first public playthrough asked "Unmoored, what does that mean?" and "what's hurting me?"; the Field Guide keeps the whole of it). */
+  const once = (id: string, key: Key): void => {
+    const told = g.overworld?.told;
+    if (!told || told.has(`said:${id}`)) return;
+    told.add(`said:${id}`);
+    say(t(key));
+  };
 
   g.events.on('SanityLost', () => (joltAt = performance.now()));
   g.events.on('SanityBandChanged', (e) => {
     const worse = bandIndex(e.to) > bandIndex(e.from);
     const call = !worse || bandIndex(e.to) < bandIndex('fractured') ? '' : g.player.laudanum > 0 ? `  ·  ${t('mind.laudanumCall', { key: glyph('item').toUpperCase() })}` : `  ·  ${t('mind.restCall')}`;
     say(`${worse ? '▼' : '▲'} ${t(`mind.${e.to}` as Key)}${call}`);
+    if (e.to === 'unmoored') once('unmoored', 'mind.unmooredWhat');
   });
+  g.events.on('Vanished', (e) => e.struck && once('phantom', 'mind.phantomWhat'));
+  g.events.on('Hit', (e) => e.target === g.player.id && g.ecs.c.phantom.has(e.attacker) && once('phantom', 'mind.phantomWhat'));
 
   return {
     update(now) {
@@ -71,12 +86,12 @@ export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) 
         frame.style.boxShadow = jolt > 0 ? `0 0 ${Math.round(8 * jolt)}px ${MAGENTA}` : '';
         jolted = jolt > 0;
       }
-      setText(band, `${t(`mind.${m.band}` as Key)} ${Math.ceil(m.sanity)}${m.mending > darkRate(m) * 1.5 ? ' ▲▲' : m.mending > 0 ? ' ▲' : ''}`);
+      setText(band, `${t(`mind.${m.band}` as Key)} ${Math.ceil(m.sanity)}${mendingInLight(g) ? ' ▲' : ''}`);
       setStyle(band, 'color', BAND_COLOURS[m.band]);
       const call = callsForLaudanum(g);
       setText(laudanum, `${call ? `${glyph('item').toUpperCase()} · ` : ''}${t('mind.laudanum', { n: g.player.laudanum })}`);
       setStyle(laudanum, 'color', call ? '#d26a9d' : BONE);
-      setStyle(laudanum, 'opacity', call ? (0.7 + 0.3 * Math.sin(now / 260)).toFixed(2) : '0.7');
+      setStyle(laudanum, 'opacity', call ? (0.85 + 0.15 * Math.sin(now / 260)).toFixed(2) : '0.85');
     },
   };
 }

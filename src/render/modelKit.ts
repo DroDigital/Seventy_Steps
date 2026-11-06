@@ -12,7 +12,7 @@ import { MODEL_INFO } from '../data/models/index';
 import { scaleOf, type Prop } from '../world/props';
 import { LANTERN_MODELS } from '../world/lanternModels';
 import { BASE, luma, mixRgb, scaleRgb, type Rgb } from './palette';
-import type { Piece, PropMat } from './propShapes';
+import type { PropMat, SolidPiece } from './propShapes';
 
 type Pack = Readonly<Record<string, string>>;
 let pack: Pack | null = null;
@@ -111,24 +111,26 @@ const LAMP_GLASS: Rgb = [0.34, 0.29, 0.2];
 const CLOTH_SWAY = 0.4; // metres a hanging cloth's hem is blown at a gust's height
 
 /** The model's materials in the prop's frame. Lantern iron and glass keep their own finish instead of the kit's leaf/wood labels. */
-export const modelPieces = (p: Prop, stone: Rgb): Piece[] => (p.set ? modelPiecesOf(p.set, stone) : []);
+export const modelPieces = (p: Prop, stone: Rgb): SolidPiece[] => (p.set ? modelPiecesOf(p.set, stone) : []);
 
 /** The same of a look alone (a gate's leaf is hung by data/gateStyles.ts, not stood as a prop): feet at the origin, its footprint centred, scaled by the look. */
-export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): Piece[] {
+export function modelPiecesOf(look: NonNullable<Prop['set']>, stone: Rgb): SolidPiece[] {
   const m = decode(look.id);
   if (!m) return [];
   const lamp = !!LANTERN_MODELS[look.id];
   const keep = look.keep ?? 0;
   const [sx, sy, sz] = scaleOf(look);
   const groups = new Map<string, number[]>(); // material → the faces drawn in it
+  const flamed = !!look.lit && !!MODEL_INFO[look.id]?.anchors?.length;
   for (let t = 0; t < m.kind.length; t++) {
     const glass = lamp && look.id === 'lightpost' && m.kind[t] === 1;
+    if (flamed && m.kind[t] === KIND.glow) continue; // a lit fixture's own baked cone of flame (the brazier's): the pixel flame at its anchor is its fire (round 87)
     // Replace the baked candle's tall wick with the oil burner's small wick and flame.
     if (lamp && look.id === 'lantern' && m.kind[t] === 1 && m.colour[t * 3 + 1] < 150) continue;
     const mat = glass ? 'glass' : lamp ? 'stone' : MATS[look.wax && WAXEN.has(m.kind[t]!) ? KIND.wax : m.kind[t]!] ?? 'stone';
     groups.get(mat)?.push(t) ?? groups.set(mat, [t]);
   }
-  const out: Piece[] = [];
+  const out: SolidPiece[] = [];
   const top = m.height * sy;
   for (const [mat, faces] of groups) {
     const n = faces.length * (faces.some((t) => m.both[t]) ? 2 : 1) * 3;

@@ -30,6 +30,18 @@ export const AI = {
   detour: 0.7, // ...it steps aside this long to get round what blocks it
 };
 
+/**
+ * How the rank and file press once they have closed (lesser foes of these tempers, and not a summon).
+ * A pack hunter's own wait ran up to a second and a half after the swing, on top of two cane-lights
+ * putting it on the ground, so a body authored to fight never finished a blow. A swarm keeps its frenzy;
+ * a caster keeps its own wait, and a shot is still held by `AI.rangedGap`. A horror keeps `BOSS.gap`.
+ */
+export const RANK = {
+  tempers: ['pack_hunter', 'skirmisher', 'brute', 'ambusher', 'flyer_swoop'] as const,
+  cooldown: [52, 84] as const, // frames between blows: a short rest after a sweep, not a pause
+  punish: 0.35, // an opening (a swallow, a recovery, a stagger) lets the next blow start once this share of the wait is left
+};
+
 /** The world's small lives (playtest round 18: data/fauna.ts gives each its size, pace and nerve; render/critterLife.ts their ways). */
 export const FAUNA = {
   near: 1, // chunks about the investigator's own whose critters live (a 3 × 3 block)

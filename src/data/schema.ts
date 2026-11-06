@@ -70,6 +70,21 @@ export const ATTACK_IDS = [
   'toxic_cloud',
   'dream_cloud',
   'thunderfall',
+  // 2026-10-29: Azathoth's own. It is blind, so none is aimed: each is a rhythm laid over the court, read by where it falls and when
+  'dirge',
+  'blind_rays',
+  'chaos_rays',
+  'rift_tentacles',
+  'rift_cascade',
+  'dirge_2',
+  'dirge_3',
+  'drumbeat',
+  'dance',
+  'seethe',
+  'maelstrom',
+  'maelstrom_burst',
+  'crescendo',
+  'miasma',
 ] as const;
 export type AttackId = (typeof ATTACK_IDS)[number];
 
@@ -212,6 +227,7 @@ export interface BossPhase {
   summons?: readonly string[]; // entity ids
   realityHooks?: readonly RealityHook[];
   arenaChange?: ArenaChange;
+  eldritch?: boolean; // this phase reveals the eldritch variant regardless of the investigator's sanity
 }
 
 export interface BossScript {

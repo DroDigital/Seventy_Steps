@@ -48,6 +48,8 @@ export interface Beat {
   shake?: number; // the camera trembles this hard (metres) for `hold` seconds
   rise?: number; // the investigator gets up from the knee, over this many seconds (0: as fast as they would in play)
   kneel?: boolean; // the investigator goes down on one knee before the Elder Sign the scene is at; the scene's end has them up again (round 55: the herald's)
+  act?: string; // the scene waits here until E (or the pad's A) does this; the beat itself plays as the word resumes (round 98)
+  hand?: 'close' | 'open'; // the investigator's right hand, on the silver key
   voice?: { by: string; text: string }; // a line said aloud by `boss:<id>` (data/speechLines.ts; the voices): its recording plays
 }
 

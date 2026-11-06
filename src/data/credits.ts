@@ -20,7 +20,7 @@ export const CREDITS: readonly CreditBlock[] = [
   {
     heading: 'MODELS, FLAMES AND SURFACES',
     lines: [
-      'free models and animations, reduced, coloured and set for the game:',
+      'free models, animations and particle sprites, reduced, coloured and set for the game:',
       'licensed CC BY 4.0: FlukierJupiter · andrewriddle · KRei · Mad_Lobster_Workshop · Jochon · rkuhlf · INGSOC1984 · carismah',
       'Heliona · Özlem Çandır · KIFIR · vertexgrocer · davdadams',
       'Samuel Francis Johnson (Oneironauticus) · TheoClarke · Goblinatron (PSX Dungeon) · BlenderVoyage · bobjh · Marin PETTE · 3D Vault',
@@ -45,6 +45,6 @@ export const CREDITS: readonly CreditBlock[] = [
   {
     heading: 'SOFTWARE',
     quiet: true,
-    lines: ['three.js · MIT License · © 2010–2026 three.js authors', 'Electron · MIT License · © Electron contributors, with Chromium under its own licences', 'IM Fell English · © Igino Marini · SIL Open Font License 1.1', 'Special Elite · © 2010 Brian J. Bonislawsky DBA Astigmatic · Apache License 2.0', 'built with TypeScript and Vite'],
+    lines: ['three.js · MIT License · © 2010–2026 three.js authors', 'Electron · MIT License · © Electron contributors, with Chromium under its own licences', 'IM Fell English · © Igino Marini · SIL Open Font License 1.1', 'EB Garamond · © 2017 The EB Garamond Project Authors · SIL Open Font License 1.1', 'Special Elite · © 2010 Brian J. Bonislawsky DBA Astigmatic · Apache License 2.0', 'built with TypeScript and Vite'],
   },
 ];

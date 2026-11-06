@@ -2,8 +2,8 @@
  * A new journey through the dream (playtest round 12: there was no NG+). After an ending, beginning
  * anew may carry the investigator's strength into a new dream: levels, arms and how far each is
  * reinforced, star-stones, the mind's upgrades, Silver Vials, the revolver's levels, Echoes and the hints given. Everything else (the
- * world, its quests and bosses) begins again, and each journey's foes are hardier, strike harder
- * and leave more Echoes (NEW_GAME_PLUS). Pure: no Three.js.
+ * world, its quests and bosses) begins again. Ordinary foes become hardier; enemies strike harder
+ * and leave more Echoes (NEW_GAME_PLUS). Boss health rises by journey. Pure: no Three.js.
  */
 
 import type { Entity } from '../core/ecs';
@@ -17,7 +17,9 @@ import type { Game } from './components';
 import { isFound } from './found';
 import { applyLevels, LEVEL_IDS } from './levels';
 import { levelsWorth } from './levelWorth';
-import { bossDamageScale, overmatch } from './bossScaling';
+import { bossDamageScale, journeyBossDamage, overmatch } from './bossScaling';
+import { homeRung, journeyIndex } from './ngPlus';
+import type { JourneyHome } from './ngPlus';
 
 export interface Carry {
   cycle: number; // the journey it carries into (1: the second)
@@ -93,17 +95,19 @@ export function applyCarry(g: Game, c: Carry): void {
   for (const id of c.found) g.overworld?.told.add(foundKey(id));
 }
 
-/** How much hardier this journey's foes are than the first's. */
-export const foeHealth = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.health * g.player.cycle;
+/** How much hardier ordinary foes and encounter servants are in this journey. */
+export const foeHealth = (g: Pick<Game, 'player'>, home?: JourneyHome): number => homeRung(home, g.player.cycle).health;
 
 /** The weight this journey, and the difficulty chosen, put on a blow from `attacker` (1 for the investigator and their allies). */
 export function foeDamage(g: Game, attacker: Entity): number {
   if (g.ecs.c.combatant.get(attacker)?.faction !== 'enemy') return 1;
-  const servant = g.ecs.c.minion.has(attacker) ? BOSS.servantDamage : 1; // a boss's summons strike lighter (round 46)
+  const home = g.ecs.c.journey.get(attacker);
+  const servant = g.ecs.c.minion.has(attacker) || home?.servant ? BOSS.servantDamage : 1;
   const fight = g.ecs.c.fight.get(attacker);
-  const level = fight ? bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage) : 1;
-  return servant * DIFFICULTIES[g.player.difficulty].foe * (1 + NEW_GAME_PLUS.damage * g.player.cycle) * level;
+  const level = fight ? (g.player.cycle > 0 ? journeyBossDamage(fight.id, g.player.cycle, home?.profile) : bossDamageScale(levelsWorth(g.player.levels), overmatch(g.player.levels, fight.id).damage)) : homeRung(home, g.player.cycle).damage;
+  const land = fight ? 1 : g.ecs.c.dread.get(attacker)?.land ?? 1;
+  return servant * DIFFICULTIES[g.player.difficulty].foe * level * land;
 }
 
 /** The Echoes this journey's foes leave, against the first's. */
-export const foeBounty = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.echoes * g.player.cycle;
+export const foeBounty = (g: Pick<Game, 'player'>): number => 1 + NEW_GAME_PLUS.echoes * journeyIndex(g.player.cycle);

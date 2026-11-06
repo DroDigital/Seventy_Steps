@@ -1,22 +1,21 @@
 /**
- * The gameplay camera's four looks (round 77, asked: Classic stays selectable and three more are options in Settings › Play, after pictures
- * of each: docs/DECISIONS.md; round 82, asked: Low hero is the default). Classic is the boom as it was, from `CAMERA`. Low hero hangs lower and closer behind the shoulder with a wider
- * lens. Long lens stands far back behind a telephoto. Tight shoulder hangs close and over the shoulder. Low hero and Long lens, locked on to a
- * foe, gather the lens back and aim it between the investigator and the foe, further for a taller one, so that a colossus is seen whole instead
- * of the camera sitting under it (the player cannot turn the camera while locked on, so only the game can do this).
+ * The gameplay camera's three looks (Settings › Play). Classic is the default, with a slight refinement to its original angle.
+ * Low hero hangs lower and closer behind the shoulder with a wider lens. Tight shoulder hangs close and over the shoulder.
+ * Classic and Low hero frame locked foes by size, moving the lens back and aiming between the investigator and the foe (a tall one at the
+ * middle of the band from the investigator's feet to its top, round 104).
  * Every boom stays on the line the picture looks along (`rig.yaw`), which the sticks, the lock, the hurt edge and the minimap read.
  */
 
 import { CAMERA, RENDER } from './tuning';
 
-export type CameraMode = 'classic' | 'hero' | 'long' | 'shoulder';
-/** In the order of the setting's values: 0 is Classic, 1 Low hero, the default (`SETTINGS.camera`). `createCameraRig` still starts from Classic, so the simulation and its tests do not depend on the setting. */
-export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'long', 'shoulder'];
+export type CameraMode = 'classic' | 'hero' | 'shoulder';
+/** In the order of the setting's values: 0 is Classic, the default, 1 Low hero, and 2 Tight shoulder. */
+export const CAMERA_MODE_IDS: readonly CameraMode[] = ['classic', 'hero', 'shoulder'];
 
 /** How a locked-on foe is framed: its height `H` in metres (clamped to `height`) sets everything. */
 export interface FrameTuning {
   follow: number; // 1/s: how fast the framing comes in and goes out (a lock lost, a lock switched)
-  height: readonly [least: number, most: number]; // the foe heights the framing scales between (a colossus of 40 m is framed as 24)
+  height: readonly [least: number, most: number]; // the foe heights the framing scales between (the tallest horror, Cthulhu, is 40 m; round 104 lifted this from 24)
   lead: number; // the share of the way to the foe the lens looks at...
   leadMax: number; // ...at most this many metres
   back: readonly [base: number, perMetre: number, least: number, most: number]; // metres the lens hangs behind the investigator
@@ -25,6 +24,7 @@ export interface FrameTuning {
   pitchMost: number; // rad: the boom never tilts further than this to get there
   tall: readonly [from: number, to: number]; // the heights between which the lens narrows...
   fovTall: number; // ...to this
+  fovMost: number; // degrees: the widest the lens goes to hold a foe that a wall or a near foe leaves little room for (round 104: was the look's own)
 }
 
 export interface CameraTuning {
@@ -40,12 +40,11 @@ export interface CameraTuning {
   lockPitchMax: number;
   easeOut: number; // m/s the boom grows back after a pull-in
   fov: number; // degrees, vertical
-  /** A narrow lens needs its boom: where a wall cuts the boom short the lens widens, as far as this many degrees, to keep the figure the size it was (Long lens). */
-  keepFov?: number;
   frame: FrameTuning | null; // null: a lock only turns the boom toward the foe
 }
 
-const CLASSIC: CameraTuning = {
+// The original numbers also supply the modes that have not changed.
+const BASE: CameraTuning = {
   pivotHeight: CAMERA.pivotHeight,
   distance: CAMERA.distance,
   mountDistance: 8.5,
@@ -62,9 +61,25 @@ const CLASSIC: CameraTuning = {
 };
 
 export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
-  classic: CLASSIC,
+  classic: {
+    ...BASE,
+    pitch: 0.23, // a little less downward than the original 0.25, with the same boom and lens
+    frame: {
+      follow: 2.5,
+      height: [1.6, 40],
+      lead: 0.4,
+      leadMax: 8,
+      back: [4.8, 0.38, 5.6, 20], // round 104: a giant's lens stands back to take in its top with the investigator (was 14)
+      aim: [0.42, 1.5, 9],
+      lensUp: [2.6, 0.05, 2.65, 3.8], // keep a view down over the investigator when a short foe is close
+      pitchMost: 0.48,
+      tall: [3, 14],
+      fovTall: 64,
+      fovMost: 72,
+    },
+  },
   hero: {
-    ...CLASSIC,
+    ...BASE,
     pivotHeight: 1.05, // the figure's chest: the horizon sits near the middle of the picture
     distance: 4.4,
     mountDistance: 8,
@@ -77,43 +92,20 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
     fov: 76,
     frame: {
       follow: 2.5,
-      height: [1.6, 24],
+      height: [1.6, 40],
       lead: 0.5,
       leadMax: 9,
-      back: [2.4, 0.6, 4.4, 12],
+      back: [2.4, 0.6, 4.4, 20], // round 104: as Classic's, for a giant (was 12)
       aim: [0.42, 1.5, 9],
       lensUp: [0.65, 0.22, 0.75, 3.45],
       pitchMost: 0.35,
       tall: [3, 14],
       fovTall: 62,
-    },
-  },
-  long: {
-    ...CLASSIC,
-    pivotHeight: 1.5,
-    distance: 11,
-    mountDistance: 14,
-    shoulder: 0.4,
-    pitch: 0.17,
-    pitchMax: 0.8,
-    easeOut: 8,
-    fov: 32,
-    keepFov: 68,
-    frame: {
-      follow: 2.5,
-      height: [1.6, 24],
-      lead: 0.5,
-      leadMax: 9,
-      back: [6, 0.95, 7, 22],
-      aim: [0.46, 1.5, 9],
-      lensUp: [0.4, 0.14, 0.5, 2.4],
-      pitchMost: 0.3,
-      tall: [3, 14],
-      fovTall: 34,
+      fovMost: 80,
     },
   },
   shoulder: {
-    ...CLASSIC,
+    ...BASE,
     pivotHeight: 1.45,
     distance: 3,
     mountDistance: 6.5,
@@ -127,5 +119,5 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
   },
 };
 
-/** The look a setting's value names (0: Classic; the default, 1, is Low hero). */
+/** The look a setting's value names (0: Classic, the default; 1: Low hero). */
 export const cameraModeOf = (setting: number): CameraMode => CAMERA_MODE_IDS[Math.min(CAMERA_MODE_IDS.length - 1, Math.max(0, Math.round(setting)))]!;

@@ -3,7 +3,7 @@
  * game to start, and what the tools around it refuse. The packed game itself is started by CI (.github/workflows/release-builds.yml).
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { describe, expect, it } from 'vitest';
 
@@ -26,6 +26,9 @@ describe('what is packed', () => {
     for (const os of ['win', 'mac', 'linux']) expect(JSON.stringify(pkg.build[os].target), os).toContain('"dir"');
     expect(pkg.build.win.executableName).toBe('SeventySteps'); // (what docs/STEAM.md and tools/smoke_packaged.mjs name)
     expect(pkg.build.linux.executableName).toBe('seventy-steps');
+    expect(pkg.build.afterPack).toBe('./packaging/linuxLaunch.mjs'); // Ubuntu AppArmor: launcher adds --no-sandbox
+    expect(read('packaging/linuxLaunch.mjs')).toMatch(/--no-sandbox/);
+    expect(read('desktop/main.js')).toMatch(/platform === 'linux'.*no-sandbox/s);
     expect(JSON.stringify(pkg.build.mac.target)).toMatch(/arm64/);
     expect(JSON.stringify(pkg.build.mac.target)).toMatch(/x64/);
   });
@@ -92,6 +95,31 @@ describe('the itch.io release (round 51)', () => {
     expect(r.stdout).toMatch(/digitaldro\/seventy-steps:osx/);
     expect(r.stdout).toMatch(/Nothing sent/);
     expect(readFileSync(`${dir}/mac-universal/.itch.toml`, 'utf8')).toContain('path = "Seventy Steps.app"');
+  });
+
+  it('the itch Linux play action passes --no-sandbox (Ubuntu AppArmor)', () => {
+    const itch = read('tools/itch_push.mjs');
+    expect(itch).toMatch(/p\.name === 'linux'/);
+    expect(itch).toMatch(/args = \["--no-sandbox"\]/);
+  });
+
+  it('the Linux afterPack wraps the binary so a start without Steam launch options still passes --no-sandbox', () => {
+    const out = mkdtempSync(`${tmpdir()}/linux-launch-`);
+    writeFileSync(`${out}/seventy-steps`, 'ELF-fake');
+    chmodSync(`${out}/seventy-steps`, 0o755);
+    const run = (platform: string) =>
+      spawnSync(process.execPath, ['--input-type=module', '-e', `import afterPack from './packaging/linuxLaunch.mjs'; await afterPack({ electronPlatformName: ${JSON.stringify(platform)}, appOutDir: ${JSON.stringify(out)} });`], {
+        env: { PATH: process.env.PATH ?? '' },
+        encoding: 'utf8',
+      });
+    expect(run('linux').status).toBe(0);
+    expect(existsSync(`${out}/seventy-steps.bin`)).toBe(true);
+    expect(readFileSync(`${out}/seventy-steps.bin`, 'utf8')).toBe('ELF-fake');
+    const sh = readFileSync(`${out}/seventy-steps`, 'utf8');
+    expect(sh.startsWith('#!/bin/sh')).toBe(true);
+    expect(sh).toMatch(/exec \.\/seventy-steps\.bin --no-sandbox "\$@"/);
+    expect(run('darwin').status).toBe(0); // other platforms leave the folder alone
+    expect(readFileSync(`${out}/seventy-steps`, 'utf8')).toBe(sh);
   });
 
   it('the workflow packs for itch.io only when asked, checks the channel, and pushes with a secret it never prints', () => {

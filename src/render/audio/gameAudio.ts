@@ -61,6 +61,7 @@ import { playSound } from './synth';
 import { createAtmosphereAudio } from './atmosphereAudio';
 import { createOcclusion, heard } from './occlusion';
 import { MIND_TIDE } from './mindTide';
+import { soundscapeAt } from './soundscape';
 
 export interface GameAudio {
   /** `paused`: the world stands still, and so do its creatures' voices. */
@@ -83,6 +84,8 @@ export interface GameAudio {
   recordedFor(key: string): boolean;
   /** Gets the realm's track ready (fetched, decoded) without sounding it: the world's sound begins when it shows (round 29). */
   warm(): void;
+  /** Holds the narrator's line, or lets it go on, at the word an ending's gesture answers (round 98). */
+  holdVoice(on: boolean): void;
 }
 
 interface Caller {
@@ -297,6 +300,9 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     warm() {
       realm.warm(trackHere(g.ecs.c.transform.get(g.player.id)?.pos));
     },
+    holdVoice(on) {
+      speech.hold(on);
+    },
     far(set, gain = 1, pitch) {
       sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.7, lowpass: 900 + 4000 * gain, pitch, bus: e.bed ?? undefined });
     },
@@ -336,7 +342,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       drones.set(region, scene.fights.length > 0);
       const at = g.ecs.c.transform.get(g.player.id)?.pos;
       const roofed = (g.overworld && at && inside(at)) || null;
-      ambience.set(roofed || (AMBIENCE[region ?? ''] ?? null));
+      ambience.set(roofed || (AMBIENCE[soundscapeAt(region, at) ?? ''] ?? null));
       weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 80: on snow and sand a storm is the wind alone, not the wash of rain)
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });

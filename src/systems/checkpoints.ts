@@ -6,6 +6,7 @@
  * into the Dreamlands. A gate leads to its twin in another realm. Pure: no Three.js.
  */
 
+import { gateModel } from '../data/gateFrames';
 import { t } from '../core/i18n';
 import { talk } from './npcs';
 import { npcDef } from '../data/npcs';
@@ -28,6 +29,7 @@ import { setLock } from './lockOn';
 import { reopen } from './overworld';
 import { setSanity } from './sanity';
 import { dismissMount } from './mounts';
+import { clearPortalRide, keepPortalCamera, portalVeil } from './mountPortal';
 import { demoAllows, demoRefuses } from './demo';
 
 export const signPlace = (id: string): SignPlace | undefined => worldLayout().signs.find((s) => s.id === id);
@@ -45,14 +47,19 @@ export function furnishWorld(g: Game): void {
     return e;
   };
   for (const s of w.signs) c.sign.set(put(s.x, s.z, yawOfDir(s.face), 'elderSign'), { id: s.id, name: s.name });
-  for (const t of w.gates) c.gate.set(put(t.x, t.z, yawOfDir(t.face), 'gate'), { id: t.id, name: t.name, to: t.to });
+  for (const t of w.gates) c.gate.set(put(t.x, t.z, yawOfDir(t.face), gateModel(t.id)), { id: t.id, name: t.name, to: t.to });
   for (const t of w.tomes) if (!g.overworld?.read.has(t.name)) spawnTome(g, { ...t.at, name: t.name, insight: t.insight, vial: t.vial, note: t.note, echoes: t.echoes, weapon: t.weapon, rounds: t.rounds });
   for (const p of w.pieces) spawnPiece(g, p);
 }
 
-/** Moves the investigator to `at` (no healing), the camera behind them. */
-export function teleport(g: Game, at: Place): void {
-  dismissMount(g);
+/** Moves the investigator to `at` (no healing), the camera behind them. `keepRide` is the gate they walked in the saddle: the ride comes through, the pace with it (mountPortal.ts). Every other jump sets them down. */
+export function teleport(g: Game, at: Place, keepRide = false): void {
+  const keep = keepRide && portalVeil(g) && !!g.player.mount.active;
+  if (!keep) {
+    dismissMount(g);
+    g.player.gatePass = null; // a jump abandons a walk into a veil, so the veil cannot pull them back afterwards
+    clearPortalRide(g);
+  }
   const tr = g.ecs.c.transform.get(g.player.id)!;
   tr.pos = { x: at.x, y: g.world.ground(at.x, at.z), z: at.z };
   tr.prev = { ...tr.pos };
@@ -63,6 +70,11 @@ export function teleport(g: Game, at: Place): void {
   g.player.kneeling = null;
   resetAim(g.camera, at.yaw);
   resetBoom(g.camera);
+  if (keep) {
+    g.player.mount.yawRate = 0; // out of the gate straight, not still turning from the far side
+    g.player.mount.jam = 0;
+    keepPortalCamera(g);
+  }
 }
 
 /** Marks a sign found; true the first time. */
@@ -171,7 +183,7 @@ export function passGate(g: Game, id: string): boolean {
     return false;
   }
   if (gateBeyondDemo(g, id)) return !demoRefuses(g); // a far realm, in the full game
-  teleport(g, twin.arrive);
+  teleport(g, twin.arrive, true); // a ride taken through the veil is still in the saddle (mountPortal.ts)
   g.events.emit('Travelled', { via: 'gate', to: twin.id, name: twin.name });
   return true;
 }

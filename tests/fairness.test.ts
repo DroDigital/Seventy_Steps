@@ -3,7 +3,7 @@ import { ATTACKS } from '../src/data/attacks';
 import { ENTITIES, paramsOf } from '../src/data/registry';
 import { AI, BOSS } from '../src/data/tuning';
 import { createWorldGame } from '../src/systems/game';
-import { minionsOf, summon } from '../src/systems/specials';
+import { minionsOf, summon, summonsAlive } from '../src/systems/specials';
 import { spawnCreature } from '../src/systems/creatures';
 import { run } from './worldHelpers';
 
@@ -57,15 +57,24 @@ describe('fair play', () => {
     expect(paramsOf(e.behavior).cooldown[0]).toBeGreaterThanOrEqual(60);
   });
 
-  it('a boss strikes no oftener than every 1 s, keeps two servants at most, and calls them no oftener than every 9 s', () => {
+  it('a boss strikes no oftener than every 1 s, keeps two servants at most, and calls them no oftener than every 13.5 s', () => {
     expect(BOSS.gap[0]).toBeGreaterThanOrEqual(60);
     expect(BOSS.minions).toBeLessThanOrEqual(2);
-    expect(BOSS.summonEvery).toBeGreaterThanOrEqual(540);
+    expect(BOSS.summonEvery).toBeGreaterThanOrEqual(810);
+    expect(BOSS.summonCap).toBeLessThanOrEqual(3);
     expect(BOSS.servantDamage).toBeLessThan(1);
     const g = createWorldGame();
     const boss = spawnCreature(g, 'keziah_mason', { x: 3000, z: 3000, yaw: 0 })!;
     for (let i = 0; i < 5; i++) summon(g, boss, 'rat_swarm');
     run(g, 2);
     expect(minionsOf(g, boss).length).toBeLessThanOrEqual(2);
+  });
+
+  it('a boss fight holds three summons at most, whatever calls them, and its decoys are not summons (round 100)', () => {
+    const g = createWorldGame();
+    const boss = spawnCreature(g, 'keziah_mason', { x: 3000, z: 3000, yaw: 0 })!;
+    for (let i = 0; i < 6; i++) summon(g, boss, 'rat_swarm', undefined, 10); // a cap of ten: only the fight's own cap holds it
+    expect(summonsAlive(g, boss)).toBe(BOSS.summonCap);
+    expect(BOSS.summonCap).toBeLessThanOrEqual(3);
   });
 });

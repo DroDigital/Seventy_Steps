@@ -1,0 +1,1562 @@
+{
+  "format": "curwen-high-priest-approved-reworks-v1",
+  "baselineCommit": "630e8c1001a42ecd082ff68d1ffd4a37237f8b67",
+  "delivery": {
+    "manifestSha256": "3976fd2029ff3d3174ae1c36fd32be7e94f5c96ef12a3f2db52a9ab54540cada",
+    "reviewedFramesSha256": "5476e899da2d6cf95cb15fd4da75b4f40d2e64bd27707616591ac69d1ed20286",
+    "frameCount": 87
+  },
+  "entities": [
+    {
+      "key": "joseph_curwen",
+      "root": "sprites/joseph_curwen/64x64",
+      "width": 64,
+      "height": 64,
+      "scale": 2.1,
+      "directions": {
+        "front": {
+          "actions": {
+            "idle": [
+              "sprites/joseph_curwen/64x64/front/idle_0.png",
+              "sprites/joseph_curwen/64x64/front/idle_1.png"
+            ],
+            "move": [
+              "sprites/joseph_curwen/64x64/front/move_0.png",
+              "sprites/joseph_curwen/64x64/front/move_1.png",
+              "sprites/joseph_curwen/64x64/front/move_2.png",
+              "sprites/joseph_curwen/64x64/front/move_3.png"
+            ],
+            "attack": [
+              "sprites/joseph_curwen/64x64/front/attack_0.png",
+              "sprites/joseph_curwen/64x64/front/attack_1.png",
+              "sprites/joseph_curwen/64x64/front/attack_2.png"
+            ],
+            "hurt": [
+              "sprites/joseph_curwen/64x64/front/hurt_0.png",
+              "sprites/joseph_curwen/64x64/front/hurt_1.png"
+            ]
+          }
+        },
+        "left": {
+          "actions": {
+            "idle": [
+              "sprites/joseph_curwen/64x64/left/idle_0.png",
+              "sprites/joseph_curwen/64x64/left/idle_1.png"
+            ],
+            "move": [
+              "sprites/joseph_curwen/64x64/left/move_0.png",
+              "sprites/joseph_curwen/64x64/left/move_1.png",
+              "sprites/joseph_curwen/64x64/left/move_2.png",
+              "sprites/joseph_curwen/64x64/left/move_3.png"
+            ]
+          }
+        },
+        "back": {
+          "actions": {
+            "idle": [
+              "sprites/joseph_curwen/64x64/back/idle_0.png",
+              "sprites/joseph_curwen/64x64/back/idle_1.png"
+            ],
+            "move": [
+              "sprites/joseph_curwen/64x64/back/move_0.png",
+              "sprites/joseph_curwen/64x64/back/move_1.png",
+              "sprites/joseph_curwen/64x64/back/move_2.png",
+              "sprites/joseph_curwen/64x64/back/move_3.png"
+            ]
+          }
+        },
+        "right": {
+          "actions": {
+            "idle": [
+              "sprites/joseph_curwen/64x64/right/idle_0.png",
+              "sprites/joseph_curwen/64x64/right/idle_1.png"
+            ],
+            "move": [
+              "sprites/joseph_curwen/64x64/right/move_0.png",
+              "sprites/joseph_curwen/64x64/right/move_1.png",
+              "sprites/joseph_curwen/64x64/right/move_2.png",
+              "sprites/joseph_curwen/64x64/right/move_3.png"
+            ]
+          }
+        }
+      },
+      "frames": [
+        {
+          "path": "sprites/joseph_curwen/64x64/front/idle_0.png",
+          "sha256": "599e18bf6f0f5b806d92aedcbf7ef7d3e289743cbf2349cf768cf531a4909b9d",
+          "pixelSha256": "4f8aba0c370783b6b636a1fe8785446d42db7f3c46d2b5d406f20b2b0f6e821f",
+          "bounds": [
+            22,
+            5,
+            43,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/idle_1.png",
+          "sha256": "546708efaf008bd0f2b9a408ae802561a95e6edb14a1f71c0c7dbaf1b746b417",
+          "pixelSha256": "0d7491ec267f1a328c81353684cad15765d19c87b20dea6a8bc7a079fdcf3a72",
+          "bounds": [
+            22,
+            5,
+            43,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/move_0.png",
+          "sha256": "47a2c5b728696bd8327007cd09332ee857809dd964fd6ed4b785f4f605bac75c",
+          "pixelSha256": "3f3b96363c6709f9c6960f6064b2265f7c3b56abb7106f8e10c584332e74703b",
+          "bounds": [
+            22,
+            5,
+            42,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/move_1.png",
+          "sha256": "497fb4b5340f3e464c7c984205c42a656621f175301998a85ede7ef63426b461",
+          "pixelSha256": "fe9365ed777d1bada0fc336cfa06ac843a2621e6ef8f6d3680843e86a30f84d7",
+          "bounds": [
+            22,
+            6,
+            42,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/move_2.png",
+          "sha256": "16107d49a678ebe7e2126f4f7715f4417357e05907cb8d5ce2ada240e68fb132",
+          "pixelSha256": "cb4d4654aca31e2e43b1cd49782cbd98859e39447113db16cb24148f65a50c00",
+          "bounds": [
+            22,
+            5,
+            42,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/move_3.png",
+          "sha256": "ee147f4d91c8d396b117a4e04683b80077494d7826b4a80704a478d732d8ce85",
+          "pixelSha256": "62e99b6b423a63dbb8b499c7ae73a6c74fd328bf19efaf8da32db23ee640e252",
+          "bounds": [
+            22,
+            6,
+            42,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/attack_0.png",
+          "sha256": "3fb43eed7cbed93624f87afbb03c7ab9967070701c64ef51fece7311ad106724",
+          "pixelSha256": "6d2c4c65f6602e3d9ea5f217f842267af7dc69d85f33ef356e05eca54e2c0e80",
+          "bounds": [
+            20,
+            6,
+            44,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/attack_1.png",
+          "sha256": "d04430d6133c0ae385d01f274af29f0be200036d28079a0383a58e978a2596cb",
+          "pixelSha256": "f08befc63284fcc41763f3d97c0fb2f6b68eb9baac920fb1f265f6d1a35e025a",
+          "bounds": [
+            18,
+            6,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/attack_2.png",
+          "sha256": "5cb7e95530c150836521f63216cb9bf17d707ff97227860ce3f0b0335c8358d0",
+          "pixelSha256": "b94d4b5734822bfe413391bfa050caa6fc741d1c80f1f93ebe28db3d28f111f8",
+          "bounds": [
+            19,
+            5,
+            44,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 2
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/hurt_0.png",
+          "sha256": "80dd434d7782bc212200be9adb61ea7fd45b9815a3c967a1ba1af4e13442abe0",
+          "pixelSha256": "1e0a7c16a6979ca169c0351570fb5b7c5123f73baeacb57793178c563747a817",
+          "bounds": [
+            16,
+            6,
+            47,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/front/hurt_1.png",
+          "sha256": "ee17de1d675a80e517b823b40d6c61b31b8f8b9a5bc7622f76d1d2ca611677b9",
+          "pixelSha256": "3d806858f577fe640cf388146bbf4b13ee24283784ae8dacb87d676d0f407127",
+          "bounds": [
+            18,
+            6,
+            45,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/idle_0.png",
+          "sha256": "affbb9441c9777cfbbef26a3d17f7d871fb69c9d558791cca495aa6f90334fbd",
+          "pixelSha256": "f2c3dc4e0c12debbfe12faeb446f1aed388441e9619a0aa91ac4187582bcee0b",
+          "bounds": [
+            24,
+            5,
+            42,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/idle_1.png",
+          "sha256": "1f236d6235239d9baa53f988ca728080bdea19ceae48ca65953514485a0d2aae",
+          "pixelSha256": "9ee5a145f9f2a335e5fb8bb51fe0f5ab888032a064e35eb0dec9194716afe5e9",
+          "bounds": [
+            24,
+            5,
+            42,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/move_0.png",
+          "sha256": "08abd1e69db1da04522570b1477f1a2218b9c6ad060a9de30c4a287f8139137a",
+          "pixelSha256": "e991bd80d2cb009a8c6db9a320266885ffebc7b0f0e4de34107fa5967b3da2f9",
+          "bounds": [
+            16,
+            5,
+            46,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/move_1.png",
+          "sha256": "114968efde63f7b85768eb3bafa3019113905f29d81e494722d86a2300a2fcf4",
+          "pixelSha256": "36aed15c9b64e9b7864a220f0520992e7cd7b9da68a3be04e31bf7d33829a741",
+          "bounds": [
+            20,
+            6,
+            43,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/move_2.png",
+          "sha256": "51e82d4b16098bde330d73fa034ae33856458f92387f4b5c32e6d02be5a9f92e",
+          "pixelSha256": "8a28fbc6edc024be4107fbfd10976b29f74cecf0240b9a0a9615d759eb761004",
+          "bounds": [
+            17,
+            5,
+            45,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/left/move_3.png",
+          "sha256": "73d7ec4287dd49d094469c2fece93343b3e519beb9984a0497e6e8e8d95c0945",
+          "pixelSha256": "f99130dccd0cdc67ceb7184fabafebd4fcfd28166a86fba3be857647bb6fdf93",
+          "bounds": [
+            20,
+            6,
+            43,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/idle_0.png",
+          "sha256": "cc8bb595de421f5955f6f47a967de2e82f9a50a8975fedc4043b341f3c87017f",
+          "pixelSha256": "7d6324135e8dc916a9761ae04774d8a4e9cb8b97b43dc514c1a88e0cf78d2511",
+          "bounds": [
+            21,
+            5,
+            43,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/idle_1.png",
+          "sha256": "caa7e9856c093a6b28cbbf9d356dae66e52e67a3c22290f6bc19d05e3a7b5e44",
+          "pixelSha256": "2974921e1c79068f532705517060da95920fdf436fbabbdf44c6408652e1588a",
+          "bounds": [
+            21,
+            5,
+            43,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/move_0.png",
+          "sha256": "cec807482d98a7f968e6a6a34760b0b7e86c6a9421862a2a35bd71c125bf1f24",
+          "pixelSha256": "0f005e4eb71b8d61a0d478d8a89ebf0999f1a4b2327f437d1ce7f9bae2f9cb09",
+          "bounds": [
+            20,
+            5,
+            43,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/move_1.png",
+          "sha256": "dc3b71677cdfb43f3f6805d310b521bcbdf9bdc46f4339f66f6dcda5f9dfb8ac",
+          "pixelSha256": "7ad187cf5ccc99875236194a1239ded1faa1261bb6402e458812c7031c158096",
+          "bounds": [
+            22,
+            6,
+            43,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/move_2.png",
+          "sha256": "965c2d50f09f6dcda0c89fa56923748d39fde94577ce6c84fdd8f8f62102dc82",
+          "pixelSha256": "cbec963e4c66a528bfac473ba6cf9785c3462b3a227788b551b8064e9f78ac2f",
+          "bounds": [
+            21,
+            5,
+            44,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/back/move_3.png",
+          "sha256": "8c29ebe9313a4d647d5a50d8243e6310511cc24ca72e1d4306dfb38cd93aa396",
+          "pixelSha256": "8a269fedd48f9e398efc056478dc30924e3f72dc152801397b505c2778e99314",
+          "bounds": [
+            21,
+            6,
+            42,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/idle_0.png",
+          "sha256": "53cd1a9b277daf7376dc4f78482f2b2e0e285e94124efcc056c1411add14accd",
+          "pixelSha256": "4041c9289b6600deac0537e43cca0a64ed879960f1ea0d2b9fff1097fc404b7d",
+          "bounds": [
+            22,
+            5,
+            40,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/idle_1.png",
+          "sha256": "c82d7d8085c57e34f9f690167c07dae95438989e3d782630bfea493aa9f82116",
+          "pixelSha256": "f05efbe79dffde18bb03ada86c82496decfe5e09ea411f398bfd143c3086db3b",
+          "bounds": [
+            22,
+            5,
+            40,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/move_0.png",
+          "sha256": "46534247de975090c64cfae5cad82a680ec31eb9f3c334f6b7796405c93d09df",
+          "pixelSha256": "ad78104b5f36bc66ef143db3296d274cf3ac377ddeda15d8888f77d489ce0e97",
+          "bounds": [
+            18,
+            5,
+            48,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/move_1.png",
+          "sha256": "c554b68b2aa99b74a5f29497e9675a0496795a860d0bdc72ef02084236ee03ff",
+          "pixelSha256": "6e0e231d5e5fe93d0e974024e17968e1c71d0fbe66f73922c6b09bf3a5ba6afc",
+          "bounds": [
+            21,
+            6,
+            44,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/move_2.png",
+          "sha256": "23c82fbf3bc5334119b50104979bf3c14c57edff2ea8a87c55c77ec4183af235",
+          "pixelSha256": "6d7e11b417190f8afea42f0a8e26d10f3ce866211b308a5e8149084d529f0172",
+          "bounds": [
+            19,
+            5,
+            47,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/joseph_curwen/64x64/right/move_3.png",
+          "sha256": "234c875a44e405e15efa5e6152f3c053be0bc2625431d9fdc0ecd9ae43bc6545",
+          "pixelSha256": "f0d893db622548644b4f3891a29b0605b6cfb15db962fc0f113c83cba6117c8b",
+          "bounds": [
+            21,
+            6,
+            44,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 3
+        }
+      ]
+    },
+    {
+      "key": "high_priest",
+      "root": "sprites/high_priest/64x64",
+      "width": 64,
+      "height": 64,
+      "scale": 2.4,
+      "directions": {
+        "front": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/64x64/front/idle_0.png",
+              "sprites/high_priest/64x64/front/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/64x64/front/move_0.png",
+              "sprites/high_priest/64x64/front/move_1.png",
+              "sprites/high_priest/64x64/front/move_2.png",
+              "sprites/high_priest/64x64/front/move_3.png"
+            ],
+            "attack": [
+              "sprites/high_priest/64x64/front/attack_0.png",
+              "sprites/high_priest/64x64/front/attack_1.png",
+              "sprites/high_priest/64x64/front/attack_2.png"
+            ],
+            "hurt": [
+              "sprites/high_priest/64x64/front/hurt_0.png",
+              "sprites/high_priest/64x64/front/hurt_1.png"
+            ]
+          }
+        },
+        "left": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/64x64/left/idle_0.png",
+              "sprites/high_priest/64x64/left/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/64x64/left/move_0.png",
+              "sprites/high_priest/64x64/left/move_1.png",
+              "sprites/high_priest/64x64/left/move_2.png",
+              "sprites/high_priest/64x64/left/move_3.png"
+            ]
+          }
+        },
+        "back": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/64x64/back/idle_0.png",
+              "sprites/high_priest/64x64/back/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/64x64/back/move_0.png",
+              "sprites/high_priest/64x64/back/move_1.png",
+              "sprites/high_priest/64x64/back/move_2.png",
+              "sprites/high_priest/64x64/back/move_3.png"
+            ]
+          }
+        },
+        "right": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/64x64/right/idle_0.png",
+              "sprites/high_priest/64x64/right/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/64x64/right/move_0.png",
+              "sprites/high_priest/64x64/right/move_1.png",
+              "sprites/high_priest/64x64/right/move_2.png",
+              "sprites/high_priest/64x64/right/move_3.png"
+            ]
+          }
+        }
+      },
+      "frames": [
+        {
+          "path": "sprites/high_priest/64x64/front/idle_0.png",
+          "sha256": "998a03558561905a93004b241c03f5331394af38dff4ce6a1c1b67f2a97e577e",
+          "pixelSha256": "9dab5b97c078dce45fb0948d86434bd2c6d457c5f2a7f7cad2717fa46f58b773",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/idle_1.png",
+          "sha256": "cb3e712d03b55951cfc8df7c37b6ef39ad975bc8efae67094691e93145812f68",
+          "pixelSha256": "ea1b2e201f1c60e584b7cf0d780e9b100cb5876efe46cc02f0b6c1f3dfe01cdc",
+          "bounds": [
+            17,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/move_0.png",
+          "sha256": "4f9e7b22bcc04c285646e982c88db99fb0f13c6be8314bc64877f7c04bd69eda",
+          "pixelSha256": "88e7fb8be0fd3043d6c095cce0b64dd19948364eea2c5401bacf6bc432cccae4",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/move_1.png",
+          "sha256": "d007e8c87cd05153885c65e94970b0420d0efbe4c3f007360484a574f6624ab3",
+          "pixelSha256": "bc196e0a336d8f579f4abfe42b86199a013b8673e97257135432c8603ae72dfd",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/move_2.png",
+          "sha256": "aa5f6622aa948807a4ca4fb88c92e1befdaf0973f54d0acc2369939fe7436985",
+          "pixelSha256": "df908f1c162b9fcbb63d5b10996893fa43f5af47ad7ff4924359cf2d6108ea73",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/move_3.png",
+          "sha256": "f81239e2a4753742a502517cd24920b37675c62d3e96f60766ef13fe70eeed82",
+          "pixelSha256": "b63d5044a38e751e7a3e08b0765a124bc8be3124ab8b5380cbd9ac638c35d52a",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/attack_0.png",
+          "sha256": "5480d9ed6a281a606d0f07c142a3cd1b00306569057ba759973aed30956fcea0",
+          "pixelSha256": "a2c9d5de70845b3031c06d17805bff4aded1ffe48764ca81d4a23ef48131d09b",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/attack_1.png",
+          "sha256": "f526765c261a338a8fd78517b04ee0f14b36ac94c24ed424356aa4fae36c5d4f",
+          "pixelSha256": "fdd422c7278394583631965756a54ef7dffb98a41cbe9f599fe17811a4416c8d",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/attack_2.png",
+          "sha256": "5531be52d0540c11313b0667fcfee1077c05817b1d1d2415f01e07ca5255b441",
+          "pixelSha256": "9c8b6a071c7aa3cd54ef09f3b7ad182483413273e31cd5bc0fe7294bdbe01092",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/hurt_0.png",
+          "sha256": "6e108baa803908408fcc8365f7320e177192b1f19c24ac7a31814fc731808748",
+          "pixelSha256": "1343e9dc16bd74fded97f6324c2bd5dd92b374afec44a0b63bfaac360aa16b54",
+          "bounds": [
+            17,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/front/hurt_1.png",
+          "sha256": "1d55b05622fa06941ba6eadfc56d6f97679705ccc0862c96dd8868f0fc0c1daf",
+          "pixelSha256": "130bdbca3d83d18b87573f9f565c23029427e66128ceedea19619f816f9dea7b",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/idle_0.png",
+          "sha256": "2d9bf8972f6ab4e39f4d576393c90c57a43ec01cdc06b21be44b156e47ae832d",
+          "pixelSha256": "7209324413b055a5ce76068467cab1836d17b6c4a52808c3495027ffebd4caa2",
+          "bounds": [
+            19,
+            8,
+            44,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/idle_1.png",
+          "sha256": "561b5ee0868a52d037b7a29bb5824050bad9ccff057ee9f0a559081820972a27",
+          "pixelSha256": "8a5aeeb9934d64c29c10763e3aa3b8244d17d1ad0f17e5f393545aa0d7219e56",
+          "bounds": [
+            19,
+            8,
+            45,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/move_0.png",
+          "sha256": "7f5a66331783cf1c5dba0f54e01f273bef51adbafb23475567080ccef6a97c45",
+          "pixelSha256": "1a6086e349a22279f766d2468cca41537c0e5155ca32c62d8dff21cb27a7bdfe",
+          "bounds": [
+            13,
+            8,
+            51,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/move_1.png",
+          "sha256": "eb508bdaa3a9ef1ccad8c7a2f79b1b3eecf33b7152389e0192171407425413aa",
+          "pixelSha256": "72296ec25d9d83e39ae388447f118eda2212b38f5502ddebab0c5a0e0f2f51a8",
+          "bounds": [
+            16,
+            8,
+            47,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/move_2.png",
+          "sha256": "93a8ea553dc14bd71e8ebc93328ec13526350b5f4217935092691d5ccba35f4a",
+          "pixelSha256": "31a799397532bb262eb89d3d0c63a5671ecbb69838df3ecc0c2136a5baa75955",
+          "bounds": [
+            13,
+            8,
+            51,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/64x64/left/move_3.png",
+          "sha256": "f3fa789dff4d258d095c1bfa9258afce004863ac273ea14962efdb3daf189718",
+          "pixelSha256": "f5fde11a7359b432c0ba0b1ce47a606f5cca8f60fd5c6bb66844d38a1d6390d7",
+          "bounds": [
+            15,
+            8,
+            48,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/idle_0.png",
+          "sha256": "236b6ce492eec40413783d6d22f4f8f7446a853b7a6b00fe9a4e73318f00c68f",
+          "pixelSha256": "0d4d5ab6fb6a38bd3f71289a236a318f17c111b8cd6a1721e6e656ef6455a7c4",
+          "bounds": [
+            18,
+            8,
+            45,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/idle_1.png",
+          "sha256": "2f4fd9432a36e8f9e72203710516b7cd1f90b1144d176f2afba504418af71b94",
+          "pixelSha256": "8cca0c4c7ddd09bde52287e3fad1052f8a231a7d8c8e04d13d1135cde572c4b7",
+          "bounds": [
+            18,
+            8,
+            46,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/move_0.png",
+          "sha256": "497c0605b5e5cf7befb4c2ffe35d178afcec0e6d05ed4242f37554c9d1435978",
+          "pixelSha256": "1b70df0af03d2edfc06ca1d7ddb402cb6793af17f6a99a1dbdbca914e1cf8030",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/move_1.png",
+          "sha256": "a5fafcb5e4dda8018392c5a46df78ddd759ab28d74bfdf2ada2d085311a02a58",
+          "pixelSha256": "1ccc79755337ae98129a17ba4664bbd9caab158db0e9cefe15ea6304e2979d19",
+          "bounds": [
+            18,
+            8,
+            45,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/move_2.png",
+          "sha256": "a202f72fbecc0cc8bfb68ff3ef83940d9d669f9088122bd85ffc1cd697af2f26",
+          "pixelSha256": "1f9ce379e564ec847c320bbccc7f7fa095f734ff43957926b2d667046d6caccb",
+          "bounds": [
+            17,
+            8,
+            47,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/64x64/back/move_3.png",
+          "sha256": "f13d7298abb3158482c285acbd99cd06473d04ff1da3a109fff2cabf13db6f79",
+          "pixelSha256": "13f7b4612e27557d95fc3382f27eafe02050e99490f917a7691d0c3f9279902f",
+          "bounds": [
+            19,
+            8,
+            46,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/idle_0.png",
+          "sha256": "42b8e335516018f51ddcbe7697b83b6c9da757f13202f751970cc8d7fa612e9e",
+          "pixelSha256": "fe6be491d34575d512234b102391bd010a5fbda632a21ef21b87810406bc495e",
+          "bounds": [
+            20,
+            8,
+            45,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/idle_1.png",
+          "sha256": "dfa8ac67776a070963c01ace264a239a2aa93f24b6e1afdab1994d26859903b2",
+          "pixelSha256": "bc10c8b15e27e2c0f308994dbcd891700121e2e7c88a33ac9002c0107295d127",
+          "bounds": [
+            19,
+            8,
+            45,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/move_0.png",
+          "sha256": "c17f18fddd64e643581d17dbb919ab26278fb15510415867b97f25a6b875ee8c",
+          "pixelSha256": "4cd62e34c8346ffcd1aa16e506a64861eb435d9ab4c4b6f9184686d6754db37c",
+          "bounds": [
+            13,
+            8,
+            51,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/move_1.png",
+          "sha256": "a826b66d92c8beb57e220c2b264b1dab866d2a5171cd72acd400d85f4d0fb391",
+          "pixelSha256": "8997ba59e741e3b97b7bbc9caac7197731f68c2d236faa8385d6b7bc2a125ec3",
+          "bounds": [
+            17,
+            8,
+            48,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/move_2.png",
+          "sha256": "c7cb9014cf0ce750c2cf7879331f358e5573c3ac1b88384bcfe6e060a34ba293",
+          "pixelSha256": "241439de2f931ba22c606073b400f7691517023a36d4ad0e495f453824f4090c",
+          "bounds": [
+            13,
+            8,
+            51,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/64x64/right/move_3.png",
+          "sha256": "6350b5ec0316975615f29e581fc39afa03e3afa18045b932ccfc7b3afc32b71a",
+          "pixelSha256": "d771e506593724b29235fb87ca555f22ddd54830881bc22a1a117e99f98e6341",
+          "bounds": [
+            16,
+            8,
+            49,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 3
+        }
+      ]
+    },
+    {
+      "key": "high_priest#eldritch",
+      "root": "sprites/high_priest/eldritch/64x64",
+      "width": 64,
+      "height": 64,
+      "scale": 2.4,
+      "directions": {
+        "front": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/eldritch/64x64/front/idle_0.png",
+              "sprites/high_priest/eldritch/64x64/front/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/eldritch/64x64/front/move_0.png",
+              "sprites/high_priest/eldritch/64x64/front/move_1.png",
+              "sprites/high_priest/eldritch/64x64/front/move_2.png",
+              "sprites/high_priest/eldritch/64x64/front/move_3.png"
+            ],
+            "attack": [
+              "sprites/high_priest/eldritch/64x64/front/attack_0.png",
+              "sprites/high_priest/eldritch/64x64/front/attack_1.png",
+              "sprites/high_priest/eldritch/64x64/front/attack_2.png"
+            ],
+            "hurt": [
+              "sprites/high_priest/eldritch/64x64/front/hurt_0.png",
+              "sprites/high_priest/eldritch/64x64/front/hurt_1.png"
+            ]
+          }
+        },
+        "left": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/eldritch/64x64/left/idle_0.png",
+              "sprites/high_priest/eldritch/64x64/left/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/eldritch/64x64/left/move_0.png",
+              "sprites/high_priest/eldritch/64x64/left/move_1.png",
+              "sprites/high_priest/eldritch/64x64/left/move_2.png",
+              "sprites/high_priest/eldritch/64x64/left/move_3.png"
+            ]
+          }
+        },
+        "back": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/eldritch/64x64/back/idle_0.png",
+              "sprites/high_priest/eldritch/64x64/back/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/eldritch/64x64/back/move_0.png",
+              "sprites/high_priest/eldritch/64x64/back/move_1.png",
+              "sprites/high_priest/eldritch/64x64/back/move_2.png",
+              "sprites/high_priest/eldritch/64x64/back/move_3.png"
+            ]
+          }
+        },
+        "right": {
+          "actions": {
+            "idle": [
+              "sprites/high_priest/eldritch/64x64/right/idle_0.png",
+              "sprites/high_priest/eldritch/64x64/right/idle_1.png"
+            ],
+            "move": [
+              "sprites/high_priest/eldritch/64x64/right/move_0.png",
+              "sprites/high_priest/eldritch/64x64/right/move_1.png",
+              "sprites/high_priest/eldritch/64x64/right/move_2.png",
+              "sprites/high_priest/eldritch/64x64/right/move_3.png"
+            ]
+          }
+        }
+      },
+      "frames": [
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/idle_0.png",
+          "sha256": "c48c8fafa7223672586128d6c03ee59585776b85a710a83a210942ae7bfb9f69",
+          "pixelSha256": "e90015c4b56594a5ff00e87701c809d37fabd890777a0a454078e39b8f2f555c",
+          "bounds": [
+            10,
+            18,
+            54,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/idle_1.png",
+          "sha256": "c6829f868d8911cd9b6b8de19566793e1938eef1f68947d7ee151c0e70f25729",
+          "pixelSha256": "c13577c43270524c8d7d15a0f5cfae7538263e68a9e46bb22b40dc3c42b5f2a8",
+          "bounds": [
+            10,
+            18,
+            53,
+            62
+          ],
+          "direction": "front",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/move_0.png",
+          "sha256": "4345ce63110c0ef244c2dbb812748959ddc6a3164a06e52470db0ff3795b17c7",
+          "pixelSha256": "e07b35fe49acde1863f1578e6de619a0b0982a1a2fb650defecfa748d31913ee",
+          "bounds": [
+            11,
+            18,
+            53,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/move_1.png",
+          "sha256": "af35bdd9008df1a7b5f86f01e82b8c680f00ee2c875c4f9e1ce06a0c5e242341",
+          "pixelSha256": "5c344047a99068884c011d7c312780b166fa15bf2ea20d4e0af1b78a699fdbd6",
+          "bounds": [
+            9,
+            18,
+            54,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/move_2.png",
+          "sha256": "e31d3ecc71c1641a83e4cef7d80fccb60419bd50fcb651e6378bd545eb9d2ee5",
+          "pixelSha256": "b256ce5506a60dbaafcc796b72cfeb7fd980ad32fadc6a51290b4d5dd79d15e7",
+          "bounds": [
+            10,
+            18,
+            53,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/move_3.png",
+          "sha256": "8ca10e9c338972cc89d3240d9434830aea797e401fc6d13a685f2588cb5e4f18",
+          "pixelSha256": "60b56f8634a1500609cf82d65531eea292dfa9b9bd94920b0bf38382b3da65c8",
+          "bounds": [
+            9,
+            18,
+            55,
+            62
+          ],
+          "direction": "front",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/attack_0.png",
+          "sha256": "81b60cae547c067a4ccaf1e5fcf42513adb8ccd2e25187cf0d2527ce8a49e15d",
+          "pixelSha256": "b8d7d49551f8dee833f19cd7fbaade94d1bcccadf5ff8ce9b3bb4a27fdaecb25",
+          "bounds": [
+            10,
+            18,
+            53,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/attack_1.png",
+          "sha256": "36e4690ff484171e70846a280d432c399aaae2eaab2f0a1132813a988b5c4b25",
+          "pixelSha256": "6a902e29ce3e308298bf02a65a341931c30a0c65d819ab6555d4abd32ad87c1f",
+          "bounds": [
+            8,
+            18,
+            55,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/attack_2.png",
+          "sha256": "f2e2fca8ef5bc96052e22471d5e14a3562ea7375801267ef2bd1a2d64cf9d9f2",
+          "pixelSha256": "ab2ff67bbb92cac799943b42f0a4abbb4eb67a84b99339560e54609fbb3927ff",
+          "bounds": [
+            12,
+            18,
+            52,
+            62
+          ],
+          "direction": "front",
+          "action": "attack",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/hurt_0.png",
+          "sha256": "c2031c79e27ad87fddd51a8b9d0cf3fc9d41a46c96135183e4c6bfcb1eaabb20",
+          "pixelSha256": "e8bc768c6daf0b320c7a00d200de19b6e0a98084b75fc351dd0cf780fdaf849e",
+          "bounds": [
+            10,
+            18,
+            53,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/front/hurt_1.png",
+          "sha256": "27558c53452eff794083a69f60fc62d7ded2db07b196bf66bb317597e7ee7a7b",
+          "pixelSha256": "13f154203b49c73ab45042832a405f26cdcef5cf0a6918f36801cb5cbf5db9b1",
+          "bounds": [
+            10,
+            18,
+            54,
+            62
+          ],
+          "direction": "front",
+          "action": "hurt",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/idle_0.png",
+          "sha256": "4ecd3ac341211a1773b4e2e0c8de2921fbe52879e225a64c404621696b178b3e",
+          "pixelSha256": "54e44c10a89b453c9f8cb7400fdf9e352cb091426eead2a2838b0b14c6df7c98",
+          "bounds": [
+            11,
+            19,
+            52,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/idle_1.png",
+          "sha256": "3f6c3494b7f184e1effc200751d1a9652ee1f0d32555949cae88b2f725d9613d",
+          "pixelSha256": "1a70cd15d2ca8b769e4497f4214dc569c420f5f7014a0d9ee981002ed361dc73",
+          "bounds": [
+            11,
+            19,
+            52,
+            62
+          ],
+          "direction": "left",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/move_0.png",
+          "sha256": "c5b3e2ea9e8515b9786f8fdc1c719a26393524b93df6c4cda325b44aff07d827",
+          "pixelSha256": "66818967bae921ba5e2699f1b8785345a5103115f5465f868e0df20eaea24679",
+          "bounds": [
+            2,
+            20,
+            62,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/move_1.png",
+          "sha256": "3dadbde2519e4d358d31f02f439231e4d0fb5bf8235fcd061b84c5915549468c",
+          "pixelSha256": "8d18677e7d6a5ea2cbc488d4a1ae88f9090d1bdfc4edcd4a57b4123ae867c71f",
+          "bounds": [
+            2,
+            19,
+            62,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/move_2.png",
+          "sha256": "ad752c60f608e2f6c1a7b9e2ca86fec514fe679652f418be4eac0586ec5ffc33",
+          "pixelSha256": "b199188e1133d1dedc0bb5faf49d774c13eb7d206197400deab9b93c2e1d0e31",
+          "bounds": [
+            3,
+            18,
+            61,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/left/move_3.png",
+          "sha256": "b52e1c457e67f57886f1c6d838295eba1723a963a5e5ca367a4c9f627d4901b3",
+          "pixelSha256": "3e8b760da39e54c50ea51b5e46261320c6acab03b7af51879aa1456df2b95c4f",
+          "bounds": [
+            3,
+            18,
+            61,
+            62
+          ],
+          "direction": "left",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/idle_0.png",
+          "sha256": "13967eef0249277759bda5ea4a214ef8e14c6b656a49f5c87f19137ee39d136b",
+          "pixelSha256": "165ea586bfd0e222bd8fe9b2281bd1cedf3312311aebdf3b29bbed81b669c9a0",
+          "bounds": [
+            11,
+            18,
+            52,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/idle_1.png",
+          "sha256": "d5b87dcfb03e04430e78463a2c53b8a2cd9ff7b4d8f92452212065cf8bb0eb6d",
+          "pixelSha256": "3212121d3e86ee7ad553a2cc6abde4576e69658db012db3b2421e34e5de13586",
+          "bounds": [
+            11,
+            18,
+            53,
+            62
+          ],
+          "direction": "back",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/move_0.png",
+          "sha256": "5b4fe8888c413284909b0816571aaff8217c3afaa48d88f1b681f2a5b990fbb0",
+          "pixelSha256": "507e85fe22a64cf21ca0e294c8dab8d7cef59ae3887cfbf7dc0f7d7a2d319fbd",
+          "bounds": [
+            7,
+            18,
+            57,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/move_1.png",
+          "sha256": "41d127b085aa2c47959ba3ff7d70e173ba8ab92973c02d00ae4e20e87096ef1e",
+          "pixelSha256": "8e902d3d8bfc26de6a6d0af750aaef4217380cafc4a93f95038fb04042c204b8",
+          "bounds": [
+            7,
+            18,
+            56,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/move_2.png",
+          "sha256": "6dc2406424613b714ff029d6e73308b96f7c7fb4a5c3566de5dbae000dc0fbd7",
+          "pixelSha256": "727d4a005363a19ab6d0273cd9833ed64dfffdeeef632ef6262707025cb46d09",
+          "bounds": [
+            9,
+            18,
+            54,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/back/move_3.png",
+          "sha256": "cacb5a47c43e7ef2870bd2da0e610f190a232a1407f07edfcaa9421df180a218",
+          "pixelSha256": "af0838dd6228b43fa05aeac0485389372d1da12c49bab586889667fee379ae27",
+          "bounds": [
+            8,
+            18,
+            55,
+            62
+          ],
+          "direction": "back",
+          "action": "move",
+          "index": 3
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/idle_0.png",
+          "sha256": "81ab7df55a5ae3023a5522a7155b88e00c92a976b8db7951f826770b1aef5a70",
+          "pixelSha256": "29588ed58e87fc92aacd86bfe515d526308b11ad45d37122aa7cd55e565cea5a",
+          "bounds": [
+            12,
+            19,
+            53,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/idle_1.png",
+          "sha256": "f5b2b374155ce3f0754f98313895aba064f72a244695cd22d8b3150164e20303",
+          "pixelSha256": "b9262ae6b9a546319deb53c0c89b3a02d0fa91a7d3cb1f963321ac155e5f7633",
+          "bounds": [
+            12,
+            19,
+            53,
+            62
+          ],
+          "direction": "right",
+          "action": "idle",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/move_0.png",
+          "sha256": "cc3c9315fd2939a0542dc401b828358323c30d16f19352a0191eb4783bcce8f8",
+          "pixelSha256": "e8866f282ee763d6b274d2e9bc6840c38a5244f5ea79631e63a5dcf000961081",
+          "bounds": [
+            2,
+            20,
+            62,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 0
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/move_1.png",
+          "sha256": "cbc465fcb2bd074c7f017f437b38bb7c95b47a687c40b6d3d6d215918ea4a7db",
+          "pixelSha256": "ca8dc4489bb4c3669841c16ddfcacd26c6c13b6eea85c7b17fd448af455a7d86",
+          "bounds": [
+            2,
+            19,
+            62,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 1
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/move_2.png",
+          "sha256": "6ce939e95bff55efd2b087c05679963eae8dcb618f6959915300e7ab15518e8b",
+          "pixelSha256": "212cb66816aeca7b34d58680208c820d00803796c9155ff11133fb1e37de859a",
+          "bounds": [
+            3,
+            18,
+            61,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 2
+        },
+        {
+          "path": "sprites/high_priest/eldritch/64x64/right/move_3.png",
+          "sha256": "eddb70e5fce3d5b4c13c1e60339a2b2d6503f7fb55aa4df5f66d4cb16893ccca",
+          "pixelSha256": "de1b495e54c5727c80013267a66160db5ae99dd6115bab08ae8ce37df0a02cca",
+          "bounds": [
+            3,
+            18,
+            61,
+            62
+          ],
+          "direction": "right",
+          "action": "move",
+          "index": 3
+        }
+      ]
+    }
+  ],
+  "nonTargetSignatureFields": "Full atlas entity metadata (page, scale, flags and ordered actions with frame IDs replaced by source paths), full source registration, and all source-keyed registered frame metadata plus decoded RGBA hash and page filename. Canonical sorted JSON, SHA-256.",
+  "nonTargetEntities": {
+    "albino_penguin": "8452e6a3822262c2ef83dac5716c5b2c927452ef924b20f199c863d3886f8949",
+    "ancient_ones": "0397cce9393a232c16b9a1bc63a0ce539bd2a81ca946c978e2ee0999fbf91ec6",
+    "azathoth": "ea042bdfc6a2f04d5f83c42a106c5790a79091384345b42f319fa384f797c96d",
+    "beast_in_the_cave": "856e51dd79c513f56ffaa68905496a4ae24a9eb0f250abf24c60a4cc5605ea6e",
+    "being_from_beyond": "f1469562adb22b3683e293f5c02cdd308e677f50588ddbaff268c8892c82ff63",
+    "being_of_ib": "ff58b05a4aa80f03bd0e2896b579033fe588a185983f5504a26d763ef919c6fc",
+    "black_man": "9bdf56dd54461cdd5dd10eef2e8be541235b4a09d666e2382edfe4fb6b7255bf",
+    "bokrug": "d19eae26fb5a81e306485c3abd110a904eed35b4d469743500fc4440ab6d7911",
+    "brown_jenkin": "c7c37501ab8598db519c8dad0bc264a07067885c4604821437ddfa9c044e0136",
+    "cat_from_saturn": "a1f394a6d99559dec5d3144d6129a4d5ce153ec09c14c3f99d19c504aac695d1",
+    "charles_le_sorcier": "dc45db3f76609ab9fb108f5593a9f8f03e5eb29c992aba2a1193d5eec5d6433e",
+    "child_of_yig": "00d6877942ed1c7af00c16277bc243fc4b12e29b0fb75bcccae5f66e2e9c02a8",
+    "colossus_pyramids": "f40a51b1988ea82948eda16ab96a7d224aef43a052bf86039f8bf0a1b8aefea5",
+    "colour_out_of_space": "566d462118dd1328055bddaa6f86173c9480eb077ef2337ce995e575eac2ce10",
+    "cthulhu": "8553f1fa38c57f29aba9e570903bf24e7a26477f7229fd6b87e4c4e44aa15c8c",
+    "cthulhu_cultist": "447a8b5b113e2e9d4f0bc26fe9a1ca36621b6da9a0dfbb002ac833780e712f03",
+    "curwen_pit_thing": "9571943a86236547bb9981aba66443354274bbda8a9cd5ade5f0b3d76f49f1cb",
+    "daemon_pipers": "de08174d94b90953cb6e68157a5bb2c9d789edc18c8bd6fe87e2e471ff85d3b8",
+    "dagon_priest": "74456377eeb41fff884fa075304aa5d7182eab033f243e5c06b78b429f485a3c",
+    "dagon_priest#eldritch": "f3a297477863151792954f7c2e00d5c160ae976a9f360c0d20e7d7ad9fe36763",
+    "deep_one": "cfec751e3597574bfb0d62c711e678fddad911c2cf882661d88997919e82cffd",
+    "deep_one#eldritch": "c3254e8232fb2a2de038b75bae304a1175c88dbbfc9c41dcd4be1e2fce41de6f",
+    "dhole": "018693743bfa7c7247bd5861ac37768affe74200002fcb176161faa85972df25",
+    "dr_munoz": "68cd9d2da5595c204b785fbf643afa1056061a2c7bf379550297ecf90a59ac26",
+    "dunwich_horror": "db11115d987546f989767401cf9bf734fa456ed35b737ed0a64f057d5dfd95cc",
+    "edward_hutchinson": "ab23cea11639321a3f297b3feeb5e68be93230dc7353293688258dcb6ab946d6",
+    "elder_thing": "1bf3d04ca69a3e2ae5569401fb782d7b64a5d2dfd73dbf66cb05f9ac37f73dbc",
+    "ephraim_waite": "ff9de505dc7ca7125b81458e4dd7ec3caf11c7795bbcf05c59c97a9e9949f5c4",
+    "ephraim_waite#eldritch": "6246c9bdd9f2a7e1b645eb529fe1b3e98ea1f38d10d7d01c0560cce894ee88ce",
+    "exham_troglodyte": "2154e598725bea959928c32cf7dd3b05e48237c284b97bc2e01f128c8d0df335",
+    "father_dagon": "456eac9d731ecab890b9b01d1a228e99a6f29a5fd120240c1b07e110b74a5a99",
+    "flying_polyp": "a487ddd8ccfc187294e2b9792aa0ec69a7bf239af47017d20981c83bf1ec4d69",
+    "flying_polyp#boss": "6604278bf4673ec0408ceb475118ea943f82520732c3784021e433a0ec08b637",
+    "formless_spawn": "fe5d234541f7022828cf8e015d9557bb39bca02c032fe364004d0eef9daf4b96",
+    "ghast": "a0a327263e8d057b2db5ed3695fc641a77047607065ac1c7cbdc6f626159343c",
+    "ghatanothoa": "5bca868629288d7e8e630c76086b8ec7a05e89ecfcc27b493a61641b3533b61f",
+    "ghoul": "8d84314748b98bfc8f0725423d008c0dc79c341e91de02e8e7b8e63a0975c1c6",
+    "ghoul#eldritch": "57c76b8a5aa61854fd9b2621615f77a4fe124deca95ce54eda7d2dee2e5a8f93",
+    "gnoph_keh": "53eb08fd7f1420a77fbddab3b511344d8becdcbb95f655874d0e5b7f7af52882",
+    "gnorri": "66cd10f82f1a5b5494fd9e1859a885abbb8f90ca9b282bc22ae196d0b41f8e72",
+    "great_ones": "f88b8c338017afaccac3e8edd70a6e5970d1ea03624948bbf52d0fd9d0a8a9d3",
+    "gug": "b1dd532182aa3fd5a03705ba74a1034dc222c2e731d9568f70ce08b74abc7e4e",
+    "gyaa_yothn": "ddd88fbb7c1564150716f9bb5b1b86bea500481ebbecd27bfbe601c9c9e49603",
+    "hastur": "53ce68d842d6f3fb2c17fb05e438b6ea124779de16dd8129588ccc8d545e7096",
+    "haunter_of_the_dark": "39cefff76cd0b6bf09a77296cf20a5058140c708f991a1fd33b3916bb255842e",
+    "hybrid_mummy": "a9a34f9503bc8490a6bcfefcb2014916426a06c5ff7f228c5083033d3b13431b",
+    "hypnos": "e293a4db2879c5becaafc6645d7c1d001726d82211d3ebdf1bd5e72ef7c76ddd",
+    "innsmouth_hybrid": "3b17a24e94d90da0a0f038650ee0517a5e59aec9593f82ad16f7b69c863b4c86",
+    "innsmouth_hybrid#eldritch": "6123e9d0f1fa95bcbe1a4a4ad755e499f8308c6e7376c5194c7561df7f92d92f",
+    "keziah_mason": "c730f46943d93426d1471d88b31b1e685f1f760d65c0ae3e1b340b8eb85e14d1",
+    "kn_yan_dweller": "de9bc10d2a02ea5490d24fd59f4ee78729a7d6daeec1f2ad6a7d16686db461b3",
+    "lilith": "99b53e48c9881be3de60a034fc8d8a02ade2377fcc077a96e826a3e4ba8312f8",
+    "man_of_leng": "b22fa14894dcc2b56b55bc55b930f077f0cd61c40c7afbd398cfab71300d0e0a",
+    "martense_degenerate": "65092229ca6f0a5688f79b17da8d407f981f1d28ebb5fdeb74cba70c61a913fe",
+    "martins_beach_horror": "ca9fae8a2f31855c1a703afb3285b81a1785837f377d4bb2f100763bb7bd296b",
+    "medusa_gorgon": "7449db4b72df627cf5649b834b65e658c487fdfcef5ed7208f6d36074f7b502b",
+    "mi_go": "302ae8f24ae2620b0ccda334cebadc19a980005fe5f6a61001e5bc9ab9d6f53e",
+    "mi_go#eldritch": "0f56df8d0e104e19b66e6eafd019714b9b790bcb67b6e1dc4f3792b8d65eb256",
+    "moon_beast": "782e64ada13d852cf8d7e74d765e6f4ab2bf3f7f5bf436b9f6661a232fa02ae4",
+    "moon_bog_wraith": "2e9373d632398cda1a887d77dfce45dac63471cd1e3633571569006db70c61fd",
+    "mother_hydra": "a5996e3eaa5ac6d95592aeb61502acd89a15d08039c39bf3e391aa0b43a11494",
+    "nameless_city_reptile": "1e95e5e552c40513c85ab8317a9156ee5d480280fd5569da3c1ee4a942f18978",
+    "night_gaunt": "c16396f1da3d3c90b7bba2da8c70b526b83b4389e45040daf40ba0ade0b151b2",
+    "nug": "a0e5d5aa01ae31c61509452d55c6c515e993362c05deaeeb404a5f15fdbbdfc5",
+    "nyarlathotep": "51f1f5a7954dee7fed3179b65dc5bb5412a4270b2abb1c43f949c84fe726bfeb",
+    "nyarlathotep#eldritch": "0024cd7d321af95693f95d9c556137b5118481f847a91dcc5c1f090cac9449b4",
+    "other_gods": "d90786098499f600716e928652945c1e4abd7720165210f5b2e73cb7c95c6121",
+    "rat_swarm": "e73e80c637dbf0bbf52a7b8cc51a880d0d5f98cc015c404be3e2f6cf5b99872e",
+    "reanimated_corpse": "5eb6572b641bfa7e03e138220f0b44bb63454f1270c31c7209c6f4ceb8a147cd",
+    "rhan_tegoth": "48f1f5015feb2ae38a72d59da9c3d7b7bb10e7a22fb0a2c176d6e02d8d91ec13",
+    "serpent_man": "60cea27843e0be48d2d9f738b6bd96f3a758129c5fbc27b12b9d9addf5ed21af",
+    "serpent_man#eldritch": "1fd59f29bc5eac5151b1e2011395635e791123ecf0272886cfd0b163ee72e069",
+    "shantak": "6c30d4718a39b77d256727e8ef66576b5a74b15083ca18259e608e0d667f7fe3",
+    "shoggoth": "0f2f3bcc0d3593711e74a22827dc86f7dd3a20d043aa089b6438b9b0ca965274",
+    "shoggoth#boss": "33ac9e94e594342ab7fe57d0323b6e288468d17b416b8ab35a15735f499c0e36",
+    "shub_niggurath": "3b07c06ded1305705d0ee1afe74dea5301af3b461a7ac61ea0d96ef1a0fbd158",
+    "shunned_house_entity": "e707bf4016ca317715b9defbe85bc63d2b626e497289d41142be848b78d05920",
+    "simon_orne": "b3da3ab7d14fd2757e0a7591d9b4b2f6602e2f3426b2b7b0a3f76c1717c0d21f",
+    "star_spawn": "c7f2494b9170c7c4711032cdaf9dc983b94c0c95d8f5fe15bc724baf8bb2d1db",
+    "terrible_old_man": "ce10fd2fc8311e1db6973b3ee5ab238f19ac6ac3b6a44710a43af8a461b5fdfd",
+    "the_hound": "fc47dc564da75b419ab5a2322dd2d61e5f46e0fb6a79df1cadb2ccb9c9fc6116",
+    "the_outsider": "19b33c51930e34861c21c08c662e59d8409e4e9f20a9cee77bd8f43c12253234",
+    "the_unnamable": "ae9a696ad6eddad4aef1024cb09ec29f5c5a0a0553f24d10fc80e143d2fabc6e",
+    "thousand_young": "9c0c92cb2481d2581ea5af24f39bbac1a9fa8f5f8d3dca9fa30a66238e164022",
+    "tsathoggua": "38d88510c184660bb4c73f4d8085b3a6d381a839cedc3551299d7e38d79b352e",
+    "umr_at_tawil": "1ee4116db9d79a46c5fb7ff3861b31cf5701921a1f30368a4b623989980d5cfe",
+    "venusian_man_lizard": "cc6746b772735fc03883dbf3e7f3a06f80da24ee80177dbcd7840d5b3e7f53c1",
+    "voice_in_the_tomb": "b69efbc6a0672d0b3146b4e9d51100987d6d62a53ff70e7dc6b6f345f60ddaaa",
+    "wamp": "63b79a3e6e23810562f4e1d833ef7a226a12bf8cf1172056c838b6a34d300aff",
+    "whisperer": "33272062fd3f9e3e34b4b92b17489234dd15f86f51b678338e2fc455a2d63280",
+    "whisperer#eldritch": "adbc702a4e5a5907096dffbf4fc74616baf8c0543eac94d67a132f8a14bf97e8",
+    "wilbur_whateley": "6a77d3e0155f595ff2fffc64096acced290664230a0f0d89be8f416b764d9313",
+    "winged_hybrid": "fd4ac6b8ea99ba605634c397aa98154e0567ab9bef676885d007bb5b2b18869a",
+    "yeb": "63d44e40ee83f0f934c3edd04ca777d22321a76d7669555bd7217f4887ac118a",
+    "yekubian": "cfa52493252236cd26f70f7820731e07bab18561b9a8d68c7f92ed71e30e553a",
+    "yig": "a8481bcd9a19df0fbc288fa105bbf3e54ee0ceb3f7782ce5dbab116b276d83d7",
+    "yithian": "1f91ea363c225057ec2a8474a834bacbaee4bab0a55107b26589c7cd7e29224c",
+    "ym_bhi": "1e50b6cffb9b3ad1b285728edf21b0c9b1cc010ca659dc8fb82d9a5a479a2ade",
+    "yog_sothoth": "32c1665b1005c33ee6803e8d078d24b4a24032851c68564145a59ba658e35edc",
+    "zann_window_thing": "a2363a2c962b50348ed6cf0b7f77d75ffd4591b86858a22479f9590f69b292fc",
+    "zkauba": "24c84355acd94df3f5e258c647e35a2ea712cd2d7f584c2b38b37f7bdaab6069",
+    "zoog": "ee24b4fc1ea0b9165a8c25973bc84e2b307b7c44b37a94ca9365da8c800a525a"
+  }
+}

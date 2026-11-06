@@ -38,12 +38,13 @@ export interface GameEvents {
   RiteDone: { boss: string; at: V3 }; // every light burns: the way is its own again
   Swung: { entity: Entity; at: V3; yaw: number }; // a blow's hit window opens (combat.ts; round 51: its flash and its sound)
   BoltLoosed: { owner: Entity; at: V3; vel: V3; fire: boolean; conjured: boolean }; // a bolt leaves its caster (projectiles.ts; round 51: the muzzle's flash)
-  BoltLanded: { owner: Entity; at: V3; vel: V3; on: 'body' | 'ground' | 'wall' | 'spent'; radius: number; lob: boolean; fire: boolean; conjured: boolean }; // a bolt's end: it struck, struck the world, or gave out
+  BoltLanded: { owner: Entity; faction: 'player' | 'enemy'; at: V3; vel: V3; on: 'body' | 'ground' | 'wall' | 'spent'; radius: number; lob: boolean; fire: boolean; conjured: boolean }; // a bolt's end: it struck, struck the world, or gave out
   Reloading: { entity: Entity }; // a reload begun: the cylinder swings out (gun.ts; round 22)
   Reloaded: { entity: Entity; loaded: number }; // the revolver's cylinder filled from the spare rounds
   DryFire: { entity: Entity }; // the trigger pulled on an empty cylinder with nothing to load it from
   Died: { entity: Entity; killer: Entity | null; at: V3 };
   Fell: { entity: Entity; at: V3; frames: number; sea?: boolean }; // the investigator goes over an edge: the fall begins, and ends in Died `frames` later (systems/falls.ts; round 54)
+  FloorTremor: { at: V3; strength: number }; // a weakened section of Azathoth's floor shudders locally
   Splash: { at: V3; speed: number; size: number }; // a body meets the sea: its speed (m/s) and the splash's size, 0..1 (systems/waterFall.ts; round 55)
   Seized: { entity: Entity; at: V3; root: V3 }; // the tentacle has hold of the investigator in the water (systems/waterFall.ts)
   Vanished: { entity: Entity; at: V3; struck: boolean }; // a hallucination gone: struck, or faded

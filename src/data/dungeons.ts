@@ -24,6 +24,8 @@ export interface RoomDef {
   dir: Dir; // the entrance: the side that opens outside; others: the side of `from` they lie on
   wide?: boolean; // hall only: a great hall of 3 × 3 cells
   rise?: number; // stair only: metres climbed toward the far side (negative descends)
+  abyss?: boolean; // stair only: a monumental flight over the void, parapets for walls (round 104: the Stairs of Slumber's; world/abyssStair.ts)
+  steps?: number; // stair only: how many steps it is cut into (round 104: the Stairs of Slumber count theirs); else one for every 25 cm of rise
   hidden?: Veil;
   boss?: readonly string[]; // a boss arena
   variant?: 'boss';
@@ -52,11 +54,20 @@ import { LAIRS } from './lairs';
 import { room, stair } from './roomBuild';
 import { SEALS } from './tuning';
 
+/** The Stairs of Slumber's flights (round 104): risers of 16 cm, seventy steps of light slumber in two flights, seven hundred of deeper slumber in fourteen. */
+export const SLUMBER_STEPS = { riser: 0.16, light: 35, deep: 50 } as const;
+const LIGHT_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.light;
+const DEEP_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.deep;
+const deep = (id: string, from: string, dir: Dir, spawns: readonly string[], words?: string, kit: KitId = 'dreamdeep'): RoomDef => stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit, spawns, ...(words && { words }) });
+
 
 export const DUNGEONS: readonly DungeonDef[] = [
   ...LAIRS,
   // Round 13: the dungeons were four to nine rooms in a line. Each now branches: side ways with foes
   // and an Echo cache at their ends, a secret or two behind a veil, and its own named places.
+  // Insight is held, not spent to enter: 1 introduces the veil, 2 rewards early exploration,
+  // 3 asks for experience of the waking horrors, 4 for the deep world's optional branches.
+  // Far-realm secrets ask for 5 (dungeonsFar.ts); no boss or required route waits on insight.
   {
     id: 'library', name: 'University Library', region: 'hub', rooms: [
       room('foyer', 'hall', undefined, 's'),
@@ -102,7 +113,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('terrace', 'hall', 'climb', 'n', { sign: { id: 'dunwich_sentinel', name: 'Sentinel Terrace' } }),
       room('circle', 'well', 'terrace', 'e', { spawns: ['thousand_young'] }),
       room('standing', 'corridor', 'circle', 'e', { spawns: ['thousand_young'] }),
-      room('altar', 'hall', 'standing', 's', { hidden: { minInsight: 1 }, tome: { name: "Old Whateley's Ledger", insight: 1 } }),
+      room('altar', 'hall', 'standing', 's', { hidden: { minInsight: 3 }, tome: { name: "Old Whateley's Ledger", insight: 1 } }),
       room('ledge', 'corridor', 'terrace', 'w', { spawns: ['thousand_young', 'mi_go'] }),
       room('lookout', 'hall', 'ledge', 'w', { spawns: ['mi_go', 'martense_degenerate'], words: 'THE ROUND HILLS' }),
       stair('ascent', 'terrace', 'n', 4),
@@ -116,7 +127,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('drowned', 'hall', 'sink', 'w', { sign: { id: 'innsmouth_yhanthlei', name: 'Drowned Hall' } }),
       room('pits', 'pit', 'drowned', 'n', { spawns: ['deep_one'] }),
       room('nursery', 'hall', 'pits', 'n', { spawns: ['deep_one', 'innsmouth_hybrid', 'dagon_priest'], words: 'THE SPAWNING POOLS' }),
-      room('reliquary', 'corridor', 'nursery', 'e', { hidden: { minInsight: 2 }, tome: { name: "Obed Marsh's Log", insight: 1 } }),
+      room('reliquary', 'corridor', 'nursery', 'e', { hidden: { minInsight: 3 }, tome: { name: "Obed Marsh's Log", insight: 1 } }),
       room('ossuary', 'corridor', 'pits', 'w', { spawns: ['deep_one', 'deep_one'] }),
       room('cells', 'corridor', 'drowned', 's', { spawns: ['innsmouth_hybrid'], weapon: 'cutlass' }),
       stair('cells_deep', 'cells', 's', -4, { spawns: ['innsmouth_hybrid'] }),
@@ -134,7 +145,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('crypt', 'hall', 'steps', 's', { sign: { id: 'prov_catacombs', name: "Curwen's Crypt" } }),
       room('pits', 'pit', 'crypt', 'e', { boss: ['curwen_pit_thing'] }),
       room('pens', 'corridor', 'pits', 'e', { spawns: ['ghoul', 'ghoul'], words: 'THE PITS' }),
-      room('ossuary', 'corridor', 'crypt', 'w', { hidden: { minInsight: 2 }, tome: { name: "Curwen's Journal", insight: 1 } }),
+      room('ossuary', 'corridor', 'crypt', 'w', { hidden: { minInsight: 3 }, tome: { name: "Curwen's Journal", insight: 1 } }),
       room('charnel', 'hall', 'ossuary', 'w', { spawns: ['ghoul', 'being_from_beyond'] }),
       room('saltes', 'corridor', 'charnel', 's', { vial: 'Silver Vial of the Essential Saltes' }),
       room('laboratory', 'hall', 'crypt', 's', { wide: true, boss: ['joseph_curwen'] }),
@@ -148,7 +159,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('undercroft', 'hall', 'crypt_stair', 'e', { spawns: ['cthulhu_cultist', 'winged_hybrid'], words: 'THE UNDERCROFT' }),
       room('catacomb', 'corridor', 'undercroft', 's', { spawns: ['ghoul', 'ghoul'] }),
       room('chapel', 'hall', 'nave', 'w', { spawns: ['cthulhu_cultist', 'winged_hybrid'] }),
-      room('sacristy', 'corridor', 'chapel', 's', { hidden: { minInsight: 1 }, tome: { name: "Bowen's Journal", insight: 1 } }),
+      room('sacristy', 'corridor', 'chapel', 's', { hidden: { minInsight: 2 }, tome: { name: "Bowen's Journal", insight: 1 } }),
       room('aisle', 'corridor', 'nave', 'n'),
       stair('tower', 'aisle', 'n', 4),
       room('belfry', 'corridor', 'tower', 'n', { sign: { id: 'prov_church', name: 'Belfry Stair' } }),
@@ -171,7 +182,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('outpost', 'well', 'shaft', 'w', { spawns: ['mi_go', 'mi_go'], kit: 'mine', words: 'THE OUTPOST' }),
       room('gallery', 'corridor', 'outpost', 's', { spawns: ['mi_go'], kit: 'mine' }),
       room('cylinders', 'hall', 'gallery', 's', { spawns: ['mi_go', 'mi_go'], kit: 'mine', words: 'THE BRAIN-CYLINDERS' }),
-      room('span', 'bridge', 'outpost', 'n', { hidden: { minInsight: 2 }, kit: 'mine' }),
+      room('span', 'bridge', 'outpost', 'n', { hidden: { minInsight: 4 }, kit: 'mine' }),
       room('vault', 'hall', 'span', 'n', { tome: { name: "Akeley's Phonograph Record", insight: 1 }, spawns: ['mi_go'], kit: 'mine' }),
       room('hangar', 'corridor', 'vault', 'n', { spawns: ['mi_go'], kit: 'mine' }),
     ],
@@ -185,7 +196,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('observatory', 'hall', 'spire', 'w', { spawns: ['gnoph_keh'], words: 'THE STAR-HEADED CITY' }),
       room('murals', 'hall', 'plaza', 'e', { tome: { name: 'Elder Thing Murals', insight: 1 }, spawns: ['gnoph_keh'] }),
       room('frieze', 'corridor', 'murals', 'n', { spawns: ['elder_thing'] }),
-      room('sketches', 'hall', 'frieze', 'n', { hidden: { minInsight: 2 }, tome: { name: "Danforth's Sketches", insight: 1 } }),
+      room('sketches', 'hall', 'frieze', 'n', { hidden: { minInsight: 4 }, tome: { name: "Danforth's Sketches", insight: 1 } }),
       room('ramp', 'stair', 'plaza', 'n', { rise: -4, spawns: ['elder_thing', 'elder_thing'] }),
       room('gallery', 'corridor', 'ramp', 'n', { spawns: ['albino_penguin', 'albino_penguin'] }),
       room('tunnels', 'corridor', 'gallery', 'w', { spawns: ['albino_penguin', 'albino_penguin', 'albino_penguin'] }),
@@ -202,7 +213,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('catalogue', 'corridor', 'reading', 'n', { spawns: ['yithian'] }),
       room('machines', 'hall', 'catalogue', 'n', { spawns: ['yithian', 'hybrid_mummy'], words: 'THE HALL OF MACHINES' }),
       room('shelves', 'corridor', 'reading', 's', { spawns: ['nameless_city_reptile', 'nameless_city_reptile'] }),
-      room('earth_race', 'hall', 'shelves', 's', { hidden: { minInsight: 1 }, tome: { name: 'The Case of the Earth Race', insight: 1 } }),
+      room('earth_race', 'hall', 'shelves', 's', { hidden: { minInsight: 4 }, tome: { name: 'The Case of the Earth Race', insight: 1 } }),
       room('down', 'stair', 'reading', 'w', { rise: -4, spawns: ['yithian'] }),
       room('deep', 'corridor', 'down', 'w', { spawns: ['nameless_city_reptile'], tome: { name: 'Pnakotic Manuscripts', insight: 1 } }),
       room('trapdoor', 'well', 'deep', 'n', { spawns: ['flying_polyp'] }),
@@ -221,7 +232,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('yoth', 'pit', 'avenue', 'w', { spawns: ['gyaa_yothn'] }),
       stair('yoth_steps', 'yoth', 'w', -4, { spawns: ['beast_in_the_cave'] }),
       room('red_yoth', 'hall', 'yoth_steps', 'w', { spawns: ['gyaa_yothn', 'serpent_man'], words: 'RED-LITTEN YOTH' }),
-      room('serpent_vault', 'corridor', 'red_yoth', 'n', { hidden: { minInsight: 2 }, tome: { name: "Zamacona's Manuscript", insight: 1 } }),
+      room('serpent_vault', 'corridor', 'red_yoth', 'n', { hidden: { minInsight: 4 }, tome: { name: "Zamacona's Manuscript", insight: 1 } }),
       stair('temple', 'avenue', 'n', -4),
       room('span', 'bridge', 'temple', 'n'),
       room('nkai', 'hall', 'span', 'n', { wide: true, boss: ['tsathoggua'] }),
@@ -230,18 +241,33 @@ export const DUNGEONS: readonly DungeonDef[] = [
   {
     id: 'slumber', name: 'Stairs of Slumber', region: 'dreamlands', sealed: true, rooms: [
       // Round 12: the descent was a 30-second walk through nine empty rooms. Now it is said as it goes,
-      // the dream's lesser things wait on the flights, and the seven hundred steps are longer.
+      // and the dream's lesser things wait on the flights. Round 104: the steps are as many as the tale says, each one cut:
+      // seventy (two flights of 35, risers of 16 cm) to the Cavern of Flame, then seven hundred (fourteen flights of 50) down a
+      // switchback, across a span over the dreamless dark, to the Gate of Deeper Slumber; something waits on every flight.
       room('threshold', 'hall', undefined, 'n'),
-      stair('light_1', 'threshold', 'n', -4, { words: 'THE SEVENTY STEPS OF LIGHT SLUMBER' }),
-      stair('light_2', 'light_1', 'n', -4, { spawns: ['zoog', 'zoog'] }),
-      room('cavern', 'hall', 'light_2', 'n', { sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', words: 'THE CAVERN OF FLAME' }),
-      stair('deep_1', 'cavern', 'n', -5, { words: 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER' }),
-      stair('deep_2', 'deep_1', 'n', -5, { spawns: ['night_gaunt'] }),
-      stair('deep_3', 'deep_2', 'n', -5, { words: 'TWO HUNDRED STEPS', spawns: ['zoog', 'zoog', 'zoog'] }),
-      stair('deep_4', 'deep_3', 'n', -5, { spawns: ['ghast'] }),
-      stair('deep_5', 'deep_4', 'n', -5, { words: 'FOUR HUNDRED STEPS', spawns: ['night_gaunt', 'ghast'] }),
-      stair('deep_6', 'deep_5', 'n', -5, { words: 'SIX HUNDRED STEPS', spawns: ['ghast', 'ghast'] }),
-      room('deeper', 'hall', 'deep_6', 'n', { gate: { id: 'dream_deeper', name: 'Gate of Deeper Slumber', to: 'dream_wood_gate' }, words: 'THE GATE OF DEEPER SLUMBER' }),
+      stair('light_1', 'threshold', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THE SEVENTY STEPS OF LIGHT SLUMBER', spawns: ['zoog'] }),
+      stair('light_2', 'light_1', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THIRTY-FIVE STEPS', spawns: ['zoog', 'zoog'] }),
+      room('cavern', 'hall', 'light_2', 'n', { sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', words: 'THE CAVERN OF FLAME', kit: 'dreamflame' }),
+      deep('deep_1', 'cavern', 'n', ['night_gaunt'], 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER'),
+      deep('deep_2', 'deep_1', 'n', ['zoog', 'zoog', 'zoog'], 'FIFTY STEPS'),
+      deep('deep_3', 'deep_2', 'n', ['ghoul', 'ghoul'], 'ONE HUNDRED STEPS'),
+      deep('deep_4', 'deep_3', 'n', ['night_gaunt', 'ghast'], 'ONE HUNDRED AND FIFTY STEPS'),
+      room('landing_1', 'hall', 'deep_4', 'n', { kit: 'dreamdeep', words: 'TWO HUNDRED STEPS', spawns: ['ghast', 'ghoul', 'zoog'] }),
+      deep('deep_5', 'landing_1', 'n', ['wamp', 'wamp']),
+      deep('deep_6', 'deep_5', 'n', ['being_of_ib', 'ghoul'], 'TWO HUNDRED AND FIFTY STEPS'),
+      deep('deep_7', 'deep_6', 'n', ['ghast', 'night_gaunt'], 'THREE HUNDRED STEPS'),
+      room('turn_1', 'hall', 'deep_7', 'n', { kit: 'dreamdeep', words: 'THREE HUNDRED AND FIFTY STEPS: HALF THE WAY', spawns: ['man_of_leng', 'zoog', 'zoog'] }),
+      room('span', 'bridge', 'turn_1', 'e', { kit: 'dreamabyss', words: 'THE SPAN OVER THE DREAMLESS DARK', spawns: ['night_gaunt'] }),
+      room('turn_2', 'hall', 'span', 'e', { kit: 'dreamabyss', spawns: ['gnorri', 'ghast'] }),
+      deep('deep_8', 'turn_2', 's', ['ghoul', 'ghoul', 'ghoul'], undefined, 'dreamabyss'),
+      deep('deep_9', 'deep_8', 's', ['man_of_leng', 'night_gaunt'], 'FOUR HUNDRED STEPS', 'dreamabyss'),
+      deep('deep_10', 'deep_9', 's', ['moon_beast'], 'FOUR HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      room('landing_2', 'hall', 'deep_10', 's', { kit: 'dreamabyss', words: 'FIVE HUNDRED STEPS', spawns: ['moon_beast', 'ghast', 'ghast'] }),
+      deep('deep_11', 'landing_2', 's', ['being_of_ib', 'being_of_ib'], undefined, 'dreamabyss'),
+      deep('deep_12', 'deep_11', 's', ['man_of_leng', 'man_of_leng'], 'FIVE HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      deep('deep_13', 'deep_12', 's', ['ghast', 'night_gaunt', 'ghoul'], 'SIX HUNDRED STEPS', 'dreamabyss'),
+      deep('deep_14', 'deep_13', 's', ['moon_beast', 'night_gaunt'], 'SIX HUNDRED AND FIFTY STEPS', 'dreamabyss'),
+      room('deeper', 'hall', 'deep_14', 's', { kit: 'dreamabyss', gate: { id: 'dream_deeper', name: 'Gate of Deeper Slumber', to: 'dream_wood_gate' }, words: 'SEVEN HUNDRED STEPS: THE GATE OF DEEPER SLUMBER' }),
     ],
   },
   {

@@ -9,7 +9,7 @@
 
 import { MIND_EARS, MIND_SOUNDS } from '../../data/mindSounds';
 import type { Game } from '../../systems/components';
-import { lanternGain } from '../lanternLife';
+import { lanternLifeGain } from '../lanternLife';
 import type { AtmAudioContext } from './atmosphereAudio';
 
 const smooth = (a: number, b: number, x: number): number => {
@@ -102,9 +102,10 @@ function createRinging(ctx: AtmAudioContext): (stress: number, quiet: boolean) =
 function createLanternEars(ctx: AtmAudioContext): (quiet: boolean) => void {
   const L = MIND_EARS.lantern;
   const g: Game = ctx.g;
-  const ear: LanternEar = { armed: true, dark: lanternGain(g) <= L.out };
+  const ear: LanternEar = { armed: true, dark: lanternLifeGain(g) <= L.out };
   return (quiet) => {
-    const cue = lanternStep(ear, lanternGain(g));
+    // Hear the flame's stutter independently of its gradual dimming with sanity.
+    const cue = lanternStep(ear, lanternLifeGain(g));
     if (!cue || quiet) return;
     if (cue === 'spit') ctx.recipe('mind:lanternSpit', MIND_SOUNDS.lanternSpit, { gain: L.spit, pan: L.pan, vary: 0.7 });
     else if (cue === 'out') ctx.recipe('mind:lanternOut', MIND_SOUNDS.lanternOut, { gain: L.died, pan: L.pan, vary: 0.5 });

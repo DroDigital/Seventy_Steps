@@ -4,7 +4,9 @@ import { SAMPLE_SETS } from '../src/data/samples';
 import type { AtmAudioContext } from '../src/render/audio/atmosphereAudio';
 import { approachDistance, approachSteps, createFollower, followDelay, nextEpisodeAt, stopAfter, treadSteps, turnedToward } from '../src/render/audio/follower';
 import type { Sampler, SampleOptions } from '../src/render/audio/sampler';
+import { STEP_VOICE } from '../src/data/footSounds';
 import { createWorldGame } from '../src/systems/game';
+import { findRoom } from './footHelpers';
 
 const T = MIND_EARS.tread;
 const A = T.approach;
@@ -66,7 +68,7 @@ function rig(stress: number) {
       follower.update(stress, now, paused);
     }
   };
-  return { g, calls, play, right, breaths, clock: () => now };
+  return { g, calls, play, right, breaths, tr, clock: () => now };
 }
 
 afterEach(() => vi.restoreAllMocks());
@@ -173,5 +175,23 @@ describe('the tread: followed in a real game (round 80)', () => {
     expect(first).toBeGreaterThan(0);
     r.play(3, 1.5); // they set off: it comes with them
     expect(r.calls.some((c) => (c.o.delay ?? 0) > 0.2)).toBe(true);
+  });
+});
+
+describe('the tread in a dungeon (round 86)', () => {
+  it("keeps to the investigator's own steps: as much louder in a room of stone as they are, and as it was in the open", () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const from = (inside: boolean): number[] => {
+      const r = rig(0.9);
+      const room = findRoom(['slab', 'stone', 'rock'], 4)!;
+      if (inside) Object.assign(r.tr.pos, { x: room.x, z: room.z });
+      r.play(40 + A.lead + 5, 0); // stood still: steps from behind
+      return r.calls.map((c) => c.o.gain!);
+    };
+    const [open, inside] = [from(false), from(true)];
+    expect(open).toHaveLength(approachSteps(() => 0));
+    expect(inside).toHaveLength(open.length);
+    open.forEach((gain, i) => expect(inside[i]!, `step ${i}`).toBeCloseTo(gain * STEP_VOICE.indoors, 6));
+    expect(Math.max(...open)).toBeLessThan(0.4); // (the open air's, as round 83 left them)
   });
 });

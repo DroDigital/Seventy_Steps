@@ -8,7 +8,7 @@
 
 import { fbm } from '../core/noise';
 import { hash2 } from '../core/rng';
-import { SERIF } from './hudKit';
+import { canvasSerif } from './hudKit';
 import { glitchAt, LOGO, letterLight, sigilLight } from './logoPlan';
 
 const [W, H] = LOGO.size;
@@ -95,7 +95,7 @@ function letters(): Cut[][] {
   [canvas.width, canvas.height] = [W, H];
   const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
   return LOGO.words.map((word, w) => {
-    ctx.font = `bold ${word.size}px ${SERIF}`;
+    ctx.font = `bold ${word.size}px ${canvasSerif()}`;
     ctx.textBaseline = 'alphabetic';
     const widths = [...word.text].map((c) => ctx.measureText(c).width);
     let x = (W - (widths.reduce((a, b) => a + b, 0) + word.track * (word.text.length - 1))) / 2;

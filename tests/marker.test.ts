@@ -141,6 +141,19 @@ describe('the pointer to it (round 60)', () => {
     expect(beaconPlace({ ...view, w: 400, h: 200 }, { x: 0, z: 10 }, 'screen')!.beyond).toBe(false);
   });
 
+  it('sets an off-screen lead in by the room its key needs, and leaves a plain pointer on the old edge', () => {
+    const far = { x: -900, z: 0 }; // off the right: +x is drawn to the left
+    const screen = { ...view, w: 400, h: 200 };
+    const plain = beaconPlace(screen, far, 'screen')!;
+    const lead = beaconPlace(screen, far, 'screen', 0, 16)!; // the key's rays, as drawBeacon asks
+    expect(plain.x).toBeCloseTo(374, 5); // 26 pixels in from the right
+    expect(lead.beyond).toBe(true);
+    expect(lead.x).toBeCloseTo(358, 5); // the same edge, pulled in by the inset
+    expect(lead.angle).toBeCloseTo(plain.angle, 5); // still the way to the place
+    const round = beaconPlace(view, { x: -300, z: 0 }, 'round', 0, 16)!;
+    expect(Math.hypot(round.x - 100, round.y - 100)).toBeCloseTo(77, 5); // the rim was 93; sixteen pixels further in
+  });
+
   it("turns with the camera as the minimap's picture does: what lay up lies to the right after a quarter turn", () => {
     const up = beaconPlace(view, { x: 0, z: 40 }, 'round')!;
     expect([Math.round(up.x), Math.round(up.y)]).toEqual([100, 60]);

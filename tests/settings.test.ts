@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
-import { clampSetting, defaultSettings, loadSettings, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
+import { brightnessGamma, HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
+import { CALIBRATED_KEY, clampSetting, defaultSettings, isCalibrated, loadSettings, markCalibrated, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
 
 function memoryStore() {
   const data = new Map<string, string>();
@@ -12,16 +12,43 @@ function memoryStore() {
 }
 
 describe('settings', () => {
-  it('defaults to full FX, sensitivity 1, 800 × 450 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
+  it('defaults to full FX, sensitivity 1, 640 × 360 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 2, brightness: 1, fog: 1, relight: 0, shadows: 1, uiScale: 1, shake: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, questTracker: 1, quietWalk: 1, camera: 1, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.6, brightness: 1, fog: 1, relight: 0, shadows: 1, evenPixels: 1, font: 0, uiScale: 1, shake: 1, rumble: 1, captions: 1, captionBack: 0, flashes: 1, cutscenes: 1, minimap: 0, questTracker: 1, quietWalk: 1, controlTips: 1, camera: 0, padSwap: 0,
       volume: 1, music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
-    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([800, 450]);
-    // the standard steps are 320 × 180 to 800 × 450, the default the sharpest of them (round 58, asked; it was 640 × 360, which is drawn a whole number of times over on a 720p, 1080p, 1440p and 4K screen: 800 × 450 is not on any of them)
+    expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([640, 360]);
+    // the standard steps are 320 × 180 to 800 × 450; the default is 640 × 360 (2026-11-03, asked, as in round 56), drawn a whole number of times over on a 720p, 1080p, 1440p and 4K screen
     expect([0.8, 1.2, 1.6, 2].map((scale) => clampSetting('resolution', scale))).toEqual([0.8, 1.2, 1.6, 2]);
-    expect(SETTINGS.resolution[1]).toBe(defaultSettings().resolution);
-    for (const screen of [720, 1080, 1440, 2160]) expect((screen / (RENDER.height * 1.6)) % 1).toBe(0); // 640 × 360 still is
+    expect(SETTINGS.resolution[1]).toBe(2);
+    for (const screen of [720, 1080, 1440, 2160]) expect((screen / (RENDER.height * defaultSettings().resolution)) % 1).toBe(0);
+  });
+
+  it('makes the old 85% look the new 100% baseline and lets the player brighten it', () => {
+    expect(SETTINGS.brightness).toEqual([0.9, 1.9, 0.05, 1]);
+    expect(brightnessGamma(defaultSettings().brightness)).toBeCloseTo(1 / 0.85);
+    expect(brightnessGamma(1.5)).toBeLessThan(brightnessGamma(1));
+    const old = (brightness: number) => parseSettings(JSON.stringify({ brightness, v: 21 })).brightness;
+    expect(old(1)).toBe(1); // the former default follows the new default
+    expect(old(0.9)).toBe(1.05);
+    expect(old(0.85)).toBe(1);
+    expect(old(1.25)).toBe(1.45); // a brighter choice is retained approximately
+    expect(old(0.7)).toBe(0.9); // the new slider starts at 90%
+    const store = memoryStore();
+    storeSettings(store, { ...defaultSettings(), brightness: 1.5 });
+    expect(loadSettings(store).brightness).toBe(1.5);
+  });
+
+  it('shows the brightness card once: kept in the store, and never on a launch with no store to keep it in', () => {
+    const store = memoryStore();
+    expect(isCalibrated(store)).toBe(false);
+    markCalibrated(store);
+    expect(isCalibrated(store)).toBe(true);
+    expect(store.getItem(CALIBRATED_KEY)).not.toBeNull();
+    expect(isCalibrated(null)).toBe(true);
+    const refusing = { getItem: () => { throw new Error('denied'); }, setItem: () => { throw new Error('full'); } };
+    expect(isCalibrated(refusing)).toBe(true);
+    expect(() => markCalibrated(refusing)).not.toThrow();
   });
 
   it('clamps into range and snaps to the step', () => {
@@ -36,6 +63,20 @@ describe('settings', () => {
     expect(clampSetting('volume', '0.5')).toBe(SETTINGS.volume[3]);
   });
 
+  it('moves a camera look saved before the Long lens was taken out: Long lens to Classic, Tight shoulder to its new place, the rest kept', () => {
+    const saved = (camera: number, v: number) => JSON.stringify({ camera, v });
+    expect(parseSettings(saved(2, 19)).camera).toBe(0); // Long lens: Classic
+    expect(parseSettings(saved(3, 19)).camera).toBe(2); // Tight shoulder
+    expect(parseSettings(saved(1, 19)).camera).toBe(1); // Low hero
+    expect(parseSettings(saved(0, 18)).camera).toBe(0); // the original Classic choice is preserved
+    expect(parseSettings(saved(2, 20)).camera).toBe(0); // round 82's numbering: 2 was the Long lens
+    expect(parseSettings(saved(2, 21)).camera).toBe(2); // this version's own 2 is Tight shoulder
+    expect(SETTINGS.camera[1]).toBe(2);
+    const store = memoryStore();
+    storeSettings(store, { ...defaultSettings(), camera: 2 });
+    expect(loadSettings(store).camera).toBe(2); // kept as it was stored
+  });
+
   it('a broken, partial or hostile entry parses to sane settings', () => {
     expect(parseSettings(null)).toEqual(defaultSettings());
     expect(parseSettings('{not json')).toEqual(defaultSettings());
@@ -45,7 +86,7 @@ describe('settings', () => {
 
   it('keeps settings apart from the save, and survives a store that refuses', () => {
     const store = memoryStore();
-    const s = { ...defaultSettings(), fxCap: 0.5, sensitivity: 1.5 };
+    const s = { ...defaultSettings(), fxCap: 0.5, sensitivity: 1.5, font: 1 };
     storeSettings(store, s);
     expect(store.getItem(SETTINGS_KEY)).not.toBeNull();
     expect(loadSettings(store)).toEqual(s);
@@ -59,13 +100,13 @@ describe('settings', () => {
     expect(parseSettings('{"resolution":1}').resolution).toBe(defaultSettings().resolution);
     for (const version of [13, 14, 15]) {
       // a lower choice is kept, at the nearest of today's steps (the one that snaps to 640 × 360, the old default, goes to the new: round 58)
-      for (const [resolution, now] of [[0.5, 0.8], [0.75, 0.8], [1, 1.2], [1.25, 1.2], [1.5, 2]]) expect(parseSettings(JSON.stringify({ resolution, v: version })).resolution).toBe(now);
+      for (const [resolution, now] of [[0.5, 0.8], [0.75, 0.8], [1, 1.2], [1.25, 1.2], [1.5, 1.6]]) expect(parseSettings(JSON.stringify({ resolution, v: version })).resolution).toBe(now);
     }
     expect(parseSettings(JSON.stringify({ resolution: 2, v: 15 })).resolution).toBe(2); // made after the warning: kept
     for (const version of [13, 14]) {
       for (const resolution of HIGH_RESOLUTIONS) {
         const chosen = { ...defaultSettings(), resolution, fxCap: 0.4, brightness: 1.25, fog: 0.5 };
-        expect(parseSettings(JSON.stringify({ ...chosen, v: version }))).toEqual({ ...chosen, resolution: defaultSettings().resolution });
+        expect(parseSettings(JSON.stringify({ ...chosen, v: version }))).toEqual({ ...chosen, brightness: 1.45, resolution: defaultSettings().resolution });
       }
     }
     const store = memoryStore();
@@ -79,16 +120,16 @@ describe('settings', () => {
     for (const resolution of HIGH_RESOLUTIONS) {
       expect(clampSetting('resolution', resolution)).toBe(resolution);
       storeSettings(store, { ...defaultSettings(), resolution });
-      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(20);
+      expect(JSON.parse(store.getItem(SETTINGS_KEY)!).v).toBe(23);
       expect(loadSettings(store).resolution).toBe(resolution);
     }
     expect(clampSetting('resolution', 99)).toBe(2.4);
   });
 
-  it('moves a picture kept at 640 × 360, the old default, to 800 × 450 once, and keeps every other choice (round 58)', () => {
+  it('kept 640 × 360 where round 58 moved it to 800 × 450, which is the default again (2026-11-03)', () => {
     const kept = (resolution: number, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), resolution, v })).resolution;
-    expect(kept(1.6, 16)).toBe(2); // the old default, kept by every save
-    expect(kept(1.6, 15)).toBe(2);
+    expect(kept(1.6, 16)).toBe(1.6); // the default of round 56, kept by every save: the default again (2026-11-03)
+    expect(kept(1.6, 15)).toBe(1.6);
     expect(kept(1.2, 16)).toBe(1.2); // a slow machine's choice, or the first launch's
     expect(kept(0.8, 16)).toBe(0.8);
     expect(kept(2.4, 16)).toBe(2.4); // a sharper choice
@@ -100,12 +141,22 @@ describe('settings', () => {
       expect(tuned({ shadows: 0 }, v), `shadows off, v${v}`).toBe(1.6);
       expect(tuned({ shadows: 0, fog: 0.75 }, v), `shadows off, thinner fog, v${v}`).toBe(1.6);
       expect(tuned({ fog: 0.5 }, v), `fog thinned, v${v}`).toBe(1.6);
-      expect(tuned({}, v), `untouched, v${v}`).toBe(2);
+      expect(tuned({}, v), `untouched, v${v}`).toBe(1.6);
     }
     expect(tuned({ shadows: 0, fxCap: 0.4, brightness: 1.25 }, 16)).toBe(1.6); // the rest of the profile is what it was
     // (and a save from before the warning took the default of the day; a marked one still takes the old one, as it did)
     expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, shadows: 0, v: 12 })).resolution).toBe(1.6);
-    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, v: 12 })).resolution).toBe(2);
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 1.2, v: 12 })).resolution).toBe(1.6);
+  });
+
+  it('moves 800 × 450, the default of versions 17 to 22, to 640 × 360 once, and keeps a choice made before or since (2026-11-03)', () => {
+    const kept = (resolution: number, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), resolution, v })).resolution;
+    for (const v of [17, 18, 19, 20, 21, 22]) expect(kept(2, v), `v${v}`).toBe(1.6); // kept by every save then, chosen or not
+    expect(kept(2, 16)).toBe(2); // chosen when 640 × 360 was the default
+    expect(kept(2, 23)).toBe(2); // chosen since
+    expect(kept(1.2, 22)).toBe(1.2); // a lower choice
+    expect(kept(2.4, 22)).toBe(2.4); // a sharper one, after the warning
+    expect(parseSettings(JSON.stringify({ ...defaultSettings(), resolution: 2, shadows: 0, v: 22 })).resolution).toBe(1.6); // (and a tuned machine's)
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), resolution: 1.6 });
     expect(loadSettings(store).resolution).toBe(1.6);
@@ -124,17 +175,20 @@ describe('settings', () => {
     expect(parseSettings(JSON.stringify({ ...round59, resolution: 1.6, v: 17 })).resolution).toBe(1.6); // 17's choice of picture is still its own
   });
 
-  it('makes Low hero the camera for a person who has the first default, Classic, kept in their settings (round 82), and keeps every other choice', () => {
+  it('defaults to Classic while preserving saved camera choices', () => {
     const camera = (o: object, v: number) => parseSettings(JSON.stringify({ ...defaultSettings(), ...o, v })).camera;
-    expect(defaultSettings().camera).toBe(1);
-    expect(parseSettings(null).camera).toBe(1); // a new person
-    expect(parseSettings(JSON.stringify({ volume: 0.5, v: 19 })).camera).toBe(1); // settings kept before the camera had a choice
-    expect(camera({ camera: 0 }, 19)).toBe(1); // Classic kept by every save since round 77, chosen or not: moved once
-    expect(camera({ camera: 2 }, 19)).toBe(2); // another look: a choice
-    expect(camera({ camera: 3 }, 19)).toBe(3);
-    expect(camera({ camera: 0 }, 20)).toBe(0); // Classic chosen since: kept
+    expect(defaultSettings().camera).toBe(0);
+    expect(parseSettings(null).camera).toBe(0);
+    expect(parseSettings(JSON.stringify({ volume: 0.5, v: 19 })).camera).toBe(0);
+    for (const version of [19, 20]) {
+      expect(camera({ camera: 0 }, version)).toBe(0);
+      expect(camera({ camera: 1 }, version)).toBe(1);
+      expect(camera({ camera: 2 }, version)).toBe(0); // removed Long lens
+      expect(camera({ camera: 3 }, version)).toBe(2); // Tight shoulder's new index
+    }
+    for (const choice of [0, 1, 2]) expect(camera({ camera: choice }, 21)).toBe(choice);
     const store = memoryStore();
-    storeSettings(store, { ...defaultSettings(), camera: 0 });
-    expect(loadSettings(store).camera).toBe(0); // and a save of it keeps it
+    storeSettings(store, { ...defaultSettings(), camera: 1 });
+    expect(loadSettings(store).camera).toBe(1);
   });
 });

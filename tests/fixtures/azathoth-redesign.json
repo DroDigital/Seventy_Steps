@@ -1,0 +1,426 @@
+{
+  "format": "seventy-steps-azathoth-redesign-v1",
+  "entity": "azathoth",
+  "canvas": [
+    128,
+    128
+  ],
+  "frames": [
+    {
+      "path": "bosses/azathoth/movement/front/idle_0.png",
+      "sha256": "3093b490855512579be83489b05528eab3d429f1aad08d98b9c44ef417c25a89",
+      "rgbaSha256": "b5722f28e9d74369986ba63de135d8b3ad8eea895ca6c4feef2ebe4a101d8d0a",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        6,
+        38,
+        122,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/idle_1.png",
+      "sha256": "dec9efde7ee4a0a256b1cbf2dd2cb1462b60f92a0be6ddc74d53d3cad4d5b81c",
+      "rgbaSha256": "9b9961401fd78bbb5b6165de1704b05d3329b7ea1a6bb6dd4cef00afcc77584e",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        5,
+        37,
+        123,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/move_0.png",
+      "sha256": "32877d1b9cdcc2d5c24edf308891c11c72d3ce5c5c09e4292151feeb6448d168",
+      "rgbaSha256": "3504100ebe95344a1ce7febc776b62160707517a14b01a85426bb066664002a3",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        12,
+        37,
+        117,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/move_1.png",
+      "sha256": "0e6e800cf5beb63c26bd1bbc6ff2e1b6e08d725af134fa227078eb09ac17a6a3",
+      "rgbaSha256": "b2fc0973b204094bfd03735d8a86114433ad4083cec214005a725c5dcf6e43ed",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        10,
+        35,
+        118,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/move_2.png",
+      "sha256": "b8da2a4c63192d01facf9450302fcc41923be023c83c8bd41b5a74a7f708272c",
+      "rgbaSha256": "5486b036df096cb8e59ee994457d2e7ccb86ce379e51b3ca762e47d958cf24c8",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        8,
+        30,
+        121,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/move_3.png",
+      "sha256": "54e4f297702ad9e0ed306961ba57b76e241f9ef4ac430d21286316e84082e69f",
+      "rgbaSha256": "e6f04b14a433ff573f1bd325092baeb42f3a302125b3f8b1cab478cdcad34214",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        12,
+        37,
+        117,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/attack_0.png",
+      "sha256": "9c5577159479790638e6725add81cf59e9be62507029a3c60cbc5b5af31711b5",
+      "rgbaSha256": "b641ecb7daf6b70edfe2099b73bd1a1bb7c07a16c3f8156e95f151fc569a8b03",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        19,
+        32,
+        110,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/attack_1.png",
+      "sha256": "8ba8f36e4435fef8f6739e6b4e9605c4e947df12399cce01cb7bab346eb5e4de",
+      "rgbaSha256": "c738b9cfcd5c89cd5f78fbf92a28997fc5eec1f56a76b4620680e121a5cc4003",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        11,
+        32,
+        117,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/attack_2.png",
+      "sha256": "066924347e7bba2649b684e650e718265eea83cb680b9ba025bdbba04e975ae5",
+      "rgbaSha256": "baeaed969e1c8cfc0ad94212505fdb5bdf9064da1aab88c73d58a2530f53088d",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        12,
+        31,
+        116,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/hurt_0.png",
+      "sha256": "2b659c0d430801ed62aa59ffbaaa23fe46614d2f1721f836a828cda8dcf77123",
+      "rgbaSha256": "6351453ec2b355b2dc544111eb7fff59bb1d6e6def78cb8396ba60a69cd9b3f3",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        18,
+        35,
+        111,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/hurt_1.png",
+      "sha256": "208c6de1374a6bf0c2ab10ae3a03e50de240998eaff1b71c31fcaa9834467300",
+      "rgbaSha256": "e402fab8725c051eccf002abab0546986e8b2b0c8a3031ff3615eed56ccd14db",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        11,
+        27,
+        117,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/stoop_0.png",
+      "sha256": "ae4bf1f556b60bb4f654331bdf2b30e9005f3f40a5a1d155143f7bc5ca0ef899",
+      "rgbaSha256": "80cdb5107233b609e65322a27463321fe21fbac26b2f4ada78a4596707f168ac",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        12,
+        36,
+        116,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/stoop_1.png",
+      "sha256": "599d89810299d4ff921bb0fc1fb6c237e016ade8ab79a9c8e13f44f556beddee",
+      "rgbaSha256": "3702ea45642bf31abb806d9686cf24643d66933039ba313b8f8e12cd456cdb9b",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        13,
+        35,
+        116,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/front/stoop_mid_0.png",
+      "sha256": "538925d4f1e324eb5b4336e94ff77a0107f9483122d908b0702ce3998c244e3f",
+      "rgbaSha256": "9c682a9227054acf80cd946a70a0e6352dda58b7508bb7f9a6afd5ffc2e68810",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        13,
+        40,
+        116,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/idle_0.png",
+      "sha256": "1cbf077b6f3af6d8a5f43535e070e2874088bc66cbe511be56b12cf70518b7d0",
+      "rgbaSha256": "b56ff8f57411f3a2490fa3612e4d4efc84d264de1f886724c37d32d901333a6e",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        20,
+        36,
+        110,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/idle_1.png",
+      "sha256": "2139a0146045d17c5a9574bef1959e1c14a6341497209ad2731cf90ce53e192f",
+      "rgbaSha256": "007f59d6d88cf794af080c32c7f07f0513a53cf121eaf0eb8a1507ff795f60e8",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        19,
+        36,
+        111,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/move_0.png",
+      "sha256": "1e15fc1ba2f79978b5e39aa1b76f6fff8c5d266e686d29a21905e92d18563c91",
+      "rgbaSha256": "3fd117663e9e71c37d80aea254739c6fb5dfbadba94b4eaff12d4910de19e55b",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        25,
+        37,
+        110,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/move_1.png",
+      "sha256": "9343248065c5ca7d449244f281877078c404a385345045bc33882d96d77c826c",
+      "rgbaSha256": "7bb4846df35ab870e1b529e5eeeaf35efa70410515115dcb53a9e50a7bf7ebb8",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        10,
+        36,
+        111,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/move_2.png",
+      "sha256": "2ac91551c2982c0869cdf07f974d081279ff8c69555befac29849543563fd28c",
+      "rgbaSha256": "5e7faf6d263a25cdce58996f0e76419645a569423e6c0da5d2fdd95bf0d1fcd6",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        8,
+        36,
+        115,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/left/move_3.png",
+      "sha256": "44bdeed400f6e458da12140f52f05975b0952f793ea22bb40d6a0b76ffe4738c",
+      "rgbaSha256": "42cc454109abe9d3fcef0098b8218cc968189e868f4f66130fa7314e1262ecba",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        14,
+        36,
+        111,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/idle_0.png",
+      "sha256": "7f8c4656bacf7ed5f542029a05df090443440cb6cedf918aae2d7b838e07a613",
+      "rgbaSha256": "656c374dbaa932ea4c6e45bba41e4e00b6b2ca3fdb8ac4502654db5159966bb3",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        16,
+        38,
+        111,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/idle_1.png",
+      "sha256": "39a99c2c82205698e34c0c863519d3183ac3bc650c20d5f232320361f7cf94b5",
+      "rgbaSha256": "b2daf209b3d4c91730763ee7f47b660b3243f255a93381bd416f4768572f5e6b",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        16,
+        37,
+        112,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/move_0.png",
+      "sha256": "30b89e15b1d4faab78816f1e446aca7c290aa7159799eec617df5eeb2609a98c",
+      "rgbaSha256": "11fa839538fa8f470cf8e9847e17185e07adff588241991b73506a51764d7e91",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        16,
+        38,
+        112,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/move_1.png",
+      "sha256": "ff2810ec4172f1cee4c29138c5b0d41b3cb6f5266a4b7d9996e1de6770dd30e0",
+      "rgbaSha256": "93e55fbede3d2483d5911835cf93c0ca4072744969db4e03eed6ad462ccaead7",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        15,
+        38,
+        113,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/move_2.png",
+      "sha256": "0983d0da0f926b38b1c3dd92dc3aca4da6312d030aced36b22334a45f4d52eab",
+      "rgbaSha256": "e199c4d4e77bfe0d140c90373a915f1d6875615bb6ae52629c8dfd5554d5d13d",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        15,
+        34,
+        113,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/back/move_3.png",
+      "sha256": "4fecb5c054230c1d220ea191ad6bb4fa84e2997517b9a30a9e9bad7afc124659",
+      "rgbaSha256": "2d00a09ae63e893b396757759ea28bf3adcaa938746f3c3a939e98b8ff38f089",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        15,
+        38,
+        112,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/idle_0.png",
+      "sha256": "b3472a6b7ee20c7f7e4f4fe6c64a55f0d7b52558650aab40be73966cc538d7c6",
+      "rgbaSha256": "f198fbd9b6c9fa87a786cc2c2cc2a5779a15724b05823ce43fe91ef0fdee798a",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        18,
+        36,
+        108,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/idle_1.png",
+      "sha256": "830a5ee04d9263acdcd3abd5cda0684abd13a4c6b3dcdec578bbbdc465d8c945",
+      "rgbaSha256": "22f3cb223e737f723961f8ff7ec4f2c7781e89e70f4e0df2f5854da0d98df272",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        17,
+        36,
+        109,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/move_0.png",
+      "sha256": "02a3bbd056258a27a939da8770baea14cd3e69388bcb71495651a1025ca891d6",
+      "rgbaSha256": "961c3cb612f070c95c3b3960b2fccf66c47b7aea61df08db7da89119ca03476c",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        18,
+        37,
+        103,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/move_1.png",
+      "sha256": "eae97e4a9dc8d7147995ed1307a2d8193e93753a95f4efcb685a8b4f1549d130",
+      "rgbaSha256": "c69df1651f1c9ba6676449181425d7070c2aed7218ae36c82581b014f55ad9cc",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        17,
+        36,
+        118,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/move_2.png",
+      "sha256": "9aedbc0443eae2545aef40f0e2434af24a4b84c08f472faa09c0a7ae2107d7a2",
+      "rgbaSha256": "8426b7216c170726b95f292448a473734b30f85f94bbd23c62344322654aea1e",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        13,
+        36,
+        120,
+        124
+      ]
+    },
+    {
+      "path": "bosses/azathoth/movement/right/move_3.png",
+      "sha256": "ca54f1a668c1b881ca43ec759235a666211b60da92eee96fa946b0df20fcfd6a",
+      "rgbaSha256": "c422608f5732c992eb737eed38c2fc54d4d7bb97db97c724cfd4db4e737e21de",
+      "width": 128,
+      "height": 128,
+      "bounds": [
+        17,
+        36,
+        114,
+        124
+      ]
+    }
+  ]
+}

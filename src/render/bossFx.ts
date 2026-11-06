@@ -7,15 +7,18 @@
 import type * as THREE from 'three';
 import type { Game } from '../systems/components';
 import { createAttackFx } from './attackFx';
+import { createAzathothFloor } from './azathothFloor';
 import { createBeams, type Beams } from './beams';
 import { createDecals } from './decals';
 import { createFlaskFx } from './flaskFx';
 import { createFogGates } from './fogGates';
+import { createFoeFx } from './foeFx';
 import type { GroundFx } from './groundFx';
 import { createMatterFx } from './matterFx';
 import { createMeleeFx } from './meleeFx';
 import type { Particles } from './particles';
 import { createStrikeTentacles } from './strikeTentacles';
+import { createRifts } from './rifts';
 import { createSurgeView } from './surgeView';
 import { createTelegraphs } from './telegraphs';
 
@@ -27,24 +30,30 @@ export interface BossFx {
 
 export function createBossFx(scene: THREE.Scene, g: Game, particles: Particles, ground: GroundFx): BossFx {
   const telegraphs = createTelegraphs(g, createDecals(scene), ground);
+  const floor = createAzathothFloor(scene, g);
   const beams = createBeams(scene, g);
   const fx = createAttackFx(g, particles, ground);
   const matter = createMatterFx(g, particles, ground, beams); // round 70: falling stars, lightning, flame and clouds
   const tentacles = createStrikeTentacles(scene, g); // the tentacles that rise from marked ground
+  const rifts = createRifts(scene, g);
   const surge = createSurgeView(scene, g, particles); // the wall of water of a tidal surge
   const melee = createMeleeFx(g, particles, ground);
+  const foes = createFoeFx(g, particles, ground); // round 90: every creature that is not a horror draws its blow quietly, in a mark of its own
   const fog = createFogGates(g, particles);
   const flasks = createFlaskFx(scene, g, particles); // round 29: a flask of lamp oil, in flight and burning
   return {
     beams,
     update(alpha, time, camera) {
+      floor.update(time);
       telegraphs.update(alpha, time);
       beams.update(alpha, time, camera);
       fx.update(alpha);
       matter.update(alpha);
       tentacles.update(time);
+      rifts.update(time, camera);
       surge.update(alpha);
       melee.update(alpha);
+      foes.update(alpha);
       fog.update(time);
       flasks.update(alpha, time);
     },

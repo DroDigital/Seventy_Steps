@@ -41,7 +41,7 @@ export const ACHIEVEMENTS = {
   hastur: { name: 'The Third Naming', note: 'Put down Hastur.', goal: { slay: ['hastur'] } },
   shub: { name: 'The Thousand Young', note: 'Put down Shub-Niggurath.', goal: { slay: ['shub_niggurath'] } },
   chaos: { name: 'The Crawling Chaos', note: 'Put down Nyarlathotep.', goal: { slay: ['nyarlathotep'] } },
-  piping: { name: 'The Piping Fades', note: 'Outlast Azathoth.', goal: { slay: ['azathoth'] } },
+  piping: { name: 'The Piping Fades', note: 'Silence Azathoth.', goal: { slay: ['azathoth'] } },
   sealed: { name: 'The Gate Is Sealed', note: 'Wake, and seal the Gate.', goal: { ending: 'seal' } },
   through: { name: 'Through the Ultimate Gate', note: "Pass through with 'Umr at-Tawil.", goal: { ending: 'silver_key' } },
   herald: { name: 'Herald of the Crawling Chaos', note: 'Kneel.', goal: { ending: 'herald' } },

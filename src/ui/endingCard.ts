@@ -14,11 +14,12 @@ import { fateOf } from '../data/epilogues';
 import { NPCS } from '../data/npcs';
 import { QUESTS } from '../data/quests';
 import { REGIONS } from '../data/regions';
+import { NEW_GAME_PLUS } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { carryOf } from '../systems/cycles';
 import { levelsBought } from '../systems/levels';
 import { isDone } from '../systems/quests';
-import { noteEnding, storeCarry, type Records } from '../systems/records';
+import { clearCarry, noteEnding, storeCarry, type Records } from '../systems/records';
 import type { SaveStore } from '../systems/save';
 import { runCard, savePng } from './keepsake';
 import { bossesSlain, playTime } from '../systems/tally';
@@ -42,14 +43,17 @@ export interface EndingCard {
   show(id: string): void;
 }
 
-/** Leaves this dream for a new one: the reload finds the flag, forgets the save and plays the opening. */
-export function beginAnew(): void {
+/** Leaves this dream only if the reload flag can be kept; false leaves the current journey open. */
+export function beginAnew(): boolean {
   try {
     sessionStorage.setItem(NEW_GAME_FLAG, '1');
+    if (sessionStorage.getItem(NEW_GAME_FLAG) !== '1') throw new Error('New game flag was not saved');
+    location.href = location.pathname;
+    return true;
   } catch {
-    // No session storage: the title's New game is still there after the reload.
+    try { sessionStorage.removeItem(NEW_GAME_FLAG); } catch { /* Storage is unavailable. */ }
+    return false;
   }
-  location.href = location.pathname;
 }
 
 /** Brings `nodes` out of the dark one after another. */
@@ -86,7 +90,7 @@ function numbers(g: Game, records: Records): [string, string][] {
 
 /** `theme` sounds the title's theme (main.ts), from the ending until the investigator walks on. */
 export function createEndingCard(g: Game, store: SaveStore | null, theme?: () => Music): EndingCard {
-  const screen = createScreen(4, '#050506', `left:50%;top:34%;width:min(640px,90vw);transform:translate(-50%,-30%);text-align:center;font:16px/1.8 ${SERIF}`);
+  const screen = createScreen(4, '#050506', `left:50%;top:50%;width:min(640px,90vw);max-height:90vh;overflow-y:auto;box-sizing:border-box;padding:12px;transform:translate(-50%,-50%);text-align:center;font:16px/1.8 ${SERIF}`);
   let music: Music | undefined;
   let noted: Records | null = null; // the ending is remembered when it is chosen, not when the card opens (round 55: a quit during the scene lost it)
   g.events.on('Ending', ({ id }) => {
@@ -123,27 +127,65 @@ export function createEndingCard(g: Game, store: SaveStore | null, theme?: () =>
       },
     };
     const credits = creditsPage(() => screen.show(end), 'Go on');
+    const nextJourney = Math.min(g.player.cycle + 1, NEW_GAME_PLUS.most) + 1;
+    const capped = g.player.cycle >= NEW_GAME_PLUS.most;
+    const choice = (parent: HTMLElement, label: string, detail: string, next: Page, prominent = false): void => {
+      const b = boxed(button(parent, label, () => screen.show(next)));
+      b.style.cssText = `display:block;box-sizing:border-box;width:min(100%,500px);margin:8px auto 0;padding:8px 18px;text-align:left;white-space:normal;font:15px/1.3 ${SERIF};letter-spacing:1px;color:${BONE};background:${prominent ? '#29221c' : '#141416'};border:1px solid ${prominent ? BONE + 'aa' : BONE + '55'};cursor:pointer`;
+      el('display:block;margin-top:3px;font-size:12px;letter-spacing:0;line-height:1.35;opacity:.72', detail, b);
+    };
+    /** Every outcome is confirmed on its own page; returning or cancelling does not take the action. */
+    const confirmation = (title: string, details: readonly string[], label: string, act: () => string | void): Page => {
+      let error = '';
+      const page: Page = {
+        back: () => screen.show(end),
+        build(panel) {
+          heading(panel, title);
+          for (const line of details) el('opacity:.8;margin:12px auto;max-width:520px;font-size:14px;line-height:1.55', line, panel);
+          if (error) el('color:#e6bdb3;margin:12px auto;max-width:520px;font-size:14px;line-height:1.5', error, panel);
+          const buttons = el('', '', panel);
+          boxed(button(buttons, 'Cancel', () => screen.show(end)));
+          boxed(button(buttons, label, () => {
+            const problem = act();
+            if (problem) { error = problem; screen.show(page); }
+          }));
+        },
+      };
+      return page;
+    };
+    const storageError = 'Unable to start the new journey because storage is unavailable. Your current journey has not been changed.';
+    const saveCard = confirmation('SAVE THE ENDING CARD?', ['Download a PNG with this journey’s ending and numbers.'], 'Save card', () => {
+      savePng(runCard(e.title, numbers(g, records)), `dream-${g.player.cycle + 1}-${e.title.toLowerCase().replace(/\W+/g, '-')}`);
+      screen.show(end);
+    });
+    const continueJourney = confirmation('CONTINUE THIS JOURNEY?', ['Return to the current world with your progress as it is.'], 'Continue journey', walkOn);
+    const newGamePlus = confirmation('START NEW GAME+?', [
+      `${capped ? 'The next journey is at the maximum New Game+ difficulty.' : `Begin journey ${nextJourney}.`} Restart the story with your levels, weapons and upgrades, gun, stones, mind upgrades, Reagent capacity, Echoes and difficulty.`,
+      'Ordinary foes grow stronger by region. Boss health and damage grow on later journeys; boss health does not scale with your level. NG+ scaling and rewards stop increasing at NG+7.',
+      'The world, quests and bosses reset. Previously opened boss entrances, hints, endings and achievements remain. The current save slot and its backups are cleared to begin the new journey.',
+    ], 'Start New Game+', () => {
+      if (!storeCarry(store, carryOf(g))) return storageError;
+      if (beginAnew()) return;
+      clearCarry(store);
+      return storageError;
+    });
+    const freshStart = confirmation('START A NEW GAME?', [
+      'Begin a fresh first journey without your current character’s levels, equipment or progress. Your ending and achievement records remain.',
+      'The current save slot and its backups will be cleared.',
+    ], 'Start fresh', () => {
+      if (!clearCarry(store) || !beginAnew()) return storageError;
+    });
     const end: Page = {
       build(page) {
         el('font-size:18px;letter-spacing:8px;margin-bottom:14px', e.title, page);
-        const table = el('display:grid;grid-template-columns:1fr auto;gap:0 24px;max-width:340px;margin:0 auto;text-align:left;font-size:14px', '', page);
+        const table = el('display:grid;grid-template-columns:1fr auto;gap:0 24px;max-width:340px;margin:0 auto;text-align:left;font-size:13px;line-height:1.45', '', page);
         for (const [k, v] of numbers(g, records)) (el('opacity:.6', k, table), el('', v, table));
+        heading(page, 'WHAT NEXT?');
         const buttons = el('', '', page);
-        boxed(button(buttons, 'Keep the card', () => savePng(runCard(e.title, numbers(g, records)), `dream-${g.player.cycle + 1}-${e.title.toLowerCase().replace(/\W+/g, '-')}`))); // round 26: a plate to show
-        boxed(button(buttons, 'Walk on', walkOn));
-        boxed(button(buttons, 'Begin anew', () => screen.show(confirm)));
-      },
-    };
-    const confirm: Page = {
-      back: () => screen.show(end),
-      build(page) {
-        heading(page, 'BEGIN ANEW?');
-        el('opacity:.6;margin-bottom:14px', 'This dream is forgotten and a new one begins. The endings you have reached are remembered.', page);
-        el('opacity:.5;font-size:13px;margin-bottom:10px', "You may carry your strength into it: your levels, arms and their stones, the mind's upgrades, vials and Echoes. Its horrors will be hardier for it.", page);
-        const buttons = el('', '', page);
-        boxed(button(buttons, 'No, go back', () => screen.show(end)));
-        boxed(button(buttons, 'Begin anew', beginAnew));
-        boxed(button(buttons, `Begin journey ${g.player.cycle + 2}, carrying your strength`, () => (storeCarry(store, carryOf(g)), beginAnew())));
+        choice(buttons, `New Game+ · Journey ${nextJourney}`, 'Restart the story while carrying your character’s strength forward.', newGamePlus, true);
+        choice(buttons, 'Continue this journey', 'Return to the current world with your progress.', continueJourney);
+        choice(buttons, 'New Game · Fresh start', 'Start a first journey without your current character.', freshStart);
+        choice(buttons, 'Save the ending card', 'Download this summary as a PNG.', saveCard);
       },
     };
     screen.show(card);

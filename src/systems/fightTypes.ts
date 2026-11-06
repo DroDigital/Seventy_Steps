@@ -13,6 +13,22 @@ export interface ArenaCircle {
   radius: number;
 }
 
+export interface ArenaTile {
+  x: number;
+  z: number;
+  strain: number; // 0..1: increasingly visible damage
+  seed: number;
+  warning: number; // frames of tremor before collapse
+  collapsed: boolean;
+  protected: boolean;
+}
+
+export interface ArenaFloor {
+  tiles: ArenaTile[];
+  size: number;
+  lastTremor: number;
+}
+
 /** A boss fight (spec §3E): the script its boss follows, the phase it has reached and the arena it holds. */
 export interface Fight {
   id: string; // roster id; a signature mechanic is keyed by it
@@ -22,6 +38,7 @@ export interface Fight {
   veiled?: boolean; // the fog has closed about the ring behind the investigator (round 12): no leaving until one of them falls
   arena: ArenaCircle;
   frames: number; // since it was engaged
+  base?: number; // its most health before it grew to meet the investigator (bossFight.ts `meet`)
   minions: Entity[]; // its summons and decoys
   props: Entity[]; // what its arena changes put up
   changes: Set<ArenaChange>; // applied since it was engaged
@@ -30,6 +47,7 @@ export interface Fight {
   form: string; // the model its brain was built for: a variant swap rebuilds it
   stoopUntil: number; // a colossus is stooped, its head within reach, until this frame (hurt.ts; round 24)
   interruptedAt?: number; // the frame a shot last broke its wind-up (round 60: BOSS.rearm)
+  arenaFloor?: ArenaFloor; // Azathoth's transient, encounter-owned floor
 }
 
 /** What a boss's arena change puts up (spec §3E): its colliders stand in the world while it does. */
@@ -42,6 +60,7 @@ export interface Prop {
 
 /** A bolt in flight (spec §3E). */
 export interface Bolt {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   vel: V3; // m/s
@@ -57,6 +76,7 @@ export interface Bolt {
 
 /** A lingering pool on the ground (spec §3E): it hurts each hostile inside it, one tick at a time. */
 export interface Hazard {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   radius: number;
@@ -67,6 +87,7 @@ export interface Hazard {
   fire?: boolean; // burning oil (round 12)
   cloud?: 'toxic' | 'dream'; // round 70: a bank of air that drifts after its target, drawn as a cloud and not as a pool
   drift?: number; // metres a frame it creeps toward its owner's target
+  heading?: number; // 2026-10-29: a blind horror's bank creeps this way instead (radians, yaw 0 = +z), after no one
   mind?: number; // sanity a second it takes of the investigator within it (before the horror's weight)
   total?: number; // its life when it rose (the picture swells in and thins out over it)
 }
@@ -87,6 +108,7 @@ export interface Mark {
 
 /** A ring racing out along the ground from where it was loosed (the quake). */
 export interface Wave {
+  enemyScale?: number;
   owner: Entity;
   faction: 'player' | 'enemy';
   r: number; // metres out its leading edge has come

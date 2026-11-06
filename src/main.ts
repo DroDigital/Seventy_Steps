@@ -13,7 +13,7 @@ import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
 import { waterAbout } from './render/reflection';
-import { CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
+import { brightnessGamma, CLOCK, LIGHT, RENDER, SIM, type DifficultyId } from './data/tuning';
 import type { Variant } from './data/registry';
 import { EDITION } from './data/edition';
 import { cameraModeOf } from './data/cameraModes';
@@ -29,7 +29,10 @@ import { createHoofFx } from './render/hoofFx';
 import { createEchoFx } from './render/echoFx';
 import { createImpactFx } from './render/impactFx';
 import { createShadows } from './render/shadows';
+import { createFinaleLook } from './render/finaleLook';
+import { endingSanity } from './render/finaleMind';
 import { createSignViews } from './render/signViews';
+import { createSignCallViews } from './render/signCallViews';
 import { createPortalViews } from './render/portalViews';
 import { createRealmLook } from './render/realmLook';
 import { createSky } from './render/sky';
@@ -42,6 +45,7 @@ import { weatherHaze } from './render/weather';
 import { createGroundFx } from './render/groundFx';
 import { createWorldLights } from './render/worldLights';
 import { createHurtFx } from './render/hurtFx';
+import { createRumbleFx } from './render/rumbleFx';
 import { createParticles } from './render/particles';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
@@ -50,6 +54,7 @@ import { fovOf, nearLens, placeCamera } from './render/followCamera';
 import { allEffectsOn, computeFx, lensAt, type FxState } from './render/fx';
 import { createFxController } from './render/fxController';
 import { createHiddenViews } from './render/hiddenViews';
+import { createPaperViews } from './render/paperViews';
 import { createWorldScene } from './render/worldScene';
 import { lightNight, placeLantern } from './render/lantern';
 import { lanternGain } from './render/lanternLife';
@@ -62,6 +67,7 @@ import { updateWorldUniforms, worldUniforms } from './render/worldMaterial';
 import { FEEL, HEART } from './render/feel';
 import { createGame, createWorldGame, stepGame } from './systems/game';
 import { clearSave, loadSave, takeRecovery } from './systems/save';
+import { JOURNEY_BALANCE_VERSION } from './data/ngPlusTuning';
 import { haltAutosave, saveNow, startAutosave } from './ui/autosave';
 import { createExtras } from './ui/runExtras';
 import { showCrash } from './ui/crashScreen';
@@ -80,7 +86,7 @@ import { installGameEvidence } from './ui/gameEvidence';
 import { installFxLab } from './ui/fxLab';
 import { createMapPainter } from './ui/mapPainter';
 import { createMapScreen } from './ui/mapScreen';
-import { noteLockAsked } from './core/mouseLock';
+import { noteLockAsked, noteLockRefused } from './core/mouseLock';
 import { menuOpen, onMenusClear } from './ui/menuKit';
 import { createPauseMenu } from './ui/pauseMenu';
 import { createDialogue } from './ui/dialogue';
@@ -103,6 +109,9 @@ import { adapted, darkShare, gloomAt } from './world/gloom';
 import { roofedAt } from './world/terrain';
 import { refreshMountEntitlement } from './ui/mounts';
 import { startMountGallery } from './ui/mountGallery';
+import { createFreeCamera } from './ui/freeCamera';
+import { createDeveloperConsole } from './ui/developerConsole';
+import { createDeveloperCommands } from './systems/developerCommands';
 
 const INTERACT_GRACE_MS = 350; // after a talk or a menu closes, E is held back this long
 
@@ -137,10 +146,12 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const store = opts.arena ? null : shell.store;
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
-  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: (store && loadSave(store)) ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
+  const saved = store ? loadSave(store) : null;
+  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: saved ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
   void refreshMountEntitlement(game);
   addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
+  if (saved?.cycle && (saved.balance ?? 0) < JOURNEY_BALANCE_VERSION) setTimeout(() => game.events.emit('Notice', { text: t('n.journeyBalance') }), 6500);
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
   const capture = (): void => {
     noteLockAsked();
@@ -149,6 +160,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       if (r instanceof Promise) r.catch(() => undefined);
     } catch {
       // No pointer lock: a click on the canvas captures the mouse, as ever.
+      noteLockRefused(); // a throw brings no pointerlockerror: the ask ends here, as input.ts's request ends it
     }
   };
   onMenusClear(capture); // however a menu was left (a key, a click), the game takes the mouse again at once, with no click on the world (round 39)
@@ -195,6 +207,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   const hidden = createHiddenViews(scene, game, { audio, particles }); // the secret passages open with dust, light and the sound of stone (round 61)
+  const notes = createPaperViews(scene, game, { audio, particles }); // a note is a leaf of burning paper; it burns away when its page is put away (round 89)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
@@ -204,6 +217,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
+  const signCallMarks = createSignCallViews(scene, game); // what a sign is worth resting at for now (systems/signCalls.ts)
+  const finale = createFinaleLook(scene);
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
@@ -217,6 +232,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
+  const rumble = createRumbleFx(game); // the game felt in the hands: a pad's motors (2026-11-03)
   const camera = new PerspectiveCamera(RENDER.fovDeg, RENDER.width / RENDER.height, RENDER.near, RENDER.far);
   const input = createInput(canvas, () => !menuOpen());
   const dialogue = createDialogue(game);
@@ -224,15 +240,26 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const finds = opts.arena ? null : createFindCard(game, () => dialogue.open || ending.open || !!intro?.open || !!demoEnd?.open || cinema.active || journeys.busy); // round 60: a weapon or a relic found says so, and what to do with it
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
-  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
-  const photo = createPhoto(game, canvas, () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture
+  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5, northUp: () => settings.minimap > 0.5, tips: () => settings.controlTips > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
+  const photo = createPhoto(game, () => pipeline.shot(), () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture (the low-res one, before it is spread over the screen)
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
+  const flight = createFreeCamera();
+  const developerCommands = createDeveloperCommands(game, {
+    setFlight: (on) => on ? flight.enable(camera) : flight.disable(),
+    flightEnabled: () => flight.active,
+  });
+  const developerConsole = createDeveloperConsole({
+    commands: developerCommands.commands,
+    execute: developerCommands.execute,
+    available: () => !building && !menuOpen() && !cinema.active && !journeys.busy && !veil.active && !game.player.falling && !game.player.fogPass && !game.player.gatePass,
+    onOpen: () => input.reset(),
+  });
   lightNight();
   worldUniforms.uGlowColor.value.set(...ANOMALY.green).multiplyScalar(LIGHT.echoGlowIntensity); // Echo drops glow
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
   const noGlow = new Vector3(0, -1e4, 0);
-  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures });
+  if (debug) Object.assign(window, { game, world, audio: shell.engine, life, cinema, pipeline, sky, scene, camera, settings, look, mist, creatures, notes });
   if (debug) installGameEvidence(game, creatures);
   setCameraMode(game.camera, cameraModeOf(settings.camera)); // the look chosen in Settings › Play (round 77)
   placeCamera(camera, game, 1);
@@ -241,14 +268,15 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
 
   let lowRes = state.enabled.pixelate;
   let scale = settings.resolution;
-  const resize = (): void => pipeline.resize(lowRes, scale);
+  let even = settings.evenPixels > 0.5; // every picture pixel the same size on the screen (2026-11-03: render/evenPixels.ts)
+  const resize = (): void => pipeline.resize(lowRes, scale, even);
   resize();
   addEventListener('resize', resize);
 
   const extras = createExtras(game, shell, store, opts, () => input.describe()); // the frame meter (with what the input hears), the first launch's picture, the benchmark, the trailer (round 46)
   let simTime = 0;
   const labHold = { on: false }; // the effects lab (?debug, ui/fxLab.ts) holds the world still and steps it by hand
-  installFxLab(game, camera, { hold: labHold, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
+  installFxLab(game, camera, { hold: labHold, particles, step(n) { for (let i = 0; i < n; i++) { simTime += 1 / SIM.hz; stepGame(game, emptyInput()); } } });
   game.lit = (p) => lights.lightAt(p.x, p.y, p.z, simTime); // the mind mends faster in lamplight (round 22: sanity.ts)
   game.seaTime = () => simTime; // a body that falls into the sea meets the wave that is drawn (round 55: waterFall.ts)
   let frames = 0;
@@ -263,6 +291,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
       step(dt) {
         setCameraMode(game.camera, cameraModeOf(settings.camera)); // (a change in the pause menu shows behind it at once)
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
+        if (developerConsole.open) return;
+        if (flight.active) {
+          if (!menuOpen() && !cinema.active && !journeys.busy && !veil.active) flight.step(frame, dt);
+          return; // the investigator and the world wait while the camera flies
+        }
         if (pause.open && !wasPaused) input.reset(); // pausing lets go of every key and button and sets a drifted stick right: the way out of an input that has stuck (round 49)
         wasPaused = pause.open;
         finds?.update();
@@ -277,21 +310,22 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
-        const still = pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
+        const still = developerConsole.open || flight.active || pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         extras.tick();
         input.sensitivity = settings.sensitivity;
         input.invertY = settings.invertY > 0.5;
         [FEEL.shake, FEEL.flashes] = [settings.shake, settings.flashes];
-        pipeline.post.uniforms.uGamma.value = 1 / settings.brightness;
+        pipeline.post.uniforms.uGamma.value = brightnessGamma(settings.brightness);
         state.cap = settings.fxCap;
-        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution) {
-          [lowRes, scale] = [state.enabled.pixelate, settings.resolution];
-          resize();
+        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution || even !== settings.evenPixels > 0.5 || pipeline.dpr !== (devicePixelRatio || 1)) {
+          [lowRes, scale, even] = [state.enabled.pixelate, settings.resolution, settings.evenPixels > 0.5];
+          resize(); // (and when the window has moved to a screen of another pixel ratio, which need not fire a resize)
         }
         placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
+        flight.apply(camera);
         hud.hide(cinema.active || extras.hidesHud);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
         const lantern = lanternGain(game, alpha); // (the eye widens where it has gone out: world/gloom.ts)
@@ -299,17 +333,22 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         look.update(time, game.overworld?.region ?? null, enclosed, camera.position, false, game.overworld ? adapted(enclosed ? darkOf(CLOCK.start) * darkShare(gloom) : darkOf(phaseOf(time)), lantern) : 0);
         sky.update(camera, time, game.overworld?.region ?? null, enclosed);
         const feet = game.ecs.c.transform.get(game.player.id)!.pos.y;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - game.mind.sanity / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        const fallen = endingSanity(cinema.sceneId, cinema.time, game.mind.sanity); // an ending: the picture goes, and stays gone through the last fade
+        const mind = fallen ?? game.mind.sanity;
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, stress: Math.min(1 - mind / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
         mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
         HEART.update(time, health ? health.hp / health.max : 1); // near death: the sound, the picture's edge and the health bar keep to it (round 23)
         hurt.update(pipeline.post, camera, time);
         impactFx.update(camera, time);
+        rumble.update(settings.rumble, still || dialogue.open || shop.open || !!menu?.open || !!rise?.open || ending.open); // (a talk, a trade, a sign's rest, the rise and an ending leave the world running, but the hands are at rest)
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
-        world?.update(at.x, at.z, journeys.budget);
+        world?.update(flight.active ? camera.position.x : at.x, flight.active ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
+        finale.update(time, game);
+        notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
@@ -324,6 +363,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         hoofFx.update(time);
         echoFx.update(time);
         signs.update(time, camera.position);
+        signCallMarks.update(time, camera.position);
         portals.update(time, camera.position, veil.active);
         bossFx.update(alpha, time, camera);
         shadows.update(alpha);
@@ -331,6 +371,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         swingTrails.update(views.swingEdge, time);
         particles.update(time, camera);
         fxController.update(state, camera.position, time);
+        if (fallen !== null) state.sanity = fallen; // drawn, not saved; the cap is applied in computeFx
         const fx = computeFx(state);
         sky.strange(fx.strange);
         look.apply(fx);
@@ -338,10 +379,10 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
         life.update(camera, time, enclosed, alpha, gloom); // after the night's light: the lightning adds to it
-        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : nearLens(camera, game));
+        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : flight.active ? camera.position : nearLens(camera, game));
         const lens = lensAt(fx, time, fovOf(game, alpha));
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
-        updateWorldUniforms(fx, time, cinema.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
+        updateWorldUniforms(fx, time, cinema.active || flight.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
         if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
         hud.update(camera);

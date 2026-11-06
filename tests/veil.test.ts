@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DUNGEONS } from '../src/data/dungeons';
 import { UPGRADES } from '../src/data/tuning';
-import { closedBy, heldOpen, listed, PASSAGES } from '../src/systems/veil';
+import { closedBy, heldOpen, listed, PASSAGE_NEED, PASSAGES } from '../src/systems/veil';
 
 describe('what insight holds open, and what spending it would shut', () => {
   it('lists every doorway and bridge that waits on insight, once', () => {
@@ -9,13 +9,13 @@ describe('what insight holds open, and what spending it would shut', () => {
     expect(PASSAGES.length).toBe(wanted.length);
     expect(PASSAGES.length).toBeGreaterThan(10);
     expect(PASSAGES.find((p) => p.dungeon === 'The Witch House' && p.room === 'closet')?.need).toBe(1);
-    expect(PASSAGES.find((p) => p.room === 'earth race')?.need).toBe(1); // an id with an underscore reads as words
+    expect(PASSAGES.find((p) => p.room === 'earth race')?.need).toBe(4); // an id with an underscore reads as words
   });
 
   it('holds open exactly those the insight reaches', () => {
     expect(heldOpen(0)).toEqual([]);
     expect(heldOpen(1).every((p) => p.need <= 1)).toBe(true);
-    expect(heldOpen(3).length).toBe(PASSAGES.length);
+    expect(heldOpen(PASSAGE_NEED).length).toBe(PASSAGES.length);
     expect(heldOpen(2).length).toBeGreaterThan(heldOpen(1).length);
   });
 
@@ -42,6 +42,6 @@ describe('what insight holds open, and what spending it would shut', () => {
     expect(closedBy(2, 2, read).map((p) => p.room)).toContain('burrow'); // its diary is not read
     expect(closedBy(2, 2, read).map((p) => p.room)).not.toContain('closet');
     const all = new Set(PASSAGES.flatMap((p) => (p.tome ? [p.tome] : [])));
-    expect(heldOpen(3, all).every((p) => p.tome === undefined)).toBe(true); // all that is left are the bridges
+    expect(heldOpen(PASSAGE_NEED, all).every((p) => p.tome === undefined)).toBe(true); // all that is left are the bridges
   });
 });

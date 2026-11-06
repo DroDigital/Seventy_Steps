@@ -70,6 +70,9 @@ export const KIT_SPACE: Readonly<Record<KitId, SpaceId>> = {
   basalt: 'vault',
   tsath: 'ruin',
   dream: 'vault',
+  dreamflame: 'cave',
+  dreamdeep: 'vault',
+  dreamabyss: 'cave',
   onyx: 'ruin',
   cyclopean: 'drowned', // sunken R'lyeh, whose geometry does not behave
   fungoid: 'ruin',

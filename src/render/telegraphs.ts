@@ -20,6 +20,9 @@ import { CLOUDS, matterLook } from './matterLook';
 import type { Decals } from './decals';
 import type { GroundFx } from './groundFx';
 
+/** Metres past its court's wall that a vortex's swirl is drawn (2026-10-29: Azathoth's pull reaches 189 m, and covered the screen in dots). */
+const COURT_SWIRL = 6;
+
 export interface Telegraphs {
   update(alpha: number, time: number): void;
 }
@@ -73,7 +76,14 @@ export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Tel
     }
     if (def.pool && frame < def.pool.frame && tp) decals.disc(tp.x, tp.y, tp.z, def.pool.radius, frame / def.pool.frame, DANGER);
     const m = def.marks;
-    if (m && frame < m.frame && tp) {
+    if (m && frame < m.frame && (m.pattern === 'beats' || m.pattern === 'spiral' || m.pattern === 'scatter')) { // a blind horror's: the ground about its body they will be laid on (the spots themselves are laid as the wind-up ends)
+      const fill = frame / m.frame;
+      if (m.pattern === 'beats') {
+        const rings = m.rings ?? 2;
+        for (let i = 0; i < rings; i++) decals.ring(p.x, p.y, p.z, body + m.ring[0] + (rings > 1 ? ((m.ring[1] - m.ring[0]) * i) / (rings - 1) : 0) + m.radius, m.radius * 2, DANGER, 0.2 + 0.3 * fill);
+      } else if (m.pattern === 'spiral') decals.swirl(p.x, p.y, p.z, body + m.ring[1] + m.radius, DANGER, 0.3 + 0.4 * fill);
+      else decals.ring(p.x, p.y, p.z, body + m.ring[1] + m.radius, m.ring[1] - m.ring[0] + m.radius * 2, DANGER, 0.12 + 0.2 * fill);
+    } else if (m && frame < m.frame && tp) {
       const mark = m.look ? matterLook(attackLook(g, id), m.look).danger : DANGER; // (a conflagration is orange under every horror)
       if (m.pattern === 'spokes') { // the lines the fire will run along, from the horror toward the target and round
         const n = m.spokes ?? 3;
@@ -90,14 +100,17 @@ export function createTelegraphs(g: Game, decals: Decals, ground: GroundFx): Tel
     if (cl && frame < cl.frame) decals.swirl(p.x, p.y, p.z, body + cl.radius * 1.6, CLOUDS[cl.kind].billow[0], 0.7);
     const sw = def.sweep;
     if (sw && frame < sw.window[0]) { // the arc it will cross, and where it starts (the beam itself shows as it sweeps)
-      decals.sector(p.x, p.y, p.z, yaw, sw.length, sw.arc, frame / sw.window[0], LINE, 0.6);
-      decals.lane(p.x, p.y, p.z, yaw - (sw.arc[0] * Math.PI) / 180, sw.length, 0.12, 1, LINE);
+      for (let arm = 0; arm < (sw.arms ?? 1); arm++) {
+        const bearing = yaw + arm * Math.PI * 2 / (sw.arms ?? 1);
+        decals.sector(p.x, p.y, p.z, bearing, sw.length, sw.arc, frame / sw.window[0], LINE, 0.6);
+        decals.lane(p.x, p.y, p.z, bearing - (sw.arc[0] * Math.PI) / 180, sw.length, sw.width, 1, LINE);
+      }
     }
     const b = def.barrage;
     if (b && frame < b.window[0]) decals.disc(p.x, p.y, p.z, body + 1.5, frame / b.window[0], LINE, 0.8);
     const pl = def.pull;
     if (pl && frame < pl.window[1]) {
-      decals.swirl(p.x, p.y, p.z, pl.range, MIND, 0.6);
+      decals.swirl(p.x, p.y, p.z, Math.min(pl.range, (c.fight.get(id)?.arena.radius ?? Infinity) + COURT_SWIRL), MIND, 0.6); // (a colossus's pull reaches past its court: the court is what is drawn, not the whole sky's ground)
       const blast = def.then ? c.actor.get(id)?.moves[def.then]?.hit : undefined;
       if (blast) decals.disc(p.x, p.y, p.z, blast.radius + 0.4, frame / pl.window[1], DANGER);
     }

@@ -236,6 +236,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   mountains: { beds: [['wind_cold', 0.75]], spots: [] },
   pnakotus: { beds: [['wind', 0.8], ['wind_ghost', 0.2]], spots: [{ set: 'timber', every: [45, 100] }] },
   kn_yan: { beds: [['cave', 0.8], ['drips', 0.65]], spots: [{ set: 'chains', every: [50, 110] }] },
+  serpent_temple: { beds: [['wind', 0.45], ['wind_ghost', 0.2]], spots: [] }, // the dry temple and Yig's approach, rather than the dripping cavern
   dreamlands: { beds: [['murmur', 0.65], ['wind', 0.4]], spots: [owls] },
   rlyeh: { beds: [['waves', 1], ['wind_ghost', 0.3]], spots: [{ set: 'gurgle', every: [25, 60] }] },
   yuggoth: { beds: [['wind_cold', 0.5], ['wind_ghost', 0.34]], spots: [{ set: 'timber', every: [40, 90] }] }, // round 68: it was the recording of a high-pitched buzz, which wore on the ear; now the cold wind of a world at the system's edge

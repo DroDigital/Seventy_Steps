@@ -18,6 +18,7 @@ import { bespokeFall } from '../data/cutscenesFall';
 import { arrivalOf } from '../data/cutscenesMore';
 import { bossLine, spokenFor, type Moment } from '../data/speechLines';
 import { signPlace } from '../systems/checkpoints';
+import { COURT_SIGN } from '../systems/endings';
 import type { Game } from '../systems/components';
 import type { Cinema } from './cinema';
 import { sceneLength } from './cinemaPlan';
@@ -76,7 +77,7 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
 
   g.events.on('BossEngaged', ({ entity, name }) => {
     const f = g.ecs.c.fight.get(entity);
-    const seen = g.overworld?.watched ?? memory;
+    const seen = g.ecs.c.combatant.get(entity)?.showcase ? memory : g.overworld?.watched ?? memory;
     if (!f || !worth(entity) || seen.has(f.id) || cinema.active) return;
     seen.add(f.id);
     void cinema.play(speaking(arrivalOf(f.id, name, EPITHETS[f.id]) ?? arrival(scaleOf(height(entity)), name, EPITHETS[f.id]), f.id, 'arrive'), { target: entity }); // the great horrors of the story each come their own way (round 34)
@@ -93,7 +94,8 @@ export function createDirector(g: Game, cinema: Cinema, opens: (endingId: string
   g.events.on('Ending', ({ id }) => {
     const scene = ENDING_SCENES[id];
     const guide = id === 'silver_key' ? [...g.ecs.c.fight].find(([, f]) => f.id === 'umr_at_tawil')?.[0] : undefined; // its camera is on the Guide the investigator goes through the Gate with (round 55)
-    void (scene ? cinema.play(scene, guide === undefined ? {} : { target: guide }) : Promise.resolve()).then(() => opens(id));
+    const cast = id === 'seal' || id === 'herald' ? { sign: COURT_SIGN } : guide === undefined ? {} : { target: guide };
+    void (scene ? cinema.play(scene, cast) : Promise.resolve()).then(() => opens(id));
   });
 
   return { wake: () => void cinema.play(WAKE) };

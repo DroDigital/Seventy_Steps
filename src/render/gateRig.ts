@@ -15,11 +15,11 @@ import { groundShade } from './meshKit';
 import { modelPiecesOf } from './modelKit';
 import { ANOMALY, type Rgb } from './palette';
 import { rune } from './passageShapes';
-import type { Piece } from './propShapes';
+import type { SolidPiece } from './propShapes';
 
 /** A part of a gate, ready to be moved: its pieces about its pivot, and how the pivot goes as the gate opens. */
 export interface RigPart {
-  pieces: Piece[];
+  pieces: SolidPiece[];
   glow: THREE.BufferGeometry | null; // runes of the house's glow, on both faces
   pivot: readonly [u: number, y: number, v: number]; // where it stands in the door's frame
   move: GateMotion;

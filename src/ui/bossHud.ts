@@ -8,6 +8,7 @@
 
 import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
+import { hooksOf } from '../systems/reality';
 import { SIGNATURES } from '../systems/signatures';
 import { bar, BLOOD, BONE, el, percent, setStyle, setText } from './hudKit';
 import { createTally } from './damageTally';
@@ -47,13 +48,15 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
 
   g.events.on('BodyStolen', () => say('YOUR BODY IS NOT YOUR OWN'));
   g.events.on('TimeSkipped', blink);
-  g.events.on('Rewired', blink);
+  const joined = (e: { entity: number }): boolean => { const f = g.ecs.c.fight.get(e.entity); return !!f && hooksOf(f).includes('arena_reconnect'); };
+  g.events.on('Rewired', (e) => (blink(), joined(e) && say('THE ROOM FOLDS · ITS EDGES MEET'))); // a first public playthrough: "why did they teleport me? ... not fair"
   g.events.on('GazeBurst', (e) => say(`THE GAZE  −${e.sanity} SANITY`));
   g.events.on('Revealed', (e) => say(`THE POWDER OF IBN GHAZI · ${e.doses} LEFT`));
   g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 68: it was said only in the field guide)
     const f = g.ecs.c.fight.get(e.entity);
     const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);
     if (line) say(line);
+    else if (joined(e)) say('THE ROOM’S EDGES ARE JOINED · WALK OUT ONE SIDE, COME IN AT THE OTHER'); // said before the first fold, not after it
   });
   g.events.on('LampChanged', (e) => say(e.lit ? 'THE LAMP BURNS AGAIN' : 'A LAMP GOES OUT'));
   g.events.on('Petrified', () => say('TURNED TO STONE'));

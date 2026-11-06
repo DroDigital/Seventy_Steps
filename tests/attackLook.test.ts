@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { BOSS_ATTACK_THEME } from '../src/data/bossAttackTheme';
 import { AOE_MOTIFS } from '../src/render/aoeLook';
-import { DANGER_FLOOR, LIGHT_FLOOR, lift, lookOf } from '../src/render/attackLook';
-import { luma, rgbToHsv, type Rgb } from '../src/render/palette';
+import { FOE_BLOWS } from '../src/data/foeBlows';
+import { createGame } from '../src/systems/game';
+import { DANGER_FLOOR, LIGHT_FLOOR, isQuiet, isThemed, lift, lookOf } from '../src/render/attackLook';
+import { hsvToRgb, luma, mixRgb, rgbToHsv, rotateHue, type Rgb } from '../src/render/palette';
 import { shotLook } from '../src/render/shotLook';
 
 const bosses = Object.keys(BOSS_ATTACK_THEME);
@@ -77,5 +79,71 @@ describe('a horror\'s marks are found against any ground (round 51)', () => {
     expect(lookOf('keziah_mason').punch).toBe(lookOf('keziah_mason').punch);
     expect(lookOf(undefined).punch).toBe(1);
     expect(lookOf(undefined).pitch).toBe(1);
+  });
+});
+
+const rgbOf = (hex: number): Rgb => [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+
+describe('a creature drawn as a mark has the colours of its blow (round 90)', () => {
+  it('turns a hue about the wheel, keeping its saturation and brightness, and leaves a grey alone', () => {
+    expect(hsvToRgb(0, 1, 1)).toEqual([1, 0, 0]);
+    expect(hsvToRgb(1 / 3, 1, 1)[1]).toBeCloseTo(1, 6);
+    expect(hsvToRgb(-2 / 3, 1, 1)[1]).toBeCloseTo(1, 6); // (the hue wraps)
+    const c: Rgb = [0.8, 0.4, 0.2];
+    const [h, s, v] = rgbToHsv(c);
+    const turned = rotateHue(c, 40 / 360);
+    expect(rgbToHsv(turned)[1]).toBeCloseTo(s, 5);
+    expect(rgbToHsv(turned)[2]).toBeCloseTo(v, 5);
+    expect(hueGap(turned, c)).toBeCloseTo(40 / 360, 4);
+    expect(h).toBeGreaterThanOrEqual(0);
+    expect(rotateHue([0.5, 0.5, 0.5], 0.3)).toEqual([0.5, 0.5, 0.5]);
+    for (const x of [0.1, 0.4, 0.7]) for (const y of [0, 0.2, 0.9]) for (const out of [rotateHue([x, y, 0.5], 0.17)]) for (const n of out) expect(n >= -1e-9 && n <= 1 + 1e-9).toBe(true);
+  });
+
+  it('every creature with a blow takes its accent, line, danger, ring and mind from the blow\'s three hues, lifted, and throws no signature', () => {
+    expect(Object.keys(FOE_BLOWS).length).toBeGreaterThanOrEqual(3);
+    for (const [id, blow] of Object.entries(FOE_BLOWS)) {
+      const look = lookOf(id);
+      const [h0, h1, h2] = blow.hues.map(rgbOf) as [Rgb, Rgb, Rgb];
+      expect(look.sig, id).toBeNull();
+      expect(look.accent, id).toEqual(lift(h0, LIGHT_FLOOR));
+      expect(look.line, id).toEqual(lift(mixRgb(h0, h1, 0.35), LIGHT_FLOOR));
+      expect(look.danger, id).toEqual(lift(h1, DANGER_FLOOR));
+      expect(look.ring, id).toEqual(lift(mixRgb(h1, h2, 0.4), DANGER_FLOOR));
+      expect(look.mind, id).toEqual(lift(rotateHue(h1, 40 / 360), DANGER_FLOOR));
+      expect(luma(look.accent), id).toBeGreaterThanOrEqual(LIGHT_FLOOR - 1e-6);
+      expect(luma(look.line), id).toBeGreaterThanOrEqual(LIGHT_FLOOR - 1e-6);
+      expect(luma(look.danger), id).toBeGreaterThanOrEqual(DANGER_FLOOR - 1e-6);
+      expect(luma(look.mind), id).toBeGreaterThanOrEqual(DANGER_FLOOR - 1e-6);
+      expect(luma(look.core), id).toBeGreaterThan(luma(look.line) - 0.01);
+      if (rgbToHsv(h1)[1] > 0.3) expect(hueGap(look.mind, look.danger), `${id}: the mind's hue is the middle hue's neighbour`).toBeGreaterThan(0.05);
+    }
+  });
+
+  it('their element, temper and sounds are what they were: only the colours and the signature are new', () => {
+    expect(lookOf('deep_one')).toMatchObject({ motif: 'tide', punch: 0.9652941176470587, twist: 0.9529411764705882, pitch: 0.9620392156862746 });
+    expect(lookOf('ghoul')).toMatchObject({ motif: 'spore', punch: 1.0998039215686275, twist: 0.7094117647058823, pitch: 0.9563921568627451 });
+    expect(lookOf('dagon_priest')).toMatchObject({ motif: 'tide', punch: 0.9049019607843137, twist: 1.351764705882353, pitch: 1.039843137254902 });
+  });
+
+  it('a horror has no blow of its own and keeps its signature and colours; an unknown id is plain', () => {
+    for (const id of bosses) {
+      expect(FOE_BLOWS[id], id).toBeUndefined();
+      expect(isThemed(id), id).toBe(true);
+    }
+    expect(lookOf('cthulhu').sig).not.toBeNull();
+    expect(lookOf('cthulhu').ink).toEqual(BOSS_ATTACK_THEME.cthulhu!.danger);
+    expect(lookOf('not_a_creature').sig).toBeNull();
+    expect(lookOf('not_a_creature').motif).toBe('plain');
+  });
+
+  it('the creatures of the roster that are not horrors are the quiet ones; a horror and the investigator are not', () => {
+    const g = createGame({ creature: 'ghoul' });
+    const c = g.ecs.c;
+    const foe = [...c.actor.keys()].find((k) => k !== g.player.id && c.dread.has(k))!;
+    expect(isQuiet(g, foe)).toBe(true);
+    expect(isQuiet(g, g.player.id)).toBe(false);
+    const dummy = [...c.actor.keys()].find((k) => c.combatant.get(k)?.name === 'Training Dummy')!;
+    expect(isQuiet(g, dummy)).toBe(false);
   });
 });

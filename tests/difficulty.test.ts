@@ -3,6 +3,7 @@ import { DEFAULT_DIFFICULTY, DIFFICULTIES, DIFFICULTY_IDS, type DifficultyId } f
 import { strike, type Blow } from '../src/systems/combat';
 import { applyCarry, carryOf, parseCarry } from '../src/systems/cycles';
 import { createWorldGame } from '../src/systems/game';
+import { foeRung } from '../src/systems/ngPlus';
 import { parseSave, snapshot } from '../src/systems/save';
 import { scriptedGame } from './helpers';
 
@@ -31,7 +32,8 @@ describe('the difficulty chosen when a dream begins (round 38)', () => {
   it('is laid over the journey’s own weight', () => {
     const plain = dealt('deep', 2, 'foe', 20); // (a lighter blow: past BOSS.blowMost of their health the blow is held to it, tests/oneHit.test.ts)
     expect(plain).toBeGreaterThan(20);
-    expect(dealt('nightmare', 2, 'foe', 20)).toBe(Math.round(plain * 1.5));
+    // The difficulty multiplies the unrounded journey damage; rounding an intermediate result can lose a point.
+    expect(dealt('nightmare', 2, 'foe', 20)).toBe(Math.round(20 * foeRung(2, 'late').damage * DIFFICULTIES.nightmare.foe));
   });
 
   it('begins at the one a new dream is given, and the default for a world made without one', () => {
@@ -46,8 +48,11 @@ describe('the difficulty chosen when a dream begins (round 38)', () => {
     const old = JSON.parse(json) as Record<string, unknown>;
     delete old.difficulty;
     expect(createWorldGame({ save: parseSave(JSON.stringify(old))!, difficulty: 'light' }).player.difficulty).toBe(DEFAULT_DIFFICULTY); // what is not in the save is not the title's choice either
-    old.difficulty = 'impossible';
-    expect(createWorldGame({ save: parseSave(JSON.stringify(old))! }).player.difficulty).toBe(DEFAULT_DIFFICULTY);
+    for (const invalid of ['impossible', '__proto__', 'constructor', 'toString']) {
+      old.difficulty = invalid;
+      expect(createWorldGame({ save: parseSave(JSON.stringify(old))! }).player.difficulty).toBe(DEFAULT_DIFFICULTY);
+      expect(parseCarry({ cycle: 1, difficulty: invalid })!.difficulty).toBe(DEFAULT_DIFFICULTY);
+    }
   });
 
   it('goes with the strength carried into a second journey, which cannot choose again', () => {

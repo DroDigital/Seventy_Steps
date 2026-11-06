@@ -72,7 +72,7 @@ export function roomProps(style: ArenaStyle, x: number, z: number, y: number, ha
   const rng = createRng((hash2(Math.round(x), Math.round(z), WORLD.seed + 31) * 4294967296) >>> 0);
   const out: Prop[] = [];
   if (style.centre) out.push(at(style.centre.kind, x + away.x * half * 0.6, z + away.z * half * 0.6, y, rng, Math.min(style.centre.scale, half / 6), 0));
-  const f = Math.min(style.fires, 4);
+  const f = Math.min(style.fires, 2); // retain only the two opposite corner campfires
   const c = half - 2.5;
   const corners = [[1, 1], [-1, -1], [1, -1], [-1, 1]].slice(0, f);
   for (const [a, b] of corners) out.push(at('firepit', x + a * c, z + b * c, y, rng));

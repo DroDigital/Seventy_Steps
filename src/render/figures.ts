@@ -1,7 +1,7 @@
 /**
  * Procedural low-poly figures (spec §3B: tweened primitives, no skeletal assets): the investigator,
- * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, a note on its
- * crate, the world's gates (its Elder Signs are signViews.ts's), and the people met in the dream
+ * the placeholder Deep One, the training dummy, an Echo drop, a tome on its lectern, the world's gates
+ * (its Elder Signs are signViews.ts's; a note is burning paper, paperViews.ts's), and the people met in the dream
  * (npcFigures.ts). Each is a small joint hierarchy that poses.ts drives: shoulders, elbows and wrists;
  * hips and knees. Arms and legs hang along -y from their pivots; forward is +z, the figure's right is
  * -x. Phase 2 replaces the enemies with generated sprites.
@@ -16,8 +16,11 @@ import type { WareId } from '../data/wares';
 import { ARMS } from './armsMeshes';
 import { investigator } from './investigator';
 import { npcFigure } from './npcFigures';
-import { gateGeometry } from './signMeshes';
+import { isGateFrame } from '../data/gateFrames';
+import { gateFrame } from './gateFrames';
 import { createWorldMaterial } from './worldMaterial';
+import { echoFigure } from './echoFigure';
+import { ammoFigure, cacheFigure } from './groundPickups';
 
 export type Rig = 'humanoid' | 'dummy' | 'echo' | 'prop';
 
@@ -176,14 +179,6 @@ function dummy(): Figure {
   return f;
 }
 
-/** Dropped Echoes: a small spinning Void Green shard (anomaly colour: Echoes are wrong). */
-function echo(): Figure {
-  const f = skeleton('echo', { hip: 0.55, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const shard = (r: number, y: number): THREE.BufferGeometry => tint(new THREE.OctahedronGeometry(r, 0).translate(0, y, 0), ANOMALY.green);
-  part(f, f.body, mergeGeometries([shard(0.2, 0), shard(0.08, 0.34), shard(0.06, -0.3)]), 'flesh', 0.9);
-  return f;
-}
-
 /** A tome lying open on a lectern: a post, a slanted desk, and pale pages that glow faintly, so it reads in the dark. */
 function tome(): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
@@ -206,50 +201,10 @@ function vial(): Figure {
   return f;
 }
 
-/** A gate to another realm: a stone frame banded with glowing glyphs (the veil between its jambs is portalViews.ts's: round 60). */
-function gate(): Figure {
+/** A gate to another realm: a frame in the look of where it leads (round 104: gateFrames.ts; the veil between its jambs is portalViews.ts's: round 60). */
+function gate(theme: string): Figure {
   const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const { frame, glyphs } = gateGeometry();
-  part(f, f.body, frame, 'stone', 0.12);
-  part(f, f.body, glyphs, 'stone', 1);
-  return f;
-}
-
-/** A note left on a crate: burnt paper, a charred rim and two small embers, so every placed note shares the look. */
-function note(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  part(f, f.body, box(0.6, 0.5, 0.45, 0, 0.25, 0, shade(mixRgb(BASE.rust, BASE.charcoal, 0.3), 1.7)), 'wood');
-  const yaw = 0.3;
-  const ember = mixRgb(BASE.rust, ANOMALY.purple, 0.28);
-  const sheet = box(0.24, 0.016, 0.3, 0.05, 0.522, 0, shade(BASE.bone, 1.02)).rotateY(yaw);
-  const char = box(0.28, 0.01, 0.36, 0.05, 0.508, 0, shade(BASE.charcoal, 0.45)).rotateY(yaw);
-  const spark = box(0.04, 0.014, 0.035, 0.14, 0.532, 0.1, shade(ember, 1.25)).rotateY(yaw);
-  const mote = box(0.02, 0.012, 0.018, -0.04, 0.53, -0.1, shade(ember, 0.85)).rotateY(yaw);
-  part(f, f.body, mergeGeometries([char, sheet, spark, mote]), 'cloth', 0.72);
-  return f;
-}
-
-/** An Echo cache: an iron-bound casket, its lid thrown back on Void Green shards (Echoes are wrong), so it reads in the dark. */
-function cache(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const wood = shade(mixRgb(BASE.rust, BASE.charcoal, 0.5), 1.6);
-  const iron = shade(BASE.charcoal, 1.3);
-  const lid = box(0.56, 0.05, 0.38, 0, 0, 0.19, wood).rotateX(-2.1).translate(0, 0.3, -0.19); // hinged at the back, thrown open
-  part(f, f.body, mergeGeometries([box(0.56, 0.3, 0.38, 0, 0.15, 0, wood), box(0.58, 0.04, 0.4, 0, 0.07, 0, iron), box(0.58, 0.04, 0.4, 0, 0.23, 0, iron), lid]), 'wood');
-  const shard = (r: number, x: number, z: number): THREE.BufferGeometry => tint(new THREE.OctahedronGeometry(r, 0).translate(x, 0.32, z), ANOMALY.green);
-  part(f, f.body, mergeGeometries([shard(0.07, -0.13, 0.03), shard(0.09, 0.03, -0.04), shard(0.06, 0.15, 0.06)]), 'flesh', 0.9);
-  return f;
-}
-
-/** A box of cartridges on the ground (round 22): a paper-labelled box, its lid up on two rows of brass rounds that catch the light, so it reads in the dark. */
-function ammo(): Figure {
-  const f = skeleton('prop', { hip: 0, shoulder: [0, 0], hipX: 0, neck: [0, 0] });
-  const card = shade(mixRgb(BASE.rust, BASE.bone, 0.35), 1.3);
-  const brass = shade(mixRgb(BASE.bone, BASE.rust, 0.4), 1.9);
-  const lid = box(0.34, 0.03, 0.22, 0, 0, 0.11, shade(card, 0.85)).rotateX(-1.9).translate(0, 0.12, -0.11); // hinged at the back, thrown up
-  part(f, f.body, mergeGeometries([box(0.34, 0.12, 0.22, 0, 0.06, 0, card), box(0.26, 0.06, 0.02, 0, 0.09, 0.115, shade(BASE.charcoal, 1.4)), lid]), 'cloth');
-  const rounds = [-1, 1].flatMap((row) => [0, 1, 2, 3, 4].map((k) => tint(new THREE.CylinderGeometry(0.02, 0.02, 0.07, 6).translate(-0.12 + k * 0.06, 0.155, row * 0.045), brass)));
-  part(f, f.body, mergeGeometries(rounds), 'cloth', 0.6);
+  for (const p of gateFrame(isGateFrame(theme) ? theme : 'miskatonic')) part(f, f.body, p.geo.clone(), p.texture, p.emissive);
   return f;
 }
 
@@ -263,11 +218,12 @@ function armRack(geo: () => THREE.BufferGeometry): Figure {
 }
 
 const BUILDERS: Record<string, () => Figure> = {
-  player: investigator, deepOne, dummy, echo, tome, vial, gate, note, cache, ammo,
+  player: investigator, deepOne, dummy, echo: echoFigure, tome, vial, gate: () => gate('miskatonic'), cache: cacheFigure, ammo: ammoFigure,
   ...Object.fromEntries(Object.entries(ARMS).map(([id, [geo]]) => [`arm:${id}`, () => armRack(geo)])),
 };
 
 export function buildFigure(model: string): Figure {
   if (model.startsWith('npc:')) return npcFigure(model.slice(4));
+  if (model.startsWith('gate:')) return gate(model.slice(5));
   return (BUILDERS[model] ?? dummy)();
 }

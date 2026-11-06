@@ -15,11 +15,13 @@ import { applyChange, clearProps, removeProp } from './arenaChanges';
 import { startMove } from './actions';
 import { holdInVeil } from './bossArena';
 import type { ArenaCircle, Fight, Game } from './components';
+import { meet } from './bossScaling';
 import { defOf } from './creatures';
 import { phaseAt, phaseBrain } from './fightPhase';
 import { SIGNATURES } from './signatures';
 import { summon } from './specials';
 import { clearStrikes } from './strikes';
+import { syncVariant } from './variantSwap';
 
 /** Fights under way: engaged, with their boss alive. */
 export const engagedFights = (g: Game): [Entity, Fight][] =>
@@ -42,6 +44,7 @@ export function refreshBrain(g: Game, e: Entity, f: Fight): void {
 
 function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {
   f.phase = i;
+  syncVariant(g, e);
   refreshBrain(g, e, f);
   const po = g.ecs.c.poise.get(e);
   if (po && i > 0) po.value = po.max; // a new phase shrugs off the stagger
@@ -56,6 +59,7 @@ function enterPhase(g: Game, e: Entity, f: Fight, i: number): void {
 
 function engage(g: Game, e: Entity, f: Fight): void {
   Object.assign(f, { engaged: true, frames: 0, sig: {}, veiled: false });
+  meet(g, e, f);
   const br = g.ecs.c.brain.get(e);
   if (br) br.cooldown = Math.max(br.cooldown, BOSS.wake); // it gathers itself before its first blow (round 60)
   g.events.emit('BossEngaged', { entity: e, name: g.ecs.c.combatant.get(e)?.name ?? f.id });
@@ -76,6 +80,7 @@ export function resetFight(g: Game, e: Entity, f: Fight): void {
   if (f.engaged) SIGNATURES[f.id]?.reset?.(g, e, f);
   clearArena(g, f);
   Object.assign(f, { engaged: false, frames: 0, phase: 0, sig: {}, veiled: false });
+  syncVariant(g, e);
   refreshBrain(g, e, f);
   const h = g.ecs.c.health.get(e);
   if (h) h.ward = undefined;
@@ -119,15 +124,16 @@ export function fightSystem(g: Game): void {
   }
 }
 
-/** A boss's death ends its fight and takes any joining bosses with it; the investigator's resets them all. */
+/** A boss's death ends its fight and takes any joining bosses with it; the investigator's resets them all. (A developer showcase boss takes showcase joiners with it, and a real one real joiners: the two never mix.) */
 export function registerFights(g: Game): void {
   g.events.on('Died', ({ entity, killer }) => {
     const c = g.ecs.c;
     const f = c.fight.get(entity);
     if (f?.engaged) endFight(g, entity, f);
     if (!f) return;
+    const showcase = !!c.combatant.get(entity)?.showcase;
     for (const [e, joining] of c.fight) {
-      if (joining.script.joins?.with !== f.id) continue;
+      if (!!c.combatant.get(e)?.showcase !== showcase || joining.script.joins?.with !== f.id) continue;
       const [h, a, tr] = [c.health.get(e), c.actor.get(e), c.transform.get(e)];
       if (!h || h.hp <= 0 || !a || !tr || c.dead.has(e)) continue;
       h.hp = 0;

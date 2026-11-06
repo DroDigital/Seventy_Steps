@@ -16,9 +16,8 @@ A blow is made of three things, and each has one place:
 
 A new horror needs its four colours (`bossAttackTheme`), a motif (`aoeLook` `ASSIGN`) and a signature (`attackSignatures`).
 It then has telegraphs, bolts, bursts, scars, beams, a summoning, an arrival and a gaze of its own, and the sounds of its
-element. An ordinary creature with no theme throws what it is made of (`MADE_OF` in `attackLook.ts`, from its palette),
-in colours of its own drawn from its signature's accent and its hide (before round 60 every one of them was the shared
-magenta and green).
+element. Every other creature (the lesser and greater creatures, the allies and the two plain named ones: 51 in all) has no
+theme and no signature: since round 90 it draws a **quiet blow** of its own, below.
 
 ### Distinct (round 60)
 
@@ -45,11 +44,68 @@ its light the edge, the fill, the flash and the outline keep, and how long a sca
 last. The lifted colours, the whole shape from the first frame and the filling front are not touched, so a mark is still read on any
 ground. A pool, a fire and a cloud's reach are not marks but what hurts, and keep their own looks and lives.
 
+### Quiet blows (round 90)
+
+Asked: "many of the lower-tier creatures' attack animations and telegraphs appear acceptable but overly elaborate; in high-density
+combat scenarios, this detracts from the intended eerie atmosphere. Several animations are visually redundant; each creature should
+instead feature a distinct, high-fidelity, subtle animation with optional graphic accents. Reevaluate overused color palettes".
+*What was wrong:* a creature that was not a horror drew through the horror's machinery (a signature's crown, fountain and column, a
+lit flash, scars, sector decals, an element's cloud), 86 particles a move on average, 200 to 525 for a caster, and nearly every
+one in the same few amber and violet hues. *What it is now:* a creature that is not in `BOSS_ATTACK_THEME` (the shoggoth and the flying
+polyp are, and keep their signatures) is routed away from all of that to `render/foeFx.ts`, and says what its blow is in one line of
+`data/foeBlows.ts`. (The horrors' telegraphs, the decals of `telegraphs.ts`, were never drawn for these: what stood in a crowd was their
+attack effects. A slow, heavy blow's warning is now its mark in miniature, once.)
+
+| | what | the choices |
+|---|---|---|
+| **mark** | the one graphic the blow leaves, drawn by the particle batch | `rake` (claw lines), `jaws` (two closing arcs), `crescent` (a blade's sweep), `lash` (an S that cracks back), `splat` (an ink blot), `swirl` (an open ring turning like a wheel), `glint` (a hairline cross), `dash` (a row of ticks), `ripple` (a ring on the ground), `sigil` (a small rune that kindles and goes out), `eye` (an eye opening), `plume` (a rising puff of smoke) |
+| **tempo** | how it moves | `snap`, `drag` (strokes lag one another), `bloom`, `settle` (it sinks), `flutter` (it turns and wanders), `pulse` (two beats) |
+| **matter** | the few specks it throws, what the creature is made of | none, brine, ash, dust, spore, frost, ichor, ember, mote, down |
+| **accent** | an optional second mark | any of the twelve, never the same |
+| **hues** | start, middle and end | pale to a colour to a dark, drifting through the particle's life (`ParticleSpec.colorMid`); each particle's own hue and light is jittered a little, so no two are alike |
+
+`tests/foeBlows.test.ts` keeps the table apart: every mark, tempo and matter is used, no (mark, tempo, hue bucket) repeats, no more than
+six middles are amber (it was a third of the roster) or five pale, no more than seven fall in one 30 degree bucket of hue, each leg of a
+path really turns, a bite is a `jaws` and a slam a `ripple` only where the creature has them, and two creatures that can be met in one
+realm and share a mark have middles at least 40 degrees of hue apart (25 if their tempos differ).
+The blow's size is the body's (`FOE_FX.size`); a blow's look in `attackLook` is derived from its hues (`sig` is null for these, its
+motif, punch, twist and pitch are unchanged, so no sound moved).
+
+**What it draws** (`FOE_FX` in `data/foeTuning.ts`: the counts, sizes, lives and budgets): a sweep lays up to three strokes along the tip as it goes (a mark that is not a stroke is stamped once, midway), a thrust
+or a bite one stamp where its tip is, a slam a ripple and a stamp; a blow that lands on the investigator marks the wound; a
+slow blow has its tell (the mark in miniature, once); a lunge leaves faint smears; a caster gathers nine motes, looses a bolt with a
+mark at the muzzle and one where it lands, a beam a mark at each end, a summoning one faint sigil, a teleport two swirls, a gaze an
+eye and motes along its look, a roar a front of motes. **What it never draws:** a crown, a fountain, a cloud, a scar, a lit arc, a
+flash or a column. It keeps one thing of the old path: the small, short light every foe's blow and bolt lays on the ground it falls on
+(round 87, `FLASH_LIGHTS`; `fxKit.glow`, laid by `meleeFx.ts` and `attackFx.ts` for these creatures, none for an ally's, as before).
+
+**A crowd** (`render/foeCrowd.ts`): the three nearest creatures draw all of their blow, the next five only its marks, the rest only
+within 10 m, and none beyond the range of its tier; the whole crowd shares one rolling budget of 56 particles in half a second, of
+which the optional things (specks, trails, tells, motes) may spend 65% and only for the full tier, so a pack of twelve spends what a
+pack of four would, and the nearest creatures' marks are never crowded out by the farthest. Measured over the 51 creatures' every
+move, with the render side running: the median was 86 particles and is 14, a caster's blow 200 to 525 and is about 20.
+
+**Free art or code?** Assessed, and code won almost everywhere. Four more masks were baked at first, three cut from Kenney's Particle
+Pack 1.1 (CC0: a claw's three lines, grit, a wavering thread) and a spiral made in code; the marks they were for (the rake, a swirl)
+are drawn as crescents and arcs in the shader instead, exact at any size, so no recipe drew them and they were left out. What the atlas holds (`tools/marks/bake_marks.py` into `data/markAtlas.ts`, 2 KB) is two
+organic things that no formula draws well, both made in the baker: `splat`, an ink blot with droplets, and `smear`, the frayed tail of a
+wet drag, whose fray takes its mottle from the pack's `smoke_05` (credited). Anything geometric with hairline strokes or a point (the
+crescent, the lash, the cross, the dash, the arc) is drawn in the particle shader (`render/shaders/particleMasks.ts`): exact at any size
+and not chunked by the dither. Animated flipbooks were not taken: the fine frames would be lost, so motion comes from spin, growth,
+the hue's drift and the timing of strokes. (The one flipbook worth it, fire, is already `data/flameAtlas.ts`.) The aligned shapes
+(`crescent`, `lash`, `dash`, `trace`) lie along their flight on the screen; `mark` and `trace` pick a cell of the atlas by `thick`,
+which is `markCell(name)`.
+
+The effects lab can lay any of them for the eye: `fxlab.spawn({ shape: 'crescent', ... })` (`ui/fxLab.ts`), and
+`fxlab.fire(move)` fires a creature's own move as any other. Seen only in a software renderer so far: `FOE_FX.marks.*.alpha` and `size`
+are the knobs if the marks are too quiet or too loud.
+
 ## The pieces
 
 - **Particles** (`render/particles.ts`): one instanced batch of 4 096 camera-facing sprites (2 400 before round 60). Shapes:
   disc, shard, streak (lies along its flight, stretched by its speed), ring, spark (four-point) and wisp, and (round 60) rune,
-  eye, fang, bubble, bolt (forked), feather, petal and note. They spin, hold their brightness before they fade, change colour
+  eye, fang, bubble, bolt (forked), feather, petal and note, and (round 90) crescent, lash, cross, dash, arc, and mark and trace
+  (a cell of the two-mask atlas). They spin, hold their brightness before they fade, change colour
   over a life (an ember from white to red to black), and (round 60) may have a floor: they bounce a little, skid and lie still
   on it. The floor is the ground under the blow (`Particles.ground`, the world's; `groundUnder` in `fxForms.ts`), so what a
   blow on a body or a wall throws down falls to the ground, not to the height it struck. Dithered like the sprites, so no sorting.
@@ -131,3 +187,7 @@ a stage that reads an undeclared uniform silently draws nothing.
 - `tests/bossFx.test.ts`: one horror of each element fires every move with the render side running beside the simulation
   (stand-ins for the batches): nothing throws or is left not a number, and the particle and decal budgets hold.
   `tests/bossFxAudit.test.ts` (`npm run audit`) does it for every creature.
+- Round 90: `tests/foeBlows.test.ts` (the table: coverage, vocabulary, the spread of hues and marks), `foeKit.test.ts` (what each mark, tempo and
+  matter draws, within its budget, never a crown or a scar, and only a small short light), `foeFx.test.ts` (the events: a blow, a wound, a bolt, a beam, a
+  summoning, a gaze; a horror's path untouched), `foeCrowd.test.ts` (the tiers and the rolling budget), `particleShapes.test.ts` (the new
+  shapes and the atlas: every cell has coverage and a zero border, the shader names the shapes it draws) and `attackLook.test.ts` (a blow's look from its hues).

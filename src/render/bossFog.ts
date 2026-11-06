@@ -14,6 +14,7 @@ import { gatePlan, type FogWall } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
 import type { GameAudio } from './audio/gameAudio';
 import type { Particles } from './particles';
+import { createFogSight, type FogSight } from './fogSight';
 
 export const FOG_VERT = `varying vec3 vWorld; varying vec2 vUv;
 void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vWorld = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
@@ -115,6 +116,7 @@ interface Wall {
   gone: boolean;
   owed: number; // motes owed
   engaged: boolean; // its horror was awake at the last look
+  sight: FogSight; // keeps the crossed wall clear until the camera is through it too
 }
 
 export interface BossFog {
@@ -122,11 +124,14 @@ export interface BossFog {
 }
 
 export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles, audio: GameAudio): BossFog {
-  const walls: Wall[] = gatePlan(worldLayout()).fogs.map((w) => ({ w, theme: FOG_THEMES[w.theme], mesh: null, vis: 0, held: 0, gone: false, owed: 0, engaged: false }));
+  const walls: Wall[] = gatePlan(worldLayout()).fogs.map((w) => ({ w, theme: FOG_THEMES[w.theme], mesh: null, vis: 0, held: 0, gone: false, owed: 0, engaged: false, sight: createFogSight(w) }));
   g.events.on('FogPassing', (e) => void audio.recipe('mist:pass', mistPass(e.frames / 60), { gain: CLASS_GAIN.mist, vary: 0.6 })); // the sound is the walk through: as long as it is
   g.events.on('FogPassed', (e) => {
     const b = walls.find((w) => w.w.id === e.wall);
-    if (b) burst(b); // it closes behind them
+    if (b) {
+      b.sight.crossed({ x: e.x, y: b.w.y, z: e.z });
+      burst(b); // it closes behind them once the camera has crossed too
+    }
   });
   let last = -1;
   const seed = { v: 11 };
@@ -162,15 +167,19 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
         b.mesh.visible = b.vis > 0.001;
         const u = (b.mesh.material as THREE.ShaderMaterial).uniforms;
         u.uTime.value = time;
-        u.uVis.value = b.vis;
-        u.uHeld.value = b.held;
         const pass = g.player.fogPass;
+        const sight = b.sight.update(camera.position, me, !!pass && pass.wall === b.w.id, dt);
+        u.uVis.value = b.vis * (1 - sight.clear);
+        u.uHeld.value = b.held;
         if (pass && pass.wall === b.w.id && me) { // the walk through: the fog opens about them, widest as they cross it
           const k = pass.frame / pass.frames;
           const opening = 3.4 * Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, k))), 0.7);
           u.uPart.value.set(me.x, g.world.ground(me.x, me.z) + 1.1, me.z, opening);
           if (k > 0.1 && k < 0.9) eddy(b, me, dt);
         } else u.uPart.value.w = 0;
+        if (sight.at) { // the camera can still be behind the wall through a scene blend or while walking onward
+          u.uPart.value.set(sight.at.x, sight.at.y, sight.at.z, sight.blocked ? 9 : 9 * sight.clear);
+        }
         if (engaged && !b.engaged && near < 12) burst(b); // it has woken: the fog is crossed
         b.engaged = engaged;
         if (b.mesh.visible && me && near < 30 && !slain && !engaged) seep(b, dt);

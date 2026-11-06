@@ -5,6 +5,7 @@
  * UI scale to the page (the others are read each frame, main.ts).
  */
 
+import { applySerif } from './hudKit';
 import { applyCaptions } from './captions';
 import { DECK } from '../data/tuning';
 import { desktop } from './desktop';
@@ -56,6 +57,7 @@ export function createShell(): Shell {
   } catch {
     // No storage: the default keys.
   }
+  applySerif(settings.font > 0.5);
   applyUiScale(settings.uiScale);
   applyCaptions(settings.captions, settings.captionBack > 0.5);
   setPadSwap(settings.padSwap > 0.5); // (A and B the other way round: core/padMap.ts)
@@ -69,6 +71,7 @@ export function createShell(): Shell {
     }
     if (id === 'music' || id === 'sfx' || id === 'ambience') engine.setLevels(levels());
     if (id === 'speech') engine.setSpeech(settings.speech);
+    if (id === 'font') applySerif(settings.font > 0.5);
     if (id === 'uiScale') applyUiScale(settings.uiScale);
     if (id === 'captions' || id === 'captionBack') applyCaptions(settings.captions, settings.captionBack > 0.5);
     if (id === 'padSwap') setPadSwap(settings.padSwap > 0.5);

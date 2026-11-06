@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
-import { FX, LANTERN, LIGHT, LIGHTING, WORLD, type Vec3 } from '../data/tuning';
+import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
@@ -43,6 +43,7 @@ export const worldUniforms = {
   uLanternFacing: { value: LANTERN.facing },
   uLamps: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // the world's nearest lights (worldLights.ts)
   uLampWindows: { value: Array.from({ length: LAMP_SLOTS }, () => new THREE.Vector4()) }, // outward normal (x, z), offset from glass, height over ground; w = 0: ordinary point light
+  uNearFade: { value: new THREE.Vector3(NEAR_FADE.gone, NEAR_FADE.from, NEAR_FADE.flat) }, // a freestanding prop before the lens dithers away (2026-11-03: `nearFade`)
   uClipY: { value: -1e9 }, // nothing below this height is drawn (the mirrored scene under the sea's surface: reflection.ts; round 35)
   uReflect: { value: null as THREE.Texture | null }, // the scene mirrored in the sea, and whether it is there
   uReflectOn: { value: 0 },
@@ -67,6 +68,9 @@ export const worldUniforms = {
   uSpriteGrade: { value: FX.spriteGrade },
   uRelight: { value: 0 }, // the Relight setting: the horrors' bodies lit over their folds (shaders/sprite.ts; main.ts sets it)
   uSpriteVivid: { value: new THREE.Vector2(...FX.spriteVivid) },
+  uSpriteWarm: { value: FX.spriteWarm }, // how much of the lantern's and the lamps' hue a creature takes (shaders/sprite.ts)
+  uSpriteReveal: { value: new THREE.Vector2(...FX.spriteReveal) }, // how much of the lantern's light shows a creature's own colours (shaders/sprite.ts)
+  uSpriteRevealMost: { value: FX.spriteRevealMost }, // and the most of its realm's tint it takes back (round 95)
   uMind: { value: 0 }, // 0..1: a failing mind's hold on what it sees of the creatures (fx.ts `mind`)
   uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
   uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },
@@ -124,6 +128,8 @@ export interface WorldMaterialOptions {
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
   surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
+  neutralCloth?: boolean; // this use of the neutral cloth texture represents metal, wax, or other non-fabric
+  nearFade?: boolean; // a freestanding thing: dithered away right before the lens (NEAR_FADE; 2026-11-03). Never the ground, a dungeon's shell, a body or glass
 }
 
 /** Whether a material is something the realm's matter lies on: vertex-coloured, varied in the world, not lit of itself, not a body, not glass (nor a mirror, liquid or wax: `surface`), not the ground, the plants or the flesh. */
@@ -134,12 +140,12 @@ export function coatable(o: WorldMaterialOptions): boolean {
 
 const textures = new Map<string, THREE.DataTexture>();
 
-/** One shared texture per (kind, seed). Nearest mip of nearest texel: crisp up close, no moiré far away. */
-export function createTexture(kind: TextureKind, seed: number): THREE.DataTexture {
-  const key = `${kind}:${seed}`;
+/** Shared by kind, seed and treatment. Nearest mip of nearest texel: crisp up close, no moiré far away. */
+export function createTexture(kind: TextureKind, seed: number, detail = true): THREE.DataTexture {
+  const key = `${kind}:${seed}${detail ? '' : ':plain'}`;
   const cached = textures.get(key);
   if (cached) return cached;
-  const tex = new THREE.DataTexture(generateTexture(kind, seed), TEXTURE_SIZE, TEXTURE_SIZE);
+  const tex = new THREE.DataTexture(generateTexture(kind, seed, detail), TEXTURE_SIZE, TEXTURE_SIZE);
   tex.name = key; // the glitch hunts name what they find by it
   tex.magFilter = THREE.NearestFilter;
   tex.minFilter = THREE.NearestMipmapNearestFilter;
@@ -156,17 +162,21 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
   const k = 1 / UV_PER_TEXTURE; // geometry UVs count 64 texels to the unit
   const [su, sv] = (o.uvScale ?? [1, 1]).map((x) => x * k);
   const [du, dv] = (o.uvScroll ?? [0, 0]).map((x) => x * k);
+  // Cloth is also the neutral base for glass and self-lit effects. Those uses
+  // retain the unpatterned version, while other uses take its soft relief.
+  const neutralCloth = !!o.neutralCloth || !!o.surface || !!o.emissive || !!o.panes || (o.opacity ?? 1) < 1;
+  const map = (kind: TextureKind): THREE.DataTexture => createTexture(kind, o.seed ?? 1, kind !== 'cloth' || !neutralCloth);
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...worldUniforms,
-      uMap: { value: createTexture(o.texture, o.seed ?? 1) },
-      uMap2: { value: createTexture(o.texture2 ?? o.texture, o.seed ?? 1) },
+      uMap: { value: map(o.texture) },
+      uMap2: { value: map(o.texture2 ?? o.texture) },
       uHasMap2: { value: o.texture2 ? 1 : 0 },
-      uMap3: { value: createTexture(o.texture3 ?? o.texture, o.seed ?? 1) },
+      uMap3: { value: map(o.texture3 ?? o.texture) },
       uHasMap3: { value: o.texture3 ? 1 : 0 },
-      uMap4: { value: createTexture(o.texture4 ?? o.texture, o.seed ?? 1) },
+      uMap4: { value: map(o.texture4 ?? o.texture) },
       uHasMap4: { value: o.texture4 ? 1 : 0 },
-      uMap5: { value: createTexture(o.texture5 ?? o.texture2 ?? o.texture, o.seed ?? 1) },
+      uMap5: { value: map(o.texture5 ?? o.texture2 ?? o.texture) },
       uHasMap5: { value: o.texture5 ? 1 : 0 },
       uPatchFade: { value: o.patchFade ? 1 : 0 },
       uPatch: { value: new THREE.Vector2(...(o.patch ?? [0.54, 0.08])) },
@@ -181,6 +191,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
       uBodyScale: { value: o.bodyScale ?? 1 },
       uGhost: { value: 0 },
       uCoatOn: { value: (o.coat ?? coatable(o)) ? 1 : 0 },
+      uNearOn: { value: o.nearFade && !o.character && (o.opacity ?? 1) >= 1 && !o.surface ? 1 : 0 },
     },
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,

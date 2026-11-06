@@ -4,7 +4,7 @@
  * optional higher resolutions) and snapped to its step; a missing or bad value takes its default. Pure: no DOM.
  */
 
-import { HIGH_RESOLUTIONS, SETTINGS } from '../data/tuning';
+import { BRIGHTNESS_BASE, HIGH_RESOLUTIONS, SETTINGS } from '../data/tuning';
 import type { SaveStore } from '../systems/save';
 
 export type SettingId = keyof typeof SETTINGS;
@@ -12,9 +12,10 @@ export type Settings = Record<SettingId, number>;
 
 export const SETTINGS_KEY = 'lovecraft-souls-like/settings';
 export const SETTING_IDS = Object.keys(SETTINGS) as SettingId[];
-/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 20: Low hero is the camera's default (round 82: a Classic kept by every save of settings, chosen or not, goes to it once). */
-const VERSION = 20;
-const OLD_DEFAULT = 1.6; // 640 × 360
+/** Before 15, higher resolutions had no immersion warning: return those to the standard maximum once. 16: steps of 160 × 90 (a kept choice snaps to the nearest). 17: 800 × 450 is the default (a picture kept at 640 × 360, the default before, goes to it once). 18: the sound's mix (round 60: a level kept at the default before goes to today's once). 21: the Long lens is gone from the camera's looks, so a choice of it goes to Classic and Tight shoulder (3) is 2 now. 22: the brightness baseline is the old 85%. 23: 640 × 360 is the default again (800 × 450, kept by every save of 17 to 22, chosen or not, goes to it once). */
+const VERSION = 23;
+const OLD_DEFAULT = 1.6; // 640 × 360 (the default again since version 23)
+const ROUND_58_DEFAULT = 2; // 800 × 450, the default of versions 17 to 22
 /** The sound's levels before round 60, kept by every save of settings, chosen or not. */
 const OLD_MIX: Partial<Settings> = { volume: 0.7, music: 1, ambience: 1, speech: 1 };
 /** Round 60's (the best mix a player found): kept by every save of version 18, chosen or not, and moved to the full levels of round 61 once. */
@@ -50,9 +51,12 @@ export function parseSettings(json: string | null): Settings {
   const tuned = s.fog < SETTINGS.fog[3] || s.shadows < SETTINGS.shadows[3];
   if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = tuned && s.resolution <= OLD_DEFAULT ? OLD_DEFAULT : SETTINGS.resolution[3];
   if (v < 17 && !tuned && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
+  if (v >= 17 && v < 23 && s.resolution === ROUND_58_DEFAULT) s.resolution = SETTINGS.resolution[3]; // 800 × 450 was kept by every save of 17 to 22, chosen or not: to 640 × 360 once
   if (v < 18) for (const [id, old] of Object.entries(OLD_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // the same of the sound's levels
   if (v < 19) for (const [id, old] of Object.entries(ROUND_60_MIX) as [SettingId, number][]) if (s[id] === old) s[id] = SETTINGS[id][3]; // and again, to the full levels of round 61
-  if (v < 20 && s.camera === 0) s.camera = SETTINGS.camera[3]; // the camera's first default, Classic, was kept by every save of settings from the day it came, chosen or not; a Classic chosen since is kept
+  if (v < 21 && typeof r.camera === 'number') s.camera = Math.round(r.camera) === 2 ? 0 : Math.round(r.camera) === 3 ? 2 : s.camera; // the Long lens (2) was taken out: its choice is Classic now, and Tight shoulder, 3, is 2
+  // The old default was saved even when untouched; move it to the new default. Other choices retain their look as closely as the new slider permits.
+  if (v < 22 && typeof r.brightness === 'number' && Number.isFinite(r.brightness)) s.brightness = r.brightness === 1 ? 1 : clampSetting('brightness', r.brightness / BRIGHTNESS_BASE);
   return s;
 }
 
@@ -69,5 +73,25 @@ export function storeSettings(store: Pick<SaveStore, 'setItem'> | null, s: Setti
     store?.setItem(SETTINGS_KEY, JSON.stringify({ ...s, v: VERSION }));
   } catch {
     // Storage refused: the settings last until the page closes.
+  }
+}
+
+/** The brightness card has been kept once (round 103): the title shows it once, after its first opening. */
+export const CALIBRATED_KEY = 'lovecraft-souls-like/brightnessCalibrated';
+
+/** Kept, or no storage to keep it in (no card on every launch); a store that refuses reads counts as kept too. */
+export function isCalibrated(store: Pick<SaveStore, 'getItem'> | null): boolean {
+  try {
+    return !store || store.getItem(CALIBRATED_KEY) !== null;
+  } catch {
+    return true;
+  }
+}
+
+export function markCalibrated(store: Pick<SaveStore, 'setItem'> | null): void {
+  try {
+    store?.setItem(CALIBRATED_KEY, '1');
+  } catch {
+    // Storage refused: the card comes back on the next launch.
   }
 }

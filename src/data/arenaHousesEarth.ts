@@ -50,7 +50,7 @@ export const EARTH_HOUSES: Readonly<Record<string, House>> = {
   colossus_pyramids: house({
     name: 'THE TEMENOS OF THE SPHINX', line: 'A wall as thick as a street is wide, and the pylons of a door that was not made for men.',
     wall: 'ashlar', height: 11, thick: 5.5, tint: [0.85, 0.72, 0.5], glow: 'purple',
-    tower: { kind: 'spire', every: 8, height: 16 }, gate: { width: 9, height: 9, flank: 18, sealed: true }, place: true,
+    tower: { kind: 'spire', every: 8, height: 16 }, gate: { width: 9, height: 12.44, flank: 18, sealed: true }, place: true, // the lintel is 12.44 m over the threshold; the width is what shuts the towers' opening
   }),
   yig: house({
     name: 'THE SERPENT MOUND', line: 'An earthwork in a ring, and a gap in it as wide as a jaw.',

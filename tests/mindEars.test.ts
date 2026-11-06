@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { MIND_EARS, MIND_SOUNDS } from '../src/data/mindSounds';
 import { gutterGain, kindleGain, lanternGain, LANTERN_LIFE } from '../src/render/lanternLife';
-import { lanternStep, ringAfter, ringLevel, ringStrike, type LanternCue, type LanternEar } from '../src/render/audio/mindEars';
+import { createMindEars, lanternStep, ringAfter, ringLevel, ringStrike, type LanternCue, type LanternEar } from '../src/render/audio/mindEars';
+import type { AtmAudioContext } from '../src/render/audio/atmosphereAudio';
 import { MIND_TIDE, tideOf } from '../src/render/audio/mindTide';
 import { createWorldGame } from '../src/systems/game';
 import { setSanity } from '../src/systems/sanity';
@@ -78,25 +79,44 @@ describe('the lantern heard (round 80)', () => {
 
   it('follows the real lantern through a fall and a climb: spits, out, dark for a long while, catching once', () => {
     const g = createWorldGame();
-    const ear: LanternEar = { armed: true, dark: lanternGain(g) <= MIND_EARS.lantern.out };
-    const log: LanternCue[] = [];
+    const log: string[] = [];
+    const ears = createMindEars({ g, e: {}, recipe: (name: string) => { log.push(name); } } as unknown as AtmAudioContext);
     const tick = (n: number): void => {
       for (let i = 0; i < n; i++) {
         g.frame += 1;
-        const c = lanternStep(ear, lanternGain(g));
-        if (c) log.push(c);
+        ears.update(0, false);
       }
     };
     setSanity(g, 10); // Unmoored
     tick(60 * 3);
-    expect(log.filter((c) => c === 'out')).toHaveLength(1);
-    expect(log.filter((c) => c === 'spit').length).toBeGreaterThanOrEqual(2);
+    expect(log.filter((c) => c === 'mind:lanternOut')).toHaveLength(1);
+    expect(log.filter((c) => c === 'mind:lanternSpit').length).toBeGreaterThanOrEqual(2);
     tick(60 * 600);
-    expect(log.filter((c) => c === 'out')).toHaveLength(1); // out it stays, silent
+    expect(log.filter((c) => c === 'mind:lanternOut')).toHaveLength(1); // out it stays, silent
     setSanity(g, 25); // Fractured
     tick(60 * 4);
-    expect(log.filter((c) => c === 'catch')).toHaveLength(1);
-    expect(log.indexOf('catch')).toBeGreaterThan(log.indexOf('out'));
+    expect(log.filter((c) => c === 'mind:lanternKindle')).toHaveLength(1);
+    expect(log.indexOf('mind:lanternKindle')).toBeGreaterThan(log.indexOf('mind:lanternOut'));
+  });
+
+  it('dims and brightens with sanity within the lit bands without making lifecycle sounds', () => {
+    const g = createWorldGame();
+    const log: string[] = [];
+    const ears = createMindEars({ g, e: {}, recipe: (name: string) => { log.push(name); } } as unknown as AtmAudioContext);
+    const full = lanternGain(g);
+    for (let sanity = 100; sanity >= 15; sanity--) {
+      setSanity(g, sanity);
+      g.frame += 1;
+      ears.update(0, false);
+    }
+    expect(lanternGain(g)).toBeLessThan(full);
+    for (let sanity = 15; sanity <= 100; sanity++) {
+      setSanity(g, sanity);
+      g.frame += 1;
+      ears.update(0, false);
+    }
+    expect(lanternGain(g)).toBe(full);
+    expect(log).toEqual([]);
   });
 
   it('every sound of it is quiet and not silent: its peak, with the gain it is played at, is under a whisper\'s best and over -40 dBFS', () => {

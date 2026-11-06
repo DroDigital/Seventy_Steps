@@ -65,7 +65,9 @@ for (const p of todo) {
   const packed = p.pack(dir);
   const channel = packed.channel;
   if (channel !== 'itch') fail(`${p.os}: ${dir} was packed for ${channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
-  writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n`);
+  // Linux: --no-sandbox for Ubuntu 23.10+ AppArmor (electron#41066); the packed launcher adds it too.
+  const args = p.name === 'linux' ? 'args = ["--no-sandbox"]\n' : '';
+  writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n${args}`);
   const name = packed.edition === 'demo' ? `${p.name}-demo` : p.name; // the demo's own channel, never the full game's
   plan.push({ ...p, dir, name });
   console.log(`${p.os}: ${dir} → ${target}:${name} (version ${version})`);

@@ -13,6 +13,7 @@ import { isAbsent, type Game } from './components';
 import { managed } from './npcLife';
 import { awaitsIntroduction } from './npcIntroduction';
 import { dismissMount, moveMounted } from './mounts';
+import { portalVeil } from './mountPortal';
 import { footprintClear } from './mountGround';
 
 export function movementSystem(g: Game, dt: number): void {
@@ -32,6 +33,7 @@ export function movementSystem(g: Game, dt: number): void {
       shove.delete(id);
       continue;
     }
+    if (id === g.player.id && g.cutscene) continue; // a slow scene lets the world move, but holds the investigator in place
     if (!b || b.fixed || isAbsent(g, id) || a?.frozen) continue;
     if (id === g.player.id && g.player.falling) continue; // over an edge: gravity has it (falls.ts), not the ground it was snapped to (round 54)
     if (id === g.player.id) {
@@ -75,7 +77,7 @@ export function movementSystem(g: Game, dt: number): void {
   }
   separate(g);
   const rider = transform.get(g.player.id)!;
-  if (g.player.mount.active && !footprintClear(g, rider.pos, rider.yaw)) dismissMount(g);
+  if (g.player.mount.active && !(g.player.gatePass && portalVeil(g)) && !footprintClear(g, rider.pos, rider.yaw)) dismissMount(g); // the veil's walk may clip the gate; the far side is checked as any other step
 }
 
 /** What a body weighs in a shove (round 24): by its footprint, so a colossus is not pushed about at half the pace of the man who bumps it. */
@@ -89,8 +91,8 @@ function separate(g: Game): void {
     for (let j = i + 1; j < ids.length; j++) {
       const ba = body.get(ids[i])!;
       const bb = body.get(ids[j])!;
-      const fixedA = ba.fixed || awaitsIntroduction(g, ids[i]);
-      const fixedB = bb.fixed || awaitsIntroduction(g, ids[j]);
+      const fixedA = ba.fixed || (g.cutscene && ids[i] === g.player.id) || awaitsIntroduction(g, ids[i]);
+      const fixedB = bb.fixed || (g.cutscene && ids[j] === g.player.id) || awaitsIntroduction(g, ids[j]);
       if (fixedA && fixedB) continue;
       const pa = transform.get(ids[i])!.pos;
       const pb = transform.get(ids[j])!.pos;

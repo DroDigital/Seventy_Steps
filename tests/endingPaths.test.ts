@@ -5,6 +5,7 @@
 //  - the endings: each of the three is offered where the lead says it is.
 import { describe, expect, it } from 'vitest';
 import { DUNGEONS } from '../src/data/dungeons';
+import { KEY_REACH, courtPlaces } from '../src/data/finale';
 import { ENDING_IDS } from '../src/data/endings';
 import { NPCS } from '../src/data/npcs';
 import { QUESTS } from '../src/data/quests';
@@ -209,7 +210,7 @@ describe('the endings are told where they are chosen', () => {
     expect(wayTo(g, gatePlace('court_in')!.arrive, { x: court.x, z: court.z })).toEqual({ x: court.x, z: court.z }); // already in the Court at the Centre
     const gulf = gatePlace('beyond_gate')!.arrive; // and from the Gate, the Court is six dimensions on: the way is the Storm Gate's, the first of the chain (round 73)
     expect(wayTo(g, gulf, { x: court.x, z: court.z })).toEqual({ x: gatePlace('beyond_cloud')!.x, z: gatePlace('beyond_cloud')!.z });
-    expect(briefLine({ kind: 'ending' })).toBe(`Choose the dream's end at ${court.name}`);
+    expect(briefLine({ kind: 'ending' })).toBe(`The silver key and the tall man wait at ${court.name}`);
   });
 
   it("'Umr at-Tawil says it yields, once, where the offer is not yet a prompt", () => {
@@ -228,9 +229,38 @@ describe('the endings are told where they are chosen', () => {
     expect(fightAction(g)).toBeNull(); // too far to hear the offer: the notice said it
     place(g, g.player.id, at.x, at.z + 4, Math.PI);
     const endings = record(g, 'Ending');
-    expect(fightAction(g)).not.toBeNull();
+    expect(fightAction(g)?.label).toBe('follow the Guide');
+    steps(g, 1, press('interact'));
+    expect(endings).toEqual([]);
+    const f = g.ecs.c.fight.get(boss)!;
+    expect(f.sig.gate).toBe(1);
+    place(g, g.player.id, f.sig.gx!, f.sig.gz!, Math.PI);
+    expect(fightAction(g)?.label).toBe('step through the Gate');
     steps(g, 1, press('interact'));
     expect(endings).toEqual([{ id: 'silver_key' }]);
+  });
+
+  it('the silver key and the tall man end the dream, and the rise before the stone does not take the key', () => {
+    const g = createWorldGame();
+    g.overworld!.slain.add('boss:azathoth');
+    const sign = worldLayout().signs.find((s) => s.id === COURT_SIGN)!;
+    const at = courtPlaces(sign);
+    expect(Math.hypot(sign.rest.x - at.key.x, sign.rest.z - at.key.z)).toBeGreaterThan(KEY_REACH);
+    place(g, g.player.id, sign.rest.x, sign.rest.z, 0);
+    expect(fightAction(g)?.label ?? '').not.toBe('close your hand on the key');
+    place(g, g.player.id, at.key.x, at.key.z, 0);
+    const endings = record(g, 'Ending');
+    expect(fightAction(g)?.label).toBe('close your hand on the key');
+    fightAction(g)!.run();
+    expect(endings).toEqual([{ id: 'seal' }]);
+    const g2 = createWorldGame();
+    g2.overworld!.slain.add('boss:azathoth');
+    const man = courtPlaces(worldLayout().signs.find((s) => s.id === COURT_SIGN)!).man;
+    place(g2, g2.player.id, man.x, man.z, 0);
+    const heralded = record(g2, 'Ending');
+    expect(fightAction(g2)?.label).toBe('attend the tall man');
+    fightAction(g2)!.run();
+    expect(heralded).toEqual([{ id: 'herald' }]);
   });
 
   it('all three endings have a way to them in the data: the Guide, and the Court for the other two, which the main line ends on', () => {

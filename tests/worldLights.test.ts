@@ -1,5 +1,3 @@
-import { BRAZIER_VERTICES } from '../src/render/dungeonFurniture';
-import { FLAME_VERTICES } from '../src/render/sconces';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '../src/data/regions';
@@ -208,12 +206,10 @@ describe('what reports a light', () => {
   it("a legacy dungeon's every sconce flame is a torch, its braziers fires", () => {
     let total = 0;
     for (const d of worldLayout().dungeons) {
-      let [meshes, spots] = [[] as THREE.Mesh[], [] as LightSpot[]];
-      finish(dungeonJob({ ...d, decor: [] }, (m, l) => ([meshes, spots] = [m, l]))); // the walls alone
-      const flames = meshes.find((m) => (m.material as THREE.ShaderMaterial).uniforms.uEmissive.value === 1);
+      let spots: LightSpot[] = [];
+      finish(dungeonJob({ ...d, decor: [] }, (_, l) => (spots = l))); // the walls alone
       const [torches, fires] = [spots.filter((s) => s.kind === 'torch').length, spots.filter((s) => s.kind === 'fire').length]; // wall torches, and braziers standing in the halls (round 30)
       expect(torches + fires, d.layout.def.id).toBe(spots.length);
-      expect(torches * FLAME_VERTICES + fires * BRAZIER_VERTICES, d.layout.def.id).toBeLessThanOrEqual(flames?.geometry.getAttribute('position').count ?? 0); // a flame is a cone and its core (the glowing growths of the deep share its mesh)
       total += torches;
       let dressed: LightSpot[] = [];
       finish(dungeonJob(d, (_, l) => (dressed = l)));

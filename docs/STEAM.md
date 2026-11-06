@@ -24,8 +24,10 @@ it). Round 50: the release itself, Windows and Mac builds, their check and how t
 - `npm run package:win`, `package:linux`, `package:mac` name the platform. **Pack each platform on that platform** (or
   in CI on one of each): the controllers' SDL library (`@kmamal/sdl`) downloads its native build for the machine it is
   installed on. `steamworks.js` carries all three.
-- The executables: `SeventySteps.exe` (Windows), `seventy-steps` (Linux), `Seventy Steps.app` (macOS). On Linux, give
-  Steam the launch option `--no-sandbox` only if the Steam Runtime's container refuses Chromium's sandbox.
+- The executables: `SeventySteps.exe` (Windows), `seventy-steps` (Linux), `Seventy Steps.app` (macOS). On Linux,
+  `seventy-steps` is a short shell that starts `seventy-steps.bin` (the Electron binary) with `--no-sandbox`: Ubuntu
+  23.10+ AppArmor blocks Chromium's unprivileged user namespaces, so without that flag the process aborts before a
+  window opens (`packaging/linuxLaunch.mjs`, electron#41066). No Steam launch option is needed.
 - The packed game holds `dist/` (the built page, its music, sounds and voices), `desktop/`, and the native modules
   unpacked beside the archive. About 615 MB on Linux.
 - macOS: an Apple Silicon app and an Intel one, each with its own SDL, and with `-- --universal` one app of both

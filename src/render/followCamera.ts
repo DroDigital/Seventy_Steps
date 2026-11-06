@@ -5,9 +5,8 @@ import { wrapAngle } from '../core/geom';
 import { CAMERA_MODES } from '../data/cameraModes';
 import { CAMERA } from '../data/tuning';
 import { QUIET } from '../data/uiMood';
-import { anchorPoint, boomDir, followY, hangPoint, lensPosition } from '../systems/camera';
+import { anchorPoint, boomDir, clearBoom, followY, hangPoint, lensPosition } from '../systems/camera';
 import type { Game } from '../systems/components';
-import { raycast } from '../world/colliders';
 import { roofedAt } from '../world/terrain';
 
 /**
@@ -26,23 +25,24 @@ export function placeCamera(camera: PerspectiveCamera, g: Game, alpha: number, c
   };
   const yaw = rig.prevYaw + wrapAngle(rig.yaw - rig.prevYaw) * alpha;
   const anchor = anchorPoint(pivot, yaw, lerp(rig.prevLead, rig.lead), lerp(rig.prevRise, rig.rise));
-  const { base } = hangPoint(g.world, anchor, yaw, g.player.falling ? g.player.falling.lip.y + tune.pivotHeight : undefined, tune.shoulder);
+  const { read, base } = hangPoint(g.world, anchor, yaw, g.player.falling ? g.player.falling.lip.y + tune.pivotHeight : undefined, tune.shoulder);
   let pitch = lerp(rig.prevPitch, rig.pitch);
   let dist = lerp(rig.prevDist, rig.dist);
   if (calm > 0.001 && !g.player.falling && !g.player.mount.active && !roofedAt(pivot.x, pivot.z)) {
     pitch = Math.min(tune.pitchMax, pitch + QUIET.lift * calm);
-    const want = dist * (1 + (QUIET.back - 1) * calm);
-    const d = boomDir(yaw, pitch);
-    const reach = want + CAMERA.margin;
-    const end = { x: base.x + d.x * reach, y: base.y + d.y * reach, z: base.z + d.z * reach };
-    dist = Math.max(dist, Math.min(want, raycast(g.world, base, end) * reach - CAMERA.margin)); // never through a wall the rig's own boom stopped short of
+    dist *= 1 + (QUIET.back - 1) * calm;
   }
+  // Interpolation can leave the lens beyond a newly encountered wall or ceiling even after the simulated boom has pulled in.
+  dist = clearBoom(g.world, read, yaw, pitch, dist);
   const lens = lensPosition(g.world, base, yaw, pitch, dist);
   camera.position.set(lens.x, lens.y, lens.z);
-  camera.lookAt(base.x, base.y, base.z);
+  if (dist < 1e-6 && Math.abs(lens.y - base.y) < 1e-6) {
+    const d = boomDir(yaw, pitch);
+    camera.lookAt(base.x - d.x, base.y - d.y, base.z - d.z);
+  } else camera.lookAt(base.x, base.y, base.z);
 }
 
-/** The lens's vertical field of view as the rig has it (Low hero narrows it for a tall foe, Long lens widens it in a narrow place), before the mind's breathing of it (render/fx.ts). */
+/** The lens's vertical field of view as the rig has it while framing a tall foe, before the mind's breathing of it (render/fx.ts). */
 export function fovOf(g: Game, alpha: number): number {
   return g.camera.prevFov + (g.camera.fov - g.camera.prevFov) * alpha;
 }

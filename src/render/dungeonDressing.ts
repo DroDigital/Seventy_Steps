@@ -16,6 +16,8 @@ import { KITS, type DungeonKit, type KitId } from '../data/kits';
 import { DUNGEON } from '../data/tuning';
 import { floorRange, kitIdOfRoom, roomPoint, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
 import { standing } from '../world/dungeonParts';
+import { isAbyss } from '../world/abyssStair';
+import { stairNewels } from './stairNewels';
 import { baysOf, cornersOf, pillarsOf, roomStyle } from '../world/roomStyle';
 import { DIRS } from '../world/worldMap';
 import { brazier, DEPTH, ITEMS, place, type Out, type Wall } from './dungeonFurniture';
@@ -23,7 +25,7 @@ import { box, worldUv } from './meshKit';
 import { scaleRgb, type Rgb } from './palette';
 import type { LightSpot } from './worldLights';
 
-export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow'; kit: DungeonKit; geo: THREE.BufferGeometry; light?: LightSpot };
+export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
 type Origin = { x: number; z: number };
 
 const AWAY = { door: 2.8, torch: 1.5, spot: 2.2 }; // metres furniture keeps from a doorway, a torch, and what stands in a room
@@ -117,7 +119,7 @@ function hall(d: DungeonLayout, r: RoomLayout, kitId: KitId, kit: DungeonKit, c:
     if (!free(p.x, p.z, -1.2)) continue;
     const b = brazier(p.x, p.z, r.level);
     out.wall.push(...b.iron);
-    lit.push({ kind: 'glow', kit, geo: b.flame, light: { ...b.at, kind: 'fire' } });
+    lit.push({ kind: 'glow', kit, light: { ...b.at, kind: 'fire' } });
   }
   return lit;
 }
@@ -132,7 +134,7 @@ export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at:
     const kit = KITS[kitId] as DungeonKit;
     const c = colour(kit);
     if (kit.roof !== 'open') roof(r, kit, c, at, out);
-    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : [];
+    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : isAbyss(r) ? stairNewels(r, kit, c, at) : []; // (round 104: a flight over the void, its newels and their fires)
     result.push(...grouped(kit, out, at), ...lit);
   }
   return result;

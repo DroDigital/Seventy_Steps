@@ -78,7 +78,7 @@ describe('recorded attack cues without caster blips', () => {
     expect(w.heard('atkFwoosh')).toHaveLength(2);
     w.g.events.emit('BoltLoosed', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, fire: true, conjured: false });
     expect(w.heard('atkFwoosh')).toHaveLength(2);
-    const land = (on: 'body' | 'ground' | 'wall' | 'spent') => w.g.events.emit('BoltLanded', { owner: w.boss, at, vel: { x: 1, y: 0, z: 0 }, on, radius: 0.3, lob: false, fire: false, conjured: false });
+    const land = (on: 'body' | 'ground' | 'wall' | 'spent') => w.g.events.emit('BoltLanded', { owner: w.boss, faction: 'enemy', at, vel: { x: 1, y: 0, z: 0 }, on, radius: 0.3, lob: false, fire: false, conjured: false });
     land('spent');
     expect(w.heard('atkFire')).toHaveLength(0);
     land('ground');

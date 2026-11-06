@@ -48,8 +48,8 @@ export const ROOM_SETS: Readonly<Record<string, ArenaSet>> = {
   'slumber/cavern': {
     puts: [put('ss_brazier', at(0.74, 90, { face: 'in' }), { lit: 'torch', size: 1.4, heart: true }), put('ss_brazier', at(0.74, 270, { face: 'in' }), { lit: 'torch', size: 1.4, heart: true })],
   },
-  // The gate of deeper slumber: a brazier at each side wall, the last light of the stair.
+  // The gate of deeper slumber: two braziers on one side of its aisle, the last light of the stair (round 104: the hall moved; its colonnade and its gate leave room for them only there).
   'slumber/deeper': {
-    puts: [put('ss_brazier', at(0.74, 90, { face: 'in' }), { lit: 'torch', size: 1.3, heart: true }), put('ss_brazier', at(0.74, 270, { face: 'in' }), { lit: 'torch', size: 1.3, heart: true })],
+    puts: [put('ss_brazier', at(0.3, 120, { face: 'in' }), { lit: 'torch', size: 1.3, heart: true }), put('ss_brazier', at(0.7, 45, { face: 'in' }), { lit: 'torch', size: 1.3, heart: true })],
   },
 };

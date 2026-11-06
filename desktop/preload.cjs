@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld('desktop', {
   edition: process.argv.includes('--edition=demo') ? 'demo' : 'full', // the demo's pack (round 56: data/edition.ts)
   channel: process.argv.includes('--channel=itch') ? 'itch' : 'steam', // the store the pack is for (round 85: the Mounts tab says its words)
   pads: () => pads, // as navigator.getGamepads() lists them, for the page to read when the browser lists none (core/pads.ts)
+  rumble: (index, strong, weak, ms) => ipcRenderer.send('desktop:rumble', { index: Number(index), strong: Number(strong), weak: Number(weak), ms: Number(ms) }), // the pad's motors (2026-11-03: core/rumble.ts)
   quit: () => ipcRenderer.invoke('desktop:quit'),
   setFullscreen: (on) => ipcRenderer.invoke('desktop:fullscreen', !!on),
   isFullscreen: () => ipcRenderer.invoke('desktop:is-fullscreen'),

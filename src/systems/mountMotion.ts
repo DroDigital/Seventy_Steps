@@ -9,6 +9,7 @@ import { stepReins } from './mountReins';
 import { steerArcade, steerHorse } from './mountSteer';
 import type { Game } from './components';
 import { footprintClear, mountFootprintForbidden, mountPlaceForbidden } from './mountGround';
+import { portalSpeedFloor, portalVeil } from './mountPortal';
 
 /** The coast, the sea or the abyss, where nothing stops the mount first: one step is taken, then the fall kills. (In play the world's containing wall stops the ride a rider's length short of the land's edge: it is on foot that the edge is walked off.) */
 function environmentalDrop(g: Game, at: V3): boolean {
@@ -64,6 +65,7 @@ export function moveMounted(g: Game, dt: number): MountMove {
   const p = g.player;
   const mount = p.mount;
   if (!mount.active) return 'idle';
+  if (p.gatePass && portalVeil(g)) return 'rode'; // the veil's walk owns the body; the pace stays what it was at the gate
   const tr = g.ecs.c.transform.get(p.id)!;
   if (mountPlaceForbidden(tr.pos.x, tr.pos.z)) return 'drop';
   const m = g.ecs.c.mover.get(p.id)!;
@@ -71,7 +73,8 @@ export function moveMounted(g: Game, dt: number): MountMove {
   const k = MOUNT_TURNING[mount.active];
   const target = Math.hypot(m.vx, m.vz);
   const steered = k.arcade ? steerArcade(k, mount.speed, tr.yaw, m.face, target, dt, p.sprinting) : steerHorse(k, mount.yawRate, mount.speed, tr.yaw, m.face, target, dt);
-  mount.speed = steered.speed;
+  const floor = portalSpeedFloor(g); // a gate just left, the stick still taken: the pace does not fall below what it was
+  mount.speed = floor === null ? steered.speed : Math.max(steered.speed, floor);
   // The rig comes round about its seat, as much as the world lets it; the horse and the carriage never strafe.
   const asked = steered.yawRate * dt;
   const turned = asked === 0 ? 0 : turnBy(g, tr, asked);

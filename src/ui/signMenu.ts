@@ -3,9 +3,10 @@
  * Endurance or Might (playtest round 4) and insight on Resolve or a Draught; set star-stones into a
  * weapon (round 12) and move them from one weapon to another (signMove.ts); choose the two relics to wear (signRelics.ts); travel to any Elder Sign
  * found, chosen by region and then by name (playtest round 12: one list grew past forty); at the hub's
- * Sleeper's Sign, descend the Seventy Steps into the Dreamlands; and at the Court's, once Azathoth
- * slumbers, choose one of two endings (Phase 5), first of all. A menu screen (menuKit.ts: mouse, keys
- * or pad; E or Esc leaves); the investigator takes no input while it is open.
+ * Sleeper's Sign, descend the Seventy Steps into the Dreamlands. At the Court's, once Azathoth
+ * slumbers, the menu says where the silver key and the tall man wait: the endings are done in the
+ * world (systems/finale.ts). A menu screen (menuKit.ts: mouse, keys or pad; E or Esc leaves); the
+ * investigator takes no input while it is open.
  */
 
 import { getRegion } from '../data/regions';
@@ -14,16 +15,16 @@ import { PLAYER_MOVES } from '../data/moves';
 import { DEFAULT_DIFFICULTY, DIFFICULTIES, GUN, LEVELS, REINFORCE, UPGRADES, type UpgradeId } from '../data/tuning';
 import { WEAPONS } from '../data/weapons';
 import { canReinforce, edgeAt, reinforce, reinforceCost } from '../systems/arms';
-import { ENDINGS } from '../data/endings';
 import { descentOpen, dream, signBeyondDemo, signPlace, travel } from '../systems/checkpoints';
-import { courtEndings, endGame } from '../systems/endings';
+import { courtEndings } from '../systems/endings';
 import { canUpgradeGun, gunCost, gunEdge, upgradeGun } from '../systems/gun';
 import type { Game } from '../systems/components';
 import { buyUpgrade, upgradeName } from '../systems/insight';
 import { closedBy, heldOpen, listed } from '../systems/veil';
 import { currentLead } from '../systems/lead';
 import { buyLevel, canLevel, LEVEL_IDS, levelName, levelsBought, might, nextLevelCost } from '../systems/levels';
-import { levelGain, softCap } from './levelGains';
+import { boon } from '../systems/relicLoadout';
+import { levelGain } from './levelGains';
 import { worldLayout, type SignPlace } from '../world/placements';
 import { button, createScreen, el, footer, heading, option, tabs, title, type Page } from './menuKit';
 import { chips, price, resources, type Chip } from './menuChips';
@@ -35,7 +36,7 @@ import { mountsTab, refreshMountEntitlement } from './mounts';
 import { t } from '../core/i18n';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
 
-/** What one more level of each of the mind's gives, in words (the body's, which fall off past a soft cap, are levelGains.ts). */
+/** What one more level of each of the mind's gives, in words (the body's are in levelGains.ts). */
 const GAINS: Record<UpgradeId, string> = {
   resolve: `sanity losses −${Math.round(UPGRADES.resolve.resist! * 100)}%`,
   draught: `+${UPGRADES.draught.doses} Laudanum`,
@@ -76,9 +77,8 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
     heading(panel, 'BODY').style.margin = '0 0 4px';
     for (const id of LEVEL_IDS) {
       const [bought, full] = [g.player.levels[id], g.player.levels[id] >= LEVELS[id].max];
-      const soft = softCap(id, bought); // (round 71: past a soft cap the next level gives less, and the row says so)
-      const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`, soft?.hint);
-      if (!full) chips(b, [{ text: levelGain(id, bought), tone: 'good' }, ...(soft ? [{ text: soft.chip, tone: 'dim' as const }] : [])]);
+      const b = option(panel, `${levelName(id)}  ${bought}/${LEVELS[id].max}`, () => (buyLevel(g, id), main.redraw?.()), canLevel(g, id), full ? `${levelName(id)} is fully grown.` : `Not enough Echoes: the next level costs ${nextLevelCost(g)}, and you carry ${g.player.echoes}.`);
+      if (!full) chips(b, [{ text: levelGain(id, bought, boon(g, 'health'), boon(g, 'stamina')), tone: 'good' }]);
       price(b, full ? 'MAX' : `${nextLevelCost(g)} Echoes`, full ? 'max' : canLevel(g, id) ? 'ok' : 'no');
     }
     heading(panel, 'MIND').style.margin = '12px 0 4px';
@@ -154,11 +154,10 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       const line = el(panel, 'div', `NEXT  ·  ${next}`, `margin:-6px 14px 10px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7`);
       [line.title, line.dataset.pin] = [next, ''];
     }
-    const endings = courtEndings(g, ow.sign); // the choice the whole dream led to comes first (round 12)
-    if (endings.length) {
+    if (courtEndings(g, ow.sign).length) {
       const box = pinned(panel);
       heading(box, 'THE COURT OF AZATHOTH').style.marginTop = '0';
-      for (const id of endings) button(box, ENDINGS[id].choice, () => void (close(), endGame(g, id)));
+      el(box, 'div', 'The silver key hangs before the stone. Close your hand on it, and ask for nothing. The tall man waits aside, in his good coat.', 'opacity:.75;margin:4px 14px 8px;font-size:13px;line-height:1.45');
     }
     if (here?.dream) {
       const box = pinned(panel);

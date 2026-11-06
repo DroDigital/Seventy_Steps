@@ -104,17 +104,25 @@ describe('a horse standing at its harness (round 59)', () => {
   });
 
   it('a horse that is called, ridden, slapped and hauled up plays every recipe that a recording stands in front of, and each recording has its recipe to fall back on', () => {
-    const r = ride('grey');
-    r.advance(60 * 60 * 10, 0); // ten minutes at its harness
-    for (let i = 0; i < 30; i++) { r.mount.reins.struck++; r.advance(60, 0); } // slapped: it answers now and then
-    r.mount.reins.halts++;
-    r.mount.reins.haltSpeed = MOUNT_TRAVERSAL.gallop;
-    r.advance(60, 0);
-    r.advance(60 * 20, MOUNT_TRAVERSAL.gallop); // and a gallop: its snort
-    const heard = new Set(r.heard.map((h) => h.key));
-    const recorded = Object.keys(RECORDED_FOR).filter((k) => k.startsWith('mount:'));
-    expect(recorded.length).toBe(PLANNED.filter((p) => p.for[0].startsWith('mount:')).reduce((n, p) => n + p.for.length, 0));
-    for (const key of recorded) expect(heard.has(key), `${key} is never played by the ride`).toBe(true);
-    for (const h of r.heard) if (RECORDED_FOR[h.key]) expect(h.sound.length, h.key).toBeGreaterThan(0); // (the recipe is there to play where the file has not loaded)
+    // Seeded, as the test above is: the toss is a draw, and a Math.random another test left standing must not decide whether a recipe is heard.
+    for (const seed of [1, 2, 3]) {
+      const random = vi.spyOn(Math, 'random').mockImplementation(((state) => () => { state = (state * 1664525 + 1013904223) >>> 0; return state / 4294967296; })(seed));
+      try {
+        const r = ride('grey');
+        r.advance(60 * 60 * 10, 0); // ten minutes at its harness
+        for (let i = 0; i < 30; i++) { r.mount.reins.struck++; r.advance(60, 0); } // slapped: it answers now and then
+        r.mount.reins.halts++;
+        r.mount.reins.haltSpeed = MOUNT_TRAVERSAL.gallop;
+        r.advance(60, 0);
+        r.advance(60 * 20, MOUNT_TRAVERSAL.gallop); // and a gallop: its snort
+        const heard = new Set(r.heard.map((h) => h.key));
+        const recorded = Object.keys(RECORDED_FOR).filter((k) => k.startsWith('mount:'));
+        expect(recorded.length).toBe(PLANNED.filter((p) => p.for[0].startsWith('mount:')).reduce((n, p) => n + p.for.length, 0));
+        for (const key of recorded) expect(heard.has(key), `${key} is never played by the ride`).toBe(true);
+        for (const h of r.heard) if (RECORDED_FOR[h.key]) expect(h.sound.length, h.key).toBeGreaterThan(0); // (the recipe is there to play where the file has not loaded)
+      } finally {
+        random.mockRestore();
+      }
+    }
   });
 });

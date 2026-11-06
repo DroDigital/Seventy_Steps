@@ -18,7 +18,7 @@ const pack = JSON.parse(readFileSync(`${ASSET_DIR}/index.json`, 'utf8')) as Revi
 const DELIVERED: [key: string, front: number[], side: number[], back: number[], idle0: string, lastWalk: string][] = [
   ['yig', [2, 6, 3, 2], [2, 6], [2, 4], '61e8c07acf90c25d86084c6491403347f230afcf7b423487813e2c5eb94e33b5', '34e0ddc289bd95af1e75af669f01f99b1c82033b13fcb584f22f843462ca39b5'],
   ['haunter_of_the_dark', [2, 8, 3, 2], [2, 8], [2, 8], 'f1318091d93c3df46f56f0686641d17a7dca15109d9023416bd074a6f8730dfe', 'cf5f61613d3ef211e993f246426d6d25db489aa9e9c55aaf27192883e79af700'],
-  ['high_priest#eldritch', [2, 6, 3, 2], [2, 6], [2, 6], '53af28d4e09f9159a36675f28109cafa82ce0f4307e9bee92291ac1006aba9c4', '47c6ee7e9e1141ec4368a9532748532c14267214b5740c4dbc161c8c3ce216f9'],
+  ['high_priest#eldritch', [2, 4, 3, 2], [2, 4], [2, 4], 'c48c8fafa7223672586128d6c03ee59585776b85a710a83a210942ae7bfb9f69', 'b52e1c457e67f57886f1c6d838295eba1723a963a5e5ca367a4c9f627d4901b3'], // superseded by the approved October 27 rework
   ['rhan_tegoth', [2, 6, 3, 2], [2, 6], [2, 6], 'e01e3319c57f21a326df56ecdab2098b82ece12e2539203d5355c72dc8c768c5', '38c428ad56c4f61a6e0501b0283513264815e35dddce976e842d5cb1e486f9eb'],
   ['dhole', [2, 6, 3, 2], [2, 6], [2, 4], '096a217168112b26a153483857ee496ab9aa9b18098a111ed31bd3ec98a91e83', 'e1b9a665e362751d1f5ca9dca8ffbdec3379cea18c9f3fccf7433317b698f540'],
   ['yog_sothoth', [2, 4, 3, 2], [2, 4], [2, 4], '04d18205368960fb89f59c47c1741ae93627a400b9eef3bf5fd771f1709688c6', '82ca69c3f5063946acbc8738631251cd34c76e223eebc6ac286acad2bcc101b2'],

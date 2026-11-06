@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { wrapAngle, yawOf } from '../core/geom';
 import { SWING_TRAIL } from '../data/fxTuning';
+import { PAPER_MODELS } from '../data/paperTuning';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import { hourOf, phaseOf } from '../systems/clock';
@@ -29,6 +30,7 @@ import { personShadow } from './moonShadow';
 import { BASE } from './palette';
 import { createPoseBlend, type PoseBlend } from './poseBlend';
 import { pose } from './poses';
+import { applyGrasp, setFinaleHand } from './finalePose';
 import { createWorldMaterial } from './worldMaterial';
 import { FEEL } from './feel';
 import { createMountViews } from './mountViews';
@@ -115,7 +117,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
 
   function sync(): void {
     for (const [id, model] of g.ecs.c.model) {
-      if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews
+      if (views.has(id) || model.startsWith(MODEL_PREFIX) || model.startsWith(FX_PREFIX) || model === SHRINE_MODEL || PAPER_MODELS.has(model)) continue; // roster creatures: creatureViews; bolts, pools and props: fightViews; Elder Signs: signViews; notes: paperViews
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip, id !== g.player.id)); // what the moon sees of them: one shape, not their twenty parts (and the lantern, for all but the one who carries it)
       scene.add(figure.root);
@@ -174,7 +176,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const post = person ? ACTS[g.ecs.c.npc.get(id) ?? '']?.post : undefined; // one with a chair or a post of their own
     if (post) placeAt(f, v, post);
     const dt = Math.min(0.1, Math.max(0, time - v.lastTime));
-    v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
+    if (id === g.player.id && g.cutscene) v.speed = 0; // stop the carried gait immediately, even when the last fog-walk step was still being eased
+    else v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
     v.stride += 2 * Math.PI * cadence(v.speed) * dt;
     v.lastTime = time;
     const speed = v.speed;
@@ -207,6 +210,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const water = falling?.water;
     const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin, sea: water ? { since: water.entered < 0 ? -1 : (falling.frame + alpha - water.entered) / SIM.hz, held: water.grab < 0 ? 0 : (falling.frame + alpha - water.grab) / SIM.hz } : undefined } : undefined;
     pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop, weapon: id === g.player.id ? g.player.weapon : undefined });
+    if (id === g.player.id) (applyGrasp(f.handR), setFinaleHand(f.handR));
     if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
       f.root.updateMatrixWorld(true);
       const beat = pipeBeat(time + id * 1.7);
