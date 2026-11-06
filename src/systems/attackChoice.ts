@@ -55,7 +55,7 @@ export function leaning(a: AttackChoice, d: number, s: Situation): number {
 }
 
 /** Whether `move` may be struck now: not a `once` blow struck last, and (`rested`) not one whose rest has not run out. */
-function allowed(move: string, s: Situation | undefined, rested: boolean): boolean {
+export function allowed(move: string, s: Situation | undefined, rested: boolean): boolean {
   const def = attackOf(move);
   if (!def || !s) return true;
   if (def.once && s.recent[0] === move) return false;

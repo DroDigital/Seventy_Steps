@@ -101,6 +101,16 @@ function pillars(m: MarksDef, centre: XZ, posts: readonly Post[], rng: () => num
   return spots;
 }
 
+/**
+ * Cut to `COURT_MOST` evenly along the pattern: a long fuse or a wide floor is spread round its whole length, not left to its first stretch
+ * (Codex: the first 24 of a rim's 46 spots left half the wall unmarked). Each spot keeps its order, so the time between those kept is as laid.
+ */
+function thin(spots: Spot[]): Spot[] {
+  if (spots.length <= COURT_MOST) return spots;
+  const step = spots.length / COURT_MOST;
+  return Array.from({ length: COURT_MOST }, (_, i) => spots[Math.floor(i * step)]);
+}
+
 /** The spots of a court pattern, or null when `m`'s pattern is not one (or, for `pillars`, no pillar stands to fall from). */
 export function courtSpots(m: MarksDef, centre: XZ, from: XZ, body: number, rng: () => number, court: Court, posts: readonly Post[] = []): Spot[] | null {
   const spots =
@@ -109,5 +119,5 @@ export function courtSpots(m: MarksDef, centre: XZ, from: XZ, body: number, rng:
     : m.pattern === 'rim' ? rim(m, court, rng)
     : m.pattern === 'pillars' ? pillars(m, centre, posts, rng)
     : null;
-  return spots && spots.slice(0, COURT_MOST);
+  return spots && thin(spots);
 }

@@ -145,7 +145,10 @@ describe('the court patterns', () => {
     expect(q.length).toBeLessThanOrEqual(COURT_MOST);
     const r = courtSpots(marks('closing_walls'), { x: 0, z: 8 }, { x: 0, z: 0 }, 0.5, rngOf(9), court)!;
     for (const s of r) expect(Math.hypot(s.at.x, s.at.z)).toBeLessThan(court.radius - marks('closing_walls').radius);
-    expect(r.map((s) => s.order)).toEqual(r.map((_, i) => i));
+    expect(r.every((s, i) => i === 0 || s.order > r[i - 1].order)).toBe(true); // in order round the rim
+    const angles = r.map((s) => Math.atan2(s.at.z, s.at.x)).sort((a, b) => a - b);
+    const gaps = angles.slice(1).map((a, i) => a - angles[i]);
+    expect(Math.max(...gaps)).toBeLessThan(Math.PI / 2); // no quarter of the rim left unmarked
     expect(r.length).toBeLessThanOrEqual(COURT_MOST);
   });
 

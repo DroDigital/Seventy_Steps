@@ -147,7 +147,8 @@ export function registerFights(g: Game): void {
   g.events.on('Hit', ({ attacker, target, outcome, lingering }) => { // it learns, within this fight, which of its blows find the investigator (round 107)
     const br = g.ecs.c.brain.get(attacker);
     const move = br?.recent?.[0];
-    if (!br || !move || lingering || target !== g.player.id || !g.ecs.c.fight.get(attacker)?.engaged) return;
+    // Only a hit of the blow it is still in: a bolt that lands after the horror has begun another blow is not that blow's, so it is not learnt (Codex)
+    if (!br || !move || g.ecs.c.actor.get(attacker)?.move !== move || lingering || target !== g.player.id || !g.ecs.c.fight.get(attacker)?.engaged) return;
     br.learnt = learnFrom(br.learnt, move, outcome);
   });
   g.events.on('Respawned', () => {
