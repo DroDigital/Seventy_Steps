@@ -14,17 +14,15 @@ import type { Prop } from '../world/props';
 import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { PropMat, SolidPiece } from './propShapes';
+import { houseLookOf, type HouseLook } from '../data/houseLooks';
+import { boards, cupola, noExtra, turret, widowWalk, type Extra } from './houseExtras';
 
 const TRIM: Rgb = scaleRgb(BASE.bone, 1.1);
 const PANE: Rgb = scaleRgb(BASE.charcoal, 0.5);
 const LIT: Rgb = scaleRgb(mixRgb(BASE.bone, [1, 0.78, 0.45], 0.6), 0.85);
 const DOOR: Rgb = scaleRgb(mixRgb(BASE.rust, BASE.charcoal, 0.5), 1.4);
 
-// Round 35 (every house was the same house in a grey): what a town's houses are painted, built of and roofed with, each house taking its own.
-const PAINT: readonly Rgb[] = [[0.82, 0.8, 0.74], [0.78, 0.7, 0.5], [0.6, 0.68, 0.6], [0.56, 0.62, 0.7], [0.7, 0.44, 0.38], [0.56, 0.46, 0.36], [0.7, 0.74, 0.76], [0.46, 0.5, 0.44]];
-const BRICKS: readonly Rgb[] = [[1.05, 0.95, 0.9], [0.95, 0.7, 0.58], [0.88, 0.78, 0.55], [0.7, 0.62, 0.6], [0.72, 0.76, 0.84], [0.82, 0.62, 0.5]];
-const ROOFS: readonly Rgb[] = [[0.62, 0.64, 0.7], [0.72, 0.6, 0.5], [0.6, 0.7, 0.56], [0.46, 0.46, 0.5], [0.74, 0.5, 0.42], [0.82, 0.8, 0.76]];
-const DOORS: readonly Rgb[] = [DOOR, [0.3, 0.42, 0.34], [0.52, 0.2, 0.18], [0.2, 0.2, 0.22], [0.42, 0.32, 0.22]];
+// Round 35 (every house was the same house in a grey): what a town's houses are painted, built of and roofed with, each house taking its own; round 111: by the realm (data/houseLooks.ts).
 const pick = <T,>(rng: Rng, list: readonly T[]): T => list[Math.floor(rng() * list.length)];
 
 /** The profile from `floor` up: a slope that starts below it starts where it crosses it. */
@@ -139,7 +137,7 @@ function frame(x: number, y: number, z: number, out: number, turn: boolean, shut
   return parts;
 }
 
-function windows(w: number, d: number, top: number, rng: Rng, lit: number, shutters: boolean, door = true, skipSide = 0): { frames: THREE.BufferGeometry[]; panes: THREE.BufferGeometry[]; glows: Lit[] } {
+function windows(w: number, d: number, top: number, rng: Rng, lit: number, shutters: boolean, door = true, skipSide = 0, boarded = 0): { frames: THREE.BufferGeometry[]; panes: THREE.BufferGeometry[]; glows: Lit[] } {
   const frames: THREE.BufferGeometry[] = [];
   const panes: THREE.BufferGeometry[] = [];
   const glows: Lit[] = [];
@@ -154,7 +152,10 @@ function windows(w: number, d: number, top: number, rng: Rng, lit: number, shutt
         const on = rng() < lit; // one draw: a lit window glows in the lamplight's colour
         const seed = seedOf(x, y, z, w, d);
         if (on) glows.push({ geo: paneBox(0.7, 1.05, 0.06, x, y, z, seed), at: [x, y, side * (d + GLASS + 0.52)], glass: [x, y, z], pane: seed });
-        else panes.push(box(0.7, 1.05, 0.06, x, y, z, PANE));
+        else {
+          panes.push(box(0.7, 1.05, 0.06, x, y, z, PANE));
+          if (boarded && seed < boarded) frames.push(...boards(x, y, side * d, side, false, scaleRgb(DOOR, 1.3))); // round 111: planked over (by where it is, so the house's draws are left as they were)
+        }
       }
       if (side === skipSide) continue; // the side a wing joins
       const x = side * (w + GLASS);
@@ -162,14 +163,17 @@ function windows(w: number, d: number, top: number, rng: Rng, lit: number, shutt
       const on = rng() < lit;
       const seed = seedOf(x, y, 0, w, d);
       if (on) glows.push({ geo: paneBox(0.06, 1.05, 0.7, x, y, 0, seed), at: [side * (w + GLASS + 0.52), y, 0], glass: [x, y, 0], pane: seed });
-      else panes.push(box(0.06, 1.05, 0.7, x, y, 0, PANE));
+      else {
+        panes.push(box(0.06, 1.05, 0.7, x, y, 0, PANE));
+        if (boarded && seed < boarded) frames.push(...boards(side * w, y, 0, side, true, scaleRgb(DOOR, 1.3)));
+      }
     }
   }
   return { frames, panes, glows };
 }
 
 /** A lower wing built onto a side of the house (round 35): its walls, its roof and gables, and its windows, all in the house's own frame. Its size is houseAddons' (round 110: the collider's). */
-function wing(part: NonNullable<HouseAddons['wing']>, tone: Rgb, rng: Rng): { walls: THREE.BufferGeometry; roof: THREE.BufferGeometry; gables: THREE.BufferGeometry; win: ReturnType<typeof windows> } {
+function wing(part: NonNullable<HouseAddons['wing']>, tone: Rgb, rng: Rng, look: HouseLook): { walls: THREE.BufferGeometry; roof: THREE.BufferGeometry; gables: THREE.BufferGeometry; win: ReturnType<typeof windows> } {
   const { side, ww, wwd, hw, at, z0 } = part; // (at: its middle, along x, sunk a little into the wall it joins; z0: flush with the back, so its front stands behind the house's)
   const topw = 0.4 + hw;
   const rh = wwd * 0.9;
@@ -178,68 +182,84 @@ function wing(part: NonNullable<HouseAddons['wing']>, tone: Rgb, rng: Rng): { wa
   r.roof.translate(at, 0, z0);
   r.gables.translate(at, 0, z0);
   tileUv(r.gables, 1, 1);
-  const win = windows(ww, wwd, hw, rng, 0.3, false, false, -side);
+  const win = windows(ww, wwd, hw, rng, look.lit, false, false, -side, look.boarded);
   for (const g of [...win.frames, ...win.panes, ...win.glows.map((l) => l.geo)]) g.translate(at, 0, z0);
   return { walls, roof: r.roof, gables: tint(r.gables, tone), win: { ...win, glows: win.glows.map((l) => ({ ...l, at: [l.at[0] + at, l.at[1], l.at[2] + z0], glass: [l.glass[0] + at, l.glass[1], l.glass[2] + z0] })) } };
 }
 
-/** A house's pieces. */
-export function housePieces(p: Prop, c: Rgb): SolidPiece[] {
+/** A house's pieces, in its realm's look (round 111: data/houseLooks.ts; with no region, round 35's). */
+export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const rng = createRng(p.seed);
+  const look = houseLookOf(region);
+  const extra = createRng(p.seed * 13 + 5); // what a realm adds draws from its own stream, so a house without it is as it was
   const style = p.style ?? 'clapboard';
   const { w, d } = p;
   const h = style === 'hovel' ? Math.min(p.h, 3.4) : style === 'brick' ? p.h + 1.5 : p.h;
   const [wx, wd] = style === 'hovel' ? [w * 0.75, d * 0.75] : [w, d];
   const top = 0.4 + h; // the eaves
   const tone0 = scaleRgb(mixRgb(BASE.bone, BASE.seaGrey, 0.25 + 0.35 * rng()), 1.25);
-  const tone = style === 'clapboard' || style === 'hovel' ? scaleRgb(mixRgb(pick(rng, PAINT), tone0, 0.35), 1.2) : tone0; // each house its own paint (round 35)
+  const tone = style === 'clapboard' || style === 'hovel' ? scaleRgb(mixRgb(pick(rng, look.paints), tone0, 0.35), 1.2) : tone0; // each house its own paint (round 35)
   const wallMat: PropMat = style === 'clapboard' ? 'clapboard' : style === 'brick' ? 'brick' : style === 'stone' ? 'stone' : 'wood';
-  const wallTint = style === 'brick' ? scaleRgb(pick(rng, BRICKS), 1.25) : style === 'stone' ? scaleRgb(c, 0.95 + 0.12 * (rng() - 0.5)) : tone;
+  const wallTint = style === 'brick' ? scaleRgb(pick(rng, look.bricks), 1.25) : style === 'stone' ? scaleRgb(c, 0.95 + 0.12 * (rng() - 0.5)) : tone;
   const walls = tileUv(box(wx * 2, h, wd * 2, 0, 0.4 + h / 2, 0, wallTint), wx * 2, h);
   const footing = tileUv(box(wx * 2 + 0.4, 0.7, wd * 2 + 0.4, 0, 0.05, 0, scaleRgb(c, 0.7)), wx * 2, 0.7);
 
-  const pitch = 0.78 + 0.45 * rng(); // steep and shallow roofs
+  const flat = style === 'stone' && !look.steep; // round 111: Ulthar's stone houses have steep slate roofs
+  const pitch = (style === 'stone' ? 1.25 : 0.78) + 0.45 * rng(); // steep and shallow roofs
   const rh = (style === 'brick' ? wd * 1.15 : style === 'hovel' ? wd * 0.6 : wd * 0.95) * pitch;
-  const over = 0.25 + 0.2 * rng();
+  const over = style === 'stone' ? 0.2 : 0.25 + 0.2 * rng();
   const form = rng();
   const profile: [number, number][] =
-    style === 'stone'
+    flat
       ? [[-wd - 0.05, top], [-wd + 0.01, top + 0.6], [wd - 0.01, top + 0.6], [wd + 0.05, top]]
-      : style === 'clapboard' && form < 0.45
+      : style === 'clapboard' && form < look.gambrel
         ? [[-wd - over, top - 0.2], [-wd * 0.62, top + rh * 0.78], [0, top + rh], [wd * 0.62, top + rh * 0.78], [wd + over, top - 0.2]] // a gambrel
-        : style !== 'hovel' && form > 0.8
+        : style !== 'hovel' && style !== 'stone' && form > 1 - look.saltbox
           ? [[-wd - over, top - 0.2], [-wd * 0.25, top + rh], [wd + over, top - 0.2]] // a saltbox: the ridge off the middle, one slope long and shallow
           : [[-wd - over, top - 0.2], [0, top + rh], [wd + over, top - 0.2]];
-  const sag = style === 'hovel' ? 0.25 : 0;
-  if (sag) profile[1][1] -= sag;
-  const { roof: roofGeo, gables } = roof(profile, wx, style === 'stone' ? 0 : over, top, wd);
-  const roofTint = style === 'stone' ? scaleRgb(c, 0.8) : scaleRgb(pick(rng, ROOFS), 1.15);
+  const ridge = profile.reduce((a, q) => (q[1] > a[1] ? q : a));
+  const sag = flat ? 0 : (style === 'hovel' ? 0.25 : 0) + look.sag;
+  if (sag) ridge[1] -= sag;
+  const { roof: roofGeo, gables } = roof(profile, wx, flat ? 0 : over, top, wd);
+  const roofTint = flat ? scaleRgb(c, 0.8) : scaleRgb(pick(rng, look.roofs), 1.15);
 
   const chimneys: THREE.BufferGeometry[] = [];
-  const stacks = style === 'brick' ? [-1, 1] : style === 'stone' ? [] : rng() < 0.2 ? [] : [rng() < 0.5 ? -1 : 1];
+  const stacks = style === 'brick' ? [-1, 1] : flat ? [] : rng() < 0.2 ? [] : [rng() < 0.5 ? -1 : 1];
   const smoke = stacks.map((s): [number, number, number] => [s * wx * 0.7, top + rh + 1.3, -wd * 0.2]); // the top of each stack
   for (const s of stacks) chimneys.push(tileUv(box(0.8, rh + 1.6, 0.8, s * wx * 0.7, top + (rh + 1.6) / 2 - 0.3, -wd * 0.2, scaleRgb(BASE.bone, 1.2)), 0.8, rh + 1.6));
 
-  const { frames, panes, glows } = windows(wx, wd, h, rng, 0.3, style === 'clapboard' && rng() < 0.6);
-  const doorC = pick(rng, DOORS);
+  // Round 111: what the realm adds, from its own draws: a turret at a gable end, a widow's walk or a cupola on the ridge. A turret stands on the
+  // side its house's wing is not on (round 110's wing is walled, so the two must not meet); the side is drawn either way, as it was.
+  const addons = houseAddons(p); // its wing, bay and porch, from their own stream: the very parts the colliders hold (round 110)
+  const turreted = style !== 'hovel' && !flat && extra() < look.turret;
+  const sideDraw: 1 | -1 | 0 = turreted ? (extra() < 0.5 ? -1 : 1) : 0;
+  const turretSide: 0 | 1 | -1 = turreted ? (addons.wing ? (-addons.wing.side as 1 | -1) : sideDraw) : 0;
+  const onRidge = style === 'hovel' || flat ? 0 : extra();
+  const adds: Extra[] = [];
+  if (turretSide) adds.push(turret(turretSide, wx, wd, top, wallTint, roofTint, PANE));
+  if (onRidge && onRidge < look.walk) adds.push(widowWalk(ridge[1], ridge[0], TRIM));
+  else if (onRidge && onRidge < look.walk + look.cupola) adds.push(cupola(ridge[1], ridge[0], wallTint, roofTint, TRIM, PANE));
+  const add = adds.reduce((a, b) => ({ wall: [...a.wall, ...b.wall], roof: [...a.roof, ...b.roof], trim: [...a.trim, ...b.trim] }), noExtra());
+
+  const { frames, panes, glows } = windows(wx, wd, h, rng, look.lit, style === 'clapboard' && rng() < look.shutters, true, turretSide, look.boarded);
+  const doorC = pick(rng, look.doors);
   const door = [box(1.1, 2.1, 0.1, 0, 0.4 + 1.05, wd + 0.05, doorC), box(1.3, 0.12, 0.12, 0, 0.4 + 2.15, wd + 0.06, TRIM)];
   const step = box(1.8, 0.25, 1.1, 0, 0.125, wd + 0.35, scaleRgb(c, 0.75)); // its back face inside the footing, not within a hand of its front (round 35: the audit); its top 15 cm under the footing's, not 10 (round 110: the ray audit's fight on seeds 1 and 3)
-  const addons = houseAddons(p); // its wing, bay and porch, from their own stream: the very parts the colliders hold (round 110)
   if (addons.porch) {
     door.push(box(2.6, 0.12, 1.6, 0, 0.4 + 2.7, wd + 0.8, DOOR));
     for (const s of [-1, 1]) door.push(box(0.14, 2.7, 0.14, s * 1.15, 0.4 + 1.35, wd + 1.5, TRIM));
   }
 
-  const body = [walls];
-  if (style !== 'stone') { // a soffit under each eave, from the wall out to the roof's edge: a roof that rises steeply over its overhang stood well above the wall's top and left a slit between them, open to the sky (found by the view audit on seeds it had not been run on)
+  const body = [walls, ...add.wall];
+  if (!flat) { // a soffit under each eave, from the wall out to the roof's edge: a roof that rises steeply over its overhang stood well above the wall's top and left a slit between them, open to the sky (found by the view audit on seeds it had not been run on)
     for (const side of [-1, 1]) body.push(tileUv(box((wx + over) * 2, 0.04, over + 0.2, 0, top - 0.22, side * (wd + (over - 0.2) / 2), wallTint), 2, 1));
   }
-  const roofs = [roofGeo];
+  const roofs = [roofGeo, ...add.roof.map((g) => (g.deleteAttribute('color'), g))]; // tinted with the roof below
   const gabs = [tint(tileUv(gables, 1, 1), wallTint)];
-  const extras: THREE.BufferGeometry[] = [...frames, ...panes, ...door];
+  const extras: THREE.BufferGeometry[] = [...frames, ...panes, ...door, ...add.trim];
   const glowing = [...glows];
-  if (addons.wing) { // a wing built on, lower, with its own roof
-    const wg = wing(addons.wing, wallTint, addons.rng);
+  if (addons.wing) { // a wing built on, lower, with its own roof (round 110: the collider's; a turret stands on the other side)
+    const wg = wing(addons.wing, wallTint, addons.rng, look);
     body.push(wg.walls);
     roofs.push(wg.roof);
     gabs.push(wg.gables);
@@ -251,21 +271,22 @@ export function housePieces(p: Prop, c: Rgb): SolidPiece[] {
     body.push(tileUv(box(1.9, 1.7, 0.7, bx, by + 0.15, wd + 0.3, wallTint), 1.9, 1.7));
     extras.push(box(2.1, 0.1, 0.9, bx, by + 1.05, wd + 0.35, TRIM), box(2.1, 0.1, 0.9, bx, by - 0.7, wd + 0.35, TRIM)); // its roof and sill
     const seed = seedOf(bx, by, wd, wx, wd);
-    if (addons.rng() < 0.35) glowing.push({ geo: paneBox(1.3, 1.0, 0.06, bx, by + 0.15, wd + 0.67, seed), at: [bx, by + 0.15, wd + 1.19], glass: [bx, by + 0.15, wd + 0.67], pane: seed });
+    if (rng() < look.lit + 0.05) glowing.push({ geo: paneBox(1.3, 1.0, 0.06, bx, by + 0.15, wd + 0.67, seed), at: [bx, by + 0.15, wd + 1.19], glass: [bx, by + 0.15, wd + 0.67], pane: seed });
     else extras.push(box(1.3, 1.0, 0.06, bx, by + 0.15, wd + 0.67, PANE));
   }
-  if (style !== 'stone') for (const side of [-1, 1]) { // a small window in each gable, up under the ridge
+  if (!flat) for (const side of [-1, 1]) { // a small window in each gable, up under the ridge
+    if (side === turretSide) continue; // behind the turret
     const y = top + rh * 0.3;
     for (const k of [-1, 1]) extras.push(box(0.12, 0.1, 0.76, side * (wx + 0.05), y + k * 0.33, 0, TRIM), box(0.12, 0.56, 0.1, side * (wx + 0.05), y, k * 0.33, TRIM)); // its frame: four bars about the glass, none over it (the depth fight audit)
     const seed = seedOf(side * wx, y, 0, wx, wd);
     const gx = side * (wx + GLASS + 0.04);
-    if (rng() < 0.3) glowing.push({ geo: paneBox(0.06, 0.56, 0.56, gx, y, 0, seed), at: [gx + side * 0.52, y, 0], glass: [gx, y, 0], pane: seed });
+    if (rng() < look.lit) glowing.push({ geo: paneBox(0.06, 0.56, 0.56, gx, y, 0, seed), at: [gx + side * 0.52, y, 0], glass: [gx, y, 0], pane: seed });
     else extras.push(box(0.06, 0.56, 0.56, gx, y, 0, PANE));
   }
   const pieces: SolidPiece[] = [
     { mat: wallMat, geo: mergeGeometries([...body, ...gabs]) },
     { mat: 'stone', geo: mergeGeometries([footing, tileUv(step, 1, 1)]) },
-    { mat: style === 'stone' ? 'stone' : 'shingle', geo: tint(mergeGeometries(roofs), roofTint) },
+    { mat: flat ? 'stone' : 'shingle', geo: tint(mergeGeometries(roofs), roofTint) },
     { mat: 'trim', geo: tileUv(mergeGeometries(extras), 1, 1) }, // relief on the walls, drawn nearer than they are (round 21)
   ];
   if (chimneys.length) pieces.push({ mat: 'brick', geo: mergeGeometries(chimneys), smoke });

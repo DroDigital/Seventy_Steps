@@ -180,7 +180,7 @@ describe("the world's lights (render/worldLights.ts)", () => {
 describe('what reports a light', () => {
   it('a street lamp shines from its glass, a fire pit above its embers, a lit window half a metre out in front of it', () => {
     const house = (seed: number): Prop => ({ kind: 'house', x: 20, y: 0.5, z: 18, w: 4, d: 3.5, h: 6, yaw: 1.1, seed });
-    const home = house([...Array(50).keys()].find((s) => housePieces(house(s), [1, 1, 1]).filter((p) => p.light).length >= 2)!);
+    const home = house([...Array(50).keys()].find((s) => housePieces(house(s), [1, 1, 1], REGIONS[0].id).filter((p) => p.light).length >= 2)!); // in the region's look, as propJob builds it (round 111)
     const lamp: Prop = { kind: 'lamp', x: 10, y: 2, z: -5, w: 0.1, d: 0, h: 3.2, yaw: 0.7, seed: 1 };
     const pit: Prop = { kind: 'firepit', x: -4, y: 1, z: 3, w: 0.8, d: 0, h: 0.5, yaw: 0.3, seed: 2 };
     let spots: LightSpot[] = [];
@@ -191,7 +191,7 @@ describe('what reports a light', () => {
     expect(spots[1].kind).toBe('fire');
     expect(where(spots[1])).toEqual([-4, 1.45, 3]);
     const windows = spots.slice(2);
-    const glass = housePieces(home, [1, 1, 1])
+    const glass = housePieces(home, [1, 1, 1], REGIONS[0].id)
       .filter((p) => p.light === 'window')
       .map((p) => centre(p.geo.rotateY(home.yaw).translate(home.x, home.y - 0.15, home.z)));
     expect(windows.length).toBe(glass.length);

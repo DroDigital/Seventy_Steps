@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { HOUSE_LOOKS } from '../src/data/houseLooks';
 import { housePieces } from '../src/render/houseMesh';
 import { elderSignGeometry, shrineGeometry } from '../src/render/signMeshes';
 import { pit, well } from '../src/render/siteMeshes';
@@ -34,8 +35,10 @@ describe('no face lies over another within a hair of it (round 19)', () => {
   it("a lit window's glass: nothing before it or behind it over its pane nearer than 5 cm, facing out as it does", () => {
     const house = (seed: number): Prop => ({ kind: 'house', x: 0, y: 0, z: 0, w: 4.2, d: 3.6, h: 6, yaw: 0, seed, style: seed % 2 ? 'clapboard' : 'brick' });
     let checked = 0;
-    for (let seed = 0; seed < 12; seed++) {
-      const pieces = housePieces(house(seed), [1, 1, 1]);
+    for (let k = 0; k < 12 * 8; k++) {
+      const seed = k % 12;
+      const region = [undefined, ...Object.keys(HOUSE_LOOKS)][Math.floor(k / 12)]; // and in each realm's look (round 111)
+      const pieces = housePieces(house(seed), [1, 1, 1], region);
       const others = pieces.filter((p) => p.mat !== 'pane').flatMap((p) => triangles(p.geo));
       for (const glass of pieces.filter((p) => p.mat === 'pane')) {
         const box = new THREE.Box3().setFromBufferAttribute(glass.geo.getAttribute('position') as THREE.BufferAttribute);
