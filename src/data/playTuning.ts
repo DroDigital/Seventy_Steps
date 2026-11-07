@@ -89,6 +89,7 @@ export const SETTINGS = {
   rumble: [0, 1, 0.25, 1], // the controller's rumble (2026-11-03: render/rumbleFx.ts); 0: the motors are never driven
   captions: [0.8, 1.6, 0.1, 1], // the size of what is said aloud and shown: cutscene lines, a talk, what is overheard (round 47)
   captionBack: [0, 1, 1, 0], // 1: a dark band behind them
+  gore: [0, 1, 1, 1], // 0: no blade cuts a creature apart and nothing bleeds (round 113: render/gore.ts, render/blood.ts); a creature dies as it did before
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)

@@ -12,6 +12,7 @@ import type { EntityDef } from '../data/schema';
 import { SIM } from '../data/tuning';
 import type { Game } from '../systems/components';
 import type { Look } from './creatureLook';
+import type { CutPlan } from './goreCut';
 import { woundPoint } from './wound';
 
 const LANDS = new Set(['hit', 'stagger', 'riposte', 'kill', 'guardBreak']);
@@ -34,15 +35,26 @@ export interface CreatureFx {
   wear(id: Entity): number;
   /** Where the last blow fell on a picture `width` by `height` metres standing at (x, y, z), `across` the camera's right: [across, up, flash left, metres it reaches], or null when none is fresh. */
   wound(id: Entity, x: number, y: number, z: number, width: number, height: number, across: { x: number; z: number }, time: number): readonly [number, number, number, number] | null;
-  /** Tells the shader, of billboard `index` of `b`, how far gone `dress.id`'s picture is, how worn, and where the last blow fell (`baseY` its feet, `across` the camera's right); a billboard with no `dress` is whole. */
-  dress(b: Batch, index: number, dress: { id: Entity; gone: Gone } | undefined, x: number, baseY: number, z: number, width: number, height: number, across: { x: number; z: number }, time: number): void;
+  /** Tells the shader, of billboard `index` of `b`, how far gone `dress.id`'s picture is, how worn, and where the last blow fell (`baseY` its feet, `across` the camera's right), and of a killing cut (round 113: `dress.cut`) which side of it this billboard is; a billboard with no `dress` is whole. */
+  dress(b: Batch, index: number, dress: { id: Entity; gone: Gone; cut?: Cut } | undefined, x: number, baseY: number, z: number, width: number, height: number, across: { x: number; z: number }, time: number): void;
   forget(live: ReadonlySet<Entity>): void;
 }
 
 interface Batch {
   fx: THREE.InstancedBufferAttribute;
   wound: THREE.InstancedBufferAttribute;
+  cut: THREE.InstancedBufferAttribute;
+  piece: THREE.InstancedBufferAttribute;
 }
+
+/** A killing cut as a billboard is told it (render/gore.ts): `side` +1 the body, -1 the piece; `blood` its index (shaders/spriteFx.ts). */
+export interface Cut {
+  plan?: CutPlan;
+  side: 1 | -1;
+  turn: number;
+  blood: number;
+}
+const CUT_KIND = { sever: 1, split: 2, chip: 3 } as const;
 
 export function createCreatureFx(g: Game): CreatureFx {
   const wounds = new Map<Entity, { x: number; y: number; z: number; at: number }>();
@@ -106,6 +118,15 @@ export function createCreatureFx(g: Game): CreatureFx {
       return woundOut;
     },
     dress(b, index, dress, x, baseY, z, width, height, across, time) {
+      const cut = dress?.cut;
+      const plan = cut?.plan;
+      if (plan) {
+        b.cut.setXYZW(index, plan.point[0], plan.point[1], cut.side * CUT_KIND[plan.kind], plan.angle);
+        b.piece.setXYZW(index, plan.middle[0], plan.middle[1], cut.turn, cut.blood);
+      } else {
+        b.cut.setXYZW(index, 0, 0, 0, 0);
+        b.piece.setXYZW(index, 0, 0, 0, cut?.blood ?? 0);
+      }
       if (!dress) {
         b.fx.setXYZW(index, 0, 0, 0, 0);
         b.wound.setXYZW(index, 0, 0, 0, 0);

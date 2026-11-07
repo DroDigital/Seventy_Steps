@@ -13,6 +13,7 @@
 import { VOID_GLSL } from './eldritch';
 import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL } from './common';
 import { SHADOW_GLSL } from './shadow';
+import { GORE_FX } from '../../data/gore';
 import { SPRITE_FX_GLSL } from './spriteFx';
 import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
@@ -24,12 +25,13 @@ uniform float uFogFar;
 uniform vec3 uLightDir; // toward the moon
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
-attribute vec4 aInfo; // flash, opacity, flip, outside the palette
+attribute vec4 aInfo; // flash, opacity, flip, outside the palette (1) + a horror's form, whose body the Relight setting lights over its folds (2) (render/creatureRelight.ts)
 attribute float aWeird; // 0..1: how far it refuses to hold its shape (eldritch.ts)
 attribute vec4 aFx; // how far gone, in what style, how worn, a seed (spriteFx.ts)
 attribute vec4 aWound; // where the last blow fell, its flash, its reach
 attribute vec4 aGlint; // the colour of the marks of this form that keep their light in the dark, and how far
-attribute float aRelit; // 1: a horror's form, whose body the Relight setting lights over its folds (render/creatureRelight.ts)
+attribute vec4 aCut; // a killing cut's line in the frame, and which side of it this billboard is (spriteFx.ts; round 113)
+attribute vec4 aPiece; // a severed piece's middle in the frame and how far it has turned, and the blood
 attribute vec4 aTone; // the form's recolour to the realm it stands in: a turn of hue (cos, sin), a lift of colour, a cast for a grey (render/spriteTone.ts)
 
 varying vec2 vUv;
@@ -49,12 +51,23 @@ varying vec4 vTone;
 varying float vRelit;
 varying vec2 vQuad;
 varying vec2 vSize;
+varying vec4 vCut;
+varying float vBlood;
 ${LANTERN_GLSL}
 ${SHADOW_GLSL}
 void main() {
   vec3 origin = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
   float w = length(instanceMatrix[0].xyz);
   float h = length(instanceMatrix[1].xyz);
+  vec2 q = uv; // where on the body's picture this corner is, as the screen sees it
+  vec2 body = vec2(w, h);
+  if (aCut.z < -0.5) { // a severed piece (round 113): its billboard is larger about the piece, which turns in it as it flies
+    body /= ${GORE_FX.pad.toFixed(3)};
+    vec2 m = (uv - 0.5) * vec2(w, h);
+    float c = cos(aPiece.z), s = sin(aPiece.z);
+    m = vec2(c * m.x + s * m.y, -s * m.x + c * m.y);
+    q = vec2(aInfo.z > 0.5 ? 1.0 - aPiece.x : aPiece.x, 1.0 - aPiece.y) + m / body;
+  }
   vec3 right = normalize(vec3(viewMatrix[0][0], 0.0, viewMatrix[2][0]));
   vec3 wp = origin + right * position.x * w + vec3(0.0, position.y * h, 0.0);
   vec4 vp = viewMatrix * vec4(wp, 1.0);
@@ -65,8 +78,8 @@ void main() {
     clip.xy += floor(foot.xy / foot.w * grid + 0.5) / grid * foot.w - foot.xy;
   }
   gl_Position = clip;
-  float u = aInfo.z > 0.5 ? 1.0 - uv.x : uv.x;
-  vUv = vec2(mix(aCell.x, aCell.z, u), mix(aCell.y, aCell.w, 1.0 - uv.y));
+  float u = aInfo.z > 0.5 ? 1.0 - q.x : q.x;
+  vUv = vec2(mix(aCell.x, aCell.z, u), mix(aCell.y, aCell.w, 1.0 - q.y));
   vec2 toMoon = uLightDir.xz;
   toMoon = length(toMoon) > 1e-3 ? normalize(toMoon) : vec2(1.0, 0.0);
   float moon = mix(1.0, moonLit(origin + vec3(toMoon.x, 0.0, toMoon.y) * (0.32 * w + 0.3) + vec3(0.0, 0.8, 0.0), vec3(0.0, 1.0, 0.0), 1.0), uShadow.x); // what stands between it and the moon (round 34), at a point beside the creature's middle, toward it along the ground (a high moon would lead a point drawn straight at it back inside the body): its own shadow's cut-out (render/silhouetteCasters.ts) stands across the light from the body, away from the moon, so it is never in the way of the middle itself
@@ -77,16 +90,18 @@ void main() {
   vDist = -vp.z;
   vFlash = aInfo.x;
   vOpacity = aInfo.y;
-  vOutside = aInfo.w;
+  vOutside = mod(aInfo.w, 2.0);
+  vRelit = floor(aInfo.w / 2.0 + 0.01);
   vWeird = aWeird;
   vCell = aCell;
   vFx = aFx;
   vWound = aWound;
   vGlint = aGlint;
-  vRelit = aRelit;
+  vCut = aCut;
+  vBlood = aPiece.w;
   vTone = aTone.z > 0.01 ? aTone : vec4(1.0, 0.0, 1.0, 0.0); // (a form with none is drawn as it is)
-  vQuad = uv;
-  vSize = vec2(w, h);
+  vQuad = q;
+  vSize = body;
 }
 `;
 
@@ -231,6 +246,7 @@ void main() {
     float lit = 1.0 - smoothstep(0.012, 0.05, distance(t.rgb, vGlint.rgb));
     col = mix(col, t.rgb * (1.0 + 0.25 * vGlint.w), lit * (1.0 - smoothstep(uEyeRange.x, uEyeRange.y, vDist)));
   }
+  if (!fxCut(src.xy, col)) discard; // the side of a killing cut that is not this billboard's (round 113)
   if (!fxKeep(src.xy, col)) discard; // and the texels that are gone, with their rim
   float fog = vFog * uFogAmount;
   if (vOutside > 0.5) {

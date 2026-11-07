@@ -87,6 +87,7 @@ export const EN = {
   'set.captions': 'Caption size',
   'set.captionBack': 'Caption backdrop',
   'set.flashes': 'Flashes',
+  'set.gore': 'Gore',
   'set.padSwap': 'Swap A / B',
   'set.volume': 'Volume',
   'set.music': 'Music',
@@ -125,6 +126,7 @@ export const EN = {
   'set.hint.captions': 'The size of the words said aloud: cutscene lines, a talk, what is overheard.',
   'set.hint.captionBack': 'A dark band behind those words, to read them against a bright picture.',
   'set.hint.flashes': 'How bright lightning strikes. Lowered, its quick flicker softens into one slow swell.',
+  'set.hint.gore': 'A blade’s killing cut parts a creature as its body is made, and what bleeds bleeds and pools. Off: they fall and fade as before.',
   'set.hint.language': 'The language of menus, hints and notices. The story’s words and the voices are English for now.',
   // controls
   'ctl.forward': 'Move forward',
