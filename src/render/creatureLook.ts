@@ -30,8 +30,8 @@ export const echoOpacity = (ghost: number, gone: number): number => (1 - ghost) 
 /** Where in its cycle each creature is, in seconds (round 83): a pack's breathing and walking were all one clock, so every Deep One stepped together. Golden-ratio steps of the entity id spread them evenly over the longest cycle (2.5 s), the same for all four views of one creature. */
 export const phaseOf = (id: Entity): number => ((id * 0.6180339887) % 1) * 2.5;
 
-/** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose). */
-export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number, arrive?: Arrival): Look | null {
+/** Which frame of which state a creature shows, from its move and speed; `counts` the frames of each state it has (a colossus's `stoop` only if it has the art), `stoopAge` the seconds since its stoop began, `riseAge` since it ended (while it comes up through its in-between pose), `walked` how many walk cycles the ground it has covered makes (render/walkCycle.ts; absent: the clock's). */
+export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record<SpriteAction, number>> = {}, stoopAge = 0, riseAge?: number, arrive?: Arrival, walked?: number): Look | null {
   const c = g.ecs.c;
   const br = c.brain.get(id);
   if (isAbsent(g, id) || br?.state === 'hidden' || isUnseen(g, id)) return null;
@@ -60,8 +60,9 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
   } else {
     const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz > 0.3;
     // a creature with its own flight cycle flies it (the Shantak's wing-beat, round 48); the others walk or stand as before
+    // (round 113: a walk steps by `walked`, the cycles its ground covered makes, so its feet keep to the ground and do not slide)
     if (moving && counts.flight) look = { state: 'flight', frame: loopFrame(time, counts.flight, 1), opacity: 1, sink: 0, lash: 0 };
-    else look = moving ? { state: 'move', frame: loopFrame(time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
+    else look = moving ? { state: 'move', frame: loopFrame(walked ?? time, counts.move ?? 2), opacity: 1, sink: 0, lash: 0 } : { state: 'idle', frame: loopFrame(time, counts.idle ?? 2, 1.25), opacity: 1, sink: 0, lash: 0 };
   }
   if (invisible && look.state !== 'attack' && look.state !== 'hurt') look.opacity = Math.min(look.opacity, 0.2); // a shimmer in the air: unseen it was not (round 45), but it can be caught moving
   if (arrive && arrive.appear < 1) [look.appear, look.sink] = [arrive.appear, Math.max(look.sink, arrive.sink)]; // a horror just roused comes into view, the great ones up out of the ground

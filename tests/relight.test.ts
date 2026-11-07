@@ -30,7 +30,7 @@ describe('the Relight setting', () => {
   });
 
   it('is in the sprite shader, guarded by the form\'s flag and the setting', () => {
-    expect(SPRITE_VERT).toContain('attribute float aRelit');
+    expect(SPRITE_VERT).toContain('vRelit = floor(aInfo.w / 2.0 + 0.01)'); // (round 113: the form's flag rides with the outside mark in aInfo.w, freeing an attribute)
     expect(SPRITE_FRAG).toContain('uniform float uRelight');
     expect(SPRITE_FRAG).toMatch(/vRelit > 0\.5 && uRelight > 0\.0/);
     expect(SPRITE_FRAG).toContain('uniform vec3 uLightDir'); // (the moon's direction is read here, not only by the vertex stage)

@@ -2,7 +2,7 @@
  * The moon's shadows (round 34): trees, houses, stones and everyone who walks cast the shadow the moon
  * gives them, on the ground, on walls and on one another, as far as the lantern's neighbourhood. One
  * depth map is drawn from the moon over the investigator each frame, of whatever stands on the CASTER
- * layer (terrain does not: it only receives); the world shader (shaders/shadow.ts) takes the moon's
+ * layer (terrain does not: it only receives; round 113: and a coarser far map past it, createFarShadow); the world shader (shaders/shadow.ts) takes the moon's
  * share of the light from what lies behind something in it. Under a roof, in a dungeon, or with the
  * setting off, nothing is drawn and the shader skips it. Render only.
  */
@@ -106,6 +106,8 @@ export function createMoonShadow(): MoonShadow {
   u.uShadow.value.set(0, 1 / size, SHADOW.bias / (depth - 1), SHADOW.offset);
   const [focus, toMoon, aim] = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
   const texel = (2 * range) / size;
+  const far = createFarShadow();
+  let lit = false; // drawn last frame (a map taken up again is drawn whole at once)
   const shadow: MoonShadow = {
     focus,
     enabled: false,
@@ -113,6 +115,8 @@ export function createMoonShadow(): MoonShadow {
       toMoon.copy(u.uLightDir.value).normalize();
       const on = shadow.enabled && toMoon.y > LOW;
       u.uShadow.value.x = on ? SHADOW.strength : 0;
+      const wasOn = lit;
+      lit = on;
       if (!on) return;
       const f = moonFrame(toMoon, focus, texel, depth);
       camera.position.copy(f.position);
@@ -126,8 +130,43 @@ export function createMoonShadow(): MoonShadow {
       renderer.render(scene, camera);
       scene.overrideMaterial = material;
       castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 94: the foes' own shapes, across the moon)
+      far(renderer, scene, toMoon, focus, !wasOn);
       renderer.setRenderTarget(was);
     },
   };
   return shadow;
+}
+
+/**
+ * The far map (round 113): the near one fades out about 30 m off, past which the moon cast no shadow at all, so a hill, a house or a
+ * wood across the field stood lit on its dark side. A coarser map over a wider ground is drawn every few frames (its matrix kept with
+ * it, so a map a frame or two old is still true of the ground) and read where the near one gives out. No creature casts into it.
+ */
+function createFarShadow(): (renderer: THREE.WebGLRenderer, scene: THREE.Scene, toMoon: THREE.Vector3, focus: THREE.Vector3, fresh: boolean) => void {
+  const { size, range, depth, every, bias, offset } = SHADOW.far;
+  const depthTexture = new THREE.DepthTexture(size, size);
+  const target = new THREE.WebGLRenderTarget(size, size, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, generateMipmaps: false, depthBuffer: true, depthTexture });
+  const camera = new THREE.OrthographicCamera(-range, range, range, -range, 1, depth);
+  camera.layers.set(CASTER);
+  const u = worldUniforms;
+  u.uShadowFarMap.value = depthTexture;
+  u.uShadowFar.value.set(0, 1 / size, bias / (depth - 1), offset);
+  const aim = new THREE.Vector3();
+  const texel = (2 * range) / size;
+  let frame = 0;
+  return (renderer, scene, toMoon, focus, fresh) => {
+    if (!fresh && ++frame % every !== 0) return;
+    const f = moonFrame(toMoon, focus, texel, depth);
+    camera.position.copy(f.position);
+    camera.up.copy(f.up);
+    camera.lookAt(aim.copy(f.position).sub(toMoon));
+    camera.updateMatrixWorld(true);
+    u.uShadowFarMat.value.multiplyMatrices(TO_UNIT, camera.projectionMatrix).multiply(camera.matrixWorldInverse);
+    const material = scene.overrideMaterial;
+    scene.overrideMaterial = DEPTH_ONLY;
+    renderer.setRenderTarget(target);
+    renderer.render(scene, camera);
+    scene.overrideMaterial = material;
+    u.uShadowFar.value.x = 1;
+  };
 }

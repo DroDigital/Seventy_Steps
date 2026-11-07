@@ -32,7 +32,7 @@ describe('the silhouette casters', () => {
     casters.scene.children.forEach((c, i) => {
       const mesh = c as THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(mesh.instanceMatrix).toBe(source[i].instanceMatrix);
-      for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx']) expect(mesh.geometry.getAttribute(name), name).toBe(source[i].geometry.getAttribute(name));
+      for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWound', 'aFx', 'aCut']) expect(mesh.geometry.getAttribute(name), name).toBe(source[i].geometry.getAttribute(name));
       expect(mesh.geometry.getIndex()).toBe(source[i].geometry.getIndex());
       expect(mesh.geometry.getAttribute('aCast').itemSize).toBe(4);
       expect(mesh.material.side).toBe(THREE.DoubleSide);
@@ -59,7 +59,7 @@ describe('the silhouette casters', () => {
     geo.addEventListener('dispose', () => held.push({ attributes: Object.keys(geo.attributes), index: geo.getIndex() !== null }));
     casters.adopt(batches());
     expect(held).toEqual([{ attributes: ['aCast'], index: false }]); // (a geometry's disposal frees every buffer it holds)
-    for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx']) expect(source[0].geometry.getAttribute(name), name).toBeDefined();
+    for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWound', 'aFx', 'aCut']) expect(source[0].geometry.getAttribute(name), name).toBeDefined();
     expect(source[0].geometry.getIndex()).not.toBeNull();
   });
 
@@ -188,7 +188,7 @@ describe('the shadow passes', () => {
     moon.enabled = true;
     worldUniforms.uLightDir.value.set(0.3, 0.8, 0.2).normalize();
     moon.render(renderer, new THREE.Scene());
-    expect(calls()).toEqual(['solids', 'foes']);
+    expect(calls()).toEqual(['solids', 'foes', 'solids']); // (round 113: then the far map's solids, none of the foes)
     intoTheMap(log);
     const to = worldUniforms.uLightDir.value.clone().normalize();
     expect(log[1].light.map((n) => +n.toFixed(5))).toEqual([to.x, to.y, to.z, 0].map((n) => +n.toFixed(5))); // toward the moon, not a place

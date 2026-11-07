@@ -14,6 +14,7 @@ import { markAtlasTexture } from './markAtlas';
 import type { Rgb } from './palette';
 import { particleMasksGlsl, shapeDefines } from './shaders/particleMasks';
 import { LANTERN_GLSL } from './shaders/world';
+import { SOFT_GLSL } from './softParticles';
 import { worldUniforms } from './worldMaterial';
 
 export const CAPACITY = 4096; // (round 60: 2400, and a colossus's burst in a crowd took the oldest away mid-flight)
@@ -61,6 +62,8 @@ export interface Particles {
   update(time: number, camera: THREE.Camera): void;
   /** The ground's height at x, z (the world's, main.ts): where what falls from a blow comes to rest, though the blow land on a body or a wall. */
   ground?(x: number, z: number): number;
+  /** The one batch they are drawn in (round 113: drawn after the world, softened where they meet it: render/softParticles.ts). */
+  mesh?: THREE.Mesh;
 }
 
 const VERT = /* glsl */ `
@@ -78,6 +81,7 @@ attribute vec3 aVel; // the flight, for a streak
 varying vec2 vUv;
 varying vec4 vColor;
 varying vec3 vLight;
+varying float vDepth; // metres from the lens (round 113)
 varying float vFog;
 varying vec2 vShape;
 ${LANTERN_GLSL}
@@ -114,6 +118,7 @@ void main() {
   vShape = vec2(aShape.x, aShape.w);
   vLight = aGlow > 0.5 ? vec3(1.0) : uAmbient + (uLightColor + uLanternColor * lanternAt(uLanternPos - wp)) * 0.8;
   vFog = clamp((-vp.z - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
+  vDepth = -vp.z;
 }
 `;
 
@@ -123,9 +128,12 @@ uniform float uFogAmount;
 varying vec2 vUv;
 varying vec4 vColor;
 varying vec3 vLight;
+varying float vDepth; // metres from the lens (round 113)
 varying float vFog;
 varying vec2 vShape;
 ${particleMasksGlsl(PARTICLE_SHAPES)}
+#include <packing>
+${SOFT_GLSL}
 float bayer4(vec2 p) {
   const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
   ivec2 q = ivec2(mod(p, 4.0));
@@ -133,7 +141,7 @@ float bayer4(vec2 p) {
 }
 void main() {
   vec2 q = (vUv - 0.5) * 2.0;
-  float a = vColor.a * mask(q, int(vShape.x + 0.5), vShape.y);
+  float a = vColor.a * mask(q, int(vShape.x + 0.5), vShape.y) * softShare(vDepth); // (round 113: thinning out where it meets the ground or a wall)
   if (a < bayer4(gl_FragCoord.xy)) discard;
   gl_FragColor = vec4(mix(vColor.rgb * vLight, uFogColor, vFog * uFogAmount), 1.0);
 }
@@ -171,7 +179,7 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
   geo.setAttribute('aGlow', glows);
   geo.setAttribute('aShape', shapes);
   geo.setAttribute('aVel', vels);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() }, uMarks: { value: markAtlasTexture() } }, vertexShader: VERT, fragmentShader: FRAG });
+  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() }, uMarks: { value: markAtlasTexture() }, uSoftDepth: { value: null }, uSoft: { value: 0 } }, vertexShader: VERT, fragmentShader: FRAG });
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;
@@ -183,6 +191,7 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
 
   return {
     ground,
+    mesh: batch,
     spawn(p) {
       if (live.length >= CAPACITY) live.shift();
       const { shape, colorEnd, colorMid, ...rest } = p;

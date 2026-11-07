@@ -7,22 +7,67 @@
  *   aFx    x how far gone (0 whole .. 1 gone), y the style (1 crumble, 2 burn, 3 melt, 4 shatter, 5 rise),
  *          z how much of its health it has lost, w a seed of its own
  *   aWound x, y where the last blow fell on the picture (0..1 across, 0..1 up), z its flash left, w the metres it reaches
+ *   aCut   (round 113, render/goreCut.ts) a killing cut: x, y a point of its line in the frame (y down), z what this billboard is
+ *          (0 whole; +k the body, kept on the near side of the line; -k the severed piece, kept beyond it; k: 1 sever, 2 split,
+ *          3 chip), w the angle of the line's normal, toward the piece
+ *   aPiece x, y the piece's middle in the frame, z how far it has turned (radians), w the blood (an index of BLOOD_ORDER, 0 none)
  * Needs `uAtlas`, `vCell` and the noise (shaders/common.ts) before it.
  */
+
+import { BLOOD, GORE_FX } from '../../data/gore';
+
+/** The bloods by the index the shader is told (aPiece.w): 0 is none. */
+export const BLOOD_ORDER = ['red', 'dark', 'ichor', 'black', 'pale', 'yellow', 'dust'] as const;
+const f = (n: number): string => n.toFixed(4);
+const rgb = (c: readonly number[]): string => `vec3(${c.map(f).join(', ')})`;
 
 export const SPRITE_FX_GLSL = /* glsl */ `
 varying vec4 vFx;
 varying vec4 vWound;
+varying vec4 vCut;
+varying float vBlood;
 varying vec2 vQuad; // across (0..1) and up (0..1) the billboard as the screen sees it, whichever way the picture is turned
 varying vec2 vSize; // metres
 
 /** The place in its frame: x across, y down (0 at the top). */
 vec2 fxCell(vec2 uv) { return (uv - vCell.xy) / (vCell.zw - vCell.xy); }
 
+/** The colour of the blood of index k (BLOOD_ORDER, from 1), and none (0) the ichor of before. */
+vec3 bloodColour(float k) {
+  if (k < 0.5) return vec3(0.04, 0.09, 0.07);
+${BLOOD_ORDER.map((b, i) => `  if (k < ${(i + 1.5).toFixed(1)}) return ${rgb(BLOOD[b])};`).join('\n')}
+  return vec3(0.04, 0.09, 0.07);
+}
+
+/** Whether the texel at uv is on this billboard's side of a killing cut; the edge of the cut lies wet (or dusty) in its blood. */
+bool fxCut(vec2 uv, inout vec3 col) {
+  float mode = vCut.z;
+  if (abs(mode) < 0.5) return true;
+  vec2 texels = (vCell.zw - vCell.xy) * vec2(textureSize(uAtlas, 0));
+  vec2 p = (floor(fxCell(uv) * texels) + 0.5) / texels; // by whole texels, so the edge is the art's own staircase
+  vec2 n = vec2(cos(vCut.w), sin(vCut.w));
+  float k = abs(mode);
+  float jag = k < 1.5 ? ${f(GORE_FX.jag.sever)} : k < 2.5 ? ${f(GORE_FX.jag.split)} : ${f(GORE_FX.jag.chip)};
+  float along = dot(vec2(-n.y, n.x), p) * (k < 1.5 ? 6.0 : 18.0);
+  float d = dot(n, p - vCut.xy) + jag * (vnoise(vec2(along, vFx.w * 7.0)) - 0.5) * 2.0;
+  if (mode > 0.0 ? d > 0.0 : d <= 0.0) return false;
+  float texel = 1.0 / max(texels.x, texels.y);
+  float rim = 1.0 - step(${f(GORE_FX.rim)} * texel, abs(d));
+  if (rim > 0.0 && vBlood > 0.5) {
+    vec3 b = bloodColour(vBlood);
+    float wet = vBlood < 6.5 ? 1.0 : 0.0;
+    col = mix(col, b * (0.7 + 0.5 * hash12(floor(p * texels) + 3.0)) + vec3(0.12) * wet * step(0.85, hash12(floor(p * texels))), 0.85);
+  }
+  return true;
+}
+
 /** The texel to show at uv while the body goes or forms: its place moved by the style; z is 0 where the frame holds nothing there. */
 vec3 fxSource(vec2 uv) {
   float s = vFx.x;
-  if (s <= 0.0) return vec3(uv, 1.0);
+  if (s <= 0.0) { // (a severed piece's billboard is padded past its frame: such a texel is the neighbour's, not its own, so it is dropped)
+    vec2 inCell = step(vCell.xy, uv) * step(uv, vCell.zw);
+    return vec3(uv, vCut.z < -0.5 ? inCell.x * inCell.y : 1.0);
+  }
   float st = vFx.y;
   vec2 p = fxCell(uv);
   float col = hash12(vec2(floor(uv.x * float(textureSize(uAtlas, 0).x)), 7.0 + vFx.w));
@@ -60,7 +105,7 @@ bool fxKeep(vec2 uv, inout vec3 col) {
   else if (st < 2.5) { // embers eat in from the edge, and the char runs ahead of them
     col = mix(col, col * vec3(0.3, 0.26, 0.26), ahead * 0.8);
     col = mix(col, vec3(1.0, 0.5, 0.12) * (0.8 + 0.5 * flick), rim);
-  } else if (st < 3.5) col = mix(col * (1.0 - 0.45 * s), vec3(0.04, 0.09, 0.07), rim * 0.8); // ichor
+  } else if (st < 3.5) col = mix(col * (1.0 - 0.45 * s), bloodColour(vBlood), rim * 0.8); // ichor, or the body's own blood (round 113)
   else if (st < 4.5) col = mix(col, vec3(0.78, 0.86, 1.0) * (0.7 + 0.5 * flick), rim); // starlight
   else col = mix(col, vec3(0.7, 0.76, 0.85), rim * 0.5); // the first of it to be there
   return true;
