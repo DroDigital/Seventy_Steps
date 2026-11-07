@@ -21,12 +21,13 @@ import { occupancy, type Occupancy } from './occupancy';
 import { colliderBounds, type Collider } from './colliders';
 import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
-import { planSpawns } from './planSpawns';
+import { planSpawns, settleSpawns } from './planSpawns';
+import { sealWings } from './sealWings';
 import { planPois, type PoiSite } from './poiPlan';
 import { planTraderLamps } from './traderPlan';
 import type { TraderSpot } from '../data/traders';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
-import { makeProp, propCollider, type Prop } from './props';
+import { makeProp, propColliders, type Prop } from './props';
 import { padDistance } from './sitePads';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
 import { chunkKey, chunkOf, DIRS, rectDistance, regionRect, toWorld, type Rect } from './worldMap';
@@ -202,6 +203,8 @@ function buildPlan(region: RegionDef): RegionPlan {
   const pois = planPois(region, features, props, spawns, undefined, open); // after everything, on streams of its own: nothing earlier moves
   props.push(...pois.props);
   spawns.push(...pois.spawns);
+  sealWings(props); // (round 110: a house's wing that shuts a yard in is taken off its house, before the foes are settled about the walls that stand)
+  settleSpawns(region, props, spawns); // (round 110: a foe in a wall, a house's wing among them, is moved out, or left out where no place is near)
   const traders = planTraderLamps(region, props, roadClear, (x, z, m) => offSites(x, z, m), spawns); // and the trader's lamps, the very last (2026-11-06)
   return bucket(layout, roads, features, props, spawns, ways, pois.sites, traders);
 }
@@ -266,10 +269,10 @@ function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props:
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
   for (const p of props) {
     add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);
-    const c = propCollider(p);
-    if (!c) continue;
-    const b = colliderBounds(c);
-    for (let cx = chunkOf(b.x0); cx <= chunkOf(b.x1); cx++) for (let cz = chunkOf(b.z0); cz <= chunkOf(b.z1); cz++) add(plan.colliders, chunkKey(cx, cz), c);
+    for (const c of propColliders(p)) { // (a house's wing, bay and porch posts too: round 110)
+      const b = colliderBounds(c);
+      for (let cx = chunkOf(b.x0); cx <= chunkOf(b.x1); cx++) for (let cz = chunkOf(b.z0); cz <= chunkOf(b.z1); cz++) add(plan.colliders, chunkKey(cx, cz), c);
+    }
   }
   for (const s of spawns) add(plan.spawns, chunkKey(chunkOf(s.at.x), chunkOf(s.at.z)), s);
   for (const r of roads) {

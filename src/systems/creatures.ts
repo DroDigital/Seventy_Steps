@@ -17,7 +17,8 @@ import { BOSS } from '../data/tuning';
 import { regionAt } from '../world/worldMap';
 import type { CombatantDef } from '../data/placeholders';
 import { getEntity, variantOf, type Variant } from '../data/registry';
-import type { AssemblyRecipe, AttackId, EntityDef, Silhouette } from '../data/schema';
+import type { AssemblyRecipe, AttackId, EntityDef } from '../data/schema';
+import { BODY, bodyOf } from '../data/bodies';
 import type { Dread, Game } from './components';
 import { phaseBrain } from './fightPhase';
 import { newFight } from './fightTypes';
@@ -28,42 +29,12 @@ import { foeBounty, foeHealth } from './cycles';
 import { bossRung, homeProfile } from './ngPlus';
 import { meet } from './bossScaling';
 
-/** Body height and capsule radius as fractions of the sprite's scale (a recipe's own `body` comes first: its art's). */
-const BODY: Record<Silhouette, readonly [height: number, radius: number]> = {
-  humanoid: [0.9, 0.18],
-  hunched: [0.85, 0.22],
-  robed: [0.9, 0.2],
-  quadruped: [0.55, 0.3],
-  serpent: [0.5, 0.25],
-  winged: [0.7, 0.25],
-  crustacean: [0.7, 0.28],
-  barrel: [0.85, 0.24],
-  cone: [0.95, 0.26],
-  blob: [0.7, 0.36],
-  orb: [0.7, 0.3],
-  swarm: [0.35, 0.4],
-  cephalopod: [0.95, 0.26],
-  giant: [0.95, 0.2],
-  toad: [0.6, 0.36],
-  spectre: [0.9, 0.22],
-};
-
-/** Capsule radius of an assembly as a fraction of its height (see render/assemblies.ts). */
-const ASSEMBLY_RADIUS = { lathe: 0.3, spheres: 0.38, mound: 0.5 } as const;
-
 export const MODEL_PREFIX = 'creature:';
 
 /** `creature:<id>` or `creature:<id>#<variant>`: what creatureViews draws. */
 export const creatureModel = (id: string, variant?: Variant): string => `${MODEL_PREFIX}${id}${variant ? `#${variant}` : ''}`;
 
-export function bodyOf(def: EntityDef): { height: number; radius: number } {
-  if (def.sprite) {
-    const [h, r] = def.sprite.body ?? BODY[def.sprite.silhouette];
-    return { height: def.sprite.scale * h, radius: Math.max(0.2, def.sprite.scale * r) };
-  }
-  const { scale, body } = def.assembly!;
-  return { height: scale, radius: scale * ASSEMBLY_RADIUS[body] }; // as wide as it looks: nothing walks inside a colossus
-}
+export { bodyOf }; // (its body's height and radius: data/bodies.ts, where the world's spawn places read it too)
 
 /** The height its blows are scaled by: its silhouette's, whatever capsule its art was fitted to (a `body` moves what is struck, not how far a blow reaches). */
 export function reachOf(def: EntityDef): number {
