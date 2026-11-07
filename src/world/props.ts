@@ -137,6 +137,13 @@ export function propWalls(p: Prop): Collider[] {
   }));
 }
 
+/** The colliders the world holds for a prop (round 112): a house's walls and its wing, bay and porch posts; any other prop its one collider, as before round 110 (a model's boxes are the planner's: `propColliders`). */
+export function worldColliders(p: Prop): Collider[] {
+  if (p.kind === 'house') return propColliders(p);
+  const c = propCollider(p);
+  return c ? [c] : [];
+}
+
 /** How far a prop's colliders reach from its centre (0 when it has none): half the box that holds them. */
 export function colliderReach(p: Prop): number {
   const cs = propColliders(p);

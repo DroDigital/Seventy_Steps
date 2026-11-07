@@ -11,7 +11,7 @@ import { GROUND_CONTACT as G } from '../data/fxTuning';
 import { WORLD } from '../data/tuning';
 import { chunkContent } from './chunks';
 import { toBoxFrame } from './colliders';
-import { propColliders, type Prop } from './props';
+import { worldColliders, type Prop } from './props';
 
 export interface Contact {
   x: number;
@@ -28,7 +28,7 @@ const reachOf = (size: number): number => Math.min(G.reachMax, G.reach0 + G.reac
 /** The footprint of what stands solid on the land: the prop's own collider, leaving out what is too slim to leave a mark. */
 export function contactsOf(props: readonly Prop[]): Contact[] {
   const out: Contact[] = [];
-  for (const p of props) for (const c of propColliders(p)) { // (a house's wing and bay too: round 110)
+  for (const p of props) for (const c of worldColliders(p)) { // (a house's wing and bay too: round 110)
     if (c.kind === 'cylinder') {
       if (c.radius >= G.minSize) out.push({ x: c.x, z: c.z, hx: c.radius, hz: c.radius, yaw: 0, round: true, reach: reachOf(c.radius) });
     } else if (c.kind === 'obox' && Math.min(c.hx, c.hz) >= G.minSize) {

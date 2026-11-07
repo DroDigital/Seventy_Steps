@@ -12,8 +12,10 @@ import { bodyOf } from '../data/bodies';
 import { getEntity } from '../data/registry';
 import { START_SIGN } from '../data/sites';
 import { WORLD } from '../data/tuning';
-import { colliderBounds, toBoxFrame, type Collider } from './colliders';
+import { toBoxFrame, type Collider } from './colliders';
+import { colliderGrid } from './colliderGrid';
 import { escapes } from './escape';
+import { houseSolids } from './houseAddons';
 import type { Feature } from './features';
 import { worldLayout, type SpawnPoint } from './placements';
 import { propColliders, propWalls, type Prop } from './props';
@@ -59,19 +61,10 @@ function pick(table: Readonly<Record<string, number>>, roll: number): string | u
  */
 type Solid = (x: number, z: number, r?: number) => boolean;
 function solidsOf(colliders: readonly Collider[], margin: (r: number) => number, filed: number): Solid {
-  const grid = new Map<number, Collider[]>(); // colliders by 8 m cell
-  const cell = (x: number, z: number): number => Math.floor(x / 8) * 65536 + Math.floor(z / 8);
-  for (const c of colliders) {
-    const b = colliderBounds(c);
-    const m = filed;
-    for (let x = Math.floor((b.x0 - m) / 8); x <= Math.floor((b.x1 + m) / 8); x++) for (let z = Math.floor((b.z0 - m) / 8); z <= Math.floor((b.z1 + m) / 8); z++) {
-      const k = x * 65536 + z;
-      grid.get(k)?.push(c) ?? grid.set(k, [c]);
-    }
-  }
+  const near = colliderGrid(colliders, 8, filed); // colliders by 8 m cell, each filed `filed` metres past its bounds
   return (x, z, r = 0) => {
     const m = margin(r);
-    return (grid.get(cell(x, z)) ?? []).some((c) => {
+    return near(x, z).some((c) => {
       if (c.kind === 'cylinder') return Math.hypot(x - c.x, z - c.z) < c.radius + m;
       if (c.kind === 'obox') {
         const l = toBoxFrame(c, x, z);
@@ -88,13 +81,14 @@ function solidsOf(colliders: readonly Collider[], margin: (r: number) => number,
  * refused as it was and the plan's random stream does not move. `settled(x, z, r)` is the true one for a body of radius `r`: a house's wing, bay and porch
  * posts too, and the margin the body needs. settleSpawns applies it once the plan is whole.
  */
-export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x: number, z: number) => boolean; solid: (x: number, z: number) => boolean; settled: (x: number, z: number, r: number) => boolean } {
+export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x: number, z: number) => boolean; solid: (x: number, z: number) => boolean; settled: (x: number, z: number, r: number) => boolean; beyond: (x: number, z: number) => boolean } {
   const w = worldLayout();
   const rect = regionRect(region);
   const safe = [...w.signs.filter((s) => s.region === region.id).map((s) => s.rest), ...w.gates.filter((g) => g.region === region.id).map((g) => g.arrive)];
   const dressing = w.arenas.filter((a) => a.region === region.id).flatMap((a) => a.decor); // and an arena's dressing (round 13)
   const walls = solidsOf([...props, ...dressing].flatMap((p) => propWalls(p)), () => MARGIN, MARGIN);
   const full = solidsOf([...props, ...dressing].flatMap((p) => propColliders(p)), marginOf, INDEX);
+  const beyond = solidsOf([...props, ...dressing].flatMap((p) => (p.kind === 'house' ? houseSolids(p) : [])), () => MARGIN, MARGIN); // a house's wing, bay and porch posts (round 110): not where a chest or flask is set (round 112)
   const ground = (x: number, z: number, solid: Solid, r: number): boolean =>
     x > rect.x0 + 6 && x < rect.x1 - 6 && z > rect.z0 + 6 && z < rect.z1 - 6 &&
     safe.every((p) => Math.hypot(p.x - x, p.z - z) >= SAFE) &&
@@ -105,6 +99,7 @@ export function groundOf(region: RegionDef, props: readonly Prop[]): { clear: (x
     clear: (x, z) => ground(x, z, walls, 0),
     solid: (x, z) => walls(x, z, 0),
     settled: (x, z, r) => ground(x, z, full, r),
+    beyond: (x, z) => beyond(x, z),
   };
 }
 
