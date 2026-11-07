@@ -228,8 +228,12 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const smoke = stacks.map((s): [number, number, number] => [s * wx * 0.7, top + rh + 1.3, -wd * 0.2]); // the top of each stack
   for (const s of stacks) chimneys.push(tileUv(box(0.8, rh + 1.6, 0.8, s * wx * 0.7, top + (rh + 1.6) / 2 - 0.3, -wd * 0.2, scaleRgb(BASE.bone, 1.2)), 0.8, rh + 1.6));
 
-  // Round 111: what the realm adds, from its own draws: a turret at a gable end, a widow's walk or a cupola on the ridge.
-  const turretSide: 0 | 1 | -1 = style !== 'hovel' && !flat && extra() < look.turret ? (extra() < 0.5 ? -1 : 1) : 0;
+  // Round 111: what the realm adds, from its own draws: a turret at a gable end, a widow's walk or a cupola on the ridge. A turret stands on the
+  // side its house's wing is not on (round 110's wing is walled, so the two must not meet); the side is drawn either way, as it was.
+  const addons = houseAddons(p); // its wing, bay and porch, from their own stream: the very parts the colliders hold (round 110)
+  const turreted = style !== 'hovel' && !flat && extra() < look.turret;
+  const sideDraw: 1 | -1 | 0 = turreted ? (extra() < 0.5 ? -1 : 1) : 0;
+  const turretSide: 0 | 1 | -1 = turreted ? (addons.wing ? (-addons.wing.side as 1 | -1) : sideDraw) : 0;
   const onRidge = style === 'hovel' || flat ? 0 : extra();
   const adds: Extra[] = [];
   if (turretSide) adds.push(turret(turretSide, wx, wd, top, wallTint, roofTint, PANE));
@@ -241,7 +245,6 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const doorC = pick(rng, look.doors);
   const door = [box(1.1, 2.1, 0.1, 0, 0.4 + 1.05, wd + 0.05, doorC), box(1.3, 0.12, 0.12, 0, 0.4 + 2.15, wd + 0.06, TRIM)];
   const step = box(1.8, 0.25, 1.1, 0, 0.125, wd + 0.35, scaleRgb(c, 0.75)); // its back face inside the footing, not within a hand of its front (round 35: the audit); its top 15 cm under the footing's, not 10 (round 110: the ray audit's fight on seeds 1 and 3)
-  const addons = houseAddons(p); // its wing, bay and porch, from their own stream: the very parts the colliders hold (round 110)
   if (addons.porch) {
     door.push(box(2.6, 0.12, 1.6, 0, 0.4 + 2.7, wd + 0.8, DOOR));
     for (const s of [-1, 1]) door.push(box(0.14, 2.7, 0.14, s * 1.15, 0.4 + 1.35, wd + 1.5, TRIM));
@@ -255,7 +258,7 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const gabs = [tint(tileUv(gables, 1, 1), wallTint)];
   const extras: THREE.BufferGeometry[] = [...frames, ...panes, ...door, ...add.trim];
   const glowing = [...glows];
-  if (addons.wing) { // a wing built on, lower, with its own roof (round 110: the collider's, so it may stand on the turret's side)
+  if (addons.wing) { // a wing built on, lower, with its own roof (round 110: the collider's; a turret stands on the other side)
     const wg = wing(addons.wing, wallTint, addons.rng, look);
     body.push(wg.walls);
     roofs.push(wg.roof);
