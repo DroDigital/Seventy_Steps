@@ -38,6 +38,7 @@ export function createBlood(g: Game, fx: Particles, pools: BloodPools): Blood {
   const c = g.ecs.c;
   const ground = (x: number, z: number): number => (fx.ground ?? g.world.ground)(x, z);
   const marks: { at: number; x: number; z: number; kind: BloodKind; size: number; yaw: number }[] = []; // spatters waiting for their drops to land
+  let off = false; // the Gore setting is off, and its blood has been taken away
   const gushes: { until: number; at: { x: number; y: number; z: number }; dir: { x: number; z: number }; kind: BloodKind; size: number; next: number }[] = [];
 
   const kindOf = (id: Entity): BloodKind => {
@@ -86,6 +87,17 @@ export function createBlood(g: Game, fx: Particles, pools: BloodPools): Blood {
       pools.lay({ x, z, size, color: colour(kind), wet: isWet(kind), kind: 0, yaw: 0, grow, life: GORE_FX.poolLife }, time);
     },
     update(time) {
+      if (!GORE_SETTING.on) { // turned off: what is still to fall or spurt goes, and the blood laid goes once (round 113)
+        if (!off) {
+          off = true;
+          marks.length = 0;
+          gushes.length = 0;
+          pools.clearBlood();
+        }
+        pools.update(time);
+        return;
+      }
+      off = false;
       for (let i = marks.length - 1; i >= 0; i--) {
         const m = marks[i];
         if (m.at > time) continue;

@@ -91,5 +91,6 @@ describe('the shaders', () => {
     expect(SPRITE_FRAG).toContain('if (!fxCut(src.xy, col)) discard;');
     expect(CAST_FRAG).toContain('fxCut(src.xy, col)');
     expect(SPRITE_VERT).toContain(`body /= ${GORE_FX.pad.toFixed(3)};`);
+    expect(SPRITE_FRAG.replace(/\s+/g, ' ')).toContain('vCut.z < -0.5 ? inCell.x * inCell.y : 1.0'); // a severed piece's padded texels past its frame are dropped (round 113, a Codex finding)
   });
 });

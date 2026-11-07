@@ -64,7 +64,10 @@ bool fxCut(vec2 uv, inout vec3 col) {
 /** The texel to show at uv while the body goes or forms: its place moved by the style; z is 0 where the frame holds nothing there. */
 vec3 fxSource(vec2 uv) {
   float s = vFx.x;
-  if (s <= 0.0) return vec3(uv, 1.0);
+  if (s <= 0.0) { // (a severed piece's billboard is padded past its frame: such a texel is the neighbour's, not its own, so it is dropped)
+    vec2 inCell = step(vCell.xy, uv) * step(uv, vCell.zw);
+    return vec3(uv, vCut.z < -0.5 ? inCell.x * inCell.y : 1.0);
+  }
   float st = vFx.y;
   vec2 p = fxCell(uv);
   float col = hash12(vec2(floor(uv.x * float(textureSize(uAtlas, 0).x)), 7.0 + vFx.w));

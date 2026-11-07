@@ -32,6 +32,8 @@ export interface BloodMark {
 export interface BloodPools {
   lay(m: BloodMark, time: number): void;
   update(time: number): void;
+  /** Takes away the blood already laid (spatter and pools), not the rings on the water: the Gore setting was turned off (round 113). */
+  clearBlood(): void;
   readonly count: number;
   readonly mesh: THREE.InstancedMesh;
 }
@@ -184,6 +186,14 @@ export function createBloodPools(scene: THREE.Scene, ground: (x: number, z: numb
       look.setXYZW(slot, m.color[0], m.color[1], m.color[2], (m.wet ? 1 : 0) + (m.kind === 1 ? 2 : m.kind === 2 ? 4 : 0));
       mesh.instanceMatrix.needsUpdate = mark.needsUpdate = look.needsUpdate = true;
       mesh.count = used;
+    },
+    clearBlood() {
+      for (let i = 0; i < used; i++) {
+        if (look.getW(i) >= 4) continue; // kind 2 (a ring on the water) keeps its place
+        deaths[i] = 0; // the slot is free again
+        mark.setX(i, -1e9); // born long ago: past its life, the shader's fade drops it
+      }
+      mark.needsUpdate = true;
     },
     update(time) {
       material.uniforms.uTime.value = time;
