@@ -21,6 +21,9 @@ import type { BoxPart, Part } from '../world/dungeonParts';
 import { drawn } from '../world/wallJoins';
 import { dressing } from './dungeonDressing';
 import { dungeonShell } from './dungeonShell';
+import { pillarFormOf, tinted } from './dungeonLook';
+import { pillarPieces } from './pillarForms';
+import type { PillarForm } from '../data/dungeonLooks';
 import { floorInlay } from './floorInlay';
 import type { ArenaPlace, Dungeon } from '../world/placements';
 import { box, tileUv, tint, worldUv } from './meshKit';
@@ -35,10 +38,10 @@ const WOOD: Rgb = [0.75, 0.7, 0.62];
 const PER_STEP = 12;
 const SLAB = 0.3; // a floor slab's depth (world/dungeonParts.ts)
 
-type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31)
+type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth' | 'shine'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31); round 108: shine is glow as relief (a light set on a surface)
 type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 87: the pixel flame, flames.ts, is its picture)
 /** What a piece is drawn with: a kit's texture, or (marked `+`) the same drawn a little nearer than it is, for relief that stands 6 to 15 cm off a wall's face. */
-export type Group = KitTexture | 'glow' | 'cloth+' | `${KitTexture}+`;
+export type Group = KitTexture | 'glow' | 'glow+' | 'cloth+' | `${KitTexture}+`;
 type Origin = { x: number; z: number }; // where a dungeon's world-space UVs count from
 const DARK_WOOD: Rgb = [0.42, 0.36, 0.3];
 const materials = new Map<string, THREE.ShaderMaterial>();
@@ -55,7 +58,7 @@ const material = (group: Group): THREE.ShaderMaterial => {
   return m;
 };
 /** The group of each kind in this kit. */
-const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall : k === 'floor' ? kit.floor : k === 'trim' ? `${kit.wall}+` : k === 'beam' ? 'wood+' : k === 'cloth' ? 'cloth+' : k);
+const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall : k === 'floor' ? kit.floor : k === 'trim' ? `${kit.wall}+` : k === 'beam' ? 'wood+' : k === 'cloth' ? 'cloth+' : k === 'shine' ? 'glow+' : k);
 
 /** Hangs torches at clear, well-spaced stops along a wall (wallTorches.ts). */
 function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], w: Parameters<typeof hangTorches>[1], ctx: WallContext, placed: LightSpot[], walls: readonly BoxPart[]): void {
@@ -191,15 +194,11 @@ function ruin(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCo
   return [{ kind: 'wall', geo: mergeGeometries(pieces) }, ...wallDetail(min, { ...max, y: min.y + Math.min(h, 3.4) }, c, { ...kit, trim: 'none' }, at, ctx, placed, walls)];
 }
 
-function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext, placed: LightSpot[], walls: readonly BoxPart[]): Built[] {
+function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallContext, placed: LightSpot[], walls: readonly BoxPart[], form: PillarForm): Built[] {
   if (p.look === 'inlay') return [floorInlay(p, c, kit, at)];
   if (p.shape === 'cyl') {
     if (p.look === 'rim') return well(p.x, p.z, p.radius, p.y1, c, p.y0).map((geo) => ({ kind: 'wall', geo }));
-    const h = p.y1 - p.y0;
-    const shaft = tint(tileUv(new THREE.CylinderGeometry(p.radius * 0.88, p.radius, h, 7, Math.ceil(h)).translate(p.x, p.y0 + h / 2, p.z), Math.PI * 2 * p.radius, h), c);
-    const base = tint(new THREE.CylinderGeometry(p.radius * 1.3, p.radius * 1.4, 0.4, 8).translate(p.x, p.y0 + 0.2, p.z), scaleRgb(c, 0.85));
-    const capital = tint(new THREE.CylinderGeometry(p.radius * 1.35, p.radius * 1.05, 0.35, 8).translate(p.x, p.y1 - 0.17, p.z), scaleRgb(c, 0.9));
-    return [{ kind: 'wall', geo: mergeGeometries([shaft, base, capital]) }];
+    return pillarPieces(form, p, c); // (round 108: each dungeon's, or its boss hall's, own form)
   }
   const [w, h, d] = [p.max.x - p.min.x, p.max.y - p.min.y, p.max.z - p.min.z];
   const [x, y, z] = [(p.min.x + p.max.x) / 2, (p.min.y + p.max.y) / 2, (p.min.z + p.max.z) / 2];
@@ -232,7 +231,7 @@ function meshes(groups: Map<Group, THREE.BufferGeometry[]>): THREE.Mesh[] {
 /** A dungeon's geometry by texture (no materials: the tests read it too), its sconces' flames pushed on `lights`; sliced, yielding between parts. */
 export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void, Map<Group, THREE.BufferGeometry[]>> {
   const ground = getRegion(d.layout.region)?.biome.tint ?? STONE;
-  const colour = (kit: DungeonKit): Rgb => mixRgb(STONE, kit.tone ?? ground, kit.mix);
+  const colour = tinted(d.layout, (kit: DungeonKit): Rgb => mixRgb(STONE, kit.tone ?? ground, kit.mix)); // (round 108: its own kit's stone in its own tint)
   const groups = new Map<Group, THREE.BufferGeometry[]>();
   const add = (t: Group, geo: THREE.BufferGeometry): void => void (groups.get(t)?.push(geo) ?? groups.set(t, [geo]));
   const at: Origin = { x: Math.round(d.layout.origin.x / 2) * 2, z: Math.round(d.layout.origin.z / 2) * 2 }; // on the texture's grid, so the bricks keep their places
@@ -242,9 +241,10 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
   const placed: LightSpot[] = []; // shared across wall sections, not the decorative fires in rooms
   for (let k = 0; k < seen.length; k++) {
     const { part, index } = seen[k];
-    const kit = kitOfRoom(d.layout, d.layout.rooms[part.room]); // each room its own kit (round 13)
+    const room = d.layout.rooms[part.room];
+    const kit = kitOfRoom(d.layout, room); // each room its own kit (round 13)
     const ctx = wallContext(d.layout, part, solids);
-    for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx, placed, walls)) {
+    for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx, placed, walls, part.shape === 'cyl' ? pillarFormOf(d.layout, room) : 'round')) {
       if (geo) {
         geo.userData.part = index; // which of the dungeon's parts it is (the depth audit names its finds by it)
         add(textureOf(kind, kit), geo);
@@ -253,7 +253,7 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
     }
     if (k % PER_STEP === PER_STEP - 1) yield;
   }
-  for (const { kind, kit, geo, light } of dressing(d.layout, colour, at, lights)) {
+  for (const { kind, kit, geo, light } of dressing(d.layout, colour, at, lights, d.decor)) {
     if (geo) add(textureOf(kind, kit), geo);
     if (light) lights.push(light);
   }

@@ -14,18 +14,24 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createRng, hash2 } from '../core/rng';
 import { KITS, type DungeonKit, type KitId } from '../data/kits';
 import { DUNGEON } from '../data/tuning';
-import { floorRange, kitIdOfRoom, roomPoint, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
+import { kitIdOfRoom, roomPoint, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
 import { standing } from '../world/dungeonParts';
 import { isAbyss } from '../world/abyssStair';
 import { stairNewels } from './stairNewels';
 import { baysOf, cornersOf, pillarsOf, roomStyle } from '../world/roomStyle';
 import { DIRS } from '../world/worldMap';
-import { brazier, DEPTH, ITEMS, place, type Out, type Wall } from './dungeonFurniture';
-import { box, worldUv } from './meshKit';
-import { scaleRgb, type Rgb } from './palette';
+import { brazier, DEPTH, ITEMS, place, type Out } from './dungeonFurniture';
+import { worldUv } from './meshKit';
+import type { Rgb } from './palette';
+import type { Prop } from '../world/props';
+import { roomLook } from './dungeonLook';
+import { roofDress } from './dungeonRoofs';
+import { frieze } from './dungeonFriezes';
+import { hallLore, loreOf, type Spot } from './hallLore';
+import { wallOf } from './roomWalls';
 import type { LightSpot } from './worldLights';
 
-export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
+export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow' | 'cloth' | 'shine'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
 type Origin = { x: number; z: number };
 
 const AWAY = { door: 2.8, torch: 1.5, spot: 2.2 }; // metres furniture keeps from a doorway, a torch, and what stands in a room
@@ -36,31 +42,6 @@ const finish = (g: THREE.BufferGeometry): THREE.BufferGeometry => {
 };
 const merged = (kind: Dressed['kind'], kit: DungeonKit, geos: THREE.BufferGeometry[]): Dressed[] => (geos.length ? [{ kind, kit, geo: mergeGeometries(geos.map(finish)) }] : []);
 
-/** A room's wall frame on the side `side` of its local axes ('u+', 'u-', 'v+', 'v-'). */
-function wallOf(r: RoomLayout, side: 'u+' | 'u-' | 'v+' | 'v-', inner: number): Wall {
-  const sgn = side.endsWith('+') ? 1 : -1;
-  const ax = DIRS[r.axis].x !== 0;
-  return {
-    at: (s, d) => (side[0] === 'u' ? roomPoint(r, sgn * (inner - d), s) : roomPoint(r, s, sgn * (inner - d))),
-    alongX: side[0] === 'u' ? ax : !ax,
-  };
-}
-
-/** Ribs under a vault, or joists under beams, across a room. */
-function roof(r: RoomLayout, kit: DungeonKit, c: Rgb, at: Origin, out: Out): void {
-  const top = floorRange(r)[1] + DUNGEON.height - 0.05;
-  const [span, step, depth, drop] = kit.roof === 'vault' ? [r.half - 0.1, r.size === 3 ? 6 : 4, 0.5, 0.6] : [r.half - 0.1, 2.5, 0.28, 0.42];
-  const alongX = DIRS[r.axis].x !== 0;
-  const put = (u: number, v: number, du: number, dv: number, h: number, y: number, col: Rgb, to: THREE.BufferGeometry[]): void => {
-    const p = roomPoint(r, u, v);
-    to.push(worldUv(box(alongX ? dv : du, h, alongX ? du : dv, p.x, y, p.z, col), at));
-  };
-  const col = kit.roof === 'vault' ? scaleRgb(c, 0.95) : scaleRgb(c, 0.5);
-  const to = kit.roof === 'vault' ? out.trim : out.beam;
-  for (let v = -r.half + step / 2; v < r.half; v += step) put(0, v, span * 2, depth, drop, top - drop / 2, col, to);
-  put(0, 0, depth * 0.8, r.half * 2 - 0.2, drop * 0.7, top - (drop * 0.7) / 2, col, to); // the ridge along it
-}
-
 /** The geometry of one room's dressing by group, in its kit's textures. */
 function grouped(kit: DungeonKit, out: Out, at: Origin): Dressed[] {
   const uv = (g: THREE.BufferGeometry, m = 2): THREE.BufferGeometry => worldUv(g, at, m);
@@ -70,6 +51,7 @@ function grouped(kit: DungeonKit, out: Out, at: Origin): Dressed[] {
     ...merged('trim', kit, out.trim.map((g) => uv(g))),
     ...merged('beam', kit, out.beam.map((g) => uv(g, 4))),
     ...merged('glow', kit, out.glow),
+    ...merged('shine', kit, out.shine),
   ];
 }
 
@@ -92,11 +74,11 @@ function hall(d: DungeonLayout, r: RoomLayout, kitId: KitId, kit: DungeonKit, c:
       torches.every((t) => Math.hypot(t.x - x, t.z - z) > AWAY.torch + margin) &&
       stands.every((p) => Math.hypot(p.x - x, p.z - z) > AWAY.spot + margin) &&
       pillars.every(([pu, pv, rad]) => Math.hypot(pu - u, pv - v) > rad * 1.5 + 0.6 + margin) &&
-      blocks.every(([u0, u1, v0, v1]) => !(u > u0 - 1 - margin && u < u1 + 1 + margin && v > v0 - 1 - margin && v < v1 + 1 + margin))
+      blocks.every(([u0, u1, v0, v1]) => !(u > u0 - 1.3 - margin && u < u1 + 1.3 + margin && v > v0 - 1.3 - margin && v < v1 + 1.3 + margin)) // (round 108: clear by the half of the widest thing, 1.2 m, or a face 5 cm into a bay fought it)
     );
   };
   const inner = r.half - DUNGEON.wall / 2;
-  const list = ITEMS[kitId];
+  const list = roomLook(d, r).items ?? ITEMS[kitId]; // (round 108: its dungeon's own things)
   let turn = Math.floor(rng() * 4);
   for (const side of list.length ? (['u+', 'u-', 'v+', 'v-'] as const) : []) {
     const wall = wallOf(r, side, inner);
@@ -124,18 +106,31 @@ function hall(d: DungeonLayout, r: RoomLayout, kitId: KitId, kit: DungeonKit, c:
   return lit;
 }
 
-/** The dressing of every room of a dungeon (halls: furniture, debris, braziers; every roofed room: its ribs). */
-export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at: Origin, lights: LightSpot[]): Dressed[] {
+/** What a boss hall's lore keeps clear of: its torches and the pieces of its set. */
+function avoidIn(r: RoomLayout, torches: readonly LightSpot[], decor: readonly Prop[]): Spot[] {
+  const near = (x: number, z: number): boolean => Math.abs(x - r.x) < r.half + 1 && Math.abs(z - r.z) < r.half + 1;
+  return [
+    ...torches.filter((t) => near(t.x, t.z)).map((t) => ({ x: t.x, z: t.z, r: 0.6 })),
+    ...decor.filter((p) => near(p.x, p.z)).map((p) => ({ x: p.x, z: p.z, r: Math.max(p.w, p.d) / 2 })),
+  ];
+}
+
+/** The dressing of every room of a dungeon (halls: furniture, debris, braziers, friezes; every roofed room: its ceiling's dressing; a boss hall: its lore). */
+export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at: Origin, lights: LightSpot[], decor: readonly Prop[] = []): Dressed[] {
   const torches = lights.filter((l) => l.kind === 'torch');
   const result: Dressed[] = [];
   for (const r of d.rooms) {
-    const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [] };
+    const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [] };
     const kitId = kitIdOfRoom(d, r);
     const kit = KITS[kitId] as DungeonKit;
     const c = colour(kit);
-    if (kit.roof !== 'open') roof(r, kit, c, at, out);
+    const look = roomLook(d, r);
+    const lore = loreOf(r);
+    const rng = createRng((hash2(Math.round(r.x), Math.round(r.z), 1080) * 4294967296) >>> 0);
+    if (kit.roof !== 'open' && !lore?.roof.includes('dome')) roofDress(look.roof, r, kit, c, at, out, rng); // (round 108: as its dungeon dresses it; a domed hall's ribs are its dome's)
+    if (r.def.kind === 'hall' && !r.def.boss && kit.roof !== 'open') frieze(look.frieze, d, r, c, out, rng);
     const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : isAbyss(r) ? stairNewels(r, kit, c, at) : []; // (round 104: a flight over the void, its newels and their fires)
-    result.push(...grouped(kit, out, at), ...lit);
+    result.push(...grouped(kit, out, at), ...lit, ...(lore ? hallLore(d, r, kit, c, at, avoidIn(r, torches, decor)) : []));
   }
   return result;
 }

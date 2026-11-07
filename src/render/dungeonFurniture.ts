@@ -11,6 +11,8 @@ import * as THREE from 'three';
 import type { XZ } from '../core/geom';
 import type { Rng } from '../core/rng';
 import type { KitId } from '../data/kits';
+import type { WallItem } from '../data/dungeonLooks';
+import { LORE_ITEMS, type LoreItem } from './loreItems';
 import { box, tint } from './meshKit';
 import { scaleRgb, type Rgb } from './palette';
 
@@ -21,6 +23,7 @@ export interface Out {
   beam: THREE.BufferGeometry[]; // relief on wood: drawn nearer (books on a shelf, planks)
   trim: THREE.BufferGeometry[]; // relief on a wall: drawn nearer
   glow: THREE.BufferGeometry[];
+  shine: THREE.BufferGeometry[]; // (round 108) light on a surface: drawn nearer than it
 }
 
 /** A wall's frame: where (s along it, d out from it into the room) is in the world, and which way it runs. */
@@ -29,10 +32,11 @@ export interface Wall {
   alongX: boolean;
 }
 
-export type Item = 'shelves' | 'crate' | 'barrel' | 'coffin' | 'statue' | 'stele' | 'pew' | 'growth' | 'rubble' | 'bones';
+export type Item = WallItem;
+type KitItem = Exclude<Item, LoreItem>;
 
 /** What each kit sets along its walls, in turn (a few repeat to weigh them). */
-export const ITEMS: Readonly<Record<KitId, readonly Item[]>> = {
+export const ITEMS: Readonly<Record<KitId, readonly KitItem[]>> = {
   masonry: ['coffin', 'stele', 'barrel', 'bones'],
   library: ['shelves', 'shelves', 'shelves', 'statue'],
   timber: ['shelves', 'crate', 'barrel', 'crate'],
@@ -59,9 +63,9 @@ export const ITEMS: Readonly<Record<KitId, readonly Item[]>> = {
   void: [],
 };
 
-const DARK: Rgb = [0.34, 0.27, 0.2];
-const IRON: Rgb = [0.24, 0.23, 0.25];
-const BONE: Rgb = [0.78, 0.74, 0.64];
+export const DARK: Rgb = [0.34, 0.27, 0.2];
+export const IRON: Rgb = [0.24, 0.23, 0.25];
+export const BONE: Rgb = [0.78, 0.74, 0.64];
 const BOOKS: readonly Rgb[] = [[0.5, 0.2, 0.18], [0.22, 0.32, 0.4], [0.62, 0.52, 0.3], [0.3, 0.38, 0.24], [0.4, 0.3, 0.42], [0.55, 0.45, 0.35]];
 
 export interface Frame {
@@ -73,20 +77,20 @@ export interface Frame {
   out: Out;
 }
 
-const wb = (f: Frame, s: number, d: number, ws: number, wd: number, h: number, y: number, c: Rgb): THREE.BufferGeometry => {
+export const wb = (f: Frame, s: number, d: number, ws: number, wd: number, h: number, y: number, c: Rgb): THREE.BufferGeometry => {
   const p = f.wall.at(f.s + s, d);
   return box(f.wall.alongX ? ws : wd, h, f.wall.alongX ? wd : ws, p.x, f.y + y + h / 2, p.z, c);
 };
-const round = (f: Frame, s: number, d: number, r: number, h: number, y: number, c: Rgb, sides = 8, top = r): THREE.BufferGeometry => {
+export const round = (f: Frame, s: number, d: number, r: number, h: number, y: number, c: Rgb, sides = 8, top = r): THREE.BufferGeometry => {
   const p = f.wall.at(f.s + s, d);
   return tint(new THREE.CylinderGeometry(top, r, h, sides).translate(p.x, f.y + y + h / 2, p.z), c);
 };
-const blob = (f: Frame, s: number, d: number, r: number, y: number, c: Rgb, squash = 0.7): THREE.BufferGeometry => {
+export const blob = (f: Frame, s: number, d: number, r: number, y: number, c: Rgb, squash = 0.7): THREE.BufferGeometry => {
   const p = f.wall.at(f.s + s, d);
   return tint(new THREE.IcosahedronGeometry(r, 0).scale(1, squash, 1).translate(p.x, f.y + y, p.z), c);
 };
 
-const BUILD: Record<Item, (f: Frame) => void> = {
+const BUILD: Record<KitItem, (f: Frame) => void> = {
   shelves(f) {
     const w = 1.9;
     f.out.wood.push(wb(f, 0, 0.26, w, 0.5, 2.8, 0, DARK));
@@ -152,7 +156,7 @@ const BUILD: Record<Item, (f: Frame) => void> = {
 };
 
 /** Builds one item on a wall at `f.s`. */
-export const place = (item: Item, f: Frame): void => BUILD[item](f);
+export const place = (item: Item, f: Frame): void => (item in LORE_ITEMS ? LORE_ITEMS[item as LoreItem](f) : BUILD[item as KitItem](f));
 
 /** How far an item stands off its wall at most (the walls' inner faces are solid; nothing is set deeper into a room than this). */
 export const DEPTH = 1.1;
