@@ -37,17 +37,17 @@ describe('how a dungeon room is laid out (round 32: every hall had the same pill
   it('uses every plan somewhere: pillars, floors, cross-shaped halls and buttressed ones', () => {
     const all = w.dungeons.flatMap((d) => d.layout.rooms.map((r) => roomStyle(d.layout, r)));
     for (const p of ['four', 'pairs', 'colonnade', 'ring', 'five', 'six', 'seven']) expect(all.some((s) => s.pillars === p), p).toBe(true);
-    for (const f of ['runner', 'frame', 'cross', 'chequer', 'nested', 'bands', 'sigil']) expect(all.some((s) => s.floor === f), f).toBe(true);
+    for (const f of ['runner', 'frame', 'cross', 'chequer', 'nested', 'bands', 'rings', 'squares', 'quincunx']) expect(all.some((s) => s.floor === f), f).toBe(true);
     expect(all.some((s) => s.corners > 0)).toBe(true);
     expect(all.some((s) => s.bays)).toBe(true);
   });
 
   it('puts an emblem under every boss in a hall, with the middle of the floor clear of pillars and its walls in bays', () => {
     for (const { d, r, s } of halls.filter((h) => h.r.def.boss)) {
-      expect(['rings', 'squares', 'quincunx', 'sigil'], `${d.layout.def.id}/${r.def.id}`).toContain(s.floor); // (round 108: every boss hall's own sigil, tests/hallLore.test.ts)
+      expect(['rings', 'squares', 'quincunx'], `${d.layout.def.id}/${r.def.id}`).toContain(s.floor);
       expect(s.bays).toBe(true);
       for (const [u, v, rad] of pillarsOf(s, r, [])) expect(Math.hypot(u, v) - rad, `${r.def.id} pillar`).toBeGreaterThan(14);
-      expect(inlaysOf(s, r, kitOfRoom(d.layout, r).floor === 'wood').length).toBeGreaterThan(s.floor === 'sigil' ? 0 : 5); // a sigil's carpet in
+      expect(inlaysOf(s, r, kitOfRoom(d.layout, r).floor === 'wood').length).toBeGreaterThan(5);
     }
   });
 

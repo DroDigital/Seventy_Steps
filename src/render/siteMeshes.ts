@@ -38,7 +38,7 @@ const WOOD: Rgb = [0.75, 0.7, 0.62];
 const PER_STEP = 12;
 const SLAB = 0.3; // a floor slab's depth (world/dungeonParts.ts)
 
-type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth' | 'shine' | 'carve'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31); round 108: shine is glow as relief, carve the floor's stone as relief (a boss hall's sigil)
+type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth' | 'shine'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31); round 108: shine is glow as relief (a light set on a surface)
 type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 87: the pixel flame, flames.ts, is its picture)
 /** What a piece is drawn with: a kit's texture, or (marked `+`) the same drawn a little nearer than it is, for relief that stands 6 to 15 cm off a wall's face. */
 export type Group = KitTexture | 'glow' | 'glow+' | 'cloth+' | `${KitTexture}+`;
@@ -58,7 +58,7 @@ const material = (group: Group): THREE.ShaderMaterial => {
   return m;
 };
 /** The group of each kind in this kit. */
-const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall : k === 'floor' ? kit.floor : k === 'trim' ? `${kit.wall}+` : k === 'beam' ? 'wood+' : k === 'cloth' ? 'cloth+' : k === 'shine' ? 'glow+' : k === 'carve' ? `${kit.floor}+` : k);
+const textureOf = (k: Kind, kit: DungeonKit): Group => (k === 'wall' ? kit.wall : k === 'floor' ? kit.floor : k === 'trim' ? `${kit.wall}+` : k === 'beam' ? 'wood+' : k === 'cloth' ? 'cloth+' : k === 'shine' ? 'glow+' : k);
 
 /** Hangs torches at clear, well-spaced stops along a wall (wallTorches.ts). */
 function torches(glow: Built[], stone: THREE.BufferGeometry[], stops: number[], w: Parameters<typeof hangTorches>[1], ctx: WallContext, placed: LightSpot[], walls: readonly BoxPart[]): void {

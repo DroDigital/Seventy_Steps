@@ -16,7 +16,7 @@ import { kitOfRoom, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { DIRS } from './worldMap';
 
 export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring' | 'five' | 'six' | 'seven';
-export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands' | 'sigil';
+export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands';
 
 export interface RoomStyle {
   pillars: Pillars;
@@ -70,11 +70,10 @@ export function roomStyle(d: DungeonLayout, r: RoomLayout): RoomStyle {
   const start = unit(d.def.id);
   const organic = ORGANIC.has(kitOfRoom(d, r).floor);
   let s: RoomStyle;
-  const lore = r.def.boss ? HALL_LORE[r.def.boss[0]] : undefined;
-  if (kind === 'hall' && lore) s = style(lore.pillars, 'sigil', 0, true); // (round 108: its own pillars, and its sigil, render/hallSigils.ts, for an emblem)
-  else if (kind === 'hall' && r.def.boss) {
+  if (kind === 'hall' && r.def.boss) {
     const k = unit(`${d.def.id}:${r.def.id}`);
-    s = style(BOSS[Math.floor(k * BOSS.length)], EMBLEMS[Math.floor(unit(`${r.def.id}:${d.def.id}`) * EMBLEMS.length)], 0, true);
+    const lore = HALL_LORE[r.def.boss[0]]; // (round 108: its lore's own pillars, data/hallLore.ts)
+    s = style(lore?.pillars ?? BOSS[Math.floor(k * BOSS.length)], EMBLEMS[Math.floor(unit(`${r.def.id}:${d.def.id}`) * EMBLEMS.length)], 0, true);
   }
   else if (kind === 'hall') {
     s = r.size === 3 ? WIDE : SMALL[(Math.floor(start * SMALL.length) + same * 3) % SMALL.length];
@@ -240,9 +239,6 @@ export function inlaysOf(s: RoomStyle, r: RoomLayout, boards: boolean): Inlay[] 
       out.push(...approach(r, 15.4 * k));
       break;
     }
-    case 'sigil': // its lore's own figure is drawn over the floor (render/hallSigils.ts); laid here, only the carpet in to its rim
-      out.push(...approach(r, r.def.boss ? (HALL_LORE[r.def.boss[0]]?.reach ?? 14.5) : 14.5));
-      break;
     case 'bands': // corridor: thresholds laid across at every four metres
       for (let v = -h + 3.5; v < h - 3; v += 4) out.push({ tone: pale, box: [-DUNGEON.lane / 2 + 0.3, DUNGEON.lane / 2 - 0.3, v, v + 0.5] });
       break;

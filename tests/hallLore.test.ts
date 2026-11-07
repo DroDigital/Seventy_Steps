@@ -1,7 +1,7 @@
 /**
  * Round 108: every dungeon its own build and every boss hall its own lore. Each dungeon is named in data/dungeonLooks.ts, every boss hall
- * has its lore and no two are alike, its sigil lies inside its reach and its room, nothing of it is drawn outside its walls or hangs
- * lower than an eye under a roof, its light is no anomaly's hue, and every pillar form stands within its collider's height.
+ * has its lore and no two are alike, laid on its emblem (no sigil: those were taken out again, asked), nothing of it is drawn outside
+ * its walls or above its roof, its light is no anomaly's hue, and every pillar form stands within its collider's height.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -14,7 +14,6 @@ import type { CylPart } from '../src/world/dungeonParts';
 import { worldLayout } from '../src/world/placements';
 import { roomStyle } from '../src/world/roomStyle';
 import { hallLore, loreOf } from '../src/render/hallLore';
-import { sigilPieces } from '../src/render/hallSigils';
 import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
 import { pillarPieces } from '../src/render/pillarForms';
 import { local } from '../src/render/roomWalls';
@@ -47,8 +46,9 @@ describe('each dungeon\'s own build and each boss hall\'s lore (round 108)', () 
       const lore = loreOf(r);
       expect(lore, `${d.def.id}/${r.def.id}`).toBeDefined();
       used.add(r.def.boss![0]);
-      signs.add(JSON.stringify(lore!.sigil));
-      expect(roomStyle(d, r).floor).toBe('sigil');
+      signs.add(JSON.stringify(lore));
+      expect(['rings', 'squares', 'quincunx'], `${d.def.id}/${r.def.id}`).toContain(roomStyle(d, r).floor); // round 32's emblem, no sigil
+      expect(roomStyle(d, r).pillars).toBe(lore!.pillars);
     }
     for (const id of Object.keys(HALL_LORE)) expect(used, id).toContain(id);
     expect(signs.size).toBe(Object.keys(HALL_LORE).length);
@@ -57,24 +57,14 @@ describe('each dungeon\'s own build and each boss hall\'s lore (round 108)', () 
   it('lights no hall in an anomaly\'s hue', () => {
     for (const [id, lore] of Object.entries(HALL_LORE)) {
       expect(anomalous(lore.glow), id).toBe(false);
-      for (const l of lore.sigil) if (l.colour) expect(anomalous(l.colour), id).toBe(false);
     }
   });
 
-  it('lays each sigil off the carpet in and draws all of a hall inside its walls', () => {
+  it('draws all of a hall inside its walls', () => {
     for (const { d, r } of bossHalls) {
-      const lore = loreOf(r)!;
       const kit = kitOfRoom(d, r);
       const floor = floorRange(r)[1];
       const name = `${d.def.id}/${r.def.id}`;
-      for (const piece of sigilPieces(r, lore.sigil, lore.reach, [0.5, 0.5, 0.5], lore.glow)) { // inside the room, and off the carpet in to its rim
-        for (const p of points(piece.geo)) {
-          const [u, v] = local(r, p);
-          expect(Math.max(Math.abs(u), Math.abs(v)), name).toBeLessThan(r.half - 1);
-          expect(Math.abs(u) < 1.7 && v < -lore.reach - 0.1, `${name}: on the carpet at ${u.toFixed(1)}, ${v.toFixed(1)}`).toBe(false);
-          expect(Math.abs(p.y - r.level - 0.06), name).toBeLessThan(0.1);
-        }
-      }
       for (const dressed of hallLore(d, r, kit, [0.5, 0.5, 0.5], { x: 0, z: 0 }, [])) {
         expect(dressed.geo, name).toBeDefined();
         for (const p of points(dressed.geo!)) {
