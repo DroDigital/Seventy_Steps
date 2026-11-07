@@ -188,5 +188,10 @@ export function rockOf(form: RockForm, p: Prop, rng: Rng, c: Rgb, look: PropLook
         return orb(p, rng, c);
     }
   })();
+  // Keep every form's visible stone within the unchanged collider height, while
+  // keeping the arrangement of its parts and its buried foot. Some forms add leaning tips.
+  geo.computeBoundingBox();
+  const top = geo.boundingBox!.max.y;
+  if (top > p.h) geo.scale(1, p.h / top, 1);
   return [{ mat, geo }];
 }

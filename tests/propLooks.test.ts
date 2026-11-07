@@ -70,6 +70,21 @@ describe('every recurring prop in its realm\'s forms (round 111)', () => {
     }
   }
 
+  it('rock forms remain below the top of their collision envelope', () => {
+    for (const form of formsOf('rocks')) {
+      for (let n = 0; n < 20; n++) {
+        const { p, region } = propOfForm('rock', 'rocks', form, n)!;
+        const top = p.h + 0.15; // propMeshes places the geometry 0.15 below its prop's foot
+        for (const { geo } of solids(propPieces(p, [0.6, 0.6, 0.58], region))) {
+          const positions = geo.getAttribute('position');
+          for (let i = 0; i < positions.count; i++) {
+            expect(positions.getY(i), `${form} seed ${p.seed}`).toBeLessThanOrEqual(top + 1e-5);
+          }
+        }
+      }
+    }
+  });
+
   it('each realm\'s houses build in every style, and the realms add their own', () => {
     let walks = 0;
     let turrets = 0;
