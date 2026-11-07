@@ -19,6 +19,9 @@ export const BODY_LIGHT_GLSL = /* glsl */ `
 uniform vec4 uBodyLight; // side, shape, bounce, sky (data/bodyLight.ts)
 
 float bodyLantern; // the lantern's light on this pixel, after its shadow (read again for the colours it shows: shaders/sprite.ts)
+vec2 bodyDx; // how the atlas runs across a screen pixel, and up one (found first in main, before any pixel is discarded)
+vec2 bodyDy;
+vec3 bodyRim = vec3(0.0); // the way out of the body here and how near its edge (bodyEdge), when the shape was read
 
 /** How much of a light from L reaches the face of a body that looks along face: whole in front, least straight behind, a high light reaching the top whatever its side. */
 float bodyFacing(vec3 face, vec3 L) {
@@ -33,11 +36,9 @@ float bodyInside(vec2 uv) {
 
 /** The way out of the body at uv on the screen (x right, y up), and how near its edge it is (0 deep inside). */
 vec3 bodyEdge(vec2 uv) {
-  vec2 dx = vec2(dFdx(vUv.x), dFdy(vUv.x));
-  vec2 dy = vec2(dFdx(vUv.y), dFdy(vUv.y));
   vec2 texel = 1.0 / vec2(textureSize(uAtlas, 0));
-  vec2 sx = vec2(sign(dx.x + 1e-9) * texel.x, 0.0) * ${f(BODY_LIGHT.shapeReach)}; // one way across the screen, in the atlas
-  vec2 sy = vec2(0.0, sign(dy.y + 1e-9) * texel.y) * ${f(BODY_LIGHT.shapeReach)}; // (the atlas runs down as the screen runs up)
+  vec2 sx = vec2(sign(bodyDx.x + 1e-9) * texel.x, 0.0) * ${f(BODY_LIGHT.shapeReach)}; // one way across the screen, in the atlas
+  vec2 sy = vec2(0.0, sign(bodyDy.y + 1e-9) * texel.y) * ${f(BODY_LIGHT.shapeReach)}; // (the atlas runs down as the screen runs up)
   float r = bodyInside(uv + sx) + 0.5 * bodyInside(uv + 0.5 * sx);
   float l = bodyInside(uv - sx) + 0.5 * bodyInside(uv - 0.5 * sx);
   float d = bodyInside(uv + sy) + 0.5 * bodyInside(uv + 0.5 * sy);
@@ -70,6 +71,7 @@ vec3 bodyLightAt(vec2 uv, bool glow) {
   vec3 light = sky + (moonLight + creatureWarmth(uLanternColor * bodyLantern + lamps) + bounce) * uCharacterLight;
   if (!glow && uBodyLight.y > 0.0) { // the body's own shape: its edge turned from the light falls into shade
     vec3 e = bodyEdge(uv);
+    bodyRim = e;
     vec3 lv = mat3(viewMatrix) * (L * dot(uLightColor * moon, vec3(0.3333)) + Ll * dot(uLanternColor * bodyLantern, vec3(0.3333)));
     vec2 ls = length(lv.xy) > 1e-4 ? normalize(lv.xy) : vec2(0.0);
     float away = max(0.0, -dot(e.xy, ls));

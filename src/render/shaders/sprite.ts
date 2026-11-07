@@ -14,8 +14,10 @@ import { VOID_GLSL } from './eldritch';
 import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL } from './common';
 import { SHADOW_GLSL } from './shadow';
 import { GORE_FX } from '../../data/gore';
+import { CREATURE_FX } from '../../data/creatureFx';
 import { SPRITE_FX_GLSL } from './spriteFx';
 import { BODY_LIGHT_GLSL } from './bodyLight';
+import { BODY_MATTER_GLSL } from './bodyMatter';
 import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
 export const SPRITE_VERT = /* glsl */ `
@@ -27,12 +29,12 @@ uniform vec3 uLightDir; // toward the moon
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
 attribute vec4 aInfo; // flash, opacity, flip, outside the palette (1) + a horror's form, whose body the Relight setting lights over its folds (2) (render/creatureRelight.ts)
-attribute float aWeird; // 0..1: how far it refuses to hold its shape (eldritch.ts)
 attribute vec4 aFx; // how far gone, in what style, how worn, a seed (spriteFx.ts)
-attribute vec4 aWound; // where the last blow fell, its flash, its reach
+attribute vec4 aWound; // where the last blow fell, its flash; w: 0..1 how far it refuses to hold its shape (eldritch.ts; round 113: it had an attribute of its own, and the blow's reach, a constant, had this one)
 attribute vec4 aGlint; // the colour of the marks of this form that keep their light in the dark, and how far
 attribute vec4 aCut; // a killing cut's line in the frame, and which side of it this billboard is (spriteFx.ts; round 113)
 attribute vec4 aPiece; // a severed piece's middle in the frame and how far it has turned, and the blood
+attribute vec4 aGround; // the sea's surface it wades in (+10000; 0 none), metres its feet sink, into what, its feet's height (render/bodyGround.ts; round 113)
 attribute vec4 aTone; // the form's recolour to the realm it stands in: a turn of hue (cos, sin), a lift of colour, a cast for a grey (render/spriteTone.ts)
 
 varying vec2 vUv;
@@ -54,6 +56,7 @@ varying vec2 vQuad;
 varying vec2 vSize;
 varying vec4 vCut;
 varying float vBlood;
+varying vec4 vGround;
 ${LANTERN_GLSL}
 ${SHADOW_GLSL}
 void main() {
@@ -93,13 +96,14 @@ void main() {
   vOpacity = aInfo.y;
   vOutside = mod(aInfo.w, 2.0);
   vRelit = floor(aInfo.w / 2.0 + 0.01);
-  vWeird = aWeird;
+  vWeird = aWound.w;
   vCell = aCell;
   vFx = aFx;
-  vWound = aWound;
+  vWound = vec4(aWound.xyz, ${CREATURE_FX.woundMetres.toFixed(3)});
   vGlint = aGlint;
   vCut = aCut;
   vBlood = aPiece.w;
+  vGround = vec4(aGround.x > 0.5 ? aGround.x - 10000.0 : -1e9, aGround.yzw);
   vTone = aTone.z > 0.01 ? aTone : vec4(1.0, 0.0, 1.0, 0.0); // (a form with none is drawn as it is)
   vQuad = q;
   vSize = body;
@@ -209,6 +213,7 @@ vec3 creatureWarmth(vec3 c) {
   return mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, uSpriteWarm);
 }
 ${BODY_LIGHT_GLSL}
+${BODY_MATTER_GLSL}
 
 /** A shifting film of colour over the picture, with its painted light and dark still visible. */
 vec3 outsideColour(vec2 uv, vec3 painted) {
@@ -222,10 +227,14 @@ vec3 outsideColour(vec2 uv, vec3 painted) {
 }
 
 void main() {
+  bodyDx = dFdx(vUv); // (before any pixel is discarded: round 113)
+  bodyDy = dFdy(vUv);
+  gl_FragDepth = gl_FragCoord.z;
   vec2 uv = vWeird > 0.2 ? slip(vUv) : (uMind > 0.0 && uReviewed > 0.5 ? mindSlip(vUv) : vUv);
+  uv = bodyWaver(uv); // below the sea's surface it wavers (bodyMatter.ts)
   vec3 src = fxSource(uv); // a body that is going or forming has its texels moved (spriteFx.ts)
   if (src.z < 0.5) discard;
-  vec4 t = texture(uAtlas, src.xy);
+  vec4 t = bodySample(src.xy); // far, the average of what a screen pixel covers (bodyMatter.ts)
   if (vWeird >= 0.6 && t.a < 0.3) { // a faint double of it, lagging to one side
     vec2 lag = vec2(clamp(uv.x + sin(uTime * 1.3) * 0.08 * (vCell.z - vCell.x), vCell.x, vCell.z), uv.y);
     if (texture(uAtlas, lag).a < 0.3 || 0.3 * vOpacity < bayer4(gl_FragCoord.xy)) discard;
@@ -242,6 +251,7 @@ void main() {
     float shown = smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * bodyLantern, vec3(0.2126, 0.7152, 0.0722)));
     col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost)); // in the light the realm's tint is taken back along the wheel, up to a share of it (round 95): its own hue, its colour whole, the light's colour on it
   }
+  if (!glow) col = bodyCoat(bodyGrain(col, src.xy), light); // a coarse form's grain, and the realm's matter on what of it faces up (bodyMatter.ts; round 113)
   if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 83)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   if (vOutside > 0.5) col = outsideColour(src.xy, t.rgb);
@@ -252,6 +262,8 @@ void main() {
   }
   if (!fxCut(src.xy, col)) discard; // the side of a killing cut that is not this billboard's (round 113)
   if (!fxKeep(src.xy, col)) discard; // and the texels that are gone, with their rim
+  if (!bodyGround(col, light)) discard; // the sea it wades in, the snow or mud its feet sink into (bodyMatter.ts)
+  gl_FragDepth = bodyDepth(src.xy); // as deep as a rounded body (bodyMatter.ts)
   float fog = vFog * uFogAmount;
   if (vOutside > 0.5) {
     gl_FragColor = vec4(mix(col, uFogColor, fog), uMarkCharacters > 0.5 ? 0.31 : 1.0);

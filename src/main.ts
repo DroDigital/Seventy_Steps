@@ -51,6 +51,7 @@ import { createParticles } from './render/particles';
 import { createBlood, GORE_SETTING } from './render/blood';
 import { createBloodPools } from './render/bloodPools';
 import { createGore } from './render/gore';
+import { createBodyWeather } from './render/bodyWeather';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
 import { createFightViews } from './render/fightViews';
@@ -207,7 +208,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const views = createActorViews(scene, game);
   await loadModels(); // the arenas' models, read before the world is built about them
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
-  const blood = createBlood(game, particles, createBloodPools(scene, (x, z) => game.world.ground(x, z))); // round 113: blood, spatter and pools
+  const marks = createBloodPools(scene, (x, z) => game.world.ground(x, z)); // round 113: what lies on the ground and the water a moment: blood, spatter, a wader's rings
+  const blood = createBlood(game, particles, marks);
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)), createGore(game, blood)); // and a blade's cut
   const fights = createFightViews(scene, game);
   const fxController = createFxController(game);
@@ -219,6 +221,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
+  const bodyWeather = createBodyWeather(game, particles, marks, creatures.figure, creatures.painted); // round 113: rain on the creatures, rings where they wade
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
   const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise, figure: creatures.figure }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
@@ -373,6 +376,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         GORE_SETTING.on = settings.gore > 0.5; // round 113: the cut and the blood (Settings › Accessibility)
         creatures.update(alpha, time, camera);
         blood.update(time);
+        bodyWeather.update(time, camera.position, enclosed);
         hidden.update(time);
         fights.update(alpha, time);
         combatFx.update();

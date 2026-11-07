@@ -49,7 +49,7 @@ interface Cast {
 }
 
 /** What a cast shares with the sprite batch it is drawn from: the batch's own buffers. */
-const SHARED = ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx', 'aCut'] as const;
+const SHARED = ['position', 'uv', 'aCell', 'aInfo', 'aWound', 'aFx', 'aCut'] as const; // (aWound's w is how far it slips: round 113)
 
 export function createSilhouetteCasters(): SilhouetteCasters {
   const scene = new THREE.Scene();

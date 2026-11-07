@@ -19,8 +19,10 @@ export interface BloodMark {
   size: number;
   color: Rgb;
   wet: boolean;
-  /** 0 a pool, 1 a spatter thrown the way of `yaw`. */
-  kind: 0 | 1;
+  /** 0 a pool, 1 a spatter thrown the way of `yaw`, 2 a ring spreading on water (round 113: render/bodyWeather.ts). */
+  kind: 0 | 1 | 2;
+  /** The height it lies at, if not the ground's (the sea's surface for a ring). */
+  y?: number;
   yaw: number;
   /** Seconds it takes to spread to its size. */
   grow: number;
@@ -37,7 +39,7 @@ export interface BloodPools {
 const VERT = /* glsl */ `
 uniform float uTime;
 attribute vec4 aMark; // born, grow seconds, life seconds, a seed
-attribute vec4 aLook; // rgb, wet (1) + spatter (2)
+attribute vec4 aLook; // rgb, wet (1) + spatter (2) or ring (4)
 varying vec2 vQ;
 varying vec4 vLook;
 varying vec3 vWorld;
@@ -107,10 +109,14 @@ float markAt(vec2 q, bool spatter) {
   return m;
 }
 void main() {
-  bool spatter = vLook.w > 1.5;
+  bool ring = vLook.w > 3.5;
+  bool spatter = !ring && vLook.w > 1.5;
   float wet = mod(vLook.w, 2.0);
-  if (markAt(vQ, spatter) < 0.5) discard;
-  float fade = 1.0 - smoothstep(0.55, 1.0, vAge);
+  if (ring) {
+    float d = length(floor(vQ * 20.0) / 20.0);
+    if (abs(d - 0.9 * vSpread) > 0.06 + 0.04 * (1.0 - vAge)) discard;
+  } else if (markAt(vQ, spatter) < 0.5) discard;
+  float fade = ring ? 1.0 - vAge : 1.0 - smoothstep(0.55, 1.0, vAge);
   if (fade < bayer4(gl_FragCoord.xy)) discard;
   vec3 n = normalize(vNormal);
   float moon = moonLit(vWorld, n, max(dot(n, uLightDir), 0.0));
@@ -168,13 +174,14 @@ export function createBloodPools(scene: THREE.Scene, ground: (x: number, z: numb
       used = Math.min(capacity, Math.max(used, slot + 1));
       deaths[slot] = time + m.life;
       const e = 0.35 * Math.max(0.3, m.size); // the slope, read over the mark's own breadth
-      const y = ground(m.x, m.z);
-      up.set(ground(m.x - e, m.z) - ground(m.x + e, m.z), 2 * e, ground(m.x, m.z - e) - ground(m.x, m.z + e)).normalize();
+      const y = m.y ?? ground(m.x, m.z);
+      if (m.y !== undefined) up.set(0, 1, 0); // (on water: level)
+      else up.set(ground(m.x - e, m.z) - ground(m.x + e, m.z), 2 * e, ground(m.x, m.z - e) - ground(m.x, m.z + e)).normalize();
       q.setFromUnitVectors(Y, up).multiply(turn.setFromAxisAngle(Y, m.yaw - Math.PI / 2));
       m4.compose(new THREE.Vector3(m.x, y + LIFT, m.z), q, new THREE.Vector3(m.size, 1, m.size));
       mesh.setMatrixAt(slot, m4);
       mark.setXYZW(slot, time, m.grow, m.life, Math.random());
-      look.setXYZW(slot, m.color[0], m.color[1], m.color[2], (m.wet ? 1 : 0) + (m.kind === 1 ? 2 : 0));
+      look.setXYZW(slot, m.color[0], m.color[1], m.color[2], (m.wet ? 1 : 0) + (m.kind === 1 ? 2 : m.kind === 2 ? 4 : 0));
       mesh.instanceMatrix.needsUpdate = mark.needsUpdate = look.needsUpdate = true;
       mesh.count = used;
     },

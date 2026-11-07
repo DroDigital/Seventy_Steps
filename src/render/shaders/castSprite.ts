@@ -22,7 +22,7 @@ uniform float uCastBack; // metres a point light's cut-out stands behind the bod
 
 attribute vec4 aCell; // u0, v0 (top), u1, v1 (bottom)
 attribute vec4 aInfo; // flash, opacity, flip, outside
-attribute float aWeird;
+attribute vec4 aWound; // w: how far it refuses to hold its shape (round 113)
 attribute vec4 aFx;
 attribute vec4 aCut; // a killing cut (round 113): the body's shadow loses what the blade took (a severed piece casts none)
 attribute vec4 aCast; // casts (0 or 1), how much taller its shadow is, how much broader, the metres its feet stand above the picture's bottom
@@ -71,7 +71,7 @@ void main() {
   vBlood = 0.0;
   vQuad = uv;
   vSize = vec2(w, h);
-  vWeird = aWeird;
+  vWeird = aWound.w;
 }
 `;
 

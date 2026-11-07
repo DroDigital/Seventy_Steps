@@ -31,6 +31,7 @@ import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
 import { createCreatureRoof } from './creatureRoof';
 import { createWalkCycles } from './walkCycle';
+import { createBodyGround } from './bodyGround';
 import { BODY_LIGHT } from '../data/bodyLight';
 import { castSilhouettes } from './silhouetteCasters';
 import { relitOf } from './creatureRelight';
@@ -113,6 +114,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     if (piece) b.mesh.setMatrixAt(index, m4.compose(at.set(piece.x, piece.y - 0.5 * size.height * GORE_FX.pad, piece.z), q, scale.set(size.width * GORE_FX.pad, size.height * GORE_FX.pad, 1))); // a severed piece: a larger billboard about its middle (round 113)
     else b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width * (1 + 0.4 * say), size.height * (1 + say), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height)
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
+    b.ground.setXYZW(index, piece ? 0 : standing[0], piece ? 0 : standing[1], standing[2], standing[3]);
     const glint = REVIEWED_GLINTS[key];
     b.glint.setXYZW(index, glint?.[0] ?? 0, glint?.[1] ?? 0, glint?.[2] ?? 0, glint ? 1 + fire : 0);
     const tone = toneForForm(key, REVIEWED_MATTER[key] ?? realm, realm, (worldUniforms.uSpriteGrade.value as number) * sky); // this form's own recolour to the realm it stands in (round 83), kept to the open sky's share of it (round 96)
@@ -135,6 +137,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const arrivals = createArrivals(); // the bosses not yet roused, and when each came into view (round 60)
   const roofs = createCreatureRoof(); // how far each creature stands under a dungeon's roof, eased (round 96)
   const walks = createWalkCycles(); // the walk cycles each has covered (round 113)
+  const grounds = createBodyGround(g); // the sea each wades in, the ground its feet sink into (round 113)
+  let standing: readonly number[] = [0, 0, 0, 0]; // the one being put
   const turning = new Map<Entity, { from: SpriteDirection; at: number }>(); // a view being dissolved into the next (round 113)
   let lastTime = 0;
   /** A creature in its death, told to the gore (round 113): where its picture stands and how it is painted this frame. */
@@ -209,6 +213,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival, walked)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           sky = roofs.sky(id, roofedAt(x, z), time); // under a dungeon's roof a creature keeps the colours it was drawn in (round 96)
+          standing = grounds.of(id, x, y, z, hover);
           const dying = look.dissolve !== undefined && gore ? dyingOf(id, key, def.sprite?.silhouette, look.dissolve, clip, pose, x, y, z, yaw, direction, time) : undefined; // its blood, and a blade's cut (round 113)
           if (dying) gore!.adjust(gone, dying, look.dissolve!);
           const cut: Cut | undefined = dying && { plan: dying.plan, side: 1, turn: 0, blood: dying.bloodIndex };
@@ -287,6 +292,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
       }
       arrivals.forget(seen);
       walks.forget(seen);
+      grounds.forget(seen);
       lastTime = time;
       fx.forget(seen);
       gore?.forget(seen);

@@ -32,7 +32,7 @@ describe('the silhouette casters', () => {
     casters.scene.children.forEach((c, i) => {
       const mesh = c as THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(mesh.instanceMatrix).toBe(source[i].instanceMatrix);
-      for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx']) expect(mesh.geometry.getAttribute(name), name).toBe(source[i].geometry.getAttribute(name));
+      for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWound', 'aFx', 'aCut']) expect(mesh.geometry.getAttribute(name), name).toBe(source[i].geometry.getAttribute(name));
       expect(mesh.geometry.getIndex()).toBe(source[i].geometry.getIndex());
       expect(mesh.geometry.getAttribute('aCast').itemSize).toBe(4);
       expect(mesh.material.side).toBe(THREE.DoubleSide);
@@ -59,7 +59,7 @@ describe('the silhouette casters', () => {
     geo.addEventListener('dispose', () => held.push({ attributes: Object.keys(geo.attributes), index: geo.getIndex() !== null }));
     casters.adopt(batches());
     expect(held).toEqual([{ attributes: ['aCast'], index: false }]); // (a geometry's disposal frees every buffer it holds)
-    for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWeird', 'aFx']) expect(source[0].geometry.getAttribute(name), name).toBeDefined();
+    for (const name of ['position', 'uv', 'aCell', 'aInfo', 'aWound', 'aFx', 'aCut']) expect(source[0].geometry.getAttribute(name), name).toBeDefined();
     expect(source[0].geometry.getIndex()).not.toBeNull();
   });
 

@@ -39,7 +39,7 @@ describe('a creature in the lantern\'s light shows its own colours (round 93)', 
     expect(SPRITE_GRADE_GLSL).toMatch(/vec4 spriteToneBack\(vec4 tone, float k\)/); // the tone of a smaller share (round 95)
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
     const at = (s: string): number => src.indexOf(s);
-    expect(at('smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y,')).toBeGreaterThan(at('t.rgb * light')); // the lantern's own light on it, as the light sums it
+    expect(at('smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * bodyLantern,')).toBeGreaterThan(at('t.rgb * light')); // the lantern's own light on it, as the light sums it
     expect(at('col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost))')).toBeGreaterThan(at('vec3 col = glow ? t.rgb : t.rgb * light')); // the lit colour, the light's own colour on it
     expect(at('spriteToneBack(vTone,')).toBeLessThan(at('float fog = vFog * uFogAmount'));
   });

@@ -35,7 +35,7 @@ describe('reviewed artwork for sky visitors', () => {
       expect(legacy.count).toBe(0);
       expect(reviewed.count).toBe(1);
       expect(reviewed.material.uniforms.uReviewed.value).toBe(1);
-      expect(reviewed.geometry.getAttribute('aWeird').getX(0)).toBe(0);
+      expect(reviewed.geometry.getAttribute('aWound').getW(0)).toBe(0);
       const pose = new THREE.Matrix4();
       reviewed.getMatrixAt(0, pose);
       const at = new THREE.Vector3().setFromMatrixPosition(pose);

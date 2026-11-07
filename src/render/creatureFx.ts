@@ -127,15 +127,16 @@ export function createCreatureFx(g: Game): CreatureFx {
         b.cut.setXYZW(index, 0, 0, 0, 0);
         b.piece.setXYZW(index, 0, 0, 0, cut?.blood ?? 0);
       }
+      const unwound = (): void => void b.wound.setX(index, 0).setY(index, 0).setZ(index, 0); // (its w is how far it slips: set by the views)
       if (!dress) {
         b.fx.setXYZW(index, 0, 0, 0, 0);
-        b.wound.setXYZW(index, 0, 0, 0, 0);
+        unwound();
         return;
       }
       b.fx.setXYZW(index, dress.gone.amount, dress.gone.style, this.wear(dress.id), (dress.id * 0.7548776662) % 1);
       const w = this.wound(dress.id, x, baseY, z, width, height, across, time);
-      if (w) b.wound.setXYZW(index, w[0], w[1], w[2], w[3]);
-      else b.wound.setXYZW(index, 0, 0, 0, 0);
+      if (w) b.wound.setX(index, w[0]).setY(index, w[1]).setZ(index, w[2]);
+      else unwound();
     },
     forget(live) {
       for (const m of [wounds, forms, forming]) for (const id of m.keys()) if (!live.has(id)) m.delete(id);
