@@ -97,7 +97,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   let spent = 0;
   for (const p of props) {
     const [s, cs] = [Math.sin(p.yaw), Math.cos(p.yaw)];
-    for (const piece of p.kind === 'house' ? housePieces(p, c) : propPieces(p, c)) {
+    for (const piece of p.kind === 'house' ? housePieces(p, c, region.id) : propPieces(p, c, region.id)) { // in the realm's own forms (round 111)
       const geo = piece.geo && placed(piece.geo, piece, p);
       if (geo) {
         if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);

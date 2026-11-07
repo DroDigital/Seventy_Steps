@@ -1,9 +1,9 @@
 /**
  * Prop shapes (spec §2: low-poly, vertex-coloured): each prop as a few pieces, each tagged with the
- * material it merges into. Dead hardwoods with forked branches and root flares, dark pines of stacked
- * boughs, lichened rocks, fluted pillars with plinths, leaning monoliths, round-topped headstones,
- * crosses, obelisks, broken walls, dry-stone field walls, rail fences, iron street lamps, fallen logs,
- * fire pits, bushes, stumps and altars. Houses are houseMesh.ts's.
+ * material it merges into. Crosses, obelisks, broken walls, dry-stone field walls, rail fences, iron
+ * street lamps, fire pits and altars here; the trees, conifers, rocks, bushes, stumps, logs, headstones,
+ * pillars and monoliths in their realm's forms (round 111: treeForms, pineForms, rockForms, shrubForms,
+ * stoneForms). Houses are houseMesh.ts's.
  */
 
 import * as THREE from 'three';
@@ -11,9 +11,16 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { createRng, type Rng } from '../core/rng';
 import type { LightKind } from '../data/tuning';
 import type { Prop } from '../world/props';
+import { formOf, lookOf, type Weights } from '../data/propLooks';
 import { landmarkPieces } from './landmarkShapes';
+import { pineOf } from './pineForms';
+import { rockOf } from './rockForms';
+import { bushOf, logOf, stumpOf } from './shrubForms';
+import { graveOf, monolithOf, pillarOf } from './stoneForms';
+import { treeOf } from './treeForms';
 import { setPieces } from './setShapes';
 import { box, tileUv, tint } from './meshKit';
+import { cyl } from './propKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
 export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
@@ -36,104 +43,8 @@ export interface Piece {
 }
 
 const BARK: Rgb = scaleRgb(mixRgb(BASE.charcoal, BASE.rust, 0.35), 1.7);
-const NEEDLES: Rgb = scaleRgb(mixRgb(BASE.seaGrey, BASE.charcoal, 0.55), 1.3);
 const IRON: Rgb = scaleRgb(BASE.charcoal, 1.8);
 const FLAME: Rgb = mixRgb(BASE.bone, [1, 0.8, 0.5], 0.6);
-
-const cyl = (r0: number, r1: number, h: number, seg: number, c: Rgb, rows = 1): THREE.BufferGeometry =>
-  tint(tileUv(new THREE.CylinderGeometry(r1, r0, h, seg, rows).translate(0, h / 2, 0), Math.PI * (r0 + r1), h), c);
-
-/** A branch from the origin along (yaw, pitch from vertical), `len` long, tapering from r. */
-function limb(len: number, r: number, yaw: number, pitch: number, c: Rgb): THREE.BufferGeometry {
-  return cyl(r, r * 0.35, len, 4, c).rotateX(pitch).rotateY(yaw);
-}
-
-/** October leaves: rust, ochre and the last of the green, dimmed. */
-const AUTUMN: readonly Rgb[] = [[0.62, 0.34, 0.2], [0.7, 0.52, 0.26], [0.5, 0.28, 0.18], [0.42, 0.42, 0.26]];
-
-function tree(p: Prop, rng: Rng): Piece[] {
-  const parts = [cyl(p.w * 1.6, p.w, 0.6, 6, scaleRgb(BARK, 0.8)), cyl(p.w, p.w * 0.45, p.h, 6, BARK, Math.ceil(p.h / 1.5))];
-  const leafy = rng() < 0.45; // many hardwoods keep some of their October leaves
-  const leaves: THREE.BufferGeometry[] = [];
-  const n = 3 + Math.floor(rng() * 3);
-  for (let k = 0; k < n; k++) {
-    const y = p.h * (0.45 + 0.45 * (k / n)) + rng() * 0.5;
-    const yaw = k * 2.3 + rng();
-    const len = (1.4 + rng() * 1.8) * (1 - k / (n + 2));
-    const pitch = 0.55 + rng() * 0.5;
-    parts.push(limb(len, p.w * 0.45, yaw, pitch, BARK).translate(0, y, 0));
-    const [ex, ey, ez] = [Math.sin(yaw) * Math.sin(pitch) * len, Math.cos(pitch) * len, Math.cos(yaw) * Math.sin(pitch) * len];
-    for (let t = 0; t < 2; t++) {
-      const [ty, tp, tl] = [yaw + (t - 0.5) * 1.2, pitch - 0.3 + rng() * 0.4, len * 0.55];
-      parts.push(limb(tl, p.w * 0.2, ty, tp, BARK).translate(ex * 0.8, y + ey * 0.8, ez * 0.8));
-      if (!leafy || rng() < 0.3) continue;
-      const tip = [ex * 0.8 + Math.sin(ty) * Math.sin(tp) * tl, y + ey * 0.8 + Math.cos(tp) * tl, ez * 0.8 + Math.cos(ty) * Math.sin(tp) * tl];
-      const r = 0.7 + rng() * 0.9;
-      const clump = new THREE.IcosahedronGeometry(r, 0).scale(1, 0.7, 1).rotateY(rng() * 3).translate(tip[0], tip[1], tip[2]);
-      leaves.push(tint(tileUv(clump, r * 2, r * 2), AUTUMN[Math.floor(rng() * AUTUMN.length)]));
-    }
-  }
-  const out: Piece[] = [{ mat: 'wood', geo: mergeGeometries(parts) }];
-  if (leaves.length) out.push({ mat: 'leaf', geo: mergeGeometries(leaves) });
-  return out;
-}
-
-function pine(p: Prop, rng: Rng): Piece[] {
-  const trunk = cyl(p.w, p.w * 0.5, p.h * 0.35, 5, BARK);
-  const boughs: THREE.BufferGeometry[] = [];
-  const tiers = 4;
-  for (let k = 0; k < tiers; k++) {
-    const t = k / tiers;
-    const r = p.h * 0.22 * (1 - t * 0.7) * (0.9 + rng() * 0.2);
-    const h = p.h * 0.34;
-    const cone = tint(tileUv(new THREE.ConeGeometry(r, h, 7), Math.PI * r, h), scaleRgb(NEEDLES, 0.85 + 0.25 * t));
-    boughs.push(cone.rotateY(rng() * 3).translate(0, p.h * 0.28 + p.h * 0.62 * t + h / 2 - h * 0.25, 0));
-  }
-  return [{ mat: 'wood', geo: trunk }, { mat: 'leaf', geo: mergeGeometries(boughs) }];
-}
-
-/** A scatter in [0, 1) from where a point is (round 21: a sphere's seam and poles are several vertices at one place, and drawing a scatter for each tore the rock open along them). */
-const scatter = (x: number, y: number, z: number, salt: number): number => {
-  const v = Math.sin(Math.round(x * 1e4) * 12.9898 + Math.round(y * 1e4) * 78.233 + Math.round(z * 1e4) * 37.719 + salt * 4.1414) * 43758.5453;
-  return v - Math.floor(v);
-};
-
-function rock(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const geo = new THREE.SphereGeometry(p.w, 8, 6);
-  const pos = geo.getAttribute('position');
-  const colors = new Float32Array(pos.count * 3);
-  const salt = rng() * 100;
-  for (let i = 0; i < pos.count; i++) {
-    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
-    const k = 0.78 + 0.44 * scatter(x, y, z, salt);
-    pos.setXYZ(i, x * k, Math.max(-0.25 * p.w, y) * (p.h / p.w) * (0.85 + 0.3 * scatter(x, y, z, salt + 1)), z * (0.78 + 0.44 * scatter(x, y, z, salt + 2)));
-    const moss = Math.max(0, y / p.w) * 0.5; // lichen on the top
-    colors.set(mixRgb(c, scaleRgb(mixRgb(BASE.seaGrey, BASE.charcoal, 0.3), 1.6), moss), i * 3);
-  }
-  geo.computeVertexNormals();
-  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  return [{ mat: 'stone', geo: tileUv(geo, p.w * 2, p.h) }];
-}
-
-function pillar(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const broken = rng() < 0.4 ? p.h * (0.5 + 0.3 * rng()) : p.h;
-  const parts = [box(p.w * 2.6, 0.4, p.w * 2.6, 0, 0.2, 0, scaleRgb(c, 0.85)), cyl(p.w * 0.95, p.w * 0.85, broken, 10, c, Math.ceil(broken))];
-  if (broken === p.h) parts.push(box(p.w * 2.3, 0.35, p.w * 2.3, 0, p.h + 0.17, 0, scaleRgb(c, 0.9)));
-  return [{ mat: 'stone', geo: tileUv(mergeGeometries(parts), 2, 2) }];
-}
-
-function monolith(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const geo = new THREE.CylinderGeometry(Math.SQRT1_2 * 0.75, Math.SQRT1_2, 1, 4, Math.ceil(p.h / 2)).rotateY(Math.PI / 4);
-  geo.scale(p.w * 2, p.h, p.d * 2).translate(0, p.h / 2, 0).rotateZ((rng() - 0.5) * 0.12);
-  return [{ mat: 'stone', geo: tint(tileUv(geo, p.w * 4, p.h), scaleRgb(c, 0.75)) }];
-}
-
-function headstone(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const tone = scaleRgb(c, 0.8 + 0.3 * rng());
-  const top = tint(new THREE.CylinderGeometry(p.w, p.w, p.d * 2, 8, 1, false, 0, Math.PI).rotateZ(Math.PI / 2).rotateY(Math.PI / 2).translate(0, p.h - p.w, 0), tone);
-  const parts = [box(p.w * 2, p.h - p.w, p.d * 2, 0, (p.h - p.w) / 2, 0, tone), top, box(p.w * 2.4, 0.1, p.d * 5, 0, 0.05, p.d * 1.5, scaleRgb(tone, 0.8))];
-  return [{ mat: 'stone', geo: tileUv(mergeGeometries(parts), 1, 1).rotateX((rng() - 0.5) * 0.18) }];
-}
 
 function cross(p: Prop, rng: Rng, c: Rgb): Piece[] {
   const stone = rng() < 0.5;
@@ -199,11 +110,6 @@ function lamp(p: Prop): Piece[] {
   return [{ mat: 'wood', geo: tileUv(post, 1, 1) }, { mat: 'glow', geo: tileUv(glass, 1, 1), light: 'lamp' }];
 }
 
-function log(p: Prop, rng: Rng): Piece[] {
-  const geo = cyl(p.d, p.d * 0.9, p.w * 2, 7, scaleRgb(BARK, 0.9 + 0.2 * rng())).translate(0, -p.w, 0).rotateZ(Math.PI / 2).translate(0, p.d, 0);
-  return [{ mat: 'wood', geo }];
-}
-
 function firepit(p: Prop, rng: Rng, c: Rgb): Piece[] {
   const stones: THREE.BufferGeometry[] = [];
   for (let k = 0; k < 9; k++) {
@@ -214,18 +120,6 @@ function firepit(p: Prop, rng: Rng, c: Rgb): Piece[] {
   return [{ mat: 'stone', geo: tileUv(mergeGeometries(stones), 1, 1) }, { mat: 'wood', geo: mergeGeometries(wood) }, { mat: 'glow', light: 'fire', at: [0, 0.6, 0] }];
 }
 
-function bush(p: Prop, rng: Rng): Piece[] {
-  const parts = Array.from({ length: 3 + Math.floor(rng() * 2) }, () => {
-    const r = p.w * (0.5 + 0.4 * rng());
-    return tint(tileUv(new THREE.SphereGeometry(r, 6, 4), r * 3, r * 2), scaleRgb(NEEDLES, 0.8 + 0.4 * rng())).scale(1, p.h / p.w, 1).translate((rng() - 0.5) * p.w, r * 0.6, (rng() - 0.5) * p.w);
-  });
-  return [{ mat: 'leaf', geo: mergeGeometries(parts) }];
-}
-
-function stump(p: Prop): Piece[] {
-  return [{ mat: 'wood', geo: mergeGeometries([cyl(p.w * 1.3, p.w, p.h, 7, BARK), cyl(p.w * 0.2, p.w * 0.05, p.h * 0.6, 3, BARK).rotateZ(1.2).translate(p.w, 0, 0)]) }];
-}
-
 function altar(p: Prop, rng: Rng, c: Rgb): Piece[] {
   const slab = box(p.w * 2, 0.3, p.d * 2, 0, p.h - 0.15, 0, scaleRgb(c, 0.8));
   const legs = [-1, 1].map((s) => box(0.5, p.h - 0.3, p.d * 1.6, s * p.w * 0.6, (p.h - 0.3) / 2, 0, scaleRgb(c, 0.7)));
@@ -233,22 +127,28 @@ function altar(p: Prop, rng: Rng, c: Rgb): Piece[] {
   return [{ mat: 'stone', geo: tileUv(mergeGeometries([slab, ...legs, stain]), 1, 1) }];
 }
 
-/** A prop's pieces in its own frame (feet at the origin, facing +z); houses are handled apart. */
-export function propPieces(p: Prop, c: Rgb): Piece[] {
+/**
+ * A prop's pieces in its own frame (feet at the origin, facing +z); houses are handled apart. Round 111: the trees, conifers, rocks,
+ * bushes, stumps, logs, headstones, pillars and monoliths are drawn in the forms of `region`'s look (data/propLooks.ts), one picked by
+ * the prop's own seed; with no region, the hub's.
+ */
+export function propPieces(p: Prop, c: Rgb, region?: string): Piece[] {
   const rng = createRng(p.seed);
+  const look = lookOf(region);
+  const form = <F extends string>(w: Weights<F>, fallback: F): F => formOf(w, createRng(p.seed * 31 + 7)(), fallback); // its own draw, so the form's builder draws as it would
   switch (p.kind) {
     case 'tree':
-      return tree(p, rng);
+      return treeOf(form(look.trees, 'dead'), p, rng, look);
     case 'pine':
-      return pine(p, rng);
+      return pineOf(form(look.pines, 'fir'), p, rng, look);
     case 'rock':
-      return rock(p, rng, c);
+      return rockOf(form(look.rocks, 'boulder'), p, rng, c, look);
     case 'pillar':
-      return pillar(p, rng, c);
+      return pillarOf(form(look.pillars, 'round'), p, rng, c);
     case 'monolith':
-      return monolith(p, rng, c);
+      return monolithOf(form(look.monoliths, 'slab'), p, rng, c, look);
     case 'grave':
-      return headstone(p, rng, c);
+      return graveOf(form(look.graves, 'round'), p, rng, c);
     case 'cross':
       return cross(p, rng, c);
     case 'obelisk':
@@ -262,13 +162,13 @@ export function propPieces(p: Prop, c: Rgb): Piece[] {
     case 'lamp':
       return lamp(p);
     case 'log':
-      return log(p, rng);
+      return logOf(form(look.logs, 'plain'), p, rng, look);
     case 'firepit':
       return firepit(p, rng, c);
     case 'bush':
-      return bush(p, rng);
+      return bushOf(form(look.bushes, 'round'), p, rng, c, look);
     case 'stump':
-      return stump(p);
+      return stumpOf(form(look.stumps, 'cut'), p, rng, look);
     case 'altar':
       return altar(p, rng, c);
     case 'house':

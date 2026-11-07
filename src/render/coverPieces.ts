@@ -86,12 +86,83 @@ function cap(b: Builder, rng: Rng, x: number, y: number, z: number): void {
   }
 }
 
-const BUILD: Record<Piece, (b: Builder, rng: Rng, x: number, y: number, z: number) => void> = { wrack, rib, sherd, cap };
+/** Round 111: a crust of lichen, a few flat irregular flakes pressed to the ground. */
+function lichen(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  for (let i = 0; i < 3 + Math.floor(rng() * 3); i++) {
+    const c = pick(PIECE_COLORS.lichen, rng);
+    const [lx, lz, r] = [x + (rng() - 0.5) * 0.6, z + (rng() - 0.5) * 0.6, 0.06 + 0.08 * rng()];
+    const a = rng() * Math.PI;
+    const ring = [0, 1, 2, 3, 4].map((k): V => [lx + Math.cos(a + k * 1.26) * r * (0.7 + 0.5 * rng()), y + 0.025, lz + Math.sin(a + k * 1.26) * r * (0.7 + 0.5 * rng())]);
+    for (let k = 1; k < 4; k++) b.tri(ring[0], ring[k], ring[k + 1], c, dim(c, 0.9), c);
+  }
+}
+
+/** A root breaking the surface: one or two low arcs, ribbons crossed so they read from any side. */
+function root(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  for (let n = 0; n < 1 + Math.floor(rng() * 2); n++) {
+    const c = pick(PIECE_COLORS.root, rng);
+    const [reach, rise, a] = [0.4 + 0.4 * rng(), 0.08 + 0.1 * rng(), rng() * Math.PI];
+    const [ux, uz] = [Math.sin(a), Math.cos(a)];
+    const point = (t: number): V => [x + ux * (t - 0.5) * 2 * reach, y - 0.03 + Math.sin(Math.PI * t) * rise, z + uz * (t - 0.5) * 2 * reach];
+    for (let s = 0; s < 3; s++) {
+      const [p, q] = [point(s / 3), point((s + 1) / 3)];
+      strip(b, p, q, 0.035, true, dim(c, 0.8), c);
+      strip(b, p, q, 0.035, false, dim(c, 0.8), c);
+    }
+  }
+}
+
+/** Ash: grey flakes lying flat, a drift of them. */
+function ash(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  for (let i = 0; i < 5; i++) {
+    const c = pick(PIECE_COLORS.ash, rng);
+    const [lx, lz, r, a] = [x + (rng() - 0.5) * 0.8, z + (rng() - 0.5) * 0.8, 0.05 + 0.07 * rng(), rng() * Math.PI * 2];
+    b.tri([lx + Math.cos(a) * r, y + 0.02, lz + Math.sin(a) * r], [lx + Math.cos(a + 2.2) * r, y + 0.02, lz + Math.sin(a + 2.2) * r], [lx + Math.cos(a + 4.1) * r, y + 0.02, lz + Math.sin(a + 4.1) * r], c, dim(c, 0.9), c);
+  }
+}
+
+/** Shards: two to four splinters standing from the ground at angles, three-sided. */
+function shard(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  const c = pick(PIECE_COLORS.shard, rng);
+  for (let i = 0; i < 2 + Math.floor(rng() * 3); i++) {
+    const [sx, sz, r, h] = [x + (rng() - 0.5) * 0.4, z + (rng() - 0.5) * 0.4, 0.03 + 0.04 * rng(), 0.12 + 0.25 * rng()];
+    const [lx, lz] = [(rng() - 0.5) * h * 0.6, (rng() - 0.5) * h * 0.6];
+    const tip: V = [sx + lx, y + h, sz + lz];
+    const ring = [0, 1, 2].map((k): V => [sx + Math.cos(k * 2.09) * r, y - 0.02, sz + Math.sin(k * 2.09) * r]);
+    for (let k = 0; k < 3; k++) b.tri(ring[k], ring[(k + 1) % 3], tip, dim(c, 0.75), dim(c, 0.75), c);
+  }
+}
+
+/** Pods: a few small round swellings, each a squat six-sided dome. */
+function pod(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  for (let i = 0; i < 2 + Math.floor(rng() * 3); i++) {
+    const c = pick(PIECE_COLORS.pod, rng);
+    const [px, pz, r] = [x + (rng() - 0.5) * 0.5, z + (rng() - 0.5) * 0.5, 0.05 + 0.07 * rng()];
+    const top: V = [px, y + r * 1.4, pz];
+    const ring = [0, 1, 2, 3, 4, 5].map((k): V => [px + Math.cos(k * 1.047) * r, y + r * 0.5, pz + Math.sin(k * 1.047) * r]);
+    for (let k = 0; k < 6; k++) b.tri(ring[k], ring[(k + 1) % 6], top, dim(c, 0.8), dim(c, 0.8), c);
+  }
+}
+
+/** Coral: a small branching piece, three or four forked ribbons from one foot. */
+function coral(b: Builder, rng: Rng, x: number, y: number, z: number): void {
+  const c = pick(PIECE_COLORS.coral, rng);
+  for (let i = 0; i < 3 + Math.floor(rng() * 2); i++) {
+    const a = rng() * Math.PI * 2;
+    const mid: V = [x + Math.sin(a) * 0.08, y + 0.1 + 0.06 * rng(), z + Math.cos(a) * 0.08];
+    strip(b, [x, y, z], mid, 0.02, false, dim(c, 0.75), c);
+    for (const t of [-0.5, 0.5]) strip(b, mid, [mid[0] + Math.sin(a + t) * 0.08, mid[1] + 0.08 + 0.05 * rng(), mid[2] + Math.cos(a + t) * 0.08], 0.015, false, c, dim(c, 1.1));
+  }
+}
+
+const BUILD: Record<Piece, (b: Builder, rng: Rng, x: number, y: number, z: number) => void> = { wrack, rib, sherd, cap, lichen, root, ash, shard, pod, coral };
+/** What is blown with the grass (into the leaf builder; a root lies there too, unblown); the rest is stone. */
+const LEAFY: ReadonlySet<Piece> = new Set(['cap', 'root']);
 
 /** The region's own piece for `roll` (0..1) laid at (x, y, z): into `leaf` (the fungus) or `stone`; false when the roll is for the ground's own cover. */
 export function regionPiece(region: string, roll: number, leaf: Builder, stone: Builder, rng: Rng, x: number, y: number, z: number): boolean {
   const piece = pieceOf(region, roll);
   if (!piece) return false;
-  BUILD[piece](piece === 'cap' ? leaf : stone, rng, x, y, z);
+  BUILD[piece](LEAFY.has(piece) ? leaf : stone, rng, x, y, z);
   return true;
 }
