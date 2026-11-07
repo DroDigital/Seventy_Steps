@@ -18,6 +18,7 @@ import type { Enclosure } from './enclosure';
 import { placeArena, propCollide } from './arenaPlace';
 import { echoCaches, roundCaches } from './caches';
 import type { Prop } from './props';
+import { applySpawn, editInPlace, siteAt, siteFace } from './edits/editApply';
 import { colliderBounds, type Collider } from './colliders';
 import { layoutDungeon, type DungeonLayout } from './dungeonKit';
 import { doorwayClear, dungeonParts, partCollider, type Part } from './dungeonParts';
@@ -148,7 +149,9 @@ function build(): WorldLayout {
     addPad({ kind: 'circle', x, z, radius, blend, level });
     return level;
   };
-  const spawn = (s: SpawnPoint): void => {
+  const spawn = (s0: SpawnPoint): void => {
+    const s = applySpawn(s0); // (the world editor's edits: round 110)
+    if (!s) return;
     w.spawns.push(s);
     bucket({ x0: s.at.x, z0: s.at.z, x1: s.at.x, z1: s.at.z }, (b) => b.spawns.push(s));
   };
@@ -184,25 +187,26 @@ function build(): WorldLayout {
     }
     const at = (p: readonly [number, number]) => toWorld(region, p);
     for (const s of sites.signs) {
-      const p = at(s.at);
-      sign(region.id, p.x, p.z, pad(p.x, p.z, PAD.sign), s.id, s.name, s.face, s.dream);
+      const p = at(siteAt('sign', region.id, s.id, s.at));
+      sign(region.id, p.x, p.z, pad(p.x, p.z, PAD.sign), s.id, s.name, siteFace('sign', region.id, s.id, s.face), s.dream);
     }
     for (const g of sites.gates) {
-      const p = at(g.at);
-      gate(region.id, p.x, p.z, pad(p.x, p.z, PAD.gate), g.id, g.name, g.to, g.face);
+      const p = at(siteAt('gate', region.id, g.id, g.at));
+      gate(region.id, p.x, p.z, pad(p.x, p.z, PAD.gate), g.id, g.name, g.to, siteFace('gate', region.id, g.id, g.face));
     }
     for (const t of sites.tomes) {
-      const p = at(t.at);
+      const p = at(siteAt('tome', region.id, t.name, t.at));
       pad(p.x, p.z, PAD.tome);
       w.tomes.push({ name: t.name, insight: t.insight, region: region.id, at: { x: p.x, z: p.z, yaw: 0 } });
     }
-    for (const [name, x, z] of NOTE_SITES[region.id] ?? []) {
+    const notes = (NOTE_SITES[region.id] ?? []).map(([name, x, z]) => [name, ...siteAt('tome', region.id, name, [x, z])] as const);
+    for (const [name, x, z] of notes) {
       const p = at([x, z]);
       pad(p.x, p.z, PAD.tome);
       w.tomes.push({ name, insight: 0, note: true, region: region.id, at: { x: p.x, z: p.z, yaw: 0 } });
     }
     // Boxes of cartridges lie about the open world (round 22): one beside each note, and in a region with none by its first Elder Sign.
-    const boxes = (NOTE_SITES[region.id] ?? []).map(([, x, z]) => at([x + 4, z - 3]));
+    const boxes = notes.map(([, x, z]) => at([x + 4, z - 3]));
     if (!boxes.length && sites.signs.length) {
       const [s, f] = [sites.signs[0], DIRS[sites.signs[0].face]];
       const [p, sd] = [at(s.at), side(s.face)];
@@ -213,12 +217,12 @@ function build(): WorldLayout {
       w.tomes.push({ name: `Cartridges: ${region.id} ${k + 1}`, insight: 0, rounds: GUN.find, region: region.id, at: { x: p.x, z: p.z, yaw: 0 } });
     });
     for (const a of sites.allies) {
-      const p = at(a.at);
+      const p = at(siteAt('ally', region.id, a.id, a.at));
       pad(p.x, p.z, PAD.ally);
       spawn({ id: `ally:${a.id}`, entity: a.id, region: region.id, at: { x: p.x, z: p.z, yaw: Math.PI }, unique: false });
     }
     for (const a of sites.arenas) {
-      const p = at(a.at);
+      const p = at(siteAt('arena', region.id, a.bosses[0]!, a.at));
       placeArena(w, region, p, a, collide, spawn, addPad);
       const placed = w.arenas[w.arenas.length - 1]!;
       placed.court = planCourt(placed, (x, z) => around(x, z, 6).every((c) => { const b = colliderBounds(c); return x < b.x0 - 2.4 || x > b.x1 + 2.4 || z < b.z0 - 2.4 || z > b.z1 + 2.4; })); // round 63: clear of a sign's shrine, a stone, a door
@@ -233,7 +237,7 @@ function build(): WorldLayout {
         w.errors.push(`region ${region.id}: unknown dungeon ${d.id}`);
         continue;
       }
-      const door = at(d.at);
+      const door = at(siteAt('dungeon', region.id, d.id, d.at));
       const layout = layoutDungeon(def, door, landHeight(door.x, door.z));
       const { parts, pieces } = dungeonParts(layout);
       w.errors.push(...layout.errors.map((e) => `dungeon ${def.id}: ${e}`));
@@ -247,6 +251,7 @@ function build(): WorldLayout {
       bucket(layout.rect, (k) => k.dungeons.push(layout));
       const [caches, boxed] = [echoCaches(def), roundCaches(def)];
       for (const r of layout.rooms) decor.push(...furnish(w, region, def.id, r, sign, gate, spawn, parts, caches.get(r.def.id), boxed.get(r.def.id)));
+      editInPlace(`dungeon:${def.id}`, decor); // (the world editor's edits: round 110)
       for (const d of decor) propCollide(d, collide);
       const first = layout.rooms[0];
       const on = first && layout.rooms.find((r) => r.def.from === first.def.id); // the way on: a sealed entrance's own axis faced its back wall (round 12)

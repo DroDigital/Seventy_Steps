@@ -128,11 +128,13 @@ interface StartOptions {
   perf?: boolean; // the frame meter shown from the start (F3 toggles it)
   trailer?: boolean; // the picture alone, turning about the dream's best places (ui/trailer.ts)
   hold?: number; // with the trailer: stay at this place
+  edit?: boolean; // the world editor open from the start (a development build only: src/editor, round 110)
 }
 
 async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const { debug, creature, variant } = opts;
   const { settings, veil } = shell;
+  if (import.meta.env.DEV && !opts.arena) (await import('./editor/editorBoot')).bootEdits(); // the world editor's working set, put in force before the world is laid (round 110; never in a release)
   if (!veil.covered) veil.darken(); // the world is made out of sight
   const made = (share: number): Promise<void> => (veil.progress(share), nextFrame());
   const state: FxState = { sanity: 100, cap: settings.fxCap, anomalyProximity: 0, enabled: allEffectsOn() };
@@ -246,6 +248,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
   const flight = createFreeCamera();
+  const editor = import.meta.env.DEV && world ? (await import('./editor/worldEditor')).installWorldEditor({ canvas, world, resetInput: () => input.reset(), held: () => building || menuOpen() || cinema.active || journeys.busy || veil.active || flight.active || developerConsole.open, openNow: !!opts.edit }) : null; // F8: the world editor (round 110; a development build only, so never in a release)
   const developerCommands = createDeveloperCommands(game, {
     setFlight: (on) => on ? flight.enable(camera) : flight.disable(),
     flightEnabled: () => flight.active,
@@ -256,6 +259,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     available: () => !building && !menuOpen() && !cinema.active && !journeys.busy && !veil.active && !game.player.falling && !game.player.fogPass && !game.player.gatePass,
     onOpen: () => input.reset(),
   });
+  if (debug && editor) Object.assign(window, { editor }); // (scripted checks of the world editor)
   lightNight();
   worldUniforms.uGlowColor.value.set(...ANOMALY.green).multiplyScalar(LIGHT.echoGlowIntensity); // Echo drops glow
   worldUniforms.uGlowRange.value = LIGHT.echoGlowRange;
@@ -293,6 +297,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         setCameraMode(game.camera, cameraModeOf(settings.camera)); // (a change in the pause menu shows behind it at once)
         const frame = input.poll(); // polled even when unused, so no press is left latched for later
         if (developerConsole.open) return;
+        editor?.step(dt); // (it opens itself once the world is in play, under ?edit)
+        if (editor?.active) return; // the world stands still while it is edited (round 110)
         if (flight.active) {
           if (!menuOpen() && !cinema.active && !journeys.busy && !veil.active) flight.step(frame, dt);
           return; // the investigator and the world wait while the camera flies
@@ -311,7 +317,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         stepGame(game, held ? emptyInput() : dialogue.talking ? { ...emptyInput(), lookX: through.lookX, lookY: through.lookY } : through); // talking, the world goes on while the investigator listens, and the camera is theirs to turn (round 68)
       },
       render(blend) {
-        const still = developerConsole.open || flight.active || pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
+        const free = flight.active || !!editor?.active; // a camera of its own: the free flight's, or the world editor's
+        const still = developerConsole.open || free || pause.open || map.open || !!finds?.open || dialogue.reading || !!intro?.open || !!demoEnd?.open || journeys.still || labHold.on;
         const alpha = still || cinema.frozen ? 1 : cinema.alpha(blend);
         const time = simTime + (cinema.frozen && !still ? blend : alpha) / SIM.hz; // (a cutscene that stands the world still still runs its clocks smoothly: the rise and the sway)
         extras.tick();
@@ -327,7 +334,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
         cinema.update(camera, still ? 0 : blend); // over the follow camera's pose
         flight.apply(camera);
-        hud.hide(cinema.active || extras.hidesHud);
+        editor?.apply(camera);
+        hud.hide(cinema.active || extras.hidesHud || !!editor?.active);
         const enclosed = !!world && roofedAt(camera.position.x, camera.position.z); // open ruins keep the sky (round 13)
         const lantern = lanternGain(game, alpha); // (the eye widens where it has gone out: world/gloom.ts)
         const gloom = enclosed ? gloomAt(camera.position.x, camera.position.z) : 0; // how dark the room under a roof is kept: the lantern is what is walked by (round 58)
@@ -346,7 +354,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         impactFx.update(camera, time);
         rumble.update(settings.rumble, still || dialogue.open || shop.open || !!menu?.open || !!rise?.open || ending.open); // (a talk, a trade, a sign's rest, the rise and an ending leave the world running, but the hands are at rest)
         const at = game.ecs.c.transform.get(game.player.id)!.pos;
-        world?.update(flight.active ? camera.position.x : at.x, flight.active ? camera.position.z : at.z, journeys.budget);
+        world?.update(free ? camera.position.x : at.x, free ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
         finale.update(time, game);
@@ -381,12 +389,13 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in
         lightReality(game.reality);
         life.update(camera, time, enclosed, alpha, gloom); // after the night's light: the lightning adds to it
-        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : flight.active ? camera.position : nearLens(camera, game));
+        if (spawned) audio.update(fx, time, camera, still, cinema.active, cinema.active ? undefined : free ? camera.position : nearLens(camera, game));
         const lens = lensAt(fx, time, fovOf(game, alpha));
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
-        updateWorldUniforms(fx, time, cinema.active || flight.active ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
+        updateWorldUniforms(fx, time, cinema.active || free ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
         if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
+        if (!veil.covered) editor?.draw(pipeline.renderer, camera); // over the finished picture
         hud.update(camera);
         extras.update(pipeline.renderer.info.render.calls, pipeline.renderer.info.render.triangles);
         if (!panel) return;
@@ -429,8 +438,9 @@ else {
     perf: params.has('perf'),
     trailer: params.has('trailer'),
     hold: params.has('hold') ? Number(params.get('hold')) : undefined,
+    edit: params.has('edit'),
   };
-  if (opts.arena || opts.fresh) launch(opts, createShell());
+  if (opts.arena || opts.fresh || (import.meta.env.DEV && opts.edit)) launch(opts, createShell()); // (the world editor's reload goes straight back to the world)
   else if (takeFlag(NEW_GAME_FLAG)) launch({ ...opts, fresh: true, intro: true }, createShell()); // begun anew from an ending
   else {
     const shell = createShell();

@@ -16,6 +16,7 @@ import { within } from './enclosure';
 import { courtLand, enclosureLand, gateReach, hasOutline, planEnclosure } from './enclosurePlan';
 import { frontOf } from './arenaFront';
 import { arenaSet } from './arenaSet';
+import { editInPlace } from './edits/editApply';
 import type { Collider } from './colliders';
 import { landHeight } from './land';
 import type { SpawnPoint, WorldLayout } from './placements';
@@ -48,6 +49,7 @@ export function placeArena(w: WorldLayout, region: RegionDef, p: XZ, a: ArenaSit
     decor.push(...house.props);
     w.pieces.push(house.piece);
   }
+  editInPlace(`arena:${a.bosses[0]}`, decor); // (the world editor's edits: round 110)
   for (const d of decor) propCollide(d, collide);
   const stones = Array.from({ length: n }, (_, k) => {
     const t = (k / n) * Math.PI * 2;

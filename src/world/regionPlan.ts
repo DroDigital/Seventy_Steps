@@ -28,6 +28,7 @@ import type { TraderSpot } from '../data/traders';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
 import { makeProp, propCollider, type Prop } from './props';
 import { padDistance } from './sitePads';
+import { addedFoes, applyProps, applySpawn } from './edits/editApply';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
 import { chunkKey, chunkOf, DIRS, rectDistance, regionRect, toWorld, type Rect } from './worldMap';
 
@@ -203,7 +204,10 @@ function buildPlan(region: RegionDef): RegionPlan {
   props.push(...pois.props);
   spawns.push(...pois.spawns);
   const traders = planTraderLamps(region, props, roadClear, (x, z, m) => offSites(x, z, m), spawns); // and the trader's lamps, the very last (2026-11-06)
-  return bucket(layout, roads, features, props, spawns, ways, pois.sites, traders);
+  const plan = bucket(layout, roads, features, ways, pois.sites, traders);
+  BASE.set(plan, { region: region.id, props, spawns });
+  fill(plan);
+  return plan;
 }
 
 function placeFeatures(layout: RegionLayout, rect: Rect, rng: Rng, roads: readonly Road[], occ: Occupancy, props: Prop[]): Feature[] {
@@ -261,17 +265,12 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
   return out;
 }
 
-function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props: Prop[], spawns: SpawnPoint[], ways: WayPlan[], pois: PoiSite[], traders: TraderSpot[]): RegionPlan {
+/** What a plan was laid as, before the world editor's edits (world/edits; round 110). */
+const BASE = new WeakMap<RegionPlan, { region: string; props: Prop[]; spawns: SpawnPoint[] }>();
+
+function bucket(layout: RegionLayout, roads: Road[], features: Feature[], ways: WayPlan[], pois: PoiSite[], traders: TraderSpot[]): RegionPlan {
   const plan: RegionPlan = { layout, roads, features, props: new Map(), colliders: new Map(), spawns: new Map(), segs: new Map(), ways, pois, traders };
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
-  for (const p of props) {
-    add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);
-    const c = propCollider(p);
-    if (!c) continue;
-    const b = colliderBounds(c);
-    for (let cx = chunkOf(b.x0); cx <= chunkOf(b.x1); cx++) for (let cz = chunkOf(b.z0); cz <= chunkOf(b.z1); cz++) add(plan.colliders, chunkKey(cx, cz), c);
-  }
-  for (const s of spawns) add(plan.spawns, chunkKey(chunkOf(s.at.x), chunkOf(s.at.z)), s);
   for (const r of roads) {
     for (let i = 1; i < r.pts.length; i++) {
       const seg = { a: r.pts[i - 1], b: r.pts[i], width: r.width };
@@ -282,6 +281,32 @@ function bucket(layout: RegionLayout, roads: Road[], features: Feature[], props:
   }
   return plan;
 }
+
+/** Buckets a plan's props, their colliders and its foes' posts by chunk, with the edits in force (refilled in place: what holds the maps sees the change). */
+function fill(plan: RegionPlan): void {
+  const base = BASE.get(plan)!;
+  for (const m of [plan.props, plan.colliders, plan.spawns]) m.clear();
+  const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
+  for (const p of applyProps(`region:${base.region}`, base.props, base.region)) {
+    add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);
+    const c = propCollider(p);
+    if (!c) continue;
+    const b = colliderBounds(c);
+    for (let cx = chunkOf(b.x0); cx <= chunkOf(b.x1); cx++) for (let cz = chunkOf(b.z0); cz <= chunkOf(b.z1); cz++) add(plan.colliders, chunkKey(cx, cz), c);
+  }
+  for (const s of [...base.spawns, ...addedFoes(base.region)]) {
+    const t = applySpawn(s);
+    if (t) add(plan.spawns, chunkKey(chunkOf(t.at.x), chunkOf(t.at.z)), t);
+  }
+}
+
+/** Lays the edits in force over the plans already built (the world editor, as it edits). */
+export function refreshPlans(): void {
+  for (const p of plans.values()) fill(p);
+}
+
+/** The props a region's plan laid, before any edit (the world editor names them by these). */
+export const basePropsOf = (region: RegionDef): readonly Prop[] => BASE.get(regionPlan(region))!.props;
 
 const plans = new Map<string, RegionPlan>();
 

@@ -31,6 +31,8 @@ export interface WorldScene {
   scene: THREE.Scene;
   /** Streams around the investigator at (x, z) and spends this frame's generation budget (ms; more while the veil hides the world). */
   update(x: number, z: number, budgetMs?: number): void;
+  /** Builds again the loaded chunks of `keys` (all, unsaid) and the sites that touch them: the world editor's edits shown (round 110). */
+  rebuild(keys?: readonly number[]): void;
   readonly loaded: number; // chunks
   readonly pending: number; // jobs not finished
 }
@@ -126,6 +128,25 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
 
   return {
     scene,
+    rebuild(keys) {
+      const these = (keys ?? [...chunks.keys()]).filter((k) => chunks.has(k));
+      for (const k of these) {
+        unload(k);
+        load(...keyChunk(k), k);
+        slicer.finish(k); // (built at once: no hole shows where it stood)
+      }
+      const again: number[] = [];
+      all.forEach((s, k) => {
+        if (!s.meshes || !s.chunks.some((c) => these.includes(c))) return;
+        slicer.cancel(-1 - k);
+        drop(s.meshes);
+        s.meshes = null;
+        lights?.remove(-1 - k);
+        again.push(-1 - k);
+      });
+      syncSites();
+      for (const k of again) slicer.finish(k);
+    },
     update(x, z, budgetMs = WORLD.sliceMs) {
       const [cx, cz] = [chunkOf(x), chunkOf(z)];
       const key = chunkKey(cx, cz);
