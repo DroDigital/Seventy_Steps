@@ -233,7 +233,7 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const turretSide: 0 | 1 | -1 = style !== 'hovel' && !flat && extra() < look.turret ? (extra() < 0.5 ? -1 : 1) : 0;
   const onRidge = style === 'hovel' || flat ? 0 : extra();
   const adds: Extra[] = [];
-  if (turretSide) adds.push(turret(turretSide, wx, top, wallTint, roofTint, PANE));
+  if (turretSide) adds.push(turret(turretSide, wx, wd, top, wallTint, roofTint, PANE));
   if (onRidge && onRidge < look.walk) adds.push(widowWalk(ridge[1], ridge[0], TRIM));
   else if (onRidge && onRidge < look.walk + look.cupola) adds.push(cupola(ridge[1], ridge[0], wallTint, roofTint, TRIM, PANE));
   const add = adds.reduce((a, b) => ({ wall: [...a.wall, ...b.wall], roof: [...a.roof, ...b.roof], trim: [...a.trim, ...b.trim] }), noExtra());

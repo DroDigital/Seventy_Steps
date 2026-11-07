@@ -40,18 +40,19 @@ export function cupola(y: number, z: number, wall: Rgb, roof: Rgb, trim: Rgb, da
   return out;
 }
 
-const TURRET = { r: 1.2, out: 0.6, seg: 8 };
+const TURRET = { r: 1.2, seg: 8 };
 
-/** A round turret on the gable end `side` (x = side * (wx + out)): its wall up past the eaves, a steep conical roof, a slit of dark glass. */
-export function turret(side: 1 | -1, wx: number, top: number, wall: Rgb, roof: Rgb, dark: Rgb): Extra {
+/** A round turret on the gable end `side`, near the eave: its wall up past the eaves, a steep conical roof, a slit of dark glass. */
+export function turret(side: 1 | -1, wx: number, wd: number, top: number, wall: Rgb, roof: Rgb, dark: Rgb): Extra {
   const out = empty();
   const { r, seg } = TURRET;
-  const x = side * (wx + TURRET.out);
+  const x = side * (wx - r * 1.25); // keep the roof and wall inside the house collider
   const h = top + 1.3;
-  out.wall.push(tileUv(tint(new THREE.CylinderGeometry(r, r * 1.05, h, seg).rotateY(Math.PI / seg).translate(x, h / 2, 0), wall), Math.PI * r * 2, h));
-  out.roof.push(tint(new THREE.ConeGeometry(r * 1.25, 2.8, seg).rotateY(Math.PI / seg).translate(x, h + 1.4, 0), roof));
+  const z = -wd + r * 1.25;
+  out.wall.push(tileUv(tint(new THREE.CylinderGeometry(r, r * 1.05, h, seg).rotateY(Math.PI / seg).translate(x, h / 2, z), wall), Math.PI * r * 2, h));
+  out.roof.push(tint(new THREE.ConeGeometry(r * 1.25, 2.8, seg).rotateY(Math.PI / seg).translate(x, h + 1.4, z), roof));
   const face = r * Math.cos(Math.PI / seg); // the flat of the wall facing out
-  out.trim.push(box(0.06, 0.9, 0.32, x + side * (face + 0.03), h - 1.2, 0, dark));
+  out.trim.push(box(0.06, 0.9, 0.32, x + side * (face + 0.03), h - 1.2, z, dark));
   return out;
 }
 
