@@ -45,12 +45,10 @@ void main() {
   float y = vUv.y, t = uTime;
   float edge = (1.0 - smoothstep(0.80, 1.0, abs(p.x))) * smoothstep(0.0, 0.1, y) * (1.0 - smoothstep(0.9, 1.0, y));
   float a = 0.0, highlight = 0.0;
-  if (uStyle < 0.5) { // surf and mist, curling across the lower body
+  if (uStyle < 0.5) { // surf and mist, curling across the lower body (round 109: no wave lines, the mist only; the bubbles are motes)
     float mist = noise2(vec2(p.x * 4.0 + t * 0.09, y * 6.0 - t * 0.13));
     float low = 1.0 - smoothstep(0.18, 0.7, y);
-    float wave = abs(sin(y * 31.0 + sin(p.x * 4.0 + t * 0.55) * 1.9 - t * 0.65));
-    highlight = (1.0 - smoothstep(0.05, 0.19, wave)) * low;
-    a = low * smoothstep(0.32, 0.78, mist) * 0.28 + highlight * 0.3;
+    a = low * smoothstep(0.32, 0.78, mist) * 0.28;
   } else if (uStyle < 1.5) { // tattered veils drawn out in the wind
     float sway = sin(y * 6.5 - t * 0.36) * 0.12 + sin(y * 15.0 + t * 0.2) * 0.035;
     float l = 1.0 - smoothstep(0.025, 0.15, abs(p.x + 0.55 + sway));

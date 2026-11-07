@@ -5,8 +5,8 @@
  * dark), a hatched promise of the whole of it from the first frame, a fill that grows with its `fill`
  * (0..1: how far the wind-up has come) and gathers its light at its front, and, once it is full, a flash
  * for the blow that is falling. A lane runs chevrons the way it points. And what the blow leaves: the
- * `scar` (burnt ground whose cracks cool), and the `sigil` (a circle of rings and spokes drawn in for a
- * summoning). Transparency is ordered-dithered like the particles', so nothing needs sorting. `style`
+ * `scar` (burnt ground whose cracks cool). There are no sigils on the ground (round 109). Transparency is
+ * ordered-dithered like the particles', so nothing needs sorting. `style`
  * sets whose mark is drawn inside that fill. The plain mark is the old even wash.
  */
 
@@ -21,7 +21,7 @@ const CAPACITY = 256;
 const LIFT = 0.05; // metres above the ground
 const DEG = Math.PI / 180;
 const f3 = (n: number): string => n.toFixed(3);
-const KIND = { disc: 0, sector: 1, lane: 2, ring: 3, swirl: 4, scar: 5, sigil: 6 } as const;
+const KIND = { disc: 0, sector: 1, lane: 2, ring: 3, swirl: 4, scar: 5 } as const;
 
 export interface Decals {
   begin(): void;
@@ -34,8 +34,6 @@ export interface Decals {
   swirl(x: number, y: number, z: number, radius: number, color: Rgb, alpha?: number): void;
   /** Ground a blow burnt: `age` 0 (fresh, its cracks lit) to 1 (cold, gone); `color` is the heat of its cracks. */
   scar(x: number, y: number, z: number, radius: number, age: number, color: Rgb, alpha?: number): void;
-  /** A circle drawn in from its centre outward as `fill` goes 0..1: rings, ticks and turning spokes. */
-  sigil(x: number, y: number, z: number, radius: number, fill: number, color: Rgb, alpha?: number): void;
   /** The mark drawn inside every shape until the next `style` or `begin`. */
   style(mark: AoeStyle): void;
   end(time: number): void;
@@ -154,14 +152,6 @@ void main() {
       body = max(body, (1.0 - smoothstep(0.0, 0.16, r)) * (0.7 + 0.3 * sin(uTime * 14.0))); // the eye of it
       inside = (1.0 - r) * vScale.x;
       lit = 0.85;
-    } else if (kind == 6) { // a sigil: rings and ticks, spokes turning, drawn in from the centre
-      float w = 0.13 / vScale.x;
-      float rot = uTime * 0.5 + vMark.y;
-      float rings = max(1.0 - smoothstep(w * 0.5, w, abs(r - 0.95)), 1.0 - smoothstep(w * 0.5, w, abs(r - 0.6)));
-      float ticks = step(0.5, fract((ang + rot) / 6.2832 * max(vMark.w, 3.0) * 4.0)) * step(0.63, r) * step(r, 0.92) * 0.55;
-      float spokes = (1.0 - smoothstep(0.0, w * 1.4 / max(r, 0.25), abs(sin((ang - rot) * max(vMark.w, 3.0) * 0.5)))) * step(0.12, r) * step(r, 0.6);
-      body = max(max(rings, ticks), spokes) * step(r, fill);
-      lit = 1.0;
     } else {
       inside = (1.0 - r) * vScale.x;
     }
@@ -174,7 +164,7 @@ void main() {
   float outline = outlined ? step(inside, EDGE * 2.1) * (1.0 - step(inside, EDGE)) : 0.0;
   if (vMark.x > 0.5 && solid) body *= 0.3 + 0.7 * motifMask(r, ang);
   if (solid && kind != 2) body *= 0.5 + 0.5 * smoothstep(0.0, max(fill, 0.05), r); // the light gathers toward the front
-  float quiet = kind <= 4 ? 1.0 : 0.0; // a telegraph is kept quiet; a scar and a sigil have their own light
+  float quiet = kind <= 4 ? 1.0 : 0.0; // a telegraph is kept quiet; a scar has its own light
   float kLine = mix(1.0, K_LINE, quiet);
   float kBody = mix(1.0, K_BODY, quiet);
   float kFlash = mix(1.0, K_FLASH, quiet);
@@ -262,9 +252,6 @@ export function createDecals(scene: THREE.Scene): Decals {
     },
     scar(x, y, z, radius, age, color, alpha = 1) {
       put(x, y, z, 0, radius, radius, [KIND.scar, clamp01(age), 0, 0], color, alpha);
-    },
-    sigil(x, y, z, radius, fill, color, alpha = 1) {
-      put(x, y, z, 0, radius, radius, [KIND.sigil, clamp01(fill), 0, 0], color, alpha);
     },
     end(time) {
       material.uniforms.uTime.value = time;
