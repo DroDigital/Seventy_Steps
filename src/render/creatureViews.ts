@@ -30,6 +30,8 @@ import type { Dying, Gore } from './gore';
 import { echoOpacity, lookOf, phaseOf, type Look } from './creatureLook';
 import { createStoops } from './creatureStoop';
 import { createCreatureRoof } from './creatureRoof';
+import { createWalkCycles } from './walkCycle';
+import { BODY_LIGHT } from '../data/bodyLight';
 import { castSilhouettes } from './silhouetteCasters';
 import { relitOf } from './creatureRelight';
 import { toneForForm } from './spriteTone';
@@ -132,6 +134,9 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const roofSeen = new Set<Entity>(); // reviewed sprites actually drawn this frame
   const arrivals = createArrivals(); // the bosses not yet roused, and when each came into view (round 60)
   const roofs = createCreatureRoof(); // how far each creature stands under a dungeon's roof, eased (round 96)
+  const walks = createWalkCycles(); // the walk cycles each has covered (round 113)
+  const turning = new Map<Entity, { from: SpriteDirection; at: number }>(); // a view being dissolved into the next (round 113)
+  let lastTime = 0;
   /** A creature in its death, told to the gore (round 113): where its picture stands and how it is painted this frame. */
   const dyingOf = (id: Entity, key: string, silhouette: string | undefined, dissolve: number, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, yaw: number, direction: SpriteDirection, time: number): Dying | undefined => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
@@ -186,8 +191,9 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const z = tr.prev.z + (tr.pos.z - tr.prev.z) * alpha;
         // the frames of each state in the way it faces, so lookOf knows a flyer has its own wing-beat (round 49: it was told only the stoop, and a flyer always walked)
         const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
+        const walked = walks.at(id, x, z, g.ecs.c.body.get(id)?.height ?? 2, time - lastTime);
         const direction = entry && art ? spriteDirection(yaw, { x, z }, camera.position, directions.get(id)) : undefined;
-        const look = lookOf(g, id, beat, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...stoops.known(bow) }, bow?.age, bow?.rise, arrival);
+        const look = lookOf(g, id, beat, { ...(direction && clips.get(key) ? clipCounts(clips.get(key)!, direction) : {}), ...stoops.known(bow) }, bow?.age, bow?.rise, arrival, walked);
         const gone = fx.gone(id, def, model, look, time); // (told of every creature, hidden or not: a hidden one rises when it shows)
         const hover = g.ecs.c.brain.get(id)?.def.params.hover ?? 0;
         const y = tr.prev.y + (tr.pos.y - tr.prev.y) * alpha + (hover > 0 ? hover + 0.2 * Math.sin(time * 2 + id) : 0);
@@ -195,18 +201,25 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         const [voice, deep] = [presence.voice(id, time), presence.deep(id)]; // a horror's voice and how far into its fight it is, worn by its picture (round 83)
         if (entry && art && direction) {
           if (!look) continue;
+          const was = directions.get(id);
+          if (was && was !== direction && look.dissolve === undefined) turning.set(id, { from: was, at: time });
           directions.set(id, direction);
           const clip = resolveDirectionalClip(clips.get(key)!, direction, look.state);
           if (!clip) continue;
-          const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival)!;
+          const pose = lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: clip.frames.length }, bow?.age, bow?.rise, arrival, walked)!;
           const weird = g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0;
           sky = roofs.sky(id, roofedAt(x, z), time); // under a dungeon's roof a creature keeps the colours it was drawn in (round 96)
           const dying = look.dissolve !== undefined && gore ? dyingOf(id, key, def.sprite?.silhouette, look.dissolve, clip, pose, x, y, z, yaw, direction, time) : undefined; // its blood, and a blade's cut (round 113)
           if (dying) gore!.adjust(gone, dying, look.dissolve!);
           const cut: Cut | undefined = dying && { plan: dying.plan, side: 1, turn: 0, blood: dying.bloodIndex };
-          const frame = put(key, clip, pose, x, y, z, flash, 1, weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside);
+          const turn = turning.get(id);
+          const k = turn ? (time - turn.at) / BODY_LIGHT.turn : 1;
+          if (turn && k >= 1) turning.delete(id);
+          const frame = put(key, clip, pose, x, y, z, flash, Math.min(1, Math.max(0.001, k)), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside);
           if (!frame) continue;
           const bodyIndex = counts[frame.page] - 1;
+          const old = turn && k < 1 ? resolveDirectionalClip(clips.get(key)!, turn.from, look.state) : undefined;
+          if (old) put(key, old, lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: old.frames.length }, bow?.age, bow?.rise, arrival, walked)!, x, y, z, flash, -Math.max(0.001, k), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, 0, !!def.sprite?.outside); // the view it turns from, going out in the pixels the new one has not yet taken (round 113)
           if (dying?.plan && dying.piece) put(key, clip, pose, x, y, z, 0, 1, 0, { id, gone, time, cut: { plan: dying.plan, side: -1, turn: dying.piece.turn, blood: dying.bloodIndex } }, 0, 0, false, dying.piece); // the piece the blade took
           roofSeen.add(id);
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
@@ -273,12 +286,15 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         glow.eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, glow.mistLook(id, time));
       }
       arrivals.forget(seen);
+      walks.forget(seen);
+      lastTime = time;
       fx.forget(seen);
       gore?.forget(seen);
       glow.forget(seen);
       stoops.forget(seen);
       roofs.forget(roofSeen);
       for (const id of directions.keys()) if (!seen.has(id)) directions.delete(id);
+      for (const id of turning.keys()) if (!seen.has(id)) turning.delete(id);
       for (const [id, asm] of assemblies) {
         if (seen.has(id)) continue;
         drop(asm);

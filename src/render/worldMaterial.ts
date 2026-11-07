@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
+import { BODY_LIGHT } from '../data/bodyLight';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
@@ -71,6 +72,7 @@ export const worldUniforms = {
   uSpriteWarm: { value: FX.spriteWarm }, // how much of the lantern's and the lamps' hue a creature takes (shaders/sprite.ts)
   uSpriteReveal: { value: new THREE.Vector2(...FX.spriteReveal) }, // how much of the lantern's light shows a creature's own colours (shaders/sprite.ts)
   uSpriteRevealMost: { value: FX.spriteRevealMost }, // and the most of its realm's tint it takes back (round 95)
+  uBodyLight: { value: new THREE.Vector4(BODY_LIGHT.side, BODY_LIGHT.shape, BODY_LIGHT.bounce, BODY_LIGHT.sky) }, // round 113: how a drawn body takes the light (data/bodyLight.ts, shaders/bodyLight.ts)
   uMind: { value: 0 }, // 0..1: a failing mind's hold on what it sees of the creatures (fx.ts `mind`)
   uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
   uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },

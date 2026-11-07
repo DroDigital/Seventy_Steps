@@ -15,6 +15,7 @@ import { LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL } from './common';
 import { SHADOW_GLSL } from './shadow';
 import { GORE_FX } from '../../data/gore';
 import { SPRITE_FX_GLSL } from './spriteFx';
+import { BODY_LIGHT_GLSL } from './bodyLight';
 import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
 export const SPRITE_VERT = /* glsl */ `
@@ -139,6 +140,7 @@ varying vec4 vTone;
 varying float vRelit;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
+${SHADOW_GLSL}
 ${NOISE_GLSL}
 ${VOID_GLSL}
 ${SPRITE_GRADE_GLSL}
@@ -206,6 +208,7 @@ float relight(vec2 uv, float centre) {
 vec3 creatureWarmth(vec3 c) {
   return mix(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), c, uSpriteWarm);
 }
+${BODY_LIGHT_GLSL}
 
 /** A shifting film of colour over the picture, with its painted light and dark still visible. */
 vec3 outsideColour(vec2 uv, vec3 painted) {
@@ -229,13 +232,14 @@ void main() {
     gl_FragColor = vec4(mix(voidAt(gl_FragCoord.xy, uTime) + vec3(0.12, 0.0, 0.18), uFogColor, vFog * uFogAmount), 1.0);
     return;
   }
-  if (t.a < 0.3 || vOpacity * (uReviewed > 0.5 ? t.a : 1.0) < bayer4(gl_FragCoord.xy)) discard;
+  float shownAs = vOpacity * (uReviewed > 0.5 ? t.a : 1.0);
+  if (t.a < 0.3 || (shownAs >= 0.0 ? shownAs < bayer4(gl_FragCoord.xy) : -shownAs > bayer4(gl_FragCoord.xy))) discard; // (a picture going out as the next comes in is told its share as less than nothing, and keeps the very pixels the next leaves: round 113)
   bool glow = uReviewed < 0.5 && t.a < 0.9;
-  vec3 light = uAmbient + uLightColor * vShade.x * uCharacterLight + creatureWarmth(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y + lampLight(vWorld, vec3(0.0, 1.0, 0.0), 0.0)) * uCharacterLight; // the world's own light, here (round 83); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 87)
+  vec3 light = bodyLightAt(src.xy, glow); // the world's own light, here (round 83), at each pixel, by its side and shape (round 113: shaders/bodyLight.ts); the lantern's and the lamps' as a creature takes them: its own colour with a little of theirs (round 87)
   if (vRelit > 0.5 && uRelight > 0.0 && !glow) light *= mix(1.0, relight(uv, dot(t.rgb, vec3(0.299, 0.587, 0.114))), uRelight * 0.8); // the Relight setting (round 83)
   vec3 col = glow ? t.rgb : t.rgb * light;
   if (uReviewed > 0.5 && vOutside < 0.5) { // the realm's colours on the older art, brightness kept (round 83: spriteGrade.ts); in the lantern's light a creature shows the colours it was drawn in (round 93), most of the way (round 95)
-    float shown = smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * lanternAt(uLanternPos - vWorld) * vShade.y, vec3(0.2126, 0.7152, 0.0722)));
+    float shown = smoothstep(uSpriteReveal.x, uSpriteReveal.y, dot(uLanternColor * bodyLantern, vec3(0.2126, 0.7152, 0.0722)));
     col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost)); // in the light the realm's tint is taken back along the wheel, up to a share of it (round 95): its own hue, its colour whole, the light's colour on it
   }
   if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 83)
