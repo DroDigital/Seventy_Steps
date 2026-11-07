@@ -14,6 +14,7 @@ import type { PropKind } from '../data/regions';
 import type { LightKind } from '../data/tuning';
 import { MODEL_INFO } from '../data/models/index';
 import { colliderBounds, type Collider } from './colliders';
+import { houseSolids } from './houseAddons';
 import { LANTERN_MODELS } from './lanternModels';
 import { surface } from './terrain';
 
@@ -28,6 +29,7 @@ export interface Prop {
   yaw: number;
   seed: number;
   style?: HouseStyle; // houses: how they are built
+  noWing?: boolean; // a house whose wing would shut a yard in: it has none (round 110: sealWings.ts)
   set?: SetLook; // a piece of an arena's set: which, and how it is dressed (round 61)
 }
 
@@ -110,6 +112,12 @@ export const scaleOf = (look: SetLook): readonly [number, number, number] => {
 
 /** The prop's colliders: one for most, a set of boxes for a model that has them (a doorway, an arch or a colonnade is boxes about its opening: a body is never walled into a whole building's box), none for what is walked through. */
 export function propColliders(p: Prop): Collider[] {
+  if (p.kind === 'house') return [...propWalls(p), ...houseSolids(p)]; // its walls, and (round 110: houseAddons.ts) the wing, bay and porch posts the renderer draws beyond them
+  return propWalls(p);
+}
+
+/** A prop's walls: its colliders as they were before round 110 (a house's walls alone, without its wing, bay and porch posts). */
+export function propWalls(p: Prop): Collider[] {
   const solids = p.kind === 'set' && p.set && !p.set.walk ? MODEL_INFO[p.set.id]?.solids : undefined;
   if (!solids || !p.set) {
     const c = propCollider(p);

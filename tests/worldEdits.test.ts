@@ -13,6 +13,9 @@ import { SITES } from '../src/data/sites';
 import { NOTE_SITES } from '../src/data/documents';
 import { WORLD_EDITS } from '../src/data/worldEdits';
 import { chunkContent } from '../src/world/chunks';
+import { colliderBounds } from '../src/world/colliders';
+import { houseAddons } from '../src/world/houseAddons';
+import { propColliders } from '../src/world/props';
 import { applyProps, originOf, refOf, siteAt, specProp } from '../src/world/edits/editApply';
 import { editKey, editProblem, propKey, readDataFile, takeExport, writeDataFile } from '../src/world/edits/editFile';
 import { putInForce } from '../src/world/edits/editRefresh';
@@ -81,6 +84,21 @@ describe('edits laid over the world', () => {
     putInForce([]);
     expect(propsIn(a.x, a.z).some((p) => p === a)).toBe(true);
     expect(propsIn(b.x, b.z).some((p) => p === b)).toBe(true);
+  });
+
+  it('refills every house collider after an edit moves a house with a wing', () => {
+    const house = basePropsOf(arkham).find((p) => p.kind === 'house' && houseAddons(p).wing)!;
+    expect(house).toBeDefined();
+    putInForce([{ prop: refOf('region:arkham', house), set: { x: house.x + 30 } }]);
+    const moved = propsIn(house.x + 30, house.z).find((p) => p.kind === 'house' && p.x === house.x + 30 && p.z === house.z)!;
+    expect(moved).toBeDefined();
+    const colliders = propColliders(moved);
+    expect(colliders.length).toBeGreaterThan(1);
+    for (const collider of colliders) {
+      const b = colliderBounds(collider);
+      const chunk = regionPlan(arkham).colliders.get(chunkKey(chunkOf((b.x0 + b.x1) / 2), chunkOf((b.z0 + b.z1) / 2))) ?? [];
+      expect(chunk).toContainEqual(collider);
+    }
   });
 
   it("lays edits over an arena's dressing in place, and off again", () => {
