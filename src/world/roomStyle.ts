@@ -11,10 +11,11 @@
 
 import { hash2 } from '../core/rng';
 import { DUNGEON } from '../data/tuning';
+import { HALL_LORE } from '../data/hallLore';
 import { kitOfRoom, type DungeonLayout, type RoomLayout } from './dungeonKit';
 import { DIRS } from './worldMap';
 
-export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring';
+export type Pillars = 'none' | 'four' | 'pairs' | 'colonnade' | 'ring' | 'five' | 'six' | 'seven';
 export type Floor = 'plain' | 'runner' | 'frame' | 'cross' | 'chequer' | 'nested' | 'rings' | 'squares' | 'quincunx' | 'bands';
 
 export interface RoomStyle {
@@ -71,7 +72,8 @@ export function roomStyle(d: DungeonLayout, r: RoomLayout): RoomStyle {
   let s: RoomStyle;
   if (kind === 'hall' && r.def.boss) {
     const k = unit(`${d.def.id}:${r.def.id}`);
-    s = style(BOSS[Math.floor(k * BOSS.length)], EMBLEMS[Math.floor(unit(`${r.def.id}:${d.def.id}`) * EMBLEMS.length)], 0, true);
+    const lore = HALL_LORE[r.def.boss[0]]; // (round 108: its lore's own pillars, data/hallLore.ts)
+    s = style(lore?.pillars ?? BOSS[Math.floor(k * BOSS.length)], EMBLEMS[Math.floor(unit(`${r.def.id}:${d.def.id}`) * EMBLEMS.length)], 0, true);
   }
   else if (kind === 'hall') {
     s = r.size === 3 ? WIDE : SMALL[(Math.floor(start * SMALL.length) + same * 3) % SMALL.length];
@@ -109,6 +111,16 @@ export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly
     case 'colonnade':
       for (const u of wide ? [-16, 16] : [-5.2, 5.2]) for (const v of wide ? [-18, -9, 0, 9, 18] : [-5.5, -1.8, 1.8, 5.5]) at.push([u, v]);
       break;
+    case 'five': // (round 108: in a ring about the fight, none across the way in: the first at the far wall, or two either side of it)
+    case 'six':
+    case 'seven': {
+      const n = s.pillars === 'five' ? 5 : s.pillars === 'six' ? 6 : 7;
+      for (let k = 0; k < n; k++) {
+        const a = ((k + (n === 6 ? 0.5 : 0)) * 2 * Math.PI) / n;
+        at.push([18 * Math.sin(a), 18 * Math.cos(a)]);
+      }
+      break;
+    }
     case 'none':
       break;
   }
