@@ -40,7 +40,7 @@ pool's. `tests/attackLook.test.ts` holds every horror to the floors, in its own 
 ### Quiet marks (round 70)
 
 A telegraph says where a blow falls without covering the floor: `INDICATOR` (`data/fxTuning.ts`) sets its edge's width and how much of
-its light the edge, the fill, the flash and the outline keep, and how long a scar (30%) and a sigil (60%) of what a blow leaves
+its light the edge, the fill, the flash and the outline keep, and how long a scar (30%) and a held ring (60%) of what a blow leaves
 last. The lifted colours, the whole shape from the first frame and the filling front are not touched, so a mark is still read on any
 ground. A pool, a fire and a cloud's reach are not marks but what hurts, and keep their own looks and lives.
 
@@ -74,7 +74,7 @@ motif, punch, twist and pitch are unchanged, so no sound moved).
 **What it draws** (`FOE_FX` in `data/foeTuning.ts`: the counts, sizes, lives and budgets): a sweep lays up to three strokes along the tip as it goes (a mark that is not a stroke is stamped once, midway), a thrust
 or a bite one stamp where its tip is, a slam a ripple and a stamp; a blow that lands on the investigator marks the wound; a
 slow blow has its tell (the mark in miniature, once); a lunge leaves faint smears; a caster gathers nine motes, looses a bolt with a
-mark at the muzzle and one where it lands, a beam a mark at each end, a summoning one faint sigil, a teleport two swirls, a gaze an
+mark at the muzzle and one where it lands, a beam a mark at each end, a summoning one a few motes, a teleport two swirls, a gaze an
 eye and motes along its look, a roar a front of motes. **What it never draws:** a crown, a fountain, a cloud, a scar, a lit arc, a
 flash or a column. It keeps one thing of the old path: the small, short light every foe's blow and bolt lays on the ground it falls on
 (round 87, `FLASH_LIGHTS`; `fxKit.glow`, laid by `meleeFx.ts` and `attackFx.ts` for these creatures, none for an ally's, as before).
@@ -115,9 +115,9 @@ are the knobs if the marks are too quiet or too loud.
 - **Decals** (`decals.ts`): flat marks on the ground, one instanced batch of 256. Telegraphs: disc, sector, lane, ring,
   swirl. Each has a bright edge with a dark outline, a hatched promise of the whole of it from the first frame, a fill that
   gathers its light at the front, and a flash when it is full; a lane runs chevrons the way it points. Added: `scar` (burnt
-  ground: ragged, its cracks glowing and cooling) and `sigil` (rings, ticks and turning spokes, drawn in from the centre).
-- **Ground marks** (`groundFx.ts`): the scar of a burst, slam or landed bolt; shock rings racing out; the sigil of a
-  summoning or arrival; the slash a swing has just swept. Each has its own clock and the horror's own mark.
+  ground: ragged, its cracks glowing and cooling) and `hold` (a plain ring, drawn in, held and let go, for ground that wears at the mind). No sigil is drawn on the ground (round 109).
+- **Ground marks** (`groundFx.ts`): the scar of a burst, slam or landed bolt; shock rings racing out; a ring held about
+  ground that wears at the mind; the slash a swing has just swept. Each has its own clock and the horror's own mark.
 - **Bolts** (`boltViews.ts`, `shotLook.ts`; round 69): five stock solids (a cone among them) were every caster's shot. Each creature that
   shoots now throws a thing from its own tale (`data/shotForms.ts`, the body built in `shotShapes*.ts` from `shotKit.ts`): Dagon's
   priests a silver fish, Keziah the crooked knife of the Walpurgis rite, Wilbur a leaf torn from the Necronomicon, the Haunter its

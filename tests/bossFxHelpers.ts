@@ -17,7 +17,7 @@ import { bossGame } from './bossHelpers';
 const SKIP = new Set(['stagger', 'guardBreak', 'parried', 'death', 'interrupted']);
 const DECAL_CAPACITY = 256;
 const PARTICLE_CAPACITY = 2400;
-const DECAL_KINDS = ['disc', 'sector', 'lane', 'ring', 'swirl', 'scar', 'sigil'] as const;
+const DECAL_KINDS = ['disc', 'sector', 'lane', 'ring', 'swirl', 'scar'] as const;
 
 export interface FxAudit {
   moves: string[]; // fired

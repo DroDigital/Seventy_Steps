@@ -7,7 +7,7 @@ function rig() {
   const calls: { kind: string; args: number[]; mark?: string }[] = [];
   let mark = 'plain';
   const rec = (kind: string) => (...args: unknown[]): void => void calls.push({ kind, args: args.filter((a): a is number => typeof a === 'number'), mark });
-  const decals = { begin: () => undefined, end: () => undefined, disc: rec('disc'), sector: rec('sector'), lane: rec('lane'), ring: rec('ring'), swirl: rec('swirl'), scar: rec('scar'), sigil: rec('sigil'), style: (m: { name: string }) => void (mark = m.name) } as unknown as Decals;
+  const decals = { begin: () => undefined, end: () => undefined, disc: rec('disc'), sector: rec('sector'), lane: rec('lane'), ring: rec('ring'), swirl: rec('swirl'), scar: rec('scar'), style: (m: { name: string }) => void (mark = m.name) } as unknown as Decals;
   const ground = createGroundFx();
   const draw = (time: number): typeof calls => (calls.length = 0, ground.draw(decals, time), [...calls]);
   return { ground, draw };
@@ -31,16 +31,16 @@ describe('what a blow leaves on the ground (round 51)', () => {
     expect(ground.count()).toBe(0);
   });
 
-  it('what a blow leaves is gone sooner than before: the longest scar is under six seconds, a sigil under two and a half', () => {
+  it('what a blow leaves is gone sooner than before: the longest scar is under six seconds, a held ring under two and a half', () => {
     expect(16 * INDICATOR.scar).toBeLessThan(6);
-    expect(2.4 * INDICATOR.sigil).toBeLessThan(2.5);
+    expect(2.4 * INDICATOR.hold).toBeLessThan(2.5);
     const { ground, draw } = rig();
     draw(0);
     ground.scar(at, 3, color, 'cthulhu', 14);
     expect(draw(6)).toEqual([]);
   });
 
-  it('a shock ring races outward, thinning and fading; a sigil is drawn in, held and let go', () => {
+  it('a shock ring races outward, thinning and fading; a held ring is drawn in, held and let go', () => {
     const { ground, draw } = rig();
     draw(0);
     ground.shock(at, 1, 9, color, undefined, 0.5, 2);
@@ -50,12 +50,12 @@ describe('what a blow leaves on the ground (round 51)', () => {
     expect(draw(0.45)[0]!.args[5]).toBeLessThan(0.3); // faded
     expect(draw(0.6)).toEqual([]);
     draw(1);
-    ground.sigil(at, 3, color, 'hastur', 2);
-    const life = 2 * INDICATOR.sigil;
+    ground.hold(at, 3, color, 'hastur', 2);
+    const life = 2 * INDICATOR.hold;
     const s = draw(1 + life * 0.15)[0]!;
-    expect(s.kind).toBe('sigil');
-    expect(s.args[4]).toBeLessThan(1); // not all of it yet
-    expect(draw(1 + life * 0.5)[0]!.args[4]).toBe(1);
+    expect(s.kind).toBe('ring'); // (a plain ring: no sigil on the ground)
+    expect(s.args[5]).toBeLessThan(1); // drawn in: not all of it yet
+    expect(draw(1 + life * 0.5)[0]!.args[5]).toBe(1);
     expect(draw(1 + life * 1.01)).toEqual([]);
   });
 

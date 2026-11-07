@@ -112,7 +112,7 @@ export const INDICATOR = {
   flash: 0.5, // ...the flash and pulse of a mark that is full, as the blow falls
   outline: 0.6, // ...the dark line about an edge
   scar: 0.3, // a scar's life (seconds): burnt ground goes in a third of the time
-  sigil: 0.6, // a sigil's life, held and let go
+  hold: 0.6, // a held ring's life (the ways' wearing ground): drawn in, held and let go
 };
 
 /** How the picture is lit and finished (round 39, render/shaders/post.ts and world.ts): what the shadow maps cannot give. */
