@@ -5,9 +5,10 @@
  * its house (`noWing`). A wing that shuts nothing stays, and nothing else about a house changes. Pure.
  */
 
-import { colliderBounds, colliderGap, type Collider } from './colliders';
+import { colliderGap, type Collider } from './colliders';
+import { colliderGrid } from './colliderGrid';
 import { ESCAPE_STEP, walkOut } from './escape';
-import { houseAddons } from './houseAddons';
+import { houseAddons, houseFrame } from './houseAddons';
 import { propColliders, propWalls, type Prop } from './props';
 import { ground } from './terrain';
 
@@ -24,22 +25,12 @@ const DIRS: readonly (readonly [number, number])[] = [[1, 0], [-1, 0], [0, 1], [
  * (the push-out of the audit, read the same way). The colliders are filed by cell once, so each test looks at the few near it.
  */
 function solidsAmong(cs: readonly Collider[]): (x: number, z: number) => boolean {
-  const cell = (x: number, z: number): number => Math.floor(x / CELL) * 65536 + Math.floor(z / CELL);
-  const grid = new Map<number, Collider[]>();
-  for (const c of cs) {
-    const b = colliderBounds(c);
-    for (let i = Math.floor((b.x0 - BODY) / CELL); i <= Math.floor((b.x1 + BODY) / CELL); i++) {
-      for (let j = Math.floor((b.z0 - BODY) / CELL); j <= Math.floor((b.z1 + BODY) / CELL); j++) {
-        const k = i * 65536 + j;
-        grid.get(k)?.push(c) ?? grid.set(k, [c]);
-      }
-    }
-  }
+  const near = colliderGrid(cs, CELL, BODY);
   return (x, z) => {
-    const near = grid.get(cell(x, z));
-    if (!near) return false;
+    const candidates = near(x, z);
+    if (!candidates.length) return false;
     let y: number | undefined; // (the ground is read only where a collider is near)
-    return near.some((c) => {
+    return candidates.some((c) => {
       if (colliderGap(c, x, z) >= BODY) return false;
       y ??= ground(x, z);
       const [y0, y1] = c.kind === 'box' ? [c.min.y, c.max.y] : [c.y0, c.y1];
@@ -90,8 +81,7 @@ export function sealWings(props: readonly Prop[]): void {
     const wingAt = propWalls(h).length; // (houseSolids lists a house's wing first of its solids)
     const withWing = solidsAmong([...others, ...own]);
     const withoutWing = solidsAmong([...others, ...own.filter((_, i) => i !== wingAt)]);
-    const [s, k] = [Math.sin(h.yaw), Math.cos(h.yaw)];
-    const world = (lx: number, lz: number): { x: number; z: number } => ({ x: h.x + lx * k + lz * s, z: h.z - lx * s + lz * k }); // turned as the model is (rotateY)
+    const world = houseFrame(h); // (the house's frame, as its colliders read it)
     const { ww, wwd, at, z0 } = wing;
     for (const [lx, lz] of placesAbout(at, z0, ww, wwd + 0.3)) { // (its gables overhang its back and front by 0.3 m)
       const { x, z } = world(lx, lz);

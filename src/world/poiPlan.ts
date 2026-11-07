@@ -169,12 +169,12 @@ export function planPois(region: RegionDef, features: readonly Feature[], props:
     let chest: XZ | null = null;
     if (def.hoard) {
       const tries = maze ? [maze.cell(CELLS >> 1, CELLS >> 1), maze.cell(CELLS >> 1, (CELLS >> 1) + 1), maze.cell((CELLS >> 1) + 1, CELLS >> 1)] : [{ x, z }, ...Array.from({ length: 30 }, (_, k) => ({ x: x + Math.sin(k * 1.9) * (1.5 + (k % 5) * r * 0.1), z: z + Math.cos(k * 1.9) * (1.5 + (k % 5) * r * 0.1) })), ...Array.from({ length: 60 }, (_, k) => ({ x: x + Math.sin(k * 2.4) * (3 + (k % 6) * r * 0.12), z: z + Math.cos(k * 2.4) * (3 + (k % 6) * r * 0.12) }))]; // (and further out, only where the near ground is crowded: a landmark's pyramids)
-      chest = tries.find((p) => set.clear(p.x, p.z) && open(p.x, p.z)) ?? null;
+      chest = tries.find((p) => set.clear(p.x, p.z) && open(p.x, p.z) && !set.beyond(p.x, p.z)) ?? null; // (not shut in a house's wing: round 112)
     }
     let flask: XZ | null = null;
     if (def.flasks) { // a flask or two of lamp oil lie about the heart, clear of the chest (round 106)
       const spots = Array.from({ length: 48 }, (_, k) => ({ x: x + Math.cos(k * 2.3 + 0.7) * (2.5 + (k % 6) * r * 0.1), z: z + Math.sin(k * 2.3 + 0.7) * (2.5 + (k % 6) * r * 0.1) }));
-      flask = spots.find((p) => set.clear(p.x, p.z) && open(p.x, p.z) && (!chest || Math.hypot(p.x - chest.x, p.z - chest.z) > 2)) ?? null;
+      flask = spots.find((p) => set.clear(p.x, p.z) && open(p.x, p.z) && !set.beyond(p.x, p.z) && (!chest || Math.hypot(p.x - chest.x, p.z - chest.z) > 2)) ?? null;
     }
     plan.sites.push({ def, x, z, r, chest, flask });
     const foes = def.foes;

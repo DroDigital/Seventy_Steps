@@ -5,6 +5,7 @@
  * walks through one. Before round 110 they were drawn without colliders and placed without a check. Pure: no Three.js.
  */
 
+import type { XZ } from '../core/geom';
 import { createRng, type Rng } from '../core/rng';
 import type { Collider } from './colliders';
 import type { Prop } from './props';
@@ -47,11 +48,16 @@ export function houseAddons(p: Prop): HouseAddons {
   };
 }
 
+/** A house's frame (round 110): its model's point (lx, lz), front toward +z, in the world, turned as the model is (rotateY). Its colliders and the wing walk (sealWings.ts) both read it. */
+export function houseFrame(p: Pick<Prop, 'x' | 'z' | 'yaw'>): (lx: number, lz: number) => XZ {
+  const [s, k] = [Math.sin(p.yaw), Math.cos(p.yaw)];
+  return (lx, lz) => ({ x: p.x + lx * k + lz * s, z: p.z - lx * s + lz * k });
+}
+
 /** A house's solid parts beyond its walls, as colliders in the world: a wing's walls, a bay's box, a porch's posts. */
 export function houseSolids(p: Prop): Collider[] {
   const a = houseAddons(p);
-  const [s, k] = [Math.sin(p.yaw), Math.cos(p.yaw)];
-  const at = (lx: number, lz: number): { x: number; z: number } => ({ x: p.x + lx * k + lz * s, z: p.z - lx * s + lz * k }); // turned as the model is (rotateY)
+  const at = houseFrame(p);
   const out: Collider[] = [];
   if (a.wing) {
     const c = at(a.wing.at, a.wing.z0);

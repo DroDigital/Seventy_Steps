@@ -27,7 +27,7 @@ import { planPois, type PoiSite } from './poiPlan';
 import { planTraderLamps } from './traderPlan';
 import type { TraderSpot } from '../data/traders';
 import { nearestRoad, placeFillers, roadside, scatterBiome } from './planFill';
-import { makeProp, propColliders, type Prop } from './props';
+import { makeProp, worldColliders, type Prop } from './props';
 import { padDistance } from './sitePads';
 import { addedFoes, applyProps, applySpawn } from './edits/editApply';
 import { borderPoints, planRoads, segmentDistance, type Road } from './roads';
@@ -292,7 +292,7 @@ function fill(plan: RegionPlan): void {
   const add = <T>(m: Map<number, T[]>, k: number, v: T): void => void (m.get(k)?.push(v) ?? m.set(k, [v]));
   for (const p of applyProps(`region:${base.region}`, base.props, base.region)) {
     add(plan.props, chunkKey(chunkOf(p.x), chunkOf(p.z)), p);
-    for (const c of propColliders(p)) {
+    for (const c of worldColliders(p)) {
       const b = colliderBounds(c);
       for (let cx = chunkOf(b.x0); cx <= chunkOf(b.x1); cx++) for (let cz = chunkOf(b.z0); cz <= chunkOf(b.z1); cz++) add(plan.colliders, chunkKey(cx, cz), c);
     }
