@@ -3,6 +3,7 @@
 import * as THREE from 'three';
 import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
+import { BODY_LIGHT } from '../data/bodyLight';
 import { NIGHT } from '../systems/clock';
 import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
@@ -71,6 +72,7 @@ export const worldUniforms = {
   uSpriteWarm: { value: FX.spriteWarm }, // how much of the lantern's and the lamps' hue a creature takes (shaders/sprite.ts)
   uSpriteReveal: { value: new THREE.Vector2(...FX.spriteReveal) }, // how much of the lantern's light shows a creature's own colours (shaders/sprite.ts)
   uSpriteRevealMost: { value: FX.spriteRevealMost }, // and the most of its realm's tint it takes back (round 95)
+  uBodyLight: { value: new THREE.Vector4(BODY_LIGHT.side, BODY_LIGHT.shape, BODY_LIGHT.bounce, BODY_LIGHT.sky) }, // round 113: how a drawn body takes the light (data/bodyLight.ts, shaders/bodyLight.ts)
   uMind: { value: 0 }, // 0..1: a failing mind's hold on what it sees of the creatures (fx.ts `mind`)
   uSpriteHues: { value: new THREE.Vector3(...ANOMALY_HUES) }, // the anomaly hues a creature keeps whole, and their window and least saturation
   uSpriteHue: { value: new THREE.Vector2(FX.hueWidth, FX.minSaturation) },
@@ -81,10 +83,14 @@ export const worldUniforms = {
   uFogColor: { value: v3(FX.fogColor) },
   uSeaLevel: { value: WORLD.seaLevel }, // where the sea lies: the shore's waterline (the world shader's SHORE)
   uWind: { value: 1 }, // how hard the wind blows the leaves and grass (shaders/world.ts SWAY): 1 on a calm night, more in a gale (weather.ts; round 34)
+  uDamp: { value: 0 }, // round 113: a drowned hall's wet floor (render/wetSheen.ts)
   uWet: wetness, // how soaked the ground is: 0 dry, 1 after hard rain (shaders/world.ts; weather.ts eases it; round 34)
   uShadowMap: { value: null as THREE.Texture | null }, // the moon's depth map, its matrix and its numbers (moonShadow.ts; round 34)
   uShadowMat: { value: new THREE.Matrix4() },
   uShadow: { value: new THREE.Vector4() },
+  uShadowFarMap: { value: null as THREE.Texture | null }, // the far map over a wider ground (round 113)
+  uShadowFarMat: { value: new THREE.Matrix4() },
+  uShadowFar: { value: new THREE.Vector4() },
   uLShadowMap: { value: null as THREE.Texture | null }, // the lantern's depth map, how it is looked through, and its numbers (lanternShadow.ts; round 34)
   uLShadowView: { value: new THREE.Matrix4() },
   uLShadowProj: { value: new THREE.Matrix4() },

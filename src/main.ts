@@ -48,6 +48,11 @@ import { createWorldLights } from './render/worldLights';
 import { createHurtFx } from './render/hurtFx';
 import { createRumbleFx } from './render/rumbleFx';
 import { createParticles } from './render/particles';
+import { createBlood, GORE_SETTING } from './render/blood';
+import { createBloodPools } from './render/bloodPools';
+import { createGore } from './render/gore';
+import { createBodyWeather } from './render/bodyWeather';
+import { createWetSheen } from './render/wetSheen';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
 import { createFightViews } from './render/fightViews';
@@ -203,18 +208,22 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (!opts.arena) watchAchievements(game, store);
   const views = createActorViews(scene, game);
   await loadModels(); // the arenas' models, read before the world is built about them
-  const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)));
+  const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
+  pipeline.softParticles(particles.mesh); // round 113: drawn after the world, thinned where they meet it
+  const marks = createBloodPools(scene, (x, z) => game.world.ground(x, z)); // round 113: what lies on the ground and the water a moment: blood, spatter, a wader's rings
+  const blood = createBlood(game, particles, marks);
+  const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)), createGore(game, blood)); // and a blade's cut
   const fights = createFightViews(scene, game);
   const fxController = createFxController(game);
   const audio = createGameAudio(shell.engine, shell.drones, game);
   audio.warm(); // the realm's track decoded while the theme plays, to come in as it sinks
-  const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   const hidden = createHiddenViews(scene, game, { audio, particles }); // the secret passages open with dust, light and the sound of stone (round 61)
   const notes = createPaperViews(scene, game, { audio, particles }); // a note is a leaf of burning paper; it burns away when its page is put away (round 89)
   const pipeSmoke = createPipeSmoke(particles); // a smoker's thread and breath (round 39)
   const combatFx = createCombatFx(game, particles, () => views.muzzle);
   const hoofFx = createHoofFx(game, particles); // round 50: the dust, spray and sparks of a ride, on the gait's own footfalls
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
+  const bodyWeather = createBodyWeather(game, particles, marks, creatures.figure, creatures.painted); // round 113: rain on the creatures, rings where they wade
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
   const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise, figure: creatures.figure }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
@@ -229,6 +238,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
+  const sheen = createWetSheen(game, pipeline.post); // round 113: wet ground mirrors
   const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
   const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
   const skyline = createSkyline(scene, look);
@@ -366,7 +376,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
         worldUniforms.uRelight.value = settings.relight > 0.5 ? 1 : 0; // the horrors' bodies lit over their folds (shaders/sprite.ts)
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
+        GORE_SETTING.on = settings.gore > 0.5; // round 113: the cut and the blood (Settings › Accessibility)
         creatures.update(alpha, time, camera);
+        blood.update(time);
+        bodyWeather.update(time, camera.position, enclosed);
+        sheen.update(time);
         hidden.update(time);
         fights.update(alpha, time);
         combatFx.update();

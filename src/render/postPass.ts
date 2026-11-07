@@ -71,6 +71,13 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uAnomalyHues: { value: new THREE.Vector3(...ANOMALY_HUES) },
     uChar: { value: new THREE.Vector2(FX.charShare, FX.charLevels) }, // what a character keeps (round 34)
     uAo: { value: new THREE.Vector3(LIGHTING.ao.strength, LIGHTING.ao.radius, LIGHTING.ao.reach) },
+    uContact: { value: new THREE.Vector4(LIGHTING.contact.strength, LIGHTING.contact.reach, LIGHTING.contact.depth, LIGHTING.contact.far) }, // fine shadows (round 113: shaders/contact.ts); x 0 while the shadows are off
+    uWetMirror: { value: new THREE.Vector4(LIGHTING.sheenMirror.strength, LIGHTING.sheenMirror.reach, LIGHTING.sheenMirror.depth, LIGHTING.sheenMirror.ripple) }, // wet ground mirrors (round 113: shaders/wetReflect.ts)
+    uProj: { value: new THREE.Matrix4() },
+    uView: { value: new THREE.Matrix4() },
+    uLightDir: w.uLightDir,
+    uLightColor: w.uLightColor,
+    uAmbient: w.uAmbient,
     uBloom: { value: new THREE.Vector4(LIGHTING.bloom.strength, LIGHTING.bloom.from, LIGHTING.bloom.knee, LIGHTING.bloom.radius) },
     uVig: { value: LIGHTING.vignette },
     uQuantize: { value: 0 },

@@ -46,7 +46,6 @@ export function createFauna(scene: THREE.Scene, g: Game, cry: (voice: VoiceId, a
   const [cells, info] = [attr(4), attr(4)];
   geo.setAttribute('aCell', cells);
   geo.setAttribute('aInfo', info);
-  geo.setAttribute('aWeird', attr(1)); // none of them is wrong
   geo.setAttribute('aFx', attr(4)); // none goes or wears (round 83)
   geo.setAttribute('aWound', attr(4));
   geo.setAttribute('aGlint', attr(4));

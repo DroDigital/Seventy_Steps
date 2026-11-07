@@ -118,7 +118,7 @@ describe('what the shader is told (render/creatureFx.ts)', () => {
     const src = SPRITE_FRAG.replace(/\s+/g, ' ');
     expect(SPRITE_VERT).toContain('attribute vec4 aFx;');
     expect(SPRITE_VERT).toContain('attribute vec4 aWound;');
-    const [moved, sampled, worn, kept] = ['fxSource(uv)', 'texture(uAtlas, src.xy)', 'fxWear(col, vFlash)', 'fxKeep(src.xy, col)'].map((s) => src.indexOf(s));
+    const [moved, sampled, worn, kept] = ['fxSource(uv)', 'bodySample(src.xy)', 'fxWear(col, vFlash)', 'fxKeep(src.xy, col)'].map((s) => src.indexOf(s));
     expect([moved, sampled, worn, kept].every((i) => i >= 0)).toBe(true);
     expect(moved).toBeLessThan(sampled);
     expect(sampled).toBeLessThan(worn);
