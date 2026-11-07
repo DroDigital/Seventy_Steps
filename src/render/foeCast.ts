@@ -1,7 +1,7 @@
 /**
  * What a caster does, drawn quietly (round 90, render only; data/foeTuning.ts `FOE_FX`): a few motes drawn in over its wind-up (`GATHER`
  * frames before the frame it looses what it winds toward, `windup.ts`), a small mark at the muzzle as a bolt leaves, a faint smear every few
- * frames along its flight, the mark and a few specks where it lands, a mark at each end of a beam, a faint sigil and a few rising motes where
+ * frames along its flight, the mark and a few specks where it lands, a mark at each end of a beam, and a few rising motes where
  * something is summoned, two swirls for a teleport, an eye and a few motes for a gaze and a few motes thrown up by a roar's front. No scar, no
  * flash: the horrors' machinery (`attackFx.ts`) is not used here, and a bolt's landing keeps the small, short light every foe's has (round 87, `fxKit.glow`, laid by `attackFx.ts`).
  */
@@ -80,9 +80,8 @@ export function createCasts(c: FoeCtx): Casts {
       const p = ecs.transform.get(entity)?.pos;
       if (!s || !p || !c.near(p) || !c.ask(by, 'mark', 1)) return;
       const U = FOE_FX.summon;
-      const r = U.sigil + (ecs.body.get(entity)?.radius ?? 0.5) * U.perRadius;
+      const r = U.radius + (ecs.body.get(entity)?.radius ?? 0.5) * U.perRadius;
       const floor = g.world.ground(p.x, p.z);
-      c.ground.sigil({ x: p.x, y: floor, z: p.z }, r, s.look.mind, s.who, U.life);
       const n = c.ask(by, 'mote', U.motes);
       for (let i = 0; i < n; i++) {
         const a = (i / n) * tau + kit.pen.rng() * 0.6;

@@ -1,7 +1,7 @@
 /**
  * A vigil kept, drawn (round 64; systems/discovery.ts keeps it): about the mark of a vigil whose turn has come, a ring on the ground
  * the breadth of where it is kept, cold while the hour, the sky or the mind it asks for is not here and warm while it is, and inside
- * it a circle drawn in from its middle as the vigil is kept and drawn back as it ebbs. Before, how far a vigil had come was said and
+ * it a ring that grows out from its middle as the vigil is kept and draws back as it ebbs. Before, how far a vigil had come was said and
  * heard but not seen. Render only.
  */
 
@@ -22,7 +22,7 @@ export function createVigilMarks(g: Game, ground: GroundFx): void {
       const y = g.world.ground(v.x, v.z);
       const pulse = 0.5 + 0.5 * Math.sin(time * (v.holds ? 3 : 1.4));
       decals.ring(v.x, y, v.z, FOUND.vigil, 0.16, v.holds ? FLAME : COLD, v.holds ? 0.7 + 0.25 * pulse : 0.35 + 0.15 * pulse);
-      if (v.share > 0) decals.sigil(v.x, y, v.z, FOUND.vigil - 0.35, v.share, FLAME, 0.85);
+      if (v.share > 0) decals.ring(v.x, y, v.z, (FOUND.vigil - 0.35) * v.share, 0.16, FLAME, 0.85);
     }
   });
 }
