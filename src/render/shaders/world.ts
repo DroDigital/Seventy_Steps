@@ -158,6 +158,7 @@ uniform float uBomb; // 1: a second, turned sample blends in by a noise mask, so
 uniform float uHasMap2; // 1: uMap2 blends in by vSplat (roads)
 uniform float uSeaLevel;
 uniform float uWet; // how soaked the ground is, 0..1 (weather.ts; round 34)
+uniform float uDamp; // round 113: how wet a drowned hall's floor stands, 0..1 (render/wetSheen.ts)
 uniform vec3 uLightColor;
 uniform vec2 uSheen;
 uniform float uCoatOn; // 1: this material takes the realm's coat (render/worldMaterial.ts: what is a prop of stone, wood or cloth)
@@ -288,6 +289,12 @@ void main() {
     pud = smoothstep(thr, thr + 0.06, pn) * smoothstep(0.86, 0.97, n.y);
     tex *= 1.0 - uWet * (0.1 + 0.16 * n.y) - 0.3 * pud;
   }
+  float shine = 0.0; // round 113: how much of a mirror what faces up is, rain-soaked or in a drowned hall: told to the post pass in the alpha (shaders/wetReflect.ts)
+  if (uWet + uDamp > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) {
+    float level = smoothstep(0.86, 0.97, n.y);
+    float pool = smoothstep(0.42, 0.68, vnoise(vWorld.xz * 0.31 + 3.0));
+    shine = level * max(uWet * (0.3 + 0.7 * pud), uDamp * (0.35 + 0.65 * pool));
+  }
   float coated = 0.0; // how much of what a pixel shows is the realm's matter: snow and salt hold the sky's light a little, as the pale things of a night do
   if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 80: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
     float cn = 0.6 * vnoise(vWorld.xz * 0.8 + vWorld.y * 0.37 + 23.0) + 0.4 * vnoise(vWorld.xz * 2.3 - vWorld.y * 0.9 + 5.0);
@@ -363,6 +370,7 @@ void main() {
 #endif
   float alpha = uCharacter > 0.5 && uMarkCharacters > 0.5 ? 0.75 : uOpacity;
 ${SURFACE_APPLY}
+  if (alpha > 0.999) alpha -= 0.08 * clamp(shine, 0.0, 1.0); // (0.92..1: a surface; below 0.9 a character, below 0.5 the Colour)
   gl_FragColor = vec4(mix(col, uFogColor, vFog * uFogAmount), alpha);
 }
 `;

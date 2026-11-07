@@ -86,6 +86,7 @@ export const SHADOW = {
   strength: 0.94, // the share of the moon's light a shadow takes away (the rest is the sky's, and what the land gives back)
   bias: 0.035, // metres a surface is held from its own shadow, more where it turns from the moon (round 54: 0.07, which left a hand's breadth of lit ground, a gap, under a wall's foot)
   offset: 0.06, // metres a point is pushed off its surface along the normal before it is looked up (round 54: 0.12)
+  far: { size: 1024, range: 130, depth: 420, every: 3, bias: 0.3, offset: 0.25 }, // round 113: a second map past the first, so the hills, houses and woods far off keep their shadows: half its width (a texel is 25 cm), its depth, drawn every so many frames, its bias and offset in metres
 };
 
 /** Eyes out of the mist (round 35, render/creatureViews.ts): in a mist, a creature that sees the investigator shows its eyes from far off, glowing out of it. */
@@ -116,8 +117,13 @@ export const INDICATOR = {
 };
 
 /** How the picture is lit and finished (round 39, render/shaders/post.ts and world.ts): what the shadow maps cannot give. */
+/** Round 113: metres over which a particle thins out before the ground or wall behind it, so a cloud of dust or smoke meets it softly (render/softParticles.ts). */
+export const PARTICLE_SOFT = 0.45;
+
 export const LIGHTING = {
   ao: { strength: 0.85, radius: 0.75, reach: 55 }, // contact shadow: the share of light a crease, a foot, the base of a wall loses at most; metres it looks about; metres from the lens it fades out by
+  sheenMirror: { strength: 0.55, reach: 14, depth: 0.9, ripple: 0.025 }, // round 113, wet ground mirrors what stands over it: the most it shows, metres the mirrored ray is followed, metres deep a thing is taken to be, how much the rain ripples it
+  contact: { strength: 0.6, reach: 0.6, depth: 0.3, far: 45 }, // round 113, fine shadows: the share of the moon's or lantern's light a point loses at most to what stands across its way to it; metres the way is followed; metres deep a thing is taken to be; metres from the lens they are gone by
   bloom: { strength: 0.95, from: 0.58, knee: 0.3, radius: 7 }, // what shines bleeds into what is about it: the strength, the brightness it begins at, how soft the start is, low-res pixels it spreads
   vignette: 0.42, // how much the picture's corners darken, so the eye is kept toward the middle
   sky: 1.05, // the ambient on a surface facing straight up (the sky's), against... (round 54: 1.3 and 0.55, which left shade too bright against what the light reaches)

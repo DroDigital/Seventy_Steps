@@ -9,7 +9,7 @@
  */
 
 import * as THREE from 'three';
-import { FX, RENDER, SETTINGS } from '../data/tuning';
+import { FX, LIGHTING, RENDER, SETTINGS } from '../data/tuning';
 import { createLanternShadow, type LanternShadow } from './lanternShadow';
 import { createLampShadows, type LampShadows } from './lampShadows';
 import { createMirrorView, type MirrorView } from './mirrorView';
@@ -18,6 +18,7 @@ import { createMoonShadow, type MoonShadow } from './moonShadow';
 import { createPostPass, type PostPass } from './postPass';
 import { createPresent } from './present';
 import { castSilhouettes } from './silhouetteCasters';
+import { createSoftDepth, drawSoft } from './softParticles';
 import { worldUniforms } from './worldMaterial';
 
 export interface Pipeline {
@@ -42,6 +43,8 @@ export interface Pipeline {
   shot(): HTMLCanvasElement;
   /** `shadowAt`: where the shadow maps are centred (the investigator), or null for none (the setting off, not in the world: round 34); `moon`: the moon is drawn over the open ground too, and not under a roof or in a dungeon. */
   render(scene: THREE.Scene, camera: THREE.Camera, shadowAt?: { x: number; y: number; z: number } | null, moon?: boolean): void;
+  /** The particles' batch, drawn after the world and softened where they meet it (round 113: render/softParticles.ts); none: drawn with the world. */
+  softParticles(mesh: THREE.Mesh | undefined): void;
   /** Starts compiling every shader the scene and the post pass need; resolves once they can be drawn without a stall. */
   compile(scene: THREE.Scene, camera: THREE.Camera): Promise<void>;
   /** Compiles, then draws a frame (sending the GPU what the scene holds), so the next one shown comes at once. */
@@ -68,6 +71,8 @@ export function createPipeline(parent: HTMLElement): Pipeline {
     depthTexture: new THREE.DepthTexture(RENDER.width, RENDER.height), // read by the volumetric fog (round 16)
   });
   const post = createPostPass(target.texture, target.depthTexture);
+  const softDepth = createSoftDepth(target.depthTexture!, RENDER.width, RENDER.height); // the world's depth for the particles to meet softly (round 113)
+  let soft: THREE.Mesh | null = null;
   const picture = new THREE.WebGLRenderTarget(RENDER.width, RENDER.height, { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false, depthBuffer: false }); // what the post pass draws, at the low-res size (the last pass filters it bilinearly where two of its pixels share a screen pixel)
   const present = createPresent(picture.texture);
   const canvasSize = new THREE.Vector2(RENDER.width, RENDER.height);
@@ -91,8 +96,14 @@ export function createPipeline(parent: HTMLElement): Pipeline {
     lamps.render(renderer, scene, shadowAt ?? shadow.focus);
     reflection.render(renderer, scene, camera);
     mirror.render(renderer, scene, camera);
+    const pu = post.uniforms;
+    pu.uContact.value.x = shadowAt ? LIGHTING.contact.strength : 0; // fine shadows go with the shadows (round 113)
+    camera.updateMatrixWorld();
+    pu.uProj.value.copy(camera.projectionMatrix);
+    pu.uView.value.copy(camera.matrixWorldInverse);
     renderer.setRenderTarget(target);
-    renderer.render(scene, camera);
+    if (soft) drawSoft(renderer, target, softDepth, soft, camera, () => renderer.render(scene, camera));
+    else renderer.render(scene, camera);
     renderer.setRenderTarget(picture);
     renderer.render(post.scene, post.camera);
     renderer.setRenderTarget(null);
@@ -122,6 +133,9 @@ export function createPipeline(parent: HTMLElement): Pipeline {
     },
     render,
     compile,
+    softParticles(mesh) {
+      soft = mesh ?? null;
+    },
     async warm(scene, camera) {
       await compile(scene, camera);
       render(scene, camera);
@@ -157,6 +171,7 @@ export function createPipeline(parent: HTMLElement): Pipeline {
       renderer.domElement.style.width = `${spread ? screenW / dpr : cssW}px`; // spread: one canvas pixel to each of the screen's
       renderer.domElement.style.height = `${spread ? screenH / dpr : cssH}px`;
       target.setSize(w, h);
+      softDepth.setSize(w, h);
       picture.setSize(w, h);
       size.set(w, h);
       present.set(size, canvasSize, spread);

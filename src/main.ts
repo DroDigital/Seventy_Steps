@@ -52,6 +52,7 @@ import { createBlood, GORE_SETTING } from './render/blood';
 import { createBloodPools } from './render/bloodPools';
 import { createGore } from './render/gore';
 import { createBodyWeather } from './render/bodyWeather';
+import { createWetSheen } from './render/wetSheen';
 import { createPipeSmoke } from './render/pipeSmoke';
 import { createCreatureViews } from './render/creatureViews';
 import { createFightViews } from './render/fightViews';
@@ -208,6 +209,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const views = createActorViews(scene, game);
   await loadModels(); // the arenas' models, read before the world is built about them
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
+  pipeline.softParticles(particles.mesh); // round 113: drawn after the world, thinned where they meet it
   const marks = createBloodPools(scene, (x, z) => game.world.ground(x, z)); // round 113: what lies on the ground and the water a moment: blood, spatter, a wader's rings
   const blood = createBlood(game, particles, marks);
   const creatures = createCreatureViews(scene, game, await spriteAtlas((p) => veil.progress(0.1 + 0.4 * p)), createGore(game, blood)); // and a blade's cut
@@ -236,6 +238,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const look = createRealmLook(pipeline.post); // round 32: each realm's own colours
   const sky = createSky(look);
   const mist = createVolumetricFog(pipeline.post); // round 16
+  const sheen = createWetSheen(game, pipeline.post); // round 113: wet ground mirrors
   const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
   const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
   const skyline = createSkyline(scene, look);
@@ -377,6 +380,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         creatures.update(alpha, time, camera);
         blood.update(time);
         bodyWeather.update(time, camera.position, enclosed);
+        sheen.update(time);
         hidden.update(time);
         fights.update(alpha, time);
         combatFx.update();

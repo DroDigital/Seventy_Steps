@@ -83,10 +83,14 @@ export const worldUniforms = {
   uFogColor: { value: v3(FX.fogColor) },
   uSeaLevel: { value: WORLD.seaLevel }, // where the sea lies: the shore's waterline (the world shader's SHORE)
   uWind: { value: 1 }, // how hard the wind blows the leaves and grass (shaders/world.ts SWAY): 1 on a calm night, more in a gale (weather.ts; round 34)
+  uDamp: { value: 0 }, // round 113: a drowned hall's wet floor (render/wetSheen.ts)
   uWet: wetness, // how soaked the ground is: 0 dry, 1 after hard rain (shaders/world.ts; weather.ts eases it; round 34)
   uShadowMap: { value: null as THREE.Texture | null }, // the moon's depth map, its matrix and its numbers (moonShadow.ts; round 34)
   uShadowMat: { value: new THREE.Matrix4() },
   uShadow: { value: new THREE.Vector4() },
+  uShadowFarMap: { value: null as THREE.Texture | null }, // the far map over a wider ground (round 113)
+  uShadowFarMat: { value: new THREE.Matrix4() },
+  uShadowFar: { value: new THREE.Vector4() },
   uLShadowMap: { value: null as THREE.Texture | null }, // the lantern's depth map, how it is looked through, and its numbers (lanternShadow.ts; round 34)
   uLShadowView: { value: new THREE.Matrix4() },
   uLShadowProj: { value: new THREE.Matrix4() },

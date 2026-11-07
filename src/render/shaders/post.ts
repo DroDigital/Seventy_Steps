@@ -8,7 +8,9 @@
  */
 
 import { FOG_GLSL } from './fog';
+import { CONTACT_GLSL } from './contact';
 import { LIGHTING_GLSL } from './lighting';
+import { WET_REFLECT_GLSL } from './wetReflect';
 
 export const POST_VERT = /* glsl */ `
 void main() {
@@ -49,6 +51,8 @@ uniform float uGamma; // inverse of the scaled brightness setting: below 1 lifts
 uniform vec3 uPalette[PALETTE_SIZE];
 ${FOG_GLSL}
 ${LIGHTING_GLSL}
+${CONTACT_GLSL}
+${WET_REFLECT_GLSL}
 
 const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
@@ -249,7 +253,13 @@ void main() {
   }
   vec4 fog = fogAlong(uv, bayer4(cell) + 0.5); // the mist between the lens and the scene (round 16)
   float crease = mix(contactAo(uv, bayer4(cell) + 0.5), 1.0, person ? 0.6 : 0.0); // the corners of the world take less light (round 39); a person only a little less
-  vec3 lit = vec3(a.r, b.g, e.b) * crease + bloomAt(uv); // and what shines spills over what is about it
+  if (!person) crease *= contactShadow(uv, bayer4(cell) + 0.5); // and what stands a hand's breadth between a point and the moon or the lantern shades it (round 113; a body is shaded by its own light: shaders/bodyLight.ts)
+  vec3 lit = vec3(a.r, b.g, e.b) * crease;
+  if (!person && centre.a < 0.995) { // wet ground: what stands over it, mirrored (round 113: shaders/wetReflect.ts)
+    vec4 mirrored = wetReflect(uv, (1.0 - centre.a) / 0.08, bayer4(cell) + 0.5);
+    lit = mix(lit, mirrored.rgb, mirrored.a);
+  }
+  lit += bloomAt(uv); // and what shines spills over what is about it
   vec3 col = pow(plunge(stone(faint(hurt(lit * fog.a + fog.rgb, uv), uv), uv), uv) * vignette((cell + 0.5) / uRes), vec3(uGamma));
   if (uQuantize > 0.5) col = person ? posterize(col, cell) : quantize(col, cell);
   gl_FragColor = vec4(col, 1.0);

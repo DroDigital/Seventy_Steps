@@ -188,7 +188,7 @@ describe('the shadow passes', () => {
     moon.enabled = true;
     worldUniforms.uLightDir.value.set(0.3, 0.8, 0.2).normalize();
     moon.render(renderer, new THREE.Scene());
-    expect(calls()).toEqual(['solids', 'foes']);
+    expect(calls()).toEqual(['solids', 'foes', 'solids']); // (round 113: then the far map's solids, none of the foes)
     intoTheMap(log);
     const to = worldUniforms.uLightDir.value.clone().normalize();
     expect(log[1].light.map((n) => +n.toFixed(5))).toEqual([to.x, to.y, to.z, 0].map((n) => +n.toFixed(5))); // toward the moon, not a place

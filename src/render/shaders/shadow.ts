@@ -8,20 +8,40 @@ export const SHADOW_GLSL = /* glsl */ `
 uniform sampler2D uShadowMap;
 uniform mat4 uShadowMat; // world to the map's 0..1 (x, y across it, z along the moon's rays)
 uniform vec4 uShadow; // strength (0: no shadows), a texel, the bias in depth units, the offset along the normal (metres)
+uniform sampler2D uShadowFarMap; // round 113: a second, coarser map over a wider ground, drawn every few frames (render/moonShadow.ts)
+uniform mat4 uShadowFarMat;
+uniform vec4 uShadowFar; // on (1) or not, a texel, the bias in depth units, the offset along the normal (metres)
+
+// The far map's word on wp: 1 lit, less behind something; whole (1) beyond its edge.
+float moonLitFar(vec3 wp, vec3 n, float ndl) {
+  if (uShadowFar.x <= 0.0) return 1.0;
+  float slope = 1.0 + 2.0 * (1.0 - ndl);
+  vec3 c = (uShadowFarMat * vec4(wp + n * uShadowFar.w * slope, 1.0)).xyz;
+  float e = max(abs(c.x - 0.5), abs(c.y - 0.5)) * 2.0;
+  if (e >= 1.0 || c.z >= 1.0 || c.z <= 0.0) return 1.0;
+  float b = uShadowFar.z * slope;
+  vec2 t = vec2(uShadowFar.y);
+  float lit = step(c.z - b, texture(uShadowFarMap, c.xy + t * vec2(-0.6, -0.3)).r)
+            + step(c.z - b, texture(uShadowFarMap, c.xy + t * vec2(0.3, -0.6)).r)
+            + step(c.z - b, texture(uShadowFarMap, c.xy + t * vec2(0.6, 0.3)).r)
+            + step(c.z - b, texture(uShadowFarMap, c.xy + t * vec2(-0.3, 0.6)).r);
+  return mix(1.0, 0.25 * lit, 1.0 - smoothstep(0.7, 0.98, e));
+}
 
 // 1 where the moon reaches wp (its surface normal n, turned ndl to the moon), 0 where something stands in front of it.
 float moonLit(vec3 wp, vec3 n, float ndl) {
   if (uShadow.x <= 0.0) return 1.0;
   vec3 c = (uShadowMat * vec4(wp + n * uShadow.w * (1.0 + 2.0 * (1.0 - ndl)), 1.0)).xyz;
   float e = max(abs(c.x - 0.5), abs(c.y - 0.5)) * 2.0;
-  if (e >= 1.0 || c.z >= 1.0 || c.z <= 0.0) return 1.0;
+  if (e >= 1.0 || c.z >= 1.0 || c.z <= 0.0) return moonLitFar(wp, n, ndl); // beyond the near map, the far one's (round 113)
   float b = uShadow.z * (1.0 + 2.0 * (1.0 - ndl));
   vec2 t = vec2(uShadow.y);
   float lit = step(c.z - b, texture(uShadowMap, c.xy + t * vec2(-0.7, -0.3)).r)
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(0.3, -0.7)).r)
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(0.7, 0.3)).r)
             + step(c.z - b, texture(uShadowMap, c.xy + t * vec2(-0.3, 0.7)).r);
-  return mix(1.0, 0.25 * lit, 1.0 - smoothstep(0.5, 0.98, e)); // the shadows thin out over the far half of the map's width, and are gone at its edge (round 54: from 0.7)
+  float near = 1.0 - smoothstep(0.5, 0.98, e); // the near map gives way over the far half of its width (round 54: from 0.7) to the far map (round 113: it thinned out to nothing)
+  return mix(near < 1.0 ? moonLitFar(wp, n, ndl) : 1.0, 0.25 * lit, near);
 }
 
 uniform sampler2D uLShadowMap;
