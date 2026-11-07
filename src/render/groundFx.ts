@@ -1,7 +1,8 @@
 /**
  * What a blow leaves on the ground and sends along it (render only, round 51), drawn as decals: the
  * scar of an eruption, a slam or a landed bolt (burnt ground whose cracks cool and go out), the shock
- * rings that race out of a burst, and the sigil drawn for a summoning or an arrival. Each is born from
+ * rings that race out of a burst, and a ring held about a place whose ground wears at the mind (round 109:
+ * no sigils on the ground any more). Each is born from
  * a game event by `attackFx` and lives on its own clock, in the horror's own mark and colours. And the
  * slash: the arc a swing has just swept, lit as it opens and gone in a quarter of a second.
  */
@@ -17,7 +18,7 @@ const MAX = 56;
 type Item =
   | { kind: 'scar'; at: V3; r: number; life: number; color: Rgb; mark: AoeStyle; born: number }
   | { kind: 'shock'; at: V3; r: number; to: number; width: number; life: number; color: Rgb; mark: AoeStyle; born: number }
-  | { kind: 'sigil'; at: V3; r: number; life: number; color: Rgb; mark: AoeStyle; born: number }
+  | { kind: 'hold'; at: V3; r: number; life: number; color: Rgb; mark: AoeStyle; born: number }
   | { kind: 'warn'; at: V3; r: number; life: number; color: Rgb; mark: AoeStyle; born: number; fill: number }
   | { kind: 'slash'; at: V3; r: number; yaw: number; arc: readonly [number, number]; life: number; color: Rgb; mark: AoeStyle; born: number };
 
@@ -26,8 +27,8 @@ export interface GroundFx {
   scar(at: V3, radius: number, color: Rgb, who?: string, life?: number): void;
   /** A ring racing out from `from` to `to` metres across `life` seconds. */
   shock(at: V3, from: number, to: number, color: Rgb, who?: string, life?: number, width?: number): void;
-  /** A circle drawn in about `at` and held, then let go (in `INDICATOR.sigil` of `life`). */
-  sigil(at: V3, radius: number, color: Rgb, who?: string, life?: number): void;
+  /** A ring laid about `at` and held: drawn in, held, and let go (in `INDICATOR.hold` of `life`). */
+  hold(at: V3, radius: number, color: Rgb, who?: string, life?: number): void;
   /** The arc (degrees, as a hit's) a swing of `radius` metres has swept about `at`, facing `yaw`. */
   slash(at: V3, radius: number, yaw: number, arc: readonly [number, number], color: Rgb, who?: string, life?: number): void;
   /** A telegraph for a bolt that will fall on `at` in `seconds`: it fills as the time runs out, and holds full a tenth of a second more. */
@@ -51,7 +52,7 @@ export function createGroundFx(): GroundFx {
   return {
     scar: (at, r, color, who, life = 9) => add({ kind: 'scar', at: { ...at }, r, life: life * INDICATOR.scar, color, mark: aoeLook(who), born: now }),
     shock: (at, from, to, color, who, life = 0.55, width = 1.4) => add({ kind: 'shock', at: { ...at }, r: from, to, width, life, color, mark: aoeLook(who), born: now }),
-    sigil: (at, r, color, who, life = 2.2) => add({ kind: 'sigil', at: { ...at }, r, life: life * INDICATOR.sigil, color, mark: aoeLook(who), born: now }),
+    hold: (at, r, color, who, life = 2.2) => add({ kind: 'hold', at: { ...at }, r, life: life * INDICATOR.hold, color, mark: aoeLook(who), born: now }),
     slash: (at, r, yaw, arc, color, who, life = 0.26) => add({ kind: 'slash', at: { ...at }, r, yaw, arc, life, color, mark: aoeLook(who), born: now }),
     warn: (at, r, seconds, color) => add({ kind: 'warn', at: { ...at }, r, life: seconds + 0.12, fill: seconds / (seconds + 0.12), color, mark: aoeLook('yog_sothoth'), born: now }), // (the star: lines of light drawn on it)
     steady: (draw) => void steadies.push(draw),
@@ -77,7 +78,7 @@ export function createGroundFx(): GroundFx {
           decals.disc(x, y, z, it.r, Math.min(1, t / it.fill), it.color, 1);
           decals.ring(x, y, z, it.r + 0.7 + 0.3 * Math.sin(time * 14), 0.2, it.color, 0.55);
         } else if (it.kind === 'slash') decals.sector(x, y, z, it.yaw, it.r, it.arc, 1, it.color, (1 - t) * (1 - t));
-        else decals.sigil(x, y, z, it.r, Math.min(1, t / 0.3), it.color, t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1);
+        else decals.ring(x, y, z, it.r, 0.16, it.color, Math.min(1, t / 0.3) * (t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1));
       }
     },
   };

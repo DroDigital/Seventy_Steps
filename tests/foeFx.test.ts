@@ -122,7 +122,7 @@ describe('a horror\'s blows are as they were, and every other creature\'s are qu
       expect(spawned.length, creature).toBeGreaterThanOrEqual(1);
       expect(spawned.length, creature).toBeLessThanOrEqual(FOE_FX.strike.marks + FOE_FX.strike.specks);
       expect(spawned.every((p) => p.shape === 'crescent'), `${creature}: a rake is crescents`).toBe(true);
-      expect(decals.filter((d) => d === 'scar' || d === 'slash' || d === 'sigil'), creature).toEqual([]);
+      expect(decals.filter((d) => d === 'scar' || d === 'slash'), creature).toEqual([]);
       if (slam === 'slam') expect(decals, creature).toEqual(['shock']);
       expect(lightsAreSmall(), `${creature}: one light`).toBe(1);
     }
@@ -340,7 +340,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 90)', () => 
     }
     expect(spawned.length).toBeGreaterThan(5);
     expect(spawned.length).toBeLessThanOrEqual(OLD_PROJECTILE / 3);
-    expect(decals.filter((d) => d !== 'sigil' && d !== 'shock')).toEqual([]);
+    expect(decals.filter((d) => d !== 'shock')).toEqual([]);
     expect(lightsAreSmall(), 'one for each bolt that landed').toBeLessThanOrEqual(Math.max(1, bolts));
     const traces = spawned.filter((s) => s.p.shape === 'trace');
     const frames = new Set(traces.map((s) => s.frame));
@@ -350,7 +350,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 90)', () => 
     expect(motes.length, 'the gather: about nine motes').toBeLessThanOrEqual(FOE_FX.gather.motes + FOE_FX.bolt.land.specks);
   });
 
-  it('a summoning is a faint sigil and a few rising motes; a teleport two swirls; a roar a few motes', () => {
+  it('a summoning is a few rising motes, with no sigil on the ground; a teleport two swirls; a roar a few motes', () => {
     for (const [creature, move] of [['dagon_priest', 'summon'], ['kn_yan_dweller', 'teleport'], ['dagon_priest', 'roar']] as const) {
       const { g, c, foe, spawned, decals, update } = rig(creature);
       place(g, g.player.id, c.transform.get(foe)!.pos.x, c.transform.get(foe)!.pos.z + 5, Math.PI);
@@ -363,7 +363,7 @@ describe('a caster draws a few motes and a mark, not a storm (round 90)', () => 
       }
       expect(spawned.length, move).toBeGreaterThan(0);
       expect(spawned.length, move).toBeLessThanOrEqual(FOE_FX.gather.motes + FOE_FX.summon.motes + FOE_FX.pulse.motes + 6);
-      if (move === 'summon') expect(decals).toContain('sigil');
+      if (move === 'summon') expect(decals).not.toContain('sigil');
       if (move === 'teleport') expect(spawned.filter((p) => p.shape === 'arc').length).toBe(2);
       expect(decals.filter((d) => d === 'scar' || d === 'slash'), move).toEqual([]);
       lightsAreSmall();

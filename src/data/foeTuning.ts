@@ -60,7 +60,7 @@ export const FOE_FX = {
     land: { marks: 1, specks: 4, size: 0.7 },
   },
   beam: { marks: 1, specks: 2, size: 0.6 }, // a mark at each end
-  summon: { sigil: 1.3, perRadius: 0.4, life: 1.5, motes: 8, rise: [0.5, 1.2] as readonly [number, number] }, // the faint sigil's radius (m) and its seconds, the motes that rise from it
+  summon: { radius: 1.3, perRadius: 0.4, motes: 8, rise: [0.5, 1.2] as readonly [number, number] }, // the ring of motes about a summoned one: its radius (m), per metre of its body, and the motes that rise from it
   teleport: { size: 0.9, motes: 4 }, // two swirls, a few motes at the arrival
   gaze: { every: 8, motes: 4, eye: 0.5 }, // sim frames between the motes a gaze lays along its look; the motes of its burst; the eye drawn at its source (`size`s)
   pulse: { motes: 6, size: 0.1, rise: [0.5, 1.6] as readonly [number, number] }, // a roar's front thrown up in this many motes over its window

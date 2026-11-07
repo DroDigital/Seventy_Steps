@@ -108,7 +108,7 @@ export function createWayFx(g: Game, particles: Particles, ground: GroundFx): Wa
       if (patches.length === 0) return;
       const p = patches[ring++ % patches.length]!;
       const m = wayLook(p.look);
-      if (Math.hypot(p.x - eye.x, p.z - eye.z) < 60) ground.sigil({ x: p.x, y: p.y, z: p.z }, p.r, mixRgb(m.look.ink, m.look.danger, 0.3), undefined, 1.4); // a ring the colour of the ground gone wrong, not of a mark laid on it
+      if (Math.hypot(p.x - eye.x, p.z - eye.z) < 60) ground.hold({ x: p.x, y: p.y, z: p.z }, p.r, mixRgb(m.look.ink, m.look.danger, 0.3), undefined, 1.4); // a ring the colour of the ground gone wrong, not of a mark laid on it
       for (const q of patches) {
         if (Math.hypot(q.x - eye.x, q.z - eye.z) > 45 || Math.random() > 0.7) continue;
         const a = Math.random() * Math.PI * 2;

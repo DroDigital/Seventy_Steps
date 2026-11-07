@@ -1,12 +1,12 @@
 /**
  * The boss attacks' particles (render only, spec §3E; redesigned in round 51). Built from the horror's
  * element (`fxKit`: what its blows are made of) and its colours (`attackLook`: lifted so that they are
- * found against any ground), and from the ground's marks (`groundFx`: scars, shock rings, sigils):
+ * found against any ground), and from the ground's marks (`groundFx`: scars, shock rings, held rings):
  *   a caster's wind-up gathers its light before a bolt, a beam, a gaze, a summoning, a marking;
  *   a bolt leaves in a flash, trails its matter and light, and lands in a spray and a scar;
  *   marked ground seethes, and bursts in a flash, a crown of matter, a fountain, a cloud and a ring;
  *   a quake's front throws dust and stone; a vortex draws its motes in; a beam's end sprays sparks
- *   and burns the ground it crosses; a teleport implodes and arrives under a sigil; a summoning rises
+ *   and burns the ground it crosses; a teleport implodes and arrives in a shock of light; a summoning rises
  *   as a column from a circle; darkness pours off its caller; a phase change shakes the whole arena.
  * The paths are the same for every horror; the matter and colours are that horror's. Read-only on the
  * simulation.
@@ -119,7 +119,6 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     flash(fx, el, to, r * 1.4, look, r, lit);
     column(fx, el, to, r * 0.8, 3 + r, look, 0.8);
     ground.shock(to, r, r * 4, look.mind, whoIs(entity), 0.5, 0.8);
-    ground.sigil(to, r * 1.7, look.mind, whoIs(entity), 1.5);
   });
   g.events.on('Summoned', ({ entity, by }) => {
     const p = c.transform.get(entity)?.pos;
@@ -128,7 +127,6 @@ export function createAttackFx(g: Game, fx: Particles, ground: GroundFx): Attack
     const r = c.body.get(entity)?.radius ?? 0.6;
     column(fx, el, p, r + 0.4, 3 + r * 2, look);
     flash(fx, el, p, r + 0.6, look, 0.6, lit);
-    ground.sigil(p, r + 2.4, look.mind, whoIs(by), 2.4);
     ground.shock(p, r, r + 4, look.line, whoIs(by), 0.6, 0.7);
   });
   g.events.on('Darkened', ({ by }) => {
