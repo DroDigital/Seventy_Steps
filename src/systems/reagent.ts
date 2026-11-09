@@ -1,6 +1,6 @@
 /**
  * West's Reagent, the investigator's healing: a luminous solution in a syringe. Its move's `item`
- * frame closes wounds (a share of full health) and holds them closed for REAGENT.mend seconds, in
+ * frame spends a dose and closes wounds (a share of full health) and holds them closed for REAGENT.mend seconds, in
  * which lingering hurts (pools, the void) do no harm; the doses refill on resting and on rising again, and
  * Silver Vials found in the world let it hold more. Pure: no Three.js.
  */
@@ -14,7 +14,8 @@ export function reagentSystem(g: Game): void {
   if (g.player.mended > 0) g.player.mended--;
   const a = g.ecs.c.actor.get(id)!;
   const def = moveDef(a);
-  if (a.frozen || def?.use !== 'reagent' || a.frame !== def.item) return;
+  if (a.frozen || def?.use !== 'reagent' || a.frame !== def.item || g.player.reagent <= 0) return;
+  g.player.reagent--; // spent as it takes: a dose cut short by a blow before its item frame is kept
   const h = g.ecs.c.health.get(id)!;
   const amount = Math.min(h.max - h.hp, Math.round(h.max * REAGENT.heal));
   h.hp += amount;
