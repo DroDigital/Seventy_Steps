@@ -20,7 +20,7 @@ export const POIS_WAKING: readonly PoiDef[] = [
   { id: 'arkham_blasted_well', region: 'arkham', at: { feature: 'ruin', nth: 0 }, name: 'The Well on the Blasted Heath', kind: 'anomaly', story: 'The Colour Out of Space',
     line: 'Grey dust where nothing grows. The well breathes a colour you cannot name.', again: 'The colour has no place in the spectrum, and it knows your face.',
     fx: { form: 'sheet', hue: 'magenta' }, aura: -0.5, insight: 1, hoard: 300 },
-  { id: 'arkham_ghoul_warren', region: 'arkham', at: { feature: 'graveyard', nth: 1 }, name: 'The Ghoul-Warren under Hill Street', kind: 'den', story: "Pickman's Model",
+  { id: 'arkham_ghoul_warren', region: 'arkham', at: { feature: 'graveyard', nth: 1 }, name: 'The Ghoul-Warren under Hill Street', kind: 'den', story: __DEMO__ ? 'An Arkham Tale' : "Pickman's Model",
     line: 'A slab stands ajar over a stair no sexton dug. Below, a lamp that has never been trimmed.', foes: { ids: ['ghoul', 'reanimated_corpse'], n: 6 }, hoard: 1000, flasks: 1 },
   { id: 'arkham_brown_jenkin', region: 'arkham', at: { feature: 'ruin', nth: 2 }, name: "Brown Jenkin's Run", kind: 'hoard', story: 'The Dreams in the Witch House',
     line: 'Small teeth in the wainscot, and something behind them that almost speaks.', foes: { ids: ['rat_swarm'], n: 4 }, hoard: 900 },

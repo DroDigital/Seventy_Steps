@@ -139,7 +139,7 @@ interface StartOptions {
 async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const { debug, creature, variant } = opts;
   const { settings, veil } = shell;
-  if (import.meta.env.DEV && !opts.arena) (await import('./editor/editorBoot')).bootEdits(); // the world editor's working set, put in force before the world is laid (round 110; never in a release)
+  if (!__DEMO__ && import.meta.env.DEV && !opts.arena) (await import('./editor/editorBoot')).bootEdits(); // the world editor's working set, put in force before the world is laid (round 110; never in a release)
   if (!veil.covered) veil.darken(); // the world is made out of sight
   const made = (share: number): Promise<void> => (veil.progress(share), nextFrame());
   const state: FxState = { sanity: 100, cap: settings.fxCap, anomalyProximity: 0, enabled: allEffectsOn() };
@@ -155,7 +155,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store && opts.fresh) clearSave(store);
   const carry = store && opts.fresh ? takeCarry(store) : null; // a new journey, begun from an ending (NG+)
   const saved = store ? loadSave(store) : null;
-  const game = opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: saved ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
+  const game = !__DEMO__ && opts.arena ? createGame({ creature, variant }) : createWorldGame({ save: saved ?? undefined, carry: carry ?? undefined, difficulty: opts.difficulty, demo: EDITION === 'demo' });
   void refreshMountEntitlement(game);
   addEventListener('focus', () => void refreshMountEntitlement(game));
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
@@ -230,7 +230,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
   const signCallMarks = createSignCallViews(scene, game); // what a sign is worth resting at for now (systems/signCalls.ts)
-  const finale = createFinaleLook(scene);
+  const finale = __DEMO__ ? null : createFinaleLook(scene);
   const portals = createPortalViews(scene, game, particles); // round 60: the gates' veils, walked through
   const ground = createGroundFx(); // what blows and bolts leave on the ground and send along it, shared by the horrors' attacks and the storm's (round 51, 52)
   const bossFx = createBossFx(scene, game, particles, ground);
@@ -256,9 +256,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5, northUp: () => settings.minimap > 0.5, tips: () => settings.controlTips > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
   const photo = createPhoto(game, () => pipeline.shot(), () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture (the low-res one, before it is spread over the screen)
   const map = createMapScreen(game, painter, capture, journeys.go);
-  const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
+  const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(!__DEMO__ && opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
   const flight = createFreeCamera();
-  const editor = import.meta.env.DEV && world ? (await import('./editor/worldEditor')).installWorldEditor({ canvas, world, resetInput: () => input.reset(), held: () => building || menuOpen() || cinema.active || journeys.busy || veil.active || flight.active || developerConsole.open, openNow: !!opts.edit }) : null; // F8: the world editor (round 110; a development build only, so never in a release)
+  const editor = !__DEMO__ && import.meta.env.DEV && world ? (await import('./editor/worldEditor')).installWorldEditor({ canvas, world, resetInput: () => input.reset(), held: () => building || menuOpen() || cinema.active || journeys.busy || veil.active || flight.active || developerConsole.open, openNow: !!opts.edit }) : null; // F8: the world editor (round 110; a development build only, so never in a release)
   const developerCommands = createDeveloperCommands(game, {
     setFlight: (on) => on ? flight.enable(camera) : flight.disable(),
     flightEnabled: () => flight.active,
@@ -367,7 +367,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         world?.update(free ? camera.position.x : at.x, free ? camera.position.z : at.z, journeys.budget);
         journeys.update(world?.pending ?? 0);
         views.update(alpha, time, enclosed);
-        finale.update(time, game);
+        finale?.update(time, game);
         notes.update(time, dialogue.reading, at);
         placeLantern(game, alpha);
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
@@ -444,7 +444,7 @@ else if (params.has('bestiary')) void startBestiary().catch(failedStart);
 else {
   const opts: StartOptions = {
     debug: params.has('debug'),
-    arena: params.has('arena') || params.has('spawn'),
+    arena: !__DEMO__ && (params.has('arena') || params.has('spawn')), // (the developers' combat arena: not in the demo)
     fresh: params.has('fresh'),
     creature: params.get('spawn') ?? undefined,
     variant: variant === 'eldritch' || variant === 'boss' ? variant : undefined,

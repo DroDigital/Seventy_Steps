@@ -72,5 +72,5 @@ export function toneOf(form: Rgb, realm: Rgb, share: number): Tone {
 
 /** The newly drawn Azathoth keeps its approved palette in every realm; other forms use the usual measured grading. */
 export function toneForForm(key: string, form: Rgb, realm: Rgb, share: number): Tone {
-  return key === 'azathoth' ? PLAIN : toneOf(form, realm, share);
+  return !__DEMO__ && key === 'azathoth' ? PLAIN : toneOf(form, realm, share);
 }

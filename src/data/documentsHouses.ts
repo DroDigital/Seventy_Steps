@@ -9,12 +9,15 @@ import type { Document } from './documents';
 
 const note = (...text: string[]): Document => ({ kind: 'note', text });
 
+/** The deposition of 1692 (the court's page, read in the discovery too): the demo's title names no one of the rest of the game. */
+export const DEPOSITION = __DEMO__ ? "Goodwife's Deposition" : "Goodwife Pickman's Deposition";
+
 export const HOUSE_DOCUMENTS: Readonly<Record<string, Document>> = {
   "The Surveyors' Report": note(
     'A report to the Reservoir Commission, typewritten, unsigned, its margins foxed with a pale bloom that is not mildew. “The old Gardner place lies in the line of the basin. The well water is sweet by every test, and kills the shrubs it is poured on. For two hundred yards about it the ground is a fine grey ash that takes no footprint and grows nothing.”',
     'A pencilled postscript: “Mr. Pierce says it was not so before the stone came down in the June of ’82, and that the gentlemen from Miskatonic who weighed it never printed a line. He keeps a lamp lit in the window at dusk, one for each of the family, so the hollow will know the house is still kept. We advise the dam be raised high, and the gates kept shut.”',
   ),
-  "Goodwife Pickman's Deposition": note(
+  [DEPOSITION]: note(
     'A court paper of 1692, the hand cramped, the ink pale. “Being asked what she saw on Meadow Hill upon the night before the first of May, she saith that there was a Fire, and a ring about it, and Keziah Mason in the ring; that a Tall Man in black stood where the light did not reach, and that she knew him for the Black Man; that he had a Book, and a pen, and that no one wrote with ink.”',
     '“She saith that those who wrote their names in it did so with their own blood and went home easier, and slept; and that a name once written was given away, not lost, so that the one who bore it walked after as one that is not quite remembered. She saith she did not sign, and ran, and that the river closed behind her like a hand.” In another ink, later: “Three candles of black tallow were found upon the stone. They had been lit in order.”',
   ),

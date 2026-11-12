@@ -59,7 +59,8 @@ const biome = (base: number, amp: number, scale: number, texture: GroundTexture,
   props,
 });
 
-export const REGIONS: readonly RegionDef[] = [
+/** Every realm of the game, in the order that seeds their land (a region's place in this list is part of its terrain). */
+const ALL: readonly RegionDef[] = [
   {
     id: 'hub', name: 'Miskatonic University', dungeon: 'University Library', bosses: [], area: [0, 0, 1, 1],
     biome: biome(3, 1.2, 40, 'grass', [0.52, 0.5, 0.5], true, 7, { tree: 3, pillar: 2, ruin: 2, grave: 1 }, 'leaves'),
@@ -163,6 +164,21 @@ export const REGIONS: readonly RegionDef[] = [
     spawns: { density: 0.7, table: { being_from_beyond: 2, night_gaunt: 1, yekubian: 1 } },
   },
 ];
+
+// The demo's edge land (docs/DEMO_BUILD.md): the demo build keeps `hub` and `arkham` of ALL (tools/demo/rules/world.ts cuts the rest) and
+// adds what lay past them as bare, unnamed ground. The seed of a realm's land is its place in this list, so the four stand where
+// Dunwich, Innsmouth, Providence and Vermont stood, with their area and ground: the university's and Arkham's land is then the very
+// land of the full game, and a demo save carries over. `full_game` is the one island, last, where the two gates of the university end.
+const edge = (id: string, area: RegionDef['area'], b: Biome): RegionDef => ({ id, name: 'Beyond the Mist', dungeon: '', bosses: [], area, biome: b, spawns: { density: 0, table: {} } });
+const EDGE: readonly RegionDef[] = [
+  edge('d_edge', [-1, 1, 1, 1], biome(9, 7, 60, 'grass', [0.58, 0.5, 0.42], true, 0, {}, 'dirt')),
+  edge('i_edge', [1, 1, 1, 1], biome(2.5, 1.4, 35, 'mud', [0.46, 0.52, 0.5], true, 0, {}, 'gravel')),
+  edge('p_edge', [1, 0, 1, 1], biome(5, 3.5, 45, 'grass', [0.5, 0.5, 0.52], true, 0, {}, 'leaves')),
+  edge('v_edge', [0, 1, 1, 1], biome(12, 10, 70, 'grass', [0.46, 0.54, 0.46], true, 0, {}, 'leaves')),
+];
+const FAR: RegionDef = edge('full_game', [-4, 4, 1, 1], biome(4, 1, 40, 'slab', [0.5, 0.5, 0.5], false, 0, {}));
+
+export const REGIONS: readonly RegionDef[] = __DEMO__ ? [...ALL, ...EDGE, FAR] : ALL;
 
 export const REGION_IDS: readonly string[] = REGIONS.map((r) => r.id);
 

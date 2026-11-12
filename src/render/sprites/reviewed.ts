@@ -2,7 +2,7 @@
 /** Lossless reviewed PNG pages and their authored animation registrations. */
 import type { DirectionalClips, SpriteAction, SpriteDirection } from './directional';
 import { REVIEWED_GROUND } from '../../data/reviewedLook';
-import { mergeReviewedArt, validateAlliedManifest, validateReviewedManifest } from './reviewedMerge';
+import { ALLIED_ART_KEYS, BASE_ART_COUNT, mergeReviewedArt, validateAlliedManifest, validateReviewedManifest } from './reviewedMerge';
 
 export interface ReviewedFrame {
   source: string;
@@ -47,8 +47,9 @@ export function reviewedClips(entity: ReviewedEntity, key: string): DirectionalC
   for (const direction of ['front', 'back', 'left', 'right'] as const) {
     // This base creature's authored physical side folders are labelled in reverse.
     // Route the complete view (idle and walk) to the correct facing without altering its pixels.
-    const authored = key === 'innsmouth_hybrid' && direction === 'left' ? 'right'
-      : key === 'innsmouth_hybrid' && direction === 'right' ? 'left' : direction;
+    const flipped = !__DEMO__ && key === 'innsmouth_hybrid'; // the one form drawn facing the other way (the demo has none)
+    const authored = flipped && direction === 'left' ? 'right'
+      : flipped && direction === 'right' ? 'left' : direction;
     const view = entity.directions[authored];
     clips[direction] = {};
     for (const state of ['idle', 'move', 'flight', 'attack', 'hurt', 'stoop', 'stoop_mid'] as const) {
@@ -88,12 +89,12 @@ export function reviewedSpan(entity: ReviewedEntity, manifest: ReviewedManifest)
 }
 
 /** Assets resolve under both a hosted subdirectory and Electron's app:// package. */
-async function loadArtworkPack(base: string, expectedCount: number, made: (share: number) => void): Promise<ReviewedArt> {
+async function loadArtworkPack(base: string, expectedCount: number | null, allied: boolean, made: (share: number) => void): Promise<ReviewedArt> {
   const response = await fetch(`${base}index.json`);
   if (!response.ok) throw new Error(`Creature artwork index could not load (${response.status}).`);
   const manifest = await response.json() as ReviewedManifest;
   validateReviewedManifest(manifest, expectedCount);
-  if (expectedCount === 7) validateAlliedManifest(manifest);
+  if (allied) validateAlliedManifest(manifest);
   let completed = 0;
   const pages = await Promise.all(manifest.pages.map((page) => new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
@@ -113,8 +114,8 @@ export async function loadReviewedArt(made: (share: number) => void): Promise<Re
   let oldShare = 0, allyShare = 0;
   const progress = (): void => made(oldShare * 0.9 + allyShare * 0.1);
   const [base, allies] = await Promise.all([
-    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/reviewed/`, 105, share => { oldShare = share; progress(); }),
-    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/allies/`, 7, share => { allyShare = share; progress(); }),
+    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/reviewed/`, BASE_ART_COUNT, false, share => { oldShare = share; progress(); }),
+    loadArtworkPack(`${import.meta.env.BASE_URL}creatures/allies/`, ALLIED_ART_KEYS.length, true, share => { allyShare = share; progress(); }),
   ]);
   return mergeReviewedArt(base, allies);
 }

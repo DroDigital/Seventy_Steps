@@ -47,7 +47,7 @@ export const NPC_SAID: Readonly<Record<string, readonly string[]>> = {
   morgan: [
     "[low voice] [satisfied] Armitage will want to hear the Horror's gone. [pause] [dryly] I carried the sprayer that night, you know. [quiet chuckle] The powder worked then, TOO.",
     "[low voice] [measured] Here, see what I have. [wry chuckle] [slowly] It all costs something... [pause] [dryly] even HERE.",
-    "[low voice] [measured] Morgan. Medicine, and comparative anatomy. [pause] I was at Dunwich with Armitage and Rice, before all this. [casually] [quietly] I've been making myself useful.",
+    __DEMO__ ? "[low voice] [measured] Morgan. Medicine, and comparative anatomy. [pause] I was in the hills with Armitage and Rice, before all this. [casually] [quietly] I've been making myself useful." : "[low voice] [measured] Morgan. Medicine, and comparative anatomy. [pause] I was at Dunwich with Armitage and Rice, before all this. [casually] [quietly] I've been making myself useful.",
     "[low voice] [matter of fact] Lamp oil in medicine bottles, mostly. Thrown, they BURN. [pause] [softly] And a few odd things from the Exhibition Hall's drawers. [dryly] I'll trade for those Echoes of yours... [long pause] [whispers] don't ask me what I do with them.",
   ],
   kuranes: [

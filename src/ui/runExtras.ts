@@ -34,8 +34,8 @@ export function createExtras(game: Game, shell: Shell, store: SaveStore | null, 
   const perf = createPerf(!!o.perf, notes);
   const readout = createReadout();
   const auto = createAutoQuality(shell, perf.stats, (text) => game.events.emit('Notice', { text }), !o.arena && !o.debug && !o.bench && (!!o.intro || !o.fresh) && firstLaunch(store)); // a first launch's picture is set for the computer
-  const bench = o.bench && !o.arena ? startBench(game, perf.stats, readout) : null;
-  const trailer = o.trailer && !o.arena && !bench ? startTrailer(game, o.hold) : null;
+  const bench = !__DEMO__ && o.bench && !o.arena ? startBench(game, perf.stats, readout) : null;
+  const trailer = !__DEMO__ && o.trailer && !o.arena && !bench ? startTrailer(game, o.hold) : null;
   return {
     tick() {
       const now = performance.now();

@@ -57,6 +57,9 @@ const ASSIGN: Readonly<Record<string, AoeMotif>> = {
 
 export const PLAIN_AOE: AoeStyle = { motif: 0, name: 'plain', seed: 0, freq: 4, arms: 3 };
 
+/** The star the sky's strikes and the warnings wear: the look `aoeLook` gives the star of the Great Ones, held as its numbers (no name of a horror in the demo). */
+export const STAR_MARK: AoeStyle = { motif: AOE_MOTIFS.indexOf('star'), name: 'star', seed: 0.82, freq: 3, arms: 4 };
+
 function vary(id: string): Pick<AoeStyle, 'seed' | 'freq' | 'arms'> {
   let n = 2166136261;
   for (let i = 0; i < id.length; i++) n = Math.imul(n ^ id.charCodeAt(i), 16777619);

@@ -44,7 +44,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('ca_column', ring(0.97, 6, { arc: [50, 310] }), { size: 0.9, tint: [0.62, 0.58, 0.46], keep: 0.1 }), // the ballroom's columns
       put('pd_chandelier', scatter(2, [0.86, 0.97], { face: 'free' }), { size: 1.4, lift: 3, tint: [0.7, 0.58, 0.32], keep: 0.3 }), // fallen from its chain, hung on none
       put('column', ring(0.95, 6, { arc: [50, 310] }), { size: [0.6, 0.85] }),
-      put('statue_head', at(0.95, 180, { face: 'in' }), { size: 0.9, tint: [0.58, 0.6, 0.66] }),
+      put(__DEMO__ ? 'altar_stone' : 'statue_head', at(0.95, 180, { face: 'in' }), { size: 0.9, tint: [0.58, 0.6, 0.66] }),
       put('coffin', ring(0.92, 3, { arc: [90, 270], face: 'free' }), { size: 1.2 }),
       put('iron_gate', at(0.95, 230, { face: 90 })),
       put('grave_broken', scatter(5, [0.8, 0.97], { face: 'free' })),
@@ -117,7 +117,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('ph_mirror', at(0.95, 210, { face: 'wall' }), { heart: true, size: 1.4, keep: 0.5 }), // the dark mirrors by the water
       put('fountain', at(0.93, 235), { size: 0.5, tint: [0.34, 0.4, 0.46] }),
       put('lily', scatter(7, [0.82, 0.97], { face: 'free' }), { walk: true, size: 1.6 }),
-      put('statue_head', ring(0.95, 3, { arc: [100, 260], face: 'in' }), { size: 0.7 }),
+      put(__DEMO__ ? 'altar_stone' : 'statue_head', ring(0.95, 3, { arc: [100, 260], face: 'in' }), { size: 0.7 }),
       put('column', ring(0.97, 4, { arc: [60, 300] }), { size: 0.75 }),
       put('urn', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.2 }),
     ],
@@ -160,7 +160,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('bench', ring(0.93, 4, { arc: [70, 290], face: 'in' }), { size: 1.2 }),
       put('chest', scatter(3, [0.84, 0.97], { arc: [70, 290], face: 'free' }), { size: 1.2 }),
       put('cross_wood', at(0.95, 240, { face: 'in' }), { size: 1.4 }),
-      put('statue_head', at(0.95, 125, { face: 'in' }), { size: 0.55 }),
+      put(__DEMO__ ? 'altar_stone' : 'statue_head', at(0.95, 125, { face: 'in' }), { size: 0.55 }),
       put('urn', scatter(5, [0.82, 0.96], { face: 'free' }), { size: 1.2 }),
     ],
   },
@@ -169,7 +169,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
     puts: [
       put('ba_bust', scatter(4, [0.84, 0.96], { arc: [70, 290], face: 'in' }), { size: [1.6, 2], tint: [0.82, 0.82, 0.86], keep: 0.2 }), // the dreamer's face in the unfinished marble (round 79: davdadams', CC BY)
       put('uv_hourglass', at(0.862, 160, { face: 'in' }), { size: 2.2 }), // the hourglass of the dreamer
-      put('statue_head', at(0.95, 180, { face: 'in' }), { size: 0.75, tint: [0.7, 0.7, 0.74] }),
+      put(__DEMO__ ? 'altar_stone' : 'statue_head', at(0.95, 180, { face: 'in' }), { size: 0.75, tint: [0.7, 0.7, 0.74] }),
       put('column', ring(0.96, 4, { arc: [60, 300] }), { size: 0.75 }),
       put('bedroll', ring(0.9, 3, { arc: [80, 280], face: 'free' }), { size: 1.4 }),
       put('bench', at(0.93, 270, { face: 90 }), { size: 1.2 }),

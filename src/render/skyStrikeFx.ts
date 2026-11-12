@@ -5,6 +5,7 @@
  * far ground so a storm is not only a flicker. Render only; the simulation's events carry all of it (systems/skyStrikes.ts).
  */
 
+import { STAR_MARK } from './aoeLook';
 import * as THREE from 'three';
 import type { V3 } from '../core/geom';
 import type { Game } from '../systems/components';
@@ -46,8 +47,8 @@ export function createSkyStrikeFx(g: Game, particles: Particles, ground: GroundF
     beams.bolt(boltPath(top, at, Math.random, { segments: 16, sway: 6, forks: 3 }), 0.45, 0.55, ARC, WHITE);
     burst(particles, RAYS, at, radius, STORM_LOOK, 1.2);
     flash(particles, RAYS, at, radius * 1.6, STORM_LOOK, 1);
-    ground.scar(at, radius * 1.2, ARC, 'yog_sothoth', 16);
-    ground.shock(at, radius * 0.5, radius * 3.2, STORM_LOOK.ring, 'yog_sothoth', 0.6, 1.1);
+    ground.scar(at, radius * 1.2, ARC, STAR_MARK, 16);
+    ground.shock(at, radius * 0.5, radius * 3.2, STORM_LOOK.ring, STAR_MARK, 0.6, 1.1);
     lightning.strikeNow(0); // the sky lights, and the thunder is on the heels of the crack
   });
   return {

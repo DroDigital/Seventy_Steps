@@ -112,6 +112,10 @@ because a Steam build started outside Steam would relaunch itself through it.
 
 ## The demo (round 56)
 
+Round 114: the browser demo is a build of its own, `npm run build:demo`, and holds none of the rest of the game (docs/DEMO_BUILD.md).
+The packed demo below is not built that way yet: it is still packed from the full build with `edition` set to `demo`, so a demo
+packed this way holds the whole game until its packaging runs `build:demo`. Check that before any demo goes to itch.io or Steam.
+
 The demo is the same game packed with `edition` set to `demo` in its package.json: the university and Arkham only, ending when Keziah Mason
 falls (`src/systems/demo.ts`; in a browser, `?demo`). Its title says DEMO under the name, and its end offers the game's page. Saves carry
 over to the full game (the same save folder).

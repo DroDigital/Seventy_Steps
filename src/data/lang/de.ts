@@ -214,7 +214,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'demo.tag': "DEMO",
   'demo.closed': "Dieser Weg führt ins volle Spiel. Die Demo bleibt bei der Universität und Arkham.",
   'demo.end.title': "DAS ENDE DER DEMO",
-  'demo.end.line': "Keziah Mason ist aus dem Hexenhaus verschwunden, und unter dem Zeichen des Schläfers öffnen sich die siebzig Stufen des leichten Schlummers. Sie führen ins volle Spiel: in die Traumlande, nach Dunwich, Innsmouth, R'lyeh und zu den Schrecken, die dort warten.",
+  'demo.end.line': "Keziah Mason ist aus dem Hexenhaus verschwunden, und unter dem Zeichen des Schläfers öffnen sich die siebzig Stufen des leichten Schlummers. Sie führen ins volle Spiel, und zu den Schrecken, die jenseits von ihnen warten.",
   'demo.end.save': "Euer Fortschritt bleibt erhalten: Das volle Spiel setzt diesen Spielstand auf diesem Computer fort.",
   'demo.end.buy': "Das volle Spiel holen",
   'demo.end.stay': "Weiter erkunden",

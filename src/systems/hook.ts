@@ -12,6 +12,9 @@ import { dungeonRoomAt } from '../world/terrain';
 import { engagedFights } from './bossFight';
 import type { Game } from './components';
 
+/** The waking realms the omens are heard in (the demo's are the university and Arkham). */
+const WAKING_REALMS: readonly string[] = __DEMO__ ? ['hub', 'arkham'] : ['hub', 'arkham', 'dunwich', 'innsmouth', 'providence', 'vermont'];
+
 export interface Omen {
   id: string;
   after: number; // seconds of play
@@ -39,7 +42,7 @@ export function hookSystem(g: Game): void {
     g.events.emit('Notice', { text: `JOURNEY ${g.player.cycle + 1} · ENEMIES STRIKE HARDER AND PAY MORE. THE ARMS YOU EARNED ARE YOURS` });
   }
   const o = nextOmen(g);
-  if (!o || g.frame / SIM.hz < o.after || !['hub', 'arkham', 'dunwich', 'innsmouth', 'providence', 'vermont'].includes(ow.region ?? '')) return;
+  if (!o || g.frame / SIM.hz < o.after || !WAKING_REALMS.includes(ow.region ?? '')) return;
   const me = g.ecs.c.transform.get(g.player.id)!.pos;
   if (engagedFights(g).length || dungeonRoomAt(me.x, me.z) || g.player.listening !== null || (g.ecs.c.health.get(g.player.id)?.hp ?? 0) <= 0) return;
   ow.told.add(`omen:${o.id}`);

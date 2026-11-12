@@ -165,7 +165,7 @@ export function dream(g: Game): boolean {
   if (!g.overworld || !at || !signPlace(g.overworld.sign)?.dream || !descentOpen(g)) return false;
   if (!demoAllows(g, at)) return !demoRefuses(g); // the stair leads into the full game
   teleport(g, at);
-  g.events.emit('Travelled', { via: 'dream', to: 'slumber', name: 'Stairs of Slumber' });
+  g.events.emit('Travelled', { via: 'dream', to: 'slumber', name: __DEMO__ ? "the Sleeper's Stair" : 'Stairs of Slumber' });
   return true;
 }
 

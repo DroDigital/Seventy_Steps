@@ -35,14 +35,6 @@ export const NARRATION_AT: Readonly<Record<EndingId, readonly number[]>> = {
 
 /** Seconds into a scene that a word of one of its lines begins. */
 const atWord = (id: EndingId, line: number, word: string): number => NARRATION_AT[id][line]! + wordAt(ENDING_NARRATION[id][line]!, word);
-const sealClose = atWord('seal', 1, 'close');
-const sealLets = atWord('seal', 1, 'lets');
-const sealClock = atWord('seal', 2, 'clock');
-const sealBreath = atWord('seal', 2, 'breathing');
-const sealWake = atWord('seal', 2, 'Wake');
-const silverFollow = atWord('silver_key', 0, 'follow');
-const silverWider = atWord('silver_key', 1, 'wider');
-const heraldKnee = atWord('herald', 1, 'knee');
 
 export const ENDING_SCENES: Readonly<Record<string, Scene>> = {
   seal: {
@@ -68,16 +60,16 @@ export const ENDING_SCENES: Readonly<Record<string, Scene>> = {
     beats: [
       { at: 0.4, fade: 'clear', over: 3.2 },
       ...narrate('seal', NARRATION_AT.seal),
-      { at: sealClose, act: 'Close your hand', hand: 'close', burst: { kind: 'motes', on: 'player', count: 12 } },
-      { at: sealLets, hand: 'open', burst: { kind: 'ash', on: 'player', count: 40 }, sound: 'release', gain: 0.8 },
-      { at: sealLets + 0.55, fade: 'white', over: 0.1, shake: 0.14, hold: 1.6, set: 'boom', gain: 0.55, pitch: 0.55 },
-      { at: sealLets + 0.7, fade: 'clear', over: 1.5 },
+      { at: atWord('seal', 1, 'close'), act: 'Close your hand', hand: 'close', burst: { kind: 'motes', on: 'player', count: 12 } },
+      { at: atWord('seal', 1, 'lets'), hand: 'open', burst: { kind: 'ash', on: 'player', count: 40 }, sound: 'release', gain: 0.8 },
+      { at: atWord('seal', 1, 'lets') + 0.55, fade: 'white', over: 0.1, shake: 0.14, hold: 1.6, set: 'boom', gain: 0.55, pitch: 0.55 },
+      { at: atWord('seal', 1, 'lets') + 0.7, fade: 'clear', over: 1.5 },
       { at: 28.6, burst: { kind: 'motes', on: 'sign', count: 30 } },
-      { at: sealClock, set: 'bell', gain: 0.5, pitch: 0.7 },
-      { at: sealClock + 2.6, set: 'bell', gain: 0.45, pitch: 0.7 },
-      { at: sealClock + 5.2, set: 'bell', gain: 0.4, pitch: 0.7, burst: { kind: 'motes', on: 'sign', count: 24 } },
-      { at: sealBreath, set: 'whisper', gain: 0.3, pitch: 0.9 },
-      { at: sealWake, act: 'Wake', fade: 'white', over: 1.6 },
+      { at: atWord('seal', 2, 'clock'), set: 'bell', gain: 0.5, pitch: 0.7 },
+      { at: atWord('seal', 2, 'clock') + 2.6, set: 'bell', gain: 0.45, pitch: 0.7 },
+      { at: atWord('seal', 2, 'clock') + 5.2, set: 'bell', gain: 0.4, pitch: 0.7, burst: { kind: 'motes', on: 'sign', count: 24 } },
+      { at: atWord('seal', 2, 'breathing'), set: 'whisper', gain: 0.3, pitch: 0.9 },
+      { at: atWord('seal', 2, 'Wake'), act: 'Wake', fade: 'white', over: 1.6 },
       { at: 42.4, fade: 'black', over: 0.8 },
     ],
   },
@@ -102,11 +94,11 @@ export const ENDING_SCENES: Readonly<Record<string, Scene>> = {
       { at: 0, fade: 'violet', over: 0.01, sound: 'teleport', gain: 0.9 },
       { at: 0.1, fade: 'clear', over: 1.8, burst: { kind: 'stars', on: 'player', count: 40 } },
       ...narrate('silver_key', NARRATION_AT.silver_key),
-      { at: silverFollow, act: 'Follow', burst: { kind: 'stars', on: 'player', count: 40 } },
+      { at: atWord('silver_key', 0, 'follow'), act: 'Follow', burst: { kind: 'stars', on: 'player', count: 40 } },
       { at: 9, set: 'choral', gain: 0.55 },
       { at: 15, burst: { kind: 'stars', on: 'player', count: 50 } }, // "the place where the dream runs out of road"
-      { at: silverWider, act: 'Step through', fade: 'violet', over: 0.15, sound: 'teleport', gain: 0.7, burst: { kind: 'stars', on: 'player', count: 60 } },
-      { at: silverWider + 0.2, fade: 'clear', over: 1.6, sound: 'rise', gain: 0.9, burst: { kind: 'stars', on: 'player', count: 60 } },
+      { at: atWord('silver_key', 1, 'wider'), act: 'Step through', fade: 'violet', over: 0.15, sound: 'teleport', gain: 0.7, burst: { kind: 'stars', on: 'player', count: 60 } },
+      { at: atWord('silver_key', 1, 'wider') + 0.2, fade: 'clear', over: 1.6, sound: 'rise', gain: 0.9, burst: { kind: 'stars', on: 'player', count: 60 } },
       { at: 27.5, burst: { kind: 'stars', on: 'player', count: 80 } },
       { at: 29.5, set: 'choral', gain: 0.5, pitch: 0.85 },
       { at: 33.4, fade: 'white', over: 2.4, sound: 'levelUp', gain: 0.6 },
@@ -135,7 +127,7 @@ export const ENDING_SCENES: Readonly<Record<string, Scene>> = {
       { at: 0.1, fade: 'clear', over: 3, burst: { kind: 'embers', on: 'sign', count: 26 } },
       ...narrate('herald', NARRATION_AT.herald),
       { at: 6.5, set: 'whisper', gain: 0.7, pitch: 0.8 },
-      { at: heraldKnee, kneel: true, act: 'Let the knee bend' },
+      { at: atWord('herald', 1, 'knee'), kneel: true, act: 'Let the knee bend' },
       { at: 18.6, burst: { kind: 'embers', on: 'sign', count: 40 }, set: 'laugh', gain: 0.5, pitch: 0.6, shake: 0.06 },
       { at: 22.5, set: 'choral', gain: 0.3, pitch: 0.6 }, // the flutes, far off
       { at: 30, fade: 'red', over: 3 },

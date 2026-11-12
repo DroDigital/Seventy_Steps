@@ -143,8 +143,10 @@ export function createWorldGame({ seed = WORLD.seed, save, carry, difficulty, de
   registerRelics(g);
   registerTally(g);
   registerRoomWords(g);
-  registerHastur(g);
-  registerNyarlathotep(g);
+  if (!__DEMO__) {
+    registerHastur(g); // (the horrors that are not in the demo)
+    registerNyarlathotep(g);
+  }
   registerSeals(g);
   registerOmens(g);
   registerSurvey(g);

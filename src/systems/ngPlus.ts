@@ -13,7 +13,7 @@ export interface JourneyHome { profile: JourneyProfile; encounter?: string; serv
 export const journeyIndex = (cycle: number): number => Number.isFinite(cycle) ? Math.min(NEW_GAME_PLUS.most, Math.max(0, Math.floor(cycle))) : 0;
 
 export function regionProfile(region: string | undefined, at?: XZ): JourneyProfile {
-  if (region === 'dreamlands' && at) {
+  if (!__DEMO__ && region === 'dreamlands' && at) {
     const r = REGIONS.find((r) => r.id === region)!;
     const rect = regionRect(r);
     // The Wood and the approach to Ulthar are gentler than Leng and Kadath, further north.
