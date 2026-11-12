@@ -13,6 +13,7 @@ import { LAIRS } from '../../src/data/lairs.ts';
 import { DUNGEON_KITS, type KitId } from '../../src/data/kits.ts';
 import { KIT_PILLARS } from '../../src/data/dungeonLooks.ts';
 import { REGION_IDS } from '../../src/data/regions.ts';
+import { SHOPS } from '../../src/data/wares.ts';
 import { createWorldGame } from '../../src/systems/game.ts';
 import { steps } from '../helpers.ts';
 
@@ -31,6 +32,12 @@ describe("the demo's world", () => {
     const dungeons = [...DUNGEONS, ...FAR_DUNGEONS, ...LAIRS];
     const used = dungeons.flatMap((d) => [DUNGEON_KITS[d.id], ...d.rooms.map((r) => r.kit)]).filter((k): k is KitId => k !== undefined);
     expect(used.filter((k) => KIT_PILLARS[k] === undefined)).toEqual([]);
+  });
+
+  // (the lamp traders of data/npcs.ts sell from the 'wayside' shop: a shop the demo cut leaves a trader selling nothing)
+  it('keeps the wayside shop the lamp traders sell from', () => {
+    expect(SHOPS).toHaveProperty('wayside');
+    expect(SHOPS.wayside.length).toBeGreaterThan(0);
   });
 
   it('builds at the university and steps without a fault', () => {

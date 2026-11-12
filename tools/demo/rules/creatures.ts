@@ -92,7 +92,8 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/epilogues.ts', decl: 'FATES', shape: 'properties', keep: npcs },
   { file: 'src/data/npcActs.ts', decl: 'ACTS', shape: 'properties', keep: npcs },
   { file: 'src/data/overheard.ts', decl: 'OVERHEARD', shape: 'properties', keep: npcs },
-  { file: 'src/data/wares.ts', decl: 'SHOPS', shape: 'properties', keep: npcs },
+  // (the people's shops, and 'wayside': the lamp traders of data/npcs.ts sell from it, so a cut would leave them selling nothing)
+  { file: 'src/data/wares.ts', decl: 'SHOPS', shape: 'properties', keep: (id) => npcs(id) || id === 'wayside' },
   // the things the player finds and keeps
   { file: 'src/data/weapons.ts', decl: 'WEAPONS', shape: 'properties', keep: weapons },
   { file: 'src/data/weapons.ts', decl: 'WEAPON_WHERE', shape: 'properties', keep: weapons },
