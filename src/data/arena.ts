@@ -60,7 +60,7 @@ export const ARENA = {
     [7, 11, 0.35, 2.2, 1.1],
   ] as const,
   colonnade: { count: 20, radius: 24.2, pillarRadius: 0.7, height: 8 },
-  tome: { x: -8.5, z: 12.5, yaw: 1.1, name: 'Pnakotic Manuscripts', insight: 1 },
+  tome: { x: -8.5, z: 12.5, yaw: 1.1, name: __DEMO__ ? 'Ancient Manuscripts' : 'Pnakotic Manuscripts', insight: 1 },
   hidden: [
     {
       name: 'Door That Should Not Be', // a doorway to nowhere, for those who have read enough

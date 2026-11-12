@@ -123,7 +123,7 @@ export const NAMED = tier('named', [
     stats: st(4750, 1000, 97, 0, 4, 12), resist: ['slash', 'blunt', 'shot'], drops: { echoes: 2000 }, insightOnSight: 2, // (round 83: damage 64 to 69: the last band's blows are as they were, and its pauses cost him 0.02 lives under the 0.2 floor)
   },
   {
-    id: 'voice_in_the_tomb', name: 'The Voice in the Tomb', source: 'The Statement of Randolph Carter', regions: ['arkham'], canonLooks: false, voice: 'whisper',
+    id: 'voice_in_the_tomb', name: 'The Voice in the Tomb', source: __DEMO__ ? 'A Statement from Arkham' : 'The Statement of Randolph Carter', regions: ['arkham'], canonLooks: false, voice: 'whisper',
     sprite: { silhouette: 'spectre', palette: 'charcoal', scale: 2.6, eyes: 0 },
     behavior: { archetype: 'stationary_horror', attacks: ['roar', 'grab'] },
     stats: st(1000, 1000, 26, 0, 3, 10), drops: { echoes: 1000 }, insightOnSight: 1,

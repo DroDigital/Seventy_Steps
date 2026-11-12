@@ -27,7 +27,7 @@ const note = (...text: string[]): Document => ({ kind: 'note', text });
 export const DOCUMENTS: Readonly<Record<string, Document>> = {
   Necronomicon: tome(
     "The Latin of Olaus Wormius, the 1623 printing: the university's own copy. Someone has been reading it with a pencil in hand.",
-    "In the margin beside the passage on the Gate, in Peaslee's small, neat writing: \"Y. is the gate and the key and the guardian. Then who holds the key now? Ask A. about Carter.\" The last line is underlined twice.",
+    __DEMO__ ? "In the margin beside the passage on the Gate, in Peaslee's small, neat writing: \"Y. is the gate and the key and the guardian. Then who holds the key now? Ask A. about the key.\" The last line is underlined twice." : "In the margin beside the passage on the Gate, in Peaslee's small, neat writing: \"Y. is the gate and the key and the guardian. Then who holds the key now? Ask A. about Carter.\" The last line is underlined twice.",
   ),
   "Keziah's Formulae": tome(
     'Loose sheets in a woman\'s hand, very old, the ink gone brown. Most of it is arithmetic. Some of the figures describe angles that add up to more than a corner should.',
@@ -69,7 +69,7 @@ export const DOCUMENTS: Readonly<Record<string, Document>> = {
   // Round 13: the tomes in the dungeons' new rooms.
   'Liber Ivonis': tome(
     "The Latin Book of Eibon, a fifteenth-century copy chained to its shelf. The chain has been cut.",
-    'A slip marks the chapter on Zhothaqquah, "who dwelleth in N\'kai beneath the mound". Someone has written in the margin: "the mound at Dunwich? or the one at Binger?"',
+    __DEMO__ ? 'A slip marks the chapter on Zhothaqquah, "who dwelleth in N\'kai beneath the mound". Someone has written in the margin: "the mound in the hills? or the one at Binger?"' : 'A slip marks the chapter on Zhothaqquah, "who dwelleth in N\'kai beneath the mound". Someone has written in the margin: "the mound at Dunwich? or the one at Binger?"',
   ),
   "Gilman's Dream-Diary": tome(
     "A student's notebook, water-stained, found in a rat-hole. Walter Gilman's hand, getting worse page by page.",

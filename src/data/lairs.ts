@@ -67,7 +67,7 @@ export const LAIRS: readonly DungeonDef[] = [
       stair('cellar_stair', 'front_room', 's', -4),
       room('cellar', 'hall', 'cellar_stair', 's', { spawns: ['moon_bog_wraith', 'moon_bog_wraith'] }),
       stair('attic_stair', 'front_room', 'e', 4),
-      room('attic', 'hall', 'attic_stair', 'e', { wide: true, boss: ['the_unnamable'], tome: { name: "Carter's Account", insight: 1 } }),
+      room('attic', 'hall', 'attic_stair', 'e', { wide: true, boss: ['the_unnamable'], tome: { name: __DEMO__ ? "Keziah's Formulae" : "Carter's Account", insight: 1 } }),
     ],
   },
   {

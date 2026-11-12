@@ -25,7 +25,7 @@ function formOf(id: string, lob: boolean): ShotForm {
 }
 
 function colorOf(id: string): Rgb {
-  if (id === 'yog_sothoth') return ANOMALY.green;
+  if (!__DEMO__ && id === 'yog_sothoth') return ANOMALY.green;
   if (id === 'colour_out_of_space') return lookOf(id).danger;
   return lookOf(id).line; // (lifted to a light's brightness)
 }

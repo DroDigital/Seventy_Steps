@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import type { Entity } from '../core/ecs';
-import { COURT_SIGN, courtOpen, ended } from '../systems/endings';
+import { COURT_SIGN, UMR, courtOpen, ended } from '../systems/endings';
 import type { Fight, Game } from '../systems/components';
 import { courtPlaces } from '../data/finale';
 import type { SetLook } from '../world/props';
@@ -104,9 +104,9 @@ export function createFinaleLook(scene: THREE.Scene): FinaleLook {
       key.visible = !!sign && show && fall < 0.98;
       key.scale.setScalar(Math.max(0.001, 1 - fall));
       let guide: [Entity, Fight] | undefined;
-      for (const pair of g.ecs.c.fight) if (pair[1].id === 'umr_at_tawil') guide = pair;
+      for (const pair of g.ecs.c.fight) if (pair[1].id === UMR) guide = pair;
       const open = guide?.[1].sig.gate === 1;
-      const passing = finaleScene() === 'ending:silver_key';
+      const passing = !__DEMO__ && finaleScene() === 'ending:silver_key';
       arch.visible = !!guide && (open || passing) && (!ended(g) || g.cutscene);
       if (arch.visible && guide && open) {
         const [e, f] = guide;

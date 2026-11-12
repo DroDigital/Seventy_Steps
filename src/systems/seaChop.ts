@@ -13,7 +13,8 @@ const EASE = 0.02; // the share of the way to the wind's chop it comes in a step
 export function seaChop(g: Game): number {
   const wx = g.overworld?.weather;
   const wind = wx ? (wx.kind === 'gale' ? 0.9 : wx.kind === 'storm' ? 1.1 : wx.kind === 'rain' ? 0.3 : 0) * wx.amount : 0;
-  return (g.overworld?.region === 'rlyeh' ? 1.5 : g.overworld?.region === 'innsmouth' ? 1.15 : 1) * (1 + wind);
+  const chop = !__DEMO__ && g.overworld?.region === 'rlyeh' ? 1.5 : !__DEMO__ && g.overworld?.region === 'innsmouth' ? 1.15 : 1; // (the drowned realms are not in the demo)
+  return chop * (1 + wind);
 }
 
 const NOW = new WeakMap<Game, number>();

@@ -31,4 +31,5 @@ const session = (): Session | null => {
   }
 };
 
-export const EDITION: Edition = editionOf((globalThis as { desktop?: { edition?: string } }).desktop?.edition, typeof location === 'undefined' ? '' : location.search, session());
+/** In the demo build (`__DEMO__`, vite.config.ts) the edition is a constant: there is no full game in that bundle for a flag to open (docs/DEMO_BUILD.md). */
+export const EDITION: Edition = __DEMO__ ? 'demo' : editionOf((globalThis as { desktop?: { edition?: string } }).desktop?.edition, typeof location === 'undefined' ? '' : location.search, session());

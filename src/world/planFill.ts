@@ -113,11 +113,11 @@ const WAKING = new Set(['hub', 'arkham', 'dunwich', 'innsmouth', 'providence', '
 const MARKS: readonly (readonly [PropKind, number])[] = [['cross', 3], ['obelisk', 2], ['monolith', 2.5], ['lamp', 2.5]];
 const MARKS_DREAM: readonly (readonly [PropKind, number])[] = [['pillar', 3], ['obelisk', 2], ['lamp', 2.5], ['monolith', 1]];
 const MARKS_BEYOND: readonly (readonly [PropKind, number])[] = [['monolith', 3], ['pillar', 2], ['obelisk', 2]];
-const marksOf = (region: RegionDef) => (WAKING.has(region.id) ? MARKS : region.id === 'dreamlands' ? MARKS_DREAM : MARKS_BEYOND);
+const marksOf = (region: RegionDef) => (WAKING.has(region.id) ? MARKS : !__DEMO__ && region.id === 'dreamlands' ? MARKS_DREAM : MARKS_BEYOND);
 
 /** What stands by a country road: its marks, with the rocks, bushes and stumps of the verge. */
 const VERGE: readonly (readonly [PropKind, number])[] = [['rock', 1.4], ['bush', 2.4], ['stump', 1]];
-const roadsideOf = (region: RegionDef) => [...marksOf(region).map(([k, w]) => [k, w * 0.5] as const), ...(WAKING.has(region.id) || region.id === 'dreamlands' ? VERGE : VERGE.slice(0, 1))];
+const roadsideOf = (region: RegionDef) => [...marksOf(region).map(([k, w]) => [k, w * 0.5] as const), ...(WAKING.has(region.id) || (!__DEMO__ && region.id === 'dreamlands') ? VERGE : VERGE.slice(0, 1))];
 
 /** Every thirty to fifty metres along each country road, on alternate sides: something to walk toward. */
 export function roadside(region: RegionDef, roads: readonly Road[], rng: Rng, occ: Occ, clear: (x: number, z: number) => boolean, props: Prop[]): void {

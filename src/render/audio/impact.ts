@@ -65,7 +65,7 @@ export function landedBlow(g: Game, e: GameEvents['Hit']): Landed | null {
     outcome: e.outcome,
     damage: e.damage,
     heavy: !!a?.move?.startsWith('heavy') || (def?.hit?.poise ?? 0) >= 30,
-    chop: g.player.weapon === 'axe',
+    chop: !__DEMO__ && g.player.weapon === 'axe', // (the axe is not in the demo)
     size,
     great: c.fight.has(e.target) || size >= IMPACT.big,
   };

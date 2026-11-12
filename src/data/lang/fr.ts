@@ -214,7 +214,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'demo.tag': "DÉMO",
   'demo.closed': "Ce chemin mène au jeu complet. La démo s’en tient à l’université et à Arkham.",
   'demo.end.title': "LA FIN DE LA DÉMO",
-  'demo.end.line': "Keziah Mason a quitté la Maison de la Sorcière, et sous le Signe du Dormeur s’ouvrent les soixante-dix marches du sommeil léger. Elles mènent au jeu complet : les Contrées du Rêve, Dunwich, Innsmouth, R’lyeh et les horreurs qui y attendent.",
+  'demo.end.line': "Keziah Mason a quitté la Maison de la Sorcière, et sous le Signe du Dormeur s’ouvrent les soixante-dix marches du sommeil léger. Elles mènent au jeu complet, et aux horreurs qui les attendent au-delà.",
   'demo.end.save': "Votre progression est conservée : le jeu complet reprend cette sauvegarde, sur cet ordinateur.",
   'demo.end.buy': "Obtenir le jeu complet",
   'demo.end.stay': "Continuer d’explorer",

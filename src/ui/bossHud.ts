@@ -51,7 +51,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   const joined = (e: { entity: number }): boolean => { const f = g.ecs.c.fight.get(e.entity); return !!f && hooksOf(f).includes('arena_reconnect'); };
   g.events.on('Rewired', (e) => (blink(), joined(e) && say('THE ROOM FOLDS · ITS EDGES MEET'))); // a first public playthrough: "why did they teleport me? ... not fair"
   g.events.on('GazeBurst', (e) => say(`THE GAZE  −${e.sanity} SANITY`));
-  g.events.on('Revealed', (e) => say(`THE POWDER OF IBN GHAZI · ${e.doses} LEFT`));
+  if (!__DEMO__) g.events.on('Revealed', (e) => say(`THE POWDER OF IBN GHAZI · ${e.doses} LEFT`)); // (the Dunwich's powder: not in the demo)
   g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 68: it was said only in the field guide)
     const f = g.ecs.c.fight.get(e.entity);
     const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);

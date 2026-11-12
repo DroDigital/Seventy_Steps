@@ -214,7 +214,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'demo.tag': "DEMO",
   'demo.closed': "Ese camino lleva al juego completo. La demo se limita a la universidad y a Arkham.",
   'demo.end.title': "EL FIN DE LA DEMO",
-  'demo.end.line': "Keziah Mason ya no está en la Casa de la Bruja, y bajo el Signo del Durmiente se abren los setenta escalones del sueño ligero. Llevan al juego completo: las Tierras del Sueño, Dunwich, Innsmouth, R'lyeh y los horrores que allí aguardan.",
+  'demo.end.line': "Keziah Mason ya no está en la Casa de la Bruja, y bajo el Signo del Durmiente se abren los setenta escalones del sueño ligero. Llevan al juego completo, y a los horrores que aguardan más allá.",
   'demo.end.save': "Tu progreso se conserva: el juego completo continúa esta partida, en este ordenador.",
   'demo.end.buy': "Conseguir el juego completo",
   'demo.end.stay': "Seguir explorando",

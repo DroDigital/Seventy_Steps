@@ -25,13 +25,13 @@ export const LESSER = tier('lesser', [
     eldritchVariant: { sprite: { glow: 'magenta' } },
   },
   {
-    id: 'cthulhu_cultist', name: 'Cthulhu Cultist', source: 'The Call of Cthulhu', regions: ['rlyeh', 'providence'], canonLooks: true,
+    id: 'cthulhu_cultist', name: __DEMO__ ? 'Cultist' : 'Cthulhu Cultist', source: __DEMO__ ? 'A Tale of the Deep' : 'The Call of Cthulhu', regions: ['rlyeh', 'providence'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'charcoal', scale: 2.1, eyes: 2 },
     behavior: { archetype: 'pack_hunter', attacks: ['sweep', 'lunge', 'combo'] },
     stats: st(150, 34, 20, 3.4, 0.1, 1), drops: { echoes: 50 }, insightOnSight: 0,
   },
   {
-    id: 'ghoul', name: 'Ghoul', source: "Pickman's Model", regions: ['providence', 'dreamlands', 'arkham'], canonLooks: true, voice: 'meep',
+    id: 'ghoul', name: 'Ghoul', source: __DEMO__ ? 'An Arkham Tale' : "Pickman's Model", regions: ['providence', 'dreamlands', 'arkham'], canonLooks: true, voice: 'meep',
     sprite: { silhouette: 'hunched', palette: 'mold', scale: 2.2, eyes: 2 },
     behavior: { archetype: 'pack_hunter', attacks: ['bite', 'sweep', 'lunge', 'combo'] },
     stats: st(220, 42, 26, 3.8, 0.3, 2), drops: { echoes: 120 }, insightOnSight: 0,

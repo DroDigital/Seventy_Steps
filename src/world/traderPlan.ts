@@ -17,7 +17,7 @@ import { makeProp, type Prop } from './props';
 const SEED = 0x7a1d;
 const KEEP = 1.1; // metres kept clear about the lamp and about the man (his own body and his turn)
 const HARD: ReadonlySet<Prop['kind']> = new Set(['house', 'set']); // what is not taken down for him: a house, a model of an arena's dressing
-const LAMPLESS: ReadonlySet<string> = new Set(['kn_yan']); // under the earth there are no street lamps (landmarks.test.ts, round 12): he stands there with none, the Elder Sign's glow his light
+const LAMPLESS: ReadonlySet<string> = new Set(__DEMO__ ? [] : ['kn_yan']); // (the demo keeps no such realm) under the earth there are no street lamps (landmarks.test.ts, round 12): he stands there with none, the Elder Sign's glow his light
 
 /** The region's traders' places, with their lamps raised into `props` and what stood in their way taken out of it. */
 export function planTraderLamps(

@@ -1,0 +1,659 @@
+{
+ "format": "seventy-steps-reviewed-atlas-v1",
+ "sourceIndexSha256": "84a3d712d810d10e2bd48c72f11818651260b089acd369b87b7f24d0eb489f43",
+ "entityCount": 1,
+ "frameCount": 33,
+ "filter": "nearest",
+ "mipmaps": false,
+ "gutter": 1,
+ "pages": [
+  {
+   "file": "allies-0.png",
+   "width": 2048,
+   "height": 131,
+   "sha256": "a3f51df8b98e3a9c5f7d00ba0e77d9a5a6f54e3b68ba38ed6df6a07484ff9c2d"
+  }
+ ],
+ "frames": [
+  {
+   "source": "sprites/algol_light_being/64x64/front/idle_0.png",
+   "sourceSha256": "09c86912d3d4ac9589eeb50e4ad25b81b740f537cee55b1bfb502b70af5c069c",
+   "pixelSha256": "dbeee11210d116cb8ecaa19b0dfec71202c7ea52e997094eeb88dc60b3fee5cf",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    18,
+    11,
+    47,
+    58
+   ],
+   "page": 0,
+   "x": 1,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/idle_1.png",
+   "sourceSha256": "c132c9caf6fdbe380daa52ba38c5ff14f629d30e7394e389b43581db9326fdec",
+   "pixelSha256": "8fbf4f78a9452aa2e8e8e2e3fc0c1b3207be06c04454582e92a78fe4b7ae03f3",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    10,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 66,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/move_0.png",
+   "sourceSha256": "041db6f51fb1d6e3b266c922c34f8975c41febaa6daa9b45f1f16ccced5011b6",
+   "pixelSha256": "5c1edc3bc24ff9d67b2bc997ebecdcfa743915c0c639afe282139aae4ab2a219",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    16,
+    10,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 131,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/move_1.png",
+   "sourceSha256": "fe2be27bbfaecd2912fc16364be314c46d5baf26619e46e5cc533f3b30f25131",
+   "pixelSha256": "7669521b8ef2652b00d5c81fbfd98f24a93d87e558c3e6d90abae124be6f742c",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    15,
+    10,
+    49,
+    58
+   ],
+   "page": 0,
+   "x": 196,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/move_2.png",
+   "sourceSha256": "1da4dfa8c4c590ee86e42680836bcf004098660336ba5e7c271932b5bdbe543f",
+   "pixelSha256": "7a26837c66e5ebb172d5fa013ded6a1cbaecb76e3f02fb07631e8e931f7fb76f",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    14,
+    11,
+    50,
+    58
+   ],
+   "page": 0,
+   "x": 261,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/move_3.png",
+   "sourceSha256": "d71fd3a36feef4d4ebe197bf5f9487f0473cd4740808e3b1d5ea06ac3e667f25",
+   "pixelSha256": "af30c0efaad54215b9dfefa26e145238c0adc236add9967e82b0ea8e8b94f16b",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    13,
+    11,
+    51,
+    58
+   ],
+   "page": 0,
+   "x": 326,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/attack_0.png",
+   "sourceSha256": "cf21b8c598ee2e3cb8568fe1883ec015821190d7a26e0307b6cd6fee24bab811",
+   "pixelSha256": "537c2b041eeef968c801d2170a3fbc07b98ff15f9f96045b5b9f18c97fcfa60c",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    10,
+    47,
+    58
+   ],
+   "page": 0,
+   "x": 391,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/attack_1.png",
+   "sourceSha256": "1900ada0a3a8767cf90df8f9c75aaa0495750bd5bd98325fb856d93e1b8be6ba",
+   "pixelSha256": "e92496cff8d8e2f49b9b73341e42aea709f27fac93f6670b0fae53045ff9e5b5",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    9,
+    10,
+    56,
+    58
+   ],
+   "page": 0,
+   "x": 456,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/attack_2.png",
+   "sourceSha256": "cba6d851c97617e3c2d1d3952552a45a89a10b480bc52d4c9e0d6d051ac900fe",
+   "pixelSha256": "3eaaca6d77423dfd365b74b72a8c417598c85037792a70cae50fda14cc99b3c4",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    15,
+    11,
+    49,
+    58
+   ],
+   "page": 0,
+   "x": 521,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/hurt_0.png",
+   "sourceSha256": "4bdfbba9309b668a7fbe5b30cfb32c596496544ca155348bcfa6f48a8ba50a82",
+   "pixelSha256": "d3c6c45d201e6260fe7228bbde90fb405bd8830d81371bcb03567cdd14feca12",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    18,
+    15,
+    46,
+    58
+   ],
+   "page": 0,
+   "x": 586,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/front/hurt_1.png",
+   "sourceSha256": "08b4dfd45cb23633c853c6e03cf93daf4d4164b70b12440c9819339ae6ae6ce2",
+   "pixelSha256": "cb3c8c1a88cb20670da1ad1eddaccf35eedb106c50f4bdd13dceeaf0441fe987",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    14,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 651,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/idle_0.png",
+   "sourceSha256": "171496b4ae9d61dd08a0cddd4bc4cab769a52a5b09a3b57ae6deaf9bf22fbe89",
+   "pixelSha256": "016a1b4d7a516b5c9939c66e7a5e58771ea8fa6356c9c9befa4fb47ffb882c90",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    10,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 716,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/idle_1.png",
+   "sourceSha256": "83c63ec09717c2c33b81f66ad89ad7d0261e62baecc38b555a823dbc93c346ef",
+   "pixelSha256": "29b65dbf9bc1304d52870142ab8d6b6ef31cff36d55b2d667ed3be458b1d6b4a",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    13,
+    11,
+    51,
+    58
+   ],
+   "page": 0,
+   "x": 781,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/move_0.png",
+   "sourceSha256": "2bd1156fd6dbbe0a24571dcc5db9f4718db535a2d6416a50123b7e5aa2743670",
+   "pixelSha256": "5a646e2e97bf6d38ad555348eb9b4d015c0d1781b78a839fe0cb9d4610b67182",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    13,
+    11,
+    51,
+    58
+   ],
+   "page": 0,
+   "x": 846,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/move_1.png",
+   "sourceSha256": "da05da7ebf464966f54b7ebb49cfbf078eccd17d52576a9add2bc9349fec396e",
+   "pixelSha256": "adc997a220bc3e7e58ce62001bf6d54acdd6784fe8ea337f8c68625b3b2c1264",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    13,
+    10,
+    52,
+    58
+   ],
+   "page": 0,
+   "x": 911,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/move_2.png",
+   "sourceSha256": "dccff907fe34bf81126f59e66160ea92cf73c40834b21132eadc0f6f51e58ed4",
+   "pixelSha256": "8592ea9efe9d9738c7c0e2b69038862c728669f5423f7dcd91a07414a52bae23",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    12,
+    11,
+    52,
+    58
+   ],
+   "page": 0,
+   "x": 976,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/move_3.png",
+   "sourceSha256": "42afcee4974856cfe5214ffc9da142a2d79cf41a1c0e12826db5a2fec203697e",
+   "pixelSha256": "30829437393c4eca5d619c7726a110b8a36dd0376f626ef0ff4bdcb0f7ee0cc1",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    10,
+    12,
+    55,
+    58
+   ],
+   "page": 0,
+   "x": 1041,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/attack_0.png",
+   "sourceSha256": "e7d1d5af10462504cbe8fbdcd698be15853bc4e7de178f1c98db44557da2bf14",
+   "pixelSha256": "2b69d7ae10bbc7cc26916c1ab49b409a0fcbb982c80deedb58eeb48cd635ea8e",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    13,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 1106,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/attack_1.png",
+   "sourceSha256": "fb75916e3ec9e7d74c7443e070c9f626c58b49cd9da66163e2d293be15059fdd",
+   "pixelSha256": "384693150965112c4c9b5bcc62157b292cdbfac7b9060409ae9cadf416f1a3e1",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    6,
+    11,
+    58,
+    58
+   ],
+   "page": 0,
+   "x": 1171,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/attack_2.png",
+   "sourceSha256": "ce72ee7b3a6cdcc7f559c7337e8c26fb39157496e690485bb9b78f8cb66a244b",
+   "pixelSha256": "25cb7b5e42093048d6fe273feb9c54efb2daf810f443f7452ca9ccf5335bf962",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    9,
+    12,
+    56,
+    58
+   ],
+   "page": 0,
+   "x": 1236,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/hurt_0.png",
+   "sourceSha256": "bca8e1b88b2e3c24dfe1c951039d930e5e5e31ec41fc9f5e4e73a7c77f72fce5",
+   "pixelSha256": "fcc428289f6954f39af942c146440219cd9645555067612380c73396879afaf7",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    22,
+    47,
+    58
+   ],
+   "page": 0,
+   "x": 1301,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/left/hurt_1.png",
+   "sourceSha256": "e88677e151226682b51c1656d9d7b17a37c7ace7a540a093ed046eccc59b39c1",
+   "pixelSha256": "a0f8c14dd41ca392b2745ff27d8f6628fb621c72bfa6fde370440efba3c22610",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    11,
+    11,
+    53,
+    58
+   ],
+   "page": 0,
+   "x": 1366,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/idle_0.png",
+   "sourceSha256": "4945abac0b187cae074923e185adb0c0ae3b3db09fe13a172c0ce8ede2d6022a",
+   "pixelSha256": "59a9ae8ce8c8d2c4f80c062c47eb08d110a10f3f078ec0873aba06f270fbb4bb",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    16,
+    10,
+    49,
+    58
+   ],
+   "page": 0,
+   "x": 1431,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/idle_1.png",
+   "sourceSha256": "310b14ead90c534932cd4ce85ce8faa9b71b57fb5814b476a13c81ac2d8f0e1d",
+   "pixelSha256": "210479ef7b387d7f241c10636e3e3446a08cc9ae28d3f2ce0f3b3a6266eb2fa2",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    15,
+    11,
+    49,
+    58
+   ],
+   "page": 0,
+   "x": 1496,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/move_0.png",
+   "sourceSha256": "4cab0d3b5a21187f2369460d8a0dc8ca07cf44878066b3ab4312012cce839df3",
+   "pixelSha256": "a1fd56908cf8c5b47f3c77d1a509cc301e4e2722950f64a4c3a9ebf1f88c8ff5",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    16,
+    10,
+    48,
+    58
+   ],
+   "page": 0,
+   "x": 1561,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/move_1.png",
+   "sourceSha256": "34ac5e660a76d2ed056b64a9a4333adda8df152860752dace0344caf728a922e",
+   "pixelSha256": "1699bed02ea04b8b0d1ca96af4f2d92904797b6925dea15aa24e0d64f0a45a80",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    14,
+    11,
+    50,
+    58
+   ],
+   "page": 0,
+   "x": 1626,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/move_2.png",
+   "sourceSha256": "8519b81763dd3f263d45e29dcdee3e8401277c5a44caacdb2cb13e73f0199df8",
+   "pixelSha256": "83208e61cff37815ad5e241fe8a4196e19428866edc048ae866ae718fe73fbd1",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    14,
+    11,
+    51,
+    58
+   ],
+   "page": 0,
+   "x": 1691,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/move_3.png",
+   "sourceSha256": "10213a2fbf50cf15c85bc23c323e00f880dec2d0c7a11a8426d985456e351f87",
+   "pixelSha256": "11c3773bc68155f5ade3d1766c0198a4ec21d4be3a7c5cfc87c1e0610c35af0c",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    13,
+    11,
+    52,
+    58
+   ],
+   "page": 0,
+   "x": 1756,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/attack_0.png",
+   "sourceSha256": "3e16c2c8e6f4df4f5a764fbf228892802504155f105a9454f8a74a6ce5d4f3da",
+   "pixelSha256": "4ae46d202cb41ba31f20c3822fcc73d73453062fffa4438921fa4fe338c2d058",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    17,
+    18,
+    47,
+    58
+   ],
+   "page": 0,
+   "x": 1821,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/attack_1.png",
+   "sourceSha256": "84c93d4b8b3ac2a9968236e85bfc5f2962f56da9a609eb0753e3daee867be41f",
+   "pixelSha256": "2ba7d143e2d1b6ec0fd371e5921f02afd7965724b1f8c372e322af33ae5cdc7f",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    14,
+    10,
+    51,
+    58
+   ],
+   "page": 0,
+   "x": 1886,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/attack_2.png",
+   "sourceSha256": "f134068df56de5269815d62e5059d2c088cb679cb1cdc4dbb989dffe6b9f6007",
+   "pixelSha256": "5a0520c91b5b60979d08da769962f65f5127d4c969f07701ae4459710113604e",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    14,
+    9,
+    50,
+    58
+   ],
+   "page": 0,
+   "x": 1951,
+   "y": 1
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/hurt_0.png",
+   "sourceSha256": "060a74677943955c7bf0723b8671678e2919812a2931d7caac25b4b621c5d721",
+   "pixelSha256": "ef290a61b7f4d7c4f5cf892ead82587aced987191b55e3c65f643d97d1d586d8",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    18,
+    21,
+    46,
+    58
+   ],
+   "page": 0,
+   "x": 1,
+   "y": 66
+  },
+  {
+   "source": "sprites/algol_light_being/64x64/back/hurt_1.png",
+   "sourceSha256": "4f990cdf5be6f34c6a2a87059aea820c9163d741b63a13cd13cdf1555fcaff4d",
+   "pixelSha256": "3d6bd5d790e0c60ddbf5f187dc7c98f7b34d84891fe3daac0f978e2122c90445",
+   "width": 64,
+   "height": 64,
+   "bounds": [
+    15,
+    10,
+    50,
+    58
+   ],
+   "page": 0,
+   "x": 66,
+   "y": 66
+  }
+ ],
+ "entities": {
+  "algol_light_being": {
+   "id": "algol_light_being",
+   "name": "The Light-Being from Algol",
+   "assetGroup": "sprites",
+   "scale": 2.6,
+   "scaleUnit": "canvas-height-metres",
+   "page": 0,
+   "directions": {
+    "front": {
+     "sourceDirection": "front",
+     "mirror": false,
+     "actions": {
+      "idle": [
+       0,
+       1
+      ],
+      "move": [
+       2,
+       3,
+       4,
+       5
+      ],
+      "attack": [
+       6,
+       7,
+       8
+      ],
+      "hurt": [
+       9,
+       10
+      ]
+     }
+    },
+    "left": {
+     "sourceDirection": "left",
+     "mirror": false,
+     "actions": {
+      "idle": [
+       11,
+       12
+      ],
+      "move": [
+       13,
+       14,
+       15,
+       16
+      ],
+      "attack": [
+       17,
+       18,
+       19
+      ],
+      "hurt": [
+       20,
+       21
+      ]
+     }
+    },
+    "back": {
+     "sourceDirection": "back",
+     "mirror": false,
+     "actions": {
+      "idle": [
+       22,
+       23
+      ],
+      "move": [
+       24,
+       25,
+       26,
+       27
+      ],
+      "attack": [
+       28,
+       29,
+       30
+      ],
+      "hurt": [
+       31,
+       32
+      ]
+     }
+    },
+    "right": {
+     "sourceDirection": "left",
+     "mirror": true,
+     "actions": {
+      "idle": [
+       11,
+       12
+      ],
+      "move": [
+       13,
+       14,
+       15,
+       16
+      ],
+      "attack": [
+       17,
+       18,
+       19
+      ],
+      "hurt": [
+       20,
+       21
+      ]
+     }
+    }
+   }
+  }
+ }
+}

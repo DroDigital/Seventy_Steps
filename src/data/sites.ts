@@ -79,8 +79,8 @@ export const SITES: Readonly<Record<string, RegionSites>> = {
     arenas: [],
     allies: [ally('algol_light_being', 420, 420)],
     gates: [
-      gate('hub_antarctic', 'Miskatonic Antarctic Expedition', 'mountains_gate', 80, 80, 'n'),
-      gate('hub_australia', 'Miskatonic Australian Expedition', 'pnakotus_gate', 432, 80, 'n'),
+      gate('hub_antarctic', 'Miskatonic Antarctic Expedition', __DEMO__ ? 'full_game_antarctic' : 'mountains_gate', 80, 80, 'n'),
+      gate('hub_australia', 'Miskatonic Australian Expedition', __DEMO__ ? 'full_game_australia' : 'pnakotus_gate', 432, 80, 'n'),
     ],
     tomes: [],
     dungeons: [dungeon('library', 256, 296), dungeon('munoz_rooms', 462, 296), dungeon('alchemist_cellars', 150, 300), dungeon('outsider_crypt', 360, 480)],
@@ -237,4 +237,6 @@ export const SITES: Readonly<Record<string, RegionSites>> = {
     tomes: [],
     dungeons: [],
   },
+  // the demo's edge (regions.ts `full_game`): the university's two gates end here, where the demo's end is said (docs/DEMO_BUILD.md)
+  ...(__DEMO__ ? { full_game: { signs: [], arenas: [], allies: [], tomes: [], dungeons: [], gates: [gate('full_game_antarctic', 'The Mist', 'hub_antarctic', 40, 40, 'n'), gate('full_game_australia', 'The Mist', 'hub_australia', 440, 40, 'n')] } } : {}),
 };

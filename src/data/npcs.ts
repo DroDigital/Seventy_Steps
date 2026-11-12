@@ -44,7 +44,10 @@ export interface NpcDef {
 const at = (quest: string, stage: When['at']): When => ({ quest, at: stage });
 
 /** Gilman, once Keziah is gone: the key, and the way down to Kuranes. */
-const WAY_DOWN: readonly string[] = [
+const WAY_DOWN: readonly string[] = __DEMO__ ? [
+  "I've been thinking about that key. The tall man must have taken it from someone, and the papers never said who.",
+  "There's a way down from here, into deeper dreams. Peaslee knows the sign. Go down the stair and see what waits at the bottom. If anyone knows what a silver key opens, it is the one who waits there.",
+] : [
   "It's quieter in my head now. Thank you.",
   "I've been thinking about that key. Randolph Carter had one like it, the writer from Boston. He's gone missing, the papers said. The tall man must have taken it from him.",
   "There's a way down from here, into deeper dreams. Peaslee knows the sign. Go down the stair and ask for Kuranes. He's been dreaming longer than any of us. If anyone knows what a silver key opens, he does.",
@@ -66,7 +69,7 @@ const NEAR_NPCS: readonly NpcDef[] = [
         'The others who fell asleep are out there somewhere. Walter Gilman was the second. He had a room in the old Witch House in Arkham, west of here. Find him. He talked with the tall man more than any of us.',
       ] },
       { when: [at('sleepers', 0)], lines: ["Gilman's in Arkham, west past the university grounds. Follow the road.", "Rest at the signs when you find them. Whatever you've killed will be back afterwards, but so will your strength."] },
-      { when: [at('kadath', 'done')], lines: ["You've been to the Gate. I can tell by the way you stand.", "If you find the man who did this, don't take anything he offers you."] },
+      ...(__DEMO__ ? [] : [{ when: [at('kadath', 'done')], lines: ["You've been to the Gate. I can tell by the way you stand.", "If you find the man who did this, don't take anything he offers you."] }]),
       { when: [at('descent', 0)], lines: ["If Gilman says the way on is down, then it's down. Use the sign at the edge of the grounds, the one set apart from the others. Rest there and you'll find the stair."] },
       { lines: ['Go on. I\'ll be here. I\'m not sure I could leave if I wanted to.', 'I was reading when it happened. I remember turning a page, and then I was standing out here in the dark.'] },
     ],
@@ -108,9 +111,9 @@ const NEAR_NPCS: readonly NpcDef[] = [
     id: 'morgan', name: 'Dr. Francis Morgan', title: 'Professor of Medicine and Comparative Anatomy', sign: 'hub_quad', side: -1, shop: 'morgan',
     look: MORGAN_LOOK,
     topics: [
-      { when: [at('dunwich', 'done')], lines: ["Armitage will want to hear the Horror's gone. I carried the sprayer that night, you know. The powder worked then too.", MORGAN_SHOWS] },
+      ...(__DEMO__ ? [] : [{ when: [at('dunwich', 'done')], lines: ["Armitage will want to hear the Horror's gone. I carried the sprayer that night, you know. The powder worked then too.", MORGAN_SHOWS] }]),
       { lines: [
-        "Morgan. Medicine, and comparative anatomy. I was at Dunwich with Armitage and Rice, before all this. I've been making myself useful.",
+        __DEMO__ ? "Morgan. Medicine, and comparative anatomy. I was in the hills with Armitage and Rice, before all this. I've been making myself useful." : "Morgan. Medicine, and comparative anatomy. I was at Dunwich with Armitage and Rice, before all this. I've been making myself useful.",
         "Lamp oil in medicine bottles, mostly. Thrown, they burn. And a few odd things from the Exhibition Hall's drawers. I'll trade for those Echoes of yours; don't ask me what I do with them.",
       ] },
     ],
@@ -128,7 +131,7 @@ const NEAR_NPCS: readonly NpcDef[] = [
       ] },
       { when: [at('kadath', 0)], lines: ["Four of them must fall before Kadath's door opens. Your journal will keep the count. Try the places where the sleepers are worst: Innsmouth, Dunwich, the hills in Vermont."] },
       { when: [at('kadath', 1)], lines: ["The door is open. Ulthar first, then the mountains. When you reach the Gate there'll be a choice to make. Don't let anyone make it for you."] },
-      { when: [at('kadath', 'done')], lines: ["You've been there. I can see it on you. Whatever you chose, I hope it was your own choice."] },
+      ...(__DEMO__ ? [] : [{ when: [at('kadath', 'done')], lines: ["You've been there. I can see it on you. Whatever you chose, I hope it was your own choice."] }]),
       { lines: ["Celephaïs is east of here, if you ever want to stop. People do."] },
     ],
   },
@@ -196,7 +199,7 @@ const NEAR_NPCS: readonly NpcDef[] = [
         "Old Wizard Whateley's grandson kept somethin' in that farmhouse. After the boy died it got loose. If you got the stomach, go up the hill and finish it.",
       ] },
       { when: [at('dunwich', 0)], lines: ["Sentinel Hill's to the east. Listen for the whippoorwills. When they all start up at once, it's close."] },
-      { when: [at('dunwich', 'done')], lines: ['The whippoorwills stopped. They do that when they miss what they come for.', 'Take this. Ma kept it for bad times. I reckon these are bad times.'] },
+      ...(__DEMO__ ? [] : [{ when: [at('dunwich', 'done')], lines: ['The whippoorwills stopped. They do that when they miss what they come for.', 'Take this. Ma kept it for bad times. I reckon these are bad times.'] }]),
       { lines: ["Folks in the village won't open their doors. Can't say I blame 'em.", "Shells I've got, if you've the Echoes for 'em. Cartridges for that pistol of yours. Ain't much else worth spendin' on."] },
     ],
   },

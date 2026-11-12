@@ -5,6 +5,7 @@
  * balance table). `check:all` runs both (what CI should).
  */
 import { configDefaults, defineConfig } from 'vitest/config';
+import { demoStrip, restStub } from './tools/demo/vitePlugin.ts';
 
 export const AUDITS = [
   'tests/soak.test.ts',
@@ -27,6 +28,19 @@ export const AUDITS = [
 // took longer than the default five seconds whenever the machine was busy (CI, or a browser open beside it): they failed by the clock, not the code.
 const TIMEOUT = 30_000;
 
+// `--mode demo` runs the demo's own tests (tests/demo) over the demo's build of the sources: __DEMO__ true and the rest of the game pruned out
+// (tools/demo, docs/DEMO_BUILD.md). Every other mode has __DEMO__ false: the sources whole.
 export default defineConfig(({ mode }) => ({
-  test: { testTimeout: TIMEOUT, ...(mode === 'audit' ? { include: AUDITS } : mode === 'all' ? {} : { exclude: [...configDefaults.exclude, ...AUDITS] }) },
+  define: { __DEMO__: JSON.stringify(mode === 'demo') },
+  plugins: mode === 'demo' ? [demoStrip(), restStub()] : [],
+  test: {
+    testTimeout: TIMEOUT,
+    ...(mode === 'demo'
+      ? { include: ['tests/demo/**/*.test.ts'] }
+      : mode === 'audit'
+        ? { include: AUDITS }
+        : mode === 'all'
+          ? { exclude: [...configDefaults.exclude, 'tests/demo/**'] }
+          : { exclude: [...configDefaults.exclude, ...AUDITS, 'tests/demo/**'] }),
+  },
 }));

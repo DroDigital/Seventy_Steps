@@ -9,6 +9,8 @@
 import { piece, spot } from './arenaWays';
 import { leaf, offer, read, rite, vigil, type Discovery } from './discoveries';
 
+import { DEPOSITION } from './documentsHouses';
+
 export const EARTH_DISCOVERIES: Readonly<Record<string, Discovery>> = {
   colour_out_of_space: {
     title: 'What the Well Gave Back',
@@ -28,11 +30,11 @@ export const EARTH_DISCOVERIES: Readonly<Record<string, Discovery>> = {
     title: 'The Signing',
     start: 'The river runs black about an island, and the one ford to it is stopped with a boulder. Someone has been here, and left their candles.',
     steps: [
-      read("Goodwife Pickman's Deposition", 'A deposition of 1692 lies in the court before the ford. It tells what was seen on Meadow Hill, and what was signed there.'),
+      read(DEPOSITION, 'A deposition of 1692 lies in the court before the ford. It tells what was seen on Meadow Hill, and what was signed there.'),
       rite('Three black candles for the coven. Light the least before the greatest, as the deposition says they were lit.'),
       offer(spot(15, -5), piece('altar_stone', { size: 1.1 }), { kind: 'mind', n: 14 }, 'sign the book with a part of your mind', 'THE NAME IS GIVEN, NOT LOST. THE BOULDER IN THE FORD STIRS', 'A flat stone stands in the court where the book was laid. The Black Man’s book is signed in what a person can least spare. Give him a part of your mind, and he will open the way.'),
     ],
-    leaves: [leaf("Goodwife Pickman's Deposition", 9, 3.4)],
+    leaves: [leaf(DEPOSITION, 9, 3.4)],
     shut: 'The boulder in the ford is set so close that no knife would go between. It has not been moved, and it is waiting to be asked.',
     opens: 'THE BOULDER IN THE FORD SINKS INTO THE EARTH. SOMEONE IS EXPECTING YOU',
     done: 'The Black Man is gone from the island in the river. Your name feels, a little, like someone else’s.',

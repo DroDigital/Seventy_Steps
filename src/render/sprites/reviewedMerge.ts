@@ -5,10 +5,14 @@ export const ALLIED_ART_KEYS = [
   'nodens', 'tritons', 'cats_of_ulthar', 'pickman', 'nasht_kaman_thah', 'algol_light_being', 'yithian_archivist',
 ] as const;
 
-export function validateReviewedManifest(manifest: ReviewedManifest, expectedCount: number): void {
+/** The creatures the main atlas holds: the full game's 105, or (null) what the demo's own atlas holds, which its index counts (tools/demo/art). */
+export const BASE_ART_COUNT: number | null = __DEMO__ ? null : 105;
+
+export function validateReviewedManifest(manifest: ReviewedManifest, expectedCount: number | null): void {
+  const count = Object.keys(manifest.entities).length;
   if (manifest.format !== 'seventy-steps-reviewed-atlas-v1'
-    || manifest.entityCount !== expectedCount
-    || Object.keys(manifest.entities).length !== expectedCount
+    || manifest.entityCount !== count
+    || (expectedCount !== null && count !== expectedCount)
     || manifest.frames.length !== manifest.frameCount
     || !manifest.pages.length) throw new Error('Creature artwork index is incomplete or incompatible.');
   for (const frame of manifest.frames) {
@@ -30,7 +34,7 @@ export function validateAlliedManifest(manifest: ReviewedManifest): void {
   const keys = Object.keys(manifest.entities);
   if (keys.some(key => !ALLIED_ART_KEYS.some(expected => expected === key))) throw new Error('Allied artwork roster is incomplete or incompatible.');
   for (const entity of Object.values(manifest.entities)) {
-    const move = entity.id === 'algol_light_being' || entity.id === 'yithian_archivist' ? 4 : 6;
+    const move = entity.id === 'algol_light_being' || (!__DEMO__ && entity.id === 'yithian_archivist') ? 4 : 6;
     const counts = { idle: 2, move, attack: 3, hurt: 2 };
     for (const direction of ['front', 'left', 'back', 'right'] as const) {
       const view = entity.directions[direction];
@@ -43,7 +47,7 @@ export function validateAlliedManifest(manifest: ReviewedManifest): void {
 }
 
 export function mergeReviewedArt(base: ReviewedArt, allies: ReviewedArt): ReviewedArt {
-  validateReviewedManifest(base.manifest, 105);
+  validateReviewedManifest(base.manifest, BASE_ART_COUNT);
   validateAlliedManifest(allies.manifest);
   const pageOffset = base.manifest.pages.length;
   const frameOffset = base.manifest.frames.length;

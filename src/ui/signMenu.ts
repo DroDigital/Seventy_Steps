@@ -154,7 +154,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       const line = el(panel, 'div', `NEXT  ·  ${next}`, `margin:-6px 14px 10px;text-align:center;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7`);
       [line.title, line.dataset.pin] = [next, ''];
     }
-    if (courtEndings(g, ow.sign).length) {
+    if (!__DEMO__ && courtEndings(g, ow.sign).length) {
       const box = pinned(panel);
       heading(box, 'THE COURT OF AZATHOTH').style.marginTop = '0';
       el(box, 'div', 'The silver key hangs before the stone. Close your hand on it, and ask for nothing. The tall man waits aside, in his good coat.', 'opacity:.75;margin:4px 14px 8px;font-size:13px;line-height:1.45');
