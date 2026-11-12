@@ -138,8 +138,7 @@ function startAction(g: Game, a: Actor, action: ActionId): void {
     g.player.laudanum--; // spent as the vial comes up, even if a blow cuts the swallow short
   }
   if (action === 'heal') {
-    if (g.player.reagent <= 0) return;
-    g.player.reagent--; // likewise the Reagent, as the needle comes up
+    if (g.player.reagent <= 0) return; // the dose is spent only when it takes (reagent.ts): a blow that cuts it short keeps it
   }
   if (action === 'throw') {
     if (g.player.oil <= 0) return;
