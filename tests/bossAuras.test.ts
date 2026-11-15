@@ -8,15 +8,23 @@ import { spawnCreature } from '../src/systems/creatures';
 import { createGame, createWorldGame } from '../src/systems/game';
 
 describe('boss-specific visual presences', () => {
-  it('assigns distinct motifs only to scripted bosses', () => {
-    expect(new Set(Object.values(BOSS_AURAS).map(p => p.style)).size).toBeGreaterThanOrEqual(7);
-    for (const id of Object.keys(BOSS_AURAS)) expect(getEntity(id)?.bossScript, id).toBeDefined();
-    expect(BOSS_AURAS.cthulhu.style).toBe('tide');
-    expect(BOSS_AURAS.hastur.style).toBe('veil');
-    expect(BOSS_AURAS.yog_sothoth.style).toBe('geometry');
-    expect(BOSS_AURAS.shub_niggurath.style).toBe('bloom');
-    expect(BOSS_AURAS.colour_out_of_space.style).toBe('prism');
-    expect(BOSS_AURAS.deep_one).toBeUndefined();
+  it('gives each scripted boss that has one its own motif, faint and drawn with no lines', () => {
+    const motif = (id: string) => { const p = BOSS_AURAS[id]; return `${p.motion}/${p.shape}/${p.haze}/${p.blend}`; };
+    const shared = new Set(['father_dagon', 'mother_hydra']); // the one pair whose lore is one
+    const seen = new Map<string, string>();
+    for (const id of Object.keys(BOSS_AURAS)) {
+      expect(getEntity(id)?.bossScript, id).toBeDefined();
+      const p = BOSS_AURAS[id];
+      expect(p.opacity, id).toBeLessThanOrEqual(0.4);
+      expect(p.count > 0 || p.haze !== 'none', id).toBe(true);
+      const other = seen.get(motif(id));
+      if (other) expect(shared.has(id) && shared.has(other), `${id} shares ${other}'s motif`).toBe(true);
+      seen.set(motif(id), id);
+    }
+    expect(BOSS_AURAS.cthulhu.shape).toBe('drop');
+    expect(BOSS_AURAS.yog_sothoth.shape).toBe('globe');
+    expect(BOSS_AURAS.haunter_of_the_dark.blend).toBe('shade');
+    for (const none of ['deep_one', 'keziah_mason', 'black_man', 'tsathoggua', 'ancient_ones']) expect(BOSS_AURAS[none], none).toBeUndefined();
   });
 
   it('follows the interpolated painted body, animates and grows stronger with the fight', () => {
@@ -32,9 +40,9 @@ describe('boss-specific visual presences', () => {
     const auras = createBossAuras(scene, g, () => ({ bottom: 2, top: 12 }), new Map([[id, 8]]), { deep: () => deep, voice: () => 0 });
     auras.update(camera, 1, 0.5);
     const aura = scene.getObjectByName(`boss-aura:${id}`)!;
-    expect(aura.userData.style).toBe('veil');
+    expect(aura.userData.motion).toBe('drift');
     expect(aura.position.toArray()).toEqual([4, 4, 0]);
-    expect(aura.children).toHaveLength(2); // a veil behind the picture and points orbiting it
+    expect(aura.children).toHaveLength(1); // rags carried off on the wind, no haze
     const material = (aura.children[0] as THREE.Mesh).material as THREE.ShaderMaterial;
     const before = material.uniforms.uAlpha.value;
     const time = material.uniforms.uTime.value;
@@ -69,8 +77,8 @@ describe('boss-specific visual presences', () => {
     const asked: number[] = [];
     const auras = createBossAuras(scene, g, () => ({ bottom: 0, top: 4 }), new Map(), { deep: id => (asked.push(id), 0.5), voice: () => 0 });
     auras.update(camera, 1, 1);
-    expect(scene.getObjectByName(`boss-aura:${boss}`)?.userData.style).toBe('chaos');
-    expect(scene.getObjectByName(`boss-aura:${decoy}`)?.userData.style).toBe('chaos');
+    expect(scene.getObjectByName(`boss-aura:${boss}`)?.userData.motion).toBe('peel');
+    expect(scene.getObjectByName(`boss-aura:${decoy}`)?.userData.motion).toBe('peel');
     expect(asked).toEqual([boss, boss]);
   });
 
