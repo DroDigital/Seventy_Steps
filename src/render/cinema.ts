@@ -3,8 +3,8 @@
  * cinemaPlan.ts) takes the lens over from the follow camera, blending in and out; the world stands
  * still under it or runs slowed (`step` says whether it takes its step); its beats set off lines,
  * fades, sounds and bursts (ui/cinemaUi.ts, audio, particles). One plays at a time, the rest wait.
- * A key or the pad's A, B or Start skips it (fading to black first), except while it waits on an
- * act: then E or A does the act and the line resumes on that word; B, Start and Esc still skip.
+ * Esc, Enter, Space or the interact key (E) skips it, and the pad's A, B or Start (fading to black first), except while it waits on an
+ * act: then E or A does the act and the line resumes on that word; B, Start, Esc, Enter and Space still skip.
  * Esc is heard here rather than by the pause menu, and so is the mouse being let go. A scene
  * refused (the setting off) resolves at once, so what follows it, an ending's card, never waits.
  */

@@ -173,7 +173,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('WayOmen', (e) => say(e.words)); // a line said on a trail to a horror (round 62)
   g.events.on('HouseSeen', (e) => great.show(e.name, 'place', e.line.toUpperCase())); // a horror's house come within sight (round 63)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
-  g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
+  g.events.on('Discovered', (e) => say(fill(tr('hud.signFound', { name: e.name.toUpperCase() }), true))); // ({map} is the map's button on the device in hand)
   g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));

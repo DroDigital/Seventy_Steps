@@ -8,6 +8,7 @@
  */
 
 import type { Entity } from '../core/ecs';
+import { t } from '../core/i18n';
 import { REINFORCE, STAR_STONES } from '../data/tuning';
 import { getEntity } from '../data/registry';
 import { armedMoves, isWeapon, WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
@@ -116,7 +117,7 @@ export function registerArms(g: Game): void {
 export function giveStones(g: Game, n: number): void {
   if (n <= 0) return;
   g.player.stones += n;
-  g.events.emit('Notice', { text: `${n === 1 ? 'A STAR-STONE' : `${n} STAR-STONES`} · SET THEM INTO YOUR ARMS AT AN ELDER SIGN` });
+  g.events.emit('Notice', { text: t(n === 1 ? 'n.stone' : 'n.stones', { n }) });
 }
 
 /** How far each weapon owned is reinforced, fresh: none. */

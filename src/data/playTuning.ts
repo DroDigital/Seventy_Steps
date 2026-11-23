@@ -92,7 +92,7 @@ export const SETTINGS = {
   gore: [0, 1, 1, 1], // 0: no blade cuts a creature apart and nothing bleeds (round 113: render/gore.ts, render/blood.ts); a creature dies as it did before
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
   cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
-  camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
+  camera: [0, 2, 1, 1], // 0 Classic; 1 Low hero (the default, round 82); 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
   minimap: [0, 1, 1, 0], // 0: the minimap turns with the camera, what lies ahead up; 1: north up, the investigator's arrow turning instead (a first public playthrough: "I don't know anyone who likes spinning maps")
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
   controlTips: [0, 1, 1, 1], // 0: the first steps' controls are not written on the screen as each is first needed (round 102: ui/firstSteps.ts)

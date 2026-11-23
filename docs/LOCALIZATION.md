@@ -16,7 +16,10 @@ English where it is none of these.
 ## What is translated
 
 The menus (title, difficulty, slots, pause, settings, controls, rise), the hints, the HUD's labels and notices, the mind's bands, the
-crash screen, and the buttons' names.
+crash screen, and the buttons' names. The HUD's notices are all of them now, including the boss HUD's labels and notices (the gaze,
+the powder, the lamp, petrification, a body stolen), each horror's status line and notices (`sig.*`: Azathoth's movements and phase
+notes, the Alert, the Haunter's lamplight, the spawning roots), the map's travel prompt and the reasons a journey is refused, what a
+court asks on its discovery (`disc.*`), and the notices of star-stones, the survey's pages and a weapon taken up.
 
 ## What is not (yet), and stays English in every language
 
@@ -24,7 +27,8 @@ crash screen, and the buttons' names.
   is overheard, death lines, epitaphs, epilogues, credits, place and region names. About 100 KB of text (`wc -c src/data/{npcs,npcsFar,
   quests,documents,intro,bestiaryNotes,bestiaryFacts,loreLines,overheard,epilogues,credits,deathLines,placeNames}.ts`).
 - **Other interface:** the Elder Sign menu (Grow, Arms, Travel), the map's words, the journal and arms pages, the ending card, the shop,
-  the dialogue's chrome, achievements, weapon and ware names.
+  the dialogue's chrome, the weapon-found card (`ui/findCard.ts`), achievements, weapon and ware names. The omens of a vigil at a court
+  (`systems/vigilCall.ts`) are the story's words and stay English with the rest of it.
 - **The voices:** every spoken line is an English recording (`public/voice`). Subtitles in another language would need the lines
   keyed (they are named by their words) and the recordings kept; a localized cast is a separate production.
 - **Fonts:** the serif stack (`hudKit.SERIF`) leads with IM Fell English (round 74, `public/fonts`), which covers English, German,

@@ -7,6 +7,7 @@
  */
 
 import type { Entity } from '../../core/ecs';
+import { t } from '../../core/i18n';
 import { yawOf } from '../../core/geom';
 import { attackRange, compileAttack } from '../../data/attacks';
 import { bandOf } from '../../data/bossPunish';
@@ -48,13 +49,13 @@ function watch(g: Game): void {
   for (const store of [c.brain, c.fight, c.dread, c.home, c.swap]) store.delete(e);
   c.combatant.get(e)!.bounty = 0;
   c.phantom.set(e, { life: NYARLATHOTEP.watch });
-  g.events.emit('Notice', { text: 'THE CRAWLING CHAOS WATCHES' });
+  g.events.emit('Notice', { text: t('sig.watches') });
 }
 
 export function registerNyarlathotep(g: Game): void {
   g.events.on('Vanquished', ({ entity }) => {
     const id = creatureOf(g, entity)?.id;
-    if (id && AVATARS.includes(id)) g.events.emit('Notice', { text: 'AN AVATAR OF NYARLATHOTEP FALLS' });
+    if (id && AVATARS.includes(id)) g.events.emit('Notice', { text: t('sig.avatarFalls') });
     else if (id && id !== ID && REGION_BOSSES.has(id)) watch(g);
   });
 }
@@ -87,7 +88,7 @@ export const NYARLATHOTEP_SIGNATURE: Signature = {
         const tr = g.ecs.c.transform.get(g.player.id)!;
         const ally: Entity | undefined = spawnCreature(g, 'nodens', { ...groundNear(g, tr.pos, [2, 4], 0.8, f.arena), yaw: tr.yaw });
         if (ally !== undefined) f.minions.push(ally); // it leaves with the fight
-        g.events.emit('Notice', { text: 'NODENS ANSWERS' });
+        g.events.emit('Notice', { text: t('sig.nodens') });
       },
     };
   },

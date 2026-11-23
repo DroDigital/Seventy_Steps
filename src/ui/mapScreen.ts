@@ -31,7 +31,7 @@ import { buildHints, buildKey, drawCompass, drawCrosshair, drawTip, keyOpenPref,
 import { chartedRect, fitScale, openingView } from './mapFit';
 import { markAt, type Mark } from './mapMarks';
 import { UNIT, type MapPainter } from './mapPainter';
-import { BAR_WORDS, drawRing, litSigns, padTravel, signAt, steerPad, triggerHeld } from './mapTravel';
+import { barWord, type BarWord, drawRing, litSigns, padTravel, signAt, steerPad, triggerHeld } from './mapTravel';
 import { worldX, worldZ, type MapView } from './mapView';
 import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
@@ -75,7 +75,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
   let lit: MapPlace[] = []; // the realm's lit signs, nearest first (the world stands still while the map is open)
   let chosen: MapPlace | null = null;
   /** Why no journey may be made to `p` now, or null: the state of things (travelBar), or, in the demo, a sign beyond its realms. */
-  const barOf = (p: MapPlace): keyof typeof BAR_WORDS | null => travelBar(g) ?? (signBeyondDemo(g, p.id) ? 'demo' : null);
+  const barOf = (p: MapPlace): BarWord | null => travelBar(g) ?? (signBeyondDemo(g, p.id) ? 'demo' : null);
   let hover: MapPlace | null = null; // the lit sign under the pointer
 
   const realm = () => {
@@ -135,9 +135,9 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     chosen = p;
     const bar = p ? barOf(p) : null;
     if (!prompt) return;
-    const again = deviceInUse() === 'pad' ? 'PRESS A' : 'CLICK AGAIN OR ENTER';
+    const again = t(deviceInUse() === 'pad' ? 'map.pressA' : 'map.clickAgain');
     prompt.style.display = p ? '' : 'none';
-    prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${BAR_WORDS[bar]}` : `TRAVEL TO ${p.name.toUpperCase()}  ·  ${again}`;
+    prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${barWord(bar)}` : t('map.travelTo', { name: p.name.toUpperCase(), again });
     prompt.style.color = bar ? '#d80073' : BONE;
   };
   const journey = (): void => {

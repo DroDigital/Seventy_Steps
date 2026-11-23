@@ -7,19 +7,18 @@
  * say why not (checkpoints.ts's travelBar: a boss fight on, a foe hunting close by).
  */
 
+import { t } from '../core/i18n';
 import { distXZ, type XZ } from '../core/geom';
+import type { Key } from '../data/lang/en';
 import type { RegionDef } from '../data/regions';
 import type { Game } from '../systems/components';
 import { mapPlaces, type MapPlace } from '../world/mapData';
 import { screenX, screenY, type MapView } from './mapView';
 
 const PICK_PX = 14; // a sign this near the pointer is picked
-export const BAR_WORDS = {
-  boss: 'NO JOURNEY WHILE THE FIGHT IS ON',
-  foes: 'FOES HUNT YOU  ·  NO JOURNEY NOW',
-  fallen: 'NO JOURNEY NOW',
-  demo: 'IN THE FULL GAME', // a sign beyond the demo's realms, found in a save from the full game (round 56)
-} as const;
+/** Why a journey may not be made, as the map's bar says it: a fight on, a foe hunting close by, the investigator fallen, or (round 56) a sign beyond the demo's realms. */
+export type BarWord = 'boss' | 'foes' | 'fallen' | 'demo';
+export const barWord = (bar: BarWord): string => t(`travel.${bar}` as Key);
 
 /** The lit Elder Signs of the realm, nearest `from` first. */
 export function litSigns(g: Game, realm: readonly RegionDef[], from: XZ): MapPlace[] {

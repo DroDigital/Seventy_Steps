@@ -6,6 +6,7 @@
  * theft, a full gaze, stone, the powder, the lamps).
  */
 
+import { t } from '../core/i18n';
 import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
 import { hooksOf } from '../systems/reality';
@@ -35,9 +36,9 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
     const status = el('letter-spacing:2px;font-size:10px;opacity:.7', '', slot);
     return { slot, name, sum, chip, fill, status, ticks: [] as HTMLDivElement[] };
   });
-  const gaze = el('position:absolute;left:16px;top:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'GAZE', root);
+  const gaze = el('position:absolute;left:16px;top:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', t('boss.gazeBar'), root);
   const gazeFill = bar(gaze, '#9468b6', 8);
-  const stone = el('position:absolute;left:16px;top:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', 'PETRIFICATION', root);
+  const stone = el('position:absolute;left:16px;top:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', t('boss.petrified'), root);
   const stoneFill = bar(stone, '#9ca29a', 8);
   const flash = el('position:absolute;inset:0;background:#e8e0cc;opacity:0', '', root);
   const name = el(`position:absolute;left:0;right:0;top:36%;text-align:center;font-size:72px;letter-spacing:28px;color:${BONE};opacity:0`, '', root);
@@ -46,20 +47,20 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   let flashUntil = 0;
   const blink = (): void => void (flashUntil = performance.now() + FLASH_MS);
 
-  g.events.on('BodyStolen', () => say('YOUR BODY IS NOT YOUR OWN'));
+  g.events.on('BodyStolen', () => say(t('boss.bodyStolen')));
   g.events.on('TimeSkipped', blink);
   const joined = (e: { entity: number }): boolean => { const f = g.ecs.c.fight.get(e.entity); return !!f && hooksOf(f).includes('arena_reconnect'); };
-  g.events.on('Rewired', (e) => (blink(), joined(e) && say('THE ROOM FOLDS · ITS EDGES MEET'))); // a first public playthrough: "why did they teleport me? ... not fair"
-  g.events.on('GazeBurst', (e) => say(`THE GAZE  −${e.sanity} SANITY`));
-  if (!__DEMO__) g.events.on('Revealed', (e) => say(`THE POWDER OF IBN GHAZI · ${e.doses} LEFT`)); // (the Dunwich's powder: not in the demo)
+  g.events.on('Rewired', (e) => (blink(), joined(e) && say(t('boss.folds')))); // a first public playthrough: "why did they teleport me? ... not fair"
+  g.events.on('GazeBurst', (e) => say(t('boss.gaze', { loss: t('hud.sanityLoss', { n: e.sanity }) })));
+  if (!__DEMO__) g.events.on('Revealed', (e) => say(t('boss.powder', { n: e.doses }))); // (the Dunwich's powder: not in the demo)
   g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 68: it was said only in the field guide)
     const f = g.ecs.c.fight.get(e.entity);
     const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);
     if (line) say(line);
-    else if (joined(e)) say('THE ROOM’S EDGES ARE JOINED · WALK OUT ONE SIDE, COME IN AT THE OTHER'); // said before the first fold, not after it
+    else if (joined(e)) say(t('boss.joined')); // said before the first fold, not after it
   });
-  g.events.on('LampChanged', (e) => say(e.lit ? 'THE LAMP BURNS AGAIN' : 'A LAMP GOES OUT'));
-  g.events.on('Petrified', () => say('TURNED TO STONE'));
+  g.events.on('LampChanged', (e) => say(t(e.lit ? 'boss.lampOn' : 'boss.lampOut')));
+  g.events.on('Petrified', () => say(t('boss.stone')));
   g.events.on('Title', (e) => show(e.text));
   g.events.on('Named', (e) => {
     name.textContent = e.name;

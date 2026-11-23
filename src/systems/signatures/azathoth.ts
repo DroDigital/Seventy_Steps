@@ -8,6 +8,8 @@
  */
 
 import type { Entity } from '../../core/ecs';
+import { t } from '../../core/i18n';
+import type { Key } from '../../data/lang/en';
 import { AZATHOTH, BOSS } from '../../data/tuning';
 import type { Fight, Game } from '../components';
 import { defOf } from '../creatures';
@@ -15,7 +17,7 @@ import type { Signature } from '../signatures';
 import { layMark } from '../strikes';
 import { createArenaFloor, stepArenaFloor } from '../azathothFloor';
 
-const MOVEMENTS = ['THE DIRGE', 'THE DANCE', 'THE SEETHING', 'THE LAST NOTE'] as const;
+const MOVEMENTS: readonly Key[] = ['sig.dirge', 'sig.dance', 'sig.seething', 'sig.lastNote'];
 const lastPhase = (f: Fight): boolean => f.phase === f.script.phases.length - 1;
 
 /** What this frame of the investigator's noise adds to its attention: a shot, a sprint, and in its last phase a roll or a swing; nothing else carries. */
@@ -45,7 +47,7 @@ function answer(g: Game, e: Entity, f: Fight): void {
   });
   if (f.sig.told) return;
   f.sig.told = 1;
-  g.events.emit('Notice', { text: 'IT HEARS YOU' });
+  g.events.emit('Notice', { text: t('sig.hears') });
 }
 
 /** What it left on the ground (the seething's pools, an answer's) goes when its fight ends or breaks off. */
@@ -62,7 +64,7 @@ export const AZATHOTH_SIGNATURE: Signature = {
     const radius = g.ecs.c.body.get(e)?.radius;
     f.arenaFloor = createArenaFloor(f.arena, at && radius !== undefined ? { x: at.x, z: at.z, radius } : undefined);
     f.sig.rest = Math.round(AZATHOTH.answer.rest / 2); // it does not answer in the first breath
-    g.events.emit('Notice', { text: 'IT IS BLIND, AND HEARS · IT ANSWERS A SHOT OR A SPRINT WHERE IT WAS MADE' });
+    g.events.emit('Notice', { text: t('sig.blind') });
   },
   step(g, e, f) {
     stepArenaFloor(g, f);
@@ -81,10 +83,11 @@ export const AZATHOTH_SIGNATURE: Signature = {
   reset: clearPools,
   end(g, e) {
     clearPools(g, e);
-    g.events.emit('Title', { text: 'THE PIPING FADES · AZATHOTH SLUMBERS' });
+    g.events.emit('Title', { text: t('sig.piping') });
   },
-  status: (_g, _e, f) => `${MOVEMENTS[Math.min(f.phase, MOVEMENTS.length - 1)]}${(f.sig.heed ?? 0) >= AZATHOTH.listens ? ' · IT LISTENS' : ''}`,
+  status: (_g, _e, f) => `${t(MOVEMENTS[Math.min(f.phase, MOVEMENTS.length - 1)]!)}${(f.sig.heed ?? 0) >= AZATHOTH.listens ? t('sig.listens') : ''}`,
   note(_g, _e, _f, phase) {
-    return [null, 'THE THIRTEEN BEGIN TO DANCE · LEAVE THE GROUND THAT FILLS FIRST', 'THE CENTRE DRAWS ALL IN · ROLL AS IT BREAKS', 'IT HEARS EVERYTHING NOW · A ROLL AND A BLOW ARE ANSWERED TOO'][phase] ?? null;
+    const line: Key | undefined = ([undefined, 'sig.thirteen', 'sig.centre', 'sig.everything'] as const)[phase];
+    return line ? t(line) : null;
   },
 };

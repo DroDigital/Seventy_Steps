@@ -6,6 +6,7 @@
  * of it) within earshot.
  */
 
+import { t } from '../../core/i18n';
 import { distXZ } from '../../core/geom';
 import { DUNWICH } from '../../data/tuning';
 import { startMove } from '../actions';
@@ -38,12 +39,12 @@ export const DUNWICH_SIGNATURE: Signature = {
   },
   status(g, e, f) {
     const a = g.ecs.c.actor.get(g.player.id)!;
-    if (a.move === 'chant') return `THE INCANTATION · ${Math.ceil((a.moves.chant.frames - a.frame) / 60)} s`;
-    if (lastPhase(f)) return 'CHANT THE INCANTATION · OR STRIKE IT DOWN';
+    if (a.move === 'chant') return t('sig.chanting', { n: Math.ceil((a.moves.chant.frames - a.frame) / 60) });
+    if (lastPhase(f)) return t('sig.incant');
     const shown = Math.ceil((g.ecs.c.unseen.get(e)?.revealed ?? 0) / 60);
-    return `${shown > 0 ? `SEEN · ${shown} s` : 'UNSEEN'} · POWDER ${f.sig.powder ?? 0}`;
+    return t(shown > 0 ? 'sig.seenFor' : 'sig.unseen', { n: shown, p: f.sig.powder ?? 0 });
   },
-  note: (_g, _e, f, phase) => (phase === f.script.phases.length - 1 ? 'CHANT THE INCANTATION · OR STRIKE IT DOWN' : null),
+  note: (_g, _e, f, phase) => (phase === f.script.phases.length - 1 ? t('sig.incant') : null),
   reset(g, e) {
     const c = g.ecs.c;
     c.health.get(e)!.floor = undefined;
