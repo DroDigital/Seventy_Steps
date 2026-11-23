@@ -119,6 +119,8 @@ if (mode === 'clip') for (const move of args[2].split(',')) { // one or several 
     window.settings.shake = 0;
     const a = g.ecs.c.actor.get(g.player.id);
     startMove(a, move);
+    const tr = g.ecs.c.transform.get(g.player.id);
+    if (a.dir) (a.dir.x = Math.sin(tr.yaw), a.dir.z = Math.cos(tr.yaw)); // a roll goes the way he faces, as its clip is made (else actorViews turns it by rollYaw)
     if (guard) a.guard = true;
     return { frames: a.moves[move]?.frames ?? null, weapon: g.player.weapon };
   }, { move, weapon, drawn, guard });
@@ -137,8 +139,16 @@ if (mode === 'clip') for (const move of args[2].split(',')) { // one or several 
         a.hitstop = 99999; // the frame is drawn as it is, with no share of the next
         const mo = a.moves[move].motion;
         const d = mo ? ((mo.dir === 'back' ? -1 : 1) * mo.distance * Math.min(1, Math.max(0, (f - mo.window[0]) / (mo.window[1] - mo.window[0])))) : 0;
-        tr.pos.x = tr.prev.x = stage.x + Math.sin(stage.yaw) * d;
-        tr.pos.z = tr.prev.z = stage.z + Math.cos(stage.yaw) * d;
+        const place = () => {
+          tr.pos.x = tr.prev.x = stage.x + Math.sin(stage.yaw) * d;
+          tr.pos.z = tr.prev.z = stage.z + Math.cos(stage.yaw) * d;
+          [a.move, a.frame] = [move, f];
+        };
+        place();
+        // The pose blend (render/poseBlend.ts, round 116) eases each change of frame that goes back, and a move begun, over its own clock, which a held
+        // game never moves on: the clock is stepped past it (the frame held by the hitstop), so no picture carries what is left of the last one.
+        window.fxlab.skip(0.26);
+        place();
       }, { f, move, stage });
       await look(VIEWS[v], 4.4, 0.92, 30, 0, true);
       await shot(`${move}_${weapon}_${v}_${String(f).padStart(3, '0')}`);
