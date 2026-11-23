@@ -54,6 +54,7 @@ export interface ParticleSpec {
   thick?: number; // a ring's or an arc's thickness, a share of its radius (default 0.18); a puff's, which of its four pictures, a mark's or a trace's, which of the two masks (`markCell`) (0 to just under 1)
   floor?: number; // the height of the ground under it: it lands there, bounces a little and comes to rest, not falling through (round 60)
   bounce?: number; // the share of its fall it keeps as it springs up again (default 0.3)
+  drift?: number; // round 116: how far a blast's wave carries it, 0 (default: a blow's mark, a spark, blood) to 1 (a mote of the air: render/ambientAir.ts)
 }
 
 export interface Particles {
@@ -149,6 +150,10 @@ void main() {
 
 type Live = Required<Omit<ParticleSpec, 'colorEnd' | 'colorMid' | 'shape'>> & { colorEnd: Rgb | null; colorMid: Rgb | null; shape: number; age: number };
 
+/** Round 116: what moves the air's own motes, those spawned with a `drift` (render/ambientAir.ts): a blast's wave (render/blastWaves.ts) writes its push at a point, m/s², into `out`. */
+export const AIR_PUSH: { push: ((x: number, z: number, out: { x: number; z: number }) => void) | null } = { push: null };
+const airPush = { x: 0, z: 0 };
+
 /** One channel `i` of a particle's colour at `t` (0 at birth, 1 at death): `color`, with an `end` the straight blend to it, with a `mid` as well the blend through it at half life (a hue that drifts through a third, not through grey). */
 export function lifeColor(color: Rgb, mid: Rgb | null, end: Rgb | null, t: number, i: 0 | 1 | 2): number {
   if (!end) return color[i];
@@ -196,7 +201,7 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
       if (live.length >= CAPACITY) live.shift();
       const { shape, colorEnd, colorMid, ...rest } = p;
       live.push({
-        vx: 0, vy: 0, vz: 0, grow: 1, alpha: 1, glow: false, gravity: 0, drag: 0, spin: 0, rot: 0, stretch: 0.12, hold: 0, thick: 0.18, floor: -Infinity, bounce: 0.3,
+        vx: 0, vy: 0, vz: 0, grow: 1, alpha: 1, glow: false, gravity: 0, drag: 0, spin: 0, rot: 0, stretch: 0.12, hold: 0, thick: 0.18, floor: -Infinity, bounce: 0.3, drift: 0,
         ...rest, shape: shape ? PARTICLE_SHAPES.indexOf(shape) : 0, colorEnd: colorEnd ?? null, colorMid: colorMid ?? null, age: 0,
       });
     },
@@ -208,6 +213,10 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
         const p = live[i];
         p.age += dt;
         if (p.age >= p.life) continue;
+        if (p.drift > 0 && AIR_PUSH.push) { // (round 116: carried off by a blast's wave)
+          AIR_PUSH.push(p.x, p.z, airPush);
+          [p.vx, p.vz] = [p.vx + airPush.x * p.drift * dt, p.vz + airPush.z * p.drift * dt];
+        }
         const k = Math.exp(-p.drag * dt);
         p.vx *= k;
         p.vz *= k;

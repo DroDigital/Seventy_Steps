@@ -59,6 +59,7 @@ export function createLanternShadow(): LanternShadow {
       const [cp, sp] = [Math.cos(held.pitch), Math.sin(held.pitch)];
       lens.lookAt(lens.position.x + Math.sin(held.yaw) * cp, lens.position.y + sp, lens.position.z + Math.cos(held.yaw) * cp);
       lens.updateMatrixWorld(true);
+      u.uLShadowMat.value.multiplyMatrices(lens.projectionMatrix, lens.matrixWorldInverse); // (round 116: for the mist, shaders/fogLantern.ts)
       const [was, material] = [renderer.getRenderTarget(), scene.overrideMaterial];
       scene.overrideMaterial = FAR_SIDE;
       renderer.setRenderTarget(target);

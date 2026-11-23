@@ -54,10 +54,10 @@ or `space='root'` for the actor's frame.
   `stand_feet(clip, t)` both boots flat as at ease. A planted boot (lift 0) must not slide (QA says).
 * `ease`: how the stretch **ending** at a key moves: `'cr'` a spline through the keys (carries speed through them: the default), `'linear'` (a blow's constant pace: use it through the
   hit window), `'out'` (fast then settling), `'in'` (slow then fast: the wind-up into a blow), `'smooth'`, `'snap'`, `'hold'`. `still=True` brings a key to rest.
-* Every clip begins and ends at (or near) the **carried pose**, `at_rest(...)` and `stand_feet`: the game crossfades 0.12 s between moves (`poseBlend`), so a clip that begins
+* Every clip begins and ends at (or near) the **carried pose**, `at_rest(...)` and `stand_feet`: the game eases from one move into the next (`poseBlend`: round 116, inertialization over at most 0.15 s, keeping each joint's speed at the change), so a clip that begins
   where he stands needs nothing hidden. A move that **chains** (`combo` in the data) is entered from its predecessor's `cancel` frame, with the crossfade: begin each attack from
   a ready stance, not mid-swing of the last.
-* The lantern's pendulum is simulated for every clip afterwards (`lantern.py`); do not key it.
+* The lantern's pendulum is simulated for every clip afterwards (`lantern.py`); do not key it. Round 116: the game solves the same pendulum live from how the pivot truly moves (`src/render/lanternSwing.ts`) and plays no baked swing; the baked one is for Blender's previews.
 
 ### Markers
 
@@ -113,7 +113,7 @@ spin and a death's fall are exempt as the code says). Then look at the picture: 
   is keyed per frame from `Clip.root(f)`. `Foot(space=…)` is one string for a clip: a boot cannot change between the actor's frame and the world's within it.
 * **`look` clamps** the head at 40° pitch and 63° yaw, and flips sign through 180°; in a deep lean or a full spin key `head` itself.
 * **Rapier and the others' carried tilt.** The game tips a carried rapier (0.8 rad), cutlass (0.2) and axe (0.15) forward in the carried gait only (`playerPose.ts CARRY`), not in a clip and not over a guard clip (a guard's weapon is held as the clip made it):
-  a clip begins and ends in the idle's hold and the 0.12 s crossfade takes up the difference. The rapier's clips begin and end with the arm raised a little so the long point clears the floor.
+  a clip begins and ends in the idle's hold and the easing between moves takes up the difference. The rapier's clips begin and end with the arm raised a little so the long point clears the floor.
   Through the walk's speeds the cane and the axe are tipped a further `WALK_TIP` (the walk clip lets the hand hang lower than the idle's, and a stick half tilted walks there), and at the kneel `poses.ts KNEEL_AIM` turns the weapon in his hand to where it clears the floor, on the side of the vertical it is carried on, so getting up never passes the straight-down hang; `tests/playerPose.test.ts` measures the lowest point of every weapon over every speed, stride phase and kneel.
 * **Never add to or lerp a clipped joint's Euler angles.** A clip sets a joint's quaternion and three.js reads its Euler (YXZ) back: past a right angle that is x = π − bend with y = z = π, so `rotation.x += d` turns the other way. Pose code that works on a clipped figure uses quaternions (`slerp`, `rotateX`) or `render/hinge.ts` (`bendOf`, `bendTo`: a joint's bend about x, its swing kept); `tests/playerKneel.test.ts` gets up from a rest at a run to keep it so.
 * **Parts are wound outward.** `kit.loft` turns a shape whose volume comes out negative inside out again (a loft given from the top down, a skirt on the left) so the faces the game draws are the outer ones; `tests/playerWinding.test.ts` checks every baked piece.

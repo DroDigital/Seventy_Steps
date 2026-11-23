@@ -8,11 +8,14 @@
  * world's own lights, the lantern and the nearest lamps, glow in it, each in closed form along the
  * whole ray (a few samples would miss a lamp's halo). The march's start is jittered by the picture's
  * own ordered dither, which hides the steps. Round 80: the moon's shafts cut into it (fogShaft.ts), a window's glow
- * poured outward and a lamp's let hang, and its fine wisps and its banks moved on their own (volumetricFog.ts).
+ * poured outward and a lamp's let hang, and its fine wisps and its banks moved on their own (volumetricFog.ts). Round 116: the lantern's
+ * glow is cut by its own shadows (fogLantern.ts).
  */
 
 import { LIVING } from '../../data/mistLight';
 import { SHAFT_GLSL } from './fogShaft';
+import { FOG_LANTERN_GLSL } from './fogLantern';
+import { BLAST_GLSL } from './blast';
 import { LAMP_SLOTS, WINDOW_LIGHT_GLSL } from './common';
 
 /** The most bodies that part the mist at once (data/fxTuning.ts MIST_WAKES.slots). */
@@ -45,6 +48,8 @@ uniform vec4 uWakeInfo[${WAKE_SLOTS}]; // each: its breadth, how much it clears,
 ${WINDOW_LIGHT_GLSL}
 uniform vec4 uLampAim[${LAMP_SLOTS}]; // where each light throws its glow (round 80): a unit direction, and how sharply it holds to it (0: all round)
 ${SHAFT_GLSL}
+${FOG_LANTERN_GLSL}
+${BLAST_GLSL}
 
 float fogHash(vec3 i) {
   i = mod(i, 289.0);
@@ -88,6 +93,7 @@ float fogDensity(vec3 p) {
   float low = uFog.x * exp(-up / uFog.y);
   vec3 wake = uWakeCount > 0 && low > 1e-4 ? wakeAt(p) : vec3(0.0);
   low *= 1.0 - wake.x;
+  if (low > 1e-4) low *= blastMist(p.xz, uFogDrift.z); // (round 116: a blast's wave throws it out of its ring: blast.ts)
   if (low > 1e-4) {
     vec2 wind = vec2(uFogDrift.x, uFogDrift.y);
     vec3 q = (p - vec3(wind.x + wake.y, 0.0, wind.y + wake.z)) * 0.085 + vec3(0.0, uFogDrift.z * 0.015, 0.0); // (a body turns the mist about it: its wake, round 83)
@@ -173,7 +179,9 @@ vec4 fogAlong(vec2 uv, float jitter) {
   }
   if (shafts) light += lightNear * (max(1.0 + uShaft.x * shaftAlong(dir, len, jitter), 0.08) - 1.0); // round 80: the moon's shafts and the shadows behind what stands in them (the mist in a shadow keeps a little of its light, never less than none)
   float k = uLanternDecay * 2.0;
-  light += glowAlong(uCamPos, dir, len, uLanternPos, uLanternColor * uFogLantern, uLanternRange * 1.2, k, vec4(0.0), vec4(0.0));
+  vec3 halo = glowAlong(uCamPos, dir, len, uLanternPos, uLanternColor * uFogLantern, uLanternRange * 1.2, k, vec4(0.0), vec4(0.0));
+  if (dot(halo, vec3(0.333)) > LANTERN_SHAFT_LEAST) halo *= lanternShaft(uCamPos, dir, len, uLanternRange * 1.2, k, jitter); // (round 116: cut by its own shadows, fogLantern.ts; not marched where the halo is too faint for its cut to show)
+  light += halo;
   for (int i = 0; i < ${LAMP_SLOTS}; i++) {
     vec4 l = uLamps[i];
     if (l.w > 0.0) light += glowAlong(uCamPos, dir, len, l.xyz, uLampColors[i] * uFogGlow, l.w, k, uLampAim[i], uLampPlane[i]);

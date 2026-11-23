@@ -1,7 +1,7 @@
 /** World materials: one shared uniform set (updated once per frame) + a procedural texture each. */
 
 import * as THREE from 'three';
-import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
+import { BLAST, BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
 import { BODY_LIGHT } from '../data/bodyLight';
 import { NIGHT } from '../systems/clock';
@@ -94,6 +94,7 @@ export const worldUniforms = {
   uLShadowMap: { value: null as THREE.Texture | null }, // the lantern's depth map, how it is looked through, and its numbers (lanternShadow.ts; round 34)
   uLShadowView: { value: new THREE.Matrix4() },
   uLShadowProj: { value: new THREE.Matrix4() },
+  uLShadowMat: { value: new THREE.Matrix4() }, // round 116: the two in one, world to the map's clip, for the mist's march (shaders/fogLantern.ts)
   uLShadowNF: { value: new THREE.Vector2(0.35, 13) }, // its near and far planes
   uLShadow: { value: new THREE.Vector4() }, // strength (0: none), a texel, the bias, the offset
   uLSlab: { value: new THREE.Vector4() }, // the seat back that hides the driver's lantern from what lies behind it: half-width (0: none), low edge, high edge, the plane's z, in its own frame (round 57: mountViews.ts)
@@ -105,6 +106,7 @@ export const worldUniforms = {
   uCoatLine: { value: new THREE.Vector4() }, // the stain's line (metres, absolute), how it thins above it, how the line wanders, how pale the salt on it is
   // Round 80, the ground answers the body (render/bodyPush.ts): the bodies that part the grass, the lane laid down behind them, and the boots ringing a puddle
   uBodies: { value: Array.from({ length: BODY_PUSH.slots }, () => new THREE.Vector4(0, -1e4, 0, 0)) }, // x, y (feet), z, radius; a far one with none parts nothing
+  uBlasts: { value: Array.from({ length: BLAST.slots }, () => new THREE.Vector4(0, 0, -1e4, 0)) }, // round 116: the blasts' waves, x, z, when, how strong (render/blastWaves.ts, shaders/blast.ts)
   uTrample: { value: trample.texture }, // the field of laid-down stems (render/trample.ts)...
   uTrampleBox: { value: new THREE.Vector4(0, 0, 1, 0) }, // ...the cell at its centre, 1 / the cell's metres, the half-width in cells (0: none)
   uStep: { value: Array.from({ length: FOOT_RINGS.slots }, () => new THREE.Vector4(0, 0, -100, 0)) }, // x, z, the time a boot landed, its strength
@@ -132,6 +134,8 @@ export interface WorldMaterialOptions {
   shore?: boolean; // the ground is washed by the sea where it meets it: a wet band and lace of foam, breathing with the swell (round 30)
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
+  field?: number; // round 116: an instanced near field (render/nearGrass.ts) whose clumps sink into the ground this many metres from the investigator
+  instanced?: boolean; // round 116: drawn as an InstancedMesh whose instances the shader places (a field implies it)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
   surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
   neutralCloth?: boolean; // this use of the neutral cloth texture represents metal, wax, or other non-fabric
@@ -202,7 +206,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
     vertexColors: o.vertexColors ?? false,
-    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
+    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.field && { NEAR_FIELD: o.field.toFixed(2) }), ...((o.instanced || o.field) && { WORLD_INSTANCED: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
   });
   if (o.opacity !== undefined && o.opacity < 1) {
     Object.assign(material, {

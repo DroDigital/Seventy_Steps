@@ -15,6 +15,7 @@ import type { Prop } from '../world/props';
 import { roadShare, type RoadSeg } from '../world/regionPlan';
 import { inDungeon, surface } from '../world/terrain';
 import { REGION_COVER } from '../data/coverKinds';
+import { CLIMATES } from '../data/foliage';
 import { regionPiece } from './coverPieces';
 import { Builder, COVER, GAIN, plantAt, shade, type Kind } from './groundCover';
 import type { PropMat } from './propShapes';
@@ -50,6 +51,7 @@ export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: 
   const cover = COVER[region.biome.texture];
   const [leaf, stone, wood] = [new Builder(true), new Builder(), new Builder(true)];
   const own = region.id in REGION_COVER;
+  const lush = Math.min(2, Math.sqrt(CLIMATES[region.id]?.cover ?? 1)); // round 116: thicker where the realm grows thicker (data/foliage.ts)
   if (cover.mix.length) {
     let spent = 0;
     for (const p of props) {
@@ -61,7 +63,7 @@ export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: 
         const y = surface(x, z);
         return y < WORLD.seaLevel ? null : y;
       };
-      const n = Math.max(3, Math.min(14, Math.round(G.cover.tufts * c.reach * (1 + Math.min(c.hx, c.hz)))));
+      const n = Math.max(3, Math.min(Math.round(14 * lush), Math.round(G.cover.tufts * c.reach * (1 + Math.min(c.hx, c.hz)) * lush)));
       for (let k = 0; k < n; k++) {
         const [x, z] = around(c, rng() * Math.PI * 2, 0.08 + rng() * c.reach * 0.8);
         const y = usable(x, z);

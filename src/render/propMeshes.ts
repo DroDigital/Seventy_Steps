@@ -17,6 +17,8 @@ import { planeOf, type MirrorSpot } from './mirrorMath';
 import { mixRgb, type Rgb } from './palette';
 import { shadowMesh } from './moonShadow';
 import { propPieces, type Piece, type PropMat } from './propShapes';
+import { settleOnLand } from './propSettle';
+import { surface } from '../world/terrain';
 import type { Top } from './chimneys';
 import type { LightSpot } from './worldLights';
 import { createWorldMaterial, type WorldMaterialOptions } from './worldMaterial';
@@ -97,8 +99,11 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   let spent = 0;
   for (const p of props) {
     const [s, cs] = [Math.sin(p.yaw), Math.cos(p.yaw)];
-    for (const piece of p.kind === 'house' ? housePieces(p, c, region.id) : propPieces(p, c, region.id)) { // in the realm's own forms (round 111)
-      const geo = piece.geo && placed(piece.geo, piece, p);
+    const pieces = p.kind === 'house' ? housePieces(p, c, region.id) : propPieces(p, c, region.id); // in the realm's own forms (round 111)
+    const put = pieces.map((piece) => piece.geo && placed(piece.geo, piece, p));
+    settleOnLand(put, p, surface); // on a slope, its foot carried down to the land (round 116)
+    for (const [k, piece] of pieces.entries()) {
+      const geo = put[k];
       if (geo) {
         if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
         if (piece.mat === 'mirror') {

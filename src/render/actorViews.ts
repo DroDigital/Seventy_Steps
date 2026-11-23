@@ -17,19 +17,22 @@ import { MODEL_PREFIX } from '../systems/creatures';
 import { buildFigure, type Figure } from './figures';
 import { livePerson, newLife, type Life, type Standing } from './personLife';
 import { edgeOf } from './swingTrails';
-import type { ActKind, Post } from '../data/npcActs';
+import type { ActKind } from '../data/npcActs';
 import { actFor } from '../systems/actFor';
 import { pipeBeat } from './npcActs';
 import type { Smoker } from './pipeSmoke';
 import { actOf } from '../systems/npcLife';
 import { stockLeft } from '../systems/trade';
-import { cadence, type Ground } from './gait';
+import { cadence } from './gait';
+import { groundAbout, placeAt } from './actorPlace';
 import { FX_PREFIX } from './fightViews';
 import { SHRINE_MODEL } from './signViews';
 import { box } from './meshKit';
 import { personShadow } from './moonShadow';
 import { BASE } from './palette';
 import { createPoseBlend, type PoseBlend } from './poseBlend';
+import { applyHitReact, kickByBlow, newHitReact, stepHitReact, type HitReact } from './hitReact';
+import { newSwing, swingLantern, type Swing } from './lanternSwing';
 import { pose } from './poses';
 import { applyGrasp, setFinaleHand } from './finalePose';
 import { createWorldMaterial } from './worldMaterial';
@@ -50,6 +53,8 @@ interface View {
   actK: number;
   life: Life; // what a person has that moves of itself: the head, the cloth, the eyes (personLife.ts; round 83)
   drawnUntil: number; // the investigator's sword-cane stays drawn until this sim time (a blow draws it)
+  react: HitReact; // round 116: the springs a blow taken sets rocking (hitReact.ts), and the lantern's live pendulum (lanternSwing.ts)
+  swing: Swing;
 }
 
 export interface ActorViews {
@@ -107,6 +112,8 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
   g.events.on('Hit', (e) => {
     const v = views.get(e.target);
     if (v && e.outcome !== 'dodged') v.hitAt = simTime();
+    const [from, to] = [g.ecs.c.transform.get(e.attacker), g.ecs.c.transform.get(e.target)];
+    if (v && from && to && !e.lingering) kickByBlow(v.react, from.pos, { ...to.pos, yaw: to.yaw }, e.outcome, e.damage); // (round 116: rocked the way it was struck)
   });
   g.events.on('Shot', ({ shooter, from: body, to }) => {
     const from = shooter === g.player.id && muzzle ? muzzle : body; // the investigator's bullet leaves the muzzle, not their chest (round 22)
@@ -122,7 +129,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       const figure = buildFigure(model);
       if (figure.rig === 'humanoid') figure.root.add(personShadow(figure.hip, id !== g.player.id)); // what the moon sees of them: one shape, not their twenty parts (and the lantern, for all but the one who carries it)
       scene.add(figure.root);
-      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, life: newLife(), drawnUntil: -Infinity });
+      views.set(id, { figure, stride: 0, speed: 0, lastTime: 0, hitAt: -Infinity, blend: createPoseBlend(figure), kneel: 0, act: null, actK: 0, life: newLife(), drawnUntil: -Infinity, react: newHitReact(), swing: newSwing() });
     }
     for (const [id, v] of views) {
       if (g.ecs.c.model.has(id)) continue;
@@ -130,31 +137,6 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       dispose(v.figure);
       views.delete(id);
     }
-  }
-
-  /** The lie of the land about a figure standing on it (none on a floor, deck or step: those are level). */
-  function groundAbout(root: THREE.Object3D): Ground | undefined {
-    const [rx, ry, rz, yaw] = [root.position.x, root.position.y, root.position.z, root.rotation.y];
-    if (Math.abs(g.world.ground(rx, rz) - ry) > 0.05) return undefined;
-    const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
-    return (x, z) => Math.min(0.3, Math.max(-0.3, g.world.ground(rx + x * c + z * s, rz - x * s + z * c) - ry));
-  }
-
-  /** One with a chair or a post of their own: they step clear of it as they stand, and the chair and table stay where they were set, whichever way the figure turns. */
-  function placeAt(f: Figure, v: View, post: Post): void {
-    const up = 1 - Math.min(1, Math.max(0, v.actK));
-    const away = post.rise * up * up * (3 - 2 * up);
-    const yaw = f.root.rotation.y;
-    f.root.position.x += Math.sin(yaw) * away;
-    f.root.position.z += Math.cos(yaw) * away;
-    const fx = f.fixture;
-    if (!fx) return;
-    const [dx, dz] = [post.x - f.root.position.x, post.z - f.root.position.z];
-    const [s, c] = [f.root.scale, Math.cos(yaw)];
-    const sn = Math.sin(yaw);
-    fx.position.set((dx * c - dz * sn) / s.x, (g.world.ground(post.x, post.z) - f.root.position.y) / s.y, (dx * sn + dz * c) / s.z);
-    fx.rotation.y = wrapAngle(post.yaw - yaw);
-    fx.scale.set(1 / s.x, 1 / s.y, 1 / s.z);
   }
 
   let sheltered = false;
@@ -175,7 +157,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       f.root.position.z += (Math.random() - 0.5) * FEEDBACK.shakeMetres * FEEL.shake;
     }
     const post = person ? actFor(g.ecs.c.npc.get(id) ?? '')?.post : undefined; // one with a chair or a post of their own
-    if (post) placeAt(f, v, post);
+    if (post) placeAt(g, f, v.actK, post);
     const dt = Math.min(0.1, Math.max(0, time - v.lastTime));
     if (id === g.player.id && g.cutscene) v.speed = 0; // stop the carried gait immediately, even when the last fog-walk step was still being eased
     else v.speed += (Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) * SIM.hz - v.speed) * Math.min(1, dt * FEEDBACK.strideEase);
@@ -189,7 +171,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const since = time - v.hitAt;
     const flinch = Math.max(0, 1 - since / FEEDBACK.flinchSeconds);
     const [move, guard] = [a?.move ?? null, a?.guard ?? false];
-    v.blend.watch(move, guard, time);
+    v.blend.watch(move, guard, time, frame); // (round 116: and a move begun again)
     const kneeling = id === g.player.id && !!g.player.kneeling;
     if (kneeling) rising = null;
     if (id === g.player.id && rising) {
@@ -210,7 +192,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
     const falling = id === g.player.id && move !== 'death' ? g.player.falling : null; // over an edge, before the death at the foot of it (round 54)
     const water = falling?.water;
     const drop = falling ? { t: (falling.frame + alpha) / SIM.hz, spin: falling.spin, sea: water ? { since: water.entered < 0 ? -1 : (falling.frame + alpha - water.entered) / SIM.hz, held: water.grab < 0 ? 0 : (falling.frame + alpha - water.grab) / SIM.hz } : undefined } : undefined;
-    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(f.root), kneel: v.kneel, act, drop, weapon: id === g.player.id ? g.player.weapon : undefined });
+    pose(f, { move, def, frame, speed, stride: v.stride, guard, flinch: f.rig === 'humanoid' ? 0 : flinch, rollYaw, time: person ? time + id * 1.7 : time, ground: groundAbout(g, f.root), kneel: v.kneel, act, drop, weapon: id === g.player.id ? g.player.weapon : undefined });
     if (id === g.player.id) (applyGrasp(f.handR), setFinaleHand(f.handR));
     if (f.pipe && f.mouth && v.act === 'lounge' && v.actK > 0.6) { // a smoker at his pipe: the smoke is drawn from it (pipeSmoke.ts)
       f.root.updateMatrixWorld(true);
@@ -218,6 +200,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       smokers.push({ bowl: f.pipe.getWorldPosition(new THREE.Vector3()), mouth: f.mouth.getWorldPosition(new THREE.Vector3()), out: beat.out * v.actK, draw: beat.draw * v.actK });
     }
     v.blend.apply(time);
+    if (f.rig === 'humanoid') (stepHitReact(v.react, dt), applyHitReact(f, v.react)); // (over the pose and its easing: a spring is its own)
     if (f.arms && id === g.player.id) { // the weapon in hand: the sword-cane's blade is drawn for a blow and sheathed a little after (his clips say when: playerPose.ts)
       if (f.held?.drawn) v.drawnUntil = time + 0.7;
       const shown = g.player.weapon === 'cane' && time < v.drawnUntil ? 'cane_drawn' : g.player.weapon;
@@ -229,7 +212,7 @@ export function createActorViews(scene: THREE.Scene, g: Game): ActorViews {
       f.gun.visible = drawn;
       if (f.holstered) f.holstered.visible = !drawn;
     }
-    if (id === g.player.id) mounts.place(f, time, dt, alpha);
+    if (id === g.player.id) (mounts.place(f, time, dt, alpha), swingLantern(f, v.swing, time, !!a && a.hitstop > 0)); // (round 116: the lantern swung from how his belt truly moves)
     const flash = id === g.player.id ? 0 : FEEDBACK.flashLevel * Math.max(0, 1 - since / FEEDBACK.flashSeconds); // the investigator never blinks (hurtFx.ts)
     for (const m of f.materials) m.uniforms.uEmissive.value = (m.userData.emissive as number) + flash;
     if (f.rig === 'echo') glow = glowAt.set(f.root.position.x, f.root.position.y + FEEDBACK.echoGlowHeight, f.root.position.z);

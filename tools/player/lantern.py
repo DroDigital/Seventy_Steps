@@ -5,6 +5,9 @@ after a blow, not one that flies about. In the frame that turns with the torso's
     phi'' = -w0^2 phi - 2 zeta w0 phi' - push a / L        (a: the pivot's horizontal acceleration, the push a share of what a free bob would feel)
 
 and a soft wall stops it swinging into his hip. The lantern hangs plumb from a torso that leans, and follows it round in yaw. A loop is run round a few times so it is the settled swing.
+
+Round 116: the game solves this same pendulum live, from how the pivot truly moves through the world (src/render/lanternSwing.ts), and does not play the
+baked swing; it is kept so the previews swing as the game does. Change a number here and there together.
 """
 import numpy as np
 import frame as F

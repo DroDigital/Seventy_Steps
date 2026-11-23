@@ -13,6 +13,7 @@ import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } fr
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
 import { SURFACE_APPLY, SURFACE_UNIFORMS } from './surfaces';
+import { BLAST_BEND_GLSL, BLAST_GLSL } from './blast';
 
 export { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 
@@ -39,6 +40,7 @@ uniform float uWind;
 uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 80: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
 uniform sampler2D uTrample; // and the lane of stems laid down where one has gone, 64 x 64 texels wrapped (render/trample.ts)
 uniform vec4 uTrampleBox; // its centre cell, 1 / a cell's metres, the half-width in cells (0: none)
+${BLAST_GLSL}
 #endif
 #ifdef PANES
 attribute float aPane; // a lit window's seed (paneLife.ts; round 18)
@@ -63,12 +65,20 @@ void main() {
   vLocal = position / max(uBodyScale, 0.001);
   vec4 wp = modelMatrix * vec4(uEldritch > 0.0 ? writhe(position, normal) : position, 1.0);
   vec3 wn = normalize(mat3(modelMatrix) * normal);
+#if defined(USE_INSTANCING) && defined(WORLD_INSTANCED)
+  wp = modelMatrix * instanceMatrix * vec4(position, 1.0); // round 116: a mesh whose instances the shader places (the near field's grass, render/nearGrass.ts; a flask in flight, flaskFx.ts); a horse's instanced bones apply their own (mountKit.ts)
+  wn = normalize(mat3(modelMatrix * instanceMatrix) * normal);
+#endif
   vWorld = wp.xyz;
 #ifdef PANES
   vPane = aPane;
   vPaneUv = aPaneUv;
 #endif
 #ifdef SWAY
+#ifdef NEAR_FIELD
+  vec3 root = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz; // round 116: the near field's clumps sink into the ground toward its edge, where the chunks' own cover goes on (render/nearGrass.ts)
+  wp.xyz = root + (wp.xyz - root) * (1.0 - smoothstep(NEAR_FIELD * 0.7, NEAR_FIELD, length(root.xz - uBodies[0].xz)));
+#endif
   float gust = 0.5 + 0.5 * sin(uTime * 0.31 + wp.x * 0.045 - wp.z * 0.03); // gusts roll across the land...
   float flutter = 0.5 * sin(uTime * 1.7 + wp.x * 0.9 + wp.z * 0.7) + 0.25 * sin(uTime * 2.9 + wp.z * 1.3); // ...and shiver in it
   wp.xz += aSway * uWind * (0.3 + 0.7 * gust + 0.3 * flutter) * vec2(0.85, 0.5); // after vWorld: lit and shadowed where it stands, drawn where the wind has it
@@ -102,6 +112,7 @@ void main() {
     }
     wp.y -= blade * min(0.5 * bent + 0.7 * laid, 0.85);
   }
+${BLAST_BEND_GLSL}
 #endif
   wp.xyz = displace(wp.xyz);
 
@@ -122,6 +133,9 @@ void main() {
   vec3 tint = vec3(1.0);
 #ifdef USE_COLOR
   tint = color;
+#endif
+#ifdef USE_INSTANCING_COLOR
+  tint *= instanceColor; // (round 116: each clump of the near field its own green)
 #endif
   vTint = tint;
   vLight = mix(light, vec3(1.0), uEmissive) * tint;
