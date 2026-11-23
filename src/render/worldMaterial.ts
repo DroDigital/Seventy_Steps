@@ -1,7 +1,7 @@
 /** World materials: one shared uniform set (updated once per frame) + a procedural texture each. */
 
 import * as THREE from 'three';
-import { BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
+import { BLAST, BODY_PUSH, FOOT_RINGS } from '../data/groundSkin';
 import { FX, LANTERN, LIGHT, LIGHTING, NEAR_FADE, WORLD, type Vec3 } from '../data/tuning';
 import { BODY_LIGHT } from '../data/bodyLight';
 import { NIGHT } from '../systems/clock';
@@ -94,6 +94,7 @@ export const worldUniforms = {
   uLShadowMap: { value: null as THREE.Texture | null }, // the lantern's depth map, how it is looked through, and its numbers (lanternShadow.ts; round 34)
   uLShadowView: { value: new THREE.Matrix4() },
   uLShadowProj: { value: new THREE.Matrix4() },
+  uLShadowMat: { value: new THREE.Matrix4() }, // round 116: the two in one, world to the map's clip, for the mist's march (shaders/fogLantern.ts)
   uLShadowNF: { value: new THREE.Vector2(0.35, 13) }, // its near and far planes
   uLShadow: { value: new THREE.Vector4() }, // strength (0: none), a texel, the bias, the offset
   uLSlab: { value: new THREE.Vector4() }, // the seat back that hides the driver's lantern from what lies behind it: half-width (0: none), low edge, high edge, the plane's z, in its own frame (round 57: mountViews.ts)
@@ -105,6 +106,7 @@ export const worldUniforms = {
   uCoatLine: { value: new THREE.Vector4() }, // the stain's line (metres, absolute), how it thins above it, how the line wanders, how pale the salt on it is
   // Round 80, the ground answers the body (render/bodyPush.ts): the bodies that part the grass, the lane laid down behind them, and the boots ringing a puddle
   uBodies: { value: Array.from({ length: BODY_PUSH.slots }, () => new THREE.Vector4(0, -1e4, 0, 0)) }, // x, y (feet), z, radius; a far one with none parts nothing
+  uBlasts: { value: Array.from({ length: BLAST.slots }, () => new THREE.Vector4(0, 0, -1e4, 0)) }, // round 116: the blasts' waves, x, z, when, how strong (render/blastWaves.ts, shaders/blast.ts)
   uTrample: { value: trample.texture }, // the field of laid-down stems (render/trample.ts)...
   uTrampleBox: { value: new THREE.Vector4(0, 0, 1, 0) }, // ...the cell at its centre, 1 / the cell's metres, the half-width in cells (0: none)
   uStep: { value: Array.from({ length: FOOT_RINGS.slots }, () => new THREE.Vector4(0, 0, -100, 0)) }, // x, z, the time a boot landed, its strength

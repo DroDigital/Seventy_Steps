@@ -13,6 +13,7 @@ import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } fr
 import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
 import { SURFACE_APPLY, SURFACE_UNIFORMS } from './surfaces';
+import { BLAST_BEND_GLSL, BLAST_GLSL } from './blast';
 
 export { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 
@@ -39,6 +40,7 @@ uniform float uWind;
 uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 80: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
 uniform sampler2D uTrample; // and the lane of stems laid down where one has gone, 64 x 64 texels wrapped (render/trample.ts)
 uniform vec4 uTrampleBox; // its centre cell, 1 / a cell's metres, the half-width in cells (0: none)
+${BLAST_GLSL}
 #endif
 #ifdef PANES
 attribute float aPane; // a lit window's seed (paneLife.ts; round 18)
@@ -102,6 +104,7 @@ void main() {
     }
     wp.y -= blade * min(0.5 * bent + 0.7 * laid, 0.85);
   }
+${BLAST_BEND_GLSL}
 #endif
   wp.xyz = displace(wp.xyz);
 

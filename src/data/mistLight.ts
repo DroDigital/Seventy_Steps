@@ -2,7 +2,7 @@
  * Round 80, atmosphere (render/atm/mist.ts): light in the mist. Moonlight cut into shafts and shadow wedges by whatever stands in it
  * (the moon's own depth map, read by the post pass: shaders/fogShaft.ts, render/moonShafts.ts), the lights that throw their glow somewhere
  * (a window outward, a lamp downward: render/lampAim.ts) and onto the ground (render/windowSpill.ts), and a mist that is not one sheet
- * (volumetricFog.ts, shaders/fog.ts). Every number of them is here.
+ * (volumetricFog.ts, shaders/fog.ts), and (round 116) the lantern's own shafts (shaders/fogLantern.ts). Every number of them is here.
  */
 
 /** The moon's shafts: the mist's light is dimmed where the moon does not reach it (the shadows of trunks, roofs and stones carry into the air), and a little lifted where it does. */
@@ -18,6 +18,14 @@ export const SHAFT = {
   mistFull: 0.05, // ...from which they are whole
   cloud: { rain: 0.55, storm: 1, gale: 0.35 } as Readonly<Record<string, number>>, // how far a spell veils the moon (at its fullest): shafts fade as it comes
   ease: 1.4, // seconds for them to come on or go
+};
+
+/** Round 116: the lantern's own shafts. Its glow in the mist (gathered in closed form along each ray, shaders/fog.ts) is dimmed where its depth map (render/lanternShadow.ts) has something solid between it and the air: a trunk, a pillar, a wall's end cuts a wedge of dark out of its halo (shaders/fogLantern.ts). */
+export const LANTERN_SHAFT = {
+  steps: 8, // taps along the stretch of a ray within the lantern's reach, their start dithered as the mist's is
+  least: 0.004, // the halo's brightness along a ray below which it is not marched: a cut of all of it would not show in the palette
+  gain: 0.9, // how far the glow follows the share of it the lantern reaches (1: wholly)
+  floor: 0.15, // the share of its glow a stretch wholly behind something keeps: the lantern is a flame, not a point, and the mist about a shadow is lit
 };
 
 /** Where a light throws its glow in the mist (render/lampAim.ts): a unit direction and how sharply the light holds to it (0: all round). */

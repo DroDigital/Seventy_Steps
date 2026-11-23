@@ -173,18 +173,20 @@ function windows(w: number, d: number, top: number, rng: Rng, lit: number, shutt
 }
 
 /** A lower wing built onto a side of the house (round 35): its walls, its roof and gables, and its windows, all in the house's own frame. Its size is houseAddons' (round 110: the collider's). */
-function wing(part: NonNullable<HouseAddons['wing']>, tone: Rgb, rng: Rng, look: HouseLook): { walls: THREE.BufferGeometry; roof: THREE.BufferGeometry; gables: THREE.BufferGeometry; win: ReturnType<typeof windows> } {
+function wing(part: NonNullable<HouseAddons['wing']>, tone: Rgb, rng: Rng, look: HouseLook, inner: number, stone: Rgb): { walls: THREE.BufferGeometry; footing: THREE.BufferGeometry; roof: THREE.BufferGeometry; gables: THREE.BufferGeometry; win: ReturnType<typeof windows> } {
   const { side, ww, wwd, hw, at, z0 } = part; // (at: its middle, along x, sunk a little into the wall it joins; z0: flush with the back, so its front stands behind the house's)
   const topw = 0.4 + hw;
   const rh = wwd * 0.9;
   const walls = tileUv(box(ww * 2, hw, wwd * 2, at, 0.4 + hw / 2, z0, tone), ww * 2, hw);
+  const out = Math.abs(at) + ww + 0.2; // round 116: a footing of its own from the house's (`inner`, its half breadth) out past its walls, as the house's is, so the wing no longer stands 25 cm over the ground
+  const footing = tileUv(box(out - inner, 0.7, wwd * 2 + 0.4, (side * (out + inner)) / 2, 0.05, z0, stone), out - inner, 0.7);
   const r = roof([[-wwd - 0.3, topw - 0.2], [0, topw + rh], [wwd + 0.3, topw - 0.2]], ww, 0.3, topw, wwd);
   r.roof.translate(at, 0, z0);
   r.gables.translate(at, 0, z0);
   tileUv(r.gables, 1, 1);
   const win = windows(ww, wwd, hw, rng, look.lit, false, false, -side, look.boarded);
   for (const g of [...win.frames, ...win.panes, ...win.glows.map((l) => l.geo)]) g.translate(at, 0, z0);
-  return { walls, roof: r.roof, gables: tint(r.gables, tone), win: { ...win, glows: win.glows.map((l) => ({ ...l, at: [l.at[0] + at, l.at[1], l.at[2] + z0], glass: [l.glass[0] + at, l.glass[1], l.glass[2] + z0] })) } };
+  return { walls, footing, roof: r.roof, gables: tint(r.gables, tone), win: { ...win, glows: win.glows.map((l) => ({ ...l, at: [l.at[0] + at, l.at[1], l.at[2] + z0], glass: [l.glass[0] + at, l.glass[1], l.glass[2] + z0] })) } };
 }
 
 /** A house's pieces, in its realm's look (round 111: data/houseLooks.ts; with no region, round 35's). */
@@ -245,9 +247,10 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const doorC = pick(rng, look.doors);
   const door = [box(1.1, 2.1, 0.1, 0, 0.4 + 1.05, wd + 0.05, doorC), box(1.3, 0.12, 0.12, 0, 0.4 + 2.15, wd + 0.06, TRIM)];
   const step = box(1.8, 0.25, 1.1, 0, 0.125, wd + 0.35, scaleRgb(c, 0.75)); // its back face inside the footing, not within a hand of its front (round 35: the audit); its top 15 cm under the footing's, not 10 (round 110: the ray audit's fight on seeds 1 and 3)
-  if (addons.porch) {
+  const stones = [footing, tileUv(step, 1, 1)];
+  if (addons.porch) { // round 116: each post on a stone pad set in the ground (they stood on the air 25 cm over it)
     door.push(box(2.6, 0.12, 1.6, 0, 0.4 + 2.7, wd + 0.8, DOOR));
-    for (const s of [-1, 1]) door.push(box(0.14, 2.7, 0.14, s * 1.15, 0.4 + 1.35, wd + 1.5, TRIM));
+    for (const s of [-1, 1]) door.push(box(0.14, 2.85, 0.14, s * 1.15, 0.25 + 1.425, wd + 1.5, TRIM)), stones.push(tileUv(box(0.32, 0.3, 0.32, s * 1.15, 0.1, wd + 1.5, scaleRgb(c, 0.75)), 1, 1));
   }
 
   const body = [walls, ...add.wall];
@@ -259,8 +262,9 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const extras: THREE.BufferGeometry[] = [...frames, ...panes, ...door, ...add.trim];
   const glowing = [...glows];
   if (addons.wing) { // a wing built on, lower, with its own roof (round 110: the collider's; a turret stands on the other side)
-    const wg = wing(addons.wing, wallTint, addons.rng, look);
+    const wg = wing(addons.wing, wallTint, addons.rng, look, wx + 0.2, scaleRgb(c, 0.7));
     body.push(wg.walls);
+    stones.push(wg.footing);
     roofs.push(wg.roof);
     gabs.push(wg.gables);
     extras.push(...wg.win.frames, ...wg.win.panes);
@@ -285,7 +289,7 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   }
   const pieces: SolidPiece[] = [
     { mat: wallMat, geo: mergeGeometries([...body, ...gabs]) },
-    { mat: 'stone', geo: mergeGeometries([footing, tileUv(step, 1, 1)]) },
+    { mat: 'stone', geo: mergeGeometries(stones) },
     { mat: flat ? 'stone' : 'shingle', geo: tint(mergeGeometries(roofs), roofTint) },
     { mat: 'trim', geo: tileUv(mergeGeometries(extras), 1, 1) }, // relief on the walls, drawn nearer than they are (round 21)
   ];

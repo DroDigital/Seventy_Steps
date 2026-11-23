@@ -98,7 +98,7 @@ export function createAmbientAir(g: Game, particles: Particles): AmbientAir {
           const along = aged ? Math.random() : 0; // how far through its life a speck of an aged field is
           const y = base + (b.falls ? b.lift * (1 - 0.9 * along) : b.lift);
           if (Math.hypot(x - cam.x, y - cam.y, z - cam.z) < b.clear) continue;
-          const spec = { x, y, z, color: tones[li]!, ...b.spec, glow: layer.glow ?? b.spec.glow, life: b.spec.life * (1 - 0.9 * along) };
+          const spec = { x, y, z, color: tones[li]!, ...b.spec, glow: layer.glow ?? b.spec.glow, life: b.spec.life * (1 - 0.9 * along), drift: 1 }; // (round 116: a blast's wave carries it off: render/blastWaves.ts)
           if (b.falls && mad) { // a failing mind sees the fall go up (the picture's; nothing is written)
             spec.vy = -(spec.vy ?? 0) + 0.2;
             spec.gravity = -(spec.gravity ?? 0);

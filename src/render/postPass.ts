@@ -2,7 +2,7 @@
 
 import * as THREE from 'three';
 import { LOOKS } from '../data/looks';
-import { SHAFT } from '../data/mistLight';
+import { LANTERN_SHAFT, SHAFT } from '../data/mistLight';
 import { brightnessGamma, FOG, FX, LIGHT, LIGHTING } from '../data/tuning';
 import type { FxParams } from './fx';
 import { ANOMALY_HUES } from './palette';
@@ -45,6 +45,12 @@ function createUniforms(source: THREE.Texture, depth: THREE.Texture | null, pale
     uShadowMat: w.uShadowMat,
     uShadow: w.uShadow,
     uShaft: { value: new THREE.Vector4(0, SHAFT.floor, SHAFT.reach, 0) }, // none until a frame sets it
+    uLShadowMap: w.uLShadowMap, // round 116: the lantern's depth map, which cuts its glow in the mist into shafts (shaders/fogLantern.ts; lanternShadow.ts fills them)
+    uLShadowMat: w.uLShadowMat,
+    uLShadowNF: w.uLShadowNF,
+    uLShadow: w.uLShadow,
+    uLanternShaft: { value: new THREE.Vector4(LANTERN_SHAFT.gain, LANTERN_SHAFT.floor, 0, 0) },
+    uBlasts: w.uBlasts, // round 116: the blasts' waves, which throw the mist out of their rings (render/blastWaves.ts, shaders/blast.ts)
     uRes: { value: new THREE.Vector2(1, 1) },
     uTime: { value: 0 },
     uRipple: { value: 0 },
@@ -97,7 +103,7 @@ export function createPostPass(source: THREE.Texture, depth: THREE.Texture | nul
   const palette = buildRealmPalette(LOOKS.hub);
   const uniforms = createUniforms(source, depth, new Float32Array(palette.flat()));
   const material = new THREE.ShaderMaterial({
-    defines: { PALETTE_SIZE: palette.length, ANOMALY_FROM, ANOMALY_TO, FOG_STEPS: FOG.steps, SHAFT_STEPS: SHAFT.steps },
+    defines: { PALETTE_SIZE: palette.length, ANOMALY_FROM, ANOMALY_TO, FOG_STEPS: FOG.steps, SHAFT_STEPS: SHAFT.steps, LANTERN_SHAFT_STEPS: LANTERN_SHAFT.steps, LANTERN_SHAFT_LEAST: LANTERN_SHAFT.least.toFixed(4) },
     uniforms,
     vertexShader: POST_VERT,
     fragmentShader: POST_FRAG,

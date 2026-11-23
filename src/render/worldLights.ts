@@ -24,6 +24,7 @@ import { paneLit } from './paneLife';
 import { stairDim, stairWaver } from './stairLights';
 import { LAMP_SLOTS } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
+import { gutterAt } from './blastWaves';
 
 import type { Caster } from './lampShadows';
 
@@ -99,6 +100,9 @@ function waver(s: LightSpot, amount: number, time: number): number {
 }
 
 /** `world`: what stands between the eye and a light (none: every light shows). */
+/** Round 116: the share of its light a flame keeps as a blast's front passes it (render/blastWaves.ts): an open fire or torch gutters wholly, a lamp behind its glass half as much, a window and a sign not at all. */
+const guttered = (s: LightSpot, time: number): number => (s.kind === 'fire' || s.kind === 'torch' ? gutterAt(s.x, s.z, time) : s.kind === 'lamp' ? 0.5 + 0.5 * gutterAt(s.x, s.z, time) : 1);
+
 export function createWorldLights(world: () => CollisionWorld | null = () => null): WorldLights {
   const spots = new Map<number, readonly LightSpot[]>();
   const batch = createHalos(MAX_HALOS, LIGHTS.haloFog);
@@ -195,7 +199,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
           const offset = Math.hypot(dx, dz);
           if (offset > 1e-4) casters.push({ slot: i, x: n.s.x, y: n.s.y, z: n.s.z, key: `${n.s.x.toFixed(2)},${n.s.y.toFixed(2)},${n.s.z.toFixed(2)}`, aim: { x: dx / offset, y: -0.6, z: dz / offset } });
         }
-        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * paneGain * stairDim(n.s));
+        colors[i].set(...k.color).multiplyScalar(k.strength * weight * n.v * waver(n.s, k.flicker, time) * paneGain * stairDim(n.s) * guttered(n.s, time));
       }
       const flashes = layFlashes(lamps, colors, casters, time, at); // a shot, a blow, a bolt in flight take the farthest slots for their moment (round 83)
       for (let k = 0; k < flashes; k++) planes[LAMP_SLOTS - 1 - k].set(0, 0, 0, 0); // (all round: no window's glass to clip a flash against)
@@ -210,7 +214,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
           if (face > 0 && !batch.put(s.glass.x, s.glass.y, s.glass.z, LIGHTS.paneHalo, k.haloColor ?? k.color, k.haloGain * face)) break;
           continue;
         }
-        if (!batch.put(s.x, s.y, s.z, s.halo ?? k.halo, k.haloColor ?? k.color, (s.haloGain ?? k.haloGain) * v * waver(s, k.flicker, time) * stairDim(s))) break;
+        if (!batch.put(s.x, s.y, s.z, s.halo ?? k.halo, k.haloColor ?? k.color, (s.haloGain ?? k.haloGain) * v * waver(s, k.flicker, time) * stairDim(s) * guttered(s, time))) break;
       }
       batch.end();
       flameBatch.begin();
@@ -218,9 +222,10 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         const f = LIGHTS.flames[s.kind];
         if (!f || v <= 0.02 || d > LIGHTS.flameReach) continue;
         const seed = (Math.abs(Math.sin(s.x * 12.9898 + s.z * 78.233 + s.y * 4.1414)) * 43758.5453) % 1; // its own beat, turn and ground
-        const gain = v * stairDim(s) * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time)));
+        const low = guttered(s, time); // (round 116: a passing front bows it down and dims it)
+        const gain = v * stairDim(s) * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time))) * low;
         let full = false;
-        const size = s.flame ?? 1;
+        const size = (s.flame ?? 1) * (0.4 + 0.6 * low);
         for (let i = 0; i < f.count && !full; i++) {
           const a = (seed + i / f.count) * Math.PI * 2;
           const spread = f.count > 1 ? f.spread * size : 0;

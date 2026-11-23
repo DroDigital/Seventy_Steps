@@ -35,3 +35,37 @@ export const FOOT_RINGS = {
   quick: 6, // metres a second
   life: 1.7, // seconds a ring spreads before it is gone (the shader's)
 };
+
+/**
+ * Round 116, a blast moves the world about it (render/blastWaves.ts): a horror's quake, a burst of marked ground, a bolt of the storm, a
+ * way's plate, a bolt that bursts, a horror's roar as it turns, a slam. Its wave runs out over the land; as the front passes, the grass,
+ * the leaves and the boughs bend away from it and the grass at its heart is laid down, the low mist is thrown out of the ring behind it and
+ * heaped at its edge, a flame or a lamp gutters, and the motes in the air are carried off. Metres, seconds, and shares of a full blast.
+ */
+export const BLAST = {
+  slots: 4, // waves alive at once (the shaders' `uBlasts[4]`)
+  speed: 16, // metres a second the front runs out
+  width: 1.8, // metres: the front's half breadth
+  reach: 28, // metres it runs before it is spent
+  near: 6, // metres from its heart within which it is whole (it weakens as 1 / (1 + r / near) beyond)
+  bend: 5, // × a blade's or a bough's own sway, the most it is bent away at the front of a full blast...
+  most: 0.7, // ...but never more than this, metres
+  flatten: 0.45, // the share of a blade's height a full front lays it down for the moment it passes
+  lay: 0.75, // a blast at least this strong lays the grass at its heart down, as a body's passing does (render/trample.ts)...
+  layReach: [1.6, 4.2] as const, // ...over a disc this wide, from the least to the strongest, metres
+  clear: 0.75, // the most of the low mist a full blast throws out of the ring behind its front
+  heap: 0.6, // and how much thicker it lies at the front
+  refill: 1.6, // seconds for the thrown mist to drift back (a share e of it each)
+  gutter: 0.65, // the most of a flame's light and height a passing front takes, and of a lamp's
+  air: 26, // m/s² a full front pushes the air's own motes (render/ambientAir.ts) away from its heart
+  /** How strong each blast is, at its full (a share of a full blast, at most 1). */
+  of: {
+    quake: 1, // a horror's quake, its ring racing out
+    strike: 0.9, // a bolt of the storm on the ground (systems/skyStrikes.ts)
+    roar: 0.7, // a horror turning into its next phase
+    ward: 0.5, // a way's plate, vent or wave bursting (systems/ways.ts)
+    slam: 0.45, // a horror's slam or ring of a blow
+    erupt: [0.35, 0.08] as const, // marked ground bursting: this, and this more for each metre of its radius
+    bolt: [0.15, 0.1, 1.2] as const, // a bolt that bursts where it lands: this, and this more for each metre of its radius, from this radius
+  },
+};
