@@ -33,7 +33,7 @@ import { createFauna, type Fauna } from './fauna';
 import { createCandleViews } from './candleViews';
 import { createGlints } from './glints';
 import { LIGHT_NERVES } from './worldLights';
-import { createLightning } from './lightning';
+import { createLightning, type Lightning } from './lightning';
 import type { Particles } from './particles';
 import { createNightFx } from './nightFx';
 import { createOmenFx } from './omenFx';
@@ -60,6 +60,8 @@ export interface WorldLife {
   /** Each drawn frame, once the night's light is set; `enclosed`: under a dungeon's roof; `alpha`: how far the picture is from the last step to the next, as the bodies are drawn at it. */
   update(camera: THREE.Camera, time: number, enclosed: boolean, alpha: number, gloom?: number): void;
   readonly fauna: Fauna;
+  /** The sky's flash and its thunder (a horror's death may call it down: render/bossDeathFx.ts). */
+  readonly lightning: Lightning;
 }
 
 export interface LifeParts {
@@ -113,6 +115,7 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const bossAuras = createBossAuras(scene, g, parts.creatures.figure, parts.creatures.painted, parts.creatures.presence);
   return {
     fauna,
+    lightning,
     update(camera, time, enclosed, alpha, gloom) {
       eye = camera;
       SEA.chop.value = seaChopNow(g); // the wind raises the sea, slowly (round 30; the simulation eases it, round 55: a body in the water floats on what is drawn). Before anything is set on the water: the tentacles are placed on the surface the sea is drawn at
