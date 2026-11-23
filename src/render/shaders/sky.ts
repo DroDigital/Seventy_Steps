@@ -39,6 +39,8 @@ uniform float uClouds; // cover
 uniform float uHaze; // the horizon's moonlit glow
 uniform float uOpen; // 0 under a roof or in a dungeon: the fog's colour alone
 uniform float uWrong; // 0..1: a failing mind's stars, which crawl, crowd and flicker
+uniform float uCrawl; // radians they have crawled: summed on the CPU at a pace by uWrong (sky.ts), so a change in the mind changes the pace, never the place
+uniform float uFlicker; // and the phase their flicker has quickened by, summed the same way
 uniform float uFlash; // a lightning stroke's light on the sky (lightning.ts)
 uniform float uMilky; // the Milky Way's strength
 uniform float uAurora; // the aurora's
@@ -144,14 +146,14 @@ void main() {
   if (ov > 0.001) cloud = mix(cloud, smoothstep(0.1, 0.5, cn * 0.62 + cn2 * 0.38) * smoothstep(-0.03, 0.1, h), ov);
   if (uVeil > 0.001) cloud = max(cloud, clamp(uVeil * 1.35 * (1.0 - smoothstep(0.0, 0.62, a)) * (0.45 + 0.9 * cn2) * smoothstep(-0.03, 0.08, h), 0.0, 1.0)); // a bank, thickest at the moon
 
-  float turn = uTime * 0.035 * uWrong; // the stars crawl about the sky, and are not where they were
+  float turn = uCrawl; // the stars crawl about the sky, and are not where they were
   vec3 sd = wheel(vec3(d.x * cos(turn) - d.z * sin(turn), d.y, d.x * sin(turn) + d.z * cos(turn)), uTurn); // and wheel
   vec3 fig = vec3(0.0); // the Alignment: the stars fallen into a figure, which does not crawl
   if (uOmen > 0.001 && dot(d, normalize(uOmenAt)) > 0.88) fig = omenLight(d);
   vec3 cell = floor(sd * 230.0);
   float s = hash(cell);
   float star = step(1.0 - 0.006 * uStars * (1.0 + 2.2 * uWrong), s) * (0.35 + 0.65 * hash(cell + 3.1)) * (1.0 - 0.85 * fig.z * uOmen);
-  float twinkle = 0.6 + 0.4 * sin(uTime * (1.3 + 2.5 * hash(cell + 7.7) + 4.0 * uWrong) + s * 60.0);
+  float twinkle = 0.6 + 0.4 * sin(uTime * (1.3 + 2.5 * hash(cell + 7.7)) + uFlicker + s * 60.0);
   vec3 starColor = mix(vec3(0.78, 0.8, 0.82), vec3(0.86, 0.7, 0.95), step(0.85, hash(cell + 9.3)) * uWrong); // and some are the wrong colour
   col += starColor * star * twinkle * lift * (1.0 - cloud);
   col += vec3(0.86, 0.86, 0.9) * (fig.x * 0.95 + fig.y * 0.4) * uOmen * smoothstep(0.0, 0.1, h) * (1.0 - cloud);

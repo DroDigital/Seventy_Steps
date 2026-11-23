@@ -52,6 +52,8 @@ export function createSky(look: RealmLook): Sky {
     uAuroraTint: { value: new THREE.Vector3(1, 1, 1) },
     uOpen: { value: 1 },
     uWrong: { value: 0 },
+    uCrawl: { value: 0 },
+    uFlicker: { value: 0 },
     uFlash: { value: 0 },
     // round 80 (render/atm/sky.ts writes these each frame; at rest they change nothing)
     uOver: { value: 0 },
@@ -117,6 +119,9 @@ export function createSky(look: RealmLook): Sky {
       u.uMoonColor.value.set(...look.now.moonColor);
       clock += dt * (1 - still);
       u.uTime.value = clock;
+      const wrongDt = dt * (1 - still) * u.uWrong.value; // summed, never time × wrongness: that leapt the whole sky round, and set every star flickering, whenever the mind moved
+      u.uCrawl.value = (u.uCrawl.value + wrongDt * SKY.crawl) % (Math.PI * 2);
+      u.uFlicker.value = (u.uFlicker.value + wrongDt * SKY.flicker) % (Math.PI * 2);
     },
   };
 }
