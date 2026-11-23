@@ -5,7 +5,7 @@ import type { PropKind } from '../src/data/regions';
 import { propAt, type Prop } from '../src/world/props';
 
 /** The forms a look draws for a kind, by its key. */
-export const FORM_KEYS: readonly [PropKind, keyof PropLook][] = [['tree', 'trees'], ['pine', 'pines'], ['rock', 'rocks'], ['bush', 'bushes'], ['stump', 'stumps'], ['log', 'logs'], ['grave', 'graves'], ['pillar', 'pillars'], ['monolith', 'monoliths']];
+export const FORM_KEYS: readonly [PropKind, keyof PropLook][] = [['tree', 'trees'], ['pine', 'pines'], ['rock', 'rocks'], ['bush', 'bushes'], ['stump', 'stumps'], ['log', 'logs'], ['grave', 'graves'], ['pillar', 'pillars'], ['monolith', 'monoliths'], ['ruin', 'ruins'], ['wall', 'walls'], ['fence', 'fences']];
 
 /** Every form any look draws for `key`. */
 export const formsOf = (key: keyof PropLook): string[] => [...new Set(Object.values(PROP_LOOKS).flatMap((l) => Object.keys(l[key] as object)))];

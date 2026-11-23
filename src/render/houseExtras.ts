@@ -6,6 +6,8 @@
  */
 
 import * as THREE from 'three';
+import type { Rng } from '../core/rng';
+import { roofAt, type Profile } from './houseRoof';
 import { box, tileUv, tint } from './meshKit';
 import { scaleRgb, type Rgb } from './palette';
 
@@ -40,19 +42,68 @@ export function cupola(y: number, z: number, wall: Rgb, roof: Rgb, trim: Rgb, da
   return out;
 }
 
-const TURRET = { r: 1.2, seg: 8 };
+const TURRET = { r: 1.2, seg: 8, clear: 1.7 };
 
-/** A round turret on the gable end `side`, near the eave: its wall up past the eaves, a steep conical roof, a slit of dark glass. */
-export function turret(side: 1 | -1, wx: number, wd: number, top: number, wall: Rgb, roof: Rgb, dark: Rgb): Extra {
+/** A triangular prism along z, `len` long, `half` wide each way and `rise` high from its foot at y = 0: a small gable's roof or a pediment. */
+const gablet = (half: number, rise: number, len: number): THREE.BufferGeometry =>
+  new THREE.CylinderGeometry(1, 1, len, 3).rotateX(-Math.PI / 2).translate(0, 0.5, 0).scale(half / Math.sin(Math.PI / 3), rise / 1.5, 1);
+
+/**
+ * A round turret in the back corner of the gable end `side`: its wall rises through the roof and stands `clear` metres above it all
+ * round, belted under its steep conical roof, a slit of dark glass looking out over the gable and another to the back. Round 117: it
+ * stood a metre and a half short of the roof over it, so only its cone came through the slope, a horn on the roof; it is still inside
+ * the house's walls (the collider's).
+ */
+export function turret(side: 1 | -1, wx: number, wd: number, profile: Profile, wall: Rgb, roof: Rgb, trim: Rgb, dark: Rgb): Extra {
   const out = empty();
-  const { r, seg } = TURRET;
-  const x = side * (wx - r * 1.25); // keep the roof and wall inside the house collider
-  const h = top + 1.3;
-  const z = -wd + r * 1.25;
+  const { seg, clear } = TURRET;
+  const r = Math.min(TURRET.r, wd * 0.33); // a narrower house a narrower turret, so it keeps clear of the ridge
+  const x = side * (wx - r * 1.3 - 0.02); // its roof's eaves within the walls
+  const z = -wd + r * 1.3 + 0.02;
+  const h = Math.max(roofAt(profile, z + r), roofAt(profile, z - r)) + clear;
   out.wall.push(tileUv(tint(new THREE.CylinderGeometry(r, r * 1.05, h, seg).rotateY(Math.PI / seg).translate(x, h / 2, z), wall), Math.PI * r * 2, h));
-  out.roof.push(tint(new THREE.ConeGeometry(r * 1.25, 2.8, seg).rotateY(Math.PI / seg).translate(x, h + 1.4, z), roof));
+  out.roof.push(tint(new THREE.ConeGeometry(r * 1.3, 3, seg).rotateY(Math.PI / seg).translate(x, h + 1.5, z), roof));
+  out.trim.push(tint(new THREE.CylinderGeometry(r * 1.1, r * 1.1, 0.18, seg).rotateY(Math.PI / seg).translate(x, h - 0.12, z), trim)); // the belt under its eaves
+  out.trim.push(tint(new THREE.CylinderGeometry(0.02, 0.06, 0.8, 4).translate(x, h + 3.3, z), trim)); // its finial
   const face = r * Math.cos(Math.PI / seg); // the flat of the wall facing out
-  out.trim.push(box(0.06, 0.9, 0.32, x + side * (face + 0.03), h - 1.2, z, dark));
+  out.trim.push(box(0.06, 0.9, 0.32, x + side * (face + 0.03), h - 0.85, z, dark), box(0.32, 0.9, 0.06, x, h - 0.85, z - face - 0.03, dark));
+  return out;
+}
+
+/**
+ * Round 117: dormers on the front slope of a pitched roof, one to three, set evenly: each a box in the wall's own material standing
+ * out of the slope, under a small gable of the roof's, with a framed window of dark glass. They end inside the roof behind them.
+ */
+export function dormers(profile: Profile, wx: number, wd: number, rng: Rng, wall: Rgb, trim: Rgb, dark: Rgb): Extra {
+  const out = empty();
+  const n = wx > 4.2 ? 2 + (rng() < 0.4 ? 1 : 0) : 1 + (rng() < 0.5 ? 1 : 0);
+  const [half, tall, zf] = [0.62 + 0.1 * rng(), 1.15, wd * (0.42 + 0.1 * rng())];
+  const foot = roofAt(profile, zf) - 0.05;
+  let zb = zf;
+  while (zb > -wd && roofAt(profile, zb) < foot + tall + 0.75) zb -= 0.1; // back to where the roof stands over its gable
+  const len = zf - zb;
+  for (let k = 0; k < n; k++) {
+    const x = (k - (n - 1) / 2) * ((wx * 1.3) / Math.max(n, 1.5));
+    out.wall.push(tileUv(box(half * 2, tall + 0.02, len, x, foot + tall / 2, zb + len / 2, wall), half * 2, tall));
+    out.roof.push(tint(gablet(half + 0.16, 0.7, len + 0.2).translate(x, foot + tall, zb + len / 2 + 0.1), wall));
+    out.trim.push(box(half * 1.3, 0.85, 0.08, x, foot + 0.6, zf + 0.04, trim), box(half * 1.05, 0.65, 0.06, x, foot + 0.6, zf + 0.1, dark));
+    out.trim.push(box(0.05, 0.65, 0.05, x, foot + 0.6, zf + 0.14, trim), box(half * 1.05, 0.05, 0.05, x, foot + 0.6, zf + 0.14, trim)); // its glazing bars
+  }
+  return out;
+}
+
+/** Corner boards (round 117): a clapboard house's four corners cased in trim from its footing to its eaves, but where a wing meets it (`skip` the side). */
+export function cornerBoards(wx: number, wd: number, h: number, skip: number, trim: Rgb): THREE.BufferGeometry[] {
+  const out: THREE.BufferGeometry[] = [];
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) if (sx !== skip) out.push(box(0.22, h, 0.22, sx * wx, 0.4 + h / 2, sz * wd, trim));
+  return out;
+}
+
+/** A door's surround (round 117): pilasters either side and, over it, a pediment or a flat hood on two brackets; the door on the front at z = `wd`. */
+export function doorHood(wd: number, pediment: boolean, trim: Rgb): THREE.BufferGeometry[] {
+  const out = [-1, 1].map((s) => box(0.16, 2.2, 0.1, s * 0.66, 0.4 + 1.1, wd + 0.06, trim));
+  if (pediment) out.push(tint(gablet(0.85, 0.42, 0.22).translate(0, 0.4 + 2.24, wd + 0.11), trim));
+  else out.push(box(1.7, 0.1, 0.55, 0, 0.4 + 2.42, wd + 0.27, trim), ...[-1, 1].map((s) => box(0.08, 0.3, 0.4, s * 0.72, 0.4 + 2.24, wd + 0.21, trim)));
   return out;
 }
 

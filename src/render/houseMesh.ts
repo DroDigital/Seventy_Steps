@@ -15,7 +15,8 @@ import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { PropMat, SolidPiece } from './propShapes';
 import { houseLookOf, type HouseLook } from '../data/houseLooks';
-import { boards, cupola, noExtra, turret, widowWalk, type Extra } from './houseExtras';
+import { boards, cornerBoards, cupola, doorHood, dormers, noExtra, turret, widowWalk, type Extra } from './houseExtras';
+import { roof } from './houseRoof';
 
 const TRIM: Rgb = scaleRgb(BASE.bone, 1.1);
 const PANE: Rgb = scaleRgb(BASE.charcoal, 0.5);
@@ -24,75 +25,6 @@ const DOOR: Rgb = scaleRgb(mixRgb(BASE.rust, BASE.charcoal, 0.5), 1.4);
 
 // Round 35 (every house was the same house in a grey): what a town's houses are painted, built of and roofed with, each house taking its own; round 111: by the realm (data/houseLooks.ts).
 const pick = <T,>(rng: Rng, list: readonly T[]): T => list[Math.floor(rng() * list.length)];
-
-/** The profile from `floor` up: a slope that starts below it starts where it crosses it. */
-function above(profile: readonly (readonly [number, number])[], floor: number): [number, number][] {
-  const out: [number, number][] = [];
-  const cross = (a: readonly [number, number], b: readonly [number, number]): [number, number] => [a[0] + ((b[0] - a[0]) * (floor - a[1])) / (b[1] - a[1]), floor];
-  profile.forEach((p, i) => {
-    if (p[1] < floor) return;
-    if (i > 0 && profile[i - 1][1] < floor) out.push(cross(profile[i - 1], p));
-    out.push([p[0], p[1]]);
-    if (i + 1 < profile.length && profile[i + 1][1] < floor) out.push(cross(p, profile[i + 1]));
-  });
-  return out;
-}
-
-/**
- * A roof and its two gable ends from a profile across the depth: [z, y] points from eave to eave.
- * Round 21: the roof is seen from below too (its eaves were open sky from beneath), and a gable
- * begins where the wall ends, at `floor` (it began 20 cm under it, and lay in the wall's own plane
- * over that band, the two fighting).
- */
-function roof(profile: readonly (readonly [number, number])[], w: number, over: number, floor: number, wallHalf = 0): { roof: THREE.BufferGeometry; gables: THREE.BufferGeometry } {
-  const pos: number[] = [];
-  const uv: number[] = [];
-  const idx: number[] = [];
-  let run = 0;
-  for (let i = 1; i < profile.length; i++) {
-    const [[z0, y0], [z1, y1]] = [profile[i - 1], profile[i]];
-    const len = Math.hypot(z1 - z0, y1 - y0);
-    const base = pos.length / 3;
-    pos.push(-w - over, y0, z0, w + over, y0, z0, -w - over, y1, z1, w + over, y1, z1);
-    uv.push(0, run / 2, (w + over) / 1, run / 2, 0, (run + len) / 2, (w + over) / 1, (run + len) / 2);
-    run += len;
-    idx.push(base, base + 2, base + 1, base + 1, base + 2, base + 3); // outward (up) faces
-  }
-  const r = new THREE.BufferGeometry();
-  r.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  r.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  r.setIndex(idx);
-  r.computeVertexNormals();
-  const under = r.clone();
-  const turned = under.getIndex()!;
-  for (let i = 0; i < turned.count; i += 3) {
-    const b = turned.getX(i + 1);
-    turned.setX(i + 1, turned.getX(i + 2));
-    turned.setX(i + 2, b);
-  }
-  under.computeVertexNormals();
-  // Gables: a fan from the eave line's middle, at both ends.
-  const pts = above(profile, floor);
-  const gp: number[] = [];
-  const gu: number[] = [];
-  const gi: number[] = [];
-  for (const side of [-1, 1]) {
-    const base = gp.length / 3;
-    gp.push(side * w, floor, 0);
-    gu.push(wallHalf, floor - 0.4);
-    for (const [z, y] of pts) {
-      gp.push(side * w, y, z * 0.995); // a hair inside the roof's edge (0.97 left a sliver of open air along each slope)
-      gu.push(z + wallHalf, y - 0.4); // metres, as the wall's own (tileUv halves them): the courses run on into the gable (round 35: its bricks were four times the wall's, and began afresh at the eaves)
-    }
-    for (let i = 1; i < pts.length; i++) side < 0 ? gi.push(base, base + i + 1, base + i) : gi.push(base, base + i, base + i + 1); // facing out
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
-  g.setAttribute('uv', new THREE.Float32BufferAttribute(gu, 2));
-  g.setIndex(gi);
-  g.computeVertexNormals();
-  return { roof: mergeGeometries([r, under]), gables: g };
-}
 
 /** A lit window's glass, where its light spills from (half a metre out from the wall), and the glass's middle, where its glow sits. */
 interface Lit {
@@ -228,7 +160,8 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const chimneys: THREE.BufferGeometry[] = [];
   const stacks = style === 'brick' ? [-1, 1] : flat ? [] : rng() < 0.2 ? [] : [rng() < 0.5 ? -1 : 1];
   const smoke = stacks.map((s): [number, number, number] => [s * wx * 0.7, top + rh + 1.3, -wd * 0.2]); // the top of each stack
-  for (const s of stacks) chimneys.push(tileUv(box(0.8, rh + 1.6, 0.8, s * wx * 0.7, top + (rh + 1.6) / 2 - 0.3, -wd * 0.2, scaleRgb(BASE.bone, 1.2)), 0.8, rh + 1.6));
+  const stackC = scaleRgb(pick(extra, look.bricks), 1.05); // round 117: a chimney is the town's brick, not all one pale stone
+  for (const s of stacks) chimneys.push(tileUv(box(0.8, rh + 1.6, 0.8, s * wx * 0.7, top + (rh + 1.6) / 2 - 0.3, -wd * 0.2, stackC), 0.8, rh + 1.6), box(1.08, 0.2, 1.08, s * wx * 0.7, top + rh + 1.35, -wd * 0.2, scaleRgb(stackC, 0.8))); // and its cap, standing a hand and more out of it
 
   // Round 111: what the realm adds, from its own draws: a turret at a gable end, a widow's walk or a cupola on the ridge. A turret stands on the
   // side its house's wing is not on (round 110's wing is walled, so the two must not meet); the side is drawn either way, as it was.
@@ -238,7 +171,8 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const turretSide: 0 | 1 | -1 = turreted ? (addons.wing ? (-addons.wing.side as 1 | -1) : sideDraw) : 0;
   const onRidge = style === 'hovel' || flat ? 0 : extra();
   const adds: Extra[] = [];
-  if (turretSide) adds.push(turret(turretSide, wx, wd, top, wallTint, roofTint, PANE));
+  if (turretSide) adds.push(turret(turretSide, wx, wd, profile, wallTint, roofTint, TRIM, PANE));
+  if (!flat && style !== 'hovel' && extra() < look.dormer) adds.push(dormers(profile, wx, wd, extra, wallTint, TRIM, PANE)); // round 117
   if (onRidge && onRidge < look.walk) adds.push(widowWalk(ridge[1], ridge[0], TRIM));
   else if (onRidge && onRidge < look.walk + look.cupola) adds.push(cupola(ridge[1], ridge[0], wallTint, roofTint, TRIM, PANE));
   const add = adds.reduce((a, b) => ({ wall: [...a.wall, ...b.wall], roof: [...a.roof, ...b.roof], trim: [...a.trim, ...b.trim] }), noExtra());
@@ -246,6 +180,8 @@ export function housePieces(p: Prop, c: Rgb, region?: string): SolidPiece[] {
   const { frames, panes, glows } = windows(wx, wd, h, rng, look.lit, style === 'clapboard' && rng() < look.shutters, true, turretSide, look.boarded);
   const doorC = pick(rng, look.doors);
   const door = [box(1.1, 2.1, 0.1, 0, 0.4 + 1.05, wd + 0.05, doorC), box(1.3, 0.12, 0.12, 0, 0.4 + 2.15, wd + 0.06, TRIM)];
+  if (style === 'clapboard') door.push(...cornerBoards(wx, wd, h, addons.wing?.side ?? 0, TRIM)); // round 117
+  if (!addons.porch && style !== 'hovel' && extra() < look.hood) door.push(...doorHood(wd, extra() < look.pediment, TRIM));
   const step = box(1.8, 0.25, 1.1, 0, 0.125, wd + 0.35, scaleRgb(c, 0.75)); // its back face inside the footing, not within a hand of its front (round 35: the audit); its top 15 cm under the footing's, not 10 (round 110: the ray audit's fight on seeds 1 and 3)
   const stones = [footing, tileUv(step, 1, 1)];
   if (addons.porch) { // round 116: each post on a stone pad set in the ground (they stood on the air 25 cm over it)

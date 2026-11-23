@@ -82,3 +82,69 @@ export function capTint(geo: THREE.BufferGeometry, c: Rgb): THREE.BufferGeometry
   for (let i = 0; i < col.count; i++) if (nor.getY(i) > 0.95) col.setXYZ(i, c[0], c[1], c[2]);
   return geo;
 }
+
+/** Darkens what faces down by up to `k` (the shade inside a crown or under a bush), by each vertex's own normal. */
+export function shadeBelow(geo: THREE.BufferGeometry, k: number): THREE.BufferGeometry {
+  geo.computeVertexNormals();
+  const [nor, col] = [geo.getAttribute('normal'), geo.getAttribute('color')];
+  for (let i = 0; i < col.count; i++) {
+    const f = 1 - k * (0.5 - 0.5 * nor.getY(i));
+    col.setXYZ(i, col.getX(i) * f, col.getY(i) * f, col.getZ(i) * f);
+  }
+  return geo;
+}
+
+/**
+ * Each point pushed out from `centre` by a scatter of where it is, between 1 - amount and 1 + amount (the same at a seam's twin points,
+ * so no face tears); with `level`, out from the upright axis through `centre` alone, so its height is kept.
+ */
+export function roughen(geo: THREE.BufferGeometry, amount: number, salt: number, centre: readonly number[] = [0, 0, 0], level = false): THREE.BufferGeometry {
+  const pos = geo.getAttribute('position');
+  for (let i = 0; i < pos.count; i++) {
+    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+    const k = 1 - amount + 2 * amount * scatter(x, y, z, salt);
+    pos.setXYZ(i, centre[0] + (x - centre[0]) * k, level ? y : centre[1] + (y - centre[1]) * k, centre[2] + (z - centre[2]) * k);
+  }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * A cone of boughs, `r` wide and `h` tall about its own middle (as ConeGeometry stands), whose rim is drawn in and lifted at every other
+ * point: a skirt of hanging bough tips, not a smooth lampshade. Its base cap's rim moves with the side's, so it stays closed.
+ */
+export function boughCone(r: number, h: number, tips: number, inset = 0.3, lift = 0.16): THREE.BufferGeometry {
+  const seg = tips * 2;
+  const g = new THREE.ConeGeometry(r, h, seg);
+  const pos = g.getAttribute('position');
+  for (let i = 0; i < pos.count; i++) {
+    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+    if (y > -h / 2 + 1e-4 || Math.hypot(x, z) < r * 0.5) continue;
+    const k = Math.round(Math.atan2(x, z) / ((Math.PI * 2) / seg));
+    if (((k % 2) + 2) % 2 === 0) continue;
+    pos.setXYZ(i, x * (1 - inset), y + h * lift, z * (1 - inset));
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
+/** Roots from a trunk of radius `r` at its foot: `n` of them out from its flank and down into the ground, `reach` metres out. */
+export function roots(r: number, n: number, reach: number, c: Rgb, rng: Rng, from = 0.3): THREE.BufferGeometry[] {
+  return Array.from({ length: n }, (_, k) => {
+    const a = (k / n) * Math.PI * 2 + rng() * 0.7;
+    const [s, co] = [Math.sin(a), Math.cos(a)];
+    const out = reach * (0.75 + 0.5 * rng());
+    return stem([s * r * 0.5, from + 0.1 * rng(), co * r * 0.5], [s * (r + out), -0.3, co * (r + out)], r * 0.45, r * 0.24, 4, c); // thick at the trunk, diving into the ground rather than pointing along it
+  });
+}
+
+/** Colours a cylinder's two flat ends (|normal.y| near 1, before it is turned): its rim `rim`, its middle `heart` (a sawn log's or stump's end grain). */
+export function endGrain(geo: THREE.BufferGeometry, rim: Rgb, heart: Rgb): THREE.BufferGeometry {
+  const [nor, col, pos] = [geo.getAttribute('normal'), geo.getAttribute('color'), geo.getAttribute('position')];
+  for (let i = 0; i < col.count; i++) {
+    if (Math.abs(nor.getY(i)) < 0.95) continue;
+    const c = Math.hypot(pos.getX(i), pos.getZ(i)) < 1e-4 ? heart : rim;
+    col.setXYZ(i, c[0], c[1], c[2]);
+  }
+  return geo;
+}
