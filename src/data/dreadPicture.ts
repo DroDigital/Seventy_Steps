@@ -8,7 +8,7 @@
 /** Pressure (render/pressure.ts): the picture and the whispers lean toward a failing mind's while the mind is pressed, even at full sanity. */
 export const PRESSURE = {
   lean: 0.4, // the most of the way to madness the picture is taken at a pressure of 1 (felt = stress + lean × pressure × (1 − stress), never past the FX intensity)
-  leanDread: 0.6, // ...and for the soft edges and the wrong stars, which wait for more of it (FX.dreadFrom) and would show too little at `lean`
+  leanDread: 0.6, // ...and for the soft edges, which wait for more of it (FX.dreadFrom) and would show too little at `lean`
   leanHeard: 0.75, // ...and for the whispers, which begin at the Fractured (AUDIO.whisper.from): one reaches the ear only at the top of a pressure
   rate: 0.9, // sanity a second lost that is a pressure of 1: a great horror's aura at its edge is about this
   attack: 0.4, // seconds in which the loss rate's pressure rises...
