@@ -10,11 +10,10 @@ import frame as F
 import qa
 from clipkit import Clip, Foot, Leg, Series, Swing, Arm, timing
 from clips.common import at_rest, stand_feet, IDLE_L
-from clips import tuck as TK
+from clips import aim as AIM
 
 W = 'rapier'  # every clip is made and checked for the longest weapon (1.13 m): a shorter one is only further from the floor and from his legs
 DEG = np.pi / 180
-TUCK = (6, 32)  # the roll's frames the weapon arm is held in to his chest (`tuck`)
 
 # ---- the carried pose, as a Swing -------------------------------------------------------------------------------------------------------------------------------------------
 # The idle hangs a rapier straight down into the floor; the game tips a carried weapon forward off the hanging line itself (playerPose.ts CARRY) but not a clip's. These clips begin and end
@@ -158,15 +157,53 @@ class Track:
         return {name: float(s.at(f)[0]) for name, s in self.series.items()}
 
 
+# The roll's weapon arm. Over the roll the blade has to turn once round in the world as he does: it goes down past his leg once (at the start, while his hand is
+# still high: the point swung round the outside of his boot, low) and up once (quickly, as he lies lowest on his back). Between, it trails behind him through the
+# dive and he comes up out of the roll with it ahead of him and low, ready; nothing is flung out, and seen from behind it is end on to the camera most of the way.
+# ROLL_AIM is where the point lies in the world, frame: (az to his right of ahead, el up); ROLL_ARM the posture the arm keeps near, frame: (fwd, out, bend, wrist,
+# tilt) as `aim.arm` has them. `aim.solve_arm` finds the joints.
+ROLL_AIM = {0: (10, -48), 1: (28, -48), 2: (58, -46), 3: (92, -39), 4: (126, -27), 5: (152, -13), 6: (168, -1), 7: (176, 8), 9: (178, 14), 11: (178, 20),
+            13: (178, 28), 14: (178, 45), 15: (178, 75), 16: (0, 75), 17: (0, 45), 18: (2, 25), 20: (5, 14), 22: (8, 8), 24: (10, 0), 26: (10, -12), 28: (9, -22),
+            31: (8, -24), 36: (10, -38), 43: (10, -53)}
+ROLL_ARM = {
+    0: (22, 7, 24, -4, 0),      # the carried pose (HOLD_R)
+    1: (12, 10, 22, -6, 20),    # swinging back past his boot
+    2: (-4, 12, 20, -10, 30),
+    3: (-22, 12, 20, -14, 28),
+    5: (-40, 10, 20, -20, 20),  # trailing behind him as he leaves the floor
+    7: (-42, 10, 22, -20, 15),
+    9: (-32, 10, 32, -15, 15),  # and curling in as he goes over
+    11: (-14, 12, 52, -15, 15),
+    13: (0, 12, 70, -15, 12),
+    15: (6, 14, 85, -12, 12),
+    17: (10, 14, 95, -12, 12),  # the forearm across his front while he is on his back, the point ahead of him
+    20: (10, 14, 95, -10, 12),
+    26: (10, 12, 92, -8, 12),   # coming up with it ahead of him and low
+    31: (10, 10, 88, -5, 10),
+    36: (15, 8, 55, -8, 5),
+    43: (22, 7, 24, -4, 0),     # and carried again
+}
+ROLL_ARM_FRAMES = (1, 43)  # the frames the arm is solved for; the rest are the carried pose
+
+
+def roll_posture():
+    """ROLL_ARM as a Track (fwd, out, bend, wrist, tilt, rot)."""
+    t = Track()
+    for f, v in ROLL_ARM.items():
+        t.at(f, **dict(zip(AIM.NAMES, (*v, 0.0))))
+    return t
+
+
 def roll():
     """A diving roll over the left shoulder: he drops and throws himself forward, hands first, and goes over in a tight tuck, the body turning once about its middle while it travels (the
     chest twisted a little to his right of the hips, as a shoulder roll is, so the turn runs diagonally across his back); the boots come down, he runs out of it onto his feet and stands.
-    The weapon arm is drawn in tight, the fist at his chest and the blade laid back along his flank, and goes over with him (`tuck`): the blade is lifted off its line only as far as
-    keeps its point off the floor, so nothing is flung out from him."""
+    The weapon arm swings back as he dives, trailing the blade behind him, and curls in across his front as he goes over, so that he comes up with the point ahead of him
+    and low; the blade is aimed in the world (ROLL_AIM) and the arm's joints found for it (`aim`), so the sword stays in line with his forearm as a hand holds one."""
     m = timing(W, 'roll')
     c = Airborne(m, 'roll', 3, 27)
     n = m.frames
     root = lambda f: float(c.root(f)[2])
+    posture = roll_posture()
     T = Track()
     # name: pitch of the whole body (degrees, a full turn is 360), rise of the lowest part of him off the floor, torso/head bend, twist of the chest to his right of the hips, the left arm (psi: how far
     # forward of straight down it points in the world, until it is folded by joints: the blend), the legs (thigh raised, knee bent)
@@ -182,7 +219,7 @@ def roll():
     T.at(22, pitch=304, torso=42, head=20, twist=-22, rise=0.0, ax=-55, elbow=-45, thigh=82, knee=98)
     T.at(24, rise=0.04)
     T.at(26, pitch=352, torso=30, head=4, twist=-8, ax=-35, elbow=-40, thigh=50, knee=60, rise=0.14)
-    c.key(0, **rest(armR=REST_R), **stand_feet(c, 0))  # the weapon arm by Swing and the left by joint angles all through, so neither channel is half of each
+    c.key(0, **rest(), **stand_feet(c, 0))  # both arms by joint angles all through, so neither channel is half of each
     # the drop: the knees go, the chest pitches over his boots and the arms come forward for the ground
     c.key(1, ease='smooth', pelvis=(0.0, 0.86, 0.03), pelvis_rot=(5, 0, 0), torso=(10, 0, 0))
     c.key(2, ease='smooth', pelvis=(0.0, 0.8, 0.07), pelvis_rot=(12, 0, 0), torso=(20, 0, 0), head=(-10, 0, 0), armL=Arm(arm=(-55, 0, 8), elbow=-30),
@@ -196,8 +233,7 @@ def roll():
         pitch_t = p['pitch'] + p['torso']
         ax = (1 - min(1.0, max(0.0, p['blend']))) * -(p['psi'] + pitch_t) + min(1.0, max(0.0, p['blend'])) * p['ax']
         ch = dict(pelvis_rot=(p['pitch'], 0, 0), torso=(p['torso'], p['twist'], 0), head=(p['head'], -0.5 * p['twist'], 0), armL=Arm(arm=(ax, 0, 8), elbow=p['elbow']), **tuck(p['thigh'], p['knee'], 6))
-        R = TK.frame(ch)[0]
-        chans[f] = (ch, np.array(grounded(dict(ch, armR=TK.swing(R, S.unit(R @ TK.TRAIL))), p['rise'])))  # the tucked fist is part of what may meet the floor
+        chans[f] = (ch, np.array(grounded(dict(ch, armR=AIM.arm(**posture.get(f))), p['rise'])))  # the arm as it is meant to go is part of what may meet the floor
     for f, (ch, at) in chans.items():  # the part that is lowest changes from one to another as he turns: the hips are eased through it, so they do not jerk
         near = [chans[g][1] for g in (f - 1, f, f + 1) if g in chans]
         c.key(f, ease='linear', pelvis=tuple(0.25 * near[0] + 0.5 * at + 0.25 * near[-1]) if 4 < f < 26 else tuple(at), **ch)
@@ -209,20 +245,16 @@ def roll():
     stride(c, 'footR', 27, 31, (-0.115, root(27) - 0.12, -7), (-0.115, zR, -7), 0.12, lift0=0.2)
     c.key(31, ease='smooth', pelvis=(0.0, 0.76, 0.02), pelvis_rot=(366, 0, 0), torso=(22, 6, 0), head=(-10, 0, 0), armL=Arm(arm=(35, 0, 12), elbow=-60))
     c.key(36, ease='smooth', pelvis=(0.0, 0.88, 0.04), pelvis_rot=(362, 0, 0), torso=(10, 3, 0), head=(-4, 0, 0), armL=Arm(arm=(-20, 0, 10), elbow=-30))
-    c.key(TUCK[1] + 6, ease='smooth', armR=REST_R)
-    c.key(n, ease='smooth', still=True, **rest(armR=REST_R, pelvis_rot=(360, 0, 0)))
+    c.key(n, ease='smooth', still=True, **rest(pelvis_rot=(360, 0, 0)))
     c.key(31, ease='linear', footL=Foot(0.115, zL, 7))
     stride(c, 'footL', 31, 38, (0.115, zL, 7), (0.115, root(n), 7), 0.1)
     c.key(n, ease='linear', footR=Foot(-0.115, root(n), -7), footL=Foot(0.115, root(n), 7))
-    # the weapon arm, last, from the body as it is keyed: drawn in as he drops, held through the turn and let down to his side as he stands
-    laid = {f: TK.frame(c.channels(f), c.root(f)) for f in range(TUCK[0], TUCK[1] + 1)}
-    blades = TK.smooth({f: TK.aim(R, sh, W) for f, (R, sh) in laid.items()})
-    for f, (R, sh) in laid.items():
-        c.key(f, ease='linear', armR=TK.swing(R, blades[f]))
-    first = TK.swing(*laid[TUCK[0]][:1], blades[TUCK[0]])
-    for f in range(1, TUCK[0]):  # drawn in from his side, the blade turned the short way round so its point is not swept through the floor
-        u = f / TUCK[0]
-        c.key(f, ease='linear', armR=TK.ease_in(REST_R, first, 0.5 * u + 0.5 * u * u * (3 - 2 * u)))  # half eased: a whole ease doubles the turn's speed through its middle
+    # the weapon arm, last, from the body as it is keyed: the joints that point the blade along ROLL_AIM, near ROLL_ARM
+    frames = range(ROLL_ARM_FRAMES[0], ROLL_ARM_FRAMES[1] + 1)
+    chest = {f: S.solve({k: v for k, v in plain(c.channels(f)).items() if k != 'armR'}, c.root(f))[1].world['torso'] for f in frames}
+    joints = AIM.solve_arm(chest, {f: AIM.aim_at(ROLL_AIM, f) for f in frames}, {f: [posture.get(f)[k] for k in AIM.NAMES] for f in frames}, W)
+    for f, p in joints.items():
+        c.key(f, ease='linear', armR=AIM.arm(*p))
     return c
 
 
