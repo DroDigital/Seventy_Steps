@@ -11,27 +11,39 @@ import type { BushForm, LogForm, PropLook, StumpForm } from '../data/propLooks';
 import type { Prop } from '../world/props';
 import { tileUv, tint } from './meshKit';
 import { mixRgb, scaleRgb, type Rgb } from './palette';
-import { capTint, cyl, join, limb, stem, tipOf, topCoat } from './propKit';
+import { boughCone, capTint, cyl, endGrain, join, limb, roots, roughen, scatter, shadeBelow, stem, tipOf, topCoat } from './propKit';
 import type { Piece } from './propShapes';
 
 const blob = (r: number, c: Rgb, sy: number, x: number, y: number, z: number, detail: 'sphere' | 'ico' = 'sphere'): THREE.BufferGeometry =>
   tint(tileUv(detail === 'sphere' ? new THREE.SphereGeometry(r, 6, 4) : new THREE.IcosahedronGeometry(r, 0), r * 3, r * 2), c).scale(1, sy, 1).translate(x, y, z);
 
-function round(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const parts = Array.from({ length: 3 + Math.floor(rng() * 2) }, () => {
-    const r = p.w * (0.5 + 0.4 * rng());
-    return blob(r, scaleRgb(c, 0.8 + 0.4 * rng()), p.h / p.w, (rng() - 0.5) * p.w, r * 0.6, (rng() - 0.5) * p.w);
+/**
+ * A round bush: a mound of leafy lumps, the larger low and in the middle, the smaller about its rim and crown, each pushed out of round
+ * and dark beneath, on a few stems from the ground (round 117: three or four smooth spheres read as boulders).
+ */
+function round(p: Prop, rng: Rng, c: Rgb, look: PropLook): Piece[] {
+  const n = 6 + Math.floor(rng() * 3);
+  const parts = Array.from({ length: n }, (_, k) => {
+    const t = k / n;
+    const r = p.w * (0.62 - 0.3 * t) * (0.85 + 0.3 * rng());
+    const a = k * 2.4 + rng();
+    const d = p.w * (k ? 0.25 + 0.4 * rng() : 0);
+    const y = Math.min(p.h - r * 0.6, r * 0.55 + p.h * 0.45 * t * rng());
+    const g = tint(tileUv(new THREE.IcosahedronGeometry(r, 0).scale(1, Math.min(1, p.h / p.w) * 0.85, 1).rotateY(rng() * 3), r * 3, r * 2), scaleRgb(c, 0.8 + 0.35 * rng()));
+    return shadeBelow(roughen(g, 0.18, rng() * 100), 0.45).translate(Math.sin(a) * d, y, Math.cos(a) * d);
   });
-  return [{ mat: 'leaf', geo: join(parts) }];
+  const stems = Array.from({ length: 4 }, (_, k) => limb(p.h * 0.6, 0.03, k * 1.6 + rng(), 0.5 + 0.3 * rng(), scaleRgb(look.bark, 0.8), 0.4));
+  return [{ mat: 'wood', geo: join(stems) }, { mat: 'leaf', geo: join(parts) }];
 }
 
-/** A juniper: low flattened cones of scale-leaves spreading from the middle. */
+/** A juniper: low cones of scale-leaves spreading from the middle, each skirt ragged with sprays, dark beneath. */
 function juniper(p: Prop, rng: Rng, c: Rgb): Piece[] {
   const parts = Array.from({ length: 3 + Math.floor(rng() * 2) }, (_, k) => {
     const r = p.w * (k ? 0.45 + 0.2 * rng() : 0.6);
     const a = k * 2.2 + rng();
     const d = k ? p.w * 0.45 : 0;
-    return tint(tileUv(new THREE.ConeGeometry(r, p.h * (k ? 0.8 : 1.3), 6), r * 2, p.h), scaleRgb(c, 0.75 + 0.3 * rng())).translate(Math.sin(a) * d, p.h * (k ? 0.4 : 0.65), Math.cos(a) * d);
+    const h = p.h * (k ? 0.8 : 1.3);
+    return shadeBelow(tint(tileUv(boughCone(r, h, 5, 0.35, 0.22), r * 2, p.h), scaleRgb(c, 0.75 + 0.3 * rng())), 0.4).rotateY(rng() * 3).translate(Math.sin(a) * d, p.h * (k ? 0.4 : 0.65), Math.cos(a) * d);
   });
   return [{ mat: 'leaf', geo: join(parts) }];
 }
@@ -129,7 +141,7 @@ export function bushOf(form: BushForm, p: Prop, rng: Rng, c: Rgb, look: PropLook
   const green = look.needles;
   switch (form) {
     case 'round':
-      return round(p, rng, green);
+      return round(p, rng, green, look);
     case 'juniper':
       return juniper(p, rng, green);
     case 'thorn':
@@ -149,18 +161,38 @@ export function bushOf(form: BushForm, p: Prop, rng: Rng, c: Rgb, look: PropLook
   }
 }
 
+const SAWN: Rgb = [0.72, 0.62, 0.46];
+
+/**
+ * A stump of `form`. Round 117: every stump stands on roots that leave its flank and go down into the ground (its one root was turned
+ * into the stump and never seen); a sawn face is pale with its heart darker; a hollow stump is a shell with a ragged rim about its rotten
+ * heart (it was a ring of planks); a broken one is torn into splinters about a jagged top.
+ */
 export function stumpOf(form: StumpForm, p: Prop, rng: Rng, look: PropLook): Piece[] {
   const bark = look.bark;
-  const base = [cyl(p.w * 1.3, p.w, p.h, 7, bark), cyl(p.w * 0.2, p.w * 0.05, p.h * 0.6, 3, bark).rotateZ(1.2).translate(p.w, 0, 0)]; // the stump every realm had, its root
-  if (form === 'cut') return [{ mat: 'wood', geo: join([capTint(base[0], mixRgb(bark, [0.72, 0.62, 0.46], 0.6)), base[1]]) }]; // its sawn face, pale
-  if (form === 'broken') return [{ mat: 'wood', geo: join([...base, ...[0, 2.1, 4.2].map((a) => tint(new THREE.ConeGeometry(p.w * 0.4, p.h * (0.5 + 0.6 * rng()), 4).translate(Math.sin(a) * p.w * 0.45, p.h + p.h * 0.25, Math.cos(a) * p.w * 0.45), bark))]) }];
-  if (form === 'hollow') {
-    const staves = Array.from({ length: 7 }, (_, k) => {
-      const a = (k / 7) * Math.PI * 2;
-      const h = p.h * (0.7 + 0.7 * rng());
-      return tint(new THREE.BoxGeometry(p.w * 0.55, h, p.w * 0.28).translate(0, h / 2, p.w * 0.9).rotateY(a), scaleRgb(bark, 0.8 + 0.3 * rng()));
+  const foot = roots(p.w * 1.15, 3 + Math.floor(rng() * 2), p.w * 0.7 + 0.1, scaleRgb(bark, 0.9), rng, Math.min(0.22, p.h * 0.35));
+  const base = [cyl(p.w * 1.3, p.w, p.h, 7, bark), ...foot]; // the stump every realm had, on its roots
+  if (form === 'cut') return [{ mat: 'wood', geo: join([endGrain(base[0], mixRgb(bark, SAWN, 0.6), mixRgb(bark, SAWN, 0.25)), ...foot]) }]; // its sawn face, pale, its heart darker
+  if (form === 'broken') {
+    const splinters = Array.from({ length: 6 }, (_, k) => {
+      const a = (k / 6) * Math.PI * 2 + rng() * 0.6;
+      const h = p.h * (0.3 + 0.9 * rng());
+      return tint(new THREE.ConeGeometry(p.w * (0.22 + 0.12 * rng()), h, 4).translate(0, h / 2, 0).rotateX(0.12 * rng()).rotateY(a).translate(Math.sin(a) * p.w * 0.6, p.h * 0.85, Math.cos(a) * p.w * 0.6), bark); // the stump's own tone: splinters that cross it or one another are one wood, not two fighting for the depth
     });
-    return [{ mat: 'wood', geo: topCoat(join(staves), look.top, 0.3) }];
+    return [{ mat: 'wood', geo: join([capTint(base[0], scaleRgb(mixRgb(bark, SAWN, 0.4), 0.8)), ...foot, ...splinters]) }];
+  }
+  if (form === 'hollow') {
+    const shell: [number, number][] = [[0, 0], [1.3, 0], [1.08, 0.75], [1, 1], [0.7, 0.95], [0.64, 0.3], [0, 0.26]]; // out, up its flank, over its rim, down into the rot
+    const g = tint(tileUv(new THREE.LatheGeometry(shell.map(([r, t]) => new THREE.Vector2(r * p.w, t * p.h)), 9), p.w * 6, p.h), bark);
+    const [pos, col] = [g.getAttribute('position'), g.getAttribute('color')];
+    const salt = rng() * 100;
+    for (let i = 0; i < pos.count; i++) { // a ragged rim: torn high and low about it
+      const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+      if (y > p.h * 0.5) pos.setY(i, y + (scatter(Math.round(Math.atan2(x, z) * 100), 0, 0, salt) - 0.5) * p.h * 0.45 * (y / p.h));
+      if (Math.hypot(x, z) < p.w * 0.72 && y < p.h * 0.9) col.setXYZ(i, ...scaleRgb(mixRgb(bark, [0.36, 0.26, 0.18], 0.5), 0.6)); // the dark rot within
+    }
+    g.computeVertexNormals();
+    return [{ mat: 'wood', geo: join([topCoat(g, look.top, 0.3), ...foot]) }];
   }
   const shelves = Array.from({ length: 2 + Math.floor(rng() * 3) }, () => {
     const a = rng() * Math.PI * 2;
@@ -170,9 +202,24 @@ export function stumpOf(form: StumpForm, p: Prop, rng: Rng, look: PropLook): Pie
   return [{ mat: 'wood', geo: join(base) }, { mat: 'leaf', geo: join(shelves) }];
 }
 
+/**
+ * A fallen log of `form` along x. Round 117: its ends show their pale grain and darker heart, its length swells and narrows as a trunk
+ * does, and moss or the realm's matter lies along its top.
+ */
 export function logOf(form: LogForm, p: Prop, rng: Rng, look: PropLook): Piece[] {
   const c = scaleRgb(look.bark, 0.9 + 0.2 * rng());
-  const lying = (len: number, x: number): THREE.BufferGeometry => cyl(p.d, p.d * 0.9, len, 7, c).translate(0, -len / 2, 0).rotateZ(Math.PI / 2).translate(x, p.d, 0);
+  const [grain, heart] = [mixRgb(c, SAWN, 0.55), mixRgb(c, SAWN, 0.2)];
+  const salt = rng() * 100;
+  const lying = (len: number, x: number): THREE.BufferGeometry => {
+    const g = endGrain(cyl(p.d, p.d * 0.9, len, 7, c, Math.max(2, Math.round(len / 0.7))), grain, heart);
+    const pos = g.getAttribute('position');
+    for (let i = 0; i < pos.count; i++) { // swollen and pinched along its length, the same at a seam's twins
+      const k = 0.9 + 0.2 * scatter(0, Math.round(pos.getY(i) * 100), 0, salt);
+      pos.setXYZ(i, pos.getX(i) * k, pos.getY(i), pos.getZ(i) * k);
+    }
+    g.computeVertexNormals();
+    return topCoat(g.translate(0, -len / 2, 0).rotateZ(Math.PI / 2).translate(x, p.d, 0), look.top, 0.25);
+  };
   if (form === 'plain') return [{ mat: 'wood', geo: lying(p.w * 2, 0) }];
   if (form === 'branched') {
     const stubs = [-0.5, 0.1, 0.6].map((t) => limb(0.4 + 0.4 * rng(), p.d * 0.4, (rng() < 0.5 ? 1 : -1) * Math.PI / 2 + Math.PI / 2, 0.4 + rng() * 0.8, c, 0.4).translate(t * p.w, p.d * 1.4, 0));

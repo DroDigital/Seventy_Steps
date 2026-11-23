@@ -23,7 +23,7 @@ const reads = (c: readonly [number, number, number]): boolean => {
 const tris = (g: THREE.BufferGeometry): number => (g.index ? g.index.count : g.getAttribute('position').count) / 3;
 
 /** The most faces a prop of the kind may have (the dead tree, the round bush and the boulder of before were about a third of these). */
-const MOST: Partial<Record<PropKind, number>> = { tree: 900, pine: 600, rock: 700, bush: 600, stump: 300, log: 300, grave: 200, pillar: 500, monolith: 300 };
+const MOST: Partial<Record<PropKind, number>> = { tree: 900, pine: 600, rock: 700, bush: 600, stump: 300, log: 300, grave: 200, pillar: 500, monolith: 300, ruin: 1100, wall: 1000, fence: 1000 };
 
 describe('every recurring prop in its realm\'s forms (round 111)', () => {
   it('every region has its own look, and the realms differ', () => {

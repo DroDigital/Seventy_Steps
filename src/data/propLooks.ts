@@ -19,6 +19,9 @@ export type LogForm = 'plain' | 'branched' | 'rotten';
 export type GraveForm = 'round' | 'shoulder' | 'peak' | 'tablet' | 'slab';
 export type PillarForm = 'round' | 'square' | 'drums' | 'twisted';
 export type MonolithForm = 'slab' | 'menhir' | 'skew';
+export type RuinForm = 'wall' | 'gable' | 'chimney' | 'arch' | 'colonnade' | 'slabs'; // round 117
+export type WallForm = 'drystone' | 'tumbled' | 'mortared' | 'slab';
+export type FenceForm = 'rail' | 'picket' | 'wattle' | 'broken';
 
 export interface PropLook {
   trees: Weights<TreeForm>;
@@ -30,6 +33,10 @@ export interface PropLook {
   graves: Weights<GraveForm>;
   pillars: Weights<PillarForm>;
   monoliths: Weights<MonolithForm>;
+  ruins: Weights<RuinForm>; // round 117: what a realm's ruins were, its field walls and its fences
+  walls: Weights<WallForm>;
+  fences: Weights<FenceForm>;
+  brick?: number; // share of a town's ruined gables and chimneys that are brick
   bark: Rgb; // a hardwood's bark (birch keeps its own pale)
   leaves: readonly Rgb[]; // what is left on the boughs
   needles: Rgb; // a conifer's and a bush's green
@@ -57,31 +64,37 @@ const NE = { // New England's defaults
   graves: { round: 3, shoulder: 3, peak: 1, tablet: 1 },
   pillars: { round: 3, drums: 1 },
   monoliths: { slab: 2, menhir: 1 },
+  ruins: { wall: 3, gable: 2, chimney: 2, arch: 1 },
+  walls: { drystone: 3, tumbled: 1 },
+  fences: { rail: 3, picket: 1 },
 } as const;
 const ALIEN = { // the realms beyond: no felled wood, cut stone instead of graves
   stumps: { broken: 1, fungal: 2 },
   logs: { rotten: 2, plain: 1 },
   graves: { slab: 3, tablet: 1 },
+  ruins: { slabs: 2, colonnade: 1, wall: 1 },
+  walls: { slab: 2, tumbled: 1 },
+  fences: { broken: 1 },
 } as const;
 
-const look = (l: Omit<PropLook, 'stumps' | 'logs' | 'graves' | 'pillars' | 'monoliths'> & Partial<PropLook>): PropLook => ({ ...NE, ...l });
+const look = (l: Omit<PropLook, 'stumps' | 'logs' | 'graves' | 'pillars' | 'monoliths' | 'ruins' | 'walls' | 'fences'> & Partial<PropLook>): PropLook => ({ ...NE, ...l });
 
 export const PROP_LOOKS: Readonly<Record<string, PropLook>> = {
-  hub: look({ trees: { oak: 3, elm: 3, maple: 2, dead: 1 }, pines: { fir: 2, spruce: 1 }, rocks: { boulder: 3, cluster: 1 }, bushes: { round: 3, juniper: 1, bracken: 1 }, bark: BARK, leaves: AUTUMN, needles: NEEDLES, top: LICHEN, topShare: 0.5 }),
-  arkham: look({ trees: { dead: 2, blasted: 2, oak: 2, elm: 1, willow: 1 }, pines: { snag: 1, fir: 2 }, rocks: { boulder: 3, split: 1, cluster: 1 }, bushes: { round: 2, thorn: 2, bracken: 1 }, bark: [0.38, 0.34, 0.33], leaves: AUTUMN, needles: NEEDLES, top: [0.56, 0.56, 0.54], topShare: 0.45 }), // the blasted heath: grey ash where the Colour fell
-  dunwich: look({ trees: { dead: 3, oak: 2, swamp: 1, elm: 1 }, pines: { hemlock: 2, snag: 1 }, rocks: { boulder: 2, strata: 2, split: 1 }, bushes: { thorn: 3, round: 1, bracken: 2 }, monoliths: { menhir: 3, slab: 1 }, bark: [0.36, 0.3, 0.26], leaves: RANK, needles: [0.27, 0.32, 0.28], top: [0.42, 0.46, 0.36], topShare: 0.6 }), // rank woods, ledges and the hilltop menhirs
-  innsmouth: look({ trees: { dead: 3, swamp: 2, blasted: 1 }, pines: { windswept: 2, snag: 2 }, rocks: { porous: 3, boulder: 1, cluster: 2 }, bushes: { scrub: 3, round: 1, thorn: 1 }, bark: [0.42, 0.4, 0.38], leaves: SALT, needles: [0.3, 0.34, 0.32], top: [0.6, 0.6, 0.56], topShare: 0.35 }), // salt-killed, wind-bent, reef stone
-  providence: look({ trees: { elm: 3, oak: 2, maple: 1, dead: 1, willow: 1 }, pines: { fir: 1, hemlock: 1 }, rocks: { boulder: 3, cluster: 2 }, bushes: { round: 3, juniper: 2 }, graves: { shoulder: 4, round: 2, tablet: 2, peak: 1 }, bark: BARK, leaves: AUTUMN, needles: NEEDLES, top: LICHEN, topShare: 0.5 }), // old elms and the slate of the burying grounds
-  vermont: look({ trees: { maple: 4, birch: 3, oak: 1, dead: 1 }, pines: { spruce: 3, fir: 2, hemlock: 2, snag: 1 }, rocks: { boulder: 3, split: 2, strata: 1 }, bushes: { round: 2, juniper: 2, bracken: 2 }, bark: [0.42, 0.34, 0.28], leaves: MAPLE, needles: [0.26, 0.34, 0.3], top: [0.44, 0.5, 0.4], topShare: 0.6 }), // the hills afire, the birches and the spruce
-  mountains: look({ trees: { blasted: 1 }, pines: { snag: 1, windswept: 1 }, rocks: { shard: 3, strata: 2, split: 2, boulder: 1 }, bushes: { scrub: 1, juniper: 1 }, stumps: { broken: 1 }, bark: [0.4, 0.38, 0.38], leaves: SALT, needles: NEEDLES, top: [0.9, 0.9, 0.92], topShare: 0.7, snow: true, rockMat: 'rock' }), // black rock and snow
-  pnakotus: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { strata: 3, hoodoo: 2, boulder: 1 }, bushes: { scrub: 3, thorn: 1 }, ...ALIEN, pillars: { square: 3, drums: 1 }, monoliths: { slab: 3 }, bark: [0.5, 0.44, 0.38], leaves: SALT, needles: [0.4, 0.4, 0.32], top: [0.68, 0.6, 0.48], topShare: 0.4, rockMat: 'rock' }), // wind-carved sandstone about the Great Race's blocks
-  kn_yan: look({ trees: { fungal: 1 }, pines: { snag: 1 }, rocks: { stalagmite: 3, boulder: 1, columns: 1 }, bushes: { fungus: 3, crystal: 1 }, ...ALIEN, pillars: { square: 2, drums: 1, round: 1 }, monoliths: { slab: 2, skew: 1 }, bark: [0.5, 0.5, 0.48], leaves: PALE, needles: [0.46, 0.5, 0.5], top: [0.42, 0.46, 0.5], topShare: 0.3 }), // the blue-litten caverns
-  dreamlands: look({ trees: { oak: 3, willow: 2, elm: 2, birch: 1, maple: 1 }, pines: { cypress: 3, fir: 1, hemlock: 1 }, rocks: { boulder: 2, cluster: 2, strata: 1, hoodoo: 1 }, bushes: { round: 3, juniper: 1, bracken: 1, fungus: 1 }, graves: { peak: 2, tablet: 2, round: 1 }, pillars: { round: 2, twisted: 1 }, bark: [0.42, 0.36, 0.34], leaves: DREAM, needles: [0.3, 0.38, 0.32], top: [0.5, 0.56, 0.42], topShare: 0.55 }), // Ulthar's gardens and the cypresses of the river Skai
-  rlyeh: look({ trees: { swamp: 1 }, pines: { snag: 1 }, rocks: { columns: 3, porous: 2, shard: 1 }, bushes: { tendril: 2, scrub: 1 }, ...ALIEN, pillars: { drums: 3, twisted: 1 }, monoliths: { skew: 3, slab: 1 }, bark: [0.34, 0.38, 0.36], leaves: SALT, needles: [0.3, 0.36, 0.34], top: [0.36, 0.42, 0.36], topShare: 0.45 }), // the angles of R'lyeh: basalt and ooze
+  hub: look({ ruins: { gable: 3, chimney: 1, arch: 1, wall: 1 }, walls: { mortared: 3, drystone: 1 }, fences: { picket: 3, rail: 1 }, brick: 0.6, trees: { oak: 3, elm: 3, maple: 2, dead: 1 }, pines: { fir: 2, spruce: 1 }, rocks: { boulder: 3, cluster: 1 }, bushes: { round: 3, juniper: 1, bracken: 1 }, bark: BARK, leaves: AUTUMN, needles: NEEDLES, top: LICHEN, topShare: 0.5 }),
+  arkham: look({ ruins: { gable: 2, chimney: 2, wall: 2, arch: 1 }, walls: { mortared: 1, drystone: 2, tumbled: 1 }, fences: { picket: 2, rail: 1, broken: 1 }, brick: 0.3, trees: { dead: 2, blasted: 2, oak: 2, elm: 1, willow: 1 }, pines: { snag: 1, fir: 2 }, rocks: { boulder: 3, split: 1, cluster: 1 }, bushes: { round: 2, thorn: 2, bracken: 1 }, bark: [0.38, 0.34, 0.33], leaves: AUTUMN, needles: NEEDLES, top: [0.56, 0.56, 0.54], topShare: 0.45 }), // the blasted heath: grey ash where the Colour fell
+  dunwich: look({ ruins: { chimney: 3, wall: 2, gable: 1 }, walls: { tumbled: 2, drystone: 2 }, fences: { broken: 3, rail: 1, wattle: 1 }, trees: { dead: 3, oak: 2, swamp: 1, elm: 1 }, pines: { hemlock: 2, snag: 1 }, rocks: { boulder: 2, strata: 2, split: 1 }, bushes: { thorn: 3, round: 1, bracken: 2 }, monoliths: { menhir: 3, slab: 1 }, bark: [0.36, 0.3, 0.26], leaves: RANK, needles: [0.27, 0.32, 0.28], top: [0.42, 0.46, 0.36], topShare: 0.6 }), // rank woods, ledges and the hilltop menhirs
+  innsmouth: look({ ruins: { gable: 3, chimney: 2, wall: 2 }, walls: { tumbled: 2, drystone: 1 }, fences: { broken: 3, picket: 1 }, brick: 0.2, trees: { dead: 3, swamp: 2, blasted: 1 }, pines: { windswept: 2, snag: 2 }, rocks: { porous: 3, boulder: 1, cluster: 2 }, bushes: { scrub: 3, round: 1, thorn: 1 }, bark: [0.42, 0.4, 0.38], leaves: SALT, needles: [0.3, 0.34, 0.32], top: [0.6, 0.6, 0.56], topShare: 0.35 }), // salt-killed, wind-bent, reef stone
+  providence: look({ ruins: { gable: 3, arch: 1, chimney: 1, wall: 1 }, walls: { mortared: 3, drystone: 1 }, fences: { picket: 3, rail: 1 }, brick: 0.6, trees: { elm: 3, oak: 2, maple: 1, dead: 1, willow: 1 }, pines: { fir: 1, hemlock: 1 }, rocks: { boulder: 3, cluster: 2 }, bushes: { round: 3, juniper: 2 }, graves: { shoulder: 4, round: 2, tablet: 2, peak: 1 }, bark: BARK, leaves: AUTUMN, needles: NEEDLES, top: LICHEN, topShare: 0.5 }), // old elms and the slate of the burying grounds
+  vermont: look({ ruins: { chimney: 3, wall: 2, gable: 1 }, walls: { drystone: 4, tumbled: 1 }, fences: { rail: 3, broken: 1 }, trees: { maple: 4, birch: 3, oak: 1, dead: 1 }, pines: { spruce: 3, fir: 2, hemlock: 2, snag: 1 }, rocks: { boulder: 3, split: 2, strata: 1 }, bushes: { round: 2, juniper: 2, bracken: 2 }, bark: [0.42, 0.34, 0.28], leaves: MAPLE, needles: [0.26, 0.34, 0.3], top: [0.44, 0.5, 0.4], topShare: 0.6 }), // the hills afire, the birches and the spruce
+  mountains: look({ ruins: { slabs: 2, wall: 1 }, walls: { tumbled: 1 }, trees: { blasted: 1 }, pines: { snag: 1, windswept: 1 }, rocks: { shard: 3, strata: 2, split: 2, boulder: 1 }, bushes: { scrub: 1, juniper: 1 }, stumps: { broken: 1 }, bark: [0.4, 0.38, 0.38], leaves: SALT, needles: NEEDLES, top: [0.9, 0.9, 0.92], topShare: 0.7, snow: true, rockMat: 'rock' }), // black rock and snow
+  pnakotus: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { strata: 3, hoodoo: 2, boulder: 1 }, bushes: { scrub: 3, thorn: 1 }, ...ALIEN, ruins: { slabs: 3, colonnade: 1, wall: 1 }, walls: { slab: 2, mortared: 1 }, pillars: { square: 3, drums: 1 }, monoliths: { slab: 3 }, bark: [0.5, 0.44, 0.38], leaves: SALT, needles: [0.4, 0.4, 0.32], top: [0.68, 0.6, 0.48], topShare: 0.4, rockMat: 'rock' }), // wind-carved sandstone about the Great Race's blocks
+  kn_yan: look({ trees: { fungal: 1 }, pines: { snag: 1 }, rocks: { stalagmite: 3, boulder: 1, columns: 1 }, bushes: { fungus: 3, crystal: 1 }, ...ALIEN, ruins: { colonnade: 2, arch: 1, slabs: 1 }, walls: { mortared: 1, slab: 1 }, pillars: { square: 2, drums: 1, round: 1 }, monoliths: { slab: 2, skew: 1 }, bark: [0.5, 0.5, 0.48], leaves: PALE, needles: [0.46, 0.5, 0.5], top: [0.42, 0.46, 0.5], topShare: 0.3 }), // the blue-litten caverns
+  dreamlands: look({ ruins: { arch: 3, colonnade: 2, gable: 1, wall: 1 }, walls: { mortared: 2, drystone: 1 }, fences: { wattle: 3, picket: 1 }, trees: { oak: 3, willow: 2, elm: 2, birch: 1, maple: 1 }, pines: { cypress: 3, fir: 1, hemlock: 1 }, rocks: { boulder: 2, cluster: 2, strata: 1, hoodoo: 1 }, bushes: { round: 3, juniper: 1, bracken: 1, fungus: 1 }, graves: { peak: 2, tablet: 2, round: 1 }, pillars: { round: 2, twisted: 1 }, bark: [0.42, 0.36, 0.34], leaves: DREAM, needles: [0.3, 0.38, 0.32], top: [0.5, 0.56, 0.42], topShare: 0.55 }), // Ulthar's gardens and the cypresses of the river Skai
+  rlyeh: look({ trees: { swamp: 1 }, pines: { snag: 1 }, rocks: { columns: 3, porous: 2, shard: 1 }, bushes: { tendril: 2, scrub: 1 }, ...ALIEN, ruins: { slabs: 3, arch: 1 }, walls: { slab: 1 }, pillars: { drums: 3, twisted: 1 }, monoliths: { skew: 3, slab: 1 }, bark: [0.34, 0.38, 0.36], leaves: SALT, needles: [0.3, 0.36, 0.34], top: [0.36, 0.42, 0.36], topShare: 0.45 }), // the angles of R'lyeh: basalt and ooze
   yuggoth: look({ trees: { fungal: 3, sinew: 1 }, pines: { snag: 1 }, rocks: { shard: 2, crystal: 2, cluster: 1 }, bushes: { fungus: 3, tube: 1 }, ...ALIEN, pillars: { twisted: 3, square: 1 }, monoliths: { skew: 2, slab: 1 }, bark: [0.46, 0.4, 0.42], leaves: PALE, needles: [0.4, 0.38, 0.4], top: [0.5, 0.44, 0.46], topShare: 0.3 }), // the fungi from Yuggoth and their black towers
   beyond: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { shard: 2, orb: 2, crystal: 1 }, bushes: { crystal: 2, tube: 1 }, ...ALIEN, pillars: { square: 2, twisted: 1 }, monoliths: { slab: 2, skew: 1 }, bark: [0.4, 0.4, 0.44], leaves: PALE, needles: [0.4, 0.42, 0.46], top: [0.56, 0.56, 0.6], topShare: 0.3 }),
   cloud_summit: look({ trees: { blasted: 1 }, pines: { snag: 1, windswept: 1 }, rocks: { shard: 3, crystal: 2, strata: 1 }, bushes: { crystal: 2, scrub: 1 }, ...ALIEN, bark: [0.44, 0.44, 0.46], leaves: SALT, needles: NEEDLES, top: [0.92, 0.92, 0.94], topShare: 0.75, snow: true, rockMat: 'rock' }), // ice above the storm
-  black_wood: look({ trees: { sinew: 4, dead: 2, swamp: 1 }, pines: { hemlock: 2, snag: 2 }, rocks: { boulder: 2, cluster: 1 }, bushes: { tendril: 3, thorn: 2, fungus: 1 }, stumps: { hollow: 2, fungal: 1, broken: 1 }, bark: [0.3, 0.22, 0.2], leaves: FLESH, needles: [0.24, 0.24, 0.2], top: [0.3, 0.32, 0.24], topShare: 0.7 }), // a wood that is a body
+  black_wood: look({ ruins: { wall: 2, slabs: 1 }, walls: { tumbled: 2 }, fences: { wattle: 1, broken: 2 }, trees: { sinew: 4, dead: 2, swamp: 1 }, pines: { hemlock: 2, snag: 2 }, rocks: { boulder: 2, cluster: 1 }, bushes: { tendril: 3, thorn: 2, fungus: 1 }, stumps: { hollow: 2, fungal: 1, broken: 1 }, bark: [0.3, 0.22, 0.2], leaves: FLESH, needles: [0.24, 0.24, 0.2], top: [0.3, 0.32, 0.24], topShare: 0.7 }), // a wood that is a body
   pale_lattice: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { crystal: 4, columns: 2 }, bushes: { crystal: 3 }, ...ALIEN, pillars: { square: 2, round: 1 }, monoliths: { slab: 2 }, bark: [0.62, 0.62, 0.6], leaves: PALE, needles: [0.6, 0.62, 0.6], top: [0.8, 0.82, 0.8], topShare: 0.4 }), // prisms in stilled time
   piping_dark: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { columns: 3, shard: 1 }, bushes: { tube: 3, tendril: 1 }, ...ALIEN, pillars: { round: 2, drums: 1 }, monoliths: { slab: 1, skew: 1 }, bark: [0.3, 0.28, 0.26], leaves: PALE, needles: [0.34, 0.32, 0.3], top: [0.4, 0.38, 0.34], topShare: 0.3 }), // pipes of stone that sound
   spheres: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { orb: 4, cluster: 1 }, bushes: { crystal: 2, tube: 1 }, ...ALIEN, pillars: { round: 2 }, monoliths: { slab: 2 }, bark: [0.4, 0.42, 0.48], leaves: PALE, needles: [0.4, 0.44, 0.5], top: [0.56, 0.6, 0.66], topShare: 0.35 }), // the iridescent globes
