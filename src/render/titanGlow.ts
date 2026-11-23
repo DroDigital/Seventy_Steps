@@ -6,8 +6,10 @@
  */
 
 import * as THREE from 'three';
+import { FAR_PLACE_GLSL } from './shaders/farPlace';
 
-const VERT = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }';
+// round 117: placed as the silhouette is, where it truly stands (shaders/farPlace.ts)
+const VERT = `varying vec2 vUv; ${FAR_PLACE_GLSL} void main() { vUv = uv; gl_Position = farClip(farPlace(modelMatrix * vec4(position, 1.0))); }`;
 
 const HALO = `uniform vec3 uColor; uniform float uAlpha; varying vec2 vUv;
 void main() {
