@@ -73,8 +73,8 @@ vec2 deathSource(vec2 p, float s0) {
 float deathOrder(vec2 p, vec2 px, float h) {
   int k = deathIndex();
   float o = DEATH_BODY[k].x;
-  if (o < ${O('top')}) return 0.6 * p.y + 0.4 * h;
-  if (o < ${O('feet')}) return 0.6 * (1.0 - p.y) + 0.4 * h;
+  if (o < ${O('top')}) return 0.78 * p.y + 0.22 * h; // (a sharper front than the plain crumble's: the head plainly first, or plainly last)
+  if (o < ${O('feet')}) return 0.78 * (1.0 - p.y) + 0.22 * h;
   if (o < ${O('char')}) return 0.3 * h + 0.55 * vnoise(px * 0.16 + vFx.w * 9.0) + 0.15 * p.y;
   if (o < ${O('blocks')}) return hash12(floor(px / 3.0) + vFx.w * 5.0);
   float r = clamp(length((p - vec2(0.5, 0.55)) * vec2(1.0, 0.8)) / 0.6, 0.0, 1.0);

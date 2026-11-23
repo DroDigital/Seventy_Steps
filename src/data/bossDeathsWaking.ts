@@ -44,7 +44,7 @@ export const WAKING_DEATHS: Readonly<Record<string, BossDeath>> = {
   },
   brown_jenkin: {
     lore: 'The Dreams in the Witch House: the rat-thing with human hands; Gilman kicked it over the gulf\'s brink and heard it whimper far below, and when the house came down its skeleton was found. Kicked, it goes over the brink into the dark, whimpering far below; a few small bones are left.',
-    body: { order: 'feet', motion: 'none', rim: [0.2, 0.17, 0.15], tint: [0.04, 0.04, 0.05], tintBy: 0.6 },
+    body: { order: 'feet', motion: 'fall', rim: [0.2, 0.17, 0.15], tint: [0.04, 0.04, 0.05], tintBy: 0.6 },
     move: { away: 1.2, y: -1.4, ease: 'in', from: 0.05 },
     cues: [{ at: 0, set: 'squeal', gain: 0.7, pitch: 1.3 }, { at: 0.05, burst: 'dust', n: 8, where: 'feet' }, { at: 0.5, burst: 'bone', n: 6, where: 'ground' }, { at: 0.75, set: 'squeak', gain: 0.35, pitch: 0.6 }],
   },
@@ -154,7 +154,7 @@ export const WAKING_DEATHS: Readonly<Record<string, BossDeath>> = {
   },
   hypnos: {
     lore: 'Hypnos: the friend who sought what sleep holds was found at the last a bust of marble, a godlike head, with the word HYPNOS on its pedestal. He sets into white marble from the feet up, the face last; then the rest falls away in chips, and the bust is what is left.',
-    body: { order: 'feet', motion: 'fall', first: 0.55, rim: [0.82, 0.81, 0.76], tint: [0.88, 0.87, 0.82], tintBy: 1 },
+    body: { order: 'feet', motion: 'none', first: 0.55, rim: [0.82, 0.81, 0.76], tint: [0.88, 0.87, 0.82], tintBy: 1 },
     cues: [{ at: 0, set: 'whisper', gain: 0.5, pitch: 1.2 }, { at: 0.4, set: 'crunch', gain: 0.5, pitch: 1.3 }, { at: 0.58, until: 0.95, stream: 'marble', n: 40 }, { at: 0.95, scar: [0.8, 0.79, 0.74], r: 1, life: 30 }],
   },
   the_outsider: {
