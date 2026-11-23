@@ -1,7 +1,7 @@
 """The moves every weapon shares: the roll and the backstep, the revolver (shoot, reload), the Laudanum (drink), West's Reagent (inject) and the flask (throw).
 
 There is one clip of each whatever is in his right hand, so that hand is kept out of the way: the weapon is carried low in front of him (`HOLD_R`), clear of the floor even if it is the rapier,
-and in the roll and the backstep it is held out to the side or in front where it can neither dig in nor catch a leg. The left hand has the revolver and the small things (`c.props`).
+in the roll it is drawn in to his chest with the blade laid back along his flank (`tuck`), and in the backstep held up in front of him in a guard. The left hand has the revolver and the small things (`c.props`).
 reload, drink and inject are laid by the game over a walking body (only their torso, head and arms are used), so their boots stand at ease.
 """
 import numpy as np
@@ -10,9 +10,11 @@ import frame as F
 import qa
 from clipkit import Clip, Foot, Leg, Series, Swing, Arm, timing
 from clips.common import at_rest, stand_feet, IDLE_L
+from clips import tuck as TK
 
 W = 'rapier'  # every clip is made and checked for the longest weapon (1.13 m): a shorter one is only further from the floor and from his legs
 DEG = np.pi / 180
+TUCK = (6, 32)  # the roll's frames the weapon arm is held in to his chest (`tuck`)
 
 # ---- the carried pose, as a Swing -------------------------------------------------------------------------------------------------------------------------------------------
 # The idle hangs a rapier straight down into the floor; the game tips a carried weapon forward off the hanging line itself (playerPose.ts CARRY) but not a clip's. These clips begin and end
@@ -159,14 +161,15 @@ class Track:
 def roll():
     """A diving roll over the left shoulder: he drops and throws himself forward, hands first, and goes over in a tight tuck, the body turning once about its middle while it travels (the
     chest twisted a little to his right of the hips, as a shoulder roll is, so the turn runs diagonally across his back); the boots come down, he runs out of it onto his feet and stands.
-    The weapon is held out to his right and up all through, along the line he turns about, so it neither digs in nor catches him."""
+    The weapon arm is drawn in tight, the fist at his chest and the blade laid back along his flank, and goes over with him (`tuck`): the blade is lifted off its line only as far as
+    keeps its point off the floor, so nothing is flung out from him."""
     m = timing(W, 'roll')
     c = Airborne(m, 'roll', 3, 27)
     n = m.frames
     root = lambda f: float(c.root(f)[2])
     T = Track()
     # name: pitch of the whole body (degrees, a full turn is 360), rise of the lowest part of him off the floor, torso/head bend, twist of the chest to his right of the hips, the left arm (psi: how far
-    # forward of straight down it points in the world, until it is folded by joints: the blend), the legs (thigh raised, knee bent), the weapon arm's reach and blade
+    # forward of straight down it points in the world, until it is folded by joints: the blend), the legs (thigh raised, knee bent)
     T.at(3, pitch=26, torso=14, head=-14, twist=0, psi=60, blend=0, ax=-90, elbow=-20, thigh=-15, knee=25, rise=0.3)
     T.at(5, pitch=52, torso=10, head=-16, twist=-12, psi=45, rise=0.25, thigh=0, knee=40)
     T.at(7, pitch=82, torso=22, head=-4, twist=-24, psi=36, elbow=-30, rise=0.0, thigh=40, knee=85)
@@ -179,44 +182,47 @@ def roll():
     T.at(22, pitch=304, torso=42, head=20, twist=-22, rise=0.0, ax=-55, elbow=-45, thigh=82, knee=98)
     T.at(24, rise=0.04)
     T.at(26, pitch=352, torso=30, head=4, twist=-8, ax=-35, elbow=-40, thigh=50, knee=60, rise=0.14)
-    # the weapon arm: out to his right and up, hand near the shoulder while he is tucked
-    T.at(3, ra=55, re=10, rd=0.5, rba=65, rbe=18)
-    T.at(7, ra=92, re=20, rd=0.4, rba=100, rbe=25)
-    T.at(13, ra=100, re=0, rd=0.25, rba=100, rbe=25)
-    T.at(19, ra=100, re=5, rd=0.3)
-    T.at(26, ra=90, re=15, rd=0.45, rba=95, rbe=20)
-
     c.key(0, **rest(armR=REST_R), **stand_feet(c, 0))  # the weapon arm by Swing and the left by joint angles all through, so neither channel is half of each
     # the drop: the knees go, the chest pitches over his boots and the arms come forward for the ground
-    c.key(1, ease='smooth', pelvis=(0.0, 0.86, 0.03), pelvis_rot=(5, 0, 0), torso=(10, 0, 0), armR=Swing(reach=(20, -28, 0.55), blade=(25, -24), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)))
-    c.key(2, ease='smooth', pelvis=(0.0, 0.8, 0.07), pelvis_rot=(12, 0, 0), torso=(20, 0, 0), head=(-10, 0, 0), armL=Arm(arm=(-55, 0, 8), elbow=-30), armR=Swing(reach=(35, -4, 0.53), blade=(42, 2), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)),
+    c.key(1, ease='smooth', pelvis=(0.0, 0.86, 0.03), pelvis_rot=(5, 0, 0), torso=(10, 0, 0))
+    c.key(2, ease='smooth', pelvis=(0.0, 0.8, 0.07), pelvis_rot=(12, 0, 0), torso=(20, 0, 0), head=(-10, 0, 0), armL=Arm(arm=(-55, 0, 8), elbow=-30),
           footR=Foot(-0.115, 0.0, -7), footL=Foot(0.115, 0.0, 7))
     # the launch: the toes drive and he is off the floor, the body falling forward in a long line, the legs trailing
-    c.key(3, ease='out', pelvis=(0.0, 0.84, 0.12), pelvis_rot=(26, 0, 0), torso=(14, 0, 0), head=(-14, 0, 0), armL=Arm(arm=(-90, 0, 8), elbow=-20), armR=Swing(reach=(55, 10, 0.5), blade=(65, 18), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)),
+    c.key(3, ease='out', pelvis=(0.0, 0.84, 0.12), pelvis_rot=(26, 0, 0), torso=(14, 0, 0), head=(-14, 0, 0), armL=Arm(arm=(-90, 0, 8), elbow=-20),
           footR=Foot(-0.115, 0.04, -7, pitch=40, lift=0.05), footL=Foot(0.115, 0.04, 7, pitch=40, lift=0.05))
     chans = {}
     for f in range(4, 27):  # the flight, the tuck and the turn: every frame, set on the floor by its lowest part
         p = T.get(f)
         pitch_t = p['pitch'] + p['torso']
         ax = (1 - min(1.0, max(0.0, p['blend']))) * -(p['psi'] + pitch_t) + min(1.0, max(0.0, p['blend'])) * p['ax']
-        ch = dict(pelvis_rot=(p['pitch'], 0, 0), torso=(p['torso'], p['twist'], 0), head=(p['head'], -0.5 * p['twist'], 0), armL=Arm(arm=(ax, 0, 8), elbow=p['elbow']),
-                  armR=Swing(reach=(p['ra'], p['re'], p['rd']), blade=(p['rba'], p['rbe']), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)), **tuck(p['thigh'], p['knee'], 6))
-        chans[f] = (ch, np.array(grounded(ch, p['rise'])))
+        ch = dict(pelvis_rot=(p['pitch'], 0, 0), torso=(p['torso'], p['twist'], 0), head=(p['head'], -0.5 * p['twist'], 0), armL=Arm(arm=(ax, 0, 8), elbow=p['elbow']), **tuck(p['thigh'], p['knee'], 6))
+        R = TK.frame(ch)[0]
+        chans[f] = (ch, np.array(grounded(dict(ch, armR=TK.swing(R, S.unit(R @ TK.TRAIL))), p['rise'])))  # the tucked fist is part of what may meet the floor
     for f, (ch, at) in chans.items():  # the part that is lowest changes from one to another as he turns: the hips are eased through it, so they do not jerk
         near = [chans[g][1] for g in (f - 1, f, f + 1) if g in chans]
         c.key(f, ease='linear', pelvis=tuple(0.25 * near[0] + 0.5 * at + 0.25 * near[-1]) if 4 < f < 26 else tuple(at), **ch)
     # the landing: the left boot is down ahead of him heel first as he comes upright, still low and still going; the right is thrown through and set down further on; he rises
     # over it and the left comes through to stand beside it
     zL, zR = root(27) + 0.3, root(31) + 0.3
-    c.key(27, ease='smooth', pelvis=(0.0, 0.7, 0.0), pelvis_rot=(364, 0, 0), torso=(30, -3, 0), head=(-12, 0, 0), armL=Arm(arm=(-30, 0, 12), elbow=-50), armR=Swing(reach=(85, 15, 0.45), blade=(95, 20), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)),
+    c.key(27, ease='smooth', pelvis=(0.0, 0.7, 0.0), pelvis_rot=(364, 0, 0), torso=(30, -3, 0), head=(-12, 0, 0), armL=Arm(arm=(-30, 0, 12), elbow=-50),
           footL=Foot(0.115, zL, 7, pitch=-12), footR=Foot(-0.115, root(27) - 0.12, -7, pitch=25, lift=0.2))
     stride(c, 'footR', 27, 31, (-0.115, root(27) - 0.12, -7), (-0.115, zR, -7), 0.12, lift0=0.2)
-    c.key(31, ease='smooth', pelvis=(0.0, 0.76, 0.02), pelvis_rot=(366, 0, 0), torso=(22, 6, 0), head=(-10, 0, 0), armL=Arm(arm=(35, 0, 12), elbow=-60), armR=Swing(reach=(70, 10, 0.5), blade=(80, 10), toward=(0, 1, 0), pole=(-0.3, -0.7, -0.3)))
-    c.key(36, ease='smooth', pelvis=(0.0, 0.88, 0.04), pelvis_rot=(362, 0, 0), torso=(10, 3, 0), head=(-4, 0, 0), armL=Arm(arm=(-20, 0, 10), elbow=-30), armR=REST_R)
+    c.key(31, ease='smooth', pelvis=(0.0, 0.76, 0.02), pelvis_rot=(366, 0, 0), torso=(22, 6, 0), head=(-10, 0, 0), armL=Arm(arm=(35, 0, 12), elbow=-60))
+    c.key(36, ease='smooth', pelvis=(0.0, 0.88, 0.04), pelvis_rot=(362, 0, 0), torso=(10, 3, 0), head=(-4, 0, 0), armL=Arm(arm=(-20, 0, 10), elbow=-30))
+    c.key(TUCK[1] + 6, ease='smooth', armR=REST_R)
     c.key(n, ease='smooth', still=True, **rest(armR=REST_R, pelvis_rot=(360, 0, 0)))
     c.key(31, ease='linear', footL=Foot(0.115, zL, 7))
     stride(c, 'footL', 31, 38, (0.115, zL, 7), (0.115, root(n), 7), 0.1)
     c.key(n, ease='linear', footR=Foot(-0.115, root(n), -7), footL=Foot(0.115, root(n), 7))
+    # the weapon arm, last, from the body as it is keyed: drawn in as he drops, held through the turn and let down to his side as he stands
+    laid = {f: TK.frame(c.channels(f), c.root(f)) for f in range(TUCK[0], TUCK[1] + 1)}
+    blades = TK.smooth({f: TK.aim(R, sh, W) for f, (R, sh) in laid.items()})
+    for f, (R, sh) in laid.items():
+        c.key(f, ease='linear', armR=TK.swing(R, blades[f]))
+    first = TK.swing(*laid[TUCK[0]][:1], blades[TUCK[0]])
+    for f in range(1, TUCK[0]):  # drawn in from his side, the blade turned the short way round so its point is not swept through the floor
+        u = f / TUCK[0]
+        c.key(f, ease='linear', armR=TK.ease_in(REST_R, first, 0.5 * u + 0.5 * u * u * (3 - 2 * u)))  # half eased: a whole ease doubles the turn's speed through its middle
     return c
 
 
