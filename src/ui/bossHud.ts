@@ -13,6 +13,7 @@ import { hooksOf } from '../systems/reality';
 import { SIGNATURES } from '../systems/signatures';
 import { bar, BLOOD, BONE, el, percent, setStyle, setText } from './hudKit';
 import { createTally } from './damageTally';
+import { fill as buttons } from './glyphs';
 
 const BARS = 2; // at once: a pair of bosses fights together at most
 const FLASH_MS = 160;
@@ -36,9 +37,11 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
     const status = el('letter-spacing:2px;font-size:10px;opacity:.7', '', slot);
     return { slot, name, sum, chip, fill, status, ticks: [] as HTMLDivElement[] };
   });
-  const gaze = el('position:absolute;left:16px;top:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', t('boss.gazeBar'), root);
+  const gaze = el('position:absolute;left:16px;top:136px;width:290px;display:none;font-size:10px;letter-spacing:2px', '', root);
+  const gazeLabel = el('', '', gaze); // its words set as it shows, so a language chosen mid-game is followed
   const gazeFill = bar(gaze, '#9468b6', 8);
-  const stone = el('position:absolute;left:16px;top:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', t('boss.petrified'), root);
+  const stone = el('position:absolute;left:16px;top:168px;width:290px;display:none;font-size:10px;letter-spacing:2px', '', root);
+  const stoneLabel = el('', '', stone);
   const stoneFill = bar(stone, '#9ca29a', 8);
   const flash = el('position:absolute;inset:0;background:#e8e0cc;opacity:0', '', root);
   const name = el(`position:absolute;left:0;right:0;top:36%;text-align:center;font-size:72px;letter-spacing:28px;color:${BONE};opacity:0`, '', root);
@@ -56,7 +59,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 68: it was said only in the field guide)
     const f = g.ecs.c.fight.get(e.entity);
     const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);
-    if (line) say(line);
+    if (line) say(buttons(line, true));
     else if (joined(e)) say(t('boss.joined')); // said before the first fold, not after it
   });
   g.events.on('LampChanged', (e) => say(t(e.lit ? 'boss.lampOn' : 'boss.lampOut')));
@@ -83,7 +86,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
         const [sum, shown] = tally.total(e, now);
         setText(s.sum, sum);
         setStyle(s.sum, 'opacity', shown.toFixed(2));
-        setText(s.status, SIGNATURES[f.id]?.status?.(g, e, f) ?? '');
+        setText(s.status, buttons(SIGNATURES[f.id]?.status?.(g, e, f) ?? '', true)); // a button named in it ({interact}) is the device in hand's
         const marks = f.script.phases.slice(1).map((p) => p.hpBelow);
         while (s.ticks.length < marks.length) s.ticks.push(el(`position:absolute;top:-2px;bottom:-2px;width:1px;background:${BONE}aa`, '', s.fill.parentElement!));
         s.ticks.forEach((t, k) => {
@@ -92,8 +95,10 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
         });
       });
       setStyle(gaze, 'display', g.reality.gaze > 0 ? 'block' : 'none');
+      if (g.reality.gaze > 0) setText(gazeLabel, t('boss.gazeBar'));
       setStyle(gazeFill, 'width', percent(g.reality.gaze, 1));
       setStyle(stone, 'display', g.reality.petrify > 0 ? 'block' : 'none');
+      if (g.reality.petrify > 0) setText(stoneLabel, t('boss.petrified'));
       setStyle(stoneFill, 'width', percent(g.reality.petrify, 1));
       const now = performance.now();
       setStyle(flash, 'opacity', Math.max(0, ((flashUntil - now) / FLASH_MS) * 0.85).toFixed(2));

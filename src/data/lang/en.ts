@@ -306,7 +306,7 @@ export const EN = {
   'boss.lampOut': 'A LAMP GOES OUT',
   'boss.gazeBar': 'GAZE',
   'map.travelTo': 'TRAVEL TO {name}  ·  {again}',
-  'map.pressA': 'PRESS A',
+  'map.press': 'PRESS {interact}',
   'map.clickAgain': 'CLICK AGAIN OR ENTER',
   // fast travel's refusals, on the map's bar
   'travel.boss': 'NO JOURNEY WHILE THE FIGHT IS ON',
@@ -338,7 +338,7 @@ export const EN = {
   'sig.bursts': 'IT BURSTS',
   'sig.reforms': "IT REFORMS · R'LYEH SINKS",
   'sig.rams': 'THE ALERT RAMS IT',
-  'sig.alertHelm': 'THE ALERT HAS COME · E AT HER HELM',
+  'sig.alertHelm': 'THE ALERT HAS COME · {interact} AT HER HELM',
   'sig.alertTake': 'THE ALERT HAS COME · TAKE HER HELM',
   'sig.wound': 'WOUND IT UNTIL THE ALERT COMES',
   'sig.incant': 'CHANT THE INCANTATION · OR STRIKE IT DOWN',

@@ -17,8 +17,9 @@ import { screenX, screenY, type MapView } from './mapView';
 
 const PICK_PX = 14; // a sign this near the pointer is picked
 /** Why a journey may not be made, as the map's bar says it: a fight on, a foe hunting close by, the investigator fallen, or (round 56) a sign beyond the demo's realms. */
-export type BarWord = 'boss' | 'foes' | 'fallen' | 'demo';
-export const barWord = (bar: BarWord): string => t(`travel.${bar}` as Key);
+const BAR_WORDS = { boss: 'travel.boss', foes: 'travel.foes', fallen: 'travel.fallen', demo: 'travel.demo' } as const satisfies Record<string, Key>;
+export type BarWord = keyof typeof BAR_WORDS;
+export const barWord = (bar: BarWord): string => t(BAR_WORDS[bar]);
 
 /** The lit Elder Signs of the realm, nearest `from` first. */
 export function litSigns(g: Game, realm: readonly RegionDef[], from: XZ): MapPlace[] {

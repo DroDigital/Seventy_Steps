@@ -37,6 +37,7 @@ import { uiScale } from './uiScale';
 import { createScreen, el, menuOpen, onPadSelect, type Page } from './menuKit';
 import { keyLayout, keyName } from '../core/bindings';
 import { deviceInUse } from '../core/device';
+import { fill } from './glyphs';
 
 const ZOOM = [1, 10] as const;
 const PAN = 0.6; // screen widths a second, held
@@ -135,7 +136,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     chosen = p;
     const bar = p ? barOf(p) : null;
     if (!prompt) return;
-    const again = t(deviceInUse() === 'pad' ? 'map.pressA' : 'map.clickAgain');
+    const again = deviceInUse() === 'pad' ? fill(t('map.press'), true) : t('map.clickAgain'); // the south face button as the pad in hand prints it (A, ✕ or B)
     prompt.style.display = p ? '' : 'none';
     prompt.textContent = !p ? '' : bar ? `${p.name.toUpperCase()}  ·  ${barWord(bar)}` : t('map.travelTo', { name: p.name.toUpperCase(), again });
     prompt.style.color = bar ? '#d80073' : BONE;
