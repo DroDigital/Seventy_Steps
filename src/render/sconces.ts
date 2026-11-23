@@ -44,13 +44,15 @@ export interface SconceSite {
 
 /** The bracket of one torch, and its light (the flame in its cup is the pixel flame's). */
 export function sconce(s: SconceSite, thick: number): { iron: THREE.BufferGeometry; light: LightSpot } {
-  const off = s.across * (thick / 2 + 0.13); // the plate's centre: on the face of the wall
+  const off = s.across * (thick / 2 + 0.13); // where the bracket's flame stands out from: 13 cm off the wall's face
   const [px, pz] = s.alongX ? [s.x, s.z + off] : [s.x + off, s.z];
   const y = s.floor + HEIGHT;
   const out = (k: number): [number, number] => (s.alongX ? [0, s.across * k] : [s.across * k, 0]);
   const [ox, oz] = out(0.1);
-  const plate = box(s.alongX ? 0.18 : 0.06, 0.34, s.alongX ? 0.06 : 0.18, px, y, pz, IRON);
-  const arm = box(s.alongX ? 0.05 : 0.2, 0.05, s.alongX ? 0.2 : 0.05, px + ox, y - 0.1, pz + oz, IRON);
+  const [bx, bz] = out(0.03 - 0.13); // the plate's middle: 3 cm off the face, so it lies on the wall (round 117: it hung 10 cm off it, in the air)
+  const [ax, az] = out(0.195 - 0.13); // the arm runs from the plate out to the cup
+  const plate = box(s.alongX ? 0.18 : 0.06, 0.34, s.alongX ? 0.06 : 0.18, px + bx, y, pz + bz, IRON);
+  const arm = box(s.alongX ? 0.05 : 0.27, 0.05, s.alongX ? 0.27 : 0.05, px + ax, y - 0.1, pz + az, IRON);
   const cup = box(0.15, 0.09, 0.15, px + ox * 2, y - 0.04, pz + oz * 2, IRON);
   const [fx, fz] = [px + ox * 2, pz + oz * 2];
   for (const g of [plate, arm, cup]) if (!g.index) g.setIndex([...Array(g.getAttribute('position').count).keys()]);

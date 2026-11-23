@@ -10,7 +10,7 @@ import { box, tileUv, tint } from './meshKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 import type { Piece } from './propShapes';
 
-const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeGeometries(parts);
+const merged = (parts: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeGeometries(parts.some((g) => !g.index) ? parts.map((g) => (g.index ? g.toNonIndexed() : g)) : parts);
 const BARK: Rgb = scaleRgb(mixRgb(BASE.charcoal, BASE.rust, 0.25), 1.5);
 const BONE: Rgb = scaleRgb(BASE.bone, 0.75);
 
@@ -31,19 +31,31 @@ export function totem(p: Prop): Piece[] {
   return [{ mat: 'wood', geo: merged(wood) }, { mat: 'glow', geo: merged(eyes) }];
 }
 
-/** A skull on a pole, antlered: what the sabbat sets about its fire. */
+/**
+ * A skull on a pole, antlered: what the sabbat sets about its fire. Round 117: the pole bound with cords at its crosspiece, small bones
+ * and rags hung from the crosspiece's ends on their strings, a jaw under the skull, and a ring of stones heaped about its foot.
+ */
 export function skullPole(p: Prop): Piece[] {
   const h = p.h;
   const cylGeo = (r0: number, r1: number, len: number, c: Rgb): THREE.BufferGeometry => tint(tileUv(new THREE.CylinderGeometry(r1, r0, len, 5).translate(0, len / 2, 0), 1, len), c);
   const wood = [cylGeo(0.1, 0.07, h, BARK), box(0.5, 0.05, 0.05, 0, h * 0.62, 0, BARK), box(0.05, 0.05, 0.4, 0, h * 0.5, 0, BARK)];
+  for (const y of [h * 0.6, h * 0.64, h * 0.48]) wood.push(tint(new THREE.CylinderGeometry(0.095, 0.095, 0.03, 5).translate(0, y, 0), scaleRgb(BARK, 0.6))); // the cords that bind it
   const bone: THREE.BufferGeometry[] = [
     tint(new THREE.SphereGeometry(0.24, 6, 5).scale(1, 0.9, 1.15).translate(0, h + 0.1, 0), BONE),
     box(0.2, 0.12, 0.2, 0, h - 0.06, 0.16, BONE),
+    box(0.22, 0.05, 0.16, 0, h - 0.17, 0.12, scaleRgb(BONE, 0.9)), // its jaw
   ];
   for (const e of [-1, 1]) {
     bone.push(cylGeo(0.05, 0.02, 0.7, BONE).rotateZ(e * 0.7).translate(e * 0.14, h + 0.2, 0), cylGeo(0.035, 0.015, 0.4, BONE).rotateZ(e * 1.1).translate(e * 0.4, h + 0.55, 0));
+    wood.push(box(0.012, 0.3, 0.012, e * 0.24, h * 0.62 - 0.15, 0, scaleRgb(BARK, 0.7)), box(0.012, 0.22, 0.012, 0, h * 0.5 - 0.11, e * 0.19, scaleRgb(BARK, 0.7))); // strings
+    bone.push(box(0.03, 0.16, 0.03, e * 0.24, h * 0.62 - 0.38, 0, BONE), box(0.03, 0.12, 0.03, 0, h * 0.5 - 0.28, e * 0.19, BONE)); // and the small bones on them
   }
-  return [{ mat: 'wood', geo: merged(wood) }, { mat: 'stone', geo: merged(bone) }];
+  const stones: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 6; k++) { // a ring of stones heaped about its foot
+    const a = (k / 6) * Math.PI * 2 + p.seed * 0.3;
+    stones.push(tint(new THREE.IcosahedronGeometry(0.13 + 0.04 * (k % 3), 0).scale(1.2, 0.7, 1).translate(Math.cos(a) * 0.3, 0.06, Math.sin(a) * 0.3), scaleRgb(BASE.seaGrey, 1.2 + 0.1 * (k % 2))));
+  }
+  return [{ mat: 'wood', geo: merged(wood) }, { mat: 'stone', geo: merged([...bone, ...stones]) }];
 }
 
 /** The horned tree of the black grove: a trunk that swells at its foot, and limbs that climb and fork like antlers. */

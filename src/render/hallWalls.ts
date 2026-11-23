@@ -14,6 +14,8 @@ import { DUNGEON } from '../data/tuning';
 import type { DungeonLayout, RoomLayout } from '../world/dungeonKit';
 import { BONE, blob, DARK, IRON, place, round, wb, type Frame, type Out, type Wall } from './dungeonFurniture';
 import { scaleRgb, type Rgb } from './palette';
+import { onWall } from './furnitureKit';
+import { tint } from './meshKit';
 import { doorsOn, slab, stroke, wallOf, type Side } from './roomWalls';
 
 /** The extra groups a hall's walls draw into, beside a furniture's. */
@@ -147,10 +149,16 @@ function farPiece(kind: FarPiece, w: Wall, y: number, c: Rgb, glow: Rgb, out: Ha
     for (const k of [-0.85, 0.85]) out.wall.push(wb(f, k, 0.4, 0.2, 0.8, 0.95, 0.6, body));
     out.trim.push(wb(f, 0, 0.26, 1.9, 0.06, 0.16, 4.1, edge), wb(f, -0.95, 0.26, 0.08, 0.06, 3.5, 0.6, edge), wb(f, 0.95, 0.26, 0.08, 0.06, 3.5, 0.6, edge));
     out.wall.push(blob(f, 0, 0.2, 0.32, 4.5, edge, 1.2));
+    out.wall.push(wb(f, 0, 0.26, 0.9, 0.24, 0.5, 4.2, body)); // round 117: the back's crest, and a finial on each arm's front post
+    for (const k of [-0.85, 0.85]) out.wall.push(blob(f, k, 0.72, 0.13, 1.68, edge, 1));
+    out.cloth.push(wb(f, 0, 0.42, 1.36, 0.66, 0.12, 1.2, scaleRgb(glow, 0.45))); // a cushion, gone dark with its years
   } else if (kind === 'hearth') { // a great cold fireplace and its chimney breast
     out.wall.push(wb(f, 0, 0.45, 3.4, 0.9, 5.9, 0, scaleRgb(c, 0.85)));
     out.trim.push(wb(f, 0, 0.93, 2.2, 0.06, 1.7, 0.1, [0.05, 0.04, 0.04]), wb(f, 0, 1.0, 3.8, 0.24, 0.18, 1.9, scaleRgb(c, 0.7)));
     for (let k = 0; k < 4; k++) out.wall.push(blob(f, -0.6 + k * 0.4, 0.95, 0.1, 0.12, [0.12, 0.1, 0.09], 0.6)); // ash and the black of old fires
+    for (const k of [-0.7, 0.7]) out.wall.push(wb(f, k, 1.15, 0.08, 0.5, 0.42, 0, IRON), blob(f, k, 1.38, 0.06, 0.48, IRON, 1)); // round 117: its andirons,
+    out.wood.push(onWall(f, tint(new THREE.CylinderGeometry(0.12, 0.13, 1.7, 7).rotateZ(Math.PI / 2), [0.16, 0.12, 0.1]), 0, 1.15, 0.54)); // a log burnt half through laid across them,
+    for (const k of [-1.3, 1.3]) out.wall.push(round(f, k, 1.0, 0.05, 0.3, 2.08, [0.7, 0.66, 0.56], 6)); // and candlesticks on the mantel
   } else { // an arch standing free of the wall, its edge alight: the way out of the world
     const stone = scaleRgb(c, 0.6);
     for (const k of [-2.2, 2.2]) out.wall.push(wb(f, k, 0.8, 0.6, 0.6, 4.4, 0, stone));
