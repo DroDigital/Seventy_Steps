@@ -8,7 +8,8 @@
 
 import * as THREE from 'three';
 import type { WallItem } from '../data/dungeonLooks';
-import { blob, BONE, DARK, IRON, round, wb, type Frame } from './dungeonFurniture';
+import { blob, BONE, DARK, IRON, round, wb, type Frame } from './furnitureKit';
+import { bookcase } from './kitItems';
 import { tint } from './meshKit';
 import { stroke } from './roomWalls';
 import { scaleRgb, type Rgb } from './palette';
@@ -28,7 +29,7 @@ export const LORE_ITEMS: Readonly<Record<LoreItem, (f: Frame) => void>> = {
   lectern(f) {
     f.out.wood.push(wb(f, 0, 0.7, 0.5, 0.5, 0.15, 0, DARK), wb(f, 0, 0.7, 0.16, 0.16, 0.9, 0.15, DARK), wb(f, 0, 0.7, 0.75, 0.55, 0.18, 1.05, scaleRgb(DARK, 1.15))); // (its desk deep enough that the post's top in it is no fight)
     f.out.beam.push(wb(f, -0.17, 0.7, 0.32, 0.42, 0.05, 1.23, PAGE), wb(f, 0.17, 0.7, 0.32, 0.42, 0.05, 1.23, scaleRgb(PAGE, 0.94))); // the open book
-    f.out.wood.push(...[-0.8, 0.8].map((s) => wb(f, s, 0.3, 0.5, 0.45, 1.6, 0, scaleRgb(DARK, 0.9)))); // a case of books either side
+    for (const s of [-0.85, 0.85]) bookcase(f, s, 0.62, 1.6, 3, 'ledgers'); // a case of books either side (round 117: they were bare slabs)
   },
   ossuary(f) {
     f.out.wall.push(wb(f, 0, 0.3, 2.2, 0.6, 2.6, 0, scaleRgb(f.c, 0.8)));
