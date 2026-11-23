@@ -11,20 +11,23 @@ import type { PineForm, PropLook } from '../data/propLooks';
 import type { Prop } from '../world/props';
 import { tileUv, tint } from './meshKit';
 import { mixRgb, scaleRgb, type Rgb } from './palette';
-import { cyl, join, limb, topCoat } from './propKit';
+import { boughCone, cyl, join, limb, roots, roughen, shadeBelow, topCoat } from './propKit';
 import type { Piece } from './propShapes';
 
 const SNOW: Rgb = [0.9, 0.9, 0.93];
 
-/** A cone of boughs `r` wide and `h` tall whose foot is at `y`, set off by (dx, dz), its colour with snow on its upper faces when the realm has it. */
+/**
+ * A cone of boughs `r` wide and `h` tall whose foot is at `y`, set off by (dx, dz), its colour with snow on its upper faces when the realm
+ * has it. Round 117: its rim is a skirt of `seg` hanging bough tips (propKit.ts boughCone), not a smooth lampshade, and its underside dark.
+ */
 function tier(r: number, h: number, y: number, c: Rgb, rng: Rng, look: PropLook, seg = 7, dx = 0, dz = 0): THREE.BufferGeometry {
-  const g = tint(tileUv(new THREE.ConeGeometry(r, h, seg), Math.PI * r, h), c).rotateY(rng() * 3).translate(dx, y + h / 2, dz);
+  const g = shadeBelow(tint(tileUv(boughCone(r, h, seg), Math.PI * r, h), c), 0.4).rotateY(rng() * 3).translate(dx, y + h / 2, dz);
   return look.snow ? topCoat(g, SNOW, 0.35) : g;
 }
 
 /** Tiers from `from` (a share of the height) to the top, each narrower: the fir's, the spruce's and the hemlock's, by their count and spread. */
 function stacked(p: Prop, rng: Rng, look: PropLook, bark: Rgb, o: { tiers: number; from: number; step: number; spread: number; tall: number; taper: number; seg: number; lean?: number; tone?: number }): Piece[] {
-  const trunk = cyl(p.w, p.w * 0.5, p.h * (o.from + 0.1), 5, bark);
+  const trunk = join([cyl(p.w, p.w * 0.5, p.h * (o.from + 0.1), 5, bark), cyl(p.w * 1.5, p.w, 0.4, 5, scaleRgb(bark, 0.85)), ...roots(p.w * 1.3, 3, 0.5, scaleRgb(bark, 0.85), rng, 0.15)]); // its flared foot and roots
   const boughs: THREE.BufferGeometry[] = [];
   const c = scaleRgb(look.needles, (o.tone ?? 0.95) + 0.2 * rng()); // one green for the whole tree: tiers that overlap in two greens fight for the depth (the view audit)
   for (let k = 0; k < o.tiers; k++) {
@@ -33,6 +36,7 @@ function stacked(p: Prop, rng: Rng, look: PropLook, bark: Rgb, o: { tiers: numbe
     const off = (o.lean ?? 0) * t * p.h;
     boughs.push(tier(r, p.h * o.tall, p.h * (o.from + o.step * t), c, rng, look, o.seg, off, 0));
   }
+  boughs.push(tier(p.h * o.spread * 0.18, p.h * 0.1, p.h * 0.93, c, rng, look, 4)); // the leader standing out of the top tier
   return [{ mat: 'wood', geo: trunk }, { mat: 'leaf', geo: join(boughs) }];
 }
 
@@ -64,15 +68,17 @@ function snag(p: Prop, rng: Rng, look: PropLook, bark: Rgb): Piece[] {
   return tufts.length ? [{ mat: 'wood', geo: join(wood) }, { mat: 'leaf', geo: join(tufts) }] : [{ mat: 'wood', geo: join(wood) }];
 }
 
-/** A cypress: a short trunk and a tall dark column of foliage, narrowing to a point. */
+/**
+ * A cypress: a short trunk and a tall dark flame of foliage, swelling from a narrow foot to its widest a third of the way up and drawn to
+ * a point (round 117: a lathed column, its face tufted; it was a cylinder wider at its top than its foot under a cone, a pencil).
+ */
 function cypress(p: Prop, rng: Rng, look: PropLook, bark: Rgb): Piece[] {
   const r = p.h * (0.09 + 0.03 * rng());
   const trunk = cyl(p.w, p.w * 0.6, p.h * 0.2, 5, bark);
-  const body = [
-    tint(tileUv(new THREE.CylinderGeometry(r, r * 0.7, p.h * 0.45, 7).translate(0, p.h * 0.15 + p.h * 0.225, 0), Math.PI * r, p.h * 0.45), scaleRgb(look.needles, 0.85)),
-    tier(r, p.h * 0.45, p.h * 0.6, scaleRgb(look.needles, 0.85), rng, look, 7),
-  ];
-  return [{ mat: 'wood', geo: trunk }, { mat: 'leaf', geo: join(body) }];
+  const shape: [number, number][] = [[0, 0.12], [0.5, 0.12], [0.85, 0.24], [1, 0.38], [0.92, 0.54], [0.7, 0.7], [0.42, 0.84], [0.16, 0.95], [0, 1]];
+  const lathe = new THREE.LatheGeometry(shape.map(([k, t]) => new THREE.Vector2(k * r, t * p.h)), 9);
+  const body = shadeBelow(roughen(tint(tileUv(lathe, Math.PI * r * 2, p.h), scaleRgb(look.needles, 0.85)), 0.14, rng() * 100, [0, 0, 0], true), 0.3);
+  return [{ mat: 'wood', geo: trunk }, { mat: 'leaf', geo: look.snow ? topCoat(body, SNOW, 0.3) : body }];
 }
 
 /** A conifer of `form`, of the realm's look. */
