@@ -4,31 +4,13 @@
  * the left shoulder to the right hip behind, a fedora with its band and pin over short hair and a lean face, gloves that close round what they hold, laced boots, the
  * lantern at the belt, the revolver in its holster, an oil flask on the belt; and what they take up: the sword-cane (a stick, and the blade drawn from it), the found
  * weapons, the revolver, the lobbed flask, the Laudanum, the Reagent's syringe, the Powder of Ibn Ghazi, a match, the book of the incantation. The joints are the
- * old figure's (a pose written for it fits), the parts hang on them as figures.ts's `skeleton` has them. The people's coat skirts (npcFigures.ts) are still `skirtPanel`.
+ * old figure's (a pose written for it fits), the parts hang on them as figures.ts's `skeleton` has them. The people's coat skirts are bodyKit's `coatSkirt` (round 116).
  */
 
 import * as THREE from 'three';
 import { PLAYER_PARTS, type PlayerPart } from '../data/player/playerIndex';
 import { part, skeleton, type Figure } from './figures';
-import { tint } from './meshKit';
 import { partGeometry } from './playerParts';
-import type { Rgb } from './palette';
-
-/**
- * One half of the coat's skirt, a closed flared shell from the belt to the knee that hangs at the hip
- * and swings with its thigh (poses.ts), so a striding leg stays inside the coat. (The people's: the investigator's are baked.)
- */
-export function skirtPanel(side: 1 | -1, c: Rgb): THREE.BufferGeometry {
-  const g = new THREE.BoxGeometry(1, 1, 1);
-  const p = g.getAttribute('position');
-  for (let i = 0; i < p.count; i++) {
-    const t = 0.5 - p.getY(i); // 0 at the belt, 1 at the hem
-    const out = p.getX(i) + 0.5; // 0 at the middle, 1 at the side
-    p.setXYZ(i, side * (0.006 + out * (0.205 + 0.035 * t)), 0.03 - 0.46 * t, p.getZ(i) * 2 * (0.125 + 0.045 * t));
-  }
-  g.computeVertexNormals();
-  return tint(g, c);
-}
 
 /** The figure's frame, as `skeleton` builds it for the investigator (tools/player/frame.py has the same numbers). */
 const FRAME = { hip: 0.92, shoulder: [0.28, 0.58], hipX: 0.11, neck: [0.64, 0], leg: 0.9, thigh: 0.42, upper: 0.3, fore: 0.28, ankle: 0.07 } as const;

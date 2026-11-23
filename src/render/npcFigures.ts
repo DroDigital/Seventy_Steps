@@ -14,9 +14,8 @@ import { WARE_SHOWN } from '../data/fxTuning';
 import { ACTS, SEATED } from '../data/npcActs';
 import { npcDef, type NpcLook } from '../data/npcs';
 import { SHOPS, WARES, type WareId } from '../data/wares';
-import { bevel, coatForms, faceForms, fist, foreArm, prism, shin, shoe, thigh, upperArm } from './bodyKit';
+import { bevel, coatForms, coatSkirt, faceForms, fist, foreArm, loft, prism, shin, shoe, thigh, upperArm } from './bodyKit';
 import { cylinder, part, shade, skeleton, type Figure, type Loose } from './figures';
-import { skirtPanel } from './investigator';
 import { addProps } from './npcProps';
 import { box, tint } from './meshKit';
 import { ANOMALY, BASE, mixRgb, type Rgb } from './palette';
@@ -68,15 +67,20 @@ function hat(look: NpcLook, dark: Rgb, band: Rgb): THREE.BufferGeometry | null {
   }
 }
 
-/** Hair, cut one way or another, over a skull of 0.2 × 0.24 (the hat sits on it). */
+/** Hair, cut one way or another, over the skull (the hat sits on it). Round 116: a cap turned to the skull's crown from the brow up and a fall behind, where blocks were; the cut adds a parting, tufts, a long fall or the temples' locks. */
 function hairOf(cut: Cut, c: Rgb): THREE.BufferGeometry[] {
-  if (cut === 'bald') return [box(0.06, 0.12, 0.04, -0.105, 0.13, -0.03, c), box(0.06, 0.12, 0.04, 0.105, 0.13, -0.03, c)];
-  const cap = [box(0.212, 0.075, 0.15, 0, 0.215, -0.03, c), box(0.205, 0.1, 0.06, 0, 0.15, -0.085, c)];
-  if (cut === 'combed') return [...cap, box(0.216, 0.03, 0.05, 0, 0.245, 0.06, shade(c, 1.1)), box(0.03, 0.09, 0.14, -0.108, 0.17, -0.01, c), box(0.03, 0.09, 0.14, 0.108, 0.17, -0.01, c)];
-  if (cut === 'wild') return [...cap, box(0.07, 0.05, 0.06, -0.09, 0.265, 0.02, c), box(0.08, 0.06, 0.06, 0.07, 0.275, -0.02, c), box(0.04, 0.12, 0.1, -0.12, 0.14, -0.06, c), box(0.04, 0.12, 0.1, 0.12, 0.14, -0.06, c)];
-  if (cut === 'long') return [...cap, box(0.23, 0.3, 0.05, 0, 0.04, -0.12, c), box(0.04, 0.26, 0.12, -0.12, 0.06, -0.03, c), box(0.04, 0.26, 0.12, 0.12, 0.06, -0.03, c)];
-  return [...cap, box(0.03, 0.06, 0.12, -0.108, 0.16, -0.02, c), box(0.03, 0.06, 0.12, 0.108, 0.16, -0.02, c)];
+  const lock = (x: number, top: number, low: number): THREE.BufferGeometry => prism(x, (top + low) / 2, -0.015, 0.03, 0.15, 0.028, 0.13, top - low, c, 0.008); // at a temple, down to the ear
+  if (cut === 'bald') return [lock(-0.104, 0.19, 0.09), lock(0.104, 0.19, 0.09)];
+  const cap = loft([{ y: 0.19, rx: 0.106, rz: 0.11, z: 0.006 }, { y: 0.226, rx: 0.103, rz: 0.108, z: 0.004 }, { y: 0.252, rx: 0.074, rz: 0.084 }, { y: 0.266, rx: 0.03, rz: 0.036, z: -0.004 }], c, 10, 2.6);
+  const back = loft([{ y: 0.06, rx: 0.088, rz: 0.05, z: -0.06 }, { y: 0.2, rx: 0.104, rz: 0.06, z: -0.052 }], shade(c, 0.95), 10, 2.4);
+  if (cut === 'combed') return [cap, back, prism(0.04, 0.262, 0.01, 0.06, 0.16, 0.05, 0.14, 0.012, shade(c, 1.12), 0.004), lock(-0.105, 0.2, 0.12), lock(0.105, 0.2, 0.12)]; // the parting's sheen
+  if (cut === 'wild') return [cap, back, ...([[-0.08, 0.27, 0.03, 0.4], [0.06, 0.275, -0.02, -0.5], [-0.11, 0.2, -0.05, 0.9], [0.11, 0.19, -0.06, -0.9], [0, 0.24, -0.1, 0]] as const).map(([x, y, z, rz]) => slab(0.07, 0.06, 0.06, x, y, z, c, rz)), lock(-0.112, 0.2, 0.08), lock(0.112, 0.2, 0.08)];
+  if (cut === 'long') return [cap, back, prism(0, -0.04, -0.105, 0.2, 0.04, 0.22, 0.05, 0.3, shade(c, 0.95), 0.012), lock(-0.11, 0.2, -0.04), lock(0.11, 0.2, -0.04)];
+  return [cap, back, lock(-0.106, 0.2, 0.13), lock(0.106, 0.2, 0.13)];
 }
+
+/** A moustache in two halves, each drooping at its end (round 116: one block across the lip before). */
+const moustache = (c: Rgb): THREE.BufferGeometry[] => ([-1, 1] as const).map((side) => slab(0.065, 0.022, 0.03, side * 0.032, 0.072, 0.138, shade(c, 1.05), side * -0.28));
 
 /** How freely each hat sits on the head in a breeze (a cap is snug; a bowler or a fedora is not). */
 const HAT_FREE: Readonly<Partial<Record<NpcLook['hat'], number>>> = { fedora: 1, bowler: 0.75, cap: 0.4, band: 0.3 };
@@ -174,7 +178,7 @@ export function npcFigure(id: string): Figure {
       const panel = new THREE.Group();
       f.body.add(panel);
       f.skirt.push(panel);
-      part(f, panel, skirtPanel(side, coatC), 'cloth');
+      part(f, panel, coatSkirt(side, coatC), 'cloth'); // (round 116: turned, where a flat panel was)
     }
   }
 
@@ -184,8 +188,8 @@ export function npcFigure(id: string): Figure {
     bevel(0.17, 0.025, 0.03, 0, 0.172, 0.112, shade(hair, 0.9), 0.008), // brow
     ...hairOf(look.hat === 'none' || who.cut !== 'short' ? who.cut : 'short', hair),
   ];
-  if (look.beard) head.push(box(0.19, 0.12, 0.08, 0, 0.02, 0.1, hair), box(0.12, 0.1, 0.07, 0, -0.06, 0.1, shade(hair, 0.95)), box(0.1, 0.03, 0.03, 0, 0.075, 0.14, shade(hair, 1.05)));
-  else if (has('moustache')) head.push(box(0.12, 0.03, 0.04, 0, 0.075, 0.135, hair));
+  if (look.beard) head.push(loft([{ y: -0.11, rx: 0.025, rz: 0.025, z: 0.105 }, { y: -0.05, rx: 0.065, rz: 0.045, z: 0.095 }, { y: 0.02, rx: 0.098, rz: 0.06, z: 0.075 }, { y: 0.085, rx: 0.104, rz: 0.06, z: 0.05 }], hair, 8, 2.2), ...moustache(hair)); // (round 116: a beard turned about the jaw, coming to its point)
+  else if (has('moustache')) head.push(...moustache(hair));
   if (has('spectacles') || look.glasses) { // thin rims round the eyes, a bridge and the arms to the ears (round 38: they were two solid lenses and a bar across the face, and read as sunglasses)
     const rim = shade(BASE.charcoal, 1.6);
     for (const x of [-0.05, 0.05]) head.push(box(0.08, 0.008, 0.012, x, 0.18, 0.13, rim), box(0.08, 0.008, 0.012, x, 0.12, 0.13, rim), box(0.008, 0.06, 0.012, x - 0.04, 0.15, 0.13, rim), box(0.008, 0.06, 0.012, x + 0.04, 0.15, 0.13, rim));
