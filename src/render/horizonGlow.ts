@@ -12,6 +12,7 @@ import { BEAM, DOME, GLOWING, LAMPS, type LampDef } from '../data/horizonLife';
 import type { Silhouette } from '../data/skylines';
 import { windowShare } from '../systems/clock';
 import type { Weather } from '../systems/weather';
+import type { Veil } from './skylineMesh';
 import type { Profile } from './skylineShapes';
 
 const smooth = (a: number, b: number, x: number): number => {
@@ -66,30 +67,42 @@ export function lampPlace(f: Profile, lamp: LampDef): { x: number; y: number } |
 }
 
 /**
- * The silhouette's geometry with its extra quads: the glow over a town (`dome`) first, then the outline `base`, then the lamp's, so the roofs
- * are drawn over the glow and the light over the roofs. Every vertex has `aFx`: its kind (0 outline, 1 glow, 2 lamp) and the quad's own coordinates.
+ * The silhouette's geometry with its extra quads, in the order they are drawn: its back layers (round 117: render/skylineMesh.ts), the glow
+ * over a town (`dome`: the town's light lies in the air before the land behind it), the outline `base`, then its `veils` (the bank of mist
+ * at its foot, a belt of cloud), then the lamp's, so the roofs stand against the glow, the mist lies over the roofs and the light over all.
+ * Every vertex has `aFx`: its kind (0 outline, 1 glow, 2 lamp, 3 veil), the quad's own coordinates and a veil's type; and `aShape`, the
+ * outline's own (render/skylineMesh.ts), carried over from `base`, whose `userData.back` says how many of its indices are its back layers'.
  */
-export function glowGeometry(base: THREE.BufferGeometry, dome: boolean, lamp: { x: number; y: number } | null): THREE.BufferGeometry {
+export function glowGeometry(base: THREE.BufferGeometry, dome: boolean, lamp: { x: number; y: number } | null, veils: readonly Veil[] = []): THREE.BufferGeometry {
   const pos: number[] = [];
   const fx: number[] = [];
+  const shape: number[] = [];
   const index: number[] = [];
-  const add = (x: number, y: number, kind: number, u = 0, v = 0): number => (pos.push(x, y, 0), fx.push(kind, u, v, 0), pos.length / 3 - 1);
-  const quad = (kind: number, c: readonly (readonly [number, number, number, number])[]): void => {
-    const [a, b, d, e] = c.map(([x, y, u, v]) => add(x, y, kind, u, v));
+  const add = (x: number, y: number, z: number, kind: number, u = 0, v = 0, w = 0): number => (pos.push(x, y, z), fx.push(kind, u, v, w), shape.push(0, 0, 0, 0), pos.length / 3 - 1);
+  const quad = (kind: number, c: readonly (readonly [number, number, number, number])[], z = 0, w = 0): void => {
+    const [a, b, d, e] = c.map(([x, y, u, v]) => add(x, y, z, kind, u, v, w));
     index.push(a, b, d, a, d, e);
   };
+  const from = base.getAttribute('position');
+  const own = base.getAttribute('aShape');
+  for (let i = 0; i < from.count; i++) {
+    add(from.getX(i), from.getY(i), from.getZ(i), 0);
+    if (own) shape.splice(shape.length - 4, 4, own.getX(i), own.getY(i), own.getZ(i), own.getW(i));
+  }
+  const all = Array.from(base.index!.array);
+  const back = Math.min(all.length, (base.userData.back as number | undefined) ?? 0);
+  for (const i of all.slice(0, back)) index.push(i);
   if (dome) {
     const { across: w, below, above } = DOME.box;
     quad(1, [[-w, -below, 0, 0], [w, -below, 1, 0], [w, above, 1, 1], [-w, above, 0, 1]]);
   }
-  const first = pos.length / 3;
-  const from = base.getAttribute('position');
-  for (let i = 0; i < from.count; i++) add(from.getX(i), from.getY(i), 0);
-  for (const i of base.index!.array) index.push(i + first);
+  for (const i of all.slice(back)) index.push(i);
+  for (const v of veils) quad(3, [[v.x0, v.y0, 0, 0], [v.x1, v.y0, 1, 0], [v.x1, v.y1, 1, 1], [v.x0, v.y1, 0, 1]], v.z, v.type);
   if (lamp) quad(2, [[lamp.x, lamp.y, -1, -1], [lamp.x, lamp.y, 1, -1], [lamp.x, lamp.y, 1, 1], [lamp.x, lamp.y, -1, 1]]);
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('aFx', new THREE.Float32BufferAttribute(fx, 4));
+  g.setAttribute('aShape', new THREE.Float32BufferAttribute(shape, 4));
   g.setIndex(index);
   return g;
 }
