@@ -4,7 +4,8 @@
  * taken away (or given back) in an order, each style with its own rim and its own movement of the rest;
  * a wound is the darkness of a wet patch laid over the pixels it falls on, and the flash of a blow is a
  * pool of light about where it fell.
- *   aFx    x how far gone (0 whole .. 1 gone), y the style (1 crumble, 2 burn, 3 melt, 4 shatter, 5 rise),
+ *   aFx    x how far gone (0 whole .. 1 gone), y the style (1 crumble, 2 burn, 3 melt, 4 shatter, 5 rise; from 16 a horror's
+ *          own death, shaders/deathFx.ts),
  *          z how much of its health it has lost, w a seed of its own
  *   aWound x, y where the last blow fell on the picture (0..1 across, 0..1 up), z its flash left, w the metres it reaches
  *   aCut   (round 113, render/goreCut.ts) a killing cut: x, y a point of its line in the frame (y down), z what this billboard is
@@ -15,6 +16,7 @@
  */
 
 import { BLOOD, GORE_FX } from '../../data/gore';
+import { DEATH_FX_GLSL } from './deathFx';
 
 /** The bloods by the index the shader is told (aPiece.w): 0 is none. */
 export const BLOOD_ORDER = ['red', 'dark', 'ichor', 'black', 'pale', 'yellow', 'dust'] as const;
@@ -31,6 +33,7 @@ varying vec2 vSize; // metres
 
 /** The place in its frame: x across, y down (0 at the top). */
 vec2 fxCell(vec2 uv) { return (uv - vCell.xy) / (vCell.zw - vCell.xy); }
+${DEATH_FX_GLSL}
 
 /** The colour of the blood of index k (BLOOD_ORDER, from 1), and none (0) the ichor of before. */
 vec3 bloodColour(float k) {
@@ -71,7 +74,8 @@ vec3 fxSource(vec2 uv) {
   float st = vFx.y;
   vec2 p = fxCell(uv);
   float col = hash12(vec2(floor(uv.x * float(textureSize(uAtlas, 0).x)), 7.0 + vFx.w));
-  if (st < 1.5 || st > 4.5) p.y -= s * s * (0.18 + 0.7 * col); // the columns of texels fall (and, the other way about in time, come up out of the ground)
+  if (st > 15.5) p = deathSource(p, s); // a horror's own death (deathFx.ts)
+  else if (st < 1.5 || st > 4.5) p.y -= s * s * (0.18 + 0.7 * col); // the columns of texels fall (and, the other way about in time, come up out of the ground)
   else if (st > 2.5 && st < 3.5) p.y = 1.0 - (1.0 - p.y) / max(1.0 - 0.78 * s, 0.06); // the body sinks into itself, to the ground
   else if (st > 3.5) p += (vec2(hash12(floor(p * 11.0) + vFx.w), hash12(floor(p * 11.0) + 3.1)) - 0.5) * 0.06 * s; // it comes apart in blocks
   vec2 inside = step(vec2(0.0), p) * step(p, vec2(1.0));
@@ -94,6 +98,7 @@ float fxOrder(vec2 uv) {
 bool fxKeep(vec2 uv, inout vec3 col) {
   float s = vFx.x;
   if (s <= 0.0) return true;
+  if (vFx.y > 15.5) return deathKeep(uv, col, s); // a horror's own (deathFx.ts)
   if (s >= 0.995) return false;
   float o = fxOrder(uv);
   if (o < s) return false;

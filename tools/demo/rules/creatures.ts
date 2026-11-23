@@ -114,6 +114,8 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/endings.ts', decl: 'ENDING_IDS', shape: 'elements', by: 'self', keep: () => false }, // (the endings are the rest of the game's)
   { file: 'src/render/sprites/reviewedMerge.ts', decl: 'ALLIED_ART_KEYS', shape: 'elements', by: 'self', keep: entities }, // (the allies the demo keeps: its art)
   { file: 'src/data/gore.ts', decl: 'GORE', shape: 'properties', keep: entities }, // (each creature's break and blood, round 113)
+  byEntity('src/data/bossDeathsWaking.ts', 'WAKING_DEATHS'), // (each horror's own death, 2026-11-23)
+  byEntity('src/data/bossDeathsDeep.ts', 'DEEP_DEATHS'),
   { file: 'src/data/hallLore.ts', decl: 'EARTH_LORE', shape: 'properties', keep: halls }, // (a boss hall's lore, by its first boss: round 108)
   { file: 'src/data/hallLoreLairs.ts', decl: 'LAIR_LORE', shape: 'properties', keep: halls },
 ];

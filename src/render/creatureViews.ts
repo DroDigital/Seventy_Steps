@@ -112,7 +112,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
     if (piece) b.mesh.setMatrixAt(index, m4.compose(at.set(piece.x, piece.y - 0.5 * size.height * GORE_FX.pad, piece.z), q, scale.set(size.width * GORE_FX.pad, size.height * GORE_FX.pad, 1))); // a severed piece: a larger billboard about its middle (round 113)
-    else b.mesh.setMatrixAt(index, m4.compose(at.set(x, y - size.groundOffset - pose.sink * size.height * 0.3, z), q, scale.set(size.width * (1 + 0.4 * say), size.height * (1 + say), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height)
+    else b.mesh.setMatrixAt(index, m4.compose(at.set(x + (pose.drift?.x ?? 0) * size.width, y - size.groundOffset + ((pose.lift ?? 0) - pose.sink * 0.3) * size.height, z + (pose.drift?.z ?? 0) * size.width), q, scale.set(size.width * (1 + 0.4 * say) * (pose.sx ?? 1), size.height * (1 + say) * (pose.sy ?? 1), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height; its own death moves the whole of it, data/bossDeaths.ts)
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     b.ground.setXYZW(index, piece ? 0 : standing[0], piece ? 0 : standing[1], standing[2], standing[3]);
     const glint = REVIEWED_GLINTS[key];
@@ -261,7 +261,8 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const yaw = tr.prevYaw + wrapAngle(tr.yaw - tr.prevYaw) * alpha;
           const aim = stooped(g, id) ? STOOP_LEAN : look.state === 'attack' ? look.lash : look.state === 'hurt' ? -0.3 : 0; // a colossus stooped after its blow bends to its prey (hurt.ts)
           const lean = (asm.lean += (aim - asm.lean) * 0.25);
-          asm.root.position.set(x, y - look.sink * h * 0.6, z);
+          asm.root.position.set(x + (look.drift?.x ?? 0) * h, y + ((look.lift ?? 0) - look.sink * 0.6) * h, z + (look.drift?.z ?? 0) * h);
+          asm.root.scale.set(look.sx ?? 1, look.sy ?? 1, look.sx ?? 1); // (a horror's own death: data/bossDeaths.ts)
           asm.root.rotation.y = yaw;
           asm.animate(time, look.lash, lean);
           for (const m of asm.materials) [m.uniforms.uEmissive.value, m.uniforms.uGhost.value] = [(m.userData.emissive as number) + flash + BOSS_PRESENCE.bodyGlow * (0.5 * deep + voice), 1 - (look.appear ?? 1)]; // (a horror just roused is dithered in)
@@ -282,12 +283,13 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
         cells.setXYZW(n, cx / atlas.width, cy / atlas.height, (cx + CELL) / atlas.width, (cy + CELL) / atlas.height);
         const facingRight = Math.sin(tr.yaw) * right.x + Math.cos(tr.yaw) * right.z >= 0;
         info.setXYZW(n, flash, look.opacity, facingRight ? 0 : 1, def.sprite.outside ? 1 : 0);
-        fx.dress(fallback, n, { id, gone }, x, y - look.sink * def.sprite.scale * 0.3, z, def.sprite.scale, def.sprite.scale, flat, time);
+        const [fx0, fy0, fz0] = [x + (look.drift?.x ?? 0) * def.sprite.scale, y + ((look.lift ?? 0) - look.sink * 0.3) * def.sprite.scale, z + (look.drift?.z ?? 0) * def.sprite.scale]; // (a horror's own death moves it: data/bossDeaths.ts)
+        fx.dress(fallback, n, { id, gone }, fx0, fy0, fz0, def.sprite.scale, def.sprite.scale, flat, time);
         weird.setX(n, Math.max(WRONGNESS[def.tier], g.ecs.c.phantom.has(id) ? PHANTOM_WEIRD : 0));
         const size = def.sprite.scale;
         painted.set(id, size * 0.45);
         if (!def.sprite.outside && def.sprite.silhouette !== 'spectre' && look.opacity >= CAST.least) castSilhouettes.put(0, n, x, z, size * 0.8, 0, 0, 1 - gone.amount, from);
-        batch.setMatrixAt(n++, m4.compose(at.set(x, y - look.sink * size * 0.3, z), q, scale.set(size, size, 1)));
+        batch.setMatrixAt(n++, m4.compose(at.set(fx0, fy0, fz0), q, scale.set(size * (look.sx ?? 1), size * (look.sy ?? 1), 1)));
         glow.eyes(cell, x, y - look.sink * size * 0.3, z, size, !facingRight, look, camera.position, glow.mistLook(id, time));
       }
       arrivals.forget(seen);
