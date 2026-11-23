@@ -73,7 +73,7 @@ export const SKYLINES: Readonly<Record<string, readonly Silhouette[]>> = {
   pnakotus: [s('dunes', 250, 900, 1800, 100, 47, { fade: 0.2 }), s('towers', 620, 700, 700, 170, 38)],
   kn_yan: [s('towers', 300, 800, 900, 150, 39, { lit: 0.35, glow: 'cyan' })],
   dreamlands: [
-    s('peak', 520, 1500, 1100, 560, 3), // unknown Kadath, in the cold waste
+    s('peak', 520, 1500, 1100, 560, 3, { lit: 0.22, glow: 'gold' }), // unknown Kadath, in the cold waste, a few windows of its onyx castle lit (round 117)
     s('minarets', 1100, 400, 700, 130, 40, { lit: 0.3, glow: 'gold' }), // Celephaïs, on its sea
     s('range', -350, 500, 1500, 320, 41, { fade: 0.3 }),
   ],
