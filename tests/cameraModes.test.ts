@@ -83,9 +83,9 @@ function up(rig: CameraRig, pivot: V3, p: V3): number {
 }
 
 describe('the setting', () => {
-  it('names a look for each value: Low hero for the default, Classic below the range and Tight shoulder above it', () => {
+  it('names a look for each value, Classic for the default and Tight shoulder for what is out of range', () => {
     expect(CAMERA_MODE_IDS.map((_, i) => cameraModeOf(i))).toEqual(['classic', 'hero', 'shoulder']);
-    expect(cameraModeOf(SETTINGS.camera[3])).toBe('hero');
+    expect(cameraModeOf(SETTINGS.camera[3])).toBe('classic');
     expect(cameraModeOf(-4)).toBe('classic');
     expect(cameraModeOf(99)).toBe('shoulder');
     expect(SETTINGS.camera[1]).toBe(CAMERA_MODE_IDS.length - 1);

@@ -29,7 +29,7 @@ game's hit sphere, the tip's trail) in seconds. **That is what you run again and
 `tools/player/clips/<module>.py` has `build() -> [Clip]`. Modules: `locomotion` (idle, walk, run, sprint, `<weapon>.guard`), `cane`, `axe`, `razor`, `cutlass`, `rapier`
 (`light1`…, `heavy1`…, `parry`), `actions` (roll, backstep, shoot, reload, drink, inject, throw), `rites` (scatter, kindle, chant, helm), `reactions` (stagger, guardBreak, parried,
 death). A clip's id is what the game looks up: `<weapon>.<move>` for `light*`, `heavy*`, `parry` and `guard`, else the move's own name (`playerPose.ts`: `idOf`). Start from
-`clips/cane.py::light1`, the worked example; `clips/common.py` has the helpers; `clipkit.py`'s docstring is the full DSL.
+`clips/cane.py::light1`, the worked example; `clips/common.py` has the helpers (`clips/aim.py`: an arm whose joints are found each frame to point the blade where the clip keys it in the world, near a posture; the roll's weapon arm); `clipkit.py`'s docstring is the full DSL.
 
 ```python
 m = timing('cane', 'light1')        # the game's numbers: m.frames, m.hit0/hit1/arc, m.item, m.shot, m.volley, m.parry, m.iframes, m.cancel, m.release, m.motion, m.hold
