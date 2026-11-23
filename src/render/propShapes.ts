@@ -18,9 +18,11 @@ import { rockOf } from './rockForms';
 import { bushOf, logOf, stumpOf } from './shrubForms';
 import { graveOf, monolithOf, pillarOf } from './stoneForms';
 import { treeOf } from './treeForms';
+import { fenceOf, wallOf } from './fieldForms';
+import { ruinOf } from './ruinForms';
 import { setPieces } from './setShapes';
 import { box, tileUv, tint } from './meshKit';
-import { cyl } from './propKit';
+import { cyl, join, lump, stem } from './propKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
 export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
@@ -60,37 +62,6 @@ function obelisk(p: Prop, c: Rgb): Piece[] {
   return [{ mat: 'stone', geo: tint(tileUv(mergeGeometries([shaft, tip, base]), 1, 2), scaleRgb(c, 0.95)) }];
 }
 
-function brokenWall(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const n = 3;
-  const seg = (p.w * 2) / n;
-  const parts = Array.from({ length: n }, (_, k) => {
-    const h = p.h * (0.35 + 0.65 * rng());
-    return tileUv(box(seg, h, p.d * 2, -p.w + seg * (k + 0.5), h / 2, 0, scaleRgb(c, 0.85 + 0.2 * rng()), 1), seg, h);
-  });
-  for (let k = 0; k < 3; k++) parts.push(tileUv(box(0.5, 0.35, 0.5, (rng() - 0.5) * p.w * 2, 0.17, p.d + 0.5 + rng(), c), 0.5, 0.5));
-  return [{ mat: 'stone', geo: mergeGeometries(parts) }];
-}
-
-/** A dry-stone field wall: a waist-high run of rough stones, uneven along its top. */
-function fieldWall(p: Prop, rng: Rng, c: Rgb): Piece[] {
-  const parts: THREE.BufferGeometry[] = [];
-  const n = Math.max(2, Math.round(p.w * 1.4));
-  for (let k = 0; k < n; k++) {
-    const len = (p.w * 2) / n;
-    const h = p.h * (0.8 + 0.35 * rng());
-    parts.push(tileUv(box(len * 1.02, h, p.d * 2 * (0.85 + 0.3 * rng()), -p.w + len * (k + 0.5), h / 2, (rng() - 0.5) * 0.1, scaleRgb(c, 0.75 + 0.3 * rng())), len, h));
-  }
-  return [{ mat: 'stone', geo: mergeGeometries(parts) }];
-}
-
-function fence(p: Prop, rng: Rng): Piece[] {
-  const parts: THREE.BufferGeometry[] = [];
-  const posts = Math.max(2, Math.round(p.w) + 1);
-  for (let k = 0; k < posts; k++) parts.push(box(0.12, p.h * (0.95 + 0.1 * rng()), 0.12, -p.w + (2 * p.w * k) / (posts - 1), p.h / 2, 0, BARK));
-  for (const y of [0.4, 0.8]) parts.push(box(p.w * 2, 0.08, 0.05, 0, p.h * y, 0.07, scaleRgb(BARK, 1.2)).rotateZ((rng() - 0.5) * 0.06));
-  return [{ mat: 'wood', geo: tileUv(mergeGeometries(parts), 1, 1) }];
-}
-
 /** A Victorian street lamp: a fluted base, a tapering post with a collar, a ladder bar, and a four-sided lantern under a pyramid cap and finial. */
 function lamp(p: Prop): Piece[] {
   const quad = (top: number, bottom: number, h: number, y: number, c: Rgb): THREE.BufferGeometry =>
@@ -110,14 +81,23 @@ function lamp(p: Prop): Piece[] {
   return [{ mat: 'wood', geo: tileUv(post, 1, 1) }, { mat: 'glow', geo: tileUv(glass, 1, 1), light: 'lamp' }];
 }
 
+/**
+ * A fire pit: a ring of fieldstones about a bed of ash, sticks leaned together over it as a fire is laid. Round 117: each stone is turned
+ * where it lies (all nine were turned about the pit's middle after they were placed, and lay heaped on one spot beside the fire).
+ */
 function firepit(p: Prop, rng: Rng, c: Rgb): Piece[] {
   const stones: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 9; k++) {
-    const a = (k / 9) * Math.PI * 2;
-    stones.push(box(0.3, 0.22, 0.24, Math.sin(a) * p.w, 0.11, Math.cos(a) * p.w, scaleRgb(c, 0.7 + 0.3 * rng())).rotateY(-a));
+  for (let k = 0; k < 10; k++) {
+    const a = (k / 10) * Math.PI * 2 + rng() * 0.2;
+    const g = lump(0.17 + 0.05 * rng(), 0.18 + 0.08 * rng(), rng, scaleRgb(c, 0.65 + 0.3 * rng()), scaleRgb(c, 0.4), 0.25, { seg: 5, rows: 3, floor: -0.4 });
+    stones.push(g.scale(1.3, 1, 1).rotateY(-a).translate(Math.sin(a) * p.w, 0.04, Math.cos(a) * p.w));
   }
-  const wood = [0, 1.2, 2.4].map((a) => cyl(0.07, 0.06, 1.1, 5, scaleRgb(BARK, 0.6)).translate(0, -0.55, 0).rotateZ(Math.PI / 2).rotateY(a).translate(0, 0.12, 0));
-  return [{ mat: 'stone', geo: tileUv(mergeGeometries(stones), 1, 1) }, { mat: 'wood', geo: mergeGeometries(wood) }, { mat: 'glow', light: 'fire', at: [0, 0.6, 0] }];
+  stones.push(tint(tileUv(new THREE.CylinderGeometry(p.w * 0.8, p.w * 0.9, 0.08, 10).translate(0, 0.04, 0), 1, 1), scaleRgb(BASE.charcoal, 0.9))); // the ash
+  const wood = Array.from({ length: 5 }, (_, k) => {
+    const a = (k / 5) * Math.PI * 2 + rng() * 0.4;
+    return stem([Math.sin(a) * p.w * 0.6, 0.05, Math.cos(a) * p.w * 0.6], [Math.sin(a + 0.3) * 0.06, 0.55 + 0.1 * rng(), Math.cos(a + 0.3) * 0.06], 0.05, 0.035, 5, scaleRgb(BARK, 0.45 + 0.2 * rng()));
+  });
+  return [{ mat: 'stone', geo: join(stones) }, { mat: 'wood', geo: join(wood) }, { mat: 'glow', light: 'fire', at: [0, 0.6, 0] }];
 }
 
 function altar(p: Prop, rng: Rng, c: Rgb): Piece[] {
@@ -148,17 +128,17 @@ export function propPieces(p: Prop, c: Rgb, region?: string): Piece[] {
     case 'monolith':
       return monolithOf(form(look.monoliths, 'slab'), p, rng, c, look);
     case 'grave':
-      return graveOf(form(look.graves, 'round'), p, rng, c);
+      return graveOf(form(look.graves, 'round'), p, rng, c, look);
     case 'cross':
       return cross(p, rng, c);
     case 'obelisk':
       return obelisk(p, c);
     case 'ruin':
-      return brokenWall(p, rng, c);
+      return ruinOf(form(look.ruins, 'wall'), p, rng, c, look);
     case 'wall':
-      return fieldWall(p, rng, c);
+      return wallOf(form(look.walls, 'drystone'), p, rng, c, look);
     case 'fence':
-      return fence(p, rng);
+      return fenceOf(form(look.fences, 'rail'), p, rng, look);
     case 'lamp':
       return lamp(p);
     case 'log':

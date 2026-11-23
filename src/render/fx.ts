@@ -114,7 +114,7 @@ export const warpOf = (stress: number): number => onsetOf(stress) * (Math.min(st
 
 /**
  * The stress leaned toward madness by `pressure` (round 80): `lean` of the way to the whole of it at a pressure of 1, never past the cap. It is what the
- * soft edges, the second picture, the swimming of the edges and the lens take (and the whispers, leaning further: `heard`); the fog, the colour, the dither, the vertex displacement and
+ * soft edges (not the stars, which keep to the true stress), the second picture, the swimming of the edges and the lens take (and the whispers, leaning further: `heard`); the fog, the colour, the dither, the vertex displacement and
  * every sound's detune and grit stay on the true stress, so a horror's fight is no harder to read and its music is never made gritty by the approach.
  */
 export const leant = (t: number, pressure: number, lean: number, cap: number): number => (pressure > 0 ? Math.min(clamp01(cap), t + lean * clamp01(pressure) * (1 - t)) : t);
@@ -157,7 +157,7 @@ export function computeFx(s: FxState): FxParams {
     shock: on.warp ? ring.strength * clamp01(s.cap) * FX.shock * scale : 0,
     shockAt: ring.radius,
     blur: on.dread ? at(FX.blur, smooth(FX.dreadFrom, 1, feltDread)) : 0,
-    strange: on.dread ? at(FX.strange, smooth(FX.dreadFrom, 1, feltDread)) : 0,
+    strange: on.dread ? at(FX.strange, smooth(FX.dreadFrom, 1, t)) : 0, // the stars follow the mind itself, not the pressure on it: a blow at full sanity leaves them be (2026-11-23)
     fovBreatheDeg: on.lens ? at(FX.fovBreatheDeg, wf) : 0,
     skew: on.lens ? at(FX.skew, wf) : 0,
     detune: at(FX.detune, t),
