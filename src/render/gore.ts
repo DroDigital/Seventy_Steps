@@ -3,11 +3,13 @@
  * comes apart as its body is made (data/gore.ts): its picture is parted along the blow's line (render/goreCut.ts plans it, the sprite
  * shader cuts it), the piece beyond the line is drawn as a billboard of its own that is thrown, turns and comes to rest on the ground,
  * the body spurts and slumps, and both lie a while before they go as the body's matter goes. A body that bleeds leaves a pool under it as
- * it dies, cut or not. The Gore setting (GORE_SETTING) turns all of it off.
+ * it dies, cut or not. The Gore setting (GORE_SETTING) turns all of it off. A horror with a death of its own (data/bossDeaths.ts) is
+ * neither cut nor pooled unless its tale is one of a blade or a tearing (`gore`), and a cut one still goes in its own style.
  */
 
 import type { Entity } from '../core/ecs';
 import { GORE_FX, goreOf, isWet, type BloodKind } from '../data/gore';
+import { deathOf } from '../data/bossDeaths';
 import { moveDef } from '../systems/actions';
 import type { Game } from '../systems/components';
 import { GORE_SETTING, type Blood } from './blood';
@@ -28,6 +30,8 @@ export interface Dying {
   bloodIndex: number;
   last: number;
   pooled: boolean;
+  /** It dies a death of its own (data/bossDeaths.ts): a cut leaves it to go in that. */
+  own: boolean;
 }
 
 export interface DrawnBody {
@@ -75,8 +79,9 @@ export function createGore(g: Game, blood: Blood): Gore {
   });
 
   function begin(id: Entity, body: DrawnBody, time: number): Dying {
-    const [kind, bloodKind] = goreOf(body.key);
-    const d: Dying = { blood: bloodKind, bloodIndex: bloodKind === 'none' ? 0 : BLOOD_ORDER.indexOf(bloodKind as never) + 1, last: time, pooled: false };
+    const own = deathOf(body.key);
+    const [kind, bloodKind] = own && !own.gore ? (['none', 'none'] as const) : goreOf(body.key); // (no cut and no pool for a horror's own death, but where its tale fits)
+    const d: Dying = { blood: bloodKind, bloodIndex: bloodKind === 'none' ? 0 : BLOOD_ORDER.indexOf(bloodKind as never) + 1, last: time, pooled: false, own: !!own };
     const kill = kills.get(id);
     if (kind === 'none' || !kill?.cuts) return d;
     const { width, height, bounds } = body.frame;
@@ -124,7 +129,7 @@ export function createGore(g: Game, blood: Blood): Gore {
     adjust(gone, d, dissolve) {
       if (!d.plan) return;
       gone.amount = smooth(GORE_FX.dissolveFrom, 0.97, dissolve);
-      gone.style = FX_STYLE[isWet(d.blood) ? 'melt' : 'crumble'];
+      if (!d.own) gone.style = FX_STYLE[isWet(d.blood) ? 'melt' : 'crumble'];
     },
     forget(live) {
       for (const id of kills.keys()) if (!live.has(id)) kills.delete(id);
