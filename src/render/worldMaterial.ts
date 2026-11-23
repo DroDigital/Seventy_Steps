@@ -134,6 +134,8 @@ export interface WorldMaterialOptions {
   shore?: boolean; // the ground is washed by the sea where it meets it: a wet band and lace of foam, breathing with the swell (round 30)
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
+  field?: number; // round 116: an instanced near field (render/nearGrass.ts) whose clumps sink into the ground this many metres from the investigator
+  instanced?: boolean; // round 116: drawn as an InstancedMesh whose instances the shader places (a field implies it)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
   surface?: 'glass' | 'liquid' | 'wax' | 'mirror'; // what the face is made of when not stone (shaders/surfaces.ts; round 79)
   neutralCloth?: boolean; // this use of the neutral cloth texture represents metal, wax, or other non-fabric
@@ -204,7 +206,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
     vertexColors: o.vertexColors ?? false,
-    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
+    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.field && { NEAR_FIELD: o.field.toFixed(2) }), ...((o.instanced || o.field) && { WORLD_INSTANCED: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
   });
   if (o.opacity !== undefined && o.opacity < 1) {
     Object.assign(material, {

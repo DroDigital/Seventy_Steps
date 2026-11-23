@@ -19,7 +19,7 @@ import { chimneyTops } from './chimneys';
 import { colliderShadowMesh } from './colliderShadow';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { baseCoverJob, mergeCover } from './baseCover';
-import { groundCover } from './groundCover';
+import { groundCoverJob } from './groundCover';
 import { propJob } from './propMeshes';
 import type { PropMat } from './propShapes';
 import { arenaJob, dungeonJob } from './siteMeshes';
@@ -92,7 +92,9 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
     if (!content.region) return;
     let base: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
     yield* baseCoverJob(content.props, content.region, content.roads, (b) => (base = b)); // the plants and roots where things meet the ground (round 54)
-    const cover = mergeCover(groundCover(content.cx, content.cz, content.region, content.roads), base, (g) => mergeGeometries(g));
+    let ground: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
+    yield* groundCoverJob(content.cx, content.cz, content.region, content.roads, content.props, (c) => (ground = c)); // (round 116: as thick as the realm grows it, a slice at a time)
+    const cover = mergeCover(ground, base, (g) => mergeGeometries(g));
     yield* propJob(content.props, content.region, (ms, spots, tops) => (ms.forEach((m) => add(list, m)), lights?.add(chunkKey(cx, cz), spots), chimneyTops.add(chunkKey(cx, cz), tops)), cover);
   }
 

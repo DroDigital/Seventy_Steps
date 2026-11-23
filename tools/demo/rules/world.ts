@@ -82,6 +82,7 @@ export const rules: readonly PruneRule[] = [
   // the looks of each realm's houses and props, and of each dungeon's pillars and walls (rounds 108 and 111): keyed by the realm or the dungeon
   { file: 'src/data/houseLooks.ts', decl: 'HOUSE_LOOKS', shape: 'properties', keep: regions },
   { file: 'src/data/propLooks.ts', decl: 'PROP_LOOKS', shape: 'properties', keep: regions },
+  { file: 'src/data/foliage.ts', decl: 'CLIMATES', shape: 'properties', keep: regions }, // (round 116: how thick each realm grows)
   { file: 'src/data/dungeonLooks.ts', decl: 'DUNGEON_LOOKS', shape: 'properties', keep: dungeons },
   { file: 'src/data/dungeonLooks.ts', decl: 'KIT_PILLARS', shape: 'properties', keep: kept('kits') },
 ];

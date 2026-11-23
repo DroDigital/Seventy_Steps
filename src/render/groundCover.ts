@@ -1,5 +1,6 @@
 /**
- * Ground cover (render only): what lies about on open ground, fifty to a hundred and thirty to a chunk by its ground (round 32: it was a few dozen, and the fields looked bare) —
+ * Ground cover (render only): what lies about on open ground, by its ground and (round 116) as thick as its realm's climate lets it grow, with the undergrowth above
+ * it where anything grows (data/foliage.ts, render/understory.ts; round 32: it was a few dozen, and the fields looked bare) —
  * tufts of grass and October leaf litter on New England turf, reeds on the Innsmouth mud, dry grass
  * on sand, pebbles on stone and snow, nodules on Yuggoth's flesh — never on a road, a site or a
  * dungeon floor. Seeded by the chunk, so it is the same each visit. Blades are lit as the ground is
@@ -16,8 +17,12 @@ import { inDungeon, surface } from '../world/terrain';
 import { padDistance } from '../world/sitePads';
 import { chunkKey } from '../world/worldMap';
 import { REGION_COVER } from '../data/coverKinds';
+import { CLIMATES } from '../data/foliage';
+import { contactsOf, edgeDistance } from '../world/groundContact';
+import type { Prop } from '../world/props';
 import { regionPiece } from './coverPieces';
 import type { PropMat } from './propShapes';
+import { underAt } from './understory';
 
 type Rgb = readonly [number, number, number];
 export type Kind = 'tuft' | 'reed' | 'dry' | 'litter' | 'pebble' | 'nodule' | 'fern' | 'tallgrass' | 'flower' | 'mushroom' | 'bramble';
@@ -60,19 +65,28 @@ export class Builder {
   nor: number[] = [];
   uv: number[] = [];
   sway: number[] = [];
+  index: number[] = []; // round 116: three corners a triangle, its two faces two orders of them (the cover grew thicker: half the corners to move)
+  private corner(p: readonly number[], col: Rgb, s: number): number {
+    this.sway.push(s);
+    this.pos.push(p[0], p[1], p[2]);
+    this.col.push(col[0], col[1], col[2]);
+    this.nor.push(0, 1, 0); // lit as the ground is
+    this.uv.push(p[0] * 0.5, p[1] * 0.5);
+    return this.pos.length / 3 - 1;
+  }
   /** A triangle seen from both sides (the world's materials cull back faces); `sway`: how far each corner is blown (metres: the tip of a blade, nothing at its foot). */
   tri(a: readonly number[], b: readonly number[], c: readonly number[], ca: Rgb, cb: Rgb, cc: Rgb, sway: readonly [number, number, number] = [0, 0, 0]): void {
-    for (const [p, col, s] of [[a, ca, sway[0]], [b, cb, sway[1]], [c, cc, sway[2]], [b, cb, sway[1]], [a, ca, sway[0]], [c, cc, sway[2]]] as const) {
-      this.sway.push(s);
-      this.pos.push(p[0], p[1], p[2]);
-      this.col.push(col[0], col[1], col[2]);
-      this.nor.push(0, 1, 0); // lit as the ground is
-      this.uv.push(p[0] * 0.5, p[1] * 0.5);
-    }
+    const [i, j, k] = [this.corner(a, ca, sway[0]), this.corner(b, cb, sway[1]), this.corner(c, cc, sway[2])];
+    this.index.push(i, j, k, j, i, k);
+  }
+  /** Round 116: a triangle seen from its front only (wound counter-clockwise as seen), for the closed lumps of the undergrowth. */
+  face(a: readonly number[], b: readonly number[], c: readonly number[], ca: Rgb, cb: Rgb, cc: Rgb, sway: readonly [number, number, number] = [0, 0, 0]): void {
+    this.index.push(this.corner(a, ca, sway[0]), this.corner(b, cb, sway[1]), this.corner(c, cc, sway[2]));
   }
   geometry(): THREE.BufferGeometry | null {
     if (!this.pos.length) return null;
     const g = new THREE.BufferGeometry();
+    g.setIndex(this.index);
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.pos, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.nor, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.col, 3));
@@ -101,7 +115,7 @@ function blades(b: Builder, rng: Rng, x: number, y: number, z: number, n: number
 }
 
 /** A fern: a crown of arching fronds, each rising and bending over to its tip. */
-function fern(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
+export function fernAt(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
   const n = 6 + Math.floor(rng() * 4);
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 + rng() * 0.5;
@@ -192,7 +206,7 @@ export function plantAt(kind: Kind, leaf: Builder, stone: Builder, rng: Rng, x: 
   else if (kind === 'dry') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 0.35, 0.04, c);
   else if (kind === 'reed') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 1.1, 0.04, c);
   else if (kind === 'litter') litter(leaf, rng, x, y, z);
-  else if (kind === 'fern') fern(leaf, rng, x, y, z, c);
+  else if (kind === 'fern') fernAt(leaf, rng, x, y, z, c);
   else if (kind === 'tallgrass') tallgrass(leaf, rng, x, y, z, c);
   else if (kind === 'flower') flower(leaf, rng, x, y, z, c);
   else if (kind === 'mushroom') mushroom(leaf, rng, x, y, z, c);
@@ -200,27 +214,57 @@ export function plantAt(kind: Kind, leaf: Builder, stone: Builder, rng: Rng, x: 
   else pebble(stone, rng, x, y, z, c);
 }
 
-/** The chunk's ground cover, as a geometry per material (leaf: blades and leaves; stone: pebbles and nodules). */
-export function groundCover(cx: number, cz: number, region: RegionDef, roads: readonly RoadSeg[]): Partial<Record<PropMat, THREE.BufferGeometry>> {
+const SLICE = 48; // pieces laid between one yield and the next (the chunk's making is sliced to a couple of milliseconds a frame: core/slicer.ts)
+
+/** The chunk's ground cover as a geometry per material (leaf: blades, leaves and the undergrowth; stone: pebbles and nodules), off the roads, the sites, the dungeons and the footprints of what stands in it, a slice at a time; `done` takes it. */
+export function* groundCoverJob(cx: number, cz: number, region: RegionDef, roads: readonly RoadSeg[], props: readonly Prop[], done: (cover: Partial<Record<PropMat, THREE.BufferGeometry>>) => void): Generator<void, void> {
   const cover = COVER[region.biome.texture];
+  const climate = CLIMATES[region.id];
   const rng = createRng(chunkKey(cx, cz) * 7919 + 17);
   const pads = worldLayout().chunk(cx, cz).pads;
+  const solid = contactsOf(props);
+  yield;
+  const clear = (x: number, z: number, margin: number): boolean => !solid.some((c) => edgeDistance(c, x, z) < margin);
   const [leaf, stone] = [new Builder(true), new Builder()];
   const own = region.id in REGION_COVER;
-  for (let k = 0; k < cover.count; k++) {
+  const count = Math.round(cover.count * (climate?.cover ?? 1));
+  for (let k = 0; k < count; k++) {
+    if (k % SLICE === SLICE - 1) yield;
     const [x, z] = [(cx + rng()) * WORLD.chunk, (cz + rng()) * WORLD.chunk];
     let roll = rng();
     const kind = cover.mix.find(([, w]) => (roll -= w) < 0)?.[0] ?? 'pebble';
     if (roadShare(roads, x, z) > 0.05 || inDungeon(x, z)) continue;
-    if (pads.some((p) => padDistance(p, x, z) < 1)) continue;
+    if (pads.some((p) => padDistance(p, x, z) < 1) || !clear(x, z, 0.05)) continue; // (round 116: not inside a house, a wall or a stone)
     const y = surface(x, z);
     if (y < WORLD.seaLevel) continue;
     if (own && regionPiece(region.id, rng(), leaf, stone, rng, x, y, z)) continue; // round 80: the region's own litter in place of a share of the ground's (data/coverKinds.ts)
     plantAt(kind, leaf, stone, rng, x, y, z);
   }
+  const under = createRng(chunkKey(cx, cz) * 6007 + 911); // round 116: the undergrowth on a stream of its own, so the cover's own draws are as they were
+  for (let k = 0; k < (climate?.under ?? 0); k++) {
+    const [x, z] = [(cx + under()) * WORLD.chunk, (cz + under()) * WORLD.chunk];
+    let roll = under();
+    const kind = climate.kinds.find(([, w]) => (roll -= w) < 0)?.[0] ?? climate.kinds[0][0];
+    if (roadShare(roads, x, z) > 0.02 || inDungeon(x, z) || pads.some((p) => padDistance(p, x, z) < 2.5) || !clear(x, z, 0.6)) continue;
+    const y = surface(x, z);
+    if (y < WORLD.seaLevel + 0.1) continue;
+    underAt(kind, region.id, leaf, under, x, y, z);
+    if (k % 8 === 7) yield;
+  }
+  yield;
   const out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
-  const [lg, sg] = [leaf.geometry(), stone.geometry()];
+  const lg = leaf.geometry();
+  yield;
+  const sg = stone.geometry();
   if (lg) out.leaf = lg;
   if (sg) out.stone = sg;
+  done(out);
+}
+
+/** The chunk's ground cover made at once (the tests', and any caller outside the sliced streaming). */
+export function groundCover(cx: number, cz: number, region: RegionDef, roads: readonly RoadSeg[], props: readonly Prop[] = []): Partial<Record<PropMat, THREE.BufferGeometry>> {
+  let out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
+  const job = groundCoverJob(cx, cz, region, roads, props, (c) => (out = c));
+  while (!job.next().done);
   return out;
 }

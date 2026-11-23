@@ -65,12 +65,20 @@ void main() {
   vLocal = position / max(uBodyScale, 0.001);
   vec4 wp = modelMatrix * vec4(uEldritch > 0.0 ? writhe(position, normal) : position, 1.0);
   vec3 wn = normalize(mat3(modelMatrix) * normal);
+#if defined(USE_INSTANCING) && defined(WORLD_INSTANCED)
+  wp = modelMatrix * instanceMatrix * vec4(position, 1.0); // round 116: a mesh whose instances the shader places (the near field's grass, render/nearGrass.ts; a flask in flight, flaskFx.ts); a horse's instanced bones apply their own (mountKit.ts)
+  wn = normalize(mat3(modelMatrix * instanceMatrix) * normal);
+#endif
   vWorld = wp.xyz;
 #ifdef PANES
   vPane = aPane;
   vPaneUv = aPaneUv;
 #endif
 #ifdef SWAY
+#ifdef NEAR_FIELD
+  vec3 root = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz; // round 116: the near field's clumps sink into the ground toward its edge, where the chunks' own cover goes on (render/nearGrass.ts)
+  wp.xyz = root + (wp.xyz - root) * (1.0 - smoothstep(NEAR_FIELD * 0.7, NEAR_FIELD, length(root.xz - uBodies[0].xz)));
+#endif
   float gust = 0.5 + 0.5 * sin(uTime * 0.31 + wp.x * 0.045 - wp.z * 0.03); // gusts roll across the land...
   float flutter = 0.5 * sin(uTime * 1.7 + wp.x * 0.9 + wp.z * 0.7) + 0.25 * sin(uTime * 2.9 + wp.z * 1.3); // ...and shiver in it
   wp.xz += aSway * uWind * (0.3 + 0.7 * gust + 0.3 * flutter) * vec2(0.85, 0.5); // after vWorld: lit and shadowed where it stands, drawn where the wind has it
@@ -125,6 +133,9 @@ ${BLAST_BEND_GLSL}
   vec3 tint = vec3(1.0);
 #ifdef USE_COLOR
   tint = color;
+#endif
+#ifdef USE_INSTANCING_COLOR
+  tint *= instanceColor; // (round 116: each clump of the near field its own green)
 #endif
   vTint = tint;
   vLight = mix(light, vec3(1.0), uEmissive) * tint;

@@ -31,8 +31,9 @@ export interface FlaskFx {
 }
 
 export function createFlaskFx(scene: THREE.Scene, g: Game, particles: Particles): FlaskFx {
-  const flasks = new THREE.InstancedMesh(bottle(), createWorldMaterial({ texture: 'water', emissive: 0.45, vertexColors: true }), FLASK.capacity);
-  const rags = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.11, 0), createWorldMaterial({ texture: 'cloth', emissive: 1, vertexColors: true }), FLASK.capacity);
+  // (round 116: the world shader places instances only when asked to; until then every flask in flight was drawn at the world's origin)
+  const flasks = new THREE.InstancedMesh(bottle(), createWorldMaterial({ texture: 'water', emissive: 0.45, vertexColors: true, instanced: true }), FLASK.capacity);
+  const rags = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.11, 0), createWorldMaterial({ texture: 'cloth', emissive: 1, vertexColors: true, instanced: true }), FLASK.capacity);
   tint(rags.geometry, rgb(FLASK.colour.core));
   for (const m of [flasks, rags]) {
     m.frustumCulled = false;
