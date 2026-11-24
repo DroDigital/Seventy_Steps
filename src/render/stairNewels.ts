@@ -1,16 +1,19 @@
 /**
  * The newels of a flight over the void (round 104; world/abyssStair.ts builds the flight): every ten steps a squat pier stands on
- * each parapet, capped, and every other one bears a stone bowl of fire, alternating sides, so the stair is a lit way down through the
- * dark with the dark falling away on both hands. At the flight's head a pair of tall pylons stand at the parapets' ends, a fire on
- * each. Render only.
+ * each parapet, capped, and at the flight's head a pair of tall pylons stand at the parapets' ends. Round 120 (asked: fewer torches,
+ * and the way down darker the deeper it goes): few of them bear a fire. On the seventy steps both pylons burn and one newel at the
+ * flight's middle; down the first half of the seven hundred, one pylon of each flight, the side alternating; below it, one on every
+ * other flight (SLUMBER.newels). The rest are capped stone, so the stair is a dark way down with a fire now and then in the mist.
+ * Render only.
  */
 
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { DungeonKit } from '../data/kits';
-import { DUNGEON } from '../data/tuning';
+import { DUNGEON, SLUMBER } from '../data/tuning';
+import { descentSpan } from '../world/descent';
 import { ABYSS, stepTop } from '../world/abyssStair';
-import { roomPoint, type RoomLayout } from '../world/dungeonKit';
+import { roomPoint, type DungeonLayout, type RoomLayout } from '../world/dungeonKit';
 import { stepsOf } from '../world/dungeonParts';
 import type { Dressed } from './dungeonDressing';
 import { box, tint, worldUv } from './meshKit';
@@ -36,8 +39,16 @@ function newel(r: RoomLayout, u: number, v: number, y: number, c: Rgb, lit: bool
   lights.push({ kind: 'glow', kit, light: { x: p.x, y: top + BOWL.h + 0.35, z: p.z, kind: 'fire' } });
 }
 
+/** Which of a flight's newel fires burn (round 120): its middle row's newel on `side` and both pylons on the seventy steps; one pylon, on `side`, down the first half; one on every other flight below. */
+export function newelFires(share: number, index: number): { side: 1 | -1; middle: boolean; pylons: 0 | 1 | 2 } {
+  const { light, half } = SLUMBER.newels;
+  const side = index % 2 ? 1 : -1;
+  if (share < light) return { side, middle: true, pylons: 2 };
+  return { side, middle: false, pylons: share < half || index % 2 === 0 ? 1 : 0 };
+}
+
 /** A flight's newels and their fires. */
-export function stairNewels(r: RoomLayout, kit: DungeonKit, c: Rgb, at: { x: number; z: number }): Dressed[] {
+export function stairNewels(d: DungeonLayout, r: RoomLayout, kit: DungeonKit, c: Rgb, at: { x: number; z: number }): Dressed[] {
   const n = stepsOf(r);
   const h = r.half;
   const u = DUNGEON.stairLane / 2 + ABYSS.rail / 2;
@@ -49,13 +60,14 @@ export function stairNewels(r: RoomLayout, kit: DungeonKit, c: Rgb, at: { x: num
     const e = Math.min(n, g + ABYSS.run);
     return Math.max(stepTop(r, g, n), stepTop(r, e - 1, n)) + ABYSS.railHeight;
   };
-  let turn = 0;
-  for (let k = EVERY / 2; k < n - 2; k += EVERY) { // a newel in the middle of a run, clear of the arches at the flight's ends
-    const mid = k + ABYSS.run / 2 - (k % ABYSS.run);
-    for (const s of [-1, 1]) newel(r, s * u, vOf(mid), railTop(mid), c, (turn + (s > 0 ? 1 : 0)) % 2 === 0, 1, at, geos, lights, kit);
-    turn++;
-  }
-  for (const s of [-1, 1]) newel(r, s * u, -h + 1.4, railTop(0), scaleRgb(c, 1.05), true, 2.4, at, geos, lights, kit); // the pylons at its head
+  const { top, bottom } = descentSpan(d);
+  const fires = newelFires(Math.min(1, Math.max(0, (top - r.level) / Math.max(1e-6, top - bottom))), r.index);
+  const rows: number[] = [];
+  for (let k = EVERY / 2; k < n - 2; k += EVERY) rows.push(k + ABYSS.run / 2 - (k % ABYSS.run)); // a newel in the middle of a run, clear of the arches at the flight's ends
+  rows.forEach((mid, i) => {
+    for (const s of [-1, 1]) newel(r, s * u, vOf(mid), railTop(mid), c, fires.middle && i === Math.floor(rows.length / 2) && s === fires.side, 1, at, geos, lights, kit);
+  });
+  for (const s of [-1, 1]) newel(r, s * u, -h + 1.4, railTop(0), scaleRgb(c, 1.05), fires.pylons === 2 || (fires.pylons === 1 && s === fires.side), 2.4, at, geos, lights, kit); // the pylons at its head
   const geo = geos.map((g) => (g.index ? g.toNonIndexed() : g));
   return [{ kind: 'wall', kit, geo: mergeGeometries(geo) }, ...lights];
 }

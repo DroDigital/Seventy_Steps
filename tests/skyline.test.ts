@@ -6,7 +6,9 @@ import { RENDER, SKY } from '../src/data/tuning';
 import { createPostPass } from '../src/render/postPass';
 import { createRealmLook } from '../src/render/realmLook';
 import { createSky } from '../src/render/sky';
-import { createSkyline, falseShown } from '../src/render/skyline';
+import { createSkyline, facing, falseShown } from '../src/render/skyline';
+import { shownElevation } from '../src/render/shaders/farPlace';
+import { FAR } from '../src/data/farLooks';
 import { profile } from '../src/render/skylineShapes';
 import { createRng } from '../src/core/rng';
 import { regionRect } from '../src/world/worldMap';
@@ -39,20 +41,62 @@ describe('the far silhouettes (round 19: render/skyline.ts)', () => {
     }
   });
 
-  it('fill the sky they would from where the investigator stands, but never more than SKY.farAngle', () => {
+  it('stand where they truly are, at their true size, and are drawn no higher than SKY.farAngle however near they are come (round 117)', () => {
     const r = regionRect(REGIONS.find((x) => x.id === 'dreamlands')!);
     const [kadath] = SKYLINES.dreamlands;
     const at = { x: r.x0 + kadath.at[0], z: r.z0 + kadath.at[1] };
-    const shown = (d: number): number => {
-      const m = lookFrom('dreamlands', at.x, at.z - d).find((x) => x.visible)!;
-      const dist = Math.hypot(m.position.x - at.x, m.position.z - (at.z - d));
-      return Math.atan(m.scale.y / dist) * (180 / Math.PI);
+    for (const d of [60, 400, 800, 3000]) {
+      const m = lookFrom('dreamlands', at.x, at.z - d).find((x) => x.visible && Math.hypot(x.position.x - at.x, x.position.z - at.z) < 1e-6)!;
+      expect(m, `${d} m`).toBeDefined(); // where it stands, wherever it is seen from (it was a card turned to the eye, 98 m off)
+      expect(m.scale.x).toBeCloseTo(kadath.width);
+      expect(m.scale.y).toBeCloseTo(kadath.height);
+    }
+    const deg = (e: number): number => (e * 180) / Math.PI;
+    expect(shownElevation(Math.atan(kadath.height / 3000))).toBeCloseTo(Math.atan(kadath.height / 3000), 6); // far off: its true size
+    let was = -1;
+    for (let e = -0.3; e < Math.PI / 2; e += 0.01) {
+      const shown = shownElevation(e);
+      expect(deg(shown)).toBeLessThanOrEqual(SKY.farAngle + 1e-9); // never a wall over the sky...
+      expect(shown).toBeGreaterThan(was); // ...but it grows as it is neared
+      if (deg(e) <= SKY.farKnee) expect(shown).toBeCloseTo(e, 9);
+      was = shown;
+    }
+    expect(deg(shownElevation(Math.atan(kadath.height / 476)))).toBeGreaterThan(deg(shownElevation(Math.atan(kadath.height / 800))) + 4); // from the realm's north edge it towers higher than from its middle
+  });
+
+  it('face their realm, turned toward the eye no further than they must be, so none is seen edge on (round 117)', () => {
+    const most = (FAR.oblique * Math.PI) / 180;
+    const angle = (a: readonly [number, number], b: readonly [number, number]): number => Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1])));
+    for (let i = 0; i < 64; i++) {
+      const [p, q] = [i * 0.71, i * 1.93 + 0.4];
+      const face = [Math.cos(p), Math.sin(p)] as const;
+      const to = [Math.cos(q), Math.sin(q)] as const;
+      const f = facing(face, to, most);
+      expect(Math.hypot(f[0], f[1])).toBeCloseTo(1, 9);
+      expect(angle(f, to)).toBeLessThanOrEqual(most + 1e-9);
+      if (angle(face, to) <= most) expect(f).toEqual([face[0], face[1]]); // within reach it holds still: walking past it, each part of it moves as far as it is
+      else expect(angle(f, to)).toBeCloseTo(most, 9); // beyond, it turns as little as it must
+    }
+  });
+
+  it('stand their back layer truly behind them and their mist before them, and a far town gives way to the real one near (round 117)', () => {
+    const scene = new THREE.Scene();
+    createSkyline(scene, realmLook());
+    const meshes = scene.children.filter((o): o is THREE.Mesh => o instanceof THREE.Mesh);
+    const zs = (m: THREE.Mesh, kind: number, haze: (h: number) => boolean): number[] => {
+      const [pos, fx, shape] = ['position', 'aFx', 'aShape'].map((n) => m.geometry.getAttribute(n));
+      return Array.from({ length: pos.count }, (_, i) => i).filter((i) => fx.getX(i) === kind && haze(shape.getW(i))).map((i) => pos.getZ(i));
     };
-    const R = RENDER.far * 0.7;
-    const far = kadath.height / Math.tan((SKY.farAngle * Math.PI) / 180) + 200;
-    expect(shown(far)).toBeCloseTo(Math.atan(kadath.height / far) * (180 / Math.PI), 1); // far off: its true size
-    expect(shown(R * 2)).toBeCloseTo(SKY.farAngle, 1); // near: held at the most
-    expect(shown(at.z - r.z1)).toBeCloseTo(SKY.farAngle, 1); // from the realm's north edge, where it rose 50°
+    let backs = 0;
+    for (const m of meshes) {
+      const back = zs(m, 0, (h) => h > 0);
+      if (back.length) backs++;
+      for (const z of back) expect(z).toBeLessThan(0);
+      for (const z of zs(m, 0, (h) => h === 0)) expect(z).toBe(0);
+      const uniforms = (m.material as THREE.ShaderMaterial).uniforms;
+      expect(uniforms.uHandoff.value.y > 0).toBe(meshes.indexOf(m) < meshes.length - 1 && Object.values(SKYLINES).flat()[meshes.indexOf(m)].kind === 'town');
+    }
+    expect(backs).toBeGreaterThan(20);
   });
 
   it("stay drawn as the investigator walks up to them, in every realm (round 49: a town vanished inside 1.5 of its drawing distance, the Dreamlands' city by the sea among them)", () => {

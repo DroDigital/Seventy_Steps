@@ -8,9 +8,11 @@
 import type * as THREE from 'three';
 import type { Entity } from '../core/ecs';
 import { CREATURE_FX, FX_STYLE, deathStyle, type FxStyle } from '../data/creatureFx';
+import { deathStyleOf } from '../data/bossDeaths';
 import type { EntityDef } from '../data/schema';
 import { SIM } from '../data/tuning';
 import type { Game } from '../systems/components';
+import { MODEL_PREFIX } from '../systems/creatures';
 import type { Look } from './creatureLook';
 import type { CutPlan } from './goreCut';
 import { woundPoint } from './wound';
@@ -82,9 +84,9 @@ export function createCreatureFx(g: Game): CreatureFx {
       }
       if (hidden.delete(id)) forming.set(id, { since: time, seconds: CREATURE_FX.emerge, style: 'rise' });
       else if (was !== undefined && was !== model) forming.set(id, { since: time, seconds: CREATURE_FX.swap, style: 'shatter' });
-      if (look.dissolve !== undefined && look.dissolve > 0) { // its death: the body goes, in the style of its matter
+      if (look.dissolve !== undefined && look.dissolve > 0) { // its death: the body goes, in the style of its matter, or a horror in its own (data/bossDeaths.ts)
         out.amount = smooth(CREATURE_FX.deathHold, 0.97, look.dissolve);
-        out.style = FX_STYLE[deathStyle(def)];
+        out.style = deathStyleOf(model.slice(MODEL_PREFIX.length)) ?? FX_STYLE[deathStyle(def)];
         return out;
       }
       if (look.appear !== undefined && look.appear < 1) { // a horror roused comes together out of the ground

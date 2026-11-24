@@ -27,6 +27,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/fogs.ts', decl: 'FOGS', shape: 'properties', keep: regions },
   { file: 'src/data/airFields.ts', decl: 'AIR_FIELDS', shape: 'properties', keep: regions },
   { file: 'src/data/skylines.ts', decl: 'SKYLINES', shape: 'properties', keep: regions },
+  { file: 'src/data/farLooks.ts', decl: 'FAR_REGIONS', shape: 'properties', keep: regions },
   { file: 'src/data/hours.ts', decl: 'HOUR_COLOURS', shape: 'properties', keep: regions },
   { file: 'src/data/regionPress.ts', decl: 'REGION_PRESS', shape: 'properties', keep: regions },
   { file: 'src/data/ngPlusTuning.ts', decl: 'REGION_JOURNEYS', shape: 'properties', keep: regions },

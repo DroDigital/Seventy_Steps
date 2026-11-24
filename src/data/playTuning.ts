@@ -216,8 +216,8 @@ export const SKY = {
   close: 0.6, // seconds for a dungeon's walls to close it off
   crawl: 0.035, // radians a second the stars crawl about the sky at the most wrong (FX.strange); the pace follows the mind, the place never leaps
   flicker: 4, // radians a second the stars' twinkle quickens by at the most wrong
-  farAngle: 34, // degrees: the most of the sky a far silhouette fills (render/skyline.ts; round 19: Kadath rose 50° over the Dreamlands' north)
-  farFoot: 0.45, // share of a far silhouette's height its foot fades into the haze over (no hard line along the horizon)
+  farAngle: 44, // degrees: the most of the sky a far silhouette fills (render/skyline.ts; round 19: Kadath rose 50° over the Dreamlands' north, and it was held at 34; round 117: it stands where it truly is and rises as it is neared, eased from farKnee toward this)
+  farKnee: 26, // degrees: below this a far silhouette fills the sky it truly would
 };
 
 export type LightKind = 'lamp' | 'window' | 'fire' | 'torch' | 'sigil';

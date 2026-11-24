@@ -10,10 +10,11 @@
 import { floorAt, roomAt, type DungeonLayout } from '../world/dungeonKit';
 import type { Part } from '../world/dungeonParts';
 import { DIRS } from '../world/worldMap';
+import { isAbyss } from '../world/abyssStair';
 import { EDGE, facesOf, sconce } from './sconces';
 
-/** What a wall needs to know of its place to hang torches: which face looks into a room (outer walls have one), the floor each face looks onto, and whether a point stands inside another solid of the dungeon. */
-export type WallContext = { inner: (alongX: boolean) => number; floor: (x: number, z: number, fallback: number) => number; buried: (x: number, y: number, z: number) => boolean };
+/** What a wall needs to know of its place to hang torches: which face looks into a room (outer walls have one), the floor each face looks onto, whether a point stands inside another solid of the dungeon, and (round 120) whether a face looks out over a flight over the void, where no torch hangs. */
+export type WallContext = { inner: (alongX: boolean) => number; floor: (x: number, z: number, fallback: number) => number; buried: (x: number, y: number, z: number) => boolean; void?: (x: number, z: number) => boolean };
 
 /** A wall part's torch context: the face of an outer wall that looks inward, the floor under any point, and whether a point is inside another of the dungeon's solids (`solids`, but for ceilings: only those near the wall are looked through). */
 export function wallContext(L: DungeonLayout, p: Part, solids: readonly Part[]): WallContext {
@@ -26,6 +27,7 @@ export function wallContext(L: DungeonLayout, p: Part, solids: readonly Part[]):
       const r = roomAt(L, x, z);
       return r ? floorAt(r, x, z) : fallback;
     },
+    void: (x, z) => isAbyss(roomAt(L, x, z)), // (round 120: a flight over the void is lit by its own newels' few fires, and a torch on the shaft's wall would hang over nothing)
     buried: (x, y, z) => near().some((q) => q.shape === 'box' && x > q.min.x && x < q.max.x && z > q.min.z && z < q.max.z && y > q.min.y && y < q.max.y),
   };
 }
@@ -40,6 +42,8 @@ export function hangTorches(stops: readonly number[], w: { along: (t: number, ac
     const faces = ctx.inner(w.alongX);
     const first = facesOf(faces, j);
     for (const across of faces !== 0 ? [first] : [first, -first]) {
+      const [qx, qz] = w.along(stop, across * (w.thick / 2 + 0.8));
+      if (ctx.void?.(qx, qz)) continue; // a face over the void hangs none (round 120)
       for (const shift of SHIFTS) {
         const t = stop + shift;
         if (Math.abs(t) > edge + 1e-9) continue;

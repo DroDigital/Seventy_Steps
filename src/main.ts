@@ -8,7 +8,7 @@
  */
 
 import { t } from './core/i18n';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { PerspectiveCamera, type ShaderMaterial, Vector3 } from 'three';
 import { createInput, emptyInput } from './core/input';
 import { startLoop } from './core/loop';
 import { darkOf, phaseOf } from './systems/clock';
@@ -22,6 +22,7 @@ import { createActorViews } from './render/actorViews';
 import { createGameAudio } from './render/audio/gameAudio';
 import { playMenuMusic } from './render/audio/music';
 import { createBossFx } from './render/bossFx';
+import { createBossDeathFx } from './render/bossDeathFx';
 import { createCinema } from './render/cinema';
 import { createDirector, wakeKneeling } from './render/cinemaDirector';
 import { createCombatFx } from './render/combatFx';
@@ -255,8 +256,9 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const sheen = createWetSheen(game, pipeline.post); // round 113: wet ground mirrors
   const mistWakes = createMistWakes(game); // what moves through it parts it (round 83)
   const swingTrails = createSwingTrails(scene); // the track a blow leaves (round 83)
-  const skyline = createSkyline(scene, look);
+  const skyline = createSkyline(scene, look, (sky.mesh.material as ShaderMaterial).uniforms); // round 117: the far land melts into the sky's own light
   const life = createWorldLife(scene, game, audio, { sky: sky.mesh, post: pipeline.post, sheet: creatures.sheet, skyline, particles, lights, ground, beams: bossFx.beams, creatures }); // round 18: the world's own life
+  const deaths = createBossDeathFx(game, { particles, ground, beams: bossFx.beams, lightning: life.lightning, audio, figure: creatures.figure, painted: creatures.painted }); // each horror's own death, as it goes (data/bossDeaths.ts)
   scene.add(sky.mesh);
   const hurt = createHurtFx(game);
   const rumble = createRumbleFx(game); // the game felt in the hands: a pad's motors (2026-11-03)
@@ -404,6 +406,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         signCallMarks.update(time, camera.position);
         portals.update(time, camera.position, veil.active);
         bossFx.update(alpha, time, camera);
+        deaths.update(time, camera);
         shadows.update(alpha);
         pipeSmoke.update(camera, time, views.smokers);
         swingTrails.update(views.swingEdge, time);

@@ -5,9 +5,11 @@
  */
 
 import type { Entity } from '../core/ecs';
+import { deathMoveAt, deathOf } from '../data/bossDeaths';
 import { FEEDBACK, SIM } from '../data/tuning';
 import { moveDef } from '../systems/actions';
 import { isAbsent, isUnseen, type Game } from '../systems/components';
+import { MODEL_PREFIX } from '../systems/creatures';
 import { stooped } from '../systems/hurt';
 import { strikeFrame } from '../systems/realityTricks';
 import type { Arrival } from './bossArrival';
@@ -22,6 +24,24 @@ export interface Look {
   lash: number; // 0..1 around an attack's strike
   appear?: number; // 0..1 how far a horror just roused has come into view (render/bossArrival.ts); absent: wholly
   dissolve?: number; // 0..1 through its death: its picture goes texel by texel (render/creatureFx.ts, shaders/spriteFx.ts); absent: not dying
+  /** A horror dying its own death (data/bossDeaths.ts) moves its whole picture: its heights up (less than nought: down), its breadth and height (×), and its breadths along the ground (away from the investigator, and its tremble). */
+  lift?: number;
+  sx?: number;
+  sy?: number;
+  drift?: { x: number; z: number };
+}
+
+/** How a horror's own death moves its picture `t` through it (data/bossDeaths.ts): `sink` is its move's, not the plain death's. */
+function ownDeath(g: Game, id: Entity, t: number, time: number): Partial<Look> | null {
+  const death = deathOf(g.ecs.c.model.get(id)?.slice(MODEL_PREFIX.length) ?? '');
+  if (!death) return null;
+  const m = deathMoveAt(death.move, t, time);
+  const tr = g.ecs.c.transform.get(id)!;
+  const from = g.ecs.c.transform.get(g.player.id)?.pos ?? tr.pos;
+  const d = Math.hypot(tr.pos.x - from.x, tr.pos.z - from.z) || 1;
+  const [ax, az] = [(tr.pos.x - from.x) / d, (tr.pos.z - from.z) / d];
+  const [rx, rz] = [-Math.cos(tr.yaw), Math.sin(tr.yaw)]; // its right
+  return { sink: 0, lift: m.lift, sx: m.sx, sy: m.sy, drift: { x: ax * m.away + rx * m.shake, z: az * m.away + rz * m.shake } };
 }
 
 /** How opaque an outer god's echo of its body is: its own ghostliness, less as far as the body itself has gone or is not yet formed (an echo is not dressed in a texel style of its own, so it goes with the body by opacity, as it did before round 83). */
@@ -43,6 +63,8 @@ export function lookOf(g: Game, id: Entity, time: number, counts: Partial<Record
   if (a.move === 'death' && def) {
     const t = a.frame / def.frames;
     look = { state: 'hurt', frame: lastFrame(counts.hurt ?? 2), opacity: 1, sink: t * 0.4, lash: 0, dissolve: t }; // (round 83: its texels go, in the style of its matter; it faded whole and sank a third of its height)
+    const own = ownDeath(g, id, t, time);
+    if (own) Object.assign(look, own);
   } else if ((counts.stoop ?? 0) > 0 && stooped(g, id)) { // a colossus after a blow of its own, or reeling: its head is down within reach (hurt.ts), and the picture bows to match; once, then held
     const down = (counts.stoop_mid ?? 0) > 0 ? FEEDBACK.midSeconds : 0; // the head comes down through its halfway pose, where it has one
     look = stoopAge < down ? { state: 'stoop_mid', frame: 0, opacity: 1, sink: 0, lash: 0 } : { state: 'stoop', frame: stoopAge < down + FEEDBACK.bowSeconds ? 0 : counts.stoop! - 1, opacity: 1, sink: 0, lash: 0 };

@@ -11,6 +11,7 @@
 import { RELICS, RELIC_IDS, RELIC_SLOTS, type RelicId } from '../data/relics';
 import { WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
 import { equip } from '../systems/arms';
+import { t } from '../core/i18n';
 import type { Game } from '../systems/components';
 import { due, free, temperOf, weaponFigureList } from '../systems/finds';
 import type { GameEvents } from '../systems/gameEvents';
@@ -64,7 +65,7 @@ export function createFindCard(g: Game, busy: () => boolean = () => false): Find
         const hand = WEAPONS[g.player.weapon].name;
         const carried = g.player.arms.length;
         sentence(panel, `${hand} is in hand.   You carry ${carried} of ${WEAPON_IDS.length} weapons.`, 'opacity:.5;font-size:12px;margin-top:10px');
-        button(panel, 'Take it up now', () => (equip(g, id), g.events.emit('Notice', { text: `IN HAND · ${w.name.toUpperCase()}` }), screen.close()), true, 'The weapon in hand is set aside. Your reinforcement stays with the weapon it was set into.');
+        button(panel, 'Take it up now', () => (equip(g, id), g.events.emit('Notice', { text: t('n.inHand', { name: w.name.toUpperCase() }) }), screen.close()), true, 'The weapon in hand is set aside. Your reinforcement stays with the weapon it was set into.');
         button(panel, 'Keep it for later', () => screen.close(), true, fill('It is kept. Take it up any time from {pause} · Arms.'));
         footer(panel, fill('Take it up any time from {pause} · Arms.'), () => screen.close());
       },

@@ -1,17 +1,19 @@
 /**
  * The Stairs of Slumber's descent (round 105): no curtain in the arch between two flights over the void, the descent's share of the
- * depth, the mist's exponential gain, and the stairs' lights: dimmed, and gutter rarely, more as the mind fails.
+ * depth, the mist's gain (round 120: thick from the head, climbing fast), and the stairs' lights: dimmed by their depth (round 120),
+ * and gutter rarely, more as the mind fails.
  */
 
 import { describe, expect, it } from 'vitest';
 import { SLUMBER } from '../src/data/tuning';
-import { markStairLights, stairDim, stairGutter, stairWaver } from '../src/render/stairLights';
+import { markStairLights, stairDim, stairFlame, stairGutter, stairWaver } from '../src/render/stairLights';
 import type { LightSpot } from '../src/render/worldLights';
 import { isAbyss } from '../src/world/abyssStair';
-import { descentAt, descentGain, descentSpan } from '../src/world/descent';
+import { descentAt, descentGain, descentRise, descentSpan } from '../src/world/descent';
 import { gatePlan } from '../src/world/gatePlan';
 import { worldLayout } from '../src/world/placements';
-import type { RoomLayout } from '../src/world/dungeonKit';
+import { roomAt, type RoomLayout } from '../src/world/dungeonKit';
+import { newelFires } from '../src/render/stairNewels';
 import { dungeonJob } from '../src/render/siteMeshes';
 
 const slumber = () => {
@@ -41,26 +43,35 @@ describe('the descent', () => {
     expect(descentAt(deepest.x, bottom, deepest.z)).toBeCloseTo(1, 6);
   });
 
-  it('is 0 out of the stairs', () => {
-    expect(descentAt(1e6, -500, 1e6)).toBe(0);
+  it('is none out of the stairs', () => {
+    expect(descentAt(1e6, -500, 1e6)).toBeNull();
   });
 
-  it('thickens the mist exponentially, from 1 at the head to SLUMBER.mist.max at the bottom', () => {
-    expect(descentGain(0)).toBe(1);
+  it('thickens the mist from the head of the stairs, climbing fast toward SLUMBER.mist.max, and leaves it alone off them (round 120)', () => {
+    expect(descentGain(null)).toBe(1);
+    expect(descentGain(undefined)).toBe(1);
+    expect(descentGain(0)).toBe(SLUMBER.mist.head);
+    expect(SLUMBER.mist.head).toBeGreaterThan(1.5); // thick from the first step: asked, "increasing fog density early in the descent"
     expect(descentGain(1)).toBeCloseTo(SLUMBER.mist.max, 9);
     const gains = Array.from({ length: 11 }, (_, i) => descentGain(i / 10));
     gains.slice(1).forEach((g, i) => expect(g).toBeGreaterThan(gains[i]));
-    expect(descentGain(0.5)).toBeLessThan(1 + (SLUMBER.mist.max - 1) / 2); // convex: it lags the straight line
-    const early = (gains[2] - gains[1]) / (gains[1] - gains[0]);
-    const late = (gains[10] - gains[9]) / (gains[9] - gains[8]);
-    expect(late).toBeGreaterThan(early); // each step down adds more than the last
+    expect(descentRise(1 / 3)).toBeGreaterThan(0.6); // most of the climb in the first third
+    expect(gains[1] - gains[0]).toBeGreaterThan(3 * (gains[10] - gains[9])); // it intensifies fast at first, and the last steps add little
   });
 });
 
 describe("the stairs' lights", () => {
-  it('dims a light on the stairs and leaves the rest', () => {
-    expect(stairDim({ x: 0, y: 0, z: 0, kind: 'torch', stairs: true })).toBe(SLUMBER.light.dim);
-    expect(stairDim({ x: 0, y: 0, z: 0, kind: 'torch' })).toBe(1);
+  it('dims a light on the stairs by its depth, every step down darker, and leaves the rest (round 120)', () => {
+    const at = (stairs?: number): LightSpot => ({ x: 0, y: 0, z: 0, kind: 'torch', ...(stairs !== undefined && { stairs }) });
+    expect(stairDim(at())).toBe(1);
+    expect(stairDim(at(0))).toBeCloseTo(SLUMBER.light.top, 9);
+    expect(stairDim(at(1))).toBeCloseTo(SLUMBER.light.bottom, 9);
+    const dims = Array.from({ length: 11 }, (_, i) => stairDim(at(i / 10)));
+    dims.slice(1).forEach((d, i) => expect(d).toBeLessThan(dims[i]));
+    expect(SLUMBER.light.bottom / SLUMBER.light.top).toBeLessThan(0.25); // the deepest torches burn at a quarter of the first ones' light, or less
+    expect(stairFlame(at())).toBe(1);
+    expect(stairFlame(at(1))).toBeCloseTo(1 - SLUMBER.light.shrink, 9);
+    expect(stairFlame(at(0.6))).toBeLessThan(stairFlame(at(0.1)));
   });
 
   it('marks only the lights of the descent, below the head', () => {
@@ -72,7 +83,12 @@ describe("the stairs' lights", () => {
     ];
     markStairLights(L, lights);
     expect(lights[0].stairs).toBeUndefined();
-    expect(lights[1].stairs).toBe(true);
+    expect(lights[1].stairs).toBeGreaterThan(0);
+    expect(lights[1].stairs).toBeLessThan(0.2);
+    const { bottom } = descentSpan(L);
+    const deep: LightSpot[] = [{ x: 0, y: bottom + 1.95, z: 0, kind: 'torch' }];
+    markStairLights(L, deep);
+    expect(deep[0].stairs).toBeCloseTo(1, 1); // a torch on the deepest floor stands at the whole of the descent
   });
 
   it('gutters rarely when the mind is calm, more often as it fails, and never a light beyond its share', () => {
@@ -102,7 +118,7 @@ describe("the stairs' lights", () => {
   });
 
   it("wavers steadily between its gutters", () => {
-    const lamp: LightSpot = { x: 3, y: 1, z: -2, kind: 'torch', stairs: true };
+    const lamp: LightSpot = { x: 3, y: 1, z: -2, kind: 'torch', stairs: 0.5 };
     for (let t = 0; t < 30; t += 0.1) expect(Number.isFinite(stairWaver(lamp, 0.1, t, 0.5))).toBe(true);
   });
 
@@ -118,7 +134,30 @@ describe("the stairs' lights", () => {
     const { top } = descentSpan(d.layout);
     const below = lights.filter((l) => l.y < top + 1);
     expect(below.length).toBeGreaterThan(0);
-    expect(below.every((l) => l.stairs === true)).toBe(true);
-    expect(lights.filter((l) => l.y >= top + 1).some((l) => l.stairs)).toBe(false);
+    expect(below.every((l) => typeof l.stairs === 'number')).toBe(true);
+    expect(lights.filter((l) => l.y >= top + 1).some((l) => l.stairs !== undefined)).toBe(false);
+  });
+});
+
+describe("the stairs' fires (round 120: fewer torches, and the deeper the fewer)", () => {
+  it('burns few of its newels: both pylons and a middle newel on the seventy steps, one pylon a flight below them, one on every other flight in the depths', () => {
+    expect(newelFires(0, 0)).toMatchObject({ middle: true, pylons: 2 });
+    expect(newelFires(0.3, 3)).toMatchObject({ middle: false, pylons: 1 });
+    expect(newelFires(0.8, 4).pylons + newelFires(0.8, 5).pylons).toBe(1);
+  });
+
+  it('hangs no wall torch over the void, and lights the whole descent with a third of the lights it had', () => {
+    const d = worldLayout().dungeons.find((x) => x.layout.def.id === 'slumber');
+    if (!d) throw new Error('no Stairs of Slumber in the world');
+    let lights: LightSpot[] = [];
+    const job = dungeonJob(d, (_meshes, out) => {
+      lights = out;
+    });
+    let step = job.next();
+    while (!step.done) step = job.next();
+    const over = (l: LightSpot) => isAbyss(roomAt(d.layout, l.x, l.z));
+    expect(lights.filter((l) => l.kind === 'torch' && over(l))).toEqual([]);
+    expect(lights.filter(over).length).toBeLessThanOrEqual(20); // sixteen flights: their newels' few fires (round 104 lit 108)
+    expect(lights.length).toBeLessThan(182 / 2); // the whole descent, halls and all (182 before round 120)
   });
 });

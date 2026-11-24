@@ -1,13 +1,21 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import { keyLayout, rebind } from '../src/core/bindings';
+import { useDevice } from '../src/core/device';
 import { detectLocale, localeId, setLocale, t } from '../src/core/i18n';
-import { LANGS } from '../src/data/lang';
+import { LANGS, type Key } from '../src/data/lang';
 import { EN } from '../src/data/lang/en';
 import { SETTINGS } from '../src/data/tuning';
+import { fill, padName } from '../src/ui/glyphs';
 
 const places = (text: string): string[] => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+/** Strip `{slots}` and the lowercase SI seconds symbol (` s`) so all-caps lines with placeholders are checked too. */
+const plain = (text: string): string => text.replace(/\{\w+\}/g, '').replace(/(^| )s(?=$| ·)/g, '$1');
 
 describe('the languages (round 46)', () => {
-  afterEach(() => setLocale(0));
+  afterEach(() => {
+    setLocale(0);
+    useDevice('keys');
+  });
 
   it('every language has every line, non-empty, with the same {places} as the English', () => {
     for (const lang of LANGS) {
@@ -25,11 +33,45 @@ describe('the languages (round 46)', () => {
       const same = Object.entries(EN).filter(([k, v]) => (lang.table as Record<string, string>)[k] === v).length;
       expect(same, lang.id).toBeLessThan(Object.keys(EN).length * 0.12); // (names and the odd word are alike)
       for (const [k, v] of Object.entries(EN)) {
-        if (/^[A-Z0-9 ·{}×+−'.,:!?&-]+$/.test(v) && /[A-Z]{4}/.test(v)) {
-          const line = (lang.table as Record<string, string>)[k];
+        const bare = plain(v);
+        if (bare === bare.toUpperCase() && /[A-Z]{4}/.test(bare)) {
+          const line = plain((lang.table as Record<string, string>)[k]);
           expect(line, `${lang.id} ${k}`).toBe(line.toUpperCase());
         }
       }
+    }
+  });
+
+  it('every hint and button-bearing notice names a real button on keyboard, rebound keys, and pad', () => {
+    const hints = Object.keys(EN).filter((k) => k.startsWith('hint.')) as Key[];
+    const buttonNotices: readonly Key[] = ['hud.signFound', 'n.newWeapon', 'hud.mountSummon', 'hud.mountRide', 'mounts.intro', 'map.press', 'sig.alertHelm', 'sig.umrOffer'];
+    const was = { ...keyLayout };
+    try {
+      for (let i = 0; i < LANGS.length; i++) {
+        setLocale(i);
+        for (const device of ['keys', 'pad'] as const) {
+          useDevice(device);
+          for (const k of hints) {
+            const shown = fill(t(k));
+            expect(shown, `${LANGS[i].id} ${device} ${k}`).not.toMatch(/[{}]/);
+          }
+          for (const k of buttonNotices) {
+            const shown = fill(t(k, { name: 'ARKHAM' }), true);
+            expect(shown, `${LANGS[i].id} ${device} ${k}`).not.toMatch(/[{}]/);
+          }
+        }
+      }
+      setLocale(0);
+      useDevice('keys');
+      rebind(keyLayout, 'interact', 'KeyG');
+      expect(fill(t('sig.alertHelm'), true)).toContain('G AT HER HELM');
+      expect(fill(t('map.press'), true)).toBe('PRESS G');
+      useDevice('pad');
+      expect(fill(t('map.press'), true)).toBe('PRESS A');
+      expect(fill(t('sig.alertHelm'), true)).toContain('A AT HER HELM');
+      expect([padName('interact', 'xbox'), padName('interact', 'playstation'), padName('interact', 'nintendo')]).toEqual(['A', '✕', 'B']);
+    } finally {
+      Object.assign(keyLayout, was);
     }
   });
 
@@ -39,6 +81,12 @@ describe('the languages (round 46)', () => {
     setLocale(1);
     expect(localeId()).toBe('de');
     expect(t('pause.resume')).toBe('Weiter');
+    expect(t('n.noRounds')).toBe('KEINE PATRONEN');
+    expect(t('sig.rams')).toBe('DIE ALERT RAMMT ES');
+    setLocale(2);
+    expect(t('sig.rams')).toBe('L’ALERT L’ÉPERONNE');
+    setLocale(3);
+    expect(t('sig.rams')).toBe('EL ALERT LO EMBISTE');
     setLocale(99);
     expect(localeId()).toBe('en');
     expect(t('nothing.here' as never)).toBe('nothing.here');

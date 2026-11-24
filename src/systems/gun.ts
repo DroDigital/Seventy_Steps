@@ -8,6 +8,7 @@
  * it far off; levels set into the gun at an Elder Sign, in star-stones, put that off. Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import { GUN } from '../data/tuning';
 import { moveDef } from './actions';
 import type { Game } from './components';
@@ -59,7 +60,7 @@ export function gunAction(g: Game, action: 'shoot' | 'reload'): 'shoot' | 'reloa
   if (action === 'reload' && p.ammo >= GUN.chamber) return null;
   if (p.rounds > 0) return 'reload';
   g.events.emit('DryFire', { entity: p.id });
-  notice(g, 'NO ROUNDS');
+  notice(g, t('n.noRounds'));
   return null;
 }
 
@@ -67,7 +68,7 @@ export function gunAction(g: Game, action: 'shoot' | 'reload'): 'shoot' | 'reloa
 export function giveRounds(g: Game, n: number): boolean {
   if (g.player.rounds + n > GUN.carry) return false;
   g.player.rounds += n;
-  notice(g, `ROUNDS · +${n}`);
+  notice(g, t('n.roundsFound', { n }));
   return true;
 }
 

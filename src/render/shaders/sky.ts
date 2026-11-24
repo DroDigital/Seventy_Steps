@@ -14,6 +14,7 @@
 import { HOURS } from '../../data/hours';
 import { COSMOS_GLSL } from './skyCosmos';
 import { OMEN_GLSL } from './skyOmen';
+import { SKY_TONE_GLSL } from './skyTone';
 
 const F = (n: number): string => n.toFixed(2);
 
@@ -111,6 +112,7 @@ float meteor(vec3 d, float t) {
 
 ${COSMOS_GLSL}
 ${OMEN_GLSL}
+${SKY_TONE_GLSL}
 
 // the stars wheel about the pole the sky turns on
 vec3 wheel(vec3 d, float ang) {
@@ -123,16 +125,11 @@ void main() {
   vec3 d = normalize(vDir);
   float h = d.y;
   vec3 m = normalize(uMoonDir);
-  float toward = 0.5 + 0.5 * dot(normalize(d.xz + 1e-4), normalize(m.xz + 1e-4)); // 1 on the moon's side
   float rise = max(h, 0.0);
   float az = atan(d.x, d.z);
   float a = acos(clamp(dot(d, m), -1.0, 1.0));
-  float glow = exp(-rise * 7.0) * (0.35 + 0.65 * toward * toward);
-  vec3 col = mix(uHorizon, uZenith, pow(smoothstep(0.0, 0.85, rise), 0.7));
-  col += uMoonColor * (0.16 * uHaze) * glow; // the moon's quarter shines low on the sky
-  vec3 hours = vec3(0.0); // the hour's own light low on the sky: a warm band opposite where the moon rose, a pale wedge opposite where it sets
-  if (uHour.x > 0.001) hours += uHourGlow * (exp(-rise * ${F(HOURS.falloff)}) * pow(0.5 + 0.5 * cos(az - uHour.z), ${F(HOURS.spread)}) * uHour.x);
-  if (uHour.y > 0.001) hours += uHourDawn * (pow(0.5 + 0.5 * cos(az - uHour.w), ${F(HOURS.cone.spread)}) * exp(-rise * ${F(HOURS.cone.lean)}) * smoothstep(0.0, 0.05, h) * uHour.y);
+  vec3 col = skyTone(d); // the gradient and the moon's quarter shining low on it (shaders/skyTone.ts: the far silhouettes melt into the same light)
+  vec3 hours = skyHours(d); // the hour's own light low on the sky
   col += hours;
   if (uNebula > 0.001) col += nebula(d, uTime) * uNebula * smoothstep(-0.02, 0.3, h); // gas behind the stars (the Outer Dark)
 

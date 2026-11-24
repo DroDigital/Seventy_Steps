@@ -7,7 +7,9 @@
  * Pure: no Three.js.
  */
 
+import { t } from '../core/i18n';
 import { distXZ, type XZ } from '../core/geom';
+import type { Key } from '../data/lang/en';
 import { ARENA_HOUSES } from '../data/arenaHousesAll';
 import { FOUND, foundKey, stepKey, type Gift, type Offer, type Step, type Vigil, type When } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
@@ -133,15 +135,15 @@ function unready(g: Game, a: ArenaPlace, i: number, s: Vigil | Offer, me: XZ): v
   if (!at || distXZ(me, at) > (s.kind === 'vigil' ? FOUND.vigil : FOUND.altar) || g.frame - (st.hushed.get(key) ?? -Infinity) < FOUND.hush * SIM.hz) return;
   st.hushed.set(key, g.frame);
   const first = DISCOVERIES[a.bosses[0]!]!.steps[currentStep(g, a.bosses[0]!)];
-  g.events.emit('Notice', { text: `NOTHING STIRS HERE YET. ${first ? FIRST[first.kind] : 'SOMETHING IS ASKED FIRST'}` }); // what is asked first (round 65: it said only that something was)
+  g.events.emit('Notice', { text: t('disc.nothing', { first: first ? t(FIRST[first.kind]) : t('disc.asked') }) }); // what is asked first (round 65: it said only that something was)
 }
 
-/** What a mark or an altar come to early says is asked first. */
-const FIRST: Readonly<Record<Step['kind'], string>> = {
-  read: 'A PAGE IN THE COURT IS STILL TO BE READ',
-  rite: 'THE LIGHTS OF THE COURT ARE STILL TO BE LIT',
-  vigil: 'A VIGIL IN THE COURT IS STILL TO BE KEPT',
-  offer: 'A GIFT IS STILL TO BE LAID',
+/** What a mark or an altar come to early says is asked first: a line of the interface's (`disc.*`). */
+const FIRST: Readonly<Record<Step['kind'], Key>> = {
+  read: 'disc.read',
+  rite: 'disc.rite',
+  vigil: 'disc.vigil',
+  offer: 'disc.offer',
 };
 
 /** How much of a vigil is kept, 0..1 (the picture and the sound read it). */
