@@ -104,18 +104,19 @@ describe('the punish windows (round 83)', () => {
     fight.phase = fight.script.phases.length - 1;
     NYARLATHOTEP_SIGNATURE.step!(g, boss, fight); // the true form rebuilds the native moveset before it borrows
     const actor = g.ecs.c.actor.get(boss)!;
-    expect(actor.moves.slam).toBeUndefined();
+    expect(actor.moves.cthulhu_feelers).toBeUndefined();
     const extra = NYARLATHOTEP_SIGNATURE.extra!(g, boss, fight);
-    expect(extra.map((a) => a.move)).toContain('slam');
-    const slam = ATTACKS.slam;
-    expect(actor.moves.slam.frames - slam.windup - slam.active).toBe(38); // Cthulhu's band is deep; the borrower's is last
+    expect(extra.map((a) => a.move)).toContain('cthulhu_feelers'); // Cthulhu's own (2026-11-24)
+    const feelers = ATTACKS.cthulhu_feelers;
+    expect(actor.moves.cthulhu_feelers.frames - feelers.windup - feelers.active).toBe(34); // Cthulhu's band is deep (39); the borrower's is last
     for (const { move } of extra) {
       const attack = ATTACKS[move as keyof typeof ATTACKS];
       expect(actor.moves[move].frames - attack.windup - attack.active, move).toBe(recoveryFor(attack, bandOf(fight.id)));
     }
-    const cached = actor.moves.slam;
+    expect(actor.moves.cthulhu_claw_2, 'a borrowed chain runs on into its own next link').toBeDefined();
+    const cached = actor.moves.cthulhu_feelers;
     NYARLATHOTEP_SIGNATURE.extra!(g, boss, fight);
-    expect(actor.moves.slam).toBe(cached);
+    expect(actor.moves.cthulhu_feelers).toBe(cached);
   });
 
   it('takes the weight of its lighter blows and its evasion from the band, a horror at a time, and leaves the heaviest blow as it was', () => {
@@ -154,14 +155,14 @@ describe('time_skip (round 83)', () => {
   });
 
   it('does not take a recovery: a boss that has struck and is held waits for another time', () => {
-    const t = due('sweep', 0);
-    t.a.frame = t.a.moves.sweep.open!;
+    const t = due('outsider_rake', 0);
+    t.a.frame = t.a.moves.outsider_rake.open!;
     const where = { ...t.g.ecs.c.transform.get(t.boss)!.pos };
     t.skip();
     expect(t.skips).toEqual([]);
     expect(t.g.reality.skipIn).toBe(REALITY.skipRetry);
     expect(t.g.ecs.c.transform.get(t.boss)!.pos).toEqual(where);
-    expect(t.a.frame).toBe(t.a.moves.sweep.open);
+    expect(t.a.frame).toBe(t.a.moves.outsider_rake.open);
   });
 
   it('does not take a stagger, or the long pause a boss keeps after a blow', () => {
@@ -177,10 +178,10 @@ describe('time_skip (round 83)', () => {
   });
 
   it('skips a boss that was about to strike anyway, and leaves it the ordinary pause after the blow', () => {
-    for (const t of [due(null, 0, REALITY.skipLead), due('sweep', 3)]) {
+    for (const t of [due(null, 0, REALITY.skipLead), due('outsider_rake', 3)]) {
       t.skip();
       expect(t.skips).toEqual([{ entity: t.boss }]);
-      expect(t.a.move).toBe('sweep');
+      expect(t.a.move).toBe('outsider_rake');
       expect(t.g.ecs.c.brain.get(t.boss)!.cooldown).toBeGreaterThanOrEqual(BOSS.gap[0]);
       expect(t.g.reality.skipIn).toBeGreaterThanOrEqual(REALITY.skipEvery[0]);
     }

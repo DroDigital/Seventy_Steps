@@ -130,7 +130,7 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const k = uiScale();
     const marks = (onShow = painter.paint(ctx, view, shown, true, shown === here())); // the investigator's arrow only on their own realm
     drawBeacon(ctx, view, currentLead(g)?.at ?? null, shown, 'screen', UNIT.full * k, 'lead');
-    for (const m of g.overworld?.markers ?? []) drawBeacon(ctx, view, m, shown, 'screen', UNIT.full * k, 'marker', 0, true); // the shown realm's (drawBeacon keeps to it); the pins are among the marks, only their pointers, off screen
+    for (const m of g.overworld?.markers ?? []) drawBeacon(ctx, view, m, shown, 'screen', UNIT.full * k, 'marker', 0, true); // the shown realm's (drawBeacon keeps to it); the pins are among the marks (gatherMarks: the shown realm's), only their pointers, off screen
     const pad = deviceInUse() === 'pad';
     const aim = pad ? view.aim : pointer;
     const hover = aim && (pad || !drag) ? signAtPoint(aim) : null;

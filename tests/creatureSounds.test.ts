@@ -6,6 +6,7 @@ import { ATTACK_IDS } from '../src/data/schema';
 import { voiceIdOf } from '../src/data/voices';
 import { attackSound, strikeFrame } from '../src/render/audio/foley';
 import { compileAttack } from '../src/data/attacks';
+import { baseOf } from '../src/data/bossMoves';
 
 const voiced = ENTITIES.filter((d) => voiceIdOf(d) !== null);
 const enemies = voiced.filter((d) => d.tier !== 'ally');
@@ -64,7 +65,7 @@ describe('every creature its own sound (round 20: data/creatureSounds.ts)', () =
 
   it('a creature’s own sound for a blow is for an attack it has', () => {
     for (const [id, c] of Object.entries(CREATURE_SOUNDS)) {
-      for (const attack of Object.keys(c.attacks ?? {})) expect(attacksOf(id).has(attack), `${id} has no ${attack}`).toBe(true);
+      for (const attack of Object.keys(c.attacks ?? {})) expect([...attacksOf(id)].some((x) => x === attack || baseOf(x) === attack), `${id} has no ${attack}`).toBe(true); // or a blow of its own built on it (2026-11-24)
     }
     for (const id of Object.keys(ATTACK_SOUNDS)) expect(ATTACK_IDS, id).toContain(id);
     for (const a of Object.values(ATTACK_SOUNDS)) expect(SAMPLE_SETS[a!.set]).toBeDefined();

@@ -8,6 +8,7 @@
 
 import { distXZ, type XZ } from '../core/geom';
 import { t } from '../core/i18n';
+import type { RegionDef } from '../data/regions';
 import { MARKER } from '../data/tuning';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
@@ -41,18 +42,22 @@ export function clearMarkers(g: Pick<Game, 'overworld'>): number {
   return n;
 }
 
-/** The markers that lie in the realm the investigator is in (another realm's are kept, and not shown there). */
-export function markersHere(g: Pick<Game, 'overworld' | 'ecs' | 'player'>): XZ[] {
+/** The markers that lie in `realm` (its regions): the realm on show on the full map. */
+export function markersIn(g: Pick<Game, 'overworld'>, realm: readonly RegionDef[]): XZ[] {
   const ms = g.overworld?.markers;
-  if (!ms?.length) return [];
-  const pos = g.ecs.c.transform.get(g.player.id)!.pos;
-  const mine = regionAt(pos.x, pos.z);
-  if (!mine) return [];
-  const realm = realmOf(mine.id);
+  if (!ms?.length || !realm.length) return [];
   return ms.filter((m) => {
     const theirs = regionAt(m.x, m.z);
     return !!theirs && realm.some((r) => r.id === theirs.id);
   });
+}
+
+/** The markers that lie in the realm the investigator is in (another realm's are kept, and not shown there). */
+export function markersHere(g: Pick<Game, 'overworld' | 'ecs' | 'player'>): XZ[] {
+  if (!g.overworld?.markers.length) return [];
+  const pos = g.ecs.c.transform.get(g.player.id)!.pos;
+  const mine = regionAt(pos.x, pos.z);
+  return mine ? markersIn(g, realmOf(mine.id)) : [];
 }
 
 /** How far a marker is from the investigator (metres). */

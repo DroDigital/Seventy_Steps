@@ -94,7 +94,7 @@ describe('the outer gods (spec §3E)', () => {
   it('in the world Nyarlathotep borrows from the bosses slain, and watches when a region boss falls', () => {
     const g = createWorldGame();
     g.overworld!.slain = new Set(['boss:cthulhu', 'boss:ghatanothoa']);
-    expect(borrowed(g)).toEqual(expect.arrayContaining(['tentacle_burst', 'slam', 'tidal_surge']));
+    expect(borrowed(g)).toEqual(['ghatan_stare', 'cthulhu_feelers', 'ghatan_tentacles', 'cthulhu_claw', 'ghatan_crush', 'cthulhu_call']); // each slain horror's own, most struck first, the last slain first (2026-11-24)
     const s = worldLayout().spawns.find((x) => x.id === 'boss:colour_out_of_space')!;
     goTo(g, s.at.x, s.at.z + 12);
     run(g, 5);

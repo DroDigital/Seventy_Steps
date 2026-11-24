@@ -11,6 +11,7 @@ import { distXZ } from '../src/core/geom';
 import { ATTACKS, compileAttack } from '../src/data/attacks';
 import { st } from '../src/data/entities/kit';
 import { ENTITIES } from '../src/data/registry';
+import { baseOf } from '../src/data/bossMoves';
 import { ATTACK_IDS, type AttackId } from '../src/data/schema';
 import { startMove } from '../src/systems/actions';
 import type { Game } from '../src/systems/components';
@@ -182,8 +183,8 @@ describe('the new attacks, played', () => {
 });
 
 describe('the new attacks, given to the horrors that they belong to', () => {
-  const users = (id: AttackId): string[] =>
-    ENTITIES.filter((e) => (e.bossScript ?? e.bossVariant?.bossScript)?.phases.some((p) => p.attacks.some((a) => a.id === id))).map((e) => e.id);
+  const users = (id: AttackId): string[] => // each horror's blow its own since 2026-11-24, built on the library's
+    ENTITIES.filter((e) => (e.bossScript ?? e.bossVariant?.bossScript)?.phases.some((p) => p.attacks.some((a) => baseOf(a.id) === id))).map((e) => e.id);
 
   it('are each some horrors\' own: at least two, and the tales\' own horrors in them', () => {
     for (const id of NEW) expect(users(id).length, id).toBeGreaterThanOrEqual(2);

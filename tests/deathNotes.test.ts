@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS } from '../src/data/deathLines';
 import { REGIONS } from '../src/data/regions';
 import { ATTACK_IDS } from '../src/data/schema';
-import { deathLine } from '../src/systems/deathNotes';
+import { deathLine, tipOf } from '../src/systems/deathNotes';
 import { createWorldGame } from '../src/systems/game';
 import { spawnCreature } from '../src/systems/creatures';
 
 describe('what the last blow teaches (round 26)', () => {
   it('has a line for every blow, short, and a fragment for every realm', () => {
-    for (const id of ATTACK_IDS) expect(TIPS[id], id).toBeTruthy();
-    for (const t of Object.values(TIPS)) expect(t.length).toBeLessThan(120);
+    for (const id of ATTACK_IDS) expect(tipOf(id), id).toBeTruthy(); // a horror's own blows carry their own (2026-11-24)
+    for (const id of ATTACK_IDS) expect(tipOf(id)!.length, id).toBeLessThan(120);
     for (const r of Object.keys(FRAGMENTS)) expect(REGIONS.some((x) => x.id === r), r).toBe(true);
     for (const r of REGIONS) expect(FRAGMENTS[r.id]?.length ?? 0, r.id).toBeGreaterThan(0);
   });

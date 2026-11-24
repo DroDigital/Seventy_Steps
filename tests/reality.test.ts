@@ -85,8 +85,8 @@ describe('reality hooks (spec §3E)', () => {
     steps(g, 4);
     expect(skips).toEqual([{ entity: boss }]);
     const a = g.ecs.c.actor.get(boss)!;
-    expect(a.move).toBe('sweep');
-    expect(a.moves.sweep.hit!.window[0] - a.frame).toBeLessThanOrEqual(REALITY.skipLead);
+    expect(a.move).toBe('outsider_rake');
+    expect(a.moves.outsider_rake.hit!.window[0] - a.frame).toBeLessThanOrEqual(REALITY.skipLead);
     expect(distXZ(g.ecs.c.transform.get(boss)!.pos, g.ecs.c.transform.get(g.player.id)!.pos)).toBeLessThan(3);
   });
 
