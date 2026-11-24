@@ -20,7 +20,6 @@ import { button, createScreen, el, heading, LIFT_ROOM, type Page } from './menuK
 import { wordmark } from './logo';
 import { EDITION } from '../data/edition';
 import { settingsPage } from './menuPages';
-import { brightnessPage } from './brightnessCalibration';
 import type { SettingId, Settings } from './settings';
 
 export interface TitleOptions {
@@ -30,8 +29,6 @@ export interface TitleOptions {
   settings: Settings;
   change(id: SettingId, v: number): void;
   saveKeys?: () => void; // keeps the keyboard's layout when rebound
-  calibrate: boolean; // the brightness card is due: shown once, as the title opens (round 103)
-  calibrated(): void; // the card was kept
   /** Resolves when the title may open without a key press or click (its theme sounds without one). */
   byItself: Promise<void>;
   /** The title opens: its first key press or click, or by itself. */
@@ -68,12 +65,11 @@ export function showTitle(o: TitleOptions): void {
   const showHead = (on: boolean): void => void (head.style.opacity = on ? '1' : '0');
   screen.onClose = () => head.remove();
   /** Where a page stands, and whether the name shows above it: set as the page is built. */
-  const placed = (page: Page, top: string, name: boolean, pureBlack = false): Page => {
+  const placed = (page: Page, top: string, name: boolean): Page => {
     const build = page.build.bind(page);
     page.build = (p) => {
       p.style.top = top;
       showHead(name);
-      screen.root.style.zIndex = pureBlack ? '25' : '5'; // keep brightness calibration completely clear of the receding purple veil
       build(p);
     };
     return page;
@@ -91,7 +87,7 @@ export function showTitle(o: TitleOptions): void {
     o.open();
     logo.play(); // the letters take fire as the dark draws back
     removeEventListener('pointerdown', wake, true);
-    setTimeout(() => screen.show(o.calibrate ? first : main), 350); // a beat, and the waking key or click is spent before the menu stands under it
+    setTimeout(() => screen.show(main), 350); // a beat, and the waking key or click is spent before the menu stands under it
   };
   void o.byItself.then(wake);
   const gate: Page = placed({
@@ -125,11 +121,7 @@ export function showTitle(o: TitleOptions): void {
       }
     },
   }, '66%', true);
-  /** Settings; from its Display tab the brightness card, which returns to them. */
-  const settingsHere = (): Page => placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0, () => screen.show(cardHere())), '50%', false);
-  const cardHere = (): Page => placed(brightnessPage(o.settings, o.change, () => screen.show(settingsHere()), o.calibrated, false), '50%', false, true);
-  /** The first launch's card: shown once, as the title opens, and on to the menu. */
-  const first = placed(brightnessPage(o.settings, o.change, () => screen.show(main), o.calibrated, true), '50%', false, true);
+  const settingsHere = (): Page => placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0), '50%', false);
   const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));
   /** How hard the dream is: chosen here, once, as a new one begins, and never after (round 38). */
   const difficultyPage = (slot: number): Page => placed({
