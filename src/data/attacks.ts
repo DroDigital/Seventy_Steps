@@ -21,6 +21,7 @@ export interface AttackDef {
   power: number; // damage = power × stats.damage
   poise: number; // poise damage = poise × stats.damage
   range: readonly [min: number, max: number]; // metres, for a human-sized body; the AI's bracket
+  far?: number; // metres its bolts, barrage, effect and dread carry, when not the bracket's far end: a chained link's bracket is none, its base's carry is kept (resolveOwn)
   reach?: number; // hitbox (see HitDef), metres for a human-sized body
   radius?: number;
   height?: number; // fraction of body height
@@ -129,6 +130,7 @@ export function resolveOwn(s: OwnSpec): AttackDef {
   const out: Record<string, unknown> = { ...base, ...over };
   for (const k of NESTED) if (over[k]) out[k] = { ...(base[k] ?? {}), ...over[k] };
   if (over.follow === undefined) delete out.follow;
+  if (out.far === undefined && (out.range as AttackDef['range'])[1] === 0 && base.range[1] > 0) out.far = base.range[1]; // a link is never chosen, but its shots still fly
   return out as unknown as AttackDef;
 }
 
@@ -163,6 +165,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   const a = ATTACKS[id];
   const k = sizeFactor(height);
   const frames = a.windup + a.active + recoveryFor(a, band);
+  const far = a.far ?? a.range[1];
   const damage = Math.round(a.power * stats.damage);
   const poise = Math.round(a.poise * stats.damage);
   const hitstop = a.kind === 'ranged' ? 2 : a.power >= 1.4 ? 4 : 3;
@@ -173,10 +176,10 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   const move: MoveDef = { frames, track: { window: [0, Math.max(1, a.windup - 4)], rate: 3 }, motion };
   if (a.sweep?.blind) delete move.track;
   if (a.sanity && stats.sanityDamage > 0) {
-    const range = a.range[1] * k;
+    const range = far * k;
     move.sanity = { window: [a.windup, a.windup + a.active], amount: a.sanity * stats.sanityDamage, range, sight: a.effect === 'gaze' };
   }
-  if (a.effect) move.effect = { window: [a.windup, a.windup + a.active], kind: a.effect, range: a.range[1] * k };
+  if (a.effect) move.effect = { window: [a.windup, a.windup + a.active], kind: a.effect, range: far * k };
   if (a.follow) move.then = a.follow;
   else if (a.kind !== 'special') move.open = a.windup + a.active; // it recovers, stooped, after the blow (hurt.ts)
   if (a.pull) move.pull = { window: [a.windup, a.windup + a.active], speed: a.pull.speed, range: a.pull.range * k };
@@ -196,9 +199,9 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   } else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
   else if (cloud) move.cloud = cloud;
   else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise, ...(a.sweep.arms && { arms: a.sweep.arms }) };
-  else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
+  else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: far * k * 1.6, damage, poise };
   else if (b) {
-    const range = a.range[1] * k * 1.5 * (1 + (b.bounces ?? 0)); // a bolt that glances off walls flies the farther for each
+    const range = far * k * 1.5 * (1 + (b.bounces ?? 0)); // a bolt that glances off walls flies the farther for each
     move.volley = { frame: a.windup, count: b.count, spread: b.spread, speed: b.speed, radius: b.radius * Math.sqrt(k), range, damage, poise, lob: !!b.lob, pool, ...(b.bounces && { bounces: b.bounces }) };
   } else if (pool) move.pool = { frame: a.windup, ...pool };
   else if (a.shot) move.shot = { frame: a.windup, damage, poise, range: a.shot * Math.sqrt(k), hitstop };
