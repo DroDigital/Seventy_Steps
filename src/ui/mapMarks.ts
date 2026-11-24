@@ -72,8 +72,9 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
   const labels: Record<'signs' | 'doors' | 'people' | 'places', MapLabel[]> = { signs: [], doors: [], people: [], places: [] };
   const add = (list: Mark[], m: Omit<Mark, 'r' | 'label' | 'badge' | 'place'> & Partial<Pick<Mark, 'badge' | 'place'>>, scale: number, label: MapLabel | null, row: keyof typeof labels): void => {
     const r = unit * scale;
-    list.push({ badge: null, place: null, ...m, r, label });
-    if (label) labels[row].push({ ...label, gap: reach(m.kind, r) + 3 });
+    const placed = label ? { ...label, gap: reach(m.kind, r) + 3 } : null;
+    list.push({ badge: null, place: null, ...m, r, label: placed });
+    if (placed) labels[row].push(placed);
   };
   const slid = (id: string, x: number, y: number): [number, number] => {
     const o = slip(id, sanity, bucket); // a failing mind's map slides (round 26)
