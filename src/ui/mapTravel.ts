@@ -1,9 +1,9 @@
 /**
  * Fast travel from the full map (playtest round 7): a lit Elder Sign of the realm on show is picked
- * under the pointer, or under the pad's mark at the middle of the map, or in a direction from where
+ * under the mouse or pad cursor, or in a direction from where
  * the map is centred (the pad's d-pad, or the stick once R3 has locked on), or in turn (nearest the
  * investigator first) with Tab or the pad's shoulders. The one chosen glows in a breathing ring, bone in Cosmic Purple like the veil's
- * sign; choosing it again (a second click, Enter, the pad's A) makes the journey, unless the words
+ * sign; A travels to the hovered sign, and a second click or Enter travels to a mouse or keyboard choice, unless the words
  * say why not (checkpoints.ts's travelBar: a boss fight on, a foe hunting close by).
  */
 
@@ -11,9 +11,10 @@ import { t } from '../core/i18n';
 import { distXZ, type XZ } from '../core/geom';
 import type { Key } from '../data/lang/en';
 import type { RegionDef } from '../data/regions';
+import { INPUT } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { mapPlaces, type MapPlace } from '../world/mapData';
-import { screenX, screenY, type MapView } from './mapView';
+import { screenX, screenY, worldX, worldZ, type MapView } from './mapView';
 
 const PICK_PX = 14; // a sign this near the pointer is picked
 /** Why a journey may not be made, as the map's bar says it: a fight on, a foe hunting close by, the investigator fallen, or (round 56) a sign beyond the demo's realms. */
@@ -30,13 +31,6 @@ export function litSigns(g: Game, realm: readonly RegionDef[], from: XZ): MapPla
 }
 
 const screenOf = (view: MapView, p: XZ): [number, number] => [screenX(view, p.x), screenY(view, p.z)];
-
-/** What the pad's A does: a sign under the mark is chosen, and the one already chosen is the journey; with neither, the view finds the investigator. */
-export function padTravel(under: MapPlace | null, chosen: MapPlace | null): 'choose' | 'journey' | 'find' {
-  if (under && under !== chosen) return 'choose';
-  if (chosen) return 'journey';
-  return 'find';
-}
 
 /**
  * The lit sign most nearly in a screen direction from `from` (y grows down the canvas), other than
@@ -85,7 +79,7 @@ export function stickSwitch(armed: boolean, signs: readonly MapPlace[], view: Ma
   return { armed: mag < STICK_REARM || armed, next: null };
 }
 
-const PAN = 0.48; // screen widths a second at a full stick. It was 0.02 of the screen a frame: 1.2 a second, and twice that on a 120 Hz Mac
+const PAN = 0.48; // screen widths a second at a full stick, for both the cursor and the chart
 const ZOOM = Math.log(1.03) * 60; // the old per-frame 1.03, as a rate, so a frame rate does not change how fast the map zooms
 
 /** How far a trigger is pulled, 0 when it is up. A digital press with no analog value counts as full. */
@@ -100,73 +94,92 @@ export function mapZoom(into: number, out: number, dt: number): number {
   return z === 0 ? 1 : Math.exp(z * ZOOM * dt);
 }
 
-/** World metres to add to the view's centre for a stick this slice of a second. Inside the dead zone, none. */
-export function padPan(x: number, y: number, w: number, scale: number, dt: number): [number, number] {
-  if (Math.hypot(x, y) <= 0.2) return [0, 0];
-  const step = (PAN * w * dt) / scale;
-  return [-x * step, -y * step];
+interface MapPoint {
+  x: number;
+  y: number;
 }
 
-export interface Steer {
+export interface PadMapView extends MapView {
   locked: boolean;
   armed: boolean;
-  cx: number;
-  cz: number;
-  w: number;
-  h: number;
-  scale: number;
-  zoom: number;
-  focus: MapPlace | null; // a sign just taken, for the chart to centre on and to choose
+  aim: MapPoint;
+}
+
+interface PadSteering {
+  stick: MapPoint;
+  pan: MapPoint;
+  lock: boolean;
+  dpad: MapPoint | null;
+  zoomIn: number;
+  zoomOut: number;
+}
+
+function stickStep(stick: MapPoint, step: number): MapPoint | null {
+  if (Math.hypot(stick.x, stick.y) <= INPUT.deadzone) return null;
+  return { x: stick.x * step, y: stick.y * step };
 }
 
 /**
- * What the pad does to the chart this frame. Unlocked, the stick pans. R3 (`lock`) takes the sign under
- * the mark, or the nearest, and holds the chart on it; the stick then flicks to the next in that
- * direction, one sign a push. The d-pad does that whether or not a sign is locked.
+ * The left stick moves the cursor and pans past the edge. The right stick pans under the cursor.
+ * R3 locks the hovered or nearest sign, then the left stick flicks between signs. The d-pad
+ * jumps to the next sign in its direction in either mode.
  */
 export function steerPad(
-  s: { locked: boolean; armed: boolean; cx: number; cz: number; w: number; h: number; scale: number },
-  stick: { x: number; y: number },
+  current: PadMapView,
+  input: PadSteering,
   dt: number,
   signs: readonly MapPlace[],
-  lock: boolean,
-  dpad: { x: number; y: number } | null,
-  into: number,
-  out: number,
   pickPx: number,
-): Steer {
-  let { locked, armed, cx, cz } = s;
-  const view: MapView = { cx, cz, scale: s.scale, w: s.w, h: s.h };
+): { view: PadMapView; zoom: number; focus: MapPlace | null } {
+  const view = { ...current };
+  const { w, h, scale } = view;
+  const { stick, pan, lock, dpad, zoomIn, zoomOut } = input;
   const take = (p: MapPlace | null): MapPlace | null => {
     if (!p) return null;
-    [cx, cz, view.cx, view.cz] = [p.x, p.z, p.x, p.z];
+    [view.cx, view.cz] = [p.x, p.z];
+    view.aim = { x: w / 2, y: h / 2 };
     return p;
   };
-  if (!locked) {
-    const [dx, dz] = padPan(stick.x, stick.y, s.w, s.scale, dt);
-    cx += dx;
-    cz += dz;
-    [view.cx, view.cz] = [cx, cz];
+
+  if (!view.locked) {
+    const step = PAN * w * dt;
+    const scroll = stickStep(pan, step);
+    if (scroll) {
+      view.cx -= scroll.x / scale;
+      view.cz -= scroll.y / scale;
+    }
+    const move = stickStep(stick, step);
+    if (move) {
+      const x = view.aim.x + move.x;
+      const y = view.aim.y + move.y;
+      view.aim = { x: Math.max(0, Math.min(w, x)), y: Math.max(0, Math.min(h, y)) };
+      view.cx -= (x - view.aim.x) / scale;
+      view.cz -= (y - view.aim.y) / scale;
+    }
   }
   let focus: MapPlace | null = null;
-  if (dpad) focus = take(signToward(signs, view, { x: cx, z: cz }, dpad));
+  const atAim = () => ({ x: worldX(view, view.aim.x), z: worldZ(view, view.aim.y) });
+  if (dpad) {
+    const on = signAt(signs, view, view.aim.x, view.aim.y, pickPx);
+    focus = take(signToward(signs, view, on ?? atAim(), dpad));
+  }
   if (lock) {
-    if (locked) locked = false;
+    if (view.locked) view.locked = false;
     else {
-      const under = signAt(signs, view, s.w / 2, s.h / 2, pickPx) ?? signNearest(signs, { x: cx, z: cz });
+      const under = signNearest(signs, atAim());
       if (under) {
         focus = take(under);
-        locked = true;
-        armed = Math.hypot(stick.x, stick.y) < STICK_REARM;
+        view.locked = true;
+        view.armed = Math.hypot(stick.x, stick.y) < STICK_REARM;
       }
     }
   }
-  if (locked) {
-    const step = stickSwitch(armed, signs, view, { x: cx, z: cz }, stick);
-    armed = step.armed;
+  if (view.locked) {
+    const step = stickSwitch(view.armed, signs, view, atAim(), stick);
+    view.armed = step.armed;
     focus = take(step.next) ?? focus;
   }
-  return { locked, armed, cx, cz, w: s.w, h: s.h, scale: s.scale, zoom: mapZoom(into, out, dt), focus };
+  return { view, zoom: mapZoom(zoomIn, zoomOut, dt), focus };
 }
 
 /** The lit sign nearest a point on the canvas (pixels), within PICK_PX, if any. */
