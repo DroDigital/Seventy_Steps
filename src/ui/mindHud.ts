@@ -18,7 +18,7 @@ import { BONE, el, setStyle, setText } from './hudKit';
 
 export const MAGENTA = '#b04a82'; // (the HUD's health bar glows in it while the Unmoored mind wears the body away)
 /** The bar and the band's name, from clear water to magenta (round 32: they were bone, bone, purple and magenta, and the bar was one of three of a colour). */
-const BAND_COLOURS: Record<Band, string> = { lucid: '#6a98b2', uneasy: '#8d98c0', fractured: '#9468b6', unmoored: MAGENTA };
+const BAND_COLOURS: Record<Band, string> = { lucid: '#5f94b8', uneasy: '#8690c8', fractured: '#9c66c2', unmoored: MAGENTA };
 
 export interface MindHud {
   update(now: number): void;
@@ -36,7 +36,7 @@ export function mendingInLight(g: Game): boolean {
 
 /** Builds the sanity bar and the band line into `vitals`; `say` shows a short notice. */
 export function createMindHud(g: Game, vitals: HTMLElement, say: (text: string) => void): MindHud {
-  const fill = gauge(vitals, BAND_COLOURS.lucid, 5);
+  const fill = gauge(vitals, BAND_COLOURS.lucid, 6);
   const frame = fill.parentElement!;
   const chip = el(`position:absolute;left:0;top:0;height:100%;width:100%;background:${MAGENTA}cc`, '', frame);
   frame.insertBefore(chip, fill);

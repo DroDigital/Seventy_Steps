@@ -14,7 +14,6 @@ import { button, createScreen, el, footer, menuOpen, onPadStart, title, type Pag
 import { saveNow } from './autosave';
 import { desktop } from './desktop';
 import { settingsPage } from './menuPages';
-import { brightnessPage } from './brightnessCalibration';
 import type { SettingId, Settings } from './settings';
 
 export interface PauseOptions {
@@ -59,9 +58,7 @@ export function createPauseMenu(o: PauseOptions): PauseMenu {
     screen.close();
     o.resume();
   };
-  /** Settings; from its Display tab the brightness card, which returns to them. */
-  const settingsHere = (): Page => settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0, () => screen.show(cardHere()));
-  const cardHere = (): Page => brightnessPage(o.settings, o.change, () => screen.show(settingsHere()));
+  const settingsHere = (): Page => settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0);
   const main: Page = {
     back: resume,
     build(p) {

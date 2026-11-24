@@ -31,7 +31,7 @@ export function gradeTint(tints: readonly Rgb[], l: number): Rgb {
 }
 
 const ACCENT_STEPS = [0.08, 0.15, 0.24, 0.35, 0.5, 0.68, 0.9] as const;
-const LANTERN_STEPS = [0.25, 0.4, 0.55, 0.7, 0.85, 1] as const;
+const LANTERN_STEPS = [0.1, 0.19, 0.34, 0.52, 0.74, 1] as const;
 const MIST_STEPS = [0.22, 0.36, 0.54, 0.76, 1] as const;
 const WHITE: Rgb = [1, 1, 1];
 /** The lantern's own warm light (the investigator carries it into every realm): its steps keep lantern-lit ground warm where a cold grade has no warm colour to snap to. */

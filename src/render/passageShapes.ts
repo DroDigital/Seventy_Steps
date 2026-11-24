@@ -74,13 +74,24 @@ export function doorKit(p: HiddenPieceDef): DoorKit {
     carved.push(...rune(3, 0, H + 0.12, 0.34, face + side * 0.05, glow)); // and the eye on the keystone
   }
   const slabStone = p.seal?.look === 'sealed' ? STONE : WALL;
-  const slab = tileUv(box(D, H + 0.3, T, 0, (H + 0.3) / 2 - 0.3, 0, slabStone, 1), D, H + 0.3);
+  const slabParts: THREE.BufferGeometry[] = [
+    tileUv(box(D, H + 0.3, Math.max(0.1, T - 0.1), 0, (H + 0.3) / 2 - 0.3, 0, slabStone, 1), D, H + 0.3),
+  ];
+  // Recessed stone relief pilasters & transom bar stay within exact slab thickness T so bounds stay flush with the wall.
+  for (const s of [-1, 1]) slabParts.push(tileUv(box(0.24, H - 0.25, T, s * (W2 - 0.26), H / 2, 0, scaleRgb(slabStone, 0.82), 0.7), 0.3, H));
+  slabParts.push(tileUv(box(D - 0.3, 0.22, T, 0, H * 0.62, 0, scaleRgb(slabStone, 0.84), 0.7), D, 0.3));
+  const slab = merged(slabParts);
   const outline: THREE.BufferGeometry[] = [];
+  const softGlow = scaleRgb(glow, 0.78);
   for (const side of [-1, 1]) {
-    const face = side * (T / 2 - 0.01); // 5 cm proud of the slab's face
-    const [iu, top, foot] = [W2 - 0.2, H - 0.2, 0.2];
-    outline.push(line(0, top, iu * 2, 0.04, face, glow), line(0, foot, iu * 2, 0.04, face, glow), line(-iu, (top + foot) / 2, 0.04, top - foot, face, glow), line(iu, (top + foot) / 2, 0.04, top - foot, face, glow));
-    outline.push(...rune(3, 0, H * 0.58, 0.5, face, glow), ...rune(0, 0, H * 0.3, 0.36, face, glow));
+    const face = side * (T / 2 + 0.01);
+    const [iu, top, foot, arm] = [W2 - 0.28, H - 0.28, 0.3, Math.min(0.65, D * 0.16)];
+    // Corner brackets and central carved seal instead of a thin neon wireframe box.
+    for (const sx of [-1, 1]) {
+      outline.push(line(sx * (iu - arm / 2), top, arm, 0.05, face, softGlow), line(sx * iu, top - arm / 2, 0.05, arm, face, softGlow));
+      outline.push(line(sx * (iu - arm / 2), foot, arm, 0.05, face, softGlow), line(sx * iu, foot + arm / 2, 0.05, arm, face, softGlow));
+    }
+    outline.push(...rune(3, 0, H * 0.62, 0.56, face + side * 0.04, softGlow), ...rune(0, 0, H * 0.34, 0.42, face, softGlow));
   }
   return { stone: merged(stone), glow: merged(carved), slab, slabGlow: merged(outline), width: D, height: H };
 }

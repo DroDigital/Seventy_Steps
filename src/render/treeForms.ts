@@ -11,23 +11,46 @@ import type { PropLook, TreeForm } from '../data/propLooks';
 import type { Prop } from '../world/props';
 import { tileUv, tint } from './meshKit';
 import { mixRgb, scaleRgb, type Rgb } from './palette';
-import { cyl, join, limb, roots, roughen, scatter, shadeBelow, stem, tipOf } from './propKit';
+import { cyl, join, limb, roots, scatter, shadeBelow, stem, tipOf } from './propKit';
 import type { Piece } from './propShapes';
 
 type V = [number, number, number];
 const pick = <T,>(rng: Rng, list: readonly T[]): T => list[Math.floor(rng() * list.length)];
 
-/** One lump of leaves: an icosahedron pushed in and out so no two read alike, darker on its underside where the crown shades it. */
-const lumpOf = (at: readonly number[], r: number, c: Rgb, rng: Rng, flat: number): THREE.BufferGeometry =>
-  shadeBelow(roughen(tint(tileUv(new THREE.IcosahedronGeometry(r, 0).scale(1, flat, 1).rotateY(rng() * 3), r * 2, r * 2), c), 0.16, rng() * 100).translate(at[0], at[1], at[2]), 0.35);
+/** One jagged foliage bough: a low-poly crown twisted and spiky so tree silhouettes read as gnarled PS1 boughs instead of smooth blobs. */
+const lumpOf = (at: readonly number[], r: number, c: Rgb, rng: Rng, flat: number): THREE.BufferGeometry => {
+  const g = new THREE.IcosahedronGeometry(r, 0);
+  g.scale(1.06, flat * 0.82, 0.9);
+  const pos = g.getAttribute('position');
+  const salt = rng() * 100;
+  for (let i = 0; i < pos.count; i++) {
+    const [x, y, z] = [pos.getX(i), pos.getY(i), pos.getZ(i)];
+    const jag = 0.62 + 0.5 * scatter(x * 3.1, y * 3.1, z * 3.1, salt);
+    const droop = y < 0 ? 0.82 : 1.0 + 0.14 * scatter(z * 2.3, x * 2.3, y * 2.3, salt + 7);
+    pos.setXYZ(i, x * jag, y * droop, z * jag);
+  }
+  g.rotateY(rng() * Math.PI * 2);
+  g.rotateZ((rng() - 0.5) * 0.34);
+  g.computeVertexNormals();
+  return shadeBelow(tint(tileUv(g, r * 2.4, r * 2.4), c).translate(at[0], at[1], at[2]), 0.42);
+};
 
-/** A clump of leaves of radius r about `at`, squashed by `flat`: a main lump and one or two smaller ones lying into its flank (round 117: one smooth gem read as a cut stone). */
+/** A ragged cluster of layered leaf boughs about `at`, flattened by `flat`, with jagged asymmetric side sprays. */
 function clump(at: readonly number[], r: number, c: Rgb, rng: Rng, flat = 0.7): THREE.BufferGeometry {
-  const parts = [lumpOf(at, r, c, rng, flat)];
-  for (let k = 0, n = r > 0.8 && rng() < 0.6 ? 2 : 1; k < n; k++) {
-    const a = rng() * Math.PI * 2;
-    const s = 0.5 + 0.15 * rng();
-    parts.push(lumpOf([at[0] + Math.sin(a) * r * 0.75, at[1] - r * flat * (0.1 + 0.3 * rng()), at[2] + Math.cos(a) * r * 0.75], r * s, scaleRgb(c, 0.9 + 0.2 * rng()), rng, flat));
+  const parts = [lumpOf(at, r * 0.96, c, rng, flat)];
+  const n = r > 0.8 && rng() < 0.6 ? 2 : 1;
+  for (let k = 0; k < n; k++) {
+    const a = (k / n) * Math.PI * 2 + rng() * 1.4;
+    const s = 0.48 + 0.16 * rng();
+    parts.push(
+      lumpOf(
+        [at[0] + Math.sin(a) * r * (0.64 + 0.14 * rng()), at[1] + r * flat * (rng() * 0.38 - 0.28), at[2] + Math.cos(a) * r * (0.64 + 0.14 * rng())],
+        r * s,
+        scaleRgb(c, 0.84 + 0.26 * rng()),
+        rng,
+        flat * (0.76 + 0.32 * rng()),
+      ),
+    );
   }
   return join(parts);
 }

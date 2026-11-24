@@ -4,6 +4,7 @@
  * Drawn only when what it says changes.
  */
 
+import { deviceInUse } from '../core/device';
 import { localeId, t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { glyph } from './glyphs';
@@ -12,6 +13,36 @@ import { TIP_ROWS, type TipView } from './firstSteps';
 
 /** 'the mouse', 'the left stick': a key's face begins with a capital. */
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+/** Strips a leading article for compact mouse keycap labels ('the mouse' → 'Mouse'). */
+const shortMouse = (s: string): string => cap(s.replace(/^(the|die|la|el)\s+/i, ''));
+
+function mouseIcon(): SVGSVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', '10');
+  svg.setAttribute('height', '13');
+  svg.setAttribute('viewBox', '0 0 10 13');
+  svg.style.cssText = 'display:block;flex:none';
+  const body = document.createElementNS(ns, 'rect');
+  body.setAttribute('x', '1');
+  body.setAttribute('y', '1');
+  body.setAttribute('width', '8');
+  body.setAttribute('height', '11');
+  body.setAttribute('rx', '4');
+  body.setAttribute('fill', 'none');
+  body.setAttribute('stroke', BONE);
+  body.setAttribute('stroke-width', '1.15');
+  const wheel = document.createElementNS(ns, 'line');
+  wheel.setAttribute('x1', '5');
+  wheel.setAttribute('y1', '3');
+  wheel.setAttribute('x2', '5');
+  wheel.setAttribute('y2', '5.8');
+  wheel.setAttribute('stroke', GOLD);
+  wheel.setAttribute('stroke-width', '1.3');
+  wheel.setAttribute('stroke-linecap', 'round');
+  svg.append(body, wheel);
+  return svg;
+}
 
 /** What the card shows, as one string: the card, its ticks, the buttons in hand and the language (a change of any redraws it). */
 export const cardKey = (view: TipView | null): string =>
@@ -40,7 +71,12 @@ export function createTipCard(parent: HTMLElement): TipCard {
       TIP_ROWS[view.id].forEach((row, i) => {
         const done = view.rows[i];
         const line = el(`display:flex;align-items:center;gap:9px;margin-top:3px;opacity:${done ? '.5' : '1'};transition:opacity .3s`, '', list);
-        el(`flex:none;min-width:16px;padding:1px 6px;border:1px solid ${BONE}99;border-radius:3px;background:#0008;font-size:11px;letter-spacing:1px;text-align:center;line-height:1.35`, cap(glyph(row.act)), line);
+        const capEl = el(`flex:none;display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:16px;padding:1px 6px;border:1px solid ${BONE}99;border-radius:3px;background:#0008;font-size:11px;letter-spacing:1px;text-align:center;line-height:1.35`, '', line);
+        if (row.act === 'look' && deviceInUse() !== 'pad') {
+          capEl.append(mouseIcon(), document.createTextNode(shortMouse(glyph(row.act))));
+        } else {
+          capEl.textContent = cap(glyph(row.act));
+        }
         el('font-size:13px', t(row.label), line);
         if (done) el(`color:${LEAF};font-size:13px`, '✓', line);
       });

@@ -343,6 +343,17 @@ void main() {
   lamp *= (1.0 - uEmissive) * vTint;
   vec3 lit = vLight - vMoon * (1.0 - moonLit(vWorld, n, max(dot(n, uLightDir), 0.0))) * uShadow.x + lamp; // what stands between a point and the moon takes the moon's light
   lit += uCoatCol * coated * 0.14;
+  if (character > 0.5 && uEmissive < 0.5) {
+    // Cool moonlight rim on shoulders/hat brim + warm hip-lantern up-bounce on coat folds so the investigator never merges into dark houses.
+    float rim = pow(1.0 - max(dot(n, toEye), 0.0), 2.4) * (0.45 + 0.55 * max(n.y, 0.0));
+    lit += (uLightColor * 0.36 + uFogColor * 0.28) * rim;
+    float upBounce = (0.35 + 0.65 * max(-n.y, 0.0)) * lanternFalloff(ld);
+    lit += uLanternColor * upBounce * 0.16 * self;
+  } else if (uEmissive < 0.5) {
+    // Faint moonlit grazing lift on exterior walls/eaves so unlit buildings read as architectural silhouettes rather than flat black polygons.
+    float archRim = pow(1.0 - max(dot(n, toEye), 0.0), 3.0) * smoothstep(-0.1, 0.65, n.y);
+    lit += (uFogColor * 0.16 + uLightColor * 0.08) * archRim;
+  }
   float peak = max(max(lit.r, lit.g), max(lit.b, 0.001));
   lit *= mix(1.0, min(1.0, uSelfMax / peak), self * max(1.0 - uEmissive, 0.0));
   tex = mix(tex, vec3(1.0), 0.6 * uEmissive); // a lit thing shines through its texture
@@ -367,7 +378,7 @@ void main() {
     if (ringed > 0.01) col += (vec3(0.06, 0.07, 0.09) + lamp * 0.8) * ringed * (uWet - 0.3);
   }
 #ifdef PANES
-  col *= paneLit(vPane, uTime) * paneFigure(vPane, uTime, vPaneUv); // lived behind: put out now and then, dimmed as someone passes, and now and then someone seen
+  col *= paneLit(vPane, uTime) * paneFigure(vPane, uTime, vPaneUv) * paneFrame(vPaneUv); // lived behind: mullions, dimming, passing silhouettes
 #endif
 #ifdef SHORE
   {

@@ -10,7 +10,7 @@ import { ph, phases, scripted, st, tier } from './kit';
 export const GREAT_OLD_ONES = tier('great_old_one', [
   {
     id: 'cthulhu', name: 'Cthulhu', source: 'The Call of Cthulhu', regions: ['rlyeh'], canonLooks: true,
-    assembly: { body: 'lathe', palette: 'sea', scale: 40, tentacles: 8, wings: 2, eyes: 2 },
+    assembly: { body: 'lathe', palette: 'sea', scale: 40, tentacles: 8, wings: 2, eyes: 2, visualBoost: [1.14, 1.12] },
     ...scripted('boss', phases(
       ph(1, { tentacle_burst: 3, slam: 2, grab: 1, roar: 1, tidal_surge: 1, crushing_blow: 1 }, { hooks: ['camera_warp'] }),
       ph(0.66, { tentacle_burst: 2, slam: 2, wind_push: 2, roar: 1, tidal_surge: 1, tentacle_rise: 2, crushing_blow: 1 }, { summons: ['star_spawn', 'star_spawn'], hooks: ['camera_warp', 'flood'] }),

@@ -10,34 +10,38 @@ import { TAU, lin, poly, rad, solid, stroke, u, unlip, type Ctx, type MarkState,
 
 const PEWTER: readonly string[] = ['#cfcdc4', '#9a988e', '#5c5b55'];
 
-/** A plain white "?", drawn as a path: a hook over a stem and a dot, with a dark halo and a breath of light. */
+/** An engraved cartographic mystery sigil: antique diamond seal around a warm bone '?' mark. */
 function rumour(ctx: Ctx, r: number): void {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  // Soft dark plate + antique brass diamond seal
+  poly(ctx, [[0, -0.92], [0.92, 0], [0, 0.92], [-0.92, 0]]);
+  ctx.fillStyle = 'rgba(12,11,15,0.78)';
+  ctx.fill();
+  ctx.lineWidth = u(r, 0.14, 1.4);
+  ctx.strokeStyle = 'rgba(8,6,12,0.9)';
+  ctx.stroke();
+  ctx.lineWidth = u(r, 0.08, 0.9);
+  ctx.strokeStyle = 'rgba(184,162,112,0.72)';
+  ctx.stroke();
+  // Engraved inner '?' glyph in warm antique bone
   const mark = (): void => {
     ctx.beginPath();
-    ctx.arc(0, -0.36, 0.33, Math.PI * 1.02, Math.PI * 2.4);
-    ctx.bezierCurveTo(0.12, 0.0, 0.0, 0.04, 0, 0.2);
+    ctx.arc(0, -0.26, 0.25, Math.PI * 1.04, Math.PI * 2.42);
+    ctx.bezierCurveTo(0.09, 0.01, 0.0, 0.05, 0, 0.19);
   };
   const dot = (): void => {
     ctx.beginPath();
-    ctx.arc(0, 0.58, 0.085, 0, TAU);
+    ctx.arc(0, 0.48, 0.075, 0, TAU);
   };
-  ctx.strokeStyle = 'rgba(8,6,12,0.85)';
-  ctx.fillStyle = 'rgba(8,6,12,0.85)';
-  ctx.lineWidth = u(r, 0.36, 3);
-  mark();
-  ctx.stroke();
-  dot();
-  ctx.stroke();
-  [ctx.shadowColor, ctx.shadowBlur] = ['rgba(255,244,214,0.6)', r * 0.7];
-  ctx.strokeStyle = '#fffaf0';
-  ctx.lineWidth = u(r, 0.2, 1.7);
+  [ctx.shadowColor, ctx.shadowBlur] = ['rgba(201,178,122,0.45)', r * 0.45];
+  ctx.strokeStyle = '#e5dbc0';
+  ctx.lineWidth = u(r, 0.16, 1.45);
   mark();
   ctx.stroke();
   unlip(ctx);
   dot();
-  ctx.fillStyle = '#fffaf0';
+  ctx.fillStyle = '#e5dbc0';
   ctx.fill();
 }
 
