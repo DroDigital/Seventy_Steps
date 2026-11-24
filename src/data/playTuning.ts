@@ -212,6 +212,7 @@ export const SKY = {
     piping_dark: { moon: 0, stars: 0.3, clouds: 0, haze: 0, milky: 0.15, aurora: 0, meteors: 0 }, // no moon: the dark is a sound
     spheres: { moon: 0, stars: 1.2, clouds: 0, haze: 0.5, milky: 1.3, aurora: 0.4, meteors: 0.5 }, // the globes are the moons
     court_centre: { moon: 0, stars: 2.2, clouds: 0, haze: 0.4, milky: 1.8, aurora: 0, meteors: 2.4 }, // the whole of the stars, falling toward the centre
+    slumber_stairs: { moon: 0, stars: 0, clouds: 0, haze: 0, milky: 0, aurora: 0, meteors: 0 }, // round 123: no sky at all over the Stairs of Slumber, only the dark they go down into
   } as Readonly<Record<string, Partial<SkyDef>>>,
   fade: 3, // seconds to ease into another realm's sky...
   jump: 30, // ...unless the camera leapt this many metres at once (a journey): then at once

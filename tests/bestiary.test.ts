@@ -5,7 +5,7 @@ import { DISCOVERIES } from '../src/data/discoveriesAll';
 import { DOCUMENTS, NOTE_SITES } from '../src/data/documents';
 import { ENTITIES } from '../src/data/registry';
 import { ARCHETYPE_IDS, TIERS } from '../src/data/schema';
-import { REGIONS } from '../src/data/regions';
+import { LANDLESS, REGIONS } from '../src/data/regions';
 import { beheld } from '../src/ui/bestiaryPage';
 import { worldLayout } from '../src/world/placements';
 
@@ -48,7 +48,7 @@ describe('the bestiary (round 34)', () => {
 
 describe('the field notes left about the world (round 34)', () => {
   it('has a note to find in every realm, two in most, each of them written', () => {
-    for (const r of REGIONS) expect((NOTE_SITES[r.id] ?? []).length, r.id).toBeGreaterThanOrEqual(1);
+    for (const r of REGIONS) expect((NOTE_SITES[r.id] ?? []).length, r.id).toBeGreaterThanOrEqual(LANDLESS.has(r.id) ? 0 : 1); // (round 123: no ground to leave a note on in the Stairs of Slumber's realm)
     for (const sites of Object.values(NOTE_SITES)) for (const [name] of sites) expect(DOCUMENTS[name]?.kind, name).toBe('note');
     expect(Object.entries(NOTE_SITES).filter(([, s]) => s.length >= 2).length).toBeGreaterThanOrEqual(12);
   });

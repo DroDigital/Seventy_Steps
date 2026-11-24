@@ -164,6 +164,12 @@ export const LOOKS: Record<string, Look> = {
     grade: ['#14020a', '#310515', '#bd2b66', '#f4dee2'], native: 0.5, accents: ['#ff4a58', '#f0e0d0'], mist: '#6a3038',
     sky: ['#c8b0a0', '#040204'], ambient: ['#a88c88', 0.45], moon: ['#fff0e8', 1.0], far: '#100808', glow: 1.3,
   }),
+  // The Stairs of Slumber (round 123, asked: "still too overcast and not eerie and dark enough"): hung in a dark with no moon and no star, a mist
+  // the colour of a bruise that swallows the light rather than giving it back, and the only warmth in the picture the fires of the stair.
+  slumber_stairs: look({
+    grade: ['#0e0818', '#381e48', '#5a5866', '#ff8c3c'], native: 0.6, accents: ['#c07038', '#54467a'], mist: '#221a30',
+    sky: ['#0a0810', '#010102'], ambient: ['#5a5478', 0.2], moon: ['#7a74a0', 0.12], far: '#050408', glow: 0.1,
+  }),
 };
 
 /** The look where no realm holds (the combat arena, the look test): the hub's. */

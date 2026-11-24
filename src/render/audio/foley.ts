@@ -27,7 +27,7 @@ import { isAbsent, type Game } from '../../systems/components';
 import { chunkContent } from '../../world/chunks';
 import { worldLayout } from '../../world/placements';
 import { segmentDistance } from '../../world/roads';
-import { dungeonRoomAt } from '../../world/terrain';
+import { dungeonRoomAt, inDungeon } from '../../world/terrain';
 import { chunkOf } from '../../world/worldMap';
 import { groundAt } from '../../world/groundKind';
 import { wetness } from '../wetness';
@@ -47,6 +47,7 @@ const SWING_RANGE = 26; // metres a creature's swing carries
 /** What the ground is at (x, y, z): the arena's flags are stone. */
 export function surfaceAt(g: Game, x: number, y: number, z: number): Surface {
   if (!g.overworld) return 'stone';
+  if (inDungeon(x, z)) return 'stone'; // (a dungeon's room is dry however far below the sea's level its floor lies; round 122)
   if (y < WORLD.seaLevel - 0.05) return 'water';
   const [cx, cz] = [chunkOf(x), chunkOf(z)];
   if (worldLayout().chunk(cx, cz).dungeons.some(({ rect: r }) => x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1)) return 'stone';

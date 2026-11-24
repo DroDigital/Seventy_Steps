@@ -13,7 +13,7 @@ import { DUNGEON } from '../data/tuning';
 import { reach } from './arenaDecor';
 import { arenaSet } from './arenaSet';
 import { roomPoint, type RoomLayout } from './dungeonKit';
-import { standing, type Part } from './dungeonParts';
+import { roomSpots, standing, type Part } from './dungeonParts';
 import { solidGap } from './candlePlan';
 import type { Prop } from './props';
 import { DIRS } from './worldMap';
@@ -46,7 +46,8 @@ export const ROOM_INNER = 0.5;
 function setProps(set: ArenaSet, r: RoomLayout, parts: readonly Part[], dressing: readonly Prop[], inner?: number): Prop[] {
   const toward = DIRS[r.entry];
   const d = r.def;
-  const used = (i: number): boolean => inner === undefined || (i === 1 || i === 2 ? !!d.sign : i === 3 ? !!d.gate : i < 6 ? i === 4 || i === 5 : i - 6 < (d.spawns?.length ?? 0) + (d.ally ? 1 : 0)); // (an ordinary room keeps clear only the spots its own things stand on)
+  const ring = 6 + roomSpots(r).ring.length; // past the ring, an ally's place of its own (round 123: `allyAt`, dungeonParts.ts `standing`)
+  const used = (i: number): boolean => inner === undefined || (i === 1 || i === 2 ? !!d.sign : i === 3 ? !!d.gate : i < 6 ? i === 4 || i === 5 : i >= ring ? !!d.allyAt : i - 6 < (d.spawns?.length ?? 0) + (d.ally && !d.allyAt ? 1 : 0)); // (an ordinary room keeps clear only the spots its own things stand on)
   const things = standing(r).map((u, i) => ({ at: roomPoint(r, ...u), clear: i === 1 || i === 3 ? (inner === undefined ? HALL.shrine : HALL.roomShrine) : inner === undefined ? HALL.thing : HALL.roomThing, i })).filter((t) => used(t.i)); // [centre, sign, rest, gate, tome, ...]
   const doors = r.doors.map((s) => ({ x: r.x + DIRS[s].x * r.half, z: r.z + DIRS[s].z * r.half, ix: -DIRS[s].x, iz: -DIRS[s].z }));
   const solids = dressing.filter((p) => reach(p) > 0);

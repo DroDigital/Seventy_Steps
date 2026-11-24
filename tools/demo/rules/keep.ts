@@ -16,7 +16,7 @@ export const kept = (kind: Kind): ((id: string) => boolean) => {
 /** Every realm of the full game, by id (data/regions.ts; `tests/demoContent.test.ts` holds this list to the file). */
 export const ALL_REALMS: readonly string[] = [
   'hub', 'arkham', 'dunwich', 'innsmouth', 'providence', 'vermont', 'mountains', 'pnakotus', 'kn_yan', 'dreamlands', 'rlyeh', 'yuggoth', 'beyond',
-  'cloud_summit', 'black_wood', 'pale_lattice', 'piping_dark', 'spheres', 'court_centre',
+  'cloud_summit', 'black_wood', 'pale_lattice', 'piping_dark', 'spheres', 'court_centre', 'slumber_stairs',
 ];
 
 /**

@@ -12,7 +12,7 @@ import { worldUniforms } from '../src/render/worldMaterial';
 const v3 = () => ({ value: new THREE.Vector3() });
 const v4 = () => ({ value: new THREE.Vector4() });
 function rig() {
-  const uniforms = { uProjInv: { value: new THREE.Matrix4() }, uCamWorld: { value: new THREE.Matrix4() }, uCamPos: v3(), uFog: v4(), uFogAir: v4(), uFogColor: v3(), uFogDrift: v3() };
+  const uniforms = { uProjInv: { value: new THREE.Matrix4() }, uCamWorld: { value: new THREE.Matrix4() }, uCamPos: v3(), uFog: v4(), uFogAir: v4(), uFogColor: v3(), uFogDrift: v3(), uFogLantern: { value: 0 }, uFogGlow: { value: 0 } };
   const fog = createVolumetricFog({ uniforms } as unknown as PostPass);
   const camera = new THREE.PerspectiveCamera();
   const frame = (o: Partial<Parameters<typeof fog.update>[2]> = {}) => ({ region: 'arkham', enclosed: false, ground: 0, stress: 0, setting: 1, ...o });

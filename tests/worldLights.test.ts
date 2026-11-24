@@ -4,6 +4,7 @@ import { REGIONS } from '../src/data/regions';
 import { LIGHTS, SANITY } from '../src/data/tuning';
 import { housePieces } from '../src/render/houseMesh';
 import { propJob } from '../src/render/propMeshes';
+import { setPieces } from '../src/render/setShapes';
 import { LAMP_SLOTS } from '../src/render/shaders/world';
 import { dungeonJob } from '../src/render/siteMeshes';
 import { createWorldLights, type LightSpot } from '../src/render/worldLights';
@@ -213,7 +214,8 @@ describe('what reports a light', () => {
       total += torches;
       let dressed: LightSpot[] = [];
       finish(dungeonJob(d, (_, l) => (dressed = l)));
-      expect(dressed.length - spots.length, d.layout.def.id).toBe(d.decor.filter((p) => p.kind === 'firepit' || (p.kind === 'set' && !!p.set?.lit)).length); // and the boss room's braziers (round 13) and the lit pieces of its set (round 62: a hall's candles and lamps)
+      const lightsOf = (p: Prop): number => (p.kind === 'firepit' ? 1 : p.kind === 'set' ? setPieces(p, [0.5, 0.5, 0.5]).filter((x) => !!x.light).length : 0);
+      expect(dressed.length - spots.length, d.layout.def.id).toBe(d.decor.reduce((n, p) => n + lightsOf(p), 0)); // and the boss room's braziers (round 13) and the lit pieces of its set (round 62: a hall's candles and lamps; round 122: the Cavern of Flame's rift, a fire and its three tongues)
     }
     expect(total).toBeGreaterThan(10);
   }, 20_000); // every legacy dungeon built whole: seconds, more when the suite runs in parallel

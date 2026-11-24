@@ -295,6 +295,8 @@ export const EN = {
   'n.joinsFight': '{name} JOINS THE FIGHT',
   'n.relicWorn': 'RELIC · {name} · WORN',
   'n.relicKept': 'RELIC · {name} · KEPT: CHOOSE WHAT TO WEAR AT AN ELDER SIGN',
+  'n.wayKept': '{name} KEEP THE WAY ON DOWN · SPEAK WITH THEM',
+  'n.wayOpened': '{name} OPEN THE WAY DOWN',
   'n.doorSealed': 'THE DOOR IS SEALED · {n} OF {need} GREAT HORRORS HAVE FALLEN',
   'n.sleepsHere': 'SOMETHING VAST SLEEPS HERE · {name} STILL KEEPS THE WAY',
   'n.another': 'ANOTHER',

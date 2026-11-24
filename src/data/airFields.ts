@@ -134,4 +134,9 @@ export const AIR_FIELDS: Readonly<Record<string, readonly AirLayer[]>> = {
     { kind: 'ember', tone: [1, 0.5, 0.22], rate: 3, glow: true },
     { kind: 'ash', tone: 'accent1', rate: 3, pale: 0.2 },
   ],
+  // The Stairs of Slumber (round 123): a few motes of the dream's dust turning slowly in the dark, and an ember now and then gone up the shaft from the cavern's flame.
+  slumber_stairs: [
+    { kind: 'dust', tone: 'accent1', rate: 1.2, pale: 0.25, by: 'dark' },
+    { kind: 'ember', tone: 'accent0', rate: 0.5, glow: true },
+  ],
 };

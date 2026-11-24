@@ -11,6 +11,7 @@ import { distXZ } from '../core/geom';
 import { t } from '../core/i18n';
 import { FOUND } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
+import { npcDef } from '../data/npcs';
 import { getEntity } from '../data/registry';
 import { SEALS } from '../data/tuning';
 import { worldLayout } from '../world/placements';
@@ -18,14 +19,21 @@ import type { Game } from './components';
 import { applyLayer } from './hiddenLayer';
 import { bossAwake, priorOf, sealsBroken } from './sealCount';
 
-/** The sealed doors look again at the seals broken (a boss's fall, a save loaded), and the gates of the horrors' houses at those found (round 63). */
+/** The sealed doors look again at the seals broken (a boss's fall, a save loaded), the gates of the horrors' houses at those found (round 63), and a door someone keeps at whether they have been spoken with (round 123). */
 export function refreshSeals(g: Game): void {
-  for (const [id, l] of g.ecs.c.layer) if (l.minSeals !== undefined || l.minFound !== undefined) applyLayer(g, id);
+  for (const [id, l] of g.ecs.c.layer) if (l.minSeals !== undefined || l.minFound !== undefined || l.met !== undefined) applyLayer(g, id);
 }
 
-/** A boss's fall may break a seal. */
+/** A boss's fall may break a seal; a word with the one who keeps a door opens it (round 123: Nasht and Kaman-Thah, the way down from the Cavern of Flame). */
 export function registerSeals(g: Game): void {
   g.events.on('Vanquished', () => refreshSeals(g));
+  g.events.on('Talked', (e) => {
+    for (const [id, l] of g.ecs.c.layer) {
+      if (l.met !== e.npc || l.shown) continue;
+      applyLayer(g, id);
+      if (l.shown) g.events.emit('Notice', { text: t('n.wayOpened', { name: e.name.toUpperCase() }) });
+    }
+  });
 }
 
 /** What the investigator standing here is kept from, in a line, or null. */
@@ -36,6 +44,10 @@ export function sealedHere(g: Game): string | null {
     if (need !== undefined && !g.ecs.c.layer.get(id)?.shown && distXZ(p.def, me) <= SEALS.warn) {
       return t('n.doorSealed', { n: sealsBroken(g), need });
     }
+  }
+  for (const [id, p] of g.ecs.c.piece) {
+    const keeper = p.def.met; // a door someone keeps (round 123): said by name, and that a word with them opens it
+    if (keeper !== undefined && !g.ecs.c.layer.get(id)?.shown && distXZ(p.def, me) <= SEALS.warn) return t('n.wayKept', { name: (npcDef(keeper)?.name ?? keeper).toUpperCase() });
   }
   for (const [id, p] of g.ecs.c.piece) {
     const boss = p.def.minFound;

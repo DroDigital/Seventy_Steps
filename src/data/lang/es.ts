@@ -282,6 +282,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'n.joinsFight': "{name} SE UNE AL COMBATE",
   'n.relicWorn': "RELIQUIA · {name} · EQUIPADA",
   'n.relicKept': "RELIQUIA · {name} · GUARDADA: ELIGE QUÉ LLEVAR EN UN SIGNO ARCANO",
+  'n.wayKept': "{name} GUARDAN EL CAMINO HACIA ABAJO · HABLA CON ELLOS",
+  'n.wayOpened': "{name} ABREN EL CAMINO HACIA ABAJO",
   'n.doorSealed': "LA PUERTA ESTÁ SELLADA · HAN CAÍDO {n} DE {need} GRANDES HORRORES",
   'n.sleepsHere': "ALGO INMENSO DUERME AQUÍ · {name} AÚN GUARDA EL CAMINO",
   'n.another': "OTRO",

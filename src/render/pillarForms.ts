@@ -201,6 +201,18 @@ const FORMS: Record<PillarForm, (o: Out, x: number, z: number, y0: number, y1: n
       o.glow.push(cyl(0.05, 0.05, 0.12, 4, x, b + 0.02, z, [0.5, 0.58, 0.85]));
     }
   },
+  lotus(o, x, z, y0, y1, r, c) { // round 122: the Stairs of Slumber's light slumber, whose priests wear the pshent: Egypt's papyrus column, a bundle of stalks tied under an open bell, on its disk, under its abacus
+    const h = y1 - y0;
+    const bell = Math.min(1.1, h * 0.2);
+    const shaft = h - 0.3 - bell - 0.3;
+    o.wall.push(cyl(r * 1.35, r * 1.3, 0.3, 10, x, y0, z, scaleRgb(c, 0.85)), cyl(r * 0.7, r * 0.62, shaft, 8, x, y0 + 0.3, z, c)); // the disk and the core
+    for (let i = 0; i < 6; i++) { // the stalks, one stone with the core
+      const a = (i / 6) * Math.PI * 2;
+      o.wall.push(cyl(r * 0.32, r * 0.25, shaft, 5, x + Math.cos(a) * r * 0.6, y0 + 0.3, z + Math.sin(a) * r * 0.6, c));
+    }
+    for (let i = 0; i < 3; i++) o.trim.push(cyl(r * 0.96, r * 0.96, 0.1, 10, x, y0 + 0.3 + shaft - 0.5 + i * 0.16, z, GILT)); // the bands that tie them, gilt
+    o.wall.push(cyl(r * 0.85, r * 1.5, bell, 10, x, y1 - 0.3 - bell, z, scaleRgb(c, 1.05)), cube(r * 1.7, 0.3, r * 1.7, x, y1 - 0.3, z, scaleRgb(c, 0.9))); // the open bell, and the abacus on it
+  },
   toad(o, x, z, y0, y1, r, c) {
     const h = y1 - y0;
     const dark = scaleRgb(c, 0.72);

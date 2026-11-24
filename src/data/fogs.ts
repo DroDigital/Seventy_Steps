@@ -52,6 +52,7 @@ export const FOGS: Readonly<Record<string, FogDef>> = {
   piping_dark: fog(0.05, 2, 'piping_dark', 0.8, { haze: 0.004, moon: 0, wind: [0.5, 0.4] }), // swirling to a tune
   spheres: fog(0.04, 1.6, 'spheres', 0.5, { haze: 0.003, moon: 0.3, wind: [0.3, -0.3] }), // the oil-bright haze between the globes
   court_centre: fog(0.045, 1.4, 'court_centre', 0.6, { haze: 0.004, moon: 0, wind: [0.6, 0.6] }), // hot ash and embers' smoke
+  slumber_stairs: fog(0.05, 2.5, 'slumber_stairs', 0.5, { haze: 0.004, moon: 0, wind: [0.04, 0.12] }), // round 123: the dark the stairs hang in, a slow breath rising up the shaft
 };
 
 /** A dungeon's roofed rooms: a thin crypt-mist over the floor, a dark of the realm's own colour. */

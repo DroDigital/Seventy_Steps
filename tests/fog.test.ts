@@ -32,7 +32,8 @@ describe('volumetric fog (playtest rounds 16 and 23)', () => {
   it("is its realm's own colour, light enough to see the land through (round 32: it was a dark grey blanket)", () => {
     for (const r of REGIONS) {
       expect(FOGS[r.id].color, r.id).toEqual(LOOKS[r.id].mist);
-      expect(Math.max(...FOGS[r.id].color), r.id).toBeGreaterThan(0.3);
+      if (r.id === 'slumber_stairs') expect(Math.max(...FOGS[r.id].color), r.id).toBeLessThan(0.2); // round 123: no land to see through it, and asked for "eerie and dark": the stairs' mist swallows the light
+      else expect(Math.max(...FOGS[r.id].color), r.id).toBeGreaterThan(0.3);
       expect(FOGS[r.id].density, r.id).toBeLessThanOrEqual(0.075); // a third of what it was
     }
     const dark = dungeonFogOf('hub').color;
@@ -72,7 +73,7 @@ describe('volumetric fog (playtest rounds 16 and 23)', () => {
 
   it("carries the mist's night tone over a dungeon's threshold as it carries its density: eased, never in one frame (round 58)", () => {
     const v3 = () => ({ value: new THREE.Vector3() }), v4 = () => ({ value: new THREE.Vector4() });
-    const uniforms = { uProjInv: { value: new THREE.Matrix4() }, uCamWorld: { value: new THREE.Matrix4() }, uCamPos: v3(), uFog: v4(), uFogAir: v4(), uFogColor: v3(), uFogDrift: v3() };
+    const uniforms = { uProjInv: { value: new THREE.Matrix4() }, uCamWorld: { value: new THREE.Matrix4() }, uCamPos: v3(), uFog: v4(), uFogAir: v4(), uFogColor: v3(), uFogDrift: v3(), uFogLantern: { value: 0 }, uFogGlow: { value: 0 } };
     const fog = createVolumetricFog({ uniforms } as unknown as PostPass);
     const camera = new THREE.PerspectiveCamera();
     const frame = (enclosed: boolean) => ({ region: 'hub', enclosed, ground: 0, stress: 0, setting: 1, dark: 1 });
