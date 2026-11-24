@@ -15,7 +15,7 @@ import { el } from './menuKit';
 /** The key's rows: a figure and its name (the second line, dim, says what to do with it, on a card while the pointer is on the row). Read down the first column, then the second. */
 export const KEY_ROWS: readonly { kind: MarkKind; state?: MarkState; words: string; hint?: string }[] = [
   { kind: 'you', words: 'You' },
-  { kind: 'sign', state: { lit: true }, words: 'Elder Sign', hint: 'rest here; click it to travel' },
+  { kind: 'sign', state: { lit: true }, words: 'Elder Sign', hint: 'rest here; click it to travel, from any realm the map shows' },
   { kind: 'sign', words: 'Unlit sign', hint: 'walk up to it to light it' },
   { kind: 'gate', words: 'Gate', hint: 'walk through it' },
   { kind: 'dungeon', words: 'Dungeon' },
@@ -111,17 +111,18 @@ export function buildKey(panel: HTMLElement, startOpen: boolean, remember: (open
   return { toggle, holds: (target) => target instanceof Node && root.contains(target) };
 }
 
-/** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. */
-export function hintsFor(pad: boolean, mapKey: string): readonly (readonly [readonly string[], string])[] {
+/** What each key does, for the keyboard or for the pad: groups of keys and the words beside them. `realms`: more than one realm is known (mapRealms.ts), and a key turns between them. */
+export function hintsFor(pad: boolean, mapKey: string, realms = false): readonly (readonly [readonly string[], string])[] {
+  const turn: readonly (readonly [readonly string[], string])[] = realms ? [[pad ? ['L3'] : ['Q', 'E'], 'Realm']] : [];
   return pad
-    ? [[['LT', 'RT'], 'Zoom'], [['Left stick'], 'Aim / switch'], [['Right stick'], 'Pan'], [['R3'], 'Lock a sign'], [['D-pad'], 'Pick a sign'], [['A'], 'Travel / find me'], [['LB', 'RB'], 'Next sign'], [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
-    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
+    ? [[['LT', 'RT'], 'Zoom'], [['Left stick'], 'Aim / switch'], [['Right stick'], 'Pan'], [['R3'], 'Lock a sign'], [['D-pad'], 'Pick a sign'], [['A'], 'Travel / find me'], [['LB', 'RB'], 'Next sign'], ...turn, [['Y'], 'Marker / remove'], [['X'], 'Key'], [['B'], 'Close']]
+    : [[['Wheel', '+', '−'], 'Zoom'], [['Drag', 'WASD'], 'Pan'], [['C'], 'Find me'], [['Click', 'Tab'], 'Pick a sign'], ...turn, [['Right-click', 'F'], 'Marker / remove'], [['Del'], 'Clear markers'], [['L'], 'Key'], [[mapKey], 'Close']];
 }
 
 /** The row of keys along the bottom edge. */
-export function buildHints(panel: HTMLElement, pad: boolean, mapKey: string): void {
+export function buildHints(panel: HTMLElement, pad: boolean, mapKey: string, realms = false): void {
   const bar = el(panel, 'div', '', 'position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 20px;padding:12px 16px 12px;background:linear-gradient(transparent,#050506e6);pointer-events:none');
-  for (const [keys, words] of hintsFor(pad, mapKey)) {
+  for (const [keys, words] of hintsFor(pad, mapKey, realms)) {
     const item = el(bar, 'div', '', 'display:flex;align-items:center;gap:4px;font-size:calc(11px * var(--ui, 1))');
     for (const k of keys) el(item, 'span', k, `border:1px solid ${BONE}55;border-radius:3px;padding:0 5px;font-size:calc(10px * var(--ui, 1));color:${BONE};background:#d9d0b81a;letter-spacing:.5px`);
     el(item, 'span', words, `color:${DIM};margin-left:3px`);

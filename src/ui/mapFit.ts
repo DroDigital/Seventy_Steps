@@ -39,6 +39,11 @@ export function fitScale(realm: readonly RegionDef[], w: number, h: number): num
   return Math.min(w / ((r.x1 - r.x0) * 1.1), h / ((r.z1 - r.z0) * 1.15));
 }
 
+/** A realm opened on a `w` × `h` screen about `at`, on what of it is charted in `ex`: the scale at which it fits, and the view it opens at. */
+export function realmOpening(realm: readonly RegionDef[], ex: Explored, at: XZ, w: number, h: number): { fit: number; cx: number; cz: number; scale: number } {
+  return { fit: fitScale(realm, w, h), ...openingView(realm, chartedRect(ex, realm), at, w, h) };
+}
+
 /** The centre and scale the map opens at: `seen` (what is charted) and `at` (the investigator) with a margin, within the realm's fit and the closest zoom. */
 export function openingView(realm: readonly RegionDef[], seen: Rect | null, at: XZ, w: number, h: number): { cx: number; cz: number; scale: number } {
   const fit = fitScale(realm, w, h);

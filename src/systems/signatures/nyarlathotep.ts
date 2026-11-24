@@ -9,7 +9,8 @@
 import type { Entity } from '../../core/ecs';
 import { t } from '../../core/i18n';
 import { yawOf } from '../../core/geom';
-import { attackRange, compileAttack } from '../../data/attacks';
+import { ATTACKS, attackRange, compileAttack } from '../../data/attacks';
+import { baseOf } from '../../data/bossMoves';
 import { bandOf } from '../../data/bossPunish';
 import { getEntity } from '../../data/registry';
 import { REGIONS } from '../../data/regions';
@@ -21,22 +22,33 @@ import type { Signature } from '../signatures';
 import { groundNear } from '../specials';
 
 const ID = 'nyarlathotep';
-/** What it does not borrow: a summoning, and a god's one heavy blow (round 60), which is that god's own (the Crawling Chaos has one of its own). */
-const KEPT: readonly AttackId[] = ['summon', 'crushing_blow', 'great_mark'];
+/** What it does not borrow: a summoning, and a god's one heavy blow (round 60), which is that god's own (the Crawling Chaos has one of its own): by what a blow is built on (2026-11-24: every horror's blows its own). */
+const KEPT: readonly string[] = ['summon', 'crushing_blow', 'great_mark'];
 export const AVATARS: readonly string[] = ['black_man', 'haunter_of_the_dark'];
 const REGION_BOSSES = new Set(REGIONS.flatMap((r) => r.bosses));
 
 const lastPhase = (f: Fight): boolean => f.phase === f.script.phases.length - 1;
 
-/** The attacks of the bosses slain before it, the most used first (summons need servants of their own). */
+/** A slain horror's blows, the one it struck most first (its weights over its phases), none it keeps for its own. */
+function blowsOf(id: string): AttackId[] {
+  const d = id === ID ? undefined : getEntity(id);
+  const weight = new Map<AttackId, number>();
+  for (const p of (d?.bossScript ?? d?.bossVariant?.bossScript)?.phases ?? []) for (const a of p.attacks) if (!KEPT.includes(baseOf(a.id))) weight.set(a.id, (weight.get(a.id) ?? 0) + a.weight);
+  return [...weight].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([x]) => x);
+}
+
+/**
+ * The attacks of the bosses slain before it (summons need servants of their own). Every horror's blows are its own (2026-11-24), so it takes
+ * from each in turn, the last slain first: each one's most struck blow, then each one's next, until it holds its copies.
+ */
 export function borrowed(g: Game): AttackId[] {
-  const slain = g.overworld ? [...g.overworld.slain].map((s) => s.replace(/^boss:/, '')) : AVATARS;
-  const uses = new Map<AttackId, number>();
-  for (const id of slain) {
-    const d = id === ID ? undefined : getEntity(id);
-    for (const p of (d?.bossScript ?? d?.bossVariant?.bossScript)?.phases ?? []) for (const a of p.attacks) if (!KEPT.includes(a.id)) uses.set(a.id, (uses.get(a.id) ?? 0) + 1);
+  const slain = g.overworld ? [...g.overworld.slain].map((s) => s.replace(/^boss:/, '')).reverse() : AVATARS;
+  const lists = slain.map(blowsOf).filter((l) => l.length);
+  const out: AttackId[] = [];
+  for (let i = 0; out.length < NYARLATHOTEP.copies && lists.some((l) => l.length > i); i++) {
+    for (const l of lists) if (l[i] && !out.includes(l[i]) && out.length < NYARLATHOTEP.copies) out.push(l[i]);
   }
-  return [...uses].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, NYARLATHOTEP.copies).map(([id]) => id);
+  return out;
 }
 
 /** It stands watching the investigator a moment: seen by them alone, gone if struck. */
@@ -75,7 +87,7 @@ export const NYARLATHOTEP_SIGNATURE: Signature = {
     return borrowed(g)
       .filter((id) => !own.has(id))
       .map((id) => {
-        if (!a.moves[id]) a.moves = { ...a.moves, [id]: compileAttack(id, stats, reach ?? height, bandOf(f.id)) };
+        for (let x: AttackId | undefined = id; x && !a.moves[x]; x = ATTACKS[x].follow) a.moves = { ...a.moves, [x]: compileAttack(x, stats, reach ?? height, bandOf(f.id)) }; // and the chain it runs into
         return { move: id, weight: 1, range: attackRange(id, reach ?? height) };
       });
   },

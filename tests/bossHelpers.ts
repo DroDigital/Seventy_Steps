@@ -34,7 +34,7 @@ export function engage({ g, boss }: BossGame): void {
 export const calm = ({ g, boss }: BossGame): void => void Object.assign(g.ecs.c.brain.get(boss)!, { cooldown: 1e6, speed: 0 });
 
 /** An engaged, calm fight whose one phase holds these hooks (and arena change), on the Outsider. */
-export function hookFight(hooks: readonly RealityHook[], arena?: ArenaChange, attacks: Partial<Record<AttackId, number>> = { sweep: 1 }): BossGame {
+export function hookFight(hooks: readonly RealityHook[], arena?: ArenaChange, attacks: Partial<Record<AttackId, number>> = { outsider_rake: 1 }): BossGame { // (the Outsider's own sweep: every horror's blows its own, 2026-11-24)
   const b = bossGame('the_outsider');
   b.fight.script = phases(ph(1, attacks, { hooks, arena }));
   engage(b);

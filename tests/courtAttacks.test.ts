@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import type { Entity } from '../src/core/ecs';
 import { distXZ } from '../src/core/geom';
 import { ATTACKS, attackRange, compileAttack } from '../src/data/attacks';
+import { baseOf } from '../src/data/bossMoves';
 import type { BrainDef } from '../src/data/archetypes';
 import { st } from '../src/data/entities/kit';
 import { ENTITIES } from '../src/data/registry';
@@ -39,12 +40,12 @@ const heightOf = (d: EntityDef): number => (d.sprite?.scale ?? d.assembly?.scale
 
 describe('the spinning barrage', () => {
   it("is left to four horrors whose tales it fits: Keziah's daggers, Zann at his window, the Daemon Pipers and Yog-Sothoth", () => {
-    const has = horrors().filter((d) => d.bossScript!.phases.some((p) => p.attacks.some((a) => a.id === 'barrage'))).map((d) => d.id);
+    const has = horrors().filter((d) => d.bossScript!.phases.some((p) => p.attacks.some((a) => baseOf(a.id) === 'barrage'))).map((d) => d.id); // each its own (2026-11-24)
     expect(has.sort()).toEqual(['daemon_pipers', 'keziah_mason', 'yog_sothoth', 'zann_window_thing']);
   });
 
   it('every new pattern is some horror\'s, and none is heavier than the barrage it replaces by more than a little', () => {
-    const used = new Set(horrors().flatMap((d) => d.bossScript!.phases.flatMap((p) => p.attacks.map((a) => a.id))));
+    const used = new Set(horrors().flatMap((d) => d.bossScript!.phases.flatMap((p) => p.attacks.map((a) => baseOf(a.id))))); // each horror's own, built on the pattern (2026-11-24)
     for (const id of NEW) {
       expect(used.has(id), id).toBe(true);
       expect(ATTACKS[id].once, id).toBe(true);

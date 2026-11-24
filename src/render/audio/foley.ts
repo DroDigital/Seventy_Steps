@@ -13,6 +13,7 @@
 import type { Entity } from '../../core/ecs';
 import type { V3 } from '../../core/geom';
 import type { Echo } from '../../data/acoustics';
+import { baseOf } from '../../data/bossMoves';
 import { ATTACK_SOUNDS, soundOf, type AttackSound } from '../../data/creatureSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import { CLASS_GAIN, HAND_FRAMES, HANDS } from '../../data/foleySounds';
@@ -72,8 +73,10 @@ export const strikeFrame = (def: MoveDef): number | undefined => def.hit?.window
 
 /** How the attack `move` of creature `rosterId` sounds as it lands: the creature's own, else the attack library's, else nothing beyond the whoosh. */
 export function attackSound(rosterId: string | undefined, move: string): AttackSound | undefined {
-  const base = ATTACK_SOUNDS[move as AttackId];
-  const own = rosterId ? soundOf(rosterId)?.attacks?.[move as AttackId] : undefined;
+  const of = baseOf(move) as AttackId; // a horror's own blow sounds as the blow it is built on, unless it has its own (2026-11-24)
+  const base = ATTACK_SOUNDS[move as AttackId] ?? ATTACK_SOUNDS[of];
+  const mine = rosterId ? soundOf(rosterId)?.attacks : undefined;
+  const own = mine?.[move as AttackId] ?? mine?.[of];
   return own ? { gain: 0.8, ...base, set: own } : base;
 }
 

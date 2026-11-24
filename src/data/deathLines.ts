@@ -5,7 +5,7 @@
  * carry back. Keyed by the attack the blow was (data/attacks.ts) and by region. Data only (systems/deathNotes.ts).
  */
 
-import type { AttackId } from './schema';
+import type { LibraryId } from './schema';
 
 /** Over an edge (round 54): the floor is not always where the eye leaves it. */
 export const EDGES: readonly string[] = [
@@ -21,8 +21,8 @@ export const SEAS: readonly string[] = [
   'The deep takes what the shore lets slip. Turn back before the ground goes under the water.',
 ];
 
-/** How each blow is met. */
-export const TIPS: Readonly<Record<AttackId, string>> = {
+/** How each blow of the library is met (a horror's own blows carry their own lines: data/bossMoves.ts). */
+export const TIPS: Readonly<Record<LibraryId, string>> = {
   sweep: 'A sweep comes low and wide. Roll toward it, not away, and you are through it.',
   slam: 'It comes down where it stands. The weight lands late: roll to the side as it does.',
   lunge: 'It crosses the ground in a breath. Roll as it leaves the ground, and be behind it.',

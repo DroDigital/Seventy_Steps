@@ -7,9 +7,11 @@
  * systems/specials.ts. The beam stays a hitscan ray.
  */
 
+import { OWN_SPECS } from './bossMoves';
+import type { OwnSpec } from './bossMoveKit';
 import { recoveryFor, type PunishBand } from './bossPunish';
 import type { CloudDef, EffectKind, MarkLook, MarkPattern, MoveDef } from './moves';
-import type { AttackId, Stats } from './schema';
+import type { AttackId, LibraryId, Stats } from './schema';
 
 export interface AttackDef {
   kind: 'melee' | 'ranged' | 'area' | 'special';
@@ -19,6 +21,7 @@ export interface AttackDef {
   power: number; // damage = power × stats.damage
   poise: number; // poise damage = poise × stats.damage
   range: readonly [min: number, max: number]; // metres, for a human-sized body; the AI's bracket
+  far?: number; // metres its bolts, barrage, effect and dread carry, when not the bracket's far end: a chained link's bracket is none, its base's carry is kept (resolveOwn)
   reach?: number; // hitbox (see HitDef), metres for a human-sized body
   radius?: number;
   height?: number; // fraction of body height
@@ -45,7 +48,8 @@ export interface AttackDef {
 
 const melee = (d: Omit<AttackDef, 'kind'>): AttackDef => ({ kind: 'melee', ...d });
 
-export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
+/** The shared library (spec §3E): the common foes' blows, the bases every horror's own are built on (data/bossMoveKit.ts), and blind Azathoth's. */
+export const LIBRARY: Readonly<Record<LibraryId, AttackDef>> = {
   sweep: melee({ windup: 22, active: 6, recovery: 22, power: 1, poise: 0.8, range: [0, 2.2], reach: 1.3, radius: 0.5, height: 0.6, arc: [80, -60] }),
   slam: melee({ windup: 30, active: 5, recovery: 30, power: 1.6, poise: 1.6, range: [0, 2.4], reach: 1.4, radius: 0.8, height: 0.4, arc: [0, 0] }),
   lunge: melee({ windup: 28, active: 10, recovery: 34, power: 1.3, poise: 1.2, range: [2.5, 5.5], reach: 1.1, radius: 0.55, height: 0.55, arc: [15, -15], lunge: 4.2 }),
@@ -117,6 +121,22 @@ export const ATTACKS: Readonly<Record<AttackId, AttackDef>> = {
   cave_in: { kind: 'area', once: true, rest: 360, windup: 46, active: 1, recovery: 50, power: 0.95, poise: 1.1, range: [0, 20], marks: { count: 3, ring: [0, 8], delay: 50, stagger: 14, radius: 1.3, pattern: 'pillars' } }, // stone falls from the pillars nearest the target, about their feet: cover is no place to stand (a shower about the target where none stands)
 };
 
+const NESTED = ['bolts', 'pool', 'marks', 'wave', 'cloud', 'sweep', 'barrage', 'pull'] as const;
+
+/** A horror's own blow made whole (2026-11-24): the blow it is built on, with its own numbers laid over it, the nested ones in part; nothing of the base's chain is kept. */
+export function resolveOwn(s: OwnSpec): AttackDef {
+  const { of, tip: _tip, ...over } = s;
+  const base = LIBRARY[of];
+  const out: Record<string, unknown> = { ...base, ...over };
+  for (const k of NESTED) if (over[k]) out[k] = { ...(base[k] ?? {}), ...over[k] };
+  if (over.follow === undefined) delete out.follow;
+  if (out.far === undefined && (out.range as AttackDef['range'])[1] === 0 && base.range[1] > 0) out.far = base.range[1]; // a link is never chosen, but its shots still fly
+  return out as unknown as AttackDef;
+}
+
+/** Every attack: the library's, and every horror's own (data/bossMoves.ts). */
+export const ATTACKS = { ...LIBRARY, ...Object.fromEntries(Object.entries(OWN_SPECS).map(([id, s]) => [id, resolveOwn(s)])) } as Readonly<Record<AttackId, AttackDef>>;
+
 /** Body size relative to a human (1.9 m); big bodies reach further. */
 export const sizeFactor = (height: number): number => Math.max(1, height / 1.9);
 
@@ -145,6 +165,7 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   const a = ATTACKS[id];
   const k = sizeFactor(height);
   const frames = a.windup + a.active + recoveryFor(a, band);
+  const far = a.far ?? a.range[1];
   const damage = Math.round(a.power * stats.damage);
   const poise = Math.round(a.poise * stats.damage);
   const hitstop = a.kind === 'ranged' ? 2 : a.power >= 1.4 ? 4 : 3;
@@ -155,10 +176,10 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   const move: MoveDef = { frames, track: { window: [0, Math.max(1, a.windup - 4)], rate: 3 }, motion };
   if (a.sweep?.blind) delete move.track;
   if (a.sanity && stats.sanityDamage > 0) {
-    const range = a.range[1] * k;
+    const range = far * k;
     move.sanity = { window: [a.windup, a.windup + a.active], amount: a.sanity * stats.sanityDamage, range, sight: a.effect === 'gaze' };
   }
-  if (a.effect) move.effect = { window: [a.windup, a.windup + a.active], kind: a.effect, range: a.range[1] * k };
+  if (a.effect) move.effect = { window: [a.windup, a.windup + a.active], kind: a.effect, range: far * k };
   if (a.follow) move.then = a.follow;
   else if (a.kind !== 'special') move.open = a.windup + a.active; // it recovers, stooped, after the blow (hurt.ts)
   if (a.pull) move.pull = { window: [a.windup, a.windup + a.active], speed: a.pull.speed, range: a.pull.range * k };
@@ -178,9 +199,9 @@ export function compileAttack(id: AttackId, stats: Stats, height: number, band?:
   } else if (a.wave) move.wave = { frame: a.windup, speed: a.wave.speed * s, width: a.wave.width * s, reach: a.wave.reach * s, damage, poise };
   else if (cloud) move.cloud = cloud;
   else if (a.sweep) move.sweep = { window: active, arc: a.sweep.arc, length: a.sweep.length * s, width: a.sweep.width * s, damage, poise, ...(a.sweep.arms && { arms: a.sweep.arms }) };
-  else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: a.range[1] * k * 1.6, damage, poise };
+  else if (a.barrage) move.barrage = { window: active, ...a.barrage, radius: a.barrage.radius * s, range: far * k * 1.6, damage, poise };
   else if (b) {
-    const range = a.range[1] * k * 1.5 * (1 + (b.bounces ?? 0)); // a bolt that glances off walls flies the farther for each
+    const range = far * k * 1.5 * (1 + (b.bounces ?? 0)); // a bolt that glances off walls flies the farther for each
     move.volley = { frame: a.windup, count: b.count, spread: b.spread, speed: b.speed, radius: b.radius * Math.sqrt(k), range, damage, poise, lob: !!b.lob, pool, ...(b.bounces && { bounces: b.bounces }) };
   } else if (pool) move.pool = { frame: a.windup, ...pool };
   else if (a.shot) move.shot = { frame: a.windup, damage, poise, range: a.shot * Math.sqrt(k), hitstop };

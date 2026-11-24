@@ -125,8 +125,8 @@ describe('hurt zones (round 24)', () => {
     const a = g.ecs.c.actor.get(boss)!;
     g.ecs.c.brain.delete(boss);
     expect(stooped(g, boss)).toBe(false);
-    startMove(a, 'slam');
-    const open = a.moves.slam.open!;
+    startMove(a, 'ghatan_crush');
+    const open = a.moves.ghatan_crush.open!;
     expect(open).toBeGreaterThan(0);
     a.frame = open - 1;
     refreshStoops(g);
