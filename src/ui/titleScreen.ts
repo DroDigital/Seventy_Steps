@@ -21,6 +21,7 @@ import { wordmark } from './logo';
 import { EDITION } from '../data/edition';
 import { settingsPage } from './menuPages';
 import { brightnessPage } from './brightnessCalibration';
+import { createTitleBackdrop } from './titleBackdrop';
 import type { SettingId, Settings } from './settings';
 
 export interface TitleOptions {
@@ -40,7 +41,9 @@ export interface TitleOptions {
 }
 
 export function showTitle(o: TitleOptions): void {
+  const backdrop = createTitleBackdrop();
   const screen = createScreen(5, '#000', 'left:50%;top:66%;transform:translate(-50%,-50%);width:min(560px,94vw);max-height:60vh;overflow-x:hidden;overflow-y:auto;text-align:center;' + LIFT_ROOM); // the menu stands in the lower half; the name has the upper (round 38)
+  screen.root.insertBefore(backdrop.canvas, screen.root.firstChild);
   const logo = wordmark(); // the name cut in stone (round 20), made once
   // The name: a layer of its own over the upper half, standing midway between the top of the screen and the menu under it (`settle`), so each page of the menu below can stand where it likes.
   const head = document.createElement('div');
@@ -66,13 +69,15 @@ export function showTitle(o: TitleOptions): void {
   seen.observe(headLayer);
   for (const panel of screen.root.querySelectorAll('[data-menu]')) seen.observe(panel);
   const showHead = (on: boolean): void => void (head.style.opacity = on ? '1' : '0');
-  screen.onClose = () => head.remove();
-  /** Where a page stands, and whether the name is over it: set as the page is built. */
-  const placed = (page: Page, top: string, name: boolean): Page => {
+  screen.onClose = () => (backdrop.remove(), head.remove());
+  /** Where a page stands, and whether the name and skyline show behind it: set as the page is built. */
+  const placed = (page: Page, top: string, name: boolean, sky = name, pureBlack = false): Page => {
     const build = page.build.bind(page);
     page.build = (p) => {
       p.style.top = top;
       showHead(name);
+      backdrop.show(sky);
+      screen.root.style.zIndex = pureBlack ? '25' : '5'; // keep brightness calibration completely clear of the receding purple veil
       build(p);
     };
     return page;
@@ -117,7 +122,7 @@ export function showTitle(o: TitleOptions): void {
       if (lines.some((l) => l?.loads)) button(menu, t('title.load'), () => screen.show(slotPage('load')));
       gap();
       button(menu, t('menu.settings'), () => screen.show(settingsHere()));
-      button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false)));
+      button(menu, t('menu.credits'), () => screen.show(placed(creditsPage(() => screen.show(main)), '50%', false, false)));
       if (desktop) { // the desktop shell only (playtest round 12): the way out is dimmer, and light ash-red when chosen
         gap();
         button(menu, t('menu.quit'), () => (saveNow(), void desktop!.quit())).classList.add('exit');
@@ -125,10 +130,10 @@ export function showTitle(o: TitleOptions): void {
     },
   }, '66%', true);
   /** Settings; from its Display tab the brightness card, which returns to them. */
-  const settingsHere = (): Page => placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0, () => screen.show(cardHere())), '50%', false);
-  const cardHere = (): Page => placed(brightnessPage(o.settings, o.change, () => screen.show(settingsHere()), o.calibrated), '50%', false);
+  const settingsHere = (): Page => placed(settingsPage(o.settings, o.change, () => screen.show(main), o.saveKeys, 0, () => screen.show(cardHere())), '50%', false, false);
+  const cardHere = (): Page => placed(brightnessPage(o.settings, o.change, () => screen.show(settingsHere()), o.calibrated, false), '50%', false, false, true);
   /** The first launch's card: shown once, as the title opens, and on to the menu. */
-  const first = placed(brightnessPage(o.settings, o.change, () => screen.show(main), o.calibrated), '50%', false);
+  const first = placed(brightnessPage(o.settings, o.change, () => screen.show(main), o.calibrated, true), '50%', false, false, true);
   const into = (slot: number, fresh: boolean, difficulty?: DifficultyId): void => (o.useSlot(slot), begin(fresh, difficulty));
   /** How hard the dream is: chosen here, once, as a new one begins, and never after (round 38). */
   const difficultyPage = (slot: number): Page => placed({

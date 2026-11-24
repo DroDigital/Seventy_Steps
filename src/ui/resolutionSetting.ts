@@ -2,7 +2,7 @@
 
 import { t } from '../core/i18n';
 import { HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../data/tuning';
-import { ACCENT, button, el, slider } from './menuParts';
+import { ACCENT, actionButton, button, el, slider } from './menuParts';
 import type { SettingId, Settings } from './settings';
 
 const picture = (scale: number): string => `${Math.round(RENDER.width * scale)}×${Math.round(RENDER.height * scale)}`;
@@ -24,7 +24,7 @@ export function createResolutionSetting(): (parent: HTMLElement, settings: Setti
     } else {
       slider(parent, t('set.resolution'), SETTINGS.resolution, settings.resolution, (value) => change('resolution', value), picture, t('set.hint.resolution'));
     }
-    const toggle = button(parent, t('set.resolutionHigher'), () => { expanded = !expanded; redraw(); }, true, t('set.resolutionWarning'));
+    const toggle = actionButton(parent, t('set.resolutionHigher'), expanded ? '▾' : '›', () => { expanded = !expanded; redraw(); }, t('set.resolutionWarning'));
     toggle.setAttribute('aria-expanded', String(expanded));
     toggle.setAttribute('aria-controls', id);
     const choices = el(parent, 'div');

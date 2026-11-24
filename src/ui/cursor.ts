@@ -39,7 +39,7 @@ const art = (still: boolean): string => {
   return `<svg width="${SIZE}" height="${SIZE}" viewBox="-20 -20 40 40" fill="none">
 <defs><radialGradient id="menu-cursor-glow"><stop offset="0" stop-color="${PALE}"/><stop offset=".35" stop-color="${GOLD}"/><stop offset="1" stop-color="${GOLD}" stop-opacity="0"/></radialGradient></defs>
 <circle class="burst" r="6" stroke="${GOLD}" stroke-width=".9"/>
-<g class="all"><g>${still ? '' : '<animate attributeName="opacity" values="1;.6;1" dur="3.2s" repeatCount="indefinite"/>'}<circle class="halo" r="11" fill="url(#menu-cursor-glow)" opacity=".55"/></g><circle class="core" r="3.2" fill="${PALE}"/>
+<g class="all"><g>${still ? '' : '<animate attributeName="opacity" values="1;.6;1" dur="3.2s" repeatCount="indefinite"/>'}<circle class="halo" r="11" fill="url(#menu-cursor-glow)" opacity=".55"/></g><circle class="core" r="3.0" fill="${PALE}" stroke="#09080c" stroke-width=".75"/><path d="M-5.5 0H-2.6M2.6 0H5.5M0-5.5V-2.6M0 2.6V5.5" stroke="${GOLD}" stroke-width=".9" stroke-linecap="round" opacity=".82"/><circle r="1.1" fill="#09080c"/><circle r=".65" fill="#fff"/>
 ${orbit('m1', 9, 1.1, GOLD, 3.2, 1, 0)}${orbit('m2', 7, 0.9, '#cbb8ee', 4.6, -1, 120)}${orbit('m3', 12, 0.8, GOLD, 6.4, 1, 240)}</g>
 </svg>`;
 };

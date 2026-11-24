@@ -17,7 +17,7 @@ import { fieldGuideBody } from './fieldGuide';
 import { keyLayout } from '../core/bindings';
 import { t } from '../core/i18n';
 import { BONE } from './hudKit';
-import { button, el, footer, heading, tabs, title, type Page } from './menuKit';
+import { actionButton, button, el, footer, heading, tabs, title, type Page } from './menuKit';
 
 const TABS = ['Under way', 'Documents', 'Field Guide', 'Bestiary'];
 
@@ -39,7 +39,11 @@ export function journalPage(g: Game, back: () => void, show: (p: Page) => void, 
         const q = QUESTS[id];
         el(body, 'div', `${q.main ? '◆ ' : followed === id ? '◇ ' : ''}${q.title}`, `color:${BONE};margin-top:8px;padding:0 14px`);
         el(body, 'div', q.stages[stageOf(g, id)].note, 'opacity:.7;line-height:1.5;padding:0 14px;font-size:14px');
-        if (canTrack(g, id)) button(body, followed === id ? 'Following it on the map  ·  stop' : 'Follow it on the map', () => (track(g, id), show(journalPage(g, back, show, 0))), true, followed === id ? 'The minimap and the map lead to the story again.' : 'The ◇ on the minimap and the map leads to this, in place of the story.');
+        if (canTrack(g, id)) {
+          const trackBtn = actionButton(body, followed === id ? 'Following on map' : 'Follow on the map', followed === id ? '◇ Stop' : '◇ Pin  ›', () => (track(g, id), show(journalPage(g, back, show, 0))), followed === id ? 'The minimap and the map lead to the story again.' : 'The ◇ on the minimap and the map leads to this, in place of the story.');
+          trackBtn.style.margin = '6px 14px 4px';
+          trackBtn.style.width = 'calc(100% - 28px)';
+        }
       }
       if (done.length) {
         heading(body, `DONE · ${done.length}`).style.margin = '18px 14px 4px';

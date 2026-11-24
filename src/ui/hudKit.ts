@@ -4,8 +4,8 @@ export const BONE = '#d9d0b8';
 export const RUST = '#74493a';
 export const SEA = '#5d6c70';
 // The vitals' own colours (round 32: the three bars were rust, slate and bone, six pixels thin and alike) and the trim of frames:
-export const BLOOD = '#96413b'; // health (round 46: a step less saturated, with the rest of the vitals)
-export const LEAF = '#848a6c'; // stamina (round 35: a drab olive; the leaf green of round 32 was too much)
+export const BLOOD = '#a83c36'; // health (clear crimson, separated in hue from stamina and sanity)
+export const LEAF = '#8fa35e'; // stamina (warm olive-brass, distinct from crimson HP and slate-blue sanity)
 export const GOLD = '#a8935f'; // the rule and the brackets of a frame, the hot edge of a choice
 export const PAPER = '#e8dec6'; // a title
 /**

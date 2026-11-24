@@ -33,7 +33,7 @@ import { createRealmCards } from './realmCards';
 import { QUIET } from '../data/uiMood';
 import { DYING_MS } from './journeys';
 import { gauge, pipRow } from './gauges';
-import { blend, BLOOD, BONE, el, LEAF, percent, SERIF, setStyle, setText } from './hudKit';
+import { blend, BLOOD, BONE, el, LEAF, PAPER, percent, SERIF, setStyle, setText } from './hudKit';
 import { bleeding } from '../systems/sanity';
 import { HEART } from '../render/feel';
 import type { MapPainter } from './mapPainter';
@@ -83,29 +83,31 @@ export interface HudOptions {
 /** `tracker`: whether the quest tracker is asked for (Settings › Play). */
 export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainter, held: () => number = () => 0, tracker: () => boolean = () => true, opts: HudOptions = {}): Hud {
   const root = el(`${PICTURE_LAYER};pointer-events:none;font:13px/1.4 ${SERIF};font-variant-numeric:lining-nums tabular-nums;color:${BONE};text-shadow:0 0 3px #000,0 1px 2px #000c;z-index:1`); // drawn at the UI scale, in the period face (round 14); a dark halo on all of its words (round 38: INSIGHT and ECHOES vanished into a pale floor)
-  const dim = el('position:absolute;inset:0', '', root); // the quiet walk's layer: the bars, counters and map sink together
+  const dim = el('position:absolute;inset:0;transition:opacity .22s', '', root); // the quiet walk's layer: the bars, counters and map sink together (and fade behind open menus)
   const questLayer = el('position:absolute;inset:0', '', root); // the objective stays readable when the other HUD recedes
   const northUp = opts.northUp ?? (() => false);
   const minimap = createMinimap(g, dim, painter, northUp);
   const steps = createSteps(g); // before the hints: what a save loaded had been told already
   const hints = createHints(g);
   const vitals = el('position:absolute;left:18px;top:14px;width:196px', '', dim); // (the vitals at the upper left)
-  const hp = gauge(vitals, BLOOD, 7, true);
+  const hp = gauge(vitals, BLOOD, 9, true);
   const chip = el(`position:absolute;left:0;top:0;height:100%;width:100%;background:${BONE}aa`, '', hp.parentElement!);
   hp.parentElement!.insertBefore(chip, hp);
   hp.style.position = 'relative';
   let chipPct = 100;
   let chipHold = 0;
-  const stamina = gauge(vitals, LEAF, 4);
+  const stamina = gauge(vitals, LEAF, 6);
   const mind = createMindHud(g, vitals, (text: string) => say(text));
   const reagent = pipRow(vitals, tr('hud.reagent'), 'diamond', '#8a8678'); // doses as diamonds, cartridges as rounds, each full or hollow (round 33)
   const gun = pipRow(vitals, tr('hud.revolver'), 'round', '#8a8678'); // the cylinder's six and the spare rounds (round 22)
   const counters = el('position:absolute;right:18px;bottom:14px;font-size:11px;letter-spacing:3px;text-align:right;opacity:.85', '', dim);
   const insight = el('', '', counters);
   const echoes = el('margin-top:1px', '', counters);
-  const reticle = el(`position:absolute;width:8px;height:8px;margin:-5px 0 0 -5px;border:1px solid ${BONE};transform:rotate(45deg)`, '', root);
+  const reticle = el('position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;display:none', '', root);
+  el(`position:absolute;inset:1px;border:1.5px solid ${BONE};transform:rotate(45deg);box-shadow:0 0 0 1px #000e,inset 0 0 0 1px #000b,0 0 7px #000d`, '', reticle);
+  el(`position:absolute;left:50%;top:50%;width:3px;height:3px;margin:-1.5px 0 0 -1.5px;border-radius:50%;background:${PAPER};box-shadow:0 0 0 1px #000e`, '', reticle);
   const notice = el('position:absolute;left:0;right:0;top:64%;text-align:center;font-size:16px;letter-spacing:4px', '', root);
-  const prompt = el('position:absolute;left:0;right:0;bottom:64px;text-align:center;letter-spacing:2px;opacity:.85', '', root);
+  const prompt = el('position:absolute;left:50%;transform:translateX(-50%);bottom:60px;padding:4px 30px;white-space:nowrap;text-align:center;letter-spacing:2px;opacity:.92;display:none;background:linear-gradient(90deg,#07060900,#070609cc 18%,#070609cc 82%,#07060900)', '', root);
   const heard = el('position:absolute;left:0;right:0;bottom:96px;padding:0 14%;text-align:center;font-style:italic;line-height:1.5;font-size:calc(var(--caption, 1) * 1em);letter-spacing:1px;opacity:0;text-shadow:0 0 6px #000,0 0 2px #000', '', root); // what someone near says to themselves (round 34)
   let heardAt = -Infinity;
   document.body.append(root);
@@ -201,11 +203,12 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       realms.update();
       hours.update();
       calmNow = calm.update();
-      setStyle(dim, 'opacity', calmNow.hud > 0 ? (1 - (1 - QUIET.hudTo) * calmNow.hud).toFixed(2) : '1');
-      setStyle(questLayer, 'opacity', calmNow.hud > 0 ? (1 - 0.15 * calmNow.hud).toFixed(2) : '1');
-      if (!menuOpen()) hints.update();
-      tipCard.show(tipsOn() && !dying && !screenHeld && !menuOpen() && !opts.held?.() ? stepTips(g, steps) : null);
-      const busy = menuOpen() ? 'hidden' : 'visible'; // a dialogue or menu has the screen
+      const open = menuOpen();
+      setStyle(dim, 'opacity', open ? '0' : calmNow.hud > 0 ? (1 - (1 - QUIET.hudTo) * calmNow.hud).toFixed(2) : '1');
+      setStyle(questLayer, 'opacity', open ? '0' : calmNow.hud > 0 ? (1 - 0.15 * calmNow.hud).toFixed(2) : '1');
+      if (!open) hints.update();
+      tipCard.show(tipsOn() && !dying && !screenHeld && !open && !opts.held?.() ? stepTips(g, steps) : null);
+      const busy = open ? 'hidden' : 'visible'; // a dialogue or menu has the screen
       setStyle(prompt, 'visibility', busy);
       setStyle(notice, 'visibility', busy);
       setStyle(heard, 'visibility', busy);
@@ -248,15 +251,17 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const mountShown = mountKey !== '' && now < mountTipUntil;
       const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
       const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
-      setText(prompt, gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '');
+      const promptText = gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '';
+      setText(prompt, promptText);
+      setStyle(prompt, 'display', promptText ? 'block' : 'none');
       bosses.update();
       foes.update(camera, canvas);
       questSigns.update(camera, canvas);
       quest.update();
 
       const t = g.lock.target;
-      const aim = t === null ? null : aimPoint(g, t);
-      if (t === null || !aim) return setStyle(reticle, 'display', 'none');
+      const aim = open || t === null ? null : aimPoint(g, t);
+      if (open || t === null || !aim) return setStyle(reticle, 'display', 'none');
       v.set(aim.x, aim.y, aim.z).project(camera);
       if (v.z >= 1) return setStyle(reticle, 'display', 'none');
       const [r, k] = [canvas.getBoundingClientRect(), uiScale()]; // screen pixels, in the scaled layer's (the picture's box)

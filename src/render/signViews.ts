@@ -88,8 +88,8 @@ void main() {
   }
   a *= uGlow;
   if (a < 0.003) discard;
-  float core = uMode > 0.5 && uMode < 1.5 ? 0.3 : 1.0; // the runes stay purple, to read over lit ground
-  vec3 col = mix(uEdge, uCore, clamp(a * a * core, 0.0, 1.0)) * min(a, 1.6);
+  float core = uMode > 0.5 && uMode < 1.5 ? 0.3 : 0.72; // keep the carved branches crisp inside the cosmic purple halo
+  vec3 col = mix(uEdge, uCore, clamp(pow(a, 2.4) * core, 0.0, 1.0)) * min(a, 1.05);
   gl_FragColor = vec4(col * (1.0 - vFog * 0.55), 1.0);
 }
 `;

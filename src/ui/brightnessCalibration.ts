@@ -8,7 +8,7 @@
 
 import { t } from '../core/i18n';
 import { brightnessGamma, CALIBRATION, SETTINGS } from '../data/tuning';
-import { button, el, footer, heading, slider, type Page } from './menuKit';
+import { button, el, footer, slider, title, type Page } from './menuKit';
 import type { SettingId, Settings } from './settings';
 
 const W = 320;
@@ -47,7 +47,7 @@ function levels(): Uint8ClampedArray {
 }
 
 /** The card as a page: its picture, the brightness slider, Default and Keep. `leave` closes it; `calibrated` marks it kept. */
-export function brightnessPage(s: Settings, change: (id: SettingId, v: number) => void, leave: () => void, calibrated: () => void = () => undefined): Page {
+export function brightnessPage(s: Settings, change: (id: SettingId, v: number) => void, leave: () => void, calibrated: () => void = () => undefined, firstLaunch = false): Page {
   const lum = levels();
   let picture: CanvasRenderingContext2D | null = null;
   let frame: ImageData | null = null;
@@ -66,21 +66,28 @@ export function brightnessPage(s: Settings, change: (id: SettingId, v: number) =
   };
   const keep = (): void => (calibrated(), leave());
   const page: Page = {
+    focus: 2, // focus Keep by default, right after slider and Default
     back: keep,
     build(panel) {
-      heading(panel, t('cal.title'));
-      const canvas = el(panel, 'canvas', '', `display:block;margin:0 auto 10px;width:min(${W}px,80vw);height:auto;border:1px solid #ffffff14`);
+      title(panel, t('cal.title'));
+      const matte = el(panel, 'div', '', 'margin:0 auto 12px;padding:12px;width:fit-content;background:#000;border:1px solid #ffffff1c;box-shadow:0 0 36px #000');
+      const canvas = el(matte, 'canvas', '', `display:block;width:min(${W}px,78vw);height:auto`);
       canvas.width = W;
       canvas.height = H;
       picture = canvas.getContext('2d');
       frame = picture?.createImageData(W, H) ?? null;
       paint(s.brightness);
-      el(panel, 'div', t('cal.hint'), 'opacity:.7;font-size:12px;line-height:1.5;max-width:420px;margin:0 auto 10px;text-align:center');
+      el(panel, 'div', t('cal.hint'), 'opacity:.74;font-size:12px;line-height:1.5;max-width:420px;margin:0 auto 12px;text-align:center');
       slider(panel, t('set.brightness'), SETTINGS.brightness, s.brightness, (v) => (change('brightness', v), paint(v)), pct, t('set.hint.brightness'));
-      const row = el(panel, 'div', '', 'display:flex;justify-content:center;gap:12px;margin-top:8px');
-      button(row, t('cal.reset'), () => (change('brightness', SETTINGS.brightness[3]), page.redraw?.())).classList.add('tag');
-      button(row, t('cal.keep'), keep).dataset.calibrationKeep = ''; // the first-launch smoke check keeps the default and continues
-      footer(panel, t('set.footer'), keep);
+      const row = el(panel, 'div', '', 'display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px');
+      const resetBtn = button(row, t('cal.reset'), () => (change('brightness', SETTINGS.brightness[3]), page.redraw?.()));
+      resetBtn.classList.add('tag');
+      resetBtn.style.minWidth = '104px';
+      const keepBtn = button(row, t('cal.keep'), keep);
+      keepBtn.classList.add('tag', 'primary');
+      keepBtn.style.minWidth = '126px';
+      keepBtn.dataset.calibrationKeep = ''; // the first-launch smoke check keeps the default and continues
+      footer(panel, t('set.hint.brightness'), firstLaunch ? undefined : keep);
     },
   };
   return page;

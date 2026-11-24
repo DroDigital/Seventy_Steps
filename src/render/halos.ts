@@ -40,7 +40,8 @@ void main() {
   float r = length(vQ);
   if (r >= 1.0) discard;
   float a = 1.0 - r;
-  gl_FragColor = vec4(vCol * a * a, 1.0);
+  float glow = pow(a, 2.5) * 0.85 + pow(a, 6.0) * 0.35;
+  gl_FragColor = vec4(vCol * glow, 0.0);
 }
 `;
 

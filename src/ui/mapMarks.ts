@@ -161,6 +161,40 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
     add(over, { kind: 'marker', x: screenX(view, pin.x), y: screenY(view, pin.z) - PIN_TIP * r, state: {}, title: 'Your marker', name: `${metres} m away`, note: 'Right-click it, or press F, to remove it', at: pin }, 0.95, null, 'places'); // its point on the place
   }
 
+  if (full) {
+    const anchors = [...middle.filter((m) => m.kind !== 'secret'), ...over];
+    const movable = [...under, ...middle.filter((m) => m.kind === 'secret')];
+    for (let i = 0; i < movable.length; i++) {
+      const m = movable[i];
+      for (let pass = 0; pass < 2; pass++) {
+        for (const other of anchors) {
+          const [dx, dy] = [m.x - other.x, m.y - other.y];
+          const minD = (m.r + other.r) * 1.08;
+          const d = Math.hypot(dx, dy);
+          if (d < minD) {
+            const ang = d > 0.5 ? Math.atan2(dy, dx) : (i * 2.39996) % (Math.PI * 2);
+            const push = minD - d;
+            m.x += Math.cos(ang) * push;
+            m.y += Math.sin(ang) * push;
+          }
+        }
+        for (let j = 0; j < i; j++) {
+          const other = movable[j];
+          const [dx, dy] = [m.x - other.x, m.y - other.y];
+          const minD = (m.r + other.r) * 0.96;
+          const d = Math.hypot(dx, dy);
+          if (d < minD) {
+            const ang = d > 0.5 ? Math.atan2(dy, dx) : ((i + j + 1) * 2.39996) % (Math.PI * 2);
+            const push = minD - d;
+            m.x += Math.cos(ang) * push;
+            m.y += Math.sin(ang) * push;
+          }
+        }
+      }
+      if (m.label) [m.label.x, m.label.y] = [m.x, m.y];
+    }
+  }
+
   out.marks.push(...under, ...middle, ...over);
   out.labels.push(...labels.signs, ...labels.doors, ...labels.people, ...labels.places);
   return out;

@@ -264,7 +264,12 @@ export function createMapScreen(g: Game, painter: MapPainter, resume: () => void
     const found = places.filter((p) => g.overworld!.places.has(p.id)).length;
     const secrets = poiTotals(g, rs); // round 61
     const gift = nextGift(g); // round 68: the gifts for the secrets found, in all the realms
-    heading = [where.toUpperCase(), `${Math.round(charted * 100)}% CHARTED   ·   ${found} OF ${places.length} PLACES FOUND${secrets.of ? `   ·   ${secrets.found} OF ${secrets.of} SECRETS` : ''}${secrets.of && gift ? `   ·   A GIFT AT ${gift.at} OF ALL (${secretsFound(g)} FOUND)` : ''}`];
+    const totalSecrets = secretsFound(g);
+    const parts: string[] = [charted >= 0.005 ? `${Math.round(charted * 100)}% CHARTED` : 'SURVEY BEGUN'];
+    if (found > 0) parts.push(`${found} ${found === 1 ? 'PLACE' : 'PLACES'} CHARTED`);
+    if (secrets.found > 0) parts.push(`${secrets.found} ${secrets.found === 1 ? 'SECRET' : 'SECRETS'} UNCOVERED`);
+    if (totalSecrets > 0 && secrets.of && gift) parts.push(`GIFT AT ${gift.at} SECRETS (${totalSecrets} FOUND)`);
+    heading = [where.toUpperCase(), parts.join('   ·   ')];
     if (title) title.textContent = heading[0];
     if (stats) stats.textContent = heading[1];
     last = 0;

@@ -27,7 +27,7 @@ export interface MapPainter {
   paint(ctx: CanvasRenderingContext2D, view: MapView, realm: readonly RegionDef[], full: boolean): readonly Mark[];
 }
 
-const FOG = '#0b0b0d';
+const FOG = '#11100f';
 
 interface Veil {
   canvas: HTMLCanvasElement;
@@ -37,21 +37,99 @@ interface Veil {
   seenVersion: number;
 }
 
-/** The unknown: a dark sheet with faint specks and the survey's ruled squares. */
+/** Deterministic PRNG for consistent antique survey paper grain. */
+function mulberry(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** The unknown: aged charcoal-parchment field chart with seamless paper tooth, surveyor grid, and intersection ticks. */
 function fogPattern(ctx: CanvasRenderingContext2D): CanvasPattern | null {
   const tile = document.createElement('canvas');
-  [tile.width, tile.height] = [64, 64];
+  const S = 128;
+  [tile.width, tile.height] = [S, S];
   const t = tile.getContext('2d')!;
-  t.fillStyle = FOG;
-  t.fillRect(0, 0, 64, 64);
-  for (let i = 0; i < 90; i++) {
-    t.fillStyle = `rgba(217,208,184,${0.02 + 0.04 * Math.random()})`;
-    t.fillRect(Math.floor(Math.random() * 64), Math.floor(Math.random() * 64), 1, 1);
+  const rnd = mulberry(1928070);
+  const img = t.createImageData(S, S);
+  const d = img.data;
+  const tau = Math.PI * 2;
+  for (let y = 0; y < S; y++) {
+    const ty = (y / S) * tau;
+    for (let x = 0; x < S; x++) {
+      const tx = (x / S) * tau;
+      // Seamless periodic paper mottling (wraps cleanly across tile edges)
+      const cloud =
+        0.5 * Math.sin(tx + 0.6) * Math.cos(ty - 0.4) +
+        0.3 * Math.cos(2 * tx - ty + 1.2) +
+        0.2 * Math.sin(tx + 2 * ty - 0.8);
+      const grain = (rnd() - 0.5) * 4.2 + cloud * 2.6;
+      const i = (y * S + x) * 4;
+      d[i] = Math.max(8, Math.min(28, Math.round(17 + grain * 1.08)));
+      d[i + 1] = Math.max(8, Math.min(26, Math.round(16 + grain)));
+      d[i + 2] = Math.max(8, Math.min(25, Math.round(15 + grain * 0.86)));
+      d[i + 3] = 255;
+    }
   }
-  t.fillStyle = 'rgba(217,208,184,0.035)';
-  t.fillRect(0, 0, 64, 1);
-  t.fillRect(0, 0, 1, 64);
+  t.putImageData(img, 0, 0);
+  // Subtle horizontal & vertical paper-fibre flecks
+  for (let i = 0; i < 140; i++) {
+    const a = 0.014 + 0.024 * rnd();
+    t.fillStyle = rnd() > 0.35 ? `rgba(217,208,184,${a.toFixed(3)})` : `rgba(0,0,0,${(a * 2).toFixed(3)})`;
+    t.fillRect(Math.floor(rnd() * S), Math.floor(rnd() * S), rnd() > 0.75 ? 3 : 1, 1);
+  }
+  // Minor and major surveyor grid lines
+  t.fillStyle = 'rgba(217,208,184,0.024)';
+  t.fillRect(0, S / 2, S, 1);
+  t.fillRect(S / 2, 0, 1, S);
+  t.fillStyle = 'rgba(217,208,184,0.055)';
+  t.fillRect(0, 0, S, 1);
+  t.fillRect(0, 0, 1, S);
+  // Subtle engraved '+' crosshairs at major intersections
+  t.fillStyle = 'rgba(168,147,95,0.16)';
+  t.fillRect(0, 0, 5, 1);
+  t.fillRect(S - 4, 0, 4, 1);
+  t.fillRect(0, 0, 1, 5);
+  t.fillRect(0, S - 4, 1, 4);
   return ctx.createPattern(tile, 'repeat');
+}
+
+/** Faint antique survey rhumb lines and double-ink chart frame drawn across the full map canvas. */
+function drawChartChrome(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+  ctx.save();
+  // Subtle compass rose rhumb lines radiating softly from off-center
+  const [rx, ry] = [w * 0.5, h * 0.52];
+  const maxR = Math.hypot(w, h) * 0.65;
+  ctx.strokeStyle = 'rgba(168,147,95,0.045)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let i = 0; i < 16; i++) {
+    const a = (i * Math.PI) / 8;
+    ctx.moveTo(rx + Math.cos(a) * 32, ry + Math.sin(a) * 32);
+    ctx.lineTo(rx + Math.cos(a) * maxR, ry + Math.sin(a) * maxR);
+  }
+  ctx.stroke();
+  for (const rad of [Math.min(w, h) * 0.28, Math.min(w, h) * 0.46]) {
+    ctx.beginPath();
+    ctx.arc(rx, ry, rad, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // Soft warm edge vignette
+  const v = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.3, w * 0.5, h * 0.5, Math.hypot(w, h) * 0.58);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(1, 'rgba(4,4,6,0.58)');
+  ctx.fillStyle = v;
+  ctx.fillRect(0, 0, w, h);
+  // Double antique hairline border inside the viewport
+  ctx.strokeStyle = 'rgba(168,147,95,0.22)';
+  ctx.strokeRect(10.5, 10.5, w - 21, h - 21);
+  ctx.strokeStyle = 'rgba(217,208,184,0.09)';
+  ctx.strokeRect(14.5, 14.5, w - 29, h - 29);
+  ctx.restore();
 }
 
 export function createMapPainter(g: Game): MapPainter {
@@ -105,6 +183,7 @@ export function createMapPainter(g: Game): MapPainter {
       if (typeof fog === 'string') fog = fogPattern(ctx) ?? FOG;
       ctx.fillStyle = fog;
       ctx.fillRect(0, 0, view.w, view.h);
+      if (full) drawChartChrome(ctx, view.w, view.h);
       if (!ow) return [];
       const sx = (x: number): number => screenX(view, x);
       const sy = (z: number): number => screenY(view, z);

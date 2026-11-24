@@ -18,6 +18,7 @@ import { CREATURE_FX } from '../../data/creatureFx';
 import { SPRITE_FX_GLSL } from './spriteFx';
 import { BODY_LIGHT_GLSL } from './bodyLight';
 import { BODY_MATTER_GLSL } from './bodyMatter';
+import { PROTOPLASM_GLSL } from './protoplasm';
 import { SPRITE_GRADE_GLSL } from './spriteGrade';
 
 export const SPRITE_VERT = /* glsl */ `
@@ -52,6 +53,8 @@ varying vec4 vWound;
 varying vec4 vGlint;
 varying vec4 vTone;
 varying float vRelit;
+varying float vEldritch;
+varying float vAmorphous;
 varying vec2 vQuad;
 varying vec2 vSize;
 varying vec4 vCut;
@@ -94,8 +97,12 @@ void main() {
   vDist = -vp.z;
   vFlash = aInfo.x;
   vOpacity = aInfo.y;
-  vOutside = mod(aInfo.w, 2.0);
+  float bits = floor(aInfo.w + 0.01);
+  vOutside = mod(bits, 2.0);
   vRelit = floor(aInfo.w / 2.0 + 0.01);
+  vRelit = mod(vRelit, 2.0);
+  vEldritch = mod(floor(bits / 4.0), 2.0);
+  vAmorphous = mod(floor(bits / 8.0), 2.0);
   vWeird = aWound.w;
   vCell = aCell;
   vFx = aFx;
@@ -142,6 +149,8 @@ varying vec4 vCell;
 varying vec4 vGlint;
 varying vec4 vTone;
 varying float vRelit;
+varying float vEldritch;
+varying float vAmorphous;
 ${LANTERN_GLSL}
 ${LAMPS_GLSL}
 ${SHADOW_GLSL}
@@ -226,11 +235,19 @@ vec3 outsideColour(vec2 uv, vec3 painted) {
   return (vec3(0.16) + hue * 0.84) * (0.35 + 0.65 * sqrt(form));
 }
 
+${PROTOPLASM_GLSL}
+
 void main() {
   bodyDx = dFdx(vUv); // (before any pixel is discarded: round 113)
   bodyDy = dFdy(vUv);
   gl_FragDepth = gl_FragCoord.z;
   vec2 uv = vWeird > 0.2 ? slip(vUv) : (uMind > 0.0 && uReviewed > 0.5 ? mindSlip(vUv) : vUv);
+  if (vAmorphous > 0.5) {
+    vec2 span = vCell.zw - vCell.xy;
+    vec2 cu = (uv - vCell.xy) / max(span, vec2(1e-4));
+    vec2 warp = vec2(vnoise(cu * 5.5 + vec2(uTime * 0.4, 1.7)) - 0.5, vnoise(cu * 5.5 + vec2(7.3, -uTime * 0.35)) - 0.5);
+    uv = clamp(uv + warp * span * 0.032, vCell.xy, vCell.zw);
+  }
   uv = bodyWaver(uv); // below the sea's surface it wavers (bodyMatter.ts)
   vec3 src = fxSource(uv); // a body that is going or forming has its texels moved (spriteFx.ts)
   if (src.z < 0.5) discard;
@@ -252,13 +269,24 @@ void main() {
     col = spriteGraded(col, spriteToneBack(vTone, 1.0 - shown * uSpriteRevealMost)); // in the light the realm's tint is taken back along the wheel, up to a share of it (round 95): its own hue, its colour whole, the light's colour on it
   }
   if (!glow) col = bodyCoat(bodyGrain(col, src.xy), light); // a coarse form's grain, and the realm's matter on what of it faces up (bodyMatter.ts; round 113)
+  if (vAmorphous > 0.5 && !glow) {
+    vec2 cellUv = (src.xy - vCell.xy) / max(vCell.zw - vCell.xy, vec2(1e-4));
+    col = protoplasmSurface(cellUv, col, t.rgb, light);
+  }
   if (!glow && uWet > 0.02) col = mix(col, col * col, 0.35 * uWet); // soaked by the rain: darker in its mid-tones, deeper in its colour, the hide and cloth heavy with water (round 83)
   if (vWeird >= 0.5 && !glow) col = mix(col, voidAt(gl_FragCoord.xy, uTime), smoothstep(0.24, 0.12, dot(t.rgb, vec3(0.3333))) * vWeird); // its darkest parts open onto nothing
   if (vOutside > 0.5) col = outsideColour(src.xy, t.rgb);
   col = fxWear(col, vFlash); // its wounds, and the flash of the blow about where it fell
-  if (vGlint.w > 0.0) { // the marks this form's eyes and lamps are drawn in keep their light in the dark, in the colour they were drawn in, until the eye can no longer pick them out (round 83: reviewedLook.ts)
+  if (vGlint.w > 0.0 && vAmorphous < 0.5) { // the marks this form's eyes and lamps are drawn in keep their light in the dark, in the colour they were drawn in, until the eye can no longer pick them out (round 83: reviewedLook.ts)
     float lit = 1.0 - smoothstep(0.012, 0.05, distance(t.rgb, vGlint.rgb));
     col = mix(col, t.rgb * (1.0 + 0.25 * vGlint.w), lit * (1.0 - smoothstep(uEyeRange.x, uEyeRange.y, vDist)));
+  }
+  if (vEldritch > 0.5 && !glow) {
+    // Unmistakable elite variant read at 640×360: pulsing cosmic-purple / void-green outline aura + deeper shadowy core.
+    float pulse = 0.6 + 0.4 * sin(uTime * 3.4 + vFx.w * 11.0);
+    float rim = smoothstep(0.28, 0.85, bodyRim.z);
+    vec3 auraCol = mix(vec3(0.55, 0.14, 0.88), vec3(0.18, 0.94, 0.62), 0.35 + 0.35 * sin(uTime * 2.1 + vQuad.y * 5.0));
+    col = mix(col * vec3(0.86, 0.82, 0.94), auraCol * (0.9 + 0.45 * pulse), rim * (0.58 + 0.25 * pulse));
   }
   if (!fxCut(src.xy, col)) discard; // the side of a killing cut that is not this billboard's (round 113)
   if (!fxKeep(src.xy, col)) discard; // and the texels that are gone, with their rim
