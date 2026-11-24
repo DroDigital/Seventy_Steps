@@ -19,6 +19,8 @@ const ROAD: Rgb = mixRgb(BASE.bone, BASE.seaGrey, 0.5);
 const SPLASH: Rgb = mixRgb(BASE.bone, BASE.seaGrey, 0.8);
 const SPARK: Rgb = mixRgb(BASE.bone, [1, 0.85, 0.6], 0.6);
 const EMBER: Rgb = [0.6, 0.18, 0.95];
+const EXHAUST: Rgb = mixRgb(BASE.seaGrey, [0.46, 0.5, 0.56], 0.55);
+const EXHAUST_RICH: Rgb = mixRgb(BASE.charcoal, BASE.seaGrey, 0.45);
 const rand = (a: number, b: number): number => a + (b - a) * Math.random();
 
 export interface HoofFx {
@@ -29,6 +31,8 @@ export function createHoofFx(g: Game, fx: Particles): HoofFx {
   let was = 0;
   let before = -1;
   let metres = 0;
+  let exhaustTimer = 0;
+  let lastSpeed = 0;
   const where = (at: V3, yaw: number, x: number, z: number): V3 => {
     const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
     const wx = at.x + x * c + z * s;
@@ -47,6 +51,25 @@ export function createHoofFx(g: Game, fx: Particles): HoofFx {
   const sparks = (p: V3): void => {
     for (let i = 0; i < 3; i++) fx.spawn({ x: p.x, y: p.y + 0.05, z: p.z, vx: rand(-1.5, 1.5), vy: rand(0.6, 2), vz: rand(-1.5, 1.5), life: rand(0.15, 0.3), size: rand(0.04, 0.07), grow: 0.5, color: SPARK, glow: true, gravity: 9, drag: 1 });
   };
+  const puffExhaust = (at: V3, yaw: number, speed: number, rich: boolean): void => {
+    const [s, c] = [Math.sin(yaw), Math.cos(yaw)];
+    const pipe = where(at, yaw, 0.46, -1.75);
+    const back = 1.1 + speed * 0.22;
+    fx.spawn({
+      x: pipe.x,
+      y: pipe.y + 0.36,
+      z: pipe.z,
+      vx: -s * back + rand(-0.28, 0.28),
+      vy: rand(0.35, 0.75) + (rich ? 0.25 : 0),
+      vz: -c * back + rand(-0.28, 0.28),
+      life: rand(0.55, 1.05),
+      size: rich ? rand(0.18, 0.28) : rand(0.11, 0.19),
+      grow: rich ? 2.6 : 2.1,
+      color: rich ? EXHAUST_RICH : EXHAUST,
+      alpha: rich ? 0.42 : 0.26,
+      drag: 2.4,
+    });
+  };
 
   return { update(time) {
     const dt = before < 0 ? 0 : Math.min(0.25, Math.max(0, time - before));
@@ -56,13 +79,24 @@ export function createHoofFx(g: Game, fx: Particles): HoofFx {
     if (!mount.active || !tr || g.ecs.c.dead.has(g.player.id) || dt === 0) {
       was = mount.phase;
       metres = 0;
+      exhaustTimer = 0;
+      lastSpeed = 0;
       return;
     }
     const id = mount.active;
     const speed = Math.max(0, mount.speed);
     const surface = surfaceAt(g, tr.pos.x, tr.pos.y, tr.pos.z);
     const weight = hoofWeight(speed);
-    if (id !== 'automobile' && speed > 2.5) {
+    if (id === 'automobile') {
+      const accel = (speed - lastSpeed) / dt;
+      const interval = speed < 0.4 ? 0.28 : accel > 2.2 ? 0.08 : 0.14;
+      exhaustTimer += dt;
+      if (exhaustTimer >= interval) {
+        exhaustTimer = 0;
+        puffExhaust(tr.pos, tr.yaw, speed, accel > 2.2 || (accel < -3.5 && lastSpeed > 4.5));
+      }
+      lastSpeed = speed;
+    } else if (speed > 2.5) {
       const horses = id === 'chariot' ? [{ x: -0.67, z: 2.7, d: 0 }, { x: 0.67, z: 2.7, d: 0.059 }] : [{ x: DRAFT_PLACE.x, z: DRAFT_PLACE.z, d: 0 }];
       const gait = gaitAt(speed);
       for (const horse of horses) for (const leg of touchdowns(was + horse.d, mount.phase + horse.d, speed)) {
@@ -79,7 +113,8 @@ export function createHoofFx(g: Game, fx: Particles): HoofFx {
     metres += speed * dt;
     if (metres > 0.7 && speed > 4 && surface !== 'stone') { // the wheels: a thin dust behind each rear wheel
       metres = 0;
-      for (const side of [-1, 1]) kick(where(tr.pos, tr.yaw, side * 0.95, -1.16), surface, weight, 0.5);
+      const rearX = id === 'automobile' ? 0.88 : 0.95;
+      for (const side of [-1, 1]) kick(where(tr.pos, tr.yaw, side * rearX, -1.16), surface, weight, 0.5);
     }
   } };
 }

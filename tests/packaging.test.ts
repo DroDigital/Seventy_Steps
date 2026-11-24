@@ -45,7 +45,13 @@ describe('what is packed', () => {
 
 describe('the scripts', () => {
   it('every package script makes the icon first (build/ is not kept: the packaged game has none without it)', () => {
-    for (const name of ['package', 'package:win', 'package:linux', 'package:mac']) expect(pkg.scripts[name], name).toMatch(/npm run icon/);
+    for (const name of ['package', 'package:win', 'package:linux', 'package:mac', 'package:demo', 'package:demo:win', 'package:demo:linux', 'package:demo:mac']) {
+      expect(pkg.scripts[name], name).toMatch(/npm run icon/);
+    }
+    for (const name of ['package:demo', 'package:demo:win', 'package:demo:linux', 'package:demo:mac']) {
+      expect(pkg.scripts[name], name).toMatch(/npm run build:demo/);
+      expect(pkg.scripts[name], name).toMatch(/edition[= ]demo/);
+    }
   });
 
   it('the Steam app id is a number, 0 until Steamworks gives one', () => {
@@ -65,12 +71,13 @@ describe('the scripts', () => {
 
 describe('the itch.io release (round 51)', () => {
   const push = (env: Record<string, string>, ...args: string[]) => spawnSync(process.execPath, ['tools/itch_push.mjs', ...args], { env: { PATH: process.env.PATH ?? '', ...env }, encoding: 'utf8' });
-  /** A release folder with a universal Mac app whose package.json holds `meta` (what the tool reads to tell which store a pack is for). */
-  const fakeRelease = (meta: string): string => {
+  /** A release folder with a universal Mac app whose package.json holds `meta` and dist/edition.json holds `bundle`. */
+  const fakeRelease = (meta: string, bundle: string | null = '{"edition":"full"}'): string => {
     const dir = mkdtempSync(`${tmpdir()}/itch-test-`);
     const resources = `${dir}/mac-universal/Seventy Steps.app/Contents/Resources/app-arm64`;
-    mkdirSync(resources, { recursive: true });
+    mkdirSync(`${resources}/dist`, { recursive: true });
     writeFileSync(`${resources}/package.json`, meta);
+    if (bundle !== null) writeFileSync(`${resources}/dist/edition.json`, bundle);
     return dir;
   };
 
@@ -95,6 +102,18 @@ describe('the itch.io release (round 51)', () => {
     expect(r.stdout).toMatch(/digitaldro\/seventy-steps:osx/);
     expect(r.stdout).toMatch(/Nothing sent/);
     expect(readFileSync(`${dir}/mac-universal/.itch.toml`, 'utf8')).toContain('path = "Seventy Steps.app"');
+  });
+
+  it('refuses a demo pack whose dist/edition.json is still the full game or missing, and accepts a real stripped demo pack', () => {
+    const mismatched = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: fakeRelease('{"channel":"itch","edition":"demo"}', '{"edition":"full"}') }, '--only', 'osx');
+    expect(mismatched.status).toBe(2);
+    expect(mismatched.stderr).toMatch(/dist\/edition\.json/);
+    const missing = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: fakeRelease('{"channel":"itch","edition":"demo"}', null) }, '--only', 'osx');
+    expect(missing.status).toBe(2);
+    expect(missing.stderr).toMatch(/dist\/edition\.json/);
+    const ok = push({ ITCH_TARGET: 'digitaldro/seventy-steps', ITCH_RELEASE: fakeRelease('{"channel":"itch","edition":"demo"}', '{"edition":"demo"}') }, '--only', 'osx');
+    expect(ok.status).toBe(0);
+    expect(ok.stdout).toMatch(/digitaldro\/seventy-steps:osx-demo/);
   });
 
   it('the itch Linux play action passes --no-sandbox (Ubuntu AppArmor)', () => {
@@ -122,10 +141,14 @@ describe('the itch.io release (round 51)', () => {
     expect(readFileSync(`${out}/seventy-steps`, 'utf8')).toBe(sh);
   });
 
-  it('the workflow packs for itch.io only when asked, checks the channel, and pushes with a secret it never prints', () => {
+  it('the workflow packs for itch.io only when asked, builds the real demo when demo=true, checks channel/edition, and pushes with a secret it never prints', () => {
     const wf = read('.github/workflows/release-builds.yml');
     expect(wf).toMatch(/channel=itch/);
     expect(wf).toMatch(/--channel itch/);
+    expect(wf).toMatch(/package:demo:win/);
+    expect(wf).toMatch(/package:demo:mac/);
+    expect(wf).toMatch(/package:demo:linux/);
+    expect(wf).toMatch(/npm run check:demo/);
     expect(wf).toMatch(/secrets\.BUTLER_API_KEY/);
     expect(wf).toMatch(/itch_push\.mjs --only windows/);
     expect(wf).toMatch(/itch_push\.mjs --only osx/);

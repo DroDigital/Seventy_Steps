@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { MOUNT_IDS } from '../src/data/mounts';
 import { buildFigure } from '../src/render/figures';
+import { createCarDynamics, stepCarDynamics } from '../src/render/automobileMotion';
 import { createMount, poseMountedRider, type MountVisual } from '../src/render/mounts';
 import { CASTER } from '../src/render/moonShadow';
 import { WORLD_VERT } from '../src/render/shaders/world';
@@ -15,7 +16,7 @@ function meshes(visual: MountVisual): THREE.Mesh[] {
 
 describe('procedural mount art', () => {
   it('keeps each appearance inside its geometry budget, with fire on the spectral horses only', () => {
-    const limit = { grey: 34, chariot: 42, automobile: 12 } as const;
+    const limit = { grey: 34, chariot: 42, automobile: 15 } as const;
     for (const id of MOUNT_IDS) {
       const visual = createMount(id);
       const horses: THREE.Object3D[] = [];
@@ -160,7 +161,7 @@ describe('procedural mount art', () => {
   });
 
   it('releases every owned mesh and shader without disposing shared world textures', () => {
-    for (const id of ['chariot', 'grey'] as const) {
+    for (const id of MOUNT_IDS) {
       const visual = createMount(id), scene = new THREE.Scene(); scene.add(visual.root);
       const geoCount = new Map<THREE.BufferGeometry, number>(), matCount = new Map<THREE.Material, number>();
       for (const mesh of meshes(visual)) {
@@ -176,6 +177,87 @@ describe('procedural mount art', () => {
       expect([...matCount.values()].every(n => n === 1)).toBe(true);
       expect(visual.root.parent).toBe(null);
     }
+  });
+});
+
+describe('the Brassbound Motor Car (circa-1914 touring car art & mechanical motion)', () => {
+  it('builds every articulated mechanical assembly and animates them cleanly through idle, acceleration, cornering and braking', () => {
+    const visual = createMount('automobile');
+    for (const part of [
+      'brass-era-touring-automobile',
+      'automobile-hood',
+      'automobile-cooling-fan',
+      'automobile-canopy',
+      'automobile-steering-wheel',
+      'automobile-shifter',
+      'automobile-tie-rod',
+      'automobile-headlight-beams',
+      'automobile-lamp-halos',
+    ]) {
+      expect(visual.root.getObjectByName(part), part).toBeTruthy();
+    }
+    const fan = visual.root.getObjectByName('automobile-cooling-fan')!;
+    const shifter = visual.root.getObjectByName('automobile-shifter')!;
+    const tieRod = visual.root.getObjectByName('automobile-tie-rod')!;
+    const steering = visual.root.getObjectByName('automobile-steering-wheel')!;
+    visual.update({ time: 0, dt: 0, speed: 0, turn: 0 });
+    const fan0 = fan.rotation.z;
+    const shifter0 = shifter.rotation.x;
+    const tie0 = tieRod.position.x;
+    const wheel0 = steering.rotation.z;
+    // Accelerate through the gears while turning
+    for (let i = 1; i <= 90; i++) {
+      const speed = (i / 90) * 14;
+      visual.update({ time: i / 60, dt: 1 / 60, speed, turn: 0.7, cycle: i * 0.04 });
+    }
+    visual.root.updateMatrixWorld(true);
+    expect(fan.rotation.z).not.toBe(fan0);
+    expect(shifter.rotation.x).not.toBeCloseTo(shifter0, 2);
+    expect(Math.abs(tieRod.position.x - tie0)).toBeGreaterThan(0.01);
+    expect(Math.abs(steering.rotation.z - wheel0)).toBeGreaterThan(0.2);
+    visual.root.traverse(o => { expect(o.matrixWorld.elements.every(Number.isFinite)).toBe(true); });
+    visual.dispose();
+  });
+
+  it('squats on launch, dives under braking, rolls in turns, shifts gear cleanly and brightens the ruby tail-lamp on brakes', () => {
+    const dyn = createCarDynamics();
+    let t = 0;
+    let dist = 0;
+    // Hard launch from 0 -> 12 m/s
+    let pose = stepCarDynamics(dyn, { time: 0, dt: 0, speed: 0, steer: 0, distance: 0 });
+    const idleTail = pose.tailGain;
+    for (let i = 1; i <= 45; i++) {
+      const speed = (i / 45) * 12;
+      t += 1 / 60;
+      dist += speed / 60;
+      pose = stepCarDynamics(dyn, { time: t, dt: 1 / 60, speed, steer: 0, distance: dist });
+    }
+    expect(pose.pitch).toBeLessThan(-0.005); // nose lifts (squat) under acceleration
+    expect(pose.gear).toBeGreaterThanOrEqual(2);
+    expect(pose.fanAngle).toBeGreaterThan(0);
+
+    // Steady high-speed left cornering rolls the body outward (-z roll)
+    for (let i = 0; i < 45; i++) {
+      t += 1 / 60;
+      dist += 12 / 60;
+      pose = stepCarDynamics(dyn, { time: t, dt: 1 / 60, speed: 12, steer: 1, distance: dist });
+    }
+    expect(pose.roll).toBeLessThan(-0.02);
+
+    // Hard braking from 12 -> 2 m/s dives the nose (+x pitch) and illuminates the ruby brake lamp
+    let peakBrake = 0;
+    let peakTail = 0;
+    for (let i = 1; i <= 40; i++) {
+      const speed = 12 - (i / 40) * 10;
+      t += 1 / 60;
+      dist += speed / 60;
+      pose = stepCarDynamics(dyn, { time: t, dt: 1 / 60, speed, steer: 0, distance: dist });
+      peakBrake = Math.max(peakBrake, pose.brake);
+      peakTail = Math.max(peakTail, pose.tailGain);
+    }
+    expect(pose.pitch).toBeGreaterThan(0.015); // nose dips under braking
+    expect(peakBrake).toBeGreaterThan(0.5);
+    expect(peakTail).toBeGreaterThan(idleTail * 1.4);
   });
 });
 

@@ -13,6 +13,8 @@ export interface Slab { halfX: number; y0: number; y1: number; z: number }
 
 /** The seat back of the chariots: the board below the black leather back, from the deck to the top (mountCarriage.ts builds both). */
 export const SEAT_BACK: Slab = Object.freeze({ halfX: 0.66, y0: 0.855, y1: 1.79, z: -0.2 });
+/** The front bench seat back and riser of the Brassbound Motor Car (mountAutomobile.ts). */
+export const CAR_SEAT_BACK: Slab = Object.freeze({ halfX: 0.62, y0: 0.64, y1: 1.62, z: -0.45 });
 
 const smooth = (t: number): number => { const c = Math.min(1, Math.max(0, t)); return c * c * (3 - 2 * c); };
 
