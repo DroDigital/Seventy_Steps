@@ -127,6 +127,7 @@ export const FRAGMENTS: Readonly<Record<string, readonly string[]>> = {
   piping_dark: ['The piping is thin and monotonous, and you had begun to move to it. That was the last of you.', 'You hoped to live in a rest between two notes. There is none.'],
   spheres: ['The gate does not close behind you. It was never open; you are only no longer on the near side.', 'Past, present and future are one in him. In him you have already fallen, and are falling, and will.'],
   court_centre: ['At the centre of everything there is a sound, and a blind thing beating time to it. You gave it the one beat it lacked.', 'The Crawling Chaos shook your hand at the door. It was precisely the temperature of your own.'],
+  slumber_stairs: ['Seven hundred steps, and you counted every one of them. The count came out wrong, and you went on.', 'Do not look back up the stair, the priests said. You looked.'],
 };
 
 /** Said when nothing more particular can be. */

@@ -163,6 +163,15 @@ const ALL: readonly RegionDef[] = [
     biome: biome(3, 1.2, 50, 'slab', [0.16, 0.16, 0.22], false, 3, { monolith: 3, pillar: 1 }),
     spawns: { density: 0.7, table: { being_from_beyond: 2, night_gaunt: 1, yekubian: 1 } },
   },
+  // The Stairs of Slumber (round 123, asked: "the whole stairs are visible on the openworld dreamlands map which doesn't make much sense, it should
+  // have its own realm"): the seventy steps and the seven hundred, between the waking world and the dream, are a realm of their own, an island two
+  // tiles west of the Dreamlands that holds nothing but the stairs (sites.ts) hung in the dark: no land is walked, nothing grows, no weather comes.
+  // Last of the list, so every other realm's land keeps its seed.
+  {
+    id: 'slumber_stairs', name: 'The Stairs of Slumber', dungeon: 'The Stairs of Slumber', bosses: [], area: [-3, 7, 1, 1],
+    biome: biome(6, 0, 60, 'slab', [0.2, 0.18, 0.24], false, 0, {}),
+    spawns: { density: 0, table: {} },
+  },
 ];
 
 // The demo's edge land (docs/DEMO_BUILD.md): the demo build keeps `hub` and `arkham` of ALL (tools/demo/rules/world.ts cuts the rest) and
@@ -181,6 +190,13 @@ const FAR: RegionDef = edge('full_game', [-4, 4, 1, 1], biome(4, 1, 40, 'slab', 
 export const REGIONS: readonly RegionDef[] = __DEMO__ ? [...ALL, ...EDGE, FAR] : ALL;
 
 export const REGION_IDS: readonly string[] = REGIONS.map((r) => r.id);
+
+/**
+ * The realms that are one place and no land (round 123: the Stairs of Slumber, hung in the dark): their ground is never walked, so no road,
+ * secret, page, box of cartridges or foe of the open ground is laid in them (world/regionPlan.ts), and the rules every other realm keeps of
+ * those do not hold of them.
+ */
+export const LANDLESS: ReadonlySet<string> = new Set(['slumber_stairs']);
 
 /** The six dimensions beyond the Ultimate Void (round 73), in the order their gates chain: where the Outer Gods are. */
 export const OUTER_DARK: readonly string[] = ['cloud_summit', 'black_wood', 'pale_lattice', 'piping_dark', 'spheres', 'court_centre'];

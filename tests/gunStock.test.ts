@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { NPCS } from '../src/data/npcs';
 import { DUNGEONS } from '../src/data/dungeons';
-import { REGIONS } from '../src/data/regions';
+import { LANDLESS, REGIONS } from '../src/data/regions';
 import { GUN, LEVELS } from '../src/data/tuning';
 import { SHOPS, WARES } from '../src/data/wares';
 import type { GameEvents } from '../src/systems/components';
@@ -104,7 +104,7 @@ describe('rounds are found and bought (round 22)', () => {
     for (const d of DUNGEONS) {
       for (const room of roundCaches(d).keys()) expect(boxes.some((b) => b.name === `Cartridges: ${d.id}/${room}`), `${d.id}/${room}`).toBe(true);
     }
-    for (const r of REGIONS) expect(boxes.filter((b) => b.region === r.id && b.name.startsWith(`Cartridges: ${r.id} `)).length, r.id).toBeGreaterThan(0);
+    for (const r of REGIONS.filter((x) => !LANDLESS.has(x.id))) expect(boxes.filter((b) => b.region === r.id && b.name.startsWith(`Cartridges: ${r.id} `)).length, r.id).toBeGreaterThan(0); // (round 123: no open world in the Stairs of Slumber's realm; their flights keep their own)
     for (const b of boxes) expect(b.rounds).toBeGreaterThanOrEqual(GUN.find);
     expect(new Set(boxes.map((b) => b.name)).size).toBe(boxes.length);
     const total = boxes.reduce((n, b) => n + b.rounds!, 0);

@@ -31,38 +31,38 @@ export const LESSER = tier('lesser', [
     stats: st(150, 34, 20, 3.4, 0.1, 1), drops: { echoes: 50 }, insightOnSight: 0,
   },
   {
-    id: 'ghoul', name: 'Ghoul', source: __DEMO__ ? 'An Arkham Tale' : "Pickman's Model", regions: ['providence', 'dreamlands', 'arkham'], canonLooks: true, voice: 'meep',
+    id: 'ghoul', name: 'Ghoul', source: __DEMO__ ? 'An Arkham Tale' : "Pickman's Model", regions: ['providence', 'dreamlands', 'slumber_stairs', 'arkham'], canonLooks: true, voice: 'meep',
     sprite: { silhouette: 'hunched', palette: 'mold', scale: 2.2, eyes: 2 },
     behavior: { archetype: 'pack_hunter', attacks: ['bite', 'sweep', 'lunge', 'combo'] },
     stats: st(220, 42, 26, 3.8, 0.3, 2), drops: { echoes: 120 }, insightOnSight: 0,
     eldritchVariant: { sprite: { eyes: 3 } }, // its eyes stand plain, no glow (round 46: it looked silly)
   },
   {
-    id: 'ghast', name: 'Ghast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true, voice: 'cough',
+    id: 'ghast', name: 'Ghast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: true, voice: 'cough',
     sprite: { silhouette: 'quadruped', palette: 'pallid', scale: 2.2, eyes: 0 },
     behavior: { archetype: 'pack_hunter', attacks: ['bite', 'lunge', 'combo'] },
     stats: st(250, 46, 28, 4.6, 0.4, 2), weak: ['light'], drops: { echoes: 110 }, insightOnSight: 0,
   },
   {
-    id: 'zoog', name: 'Zoog', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true, voice: 'flutter',
+    id: 'zoog', name: 'Zoog', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: true, voice: 'flutter',
     sprite: { silhouette: 'quadruped', palette: 'rust', scale: 0.9, eyes: 2 },
     behavior: { archetype: 'skirmisher', attacks: ['bite'] },
     stats: st(55, 12, 10, 4.2, 0.1, 1), drops: { echoes: 20 }, insightOnSight: 0,
   },
   {
-    id: 'night_gaunt', name: 'Night-gaunt', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'cloud_summit', 'piping_dark', 'court_centre'], canonLooks: true, voice: 'silent',
+    id: 'night_gaunt', name: 'Night-gaunt', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs', 'cloud_summit', 'piping_dark', 'court_centre'], canonLooks: true, voice: 'silent',
     sprite: { silhouette: 'winged', palette: 'rubber', scale: 2.8, eyes: 0, wings: 2 },
     behavior: { archetype: 'flyer_swoop', attacks: ['grab', 'dive'] },
     stats: st(200, 40, 16, 5, 0.5, 3), drops: { echoes: 140 }, insightOnSight: 0,
   },
   {
-    id: 'moon_beast', name: 'Moon-beast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'cloud_summit'], canonLooks: true,
+    id: 'moon_beast', name: 'Moon-beast', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs', 'cloud_summit'], canonLooks: true,
     sprite: { silhouette: 'toad', palette: 'pallid', scale: 2.6, eyes: 0, tentacles: 6 },
     behavior: { archetype: 'brute', attacks: ['tentacle_burst', 'slam'] },
     stats: st(380, 46, 34, 2.4, 0.6, 3), drops: { echoes: 200 }, insightOnSight: 0,
   },
   {
-    id: 'man_of_leng', name: 'Man of Leng', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
+    id: 'man_of_leng', name: 'Man of Leng', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: true,
     sprite: { silhouette: 'humanoid', palette: 'rust', scale: 2.2, eyes: 2 },
     behavior: { archetype: 'skirmisher', attacks: ['sweep', 'lunge', 'combo'] },
     stats: st(180, 40, 24, 3.8, 0.3, 2), drops: { echoes: 90 }, insightOnSight: 0,
@@ -74,7 +74,7 @@ export const LESSER = tier('lesser', [
     stats: st(90, 12, 12, 5, 0.3, 2), drops: { echoes: 60 }, insightOnSight: 0,
   },
   {
-    id: 'wamp', name: 'Wamp', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: false,
+    id: 'wamp', name: 'Wamp', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: false,
     sprite: { silhouette: 'quadruped', palette: 'rust', scale: 1.3, eyes: 2, limbs: 8 },
     behavior: { archetype: 'pack_hunter', attacks: ['bite'] },
     stats: st(100, 12, 12, 4, 0.2, 1), drops: { echoes: 50 }, insightOnSight: 0,
@@ -147,7 +147,7 @@ export const LESSER = tier('lesser', [
     stats: st(120, 30, 14, 3.2, 0.8, 5), resist: ['slash', 'blunt'], weak: ['light'], drops: { echoes: 80 }, insightOnSight: 0,
   },
   {
-    id: 'being_of_ib', name: 'Being of Ib', source: 'The Doom that Came to Sarnath', regions: ['dreamlands'], canonLooks: true,
+    id: 'being_of_ib', name: 'Being of Ib', source: 'The Doom that Came to Sarnath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: true,
     sprite: { silhouette: 'hunched', palette: 'mold', scale: 2, eyes: 2 },
     behavior: { archetype: 'skirmisher', attacks: ['bite', 'spit', 'combo'] },
     stats: st(130, 30, 18, 3.6, 0.3, 2), drops: { echoes: 60 }, insightOnSight: 0,

@@ -38,4 +38,5 @@ export const CLIMATES: Readonly<Record<string, Climate>> = {
   piping_dark: { near: 0, cover: 1.2, under: 6, kinds: [['brush', 1]] },
   spheres: { near: 0, cover: 0, under: 0, kinds: [] },
   court_centre: { near: 0, cover: 1, under: 0, kinds: [] },
+  slumber_stairs: { near: 0, cover: 0, under: 0, kinds: [] }, // round 123: the stairs hang over nothing; nothing grows
 };

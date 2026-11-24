@@ -46,8 +46,13 @@ export const ROOM_SETS: Readonly<Record<string, ArenaSet>> = {
   },
   // The Cavern of Flame (round 122, the tale's: "the cavern of flame" and "the bearded priests Nasht and Kaman-Thah" with their "pshent-bearing heads"):
   // a wide hall of raw rock (dungeons.ts), the flame that names it standing out of a rift at its heart within a ring of stalagmites, and the priests' seated effigies either side of the way on down to the seven hundred steps.
+  // Round 123: a cavern of flame, not a black hall with one fire in it: four fissures about the flame that fire breaks out of, two flanking the
+  // priests at their place (dungeons.ts `allyAt`) and two nearer the way in, so that it and they are seen from the stair.
   'slumber/cavern': {
-    puts: [put('cleft', at(0, 0, { face: 'free' }), { heart: true }), put('priest', at(0.5, 180, { side: 6, mirror: true, face: 'in' }), { heart: true })],
+    puts: [
+      put('cleft', at(0, 0, { face: 'free' }), { heart: true }), put('priest', at(0.5, 180, { side: 6, mirror: true, face: 'in' }), { heart: true }),
+      put('vent', at(0.33, 180, { side: 12, mirror: true, face: 'in' }), { heart: true }), put('vent', at(0.33, 0, { side: 12, mirror: true, face: 'in' }), { heart: true }),
+    ],
   },
   // The gate of deeper slumber: two braziers on one side of its aisle, the last light of the stair (round 104: the hall moved; its colonnade and its gate leave room for them only there).
   'slumber/deeper': {

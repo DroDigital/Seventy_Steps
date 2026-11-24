@@ -9,6 +9,7 @@ import { lookOf } from '../src/data/dungeonLooks';
 import { KITS } from '../src/data/kits';
 import { DUNGEON } from '../src/data/tuning';
 import { setPieces } from '../src/render/setShapes';
+import { roomPoint } from '../src/world/dungeonKit';
 import { roomSetProps } from '../src/world/hallSet';
 import { worldLayout } from '../src/world/placements';
 import { DIRS } from '../src/world/worldMap';
@@ -30,6 +31,11 @@ describe('the Stairs of Slumber as the tale has them (round 122)', () => {
     const fires = setPieces(flame[0], [0.6, 0.6, 0.6]).filter((p) => p.light === 'fire');
     expect(Math.max(...fires.map((f) => f.flame ?? 1))).toBeGreaterThanOrEqual(2.5); // a flame taller than a man
     expect(set.filter((p) => p.set?.id === 'priest')).toHaveLength(2); // Nasht and Kaman-Thah
+    const vents = set.filter((p) => p.set?.id === 'vent'); // (round 123: a cavern of flame, fire breaking out of fissures about the flame)
+    expect(vents).toHaveLength(4);
+    for (const v of vents) expect(setPieces(v, [0.6, 0.6, 0.6]).filter((p) => p.light === 'fire')).toHaveLength(1);
+    const post = roomPoint(cavern, ...cavern.def.allyAt!); // and the priests' own place kept clear
+    for (const p of set) expect(Math.hypot(p.x - post.x, p.z - post.z), p.set?.id).toBeGreaterThan(2.5);
   });
 
   it('the way from each of its doorways to the flame is clear of its ring of stalagmites', () => {

@@ -12,7 +12,7 @@ import type { XZ } from '../core/geom';
 import { createRng, hash2, type Rng } from '../core/rng';
 import { ARENA_WAYS } from '../data/arenaWaysAll';
 import { REGION_LAYOUTS, type RegionLayout } from '../data/regionFeatures';
-import type { PropKind, RegionDef } from '../data/regions';
+import { LANDLESS, type PropKind, type RegionDef } from '../data/regions';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
 import { clearsFor, clearsRite, nearPath, planWay, wayProps, type WayPlan } from './arenaWay';
@@ -60,6 +60,7 @@ const DEFAULT: RegionLayout = { road: 'mud', width: 3.5, towns: [], groves: 0, g
  * a dungeon is found by searching, or by the lead's mark.
  */
 function stops(region: RegionDef, layout: RegionLayout): XZ[] {
+  if (LANDLESS.has(region.id)) return []; // (round 123: its sign and gate stand on a stair over the dark, not on land a road could reach)
   const w = worldLayout();
   const out: XZ[] = [...w.signs.filter((s) => s.region === region.id).map((s) => s.rest), ...w.gates.filter((g) => g.region === region.id).map((g) => g.arrive)];
   out.push(...layout.towns.map((t) => toWorld(region, t.at)), ...borderPoints(region));

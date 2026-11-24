@@ -28,6 +28,7 @@ export const REGION_PRESS: Readonly<Record<string, number>> = {
   piping_dark: 2.42,
   spheres: 2.5,
   court_centre: 2.6, // the Outer Gods, each dimension harder than the last
+  slumber_stairs: 1.72, // round 123: the way down into the Dreamlands presses as the Dreamlands do
 };
 
 /** The most a region's press may multiply a creature past its mildest home. A boss is never pressed: its own scaling stands. */

@@ -46,14 +46,15 @@ export const KITS = {
   elder: { wall: 'slab', floor: 'slab', tone: [0.84, 0.86, 0.88], mix: 0.5, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   basalt: { wall: 'rock', floor: 'slab', tone: [0.42, 0.42, 0.47], mix: 0.65, trim: 'masonry', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
   tsath: { wall: 'stone', floor: 'cobble', tone: [0.55, 0.6, 0.74], mix: 0.55, trim: 'masonry', flames: 0.5, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
-  dream: { wall: 'stone', floor: 'slab', tone: [0.92, 0.82, 0.66], mix: 0.4, trim: 'masonry', flames: 0.4, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.5 },
+  dream: { wall: 'stone', floor: 'slab', tone: [0.92, 0.82, 0.66], mix: 0.4, trim: 'masonry', flames: 0.4, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.62 },
   // Round 104, the Stairs of Slumber by depth: the light slumber's warm stone, the Cavern of Flame's fire-reddened rock, then the seven
   // hundred steps going grey and violet, and below the span bluer and darker still, their walls' torches fewer as the newels' fires take over.
+  // Round 123 (asked: "still too overcast and not eerie and dark enough"): the light slumber's, the seven hundred's and the last reach's rooms are kept as dark as a crypt's, deeper the lower (0.5, 0.6 and 0.7 were); the cavern is a refuge, lit by its flame.
   // Round 122: the cavern is raw rock, no cornice, pilaster or iron sconce, lit by its own flame (data/roomSets.ts; KIT_LOOKS in data/dungeonLooks.ts gives each of these kits its pillars, frieze and roof).
   // Round 120 (asked: fewer torches): the head's and the cavern's walls keep fewer of them (0.7 and 0.9 were), and no wall over the void hangs one (render/wallTorches.ts).
   dreamflame: { wall: 'rock', floor: 'slab', tone: [0.98, 0.74, 0.56], mix: 0.45, trim: 'none', flames: 0, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.4 },
-  dreamdeep: { wall: 'stone', floor: 'slab', tone: [0.72, 0.66, 0.82], mix: 0.5, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.6 },
-  dreamabyss: { wall: 'rock', floor: 'slab', tone: [0.54, 0.58, 0.76], mix: 0.6, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.7 },
+  dreamdeep: { wall: 'stone', floor: 'slab', tone: [0.72, 0.66, 0.82], mix: 0.5, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.82 },
+  dreamabyss: { wall: 'rock', floor: 'slab', tone: [0.54, 0.58, 0.76], mix: 0.6, trim: 'masonry', flames: 0.3, roof: 'vault', sound: 'cave', shell: 'mound', gloom: 0.9 },
   onyx: { wall: 'slab', floor: 'cobble', tone: [0.4, 0.4, 0.46], mix: 0.65, trim: 'masonry', flames: 0.35, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   cyclopean: { wall: 'slab', floor: 'rock', tone: [0.44, 0.54, 0.5], mix: 0.7, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },
   fungoid: { wall: 'flesh', floor: 'rot', tone: [0.56, 0.5, 0.56], mix: 0.6, trim: 'none', flames: 0, roof: 'open', sound: 'open', shell: 'none', gloom: 0.5 },

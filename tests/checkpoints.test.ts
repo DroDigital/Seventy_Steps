@@ -113,7 +113,7 @@ describe('Elder Signs', () => {
     expect(dream(g)).toBe(true);
     const threshold = worldLayout().dream!;
     expect(pos(g)).toMatchObject({ x: threshold.x, z: threshold.z });
-    expect(regionAt(pos(g).x, pos(g).z)?.id).toBe('dreamlands');
+    expect(regionAt(pos(g).x, pos(g).z)?.id).toBe('slumber_stairs'); // (round 123: the stairs are a realm of their own, between the waking world and the dream)
     const slumber = worldLayout().dungeons.find((d) => d.layout.def.id === 'slumber')!.layout;
     const sign = signPlace('dream_cavern')!; // (round 122: the cavern is a wide hall now, its Elder Sign near its way in)
     const found = record(g, 'Discovered');

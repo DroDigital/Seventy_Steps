@@ -15,6 +15,7 @@ export interface Veil {
   minInsight?: number;
   maxSanity?: number; // a band floor
   minSeals?: number; // the waking world's seals broken (systems/seals.ts): a door sealed until then (round 12)
+  met?: string; // one spoken with first (data/npcs.ts): a door sealed until then (round 123: Nasht and Kaman-Thah keep the way on down from the Cavern of Flame)
 }
 
 export interface RoomDef {
@@ -31,6 +32,7 @@ export interface RoomDef {
   variant?: 'boss';
   spawns?: readonly string[];
   ally?: string;
+  allyAt?: readonly [u: number, v: number]; // where its ally stands, across and along the room from its middle (round 123: the Cavern of Flame's priests, at a place of their own); else the room's first spot
   sign?: { id: string; name: string }; // an Elder Sign
   gate?: { id: string; name: string; to: string };
   tome?: { name: string; insight: number };
@@ -58,9 +60,9 @@ import { SEALS } from './tuning';
 export const SLUMBER_STEPS = { riser: 0.16, light: 35, deep: 50 } as const;
 const LIGHT_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.light;
 const DEEP_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.deep;
-/** A flight of the seven hundred steps (round 104): over the void, its words said as it is entered, its kit by depth, and (rounds 120, 121) what waits on it, if anything. */
-const deep = (id: string, from: string, dir: Dir, o: { words?: string; kit?: KitId; foes?: readonly string[] } = {}): RoomDef =>
-  stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit: o.kit ?? 'dreamdeep', ...(o.foes?.length && { spawns: o.foes }), ...(o.words && { words: o.words }) });
+/** A flight of the seven hundred steps (round 104): over the void, its words said as it is entered, its kit by depth, and (rounds 120, 121) what waits on it, if anything; (round 123) the veil on the way into it. */
+const deep = (id: string, from: string, dir: Dir, o: { words?: string; kit?: KitId; foes?: readonly string[]; hidden?: Veil } = {}): RoomDef =>
+  stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit: o.kit ?? 'dreamdeep', ...(o.foes?.length && { spawns: o.foes }), ...(o.words && { words: o.words }), ...(o.hidden && { hidden: o.hidden }) });
 
 
 export const DUNGEONS: readonly DungeonDef[] = [
@@ -241,7 +243,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
     ],
   },
   {
-    id: 'slumber', name: 'Stairs of Slumber', region: 'dreamlands', sealed: true, rooms: [
+    id: 'slumber', name: 'Stairs of Slumber', region: 'slumber_stairs', sealed: true, rooms: [ // (round 123: a realm of their own, data/regions.ts)
       // Round 12: the descent was a 30-second walk through nine empty rooms. Now it is said as it goes,
       // and the dream's lesser things wait on the flights. Round 104: the steps are as many as the tale says, each one cut:
       // seventy (two flights of 35, risers of 16 cm) to the Cavern of Flame, then seven hundred (fourteen flights of 50) down a
@@ -252,8 +254,11 @@ export const DUNGEONS: readonly DungeonDef[] = [
       room('threshold', 'hall', undefined, 'n'),
       stair('light_1', 'threshold', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THE SEVENTY STEPS OF LIGHT SLUMBER', spawns: ['zoog'] }),
       stair('light_2', 'light_1', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, spawns: ['zoog', 'zoog'] }),
-      room('cavern', 'hall', 'light_2', 'n', { wide: true, sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', words: 'THE CAVERN OF FLAME', kit: 'dreamflame' }),
-      deep('deep_1', 'cavern', 'n', { words: 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER' }),
+      // Round 123 (asked: the priests must not be stuck anywhere when first come to; "it should have a fixed location in the cavern and you need to talk
+      // to them to progress further down the steps and then they follow and help you"): they stand between their effigies before the way on down, and
+      // that way is sealed until they are spoken with (`met`); then they go with the investigator (systems/allyTrail.ts).
+      room('cavern', 'hall', 'light_2', 'n', { wide: true, sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', allyAt: [0, 13], words: 'THE CAVERN OF FLAME', kit: 'dreamflame' }),
+      deep('deep_1', 'cavern', 'n', { words: 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER', hidden: { met: 'nasht' } }),
       deep('deep_2', 'deep_1', 'n', { foes: ['night_gaunt'] }),
       deep('deep_3', 'deep_2', 'n', { foes: ['ghoul'] }),
       deep('deep_4', 'deep_3', 'n', ),

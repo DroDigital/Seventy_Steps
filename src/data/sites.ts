@@ -162,7 +162,7 @@ export const SITES: Readonly<Record<string, RegionSites>> = {
     allies: [],
     gates: [gate('dream_wood_gate', 'The Enchanted Wood (to the Stairs of Slumber)', 'dream_deeper', 272, 120, 'n')],
     tomes: [tome('Seven Cryptical Books of Hsan', 1, 600, 640)],
-    dungeons: [dungeon('slumber', 120, 600), dungeon('ulthar_kadath', 400, 300), dungeon('sculptor_studio', 200, 360)],
+    dungeons: [dungeon('ulthar_kadath', 400, 300), dungeon('sculptor_studio', 200, 360)], // (round 123: the Stairs of Slumber are a realm of their own, below)
   },
   rlyeh: {
     signs: [sign('rlyeh_deck', "The Alert's Deck", 88, 60, 'n'), sign('rlyeh_door', 'The Great Door', 352, 200, 'n')],
@@ -237,6 +237,9 @@ export const SITES: Readonly<Record<string, RegionSites>> = {
     tomes: [],
     dungeons: [],
   },
+  // The Stairs of Slumber (round 123): their realm holds them and nothing else; the Sleeper's Sign leads to their head and the Gate of Deeper Slumber
+  // at their foot to the Enchanted Wood (data/dungeons.ts), and they run 240 m north and back over 64 m, so they stand in the middle of the tile.
+  slumber_stairs: { signs: [], ...none, dungeons: [dungeon('slumber', 224, 136)] },
   // the demo's edge (regions.ts `full_game`): the university's two gates end here, where the demo's end is said (docs/DEMO_BUILD.md)
   ...(__DEMO__ ? { full_game: { signs: [], arenas: [], allies: [], tomes: [], dungeons: [], gates: [gate('full_game_antarctic', 'The Mist', 'hub_antarctic', 40, 40, 'n'), gate('full_game_australia', 'The Mist', 'hub_australia', 440, 40, 'n')] } } : {}),
 };

@@ -138,6 +138,7 @@ export const DRONES = {
   piping_dark: d(30, [1, 1.12, 1.5, 2.25], 'triangle', 500, 0.03, 0.02, 400),
   spheres: d(52, [1, 1.5, 2.25, 3], 'sine', 1000, 0.026, 0.01, 1200),
   court_centre: d(24.5, [1, 1.06, 1.414, 2.97], 'sawtooth', 300, 0.04, 0.03, 300),
+  slumber_stairs: d(29.1, [1, 1.5, 2.02], 'sine', 260, 0.03, 0.012, 260), // round 123: the stairs' realm: low, and darker the longer it is listened to
   boss: d(36.7, [1, 1.06, 1.5], 'sawtooth', 180, 0.08), // under a boss fight
 } satisfies Record<string, Drone>;
 

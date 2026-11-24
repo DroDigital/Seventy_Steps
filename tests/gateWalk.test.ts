@@ -127,7 +127,9 @@ describe('the gates are walked through (round 60: "accessible via straightforwar
     goTo(g, gate.arrive.x, gate.arrive.z);
     expect(gateNear(g)).toEqual({ id: gate.id, leads: 'Pnakotus' });
     expect(leadsTo(gate)).toBe('Pnakotus');
-    expect(leadsTo(gatePlace('dream_wood_gate')!)).toBe(gatePlace('dream_deeper')!.name); // its twin is in the same region: the twin is the name
+    expect(leadsTo(gatePlace('dream_wood_gate')!)).toBe('The Stairs of Slumber'); // (round 123: the stairs are a realm of their own)
+    const deeper = gatePlace('dream_deeper')!;
+    expect(leadsTo({ ...deeper, id: 'beside', to: deeper.id, x: deeper.x + 6 })).toBe(deeper.name); // a twin in the same region: the twin is the name
     goTo(g, gate.x + GATE_WALK.notice + 5, gate.z + 5);
     expect(gateNear(g)).toBeNull(); // too far to be told
     goTo(g, gate.arrive.x, gate.arrive.z);

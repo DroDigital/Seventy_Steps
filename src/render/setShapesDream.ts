@@ -3,7 +3,8 @@
  * Dream-Quest of Unknown Kadath gives it three things: the seventy steps of light slumber lead down to it, it is a cavern of flame, and in
  * it dwell "the bearded priests Nasht and Kaman-Thah", who "shook their pshent-bearing heads". So: a rift in the cavern's floor ringed
  * with scorched rock, out of which the flame that names it stands; and the priests' effigies, seated colossi with the false beard and the
- * pshent, the white crown set in the red. In the piece's own frame, feet at the origin, facing +z. Render only: geometry.
+ * pshent, the white crown set in the red; and (round 123) the fissures about it that fire breaks out of. In the piece's own frame, feet at the
+ * origin, facing +z. Render only: geometry.
  */
 
 import * as THREE from 'three';
@@ -32,12 +33,31 @@ export function cleft(p: Prop): Piece[] {
     const g = new THREE.IcosahedronGeometry(1, 0).scale(s, h, s * 0.8).rotateY(a).rotateZ(0.25 * Math.cos(a)).rotateX(-0.25 * Math.sin(a));
     parts.push(tint(g.translate(Math.cos(a) * p.w * 0.78, h * 0.55, Math.sin(a) * p.w * 0.78), i % 3 === 0 ? c : scorched));
   }
-  const fires: Piece[] = [{ mat: 'glow', ...fireSpot('fire', [0, 0.1, 0], 3, 1.6) }]; // the flame itself, three times a fire's height, its light high in it
+  const fires: Piece[] = [{ mat: 'glow', ...fireSpot('fire', [0, 0.1, 0], 4, 2) }]; // the flame itself, four times a fire's height (round 123: it was three), its light high in it
   for (let i = 0; i < 3; i++) { // lesser tongues licking up from the rift's edges
     const a = (i / 3) * Math.PI * 2 + 0.5;
-    fires.push({ mat: 'glow', ...fireSpot('fire', [Math.cos(a) * p.w * 0.38, 0.1, Math.sin(a) * p.w * 0.38], 1.1) });
+    fires.push({ mat: 'glow', ...fireSpot('fire', [Math.cos(a) * p.w * 0.38, 0.1, Math.sin(a) * p.w * 0.38], 1.4) });
   }
   return [{ mat: 'rock', geo: merged(parts) }, ...fires];
+}
+
+/**
+ * A fissure in the cavern's floor with fire breaking out of it (round 123: the cavern of flame was a black hall with one fire in its middle, its
+ * priests unseen in the dark): a black slit between jagged, scorched lips, and a flame standing out of it. `w` its length, `d` its breadth.
+ */
+export function vent(p: Prop): Piece[] {
+  const c = stone(p);
+  const scorched = scaleRgb(mixRgb(c, BASE.charcoal, 0.6), 0.85);
+  const parts: THREE.BufferGeometry[] = [cube(p.w * 1.6, 0.05, p.d * 0.5, 0, 0.025, 0, scaleRgb(BASE.charcoal, 0.55))]; // the slit, black
+  for (let i = 0; i < 6; i++) { // its lips: broken stones either side of it
+    const side = i % 2 ? 1 : -1;
+    const along = ((i >> 1) - 1) * p.w * 0.55 + (hash2(i, 5, p.seed) - 0.5) * 0.2;
+    const s = 0.18 + hash2(i, 9, p.seed) * 0.16;
+    const h = s * (0.8 + hash2(i, 13, p.seed) * 0.8);
+    const g = new THREE.IcosahedronGeometry(1, 0).scale(s * 1.3, h, s).rotateY(hash2(i, 17, p.seed) * Math.PI).rotateX(side * 0.3);
+    parts.push(tint(g.translate(along, h * 0.45, side * p.d * 0.42), i % 3 ? scorched : c));
+  }
+  return [{ mat: 'rock', geo: merged(parts) }, { mat: 'glow', ...fireSpot('fire', [0, 0.05, 0], 1.6) }];
 }
 
 /**

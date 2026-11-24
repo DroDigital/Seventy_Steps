@@ -9,7 +9,8 @@ import type { PoiDef } from './pois';
 export const POIS_DREAM: readonly PoiDef[] = [
   { id: 'dream_zoog_council', region: 'dreamlands', at: { feature: 'circle', nth: 0 }, name: "The Zoogs' Council", kind: 'den', story: 'The Dream-Quest of Unknown Kadath',
     line: 'A ring of small brown shapes falls silent. One of them seems to know your name.', foes: { ids: ['zoog'], n: 8 }, hoard: 2000 },
-  { id: 'dream_hatheg_ledge', region: 'dreamlands', at: { near: [110, 680], as: 'cliff' }, name: "Barzai's Last Ledge", kind: 'anomaly', story: 'The Other Gods',
+  { id: 'dream_hatheg_ledge', region: 'dreamlands', at: { feature: 'outcrop', nth: 2 }, // (round 123: its cliff was the brow of the Stairs of Slumber's ground, gone to their own realm, and the Dreamlands' gentle land has no other: a ledge of rock now)
+    name: "Barzai's Last Ledge", kind: 'anomaly', story: 'The Other Gods',
     line: 'Here a philosopher stood to watch the gods of Earth dance, and learned that the others were nearer.', again: 'Nothing here casts a shadow, but the ledge has one.', fx: { form: 'column', hue: 'magenta' }, aura: -0.4, insight: 1, hoard: 1200 },
   { id: 'dream_cats_circle', region: 'dreamlands', at: { feature: 'ruin', nth: 0 }, name: "The Cats' Circle", kind: 'tale', story: 'The Cats of Ulthar',
     line: 'Every cat on the terrace has turned to face you. None of them is afraid.', again: 'They arrange themselves a little, to make you room.', aura: 0.7, hoard: 1600, insight: 1 },

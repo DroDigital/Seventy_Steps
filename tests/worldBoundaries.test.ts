@@ -10,7 +10,6 @@ import { npcEntity, talk } from '../src/systems/npcs';
 import { populationSystem } from '../src/systems/population';
 import { hasLineOfSight, resolveCapsule } from '../src/world/colliders';
 import { kitOfRoom, roomPoint } from '../src/world/dungeonKit';
-import { roomSpots } from '../src/world/dungeonParts';
 import { grounded, outerFace } from '../src/world/moundBanks';
 import { worldLayout } from '../src/world/placements';
 import { createWorldCollision } from '../src/world/worldCollision';
@@ -57,7 +56,7 @@ function cavern() {
   const g = createWorldGame();
   const r = worldLayout().dungeons.find((d) => d.layout.def.id === 'slumber')!.layout.rooms.find((r) => r.def.id === 'cavern')!;
   const pp = g.ecs.c.transform.get(g.player.id)!;
-  const post = roomPoint(r, ...roomSpots(r).ring[0]); // the priests' post: the room's ally stands at its first spot (round 122: the cavern is a wide hall, the post 13 m from its middle)
+  const post = roomPoint(r, ...r.def.allyAt!); // the priests' post: a place of their own, between their effigies before the way on down (round 123)
   pp.pos = { x: post.x - 5, y: r.level, z: post.z - 5 }; // (as far off as it stood from the small hall's post: near enough to be followed, far enough that following is a walk)
   pp.prev = { ...pp.pos };
   populationSystem(g);

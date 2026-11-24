@@ -12,6 +12,7 @@ export const REGION_JOURNEYS: Readonly<Record<string, JourneyProfile>> = {
   hub: 'early', arkham: 'early', dunwich: 'middle', innsmouth: 'middle', providence: 'middle', vermont: 'middle',
   mountains: 'late', pnakotus: 'late', kn_yan: 'late', dreamlands: 'late', rlyeh: 'late', yuggoth: 'late', beyond: 'late',
   cloud_summit: 'late', black_wood: 'late', pale_lattice: 'late', piping_dark: 'late', spheres: 'late', court_centre: 'late',
+  slumber_stairs: 'late', // (round 123: the stairs' own realm; they lay in the Dreamlands' late north before)
 };
 
 /** Fixed tuning reference, never the current player's build or a minimum required carry. */

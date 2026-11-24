@@ -168,10 +168,10 @@ export const stepsOf = (r: RoomLayout): number => r.def.steps ?? Math.max(2, Mat
 /** Where things are put in a hall, in its own frame: a pillar keeps a pace from each (roomStyle.ts). */
 export function standing(r: RoomLayout): readonly (readonly [number, number])[] {
   const s = roomSpots(r);
-  return [s.centre, s.sign, s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring];
+  return [s.centre, s.sign, s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring, ...(r.def.allyAt ? [r.def.allyAt] : [])];
 }
 
-const glowOf = (v: Veil): 'purple' | 'magenta' => (v.minInsight !== undefined || v.minSeals !== undefined ? 'purple' : 'magenta');
+const glowOf = (v: Veil): 'purple' | 'magenta' => (v.minInsight !== undefined || v.minSeals !== undefined || v.met !== undefined ? 'purple' : 'magenta');
 
 /** A hidden bridge: its deck while shown, and an unseen edge across the gap while hidden. */
 function bridgePiece(r: RoomLayout, name: string, p: number, veil: Veil): HiddenPieceDef {
@@ -196,7 +196,7 @@ function doorPiece(o: DoorLayout, name: string, veil: Veil): HiddenPieceDef {
   return {
     name, x: o.x, z: o.z, ...veil, glow: glowOf(veil),
     boxes: [box(-(D / 2 + 0.12), 0.12, T / 2 + 0.05, L, L + lintel), box(D / 2 + 0.12, 0.12, T / 2 + 0.05, L, L + lintel), box(0, D / 2 + 0.24, T / 2 + 0.05, L + lintel, L + lintel + 0.2)],
-    seal: { boxes: [box(0, D / 2, T / 2, L - 0.3, L + lintel)], look: veil.minSeals !== undefined ? 'sealed' : 'wall' },
+    seal: { boxes: [box(0, D / 2, T / 2, L - 0.3, L + lintel)], look: veil.minSeals !== undefined || veil.met !== undefined ? 'sealed' : 'wall' }, // (a door kept by someone, round 123, is sealed as Kadath's is: it is seen to be shut)
     door: { alongX, width: D, height: lintel, thick: T, y: L },
   };
 }
