@@ -1,6 +1,6 @@
 /**
  * The newels of a flight over the void (round 104; world/abyssStair.ts builds the flight): every ten steps a squat pier stands on
- * each parapet, capped, and at the flight's head a pair of tall pylons stand at the parapets' ends. Round 119 (asked: fewer torches,
+ * each parapet, capped, and at the flight's head a pair of tall pylons stand at the parapets' ends. Round 120 (asked: fewer torches,
  * and the way down darker the deeper it goes): few of them bear a fire. On the seventy steps both pylons burn and one newel at the
  * flight's middle; down the first half of the seven hundred, one pylon of each flight, the side alternating; below it, one on every
  * other flight (SLUMBER.newels). The rest are capped stone, so the stair is a dark way down with a fire now and then in the mist.
@@ -39,7 +39,7 @@ function newel(r: RoomLayout, u: number, v: number, y: number, c: Rgb, lit: bool
   lights.push({ kind: 'glow', kit, light: { x: p.x, y: top + BOWL.h + 0.35, z: p.z, kind: 'fire' } });
 }
 
-/** Which of a flight's newel fires burn (round 119): its middle row's newel on `side` and both pylons on the seventy steps; one pylon, on `side`, down the first half; one on every other flight below. */
+/** Which of a flight's newel fires burn (round 120): its middle row's newel on `side` and both pylons on the seventy steps; one pylon, on `side`, down the first half; one on every other flight below. */
 export function newelFires(share: number, index: number): { side: 1 | -1; middle: boolean; pylons: 0 | 1 | 2 } {
   const { light, half } = SLUMBER.newels;
   const side = index % 2 ? 1 : -1;

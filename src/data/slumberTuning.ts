@@ -1,6 +1,6 @@
 /**
  * The Stairs of Slumber's descent (round 105, asked by XDro: the lights down the steps dimmed "significantly", a maximal dense mist
- * that grows exponentially the further down the steps go, and lights that flicker rarely, more of them as the mind fails). Round 119
+ * that grows exponentially the further down the steps go, and lights that flicker rarely, more of them as the mind fails). Round 120
  * (asked: thicker fog early in the descent, the mist intensifying rapidly, the torches dimming progressively with depth, and fewer of
  * them): the mist is thick from the first step and does most of its climbing in the first third, and each light keeps the share of its
  * own depth. Every number of how the descent looks: its mist (data/fogs.ts's crypt-mist, thickened by world/descent.ts), its lights
@@ -18,7 +18,7 @@ export const SLUMBER = {
     half: 0.5, // below that, a flight whose head lies above this share has one of its pylons lit; deeper, every other flight has one
   },
   mist: {
-    head: 2.4, // the mist at the head of the stairs, as many times the crypt-mist's density (round 119: thick from the first step; 1 out of the stairs)
+    head: 2.4, // the mist at the head of the stairs, as many times the crypt-mist's density (round 120: thick from the first step; 1 out of the stairs)
     max: 6, // and on the deepest floor
     curve: 3.5, // how fast it climbs between: an ease-out in the share of the descent, so most of the climb is in its first third
     height: 2.5, // metres the low mist rises by on the deepest floor, so a stair's shaft fills to a man's height and over (rising as the density does)

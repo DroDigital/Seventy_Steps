@@ -1,7 +1,7 @@
 /**
  * How far down the Stairs of Slumber the investigator is (round 105): 0 at the head of the seventy steps (the threshold's floor),
  * 1 on the deepest floor of the descent, read from the height the feet stand at. It thickens the mist (render/volumetricFog.ts,
- * `descentGain`; round 119: thick from the head and climbing fast, most of the way in the first third) and says how far the stairs'
+ * `descentGain`; round 120: thick from the head and climbing fast, most of the way in the first third) and says how far the stairs'
  * lights are taken down (render/stairLights.ts). It is null in any other place: the open world and every other dungeon included,
  * where the mist is its place's own. The stairs' layout is found by where the investigator stands (terrain.ts `dungeonRoomAt`).
  */
@@ -34,7 +34,7 @@ export function descentAt(x: number, y: number, z: number): number | null {
   return Math.min(1, Math.max(0, (top - y) / (top - bottom)));
 }
 
-/** How far the mist has climbed toward its deepest at a share of the descent: 0 at the head (and out of the stairs), 1 on the deepest floor, most of it early (round 119: an ease-out). */
+/** How far the mist has climbed toward its deepest at a share of the descent: 0 at the head (and out of the stairs), 1 on the deepest floor, most of it early (round 120: an ease-out). */
 export function descentRise(share: number | null | undefined): number {
   if (share === null || share === undefined) return 0;
   const s = Math.min(1, Math.max(0, share));

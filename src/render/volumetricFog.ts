@@ -96,8 +96,8 @@ export function createVolumetricFog(post: PostPass): VolumetricFog {
       u.uProjInv.value.copy(camera.projectionMatrixInverse);
       u.uCamWorld.value.copy(camera.matrixWorld);
       u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
-      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet) * descentGain(f.descent); // a failing mind thickens it, and a wood, and rain (round 80), and the Stairs of Slumber (round 105; 119: from their head)
-      const rise = descentRise(f.descent); // (round 119: the stairs' mist rises and evens out as it thickens, most of it in the first third)
+      const thick = thickAfterRain(f.setting * (1 + FOG.madness * f.stress) * (1 + 1.1 * (f.wood ?? 0)), wet) * descentGain(f.descent); // a failing mind thickens it, and a wood, and rain (round 80), and the Stairs of Slumber (round 105; 120: from their head)
+      const rise = descentRise(f.descent); // (round 120: the stairs' mist rises and evens out as it thickens, most of it in the first third)
       u.uFog.value.set(now.density * thick, now.height + SLUMBER.mist.height * rise, ground - 0.3, now.patchy * (1 - SLUMBER.mist.patchy * rise));
       MIST.thickness = f.enclosed ? 0 : now.density * thick;
       u.uFogAir.value.set(now.haze * thick, FOG.hazeHeight, now.moon, f.enclosed ? 0 : LIVING.swell * now.patchy); // (w: its banks swell and thin; a crypt's mist is still)

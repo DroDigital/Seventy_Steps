@@ -79,7 +79,7 @@ describe('the dungeon kit', () => {
     expect(steps('cavern', 'deeper')).toBe(700);
     expect(room(d, 'cavern').level - d.base).toBeCloseTo(-70 * SLUMBER_STEPS.riser);
     expect(room(d, 'deeper').level - room(d, 'cavern').level).toBeCloseTo(-700 * SLUMBER_STEPS.riser);
-    // Round 119 (asked: the descent was a gauntlet run at a sprint on potions): a few lone things in the mist, far apart, and no empty walk either.
+    // Round 120 (asked: the descent was a gauntlet run at a sprint on potions): a few lone things in the mist, far apart, and no empty walk either.
     const foes = d.rooms.flatMap((r) => r.def.spawns ?? []);
     expect(foes.length).toBeGreaterThanOrEqual(4);
     expect(foes.length).toBeLessThanOrEqual(8);

@@ -6,6 +6,7 @@
  */
 
 import type { Entity } from '../../core/ecs';
+import { t } from '../../core/i18n';
 import { distXZ, yawOf } from '../../core/geom';
 import { CTHULHU, SIM } from '../../data/tuning';
 import { startMove } from '../actions';
@@ -35,7 +36,7 @@ function sail(g: Game, e: Entity, f: Fight, ship: Entity): void {
   startMove(c.actor.get(e)!, 'stagger');
   c.actor.get(g.player.id)!.move = null; // off the helm
   g.events.emit('Rammed', { entity: e });
-  g.events.emit('Title', { text: 'IT BURSTS' });
+  g.events.emit('Title', { text: t('sig.bursts') });
 }
 
 /** It reforms, and R'lyeh sinks. */
@@ -45,7 +46,7 @@ function sink(g: Game, e: Entity): void {
   [h.floor, h.hp] = [undefined, 0];
   startMove(c.actor.get(e)!, 'death');
   g.events.emit('Died', { entity: e, killer: g.player.id, at: { ...c.transform.get(e)!.pos } });
-  g.events.emit('Title', { text: "IT REFORMS · R'LYEH SINKS" });
+  g.events.emit('Title', { text: t('sig.reforms') });
 }
 
 /** A fight ended or reset while sailing releases the investigator before the ship disappears. */
@@ -69,11 +70,11 @@ export const CTHULHU_SIGNATURE: Signature = {
     if (f.sig.sailing && ship !== undefined) sail(g, e, f, ship);
   },
   status(g, _e, f) {
-    if (f.sig.burst > 0) return "IT REFORMS · R'LYEH SINKS";
-    if (f.sig.sailing) return 'THE ALERT RAMS IT';
-    return shipOf(g, f) !== undefined ? "THE ALERT HAS COME · E AT HER HELM" : 'WOUND IT UNTIL THE ALERT COMES';
+    if (f.sig.burst > 0) return t('sig.reforms');
+    if (f.sig.sailing) return t('sig.rams');
+    return shipOf(g, f) !== undefined ? t('sig.alertHelm') : t('sig.wound');
   },
-  note: (g, _e, f) => (shipOf(g, f) !== undefined && !f.sig.sailing ? "THE ALERT HAS COME · TAKE HER HELM" : null),
+  note: (g, _e, f) => (shipOf(g, f) !== undefined && !f.sig.sailing ? t('sig.alertTake') : null),
   action(g, _e, f) {
     const ship = shipOf(g, f);
     if (ship === undefined || f.sig.sailing || f.sig.burst) return null;

@@ -5,6 +5,7 @@
  */
 
 import type { Entity } from '../../core/ecs';
+import { t } from '../../core/i18n';
 import { SHUB } from '../../data/tuning';
 import type { Fight, Game } from '../components';
 import type { Signature } from '../signatures';
@@ -27,6 +28,6 @@ export const SHUB_SIGNATURE: Signature = {
   },
   status(g, _e, f) {
     const n = rootsOf(g, f).length;
-    return n ? `SPAWNING ROOTS ${n}` : null;
+    return n ? t('sig.roots', { n }) : null;
   },
 };

@@ -1,6 +1,6 @@
 /**
  * The Stairs of Slumber's descent (round 105): no curtain in the arch between two flights over the void, the descent's share of the
- * depth, the mist's gain (round 119: thick from the head, climbing fast), and the stairs' lights: dimmed by their depth (round 119),
+ * depth, the mist's gain (round 120: thick from the head, climbing fast), and the stairs' lights: dimmed by their depth (round 120),
  * and gutter rarely, more as the mind fails.
  */
 
@@ -47,7 +47,7 @@ describe('the descent', () => {
     expect(descentAt(1e6, -500, 1e6)).toBeNull();
   });
 
-  it('thickens the mist from the head of the stairs, climbing fast toward SLUMBER.mist.max, and leaves it alone off them (round 119)', () => {
+  it('thickens the mist from the head of the stairs, climbing fast toward SLUMBER.mist.max, and leaves it alone off them (round 120)', () => {
     expect(descentGain(null)).toBe(1);
     expect(descentGain(undefined)).toBe(1);
     expect(descentGain(0)).toBe(SLUMBER.mist.head);
@@ -61,7 +61,7 @@ describe('the descent', () => {
 });
 
 describe("the stairs' lights", () => {
-  it('dims a light on the stairs by its depth, every step down darker, and leaves the rest (round 119)', () => {
+  it('dims a light on the stairs by its depth, every step down darker, and leaves the rest (round 120)', () => {
     const at = (stairs?: number): LightSpot => ({ x: 0, y: 0, z: 0, kind: 'torch', ...(stairs !== undefined && { stairs }) });
     expect(stairDim(at())).toBe(1);
     expect(stairDim(at(0))).toBeCloseTo(SLUMBER.light.top, 9);
@@ -139,7 +139,7 @@ describe("the stairs' lights", () => {
   });
 });
 
-describe("the stairs' fires (round 119: fewer torches, and the deeper the fewer)", () => {
+describe("the stairs' fires (round 120: fewer torches, and the deeper the fewer)", () => {
   it('burns few of its newels: both pylons and a middle newel on the seventy steps, one pylon a flight below them, one on every other flight in the depths', () => {
     expect(newelFires(0, 0)).toMatchObject({ middle: true, pylons: 2 });
     expect(newelFires(0.3, 3)).toMatchObject({ middle: false, pylons: 1 });
@@ -158,6 +158,6 @@ describe("the stairs' fires (round 119: fewer torches, and the deeper the fewer)
     const over = (l: LightSpot) => isAbyss(roomAt(d.layout, l.x, l.z));
     expect(lights.filter((l) => l.kind === 'torch' && over(l))).toEqual([]);
     expect(lights.filter(over).length).toBeLessThanOrEqual(20); // sixteen flights: their newels' few fires (round 104 lit 108)
-    expect(lights.length).toBeLessThan(182 / 2); // the whole descent, halls and all (182 before round 119)
+    expect(lights.length).toBeLessThan(182 / 2); // the whole descent, halls and all (182 before round 120)
   });
 });

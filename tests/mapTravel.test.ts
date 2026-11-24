@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { setLocale } from '../src/core/i18n';
+import { LANGS } from '../src/data/lang';
 import { START_SIGN } from '../src/data/sites';
 import { signPlace, travel, travelBar } from '../src/systems/checkpoints';
 import { isAbsent } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
-import { litSigns, mapZoom, padTravel, signAt, signToward, steerPad } from '../src/ui/mapTravel';
+import { barWord, litSigns, mapZoom, padTravel, signAt, signToward, steerPad, type BarWord } from '../src/ui/mapTravel';
 import type { MapPlace } from '../src/world/mapData';
 import { realmOf } from '../src/world/mapData';
 
@@ -92,5 +94,21 @@ describe('playtest round 7: fast travel from the map', () => {
     g.overworld!.discovered.add('arkham_streets');
     expect(travel(g, 'arkham_streets')).toBe(true);
     expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: signPlace('arkham_streets')!.rest.x, z: signPlace('arkham_streets')!.rest.z });
+  });
+
+  it('every travel refusal has words in every language', () => {
+    const bars: readonly BarWord[] = ['boss', 'foes', 'fallen', 'demo'];
+    try {
+      for (let i = 0; i < LANGS.length; i++) {
+        setLocale(i);
+        for (const bar of bars) expect(barWord(bar), `${LANGS[i].id} ${bar}`).toBeTruthy();
+      }
+      setLocale(0);
+      const en = bars.map(barWord);
+      setLocale(1);
+      expect(bars.map(barWord)).not.toEqual(en);
+    } finally {
+      setLocale(0);
+    }
   });
 });

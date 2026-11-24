@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { ENTITIES, variantOf } from '../src/data/registry';
 import { LEVELS, REINFORCE, STAR_STONES } from '../src/data/tuning';
 import { WEAPONS } from '../src/data/weapons';
-import { affordableMoves, canReinforce, edge, edgeAt, movable, moveCost, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
+import { affordableMoves, canReinforce, edge, edgeAt, giveStones, movable, moveCost, moveLevels, reinforce, reinforceCost, stonesOf, stonesOfSlain } from '../src/systems/arms';
 import { mightAt } from '../src/systems/levelWorth';
 import { createWorldGame } from '../src/systems/game';
 import { snapshot } from '../src/systems/save';
@@ -59,6 +59,16 @@ describe('reinforcing arms with star-stones (round 12)', () => {
     expect(stonesOf('cthulhu')).toBe(STAR_STONES.great_old_one);
     expect(stonesOf('azathoth')).toBe(STAR_STONES.outer_god);
     expect(stonesOf('deep_one')).toBe(0);
+  });
+
+  it('a single star-stone says SET IT and several say SET THEM', () => {
+    const { g } = scriptedGame();
+    const notices: string[] = [];
+    g.events.on('Notice', ({ text }) => void notices.push(text));
+    giveStones(g, 1);
+    giveStones(g, 3);
+    expect(notices[0]).toContain('A STAR-STONE · SET IT');
+    expect(notices[1]).toContain('3 STAR-STONES · SET THEM');
   });
 
   it("an older save is paid the stones its slain bosses would have left", () => {

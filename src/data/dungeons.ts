@@ -58,7 +58,7 @@ import { SEALS } from './tuning';
 export const SLUMBER_STEPS = { riser: 0.16, light: 35, deep: 50 } as const;
 const LIGHT_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.light;
 const DEEP_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.deep;
-/** A flight of the seven hundred steps (round 104): over the void, its words said as it is entered, its kit by depth, and (round 119) what waits on it, if anything. */
+/** A flight of the seven hundred steps (round 104): over the void, its words said as it is entered, its kit by depth, and (round 120) what waits on it, if anything. */
 const deep = (id: string, from: string, dir: Dir, o: { words?: string; kit?: KitId; foe?: string } = {}): RoomDef =>
   stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit: o.kit ?? 'dreamdeep', ...(o.foe && { spawns: [o.foe] }), ...(o.words && { words: o.words }) });
 
@@ -245,7 +245,7 @@ export const DUNGEONS: readonly DungeonDef[] = [
       // Round 12: the descent was a 30-second walk through nine empty rooms. Now it is said as it goes,
       // and the dream's lesser things wait on the flights. Round 104: the steps are as many as the tale says, each one cut:
       // seventy (two flights of 35, risers of 16 cm) to the Cavern of Flame, then seven hundred (fourteen flights of 50) down a
-      // switchback, across a span over the dreamless dark, to the Gate of Deeper Slumber. Round 119 (asked: the 44 foes made the
+      // switchback, across a span over the dreamless dark, to the Gate of Deeper Slumber. Round 120 (asked: the 44 foes made the
       // descent a gauntlet run at a sprint on potions): six lone things wait in the mist, a hundred steps and more apart.
       room('threshold', 'hall', undefined, 'n'),
       stair('light_1', 'threshold', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THE SEVENTY STEPS OF LIGHT SLUMBER' }),

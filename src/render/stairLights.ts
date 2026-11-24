@@ -2,7 +2,7 @@
  * The lights of the Stairs of Slumber's descent (round 105): every light of the stairs' dungeon that stands more than a metre below
  * its head (the threshold's torches stay bright) is dimmed, so the stairs are lit by the lantern and the way down is a dim one, and it
  * may gutter now and then, the more so as the mind fails: a rare dip of a fraction of a second, in a window of its own (`stairGutter`).
- * Round 119 (asked: the torches' brightness should diminish progressively with depth): each light keeps the share of its own depth,
+ * Round 120 (asked: the torches' brightness should diminish progressively with depth): each light keeps the share of its own depth,
  * from SLUMBER.light.top at the head to SLUMBER.light.bottom on the deepest floor, and its flame burns lower the deeper it hangs.
  * Lights off the stairs keep their own waver, and the lantern its own (lanternLife.ts). Pure.
  */
@@ -29,14 +29,14 @@ export function markStairLights(layout: DungeonLayout, lights: LightSpot[]): voi
 /** The seed of a light, in [0, 1): its own gutter and its own moment (as worldLights' flames seed theirs). */
 export const lightSeed = (s: { x: number; y: number; z: number }): number => (Math.abs(Math.sin(s.x * 12.9898 + s.z * 78.233 + s.y * 4.1414)) * 43758.5453) % 1;
 
-/** The share of a light's strength, halo and flame that is left: a stair light's falls by the same ratio with each metre down, from SLUMBER.light.top at the head to SLUMBER.light.bottom on the deepest floor (round 119; it was one share for all, round 105's). */
+/** The share of a light's strength, halo and flame that is left: a stair light's falls by the same ratio with each metre down, from SLUMBER.light.top at the head to SLUMBER.light.bottom on the deepest floor (round 120; it was one share for all, round 105's). */
 export function stairDim(s: LightSpot): number {
   if (s.stairs === undefined) return 1;
   const { top, bottom } = SLUMBER.light;
   return top * Math.pow(bottom / top, clamp01(s.stairs));
 }
 
-/** How tall a stair light's flame burns, as a share of its own: lower the deeper it hangs (round 119). */
+/** How tall a stair light's flame burns, as a share of its own: lower the deeper it hangs (round 120). */
 export const stairFlame = (s: LightSpot): number => (s.stairs === undefined ? 1 : 1 - SLUMBER.light.shrink * clamp01(s.stairs));
 
 /**
