@@ -23,8 +23,8 @@ import { uiScale } from './uiScale';
 export const UNIT = { full: 10, mini: 7.4 } as const;
 
 export interface MapPainter {
-  /** Paints `realm` on `view`; `full`: the full map, with its names. The marks drawn, the first underneath. */
-  paint(ctx: CanvasRenderingContext2D, view: MapView, realm: readonly RegionDef[], full: boolean): readonly Mark[];
+  /** Paints `realm` on `view`; `full`: the full map, with its names; `you`: the investigator's arrow (not on another realm than theirs). The marks drawn, the first underneath. */
+  paint(ctx: CanvasRenderingContext2D, view: MapView, realm: readonly RegionDef[], full: boolean, you?: boolean): readonly Mark[];
 }
 
 const FOG = '#11100f';
@@ -178,7 +178,7 @@ export function createMapPainter(g: Game): MapPainter {
   }
 
   return {
-    paint(ctx, view, realm, full) {
+    paint(ctx, view, realm, full, you = true) {
       const ow = g.overworld;
       if (typeof fog === 'string') fog = fogPattern(ctx) ?? FOG;
       ctx.fillStyle = fog;
@@ -219,7 +219,7 @@ export function createMapPainter(g: Game): MapPainter {
       const s2 = slip('you', sanity, bucket);
       const lie = falseSign(g, view); // a star where there is none, for a moment of each slide
       if (lie) drawMark(ctx, 'sign', lie.x, lie.y, unit, { lit: false });
-      drawMark(ctx, 'you', sx(tr.pos.x) + s2.dx, sy(tr.pos.z) + s2.dy, unit * 1.05, { turn: -tr.yaw });
+      if (you) drawMark(ctx, 'you', sx(tr.pos.x) + s2.dx, sy(tr.pos.z) + s2.dy, unit * 1.05, { turn: -tr.yaw });
       return marks;
     },
   };
