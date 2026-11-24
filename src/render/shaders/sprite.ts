@@ -282,11 +282,12 @@ void main() {
     col = mix(col, t.rgb * (1.0 + 0.25 * vGlint.w), lit * (1.0 - smoothstep(uEyeRange.x, uEyeRange.y, vDist)));
   }
   if (vEldritch > 0.5 && !glow) {
-    // Unmistakable elite variant read at 640×360: pulsing cosmic-purple / void-green outline aura + deeper shadowy core.
-    float pulse = 0.6 + 0.4 * sin(uTime * 3.4 + vFx.w * 11.0);
-    float rim = smoothstep(0.28, 0.85, bodyRim.z);
-    vec3 auraCol = mix(vec3(0.55, 0.14, 0.88), vec3(0.18, 0.94, 0.62), 0.35 + 0.35 * sin(uTime * 2.1 + vQuad.y * 5.0));
-    col = mix(col * vec3(0.86, 0.82, 0.94), auraCol * (0.9 + 0.45 * pulse), rim * (0.58 + 0.25 * pulse));
+    // Subtle grimdark cosmic-horror read: faint creeping cold-violet / corpse-teal miasma clinging to outer silhouette edges.
+    float drift = vnoise(vQuad * 7.5 + vec2(sin(uTime * 0.3), -uTime * 0.45));
+    float breath = 0.72 + 0.28 * sin(uTime * 1.9 + vFx.w * 11.0);
+    float rim = smoothstep(0.56, 0.96, bodyRim.z) * (0.42 + 0.58 * drift);
+    vec3 auraCol = mix(vec3(0.22, 0.10, 0.32), vec3(0.10, 0.26, 0.22), smoothstep(0.25, 0.85, drift));
+    col = col * vec3(0.90, 0.89, 0.94) + auraCol * rim * breath * 0.46;
   }
   if (!fxCut(src.xy, col)) discard; // the side of a killing cut that is not this billboard's (round 113)
   if (!fxKeep(src.xy, col)) discard; // and the texels that are gone, with their rim
