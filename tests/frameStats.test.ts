@@ -40,16 +40,14 @@ describe('frame statistics', () => {
 
 describe('the quality ladder', () => {
   it('starts at the default picture and every rung is no sharper than the one above', () => {
-    expect(LADDER[0]).toEqual({ resolution: 1.6, fog: 1, shadows: 1 });
+    expect(LADDER[0]).toEqual({ resolution: 1.6 });
     for (let i = 1; i < LADDER.length; i++) {
       expect(LADDER[i].resolution).toBeLessThanOrEqual(LADDER[i - 1].resolution);
-      expect(LADDER[i].fog).toBeLessThanOrEqual(LADDER[i - 1].fog);
-      expect(LADDER[i].shadows).toBeLessThanOrEqual(LADDER[i - 1].shadows);
     }
-    expect(rungOf(LADDER[3])).toBe(3);
-    expect(rungOf({ resolution: 1.6, fog: 1, shadows: 1 })).toBe(0);
-    expect(rungOf({ resolution: 2, fog: 1, shadows: 1 })).toBe(0); // 800 × 450, a player's choice
-    expect(rungOf({ resolution: 2.4, fog: 1, shadows: 1 })).toBe(0); // a sharper choice is not below the default
+    expect(rungOf(LADDER[2])).toBe(2);
+    expect(rungOf({ resolution: 1.6 })).toBe(0);
+    expect(rungOf({ resolution: 2 })).toBe(0); // 800 × 450, a player's choice
+    expect(rungOf({ resolution: 2.4 })).toBe(0); // a sharper choice is not below the default
   });
 
   it('steps down one rung when slow, two when poor, none when smooth or unmeasured, and stops at the last', () => {
@@ -91,14 +89,14 @@ describe('first-launch picture', () => {
     expect(run.notices).toEqual([]);
   });
 
-  it('measures the new default and removes shadows before reducing its resolution', () => {
+  it('steps resolution down one rung when slow and stops once smooth', () => {
     const run = launch();
     run.frames(40);
     run.quality.tick(run.measuredAt);
-    expect(run.settings).toEqual({ ...defaultSettings(), shadows: 0 });
+    expect(run.settings).toEqual({ ...defaultSettings(), resolution: LADDER[1].resolution });
     run.frames(60);
     run.quality.tick(run.measuredAt + (1.5 + QUALITY.measure) * 1000);
-    expect(run.settings.resolution).toBe(defaultSettings().resolution); // (the fog is what went next)
+    expect(run.settings.resolution).toBe(LADDER[1].resolution);
     expect(run.store.getItem(AUTO_KEY)).toBe('1');
     expect(run.notices).toHaveLength(1);
   });
@@ -111,7 +109,7 @@ describe('first-launch picture', () => {
       run.quality.tick(at);
     }
     const last = LADDER[LADDER.length - 1];
-    expect(run.settings).toMatchObject({ resolution: last.resolution, fog: last.fog, shadows: last.shadows });
+    expect(run.settings).toMatchObject({ resolution: last.resolution });
     expect(run.settings.resolution).toBeLessThan(defaultSettings().resolution);
     expect(run.store.getItem(AUTO_KEY)).toBe('1');
   });

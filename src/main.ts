@@ -240,7 +240,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const impactFx = createImpactFx(game, particles); // round 20: the weight of the investigator's blows
   const bodyWeather = createBodyWeather(game, particles, marks, creatures.figure, creatures.painted); // round 113: rain on the creatures, rings where they wade
   const echoFx = createEchoFx(game, particles, audio); // round 20: a slain foe's Echoes leave the body and are drawn into the investigator
-  const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => settings.cutscenes > 0.5, rise: views.rise, figure: creatures.figure }); // round 20: wake, arrivals, falls, endings
+  const cinema = createCinema(game, createCinemaUi(), audio, particles, { enabled: () => true, rise: views.rise, figure: creatures.figure }); // round 20: wake, arrivals, falls, endings
   const director = createDirector(game, cinema, (id) => ending.show(id));
   const demoEnd = game.demo ? createDemoEnd(game, () => cinema.active || journeys.busy) : null; // round 56: the demo's end, once Keziah Mason has fallen
   const signs = createSignViews(scene, game, particles, lights);
@@ -269,7 +269,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const finds = opts.arena ? null : createFindCard(game, () => dialogue.open || ending.open || !!intro?.open || !!demoEnd?.open || cinema.active || journeys.busy); // round 60: a weapon or a relic found says so, and what to do with it
   const rise = opts.arena ? null : createRiseMenu(game); // where to rise, when a lit candle reaches a fall (round 45)
   const painter = createMapPainter(game);
-  const hud = createHud(game, canvas, painter, echoFx.pending, () => settings.questTracker > 0.5, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => settings.quietWalk > 0.5, northUp: () => settings.minimap > 0.5, tips: () => settings.controlTips > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
+  const hud = createHud(game, canvas, painter, echoFx.pending, () => true, { held: () => veil.active || cinema.active || journeys.busy, quiet: () => true, northUp: () => settings.minimap > 0.5, tips: () => settings.controlTips > 0.5 }); // round 80: the cards wait for the veil; the quiet walk
   const photo = createPhoto(game, () => pipeline.shot(), () => audio.sample('clang', { gain: 0.4, pitch: 1.6 })); // round 26: P keeps a picture (the low-res one, before it is spread over the screen)
   const map = createMapScreen(game, painter, capture, journeys.go);
   const panel = debug || opts.arena ? createDebugPanel(state, [...HINTS, ...(!__DEMO__ && opts.arena ? spawnHint(creature, variant) : [])], panelOptions(game, settings, shell.change)) : null;
@@ -299,8 +299,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
 
   let lowRes = state.enabled.pixelate;
   let scale = settings.resolution;
-  let even = settings.evenPixels > 0.5; // every picture pixel the same size on the screen (2026-11-03: render/evenPixels.ts)
-  const resize = (): void => pipeline.resize(lowRes, scale, even);
+  const resize = (): void => pipeline.resize(lowRes, scale, true); // every picture pixel the same size on the screen (2026-11-03: render/evenPixels.ts)
   resize();
   addEventListener('resize', resize);
 
@@ -353,8 +352,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         [FEEL.shake, FEEL.flashes] = [settings.shake, settings.flashes];
         pipeline.post.uniforms.uGamma.value = brightnessGamma(settings.brightness);
         state.cap = settings.fxCap;
-        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution || even !== settings.evenPixels > 0.5 || pipeline.dpr !== (devicePixelRatio || 1)) {
-          [lowRes, scale, even] = [state.enabled.pixelate, settings.resolution, settings.evenPixels > 0.5];
+        if (lowRes !== state.enabled.pixelate || scale !== settings.resolution || pipeline.dpr !== (devicePixelRatio || 1)) {
+          [lowRes, scale] = [state.enabled.pixelate, settings.resolution];
           resize(); // (and when the window has moved to a screen of another pixel ratio, which need not fire a resize)
         }
         placeCamera(camera, game, alpha, still || extras.hidesHud ? 0 : hud.calm); // (round 80: the quiet walk draws the camera back a little)
@@ -371,7 +370,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         const feet = playerAt.y;
         const fallen = endingSanity(cinema.sceneId, cinema.time, game.mind.sanity); // an ending: the picture goes, and stays gone through the last fade
         const mind = fallen ?? game.mind.sanity;
-        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, descent: descentAt(playerAt.x, feet, playerAt.z), stress: Math.min(1 - mind / 100, settings.fxCap), setting: settings.fog, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
+        mist.update(camera, time, { region: game.overworld?.region ?? null, enclosed, ground: feet, descent: descentAt(playerAt.x, feet, playerAt.z), stress: Math.min(1 - mind / 100, settings.fxCap), setting: 1, wood: world ? woodOf(game.overworld?.region ?? null, camera.position.x, camera.position.z) : 0, court: world && !enclosed ? courtAt(camera.position.x, camera.position.z) : null, dark: look.dark });
         mistWakes.update(pipeline.post, camera.position, alpha);
         skyline.update(camera, time, game.overworld?.region ?? null, enclosed);
         const health = game.ecs.c.health.get(game.player.id);
@@ -389,8 +388,8 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         if (game.player.mount.active && views.flame) worldUniforms.uLanternPos.value.copy(views.flame);
         lights.update(camera.position, time, views.flame, { x: at.x, y: at.y + 1.25, z: at.z }, 1 - (1 - views.flameCover(camera.position)) * lantern); // (a flame gone dark has no halo)
         pipeline.reflection.enabled = !!world && (frames % 30 === 0 ? (waterNow = waterAbout(game.world.ground, camera.position.x, camera.position.z)) : waterNow); // mirrored only where the sea is about (round 35)
-        pipeline.lamps.enabled = !!world && settings.shadows > 0.5;
-        worldUniforms.uRelight.value = settings.relight > 0.5 ? 1 : 0; // the horrors' bodies lit over their folds (shaders/sprite.ts)
+        pipeline.lamps.enabled = !!world;
+        worldUniforms.uRelight.value = 1; // the horrors' bodies lit over their folds (shaders/sprite.ts)
         pipeline.lamps.update(lights.casters, 1 / 60); // which lamps cast this frame, before they are drawn (round 35)
         GORE_SETTING.on = settings.gore > 0.5; // round 113: the cut and the blood (Settings › Accessibility)
         creatures.update(alpha, time, camera);
@@ -425,7 +424,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         applyLens(camera, cinema.lensFov(lens.fovDeg), lens.skew);
         updateWorldUniforms(fx, time, cinema.active || free ? camera.position : nearLens(camera, game), views.glow ?? noGlow, pipeline.size);
         updatePostUniforms(pipeline.post, fx, time, pipeline.size);
-        if (!veil.covered) (pipeline.render(scene, camera, world && settings.shadows > 0.5 ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
+        if (!veil.covered) (pipeline.render(scene, camera, world ? at : null, !enclosed), photo.after()); // nothing shows under the veil: its frames go to the making
         if (!veil.covered) editor?.draw(pipeline.renderer, camera); // over the finished picture
         hud.update(camera);
         extras.update(pipeline.renderer.info.render.calls, pipeline.renderer.info.render.triangles);
