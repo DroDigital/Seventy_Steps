@@ -79,14 +79,18 @@ describe('the dungeon kit', () => {
     expect(steps('cavern', 'deeper')).toBe(700);
     expect(room(d, 'cavern').level - d.base).toBeCloseTo(-70 * SLUMBER_STEPS.riser);
     expect(room(d, 'deeper').level - room(d, 'cavern').level).toBeCloseTo(-700 * SLUMBER_STEPS.riser);
-    // Round 120 (asked: the descent was a gauntlet run at a sprint on potions): a few lone things in the mist, far apart, and no empty walk either.
+    // Round 120 (asked: the 44 foes made the descent a gauntlet run at a sprint on potions) left six; round 121 (asked: "way too few", 15 to 25):
+    // twenty, one or two on a flight (a narrow lane over the void) and three at most in a hall, with breathers between and none where one rests or arrives.
     const foes = d.rooms.flatMap((r) => r.def.spawns ?? []);
-    expect(foes.length).toBeGreaterThanOrEqual(4);
-    expect(foes.length).toBeLessThanOrEqual(8);
-    expect(d.rooms.every((r) => (r.def.spawns?.length ?? 0) <= 1)).toBe(true); // alone, each one
-    const stepAt = (id: string) => steps('threshold', id); // the steps taken before a room is entered
-    const met = d.rooms.filter((r) => r.def.spawns?.length).map((r) => stepAt(r.def.id));
-    met.slice(1).forEach((s, i) => expect(s - met[i], `between the foes before step ${s}`).toBeGreaterThanOrEqual(80));
+    expect(foes.length).toBeGreaterThanOrEqual(15);
+    expect(foes.length).toBeLessThanOrEqual(25);
+    for (const r of d.rooms) expect(r.def.spawns?.length ?? 0, r.def.id).toBeLessThanOrEqual(r.def.kind === 'hall' ? 3 : 2);
+    for (const id of ['threshold', 'cavern', 'deeper']) expect(room(d, id).def.spawns ?? [], id).toEqual([]);
+    let run = 0; // rooms in a row that hold foes: a quiet flight or landing always comes after two
+    for (const r of d.rooms) {
+      run = r.def.spawns?.length ? run + 1 : 0;
+      expect(run, `${r.def.id}: three rooms in a row hold foes`).toBeLessThanOrEqual(2);
+    }
     expect(d.errors).toEqual([]);
     expect(roomAt(d, worldLayout().dream!.x, worldLayout().dream!.z)?.def.id).toBe('threshold');
     const on = room(d, 'light_1');
