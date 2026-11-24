@@ -69,8 +69,6 @@ export const HIGH_RESOLUTIONS = [2.4] as const; // 960 × 540 (twice over on a 1
 /** The old 85% brightness is the new 100% baseline. */
 export const BRIGHTNESS_BASE = 0.85;
 export const brightnessGamma = (brightness: number): number => 1 / (BRIGHTNESS_BASE * brightness);
-/** The brightness card (ui/brightnessCalibration.ts): the sign's level and the strip's steps, as the picture's levels before its gamma. */
-export const CALIBRATION = { sign: 0.14, strip: [0.02, 0.04, 0.06, 0.08, 0.1, 0.12, 0.14, 0.16] } as const;
 
 /** The settings menu (Phase 6): [min, standard max, step, default]. */
 export const SETTINGS = {
@@ -97,6 +95,8 @@ export const SETTINGS = {
   questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
   controlTips: [0, 1, 1, 1], // 0: the first steps' controls are not written on the screen as each is first needed (round 102: ui/firstSteps.ts)
   quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
+  devRevealed: [0, 1, 1, 0], // 1: the developer options are shown in Settings › Play (revealed and hidden again by Ctrl+Alt+Shift+D: ui/devReveal.ts); never drawn as a slider
+  devConsole: [0, 1, 1, 0], // 1: < (or D-pad Right twice) opens the developer console (ui/developerConsole.ts); only while devRevealed
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
   // The sound's levels (round 61, asked with a picture of Settings › Sound: all five at 100%; round 60 had 0.5, 0.5, 1, 0.45 and 0.55, the best mix a
   // player had found, and before it the volume was 0.7 and the others 1)

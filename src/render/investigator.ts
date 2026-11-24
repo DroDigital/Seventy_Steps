@@ -69,6 +69,20 @@ export function investigator(): Figure {
       mesh.visible = true;
     }
   }
+  // Subtle coat-sleeve joint caps seal the elbow bend seams in close-up camera views without altering baked clips.
+  const cuff = (r: number, h: number, y: number, rgb: readonly [number, number, number]): THREE.BufferGeometry => {
+    const g = new THREE.CylinderGeometry(r * 0.96, r, h, 7);
+    g.translate(0, y, 0);
+    const n = g.getAttribute('position').count;
+    const c = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) [c[i * 3], c[i * 3 + 1], c[i * 3 + 2]] = rgb;
+    g.setAttribute('color', new THREE.BufferAttribute(c, 3));
+    return g;
+  };
+  const coatCol: readonly [number, number, number] = [0.18, 0.17, 0.16];
+  part(f, f.elbowL, cuff(0.068, 0.08, 0.01, coatCol), 'cloth', 0);
+  part(f, f.elbowR, cuff(0.068, 0.08, 0.01, coatCol), 'cloth', 0);
+  part(f, f.head, cuff(0.092, 0.075, 0.075, [0.12, 0.1, 0.09]), 'cloth', 0);
   f.arms.cane.visible = true;
   return f;
 }

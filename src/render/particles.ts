@@ -142,9 +142,15 @@ float bayer4(vec2 p) {
 }
 void main() {
   vec2 q = (vUv - 0.5) * 2.0;
-  float a = vColor.a * mask(q, int(vShape.x + 0.5), vShape.y) * softShare(vDepth); // (round 113: thinning out where it meets the ground or a wall)
-  if (a < bayer4(gl_FragCoord.xy)) discard;
-  gl_FragColor = vec4(mix(vColor.rgb * vLight, uFogColor, vFog * uFogAmount), 1.0);
+  int sh = int(vShape.x + 0.5);
+  float a = vColor.a * mask(q, sh, vShape.y) * softShare(vDepth); // (round 113: thinning out where it meets the ground or a wall)
+  if (a < 0.02) discard;
+  vec3 col = mix(vColor.rgb * vLight, uFogColor, vFog * uFogAmount);
+  // Keep crisp retro dithering on bright sparks/glyphs while softly blending dark smoke/dust/puffs so they never stamp black polka-dots onto the sky.
+  bool misty = sh == SH_DISC || sh == SH_WISP || sh == SH_PUFF || sh == SH_BUBBLE || sh == SH_MARK || sh == SH_TRACE;
+  float alpha = misty ? clamp(a * 0.88, 0.0, 1.0) : (a < bayer4(gl_FragCoord.xy) ? 0.0 : 1.0);
+  if (alpha < 0.02) discard;
+  gl_FragColor = vec4(col, alpha);
 }
 `;
 
@@ -184,7 +190,18 @@ export function createParticles(scene: THREE.Scene, ground?: (x: number, z: numb
   geo.setAttribute('aGlow', glows);
   geo.setAttribute('aShape', shapes);
   geo.setAttribute('aVel', vels);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() }, uMarks: { value: markAtlasTexture() }, uSoftDepth: { value: null }, uSoft: { value: 0 } }, vertexShader: VERT, fragmentShader: FRAG });
+  const material = new THREE.ShaderMaterial({
+    uniforms: { ...worldUniforms, uPuffs: { value: flameAtlasTexture() }, uMarks: { value: markAtlasTexture() }, uSoftDepth: { value: null }, uSoft: { value: 0 } },
+    vertexShader: VERT,
+    fragmentShader: FRAG,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.SrcAlphaFactor,
+    blendDst: THREE.OneMinusSrcAlphaFactor,
+    blendSrcAlpha: THREE.ZeroFactor,
+    blendDstAlpha: THREE.OneFactor,
+  });
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;

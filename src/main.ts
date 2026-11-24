@@ -113,11 +113,13 @@ import { takeCarry } from './systems/records';
 import { takeFlag, title } from './ui/titleFlow';
 import { createArenaScene } from './world/arenaScene';
 import { adapted, darkShare, gloomAt } from './world/gloom';
+import { signPlace } from './systems/checkpoints';
 import { roofedAt } from './world/terrain';
 import { refreshMountEntitlement } from './ui/mounts';
 import { startMountGallery } from './ui/mountGallery';
 import { createFreeCamera } from './ui/freeCamera';
 import { createDeveloperConsole } from './ui/developerConsole';
+import { devConsoleOn } from './ui/devReveal';
 import { createDeveloperCommands } from './systems/developerCommands';
 
 const INTERACT_GRACE_MS = 350; // after a talk or a menu closes, E is held back this long
@@ -162,6 +164,15 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (!opts.arena && takeRecovery()) setTimeout(() => game.events.emit('Notice', { text: t('n.recovered') }), 6000); // (systems/save.ts)
   if (saved?.cycle && (saved.balance ?? 0) < JOURNEY_BALANCE_VERSION) setTimeout(() => game.events.emit('Notice', { text: t('n.journeyBalance') }), 6500);
   if (opts.intro && !opts.arena) wakeKneeling(game); // the wake (render/cinema.ts) begins on one knee
+  else if (!opts.arena && !saved) {
+    const s = game.overworld && signPlace(game.overworld.sign);
+    const tr = game.ecs.c.transform.get(game.player.id);
+    if (s && tr) {
+      const yaw = Math.atan2(s.x - tr.pos.x, s.z - tr.pos.z);
+      tr.yaw = tr.prevYaw = yaw;
+      Object.assign(game.camera, { yaw, prevYaw: yaw });
+    }
+  }
   const capture = (): void => {
     noteLockAsked();
     try {
@@ -180,7 +191,11 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
     shell.music = undefined;
     if (opts.intro) director.wake(); // a new game: the investigator wakes in the dream (round 20)
   };
-  const journeys = createJourneys(game, veil, () => pipeline.warm(scene, camera).then(nextFrame)); // before the veil lifts, once the GPU has caught up
+  const journeys = createJourneys(game, veil, () => {
+    const p = game.ecs.c.transform.get(game.player.id)!.pos;
+    world?.ensureNear(p.x, p.z);
+    return pipeline.warm(scene, camera).then(nextFrame);
+  }); // before the veil lifts, once near chunks stand and the GPU has caught up
   const intro: Intro | null = opts.intro ? showIntro(() => (capture(), journeys.arrive(reveal)), shell.engine) : null; // the world is made behind it
   if (!intro) journeys.arrive(reveal); // names where the investigator wakes while the world is made
   await made(0.1);
@@ -268,6 +283,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const developerConsole = createDeveloperConsole({
     commands: developerCommands.commands,
     execute: developerCommands.execute,
+    enabled: () => devConsoleOn(settings), // hidden until Ctrl+Alt+Shift+D reveals it in Settings › Play and it is turned on (ui/devReveal.ts)
     available: () => !building && !menuOpen() && !cinema.active && !journeys.busy && !veil.active && !game.player.falling && !game.player.fogPass && !game.player.gatePass,
     onOpen: () => input.reset(),
   });

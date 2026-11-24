@@ -14,18 +14,18 @@ import { createWorldMaterial, updateWorldUniforms, worldUniforms } from '../rend
 
 const clamp = (v: number, a: number, b: number): number => Math.min(b, Math.max(a, v));
 const STYLE = `
- .mount-exhibit{position:fixed;inset:0;z-index:30;color:#e4ddd1;font:13px/1.5 'IM Fell English',Georgia,serif;pointer-events:none;background:linear-gradient(180deg,#07080ca8,transparent 20%,transparent 60%,#07080cdd)}
- .mount-exhibit *{box-sizing:border-box}.mount-exhibit header{position:absolute;top:28px;left:36px;right:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+ .mount-exhibit{position:fixed;inset:0;z-index:30;color:#e4ddd1;font:13px/1.5 'IM Fell English',Georgia,serif;pointer-events:none;background:linear-gradient(180deg,#07080cb0,transparent 18%,transparent 68%,#07080ce8)}
+ .mount-exhibit *{box-sizing:border-box}.mount-exhibit header{position:absolute;top:24px;left:36px;right:36px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
  .mount-exhibit .eyebrow{font:10px/1.5 monospace;letter-spacing:.22em;text-transform:uppercase;color:#b3a590}.mount-exhibit .brand{margin:3px 0 0;font-size:21px;letter-spacing:.12em;font-weight:normal}
  .mount-exhibit a{color:#bbb4a9;pointer-events:auto;text-decoration:none;border-bottom:1px solid #777064;padding:3px 0;font:11px/1.5 monospace}
- .mount-exhibit .plate{position:absolute;left:36px;right:36px;bottom:26px;max-width:1120px;margin:auto;display:grid;grid-template-columns:minmax(250px,1fr) auto;gap:28px;align-items:end}
- .mount-exhibit h1{margin:6px 0 8px;font-size:clamp(23px,3.1vw,39px);font-weight:normal;line-height:1.1;letter-spacing:-.02em}.mount-exhibit p{margin:0;color:#aca69e;max-width:400px;font-size:13px}
- .mount-exhibit .spec{margin-top:14px;font:10px/1.6 monospace;letter-spacing:.06em;color:#8e8794}.mount-exhibit .controls{max-width:460px;pointer-events:auto;padding:15px 17px;background:#0c0d12d9;border:1px solid #39323e;box-shadow:0 8px 40px #0007}
- .mount-exhibit .row{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.mount-exhibit .row:first-child{margin-top:0}.mount-exhibit button{font:11px/1.4 monospace;color:#b8b0b4;cursor:pointer;border:1px solid #413a43;background:#141319;padding:8px 10px;min-height:33px}
+ .mount-exhibit .plate{position:absolute;left:36px;right:36px;bottom:18px;max-width:1180px;margin:auto;display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:24px;align-items:end}
+ .mount-exhibit h1{margin:4px 0 5px;font-size:clamp(22px,2.8vw,34px);font-weight:normal;line-height:1.08;letter-spacing:-.02em}.mount-exhibit p{margin:0;color:#aca69e;max-width:420px;font-size:12.5px;line-height:1.45}
+ .mount-exhibit .spec{margin-top:8px;font:10px/1.5 monospace;letter-spacing:.06em;color:#8e8794}.mount-exhibit .controls{max-width:500px;pointer-events:auto;padding:10px 13px;background:#0c0d12d6;border:1px solid #3f3845;box-shadow:0 8px 34px #0009;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+ .mount-exhibit .row{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.mount-exhibit .row:first-child{margin-top:0}.mount-exhibit button{font:11px/1.35 monospace;color:#bdb5b9;cursor:pointer;border:1px solid #413a43;background:#141319;padding:5px 9px;min-height:28px}
  .mount-exhibit button:hover{border-color:#b49cc3;color:#fff}.mount-exhibit button:focus-visible,.mount-exhibit a:focus-visible{outline:2px solid #d5b5ec;outline-offset:3px}.mount-exhibit button[aria-pressed=true]{border-color:#a48cbb;background:#31243b;color:#f2e5fa}
- .mount-exhibit .hint{margin-top:12px;color:#817986;font:9px/1.6 monospace}.mount-exhibit .status{position:absolute;top:103px;right:36px;color:#9c8ca5;font:10px/1.5 monospace;letter-spacing:.08em}
+ .mount-exhibit .hint{margin-top:7px;color:#817986;font:9px/1.5 monospace}.mount-exhibit .status{position:absolute;top:64px;right:36px;color:#a595ae;font:10px/1.5 monospace;letter-spacing:.08em}
  .mount-exhibit.is-hidden{background:none}.mount-exhibit.is-hidden>*{display:none}
- @media(max-width:720px){.mount-exhibit header{top:18px;left:20px;right:20px}.mount-exhibit .brand{font-size:16px}.mount-exhibit .plate{left:20px;right:20px;bottom:14px;gap:12px;grid-template-columns:1fr}.mount-exhibit .controls{max-width:none;padding:9px 10px}.mount-exhibit h1{font-size:25px;margin:4px 0}.mount-exhibit p,.mount-exhibit .spec{display:none}.mount-exhibit .row{margin-top:5px}.mount-exhibit button{padding:5px 8px;min-height:28px}.mount-exhibit .hint{margin-top:7px}.mount-exhibit .status{top:80px;right:20px;font-size:9px}}
+ @media(max-width:720px){.mount-exhibit header{top:16px;left:20px;right:20px}.mount-exhibit .brand{font-size:16px}.mount-exhibit .plate{left:20px;right:20px;bottom:12px;gap:10px;grid-template-columns:1fr}.mount-exhibit .controls{max-width:none;padding:8px 9px}.mount-exhibit h1{font-size:24px;margin:4px 0}.mount-exhibit p,.mount-exhibit .spec{display:none}.mount-exhibit .row{margin-top:5px}.mount-exhibit button{padding:5px 8px;min-height:26px}.mount-exhibit .hint{margin-top:6px}.mount-exhibit .status{top:56px;right:20px;font-size:9px}}
 `;
 
 export async function startMountGallery(): Promise<void> {
@@ -34,7 +34,7 @@ export async function startMountGallery(): Promise<void> {
   canvas.setAttribute('aria-label', 'Rotatable animated mount exhibit. Drag to orbit, scroll to zoom.');
   canvas.style.touchAction = 'none';
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0.013, 0.014, 0.022);
+  scene.background = new THREE.Color(0.024, 0.026, 0.038);
   const camera = new THREE.PerspectiveCamera(42, RENDER.width / RENDER.height, 0.1, 90);
   const mounts: Record<MountId, MountVisual> = { grey: createMount('grey'), chariot: createMount('chariot'), automobile: createMount('automobile') };
   for (const m of Object.values(mounts)) scene.add(m.root);
@@ -44,36 +44,43 @@ export async function startMountGallery(): Promise<void> {
   const enabled = allEffectsOn();
   enabled.warp = enabled.displace = enabled.lens = enabled.dread = false;
   const fx = computeFx({ sanity: 100, cap: 0, anomalyProximity: 0.5, enabled });
-  fx.fogNear = 17; fx.fogFar = 40;
+  fx.fogNear = 19; fx.fogFar = 44;
   const u = worldUniforms;
   u.uLightDir.value.set(-0.55, 0.85, 0.4).normalize();
-  u.uLightColor.value.set(1.12, 1.06, 0.98);
-  u.uAmbient.value.set(0.56, 0.52, 0.65);
-  u.uFogColor.value.set(0.013, 0.014, 0.022);
+  u.uLightColor.value.set(1.16, 1.1, 1.02);
+  u.uAmbient.value.set(0.6, 0.56, 0.7);
+  u.uFogColor.value.set(0.024, 0.026, 0.038);
   u.uGlowPos.value.set(3, 1.6, 2); u.uGlowColor.value.set(0.24, 0.03, 0.42); u.uGlowRange.value = 11;
   u.uLamps.value[0].set(-4, 3, 2, 15); u.uLampColors.value[0].set(4, 2.7, 1.6);
   u.uLamps.value[1].set(4, 3, -3, 13); u.uLampColors.value[1].set(2.5, 0.3, 4);
+  u.uLamps.value[2].set(2.8, 3.8, -5.2, 16); u.uLampColors.value[2].set(1.6, 2.0, 3.1); // cool coach-house rim light to separate dark enamel and timber silhouettes
+  u.uLamps.value[3].set(-2.5, 1.6, -4.5, 12); u.uLampColors.value[3].set(1.2, 1.4, 2.1);
 
   const overlay = document.createElement('section');
   overlay.className = 'mount-exhibit'; overlay.setAttribute('aria-label', 'Mount exhibit controls');
   const style = document.createElement('style'); style.textContent = STYLE; overlay.append(style);
   overlay.insertAdjacentHTML('beforeend', `<header><div><div class="eyebrow">Seventy Steps · The coach house</div><h2 class="brand">A SWIFTER PASSAGE</h2></div><a href="${location.pathname}">Return to title ↗</a></header>
-    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · Chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom<br>1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
+    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · Chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom · 1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
   document.body.append(overlay);
   const heading = overlay.querySelector('h1')!;
   const description = overlay.querySelector('p')!;
   const chapter = overlay.querySelector('.plate .eyebrow')!;
   const status = overlay.querySelector('.status')!;
   const buttons: HTMLButtonElement[] = [];
+  const gaitButtons: HTMLButtonElement[] = [];
   let id: MountId = 'grey', gait = 2, paused = false, auto = true, detailed = false;
   let yaw = -0.92, pitch = 0.22, radius = 11, distance = 11, time = 0, speed = 0;
   let dragging = false, lastX = 0, lastY = 0, hidden = false;
-  const target = new THREE.Vector3(0, 1.2, 1.3), aim = target.clone();
+  const target = new THREE.Vector3(0, 0.85, 1.3), aim = target.clone();
   const rates = [0, MOUNT_TRAVERSAL.cruise, MOUNT_TRAVERSAL.gallop];
   const refresh = (): void => {
     const data = MOUNTS[id]; heading.textContent = data.name; description.textContent = data.description;
     chapter.textContent = id === 'grey' ? 'I · Chariot' : id === 'chariot' ? 'II · The spectral procession' : 'III · A machine out of time';
-    status.textContent = `${['AT REST', 'TRAVELLING', 'GALLOPING'][gait]}${paused ? ' · PAUSED' : ''} · VISUAL EXHIBIT`;
+    const car = id === 'automobile';
+    const states = car ? ['IDLING', 'CRUISING', 'DRIVING'] : ['AT REST', 'TRAVELLING', 'GALLOPING'];
+    const labels = car ? ['Idle', 'Cruise', 'Drive'] : ['Rest', 'Walk', 'Gallop'];
+    gaitButtons.forEach((b, i) => (b.textContent = labels[i]));
+    status.textContent = `${states[gait]}${paused ? ' · PAUSED' : ''} · VISUAL EXHIBIT`;
     for (const b of buttons) b.setAttribute('aria-pressed', String(b.dataset.mount ? b.dataset.mount === id : b.dataset.gait ? Number(b.dataset.gait) === gait : b.dataset.action === 'pause' ? paused : b.dataset.action === 'orbit' ? auto : b.dataset.action === 'resolution' ? detailed : false));
   };
   const button = (row: string, text: string, action: () => void, data: Record<string, string> = {}): HTMLButtonElement => {
@@ -83,15 +90,15 @@ export async function startMountGallery(): Promise<void> {
   };
   const frame = (): void => {
     const bounds = new THREE.Box3().setFromObject(mounts[id].root), size = bounds.getSize(new THREE.Vector3());
-    bounds.getCenter(target); target.y = Math.max(1, size.y * 0.48); aim.copy(target);
-    distance = Math.max(size.z, size.x * 1.1, size.y * 1.5) * 1.65; radius = distance;
+    bounds.getCenter(target); target.y = Math.max(0.38, size.y * 0.22); aim.copy(target); // look slightly lower so the full mount sits cleanly above the bottom dock
+    distance = Math.max(size.z, size.x * 1.15, size.y * 1.55) * 1.82; radius = distance;
   };
   const choose = (next: MountId): void => {
     mounts[id].root.visible = false; id = next; mounts[id].root.visible = true; frame(); refresh();
   };
   const labels: Record<MountId, string> = { grey: '1 · Chariot', chariot: '2 · Spectral chariot', automobile: '3 · Brassbound motor car' };
   for (const mount of MOUNT_IDS) button('mount', labels[mount], () => choose(mount), { mount });
-  ['Rest', 'Walk', 'Gallop'].forEach((label, i) => button('gait', label, () => { gait = i; }, { gait: String(i) }));
+  ['Rest', 'Walk', 'Gallop'].forEach((label, i) => gaitButtons.push(button('gait', label, () => { gait = i; }, { gait: String(i) })));
   const pauseButton = button('gait', 'Pause', () => { paused = !paused; }, { action: 'pause' });
   button('view', 'Orbit', () => { auto = !auto; }, { action: 'orbit' });
   button('view', 'Profile', () => { yaw = -Math.PI / 2; pitch = 0.12; auto = false; radius = distance; });

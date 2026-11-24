@@ -14,7 +14,6 @@ import { makeAhead } from './loading';
 import { desktop } from './desktop';
 import type { Shell } from './shell';
 import { showTitle } from './titleScreen';
-import { isCalibrated, markCalibrated } from './settings';
 
 /** Shows the title; `start` makes the world once a choice is made (fresh: a new game, with its opening). */
 export function title(shell: Shell, start: (fresh: boolean, difficulty?: DifficultyId) => void): void {
@@ -32,8 +31,6 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
     useSlot: (slot) => useSlot(shell.store, slot),
     settings: shell.settings,
     change: shell.change,
-    calibrate: !isCalibrated(shell.store),
-    calibrated: () => markCalibrated(shell.store),
     saveKeys: shell.saveKeys,
     // The desktop menu needs no audio gesture, including when a missing track or a device prevents playback.
     byItself: desktop ? Promise.resolve() : new Promise((resolve) => {

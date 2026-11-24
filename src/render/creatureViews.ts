@@ -101,18 +101,22 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
   const sizes = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSize(entity, art!.manifest)]));
   const spans = new Map(Object.entries(art?.manifest.entities ?? {}).map(([key, entity]) => [key, reviewedSpan(entity, art!.manifest)]));
   /** One billboard of a reviewed form, `fade` of its opacity, in the batch of its frame's page: that frame, or null when the page is full. */
-  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number; cut?: Cut }, say = 0, fire = 0, outside = false, piece?: { x: number; y: number; z: number }) => {
+  const put = (key: string, clip: DirectionalClip<number>, pose: Look, x: number, y: number, z: number, flash: number, fade: number, weird: number, dress?: { id: Entity; gone: Gone; time: number; cut?: Cut }, say = 0, fire = 0, outside = false, piece?: { x: number; y: number; z: number }, amorphous = false, boost?: readonly [number, number]) => {
     const frame = art!.manifest.frames[clip.frames[pose.frame]];
     const page = art!.manifest.pages[frame.page];
     const b = pages[frame.page];
     const index = counts[frame.page];
     if (index >= CAPACITY) return null;
     b.cells.setXYZW(index, frame.x / page.width, frame.y / page.height, (frame.x + frame.width) / page.width, (frame.y + frame.height) / page.height);
-    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, (outside ? 1 : 0) + 2 * relitOf(key)); // (a horror's form, relit by the setting, rides with the outside mark: round 113)
+    const eldritchBit = key.endsWith('#eldritch') ? 4 : 0;
+    const amorphousBit = amorphous ? 8 : 0;
+    b.info.setXYZW(index, flash, pose.opacity * fade, clip.mirror_horizontal ? 1 : 0, (outside ? 1 : 0) + 2 * relitOf(key) + eldritchBit + amorphousBit); // (a horror's form, relit by the setting, rides with the outside mark: round 113)
     b.weird.setX(index, weird); // accepted anatomy, texture and palette stay intact through the cycle; only what was never there slips and glitches
     const size = sizes.get(key)!;
+    const imposingW = boost?.[0] ?? 1;
+    const imposingH = boost?.[1] ?? 1;
     if (piece) b.mesh.setMatrixAt(index, m4.compose(at.set(piece.x, piece.y - 0.5 * size.height * GORE_FX.pad, piece.z), q, scale.set(size.width * GORE_FX.pad, size.height * GORE_FX.pad, 1))); // a severed piece: a larger billboard about its middle (round 113)
-    else b.mesh.setMatrixAt(index, m4.compose(at.set(x + (pose.drift?.x ?? 0) * size.width, y - size.groundOffset + ((pose.lift ?? 0) - pose.sink * 0.3) * size.height, z + (pose.drift?.z ?? 0) * size.width), q, scale.set(size.width * (1 + 0.4 * say) * (pose.sx ?? 1), size.height * (1 + say) * (pose.sy ?? 1), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height; its own death moves the whole of it, data/bossDeaths.ts)
+    else b.mesh.setMatrixAt(index, m4.compose(at.set(x + (pose.drift?.x ?? 0) * size.width * imposingW, y - size.groundOffset * imposingH + ((pose.lift ?? 0) - pose.sink * 0.3) * size.height * imposingH, z + (pose.drift?.z ?? 0) * size.width * imposingW), q, scale.set(size.width * imposingW * (1 + 0.4 * say) * (pose.sx ?? 1), size.height * imposingH * (1 + say) * (pose.sy ?? 1), 1))); // (a horror's voice swells its picture, its feet kept where they are: `say` is a share of its height; its own death moves the whole of it, data/bossDeaths.ts)
     fx.dress(b, index, dress, x, at.y, z, size.width, size.height, flat, dress?.time ?? 0);
     b.ground.setXYZW(index, piece ? 0 : standing[0], piece ? 0 : standing[1], standing[2], standing[3]);
     const glint = REVIEWED_GLINTS[key];
@@ -220,11 +224,13 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
           const turn = turning.get(id);
           const k = turn ? (time - turn.at) / BODY_LIGHT.turn : 1;
           if (turn && k >= 1) turning.delete(id);
-          const frame = put(key, clip, pose, x, y, z, flash, Math.min(1, Math.max(0.001, k)), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside);
+          const amorphous = !!def.sprite?.amorphous;
+          const boost = def.assembly?.visualBoost;
+          const frame = put(key, clip, pose, x, y, z, flash, Math.min(1, Math.max(0.001, k)), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, voice * BOSS_PRESENCE.glints + deep * BOSS_PRESENCE.deepGlints, !!def.sprite?.outside, undefined, amorphous, boost);
           if (!frame) continue;
           const bodyIndex = counts[frame.page] - 1;
           const old = turn && k < 1 ? resolveDirectionalClip(clips.get(key)!, turn.from, look.state) : undefined;
-          if (old) put(key, old, lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: old.frames.length }, bow?.age, bow?.rise, arrival, walked)!, x, y, z, flash, -Math.max(0.001, k), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, 0, !!def.sprite?.outside); // the view it turns from, going out in the pixels the new one has not yet taken (round 113)
+          if (old) put(key, old, lookOf(g, id, beat, { ...stoops.known(bow), [look.state]: old.frames.length }, bow?.age, bow?.rise, arrival, walked)!, x, y, z, flash, -Math.max(0.001, k), weird, { id, gone, time, cut }, voice * BOSS_PRESENCE.breathe, 0, !!def.sprite?.outside, undefined, amorphous, boost); // the view it turns from, going out in the pixels the new one has not yet taken (round 113)
           if (dying?.plan && dying.piece) put(key, clip, pose, x, y, z, 0, 1, 0, { id, gone, time, cut: { plan: dying.plan, side: -1, turn: dying.piece.turn, blood: dying.bloodIndex } }, 0, 0, false, dying.piece); // the piece the blade took
           roofSeen.add(id);
           debug.push({ id, key, direction, state: pose.state, frame: pose.frame, source: frame.source, mirror: clip.mirror_horizontal, page: frame.page, width: frame.width, height: frame.height });
@@ -241,7 +247,7 @@ export function createCreatureViews(scene: THREE.Scene, g: Game, atlas: SpriteAt
               const lagged = late && resolveDirectionalClip(clips.get(key)!, direction, late.state);
               if (!late || !lagged) return;
               const d = echoDrift(i, time, def.assembly!.scale);
-              put(key, lagged, lookOf(g, id, beat - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, echoOpacity(e.ghost, gone.amount), 0); // (they go with the body, and come in with it)
+              put(key, lagged, lookOf(g, id, beat - e.lag, { ...behind, [late.state]: lagged.frames.length }, age, bow?.rise, arrival)!, x + d.x, y, z + d.z, 0, echoOpacity(e.ghost, gone.amount), 0, undefined, 0, 0, false, undefined, amorphous, boost); // (they go with the body, and come in with it)
             });
           }
           continue;

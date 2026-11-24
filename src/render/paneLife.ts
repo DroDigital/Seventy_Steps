@@ -69,4 +69,12 @@ float paneFigure(float s, float t, vec2 uv) {
   float seen = smoothstep(0.0, 0.14, k) * (1.0 - smoothstep(0.86, 1.0, k));
   return 1.0 - 0.8 * max(head, body) * seen;
 }
+// 1928 multi-pane sash mullions and warm inner-glass vignette so lit windows read as architectural glass rather than flat yellow cutouts.
+float paneFrame(vec2 uv) {
+  float border = smoothstep(0.0, 0.09, uv.x) * smoothstep(0.0, 0.09, 1.0 - uv.x) * smoothstep(0.0, 0.08, uv.y) * smoothstep(0.0, 0.08, 1.0 - uv.y);
+  float vBar = 1.0 - 0.72 * (1.0 - smoothstep(0.025, 0.065, abs(uv.x - 0.5)));
+  float hBar = 1.0 - 0.78 * (1.0 - smoothstep(0.025, 0.065, abs(uv.y - 0.52)));
+  float warm = 0.76 + 0.24 * (1.0 - length((uv - vec2(0.5, 0.48)) * vec2(1.1, 0.9)));
+  return (0.28 + 0.72 * border) * vBar * hBar * warm;
+}
 `;

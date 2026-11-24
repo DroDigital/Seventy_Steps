@@ -18,7 +18,7 @@ export const GREATER = tier('greater', [
   },
   {
     id: 'shoggoth', name: 'Shoggoth', source: 'At the Mountains of Madness', regions: ['mountains'], canonLooks: true, voice: 'tekeli',
-    sprite: { silhouette: 'blob', palette: 'ichor', scale: 4.2, eyes: 12, glow: 'green' },
+    sprite: { silhouette: 'blob', palette: 'ichor', scale: 4.2, eyes: 12, glow: 'green', amorphous: true },
     behavior: { archetype: 'brute', attacks: ['tentacle_burst', 'grab', 'slam', 'aoe_ring'] },
     stats: st(900, 160, 36, 3.6, 2, 8), resist: ['slash', 'shot'], weak: ['fire'], drops: { echoes: 900 }, insightOnSight: 0,
     bossVariant: {

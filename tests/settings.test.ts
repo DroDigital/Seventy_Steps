@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { brightnessGamma, HIGH_RESOLUTIONS, RENDER, SETTINGS } from '../src/data/tuning';
-import { CALIBRATED_KEY, clampSetting, defaultSettings, isCalibrated, loadSettings, markCalibrated, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
+import { clampSetting, defaultSettings, loadSettings, parseSettings, SETTINGS_KEY, storeSettings } from '../src/ui/settings';
 
 function memoryStore() {
   const data = new Map<string, string>();
@@ -14,7 +14,7 @@ function memoryStore() {
 describe('settings', () => {
   it('defaults to full FX, sensitivity 1, 640 × 360 and every sound level full (round 61, asked: all five sliders at 100%)', () => {
     expect(defaultSettings()).toEqual({
-      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.6, brightness: 1, fog: 1, relight: 0, shadows: 1, evenPixels: 1, font: 0, uiScale: 1, shake: 1, rumble: 1, captions: 1, captionBack: 0, flashes: 1, gore: 1, cutscenes: 1, minimap: 0, questTracker: 1, quietWalk: 1, controlTips: 1, camera: 0, padSwap: 0,
+      fxCap: 1, sensitivity: 1, invertY: 0, resolution: 1.6, brightness: 1, fog: 1, relight: 0, shadows: 1, evenPixels: 1, font: 0, uiScale: 1, shake: 1, rumble: 1, captions: 1, captionBack: 0, flashes: 1, gore: 1, cutscenes: 1, minimap: 0, questTracker: 1, quietWalk: 1, controlTips: 1, camera: 0, padSwap: 0, devRevealed: 0, devConsole: 0,
       volume: 1, music: 1, sfx: 1, ambience: 1, speech: 1, language: 0,
     });
     expect([RENDER.width, RENDER.height].map((v) => Math.round(v * defaultSettings().resolution))).toEqual([640, 360]);
@@ -37,18 +37,6 @@ describe('settings', () => {
     const store = memoryStore();
     storeSettings(store, { ...defaultSettings(), brightness: 1.5 });
     expect(loadSettings(store).brightness).toBe(1.5);
-  });
-
-  it('shows the brightness card once: kept in the store, and never on a launch with no store to keep it in', () => {
-    const store = memoryStore();
-    expect(isCalibrated(store)).toBe(false);
-    markCalibrated(store);
-    expect(isCalibrated(store)).toBe(true);
-    expect(store.getItem(CALIBRATED_KEY)).not.toBeNull();
-    expect(isCalibrated(null)).toBe(true);
-    const refusing = { getItem: () => { throw new Error('denied'); }, setItem: () => { throw new Error('full'); } };
-    expect(isCalibrated(refusing)).toBe(true);
-    expect(() => markCalibrated(refusing)).not.toThrow();
   });
 
   it('clamps into range and snaps to the step', () => {

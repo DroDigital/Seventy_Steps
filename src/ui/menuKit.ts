@@ -62,6 +62,8 @@ let started = false;
 
 export const menuOpen = (): boolean => stack.length > 0;
 const clearWatchers: (() => void)[] = [];
+/** Draws the open menu again (a setting revealed behind it: ui/devReveal.ts). */
+export const redrawMenu = (): void => stack.at(-1)?.redraw();
 /** Once every menu has closed (and none opened in its place): the game is played again (round 39: the mouse is taken back). */
 export const onMenusClear = (fn: () => void): void => void clearWatchers.push(fn);
 export const onPadStart = (fn: () => void): void => void padStart.push(fn);
@@ -157,6 +159,7 @@ function back(top: Entry): void {
 function nudge(by: 1 | -1, page?: Page): void {
   const el = document.activeElement;
   if (el instanceof HTMLElement && el.classList.contains('tab')) return void page?.tab?.(by); // on the tab row, sideways changes the tab
+  if (el instanceof HTMLButtonElement && el.dataset.toggle !== undefined) return void el.click();
   if (!(el instanceof HTMLInputElement) || el.type !== 'range') return;
   if (by > 0) el.stepUp();
   else el.stepDown();
@@ -184,6 +187,9 @@ function onKey(e: KeyboardEvent): void {
     if (top.page.tab && on instanceof HTMLElement && on.classList.contains('tab')) {
       e.preventDefault();
       top.page.tab(e.code === 'ArrowLeft' ? -1 : 1);
+    } else if (!e.repeat && on instanceof HTMLButtonElement && on.dataset.toggle !== undefined) {
+      e.preventDefault();
+      on.click();
     }
   } else if (e.code === 'ArrowDown' || e.code === 'ArrowUp' || e.code === 'Tab') {
     e.preventDefault();
@@ -252,7 +258,8 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   panelCss ??= `left:50%;top:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:min(594px,92vw);max-height:${skin ? (skin.maxVh ?? 95) : 90}vh;overflow:auto;${skin ? `padding:${skin.pad}` : frame()}`;
   startOnce();
   const root = document.createElement('div');
-  root.style.cssText = `position:fixed;inset:0;display:none;z-index:${z};background:${backdrop};font:14px/1.45 ${SERIF};color:${INK}`;
+  const blur = backdrop !== '#000' && backdrop !== 'transparent' && !keepLock ? ';backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)' : '';
+  root.style.cssText = `position:fixed;inset:0;display:none;z-index:${z};background:${backdrop}${blur};font:14px/1.45 ${SERIF};color:${INK}`;
   const layer = document.createElement('div'); // the panel's world, scaled with the UI (its vw and vh become shares of it)
   layer.style.cssText = scaled ? SCALED_LAYER : 'position:absolute;inset:0';
   const panel = document.createElement('div');
@@ -265,6 +272,12 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   let entry: Entry | null = null;
   const memory = new Map<Page, number>(); // where the focus was on each page left while the screen stays open
   const focused = (): number => items(panel).indexOf(document.activeElement as HTMLElement);
+  // Keep mouse hover and keyboard focus unified on non-tab buttons so two items never light up at once.
+  panel.addEventListener('pointerover', (e) => {
+    const hit = (e.target as HTMLElement).closest?.<HTMLElement>('button:not(:disabled), input[type=range]');
+    if (!hit || hit.classList.contains('tab') || document.activeElement === hit) return;
+    if (panel.contains(hit)) hit.focus({ preventScroll: true });
+  });
   // A choice that rebuilds the page keeps the focus where it was.
   panel.addEventListener('click', (e) => {
     const hit = (e.target as HTMLElement).closest?.('button, input');
@@ -346,4 +359,4 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   return self;
 }
 
-export { ACCENT, button, el, footer, frame, heading, option, slider, tabs, title } from './menuParts';
+export { ACCENT, actionButton, button, el, footer, frame, heading, option, slider, tabs, title, toggle } from './menuParts';
