@@ -192,4 +192,18 @@ describe('the markers on the full map (round 68)', () => {
     clearMarkers(g);
     expect(gatherMarks(g, view, hubRealm(g), true, 7, 1).marks.some((m) => m.kind === 'marker')).toBe(false);
   });
+  it("are drawn and picked in the realm on show when it is not the investigator's, with no distance across realms", () => {
+    const g = createWorldGame();
+    const other = allRealms().find((r) => r !== hubRealm(g) && r[0].id !== hubRealm(g)[0].id)!;
+    const rc = regionRect(other[0]);
+    const far = { x: (rc.x0 + rc.x1) / 2, z: (rc.z0 + rc.z1) / 2 };
+    addMarker(g, far);
+    addMarker(g, { x: pos(g).x + 30, z: pos(g).z });
+    const view: MapView = { cx: far.x, cz: far.z, scale: 4, w: 1280, h: 720 };
+    const pins = gatherMarks(g, view, other, true, 7, 1).marks.filter((m) => m.kind === 'marker');
+    expect(pins.map((m) => m.at)).toEqual([g.overworld!.markers[0]]); // that realm's alone
+    expect(pins[0]!.name).toBe('');
+    expect(markAt(pins, pins[0]!.x, pins[0]!.y)?.at).toBe(g.overworld!.markers[0]); // so a click on it removes it
+  });
 });
+
