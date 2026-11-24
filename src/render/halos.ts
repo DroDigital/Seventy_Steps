@@ -40,7 +40,8 @@ void main() {
   float r = length(vQ);
   if (r >= 1.0) discard;
   float a = 1.0 - r;
-  gl_FragColor = vec4(vCol * a * a, 1.0);
+  float glow = pow(a, 2.5) * 0.85 + pow(a, 6.0) * 0.35;
+  gl_FragColor = vec4(vCol * glow, 1.0);
 }
 `;
 
@@ -69,7 +70,12 @@ export function createHalos(capacity: number, fog: number): Halos {
     uniforms: { uFogNear: worldUniforms.uFogNear, uFogFar: worldUniforms.uFogFar, uHaloFog: { value: fog } },
     vertexShader: HALO_VERT,
     fragmentShader: HALO_FRAG,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.CustomBlending,
+    blendEquation: THREE.AddEquation,
+    blendSrc: THREE.OneFactor,
+    blendDst: THREE.OneFactor,
+    blendSrcAlpha: THREE.ZeroFactor,
+    blendDstAlpha: THREE.OneFactor,
     transparent: true,
     depthWrite: false,
   });

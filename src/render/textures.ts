@@ -38,14 +38,15 @@ const rock: TexelFn = (u, v, seed) => {
   return c;
 };
 
-/** Wet flesh: pale meat, dark branching veins, glossy glints. */
+/** Wet flesh: pale meat, dark branching veins, soft glossy sheen without harsh blotches. */
 const flesh: TexelFn = (u, v, seed) => {
   const vein = 1 - Math.abs(2 * fbm(u * 8, v * 8, seed, 4, 8) - 1);
   const meat = fbm(u * 16, v * 16, seed + 3, 3, 16);
-  const gloss = fbm(u * 32, v * 32, seed + 9, 2, 32);
-  let c = mixRgb(BASE.rust, BASE.bone, 0.35 + 0.35 * meat);
-  if (vein > 0.86) c = scaleRgb(BASE.rust, 0.45);
-  if (gloss > 0.72) c = mixRgb(c, BASE.bone, 0.6);
+  const gloss = fbm(u * 24, v * 24, seed + 9, 3, 24);
+  let c = mixRgb(BASE.rust, BASE.bone, 0.24 + 0.28 * meat);
+  if (vein > 0.84) c = mixRgb(c, scaleRgb(BASE.rust, 0.48), Math.min(1, (vein - 0.84) * 5));
+  const sheen = Math.max(0, Math.min(1, (gloss - 0.62) * 2.6));
+  if (sheen > 0) c = mixRgb(c, BASE.bone, sheen * sheen * 0.28);
   return c;
 };
 
@@ -63,12 +64,16 @@ const hide: TexelFn = (u, v, seed) => {
   return [k * 0.99, k * 0.96, k * 0.92];
 };
 
-/** Dark still water: wavy ripples with pale crests. */
+/** Dark still water: cross-rippled surface with gentle crests (no stretched parallel bands). */
 const water: TexelFn = (u, v, seed) => {
-  const warp = fbm(u * 8, v * 8, seed, 3, 8);
-  const wave = 0.5 + 0.5 * Math.sin((v * 10 + warp * 1.2) * Math.PI * 2);
-  let c = mixRgb(scaleRgb(BASE.seaGrey, 0.3), BASE.seaGrey, 0.2 + 0.5 * wave * warp);
-  if (wave > 0.93) c = mixRgb(c, BASE.bone, 0.3);
+  const warp = fbm(u * 6, v * 6, seed, 3, 6);
+  const cross = fbm(u * 10, v * 10, seed + 5, 3, 10);
+  const w1 = 0.5 + 0.5 * Math.sin((v * 7 + u * 2 + warp * 1.8) * Math.PI * 2);
+  const w2 = 0.5 + 0.5 * Math.sin((u * 6 - v * 3 + cross * 1.6) * Math.PI * 2);
+  const wave = 0.6 * w1 + 0.4 * w2;
+  let c = mixRgb(scaleRgb(BASE.seaGrey, 0.32), BASE.seaGrey, 0.18 + 0.42 * wave * (0.55 + 0.45 * warp));
+  const crest = Math.max(0, (wave - 0.86) * 5);
+  if (crest > 0) c = mixRgb(c, BASE.bone, Math.min(0.22, crest * 0.22));
   return c;
 };
 

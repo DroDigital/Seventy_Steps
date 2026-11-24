@@ -173,6 +173,7 @@ export interface SpriteRecipe {
   glow?: Glow; // eyes and markings glow in this anomaly colour
   gear?: readonly Gear[]; // what they wear or carry (the upright, hunched and robed bodies only)
   outside?: boolean; // drawn in a hue outside the palette (the Colour Out of Space)
+  amorphous?: boolean; // writhing protoplasmic surface warp and organic blinking eye clusters
   body?: readonly [height: number, radius: number]; // the capsule struck and stood off, as fractions of `scale`, where the art's body is not its silhouette's (systems/creatures.ts)
   seed?: number;
 }
@@ -185,6 +186,7 @@ export interface AssemblyRecipe {
   tentacles?: number;
   wings?: number;
   eyes?: number;
+  visualBoost?: readonly [w: number, h: number]; // optional reviewed-billboard silhouette scale multiplier
   spheres?: number;
   /** A body of spheres as the reviewed art paints it: each sphere's place and size as a fraction of `scale` (across from the picture's centre, up from its foot, radius), what is struck (data/assemblyShape.ts). */
   hit?: readonly (readonly [across: number, up: number, radius: number])[];

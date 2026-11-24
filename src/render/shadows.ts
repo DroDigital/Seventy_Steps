@@ -36,16 +36,12 @@ const FRAG = /* glsl */ `
 varying vec2 vP;
 varying float vAlpha;
 varying float vFog;
-float bayer4(vec2 p) {
-  const float m[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
-  ivec2 q = ivec2(mod(p, 4.0));
-  return (m[q.x + q.y * 4] + 0.5) / 16.0;
-}
 void main() {
   float r = length(vP);
-  float a = vAlpha * (1.0 - smoothstep(0.35, 1.0, r)) * (1.0 - vFog);
-  if (a < bayer4(gl_FragCoord.xy)) discard;
-  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  float edge = 1.0 - smoothstep(0.22, 1.0, r);
+  float a = vAlpha * edge * edge * (1.0 - vFog) * 0.72;
+  if (a < 0.01) discard;
+  gl_FragColor = vec4(0.0, 0.0, 0.0, a);
 }
 `;
 
@@ -58,7 +54,21 @@ export function createShadows(scene: THREE.Scene, g: Game, painted: ReadonlyMap<
   const geo = new THREE.PlaneGeometry(2, 2).rotateX(-Math.PI / 2);
   const alphas = new THREE.InstancedBufferAttribute(new Float32Array(CAPACITY), 1).setUsage(THREE.DynamicDrawUsage);
   geo.setAttribute('aAlpha', alphas);
-  const material = new THREE.ShaderMaterial({ uniforms: { ...worldUniforms }, vertexShader: VERT, fragmentShader: FRAG, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+  const material = new THREE.ShaderMaterial({
+    uniforms: { ...worldUniforms },
+    vertexShader: VERT,
+    fragmentShader: FRAG,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.CustomBlending,
+    blendSrc: THREE.SrcAlphaFactor,
+    blendDst: THREE.OneMinusSrcAlphaFactor,
+    blendSrcAlpha: THREE.ZeroFactor,
+    blendDstAlpha: THREE.OneFactor,
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+  });
   const batch = new THREE.InstancedMesh(geo, material, CAPACITY);
   batch.frustumCulled = false;
   batch.count = 0;

@@ -14,7 +14,7 @@ import { currentLead } from '../systems/lead';
 import { markersHere } from '../systems/marker';
 import { realmOf } from '../world/mapData';
 import { regionAt } from '../world/worldMap';
-import { BONE, el, setText } from './hudKit';
+import { BONE, el, GOLD, setText } from './hudKit';
 import { HOUR_LABEL } from './hourCards';
 import { drawBeacon } from './leadMark';
 import { workArt } from './mapArt';
@@ -30,14 +30,48 @@ export interface Minimap {
 /** How far the minimap's picture is turned: the camera's yaw, or 0 when north is kept up. The quest tracker's pointer turns with it. */
 export const minimapYaw = (g: Game, northUp: boolean): number => (northUp ? 0 : g.camera.yaw);
 
+/** Subtle antique brass dial ticks and inner ring etched inside the circular minimap bezel. */
+function drawDial(ctx: CanvasRenderingContext2D, yaw: number): void {
+  const half = SIZE / 2;
+  ctx.save();
+  // Soft inner vignette so the circular frame seats cleanly over dark or snowy scenes
+  const vig = ctx.createRadialGradient(half, half, half * 0.62, half, half, half);
+  vig.addColorStop(0, 'rgba(0,0,0,0)');
+  vig.addColorStop(1, 'rgba(4,4,6,0.52)');
+  ctx.fillStyle = vig;
+  ctx.beginPath();
+  ctx.arc(half, half, half, 0, Math.PI * 2);
+  ctx.fill();
+  // Inner brass hairline + 12 engraved compass ticks turning with the map
+  ctx.translate(half, half);
+  ctx.rotate(yaw);
+  ctx.strokeStyle = 'rgba(168,147,95,0.28)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(0, 0, half - 3.5, 0, Math.PI * 2);
+  ctx.stroke();
+  for (let i = 0; i < 12; i++) {
+    const a = (i * Math.PI) / 6;
+    const major = i % 3 === 0;
+    const r0 = half - (major ? 8 : 5.5);
+    const r1 = half - 2;
+    ctx.strokeStyle = major ? 'rgba(217,208,184,0.48)' : 'rgba(168,147,95,0.28)';
+    ctx.beginPath();
+    ctx.moveTo(Math.sin(a) * r0, -Math.cos(a) * r0);
+    ctx.lineTo(Math.sin(a) * r1, -Math.cos(a) * r1);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 /** `northUp`: whether Settings › Play › Minimap keeps north at the top. */
 export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter, northUp: () => boolean = () => false): Minimap {
   const frame = el(`position:absolute;right:16px;top:16px;width:${SIZE}px;height:${SIZE}px`, '', root);
   const canvas = document.createElement('canvas');
   [canvas.width, canvas.height] = [SIZE, SIZE];
-  canvas.style.cssText = `width:100%;height:100%;border-radius:50%;border:1px solid ${BONE}66;box-shadow:0 0 0 2px #000c;opacity:.92`;
+  canvas.style.cssText = `width:100%;height:100%;border-radius:50%;border:1px solid ${GOLD}99;box-shadow:0 0 0 2px #000d,0 2px 10px #000a;opacity:.94`;
   frame.append(canvas);
-  const north = el(`position:absolute;left:50%;top:0;transform:translate(-50%,-50%);font-size:10px;text-shadow:0 0 3px #000,0 0 3px #000`, 'N', frame);
+  const north = el(`position:absolute;left:50%;top:0;transform:translate(-50%,-50%);font-size:10px;color:${GOLD};text-shadow:0 0 3px #000,0 0 4px #000`, 'N', frame);
   // The night's clock (round 35), small and under the map: a hair line the night runs along, a moon on it where the night is, and the hour's name.
   const clock = el(`position:absolute;left:14px;right:14px;bottom:-34px;height:12px`, '', frame);
   el(`position:absolute;left:0;right:0;top:5px;height:1px;background:linear-gradient(90deg,${BONE}55,${BONE}33 70%,#9a9aa866)`, '', clock);
@@ -67,6 +101,7 @@ export function createMinimap(g: Game, root: HTMLElement, painter: MapPainter, n
       ctx.translate(-SIZE / 2, -SIZE / 2);
       painter.paint(ctx, view, realmOf(region), false);
       ctx.restore();
+      drawDial(ctx, yaw);
       drawBeacon(ctx, view, currentLead(g)?.at ?? null, realmOf(region), 'round', UNIT.mini, 'lead', yaw); // upright, set where the turned picture puts them (round 60)
       for (const m of markersHere(g)) drawBeacon(ctx, view, m, realmOf(region), 'round', UNIT.mini, 'marker', yaw); // the investigator's own markers, each with its arrow
       const r = SIZE / 2 - 1;

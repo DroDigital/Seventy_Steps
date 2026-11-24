@@ -10,9 +10,9 @@ import { BONE, el, GOLD } from './hudKit';
 
 /** A gauge `height` pixels thick; set the returned fill's width in percent. `caps`: a diamond at each end. */
 export function gauge(parent: HTMLElement, colour: string, height: number, caps = false): HTMLDivElement {
-  const frame = el(`position:relative;height:${height}px;margin:3px 0;border:1px solid ${GOLD}66;background:#060608;box-shadow:0 0 0 1px #000d,inset 0 0 3px #000`, '', parent);
-  if (caps) for (const side of ['left', 'right']) el(`position:absolute;${side}:-5px;top:50%;width:5px;height:5px;margin-top:-3px;transform:rotate(45deg);background:${GOLD};box-shadow:0 0 0 1px #000`, '', frame);
-  return el(`height:100%;width:100%;background:linear-gradient(#ffffff26,#0000 45%,#0000005c),${colour};filter:saturate(.55) brightness(.92)`, '', frame);
+  const frame = el(`position:relative;height:${height}px;margin:3px 0;border:1px solid ${GOLD}88;background:#060608;box-shadow:0 0 0 1px #000d,inset 0 0 3px #000`, '', parent);
+  if (caps) for (const side of ['left', 'right']) el(`position:absolute;${side}:-5px;top:50%;width:6px;height:6px;margin-top:-3px;transform:rotate(45deg);background:${GOLD};box-shadow:0 0 0 1px #000`, '', frame);
+  return el(`height:100%;width:100%;background:linear-gradient(#ffffff2e,#0000 48%,#0000005c),${colour};filter:saturate(.82) brightness(.98)`, '', frame);
 }
 
 export interface Pips {

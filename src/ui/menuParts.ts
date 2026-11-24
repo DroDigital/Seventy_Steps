@@ -44,8 +44,15 @@ export const CSS = `
 [data-menu] button.tab::before{display:none}
 [data-menu] button.tab.on{color:${BRIGHT};border-bottom-color:${ACCENT}}
 [data-menu] button.tab:focus,[data-menu] button.tab:hover:not(:disabled){color:${BRIGHT};background:${ACCENT}14}
-[data-menu] button.tag{display:inline-block;width:auto;margin:1px 0;padding:2px 8px;border:1px solid ${ACCENT}44;text-align:center}
+[data-menu] button.tag{display:inline-block;width:auto;margin:1px 0;padding:4px 12px;border:1px solid ${ACCENT}55;text-align:center;background:#121017aa}
+[data-menu] button.tag.primary{border-color:${ACCENT}cc;color:${BRIGHT};background:linear-gradient(180deg,${ACCENT}33,${ACCENT}18);box-shadow:0 0 12px ${ACCENT}26}
 [data-menu] button.tag::before{display:none}
+[data-menu] button.action{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 14px 7px 30px;margin:2px 0;border:1px solid ${ACCENT}26;background:${ACCENT}0a}
+[data-menu] button.action .act-right{font-size:12px;letter-spacing:1.2px;color:${ACCENT};opacity:.9;white-space:nowrap}
+[data-menu] button.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 14px 6px 30px}
+[data-menu] button.toggle .seg{display:inline-flex;border:1px solid ${ACCENT}44;background:#09080ccc;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;overflow:hidden}
+[data-menu] button.toggle .seg i{font-style:normal;padding:2px 10px;color:${INK}77;transition:background .15s,color .15s}
+[data-menu] button.toggle .seg i.on{background:${ACCENT}44;color:${BRIGHT};box-shadow:inset 0 0 0 1px ${ACCENT}88}
 [data-menu] .pause button{display:block;width:fit-content;min-width:300px;margin:0 auto;padding:7px 48px;text-align:center}
 [data-menu] .pause button::before{left:22px}
 [data-menu] .pause button::after{content:'';position:absolute;right:22px;top:50%;width:5px;height:5px;margin-top:-3px;border:1px solid ${ACCENT};transform:rotate(45deg) scale(.3);opacity:0;transition:opacity .15s,transform .15s}
@@ -56,9 +63,11 @@ export const CSS = `
 [data-menu] .pause button.exit::after,[data-menu] .pause button.exit::before{border-color:#c0614f}
 [data-menu] .pause button.exit:focus::before,[data-menu] .pause button.exit:hover:not(:disabled)::before,[data-menu] .pause button.exit:focus::after,[data-menu] .pause button.exit:hover:not(:disabled)::after{background:#c0614f;box-shadow:0 0 8px #c0614f}
 [data-menu] label{display:flex;gap:12px;align-items:center;margin:0;padding:6px 14px;border-top:1px solid transparent;border-bottom:1px solid transparent;transition:background .15s,border-color .15s}
-[data-menu] label span:first-child{min-width:14ch;text-align:left}
-[data-menu] label span:last-child{min-width:7ch;text-align:right;opacity:.85}
-[data-menu] input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:16px;background:transparent;cursor:pointer}
+[data-menu] label>span:first-child{min-width:14ch;text-align:left}
+[data-menu] label>span:last-child{min-width:7ch;text-align:right;opacity:.85}
+[data-menu] .track-wrap{position:relative;flex:1;display:flex;align-items:center}
+[data-menu] .track-wrap .def-tick{position:absolute;top:50%;width:1px;min-width:0;height:9px;margin-top:-4.5px;background:${INK}88;pointer-events:none}
+[data-menu] input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:16px;background:transparent;cursor:pointer;position:relative;z-index:1}
 [data-menu] input[type=range]::-webkit-slider-runnable-track{height:3px;background:linear-gradient(90deg,${ACCENT}aa var(--fill,50%),${INK}22 var(--fill,50%))}
 [data-menu] input[type=range]::-moz-range-track{height:3px;background:${INK}22}
 [data-menu] input[type=range]::-moz-range-progress{height:3px;background:${ACCENT}aa}
@@ -125,6 +134,42 @@ export function button(parent: HTMLElement, text: string, run: () => void, enabl
   return b;
 }
 
+/** An interactive action row with clear affordance (subtle hairline + right value or chevron). */
+export function actionButton(parent: HTMLElement, text: string, right: string, run: () => void, hint = ''): HTMLButtonElement {
+  const b = button(parent, '', run, true, hint);
+  b.classList.add('action');
+  el(b, 'span', text);
+  el(b, 'span', right).className = 'act-right';
+  return b;
+}
+
+/** A segmented Off | On toggle button (replaces full-width sliders for binary settings). */
+export function toggle(parent: HTMLElement, label: string, on: boolean, set: (v: number) => void, offLabel = t('val.off'), onLabel = t('val.on'), hint = ''): HTMLButtonElement {
+  let state = on;
+  const b = el(parent, 'button');
+  b.className = 'toggle';
+  b.dataset.toggle = '';
+  if (hint) b.dataset.hint = hint;
+  el(b, 'span', label);
+  const seg = el(b, 'span');
+  seg.className = 'seg';
+  const a = el(seg, 'i', offLabel);
+  const c = el(seg, 'i', onLabel);
+  const sync = (): void => {
+    a.classList.toggle('on', !state);
+    c.classList.toggle('on', state);
+    b.setAttribute('aria-pressed', String(state));
+  };
+  sync();
+  const flip = (): void => {
+    state = !state;
+    sync();
+    set(state ? 1 : 0);
+  };
+  b.addEventListener('click', flip);
+  return b;
+}
+
 /**
  * A choice that may not be taken now (round 38: a line that was disabled could not be reached, so what it was,
  * and why it could not be taken, could not be read): it stays a line to choose, dimmed, and choosing it says
@@ -136,12 +181,18 @@ export function option(parent: HTMLElement, text: string, run: () => void, ok: b
   return b;
 }
 
-/** A labelled range slider showing its value through `show`. */
-export function slider(parent: HTMLElement, label: string, [min, max, step]: readonly number[], value: number, set: (v: number) => void, show: (v: number) => string, hint = ''): HTMLInputElement {
+/** A labelled range slider showing its value through `show`, with a subtle tick mark at the default value when present. */
+export function slider(parent: HTMLElement, label: string, [min, max, step, def]: readonly number[], value: number, set: (v: number) => void, show: (v: number) => string, hint = ''): HTMLInputElement {
   const row = el(parent, 'label');
   if (hint) row.dataset.hint = hint;
   el(row, 'span', label);
-  const input = el(row, 'input');
+  const wrap = el(row, 'span');
+  wrap.className = 'track-wrap';
+  if (def !== undefined && def > min && def < max) {
+    const tick = el(wrap, 'span', '', `left:${(((def - min) / (max - min || 1)) * 100).toFixed(1)}%`);
+    tick.className = 'def-tick';
+  }
+  const input = el(wrap, 'input');
   Object.assign(input, { type: 'range', min: String(min), max: String(max), step: String(step), value: String(value) });
   const out = el(row, 'span', show(value));
   const fill = (): void => void input.style.setProperty('--fill', `${((Number(input.value) - min) / (max - min || 1)) * 100}%`);

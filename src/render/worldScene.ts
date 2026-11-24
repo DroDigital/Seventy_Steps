@@ -31,6 +31,8 @@ export interface WorldScene {
   scene: THREE.Scene;
   /** Streams around the investigator at (x, z) and spends this frame's generation budget (ms; more while the veil hides the world). */
   update(x: number, z: number, budgetMs?: number): void;
+  /** Synchronously finishes the 3 × 3 chunks and sites about (x, z) so the veil never lifts onto a missing chunk edge. */
+  ensureNear(x: number, z: number): void;
   /** Builds again the loaded chunks of `keys` (all, unsaid) and the sites that touch them: the world editor's edits shown (round 110). */
   rebuild(keys?: readonly number[]): void;
   readonly loaded: number; // chunks
@@ -148,6 +150,26 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
       });
       syncSites();
       for (const k of again) slicer.finish(k);
+    },
+    ensureNear(x, z) {
+      const [cx, cz] = [chunkOf(x), chunkOf(z)];
+      const key = chunkKey(cx, cz);
+      if (key !== at) {
+        at = key;
+        const diff = streamDiff(new Set(chunks.keys()), cx, cz);
+        for (const k of diff.unload) unload(k);
+        for (const c of diff.load) load(c.cx, c.cz, c.key);
+        syncSites();
+      }
+      const near = new Set<number>();
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+          const k = chunkKey(cx + dx, cz + dz);
+          near.add(k);
+          slicer.finish(k);
+        }
+      }
+      all.forEach((s, k) => s.chunks.some((c) => near.has(c)) && slicer.finish(-1 - k));
     },
     update(x, z, budgetMs = WORLD.sliceMs) {
       const [cx, cz] = [chunkOf(x), chunkOf(z)];

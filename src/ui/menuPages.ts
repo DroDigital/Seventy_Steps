@@ -12,7 +12,7 @@ import { cameraModeOf } from '../data/cameraModes';
 import { LANGS, type Key } from '../data/lang';
 import { RENDER, SETTINGS } from '../data/tuning';
 import { desktop } from './desktop';
-import { button, el, footer, slider, tabs, title, type Page } from './menuKit';
+import { actionButton, button, el, footer, slider, tabs, title, toggle, type Page } from './menuKit';
 import { createResolutionSetting } from './resolutionSetting';
 import type { SettingId, Settings } from './settings';
 
@@ -20,6 +20,11 @@ const pct = (v: number): string => `${Math.round(v * 100)}%`;
 const onOff = (v: number): string => t(v > 0.5 ? 'val.on' : 'val.off');
 /** Each setting's name (a key `set.<id>`), and how its value reads. */
 type Slid = Exclude<SettingId, 'language' | 'devRevealed'>;
+const BINARY = new Set<Slid>(['evenPixels', 'shadows', 'relight', 'invertY', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips', 'captionBack', 'gore', 'devConsole']);
+const PAIR_LABELS: Partial<Record<Slid, () => readonly [string, string]>> = {
+  minimap: () => [t('val.minimap.turn'), t('val.minimap.north')],
+  font: () => ['IM Fell', 'Garamond'],
+};
 const SHOW: Record<Slid, (v: number) => string> = {
   fxCap: pct,
   sensitivity: (v) => `×${v.toFixed(2)}`,
@@ -76,7 +81,7 @@ async function fullscreen(on: boolean): Promise<void> {
 const isFullscreen = async (): Promise<boolean> => (desktop ? desktop.isFullscreen() : !!document.fullscreenElement);
 
 /** Every change goes to `change` (which applies and keeps it); `back` leaves. `at`: the tab it opens on. Controls is the last tab (the keys' table: controlsTab). */
-export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0, calibrate?: () => void): Page {
+export function settingsPage(s: Settings, change: (id: SettingId, v: number) => void, back: () => void, saveKeys: () => void = () => undefined, at = 0): Page {
   const resolution = createResolutionSetting();
   let open = at;
   let waiting: Action | null = null;
@@ -101,15 +106,19 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
       tabs(panel, [...TABS.map(([n]) => t(n)), t('set.tab.controls')], open, (i) => ((open = i), (waiting = null), (refused = false), page.redraw?.()), page);
       if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0), triggerCalibration, () => (triggerCalibration = calibratePadTriggers()));
       const body = el(panel, 'div', '', 'min-height:226px');
-      if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
+      if (open === 0) actionButton(body, t('set.language'), `${LANGS[s.language].name}  ›`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
       for (const id of linesOf(open, s)) {
         if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
-        else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
-        if (id === 'brightness' && open === 0 && calibrate) button(body, t('cal.open'), calibrate, true, t('cal.openHint')); // the brightness card (ui/brightnessCalibration.ts), beside the slider it sets
+        else if (BINARY.has(id)) toggle(body, NAME(id), s[id] > 0.5, (v) => change(id, v), t('val.off'), t('val.on'), HINT(id));
+        else if (PAIR_LABELS[id]) {
+          const [a, b] = PAIR_LABELS[id]!();
+          toggle(body, NAME(id), s[id] > 0.5, (v) => change(id, v), a, b, HINT(id));
+        } else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
       }
       if (open === 0) {
-        const b = button(body, t('set.fullscreen'), () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), true, t('set.fullscreenHint'));
-        const label = (): void => void isFullscreen().then((on) => (b.textContent = t('set.fullscreenState', { state: t(on ? 'val.onLc' : 'val.offLc') })));
+        const b = actionButton(body, t('set.fullscreen'), '…', () => void isFullscreen().then((on) => fullscreen(!on)).then(() => setTimeout(label, 300)), t('set.fullscreenHint'));
+        const right = b.querySelector('.act-right') as HTMLElement;
+        const label = (): void => void isFullscreen().then((on) => (right.textContent = `${t(on ? 'val.on' : 'val.off')}  ›`));
         label();
       }
       footer(panel, t('set.footer'), page.back);

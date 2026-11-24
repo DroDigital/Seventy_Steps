@@ -13,7 +13,7 @@ import { worldUniforms } from './worldMaterial';
 
 /** What a flame burns as: the colour of its rim, its body and its core. */
 export const FLAME_HUES = {
-  warm: [[0.75, 0.16, 0.04], [1, 0.52, 0.12], [1, 0.95, 0.72]],
+  warm: [[0.7, 0.14, 0.03], [0.98, 0.46, 0.1], [1, 0.86, 0.56]],
   cold: [[0.08, 0.2, 0.75], [0.25, 0.55, 1], [0.85, 0.95, 1]],
   sickly: [[0.12, 0.45, 0.1], [0.45, 0.9, 0.3], [0.92, 1, 0.8]],
   violet: [[0.4, 0.1, 0.7], [0.72, 0.35, 1], [0.95, 0.88, 1]],
@@ -35,13 +35,16 @@ varying vec2 vUv;
 varying float vFrame;
 varying float vHue;
 varying float vGain;
+varying float vPhase;
 void main() {
   vec3 base = aFlame.xyz;
   vec3 toEye = cameraPosition - base;
   vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), toEye) + vec3(1e-5, 0.0, 0.0));
-  float h = aFlame.w * (1.0 + 0.07 * sin(uTime * 11.0 + aBeat.x * 6.2831)); // a little taller and shorter as it breathes
-  float w = h * 0.667;
-  vec3 wp = base + right * position.x * w * aBeat.y + vec3(0.0, 1.0, 0.0) * (position.y + 0.5) * h;
+  float h = aFlame.w * (1.0 + 0.09 * sin(uTime * 11.0 + aBeat.x * 6.2831)); // a little taller and shorter as it breathes
+  float w = h * 0.68;
+  float tip = position.y + 0.5;
+  float sway = sin(uTime * 13.0 + aBeat.x * 19.0) * 0.09 * tip * tip * h;
+  vec3 wp = base + right * (position.x * w * aBeat.y + sway) + vec3(0.0, 1.0, 0.0) * tip * h;
   wp += normalize(toEye) * 0.08; // a flame is before the cup it stands in
   vec4 mv = viewMatrix * vec4(wp, 1.0);
   float d = length(mv.xyz);
@@ -54,6 +57,7 @@ void main() {
   vUv = vec2(position.x + 0.5, position.y + 0.5);
   vFrame = floor(mod(uTime * ${FPS}.0 + aBeat.x * 4.0, 4.0));
   vHue = aBeat.z;
+  vPhase = aBeat.x;
   float fog = clamp((d - uFogNear) / max(uFogFar - uFogNear, 0.001), 0.0, 1.0);
   float near = smoothstep(h * 1.2, h * 3.5, d); // close to the lens a flame would fill the picture
   vGain = aBeat.w * (1.0 - 0.9 * fog) * near;
@@ -62,16 +66,20 @@ void main() {
 
 const FRAG = /* glsl */ `
 uniform sampler2D uAtlas;
+uniform float uTime;
 uniform vec3 uRamp[12]; // four hues of three
 varying vec2 vUv;
 varying float vFrame;
 varying float vHue;
 varying float vGain;
+varying float vPhase;
 void main() {
   if (vGain <= 0.003) discard;
   vec2 cell = vec2(${FLAME_CELLS.w}.0, ${FLAME_CELLS.h}.0);
   vec2 atlas = vec2(${FLAME_ATLAS.width}.0, ${FLAME_ATLAS.height}.0);
-  vec2 px = vec2(vFrame * cell.x + vUv.x * cell.x, (1.0 - vUv.y) * cell.y);
+  float lick = sin(uTime * 15.0 + vUv.y * 6.0 + vPhase * 25.0) * 0.045 * vUv.y;
+  float ux = clamp(vUv.x + lick, 0.0, 0.999);
+  vec2 px = vec2(vFrame * cell.x + ux * cell.x, (1.0 - vUv.y) * cell.y);
   vec2 hc = texture2D(uAtlas, px / atlas).rg;
   if (hc.g < 0.5) discard;
   int hue = int(vHue + 0.5) * 3;
@@ -79,7 +87,7 @@ void main() {
   vec3 body = uRamp[hue + 1];
   vec3 core = uRamp[hue + 2];
   float t = hc.r;
-  vec3 c = mix(mix(rim, body, smoothstep(0.15, 0.5, t)), core, smoothstep(0.55, 0.92, t));
+  vec3 c = mix(mix(rim, body, smoothstep(0.18, 0.55, t)), core, smoothstep(0.62, 0.95, t));
   gl_FragColor = vec4(c * vGain, 1.0);
 }
 `;
