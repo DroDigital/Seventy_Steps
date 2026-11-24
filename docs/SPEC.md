@@ -1,18 +1,18 @@
 # [WORKING TITLE] — Technical Spec
 A Lovecraftian open-world soulslike in retro 3D (Doom sprites + PS1-era worlds).
-Built with Claude Code, one phase per session. At the start of each session, read this file and CLAUDE.md, then do only the phase named in the message.
+Built with Claude Code. At the start of each session, read this file, `docs/RULES.md` (what the author has decided) and CLAUDE.md, then do only what the message asks. The phases of §5 are done; work now comes as requests.
 
 ## 0. Working rules (these keep cost down)
-- Do only the requested phase. Never scaffold later phases "in advance."
+- Do only what the message asks. Never scaffold later work "in advance."
 - Write a plan of 15 lines or fewer, then execute without asking for confirmation. Stop only if blocked.
-- If something is ambiguous, pick the simplest option that fits this spec, log it as one line in `docs/DECISIONS.md`, and keep going.
-- Never echo file contents or large diffs in chat. End each phase with a summary of 10 lines or fewer, plus a git commit.
+- If something is ambiguous, pick the simplest option that fits this spec and `docs/RULES.md`, log it as one line in `docs/DECISIONS.md`, and keep going. Label new work by its date (YYYY-MM-DD) or PR number, not by a round number.
+- Never echo file contents or large diffs in chat. End each piece of work with a summary of 10 lines or fewer, plus a git commit.
 - Make surgical edits. Never rewrite a whole file for a small change. Keep files under 300 lines with one responsibility each.
 - Verify with `npm run check` (typecheck + tests). Read only the failing output. Never open `node_modules/` or `dist/`.
-- No asset files. Textures, sprites, meshes, and audio are all generated in code.
+- Assets may be made in code or found, when their licence allows shipping them (CC0, CC BY with credit, or made for the game); each is credited in its folder's `CREDITS.md`. For sound effects, icons and interface art, a found recording or drawn piece comes before a generated one (2026-11-24; until then every asset was generated in code but for listed exceptions).
 - Creatures are data, not classes. A typical entity is 15–30 lines of data. Bosses get phase scripts, and those are data too.
-- Dependencies are limited to `three`, `typescript`, `vite`, and `vitest`. Ask before adding anything else.
-- Out of scope: multiplayer, skeletal animation, imported models/textures, mobile.
+- Dependencies are limited to `three`, `typescript`, `vite`, `vitest`, `electron`, `electron-builder`, `gamepad-node` and `steamworks.js` (with `@types/three`). Ask before adding anything else.
+- Out of scope: multiplayer, skeletal animation, mobile.
 
 ## 1. Stack & architecture
 - TypeScript (strict) + Three.js (WebGL2) + Vite, with Vitest for tests. Runs in the browser, with keyboard/mouse and the Gamepad API for input.
@@ -48,7 +48,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - A recipe is a silhouette archetype + palette + feature params (eye count, tentacles, wings, limbs, glow, scale).
   - Each state gets 2–4 frames, and everything is packed into one atlas.
   - Colossal bosses are low-poly primitive assemblies (segment-chain tentacles, lathed bodies) built from the same data.
-- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation.
+- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation near them: the tests hold every colour that lights or fills the scene, when its saturation passes 0.3, at least 18 degrees of hue from each (on trial since 2026-11-24; it was 36).
 - **Post-processing:** one fullscreen post pass handles everything:
   1. Color isolation: desaturate toward bone/sepia, except hues near the anomaly colors, which get boosted by an `anomalyProximity` uniform.
   2. Palette quantization (64 colors or fewer) with 4×4 Bayer dithering.
