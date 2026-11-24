@@ -35,7 +35,7 @@ creature), `?spawn=<id>`, `?look`, `?debug` (the debug panel).
 | Rest, talk, act | E | A |
 | Summon / dismiss mount | B | L3 |
 | Map / pause | M / Esc | View / Menu |
-| Developer console | ` (backquote) | D-pad Right twice |
+| Developer console (hidden: Ctrl+Alt+Shift+D reveals it under Settings › Play; turn it on there) | < | D-pad Right twice |
 
 Every keyboard action can be rebound under Controls. Prompts name the buttons of whichever device you
 used last.

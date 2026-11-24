@@ -119,6 +119,7 @@ import { refreshMountEntitlement } from './ui/mounts';
 import { startMountGallery } from './ui/mountGallery';
 import { createFreeCamera } from './ui/freeCamera';
 import { createDeveloperConsole } from './ui/developerConsole';
+import { devConsoleOn } from './ui/devReveal';
 import { createDeveloperCommands } from './systems/developerCommands';
 
 const INTERACT_GRACE_MS = 350; // after a talk or a menu closes, E is held back this long
@@ -282,6 +283,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   const developerConsole = createDeveloperConsole({
     commands: developerCommands.commands,
     execute: developerCommands.execute,
+    enabled: () => devConsoleOn(settings), // hidden until Ctrl+Alt+Shift+D reveals it in Settings › Play and it is turned on (ui/devReveal.ts)
     available: () => !building && !menuOpen() && !cinema.active && !journeys.busy && !veil.active && !game.player.falling && !game.player.fogPass && !game.player.gatePass,
     onOpen: () => input.reset(),
   });

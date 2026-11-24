@@ -417,6 +417,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'set.hint.quietWalk': "Las barras y el mapa se desvanecen, y la vista se aleja un poco, cuando nada te amenaza.",
   'set.controlTips': "Ayuda de controles",
   'set.hint.controlTips': "Los controles, abajo a la izquierda, en cuanto se necesitan por primera vez: andar, correr, golpear, rodar, curarse, el carro.",
+  'set.devConsole': "Consola de desarrollo",
+  'set.hint.devConsole': "Activada, < (o dos veces la cruceta derecha en el mando) abre la consola de desarrollo.",
   'tip.head.walk': "Moverse",
   'tip.head.run': "Correr",
   'tip.head.strike': "Luchar",

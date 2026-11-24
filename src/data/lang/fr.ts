@@ -417,6 +417,8 @@ export const FR: Readonly<Record<Key, string>> = {
   'set.hint.quietWalk': "Les jauges et la carte s’estompent, et la vue recule un peu, quand rien ne vous menace.",
   'set.controlTips': "Aide aux commandes",
   'set.hint.controlTips': "Les commandes, en bas à gauche, dès qu’on en a besoin pour la première fois : marcher, courir, frapper, rouler, se soigner, le char.",
+  'set.devConsole': "Console développeur",
+  'set.hint.devConsole': "Activée, < (ou deux fois la croix droite à la manette) ouvre la console développeur.",
   'tip.head.walk': "Se déplacer",
   'tip.head.run': "Courir",
   'tip.head.strike': "Combattre",
