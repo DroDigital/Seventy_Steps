@@ -189,7 +189,7 @@ Place every other entity in the spawn tables of its best-fitting region.
   - **Nyarlathotep:** appears as avatars throughout the game. Its final form copies earlier bosses' movesets. Nodens can be summoned as an ally for this fight.
   - **Azathoth:** blind, and the hardest fight in the game (it was once invulnerable, a fight of silence against a timer; 2026-10-29). It aims nothing: its blows are rhythms laid over the whole court (rings of sound, beats of boils, a dance of thirteen, a seething that leaves pools, a miasma that spreads outward and takes the mind, a centre that draws all in), read by where and when they fall. It hears the loud, a shot and a sprint (in its last phase a roll and a swing too), and answers where it was made.
 
-Every other boss is composed from the shared library.
+Every other boss is composed from the shared library's mechanics, and every boss's moveset is its own (2026-11-24): each of its blows is a library attack it is built on, with the boss's own timing, shape, matter and chain, struck by no other creature and no other boss (`src/data/bossMoves*.ts`). Only the summons is shared, since what it calls up is each boss's own. Azathoth's blows are the library's, and no other creature strikes them; Nyarlathotep's last form borrows the slain bosses' own blows.
 
 ## 4. Bestiary roster (implement every entry)
 Sanity variants and boss variants are overrides on existing entries, not new roster ids.

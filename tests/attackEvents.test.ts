@@ -17,12 +17,12 @@ function watch(id: string) {
 describe('the events the effects of a blow keep to (round 51)', () => {
   it('a volley is loosed once for each bolt, and each lands exactly once: on a body, the world, or spent', () => {
     const w = watch('keziah_mason');
-    startMove(w.act, 'projectile_fan');
+    startMove(w.act, 'keziah_fan'); // her own fan of six (2026-11-24)
     steps(w.g, 200);
     const loosed = w.of('BoltLoosed');
     const landed = w.of('BoltLanded');
-    expect(loosed.length).toBe(5);
-    expect(landed.length).toBe(5);
+    expect(loosed.length).toBe(6);
+    expect(landed.length).toBe(6);
     for (const e of landed) {
       expect(['body', 'ground', 'wall', 'spent']).toContain(e.data.on);
       for (const k of ['x', 'y', 'z']) expect(Number.isFinite((e.data.at as Record<string, number>)[k])).toBe(true);
@@ -47,11 +47,11 @@ describe('the events the effects of a blow keep to (round 51)', () => {
 
   it('a blow that opens its hit window is swung once, however long the window is', () => {
     const w = watch('cthulhu');
-    startMove(w.act, 'slam');
+    startMove(w.act, 'cthulhu_fall');
     steps(w.g, 120);
     expect(w.of('Swung').length).toBe(1);
     expect(w.of('Swung')[0]!.data.entity).toBe(w.boss);
-    startMove(w.act, 'tentacle_burst');
+    startMove(w.act, 'cthulhu_feelers');
     steps(w.g, 120);
     expect(w.of('Swung').length).toBe(2);
   });

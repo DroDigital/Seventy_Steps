@@ -42,6 +42,11 @@ export const rules: readonly PruneRule[] = [
   byEntity('src/data/attackSignatures.ts', 'HORRORS'),
   byEntity('src/data/attackSignatures.ts', 'THEMED_GREATER'),
   byEntity('src/data/bossPunish.ts', 'BOSS_BAND'),
+  byEntity('src/data/bossMovesFirst.ts', 'FIRST_MOVES'), // every horror's own blows (2026-11-24), by horror
+  byEntity('src/data/bossMovesMiddle.ts', 'MIDDLE_MOVES'),
+  byEntity('src/data/bossMovesDream.ts', 'DREAM_MOVES'),
+  byEntity('src/data/bossMovesDeep.ts', 'DEEP_MOVES'),
+  byEntity('src/data/bossMovesLast.ts', 'LAST_MOVES'),
   byEntity('src/data/bossAttackTheme.ts', 'BOSS_ATTACK_THEME'),
   byEntity('src/data/bossStanding.ts', 'BOSS_STANDING'),
   byEntity('src/data/bossAuras.ts', 'BOSS_AURAS'),

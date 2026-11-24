@@ -43,7 +43,7 @@ export const BOSS_STANDING: Readonly<Record<string, readonly [vigour: number, mi
   ghatanothoa: [16, 15, 5],
   hastur: [16, 15, 5],
   zkauba: [18, 17, 5],
-  zann_window_thing: [18, 17, 5],
+  zann_window_thing: [18, 18, 5],
   daemon_pipers: [18, 17, 5],
   nyarlathotep: [18, 17, 5],
   other_gods: [18, 17, 5],

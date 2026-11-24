@@ -70,8 +70,8 @@ describe('boss sanity pressure leaves time to fight', () => {
     for (let second = 0; second < 120; second++) {
       if ([20, 45, 100].includes(second)) hit(g, boss);
       if ([30, 90].includes(second)) {
-        const roar = actor.moves.roar.sanity!;
-        startMove(actor, 'roar');
+        const roar = actor.moves.othergods_scream.sanity!;
+        startMove(actor, 'othergods_scream');
         // Each active frame takes its share of one roar; the rest of this second is passive aura.
         for (let frame = roar.window[0]; frame < roar.window[1]; frame++) {
           actor.frame = frame;
@@ -95,9 +95,9 @@ describe('boss sanity pressure leaves time to fight', () => {
       setSanity(g, 100);
       g.mind.upgrades.resolve = resolve;
       hit(g, boss);
-      startMove(g.ecs.c.actor.get(boss)!, 'roar');
+      startMove(g.ecs.c.actor.get(boss)!, 'othergods_scream');
       const actor = g.ecs.c.actor.get(boss)!;
-      const roar = actor.moves.roar.sanity!;
+      const roar = actor.moves.othergods_scream.sanity!;
       for (let frame = roar.window[0]; frame < roar.window[1]; frame++) {
         actor.frame = frame;
         sanitySystem(g, 1 / SIM.hz);
@@ -132,8 +132,8 @@ describe('Laudanum protects against every recurring sanity attack', () => {
   it('prevents a near-full gaze from bursting and lets its buildup decay during protection', () => {
     const { g, boss } = pressure('hastur');
     const actor = g.ecs.c.actor.get(boss)!;
-    startMove(actor, 'gaze');
-    actor.frame = actor.moves.gaze.effect!.window[0];
+    startMove(actor, 'hastur_sign');
+    actor.frame = actor.moves.hastur_sign.effect!.window[0];
     const bursts: number[] = [];
     g.events.on('GazeBurst', ({ sanity }) => bursts.push(sanity));
     g.reality.gaze = 1 - BOSS.gazeRate / 2;

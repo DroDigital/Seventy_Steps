@@ -81,13 +81,13 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
   };
 
   it('swings from the side it is seen: its left drawn, its back drawn, its right the left mirrored', () => {
-    expect(seen('cthulhu', 'slam', [12, 0])).toMatchObject({ direction: 'left', state: 'attack', mirror: false });
-    expect(seen('cthulhu', 'slam', [12, 0]).source).toMatch(/cthulhu\/movement\/left\/attack_\d\.png$/);
-    expect(seen('cthulhu', 'slam', [0, -12]).source).toMatch(/cthulhu\/movement\/back\/attack_\d\.png$/);
-    const right = seen('cthulhu', 'slam', [-12, 0]);
+    expect(seen('cthulhu', 'cthulhu_fall', [12, 0])).toMatchObject({ direction: 'left', state: 'attack', mirror: false });
+    expect(seen('cthulhu', 'cthulhu_fall', [12, 0]).source).toMatch(/cthulhu\/movement\/left\/attack_\d\.png$/);
+    expect(seen('cthulhu', 'cthulhu_fall', [0, -12]).source).toMatch(/cthulhu\/movement\/back\/attack_\d\.png$/);
+    const right = seen('cthulhu', 'cthulhu_fall', [-12, 0]);
     expect(right).toMatchObject({ direction: 'right', state: 'attack', mirror: true });
     expect(right.source).toMatch(/cthulhu\/movement\/left\/attack_\d\.png$/);
-    expect(seen('cthulhu', 'slam', [0, 12]).source).toMatch(/cthulhu\/movement\/front\/attack_\d\.png$/); // from the front, as it was
+    expect(seen('cthulhu', 'cthulhu_fall', [0, 12]).source).toMatch(/cthulhu\/movement\/front\/attack_\d\.png$/); // from the front, as it was
   });
 
   it('reels from the side it is seen too', () => {
@@ -97,7 +97,7 @@ describe('a boss swinging or reeling, seen from beside it or behind it', () => {
   });
 
   it('is front art only for Yog-Sothoth, Shub-Niggurath and Azathoth, whatever the side they are seen from', () => {
-    for (const [key, move] of [['yog_sothoth', 'beam'], ['shub_niggurath', 'tentacle_burst'], ['azathoth', 'blind_rays']] as const) {
+    for (const [key, move] of [['yog_sothoth', 'yog_ray'], ['shub_niggurath', 'shub_ropes'], ['azathoth', 'blind_rays']] as const) {
       const views = pack.entities[key].directions;
       for (const direction of ['left', 'back', 'right'] as const) expect(Object.keys(views[direction].actions).sort(), `${key}/${direction}`).toEqual(['idle', 'move']);
       for (const at of [[12, 0], [0, -12], [-12, 0]] as [number, number][]) {

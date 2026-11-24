@@ -130,7 +130,7 @@ describe('boss fights (spec §3E)', () => {
     steps(g, 1);
     expect(g.ecs.c.model.get(boss)).toBe('creature:whisperer#eldritch');
     expect(fight.phase).toBe(1);
-    expect(g.ecs.c.brain.get(boss)!.def.attacks.map((x) => x.move)).toContain('projectile_fan');
+    expect(g.ecs.c.brain.get(boss)!.def.attacks.map((x) => x.move)).toContain('whisperer_cylinders');
   });
 
   it('world bosses hold the arena they stand in: a ring of stones or their room', () => {

@@ -41,11 +41,11 @@ describe('the High Priest reveals its true form in phase two', () => {
       expect(g.ecs.c.model.get(boss)).toBe(model);
       expect(h.hp / h.max).toBeCloseTo(fraction);
       expect(g.ecs.c.body.get(boss)).toMatchObject(bodyOf(variantOf(getEntity('high_priest')!, 'eldritch')!));
-      expect(g.ecs.c.brain.get(boss)!.def.attacks.map(a => a.move)).toContain(phase === 1 ? 'dream_cloud' : 'sweep_beam');
+      expect(g.ecs.c.brain.get(boss)!.def.attacks.map(a => a.move)).toContain(phase === 1 ? 'priest_incense' : 'priest_sweep');
 
       for (const [direction, x, z] of [['front', 0, 8], ['left', 8, 0], ['back', 0, -8], ['right', -8, 0]] as const) {
         camera.position.set(tr.pos.x + x, tr.pos.y + 1.6, tr.pos.z + z);
-        for (const move of [null, 'evade', phase === 1 ? 'dream_cloud' : 'sweep_beam', 'stagger'] as const) {
+        for (const move of [null, 'evade', phase === 1 ? 'priest_incense' : 'priest_sweep', 'stagger'] as const) {
           actor.move = move;
           actor.frame = 10;
           views.update(1, 5, camera);

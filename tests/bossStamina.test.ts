@@ -36,7 +36,7 @@ describe('stamina against the Other Gods', () => {
     const { g, player, boss, stamina, hits } = otherGods();
     expect(g.player.levels.endurance).toBe(0);
     expect(stamina.max).toBe(100);
-    startMove(g.ecs.c.actor.get(boss)!, 'quake');
+    startMove(g.ecs.c.actor.get(boss)!, 'othergods_tremor');
     until(g, () => hits.length > 0);
 
     expect(hits[0]).toMatchObject({ outcome: 'blocked', damage: 0, stamina: 60.5 });
@@ -67,10 +67,10 @@ describe('stamina against the Other Gods', () => {
     const { g, player, boss, stamina, hits } = otherGods();
     stamina.value = 20;
     stamina.delay = STAMINA.regenDelay;
-    startMove(g.ecs.c.actor.get(boss)!, 'quake');
+    startMove(g.ecs.c.actor.get(boss)!, 'othergods_tremor');
     until(g, () => hits.length > 0);
 
-    const wave = g.ecs.c.actor.get(boss)!.moves.quake.wave!;
+    const wave = g.ecs.c.actor.get(boss)!.moves.othergods_tremor.wave!;
     const overflow = wave.damage * (1 - 20 / 39.5); // the same 39.5 cost as a fully blocked wave
     expect(hits[0]).toMatchObject({ outcome: 'guardBreak', stamina: 0 });
     expect(hits[0].damage).toBeCloseTo(overflow, 6);
@@ -82,7 +82,7 @@ describe('stamina against the Other Gods', () => {
     const { g, player, boss, stamina, hits } = otherGods();
     const actor = g.ecs.c.actor.get(boss)!;
     for (let n = 0; n < 4; n++) {
-      startMove(actor, 'slam');
+      startMove(actor, 'othergods_smite_2'); // the heavy second smite (2026-11-24: their own)
       until(g, () => hits.length > n);
       if (hits[n].outcome === 'guardBreak') break;
       until(g, () => actor.move === null);

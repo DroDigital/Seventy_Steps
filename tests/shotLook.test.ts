@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { SHOT_FORMS, SHOTS } from '../src/data/shotForms';
+import { baseOf } from '../src/data/bossMoves';
 import { ENTITIES } from '../src/data/registry';
 import { ANOMALY } from '../src/render/palette';
 import { shotLook } from '../src/render/shotLook';
@@ -14,8 +15,8 @@ const greenOrb = (id: string): boolean => {
 
 /** Every attack a creature can choose, in its list or in any phase of its script. */
 const attacksOf = (e: (typeof ENTITIES)[number]): Set<string> => {
-  const all = new Set<string>(e.behavior.attacks);
-  for (const p of e.bossScript?.phases ?? []) for (const a of p.attacks) all.add(a.id);
+  const all = new Set<string>(e.behavior.attacks.map(baseOf));
+  for (const p of e.bossScript?.phases ?? []) for (const a of p.attacks) all.add(baseOf(a.id)); // a horror's own shot is built on the library's (2026-11-24)
   return all;
 };
 const SHOOTS = ['projectile', 'projectile_fan', 'spit', 'barrage'];

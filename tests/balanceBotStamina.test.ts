@@ -17,8 +17,8 @@ describe('balance bot stamina', () => {
   it('prioritizes an incoming blow over a simultaneous attack', () => {
     const { g, boss } = bossGame('other_gods', undefined, 2);
     const enemy = g.ecs.c.actor.get(boss)!;
-    startMove(enemy, 'quake');
-    enemy.frame = enemy.moves.quake.wave!.frame - 8;
+    startMove(enemy, 'othergods_tremor');
+    enemy.frame = enemy.moves.othergods_tremor.wave!.frame - 8;
     driveBot(g, boss, 2, false, { levels: {}, skill: 1 });
     expect(g.ecs.c.actor.get(g.player.id)!.move).toBe('roll');
   });
@@ -26,8 +26,8 @@ describe('balance bot stamina', () => {
   it('keeps a queued dodge while waiting for an action to recover', () => {
     const { g, boss } = bossGame('other_gods', undefined, 2);
     const enemy = g.ecs.c.actor.get(boss)!;
-    startMove(enemy, 'quake');
-    enemy.frame = enemy.moves.quake.wave!.frame - 18;
+    startMove(enemy, 'othergods_tremor');
+    enemy.frame = enemy.moves.othergods_tremor.wave!.frame - 18;
     g.ecs.c.actor.get(g.player.id)!.hitstop = 30;
     driveBot(g, boss, 23, false, { levels: {}, skill: 1 });
     expect(g.player.buffer.action).toBe('dodge');
@@ -36,8 +36,8 @@ describe('balance bot stamina', () => {
   it('retries a drink after a simultaneous dodge takes priority', () => {
     const { g, boss } = bossGame('other_gods', undefined, 2);
     const enemy = g.ecs.c.actor.get(boss)!;
-    startMove(enemy, 'quake');
-    enemy.frame = enemy.moves.quake.wave!.frame - 8;
+    startMove(enemy, 'othergods_tremor');
+    enemy.frame = enemy.moves.othergods_tremor.wave!.frame - 8;
     g.mind.sanity = 30;
     driveBot(g, boss, 3, false, { levels: {}, skill: 1, mind: true });
     expect(g.player.buffer.action).toBe('item');
