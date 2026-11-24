@@ -423,6 +423,8 @@ export const DE: Readonly<Record<Key, string>> = {
   'set.hint.quietWalk': "Leisten und Karte verblassen, und die Ansicht weicht ein wenig zurück, wenn nichts euch bedroht.",
   'set.controlTips': "Steuerungshinweise",
   'set.hint.controlTips': "Die Steuerung, unten links, sobald sie zum ersten Mal gebraucht wird: Gehen, Laufen, Schlagen, Ausweichen, Heilen, der Wagen.",
+  'set.devConsole': "Entwicklerkonsole",
+  'set.hint.devConsole': "Wenn aktiv, öffnet < (oder zweimal Steuerkreuz rechts am Pad) die Entwicklerkonsole.",
   'tip.head.walk': "Bewegen",
   'tip.head.run': "Laufen",
   'tip.head.strike': "Kämpfen",

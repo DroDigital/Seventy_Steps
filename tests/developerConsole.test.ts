@@ -30,7 +30,7 @@ vi.mock('../src/core/pads', () => ({ activePad: () => ({ buttons: Array.from({ l
 
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
 
-async function setup() {
+async function setup(enabled = true) {
   Object.assign(state, { open: false, other: false, page: null, padDown: false, buttons: [], elements: [] });
   vi.useFakeTimers({ toFake: ['performance'] });
   let key: ((e: any) => void) | undefined;
@@ -40,15 +40,24 @@ async function setup() {
   const { createDeveloperConsole } = await import('../src/ui/developerConsole');
   const execute = vi.fn((line: string) => `Done: ${line}`);
   const onOpen = vi.fn();
-  const console = createDeveloperConsole({ commands: [{ command: 'spawn ghoul', description: 'Spawn a ghoul' }, { command: 'warp boss', description: 'Go to the boss' }], execute, onOpen });
+  const console = createDeveloperConsole({ commands: [{ command: 'spawn ghoul', description: 'Spawn a ghoul' }, { command: 'warp boss', description: 'Go to the boss' }], execute, onOpen, enabled: () => enabled });
   return {
     console, execute, onOpen,
-    key: () => key?.({ code: 'Backquote', repeat: false, preventDefault: vi.fn(), stopImmediatePropagation: vi.fn() }),
+    key: () => key?.({ key: '<', code: 'IntlBackslash', repeat: false, preventDefault: vi.fn(), stopImmediatePropagation: vi.fn() }),
     frame: (down: boolean, after = 0) => { vi.advanceTimersByTime(after); state.padDown = down; frame?.(); },
   };
 }
 
 describe('developer console', () => {
+  it('stays shut on < and on the pad until Settings › Play turns it on (ui/devReveal.ts)', async () => {
+    const p = await setup(false);
+    p.key();
+    p.frame(true);
+    p.frame(false, 100);
+    p.frame(true, 100);
+    expect(p.console.open).toBe(false);
+  });
+
   it('opens with the keyboard and executes both typed and browsed commands', async () => {
     const p = await setup();
     p.key();

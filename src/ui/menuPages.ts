@@ -19,7 +19,7 @@ import type { SettingId, Settings } from './settings';
 const pct = (v: number): string => `${Math.round(v * 100)}%`;
 const onOff = (v: number): string => t(v > 0.5 ? 'val.on' : 'val.off');
 /** Each setting's name (a key `set.<id>`), and how its value reads. */
-type Slid = Exclude<SettingId, 'language'>;
+type Slid = Exclude<SettingId, 'language' | 'devRevealed'>;
 const SHOW: Record<Slid, (v: number) => string> = {
   fxCap: pct,
   sensitivity: (v) => `×${v.toFixed(2)}`,
@@ -40,6 +40,7 @@ const SHOW: Record<Slid, (v: number) => string> = {
   camera: (v) => t(`val.camera.${cameraModeOf(v)}` as Key),
   quietWalk: onOff,
   controlTips: onOff,
+  devConsole: onOff,
   captions: (v) => `×${v.toFixed(1)}`,
   captionBack: onOff,
   flashes: pct,
@@ -59,6 +60,8 @@ const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
   ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
   ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'gore', 'shake', 'rumble', 'fxCap']],
 ];
+/** A tab's lines; the developer console's only once Ctrl+Alt+Shift+D has revealed it (ui/devReveal.ts). */
+const linesOf = (tab: number, s: Settings): readonly Slid[] => TABS[tab][0] === 'set.tab.play' && s.devRevealed > 0.5 ? [...TABS[tab][1], 'devConsole'] : TABS[tab][1];
 const HINT = (id: SettingId): string | undefined => {
   const k = `set.hint.${id}` as Key;
   return k in LANGS[0].table ? t(k) : undefined;
@@ -99,7 +102,7 @@ export function settingsPage(s: Settings, change: (id: SettingId, v: number) => 
       if (open === TABS.length) return controlsTab(panel, page, () => waiting, (a) => (waiting = a), () => refused, saveKeys, s.padSwap > 0.5, (on) => change('padSwap', on ? 1 : 0), triggerCalibration, () => (triggerCalibration = calibratePadTriggers()));
       const body = el(panel, 'div', '', 'min-height:226px');
       if (open === 0) button(body, `${t('set.language')}: ${LANGS[s.language].name}`, () => (change('language', (s.language + 1) % LANGS.length), page.redraw?.()), true, t('set.hint.language')); // a button, not a slider: the page is drawn anew in the language chosen
-      for (const id of TABS[open][1]) {
+      for (const id of linesOf(open, s)) {
         if (id === 'resolution') resolution(body, s, change, () => page.redraw?.());
         else slider(body, NAME(id), SETTINGS[id], s[id], (v) => change(id, v), SHOW[id], HINT(id));
         if (id === 'brightness' && open === 0 && calibrate) button(body, t('cal.open'), calibrate, true, t('cal.openHint')); // the brightness card (ui/brightnessCalibration.ts), beside the slider it sets

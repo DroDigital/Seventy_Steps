@@ -14,6 +14,8 @@ export interface DeveloperConsoleOptions {
   execute(line: string): string;
   /** Opening can be suspended while a transition or cutscene is in progress. */
   available?: () => boolean;
+  /** Whether the shortcuts open it at all: Settings › Play › Developer console, once revealed (ui/devReveal.ts). */
+  enabled?: () => boolean;
   onOpen?: () => void;
 }
 
@@ -48,10 +50,16 @@ export function createDeveloperConsole(options: DeveloperConsoleOptions): Develo
   const close = (): void => screen.close();
   const page: Page = {
     back: close,
-    backKeys: ['Backquote'],
+    keys(e) {
+      // < closes it again, unless it is being typed into the command field.
+      if (e.key === '<' && !e.repeat && !(e.target instanceof HTMLInputElement)) {
+        e.preventDefault();
+        close();
+      }
+    },
     build(panel) {
       title(panel, 'DEVELOPER CONSOLE');
-      el(panel, 'div', 'Type a command or choose one from the list. Backquote or double-tap D-pad Right opens the console.', 'font-size:12px;opacity:.7;margin:0 0 8px');
+      el(panel, 'div', 'Type a command or choose one from the list. < or double-tap D-pad Right opens the console.', 'font-size:12px;opacity:.7;margin:0 0 8px');
       input = el(panel, 'input');
       input.type = 'text';
       input.dataset.menuText = '';
@@ -84,13 +92,15 @@ export function createDeveloperConsole(options: DeveloperConsoleOptions): Develo
       button(panel, 'Close', close);
     },
   };
+  const enabled = (): boolean => options.enabled?.() !== false;
   const show = (): void => {
-    if (screen.open || menuOpen() || options.available?.() === false) return;
+    if (screen.open || menuOpen() || !enabled() || options.available?.() === false) return;
     options.onOpen?.();
     screen.show(page);
   };
   addEventListener('keydown', (e) => {
-    if (e.code !== 'Backquote' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || screen.open || menuOpen()) return;
+    // By the character, so it is < on any layout (Shift+Comma, or the ISO key beside the left Shift).
+    if (e.key !== '<' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || screen.open || menuOpen() || !enabled()) return;
     if (options.available?.() === false) return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -105,7 +115,7 @@ export function createDeveloperConsole(options: DeveloperConsoleOptions): Develo
     const pad = activePad();
     const key = pad?.buttons[PAD_BUTTON.right];
     const down = !!key && (key.pressed || key.value > 0.5);
-    const available = !menuOpen() && options.available?.() !== false;
+    const available = enabled() && !menuOpen() && options.available?.() !== false;
     if (!available) lastTap = -Infinity;
     else if (down && !wasDown) {
       const now = performance.now();

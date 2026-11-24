@@ -5,6 +5,7 @@
  * UI scale to the page (the others are read each frame, main.ts).
  */
 
+import { installDevReveal } from './devReveal';
 import { applySerif } from './hudKit';
 import { applyCaptions } from './captions';
 import { DECK } from '../data/tuning';
@@ -88,6 +89,7 @@ export function createShell(): Shell {
       // Storage refused: the layout lasts until the page closes.
     }
   };
+  installDevReveal(settings, change); // Ctrl+Alt+Shift+D: the developer console's hidden option (ui/devReveal.ts)
   const shell: Shell = { settings, change, saveKeys, store, engine, drones: createDrones(engine), veil: createVeil() };
   return shell;
 }

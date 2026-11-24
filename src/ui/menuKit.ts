@@ -62,6 +62,8 @@ let started = false;
 
 export const menuOpen = (): boolean => stack.length > 0;
 const clearWatchers: (() => void)[] = [];
+/** Draws the open menu again (a setting revealed behind it: ui/devReveal.ts). */
+export const redrawMenu = (): void => stack.at(-1)?.redraw();
 /** Once every menu has closed (and none opened in its place): the game is played again (round 39: the mouse is taken back). */
 export const onMenusClear = (fn: () => void): void => void clearWatchers.push(fn);
 export const onPadStart = (fn: () => void): void => void padStart.push(fn);

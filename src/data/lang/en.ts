@@ -442,6 +442,8 @@ export const EN = {
   'set.hint.quietWalk': "The bars and the map fade, and the view draws back a little, when nothing threatens you.",
   'set.controlTips': "Control tips",
   'set.hint.controlTips': "The controls, written at the lower left as each is first needed: walking, running, striking, rolling, healing, the chariot.",
+  'set.devConsole': "Developer console",
+  'set.hint.devConsole': "When on, < (or D-pad Right twice on a pad) opens the developer console.",
   'tip.head.walk': "Moving",
   'tip.head.run': "Running",
   'tip.head.strike': "Fighting",
