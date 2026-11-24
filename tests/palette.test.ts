@@ -1,16 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { LOOKS, lookOf, type Look } from '../src/data/looks';
 import { REGIONS } from '../src/data/regions';
-import { ANOMALY, ANOMALY_HUES, luma, rgbToHsv } from '../src/render/palette';
+import { ANOMALY, ANOMALY_HUES, luma } from '../src/render/palette';
 import { ANOMALY_FROM, ANOMALY_TO, buildRealmPalette, gradeTint, gradeTints } from '../src/render/realmPalette';
 
 const anomalies = Object.values(ANOMALY);
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
 /** Whether a colour would be taken for an anomaly by the post pass's colour isolation: an anomaly's hue, more than FX.minSaturation of it, and not so dark the pass ignores it (shaders/post.ts). */
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 
 describe('the realms\' looks (round 32: every realm was the same dark grey-sepia)', () => {
   it('give every region its own look, and name no other', () => {
@@ -37,7 +33,7 @@ describe('the realms\' looks (round 32: every realm was the same dark grey-sepia
   it('light and fill the scene only in colours the isolation does not take for an anomaly (their saturation is muted where their hue is an anomaly\'s)', () => {
     for (const [id, l] of Object.entries(LOOKS)) {
       for (const [what, c] of [['ambient', l.ambient], ['moon', l.moon], ['horizon', l.horizon], ['zenith', l.zenith], ['far', l.far]] as const) {
-        expect(reads(c), `${id}: ${what}`).toBe(false);
+        expect(readsAsAnomaly(c), `${id}: ${what}`).toBe(false);
       }
     }
   });

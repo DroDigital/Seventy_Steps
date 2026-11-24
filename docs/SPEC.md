@@ -48,7 +48,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - A recipe is a silhouette archetype + palette + feature params (eye count, tentacles, wings, limbs, glow, scale).
   - Each state gets 2–4 frames, and everything is packed into one atlas.
   - Colossal bosses are low-poly primitive assemblies (segment-chain tentacles, lathed bodies) built from the same data.
-- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation near them: the tests hold every colour that lights or fills the scene, when its saturation passes 0.3, at least 18 degrees of hue from each (on trial since 2026-11-24; it was 36).
+- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation near them: the tests hold every colour that lights or fills the scene, when its saturation passes 0.3, at least 36 degrees of hue from each (`FX.hueWidth`, the post pass's own window; a narrower one was tried on 2026-11-24 and waits on the author).
 - **Post-processing:** one fullscreen post pass handles everything:
   1. Color isolation: desaturate toward bone/sepia, except hues near the anomaly colors, which get boosted by an `anomalyProximity` uniform.
   2. Palette quantization (64 colors or fewer) with 4×4 Bayer dithering.

@@ -4,19 +4,15 @@
  * only, never on the lit, the living or the ground.
  */
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { COAT_EASE, COATS, coatOf, easeCoat, NO_COAT, type CoatLook } from '../src/data/coats';
 import { getRegion, REGIONS } from '../src/data/regions';
 import { createCoatLayer } from '../src/render/coat';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
+import { rgbToHsv } from '../src/render/palette';
 import { WORLD_FRAG } from '../src/render/shaders/world';
 import { coatable, worldUniforms } from '../src/render/worldMaterial';
 
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
 /** The post pass's colour isolation (tests/palette.test.ts): an anomaly's hue with more than 0.3 of saturation, not so dark it is ignored. */
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 
 describe('the realms\' coats', () => {
   it('belong to real realms, and every realm without one wears none', () => {
@@ -34,7 +30,7 @@ describe('the realms\' coats', () => {
     for (const [id, def] of Object.entries(COATS)) {
       for (const [what, c] of [['cap', def.cap], ['stain', def.stain]] as const) {
         if (!c) continue;
-        expect(reads(c), `${id} ${what}`).toBe(false);
+        expect(readsAsAnomaly(c), `${id} ${what}`).toBe(false);
         expect(rgbToHsv(c)[1], `${id} ${what} saturation`).toBeLessThan(0.36);
         for (const x of c) expect(x >= 0 && x <= 1).toBe(true);
       }

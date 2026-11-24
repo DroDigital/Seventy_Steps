@@ -1,22 +1,17 @@
 /** Round 80: each realm's own air (render/ambientAir.ts, data/airFields.ts, render/airKinds.ts). */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { AIR_FIELD, AIR_FIELDS, type AirKind } from '../src/data/airFields';
 import { FOGS } from '../src/data/fogs';
 import { REGION_IDS } from '../src/data/regions';
 import { createAmbientAir, rateOf } from '../src/render/ambientAir';
 import { gustAt, KINDS, toneOf } from '../src/render/airKinds';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
 import type { ParticleSpec, Particles } from '../src/render/particles';
 import { createWorldGame } from '../src/systems/game';
 import { worldLayout } from '../src/world/placements';
 
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
 /** Whether a colour would be taken for an anomaly by the post pass's colour isolation (the rule of tests/palette.test.ts). */
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 const calm = { dark: 1, mist: 1, gust: 0.5, rain: 0, shake: 1 };
 
 /** The air of `region` over `seconds` seen by a camera about the investigator, and what was born. */
@@ -55,7 +50,7 @@ describe('each realm\'s air (round 80)', () => {
       for (const l of layers) {
         const c = toneOf(id, l);
         for (const v of c) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(1);
-        if (!l.anomaly) expect(reads(c), `${id} ${l.kind} ${c.map((v) => v.toFixed(2))}`).toBe(false);
+        if (!l.anomaly) expect(readsAsAnomaly(c), `${id} ${l.kind} ${c.map((v) => v.toFixed(2))}`).toBe(false);
       }
     }
     expect(Object.values(AIR_FIELDS).flat().filter((l) => l.anomaly).length).toBeLessThanOrEqual(2); // the heath's spark and Yuggoth's spore

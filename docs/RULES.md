@@ -46,8 +46,10 @@ reasoning behind each is in `docs/DECISIONS.md`; the design is `docs/SPEC.md`.
 - No foe is posted inside a wall or a house (`tests/enclosedAudit.test.ts`).
 
 ## Look and sound
-- Colour means something is wrong: only the three anomaly hues are saturated near themselves. Scene colours are held
-  18 degrees of hue from them when saturated, on trial (2026-11-24; the window was 36 degrees).
+- Colour means something is wrong: only the three anomaly hues are saturated near themselves. A scene colour saturated
+  past 0.3 is held 36 degrees of hue from each: `FX.hueWidth`, the post pass's own window, which the tests read. A window
+  of 18 degrees was tried (2026-11-24): it changed almost nothing seen at five places, would dim lit anomalies under the
+  lantern, and adds colour only once colours are made to use it. It waits on the author.
 - Falling sanity never coarsens the picture; the wavy morphing stays (playtest round 7).
 - Brightness defaults to 100% on the plain gamma, with no toe curve (round 103). There is no brightness calibration
   menu, and the title's backdrop is pure black (2026-11-24).
