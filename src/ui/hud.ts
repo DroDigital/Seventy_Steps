@@ -224,8 +224,10 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setStyle(hp.parentElement!, 'boxShadow', `0 0 0 1px #000d,inset 0 0 3px #000${bleeding(g) ? `,0 0 ${(3 + 3 * Math.sin(now0 / 320)).toFixed(0)}px ${MAGENTA}` : ''}`); // the Unmoored mind wearing the body away, shown where it is felt
       setStyle(stamina, 'width', percent(s.value, s.max));
       mind.update(now0);
+      setText(reagent.label, tr('hud.reagent'));
       reagent.set(g.player.reagent, g.player.reagentMax);
       setText(reagent.after, g.player.oil > 0 ? tr('hud.oil', { n: g.player.oil }) : ''); // flasks once any are carried (round 12)
+      setText(gun.label, tr('hud.revolver'));
       gun.set(g.player.ammo, GUN.chamber);
       setText(gun.after, `· ${g.player.rounds}`);
       setStyle(gun.after, 'color', g.player.ammo === 0 ? '#b0604f' : BONE); // dry: it reddens

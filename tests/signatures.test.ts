@@ -8,6 +8,7 @@ import { inSight } from '../src/systems/insight';
 import { candidates } from '../src/systems/lockOn';
 import { lampsOf } from '../src/systems/reality';
 import { SIGNATURES } from '../src/systems/signatures';
+import { fill } from '../src/ui/glyphs';
 import { bossGame, calm, engage } from './bossHelpers';
 import { press, steps } from './helpers';
 import { deathblow, kill, record, run, slay } from './worldHelpers';
@@ -136,6 +137,13 @@ describe('signature mechanics (spec §3E)', () => {
     engage(c);
     expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe('WOUND IT UNTIL THE ALERT COMES');
     expect(SIGNATURES.cthulhu.note?.(c.g, c.boss, c.fight, 0)).toBeNull(); // no Alert yet
+    const ship = c.g.ecs.spawn();
+    c.g.ecs.c.prop.set(ship, { kind: 'ship', owner: c.boss, lit: false, colliders: [] });
+    c.fight.props.push(ship);
+    const helm = SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight) ?? '';
+    expect(helm).toBe('THE ALERT HAS COME · {interact} AT HER HELM');
+    expect(fill(helm, true)).toBe('THE ALERT HAS COME · E AT HER HELM');
+    expect(SIGNATURES.cthulhu.note?.(c.g, c.boss, c.fight, 2)).toBe('THE ALERT HAS COME · TAKE HER HELM');
     c.fight.sig.burst = 5;
     expect(SIGNATURES.cthulhu.status?.(c.g, c.boss, c.fight)).toBe("IT REFORMS · R'LYEH SINKS");
   });

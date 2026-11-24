@@ -8,8 +8,15 @@ const hintsLeftOut = new Set<string>(KEEP.hintsLeftOut);
 const keptRealms = new Set<string>(KEEP.regions);
 const realms = new Set<string>(ALL_REALMS);
 
+/**
+ * The horrors' status lines and notices (`sig.*`: each belongs to a signature the demo does not keep; the Colour's has none of them) and
+ * the Dunwich's powder, which only the full game's Dunwich Horror shows (`boss.powder`): the demo's bundle never holds their names.
+ */
+const horrorLinesLeftOut = (key: string): boolean => key.startsWith('sig.') || key === 'boss.powder';
+
 /** A line of the field guide or a hint the demo leaves out (`hint.ship`), and a realm's epigraph the demo does not keep (`epigraph.pnakotus`). */
 const lineKept = (key: string): boolean => {
+  if (horrorLinesLeftOut(key)) return false;
   if (key.startsWith('hint.') && hintsLeftOut.has(key.slice(5))) return false;
   if (key.startsWith('epigraph.') && realms.has(key.slice(9)) && !keptRealms.has(key.slice(9))) return false;
   return true;

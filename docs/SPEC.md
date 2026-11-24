@@ -80,7 +80,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
 
 ### B. Combat & controller
 - Kinematic capsule controller, with a third-person camera that pulls in on collision.
-- Input buffer: one queued action with a 150 ms window. It is consumed at the end of recovery or at a cancel window.
+- Input buffer: one queued action with a 250 ms window (150 ms until playtest round 7; `COMBAT.bufferMs`). It is consumed at the end of recovery or at a cancel window.
 - Actions:
   - light and heavy attacks, with combo chains defined in data
   - directional dodge roll, with i-frames defined as a frame window
@@ -88,7 +88,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - block, which takes stamina damage on hit
   - parry window
   - off-hand 1920s revolver: low damage, but a well-timed shot interrupts (Bloodborne-style)
-- Stamina: actions with a cost require the full amount to start; sprinting requires the next step of its drain. Revolver shots cost no stamina. Regen is delayed after spending, and a blocked hit that empties stamina causes a guard break.
+- Stamina: an action with a cost starts from any bar above empty and may overdraw it into debt, which must regenerate above empty before another costed action can begin and to zero before a free shot (2026-10-28); sprinting requires the next step of its drain. Revolver shots cost no stamina. Regen is delayed after spending, and a blocked hit that empties stamina causes a guard break.
 - Poise and stagger apply to both the player and enemies. Hits get 2–4 frames of hitstop.
 - Critical bonuses are modest: +15% against ordinary enemies, +10% against bosses. Backstabs require a heavy attack within the rear 40° of a small non-boss foe. Body parts have no weakspot bonuses; multipart hitboxes only follow the creature's shape.
 - Lock-on:
@@ -164,7 +164,7 @@ Place every other entity in the spawn tables of its best-fitting region.
 
 ### E. Bosses
 - `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?, eldritch?}`.
-- Boss health is independent of investigator level: it starts at the authored maximum for its current form, grows to 115% on NG+1, then by five percentage points per journey to 145% at NG+7 and beyond. On the first journey a boss's damage gains +0.3% per purchased attribute level and, past its expected standing, absorbs 45% of the investigator's extra health growth. Later journeys use a fixed reference and regional damage progression through NG+7 (`docs/NGPLUS.md`); the chosen difficulty still applies. Every attribute level grants its full benefit. Leveling leaves a living boss's health and wounds unchanged. Ordinary enemies receive regional journey scaling; encounter servants keep authored health and inherit the encounter's journey damage growth.
+- Boss health does not rise with each level bought (only past the standing, below): it starts at the authored maximum for its current form, grows to 115% on NG+1, then by five percentage points per journey to 145% at NG+7 and beyond. On the first journey a boss's damage gains +0.3% per purchased attribute level and, past its expected standing, its blows absorb 55% of the investigator's extra health growth, and its health grows with 75% of their extra damage (Might and the weapon's edge) (`BOSS_OVERMATCH`, 2026-11-01 and 2026-11-02). Later journeys use a fixed reference and regional damage progression through NG+7 (`docs/NGPLUS.md`); the chosen difficulty still applies. Every Vigour and Endurance level grants its full benefit, while Might gives half its damage per level past level 18 (`LEVELS.might.knee`). Leveling leaves a living boss's health and wounds unchanged. Ordinary enemies receive regional journey scaling; encounter servants keep authored health and inherit the encounter's journey damage growth.
 - The High Priest reveals its eldritch form in phases two and three regardless of sanity. Dagon and Hydra coordinate attacks while engaged together in the same arena, waiting through the partner's complete recovery plus 24 rest frames before another wind-up. The waiting boss yields 0.75 m beyond the two collision radii, leaving room to dodge while remaining within blade reach. Their authored health is 2550/2450 and damage 35/38, balanced as one combined encounter. Their flood remains, while second-phase darkness and servant packs are removed to preserve visible ground cues and space to counterattack.
 - Arenas have no decorative neon floor symbols. Markings on arena props and functional combat or puzzle markings remain.
 - Shared attack library, about 20 parameterized attacks:

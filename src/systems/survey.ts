@@ -6,6 +6,7 @@
  */
 
 import { distXZ } from '../core/geom';
+import { t } from '../core/i18n';
 import { SURVEY } from '../data/tuning';
 import { worldLayout } from '../world/placements';
 import type { Game } from './components';
@@ -31,6 +32,6 @@ export function registerSurvey(g: Game): void {
     const s = ow && me && nearestUnfound(g, me);
     if (!ow || !s) return;
     for (const region of explore(ow.explored, s, SURVEY.radius)) g.events.emit('Explored', { region });
-    g.events.emit('Notice', { text: `THE PAGES SKETCH A WAY TO ${s.name.toUpperCase()} · MARKED ON THE MAP` });
+    g.events.emit('Notice', { text: t('n.survey', { name: s.name.toUpperCase() }) });
   });
 }

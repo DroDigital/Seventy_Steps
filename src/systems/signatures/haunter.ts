@@ -4,9 +4,10 @@
  * where a blow that does next to nothing in the dark read as a fight that could not be won. Pure: no Three.js.
  */
 
+import { t } from '../../core/i18n';
 import { litNear } from '../reality';
 import type { Signature } from '../signatures';
 
 export const HAUNTER_SIGNATURE: Signature = {
-  status: (g, e, f) => (litNear(g, f, e) ? 'THE LAMPLIGHT WOUNDS IT' : 'ONLY LAMPLIGHT WOUNDS IT · LURE IT TO A LAMP'),
+  status: (g, e, f) => (litNear(g, f, e) ? t('sig.lamplit') : t('sig.lure')),
 };

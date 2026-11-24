@@ -21,7 +21,7 @@ import { browserStore } from './autosave';
 import { recallSlot } from '../systems/save';
 import { setMenuSound } from './menuKit';
 import { setPadSwap } from '../core/padMap';
-import { detectLocale, setLocale } from '../core/i18n';
+import { detectLocale, localeId, setLocale } from '../core/i18n';
 import { clampSetting, loadSettings, SETTINGS_KEY, storeSettings, type SettingId, type Settings } from './settings';
 import { applyUiScale } from './uiScale';
 import { createVeil, type Veil } from './veil';
@@ -47,6 +47,7 @@ export function createShell(): Shell {
     if (desktop?.deck) Object.assign(settings, DECK); // and on a Steam Deck's seven inches, larger text (round 47)
   }
   setLocale(settings.language);
+  document.documentElement.lang = localeId(); // the page says the language it is in (the Language setting), for the browser and a screen reader
   const levels = (): { music: number; sfx: number; ambience: number } => ({ music: settings.music, sfx: settings.sfx, ambience: settings.ambience });
   const engine = createAudioEngine(settings.volume, levels());
   engine.setSpeech(settings.speech);
@@ -75,7 +76,10 @@ export function createShell(): Shell {
     if (id === 'uiScale') applyUiScale(settings.uiScale);
     if (id === 'captions' || id === 'captionBack') applyCaptions(settings.captions, settings.captionBack > 0.5);
     if (id === 'padSwap') setPadSwap(settings.padSwap > 0.5);
-    if (id === 'language') setLocale(settings.language);
+    if (id === 'language') {
+      setLocale(settings.language);
+      document.documentElement.lang = localeId();
+    }
   };
   const saveKeys = (): void => {
     try {
