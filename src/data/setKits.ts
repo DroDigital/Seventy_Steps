@@ -25,6 +25,8 @@ export const SET_KITS: Readonly<Record<string, SetKit>> = {
   pipes: { w: 1.5, d: 1.5, h: 6, round: true },
   banner: { w: 1.1, d: 0.3, h: 5.5, round: true },
   meteor: { w: 1.6, d: 1.6, h: 2, round: true },
+  cleft: { w: 1.4, d: 1.4, h: 0.9, round: true }, // round 122: the Cavern of Flame's rift and its flame (render/setShapesDream.ts): its lip a collider, so none walks into the fire
+  priest: { w: 0.95, d: 1.25, h: 4.5 }, // round 122: an effigy of Nasht or Kaman-Thah, seated, bearded, in the pshent
   bookcase: { w: 0.65, d: 0.28, h: 2.5 }, // round 79: a reading room's furniture, built (render/setShapesBooks.ts)
   bookcase_low: { w: 0.65, d: 0.26, h: 1.1 },
   bookshelf: { w: 0.9, d: 0.16, h: 0.4, walk: true }, // on a wall, high: no collider

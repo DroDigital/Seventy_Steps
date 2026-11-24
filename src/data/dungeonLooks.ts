@@ -13,7 +13,7 @@ import type { Vec3 } from './tuning';
 /** What a pillar is drawn as (its collider is the same cylinder whatever it is). */
 export type PillarForm =
   | 'round' | 'square' | 'cluster' | 'fluted' | 'fivefold' | 'twisted' | 'post' | 'mast' | 'pipe' | 'brick'
-  | 'menhir' | 'stalagmite' | 'coral' | 'bones' | 'basalt' | 'onyx' | 'fungal' | 'shard' | 'toad';
+  | 'menhir' | 'stalagmite' | 'coral' | 'bones' | 'basalt' | 'onyx' | 'fungal' | 'shard' | 'toad' | 'lotus';
 
 /** The relief carved in a band round a roofed hall under its cornice. */
 export type Frieze = 'none' | 'dentils' | 'meander' | 'waves' | 'stars' | 'eyes' | 'skulls' | 'tentacles' | 'runes' | 'fivefold' | 'zigzag' | 'boards';
@@ -34,11 +34,11 @@ export interface DungeonLook {
   tint?: Vec3; // its stone, multiplied
 }
 
-/** The pillars of a room of each kit, wherever its dungeon says nothing (the Stairs of Slumber's kits keep the round column). */
+/** The pillars of a room of each kit, wherever its dungeon says nothing (round 122: the Stairs of Slumber's kits have their own, `KIT_LOOKS`). */
 export const KIT_PILLARS: Readonly<Record<KitId, PillarForm>> = {
   masonry: 'round', library: 'fluted', timber: 'post', townhouse: 'post', cellar: 'brick', mine: 'post', brick: 'brick', crypt: 'square',
   church: 'cluster', marble: 'fluted', hill: 'menhir', drowned: 'coral', sunken: 'coral', elder: 'fivefold', basalt: 'basalt', tsath: 'onyx',
-  dream: 'round', dreamflame: 'round', dreamdeep: 'round', dreamabyss: 'round', onyx: 'onyx', cyclopean: 'twisted', fungoid: 'fungal', void: 'shard',
+  dream: 'lotus', dreamflame: 'stalagmite', dreamdeep: 'square', dreamabyss: 'menhir', onyx: 'onyx', cyclopean: 'twisted', fungoid: 'fungal', void: 'shard',
 };
 
 /** Each dungeon's own build, for the rooms of its own kit. A dungeon not named keeps the look it had (the Stairs of Slumber). */
@@ -75,10 +75,27 @@ export const DUNGEON_LOOKS: Readonly<Record<string, DungeonLook>> = {
   rue_dauseil: { pillar: 'post', frieze: 'none', roof: 'rafters', items: ['shelves', 'crate', 'chains'], tint: [0.84, 0.82, 0.86] },
 };
 
+/**
+ * The looks of the kits that are one place's alone, wherever their rooms are (round 122, asked: the Cavern of Flame and the whole of the
+ * stairs "way more lore accurate"). The Dream-Quest of Unknown Kadath gives the Stairs of Slumber little, and every piece of it is kept:
+ * the seventy steps of light slumber come down to a cavern of flame where the bearded priests Nasht and Kaman-Thah shake their
+ * pshent-bearing heads, so the light slumber's halls are an Egyptian priests' temple (papyrus columns under a starry frieze and a coffered
+ * ceiling, their statues and stelae along the walls); the cavern is a cavern, raw rock with its stalagmites and its dripping roof (its
+ * flame and its priests' effigies are its set's: data/roomSets.ts); the seven hundred steps of deeper slumber go down bare and plain; and
+ * below the span, nearing the Gate of Deeper Slumber, which opens on "the enchanted wood, whose low prodigious oaks twine groping boughs,
+ * and shine dim with the phosphorescence of strange fungi", the oaks' roots come down through the vaults and the fungi grow on the walls.
+ */
+export const KIT_LOOKS: Readonly<Partial<Record<KitId, DungeonLook>>> = {
+  dream: { pillar: 'lotus', frieze: 'stars', roof: 'coffers', items: ['statue', 'stele', 'statue', 'stele'], tint: [1.04, 1, 0.92] },
+  dreamflame: { pillar: 'stalagmite', frieze: 'none', roof: 'stalactites', items: ['stele', 'rubble'] },
+  dreamdeep: { pillar: 'square', frieze: 'none', roof: 'groin', items: ['stele', 'rubble'] },
+  dreamabyss: { pillar: 'menhir', frieze: 'none', roof: 'roots', items: ['roots', 'growth', 'roots', 'growth'] },
+};
+
 const PLAIN: DungeonLook = { pillar: 'round', frieze: 'none', roof: 'ribs' };
 
 /** A dungeon's look for a room of kit `kit`: its own if the room is of its own kit, else the kit's defaults. */
 export function lookOf(dungeon: string, kit: KitId, own: KitId): DungeonLook {
   const look = DUNGEON_LOOKS[dungeon];
-  return look && kit === own ? look : { ...PLAIN, pillar: KIT_PILLARS[kit] };
+  return look && kit === own ? look : (KIT_LOOKS[kit] ?? { ...PLAIN, pillar: KIT_PILLARS[kit] });
 }

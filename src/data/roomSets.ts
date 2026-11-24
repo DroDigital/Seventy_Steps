@@ -40,13 +40,14 @@ export const ROOM_SETS: Readonly<Record<string, ArenaSet>> = {
   'library/bindery': {
     puts: [row('bookcase_low', 0.86, [0, 90, 270, 180], { tint: DAMP }), shelves([0, 90, 270, 180], 2.1, { tint: DAMP }), piles(6, { tint: DAMP })],
   },
-  // Where the seventy steps begin: a brazier on each side wall of the stair head.
+  // Where the seventy steps begin (round 122: the priests below wear the pshent, so the light slumber's head is an Egyptian temple's): a pair of sphinxes couched either side of the way, facing whoever comes in.
   'slumber/threshold': {
-    puts: [put('ss_brazier', at(0.74, 90, { face: 'in' }), { lit: 'torch', size: 1.2, heart: true }), put('ss_brazier', at(0.74, 270, { face: 'in' }), { lit: 'torch', size: 1.2, heart: true })],
+    puts: [put('sphinx', at(0, 0, { side: 5, mirror: true, face: 'in' }), { size: 0.45, heart: true })],
   },
-  // The Cavern of Flame: the two eternal fires, tall, one at each side wall.
+  // The Cavern of Flame (round 122, the tale's: "the cavern of flame" and "the bearded priests Nasht and Kaman-Thah" with their "pshent-bearing heads"):
+  // a wide hall of raw rock (dungeons.ts), the flame that names it standing out of a rift at its heart within a ring of stalagmites, and the priests' seated effigies either side of the way on down to the seven hundred steps.
   'slumber/cavern': {
-    puts: [put('ss_brazier', at(0.74, 90, { face: 'in' }), { lit: 'torch', size: 1.4, heart: true }), put('ss_brazier', at(0.74, 270, { face: 'in' }), { lit: 'torch', size: 1.4, heart: true })],
+    puts: [put('cleft', at(0, 0, { face: 'free' }), { heart: true }), put('priest', at(0.5, 180, { side: 6, mirror: true, face: 'in' }), { heart: true })],
   },
   // The gate of deeper slumber: two braziers on one side of its aisle, the last light of the stair (round 104: the hall moved; its colonnade and its gate leave room for them only there).
   'slumber/deeper': {

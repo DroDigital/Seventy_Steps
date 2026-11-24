@@ -86,6 +86,8 @@ describe('the dungeon kit', () => {
     expect(foes.length).toBeLessThanOrEqual(25);
     for (const r of d.rooms) expect(r.def.spawns?.length ?? 0, r.def.id).toBeLessThanOrEqual(r.def.kind === 'hall' ? 3 : 2);
     for (const id of ['threshold', 'cavern', 'deeper']) expect(room(d, id).def.spawns ?? [], id).toEqual([]);
+    // Round 122 (asked: no notice every fifty steps, only the important ones): the two stairs, the cavern and the gate.
+    expect(d.rooms.filter((r) => r.def.words).map((r) => r.def.id)).toEqual(['light_1', 'cavern', 'deep_1', 'deeper']);
     let run = 0; // rooms in a row that hold foes: a quiet flight or landing always comes after two
     for (const r of d.rooms) {
       run = r.def.spawns?.length ? run + 1 : 0;

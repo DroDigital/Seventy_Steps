@@ -49,9 +49,9 @@ export function patchAt(x: number, z: number): boolean {
 /** The ground at (x, y, z); a game with no open world (the arena's) is stone. */
 export function groundAt(g: Game, x: number, y: number, z: number): GroundKind {
   if (!g.overworld) return 'stone';
-  if (y < WORLD.seaLevel - 0.05) return 'water';
-  const room = dungeonRoomAt(x, z);
+  const room = dungeonRoomAt(x, z); // (first: a dungeon's room is dry however far below the sea's level its floor lies; round 122, the Stairs of Slumber splashed)
   if (room) return OF_KIT[kitOfRoom(room.layout, room.room).floor] ?? 'slab';
+  if (y < WORLD.seaLevel - 0.05) return 'water';
   const [cx, cz] = [chunkOf(x), chunkOf(z)];
   if (worldLayout().chunk(cx, cz).dungeons.some(({ rect: r }) => x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1)) return 'slab'; // (the dungeon's footprint beyond its rooms: stone, as surfaceAt)
   if (chunkContent(cx, cz).roads.some((s) => segmentDistance(x, z, s.a, s.b) < s.width / 2)) return 'road';

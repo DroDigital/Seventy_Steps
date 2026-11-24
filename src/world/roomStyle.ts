@@ -125,10 +125,11 @@ export function pillarsOf(s: RoomStyle, r: RoomLayout, spots: readonly (readonly
       break;
   }
   const ways = lanes(r);
+  const lane = s === WIDE ? 0 : h - 6; // a doorway's lane runs 6 m in; a great hall that is no boss's keeps it clear to its middle (round 122: the Cavern of Flame's ring stood across its way)
   return at.filter(([u, v]) => {
     if (Math.max(Math.abs(u), Math.abs(v)) > h - 1.8) return false; // inside its walls
     if (spots.some(([a, b]) => Math.hypot(u - a, v - b) < rad + 1.6)) return false;
-    return !ways.some(([lu, lv]) => u * lu + v * lv > h - 6 && Math.abs(-u * lv + v * lu) < rad + 2.2); // nor in a doorway's lane
+    return !ways.some(([lu, lv]) => u * lu + v * lv > lane && Math.abs(-u * lv + v * lu) < rad + 2.2); // nor in a doorway's lane
   }).map(([u, v]) => [u, v, rad] as const);
 }
 
