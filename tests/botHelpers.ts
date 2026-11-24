@@ -50,7 +50,7 @@ export interface BotFight {
   shots: number;
   remaining: number;
   phases: number[];
-  health: number; // the foe's maximum health after applying this run's player level
+  health: number; // the most health the foe has in the run: past its standing it grows to meet the investigator as it engages
   frames: number; // how many it ran (fewer than asked when the foe fell)
   fell: boolean; // the foe fell within them
   dealt: number; // damage the bot did to the foe
@@ -130,7 +130,7 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   Object.assign(g.player.levels, style.levels ?? { vigour: 0, endurance: 0, might: LEVELS.might.max });
   applyLevels(g); // refresh the investigator’s resources without changing boss health
   if (style.sanity !== undefined) setSanity(g, style.sanity);
-  const health = c.health.get(boss)?.max ?? 0;
+  let health = c.health.get(boss)?.max ?? 0; // the most it has in the run: a fight grows to meet the investigator as it engages (2026-11-24)
   if (style.weapon) {
     if (!g.player.arms.includes(style.weapon)) g.player.arms.push(style.weapon);
     equip(g, style.weapon);
@@ -178,6 +178,7 @@ export function driveBot(g: Game, boss: Entity, frames: number, stopAtHit = fals
   for (; frame < frames; frame++) {
     const from = c.transform.get(g.player.id)!;
     const hp = c.health.get(boss);
+    health = Math.max(health, hp?.max ?? 0);
     if (style.smart && c.transform.has(boss)) {
       const nearest = (list: Entity[]): Entity => list.reduce((a, b) => (dist(c.transform.get(a)!.pos, from.pos) <= dist(c.transform.get(b)!.pos, from.pos) ? a : b));
       const roots = propsOf('root');

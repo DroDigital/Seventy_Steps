@@ -1,14 +1,13 @@
 /**
  * The seam that lets a horror's place be any outline (round 66; world/enclosure.ts, sitePads.ts, occupancy.ts, closure.ts): a pad is asked its
  * distance through one function whatever its kind; the fill keeps off a shape; and every enclosure, of whatever kind, keeps the invariants the
- * rest of the world relies on: its gate on its wall, its stake and candle within it, its set clear of it, and no way in but the gate, found by
- * a flood over every place rather than a walk from some sides.
+ * rest of the world relies on: its gate on its wall, its stake and candle within it, its set clear of it, and no way in but the gate (the
+ * exhaustive flood over every house moved to tests/enclosureAudit.test.ts on 2026-11-24).
  */
 import { describe, expect, it } from 'vitest';
 import { HOUSE } from '../src/data/arenaHouses';
 import { allFogs } from '../src/systems/fogGates';
-import { closure, CLOSURE } from '../src/world/closure';
-import { chunkContent } from '../src/world/chunks';
+import { closure } from '../src/world/closure';
 import { reach } from '../src/world/arenaDecor';
 import { pieceColliders } from '../src/world/arena';
 import type { Collider } from '../src/world/colliders';
@@ -151,19 +150,4 @@ describe('the closure audit', () => {
     expect(closure({ ...input, colliders: sealed }).leak, 'a wall with a stretch gone').not.toBeNull();
     expect(closure({ ...input, colliders: [...sealed, ...gone.map(propCollider).filter((c): c is Collider => !!c)] }).leak, 'and whole').toBeNull();
   });
-
-  it('shuts every house, and lets the open gate in to the stake', () => {
-    for (const a of arenas) {
-      const e = a.house!;
-      const near: Collider[] = [];
-      for (let cx = chunkOf(e.rect.x0 - CLOSURE.margin - 2); cx <= chunkOf(e.rect.x1 + CLOSURE.margin + 2); cx++) {
-        for (let cz = chunkOf(e.rect.z0 - CLOSURE.margin - 2); cz <= chunkOf(e.rect.z1 + CLOSURE.margin + 2); cz++) near.push(...chunkContent(cx, cz).colliders);
-      }
-      const colliders = [...new Set(near)];
-      const input = { rect: e.rect, colliders, ground, inside: (p: { x: number; z: number }) => e.gap(p) <= -HOUSE.margin, into: e.stake };
-      const shut = closure({ ...input, colliders: [...colliders, ...pieceColliders({ ...e.piece, boxes: e.piece.seal!.boxes })] });
-      expect(shut.leak, `${a.bosses[0]}: sealed, a way in at ${shut.leak?.x.toFixed(1)}, ${shut.leak?.z.toFixed(1)}`).toBeNull();
-      expect(closure(input).reached, `${a.bosses[0]}: open, the gate leads to the stake before the fog`).toBe(true);
-    }
-  }, 120_000);
 });

@@ -237,9 +237,9 @@ export function applySave(g: Game, s: SaveData): void {
   g.player.cycle = clampInt(s.cycle ?? 0, 0, NEW_GAME_PLUS.most); // before the world fills
   applyLevels(g);
   g.player.arms = ['cane', ...new Set((s.arms ?? []).filter((id): id is WeaponId => isWeapon(id) && id !== 'cane'))];
-  if (!equip(g, s.weapon ?? 'cane')) equip(g, 'cane');
   g.player.stones = clampInt(s.stones ?? stonesOfSlain(s.slain), 0, 999);
   for (const id of WEAPON_IDS) g.player.reinforced[id] = clampInt(s.reinforced?.[id] ?? 0, 0, REINFORCE.max);
+  if (!equip(g, s.weapon ?? 'cane')) equip(g, 'cane');
   const h = c.health.get(g.player.id)!;
   h.hp = Math.min(h.max, Math.max(1, s.hp));
   const st = c.stamina.get(g.player.id)!;

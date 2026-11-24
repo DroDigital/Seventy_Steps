@@ -1,14 +1,11 @@
 /**
- * Round 117, the dungeons' props and the arenas' built pieces reviewed: each thing on a hall's wall in every way it can be built stays
- * on its own stretch of the wall and within reach of it, a torch's plate lies on the wall (it hung 10 cm off it), a brazier's legs lean
- * in to its bowl, and R'lyeh's leaning slab keeps its foot in the ground at both ends (one corner of it stood in the air).
+ * Round 117, the dungeons' props and the arenas' built pieces reviewed: a torch's plate lies on the wall (it hung 10 cm off it),
+ * a brazier's legs lean in to its bowl, and R'lyeh's leaning slab keeps its foot in the ground at both ends (one corner of it stood
+ * in the air). The exhaustive wall-item sweep across twenty-four seeds moved to tests/dungeonPropsAudit.test.ts (2026-11-24).
  */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { createRng } from '../src/core/rng';
-import { brazier, DEPTH, place, type Out } from '../src/render/dungeonFurniture';
-import { KIT_ITEMS, type KitItem } from '../src/render/kitItems';
-import { LORE_ITEMS, type LoreItem } from '../src/render/loreItems';
+import { brazier } from '../src/render/dungeonFurniture';
 import { sconce } from '../src/render/sconces';
 import { slab } from '../src/render/setShapesStone';
 import { setPieces } from '../src/render/setShapes';
@@ -17,37 +14,12 @@ import { SET_KITS } from '../src/data/setKits';
 import type { Prop } from '../src/world/props';
 
 const C: [number, number, number] = [0.6, 0.6, 0.58];
-const each = (out: Out): THREE.BufferGeometry[] => Object.values(out).flat();
 const points = (g: THREE.BufferGeometry): THREE.Vector3[] => {
   const pos = g.getAttribute('position');
   return Array.from({ length: pos.count }, (_, i) => new THREE.Vector3().fromBufferAttribute(pos, i));
 };
 
-/** A wall along x, its face at z = 0, the room toward +z, or turned the other way round. */
-const walls = [{ at: (s: number, d: number) => ({ x: s, z: d }), alongX: true }, { at: (s: number, d: number) => ({ x: -d, z: -s }), alongX: false }];
-
 describe('the dungeons\' props and the arenas\' built pieces (round 117)', () => {
-  it('builds every thing on a hall\'s wall, in every way it can be, on its own stretch of the wall and within reach of it', () => {
-    const kinds = [...Object.keys(KIT_ITEMS), ...Object.keys(LORE_ITEMS)] as (KitItem | LoreItem)[];
-    for (const item of kinds) for (const [w, wall] of walls.entries()) for (let seed = 1; seed <= 24; seed++) {
-      const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [] };
-      place(item, { wall, s: 0, y: 0, c: C, rng: createRng(seed * 7919 + w), out });
-      const geos = each(out);
-      expect(geos.length, item).toBeGreaterThan(0);
-      for (const g of geos) {
-        expect(g.getAttribute('color'), `${item} colour`).toBeDefined();
-        for (const p of points(g)) {
-          expect(Number.isFinite(p.x + p.y + p.z), item).toBe(true);
-          const [s, d] = w ? [-p.z, -p.x] : [p.x, p.z];
-          expect(d, `${item} seed ${seed}: off the wall`).toBeLessThan(DEPTH + 0.06);
-          expect(d, `${item} seed ${seed}: into the wall`).toBeGreaterThan(-0.02);
-          expect(p.y, `${item} seed ${seed}: under the floor`).toBeGreaterThan(-0.3); // (stones and a leaning block are sunk a little in it, as the halls' test allows)
-          if (item in KIT_ITEMS) expect(Math.abs(s), `${item} seed ${seed}: along the wall`).toBeLessThan(1.45);
-        }
-      }
-    }
-  });
-
   it('hangs a torch\'s plate on the wall\'s face, its flame where it was', () => {
     for (const across of [1, -1]) for (const alongX of [true, false]) {
       const s = sconce({ x: 0, z: 0, across, alongX, floor: 0 }, 1);

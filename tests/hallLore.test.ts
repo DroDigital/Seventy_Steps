@@ -5,6 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { DUNGEON_LOOKS, KIT_PILLARS, type PillarForm } from '../src/data/dungeonLooks';
 import { HALL_LORE } from '../src/data/hallLore';
 import { KITS } from '../src/data/kits';
@@ -14,17 +15,11 @@ import type { CylPart } from '../src/world/dungeonParts';
 import { worldLayout } from '../src/world/placements';
 import { roomStyle } from '../src/world/roomStyle';
 import { hallLore, loreOf } from '../src/render/hallLore';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
 import { pillarPieces } from '../src/render/pillarForms';
 import { local } from '../src/render/roomWalls';
 
 const w = worldLayout();
 const bossHalls = w.dungeons.flatMap((d) => d.layout.rooms.filter((r) => r.def.kind === 'hall' && r.def.boss).map((r) => ({ d: d.layout, r })));
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
-const anomalous = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 const points = (g: { getAttribute(n: string): { count: number; getX(i: number): number; getY(i: number): number; getZ(i: number): number } }) => {
   const p = g.getAttribute('position');
   return Array.from({ length: p.count }, (_, i) => ({ x: p.getX(i), y: p.getY(i), z: p.getZ(i) }));
@@ -56,7 +51,7 @@ describe('each dungeon\'s own build and each boss hall\'s lore (round 108)', () 
 
   it('lights no hall in an anomaly\'s hue', () => {
     for (const [id, lore] of Object.entries(HALL_LORE)) {
-      expect(anomalous(lore.glow), id).toBe(false);
+      expect(readsAsAnomaly(lore.glow), id).toBe(false);
     }
   });
 

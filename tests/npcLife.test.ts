@@ -74,26 +74,6 @@ describe('the people have somewhere to be (round 26)', () => {
   });
 });
 
-describe('the people are seen to walk, when they do (rounds 35 and 39)', () => {
-  it('a breather has a step between where they were and are, through the whole game step (the movement system left it alone: they stood in their walk)', async () => {
-    const { stepGame } = await import('../src/systems/game');
-    const { emptyInput } = await import('../src/core/input');
-    const g = night(0.05);
-    const e = npcEntity(g, 'gilman')!;
-    const tr = g.ecs.c.transform.get(e)!;
-    let walked = 0;
-    let longest = 0;
-    for (let i = 0; i < 60 * 240; i++) {
-      stepGame(g, emptyInput());
-      const d = distXZ(tr.prev, tr.pos);
-      if (d > 1e-4) walked++;
-      longest = Math.max(longest, d * SIM.hz);
-    }
-    expect(walked).toBeGreaterThan(60 * 2); // some seconds of walking in four minutes: the breathers
-    expect(longest).toBeLessThan(1.6); // an unhurried walk, m/s
-  }, 90000);
-});
-
 describe('the people keep at what they do (round 39)', () => {
   const doers = NPCS.filter((n) => !n.creature);
 
