@@ -55,24 +55,6 @@ const banks = (() => {
 })();
 const size = { w: 0, h: 0, at: -1 }; // the ground's size as drawn: it eases to each page's
 
-let ditherPat: CanvasPattern | null = null;
-function bayerPattern(g: CanvasRenderingContext2D): CanvasPattern | null {
-  if (ditherPat) return ditherPat;
-  const t = document.createElement('canvas');
-  [t.width, t.height] = [8, 8];
-  const tg = t.getContext('2d');
-  if (!tg) return null;
-  const m = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-  for (let y = 0; y < 4; y++) {
-    for (let x = 0; x < 4; x++) {
-      const v = m[x + y * 4];
-      tg.fillStyle = v < 8 ? 'rgba(6,5,10,0.16)' : 'rgba(170,150,215,0.05)';
-      tg.fillRect(x * 2, y * 2, 2, 2);
-    }
-  }
-  return (ditherPat = g.createPattern(t, 'repeat'));
-}
-
 export const mist: Skin = {
   id: 'mist',
   name: 'Mist',
@@ -93,7 +75,7 @@ export const mist: Skin = {
         const [sw, sh] = [size.w, size.h];
         const [cx, cy] = [w / 2, h / 2];
         g.globalAlpha = smooth(0, 0.6, open);
-        feathered(g, (w - sw) / 2 + 4, (h - sh) / 2 + 4, (w + sw) / 2 - 4, (h + sh) / 2 - 4, FEATHER, '8,7,12', 0.78); // the ground, with no edge to it
+        feathered(g, (w - sw) / 2 + 4, (h - sh) / 2 + 4, (w + sw) / 2 - 4, (h + sh) / 2 - 4, FEATHER, '8,7,12', 0.7); // the ground, with no edge to it
         g.globalAlpha = roll;
         for (const b of banks) { // the mist, turning (a surge when a page changes: it stirs, closer and brighter)
           const a = b.a + ms * b.spin + stir * 0.35;
@@ -106,12 +88,6 @@ export const mist: Skin = {
           grd.addColorStop(1, 'rgba(60,56,80,0)');
           g.fillStyle = grd;
           g.fillRect(x - b.rad, y - b.rad, b.rad * 2, b.rad * 2);
-        }
-        const pat = bayerPattern(g);
-        if (pat) {
-          g.globalAlpha = roll * 0.7;
-          g.fillStyle = pat;
-          g.fillRect(-BLEED, -BLEED, w + BLEED * 2, h + BLEED * 2);
         }
         g.globalAlpha = 1;
         g.globalCompositeOperation = 'destination-in';
