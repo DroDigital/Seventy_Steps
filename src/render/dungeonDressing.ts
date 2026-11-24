@@ -129,7 +129,7 @@ export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at:
     const rng = createRng((hash2(Math.round(r.x), Math.round(r.z), 1080) * 4294967296) >>> 0);
     if (kit.roof !== 'open' && !lore?.roof.includes('dome')) roofDress(look.roof, r, kit, c, at, out, rng); // (round 108: as its dungeon dresses it; a domed hall's ribs are its dome's)
     if (r.def.kind === 'hall' && !r.def.boss && kit.roof !== 'open') frieze(look.frieze, d, r, c, out, rng);
-    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : isAbyss(r) ? stairNewels(r, kit, c, at) : []; // (round 104: a flight over the void, its newels and their fires)
+    const lit = r.def.kind === 'hall' ? hall(d, r, kitId, kit, c, torches, out) : isAbyss(r) ? stairNewels(d, r, kit, c, at) : []; // (round 104: a flight over the void, its newels and their fires)
     result.push(...grouped(kit, out, at), ...lit, ...(lore ? hallLore(d, r, kit, c, at, avoidIn(r, torches, decor)) : []));
   }
   return result;

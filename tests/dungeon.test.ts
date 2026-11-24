@@ -79,7 +79,14 @@ describe('the dungeon kit', () => {
     expect(steps('cavern', 'deeper')).toBe(700);
     expect(room(d, 'cavern').level - d.base).toBeCloseTo(-70 * SLUMBER_STEPS.riser);
     expect(room(d, 'deeper').level - room(d, 'cavern').level).toBeCloseTo(-700 * SLUMBER_STEPS.riser);
-    expect(stairs('threshold', 'deeper').every((r) => r.def.spawns?.length)).toBe(true); // something waits on every flight, all the way down
+    // Round 119 (asked: the descent was a gauntlet run at a sprint on potions): a few lone things in the mist, far apart, and no empty walk either.
+    const foes = d.rooms.flatMap((r) => r.def.spawns ?? []);
+    expect(foes.length).toBeGreaterThanOrEqual(4);
+    expect(foes.length).toBeLessThanOrEqual(8);
+    expect(d.rooms.every((r) => (r.def.spawns?.length ?? 0) <= 1)).toBe(true); // alone, each one
+    const stepAt = (id: string) => steps('threshold', id); // the steps taken before a room is entered
+    const met = d.rooms.filter((r) => r.def.spawns?.length).map((r) => stepAt(r.def.id));
+    met.slice(1).forEach((s, i) => expect(s - met[i], `between the foes before step ${s}`).toBeGreaterThanOrEqual(80));
     expect(d.errors).toEqual([]);
     expect(roomAt(d, worldLayout().dream!.x, worldLayout().dream!.z)?.def.id).toBe('threshold');
     const on = room(d, 'light_1');

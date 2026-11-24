@@ -21,7 +21,7 @@ import { createHalos } from './halos';
 import { layFlashes } from './flashLights';
 import { createLightSight } from './lightSight';
 import { paneLit } from './paneLife';
-import { stairDim, stairWaver } from './stairLights';
+import { stairDim, stairFlame, stairWaver } from './stairLights';
 import { LAMP_SLOTS } from './shaders/world';
 import { worldUniforms } from './worldMaterial';
 import { gutterAt } from './blastWaves';
@@ -39,7 +39,7 @@ export interface LightSpot {
   glass?: { x: number; y: number; z: number };
   pane?: number; // a lit window's seed: put out now and then, dimmed as someone passes (paneLife.ts; round 18)
   seat?: number; // the distance of its pixel flame's foot from the light (negative, under it), where its kind's `base` does not say
-  stairs?: boolean; // on the Stairs of Slumber's descent: dimmed, and liable to gutter as the mind fails (render/stairLights.ts; round 105)
+  stairs?: number; // on the Stairs of Slumber's descent, the share of it this light stands at: dimmed by its depth, its flame burning lower, and liable to gutter as the mind fails (render/stairLights.ts; rounds 105, 119)
   flame?: number; // the size of its pixel flame, as a multiple of its kind's (`LIGHTS.flames`; round 87, from the cone it replaced: a great brazier burns higher than a candle)
 }
 
@@ -90,7 +90,7 @@ export const LIGHT_NERVES = { madness: 0 };
 
 /** A flame's waver: about 1, by `amount` (and a failing mind's), its own rhythm for each spot. */
 function waver(s: LightSpot, amount: number, time: number): number {
-  if (s.stairs) return stairWaver(s, amount, time, LIGHT_NERVES.madness); // (round 105: the stairs' lights keep a steady wobble and their own rare gutters)
+  if (s.stairs !== undefined) return stairWaver(s, amount, time, LIGHT_NERVES.madness); // (round 105: the stairs' lights keep a steady wobble and their own rare gutters)
   const m = LIGHT_NERVES.madness;
   const a = amount + m * 0.3;
   if (a <= 0) return 1;
@@ -225,7 +225,7 @@ export function createWorldLights(world: () => CollisionWorld | null = () => nul
         const low = guttered(s, time); // (round 116: a passing front bows it down and dims it)
         const gain = v * stairDim(s) * (0.8 + 0.2 * Math.min(1.2, waver(s, LIGHTS.kinds[s.kind].flicker, time))) * low;
         let full = false;
-        const size = (s.flame ?? 1) * (0.4 + 0.6 * low);
+        const size = (s.flame ?? 1) * (0.4 + 0.6 * low) * stairFlame(s); // (round 119: a stair's flames burn lower the deeper they hang)
         for (let i = 0; i < f.count && !full; i++) {
           const a = (seed + i / f.count) * Math.PI * 2;
           const spread = f.count > 1 ? f.spread * size : 0;
