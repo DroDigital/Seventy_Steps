@@ -15,12 +15,13 @@ line each, labelled by date (YYYY-MM-DD) or PR number, never by a round number.
   changes. `npm run check:all`: both, what CI runs.
 - `npm run build`: typecheck + production build into `dist/`. `build:demo`, `check:demo`, `smoke:demo`: the demo as a
   build of its own (`docs/DEMO_BUILD.md`).
-- `npm run desktop` (`desktop:dev` on the dev server): the Electron shell. `package[:win|:linux|:mac]`, `smoke`,
-  `steam:upload`, `itch:push`, `icon`: packing and shipping (`docs/RELEASE.md`, `docs/STEAM.md`).
+- `npm run desktop` (`desktop:dev` on the dev server): the Electron shell. `package[:win|:linux|:mac]`,
+  `package:demo[:win|:linux|:mac]`, `smoke`, `steam:upload`, `itch:push`, `icon`: packing and shipping
+  (`docs/RELEASE.md`, `docs/STEAM.md`).
 - World editor, development builds only: F8 in the open world or `?edit`; `node tools/world_edits.mjs describe|apply
   <export.json>` writes `src/data/worldEdits.ts` (`docs/WORLD_EDITOR.md`).
 - Asset pipelines (recording levels, voices, sprites, models, gates, flames, marks, the investigator's clips, boss
-  music, store and itch.io art): `docs/TOOLS.md`. Each writes generated data under `src/data`; never edit that by hand.
+  music, store, DLC and itch.io art): `docs/TOOLS.md`. Each writes generated data under `src/data`; never edit that by hand.
 
 ## Folders (the detailed map, with what each file holds: `docs/CODEMAP.md`)
 - `src/core`: the 60 Hz loop, ECS, event bus, input (keys, mouse, pads, rebinding), rumble, rng, noise, i18n.

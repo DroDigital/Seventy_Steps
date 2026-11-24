@@ -44,13 +44,14 @@ export const journeyBossDamage = (id: string, cycle: number, profile?: JourneyPr
  */
 export function meet(g: Game, e: Entity, f: Fight): void {
   const h = g.ecs.c.health.get(e);
-  if (!h || g.player.cycle > 0) return;
+  if (!h || h.max <= 0 || h.hp <= 0 || g.ecs.c.dead.has(e) || g.player.cycle > 0) return;
   f.base ??= h.max;
   const max = Math.round(f.base * overmatchHealth(g.player.levels, g.player.reinforced[g.player.weapon] ?? 0, f.id));
+  if (max === h.max) return;
   [h.hp, h.max] = [(h.hp / h.max) * max, max];
 }
 
-/** Every engaged fight meets the investigator again (a weapon taken up in the middle of one). */
+/** Every live engaged fight meets the investigator again (a weapon taken up in the middle of one). */
 export function meetAgain(g: Game): void {
-  for (const [e, f] of g.ecs.c.fight) if (f.engaged) meet(g, e, f);
+  for (const [e, f] of g.ecs.c.fight) if (f.engaged && !g.ecs.c.dead.has(e)) meet(g, e, f);
 }

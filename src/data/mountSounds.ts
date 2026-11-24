@@ -38,15 +38,17 @@ export const MOUNT_MIX = {
   swish: 1.6, // idle: the tail
   flutter: 1.6, // idle: the lips
   whisper: 1.5, // the spectral chariot's breath and violet crackle
-  pop: 1.1, // the car's exhaust, easing off
+  pop: 1.15, // the car's exhaust overrun burble, easing off
+  gearShift: 1.1, // vintage sliding-mesh gearbox clunk & throttle catch
+  carBrake: 1.05, // hard braking tyre scrub, brake band & nose dive
   spectralSummon: 0.85,
   spectralDismiss: 0.9,
-  engineStart: 1.2,
-  engineStop: 1.2,
+  engineStart: 1.15,
+  engineStop: 1.15,
   bedRumble: 0.7, // the chassis' low roar
   bedRoll: 0.4, // the wheels rolling: soft, low, and slower than the speed
   bedWind: 0.24, // the air rushing by, with the square of the speed
-  bedEngine: 0.3,
+  bedEngine: 0.34,
   bedSpectral: 0.16, // (round 61: 0.28, the loudest bed by 3 dB)
 } as const;
 
@@ -98,14 +100,22 @@ export function hoofBeat(ground: Ground, o: { hind?: boolean; shoe?: Shoe; weigh
 
 /**
  * A wheel over a joint, a cobble or a rut: a soft thump through the axle, not a clack. `wood` is a coach's iron-shod rim on its felloes, deadened;
- * `rubber` the car's tyre and its springs: lower and rounder.
+ * `rubber` the car's pneumatic tyre and steel leaf springs: deeper, hollower and damped.
  */
 export function wheelThump(kind: 'wood' | 'rubber', ground: Ground = 'road'): Sound {
-  const body = kind === 'rubber' ? 78 : 104;
+  if (kind === 'rubber') {
+    return [
+      tone('sine', 74, 0.16, 0.62, { to: 38 }),
+      noise('lowpass', ground === 'stone' ? 980 : ground === 'dirt' ? 480 : 680, 0.11, 0.4, { to: 180, q: 0.65 }),
+      tone('triangle', 136, 0.12, 0.2, { at: 0.042, to: 84, filter: { type: 'lowpass', hz: 420 } }), // leaf-spring damped rebound
+      noise('bandpass', 360, 0.09, 0.18, { at: 0.025, to: 210, q: 1.1 }),
+    ];
+  }
+  const body = 104;
   return [
     tone('sine', body, 0.15, 0.62, { to: body * 0.5 }),
     noise('lowpass', ground === 'stone' ? 1100 : ground === 'dirt' ? 520 : 760, 0.1, 0.42, { to: 200, q: 0.6 }),
-    ...(kind === 'wood' ? [tone('triangle', 180, 0.06, 0.16, { to: 118, filter: { type: 'lowpass', hz: 560 } })] : [tone('sine', 150, 0.12, 0.14, { at: 0.04, to: 96 })]),
+    tone('triangle', 180, 0.06, 0.16, { to: 118, filter: { type: 'lowpass', hz: 560 } }),
   ];
 }
 
@@ -154,13 +164,44 @@ export const SPECTRAL_WHISPER: Sound = [
   noise('highpass', 3500, 0.03, 0.1, { at: 0.55 }),
 ];
 
-/** The car's exhaust easing off: a pop and a burble. */
+/** The car's exhaust easing off at speed: a staggered hollow pop and iron-pipe burble. */
 export const EXHAUST_POP: Sound = [
-  noise('lowpass', 520, 0.07, 0.55, { to: 180 }),
-  tone('sine', 78, 0.12, 0.45, { to: 46 }),
-  noise('bandpass', 700, 0.05, 0.3, { at: 0.11, q: 1.2 }),
-  tone('sine', 66, 0.1, 0.3, { at: 0.12, to: 44 }),
+  noise('lowpass', 540, 0.08, 0.52, { to: 160 }),
+  tone('sine', 82, 0.13, 0.46, { to: 44 }),
+  noise('bandpass', 640, 0.06, 0.34, { at: 0.095, to: 260, q: 1.4 }),
+  tone('sine', 68, 0.11, 0.36, { at: 0.1, to: 40 }),
+  noise('lowpass', 420, 0.08, 0.26, { at: 0.2, to: 140 }),
+  tone('triangle', 56, 0.12, 0.22, { at: 0.205, to: 36, filter: { type: 'lowpass', hz: 220 } }),
 ];
+
+/** Vintage sliding-mesh gearbox shift: iron dog-clutch engage clunk, brass lever snick and brief throttle transition. */
+export function gearShift(up: boolean): Sound {
+  return [
+    tone('sine', up ? 118 : 132, 0.12, 0.52, { to: up ? 58 : 66 }),
+    noise('bandpass', up ? 880 : 1020, 0.075, 0.38, { to: 380, q: 1.6 }),
+    noise('lowpass', 520, 0.09, 0.3, { at: 0.055, to: 190 }),
+    tone('sawtooth', up ? 76 : 48, 0.2, 0.26, { at: 0.06, to: up ? 46 : 68, filter: { type: 'lowpass', hz: 340, to: 220 } }),
+    tone('triangle', 260, 0.055, 0.16, { at: 0.012, to: 170, filter: { type: 'lowpass', hz: 700 } }),
+  ];
+}
+
+/** Hard braking in the Brassbound Motor Car: ground-aware rubber tyre scrub, mechanical brake band groan and nose-dive thud. */
+export function carBrake(ground: Ground): Sound {
+  if (ground === 'water') {
+    return [
+      noise('lowpass', 780, 0.34, 0.56, { to: 260, attack: 0.02 }),
+      noise('bandpass', 1350, 0.26, 0.34, { to: 620, q: 0.8, attack: 0.03 }),
+      tone('sine', 78, 0.22, 0.36, { to: 42 }),
+    ];
+  }
+  const hard = ground === 'stone' ? 1 : ground === 'road' ? 0.6 : 0;
+  return [
+    noise('bandpass', 560 + 520 * hard, 0.34, 0.44, { to: 260 + 240 * hard, q: 0.9, attack: 0.025 }),
+    noise('lowpass', 420, 0.3, 0.4, { to: 140, attack: 0.02 }),
+    tone('triangle', 138, 0.28, 0.24, { to: 82, vibrato: [11, 22], attack: 0.03, filter: { type: 'lowpass', hz: 460 } }), // damped brake band groan
+    tone('sine', 74, 0.22, 0.42, { to: 40, at: 0.02 }), // front leaf-spring dive thud
+  ];
+}
 
 /** A great cold wind drawn through a carriage: the spectral chariot's summons. */
 export const SPECTRAL_SUMMON: Sound = [
@@ -175,20 +216,32 @@ export const SPECTRAL_DISMISS: Sound = [
   tone('triangle', 400, 0.6, 0.1, { to: 240, vibrato: [5, 40] }),
 ];
 
-/** The motor car brought to life: the crank, a cough, the catch. */
+/** The Brassbound Motor Car brought to life: magneto click, three rising compression crank turns, intake cough, and a proud inline-4 catch settling into idle (< 1.25 s). */
 export const ENGINE_START: Sound = [
-  tone('sawtooth', 120, 0.55, 0.22, { to: 260, filter: { type: 'lowpass', hz: 900 } }),
-  noise('bandpass', 1400, 0.5, 0.2, { q: 1.6 }),
-  tone('sawtooth', 52, 0.18, 0.6, { at: 0.56, to: 40, filter: { type: 'lowpass', hz: 360 } }),
-  tone('sawtooth', 44, 0.5, 0.55, { at: 0.8, to: 38, filter: { type: 'lowpass', hz: 300 } }),
-  noise('lowpass', 260, 0.4, 0.45, { at: 0.78, to: 140 }),
+  // Magneto brass switch click
+  noise('bandpass', 1650, 0.028, 0.26, { q: 2.2 }),
+  // Three rhythmic crank/starter compression turns climbing in pace
+  tone('sawtooth', 54, 0.14, 0.34, { at: 0.04, to: 68, filter: { type: 'lowpass', hz: 360 } }),
+  noise('bandpass', 880, 0.12, 0.2, { at: 0.04, to: 1050, q: 1.8 }),
+  tone('sawtooth', 62, 0.14, 0.38, { at: 0.2, to: 78, filter: { type: 'lowpass', hz: 400 } }),
+  noise('bandpass', 960, 0.12, 0.22, { at: 0.2, to: 1150, q: 1.8 }),
+  tone('sawtooth', 70, 0.14, 0.42, { at: 0.36, to: 92, filter: { type: 'lowpass', hz: 450 } }),
+  // Carburetor cough & rich inline-4 ignition catch settling into warm idle
+  noise('bandpass', 560, 0.1, 0.44, { at: 0.5, to: 240, q: 1.1 }),
+  tone('sawtooth', 78, 0.58, 0.46, { at: 0.54, to: 42, attack: 0.03, filter: { type: 'lowpass', hz: 540, to: 260 } }),
+  tone('sine', 52, 0.62, 0.48, { at: 0.54, to: 28, attack: 0.025 }),
+  noise('lowpass', 360, 0.52, 0.4, { at: 0.55, to: 140, attack: 0.03 }),
 ];
-/** ...and let die: a last shudder, the exhaust's pop. */
+/** ...and cut off: magneto click, two stumbling compression dies, hollow exhaust sigh and a tiny hot-iron manifold tick (< 1.0 s). */
 export const ENGINE_STOP: Sound = [
-  tone('sawtooth', 46, 0.5, 0.55, { to: 24, filter: { type: 'lowpass', hz: 260, to: 120 } }),
-  noise('lowpass', 240, 0.4, 0.45, { to: 70 }),
-  noise('bandpass', 900, 0.04, 0.5, { at: 0.34, q: 1.4 }),
-  tone('triangle', 3400, 0.05, 0.04, { at: 0.5, to: 2600 }),
+  noise('bandpass', 1550, 0.025, 0.24, { q: 2.2 }),
+  tone('sawtooth', 46, 0.48, 0.48, { at: 0.02, to: 22, filter: { type: 'lowpass', hz: 280, to: 110 } }),
+  tone('sine', 44, 0.46, 0.44, { at: 0.02, to: 24 }),
+  noise('lowpass', 250, 0.42, 0.42, { at: 0.02, to: 75 }),
+  // Final compression stumble + hollow exhaust puff
+  tone('sawtooth', 32, 0.18, 0.32, { at: 0.26, to: 19, filter: { type: 'lowpass', hz: 190 } }),
+  noise('bandpass', 560, 0.08, 0.36, { at: 0.38, to: 210, q: 1.3 }),
+  tone('triangle', 1650, 0.04, 0.035, { at: 0.62, to: 1320 }),
 ];
 
 /**

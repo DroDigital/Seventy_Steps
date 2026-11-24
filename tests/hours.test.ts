@@ -14,7 +14,6 @@ import type { Game } from '../src/systems/components';
 
 afterEach(() => void (NIGHT.hurried = 0));
 
-/** The same test as tests/palette.test.ts: whether a colour would be taken for an anomaly by the post pass's colour isolation. */
 const at = (phase: number): number => ((phase - CLOCK.start + 1) % 1) * CLOCK.night; // the seconds of play at which the night stands at `phase`
 
 describe('the afterglow and the false dawn (round 80)', () => {

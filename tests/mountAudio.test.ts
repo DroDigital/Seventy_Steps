@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { V3 } from '../src/core/geom';
 import { MOUNT_IDS, MOUNT_TRAVERSAL, type MountId } from '../src/data/mounts';
 import {
-  CREAK, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, TAIL_SWISH, TRACE_SHIFT, hoofBeat, hoofScrape, wheelThump, type Ground,
+  CREAK, ENGINE_START, ENGINE_STOP, EXHAUST_POP, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, TAIL_SWISH, TRACE_SHIFT, carBrake, gearShift, hoofBeat, hoofScrape, wheelThump, type Ground,
 } from '../src/data/mountSounds';
 import type { Sound } from '../src/data/sounds';
 import { SAMPLE_LEVELS } from '../src/data/sampleLevels';
@@ -486,5 +486,48 @@ describe('the horse and the reins, heard (round 57)', () => {
       for (const layer of sound) if (layer.src !== 'noise') expect(layer.hz!, name).toBeLessThan(700); // no bell: every tone is a voice or a thump
       expect(sound.some((l) => l.src === 'sine' || l.src === 'triangle' || l.src === 'sawtooth' || l.src === 'noise'), name).toBe(true);
     }
+  });
+});
+
+describe('the Brassbound Motor Car, heard (dramatic mechanical overhaul)', () => {
+  it('crank, shutdown, overrun pop, gear shift and mechanical brakes sit inside the mix and stay warm', () => {
+    const cases: [string, Sound, number, boolean?][] = [
+      ['start', ENGINE_START, MOUNT_MIX.engineStart],
+      ['stop', ENGINE_STOP, MOUNT_MIX.engineStop],
+      ['pop', EXHAUST_POP, MOUNT_MIX.pop],
+      ['shift up', gearShift(true), MOUNT_MIX.gearShift, true],
+      ['shift down', gearShift(false), MOUNT_MIX.gearShift, true],
+      ...(['dirt', 'road', 'stone', 'water'] as Ground[]).map((g): [string, Sound, number, boolean] => [`brake ${g}`, carBrake(g), MOUNT_MIX.carBrake, true]),
+    ];
+    for (const [name, sound, gain, aside] of cases) {
+      const out = render(sound.map((l) => ({ ...l, gain: l.gain * gain * MOUNT_MIX.level })));
+      expect(out.rms, name).toBeGreaterThan(aside ? -36 : -28);
+      expect(out.rms, name).toBeLessThan(-17);
+      expect(out.peak, name).toBeLessThan(0);
+      expect(out.sec, name).toBeLessThan(1.3);
+      expect(above(sound, 3200), name).toBeLessThan(0.18);
+    }
+  });
+
+  it('responds to throttle load, idle lope and low-gear planetary hum, and triggers gear-shift and braking cues during real driving', () => {
+    const idle = bedTargets('automobile', 0, 'road', 0);
+    const pull = bedTargets('automobile', 6, 'road', 5.5);
+    const coast = bedTargets('automobile', 6, 'road', -3.0);
+    const lowGear = bedTargets('automobile', 2.2, 'road', 3.0);
+    const topGear = bedTargets('automobile', 12, 'road', 0);
+    expect(idle.engineLope).toBeGreaterThan(0.5);
+    expect(pull.engineLoad).toBeGreaterThan(coast.engineLoad + 0.35);
+    expect(pull.engine).toBeGreaterThan(coast.engine);
+    expect(lowGear.gearWhine).toBeGreaterThan(topGear.gearWhine);
+
+    const car = ride('automobile');
+    car.heard.length = 0;
+    // Accelerate through the gears from 0 -> 12 m/s
+    for (let i = 1; i <= 140; i++) car.advance(1, (i / 140) * MOUNT_TRAVERSAL.gallop);
+    expect(car.heard.some((h) => h.key === 'mount:automobile:shift')).toBe(true);
+    // Hard brake from 12 -> 1 m/s
+    car.heard.length = 0;
+    for (let i = 1; i <= 35; i++) car.advance(1, Math.max(1, MOUNT_TRAVERSAL.gallop - i * 0.42));
+    expect(car.heard.some((h) => h.key === 'mount:automobile:brake')).toBe(true);
   });
 });

@@ -51,6 +51,7 @@ const BY_REGION: Readonly<Record<string, RealmTrackId>> = {
   piping_dark: 'remote_arpeggio',
   spheres: 'wavering_pads',
   court_centre: 'vazio_cosmico',
+  slumber_stairs: 'cavernous_tail', // round 123: the stairs' realm; on the stairs themselves their own two tracks hold (stairsTrack)
 };
 
 /** The way into the Dreamlands (data/dungeons.ts `slumber`): its own two tracks, by where on the stairs the investigator is. */

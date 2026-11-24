@@ -1,5 +1,5 @@
 /** Mount selection and store ownership. A save remembers a preference, never an entitlement. */
-import { FREE_MOUNT, MOUNT_IDS, MOUNTS, type MountId } from '../data/mounts';
+import { FREE_MOUNT, MOUNTS, OFFERED_MOUNT_IDS, type MountId } from '../data/mounts';
 import type { Game } from '../systems/components';
 import { mountAvailable, mountUnlocked, selectMount, setAutomobileEntitlement, setChariotEntitlement } from '../systems/mounts';
 import { desktop } from './desktop';
@@ -17,12 +17,9 @@ export function refreshMountEntitlement(g: Game): Promise<void> {
   if (checking) return checking;
   const request = (async () => {
     try {
-      const [car, chariot] = await Promise.all([
-        Promise.resolve(desktop?.ownsAutomobileDlc?.() ?? false),
-        Promise.resolve(desktop?.ownsChariotDlc?.() ?? false),
-      ]);
+      const car = await Promise.resolve(desktop?.ownsAutomobileDlc?.() ?? false);
       setAutomobileEntitlement(g, car === true);
-      setChariotEntitlement(g, chariot === true);
+      setChariotEntitlement(g, false);
     } catch {
       setAutomobileEntitlement(g, false);
       setChariotEntitlement(g, false);
@@ -43,17 +40,17 @@ export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void
   const unlocked = mountUnlocked(g);
   heading(panel, t('mounts.title')).style.marginTop = '0';
   el(panel, 'div', unlocked ? fill(t('mounts.intro')) : t('mounts.locked'), 'opacity:.6;font-size:12px;line-height:1.5;padding:0 14px 8px');
-  for (const id of MOUNT_IDS) {
+  for (const id of OFFERED_MOUNT_IDS) {
     const selected = g.player.mount.selected === id;
     const has = owned(g, id);
     const why = !unlocked ? t('mounts.whyQuest') : t('mounts.whyDlc');
     const b = option(panel, MOUNTS[id].name, () => {
       if (selectMount(g, id)) { saveNow(); redraw(); }
     }, mountAvailable(g, id), why, NOTES[id]());
-    if (id === FREE_MOUNT || has) chips(b, [{ text: id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional'), tone: 'dim' }]); // (a mount not owned says what it costs at the right, once)
-    price(b, !has ? t('mounts.dlc') : !unlocked ? t('mounts.needQuest') : selected ? t('mounts.selected') : t('mounts.available'), selected ? 'ok' : 'max'); // the one chosen is boxed and lit; the rest are a quiet word
+    if (id === FREE_MOUNT || has) chips(b, [{ text: id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional'), tone: 'dim' }]);
+    price(b, !has ? t('mounts.dlc') : !unlocked ? t('mounts.needQuest') : selected ? t('mounts.selected') : t('mounts.available'), selected ? 'ok' : 'max');
   }
-  if (desktop?.ownsAutomobileDlc || desktop?.ownsChariotDlc) {
+  if (desktop?.ownsAutomobileDlc) {
     const refresh = button(panel, t('mounts.refresh'), () => {
       refresh.disabled = true;
       refresh.textContent = t('mounts.checking');

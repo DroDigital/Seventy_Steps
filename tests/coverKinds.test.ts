@@ -11,7 +11,6 @@ import { groundCover } from '../src/render/groundCover';
 import { rgbToHsv } from '../src/render/palette';
 import { chunkContent } from '../src/world/chunks';
 
-
 /** The first chunk of a region, searched on its tile. */
 function chunkOf(id: string): { cx: number; cz: number } {
   const [tx, tz, w, h] = getRegion(id)!.area;

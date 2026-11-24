@@ -11,7 +11,6 @@ import type { ParticleSpec, Particles } from '../src/render/particles';
 import { createWorldGame } from '../src/systems/game';
 import { worldLayout } from '../src/world/placements';
 
-/** Whether a colour would be taken for an anomaly by the post pass's colour isolation (the rule of tests/palette.test.ts). */
 const calm = { dark: 1, mist: 1, gust: 0.5, rain: 0, shake: 1 };
 
 /** The air of `region` over `seconds` seen by a camera about the investigator, and what was born. */

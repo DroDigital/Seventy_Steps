@@ -12,7 +12,7 @@ import type { V3 } from '../../core/geom';
 import { MOUNT_TRAVERSAL, type MountId } from '../../data/mounts';
 import {
   CREAK, ENGINE_START, ENGINE_STOP, EXHAUST_POP, HARNESS_SHAKE, HORSE_BLOW, HORSE_HALT, HORSE_URGE, HORSE_WHICKER, LIP_FLUTTER, MOUNT_MIX, NICKER, SNORT, SPECTRAL_DISMISS, SPECTRAL_SUMMON,
-  SPECTRAL_WHISPER, TAIL_SWISH, TRACE_SHIFT, UNHITCH, hoofBeat, hoofScrape, wheelThump, type Ground,
+  SPECTRAL_WHISPER, TAIL_SWISH, TRACE_SHIFT, UNHITCH, carBrake, gearShift, hoofBeat, hoofScrape, wheelThump, type Ground,
 } from '../../data/mountSounds';
 import { SAMPLE_SETS, type SampleSetId } from '../../data/samples';
 import { SIM } from '../../data/tuning';
@@ -20,6 +20,7 @@ import type { Sound } from '../../data/sounds';
 import type { Game } from '../../systems/components';
 import { HORSE_TOSS, pawLanded } from '../../systems/horseIdle';
 import { gaitAt, gaitScale, hoofWeight, touchdowns } from '../../systems/mountGait';
+import { gearWithHysteresis } from '../automobileMotion';
 import { surfaceAt } from './foley';
 import { SILENT_BED, bedTargets, type MountBed } from './mountBed';
 import type { Sampler } from './sampler';
@@ -64,6 +65,10 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
   let traceIn = 2;
   let whisperIn = 5;
   let lastSpeed = 0;
+  let carGear = 0;
+  let shiftReadyAt = 0;
+  let brakeReadyAt = 0;
+  let carAccel = 0;
   let snortIn = 12;
   let idleIn = 8;
   let ridden = 0; // seconds of this ride
@@ -83,6 +88,10 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
     traceIn = between([1.5, RIDE.trace[0]]);
     whisperIn = between([3, RIDE.whisper[0]]);
     lastSpeed = 0;
+    carGear = 0;
+    shiftReadyAt = 0.25;
+    brakeReadyAt = 0.4;
+    carAccel = 0;
     snortIn = between([0, 6]); // the first gallop of a ride is announced, the next ones seldom
     idleIn = between([6, RIDE.idle[0]]);
     answeredAt = -99;
@@ -179,7 +188,9 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
       }
       ridden += dt;
       if (frames++ % 6 === 0) ground = surfaceAt(g, pos.x, pos.y, pos.z);
-      bed?.set(bedTargets(id, speed, ground));
+      const rawAccel = (speed - lastSpeed) / dt;
+      carAccel += (rawAccel - carAccel) * Math.min(1, dt * 8);
+      bed?.set(bedTargets(id, speed, ground, id === 'automobile' ? carAccel : 0));
       const was = phase;
       phase = mount.phase;
       const travelled = speed * dt;
@@ -234,8 +245,24 @@ export function createMountAudio(g: Game, play: Recipe, sampler?: Pick<Sampler, 
         thumpAt = between(THUMP_EVERY[ground]);
         if (ground !== 'water') recipe(`mount:${id}:thump`, wheelThump(id === 'automobile' ? 'rubber' : 'wood', ground), { gain: MOUNT_MIX.thump * (0.5 + 0.5 * Math.min(1, speed / MOUNT_TRAVERSAL.gallop)) * (ground === 'dirt' ? 0.75 : 1), vary: 0.5, pan: Math.random() * 0.5 - 0.25 });
       }
-      if (id === 'automobile' && lastSpeed - speed > 0.12 && lastSpeed > 9 * gaitScale && Math.random() < 0.5) { // easing off at speed: the exhaust pops
-        recipe('mount:automobile:pop', EXHAUST_POP, { gain: MOUNT_MIX.pop, pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.3 - 0.15 });
+      if (id === 'automobile') {
+        const nextGear = speed < 0.3 ? 0 : gearWithHysteresis(carGear, speed);
+        if (nextGear !== carGear) {
+          const up = nextGear > carGear;
+          carGear = nextGear;
+          if (ridden >= shiftReadyAt && speed > 1.4) {
+            shiftReadyAt = ridden + 0.45;
+            recipe('mount:automobile:shift', gearShift(up), { gain: MOUNT_MIX.gearShift, pitch: around(0.12, 1), vary: 0.35, pan: 0.08 });
+          }
+        }
+        if (rawAccel < -4.2 && lastSpeed > 3.2 && ridden >= brakeReadyAt) {
+          brakeReadyAt = ridden + 1.35;
+          const load = Math.min(1, lastSpeed / MOUNT_TRAVERSAL.gallop);
+          recipe('mount:automobile:brake', carBrake(ground), { gain: MOUNT_MIX.carBrake * (0.65 + 0.35 * load), pitch: around(0.14, 1), vary: 0.35, pan: spread(0.25) });
+        }
+        if (lastSpeed - speed > 0.12 && lastSpeed > 9 * gaitScale && Math.random() < 0.5) { // easing off at speed: the exhaust pops & burbles
+          recipe('mount:automobile:pop', EXHAUST_POP, { gain: MOUNT_MIX.pop, pitch: 0.9 + 0.2 * Math.random(), vary: 0.5, pan: Math.random() * 0.3 - 0.15 });
+        }
       }
       lastSpeed = speed;
     },

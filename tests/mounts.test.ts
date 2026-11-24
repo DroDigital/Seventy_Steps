@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { t } from '../src/core/i18n';
 import { emptyInput } from '../src/core/input';
-import { MOUNT_IDS, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL } from '../src/data/mounts';
+import { MOUNT_IDS, MOUNTS, MOUNT_QUEST, MOUNT_TRAVERSAL, OFFERED_MOUNT_IDS } from '../src/data/mounts';
+import { EN } from '../src/data/lang/en';
+import { DE } from '../src/data/lang/de';
+import { FR } from '../src/data/lang/fr';
+import { ES } from '../src/data/lang/es';
 import { QUESTS } from '../src/data/quests';
 import { CAMERA, PLAYER, SIM } from '../src/data/tuning';
 import { discover, rest, teleport, travel } from '../src/systems/checkpoints';
@@ -324,5 +328,19 @@ describe('the borrowed reins', () => {
     expect(parseSave(JSON.stringify(s))).not.toBe(null);
     expect(createWorldGame({ save: s }).player.mount.selected).toBe('grey');
     expect(parseSave(JSON.stringify({ ...s, mount: 'forged' }))).toBe(null);
+  });
+
+  it('offers only the included Chariot and optional Brassbound Motor Car with no prices or Spectral Chariot copy in any language', () => {
+    expect(OFFERED_MOUNT_IDS).toEqual(['grey', 'automobile']);
+    expect(OFFERED_MOUNT_IDS).not.toContain('chariot');
+    for (const [code, table] of [['en', EN], ['de', DE], ['fr', FR], ['es', ES]] as const) {
+      for (const [key, value] of Object.entries(table)) {
+        if (!key.startsWith('mounts.')) continue;
+        expect(value, `${code}:${key}`).not.toMatch(/\$|0[.,]99|€|£/);
+      }
+      expect(table['mounts.note.grey'], `${code}:mounts.note.grey`).not.toMatch(/spectral|Geister|spectrale|espectral/i);
+      expect(table['mounts.locked'], `${code}:mounts.locked`).not.toMatch(/three|drei|trois|tres/i);
+    }
+    expect(MOUNTS.grey.description).not.toMatch(/spectral/i);
   });
 });

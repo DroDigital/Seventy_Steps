@@ -65,8 +65,8 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**
- * The same fights again at the cap (every level bought, the cane set to +5). Bosses retain authored health,
- * so these runs can be much shorter than at their expected standing; upper pressure and completion remain checked for non-exempt fights.
+ * The same fights again at the cap (every level bought, the cane set to +5). Bosses grow past their standing at most
+ * `BOSS_OVERMATCH.most` times; upper pressure and completion remain checked for non-exempt fights.
  */
 const CAP = { reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const;
 const YOG_STANDING_MAX = 2.5;
@@ -156,7 +156,7 @@ function fightAt(s: Standing, starts: readonly number[] = STARTS): Row {
   for (const r of runs) expect(r.bad).toEqual([]);
   const mean = (k: 'dealt' | 'taken' | 'frames'): number => runs.reduce((n, r) => n + r[k], 0) / runs.length;
   const taken = mean('taken');
-  return { ...s, health: runs[0].health, dealt: mean('dealt'), taken, fell: runs.every((r) => r.fell), deaths: runs.reduce((n, r) => n + r.deaths, 0), seconds: (mean('frames') / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), doses: dosesAt(s.rank, TOTAL), pressure: taken / (s.hp * (1 + dosesAt(s.rank, TOTAL) * REAGENT.heal)) };
+  return { ...s, health: Math.max(...runs.map((r) => r.health)), dealt: mean('dealt'), taken, fell: runs.every((r) => r.fell), deaths: runs.reduce((n, r) => n + r.deaths, 0), seconds: (mean('frames') / SIM.hz) * (w?.scale ?? 1) + (w?.add ?? 0), doses: dosesAt(s.rank, TOTAL), pressure: taken / (s.hp * (1 + dosesAt(s.rank, TOTAL) * REAGENT.heal)) };
 }
 
 const tableOf = (list: Row[]): string => {
@@ -170,6 +170,7 @@ describe('the balance table (round 25)', () => {
   it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void rows.push(fightAt(s)), FIGHT_TIMEOUT);
 
   it('holds every boss to a fight worth having', () => {
+    LIGHT.length = 0;
     const bad: string[] = [];
     for (const r of rows.filter((x) => !EXEMPT.includes(x.id))) {
       const [bought, worth] = [levelsOf(r.levels), levelsWorth(r.levels)];

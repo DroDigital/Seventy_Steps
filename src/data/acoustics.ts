@@ -88,6 +88,7 @@ export const REGION_SPACE: Readonly<Record<string, SpaceId>> = {
   piping_dark: 'cosmos',
   spheres: 'cosmos',
   court_centre: 'cosmos',
+  slumber_stairs: 'cosmos', // round 123: the dark the stairs hang over has no walls to give a voice back
 };
 
 /** How the shape of a dungeon room changes its space: a corridor is close, a wide hall opens, a pit or a well rings. */

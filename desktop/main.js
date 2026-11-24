@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
-import { channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
+import { bundleEdition, channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
 
 const ORIGIN = 'app://seventy-steps';
 const DEV = process.argv.includes('--dev');
@@ -271,12 +271,18 @@ function smoke(win) {
       // the page is still loading
     }
     calibrationKept ||= !!page?.calibrationKept;
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, calibrationKept, steamBinding: steamBinding(), controllers: padState };
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), bundleEdition: bundleEdition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, calibrationKept, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;
     clearInterval(timer);
-    const missing = [!report.title && 'the title never appeared', !report.bridge && "the shell's bridge is missing", needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load', needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`].filter(Boolean);
+    const missing = [
+      !report.title && 'the title never appeared',
+      !report.bridge && "the shell's bridge is missing",
+      report.packaged && report.bundleEdition !== report.edition && `the bundle is "${report.bundleEdition}", not "${report.edition}"`,
+      needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load',
+      needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`,
+    ].filter(Boolean);
     console.log(`${missing.length ? 'SMOKE FAIL' : 'SMOKE OK'} ${JSON.stringify(report)}${missing.length ? ` :: ${missing.join('; ')}` : ''}`);
     app.exit(missing.length ? 1 : 0);
   }, 1000);

@@ -1,8 +1,8 @@
 /**
  * The seam that lets a horror's place be any outline (round 66; world/enclosure.ts, sitePads.ts, occupancy.ts, closure.ts): a pad is asked its
  * distance through one function whatever its kind; the fill keeps off a shape; and every enclosure, of whatever kind, keeps the invariants the
- * rest of the world relies on: its gate on its wall, its stake and candle within it, its set clear of it, and no way in but the gate, found by
- * a flood over every place rather than a walk from some sides.
+ * rest of the world relies on: its gate on its wall, its stake and candle within it, its set clear of it, and no way in but the gate (the
+ * exhaustive flood over every house moved to tests/enclosureAudit.test.ts on 2026-11-24).
  */
 import { describe, expect, it } from 'vitest';
 import { HOUSE } from '../src/data/arenaHouses';

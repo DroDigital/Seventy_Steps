@@ -59,6 +59,16 @@ export function edition(pkg = readPkg()) {
   return pkg?.edition === 'demo' ? 'demo' : 'full';
 }
 
+/** What the built page bundle actually holds (`dist/edition.json`, written by tools/demo/vitePlugin.ts). */
+export function bundleEdition(file = new URL('../dist/edition.json', import.meta.url)) {
+  try {
+    const e = JSON.parse(readFileSync(file, 'utf8'))?.edition;
+    return e === 'demo' || e === 'full' ? e : 'missing';
+  } catch {
+    return 'missing';
+  }
+}
+
 let lib = null;
 let client = null;
 

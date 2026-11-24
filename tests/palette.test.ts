@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { readsAsAnomaly } from './anomalyHue';
+import { hueGap, readsAsAnomaly } from './anomalyHue';
 import { LOOKS, lookOf, type Look } from '../src/data/looks';
 import { REGIONS } from '../src/data/regions';
+import { FX } from '../src/data/tuning';
 import { ANOMALY, ANOMALY_HUES, luma } from '../src/render/palette';
 import { ANOMALY_FROM, ANOMALY_TO, buildRealmPalette, gradeTint, gradeTints } from '../src/render/realmPalette';
 
 const anomalies = Object.values(ANOMALY);
-/** Whether a colour would be taken for an anomaly by the post pass's colour isolation: an anomaly's hue, more than FX.minSaturation of it, and not so dark the pass ignores it (shaders/post.ts). */
 
 describe('the realms\' looks (round 32: every realm was the same dark grey-sepia)', () => {
   it('give every region its own look, and name no other', () => {
@@ -83,9 +83,17 @@ describe('a realm\'s palette', () => {
     expect(light[0]).toBeGreaterThan(light[2]); // its high is lamplight: red over blue
   });
 
-  it('knows the anomaly hues', () => {
+  it('knows the anomaly hues and checks them against the post pass window', () => {
     expect(ANOMALY_HUES[0] * 360).toBeCloseTo(328, 0);
     expect(ANOMALY_HUES[1] * 360).toBeCloseTo(275, 0);
     expect(ANOMALY_HUES[2] * 360).toBeCloseTo(153, 0);
+    expect(hueGap(0.98, 0.02)).toBeCloseTo(0.04, 9);
+    expect(hueGap(0.1, 0.9)).toBeCloseTo(0.2, 9);
+    for (const a of anomalies) expect(readsAsAnomaly(a)).toBe(true);
+    expect(readsAsAnomaly([0.5, 0.5, 0.5])).toBe(false); // grey: zero saturation
+    expect(readsAsAnomaly([0.07, 0.0, 0.04])).toBe(false); // near-black: below value floor
+    expect(readsAsAnomaly([0.8, 0.55, 0.2])).toBe(false); // warm ochre: well outside FX.hueWidth of every anomaly hue
+    expect(readsAsAnomaly([0.6, 0.6 * (1 - FX.minSaturation), 0.55])).toBe(false); // at saturation threshold, not strictly past it
+    expect(readsAsAnomaly([0.8, 0.2, 0.25])).toBe(true); // red-rose within FX.hueWidth across the 0/1 wrap from magenta (~0.911)
   });
 });

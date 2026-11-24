@@ -110,21 +110,26 @@ because a Steam build started outside Steam would relaunch itself through it.
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
 
-## The demo (round 56)
+## The demo (round 56; stripped bundle packaging fixed)
 
-Round 114: the browser demo is a build of its own, `npm run build:demo`, and holds none of the rest of the game (docs/DEMO_BUILD.md).
-The packed demo below is not built that way yet: it is still packed from the full build with `edition` set to `demo`, so a demo
-packed this way holds the whole game until its packaging runs `build:demo`. Check that before any demo goes to itch.io or Steam.
+The demo is a stripped build of its own (`npm run build:demo`, `docs/DEMO_BUILD.md`) that leaves out the rest of the game's
+code, data, pictures, music, voices and text, and writes `dist/edition.json` (`{"edition":"demo"}`). Packed desktop demos
+use `npm run package:demo:win`, `npm run package:demo:mac -- --universal`, and `npm run package:demo:linux`, which run
+`npm run build:demo` and set `edition: "demo"` in the packed `package.json`. Both `desktop/main.js` (`--smoke-test`) and
+`tools/itch_push.mjs` verify that the packed `dist/edition.json` agrees with `package.json`'s `edition`, refusing to pass
+smoke or push if a demo package accidentally holds the full bundle.
 
-The demo is the same game packed with `edition` set to `demo` in its package.json: the university and Arkham only, ending when Keziah Mason
-falls (`src/systems/demo.ts`; in a browser, `?demo`). Its title says DEMO under the name, and its end offers the game's page. Saves carry
-over to the full game (the same save folder).
+The demo covers Miskatonic University, Arkham and the Blasted Heath, ending when Keziah Mason falls (`src/systems/demo.ts`;
+in a browser, `?demo`). Its title says DEMO under the name, and its end offers the game's page. Saves carry over to the full
+game (the same save folder).
 
-- **From CI:** Actions › Release builds › Run workflow, tick *itch* and *demo*. Each platform is packed as the demo for itch.io, started
-  (`--edition demo` must show in its report) and pushed to the channels `windows-demo`, `osx-demo` and `linux-demo` of the same project,
-  beside the full game's. Run it once more without *demo* for the full game: the two are separate runs.
-- **From a machine:** add `-c.extraMetadata.edition=demo` to the `package:win` / `package:linux` line (the Mac: `--edition demo`), then
-  `npm run itch:push` as above: it sees the edition and names the `-demo` channels.
+- **From CI:** Actions › Release builds › Run workflow, tick *itch* and *demo*. The Linux job runs `npm run check:demo`, and
+  all three platforms pack with `package:demo:*` for itch.io, smoke-test (`--channel itch --edition demo`, verifying both
+  `edition` and `bundleEdition` are `"demo"`), and push to `windows-demo`, `osx-demo` and `linux-demo` of the same project,
+  beside the full game's channels. Run it once more without *demo* for the full game: the two are separate runs.
+- **From a machine:** run `npm run package:demo:win -- -c.extraMetadata.channel=itch` (likewise `package:demo:linux`; the Mac:
+  `npm run package:demo:mac -- --universal --channel itch`), then `npm run itch:push` as above: it checks `dist/edition.json`
+  and names the `-demo` channels.
 - **On the page (only you can):** in the project's editor, under Uploads, tick *This file is a demo* on each `-demo` upload, so itch.io
-  shows a "Download demo" button beside the purchase. Not checked: no demo has been pushed.
+  shows a "Download demo" button beside the purchase.
 

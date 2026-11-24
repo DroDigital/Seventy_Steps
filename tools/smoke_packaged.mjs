@@ -30,12 +30,14 @@ const child = spawn(arch ? 'arch' : exe, arch ? [`-${arch}`, exe, ...shell] : sh
 let ok = false;
 let said = ''; // the channel the build reports
 let edition = ''; // and its edition
+let bundleEdition = ''; // and what dist/edition.json holds
 for (const [stream, out] of [[child.stdout, process.stdout], [child.stderr, process.stderr]]) {
   stream.on('data', (d) => {
     const text = String(d);
     if (text.includes('SMOKE OK')) ok = true;
     said = text.match(/"channel":"(\w+)"/)?.[1] ?? said;
     edition = text.match(/"edition":"(\w+)"/)?.[1] ?? edition;
+    bundleEdition = text.match(/"bundleEdition":"(\w+)"/)?.[1] ?? bundleEdition;
     out.write(text);
   });
 }
@@ -50,5 +52,7 @@ child.on('exit', (code) => {
   if (!channelOk) console.error(`SMOKE FAIL: the build says channel "${said}", not "${flag('--channel')}"`);
   const editionOk = !flag('--edition') || edition === flag('--edition');
   if (!editionOk) console.error(`SMOKE FAIL: the build says edition "${edition}", not "${flag('--edition')}"`);
-  process.exit(ok && code === 0 && channelOk && editionOk ? 0 : 1);
+  const bundleOk = !flag('--edition') || bundleEdition === flag('--edition');
+  if (!bundleOk) console.error(`SMOKE FAIL: the built bundle says edition "${bundleEdition}", not "${flag('--edition')}"`);
+  process.exit(ok && code === 0 && channelOk && editionOk && bundleOk ? 0 : 1);
 });

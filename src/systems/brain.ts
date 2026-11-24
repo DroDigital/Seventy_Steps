@@ -31,6 +31,7 @@ import { assignTokens, fight, walk } from './tactics';
 import { parted } from './endings';
 import { targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
+import { catchUp, followPace, followPoint, recordTrail } from './allyTrail';
 
 export { chooseAttack } from './tactics';
 
@@ -71,7 +72,8 @@ function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transfor
     settle(g, id, br, m);
     return;
   }
-  const anchor: XZ = ally ? g.ecs.c.transform.get(g.player.id)!.pos : g.ecs.c.home.get(id) ?? tr.pos;
+  const me = g.ecs.c.transform.get(g.player.id)!.pos;
+  const anchor: XZ = ally ? me : g.ecs.c.home.get(id) ?? tr.pos;
   const perceived = perceive(g, id, br.target, p);
   const seen = arena ? arenaSight(g, id, br, arena, perceived) : perceived;
   br.lost = seen === null ? br.lost + 1 : 0;
@@ -90,10 +92,12 @@ function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transfor
     else if (ally && (br.state === 'follow' || distXZ(tr.pos, anchor) <= p.aggro)) {
       br.state = 'follow'; // an ally waits where it stands until the investigator comes within sight
       if (!br.joined) announce(g, id, br);
-      if (distXZ(tr.pos, anchor) > FOLLOW[1]) walk(m, tr.pos, anchor, br.speed);
+      if (catchUp(g, id, br)) return; // (round 123: left behind, one that steps through the dream is at their back again)
+      if (distXZ(tr.pos, anchor) > FOLLOW[1]) walk(m, tr.pos, followPoint(g, tr.pos, me), followPace(tr.pos, me, br.speed)); // (round 123: along the way they went where it cannot see them plainly, hurrying when behind: allyTrail.ts)
       else if (distXZ(tr.pos, anchor) < FOLLOW[0]) m.face = null;
     }
   } else if (br.state === 'engage') {
+    if (ally && catchUp(g, id, br, true)) return void ([br.state, br.target] = ['follow', null]); // (round 123: a fight left far behind is let go of)
     const lose = arena ? BOSS.grace : LOSE_FRAMES;
     if (target === null || !tp || br.lost > lose || (!ally && !arena && distXZ(tr.pos, anchor) > p.leash)) {
       [br.state, br.target] = [ally ? 'follow' : 'return', null];
@@ -208,6 +212,7 @@ export function brainSystem(g: Game): void {
   const { brain, actor, mover, transform, health } = g.ecs.c;
   const noise = noiseOf(g);
   assignTokens(g);
+  recordTrail(g); // (round 123: the way the investigator went, for an ally to walk)
   for (const [id, br] of brain) {
     const a = actor.get(id)!;
     const m = mover.get(id)!;

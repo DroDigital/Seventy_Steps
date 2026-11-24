@@ -12,8 +12,6 @@ import { rgbToHsv } from '../src/render/palette';
 import { WORLD_FRAG } from '../src/render/shaders/world';
 import { coatable, worldUniforms } from '../src/render/worldMaterial';
 
-/** The post pass's colour isolation (tests/palette.test.ts): an anomaly's hue with more than 0.3 of saturation, not so dark it is ignored. */
-
 describe('the realms\' coats', () => {
   it('belong to real realms, and every realm without one wears none', () => {
     for (const id of Object.keys(COATS)) expect(getRegion(id), id).toBeDefined();

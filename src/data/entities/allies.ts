@@ -28,7 +28,7 @@ export const ALLIES = tier('ally', [
     stats: st(900, 80, 26, 4, 0, 0), drops: { echoes: 0 }, insightOnSight: 1,
   },
   {
-    id: 'nasht_kaman_thah', name: 'Nasht & Kaman-Thah', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands'], canonLooks: true,
+    id: 'nasht_kaman_thah', name: 'Nasht & Kaman-Thah', source: 'The Dream-Quest of Unknown Kadath', regions: ['dreamlands', 'slumber_stairs'], canonLooks: true,
     sprite: { silhouette: 'robed', palette: 'bone', scale: 2.4, eyes: 2, gear: ['cowl'] },
     behavior: { archetype: 'ally', params: { range: [5, 10] }, attacks: ['projectile', 'teleport'] },
     stats: st(1200, 120, 26, 2.6, 0, 0), drops: { echoes: 0 }, insightOnSight: 1,

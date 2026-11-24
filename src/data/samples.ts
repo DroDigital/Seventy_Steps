@@ -248,6 +248,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   piping_dark: { beds: [['wind_ghost', 0.5], ['cave', 0.3]], spots: [] },
   spheres: { beds: [['murmur', 0.5], ['wind_ghost', 0.3]], spots: [] },
   court_centre: { beds: [['cave', 0.5], ['wind_ghost', 0.62]], spots: [] },
+  slumber_stairs: { beds: [['cave', 0.55], ['wind_ghost', 0.34]], spots: [{ set: 'gurgle', every: [50, 110] }] }, // round 123: a shaft's breath, and far below, now and then, something that drips
 };
 
 /**

@@ -1,7 +1,7 @@
 /**
- * Round 117, the dungeons' props and the arenas' built pieces reviewed: each thing on a hall's wall in every way it can be built stays
- * on its own stretch of the wall and within reach of it, a torch's plate lies on the wall (it hung 10 cm off it), a brazier's legs lean
- * in to its bowl, and R'lyeh's leaning slab keeps its foot in the ground at both ends (one corner of it stood in the air).
+ * Round 117, the dungeons' props and the arenas' built pieces reviewed: a torch's plate lies on the wall (it hung 10 cm off it),
+ * a brazier's legs lean in to its bowl, and R'lyeh's leaning slab keeps its foot in the ground at both ends (one corner of it stood
+ * in the air). The exhaustive wall-item sweep across twenty-four seeds moved to tests/dungeonPropsAudit.test.ts (2026-11-24).
  */
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';

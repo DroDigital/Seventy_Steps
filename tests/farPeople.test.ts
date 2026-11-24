@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FAR_NPCS } from '../src/data/npcsFar';
 import { QUESTS } from '../src/data/quests';
-import { REGIONS } from '../src/data/regions';
+import { LANDLESS, REGIONS } from '../src/data/regions';
 import { discover, travel } from '../src/systems/checkpoints';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
@@ -28,7 +28,8 @@ describe('the far realms (round 12)', () => {
   });
 
   it('every spawn table holds at least three kinds of creature, and the thin ones four (Dunwich had one; Vermont, Yuggoth and Beyond two)', () => {
-    for (const r of REGIONS) expect(Object.keys(r.spawns.table).length, r.id).toBeGreaterThanOrEqual(['dunwich', 'vermont', 'yuggoth', 'beyond'].includes(r.id) ? 4 : 3);
+    for (const r of REGIONS.filter((x) => !LANDLESS.has(x.id))) expect(Object.keys(r.spawns.table).length, r.id).toBeGreaterThanOrEqual(['dunwich', 'vermont', 'yuggoth', 'beyond'].includes(r.id) ? 4 : 3); // (round 123: no open ground in the Stairs of Slumber's realm: its foes are the flights')
+    for (const id of LANDLESS) expect(Object.keys(REGIONS.find((r) => r.id === id)!.spawns.table), id).toEqual([]);
   });
 
   it("Zamacona's thanks is his espada; Johansen's, star-stones", () => {
