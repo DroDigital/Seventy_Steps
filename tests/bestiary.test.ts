@@ -59,4 +59,19 @@ describe('the field notes left about the world (round 34)', () => {
     expect(placed.sort()).toEqual([...wanted].sort());
     expect(Object.keys(DOCUMENTS).filter((n) => DOCUMENTS[n].kind === 'note').sort()).toEqual([...wanted].sort()); // none written and never placed
   });
+
+  it('keeps the open-world boss arena notes short and free of old gate-puzzle instructions', () => {
+    const courtNotes = Object.values(DISCOVERIES).flatMap((d) => d.leaves.map((l) => l.doc));
+    expect(courtNotes.length).toBeGreaterThan(0);
+    for (const name of courtNotes) {
+      const doc = DOCUMENTS[name];
+      expect(doc?.kind, name).toBe('note');
+      expect(doc.text.length, name).toBeLessThanOrEqual(2);
+      const joined = doc.text.join(' ');
+      const words = joined.split(/\s+/).filter(Boolean).length;
+      expect(words, `${name} words`).toBeLessThanOrEqual(80);
+      expect(joined.length, `${name} chars`).toBeLessThanOrEqual(450);
+      expect(joined, `${name} puzzle remnant`).not.toMatch(/\b(lit in order|four (lamps|lights|braziers|pipes|green fires)|three (candles|lifts)|hour before (dawn|sunrise)|pay it plainly|echoes|laudanum|keep a clear head|keeps one’s head clear|takes a toll|asks a toll|out of its turn)\b/i);
+    }
+  });
 });
