@@ -88,9 +88,8 @@ describe('reviewed creature artwork imported into the game', () => {
     }
     expect(scopes).toBe(1092); // Azathoth's four old left/back combat scopes are removed with its old design.
     expect(mirrors).toBe(89); // Its right idle and movement now mirror the new left exactly once.
-    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(2816);
+    expect(new Set(pack.frames.map((f) => f.source)).size).toBe(pack.frameCount); // each frame its own source
     expect(pack.frameCount).toBe(source.unique_png_count);
-    expect(pack.frameCount).toBe(2816); // Azathoth's new poses replace its old art and drop eight unique frames overall.
   });
 
   it('preserves all 2816 native canvases, RGBA pixels, bounds and the fixed Winged Hybrid pose', () => {

@@ -31,7 +31,8 @@ function near(c: Collider, x: number, z: number): number {
 
 describe('the twenty boss places', () => {
   it('stand about every one of the twenty open arenas (round 73 added the hall of Nyarlathotep), and each of them has the packs in it', () => {
-    expect(new Set(BOSSES).size).toBe(20);
+    expect(new Set(BOSSES).size).toBe(BOSSES.length);
+    for (const a of arenas.filter((x) => x.house)) expect(BOSSES, a.bosses[0]).toContain(a.bosses[0]); // every house has its place (no count: 2026-11-24)
     for (const boss of BOSSES) {
       const a = arenaOf(boss);
       expect(a, boss).toBeTruthy();

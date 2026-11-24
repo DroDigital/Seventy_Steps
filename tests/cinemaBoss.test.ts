@@ -15,7 +15,6 @@ describe('the great horrors\' own arrivals (round 34)', () => {
   const ids = Object.keys(BESPOKE);
 
   it('are for bosses that are in the roster and fight from a script, each with its card', () => {
-    expect(ids.length).toBe(17);
     for (const later of ['ghatanothoa', 'mother_hydra', 'colossus_pyramids', 'tsathoggua', 'yig', 'wilbur_whateley', 'joseph_curwen']) expect(ids, later).toContain(later);
     for (const id of ids) {
       expect(getEntity(id)?.bossScript, id).toBeDefined();

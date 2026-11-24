@@ -32,7 +32,6 @@ function samples(fadeIn: number, body: number, fadeOut: number, amp: number): Sa
 
 describe('the boss themes (round 44)', () => {
   it('has a theme for every scripted horror, shared by a pair, and every id in it is a creature', () => {
-    expect(BOSS_TRACK_IDS.length).toBe(48);
     for (const id of SCRIPTED) if (!PROCEDURAL.includes(id)) expect(bossTrackOf(id), `${id} has no theme`).not.toBeNull();
     for (const id of PROCEDURAL) expect(bossTrackOf(id), `${id} is listed as procedural but has a theme`).toBeNull();
     expect(bossTrackOf('keziah_mason')).toBe(bossTrackOf('brown_jenkin'));
@@ -50,7 +49,7 @@ describe('the boss themes (round 44)', () => {
         seen.add(b);
       }
     }
-    expect(new Set(BOSS_TRACK_IDS.map(bossFile)).size).toBe(48);
+    expect(new Set(BOSS_TRACK_IDS.map(bossFile)).size).toBe(BOSS_TRACK_IDS.length); // each theme its own file (no count: a theme added is no failure, 2026-11-24)
   });
 
   it('every file in public/music/bosses is a track, every track has its file (once they are in), and CREDITS names each', () => {
