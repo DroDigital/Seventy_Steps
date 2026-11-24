@@ -42,11 +42,11 @@ nothing in its way.
 | 11 | The Haunter of the Dark | 8/4/7 | 5 | 1050 | 227 | 1452 | 288 | 6 | 1.48 | 0 |
 | 12 | The Terrible Old Man | 9/4/8 | 5 | 1500 | 35 | 674 | 304 | 7 | 0.58 | 0 |
 | 13 | The Gorgon of Medusa's Coil | 9/4/9 | 5 | 1600 | 36 | 331 | 304 | 7 | 0.29 | 0 |
-| 14 | Edward Hutchinson | 10/4/9 | 5 | 1700 | 46 | 597 | 320 | 7 | 0.49 | 0 |
+| 14 | Edward Hutchinson | 10/4/9 | 5 | 1700 | 35 | 360 | 320 | 7 | 0.30 | 0 |
 | 15 | Simon Orne | 10/5/9 | 5 | 1700 | 54 | 421 | 320 | 7 | 0.35 | 0 |
 | 16 | Lilith | 10/5/10 | 5 | 1900 | 53 | 521 | 320 | 8 | 0.39 | 0 |
 | 17 | The Shunned House Entity | 11/5/10 | 5 | 1950 | 38 | 748 | 336 | 8 | 0.53 | 0 |
-| 18 | Joseph Curwen | 11/5/11 | 5 | 2200 | 54 | 783 | 336 | 8 | 0.55 | 0 |
+| 18 | Joseph Curwen | 11/5/11 | 5 | 2200 | 55 | 834 | 336 | 8 | 0.59 | 0 |
 | 19 | Wilbur Whateley | 12/5/11 | 5 | 2400 | 71 | 1038 | 352 | 8 | 0.70 | 0 |
 | 20 | The Dunwich Horror | 12/6/11 | 5 | 2950 | 62 | 1111 | 352 | 8 | 0.75 | 0 |
 | 21 | The Whisperer in Akeley's Chair | 12/6/12 | 5 | 2950 | 67 | 683 | 352 | 8 | 0.46 | 0 |
@@ -55,7 +55,7 @@ nothing in its way.
 | 24 | Father Dagon | 11/5/11 | 5 | 2550 | 47 | 434 | 336 | 8 | 0.31 | 0 |
 | 25 | Hypnos | 14/7/13 | 5 | 3450 | 62 | 599 | 384 | 8 | 0.37 | 0 |
 | 26 | The Colossus Beneath the Pyramids | 16/7/15 | 5 | 3950 | 72 | 986 | 416 | 8 | 0.56 | 0 |
-| 27 | High Priest Not to Be Described | 17/8/16 | 5 | 4700 | 65 | 414 | 432 | 8 | 0.23 | 0 |
+| 27 | High Priest Not to Be Described | 17/8/16 | 5 | 4700 | 65 | 437 | 432 | 8 | 0.24 | 0 |
 | 28 | Yeb | 16/7/15 | 5 | 4200 | 73 | 1271 | 416 | 8 | 0.73 | 0 |
 | 29 | Yig | 16/7/15 | 5 | 4300 | 90 | 2282 | 416 | 8 | 1.31 | 0 |
 | 30 | Tsathoggua | 16/7/15 | 5 | 4350 | 97 | 1562 | 416 | 8 | 0.89 | 0 |
@@ -69,7 +69,7 @@ nothing in its way.
 | 38 | Zkauba the Wizard | 18/8/17 | 5 | 4150 | 101 | 1894 | 448 | 8 | 1.01 | 0 |
 | 39 | The Thing Beyond Erich Zann's Window | 18/9/18 | 5 | 4750 | 66 | 875 | 448 | 8 | 0.47 | 0 |
 | 40 | The Daemon Pipers | 18/9/17 | 5 | 3900 | 56 | 743 | 448 | 8 | 0.39 | 0 |
-| 41 | Nyarlathotep | 18/9/17 | 5 | 5150 | 216 | 2422 | 448 | 8 | 1.29 | 0 |
+| 41 | Nyarlathotep | 18/9/17 | 5 | 5150 | 229 | 2701 | 448 | 8 | 1.44 | 0 |
 | 42 | The Other Gods | 18/9/17 | 5 | 5200 | 89 | 1530 | 448 | 8 | 0.81 | 0 |
 | 43 | The Ancient Ones | 18/9/17 | 5 | 5550 | 74 | 841 | 448 | 8 | 0.45 | 0 |
 | 44 | 'Umr at-Tawil | 18/9/17 | 5 | 5850 | 90 | 947 | 448 | 8 | 0.50 | 0 |
@@ -99,11 +99,11 @@ The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vi
 | 11 | The Haunter of the Dark | 30/30/30 | 5 | 1050 | 164 | 2207 | 640 | 6 | 1.01 | 0 |
 | 12 | The Terrible Old Man | 30/30/30 | 5 | 1500 | 21 | 657 | 640 | 7 | 0.27 | 0 |
 | 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 1600 | 18 | 441 | 640 | 7 | 0.18 | 0 |
-| 14 | Edward Hutchinson | 30/30/30 | 5 | 1700 | 21 | 414 | 640 | 7 | 0.17 | 0 |
+| 14 | Edward Hutchinson | 30/30/30 | 5 | 1700 | 20 | 492 | 640 | 7 | 0.20 | 0 |
 | 15 | Simon Orne | 30/30/30 | 5 | 1700 | 26 | 324 | 640 | 7 | 0.13 | 0 |
 | 16 | Lilith | 30/30/30 | 5 | 1900 | 28 | 657 | 640 | 8 | 0.24 | 0 |
 | 17 | The Shunned House Entity | 30/30/30 | 5 | 1950 | 19 | 588 | 640 | 8 | 0.22 | 0 |
-| 18 | Joseph Curwen | 30/30/30 | 5 | 2200 | 30 | 762 | 640 | 8 | 0.28 | 0 |
+| 18 | Joseph Curwen | 30/30/30 | 5 | 2200 | 30 | 767 | 640 | 8 | 0.29 | 0 |
 | 19 | Wilbur Whateley | 30/30/30 | 5 | 2400 | 30 | 944 | 640 | 8 | 0.35 | 0 |
 | 20 | The Dunwich Horror | 30/30/30 | 5 | 2950 | 32 | 1201 | 640 | 8 | 0.45 | 0 |
 | 21 | The Whisperer in Akeley's Chair | 30/30/30 | 5 | 2950 | 40 | 560 | 640 | 8 | 0.21 | 0 |
@@ -112,7 +112,7 @@ The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vi
 | 24 | Father Dagon | 30/30/30 | 5 | 2550 | 26 | 554 | 640 | 8 | 0.21 | 0 |
 | 25 | Hypnos | 30/30/30 | 5 | 3450 | 51 | 662 | 640 | 8 | 0.25 | 0 |
 | 26 | The Colossus Beneath the Pyramids | 30/30/30 | 5 | 3950 | 43 | 1104 | 640 | 8 | 0.41 | 0 |
-| 27 | High Priest Not to Be Described | 30/30/30 | 5 | 4700 | 49 | 339 | 640 | 8 | 0.13 | 0 |
+| 27 | High Priest Not to Be Described | 30/30/30 | 5 | 4700 | 46 | 402 | 640 | 8 | 0.15 | 0 |
 | 28 | Yeb | 30/30/30 | 5 | 4200 | 49 | 1544 | 640 | 8 | 0.57 | 0 |
 | 29 | Yig | 30/30/30 | 5 | 4300 | 54 | 1608 | 640 | 8 | 0.60 | 0 |
 | 30 | Tsathoggua | 30/30/30 | 5 | 4350 | 62 | 1610 | 640 | 8 | 0.60 | 0 |
@@ -126,7 +126,7 @@ The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vi
 | 38 | Zkauba the Wizard | 30/30/30 | 5 | 4150 | 64 | 1367 | 640 | 8 | 0.51 | 0 |
 | 39 | The Thing Beyond Erich Zann's Window | 30/30/30 | 5 | 4750 | 43 | 809 | 640 | 8 | 0.30 | 0 |
 | 40 | The Daemon Pipers | 30/30/30 | 5 | 3900 | 37 | 668 | 640 | 8 | 0.25 | 0 |
-| 41 | Nyarlathotep | 30/30/30 | 5 | 5150 | 100 | 1424 | 640 | 8 | 0.53 | 0 |
+| 41 | Nyarlathotep | 30/30/30 | 5 | 5150 | 104 | 1508 | 640 | 8 | 0.56 | 0 |
 | 42 | The Other Gods | 30/30/30 | 5 | 5200 | 86 | 2657 | 640 | 8 | 0.99 | 0 |
 | 43 | The Ancient Ones | 30/30/30 | 5 | 5550 | 56 | 781 | 640 | 8 | 0.29 | 0 |
 | 44 | 'Umr at-Tawil | 30/30/30 | 5 | 5850 | 64 | 771 | 640 | 8 | 0.29 | 0 |

@@ -57,7 +57,7 @@ export const DREAM_MOVES = {
     priest_veil: own('teleport', { windup: 30, follow: 'priest_silk' }, 'He is beside you in a swirl of yellow silk, and it bursts. Roll out as he appears.'),
     priest_silk: link('aoe_ring', { windup: 16, radius: 2.2, power: 1 }),
     priest_mask: own('gaze', { windup: 32, active: 22, sanity: 0.7 }, 'What is under the mask looks out at you. Break its sight.'),
-    priest_monastery: own('cave_in', { power: 1.25, marks: { count: 3, ring: [0, 9], radius: 1.4, delay: 44 } }, "The monastery's stones fall about the pillars nearest you. Step into the open."),
+    priest_monastery: own('cave_in', { power: 1.25, marks: { count: 3, ring: [0, 9], radius: 1.4, delay: 38 } }, "The monastery's stones fall about the pillars nearest you. Step into the open."),
     priest_fan: own('projectile_fan', { windup: 48, power: 0.8, bolts: { count: 5, spread: 76, speed: 11 } }, 'Five bolts, wide apart. Stand in a gap and let them pass.'),
     priest_incense: own('dream_cloud', { cloud: { radius: 2.8, drift: 1.3 } }, 'The incense drifts after you, faster than it looks. Keep out of it.'),
     priest_lamp: own('beam', { windup: 50, recovery: 14, follow: 'priest_lamp_2' }, "The lamp's ray strikes, then strikes again where you went. Move twice."),
