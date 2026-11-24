@@ -30,7 +30,7 @@ export interface AutoQuality {
 
 export function createAutoQuality(shell: Shell, stats: FrameStats, tell: (text: string) => void, active: boolean): AutoQuality {
   if (!active) return { tick() {} };
-  const start = rungOf({ resolution: shell.settings.resolution, fog: shell.settings.fog, shadows: shell.settings.shadows });
+  const start = rungOf({ resolution: shell.settings.resolution });
   let rung = start;
   let steps = 0;
   let from = 0;
@@ -45,10 +45,7 @@ export function createAutoQuality(shell: Shell, stats: FrameStats, tell: (text: 
     }
     if (rung !== start) tell(t('n.autoQuality'));
   };
-  const intervened = (): boolean => {
-    const r = LADDER[rung];
-    return shell.settings.resolution !== r.resolution || shell.settings.fog !== r.fog || shell.settings.shadows !== r.shadows;
-  };
+  const intervened = (): boolean => shell.settings.resolution !== LADDER[rung].resolution;
   return {
     tick(now) {
       if (done) return;
@@ -62,8 +59,6 @@ export function createAutoQuality(shell: Shell, stats: FrameStats, tell: (text: 
       rung = to;
       steps++;
       shell.change('resolution', LADDER[to].resolution);
-      shell.change('fog', LADDER[to].fog);
-      shell.change('shadows', LADDER[to].shadows);
       [from, warm] = [now, 1.5];
       stats.clear();
     },
