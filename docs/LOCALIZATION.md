@@ -11,15 +11,16 @@ English where it is none of these.
 - `data/lang/en.ts` is the source: every line, by key. `de.ts`, `fr.ts` and `es.ts` are typed `Record<Key, string>`, so a line added
   to English **fails their compile** until it is translated. `tests/i18n.test.ts` keeps their `{places}` the same as the English, none
   empty, none left over from a line that is gone, lines in capitals in capitals, and every hint's `{button}` a button that exists.
-- The Language setting holds a place in `LANGS` (`data/lang/index.ts`), so a new language goes at the end of that list.
+- The Language setting holds a place in `LANGS` (`data/lang/index.ts`), so a new language goes at the end of that list. Changing it also updates `document.documentElement.lang` (`ui/shell.ts`).
 
 ## What is translated
 
 The menus (title, difficulty, slots, pause, settings, controls, rise), the hints, the HUD's labels and notices, the mind's bands, the
 crash screen, and the buttons' names. The HUD's notices are all of them now, including the boss HUD's labels and notices (the gaze,
 the powder, the lamp, petrification, a body stolen), each horror's status line and notices (`sig.*`: Azathoth's movements and phase
-notes, the Alert, the Haunter's lamplight, the spawning roots), the map's travel prompt and the reasons a journey is refused, what a
-court asks on its discovery (`disc.*`), and the notices of star-stones, the survey's pages and a weapon taken up.
+notes, the Alert, the Haunter's lamplight, the spawning roots, 'Umr at-Tawil's yield), the map's travel prompt and the reasons a
+journey is refused, what a court asks on its discovery (`disc.*`), and the notices for star-stones, weapons, relics, rounds, seals,
+allies, joining horrors, New Game+, and the survey's pages. The main HUD's and boss HUD's labels follow a language change mid-game.
 
 ## What is not (yet), and stays English in every language
 

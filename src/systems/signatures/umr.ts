@@ -55,7 +55,7 @@ export const UMR_SIGNATURE: Signature = {
     g.ecs.c.brain.get(e)!.cooldown = Infinity; // it strikes no more
     if (f.sig.told) return;
     f.sig.told = 1; // round 70: the offer was only a prompt within eight metres, and a blow in the middle of a fight finished it unseen
-    g.events.emit('Notice', { text: g.ecs.c.combatant.get(e)?.showcase ? "'UMR AT-TAWIL YIELDS" : "'UMR AT-TAWIL YIELDS · {interact} NEAR HIM TO PASS THE GATE WITH HIM, OR STRIKE HIM DOWN" });
+    g.events.emit('Notice', { text: t(g.ecs.c.combatant.get(e)?.showcase ? 'sig.umrYields' : 'sig.umrOffer') });
   },
   action(g, e, f) {
     if (!yields(f) || g.overworld?.ending || g.ecs.c.combatant.get(e)?.showcase) return null;

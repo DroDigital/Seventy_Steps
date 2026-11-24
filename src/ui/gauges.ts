@@ -21,9 +21,9 @@ export interface Pips {
 }
 
 /** A row of `shape` pips after a small `label`; `after` is a text that follows them. */
-export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'round', fill: string): Pips & { after: HTMLSpanElement } {
+export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'round', fill: string): Pips & { label: HTMLDivElement; after: HTMLSpanElement } {
   const row = el('display:flex;align-items:center;gap:6px;height:12px;margin-top:3px;font-size:10px;letter-spacing:2px', '', parent);
-  el('opacity:.8;width:78px;flex:none', label, row); // IM Fell English's REVOLVER is 73 px at this size and spacing
+  const name = el('opacity:.8;width:78px;flex:none', label, row); // IM Fell English's REVOLVER is 73 px at this size and spacing
   const holder = el('display:flex;gap:3px;align-items:center', '', row);
   const after = document.createElement('span');
   after.style.cssText = 'opacity:.85;font-size:10px;letter-spacing:1px';
@@ -31,6 +31,7 @@ export function pipRow(parent: HTMLElement, label: string, shape: 'diamond' | 'r
   let made = -1;
   let marks: HTMLElement[] = [];
   return {
+    label: name,
     after,
     set(on, max) {
       if (max !== made) {

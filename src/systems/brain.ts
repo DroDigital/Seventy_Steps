@@ -20,6 +20,7 @@
  */
 
 import type { Entity } from '../core/ecs';
+import { t } from '../core/i18n';
 import { distXZ, yawOf, type XZ } from '../core/geom';
 import { AI, BOSS, SIM } from '../data/tuning';
 import { arenaOf, within } from './bossArena';
@@ -106,7 +107,7 @@ function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transfor
 /** An ally falls in beside the investigator: said once, so a glowing thing that never strikes them is known for a friend (round 19: the Light-Being from Algol was taken for a foe that would not fight). */
 function announce(g: Game, id: Entity, br: Brain): void {
   br.joined = true;
-  g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} · AT YOUR SIDE` });
+  g.events.emit('Notice', { text: t('n.allySide', { name: (g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase() }) });
 }
 
 /**
@@ -131,7 +132,7 @@ function waitsToJoin(g: Game, id: Entity, br: Brain): boolean {
   if (!joins || br.state === 'engage') return false;
   if (!mayJoin(g, id, joins) || isSheltered(g)) return (br.state = 'hidden'), true; // (nor while the investigator is sheltered: in a talk, or at peace on arriving, round 88)
   [br.state, br.cooldown, br.target] = ['engage', BOSS.wake, g.player.id]; // it gathers itself before its first blow, as one woken does (round 60)
-  g.events.emit('Notice', { text: `${(g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase()} JOINS THE FIGHT` });
+  g.events.emit('Notice', { text: t('n.joinsFight', { name: (g.ecs.c.combatant.get(id)?.name ?? '').toUpperCase() }) });
   return false;
 }
 

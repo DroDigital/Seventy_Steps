@@ -8,6 +8,7 @@
  */
 
 import { distXZ } from '../core/geom';
+import { t } from '../core/i18n';
 import { FOUND } from '../data/discoveries';
 import { DISCOVERIES } from '../data/discoveriesAll';
 import { getEntity } from '../data/registry';
@@ -33,7 +34,7 @@ export function sealedHere(g: Game): string | null {
   for (const [id, p] of g.ecs.c.piece) {
     const need = p.def.minSeals;
     if (need !== undefined && !g.ecs.c.layer.get(id)?.shown && distXZ(p.def, me) <= SEALS.warn) {
-      return `THE DOOR IS SEALED · ${sealsBroken(g)} OF ${need} GREAT HORRORS HAVE FALLEN`;
+      return t('n.doorSealed', { n: sealsBroken(g), need });
     }
   }
   for (const [id, p] of g.ecs.c.piece) {
@@ -42,7 +43,7 @@ export function sealedHere(g: Game): string | null {
   }
   for (const s of worldLayout().spawns) {
     if (!s.arena || bossAwake(g, s.entity) || distXZ(s.arena, me) > s.arena.radius) continue;
-    return `SOMETHING VAST SLEEPS HERE · ${(getEntity(priorOf(s.entity)!)?.name ?? 'ANOTHER').toUpperCase()} STILL KEEPS THE WAY`;
+    return t('n.sleepsHere', { name: getEntity(priorOf(s.entity)!)?.name.toUpperCase() ?? t('n.another') });
   }
   return null;
 }

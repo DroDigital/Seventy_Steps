@@ -31,7 +31,7 @@ export function takeUp(g: Game, id: string, from?: string): void {
   if (!isWeapon(id) || g.player.arms.includes(id)) return;
   g.player.arms.push(id);
   markNew(g, 'weapon', id);
-  g.events.emit('Notice', { text: `${WEAPONS[id].name.toUpperCase()} · A NEW WEAPON · TAKE IT UP FROM {pause} · ARMS` }); // the HUD names the button
+  g.events.emit('Notice', { text: t('n.newWeapon', { name: WEAPONS[id].name.toUpperCase() }) }); // the HUD names the button
   g.events.emit('Found', { kind: 'weapon', id, from });
 }
 

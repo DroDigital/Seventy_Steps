@@ -173,7 +173,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('WayOmen', (e) => say(e.words)); // a line said on a trail to a horror (round 62)
   g.events.on('HouseSeen', (e) => great.show(e.name, 'place', e.line.toUpperCase())); // a horror's house come within sight (round 63)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
-  g.events.on('Discovered', (e) => say(fill(tr('hud.signFound', { name: e.name.toUpperCase() }), true))); // ({map} is the map's button on the device in hand)
+  g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
   g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
@@ -224,8 +224,10 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       setStyle(hp.parentElement!, 'boxShadow', `0 0 0 1px #000d,inset 0 0 3px #000${bleeding(g) ? `,0 0 ${(3 + 3 * Math.sin(now0 / 320)).toFixed(0)}px ${MAGENTA}` : ''}`); // the Unmoored mind wearing the body away, shown where it is felt
       setStyle(stamina, 'width', percent(s.value, s.max));
       mind.update(now0);
+      setText(reagent.label, tr('hud.reagent'));
       reagent.set(g.player.reagent, g.player.reagentMax);
       setText(reagent.after, g.player.oil > 0 ? tr('hud.oil', { n: g.player.oil }) : ''); // flasks once any are carried (round 12)
+      setText(gun.label, tr('hud.revolver'));
       gun.set(g.player.ammo, GUN.chamber);
       setText(gun.after, `· ${g.player.rounds}`);
       setStyle(gun.after, 'color', g.player.ammo === 0 ? '#b0604f' : BONE); // dry: it reddens

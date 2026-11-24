@@ -59,7 +59,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   g.events.on('BossPhase', (e) => { // what the fight now asks, said on the screen when its phase begins (round 68: it was said only in the field guide)
     const f = g.ecs.c.fight.get(e.entity);
     const line = f && SIGNATURES[f.id]?.note?.(g, e.entity, f, e.phase);
-    if (line) say(buttons(line, true));
+    if (line) say(line); // the notice board fills any {button} as it shows
     else if (joined(e)) say(t('boss.joined')); // said before the first fold, not after it
   });
   g.events.on('LampChanged', (e) => say(t(e.lit ? 'boss.lampOn' : 'boss.lampOut')));
