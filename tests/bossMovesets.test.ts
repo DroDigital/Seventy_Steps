@@ -5,7 +5,7 @@
  * horror's own next link, and every blow says how it is met.
  */
 import { describe, expect, it } from 'vitest';
-import { ATTACKS, LIBRARY } from '../src/data/attacks';
+import { ATTACKS, LIBRARY, compileAttack } from '../src/data/attacks';
 import { OWNER, OWN_SPECS, baseOf } from '../src/data/bossMoves';
 import { ENTITIES } from '../src/data/registry';
 import type { AttackId, EntityDef } from '../src/data/schema';
@@ -96,6 +96,18 @@ describe("every horror's moveset is its own (2026-11-24)", () => {
       if (a.bolts) expect(a.bolts.speed, id).toBeLessThanOrEqual(13);
       expect(tipOf(id), id).toBeTruthy();
       expect(baseOf(id), id).toBe(OWN_SPECS[id].of);
+    }
+  });
+
+  it('a chained link\'s bolts, barrage and gaze still carry across the court, though no horror chooses it on its own', () => {
+    const stats = { damage: 10, sanityDamage: 1 } as Parameters<typeof compileAttack>[1];
+    for (const id of Object.keys(OWN_SPECS) as AttackId[]) {
+      if (ATTACKS[id].range[1] !== 0) continue;
+      const m = compileAttack(id, stats, 1.9);
+      const far = LIBRARY[OWN_SPECS[id].of].range[1];
+      if (m.volley) expect(m.volley.range, id).toBeGreaterThanOrEqual(Math.max(far * 1.5, 1));
+      if (m.barrage) expect(m.barrage.range, id).toBeGreaterThanOrEqual(far * 1.6);
+      if (m.effect) expect(m.effect.range, id).toBe(far);
     }
   });
 });
