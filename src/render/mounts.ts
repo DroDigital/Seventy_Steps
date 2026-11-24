@@ -7,10 +7,11 @@ import type { HorseToss } from '../systems/horseIdle';
 import { CASTER } from './moonShadow';
 import { MountBuilder, type CoachWheel } from './mountKit';
 import { automobileArt } from './mountAutomobile';
+import { createCarDynamics, stepCarDynamics } from './automobileMotion';
 import { carriageArt } from './mountCarriage';
 import { animateReins, type ReinHands } from './reinLines';
 import { CALM, type RiderCue } from './riderPose';
-import { SEAT_BACK, type Slab } from './lanternCover';
+import { CAR_SEAT_BACK, SEAT_BACK, type Slab } from './lanternCover';
 import { swayLamps } from './chariotFittings';
 
 export type { MountId } from '../data/mounts';
@@ -48,24 +49,29 @@ export function createMount(id: MountId): MountVisual {
   const root = new THREE.Group(); root.name = `mount-${id}`;
   const b = new MountBuilder();
   const car = id === 'automobile' ? automobileArt(b, root) : null;
+  const carDyn = car ? createCarDynamics() : null;
   const coach = id === 'chariot' || id === 'grey' ? carriageArt(b, root, id === 'grey') : null;
   const art = car ?? coach;
   if (!art) throw new Error(`unknown mount ${id}`);
   const wheels = car?.wheels ?? coach?.wheels ?? [];
-  const materials = [...b.materials, ...(coach ? coach.horses.map((horse) => horse.flame.material) : [])];
+  const materials = [
+    ...b.materials,
+    ...(coach ? coach.horses.map((horse) => horse.flame.material) : []),
+    ...(car ? [car.beamMaterial, car.halos.mesh.material as THREE.ShaderMaterial] : []),
+  ];
   // The global depth-only shadow shader has no instance transform. Ordinary coachwork casts;
-  // animated limb instances stay out of that pass instead of casting their unposed rest mesh.
+  // animated limb instances and transparent beams/halos stay out of that pass.
   root.traverse(o => {
     if (o instanceof THREE.Mesh && !(o instanceof THREE.InstancedMesh) && ![o.material].flat().some(m => m.transparent)) o.layers.enable(CASTER);
   });
   let distance = 0, phase = 0, cycle = 0, lastSpeed = 0, accel = 0;
   const shown = { time: 0, pace: 0 }; // the frame the reins are drawn for, when the driver's hands are known
-  function poseWheel(w: CoachWheel, turn: number, ground?: MountFrame['ground']): void {
+  function poseWheel(w: CoachWheel, steerAngle: number, ground?: MountFrame['ground']): void {
     w.pivot.position.y = w.radius + (ground?.(w.x, w.z) ?? 0);
-    w.pivot.rotation.y = w.steer ? turn * 0.3 : 0;
+    w.pivot.rotation.y = w.steer ? steerAngle : 0;
     w.spin.rotation.x = distance / w.radius;
   }
-  return { root, seat: art.seat, materials, back: coach ? { at: coach.body, slab: SEAT_BACK } : null,
+  return { root, seat: art.seat, materials, back: coach ? { at: coach.body, slab: SEAT_BACK } : car ? { at: car.body, slab: CAR_SEAT_BACK } : null,
     holdReins(hands, cue) {
       if (coach) animateReins(coach, shown.time, shown.pace, hands, cue);
     },
@@ -76,14 +82,36 @@ export function createMount(id: MountId): MountVisual {
       if (ridden === undefined) cycle += cyclesFor(pace * step, pace);
       else cycle = Math.abs(ridden - cycle) > 0.75 ? ridden : cycle + (ridden - cycle) * Math.min(1, step * 40); // the simulation's count, eased between its steps
       phase = (cycle * Math.PI * 2) % (Math.PI * 2);
-      const rear = ground?.(0, -1.1) ?? 0, front = ground?.(0, 0.65) ?? 0;
-      const left = ground?.(-0.8, -0.2) ?? 0, right = ground?.(0.8, -0.2) ?? 0;
-      const movement = Math.min(1, pace / 2), suspension = Math.sin(distance * 7.1) * 0.018 + Math.sin(distance * 11.9) * 0.008;
-      art.body.position.y = (rear + front) * 0.5 + suspension * movement;
-      art.body.rotation.x = Math.max(-0.22, Math.min(0.22, -Math.atan2(front - rear, 1.75))) + Math.max(-0.035, Math.min(0.035, (lastSpeed - pace) * 0.025));
-      art.body.rotation.z = Math.max(-0.2, Math.min(0.2, Math.atan2(right - left, 1.6))) - steer * 0.035 * movement;
-      for (const w of wheels) poseWheel(w, steer, ground);
-      if (car) car.steering.rotation.z = -steer * 0.48;
+      if (car && carDyn) {
+        const rear = ground?.(0, -1.16) ?? 0, front = ground?.(0, 1.12) ?? 0;
+        const left = ground?.(0.86, 0) ?? 0, right = ground?.(-0.86, 0) ?? 0;
+        const pose = stepCarDynamics(carDyn, { time, dt: step, speed: pace, steer, distance });
+        const terrainPitch = Math.max(-0.24, Math.min(0.24, -Math.atan2(front - rear, 2.28)));
+        const terrainRoll = Math.max(-0.22, Math.min(0.22, Math.atan2(right - left, 1.72)));
+        car.body.position.y = (rear + front) * 0.5 + pose.heave + pose.vibeY;
+        car.body.rotation.x = terrainPitch + pose.pitch;
+        car.body.rotation.z = terrainRoll + pose.roll + pose.vibeRoll;
+        car.hood.position.y = pose.hoodVibe;
+        car.hood.rotation.z = pose.vibeRoll * 1.4;
+        car.canopy.rotation.x = pose.canopyPitch;
+        car.canopy.rotation.z = pose.canopyRoll;
+        car.steering.rotation.z = pose.wheelSpinSteer;
+        car.shifter.rotation.x = pose.shifterAngle;
+        car.fan.rotation.z = pose.fanAngle;
+        car.tieRod.position.x = pose.tieRodX;
+        car.tieRod.position.y = 0.48 + (ground?.(0, 1.0) ?? 0);
+        for (const w of wheels) poseWheel(w, pose.steerAngle, ground);
+        const ghost = b.materials[0]?.uniforms.uGhost?.value ?? 0;
+        car.updateLights(pose, ghost);
+      } else {
+        const rear = ground?.(0, -1.1) ?? 0, front = ground?.(0, 0.65) ?? 0;
+        const left = ground?.(-0.8, -0.2) ?? 0, right = ground?.(0.8, -0.2) ?? 0;
+        const movement = Math.min(1, pace / 2), suspension = Math.sin(distance * 7.1) * 0.018 + Math.sin(distance * 11.9) * 0.008;
+        art.body.position.y = (rear + front) * 0.5 + suspension * movement;
+        art.body.rotation.x = Math.max(-0.22, Math.min(0.22, -Math.atan2(front - rear, 1.75))) + Math.max(-0.035, Math.min(0.035, (lastSpeed - pace) * 0.025));
+        art.body.rotation.z = Math.max(-0.2, Math.min(0.2, Math.atan2(right - left, 1.6))) - steer * 0.035 * movement;
+        for (const w of wheels) poseWheel(w, steer * 0.3, ground);
+      }
       if (coach) {
         const answer = { check: cue.pull, urge: cue.arrive }; // the horse feels the reins at the bit: a haul on them, a ripple's end
         for (const horse of coach.horses) horse.update(time, phase, pace, steer, ground, bend, answer);

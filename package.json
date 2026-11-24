@@ -25,6 +25,10 @@
     "package:win": "npm run build && npm run icon && electron-builder --win --dir",
     "package:linux": "npm run build && npm run icon && electron-builder --linux --dir",
     "package:mac": "npm run build && npm run icon && node tools/package_mac.mjs",
+    "package:demo": "npm run build:demo && npm run icon && electron-builder --dir -c.extraMetadata.edition=demo",
+    "package:demo:win": "npm run build:demo && npm run icon && electron-builder --win --dir -c.extraMetadata.edition=demo",
+    "package:demo:linux": "npm run build:demo && npm run icon && electron-builder --linux --dir -c.extraMetadata.edition=demo",
+    "package:demo:mac": "npm run build:demo && npm run icon && node tools/package_mac.mjs --edition demo",
     "smoke": "node tools/smoke_packaged.mjs",
     "steam:upload": "node tools/steam_upload.mjs",
     "itch:push": "node tools/itch_push.mjs"

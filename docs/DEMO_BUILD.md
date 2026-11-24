@@ -73,9 +73,10 @@ markers name the module.
 
 ## What is left as it was
 
-- **The packed demo is not built this way yet.** `npm run package:*` and the release workflow still run the full build and set
-  the demo's `edition` in the package's metadata (docs/RELEASE.md). A packed demo for itch.io, Steam or Electron therefore still
-  holds the full bundle until its packaging runs `build:demo`. This round changes the browser demo's build and its checks; the packaging scripts are untouched.
+- **Packed desktop demos now use `build:demo`.** `npm run package:demo`, `package:demo:win`, `package:demo:mac`, and
+  `package:demo:linux` (and `.github/workflows/release-builds.yml` when `demo=true`) build via `npm run build:demo`, run
+  `npm run check:demo` in CI, and verify `dist/edition.json` equals `"demo"` in both `desktop/main.js` (`--smoke-test`)
+  and `tools/itch_push.mjs`.
 - **The Morgan line about Dunwich** (`src/data/npcs.ts`) is gated out of the demo, so its recording is not shipped either.
 - **Every recorded sound ships.** The sample sets name their sounds whole, and none of them is part of the story.
 - **The demo's cultist is named "Cultist"** (`DEMO_NAMES` in `pack_art.py`; `src/data/entities/lesser.ts`).

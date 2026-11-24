@@ -15,7 +15,7 @@
 import { spawnSync } from 'node:child_process';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -36,19 +36,33 @@ const version = (flag('--version') ?? process.env.ITCH_VERSION ?? '').trim() || 
 if (!/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$/.test(version)) fail(`"${version}" is not a version (1.0.0-rc.2).`);
 
 const readJson = (file) => JSON.parse(readFileSync(file, 'utf8'));
-/** package.json out of an asar (a Windows or Linux pack). */
-function inAsar(asar) {
+const readJsonOpt = (file) => (existsSync(file) ? readJson(file) : null);
+/** Reads `entry` out of an asar (a Windows or Linux pack). */
+function inAsar(asar, entry = 'package.json', required = true) {
   const dir = mkdtempSync(join(tmpdir(), 'itch-push-'));
-  const r = spawnSync(process.execPath, [asarBin, 'extract-file', asar, 'package.json'], { cwd: dir, encoding: 'utf8' });
-  if (r.status !== 0) fail(`Could not read ${asar}: ${r.stderr}`);
-  return readJson(join(dir, 'package.json'));
+  const r = spawnSync(process.execPath, [asarBin, 'extract-file', asar, entry], { cwd: dir, encoding: 'utf8' });
+  if (r.status !== 0) {
+    if (!required) return null;
+    fail(`Could not read ${entry} from ${asar}: ${r.stderr}`);
+  }
+  return readJson(join(dir, basename(entry)));
 }
 const app = 'Seventy Steps.app';
 const resources = (dir) => join(dir, app, 'Contents', 'Resources');
+const macBundleEdition = (d) => {
+  const arm = readJsonOpt(join(resources(d), 'app-arm64', 'dist', 'edition.json'))?.edition;
+  const x64Path = join(resources(d), 'app-x64');
+  if (existsSync(x64Path)) {
+    const x64 = readJsonOpt(join(x64Path, 'dist', 'edition.json'))?.edition;
+    if (arm !== x64) return `mismatch (${arm ?? 'missing'} vs ${x64 ?? 'missing'})`;
+  }
+  return arm ?? 'missing';
+};
+const asarEditionEntry = join('dist', 'edition.json');
 const platforms = [
-  { name: 'windows', os: 'Windows', dir: 'win-unpacked', play: 'SeventySteps.exe', pack: (d) => inAsar(join(d, 'resources', 'app.asar')) },
-  { name: 'osx', os: 'macOS', dir: 'mac-universal', play: app, pack: (d) => readJson(join(resources(d), 'app-arm64', 'package.json')), hint: 'the universal app, for Intel Macs too: npm run package:mac -- --universal --channel itch' },
-  { name: 'linux', os: 'Linux', dir: 'linux-unpacked', play: 'seventy-steps', pack: (d) => inAsar(join(d, 'resources', 'app.asar')) },
+  { name: 'windows', os: 'Windows', dir: 'win-unpacked', play: 'SeventySteps.exe', pack: (d) => inAsar(join(d, 'resources', 'app.asar'), 'package.json'), bundle: (d) => inAsar(join(d, 'resources', 'app.asar'), asarEditionEntry, false)?.edition ?? 'missing' },
+  { name: 'osx', os: 'macOS', dir: 'mac-universal', play: app, pack: (d) => readJson(join(resources(d), 'app-arm64', 'package.json')), bundle: macBundleEdition, hint: 'the universal app, for Intel Macs too: npm run package:mac -- --universal --channel itch' },
+  { name: 'linux', os: 'Linux', dir: 'linux-unpacked', play: 'seventy-steps', pack: (d) => inAsar(join(d, 'resources', 'app.asar'), 'package.json'), bundle: (d) => inAsar(join(d, 'resources', 'app.asar'), asarEditionEntry, false)?.edition ?? 'missing' },
 ];
 const only = flag('--only')?.split(',');
 const todo = platforms.filter((p) => !only || only.includes(p.name));
@@ -65,12 +79,17 @@ for (const p of todo) {
   const packed = p.pack(dir);
   const channel = packed.channel;
   if (channel !== 'itch') fail(`${p.os}: ${dir} was packed for ${channel ?? 'Steam'}, not itch.io: it would relaunch itself through Steam. Pack it again for itch (see this file's header).`);
+  const wantEdition = packed.edition === 'demo' ? 'demo' : 'full';
+  const gotBundle = p.bundle(dir);
+  if (gotBundle !== wantEdition) {
+    fail(`${p.os}: ${dir} says edition "${wantEdition}" in package.json, but its built dist/edition.json is "${gotBundle}". Pack the demo with npm run package:demo:${p.name === 'osx' ? 'mac' : p.name === 'windows' ? 'win' : 'linux'} (not npm run build).`);
+  }
   // Linux: --no-sandbox for Ubuntu 23.10+ AppArmor (electron#41066); the packed launcher adds it too.
   const args = p.name === 'linux' ? 'args = ["--no-sandbox"]\n' : '';
   writeFileSync(join(dir, '.itch.toml'), `# what the itch app launches\n[[actions]]\nname = "play"\npath = "${p.play}"\n${args}`);
-  const name = packed.edition === 'demo' ? `${p.name}-demo` : p.name; // the demo's own channel, never the full game's
+  const name = wantEdition === 'demo' ? `${p.name}-demo` : p.name; // the demo's own channel, never the full game's
   plan.push({ ...p, dir, name });
-  console.log(`${p.os}: ${dir} → ${target}:${name} (version ${version})`);
+  console.log(`${p.os}: ${dir} → ${target}:${name} (version ${version}, bundle ${gotBundle})`);
 }
 if (!plan.length) fail('Nothing is packed for itch.io.');
 

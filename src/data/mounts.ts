@@ -1,9 +1,11 @@
-/** Three appearances, one traversal model. Ownership is verified by the desktop store, never a save. */
+/** Mount appearances: `grey` (included), `automobile` (optional DLC), and dormant `chariot` kept in `MOUNT_IDS` so legacy saves still load cleanly. */
 export const MOUNT_IDS = ['grey', 'chariot', 'automobile'] as const;
 export type MountId = (typeof MOUNT_IDS)[number];
+/** Mount appearances currently offered in menus and the coach-house exhibit (the spectral chariot is shelved for now). */
+export const OFFERED_MOUNT_IDS = ['grey', 'automobile'] as const;
 export const isMount = (id: unknown): id is MountId => MOUNT_IDS.includes(id as MountId);
 export const MOUNT_QUEST = 'borrowed_reins';
-/** The plain chariot the quest gives. The spectral chariot and the motor car are optional appearances. The id stays `grey` so older saves still load. */
+/** The plain chariot the quest gives. The motor car is an optional cosmetic appearance. The id stays `grey` so older saves still load. */
 export const FREE_MOUNT: MountId = 'grey';
 
 /** Metres and seconds; every mount shares this exact frozen object. */
@@ -38,7 +40,7 @@ const CAR: MountTurning = Object.freeze({ arcade: true, radius: Object.freeze([3
 export const MOUNT_TURNING: Readonly<Record<MountId, MountTurning>> = Object.freeze({ grey: HORSE, chariot: HORSE, automobile: CAR });
 
 export const MOUNTS = Object.freeze({
-  grey: Object.freeze({ id: 'grey', name: 'Chariot', description: 'A wooden chariot of the spectral coach\'s pattern, drawn by one horse. No fire, no funeral dress.', dlc: false, price: 0, traversal: MOUNT_TRAVERSAL }),
+  grey: Object.freeze({ id: 'grey', name: 'Chariot', description: 'A wooden chariot drawn by one horse, with a tufted bench and brass lanterns.', dlc: false, price: 0, traversal: MOUNT_TRAVERSAL }),
   chariot: Object.freeze({ id: 'chariot', name: 'The Spectral Chariot', description: 'A mourning carriage drawn by two spectral skeleton horses.', dlc: true, price: 0.99, traversal: MOUNT_TRAVERSAL }),
-  automobile: Object.freeze({ id: 'automobile', name: 'The Brassbound Motor Car', description: 'An antique touring automobile in black enamel and tarnished brass.', dlc: true, price: 0.99, traversal: MOUNT_TRAVERSAL }),
+  automobile: Object.freeze({ id: 'automobile', name: 'The Brassbound Motor Car', description: 'A circa-1914 touring motorcar in black enamel and aged brass, with acetylene headlamps, wooden artillery wheels and a folding canvas canopy.', dlc: true, price: 0.99, traversal: MOUNT_TRAVERSAL }),
 });

@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { startLoop } from '../core/loop';
 import { PAD_BUTTON } from '../core/padMap';
 import { activePad } from '../core/pads';
-import { MOUNT_IDS, MOUNTS, MOUNT_TRAVERSAL, type MountId } from '../data/mounts';
+import { MOUNTS, MOUNT_TRAVERSAL, OFFERED_MOUNT_IDS, type MountId } from '../data/mounts';
 import { HIGH_RESOLUTIONS, RENDER, SETTINGS, SIM } from '../data/tuning';
 import { allEffectsOn, computeFx } from '../render/fx';
 import { tint } from '../render/meshKit';
@@ -12,6 +12,7 @@ import { createPipeline } from '../render/pipeline';
 import { updatePostUniforms } from '../render/postPass';
 import { createWorldMaterial, updateWorldUniforms, worldUniforms } from '../render/worldMaterial';
 
+type OfferedMountId = (typeof OFFERED_MOUNT_IDS)[number];
 const clamp = (v: number, a: number, b: number): number => Math.min(b, Math.max(a, v));
 const STYLE = `
  .mount-exhibit{position:fixed;inset:0;z-index:30;color:#e4ddd1;font:13px/1.5 'IM Fell English',Georgia,serif;pointer-events:none;background:linear-gradient(180deg,#07080cb0,transparent 18%,transparent 68%,#07080ce8)}
@@ -36,9 +37,8 @@ export async function startMountGallery(): Promise<void> {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0.024, 0.026, 0.038);
   const camera = new THREE.PerspectiveCamera(42, RENDER.width / RENDER.height, 0.1, 90);
-  const mounts: Record<MountId, MountVisual> = { grey: createMount('grey'), chariot: createMount('chariot'), automobile: createMount('automobile') };
+  const mounts: Record<OfferedMountId, MountVisual> = { grey: createMount('grey'), automobile: createMount('automobile') };
   for (const m of Object.values(mounts)) scene.add(m.root);
-  mounts.chariot.root.visible = false;
   mounts.automobile.root.visible = false;
   const stage = makeStage(scene);
   const enabled = allEffectsOn();
@@ -60,7 +60,7 @@ export async function startMountGallery(): Promise<void> {
   overlay.className = 'mount-exhibit'; overlay.setAttribute('aria-label', 'Mount exhibit controls');
   const style = document.createElement('style'); style.textContent = STYLE; overlay.append(style);
   overlay.insertAdjacentHTML('beforeend', `<header><div><div class="eyebrow">Seventy Steps · The coach house</div><h2 class="brand">A SWIFTER PASSAGE</h2></div><a href="${location.pathname}">Return to title ↗</a></header>
-    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · Chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · THREE APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom · 1 / 2 / 3: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
+    <div class="status" aria-live="polite"></div><div class="plate"><div><div class="eyebrow">I · Chariot</div><h1></h1><p></p><div class="spec">ONE TRAVERSAL MODEL · TWO APPEARANCES</div></div><div class="controls"><div class="row" data-row="mount"></div><div class="row" data-row="gait"></div><div class="row" data-row="view"></div><div class="hint">Drag / right stick: orbit · Wheel / left stick: zoom · 1 / 2: mount · Space: pause · O: orbit · H: hide labels</div></div></div>`);
   document.body.append(overlay);
   const heading = overlay.querySelector('h1')!;
   const description = overlay.querySelector('p')!;
@@ -68,14 +68,14 @@ export async function startMountGallery(): Promise<void> {
   const status = overlay.querySelector('.status')!;
   const buttons: HTMLButtonElement[] = [];
   const gaitButtons: HTMLButtonElement[] = [];
-  let id: MountId = 'grey', gait = 2, paused = false, auto = true, detailed = false;
+  let id: OfferedMountId = 'grey', gait = 2, paused = false, auto = true, detailed = false;
   let yaw = -0.92, pitch = 0.22, radius = 11, distance = 11, time = 0, speed = 0;
   let dragging = false, lastX = 0, lastY = 0, hidden = false;
   const target = new THREE.Vector3(0, 0.85, 1.3), aim = target.clone();
   const rates = [0, MOUNT_TRAVERSAL.cruise, MOUNT_TRAVERSAL.gallop];
   const refresh = (): void => {
-    const data = MOUNTS[id]; heading.textContent = data.name; description.textContent = data.description;
-    chapter.textContent = id === 'grey' ? 'I · Chariot' : id === 'chariot' ? 'II · The spectral procession' : 'III · A machine out of time';
+    const data = MOUNTS[id as MountId]; heading.textContent = data.name; description.textContent = data.description;
+    chapter.textContent = id === 'grey' ? 'I · Chariot' : 'II · A machine out of time';
     const car = id === 'automobile';
     const states = car ? ['IDLING', 'CRUISING', 'DRIVING'] : ['AT REST', 'TRAVELLING', 'GALLOPING'];
     const labels = car ? ['Idle', 'Cruise', 'Drive'] : ['Rest', 'Walk', 'Gallop'];
@@ -89,15 +89,22 @@ export async function startMountGallery(): Promise<void> {
     overlay.querySelector(`[data-row="${row}"]`)!.append(b); buttons.push(b); return b;
   };
   const frame = (): void => {
-    const bounds = new THREE.Box3().setFromObject(mounts[id].root), size = bounds.getSize(new THREE.Vector3());
-    bounds.getCenter(target); target.y = Math.max(0.38, size.y * 0.22); aim.copy(target); // look slightly lower so the full mount sits cleanly above the bottom dock
-    distance = Math.max(size.z, size.x * 1.15, size.y * 1.55) * 1.82; radius = distance;
+    const bounds = new THREE.Box3();
+    mounts[id].root.updateMatrixWorld(true);
+    mounts[id].root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+      if (o.name === 'automobile-headlight-beams' || o.name === 'automobile-lamp-halos') return;
+      bounds.expandByObject(o);
+    });
+    const size = bounds.getSize(new THREE.Vector3());
+    bounds.getCenter(target); target.y = Math.max(0.45, size.y * 0.36); aim.copy(target); // look slightly lower so the full mount sits cleanly above the bottom dock
+    distance = Math.max(size.z, size.x * 1.15, size.y * 1.55) * 1.72; radius = distance;
   };
-  const choose = (next: MountId): void => {
+  const choose = (next: OfferedMountId): void => {
     mounts[id].root.visible = false; id = next; mounts[id].root.visible = true; frame(); refresh();
   };
-  const labels: Record<MountId, string> = { grey: '1 · Chariot', chariot: '2 · Spectral chariot', automobile: '3 · Brassbound motor car' };
-  for (const mount of MOUNT_IDS) button('mount', labels[mount], () => choose(mount), { mount });
+  const labels: Record<OfferedMountId, string> = { grey: '1 · Chariot', automobile: '2 · Brassbound motor car' };
+  for (const mount of OFFERED_MOUNT_IDS) button('mount', labels[mount], () => choose(mount), { mount });
   ['Rest', 'Walk', 'Gallop'].forEach((label, i) => gaitButtons.push(button('gait', label, () => { gait = i; }, { gait: String(i) })));
   const pauseButton = button('gait', 'Pause', () => { paused = !paused; }, { action: 'pause' });
   button('view', 'Orbit', () => { auto = !auto; }, { action: 'orbit' });
@@ -121,7 +128,7 @@ export async function startMountGallery(): Promise<void> {
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return;
     const key = e.key.toLowerCase();
     if (key === ' ' && e.target instanceof HTMLElement && ['BUTTON', 'A'].includes(e.target.tagName)) return;
-    if (key === '1' || key === '2' || key === '3') choose(MOUNT_IDS[Number(key) - 1]);
+    if (key === '1' || key === '2') choose(OFFERED_MOUNT_IDS[Number(key) - 1]);
     if (key === ' ') { e.preventDefault(); paused = !paused; }
     if (key === 'o') auto = !auto;
     if (key === 'h') { hidden = !hidden; overlay.classList.toggle('is-hidden', hidden); }
@@ -136,8 +143,8 @@ export async function startMountGallery(): Promise<void> {
       const pad = activePad();
       const down = new Set(pad?.buttons.flatMap((b, i) => b.pressed ? [i] : []) ?? []);
       const hit = (n: number): boolean => down.has(n) && !padHeld.has(n);
-      if (hit(PAD_BUTTON.lb)) choose(MOUNT_IDS[(MOUNT_IDS.indexOf(id) + MOUNT_IDS.length - 1) % MOUNT_IDS.length]);
-      if (hit(PAD_BUTTON.rb)) choose(MOUNT_IDS[(MOUNT_IDS.indexOf(id) + 1) % MOUNT_IDS.length]);
+      if (hit(PAD_BUTTON.lb)) choose(OFFERED_MOUNT_IDS[(OFFERED_MOUNT_IDS.indexOf(id) + OFFERED_MOUNT_IDS.length - 1) % OFFERED_MOUNT_IDS.length]);
+      if (hit(PAD_BUTTON.rb)) choose(OFFERED_MOUNT_IDS[(OFFERED_MOUNT_IDS.indexOf(id) + 1) % OFFERED_MOUNT_IDS.length]);
       if (hit(PAD_BUTTON.a)) { paused = !paused; refresh(); }
       if (hit(PAD_BUTTON.up)) { gait = (gait + 1) % 3; refresh(); }
       padHeld = down;
