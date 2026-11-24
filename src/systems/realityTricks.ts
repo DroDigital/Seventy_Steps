@@ -11,7 +11,7 @@
 import type { Entity } from '../core/ecs';
 import { distXZ, yawOf } from '../core/geom';
 import { emptyInput, type InputFrame } from '../core/input';
-import { attackRange } from '../data/attacks';
+import { ATTACKS, attackRange } from '../data/attacks';
 import type { MoveDef } from '../data/moves';
 import type { RealityHook } from '../data/schema';
 import { BOSS, REALITY } from '../data/tuning';
@@ -57,6 +57,8 @@ const decoys: HookStep = (g, fights) => {
 };
 
 const REACTIONS = new Set(['stagger', 'guardBreak', 'parried', 'death']);
+/** What a skip never lands a horror in: a summons, or a step elsewhere (its own step, whatever it is called). */
+const SKIPS_PAST: ReadonlySet<string> = new Set(['summon', 'teleport']);
 
 /**
  * Whether a skip now would take from the investigator an opening: the boss is recovering from a blow, or reeling, or the pause it keeps
@@ -77,7 +79,7 @@ function skipAhead(g: Game, e: Entity, f: Fight): boolean {
   if (costsAnOpening(g, e, a)) return false;
   const br = c.brain.get(e);
   const s = { recent: br?.recent ?? [], usedAt: br?.usedAt ?? {}, now: g.frame, hidden: false, healing: false };
-  const fit = (rested: boolean) => f.script.phases[f.phase].attacks.filter((x) => x.id !== 'summon' && x.id !== 'teleport' && strikeFrame(a.moves[x.id]) !== null && allowed(x.id, s, rested)); // the same `once` and rest rules as a chosen blow (round 107)
+  const fit = (rested: boolean) => f.script.phases[f.phase].attacks.filter((x) => !SKIPS_PAST.has(ATTACKS[x.id].effect ?? '') && strikeFrame(a.moves[x.id]) !== null && allowed(x.id, s, rested)); // the same `once` and rest rules as a chosen blow (round 107); a summons or a step of its own is no blow to skip to (2026-11-24: by what it does, every horror's step its own)
   let options = fit(true);
   if (!options.length) options = fit(false); // every one resting: the rest gives way, never the `once`
   let roll = g.rng() * options.reduce((s, x) => s + x.weight, 0);

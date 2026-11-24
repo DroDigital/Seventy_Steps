@@ -52,15 +52,15 @@ describe('Dagon and Hydra share a readable fight', () => {
   it('holds the partner through the full attack and recovery, then leaves a short rest for the counterattack', () => {
     const { g, bosses: [dagon, hydra] } = pair();
     const actor = g.ecs.c.actor.get(dagon)!;
-    startMove(actor, 'slam');
-    const end = ATTACKS.slam.windup + ATTACKS.slam.active;
+    startMove(actor, 'dagon_monolith');
+    const end = ATTACKS.dagon_monolith.windup + ATTACKS.dagon_monolith.active;
     for (const frame of [0, end - 1, end, end + 23]) {
       actor.frame = frame;
       expect(seaPartnerBusy(g, hydra, g.player.id), `frame ${frame}`).toBe(true);
     }
-    actor.frame = actor.moves.slam.frames - 1;
+    actor.frame = actor.moves.dagon_monolith.frames - 1;
     expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(true);
-    Object.assign(actor, { move: null, last: 'slam', idle: 23 });
+    Object.assign(actor, { move: null, last: 'dagon_monolith', idle: 23 });
     expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(true);
     actor.idle = 24;
     expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(false);
@@ -71,22 +71,22 @@ describe('Dagon and Hydra share a readable fight', () => {
 
   it('keeps a vortex and its burst together and leaves stagger and parry punishable', () => {
     const { g, bosses: [dagon, hydra] } = pair();
-    const actor = g.ecs.c.actor.get(dagon)!;
-    startMove(actor, 'vortex');
-    actor.frame = actor.moves.vortex.frames - 1;
-    expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(true);
-    startMove(actor, 'vortex_burst');
-    expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(true);
+    const actor = g.ecs.c.actor.get(hydra)!; // (Mother Hydra's depths: since 2026-11-24 the two share no blow, and the whirl is hers)
+    startMove(actor, 'hydra_depths');
+    actor.frame = actor.moves.hydra_depths.frames - 1;
+    expect(seaPartnerBusy(g, dagon, g.player.id)).toBe(true);
+    startMove(actor, 'hydra_depths_burst');
+    expect(seaPartnerBusy(g, dagon, g.player.id)).toBe(true);
     for (const move of ['stagger', 'parried']) {
       startMove(actor, move);
-      expect(seaPartnerBusy(g, hydra, g.player.id), move).toBe(false);
+      expect(seaPartnerBusy(g, dagon, g.player.id), move).toBe(false);
     }
   });
 
   it('returns to solo pacing if the partner dies, disengages, targets someone else or leaves the arena', () => {
     for (const leave of ['dead', 'disengaged', 'other target', 'out of range', 'different arena'] as const) {
       const { g, bosses: [dagon, hydra] } = pair();
-      startMove(g.ecs.c.actor.get(dagon)!, 'slam');
+      startMove(g.ecs.c.actor.get(dagon)!, 'dagon_monolith');
       expect(seaPartnerBusy(g, hydra, g.player.id)).toBe(true);
       if (leave === 'dead') g.ecs.c.health.get(dagon)!.hp = 0;
       if (leave === 'disengaged') g.ecs.c.fight.get(dagon)!.engaged = false;
@@ -102,7 +102,7 @@ describe('Dagon and Hydra share a readable fight', () => {
     const c = g.ecs.c;
     place(g, g.player.id, 0, 0, Math.PI);
     place(g, hydra, 0, 3.8, Math.PI);
-    startMove(c.actor.get(dagon)!, 'slam');
+    startMove(c.actor.get(dagon)!, 'dagon_monolith');
     const m = c.mover.get(hydra)!, br = c.brain.get(hydra)!;
     fight(g, hydra, br, m, g.player.id, c.fight.get(hydra)!.arena);
     expect(m.vz).toBeGreaterThan(0); // opens space instead of pushing toward the investigator

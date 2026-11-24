@@ -4,6 +4,7 @@
  * and optional sanity/boss overrides. Pure types, no Three.js.
  */
 
+import { OWN_IDS, type OwnAttackId } from './bossMoves';
 import type { VoiceId } from './voices';
 
 export const TIERS = ['lesser', 'greater', 'named', 'great_old_one', 'outer_god', 'ally'] as const;
@@ -28,7 +29,7 @@ export const ARCHETYPE_IDS = [
 export type ArchetypeId = (typeof ARCHETYPE_IDS)[number];
 
 /** The shared attack library (spec §3E). */
-export const ATTACK_IDS = [
+export const LIBRARY_IDS = [
   'sweep',
   'slam',
   'lunge',
@@ -93,7 +94,11 @@ export const ATTACK_IDS = [
   'closing_walls',
   'cave_in',
 ] as const;
-export type AttackId = (typeof ATTACK_IDS)[number];
+export type LibraryId = (typeof LIBRARY_IDS)[number];
+/** A blow of the library, or a horror's own (2026-11-24: data/bossMoves.ts, every horror's moveset its own). */
+export type AttackId = LibraryId | OwnAttackId;
+/** Every attack there is: the library's, then the horrors' own. */
+export const ATTACK_IDS: readonly AttackId[] = [...LIBRARY_IDS, ...OWN_IDS];
 
 /** Boss reality hooks (spec §3E). */
 export const REALITY_HOOKS = [

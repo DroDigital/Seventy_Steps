@@ -1,6 +1,6 @@
 /** Greater tier (spec §4): servitor races and elder species. First sight of one costs sanity (Phase 3). */
 
-import { ph, phases, st, tier } from './kit';
+import { ph, phases, scripted, st, tier } from './kit';
 
 export const GREATER = tier('greater', [
   {
@@ -23,8 +23,8 @@ export const GREATER = tier('greater', [
     stats: st(900, 160, 36, 3.6, 2, 8), resist: ['slash', 'shot'], weak: ['fire'], drops: { echoes: 900 }, insightOnSight: 0,
     bossVariant: {
       name: 'Elder Shoggoth', sprite: { scale: 9, eyes: 16 }, stats: { hp: 2000, poise: 900, damage: 60 },
-      drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
-      bossScript: phases(ph(1, { tentacle_burst: 2, grab: 1, slam: 1, aoe_ring: 1, vortex: 1 }, { hooks: ['darkness'] }), ph(0.5, { tentacle_burst: 2, charge: 2, aoe_ring: 1, roar: 1, quake: 1 }, { hooks: ['darkness'] })),
+      drops: { echoes: 8000 }, insightOnSight: 2, // its own blows (2026-11-24: data/bossMovesDream.ts), not the shoggoth's
+      ...scripted('boss', phases(ph(1, { shoggoth_pseudopods: 2, shoggoth_engulf: 1, shoggoth_crush: 1, shoggoth_eyes: 1, shoggoth_maw: 1 }, { hooks: ['darkness'] }), ph(0.5, { shoggoth_pseudopods: 2, shoggoth_train: 2, shoggoth_eyes: 1, shoggoth_tekeli: 1, shoggoth_ripple: 1 }, { hooks: ['darkness'] }))),
     },
   },
   {
@@ -46,8 +46,8 @@ export const GREATER = tier('greater', [
     stats: st(800, 120, 32, 5, 2, 6), resist: ['slash', 'blunt', 'shot'], weak: ['light'], drops: { echoes: 800 }, insightOnSight: 0,
     bossVariant: {
       name: 'Polyp Swarm', sprite: { scale: 8, tentacles: 14, body: [0.73, 0.25] }, stats: { hp: 1900, poise: 800, damage: 55 }, // its redrawn body: a mass 3 m across under 6.25 m of tentacle; struck up to 5.84 m, for its hall's roof is at 6 and a capsule that reaches it is pushed out through the wall (round 57)
-      drops: { echoes: 8000 }, insightOnSight: 2, behavior: { archetype: 'boss' },
-      bossScript: phases(ph(1, { wind_push: 2, grab: 1, tentacle_burst: 1, vortex: 1 }, { hooks: ['decoys'] }), ph(0.5, { wind_push: 2, aoe_ring: 1, tentacle_burst: 1, grab: 1, procession: 1 }, { hooks: ['decoys', 'control_swap'] })),
+      drops: { echoes: 8000 }, insightOnSight: 2, // its own blows (2026-11-24), not the polyp's
+      ...scripted('boss', phases(ph(1, { polyp_wind: 2, polyp_grip: 1, polyp_lash: 1, polyp_gale: 1 }, { hooks: ['decoys'] }), ph(0.5, { polyp_wind: 2, polyp_burst: 1, polyp_lash: 1, polyp_grip: 1, polyp_whistle: 1 }, { hooks: ['decoys', 'control_swap'] }))),
     },
   },
   {

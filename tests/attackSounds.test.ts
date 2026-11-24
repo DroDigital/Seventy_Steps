@@ -111,13 +111,13 @@ describe('recorded attack cues without caster blips', () => {
 
   it('caster wind-ups and sustained beams stay free of repeated tones', () => {
     const w = listen('edward_hutchinson');
-    startMove(w.act, 'projectile');
+    startMove(w.act, 'hutchinson_fan'); // his own (2026-11-24): a fan is one throw
     w.run(15);
     expect(w.samples).toEqual([]);
     w.run(105);
     expect(w.heard('atkFrostCast')).toHaveLength(1); // the frost caster's own throw (round 68)
     w.samples.length = 0;
-    startMove(w.act, 'sweep_beam');
+    startMove(w.act, 'hutchinson_arc');
     w.run(150);
     expect(w.samples).toEqual([]);
   });

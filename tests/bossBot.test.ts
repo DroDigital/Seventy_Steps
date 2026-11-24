@@ -21,7 +21,8 @@ const ASKS_MORE = ['cthulhu', 'ghatanothoa', 'shub_niggurath'];
 // Round 107: Zkauba's first barrage, through which he stood still for seconds, is now a rebound; this bot, which follows him through his
 // teleports, takes about 310 seconds (the balance audit's bot, which dodges and keeps its distance, 91); six minutes, and still a kill.
 // Round 107: Hypnos's time skips now keep to each blow's rest, so the bot waits longer for one; it falls at about 246 s, so five minutes.
-const SLOW: Record<string, number> = { haunter_of_the_dark: 60 * 360, yog_sothoth: 60 * 780, daemon_pipers: 60 * 300, hastur: 60 * 300, other_gods: 60 * 300, azathoth: 60 * 300, ancient_ones: 60 * 300, zkauba: 60 * 360, hypnos: 60 * 300 }; // (2026-11-01: the Ancient Ones grow to meet this bot's capped build, overmatchHealth)
+// 2026-11-24: Hypnos's own blows (his sleep, his crown of stars, his hours): this bot, which never walks out of a cloud or drinks Laudanum, fells him at about 311 s; six minutes (the balance audit's bot still takes the 75 s it did).
+const SLOW: Record<string, number> = { haunter_of_the_dark: 60 * 360, yog_sothoth: 60 * 780, daemon_pipers: 60 * 300, hastur: 60 * 300, other_gods: 60 * 300, azathoth: 60 * 300, ancient_ones: 60 * 300, zkauba: 60 * 360, hypnos: 60 * 360 }; // (2026-11-01: the Ancient Ones grow to meet this bot's capped build, overmatchHealth)
 
 describe('a bot fights every boss (playtest round 24)', () => {
   it('has bosses to fight', () => expect(BOSSES.length).toBeGreaterThan(40));
