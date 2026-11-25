@@ -47,6 +47,7 @@ function fakeAudio() {
     createBiquadFilter: () => (made.filters.push(new Filter()), made.filters[made.filters.length - 1]),
     createOscillator: () => new Osc(),
     createBufferSource: () => new Src(),
+    createBuffer: (_channels: number, length: number, rate: number) => ({ duration: length / rate, copyToChannel: () => undefined }), // (round 121: a made bed's loop)
   };
   const bed = new Gain();
   const plays: { set: unknown; o: { gain?: number; pan?: number } }[] = [];

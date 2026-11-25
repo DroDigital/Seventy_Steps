@@ -17,7 +17,7 @@ import type { Entity } from '../../core/ecs';
 import type { V3 } from '../../core/geom';
 import { soundOf, type CreatureSound } from '../../data/creatureSounds';
 import { getEntity } from '../../data/registry';
-import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, setOf, STINGER_SAMPLES, recipeShare, VOICE_ALERTS, VOICE_SAMPLES, type Ambience, type SampleSetId } from '../../data/samples';
+import { AMBIENCE, PLANNED_SETS, RECORDED_FOR, SAMPLE_SETS, setOf, STINGER_SAMPLES, recipeShare, VOICE_ALERTS, VOICE_SAMPLES, type Ambience, type SampleSetId } from '../../data/samples';
 import { STINGERS, type Sound, type StingerId } from '../../data/sounds';
 import { CLASS_GAIN, HANDS, STINGER_VARY } from '../../data/foleySounds';
 import { AUDIO } from '../../data/tuning';
@@ -28,10 +28,11 @@ import { shown } from '../../data/speech';
 import { bossLine } from '../../data/speechLines';
 import { voiceIdOf, VOICES, type Voice, type VoiceId } from '../../data/voices';
 import { isAbsent, isConcealed, type Game, type GameEvents } from '../../systems/components';
-import { kitOfRoom } from '../../world/dungeonKit';
+import { kitIdOfRoom } from '../../world/dungeonKit';
 import { dungeonRoomAt } from '../../world/terrain';
 import type { FxParams } from '../fx';
 import { createAmbience } from './ambience';
+import { roomAmbience } from './roomAmbience';
 import { createBossMusic } from './bossMusic';
 import { bossScene } from './bossScene';
 import { realmTrackOf, type RealmTrackId } from '../../data/realmMusic';
@@ -273,11 +274,10 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     for (const id of callers.keys()) if (!c.dread.has(id)) callers.delete(id);
   }
 
-  /** Inside a legacy dungeon: what its room sounds like (its kit), else null (outside, or ruins under the sky). */
+  /** Inside a legacy dungeon: what its room sounds like (its kit's, and its dungeon's own: round 121), else null (outside, or ruins under the sky). */
   const inside = (p: V3): Ambience | null => {
     const d = dungeonRoomAt(p.x, p.z);
-    const sound = d ? kitOfRoom(d.layout, d.room).sound : 'open';
-    return sound === 'open' ? null : DUNGEON_AMBIENCE[sound];
+    return d ? roomAmbience(d.layout.def.id, kitIdOfRoom(d.layout, d.room)) : null;
   };
 
   let lastBeat = HEART.beats; // the beats already heard

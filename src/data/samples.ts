@@ -9,6 +9,7 @@
  */
 
 import { PLANNED, type PlannedId } from './plannedSounds';
+import type { RoomSoundId } from './roomSounds';
 import type { StingerId } from './sounds';
 import type { VoiceId } from './voices';
 
@@ -182,16 +183,22 @@ export const VOICE_SAMPLES: Partial<Record<VoiceId, SampleSetId>> = {
 /** Voices that snarl as they turn on the investigator, rather than call as they do the rest of the time. */
 export const VOICE_ALERTS: Partial<Record<VoiceId, SampleSetId>> = { growl: 'snarl' };
 
-/** Spot sounds over a bed: one of the set, far off (panned anywhere, dulled), every so often. */
+/** Spot sounds over a bed: one of the set (or, round 121, a recipe of data/roomSounds.ts), far off (panned anywhere, dulled), every so often. */
 export interface Spot {
-  set: SampleSetId;
+  set?: SampleSetId; // a recording, or...
+  recipe?: RoomSoundId; // ...a recipe (round 121): one or the other
   every: readonly [min: number, max: number]; // seconds between
+  gain?: number; // round 121: its own level, against SPOT_TRIM (1 if not said)
+  pitch?: readonly [lo: number, hi: number]; // round 121: the rate it is played at, drawn (a recording's own range if not said)
+  lowpass?: number; // round 121: Hz, the top shut off it (through a wall, a floor); if not said, dulled at random as anything far off
+  run?: { count: readonly [number, number]; gap: readonly [number, number] }; // round 121: a seep: it comes again from the same place at the same pitch, `count` times `gap` seconds apart, and is then still
 }
 
-/** A region's recorded ambience: looped beds (audio/amb/, at a level) and spot sounds. */
+/** A region's recorded ambience: looped beds (audio/amb/, at a level; `gen_` ones made in code, render/audio/bedTextures.ts) and spot sounds. */
 export interface Ambience {
   beds: readonly (readonly [file: string, gain: number])[];
   spots: readonly Spot[];
+  roofed?: boolean; // round 121: a dungeon's room, under a roof: the hour does not reach it (render/audio/ambience.ts)
 }
 
 const owls: Spot = { set: 'owl', every: [25, 60] };
@@ -216,7 +223,13 @@ export const BED_MANNER: Readonly<Record<string, { lowpass?: number; breath?: nu
   surf: { lowpass: 2800, breath: 0.3, every: [24, 50] },
   waves: { lowpass: 2800, breath: 0.3, every: [24, 50] },
   cave: { lowpass: 2400, breath: 0.25, every: [40, 90] },
-  drips: { lowpass: 4200 },
+  drips: { lowpass: 3600, breath: 0.6, every: [35, 80] }, // round 121: the grotto's drops come and go, and duller (they were the brightest, sharpest thing in every vault, held at one level)
+  // Round 121, the beds made in code (render/audio/bedTextures.ts): each breathes on its own slow round.
+  gen_still: { breath: 0.3, every: [45, 90] },
+  gen_trickle: { lowpass: 4200, breath: 0.35, every: [30, 70] },
+  gen_embers: { lowpass: 3000, breath: 0.3, every: [24, 50] },
+  gen_hum: { lowpass: 1800, breath: 0.4, every: [40, 80] },
+  gen_abyss: { breath: 0.35, every: [50, 100] },
 };
 
 /** The share of a bed's listed level it is played at: the tonal beds above were already eased (round 30), the rest were not (round 31). */
@@ -235,7 +248,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   vermont: { beds: [['leaves', 0.8], ['crickets', 0.12]], spots: [owls, { set: 'farHowl', every: [60, 120] }] },
   mountains: { beds: [['wind_cold', 0.75]], spots: [] },
   pnakotus: { beds: [['wind', 0.8], ['wind_ghost', 0.2]], spots: [{ set: 'timber', every: [45, 100] }] },
-  kn_yan: { beds: [['cave', 0.8], ['drips', 0.65]], spots: [{ set: 'chains', every: [50, 110] }] },
+  kn_yan: { beds: [['cave', 0.8], ['drips', 0.5]], spots: [{ set: 'chains', every: [50, 110] }, { recipe: 'pebbles', every: [40, 90], gain: 0.6 }, { recipe: 'settle', every: [60, 130], gain: 0.7 }] }, // (round 121: its drips breathe and are fewer; grit and stone among them)
   serpent_temple: { beds: [['wind', 0.45], ['wind_ghost', 0.2]], spots: [] }, // the dry temple and Yig's approach, rather than the dripping cavern
   dreamlands: { beds: [['murmur', 0.65], ['wind', 0.4]], spots: [owls] },
   rlyeh: { beds: [['waves', 1], ['wind_ghost', 0.3]], spots: [{ set: 'gurgle', every: [25, 60] }] },
@@ -251,13 +264,13 @@ export const AMBIENCE: Record<string, Ambience> = {
 };
 
 /**
- * Inside a legacy dungeon, by its kit's sound (data/kits.ts; round 13: every dungeon dripped, the
- * roofless ruins and the upstairs of houses too): stone and water below ground, old boards and the
- * wind outside in a house, water and worse in the drowned places. Ruins under the sky ('open') keep
- * the region's own.
+ * Inside a legacy dungeon, by its kit's sound (data/kits.ts; round 13: every dungeon dripped, the roofless ruins and the upstairs of houses
+ * too): what a room sounds like when its kit has no soundscape of its own. Round 121: every roofed kit has one (data/dungeonAmbience.ts:
+ * the cave and its grotto of drips had been the whole of every vault, crypt, cellar, mine and stair of the dream), so these are the
+ * fallback for a kit not yet given its own. Ruins under the sky ('open') keep the region's own.
  */
 export const DUNGEON_AMBIENCE: Record<'cave' | 'house' | 'drowned', Ambience> = {
-  cave: { beds: [['cave', 0.63], ['drips', 0.8]], spots: [{ set: 'chains', every: [45, 100] }, { set: 'timber', every: [50, 110] }] },
-  house: { beds: [['wind', 0.3]], spots: [creaks, { set: 'timber', every: [30, 70] }] },
-  drowned: { beds: [['cave', 0.5], ['drips', 1]], spots: [{ set: 'gurgle', every: [15, 40] }, { set: 'chains', every: [60, 120] }] },
+  cave: { beds: [['gen_still', 0.5], ['cave', 0.35]], spots: [{ recipe: 'drop', every: [45, 100], gain: 0.6, pitch: [0.75, 1.3], run: { count: [3, 7], gap: [1.6, 3.4] } }, { recipe: 'settle', every: [40, 90], gain: 0.75 }, { recipe: 'dust', every: [35, 80], gain: 0.5 }, { set: 'chains', every: [60, 130] }], roofed: true },
+  house: { beds: [['wind', 0.3]], spots: [creaks, { set: 'timber', every: [30, 70] }], roofed: true },
+  drowned: { beds: [['cave', 0.45], ['drips', 0.42]], spots: [{ set: 'gurgle', every: [20, 45] }, { set: 'chains', every: [60, 120] }], roofed: true },
 };

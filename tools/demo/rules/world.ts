@@ -68,6 +68,8 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/fogThemes.ts', decl: 'BY_REGION', shape: 'properties', keep: regions },
   { file: 'src/data/kits.ts', decl: 'KITS', shape: 'properties', keep: kept('kits') },
   { file: 'src/data/acoustics.ts', decl: 'KIT_SPACE', shape: 'properties', keep: kept('kits') },
+  { file: 'src/data/dungeonAmbience.ts', decl: 'KIT_AMBIENCE', shape: 'properties', keep: kept('kits') }, // (round 121: each roofed kit's own sound)
+  { file: 'src/data/dungeonAmbience.ts', decl: 'DUNGEON_ACCENTS', shape: 'properties', keep: dungeons }, // (and what a dungeon's tale adds to it)
   { file: 'src/data/doors.ts', decl: 'DOOR_LOOKS', shape: 'properties', keep: kept('kits') },
   // the realms' lists and tables the demo does not keep: a realm's own entry, or a realm named in a list
   { file: 'src/data/ambienceHours.ts', decl: 'STILL_HOWL', path: ['realms'], shape: 'elements', by: 'self', keep: regions },

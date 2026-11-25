@@ -76,4 +76,24 @@ export const PLACE_VOICES: Readonly<Record<string, readonly PlaceVoice[]>> = {
     { id: 'leng-drum', recipe: 'drum', every: [150, 260], gain: 0.9, far: [160, 280], hours: { gloaming: 0.5, deep: 1, waning: 0.5 } },
   ],
   rlyeh: [{ id: 'rlyeh-swell', recipe: 'deepSwell', every: [120, 220], gain: 0.9, far: [100, 200], hours: { gloaming: 1, deep: 1, waning: 1 } }],
+  // Round 121: Yuggoth and the realms past the stars had none, only their wind (the Pale Lattice keeps its silence: time does not stir the air).
+  yuggoth: [
+    { id: 'yuggoth-drone', recipe: 'woodsDrone', every: [140, 240], gain: 0.8, far: [150, 260], hours: { gloaming: 0.6, deep: 1, waning: 0.8 } }, // the Mi-Go's engines across the black rivers
+    { id: 'yuggoth-buzz', set: 'buzz', every: [120, 220], gain: 0.5, far: [110, 200], hours: { gloaming: 1, deep: 1, waning: 1 }, lowpass: 1400, pitch: [0.7, 0.85] }, // their buzzing voices, far off
+  ],
+  beyond: [{ id: 'beyond-viol', recipe: 'viol', every: [160, 280], gain: 0.75, far: [120, 220], hours: { gloaming: 0.6, deep: 1.2, waning: 0.8 } }], // Zann's viol behind the walls of the Rue d'Auseil
+  cloud_summit: [
+    { id: 'summit-pipe', recipe: 'windpipe', every: [90, 170], gain: 0.85, far: [140, 240], hours: { gloaming: 1, deep: 1, waning: 1.2 } },
+    { id: 'summit-ice', recipe: 'iceBoom', every: [150, 260], gain: 0.7, far: [180, 300], hours: night },
+  ],
+  black_wood: [
+    { id: 'blackwood-drum', recipe: 'drum', every: [150, 260], gain: 0.85, far: [150, 260], hours: { gloaming: 0.6, deep: 1, waning: 0.6 } }, // the Black Goat's rites, deep in the wood
+    { id: 'blackwood-chant', set: 'chant', every: [140, 250], gain: 0.5, far: [160, 260], hours: { deep: 1, waning: 0.5 }, lowpass: 600, pitch: [0.78, 0.9] },
+  ],
+  piping_dark: [{ id: 'piping-flute', recipe: 'flute', every: [80, 160], gain: 0.85, far: [120, 220], hours: { gloaming: 1, deep: 1, waning: 1 } }],
+  spheres: [{ id: 'spheres-chime', recipe: 'dryChime', every: [90, 170], gain: 0.8, far: [100, 200], hours: { gloaming: 1, deep: 1, waning: 1 } }],
+  court_centre: [ // "the muffled, maddening beating of vile drums and the thin monotonous whine of accursed flutes"
+    { id: 'court-drum', recipe: 'drum', every: [100, 190], gain: 0.9, far: [140, 240], hours: { gloaming: 1, deep: 1, waning: 1 } },
+    { id: 'court-flute', recipe: 'flute', every: [90, 170], gain: 0.85, far: [130, 230], hours: { gloaming: 1, deep: 1, waning: 1 } },
+  ],
 };

@@ -3,6 +3,8 @@
  * mud, boards that creak now and then, flesh), the coat swinging as a stride begins and now and then at a run, the pack's leather shifting at a
  * run (round 83: no buckle, no lantern's bail; nothing metal rings as he walks), the breath (panting after a sprint, a gasp when the bar empties, ragged and wet near death, a slow exhale in the cold), and, in a failing mind,
  * a second step that follows a moment after one's own. It keeps the foley's stride (render/footfalls.ts) so the recipe falls on the recording.
+ * Round 121: the recipe settles with the recorded step into a long walk (footing.ts `settleGain`, kept on this clock as foley.ts keeps it on
+ * its own), and the cloth comes after a number of strides drawn afresh each time, with a soft brush of the coat now and then at a walk.
  * Read-only on the simulation; nothing here is heard by the creatures.
  */
 
@@ -16,7 +18,7 @@ import { roofedAt } from '../../world/terrain';
 import { HEART } from '../feel';
 import { createStrideClock, followed, type Footfall } from '../footfalls';
 import { indoorsAt } from './foley';
-import { coldAt, indoorLift, stepLevel, stepSetOf } from './footing';
+import { coldAt, indoorLift, settleAnew, settleGain, settleStep, stepLevel, stepSetOf } from './footing';
 import type { Sampler } from './sampler';
 
 type Recipe = (key: string, sound: Sound, o?: { at?: null; gain?: number; vary?: number; pan?: number }) => boolean;
@@ -34,21 +36,36 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
   let underfoot: Footfall['ground'] = 'dirt';
   let lifted = 1; // the lift of the room underfoot (round 86)
   let [lastSeconds, ragged, cold, coldCheck, coldNext, gasped] = [-1, 0, 0, -1e9, 0, false];
+  let [busy, fellAt, settledOn] = [0, -1e9, null as Footfall['ground'] | null]; // the walk the ear has settled into (round 121), the last footfall, and its ground
+  const draw = (r: readonly [number, number]): number => r[0] + Math.floor(rand() * (r[1] - r[0] + 1));
+  let [coatIn, packIn, rustleIn] = [draw(BODY.coatEvery), draw(BODY.satchelEvery), draw(BODY.rustleEvery)]; // strides until the cloth is heard again
   const soft = (key: string, sound: Sound, gain: number, vary = 1): boolean => recipe(key, sound, { at: null, gain, vary });
   /** The step of a mind that is followed: duller, to one side, a moment late. */
   const phantom = (ground: Footfall['ground'], delay: number, lift: number): void => void sampler.play(SAMPLE_SETS[stepSetOf(ground)], { gain: FOOT_GAIN.phantom * lift, pan: (rand() < 0.5 ? -1 : 1) * BODY.phantom.pan, pitch: BODY.phantom.pitch, lowpass: BODY.phantom.lowpass, delay });
 
-  function stride(f: Footfall, stress: number): void {
+  function stride(f: Footfall, stress: number, seconds: number): void {
     strides++;
     underfoot = f.ground;
+    if (f.ground !== settledOn) [busy, settledOn] = [settleAnew(busy), f.ground]; // (new ground is heard whole, as the recording is: foley.ts)
+    fellAt = seconds;
     lifted = indoorLift(indoorsAt(g, f.body.x, f.y, f.body.z));
     const layer = STEP_LAYERS[f.ground];
-    const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot) * lifted; // (the recording's level, so the recipe keeps under it; in a dungeon's room lifted with it, round 86)
+    const pace = stepLevel(f.speed) * (f.foot === 1 ? 1 : STEP_VOICE.offFoot) * lifted * settleGain(busy); // (the recording's level, so the recipe keeps under it; in a dungeon's room lifted with it, round 86; settling with it, round 121)
     if (layer) soft(`foot:${f.ground}`, layer, FOOT_GAIN.steps * pace, 0.9);
     if (f.ground === 'boards' && strides % BODY.creakEvery === 0) soft('foot:creak', BOARD_CREAK, FOOT_GAIN.steps * pace);
-    const sprint = clock.walking.sprint;
-    if (sprint && strides % BODY.coatEvery === 0) soft('gear:coat', GEAR.coat, FOOT_GAIN.gear * 0.8);
-    if (sprint && strides % BODY.satchelEvery === 0) soft('gear:satchel', GEAR.satchel, FOOT_GAIN.gear * 0.8);
+    if (clock.walking.sprint) {
+      if (--coatIn <= 0) {
+        coatIn = draw(BODY.coatEvery);
+        soft('gear:coat', GEAR.coat, FOOT_GAIN.gear * 0.8);
+      }
+      if (--packIn <= 0) {
+        packIn = draw(BODY.satchelEvery);
+        soft('gear:satchel', GEAR.satchel, FOOT_GAIN.gear * 0.8);
+      }
+    } else if (--rustleIn <= 0) { // (round 121: a walk's cloth, quieter than a run's, softer at a creep)
+      rustleIn = draw(BODY.rustleEvery);
+      soft('gear:rustle', GEAR.rustle, FOOT_GAIN.gear * 0.8 * BODY.rustle * stepLevel(f.speed) * settleGain(busy));
+    }
     const p = g.mind.band === 'unmoored' ? BODY.phantom.unmoored : BODY.phantom.fractured;
     if (followed(g.mind.band, stress) && !fighting(g) && rand() < p) phantom(f.ground, between(BODY.phantom.delay, rand()), lifted);
   }
@@ -86,8 +103,10 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
 
   return {
     update(seconds, stress) {
-      const dt = lastSeconds < 0 ? 0 : Math.min(0.25, Math.max(0, seconds - lastSeconds));
+      const gap = lastSeconds < 0 ? 0 : Math.max(0, seconds - lastSeconds);
+      const dt = Math.min(0.25, gap);
       lastSeconds = seconds;
+      busy = settleStep(busy, gap, seconds - fellAt < STEP_VOICE.settle.gap); // (round 121: as foley.ts keeps it for the recorded step)
       const f = clock.step(seconds);
       const w = clock.walking;
       if (w.moving && !wasMoving && seconds - stoppedAt > BODY.coatAfter) soft('gear:coat', GEAR.coat, FOOT_GAIN.gear * 0.8); // setting off
@@ -102,7 +121,7 @@ export function createBodyFoley(g: Game, recipe: Recipe, sampler: Pick<Sampler, 
         sprintFor = longestWalk = 0;
       }
       wasMoving = w.moving;
-      if (f) stride(f, stress);
+      if (f) stride(f, stress, seconds);
       breathe(seconds, dt);
     },
   };

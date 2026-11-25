@@ -54,3 +54,6 @@ export const HEARTH = {
   } satisfies Record<'fire' | 'torch' | 'lamp', FlameSpec>,
   sigil: { tones: [[98, 0.5], [98.3, 0.5], [147, 0.3], [147.45, 0.3]] as readonly (readonly [number, number])[], air: 0.07, airHz: 1800, mix: 0.36 }, // the hum: pairs of sines a few tenths of a hertz apart (the shimmer), a breath of air above
 };
+
+/** Round 121: the Cavern of Flame's own fire, the whole cavern's, as a bed (render/audio/bedTextures.ts `embers`): a deep roar that swells and falls, little hiss and few pops (its torches, heard by the hearth beside it, carry the crackle). */
+export const HEARTH_GREAT: FlameSpec = { body: 1, rumble: 130, flutter: 0.5, hiss: 0.16, pops: 2.6, pop: 1.2, band: [500, 2400], seed: 21 };

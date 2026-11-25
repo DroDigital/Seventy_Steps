@@ -3,7 +3,8 @@
  * softer and duller, mud lower, boards a hollow knock, a slab or a cobble the stone's recording rather than dirt's), which of the four
  * recordings a phantom step is made from, and how cold the air is for a breath. Pure; render/audio/foley.ts and render/audio/bodyFoley.ts use it.
  * Round 83: and how loud a step is for the pace it is taken at (understated, and the road's bright recording dulled), and the faint returns
- * a room gives it.
+ * a room gives it. Round 121: the level back at round 80's, each foot to its own side, and the ear settling into a long walk (`settleStep`,
+ * `settleGain`), which foley.ts and bodyFoley.ts each keep for their own clock.
  */
 
 import { ECHO_MOST, ECHO_PACE, type Echo } from '../../data/acoustics';
@@ -44,6 +45,28 @@ export function coldAt(region: string | null, dark: number, raining: boolean, ro
 
 /** How loud a footfall at `speed` (m/s) is against its set's own level: quiet creeping, a little more at a walk, the most at a sprint; the recipe laid over it keeps to the same. */
 export const stepLevel = (speed: number): number => STEP_VOICE.level[0] + (STEP_VOICE.level[1] - STEP_VOICE.level[0]) * Math.min(1, Math.max(0, speed / PLAYER.sprintSpeed));
+
+/** Where a footfall of `foot` (1 the right, -1 the left) is heard: a little to its own side (`STEP_VOICE.spread`, round 121). */
+export const footPan = (foot: 1 | -1): number => foot * STEP_VOICE.spread;
+
+/**
+ * How long the ear has been walking (round 121, `STEP_VOICE.settle`): `busy` seconds, grown by `dt` while footfalls keep coming (`walking`)
+ * and given back `recover` times as fast once they stop. Held under the point where the ease is whole, so a walk's end is soon undone.
+ */
+export function settleStep(busy: number, dt: number, walking: boolean): number {
+  const s = STEP_VOICE.settle;
+  return walking ? Math.min(s.after + s.over, busy + dt) : Math.max(0, busy - dt * s.recover);
+}
+
+/** The share of its level a footfall keeps after `busy` seconds of walking: whole for the first `after`, then easing (smoothly) to `floor` over `over`. */
+export function settleGain(busy: number): number {
+  const s = STEP_VOICE.settle;
+  const u = Math.min(1, Math.max(0, (busy - s.after) / s.over));
+  return 1 - (1 - s.floor) * u * u * (3 - 2 * u);
+}
+
+/** New ground underfoot is heard whole again: the walk's settling goes back to where the ease begins. */
+export const settleAnew = (busy: number): number => Math.min(busy, STEP_VOICE.settle.after);
 
 /** How much louder a footfall is on a dungeon room's floor (render/audio/foley.ts `indoorsAt`) than the same one in the open (`STEP_VOICE.indoors`, round 86); 1 anywhere else. The recipe laid over the step and a failing mind's followers keep to it. */
 export const indoorLift = (indoors: boolean): number => (indoors ? STEP_VOICE.indoors : 1);

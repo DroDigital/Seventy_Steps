@@ -9,7 +9,7 @@
 
 import { noise, tone, type Layer, type Sound, type Wave } from './sounds';
 
-export type FarId = 'foghorn' | 'buoy' | 'toll' | 'organ' | 'windpipe' | 'iceBoom' | 'dryChime' | 'drip' | 'templeBell' | 'drum' | 'woodsDrone' | 'deepSwell';
+export type FarId = 'foghorn' | 'buoy' | 'toll' | 'organ' | 'windpipe' | 'iceBoom' | 'dryChime' | 'drip' | 'templeBell' | 'drum' | 'woodsDrone' | 'deepSwell' | 'flute' | 'viol';
 
 const lp = (hz: number, to?: number): Layer['filter'] => ({ type: 'lowpass', hz, to });
 
@@ -106,6 +106,20 @@ const RAW: Readonly<Record<FarId, Sound>> = {
     tone('sawtooth', 118.5, 7, 0.04, { attack: 3, filter: lp(320, 220), vibrato: [6.3, 24] }),
     noise('bandpass', 700, 7, 0.04, { attack: 3, q: 3, to: 640 }),
   ],
+  // Round 121, the Outer Dark: "the thin monotonous whine of accursed flutes" (the Court at the Centre, the Piping Dark): one note held and
+  // wavering, a second a few hertz off it so the two beat, the breath of the pipe, and the sag as it is let go. No tune.
+  flute: [
+    ...held('triangle', 740, 4.2, 0.12, { attack: 0.6, vibrato: [5.5, 18] }),
+    ...held('sine', 746.5, 4, 0.08, { at: 0.3, attack: 0.7, vibrato: [4.8, 22] }),
+    noise('bandpass', 1500, 4.4, 0.05, { attack: 0.8, q: 6 }),
+    tone('triangle', 740, 1.2, 0.07, { at: 4.2, attack: 0.1, to: 690 }),
+  ],
+  // Round 121, beyond the gate: a viol played wildly somewhere behind walls (the music of Erich Zann), a run of notes that is no scale and a high one held, shut in to its middle.
+  viol: [
+    ...[[0, 440], [0.2, 554], [0.38, 622], [0.55, 587], [0.74, 740], [0.9, 698], [1.08, 880]].map(([at, hz]) => tone('sawtooth', hz!, 0.32, 0.07, { at, attack: 0.02, vibrato: [6.5, 22], filter: lp(1400, 1000) })),
+    ...held('sawtooth', 932, 2.2, 0.08, { at: 1.3, attack: 0.08, vibrato: [7, 30], filter: lp(1500, 1100) }),
+    noise('bandpass', 2200, 3, 0.02, { attack: 0.3, q: 2 }),
+  ],
   // R'lyeh: the swell of something enormous breathing far under the water, mostly below the ear, and the moan it makes in the stone.
   deepSwell: [
     tone('sine', 34, 8, 0.5, { attack: 2.6, to: 26 }),
@@ -116,7 +130,7 @@ const RAW: Readonly<Record<FarId, Sound>> = {
 };
 
 /** How much each is lifted or let down against its recipe as written, so that all sit alike in the mix (rms about -21 dBFS before the placing; tests/ambienceHours.test.ts renders them). */
-export const FAR_MIX: Readonly<Record<FarId, number>> = { foghorn: 1.2, buoy: 1.6, toll: 1.4, organ: 2.4, windpipe: 2.2, iceBoom: 0.6, dryChime: 1.6, drip: 0.8, templeBell: 1.4, drum: 1, woodsDrone: 1.8, deepSwell: 0.55 };
+export const FAR_MIX: Readonly<Record<FarId, number>> = { foghorn: 1.2, buoy: 1.6, toll: 1.4, organ: 2.4, windpipe: 2.2, iceBoom: 0.6, dryChime: 1.6, drip: 0.8, templeBell: 1.4, drum: 1, woodsDrone: 1.8, deepSwell: 0.55, flute: 2, viol: 4 };
 
 const level = (sound: Sound, k: number): Sound => sound.map((l): Layer => ({ ...l, gain: Math.min(1, l.gain * k) }));
 
