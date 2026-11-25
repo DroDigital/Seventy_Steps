@@ -26,6 +26,9 @@ contextBridge.exposeInMainWorld('desktop', {
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
   ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; never purchases or accepts an app id from the page
   ownsChariotDlc: () => ipcRenderer.invoke('desktop:chariot-dlc'),
+  ...(process.argv.includes('--import-automobile-dlc') && {
+    importAutomobileDlc: () => ipcRenderer.invoke('desktop:import-automobile-dlc'),
+  }),
   store: { // saves, settings and records as files in the user's data folder (round 12)
     get: (key) => ipcRenderer.sendSync('desktop:store-get', String(key)),
     set: (key, value) => ipcRenderer.sendSync('desktop:store-set', String(key), String(value)),

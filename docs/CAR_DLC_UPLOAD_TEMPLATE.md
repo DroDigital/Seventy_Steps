@@ -48,7 +48,7 @@ node tools/dlc_car_art.mjs
 #### Purely Cosmetic — No Advantage, No Shortcut
 - **Identical traversal:** The Brassbound Motor Car shares the exact same speed, turning, stamina use, collision footprint, and rules as the horse-drawn Chariot included in the base game.
 - **Earned the same way:** Complete the early errand *The Borrowed Reins* to unlock mounts, then switch between the included Chariot and the Brassbound Motor Car at any Elder Sign's **Mounts** tab.
-- **No separate download required:** Assets are already included in the base game; owning and enabling this DLC unlocks the appearance in-game automatically on Steam.
+- **Itch.io installation:** Requires the full [Seventy Steps itch.io desktop game](https://digitaldro.itch.io/seventy-steps), v1.4.4 or later. Extract `Brassbound-Motor-Car.zip`, rest at any Elder Sign, open **Mounts → Import DLC** and select `brassbound-motor-car.seventysteps-dlc`. You can import offline. The archive includes a personal-use license.
 
 ---
 
@@ -119,3 +119,8 @@ node tools/dlc_car_art.mjs
 3. Paste the **Short Description** and **BBCode About This Content** above, select languages & tags, and set regional pricing in Steamworks.
 4. Configure the DLC as entitlement-only (no separate depot required; the assets ship in the base build and unlock when `apps.isSubscribedApp(id) && apps.isDlcInstalled(id)` both return `true`).
 5. Record the live DLC App ID in `package.json` under `steam.automobileDlcAppId` (distinct from `steam.appId`), pack a Steam test build, and verify owned, unowned, disabled, offline, and refunded states via the Elder Sign **Mounts** tab.
+
+## 7. itch.io Release Checklist
+
+Use the [itch release checklist](RELEASE.md#brassbound-motor-car-for-itchio) to update the base game, upload the
+buyer ZIP to the standalone paid listing, and test the download while the listing is in draft.

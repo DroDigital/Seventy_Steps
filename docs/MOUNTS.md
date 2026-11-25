@@ -22,7 +22,7 @@ Buildings, water and steep terrain still stop the ride where it stands.
 Every appearance uses the exact same frozen `MOUNT_TRAVERSAL` object: cruise 11 m/s, gallop 18 m/s, shared
 acceleration, braking, steering, terrain checks and a multi-circle footprint. Galloping uses normal sprint stamina.
 The rider keeps the ordinary hurtbox; mounting gives no healing, stamina refill, invulnerability or combat bonus.
-Only the preferred appearance is saved. Mount use resets on load; ownership is checked from Steam again.
+Only the preferred appearance is saved. Mount use resets on load. The desktop build checks access again on load.
 Removal or failed ownership verification falls back to the included chariot.
 
 The `?mounts` coach house is a standalone visual exhibit (keys 1–2) with orbit, rest/cruise/gallop, pause and inspection
@@ -71,14 +71,10 @@ game’s retro pipeline. The plain chariot's horse is a chestnut draft horse of 
 
 ## Steam entitlement
 
-The desktop shell exposes `desktop.ownsAutomobileDlc()` (and the dormant `desktop.ownsChariotDlc()`), each a `Promise<boolean>`.
-Every call reads Steam's current `apps.isSubscribedApp` and `apps.isDlcInstalled` for that appearance's app id; both
-must return true. The page cannot supply an app id. `refreshMountEntitlement` currently checks `ownsAutomobileDlc()`
-and keeps the shelved Spectral Chariot locked (`setChariotEntitlement(g, false)`).
-No save file, browser storage flag or simulated purchase grants ownership. Each entitlement is false when Steam is
-unavailable, its id is unset or invalid, the binding lacks either method, the check fails, or the build is packaged
-for itch.io. A thrown check fails closed. Browser builds have no Steam entitlement bridge. Refreshing ownership
-can detect installation or removal while the game is running; no ownership is cached here.
+The Steam desktop build checks `apps.isSubscribedApp` and `apps.isDlcInstalled` for the car's configured app id on
+every `desktop.ownsAutomobileDlc()` call. Both must return true. Refreshing ownership can detect installation or
+removal while the game is running. Access falls back to the included chariot if verification fails. The renderer
+keeps the shelved Spectral Chariot locked.
 
 The repository does not have live Steam app ids. Store configuration and copy are documented in
 [the Brassbound Motor Car DLC upload template](CAR_DLC_UPLOAD_TEMPLATE.md):
@@ -87,14 +83,22 @@ The repository does not have live Steam app ids. Store configuration and copy ar
 2. Set the store price in Steamworks (do not display prices inside the game UI).
 3. Set `steam.appId` to the base game id and add `steam.automobileDlcAppId` to `package.json`.
    `STEAM_AUTOMOBILE_DLC_APP_ID` overrides that for developer testing. Zero, an omitted id, or the base game id disables access.
-4. Configure the DLC so Steam reports it installed when enabled. The cosmetic assets ship in the base game build;
-   there is no separate asset download in this implementation.
+4. Configure the DLC so Steam reports it installed when enabled. The cosmetic assets ship in the base game build.
 5. In a Steam test branch, verify an owner with the DLC installed, a non-owner, an owner with it disabled, offline
    startup, and refund/removal followed by an ownership refresh. Confirm the early quest grants only the plain chariot, and that
-   both offered appearances handle identically once owned. A non-Steam build offers only the plain chariot.
+   both offered appearances handle identically once owned.
 
 The game never starts a purchase or changes a Steam subscription. Unit tests use fake read-only Steam clients;
 live account entitlement, checkout, regional pricing and refund behavior require the configured Steam test branch.
+
+## itch.io entitlement
+
+In the full itch desktop build, rest at an Elder Sign and open **Mounts → Import DLC**. Select the
+`brassbound-motor-car.seventysteps-dlc` file extracted from the buyer ZIP. The desktop shell verifies the file and
+stores a copy in the current OS user profile, outside the save files. It checks that copy locally when the game
+checks car access. Once The Borrowed Reins is complete, the car can be selected from Mounts. The import works
+offline and the personal-use license prohibits redistributing the file.
+See the [itch release checklist](RELEASE.md#brassbound-motor-car-for-itchio).
 
 ## Notes
 
