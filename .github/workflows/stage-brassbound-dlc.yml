@@ -70,3 +70,34 @@ jobs:
         if: always()
         run: |
           rm -f -- "$RUNNER_TEMP/brassbound-key.pem" "$RUNNER_TEMP/brassbound-dlc.cms" "$RUNNER_TEMP/brassbound-upload/Brassbound-Motor-Car.zip"
+
+  verify:
+    if: github.event.head_commit.message == 'Verify the staged itch DLC download'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Check the processed DLC channel
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          curl --fail --silent --show-error --location https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default -o "$RUNNER_TEMP/brassbound-butler.zip"
+          unzip -q "$RUNNER_TEMP/brassbound-butler.zip" -d "$RUNNER_TEMP/brassbound-butler"
+          chmod +x "$RUNNER_TEMP/brassbound-butler/butler"
+          "$RUNNER_TEMP/brassbound-butler/butler" status --json digitaldro/seventy-steps-the-brassbound-motor-car:brassbound-motor-car-dlc
+      - name: Check the owner can see the upload
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          node --input-type=module <<'JS'
+          const headers = { Authorization: `Bearer ${process.env.BUTLER_API_KEY}` };
+          const res = await fetch('https://api.itch.io/games/5440073/uploads', { headers });
+          if (!res.ok) {
+            console.log(`Owner upload listing returned HTTP ${res.status}.`);
+          } else {
+            const { uploads } = await res.json();
+            console.log(JSON.stringify(uploads?.map(({ id, filename, display_name, hidden, size, build }) => ({ id, filename, display_name, hidden, size, buildId: build?.id }))));
+          }
+          JS
