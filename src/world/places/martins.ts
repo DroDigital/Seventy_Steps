@@ -37,6 +37,7 @@ export const martins: PlaceFn = (c: Court, h: House) => {
   c.run('ms_barricade', [G, S], [-B, S], wall);
   c.run('ms_barricade', [G, -S], [-B, -S], wall);
   c.run('ms_barricade', [-B, S], [-B, -S], sea);
+  for (const side of [-1, 1]) c.add('ms_barricade', G, side * (h.gate.width / 2 + 0.85), { ...CONCRETE, face: 'front', stretch: [0.5, 1, 2.6], height: 5 }); // concrete gate piers capping the sea wall ends
 
   // a raised platform at each corner: a lookout on two, the derrick on one, the mast on another
   const corner = (a: number, cc: number): void => { c.add('ms_platform', a, cc, { ...CONCRETE, s: 1.8, face: 'front' }); };

@@ -52,8 +52,10 @@ export const nyarlathotep: PlaceFn = (c: Court, h: House) => {
   for (const [i, cc] of [-12, -8, 8, 12].entries()) c.add('px_rod', back + 1.5, cc, { tint: [0.62, 0.64, 0.74], keep: 0.5, s: 1, y: 0.6, height: 13 + (i % 2) * 3 });
   for (const cc of [-5.2, 5.2]) c.add('px_brazier', back - 1.6, cc, { ...GILT, s: 2, y: 0.6, lit: 'torch', walk: true });
 
-  // the gate: seated colossi that watch the way, obelisks beyond them
+  // the gate: tall basalt columns framing the 12 m doors, seated colossi that watch the way, obelisks beyond them
   for (const side of [-1, 1]) {
+    const top = column(c, G, side * (h.gate.width / 2 + 1.45), 3, { ...BASALT, s: 1.6 });
+    c.add('px_brazier', G, side * (h.gate.width / 2 + 1.45), { ...GILT, y: top, s: 1.5, lit: 'torch', walk: true });
     c.add('fg_seat', G + 0.4, side * (gate + 3.4), { ...BASALT, s: 3.4, face: 'front' });
     c.add('px_obelisk', G + 6, side * (gate + 7.5), { ...BASALT, s: 1.3, face: 'front' });
   }

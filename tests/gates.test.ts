@@ -63,16 +63,33 @@ describe('the doors and the fog of the dungeons (round 27)', () => {
     expect(plan.wakes.find((r) => r.x === a.x && r.z === a.z)!.radius).toBeGreaterThan(a.radius);
   });
 
-  it('stands an arena\'s mist inside the gate\'s opening, behind the leaves and no wider than the opening asks, so there is no walking round it', () => {
+  it('stands an arena\'s mist inside the gate\'s opening, behind the leaves and embedded cleanly into both flanking piers with no gap', async () => {
+    const { propColliders } = await import('../src/world/props');
+    const { toBoxFrame } = await import('../src/world/colliders');
+    const inside = (c: ReturnType<typeof propColliders>[number], x: number, y: number, z: number): boolean => {
+      if (c.kind === 'cylinder') return Math.hypot(x - c.x, z - c.z) <= c.radius + 0.05 && y >= c.y0 - 0.05 && y <= c.y1 + 0.05;
+      if (c.kind === 'box') return x >= c.min.x - 0.05 && x <= c.max.x + 0.05 && z >= c.min.z - 0.05 && z <= c.max.z + 0.05 && y >= c.min.y - 0.05 && y <= c.max.y + 0.05;
+      const p = toBoxFrame(c, x, z);
+      return Math.abs(p.x) <= c.hx + 0.05 && Math.abs(p.z) <= c.hz + 0.05 && y >= c.y0 - 0.05 && y <= c.y1 + 0.05;
+    };
     worldLayout().arenas.forEach((a, i) => {
       const f = plan.fogs.find((x) => x.id === `ring:${i}:${a.bosses[0]}`)!;
       const door = a.house!.piece.door!;
       expect(f.gate, f.id).toBe(a.house!.piece.name);
       expect(f.width, f.id).toBeGreaterThanOrEqual(door.width);
-      expect(f.width, f.id).toBeLessThanOrEqual(door.width + 0.5);
+      expect(f.width, f.id).toBeLessThanOrEqual(door.width + 3.0);
       expect(f.height, f.id).toBeGreaterThanOrEqual(door.height);
       expect(Math.hypot(f.x - a.house!.gate.x, f.z - a.house!.gate.z), `${f.id}: within the wall's thickness`).toBeLessThanOrEqual(door.thick / 2);
       expect((a.x - f.x) * Math.sin(f.yaw) + (a.z - f.z) * Math.cos(f.yaw), `${f.id}: the court is its far side`).toBeGreaterThan(0);
+      // Both left and right edges of every open-arena boss fog must embed inside solid flanking masonry at mid and upper height.
+      const cols = a.house!.props.flatMap(propColliders);
+      const [ux, uz] = [Math.cos(f.yaw), -Math.sin(f.yaw)];
+      const half = f.width / 2;
+      for (const side of [-1, 1]) {
+        const [ex, ez] = [f.x + ux * side * (half - 0.1), f.z + uz * side * (half - 0.1)];
+        expect(cols.some((c) => inside(c, ex, f.y + 1.5, ez)), `${f.id}: ${side < 0 ? 'left' : 'right'} edge anchored at mid-height`).toBe(true);
+        expect(cols.some((c) => inside(c, ex, f.y + Math.max(2, door.height - 0.65), ez)), `${f.id}: ${side < 0 ? 'left' : 'right'} edge anchored at upper height`).toBe(true);
+      }
     });
   });
 

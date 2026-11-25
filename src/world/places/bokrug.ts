@@ -26,7 +26,7 @@ export const bokrug: PlaceFn = (c: Court, h: House) => {
   const G = c.R + (h.reach ?? HOUSE.reach);
   const [S, B] = [34, 44];
   const gate = h.gate.width / 2 + 0.9;
-  const tower = gate + 3.9;
+  const tower = h.gate.width / 2 + 3.65; // inner face sits right on the gate jamb, sealing wall, doors and fog
   const ground = shaped(c, [LAKE]);
   const [bedY, surfY] = [bed(LAKE), -LAKE.depth * SURFACE];
   wallRect(c, 'tp_wall_mid', G, S, B, gate, { ...MARBLE, stretch: [1, 1.9, 3.2], height: 4.6 });

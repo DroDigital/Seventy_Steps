@@ -34,8 +34,11 @@ export const cthulhu: PlaceFn = (c: Court, h: House) => {
   const pts: [number, number][] = [[G, 0], [G, 46], [40, 70], [-20, 66], [-62, 40], [-70, -12], [-48, -60], [10, -68], [G, -46]];
   wallAbout(c, 'px_slab', pts, gate, { ...SLAB, s: 2, lap: 0.8 });
 
-  // the gate's two obelisks, and one at each corner the wall turns most
-  for (const side of [-1, 1]) c.add('px_obelisk', G + 1, side * (gate + 4.6), { ...SLAB, s: 2.3, face: 'front' });
+  // the gate's flanking cyclopean piers and outer obelisks, and one at each corner the wall turns most
+  for (const side of [-1, 1]) {
+    c.add('px_monolith', G, side * (h.gate.width / 2 + 2.5), { ...SLAB, s: 1.5, height: 18.5, face: 'front' });
+    c.add('px_obelisk', G + 1, side * (gate + 4.6), { ...SLAB, s: 2.3, face: 'front' });
+  }
   for (const [a, cc] of [[40, 70], [-62, 40], [-70, -12], [-48, -60], [10, -68]] as const) c.add('px_obelisk', a, cc, { ...SLAB, s: 1.7, face: 'in', height: 24 });
 
   // slabs standing in the court at no angle in particular, between the fight and the walls

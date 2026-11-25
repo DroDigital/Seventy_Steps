@@ -18,6 +18,7 @@ import { DUNGEON } from '../data/tuning';
 import { kitIdOfRoom, roomAt, type DoorLayout, type DungeonLayout } from './dungeonKit';
 import type { Part } from './dungeonParts';
 import { STAKE } from './enclosure';
+import { fitGateFog } from './fogFit';
 import type { WorldLayout } from './placements';
 import { yawOfDir } from './worldMap';
 
@@ -42,6 +43,8 @@ export interface FogWall {
   yaw: number; // local +z runs through it, into the room or the court beyond
   width: number;
   height: number;
+  depth?: number; // half-thickness of the layered mist curtain (metres)
+  capped?: boolean; // true when a solid lintel or arch closes the top of the opening
   theme: FogThemeId;
   region: string;
   bosses: string[]; // roster ids
@@ -61,7 +64,7 @@ export interface Wake {
   spawns: string[];
 }
 
-const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, wake: STAKE.ring, stake: 6.5, past: STAKE.past, behind: 1.6, gateWidth: 9 };
+const FOG = { doorHeight: 3.9, doorWidth: DUNGEON.door + 0.4, doorDepth: 0.22, wake: STAKE.ring, stake: 6.5, past: STAKE.past, behind: 1.6, gateWidth: 9 };
 
 /** A doorway's yaw: through it, from the room `a` into the room `b` (or out). */
 const yawOf = (d: DoorLayout): number => yawOfDir(d.side);
@@ -89,7 +92,7 @@ function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[
       const [sx, sz] = spots.find(([x, z]) => roomAt(L, x, z) !== undefined && roomAt(L, x, z) !== boss && free(parts, x, z, d.level)) ?? spots[0]; // not over a pit or against a pillar
       const stake = { x: sx, z: sz, yaw: Math.atan2(-vx, -vz) };
       const candle = hallCandle(L, parts, boss, { x: d.x, z: d.z }, { x: ux, z: uz }, d.level, stake);
-      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, height: FOG.doorHeight, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
+      fogs.push({ id: `${L.def.id}:${boss.def.id}:${i}`, x: d.x, z: d.z, y: d.level, yaw: yawOf(d), width: FOG.doorWidth, height: FOG.doorHeight, depth: FOG.doorDepth, capped: true, theme: fogThemeOf(bosses, L.region), region: L.region, bosses, spawns: bosses.map((b) => `boss:${b}`), stake, candle });
       return;
     }
     if (isAbyss(d.a) && isAbyss(d.b)) return; // an arch between two flights over the void has nothing to hang a door from: no curtain stands in it (round 105)
@@ -122,9 +125,9 @@ export function gatePlan(w: WorldLayout): GatePlan {
     wakes.push({ id, x: a.x, z: a.z, radius, bosses, spawns });
     const door = a.house?.piece.door;
     const into = { x: -sx, z: -sz }; // through the gate, into the court
-    const at = a.house?.gate ?? { x: a.x + sx * radius, z: a.z + sz * radius };
-    const behind = door ? Math.max(0, Math.min(FOG.behind, door.thick / 2 - 0.25)) : 0; // on the court's side of the leaves, still within the wall's thickness, so there is no walking round it
-    fogs.push({ id, x: at.x + into.x * behind, z: at.z + into.z * behind, y: door?.y ?? a.y, yaw: Math.atan2(into.x, into.z), width: (door?.width ?? FOG.gateWidth) + 0.4, height: (door?.height ?? FOG.doorHeight) + 0.1, theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns, stake, candle, ...(a.house && { gate: a.house.piece.name }) });
+    const yaw = Math.atan2(into.x, into.z);
+    const fit = a.house && door ? fitGateFog(a.house, door, yaw) : { x: a.x + sx * radius, z: a.z + sz * radius, width: FOG.gateWidth + 0.4, height: FOG.doorHeight + 0.1, depth: FOG.doorDepth, capped: false };
+    fogs.push({ id, x: fit.x, z: fit.z, y: door?.y ?? a.y, yaw, width: fit.width, height: fit.height, depth: fit.depth, capped: fit.capped, theme: fogThemeOf(bosses, a.region), region: a.region, bosses, spawns, stake, candle, ...(a.house && { gate: a.house.piece.name }) });
   });
   return { doors, fogs, wakes };
 }

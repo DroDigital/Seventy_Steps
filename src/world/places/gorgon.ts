@@ -34,10 +34,10 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
     c.run('tp_wall_mid', [wingA, side * S], [wingA, side * inner], { ...tall, height: 6.2 });
   }
   c.run('tp_wall_mid', [-B, S], [-B, -S], { ...tall, height: 8.4 });
-  // the gate's piers, each a base, a shaft and a capital, a lamp on each
+  // the gate's piers, tall enough to frame the 4.6 m porch doors and their fog, a lamp on each
   for (const side of [-1, 1]) {
-    c.add('tr_pillar', G, side * (gate - 0.2), { ...MARBLE, stretch: [1.3, 1, 1.3] });
-    c.add('lantern', G, side * (gate - 0.2), { y: 3.6, s: 2, lit: 'lamp', round: true });
+    c.add('tr_pillar', G, side * (h.gate.width / 2 + 0.72), { ...MARBLE, stretch: [1.6, 1, 1.8], height: 5, face: 'front' });
+    c.add('lantern', G, side * (h.gate.width / 2 + 0.72), { y: 5, s: 2, lit: 'lamp', round: true });
   }
 
   // the wings' inner walls: windows and collapse, with a doorway to each

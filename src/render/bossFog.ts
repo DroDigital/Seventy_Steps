@@ -1,91 +1,29 @@
 /**
- * The fog before a horror (round 27; data/fogThemes.ts, world/gatePlan.ts): a wall of mist across the
- * doorway of a boss's room, or (round 78: it was an opaque ring all round the fight) across the opening of an
- * open arena's gate, behind its leaves, in the weather of that place. The investigator walks through it
- * and the fight begins a few steps beyond. It thickens while the fight holds them and is gone,
- * dissolving over a few seconds, once every horror it keeps is slain. A wall is made only when the camera is near. Render only.
+ * The fog before a horror (round 27; data/fogThemes.ts, world/gatePlan.ts; 2026-11-24 volumetric 3-layer curtain & breach):
+ * a dense, multi-layered wall of mist anchored cleanly into the doorway of a boss's room or the piers of an open arena's
+ * gate, in the weather of that place. Walking through tears a ragged body-sized hole right where the investigator crosses,
+ * billowing the mist around them; the surrounding wall stays solid while the hole lingers and then visibly swirls inward
+ * with creeping wisps to close shut again. Dissolves over a few seconds once every horror it keeps is slain. Render only.
  */
 
 import * as THREE from 'three';
-import { FOG_THEMES, type FogMotion, type FogTheme } from '../data/fogThemes';
+import { FOG_THEMES, type FogTheme } from '../data/fogThemes';
 import { CLASS_GAIN, MIST_CLOSE, mistPass } from '../data/foleySounds';
 import type { Game } from '../systems/components';
 import { gatePlan, type FogWall } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
 import type { GameAudio } from './audio/gameAudio';
-import type { Particles } from './particles';
+import { bossFogMaterials, FOG_VERT, fogFrag, fogMaterial, type FogFragOptions } from './bossFogShader';
+import { createFogBreach, type BreachState, type FogBreach } from './fogBreach';
 import { createFogSight, type FogSight } from './fogSight';
+import type { Particles } from './particles';
 
-export const FOG_VERT = `varying vec3 vWorld; varying vec2 vUv;
-void main() { vUv = uv; vec4 w = modelMatrix * vec4(position, 1.0); vWorld = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
+export { FOG_VERT, fogFrag, fogMaterial, type FogFragOptions };
 
-/**
- * The fog's fragment shader. A boss's fog takes the defaults; the demo's border (render/demoMist.ts) the rest:
- * `height`, the GLSL for how far up the wall a point is (0 at its foot, 1 at its crown; by default, a wall over level ground, by its
- * world height); `far`, a factor on what shows (thinning with distance from the eye); `solid`, above 0, a depth-only pass that keeps
- * only where it shows at least that much (so what the post pass reads from the depth, its haze and contact shadows, is the wall, not
- * what stands behind it); `lit`, its colour by the world's light (uAmbient, uLightColor: worldUniforms), so it is not lit at night.
- */
-export interface FogFragOptions {
-  height?: string;
-  far?: string;
-  solid?: number;
-  lit?: boolean;
-}
-export const fogFrag = ({ height = 'clamp((vWorld.y - uFoot) / uHeight, 0.0, 1.0)', far = '1.0', solid = 0, lit = false }: FogFragOptions = {}): string => `${lit ? 'uniform vec3 uAmbient, uLightColor;' : ''}
-uniform vec3 uBase, uTop, uSpark, uGlow; uniform vec3 uCentre; uniform vec4 uPart; // uPart: where the fog parts (a walker passing), and how wide
-uniform float uTime, uVis, uDensity, uSpeed, uMode, uShimmer, uShare, uFoot, uHeight, uHeld, uGlyph;
-varying vec3 vWorld; varying vec2 vUv;
-float hash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
-float noise(vec3 x) {
-  vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(mix(hash(i), hash(i + vec3(1,0,0)), f.x), mix(hash(i + vec3(0,1,0)), hash(i + vec3(1,1,0)), f.x), f.y),
-             mix(mix(hash(i + vec3(0,0,1)), hash(i + vec3(1,0,1)), f.x), mix(hash(i + vec3(0,1,1)), hash(i + vec3(1,1,1)), f.x), f.y), f.z);
-}
-float fbm(vec3 p) { return 0.55 * noise(p) + 0.3 * noise(p * 2.1 + 7.0) + 0.15 * noise(p * 4.3 + 3.0); }
-void main() {
-  float col_boost = 0.0;
-  float h = ${height};
-  float t = uTime * uSpeed * 0.3;
-  vec3 p = vec3(vWorld.x, vWorld.y, vWorld.z) * 0.32;
-  if (uMode < 0.5) p.y -= t * 1.4;                                          // rise
-  else if (uMode < 1.5) { p.x += t * 1.1; p.z -= t * 0.7; p.y -= t * 0.2; } // roll
-  else if (uMode < 2.5) {                                                   // swirl, about the centre
-    vec2 d = vWorld.xz - uCentre.xz; float a = t * 0.9; float c = cos(a), s = sin(a);
-    p.xz = (mat2(c, -s, s, c) * d) * 0.32; p.y -= t * 0.4;
-  } else { p.x += t * 2.4; p.y += sin(vWorld.x * 0.5 + uTime * uSpeed) * 0.15; p.z += t * 0.4; } // shear, in sheets
-  float n = fbm(p);
-  float crown = 1.0 - smoothstep(0.5 + 0.35 * n, 1.0, h);
-  float foot = smoothstep(0.0, 0.07, h);
-  float a = uDensity * (0.35 + 0.95 * n) * crown * foot;
-  // A wall, not a haze (round 35: the horror could be seen through it): solid from its foot to near its crown, the mist's own mottling in its colour.
-  a = max(min(0.96, a * (1.0 + 0.3 * uHeld)), 0.985 * (1.0 - smoothstep(0.8, 1.0, h)) * foot) * uVis;
-  if (uPart.w > 0.0) { // it parts about a body passing through, in a ragged round, and eddies at its edge
-    float dd = length(vWorld - uPart.xyz);
-    float edge = uPart.w * (0.82 + 0.4 * fbm(vWorld * 0.9 + uTime * 0.6));
-    a *= smoothstep(edge * 0.55, edge, dd);
-    col_boost += 0.35 * (1.0 - smoothstep(edge, edge * 1.5, dd)) * step(0.001, a);
-  }
-  vec3 col = mix(uBase, uTop, clamp(h * 0.5 + (n - 0.5) * 1.5 + 0.25, 0.0, 1.0));
-  col *= 0.72 + 0.5 * noise(p * vec3(2.2, 0.5, 2.2) + 11.0); // drifting banks, darker and paler
-  if (uShimmer > 0.0) col = mix(col, 0.55 + 0.45 * cos(6.2832 * (n * 1.6 + uTime * 0.12 + vec3(0.0, 0.33, 0.67))), uShimmer * 0.6);
-  if (uShare > 0.0) { // motes that catch the light
-    vec3 q = floor(p * 9.0);
-    float s = step(1.0 - 0.06 * uShare, hash(q)) * (0.5 + 0.5 * sin(uTime * 3.0 + hash(q + 3.0) * 40.0));
-    col += uSpark * s * 0.9; a = max(a, s * 0.7 * uVis * foot);
-  }
-  if (uGlyph > 0.0) col += uGlow * pow(n, 5.0) * 1.6 * (0.6 + 0.4 * sin(uTime * 1.3));
-  ${lit ? 'col *= clamp(uAmbient * 1.6 + uLightColor * 0.55, 0.36, 1.0); // the light of the hour on it' : ''}
-  float shown = a * (${far});
-  ${solid > 0 ? `if (shown < ${solid.toFixed(3)}) discard;` : ''}
-  gl_FragColor = vec4(col + col_boost, shown);
-}`;
-
-const FRAG = fogFrag();
-const MODE: Record<FogMotion, number> = { rise: 0, roll: 1, swirl: 2, shear: 3 };
 const SEE = 138; // metres from its nearest point past which a wall is not made
 const FADE = [112, 134] as const; // and over which it thins to nothing
 const DISSOLVE = 3.5; // seconds a slain horror's fog takes to go
+const SINK = 0.15; // metres the foot sinks into the floor so no seam shows
 
 /** How much of a wall shows `distance` metres off. */
 export const fogSeen = (distance: number): number => Math.min(1, Math.max(0, (FADE[1] - distance) / (FADE[1] - FADE[0])));
@@ -93,30 +31,56 @@ export const fogSeen = (distance: number): number => Math.min(1, Math.max(0, (FA
 /** The distance from `p` to a wall (the doorway's middle). */
 export const wallGap = (w: Pick<FogWall, 'x' | 'z'>, p: { x: number; z: number }): number => Math.hypot(p.x - w.x, p.z - w.z);
 
-/** A fog's material in `theme`: `centre` its middle (a swirl turns about it), `foot` and `height` its wall's (the default shader's). */
-export function fogMaterial(theme: FogTheme, centre: { x: number; y: number; z: number }, foot: number, height: number, frag = FRAG): THREE.ShaderMaterial {
-  const v = (c: readonly number[]): THREE.Vector3 => new THREE.Vector3(c[0], c[1], c[2]);
-  return new THREE.ShaderMaterial({
-    uniforms: {
-      uBase: { value: v(theme.base) }, uTop: { value: v(theme.top) }, uSpark: { value: v(theme.sparks?.colour ?? [0, 0, 0]) }, uGlow: { value: v(theme.glyph ?? [0, 0, 0]) }, uCentre: { value: new THREE.Vector3(centre.x, centre.y, centre.z) },
-      uTime: { value: 0 }, uVis: { value: 0 }, uDensity: { value: theme.density }, uSpeed: { value: theme.speed }, uMode: { value: MODE[theme.motion] },
-      uShimmer: { value: theme.shimmer ?? 0 }, uShare: { value: theme.sparks?.share ?? 0 }, uFoot: { value: foot }, uHeight: { value: height }, uHeld: { value: 0 }, uPart: { value: new THREE.Vector4(0, 0, 0, 0) }, uGlyph: { value: theme.glyph ? 1 : 0 },
-    },
-    vertexShader: FOG_VERT, fragmentShader: frag, transparent: true, depthWrite: false, side: THREE.DoubleSide,
-  });
+type LayerSpec = readonly [layer: number, z: number, sx: number, sy: number];
+
+/** Builds a tessellated fog mesh from one or more z-offset sheets with per-vertex `aLayer` (-1, 0, +1). */
+export function buildFogLayers(width: number, height: number, layers: readonly LayerSpec[]): THREE.BufferGeometry {
+  const pos: number[] = [];
+  const uv: number[] = [];
+  const layerAttr: number[] = [];
+  const idx: number[] = [];
+  let base = 0;
+  const totalH = height + SINK;
+  for (const [layer, z, sx, sy] of layers) {
+    for (let iy = 0; iy <= sy; iy++) {
+      const v = iy / sy;
+      const y = -SINK + v * totalH;
+      for (let ix = 0; ix <= sx; ix++) {
+        const u = ix / sx;
+        pos.push((u - 0.5) * width, y, z);
+        uv.push(u, v);
+        layerAttr.push(layer);
+      }
+    }
+    const stride = sx + 1;
+    for (let iy = 0; iy < sy; iy++) {
+      for (let ix = 0; ix < sx; ix++) {
+        const a = base + iy * stride + ix;
+        idx.push(a, a + 1, a + stride, a + 1, a + stride + 1, a + stride);
+      }
+    }
+    base += (sx + 1) * (sy + 1);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.setAttribute('aLayer', new THREE.Float32BufferAttribute(layerAttr, 1));
+  geo.setIndex(idx);
+  geo.computeBoundingSphere();
+  return geo;
 }
-const materialOf = (w: FogWall, theme: FogTheme): THREE.ShaderMaterial => fogMaterial(theme, w, w.y, w.height);
 
 interface Wall {
   w: FogWall;
   theme: FogTheme;
-  mesh: THREE.Mesh | null;
+  mesh: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial> | null;
   vis: number; // 0..1 shown now
   held: number; // 0..1 while a fight holds the investigator
   gone: boolean;
   owed: number; // motes owed
   engaged: boolean; // its horror was awake at the last look
-  sight: FogSight; // keeps the crossed wall clear until the camera is through it too
+  sight: FogSight; // tracks whether the follow camera is still behind the crossed wall
+  breach: FogBreach; // localized body-sized tear & closing state machine
 }
 
 export interface BossFog {
@@ -124,27 +88,38 @@ export interface BossFog {
 }
 
 export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles, audio: GameAudio): BossFog {
-  const walls: Wall[] = gatePlan(worldLayout()).fogs.map((w) => ({ w, theme: FOG_THEMES[w.theme], mesh: null, vis: 0, held: 0, gone: false, owed: 0, engaged: false, sight: createFogSight(w) }));
-  g.events.on('FogPassing', (e) => void audio.recipe('mist:pass', mistPass(e.frames / 60), { gain: CLASS_GAIN.mist, vary: 0.6 })); // the sound is the walk through: as long as it is
+  const walls: Wall[] = gatePlan(worldLayout()).fogs.map((w) => ({
+    w, theme: FOG_THEMES[w.theme], mesh: null, vis: 0, held: 0, gone: false, owed: 0, engaged: false,
+    sight: createFogSight(w), breach: createFogBreach(w),
+  }));
+  g.events.on('FogPassing', (e) => void audio.recipe('mist:pass', mistPass(e.frames / 60), { gain: CLASS_GAIN.mist, vary: 0.6 }));
   g.events.on('FogPassed', (e) => {
     const b = walls.find((w) => w.w.id === e.wall);
     if (b) {
       b.sight.crossed({ x: e.x, y: b.w.y, z: e.z });
-      burst(b); // it closes behind them once the camera has crossed too
+      b.breach.passed({ x: e.x, z: e.z });
+      wakeBurst(b, e.x, e.z);
     }
   });
   let last = -1;
   const seed = { v: 11 };
   const rand = (): number => (seed.v = (seed.v * 16807) % 2147483647) / 2147483647;
-  const make = (b: Wall): THREE.Mesh => {
+  const make = (b: Wall): THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial> => {
     const { w } = b;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w.width, w.height).translate(0, w.height / 2, 0), materialOf(w, b.theme));
-    mesh.position.set(w.x, w.y, w.z);
-    mesh.rotation.y = w.yaw;
-    mesh.frustumCulled = false;
-    mesh.renderOrder = 2;
-    scene.add(mesh);
-    return mesh;
+    const depth = w.depth ?? 0.24;
+    const mats = bossFogMaterials(b.theme, w, w.width, w.height, w.capped ?? !w.gate);
+    // Core curtain writes depth while active (renderOrder 1); wispy parallax veils draw over it without depth write (renderOrder 2).
+    const core = new THREE.Mesh(buildFogLayers(w.width, w.height, [[0, 0, 14, 12]]), mats.core);
+    const veils = new THREE.Mesh(buildFogLayers(w.width, w.height, [[-1, -depth, 9, 9], [1, depth, 9, 9]]), mats.veil);
+    core.position.set(w.x, w.y, w.z);
+    core.rotation.y = w.yaw;
+    core.frustumCulled = false;
+    core.renderOrder = 1;
+    veils.frustumCulled = false;
+    veils.renderOrder = 2;
+    core.add(veils);
+    scene.add(core);
+    return core;
   };
   return {
     update(camera, time, hidden) {
@@ -165,59 +140,100 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
         if (!b.mesh && b.vis > 0.001 && !b.gone) b.mesh = make(b);
         if (!b.mesh) continue;
         b.mesh.visible = b.vis > 0.001;
-        const u = (b.mesh.material as THREE.ShaderMaterial).uniforms;
+        b.mesh.material.depthWrite = b.vis > 0.72;
+        const u = b.mesh.material.uniforms;
         u.uTime.value = time;
-        const pass = g.player.fogPass;
-        const sight = b.sight.update(camera.position, me, !!pass && pass.wall === b.w.id, dt);
-        u.uVis.value = b.vis * (1 - sight.clear);
+        const pass = g.player.fogPass?.wall === b.w.id ? g.player.fogPass : null;
+        const sight = b.sight.update(camera.position, me, !!pass, dt);
+        const breach = b.breach.update(me, pass, sight, dt);
+        // The wall itself stays visible throughout traversal; only the localized breach opens & closes!
+        u.uVis.value = b.vis;
         u.uHeld.value = b.held;
-        if (pass && pass.wall === b.w.id && me) { // the walk through: the fog opens about them, widest as they cross it
-          const k = pass.frame / pass.frames;
-          const opening = 3.4 * Math.pow(Math.sin(Math.PI * Math.min(1, Math.max(0, k))), 0.7);
-          u.uPart.value.set(me.x, g.world.ground(me.x, me.z) + 1.1, me.z, opening);
-          if (k > 0.1 && k < 0.9) eddy(b, me, dt);
-        } else u.uPart.value.w = 0;
-        if (sight.at) { // the camera can still be behind the wall through a scene blend or while walking onward
-          u.uPart.value.set(sight.at.x, sight.at.y, sight.at.z, sight.blocked ? 9 : 9 * sight.clear);
-        }
-        if (engaged && !b.engaged && near < 12) burst(b); // it has woken: the fog is crossed
+        u.uBreach.value.set(breach.u, breach.y, breach.rx, breach.ry);
+        u.uBreachFx.value.set(breach.swirl, breach.push, breach.rim, breach.closeProg);
+        if (breach.phase === 'tearing') rimEddy(b, breach, dt, 1);
+        else if (breach.phase === 'closing') rimEddy(b, breach, dt, -1);
+        if (breach.sealedNow) sealBurst(b, breach);
+        if (engaged && !b.engaged && near < 12) audio.sample('rumble', { gain: 0.3, pitch: 0.62 });
         b.engaged = engaged;
-        if (b.mesh.visible && me && near < 30 && !slain && !engaged) seep(b, dt);
+        if (b.mesh.visible && me && near < 32 && !slain && breach.phase === 'idle') seep(b, dt);
       }
     },
   };
 
-  /** A mote: mist low down, or a spark higher up, where the wall is. */
-  function mote(b: Wall, x: number, z: number, spark: boolean, rise: number): void {
-    const { w, theme } = b;
-    const c = spark ? theme.sparks!.colour : theme.base;
-    particles.spawn({ x, y: g.world.ground(x, z) + (spark ? rand() * w.height * 0.7 : rand() * 0.6), z, vy: rise * (0.4 + rand()), life: spark ? 2.6 : 2.4, size: spark ? 0.22 : 1.4, grow: spark ? 1 : 2, color: [c[0], c[1], c[2]], alpha: spark ? 0.85 : 0.22, drag: 0.4, glow: spark });
+  /** Wall-local (u, y, v) to world coordinates. */
+  function toWorld(w: FogWall, lu: number, ly: number, lv: number): [number, number, number] {
+    const [cs, sn] = [Math.cos(w.yaw), Math.sin(w.yaw)];
+    return [w.x + cs * lu + sn * lv, w.y + ly, w.z - sn * lu + cs * lv];
   }
 
-  /** Motes that seep off a wall near the investigator. */
+  /** Soft wisp or glint mote near the wall. */
+  function mote(b: Wall, x: number, y: number, z: number, spark: boolean, vx: number, vy: number, vz: number, size: number, alpha: number, life: number): void {
+    const c = spark ? b.theme.sparks!.colour : (rand() < 0.45 ? b.theme.top : b.theme.base);
+    particles.spawn({
+      x, y, z, vx, vy, vz, life, size, grow: spark ? 0.9 : 1.9,
+      color: [c[0], c[1], c[2]], alpha, drag: spark ? 0.5 : 1.1,
+      shape: spark ? 'spark' : 'wisp', glow: spark, spin: (rand() - 0.5) * 1.4,
+    });
+  }
+
+  /** Ambient mist curling along the wall's threshold and jambs while idle. */
   function seep(b: Wall, dt: number): void {
-    b.owed += dt * (b.theme.sparks ? 16 : 9);
+    const { w, theme } = b;
+    b.owed += dt * (theme.sparks ? 15 : 10);
     for (; b.owed >= 1; b.owed--) {
-      const s = (rand() - 0.5) * b.w.width;
-      const [x, z] = [b.w.x + Math.cos(b.w.yaw) * s, b.w.z - Math.sin(b.w.yaw) * s];
-      mote(b, x, z, !!b.theme.sparks && rand() < b.theme.sparks.share, 0.5);
+      const s = (rand() - 0.5) * w.width * 0.94;
+      const spark = !!theme.sparks && rand() < theme.sparks.share;
+      const ly = spark ? 0.4 + rand() * w.height * 0.72 : 0.1 + rand() * 0.55;
+      const [x, y, z] = toWorld(w, s, ly, (rand() - 0.5) * 0.5);
+      mote(b, x, y, z, spark, (rand() - 0.5) * 0.25, 0.25 + rand() * 0.4, (rand() - 0.5) * 0.25, spark ? 0.18 : 1.15, spark ? 0.8 : 0.2, spark ? 2.4 : 2.3);
     }
   }
 
-  /** Mist torn from the wall as a body goes through it: curls that stream past, thickest as it crosses. */
-  function eddy(b: Wall, me: { x: number; z: number }, dt: number): void {
-    b.owed += dt * 60;
+  /** Torn mist curling off the breach rim as the player pushes through (+1), or curling inward as the hole knits shut (-1). */
+  function rimEddy(b: Wall, br: BreachState, dt: number, mode: 1 | -1): void {
+    const { w, theme } = b;
+    b.owed += dt * (mode > 0 ? 58 : 34);
+    const [cs, sn] = [Math.cos(w.yaw), Math.sin(w.yaw)];
+    const pushDir = Math.sign(br.push) || 1;
     for (; b.owed >= 1; b.owed--) {
       const a = rand() * Math.PI * 2;
-      const r = 0.5 + rand() * 1.4;
-      mote(b, me.x + Math.cos(a) * r, me.z + Math.sin(a) * r, !!b.theme.sparks && rand() < b.theme.sparks.share, 0.9);
+      const [cu, cy] = [Math.cos(a), Math.sin(a)];
+      const lu = br.u + cu * Math.max(0.25, br.rx * (0.9 + rand() * 0.25));
+      const ly = Math.max(0.15, br.y + cy * Math.max(0.3, br.ry * (0.85 + rand() * 0.2)));
+      const lv = (rand() - 0.5) * (w.depth ?? 0.24) * 2;
+      const [x, y, z] = toWorld(w, lu, ly, lv);
+      const radial = mode > 0 ? 0.7 + rand() * 0.8 : -(0.55 + rand() * 0.6); // outward on tear, inward while closing
+      const along = mode > 0 ? pushDir * (1.1 + rand() * 1.0) : (rand() - 0.5) * 0.35;
+      const vx = cs * (cu * radial) + sn * along;
+      const vz = -sn * (cu * radial) + cs * along;
+      const vy = cy * radial * 0.65 + (mode > 0 ? 0.25 : 0.12);
+      const spark = !!theme.sparks && rand() < theme.sparks.share * (mode > 0 ? 1.2 : 0.8);
+      mote(b, x, y, z, spark, vx, vy, vz, spark ? 0.2 : 0.75 + rand() * 0.55, spark ? 0.88 : 0.28, spark ? 1.8 : 1.5);
     }
   }
 
-  /** The fog is crossed and the horror wakes: a billow of it where the investigator came through, and a low sound. */
-  function burst(b: Wall): void {
-    for (let i = 0; i < 46; i++) mote(b, b.w.x + (rand() - 0.5) * b.w.width, b.w.z + (rand() - 0.5) * 3, !!b.theme.sparks && rand() < b.theme.sparks.share * 1.4, 1.4);
-    audio.recipe('mist:close', MIST_CLOSE, { gain: CLASS_GAIN.mist, vary: 0.6 }); // the wall closes behind them...
-    audio.sample('rumble', { gain: 0.3, pitch: 0.62 }); // ...and the horror stirs
+  /** Mist trailed behind the investigator right as they step out the far side. */
+  function wakeBurst(b: Wall, px: number, pz: number): void {
+    const { w, theme } = b;
+    for (let i = 0; i < 18; i++) {
+      const a = rand() * Math.PI * 2;
+      const r = 0.25 + rand() * 0.9;
+      const spark = !!theme.sparks && rand() < theme.sparks.share * 1.2;
+      mote(b, px + Math.cos(a) * r, w.y + 0.3 + rand() * 1.8, pz + Math.sin(a) * r, spark, Math.cos(a) * 0.6, 0.3 + rand() * 0.5, Math.sin(a) * 0.6, spark ? 0.2 : 0.95, spark ? 0.85 : 0.24, 1.8);
+    }
+  }
+
+  /** The torn hole finishes knitting shut: a settling billow right at the sealed spot and the exhale sound. */
+  function sealBurst(b: Wall, br: BreachState): void {
+    const { w, theme } = b;
+    for (let i = 0; i < 24; i++) {
+      const a = rand() * Math.PI * 2;
+      const r = rand() * 0.85;
+      const [x, y, z] = toWorld(w, br.u + Math.cos(a) * r, Math.max(0.2, br.y + Math.sin(a) * r * 1.2), (rand() - 0.5) * 0.45);
+      const spark = !!theme.sparks && rand() < theme.sparks.share * 1.3;
+      mote(b, x, y, z, spark, Math.cos(a) * 0.45, 0.25 + rand() * 0.55, Math.sin(a) * 0.45, spark ? 0.22 : 1.05, spark ? 0.85 : 0.26, 2.0);
+    }
+    audio.recipe('mist:close', MIST_CLOSE, { gain: CLASS_GAIN.mist, vary: 0.6 });
   }
 }
