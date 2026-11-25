@@ -67,7 +67,7 @@ export const worldUniforms = {
   uEyeRange: { value: new THREE.Vector2(...LIGHT.eyes) },
   uSpriteTints: { value: [new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1), new THREE.Vector3(1, 1, 1)] }, // the realm's grade, four stops (render/realmLook.ts), and the share the drawn creatures take of it (round 83: shaders/spriteGrade.ts)
   uSpriteGrade: { value: FX.spriteGrade },
-  uRelight: { value: 0 }, // the Relight setting: the horrors' bodies lit over their folds (shaders/sprite.ts; main.ts sets it)
+  uRelight: { value: 1 }, // horror relighting: the horrors' bodies lit over their folds (shaders/sprite.ts), always enabled
   uSpriteVivid: { value: new THREE.Vector2(...FX.spriteVivid) },
   uSpriteWarm: { value: FX.spriteWarm }, // how much of the lantern's and the lamps' hue a creature takes (shaders/sprite.ts)
   uSpriteReveal: { value: new THREE.Vector2(...FX.spriteReveal) }, // how much of the lantern's light shows a creature's own colours (shaders/sprite.ts)

@@ -20,7 +20,7 @@ const pct = (v: number): string => `${Math.round(v * 100)}%`;
 const onOff = (v: number): string => t(v > 0.5 ? 'val.on' : 'val.off');
 /** Each setting's name (a key `set.<id>`), and how its value reads. */
 type Slid = Exclude<SettingId, 'language' | 'devRevealed'>;
-const BINARY = new Set<Slid>(['evenPixels', 'shadows', 'relight', 'invertY', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips', 'captionBack', 'gore', 'devConsole']);
+const BINARY = new Set<Slid>(['invertY', 'controlTips', 'captionBack', 'gore', 'devConsole']);
 const PAIR_LABELS: Partial<Record<Slid, () => readonly [string, string]>> = {
   minimap: () => [t('val.minimap.turn'), t('val.minimap.north')],
   font: () => ['IM Fell', 'Garamond'],
@@ -31,19 +31,12 @@ const SHOW: Record<Slid, (v: number) => string> = {
   invertY: onOff,
   resolution: (v) => `${Math.round(RENDER.width * v)}×${Math.round(RENDER.height * v)}`,
   brightness: pct,
-  fog: (v) => (v > 0 ? pct(v) : t('val.off')),
-  shadows: onOff,
-  evenPixels: onOff,
-  relight: onOff,
   font: (v) => v > 0.5 ? 'EB Garamond' : 'IM Fell English',
   uiScale: (v) => `×${v.toFixed(2)}`,
   shake: pct,
   rumble: pct,
-  cutscenes: onOff,
-  questTracker: onOff,
   minimap: (v) => t(v > 0.5 ? 'val.minimap.north' : 'val.minimap.turn'),
   camera: (v) => t(`val.camera.${cameraModeOf(v)}` as Key),
-  quietWalk: onOff,
   controlTips: onOff,
   devConsole: onOff,
   captions: (v) => `×${v.toFixed(1)}`,
@@ -60,9 +53,9 @@ const SHOW: Record<Slid, (v: number) => string> = {
 const NAME = (id: SettingId): string => t(`set.${id}` as Key);
 /** The settings' tabs, each a few lines that fit the panel, and what each line does (said under the list as it is chosen). */
 const TABS: readonly (readonly [Key, readonly Slid[]])[] = [
-  ['set.tab.display', ['resolution', 'evenPixels', 'brightness', 'fog', 'shadows', 'relight', 'uiScale']],
+  ['set.tab.display', ['resolution', 'brightness', 'uiScale']],
   ['set.tab.sound', ['volume', 'music', 'sfx', 'ambience', 'speech']],
-  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'cutscenes', 'questTracker', 'quietWalk', 'controlTips']],
+  ['set.tab.play', ['sensitivity', 'invertY', 'camera', 'minimap', 'controlTips']],
   ['set.tab.access', ['font', 'captions', 'captionBack', 'flashes', 'gore', 'shake', 'rumble', 'fxCap']],
 ];
 /** A tab's lines; the developer console's only once Ctrl+Alt+Shift+D has revealed it (ui/devReveal.ts). */
