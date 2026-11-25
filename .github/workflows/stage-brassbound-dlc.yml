@@ -1,0 +1,72 @@
+name: Stage the licensed Brassbound DLC
+
+on:
+  push:
+    branches: ['codex/stage-brassbound-itch-upload']
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    if: github.event.created
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Prepare a one-time upload certificate
+        run: |
+          openssl req -new -x509 -newkey rsa:3072 -nodes -days 1 \
+            -subj '/CN=Brassbound DLC one-time transfer' \
+            -keyout "$RUNNER_TEMP/brassbound-key.pem" -out "$RUNNER_TEMP/brassbound-cert.pem" 2>/dev/null
+          printf 'BRASSBOUND_UPLOAD_CERTIFICATE='
+          base64 -w 0 "$RUNNER_TEMP/brassbound-cert.pem"
+          printf '\n'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: brassbound-upload-public-certificate
+          path: ${{ runner.temp }}/brassbound-cert.pem
+          retention-days: 1
+          if-no-files-found: error
+      - name: Receive and check the licensed archive
+        run: |
+          work="$RUNNER_TEMP/brassbound-upload"
+          install -d -m 700 "$work"
+          for attempt in {1..54}; do
+            git fetch --no-tags --depth=1 --quiet origin refs/heads/codex/stage-brassbound-itch-upload
+            if git show FETCH_HEAD:brassbound-dlc.cms > "$RUNNER_TEMP/brassbound-dlc.cms" 2>/dev/null; then break; fi
+            sleep 5
+          done
+          test -s "$RUNNER_TEMP/brassbound-dlc.cms"
+          openssl cms -decrypt -binary -inform DER -in "$RUNNER_TEMP/brassbound-dlc.cms" \
+            -inkey "$RUNNER_TEMP/brassbound-key.pem" -out "$work/Brassbound-Motor-Car.zip"
+          rm -- "$RUNNER_TEMP/brassbound-key.pem" "$RUNNER_TEMP/brassbound-dlc.cms"
+          printf '%s  %s\n' f63d3222a267b5d6d3a62234ab95516b7495fa387fc50417836caa5e9d288dd8 "$work/Brassbound-Motor-Car.zip" | sha256sum --check
+          unzip -tq "$work/Brassbound-Motor-Car.zip"
+      - name: Upload to the paid listing with the file hidden
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          node --input-type=module <<'JS'
+          const url = 'https://digitaldro.itch.io/seventy-steps-the-brassbound-motor-car';
+          const key = process.env.BUTLER_API_KEY;
+          if (!key) throw Error('No Butler credential configured');
+          const res = await fetch('https://api.itch.io/profile/games', { headers: { Authorization: `Bearer ${key}` } });
+          if (!res.ok) throw Error(`itch.io returned HTTP ${res.status}`);
+          const { games } = await res.json();
+          const car = games.find(game => game.id === 5440073 && game.url === url);
+          if (car?.min_price !== 100) throw Error('The expected $1 car listing could not be verified');
+          JS
+          curl --fail --silent --show-error --location https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default -o "$RUNNER_TEMP/brassbound-butler.zip"
+          unzip -q "$RUNNER_TEMP/brassbound-butler.zip" -d "$RUNNER_TEMP/brassbound-butler"
+          chmod +x "$RUNNER_TEMP/brassbound-butler/butler"
+          target=digitaldro/seventy-steps-the-brassbound-motor-car
+          "$RUNNER_TEMP/brassbound-butler/butler" push "$RUNNER_TEMP/brassbound-upload" "$target:brassbound-motor-car-dlc" --hidden --no-auto-unzip
+          "$RUNNER_TEMP/brassbound-butler/butler" status "$target"
+      - name: Remove the temporary archive and transfer key
+        if: always()
+        run: |
+          rm -f -- "$RUNNER_TEMP/brassbound-key.pem" "$RUNNER_TEMP/brassbound-dlc.cms" "$RUNNER_TEMP/brassbound-upload/Brassbound-Motor-Car.zip"
