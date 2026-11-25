@@ -210,8 +210,6 @@ export const SKY = {
   fade: 3, // seconds to ease into another realm's sky...
   jump: 30, // ...unless the camera leapt this many metres at once (a journey): then at once
   close: 0.6, // seconds for a dungeon's walls to close it off
-  crawl: 0.035, // radians a second the stars crawl about the sky at the most wrong (FX.strange); the pace follows the mind, the place never leaps
-  flicker: 4, // radians a second the stars' twinkle quickens by at the most wrong
   farAngle: 44, // degrees: the most of the sky a far silhouette fills (render/skyline.ts; round 19: Kadath rose 50° over the Dreamlands' north, and it was held at 34; round 117: it stands where it truly is and rises as it is neared, eased from farKnee toward this)
   farKnee: 26, // degrees: below this a far silhouette fills the sky it truly would
 };

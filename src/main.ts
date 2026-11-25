@@ -415,7 +415,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
         fxController.update(state, camera.position, time);
         if (fallen !== null) state.sanity = fallen; // drawn, not saved; the cap is applied in computeFx
         const fx = computeFx(state);
-        sky.strange(fx.strange);
+        sky.strange(fx.strange, fx.spin);
         look.apply(fx);
         applyReality(fx, game.reality);
         weatherHaze(fx, game.overworld?.weather, enclosed); // round 52: rain and storm close the world in

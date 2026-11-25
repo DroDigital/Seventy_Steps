@@ -56,3 +56,22 @@ export const OMEN = {
   period: 90, // seconds of its slow swelling
   sour: 0.5, // the share of the moon's colour that goes toward the stars' wrong violet
 };
+
+/**
+ * The wrong stars' spin (2026-11-25; asked: "i liked the wild spinning but it only made sense on very low sanity so it should progressively increase
+ * spinning rate the lower sanity goes"). The stars spin about the zenith at a pace the true stress alone sets (render/fx.ts `spinOf`: no pressure, no blow
+ * that leaves sanity where it was), doubling for every `halving` of it lost, from a still sky to a wild one at the last; render/sky.ts sums the turn, so the
+ * pace changes and the place never leaps (2026-11-23), and a fast star leaves a streak (shaders/sky.ts).
+ */
+export const WRONG_STARS = {
+  most: 2.4, // radians a second at sanity 0 (a turn in under three seconds)...
+  halving: 0.08, // ...halved for every 0.08 of the stress above it (eight points of sanity): 1.2 at 8, 0.65 at 15, 0.3 at 24, 0.075 at 40, 0.03 at 50...
+  from: 0.25, // ...and none at all above this stress (sanity 75, FX.dreadFrom), eased in over...
+  rise: 0.2, // ...this much more of it (0.02 at 55, 0.001 at 70)
+  ease: 0.8, // seconds in which the spin follows the mind: it spins up and down, never jolts
+  lurch: 0.35, // the share the spin surges and lulls by at its wildest (render/warpWaves.ts driftAt), as much less as it is slower: never backward
+  lurchPace: 1.5, // how much quicker than the lens's drift the lurches come (every few seconds)
+  shutter: 0.1, // seconds of its own motion a fast star's streak shows behind it...
+  streak: 0.065, // ...never longer than this many radians (the shader's taps, STREAK_TAPS, are a star's width apart at most)
+  flicker: 4, // radians a second the stars' twinkle quickens by at the most wrong (FX.strange), each star one to three times that
+};
