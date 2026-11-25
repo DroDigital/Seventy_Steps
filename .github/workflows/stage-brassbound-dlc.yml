@@ -92,12 +92,38 @@ jobs:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
           node --input-type=module <<'JS'
+          import { createHash } from 'node:crypto';
           const headers = { Authorization: `Bearer ${process.env.BUTLER_API_KEY}` };
           const res = await fetch('https://api.itch.io/games/5440073/uploads', { headers });
           if (!res.ok) {
             console.log(`Owner upload listing returned HTTP ${res.status}.`);
           } else {
             const { uploads } = await res.json();
-            console.log(JSON.stringify(uploads?.map(({ id, filename, display_name, hidden, size, build }) => ({ id, filename, display_name, hidden, size, buildId: build?.id }))));
+            const upload = Object.values(uploads ?? {}).find(upload => upload?.id === 20806248);
+            if (upload) {
+              const { id, filename, display_name, hidden, size, build } = upload;
+              console.log(JSON.stringify({ id, filename, display_name, hidden, size, buildId: build?.id }));
+            } else {
+              console.log('The owner upload response did not list the hidden upload by ID.');
+            }
+          }
+          const download = await fetch('https://api.itch.io/uploads/20806248/download', { headers });
+          if (!download.ok) {
+            console.log(`Owner download returned HTTP ${download.status}.`);
+          } else {
+            let file = download;
+            if (download.headers.get('content-type')?.includes('application/json')) {
+              const { url } = await download.json();
+              if (typeof url !== 'string' || new URL(url).protocol !== 'https:') {
+                console.log('Owner download response did not contain a direct link.');
+                process.exit(0);
+              }
+              file = await fetch(url);
+            }
+            if (!file.ok) throw Error(`Download returned HTTP ${file.status}`);
+            const body = Buffer.from(await file.arrayBuffer());
+            const hash = createHash('sha256').update(body).digest('hex');
+            if (hash !== 'f63d3222a267b5d6d3a62234ab95516b7495fa387fc50417836caa5e9d288dd8') throw Error('The downloaded file did not match the original archive.');
+            console.log('Owner download matches the original licensed archive byte for byte.');
           }
           JS
