@@ -38,19 +38,40 @@ function owned(g: Game, id: MountId): boolean {
 
 export function mountsTab(panel: HTMLElement, g: Game, redraw: () => void): void {
   const unlocked = mountUnlocked(g);
+  const importDlc = desktop?.importAutomobileDlc;
   heading(panel, t('mounts.title')).style.marginTop = '0';
   el(panel, 'div', unlocked ? fill(t('mounts.intro')) : t('mounts.locked'), 'opacity:.6;font-size:12px;line-height:1.5;padding:0 14px 8px');
   for (const id of OFFERED_MOUNT_IDS) {
     const selected = g.player.mount.selected === id;
     const has = owned(g, id);
-    const why = !unlocked ? t('mounts.whyQuest') : t('mounts.whyDlc');
+    const why = !unlocked ? t('mounts.whyQuest') : t(importDlc ? 'mounts.whyItchDlc' : 'mounts.whyDlc');
     const b = option(panel, MOUNTS[id].name, () => {
       if (selectMount(g, id)) { saveNow(); redraw(); }
     }, mountAvailable(g, id), why, NOTES[id]());
     if (id === FREE_MOUNT || has) chips(b, [{ text: id === FREE_MOUNT ? t('mounts.included') : t('mounts.optional'), tone: 'dim' }]);
     price(b, !has ? t('mounts.dlc') : !unlocked ? t('mounts.needQuest') : selected ? t('mounts.selected') : t('mounts.available'), selected ? 'ok' : 'max');
   }
-  if (desktop?.ownsAutomobileDlc) {
+  if (importDlc) {
+    const importButton = button(panel, t('mounts.importDlc'), async () => {
+      importButton.disabled = true;
+      status.textContent = '';
+      const result = await importDlc().catch(() => 'error' as const);
+      if (result === 'imported') {
+        await pending.get(g);
+        await refreshMountEntitlement(g);
+        importButton.disabled = false;
+        redraw();
+        return;
+      } else if (result !== 'canceled') {
+        status.textContent = t(result === 'invalid' ? 'mounts.invalidDlc' : 'mounts.importDlcError');
+      } else if (g.player.mount.automobileOwned) {
+        status.textContent = t('mounts.dlcInstalled');
+      }
+      importButton.disabled = false;
+    }, true, t('mounts.whyItchDlc'));
+    const status = el(panel, 'div', g.player.mount.automobileOwned ? t('mounts.dlcInstalled') : '', 'font-size:12px;line-height:1.5;padding:0 14px');
+    status.setAttribute('role', 'status');
+  } else if (desktop?.ownsAutomobileDlc) {
     const refresh = button(panel, t('mounts.refresh'), () => {
       refresh.disabled = true;
       refresh.textContent = t('mounts.checking');

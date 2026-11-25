@@ -21,6 +21,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { iconPng } from './icon.js';
+import { importItchAutomobileDlc, ITCH_DLC_EXTENSION, ownsItchAutomobileDlc } from './itchDlc.js';
 import { rescanWait } from './padRescan.js';
 import { serveFrom } from './serve.js';
 import { bundleEdition, channel, edition, startSteam, steamAchieve, steamBinding, steamEarly, steamOwnsAutomobileDlc, steamOwnsChariotDlc } from './steam.js';
@@ -31,6 +32,7 @@ const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the titl
 const SMOKE_LATE = Number(process.env.SMOKE_LATE) || 150; // seconds a smoke test waits for its title before it gives up (tools/smoke_packaged.mjs sets it under its own timeout: Rosetta starts slowly)
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
 const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
+const canImportAutomobileDlc = channel() === 'itch' && edition() === 'full';
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
 // Ubuntu 23.10+ AppArmor blocks Chromium's userns sandbox (electron#41066). Steam/itch ship a folder,
@@ -123,7 +125,11 @@ function open() {
       nodeIntegration: false,
       devTools: DEV || process.argv.includes('--devtools'), // a release has none to open (Ctrl+Shift+I, the View menu); `--devtools` is for a tester who is asked for one
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
-      additionalArguments: [...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []), `--edition=${edition()}`], // Steam sets SteamDeck=1 on a Deck (round 47): its first launch takes larger text; the demo is told it is one (round 56)
+      additionalArguments: [
+        ...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []),
+        `--edition=${edition()}`,
+        ...(canImportAutomobileDlc ? ['--import-automobile-dlc'] : []),
+      ],
     },
   });
   win.once('ready-to-show', () => {
@@ -162,9 +168,20 @@ function open() {
 ipcMain.handle('desktop:quit', () => app.quit());
 // An achievement earned: the game keeps it itself, and Steam is told when it is there (round 47: steam.js).
 ipcMain.handle('desktop:achieve', (_e, id) => steamAchieve(String(id)));
-// Cosmetic mount DLC; only Steam ownership and installation can unlock either appearance.
-ipcMain.handle('desktop:automobile-dlc', () => steamOwnsAutomobileDlc());
+// The full itch game reads its local unlock file. Steam continues to use its own ownership check.
+ipcMain.handle('desktop:automobile-dlc', () => canImportAutomobileDlc
+  ? ownsItchAutomobileDlc(app.getPath('userData')) : steamOwnsAutomobileDlc());
 ipcMain.handle('desktop:chariot-dlc', () => steamOwnsChariotDlc());
+ipcMain.handle('desktop:import-automobile-dlc', async (e) => {
+  const win = BrowserWindow.fromWebContents(e.sender);
+  if (!canImportAutomobileDlc || !win) return 'error';
+  const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+    properties: ['openFile'],
+    filters: [{ name: 'Brassbound Motor Car DLC', extensions: [ITCH_DLC_EXTENSION] }],
+  });
+  if (canceled || !filePaths[0]) return 'canceled';
+  return importItchAutomobileDlc(app.getPath('userData'), filePaths[0]);
+});
 
 // The game's storage as files, one a key (sync, as the Web Storage API it stands in for is).
 const keyFile = (key) => join(app.getPath('userData'), 'saves', `${String(key).replace(/[^A-Za-z0-9_-]+/g, '_')}.json`);
@@ -265,13 +282,18 @@ function smoke(win) {
         const button = document.querySelector('[data-menu]:not([data-ghost]) button[data-title-new-game]');
         const veil = document.querySelector('canvas[data-veil]');
         const clear = veil && (getComputedStyle(veil).display === 'none' || veil.getContext('2d').getImageData(veil.width / 2, veil.height / 2, 1, 1).data[3] < 255);
-        return { title: visible(button) && !!clear, bridge: typeof window.desktop?.quit === 'function', calibrationKept };
+        return {
+          title: visible(button) && !!clear,
+          bridge: typeof window.desktop?.quit === 'function',
+          dlcImport: typeof window.desktop?.importAutomobileDlc === 'function',
+          calibrationKept,
+        };
       })()`);
     } catch {
       // the page is still loading
     }
     calibrationKept ||= !!page?.calibrationKept;
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), bundleEdition: bundleEdition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, calibrationKept, steamBinding: steamBinding(), controllers: padState };
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), bundleEdition: bundleEdition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, dlcImport: !!page?.dlcImport, calibrationKept, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;
@@ -279,6 +301,7 @@ function smoke(win) {
     const missing = [
       !report.title && 'the title never appeared',
       !report.bridge && "the shell's bridge is missing",
+      report.dlcImport !== canImportAutomobileDlc && 'the DLC import bridge does not match the release channel and edition',
       report.packaged && report.bundleEdition !== report.edition && `the bundle is "${report.bundleEdition}", not "${report.edition}"`,
       needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load',
       needs.includes('pads') && padState !== 'ready' && `the controllers' worker is ${padState}`,
