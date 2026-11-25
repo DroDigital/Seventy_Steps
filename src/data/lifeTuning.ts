@@ -146,6 +146,7 @@ export const DUNGEON_LIGHT = {
   arena: 0.5, // and a horror's arena: a fight is read by what the horror throws and by its braziers (round 58)
   adapt: 0.15, // the eye widens without a lantern: the darkness, in a room or on the road, is this much less of what it was where the lantern has gone out (render/lanternLife.ts; round 58)
   ease: 1.3, // 1/s: how fast the room's light takes over from the open sky's (and back) as the camera passes a door
+  faint: 0.14, // the share of its own light a faintly lit thing gives (2026-11-25: a jar of glowing fluid was wholly self-lit, as bright 20 m off in the dark as at hand; render/siteMeshes.ts `faint`)
 };
 
 /** How dark the night is kept (round 35: it was too bright to be creepy; render/realmLook.ts): at its deepest the sky, the mist, the far land and both lights are this much of what a realm's look gives them. */

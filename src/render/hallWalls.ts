@@ -75,7 +75,7 @@ function niche({ w, y, s, c, glow, put, out }: Ctx): void {
       out.wall.push(wb(f, 0, 0.25, 0.4, 0.24, 0.3, lo, scaleRgb(c, 1.1)), blob(f, 0, 0.25, 0.17, lo + 0.48, scaleRgb(c, 1.15), 1.25));
       break;
     case 'jar':
-      out.glow.push(round(f, 0, 0.25, 0.17, 0.5, lo, scaleRgb(glow, 0.7), 8)); // lit by what floats in it
+      out.faint.push(round(f, 0, 0.25, 0.17, 0.5, lo, scaleRgb(glow, 0.7), 8)); // faintly lit by what floats in it (2026-11-25: as the specimens' jars, loreItems.ts)
       break;
     case 'candle':
       out.wall.push(round(f, 0, 0.25, 0.06, 0.3, lo, [0.86, 0.82, 0.7], 6));

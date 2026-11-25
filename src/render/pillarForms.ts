@@ -17,7 +17,7 @@ import { tileUv, tint } from './meshKit';
 import { scaleRgb, type Rgb } from './palette';
 
 /** The groups a pillar's pieces go into: its stone, timber, relief on either (drawn nearer), and glow. */
-export type PillarKind = 'wall' | 'wood' | 'trim' | 'beam' | 'glow' | 'shine';
+export type PillarKind = 'wall' | 'wood' | 'trim' | 'beam' | 'glow' | 'shine' | 'faint';
 export type PillarPiece = { kind: PillarKind; geo: THREE.BufferGeometry };
 
 const WOOD: Rgb = [0.4, 0.33, 0.27];
@@ -230,7 +230,7 @@ const mixDark = (c: Rgb): Rgb => [ONYX[0] + c[0] * 0.12, ONYX[1] + c[1] * 0.12, 
 
 /** A pillar's pieces by group, drawn as `form`. */
 export function pillarPieces(form: PillarForm, p: CylPart, c: Rgb): PillarPiece[] {
-  const o: Out = { wall: [], wood: [], trim: [], beam: [], glow: [], shine: [] };
+  const o: Out = { wall: [], wood: [], trim: [], beam: [], glow: [], shine: [], faint: [] };
   FORMS[form](o, p.x, p.z, p.y0, p.y1, p.radius, c, hash2(Math.round(p.x * 10), Math.round(p.z * 10), 108));
   const out: PillarPiece[] = [];
   for (const kind of Object.keys(o) as PillarKind[]) {
