@@ -258,8 +258,7 @@ export function createScreen(z: number, backdrop = '#050506dd', panelCss?: strin
   panelCss ??= `left:50%;top:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:min(594px,92vw);max-height:${skin ? (skin.maxVh ?? 95) : 90}vh;overflow:auto;${skin ? `padding:${skin.pad}` : frame()}`;
   startOnce();
   const root = document.createElement('div');
-  const blur = backdrop !== '#000' && backdrop !== 'transparent' && !keepLock ? ';backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)' : '';
-  root.style.cssText = `position:fixed;inset:0;display:none;z-index:${z};background:${backdrop}${blur};font:14px/1.45 ${SERIF};color:${INK}`;
+  root.style.cssText = `position:fixed;inset:0;display:none;z-index:${z};background:${backdrop};font:14px/1.45 ${SERIF};color:${INK}`;
   const layer = document.createElement('div'); // the panel's world, scaled with the UI (its vw and vh become shares of it)
   layer.style.cssText = scaled ? SCALED_LAYER : 'position:absolute;inset:0';
   const panel = document.createElement('div');
