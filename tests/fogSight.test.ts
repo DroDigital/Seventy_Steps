@@ -77,16 +77,25 @@ it('keeps the surrounding fog wall visible, holds a localized torn hole while th
   expect(u.uVis.value, 'wall stays visible while camera remains behind').toBeGreaterThan(0.9);
   expect(u.uBreach.value.z, 'sight hole remains open without fixed timeout while camera is behind').toBeGreaterThan(0.5);
 
+  // Moving near a jamb while the camera remains outside keeps the breach aligned with the camera ray.
+  const across = { x: Math.cos(w.yaw), z: -Math.sin(w.yaw) };
+  const nearJamb = Math.max(0.8, w.width * 0.5 - 0.25);
+  player.x = w.x + 1.8 * normal.x + nearJamb * across.x;
+  player.z = w.z + 1.8 * normal.z + nearJamb * across.z;
+  camera.position.set(w.x - 3 * normal.x + nearJamb * across.x, w.y + 1.7, w.z - 3 * normal.z + nearJamb * across.z);
+  for (let t = 5.1; t <= 6.5; t += 0.1) fog.update(camera, t, false);
+  expect(Math.abs(nearJamb - u.uBreach.value.x) / u.uBreach.value.z, 'jamb-side camera ray stays inside the clear breach').toBeLessThan(0.2);
+
   // Camera enters: hole lingers briefly, then visibly swirls inward and seals shut.
-  camera.position.set(w.x + normal.x, w.y + 1.7, w.z + normal.z);
-  fog.update(camera, 5.1, false);
+  camera.position.set(w.x + normal.x + nearJamb * across.x, w.y + 1.7, w.z + normal.z + nearJamb * across.z);
+  fog.update(camera, 6.6, false);
   const openAfterEnter = u.uBreach.value.z;
   expect(openAfterEnter, 'hole stays visible immediately as camera enters').toBeGreaterThan(0.4);
-  for (let t = 5.2; t <= 6.2; t += 0.1) fog.update(camera, t, false);
+  for (let t = 6.7; t <= 7.7; t += 0.1) fog.update(camera, t, false);
   expect(u.uBreach.value.z, 'hole is actively shrinking closed').toBeLessThan(openAfterEnter);
   expect(u.uBreach.value.z, 'hole is still partly open mid-close').toBeGreaterThan(0.1);
   expect(u.uBreachFx.value.x, 'mist swirls inward while closing').toBeLessThan(0);
-  for (let t = 6.3; t <= 8.5; t += 0.1) fog.update(camera, t, false);
+  for (let t = 7.8; t <= 10.0; t += 0.1) fog.update(camera, t, false);
   expect(u.uBreach.value.z, 'hole closes completely shut').toBe(0);
   expect(u.uVis.value, 'wall remains solid after closing').toBeGreaterThan(0.9);
   expect(recipe.mock.calls.some(([k]) => k === 'mist:close'), 'close sound plays when the breach seals').toBe(true);

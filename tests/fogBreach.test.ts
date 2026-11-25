@@ -65,6 +65,28 @@ describe('the breach torn through a boss fog (2026-11-24)', () => {
     expect(s.y + s.ry, 'hole leaves mist intact beneath the lintel').toBeLessThan(doorway.height - 0.1);
   });
 
+  it('keeps the held sight opening aligned with the camera ray near a dungeon doorway jamb or lintel', () => {
+    const doorway = { x: 0, y: 0, z: 0, yaw: 0, width: 3.6, height: 3.9 };
+    const breach = createFogBreach(doorway);
+    breach.passed({ x: 0, z: 1.8 });
+
+    // Player moves toward the right jamb so the camera ray crosses at u = 1.55 m (inside the 3.2 m doorway).
+    const first = breach.update({ x: 1.55, y: 0, z: 1.8 }, null, blockedSight(1.55, 1.2), 0.05);
+    expect(Math.abs(1.55 - first.u) / first.rx, 'ray stays inside the clear core opening immediately').toBeLessThan(0.45);
+
+    let settled = first;
+    for (let i = 0; i < 30; i++) settled = breach.update({ x: 1.55, y: 0, z: 1.8 }, null, blockedSight(1.55, 1.2), 0.05);
+    expect(settled.phase).toBe('open');
+    expect(Math.abs(1.55 - settled.u) / settled.rx, 'settled opening stays centred on the jamb-side sight ray').toBeLessThan(0.15);
+    // Opposite jamb remains covered by opaque mist (breach does not swallow the whole doorway).
+    expect(settled.u - settled.rx).toBeGreaterThan(-doorway.width * 0.25);
+
+    // Also tracks an elevated sight ray near the lintel on the opposite jamb.
+    let high = settled;
+    for (let i = 0; i < 30; i++) high = breach.update({ x: -1.55, y: 0, z: 1.8 }, null, blockedSight(-1.55, 3.2), 0.05);
+    expect(Math.hypot((-1.55 - high.u) / high.rx, (3.2 - high.y) / high.ry)).toBeLessThan(0.15);
+  });
+
   it('pushes in the opposite direction when walking back out through a wall', () => {
     const breach = createFogBreach(wall);
     const pass = { from: { x: 0, z: 2 }, to: { x: 0, z: -1.8 }, frame: 45, frames: 90 };
