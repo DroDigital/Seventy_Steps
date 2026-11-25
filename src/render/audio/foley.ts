@@ -8,6 +8,8 @@
  * HAND_FRAMES); and a warning as a grab winds up. Read-only on the simulation. Round 83: the footsteps are understated (quieter at every
  * pace, a lilt between the feet, no two alike, the bright recordings dulled: data/footSounds.ts `STEP_VOICE`) and a room that answers a
  * footfall (data/acoustics.ts `Echo`) is heard giving it back, faintly. Round 86: a step on a dungeon room's floor is lifted back (`STEP_VOICE.indoors`, footing.ts `indoorLift`, foley.ts `indoorsAt`): round 83 had left it almost unheard there.
+ * Round 124: the steps back at round 80's level everywhere, each foot a little to its own side, the ear settling into a long walk
+ * (`STEP_VOICE.settle`: new ground and a stop undo it), and a walk that ends drawing its trailing foot up (`STEP_VOICE.plant`).
  */
 
 import type { Entity } from '../../core/ecs';
@@ -29,10 +31,10 @@ import { worldLayout } from '../../world/placements';
 import { segmentDistance } from '../../world/roads';
 import { dungeonRoomAt, inDungeon } from '../../world/terrain';
 import { chunkOf } from '../../world/worldMap';
-import { groundAt } from '../../world/groundKind';
+import { groundAt, type GroundKind } from '../../world/groundKind';
 import { wetness } from '../wetness';
 import { dullness } from './cues';
-import { echoesOf, footFeel, stepGain, stepLevel, stepLowpass } from './footing';
+import { echoesOf, footFeel, footPan, settleAnew, settleGain, settleStep, stepGain, stepLevel, stepLowpass } from './footing';
 import type { Sampler, SampleEcho } from './sampler';
 
 export type Surface = 'water' | 'stone' | 'road' | 'dirt';
@@ -98,19 +100,34 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe, room: () 
   let walked = 0;
   let before = 0;
   let movedAt = -1e9; // the render second the body last moved
-  let foot: 1 | -1 = 1; // the feet take turns (a returned step is heard to the side of the foot that fell)
+  let foot: 1 | -1 = 1; // the feet take turns (each heard a little to its own side, and its room's return to that side)
+  let busy = 0; // seconds the ear has been walking (round 124: STEP_VOICE.settle)
+  let underfoot: GroundKind | null = null; // the ground of the last footfall: new ground is heard whole
+  let [fell, walkFrom, plantedAt, lastLevel, planted] = [-1e9, -1e9, -1e9, 0, true]; // the last footfall, the first of its walk, the last plant, the last step's level, and whether the walk's end is heard
   const play = (id: SampleSetId, gain = 1, pan = 0, pitch = 1, lowpass?: number, echoes?: SampleEcho[]): boolean => sampler.play(SAMPLE_SETS[id], { gain, pan, pitch, lowpass, echoes });
   const hand = (id: keyof typeof HANDS, gain = 1): boolean => recipe(`hands:${id}`, HANDS[id], { gain: CLASS_GAIN[id === 'burst' || id === 'anvil' ? 'impact' : 'hands'] * gain });
   let [arm, edge, knee]: [string, number, boolean | null] = [g.player.weapon, reinforcement(), null]; // what is in hand, how far it is reinforced, whether they kneel: heard to change
 
-  /** A step on the ground at `p`: the surface's recording as the ground takes it (round 80: snow and sand softer, mud lower, boards hollow; round 83: the bright ones dulled, and a room's faint answer). */
-  function stepOn(p: V3, gain: number, speed = 0): Surface {
+  /** A step on the ground at `p` (of `ground`, if known): the surface's recording as the ground takes it (round 80: snow and sand softer, mud lower, boards hollow; round 83: the bright ones dulled, and a room's faint answer; round 124: to the side of the foot that fell). `dull` closes its top further. */
+  function stepOn(p: V3, gain: number, speed = 0, o: { ground?: GroundKind; dull?: number } = {}): Surface {
     const surface = surfaceAt(g, p.x, p.y, p.z);
-    const feel = footFeel(surface, groundAt(g, p.x, p.y, p.z));
-    const lowpass = stepLowpass(surface, feel.lowpass);
+    const feel = footFeel(surface, o.ground ?? groundAt(g, p.x, p.y, p.z));
+    const own = stepLowpass(surface, feel.lowpass);
+    const lowpass = o.dull ? Math.min(own ?? o.dull, o.dull) : own;
     const answer = room();
-    play(feel.set ?? STEPS[surface], gain * feel.gain * stepGain(surface, indoorsAt(g, p.x, p.y, p.z)), 0, feel.pitch, lowpass, answer && echoesOf(answer, foot, lowpass, speed));
+    play(feel.set ?? STEPS[surface], gain * feel.gain * stepGain(surface, indoorsAt(g, p.x, p.y, p.z)), footPan(foot), feel.pitch, lowpass, answer && echoesOf(answer, foot, lowpass, speed));
     return surface;
+  }
+
+  /** A walk of a while that has stopped: the trailing foot drawn up beside the other, once, a moment after the last footfall (round 124). */
+  function plant(seconds: number, p: V3): void {
+    const s = STEP_VOICE.plant;
+    if (planted || seconds - fell < s.wait || seconds - movedAt < 0.12) return; // (still moving between two simulation steps is not a stop)
+    planted = true;
+    if (fell - walkFrom < s.after || seconds - plantedAt < s.every || seconds - fell > s.wait + 0.6) return; // (a shuffle, a stop just heard, or one seen too late to be this walk's)
+    plantedAt = seconds;
+    foot = foot === 1 ? -1 : 1;
+    stepOn(p, lastLevel * s.gain * settleGain(busy), 0, { dull: s.lowpass });
   }
 
   function steps(seconds: number): void {
@@ -119,22 +136,29 @@ export function createFoley(g: Game, sampler: Sampler, recipe: Recipe, room: () 
     const a = actor.get(g.player.id);
     const dt = Math.max(1e-3, seconds - before);
     before = seconds;
+    busy = settleStep(busy, dt, seconds - fell < STEP_VOICE.settle.gap); // (round 124: the ear settles into a walk, and comes back as it stops)
     if (!tr || !a) return;
     const moved = last ? Math.hypot(tr.pos.x - last.x, tr.pos.z - last.z) : 0;
     last = { ...tr.pos };
-    if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id)) return (walked = 0), undefined; // mounted, a jump, a move or a fall: no stride
+    if (g.player.mount.active || moved > 3 || a.move !== null || g.ecs.c.dead.has(g.player.id)) return (walked = 0), (planted = true), undefined; // mounted, a jump, a move or a fall: no stride (and no foot drawn up after it)
     const span = moved > 0 && seconds - movedAt <= TICK ? seconds - movedAt : dt; // (the metres took the time since the body last moved, not since the last frame: a frame drawn faster than the simulation sees it move on some frames only)
     if (moved > 0) movedAt = seconds;
     const speed = moved / Math.max(1e-3, span);
-    if (speed < 0.3) return;
+    if (speed < 0.3) return plant(seconds, tr.pos);
     walked += moved;
     const stride = strideAt(speed);
     if (walked < stride) return;
     walked %= stride;
     foot = foot === 1 ? -1 : 1;
     const lilt = foot === 1 ? 1 : STEP_VOICE.offFoot;
-    const surface = stepOn(tr.pos, stepLevel(speed) * lilt * (1 + STEP_VOICE.jitter * (2 * Math.random() - 1)), speed);
-    if (surface !== 'water' && wetness.value > 0.3 && Math.random() < wetness.value) play('stepWater', STEP_VOICE.splash * wetness.value * stepGain('water'), 0, 1.1 + 0.25 * Math.random(), stepLowpass('water')); // a stride on ground the rain has soaked splashes (round 34; round 83: fainter and duller)
+    const ground = groundAt(g, tr.pos.x, tr.pos.y, tr.pos.z);
+    if (ground !== underfoot) [busy, underfoot] = [settleAnew(busy), ground]; // (new ground underfoot is heard whole)
+    if (seconds - fell >= STEP_VOICE.settle.gap) walkFrom = seconds; // (a walk begins)
+    [fell, planted] = [seconds, false];
+    lastLevel = stepLevel(speed) * lilt * (1 + STEP_VOICE.jitter * (2 * Math.random() - 1));
+    const settled = settleGain(busy);
+    const surface = stepOn(tr.pos, lastLevel * settled, speed, { ground });
+    if (surface !== 'water' && wetness.value > 0.3 && Math.random() < wetness.value) play('stepWater', STEP_VOICE.splash * wetness.value * stepGain('water') * settled, footPan(foot), 1.1 + 0.25 * Math.random(), stepLowpass('water')); // a stride on ground the rain has soaked splashes (round 34; round 83: fainter and duller)
   }
 
   function moves(place: (at: V3, range: number) => { gain: number; pan: number }, warn: (at: V3) => void): void {

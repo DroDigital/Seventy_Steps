@@ -12,6 +12,7 @@ be made: `src/data/plannedSounds.ts`. Credits and licences: `public/audio/CREDIT
 | A horror's blows | `render/audio/attackAudio.ts`, `data/plannedSounds.ts` `atk(...)`, `public/audio/sfx/atk_*`, `swipe*` | CC0 recordings by element for a bolt's landing, a burst and a throw; a foe's swing its own whoosh. Caster attacks add no procedural tones or fallback while recordings load. |
 | Rain and a bolt on the ground (round 59) | `render/audio/weatherBed.ts`, `public/audio/amb/rain_*`, `sfx/strike*` | a light rain and a downpour recorded, each read twice and panned apart; four close strikes |
 | Ambience | `data/samples.ts` `AMBIENCE`, `public/audio/amb`, `render/audio/ambience.ts` | looped beds with spot sounds, breathing |
+| Dungeons (round 124) | `data/dungeonAmbience.ts`, `data/roomSounds.ts`, `render/audio/bedTextures.ts`, `render/audio/roomAmbience.ts` | each roofed kit's own beds (recordings, and five loops made in code) and spots (recordings, and sixteen recipes), with a dungeon's own voices laid over its kit's |
 | Doors | `data/doorSounds.ts`, `render/doorViews.ts` | a recipe made for each swing (below) |
 | Menus | `data/foleySounds.ts` `UI`, `ui/menuSounds.ts` | seven small sounds (move, choose, back, tab, open, close, tick), quiet, wood and paper |
 | The investigator's hands | `data/foleySounds.ts` `HANDS`, `render/audio/foley.ts` | a guard lifted, a draught swallowed, the Reagent's needle and plunger, a flask lobbed and burst, an arm taken up, an arm reinforced, a knee bent and risen from, coins counted |
@@ -72,6 +73,46 @@ if a fight begins before the file has loaded, and the theme takes over by a 2.5 
   3.8 to 20.8 dB across their ten seconds of crossfade (gradually; and drum-smeared, the reason for cutting the others on the beat): they
   are the ones to listen to, with `OVERRIDES.<id>.loop` to mend them.
   `tests/bossMusic.test.ts` keeps the table, the files, the credits and the map in agreement; `tests/bossThemes.test.ts` the player.
+
+## Footsteps (round 124)
+
+Round 83 made the steps understated, about 5 dB under round 80 at every pace, and they went all but unheard (round 86 gave the
+dungeons' rooms their 5 dB back). They are at round 80's level again (`STEP_VOICE.level` 0.55 to 1 by pace, a walk 0.84; a dungeon
+room's floor 1.12 over that), and a long walk is kept easy on the ear by other means (`data/footSounds.ts`, `render/audio/footing.ts`):
+
+- **The ear settles** (`settle`): after 8 s of steady footfalls the steps ease over 25 s toward 0.8 of their level (-1.9 dB at most),
+  come back four times as fast once the walk stops, and are whole again on new ground. The ground's recipe settles with them.
+- **Each foot to its own side** (`spread` 0.08), the lilt between them (the second 0.86) and each step's level drawn 12% either way.
+- **The bright recordings softened, not blanketed**: the road 0.9 under 3.2 kHz, the shallows 0.9 under 3 kHz (round 83: 2 kHz).
+- **A walk ends with the trailing foot drawn up** (`plant`): one soft, dull scuff, once, after a walk of 1.2 s or more.
+- **The cloth comes at drawn intervals**: the coat's swing and the pack at a run after two to four and three to five strides, a soft
+  brush of the coat at a walk after six to ten (`GEAR.rustle`); nothing metal, nothing above 2 kHz.
+- **One stone take lifted**: the first stone step is a thump under 200 Hz, about 6 dB under its fellows to the ear; it is lifted 3.5 dB
+  (`TAKE_LIFT`, `data/takeTrim.ts`).
+
+`tests/footing.test.ts` holds the level against round 80's and round 83's, the settling, the sides, the plant and the cloth.
+
+## Dungeons (round 124)
+
+Every vault, crypt, cellar, sewer, mine, archive and stair of the dream played one recording of a cave and one of a grotto's drips (5.7
+drops a second, peaking near full scale, about 13 dB over a footfall in the same room). Now each roofed kit has its own soundscape
+(`KIT_AMBIENCE`), and fifteen dungeons lay a voice of their own tale over their kit's (`DUNGEON_ACCENTS`):
+
+- **Beds**: the recordings, and five loops made in code (`bedTextures.ts`, named `gen_…`): the still air of a shut room, water running
+  in a channel, a great fire's roar, the Mi-Go's hum (86 Hz, not the Elder Sign's 98), the void's wind. Each a mono loop that closes on
+  itself at the recordings' level (16 kHz, 12 s), drawn once a while after sound starts. Each kit's beds sum to within a few dB of the
+  old cave and grotto, A-weighted.
+- **Spots**: the recorded sets (rats, bats, bones, chains, a chant through stone, whispers, wings, the Mi-Go's buzz, a deep rumble) and
+  sixteen recipes (`roomSounds.ts`: a drop, grit, settling stone, a far thud, a draught, dust, claws, a fire's snap, a flame rolling up,
+  a machine, glass, a pump, a shutter, a small bell, a swell, a page), levelled to -30 dBFS (`ROOM_MIX`). A spot may carry its own level
+  and wall (`gain`, `lowpass`), and a drop is a **seep** (`run`): one drop from one place at one pitch, three to seven times, then still.
+- **The grotto** stays where water stands: Y'ha-nthlei (at 0.42) and K'n-yan's open caverns (0.5); it breathes now wherever it plays.
+
+`tests/dungeonAmbience.test.ts` holds that every roofed kit has its own and no two are alike, that the grotto is the drowned halls'
+alone, and how a seep and a recipe spot are played; `tests/bedTextures.test.ts` and `tests/roomSounds.test.ts` render the beds and the
+recipes. Yuggoth and the realms of the Outer Dark were given far voices too (`data/placeSounds.ts`: the Court's drums and flutes, the
+Piping Dark's flutes, the Black Wood's drum and chant, the Spheres' glassy notes, the Cloud Summit's piping and ice, the Mi-Go's drone
+and buzz, Zann's viol beyond the gate); the Pale Lattice keeps its silence.
 
 ## Doors
 
@@ -158,5 +199,8 @@ and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rm
 
 - A recipe: a `Sound` in `data/foleySounds.ts` (or `sounds.ts`), a class gain, and its place (an event in `cues.ts`, a frame in
   `foley.ts`, a cue in `actBeats.ts`). `tests/soundMix.test.ts` will want its level.
+- A dungeon's sound (round 124): its kit's row in `data/dungeonAmbience.ts` `KIT_AMBIENCE` (a roofed kit without one falls back on its
+  kind's), or a voice of its own tale in `DUNGEON_ACCENTS`; an indoor recipe in `data/roomSounds.ts` (`ROOM_MIX` levels it to -30 dBFS:
+  `tests/roomSounds.test.ts`); a bed made in code in `render/audio/bedTextures.ts`, named `gen_<id>`, with a `BED_MANNER` row.
 - A recording: see `src/data/plannedSounds.ts` for the planned ones; for any other, a set in `data/samples.ts`, a row in `public/audio/CREDITS.md`
   (CC0, or made with Suno Sounds with its date and plan), and `python3 tools/audio_levels.py`.

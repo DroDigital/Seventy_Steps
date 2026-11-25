@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { PLACE_VOICES } from '../src/data/placeSounds';
-import { AMBIENCE, DUNGEON_AMBIENCE } from '../src/data/samples';
+import { AMBIENCE } from '../src/data/samples';
+import { KIT_AMBIENCE } from '../src/data/dungeonAmbience';
+import { roomAmbience } from '../src/render/audio/roomAmbience';
 import { createGameAudio } from '../src/render/audio/gameAudio';
 import type { AudioEngine } from '../src/render/audio/engine';
 import type { Drones } from '../src/render/audio/drones';
@@ -67,7 +69,9 @@ describe('the Serpent Temple soundscape', () => {
 
     const house = world.dungeons.find((d) => d.layout.def.id === 'witch_house')!.layout.rooms[0];
     move('arkham', house, 3);
-    expect(heard.bed).toHaveBeenLastCalledWith(DUNGEON_AMBIENCE.house);
+    expect(heard.bed).toHaveBeenLastCalledWith(roomAmbience('witch_house', 'timber')); // (round 124: the house's own, and the Witch House's rats in its walls)
+    expect(roomAmbience('witch_house', 'timber')!.beds).toEqual(KIT_AMBIENCE.timber!.beds);
+    expect(roomAmbience('witch_house', 'timber')!.roofed).toBe(true);
     expect(heard.voices).toHaveBeenLastCalledWith(3, expect.objectContaining({ outdoors: false }));
   });
 });

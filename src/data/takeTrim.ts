@@ -11,6 +11,13 @@ import { SAMPLE_LEVELS, type Level } from './sampleLevels';
 
 export const TRIM = { boost: 6, cut: 12, ceiling: -0.5 } as const; // dB
 
+/**
+ * Round 124: a take whose weight lies where the ear hears little is lifted this much (dB) over its set's level (within the boost and the
+ * ceiling). The first stone step is a thump under 200 Hz (centroid 160 Hz against its fellows' 320 to 410): at one rms it is about 6 dB
+ * quieter to the ear, A-weighted, so one footfall in four on a dungeon's floor all but vanished. Half of that and a little more.
+ */
+export const TAKE_LIFT: Readonly<Record<string, number>> = { step_stone1: 3.5 };
+
 /** The trim of each take of `set` in dB. A take with no measurement is left as it is. */
 export function takeTrims(set: SampleSet, levels: Readonly<Record<string, Level>> = SAMPLE_LEVELS): Record<string, number> {
   const known = set.files.map((f) => levels[`sfx/${f}`]).filter((l): l is Level => !!l);
@@ -21,7 +28,7 @@ export function takeTrims(set: SampleSet, levels: Readonly<Record<string, Level>
   for (const f of set.files) {
     const l = levels[`sfx/${f}`];
     if (!l) continue;
-    const wanted = Math.min(TRIM.boost, Math.max(-TRIM.cut, mean - l.rms));
+    const wanted = Math.min(TRIM.boost, Math.max(-TRIM.cut, mean - l.rms) + (TAKE_LIFT[f] ?? 0));
     out[f] = Math.min(wanted, TRIM.ceiling - (l.peak + gain)); // (a take already at the ceiling is not raised; one over it is cut to it)
   }
   return out;

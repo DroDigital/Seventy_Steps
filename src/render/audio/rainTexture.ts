@@ -7,7 +7,7 @@
  * nothing here needs the audio context, so what they are is tested (tests/rainTexture.test.ts). Pure.
  */
 
-type Samples = Float32Array<ArrayBuffer>;
+export type Samples = Float32Array<ArrayBuffer>;
 
 export interface Texture {
   left: Samples;
@@ -17,13 +17,13 @@ export interface Texture {
 const TAU = Math.PI * 2;
 
 /** A small seeded stream (the same rain on every start: a loop heard again is the same loop). */
-function stream(seed: number): () => number {
+export function stream(seed: number): () => number {
   let n = (seed * 2654435761) >>> 0 || 1;
   return () => ((n = (Math.imul(n, 1664525) + 1013904223) >>> 0) / 4294967296);
 }
 
 /** One-pole low-pass of `x` about its ring, run twice round so that the end meets the start (a loop that closes). */
-function ringLow(x: Samples, rate: number, hz: number): Samples {
+export function ringLow(x: Samples, rate: number, hz: number): Samples {
   const k = 1 - Math.exp((-TAU * hz) / rate);
   const y = new Float32Array(x.length);
   let s = 0;

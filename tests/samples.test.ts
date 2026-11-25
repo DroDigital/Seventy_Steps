@@ -2,12 +2,15 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES } from '../src/data/registry';
-import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, SAMPLE_SETS, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES } from '../src/data/samples';
+import { KIT_AMBIENCE, DUNGEON_ACCENTS } from '../src/data/dungeonAmbience';
+import { ROOM_SOUNDS } from '../src/data/roomSounds';
+import { AMBIENCE, DUNGEON_AMBIENCE, PLANNED_SETS, SAMPLE_SETS, STINGER_SAMPLES, VOICE_ALERTS, VOICE_SAMPLES, type Ambience } from '../src/data/samples';
 import { WORLD } from '../src/data/tuning';
 import { voiceIdOf } from '../src/data/voices';
 import { nextSpot } from '../src/render/audio/ambience';
 import { reached, strideAt, surfaceAt } from '../src/render/audio/foley';
 import { RAIN_BEDS } from '../src/render/audio/weatherBed';
+import { generatedOf } from '../src/render/audio/bedTextures';
 import { dullness } from '../src/render/audio/cues';
 import { pickTake, setFiles } from '../src/render/audio/sampler';
 import { createGame, createWorldGame } from '../src/systems/game';
@@ -17,7 +20,8 @@ import { chunkOf } from '../src/world/worldMap';
 
 const AUDIO = 'public/audio';
 const files = (dir: string): string[] => readdirSync(`${AUDIO}/${dir}`).map((f) => `${dir}/${f.replace(/\.mp3$/, '')}`);
-const beds = [...[...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE)].flatMap((a) => a.beds.map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59)
+const places: Partial<Ambience>[] = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE), ...Object.values(KIT_AMBIENCE), ...Object.values(DUNGEON_ACCENTS)]; // (round 124: the dungeons' own, and their tales')
+const beds = [...places.flatMap((a) => (a.beds ?? []).filter(([f]) => !generatedOf(f)).map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59; the made ones are drawn in code: round 124)
 
 describe('the recorded sounds (data/samples.ts, public/audio)', () => {
   it('every file a set or a bed names is there, and every file there is named', () => {
@@ -42,9 +46,14 @@ describe('the recorded sounds (data/samples.ts, public/audio)', () => {
 
   it('every region, the arena and a dungeon have their ambience; every set is sane', () => {
     for (const id of [...REGIONS.map((r) => r.id), 'arena']) expect(AMBIENCE[id]?.beds.length, id).toBeGreaterThan(0);
-    for (const a of [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE)]) {
-      for (const [, gain] of a.beds) expect(gain > 0 && gain <= 1).toBe(true);
-      for (const s of a.spots) expect(SAMPLE_SETS[s.set] && s.every[0] > 5 && s.every[0] <= s.every[1]).toBeTruthy();
+    for (const a of places) {
+      for (const [file, gain] of a.beds ?? []) expect(gain > 0 && gain <= 1, file).toBe(true);
+      for (const s of a.spots ?? []) {
+        expect(!!s.set !== !!s.recipe, `${s.set ?? s.recipe}: a recording or a recipe`).toBe(true); // (round 124: a spot may be a recipe)
+        expect(s.set ? SAMPLE_SETS[s.set] : ROOM_SOUNDS[s.recipe!], s.set ?? s.recipe).toBeDefined();
+        expect(s.every[0] > 5 && s.every[0] <= s.every[1], s.set ?? s.recipe).toBe(true);
+        if (s.gain !== undefined) expect(s.gain > 0 && s.gain <= 2, s.set ?? s.recipe).toBe(true);
+      }
     }
     for (const [id, s] of Object.entries(SAMPLE_SETS)) {
       expect(s.files.length, id).toBeGreaterThan(0);

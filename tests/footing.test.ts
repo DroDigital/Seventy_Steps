@@ -7,7 +7,7 @@ import { SAMPLE_SETS } from '../src/data/samples';
 import type { Layer, Sound } from '../src/data/sounds';
 import { createBodyFoley } from '../src/render/audio/bodyFoley';
 import { createFoley, indoorsAt, surfaceAt } from '../src/render/audio/foley';
-import { coldAt, footFeel, indoorLift, stepGain, stepLevel, stepSetOf } from '../src/render/audio/footing';
+import { coldAt, footFeel, footPan, indoorLift, settleAnew, settleGain, settleStep, stepGain, stepLevel, stepSetOf } from '../src/render/audio/footing';
 import type { Sampler, SampleOptions } from '../src/render/audio/sampler';
 import { HEART } from '../src/render/feel';
 import { createWorldGame } from '../src/systems/game';
@@ -117,7 +117,7 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
   });
 
   it('the gear is cloth and leather and nothing rings: noise only, nothing above 2 kHz, no lantern bail (round 83)', () => {
-    expect(Object.keys(GEAR).sort()).toEqual(['coat', 'satchel']);
+    expect(Object.keys(GEAR).sort()).toEqual(['coat', 'rustle', 'satchel']); // (round 124: the coat's brush at a walk)
     for (const [id, s] of Object.entries(GEAR)) {
       for (const layer of s) {
         expect(layer.src, id).toBe('noise'); // (a ringing is a tone; the bail and the buckle were tones)
@@ -281,7 +281,7 @@ describe('the body, heard', () => {
   });
 });
 
-describe('the footsteps, understated (round 83)', () => {
+describe('the footsteps heard again (round 124; round 83 had them understated)', () => {
   /** The gains of the recorded footfalls of a walk of `seconds` at `speed`, over snow (the ground's feel taken out). */
   function walk(speed: number, seconds = 10, room?: () => Echo | undefined) {
     const r = rig('mountains', 'snow', undefined, 110, room);
@@ -290,9 +290,14 @@ describe('the footsteps, understated (round 83)', () => {
     return { steps, gains: steps.map((p) => p.o.gain! / FEEL.snow!.gain) };
   }
 
-  it('each step is quieter than round 80\'s at every pace, a creep quietest and a sprint the loudest', () => {
-    const oldLevel = (speed: number): number => 0.55 + 0.45 * Math.min(1, speed / 6.4);
-    for (const speed of [1.5, 2.2, 3, 4.2, 5.5, 6.4, 8]) expect(stepLevel(speed), `${speed} m/s`).toBeLessThan(oldLevel(speed) * 0.7); // at least 3 dB under
+  it('each step is back at round 80\'s level at every pace (round 83\'s was all but unheard), a creep quietest and a sprint the loudest', () => {
+    const round80 = (speed: number): number => 0.55 + 0.45 * Math.min(1, speed / 6.4);
+    const round83 = (speed: number): number => 0.26 + 0.32 * Math.min(1, speed / 6.4);
+    for (const speed of [1.5, 2.2, 3, 4.2, 5.5, 6.4, 8]) {
+      expect(stepLevel(speed), `${speed} m/s`).toBeGreaterThan(round80(speed) * 0.95); // (within half a decibel of round 80)
+      expect(stepLevel(speed), `${speed} m/s`).toBeLessThan(round80(speed) * 1.06);
+      expect(stepLevel(speed) * STEP_VOICE.settle.floor, `${speed} m/s settled`).toBeGreaterThan(round83(speed) * 1.3); // (settled into the longest walk, still over 2 dB above round 83)
+    }
     expect(stepLevel(2.2)).toBeLessThan(stepLevel(4.2));
     expect(stepLevel(4.2)).toBeLessThan(stepLevel(6.4));
     expect(stepLevel(6.4)).toBeCloseTo(STEP_VOICE.level[1]);
@@ -316,7 +321,7 @@ describe('the footsteps, understated (round 83)', () => {
     const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
     for (const gain of gains) {
       expect(gain).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-9);
-      expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) - 1e-9);
+      expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) * settleGain(10.5) - 1e-9); // (ten seconds in, the ear has just begun to settle)
     }
     const [first, second] = [gains.filter((_, i) => i % 2 === 0), gains.filter((_, i) => i % 2 === 1)]; // (the feet take turns)
     const [soft, firm] = [Math.min(mean(first), mean(second)), Math.max(mean(first), mean(second))];
@@ -336,15 +341,18 @@ describe('the footsteps, understated (round 83)', () => {
     }
   });
 
-  it('the steps of a failing mind keep under the investigator\'s own, which are quieter now', () => {
-    expect(FOOT_GAIN.phantom).toBeLessThan(0.15);
+  it('the steps of a failing mind keep under the investigator\'s own, and came back up with them', () => {
+    expect(FOOT_GAIN.phantom).toBeLessThan(0.25);
+    expect(FOOT_GAIN.phantom).toBeGreaterThan(0.15); // (round 83's 0.12 was set beside its quieter steps)
     expect(MIND_EARS.tread.gain[1]).toBeLessThanOrEqual(STEP_VOICE.level[1] * 0.45);
+    expect(MIND_EARS.tread.gain[0]).toBeGreaterThan(0.2);
     expect(MIND_EARS.tread.last.gain).toBeLessThan(MIND_EARS.tread.gain[1] * 1.3);
   });
 
-  it('a backstep\'s scuffs are no louder than a sprint\'s step', () => {
+  it('a backstep\'s scuffs are no louder than a sprint\'s step, and a soaked stride\'s splash under round 80\'s', () => {
     expect(STEP_VOICE.backstep).toBeLessThanOrEqual(STEP_VOICE.level[1]);
     expect(STEP_VOICE.splash).toBeLessThan(0.32);
+    expect(STEP_VOICE.splash).toBeGreaterThan(0.2);
   });
 
   it('the recipe laid over a step keeps under the recording at every pace, on both feet', () => {
@@ -353,6 +361,119 @@ describe('the footsteps, understated (round 83)', () => {
     const recipes = r.heard.filter((h) => h.key.startsWith('foot:snow'));
     expect(recipes.length).toBeGreaterThanOrEqual(30);
     for (const h of recipes) expect(h.gain).toBeLessThanOrEqual(FOOT_GAIN.steps * stepLevel(4.2) * (1 + 1e-9));
+  });
+});
+
+describe('a long walk is easy on the ear without going quiet (round 124)', () => {
+  const S = STEP_VOICE.settle;
+
+  it('the ear settles: whole for the first seconds of a walk, then easing smoothly to a floor a couple of decibels down; back as fast as it went, four times over, once the walk stops; whole again on new ground', () => {
+    expect(settleGain(0)).toBe(1);
+    expect(settleGain(S.after)).toBe(1);
+    expect(settleGain(S.after + S.over)).toBeCloseTo(S.floor);
+    expect(settleGain(1e6)).toBeCloseTo(S.floor);
+    expect(S.floor).toBeGreaterThanOrEqual(0.75); // (never more than 2.5 dB: the walk must still be heard)
+    let prev = 1;
+    for (let t = 0; t <= S.after + S.over + 5; t += 0.5) {
+      expect(settleGain(t)).toBeLessThanOrEqual(prev + 1e-12);
+      expect(prev - settleGain(t)).toBeLessThan(0.02); // (no step in it the ear could catch)
+      prev = settleGain(t);
+    }
+    let busy = 0;
+    for (let i = 0; i < 600; i++) busy = settleStep(busy, 0.1, true);
+    expect(busy).toBe(S.after + S.over); // (held at the end of the ease: a stop undoes it soon)
+    for (let i = 0; i < 10 * (S.over / S.recover); i++) busy = settleStep(busy, 0.1, false);
+    expect(busy).toBeLessThanOrEqual(S.after); // (the ease is undone in over / recover seconds of standing)
+    expect(settleGain(busy)).toBe(1);
+    expect(settleAnew(30)).toBe(S.after);
+    expect(settleAnew(2)).toBe(2);
+  });
+
+  it('a minute\'s walk over one ground eases its steps toward the floor; a stop of a few seconds and the next walk is heard whole', () => {
+    const r = rig('mountains', 'snow', undefined, 110);
+    for (let leg = 0; leg < 6; leg++) r.tick(10, 30, leg % 2 ? Math.PI : 0); // (back and forth along a run of snow, without a stop: a minute at 3 m/s)
+    const snow = (ps: Played[]): number[] => ps.filter((p) => p.o.pitch === FEEL.snow!.pitch).map((p) => p.o.gain! / FEEL.snow!.gain / stepLevel(3));
+    const all = snow(recorded(r));
+    const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
+    expect(all.length).toBeGreaterThan(100);
+    const [first, last] = [mean(all.slice(0, 20)), mean(all.slice(-20))];
+    expect(last / first).toBeLessThan(0.86); // (settled)
+    expect(last / first).toBeGreaterThan(S.floor - 0.06); // (but not past the floor)
+    r.tick(S.over / S.recover + 1, 0); // stood still (the walk's end drawn up as it stops: not counted)
+    const before = r.played.length;
+    r.tick(3, 9, 0);
+    const again = snow(recorded({ played: r.played.slice(before) }));
+    expect(again.length).toBeGreaterThan(5);
+    expect(mean(again.slice(0, 8)) / first).toBeGreaterThan(0.93); // (whole again)
+  });
+
+  it('each foot is heard a little to its own side, by turns', () => {
+    expect(footPan(1)).toBeCloseTo(STEP_VOICE.spread);
+    expect(footPan(-1)).toBeCloseTo(-STEP_VOICE.spread);
+    expect(STEP_VOICE.spread).toBeGreaterThan(0);
+    expect(STEP_VOICE.spread).toBeLessThanOrEqual(0.15); // (a step is the body's, not off in the room)
+    const r = rig('mountains', 'snow', undefined, 110);
+    r.tick(5, 20);
+    const pans = recorded(r).map((p) => p.o.pan!);
+    expect(pans.length).toBeGreaterThan(10);
+    pans.forEach((pan, i) => {
+      expect(Math.abs(pan)).toBeCloseTo(STEP_VOICE.spread);
+      if (i > 0) expect(Math.sign(pan)).toBe(-Math.sign(pans[i - 1]!));
+    });
+  });
+
+  it('a walk that stops draws its trailing foot up once, softly and duller; a shuffle, a roll or a ride does not', () => {
+    const P = STEP_VOICE.plant;
+    const r = rig('mountains', 'snow', undefined, 110);
+    r.tick(3, 9);
+    const walked = recorded(r);
+    r.tick(1.5, 0);
+    const after = recorded(r).slice(walked.length);
+    expect(after).toHaveLength(1);
+    const plant = after[0]!;
+    const steps = walked.map((p) => p.o.gain!);
+    expect(plant.o.gain!).toBeLessThan(Math.max(...steps) * (P.gain + 0.08));
+    expect(plant.o.gain!).toBeGreaterThan(Math.min(...steps) * P.gain * 0.7);
+    expect(plant.o.lowpass!).toBeLessThanOrEqual(P.lowpass);
+    expect(plant.o.delay).toBeUndefined(); // (not a step from the dark)
+    expect(Math.sign(plant.o.pan!)).toBe(-Math.sign(walked[walked.length - 1]!.o.pan!)); // (the other foot)
+    r.tick(2, 0);
+    expect(recorded(r).length).toBe(walked.length + 1); // (once)
+    const shuffle = rig('mountains', 'snow', undefined, 110);
+    shuffle.tick(0.6, 1.5);
+    const n = recorded(shuffle).length;
+    shuffle.tick(1.5, 0);
+    expect(recorded(shuffle).length).toBe(n);
+    const ride = rig('mountains', 'snow', undefined, 110);
+    ride.tick(3, 9);
+    const m = recorded(ride).length;
+    ride.g.player.mount.active = 'grey';
+    ride.tick(1.5, 0);
+    expect(recorded(ride).length).toBe(m);
+  });
+
+  it('the cloth comes after strides drawn afresh: a brush of the coat now and then at a walk, under the run\'s swing; the coat and the pack at a run', () => {
+    let seed = 7;
+    const rand = (): number => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 2 ** 32);
+    const r = rig('mountains', 'snow', rand, 110);
+    r.tick(2, 0);
+    r.tick(20, 60);
+    const strides = keys(r, 'foot:snow');
+    const rustles = r.heard.filter((h) => h.key === 'gear:rustle');
+    expect(rustles.length).toBeGreaterThanOrEqual(Math.floor(strides / BODY.rustleEvery[1]) - 1);
+    expect(rustles.length).toBeLessThanOrEqual(Math.ceil(strides / BODY.rustleEvery[0]) + 1);
+    for (const h of rustles) expect(h.gain).toBeLessThan(FOOT_GAIN.gear * 0.8 * 0.75); // (under the run's swing)
+    expect(keys(r, 'gear:coat')).toBe(1); // (the setting off)
+    r.g.player.sprinting = true;
+    const before = r.heard.length;
+    r.tick(8, 53, Math.PI); // (back along the same snow)
+    const run = r.heard.slice(before);
+    const at = (key: string): number[] => run.flatMap((h, i) => (h.key === key ? [run.slice(0, i).filter((x) => x.key === 'foot:snow').length] : []));
+    const coats = at('gear:coat');
+    const gaps = coats.slice(1).map((c, i) => c - coats[i]!);
+    expect(coats.length).toBeGreaterThan(8);
+    expect(new Set(gaps).size).toBeGreaterThan(1); // (not every third stride, as round 83 had it)
+    for (const gap of gaps) expect(gap >= BODY.coatEvery[0] && gap <= BODY.coatEvery[1], `${gap}`).toBe(true);
   });
 });
 
@@ -411,7 +532,7 @@ describe('a room answers the footfall (round 83)', () => {
   });
 });
 
-describe('inside a dungeon the steps are lifted, in the open they are as round 83 left them (round 86)', () => {
+describe('inside a dungeon the steps are lifted a little over the open air\'s (round 86; round 124 with the open air restored)', () => {
   /** A walk through a room at 4.2 m/s, 12 m along +x from `from` metres inside its west wall. */
   function inRoom(floors: readonly string[], rand?: () => number) {
     const room = findRoom(floors)!;
@@ -423,8 +544,9 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
     return r;
   }
 
-  it('only a dungeon room\'s floor is lifted: the open air, the road and the shallows keep what they had', () => {
+  it('only a dungeon room\'s floor is lifted: the open air, the road and the shallows keep what they have', () => {
     expect(STEP_VOICE.indoors).toBeGreaterThan(1);
+    expect(STEP_VOICE.indoors).toBeLessThan(1.26); // (a little: under 2 dB, now that the open air's steps are heard again)
     expect(indoorLift(true)).toBe(STEP_VOICE.indoors);
     expect(indoorLift(false)).toBe(1);
     for (const open of ['dirt', 'road', 'water', 'stone'] as const) expect(stepGain(open), open).toBe(STEP_VOICE.surface[open]?.gain ?? 1); // (the recording's own softening, as round 83 had it, lifted or not by where the body stands)
@@ -432,7 +554,7 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
     expect(stepGain('dirt', true)).toBe(STEP_VOICE.indoors); // (a lift is a lift: only indoorsAt decides where it is asked for)
     expect(stepGain('road')).toBe(STEP_VOICE.surface.road!.gain);
     expect(stepGain('water')).toBe(STEP_VOICE.surface.water!.gain);
-    expect(STEP_VOICE.level).toEqual([0.26, 0.58]); // (the pace curve is round 83's, for the open air and the room alike)
+    expect(STEP_VOICE.level).toEqual([0.55, 1]); // (the pace curve is round 80's again, for the open air and the room alike)
   });
 
   it('the ground inside a dungeon\'s bounding rectangle but off its floors is the open air\'s: not lifted, though its recording is the stone\'s', () => {
@@ -452,7 +574,7 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
     for (const p of steps) expect(p.o.gain!).toBeLessThanOrEqual(stepLevel(4.2) * (1 + STEP_VOICE.jitter) + 1e-6); // (the open air's bound, no lift)
   });
 
-  it('a walk through a room of stone is back at round 80\'s level, each step within the lift of the open air\'s bounds, the second foot softer', () => {
+  it('a walk through a room of stone is a little over round 80\'s and the open air\'s, each step within the lift of the open air\'s bounds, the second foot softer', () => {
     const r = inRoom(['slab', 'stone', 'rock']);
     const steps = recorded(r).filter((p) => p.set === SAMPLE_SETS.stepStone);
     expect(steps.length).toBeGreaterThanOrEqual(9);
@@ -462,13 +584,13 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
       expect(gain).toBeGreaterThanOrEqual(stepLevel(4.2) * STEP_VOICE.offFoot * (1 - STEP_VOICE.jitter) * STEP_VOICE.indoors - 1e-6);
     }
     const mean = gains.reduce((a, b) => a + b, 0) / gains.length;
-    const oldWalk = 0.55 + 0.45 * (4.2 / 6.4); // (round 80: the walk at 0.85)
-    expect(mean).toBeGreaterThan(oldWalk * 0.85); // (the lilt between the feet takes a little)
-    expect(mean).toBeLessThan(oldWalk * 1.05);
-    expect(mean).toBeGreaterThan(stepLevel(4.2) * 1.5); // ...and well over what the open air gets
-    expect(STEP_VOICE.indoors * stepLevel(4.2)).toBeGreaterThan(oldWalk * 0.97);
-    expect(STEP_VOICE.indoors * stepLevel(4.2)).toBeLessThan(oldWalk * 1.03); // (a walk back where round 80 had it)
-    expect(STEP_VOICE.indoors * STEP_VOICE.level[1]).toBeLessThan(1.1); // (a sprint no louder than round 80\'s)
+    const oldWalk = 0.55 + 0.45 * (4.2 / 6.4); // (round 80: the walk at 0.85, the open air's and the room's alike)
+    expect(mean).toBeGreaterThan(oldWalk * 0.88); // (the lilt between the feet takes a little)
+    expect(mean).toBeLessThan(oldWalk * 1.2);
+    expect(mean).toBeGreaterThan(stepLevel(4.2) * 0.97); // ...and over what the open air gets, for all the lilt
+    expect(STEP_VOICE.indoors * stepLevel(4.2)).toBeGreaterThan(oldWalk);
+    expect(STEP_VOICE.indoors * stepLevel(4.2)).toBeLessThan(oldWalk * 1.26); // (under 2 dB over round 80's walk)
+    expect(STEP_VOICE.indoors * STEP_VOICE.level[1]).toBeLessThan(1.26); // (and a sprint the same)
   });
 
   it('the room still answers it, the returns a share of the louder step', () => {
@@ -489,7 +611,7 @@ describe('inside a dungeon the steps are lifted, in the open they are as round 8
     expect(recipes.length).toBeGreaterThanOrEqual(9);
     const [most, bound] = [Math.max(...recipes.map((h) => h.gain)), FOOT_GAIN.steps * stepLevel(4.2) * STEP_VOICE.indoors];
     expect(most).toBeLessThanOrEqual(bound * (1 + 1e-9));
-    expect(most).toBeGreaterThan(FOOT_GAIN.steps * stepLevel(4.2) * 1.5); // (more than the open air\'s ever gets)
+    expect(most).toBeGreaterThan(FOOT_GAIN.steps * stepLevel(4.2) * 1.05); // (more than the open air\'s ever gets)
     const board = recorded(r).filter((p) => p.set === SAMPLE_SETS.stepStone);
     expect(board.length).toBe(recipes.length); // (one recipe a footfall, as in the open)
     for (const h of recipes) expect(h.gain).toBeLessThan(0.45 * 1.3);
