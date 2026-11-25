@@ -110,6 +110,22 @@ because a Steam build started outside Steam would relaunch itself through it.
 - **Not checked:** an actual push (it needs the key and the project), the itch app launching the universal `.app`, and a Mac download
   through a browser.
 
+### Brassbound Motor Car for itch.io
+
+1. Run **Actions → Release builds → Run workflow** from a ref containing DLC import. Enable `itch`, leave `demo`
+   off, set `itch_target` to `digitaldro/seventy-steps`, and set `itch_version` to `1.4.4` for the first compatible
+   release. Check that the Windows, macOS and Linux uploads all complete and are available on the base game page.
+2. The buyer archive is `Brassbound-Motor-Car.zip`. It contains `brassbound-motor-car.seventysteps-dlc` and the
+   [README.txt](../packaging/itch-dlc/README.txt) and [LICENSE.txt](../packaging/itch-dlc/LICENSE.txt) at the ZIP root.
+   Keep the unlock file and archive in private release storage outside Git and public build artifacts.
+3. In the standalone car project's itch editor, set the project to **Downloadable** and **Paid** with a **$1.00**
+   minimum. Under **Uploads**, use **Upload files** to send the ZIP. Link the [base game](https://digitaldro.itch.io/seventy-steps)
+   on the listing and state that it requires the full itch desktop release v1.4.4 or later. The
+   [listing template](CAR_DLC_UPLOAD_TEMPLATE.md) includes the buyer instructions.
+4. Keep the DLC page in draft while testing. Start the updated base game with a fresh OS user profile, confirm the
+   car requires an import, and test using the ZIP downloaded from itch. Check that a valid import survives a restart,
+   The Borrowed Reins still gates selection, and the car can be selected and summoned on clear ground after the quest.
+
 ## The demo (round 56; stripped bundle packaging fixed)
 
 The demo is a stripped build of its own (`npm run build:demo`, `docs/DEMO_BUILD.md`) that leaves out the rest of the game's

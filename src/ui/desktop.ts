@@ -18,8 +18,9 @@ export interface Desktop {
   openLogs?(): Promise<void>; // the logs folder, shown
   openPage?(): Promise<void>; // the game's page, in the player's browser (round 56)
   achieve?(id: string): Promise<boolean>; // an achievement earned, for Steam's (round 12)
-  ownsAutomobileDlc?(): Promise<boolean>; // current Steam ownership + installation of the cosmetic automobile; absent on web
-  ownsChariotDlc?(): Promise<boolean>; // the spectral chariot, read the same way
+  ownsAutomobileDlc?(): Promise<boolean>; // current Steam or itch entitlement; absent on web
+  ownsChariotDlc?(): Promise<boolean>; // the spectral chariot's Steam entitlement
+  importAutomobileDlc?(): Promise<'imported' | 'invalid' | 'error' | 'canceled'>; // opens the native file picker in the full itch build
 }
 
 export const desktop: Desktop | undefined = (globalThis as { desktop?: Desktop }).desktop;

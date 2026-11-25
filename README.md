@@ -48,9 +48,9 @@ teleport moves the investigator in the current game and can be saved; demo bound
 
 Speak with Peaslee, then find the Sleeper’s Sign to complete **The Borrowed Reins** and unlock the plain chariot,
 one horse drawing a wooden coach of the spectral chariot's pattern. Choose a mount at an Elder Sign’s Mounts tab; hold the dodge button while moving to gallop.
-The spectral chariot and the $0.99 automobile are optional appearances with the same traversal. Their Steam DLCs need
-release configuration before either can be owned: [`docs/MOUNTS.md`](docs/MOUNTS.md).
-Inspect the three animated models in the read-only coach house at `?mounts`. The automobile follows a researched
+The optional Brassbound Motor Car has the same traversal. The full itch.io desktop build accepts its unlock file
+under **Mounts → Import DLC**. The Steam build checks Steam ownership and installation. See [mounts](docs/MOUNTS.md).
+Inspect the animated models in the read-only coach house at `?mounts`. The automobile follows a researched
 circa-1914 touring design within the requested 1890–1940 range: [`reference research`](docs/MOUNT_CAR_REFERENCES.md).
 
 ## Saves

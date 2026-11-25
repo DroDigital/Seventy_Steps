@@ -58,6 +58,24 @@ describe('the optional cosmetic automobile DLC', () => {
     expect(await bridge!.ownsChariotDlc()).toBe(true);
     expect(invoke).toHaveBeenLastCalledWith('desktop:chariot-dlc');
   });
+
+  it('only offers the local DLC picker when the shell enables it', async () => {
+    type Bridge = { importAutomobileDlc?: () => Promise<string> };
+    const invoke = vi.fn((channel: string) => Promise.resolve(channel === 'desktop:pads-get' ? [] : 'imported'));
+    const runPreload = new Function('require', 'process', readFileSync('desktop/preload.cjs', 'utf8'));
+    function bridgeFor(argv: string[]): Bridge {
+      let bridge: Bridge = {};
+      runPreload(() => ({
+        contextBridge: { exposeInMainWorld: (_key: string, value: Bridge) => { bridge = value; } },
+        ipcRenderer: { on: vi.fn(), invoke },
+      }), { argv });
+      return bridge;
+    }
+
+    expect(bridgeFor([]).importAutomobileDlc).toBeUndefined();
+    expect(await bridgeFor(['--import-automobile-dlc']).importAutomobileDlc?.()).toBe('imported');
+    expect(invoke).toHaveBeenLastCalledWith('desktop:import-automobile-dlc');
+  });
 });
 
 describe('the optional spectral chariot DLC', () => {
