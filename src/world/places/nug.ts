@@ -10,7 +10,7 @@
 import { HOUSE, type House } from '../../data/arenaHouses';
 import type { PlaceFn } from '../enclosurePlace';
 import type { Court, Put } from '../placeKit';
-import { rectOutline, wallRect } from './common';
+import { column, rectOutline, wallRect } from './common';
 import { shaped, strip, SURFACE, type PoolSpec } from './water';
 
 const BASALT: Put = { tint: [0.22, 0.22, 0.28], keep: 0.25 };
@@ -29,6 +29,10 @@ export const nug: PlaceFn = (c: Court, h: House) => {
   const ground = shaped(c, [channel(-1), channel(1)]);
   const surfY = -0.9 * SURFACE;
   wallRect(c, 'tp_wall_mid', G, S, B, gate, { ...BASALT, stretch: [1, 1, 3.6], height: 6.4 });
+  for (const side of [-1, 1]) { // flanking basalt gate columns framing the 8 m gate and closing the wall ends
+    const top = column(c, G, side * (h.gate.width / 2 + 1.3), 2, { ...BASALT, s: 1.35 });
+    c.add('px_brazier', G, side * (h.gate.width / 2 + 1.3), { y: top, s: 1.4, tint: [0.3, 0.26, 0.28], keep: 0.4, lit: 'fire', walk: true });
+  }
 
   // a tower at each corner of the wall, a fire on its top
   for (const [a, cc] of [[G - 3.4, S - 3.4], [G - 3.4, -S + 3.4], [-B + 3.4, S - 3.4], [-B + 3.4, -S + 3.4]] as const) {

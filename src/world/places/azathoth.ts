@@ -48,8 +48,12 @@ export const azathoth: PlaceFn = (c: Court, h: House) => {
     c.add('px_globes', Math.cos(th) * (c.R + 8), Math.sin(th) * (c.R + 8), { tint: [0.34, 0.3, 0.6], keep: 0.8, s: 1.4, round: true, turn: i * 61 });
   }
 
-  // posts of black stone either side of the way in
-  for (const side of [-1, 1]) c.add('px_obelisk', G + 1.5, side * (gate + 3.8), { ...BLACK, s: 1.3, face: 'front' });
+  // posts of black stone either side of the way in: tall monoliths framing the 12 m gate and obelisks beyond them
+  for (const side of [-1, 1]) {
+    c.add('px_monolith', G, side * (h.gate.width / 2 + 1.75), { ...BLACK, face: 'front', s: 1.45, height: 13.6 });
+    c.add('px_sphere', G, side * (h.gate.width / 2 + 1.75), { y: 14.5, s: 0.55, tint: [0.78, 0.8, 1], keep: 0.9, walk: true, round: true });
+    c.add('px_obelisk', G + 1.5, side * (gate + 3.8), { ...BLACK, s: 1.3, face: 'front' });
+  }
 
   // what crosses the floor: low clouds of nothing, a white ember falling, a cold light at the gate
   c.emit({ at: [0, 0], y: [0.1, 2], r: c.R + 8, rate: 7, life: [6, 10], size: [4, 7], grow: 1.6, colour: [0.2, 0.18, 0.3], alpha: 0.2, drift: 0.5, flow: { x: 0.5, z: 0.4 }, shape: 'wisp', reach: 150 });

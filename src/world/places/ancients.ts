@@ -37,6 +37,7 @@ export const ancients: PlaceFn = (c: Court, h: House) => {
       c.add('px_prism', a, cc, { ...PALE, s: 1.6, height: i === 0 ? 12.5 : 7.2, face: 'in', turn: 30 });
     }
   }
+  for (const side of [-1, 1]) c.add('px_prism', G, side * (h.gate.width / 2 + 2.4), { ...PALE, s: 1.6, height: 10.6, face: 'front' }); // tall flanking prisms framing the 9 m gate
 
   // the floor: hexagonal tiles laid edge to edge in the ring between the fight and the walls
   for (let j = -7; j <= 7; j++) {

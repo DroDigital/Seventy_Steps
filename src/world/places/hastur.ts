@@ -10,6 +10,7 @@
 import { HOUSE, type House } from '../../data/arenaHouses';
 import type { PlaceFn } from '../enclosurePlace';
 import type { Court, Put } from '../placeKit';
+import { column } from './common';
 
 const STONE: Put = { tint: [0.74, 0.7, 0.8], keep: 0.5 };
 const GHOST: Put = { tint: [0.72, 0.74, 0.9], keep: 0.3 };
@@ -32,10 +33,11 @@ export const hastur: PlaceFn = (c: Court, h: House) => {
     c.run('tp_wall_mid', polar(CORNER, deg - 10), polar(CORNER, deg + 10), { ...STONE, stretch: [1, 3.8, 4], height: 9 });
   }
 
-  // the passage's mouth: a wall from each wedge's corner in to the gate, so the way narrows to the door
+  // the passage's mouth: a wall from each wedge's corner in to the gate, capped by tall piers framing the 10 m gate
   for (const side of [-1, 1]) {
     const [a, cc] = polar(CORNER, 30);
     c.run('tp_wall_mid', [G, side * gate], [a, side * cc], { ...STONE, stretch: [1, 3.8, 4], height: 9 });
+    column(c, G, side * (h.gate.width / 2 + 1.35), 3, { ...STONE, s: 1.45 });
     c.add('px_brazier', G - 9, side * 4.1, { y: 0, s: 1.6, tint: [0.4, 0.38, 0.46], keep: 0.4, lit: 'torch' });
     c.add('px_brazier', G - 17, side * 4.9, { y: 0, s: 1.6, tint: [0.4, 0.38, 0.46], keep: 0.4, lit: 'torch' });
     c.add(side > 0 ? 'tp_flag_eclipse' : 'tp_flag_moon', G - 1.4, side * (gate + 0.7), { y: 3.2, face: 'front', turn: 180, stretch: [1, 1.6, 1], s: 1.8, walk: true });

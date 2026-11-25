@@ -48,6 +48,8 @@ export const yig: PlaceFn = (c: Court, h: House) => {
       c.add('px_fang', G + 0.4 + 12.6 * t, side * (gate + 0.5 + 9.5 * t - 2.1), { tint: [0.85, 0.82, 0.7], keep: 0.9, face: 'front', turn: side * -25, s: 1.1 + (i % 2) * 0.4 });
     }
     c.add('px_fang_big', G + 0.2, side * (gate + 2.1), { tint: [0.85, 0.82, 0.7], keep: 0.9, face: 'front', turn: side * 90, s: 1.15 });
+    const top = column(c, G, side * (h.gate.width / 2 + 1.15), 2, { ...SAND, s: 1.05 });
+    c.add('px_brazier', G, side * (h.gate.width / 2 + 1.15), { y: top, s: 1.1, tint: [0.4, 0.34, 0.28], keep: 0.5, lit: 'fire', walk: true });
     c.add('px_sphere', G + 13.5, side * (gate + 10.2), { tint: [0.8, 0.9, 0.3], keep: 0.4, s: 0.9, y: 2.3, round: true, walk: true });
   }
 
