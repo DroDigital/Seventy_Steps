@@ -26,6 +26,7 @@ on:
       - '.github/workflows/release-builds.yml'
   push:
     tags: ['v*']
+    branches: ['codex/publish-brassbound-itch-1.4.4']
   workflow_dispatch:
     inputs:
       itch:
@@ -61,10 +62,10 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - run: npm run ${{ inputs.demo && 'package:demo:win' || 'package:win' }} -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+      - run: npm run ${{ inputs.demo && 'package:demo:win' || 'package:win' }} -- ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '-c.extraMetadata.channel=itch' || '' }}
         shell: bash
       - name: Starts, and reaches its title
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
+        run: node tools/smoke_packaged.mjs ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
       - name: The executable wears the Elder Sign (its icon, 32 px, is printed as base64 for the log)
         shell: pwsh
         run: |
@@ -91,12 +92,12 @@ jobs:
           retention-days: 7
           compression-level: 0
       - name: Push to itch.io
-        if: ${{ inputs.itch }}
+        if: ${{ inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' }}
         shell: bash
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          ITCH_TARGET: ${{ inputs.itch_target }}
-          ITCH_VERSION: ${{ inputs.itch_version }}
+          ITCH_TARGET: ${{ inputs.itch_target || 'digitaldro/seventy-steps' }}
+          ITCH_VERSION: ${{ github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' && '1.4.4' || inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only windows --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only windows --get-butler; fi
@@ -131,14 +132,14 @@ jobs:
           IDENTITY="$(security find-identity -v -p codesigning "$KEYCHAIN" | grep 'Developer ID Application' | head -1 | sed -E 's/.*"(.*)"/\1/')"
           [ -n "$IDENTITY" ] || { echo "::error::that certificate holds no Developer ID Application identity"; exit 1; }
           echo "MAC_SIGN_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
-      - run: npm run ${{ inputs.demo && 'package:demo:mac' || 'package:mac' }} -- ${{ inputs.itch && '--channel itch' || '' }}
+      - run: npm run ${{ inputs.demo && 'package:demo:mac' || 'package:mac' }} -- ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }}
       - name: Starts, and reaches its title (Apple Silicon)
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: node tools/smoke_packaged.mjs ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --app "release/mac-arm64/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: Starts under Rosetta (Intel)
         run: |
           arch -x86_64 /usr/bin/true || softwareupdate --install-rosetta --agree-to-license
           arch -x86_64 /usr/bin/true
-          node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --arch x86_64 --verbose --timeout 600 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+          node tools/smoke_packaged.mjs ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --arch x86_64 --verbose --timeout 600 --app "release/mac/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: One app for both (notarised when the Apple secrets are set)
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -146,7 +147,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: node tools/package_mac.mjs --universal --no-build
       - name: Universal app starts
-        run: node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
+        run: node tools/smoke_packaged.mjs ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }} --verbose --timeout 90 --app "release/mac-universal/Seventy Steps.app/Contents/MacOS/Seventy Steps"
       - name: The Mac apps wear the Elder Sign (each icon, 48 px, is printed as base64 for the log)
         run: |
           for d in mac-arm64 mac mac-universal; do
@@ -185,11 +186,11 @@ jobs:
           retention-days: 7
           compression-level: 0
       - name: Push to itch.io
-        if: ${{ inputs.itch }}
+        if: ${{ inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' }}
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          ITCH_TARGET: ${{ inputs.itch_target }}
-          ITCH_VERSION: ${{ inputs.itch_version }}
+          ITCH_TARGET: ${{ inputs.itch_target || 'digitaldro/seventy-steps' }}
+          ITCH_VERSION: ${{ github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' && '1.4.4' || inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only osx --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only osx --get-butler; fi
@@ -207,11 +208,11 @@ jobs:
       - name: Verify stripped demo holds no full-game content
         if: ${{ inputs.demo }}
         run: npm run check:demo
-      - run: npm run ${{ inputs.demo && 'package:demo:linux' || 'package:linux' }} -- ${{ inputs.itch && '-c.extraMetadata.channel=itch' || '' }}
+      - run: npm run ${{ inputs.demo && 'package:demo:linux' || 'package:linux' }} -- ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '-c.extraMetadata.channel=itch' || '' }}
       - name: Starts, and reaches its title
         env:
           SMOKE_SOFTWARE_GL: '1' # no GPU here
-        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs ${{ inputs.itch && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
+        run: xvfb-run -a -s "-screen 0 1280x720x24" node tools/smoke_packaged.mjs ${{ (inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4') && '--channel itch' || '' }} ${{ inputs.demo && '--edition demo' || '' }}
       - name: Pack the depot (tar keeps the executable bit)
         run: tar -czf seventy-steps-linux.tar.gz -C release linux-unpacked
       - uses: actions/upload-artifact@v4
@@ -221,11 +222,33 @@ jobs:
           retention-days: 7
           compression-level: 0
       - name: Push to itch.io
-        if: ${{ inputs.itch }}
+        if: ${{ inputs.itch || github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' }}
         env:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-          ITCH_TARGET: ${{ inputs.itch_target }}
-          ITCH_VERSION: ${{ inputs.itch_version }}
+          ITCH_TARGET: ${{ inputs.itch_target || 'digitaldro/seventy-steps' }}
+          ITCH_VERSION: ${{ github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' && '1.4.4' || inputs.itch_version }}
         run: |
           if [ -n "$BUTLER_API_KEY" ]; then node tools/itch_push.mjs --only linux --get-butler --run
           else echo "::warning::No BUTLER_API_KEY secret: nothing was sent to itch.io (the plan only)"; node tools/itch_push.mjs --only linux --get-butler; fi
+
+  itch-car-draft:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/codex/publish-brassbound-itch-1.4.4' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Check the car listing exists in the creator account
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          node --input-type=module <<'JS'
+          const key = process.env.BUTLER_API_KEY;
+          if (!key) throw Error('The workflow has no Butler credential.');
+          const res = await fetch('https://api.itch.io/profile/games', { headers: { Authorization: `Bearer ${key}` } });
+          if (!res.ok) throw Error(`itch.io profile listing returned HTTP ${res.status}.`);
+          const { games } = await res.json();
+          const car = games.find(({url}) => /^https?:\/\/digitaldro\.itch\.io\/seventy-steps-+the-brassbound-motor-car\/?$/i.test(url));
+          console.log(car ? JSON.stringify({id: car.id, url: car.url, published: car.published, min_price: car.min_price}) : 'No matching Brassbound Motor Car project in this creator account.');
+          JS
