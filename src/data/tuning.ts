@@ -58,7 +58,7 @@ export const FX = {
   warpSlope: 0.3, // ...so at sanity 0 it warps 0.65 of what it did before round 22, and at the edge of Unmoored 0.6 (round 22 left it at 0.4)
   dreadFrom: 0.25, // what a failing mind does besides begins at this stress and grows to madness: the edges of sight lose their focus...
   blur: [0, 1.1] as Ramp, // ...by up to this many low-res pixels...
-  strange: [0, 1] as Ramp, // ...and the stars crawl, crowd and flicker (render/shaders/sky.ts)
+  strange: [0, 1] as Ramp, // ...and the stars crowd, flicker and take the wrong colour (render/shaders/sky.ts); how fast they spin is the true stress's alone (data/skyAir.ts WRONG_STARS, render/fx.ts spinOf)
   fovBreatheDeg: [0, 5] as Ramp, // (round 58: 7, and a pure sine: the lens drifts unevenly now, with the surges; render/warpWaves.ts)
   breatheHz: 0.23,
   skew: [0, 0.05] as Ramp, // horizontal shear per unit of screen height (round 58: 0.07)

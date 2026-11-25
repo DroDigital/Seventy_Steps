@@ -11,6 +11,7 @@
  */
 
 import { PRESSURE } from '../data/dreadPicture';
+import { WRONG_STARS } from '../data/skyAir';
 import { FX, RENDER, type Ramp } from '../data/tuning';
 import { driftAt, ringAt, surgeAt } from './warpWaves';
 
@@ -65,6 +66,7 @@ export interface FxParams {
   shockAt: number; // ...and how far it has gone, in picture heights
   blur: number; // low-res pixels the edges blur by
   strange: number; // 0..1: how wrong the stars are
+  spin: number; // radians a second the wrong stars spin about the zenith (`spinOf`): by the true stress, wild only at the last
   fovBreatheDeg: number;
   skew: number;
   detune: number; // cents
@@ -84,7 +86,7 @@ export const EFFECT_PARAMS: Record<EffectId, readonly (keyof FxParams)[]> = {
   warp: ['ripple', 'chroma', 'ghost', 'tear', 'shock', 'mind'],
   displace: ['displace'],
   lens: ['fovBreatheDeg', 'skew'],
-  dread: ['blur', 'strange'],
+  dread: ['blur', 'strange', 'spin'],
 };
 
 /** The effects that hold at every sanity. */
@@ -111,6 +113,15 @@ export const onsetOf = (stress: number): number => smooth(FX.calm, FX.warpCap, s
 
 /** How much the picture warps at `stress`: nothing until FX.calm, then in step with it up to FX.warpCap, past it only FX.warpSlope as fast (round 23). */
 export const warpOf = (stress: number): number => onsetOf(stress) * (Math.min(stress, FX.warpCap) + Math.max(0, stress - FX.warpCap) * FX.warpSlope);
+
+/**
+ * How fast the wrong stars spin at `stress`, radians a second (2026-11-25): none until WRONG_STARS.from, then doubling for every `halving` of the stress lost,
+ * to `most` at sanity 0, so the sky is still in a sound mind, turns slowly in an uneasy one and spins wildly only at the last. The true stress's alone.
+ */
+export const spinOf = (stress: number): number => {
+  const t = clamp01(stress);
+  return WRONG_STARS.most * 2 ** ((t - 1) / WRONG_STARS.halving) * smooth(WRONG_STARS.from, WRONG_STARS.from + WRONG_STARS.rise, t);
+};
 
 /**
  * The stress leaned toward madness by `pressure` (round 80): `lean` of the way to the whole of it at a pressure of 1, never past the cap. It is what the
@@ -158,6 +169,7 @@ export function computeFx(s: FxState): FxParams {
     shockAt: ring.radius,
     blur: on.dread ? at(FX.blur, smooth(FX.dreadFrom, 1, feltDread)) : 0,
     strange: on.dread ? at(FX.strange, smooth(FX.dreadFrom, 1, t)) : 0, // the stars follow the mind itself, not the pressure on it: a blow at full sanity leaves them be (2026-11-23)
+    spin: on.dread ? spinOf(t) : 0, // and so does their spin (2026-11-25)
     fovBreatheDeg: on.lens ? at(FX.fovBreatheDeg, wf) : 0,
     skew: on.lens ? at(FX.skew, wf) : 0,
     detune: at(FX.detune, t),
