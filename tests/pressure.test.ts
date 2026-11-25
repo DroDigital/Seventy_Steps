@@ -133,7 +133,7 @@ describe('the picture leans toward madness by the pressure (fx.ts)', () => {
     const calm = computeFx(state(100));
     const pressed = computeFx(state(100, 1));
     for (const key of ['ripple', 'chroma', 'ghost', 'fovBreatheDeg', 'skew', 'blur'] as const) expect(pressed[key]).toBeGreaterThan(calm[key]);
-    for (const sanity of [100, 80, 55, 30, 5]) expect(computeFx(state(sanity, 1)).strange).toBe(computeFx(state(sanity)).strange); // the stars keep to the true stress
+    for (const sanity of [100, 80, 55, 30, 5]) for (const key of ['strange', 'spin'] as const) expect(computeFx(state(sanity, 1))[key]).toBe(computeFx(state(sanity))[key]); // the stars and their spin keep to the true stress
     expect(pressed.felt).toBeCloseTo(PRESSURE.lean, 9);
     expect(pressed.heard).toBeCloseTo(PRESSURE.leanHeard, 9);
   });

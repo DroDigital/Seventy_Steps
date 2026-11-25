@@ -9,19 +9,13 @@ import type { FrameSummary } from '../core/frameStats';
 
 export interface Rung {
   resolution: number;
-  fog: number;
-  shadows: number;
 }
 
-/** From the default picture to the plainest it can draw; sharper resolutions remain a player's choice. */
+/** From the default picture to the lowest resolution; fog and shadows stay enabled, and sharper resolutions remain a player's choice. */
 export const LADDER: readonly Rung[] = [
-  { resolution: 1.6, fog: 1, shadows: 1 },
-  { resolution: 1.6, fog: 1, shadows: 0 },
-  { resolution: 1.6, fog: 0.75, shadows: 0 },
-  { resolution: 1.2, fog: 0.5, shadows: 0 },
-  { resolution: 0.8, fog: 0.5, shadows: 0 },
-  { resolution: 0.8, fog: 0.25, shadows: 0 },
-  { resolution: 0.8, fog: 0, shadows: 0 },
+  { resolution: 1.6 },
+  { resolution: 1.2 },
+  { resolution: 0.8 },
 ];
 
 export const QUALITY = {
@@ -33,7 +27,7 @@ export const QUALITY = {
 
 /** The rung the settings stand on now: the highest whose numbers the settings do not exceed. */
 export function rungOf(s: Rung): number {
-  const i = LADDER.findIndex((r) => r.resolution <= s.resolution && r.fog <= s.fog && r.shadows <= s.shadows);
+  const i = LADDER.findIndex((r) => r.resolution <= s.resolution);
   return i < 0 ? LADDER.length - 1 : i;
 }
 

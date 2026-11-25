@@ -9,6 +9,8 @@
  * Round 80: it answers the weather and the hours (render/atm/sky.ts): a cloud ceiling that closes in rain and storm (`uOver`) and a bank over the moon on a clear night (`uVeil`) with the thin cloud's ring,
  * a cloud belly lit by the lightning in its structure; an afterglow, a false dawn and stars that wheel (`uHour`, `uTurn`); heat lightning on a far horizon (`uHeat`); the moon swollen and soured by a failing mind,
  * and the Alignment, the stars fallen into the Elder Sign (`uOmen`; shaders/skyOmen.ts).
+ * 2026-11-25: a failing mind's stars spin about the zenith (`uCrawl`, summed on the CPU at the pace fx.ts `spinOf` sets: still in a sound mind, wild at the last),
+ * and a fast one is drawn with a streak behind it (`uTrail`, `stars`).
  */
 
 import { HOURS } from '../../data/hours';
@@ -39,9 +41,10 @@ uniform float uStars; // density
 uniform float uClouds; // cover
 uniform float uHaze; // the horizon's moonlit glow
 uniform float uOpen; // 0 under a roof or in a dungeon: the fog's colour alone
-uniform float uWrong; // 0..1: a failing mind's stars, which crawl, crowd and flicker
-uniform float uCrawl; // radians they have crawled: summed on the CPU at a pace by uWrong (sky.ts), so a change in the mind changes the pace, never the place
-uniform float uFlicker; // and the phase their flicker has quickened by, summed the same way
+uniform float uWrong; // 0..1: a failing mind's stars, which crowd, flicker and take the wrong colour
+uniform float uCrawl; // radians they have spun about the zenith: summed on the CPU at the pace the mind sets (sky.ts, fx.ts spinOf), so a change in it changes the pace, never the place
+uniform float uTrail; // radians of that spin a fast star's streak shows behind it (0: none; at most WRONG_STARS.streak)
+uniform float uFlicker; // the phase their flicker has quickened by, summed the same way
 uniform float uFlash; // a lightning stroke's light on the sky (lightning.ts)
 uniform float uMilky; // the Milky Way's strength
 uniform float uAurora; // the aurora's
@@ -121,6 +124,37 @@ vec3 wheel(vec3 d, float ang) {
   return d * c + cross(k, d) * sin(ang) + k * dot(k, d) * (1.0 - c);
 }
 
+#define STREAK_TAPS 24
+// The stars where the mind's spin has carried them (uCrawl, about the zenith) and the hours have wheeled them (uTurn, about the pole): a star is a lit cell
+// of their own frame. A fast one is drawn with a streak behind it: the places it passed in the last of its motion (uTrail), tapped under a star's width apart
+// and fading from the head. .x the light (0: none), .yzw the cell.
+vec4 stars(vec3 d) {
+  vec3 k = normalize(vec3(${HOURS.pole.map(F).join(', ')}));
+  float c = cos(uTurn);
+  mat3 wheelM = mat3(c) + sin(uTurn) * mat3(0.0, k.z, -k.y, -k.z, 0.0, k.x, k.y, -k.x, 0.0) + (1.0 - c) * outerProduct(k, k); // wheel(v, uTurn) as a matrix
+  float taps = 1.0;
+  float back = 0.0;
+  if (uTrail > 0.0) {
+    taps = min(1.0 + ceil(uTrail * sqrt(max(1.0 - d.y * d.y, 0.0)) * 230.0 / 0.7), float(STREAK_TAPS)); // a star travels uTrail x its circle's radius
+    back = uTrail / max(taps - 1.0, 1.0);
+  }
+  vec3 v = vec3(d.x * cos(uCrawl) - d.z * sin(uCrawl), d.y, d.x * sin(uCrawl) + d.z * cos(uCrawl)); // the head: where the spin has carried them
+  float cb = cos(back);
+  float sb = sin(back);
+  float thr = 1.0 - 0.006 * uStars * (1.0 + 2.2 * uWrong); // and they crowd in
+  vec4 best = vec4(0.0);
+  for (int i = 0; i < STREAK_TAPS; i++) {
+    if (float(i) >= taps) break;
+    vec3 cell = floor(wheelM * v * 230.0);
+    if (hash(cell) >= thr) {
+      float lit = (0.35 + 0.65 * hash(cell + 3.1)) * (1.0 - 0.75 * float(i) / max(taps - 1.0, 1.0));
+      if (lit > best.x) best = vec4(lit, cell);
+    }
+    v = vec3(v.x * cb + v.z * sb, v.y, v.z * cb - v.x * sb); // a step back along the spin: where they were
+  }
+  return best;
+}
+
 void main() {
   vec3 d = normalize(vDir);
   float h = d.y;
@@ -143,14 +177,14 @@ void main() {
   if (ov > 0.001) cloud = mix(cloud, smoothstep(0.1, 0.5, cn * 0.62 + cn2 * 0.38) * smoothstep(-0.03, 0.1, h), ov);
   if (uVeil > 0.001) cloud = max(cloud, clamp(uVeil * 1.35 * (1.0 - smoothstep(0.0, 0.62, a)) * (0.45 + 0.9 * cn2) * smoothstep(-0.03, 0.08, h), 0.0, 1.0)); // a bank, thickest at the moon
 
-  float turn = uCrawl; // the stars crawl about the sky, and are not where they were
-  vec3 sd = wheel(vec3(d.x * cos(turn) - d.z * sin(turn), d.y, d.x * sin(turn) + d.z * cos(turn)), uTurn); // and wheel
-  vec3 fig = vec3(0.0); // the Alignment: the stars fallen into a figure, which does not crawl
+  vec3 fig = vec3(0.0); // the Alignment: the stars fallen into a figure, which does not spin
   if (uOmen > 0.001 && dot(d, normalize(uOmenAt)) > 0.88) fig = omenLight(d);
-  vec3 cell = floor(sd * 230.0);
+  vec4 st = uOpen > 0.001 && lift * (1.0 - cloud) > 0.0 ? stars(d) : vec4(0.0); // spun about the sky, and not where they were
+  vec3 cell = st.yzw;
   float s = hash(cell);
-  float star = step(1.0 - 0.006 * uStars * (1.0 + 2.2 * uWrong), s) * (0.35 + 0.65 * hash(cell + 3.1)) * (1.0 - 0.85 * fig.z * uOmen);
-  float twinkle = 0.6 + 0.4 * sin(uTime * (1.3 + 2.5 * hash(cell + 7.7)) + uFlicker + s * 60.0);
+  float star = st.x * (1.0 - 0.85 * fig.z * uOmen);
+  float deep = 0.4 + 0.25 * uWrong; // a failing mind's stars gutter out between their flickers, each at one to three times the quickening
+  float twinkle = max(0.0, 1.0 - deep + deep * sin(uTime * (1.3 + 2.5 * hash(cell + 7.7)) + uFlicker * floor(1.0 + 3.0 * hash(cell + 5.3)) + s * 60.0));
   vec3 starColor = mix(vec3(0.78, 0.8, 0.82), vec3(0.86, 0.7, 0.95), step(0.85, hash(cell + 9.3)) * uWrong); // and some are the wrong colour
   col += starColor * star * twinkle * lift * (1.0 - cloud);
   col += vec3(0.86, 0.86, 0.9) * (fig.x * 0.95 + fig.y * 0.4) * uOmen * smoothstep(0.0, 0.1, h) * (1.0 - cloud);

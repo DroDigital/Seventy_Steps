@@ -60,6 +60,7 @@ describe('computeFx', () => {
       skew: 0,
       blur: 0,
       strange: 0,
+      spin: 0,
     });
   });
 
@@ -160,9 +161,10 @@ describe('a failing mind warps the picture more slowly past a point, and loses i
   it('keeps to the accessibility cap and its own toggle', () => {
     expect(computeFx(state(0, 0)).blur).toBe(0);
     expect(computeFx(state(0, 0)).strange).toBe(0);
+    expect(computeFx(state(0, 0)).spin).toBe(0);
     const s = state(0);
     s.enabled.dread = false;
-    expect(computeFx(s)).toMatchObject({ blur: 0, strange: 0 });
+    expect(computeFx(s)).toMatchObject({ blur: 0, strange: 0, spin: 0 });
     expect(computeFx(s).ripple).toBeGreaterThan(0); // the warp is its own toggle
   });
 });
