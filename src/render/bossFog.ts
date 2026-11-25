@@ -199,8 +199,8 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
     for (; b.owed >= 1; b.owed--) {
       const a = rand() * Math.PI * 2;
       const [cu, cy] = [Math.cos(a), Math.sin(a)];
-      const lu = br.u + cu * Math.max(0.25, br.rx * (0.9 + rand() * 0.25));
-      const ly = Math.max(0.15, br.y + cy * Math.max(0.3, br.ry * (0.85 + rand() * 0.2)));
+      const lu = Math.max(-w.width * 0.5, Math.min(w.width * 0.5, br.u + cu * Math.max(0.25, br.rx * (0.9 + rand() * 0.25))));
+      const ly = Math.max(0.15, Math.min(w.height, br.y + cy * Math.max(0.3, br.ry * (0.85 + rand() * 0.2))));
       const lv = (rand() - 0.5) * (w.depth ?? 0.24) * 2;
       const [x, y, z] = toWorld(w, lu, ly, lv);
       const radial = mode > 0 ? 0.7 + rand() * 0.8 : -(0.55 + rand() * 0.6); // outward on tear, inward while closing
@@ -230,7 +230,9 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
     for (let i = 0; i < 24; i++) {
       const a = rand() * Math.PI * 2;
       const r = rand() * 0.85;
-      const [x, y, z] = toWorld(w, br.u + Math.cos(a) * r, Math.max(0.2, br.y + Math.sin(a) * r * 1.2), (rand() - 0.5) * 0.45);
+      const lu = Math.max(-w.width * 0.5, Math.min(w.width * 0.5, br.u + Math.cos(a) * r));
+      const ly = Math.max(0.2, Math.min(w.height, br.y + Math.sin(a) * r * 1.2));
+      const [x, y, z] = toWorld(w, lu, ly, (rand() - 0.5) * 0.45);
       const spark = !!theme.sparks && rand() < theme.sparks.share * 1.3;
       mote(b, x, y, z, spark, Math.cos(a) * 0.45, 0.25 + rand() * 0.55, Math.sin(a) * 0.45, spark ? 0.22 : 1.05, spark ? 0.85 : 0.26, 2.0);
     }

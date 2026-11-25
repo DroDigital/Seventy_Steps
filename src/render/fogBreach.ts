@@ -55,10 +55,12 @@ const smoothstep = (a: number, b: number, v: number): number => {
 export function createFogBreach(w: Pick<FogWall, 'x' | 'y' | 'z' | 'yaw' | 'width' | 'height'>): FogBreach {
   const [cs, sn] = [Math.cos(w.yaw), Math.sin(w.yaw)];
   const across = (p: XZ): number => (p.x - w.x) * cs - (p.z - w.z) * sn;
-  // Keep thick mist clinging to both jambs and overhead even on the narrowest dungeon doorway.
+  // Keep thick mist clinging to both jambs and overhead during the centred walk-through; once free movement begins while
+  // the camera remains outside (`sight.blocked`), allow the sight opening to follow the ray all the way to either jamb.
+  const halfW = w.width * 0.5;
   const maxRx = Math.min(1.08, Math.max(0.68, w.width * 0.3));
   const maxRy = Math.min(1.42, Math.max(1.02, w.height * 0.37));
-  const maxU = Math.max(0, w.width * 0.5 - maxRx - 0.22);
+  const maxU = Math.max(0, halfW - maxRx - 0.22);
 
   let phase: BreachPhase = 'idle';
   let [u, y, crossU] = [0, BODY_Y, 0];
@@ -114,20 +116,28 @@ export function createFogBreach(w: Pick<FogWall, 'x' | 'y' | 'z' | 'yaw' | 'widt
         phase = open > 0.01 || bow > 0.05 ? 'tearing' : 'idle';
       } else if (phase !== 'idle' || sight.blocked) {
         if (sight.blocked) {
-          // Camera is still behind the crossed wall: hold a localized ragged breach along the sight line so the player stays visible.
+          // Camera is still behind the crossed wall: align the held opening with the actual camera sight ray across the
+          // full doorway span so moving near a jamb or lintel never leaves the player obscured behind opaque mist.
+          const sightU = clamp(sight.u, -halfW, halfW);
+          const sightY = clamp(sight.y, 0.5, Math.max(0.9, w.height));
           if (phase === 'idle') {
-            crossU = clamp(sight.u, -maxU, maxU);
-            u = crossU;
-            y = clamp(sight.y, 0.85, Math.max(0.9, w.height - maxRy - 0.15));
+            crossU = sightU;
+            u = sightU;
+            y = sightY;
             open = 1;
+          } else if (phase === 'closing') {
+            peekTimer = 0;
           }
-          const targetU = clamp(sight.u, -maxU, maxU);
-          const targetY = clamp(sight.y, 0.85, Math.max(0.9, w.height - maxRy - 0.15));
-          u += (targetU - u) * Math.min(1, step * 7);
-          y += (targetY - y) * Math.min(1, step * 7);
+          u += (sightU - u) * Math.min(1, step * 12);
+          y += (sightY - y) * Math.min(1, step * 12);
           peekTimer = Math.min(PEEK_SETTLE, peekTimer + step);
           const targetOpen = 1 - (1 - PEEK_SHARE) * smoothstep(0.25, PEEK_SETTLE, peekTimer);
-          open += (targetOpen - open) * Math.min(1, step * 5);
+          open += (targetOpen - open) * Math.min(1, step * (open < targetOpen ? 12 : 5));
+          // Keep the sight ray inside the clear interior of the core opening even on fast lateral strafes or camera orbits.
+          const leashX = maxRx * Math.max(open, PEEK_SHARE) * 0.32;
+          const leashY = maxRy * Math.max(open, PEEK_SHARE) * 0.32;
+          u = clamp(u, sightU - leashX, sightU + leashX);
+          y = clamp(y, sightY - leashY, sightY + leashY);
           push += (dir * 0.14 - push) * Math.min(1, step * 4);
           swirl += (-0.28 - swirl) * Math.min(1, step * 4); // subtle inward tug as the mist tries to reclaim the breach
           rim += (0.72 - rim) * Math.min(1, step * 5);
