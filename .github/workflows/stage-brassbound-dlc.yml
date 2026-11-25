@@ -92,7 +92,10 @@ jobs:
           BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
         run: |
           node --input-type=module <<'JS'
+          import { execFileSync } from 'node:child_process';
           import { createHash } from 'node:crypto';
+          import { rm, writeFile } from 'node:fs/promises';
+          import { join } from 'node:path';
           const headers = { Authorization: `Bearer ${process.env.BUTLER_API_KEY}` };
           const res = await fetch('https://api.itch.io/games/5440073/uploads', { headers });
           if (!res.ok) {
@@ -122,8 +125,24 @@ jobs:
             }
             if (!file.ok) throw Error(`Download returned HTTP ${file.status}`);
             const body = Buffer.from(await file.arrayBuffer());
-            const hash = createHash('sha256').update(body).digest('hex');
-            if (hash !== 'f63d3222a267b5d6d3a62234ab95516b7495fa387fc50417836caa5e9d288dd8') throw Error('The downloaded file did not match the original archive.');
-            console.log('Owner download matches the original licensed archive byte for byte.');
+            const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+            const expected = 'f63d3222a267b5d6d3a62234ab95516b7495fa387fc50417836caa5e9d288dd8';
+            if (sha256(body) === expected) {
+              console.log('Owner download matches the original licensed archive byte for byte.');
+            } else if (body.subarray(0, 2).toString() === 'PK') {
+              const archive = join(process.env.RUNNER_TEMP, 'brassbound-owner-download.zip');
+              await writeFile(archive, body, { mode: 0o600 });
+              try {
+                const list = execFileSync('unzip', ['-Z1', archive], { encoding: 'utf8' }).trim().split('\n');
+                if (list.length !== 1 || list[0] !== 'Brassbound-Motor-Car.zip') throw Error('The download ZIP did not contain the expected one-file wrapper.');
+                const inner = execFileSync('unzip', ['-p', archive, 'Brassbound-Motor-Car.zip']);
+                if (sha256(inner) !== expected) throw Error('The wrapped archive did not match the original.');
+                console.log('The itch download wraps Brassbound-Motor-Car.zip. The archive inside matches the original byte for byte.');
+              } finally {
+                await rm(archive, { force: true });
+              }
+            } else {
+              throw Error(`Unexpected download type ${file.headers.get('content-type')} (${body.length} bytes).`);
+            }
           }
           JS
