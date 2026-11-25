@@ -112,6 +112,7 @@ function silhouetteMaterial(tone: THREE.Vector3, region: string, alpha: { value:
       uDome: { value: new THREE.Vector3(0, DOME.across, DOME.up) }, // its strength (set each frame), how far it spreads across and up
       uLamp: { value: new THREE.Vector4() }, uLampCol: { value: new THREE.Vector3(...(lamp?.colour ?? [1, 1, 1])) }, uLampBox: { value: new THREE.Vector2(...BEAM.box).multiplyScalar(lamp?.size ?? 1) }, uPer: { value: new THREE.Vector2(1, 1) },
       uLightDir: worldUniforms.uLightDir, uLightColor: worldUniforms.uLightColor, uAmbient: worldUniforms.uAmbient, uMoonRef: { value: night.moon },
+      uFogFar: worldUniforms.uFogFar, uFogAmount: worldUniforms.uFogAmount, // the world's fog: as it closes in, the far land recedes into the air (2026-11-25)
       uSize: { value: new THREE.Vector2(def.width, def.height) }, uHandoff: { value: new THREE.Vector2(...(def.kind === 'town' ? FAR.handoff : [0, 0])) }, uBand: { value: new THREE.Vector2(...(def.kind === 'peak' ? [2, 3] : [0.3, 0.85])) }, uWallFoot: { value: def.kind === 'peak' ? 0.7 : -1 },
       uAir: { value: new THREE.Vector4((FOGS[region]?.haze ?? 0.0035) * FAR.air, FAR.ground, FAR.groundRise, 0) },
       uLook: { value: new THREE.Vector4(look.grain, look.snow, look.snowline, look.wet) },
@@ -172,6 +173,7 @@ export function createSkyline(scene: THREE.Scene, look: RealmLook, skyUniforms?:
   const fake = { value: 0 };
   const fakeDef: Silhouette = { kind: 'towers', at: [0, 0], width: 700, height: 240, seed: 97 };
   const fakeMesh = new THREE.Mesh(shape('beyond', fakeDef).geometry, silhouetteMaterial(tone, 'beyond', fake, fakeDef, shared));
+  (fakeMesh.material as THREE.ShaderMaterial).uniforms.uFogAmount = { value: 0 }; // the fog a failing mind closes in does not hide what that mind sees
   fakeMesh.renderOrder = -999;
   fakeMesh.frustumCulled = false;
   fakeMesh.visible = false;

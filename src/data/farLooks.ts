@@ -78,6 +78,7 @@ export const farLookOf = (region: string, kind: SilhouetteKind): FarLook => ({ .
 /** The far land's numbers (render/skyline.ts, render/shaders/skylineFar.ts). */
 export const FAR = {
   air: 0.065, // the far air's thickness per metre, as a share of the realm's haze (data/fogs.ts: 0.0035 a metre is a far shape's crest a fifth gone at 1 km, half at 3 km)
+  edge: 1, // (2026-11-25) and the near haze over the world's own reach (RENDER.far) as a share, which every far shape lies beyond: it was 15 times clearer than the land 100 m off, and read as nearer than it
   ground: 1.5, // how much thicker the air is at a far shape's foot than over its crest...
   groundRise: 50, // ...thinning over this many metres up it
   weather: 1.5, // a closed sky (rain, storm, gale) thickens the air by this share more
