@@ -12,7 +12,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { V3 } from '../core/geom';
 import type { DungeonKit, KitTexture } from '../data/kits';
 import { getRegion } from '../data/regions';
-import { DUNGEON } from '../data/tuning';
+import { DUNGEON, DUNGEON_LIGHT } from '../data/tuning';
 import { kitOfRoom } from '../world/dungeonKit';
 import { torchStops } from './sconces';
 import { markStairLights } from './stairLights';
@@ -38,10 +38,10 @@ const WOOD: Rgb = [0.75, 0.7, 0.62];
 const PER_STEP = 12;
 const SLAB = 0.3; // a floor slab's depth (world/dungeonParts.ts)
 
-type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth' | 'shine'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31); round 108: shine is glow as relief (a light set on a surface)
+type Kind = 'wall' | 'floor' | 'wood' | 'glow' | 'trim' | 'beam' | 'cloth' | 'shine' | 'faint'; // a kit gives the first two their textures; trim and beams are relief on a wall (round 21), cloth relief on a floor (round 31); round 108: shine is glow as relief (a light set on a surface); 2026-11-25: faint is lit as the rest is, with a little light of its own
 type Built = { kind: Kind; geo?: THREE.BufferGeometry; light?: LightSpot }; // a flame is a light too (worldLights.ts), and a light alone (round 87: the pixel flame, flames.ts, is its picture)
 /** What a piece is drawn with: a kit's texture, or (marked `+`) the same drawn a little nearer than it is, for relief that stands 6 to 15 cm off a wall's face. */
-export type Group = KitTexture | 'glow' | 'glow+' | 'cloth+' | `${KitTexture}+`;
+export type Group = KitTexture | 'glow' | 'glow+' | 'cloth+' | 'faint' | `${KitTexture}+`;
 type Origin = { x: number; z: number }; // where a dungeon's world-space UVs count from
 const DARK_WOOD: Rgb = [0.42, 0.36, 0.3];
 const materials = new Map<string, THREE.ShaderMaterial>();
@@ -49,8 +49,8 @@ const material = (group: Group): THREE.ShaderMaterial => {
   let m = materials.get(group);
   if (!m) {
     const relief = group.endsWith('+');
-    const texture = (relief ? group.slice(0, -1) : group) as KitTexture | 'glow' | 'cloth';
-    const o = texture === 'glow' ? { texture: 'cloth' as const, emissive: 1 } : { texture, vary: 0.7, ...(texture === 'wood' && { uvScale: [0.5, 0.5] as const }) };
+    const texture = (relief ? group.slice(0, -1) : group) as KitTexture | 'glow' | 'cloth' | 'faint';
+    const o = texture === 'glow' ? { texture: 'cloth' as const, emissive: 1 } : texture === 'faint' ? { texture: 'cloth' as const, emissive: DUNGEON_LIGHT.faint } : { texture, vary: 0.7, ...(texture === 'wood' && { uvScale: [0.5, 0.5] as const }) };
     m = createWorldMaterial({ seed: 8, vertexColors: true, ...o });
     if (relief) Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4 }); // nearer by a pixel's slope, however slanted the view: the PS1's snapping moves a face's depth by up to that, and the wall behind showed through it
     materials.set(group, m);

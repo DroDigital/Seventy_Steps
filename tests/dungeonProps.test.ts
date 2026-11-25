@@ -30,7 +30,7 @@ describe('the dungeons\' props and the arenas\' built pieces (round 117)', () =>
   it('builds every thing on a hall\'s wall, in every way it can be, on its own stretch of the wall and within reach of it', () => {
     const kinds = [...Object.keys(KIT_ITEMS), ...Object.keys(LORE_ITEMS)] as (KitItem | LoreItem)[];
     for (const item of kinds) for (const [w, wall] of walls.entries()) for (let seed = 1; seed <= 24; seed++) {
-      const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [] };
+      const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [], faint: [] };
       place(item, { wall, s: 0, y: 0, c: C, rng: createRng(seed * 7919 + w), out });
       const geos = each(out);
       expect(geos.length, item).toBeGreaterThan(0);

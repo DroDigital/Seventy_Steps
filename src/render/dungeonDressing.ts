@@ -31,7 +31,7 @@ import { hallLore, loreOf, type Spot } from './hallLore';
 import { wallOf } from './roomWalls';
 import type { LightSpot } from './worldLights';
 
-export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow' | 'cloth' | 'shine'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
+export type Dressed = { kind: 'wall' | 'wood' | 'trim' | 'beam' | 'glow' | 'cloth' | 'shine' | 'faint'; kit: DungeonKit; geo?: THREE.BufferGeometry; light?: LightSpot }; // (a light alone has no geometry: round 87)
 type Origin = { x: number; z: number };
 
 const AWAY = { door: 2.8, torch: 1.5, spot: 2.2 }; // metres furniture keeps from a doorway, a torch, and what stands in a room
@@ -52,6 +52,7 @@ function grouped(kit: DungeonKit, out: Out, at: Origin): Dressed[] {
     ...merged('beam', kit, out.beam.map((g) => uv(g, 4))),
     ...merged('glow', kit, out.glow),
     ...merged('shine', kit, out.shine),
+    ...merged('faint', kit, out.faint),
   ];
 }
 
@@ -120,7 +121,7 @@ export function dressing(d: DungeonLayout, colour: (kit: DungeonKit) => Rgb, at:
   const torches = lights.filter((l) => l.kind === 'torch');
   const result: Dressed[] = [];
   for (const r of d.rooms) {
-    const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [] };
+    const out: Out = { wall: [], wood: [], beam: [], trim: [], glow: [], shine: [], faint: [] };
     const kitId = kitIdOfRoom(d, r);
     const kit = KITS[kitId] as DungeonKit;
     const c = colour(kit);

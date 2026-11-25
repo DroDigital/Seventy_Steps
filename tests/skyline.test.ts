@@ -2,12 +2,15 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { REGIONS } from '../src/data/regions';
 import { SKYLINES } from '../src/data/skylines';
-import { RENDER, SKY } from '../src/data/tuning';
+import { FX, RENDER, SKY } from '../src/data/tuning';
+import { FOGS } from '../src/data/fogs';
 import { createPostPass } from '../src/render/postPass';
 import { createRealmLook } from '../src/render/realmLook';
 import { createSky } from '../src/render/sky';
 import { createSkyline, facing, falseShown } from '../src/render/skyline';
 import { shownElevation } from '../src/render/shaders/farPlace';
+import { closingOf, farAirShare } from '../src/render/shaders/skylineFar';
+import { worldUniforms } from '../src/render/worldMaterial';
 import { FAR } from '../src/data/farLooks';
 import { profile } from '../src/render/skylineShapes';
 import { createRng } from '../src/core/rng';
@@ -120,6 +123,29 @@ describe('the far silhouettes (round 19: render/skyline.ts)', () => {
     expect(falseShown(0.9, 8)).toBe(1);
     expect(falseShown(0.9, 15)).toBe(0);
     expect(falseShown(0.7, 8)).toBeLessThan(falseShown(0.9, 8));
+  });
+
+  it('are never clearer than the near haze leaves the land at the world\'s edge, and recede as the fog closes on a failing mind (2026-11-25)', () => {
+    // (asked: "something is wrong with the viewing distances": a range 1 km off was as clear as the land 100 m off, crisper than the fogged land before it)
+    const [lucid, mad] = FX.fogFar;
+    for (const [id, f] of Object.entries(FOGS)) {
+      const edge = 1 - Math.exp(-f.haze * RENDER.far); // the near haze over all the land the world draws
+      let was = 0;
+      for (const d of [RENDER.far, 400, 800, 1500, 3000]) {
+        const k = farAirShare(d, 0, f.haze, lucid);
+        expect(k, `${id} ${d} m`).toBeGreaterThanOrEqual(edge);
+        expect(k, `${id} ${d} m`).toBeGreaterThanOrEqual(was); // and hazier the farther
+        expect(k, `${id} ${d} m: never wholly gone`).toBeLessThanOrEqual(FAR.most);
+        was = k;
+      }
+      expect(farAirShare(800, 200, f.haze, mad), id).toBeGreaterThan(farAirShare(800, 200, f.haze, lucid) + 0.15); // the far land recedes as the near closes in
+      expect(farAirShare(800, 200, f.haze, mad, 0), `${id}: no fog, no closing`).toBeCloseTo(farAirShare(800, 200, f.haze, lucid), 9);
+    }
+    expect(closingOf(lucid, 1)).toBe(1);
+    const meshes = lookFrom('dreamlands', 0, 4000);
+    const fake = meshes.find((m) => (m.material as THREE.ShaderMaterial).uniforms.uFogAmount.value === 0)!;
+    expect(fake, 'the false one a failing mind sees is not hidden by the fog that mind closes in').toBeDefined();
+    for (const m of meshes) if (m !== fake) expect((m.material as THREE.ShaderMaterial).uniforms.uFogFar).toBe(worldUniforms.uFogFar); // the world's own, live
   });
 });
 
