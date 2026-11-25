@@ -99,6 +99,7 @@ export const PROP_LOOKS: Readonly<Record<string, PropLook>> = {
   piping_dark: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { columns: 3, shard: 1 }, bushes: { tube: 3, tendril: 1 }, ...ALIEN, pillars: { round: 2, drums: 1 }, monoliths: { slab: 1, skew: 1 }, bark: [0.3, 0.28, 0.26], leaves: PALE, needles: [0.34, 0.32, 0.3], top: [0.4, 0.38, 0.34], topShare: 0.3 }), // pipes of stone that sound
   spheres: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { orb: 4, cluster: 1 }, bushes: { crystal: 2, tube: 1 }, ...ALIEN, pillars: { round: 2 }, monoliths: { slab: 2 }, bark: [0.4, 0.42, 0.48], leaves: PALE, needles: [0.4, 0.44, 0.5], top: [0.56, 0.6, 0.66], topShare: 0.35 }), // the iridescent globes
   court_centre: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { shard: 3, columns: 1, orb: 1 }, bushes: { tendril: 2, tube: 1 }, ...ALIEN, pillars: { twisted: 2, square: 1 }, monoliths: { skew: 2, slab: 1 }, bark: [0.24, 0.24, 0.28], leaves: PALE, needles: [0.26, 0.26, 0.3], top: [0.32, 0.32, 0.38], topShare: 0.3 }),
+  slumber_stairs: look({ trees: { blasted: 1 }, pines: { snag: 1 }, rocks: { boulder: 2, shard: 1 }, bushes: { scrub: 1 }, ...ALIEN, pillars: { square: 2, drums: 1 }, monoliths: { slab: 2, skew: 1 }, bark: [0.22, 0.2, 0.26], leaves: PALE, needles: [0.24, 0.22, 0.28], top: [0.3, 0.28, 0.34], topShare: 0.2 }), // round 123: nothing stands in the stairs' realm but the stairs; were anything to, it would be the dream's bare stone
 };
 
 /** Every region's look (a region with none, the hub's). */

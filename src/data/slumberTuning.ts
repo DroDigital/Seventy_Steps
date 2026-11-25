@@ -23,6 +23,11 @@ export const SLUMBER = {
     curve: 3.5, // how fast it climbs between: an ease-out in the share of the descent, so most of the climb is in its first third
     height: 2.5, // metres the low mist rises by on the deepest floor, so a stair's shaft fills to a man's height and over (rising as the density does)
     patchy: 0.8, // how far its drifts even out into one dense veil on the deepest floor (0 keeps them)
+    // Round 123 (asked: "still too overcast and not eerie and dark enough"): the thick mist took the lantern's light and gave it back over the
+    // whole picture, a beige overcast. The mist thickens the dark now, not the glow: the lantern lights as much of it as a crypt's whatever its
+    // thickness, and a fire as the root of the thickening, so each still blooms in it, a pool of light in the dark.
+    lantern: 1, // the lantern's glow in the mist is divided by the mist's gain to this power (1: held to a crypt's)
+    lamps: 0.5, // ...and a lamp's or fire's
   },
   flicker: {
     share: [0.12, 0.75], // the share of stair lights that may gutter at all: a calm mind's, then a failing one's (the rest never do)

@@ -69,7 +69,7 @@ describe('the Serpent Temple soundscape', () => {
 
     const house = world.dungeons.find((d) => d.layout.def.id === 'witch_house')!.layout.rooms[0];
     move('arkham', house, 3);
-    expect(heard.bed).toHaveBeenLastCalledWith(roomAmbience('witch_house', 'timber')); // (round 121: the house's own, and the Witch House's rats in its walls)
+    expect(heard.bed).toHaveBeenLastCalledWith(roomAmbience('witch_house', 'timber')); // (round 124: the house's own, and the Witch House's rats in its walls)
     expect(roomAmbience('witch_house', 'timber')!.beds).toEqual(KIT_AMBIENCE.timber!.beds);
     expect(roomAmbience('witch_house', 'timber')!.roofed).toBe(true);
     expect(heard.voices).toHaveBeenLastCalledWith(3, expect.objectContaining({ outdoors: false }));

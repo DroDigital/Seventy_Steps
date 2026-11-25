@@ -144,7 +144,7 @@ describe('the returns of a step (round 83)', () => {
   });
 
   it('the recorded steps of the bright ground are softened and brought a little down, and the dark left as they were', () => {
-    expect(stepLowpass('road')).toBeLessThanOrEqual(3500); // (round 121: no longer the 2 kHz blanket of round 83, which dulled the commonest walk to a thud)
+    expect(stepLowpass('road')).toBeLessThanOrEqual(3500); // (round 124: no longer the 2 kHz blanket of round 83, which dulled the commonest walk to a thud)
     expect(stepLowpass('road')).toBeGreaterThanOrEqual(2800);
     expect(stepLowpass('water')).toBeLessThanOrEqual(3500);
     expect(stepLowpass('dirt')).toBeUndefined();

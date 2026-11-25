@@ -12,7 +12,7 @@
  * far and dull inland, the wind beds rise and brighten on a height and drop in a lee (render/audio/bedShape.ts). The spots come
  * oftener or rarer by the hour, hold through the Still, and the hull and the gurgle come from the water.
  *
- * Round 121: a bed may be made in code (`gen_`, render/audio/bedTextures.ts: drawn once for the context, a while after sound starts, so no
+ * Round 124: a bed may be made in code (`gen_`, render/audio/bedTextures.ts: drawn once for the context, a while after sound starts, so no
  * room waits on one; a loop that closes on itself, with no encoder's padding to skip), a spot may be a recipe (data/roomSounds.ts) at its
  * own level and through its own wall, and a seep comes again from the same place at the same pitch a few times (`run`) before it is still.
  */
@@ -39,7 +39,7 @@ export interface AmbienceBeds {
 }
 
 const EDGE = 0.06; // seconds of each end a loop skips: an MP3's encoder padding, where a browser keeps it
-const AMBIENCE_WARM = 1500; // ms between the made beds being drawn, after sound starts (round 121: each takes a few hundredths of a second)
+const AMBIENCE_WARM = 1500; // ms between the made beds being drawn, after sound starts (round 124: each takes a few hundredths of a second)
 const WIDTH = 0.6; // how far apart a bed's two readers are panned
 
 /** One reading of a bed: the nodes the hour and the place shape (round 80). */
@@ -78,7 +78,7 @@ const bare = (file: string): string => file.replace(/\.\w+$/, '');
 const fetched = (a: Ambience): string[] => a.beds.map(([file]) => file).filter((f) => !generatedOf(bare(f)));
 
 const made = new WeakMap<BaseAudioContext, Map<GeneratedBed, AudioBuffer>>();
-/** A made bed's loop as a buffer of `ctx`, drawn once (round 121). */
+/** A made bed's loop as a buffer of `ctx`, drawn once (round 124). */
 function madeBed(ctx: BaseAudioContext, id: GeneratedBed): AudioBuffer {
   let all = made.get(ctx);
   if (!all) made.set(ctx, (all = new Map()));
@@ -102,7 +102,7 @@ export function createAmbience(e: AudioEngine, sampler: Sampler): AmbienceBeds {
   let want: Ambience | null = null;
   let playing: Playing | null = null;
   let spots: { spot: Spot; next: number }[] = [];
-  let seeping: { at: number; play: () => void }[] = []; // the drops still to come of a seep (round 121)
+  let seeping: { at: number; play: () => void }[] = []; // the drops still to come of a seep (round 124)
   const vary = createVarier();
   let clock = 0;
   e.onStart?.((ctx) => GENERATED_BEDS.forEach((id, k) => setTimeout(() => madeBed(ctx, id), AMBIENCE_WARM * (k + 1)))); // (each made bed drawn a while after sound starts, one at a time, before a room asks for it)

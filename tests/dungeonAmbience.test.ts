@@ -21,7 +21,7 @@ const sig = (a: Ambience): string => JSON.stringify([a.beds, a.spots.map((s) => 
 /** Events a minute a place's spots give, at the middle of their intervals (a seep counted by its drops). */
 const perMinute = (a: Ambience): number => a.spots.reduce((n, s) => n + (60 / ((s.every[0] + s.every[1]) / 2)) * (s.run ? (s.run.count[0] + s.run.count[1]) / 2 : 1), 0);
 
-describe('every dungeon\'s own sound (round 121)', () => {
+describe('every dungeon\'s own sound (round 124)', () => {
   it('every roofed kit has a soundscape of its own and every one under the sky has none (its rooms keep the realm\'s)', () => {
     for (const k of roofed) expect(KIT_AMBIENCE[k], k).toBeDefined();
     for (const k of kits.filter((x) => !roofed.includes(x))) expect(KIT_AMBIENCE[k], k).toBeUndefined();
@@ -88,7 +88,7 @@ describe('every dungeon\'s own sound (round 121)', () => {
   });
 });
 
-describe('the spots of a room, as played (render/audio/ambience.ts, round 121)', () => {
+describe('the spots of a room, as played (render/audio/ambience.ts, round 124)', () => {
   let seed = 1;
   beforeEach(() => {
     seed = 1;

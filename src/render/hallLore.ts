@@ -34,12 +34,12 @@ export function hallLore(d: DungeonLayout, r: RoomLayout, kit: DungeonKit, c: Rg
   if (!lore) return [];
   const rng = createRng((hash2(Math.round(r.x), Math.round(r.z), 108) * 4294967296) >>> 0);
   const open = kit.roof === 'open';
-  const out: HallOut = { wall: [], wood: [], beam: [], trim: [], glow: [], cloth: [], shine: [] };
+  const out: HallOut = { wall: [], wood: [], beam: [], trim: [], glow: [], cloth: [], shine: [], faint: [] };
   hallWalls(d, r, lore, c, open, avoid, out);
   hallRoof(r, lore, c, open, out, rng);
   const group = (kind: Dressed['kind'], geos: THREE.BufferGeometry[], uv = 2): Dressed[] => (geos.length ? [{ kind, kit, geo: mergeGeometries(geos.map((g) => worldUv(finish(g), at, uv))) }] : []);
   return [
     ...group('wall', out.wall), ...group('wood', out.wood, 3), ...group('trim', out.trim), ...group('beam', out.beam, 4),
-    ...group('glow', out.glow), ...group('cloth', out.cloth), ...group('shine', out.shine),
+    ...group('glow', out.glow), ...group('cloth', out.cloth), ...group('shine', out.shine), ...group('faint', out.faint),
   ];
 }

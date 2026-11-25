@@ -11,6 +11,7 @@ import type { Game } from '../systems/components';
 import { MODEL_PREFIX } from '../systems/creatures';
 import type { BloodPools } from './bloodPools';
 import type { Particles } from './particles';
+import { inDungeon } from '../world/terrain';
 
 const NEAR = 30; // metres from the camera within which any of it is drawn
 
@@ -46,7 +47,7 @@ export function createBodyWeather(g: Game, fx: Particles, marks: BloodPools, fig
         }
         const moving = Math.hypot(tr.pos.x - tr.prev.x, tr.pos.z - tr.prev.z) > 0.004;
         const depth = WORLD.seaLevel - g.world.ground(tr.pos.x, tr.pos.z);
-        if (depth > 0.05 && moving && time - (rings.get(id) ?? -Infinity) > BODY_MATTER.rings) { // it wades: a ring spreads from it on the water
+        if (depth > 0.05 && moving && time - (rings.get(id) ?? -Infinity) > BODY_MATTER.rings && !inDungeon(tr.pos.x, tr.pos.z)) { // it wades: a ring spreads from it on the water (never in a dungeon's room, dry however deep: round 122)
           rings.set(id, time);
           marks.lay({ x: tr.pos.x, z: tr.pos.z, y: WORLD.seaLevel + 0.01, size: broad * 2.4 + 0.8, color: [0.5, 0.56, 0.6], wet: true, kind: 2, yaw: 0, grow: 1.1, life: 1.2 }, time);
         }

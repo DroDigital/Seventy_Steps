@@ -68,7 +68,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/fogThemes.ts', decl: 'BY_REGION', shape: 'properties', keep: regions },
   { file: 'src/data/kits.ts', decl: 'KITS', shape: 'properties', keep: kept('kits') },
   { file: 'src/data/acoustics.ts', decl: 'KIT_SPACE', shape: 'properties', keep: kept('kits') },
-  { file: 'src/data/dungeonAmbience.ts', decl: 'KIT_AMBIENCE', shape: 'properties', keep: kept('kits') }, // (round 121: each roofed kit's own sound)
+  { file: 'src/data/dungeonAmbience.ts', decl: 'KIT_AMBIENCE', shape: 'properties', keep: kept('kits') }, // (round 124: each roofed kit's own sound)
   { file: 'src/data/dungeonAmbience.ts', decl: 'DUNGEON_ACCENTS', shape: 'properties', keep: dungeons }, // (and what a dungeon's tale adds to it)
   { file: 'src/data/doors.ts', decl: 'DOOR_LOOKS', shape: 'properties', keep: kept('kits') },
   // the realms' lists and tables the demo does not keep: a realm's own entry, or a realm named in a list
@@ -79,6 +79,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/world/planFill.ts', decl: 'WAKING', shape: 'elements', by: 'self', keep: regions },
   { file: 'src/data/regionEpigraphs.ts', decl: 'EPIGRAPH_REGIONS', shape: 'elements', by: 'self', keep: regions },
   { file: 'src/data/regions.ts', decl: 'OUTER_DARK', shape: 'elements', by: 'self', keep: regions },
+  { file: 'src/data/regions.ts', decl: 'LANDLESS', shape: 'elements', by: 'self', keep: regions }, // (round 123: the Stairs of Slumber's realm)
   { file: 'src/data/wanderers.ts', decl: 'WANDERINGS', shape: 'elements', by: 'id', nested: 'regions', keep: regions, mustRemove: false },
   { file: 'src/data/regionPress.ts', decl: 'VERMIN_PRESS', shape: 'elements', by: 'self', keep: kept('entities') },
   { file: 'src/render/dungeonFurniture.ts', decl: 'ITEMS', shape: 'properties', keep: kept('kits') },
@@ -88,6 +89,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/foliage.ts', decl: 'CLIMATES', shape: 'properties', keep: regions }, // (round 116: how thick each realm grows)
   { file: 'src/data/dungeonLooks.ts', decl: 'DUNGEON_LOOKS', shape: 'properties', keep: dungeons },
   { file: 'src/data/dungeonLooks.ts', decl: 'KIT_PILLARS', shape: 'properties', keep: kept('kits') },
+  { file: 'src/data/dungeonLooks.ts', decl: 'KIT_LOOKS', shape: 'properties', keep: kept('kits') }, // (round 122: the Stairs of Slumber's kits' own looks)
 ];
 
 export const rest: readonly string[] = [];

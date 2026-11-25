@@ -1,5 +1,6 @@
 /**
- * The ground a drawn body stands in (round 113; render only): the sea's surface when it wades, and how deep the snow, mud, sand, grass
+ * The ground a drawn body stands in (round 113; render only): the sea's surface when it wades (never in a dungeon's room, whose floors lie
+ * below the sea's level in places and are dry: round 122, the Stairs of Slumber's foes and priests were drawn sunk in a sea that is not there), and how deep the snow, mud, sand, grass
  * or leaves under it take its feet (data/bodyLight.ts BODY_MATTER.sink), read now and then for each creature (the ground under a foot,
  * world/groundKind.ts, is the one the investigator's prints and steps read) and told to the sprite shader (shaders/bodyMatter.ts).
  */
@@ -9,6 +10,7 @@ import { BODY_MATTER, SINKS } from '../data/bodyLight';
 import { WORLD } from '../data/tuning';
 import type { Game } from '../systems/components';
 import { groundAt } from '../world/groundKind';
+import { inDungeon } from '../world/terrain';
 
 const EVERY = 12; // frames between readings of the ground under a body
 
@@ -26,7 +28,7 @@ export function createBodyGround(g: Game): BodyGround {
     of(id, x, y, z, hover) {
       frame++;
       const ground = g.world.ground(x, z);
-      const wet = ground < WORLD.seaLevel - 0.05 && hover <= 0;
+      const wet = ground < WORLD.seaLevel - 0.05 && hover <= 0 && !inDungeon(x, z); // (a dungeon's room is dry, however deep: round 122)
       let k = known.get(id);
       if (!k || frame - k.at > EVERY) {
         const kind = hover > 0 || wet ? undefined : groundAt(g, x, y, z);

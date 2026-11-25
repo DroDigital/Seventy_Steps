@@ -3,7 +3,7 @@
  * softer and duller, mud lower, boards a hollow knock, a slab or a cobble the stone's recording rather than dirt's), which of the four
  * recordings a phantom step is made from, and how cold the air is for a breath. Pure; render/audio/foley.ts and render/audio/bodyFoley.ts use it.
  * Round 83: and how loud a step is for the pace it is taken at (understated, and the road's bright recording dulled), and the faint returns
- * a room gives it. Round 121: the level back at round 80's, each foot to its own side, and the ear settling into a long walk (`settleStep`,
+ * a room gives it. Round 124: the level back at round 80's, each foot to its own side, and the ear settling into a long walk (`settleStep`,
  * `settleGain`), which foley.ts and bodyFoley.ts each keep for their own clock.
  */
 
@@ -46,11 +46,11 @@ export function coldAt(region: string | null, dark: number, raining: boolean, ro
 /** How loud a footfall at `speed` (m/s) is against its set's own level: quiet creeping, a little more at a walk, the most at a sprint; the recipe laid over it keeps to the same. */
 export const stepLevel = (speed: number): number => STEP_VOICE.level[0] + (STEP_VOICE.level[1] - STEP_VOICE.level[0]) * Math.min(1, Math.max(0, speed / PLAYER.sprintSpeed));
 
-/** Where a footfall of `foot` (1 the right, -1 the left) is heard: a little to its own side (`STEP_VOICE.spread`, round 121). */
+/** Where a footfall of `foot` (1 the right, -1 the left) is heard: a little to its own side (`STEP_VOICE.spread`, round 124). */
 export const footPan = (foot: 1 | -1): number => foot * STEP_VOICE.spread;
 
 /**
- * How long the ear has been walking (round 121, `STEP_VOICE.settle`): `busy` seconds, grown by `dt` while footfalls keep coming (`walking`)
+ * How long the ear has been walking (round 124, `STEP_VOICE.settle`): `busy` seconds, grown by `dt` while footfalls keep coming (`walking`)
  * and given back `recover` times as fast once they stop. Held under the point where the ease is whole, so a walk's end is soon undone.
  */
 export function settleStep(busy: number, dt: number, walking: boolean): number {

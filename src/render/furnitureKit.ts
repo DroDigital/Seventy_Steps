@@ -19,6 +19,7 @@ export interface Out {
   trim: THREE.BufferGeometry[]; // relief on a wall: drawn nearer
   glow: THREE.BufferGeometry[];
   shine: THREE.BufferGeometry[]; // (round 108) light on a surface: drawn nearer than it
+  faint: THREE.BufferGeometry[]; // (2026-11-25) lit as the stone is, with a little light of its own: a jar of glowing fluid
 }
 
 /** A wall's frame: where (s along it, d out from it into the room) is in the world, and which way it runs. */

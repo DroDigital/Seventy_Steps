@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import type { Rng } from '../core/rng';
 import type { PropLook, TreeForm } from '../data/propLooks';
 import type { Prop } from '../world/props';
+import { hangFrom } from './crownUnder';
 import { tileUv, tint } from './meshKit';
 import { mixRgb, scaleRgb, type Rgb } from './palette';
 import { cyl, join, limb, roots, scatter, shadeBelow, stem, tipOf } from './propKit';
@@ -146,15 +147,21 @@ function willow(p: Prop, rng: Rng, look: PropLook, bark: Rgb): Piece[] {
     const a = (k / 3) * Math.PI * 2 + rng();
     leaves.push(lumpOf([top[0] + Math.sin(a) * r * 0.55, top[1] + r * 0.25, top[2] + Math.cos(a) * r * 0.55], r * 0.6, scaleRgb(c, 0.9 + 0.15 * rng()), rng, 0.6));
   }
+  const crown = join(leaves); // what the strands hang from (2026-11-24: they hung from fixed heights the jagged dome often did not reach, in the air under it)
   const n = 18 + Math.floor(rng() * 6); // the curtain: thin strands from the dome's rim in two rings, the inner longer
   for (let k = 0; k < n; k++) {
     const a = (k / n) * Math.PI * 2 + rng() * 0.25;
     const ring = k % 2 ? 0.95 : 0.7;
     const [x, z] = [top[0] + Math.sin(a) * r * ring, top[2] + Math.cos(a) * r * ring];
     const from = top[1] + r * (k % 2 ? 0.15 : 0.35);
-    const drop = from - 0.5 - rng() * (k % 2 ? 1.4 : 0.8); // hangs to well above the ground
-    leaves.push(tint(new THREE.ConeGeometry(0.1 + 0.05 * rng(), drop, 4).rotateX(Math.PI).rotateY(rng()).translate(x, from - drop / 2, z), scaleRgb(c, 0.8 + 0.25 * rng())));
+    const foot = 0.5 + rng() * (k % 2 ? 1.4 : 0.8); // hangs to well above the ground
+    const [w, turn, shade] = [0.1 + 0.05 * rng(), rng(), 0.8 + 0.25 * rng()];
+    const at = hangFrom(crown, x, z, top[0], top[2], 0.15); // its top inside the dome's underside, drawn in under it if the rim is thin there
+    if (!at) continue;
+    const drop = Math.max(0.6, at[1] - Math.min(foot, from - 0.6));
+    leaves.push(tint(new THREE.ConeGeometry(w, drop, 4).rotateX(Math.PI).rotateY(turn).translate(at[0], at[1] - drop / 2, at[2]), scaleRgb(c, shade)));
   }
+  crown.dispose();
   return pieces(wood, leaves);
 }
 

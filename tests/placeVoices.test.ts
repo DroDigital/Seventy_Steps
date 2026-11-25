@@ -94,7 +94,7 @@ describe('the places\' voices as data (data/placeSounds.ts)', () => {
     expect(has('mountains', 'iceBoom') && has('mountains', 'windpipe')).toBe(true);
     expect(has('dreamlands', 'drum') && has('dreamlands', 'templeBell')).toBe(true);
     expect(has('pnakotus', 'dryChime') && has('kn_yan', 'drip') && has('rlyeh', 'deepSwell')).toBe(true);
-    expect(has('court_centre', 'drum') && has('court_centre', 'flute') && has('piping_dark', 'flute')).toBe(true); // (round 121: the drums and the flutes at the centre)
+    expect(has('court_centre', 'drum') && has('court_centre', 'flute') && has('piping_dark', 'flute')).toBe(true); // (round 124: the drums and the flutes at the centre)
     expect(has('beyond', 'viol') && has('yuggoth', 'buzz') && has('black_wood', 'drum')).toBe(true);
   });
 
@@ -169,7 +169,7 @@ describe('the places\' voices played out (render/audio/placeVoices.ts schedule)'
   });
 
   it('a realm with no voices is silent, a journey into another starts that one\'s clocks afresh, and a Still jumped over leaves no dog', () => {
-    expect(PLACE_VOICES.pale_lattice ?? []).toEqual([]); // (round 121: the one realm kept silent, where time does not stir the air)
+    expect(PLACE_VOICES.pale_lattice ?? []).toEqual([]); // (round 124: the one realm kept silent, where time does not stir the air)
     expect(run('pale_lattice', 2)).toEqual([]);
     expect(run('hub', 1, (t, s) => { s.region = t < 400 ? 'pale_lattice' : 'hub'; }).filter((h) => h.t < 400)).toEqual([]);
     const jumped = run('arkham', 2, (t, s) => { if (t > 400 && t < 700) s.phase = 0.6; }); // (seconds 400 to 700 stand at 0.6, past the Still)

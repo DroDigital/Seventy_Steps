@@ -71,9 +71,9 @@ export const LORE_ITEMS: Readonly<Record<LoreItem, (f: Frame) => void>> = {
   specimens(f) {
     f.out.wood.push(wb(f, 0, 0.25, 2.0, 0.44, 0.06, 0.9, DARK), wb(f, 0, 0.25, 2.0, 0.44, 0.06, 1.7, DARK));
     f.out.beam.push(wb(f, 0, 0.06, 2.0, 0.1, 2.2, 0, scaleRgb(DARK, 0.8))); // its back, against the wall: relief
-    for (const [row, y] of [[0, 0.96], [1, 1.76]]) for (let k = 0; k < 5; k++) { // jars, lit by what floats in them
+    for (const [row, y] of [[0, 0.96], [1, 1.76]]) for (let k = 0; k < 5; k++) { // jars, faintly lit by what floats in them (2026-11-25: wholly self-lit, they stood out of the dark across a hall)
       const s = -0.76 + k * 0.38;
-      f.out.glow.push(round(f, s, 0.26, 0.13, 0.36, y, scaleRgb(FLUID[(k + row) % FLUID.length], 0.8), 8));
+      f.out.faint.push(round(f, s, 0.26, 0.13, 0.36, y, scaleRgb(FLUID[(k + row) % FLUID.length], 0.8), 8));
     }
   },
   slab(f) {

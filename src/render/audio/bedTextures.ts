@@ -1,5 +1,5 @@
 /**
- * Round 121, the beds no recording fits, made in code (rainTexture.ts's way). Every vault had the one cave and the one grotto of drips
+ * Round 124, the beds no recording fits, made in code (rainTexture.ts's way). Every vault had the one cave and the one grotto of drips
  * (five and a half drops a second, the loudest thing in the room), so a crypt, a cellar, a mine and the stairs of the dream all sounded
  * alike and all dripped. These are what the places have instead (data/dungeonAmbience.ts):
  *   still: the air of a shut room, a low pressure that swells a little, with a breath in it

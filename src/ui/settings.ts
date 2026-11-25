@@ -47,8 +47,8 @@ export function parseSettings(json: string | null): Settings {
   const v = typeof r.v === 'number' ? r.v : 0;
   const warned = v >= 15;
   const prior = v === 13 || v === 14;
-  // The first launch's steps down (render/autoQuality.ts) leave their mark in the fog and the shadows: a profile so marked is a machine that missed the frame target at 640 × 360, and is not moved up to 800 × 450 (a sharper choice, made without the warning, is another matter: it goes to the default).
-  const tuned = s.fog < SETTINGS.fog[3] || s.shadows < SETTINGS.shadows[3];
+  // Legacy first-launch steps down left their mark in raw fog/shadows entries; keep those resolution migrations working even though fog and shadows are now always on.
+  const tuned = (typeof r.fog === 'number' && r.fog < 1) || (typeof r.shadows === 'number' && r.shadows < 1);
   if (!warned && (!prior || s.resolution > SETTINGS.resolution[1])) s.resolution = tuned && s.resolution <= OLD_DEFAULT ? OLD_DEFAULT : SETTINGS.resolution[3];
   if (v < 17 && !tuned && s.resolution === OLD_DEFAULT) s.resolution = SETTINGS.resolution[3]; // the old default was kept by every save of settings, chosen or not; a lower choice (a slow machine's, the first launch's) is kept
   if (v >= 17 && v < 23 && s.resolution === ROUND_58_DEFAULT) s.resolution = SETTINGS.resolution[3]; // 800 × 450 was kept by every save of 17 to 22, chosen or not: to 640 × 360 once

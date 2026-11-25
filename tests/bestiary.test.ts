@@ -5,7 +5,7 @@ import { DISCOVERIES } from '../src/data/discoveriesAll';
 import { DOCUMENTS, NOTE_SITES } from '../src/data/documents';
 import { ENTITIES } from '../src/data/registry';
 import { ARCHETYPE_IDS, TIERS } from '../src/data/schema';
-import { REGIONS } from '../src/data/regions';
+import { LANDLESS, REGIONS } from '../src/data/regions';
 import { beheld } from '../src/ui/bestiaryPage';
 import { worldLayout } from '../src/world/placements';
 
@@ -48,7 +48,7 @@ describe('the bestiary (round 34)', () => {
 
 describe('the field notes left about the world (round 34)', () => {
   it('has a note to find in every realm, two in most, each of them written', () => {
-    for (const r of REGIONS) expect((NOTE_SITES[r.id] ?? []).length, r.id).toBeGreaterThanOrEqual(1);
+    for (const r of REGIONS) expect((NOTE_SITES[r.id] ?? []).length, r.id).toBeGreaterThanOrEqual(LANDLESS.has(r.id) ? 0 : 1); // (round 123: no ground to leave a note on in the Stairs of Slumber's realm)
     for (const sites of Object.values(NOTE_SITES)) for (const [name] of sites) expect(DOCUMENTS[name]?.kind, name).toBe('note');
     expect(Object.entries(NOTE_SITES).filter(([, s]) => s.length >= 2).length).toBeGreaterThanOrEqual(12);
   });
@@ -58,5 +58,20 @@ describe('the field notes left about the world (round 34)', () => {
     const wanted = [...Object.values(NOTE_SITES).flat().map(([n]) => n), ...Object.values(DISCOVERIES).flatMap((d) => d.leaves.map((l) => l.doc))]; // (and the pages in the courts of the horrors' houses, round 63)
     expect(placed.sort()).toEqual([...wanted].sort());
     expect(Object.keys(DOCUMENTS).filter((n) => DOCUMENTS[n].kind === 'note').sort()).toEqual([...wanted].sort()); // none written and never placed
+  });
+
+  it('keeps the open-world boss arena notes short and free of old gate-puzzle instructions', () => {
+    const courtNotes = Object.values(DISCOVERIES).flatMap((d) => d.leaves.map((l) => l.doc));
+    expect(courtNotes.length).toBeGreaterThan(0);
+    for (const name of courtNotes) {
+      const doc = DOCUMENTS[name];
+      expect(doc?.kind, name).toBe('note');
+      expect(doc.text.length, name).toBeLessThanOrEqual(2);
+      const joined = doc.text.join(' ');
+      const words = joined.split(/\s+/).filter(Boolean).length;
+      expect(words, `${name} words`).toBeLessThanOrEqual(80);
+      expect(joined.length, `${name} chars`).toBeLessThanOrEqual(450);
+      expect(joined, `${name} puzzle remnant`).not.toMatch(/\b(lit in order|four (lamps|lights|braziers|pipes|green fires)|three (candles|lifts)|hour before (dawn|sunrise)|pay it plainly|echoes|laudanum|keep a clear head|keeps one’s head clear|takes a toll|asks a toll|out of its turn)\b/i);
+    }
   });
 });

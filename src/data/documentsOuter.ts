@@ -51,8 +51,8 @@ export const OUTER_DOCUMENTS: Readonly<Record<string, Document>> = {
     'In the margin, in the same ink, larger and less composed: “They will not let me go through whole. They will want the part that is human to stay. I have told them I will leave them my face.”',
   ),
   'A Handbill': note(
-    'A single sheet printed in a clean black type that no press made. “NYARLATHOTEP. Tonight, and tomorrow night, and every night until it is over, in the hall that is open to all. The man will show you what he has seen. There is no charge. No one has asked for his money back. Doors at the hour of your choosing.”',
-    'A clerk’s tick beside it, and a note: “Tall, dark, courteous. He shook my hand. I should like to say that it was cold. It was not cold. It was precisely the temperature of my own.”',
+    'A clean black handbill for an exhibition of strange apparatus. Pencilled on the back:',
+    '“And it was then that Nyarlathotep came out of Egypt. Who he was, none could tell, but he was of the old native blood and looked like a Pharaoh… swarthy, slender, and sinister, always buying strange instruments of glass and metal and combining them into instruments yet stranger.”',
   ),
   "A Night-Gaunt's Tally": note(
     'Scratched into the black floor with something that was not a tool, in tallies of five, many hundreds of them. “Carried: one rider. He did not scream. He had already screamed, on the way up, and was done. The faceless ones do not like to be screamed at. They hold their riders very firmly, and bear them past the stars, and do not tire.”',

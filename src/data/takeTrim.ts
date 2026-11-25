@@ -12,7 +12,7 @@ import { SAMPLE_LEVELS, type Level } from './sampleLevels';
 export const TRIM = { boost: 6, cut: 12, ceiling: -0.5 } as const; // dB
 
 /**
- * Round 121: a take whose weight lies where the ear hears little is lifted this much (dB) over its set's level (within the boost and the
+ * Round 124: a take whose weight lies where the ear hears little is lifted this much (dB) over its set's level (within the boost and the
  * ceiling). The first stone step is a thump under 200 Hz (centroid 160 Hz against its fellows' 320 to 410): at one rms it is about 6 dB
  * quieter to the ear, A-weighted, so one footfall in four on a dungeon's floor all but vanished. Half of that and a little more.
  */

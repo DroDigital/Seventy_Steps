@@ -36,7 +36,7 @@ function above(samples: Float32Array, hz: number): number {
   return Math.max(0, 1 - eLow / Math.max(eAll, 1e-12));
 }
 
-describe('what is heard now and then inside (round 121, data/roomSounds.ts)', () => {
+describe('what is heard now and then inside (round 124, data/roomSounds.ts)', () => {
   const ids = Object.keys(ROOM_SOUNDS) as RoomSoundId[];
 
   it('every one is a playable recipe, short, soft and alike in level; none is a cue or a far voice the game already has', () => {

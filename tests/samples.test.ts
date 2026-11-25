@@ -20,8 +20,8 @@ import { chunkOf } from '../src/world/worldMap';
 
 const AUDIO = 'public/audio';
 const files = (dir: string): string[] => readdirSync(`${AUDIO}/${dir}`).map((f) => `${dir}/${f.replace(/\.mp3$/, '')}`);
-const places: Partial<Ambience>[] = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE), ...Object.values(KIT_AMBIENCE), ...Object.values(DUNGEON_ACCENTS)]; // (round 121: the dungeons' own, and their tales')
-const beds = [...places.flatMap((a) => (a.beds ?? []).filter(([f]) => !generatedOf(f)).map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59; the made ones are drawn in code: round 121)
+const places: Partial<Ambience>[] = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE), ...Object.values(KIT_AMBIENCE), ...Object.values(DUNGEON_ACCENTS)]; // (round 124: the dungeons' own, and their tales')
+const beds = [...places.flatMap((a) => (a.beds ?? []).filter(([f]) => !generatedOf(f)).map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59; the made ones are drawn in code: round 124)
 
 describe('the recorded sounds (data/samples.ts, public/audio)', () => {
   it('every file a set or a bed names is there, and every file there is named', () => {
@@ -49,7 +49,7 @@ describe('the recorded sounds (data/samples.ts, public/audio)', () => {
     for (const a of places) {
       for (const [file, gain] of a.beds ?? []) expect(gain > 0 && gain <= 1, file).toBe(true);
       for (const s of a.spots ?? []) {
-        expect(!!s.set !== !!s.recipe, `${s.set ?? s.recipe}: a recording or a recipe`).toBe(true); // (round 121: a spot may be a recipe)
+        expect(!!s.set !== !!s.recipe, `${s.set ?? s.recipe}: a recording or a recipe`).toBe(true); // (round 124: a spot may be a recipe)
         expect(s.set ? SAMPLE_SETS[s.set] : ROOM_SOUNDS[s.recipe!], s.set ?? s.recipe).toBeDefined();
         expect(s.every[0] > 5 && s.every[0] <= s.every[1], s.set ?? s.recipe).toBe(true);
         if (s.gain !== undefined) expect(s.gain > 0 && s.gain <= 2, s.set ?? s.recipe).toBe(true);

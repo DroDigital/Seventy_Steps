@@ -12,7 +12,7 @@ be made: `src/data/plannedSounds.ts`. Credits and licences: `public/audio/CREDIT
 | A horror's blows | `render/audio/attackAudio.ts`, `data/plannedSounds.ts` `atk(...)`, `public/audio/sfx/atk_*`, `swipe*` | CC0 recordings by element for a bolt's landing, a burst and a throw; a foe's swing its own whoosh. Caster attacks add no procedural tones or fallback while recordings load. |
 | Rain and a bolt on the ground (round 59) | `render/audio/weatherBed.ts`, `public/audio/amb/rain_*`, `sfx/strike*` | a light rain and a downpour recorded, each read twice and panned apart; four close strikes |
 | Ambience | `data/samples.ts` `AMBIENCE`, `public/audio/amb`, `render/audio/ambience.ts` | looped beds with spot sounds, breathing |
-| Dungeons (round 121) | `data/dungeonAmbience.ts`, `data/roomSounds.ts`, `render/audio/bedTextures.ts`, `render/audio/roomAmbience.ts` | each roofed kit's own beds (recordings, and five loops made in code) and spots (recordings, and sixteen recipes), with a dungeon's own voices laid over its kit's |
+| Dungeons (round 124) | `data/dungeonAmbience.ts`, `data/roomSounds.ts`, `render/audio/bedTextures.ts`, `render/audio/roomAmbience.ts` | each roofed kit's own beds (recordings, and five loops made in code) and spots (recordings, and sixteen recipes), with a dungeon's own voices laid over its kit's |
 | Doors | `data/doorSounds.ts`, `render/doorViews.ts` | a recipe made for each swing (below) |
 | Menus | `data/foleySounds.ts` `UI`, `ui/menuSounds.ts` | seven small sounds (move, choose, back, tab, open, close, tick), quiet, wood and paper |
 | The investigator's hands | `data/foleySounds.ts` `HANDS`, `render/audio/foley.ts` | a guard lifted, a draught swallowed, the Reagent's needle and plunger, a flask lobbed and burst, an arm taken up, an arm reinforced, a knee bent and risen from, coins counted |
@@ -74,7 +74,7 @@ if a fight begins before the file has loaded, and the theme takes over by a 2.5 
   are the ones to listen to, with `OVERRIDES.<id>.loop` to mend them.
   `tests/bossMusic.test.ts` keeps the table, the files, the credits and the map in agreement; `tests/bossThemes.test.ts` the player.
 
-## Footsteps (round 121)
+## Footsteps (round 124)
 
 Round 83 made the steps understated, about 5 dB under round 80 at every pace, and they went all but unheard (round 86 gave the
 dungeons' rooms their 5 dB back). They are at round 80's level again (`STEP_VOICE.level` 0.55 to 1 by pace, a walk 0.84; a dungeon
@@ -92,7 +92,7 @@ room's floor 1.12 over that), and a long walk is kept easy on the ear by other m
 
 `tests/footing.test.ts` holds the level against round 80's and round 83's, the settling, the sides, the plant and the cloth.
 
-## Dungeons (round 121)
+## Dungeons (round 124)
 
 Every vault, crypt, cellar, sewer, mine, archive and stair of the dream played one recording of a cave and one of a grotto's drips (5.7
 drops a second, peaking near full scale, about 13 dB over a footfall in the same room). Now each roofed kit has its own soundscape
@@ -199,7 +199,7 @@ and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rm
 
 - A recipe: a `Sound` in `data/foleySounds.ts` (or `sounds.ts`), a class gain, and its place (an event in `cues.ts`, a frame in
   `foley.ts`, a cue in `actBeats.ts`). `tests/soundMix.test.ts` will want its level.
-- A dungeon's sound (round 121): its kit's row in `data/dungeonAmbience.ts` `KIT_AMBIENCE` (a roofed kit without one falls back on its
+- A dungeon's sound (round 124): its kit's row in `data/dungeonAmbience.ts` `KIT_AMBIENCE` (a roofed kit without one falls back on its
   kind's), or a voice of its own tale in `DUNGEON_ACCENTS`; an indoor recipe in `data/roomSounds.ts` (`ROOM_MIX` levels it to -30 dBFS:
   `tests/roomSounds.test.ts`); a bed made in code in `render/audio/bedTextures.ts`, named `gen_<id>`, with a `BED_MANNER` row.
 - A recording: see `src/data/plannedSounds.ts` for the planned ones; for any other, a set in `data/samples.ts`, a row in `public/audio/CREDITS.md`

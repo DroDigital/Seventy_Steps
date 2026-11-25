@@ -76,7 +76,7 @@ export const PLACE_VOICES: Readonly<Record<string, readonly PlaceVoice[]>> = {
     { id: 'leng-drum', recipe: 'drum', every: [150, 260], gain: 0.9, far: [160, 280], hours: { gloaming: 0.5, deep: 1, waning: 0.5 } },
   ],
   rlyeh: [{ id: 'rlyeh-swell', recipe: 'deepSwell', every: [120, 220], gain: 0.9, far: [100, 200], hours: { gloaming: 1, deep: 1, waning: 1 } }],
-  // Round 121: Yuggoth and the realms past the stars had none, only their wind (the Pale Lattice keeps its silence: time does not stir the air).
+  // Round 124: Yuggoth and the realms past the stars had none, only their wind (the Pale Lattice keeps its silence: time does not stir the air).
   yuggoth: [
     { id: 'yuggoth-drone', recipe: 'woodsDrone', every: [140, 240], gain: 0.8, far: [150, 260], hours: { gloaming: 0.6, deep: 1, waning: 0.8 } }, // the Mi-Go's engines across the black rivers
     { id: 'yuggoth-buzz', set: 'buzz', every: [120, 220], gain: 0.5, far: [110, 200], hours: { gloaming: 1, deep: 1, waning: 1 }, lowpass: 1400, pitch: [0.7, 0.85] }, // their buzzing voices, far off

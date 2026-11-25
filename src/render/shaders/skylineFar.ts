@@ -10,9 +10,28 @@
 
 import { FAR } from '../../data/farLooks';
 import { WINK } from '../../data/horizonLife';
+import { FX, RENDER } from '../../data/tuning';
 import { SKY_TONE_GLSL } from './skyTone';
 
 const F = (n: number, d = 3): string => n.toFixed(d);
+
+/** Metres of far air every far shape lies behind besides its own distance: the realm's near haze over the world's reach (RENDER.far), in the far air's units. */
+const EDGE = (FAR.edge * RENDER.far) / FAR.air;
+
+/** How much thicker the far air is as the world's fog closes in (a failing mind: FX.fogFar): 1 while it is where a lucid mind's is, or off. */
+export const closingOf = (fogFar: number, fogAmount: number): number => 1 + fogAmount * Math.max(FX.fogFar[0] / Math.max(fogFar, 1) - 1, 0);
+
+/**
+ * The share of a far shape the air between takes (2026-11-25; the shader's `airShare`, for the tests): `dist` metres off and `h` over its foot,
+ * in a realm of `haze` a metre (data/fogs.ts), the world's fog closing at `fogFar` (`fogAmount`: on), under `overcast` of a closed sky, the
+ * silhouette `fade`d and its layer behind `layer` of air. A far shape lies beyond all the land the world draws, so it is never clearer than
+ * the near haze leaves that land at its edge, and as the fog closes on a failing mind it closes on the far land too: it was as clear at
+ * 1 km as the land at 100 m, crisper than the fogged land before it, and read as near.
+ */
+export function farAirShare(dist: number, h: number, haze: number, fogFar: number, fogAmount = 1, overcast = 0, fade = 0, layer = 0): number {
+  const tau = (dist + EDGE) * haze * FAR.air * closingOf(fogFar, fogAmount) * (1 + FAR.weather * overcast) * (1 + FAR.ground * Math.exp(-Math.max(h, 0) / FAR.groundRise));
+  return Math.min(1 - Math.exp(-tau) * (1 - fade) * (1 - layer), FAR.most);
+}
 
 export const FAR_UNIFORMS = /* glsl */ `
 uniform vec3 uZenith; uniform vec3 uMoonColor; uniform vec3 uMoonDir; uniform float uHaze; uniform vec3 uFogColor; // the sky's own (sky.ts)
@@ -28,6 +47,7 @@ uniform float uSeed;
 uniform vec2 uBand; // the heights (its own share) over which its windows thin out: a town's are mostly in its lower half, a castle's high on its peak
 uniform float uWallFoot; // and below which it has no walls (a castle's are on its summit, not down the mountain under it)
 uniform vec2 uHandoff; // metres over which a far town's columns give way to the real town nearer than them (0: none)
+uniform float uFogFar; uniform float uFogAmount; // the world's fog (worldMaterial.ts): where it closes, and whether it is on
 varying vec4 vShape; varying vec3 vView; varying vec3 vMoon; varying float vDist;
 `;
 
@@ -62,9 +82,10 @@ vec3 airAt(vec3 d) {
   sky += vec3(0.8, 0.85, 1.0) * uFlash * ((0.5 + 0.5 * exp(-rise * 3.0)) * (1.0 - 0.6 * ov) + 0.6 * ov);
   return mix(uFogColor, sky, smoothstep(-0.035, 0.015, d.y));
 }
-// how much of a far thing h metres over its foot the air between takes
+// how much of a far thing h metres over its foot the air between takes: its own distance's and the near haze over the world's reach, which it lies beyond, thickened as the world's fog closes in (farAirShare)
 float airShare(float h, float layer) {
-  float tau = vDist * uAir.x * (1.0 + ${F(FAR.weather, 2)} * uAir.w) * (1.0 + uAir.y * exp(-max(h, 0.0) / uAir.z));
+  float closing = 1.0 + uFogAmount * max(${F(FX.fogFar[0], 1)} / max(uFogFar, 1.0) - 1.0, 0.0);
+  float tau = (vDist + ${F(EDGE, 1)}) * uAir.x * closing * (1.0 + ${F(FAR.weather, 2)} * uAir.w) * (1.0 + uAir.y * exp(-max(h, 0.0) / uAir.z));
   return min(1.0 - exp(-tau) * (1.0 - uFade) * (1.0 - layer), ${F(FAR.most, 2)});
 }
 // a far town gives way, column by column, to the real one the world draws nearer than the far plane

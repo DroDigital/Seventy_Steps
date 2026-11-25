@@ -1,5 +1,5 @@
 /**
- * Round 121: what a dungeon's room sounds like, its kit's soundscape (data/dungeonAmbience.ts KIT_AMBIENCE; a kit without one falls back
+ * Round 124: what a dungeon's room sounds like, its kit's soundscape (data/dungeonAmbience.ts KIT_AMBIENCE; a kit without one falls back
  * on its kind's, data/samples.ts DUNGEON_AMBIENCE) with whatever its dungeon adds of its own tale (DUNGEON_ACCENTS), or null for a room
  * under the sky, which keeps its region's. Put together once for each dungeon and kit and kept, so the same room is the same object and
  * render/audio/ambience.ts does not cross-fade into what it already plays. Pure.

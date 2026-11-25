@@ -31,6 +31,27 @@ export const AI = {
 };
 
 /**
+ * How an ally that goes with the investigator keeps up (round 123, systems/allyTrail.ts; asked: the Cavern of Flame's priests "follow and help you",
+ * and are never left stuck): it walks the investigator's own trail when it cannot see them plainly, and one that steps through the dream is at
+ * their back again when left behind.
+ */
+export const ALLY_TRAIL = {
+  step: 1, // metres walked between two points of the trail...
+  length: 60, // ...and the most points kept (the last sixty metres)
+  leap: 8, // a move this long in one step is a journey, a gate or a fall: the trail begins anew
+  rise: 1.6, // metres of height between ally and investigator past which it does not see them plainly (another flight of the stair)
+  ahead: 2, // points past the one nearest it that an ally walks to
+  hurry: 1.8, // its pace, as a share of its own, while it is more than `hurryFrom` metres behind: it keeps up with a walk, and only a run leaves it
+  hurryFrom: 4.5,
+  near: 6, // metres (in the round) within which an ally is with the investigator, and has nothing to catch up
+  far: 16, // ...beyond which one that steps through the dream does so at once
+  leave: 28, // ...and beyond which it leaves a fight to do so
+  gain: 0.5, // metres nearer it must come to count as gaining on them...
+  stuck: 3.5, // ...and seconds without gaining after which it is held for stuck, and steps
+  back: 3, // metres behind the investigator, along their trail, that it stands when it steps
+};
+
+/**
  * How the rank and file press once they have closed (lesser foes of these tempers, and not a summon).
  * A pack hunter's own wait ran up to a second and a half after the swing, on top of two cane-lights
  * putting it on the ground, so a body authored to fight never finished a blow. A swarm keeps its frenzy;
@@ -125,6 +146,7 @@ export const DUNGEON_LIGHT = {
   arena: 0.5, // and a horror's arena: a fight is read by what the horror throws and by its braziers (round 58)
   adapt: 0.15, // the eye widens without a lantern: the darkness, in a room or on the road, is this much less of what it was where the lantern has gone out (render/lanternLife.ts; round 58)
   ease: 1.3, // 1/s: how fast the room's light takes over from the open sky's (and back) as the camera passes a door
+  faint: 0.14, // the share of its own light a faintly lit thing gives (2026-11-25: a jar of glowing fluid was wholly self-lit, as bright 20 m off in the dark as at hand; render/siteMeshes.ts `faint`)
 };
 
 /** How dark the night is kept (round 35: it was too bright to be creepy; render/realmLook.ts): at its deepest the sky, the mist, the far land and both lights are this much of what a realm's look gives them. */

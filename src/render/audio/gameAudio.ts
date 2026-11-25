@@ -274,7 +274,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     for (const id of callers.keys()) if (!c.dread.has(id)) callers.delete(id);
   }
 
-  /** Inside a legacy dungeon: what its room sounds like (its kit's, and its dungeon's own: round 121), else null (outside, or ruins under the sky). */
+  /** Inside a legacy dungeon: what its room sounds like (its kit's, and its dungeon's own: round 124), else null (outside, or ruins under the sky). */
   const inside = (p: V3): Ambience | null => {
     const d = dungeonRoomAt(p.x, p.z);
     return d ? roomAmbience(d.layout.def.id, kitIdOfRoom(d.layout, d.room)) : null;

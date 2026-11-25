@@ -106,7 +106,7 @@ const RAW: Readonly<Record<FarId, Sound>> = {
     tone('sawtooth', 118.5, 7, 0.04, { attack: 3, filter: lp(320, 220), vibrato: [6.3, 24] }),
     noise('bandpass', 700, 7, 0.04, { attack: 3, q: 3, to: 640 }),
   ],
-  // Round 121, the Outer Dark: "the thin monotonous whine of accursed flutes" (the Court at the Centre, the Piping Dark): one note held and
+  // Round 124, the Outer Dark: "the thin monotonous whine of accursed flutes" (the Court at the Centre, the Piping Dark): one note held and
   // wavering, a second a few hertz off it so the two beat, the breath of the pipe, and the sag as it is let go. No tune.
   flute: [
     ...held('triangle', 740, 4.2, 0.12, { attack: 0.6, vibrato: [5.5, 18] }),
@@ -114,7 +114,7 @@ const RAW: Readonly<Record<FarId, Sound>> = {
     noise('bandpass', 1500, 4.4, 0.05, { attack: 0.8, q: 6 }),
     tone('triangle', 740, 1.2, 0.07, { at: 4.2, attack: 0.1, to: 690 }),
   ],
-  // Round 121, beyond the gate: a viol played wildly somewhere behind walls (the music of Erich Zann), a run of notes that is no scale and a high one held, shut in to its middle.
+  // Round 124, beyond the gate: a viol played wildly somewhere behind walls (the music of Erich Zann), a run of notes that is no scale and a high one held, shut in to its middle.
   viol: [
     ...[[0, 440], [0.2, 554], [0.38, 622], [0.55, 587], [0.74, 740], [0.9, 698], [1.08, 880]].map(([at, hz]) => tone('sawtooth', hz!, 0.32, 0.07, { at, attack: 0.02, vibrato: [6.5, 22], filter: lp(1400, 1000) })),
     ...held('sawtooth', 932, 2.2, 0.08, { at: 1.3, attack: 0.08, vibrato: [7, 30], filter: lp(1500, 1100) }),

@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRng } from '../src/core/rng';
 import { POI_KINDS, POIS, hoardName, poiKey, poisOf, type PoiDef } from '../src/data/pois';
-import { REGIONS } from '../src/data/regions';
+import { LANDLESS, REGIONS } from '../src/data/regions';
 import { ENTITIES, getEntity } from '../src/data/registry';
 import { START_SIGN } from '../src/data/sites';
 import { POI } from '../src/data/tuning';
@@ -42,7 +42,7 @@ describe('the points of interest: what is written', () => {
   });
 
   it('each region has a few (the university, where the first hour is spent, the fewest), and every kind of place is among them', () => {
-    for (const r of REGIONS) expect(poisOf(r.id).length, r.id).toBeGreaterThanOrEqual(r.id === 'hub' ? 2 : 3);
+    for (const r of REGIONS) expect(poisOf(r.id).length, r.id).toBeGreaterThanOrEqual(LANDLESS.has(r.id) ? 0 : r.id === 'hub' ? 2 : 3); // (round 123: the Stairs of Slumber's realm has no land to find a secret on)
     const kinds = new Set(POIS.map((p) => p.kind));
     expect([...kinds].sort()).toEqual([...POI_KINDS].sort()); // a place of every kind
     expect(POIS.filter((p) => p.maze).length).toBeGreaterThanOrEqual(2); // mazes

@@ -117,7 +117,7 @@ describe('the recipes are in the level of a footfall, and each sounds like what 
   });
 
   it('the gear is cloth and leather and nothing rings: noise only, nothing above 2 kHz, no lantern bail (round 83)', () => {
-    expect(Object.keys(GEAR).sort()).toEqual(['coat', 'rustle', 'satchel']); // (round 121: the coat's brush at a walk)
+    expect(Object.keys(GEAR).sort()).toEqual(['coat', 'rustle', 'satchel']); // (round 124: the coat's brush at a walk)
     for (const [id, s] of Object.entries(GEAR)) {
       for (const layer of s) {
         expect(layer.src, id).toBe('noise'); // (a ringing is a tone; the bail and the buckle were tones)
@@ -281,7 +281,7 @@ describe('the body, heard', () => {
   });
 });
 
-describe('the footsteps heard again (round 121; round 83 had them understated)', () => {
+describe('the footsteps heard again (round 124; round 83 had them understated)', () => {
   /** The gains of the recorded footfalls of a walk of `seconds` at `speed`, over snow (the ground's feel taken out). */
   function walk(speed: number, seconds = 10, room?: () => Echo | undefined) {
     const r = rig('mountains', 'snow', undefined, 110, room);
@@ -364,7 +364,7 @@ describe('the footsteps heard again (round 121; round 83 had them understated)',
   });
 });
 
-describe('a long walk is easy on the ear without going quiet (round 121)', () => {
+describe('a long walk is easy on the ear without going quiet (round 124)', () => {
   const S = STEP_VOICE.settle;
 
   it('the ear settles: whole for the first seconds of a walk, then easing smoothly to a floor a couple of decibels down; back as fast as it went, four times over, once the walk stops; whole again on new ground', () => {
@@ -532,7 +532,7 @@ describe('a room answers the footfall (round 83)', () => {
   });
 });
 
-describe('inside a dungeon the steps are lifted a little over the open air\'s (round 86; round 121 with the open air restored)', () => {
+describe('inside a dungeon the steps are lifted a little over the open air\'s (round 86; round 124 with the open air restored)', () => {
   /** A walk through a room at 4.2 m/s, 12 m along +x from `from` metres inside its west wall. */
   function inRoom(floors: readonly string[], rand?: () => number) {
     const room = findRoom(floors)!;

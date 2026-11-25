@@ -77,10 +77,6 @@ export const SETTINGS = {
   invertY: [0, 1, 1, 0], // 1: up looks down (round 12)
   resolution: [0.8, 2, 0.4, 1.6], // internal resolution, × RENDER's 400 × 225, in steps of 160 × 90: 320 × 180, 480 × 270, 640 × 360, the default, and 800 × 450 (2026-11-03, asked: 640 × 360 again, as in round 56, which a 720p, 1080p, 1440p and 4K screen each holds a whole number of times over, 2, 3, 4 and 6; round 58 had made it 800 × 450, which is 1.6, 2.4, 3.2 and 4.8 times over on them; even pixels draw every pixel the same size at either)
   brightness: [0.9, 1.9, 0.05, 1], // 100% is the old 85% look; higher values lift the dark
-  fog: [0, 1, 0.25, 1], // the volumetric fog's strength (0: none, for slower machines; round 16)
-  relight: [0, 1, 1, 0], // 1: the great ones' and the outer gods' bodies are lit over their folds by the lantern and the moon (round 83: shaders/sprite.ts); off, they are lit as the rest
-  shadows: [0, 1, 1, 1], // 0: neither the moon nor the lantern casts shadows (a second and a third pass over the scene each frame, for slower machines; round 34)
-  evenPixels: [0, 1, 1, 1], // 1: every pixel of the picture drawn the same size on any screen (2026-11-03: render/evenPixels.ts); 0: blown up nearest-neighbour, some rows and columns wider than others where the screen does not hold the picture a whole number of times
   font: [0, 1, 1, 0], // 0: IM Fell English; 1: EB Garamond
   uiScale: [0.75, 1.5, 0.05, 1], // × the scale the window's height gives (ui/uiScale.ts; round 12)
   shake: [0, 1, 0.25, 1], // the camera's jolts when struck and at hitstop (round 12)
@@ -89,12 +85,9 @@ export const SETTINGS = {
   captionBack: [0, 1, 1, 0], // 1: a dark band behind them
   gore: [0, 1, 1, 1], // 0: no blade cuts a creature apart and nothing bleeds (round 113: render/gore.ts, render/blood.ts); a creature dies as it did before
   flashes: [0, 1, 0.25, 1], // lightning's brightness; below 1 its strobe softens into one swell (photosensitivity)
-  cutscenes: [0, 1, 1, 1], // 0: none play: a new game's wake, a horror's arrival and fall, an ending's (round 20)
   camera: [0, 2, 1, 0], // 0 Classic (default); 1 Low hero; 2 Tight shoulder (older saved values are migrated in ui/settings.ts)
   minimap: [0, 1, 1, 0], // 0: the minimap turns with the camera, what lies ahead up; 1: north up, the investigator's arrow turning instead (a first public playthrough: "I don't know anyone who likes spinning maps")
-  questTracker: [0, 1, 1, 1], // 0: the quest followed is not written at the side of the screen (it is still in the journal and on the map)
   controlTips: [0, 1, 1, 1], // 0: the first steps' controls are not written on the screen as each is first needed (round 102: ui/firstSteps.ts)
-  quietWalk: [0, 1, 1, 1], // 0: the bars and the map do not sink, nor the camera draw back, when nothing threatens (round 80: ui/calm.ts)
   devRevealed: [0, 1, 1, 0], // 1: the developer options are shown in Settings › Play (revealed and hidden again by Ctrl+Alt+Shift+D: ui/devReveal.ts); never drawn as a slider
   devConsole: [0, 1, 1, 0], // 1: < (or D-pad Right twice) opens the developer console (ui/developerConsole.ts); only while devRevealed
   padSwap: [0, 1, 1, 0], // 1: the pad's A and B are read the other way round (round 45: a pad that reports them swapped; Settings › Controls)
@@ -212,12 +205,11 @@ export const SKY = {
     piping_dark: { moon: 0, stars: 0.3, clouds: 0, haze: 0, milky: 0.15, aurora: 0, meteors: 0 }, // no moon: the dark is a sound
     spheres: { moon: 0, stars: 1.2, clouds: 0, haze: 0.5, milky: 1.3, aurora: 0.4, meteors: 0.5 }, // the globes are the moons
     court_centre: { moon: 0, stars: 2.2, clouds: 0, haze: 0.4, milky: 1.8, aurora: 0, meteors: 2.4 }, // the whole of the stars, falling toward the centre
+    slumber_stairs: { moon: 0, stars: 0, clouds: 0, haze: 0, milky: 0, aurora: 0, meteors: 0 }, // round 123: no sky at all over the Stairs of Slumber, only the dark they go down into
   } as Readonly<Record<string, Partial<SkyDef>>>,
   fade: 3, // seconds to ease into another realm's sky...
   jump: 30, // ...unless the camera leapt this many metres at once (a journey): then at once
   close: 0.6, // seconds for a dungeon's walls to close it off
-  crawl: 0.035, // radians a second the stars crawl about the sky at the most wrong (FX.strange); the pace follows the mind, the place never leaps
-  flicker: 4, // radians a second the stars' twinkle quickens by at the most wrong
   farAngle: 44, // degrees: the most of the sky a far silhouette fills (render/skyline.ts; round 19: Kadath rose 50° over the Dreamlands' north, and it was held at 34; round 117: it stands where it truly is and rises as it is neared, eased from farKnee toward this)
   farKnee: 26, // degrees: below this a far silhouette fills the sky it truly would
 };

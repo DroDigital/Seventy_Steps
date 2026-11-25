@@ -20,7 +20,7 @@ function below(x: Float32Array, hz: number): number {
   return eLow / Math.max(eAll, 1e-12);
 }
 
-describe('the beds made in code (round 121, render/audio/bedTextures.ts)', () => {
+describe('the beds made in code (round 124, render/audio/bedTextures.ts)', () => {
   it('each is a mono loop at the recordings\' level, its peak held, the same each time it is drawn', () => {
     for (const [id, x] of made) {
       const seconds = id === 'embers' ? TEXTURE.flame : TEXTURE.seconds;
