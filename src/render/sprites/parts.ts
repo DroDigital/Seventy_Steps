@@ -5,7 +5,7 @@
 
 import type { Rng } from '../../core/rng';
 import type { SpriteRecipe } from '../../data/schema';
-import { capsule, ellipse, poly, type Canvas, type Ink } from './raster';
+import { capsule, ellipse, poly, stroke, type Canvas, type Ink } from './raster';
 
 export const MID = 32;
 export const GROUND = 62;
@@ -27,6 +27,8 @@ export interface Sketch {
   body: Ink;
   dark: Ink;
   light: Ink;
+  ridge: Ink;
+  recess: Ink;
   eye: Ink;
   claw: Ink;
 }
@@ -40,6 +42,7 @@ export function eyes(s: Sketch, cx: number, cy: number, n: number, spread: numbe
   if (n <= 3) {
     for (let i = 0; i < n; i++) {
       const x = cx + (n === 1 ? 0 : (i / (n - 1) - 0.5) * spread * 2);
+      ellipse(s.c, x, cy + 0.3, size + 0.8, size + 0.75, s.dark);
       ellipse(s.c, x, cy, size, size, s.eye);
     }
     return;
@@ -89,6 +92,21 @@ export function wing(s: Sketch, sx: number, sy: number, side: 1 | -1, span: numb
   );
   capsule(s.c, sx, sy, tip[0], tip[1], 1.4, 0.6, s.body);
   capsule(s.c, sx + side * span * 0.45, sy - lift * 0.45, sx + side * span * 0.55, sy + span * 0.2, 0.8, 0.5, s.body);
+  const wrist = sx + side * span * 0.54, wy = sy - lift * 0.54;
+  stroke(s.c, wrist, wy, sx + side * span * 0.83, sy + span * 0.32 - lift * 0.3, s.ridge);
+  stroke(s.c, wrist, wy + 1, sx + side * span * 0.31, sy + span * 0.38, s.body);
+}
+
+/** Exposed rib ends converge on the breastbone, uneven on either side of the chest. */
+export function ribs(s: Sketch, x: number, y: number, halfWidth: number, rows: number): void {
+  for (let row = 0; row < rows; row++) {
+    const top = y + row * 3, width = halfWidth - row;
+    for (const side of [-1, 1]) {
+      const inner = x + side * 1.5, outer = x + side * width;
+      stroke(s.c, outer, top, inner, top + 2.5, s.recess);
+      stroke(s.c, outer, top - 1, inner + side, top + 1, side < 0 ? s.ridge : s.body);
+    }
+  }
 }
 
 /** Three short claws at the end of a limb. */

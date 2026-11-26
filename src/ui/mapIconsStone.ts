@@ -60,6 +60,11 @@ export function sign(ctx: Ctx, r: number, lit: boolean): void {
   ctx.fill();
   stroke(ctx, r, [[0.1, 0.55], [0.34, 0.2]], 'rgba(0,0,0,0.3)', 0.03); // two cracks and a pitting
   stroke(ctx, r, [[-0.55, 0.3], [-0.38, 0.12], [-0.42, -0.02]], 'rgba(0,0,0,0.26)', 0.03);
+  // A flake has broken out of the shoulder, exposing its violet-black grain.
+  poly(ctx, [[-0.50, -0.83], [-0.27, -0.76], [-0.39, -0.64], [-0.35, -0.43], [-0.51, -0.52]]);
+  ctx.fillStyle = lit ? '#71688c' : '#454959';
+  ctx.fill();
+  stroke(ctx, r, [[-0.27, -0.76], [-0.39, -0.64], [-0.35, -0.43]], 'rgba(220,215,222,0.55)', 0.035, 0.55);
   ctx.restore();
   stroke(ctx, r, [BL, TL, TR], 'rgba(255,255,255,0.42)', 0.04);
   stroke(ctx, r, [shift(TL, d), shift(TR, d)], 'rgba(255,255,255,0.35)', 0.03);
@@ -149,6 +154,12 @@ export function gate(ctx: Ctx, r: number): void {
   stroke(ctx, r, [[-hi, foot - 0.12], [-hi, top]], 'rgba(255,255,255,0.4)', 0.04);
   stroke(ctx, r, [[-1.08, top], [-1.08, lintel], [1.08, lintel]], 'rgba(255,255,255,0.4)', 0.04);
   stroke(ctx, r, [[-0.56, lintel], [0, -1.14]], 'rgba(255,255,255,0.45)', 0.035);
+  // The jambs split in angular faults; the light from inside catches their lips.
+  for (const side of [-1, 1]) {
+    const joint: Pt[] = [[side * 0.95, 0.02], [side * 0.77, 0.13], [side * 0.82, 0.31], [side * 0.64, 0.45]];
+    stroke(ctx, r, joint, '#282d43', 0.075, 0.9);
+    stroke(ctx, r, joint.slice(1), '#8996b0', 0.028, 0.45);
+  }
   ctx.shadowColor = '#74c0ff';
   ctx.shadowBlur = Math.max(2, r * 0.4);
   ctx.beginPath(); // the glyph band: five bars struck in one stroke, so the glow is paid for once
@@ -207,6 +218,9 @@ export function dungeon(ctx: Ctx, r: number): void {
   ctx.fillRect(-1.3, -0.8, 2.6, 0.7);
   if (r > 9) for (const k of [0.84, 0.62]) stroke(ctx, r, [[-1.16 * k, 0.96], [-1.1 * k, 0.1], [-0.7 * k, -0.5 * k], [-0.2 * k, -0.66 * k - 0.02], [0.4 * k, -0.5 * k], [1.0 * k, 0.1], [1.16 * k, 0.96]], 'rgba(0,0,0,0.22)', 0.03); // the courses of its stone
   ctx.restore();
+  // Roots grip the lintel like knuckles and part just above the black opening.
+  stroke(ctx, r, [[-0.64, -0.46], [-0.45, -0.30], [-0.49, -0.17], [-0.31, -0.08]], '#493c33', 0.09, 0.75);
+  stroke(ctx, r, [[-0.45, -0.30], [-0.30, -0.27], [-0.19, -0.18]], '#bfaa83', 0.045, 0.55);
   poly(ctx, [[jl, top], [jr, top], [jr, floor], [jl, floor]]);
   ctx.fillStyle = rad(ctx, 0.06, floor, 0, 0.9, '#ffb04a', '#8a3c12', '#150b08', '#07050a');
   ctx.fill();

@@ -1,8 +1,8 @@
 /** Upright body plans, drawn facing the viewer: humanoid, hunched, robed, giant, cephalopod, spectre. */
 
-import { capsule, ellipse, poly } from './raster';
+import { capsule, ellipse, poly, stroke } from './raster';
 import { dress, type Anchors } from './gear';
-import { claws, eyes, GROUND, MID, recoil, tentacles, wing, type Pose, type Sketch } from './parts';
+import { claws, eyes, GROUND, MID, recoil, ribs, tentacles, wing, type Pose, type Sketch } from './parts';
 
 const HALF_PI = Math.PI / 2;
 
@@ -32,6 +32,13 @@ export function humanoid(s: Sketch): void {
     ellipse(c, fx + side * 0.8, GROUND - 0.6, 2.8, 1.2, s.dark); // foot
   }
   capsule(c, x, hip, x, sh + 2, 5, 6.5, s.body);
+  if (fishy || r.palette === 'flesh' || r.palette === 'mold') {
+    ribs(s, x, sh + 5, 5, 3);
+  } else {
+    stroke(c, x - 4, sh + 2, x - 0.5, sh + 6, s.ridge);
+    stroke(c, x + 4, sh + 2, x + 0.5, sh + 8, s.dark);
+    stroke(c, x, sh + 8, x + 1, hip - 4, s.dark);
+  }
   capsule(c, x - 4.5, hip - 1, x + 4.5, hip - 1, 0.9, 0.9, s.dark); // belt, or the line of the hips
   dress(s, 'torso', worn);
   capsule(c, x, sh + 1, x, head + 3, 1.9, 1.7, s.body); // neck
@@ -62,7 +69,7 @@ export function hunched(s: Sketch): void {
   capsule(c, x - 5, 46 + b, x - 7 + p.swing * 4, GROUND - 1, 3, 2.4, s.dark);
   capsule(c, x + 5, 46 + b, x + 7 - p.swing * 4, GROUND - 1, 3, 2.4, s.body);
   ellipse(c, x, 38 + b, 11, 11, s.body);
-  for (let k = 0; k < 3; k++) capsule(c, x - 7 + k * 0.6, 36 + k * 3.5 + b, x + 7 - k * 0.6, 36 + k * 3.5 + b, 0.4, 0.4, s.dark); // ribs under the hide
+  ribs(s, x, 34 + b, 8, 4);
   for (let k = 0; k < 5; k++) ellipse(c, x - 6 + k * 3, 28 + Math.abs(k - 2) * 0.8 + b, 1.2, 1.4, s.light); // the knobs of the spine
   for (const side of [-1, 1] as const) {
     const up = p.attack === 1 ? -26 : p.attack === 2 ? 8 : p.hurt ? 2 : 0;
@@ -73,8 +80,9 @@ export function hunched(s: Sketch): void {
   }
   ellipse(c, x, 25 + b, 6, 5.5, s.light);
   eyes(s, x, 24 + b, r.eyes ?? 2, 2.6, 1.2);
-  capsule(c, x - 3, 28 + b, x + 3, 28 + b, 0.8, 0.8, s.dark); // wide mouth
-  for (let k = -2; k <= 2; k += 2) ellipse(c, x + k, 28.3 + b, 0.5, 0.7, s.claw); // and its teeth
+  ellipse(c, x, 28 + b, 4.2, p.attack === 2 ? 2.8 : 1.7, s.recess);
+  stroke(c, x - 3, 27 + b, x - 2, 29 + b, s.claw);
+  stroke(c, x + 2, 27 + b, x + 2, 28 + b, s.claw);
   if (r.tentacles) tentacles(s, x, 29 + b, r.tentacles, 9, 1.1, HALF_PI - 0.4, HALF_PI + 0.4, p.bob);
   dress(s, 'after', worn);
 }
@@ -88,7 +96,12 @@ export function robed(s: Sketch): void {
   dress(s, 'before', worn);
   if (r.tentacles) tentacles(s, x, 58, r.tentacles, 10, 1.4, 0.3, Math.PI - 0.3, p.bob);
   poly(c, [[x - 7, 20 + b], [x + 7, 20 + b], [x + 13 + p.swing, GROUND], [x - 13 + p.swing, GROUND]], s.body);
-  capsule(c, x, 24 + b, x, GROUND - 2, 0.6, 0.8, s.dark);
+  // The stole crosses at the throat and divides into two weighty folds below the belt.
+  poly(c, [[x - 7, 22 + b], [x - 4, 20 + b], [x + 2, 34 + b], [x - 1, 40 + b]], s.dark);
+  poly(c, [[x + 5, 21 + b], [x + 7, 22 + b], [x - 2 + p.swing, GROUND - 1], [x - 5 + p.swing, GROUND]], s.dark);
+  stroke(c, x + 4, 24 + b, x - 2 + p.swing, GROUND - 3, s.ridge);
+  stroke(c, x + 1, 40 + b, x + 6 + p.swing, GROUND - 4, s.ridge);
+  stroke(c, x - 9 + p.swing, GROUND - 5, x - 6, 42 + b, s.body);
   for (const side of [-1, 1] as const) {
     const [hx, hy] =
       p.attack === 1 ? [x + side * 11, 6 + b] : p.attack === 2 ? [x + side * 4, 26 + b] : p.attack === 3 ? [x + side * 9, 30 + b] : [x + side * 9, 36 + b];
@@ -112,6 +125,7 @@ export function giant(s: Sketch): void {
   capsule(c, x + 7, 38 + b, x + 9 - p.swing * 3, GROUND - 1, 4.5, 3.5, s.body);
   if (r.tentacles) tentacles(s, x, 40 + b, r.tentacles, 18, 1.8, HALF_PI - 0.7, HALF_PI + 0.7, p.bob + p.swing);
   ellipse(c, x, 27 + b, 14, 14, s.body);
+  ribs(s, x, 22 + b, 10, 4);
   const pairs = Math.max(1, Math.round((r.limbs ?? 2) / 2));
   for (let k = 0; k < pairs; k++) {
     for (const side of [-1, 1] as const) {
@@ -124,7 +138,13 @@ export function giant(s: Sketch): void {
   }
   const big = (r.limbs ?? 2) >= 4; // gugs: a huge head split by a vertical mouth
   ellipse(c, x, 10 + b, big ? 8 : 5, big ? 9 : 5.5, s.light);
-  if (big) capsule(c, x, 3 + b, x, 17 + b, 1.5, 1.5, s.dark);
+  if (big) {
+    ellipse(c, x, 10 + b, p.attack === 2 ? 4.5 : 2.7, 8, s.recess);
+    for (let k = 0; k < 4; k++) {
+      const side = k % 2 ? 1 : -1;
+      stroke(c, x + side * 2, 5 + b + k * 3, x + side * 0.5, 6 + b + k * 3, s.claw);
+    }
+  }
   eyes(s, x, 8 + b, r.eyes ?? 2, big ? 5 : 2.2, 1.2);
 }
 
@@ -137,12 +157,17 @@ export function cephalopod(s: Sketch): void {
   capsule(c, x - 6, 40 + b, x - 7 + p.swing * 3, GROUND - 1, 4, 3, s.dark);
   capsule(c, x + 6, 40 + b, x + 7 - p.swing * 3, GROUND - 1, 4, 3, s.body);
   ellipse(c, x, 32 + b, 11, 12, s.body);
+  ribs(s, x, 30 + b, 8, 3);
   for (const side of [-1, 1] as const) {
     const [hx, hy] = arm(p, x + side * 9, 26 + b, side, 20);
     capsule(c, x + side * 9, 26 + b, hx, hy, 3, 2.4, s.body);
     claws(s, hx, hy, side);
   }
   ellipse(c, x, 13 + b, 9, 10, s.light);
+  for (const side of [-1, 1]) {
+    stroke(c, x + side * 2, 4 + b, x + side * 5, 8 + b, s.recess);
+    stroke(c, x + side * 5, 8 + b, x + side * 6, 15 + b, s.ridge);
+  }
   eyes(s, x, 11 + b, r.eyes ?? 2, 3.5, 1.3);
   tentacles(s, x, 19 + b, r.tentacles ?? 6, 15, 1.4, HALF_PI - 0.5, HALF_PI + 0.5, p.bob + p.attack);
 }
@@ -158,6 +183,10 @@ export function spectre(s: Sketch): void {
     [[x - 6, 16 + b], [x + 6, 16 + b], [x + 11, 40 + b], [x + 7, 54 + b], [x + 3, 47 + b], [x, 57 + b], [x - 3, 47 + b], [x - 7, 54 + b], [x - 11, 40 + b]],
     s.body,
   );
+  for (const side of [-1, 1]) {
+    poly(c, [[x, 20 + b], [x + side * 7, 32 + b], [x + side * 6, 50 + b], [x + side * 3, 34 + b]], s.dark);
+    stroke(c, x + side * 2, 21 + b, x + side * 7, 39 + b, s.ridge);
+  }
   for (const side of [-1, 1] as const) {
     const reach = p.attack === 2 ? 4 : p.attack === 1 ? 14 : 11;
     capsule(c, x + side * 6, 20 + b, x + side * reach, (p.attack === 1 ? 8 : 36) + b, 1.6, 1, s.body);

@@ -3,7 +3,7 @@
 
 Needs `pip install pillow`. tools/pack_reviewed_assets.py builds the pack from the author's whole library;
 this adds frames the author drew afterwards (the colossi's stoop, its in-between frame, the bosses' side and
-back attack and hurt) to the pack as it stands: the frames go on a new page (public/creatures/reviewed/creatures-<n>.png),
+back attack and hurt) to the pack as it stands: the frames go on a new page (tools/sprites/source/reviewed/creatures-<n>.png),
 the creature's view gains the action, and index.json and source-index.json are brought in line, so the integrity
 test (tests/reviewedCreatureAssets.test.ts) holds the new frames to the same account as the old.
 
@@ -27,7 +27,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-PACK = ROOT / 'public' / 'creatures' / 'reviewed'
+PACK = ROOT / 'tools' / 'sprites' / 'source' / 'reviewed'
 LIMIT = 2048
 GUTTER = 1
 GROUND = {'default': 2, 'yog_sothoth': 4}  # pixels a frame's base may stand from its view's idle (a body of drifting spheres has a looser base)

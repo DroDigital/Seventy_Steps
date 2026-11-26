@@ -20,6 +20,8 @@ export function place(ctx: Ctx, r: number): void {
   ctx.fillStyle = 'rgba(112,142,78,0.62)'; // the moss in the crevice of the lowest two
   poly(ctx, [[-0.66, 0.3], [-0.5, 0.2], [-0.34, 0.2], [-0.4, 0.3], [-0.56, 0.36]]);
   ctx.fill();
+  stroke(ctx, r, [[0.12, 0.17], [0.04, 0.28], [0.18, 0.38], [0.10, 0.53]], '#504940', 0.07, 0.65);
+  stroke(ctx, r, [[0.18, 0.38], [0.38, 0.32], [0.46, 0.35]], '#8b806c', 0.04, 0.5);
 }
 
 /**
@@ -62,6 +64,12 @@ export function you(ctx: Ctx, r: number, turn: number): void {
   ctx.fillRect(-1, -1.4, 1, 2.6);
   ctx.fillStyle = rad(ctx, -0.04, 0.12, 0, 0.9, 'rgba(255,214,120,0.8)', 'rgba(255,190,80,0.22)', 'rgba(255,190,80,0)'); // the lantern's warmth
   ctx.fillRect(-1, -1.4, 2, 2.6);
+  // Long flake scars along the struck blade meet its central ridge at different heights.
+  for (const [y, width] of [[-0.46, 0.28], [-0.03, 0.44], [0.43, 0.45]]) {
+    poly(ctx, [[-width, y], [-0.06, y - 0.19], [-0.12, y + 0.06], [-width, y + 0.11]]);
+    ctx.fillStyle = '#c0a978';
+    ctx.fill();
+  }
   ctx.fillStyle = 'rgba(255,255,255,0.6)'; // the flaking along the blade's edge: a few small chips
   for (const [cx, cy] of [[-0.3, -0.62], [-0.46, -0.2], [0.3, -0.54], [0.45, -0.1]] as const) {
     poly(ctx, [[cx, cy - 0.06], [cx + 0.07, cy], [cx, cy + 0.06]]);
@@ -104,6 +112,8 @@ export function marker(ctx: Ctx, r: number): void {
   ctx.fillStyle = 'rgba(0,30,26,0.32)'; // a fold in the cloth, its lower half in shade
   poly(ctx, [[0.07, -0.54], [0.5, -0.56], [0.86, -0.58], [1.12, -0.34], [0.6, -0.34], [0.07, -0.2]]);
   ctx.fill();
+  stroke(ctx, r, [[0.22, -0.72], [0.42, -0.70], [0.52, -0.58], [0.78, -0.64]], '#367a6c', 0.06, 0.55);
+  stroke(ctx, r, [[0.42, -0.70], [0.42, -0.49]], '#bde1bd', 0.035, 0.5);
   stroke(ctx, r, [[0.1, -0.86], [0.6, -0.97], [1.08, -0.79]], 'rgba(255,255,255,0.6)', 0.035);
   ctx.fillStyle = rad(ctx, -0.04, -1.0, 0, 0.14, '#fff6cc', '#d9a84e', '#6a4818'); // the finial
   ctx.beginPath();
