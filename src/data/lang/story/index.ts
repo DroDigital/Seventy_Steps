@@ -15,7 +15,7 @@ import { FR_STORY } from './fr';
 export type StoryTable = Readonly<Record<string, Readonly<Record<string, string>>>>;
 
 /** The domains of the story, each a table of its own in every language. */
-export const STORY_DOMAINS = ['intro', 'people', 'rumors', 'overheard', 'fates', 'quests', 'documents'] as const;
+export const STORY_DOMAINS = ['intro', 'people', 'rumors', 'overheard', 'fates', 'quests', 'documents', 'places'] as const;
 export type StoryDomain = (typeof STORY_DOMAINS)[number];
 export type StoryBook = Readonly<Record<StoryDomain, StoryTable>>;
 

@@ -7,6 +7,8 @@ import { ES_FATES } from './fates';
 import { ES_INTRO } from './intro';
 import { ES_OVERHEARD } from './overheard';
 import { ES_PEOPLE } from './people';
+import { ES_PLACES } from './places';
+import { ES_PLACESFAR } from './placesFar';
 import { ES_QUESTS } from './quests';
 import { ES_RUMORS } from './rumors';
 
@@ -18,4 +20,5 @@ export const ES_STORY: StoryBook = {
   fates: ES_FATES,
   quests: ES_QUESTS,
   documents: { ...ES_DOCUMENTS, ...ES_DOCUMENTSMORE },
+  places: { ...ES_PLACES, ...ES_PLACESFAR },
 };

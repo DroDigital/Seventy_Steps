@@ -7,6 +7,7 @@
  * called, where the map opens on one not stood in, the heading's line of what is charted, and the row of names.
  */
 
+import { story, t } from '../core/i18n';
 import type { XZ } from '../core/geom';
 import type { RegionDef } from '../data/regions';
 import { signBeyondDemo, signPlace } from '../systems/checkpoints';
@@ -39,7 +40,7 @@ export function knownRealms(g: Game, here: readonly RegionDef[]): RegionDef[][] 
 }
 
 /** A realm's name: its one region's, or, for the realm of many (the waking world, in the full game and the demo), what it is. */
-export const realmName = (rs: readonly RegionDef[]): string => (rs.length !== 1 && rs.some((r) => r.id === 'hub') ? 'The Waking World' : (rs[0]?.name ?? ''));
+export const realmName = (rs: readonly RegionDef[]): string => (rs.length !== 1 && rs.some((r) => r.id === 'hub') ? t('map.wakingWorld') : story(rs[0]?.name ?? ''));
 
 /** Where the map opens on a realm: the investigator, in their own; in another, the sign last rested at or come to, if it is there, else its first sign lit, else its middle. */
 export function realmAnchor(g: Game, rs: readonly RegionDef[]): XZ {
@@ -57,7 +58,8 @@ export function realmAnchor(g: Game, rs: readonly RegionDef[]): XZ {
 
 /** The heading over a realm: the region stood in, in the investigator's own (`mine`), else the realm's name; and what is charted of it. */
 export function realmHeading(g: Game, rs: readonly RegionDef[], mine: boolean): [string, string] {
-  const where = mine ? rs.find((x) => x.id === g.overworld?.region)?.name : undefined;
+  const here = mine ? rs.find((x) => x.id === g.overworld?.region)?.name : undefined;
+  const where = here === undefined ? undefined : story(here);
   return [(where ?? realmName(rs)).toUpperCase(), realmStats(g, rs)];
 }
 

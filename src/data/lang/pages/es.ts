@@ -28,4 +28,6 @@ export const ES_PAGES: Readonly<Record<PageKey, string>> = {
   'lead.speak': 'Habla con {name}, junto al Signo Arcano: {sign}.',
   'lead.anySign': 'un Signo Arcano',
   'lead.rite': 'Acércate a una luz para encenderla, o interactúa cuando estés cerca. El marcador sigue a la luz siguiente.',
+  'journey.theSign': 'EL SIGNO ARCANO',
+  'map.wakingWorld': 'El Mundo de la Vigilia',
 };

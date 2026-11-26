@@ -32,6 +32,9 @@ export const EN_PAGES = {
   'lead.speak': 'Speak with {name}, by the Elder Sign at {sign}.',
   'lead.anySign': 'an Elder Sign',
   'lead.rite': 'Approach a light to kindle it, or interact when nearby. The marker follows the next light.',
+  // travel and the map's realms (ui/journeys.ts, ui/mapRealms.ts)
+  'journey.theSign': 'THE ELDER SIGN',
+  'map.wakingWorld': 'The Waking World',
 } as const satisfies Record<string, string>;
 
 export type PageKey = keyof typeof EN_PAGES;

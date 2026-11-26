@@ -4,7 +4,7 @@
  * load or to begin a new game in.
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { DEFAULT_DIFFICULTY, isDifficulty } from '../data/tuning';
 import { levelsOf } from '../systems/levels';
@@ -23,7 +23,8 @@ export interface SlotLine {
 export function slotLine(store: SaveStore | null, slot: number): SlotLine | null {
   const s = store && loadSave(store, slot);
   if (!s) return store && newerSave(store.getItem(slotKey(slot))) ? { line: t('slot.newer'), loads: false } : null;
-  const where = regionAt(s.at.x, s.at.z)?.name ?? t('slot.dream');
+  const realm = regionAt(s.at.x, s.at.z)?.name;
+  const where = realm ? story(realm) : t('slot.dream');
   const journey = s.cycle ? `  ·  ${t('slot.journey', { n: s.cycle + 1 })}` : '';
   const hard = isDifficulty(s.difficulty) && s.difficulty !== DEFAULT_DIFFICULTY ? `  ·  ${t(`diff.${s.difficulty}.name` as Key).toLowerCase()}` : ''; // the one it was begun at (round 38)
   return { loads: true, line: `${where}  ·  ${t('slot.level', { n: levelsOf(s.levels) + 1 })}  ·  ${playTime(s.tally?.frames ?? 0)}${journey}${hard}` };

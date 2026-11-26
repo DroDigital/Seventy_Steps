@@ -11,7 +11,10 @@ import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
 import { QUESTS } from '../src/data/quests';
+import { REGIONS } from '../src/data/regions';
 import { RUMORS } from '../src/data/rumors';
+import { placesOf } from '../src/world/namedPlaces';
+import { worldLayout } from '../src/world/placements';
 import type { StoryDomain } from '../src/data/lang/story';
 
 /** A domain's lines: the source's id -> the English of each line it shows. */
@@ -38,4 +41,15 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
     new Map(Object.entries(QUESTS).filter(([id]) => !id.startsWith('discover_')).map(([id, q]) => [id, lines(q.title, ...q.stages.map((s) => s.note), q.done)])),
   // the tomes, notes and letters: a name and its paragraphs, by name (the pages of the horrors' courts and the Outer Dark among them)
   documents: () => new Map(Object.entries(DOCUMENTS).map(([name, doc]) => [name, lines(name, ...doc.text)])),
+  // the places, by realm: its name, its lesser places' names (world/namedPlaces.ts), and its Elder Signs', gates' and dungeons' names
+  places: () => {
+    const by = new Map<string, Set<string>>();
+    const add = (region: string, ...names: string[]): void => void names.forEach((n) => n && (by.get(region) ?? by.set(region, new Set()).get(region)!).add(n));
+    for (const r of REGIONS) add(r.id, r.name, ...placesOf(r.id).map((p) => p.name));
+    const w = worldLayout();
+    for (const s of w.signs) add(s.region, s.name);
+    for (const g of w.gates) add(g.region, g.name);
+    for (const { layout: d } of w.dungeons) add(d.region, d.def.name);
+    return new Map([...by].map(([id, names]) => [id, [...names]]));
+  },
 };

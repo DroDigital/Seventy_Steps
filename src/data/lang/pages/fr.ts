@@ -28,4 +28,6 @@ export const FR_PAGES: Readonly<Record<PageKey, string>> = {
   'lead.speak': 'Parlez à {name}, près du Signe des Anciens : {sign}.',
   'lead.anySign': 'un Signe des Anciens',
   'lead.rite': 'Approchez-vous d’une lumière pour l’allumer, ou interagissez quand vous êtes près. Le repère suit la lumière suivante.',
+  'journey.theSign': 'LE SIGNE DES ANCIENS',
+  'map.wakingWorld': 'Le Monde de l’éveil',
 };

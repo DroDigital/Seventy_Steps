@@ -28,4 +28,6 @@ export const DE_PAGES: Readonly<Record<PageKey, string>> = {
   'lead.speak': 'Sprecht mit {name}, beim Ältesten Zeichen: {sign}.',
   'lead.anySign': 'ein Ältestes Zeichen',
   'lead.rite': 'Nähert euch einem Licht, um es zu entzünden, oder interagiert in seiner Nähe. Die Markierung folgt dem nächsten Licht.',
+  'journey.theSign': 'DAS ÄLTESTE ZEICHEN',
+  'map.wakingWorld': 'Die Wache Welt',
 };

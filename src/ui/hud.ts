@@ -164,19 +164,19 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
     banner.hide();
   });
   g.events.on('FirstSight', (e) => {
-    if (e.sanity || e.insight) say([e.name.toUpperCase(), e.sanity && tr('hud.sanityLoss', { n: e.sanity }), e.insight && tr('hud.insightGain', { sign: sign(e.insight), n: Math.abs(e.insight) })].filter(Boolean).join('  '));
+    if (e.sanity || e.insight) say([story(e.name).toUpperCase(), e.sanity && tr('hud.sanityLoss', { n: e.sanity }), e.insight && tr('hud.insightGain', { sign: sign(e.insight), n: Math.abs(e.insight) })].filter(Boolean).join('  '));
   });
   g.events.on('InsightChanged', (e) => {
     if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
   });
   g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', e.name.toUpperCase(), EPITAPHS[creatureOf(g, e.entity)?.id ?? '']));
-  g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', e.name.toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
+  g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', story(e.name).toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
   g.events.on('Foreboding', (e) => setTimeout(() => great.show(tr('hud.stirs'), 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
   g.events.on('WayOmen', (e) => say(e.words)); // a line said on a trail to a horror (round 62)
-  g.events.on('HouseSeen', (e) => great.show(e.name, 'place', e.line.toUpperCase())); // a horror's house come within sight (round 63)
+  g.events.on('HouseSeen', (e) => great.show(story(e.name), 'place', story(e.line).toUpperCase())); // a horror's house come within sight (round 63)
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
-  g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
-  g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
+  g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: story(e.name).toUpperCase() })));
+  g.events.on('PlaceFound', (e) => great.show(story(e.name).toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: story(REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
   g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: story(e.title).toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Notice', ({ text }) => say(text));
@@ -253,7 +253,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
       const mountShown = mountKey !== '' && now < mountTipUntil;
       const mountLine = fill(tr(mounted ? 'hud.mountRide' : 'hud.mountSummon', { name: MOUNTS[mounted ?? g.player.mount.selected].name }));
       const gate = !act && !near ? gateNear(g) : null; // a gate has no key to press: nearing it says where it leads (round 60)
-      const promptText = gate ? tr('hud.gateLeads', { name: gate.leads }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '';
+      const promptText = gate ? tr('hud.gateLeads', { name: story(gate.leads) }) : mountShown && (mounted || (!act && !near)) ? mountLine : act ? `${e} · ${act.label}` : near ? `${e} · ${verb} ${near.name}${near.kind === 'sign' ? restWhy(near.id) : ''}` : '';
       setText(prompt, promptText);
       setStyle(prompt, 'display', promptText ? 'block' : 'none');
       bosses.update();

@@ -89,23 +89,23 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
     const found = ow.discovered.has(p.id);
     if (!isExplored(ow.explored, p.x, p.z) && !(p.kind === 'sign' && found)) continue;
     if (p.kind === 'sign') {
-      const text = { text: p.name, x, y, size: 11 * k, color: BONE, gap: 0 };
+      const text = { text: story(p.name), x, y, size: 11 * k, color: BONE, gap: 0 };
       add(middle, {
         kind: 'sign', x, y, state: { lit: found }, place: p,
         title: found ? 'Elder Sign' : 'An Elder Sign, unlit',
-        name: found ? p.name : '',
+        name: found ? story(p.name) : '',
         note: found ? 'A place to rest. Click to choose it for a journey' : 'Walk up to it to light it',
       }, 1, found && full ? text : null, 'signs');
     } else if (p.kind === 'gate') {
-      add(middle, { kind: 'gate', x, y, state: {}, place: p, title: 'Gate', name: p.name, note: 'Walk into it to pass through' }, 1,
-        full && detail >= DETAIL.doorNames ? { text: p.name, x, y, size: 10 * k, color: GATE_NAME, gap: 0 } : null, 'doors');
+      add(middle, { kind: 'gate', x, y, state: {}, place: p, title: 'Gate', name: story(p.name), note: 'Walk into it to pass through' }, 1,
+        full && detail >= DETAIL.doorNames ? { text: story(p.name), x, y, size: 10 * k, color: GATE_NAME, gap: 0 } : null, 'doors');
     } else if (p.kind === 'dungeon') {
       const met = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b));
       const done = met.length > 0 && met.every(slain);
       add(middle, {
         kind: 'dungeon', x, y, state: {}, place: p, badge: met.length ? (done ? 'slain' : 'live') : null,
-        title: 'Dungeon', name: p.name, note: !met.length ? 'Its door stands open' : done ? 'Its horror is slain' : 'A horror lurks within',
-      }, 1, full && detail >= DETAIL.doorNames ? { text: p.name, x, y, size: 10 * k, color: DOOR_NAME, gap: 0 } : null, 'doors');
+        title: 'Dungeon', name: story(p.name), note: !met.length ? 'Its door stands open' : done ? 'Its horror is slain' : 'A horror lurks within',
+      }, 1, full && detail >= DETAIL.doorNames ? { text: story(p.name), x, y, size: 10 * k, color: DOOR_NAME, gap: 0 } : null, 'doors');
     } else {
       const done = p.bosses.every(slain);
       const known = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b)).map((b) => getEntity(b)?.name ?? '');
@@ -131,8 +131,8 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
     for (const pl of realm.flatMap((r) => placesOf(r.id))) { // the named places found, marked and named last (round 18)
       if (!ow.places.has(pl.id)) continue;
       const [x, y] = [screenX(view, pl.x), screenY(view, pl.z)];
-      add(under, { kind: 'place', x, y, state: {}, title: 'A place you found', name: pl.name, note: '' }, 0.7,
-        full && detail >= DETAIL.placeNames ? { text: pl.name, x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
+      add(under, { kind: 'place', x, y, state: {}, title: 'A place you found', name: story(pl.name), note: '' }, 0.7,
+        full && detail >= DETAIL.placeNames ? { text: story(pl.name), x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
     }
   }
 
@@ -146,9 +146,9 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       const named = !rumour && full && detail >= DETAIL.placeNames && placeAt(site.x, site.z)?.name !== site.def.name; // (a place the map already names under the same name is not named twice)
       add(middle, {
         kind: 'secret', x, y, state: rumour ? { rumour: true } : { poi: site.def.kind, spent: mark === 'spent' },
-        title: rumour ? 'Something strange' : SECRET_TITLE[site.def.kind], name: rumour ? '' : site.def.name,
+        title: rumour ? 'Something strange' : SECRET_TITLE[site.def.kind], name: rumour ? '' : story(site.def.name),
         note: rumour ? 'Near ground you have charted: go and see' : mark === 'spent' ? 'Its chest is taken' : site.def.hoard ? 'A chest of Echoes lies near' : '',
-      }, 0.9, named ? { text: site.def.name, x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
+      }, 0.9, named ? { text: story(site.def.name), x, y, size: 8.5 * k, color: DIM, gap: 0 } : null, 'places');
     }
   }
 

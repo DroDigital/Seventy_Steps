@@ -7,6 +7,8 @@ import { DE_FATES } from './fates';
 import { DE_INTRO } from './intro';
 import { DE_OVERHEARD } from './overheard';
 import { DE_PEOPLE } from './people';
+import { DE_PLACES } from './places';
+import { DE_PLACESFAR } from './placesFar';
 import { DE_QUESTS } from './quests';
 import { DE_RUMORS } from './rumors';
 
@@ -18,4 +20,5 @@ export const DE_STORY: StoryBook = {
   fates: DE_FATES,
   quests: DE_QUESTS,
   documents: { ...DE_DOCUMENTS, ...DE_DOCUMENTSMORE },
+  places: { ...DE_PLACES, ...DE_PLACESFAR },
 };

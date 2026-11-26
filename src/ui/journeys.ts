@@ -12,6 +12,7 @@
  * `Travelled` then holds it while the far side is made.
  */
 
+import { story, t } from '../core/i18n';
 import { candleFor } from '../systems/candles';
 import { emptyInput, type InputFrame } from '../core/input';
 import { LOOKS } from '../data/looks';
@@ -68,7 +69,10 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     return phase === 'dying' && !veil.covered && a.move === 'death' && a.frame >= a.moves.death.frames - 2;
   };
   const met = (region: string | undefined): boolean => !!region && !!g.overworld?.told.has(`seen:${region}`); // a realm this save has been in has said its epigraph (ui/realmCards.ts)
-  const restPlace = (): string => (g.overworld ? signPlace(g.overworld.sign)?.name : undefined)?.toUpperCase() ?? 'THE ELDER SIGN';
+  const restPlace = (): string => {
+    const name = g.overworld ? signPlace(g.overworld.sign)?.name : undefined;
+    return name ? story(name).toUpperCase() : t('journey.theSign');
+  };
 
   g.events.on('Died', ({ entity }) => {
     if (entity !== g.player.id || phase !== 'idle') return;
@@ -82,7 +86,7 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     const light = [0, 1, 2].map((k) => Math.min(1, look.grade[3][k] * 0.7 + look.accents[0][k] * 0.3 + 0.08)) as [number, number, number];
     const epigraph = firstEpigraph(twin?.region, met(twin?.region)); // a realm come to for the first time says its epigraph under the veil (round 80)
     [phase, least] = ['entering', epigraph ? epigraphHold(epigraph) : HOLD_MS[0]];
-    void veil.cover((twin?.name ?? '').toUpperCase(), (frames / 60) * 0.85, epigraph, light); // made to close as the walk ends
+    void veil.cover(story(twin?.name ?? '').toUpperCase(), (frames / 60) * 0.85, epigraph, light); // made to close as the walk ends
   });
   g.events.on('Travelled', ({ via }) => void (via === 'gate' && phase === 'entering' && hold()));
 
@@ -98,7 +102,10 @@ export function createJourneys(g: Game, veil: Veil, ready?: () => Promise<void>)
     },
     arrive(after) {
       const at = g.ecs.c.transform.get(g.player.id)!.pos;
-      if (g.overworld) veil.darken(regionAt(at.x, at.z)?.name.toUpperCase());
+      if (g.overworld) {
+        const realm = regionAt(at.x, at.z)?.name;
+        veil.darken(realm && story(realm).toUpperCase());
+      }
       hold(after);
     },
     before(frame) {
