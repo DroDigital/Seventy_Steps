@@ -6,7 +6,7 @@
 import { createRng } from '../../core/rng';
 import { ENTITIES, variantOf, type Variant } from '../../data/registry';
 import type { Silhouette, SpriteRecipe } from '../../data/schema';
-import { ANOMALY, CREATURE_COLORS, scaleRgb } from '../palette';
+import { ANOMALY, CREATURE_COLORS, mixRgb, scaleRgb } from '../palette';
 import { crustacean, quadruped, serpent, toad, winged } from './beasts';
 import { barrel, blob, cone, orb, swarm } from './masses';
 import type { Pose, Sketch } from './parts';
@@ -65,7 +65,9 @@ export function drawSprite(r: SpriteRecipe, state: SpriteState, frame: number, s
     body: { rgb: pal.mid, ...skin },
     dark: { rgb: pal.dark, ...skin },
     light: { rgb: pal.light },
-    claw: { rgb: scaleRgb(pal.light, 0.9) },
+    ridge: { rgb: mixRgb(pal.mid, pal.light, 0.55) },
+    recess: { rgb: mixRgb(pal.dark, [0.34, 0.16, 0.19], 0.42) },
+    claw: { rgb: mixRgb(pal.light, [0.8, 0.74, 0.61], 0.4) },
     eye: r.glow ? { rgb: ANOMALY[r.glow], glow: true } : { rgb: PALE_EYE, glint: true },
   });
   outline(c, scaleRgb(pal.dark, 0.35));

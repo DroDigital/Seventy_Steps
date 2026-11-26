@@ -5,7 +5,7 @@
  * horns, its colour and its dark skirt. (The living eye's slit is the one `ellipse` of the mark; a slain one is drawn without.)
  */
 
-import { TAU, glow, groundShadow, lin, mix, rad, rgba, solid, stroke, u, type Ctx, type Pt } from './mapIconKit';
+import { TAU, glow, groundShadow, lin, mix, poly, rad, rgba, solid, stroke, u, type Ctx, type Pt } from './mapIconKit';
 
 type Curve = readonly [Pt, Pt, Pt, Pt];
 
@@ -68,7 +68,7 @@ function almond(ctx: Ctx, w: number, h: number, lid = 1): void {
 /** A horror's eye: open and lit from within when it lives, shut, cracked and grey when it is slain. */
 export function eye(ctx: Ctx, r: number, slain: boolean): void {
   const bone = slain ? ['#c4beb0', '#8f8a7b', '#4d4a42'] : ['#f4ecd4', '#cdc19c', '#756b50'];
-  const flesh = slain ? ['#5f5968', '#33303a'] : ['#8f2a5c', '#2b0b21'];
+  const flesh = slain ? ['#85747e', '#37333e', '#241e29'] : ['#f2a094', '#a63556', '#3c132d'];
   if (!slain) glow(ctx, 0, 0, 1.6, '#ff2a78', 0.4);
   groundShadow(ctx, 0.3, 1.1, 1.1, 0.2);
   const arms = [...(slain ? LIMP : ARMS), ...(slain ? LIMP : ARMS).map(mirror)];
@@ -89,6 +89,15 @@ export function eye(ctx: Ctx, r: number, slain: boolean): void {
     [plate(), lin(ctx, -0.9, -0.7, 0.9, 0.7, ...bone)],
   ], 0.1);
   const [w, h] = [0.72, 0.34];
+  // A torn gum hangs below the socket, its root still gripped by the bone.
+  poly(ctx, [[-0.65, 0.24], [-0.33, 0.35], [0.06, 0.38], [0.60, 0.25], [0.48, 0.49], [0.14, 0.60], [-0.22, 0.56], [-0.48, 0.46]]);
+  ctx.fillStyle = lin(ctx, -0.5, 0.28, 0.48, 0.58, ...(slain ? ['#635960', '#312b33'] : ['#c37477', '#632339', '#45182b']));
+  ctx.fill();
+  for (const [x, y, length] of [[-0.38, 0.39, 0.18], [-0.10, 0.46, 0.30], [0.18, 0.45, 0.18], [0.39, 0.37, 0.15]]) {
+    poly(ctx, [[x - 0.07, y], [x + 0.07, y - 0.02], [x + 0.035, y + length]]);
+    ctx.fillStyle = slain ? '#a39a8f' : '#eddbb6';
+    ctx.fill();
+  }
   stroke(ctx, r, [[-0.52, -0.38], [-0.86, -0.3]], 'rgba(0,0,0,0.3)', 0.05); // where each horn grows from the brow
   stroke(ctx, r, [[0.52, -0.38], [0.86, -0.3]], 'rgba(0,0,0,0.3)', 0.05);
   if (slain) {
@@ -138,6 +147,10 @@ export function eye(ctx: Ctx, r: number, slain: boolean): void {
   ctx.lineWidth = u(r, 0.04, 0.7);
   ctx.strokeStyle = 'rgba(70,0,30,0.8)';
   ctx.stroke();
+  if (r > 9) for (const angle of [-2.9, -2.4, -1.9, -0.8, -0.25, 0.5, 1.1, 2, 2.6]) {
+    const dx = Math.cos(angle), dy = Math.sin(angle);
+    stroke(ctx, r, [[dx * 0.30, dy * 0.30], [dx * 0.22 - 0.025, dy * 0.22], [dx * 0.17, dy * 0.17]], '#f77888', 0.025, 0.45);
+  }
   ctx.fillStyle = '#05000a';
   ctx.beginPath();
   ctx.ellipse(0, 0, 0.08, 0.29, 0, 0, TAU); // the slit

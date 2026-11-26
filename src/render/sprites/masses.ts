@@ -1,7 +1,7 @@
 /** Non-bilateral body plans: barrel (Elder Thing), cone (Yithian), blob, orb, swarm. */
 
 import { createRng } from '../../core/rng';
-import { capsule, ellipse, poly } from './raster';
+import { capsule, ellipse, poly, stroke } from './raster';
 import { eyes, GROUND, MID, recoil, tentacle, tentacles, wing, type Sketch } from './parts';
 
 const HALF_PI = Math.PI / 2;
@@ -18,7 +18,11 @@ export function barrel(s: Sketch): void {
     capsule(c, x, 52 + b, x + Math.cos(a) * 12 + p.swing * (k % 2 ? 2 : -2), GROUND - 1, 2.2, 1, s.dark);
   }
   ellipse(c, x, 38 + b, 9, 15, s.body);
-  for (let k = -1.5; k <= 1.5; k++) capsule(c, x + k * 3.6, 26 + b, x + k * 3.6, 50 + b, 0.5, 0.5, s.dark);
+  for (let k = -1.5; k <= 1.5; k++) {
+    const shoulder = x + k * 2.8, belly = x + k * 4.1;
+    stroke(c, shoulder, 25 + b, belly, 38 + b, s.ridge);
+    stroke(c, belly, 38 + b, shoulder, 50 + b, s.dark);
+  }
   const reach = p.attack === 2 ? 1.6 : p.attack === 1 ? 0.6 : 1;
   tentacles(s, x, 36 + b, r.tentacles ?? 5, 14 * reach, 1.1, -0.3, Math.PI + 0.3, p.bob + p.attack);
   capsule(c, x, 24 + b, x, 18 + b, 2.2, 1.8, s.body);
@@ -43,6 +47,10 @@ export function cone(s: Sketch): void {
     for (const side of [-1, 1] as const) capsule(c, x + side * 9, 30 + b, x + side * 13, 44 + b + flap + p.swing * side * 2, 2.4, 1.2, s.dark);
     ellipse(c, x, 40 + b, 12, 21, s.body);
     ellipse(c, x, 45 + b, 8, 15, s.light);
+    for (let k = 0; k < 3; k++) {
+      stroke(c, x - 6, 37 + b + k * 4, x - 4, 40 + b + k * 4, s.ridge);
+      stroke(c, x + 3, 40 + b + k * 4, x + 6, 37 + b + k * 4, s.ridge);
+    }
     ellipse(c, x, 20 + b + peck, 7, 7, s.body);
     poly(c, [[x - 2, 22 + b + peck], [x + 2, 22 + b + peck], [x, 27 + b + peck * 1.5]], s.light);
     for (const side of [-1, 1] as const) ellipse(c, x + side * 4, 61, 3, 1.4, s.light);
@@ -50,6 +58,9 @@ export function cone(s: Sketch): void {
   }
   const tip: readonly [number, number] = [x, 26 + b];
   poly(c, [[x - 3, 26 + b], [x + 3, 26 + b], [x + 16 + p.swing, GROUND - 2], [x - 16 + p.swing, GROUND - 2]], s.body);
+  for (let k = -2; k <= 2; k++) {
+    stroke(c, x + k * 0.8, 27 + b, x + k * 5.3 + p.swing, GROUND - 3, k % 2 ? s.dark : s.ridge);
+  }
   ellipse(c, x + p.swing, GROUND - 2, 16, 2.5, s.dark);
   const lift = p.attack === 1 ? -6 : p.attack === 2 ? 6 : 0;
   capsule(c, tip[0], tip[1], x - 14, 12 + b + lift, 2.2, 1.6, s.body);
@@ -77,7 +88,14 @@ export function blob(s: Sketch): void {
   ellipse(c, x, 52 + dy, 22 * pulse, 10, s.body);
   for (let k = 0; k < 7; k++) {
     const rad = (6 + shape() * 6) * pulse;
-    ellipse(c, x + (shape() - 0.5) * 30, 40 + dy + (shape() - 0.5) * 18, rad, rad * 0.9, k % 3 ? s.body : s.light);
+    const px = x + (shape() - 0.5) * 30, py = 40 + dy + (shape() - 0.5) * 18;
+    ellipse(c, px, py, rad, rad * 0.9, k % 3 ? s.body : s.ridge);
+    if (k % 2 === 0) {
+      // Recessed, uneven vents sit in the lobe and deform with its pulse.
+      ellipse(c, px + 1, py, rad * 0.45, rad * 0.26, s.recess, -0.43);
+      stroke(c, px - rad * 0.3, py + 1, px, py - 1, s.claw);
+      stroke(c, px + 2, py - 1, px + 2, py + 1, s.ridge);
+    }
   }
   if (p.attack === 2 && !r.tentacles) {
     for (const side of [-1, 1] as const) tentacle(s, x + side * 14, 42 + dy, side === 1 ? -0.3 : Math.PI + 0.3, 18, 2.4, p.bob);
@@ -94,9 +112,16 @@ export function orb(s: Sketch): void {
   const grow = p.attack === 1 ? 2 : p.attack === 2 ? -1 : 0;
   if (r.tentacles) tentacles(s, x, 34 + b, r.tentacles, 22, 1.2, HALF_PI - 0.5, HALF_PI + 0.5, p.bob + p.swing);
   ellipse(c, x, 26 + b, 12 + grow, 12 + grow, s.body);
-  ellipse(c, x - 3, 22 + b, 5, 4, s.light);
+  for (const side of [-1, 1]) {
+    stroke(c, x + side * 3, 17 + b - grow, x + side * 8, 22 + b, s.ridge);
+    stroke(c, x + side * 8, 22 + b, x + side * 5, 25 + b, s.recess);
+    stroke(c, x + side * 5, 30 + b, x + side * 2, 34 + b + grow, s.ridge);
+  }
   if (r.glow) {
-    ellipse(c, x, 27 + b, 4 + (p.attack === 2 ? 3 : 0), 4 + (p.attack === 2 ? 3 : 0), s.eye);
+    const aperture = p.attack === 2 ? 6 : 3;
+    ellipse(c, x, 26 + b, aperture + 2, 6.5, s.recess, 0.18);
+    ellipse(c, x, 26 + b, aperture, 4.8, s.eye, 0.18);
+    ellipse(c, x, 26 + b, 0.85, 3, s.dark, 0.18);
     const motes = createRng((r.seed ?? 0) + p.bob * 7 + p.attack * 13 + 3);
     for (let k = 0; k < 7; k++) ellipse(c, x + (motes() - 0.5) * 40, 26 + b + (motes() - 0.5) * 36, 0.8, 0.8, s.eye);
   }
@@ -116,6 +141,10 @@ export function swarm(s: Sketch): void {
     tentacle(s, x - dir * 2, y, dir === 1 ? Math.PI : 0, serpentine ? 9 : 6, serpentine ? 1.4 : 0.7, k + p.swing);
     ellipse(c, x, y, serpentine ? 2.2 : 3.6, serpentine ? 1.6 : 2.4, s.body);
     ellipse(c, x + dir * (serpentine ? 1.5 : 3), y - 1, 1.6, 1.4, s.body);
+    if (!serpentine) {
+      ellipse(c, x + dir * 2, y - 2.3, 1.2, 1.15, s.recess);
+      stroke(c, x - dir * 2, y, x - dir, y - 1, s.ridge);
+    }
     ellipse(c, x + dir * (serpentine ? 2 : 3.6), y - 1.4, 0.6, 0.6, s.eye);
   }
 }

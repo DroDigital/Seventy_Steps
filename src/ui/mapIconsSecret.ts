@@ -30,17 +30,14 @@ function rumour(ctx: Ctx, r: number): void {
     ctx.arc(0, -0.26, 0.25, Math.PI * 1.04, Math.PI * 2.42);
     ctx.bezierCurveTo(0.09, 0.01, 0.0, 0.05, 0, 0.19);
   };
-  const dot = (): void => {
-    ctx.beginPath();
-    ctx.arc(0, 0.48, 0.075, 0, TAU);
-  };
   [ctx.shadowColor, ctx.shadowBlur] = ['rgba(201,178,122,0.45)', r * 0.45];
   ctx.strokeStyle = '#e5dbc0';
   ctx.lineWidth = u(r, 0.16, 1.45);
   mark();
   ctx.stroke();
   unlip(ctx);
-  dot();
+  // A pen nib leaves a short angled foot on the question.
+  poly(ctx, [[-0.06, 0.43], [0.08, 0.41], [0.04, 0.55], [-0.07, 0.51]]);
   ctx.fillStyle = '#e5dbc0';
   ctx.fill();
 }
@@ -58,6 +55,9 @@ const FIGURES: Record<PoiKind, (ctx: Ctx, r: number) => void> = {
       stroke(ctx, r, [[0.1, y + 0.0], [0.5, y - 0.1]], 'rgba(60,56,48,0.4)', 0.03, 0.5);
     }
     stroke(ctx, r, [[0, -0.16], [0, 0.4]], 'rgba(40,36,30,0.6)', 0.04, 0.6);
+    poly(ctx, [[0.16, 0.30], [0.28, 0.27], [0.28, 0.60], [0.22, 0.53], [0.16, 0.62]]);
+    ctx.fillStyle = '#887968';
+    ctx.fill();
   },
   hoard(ctx, r) { // a coffer with a domed lid, its strap and lock
     const lid = (): void => {
@@ -78,6 +78,10 @@ const FIGURES: Record<PoiKind, (ctx: Ctx, r: number) => void> = {
     ctx.fillStyle = '#efe6c4';
     ctx.fill();
     stroke(ctx, r, [[0, 0.0], [0, 0.1]], '#2a2822', 0.05, 0.6);
+    for (const x of [-0.36, 0.36]) {
+      stroke(ctx, r, [[x - 0.03, 0.20], [x + 0.03, 0.22]], '#e0ddcc', 0.06, 0.6);
+      stroke(ctx, r, [[x - 0.03, 0.42], [x + 0.03, 0.44]], '#d0cdbf', 0.06, 0.6);
+    }
     stroke(ctx, r, [[-0.5, -0.2], [-0.24, -0.42]], 'rgba(255,255,255,0.55)', 0.04);
   },
   rite(ctx, r) { // a candle on a dish, lit
@@ -95,6 +99,8 @@ const FIGURES: Record<PoiKind, (ctx: Ctx, r: number) => void> = {
     ctx.bezierCurveTo(-0.18, -0.38, -0.16, -0.6, 0, -0.88);
     ctx.fill();
     stroke(ctx, r, [[0, -0.3], [0, -0.38]], '#1a1814', 0.04, 0.6);
+    stroke(ctx, r, [[-0.13, -0.25], [-0.04, -0.15], [-0.07, 0.15]], '#fbf3dc', 0.085, 0.6);
+    stroke(ctx, r, [[0.03, -0.19], [0.12, -0.13], [0.11, 0.02]], '#87867a', 0.05, 0.5);
   },
   anomaly(ctx, r) { // a spark of four points
     const star: Pt[] = [[0, -0.8], [0.15, -0.15], [0.8, 0], [0.15, 0.15], [0, 0.8], [-0.15, 0.15], [-0.8, 0], [-0.15, -0.15]];
@@ -109,6 +115,9 @@ const FIGURES: Record<PoiKind, (ctx: Ctx, r: number) => void> = {
       ctx.fillStyle = fill;
       ctx.fill();
     }
+    poly(ctx, [[0, -0.16], [0.11, -0.02], [0.01, 0.17], [-0.09, 0.02]]);
+    ctx.fillStyle = '#595852';
+    ctx.fill();
   },
   den(ctx, r) { // a skull
     solid(ctx, r, [
@@ -126,6 +135,8 @@ const FIGURES: Record<PoiKind, (ctx: Ctx, r: number) => void> = {
     }
     poly(ctx, [[0, 0.06], [0.07, 0.2], [-0.07, 0.2]]);
     ctx.fill();
+    stroke(ctx, r, [[-0.14, -0.54], [-0.05, -0.38], [-0.12, -0.30], [-0.03, -0.2]], '#6b6962', 0.055, 0.55);
+    stroke(ctx, r, [[-0.05, -0.38], [0.10, -0.43]], '#8a8680', 0.035, 0.4);
     for (const x of [-0.1, 0, 0.1]) stroke(ctx, r, [[x, 0.38], [x, 0.56]], 'rgba(20,18,16,0.6)', 0.03, 0.5);
   },
 };

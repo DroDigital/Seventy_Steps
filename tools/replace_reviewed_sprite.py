@@ -42,7 +42,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
-PACK = ROOT / 'public' / 'creatures' / 'reviewed'
+PACK = ROOT / 'tools' / 'sprites' / 'source' / 'reviewed'
 LIMIT = 2048  # the most a page may be, either way
 GUTTER = 1
 GROUND = 2
