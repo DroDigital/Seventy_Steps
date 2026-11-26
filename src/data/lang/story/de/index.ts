@@ -1,6 +1,8 @@
 /** The story in German (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { DE_DOCUMENTS } from './documents';
+import { DE_DOCUMENTSMORE } from './documentsMore';
 import { DE_FATES } from './fates';
 import { DE_INTRO } from './intro';
 import { DE_OVERHEARD } from './overheard';
@@ -15,4 +17,5 @@ export const DE_STORY: StoryBook = {
   overheard: DE_OVERHEARD,
   fates: DE_FATES,
   quests: DE_QUESTS,
+  documents: { ...DE_DOCUMENTS, ...DE_DOCUMENTSMORE },
 };

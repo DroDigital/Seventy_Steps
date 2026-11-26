@@ -5,6 +5,7 @@
  * never its [tags]).
  */
 
+import { DOCUMENTS } from '../src/data/documents';
 import { INTRO, introText } from '../src/data/intro';
 import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
@@ -35,4 +36,6 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
   // round 69 switched the discoveries off (systems/discovery.ts), so none begins and none is shown (docs/LOCALIZATION.md)
   quests: () =>
     new Map(Object.entries(QUESTS).filter(([id]) => !id.startsWith('discover_')).map(([id, q]) => [id, lines(q.title, ...q.stages.map((s) => s.note), q.done)])),
+  // the tomes, notes and letters: a name and its paragraphs, by name (the pages of the horrors' courts and the Outer Dark among them)
+  documents: () => new Map(Object.entries(DOCUMENTS).map(([name, doc]) => [name, lines(name, ...doc.text)])),
 };

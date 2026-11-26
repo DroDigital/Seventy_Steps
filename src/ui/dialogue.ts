@@ -43,7 +43,7 @@ export const notePaper: { screen: Screen | null } = { screen: null };
 const letterScreen = (): Screen => (notePaper.screen ??= createScreen(8, '#050506cc', undefined, true, false, paper));
 
 /** A note (a letter, a clipping, a report) on its burnt paper. `label` is its button: from the world it is put away; from the journal it goes back to the journal (which stays open beneath it). */
-export function showNote(name: string, label = `${glyph('interact')} · Put it away`): void {
+export function showNote(name: string, label = `${glyph('interact')} · ${t('talk.putAway')}`): void {
   const screen = letterScreen();
   screen.show(documentPage(name, () => screen.close(), label));
 }
