@@ -16,6 +16,7 @@ import { roomPoint, type RoomLayout } from './dungeonKit';
 import { roomSpots, standing, type Part } from './dungeonParts';
 import { solidGap } from './candlePlan';
 import type { Prop } from './props';
+import { flushToWall } from './wallFlush';
 import { DIRS } from './worldMap';
 
 export const HALL = {
@@ -66,5 +67,6 @@ function setProps(set: ArenaSet, r: RoomLayout, parts: readonly Part[], dressing
     if (things.some((t) => Math.hypot(p.x - t.at.x, p.z - t.at.z) - k < t.clear)) return true;
     return solids.some((o) => Math.hypot(p.x - o.x, p.z - o.z) - reach(o) - k < HALL.dress);
   };
-  return arenaSet(set, { x: r.x, z: r.z, y: r.level, radius: r.half - DUNGEON.wall, front: { x: toward.x, z: toward.z }, well: false, inner }, taken);
+  const laid = arenaSet(set, { x: r.x, z: r.z, y: r.level, radius: r.half - DUNGEON.wall, front: { x: toward.x, z: toward.z }, well: false, inner }, taken);
+  return laid.flatMap((p) => (p.set?.hung ? (flushToWall(p, parts) ?? []) : [p])); // (2026-11-26: a hung piece against its wall, not a metre short of it: wallFlush.ts)
 }
