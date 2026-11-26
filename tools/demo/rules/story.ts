@@ -2,7 +2,7 @@
 
 import { KEEP } from '../../../src/data/demoContent.ts';
 import type { PruneRule } from '../prune.ts';
-import { ALL_REALMS } from './keep.ts';
+import { ALL_REALMS, kept } from './keep.ts';
 
 const hintsLeftOut = new Set<string>(KEEP.hintsLeftOut);
 const keptRealms = new Set<string>(KEEP.regions);
@@ -24,6 +24,15 @@ const lineKept = (key: string): boolean => {
 
 const language = (file: string, decl: string): PruneRule => ({ file, decl, shape: 'properties', keep: lineKept });
 
+/**
+ * The story's translations (src/data/lang/story, 1.5.0): each language's table of a domain is keyed by the ids of the source it
+ * translates, and cut by the same ids the demo keeps of that source, so the demo holds the lines of its own people, horrors and pages only.
+ */
+const storyTable = (domain: string, keep: (id: string) => boolean): PruneRule[] =>
+  (['de', 'fr', 'es'] as const).map((l) => ({ file: `src/data/lang/story/${l}/${domain}.ts`, decl: `${l.toUpperCase()}_${domain.toUpperCase()}`, shape: 'properties', keep }));
+const npcs = kept('npcs');
+const entities = kept('entities');
+
 export const rules: readonly PruneRule[] = [
   // the field guide's hints and the veil's lines: the ones the demo leaves out, and the one quote that names a horror it does not keep
   { file: 'src/data/fieldGuide.ts', decl: 'GUIDE', shape: 'properties', keep: (k) => !hintsLeftOut.has(k) },
@@ -34,6 +43,11 @@ export const rules: readonly PruneRule[] = [
   language('src/data/lang/de.ts', 'DE'),
   language('src/data/lang/fr.ts', 'FR'),
   language('src/data/lang/es.ts', 'ES'),
+  // the story's translations, by the source's ids: the people (and the trader at the lamps), the rumours of a horror's fall, the mutterings, the epilogues
+  ...storyTable('people', (id) => npcs(id) || id === 'trader'),
+  ...storyTable('rumors', entities),
+  ...storyTable('overheard', npcs),
+  ...storyTable('fates', npcs),
 ];
 
 export const rest: readonly string[] = [];

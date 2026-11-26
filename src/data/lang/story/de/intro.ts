@@ -9,7 +9,7 @@ export const DE_INTRO: StoryTable = {
       'Kommen Sie sofort. Peaslee Montag schlafend in der Bibliothek gefunden, nicht zu wecken. Sechs weitere in der Stadt, ebenso. Erwarte Sie am Zug aus Boston. Armitage.',
     'From the notebook · October 5th': 'Aus dem Notizbuch · 5. Oktober',
     'Eleven sleepers now, two of them children. Their eyes move under the lids, as if they were reading. All of them speak of the same things: a stair going down... a key... and a tall man in a good coat.':
-      'Elf Schläfer inzwischen, zwei davon Kinder. Ihre Augen bewegen sich unter den Lidern, als läsen sie. Alle sprechen von denselben Dingen: von einer Treppe, die hinabführt ... von einem Schlüssel ... und von einem großen Mann in einem guten Mantel.',
+      'Elf Schläfer inzwischen, zwei davon Kinder. Ihre Augen bewegen sich unter den Lidern, als läsen sie. Alle sprechen von denselben Dingen: von einer Treppe, die hinabführt ... von einem Schlüssel ... und von einem hochgewachsenen Mann in einem guten Mantel.',
     'October 6th': '6. Oktober',
     'Armitage thinks Peaslee read what he should have left alone, and that the sleepers are not so much asleep as somewhere else. He wants me to go after them.':
       'Armitage glaubt, Peaslee habe gelesen, was er besser hätte ruhen lassen, und die Schläfer seien nicht so sehr eingeschlafen als vielmehr anderswo. Er will, dass ich ihnen folge.',

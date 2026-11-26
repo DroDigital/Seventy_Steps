@@ -32,13 +32,16 @@ export interface Report {
   hits: Hit[];
 }
 
-/** The words of a text, lower case: letters, digits and underscores, split at anything else. */
-const wordsOf = (text: string): string[] => text.toLowerCase().split(/[^a-z0-9_]+/).filter(Boolean);
+/**
+ * The words of a text, lower case: letters (any alphabet's), digits and underscores, split at anything else, so a translated word is one
+ * word (`écart` is not `cart`, 1.5.0); the ids are ASCII and match as before.
+ */
+const wordsOf = (text: string): string[] => text.toLowerCase().split(/[^\p{L}\p{N}_]+/u).filter(Boolean);
 /**
  * A text with its words spaced, lower case, padded at both ends: a display name matches as whole words (`Cthulhu` in `Cthulhu Cultist`,
  * not in the id `cthulhu_cultist`, where an underscore joins the words).
  */
-const spaced = (text: string): string => ' ' + text.toLowerCase().replace(/[^a-z0-9_]+/g, ' ').trim() + ' ';
+const spaced = (text: string): string => ' ' + text.toLowerCase().replace(/[^\p{L}\p{N}_]+/gu, ' ').trim() + ' ';
 
 interface Node {
   type: string;

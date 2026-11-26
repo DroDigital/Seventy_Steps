@@ -10,6 +10,7 @@
  */
 
 import { ENDINGS, type EndingId } from '../data/endings';
+import { story } from '../core/i18n';
 import { fateOf } from '../data/epilogues';
 import { NPCS } from '../data/npcs';
 import { QUESTS } from '../data/quests';
@@ -67,7 +68,7 @@ function fates(g: Game, id: EndingId): string[] {
   return NPCS.filter((n) => met.has(n.id)).flatMap((n) => {
     const quest = n.topics.find((t) => t.starts)?.starts;
     const line = fateOf(n.id, id, !quest || !QUESTS[quest] || isDone(g, quest));
-    return line ? [line] : [];
+    return line ? [story(line)] : [];
   });
 }
 

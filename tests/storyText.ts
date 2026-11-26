@@ -6,6 +6,10 @@
  */
 
 import { INTRO, introText } from '../src/data/intro';
+import { NPCS, TRADERS } from '../src/data/npcs';
+import { FATES } from '../src/data/epilogues';
+import { OVERHEARD } from '../src/data/overheard';
+import { RUMORS } from '../src/data/rumors';
 import type { StoryDomain } from '../src/data/lang/story';
 
 /** A domain's lines: the source's id -> the English of each line it shows. */
@@ -15,4 +19,15 @@ const lines = (...all: (string | undefined | null | false)[]): string[] => all.f
 
 export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
   intro: () => new Map([['intro', INTRO.flatMap((c) => lines(c.heading, introText(c)))]]),
+  // the people met: a name, a title, every line of every topic (the trader at the lamps is one man at every second sign: 'trader')
+  people: () =>
+    new Map([
+      ...NPCS.map((n) => [n.id, lines(n.name, n.title, ...n.topics.flatMap((tp) => tp.lines))] as const),
+      ['trader', [...new Set(TRADERS.flatMap((n) => lines(n.name, n.title, ...n.topics.flatMap((tp) => tp.lines))))]],
+    ]),
+  // what the people say of a horror's fall, by horror; what they mutter as one passes, by person; what became of them, by person
+  rumors: () => new Map(Object.entries(RUMORS).map(([id, text]) => [id, lines(text)])),
+  overheard: () => new Map(Object.entries(OVERHEARD).map(([id, said]) => [id, lines(...said)])),
+  fates: () =>
+    new Map(Object.entries(FATES).map(([id, f]) => [id, lines(f.done, f.undone, ...Object.values(f.endings ?? {}), ...Object.values(f.undoneEndings ?? {}))])),
 };

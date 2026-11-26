@@ -8,7 +8,7 @@
  */
 
 import { CAPTION_BAND } from './captions';
-import { t as tr } from '../core/i18n';
+import { story, t as tr } from '../core/i18n';
 import type { Key } from '../data/lang';
 import { Vector3, type Camera } from 'three';
 import { GUN, HEARD, HURT } from '../data/tuning';
@@ -177,7 +177,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('Wandered', (e) => void (e.words && say(e.words))); // the first time one is seen (round 26)
   g.events.on('Discovered', (e) => say(tr('hud.signFound', { name: e.name.toUpperCase() })));
   g.events.on('PlaceFound', (e) => great.show(e.name.toUpperCase(), 'place', tr('hud.places', { found: e.found, of: e.of, region: (REGIONS.find((r) => r.id === e.region)?.name ?? '').toUpperCase() }))); // round 18
-  g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: e.title.toUpperCase() })));
+  g.events.on('QuestChanged', (e) => say(tr(e.done ? 'hud.questDone' : e.stage === 0 ? 'hud.questNew' : 'hud.questUpdated', { title: story(e.title).toUpperCase() })));
   g.events.on('RestRefused', () => say(tr('hud.noRest')));
   g.events.on('Notice', ({ text }) => say(text));
   const mutter = (name: string, text: string): void => {
@@ -186,10 +186,10 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
     band.append(el('display:inline;font-style:normal;font-size:.8em;letter-spacing:3px;color:#b9a577;margin-right:10px', name.toUpperCase()), text);
     heardAt = performance.now();
   };
-  g.events.on('Overheard', (e) => mutter(e.name, `“${e.text}”`));
+  g.events.on('Overheard', (e) => mutter(story(e.name), tr('hud.quoted', { text: story(e.text) })));
   // A secret found, or come back to, is a quiet line low on the screen, not great words (they were long, and the place's own words came with them: asked in a later round)
-  g.events.on('PoiFound', (e) => mutter(e.name, e.line));
-  g.events.on('PoiAgain', (e) => mutter(e.name, e.line));
+  g.events.on('PoiFound', (e) => mutter(story(e.name), story(e.line)));
+  g.events.on('PoiAgain', (e) => mutter(story(e.name), story(e.line)));
 
   const v = new Vector3();
   root.style.transition = 'opacity .6s';

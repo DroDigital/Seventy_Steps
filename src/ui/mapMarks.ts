@@ -8,6 +8,7 @@
  */
 
 import type { XZ } from '../core/geom';
+import { story } from '../core/i18n';
 import { NPCS } from '../data/npcs';
 import type { PoiKind } from '../data/pois';
 import { getEntity } from '../data/registry';
@@ -121,8 +122,8 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       if (!at || !inRealm.has(regionAt(at.x, at.z)?.id ?? '') || !isExplored(ow.explored, at.x, at.z)) continue;
       const [x, y] = slid(n.id, screenX(view, at.x), screenY(view, at.z));
       const met = ow.met.has(n.id);
-      add(under, { kind: 'person', x, y, state: { met }, title: met ? 'Someone you have met' : 'A figure', name: met ? n.name : '', note: met ? '' : 'Speak with them to learn who they are' }, 0.8,
-        full && met && detail >= DETAIL.peopleNames ? { text: n.name, x, y, size: 10 * k, color: DIM, gap: 0 } : null, 'people');
+      add(under, { kind: 'person', x, y, state: { met }, title: met ? 'Someone you have met' : 'A figure', name: met ? story(n.name) : '', note: met ? '' : 'Speak with them to learn who they are' }, 0.8,
+        full && met && detail >= DETAIL.peopleNames ? { text: story(n.name), x, y, size: 10 * k, color: DIM, gap: 0 } : null, 'people');
     }
   }
 
