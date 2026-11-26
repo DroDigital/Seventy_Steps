@@ -12,6 +12,7 @@ be made: `src/data/plannedSounds.ts`. Credits and licences: `public/audio/CREDIT
 | A horror's blows | `render/audio/attackAudio.ts`, `data/plannedSounds.ts` `atk(...)`, `public/audio/sfx/atk_*`, `swipe*` | CC0 recordings by element for a bolt's landing, a burst and a throw; a foe's swing its own whoosh. Caster attacks add no procedural tones or fallback while recordings load. |
 | Rain and a bolt on the ground (round 59) | `render/audio/weatherBed.ts`, `public/audio/amb/rain_*`, `sfx/strike*` | a light rain and a downpour recorded, each read twice and panned apart; four close strikes |
 | Ambience | `data/samples.ts` `AMBIENCE`, `public/audio/amb`, `render/audio/ambience.ts` | looped beds with spot sounds, breathing |
+| The trees (round 126) | `render/audio/leafBed.ts`, `data/windTuning.ts` `LEAF_SOUND`, `public/audio/amb/{canopy,pines,boughs}`, `sfx/tree_creak*` | three CC0 recordings of wind in trees, mixed by the stand about the listener and the gust on it; a trunk's groan placed where it stands |
 | Dungeons (round 124) | `data/dungeonAmbience.ts`, `data/roomSounds.ts`, `render/audio/bedTextures.ts`, `render/audio/roomAmbience.ts` | each roofed kit's own beds (recordings, and five loops made in code) and spots (recordings, and sixteen recipes), with a dungeon's own voices laid over its kit's |
 | Doors | `data/doorSounds.ts`, `render/doorViews.ts` | a recipe made for each swing (below) |
 | Menus | `data/foleySounds.ts` `UI`, `ui/menuSounds.ts` | seven small sounds (move, choose, back, tab, open, close, tick), quiet, wood and paper |
@@ -194,6 +195,29 @@ the cue and cancels its pending rattle. It is never saved. `tests/horseToss.test
 the neutral pose at the same time, including the frame the harness sounds and those cancellation paths.
 `tests/horseVoice.test.ts` holds the order and timing of the arrival, the toss, that the ride plays every recipe a recording answers,
 and that each is levelled (`tests/plannedSounds.test.ts`: −26 to −14 dBFS rms as it plays).
+
+## The trees (round 126)
+
+Round 125 made the leaves of noise: a band about 3.6 kHz flickered by two tremolos at 11 and 17 Hz, so that it crackled beside every tree
+like static, over a region's own recorded bed of leaves (Vermont, the Black Wood) that it doubled. It is gone. The trees are heard by
+three CC0 field recordings, cut by `tools/foliage_sounds.py` from stretches measured for no birds, insects or mic rumble, high-passed
+under the leaves and softened over them (the game's own low-pass does the rest), looped by a crossfade and cut to the beds' level:
+
+- `amb/canopy`: cottonwoods in a breeze, a broadleaf crown's rustle; `amb/pines`: pines soughing; `amb/boughs`: a gale's gusts heaving a
+  conifer's boughs. `sfx/tree_creak1..5`: a trunk's groans on near silence.
+- **By what stands about** (`standAt`, every half second): trees, conifers and bushes within 28 m, the nearer the more, broadleaf and
+  conifer apart, so an oak wood rustles and a fir wood sighs. A thin, far stand is dull (1.5 kHz), the midst of a wood bright (6.5 kHz).
+  The beds lean to the side the trees stand on.
+- **By the gust** (`gustAt`, the very gust the crowns bend to): a lull keeps 0.4 of a gust's rustle (the recordings breathe of
+  themselves); a gust comes in over about a second and dies over three; the boughs come only in strong gusts and a gale.
+- **Each bed read twice**, half its length apart, panned apart and a hair apart in speed, so no stretch is heard twice alike.
+- **A trunk groans** now and then in a gust (once in about 34 s at a full gust in a thick wood, never within 9 s of the last), from a
+  tree 4 to 24 m off, placed, dulled and walled like any sound of the world (`treeCreak`).
+- The rain drowns half of it; under a roof, in a dungeon or out of the world it is silent. It is in the bed, so the ambience setting and
+  a horror's hush take it. Vermont keeps a low wind and the Black Wood its ghostly one in the leaves' place.
+
+`tests/leafBed.test.ts` holds the woods heard and the desert not, the two kinds of wood, the gust, the dulling, the rain, the roof, the
+creaks' pace and that the recordings are there, measured, credited and not doubled.
 
 ## Adding
 

@@ -118,6 +118,7 @@ export const SAMPLE_SETS = {
   farHowl: set(['spot_howl'], 0.2, [0.9, 1]),
   hull: set(['spot_boat'], 0.3),
   creak: set(['spot_creak1', 'spot_creak2'], 0.22, [0.8, 1]),
+  treeCreak: set(takes('tree_creak', 5), 0.3, [0.85, 1.05]), // round 126: a trunk groaning in a gust (render/audio/leafBed.ts), placed where it stands
   thunder: set([...takes('storm_thunder', 3), 'spot_thunder'], 0.35, [0.85, 1]), // round 68: three takes of a rolling clap beside the one (the procedural roll beneath it is a bed now: STORM_MIX)
   strike: set(takes('strike', 4), 1, [0.9, 1.04]), // a bolt on the ground close by (round 59: the recipe's crack was a blip): the crack, the tearing and the crash
   zap: set(takes('storm_zap', 3), 0.6, [0.92, 1.06]), // round 68: the electric snap of a bolt on the ground, over the strike's crash
@@ -215,11 +216,10 @@ export const BED_MANNER: Readonly<Record<string, { lowpass?: number; breath?: nu
   crickets: { lowpass: 3600, breath: 0.75, every: [38, 85] },
   frogs: { lowpass: 3200, breath: 0.7, every: [30, 70] },
   murmur: { breath: 0.35, every: [50, 100] },
-  // Round 31 (the rest were too loud): the winds, the sea, the leaves and the cave soften and breathe too.
+  // Round 31 (the rest were too loud): the winds, the sea and the cave soften and breathe too (round 126: the leaves are the trees' own now, render/audio/leafBed.ts).
   wind: { lowpass: 2600, breath: 0.45, every: [30, 70] },
   wind_cold: { lowpass: 2400, breath: 0.4, every: [30, 70] },
   wind_ghost: { lowpass: 2800, breath: 0.5, every: [35, 80] },
-  leaves: { lowpass: 3000, breath: 0.4, every: [25, 60] },
   surf: { lowpass: 2800, breath: 0.3, every: [24, 50] },
   waves: { lowpass: 2800, breath: 0.3, every: [24, 50] },
   cave: { lowpass: 2400, breath: 0.25, every: [40, 90] },
@@ -245,7 +245,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   dunwich: { beds: [['crickets', 0.22], ['wind', 0.5]], spots: [{ set: 'whippoorwill', every: [14, 35] }, owls] }, // its thunder follows the lightning (round 18: render/lightning.ts)
   innsmouth: { beds: [['surf', 0.9], ['frogs', 0.14]], spots: [{ set: 'hull', every: [15, 40] }, { set: 'gurgle', every: [30, 70] }] },
   providence: { beds: [['wind', 0.72]], spots: [creaks, dogs, owls] },
-  vermont: { beds: [['leaves', 0.8], ['crickets', 0.12]], spots: [owls, { set: 'farHowl', every: [60, 120] }] },
+  vermont: { beds: [['wind', 0.4], ['crickets', 0.12]], spots: [owls, { set: 'farHowl', every: [60, 120] }] },
   mountains: { beds: [['wind_cold', 0.75]], spots: [] },
   pnakotus: { beds: [['wind', 0.8], ['wind_ghost', 0.2]], spots: [{ set: 'timber', every: [45, 100] }] },
   kn_yan: { beds: [['cave', 0.8], ['drips', 0.5]], spots: [{ set: 'chains', every: [50, 110] }, { recipe: 'pebbles', every: [40, 90], gain: 0.6 }, { recipe: 'settle', every: [60, 130], gain: 0.7 }] }, // (round 124: its drips breathe and are fewer; grit and stone among them)
@@ -256,7 +256,7 @@ export const AMBIENCE: Record<string, Ambience> = {
   beyond: { beds: [['wind_ghost', 0.72], ['cave', 0.36]], spots: [] },
   // The Outer Dark (round 73)
   cloud_summit: { beds: [['wind_cold', 0.8], ['wind_ghost', 0.22]], spots: [] },
-  black_wood: { beds: [['leaves', 0.55], ['murmur', 0.4]], spots: [creaks, { set: 'gurgle', every: [40, 90] }] },
+  black_wood: { beds: [['wind_ghost', 0.15], ['murmur', 0.4]], spots: [creaks, { set: 'gurgle', every: [40, 90] }] },
   pale_lattice: { beds: [['wind_ghost', 0.3]], spots: [] }, // near silence: time does not stir the air
   piping_dark: { beds: [['wind_ghost', 0.5], ['cave', 0.3]], spots: [] },
   spheres: { beds: [['murmur', 0.5], ['wind_ghost', 0.3]], spots: [] },

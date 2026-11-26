@@ -21,15 +21,19 @@ export const WIND = {
   ease: 0.35, // a second's share of the way the wind's bearing turns to a new realm's
 } as const;
 
-/** The leaves heard (render/audio/leafBed.ts): how far trees are heard, how many make it full, and its two voices. */
+/** Round 126, the trees heard (render/audio/leafBed.ts): three recorded beds, mixed by what stands about the listener and the gust on it. */
 export const LEAF_SOUND = {
-  reach: 28, // metres a tree is heard rustling from
-  full: 3.2, // the trees (by nearness) that make the rustle full
+  reach: 28, // metres a tree is heard from
+  full: 3.2, // the trees (by nearness) that make a stand full
   every: 0.5, // seconds between countings of them
-  calm: 0.18, // the rustle with no gust on it, of a full gust's
-  rustleHz: 3600, // the leaves' chatter: a band about here...
-  boughHz: 900, // ...and the boughs' rush about here
-  flicker: [[11.3, 0.22], [17.1, 0.16]] as const, // the tremolos on the chatter (Hz, depth)
-  rustleGain: 0.07, // at full cover and a full gust
-  boughGain: 0.05,
+  calm: 0.4, // a crown's rustle with no gust on it, of a full gust's (the recordings breathe of themselves)
+  beds: { canopy: 'amb/canopy', pines: 'amb/pines', boughs: 'amb/boughs' },
+  gain: { canopy: 0.42, pines: 0.4, boughs: 0.34 }, // at a full stand and a full gust (the region's beds are at 0.3..0.7)
+  rise: 1.1, // s: a gust is heard coming into the crowns...
+  fall: 2.8, // ...and dying out of them more slowly
+  dull: [1500, 6500] as const, // Hz: the low-pass from a far, thin stand to the midst of a wood
+  rain: 0.55, // the share of the leaves the rain drowns
+  spread: 0.65, // how far apart each bed's two readers are panned
+  lean: 0.35, // how far the beds lean toward the side the trees stand on
+  creak: { every: 34, gap: 9, range: 30, near: [4, 24] as const, least: 0.18, height: 3 }, // a trunk's groan (heard `height` m up its trunk): once in `every` s at a full gust, never within `gap` s of the last, from a tree `near` m off
 } as const;

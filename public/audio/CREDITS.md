@@ -24,12 +24,14 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 
 | File | Recording | By | Licence | Treatment |
 | --- | --- | --- | --- | --- |
+| `amb/boughs.mp3` | [gusts on coniferous tree 2](https://freesound.org/people/bruno.auzet/sounds/829004/) | bruno.auzet | CC0 | 76–118 s; high-pass 90 Hz, low-pass 5500 Hz; looped (a 3 s crossfade); tools/foliage_sounds.py, round 126 |
+| `amb/canopy.mp3` | [Wind in Cottonwood Trees Utah](https://freesound.org/people/Danjocross/sounds/579250/) | Danjocross | CC0 | 32–76 s; high-pass 140 Hz, low-pass 7000 Hz; looped (a 2.5 s crossfade); tools/foliage_sounds.py, round 126 |
 | `amb/cave.mp3` | [ambience large cave variation.ogg](https://freesound.org/people/fonografico/sounds/636124/) | fonografico | CC0 | 4–34 s; low-pass 5000 Hz; looped (a 2 s crossfade) |
 | `amb/crickets.mp3` | [R01-42-Night Time Crickets.wav](https://freesound.org/people/craigsmith/sounds/479815/) | craigsmith | CC0 | 2.5–36 s; looped (a 2 s crossfade) |
 | `amb/drips.mp3` | [Ambience INT water drip dropping cave grotto spooky (quinta da regaleira portugal).flac](https://freesound.org/people/corkob/sounds/392668/) | corkob | CC0 | 0.5–19.3 s; high-pass 120 Hz; looped (a 1.5 s crossfade) |
 | `amb/frogs.mp3` | [G12-20-Frogs Croaking.wav](https://freesound.org/people/craigsmith/sounds/437952/) | craigsmith | CC0 | 64–100 s; high-pass 90 Hz; looped (a 2 s crossfade) |
-| `amb/leaves.mp3` | [Wind Through Leaves](https://freesound.org/people/craigsmith/sounds/817192/) | craigsmith | CC0 | 5–37 s; looped (a 2 s crossfade) |
 | `amb/murmur.mp3` | [S41-06 Filtered auditorium crowd atmosphere; strange; wind-like.wav](https://freesound.org/people/craigsmith/sounds/675048/) | craigsmith | CC0 | 3–35 s; tape speed ×0.9; low-pass 4000 Hz; looped (a 2 s crossfade) |
+| `amb/pines.mp3` | [Wind in pine trees (from soft to strong)](https://freesound.org/people/AndisIkaria/sounds/701085/) | AndisIkaria | CC0 | 40–83 s (the soft part); high-pass 110 Hz, low-pass 6500 Hz; looped (a 3 s crossfade); tools/foliage_sounds.py, round 126 |
 | `amb/rain_heavy.mp3` | [Rain heavy 2 (rural)](https://freesound.org/people/jmbphilmes/sounds/200272/) | jmbphilmes | CC0 | 4–36 s; high-pass 70 Hz; looped (a 2 s crossfade) (round 59) |
 | `amb/rain_light.mp3` | [Rain light 2 (rural)](https://freesound.org/people/jmbphilmes/sounds/200273/) | jmbphilmes | CC0 | 6–38 s; high-pass 90 Hz; looped (a 2 s crossfade) (round 59) |
 | `amb/surf.mp3` | [S35-25 Surf; medium distance; loopable.wav](https://freesound.org/people/craigsmith/sounds/675578/) | craigsmith | CC0 | 0.2–41.5 s; looped (a 3 s crossfade) |
@@ -382,6 +384,11 @@ The title's theme (`../music/subterranean-pulse.mp3`) came with the project.
 | `sfx/thud1.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 3.08–3.99 s |
 | `sfx/thud2.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 5.48–6.39 s |
 | `sfx/thud3.mp3` | [R19-27-Big Fight Punches.wav](https://freesound.org/people/craigsmith/sounds/483272/) | craigsmith | CC0 | 7.94–8.85 s |
+| `sfx/tree_creak1.mp3` | [Tree creaks](https://freesound.org/people/Sacha.Julien/sounds/726217/) | Sacha.Julien | CC0 | 4.83–6.80 s; high-pass 180 Hz, low-pass 6000 Hz; its tail faded; tools/foliage_sounds.py, round 126 |
+| `sfx/tree_creak2.mp3` | [Tree creaks](https://freesound.org/people/Sacha.Julien/sounds/726217/) | Sacha.Julien | CC0 | 16.08–18.10 s; high-pass 180 Hz, low-pass 6000 Hz; its tail faded; tools/foliage_sounds.py, round 126 |
+| `sfx/tree_creak3.mp3` | [Tree creaks](https://freesound.org/people/Sacha.Julien/sounds/726217/) | Sacha.Julien | CC0 | 36.93–39.05 s; high-pass 180 Hz, low-pass 6000 Hz; its tail faded; tools/foliage_sounds.py, round 126 |
+| `sfx/tree_creak4.mp3` | [Tree creaks](https://freesound.org/people/Sacha.Julien/sounds/726217/) | Sacha.Julien | CC0 | 40.33–42.20 s; high-pass 180 Hz, low-pass 6000 Hz; its tail faded; tools/foliage_sounds.py, round 126 |
+| `sfx/tree_creak5.mp3` | [Tree creaks](https://freesound.org/people/Sacha.Julien/sounds/726217/) | Sacha.Julien | CC0 | 49.18–50.95 s; high-pass 180 Hz, low-pass 6000 Hz; its tail faded; tools/foliage_sounds.py, round 126 |
 | `sfx/troll1.mp3` | [Troll 1.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330015/) | _eanarmstrong95 | CC0 | 1.04–3.14 s; tape speed ×0.9 (round 20) |
 | `sfx/troll2.mp3` | [Troll 2.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330014/) | _eanarmstrong95 | CC0 | 3.5–5.6 s; tape speed ×0.9 (round 20) |
 | `sfx/troll3.mp3` | [Troll 3.mp3](https://freesound.org/people/_eanarmstrong95/sounds/330013/) | _eanarmstrong95 | CC0 | 5.28–7.02 s; tape speed ×0.9 (round 20) |
