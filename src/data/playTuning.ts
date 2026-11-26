@@ -133,10 +133,11 @@ export const BOSS_LEVEL_SCALING = { damage: 0.003 };
 
 /**
  * Past the standing a horror is made to be met at (data/bossStanding.ts), the share of the investigator's growth in health
- * that its blows take up, and of their growth in damage (Might and the edge of the weapon in hand) that its health takes up, on the
- * first journey; neither grows past `most` times what it was made to be.
+ * that its blows take up, and of their growth in damage (Might and the edge of the weapon in hand) that its health takes up,
+ * on the first journey. No ceiling: every horror stays a fight, the early ones most of all (docs/RULES.md); a share under 1
+ * keeps every level and reinforcement worth having.
  */
-export const BOSS_OVERMATCH = { share: 0.55, health: 0.75, most: 1.5 }; // (2026-11-24: `most`, the most either grows: an upgrade or a level is never mostly taken back) (2026-11-01: blows 0.45 to 0.55 of (0.7 broke the rule that every Vigour level helps) the growth in health; and health, again, 0.75 of the growth in damage, Might and the weapon's edge, past the standing: in an open world a horror met late is still a fight)
+export const BOSS_OVERMATCH = { share: 0.55, health: 0.75 }; // (2026-11-26: a ceiling of 1.5 was tried on PR #292 and taken out: it cut only the earliest horrors' growth, Dr. Muñoz's health at the cap from 1,538 to 750) (2026-11-01: blows 0.45 to 0.55 of (0.7 broke the rule that every Vigour level helps) the growth in health; and health, again, 0.75 of the growth in damage, Might and the weapon's edge, past the standing: in an open world a horror met late is still a fight)
 
 /**
  * Echoes the next level costs: base + step·n + curve·n², n being the levels bought so far. Round 60 (a playthrough found

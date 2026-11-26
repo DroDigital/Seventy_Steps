@@ -23,10 +23,14 @@ reasoning behind each is in `docs/DECISIONS.md`; the design is `docs/SPEC.md`.
   (round 83: "keep all my sprites, only improve them").
 
 ## Bosses and difficulty
-- A boss met past its standing grows to meet the investigator at most 1.5 times: its health by Might and the edge of
-  the weapon in hand, its blows by Vigour. First journey only; later journeys keep their own scaling (2026-11-24).
-- The balance test fails a boss that cannot be beaten or costs more than its band; a fight that costs less than its band
-  is a warning in `docs/BALANCE.md`, not a failure (2026-11-24).
+- Every boss keeps a chance, the early ones most of all (2026-11-26: "I wanted every boss to have a chance especially
+  early ones"). Met past its standing, a boss grows to meet the investigator with no ceiling: its health by Might and the
+  edge of the weapon in hand (2026-11-24), its blows by Vigour. First journey only; later journeys keep their own scaling.
+  It takes up only a share of the growth (`BOSS_OVERMATCH`), so every level and reinforcement still helps (2026-11-01).
+  A ceiling of 1.5 times was tried and taken out: it cut the growth of the earliest bosses alone.
+- The balance test fails a boss that cannot be beaten, costs more than its band, or costs less than half its band's floor
+  (a horror that cheap has no chance left, 2026-11-26); a fight between that and its band is a warning in
+  `docs/BALANCE.md`, not a failure (2026-11-24).
 - No blow of a foe kills from full health, `BOSS.blowMost` (round 68: "make sure that bosses never one-hit kill").
 - No mercy system (round 61: "remove the mercy system entirely").
 - Every boss's moveset is its own: no blow is shared between bosses but the summons (2026-11-24,

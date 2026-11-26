@@ -7,36 +7,32 @@ import { bossRung } from './ngPlus';
 import type { Entity } from '../core/ecs';
 import type { Fight, Game } from './components';
 
-/** The blows' growth past the standing, uncapped: what later journeys' fixed reference keeps (`journeyBossDamage`). */
-function grownBlows(levels: { vigour: number }, id: string | undefined): number {
-  const standing = id ? BOSS_STANDING[id] : undefined;
-  if (!standing) return 1;
-  const body = healthAt(levels.vigour) / healthAt(standing[0]);
-  return 1 + BOSS_OVERMATCH.share * Math.max(0, body - 1);
-}
-
-/** How much harder a horror strikes when the investigator's health exceeds its expected standing: at most `BOSS_OVERMATCH.most` (2026-11-24). */
+/** How much harder a horror strikes when the investigator's health exceeds its expected standing: no ceiling (2026-11-26). */
 export function overmatch(levels: { vigour: number }, id: string | undefined): { damage: number } {
-  return { damage: Math.min(BOSS_OVERMATCH.most, grownBlows(levels, id)) };
+  const standing = id ? BOSS_STANDING[id] : undefined;
+  if (!standing) return { damage: 1 };
+  const body = healthAt(levels.vigour) / healthAt(standing[0]);
+  return { damage: 1 + BOSS_OVERMATCH.share * Math.max(0, body - 1) };
 }
 
 /**
  * How much more health a horror has when the investigator's damage exceeds its expected standing (Might and the edge of
- * the weapon in hand; 2026-11-01): at most `BOSS_OVERMATCH.most` (2026-11-24).
+ * the weapon in hand; 2026-11-01, 2026-11-24): no ceiling, so the earliest horrors, furthest below a grown investigator,
+ * grow the most (2026-11-26, docs/RULES.md).
  */
 export function overmatchHealth(levels: { might: number }, edge: number, id: string | undefined): number {
   const standing = id ? BOSS_STANDING[id] : undefined;
   if (!standing) return 1;
   const keen = (level: number): number => 1 + REINFORCE.damage * level;
   const power = (mightAt(levels.might) * keen(edge)) / (mightAt(standing[1]) * keen(standing[2] ?? 0));
-  return Math.min(BOSS_OVERMATCH.most, 1 + BOSS_OVERMATCH.health * Math.max(0, power - 1));
+  return 1 + BOSS_OVERMATCH.health * Math.max(0, power - 1);
 }
 
 export const bossDamageScale = (levels: number, over = 1): number => (1 + BOSS_LEVEL_SCALING.damage * levels) * over;
 
-/** Later journeys use a fixed reference: buying another level does not strengthen their bosses, and the first journey's cap is not theirs. */
+/** Later journeys use a fixed reference: buying another level does not strengthen their bosses. */
 export const journeyBossDamage = (id: string, cycle: number, profile?: JourneyProfile): number =>
-  bossDamageScale(levelsWorth(JOURNEY_REFERENCE), grownBlows(JOURNEY_REFERENCE, id)) * bossRung(id, cycle, profile).damage;
+  bossDamageScale(levelsWorth(JOURNEY_REFERENCE), overmatch(JOURNEY_REFERENCE, id).damage) * bossRung(id, cycle, profile).damage;
 
 /**
  * On the first journey a horror grows to meet an investigator stronger than its standing (`overmatchHealth`), by the

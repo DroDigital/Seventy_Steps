@@ -65,8 +65,8 @@ const WIDER: Partial<Record<string, { seconds?: readonly [number, number]; lives
 };
 const bandOf = (id: string, tier: 'named' | 'god') => ({ ...BANDS[tier], ...WIDER[id] });
 /**
- * The same fights again at the cap (every level bought, the cane set to +5). Bosses grow past their standing at most
- * `BOSS_OVERMATCH.most` times; upper pressure and completion remain checked for non-exempt fights.
+ * The same fights again at the cap (every level bought, the cane set to +5). Bosses grow past their standing to meet them,
+ * with no ceiling; upper pressure and completion remain checked for non-exempt fights.
  */
 const CAP = { reinforced: 5, starts: [6, 7, 8, 9, 10, 11, 12, 13, 14] } as const;
 const YOG_STANDING_MAX = 2.5;
@@ -79,7 +79,7 @@ const BOUNDS_TEXT = `${BOUNDS.seconds[0]} to ${BOUNDS.seconds[1]} seconds`;
 const AT_CAP_TEXT = `
 ## At the cap
 
-The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which give ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. Past its standing a boss grows to meet the investigator, at most ${BOSS_OVERMATCH.most} times: its health with their damage and its blows with their health (\`overmatchHealth\` and \`overmatch\` in \`systems/bossScaling.ts\`), so **Boss health** here is what it had in the fight. These fights become shorter as the investigator grows. Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
+The same bot, from ${CAP.starts.length} starts (${CAP.starts[0]} to ${CAP.starts[CAP.starts.length - 1]} metres off), with every level bought (${LEVELS.vigour.max} Vigour, ${LEVELS.endurance.max} Endurance, ${LEVELS.might.max} Might, which give ${healthAt(LEVELS.vigour.max)} health, ${staminaAt(LEVELS.endurance.max)} stamina and blows of ${mightAt(LEVELS.might.max).toFixed(2)}) and the cane at +${CAP.reinforced}. Past its standing a boss grows to meet the investigator, with no ceiling: its health with ${Math.round(BOSS_OVERMATCH.health * 100)}% of the growth in their damage and its blows with ${Math.round(BOSS_OVERMATCH.share * 100)}% of the growth in their health (\`overmatchHealth\` and \`overmatch\` in \`systems/bossScaling.ts\`), so the earliest grow the most and **Boss health** here is what it had in the fight. These fights become shorter as the investigator grows. Dagon and Hydra's combined encounter is additionally bounded in \`tests/seaBosses.test.ts\`.
 `;
 /** The Haunter needs lamplight; Azathoth's health is intentionally outside the bot's balance limits. */
 const EXEMPT = ['haunter_of_the_dark', 'azathoth'];
@@ -100,7 +100,7 @@ three, from ${STARTS.join(', ')} metres off (a bot's path through a fight is cha
 low walls and training dummy set aside: a body that wide finds no place to stand among them, as its own arena in the world has
 nothing in its way.
 
-- On the first journey a boss has its authored health at the standing it is met at, and grows past it to meet a stronger investigator: its health with their damage (Might and the edge of the weapon in hand), its blows with their health, each at most ${BOSS_OVERMATCH.most} times; its damage also gains ${BOSS_LEVEL_SCALING.damage * 100}% per purchased player level. Boss health rises on later journeys, capped at NG+7. **Boss health** is the most it had in that run.
+- On the first journey a boss has its authored health at the standing it is met at, and grows past it to meet a stronger investigator: its health with their damage (Might and the edge of the weapon in hand), its blows with their health, each by a share of that growth (${Math.round(BOSS_OVERMATCH.health * 100)}% and ${Math.round(BOSS_OVERMATCH.share * 100)}%) and with no ceiling; its damage also gains ${BOSS_LEVEL_SCALING.damage * 100}% per purchased player level. Boss health rises on later journeys, capped at NG+7. **Boss health** is the most it had in that run.
 - **Seconds** is how long the boss took with this bot's choices; actual players' fight times will differ.
 - **Lives** is the damage taken against the health a person has there and the Reagent they carry there (${REAGENT.doses} doses of ${Math.round(REAGENT.heal * 100)}% at the start, a vial more as the horrors fall, to ${REAGENT.maxDoses}):
   1 is the equivalent of all of it. A selected dodge can fail to start or avoid damage, and a value above 1 exceeds the carried healing
@@ -115,10 +115,11 @@ nothing in its way.
 `;
 const NOTES = `
 Bounds held by the test: each non-exempt boss finishes within ${BOUNDS_TEXT} (under ${BOUNDS.seconds[0]} seconds a fight is broken, not easy), and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, ${BOUNDS.godLives}), and the bot does not die, subject to the named pressure exceptions below.
-Each tier has its band: a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs ${BANDS.named.lives.join(' to ')} lives (the Colour may cost up to 1.5); one of the ${GREAT.size} great fights takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives. Named exceptions are ${Object.entries(WIDER).map(([id, b]) => `${id.replaceAll('_', ' ')}${b?.seconds ? ` ${b.seconds.join('–')} seconds` : ''}${b?.lives ? ` ${b.lives.join('–')} lives` : ''}`).join('; ')}. Yog-Sothoth is additionally capped at ${YOG_STANDING_MAX} lives at its expected standing. The upper end of each band fails the test; the lower end is a warning, listed below (2026-11-24: how hard a fight should be is the author's call, and the bot is not a person).
+Each tier has its band: a named horror takes ${BANDS.named.seconds.join(' to ')} seconds and costs ${BANDS.named.lives.join(' to ')} lives (the Colour may cost up to 1.5); one of the ${GREAT.size} great fights takes ${BANDS.god.seconds.join(' to ')} seconds and costs ${BANDS.god.lives.join(' to ')} lives. Named exceptions are ${Object.entries(WIDER).map(([id, b]) => `${id.replaceAll('_', ' ')}${b?.seconds ? ` ${b.seconds.join('–')} seconds` : ''}${b?.lives ? ` ${b.lives.join('–')} lives` : ''}`).join('; ')}. Yog-Sothoth is additionally capped at ${YOG_STANDING_MAX} lives at its expected standing. The upper end of each band fails the test. Below the lower end a fight is a warning, listed below (2026-11-24: how hard a fight should be is the author's call, and the bot is not a person); below half of it, a failure (2026-11-26: a horror that cheap has no chance left).
 `;
 
-/** The fights that cost the bot less than their band: warnings, written to docs/BALANCE.md, never failures (2026-11-24). */
+/** The fights that cost the bot less than their band: warnings, written to docs/BALANCE.md (2026-11-24); under `BROKEN` of the band's floor, failures (2026-11-26). */
+const BROKEN = 0.5;
 const LIGHT: string[] = [];
 const lightText = (): string => `\n## Below their bands\n\n${LIGHT.length ? LIGHT.map((l) => `- ${l}`).join('\n') : 'None.'}\n`;
 
@@ -182,10 +183,12 @@ describe('the balance table (round 25)', () => {
       if (r.deaths > 0) bad.push(`${label}: died ${r.deaths} times`);
       const band = bandOf(r.id, GREAT.has(r.id) ? 'god' : 'named'); // (the lesser Outer Gods, the Pipers, the Other Gods and the Ancient Ones, are fought as the named are)
       if (r.seconds > band.seconds[1]) bad.push(`${label}: ${r.seconds.toFixed(0)} seconds, its tier's band is ${band.seconds.join(' to ')}`);
-      if (r.seconds < band.seconds[0]) LIGHT.push(`${getEntity(r.id)!.name}: ${r.seconds.toFixed(0)} seconds, its band is ${band.seconds.join(' to ')}`);
+      if (r.seconds < band.seconds[0] * BROKEN) bad.push(`${label}: ${r.seconds.toFixed(0)} seconds, under half its band's ${band.seconds[0]}`);
+      else if (r.seconds < band.seconds[0]) LIGHT.push(`${getEntity(r.id)!.name}: ${r.seconds.toFixed(0)} seconds, its band is ${band.seconds.join(' to ')}`);
       const maxLives = r.id === 'colour_out_of_space' ? 1.5 : band.lives[1]; // its restored 30 hp/s healing makes this fight harder
       if (r.pressure > maxLives) bad.push(`${label}: ${r.pressure.toFixed(2)} lives, its tier's band is ${band.lives[0]} to ${maxLives}`);
-      if (r.pressure < band.lives[0]) LIGHT.push(`${getEntity(r.id)!.name}: ${r.pressure.toFixed(2)} lives, its band is ${band.lives[0]} to ${maxLives}`);
+      if (r.pressure < band.lives[0] * BROKEN) bad.push(`${label}: ${r.pressure.toFixed(2)} lives, under half its band's ${band.lives[0]}`);
+      else if (r.pressure < band.lives[0]) LIGHT.push(`${getEntity(r.id)!.name}: ${r.pressure.toFixed(2)} lives, its band is ${band.lives[0]} to ${maxLives}`);
     }
     if (LIGHT.length) console.warn(`Below their bands (warnings):\n${LIGHT.join('\n')}`);
     expect(bad).toEqual([]);
@@ -209,7 +212,7 @@ const atCapOf = (s: Standing): Standing => {
   return { ...s, levels, hp: healthAt(levels.vigour), reinforced: CAP.reinforced };
 };
 
-describe('at the cap: every level bought, with bosses grown to meet them (at most BOSS_OVERMATCH.most times)', () => {
+describe('at the cap: every level bought, with bosses grown to meet them', () => {
   const table = standings().map(atCapOf);
 
   it.each(table.map((s) => [s.id, s] as const))('%s', (_id, s) => void atCap.push(fightAt(s, CAP.starts)), FIGHT_TIMEOUT);

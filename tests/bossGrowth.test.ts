@@ -1,31 +1,41 @@
-/** A horror grows to meet an investigator past its standing at most `BOSS_OVERMATCH.most` times, by the weapon in hand; later journeys keep their own scaling (2026-11-24, docs/RULES.md). */
+/** A horror grows to meet an investigator past its standing with no ceiling, by the weapon in hand, and every level still helps (2026-11-24, 2026-11-26, docs/RULES.md). */
 import { describe, expect, it } from 'vitest';
 import { BOSS_STANDING } from '../src/data/bossStanding';
-import { JOURNEY_REFERENCE } from '../src/data/ngPlusTuning';
 import { getEntity, variantOf } from '../src/data/registry';
-import { BOSS_OVERMATCH, LEVELS, REINFORCE } from '../src/data/tuning';
+import { LEVELS, REINFORCE } from '../src/data/tuning';
 import { WEAPON_IDS } from '../src/data/weapons';
 import { edgeAt, equip } from '../src/systems/arms';
-import { bossDamageScale, journeyBossDamage, overmatch, overmatchHealth } from '../src/systems/bossScaling';
+import { overmatch, overmatchHealth } from '../src/systems/bossScaling';
 import { morph, spawnCreature } from '../src/systems/creatures';
 import { createWorldGame } from '../src/systems/game';
-import { levelsWorth, mightAt } from '../src/systems/levelWorth';
+import { healthAt, mightAt } from '../src/systems/levelWorth';
 import { applyLevels } from '../src/systems/levels';
-import { bossRung } from '../src/systems/ngPlus';
 import { applySave, snapshot } from '../src/systems/save';
 import { bossGame, engage } from './bossHelpers';
 import { steps } from './helpers';
 
 const TOP = { vigour: 30, endurance: 30, might: 30 };
 
-describe('a horror grows to meet the investigator, within a cap', () => {
-  it('never grows its blows or its health past the cap, and the first horror met last is at it', () => {
+describe('a horror grows to meet the investigator, with no ceiling', () => {
+  it('keeps growing with every level and reinforcement up to the last, the earliest horror most (2026-11-26: every horror keeps a chance)', () => {
+    const below = { vigour: TOP.vigour - 1, endurance: TOP.endurance, might: TOP.might - 1 };
     for (const id of Object.keys(BOSS_STANDING)) {
-      expect(overmatch(TOP, id).damage, id).toBeLessThanOrEqual(BOSS_OVERMATCH.most);
-      expect(overmatchHealth(TOP, REINFORCE.max, id), id).toBeLessThanOrEqual(BOSS_OVERMATCH.most);
+      expect(overmatch(TOP, id).damage, `${id}: blows`).toBeGreaterThan(overmatch(below, id).damage);
+      expect(overmatchHealth(TOP, REINFORCE.max, id), `${id}: health by Might`).toBeGreaterThan(overmatchHealth(below, REINFORCE.max, id));
+      expect(overmatchHealth(TOP, REINFORCE.max, id), `${id}: health by the edge`).toBeGreaterThan(overmatchHealth(TOP, REINFORCE.max - 1, id));
     }
-    expect(overmatch(TOP, 'dr_munoz').damage).toBe(BOSS_OVERMATCH.most);
-    expect(overmatchHealth(TOP, REINFORCE.max, 'dr_munoz')).toBe(BOSS_OVERMATCH.most);
+    const most = (grow: (id: string) => number): string => Object.keys(BOSS_STANDING).reduce((a, b) => (grow(b) > grow(a) ? b : a));
+    expect(most((id) => overmatch(TOP, id).damage)).toBe('dr_munoz');
+    expect(most((id) => overmatchHealth(TOP, REINFORCE.max, id))).toBe('dr_munoz');
+  });
+
+  it('every Vigour level strictly increases the blows the investigator can take from every boss', () => {
+    const blows = (id: string, vigour: number): number => healthAt(vigour) / overmatch({ vigour }, id).damage;
+    for (const id of Object.keys(BOSS_STANDING)) {
+      for (let vigour = 0; vigour < LEVELS.vigour.max; vigour++) {
+        expect(blows(id, vigour + 1), `${id} vigour ${vigour}->${vigour + 1}`).toBeGreaterThan(blows(id, vigour));
+      }
+    }
   });
 
   it('every Might level and weapon reinforcement strictly increases effective damage share against every boss', () => {
@@ -152,11 +162,6 @@ describe('a horror grows to meet the investigator, within a cap', () => {
     lf.engaged = true;
     applySave(loaded, { ...saved, levels: TOP });
     expect(loaded.player.reinforced[other]).toBe(REINFORCE.max);
-    expect(loaded.ecs.c.health.get(liveBoss)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * BOSS_OVERMATCH.most));
-  });
-
-  it('leaves later journeys the growth of their fixed reference, uncapped', () => {
-    const grown = journeyBossDamage('dr_munoz', 1) / bossRung('dr_munoz', 1).damage;
-    expect(grown).toBeGreaterThan(bossDamageScale(levelsWorth(JOURNEY_REFERENCE), BOSS_OVERMATCH.most));
+    expect(loaded.ecs.c.health.get(liveBoss)!.max).toBe(Math.round(getEntity('dr_munoz')!.stats.hp * overmatchHealth(TOP, REINFORCE.max, 'dr_munoz')));
   });
 });
