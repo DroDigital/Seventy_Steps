@@ -23,6 +23,7 @@ Needs `pip install pillow numpy`. Run it when the pack in public/creatures/revie
          of the canvas height. The renderer keeps this one anchor through every pose and view.
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -198,21 +199,19 @@ def body_bands(px, bounds):
     return bands
 
 
-def main():
-    manifest = json.loads((PACK / 'index.json').read_text())
+def read_pack(pack):
+    manifest = json.loads((pack / 'index.json').read_text())
+    pages = [np.array(Image.open(pack / p['file']).convert('RGBA')) for p in manifest['pages']]
+    return manifest, pages
+
+
+def measure_lights(manifest, pages):
+    eyes, glints = {}, {}
     frames = manifest['frames']
-    pages = [np.array(Image.open(PACK / p['file']).convert('RGBA')) for p in manifest['pages']]
-    eyes, body, ground, glints, matter = {}, {}, {}, {}, {}
     for key, entity in manifest['entities'].items():
-        front = frames[entity['directions']['front']['actions']['idle'][0]]
-        px = frame_pixels(pages, front)
-        matter[key] = body_matter(px)
-        if entity['assetGroup'] == 'bosses':
-            body[key] = body_bands(px, front['bounds'])
-        if key in GROUNDED:
-            cluster = max(marks(px[..., 3] > 128), key=len)
-            ground[key] = max(y for y, _ in cluster) / front['height']
         if key in EYED:
+            front = frames[entity['directions']['front']['actions']['idle'][0]]
+            px = frame_pixels(pages, front)
             where = EYED[key]
             box, colour = where if isinstance(where, tuple) and isinstance(where[0], tuple) else (where, None)
             found = find_eyes(px, front['bounds'], box, colour)
@@ -227,6 +226,25 @@ def main():
             if not glint:
                 sys.exit(f'{key} is named in GLINTED but no colour of its marks was found')
             glints[key] = glint
+    return eyes, glints
+
+
+def main(pack=PACK, output=OUT, light_source=None):
+    manifest, pages = read_pack(pack)
+    frames = manifest['frames']
+    # The paint bake reserves authored light texels. Measure those marks on the
+    # source so a shiny raised scale cannot be mistaken for an eye.
+    eyes, glints = measure_lights(*(read_pack(light_source) if light_source else (manifest, pages)))
+    body, ground, matter = {}, {}, {}
+    for key, entity in manifest['entities'].items():
+        front = frames[entity['directions']['front']['actions']['idle'][0]]
+        px = frame_pixels(pages, front)
+        matter[key] = body_matter(px)
+        if entity['assetGroup'] == 'bosses':
+            body[key] = body_bands(px, front['bounds'])
+        if key in GROUNDED:
+            cluster = max(marks(px[..., 3] > 128), key=len)
+            ground[key] = max(y for y, _ in cluster) / front['height']
     unknown = [key for key in EYED.keys() | GROUNDED | set(GLINTED) if key not in manifest['entities']]
     if unknown:
         sys.exit(f'Art measurements name forms the pack does not hold: {unknown}')
@@ -266,9 +284,14 @@ def main():
     ]
     lines += [f"  '{key}': [{', '.join(str(v) for v in value)}]," for key, value in sorted(matter.items())]
     lines += ['};', '']
-    OUT.write_text('\n'.join(lines))
-    print(f'{OUT.relative_to(ROOT)}: {len(eyes)} with eyes, {len(glints)} with lit marks, {len(matter)} with matter, {len(body)} boss bodies, {len(ground)} body ground rows measured', file=sys.stderr)
+    output.write_text('\n'.join(lines))
+    print(f'{output.name}: {len(eyes)} with eyes, {len(glints)} with lit marks, {len(matter)} with matter, {len(body)} boss bodies, {len(ground)} body ground rows measured', file=sys.stderr)
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pack', type=Path, default=PACK)
+    parser.add_argument('--out', type=Path, default=OUT)
+    parser.add_argument('--light-source', type=Path, default=ROOT / 'tools/sprites/source/reviewed')
+    args = parser.parse_args()
+    main(args.pack, args.out, args.light_source)

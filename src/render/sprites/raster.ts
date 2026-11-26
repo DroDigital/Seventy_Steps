@@ -2,15 +2,14 @@
  * A tiny software rasteriser for the sprite generator (pure, no Three.js): shaded ellipses,
  * tapered capsules and polygons written into an RGBA cell, then an outline pass. Shapes are shaded
  * as if they were rounded, lit from the upper left, in a few bands dithered where they meet, as a
- * pixel artist would (playtest round 7), with a small highlight, a cool rim on the edge turned from
- * the light, a little seeded grit and the creature's skin worked in (scales, fur, plates...;
+ * pixel artist would (playtest round 7), with a small highlight, a cool edge turned from
+ * the light and the creature's skin worked in (scales, fur, plates...;
  * skins.ts); wet hides take a hot highlight. A shape drawn over another is edged with a dark contour
  * where it overlaps, so limbs part from bodies, and the outline takes a dark shade of the body it
  * rings. Alpha marks the pixel kind: 0 empty, LIT lit by the world, GLOW self-lit (anomaly-coloured
  * markings), GLINT self-lit but muted (eye glints).
  */
 
-import { hash2 } from '../../core/rng';
 import { skinAt } from './skins';
 import { luma, type Rgb } from '../palette';
 
@@ -67,17 +66,25 @@ function band(k: number, x: number, y: number): number {
   return K0 + (Math.max(0, Math.min(BANDS - 1, q)) / (BANDS - 1)) * (K1 - K0);
 }
 
-/** `edge`: the pixel lies on the shape's rim; drawn over another shape, it becomes a contour. */
-function put(c: Canvas, x: number, y: number, ink: Ink, k: number, edge = false): void {
+/** u and v follow the painted part, so its scales, seams and shading travel with its animation. */
+function put(c: Canvas, x: number, y: number, ink: Ink, k: number, edge: boolean, u: number, v: number): void {
   if (x < 0 || y < 0 || x >= c.w || y >= c.h) return;
   const i = (y * c.w + x) * 4;
-  const self = ink.glow || ink.glint;
-  const grit = self ? 1 : 1 + (hash2(x, y, c.seed) - 0.5) * 0.08;
-  const contour = edge && !self && c.px[i + 3] > 0 ? 0.55 : 1;
-  const lit = band(ink.wet && k > 1 ? k + (k - 1) * 1.8 : k, x, y) * contour; // a wet hide catches the light
-  const s = (self ? 1 : lit * (ink.skin ? skinAt(ink.skin, x, y, c.seed) : 1)) * grit;
-  const rgb: Rgb = [ink.rgb[0] * s, ink.rgb[1] * s, ink.rgb[2] * s];
-  write(c, i, ink.glow ? rgb : mute(rgb), ink.glow ? GLOW : ink.glint ? GLINT : LIT);
+  if (ink.glow || ink.glint) {
+    write(c, i, ink.rgb, ink.glow ? GLOW : GLINT);
+    return;
+  }
+  // Positive integer material coordinates also keep periodic patterns continuous across their origin.
+  const tx = Math.floor(u) + 256, ty = Math.floor(v) + 256;
+  const relief = ink.skin ? skinAt(ink.skin, tx, ty, c.seed) : 1;
+  const contour = edge && c.px[i + 3] ? 0.56 + 0.2 * k : 1;
+  const tone = band((k + (ink.wet ? Math.max(0, k - 1.18) : 0)) * relief, tx, ty) * contour;
+  const shade = Math.max(0, 1 - tone), light = Math.max(0, tone - 1);
+  write(c, i, mute([
+    ink.rgb[0] * tone + light * 0.055,
+    ink.rgb[1] * tone + light * 0.038 + shade * 0.008,
+    ink.rgb[2] * tone + light * 0.019 + shade * 0.025,
+  ]), LIT);
 }
 
 /** Near black, a colour greys: eight bits would round its last shades into a false saturation. */
@@ -89,6 +96,17 @@ function mute(c: Rgb): Rgb {
 
 function write(c: Canvas, i: number, rgb: Rgb, kind: number): void {
   [c.px[i], c.px[i + 1], c.px[i + 2], c.px[i + 3]] = [to8(rgb[0]), to8(rgb[1]), to8(rgb[2]), kind];
+}
+
+/** A one-pixel painted line, clipped to the lit surface beneath it. */
+export function stroke(c: Canvas, x0: number, y0: number, x1: number, y1: number, ink: Ink): void {
+  const steps = Math.max(1, Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))));
+  for (let j = 0; j <= steps; j++) {
+    const x = Math.floor(x0 + (x1 - x0) * j / steps), y = Math.floor(y0 + (y1 - y0) * j / steps);
+    if (x < 0 || x >= c.w || y < 0 || y >= c.h) continue;
+    const i = (y * c.w + x) * 4;
+    if (c.px[i + 3] === LIT) write(c, i, ink.rgb, LIT);
+  }
 }
 
 /** A filled ellipse centred at (cx, cy), radii (rx, ry), turned by `rot` radians. */
@@ -106,7 +124,7 @@ export function ellipse(c: Canvas, cx: number, cy: number, rx: number, ry: numbe
       if (d2 > 1) continue;
       const nx = u * cs - v * sn;
       const ny = u * sn + v * cs;
-      put(c, x, y, ink, lambert(nx, ny, Math.sqrt(1 - d2)), Math.sqrt(d2) > 1 - 1.1 / Math.min(rx, ry));
+      put(c, x, y, ink, lambert(nx, ny, Math.sqrt(1 - d2)), Math.sqrt(d2) > 1 - 1.1 / Math.min(rx, ry), u * rx, v * ry);
     }
   }
 }
@@ -116,6 +134,7 @@ export function capsule(c: Canvas, x0: number, y0: number, x1: number, y1: numbe
   const dx = x1 - x0;
   const dy = y1 - y0;
   const len2 = dx * dx + dy * dy || 1e-6;
+  const len = Math.sqrt(len2);
   const r = Math.max(r0, r1);
   for (let y = Math.floor(Math.min(y0, y1) - r); y <= Math.ceil(Math.max(y0, y1) + r); y++) {
     for (let x = Math.floor(Math.min(x0, x1) - r); x <= Math.ceil(Math.max(x0, x1) + r); x++) {
@@ -128,7 +147,8 @@ export function capsule(c: Canvas, x0: number, y0: number, x1: number, y1: numbe
       const d = Math.hypot(ex, ey);
       if (d > rad) continue;
       const a = d / rad;
-      put(c, x, y, ink, lambert((ex / (d || 1)) * a, (ey / (d || 1)) * a, Math.sqrt(1 - a * a)), d > rad - 1.05);
+      put(c, x, y, ink, lambert(ex / rad, ey / rad, Math.sqrt(1 - a * a)), d > rad - 1.05,
+        (px * dy - py * dx) / len, (px * dx + py * dy) / len);
     }
   }
 }
@@ -149,7 +169,7 @@ export function poly(c: Canvas, pts: readonly (readonly [number, number])[], ink
     const k = 1.15 - 0.45 * ((sy - y0) / Math.max(1, y1 - y0));
     for (let i = 0; i + 1 < xs.length; i += 2) {
       const [a, b] = [Math.ceil(xs[i] - 0.5), Math.floor(xs[i + 1] - 0.5)];
-      for (let x = a; x <= b; x++) put(c, x, y, ink, k, x === a || x === b || y === Math.floor(y0) || y === Math.ceil(y1));
+      for (let x = a; x <= b; x++) put(c, x, y, ink, k, x === a || x === b || y === Math.floor(y0) || y === Math.ceil(y1), x - pts[0][0], sy - y0);
     }
   }
 }

@@ -1,7 +1,7 @@
 /** Beast body plans: quadruped and serpent (in profile), winged, crustacean, toad. */
 
-import { capsule, ellipse, poly } from './raster';
-import { claws, eyes, GROUND, MID, recoil, tentacle, tentacles, wing, type Sketch } from './parts';
+import { capsule, ellipse, poly, stroke } from './raster';
+import { claws, eyes, GROUND, MID, recoil, ribs, tentacle, tentacles, wing, type Sketch } from './parts';
 
 const HALF_PI = Math.PI / 2;
 
@@ -24,7 +24,11 @@ export function quadruped(s: Sketch): void {
   }
   ellipse(c, x, y, 17, 8.5, s.body);
   ellipse(c, x + 2, y + 3, 12, 4, s.light);
-  for (let k = 0; k < 4; k++) capsule(c, x - 4 + k * 4, y - 5, x - 6 + k * 4, y + 1, 0.4, 0.3, s.dark); // ribs
+  for (let k = 0; k < 4; k++) {
+    const rib = x - 7 + k * 4;
+    stroke(c, rib + 1, y - 4, rib - 1, y + 1, s.ridge);
+    stroke(c, rib, y, rib + 2, y + 4, s.recess);
+  }
   for (let k = 0; k < 6; k++) poly(c, [[x - 13 + k * 4, y - 7], [x - 11 + k * 4, y - 11 - (k % 2)], [x - 10 + k * 4, y - 7]], s.dark); // the ridge of its back
   if (r.tentacles) tentacles(s, x, y - 6, r.tentacles, 12, 1.4, -HALF_PI - 0.6, -HALF_PI + 0.6, p.bob + p.swing);
   const reach = p.attack === 1 ? -4 : p.attack === 2 ? 6 : 0;
@@ -32,6 +36,8 @@ export function quadruped(s: Sketch): void {
   capsule(c, x + 11, y - 3, hx - 2, hy + 2, 5, 4, s.body);
   ellipse(c, hx, hy, 7, 6, s.body);
   ellipse(c, hx + 6, hy + 2, 4, 3, s.light);
+  stroke(c, hx + 8, hy + 2, hx + 3, hy + 3, s.recess);
+  stroke(c, hx + 4, hy + 3, hx + 4, hy + 4, s.claw);
   if (p.attack === 2) {
     poly(c, [[hx + 3, hy + 3], [hx + 11, hy + 1], [hx + 10, hy + 7]], s.dark);
     for (let k = 0; k < 3; k++) ellipse(c, hx + 5 + k * 2, hy + 2.6 - k * 0.3, 0.5, 0.8, s.claw); // teeth
@@ -57,6 +63,12 @@ export function serpent(s: Sketch): void {
     }
   }
   for (const [px, py, rad] of pts) ellipse(c, px, py, rad, rad, s.body);
+  // Broad ventral scutes bend with the coil rather than appearing as separate beads.
+  for (let i = 2; i < pts.length - 1; i += 2) {
+    const [px, py, rad] = pts[i];
+    if (i < 17) stroke(c, px - 1, py + rad * 0.48, px + 1, py + rad * 0.78, s.ridge);
+    else stroke(c, px - rad * 0.6, py - 1, px + rad * 0.7, py + 1, s.ridge);
+  }
   if (r.limbs) {
     for (let i = 0; i < r.limbs; i++) {
       const [px, py] = pts[Math.min(pts.length - 1, 3 + Math.floor((i / r.limbs) * 16))];
@@ -85,8 +97,12 @@ export function winged(s: Sketch): void {
     claws(s, fx, 48 + b, side);
   }
   ellipse(c, x, 30 + b, 6, 10, s.body);
+  ribs(s, x, 26 + b, 5, 3);
   const faceless = (r.eyes ?? 2) === 0;
-  if (faceless) for (const side of [-1, 1] as const) capsule(c, x + side * 2.5, 14 + b, x + side * 6, 6 + b, 1.3, 0.5, s.dark);
+  if (faceless) for (const side of [-1, 1] as const) {
+    capsule(c, x + side * 2.5, 14 + b, x + side * 6, 6 + b, 1.3, 0.5, s.dark);
+    stroke(c, x + side * 3, 13 + b, x + side * 5, 8 + b, s.ridge);
+  }
   ellipse(c, x, 18 + b, 4.5, 5.5, faceless ? s.body : s.light);
   eyes(s, x, 17 + b, r.eyes ?? 2, 2, 1.1);
 }
@@ -113,6 +129,11 @@ export function crustacean(s: Sketch): void {
   }
   ellipse(c, x - 2, 42 + b, 8, 6, s.body);
   ellipse(c, x + 1, 33 + b, 7, 6, s.body);
+  for (let k = 0; k < 3; k++) {
+    const row = 34 + k * 4 + b;
+    stroke(c, x - 6, row - 2, x - 1, row, s.ridge);
+    stroke(c, x - 1, row, x + 4, row - 1, s.recess);
+  }
   const claw = p.attack === 1 ? -10 : p.attack === 2 ? 8 : 0;
   for (const side of [-1, 1] as const) capsule(c, x + side * 5, 31 + b, x + side * 9 + (p.attack === 2 ? -side * 5 : 0), 22 + b + claw, 1.5, 1, s.body);
   ellipse(c, x + 3, 20 + b, 6.5, 7.5, s.light);
@@ -138,7 +159,10 @@ export function toad(s: Sketch): void {
   ellipse(c, x, 46 + b, 22, 14, s.body);
   ellipse(c, x, 52 + b, 15, 7, s.light);
   const gape = p.attack === 2 ? 4 : 0.8;
-  ellipse(c, x, 49 + b, 11, gape, s.dark);
+  ellipse(c, x, 49 + b, 12, gape + 0.6, s.recess);
+  stroke(c, x - 11, 48 + b, x - 4, 49 + b - gape, s.claw);
+  stroke(c, x + 2, 54 + b, x + 9, 52 + b, s.body);
+  stroke(c, x - 8, 55 + b, x - 1, 56 + b, s.ridge);
   for (const side of [-1, 1] as const) ellipse(c, x + side * 8, 35 + b, 4, 4, s.body);
   eyes(s, x, 35 + b, r.eyes ?? 2, 8, 1.6);
   if (r.tentacles) tentacles(s, x, 50 + b, r.tentacles, 12 + (p.attack === 2 ? 6 : 0), 1.4, HALF_PI - 0.8, HALF_PI + 0.8, p.bob + p.swing);

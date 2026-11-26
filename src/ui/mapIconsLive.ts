@@ -57,6 +57,11 @@ export function person(ctx: Ctx, r: number, met: boolean): void {
   ctx.beginPath();
   ctx.arc(0.13, cy - 0.28, 0.14, 0, TAU);
   ctx.fill();
+  // The carved sitter wears a high, pleated mourning collar.
+  poly(ctx, [[-0.31, cy + 0.23], [-0.16, cy + 0.09], [-0.02, cy + 0.23], [0.18, cy + 0.07], [0.35, cy + 0.23], [0.02, cy + 0.44]]);
+  ctx.fillStyle = '#958069';
+  ctx.fill();
+  stroke(ctx, r, [[-0.22, cy + 0.18], [0.02, cy + 0.34], [0.18, cy + 0.14]], '#f3dbb2', 0.04, 0.55);
   ctx.fillStyle = lin(ctx, -0.6, cy - 0.7, 0.2, cy + 0.2, 'rgba(255,255,255,0.4)', 'rgba(255,255,255,0)'); // the glass: a streak of daylight across it
   poly(ctx, [[-0.6, cy - 0.5], [-0.12, cy - 0.7], [-0.6, cy + 0.15]]);
   ctx.fill();
@@ -81,13 +86,16 @@ function letter(ctx: Ctx, r: number): void {
   stroke(ctx, r, [[w, h], [0.34, -0.04]], 'rgba(30,26,20,0.3)', 0.03);
   stroke(ctx, r, [[-w + 0.03, h - 0.03], [-w + 0.03, -h + 0.03], [w - 0.05, -h + 0.03]], 'rgba(255,255,255,0.35)', 0.035);
   const [sx, sy] = [0, 0.1];
-  ctx.fillStyle = rad(ctx, sx - 0.06, sy - 0.07, 0, 0.3, '#a0605c', '#6a3031', '#3a171a'); // the wax: dull, with one sheen
+  ctx.fillStyle = rad(ctx, sx - 0.06, sy - 0.07, 0, 0.3, '#b96f62', '#843c3b', '#3a171a'); // the wax: dull, with one sheen
+  poly(ctx, [[-0.14, 0.16], [-0.02, 0.28], [-0.08, 0.42], [-0.16, 0.37]]);
+  ctx.fill();
   ctx.beginPath();
   ctx.arc(sx, sy, 0.24, 0, TAU);
   ctx.lineWidth = u(r, 0.05, 0.9);
   ctx.strokeStyle = 'rgba(8,6,12,0.9)';
   ctx.stroke();
   ctx.fill();
+  stroke(ctx, r, [[-0.12, 0.13], [-0.04, 0.06], [0.10, 0.09], [0.02, 0.15], [-0.12, 0.13]], '#572626', 0.04, 0.55);
   ctx.fillStyle = 'rgba(255,230,220,0.5)';
   ctx.beginPath();
   ctx.arc(sx - 0.08, sy - 0.08, u(r, 0.04, 0.5), 0, TAU);
@@ -130,6 +138,7 @@ export function echo(ctx: Ctx, r: number, now: number): void {
   ctx.bezierCurveTo(0.2, -0.05, 0.26, 0.2, 0.0, 0.34);
   ctx.bezierCurveTo(-0.26, 0.22, -0.18, -0.04, 0.02, -0.34 * k);
   ctx.fill();
+  stroke(ctx, r, [[0.02, -0.21 * k], [-0.08, -0.02], [0.03, 0.18]], '#fffbd9', 0.07, 0.65);
   stroke(ctx, r, [[-0.34, -0.38], [-0.4, 0.1], [-0.34, 0.5]], 'rgba(255,255,255,0.6)', 0.05); // the glass's lit side
 }
 
@@ -181,6 +190,9 @@ export function lead(ctx: Ctx, r: number, now: number): void {
   ctx.beginPath();
   ctx.arc(-0.74, 0, 0.17, 0, TAU);
   ctx.stroke();
+  for (const x of [0.22, 0.38, 0.54]) {
+    stroke(ctx, r, [[x, -0.07], [x - 0.07, 0.07]], '#855528', 0.04, 0.55);
+  }
   stroke(ctx, r, [[-0.1, -0.045], [0.95, -0.045]], 'rgba(255,255,255,0.8)', 0.03);
   ctx.restore();
   const [gx, gy, gs] = [0.74, -0.78, 0.3 + 0.12 * breath]; // the glint

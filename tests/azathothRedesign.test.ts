@@ -11,7 +11,8 @@ import { spawnCreature } from '../src/systems/creatures';
 import { createGame } from '../src/systems/game';
 import { alphaBounds, crop, pngRgba } from './reviewedPackHelpers';
 
-const ASSETS = 'public/creatures/reviewed';
+// These fixtures pin the delivered pixels before the production repaint.
+const ASSETS = 'tools/sprites/source/reviewed';
 const DIRECTIONS = ['front', 'left', 'back', 'right'] as const;
 const FRONT_ACTIONS = ['idle', 'move', 'attack', 'hurt', 'stoop', 'stoop_mid'] as const;
 const OTHER_ACTIONS = ['idle', 'move'] as const;
@@ -28,9 +29,10 @@ interface SourceEntity {
 /** This fixture records the hashes of the exact user-approved delivery, independent of the atlas. */
 const approved = JSON.parse(readFileSync('tests/fixtures/azathoth-redesign.json', 'utf8')) as { frames: ApprovedFrame[] };
 const reference = new Map(approved.frames.map(frame => [frame.path, frame]));
-const pack = JSON.parse(readFileSync(`${ASSETS}/index.json`, 'utf8')) as ReviewedManifest;
+const originals = JSON.parse(readFileSync(`${ASSETS}/index.json`, 'utf8')) as ReviewedManifest;
+const pack = JSON.parse(readFileSync('public/creatures/reviewed/index.json', 'utf8')) as ReviewedManifest;
 const source = JSON.parse(readFileSync(`${ASSETS}/source-index.json`, 'utf8')) as { entities: SourceEntity[] };
-const pages = pack.pages.map(page => pngRgba(readFileSync(`${ASSETS}/${page.file}`)));
+const pages = originals.pages.map(page => pngRgba(readFileSync(`${ASSETS}/${page.file}`)));
 
 function reflect(pixels: Uint8Array): Uint8Array {
   const out = new Uint8Array(pixels.length);
@@ -44,7 +46,7 @@ function reflect(pixels: Uint8Array): Uint8Array {
 describe('the approved Azathoth sprite redesign', () => {
   it('contains all 32 delivered poses, in order and with their exact PNG and rendered RGBA hashes', () => {
     expect(approved.frames).toHaveLength(32);
-    const entity = pack.entities.azathoth;
+    const entity = originals.entities.azathoth;
     const original = source.entities.find(entry => entry.key === 'azathoth')!;
     expect(entity.scale).toBe(30);
     expect(original.sprite_scale).toBe(30);
@@ -69,7 +71,7 @@ describe('the approved Azathoth sprite redesign', () => {
           const author = reference.get(pathname(from, action, n))!;
           expect(wanted, `${direction}/${action}/${n}`).toBeDefined();
           expect(author, `${from}/${action}/${n}`).toBeDefined();
-          const frame = pack.frames[id], pixels = crop(frame, pages[frame.page]);
+          const frame = originals.frames[id], pixels = crop(frame, pages[frame.page]);
           const rendered = clip.mirror_horizontal ? reflect(pixels) : pixels;
           expect([frame.width, frame.height]).toEqual([128, 128]);
           expect(frame.source).toBe(author.path);
@@ -88,7 +90,7 @@ describe('the approved Azathoth sprite redesign', () => {
     }
     expect(count).toBe(32);
     // The 26 unique drawn images are packed once; no old side/back combat survives.
-    const paths = pack.frames.filter(f => f.source.startsWith('bosses/azathoth/movement/')).map(f => f.source).sort();
+    const paths = originals.frames.filter(f => f.source.startsWith('bosses/azathoth/movement/')).map(f => f.source).sort();
     expect(paths).toEqual(approved.frames.filter(f => !f.path.includes('/right/')).map(f => f.path).sort());
   });
 

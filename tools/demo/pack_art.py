@@ -10,6 +10,7 @@ it was made from. Deterministic: run it again after the source atlas or KEEP cha
     python3 -I tools/demo/pack_art.py            (needs pip install pillow)
 """
 
+import argparse
 import hashlib
 import json
 import os
@@ -167,10 +168,20 @@ def pack(name, pack_dir, out_dir, keep, source_pages):
     return entities, new_frames, out_pages
 
 
-def verify(name, pack_dir, out_dir, source_index, demo_index):
+def verify(name, pack_dir, out_dir):
     """Every kept frame's pixels are the source frame's, byte for byte, and every page's hash is its file's."""
     source = json.load(open(os.path.join(pack_dir, 'index.json'), encoding='utf8'))
     demo = json.load(open(os.path.join(out_dir, 'index.json'), encoding='utf8'))
+    def pages(folder, index):
+        decoded = []
+        for page in index['pages']:
+            with Image.open(os.path.join(folder, page['file'])) as image:
+                decoded.append(image.convert('RGBA'))
+        return decoded
+
+    # Each source page serves hundreds of frames. Decode it once for the complete comparison.
+    originals = pages(pack_dir, source)
+    copies = pages(out_dir, demo)
     for key, entity in demo['entities'].items():
         src = source['entities'][key]
         for direction, view in entity['directions'].items():
@@ -179,8 +190,8 @@ def verify(name, pack_dir, out_dir, source_index, demo_index):
                     nf, sf = demo['frames'][new_i], source['frames'][old_i]
                     if nf['pixelSha256'] != sf['pixelSha256'] or nf['source'] != sf['source']:
                         sys.exit(f'pack_art: {name}/{key} {direction}/{action} changed')
-                    a = Image.open(os.path.join(pack_dir, source['pages'][sf['page']]['file'])).convert('RGBA').crop((sf['x'], sf['y'], sf['x'] + sf['width'], sf['y'] + sf['height']))
-                    b = Image.open(os.path.join(out_dir, demo['pages'][nf['page']]['file'])).convert('RGBA').crop((nf['x'], nf['y'], nf['x'] + nf['width'], nf['y'] + nf['height']))
+                    a = originals[sf['page']].crop((sf['x'], sf['y'], sf['x'] + sf['width'], sf['y'] + sf['height']))
+                    b = copies[nf['page']].crop((nf['x'], nf['y'], nf['x'] + nf['width'], nf['y'] + nf['height']))
                     if a.tobytes() != b.tobytes():
                         sys.exit(f'pack_art: {name}/{key} {direction}/{action} pixels differ')
     for page in demo['pages']:
@@ -192,16 +203,20 @@ def source_frame(entity, direction, action, j):
     return entity['directions'][direction]['actions'][action][j]
 
 
-def main():
+def main(source=SOURCE, out=OUT):
     keep = set(kept_entities())
-    base_entities, _, _ = pack('reviewed', os.path.join(SOURCE, 'reviewed'), os.path.join(OUT, 'reviewed'), keep,
+    base_entities, _, _ = pack('reviewed', os.path.join(source, 'reviewed'), os.path.join(out, 'reviewed'), keep,
                                [f'creatures-{i}.png' for i in range(64)])
-    allies_entities, _, _ = pack('allies', os.path.join(SOURCE, 'allies'), os.path.join(OUT, 'allies'), keep,
+    allies_entities, _, _ = pack('allies', os.path.join(source, 'allies'), os.path.join(out, 'allies'), keep,
                                  [f'allies-{i}.png' for i in range(64)])
-    verify('reviewed', os.path.join(SOURCE, 'reviewed'), os.path.join(OUT, 'reviewed'), None, None)
-    verify('allies', os.path.join(SOURCE, 'allies'), os.path.join(OUT, 'allies'), None, None)
+    verify('reviewed', os.path.join(source, 'reviewed'), os.path.join(out, 'reviewed'))
+    verify('allies', os.path.join(source, 'allies'), os.path.join(out, 'allies'))
     print('kept:', ', '.join(sorted(set(base_entities) | set(allies_entities))))
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source', default=SOURCE)
+    parser.add_argument('--out', default=OUT)
+    args = parser.parse_args()
+    main(args.source, args.out)

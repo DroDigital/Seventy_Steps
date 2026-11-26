@@ -6,7 +6,8 @@ import { resolveDirectionalClip, type SpriteAction, type SpriteDirection } from 
 import { reviewedClips, reviewedSize, type ReviewedManifest } from '../src/render/sprites/reviewed';
 import { alphaBounds, crop, pngRgba } from './reviewedPackHelpers';
 
-const ASSET_DIR = 'public/creatures/reviewed';
+// These fixtures pin the delivered pixels before the production repaint.
+const ASSET_DIR = 'tools/sprites/source/reviewed';
 const DIRECTIONS = ['front', 'left', 'back', 'right'] as const;
 const TARGETS = ['joseph_curwen', 'high_priest', 'high_priest#eldritch'];
 const hash = (bytes: Uint8Array): string => createHash('sha256').update(bytes).digest('hex');

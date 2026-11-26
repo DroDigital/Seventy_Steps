@@ -1,12 +1,30 @@
 # Reviewed creature artwork
 
-The game uses the accepted 105-entry creature library for every enemy form: 93 base enemies and 12 variants. Its 2,577 registered source PNGs are packed without resizing, trimming, recoloring or changing frame order; what the author drew afterwards is packed beside them: the stoop of seven colossi (14 frames) and its in-between pose (7), the nine bosses' left and back attack and hurt (126), 'Umr at-Tawil drawn again whole (his 17 frames put in place of the old, and 4 more for a right view of his own), and Nyarlathotep's two forms drawn again whole (the pharaoh in robes and the Crawling Chaos: 55 frames put in place of the old, and 8 more for the Chaos's longer side walks); round 92 drew Nug, Yeb and Shub-Niggurath again whole, the pack then holding 2,850 frames.
+The original imports use the accepted 105-entry creature library for every enemy form: 93 base enemies and 12 variants. Its 2,577 registered source PNGs are packed without resizing, trimming, recoloring or changing frame order; what the author drew afterwards is packed beside them: the stoop of seven colossi (14 frames) and its in-between pose (7), the nine bosses' left and back attack and hurt (126), 'Umr at-Tawil drawn again whole (his 17 frames put in place of the old, and 4 more for a right view of his own), and Nyarlathotep's two forms drawn again whole (the pharaoh in robes and the Crawling Chaos: 55 frames put in place of the old, and 8 more for the Chaos's longer side walks); round 92 drew Nug, Yeb and Shub-Niggurath again whole, the pack then holding 2,850 frames.
+
+## Production repaint
+
+All 112 creature forms use painted frames in the bestiary, arena, open world and desktop package. The nine full-game pages hold 3,088 frame records, including the flight, stoop and combat poses. The demo takes its 444 frames from those same painted pages.
+
+The original packed artwork and registrations live in `tools/sprites/source/{reviewed,allies}/`. The source importers write new deliveries there. The two dated delivery fixtures for Azathoth and Curwen verify those input pixels. In each production manifest, `sourceSha256` identifies the original PNG and `pixelSha256` identifies the displayed frame's RGBA bytes.
+
+The bake assigns 15 materials using source colors and the anatomy of each form. It fits material coordinates to the moving poses and adds form-specific details such as gills, exposed tendons, and damaged vestments. Run the following from the repository root with Pillow, NumPy and SciPy installed.
+
+```sh
+python3 tools/repaint_creature_sprites.py /path/to/painted-pages
+python3 tools/install_sprite_paint.py /path/to/painted-pages
+npm run check
+npm run check:demo
+```
+
+The installer verifies the alpha channel and a visible repaint of every registered frame. It measures the source's reserved eye and glint texels and samples the finished sprites for body colors and grounding. It also verifies the demo crops against the painted full-game pages before installing both editions. Playback uses the authored frame order, facing, scale and feet anchors. The production build serves the painted pages.
 
 ## Runtime files
 
 - `public/creatures/reviewed/index.json`: page rectangles, native canvas sizes, scales, directions, mirror flags and action registrations.
 - `public/creatures/reviewed/creatures-0.png` through `creatures-3.png`: four lossless PNG texture pages, with transparent gutters and nearest filtering; `creatures-4.png` holds the fourteen stoop frames, `creatures-5.png` the seven in-between frames and `creatures-6.png` the bosses' side and back frames (126 at first; Yog-Sothoth's ten went in round 56 and Shub-Niggurath's sixteen in round 92, so 100 now); 'Umr at-Tawil's and Nyarlathotep's new frames are in place on `creatures-3.png` (which grew a shelf at its foot for 'Umr's right view, and a second for the Chaos's four added side-walk frames each way).
 - `public/creatures/reviewed/source-index.json`: the active source registrations used to build this pack.
+- `public/creatures/reviewed/creatures-7.png` holds the Shantak's flight cycle.
 
 These files are copied into `dist/creatures/reviewed/` by the normal production build and served by the existing Electron package. No separate sprite folder needs to be installed into the game.
 
@@ -82,7 +100,7 @@ The author's `Seventy-Steps-Nug-Yeb-Shub-Lore-Overhauls-Full` zip holds 93 PNGs 
 
 ## Rebuilding and checking
 
-Run `python3 tools/pack_reviewed_assets.py --source /path/to/accepted/library --output public/creatures/reviewed` with Pillow available. The source folder must contain its current `CURRENT-GAME-ANIMATIONS.json` and every referenced PNG. The packer rejects changed source hashes and verifies every RGBA crop after packing.
+Run `python3 tools/pack_reviewed_assets.py --source /path/to/accepted/library --output tools/sprites/source/reviewed` with Pillow available. The source folder must contain its current `CURRENT-GAME-ANIMATIONS.json` and every referenced PNG. The packer rejects changed source hashes and verifies every RGBA crop after packing.
 
 `npm run check:all` includes checks for all 105 registry keys, all 1,096 animation scopes (1,050 of the library, the stoop and its halfway pose of seven colossi, and the seven other bosses' left and back attack and hurt), every packed frame's RGBA hash and bounds, native canvases, mirroring, variable animation timing and Electron asset serving. `npm run build` includes the artwork in the production game.
 

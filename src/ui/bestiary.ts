@@ -10,8 +10,8 @@ import { TIERS, type AssemblyRecipe, type EntityDef } from '../data/schema';
 import { FX } from '../data/tuning';
 import { buildAssembly, type Assembly } from '../render/assemblies';
 import { WRONGNESS } from '../render/eldritch';
-import { CELL, cellOrigin, SPRITE_STATES, spriteKey, STATE_POSES, type SpriteAtlas, type SpriteState } from '../render/sprites/atlas';
-import { loopFrame, type SpriteDirection } from '../render/sprites/directional';
+import { CELL, cellOrigin, SPRITE_STATES, spriteKey, STATE_POSES, type SpriteAtlas } from '../render/sprites/atlas';
+import { loopFrame, type SpriteAction, type SpriteDirection } from '../render/sprites/directional';
 import { reviewedClips, type ReviewedArt, type ReviewedEntity } from '../render/sprites/reviewed';
 import { worldUniforms } from '../render/worldMaterial';
 import { spriteAtlas } from './loading';
@@ -51,33 +51,37 @@ function blit(ctx: CanvasRenderingContext2D, atlas: SpriteAtlas, cell: number): 
 }
 
 function tile(grid: HTMLElement, d: EntityDef, variant?: Variant): { canvas: HTMLCanvasElement; caption: HTMLElement } {
-  const card = el('a', `display:block;width:${TILE + 16}px;padding:8px;background:#0c0c0e;border:1px solid #2a2a2e;color:${BONE};text-decoration:none;cursor:pointer`, '', grid);
-  card.href = `?spawn=${d.id}${variant ? `&variant=${variant}` : ''}`;
-  card.title = `Spawn ${d.name} in the arena`;
+  const card = el(__DEMO__ ? 'div' : 'a', `display:block;width:${TILE + 16}px;padding:8px;background:#0c0c0e;border:1px solid #2a2a2e;color:${BONE};text-decoration:none`, '', grid);
+  if (card instanceof HTMLAnchorElement) {
+    card.href = `?spawn=${d.id}${variant ? `&variant=${variant}` : ''}`;
+    card.title = `Spawn ${d.name} in the arena`;
+  }
   const canvas = el('canvas', `width:${TILE}px;height:${TILE}px;image-rendering:pixelated;background:#16161a`, '', card);
   [canvas.width, canvas.height] = d.sprite ? [CELL, CELL] : [TILE, TILE];
   const caption = el('div', 'font:10px/1.5 monospace;opacity:.6;min-height:15px', '', card);
   el('div', 'font:bold 12px/1.3 monospace;margin-top:6px', d.name, card);
   el('div', 'font:11px/1.3 monospace;opacity:.6', `${TIER_NAMES[d.tier]}${variant ? ` · ${variant}` : ''} · ${paramsOf(d.behavior).hide !== 'none' ? `${d.behavior.archetype} (hidden)` : d.behavior.archetype}`, card);
   el('div', 'font:italic 11px/1.3 serif;opacity:.5', `${d.source}${d.canonLooks ? '' : ' · conjectured look'}`, card);
-  const links = el('div', 'font:11px/1.6 monospace', '', card);
-  for (const v of ['eldritch', 'boss'] as const) {
-    if (!variantOf(d, v)) continue;
-    const a = el('a', `color:${BONE};opacity:.7;margin-right:8px`, `${v} variant`, links);
-    a.href = `?spawn=${d.id}&variant=${v}`;
-    a.addEventListener('click', (e) => e.stopPropagation());
+  if (!__DEMO__) {
+    const links = el('div', 'font:11px/1.6 monospace', '', card);
+    for (const v of ['eldritch', 'boss'] as const) {
+      if (!variantOf(d, v)) continue;
+      const a = el('a', `color:${BONE};opacity:.7;margin-right:8px`, `${v} variant`, links);
+      a.href = `?spawn=${d.id}&variant=${v}`;
+      a.addEventListener('click', (e) => e.stopPropagation());
+    }
   }
   return { canvas, caption };
 }
 
-interface AuthoredClip { direction: SpriteDirection; state: SpriteState | 'stoop' | 'stoop_mid'; frames: readonly number[]; mirror: boolean; duration: number }
-const CLIP_SECONDS = { idle: 2, move: 0.8, attack: 0.8, hurt: 0.6, stoop: 1.2, stoop_mid: 0.4 };
+interface AuthoredClip { direction: SpriteDirection; state: SpriteAction; frames: readonly number[]; mirror: boolean; duration: number }
+const CLIP_SECONDS: Record<SpriteAction, number> = { idle: 2, move: 0.8, flight: 0.8, attack: 0.8, hurt: 0.6, stoop: 1.2, stoop_mid: 0.4 };
 
 function authoredClips(entity: ReviewedEntity, key: string): AuthoredClip[] {
   const clips = reviewedClips(entity, key);
   return (['front', 'left', 'back', 'right'] as const).flatMap((direction) => {
     const view = clips[direction]!;
-    return [...SPRITE_STATES, 'stoop' as const, 'stoop_mid' as const].flatMap((state) => {
+    return (Object.keys(CLIP_SECONDS) as SpriteAction[]).flatMap((state) => {
       const clip = view[state];
       return clip?.frames.length ? [{ direction, state, frames: clip.frames, mirror: clip.mirror_horizontal, duration: CLIP_SECONDS[state] }] : [];
     });
@@ -138,9 +142,12 @@ export async function startBestiary(): Promise<void> {
     console.error(error);
     return;
   }
-  status.textContent = `${ENTITIES.length} entities · ${atlas.reviewed?.manifest.entityCount ?? 0} authored forms including 7 allies · click a form to spawn it in the arena · `;
+  const count = atlas.reviewed?.manifest.entityCount ?? 0;
+  status.textContent = __DEMO__
+    ? `${count} authored forms · `
+    : `${ENTITIES.length} entities · ${count} authored forms including 7 allies · click a form to spawn it in the arena · `;
   status.append(
-    Object.assign(el('a', `color:${BONE}`, 'back to the arena'), { href: '?arena' }),
+    Object.assign(el('a', `color:${BONE}`, __DEMO__ ? 'back to the game' : 'back to the arena'), { href: __DEMO__ ? './' : '?arena' }),
   );
   const sprites: { ctx: CanvasRenderingContext2D; key: string }[] = [];
   const colossi: { ctx: CanvasRenderingContext2D; asm: Assembly; recipe: AssemblyRecipe }[] = [];
@@ -157,9 +164,10 @@ export async function startBestiary(): Promise<void> {
         if (def) forms.push({ def, variant });
       }
       for (const { def: d, variant } of forms) {
+        const key = spriteKey(d.id, variant), source = art?.manifest.entities[key];
+        if (__DEMO__ && !source) continue;
         const { canvas, caption } = tile(grid, d, variant);
         const ctx = canvas.getContext('2d')!;
-        const key = spriteKey(d.id, variant), source = art?.manifest.entities[key];
         if (source && art) {
           const clips = authoredClips(source, key), frame = art.manifest.frames[clips[0].frames[0]];
           [canvas.width, canvas.height] = [frame.width, frame.height];

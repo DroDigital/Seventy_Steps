@@ -64,6 +64,50 @@ def splat(seed=3):
     return 1 - smoothstep(-0.02, 0.05, f)
 
 
+def filament(points):
+    """Coverage of a tapered strand through (x, y, radius) control points, in texels."""
+    y, x = np.indices((CELL, CELL))
+    coverage = np.zeros((CELL, CELL))
+    for (ax, ay, ar), (bx, by, br) in zip(points, points[1:]):
+        dx, dy = bx - ax, by - ay
+        t = np.clip(((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy), 0, 1)
+        distance = np.hypot(x - ax - t * dx, y - ay - t * dy)
+        radius = ar + (br - ar) * t
+        coverage = np.maximum(coverage, 1 - smoothstep(radius - 0.4, radius + 0.45, distance))
+    return coverage
+
+
+def paint_mark(name, source):
+    """Torn membranes leave pale slits in the central clot and long, clinging strands at the edges."""
+    if name == 'splat':
+        veins = [
+            [(17, 15, 2.4), (20, 10, 1.2), (24, 8, 0.7), (27, 4, 0.45)],
+            [(21, 10, 0.9), (24, 11, 0.6), (28, 9, 0.4)],
+            [(14, 19, 2.0), (10, 23, 1.0), (9, 27, 0.6), (6, 29, 0.4)],
+            [(14, 13, 1.4), (9, 11, 0.85), (6, 7, 0.5)],
+        ]
+        tears = [
+            [(11, 11, 0.4), (14, 13, 0.85), (16, 17, 0.4)],
+            [(20, 13, 0.5), (17, 16, 0.9), (16, 20, 0.5), (14, 22, 0.35)],
+        ]
+    else:
+        veins = [
+            [(22, 16, 2.2), (17, 16, 1.1), (12, 13, 0.8), (8, 14, 0.48), (3, 12, 0.35)],
+            [(25, 19, 1.5), (18, 19, 0.9), (13, 21, 0.6), (6, 20, 0.4)],
+            [(15, 14, 0.8), (12, 12, 0.6), (9, 11, 0.4)],
+        ]
+        tears = [
+            [(12, 15, 0.4), (18, 17, 0.8), (23, 16, 0.65), (26, 16, 0.4)],
+            [(17, 20, 0.35), (22, 18, 0.7), (27, 19, 0.4)],
+        ]
+    ink = source / 255.0
+    for path in veins:
+        ink = np.maximum(ink, filament(path))
+    for path in tears:
+        ink *= 1 - 0.86 * filament(path)
+    return np.rint(ink * 255).astype(np.uint8)
+
+
 def bake(folder, out, preview):
     cells = [splat(), smear(folder)]
     atlas = np.zeros((CELL, CELL * len(cells)), dtype=np.uint8)
@@ -71,7 +115,7 @@ def bake(folder, out, preview):
         c = np.clip(c, 0, 1).copy()
         c[0, :] = c[-1, :] = 0  # the safe margin: a texel of nothing all round
         c[:, 0] = c[:, -1] = 0
-        atlas[:, i * CELL:(i + 1) * CELL] = np.round(c * 255)
+        atlas[:, i * CELL:(i + 1) * CELL] = paint_mark(NAMES[i], np.round(c * 255))
         assert atlas[:, i * CELL:(i + 1) * CELL].max() > 0, NAMES[i]
     data = base64.b64encode(atlas.tobytes()).decode()
     lines = [
