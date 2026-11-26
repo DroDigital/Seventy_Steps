@@ -14,7 +14,7 @@ three, from 7, 10, 13 metres off (a bot's path through a fight is chaos), and a 
 low walls and training dummy set aside: a body that wide finds no place to stand among them, as its own arena in the world has
 nothing in its way.
 
-- On the first journey a boss has its authored health at the standing it is met at, and grows past it to meet a stronger investigator: its health with their damage (Might and the edge of the weapon in hand), its blows with their health, each at most 1.5 times; its damage also gains 0.3% per purchased player level. Boss health rises on later journeys, capped at NG+7. **Boss health** is the most it had in that run.
+- On the first journey a boss has its authored health at the standing it is met at, and grows past it to meet a stronger investigator: its health with their damage (Might and the edge of the weapon in hand), its blows with their health, each by a share of that growth (75% and 55%) and with no ceiling; its damage also gains 0.3% per purchased player level. Boss health rises on later journeys, capped at NG+7. **Boss health** is the most it had in that run.
 - **Seconds** is how long the boss took with this bot's choices; actual players' fight times will differ.
 - **Lives** is the damage taken against the health a person has there and the Reagent they carry there (4 doses of 40% at the start, a vial more as the horrors fall, to 8):
   1 is the equivalent of all of it. A selected dodge can fail to start or avoid damage, and a value above 1 exceeds the carried healing
@@ -78,7 +78,7 @@ nothing in its way.
 | 47 | Azathoth | 18/9/17 | 5 | 15075 | 474 | 10645 | 448 | 8 | 5.66 | 0 |
 
 Bounds held by the test: each non-exempt boss finishes within 6 to 450 seconds (under 6 seconds a fight is broken, not easy), and costs at most 3 lives (a colossus, 6; a Great Old One or an Outer God, 1.5), and the bot does not die, subject to the named pressure exceptions below.
-Each tier has its band: a named horror takes 14 to 90 seconds and costs 0.2 to 1.2 lives (the Colour may cost up to 1.5); one of the 17 great fights takes 35 to 170 seconds and costs 0.45 to 1.5 lives. Named exceptions are brown jenkin 14–120 seconds; colossus pyramids 14–110 seconds; daemon pipers 14–145 seconds 0.2–1.6 lives; zkauba 14–130 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–280 seconds; nyarlathotep 35–430 seconds 0.45–3 lives; shub niggurath 35–250 seconds; yog sothoth 35–400 seconds 0.45–2.5 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–135 seconds. Yog-Sothoth is additionally capped at 2.5 lives at its expected standing. The upper end of each band fails the test; the lower end is a warning, listed below (2026-11-24: how hard a fight should be is the author's call, and the bot is not a person).
+Each tier has its band: a named horror takes 14 to 90 seconds and costs 0.2 to 1.2 lives (the Colour may cost up to 1.5); one of the 17 great fights takes 35 to 170 seconds and costs 0.45 to 1.5 lives. Named exceptions are brown jenkin 14–120 seconds; colossus pyramids 14–110 seconds; daemon pipers 14–145 seconds 0.2–1.6 lives; zkauba 14–130 seconds; mother hydra 0.2–1.5 lives; father dagon 0.2–1.5 lives; ghatanothoa 35–280 seconds; nyarlathotep 35–430 seconds 0.45–3 lives; shub niggurath 35–250 seconds; yog sothoth 35–400 seconds 0.45–2.5 lives; umr at tawil 0.25–1.5 lives; colour out of space 14–135 seconds. Yog-Sothoth is additionally capped at 2.5 lives at its expected standing. The upper end of each band fails the test. Below the lower end a fight is a warning, listed below (2026-11-24: how hard a fight should be is the author's call, and the bot is not a person); below half of it, a failure (2026-11-26: a horror that cheap has no chance left).
 
 ## Below their bands
 
@@ -86,26 +86,26 @@ None.
 
 ## At the cap
 
-The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vigour, 30 Endurance, 30 Might, which give 640 health, 340 stamina and blows of 1.96) and the cane at +5. Past its standing a boss grows to meet the investigator, at most 1.5 times: its health with their damage and its blows with their health (`overmatchHealth` and `overmatch` in `systems/bossScaling.ts`), so **Boss health** here is what it had in the fight. These fights become shorter as the investigator grows. Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
+The same bot, from 9 starts (6 to 14 metres off), with every level bought (30 Vigour, 30 Endurance, 30 Might, which give 640 health, 340 stamina and blows of 1.96) and the cane at +5. Past its standing a boss grows to meet the investigator, with no ceiling: its health with 75% of the growth in their damage and its blows with 55% of the growth in their health (`overmatchHealth` and `overmatch` in `systems/bossScaling.ts`), so the earliest grow the most and **Boss health** here is what it had in the fight. These fights become shorter as the investigator grows. Dagon and Hydra's combined encounter is additionally bounded in `tests/seaBosses.test.ts`.
 
 | # | Boss | Vig/End/Might | Cane + | Boss health | Seconds | Taken | Our health | Doses | Lives | Deaths |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Dr. Muñoz | 30/30/30 | 5 | 750 | 7 | 45 | 640 | 4 | 0.03 | 0 |
-| 2 | Charles le Sorcier | 30/30/30 | 5 | 825 | 8 | 72 | 640 | 4 | 0.04 | 0 |
-| 3 | The Outsider | 30/30/30 | 5 | 1425 | 11 | 99 | 640 | 4 | 0.06 | 0 |
-| 4 | Brown Jenkin | 30/30/30 | 5 | 675 | 8 | 91 | 640 | 4 | 0.05 | 0 |
-| 5 | Ephraim Waite | 30/30/30 | 5 | 1200 | 11 | 166 | 640 | 5 | 0.09 | 0 |
-| 6 | The Colour Out of Space | 30/30/30 | 5 | 1950 | 14 | 290 | 640 | 5 | 0.15 | 0 |
-| 7 | The Hound | 30/30/30 | 5 | 2175 | 14 | 272 | 640 | 5 | 0.14 | 0 |
-| 8 | Keziah Mason | 30/30/30 | 5 | 2400 | 21 | 109 | 640 | 5 | 0.06 | 0 |
-| 9 | The Unnamable | 30/30/30 | 5 | 3000 | 21 | 264 | 640 | 6 | 0.12 | 0 |
-| 10 | The Black Man | 30/30/30 | 5 | 3496 | 36 | 262 | 640 | 6 | 0.12 | 0 |
-| 11 | The Haunter of the Dark | 30/30/30 | 5 | 1468 | 164 | 1983 | 640 | 6 | 0.91 | 0 |
-| 12 | The Terrible Old Man | 30/30/30 | 5 | 2045 | 21 | 610 | 640 | 7 | 0.25 | 0 |
-| 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 2129 | 18 | 411 | 640 | 7 | 0.17 | 0 |
-| 14 | Edward Hutchinson | 30/30/30 | 5 | 2263 | 20 | 476 | 640 | 7 | 0.20 | 0 |
-| 15 | Simon Orne | 30/30/30 | 5 | 2263 | 26 | 313 | 640 | 7 | 0.13 | 0 |
-| 16 | Lilith | 30/30/30 | 5 | 2470 | 28 | 636 | 640 | 8 | 0.24 | 0 |
+| 1 | Dr. Muñoz | 30/30/30 | 5 | 1538 | 13 | 118 | 640 | 4 | 0.07 | 0 |
+| 2 | Charles le Sorcier | 30/30/30 | 5 | 1385 | 10 | 108 | 640 | 4 | 0.07 | 0 |
+| 3 | The Outsider | 30/30/30 | 5 | 2019 | 18 | 379 | 640 | 4 | 0.23 | 0 |
+| 4 | Brown Jenkin | 30/30/30 | 5 | 927 | 11 | 104 | 640 | 4 | 0.06 | 0 |
+| 5 | Ephraim Waite | 30/30/30 | 5 | 1425 | 12 | 180 | 640 | 5 | 0.09 | 0 |
+| 6 | The Colour Out of Space | 30/30/30 | 5 | 2316 | 17 | 393 | 640 | 5 | 0.20 | 0 |
+| 7 | The Hound | 30/30/30 | 5 | 2272 | 15 | 338 | 640 | 5 | 0.18 | 0 |
+| 8 | Keziah Mason | 30/30/30 | 5 | 2508 | 21 | 125 | 640 | 5 | 0.07 | 0 |
+| 9 | The Unnamable | 30/30/30 | 5 | 3052 | 22 | 321 | 640 | 6 | 0.15 | 0 |
+| 10 | The Black Man | 30/30/30 | 5 | 3496 | 36 | 305 | 640 | 6 | 0.14 | 0 |
+| 11 | The Haunter of the Dark | 30/30/30 | 5 | 1468 | 164 | 2207 | 640 | 6 | 1.01 | 0 |
+| 12 | The Terrible Old Man | 30/30/30 | 5 | 2045 | 21 | 657 | 640 | 7 | 0.27 | 0 |
+| 13 | The Gorgon of Medusa's Coil | 30/30/30 | 5 | 2129 | 18 | 441 | 640 | 7 | 0.18 | 0 |
+| 14 | Edward Hutchinson | 30/30/30 | 5 | 2263 | 20 | 492 | 640 | 7 | 0.20 | 0 |
+| 15 | Simon Orne | 30/30/30 | 5 | 2263 | 26 | 324 | 640 | 7 | 0.13 | 0 |
+| 16 | Lilith | 30/30/30 | 5 | 2470 | 28 | 657 | 640 | 8 | 0.24 | 0 |
 | 17 | The Shunned House Entity | 30/30/30 | 5 | 2535 | 19 | 588 | 640 | 8 | 0.22 | 0 |
 | 18 | Joseph Curwen | 30/30/30 | 5 | 2796 | 30 | 767 | 640 | 8 | 0.29 | 0 |
 | 19 | Wilbur Whateley | 30/30/30 | 5 | 3050 | 30 | 944 | 640 | 8 | 0.35 | 0 |
