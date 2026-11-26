@@ -26,8 +26,8 @@ export interface RoomLayout {
   rise: number; // stairs: climbed toward `axis`
   entry: Dir; // the side it is entered from (the entrance: its outside doorway)
   axis: Dir; // the way through it, away from the entry
-  doors: Dir[]; // sides with doorways (round 125: a link's too, world/dungeonLinks.ts)
-  windows: Dir[]; // sides with a window (round 125)
+  doors: Dir[]; // sides with doorways (round 127: a link's too, world/dungeonLinks.ts)
+  windows: Dir[]; // sides with a window (round 127)
 }
 
 export interface DoorLayout {
@@ -38,7 +38,7 @@ export interface DoorLayout {
   b: RoomLayout | null; // null: the way outside
   level: number; // floor height in the doorway (a drop's: its upper floor)
   hidden?: Veil;
-  link?: LinkLayout; // a second way, not the tree's (round 125)
+  link?: LinkLayout; // a second way, not the tree's (round 127)
 }
 
 export interface DungeonLayout {
@@ -47,8 +47,8 @@ export interface DungeonLayout {
   base: number; // floor height at the entrance: the ground in front of it
   origin: XZ; // centre of cell (0, 0), the entrance's
   rooms: RoomLayout[];
-  doors: DoorLayout[]; // the tree's, then its links' (round 125: a link's doorway carries `link`)
-  windows: DoorLayout[]; // round 125: the windows between rooms, which nobody passes
+  doors: DoorLayout[]; // the tree's, then its links' (round 127: a link's doorway carries `link`)
+  windows: DoorLayout[]; // round 127: the windows between rooms, which nobody passes
   rect: Rect; // around every room
   errors: string[];
 }
@@ -125,7 +125,7 @@ export function layoutDungeon(def: DungeonDef, door: XZ, base: number): DungeonL
     ids.add(r.id);
   }
   const windows: DoorLayout[] = [];
-  layLinks(def.id, def.links ?? [], byId, doors, windows, errors); // round 125: the loops, shortcuts, drops and windows
+  layLinks(def.id, def.links ?? [], byId, doors, windows, errors); // round 127: the loops, shortcuts, drops and windows
   for (const r of def.rooms) if (r.lurk?.length && r.sign) errors.push(`${r.id}: nothing lies in wait where an Elder Sign stands`);
   for (const r of rooms) {
     const out = r.doors.filter((d) => d !== r.entry);

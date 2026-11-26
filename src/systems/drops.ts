@@ -1,5 +1,5 @@
 /**
- * A body come off a ledge (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a drop's doorway
+ * A body come off a ledge (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a drop's doorway
  * stands on a ledge over a lower room (world/dungeonLinks.ts), and the ground under a step there falls away by more than a step. The feet
  * used to follow the ground at once; inside a dungeon, a body whose ground falls away by more than `DROP.snap` in a step now keeps its
  * height and falls to it, quickly, and lands (heard and felt from `DROP.land`). The ledge's face stops a body below it (a wall from the

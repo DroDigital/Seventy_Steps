@@ -1,6 +1,6 @@
 # Level design: the dungeons as Souls levels
 
-Round 125. The request was: "do the absolute best you can do for 2.", which was the second point of a review: *design the dungeons the way Souls levels are designed*.
+Round 127. The request was: "do the absolute best you can do for 2.", which was the second point of a review: *design the dungeons the way Souls levels are designed*.
 
 Before this round, every dungeon was a tree of rooms. Each room had one way in, from its parent. Going deeper meant walking every room back again, and nothing ever opened behind you. Souls levels work the other way round:
 

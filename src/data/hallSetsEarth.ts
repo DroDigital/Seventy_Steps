@@ -36,9 +36,9 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The reef temple under the water: the hulls of what the Deep Ones took, rubble and kelp, heads of the idol fallen from its walls, the bones of fish.
   father_dagon: {
     puts: [
-      put('rowboat', at(0.85, 280, { face: 'free' }), { size: 0.4 }), // a wreck washed in (round 79: it stands where the hall has room for it; round 125: its room is at 280 now, and it and the rocks are laid before the coral, which would take their places)
+      put('rowboat', at(0.85, 280, { face: 'free' }), { size: 0.4 }), // a wreck washed in (round 79: it stands where the hall has room for it; round 127: its room is at 280 now, and it and the rocks are laid before the coral, which would take their places)
       put('rocks_sand_a', at(0.9, 100), { size: [0.5, 0.7] }),
-      put('yh_coral_a', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2], keep: 0.7 }), // coral grown over the sunken stone (round 79; round 125: laid after the wreck and the rocks, as the temple turned to face its causeway)
+      put('yh_coral_a', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2], keep: 0.7 }), // coral grown over the sunken stone (round 79; round 127: laid after the wreck and the rocks, as the temple turned to face its causeway)
       put('yh_coral_b', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2.1], keep: 0.7 }),
       put('yh_coral_c', scatter(2, [0.84, 0.97], { face: 'free' }), { size: [1.3, 1.7], keep: 0.7 }),
       put('sw_pipe_big', ring(0.96, 5, { arc: [60, 300] }), { size: 1.2, tint: [0.3, 0.38, 0.36] }), // the drowned city's drains and tidal grilles

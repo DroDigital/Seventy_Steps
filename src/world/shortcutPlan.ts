@@ -1,5 +1,5 @@
 /**
- * Where each shortcut stands (round 125, asked: the dungeons designed as Souls levels are): a doorway between two rooms shut by a
+ * Where each shortcut stands (round 127, asked: the dungeons designed as Souls levels are): a doorway between two rooms shut by a
  * door barred on one side, its `from` side, the deeper one, so that it is found shut on the way in and opened from beyond on the
  * way back (systems/shortcuts.ts keeps which are open; render/shortcutViews.ts draws them). Its seal is the collider that fills the
  * doorway while it is barred. Pure.

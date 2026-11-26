@@ -1,7 +1,7 @@
 /**
  * The dungeon kit's pieces (spec §3D): floors, walls, stairs, pillars, pits, bridge chasms and wells.
  * A pit or a gap stops a foe and drops the investigator; a well has a wall of its own (a curb knee-high above the floor), which stops everyone and is not fallen over (round 55). Hidden doors and bridges are pieces.
- * The walls, doorways, ledges and windows are dungeonWalls.ts's (round 125).
+ * The walls, doorways, ledges and windows are dungeonWalls.ts's (round 127).
  * `roomSpots` places signs, gates, tomes, bosses and spawns. Pure: no Three.js.
  */
 
@@ -20,7 +20,7 @@ import { DIRS } from './worldMap';
 export { doorwayClear, windowClear } from './dungeonWalls';
 
 /** How a part is drawn: 'none' is an invisible collider (a chasm's edge), 'chasm' a dark hole. */
-export type Look = 'wall' | 'floor' | 'step' | 'pillar' | 'rim' | 'deck' | 'chasm' | 'ceiling' | 'inlay' | 'rail' | 'grate' | 'none'; // 'rail': a parapet (abyssStair.ts); 'grate': a window's bars (round 125)
+export type Look = 'wall' | 'floor' | 'step' | 'pillar' | 'rim' | 'deck' | 'chasm' | 'ceiling' | 'inlay' | 'rail' | 'grate' | 'none'; // 'rail': a parapet (abyssStair.ts); 'grate': a window's bars (round 127)
 
 export interface BoxPart {
   shape: 'box';
@@ -85,7 +85,7 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
   const [lo, hi] = floorRange(r);
   const floor = (u0: number, u1: number, v0: number, v1: number): number => out.push(local(r, u0, u1, v0, v1, L - 0.3, L, 'floor', false));
   const block = (u0: number, u1: number, v0: number, v1: number): number => out.push(local(r, u0, u1, v0, v1, lo - 0.2, hi + H, 'wall', true));
-  const open = new Set([...r.doors, ...r.windows].map((d) => localSide(r, d))); // (round 125: a corridor's lane runs on to its window too)
+  const open = new Set([...r.doors, ...r.windows].map((d) => localSide(r, d))); // (round 127: a corridor's lane runs on to its window too)
   switch (r.def.kind) {
     case 'hall': {
       floor(-h, h, -h, h);
@@ -172,7 +172,7 @@ export const stepsOf = (r: RoomLayout): number => r.def.steps ?? Math.max(2, Mat
 /** Where things are put in a hall, in its own frame: a pillar keeps a pace from each (roomStyle.ts). */
 export function standing(r: RoomLayout): readonly (readonly [number, number])[] {
   const s = roomSpots(r);
-  return [s.centre, s.sign, s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring, ...(r.def.allyAt ? [r.def.allyAt] : []), ...s.lurk.slice(0, r.def.lurk?.length ?? 0)]; // (round 125: and where its foes lie in wait)
+  return [s.centre, s.sign, s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring, ...(r.def.allyAt ? [r.def.allyAt] : []), ...s.lurk.slice(0, r.def.lurk?.length ?? 0)]; // (round 127: and where its foes lie in wait)
 }
 
 /** A hidden bridge: its deck while shown, and an unseen edge across the gap while hidden. */
@@ -238,7 +238,7 @@ export interface RoomSpots {
   gate: Spot; // faces back toward the entry, at the far end
   tome: Spot;
   ring: readonly Spot[]; // allies and spawns, in turn
-  lurk: readonly Spot[]; // round 125: where foes lie in wait, in turn: aside from the way in, where one coming through passes near
+  lurk: readonly Spot[]; // round 127: where foes lie in wait, in turn: aside from the way in, where one coming through passes near
 }
 
 /** Where things stand in a room, clear of its pillars, blocks and chasms. */
@@ -251,7 +251,7 @@ export function roomSpots(r: RoomLayout): RoomSpots {
         ? { centre: [0, 0], sign: [6, 4.5 - h], rest: [3, 7 - h], gate: [0, h - 4], tome: [-8, 8], ring: [[10, 8], [-10, 8], [10, -8], [-10, -8], [0, 12], [0, -12]], lurk: [[-6.5, 6 - h], [6.5, 6 - h], [0, 0]] }
         : { centre: [0, 0], sign: [3, 4.5 - h], rest: [1, 6.5 - h], gate: [0, h - 3], tome: [-3, 2], ring: [[2.5, 3], [-2.5, 3], [-2.5, -2.5], [2.5, -1.5]], lurk: [[-4.5, 3.2 - h], [4.5, 3.2 - h], [0, 3.5]] }; // the sign 3.5 m from the wall: its whole ring of stones stands (round 20: at 2.5 they sank into it)
     case 'corridor':
-      return { centre: [0, 0], sign: [0.7, 3 - h], rest: [-0.6, 5 - h], gate: [0, 0], tome: [0, 0.5], ring: [[0, -3.5], [-1, -6.5], [1, -6.5], [0, 1]], lurk: [[0.9, 0.9], [-0.9, 0.3], [0, -0.9]] }; // its plinth 10 cm off the lane's wall (round 20: it stood 0.4 m in it); (round 125: those in wait, in the square every corridor's lanes cross, a great body's breadth from its corners)
+      return { centre: [0, 0], sign: [0.7, 3 - h], rest: [-0.6, 5 - h], gate: [0, 0], tome: [0, 0.5], ring: [[0, -3.5], [-1, -6.5], [1, -6.5], [0, 1]], lurk: [[0.9, 0.9], [-0.9, 0.3], [0, -0.9]] }; // its plinth 10 cm off the lane's wall (round 20: it stood 0.4 m in it); (round 127: those in wait, in the square every corridor's lanes cross, a great body's breadth from its corners)
     case 'stair':
       return { centre: [0, 0], sign: [1.7, -4], rest: [-0.5, -2.5], gate: [0, 4], tome: [-1.8, 2], ring: [[0, -4], [0, 3], [-1.5, 6], [1.5, -6]], lurk: [[1.6, 2], [-1.6, 4.5], [0, 6]] };
     case 'well':

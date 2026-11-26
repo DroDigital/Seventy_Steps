@@ -7,12 +7,14 @@ export interface Level {
 }
 
 export const SAMPLE_LEVELS: Readonly<Record<string, Level>> = {
+  'amb/boughs': { sec: 39.0, peak: -6.4, rms: -22.8 },
+  'amb/canopy': { sec: 41.5, peak: -7.9, rms: -22.8 },
   'amb/cave': { sec: 28.0, peak: -10.0, rms: -22.4 },
   'amb/crickets': { sec: 31.5, peak: -6.3, rms: -22.4 },
   'amb/drips': { sec: 17.29, peak: -0.8, rms: -32.7 },
   'amb/frogs': { sec: 33.98, peak: -2.6, rms: -22.4 },
-  'amb/leaves': { sec: 30.0, peak: -5.5, rms: -22.4 },
   'amb/murmur': { sec: 33.56, peak: -8.1, rms: -22.4 },
+  'amb/pines': { sec: 40.0, peak: -7.4, rms: -22.8 },
   'amb/rain_heavy': { sec: 32.0, peak: -1.5, rms: -26.2 },
   'amb/rain_light': { sec: 32.0, peak: -0.7, rms: -22.8 },
   'amb/surf': { sec: 38.3, peak: -4.9, rms: -22.4 },
@@ -365,6 +367,11 @@ export const SAMPLE_LEVELS: Readonly<Record<string, Level>> = {
   'sfx/thud1': { sec: 0.57, peak: -1.3, rms: -19.7 },
   'sfx/thud2': { sec: 0.52, peak: -1.1, rms: -19.7 },
   'sfx/thud3': { sec: 0.5, peak: -1.3, rms: -21.3 },
+  'sfx/tree_creak1': { sec: 1.97, peak: -1.8, rms: -29.1 },
+  'sfx/tree_creak2': { sec: 2.02, peak: -1.8, rms: -29.1 },
+  'sfx/tree_creak3': { sec: 2.12, peak: -1.9, rms: -28.2 },
+  'sfx/tree_creak4': { sec: 1.87, peak: -1.9, rms: -23.3 },
+  'sfx/tree_creak5': { sec: 1.77, peak: -1.8, rms: -24.0 },
   'sfx/troll1': { sec: 2.33, peak: -0.1, rms: -10.9 },
   'sfx/troll2': { sec: 2.33, peak: -0.6, rms: -13.4 },
   'sfx/troll3': { sec: 1.93, peak: -1.0, rms: -17.5 },

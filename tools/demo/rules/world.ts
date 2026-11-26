@@ -49,7 +49,7 @@ export const rules: readonly PruneRule[] = [
   { file: 'src/data/wanderers.ts', decl: 'WANDERINGS', shape: 'elements', by: 'id', keep: kept('wanderings') },
   { file: 'src/data/deathLines.ts', decl: 'FRAGMENTS', shape: 'properties', keep: regions },
   { file: 'src/data/kits.ts', decl: 'DUNGEON_KITS', shape: 'properties', keep: dungeons },
-  { file: 'src/data/dungeonsWaking.ts', decl: 'WAKING_DUNGEONS', shape: 'elements', by: 'id', keep: dungeons }, // (round 125: the legacy dungeons in two tables of their own)
+  { file: 'src/data/dungeonsWaking.ts', decl: 'WAKING_DUNGEONS', shape: 'elements', by: 'id', keep: dungeons }, // (round 127: the legacy dungeons in two tables of their own)
   { file: 'src/data/dungeonsDeep.ts', decl: 'DEEP_DUNGEONS', shape: 'elements', by: 'id', keep: dungeons },
   { file: 'src/data/dungeonsFar.ts', decl: 'FAR_DUNGEONS', shape: 'elements', by: 'id', keep: dungeons },
   { file: 'src/data/lairs.ts', decl: 'LAIRS', shape: 'elements', by: 'id', keep: dungeons },

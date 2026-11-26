@@ -49,11 +49,19 @@ const fract = (v: number): number => v - Math.floor(v);
 /** A fixed scatter in [0, 1) for a cell and a salt: the same every visit. */
 export const cellHash = (i: number, j: number, salt: number): number => fract(Math.sin(i * 127.1 + j * 311.7 + salt * 74.7) * 43758.5453);
 
-/** One clump: blades about its foot, white (the instance's colour is laid over), dark at the foot, the tips blown. */
+/**
+ * One clump, white (the instance's colour is laid over), dark at the foot, the tips blown: round 125, two crossed cards of the leaf
+ * atlas's grass (some fifteen blades and their seed heads each, cut out) and a few blades of its own before them, for the same faces
+ * the seven blades it was cost.
+ */
 function clump(): THREE.BufferGeometry {
   const b = new Builder(true);
   const { blades, height } = NEAR_GRASS;
-  for (let k = 0; k < blades; k++) {
+  for (let k = 0; k < 2; k++) {
+    const a = k * Math.PI * 0.5 + 0.4;
+    b.card([0, -0.02, 0], [0.04 * (k ? 1 : -1), height * (0.9 + 0.2 * k), 0.03], [Math.cos(a) * 0.3, 0, Math.sin(a) * 0.3], 'grass', [0.5, 0.5, 0.5], [1, 1, 1], 0.16 * height, 0.8, k * 0.31);
+  }
+  for (let k = 0; k < blades - 4; k++) {
     const a = (k / blades) * Math.PI * 2 + cellHash(k, 3, 9) * 0.8;
     const [s, c] = [Math.sin(a), Math.cos(a)];
     const len = height * (0.55 + 0.45 * cellHash(k, 7, 2));
@@ -80,7 +88,7 @@ export interface NearGrass {
 export function createNearGrass(scene: THREE.Scene, g: Game): NearGrass {
   const { cell, span: n, perFrame } = NEAR_GRASS;
   const reach = (n * cell) / 2;
-  const mesh = new THREE.InstancedMesh(clump(), createWorldMaterial({ texture: 'grass', seed: 9, vertexColors: true, vary: 0.4, sway: true, field: reach - cell, nearFade: true }), n * n);
+  const mesh = new THREE.InstancedMesh(clump(), createWorldMaterial({ texture: 'grass', foliage: true, seed: 9, vertexColors: true, vary: 0.4, sway: true, field: reach - cell, nearFade: true }), n * n);
   mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(n * n * 3), 3);
   mesh.frustumCulled = false; // (the clumps lie all about; the shader sinks those past the edge)
   mesh.visible = false;

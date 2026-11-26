@@ -1,5 +1,5 @@
 /**
- * What the dungeons' ambushes and drops are heard and seen by (round 125: systems/ambush.ts, systems/drops.ts): a foe lying in wait
+ * What the dungeons' ambushes and drops are heard and seen by (round 127: systems/ambush.ts, systems/drops.ts): a foe lying in wait
  * springs with a rush of air and a scrape out of the dark, and the dust it lay in thrown up about it (its body rises into view as an
  * ambusher's does, render/creatureFx.ts); a body landing off a ledge lands with a thud of its weight on the stone, a scuff, and a puff of
  * the floor's dust. Render only.

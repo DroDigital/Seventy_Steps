@@ -41,7 +41,7 @@ export function fightAction(g: Game): FightAction | null {
     const act = SIGNATURES[f.id]?.action?.(g, e, f);
     if (act) return act;
   }
-  return discoveryAction(g) ?? riteAction(g) ?? shortcutAction(g); // an altar or a rite's light in a horror's court; a shortcut's bar (round 125)
+  return discoveryAction(g) ?? riteAction(g) ?? shortcutAction(g); // an altar or a rite's light in a horror's court; a shortcut's bar (round 127)
 }
 
 /** Runs the fight action E asks for; true when E was spent on one. */

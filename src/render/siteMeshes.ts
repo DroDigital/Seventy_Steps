@@ -214,7 +214,7 @@ function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCon
     case 'none':
       return [];
     case 'grate':
-      return [{ kind: 'trim', geo: grateGeometry(p.min, p.max) }]; // round 125: a window's bars, the room beyond seen between them
+      return [{ kind: 'trim', geo: grateGeometry(p.min, p.max) }]; // round 127: a window's bars, the room beyond seen between them
     case 'ceiling':
       return [{ kind: kit.roof === 'beams' ? 'wood' : 'wall', geo: worldUv(box(w, h, d, x, y, z, scaleRgb(c, 0.6), 2), at, kit.roof === 'beams' ? 4 : 2) }];
     case 'wall':

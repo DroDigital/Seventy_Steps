@@ -1,5 +1,5 @@
 /**
- * How a shortcut's bar sounds (round 125: render/shortcutViews.ts plays it where the door stands, and then the door's own swing,
+ * How a shortcut's bar sounds (round 127: render/shortcutViews.ts plays it where the door stands, and then the door's own swing,
  * data/doorSounds.ts): a beam lifted out of its brackets and set down against the wall, a bolt drawn back grinding into its jamb, a lever
  * thrown and the works behind the wall taking up; and a door tried from the side it will not open from, rattling on its bar. Data only.
  */

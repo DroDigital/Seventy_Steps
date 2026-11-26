@@ -1,5 +1,5 @@
 /**
- * The dungeons as Souls levels (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md), read as graphs:
+ * The dungeons as Souls levels (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md), read as graphs:
  * the tree's doorways go both ways, an open link both ways, a shortcut both ways once opened and not at all before, a drop one way, down.
  * Every legacy dungeon and lair has a shortcut or a drop; every shortcut can be come to from beyond without insight, and opening it brings
  * its far side two rooms or more nearer the dungeon's Elder Sign (or its door, where it has none); nothing drops anyone where they cannot
@@ -52,7 +52,7 @@ const anchorOf = (d: DungeonLayout): string => d.rooms.find((r) => r.def.sign)?.
 const shortcuts = (d: DungeonLayout) => d.doors.filter((o) => o.link?.kind === 'shortcut').map((o) => o.link!);
 const NONE = new Set<string>();
 
-describe('the dungeons as Souls levels (round 125)', () => {
+describe('the dungeons as Souls levels (round 127)', () => {
   it('lays every dungeon without a fault, and gives each but the two that keep their one way a shortcut or a drop', () => {
     for (const [id, d] of laid) {
       expect(d.errors, id).toEqual([]);

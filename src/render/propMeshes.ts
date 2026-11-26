@@ -22,6 +22,8 @@ import { surface } from '../world/terrain';
 import type { Top } from './chimneys';
 import type { LightSpot } from './worldLights';
 import { createWorldMaterial, type WorldMaterialOptions } from './worldMaterial';
+import { ensureWind } from './windKit';
+import { FOLIAGE_CASTER } from './foliageShadow';
 
 const STONE: Rgb = [0.86, 0.86, 0.84];
 /** The stone of a region's props: the pale stone leaned toward the ground (the arenas' gates are stood in it too, render/gateViews.ts). */
@@ -33,6 +35,7 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
   wood: { texture: 'wood', seed: 6, uvScale: [0.5, 0.5], vertexColors: true, vary: 0.4, sway: true },
   trim: { texture: 'wood', seed: 6, uvScale: [0.5, 0.5], vertexColors: true, vary: 0.4 },
   leaf: { texture: 'grass', seed: 9, vertexColors: true, vary: 0.4, sway: true },
+  foliage: { texture: 'grass', foliage: true, vertexColors: true, vary: 0.3, sway: true }, // round 125: what grows, cut out of the leaf atlas (render/textureFoliage.ts)
   clapboard: { texture: 'clapboard', seed: 3, vertexColors: true, vary: 0.5 },
   brick: { texture: 'brick', seed: 3, vertexColors: true, vary: 0.5 },
   shingle: { texture: 'shingle', seed: 3, vertexColors: true, vary: 0.5 },
@@ -53,10 +56,13 @@ const OPTIONS: Record<PropMat, WorldMaterialOptions> = {
 const materials = new Map<PropMat, THREE.ShaderMaterial>();
 /** What bends in the wind (round 34): the trees and bushes, from nothing at their feet to the most at the tops; the rest of a swaying material's vertices stand still. */
 const BENDS: ReadonlySet<string> = new Set(['tree', 'pine', 'bush']);
+/** What the wind moves (round 125: each given its own wind, render/windKit.ts). */
+const SWAYS: ReadonlySet<PropMat> = new Set(['leaf', 'foliage', 'wood', 'cloth']);
 const BEND = 0.03; // metres of lean at the top of a prop at a gust's height, per metre it stands
 
 function addSway(geo: THREE.BufferGeometry, p: Prop): void {
-  if (geo.getAttribute('aSway')) return; // a model's own (a cloth blown from where it hangs)
+  ensureWind(geo);
+  if (geo.getAttribute('aSway')) return; // a model's own (a cloth blown from where it hangs), or a library plant's (render/floraKit.ts)
   const at = geo.getAttribute('position');
   const sway = new Float32Array(at.count);
   if (BENDS.has(p.kind)) {
@@ -91,7 +97,10 @@ function placed(geo: THREE.BufferGeometry, piece: Piece, p: Prop): THREE.BufferG
 export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshes: THREE.Mesh[], lights: LightSpot[], chimneys: Top[]) => void, cover?: Partial<Record<PropMat, THREE.BufferGeometry>>): Generator<void, void> {
   const c = regionStone(region);
   const groups = new Map<PropMat, THREE.BufferGeometry[]>();
-  for (const [m, geo] of Object.entries(cover ?? {}) as [PropMat, THREE.BufferGeometry][]) groups.set(m, [geo]);
+  for (const [m, geo] of Object.entries(cover ?? {}) as [PropMat, THREE.BufferGeometry][]) {
+    if (SWAYS.has(m)) ensureWind(geo);
+    groups.set(m, [geo]);
+  }
   const lights: LightSpot[] = [];
   const mirrors: MirrorSpot[] = []; // where the glass of a mirror stands, for the one that is drawn (mirrorView.ts; round 79)
   const chimneys: Top[] = []; // where smoke goes up
@@ -105,7 +114,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
     for (const [k, piece] of pieces.entries()) {
       const geo = put[k];
       if (geo) {
-        if (piece.mat === 'leaf' || piece.mat === 'wood' || piece.mat === 'cloth') addSway(geo, p);
+        if (SWAYS.has(piece.mat)) addSway(geo, p);
         if (piece.mat === 'mirror') {
           const spot = planeOf(geo);
           if (spot) mirrors.push(spot);
@@ -134,6 +143,7 @@ export function* propJob(props: readonly Prop[], region: RegionDef, done: (meshe
   for (const [m, geos] of groups) {
     for (const g of geos) if (!g.index) g.setIndex([...Array(g.getAttribute('position').count).keys()]); // merging needs all indexed or none
     const mesh = new THREE.Mesh(mergeGeometries(geos), propMaterial(m));
+    if (m === 'foliage') mesh.layers.enable(FOLIAGE_CASTER); // round 125: its leaves cast, cut out and blown (render/foliageShadow.ts)
     if (m === 'mirror' && mirrors.length) mesh.userData.mirrors = mirrors;
     if (m === 'liquid' || m === 'glassware') mesh.renderOrder = m === 'liquid' ? 1 : 2; // the glass over what it holds
     meshes.push(mesh);

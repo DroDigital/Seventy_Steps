@@ -1,5 +1,5 @@
 /**
- * Shortcuts (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a doorway between two rooms
+ * Shortcuts (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a doorway between two rooms
  * shut by a door barred on one side, its `from`, the deeper side. Coming the long way round, the investigator finds the bar and
  * works it (E), the door opens, and stays open: the save keeps it (`ow.told`, `cut:<id>`), and a new journey bars it again (cycles.ts
  * carries only hints and finds across). From the other side it will not move: E tries it, and it rattles on its bar. While shut its

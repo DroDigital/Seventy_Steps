@@ -1,5 +1,5 @@
 /**
- * The shortcuts' barred doors, drawn and moved (round 125: systems/shortcuts.ts, data/shortcutLooks.ts): each stands shut in its doorway
+ * The shortcuts' barred doors, drawn and moved (round 127: systems/shortcuts.ts, data/shortcutLooks.ts): each stands shut in its doorway
  * with its bar across it on the side it is opened from (a beam in iron brackets, a bolt in its keepers, or a lever on the wall beside a
  * slab), and does not open as a body nears, as the other doors do. Worked from beyond, the bar goes first (the beam lifted out and leant
  * against the wall, the bolt drawn back, the lever thrown down), then the leaves swing away from whoever opened it, or the slab sinks, and

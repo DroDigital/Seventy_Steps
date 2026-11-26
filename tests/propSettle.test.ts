@@ -146,7 +146,7 @@ describe('a prop on a slope meets the land (render/propSettle.ts)', () => {
 
 describe("the open world's props on its steepest ground (round 116)", () => {
   // The worst a prop of each kind stood over the air before (measured over every region's plan): its kind and where it stands.
-  // (Round 125: the dungeons' new ground moved the land's fill; the house, the wall and the pyramid are measured again.)
+  // (Round 127: the dungeons' new ground moved the land's fill; the house, the wall and the pyramid are measured again.)
   const WORST: readonly [Prop['kind'], number, number][] = [
     ['house', 206.9, 585.8], ['wall', 399.6, 723.4], ['ruin', 402.0, 2164.0], ['rock', -1856.1, 2200.0], ['cone', -1747.5, 2094.5], ['pyramid', 33.3, 2165.9],
   ];

@@ -4,7 +4,8 @@
  * fungus, and the ice, the void and the gods' courts nothing more; nothing grows inside what stands; a chunk's growth is the same each
  * time and within a budget of corners.
  */
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { loadFlora } from '../src/render/floraData';
 import { CLIMATES, type Under } from '../src/data/foliage';
 import { getRegion, REGIONS } from '../src/data/regions';
 import { Builder, groundCover } from '../src/render/groundCover';
@@ -28,6 +29,8 @@ const corners = (id: string): number => {
     return sum + Object.values(groundCover(cx, cz, c.region!, c.roads, c.props)).reduce((m, g) => m + g.getAttribute('position').count, 0);
   }, 0) / cs.length;
 };
+
+beforeAll(loadFlora); // round 125: the undergrowth's saplings, young firs and shrubs are the flora library's
 
 describe("a realm's growth follows its climate (data/foliage.ts)", () => {
   it('every realm says how it grows, and the ice, the void and the gods\' courts grow nothing more', () => {
@@ -66,30 +69,35 @@ describe("a chunk's growth (render/groundCover.ts)", () => {
 
   it('is the same each time it is made', () => {
     const [a, b] = [groundCover(cx, cz, c.region!, c.roads, c.props), groundCover(cx, cz, c.region!, c.roads, c.props)];
-    expect(a.leaf!.getAttribute('position').array).toEqual(b.leaf!.getAttribute('position').array);
+    expect(a.foliage!.getAttribute('position').array).toEqual(b.foliage!.getAttribute('position').array);
   });
 
   it('grows nothing inside what stands', () => {
     const [x, z] = [(cx + 0.5) * 64, (cz + 0.5) * 64];
     const barn: Prop = { ...propAt('house', x, surface(x, z), z, createRng(3), 0, [14, 14, 4]), style: 'stone' }; // a great stone house over the chunk's middle
     const cover = groundCover(cx, cz, c.region!, c.roads, [barn]);
-    const pos = cover.leaf!.getAttribute('position');
+    const pos = cover.foliage!.getAttribute('position');
     let inside = 0;
     for (let i = 0; i < pos.count; i++) if (Math.abs(pos.getX(i) - x) < 14 - 1.5 && Math.abs(pos.getZ(i) - z) < 14 - 1.5) inside++;
     expect(inside).toBe(0);
-    const open = groundCover(cx, cz, c.region!, c.roads, []).leaf!.getAttribute('position');
+    const open = groundCover(cx, cz, c.region!, c.roads, []).foliage!.getAttribute('position');
     let before = 0;
     for (let i = 0; i < open.count; i++) if (Math.abs(open.getX(i) - x) < 14 - 1.5 && Math.abs(open.getZ(i) - z) < 14 - 1.5) before++;
     expect(before).toBeGreaterThan(100); // (it grew there with nothing standing)
   });
 
-  it('draws a blade on three corners with both its faces, and a lump\'s face on its own', () => {
+  it('draws a blade on three corners, once (round 125: what grows is drawn from both sides by its material), a stone\'s both ways, and a lump\'s face on its own', () => {
     const b = new Builder(true);
     b.tri([0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1], [0, 0, 0.1]);
     b.face([0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]);
     const g = b.geometry()!;
     expect(g.getAttribute('position').count).toBe(6);
-    expect(Array.from(g.getIndex()!.array)).toEqual([0, 1, 2, 1, 0, 2, 3, 4, 5]);
+    expect(Array.from(g.getIndex()!.array)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(Array.from(g.getAttribute('aSway').array as Float32Array).map((v) => +v.toFixed(3))).toEqual([0, 0, 0.1, 0, 0, 0]);
+    expect(Array.from(g.getAttribute('aWind').array as Uint8Array).filter((_, i) => i % 4 === 2)).toEqual([0, 0, 102, 0, 0, 0]); // the blade's tip flutters, its foot and the lump do not
+    const stone = new Builder();
+    stone.tri([0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 1], [1, 1, 1], [1, 1, 1]);
+    expect(Array.from(stone.geometry()!.getIndex()!.array)).toEqual([0, 1, 2, 1, 0, 2]);
+    expect(stone.geometry()!.getAttribute('aWind')).toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 /**
- * A dungeon's second ways (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): doorways laid
+ * A dungeon's second ways (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): doorways laid
  * between rooms that meet side by side, once the room tree is placed, closing it into loops. A link joins two rooms only where the
  * side they share is centred on both, as every doorway of the kit is (a corridor's lanes, a hall's plan, its pillars and its set
  * keep to the middle of a side). No link touches a boss's room: its one doorway keeps its fog. A shortcut's two floors meet level; a

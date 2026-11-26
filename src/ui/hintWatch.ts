@@ -2,7 +2,7 @@
  * What to tell a new investigator before it costs them (round 46, the first hour): hints that wait to be struck, or to fall, came
  * too late for the things a first fight, a first empty breath and a first horror's mist teach hardest. These are looked at a
  * couple of times a second: a foe closing in, the breath gone, a wall of fog near, a person to talk to, a doorway that only insight
- * shows, a horror's gate still shut, a shortcut still barred (round 125), a relic found, a weapon found late beside a reinforced one, insight to spare. Pure: the game is read,
+ * shows, a horror's gate still shut, a shortcut still barred (round 127), a relic found, a weapon found late beside a reinforced one, insight to spare. Pure: the game is read,
  * nothing is changed (ui/hints.ts raises the ones not yet shown).
  */
 
@@ -31,7 +31,7 @@ function nearPassage(g: Game, me: { x: number; z: number }): boolean {
   return false;
 }
 
-/** Whether a shortcut still barred stands within reach of `me` (round 125): either side of it, the first one met. */
+/** Whether a shortcut still barred stands within reach of `me` (round 127): either side of it, the first one met. */
 function nearBarred(g: Game, me: { x: number; z: number }): boolean {
   return worldLayout().shortcuts.some((s) => !isOpened(g, s.id) && distXZ(s, me) <= NEAR.shortcut);
 }

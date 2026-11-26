@@ -1,5 +1,5 @@
 /**
- * What shuts a shortcut in each kit's doorway (round 125: render/shortcutViews.ts): the kit's own door where it has one that can be
+ * What shuts a shortcut in each kit's doorway (round 127: render/shortcutViews.ts): the kit's own door where it has one that can be
  * barred, and what bars it on the side it is opened from. A plank door is held by a beam across iron brackets, lifted away; a gate of
  * bars by a bolt drawn back into its jamb; a slab, a valve or a stone door by a lever thrown beside it, and the slab sinks. A kit with
  * no door (the open ruins, the hill, the drowned temple, the void) or one hung with a drape takes a gate of bars in its stone's tone.

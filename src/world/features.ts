@@ -176,7 +176,7 @@ function camp(f: Feature, rng: Rng): Prop[] {
   return out;
 }
 
-/** Metres the great one at a landmark's heart stands at the least (round 125: Pnakotus's blocks are 4 to 7 high, and five hearts all drawn under six were no greater than the lesser about them). Its height only: its footprint, and so the land's fill, is as drawn. */
+/** Metres the great one at a landmark's heart stands at the least (round 127: Pnakotus's blocks are 4 to 7 high, and five hearts all drawn under six were no greater than the lesser about them). Its height only: its footprint, and so the land's fill, is as drawn. */
 const GREAT = 6.2;
 
 /** A realm's landmark (round 12): one great one at the heart, and two or three lesser about it. */
@@ -231,7 +231,7 @@ function farm(f: Filler, rng: Rng, ctx: FeatureContext): Prop[] {
   const barnSize: [number, number, number] = [5.5, 4, 5];
   const house = local(f, -(lane + size[0]), beyond + size[1]);
   const barn = local(f, lane + barnSize[0], beyond + barnSize[1]);
-  const offLane = (p: Prop): Prop => { // round 125: no wing on the lane's side, where it stood across the way out (Arkham, a yard of 878 cells shut by a barn's wing: sealWings.ts, walking from beside the wing, found it open)
+  const offLane = (p: Prop): Prop => { // round 127: no wing on the lane's side, where it stood across the way out (Arkham, a yard of 878 cells shut by a barn's wing: sealWings.ts, walking from beside the wing, found it open)
     const wing = houseAddons(p).wing;
     if (!wing) return p;
     const c = houseFrame(p)(wing.at, wing.z0);

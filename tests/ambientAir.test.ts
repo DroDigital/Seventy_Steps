@@ -110,8 +110,9 @@ describe('each realm\'s air (round 80)', () => {
       expect(Math.sign(mean((p) => p.vz ?? 0)), id).toBe(Math.sign(wz));
       expect(mean((p) => Math.hypot(p.vx ?? 0, p.vz ?? 0)), id).toBeGreaterThan(Math.hypot(wx, wz)); // faster than the mist: it streams
     }
-    expect(gustAt(0, 0, 0)).toBeCloseTo(0.5, 5);
-    for (let i = 0; i < 50; i++) expect(gustAt(i * 7.3, i * 11, -i * 5)).toBeGreaterThanOrEqual(0);
+    const gusts = Array.from({ length: 50 }, (_, i) => gustAt(i * 7.3, i * 11, -i * 5)); // (round 125: the trees' gust fronts, render/windField.ts)
+    for (const g of gusts) expect(g).toBeGreaterThanOrEqual(0), expect(g).toBeLessThanOrEqual(1);
+    expect(Math.max(...gusts) - Math.min(...gusts)).toBeGreaterThan(0.4); // it rolls: calm here, a gust there
   });
 
   it('lets leaves fall to rest on the ground, and rain wash the dry from the air', () => {

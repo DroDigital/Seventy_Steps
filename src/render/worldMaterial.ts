@@ -9,6 +9,7 @@ import type { FxParams } from './fx';
 import { ANOMALY, ANOMALY_HUES } from './palette';
 import { LAMP_SLOTS, WORLD_FRAG, WORLD_VERT } from './shaders/world';
 import { generateTexture, TEXTURE_SIZE, UV_PER_TEXTURE, type TextureKind } from './textures';
+import { generateFoliage } from './textureFoliage';
 import { trample } from './trample';
 import { wetness } from './wetness';
 
@@ -83,6 +84,7 @@ export const worldUniforms = {
   uFogColor: { value: v3(FX.fogColor) },
   uSeaLevel: { value: WORLD.seaLevel }, // where the sea lies: the shore's waterline (the world shader's SHORE)
   uWind: { value: 1 }, // how hard the wind blows the leaves and grass (shaders/world.ts SWAY): 1 on a calm night, more in a gale (weather.ts; round 34)
+  uWindDir: { value: new THREE.Vector2(0.89, 0.45) }, // round 125: where it blows to, the realm's own (render/windField.ts)
   uDamp: { value: 0 }, // round 113: a drowned hall's wet floor (render/wetSheen.ts)
   uWet: wetness, // how soaked the ground is: 0 dry, 1 after hard rain (shaders/world.ts; weather.ts eases it; round 34)
   uShadowMap: { value: null as THREE.Texture | null }, // the moon's depth map, its matrix and its numbers (moonShadow.ts; round 34)
@@ -134,6 +136,7 @@ export interface WorldMaterialOptions {
   shore?: boolean; // the ground is washed by the sea where it meets it: a wet band and lace of foam, breathing with the swell (round 30)
   panes?: boolean; // lit windows, each lived behind by its aPane seed (paneLife.ts; round 18)
   sway?: boolean; // blown by the wind, by each vertex's aSway (round 34)
+  foliage?: boolean; // round 125: what grows: the leaf atlas cut out (render/textureFoliage.ts), drawn on both sides, lit as leaves are (shaders/foliage.ts); `texture` is unused
   field?: number; // round 116: an instanced near field (render/nearGrass.ts) whose clumps sink into the ground this many metres from the investigator
   instanced?: boolean; // round 116: drawn as an InstancedMesh whose instances the shader places (a field implies it)
   coat?: boolean; // takes the realm's coat (snow, sand, brine, soot: data/coats.ts); by default what is a prop of stone, wood or cloth does (`coatable`), and the ground, the living, the lit and the glass do not
@@ -167,6 +170,24 @@ export function createTexture(kind: TextureKind, seed: number, detail = true): T
   return tex;
 }
 
+let foliage: THREE.DataTexture | null = null;
+
+/** Round 125: the leaf atlas, with its own mips (each the mean of the covered texels under it; its alpha their share). */
+export function foliageTexture(): THREE.DataTexture {
+  if (foliage) return foliage;
+  const levels = generateFoliage();
+  const tex = new THREE.DataTexture(levels[0].data, levels[0].width, levels[0].height);
+  tex.name = 'foliage';
+  tex.mipmaps = levels as unknown as THREE.CompressedTextureMipmap[];
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestMipmapNearestFilter;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.generateMipmaps = false;
+  tex.needsUpdate = true;
+  return (foliage = tex);
+}
+
 /** `userData.emissive` keeps the base emissive level, so hit flashes can add to it and fade back. */
 export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMaterial {
   const k = 1 / UV_PER_TEXTURE; // geometry UVs count 64 texels to the unit
@@ -179,7 +200,7 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
   const material = new THREE.ShaderMaterial({
     uniforms: {
       ...worldUniforms,
-      uMap: { value: map(o.texture) },
+      uMap: { value: o.foliage ? foliageTexture() : map(o.texture) },
       uMap2: { value: map(o.texture2 ?? o.texture) },
       uHasMap2: { value: o.texture2 ? 1 : 0 },
       uMap3: { value: map(o.texture3 ?? o.texture) },
@@ -206,7 +227,8 @@ export function createWorldMaterial(o: WorldMaterialOptions): THREE.ShaderMateri
     vertexShader: WORLD_VERT,
     fragmentShader: WORLD_FRAG,
     vertexColors: o.vertexColors ?? false,
-    defines: { ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.field && { NEAR_FIELD: o.field.toFixed(2) }), ...((o.instanced || o.field) && { WORLD_INSTANCED: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
+    side: o.foliage ? THREE.DoubleSide : THREE.FrontSide,
+    defines: { ...(o.foliage && { FOLIAGE: '' }), ...(o.panes && { PANES: '' }), ...(o.shore && { SHORE: '' }), ...(o.sway && { SWAY: '' }), ...(o.field && { NEAR_FIELD: o.field.toFixed(2) }), ...((o.instanced || o.field) && { WORLD_INSTANCED: '' }), ...(o.surface && { [`SURF_${o.surface.toUpperCase()}`]: '' }) },
   });
   if (o.opacity !== undefined && o.opacity < 1) {
     Object.assign(material, {

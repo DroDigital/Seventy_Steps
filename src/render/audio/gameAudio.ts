@@ -39,6 +39,9 @@ import { realmTrackOf, type RealmTrackId } from '../../data/realmMusic';
 import { createRealmMusic } from './realmMusic';
 import { createDread } from './dread';
 import { createWeatherBed } from './weatherBed';
+import { createLeafBed, rainOf } from './leafBed';
+import { LEAF_SOUND } from '../../data/windTuning';
+import { worldUniforms } from '../worldMaterial';
 import { bedKind } from '../../data/weatherSkins';
 import { CUES, cueFor, dullness, nextCall, placeSound, type Cue } from './cues';
 import { impactLayers, landedBlow } from './impact';
@@ -119,6 +122,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const { gain, pan, lowpass } = place(at, range);
     return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? lowpass : undefined });
   };
+  const leafBed = createLeafBed(e, sampler, right, (at, gain) => void recorded('treeCreak', at, LEAF_SOUND.creak.range, { gain })); // round 125 (recorded in round 126): the trees about the investigator, and a trunk's groan in a gust
   const varier = createVarier(); // round 40: a recipe is drawn a little anew each time it plays, and never at the last play's pitch
   /** A recipe where `at` is: placed, dulled by the distance, varied. */
   const recipe: GameAudio['recipe'] = (key, sound, o = {}) => {
@@ -344,6 +348,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       const roofed = (g.overworld && at && inside(at)) || null;
       ambience.set(roofed || (AMBIENCE[soundscapeAt(region, at) ?? ''] ?? null));
       weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 80: on snow and sand a storm is the wind alone, not the wash of rain)
+      if (at) leafBed.set(at.x, at.z, worldUniforms.uTime.value, worldUniforms.uWind.value, rainOf(g.overworld?.weather), !!roofed || !g.overworld);
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });

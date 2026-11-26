@@ -66,7 +66,7 @@ function hall(d: DungeonLayout, r: RoomLayout, kitId: KitId, kit: DungeonKit, c:
   const blocks = [...cornersOf(plan, r, spots), ...baysOf(plan, r)];
   const a = DIRS[r.axis];
   const stands = spots.map(([u, v]) => roomPoint(r, u, v));
-  const doors = [...d.doors, ...d.windows].filter((o) => o.a === r || o.b === r); // (round 125: a window is kept clear as a doorway is)
+  const doors = [...d.doors, ...d.windows].filter((o) => o.a === r || o.b === r); // (round 127: a window is kept clear as a doorway is)
   const free = (x: number, z: number, margin: number): boolean => {
     const [dx, dz] = [x - r.x, z - r.z];
     const [u, v] = [dx * a.z - dz * a.x, dx * a.x + dz * a.z]; // in the room's own frame

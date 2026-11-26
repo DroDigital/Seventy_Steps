@@ -7,6 +7,7 @@
  */
 
 import { FIGURE_LIFE } from '../../data/fxTuning';
+import { WIND } from '../../data/windTuning';
 import { BODY_PUSH, FOOT_RINGS } from '../../data/groundSkin';
 import { PANE_GLSL } from '../paneLife';
 import { LAMPS_GLOSS_GLSL, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
@@ -14,6 +15,8 @@ import { ELDRITCH_FRAG, ELDRITCH_VERT } from './eldritch';
 import { SHADOW_GLSL } from './shadow';
 import { SURFACE_APPLY, SURFACE_UNIFORMS } from './surfaces';
 import { BLAST_BEND_GLSL, BLAST_GLSL } from './blast';
+import { FOLIAGE_FRAG, FOLIAGE_VERT } from './foliage';
+import { WIND_GLSL } from './wind';
 
 export { LAMP_SLOTS, LAMPS_GLSL, LANTERN_GLSL, NOISE_GLSL, SPACE_GLSL } from './common';
 
@@ -37,6 +40,7 @@ attribute float aEdge; // the share of the region beside's ground, toward the bo
 #ifdef SWAY
 attribute float aSway; // metres this vertex is blown at the height of a gust: nothing at a trunk's foot, most at the tip of a bough or a blade (round 34)
 uniform float uWind;
+${WIND_GLSL}
 uniform vec4 uBodies[${BODY_PUSH.slots}]; // round 80: x, feet y, z and radius of the bodies the grass parts for (render/bodyPush.ts)
 uniform sampler2D uTrample; // and the lane of stems laid down where one has gone, 64 x 64 texels wrapped (render/trample.ts)
 uniform vec4 uTrampleBox; // its centre cell, 1 / a cell's metres, the half-width in cells (0: none)
@@ -49,6 +53,9 @@ varying vec2 vPaneUv;
 varying float vPane;
 #endif
 ${ELDRITCH_VERT}
+#ifdef FOLIAGE
+${FOLIAGE_VERT}
+#endif
 
 varying vec2 vUv;
 varying vec3 vUvw;
@@ -70,6 +77,7 @@ void main() {
   wn = normalize(mat3(modelMatrix * instanceMatrix) * normal);
 #endif
   vWorld = wp.xyz;
+  float gusted = 0.0; // the gust on this point (shaders/wind.ts), which a bowed leaf or blade shows as a sheen
 #ifdef PANES
   vPane = aPane;
   vPaneUv = aPaneUv;
@@ -79,9 +87,7 @@ void main() {
   vec3 root = (modelMatrix * instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz; // round 116: the near field's clumps sink into the ground toward its edge, where the chunks' own cover goes on (render/nearGrass.ts)
   wp.xyz = root + (wp.xyz - root) * (1.0 - smoothstep(NEAR_FIELD * 0.7, NEAR_FIELD, length(root.xz - uBodies[0].xz)));
 #endif
-  float gust = 0.5 + 0.5 * sin(uTime * 0.31 + wp.x * 0.045 - wp.z * 0.03); // gusts roll across the land...
-  float flutter = 0.5 * sin(uTime * 1.7 + wp.x * 0.9 + wp.z * 0.7) + 0.25 * sin(uTime * 2.9 + wp.z * 1.3); // ...and shiver in it
-  wp.xz += aSway * uWind * (0.3 + 0.7 * gust + 0.3 * flutter) * vec2(0.85, 0.5); // after vWorld: lit and shadowed where it stands, drawn where the wind has it
+  wp.xyz += windMove(wp.xyz, aSway, aWind, wn, uWind, gusted); // round 125: gust fronts down the realm's wind, the trunk's lean and swing, each bough's own sway, each leaf's shiver (shaders/wind.ts); after vWorld: lit and shadowed where it stands, drawn where the wind has it
   if (aSway > 0.002) { // round 80: the grass parts for a body going through it, and lies where one has gone (a trunk's foot and a stone have no sway: they stand)
     float blade = aSway * 6.25; // the height of this vertex above its foot, near enough (a blade's tip is blown 0.16 of its length)
     vec2 away = vec2(0.0);
@@ -114,6 +120,9 @@ void main() {
   }
 ${BLAST_BEND_GLSL}
 #endif
+#ifdef FOLIAGE
+  vWorld = wp.xyz; // round 125: a leaf is lit and shadowed where the wind has it, as its shadow is cast (render/foliageShadow.ts)
+#endif
   wp.xyz = displace(wp.xyz);
 
   vec4 vp = viewMatrix * wp;
@@ -124,7 +133,11 @@ ${BLAST_BEND_GLSL}
   vUv = uv0;
   vUvw = vec3(uv0 * clip.w, clip.w);
 
+#ifdef FOLIAGE
+  vec3 moon = foliageMoon(wn, wp.xyz); // round 125: wrapped about the crown, and through it against the moon (shaders/foliage.ts)
+#else
   vec3 moon = uLightColor * max(dot(wn, uLightDir), 0.0);
+#endif
   vec3 light = uAmbient * mix(uHemi.x, uHemi.y, 0.5 + 0.5 * wn.y) + moon; // a hemisphere's ambient: the sky's on what faces up, the dark ground's on what faces down (round 39)
   vec3 toGlow = uGlowPos - wp.xyz;
   float gd = length(toGlow);
@@ -139,6 +152,9 @@ ${BLAST_BEND_GLSL}
 #endif
   vTint = tint;
   vLight = mix(light, vec3(1.0), uEmissive) * tint;
+#ifdef SWAY
+  vLight *= 1.0 + ${WIND.sheen.toFixed(3)} * gusted * aWind.z; // round 125: a leaf or a blade bowed by a gust catches the moon (a silver wave over a field)
+#endif
   vMoon = moon * (1.0 - uEmissive) * tint;
   vNormal = wn;
   vSplat = aSplat;
@@ -244,9 +260,13 @@ float footRings(vec2 p) {
 }
 
 uniform float uClipY;
+uniform vec2 uWindDir; // round 125: where the wind blows to (render/windField.ts)
 uniform vec3 uNearFade; // within .y metres of the eye a freestanding prop dithers away, gone within .x; nothing facing up more than .z (2026-11-03)
 uniform float uNearOn;
 const float BAYER4[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+#ifdef FOLIAGE
+${FOLIAGE_FRAG}
+#endif
 ${SURFACE_UNIFORMS}
 void main() {
   if (vWorld.y < uClipY) discard; // under the sea's surface, in the mirrored scene (reflection.ts; round 35)
@@ -258,6 +278,9 @@ void main() {
   vec2 uv = affineUv(vec2(textureSize(uMap, 0)));
   vec2 gx = dFdx(vUv);
   vec2 gy = dFdy(vUv);
+#ifdef FOLIAGE
+  foliageCut(uv, gx, gy); // round 125: a leaf card cut out where the mist shows through (shaders/foliage.ts)
+#endif
   vec3 tex = sampleMap(uMap, uv, gx, gy);
   if (uHasMap4 > 0.5 && vEdge > 0.003) tex = mix(tex, sampleMap(uMap4, uv, gx, gy), vEdge);
   if (uHasMap2 > 0.5 && vSplat > 0.01) {
@@ -313,7 +336,7 @@ void main() {
   if (uCoatOn * uCoatA.w > 0.01 && uEmissive < 0.5 && uCharacter < 0.5) { // round 80: the realm's matter lies on its stones: a cap on what faces up, a film on what faces the wind, a stain below a line (data/coats.ts)
     float cn = 0.6 * vnoise(vWorld.xz * 0.8 + vWorld.y * 0.37 + 23.0) + 0.4 * vnoise(vWorld.xz * 2.3 - vWorld.y * 0.9 + 5.0);
     float cap = uCoatA.x * smoothstep(0.4, 0.75, n.y + (cn - 0.5) * 0.7);
-    float windward = max(dot(n.xz, vec2(-0.86, -0.5)), 0.0) * (1.0 - n.y); // faces turned into the wind the grass leans from
+    float windward = max(dot(n.xz, -uWindDir), 0.0) * (1.0 - n.y); // faces turned into the wind the grass leans from (round 125: the realm's own)
     float film = uCoatA.y * smoothstep(0.2, 0.55, windward + (cn - 0.5) * 0.8);
     float cover = clamp(max(cap, film), 0.0, 1.0) * uCoatA.w;
     tex = mix(tex, uCoatCol * (0.95 + 0.7 * dot(tex, vec3(0.333))), cover); // (the stone's own light and dark still show through a little)
@@ -329,7 +352,11 @@ void main() {
     tex = mix(tex, uCoatCol * (0.95 + 0.7 * dot(tex, vec3(0.333))), dust);
     coated = max(coated, dust);
   }
+#ifdef FOLIAGE
+  float facing = mix(1.0, foliageFacing(n, toLamp / max(ld, 0.001)), uLanternFacing);
+#else
   float facing = mix(1.0, max(dot(n, toLamp / max(ld, 0.001)), 0.0), uLanternFacing);
+#endif
   float self = uCharacter > 1.5 ? 1.0 : 0.0;
   float share = uCharacterLight * mix(1.0, uLanternSelf, self);
   float character = min(uCharacter, 1.0);

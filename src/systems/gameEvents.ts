@@ -54,10 +54,10 @@ export interface GameEvents {
   FogPassing: { wall: string; x: number; z: number; frames: number }; // frames: how long the walk through takes (the sound is made to its length) // the investigator sets out through a boss's fog (round 35)
   FogPassed: { wall: string; x: number; z: number };
   PassageOpening: { id: Entity; kind: 'door' | 'bridge' | 'sealed'; x: number; y: number; z: number; seconds: number }; // a secret passage the investigator has come near begins to open: a door's slab draws aside, a bridge's stones rise (systems/passages.ts; round 61)
-  ShortcutOpened: { id: string; x: number; y: number; z: number }; // round 125: a shortcut's bar worked from its far side: the door opens, for good (systems/shortcuts.ts)
-  ShortcutTried: { id: string; x: number; y: number; z: number }; // round 125: a shortcut tried from the side it does not open from: it rattles on its bar
-  AmbushSprung: { entity: Entity; x: number; y: number; z: number }; // round 125: a foe lying in wait springs (systems/ambush.ts)
-  Dropped: { entity: Entity; at: V3; height: number }; // round 125: a body comes down off a ledge, `height` metres (systems/drops.ts)
+  ShortcutOpened: { id: string; x: number; y: number; z: number }; // round 127: a shortcut's bar worked from its far side: the door opens, for good (systems/shortcuts.ts)
+  ShortcutTried: { id: string; x: number; y: number; z: number }; // round 127: a shortcut tried from the side it does not open from: it rattles on its bar
+  AmbushSprung: { entity: Entity; x: number; y: number; z: number }; // round 127: a foe lying in wait springs (systems/ambush.ts)
+  Dropped: { entity: Entity; at: V3; height: number }; // round 127: a body comes down off a ledge, `height` metres (systems/drops.ts)
   GateEntering: { gate: string; x: number; z: number; frames: number }; // a realm's gate walked into: the walk on into its light takes `frames`, and then they are through (round 60: gateWalk.ts)
   Echoes: { change: 'earned' | 'dropped' | 'recovered' | 'lost' | 'spent'; amount: number; total: number; on?: 'ware' | 'level' }; // `on`: what spent Echoes were spent on (the coins of a ware are heard; a level has its own sound)
   LevelUp: { attribute: LevelId; level: number; total: number }; // a level bought with Echoes: the attribute's level and the investigator's

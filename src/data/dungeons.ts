@@ -3,7 +3,7 @@
  * bridge, well. The first room is the entrance and opens outside on its `dir` side; every other
  * room opens off `from`, on that room's `dir` side. Stairs run straight on, climbing `rise` metres.
  * world/dungeonKit.ts lays a graph out on a grid of 16 m cells; sites.ts says where each one stands. The graphs are dungeonsWaking.ts,
- * dungeonsDeep.ts, dungeonsFar.ts and lairs.ts (round 125: and their links, the second ways that close them into loops).
+ * dungeonsDeep.ts, dungeonsFar.ts and lairs.ts (round 127: and their links, the second ways that close them into loops).
  */
 
 export const ROOM_KINDS = ['corridor', 'hall', 'stair', 'pit', 'bridge', 'well'] as const;
@@ -32,7 +32,7 @@ export interface RoomDef {
   boss?: readonly string[]; // a boss arena
   variant?: 'boss';
   spawns?: readonly string[];
-  lurk?: readonly string[]; // round 125: foes lying in wait, unseen, that spring when the investigator comes near (systems/ambush.ts)
+  lurk?: readonly string[]; // round 127: foes lying in wait, unseen, that spring when the investigator comes near (systems/ambush.ts)
   ally?: string;
   allyAt?: readonly [u: number, v: number]; // where its ally stands, across and along the room from its middle (round 123: the Cavern of Flame's priests, at a place of their own); else the room's first spot
   sign?: { id: string; name: string }; // an Elder Sign
@@ -50,11 +50,11 @@ export interface DungeonDef {
   region: string;
   sealed?: boolean; // no way in from outside: the Stairs of Slumber are reached only in dreams
   rooms: readonly RoomDef[];
-  links?: readonly LinkDef[]; // round 125: the second ways between rooms that close the graph into loops (docs/LEVEL_DESIGN.md)
+  links?: readonly LinkDef[]; // round 127: the second ways between rooms that close the graph into loops (docs/LEVEL_DESIGN.md)
 }
 
 /**
- * A second way between two rooms that meet side by side, centred on the side they share (round 125, asked: the dungeons designed
+ * A second way between two rooms that meet side by side, centred on the side they share (round 127, asked: the dungeons designed
  * as Souls levels are). 'open': a doorway like any other, closing a loop. 'shortcut': a doorway shut by a barred door that opens
  * only from `from`, the far side, and stays open once opened (systems/shortcuts.ts). 'drop': a ledge in `from`'s wall, a short drop
  * into `to` below it that cannot be climbed back. 'window': a barred opening a person looks through and cannot pass.
@@ -76,6 +76,6 @@ import { WAKING_DUNGEONS } from './dungeonsWaking';
 
 export { SLUMBER_STEPS } from './dungeonsDeep';
 
-export const DUNGEONS: readonly DungeonDef[] = [...LAIRS, ...WAKING_DUNGEONS, ...DEEP_DUNGEONS, ...FAR_DUNGEONS]; // (round 125: the legacy dungeons in two files, dungeonsWaking.ts and dungeonsDeep.ts)
+export const DUNGEONS: readonly DungeonDef[] = [...LAIRS, ...WAKING_DUNGEONS, ...DEEP_DUNGEONS, ...FAR_DUNGEONS]; // (round 127: the legacy dungeons in two files, dungeonsWaking.ts and dungeonsDeep.ts)
 
 export const getDungeon = (id: string): DungeonDef | undefined => DUNGEONS.find((d) => d.id === id);

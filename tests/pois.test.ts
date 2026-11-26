@@ -140,7 +140,7 @@ describe('the points of interest: where they stand', () => {
     const start = worldLayout().signs.find((x) => x.id === START_SIGN)!;
     const plan = regionPlan(hub);
     const groves = plan.features.filter((f) => f.kind === 'grove');
-    const nth = groves.reduce((best, f, i) => (Math.hypot(f.x - start.x, f.z - start.z) < Math.hypot(groves[best].x - start.x, groves[best].z - start.z) ? i : best), 0); // the grove nearest the opening (round 125: by index it moved off as the dungeons' ground changed)
+    const nth = groves.reduce((best, f, i) => (Math.hypot(f.x - start.x, f.z - start.z) < Math.hypot(groves[best].x - start.x, groves[best].z - start.z) ? i : best), 0); // the grove nearest the opening (round 127: by index it moved off as the dungeons' ground changed)
     const def: PoiDef = { id: 'test_early', region: 'hub', at: { feature: 'grove', nth }, name: 'Test grove', kind: 'den', story: 'x', line: 'x', foes: { ids: ['ghoul', 'thousand_young', 'deep_one', 'rat_swarm'], n: 8 } };
     const out = planPois(hub, plan.features, [...plan.props.values()].flat(), [...plan.spawns.values()].flat(), [def]);
     expect(out.sites).toHaveLength(1);

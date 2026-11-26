@@ -1,5 +1,5 @@
 /**
- * The second ways between a dungeon's rooms (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md):
+ * The second ways between a dungeon's rooms (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md):
  * what world/dungeonLinks.ts lays and refuses, and what its pieces do to a body: a window stops feet and eyes, a drop's ledge lets a
  * body down and stops one coming up, a shortcut's seal stops feet until it is taken out.
  */

@@ -1,5 +1,5 @@
 /**
- * The dungeons' second ways at play (round 125; docs/LEVEL_DESIGN.md): a barred shortcut opens from its far side only, rattles from
+ * The dungeons' second ways at play (round 127; docs/LEVEL_DESIGN.md): a barred shortcut opens from its far side only, rattles from
  * the near one, lets a body through once its door has swung, and stays open in the save but not into a new journey; a foe lying in
  * wait keeps hidden until the investigator comes within its reach (never while they are at peace); and a ledge is dropped from, over
  * some frames, and cannot be climbed.
@@ -30,7 +30,7 @@ const stand = (g: Game, s: ShortcutPlace, side: 'from' | 'to'): void => {
 /** Walks from a pace before the door on `side` through it, and says which side the walk ends on. */
 const through = (g: Game, s: ShortcutPlace, side: 'from' | 'to'): 'from' | 'to' => sideOf(s, walkEnd(g, standAt(s, side === 'from' ? 'to' : 'from', 4), standAt(s, side), 120));
 
-describe('a barred shortcut (round 125)', () => {
+describe('a barred shortcut (round 127)', () => {
   it('will not move from its near side, opens from its far side, and lets a body through once its door has swung', () => {
     const g = free(createWorldGame());
     const s = cut();
@@ -82,7 +82,7 @@ describe('a barred shortcut (round 125)', () => {
   });
 });
 
-describe('a foe lying in wait (round 125)', () => {
+describe('a foe lying in wait (round 127)', () => {
   const lurker = () => worldLayout().spawns.find((p) => p.lurk && p.id === 'room:curwen_catacombs:niches:lurk:0')!;
   /** A world game with the investigator `away` metres from the lurker's post (toward the cloister, east), the lurker spawned. */
   function waiting(away: number): { g: Game; e: number; post: { x: number; z: number } } {
@@ -120,7 +120,7 @@ describe('a foe lying in wait (round 125)', () => {
   });
 });
 
-describe('a drop (round 125)', () => {
+describe('a drop (round 127)', () => {
   const ledge = () => {
     const d = worldLayout().dungeons.find((x) => x.layout.def.id === 'witch_house')!.layout;
     const o = d.doors.find((x) => x.link?.kind === 'drop')!;

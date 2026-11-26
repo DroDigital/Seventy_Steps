@@ -3,7 +3,7 @@
  * boss at its far end behind a few rooms of foes, with a Silver Vial (one more dose of West's
  * Reagent) or a tome for whoever gets that far. Placed by sites.ts like the legacy dungeons.
  *
- * Round 125 (asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a lair has no Elder Sign of its own, so its
+ * Round 127 (asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a lair has no Elder Sign of its own, so its
  * door is where a fallen investigator comes back from. The straight way from the door to the boss's antechamber (a stair, most often)
  * is barred at its far end, and the first way there is the long one, through the lair's rooms; from the antechamber the straight way
  * is opened, and the boss is then a few rooms from the door. Something lies in wait in each. The Deserted House drops from its attic

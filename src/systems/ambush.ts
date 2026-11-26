@@ -1,5 +1,5 @@
 /**
- * Foes that lie in wait (round 125, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a dungeon room's
+ * Foes that lie in wait (round 127, asked: the dungeons designed the way Souls levels are; docs/LEVEL_DESIGN.md): a dungeon room's
  * `lurk` foes are laid hidden, as an ambusher of the open ground hides, unseen, untouched and unlocked-on, and spring at an investigator
  * they see within `AMBUSH.reach` (or who brushes past them unseen, close enough to touch): they rise into view (render/creatureFx.ts) and
  * are on them at once, and from then on hunt as any foe of their kind (they do not lie down again). A rest brings them back as they were,

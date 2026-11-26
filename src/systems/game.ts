@@ -264,7 +264,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   explorationSystem(g);
   markerSystem(g); // the marker reached is cleared (round 60)
   passageSystem(g); // a secret passage the investigator is near opens (round 61)
-  shortcutSystem(g); // a shortcut's barred door stands in its doorway until it is opened from beyond (round 125)
+  shortcutSystem(g); // a shortcut's barred door stands in its doorway until it is opened from beyond (round 127)
   placeSystem(g);
   poiSystem(g);
   questSystem(g);

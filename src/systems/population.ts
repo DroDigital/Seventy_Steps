@@ -89,7 +89,7 @@ export function populationSystem(g: Game): void {
         ow.wounds.delete(s.id);
       }
       if (s.arena) setArena(g, e, s.arena);
-      if (s.lurk) lieInWait(g, e); // round 125: hidden until it springs
+      if (s.lurk) lieInWait(g, e); // round 127: hidden until it springs
       voice(g, e, s.entity);
       c.origin.set(e, s.id);
       ow.alive.set(s.id, e);

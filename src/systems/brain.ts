@@ -177,7 +177,7 @@ function hunt(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transform,
   if (a.move !== null) return;
   if (br.cooldown > 0) br.cooldown--;
   if (br.state === 'hidden') {
-    if (springs(g, id, br, p.reveal, quarry, tp, tr.pos)) [br.state, br.cooldown] = ['engage', 0]; // (round 125: one lying in wait springs at its own reach: ambush.ts)
+    if (springs(g, id, br, p.reveal, quarry, tp, tr.pos)) [br.state, br.cooldown] = ['engage', 0]; // (round 127: one lying in wait springs at its own reach: ambush.ts)
     return;
   }
   const home = distXZ(tr.pos, anchor);

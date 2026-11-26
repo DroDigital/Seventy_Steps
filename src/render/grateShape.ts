@@ -1,5 +1,5 @@
 /**
- * A window's grate (round 125: world/dungeonWalls.ts): upright iron bars a hand apart in a flat frame, with two cross bands, filling
+ * A window's grate (round 127: world/dungeonWalls.ts): upright iron bars a hand apart in a flat frame, with two cross bands, filling
  * the opening the part's box spans. The box itself stops feet and eyes (a window is looked through, never passed); the bars are what the
  * picture draws, so the room beyond shows between them. Render only.
  */

@@ -92,7 +92,7 @@ export interface SpawnPoint {
   at: Place;
   unique: boolean; // bosses and optional bosses stay slain
   arena?: { x: number; z: number; radius: number }; // a boss's: its ring of stones or its room
-  lurk?: boolean; // round 125: it lies in wait, hidden, until it springs (systems/ambush.ts)
+  lurk?: boolean; // round 127: it lies in wait, hidden, until it springs (systems/ambush.ts)
 }
 
 export type { Pad };
@@ -119,7 +119,7 @@ export interface WorldLayout {
   spawns: SpawnPoint[]; // the fixed ones; open ground adds more per chunk (chunks.ts)
   pads: Pad[];
   pieces: HiddenPieceDef[];
-  shortcuts: ShortcutPlace[]; // round 125: the dungeons' barred doors (shortcutPlan.ts)
+  shortcuts: ShortcutPlace[]; // round 127: the dungeons' barred doors (shortcutPlan.ts)
   dream: Place | null; // where a dreamer arrives: the first room of the Stairs of Slumber
   errors: string[];
   chunk(cx: number, cz: number): ChunkStatics;
@@ -248,8 +248,8 @@ function build(): WorldLayout {
       const decor: Prop[] = [];
       w.dungeons.push({ layout, parts, decor });
       for (const o of layout.doors) doorways.push(doorwayClear(o));
-      for (const o of layout.windows) doorways.push(windowClear(o)); // (round 125: nothing is set before a window)
-      w.shortcuts.push(...shortcutsOf(layout)); // round 125
+      for (const o of layout.windows) doorways.push(windowClear(o)); // (round 127: nothing is set before a window)
+      w.shortcuts.push(...shortcutsOf(layout)); // round 127
       w.pieces.push(...pieces);
       for (const p of parts) if (p.solid) collide(partCollider(p));
       addPad({ kind: 'rect', rect: layout.rect, blend: PAD.dungeon, level: layout.base });

@@ -1,7 +1,7 @@
 /**
- * The waking world's legacy dungeons (split from dungeons.ts in round 125): the University Library, the Witch House, Sentinel Hill,
+ * The waking world's legacy dungeons (split from dungeons.ts in round 127): the University Library, the Witch House, Sentinel Hill,
  * Y'ha-nthlei, Curwen's catacombs, the Starry Wisdom church and Akeley's farmhouse, as room graphs over the primitive kit, with the
- * second ways that close them into loops (round 125: docs/LEVEL_DESIGN.md). Data only.
+ * second ways that close them into loops (round 127: docs/LEVEL_DESIGN.md). Data only.
  */
 
 import type { DungeonDef } from './dungeons';
@@ -15,7 +15,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
   // 3 asks for experience of the waking horrors, 4 for the deep world's optional branches.
   // Far-realm secrets ask for 5 (dungeonsFar.ts); no boss or required route waits on insight.
   {
-    // Round 125: the way down is round by the west stacks and the periodicals, and the sub-basement is crossed from the charnel pit to
+    // Round 127: the way down is round by the west stacks and the periodicals, and the sub-basement is crossed from the charnel pit to
     // the archive's sign; the lift stair behind the sign comes up to a barred door in the circulation room off the reading room, seen
     // shut on the way in and opened from below: then the sign is two rooms from the way out.
     id: 'library', name: 'University Library', region: 'hub', rooms: [
@@ -38,7 +38,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('lift', 'circulation', 'shortcut')],
   },
   {
-    // Round 125 (asked: the dungeons designed the way Souls levels are): the front stair is barred at its foot, and the first climb is
+    // Round 127 (asked: the dungeons designed the way Souls levels are): the front stair is barred at its foot, and the first climb is
     // the servants' stair from the hallway, round through the lodgers' rooms to the landing (Peaslee's: the last quiet place, the closet
     // off it to the west, the garret above it); from there the front stair goes down to its bar, and lifted, the parlour and the landing
     // are a flight apart for good. The pantry's floor has rotted through into the cellar, where something waits by the sump.
@@ -64,7 +64,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('stair', 'parlour', 'shortcut'), link('pantry', 'sump', 'drop')],
   },
   {
-    // Round 125: the sign is the terrace at the hill's foot; the climb goes round by the circle and the standing stones, up the east
+    // Round 127: the sign is the terrace at the hill's foot; the climb goes round by the circle and the standing stones, up the east
     // flank and across to the crown before the summit, and from the crown the sheer path drops straight down to a gate barred at the
     // terrace: opened from above, the summit is one flight from the sign. The west barrow and the lookout are the hill's own corner.
     id: 'sentinel_hill', name: 'Sentinel Hill', region: 'dunwich', rooms: [
@@ -88,7 +88,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('sheer', 'terrace', 'shortcut')],
   },
   {
-    // Round 125: from the Drowned Hall the way to the temple is the long one: up through the spawning pools, west by the ossuary, down
+    // Round 127: from the Drowned Hall the way to the temple is the long one: up through the spawning pools, west by the ossuary, down
     // to the oubliette and up the undertow to the causeway at the temple's door. From the causeway the span crosses back east to the
     // sluice, whose door into the Drowned Hall is barred on the sluice's side: lifted, the temple is three rooms from the sign.
     id: 'yhanthlei', name: "Y'ha-nthlei", region: 'innsmouth', rooms: [
@@ -111,7 +111,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('sluice', 'drowned', 'shortcut')],
   },
   {
-    // Round 125: the laboratory lies two cells further down, behind its vestibule, and the way to it from the crypt's sign is round by
+    // Round 127: the laboratory lies two cells further down, behind its vestibule, and the way to it from the crypt's sign is round by
     // the catacomb, the charnel and the saltes, then along the burial niches, where the dead are not all dead. The vestibule's passage
     // comes back north to a door barred on its own side, in the crypt's south wall: opened, Curwen is three rooms from the sign.
     id: 'curwen_catacombs', name: "Curwen's Catacombs", region: 'providence', rooms: [
@@ -136,7 +136,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('passage', 'crypt', 'shortcut')],
   },
   {
-    // Round 125: the sign stands at the belfry stair's foot, and the stair is barred there. The first way up is round by the chapel and
+    // Round 127: the sign stands at the belfry stair's foot, and the stair is barred there. The first way up is round by the chapel and
     // the cloister, up the organ stair to the loft and along the galleries (a balcony looks down through its grille on the sign below)
     // to the choir and the belfry; from the belfry the tower stair goes down to its bar, and lifted, the steeple is a climb from the sign.
     id: 'starry_wisdom', name: 'Starry Wisdom Church', region: 'providence', rooms: [
@@ -162,7 +162,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     links: [link('tower', 'aisle', 'shortcut'), link('balcony', 'aisle', 'window')],
   },
   {
-    // Round 125: the Outer Ones have dug in under the farm. The cellar off the kitchen goes down to the root cellar and their tunnels
+    // Round 127: the Outer Ones have dug in under the farm. The cellar off the kitchen goes down to the root cellar and their tunnels
     // run east beneath the yard to the outpost and the brain-cylinders; from the cylinders their lift climbs to a trapdoor barred from
     // below in the barn floor, beside the kitchen's sign. The study keeps its one door, off the parlour.
     id: 'akeley', name: 'Akeley Farmhouse', region: 'vermont', rooms: [

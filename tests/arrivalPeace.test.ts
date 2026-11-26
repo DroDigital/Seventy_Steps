@@ -52,7 +52,7 @@ function quietSign(g: Game): string {
 
 /**
  * A world game with a quiet sign found, travelled to, and a deep one `away` metres out in front of the investigator, facing them. It keeps
- * to where it stands (no post, so no rounds: roam.ts): it is the foe beside the stone, not one that strolls off while they kneel (round 125:
+ * to where it stands (no post, so no rounds: roam.ts): it is the foe beside the stone, not one that strolls off while they kneel (round 127:
  * the world's own foes draw on the same dice, and one that had happened to stay near had walked nine metres away).
  */
 function arrive(away = 4): { g: Game; foe: number; hp: number } {

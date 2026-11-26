@@ -46,7 +46,7 @@ describe('the dungeons\' props and the arenas\' built pieces (round 117)', () =>
         }
       }
     }
-  });
+  }, 120000); // (some ten seconds alone; the full audit run beside it on CI's few cores took it past the 30 s default, as the view audits' own long cases are given room)
 
   it('hangs a torch\'s plate on the wall\'s face, its flame where it was', () => {
     for (const across of [1, -1]) for (const alongX of [true, false]) {

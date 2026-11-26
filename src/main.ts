@@ -88,6 +88,7 @@ import { createHud } from './ui/hud';
 import { createPhoto } from './ui/photo';
 import { startLookTest } from './ui/lookTest';
 import { loadModels } from './render/modelKit';
+import { loadFlora } from './render/floraData';
 import { nextFrame, spriteAtlas } from './ui/loading';
 import { installGameEvidence } from './ui/gameEvidence';
 import { installFxLab } from './ui/fxLab';
@@ -223,7 +224,7 @@ async function startGame(opts: StartOptions, shell: Shell): Promise<void> {
   if (store) startAutosave(game, store);
   if (!opts.arena) watchAchievements(game, store);
   const views = createActorViews(scene, game);
-  await loadModels(); // the arenas' models, read before the world is built about them
+  await Promise.all([loadModels(), loadFlora()]); // the arenas' models and (round 125) the flora library, read before the world is built about them
   const particles = createParticles(scene, (x, z) => game.world.ground(x, z)); // what falls from a blow rests on the ground under it (round 60)
   pipeline.softParticles(particles.mesh); // round 113: drawn after the world, thinned where they meet it
   const marks = createBloodPools(scene, (x, z) => game.world.ground(x, z)); // round 113: what lies on the ground and the water a moment: blood, spatter, a wader's rings

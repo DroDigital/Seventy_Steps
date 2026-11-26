@@ -1,7 +1,7 @@
 /**
- * The deep world's legacy dungeons (split from dungeons.ts in round 125): the Elder Thing city, the Great Race's archives, Tsath, the
+ * The deep world's legacy dungeons (split from dungeons.ts in round 127): the Elder Thing city, the Great Race's archives, Tsath, the
  * Stairs of Slumber and the way from Ulthar to Kadath, as room graphs over the primitive kit, with the second ways that close them into
- * loops (round 125: docs/LEVEL_DESIGN.md; the Stairs of Slumber keep their one descent, as the tale counts its steps). Data only.
+ * loops (round 127: docs/LEVEL_DESIGN.md; the Stairs of Slumber keep their one descent, as the tale counts its steps). Data only.
  */
 
 import type { Dir, DungeonDef, RoomDef, Veil } from './dungeons';
@@ -20,7 +20,7 @@ const deep = (id: string, from: string, dir: Dir, o: { words?: string; kit?: Kit
 
 export const DEEP_DUNGEONS: readonly DungeonDef[] = [
   {
-    // Round 125: the ramp down from the plaza's sign is barred at its head, and the way to the abyss is the long one: up the spire to
+    // Round 127: the ramp down from the plaza's sign is barred at its head, and the way to the abyss is the long one: up the spire to
     // the observatory, down the deep stair beyond it to the hatchery, east through the tunnels and the warren to the gallery at the
     // span. From the gallery the ramp climbs to its bar; lifted, the shoggoth is four rooms from the sign, and the way out is short.
     id: 'elder_city', name: 'Elder Thing City', region: 'mountains', rooms: [
@@ -44,7 +44,7 @@ export const DEEP_DUNGEONS: readonly DungeonDef[] = [
     links: [link('ramp', 'plaza', 'shortcut')],
   },
   {
-    // Round 125: the reading hall keeps its sign (Peaslee's: "past the reading hall"), and the way down past it is round by the catalogue,
+    // Round 127: the reading hall keeps its sign (Peaslee's: "past the reading hall"), and the way down past it is round by the catalogue,
     // the hall of machines and the gallery to the trapdoor, down to the deep passage at the walled-in vault (the basalt deeps below the
     // trapdoor are a corner of their own). From the deep passage the return stair climbs to a door barred into the reading hall.
     id: 'archives', name: 'Archives of the Great Race', region: 'pnakotus', rooms: [
@@ -68,7 +68,7 @@ export const DEEP_DUNGEONS: readonly DungeonDef[] = [
     links: [link('return', 'reading', 'shortcut')],
   },
   {
-    // Round 125: the temple stands north of the avenue's sign, its door into the avenue barred on the temple's side; the way to it is
+    // Round 127: the temple stands north of the avenue's sign, its door into the avenue barred on the temple's side; the way to it is
     // down through Yoth and red-litten Yoth, along the dark way and up into the cloister, where the serpent folk wait (a grille in the
     // cloister looks down into the Yoth pit). Past the temple, the temple stair and the span go down to N'kai, as Zamacona says.
     id: 'tsath', name: 'Tsath', region: 'kn_yan', rooms: [
@@ -135,7 +135,7 @@ export const DEEP_DUNGEONS: readonly DungeonDef[] = [
       room('ulthar', 'hall', 'ulthar_gate', 'n', { sign: { id: 'dream_ulthar', name: 'Ulthar' }, ally: 'cats_of_ulthar' }),
       room('cats_lane', 'corridor', 'ulthar', 'w', { spawns: ['cat_from_saturn'] }),
       room('elder_temple', 'hall', 'cats_lane', 'w', { tome: { name: 'The Pnakotic Fragments', insight: 1 }, spawns: ['zoog', 'zoog'], words: 'THE TEMPLE OF THE ELDER ONES' }),
-      // Round 125: the road north out of Ulthar is barred on the road's side; the way to it is east by the docks and the wharf, where the
+      // Round 127: the road north out of Ulthar is barred on the road's side; the way to it is east by the docks and the wharf, where the
       // black galleys of the men of Leng tie up, and through Dylath-Leen. Lifted, Leng is a climb from Ulthar's sign.
       room('docks', 'corridor', 'ulthar', 'e', { spawns: ['zoog'] }),
       room('wharf', 'hall', 'docks', 'e', { spawns: ['moon_beast', 'zoog'] }),

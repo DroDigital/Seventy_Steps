@@ -18,6 +18,7 @@ import { rockOf } from './rockForms';
 import { bushOf, logOf, stumpOf } from './shrubForms';
 import { graveOf, monolithOf, pillarOf } from './stoneForms';
 import { treeOf } from './treeForms';
+import { floraProp } from './floraKit';
 import { fenceOf, wallOf } from './fieldForms';
 import { ruinOf } from './ruinForms';
 import { setPieces } from './setShapes';
@@ -25,7 +26,7 @@ import { box, tileUv, tint } from './meshKit';
 import { cyl, join, lump, stem } from './propKit';
 import { BASE, mixRgb, scaleRgb, type Rgb } from './palette';
 
-export type PropMat = 'stone' | 'wood' | 'leaf' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
+export type PropMat = 'stone' | 'wood' | 'leaf' | 'foliage' | 'clapboard' | 'brick' | 'shingle' | 'glow' | 'pane' | 'trim' | 'glass' | 'rock' | 'slab' | 'cobble' | 'cloth' | 'metal' | 'bone' | 'glassware' | 'liquid' | 'mirror' | 'wax'; // 'trim': wood that stands off a wall (a house's frames, panes and door), drawn nearer than it is (round 21)
 /** A piece that has its geometry: all but the light of a fire, which has none (round 87). */
 export type SolidPiece = Piece & { geo: THREE.BufferGeometry };
 /** The pieces of `pieces` that have geometry. */
@@ -117,10 +118,14 @@ export function propPieces(p: Prop, c: Rgb, region?: string): Piece[] {
   const look = lookOf(region);
   const form = <F extends string>(w: Weights<F>, fallback: F): F => formOf(w, createRng(p.seed * 31 + 7)(), fallback); // its own draw, so the form's builder draws as it would
   switch (p.kind) {
-    case 'tree':
-      return treeOf(form(look.trees, 'dead'), p, rng, look);
-    case 'pine':
-      return pineOf(form(look.pines, 'fir'), p, rng, look);
+    case 'tree': { // round 125: the library's, modelled in Blender (render/floraKit.ts); the old forms while it is not read
+      const f = form(look.trees, 'dead');
+      return floraProp('tree', f, p, look, region) ?? treeOf(f, p, rng, look);
+    }
+    case 'pine': {
+      const f = form(look.pines, 'fir');
+      return floraProp('pine', f, p, look, region) ?? pineOf(f, p, rng, look);
+    }
     case 'rock':
       return rockOf(form(look.rocks, 'boulder'), p, rng, c, look);
     case 'pillar':
@@ -145,8 +150,10 @@ export function propPieces(p: Prop, c: Rgb, region?: string): Piece[] {
       return logOf(form(look.logs, 'plain'), p, rng, look);
     case 'firepit':
       return firepit(p, rng, c);
-    case 'bush':
-      return bushOf(form(look.bushes, 'round'), p, rng, c, look);
+    case 'bush': {
+      const f = form(look.bushes, 'round');
+      return floraProp('bush', f, p, look, region) ?? bushOf(f, p, rng, c, look); // (crystal, tube and fungus are built here still)
+    }
     case 'stump':
       return stumpOf(form(look.stumps, 'cut'), p, rng, look);
     case 'altar':

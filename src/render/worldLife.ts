@@ -98,8 +98,8 @@ export function createWorldLife(scene: THREE.Scene, g: Game, audio: GameAudio, p
   const drag = createDragTentacle(scene, g, parts.particles); // round 55: the one that takes hold of the investigator in the water...
   const splash = createSplashFx(g, parts.particles); // ...and what the water throws up as they go in
   const doors = createDoors(scene, g, audio); // round 27: a door in each doorway that has one
-  const shortcuts = createShortcutViews(scene, g, audio); // round 125: the barred doors of the shortcuts
-  createLurkFx(g, parts.particles, audio); // round 125: an ambush sprung, a body landing off a ledge
+  const shortcuts = createShortcutViews(scene, g, audio); // round 127: the barred doors of the shortcuts
+  createLurkFx(g, parts.particles, audio); // round 127: an ambush sprung, a body landing off a ledge
   const fog = createBossFog(scene, g, parts.particles, audio); // round 27: a wall of mist before each horror
   const demoMist = g.demo ? createDemoMist(scene) : null; // round 56: the demo's edge, a bank of mist
   const chimneys = createChimneys(parts.particles); // round 34: smoke from the chimneys of the houses that stand

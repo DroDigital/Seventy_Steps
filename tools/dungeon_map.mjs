@@ -1,5 +1,5 @@
 /**
- * Prints each dungeon's plan as text (round 125, docs/LEVEL_DESIGN.md): its rooms on the kit's 16 m grid, north up, with their
+ * Prints each dungeon's plan as text (round 127, docs/LEVEL_DESIGN.md): its rooms on the kit's 16 m grid, north up, with their
  * floors, doorways, and the second ways of world/dungeonLinks.ts, and whatever the layout cannot build. Loads the game's own modules
  * through Vite, so what it prints is what the game lays.
  *

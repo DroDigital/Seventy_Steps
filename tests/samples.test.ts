@@ -10,6 +10,7 @@ import { voiceIdOf } from '../src/data/voices';
 import { nextSpot } from '../src/render/audio/ambience';
 import { reached, strideAt, surfaceAt } from '../src/render/audio/foley';
 import { RAIN_BEDS } from '../src/render/audio/weatherBed';
+import { LEAF_SOUND } from '../src/data/windTuning';
 import { generatedOf } from '../src/render/audio/bedTextures';
 import { dullness } from '../src/render/audio/cues';
 import { pickTake, setFiles } from '../src/render/audio/sampler';
@@ -21,7 +22,7 @@ import { chunkOf } from '../src/world/worldMap';
 const AUDIO = 'public/audio';
 const files = (dir: string): string[] => readdirSync(`${AUDIO}/${dir}`).map((f) => `${dir}/${f.replace(/\.mp3$/, '')}`);
 const places: Partial<Ambience>[] = [...Object.values(AMBIENCE), ...Object.values(DUNGEON_AMBIENCE), ...Object.values(KIT_AMBIENCE), ...Object.values(DUNGEON_ACCENTS)]; // (round 124: the dungeons' own, and their tales')
-const beds = [...places.flatMap((a) => (a.beds ?? []).filter(([f]) => !generatedOf(f)).map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS)]; // (the rain's are the weather bed's: round 59; the made ones are drawn in code: round 124)
+const beds = [...places.flatMap((a) => (a.beds ?? []).filter(([f]) => !generatedOf(f)).map(([f]) => `amb/${f}`)), ...Object.values(RAIN_BEDS), ...Object.values(LEAF_SOUND.beds)]; // (the rain's are the weather bed's: round 59; the trees' the leaf bed's: round 126; the made ones are drawn in code: round 124)
 
 describe('the recorded sounds (data/samples.ts, public/audio)', () => {
   it('every file a set or a bed names is there, and every file there is named', () => {
