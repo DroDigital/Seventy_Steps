@@ -3,7 +3,11 @@
 The game was made in numbered rounds (every judgment call is in [`docs/DECISIONS.md`](docs/DECISIONS.md)); this lists what a
 player would notice, newest first. Versions before 1.0 were never released.
 
-## Unreleased
+## 1.5.0
+
+- **The game knows its version.** Every build since 1.0.8 called itself 1.0.8 in its crash reports and its saves, whatever itch.io showed (1.4.9 the last). The version typed for an itch.io push is now stamped into the build, so the game, its crash report, its saves and the app's own version all say the same as the page, and every full game pushed to itch.io is tagged in the repository (`v1.5.0`, and so on).
+
+## 1.4.1 to 1.4.9
 
 - **Ghatanothoa's gaze is slower.** It now takes eight seconds in its sight to turn you to stone, not four, and still wears off in five once you break its sight behind a monolith.
 - **The dungeons fold back on themselves.** Every dungeon was a string of rooms you walked in and walked back out of. Now each one loops, the way a Souls level does:
@@ -32,6 +36,9 @@ player would notice, newest first. Versions before 1.0 were never released.
 - **Dismemberment only where it fits a horror's tale.** A killing cut no longer parts a horror that dies its own death, and none leaves a pool of blood, except Wilbur Whateley (torn by the watchdog) and the Gorgon of Medusa's Coil (killed with a machete). Every other creature is cut and bleeds as before.
 - **Dungeon furnishings and arena pieces are better made and more varied.** Bookcases have shelves full of books of every height (some with ledgers and a skull, some with scrolls); crates are battened and braced, some open with straw spilling; casks swell in their hoops and stand, lie on chocks or stack; coffins come as carved sarcophagi, effigy tombs, broken-open chests and wooden coffins on trestles; statues are robed, winged, kneeling or broken; steles are round-headed, pointed or broken; pews have backs, ends and kneelers; braziers stand on three legs with coals in their bowls. In the arenas, R'lyeh's slabs carry an eye, a line or a spiral and have broken crowns, standing-stone gateways are rough-hewn (some with a fallen lintel), and the pipes, banners, pedestals, skull poles and the fallen star are more finely made.
 - **Dungeon and arena defects fixed.** Wall torch brackets no longer hang in the air in front of the wall, R'lyeh's leaning slabs no longer lift a corner of their foot off the ground, and the reading desk's two book cases are no longer blank slabs.
+
+## 1.4.0
+
 - **The world's props are better made and more varied.** Ruins come in six kinds by realm (a broken wall, a house's gable end with its window, a lone chimney over a burned house's footings, an arched doorway, a colonnade, cyclopean blocks), field walls in four (dry-stone, tumbled, mortared, upright slabs) and fences in four (rails, white pickets, wattle hurdles, broken). Houses can have dormers, a pediment or hood over the door, corner boards and brick chimneys. Trees have roots and fuller, lumpier crowns; firs have ragged bough tips; the Dreamlands' cypresses are flame-shaped; birches are marked; stumps, logs, bushes and columns are more finely made.
 - **Prop defects fixed.** Fire pits had their ring of stones heaped on one spot; stumps' roots were hidden inside them; oak, maple and birch crowns had a top clump floating above the trunk; swamp-tree limbs could start off the trunk; stacked columns had gaps of sky between their drums; graves' plots tilted with their stones; the Dreamlands' house turrets were buried in the house with only their cone poking through the roof.
 - **The people are more finely made.** The townsfolk and the dreamers you meet are no longer built of blocks: their bodies, sleeves, legs and heads are rounded, their coat skirts hang as rounded skirts, and hair, beards and moustaches follow the shape of the head.
@@ -41,6 +48,11 @@ player would notice, newest first. Versions before 1.0 were never released.
 - **Blasts move the world about them.** A horror's quake, slam or roar, a bolt of the storm, a burst of marked ground and a bursting shot send a wave over the land: grass, leaves, boughs and banners bend away as it passes, a strong one flattens the grass at its heart for a few seconds, the low mist is thrown back in a ring and drifts back, nearby fires and torches gutter, and the motes in the air are carried off.
 - **The lantern's glow in the mist has shadows.** Trunks, pillars and walls cut faint wedges of dark through the halo the lantern throws into the mist.
 - **Houses and stones meet the ground.** A house's wing and its porch posts no longer stand above the ground, and on sloping land a house's footing, a ruin, a boulder, a standing stone and the realms' great landmarks reach down into the hillside instead of floating over it; field walls, fences and fallen logs follow the slope.
+
+## Up to 1.3.7
+
+What the itch.io builds after 1.0.8 brought, the last of them 1.3.7 (this changelog did not name each).
+
 - **The horrors' auras, remade.** The flat panels of drawn lines behind some horrors (frames, cracks, stripes, spirals, vines) are gone. What remains is fainter and different for each, from its tale: sea water running off Cthulhu, rags of Hastur's mantle carried on the wind, a dark that closes about the Haunter of the Dark, smoke peeling off Nyarlathotep, Yog-Sothoth's iridescent globes, motes that hang still about 'Umr at-Tawil, spores settling from Shub-Niggurath, the Colour's glimmers, specks drawn into Azathoth, cloud streaming up from the Other Gods, grey grit falling from Ghatanothoa. Keziah Mason, the Black Man, Tsathoggua and the Ancient Ones have none.
 - **The demo ships only its own content.** The demo is built without the rest of the game: its code, data, pictures, sounds and text for the other realms are left out of the build, not hidden while it runs. The few lines of the demo that named the rest of the game are reworded or left out.
 - **No sigils on the ground, and calmer auras.** A horror that arrives or summons no longer draws a glowing sigil on the floor beneath it, and the wave lines that ran across the mist about Cthulhu, Father Dagon, Mother Hydra and Bokrug are gone; their bubbles stay. A vigil still shows how far it has come, as a ring that grows.
