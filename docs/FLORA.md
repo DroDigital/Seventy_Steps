@@ -24,7 +24,7 @@ it, and rustles as the gusts come through it. The theme is kept: low-poly, verte
 | The wind (gust fronts, a trunk's lean and ring, boughs' own phases, flutter, sheen) | `src/render/shaders/wind.ts`, `windField.ts` (the same gust on the CPU), `windKit.ts`, `data/windTuning.ts` |
 | Leaf shadows, cut out and blown | `src/render/foliageShadow.ts` (drawn by `moonShadow.ts`) |
 | The ground's growth: grass clumps, tall grass, reeds, ferns, brambles, fallen leaves | `src/render/groundCover.ts`, `coverBuilder.ts`, `understory.ts`, `nearGrass.ts` |
-| The leaves heard | `src/render/audio/leafBed.ts` |
+| The trees heard (round 126: recorded, docs/SOUND.md) | `src/render/audio/leafBed.ts` |
 | Pictures of it in the game | `tools/flora_shots.mjs` |
 
 ## Making the library again
