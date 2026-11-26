@@ -46,7 +46,7 @@ export function record<K extends keyof import('../src/systems/components').GameE
 }
 
 /** Sends every horror away and keeps it from streaming back: the walk is of the walls, and a body beside them can shove the investigator through. */
-function sendAway(g: Game): void {
+export function sendAway(g: Game): void {
   const ow = g.overworld;
   if (ow) {
     for (const id of ow.alive.keys()) ow.killed.add(id);

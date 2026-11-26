@@ -83,7 +83,7 @@ export function roomStyle(d: DungeonLayout, r: RoomLayout): RoomStyle {
 }
 
 /** The unit vectors, in a room's own frame (u across, v along), of the ways in and out: a doorway on that side. */
-const lanes = (r: RoomLayout): [number, number][] => r.doors.map((side) => {
+const lanes = (r: RoomLayout): [number, number][] => [...r.doors, ...r.windows].map((side) => { // (round 127: no pillar stands before a window)
   const [s, a] = [DIRS[side], DIRS[r.axis]];
   return [s.x * a.z - s.z * a.x, s.x * a.x + s.z * a.z];
 });

@@ -326,6 +326,7 @@ export const DUNGEON = {
 };
 
 export * from './bossTuning';
+export * from './levelTuning';
 export * from './fxTuning';
 export * from './lifeTuning';
 export * from './playTuning';

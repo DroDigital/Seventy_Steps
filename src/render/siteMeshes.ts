@@ -25,6 +25,7 @@ import { pillarFormOf, tinted } from './dungeonLook';
 import { pillarPieces } from './pillarForms';
 import type { PillarForm } from '../data/dungeonLooks';
 import { floorInlay } from './floorInlay';
+import { grateGeometry } from './grateShape';
 import type { ArenaPlace, Dungeon } from '../world/placements';
 import { box, tileUv, tint, worldUv } from './meshKit';
 import { mixRgb, scaleRgb, type Rgb } from './palette';
@@ -212,6 +213,8 @@ function partGeometry(p: Part, c: Rgb, kit: DungeonKit, at: Origin, ctx: WallCon
       return [{ kind: 'beam', geo: worldUv(box(w, h, d, x, y, z, WOOD, 1), at, 4) }]; // laid on the stone: relief, drawn nearer than what it rests on
     case 'none':
       return [];
+    case 'grate':
+      return [{ kind: 'trim', geo: grateGeometry(p.min, p.max) }]; // round 127: a window's bars, the room beyond seen between them
     case 'ceiling':
       return [{ kind: kit.roof === 'beams' ? 'wood' : 'wall', geo: worldUv(box(w, h, d, x, y, z, scaleRgb(c, 0.6), 2), at, kit.roof === 'beams' ? 4 : 2) }];
     case 'wall':

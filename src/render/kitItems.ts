@@ -276,12 +276,14 @@ export const KIT_ITEMS: Readonly<Record<KitItem, (f: Frame) => void>> = {
   rubble(f) {
     const drum = f.rng() < 0.4 ? (f.rng() - 0.5) * 1.2 : null; // a column's drum, fallen among the stones
     if (drum !== null) f.out.wall.push(onWall(f, tint(new THREE.CylinderGeometry(0.3, 0.3, 0.55, 9).rotateZ(Math.PI / 2).rotateY(f.rng()), scaleRgb(f.c, 0.85)), drum, 0.55, 0.3));
+    const laid: [number, number, number][] = [];
     for (let k = 0; k < 7; k++) {
       const r = 0.12 + f.rng() * 0.3;
       const [s, d] = [(f.rng() - 0.5) * 1.8, r + f.rng() * (1.08 - 2 * r)]; // (none in the wall, nor farther from it than an item stands)
       const c = scaleRgb(f.c, 0.62 + 0.16 * f.rng());
       if (drum !== null && Math.hypot(s - drum, d - 0.55) < 0.45 + r) continue; // (none lying in the drum: two stones of two tones in one another fight for the depth)
-      f.out.wall.push(blob(f, s, d, r, r * 0.4, c));
+      if (laid.some(([s2, d2, r2]) => Math.hypot(s - s2, d - d2) < r + r2)) continue; // (nor in one another, for the same reason: round 127's conduit in the Mi-Go cities had two)
+      f.out.wall.push(blob(f, s, d, r, r * 0.4, c)), laid.push([s, d, r]);
     }
   },
   bones(f) {

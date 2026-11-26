@@ -74,7 +74,8 @@ export const POIS_WAKING: readonly PoiDef[] = [
     line: 'A black hulk on the mountain, its stair worn smooth by feet that did not wear shoes.', foes: { ids: ['martense_degenerate', 'rat_swarm'], n: 7 }, hoard: 2400, flasks: 1 },
   { id: 'vermont_brook', region: 'vermont', at: { feature: 'grove', nth: 7 }, name: 'The Brook of Strange Bodies', kind: 'anomaly', story: 'The Whisperer in Darkness',
     line: 'After the flood, they say, the river carried something pink and many-limbed past the farms.', again: 'Something in the water shifts, many-jointed and careful.', fx: { form: 'sheet', hue: 'purple' }, aura: -0.3, insight: 1, hoard: 500 },
-  { id: 'vermont_black_stone', region: 'vermont', at: { near: [160, 430], as: 'cliff' }, name: 'The Black Stone of Dark Mountain', kind: 'rite', story: 'The Whisperer in Darkness',
+  // (round 127: the ledge it stood on near Dark Mountain was the edge of Akeley's farm's old ground, and went with it; it stands on the next ledge)
+  { id: 'vermont_black_stone', region: 'vermont', at: { near: [286, 226], as: 'cliff' }, name: 'The Black Stone of Dark Mountain', kind: 'rite', story: 'The Whisperer in Darkness',
     line: 'A black stone covered in writing, where the Outer Ones come to cut and bear away.', foes: { ids: ['mi_go', 'moon_bog_wraith'], n: 4 }, hoard: 2850, fx: { form: 'column', hue: 'magenta' }, aura: -0.25 },
   { id: 'vermont_farm', region: 'vermont', at: { feature: 'grove', nth: 3 }, name: "The Lonely Farm", kind: 'tale', story: 'The Whisperer in Darkness',
     line: 'The dog is chained and has not barked. The letters in the box all end the same way.', again: 'The wind has a buzzing in it, as of a voice using a machine.', aura: -0.2, insight: 1, hoard: 500 },

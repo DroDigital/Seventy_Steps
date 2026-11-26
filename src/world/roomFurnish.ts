@@ -69,6 +69,7 @@ export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: R
   const next = (): XZ => roomPoint(r, ...(ring.shift() ?? [0, 0]));
   if (d.ally) spawn({ id: `ally:${d.ally}`, entity: d.ally, region: region.id, at: { ...(d.allyAt ? roomPoint(r, ...d.allyAt) : next()), yaw: face }, unique: false }); // (round 123: at a place of its own, if it has one)
   (d.spawns ?? []).forEach((id, k) => spawn({ id: `room:${dungeon}:${d.id}:${k}`, entity: id, region: region.id, at: { ...next(), yaw: face }, unique: false }));
+  (d.lurk ?? []).forEach((id, k) => spawn({ id: `room:${dungeon}:${d.id}:lurk:${k}`, entity: id, region: region.id, at: { ...roomPoint(r, ...(s.lurk[k] ?? s.centre)), yaw: face }, unique: false, lurk: true })); // round 127: lying in wait, aside from the way in
   if (!d.boss) return hasRoomSet(`${dungeon}/${d.id}`) ? roomSetProps(`${dungeon}/${d.id}`, r, parts) : []; // (round 79: a room with a set of its own, data/roomSets.ts)
   const ax = DIRS[r.axis];
   const away = d.gate ? { x: ax.z, z: -ax.x } : ax; // the far side, or beside it when a gate stands there

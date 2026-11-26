@@ -11,6 +11,7 @@ import type { XZ } from '../core/geom';
 import { createRng, type Rng } from '../core/rng';
 import type { PropKind } from '../data/regions';
 import type { HouseStyle } from '../data/regionFeatures';
+import { houseAddons, houseFrame } from './houseAddons';
 import { makeProp, type Prop } from './props';
 
 export const FEATURE_KINDS = ['grove', 'graveyard', 'circle', 'ruin', 'outcrop', 'camp', 'landmark'] as const;
@@ -175,11 +176,15 @@ function camp(f: Feature, rng: Rng): Prop[] {
   return out;
 }
 
+/** Metres the great one at a landmark's heart stands at the least (round 127: Pnakotus's blocks are 4 to 7 high, and five hearts all drawn under six were no greater than the lesser about them). Its height only: its footprint, and so the land's fill, is as drawn. */
+const GREAT = 6.2;
+
 /** A realm's landmark (round 12): one great one at the heart, and two or three lesser about it. */
 function landmark(f: Feature, rng: Rng, ctx: FeatureContext): Prop[] {
   if (!ctx.landmark) return [];
   const kind = ctx.landmark;
-  const out = [makeProp(kind, f.x, f.z, rng)];
+  const heart = makeProp(kind, f.x, f.z, rng);
+  const out = [heart.h < GREAT ? { ...heart, h: GREAT } : heart];
   return [...out, ...scatter(f, rng, 2 + Math.floor(rng() * 2), 9, { ...ctx, free: (x, z) => ctx.free(x, z) && Math.hypot(x - f.x, z - f.z) > 8 }, () => kind).map((p) => ({ ...p, w: p.w * 0.6, d: p.d * 0.6, h: p.h * 0.55 }))];
 }
 
@@ -226,9 +231,15 @@ function farm(f: Filler, rng: Rng, ctx: FeatureContext): Prop[] {
   const barnSize: [number, number, number] = [5.5, 4, 5];
   const house = local(f, -(lane + size[0]), beyond + size[1]);
   const barn = local(f, lane + barnSize[0], beyond + barnSize[1]);
+  const offLane = (p: Prop): Prop => { // round 127: no wing on the lane's side, where it stood across the way out (Arkham, a yard of 878 cells shut by a barn's wing: sealWings.ts, walking from beside the wing, found it open)
+    const wing = houseAddons(p).wing;
+    if (!wing) return p;
+    const c = houseFrame(p)(wing.at, wing.z0);
+    return Math.abs(toLocal(f, c.x, c.z).x) < Math.abs(toLocal(f, p.x, p.z).x) ? { ...p, noWing: true } : p;
+  };
   const out: Prop[] = [
-    makeProp('house', house.x, house.z, rng, f.yaw, size, style),
-    makeProp('house', barn.x, barn.z, rng, f.yaw + (rng() < 0.5 ? 0 : Math.PI), barnSize, style),
+    offLane(makeProp('house', house.x, house.z, rng, f.yaw, size, style)),
+    offLane(makeProp('house', barn.x, barn.z, rng, f.yaw + (rng() < 0.5 ? 0 : Math.PI), barnSize, style)),
   ];
   out.push(...fenceRun(f, rng, { x: -hw, z: -hd }, { x: hw, z: -hd }), ...fenceRun(f, rng, { x: -hw, z: -hd }, { x: -hw, z: hd * 0.3 }), ...fenceRun(f, rng, { x: hw, z: -hd }, { x: hw, z: hd * 0.3 }));
   out.push(...fenceRun(f, rng, { x: -hw, z: -hd * 0.2 }, { x: -gate, z: -hd * 0.2 }), ...fenceRun(f, rng, { x: gate, z: -hd * 0.2 }, { x: hw, z: -hd * 0.2 }));
