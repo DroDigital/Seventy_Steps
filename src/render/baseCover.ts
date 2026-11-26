@@ -46,10 +46,10 @@ function root(b: Builder, x: number, y: number, z: number, a: number, r0: number
   b.tri([foot[0] + nx * w, y + 0.34, foot[1] + nz * w], [foot[0] + nx * w * 0.2, y + 0.02, foot[1] + nz * w * 0.2], tip, light, dark, dark);
 }
 
-/** The chunk's base cover as a geometry per material (leaf: plants; stone: pebbles; wood: roots), built a few props at a time. */
+/** The chunk's base cover as a geometry per material (foliage: plants; stone: pebbles; wood: roots), built a few props at a time. */
 export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: readonly RoadSeg[], done: (cover: Partial<Record<PropMat, THREE.BufferGeometry>>) => void): Generator<void, void> {
   const cover = COVER[region.biome.texture];
-  const [leaf, stone, wood] = [new Builder(true), new Builder(), new Builder(true)];
+  const [leaf, stone, wood] = [new Builder(true), new Builder(), new Builder(true, true)]; // (the roots are wood, which culls: both windings)
   const own = region.id in REGION_COVER;
   const lush = Math.min(2, Math.sqrt(CLIMATES[region.id]?.cover ?? 1)); // round 116: thicker where the realm grows thicker (data/foliage.ts)
   if (cover.mix.length) {
@@ -86,7 +86,7 @@ export function* baseCoverJob(props: readonly Prop[], region: RegionDef, roads: 
   }
   const out: Partial<Record<PropMat, THREE.BufferGeometry>> = {};
   const [lg, sg, wg] = [leaf.geometry(), stone.geometry(), wood.geometry()];
-  if (lg) out.leaf = lg;
+  if (lg) out.foliage = lg; // round 125: what grows, cut out of the leaf atlas
   if (sg) out.stone = sg;
   if (wg) out.wood = wg;
   done(out);

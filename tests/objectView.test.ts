@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { loadFlora } from '../src/render/floraData';
 import { createRng } from '../src/core/rng';
 import { PROP_KINDS } from '../src/data/regions';
 import type { HouseStyle } from '../src/data/regionFeatures';
@@ -22,6 +23,14 @@ import type * as THREE from 'three';
 const SMALL: ReadonlySet<string> = new Set(['grave', 'firepit', 'bush', 'fence', 'altar']);
 const STYLES: readonly HouseStyle[] = ['clapboard', 'brick', 'hovel'];
 const RELIEF: ReadonlySet<string> = new Set(['trim', 'pane']);
+/**
+ * Round 125: what grows is leaf cards cut out of the atlas, drawn from both sides and crossing one another and the boughs that hold them,
+ * as a crown's clumps always did: it is not a surface this audit can hold. And a library tree's bark is one mesh whose boughs leave their
+ * parents (and roots the flared foot) through its skin, a darker collar at the join: its own skins crossing there are a join, not a fight.
+ */
+const GROWS = (key: string, kind: string): boolean => key.includes('foliage:') || ((kind === 'tree' || kind === 'pine') && /^wood:(\S+) ~ wood:\1 /.test(key));
+
+beforeAll(loadFlora); // (the trees, conifers and bushes are the flora library's)
 
 describe('what the eye meets of a prop or a house (round 21)', () => {
   it('houses, rocks, trees, pillars and the realms landmarks show no hole and no fight', () => {
@@ -34,7 +43,7 @@ describe('what the eye meets of a prop or a house (round 21)', () => {
           const pieces = kind === 'house' ? housePieces(p, [0.6, 0.6, 0.58]) : solids(propPieces(p, [0.6, 0.6, 0.58]));
           const parts = pieces.map((q, i) => ({ tag: `${kind}${style ? `/${style}` : ''}/${q.mat}${i}`, tex: RELIEF.has(q.mat) ? `${q.mat}+` : q.mat, geo: q.geo }));
           objects++;
-          for (const f of auditObject(parts)) if (!(kind === 'tree' && f.key.startsWith('leaf:tree'))) found.push(`${kind}${style ? `/${style}` : ''} seed ${seed}: ${f.kind} ${f.key}`); // a tree's leaves are round clumps that cross one another: their surfaces meet along a line, they do not lie one over another
+          for (const f of auditObject(parts)) if (!(kind === 'tree' && f.key.startsWith('leaf:tree')) && !GROWS(f.key, kind)) found.push(`${kind}${style ? `/${style}` : ''} seed ${seed}: ${f.kind} ${f.key}`); // a tree's leaves are round clumps that cross one another: their surfaces meet along a line, they do not lie one over another
         }
       }
     }
@@ -46,7 +55,7 @@ describe('what the eye meets of a prop or a house (round 21)', () => {
     const found: string[] = [];
     const look = (tag: string, pieces: readonly { mat: string; geo: THREE.BufferGeometry }[], leafy: boolean): string[] => {
       const parts = pieces.map((q, i) => ({ tag: `${tag}/${q.mat}${i}`, tex: RELIEF.has(q.mat) ? `${q.mat}+` : q.mat, geo: q.geo }));
-      return auditObject(parts).filter((f) => !(leafy && f.key.startsWith('leaf:'))).map((f) => `${tag}: ${f.kind} ${f.key}`); // a crown's clumps and caps cross one another, as a tree's always did
+      return auditObject(parts).filter((f) => !(leafy && f.key.startsWith('leaf:')) && !GROWS(f.key, tag.split(':')[0])).map((f) => `${tag}: ${f.kind} ${f.key}`); // a crown's clumps and caps cross one another, as a tree's always did
     };
     const see = (tag: string, pieces: readonly { mat: string; geo: THREE.BufferGeometry }[], leafy: boolean): void => void found.push(...look(tag, pieces, leafy));
     for (const [kind, key] of FORM_KEYS) {

@@ -10,7 +10,9 @@ import type { Rng } from '../core/rng';
 import { PIECE_COLORS } from '../data/coverKinds';
 import type { Under } from '../data/foliage';
 import { lookOf, type PropLook } from '../data/propLooks';
-import { COLORS, GAIN, fernAt, shade, type Builder } from './groundCover';
+import { COLORS, GAIN, clump, fernAt, shade, type Builder } from './groundCover';
+import { floraFor, floraGeometry, FLORA_LEAF_GAIN } from './floraKit';
+import { paletteOf } from './floraColours';
 
 type Rgb = readonly [number, number, number];
 type V = readonly [number, number, number];
@@ -39,7 +41,25 @@ function stem(b: Builder, x: number, y: number, z: number, h: number, r: number,
   }
 }
 
+/**
+ * Round 125: a plant of the library (render/floraKit.ts) laid into the cover at (x, y, z), `h` tall (and `w` across its crown's half,
+ * for a bush), turned its own way, in its realm's colours; false if the library is not read (the old lumps are drawn instead).
+ */
+function plant(b: Builder, rng: Rng, kind: string, form: string, x: number, y: number, z: number, h: number, w: number | null, look: PropLook): boolean {
+  const m = floraFor(kind, form, Math.floor(rng() * 1e6));
+  if (!m) return false;
+  const sy = h / m.info.h;
+  const sx = w === null ? sy * (0.85 + 0.3 * rng()) : w / Math.max(m.info.crown[3], m.info.crown[5], 0.1);
+  const g = floraGeometry(m, { sy, sx, trunk: 1, fork: 0, turn: rng() * Math.PI * 2, height: h }, paletteOf(look, form, Math.floor(rng() * 4)), rng(), 0.85 + 0.25 * rng(), !!look.snow, FLORA_LEAF_GAIN);
+  if (g.wood) b.merge(g.wood, x, y - 0.05, z, false);
+  if (g.foliage) b.merge(g.foliage, x, y - 0.05, z, true);
+  g.wood?.dispose();
+  g.foliage?.dispose();
+  return true;
+}
+
 function shrub(b: Builder, rng: Rng, x: number, y: number, z: number, look: PropLook): void {
+  if (plant(b, rng, 'bush', 'round', x, y, z, 0.7 + 0.5 * rng(), 0.45 + 0.35 * rng(), look)) return;
   const n = 3 + Math.floor(rng() * 3);
   for (let i = 0; i < n; i++) {
     const [ox, oz] = [(rng() - 0.5) * 0.7, (rng() - 0.5) * 0.7];
@@ -51,6 +71,7 @@ function shrub(b: Builder, rng: Rng, x: number, y: number, z: number, look: Prop
 
 function sapling(b: Builder, rng: Rng, x: number, y: number, z: number, look: PropLook): void {
   const h = 1.6 + 1.3 * rng();
+  if (plant(b, rng, 'under', 'sapling', x, y, z, h, null, look)) return;
   const [lx, lz] = [(rng() - 0.5) * 0.3, (rng() - 0.5) * 0.3];
   stem(b, x, y, z, h, 0.035 + 0.02 * rng(), lx, lz, shade(look.bark, GAIN * 0.9), 0.08);
   for (let i = 0; i < 3 + Math.floor(rng() * 2); i++) { // a crown of several small clusters, not one ball
@@ -61,6 +82,7 @@ function sapling(b: Builder, rng: Rng, x: number, y: number, z: number, look: Pr
 
 function fir(b: Builder, rng: Rng, x: number, y: number, z: number, look: PropLook): void {
   const h = 1.1 + 1.4 * rng();
+  if (plant(b, rng, 'under', 'fir', x, y, z, h, null, look)) return;
   stem(b, x, y, z, h * 0.35, 0.04, 0, 0, shade(look.bark, GAIN * 0.8), 0.01);
   const c = shade(look.needles, GAIN * (0.9 + 0.2 * rng()));
   for (let t = 0; t < 3; t++) { // tiers, each a five-sided skirt narrowing up
@@ -78,7 +100,8 @@ function ferns(b: Builder, rng: Rng, x: number, y: number, z: number): void {
 }
 
 function cattails(b: Builder, rng: Rng, x: number, y: number, z: number): void {
-  for (let i = 0; i < 8 + Math.floor(rng() * 7); i++) {
+  for (let i = 0; i < 3 + Math.floor(rng() * 3); i++) clump(b, rng, x + (rng() - 0.5) * 0.9, y, z + (rng() - 0.5) * 0.9, 1.1 + 0.6 * rng(), 0.6, pick(COLORS.reed, rng), 'reeds', 2); // round 125: the atlas's reeds and their heads
+  for (let i = 0; i < 3 + Math.floor(rng() * 3); i++) {
     const [rx, rz] = [x + (rng() - 0.5) * 0.9, z + (rng() - 0.5) * 0.9];
     const h = 1.1 + 0.6 * rng();
     const [lx, lz] = [(rng() - 0.5) * 0.25, (rng() - 0.5) * 0.25];
@@ -89,6 +112,7 @@ function cattails(b: Builder, rng: Rng, x: number, y: number, z: number): void {
 }
 
 function scrub(b: Builder, rng: Rng, x: number, y: number, z: number, look: PropLook): void {
+  if (plant(b, rng, 'bush', 'scrub', x, y, z, 0.5 + 0.35 * rng(), 0.35 + 0.25 * rng(), look)) return;
   const c = shade(look.bark, GAIN);
   for (let i = 0; i < 10; i++) {
     const a = rng() * Math.PI * 2;
@@ -100,6 +124,7 @@ function scrub(b: Builder, rng: Rng, x: number, y: number, z: number, look: Prop
 
 function brush(b: Builder, rng: Rng, x: number, y: number, z: number, look: PropLook): void {
   const c = shade(look.bark, GAIN * 0.85);
+  clump(b, rng, x, y, z, 0.7 + 0.6 * rng(), 0.8 + 0.4 * rng(), shade(c, 1.2), 'bare', 3); // round 125: the atlas's bare twigs, a dead brush's lace
   for (let i = 0; i < 7 + Math.floor(rng() * 5); i++) {
     const a = rng() * Math.PI * 2;
     const len = 0.6 + 0.6 * rng();

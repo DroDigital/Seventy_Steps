@@ -18,6 +18,7 @@ import type { FxParams } from './fx';
 import type { Particles } from './particles';
 import { wetness } from './wetness';
 import { worldUniforms } from './worldMaterial';
+import { turnWind } from './windField';
 
 const BOX = 15; // metres about the lens the rain falls in
 const TOP = 9;
@@ -106,6 +107,7 @@ export function createWeatherFx(scene: THREE.Scene, g: Game, particles: Particle
       const skin = (over.skin = skinOf(g.overworld?.region)); // (round 80: the land's own matter)
       const blow = windOfSkin(skin, kind, amount);
       worldUniforms.uWind.value = blow.sway; // the trees and the grass bend with it (round 34)
+      turnWind(g.overworld?.region ?? undefined, dt, worldUniforms.uWindDir.value); // round 125: down the realm's own wind, turned to slowly (render/windField.ts)
       wind.x = blow.slant;
       wind.z = blow.slant * 0.4;
       const cam = camera.position;
