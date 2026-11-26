@@ -35,5 +35,5 @@ export const LEAF_SOUND = {
   rain: 0.55, // the share of the leaves the rain drowns
   spread: 0.65, // how far apart each bed's two readers are panned
   lean: 0.35, // how far the beds lean toward the side the trees stand on
-  creak: { every: 34, gap: 9, range: 30, near: [4, 24] as const, least: 0.18 }, // a trunk's groan: once in `every` s at a full gust, never within `gap` s of the last, from a tree `near` m off
+  creak: { every: 34, gap: 9, range: 30, near: [4, 24] as const, least: 0.18, height: 3 }, // a trunk's groan (heard `height` m up its trunk): once in `every` s at a full gust, never within `gap` s of the last, from a tree `near` m off
 } as const;

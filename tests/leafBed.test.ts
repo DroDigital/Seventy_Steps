@@ -49,6 +49,7 @@ describe('the trees heard (round 126)', () => {
     expect(fir.canopy).toBe(0);
     expect(Math.hypot(...oak.side)).toBeLessThanOrEqual(1.0001);
     expect(oak.trunks.length).toBeGreaterThan(0);
+    for (const t of oak.trunks) expect(Number.isFinite(t.y), 'a creak is placed on the ground its tree stands on').toBe(true);
   });
 
   it('swells in a gust, heaves its boughs in a gale, and is calmer, never silent, in a lull', () => {

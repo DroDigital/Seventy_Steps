@@ -29,7 +29,7 @@ export interface Stand {
   broad: number; // the broadleaf trees and bushes about the listener, 0..1
   conifer: number; // the conifers
   side: [number, number]; // which way the stand lies from the listener (x, z), its length the share of it that is to one side
-  trunks: { x: number; z: number }[]; // the trees near enough to be heard creak
+  trunks: { x: number; y: number; z: number }[]; // the trees near enough to be heard creak (y: the ground they stand on)
 }
 
 /** What stands about (x, z): the trees, conifers and bushes within reach, the nearer the more. */
@@ -49,7 +49,7 @@ export function standAt(x: number, z: number): Stand {
         else broad += k;
         if (d > 0.5) [sx, sz] = [sx + (k * (p.x - x)) / d, sz + (k * (p.z - z)) / d];
         sum += k;
-        if (p.kind !== 'bush' && d >= L.creak.near[0] && d <= L.creak.near[1] && trunks.length < 12) trunks.push({ x: p.x, z: p.z });
+        if (p.kind !== 'bush' && d >= L.creak.near[0] && d <= L.creak.near[1] && trunks.length < 12) trunks.push({ x: p.x, y: p.y, z: p.z });
       }
     }
   }
@@ -91,7 +91,7 @@ export function creaks(trees: number, gust: number, wind: number, since: number,
   return rand < (dt / L.creak.every) * trees * (0.25 + 1.75 * gust * gust);
 }
 
-export function createLeafBed(e: AudioEngine, sampler: Sampler, right: { x: number; z: number }, onCreak: (x: number, z: number, gain: number) => void): LeafBed {
+export function createLeafBed(e: AudioEngine, sampler: Sampler, right: { x: number; z: number }, onCreak: (at: { x: number; y: number; z: number }, gain: number) => void): LeafBed {
   let apply: ((l: LeafLevels, lean: number) => void) | null = null;
   let stand: Stand = { broad: 0, conifer: 0, side: [0, 0], trunks: [] };
   let [measured, lastTime, lastCreak, asked] = [-1, -1, -Infinity, false];
@@ -160,7 +160,7 @@ export function createLeafBed(e: AudioEngine, sampler: Sampler, right: { x: numb
       if (!inside && stand.trunks.length && creaks(all, gust, wind, time - lastCreak, dt, Math.random())) {
         lastCreak = time;
         const tr = stand.trunks[Math.floor(Math.random() * stand.trunks.length)];
-        onCreak(tr.x, tr.z, (0.55 + 0.45 * gust) * (1 - 0.4 * Math.min(1, rain)));
+        onCreak({ x: tr.x, y: tr.y + L.creak.height, z: tr.z }, (0.55 + 0.45 * gust) * (1 - 0.4 * Math.min(1, rain)));
       }
     },
   };

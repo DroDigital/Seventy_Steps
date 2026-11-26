@@ -122,7 +122,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
     const { gain, pan, lowpass } = place(at, range);
     return gain > 0 && sampler.play(setOf(id), { gain: gain * (o.gain ?? 1), pan: at ? pan : o.pan ?? pan, pitch: o.pitch, delay: o.delay, fit: o.fit, lowpass: at ? lowpass : undefined });
   };
-  const leafBed = createLeafBed(e, sampler, right, (x, z, gain) => void recorded('treeCreak', { x, y: 3, z }, LEAF_SOUND.creak.range, { gain })); // round 125 (recorded in round 126): the trees about the investigator, and a trunk's groan in a gust
+  const leafBed = createLeafBed(e, sampler, right, (at, gain) => void recorded('treeCreak', at, LEAF_SOUND.creak.range, { gain })); // round 125 (recorded in round 126): the trees about the investigator, and a trunk's groan in a gust
   const varier = createVarier(); // round 40: a recipe is drawn a little anew each time it plays, and never at the last play's pitch
   /** A recipe where `at` is: placed, dulled by the distance, varied. */
   const recipe: GameAudio['recipe'] = (key, sound, o = {}) => {
