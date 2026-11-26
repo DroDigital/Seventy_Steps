@@ -9,6 +9,7 @@ import { INTRO, introText } from '../src/data/intro';
 import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
+import { QUESTS } from '../src/data/quests';
 import { RUMORS } from '../src/data/rumors';
 import type { StoryDomain } from '../src/data/lang/story';
 
@@ -30,4 +31,8 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
   overheard: () => new Map(Object.entries(OVERHEARD).map(([id, said]) => [id, lines(...said)])),
   fates: () =>
     new Map(Object.entries(FATES).map(([id, f]) => [id, lines(f.done, f.undone, ...Object.values(f.endings ?? {}), ...Object.values(f.undoneEndings ?? {}))])),
+  // the quests: a title, each stage's line in the journal, the line once done. A horror's discovery (`discover_<horror>`) is left out:
+  // round 69 switched the discoveries off (systems/discovery.ts), so none begins and none is shown (docs/LOCALIZATION.md)
+  quests: () =>
+    new Map(Object.entries(QUESTS).filter(([id]) => !id.startsWith('discover_')).map(([id, q]) => [id, lines(q.title, ...q.stages.map((s) => s.note), q.done)])),
 };

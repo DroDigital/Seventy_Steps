@@ -8,7 +8,7 @@
  */
 
 import type { XZ } from '../core/geom';
-import { t as tr } from '../core/i18n';
+import { story, t as tr } from '../core/i18n';
 import type { Game } from '../systems/components';
 import { engagedFights } from '../systems/bossFight';
 import { currentLead } from '../systems/lead';
@@ -56,7 +56,7 @@ export function createQuestTracker(g: Game, root: HTMLElement, shown: () => bool
           const words = briefLine(lead.goal, sealsBroken(g));
           if (`${lead.title}|${words}` !== key) {
             [key, since] = [`${lead.title}|${words}`, now]; // a first sight stands out, and so does a stage that moves on
-            setText(title, lead.title);
+            setText(title, story(lead.title));
             setText(line, words);
           }
           at = lead.at;

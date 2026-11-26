@@ -5,6 +5,7 @@ import { DE_FATES } from './fates';
 import { DE_INTRO } from './intro';
 import { DE_OVERHEARD } from './overheard';
 import { DE_PEOPLE } from './people';
+import { DE_QUESTS } from './quests';
 import { DE_RUMORS } from './rumors';
 
 export const DE_STORY: StoryBook = {
@@ -13,4 +14,5 @@ export const DE_STORY: StoryBook = {
   rumors: DE_RUMORS,
   overheard: DE_OVERHEARD,
   fates: DE_FATES,
+  quests: DE_QUESTS,
 };

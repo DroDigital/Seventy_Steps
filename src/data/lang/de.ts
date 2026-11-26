@@ -1,6 +1,7 @@
 /** Deutsch (core/i18n.ts). Alle Schlüssel des englischen Originals; die Erzählung und die Stimmen bleiben vorerst englisch. */
 
 import type { Key } from './en';
+import { DE_PAGES } from './pages/de';
 
 export const DE: Readonly<Record<Key, string>> = {
   'keys.back': "Zurück",
@@ -443,4 +444,5 @@ export const DE: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Unter einem Hieb hindurchrollen",
   'tip.heal.inject': "Wests Reagenz spritzen · schließt Wunden",
   'tip.mount.call': "Den Wagen rufen",
+  ...DE_PAGES, // (1.5.0)
 };

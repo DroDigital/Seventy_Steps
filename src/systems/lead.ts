@@ -6,6 +6,7 @@
  * 17, leadWay.ts). A side quest followed from the journal leads in its place. Pure: no Three.js.
  */
 
+import { story, t } from '../core/i18n';
 import { distXZ, type XZ } from '../core/geom';
 import { ARENA_WAYS } from '../data/arenaWaysAll';
 import { DISCOVERIES } from '../data/discoveriesAll';
@@ -94,7 +95,7 @@ function sealLead(g: Game, count: number, note: string): Omit<Lead, 'title'> {
       if (far < best) [at, best] = [p, far];
     }
   }
-  return { text: `${note} (${Math.min(count, sealsBroken(g))} of ${count} have fallen.)`, at: at && wayTo(g, from, at), goal: { kind: 'seals', count } };
+  return { text: `${story(note)} ${t('lead.fallen', { n: Math.min(count, sealsBroken(g)), of: count })}`, at: at && wayTo(g, from, at), goal: { kind: 'seals', count } };
 }
 
 /** The lead a quest's open stage gives: what to do, and where. */
@@ -106,7 +107,7 @@ function stageLead(g: Game, id: string, stage: number): Lead {
   const run = rite && wayRuns(g).find((r) => r.plan.boss === goal.boss);
   const light = run && run.lights.find((l) => !l.lit && l.rank === run.progress);
   const at = light ? { x: light.x, z: light.z } : goalPlace(goal);
-  const text = q.stages[stage].note + (rite ? ' Approach a light to kindle it, or interact when nearby. The marker follows the next light.' : '');
+  const text = story(q.stages[stage].note) + (rite ? ` ${t('lead.rite')}` : '');
   return { text, at: at && wayTo(g, me(g), at), title: q.title, goal };
 }
 
@@ -124,9 +125,10 @@ export function mainLead(g: Game): Lead | null {
     if (stage !== UNSTARTED) return stageLead(g, id, stage);
     const giver = NPCS.find((n) => n.topics.some((t) => t.starts === id));
     if (!giver) continue;
-    const sign = worldLayout().signs.find((s) => s.id === giver.sign)?.name ?? 'an Elder Sign';
+    const signName = worldLayout().signs.find((s) => s.id === giver.sign)?.name;
+    const sign = signName ? story(signName) : t('lead.anySign');
     const place = npcAt(giver.id);
-    return { text: `Speak with ${giver.name}, by the Elder Sign at ${sign}.`, at: place && wayTo(g, me(g), place), title: q.title, goal: { kind: 'talk', npc: giver.id } };
+    return { text: t('lead.speak', { name: story(giver.name), sign }), at: place && wayTo(g, me(g), place), title: q.title, goal: { kind: 'talk', npc: giver.id } };
   }
   return null;
 }

@@ -5,6 +5,7 @@ import { FR_FATES } from './fates';
 import { FR_INTRO } from './intro';
 import { FR_OVERHEARD } from './overheard';
 import { FR_PEOPLE } from './people';
+import { FR_QUESTS } from './quests';
 import { FR_RUMORS } from './rumors';
 
 export const FR_STORY: StoryBook = {
@@ -13,4 +14,5 @@ export const FR_STORY: StoryBook = {
   rumors: FR_RUMORS,
   overheard: FR_OVERHEARD,
   fates: FR_FATES,
+  quests: FR_QUESTS,
 };

@@ -1,6 +1,7 @@
 /** Español (core/i18n.ts). Todas las claves del original inglés; el relato y las voces siguen en inglés por ahora. */
 
 import type { Key } from './en';
+import { ES_PAGES } from './pages/es';
 
 export const ES: Readonly<Record<Key, string>> = {
   'keys.back': "Volver",
@@ -443,4 +444,5 @@ export const ES: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Rueda bajo un golpe",
   'tip.heal.inject': "Inyecta el Reactivo de West · cierra heridas",
   'tip.mount.call': "Llamar al carro",
+  ...ES_PAGES, // (1.5.0)
 };

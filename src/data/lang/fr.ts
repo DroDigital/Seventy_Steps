@@ -1,6 +1,7 @@
 /** Français (core/i18n.ts). Toutes les clés de l’original anglais ; le récit et les voix restent en anglais pour l’instant. */
 
 import type { Key } from './en';
+import { FR_PAGES } from './pages/fr';
 
 export const FR: Readonly<Record<Key, string>> = {
   'keys.back': "Retour",
@@ -443,4 +444,5 @@ export const FR: Readonly<Record<Key, string>> = {
   'tip.dodge.roll': "Rouler sous un coup",
   'tip.heal.inject': "Injecter le Réactif de West · ferme les plaies",
   'tip.mount.call': "Appeler le char",
+  ...FR_PAGES, // (1.5.0)
 };
