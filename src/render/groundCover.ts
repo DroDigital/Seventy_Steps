@@ -58,92 +58,62 @@ export const COLORS: Readonly<Record<Kind, readonly Rgb[]>> = {
   bramble: [[0.34, 0.3, 0.24], [0.4, 0.34, 0.26]],
 };
 
-export class Builder {
-  constructor(private readonly swaying = false) {} // a geometry that is blown carries aSway for it; one that is not (stones) must not, or it will not merge with the props' (propMeshes.ts)
-  pos: number[] = [];
-  col: number[] = [];
-  nor: number[] = [];
-  uv: number[] = [];
-  sway: number[] = [];
-  index: number[] = []; // round 116: three corners a triangle, its two faces two orders of them (the cover grew thicker: half the corners to move)
-  private corner(p: readonly number[], col: Rgb, s: number): number {
-    this.sway.push(s);
-    this.pos.push(p[0], p[1], p[2]);
-    this.col.push(col[0], col[1], col[2]);
-    this.nor.push(0, 1, 0); // lit as the ground is
-    this.uv.push(p[0] * 0.5, p[1] * 0.5);
-    return this.pos.length / 3 - 1;
-  }
-  /** A triangle seen from both sides (the world's materials cull back faces); `sway`: how far each corner is blown (metres: the tip of a blade, nothing at its foot). */
-  tri(a: readonly number[], b: readonly number[], c: readonly number[], ca: Rgb, cb: Rgb, cc: Rgb, sway: readonly [number, number, number] = [0, 0, 0]): void {
-    const [i, j, k] = [this.corner(a, ca, sway[0]), this.corner(b, cb, sway[1]), this.corner(c, cc, sway[2])];
-    this.index.push(i, j, k, j, i, k);
-  }
-  /** Round 116: a triangle seen from its front only (wound counter-clockwise as seen), for the closed lumps of the undergrowth. */
-  face(a: readonly number[], b: readonly number[], c: readonly number[], ca: Rgb, cb: Rgb, cc: Rgb, sway: readonly [number, number, number] = [0, 0, 0]): void {
-    this.index.push(this.corner(a, ca, sway[0]), this.corner(b, cb, sway[1]), this.corner(c, cc, sway[2]));
-  }
-  geometry(): THREE.BufferGeometry | null {
-    if (!this.pos.length) return null;
-    const g = new THREE.BufferGeometry();
-    g.setIndex(this.index);
-    g.setAttribute('position', new THREE.Float32BufferAttribute(this.pos, 3));
-    g.setAttribute('normal', new THREE.Float32BufferAttribute(this.nor, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(this.col, 3));
-    g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uv, 2));
-    if (this.swaying) g.setAttribute('aSway', new THREE.Float32BufferAttribute(this.sway, 1));
-    return g;
-  }
-}
+import { Builder, GAIN, shade } from './coverBuilder';
+import type { FoliageCell } from './textureFoliage';
 
-export const shade = (c: Rgb, k: number): Rgb => [c[0] * k, c[1] * k, c[2] * k];
-export const GAIN = 1.8; // textures average about half brightness: vertex colours are raised to show their own
+export { Builder, GAIN, shade };
+type V = readonly [number, number, number];
 
-/** Blades from (x, y, z), each a thin triangle leaning out, both faces. */
+/** Blades from (x, y, z), each a thin triangle leaning out (drawn from both sides by its material). */
 function blades(b: Builder, rng: Rng, x: number, y: number, z: number, n: number, h: number, w: number, c: Rgb): void {
   for (let i = 0; i < n; i++) {
     const a = rng() * Math.PI * 2;
     const [s, co] = [Math.sin(a), Math.cos(a)];
     const len = h * (0.6 + 0.6 * rng());
     const lean = 0.15 + 0.35 * rng();
-    const base0 = [x - co * w, y, z + s * w];
-    const base1 = [x + co * w, y, z - s * w];
-    const tip = [x + s * len * lean, y + len, z + co * len * lean];
+    const tip: V = [x + s * len * lean, y + len, z + co * len * lean];
     const dark = shade(c, 0.6);
-    b.tri(base0, base1, tip, dark, dark, c, [0, 0, 0.16 * len]); // the tip is blown, the foot is not
+    b.tri([x - co * w, y, z + s * w], [x + co * w, y, z - s * w], tip, dark, dark, c, [0, 0, 0.16 * len]); // the tip is blown, the foot is not
   }
 }
 
-/** A fern: a crown of arching fronds, each rising and bending over to its tip. */
+/**
+ * Round 125: a clump as cards of the leaf atlas, `n` crossed planes rooted at (x, y, z), `h` tall and `w` wide, leaning a little
+ * each its own way, dark at the root and pale at the tips (a tuft of grass, a clump gone to seed, reeds, a bramble's canes).
+ */
+export function clump(b: Builder, rng: Rng, x: number, y: number, z: number, h: number, w: number, c: Rgb, cell: FoliageCell, n = 2): void {
+  const a0 = rng() * Math.PI;
+  const phase = rng();
+  for (let k = 0; k < n; k++) {
+    const a = a0 + (k * Math.PI) / n + (rng() - 0.5) * 0.5;
+    const hh = h * (0.85 + 0.3 * rng());
+    b.card([x, y - 0.03, z], [(rng() - 0.5) * 0.3 * hh, hh, (rng() - 0.5) * 0.3 * hh], [Math.cos(a) * w * 0.5, 0, Math.sin(a) * w * 0.5], cell, shade(c, 0.5), shade(c, 1.12), 0.16 * hh, 0.8, phase + k * 0.13);
+  }
+}
+
+/** A fern: a rosette of fronds from its crown, each leaning out and turned up to the sky (round 125: the atlas's frond). */
 export function fernAt(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
   const n = 6 + Math.floor(rng() * 4);
+  const phase = rng();
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 + rng() * 0.5;
     const [s, co] = [Math.sin(a), Math.cos(a)];
-    const len = 0.55 + 0.35 * rng();
-    const w = 0.06;
-    const rise = [x + s * len * 0.4, y + len * 0.7, z + co * len * 0.4];
-    const tip = [x + s * len, y + len * 0.5, z + co * len];
-    const [dark, light] = [shade(c, 0.6), shade(c, 1.1)];
-    b.tri([x - co * w, y, z + s * w], [x + co * w, y, z - s * w], rise, dark, dark, c, [0, 0, 0.05 * len]);
-    b.tri([rise[0] - co * w * 1.6, rise[1], rise[2] + s * w * 1.6], [rise[0] + co * w * 1.6, rise[1], rise[2] - s * w * 1.6], tip, c, c, light, [0.05 * len, 0.05 * len, 0.2 * len]);
+    const len = 0.6 + 0.4 * rng();
+    const tilt = 0.6 + 0.5 * rng(); // radians from upright
+    const up: V = [s * Math.sin(tilt) * len, Math.cos(tilt) * len, co * Math.sin(tilt) * len];
+    b.card([x + s * 0.04, y - 0.02, z + co * 0.04], up, [co * len * 0.28, 0, -s * len * 0.28], 'frond', shade(c, 0.6), shade(c, 1.1), 0.05 + 0.1 * len, 0.7, phase + i * 0.07, [s * 0.5, 0.86, co * 0.5]);
   }
 }
 
-/** Tall seeding grass: long stems, a pale seed head at the tip of each. */
+/** Tall seeding grass: crossed clumps of the atlas's grass, its seed heads pale at the tips. */
 function tallgrass(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
-  blades(b, rng, x, y, z, 5 + Math.floor(rng() * 4), 0.95, 0.04, c);
-  const head = shade(c, 1.3);
-  for (let i = 0; i < 3; i++) {
-    const [hx, hz] = [x + (rng() - 0.5) * 0.3, z + (rng() - 0.5) * 0.3];
-    const hy = y + 0.8 + 0.25 * rng();
-    b.tri([hx - 0.03, hy, hz], [hx + 0.03, hy, hz], [hx, hy + 0.2, hz + 0.02], head, head, shade(head, 1.1), [0.12, 0.12, 0.2]);
-  }
+  clump(b, rng, x, y, z, 0.8 + 0.35 * rng(), 0.55 + 0.15 * rng(), c, 'grass', 3);
 }
 
 /** A few stems and a blossom each, small and pale (a flower here is a speck of colour in the grass, not a bed). */
 function flower(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
   const stem = shade([0.4, 0.5, 0.32], GAIN);
+  clump(b, rng, x, y, z, 0.3 + 0.1 * rng(), 0.4, shade(stem, 0.75), 'grass');
   for (let i = 0; i < 3; i++) {
     const [fx, fz] = [x + (rng() - 0.5) * 0.5, z + (rng() - 0.5) * 0.5];
     const h = 0.35 + 0.25 * rng();
@@ -164,16 +134,16 @@ function mushroom(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb)
     const r = 0.05 + 0.07 * rng();
     const stem = shade([0.8, 0.78, 0.7], GAIN * 0.6);
     b.tri([mx - 0.012, y, mz], [mx + 0.012, y, mz], [mx, y + h, mz], stem, stem, stem);
-    const top = [mx, y + h + r * 0.55, mz];
-    const ring = [0, 1, 2, 3, 4].map((k) => [mx + Math.cos((k / 5) * Math.PI * 2) * r, y + h, mz + Math.sin((k / 5) * Math.PI * 2) * r]);
+    const top: V = [mx, y + h + r * 0.55, mz];
+    const ring: V[] = [0, 1, 2, 3, 4].map((k) => [mx + Math.cos((k / 5) * Math.PI * 2) * r, y + h, mz + Math.sin((k / 5) * Math.PI * 2) * r]);
     for (let k = 0; k < 5; k++) b.tri(ring[k], ring[(k + 1) % 5], top, shade(c, 0.8), shade(c, 0.8), c);
   }
 }
 
-/** A tangle of dark thorny stems, low and dense. */
+/** A tangle of dark thorny canes, low and dense (round 125: the atlas's thorn, with a few bare stems). */
 function bramble(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): void {
-  blades(b, rng, x, y, z, 11, 0.7, 0.025, c);
-  blades(b, rng, x + (rng() - 0.5) * 0.3, y, z + (rng() - 0.5) * 0.3, 7, 0.5, 0.025, shade(c, 0.85));
+  clump(b, rng, x, y, z, 0.5 + 0.25 * rng(), 0.6 + 0.2 * rng(), c, 'thorn');
+  blades(b, rng, x, y, z, 4, 0.6, 0.025, shade(c, 0.85));
 }
 
 /** A small rounded stone: a squat octahedron. */
@@ -181,30 +151,31 @@ function pebble(b: Builder, rng: Rng, x: number, y: number, z: number, c: Rgb): 
   const r = 0.07 + 0.14 * rng();
   const h = r * (0.5 + 0.4 * rng());
   const a = rng() * Math.PI;
-  const ring = [0, 1, 2, 3].map((k) => [x + Math.cos(a + (k * Math.PI) / 2) * r, y + h * 0.3, z + Math.sin(a + (k * Math.PI) / 2) * r]);
-  const top = [x, y + h, z];
+  const ring: V[] = [0, 1, 2, 3].map((k) => [x + Math.cos(a + (k * Math.PI) / 2) * r, y + h * 0.3, z + Math.sin(a + (k * Math.PI) / 2) * r]);
+  const top: V = [x, y + h, z];
   for (let k = 0; k < 4; k++) b.tri(ring[k], ring[(k + 1) % 4], top, shade(c, 0.8), shade(c, 0.8), c);
 }
 
-/** Fallen leaves lying flat, a few together. */
+const FALLEN: readonly FoliageCell[] = ['broad', 'maple', 'small'];
+
+/** Fallen leaves lying flat, a few together (round 125: each a leaf of the atlas, curled a little off the ground). */
 function litter(b: Builder, rng: Rng, x: number, y: number, z: number): void {
-  for (let i = 0; i < 4; i++) {
-    const c = shade(COLORS.litter[Math.floor(rng() * COLORS.litter.length)], GAIN);
+  for (let i = 0; i < 5; i++) {
+    const c = shade(COLORS.litter[Math.floor(rng() * COLORS.litter.length)], GAIN * (0.8 + 0.3 * rng()));
     const [lx, lz] = [x + (rng() - 0.5) * 0.9, z + (rng() - 0.5) * 0.9];
-    const a = rng() * Math.PI;
-    const [s, co] = [Math.sin(a) * 0.1, Math.cos(a) * 0.1];
-    const ly = y + 0.03;
-    b.tri([lx - co, ly, lz - s], [lx + s * 0.6, ly, lz - co * 0.6], [lx + co, ly, lz + s], c, c, c);
-    b.tri([lx - co, ly, lz - s], [lx - s * 0.6, ly, lz + co * 0.6], [lx + co, ly, lz + s], c, c, c);
+    const a = rng() * Math.PI * 2;
+    const r = 0.1 + 0.07 * rng();
+    const [ux, uz] = [Math.sin(a) * r * 2, Math.cos(a) * r * 2];
+    b.card([lx - ux / 2, y + 0.03, lz - uz / 2], [ux, 0.03 + 0.04 * rng(), uz], [uz * 0.5, 0, -ux * 0.5], FALLEN[Math.floor(rng() * FALLEN.length)], shade(c, 0.85), c, 0, 0.15, rng());
   }
 }
 
-/** One piece of cover of `kind` standing at (x, y, z): blades and leaves into `leaf`, stones and nodules into `stone`. */
+/** One piece of cover of `kind` standing at (x, y, z): what grows into `leaf`, stones and nodules into `stone`. */
 export function plantAt(kind: Kind, leaf: Builder, stone: Builder, rng: Rng, x: number, y: number, z: number): void {
   const c = shade(COLORS[kind][Math.floor(rng() * COLORS[kind].length)], GAIN);
-  if (kind === 'tuft') blades(leaf, rng, x, y, z, 4 + Math.floor(rng() * 4), 0.45, 0.05, c);
-  else if (kind === 'dry') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 0.35, 0.04, c);
-  else if (kind === 'reed') blades(leaf, rng, x, y, z, 3 + Math.floor(rng() * 3), 1.1, 0.04, c);
+  if (kind === 'tuft') (clump(leaf, rng, x, y, z, 0.38 + 0.22 * rng(), 0.45 + 0.15 * rng(), c, 'grass'), blades(leaf, rng, x, y, z, 2, 0.45, 0.04, c));
+  else if (kind === 'dry') clump(leaf, rng, x, y, z, 0.3 + 0.15 * rng(), 0.4, c, 'grass');
+  else if (kind === 'reed') clump(leaf, rng, x, y, z, 1.0 + 0.4 * rng(), 0.5, c, 'reeds', 3);
   else if (kind === 'litter') litter(leaf, rng, x, y, z);
   else if (kind === 'fern') fernAt(leaf, rng, x, y, z, c);
   else if (kind === 'tallgrass') tallgrass(leaf, rng, x, y, z, c);
@@ -216,7 +187,7 @@ export function plantAt(kind: Kind, leaf: Builder, stone: Builder, rng: Rng, x: 
 
 const SLICE = 48; // pieces laid between one yield and the next (the chunk's making is sliced to a couple of milliseconds a frame: core/slicer.ts)
 
-/** The chunk's ground cover as a geometry per material (leaf: blades, leaves and the undergrowth; stone: pebbles and nodules), off the roads, the sites, the dungeons and the footprints of what stands in it, a slice at a time; `done` takes it. */
+/** The chunk's ground cover as a geometry per material (foliage: blades, leaves and the undergrowth; stone: pebbles and nodules), off the roads, the sites, the dungeons and the footprints of what stands in it, a slice at a time; `done` takes it. */
 export function* groundCoverJob(cx: number, cz: number, region: RegionDef, roads: readonly RoadSeg[], props: readonly Prop[], done: (cover: Partial<Record<PropMat, THREE.BufferGeometry>>) => void): Generator<void, void> {
   const cover = COVER[region.biome.texture];
   const climate = CLIMATES[region.id];
@@ -256,7 +227,7 @@ export function* groundCoverJob(cx: number, cz: number, region: RegionDef, roads
   const lg = leaf.geometry();
   yield;
   const sg = stone.geometry();
-  if (lg) out.leaf = lg;
+  if (lg) out.foliage = lg; // round 125: what grows, cut out of the leaf atlas
   if (sg) out.stone = sg;
   done(out);
 }

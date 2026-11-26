@@ -128,7 +128,7 @@ describe('the air, the grass and the mist answer it', () => {
 
   it('the world shader bends what sways by it, after the wind and the bodies; the mist is thrown by it', () => {
     expect(BLAST_GLSL).toContain(`uniform vec4 uBlasts[${BLAST.slots}]`);
-    const from = WORLD_VERT.indexOf('float gust = 0.5');
+    const from = WORLD_VERT.indexOf('windMove(wp.xyz'); // (round 125: the wind of shaders/wind.ts)
     expect(from).toBeGreaterThan(0);
     const sway = WORLD_VERT.slice(from, WORLD_VERT.indexOf('wp.xyz = displace(wp.xyz);'));
     expect(sway).toContain(BLAST_BEND_GLSL.trim().split('\n')[0]);

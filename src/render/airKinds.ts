@@ -132,5 +132,5 @@ export function toneOf(region: string, layer: Pick<AirLayer, 'tone' | 'pale'>): 
   return [base[0] + (1 - base[0]) * p, base[1] + (1 - base[1]) * p, base[2] + (1 - base[2]) * p];
 }
 
-/** The gusts that roll across the land: the very function shaders/world.ts bends the grass by, so a leaf lifts as the blades bow. */
-export const gustAt = (time: number, x: number, z: number): number => 0.5 + 0.5 * Math.sin(time * 0.31 + x * 0.045 - z * 0.03);
+/** The gusts that roll across the land: the very field the trees and the grass bend by (round 125: render/windField.ts, shaders/wind.ts), so a leaf lifts as the blades bow. */
+export { gustAt } from './windField';

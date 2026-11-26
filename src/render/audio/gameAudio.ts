@@ -39,6 +39,8 @@ import { realmTrackOf, type RealmTrackId } from '../../data/realmMusic';
 import { createRealmMusic } from './realmMusic';
 import { createDread } from './dread';
 import { createWeatherBed } from './weatherBed';
+import { createLeafBed } from './leafBed';
+import { worldUniforms } from '../worldMaterial';
 import { bedKind } from '../../data/weatherSkins';
 import { CUES, cueFor, dullness, nextCall, placeSound, type Cue } from './cues';
 import { impactLayers, landedBlow } from './impact';
@@ -108,6 +110,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   const foley = createFoley(g, sampler, (key, sound, o) => recipe(key, sound, o), () => (e.space?.state.on ? e.space.state.echo : undefined)); // round 83: the room answers a footfall
   const acts = createActFoley(g, (key, sound, o) => recipe(key, sound, o));
   const weatherBed = createWeatherBed(e, sampler); // round 59: the rain is recorded
+  const leafBed = createLeafBed(e); // round 125: the leaves about the investigator, rustling as the gusts come through them
   const dread = createDread(e, g, (set, gain, pitch) => void sampler.play(SAMPLE_SETS[set], { gain, pan: (Math.random() * 2 - 1) * 0.6, lowpass: 700 + 3000 * gain, pitch })); // round 26: the ground goes quiet, and far off it is heard
   const occlusion = createOcclusion(g); // round 80: a wall, a roof or a horror's fog between the investigator and a sound dulls it
   const place = (at: V3 | null, range: number): { gain: number; pan: number; lowpass: number; occ: number } => {
@@ -344,6 +347,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
       const roofed = (g.overworld && at && inside(at)) || null;
       ambience.set(roofed || (AMBIENCE[soundscapeAt(region, at) ?? ''] ?? null));
       weatherBed.set(bedKind(g.overworld?.region, g.overworld?.weather.kind ?? 'clear'), g.overworld?.weather.amount ?? 0, !!roofed); // round 26 (round 80: on snow and sand a storm is the wind alone, not the wash of rain)
+      if (at) leafBed.set(at.x, at.z, worldUniforms.uTime.value, worldUniforms.uWind.value, !!roofed || !g.overworld);
       ambience.update(seconds);
       music.update({ ...scene, scene: cinematic });
       realm.update(seconds, { track: trackHere(at), fight: scene.fights.length > 0, hush: e.hushed, paused });

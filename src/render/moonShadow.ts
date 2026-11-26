@@ -14,6 +14,7 @@ import { INSTANCED_POSITION, LANTERN_CASTER } from './colliderShadow';
 import { box } from './meshKit';
 import { moonFrame } from './moonFrame';
 import { castSilhouettes } from './silhouetteCasters';
+import { castFoliage } from './foliageShadow';
 import { worldUniforms } from './worldMaterial';
 
 /** The layer a body that casts a shadow is on (the camera sees layer 0, which it keeps). */
@@ -129,6 +130,7 @@ export function createMoonShadow(): MoonShadow {
       renderer.setRenderTarget(target);
       renderer.render(scene, camera);
       scene.overrideMaterial = material;
+      castFoliage(renderer, scene, camera); // (round 125: the leaves, cut out and blown as they are drawn)
       castSilhouettes.draw(renderer, camera, { x: toMoon.x, y: toMoon.y, z: toMoon.z, point: false }); // (round 94: the foes' own shapes, across the moon)
       far(renderer, scene, toMoon, focus, !wasOn);
       renderer.setRenderTarget(was);
@@ -167,6 +169,7 @@ function createFarShadow(): (renderer: THREE.WebGLRenderer, scene: THREE.Scene, 
     renderer.setRenderTarget(target);
     renderer.render(scene, camera);
     scene.overrideMaterial = material;
+    castFoliage(renderer, scene, camera);
     u.uShadowFar.value.x = 1;
   };
 }

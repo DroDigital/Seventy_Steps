@@ -9,6 +9,7 @@ import { loomOf } from '../src/render/castPlan';
 import { createLampShadows } from '../src/render/lampShadows';
 import { createLanternShadow } from '../src/render/lanternShadow';
 import { createMoonShadow } from '../src/render/moonShadow';
+import { FOLIAGE_CASTER } from '../src/render/foliageShadow';
 import { createSilhouetteCasters, castSilhouettes } from '../src/render/silhouetteCasters';
 import { spriteBatch } from '../src/render/sprites/batch';
 import { worldUniforms } from '../src/render/worldMaterial';
@@ -150,7 +151,7 @@ describe('the silhouette casters', () => {
 describe('the shadow passes', () => {
   /** A renderer that remembers what each draw was drawn into and from which light: the map's own target must be bound for the foes as for the solids, and given back after. */
   const fake = () => {
-    const log: { what: 'solids' | 'foes'; target: unknown; light: number[]; back: number }[] = [];
+    const log: { what: 'solids' | 'foes' | 'leaves'; target: unknown; light: number[]; back: number }[] = [];
     let bound: unknown = null;
     const lightNow = (): number[] => ((castSilhouettes.scene.children[1] as THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>).material.uniforms.uCastLight.value as THREE.Vector4).toArray();
     const backNow = (): number => (castSilhouettes.scene.children[1] as THREE.InstancedMesh<THREE.BufferGeometry, THREE.ShaderMaterial>).material.uniforms.uCastBack.value as number;
@@ -158,7 +159,7 @@ describe('the shadow passes', () => {
       autoClear: true,
       getRenderTarget: () => bound,
       setRenderTarget: (target: unknown) => void (bound = target),
-      render: (scene: THREE.Scene) => void log.push({ what: scene === castSilhouettes.scene ? 'foes' : 'solids', target: bound, light: lightNow(), back: backNow() }),
+      render: (scene: THREE.Scene, camera?: THREE.Camera) => void log.push({ what: scene === castSilhouettes.scene ? 'foes' : camera?.layers.mask === 1 << FOLIAGE_CASTER ? 'leaves' : 'solids', target: bound, light: lightNow(), back: backNow() }),
     } as unknown as THREE.WebGLRenderer;
     return { renderer, log, calls: (): string[] => log.map((l) => l.what), bound: (): unknown => bound };
   };
@@ -188,11 +189,13 @@ describe('the shadow passes', () => {
     moon.enabled = true;
     worldUniforms.uLightDir.value.set(0.3, 0.8, 0.2).normalize();
     moon.render(renderer, new THREE.Scene());
-    expect(calls()).toEqual(['solids', 'foes', 'solids']); // (round 113: then the far map's solids, none of the foes)
-    intoTheMap(log);
+    expect(calls()).toEqual(['solids', 'leaves', 'foes', 'solids', 'leaves']); // (round 113: then the far map's solids, none of the foes; round 125: the leaves after each map's solids, cut out and blown)
+    intoTheMap(log.filter((l) => l.what !== 'leaves'));
+    expect(log.filter((l) => l.what === 'leaves').map((l) => l.target)).toEqual(log.filter((l) => l.what === 'solids').map((l) => l.target)); // into the same maps
     const to = worldUniforms.uLightDir.value.clone().normalize();
-    expect(log[1].light.map((n) => +n.toFixed(5))).toEqual([to.x, to.y, to.z, 0].map((n) => +n.toFixed(5))); // toward the moon, not a place
-    expect(log[1].back).toBe(0); // and stood at the body
+    const foes = log.find((l) => l.what === 'foes')!;
+    expect(foes.light.map((n) => +n.toFixed(5))).toEqual([to.x, to.y, to.z, 0].map((n) => +n.toFixed(5))); // toward the moon, not a place
+    expect(foes.back).toBe(0); // and stood at the body
     expect(bound()).toBeNull(); // the target the pass found is bound again
   });
 

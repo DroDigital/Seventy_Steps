@@ -32,18 +32,18 @@ describe('the plants and roots where things meet the ground (round 54)', () => {
   const props = chunkContent(cx, cz).props;
 
   it('stands plants and pebbles about the bases, and roots about the trees', () => {
-    expect(cover.leaf?.getAttribute('position').count ?? 0).toBeGreaterThan(100);
+    expect(cover.foliage?.getAttribute('position').count ?? 0).toBeGreaterThan(100);
     expect(cover.wood?.getAttribute('position').count ?? 0).toBeGreaterThan(0);
     const trees = props.filter((p) => p.kind === 'tree' || p.kind === 'pine' || p.kind === 'stump').length;
     const roots = (cover.wood?.getAttribute('position').count ?? 0) / 9; // three triangles, both faces of each on its three corners (round 116: indexed), to a root
     expect(roots).toBeGreaterThanOrEqual(trees * GROUND_CONTACT.cover.roots * 0.5);
     expect(cover.wood?.getAttribute('aSway')).toBeDefined(); // the wood material bends, so what merges with it must carry the attribute
-    expect(cover.leaf?.getAttribute('aSway')).toBeDefined();
+    expect(cover.foliage?.getAttribute('aSway')).toBeDefined();
   });
 
   it('keeps every plant within reach of some footprint: it is about the bases, not a scatter', () => {
     const cs = contactsOf(props);
-    const pos = cover.leaf!.getAttribute('position');
+    const pos = cover.foliage!.getAttribute('position');
     let far = 0;
     for (let i = 0; i < pos.count; i += 3) { // one corner of each triangle (round 116: its two faces share its three)
       const d = Math.min(...cs.map((c) => edgeDistance(c, pos.getX(i), pos.getZ(i))));
@@ -54,7 +54,7 @@ describe('the plants and roots where things meet the ground (round 54)', () => {
 
   it('is the same each time it is made', () => {
     const again = build(cx, cz);
-    expect(again.leaf!.getAttribute('position').count).toBe(cover.leaf!.getAttribute('position').count);
+    expect(again.foliage!.getAttribute('position').count).toBe(cover.foliage!.getAttribute('position').count);
     expect(again.wood!.getAttribute('position').array).toEqual(cover.wood!.getAttribute('position').array);
   });
 });
