@@ -49,7 +49,9 @@
     "joseph_curwen: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 18 old frames dropped, right mirrored.",
     "high_priest: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 2 old frames dropped, right mirrored.",
     "high_priest#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 6 old frames dropped, right mirrored.",
-    "azathoth: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 10 old frames dropped, right mirrored, its 3 stoop frames (stoop, stoop_mid) drawn in place."
+    "azathoth: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 10 old frames dropped, right mirrored, its 3 stoop frames (stoop, stoop_mid) drawn in place.",
+    "zann_window_thing: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 17 frames drawn (17 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "medusa_gorgon: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored."
   ],
   "entities": [
     {
@@ -17339,12 +17341,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zann_window_thing/64x64/front/idle_0.png",
-                  "sha256": "082ca0d431693254f96967d8e80d3e8d58ec6522459ea3e85388de270e6b98ff"
+                  "sha256": "c7cbc58a6e7e84cb3dbed009b1aabba401fbeb8ddefe54abfc2ace43467eba4a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zann_window_thing/64x64/front/idle_1.png",
-                  "sha256": "bff750324cb40679a0211968fd733258aedeb1d211e0a3dcc97a61026006a2af"
+                  "sha256": "9f929df0baac6864fc726455a788f606edc8ad9ebabbefe75c0b55a3ecec0d2e"
                 }
               ]
             },
@@ -17354,12 +17356,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zann_window_thing/64x64/front/move_0.png",
-                  "sha256": "6cebfb758a6e29c039319651349ad5b74984526a559cce95e2702cc0c456f627"
+                  "sha256": "db45dd065c31203482ec700a789b4bf849f4e8fcb53609f00fbbb4f32964b55e"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zann_window_thing/64x64/front/move_1.png",
-                  "sha256": "e0513d3012c3f02cf2f0846d01b1cf4d7970d382dec1b8242701999aae602aeb"
+                  "sha256": "856e943d214b2129714984d09f99bfa9190cd5db7033f512b93521d4b5db2a8c"
                 }
               ]
             },
@@ -17369,17 +17371,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/zann_window_thing/64x64/front/attack_0.png",
-                  "sha256": "20776efc49135709e79de20030e7e67e939d3d8d0ee7b087381ad05c4a2ffa04"
+                  "sha256": "fa13d6166ca42d8cc20e288c0971934db9bf4c592a82e60f5e278e2245032a7e"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/zann_window_thing/64x64/front/attack_1.png",
-                  "sha256": "bf1d57f689a576de8b1226ed0463ee7e1394bb258515fa41102a19e6d88d86d6"
+                  "sha256": "d59990d2845ccf464e77b71a51815f222e2d1d0ba13d2e8614f0bd0ea4786fac"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/zann_window_thing/64x64/front/attack_2.png",
-                  "sha256": "ea401bcc734e109fc4ccd60a6bb182bc5a49c29300012ee03067ec55923e1e24"
+                  "sha256": "6c4e6de3a501324672a615dbe827bd33ec28052f1d458606fd1f3b773a41d678"
                 }
               ]
             },
@@ -17389,12 +17391,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/zann_window_thing/64x64/front/hurt_0.png",
-                  "sha256": "29f9d7844ddbfd11dc98469d1831a449809dd3785d17468189a16a8280986d58"
+                  "sha256": "e6d0bd4672717ce124e873a58a90b64e34b96844c4a8692690e6a615e334abe7"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/zann_window_thing/64x64/front/hurt_1.png",
-                  "sha256": "f68f5200e1f2ff2ccbe7ab42bdd58bf199c55b82f8c8318e1bb50445b3056a39"
+                  "sha256": "874d4aff70bcc1faf13d1b92698dd2cf39e1557c3941b6a70e255fb6f4172a76"
                 }
               ]
             }
@@ -17410,12 +17412,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zann_window_thing/64x64/back/idle_0.png",
-                  "sha256": "1470343d9c18a61b1108b9bf9e4c91278de739d804d4a781075422f259a0333c"
+                  "sha256": "88985c26ac7b0271d4891d1e68b211c27968db1a35f635693027f4dc88b7f1e8"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zann_window_thing/64x64/back/idle_1.png",
-                  "sha256": "8aeb85e76dc97879adb3a97703d808cdf6286b9f0a4c31b1c6845f9c52fe9c8f"
+                  "sha256": "34676908303a7b711e20b5e0a62a98da0a7631dad1e46bb1dd9531c48d6a018f"
                 }
               ]
             },
@@ -17425,12 +17427,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zann_window_thing/64x64/back/move_0.png",
-                  "sha256": "119d306622d0be32179dff805fa8224015af4d5251d84c9900662ca77461e254"
+                  "sha256": "0b1040dd25e00a45f13801a1aad53bbbbf174240576dc7465ff1dfe619dcd354"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zann_window_thing/64x64/back/move_1.png",
-                  "sha256": "8824a1e442331712483db7b850250c8d571dda5a60b417979f0bfc3237e8e1e2"
+                  "sha256": "df9db527be62f1ce4ed965e2f316cb68af46f6a7ea44fb0e7943ebf2b05936ca"
                 }
               ]
             }
@@ -17446,12 +17448,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zann_window_thing/64x64/left/idle_0.png",
-                  "sha256": "e62593edbfed5f7f2b31769a5d53a6a8ab0748841d9f78809bd39be3119ac0ca"
+                  "sha256": "12cdf3bcdefb3957717d56f6c3b52aa6a110e3f51f27b8985e74c74fb0167b15"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zann_window_thing/64x64/left/idle_1.png",
-                  "sha256": "bc420b4e405680641c33268e0c3810b32d49783f895e1ce68ba16f54c2afc95b"
+                  "sha256": "d147257ed184df6316ea1591c3bfe8e2a306b433202654de5677e98a8e148b9a"
                 }
               ]
             },
@@ -17461,12 +17463,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zann_window_thing/64x64/left/move_0.png",
-                  "sha256": "ff2519c667c3e2de990f5696eccb23ab010e10a21f9a0188cdc4732b0d01c36c"
+                  "sha256": "5bc06e9dbd44080171173a478ca72f24af48e01db81ab0d969afa58d11f951ee"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zann_window_thing/64x64/left/move_1.png",
-                  "sha256": "dfbb6871c75d6267b67626bdfde5da62f43c14a4f42442e6a2cc77f819921b30"
+                  "sha256": "12838f122d24b379c0b1b9dee920bdae77489998b6bd8bede77c1cab365320c0"
                 }
               ]
             }
@@ -17482,12 +17484,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/zann_window_thing/64x64/left/idle_0.png",
-                  "sha256": "e62593edbfed5f7f2b31769a5d53a6a8ab0748841d9f78809bd39be3119ac0ca"
+                  "sha256": "12cdf3bcdefb3957717d56f6c3b52aa6a110e3f51f27b8985e74c74fb0167b15"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/zann_window_thing/64x64/left/idle_1.png",
-                  "sha256": "bc420b4e405680641c33268e0c3810b32d49783f895e1ce68ba16f54c2afc95b"
+                  "sha256": "d147257ed184df6316ea1591c3bfe8e2a306b433202654de5677e98a8e148b9a"
                 }
               ]
             },
@@ -17497,12 +17499,12 @@
                 {
                   "name": "move_0",
                   "path": "sprites/zann_window_thing/64x64/left/move_0.png",
-                  "sha256": "ff2519c667c3e2de990f5696eccb23ab010e10a21f9a0188cdc4732b0d01c36c"
+                  "sha256": "5bc06e9dbd44080171173a478ca72f24af48e01db81ab0d969afa58d11f951ee"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/zann_window_thing/64x64/left/move_1.png",
-                  "sha256": "dfbb6871c75d6267b67626bdfde5da62f43c14a4f42442e6a2cc77f819921b30"
+                  "sha256": "12838f122d24b379c0b1b9dee920bdae77489998b6bd8bede77c1cab365320c0"
                 }
               ]
             }
@@ -19271,12 +19273,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/medusa_gorgon/64x64/front/idle_0.png",
-                  "sha256": "825758911b9f8a2bec5c1e3cd99b17ebba8c35591fa6938a4df8375280c717b9"
+                  "sha256": "17099ad16e9318dcf6066fe2889a7bdff76e3adfb597ca6c6aca6578a014296c"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/medusa_gorgon/64x64/front/idle_1.png",
-                  "sha256": "fe10ca0e663b7d0da0ea40d0ccc2279af0cadb4f2a2f2d20fc1e0fb8e37e9905"
+                  "sha256": "5a085eda0b45d3a033ca9f515fb548a98090e4186898238dd9ad013f17affaf6"
                 }
               ]
             },
@@ -19286,22 +19288,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/medusa_gorgon/64x64/front/move_0.png",
-                  "sha256": "ed732229eda38d3821f2fafaf2690990df351277dec489d99e54d785f01b9c7e"
+                  "sha256": "213af5a5083b88c4b76c37c1a939206ba66fd1c88168e73aeefdb0f6d8b3b51f"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/medusa_gorgon/64x64/front/move_1.png",
-                  "sha256": "fced46388068044de3cea8c6f9dbffac237d38fda0446bfb286196f74783f0fe"
+                  "sha256": "b08e4bda953c74d08d13953064c54f3c2ca50bbcb5688c35f2f87a4d35ad1702"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/medusa_gorgon/64x64/front/move_2.png",
-                  "sha256": "782ac8a96538ee3002b64f37325e61046db0a17fb58fdb7a35e4c96eb41c183d"
+                  "sha256": "0b5bc6c4df2736ca24b355d6639d52d27ba7d23e2dc989f9d968ecf5941a7f5a"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/medusa_gorgon/64x64/front/move_3.png",
-                  "sha256": "6dc2de6efa78de9305909ed7de190530037d41197221bdbf3e335741194acf3c"
+                  "sha256": "8c70d22d78f5de581cdffc92a2108add88f5f4930e90c181b432e90b004cf6c8"
                 }
               ]
             },
@@ -19311,17 +19313,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/medusa_gorgon/64x64/front/attack_0.png",
-                  "sha256": "a9a946ec6426d0e7c042656c21091e3bbf3e49aa22a46e9105bfb6f08ad94500"
+                  "sha256": "d6a01ee7f85459775a968d28977bbadb3ca6757c6b59ec230c25a874621cf38f"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/medusa_gorgon/64x64/front/attack_1.png",
-                  "sha256": "ccfc8c3294e2a0d7ea7cefbc43cbfb62e2b43cd20f969dcbae4896ce667a3779"
+                  "sha256": "366b2e84bdcc1afa39dab1c2e1d00059be6c339dbaf5c2abdf29bb8a8b525895"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/medusa_gorgon/64x64/front/attack_2.png",
-                  "sha256": "9a66026231c776b2022d54a75285866099377437f04b5bbc372ef6fa77976380"
+                  "sha256": "26fc1fdebbf1bc80b882982300214cde8b03a79f6957bf61e5d5b6f91fd1a948"
                 }
               ]
             },
@@ -19331,12 +19333,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/medusa_gorgon/64x64/front/hurt_0.png",
-                  "sha256": "cedf59793cd1c86edb3c59f06010d509c898625ef0dab3cc13c2bf332e2fde74"
+                  "sha256": "8558694f6649d713ab3492a437af7ee09c003529811136a8046b2b5f28e6c2f9"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/medusa_gorgon/64x64/front/hurt_1.png",
-                  "sha256": "2424ce59a1ae3c57769c441b2c7e888ca9d9300d0a2fb762c4706d07c8878951"
+                  "sha256": "ee8fe89707685c0d842d82f4355665c0dde344bc25005cc7e0624eb1f1ce92b0"
                 }
               ]
             }
@@ -19352,12 +19354,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/medusa_gorgon/64x64/back/idle_0.png",
-                  "sha256": "6610b8dc1de2a54e331b38cac36aac656d11f48a48fb7789e89191c589a6bdc5"
+                  "sha256": "2fde6004e496047acaefc7a56b4ad218dbab3cdd81dfc83d22630de990a44f69"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/medusa_gorgon/64x64/back/idle_1.png",
-                  "sha256": "fa838b8cefdffb3f6df000d3461f1145f1dd12dca3c442c6cf718cdc6231813d"
+                  "sha256": "c3d9afe21fd2b77eb0854d69cfd8aef2452fca2a5097a4104d98f1b37e1f5f36"
                 }
               ]
             },
@@ -19367,22 +19369,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/medusa_gorgon/64x64/back/move_0.png",
-                  "sha256": "379a872dd82b4f33454cb46baf66436206311cfc52eaa35649bf39716ec5c9e3"
+                  "sha256": "3c0b28b916a38a7d495c1bb269a0f7ec065fead27858cb372247e65042f04903"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/medusa_gorgon/64x64/back/move_1.png",
-                  "sha256": "901c59b178013e0c6bf74ff1ad2cc7a87b91b2664e7089ea74135091aa3e1edd"
+                  "sha256": "45fe12dcc98dcfdfcd7b48cdbfedb8306418f8d79b13fe1fb0e4d0297dc158ba"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/medusa_gorgon/64x64/back/move_2.png",
-                  "sha256": "4c9217a296d51e622ce54e3a984eecdf84a0a7db94d8bdf3b07f2b422bca36ab"
+                  "sha256": "fd9afa08f4980aecaf8552a228acf1f071ceb0d315f95b299038d51d8bc2a492"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/medusa_gorgon/64x64/back/move_3.png",
-                  "sha256": "8c71ef7be35b8b2b9fd96407a5669f25cbfd958d8cd8830032aad20985f12750"
+                  "sha256": "8db5f88f716cc21a4f5b4ad0bfd54fdc890aaa41abdbb65f63aca57bba85a696"
                 }
               ]
             }
@@ -19398,12 +19400,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/medusa_gorgon/64x64/left/idle_0.png",
-                  "sha256": "5de1d2d9d14dfe9521c9b34f011fcf42cb9d589b109f2ef0b11a55dc25800af7"
+                  "sha256": "1295afb6853aeea70b2511f0f0a6030cdce469f7d846cd8a81afbe05f7694c1a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/medusa_gorgon/64x64/left/idle_1.png",
-                  "sha256": "f52f4a12b0ed67135a3f67d899c66bb46ccf69fe4f3045f1c03aa14d470bb13e"
+                  "sha256": "0b16f7647fe23f27780771f9d1206e8e2aca3f6f24c7dcb3b72e5d11ab40ef82"
                 }
               ]
             },
@@ -19413,22 +19415,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/medusa_gorgon/64x64/left/move_0.png",
-                  "sha256": "07d5a5190672c2c8c6f7fca7b48a4145234d1854df10f743a90256cbc8dfda49"
+                  "sha256": "c70f12d44b658b485972088492b80013f73a6fb778551e94ffdad3d2d28270d5"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/medusa_gorgon/64x64/left/move_1.png",
-                  "sha256": "4c62ba56de5a6815c51dd753570411b242431112003ca9630555ad66edd59fd8"
+                  "sha256": "70dab7286487b59b63a3916fa38536e763ad4bb376d9d9eeaddb7eb3bcb29adb"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/medusa_gorgon/64x64/left/move_2.png",
-                  "sha256": "e5f3e7b5ef2d6b0840e6063263298d0c4ff5da0e84014b8dea22c511b0e2fb97"
+                  "sha256": "a53d0eec7c18740048eb70fc82fe9f26a8120dfbee79a451a02527e07a79d2ed"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/medusa_gorgon/64x64/left/move_3.png",
-                  "sha256": "298399f00a02fe3769bb8a47cdeffcaf6eaadf0d1e17af1a1fc0c4fedd9f188d"
+                  "sha256": "c8e020cc032dbe7cfcb9265dd1e13dca889bb9d5e29bc53a01eb52566df9ffaa"
                 }
               ]
             }
@@ -19444,12 +19446,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/medusa_gorgon/64x64/left/idle_0.png",
-                  "sha256": "5de1d2d9d14dfe9521c9b34f011fcf42cb9d589b109f2ef0b11a55dc25800af7"
+                  "sha256": "1295afb6853aeea70b2511f0f0a6030cdce469f7d846cd8a81afbe05f7694c1a"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/medusa_gorgon/64x64/left/idle_1.png",
-                  "sha256": "f52f4a12b0ed67135a3f67d899c66bb46ccf69fe4f3045f1c03aa14d470bb13e"
+                  "sha256": "0b16f7647fe23f27780771f9d1206e8e2aca3f6f24c7dcb3b72e5d11ab40ef82"
                 }
               ]
             },
@@ -19459,22 +19461,22 @@
                 {
                   "name": "move_0",
                   "path": "sprites/medusa_gorgon/64x64/left/move_0.png",
-                  "sha256": "07d5a5190672c2c8c6f7fca7b48a4145234d1854df10f743a90256cbc8dfda49"
+                  "sha256": "c70f12d44b658b485972088492b80013f73a6fb778551e94ffdad3d2d28270d5"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/medusa_gorgon/64x64/left/move_1.png",
-                  "sha256": "4c62ba56de5a6815c51dd753570411b242431112003ca9630555ad66edd59fd8"
+                  "sha256": "70dab7286487b59b63a3916fa38536e763ad4bb376d9d9eeaddb7eb3bcb29adb"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/medusa_gorgon/64x64/left/move_2.png",
-                  "sha256": "e5f3e7b5ef2d6b0840e6063263298d0c4ff5da0e84014b8dea22c511b0e2fb97"
+                  "sha256": "a53d0eec7c18740048eb70fc82fe9f26a8120dfbee79a451a02527e07a79d2ed"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/medusa_gorgon/64x64/left/move_3.png",
-                  "sha256": "298399f00a02fe3769bb8a47cdeffcaf6eaadf0d1e17af1a1fc0c4fedd9f188d"
+                  "sha256": "c8e020cc032dbe7cfcb9265dd1e13dca889bb9d5e29bc53a01eb52566df9ffaa"
                 }
               ]
             }
