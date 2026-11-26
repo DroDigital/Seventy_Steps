@@ -10,6 +10,7 @@ import type { Entity } from '../core/ecs';
 import { distXZ, type V3 } from '../core/geom';
 import { AMBUSH } from '../data/tuning';
 import type { Brain, Game } from './components';
+import { targetsOf } from './targets';
 
 /** The distance at which a body brushing past one lying in wait is felt, seen or not. */
 const BRUSH = 2.2;
@@ -23,14 +24,15 @@ export function lieInWait(g: Game, e: Entity): void {
 }
 
 /**
- * Whether a hidden foe at `at` springs now: one lying in wait at a quarry it sees within its reach, or at the investigator brushing past;
- * an ambusher or a burrower of the open ground at a quarry within its own `reveal`. One lying in wait is no longer, once it has sprung.
+ * Whether a hidden foe at `at` springs now: one lying in wait at a quarry it sees within its reach, or at the investigator brushing past
+ * (only while it may reach them: never at one at peace, in a talk, in a cutscene or in a fog, targets.ts); an ambusher or a burrower of the
+ * open ground at a quarry within its own `reveal`. One lying in wait is no longer, once it has sprung.
  */
 export function springs(g: Game, id: Entity, br: Brain, reveal: number, quarry: Entity | null, tp: V3 | undefined, at: V3): boolean {
   if (br.lurk === undefined) return quarry !== null && !!tp && distXZ(at, tp) <= reveal;
   const me = g.ecs.c.transform.get(g.player.id)?.pos;
   const seen = quarry !== null && !!tp && distXZ(at, tp) <= br.lurk;
-  const brushed = !!me && distXZ(at, me) <= BRUSH && Math.abs(me.y - at.y) < 2;
+  const brushed = !seen && !!me && distXZ(at, me) <= BRUSH && Math.abs(me.y - at.y) < 2 && targetsOf(g, id).includes(g.player.id);
   if (!seen && !brushed) return false;
   delete br.lurk;
   if (!seen) br.target = g.player.id;

@@ -61,7 +61,8 @@ export const DEEP_DUNGEONS: readonly DungeonDef[] = [
       room('basalt', 'corridor', 'shaft', 'n', { spawns: ['hybrid_mummy', 'hybrid_mummy'], words: 'THE BASALT DEEPS' }),
       stair('down', 'trapdoor', 's', -4, { spawns: ['yithian'] }),
       room('deep', 'corridor', 'down', 's', { spawns: ['nameless_city_reptile'], tome: { name: 'Pnakotic Manuscripts', insight: 1 } }),
-      room('vault', 'hall', 'deep', 'w', { wide: true, boss: ['flying_polyp'], variant: 'boss' }),
+      room('sill', 'corridor', 'deep', 's', { spawns: ['nameless_city_reptile'] }), // (the vault a cell south of the stair: a wall between a sunk hall and a stair rose over the hall's heap)
+      room('vault', 'hall', 'sill', 'w', { wide: true, boss: ['flying_polyp'], variant: 'boss' }),
       stair('return', 'deep', 'e', 4), // up to its barred head in the reading hall
     ],
     links: [link('return', 'reading', 'shortcut')],

@@ -64,10 +64,10 @@ export function wallParts(d: DungeonLayout, out: Part[], pieces: HiddenPieceDef[
         const [nlo, nhi] = nb ? floorRange(nb) : [d.base, d.base];
         const y0 = Math.min(lo - wallFoot(r), nlo - wallFoot(nb)); // (round 104: down the void beside a flight over it)
         const y1 = Math.max(hi + H, nb ? nhi + H : d.base + 1.2);
-        const seg = (a0: number, a1: number, b0: number, b1: number, look: 'wall' | 'grate' = 'wall', thick = T): void => {
-          const ax = [mx + p.x * a0 - n.x * (thick / 2), mx + p.x * a1 + n.x * (thick / 2)];
-          const az = [mz + p.z * a0 - n.z * (thick / 2), mz + p.z * a1 + n.z * (thick / 2)];
-          out.push({ shape: 'box', look, solid: true, room: r.index, ...(!nb && { outer: side }), min: { x: Math.min(...ax), y: b0, z: Math.min(...az) }, max: { x: Math.max(...ax), y: b1, z: Math.max(...az) } });
+        const seg = (a0: number, a1: number, b0: number, b1: number, look: 'wall' | 'grate' | 'none' = 'wall', thick = T, out0 = 0, solid = true): void => { // (`out0`: how far out of `r` its middle stands)
+          const ax = [mx + p.x * a0 + n.x * (out0 - thick / 2), mx + p.x * a1 + n.x * (out0 + thick / 2)];
+          const az = [mz + p.z * a0 + n.z * (out0 - thick / 2), mz + p.z * a1 + n.z * (out0 + thick / 2)];
+          out.push({ shape: 'box', look, solid, room: r.index, ...(!nb && { outer: side }), min: { x: Math.min(...ax), y: b0, z: Math.min(...az) }, max: { x: Math.max(...ax), y: b1, z: Math.max(...az) } });
         };
         const L = C / 2 + T / 2;
         const here = (o: DoorLayout): boolean => Math.abs(o.x - mx) < 0.01 && Math.abs(o.z - mz) < 0.01;
@@ -91,7 +91,10 @@ export function wallParts(d: DungeonLayout, out: Part[], pieces: HiddenPieceDef[
         seg(-L, -wide / 2, y0, y1);
         seg(wide / 2, L, y0, y1);
         if (arch) seg(-wide / 2, wide / 2, y0, door.level - ABYSS.foot); // under the steps' mass, the cross wall closes the void's ends
-        if (door.link?.kind === 'drop') seg(-wide / 2, wide / 2, y0, door.level); // round 125: the ledge's face, from the lower floor to the doorway's sill
+        if (door.link?.kind === 'drop') { // round 125: the ledge's face, from the lower floor to the doorway's sill...
+          seg(-wide / 2, wide / 2, y0, door.level, 'wall', T / 2, door.link.to === r ? -T / 4 : T / 4, false); // ...drawn in the lower room's half of the wall (the upper floor runs to the wall's middle: their tops lie side by side, not one in the other)...
+          seg(-wide / 2, wide / 2, y0, door.level, 'none'); // ...and solid through its whole thickness, so a body stepping past the wall's middle is put out on the lower side, and falls
+        }
         if (y1 > door.level + high) seg(-wide / 2, wide / 2, door.level + high, y1);
         if (door.hidden) pieces.push(doorPiece(door, doorName(d, door), door.hidden));
       }

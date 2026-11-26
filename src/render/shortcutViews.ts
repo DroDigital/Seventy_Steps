@@ -128,6 +128,7 @@ export function createShortcutViews(scene: THREE.Scene, g: Game, audio: GameAudi
   };
   const drop = (v: View): void => {
     if (v.group) scene.remove(v.group);
+    v.bar?.traverse((o) => (o as THREE.Mesh).geometry?.dispose()); // (its bar is its own; the leaves and frame are doorShapes.ts's, shared and kept)
     v.group = v.leaves = v.bar = null;
   };
 
