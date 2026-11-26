@@ -4,6 +4,7 @@
  * where it is asked and in the hour, the weather or the state of mind it asks for, a gift laid on its altar with E), each told once under
  * `disc:<horror>:<n>` in `ow.told` (so they are in the save); when the last is done the gate's seal is lifted for good (`found:<horror>`,
  * which `hiddenLayer.ts` reads), and a horror put down opens it too. A vigil is not saved: it ebbs when it is not kept, and begins again.
+ * Round 69 switched all of it off: `arenasHere` finds no house, so nothing here runs and no gate waits on a discovery.
  * Pure: no Three.js.
  */
 

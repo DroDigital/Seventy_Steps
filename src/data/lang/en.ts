@@ -390,7 +390,7 @@ export const EN = {
   'hint.boss': 'Watch the ground: a boss shows where its blows will land. Roll through rings and beams.',
   'hint.ship': "Wound Cthulhu until the Alert comes, then take her helm ({interact}) and drive her at it. Your weapons can also finish it.",
   'hint.powder': "The Dunwich Horror cannot be seen. Near it, {interact} scatters the Powder of Ibn Ghazi, three doses, and shows it for a while. In its last phase you can also chant the incantation ({interact}) near it to finish it. Your weapons remain lethal.",
-  'hint.cover': "Ghatanothoa's gaze turns flesh to stone: four seconds in its sight and you are lost, the colour draining and the picture cracking as it takes hold. Stand behind a monolith and it wears off.",
+  'hint.cover': "Ghatanothoa's gaze turns flesh to stone: eight seconds in its sight and you are lost, the colour draining and the picture cracking as it takes hold. Stand behind a monolith and it wears off.",
   'hint.roots': 'While the spawning roots stand, Shub-Niggurath takes only a fifth of each blow, and they bring forth its young. Cut the roots down.',
   'hint.spheres': 'The iridescent spheres are gates: touch one and you come out of the next, and now and then the whole arena leaps. Yog-Sothoth is struck where its own spheres rest.',
   'hint.blind': 'Azathoth cannot see you. Rays and rifts cross the court: watch where they gather and leave their marks before they strike. It hears a shot or a sprint and answers where it was made. The floor cracks as the fight goes on; crossing a fissure weakens it faster. Leave a trembling tile before it falls.',

@@ -371,7 +371,7 @@ export const ES: Readonly<Record<Key, string>> = {
   'hint.boss': "Mira el suelo: un jefe muestra dónde caerán sus golpes. Rueda a través de anillos y rayos.",
   'hint.ship': "Hiere a Cthulhu hasta que llegue el Alert, luego toma su timón ({interact}) y lánzala contra él. Tus armas también pueden acabar con él.",
   'hint.powder': "El Horror de Dunwich no puede verse. Cerca de él, {interact} esparce el Polvo de Ibn Ghazi, tres dosis, y lo muestra un rato. En su última fase también puedes cantar el conjuro ({interact}) cerca de él para acabar con él. Tus armas siguen siendo letales.",
-  'hint.cover': "La mirada de Ghatanothoa vuelve piedra la carne: cuatro segundos bajo ella y estás perdido, el color se escurre y la imagen se agrieta. Ponte tras un monolito y se pasa.",
+  'hint.cover': "La mirada de Ghatanothoa vuelve piedra la carne: ocho segundos bajo ella y estás perdido, el color se escurre y la imagen se agrieta. Ponte tras un monolito y se pasa.",
   'hint.roots': "Mientras las raíces de cría sigan en pie, Shub-Niggurath solo recibe una quinta parte de cada golpe, y ellas engendran a sus crías. Corta las raíces.",
   'hint.spheres': "Las esferas iridiscentes son puertas: toca una y sales por la siguiente, y de vez en cuando salta la arena entera. Yog-Sothoth recibe el golpe donde reposan sus esferas.",
   'hint.blind': "Azathoth no puede verte. Rayos y grietas atraviesan la corte: observa dónde aparecen y sal de las marcas antes del golpe. Oye los disparos y las carreras y responde en su origen. El suelo se agrieta; cruzar una fisura lo debilita más rápido. Aléjate de las losas que tiemblan antes de que caigan.",

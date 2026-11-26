@@ -45,7 +45,7 @@ export function mindTarget(m: { from: Mind; to: Mind }): number {
   return (ceiling(bandIndex(m.from)) + floor(bandIndex(m.to))) / 2;
 }
 
-/** The sky to call: the first asked that the realm knows (a vigil asks only what its realm has: tests/discovery.test.ts). */
+/** The sky to call: the first asked that the realm knows (a vigil should ask only what its realm has; nothing tests it while the discoveries are off, round 69: see data/discoveries.ts). */
 const skyFor = (g: Game, sky: readonly Sky[]): Sky | undefined => sky.find((k) => kindsOf(g.overworld?.region ?? null).some(([r]) => r === k));
 
 const hourHolds = (g: Game, hours: readonly Hour[]): boolean => {

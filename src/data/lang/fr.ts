@@ -371,7 +371,7 @@ export const FR: Readonly<Record<Key, string>> = {
   'hint.boss': "Surveillez le sol : un boss montre où ses coups vont tomber. Roulez à travers les anneaux et les rayons.",
   'hint.ship': "Blessez Cthulhu jusqu’à l’arrivée de l’Alert, puis prenez sa barre ({interact}) et lancez-la sur lui. Vos armes peuvent aussi l’achever.",
   'hint.powder': "L’Horreur de Dunwich est invisible. Près d’elle, {interact} répand la poudre d’Ibn Ghazi, trois doses, et la montre un moment. Dans sa dernière phase, vous pouvez aussi réciter l’incantation ({interact}) près d’elle pour l’achever. Vos armes restent mortelles.",
-  'hint.cover': "Le regard de Ghatanothoa change la chair en pierre : quatre secondes sous son regard et vous êtes perdu, la couleur s’efface et l’image se fissure. Placez-vous derrière un monolithe et cela passe.",
+  'hint.cover': "Le regard de Ghatanothoa change la chair en pierre : huit secondes sous son regard et vous êtes perdu, la couleur s’efface et l’image se fissure. Placez-vous derrière un monolithe et cela passe.",
   'hint.roots': "Tant que les racines de ponte tiennent, Shub-Niggurath ne subit qu’un cinquième de chaque coup, et elles engendrent sa progéniture. Abattez les racines.",
   'hint.spheres': "Les sphères irisées sont des portes : touchez-en une et vous sortez de la suivante, et de temps en temps l’arène entière bondit. Yog-Sothoth est frappé là où reposent ses sphères.",
   'hint.blind': "Azathoth ne peut pas vous voir. Des rayons et des failles traversent la cour : surveillez leur apparition et quittez les marques avant le coup. Il entend les tirs et les courses et répond à leur origine. Le sol se fissure ; traverser une fissure accélère son affaiblissement. Quittez les dalles qui tremblent avant leur chute.",

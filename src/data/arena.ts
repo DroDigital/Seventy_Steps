@@ -23,7 +23,7 @@ export interface HiddenPieceDef {
   minInsight?: number;
   maxSanity?: number; // a band floor: 70, 40 or 15
   minSeals?: number; // seals broken (systems/seals.ts): a sealed door stands until then
-  minFound?: string; // a horror found (data/discoveries*.ts; round 63): the gate of its house stands shut until its discovery is done
+  minFound?: string; // a horror found (`found:<id>`, discovery.ts): shut until then. Unset since round 69: no house gate waits on a discovery (tests/arenaHouse.test.ts), and no discovery is played (discovery.ts `arenasHere`)
   met?: string; // one spoken with (data/npcs.ts; round 123): a sealed door stands until then
   glow: Glow; // the colour of its glyphs
   boxes: readonly LayerBox[];

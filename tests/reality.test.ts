@@ -156,7 +156,7 @@ describe('reality hooks (spec §3E)', () => {
     const stone = record(b.g, 'Petrified');
     steps(b.g, 120);
     expect(b.g.reality.petrify).toBeCloseTo(120 * REALITY.petrifyRate, 1);
-    steps(b.g, 130);
+    steps(b.g, Math.ceil(1 / REALITY.petrifyRate) - 120 + 10); // the rest of the way to stone, and a little more
     expect(stone).toHaveLength(1);
     expect(b.g.ecs.c.actor.get(b.g.player.id)!.move).toBe('death');
     const hidden = hookFight(['petrify_buildup']);

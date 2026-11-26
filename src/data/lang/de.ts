@@ -371,7 +371,7 @@ export const DE: Readonly<Record<Key, string>> = {
   'hint.boss': "Achtet auf den Boden: Ein Boss zeigt, wo seine Schläge landen. Rollt durch Ringe und Strahlen.",
   'hint.ship': "Verwundet Cthulhu, bis die Alert kommt, dann nehmt ihr Steuer ({interact}) und steuert sie auf es zu. Auch eure Waffen können es töten.",
   'hint.powder': "Das Grauen von Dunwich ist nicht zu sehen. In seiner Nähe streut {interact} das Pulver des Ibn Ghazi, drei Dosen, und zeigt es eine Weile. In seiner letzten Phase könnt ihr es auch mit der Beschwörung ({interact}) in seiner Nähe erledigen. Eure Waffen bleiben tödlich.",
-  'hint.cover': "Ghatanothoas Blick verwandelt Fleisch in Stein: vier Sekunden in seinem Blick, und ihr seid verloren, die Farbe weicht, und das Bild bekommt Risse. Stellt euch hinter einen Monolithen, und es lässt nach.",
+  'hint.cover': "Ghatanothoas Blick verwandelt Fleisch in Stein: acht Sekunden in seinem Blick, und ihr seid verloren, die Farbe weicht, und das Bild bekommt Risse. Stellt euch hinter einen Monolithen, und es lässt nach.",
   'hint.roots': "Solange die Brutwurzeln stehen, nimmt Shub-Niggurath nur ein Fünftel jedes Schlags, und sie bringen seine Brut hervor. Fällt die Wurzeln.",
   'hint.spheres': "Die schillernden Kugeln sind Tore: Berührt eine, und ihr kommt aus der nächsten heraus, und hin und wieder springt die ganze Arena. Yog-Sothoth wird getroffen, wo seine eigenen Kugeln ruhen.",
   'hint.blind': "Azathoth kann euch nicht sehen. Strahlen und Risse durchziehen den Hof: Achtet darauf, wo sie entstehen, und verlasst die Markierungen rechtzeitig. Es hört Schüsse und Sprints und antwortet an ihrem Ursprung. Der Boden bekommt Risse; wer sie überquert, schwächt ihn schneller. Verlasst zitternde Platten, bevor sie einbrechen.",

@@ -141,7 +141,7 @@ export interface Dread {
 /** HiddenLayer (spec §3A): there only while insight ≥ minInsight and the sanity band lies at or below maxSanity. */
 export interface Layer {
   minSeals?: number; // the waking world's seals broken (seals.ts)
-  minFound?: string; // a horror found (`found:<id>` told, discovery.ts; round 63): its house's gate stands shut until then
+  minFound?: string; // a horror found (`found:<id>` told, discovery.ts): shut until then (unset since round 69: no house gate waits on a discovery, and none is played)
   met?: string; // one spoken with (`overworld.met`, npcs.ts; round 123): a door they keep stands sealed until then
   minInsight?: number;
   maxSanity?: number; // a band floor (70, 40, 15): shown once the whole band is at or below it
