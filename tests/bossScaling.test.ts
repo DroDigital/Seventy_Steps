@@ -195,11 +195,11 @@ describe('a horror’s damage grows with an investigator’s health', () => {
     expect(overmatch({ vigour: 30 }, undefined)).toEqual({ damage: 1 });
   });
 
-  it('takes up a share of the growth in health as damage, and only past the standing', () => {
+  it('takes up a share of the growth in health as damage, only past the standing, with no ceiling', () => {
     const [v] = BOSS_STANDING.dr_munoz!;
     const vigour = overmatch({ vigour: v + 10 }, 'dr_munoz');
     expect(vigour.damage).toBeCloseTo(1 + BOSS_OVERMATCH.share * (bodyAt(v + 10) / bodyAt(v) - 1), 9);
-    expect(overmatch({ vigour: 30 }, 'dr_munoz').damage).toBeGreaterThan(vigour.damage);
+    expect(overmatch({ vigour: 30 }, 'dr_munoz').damage).toBeCloseTo(1 + BOSS_OVERMATCH.share * (bodyAt(30) / bodyAt(v) - 1), 9); // 2026-11-26: a ceiling of 1.5 was tried and taken out
   });
 
   it('keeps the share of the health growth that is the investigator\'s', () => {

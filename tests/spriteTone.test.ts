@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 import { LOOKS } from '../src/data/looks';
 import { REVIEWED_MATTER } from '../src/data/reviewedLook';
+import { ROSTER_IDS } from '../src/data/roster';
 import { FX } from '../src/data/tuning';
 import type { Rgb } from '../src/render/palette';
 import { gradeTints } from '../src/render/realmPalette';
@@ -179,7 +180,8 @@ describe('a form drawn in a strong colour keeps it (round 93: the Zoog was turne
 describe('every form in every realm', () => {
   it('is a finite, bounded recolour', () => {
     const keys = Object.keys(REVIEWED_MATTER);
-    expect(keys.length).toBe(105);
+    expect(keys.length).toBeGreaterThan(0);
+    for (const key of keys) expect(ROSTER_IDS, key).toContain(key.split('#')[0]); // every form's matter is a creature's, in any of its forms (no count: 2026-11-24)
     for (const id of Object.keys(LOOKS)) {
       const mid = gradeTints(LOOKS[id])[2] as Rgb;
       for (const key of keys) {

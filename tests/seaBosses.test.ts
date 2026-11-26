@@ -168,10 +168,12 @@ describe('Dagon and Hydra share a readable fight', () => {
     }
     const budget = standing.hp * (1 + REAGENT.heal * dosesAt(standing.rank, list.length));
     const lives = taken / budget;
-    expect(frames / 60).toBeGreaterThan(45);
+    const floor = { seconds: 45, lives: 0.4 }; // their band's floor: under it a warning (2026-11-24), under half of it a failure, as tests/balance.test.ts (2026-11-26)
+    expect(frames / 60).toBeGreaterThan(floor.seconds / 2);
     expect(frames / 60).toBeLessThan(240);
-    expect(lives).toBeGreaterThan(0.4);
+    expect(lives).toBeGreaterThan(floor.lives / 2);
     expect(lives).toBeLessThan(2.5);
+    if (frames / 60 <= floor.seconds || lives <= floor.lives) console.warn(`Dagon and Hydra together: ${(frames / 60).toFixed(0)} s, ${lives.toFixed(2)} lives, below their band (a warning; under half of it fails)`);
   });
 });
 

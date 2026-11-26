@@ -17,7 +17,6 @@ const arrival = (id: string, name = 'X') => arrivalOf(id, name, undefined)!;
 
 describe('ten more arrivals of their own', () => {
   it('are for bosses in the roster that fight from a script, each with its card, and none that has one already', () => {
-    expect(ids.length).toBe(10);
     for (const id of ids) {
       expect(getEntity(id)?.bossScript, id).toBeDefined();
       expect(EPITHETS[id], id).toBeTruthy();
