@@ -71,7 +71,7 @@ describe('secret-path Insight progression', () => {
   it('returns an older save stranded beyond a raised threshold to its checkpoint with progress and resources intact', () => {
     const saved = { ...snapshot(createWorldGame()), echoes: 321, hp: 37, seen: ['deep_one'], read: ["Curwen's Journal"], slain: ['boss:keziah_mason'] };
     // Cover the immediate secret, descendants behind a doorway, and descendants across a bridge.
-    for (const [dungeon, room, insight] of [['migo_cities', 'brain_rack', 1], ['curwen_catacombs', 'saltes', 2], ['akeley', 'hangar', 2]] as const) {
+    for (const [dungeon, room, insight] of [['migo_cities', 'brain_rack', 1], ['curwen_catacombs', 'study', 2], ['akeley', 'hangar', 2]] as const) {
       const r = worldLayout().dungeons.find((d) => d.layout.def.id === dungeon)!.layout.rooms.find((r) => r.def.id === room)!;
       const g = createWorldGame({ save: { ...saved, insight, at: { x: r.x, z: r.z, yaw: 0 } } });
       expect(g.ecs.c.transform.get(g.player.id)!.pos).toMatchObject({ x: g.player.checkpoint.x, z: g.player.checkpoint.z });

@@ -21,7 +21,8 @@ import type { Prop } from './props';
 import { applySpawn, editInPlace, siteAt, siteFace } from './edits/editApply';
 import { colliderBounds, type Collider } from './colliders';
 import { layoutDungeon, type DungeonLayout } from './dungeonKit';
-import { doorwayClear, dungeonParts, partCollider, type Part } from './dungeonParts';
+import { doorwayClear, dungeonParts, partCollider, windowClear, type Part } from './dungeonParts';
+import { shortcutsOf, type ShortcutPlace } from './shortcutPlan';
 import { landHeight } from './land';
 import { restPoint, shrineColliders, standingStones } from './shrine';
 import { furnish, type GateFn, type SignFn } from './roomFurnish';
@@ -91,6 +92,7 @@ export interface SpawnPoint {
   at: Place;
   unique: boolean; // bosses and optional bosses stay slain
   arena?: { x: number; z: number; radius: number }; // a boss's: its ring of stones or its room
+  lurk?: boolean; // round 125: it lies in wait, hidden, until it springs (systems/ambush.ts)
 }
 
 export type { Pad };
@@ -117,6 +119,7 @@ export interface WorldLayout {
   spawns: SpawnPoint[]; // the fixed ones; open ground adds more per chunk (chunks.ts)
   pads: Pad[];
   pieces: HiddenPieceDef[];
+  shortcuts: ShortcutPlace[]; // round 125: the dungeons' barred doors (shortcutPlan.ts)
   dream: Place | null; // where a dreamer arrives: the first room of the Stairs of Slumber
   errors: string[];
   chunk(cx: number, cz: number): ChunkStatics;
@@ -126,7 +129,7 @@ const EMPTY: ChunkStatics = { colliders: [], pads: [], dungeons: [], spawns: [] 
 const PAD = { sign: [4, 6], gate: [5, 6], tome: [2.5, 4], ally: [3, 4], dungeon: 12 } as const;
 
 function build(): WorldLayout {
-  const w: WorldLayout = { signs: [], gates: [], tomes: [], arenas: [], dungeons: [], spawns: [], pads: [], pieces: [], dream: null, errors: [], chunk: () => EMPTY };
+  const w: WorldLayout = { signs: [], gates: [], tomes: [], arenas: [], dungeons: [], spawns: [], pads: [], pieces: [], shortcuts: [], dream: null, errors: [], chunk: () => EMPTY };
   const buckets = new Map<number, ChunkStatics>();
   const doorways: Collider[] = []; // what the dungeons' doors keep open: no collision, but nothing is set in them
   const bucket = (r: Rect, add: (b: ChunkStatics) => void): void => {
@@ -245,6 +248,8 @@ function build(): WorldLayout {
       const decor: Prop[] = [];
       w.dungeons.push({ layout, parts, decor });
       for (const o of layout.doors) doorways.push(doorwayClear(o));
+      for (const o of layout.windows) doorways.push(windowClear(o)); // (round 125: nothing is set before a window)
+      w.shortcuts.push(...shortcutsOf(layout)); // round 125
       w.pieces.push(...pieces);
       for (const p of parts) if (p.solid) collide(partCollider(p));
       addPad({ kind: 'rect', rect: layout.rect, blend: PAD.dungeon, level: layout.base });

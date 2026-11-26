@@ -19,6 +19,7 @@ import { spawnCreature } from './creatures';
 import { demoAllows } from './demo';
 import { voice } from './npcs';
 import { bossAwake } from './sealCount';
+import { lieInWait } from './ambush';
 
 const RESCAN = 30; // frames between looks at spawn points when nothing has changed
 
@@ -88,6 +89,7 @@ export function populationSystem(g: Game): void {
         ow.wounds.delete(s.id);
       }
       if (s.arena) setArena(g, e, s.arena);
+      if (s.lurk) lieInWait(g, e); // round 125: hidden until it springs
       voice(g, e, s.entity);
       c.origin.set(e, s.id);
       ow.alive.set(s.id, e);

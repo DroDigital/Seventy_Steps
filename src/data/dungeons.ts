@@ -2,7 +2,8 @@
  * Legacy dungeons (spec §3D) as room graphs over the primitive kit: corridor, hall, stair, pit,
  * bridge, well. The first room is the entrance and opens outside on its `dir` side; every other
  * room opens off `from`, on that room's `dir` side. Stairs run straight on, climbing `rise` metres.
- * world/dungeonKit.ts lays a graph out on a grid of 16 m cells; sites.ts says where each one stands.
+ * world/dungeonKit.ts lays a graph out on a grid of 16 m cells; sites.ts says where each one stands. The graphs are dungeonsWaking.ts,
+ * dungeonsDeep.ts, dungeonsFar.ts and lairs.ts (round 125: and their links, the second ways that close them into loops).
  */
 
 export const ROOM_KINDS = ['corridor', 'hall', 'stair', 'pit', 'bridge', 'well'] as const;
@@ -31,6 +32,7 @@ export interface RoomDef {
   boss?: readonly string[]; // a boss arena
   variant?: 'boss';
   spawns?: readonly string[];
+  lurk?: readonly string[]; // round 125: foes lying in wait, unseen, that spring when the investigator comes near (systems/ambush.ts)
   ally?: string;
   allyAt?: readonly [u: number, v: number]; // where its ally stands, across and along the room from its middle (round 123: the Cavern of Flame's priests, at a place of their own); else the room's first spot
   sign?: { id: string; name: string }; // an Elder Sign
@@ -48,263 +50,32 @@ export interface DungeonDef {
   region: string;
   sealed?: boolean; // no way in from outside: the Stairs of Slumber are reached only in dreams
   rooms: readonly RoomDef[];
+  links?: readonly LinkDef[]; // round 125: the second ways between rooms that close the graph into loops (docs/LEVEL_DESIGN.md)
+}
+
+/**
+ * A second way between two rooms that meet side by side, centred on the side they share (round 125, asked: the dungeons designed
+ * as Souls levels are). 'open': a doorway like any other, closing a loop. 'shortcut': a doorway shut by a barred door that opens
+ * only from `from`, the far side, and stays open once opened (systems/shortcuts.ts). 'drop': a ledge in `from`'s wall, a short drop
+ * into `to` below it that cannot be climbed back. 'window': a barred opening a person looks through and cannot pass.
+ */
+export type LinkKind = 'open' | 'shortcut' | 'drop' | 'window';
+
+export interface LinkDef {
+  from: string; // a shortcut's opening side; a drop's upper room
+  to: string;
+  kind: LinkKind;
+  hidden?: Veil; // an open way that only a mind can see, as a room's doorway
 }
 
 import type { KitId } from './kits';
+import { DEEP_DUNGEONS } from './dungeonsDeep';
 import { FAR_DUNGEONS } from './dungeonsFar';
 import { LAIRS } from './lairs';
-import { room, stair } from './roomBuild';
-import { SEALS } from './tuning';
+import { WAKING_DUNGEONS } from './dungeonsWaking';
 
-/** The Stairs of Slumber's flights (round 104): risers of 16 cm, seventy steps of light slumber in two flights, seven hundred of deeper slumber in fourteen. */
-export const SLUMBER_STEPS = { riser: 0.16, light: 35, deep: 50 } as const;
-const LIGHT_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.light;
-const DEEP_FLIGHT = -SLUMBER_STEPS.riser * SLUMBER_STEPS.deep;
-/** A flight of the seven hundred steps (round 104): over the void, its words said as it is entered, its kit by depth, and (rounds 120, 121) what waits on it, if anything; (round 123) the veil on the way into it. */
-const deep = (id: string, from: string, dir: Dir, o: { words?: string; kit?: KitId; foes?: readonly string[]; hidden?: Veil } = {}): RoomDef =>
-  stair(id, from, dir, DEEP_FLIGHT, { steps: SLUMBER_STEPS.deep, abyss: true, kit: o.kit ?? 'dreamdeep', ...(o.foes?.length && { spawns: o.foes }), ...(o.words && { words: o.words }), ...(o.hidden && { hidden: o.hidden }) });
+export { SLUMBER_STEPS } from './dungeonsDeep';
 
-
-export const DUNGEONS: readonly DungeonDef[] = [
-  ...LAIRS,
-  // Round 13: the dungeons were four to nine rooms in a line. Each now branches: side ways with foes
-  // and an Echo cache at their ends, a secret or two behind a veil, and its own named places.
-  // Insight is held, not spent to enter: 1 introduces the veil, 2 rewards early exploration,
-  // 3 asks for experience of the waking horrors, 4 for the deep world's optional branches.
-  // Far-realm secrets ask for 5 (dungeonsFar.ts); no boss or required route waits on insight.
-  {
-    id: 'library', name: 'University Library', region: 'hub', rooms: [
-      room('foyer', 'hall', undefined, 's'),
-      room('reading', 'hall', 'foyer', 'n', { spawns: ['exham_troglodyte'] }),
-      room('stacks_w', 'corridor', 'reading', 'w', { spawns: ['rat_swarm'] }),
-      room('catalogue', 'corridor', 'stacks_w', 'w', { spawns: ['reanimated_corpse'] }),
-      room('periodicals', 'hall', 'catalogue', 'n', { spawns: ['rat_swarm', 'exham_troglodyte'] }),
-      room('stacks_e', 'corridor', 'reading', 'e'),
-      room('restricted', 'hall', 'stacks_e', 'n', { hidden: { minInsight: 1 }, tome: { name: 'Necronomicon', insight: 2 } }),
-      room('descent', 'stair', 'reading', 'n', { rise: -4, spawns: ['exham_troglodyte', 'rat_swarm'] }),
-      room('archive', 'well', 'descent', 'n', { sign: { id: 'hub_archive', name: 'Library Archive' } }),
-      room('vaults', 'corridor', 'archive', 'e', { spawns: ['exham_troglodyte', 'reanimated_corpse'], words: 'THE SUB-BASEMENT' }),
-      room('bindery', 'hall', 'vaults', 'e', { spawns: ['exham_troglodyte', 'exham_troglodyte', 'rat_swarm'] }),
-      room('charnel', 'pit', 'archive', 'w', { spawns: ['rat_swarm', 'rat_swarm'] }),
-      room('sealed_stacks', 'corridor', 'charnel', 'w', { hidden: { maxSanity: 40 }, tome: { name: 'Liber Ivonis', insight: 1 } }),
-    ],
-  },
-  {
-    id: 'witch_house', name: 'The Witch House', region: 'arkham', rooms: [
-      room('hallway', 'corridor', undefined, 'e'),
-      room('parlour', 'hall', 'hallway', 'w', { spawns: ['rat_swarm', 'rat_swarm'], weapon: 'razor' }),
-      room('kitchen', 'corridor', 'parlour', 'w', { spawns: ['reanimated_corpse'] }),
-      room('pantry', 'hall', 'kitchen', 's', { spawns: ['rat_swarm', 'rat_swarm'] }),
-      stair('cellar', 'hallway', 's', -4, { spawns: ['rat_swarm'] }), // round 12: the house was six rooms; the rats come up from below
-      room('vault', 'hall', 'cellar', 's', { spawns: ['rat_swarm', 'rat_swarm', 'reanimated_corpse'], words: 'THE CELLAR' }),
-      room('cistern', 'well', 'vault', 'e', { spawns: ['rat_swarm'] }),
-      room('ratholes', 'corridor', 'vault', 's', { spawns: ['rat_swarm', 'reanimated_corpse'], words: 'THE RAT-HOLES' }),
-      room('burrow', 'pit', 'ratholes', 's', { hidden: { minInsight: 2 }, tome: { name: "Gilman's Dream-Diary", insight: 1 } }),
-      room('stair', 'stair', 'parlour', 'n', { rise: 4, spawns: ['reanimated_corpse'] }),
-      room('landing', 'corridor', 'stair', 'n', { sign: { id: 'arkham_witch', name: 'Witch House Stair' } }),
-      room('lodgers', 'corridor', 'landing', 'e', { spawns: ['reanimated_corpse', 'rat_swarm'] }), // the lodgers' rooms, empty of lodgers
-      room('dombrowski', 'hall', 'lodgers', 'e', { spawns: ['reanimated_corpse', 'rat_swarm', 'rat_swarm'] }),
-      room('closet', 'hall', 'landing', 'w', { hidden: { minInsight: 1 }, tome: { name: "Keziah's Formulae", insight: 1 } }),
-      room('garret', 'hall', 'landing', 'n', { wide: true, boss: ['keziah_mason', 'brown_jenkin'] }),
-    ],
-  },
-  {
-    id: 'sentinel_hill', name: 'Sentinel Hill', region: 'dunwich', rooms: [
-      room('path', 'corridor', undefined, 's'),
-      room('hollow', 'corridor', 'path', 'w', { spawns: ['martense_degenerate'] }),
-      room('barrow', 'hall', 'hollow', 'w', { spawns: ['martense_degenerate', 'martense_degenerate', 'rat_swarm'] }),
-      stair('climb', 'path', 'n', 4),
-      room('terrace', 'hall', 'climb', 'n', { sign: { id: 'dunwich_sentinel', name: 'Sentinel Terrace' } }),
-      room('circle', 'well', 'terrace', 'e', { spawns: ['thousand_young'] }),
-      room('standing', 'corridor', 'circle', 'e', { spawns: ['thousand_young'] }),
-      room('altar', 'hall', 'standing', 's', { hidden: { minInsight: 3 }, tome: { name: "Old Whateley's Ledger", insight: 1 } }),
-      room('ledge', 'corridor', 'terrace', 'w', { spawns: ['thousand_young', 'mi_go'] }),
-      room('lookout', 'hall', 'ledge', 'w', { spawns: ['mi_go', 'martense_degenerate'], words: 'THE ROUND HILLS' }),
-      stair('ascent', 'terrace', 'n', 4),
-      room('summit', 'hall', 'ascent', 'n', { wide: true, boss: ['dunwich_horror'] }),
-    ],
-  },
-  {
-    id: 'yhanthlei', name: "Y'ha-nthlei", region: 'innsmouth', rooms: [
-      room('mouth', 'corridor', undefined, 'e'),
-      stair('sink', 'mouth', 'w', -4),
-      room('drowned', 'hall', 'sink', 'w', { sign: { id: 'innsmouth_yhanthlei', name: 'Drowned Hall' } }),
-      room('pits', 'pit', 'drowned', 'n', { spawns: ['deep_one'] }),
-      room('nursery', 'hall', 'pits', 'n', { spawns: ['deep_one', 'innsmouth_hybrid', 'dagon_priest'], words: 'THE SPAWNING POOLS' }),
-      room('reliquary', 'corridor', 'nursery', 'e', { hidden: { minInsight: 3 }, tome: { name: "Obed Marsh's Log", insight: 1 } }),
-      room('ossuary', 'corridor', 'pits', 'w', { spawns: ['deep_one', 'deep_one'] }),
-      room('cells', 'corridor', 'drowned', 's', { spawns: ['innsmouth_hybrid'], weapon: 'cutlass' }),
-      stair('cells_deep', 'cells', 's', -4, { spawns: ['innsmouth_hybrid'] }),
-      room('oubliette', 'pit', 'cells_deep', 's', { spawns: ['deep_one', 'innsmouth_hybrid'] }),
-      room('span', 'bridge', 'drowned', 'w', { spawns: ['deep_one', 'deep_one'] }),
-      room('temple', 'hall', 'span', 'w', { wide: true, boss: ['father_dagon', 'mother_hydra'], kit: 'sunken' }),
-    ],
-  },
-  {
-    id: 'curwen_catacombs', name: "Curwen's Catacombs", region: 'providence', rooms: [
-      room('cellar', 'corridor', undefined, 'n'),
-      room('storeroom', 'corridor', 'cellar', 'e', { spawns: ['ghoul'] }),
-      room('cistern', 'well', 'storeroom', 'e', { spawns: ['ghoul', 'winged_hybrid'] }),
-      room('steps', 'stair', 'cellar', 's', { rise: -4, spawns: ['ghoul', 'ghoul'] }),
-      room('crypt', 'hall', 'steps', 's', { sign: { id: 'prov_catacombs', name: "Curwen's Crypt" } }),
-      room('pits', 'pit', 'crypt', 'e', { boss: ['curwen_pit_thing'] }),
-      room('pens', 'corridor', 'pits', 'e', { spawns: ['ghoul', 'ghoul'], words: 'THE PITS' }),
-      room('ossuary', 'corridor', 'crypt', 'w', { hidden: { minInsight: 3 }, tome: { name: "Curwen's Journal", insight: 1 } }),
-      room('charnel', 'hall', 'ossuary', 'w', { spawns: ['ghoul', 'being_from_beyond'] }),
-      room('saltes', 'corridor', 'charnel', 's', { vial: 'Silver Vial of the Essential Saltes' }),
-      room('laboratory', 'hall', 'crypt', 's', { wide: true, boss: ['joseph_curwen'] }),
-    ],
-  },
-  {
-    id: 'starry_wisdom', name: 'Starry Wisdom Church', region: 'providence', rooms: [
-      room('nave', 'hall', undefined, 's', { spawns: ['cthulhu_cultist', 'cthulhu_cultist'] }),
-      room('vestry', 'corridor', 'nave', 'e', { spawns: ['cthulhu_cultist'] }),
-      stair('crypt_stair', 'vestry', 'e', -4),
-      room('undercroft', 'hall', 'crypt_stair', 'e', { spawns: ['cthulhu_cultist', 'winged_hybrid'], words: 'THE UNDERCROFT' }),
-      room('catacomb', 'corridor', 'undercroft', 's', { spawns: ['ghoul', 'ghoul'] }),
-      room('chapel', 'hall', 'nave', 'w', { spawns: ['cthulhu_cultist', 'winged_hybrid'] }),
-      room('sacristy', 'corridor', 'chapel', 's', { hidden: { minInsight: 2 }, tome: { name: "Bowen's Journal", insight: 1 } }),
-      room('aisle', 'corridor', 'nave', 'n'),
-      stair('tower', 'aisle', 'n', 4),
-      room('belfry', 'corridor', 'tower', 'n', { sign: { id: 'prov_church', name: 'Belfry Stair' } }),
-      room('gallery', 'corridor', 'belfry', 'w', { spawns: ['winged_hybrid', 'winged_hybrid'] }),
-      stair('spire', 'belfry', 'n', 4),
-      room('steeple', 'hall', 'spire', 'n', { wide: true, boss: ['haunter_of_the_dark'] }),
-    ],
-  },
-  {
-    id: 'akeley', name: 'Akeley Farmhouse', region: 'vermont', rooms: [
-      room('porch', 'corridor', undefined, 's'),
-      room('parlour', 'hall', 'porch', 'n', { spawns: ['martense_degenerate'] }),
-      room('kitchen', 'corridor', 'parlour', 'e', { sign: { id: 'vermont_farm', name: 'Akeley Farmhouse' } }),
-      room('barn', 'hall', 'kitchen', 'e', { spawns: ['martense_degenerate', 'martense_degenerate', 'rat_swarm'] }),
-      stair('cellar', 'parlour', 'w', -4, { spawns: ['rat_swarm'] }),
-      room('root_cellar', 'hall', 'cellar', 'w', { spawns: ['martense_degenerate', 'moon_bog_wraith'] }),
-      room('study', 'hall', 'parlour', 'n', { wide: true, boss: ['whisperer'] }),
-      room('tunnel', 'corridor', 'study', 'w', { kit: 'mine' }),
-      stair('shaft', 'tunnel', 'w', -4, { kit: 'mine' }),
-      room('outpost', 'well', 'shaft', 'w', { spawns: ['mi_go', 'mi_go'], kit: 'mine', words: 'THE OUTPOST' }),
-      room('gallery', 'corridor', 'outpost', 's', { spawns: ['mi_go'], kit: 'mine' }),
-      room('cylinders', 'hall', 'gallery', 's', { spawns: ['mi_go', 'mi_go'], kit: 'mine', words: 'THE BRAIN-CYLINDERS' }),
-      room('span', 'bridge', 'outpost', 'n', { hidden: { minInsight: 4 }, kit: 'mine' }),
-      room('vault', 'hall', 'span', 'n', { tome: { name: "Akeley's Phonograph Record", insight: 1 }, spawns: ['mi_go'], kit: 'mine' }),
-      room('hangar', 'corridor', 'vault', 'n', { spawns: ['mi_go'], kit: 'mine' }),
-    ],
-  },
-  {
-    id: 'elder_city', name: 'Elder Thing City', region: 'mountains', rooms: [
-      room('gate', 'corridor', undefined, 's'),
-      room('plaza', 'hall', 'gate', 'n', { sign: { id: 'mountains_city', name: 'Elder Thing City' } }),
-      room('arcade', 'corridor', 'plaza', 'w', { spawns: ['albino_penguin', 'elder_thing'] }),
-      stair('spire', 'arcade', 'w', 4),
-      room('observatory', 'hall', 'spire', 'w', { spawns: ['gnoph_keh'], words: 'THE STAR-HEADED CITY' }),
-      room('murals', 'hall', 'plaza', 'e', { tome: { name: 'Elder Thing Murals', insight: 1 }, spawns: ['gnoph_keh'] }),
-      room('frieze', 'corridor', 'murals', 'n', { spawns: ['elder_thing'] }),
-      room('sketches', 'hall', 'frieze', 'n', { hidden: { minInsight: 4 }, tome: { name: "Danforth's Sketches", insight: 1 } }),
-      room('ramp', 'stair', 'plaza', 'n', { rise: -4, spawns: ['elder_thing', 'elder_thing'] }),
-      room('gallery', 'corridor', 'ramp', 'n', { spawns: ['albino_penguin', 'albino_penguin'] }),
-      room('tunnels', 'corridor', 'gallery', 'w', { spawns: ['albino_penguin', 'albino_penguin', 'albino_penguin'] }),
-      room('hatchery', 'pit', 'tunnels', 'w', { spawns: ['elder_thing'] }),
-      room('span', 'bridge', 'gallery', 'n'),
-      room('abyss', 'hall', 'span', 'n', { wide: true, boss: ['shoggoth'], variant: 'boss' }),
-    ],
-  },
-  {
-    id: 'archives', name: 'Archives of the Great Race', region: 'pnakotus', rooms: [
-      room('stacks', 'corridor', undefined, 'e'),
-      room('annex', 'corridor', 'stacks', 'n', { spawns: ['nameless_city_reptile'] }),
-      room('reading', 'hall', 'stacks', 'w', { sign: { id: 'pnakotus_archives', name: 'Archive Reading Hall' }, ally: 'yithian_archivist' }),
-      room('catalogue', 'corridor', 'reading', 'n', { spawns: ['yithian'] }),
-      room('machines', 'hall', 'catalogue', 'n', { spawns: ['yithian', 'hybrid_mummy'], words: 'THE HALL OF MACHINES' }),
-      room('shelves', 'corridor', 'reading', 's', { spawns: ['nameless_city_reptile', 'nameless_city_reptile'] }),
-      room('earth_race', 'hall', 'shelves', 's', { hidden: { minInsight: 4 }, tome: { name: 'The Case of the Earth Race', insight: 1 } }),
-      room('down', 'stair', 'reading', 'w', { rise: -4, spawns: ['yithian'] }),
-      room('deep', 'corridor', 'down', 'w', { spawns: ['nameless_city_reptile'], tome: { name: 'Pnakotic Manuscripts', insight: 1 } }),
-      room('trapdoor', 'well', 'deep', 'n', { spawns: ['flying_polyp'] }),
-      stair('shaft', 'trapdoor', 'n', -4, { spawns: ['hybrid_mummy'] }),
-      room('basalt', 'corridor', 'shaft', 'n', { spawns: ['hybrid_mummy', 'hybrid_mummy'], words: 'THE BASALT DEEPS' }),
-      room('vault', 'hall', 'deep', 'w', { wide: true, boss: ['flying_polyp'], variant: 'boss' }),
-    ],
-  },
-  {
-    id: 'tsath', name: 'Tsath', region: 'kn_yan', rooms: [
-      room('blue_gate', 'corridor', undefined, 's', { spawns: ['kn_yan_dweller', 'kn_yan_dweller'] }),
-      room('guardhouse', 'hall', 'blue_gate', 'w', { spawns: ['ym_bhi', 'kn_yan_dweller'] }),
-      room('avenue', 'hall', 'blue_gate', 'n', { sign: { id: 'knyan_tsath', name: 'Avenue of Tsath' } }),
-      room('market', 'hall', 'avenue', 'e', { spawns: ['kn_yan_dweller', 'kn_yan_dweller', 'ym_bhi'] }),
-      room('baths', 'corridor', 'market', 'e', { spawns: ['serpent_man'] }),
-      room('yoth', 'pit', 'avenue', 'w', { spawns: ['gyaa_yothn'] }),
-      stair('yoth_steps', 'yoth', 'w', -4, { spawns: ['beast_in_the_cave'] }),
-      room('red_yoth', 'hall', 'yoth_steps', 'w', { spawns: ['gyaa_yothn', 'serpent_man'], words: 'RED-LITTEN YOTH' }),
-      room('serpent_vault', 'corridor', 'red_yoth', 'n', { hidden: { minInsight: 4 }, tome: { name: "Zamacona's Manuscript", insight: 1 } }),
-      stair('temple', 'avenue', 'n', -4),
-      room('span', 'bridge', 'temple', 'n'),
-      room('nkai', 'hall', 'span', 'n', { wide: true, boss: ['tsathoggua'] }),
-    ],
-  },
-  {
-    id: 'slumber', name: 'Stairs of Slumber', region: 'slumber_stairs', sealed: true, rooms: [ // (round 123: a realm of their own, data/regions.ts)
-      // Round 12: the descent was a 30-second walk through nine empty rooms. Now it is said as it goes,
-      // and the dream's lesser things wait on the flights. Round 104: the steps are as many as the tale says, each one cut:
-      // seventy (two flights of 35, risers of 16 cm) to the Cavern of Flame, then seven hundred (fourteen flights of 50) down a
-      // switchback, across a span over the dreamless dark, to the Gate of Deeper Slumber. Round 120 (asked: the 44 foes made the
-      // descent a gauntlet run at a sprint on potions) left six lone things in the mist; round 121 (asked: "way too few", 15 to 25)
-      // sets twenty: one or two on a flight, three at a landing, worse the deeper, and never more than two rooms in a row hold any. Round 122
-      // (asked: no notice every fifty steps, only at the important places): the words name the two stairs, the cavern and the gate alone.
-      room('threshold', 'hall', undefined, 'n'),
-      stair('light_1', 'threshold', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, words: 'THE SEVENTY STEPS OF LIGHT SLUMBER', spawns: ['zoog'] }),
-      stair('light_2', 'light_1', 'n', LIGHT_FLIGHT, { steps: 35, abyss: true, spawns: ['zoog', 'zoog'] }),
-      // Round 123 (asked: the priests must not be stuck anywhere when first come to; "it should have a fixed location in the cavern and you need to talk
-      // to them to progress further down the steps and then they follow and help you"): they stand between their effigies before the way on down, and
-      // that way is sealed until they are spoken with (`met`); then they go with the investigator (systems/allyTrail.ts).
-      room('cavern', 'hall', 'light_2', 'n', { wide: true, sign: { id: 'dream_cavern', name: 'Cavern of Flame' }, ally: 'nasht_kaman_thah', allyAt: [0, 13], words: 'THE CAVERN OF FLAME', kit: 'dreamflame' }),
-      deep('deep_1', 'cavern', 'n', { words: 'THE SEVEN HUNDRED STEPS OF DEEPER SLUMBER', hidden: { met: 'nasht' } }),
-      deep('deep_2', 'deep_1', 'n', { foes: ['night_gaunt'] }),
-      deep('deep_3', 'deep_2', 'n', { foes: ['ghoul'] }),
-      deep('deep_4', 'deep_3', 'n', ),
-      room('landing_1', 'hall', 'deep_4', 'n', { kit: 'dreamdeep', spawns: ['ghast', 'ghoul', 'zoog'] }),
-      deep('deep_5', 'landing_1', 'n'),
-      deep('deep_6', 'deep_5', 'n', { foes: ['wamp', 'wamp'] }),
-      deep('deep_7', 'deep_6', 'n', { foes: ['man_of_leng'] }),
-      room('turn_1', 'hall', 'deep_7', 'n', { kit: 'dreamdeep' }),
-      room('span', 'bridge', 'turn_1', 'e', { kit: 'dreamabyss', spawns: ['night_gaunt'] }),
-      room('turn_2', 'hall', 'span', 'e', { kit: 'dreamabyss' }),
-      deep('deep_8', 'turn_2', 's', { kit: 'dreamabyss', foes: ['ghast'] }),
-      deep('deep_9', 'deep_8', 's', { kit: 'dreamabyss' }),
-      deep('deep_10', 'deep_9', 's', { kit: 'dreamabyss', foes: ['being_of_ib'] }),
-      room('landing_2', 'hall', 'deep_10', 's', { kit: 'dreamabyss', spawns: ['moon_beast', 'ghast', 'ghast'] }),
-      deep('deep_11', 'landing_2', 's', { kit: 'dreamabyss' }),
-      deep('deep_12', 'deep_11', 's', { kit: 'dreamabyss', foes: ['man_of_leng', 'ghoul'] }),
-      deep('deep_13', 'deep_12', 's', { kit: 'dreamabyss' }),
-      deep('deep_14', 'deep_13', 's', { kit: 'dreamabyss', foes: ['moon_beast'] }),
-      room('deeper', 'hall', 'deep_14', 's', { kit: 'dreamabyss', gate: { id: 'dream_deeper', name: 'Gate of Deeper Slumber', to: 'dream_wood_gate' }, words: 'THE GATE OF DEEPER SLUMBER' }),
-    ],
-  },
-  {
-    id: 'ulthar_kadath', name: 'Ulthar to Kadath', region: 'dreamlands', rooms: [
-      room('ulthar_gate', 'corridor', undefined, 's'),
-      room('ulthar', 'hall', 'ulthar_gate', 'n', { sign: { id: 'dream_ulthar', name: 'Ulthar' }, ally: 'cats_of_ulthar' }),
-      room('cats_lane', 'corridor', 'ulthar', 'w', { spawns: ['cat_from_saturn'] }),
-      room('elder_temple', 'hall', 'cats_lane', 'w', { tome: { name: 'The Pnakotic Fragments', insight: 1 }, spawns: ['zoog', 'zoog'], words: 'THE TEMPLE OF THE ELDER ONES' }),
-      room('road', 'corridor', 'ulthar', 'n', { spawns: ['zoog', 'zoog'] }),
-      room('dylath_leen', 'hall', 'road', 'e', { spawns: ['moon_beast', 'man_of_leng'], words: 'DYLATH-LEEN' }),
-      stair('leng_climb', 'road', 'n', 5),
-      room('leng', 'hall', 'leng_climb', 'n', { wide: true, boss: ['high_priest'], spawns: ['man_of_leng'] }),
-      room('monastery', 'corridor', 'leng', 'n', { spawns: ['man_of_leng', 'man_of_leng'] }),
-      room('zin_steps', 'stair', 'leng', 'e', { rise: -5, spawns: ['gug', 'ghast'] }),
-      room('zin', 'pit', 'zin_steps', 'e', { sign: { id: 'dream_zin', name: 'Vaults of Zin' }, ally: 'pickman' }),
-      room('gug_city', 'hall', 'zin', 's', { spawns: ['gug', 'ghast', 'ghast'], words: 'THE CITY OF THE GUGS' }),
-      stair('koth', 'gug_city', 's', 5, { spawns: ['ghast'], words: 'THE TOWER OF KOTH' }),
-      room('koth_top', 'corridor', 'koth', 's', { spawns: ['zoog', 'zoog', 'ghoul'] }),
-      room('zin_span', 'bridge', 'zin', 'e'),
-      stair('kadath_climb', 'zin_span', 'e', 6),
-      room('kadath', 'hall', 'kadath_climb', 'e', {
-        wide: true, boss: ['great_ones'], gate: { id: 'dream_ultimate', name: 'The Ultimate Gate', to: 'beyond_gate' },
-        hidden: { minSeals: SEALS.kadath }, // the Great Ones' door: sealed until the waking world's horrors fall (round 12)
-      }),
-    ],
-  },
-  ...FAR_DUNGEONS,
-];
+export const DUNGEONS: readonly DungeonDef[] = [...LAIRS, ...WAKING_DUNGEONS, ...DEEP_DUNGEONS, ...FAR_DUNGEONS]; // (round 125: the legacy dungeons in two files, dungeonsWaking.ts and dungeonsDeep.ts)
 
 export const getDungeon = (id: string): DungeonDef | undefined => DUNGEONS.find((d) => d.id === id);

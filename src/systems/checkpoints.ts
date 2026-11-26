@@ -31,6 +31,7 @@ import { setSanity } from './sanity';
 import { dismissMount } from './mounts';
 import { clearPortalRide, keepPortalCamera, portalVeil } from './mountPortal';
 import { demoAllows, demoRefuses } from './demo';
+import { furnishShortcuts } from './shortcuts';
 
 export const signPlace = (id: string): SignPlace | undefined => worldLayout().signs.find((s) => s.id === id);
 export const gatePlace = (id: string): GatePlace | undefined => worldLayout().gates.find((g) => g.id === id);
@@ -50,6 +51,7 @@ export function furnishWorld(g: Game): void {
   for (const t of w.gates) c.gate.set(put(t.x, t.z, yawOfDir(t.face), gateModel(t.id)), { id: t.id, name: t.name, to: t.to });
   for (const t of w.tomes) if (!g.overworld?.read.has(t.name)) spawnTome(g, { ...t.at, name: t.name, insight: t.insight, vial: t.vial, note: t.note, echoes: t.echoes, weapon: t.weapon, rounds: t.rounds });
   for (const p of w.pieces) spawnPiece(g, p);
+  furnishShortcuts(g); // round 125: the dungeons' barred doors
 }
 
 /** Moves the investigator to `at` (no healing), the camera behind them. `keepRide` is the gate they walked in the saddle: the ride comes through, the pace with it (mountPortal.ts). Every other jump sets them down. */

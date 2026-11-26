@@ -38,7 +38,7 @@ describe('resting at an Elder Sign', () => {
   it('foes posted about a sign stay down when it is rested at, and come back with a rest elsewhere', () => {
     const g = createWorldGame();
     for (const s of worldLayout().signs) g.overworld!.discovered.add(s.id);
-    const sign = signPlace('dunwich_sentinel')!; // a sign in a dungeon, its foes about it
+    const sign = signPlace('prov_church')!; // a sign in a dungeon, its foes about it (round 125: Sentinel Hill's terrace went down to the hill's foot, its climb beyond; the church's aisle has the nave and the chapels about it)
     travel(g, sign.id);
     run(g, 31);
     const ow = g.overworld!;

@@ -42,7 +42,7 @@ export function along(r: RoomLayout, side: Side, p: XZ, reach: number): number |
 
 /** The `s` of each doorway in a room's wall `side`. */
 export const doorsOn = (d: DungeonLayout, r: RoomLayout, side: Side): number[] =>
-  d.doors.filter((o) => o.a === r || o.b === r).map((o) => along(r, side, o, 1.2)).filter((s): s is number => s !== null);
+  [...d.doors, ...d.windows].filter((o) => o.a === r || o.b === r).map((o) => along(r, side, o, 1.2)).filter((s): s is number => s !== null); // (round 125: and its windows)
 
 /** A stroke on a wall's face from (s0, y0) to (s1, y1), `d` off it, `w` wide and `t` deep, the floor at `y`. */
 export function stroke(w: Wall, y: number, s0: number, y0: number, s1: number, y1: number, d: number, wide: number, t: number, c: Rgb): THREE.BufferGeometry {

@@ -175,11 +175,15 @@ function camp(f: Feature, rng: Rng): Prop[] {
   return out;
 }
 
+/** Metres the great one at a landmark's heart stands at the least (round 125: Pnakotus's blocks are 4 to 7 high, and five hearts all drawn under six were no greater than the lesser about them). Its height only: its footprint, and so the land's fill, is as drawn. */
+const GREAT = 6.2;
+
 /** A realm's landmark (round 12): one great one at the heart, and two or three lesser about it. */
 function landmark(f: Feature, rng: Rng, ctx: FeatureContext): Prop[] {
   if (!ctx.landmark) return [];
   const kind = ctx.landmark;
-  const out = [makeProp(kind, f.x, f.z, rng)];
+  const heart = makeProp(kind, f.x, f.z, rng);
+  const out = [heart.h < GREAT ? { ...heart, h: GREAT } : heart];
   return [...out, ...scatter(f, rng, 2 + Math.floor(rng() * 2), 9, { ...ctx, free: (x, z) => ctx.free(x, z) && Math.hypot(x - f.x, z - f.z) > 8 }, () => kind).map((p) => ({ ...p, w: p.w * 0.6, d: p.d * 0.6, h: p.h * 0.55 }))];
 }
 

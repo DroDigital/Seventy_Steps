@@ -45,6 +45,7 @@ export const GUIDE: Readonly<Record<HintId, { group: GuideGroup; title: string }
   talk: g(DREAM, 'People'),
   relic: g(DREAM, 'Relics'),
   transfer: g(DREAM, 'Moving reinforcement'),
+  shortcut: g(DREAM, 'Shortcuts'),
   boss: g(HORRORS, 'Bosses'),
   fog: g(HORRORS, 'The mist'),
   candle: g(HORRORS, 'Candles'),

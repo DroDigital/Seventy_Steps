@@ -9,6 +9,7 @@ import type { XZ } from '../core/geom';
 import type { Dir, DungeonDef, RoomDef, Veil } from '../data/dungeons';
 import { roomKit, roomKitId, type DungeonKit, type KitId } from '../data/kits';
 import { DUNGEON, WORLD } from '../data/tuning';
+import { layLinks, type LinkLayout } from './dungeonLinks';
 import { DIRS, OPPOSITE, type Rect } from './worldMap';
 
 export interface RoomLayout {
@@ -25,7 +26,8 @@ export interface RoomLayout {
   rise: number; // stairs: climbed toward `axis`
   entry: Dir; // the side it is entered from (the entrance: its outside doorway)
   axis: Dir; // the way through it, away from the entry
-  doors: Dir[]; // sides with doorways
+  doors: Dir[]; // sides with doorways (round 125: a link's too, world/dungeonLinks.ts)
+  windows: Dir[]; // sides with a window (round 125)
 }
 
 export interface DoorLayout {
@@ -34,8 +36,9 @@ export interface DoorLayout {
   side: Dir; // which side of `a` it is on
   a: RoomLayout;
   b: RoomLayout | null; // null: the way outside
-  level: number; // floor height in the doorway
+  level: number; // floor height in the doorway (a drop's: its upper floor)
   hidden?: Veil;
+  link?: LinkLayout; // a second way, not the tree's (round 125)
 }
 
 export interface DungeonLayout {
@@ -44,7 +47,8 @@ export interface DungeonLayout {
   base: number; // floor height at the entrance: the ground in front of it
   origin: XZ; // centre of cell (0, 0), the entrance's
   rooms: RoomLayout[];
-  doors: DoorLayout[];
+  doors: DoorLayout[]; // the tree's, then its links' (round 125: a link's doorway carries `link`)
+  windows: DoorLayout[]; // round 125: the windows between rooms, which nobody passes
   rect: Rect; // around every room
   errors: string[];
 }
@@ -94,6 +98,7 @@ export function layoutDungeon(def: DungeonDef, door: XZ, base: number): DungeonL
       axis: OPPOSITE[entrySide],
       rect: { x0: x - half, z0: z - half, x1: x + half, z1: z + half },
       doors: parent || !def.sealed ? [entrySide] : [],
+      windows: [],
     };
     if (r.kind === 'stair' && !room.rise) errors.push(`${r.id}: a stair needs a rise`);
     const h = (size - 1) / 2;
@@ -119,6 +124,9 @@ export function layoutDungeon(def: DungeonDef, door: XZ, base: number): DungeonL
     if (ids.has(r.id)) errors.push(`${r.id}: two rooms share the id`);
     ids.add(r.id);
   }
+  const windows: DoorLayout[] = [];
+  layLinks(def.id, def.links ?? [], byId, doors, windows, errors); // round 125: the loops, shortcuts, drops and windows
+  for (const r of def.rooms) if (r.lurk?.length && r.sign) errors.push(`${r.id}: nothing lies in wait where an Elder Sign stands`);
   for (const r of rooms) {
     const out = r.doors.filter((d) => d !== r.entry);
     if ((r.def.kind === 'stair' || r.def.kind === 'bridge') && out.length > 1) errors.push(`${r.def.id}: a ${r.def.kind} leads on to one room at most`);
@@ -127,7 +135,7 @@ export function layoutDungeon(def: DungeonDef, door: XZ, base: number): DungeonL
     (b, r) => ({ x0: Math.min(b.x0, r.rect.x0), z0: Math.min(b.z0, r.rect.z0), x1: Math.max(b.x1, r.rect.x1), z1: Math.max(b.z1, r.rect.z1) }),
     { x0: Infinity, z0: Infinity, x1: -Infinity, z1: -Infinity },
   );
-  const layout: DungeonLayout = { def, region: def.region, base, origin, rooms, doors, rect, errors };
+  const layout: DungeonLayout = { def, region: def.region, base, origin, rooms, doors, windows, rect, errors };
   cells.set(layout, byCell);
   return layout;
 }

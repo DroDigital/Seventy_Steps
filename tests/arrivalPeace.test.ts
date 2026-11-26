@@ -50,7 +50,11 @@ function quietSign(g: Game): string {
   return s.id;
 }
 
-/** A world game with a quiet sign found, travelled to, and a deep one `away` metres out in front of the investigator, facing them. */
+/**
+ * A world game with a quiet sign found, travelled to, and a deep one `away` metres out in front of the investigator, facing them. It keeps
+ * to where it stands (no post, so no rounds: roam.ts): it is the foe beside the stone, not one that strolls off while they kneel (round 125:
+ * the world's own foes draw on the same dice, and one that had happened to stay near had walked nine metres away).
+ */
 function arrive(away = 4): { g: Game; foe: number; hp: number } {
   const g = createWorldGame();
   const id = quietSign(g);
@@ -59,6 +63,7 @@ function arrive(away = 4): { g: Game; foe: number; hp: number } {
   const me = g.ecs.c.transform.get(g.player.id)!;
   const [sin, cos] = [Math.sin(me.yaw), Math.cos(me.yaw)];
   const foe = spawnCreature(g, 'deep_one', { x: me.pos.x + sin * away, z: me.pos.z + cos * away, yaw: me.yaw + Math.PI })!;
+  g.ecs.c.home.delete(foe);
   return { g, foe, hp: g.ecs.c.health.get(g.player.id)!.hp };
 }
 

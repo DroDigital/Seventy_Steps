@@ -41,6 +41,7 @@ import { registerHiddenLayer, spawnPiece } from './hiddenLayer';
 import { explorationSystem } from './exploration';
 import { markerSystem } from './marker';
 import { passageSystem } from './passages';
+import { shortcutSystem } from './shortcuts';
 import { placeSystem } from './places';
 import { poiSystem } from './pois';
 import { createBuffer } from './inputBuffer';
@@ -263,6 +264,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   explorationSystem(g);
   markerSystem(g); // the marker reached is cleared (round 60)
   passageSystem(g); // a secret passage the investigator is near opens (round 61)
+  shortcutSystem(g); // a shortcut's barred door stands in its doorway until it is opened from beyond (round 125)
   placeSystem(g);
   poiSystem(g);
   questSystem(g);

@@ -2,7 +2,7 @@
  * What to tell a new investigator before it costs them (round 46, the first hour): hints that wait to be struck, or to fall, came
  * too late for the things a first fight, a first empty breath and a first horror's mist teach hardest. These are looked at a
  * couple of times a second: a foe closing in, the breath gone, a wall of fog near, a person to talk to, a doorway that only insight
- * shows, a horror's gate still shut, a relic found, a weapon found late beside a reinforced one, insight to spare. Pure: the game is read,
+ * shows, a horror's gate still shut, a shortcut still barred (round 125), a relic found, a weapon found late beside a reinforced one, insight to spare. Pure: the game is read,
  * nothing is changed (ui/hints.ts raises the ones not yet shown).
  */
 
@@ -13,10 +13,12 @@ import { isAbsent, type Game } from '../systems/components';
 import { LORE } from '../data/tuning';
 import { surplusInsight } from '../systems/insight';
 import { owned } from '../systems/relics';
+import { isOpened } from '../systems/shortcuts';
+import { worldLayout } from '../world/placements';
 
-export type Watched = 'fight' | 'breath' | 'fog' | 'talk' | 'passage' | 'gate' | 'relic' | 'transfer' | 'lore';
+export type Watched = 'fight' | 'breath' | 'fog' | 'talk' | 'passage' | 'gate' | 'relic' | 'transfer' | 'lore' | 'shortcut';
 
-const NEAR = { foe: 32, fog: 14, person: 7, passage: 10 }; // metres
+const NEAR = { foe: 32, fog: 14, person: 7, passage: 10, shortcut: 6 }; // metres
 
 /** Whether a doorway or bridge that insight alone shows stands open within reach of `me`: the first the investigator is shown. */
 function nearPassage(g: Game, me: { x: number; z: number }): boolean {
@@ -27,6 +29,11 @@ function nearPassage(g: Game, me: { x: number; z: number }): boolean {
     if (l?.shown && l.minInsight !== undefined && at && distXZ(at, me) <= NEAR.passage) return true;
   }
   return false;
+}
+
+/** Whether a shortcut still barred stands within reach of `me` (round 125): either side of it, the first one met. */
+function nearBarred(g: Game, me: { x: number; z: number }): boolean {
+  return worldLayout().shortcuts.some((s) => !isOpened(g, s.id) && distXZ(s, me) <= NEAR.shortcut);
 }
 
 /** Whether a horror's gate that is still shut (its horror not yet found: discovery.ts) stands within reach of `me` (round 64). */
@@ -60,6 +67,7 @@ export function watch(g: Game): Watched[] {
   }
   if (nearPassage(g, me)) out.push('passage');
   if (nearShutGate(g, me)) out.push('gate');
+  if (nearBarred(g, me)) out.push('shortcut');
   if (g.overworld && owned(g).length) out.push('relic');
   if (g.player.arms.length > 1 && Object.values(g.player.reinforced).some((n) => n > 0)) out.push('transfer');
   if (surplusInsight(g) >= LORE.hintAt) out.push('lore'); // insight with no other use: it can be offered for Echoes (round 61)

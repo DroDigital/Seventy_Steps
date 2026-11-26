@@ -32,6 +32,7 @@ import { parted } from './endings';
 import { targetsOf } from './targets';
 import { awaitsIntroduction } from './npcIntroduction';
 import { catchUp, followPace, followPoint, recordTrail } from './allyTrail';
+import { springs } from './ambush';
 
 export { chooseAttack } from './tactics';
 
@@ -85,7 +86,7 @@ function steady(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transfor
   if (a.move !== null) return;
   if (br.cooldown > 0) br.cooldown--;
   if (br.state === 'hidden') {
-    if (seen !== null && tp && distXZ(tr.pos, tp) <= p.reveal) [br.state, br.cooldown] = ['engage', 0];
+    if (springs(g, id, br, p.reveal, seen, tp, tr.pos)) [br.state, br.cooldown] = ['engage', 0];
   } else if (br.state === 'idle' || br.state === 'follow' || br.state === 'alert' || br.state === 'search') {
     if (seen !== null) br.state = 'engage';
     else if (p.hide === 'ambush' || p.hide === 'burrow') br.state = 'hidden';
@@ -176,7 +177,7 @@ function hunt(g: Game, id: Entity, br: Brain, a: Actor, m: Mover, tr: Transform,
   if (a.move !== null) return;
   if (br.cooldown > 0) br.cooldown--;
   if (br.state === 'hidden') {
-    if (quarry !== null && tp && distXZ(tr.pos, tp) <= p.reveal) [br.state, br.cooldown] = ['engage', 0];
+    if (springs(g, id, br, p.reveal, quarry, tp, tr.pos)) [br.state, br.cooldown] = ['engage', 0]; // (round 125: one lying in wait springs at its own reach: ambush.ts)
     return;
   }
   const home = distXZ(tr.pos, anchor);

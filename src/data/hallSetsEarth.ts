@@ -36,15 +36,15 @@ export const EARTH_HALLS: Readonly<Record<string, ArenaSet>> = {
   // The reef temple under the water: the hulls of what the Deep Ones took, rubble and kelp, heads of the idol fallen from its walls, the bones of fish.
   father_dagon: {
     puts: [
-      put('yh_coral_a', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2], keep: 0.7 }), // coral grown over the sunken stone (round 79)
+      put('rowboat', at(0.85, 280, { face: 'free' }), { size: 0.4 }), // a wreck washed in (round 79: it stands where the hall has room for it; round 125: its room is at 280 now, and it and the rocks are laid before the coral, which would take their places)
+      put('rocks_sand_a', at(0.9, 100), { size: [0.5, 0.7] }),
+      put('yh_coral_a', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2], keep: 0.7 }), // coral grown over the sunken stone (round 79; round 125: laid after the wreck and the rocks, as the temple turned to face its causeway)
       put('yh_coral_b', scatter(3, [0.84, 0.97], { face: 'free' }), { size: [1.5, 2.1], keep: 0.7 }),
       put('yh_coral_c', scatter(2, [0.84, 0.97], { face: 'free' }), { size: [1.3, 1.7], keep: 0.7 }),
       put('sw_pipe_big', ring(0.96, 5, { arc: [60, 300] }), { size: 1.2, tint: [0.3, 0.38, 0.36] }), // the drowned city's drains and tidal grilles
       put('sw_grille', at(0.95, 210, { face: 'wall' }), { heart: true, size: 1.05, tint: [0.34, 0.4, 0.38] }),
       put('sw_bars', at(0.95, 150, { face: 'wall' }), { heart: true, size: 1, tint: [0.34, 0.4, 0.38] }),
       put('sw_support', scatter(4, [0.88, 0.98], { arc: [60, 300], face: 'free' }), { size: 1.1, tint: [0.36, 0.42, 0.4] }),
-      put('rowboat', at(0.85, 320, { face: 'free' }), { size: 0.4 }), // a wreck washed in (round 79: it stands where the hall has room for it)
-      put('rocks_sand_a', ring(0.9, 2, { arc: [95, 265] }), { size: [0.5, 0.7] }),
       put('statue_head', ring(0.93, 4, { arc: [100, 260], face: 'in' }), { size: [0.8, 1.1], tint: [0.45, 0.55, 0.5] }),
       put('fish', scatter(7, [0.8, 0.97], { face: 'free' }), { walk: true, size: 1.6 }),
       put('lily', scatter(6, [0.8, 0.98], { face: 'free' }), { walk: true, size: 1.6 }),
