@@ -39,6 +39,9 @@ export const EN = {
   'title.anewNote': 'This deletes the dream in slot {slot}. The endings you have reached are remembered.',
   'title.no': 'No, go back',
   'title.yes': 'Yes, begin anew',
+  'intro.goOn': 'go on',
+  'intro.wake': 'wake',
+  'intro.skip': 'skip',
   // the pause menu
   'pause.title': 'PAUSED',
   'pause.resume': 'Resume',

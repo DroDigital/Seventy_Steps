@@ -8,6 +8,7 @@
  * page change would drift the old words away over the new). The world waits until it is done (main.ts).
  */
 
+import { story, t } from '../core/i18n';
 import { INTRO, NARRATOR, introText } from '../data/intro';
 import { createSpeech } from '../render/audio/speech';
 import type { AudioEngine } from '../render/audio/engine';
@@ -67,10 +68,10 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
     if (!stage || !hint) return;
     const c = INTRO[i];
     if (!keep) stage.replaceChildren();
-    ash = createAshCard(stage, { heading: c.heading, body: introText(c), telegram: !!c.telegram }, i + 1);
+    ash = createAshCard(stage, { heading: story(c.heading), body: story(introText(c)), telegram: !!c.telegram }, i + 1); // (the narrator reads the English: c.say)
     if (fade) void ash.form(IN);
     else ash.hold();
-    hint.textContent = `${glyph('interact')} · ${i < INTRO.length - 1 ? 'go on' : 'wake'}`;
+    hint.textContent = `${glyph('interact')} · ${i < INTRO.length - 1 ? t('intro.goOn') : t('intro.wake')}`;
   }
 
   /** Card `i`, its lines coming out of the mist one after another, and its reading after a breath. */
@@ -83,7 +84,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
       clearTimeout(timer);
       later((seconds + AFTER) * 1000, turn);
     };
-    const words = introText(c).split(/\s+/).length;
+    const words = story(introText(c)).split(/\s+/).length; // (read by eye in the language shown)
     later(BEFORE * 1000, () => {
       voice?.say(NARRATOR, c.say);
       later(LATE * 1000, () => rest(Math.max(2, words * READ - LATE))); // no voice began: read it by eye
@@ -128,7 +129,7 @@ export function showIntro(done: () => void, engine?: AudioEngine): Intro {
       screen.root.append(row);
       if (again) row.style.opacity = '0.55';
       else row.animate([{ opacity: 0 }, { opacity: 0.55 }], { duration: 2400, delay: 1800, fill: 'forwards' }); // what the keys do, faint, once the first words are out
-      el(row, 'div', `${glyph('back')} · skip`);
+      el(row, 'div', `${glyph('back')} · ${t('intro.skip')}`);
       hint = el(row, 'div', '');
       hint.style.cursor = 'pointer';
       hint.addEventListener('click', turn);
