@@ -9,6 +9,7 @@
 
 import { distXZ } from '../core/geom';
 import { t } from '../core/i18n';
+import { shortcutLook } from '../data/shortcutLooks';
 import { SHORTCUT } from '../data/tuning';
 import type { Collider } from '../world/colliders';
 import { worldLayout } from '../world/placements';
@@ -16,6 +17,8 @@ import { shortcutSeal, sideOf, type ShortcutPlace } from '../world/shortcutPlan'
 import { startMove } from './actions';
 import type { Game } from './components';
 import type { FightAction } from './signatures';
+
+const UNBAR = { beam: 'hud.unbar', bolt: 'hud.unbolt', lever: 'hud.unlever' } as const;
 
 /** What the save keeps of an opened shortcut. */
 export const shortcutKey = (id: string): string => `cut:${id}`;
@@ -79,6 +82,6 @@ export function shortcutAction(g: Game): FightAction | null {
   const s = nearShut(g);
   if (!s) return null;
   const me = g.ecs.c.transform.get(g.player.id)!.pos;
-  if (sideOf(s, me) === 'from') return { label: t('hud.unbar'), run: () => openShortcut(g, s) };
+  if (sideOf(s, me) === 'from') return { label: t(UNBAR[shortcutLook(s.kit).bar]), run: () => openShortcut(g, s) }; // the beam lifted, the bolt drawn, the lever thrown
   return { label: t('hud.barredBeyond'), run: () => g.events.emit('ShortcutTried', { id: s.id, x: s.x, y: s.y, z: s.z }) };
 }

@@ -7,6 +7,7 @@
 import { describe, expect, it } from 'vitest';
 import { t } from '../src/core/i18n';
 import { emptyInput } from '../src/core/input';
+import { shortcutLook } from '../src/data/shortcutLooks';
 import { AMBUSH, SHORTCUT } from '../src/data/tuning';
 import { carryOf } from '../src/systems/cycles';
 import { isConcealed, type Game } from '../src/systems/components';
@@ -44,7 +45,8 @@ describe('a barred shortcut (round 125)', () => {
     stand(g, s, 'from');
     const opened = record(g, 'ShortcutOpened');
     const bar = shortcutAction(g)!;
-    expect(bar.label).toBe(t('hud.unbar'));
+    expect(bar.label).toBe(t(({ beam: 'hud.unbar', bolt: 'hud.unbolt', lever: 'hud.unlever' } as const)[shortcutLook(s.kit).bar])); // the beam lifted, the bolt drawn, the lever thrown
+    expect(shortcutLook(s.kit).bar, 'the catacombs\' grille is bolted').toBe('bolt');
     bar.run();
     expect([opened.length, isOpened(g, s.id), g.overworld!.told.has(shortcutKey(s.id))]).toEqual([1, true, true]);
     expect(shortcutAction(g), 'nothing more to do at an open door').toBeNull();

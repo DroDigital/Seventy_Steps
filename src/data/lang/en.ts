@@ -368,6 +368,8 @@ export const EN = {
   'sign.call.relic': "a new relic to wear",
   'hud.passThrough': "pass through",
   'hud.unbar': "lift the bar",
+  'hud.unbolt': "draw the bolt",
+  'hud.unlever': "throw the lever",
   'hud.barredBeyond': "barred from the other side",
   'hud.gateLeads': "Leads to {name}",
   'slot.dream': "the dream",

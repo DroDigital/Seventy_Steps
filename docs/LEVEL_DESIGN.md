@@ -28,7 +28,7 @@ links: [link('passage', 'crypt', 'shortcut'), link('pantry', 'sump', 'drop'), li
 | Kind | What it is | Who walks it | Code |
 |---|---|---|---|
 | `open` | A second doorway between two rooms: a loop. | Both ways. | `world/dungeonLinks.ts` |
-| `shortcut` | A doorway shut by a door barred on `from`'s side. Press E at the bar to open it for good. From `to`'s side the door rattles and holds ("Barred from the other side"). | Once opened, both ways. | `world/shortcutPlan.ts`, `systems/shortcuts.ts`, `render/shortcutViews.ts`, `data/shortcutLooks.ts`, `data/shortcutSounds.ts` |
+| `shortcut` | A doorway shut by a door barred on `from`'s side. Press E at the bar ("lift the bar", "draw the bolt" or "throw the lever", by its kind) to open it for good. From `to`'s side the door rattles and holds ("Barred from the other side"). | Once opened, both ways. | `world/shortcutPlan.ts`, `systems/shortcuts.ts`, `render/shortcutViews.ts`, `data/shortcutLooks.ts`, `data/shortcutSounds.ts` |
 | `drop` | A doorway on a ledge 1.2–2.4 m over the lower room, `to`. The ledge's face is a wall from the lower floor up to the doorway's sill. | Down only. | `world/dungeonWalls.ts`, `systems/drops.ts` |
 | `window` | A barred opening (a grate) between two rooms, 1.1 m to 2.7 m high, whose floors may stand up to 3.2 m apart. | Nobody: it is for seeing through. | `world/dungeonWalls.ts`, `render/grateShape.ts` |
 | `lurk` | Foes on a room (`lurk: ['ghoul']`). They are laid hidden, cannot be targeted or locked on, and spring at an investigator within `AMBUSH.reach` (4.2 m) whom they can see, or who brushes within 2.2 m of them. | — | `systems/ambush.ts`, `render/lurkFx.ts`, `world/roomFurnish.ts` |

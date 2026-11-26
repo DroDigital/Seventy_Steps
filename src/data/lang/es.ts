@@ -350,6 +350,8 @@ export const ES: Readonly<Record<Key, string>> = {
   'sign.call.relic': "una reliquia nueva que llevar",
   'hud.passThrough': "atravesar",
   'hud.unbar': "alzar la tranca",
+  'hud.unbolt': "correr el cerrojo",
+  'hud.unlever': "bajar la palanca",
   'hud.barredBeyond': "atrancada desde el otro lado",
   'hud.gateLeads': "Lleva a {name}",
   'slot.dream': "el sueño",
