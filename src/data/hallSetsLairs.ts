@@ -77,7 +77,7 @@ export const LAIR_HALLS: Readonly<Record<string, ArenaSet>> = {
       put('crate', scatter(5, [0.82, 0.97], { arc: [50, 310], face: 'free' }), { size: [1, 1.4] }),
       put('hay_bale', scatter(3, [0.86, 0.97], { arc: [90, 270], face: 'free' }), { size: 1.2 }),
       put('barrel', scatter(3, [0.86, 0.97], { arc: [90, 270] }), { size: 1.2 }),
-      put('grave_wide', at(0.95, 210, { face: 'in' }), { size: 1.3 }),
+      put('grave_wide', at(0.95, 330, { face: 'in' }), { size: 1.3 }), // (round 127: the attic moved a cell; its room is at 330 now)
     ],
   },
   // The vault in the tomb: niches cut in its walls with the dead in them, urns and a telephone wire's end where it comes down.

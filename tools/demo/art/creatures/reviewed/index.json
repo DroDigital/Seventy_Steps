@@ -12,8 +12,8 @@
    "file": "creatures-0.png",
    "width": 2048,
    "height": 911,
-   "sha256": "8d69f0ec385a5fd0fea51ee446f08b183e7592a85aae98dac2d03a5fdefcbf28",
-   "pngBytes": 1193305
+   "sha256": "f139391a3c68ae6d0226e7b04c125d3f38b38c05e1d94c79fca76b96c7abd49a",
+   "pngBytes": 1193624
   }
  ],
  "frames": [
@@ -2148,7 +2148,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/idle_0.png",
    "sourceSha256": "1a2eb20a9e0a58c0d32fc4752d8b47af38a306874f4a6ad6ddb517782d6c651e",
-   "pixelSha256": "09542b12af834b442deba75b8c1f9f8de975d222f7f917b67db70f31fd5a0b9e",
+   "pixelSha256": "4ba077198d130ef75e2389a11ace40aecb18a1902a7bca2ac46f16e68fbc29ef",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2164,7 +2164,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/idle_1.png",
    "sourceSha256": "98649ebc69a38bca1edf95b5e9069062b2369d90c0a434f1bf916b1577f0b3b7",
-   "pixelSha256": "f0e8af030f70d123eb94ae8bef452836527dd16f01ebe5645969c2f1176ea574",
+   "pixelSha256": "b76414837bc4405552bfdc82cc58ced9a4e758b4c4457e4be4a2c3bdd1be75be",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2180,7 +2180,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_0.png",
    "sourceSha256": "a57fca9592bf4767be95697a591182f9a95670034a9af864f44994312c8f7c08",
-   "pixelSha256": "0c379c166ecef454fab489c9ae7c6fa82caef3839ea153acf99ea8c23d99affd",
+   "pixelSha256": "b1ecb28edcf0fbfa3b5a9ec9a53be5a8134c93f7d41390be04e198abf507b945",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2196,7 +2196,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_1.png",
    "sourceSha256": "37826807de08c698d7184222a938a4717e66ae785579ed941bcdd8c5727d7c91",
-   "pixelSha256": "5656de3143c710c972210d32cccab391d045194ae8bb60f116e2a7f21d02ecab",
+   "pixelSha256": "d5c4eaa34634a87601648f0140ac01d493fa74cb02fe859a1be4684a332b44d3",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2212,7 +2212,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_2.png",
    "sourceSha256": "5238785fa8401427386ef2d8c4aed6142b38623bfd11cfbc17a112dd1aef0c79",
-   "pixelSha256": "bbc9540faec7bab048211f57bdaca8dd705a0a9c1d6e36e6506d5c2b4fd62755",
+   "pixelSha256": "42cb38dfa3aaa019ce55aefb818e3b1dbcb208fae4d2a0739c3fe324dbc54263",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2228,7 +2228,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_3.png",
    "sourceSha256": "bfa7811cc07ddb70970b4664204c73ccd06f4db1979d671387a40683be4803a4",
-   "pixelSha256": "d0e2fbec69779af6a07f518d9e8bc4d12fe58d0045b1714160edcb4495296215",
+   "pixelSha256": "04cda6e1d6db7cee81f92e3bcc9d327d6d89fc7c3b077c427f216af5c5c0ce66",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2244,7 +2244,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_4.png",
    "sourceSha256": "60b872c63c6f0c9f2f88e36bbd5379adcac42ed9dbd082683ac494069a524782",
-   "pixelSha256": "ef7c31325df502950ebd4382c03809fcd0a1f1d98b11747cdc2a1d03dec84afd",
+   "pixelSha256": "ae530bdb33f39340337020d3059d7a37db47a802a2bf4de06b17fcb0232167d5",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2260,7 +2260,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/move_5.png",
    "sourceSha256": "0e529592aed4a96ee70d35cdddb68a6aaba282487ec09f50830eb66e3def75d4",
-   "pixelSha256": "2d46d6f027c4e246045cec1ab2836df0119c968257234ca2b3de3a193d53d2a5",
+   "pixelSha256": "973c9448a1f64676c5d5e6c9ac75e2ec1d5bd77b4e88e204ad1fafed7dae825f",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2276,7 +2276,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/attack_0.png",
    "sourceSha256": "4e69fe47303ffd4edc100de7cc0353515de64a89a6f11265da02cf0b850f0dca",
-   "pixelSha256": "ad1628d44e533bf8c3d088b376a0ff33c1310af84ea3907ab0816521303c9793",
+   "pixelSha256": "a86dbece771596e9e02642c4f506b23a857d86e4fa0fe8916ed58d5101cfbeaf",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2292,7 +2292,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/attack_1.png",
    "sourceSha256": "cf26baa7adafa172dbc9b9a862f05fdb97239edd5d23d5300e5513da8eedb818",
-   "pixelSha256": "afe08387244e770beb992ee2e4b54920fee7787288cc1acd9934bc909b6d3378",
+   "pixelSha256": "241c5babec8e6ab0207f728778ab7e588a0277ce87e248bb212145e3f992aacd",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2308,7 +2308,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/attack_2.png",
    "sourceSha256": "5aecd970929f8262ffce3d679703b39ccc04dfb4643f26036192ab7cea2be0d7",
-   "pixelSha256": "a08cdd347c5da6bf59d2dd7813fb1368ef887ce2368448065098ec074e937e8c",
+   "pixelSha256": "26503524a08c2ad186a739107bf518b6b7002483d87d722466655e6cf9110d21",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2324,7 +2324,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/hurt_0.png",
    "sourceSha256": "ac472f7c63648505b4d85b43291cbc3f59f683497a89d499f4e340a9c870fc28",
-   "pixelSha256": "be039e42ac8946a781a42783820472507f53f1f6f436c7979bf3b8c099340f7c",
+   "pixelSha256": "1fab06704b49636b9d628d78a81b5107472868e839ec9b43b9e8f63a0957b2bd",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2340,7 +2340,7 @@
   {
    "source": "sprites/moon_bog_wraith/64x64/front/hurt_1.png",
    "sourceSha256": "549d029e5cba390e8a85fa10586f9cfb947d0de3b18a891d6b86425615c8bb71",
-   "pixelSha256": "bc526caf7bf76bf711dcadd850c2ddf70d053155c291a94b7c0578e1b935d60d",
+   "pixelSha256": "4c1b77c7bab22d8ca13a30fdb7bd0f9fec347936ef9e812ed776b54154271696",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2548,7 +2548,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/idle_0.png",
    "sourceSha256": "1efab9a7a19152283cce5a83c0b6b3a4ae93bb3c9b482a97c1942a2212c3f450",
-   "pixelSha256": "a7fd163683098fba8cc0b2764beccf1da43cc293f921aacbe5e9c7fb14ab9c9c",
+   "pixelSha256": "c4718807c486535dd0616c3b0381a499b3a095baa511c3985eb9403578dee916",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2564,7 +2564,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/idle_1.png",
    "sourceSha256": "04896059c09bc5d8adf8660b6b398e7ffd11cefbd45b3ef3b7cf9933307c9e69",
-   "pixelSha256": "56c4f2fda793485f95100a600f915a29230792cfffc59503cca34f056b5b5048",
+   "pixelSha256": "0210dcf555868fcea7a4bfd240a5168fabf12edfd2428a3d4b6d93f585ccc9a8",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2580,7 +2580,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/move_0.png",
    "sourceSha256": "b35c37e0ec1a48023c2486a6f713b0c2417ff1c141f491ba263eece0ee98b6e4",
-   "pixelSha256": "a4753259b355da229082d1735e94a7675f771a8498ac1c2d8ce3b139e57ef1f9",
+   "pixelSha256": "0c4b484f60a4954689f925b5e222e867e05fd5046f855fb58774f97f8f2637d7",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2596,7 +2596,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/move_1.png",
    "sourceSha256": "91f258c1ca640583fc95beebe6e1243919aedf84f0ba45ac78b039b1537a5b87",
-   "pixelSha256": "233dc5843b8d21c820a0888878e14ef82516128509f6493d0eaf4d871e4a1680",
+   "pixelSha256": "d40a1ef835582388966318d1dd00608bb7cb2dbb4491bd0d2c8d49fca08c70a0",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2612,7 +2612,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/attack_0.png",
    "sourceSha256": "b6c89f757210b574d32d05b7b35847c066298652c9fff5bcb194ccdc4724f51b",
-   "pixelSha256": "e61d4114e5666f45f8c4382cf6c7750b74333661026065350fa17ce2aa1f5f65",
+   "pixelSha256": "5eb85395fc06626da268a32705c797bcc946a8f48bb3028529ce0396da9552e0",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2628,7 +2628,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/attack_1.png",
    "sourceSha256": "3029fb58f1468dfb9433f8f7f58082c8efc680e59b579514897a9c4abd4feeac",
-   "pixelSha256": "8aa41cd48482f5793a1df2947e3fc9c394c6464bb46adc5a384f788b53636b29",
+   "pixelSha256": "d411dff2d7ac232aaab72592e10069486d02a298baf8107599a6d12478cac843",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2644,7 +2644,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/attack_2.png",
    "sourceSha256": "f1cf13ef3774c807689d6d85b2703502aed9fe2e2fb9c1ab4270c3572222c8fd",
-   "pixelSha256": "5d91dc384060423fffa54488392e7c219752e74531daef548bc36034f7d3b5f1",
+   "pixelSha256": "2a479df7a14695044bc6842ac72c1d5fae8376ead16e0dc8af677b1c86ea0fe2",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2660,7 +2660,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/hurt_0.png",
    "sourceSha256": "48fa84329d3d19d8d8ebd78d9de14eb4da4409a380f8c208ce7624b30ee916d4",
-   "pixelSha256": "f0340c21f1c3380aff0949aeee08cff93eeffbd594d7c3c75cbfb306cdb2f042",
+   "pixelSha256": "716b1aec01fb62eeb5e126537eed17bf74bab18881368442aca3ad01971f5da5",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -2676,7 +2676,7 @@
   {
    "source": "sprites/being_from_beyond/64x64/front/hurt_1.png",
    "sourceSha256": "8d0b533d321ee51a6b4d1bf0d8b04cf81fc2ec9fd929d5a2c3180e9973b6104c",
-   "pixelSha256": "9587dff4542b09a8d3d8d19f520f95504c6fef089e2483a980f0071e12e93456",
+   "pixelSha256": "2bf28f4d6e4e9576d0a5d470d4b5ea708226575f4d8dd25615952b8ef5d94d1a",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -4996,7 +4996,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/idle_0.png",
    "sourceSha256": "fd2218d9294adcc3675cd555933b692c68d689751f84baec59833f3cc2a26f54",
-   "pixelSha256": "85331a83ad35517a5996f5dfb851270ae660f7ff26e09a1bd8e3eb5f2e798481",
+   "pixelSha256": "099eeb131807572877b8e7c8baa02c4248312e6e8387bfa7f88b18f4a4465477",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5012,7 +5012,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/idle_1.png",
    "sourceSha256": "70cb6ebd28cb089ab1220bb48d3e5c28644dd3a9e7a5d5e87b95bc5b12cb2497",
-   "pixelSha256": "6f76db7456f2da28f58b144192b612247505dabb976cfbed24e2b2afabba4a28",
+   "pixelSha256": "f06728b398a5680e72f7a21cbc6157d3702648e4a04ecf50ff40203fe25ec018",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5028,7 +5028,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/move_0.png",
    "sourceSha256": "4ab0d70fce0c597a997453de31ec9e4917abb6700e165893df91fc2d593c5259",
-   "pixelSha256": "972ce3fbfa8df408e8b86ca716a891bf325fdeebd9719fc01c8e58603cb0b88d",
+   "pixelSha256": "03cb194726a5e47598e4316fce17032c199c9a6e137df996b3d525e795786be8",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5044,7 +5044,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/move_1.png",
    "sourceSha256": "70a30a529a411e845d492f41347911047da758bcdd29ef0d9e8ff413eef55ca6",
-   "pixelSha256": "cabffb15fe9e2ad29790f1279b7255cdaf9bb2b3a993d99525cbedb072137449",
+   "pixelSha256": "c14853de9f03ae7c18833becd24c1045a7df294fd3d6f43183fd0d7e672c6e72",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5060,7 +5060,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/attack_0.png",
    "sourceSha256": "221bcaa367b8e7f414cd7cf104caf8b9e4d3155e81a06b99ac99b9c7f0c96151",
-   "pixelSha256": "4ffcabb4c360b6e264b375413d060a47aed3783d6e6010f602f0f6e30189d0c4",
+   "pixelSha256": "5204cd535361585e03584b88b6bb616339273662da2ee8f71bdaa1c02e27303c",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5076,7 +5076,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/attack_1.png",
    "sourceSha256": "eb7087244fcb10dedc6fd80dd3c0930e21a06e076cfaa5a7c09bc7c786c9b742",
-   "pixelSha256": "090754bf7569e7347dfe213357d3329d4743586e23b2753360736a33a1dda8db",
+   "pixelSha256": "388f39cf54de36747a316f5f3c47dc46bcf4f8fb17c7c6d62792544098fa3dfc",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5092,7 +5092,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/attack_2.png",
    "sourceSha256": "48dcd105897f4c7fa8e81bff3ecd2053117aec2054e211085f28a8cfb545348b",
-   "pixelSha256": "f18a9b42485d1ddeb22a2b68e7478ea7f77f1de01205c62b8868f71b3f3f878b",
+   "pixelSha256": "63f879516e4b402ba4de49437b36a97f2c1732dae3fc1472297f1db7f3ff1922",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5108,7 +5108,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/hurt_0.png",
    "sourceSha256": "aceb444ae312ef11457d93a54d5065b8d16768a7c763a72fbaef18c27b84d956",
-   "pixelSha256": "177013c56e57e628a761d795a41611619f71ae695419ff2951eb3048d1e210fe",
+   "pixelSha256": "0e54ecee1f5ad98ef95f1bd3423d9166e08661c92d865d270f657caa4f279447",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -5124,7 +5124,7 @@
   {
    "source": "sprites/voice_in_the_tomb/64x64/front/hurt_1.png",
    "sourceSha256": "78a8c2641e8e5db30436b4672642f49ef70d28e86e58ef306b7765279553cfd5",
-   "pixelSha256": "458095f13d44be7e3298dbbbfca8e6c5ccd6a368f11c5dc4fcdf850284cc460f",
+   "pixelSha256": "da51761d78ca0ec9445a9ae2f7b7c219209c7f0d653a6b71bc56716f1d63f739",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6180,7 +6180,7 @@
   {
    "source": "sprites/the_outsider/64x64/front/move_1.png",
    "sourceSha256": "d8d48a319407e20f0d80282ad39e608d981c8bef9c722a53151393af12076b86",
-   "pixelSha256": "a7e64643413e185964d9b3ea0a80e46cb5f7cdedbdaf1eebb30116d4517de426",
+   "pixelSha256": "69ccfff11d63fd3e50a772c40058e52bbcf0d533f01ef3c5dc1082c41793d325",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6308,7 +6308,7 @@
   {
    "source": "sprites/the_outsider/64x64/back/idle_0.png",
    "sourceSha256": "54222a4d4fb187a47227b53fead36b3bfa3e08e26c4a24eb0c5b88457331590c",
-   "pixelSha256": "90abc973c30a71a2e93cf69f13abbc96620865019f23f42d7aefc50b4794659a",
+   "pixelSha256": "d4205fbab16f731426b23f227543d5d7b51d25d4baa04494fce496c24a902d2d",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6324,7 +6324,7 @@
   {
    "source": "sprites/the_outsider/64x64/back/idle_1.png",
    "sourceSha256": "a81ef4159d428b3f88353fcfb0dd24110dec6f4fa70ce780b1395c7e5d150314",
-   "pixelSha256": "694faf67a00127d3a36df8504516308a94242c656b6e00d8c36c366083b51e97",
+   "pixelSha256": "ca65e9da28c6e5304f916543ae4d6f53994a37013bde69de147e8b8f05d4b592",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6340,7 +6340,7 @@
   {
    "source": "sprites/the_outsider/64x64/back/move_0.png",
    "sourceSha256": "b105091f4a560a0f78d0686cbeb66cef5a5adfa822414dd0f69f8bc938e60a9b",
-   "pixelSha256": "1b7e1a138c8f0bc23d76d1a69de7ff6a90b0ac393ad2a0801a23300acbe72871",
+   "pixelSha256": "4b1dad4018b2f755c1c4e2a0dd7c555f0592096b2223b53277a8ef9a068a0078",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6356,7 +6356,7 @@
   {
    "source": "sprites/the_outsider/64x64/back/move_1.png",
    "sourceSha256": "00b753aa9aea593088bd23de50a6a56cf4cc996ac2e92a10d7a1cd24b3083c56",
-   "pixelSha256": "6b9fc8359e829b9cd682997b79a04c6d4bb1516695996003a6f34549c005d552",
+   "pixelSha256": "5501f3a55a13f4bdf3c07b08057b5813938a96d5451d64f8774ee04af100c0b6",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6388,7 +6388,7 @@
   {
    "source": "sprites/the_outsider/64x64/back/move_3.png",
    "sourceSha256": "6edd99e5986f420ac8bafd5810344fca6809e7fcf53c6cce66c31ca90f7b2d86",
-   "pixelSha256": "883a4f2d51da50c4ba8a5f60c1343d31b8ce67bb951ed39c3a93b68e350b41d8",
+   "pixelSha256": "7cd8c1e86f2781ffc781f45294ceadaab2a0992152eb7f8cacb930baf02b3b28",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6452,7 +6452,7 @@
   {
    "source": "sprites/the_outsider/64x64/left/move_1.png",
    "sourceSha256": "a0bc4f39137ee742e84b0d0c95dd791b8f48e745114a7e6851a01dce59048df4",
-   "pixelSha256": "4648d1a78930e725b0a8bf7af8da5dd7c20313806d95dfa6b55c7690f24a31cc",
+   "pixelSha256": "f471e443637b92c116c81f477c61db35f359101b1bef0b8dfc669b609bada6db",
    "width": 64,
    "height": 64,
    "bounds": [
@@ -6548,7 +6548,7 @@
   {
    "source": "sprites/the_outsider/64x64/right/move_1.png",
    "sourceSha256": "5aefd21d0fbb3483432d0c2558d702703ab77be7a48158e15aeec7666641894d",
-   "pixelSha256": "b2184c347bc24a896cfbb469bd8f913097b8408d76b841dab7b54735afa356c4",
+   "pixelSha256": "2f63243914a5af4c13e335435f288e1b521863f0ec5d8072301fced8ea5be53b",
    "width": 64,
    "height": 64,
    "bounds": [

@@ -7,7 +7,10 @@ LUMA = np.array([.25, .64, .11], dtype=np.float32)
 
 
 def coverage(rgba):
-    return rgba[..., 3] > 32
+    alpha = rgba[..., 3]
+    solid = alpha > 32
+    # A soft pose may have no fully modeled texels but still has a silhouette.
+    return solid if np.any(solid) else alpha > 0
 
 
 def extent(mask):

@@ -8,19 +8,27 @@ import argparse
 from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
 from hashlib import sha256
+from io import BytesIO
 import json
 from pathlib import Path
+import re
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from PIL import Image
 from scipy.ndimage import distance_transform_edt, gaussian_filter, map_coordinates, maximum_filter
 
-from reviewed_look import measure_lights, read_pack
+from reviewed_look import measure_lights
 from sprites.materials import BASE, MAT, MATERIALS, material_map
 from sprites.paint_forms import FRONT, SECONDARY
-from sprites.paint_registration import register
+from sprites.paint_receipt import RECEIPT, digest, read_source_page, write_receipt
+from sprites.paint_registration import coverage, register
 
-ART = Path(__file__).resolve().parent / 'sprites'
+ROOT = Path(__file__).resolve().parents[1]
+ART = ROOT / 'tools/sprites'
+PROTECTED_ATLASES = (
+    ART / 'source', ROOT / 'public/creatures', ROOT / 'tools/demo/art/creatures',
+)
 LUMA = np.array([.25, .64, .11], dtype=np.float32)
 GAME_LUMA = np.array([.2126, .7152, .0722], dtype=np.float32)
 # Keep these forms' material accents within their muted, realm-graded palettes.
@@ -81,13 +89,27 @@ def normalized_grid(shape, bounds):
     return (x + .5 - left) / (right - left), (y + .5 - top) / (bottom - top)
 
 
+@lru_cache
+def glint_radius_squared():
+    """Use the shader's outer emissive radius, converted to squared byte distance."""
+    shader = (ROOT / 'src/render/shaders/sprite.ts').read_text()
+    match = re.search(r'smoothstep\(\s*[\d.]+,\s*([\d.]+),\s*distance\(t\.rgb,\s*vGlint\.rgb\)\)', shader)
+    if not match:
+        raise ValueError('could not read the sprite shader emissive radius')
+    return (float(match[1]) * 255) ** 2
+
+
+def emissive_mask(rgb, color):
+    return np.square(rgb - color).sum(axis=-1) <= glint_radius_squared()
+
+
 def paint(key, direction, rgba, reference, bounds, ref_bounds, eye, glint, register_pose):
     texture_seed = sha256(key.encode()).digest()
     geometry_seed = sha256(f'{key}/{direction}'.encode()).digest()
     alpha = rgba[..., 3]
     rgb = rgba[..., :3].astype(np.float32)
     lum = rgb @ LUMA
-    solid = alpha > 32
+    solid = coverage(rgba)
     depth = distance_transform_edt(solid)
     soft_depth = np.clip((depth - .45) / 2.4, 0, 1)
     internal = np.clip((depth - 1) / 2.6, 0, 1)
@@ -163,10 +185,10 @@ def paint(key, direction, rgba, reference, bounds, ref_bounds, eye, glint, regis
         a = strength * (detail[:, 3] / 255) * internal[mask] * np.clip((lum[mask] - 12) / 49, 0, 1)
         painted[mask] += (patch - painted[mask]) * a[:, None]
 
-    protected = (alpha <= 8)
+    protected = alpha <= 8 if np.any(alpha > 8) else alpha == 0
     if glint:
-        color = np.round(np.array(glint) * 255)
-        protected |= np.sum(np.abs(rgb - color), axis=-1) <= 3
+        color = np.array(glint) * 255
+        protected |= emissive_mask(rgb, color)
     if eye and direction == 'front':
         cx, cy, radius = eye[:3]
         distance = np.hypot(u - cx * rgba.shape[1], v - cy * rgba.shape[0])
@@ -184,20 +206,34 @@ def paint(key, direction, rgba, reference, bounds, ref_bounds, eye, glint, regis
     result = rgba.copy()
     result[..., :3] = np.where(protected[..., None], rgb, np.clip(np.rint(painted), 0, 255)).astype(np.uint8)
     if glint:
-        # The shader uses an RGB key for emissive marks. A new highlight must
-        # never acquire that key by rounding or by clipping a channel.
-        alias = (~protected) & (np.abs(result[..., :3] - color).sum(axis=-1) <= 3)
-        result[..., 1][alias] = color[1] + (4 if color[1] < 128 else -4)
+        # Any newly matching highlight reverts to its original nonemissive RGB.
+        alias = ~protected & emissive_mask(result[..., :3], color)
+        result[..., :3][alias] = rgba[..., :3][alias]
     return result
 
 
-def pack_frames(pack, target, eyes, glints, selected, jobs, register_pose):
+def prepare_pack(pack, target):
     source = ART / 'source' / pack
-    manifest = json.loads((source / 'index.json').read_text())
+    index_bytes = (source / 'index.json').read_bytes()
+    manifest = json.loads(index_bytes)
+    output = target / pack
+    written = [output, output / RECEIPT, *(output / page['file'] for page in manifest['pages'])]
+    for path in written:
+        dest = path.resolve()
+        for protected in PROTECTED_ATLASES:
+            protected = protected.resolve()
+            if dest.is_relative_to(protected) or protected.is_relative_to(dest):
+                raise ValueError(f'{path} overlaps protected atlas directory {protected}')
+    return source, index_bytes, manifest, output
+
+
+def pack_frames(source, index_bytes, manifest, output, selected, jobs, register_pose):
+    pack = source.name
     pages = []
     for page in manifest['pages']:
-        with Image.open(source / page['file']) as im:
+        with Image.open(BytesIO(read_source_page(source, page))) as im:
             pages.append(np.array(im.convert('RGBA')))
+    eyes, glints = measure_lights(manifest, pages) if pack == 'reviewed' else ({}, {})
 
     def crop(frame):
         x, y = frame['x'], frame['y']
@@ -232,9 +268,19 @@ def pack_frames(pack, target, eyes, glints, selected, jobs, register_pose):
             x, y = frame['x'], frame['y']
             pages[frame['page']][y:y + frame['height'], x:x + frame['width']] = texture
 
-    (target / pack).mkdir(parents=True, exist_ok=True)
-    for page, pixels in zip(manifest['pages'], pages, strict=True):
-        Image.fromarray(pixels).save(target / pack / page['file'])
+    output.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(prefix='.paint-', dir=output) as scratch:
+        staged = Path(scratch)
+        hashes = {}
+        for page, pixels in zip(manifest['pages'], pages, strict=True):
+            name = page['file']
+            path = staged / name
+            Image.fromarray(pixels).save(path)
+            hashes[name] = digest(path.read_bytes())
+        write_receipt(staged, index_bytes, hashes)
+        for name in hashes:
+            (staged / name).replace(output / name)
+        (staged / RECEIPT).replace(output / RECEIPT)
     print(f'{pack}: painted {len(seen)} frames', flush=True)
 
 
@@ -251,6 +297,9 @@ if __name__ == '__main__':
     opts = parser.parse_args()
     if unknown := set(opts.forms or []) - BASE.keys():
         parser.error(f'unknown forms: {", ".join(sorted(unknown))}')
-    eyes, glints = measure_lights(*read_pack(ART / 'source' / 'reviewed'))
-    for pack_name in ('reviewed', 'allies'):
-        pack_frames(pack_name, opts.output, eyes, glints, opts.forms, opts.jobs, not opts.quick)
+    try:
+        packs = [prepare_pack(name, opts.output) for name in ('reviewed', 'allies')]
+    except ValueError as error:
+        parser.error(str(error))
+    for pack in packs:
+        pack_frames(*pack, opts.forms, opts.jobs, not opts.quick)

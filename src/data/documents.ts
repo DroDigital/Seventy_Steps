@@ -260,7 +260,7 @@ export const NOTE_SITES: Readonly<Record<string, readonly (readonly [name: strin
   kn_yan: [["A Judge's Notice", 292, 94], ['Tally of the Red Stairs', 138, 362]],
   rlyeh: [["A Cultist's Chalk", 128, 88], ['Notice to Mariners', 318, 172]],
   yuggoth: [['A Surgical Chart', 98, 282], ['Cylinder Labels', 300, 254]],
-  beyond: [["Carter's Pocket Notebook", 224, 78], ["Erich Zann's Score", 120, 242]],
+  beyond: [["Carter's Pocket Notebook", 224, 78], ["Erich Zann's Score", 136, 238]],
   cloud_summit: [["Barzai's Last Page", 70, 260], ["Atal's Warning", 420, 190]],
   black_wood: [["A Drover's Tally", 90, 210], ["Akeley's Postscript", 440, 370]],
   pale_lattice: [["Carter's Margin", 130, 300], ['Inscription on a Prism', 400, 230]],

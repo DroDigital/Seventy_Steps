@@ -13,11 +13,12 @@ The bake assigns 15 materials using source colors and the anatomy of each form. 
 ```sh
 python3 tools/repaint_creature_sprites.py /path/to/painted-pages
 python3 tools/install_sprite_paint.py /path/to/painted-pages
+python3 -m unittest discover -s tools -p 'test_*sprite_paint*.py'
 npm run check
 npm run check:demo
 ```
 
-The installer verifies the alpha channel and a visible repaint of every registered frame. It measures the source's reserved eye and glint texels and samples the finished sprites for body colors and grounding. It also verifies the demo crops against the painted full-game pages before installing both editions. Playback uses the authored frame order, facing, scale and feet anchors. The production build serves the painted pages.
+The bake writes a receipt for each pack with the source manifest digest and the digest of every painted page. The installer checks those digests, the alpha channel, and a visible repaint of every registered frame. It measures the source's reserved eye and glint texels and samples the finished sprites for body colors and grounding. It verifies the demo crops against the painted full-game pages and removes obsolete atlas pages as part of the installation. Playback uses the authored frame order, facing, scale and feet anchors. The production build serves the painted pages.
 
 ## Runtime files
 

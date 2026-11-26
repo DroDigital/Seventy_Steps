@@ -14,8 +14,9 @@ import { CACHE, GUN } from '../data/tuning';
 /** The rooms of `def` that keep a cache: its dead ends, or its deepest free room when it has none. */
 function cacheRooms(def: DungeonDef): string[] {
   const opened = new Set(def.rooms.map((r) => r.from));
+  const through = new Set((def.links ?? []).filter((l) => l.kind !== 'window').flatMap((l) => [l.from, l.to])); // (round 127: a room a loop passes through is no dead end)
   const free = def.rooms.filter((r) => r.from && !r.sign && !r.gate && !r.boss && !r.tome && !r.vial && !r.ally && !r.weapon);
-  const ends = free.filter((r) => !opened.has(r.id));
+  const ends = free.filter((r) => !opened.has(r.id) && !through.has(r.id));
   const depth = (id: string | undefined): number => {
     const r = def.rooms.find((x) => x.id === id);
     return r?.from ? 1 + depth(r.from) : 0;

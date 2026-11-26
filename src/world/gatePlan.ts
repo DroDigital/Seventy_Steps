@@ -80,6 +80,7 @@ function free(parts: readonly Part[], x: number, z: number, y: number): boolean 
 function dungeonGates(L: DungeonLayout, parts: readonly Part[], doors: DoorSpec[], fogs: FogWall[]): void {
   L.doors.forEach((d, i) => {
     if (d.hidden) return; // the hidden layer has its own seals
+    if (d.link && d.link.kind !== 'open') return; // round 127: a shortcut has its own barred door (render/shortcutViews.ts), a drop's ledge none
     const room = d.b ?? d.a;
     const boss = [d.a, d.b].find((r) => r?.def.boss);
     if (boss?.def.boss) {

@@ -15,6 +15,7 @@ import { awaitsIntroduction } from './npcIntroduction';
 import { dismissMount, moveMounted } from './mounts';
 import { portalVeil } from './mountPortal';
 import { footprintClear } from './mountGround';
+import { fallStep, grounded, heldAt } from './drops';
 
 export function movementSystem(g: Game, dt: number): void {
   const { transform, body, mover, actor, shove } = g.ecs.c;
@@ -29,6 +30,7 @@ export function movementSystem(g: Game, dt: number): void {
     }
     const b = body.get(id);
     const a = actor.get(id);
+    const [wasX, wasY, wasZ] = [tr.pos.x, tr.pos.y, tr.pos.z]; // (round 127: where the step began: a ledge is fallen from, drops.ts)
     if (awaitsIntroduction(g, id)) {
       shove.delete(id);
       continue;
@@ -71,9 +73,11 @@ export function movementSystem(g: Game, dt: number): void {
       tr.pos.z += s.z;
       if (--s.frames <= 0) shove.delete(id);
     }
-    tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
+    const jumped = Math.hypot(tr.pos.x - wasX, tr.pos.z - wasZ) > 3; // set down elsewhere (a teleport): not a step off a ledge
+    if (jumped) grounded(g, id);
+    tr.pos.y = jumped ? g.world.ground(tr.pos.x, tr.pos.z) : heldAt(g, id, wasY, tr.pos); // round 127: over a ledge's drop the body keeps its height...
     resolveCapsule(g.world, tr.pos, b.radius, b.height, id === g.player.id && !!g.overworld);
-    tr.pos.y = g.world.ground(tr.pos.x, tr.pos.z);
+    tr.pos.y = jumped ? g.world.ground(tr.pos.x, tr.pos.z) : fallStep(g, id, wasY, tr.pos, dt); // ...and falls to the floor below (drops.ts)
   }
   separate(g);
   const rider = transform.get(g.player.id)!;
