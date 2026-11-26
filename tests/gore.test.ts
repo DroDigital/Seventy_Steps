@@ -3,16 +3,15 @@
  * creature comes apart as its body is made and bleeds what the tales give it; a cut's line, its piece and the piece's flight are sound.
  */
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { BLOOD, GORE, GORE_FX, goreOf } from '../src/data/gore';
 import { ROSTER_IDS } from '../src/data/roster';
 import { getEntity } from '../src/data/registry';
 import { planCut, reachDown, startPiece, stepPiece, type CutInput } from '../src/render/goreCut';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
 import { SPRITE_FRAG, SPRITE_VERT } from '../src/render/shaders/sprite';
 import { CAST_FRAG } from '../src/render/shaders/castSprite';
 import { BLOOD_ORDER } from '../src/render/shaders/spriteFx';
 
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
 const seeded = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 const base = (over: Partial<CutInput> = {}): CutInput => ({
   kind: 'sever', blow: { x: 0, z: 1 }, across: { x: -1, z: 0 }, facing: { x: 0, z: -1 }, mirror: false, wound: 0.7,
@@ -39,8 +38,7 @@ describe('each creature\'s gore (data/gore.ts)', () => {
 
   it('bleeds no colour that reads as an anomaly hue', () => {
     for (const [kind, c] of Object.entries(BLOOD)) {
-      const [h, s, v] = rgbToHsv(c);
-      expect(s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1), kind).toBe(false);
+      expect(readsAsAnomaly(c), kind).toBe(false);
     }
     expect(BLOOD_ORDER.length).toBe(Object.keys(BLOOD).length);
   });

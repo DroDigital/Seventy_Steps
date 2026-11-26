@@ -24,7 +24,6 @@ function track(fadeIn: number, body: number, fadeOut: number, amp: number, spike
 describe('the realms\' music (round 28)', () => {
   it('has a track for every realm, and the stairs of slumber have two of their own', () => {
     for (const r of REGIONS) expect(realmTrackOf(r.id), r.id).not.toBeNull();
-    expect(REALM_TRACK_IDS.length).toBe(15);
     const own = REGIONS.filter((r) => !OUTER_DARK.includes(r.id)); // (the Outer Dark's dimensions borrow the nearest track until they have their own: round 73)
     expect(new Set(own.map((r) => realmTrackOf(r.id))).size).toBe(own.length); // each realm its own
     expect(realmTrackOf('arena')).toBeNull();
@@ -35,7 +34,7 @@ describe('the realms\' music (round 28)', () => {
     expect(tracks[0]).toBe('descente_hypnotique');
     expect(tracks[tracks.length - 1]).toBe('cavernous_tail');
     expect(realmTrackOf('dreamlands', 'ulthar_kadath', 'ulthar')).toBe('wavering_pads');
-    expect(new Set(REALM_TRACK_IDS.map(realmFile)).size).toBe(15);
+    expect(new Set(REALM_TRACK_IDS.map(realmFile)).size).toBe(REALM_TRACK_IDS.length); // each track its own file (no count: a track added is no failure, 2026-11-24)
     for (const id of REALM_TRACK_IDS) expect(REALM_TRACKS[id].title.length).toBeGreaterThan(3);
   });
 

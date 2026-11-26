@@ -22,6 +22,12 @@ export const AUDITS = [
   'tests/houseWalk.test.ts',
   'tests/balance.test.ts',
   'tests/ngPlus.test.ts',
+  // 2026-11-24: the exhaustive halves of four everyday files, about a minute of the everyday set: every house flooded, every
+  // dungeon dressed twice, every wall thing built every way, four minutes of the whole world's game.
+  'tests/enclosureAudit.test.ts',
+  'tests/dungeonDressing.test.ts',
+  'tests/dungeonPropsAudit.test.ts',
+  'tests/npcLifeAudit.test.ts',
 ];
 
 // Round 38: several tests build a whole world (npcLife, worldDeath, worldLights, nightWeather, outerGods, wanderers, overheard) and

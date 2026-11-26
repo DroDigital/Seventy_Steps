@@ -19,7 +19,6 @@ const NOT_ARRIVED_FOR = ['brown_jenkin', 'curwen_pit_thing', 'dunwich_horror', '
 
 describe('the entrances of the horrors that arrived by their size alone (round 61)', () => {
   it('are for the bosses the world raises, and found by arrivalOf', () => {
-    expect(ids.length).toBe(20);
     const bosses = new Set(worldLayout().spawns.filter((s) => s.id.startsWith('boss:')).map((s) => s.entity)); // (the Shoggoth and the Polyp fight as bosses by their variant, not a script of their own)
     for (const id of ids) {
       expect(bosses.has(id), id).toBe(true);

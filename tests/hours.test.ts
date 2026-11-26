@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { HOURS, HOUR_COLOURS } from '../src/data/hours';
 import { REGIONS } from '../src/data/regions';
 import { CLOCK } from '../src/data/tuning';
 import { moonDir } from '../src/render/nightFx';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
+import { rgbToHsv } from '../src/render/palette';
 import { createSkyHours, oppositeOf } from '../src/render/skyHours';
 import { newAtm } from '../src/render/skyForce';
 import { worldUniforms } from '../src/render/worldMaterial';
@@ -13,12 +14,6 @@ import type { Game } from '../src/systems/components';
 
 afterEach(() => void (NIGHT.hurried = 0));
 
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
-/** The same test as tests/palette.test.ts: whether a colour would be taken for an anomaly by the post pass's colour isolation. */
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 const at = (phase: number): number => ((phase - CLOCK.start + 1) % 1) * CLOCK.night; // the seconds of play at which the night stands at `phase`
 
 describe('the afterglow and the false dawn (round 80)', () => {
@@ -92,8 +87,8 @@ describe('the hours\' colours (round 80)', () => {
 
   it('are warm and low in saturation, and none reads as an anomaly hue to the post pass\'s colour isolation', () => {
     for (const [id, c] of Object.entries(HOUR_COLOURS)) {
-      expect(reads(c.glow), `${id} glow`).toBe(false);
-      expect(reads(c.dawn), `${id} dawn`).toBe(false);
+      expect(readsAsAnomaly(c.glow), `${id} glow`).toBe(false);
+      expect(readsAsAnomaly(c.dawn), `${id} dawn`).toBe(false);
       for (const x of [...c.glow, ...c.dawn]) expect(x >= 0 && x <= 1).toBe(true);
       expect(c.glow[0], `${id}: a dusk is warm`).toBeGreaterThanOrEqual(c.glow[2] - 0.05);
       expect(rgbToHsv(c.dawn)[1], `${id}: a false dawn is pale`).toBeLessThan(0.3);

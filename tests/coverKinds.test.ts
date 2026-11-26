@@ -4,17 +4,12 @@
  * little more than the ground's own would.
  */
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { PIECE_COLORS, pieceOf, REGION_COVER, type Piece } from '../src/data/coverKinds';
 import { getRegion } from '../src/data/regions';
 import { groundCover } from '../src/render/groundCover';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
+import { rgbToHsv } from '../src/render/palette';
 import { chunkContent } from '../src/world/chunks';
-
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 
 /** The first chunk of a region, searched on its tile. */
 function chunkOf(id: string): { cx: number; cz: number } {
@@ -40,7 +35,7 @@ describe('a region\'s own litter', () => {
   it('is of colours the isolation does not take for an anomaly, and muted ones', () => {
     for (const [piece, colors] of Object.entries(PIECE_COLORS) as [Piece, readonly (readonly [number, number, number])[]][]) {
       for (const c of colors) {
-        expect(reads(c), piece).toBe(false);
+        expect(readsAsAnomaly(c), piece).toBe(false);
         expect(rgbToHsv(c)[1], `${piece} saturation`).toBeLessThan(0.45);
       }
     }

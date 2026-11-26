@@ -5,21 +5,17 @@
  */
 import type * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { readsAsAnomaly } from './anomalyHue';
 import { createRng } from '../src/core/rng';
 import { HOUSE_LOOKS } from '../src/data/houseLooks';
 import { PROP_LOOKS, lookOf } from '../src/data/propLooks';
 import { REGIONS, type PropKind } from '../src/data/regions';
 import { housePieces } from '../src/render/houseMesh';
-import { ANOMALY_HUES, rgbToHsv } from '../src/render/palette';
+import { rgbToHsv } from '../src/render/palette';
 import { propPieces, solids } from '../src/render/propShapes';
 import { propAt } from '../src/world/props';
 import { FORM_KEYS, formsOf, propOfForm } from './propForms';
 
-const hueGap = (a: number, b: number): number => Math.min(Math.abs(a - b), 1 - Math.abs(a - b));
-const reads = (c: readonly [number, number, number]): boolean => {
-  const [h, s, v] = rgbToHsv(c);
-  return s > 0.3 && v > 0.08 && ANOMALY_HUES.some((a) => hueGap(h, a) < 0.1);
-};
 const tris = (g: THREE.BufferGeometry): number => (g.index ? g.index.count : g.getAttribute('position').count) / 3;
 
 /** The most faces a prop of the kind may have (the dead tree, the round bush and the boulder of before were about a third of these). */
@@ -40,7 +36,7 @@ describe('every recurring prop in its realm\'s forms (round 111)', () => {
     for (const l of Object.values(PROP_LOOKS)) colours.push(l.bark, l.needles, l.top, ...l.leaves);
     for (const h of Object.values(HOUSE_LOOKS)) colours.push(...h.paints, ...h.roofs, ...h.doors);
     for (const c of colours) {
-      expect(reads(c), `${c}`).toBe(false);
+      expect(readsAsAnomaly(c), `${c}`).toBe(false);
       expect(rgbToHsv(c)[1], `${c}`).toBeLessThan(0.7); // (October's rust, as before)
     }
   });

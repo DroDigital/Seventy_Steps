@@ -1,18 +1,18 @@
 # [WORKING TITLE] — Technical Spec
 A Lovecraftian open-world soulslike in retro 3D (Doom sprites + PS1-era worlds).
-Built with Claude Code, one phase per session. At the start of each session, read this file and CLAUDE.md, then do only the phase named in the message.
+Built with Claude Code. At the start of each session, read this file, `docs/RULES.md` (what the author has decided) and CLAUDE.md, then do only what the message asks. The phases of §5 are done; work now comes as requests.
 
 ## 0. Working rules (these keep cost down)
-- Do only the requested phase. Never scaffold later phases "in advance."
+- Do only what the message asks. Never scaffold later work "in advance."
 - Write a plan of 15 lines or fewer, then execute without asking for confirmation. Stop only if blocked.
-- If something is ambiguous, pick the simplest option that fits this spec, log it as one line in `docs/DECISIONS.md`, and keep going.
-- Never echo file contents or large diffs in chat. End each phase with a summary of 10 lines or fewer, plus a git commit.
+- If something is ambiguous, pick the simplest option that fits this spec and `docs/RULES.md`, log it as one line in `docs/DECISIONS.md`, and keep going. Label new work by its date (YYYY-MM-DD) or PR number, not by a round number.
+- Never echo file contents or large diffs in chat. End each piece of work with a summary of 10 lines or fewer, plus a git commit.
 - Make surgical edits. Never rewrite a whole file for a small change. Keep files under 300 lines with one responsibility each.
 - Verify with `npm run check` (typecheck + tests). Read only the failing output. Never open `node_modules/` or `dist/`.
-- No asset files. Textures, sprites, meshes, and audio are all generated in code.
+- Assets may be made in code or found, when their licence allows shipping them (CC0, CC BY with credit, or made for the game); each is credited in its folder's `CREDITS.md`. For sound effects, icons and interface art, a found recording or drawn piece comes before a generated one (2026-11-24; until then every asset was generated in code but for listed exceptions).
 - Creatures are data, not classes. A typical entity is 15–30 lines of data. Bosses get phase scripts, and those are data too.
-- Dependencies are limited to `three`, `typescript`, `vite`, and `vitest`. Ask before adding anything else.
-- Out of scope: multiplayer, skeletal animation, imported models/textures, mobile.
+- Dependencies are limited to `three`, `typescript`, `vite`, `vitest`, `electron`, `electron-builder`, `gamepad-node` and `steamworks.js` (with `@types/three`). Ask before adding anything else.
+- Out of scope: multiplayer, skeletal animation, mobile.
 
 ## 1. Stack & architecture
 - TypeScript (strict) + Three.js (WebGL2) + Vite, with Vitest for tests. Runs in the browser, with keyboard/mouse and the Gamepad API for input.
@@ -48,7 +48,7 @@ The look is Doom's billboarded sprites plus PS1-era low-poly worlds, with a thir
   - A recipe is a silhouette archetype + palette + feature params (eye count, tentacles, wings, limbs, glow, scale).
   - Each state gets 2–4 frames, and everything is packed into one atlas.
   - Colossal bosses are low-poly primitive assemblies (segment-chain tentacles, lathed bodies) built from the same data.
-- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation.
+- **Palette:** charcoal, bone, rust, sea-grey. The saturated anomaly colors are Eldritch Magenta `#D80073`, Cosmic Purple `#6A0DAD`, and Void Green `#2BFFA0`, and nothing else in the world gets saturation near them: the tests hold every colour that lights or fills the scene, when its saturation passes 0.3, at least 36 degrees of hue from each (`FX.hueWidth`, the post pass's own window; a narrower one was tried on 2026-11-24 and waits on the author).
 - **Post-processing:** one fullscreen post pass handles everything:
   1. Color isolation: desaturate toward bone/sepia, except hues near the anomaly colors, which get boosted by an `anomalyProximity` uniform.
   2. Palette quantization (64 colors or fewer) with 4×4 Bayer dithering.
@@ -164,7 +164,7 @@ Place every other entity in the spawn tables of its best-fitting region.
 
 ### E. Bosses
 - `bossScript` is data: `phases[] {hpBelow, attacks[] (weighted ids), summons?, realityHooks?, arenaChange?, eldritch?}`.
-- Boss health does not rise with each level bought (only past the standing, below): it starts at the authored maximum for its current form, grows to 115% on NG+1, then by five percentage points per journey to 145% at NG+7 and beyond. On the first journey a boss's damage gains +0.3% per purchased attribute level and, past its expected standing, its blows absorb 55% of the investigator's extra health growth, and its health grows with 75% of their extra damage (Might and the weapon's edge) (`BOSS_OVERMATCH`, 2026-11-01 and 2026-11-02). Later journeys use a fixed reference and regional damage progression through NG+7 (`docs/NGPLUS.md`); the chosen difficulty still applies. Every Vigour and Endurance level grants its full benefit, while Might gives half its damage per level past level 18 (`LEVELS.might.knee`). Leveling leaves a living boss's health and wounds unchanged. Ordinary enemies receive regional journey scaling; encounter servants keep authored health and inherit the encounter's journey damage growth.
+- Boss health does not rise with each level bought (only past the standing, below): it starts at the authored maximum for its current form, grows to 115% on NG+1, then by five percentage points per journey to 145% at NG+7 and beyond. On the first journey a boss's damage gains +0.3% per purchased attribute level and, past its expected standing, its blows absorb 55% of the investigator's extra health growth, and its health grows with 75% of their extra damage (Might and the edge of the weapon in hand), neither growing past 1.5 times (`BOSS_OVERMATCH`, 2026-11-01, 2026-11-02 and 2026-11-24). Later journeys use a fixed reference and regional damage progression through NG+7 (`docs/NGPLUS.md`); the chosen difficulty still applies. Every Vigour and Endurance level grants its full benefit, while Might gives half its damage per level past level 18 (`LEVELS.might.knee`). Leveling leaves a living boss's health and wounds unchanged. Ordinary enemies receive regional journey scaling; encounter servants keep authored health and inherit the encounter's journey damage growth.
 - The High Priest reveals its eldritch form in phases two and three regardless of sanity. Dagon and Hydra coordinate attacks while engaged together in the same arena, waiting through the partner's complete recovery plus 24 rest frames before another wind-up. The waiting boss yields 0.75 m beyond the two collision radii, leaving room to dodge while remaining within blade reach. Their authored health is 2550/2450 and damage 35/38, balanced as one combined encounter. Their flood remains, while second-phase darkness and servant packs are removed to preserve visible ground cues and space to counterattack.
 - Arenas have no decorative neon floor symbols. Markings on arena props and functional combat or puzzle markings remain.
 - Shared attack library, about 20 parameterized attacks:

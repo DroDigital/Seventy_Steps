@@ -7,34 +7,51 @@ import { bossRung } from './ngPlus';
 import type { Entity } from '../core/ecs';
 import type { Fight, Game } from './components';
 
-/** How much harder a horror strikes when the investigator's health exceeds its expected standing. */
-export function overmatch(levels: { vigour: number }, id: string | undefined): { damage: number } {
+/** The blows' growth past the standing, uncapped: what later journeys' fixed reference keeps (`journeyBossDamage`). */
+function grownBlows(levels: { vigour: number }, id: string | undefined): number {
   const standing = id ? BOSS_STANDING[id] : undefined;
-  if (!standing) return { damage: 1 };
+  if (!standing) return 1;
   const body = healthAt(levels.vigour) / healthAt(standing[0]);
-  return { damage: 1 + BOSS_OVERMATCH.share * Math.max(0, body - 1) };
+  return 1 + BOSS_OVERMATCH.share * Math.max(0, body - 1);
 }
 
-/** How much more health a horror has when the investigator's damage exceeds its expected standing (Might and the weapon's edge; 2026-11-01). */
+/** How much harder a horror strikes when the investigator's health exceeds its expected standing: at most `BOSS_OVERMATCH.most` (2026-11-24). */
+export function overmatch(levels: { vigour: number }, id: string | undefined): { damage: number } {
+  return { damage: Math.min(BOSS_OVERMATCH.most, grownBlows(levels, id)) };
+}
+
+/**
+ * How much more health a horror has when the investigator's damage exceeds its expected standing (Might and the edge of
+ * the weapon in hand; 2026-11-01): at most `BOSS_OVERMATCH.most` (2026-11-24).
+ */
 export function overmatchHealth(levels: { might: number }, edge: number, id: string | undefined): number {
   const standing = id ? BOSS_STANDING[id] : undefined;
   if (!standing) return 1;
   const keen = (level: number): number => 1 + REINFORCE.damage * level;
   const power = (mightAt(levels.might) * keen(edge)) / (mightAt(standing[1]) * keen(standing[2] ?? 0));
-  return 1 + BOSS_OVERMATCH.health * Math.max(0, power - 1);
+  return Math.min(BOSS_OVERMATCH.most, 1 + BOSS_OVERMATCH.health * Math.max(0, power - 1));
 }
 
 export const bossDamageScale = (levels: number, over = 1): number => (1 + BOSS_LEVEL_SCALING.damage * levels) * over;
 
-/** Later journeys use a fixed reference: buying another level does not strengthen their bosses. */
+/** Later journeys use a fixed reference: buying another level does not strengthen their bosses, and the first journey's cap is not theirs. */
 export const journeyBossDamage = (id: string, cycle: number, profile?: JourneyProfile): number =>
-  bossDamageScale(levelsWorth(JOURNEY_REFERENCE), overmatch(JOURNEY_REFERENCE, id).damage) * bossRung(id, cycle, profile).damage;
+  bossDamageScale(levelsWorth(JOURNEY_REFERENCE), grownBlows(JOURNEY_REFERENCE, id)) * bossRung(id, cycle, profile).damage;
 
-/** On the first journey a horror grows to meet an investigator stronger than its standing (`overmatchHealth`), its wounds kept as a share. */
+/**
+ * On the first journey a horror grows to meet an investigator stronger than its standing (`overmatchHealth`), by the
+ * weapon in their hand, its wounds kept as a share. Met again whenever that weapon changes in the fight (`arms.equip`).
+ */
 export function meet(g: Game, e: Entity, f: Fight): void {
   const h = g.ecs.c.health.get(e);
-  if (!h || g.player.cycle > 0) return;
+  if (!h || h.max <= 0 || h.hp <= 0 || g.ecs.c.dead.has(e) || g.player.cycle > 0) return;
   f.base ??= h.max;
-  const max = Math.round(f.base * overmatchHealth(g.player.levels, Math.max(0, ...Object.values(g.player.reinforced)), f.id));
+  const max = Math.round(f.base * overmatchHealth(g.player.levels, g.player.reinforced[g.player.weapon] ?? 0, f.id));
+  if (max === h.max) return;
   [h.hp, h.max] = [(h.hp / h.max) * max, max];
+}
+
+/** Every live engaged fight meets the investigator again (a weapon taken up in the middle of one). */
+export function meetAgain(g: Game): void {
+  for (const [e, f] of g.ecs.c.fight) if (f.engaged && !g.ecs.c.dead.has(e)) meet(g, e, f);
 }

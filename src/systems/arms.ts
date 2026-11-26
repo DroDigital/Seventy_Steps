@@ -12,6 +12,7 @@ import { t } from '../core/i18n';
 import { REINFORCE, STAR_STONES } from '../data/tuning';
 import { getEntity } from '../data/registry';
 import { armedMoves, isWeapon, WEAPON_IDS, WEAPONS, type WeaponId } from '../data/weapons';
+import { meetAgain } from './bossScaling';
 import type { Game } from './components';
 import { markNew } from './finds';
 
@@ -20,6 +21,7 @@ export function equip(g: Game, id: string): boolean {
   if (!isWeapon(id) || !g.player.arms.includes(id)) return false;
   g.player.weapon = id;
   g.ecs.c.actor.get(g.player.id)!.moves = armedMoves(id);
+  meetAgain(g); // a horror in its fight grows to meet the weapon now in hand (2026-11-24)
   return true;
 }
 
