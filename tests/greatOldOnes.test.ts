@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
-import { CTHULHU, HASTUR } from '../src/data/tuning';
+import { CTHULHU, HASTUR, REALITY } from '../src/data/tuning';
 import { strike } from '../src/systems/combat';
 import { fightAction } from '../src/systems/fightActions';
 import { createWorldGame } from '../src/systems/game';
@@ -36,7 +36,7 @@ describe('the great old ones (spec §3E)', () => {
       .find((p) => hasLineOfSight(g.world, eye, { x: p.x, y: 1.6, z: p.z }) && Math.hypot(p.x, p.z) < 20)!;
     place(g, g.player.id, open.x, open.z, 0);
     steps(g, 60);
-    expect(g.reality.petrify).toBeGreaterThan(0.2);
+    expect(g.reality.petrify).toBeGreaterThan(30 * REALITY.petrifyRate); // out of cover, it builds (a second of it, at least half)
     const risen = record(g, 'Respawned');
     slay(g, boss);
     for (let i = 0; i < 300 && !risen.length; i++) run(g, 1);

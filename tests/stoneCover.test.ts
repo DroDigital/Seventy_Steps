@@ -1,7 +1,7 @@
 /**
  * Ghatanothoa's monoliths (playtest round 24 asked: do they stand where they can be used from the foot of
  * its body?). Behind each, a little way out from the ring, the investigator is out of its sight; and its
- * gaze, four seconds to stone, gives the time to run there from anywhere in the ring.
+ * gaze, eight seconds to stone, gives the time to run there from anywhere in the ring.
  */
 import { describe, expect, it } from 'vitest';
 import { distXZ } from '../src/core/geom';
@@ -34,7 +34,7 @@ describe('Ghatanothoa\'s monoliths are cover (round 25)', () => {
     }
   });
 
-  it('is reached in time from anywhere in the ring: the nearest is no farther than four seconds of running', () => {
+  it('is reached in time from anywhere in the ring: the nearest is no farther than the stone takes to fill, running', () => {
     const run = 6.4; // metres a second, sprinting
     const reach = (REALITY.petrifyRate ** -1 / SIM.hz) * run; // metres covered while the stone fills
     for (let k = 0; k < 16; k++) {

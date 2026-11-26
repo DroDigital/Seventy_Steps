@@ -4,7 +4,10 @@
  * been found, and finding it is a short story told in its own matter, two or three acts, in the court before the gate: a page read that
  * says what happened here, a vigil kept at the hour, in the weather or in the state of mind the place asks for, a gift laid on its altar
  * (a dose, some Echoes, a little of the mind or of the blood), the rite of lights the way had (data/arenaWays.ts). The acts are a quest
- * in the journal, and what the gate wants is read there; when they are all done the gate draws aside and stays so. Written for each horror
+ * in the journal, and what the gate wants is read there; when they are all done the gate draws aside and stays so. Round 69 switched them
+ * off (asked: no puzzles, every boss door opens): `systems/discovery.ts` `arenasHere` finds no house, so none of this is played and
+ * no gate waits on it. Kept as written; before playing them again, note Shub-Niggurath's and the Other Gods' vigils ask a gale and the
+ * motes, and their realms in the Outer Dark (round 73) know no weather (`WEATHER.regions`), so the place could not call either. Written for each horror
  * in `discoveriesEarth.ts` and `discoveriesBeyond.ts`; its court laid by `world/discoveryPlan.ts`, played by `systems/discovery.ts`. Data only.
  */
 

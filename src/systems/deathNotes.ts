@@ -31,7 +31,7 @@ export function deathLine(g: Game): string {
   const blow = last.get(g)?.move;
   if (blow === 'fell') return EDGES[Math.floor(g.rng() * EDGES.length)];
   if (blow === 'drowned') return SEAS[Math.floor(g.rng() * SEAS.length)];
-  if (blow === 'petrified') return 'Stone takes four seconds. Break its sight behind a monolith, and it wears off.';
+  if (blow === 'petrified') return 'Stone takes eight seconds. Break its sight behind a monolith, and it wears off.';
   const tip = blow && tipOf(blow);
   if (tip) return tip;
   const before = said.get(g);

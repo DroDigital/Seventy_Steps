@@ -5,6 +5,7 @@ player would notice, newest first. Versions before 1.0 were never released.
 
 ## Unreleased
 
+- **Ghatanothoa's gaze is slower.** It now takes eight seconds in its sight to turn you to stone, not four, and still wears off in five once you break its sight behind a monolith.
 - **The dungeons fold back on themselves.** Every dungeon was a string of rooms you walked in and walked back out of. Now each one loops, the way a Souls level does:
   - **Barred doors.** Most have a door found barred on the way in. Go the long way round, lift its bar from the far side, and it stays open: the run from the Elder Sign to the horror is often half as long after that. From the near side the door only rattles.
   - **Ledges.** The Deserted House, the Shunned House and the Witch House's pantry have a ledge you can drop from but never climb back.
