@@ -26,13 +26,18 @@ describe('Microsoft Store package preparation', () => {
     expect(config).toContain('<ProcessorArchitecture>x64</ProcessorArchitecture>');
     expect(config).not.toMatch(/<(MSAAppId|TitleId)>/);
 
-    for (const [name, size] of [['StoreLogo', 100], ['Square150x150Logo', 150], ['Square44x44Logo', 44]] as const) {
+    for (const [name, width, height] of [
+      ['StoreLogo', 100, 100],
+      ['Square150x150Logo', 150, 150],
+      ['Square44x44Logo', 44, 44],
+      ['SplashScreenImage', 1920, 1080],
+    ] as const) {
       expect(config).toContain(`${name}="${name}.png"`);
       const png = readFileSync(`${dir}/${name}.png`);
       const header = new DataView(png.buffer, png.byteOffset, png.byteLength);
       expect(header.getUint32(0)).toBe(0x89504e47);
-      expect(header.getUint32(16)).toBe(size);
-      expect(header.getUint32(20)).toBe(size);
+      expect(header.getUint32(16)).toBe(width);
+      expect(header.getUint32(20)).toBe(height);
     }
   });
 

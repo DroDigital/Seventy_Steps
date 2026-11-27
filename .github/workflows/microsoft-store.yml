@@ -60,4 +60,10 @@ jobs:
           if (-not $makePkg) { throw 'MakePkg was not found after installing the GDK.' }
           $makePkg.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build and validate the Store package
-        run: npm run package:microsoft
+        shell: pwsh
+        run: |
+          npm run package:microsoft
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $package = Get-ChildItem 'release/microsoft-store/package' -Filter '*.msixvc' -File
+          if (-not $package) { throw 'The Store package was not created.' }
+          $package | Get-FileHash -Algorithm SHA256 | Format-List

@@ -87,15 +87,21 @@ function chunk(type, data) {
 
 /** The icon as a PNG, `size` square (`shape`: see iconPixels). */
 export function iconPng(size = 256, shape = 'round') {
-  const rgba = iconPixels(size, shape);
-  const rows = Buffer.alloc(size * (size * 4 + 1));
-  for (let y = 0; y < size; y++) {
-    rows[y * (size * 4 + 1)] = 0; // no filter
-    Buffer.from(rgba.buffer, y * size * 4, size * 4).copy(rows, y * (size * 4 + 1) + 1);
+  return rgbaPng(size, size, iconPixels(size, shape));
+}
+
+/** Encode a row-major RGBA image as an 8-bit PNG. */
+export function rgbaPng(width, height, rgba) {
+  const rowBytes = width * 4;
+  const rows = Buffer.alloc(height * (rowBytes + 1));
+  const pixels = Buffer.from(rgba.buffer, rgba.byteOffset, rgba.byteLength);
+  for (let y = 0; y < height; y++) {
+    // Each row starts with a zero byte (no filter).
+    pixels.copy(rows, y * (rowBytes + 1) + 1, y * rowBytes, (y + 1) * rowBytes);
   }
   const ihdr = Buffer.alloc(13);
-  ihdr.writeUInt32BE(size, 0);
-  ihdr.writeUInt32BE(size, 4);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
   ihdr.set([8, 6, 0, 0, 0], 8); // 8 bits, RGBA
   return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(rows)), chunk('IEND', Buffer.alloc(0))]);
 }

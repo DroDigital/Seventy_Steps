@@ -1,12 +1,35 @@
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { iconPng } from '../desktop/icon.js';
+import { iconPixels, iconPng, rgbaPng } from '../desktop/icon.js';
 
 const shellImages = [
   ['StoreLogo', 100],
   ['Square150x150Logo', 150],
   ['Square44x44Logo', 44],
 ];
+
+function splashScreen() {
+  const width = 1920;
+  const height = 1080;
+  const size = 512;
+  const art = iconPixels(size, 'plain');
+  const background = Buffer.from([9, 9, 11, 255]);
+  const pixels = Buffer.alloc(width * height * 4, background);
+  const left = (width - size) / 2;
+  const top = (height - size) / 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const edge = Math.min(x, y, size - x - 1, size - y - 1);
+      const opacity = Math.min(1, edge / 48);
+      const source = (y * size + x) * 4;
+      const target = ((top + y) * width + left + x) * 4;
+      for (let c = 0; c < 3; c++) {
+        pixels[target + c] = Math.round(background[c] + (art[source + c] - background[c]) * opacity);
+      }
+    }
+  }
+  return rgbaPng(width, height, pixels);
+}
 
 /** Add the PC GDK manifest and shell images to a staged Windows build. */
 export function prepareMicrosoftStore(payloadDir, version) {
@@ -20,6 +43,7 @@ export function prepareMicrosoftStore(payloadDir, version) {
   for (const [name, size] of shellImages) {
     writeFileSync(join(payloadDir, `${name}.png`), iconPng(size, 'plain'));
   }
+  writeFileSync(join(payloadDir, 'SplashScreenImage.png'), splashScreen());
 
   writeFileSync(join(payloadDir, 'MicrosoftGame.config'), `<?xml version="1.0" encoding="utf-8"?>
 <Game configVersion="1">
@@ -42,6 +66,7 @@ export function prepareMicrosoftStore(payloadDir, version) {
                 StoreLogo="StoreLogo.png"
                 Square150x150Logo="Square150x150Logo.png"
                 Square44x44Logo="Square44x44Logo.png"
+                SplashScreenImage="SplashScreenImage.png"
                 BackgroundColor="#09090B" />
   <DesktopRegistration>
     <ProcessorArchitecture>x64</ProcessorArchitecture>
