@@ -6,8 +6,9 @@
  */
 
 import type { Entity } from '../core/ecs';
-import { ATTACKS, compileAttack } from '../data/attacks';
-import { bandOf, blowWeight } from '../data/bossPunish';
+import { ATTACKS, compileAttack, pacedAttack } from '../data/attacks';
+import { quickWeight, strikesDirect } from '../data/bossPace';
+import { bandOf, blowWeight, type PunishBand } from '../data/bossPunish';
 import { EVADE } from './bossArena';
 import type { Place } from '../data/arena';
 import { REACTIONS, type MoveDef } from '../data/moves';
@@ -53,6 +54,12 @@ export function attacksOf(def: EntityDef): AttackId[] {
 const painted = (recipe: AssemblyRecipe, id: string): AssemblyRecipe =>
   recipe.body === 'lathe' && REVIEWED_BODY[id] ? { ...recipe, painted: REVIEWED_BODY[id] } : recipe;
 
+/** A horror's blow that is still quick when paced weighs less (data/bossPace.ts, 2026-11-27); its heaviest is held where it is met. */
+function quicker(id: AttackId, reach: number, band: PunishBand, top: number): number {
+  const a = pacedAttack(id, reach, band);
+  return a.power >= top || !strikesDirect(a) ? 1 : quickWeight(a.windup);
+}
+
 export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   const { height, radius } = bodyOf(def);
   const reach = reachOf(def);
@@ -61,7 +68,7 @@ export function toCombatant(def: EntityDef, variant?: Variant): CombatantDef {
   const ids = attacksOf(def);
   const top = Math.max(...ids.map((id) => ATTACKS[id].power));
   for (const id of ids) {
-    const weight = band ? blowWeight(band, ATTACKS[id].power, top) : 1; // and its lighter blows strike the harder for it, the heaviest as they were
+    const weight = band ? blowWeight(band, ATTACKS[id].power, top) * quicker(id, reach, band, top) : 1; // and its lighter blows strike the harder for it, the heaviest as they were
     moves[id] = compileAttack(id, weight === 1 ? def.stats : { ...def.stats, damage: def.stats.damage * weight }, reach, band || undefined);
   }
   const brain = phaseBrain(def, 0, reach); // a boss starts in its script's first phase (bossFight.ts moves it on)
