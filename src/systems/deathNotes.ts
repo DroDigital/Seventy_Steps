@@ -5,9 +5,13 @@
  * has its own. Pure: no Three.js.
  */
 
+import { story } from '../core/i18n';
 import { ownTip } from '../data/bossMoves';
 import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS } from '../data/deathLines';
 import type { Game } from './components';
+
+/** Said when stone was the end (Ghatanothoa's gaze). */
+export const PETRIFIED = 'Stone takes eight seconds. Break its sight behind a monolith, and it wears off.';
 
 const last = new WeakMap<Game, { move: string | null; by: string }>();
 const said = new WeakMap<Game, string>();
@@ -26,12 +30,14 @@ export function registerDeathNotes(g: Game): void {
 /** How a blow is met: the library's line for its blows, a horror's own line for its own (2026-11-24, data/bossMoves.ts). */
 export const tipOf = (move: string): string | undefined => (move in TIPS ? TIPS[move as keyof typeof TIPS] : ownTip(move));
 
-/** The line to read under a fall: how the last blow is met, or else a fragment of the place. */
-export function deathLine(g: Game): string {
+/** The line to read under a fall, in the language chosen (1.5.0): how the last blow is met, or else a fragment of the place. */
+export const deathLine = (g: Game): string => story(lineOf(g));
+
+function lineOf(g: Game): string {
   const blow = last.get(g)?.move;
   if (blow === 'fell') return EDGES[Math.floor(g.rng() * EDGES.length)];
   if (blow === 'drowned') return SEAS[Math.floor(g.rng() * SEAS.length)];
-  if (blow === 'petrified') return 'Stone takes eight seconds. Break its sight behind a monolith, and it wears off.';
+  if (blow === 'petrified') return PETRIFIED;
   const tip = blow && tipOf(blow);
   if (tip) return tip;
   const before = said.get(g);

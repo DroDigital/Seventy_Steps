@@ -2,7 +2,7 @@
 
 import { KEEP } from '../../../src/data/demoContent.ts';
 import type { PruneRule } from '../prune.ts';
-import { ALL_REALMS, kept } from './keep.ts';
+import { ALL_REALMS, kept, realmsOrOther } from './keep.ts';
 
 const hintsLeftOut = new Set<string>(KEEP.hintsLeftOut);
 const keptRealms = new Set<string>(KEEP.regions);
@@ -58,6 +58,10 @@ export const rules: readonly PruneRule[] = [
   ...storyTable('creaturesLast', entities),
   ...storyTable('pois', kept('pois')),
   ...storyTable('poisMore', kept('pois')),
+  ...storyTable('deaths', realmsOrOther()),
+  ...storyTable('blows', entities),
+  ...storyTable('blowsMore', entities),
+  ...storyTable('lore', (id) => id !== 'cthulhu' && !hintsLeftOut.has(id)),
 ];
 
 export const rest: readonly string[] = [];

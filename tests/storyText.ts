@@ -6,10 +6,14 @@
  */
 
 import { FIELD_NOTES } from '../src/data/bestiaryNotes';
+import { OWN_SPECS, OWNER } from '../src/data/bossMoves';
 import { EPITHETS } from '../src/data/bossCards';
+import { EDGES, FRAGMENTS, GENERIC, SEAS, TIPS as BLOW_TIPS } from '../src/data/deathLines';
+import { PETRIFIED } from '../src/systems/deathNotes';
 import { DOCUMENTS } from '../src/data/documents';
 import { EPITAPHS } from '../src/data/epitaphs';
 import { INTRO, introText } from '../src/data/intro';
+import { DESCENT_LINE, QUOTES, TIPS as LESSONS } from '../src/data/loreLines';
 import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
@@ -65,4 +69,25 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
     ),
   // the secrets of the land, by id: a name, the line said on finding it, and the line on coming back
   pois: () => new Map(POIS.map((p) => [p.id, lines(p.name, p.line, p.again)])),
+  // what is read under UNMADE: how a library blow is met, a fall's and the sea's lines, the stone's, and a fragment of each realm
+  deaths: () =>
+    new Map<string, string[]>([
+      ['library', lines(...Object.values(BLOW_TIPS))],
+      ['edges', lines(...EDGES, PETRIFIED)],
+      ['seas', lines(...SEAS)],
+      ['generic', lines(...GENERIC)],
+      ...Object.entries(FRAGMENTS).map(([region, f]) => [region, lines(...f)] as [string, string[]]),
+    ]),
+  // how each horror's own blows are met (data/bossMoves.ts), by the horror
+  blows: () => {
+    const by = new Map<string, string[]>();
+    for (const [id, spec] of Object.entries(OWN_SPECS)) if (spec.tip) (by.get(OWNER[id]!) ?? by.set(OWNER[id]!, []).get(OWNER[id]!)!).push(spec.tip);
+    return new Map([...by].map(([who, l]) => [who, [...new Set(l)]]));
+  },
+  // the lines under the veil: Lovecraft's (the one that names Cthulhu apart, which the demo leaves out), the lessons by their hint, the descent's
+  lore: () => {
+    const by = new Map<string, string[]>([['quotes', QUOTES.filter((q) => !q.includes('Cthulhu'))], ['cthulhu', QUOTES.filter((q) => q.includes('Cthulhu'))], ['descent', [DESCENT_LINE]]]);
+    for (const l of LESSONS) (by.get(l.topic) ?? by.set(l.topic, []).get(l.topic)!).push(l.text);
+    return new Map([...by].filter(([, l]) => l.length)); // (the demo has no quote that names Cthulhu)
+  },
 };

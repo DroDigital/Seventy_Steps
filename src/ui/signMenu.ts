@@ -33,7 +33,7 @@ import { loreSection } from './signLore';
 import { moveSection, movePage } from './signMove';
 import { relicsTab, slotPage } from './signRelics';
 import { mountsTab, refreshMountEntitlement } from './mounts';
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { MOUNT_TRAVERSAL } from '../data/mounts';
 
 /** What one more level of each of the mind's gives, in words (the body's are in levelGains.ts). */
@@ -163,7 +163,7 @@ export function createSignMenu(g: Game, go: (words: string, jump: () => void, li
       const box = pinned(panel);
       heading(box, 'THE SLEEPER’S SIGN').style.marginTop = '0';
       if (descentOpen(g) && g.demo) el(box, 'div', t('demo.closed'), 'opacity:.6;margin:4px 0 8px;font-size:13px'); // the stair leads out of the demo (round 56)
-      else if (descentOpen(g)) button(box, 'Descend the Seventy Steps of Light Slumber', () => (close(), go('THE SEVENTY STEPS OF LIGHT SLUMBER', () => dream(g), DESCENT_LINE)));
+      else if (descentOpen(g)) button(box, 'Descend the Seventy Steps of Light Slumber', () => (close(), go('THE SEVENTY STEPS OF LIGHT SLUMBER', () => dream(g), story(DESCENT_LINE))));
       else el(box, 'div', 'The stair will not open while Keziah Mason troubles the sleepers, in the Witch House in Arkham.', 'opacity:.6;margin:4px 0 8px;font-size:13px');
     }
     tabs(panel, TABS, tab, (i) => ((tab = i), main.redraw?.()), main);

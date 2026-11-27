@@ -1,13 +1,17 @@
 /** The story in Spanish (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { ES_BLOWS } from './blows';
+import { ES_BLOWSMORE } from './blowsMore';
 import { ES_CREATURES } from './creatures';
 import { ES_CREATURESLAST } from './creaturesLast';
 import { ES_CREATURESMORE } from './creaturesMore';
+import { ES_DEATHS } from './deaths';
 import { ES_DOCUMENTS } from './documents';
 import { ES_DOCUMENTSMORE } from './documentsMore';
 import { ES_FATES } from './fates';
 import { ES_INTRO } from './intro';
+import { ES_LORE } from './lore';
 import { ES_OVERHEARD } from './overheard';
 import { ES_PEOPLE } from './people';
 import { ES_PLACES } from './places';
@@ -28,4 +32,7 @@ export const ES_STORY: StoryBook = {
   places: { ...ES_PLACES, ...ES_PLACESFAR },
   creatures: { ...ES_CREATURES, ...ES_CREATURESMORE, ...ES_CREATURESLAST },
   pois: { ...ES_POIS, ...ES_POISMORE },
+  deaths: ES_DEATHS,
+  blows: { ...ES_BLOWS, ...ES_BLOWSMORE },
+  lore: ES_LORE,
 };
