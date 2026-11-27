@@ -56,6 +56,9 @@ export interface SetLook {
 export type Dye = Partial<Record<'cloth' | 'metal' | 'bone' | 'glow' | 'wood', readonly [number, number, number]>>;
 
 const ROUND = new Set<PropKind>(['tree', 'pine', 'rock', 'pillar', 'lamp', 'obelisk', 'cross', 'stump', 'spire', 'tower', 'cone']);
+/** Metres two street lamps stand apart at the least (2026-11-27: the trader's lamp was raised 1.8 m from a town's on Benefit Street). */
+export const LAMP_APART = 9;
+
 const OPEN = new Set<PropKind>(['bush', 'firepit', 'globe']); // no collider: walked through or over (or under: a globe hangs in the air)
 
 type Size = readonly [w: number, d: number, h: number];
