@@ -76,6 +76,47 @@ describe('the optional cosmetic automobile DLC', () => {
     expect(await bridgeFor(['--import-automobile-dlc']).importAutomobileDlc?.()).toBe('imported');
     expect(invoke).toHaveBeenLastCalledWith('desktop:import-automobile-dlc');
   });
+
+  it('does not expose cross-store DLC commands in a Microsoft Store build', () => {
+    let bridge: Record<string, unknown> = {};
+    const runPreload = new Function('require', 'process', readFileSync('desktop/preload.cjs', 'utf8'));
+    runPreload(() => ({
+      contextBridge: { exposeInMainWorld: (_key: string, value: typeof bridge) => { bridge = value; } },
+      ipcRenderer: { on: vi.fn(), invoke: async () => [] },
+    }), { argv: ['--channel=microsoft'] });
+    expect(bridge.ownsAutomobileDlc).toBeUndefined();
+    expect(bridge.ownsChariotDlc).toBeUndefined();
+    expect(bridge.importAutomobileDlc).toBeUndefined();
+  });
+
+  it('keeps the included chariot and omits other storefront prompts when the desktop shell has no DLC capability', async () => {
+    class MenuElement {
+      readonly children: MenuElement[] = [];
+      readonly style = {};
+      readonly dataset = {};
+      readonly classList = { add() {} };
+      textContent = '';
+      constructor(readonly tagName: string) {}
+      append(child: MenuElement) { this.children.push(child); }
+      addEventListener() {}
+    }
+
+    vi.resetModules();
+    vi.stubGlobal('desktop', {});
+    vi.stubGlobal('document', { createElement: (tag: string) => new MenuElement(tag.toUpperCase()) });
+    try {
+      const { createWorldGame } = await import('../src/systems/game');
+      const { mountsTab } = await import('../src/ui/mounts');
+      const panel = new MenuElement('DIV');
+      mountsTab(panel as unknown as HTMLElement, createWorldGame(), () => {});
+      const text = panel.children.map((node) => node.textContent).join(' ');
+      expect(panel.children.filter((node) => node.tagName === 'BUTTON').map((node) => node.textContent)).toEqual(['Chariot']);
+      expect(text).toMatch(/Peaslee.*Sleeper.*Sign/i);
+      expect(text).not.toMatch(/motor car|Steam|itch\.io/i);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
 
 describe('the optional spectral chariot DLC', () => {

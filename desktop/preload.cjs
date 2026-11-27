@@ -5,6 +5,7 @@
  */
 
 const { contextBridge, ipcRenderer } = require('electron');
+const supportsMountDlc = !process.argv.includes('--channel=microsoft');
 
 // The controllers the shell reads natively (padWorker.js): the latest state, stamped as it arrives.
 let pads = [];
@@ -24,10 +25,12 @@ contextBridge.exposeInMainWorld('desktop', {
   openLogs: () => ipcRenderer.invoke('desktop:open-logs'),
   openPage: () => ipcRenderer.invoke('desktop:open-page'), // the game's page, in the browser (round 56); the shell names it, not the page
   achieve: (id) => ipcRenderer.invoke('desktop:achieve', String(id)), // an achievement earned (round 12)
-  ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; never purchases or accepts an app id from the page
-  ownsChariotDlc: () => ipcRenderer.invoke('desktop:chariot-dlc'),
-  ...(process.argv.includes('--import-automobile-dlc') && {
-    importAutomobileDlc: () => ipcRenderer.invoke('desktop:import-automobile-dlc'),
+  ...(supportsMountDlc && {
+    ownsAutomobileDlc: () => ipcRenderer.invoke('desktop:automobile-dlc'), // a fresh read; the shell picks the app id
+    ownsChariotDlc: () => ipcRenderer.invoke('desktop:chariot-dlc'),
+    ...(process.argv.includes('--import-automobile-dlc') && {
+      importAutomobileDlc: () => ipcRenderer.invoke('desktop:import-automobile-dlc'),
+    }),
   }),
   store: { // saves, settings and records as files in the user's data folder (round 12)
     get: (key) => ipcRenderer.sendSync('desktop:store-get', String(key)),

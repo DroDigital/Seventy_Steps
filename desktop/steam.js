@@ -5,8 +5,8 @@
  * in a release build, a relaunch through Steam when the game is started outside it. Saves need nothing here:
  * Steam Auto-Cloud keeps the saves folder (main.js). The app id: `STEAM_APP_ID`, else `steam.appId` in
  * package.json (0 until there is one), else a `steam_appid.txt` beside the program (Steam's own, for a dev run).
- * Another store's build (itch.io) is packed with `channel` set in its package.json (`-c.extraMetadata.channel=itch`): the shell then
- * keeps off Steam altogether, whatever app id is set (no relaunch through Steam, no overlay, no achievements sent).
+ * Builds for itch.io and Microsoft Store set `channel` in their package metadata. They skip Steam launch,
+ * overlay, and achievement reporting, regardless of the configured Steam app id.
  */
 
 import { createRequire } from 'node:module';
@@ -49,9 +49,10 @@ function readPkg() {
   }
 }
 
-/** The store this build is for: "itch" when packed for itch.io (docs/RELEASE.md), else "steam". */
+/** The store this build was packed for. An unmarked build defaults to Steam. */
 export function channel(pkg = readPkg()) {
-  return pkg?.channel === 'itch' ? 'itch' : 'steam';
+  const store = pkg?.channel;
+  return store === 'itch' || store === 'microsoft' ? store : 'steam';
 }
 
 /** "demo" when packed as the demo (`-c.extraMetadata.edition=demo`, round 56: Arkham and the Quad only), else "full". */
@@ -146,5 +147,5 @@ export function steamOwnsChariotDlc(dlcClient = client, env = process.env, pkg =
 /** Whether the shell is speaking to Steam. */
 export const steamOn = () => client !== null;
 
-/** Whether steamworks.js (its native binding for this platform) loaded at all, Steam running or not: what a packed build is checked for (`--smoke-test`, main.js). */
-export const steamBinding = () => !!load();
+/** Checks the native binding during smoke tests for builds that ship it. */
+export const steamBinding = (pkg = readPkg()) => channel(pkg) !== 'microsoft' && !!load();

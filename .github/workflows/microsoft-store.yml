@@ -1,0 +1,63 @@
+name: Microsoft Store package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'microsoft-store/**'
+    paths:
+      - '.github/workflows/microsoft-store.yml'
+      - 'desktop/**'
+      - 'packaging/microsoft*.mjs'
+      - 'package*.json'
+      - 'tools/package_microsoft.mjs'
+      - 'tools/smoke_packaged.mjs'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: microsoft-store-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Install October 2026 Microsoft GDK
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'GDK_2610.0.9661.zip'
+          $installerDirectory = Join-Path $env:RUNNER_TEMP 'gdk-installer'
+          $uri = 'https://download.microsoft.com/download/6a0182a2-1b1a-4b2a-816b-27451119e490/GDK_2610.0.9661.zip'
+          curl.exe --fail --location --retry 3 --output $archive $uri
+          if ($LASTEXITCODE -ne 0) { throw 'GDK download failed.' }
+          $expectedHash = 'B5773C5FDF0B5B1AF0C35F9B7D22CF27D58C6F3FAFD4F61E0E01477E0194480B'
+          if ((Get-FileHash -Path $archive -Algorithm SHA256).Hash -ne $expectedHash) {
+            throw 'The GDK download did not match its published SHA-256 hash.'
+          }
+          Expand-Archive -Path $archive -DestinationPath $installerDirectory
+          $installer = Join-Path $installerDirectory 'PGDK.exe'
+          $process = Start-Process -FilePath $installer -ArgumentList '/q', '/norestart' -Wait -PassThru
+          if ($process.ExitCode -notin 0, 3010) {
+            throw "GDK installer exited with code $($process.ExitCode)."
+          }
+          $gdkRoot = Join-Path ${env:ProgramFiles(x86)} 'Microsoft GDK'
+          $makePkg = Get-Item (Join-Path $gdkRoot 'bin\makepkg.exe') -ErrorAction SilentlyContinue
+          if (-not $makePkg) {
+            $makePkg = Get-ChildItem (Join-Path $gdkRoot '261000') -Filter 'makepkg.exe' -File -Recurse |
+              Select-Object -First 1
+          }
+          if (-not $makePkg) { throw 'MakePkg was not found after installing the GDK.' }
+          $makePkg.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Build and validate the Store package
+        run: npm run package:microsoft

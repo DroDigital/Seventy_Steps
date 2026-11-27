@@ -31,8 +31,11 @@ const DEV = process.argv.includes('--dev');
 const SMOKE = process.argv.includes('--smoke-test'); // starts, reaches the title, reports, quits: a packed build's own check
 const SMOKE_LATE = Number(process.env.SMOKE_LATE) || 150; // seconds a smoke test waits for its title before it gives up (tools/smoke_packaged.mjs sets it under its own timeout: Rosetta starts slowly)
 const URL_TO_OPEN = DEV ? 'http://localhost:5173/' : `${ORIGIN}/`;
-const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // the one page the game may open (src/data/links.ts says the same; tests/demo.test.ts)
-const canImportAutomobileDlc = channel() === 'itch' && edition() === 'full';
+const GAME_PAGE = 'https://digitaldro.itch.io/seventy-steps'; // also used by the browser build (src/data/links.ts)
+const MICROSOFT_STORE_PAGE = 'https://www.microsoft.com/store/productid/9npxf7d955v7';
+const releaseChannel = channel();
+const supportsMountDlc = releaseChannel !== 'microsoft';
+const canImportAutomobileDlc = releaseChannel === 'itch' && edition() === 'full';
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required'); // the theme sounds at once
 // Ubuntu 23.10+ AppArmor blocks Chromium's userns sandbox (electron#41066). Steam/itch ship a folder,
@@ -44,7 +47,7 @@ if (SMOKE) {
   if (process.env.SMOKE_SOFTWARE_GL) for (const [k, v] of [['use-gl', 'angle'], ['use-angle', 'swiftshader'], ['enable-unsafe-swiftshader', ''], ['ignore-gpu-blocklist', '']]) app.commandLine.appendSwitch(k, v || undefined); // a machine with no GPU (CI on Linux)
 }
 if (steamEarly(app.isPackaged)) app.exit(0); // a release build started outside Steam is started again through it (round 47: steam.js)
-if (process.platform === 'win32') app.setAppUserModelId('com.digitaldro.seventysteps'); // the taskbar groups and names the window as the game's own
+if (process.platform === 'win32' && releaseChannel !== 'microsoft') app.setAppUserModelId('com.digitaldro.seventysteps'); // installed Store builds use their package identity
 if (!SMOKE && !DEV && !app.requestSingleInstanceLock()) app.exit(0); // a second start (Steam launching again) only brings the first forward
 app.on('second-instance', () => {
   const win = BrowserWindow.getAllWindows()[0];
@@ -89,7 +92,7 @@ ipcMain.handle('desktop:open-logs', async () => {
   mkdirSync(logsDir(), { recursive: true });
   await shell.openPath(logsDir());
 });
-ipcMain.handle('desktop:open-page', () => shell.openExternal(GAME_PAGE)); // round 56: the game's page, in the player's browser (no address from the page is opened)
+ipcMain.handle('desktop:open-page', () => shell.openExternal(releaseChannel === 'microsoft' ? MICROSOFT_STORE_PAGE : GAME_PAGE));
 
 const windowFile = () => join(app.getPath('userData'), 'window.json');
 
@@ -127,6 +130,7 @@ function open() {
       preload: fileURLToPath(new URL('./preload.cjs', import.meta.url)), // window.desktop: quit, fullscreen
       additionalArguments: [
         ...(process.env.SteamDeck === '1' ? ['--steam-deck'] : []),
+        `--channel=${releaseChannel}`,
         `--edition=${edition()}`,
         ...(canImportAutomobileDlc ? ['--import-automobile-dlc'] : []),
       ],
@@ -285,6 +289,7 @@ function smoke(win) {
         return {
           title: visible(button) && !!clear,
           bridge: typeof window.desktop?.quit === 'function',
+          dlcOwnership: typeof window.desktop?.ownsAutomobileDlc === 'function',
           dlcImport: typeof window.desktop?.importAutomobileDlc === 'function',
           calibrationKept,
         };
@@ -293,7 +298,7 @@ function smoke(win) {
       // the page is still loading
     }
     calibrationKept ||= !!page?.calibrationKept;
-    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: channel(), edition: edition(), bundleEdition: bundleEdition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, dlcImport: !!page?.dlcImport, calibrationKept, steamBinding: steamBinding(), controllers: padState };
+    const report = { platform: process.platform, arch: process.arch, electron: process.versions.electron, packaged: app.isPackaged, channel: releaseChannel, edition: edition(), bundleEdition: bundleEdition(), seconds: Math.round((Date.now() - began) / 1000), title: !!page?.title, bridge: !!page?.bridge, dlcOwnership: !!page?.dlcOwnership, dlcImport: !!page?.dlcImport, calibrationKept, steamBinding: steamBinding(), controllers: padState };
     const settled = report.title && report.bridge && (padState === 'ready' || padState.startsWith('unavailable') || report.seconds > 45);
     const late = report.seconds > SMOKE_LATE;
     if (!settled && !late) return;
@@ -301,6 +306,7 @@ function smoke(win) {
     const missing = [
       !report.title && 'the title never appeared',
       !report.bridge && "the shell's bridge is missing",
+      report.dlcOwnership !== supportsMountDlc && 'the DLC ownership bridge does not match the release channel',
       report.dlcImport !== canImportAutomobileDlc && 'the DLC import bridge does not match the release channel and edition',
       report.packaged && report.bundleEdition !== report.edition && `the bundle is "${report.bundleEdition}", not "${report.edition}"`,
       needs.includes('steam') && !report.steamBinding && 'the Steam binding did not load',

@@ -79,6 +79,28 @@ Without `--run` it only writes the scripts, so they can be read first. Each plat
 packed it (or from CI's artifacts, unzipped: a Mac's with `ditto -x -k`, a Linux's with `tar -xzf`, so that the links and the
 executable bit are kept).
 
+## Microsoft Store (Windows PC)
+
+Run these commands from an October 2026 GDK command prompt on x64 Windows to make a package for submission:
+
+```text
+npm ci
+npm run package:microsoft
+```
+
+The build uses the full game and the reserved `DigitalDro.SeventySteps` identity. It checks that the game
+reaches the title with the controller worker ready, then runs MakePkg's Submission Validator. The package
+and its accompanying files are in `release/microsoft-store/package/`. Set the release version in `package.json`
+before each Store release. The [Microsoft Store package workflow](https://github.com/DroDigital/Seventy_Steps/actions/workflows/microsoft-store.yml)
+runs the same build and validator for CI.
+
+On a Windows PC with Developer Mode enabled, run `packageutil set msixvc2 on` from an elevated GDK
+prompt and `wdapp install "<package.msixvc>"`. Start the installed game from Start and check controller
+input, saving, and continuing after a restart. To send the tested package to the game's `main` package branch,
+run `makepkg upload /pd "release\microsoft-store\package" /branch main` and sign in to Partner Center.
+Review the package, listing, age ratings, and pricing and availability there before submitting for certification.
+[Microsoft's packaging and upload steps](https://learn.microsoft.com/en-us/gaming/gdk/docs/features/common/packaging/overviews/packaging-getting-started-for-pc-msixvc2?view=gdk-2610)
+
 ## itch.io (before Steam)
 
 A build packed with `channel` set to `itch` in its package.json keeps off Steam altogether (no relaunch through Steam, no overlay,

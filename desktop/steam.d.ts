@@ -8,7 +8,8 @@ export function steamEarly(packaged: boolean): boolean;
 export function startSteam(): unknown;
 export function steamAchieve(id: string): boolean;
 export function steamOn(): boolean;
-/** The store this build is for: "itch" when packed for itch.io (`channel` in its package.json), else "steam". */
-export function channel(pkg?: { channel?: string; steam?: { appId?: number } } | null): 'itch' | 'steam';
+export function steamBinding(pkg?: SteamPkg): boolean;
+/** The store this build was packed for. An unmarked build defaults to Steam. */
+export function channel(pkg?: SteamPkg): 'itch' | 'microsoft' | 'steam';
 /** The build's edition: "demo" when packed as the demo (`edition` in its package.json; round 56), else "full". */
 export function edition(pkg?: { edition?: string; channel?: string } | null): 'demo' | 'full';
