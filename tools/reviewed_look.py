@@ -42,7 +42,8 @@ OUT = ROOT / 'src' / 'data' / 'reviewedLook.ts'
 # bone, the Wamp's and the rat swarm's dim amber) were looked at and are left out (round 83 took the Haunter's, below).
 EYED = {
     'black_man': None, 'charles_le_sorcier': (27, 13, 36, 19), 'cthulhu_cultist': None, 'ghoul': None, 'ghoul#eldritch': None,
-    'gnoph_keh': None, 'gug': None, 'martense_degenerate': (30, 14, 37, 20), 'medusa_gorgon': None, 'winged_hybrid': None,
+    'gnoph_keh': None, 'gug': None, 'martense_degenerate': (30, 14, 37, 20), 'winged_hybrid': None,
+    'medusa_gorgon': (30, 14, 35, 17),  # keep the snakes' bright heads out of the face search
     'the_hound': ((24, 26, 40, 33), (43, 255, 160)), 'haunter_of_the_dark': (26, 25, 38, 34), 'serpent_man': (26, 10, 40, 18), 'the_outsider': (26, 5, 38, 13),  # round 83
 }
 
