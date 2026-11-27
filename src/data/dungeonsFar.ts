@@ -23,7 +23,7 @@ export const FAR_DUNGEONS: readonly DungeonDef[] = [
       // Round 127: Mu lies beyond its antechamber, and the way to it from the vestibule's sign is the angled one: west along the
       // gallery into the leaning hall, up the tilted stair to the angle-top and down again to the antechamber. The antechamber's
       // passage comes back south to a door barred into the vestibule: lifted, Ghatanothoa is two rooms from the sign.
-      room('vestibule', 'corridor', 'climb', 'n', { sign: { id: 'rlyeh_vestibule', name: 'Vestibule of Mu' } }),
+      room('vestibule', 'hall', 'climb', 'n', { sign: { id: 'rlyeh_vestibule', name: 'Vestibule of Mu', rest: [-0.6, -3] } }),
       room('angled_gallery', 'corridor', 'vestibule', 'w', { spawns: ['star_spawn', 'cthulhu_cultist'] }),
       room('leaning_hall', 'hall', 'angled_gallery', 'w', { lurk: ['cthulhu_cultist', 'deep_one'], words: 'THE ANGLES ARE WRONG' }),
       stair('tilted_stair', 'leaning_hall', 'n', 4, { spawns: ['deep_one'] }),

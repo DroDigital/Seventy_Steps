@@ -94,7 +94,8 @@ describe('the ground the places shape', () => {
       for (const p of e.props) {
         const on = [...pads].reverse().find((q) => q!.fp.dist(p.x, p.z) < -0.4); // (the pad laid last that holds it: a causeway lies over the pool it crosses)
         if (!on) continue;
-        expect(p.y, `${boss}: ${p.set?.id} is not buried`).toBeGreaterThanOrEqual(on.level - 0.4);
+        if (p.set?.walk) expect(p.y + p.h, `${boss}: ${p.set?.id} walked over shows at its ground`).toBeGreaterThan(on.level - 0.05); // (2026-11-27: a piece walked over is sunk to the ankle, world/walkOver.ts)
+        else expect(p.y, `${boss}: ${p.set?.id} is not buried`).toBeGreaterThanOrEqual(on.level - 0.4);
         if (on.level < a.y - 0.2) expect(Math.abs(p.y - a.y), `${boss}: ${p.set?.id} is not left at the court's level over the sunk ground`).toBeGreaterThan(0.2);
       }
     }

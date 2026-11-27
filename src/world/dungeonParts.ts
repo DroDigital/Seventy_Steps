@@ -16,6 +16,8 @@ import { bankEnds, grounded } from './moundBanks';
 import { ABYSS, abyssSides, isAbyss, stepTop } from './abyssStair';
 import { glowOf, wallParts } from './dungeonWalls';
 import { DIRS } from './worldMap';
+import { DUNGEON_TRAPS } from '../data/dungeonTraps';
+import { pitFloor, pitHoles } from './pitForms';
 
 export { doorwayClear, windowClear } from './dungeonWalls';
 
@@ -118,14 +120,18 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
       for (let k = 0; k < n; k++) out.push(local(r, -S / 2, S / 2, -h + (2 * h * k) / n, -h + (2 * h * (k + 1)) / n, lo - foot, stepTop(r, k, n), 'step', false));
       break;
     }
-    case 'pit': {
+    case 'pit': { // (2026-11-27: each dungeon's chasm cut in its own form, world/pitForms.ts; it was one square hole in all of them)
       const p = h - ledge;
       floor(-h, h, -h, -p);
       floor(-h, h, p, h);
       floor(-h, -p, -p, p);
       floor(p, h, -p, p);
-      out.push(local(r, -p, p, -p, p, L - chasm, L, 'chasm', false));
-      out.push({ ...local(r, -p, p, -p, p, L - chasm, L + rim, 'none', true), fall: true });
+      const form = DUNGEON_TRAPS[d.def.id]?.pit ?? 'square';
+      for (const [u0, u1, v0, v1] of pitFloor(form, p)) floor(u0, u1, v0, v1);
+      for (const [u0, u1, v0, v1] of pitHoles(form, p)) {
+        out.push(local(r, u0, u1, v0, v1, L - chasm, L, 'chasm', false));
+        out.push({ ...local(r, u0, u1, v0, v1, L - chasm, L + rim, 'none', true), fall: true });
+      }
       break;
     }
     case 'bridge': {
@@ -169,10 +175,13 @@ function roomParts(d: DungeonLayout, r: RoomLayout, out: Part[], pieces: HiddenP
 /** How many steps a stair is cut into: its own count (the Stairs of Slumber's), else one for every 25 cm of rise. */
 export const stepsOf = (r: RoomLayout): number => r.def.steps ?? Math.max(2, Math.ceil(Math.abs(r.rise) / 0.25));
 
+/** How far a pillar keeps from a sign's middle beyond its own radius: the ring of runes (2.35 m) and a hand more (2026-11-27: at 1.6 the ring ran under a pillar's foot). */
+export const SIGN_KEEP = 2.9;
+
 /** Where things are put in a hall, in its own frame: a pillar keeps a pace from each (roomStyle.ts). */
-export function standing(r: RoomLayout): readonly (readonly [number, number])[] {
+export function standing(r: RoomLayout): readonly (readonly [number, number, number?])[] {
   const s = roomSpots(r);
-  return [s.centre, s.sign, s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring, ...(r.def.allyAt ? [r.def.allyAt] : []), ...s.lurk.slice(0, r.def.lurk?.length ?? 0)]; // (round 127: and where its foes lie in wait)
+  return [s.centre, [...s.sign, SIGN_KEEP], s.rest, s.gate, s.tome, [s.tome[0], -s.tome[1]], ...s.ring, ...(r.def.allyAt ? [r.def.allyAt] : []), ...s.lurk.slice(0, r.def.lurk?.length ?? 0)]; // (round 127: and where its foes lie in wait)
 }
 
 /** A hidden bridge: its deck while shown, and an unseen edge across the gap while hidden. */
@@ -254,8 +263,8 @@ export function roomSpots(r: RoomLayout): RoomSpots {
       return { centre: [0, 0], sign: [0.7, 3 - h], rest: [-0.6, 5 - h], gate: [0, 0], tome: [0, 0.5], ring: [[0, -3.5], [-1, -6.5], [1, -6.5], [0, 1]], lurk: [[0.9, 0.9], [-0.9, 0.3], [0, -0.9]] }; // its plinth 10 cm off the lane's wall (round 20: it stood 0.4 m in it); (round 127: those in wait, in the square every corridor's lanes cross, a great body's breadth from its corners)
     case 'stair':
       return { centre: [0, 0], sign: [1.7, -4], rest: [-0.5, -2.5], gate: [0, 4], tome: [-1.8, 2], ring: [[0, -4], [0, 3], [-1.5, 6], [1.5, -6]], lurk: [[1.6, 2], [-1.6, 4.5], [0, 6]] };
-    case 'well':
-      return { centre: [0, e - 0.75], sign: [3, 2.5 - e], rest: [0.5, 2 - e], gate: [0, e - 0.75], tome: [e - 0.75, 0], ring: [[0.75 - e, 0], [-5, 5], [5, 5], [-5, -5]], lurk: [[-5, -1.5], [5, -1.5], [0, e - 0.75]] };
+    case 'well': // (2026-11-27: the sign in the corner before the curb, its ring clear of both: beside the curb, the ring ran under it)
+      return { centre: [0, e - 0.75], sign: [4.6, -4.6], rest: [0.5, 2 - e], gate: [0, e - 0.75], tome: [e - 0.75, 0], ring: [[0.75 - e, 0], [-5, 5], [5, 5], [-5, -5]], lurk: [[-5, -1.5], [5, -1.5], [0, e - 0.75]] };
     default: // pit and bridge: the ledges
       return { centre: [0, e], sign: [3, -e], rest: [0, -e], gate: [0, e], tome: [-4, e], ring: [[4, e], [-4, -e], [5.5, e], [-5.5, e]], lurk: [[-e, 0], [e, 0], [0, e]] };
   }

@@ -4,7 +4,9 @@ import { createWorldGame } from '../src/systems/game';
 import { chunkContent } from '../src/world/chunks';
 import { colliderBounds, resolveCapsule, type Collider } from '../src/world/colliders';
 import { doorwayClear } from '../src/world/dungeonParts';
+import { mapPlaces } from '../src/world/mapData';
 import { worldLayout } from '../src/world/placements';
+import { dungeonRoomAt } from '../src/world/terrain';
 import { ALL_STONES, SHRINE, shrineColliders, standingStones } from '../src/world/shrine';
 import { chunkOf, DIRS, yawOfDir } from '../src/world/worldMap';
 
@@ -86,5 +88,38 @@ describe('playtest round 7: the Elder Sign’s shrine', () => {
     for (const c of shrineColliders(0, 0, 0, 0, stones).slice(2)) if (c.kind === 'cylinder') expect(c.z - c.radius).toBeGreaterThanOrEqual(-3.5 + 0.4 - 1e-9); // 40 cm off the wall's face
     const low: Collider = { kind: 'box', min: { x: -20, y: -40, z: -4.5 }, max: { x: 20, y: -30, z: -3.5 } }; // a wall far below the stones is none of theirs
     expect(standingStones(0, 0, 0, 0, [low])).toEqual(ALL_STONES);
+  });
+
+  it('lays its ring of runes clear of every wall, pillar and chasm (2026-11-27: the ring ran into a corridor’s walls and over a pit)', () => {
+    const far = (c: Collider, x: number, z: number): number => {
+      if (c.kind === 'cylinder') return Math.hypot(x - c.x, z - c.z) - c.radius;
+      const b = colliderBounds(c);
+      return Math.hypot(Math.max(b.x0 - x, 0, x - b.x1), Math.max(b.z0 - z, 0, z - b.z1));
+    };
+    for (const s of worldLayout().signs) {
+      const own = shrineColliders(s.x, s.y, s.z, yawOfDir(s.face)).map((c) => JSON.stringify(c));
+      let nearest = Infinity;
+      for (let cx = chunkOf(s.x - 8); cx <= chunkOf(s.x + 8); cx++) {
+        for (let cz = chunkOf(s.z - 8); cz <= chunkOf(s.z + 8); cz++) {
+          for (const c of chunkContent(cx, cz).colliders) {
+            const [lo, hi] = c.kind === 'box' ? [c.min.y, c.max.y] : [c.y0, c.y1];
+            if (hi <= s.y + 0.02 || lo >= s.y + 2 || own.includes(JSON.stringify(c))) continue; // under the floor, overhead, or the shrine's own
+            nearest = Math.min(nearest, far(c, s.x, s.z));
+          }
+        }
+      }
+      expect(nearest, s.id).toBeGreaterThanOrEqual(SHRINE.runes[1] + 0.3);
+    }
+  }, 60000);
+
+  it('is marked on the map where it stands, in the room it was set in (2026-11-27: signs moved clear of walls)', () => {
+    const marks = mapPlaces().filter((m) => m.kind === 'sign');
+    for (const s of worldLayout().signs) {
+      const m = marks.find((x) => x.id === s.id);
+      expect(m, s.id).toBeDefined();
+      expect([m!.x, m!.z], s.id).toEqual([s.x, s.z]);
+      const at = dungeonRoomAt(s.x, s.z);
+      if (at) expect(at.room.def.sign?.id, s.id).toBe(s.id); // a dungeon's sign is drawn inside its own room on the plan
+    }
   });
 });

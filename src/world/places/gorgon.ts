@@ -61,9 +61,9 @@ export const gorgon: PlaceFn = (c: Court, h: House) => {
   for (const [a, cc, id] of [[porch + 2.2, cols[4]! - 3.4, 'tr_pillar_vb'], [porch + 3.4, cols[4]! + 3, 'tr_pillar_b'], [porch + 1.2, cols[7]! + 2, 'tr_pillar_vb']] as const) c.add(id, a, cc, { ...MARBLE, jitter: 0.3, stretch: [1.4, 1, 1.4], turn: a * 37, walk: true }); // the ones that fell
   c.run('tp_beam', [porch, cols[0]! - 1], [porch, cols[3]! + 1], { ...CHAR, y: 6.7 });
   c.run('tp_beam', [porch, cols[5]! - 1], [porch, cols[8]! + 1], { ...CHAR, y: 6.7, from: 0.2 });
-  c.add('tp_floor', porch - 3.2, 0, { ...CHAR, stretch: [2 * S / 2.4, 1, 5], y: 0.02, walk: true, face: 'front' });
+  c.add('tp_floor', porch - 3.2, 0, { ...CHAR, // (2026-11-27: flush with the court, world/walkOver.ts; the steps up to it, when it stood half a metre proud and was walked through, went with that)
+     stretch: [2 * S / 2.4, 1, 5], y: 0.02, walk: true, face: 'front' });
   for (let cc = -S + 3; cc < S - 2; cc += 4.8) c.add('tp_wall_win', -B + 0.9, cc, { ...CHAR, face: 'front', stretch: [1, 1.5, 1.1] });
-  for (const side of [-1, 1]) for (const cc of [side * 9, side * 21]) c.add('tp_stairs', porch + 2.4, cc, { ...CHAR, face: 'front', walk: true, s: 0.8, stretch: [1.8, 0.7, 1] });
 
   // rafters: standing across the wings and the back wing, the others down
   for (const side of [-1, 1]) {

@@ -64,6 +64,7 @@ import { boltSystem } from './projectiles';
 import { skyStrikeSystem } from './skyStrikes';
 import { discoverySystem } from './discovery';
 import { waySystem } from './ways';
+import { dungeonTrapSystem } from './dungeonTraps';
 import { questSystem, startQuest } from './quests';
 import { npcLife } from './npcLife';
 import { emptyInput } from '../core/input';
@@ -251,6 +252,7 @@ export function stepGame(g: Game, input: InputFrame): void {
   hazardSystem(g);
   skyStrikeSystem(g); // round 52: a thunderstorm's bolt on the ground, a ring of light before it
   waySystem(g); // round 62: the courts before the open arenas' gates: wards, vents, waves, blight, rites, omens
+  dungeonTrapSystem(g); // 2026-11-27: the dungeons' traps: spikes, darts, blades, flames, crushers, boulders, gas, watchers, tides
   discoverySystem(g); // round 63: a house seen, a page read, a vigil kept, a gate given
   vitalsSystem(g, dt);
   sanitySystem(g, dt);

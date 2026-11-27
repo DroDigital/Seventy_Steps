@@ -71,7 +71,7 @@ export function createRumbleFx(g: Game, now: () => number = () => performance.no
   g.events.on('Quaked', (e) => ground(e.at));
   g.events.on('Erupted', (e) => ground(e.at, 0.8));
   g.events.on('StrikeLanded', (e) => ground(e.at));
-  g.events.on('WardLanded', (e) => void (!e.mute && ground(e.at, 0.7)));
+  g.events.on('WardLanded', (e) => void (!e.mute && !e.hush && ground(e.at, 0.7)));
   g.events.on('FloorTremor', (e) => ground(e.at, Math.min(1, e.strength)));
   const omen = (shake: number): void => add({ strong: Math.min(1, shake * RUMBLE.omen.per), weak: 0, ms: RUMBLE.omen.ms });
   g.events.on('WayOmen', (e) => omen(e.shake));

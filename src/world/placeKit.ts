@@ -6,6 +6,7 @@
  * Deterministic from where the arena stands. Pure: no Three.js.
  */
 
+import { walkOver } from './walkOver';
 import type { XZ } from '../core/geom';
 import { createRng, hash2, type Rng } from '../core/rng';
 import { MODEL_INFO } from '../data/models/index';
@@ -28,6 +29,7 @@ export interface Put {
   height?: number; // metres: the piece is made this tall (its y stretch)
   length?: number; // metres: its x extent is made this long (its x stretch)
   y?: number; // metres off the court's ground (sunk if negative)
+  floor?: number; // metres the ground it stands on is off the court's (a terrace a place raised): a piece walked over is laid to it (world/walkOver.ts)
   tint?: readonly [number, number, number]; // the colour its stone leans toward
   keep?: number; // how much of the model's own colour it keeps (0..1)
   dye?: Dye;
@@ -104,13 +106,14 @@ export function makeCourt(s: EnclosureSite): Court {
     const j = o.jitter ?? 0;
     const [dx, dz] = j ? [(rng() - 0.5) * 2 * j, (rng() - 0.5) * 2 * j] : [0, 0];
     const yaw = (o.yaw ?? yawAt(at, o.face ?? 'in')) + (o.turn ?? 0) * RAD + (j ? (rng() - 0.5) * 0.3 : 0);
+    const over = o.walk ? walkOver(id, ((info.x1 - info.x0) / 2) * sx, ((info.z1 - info.z0) / 2) * sz, (info.y1 - info.y0) * sy, (o.y ?? 0) - (o.floor ?? 0)) : { drop: 0, walk: false }; // (2026-11-27: no leg sunk in a piece walked over)
     const look: SetLook = {
-      id, scale: k, round: o.round ?? info.round, walk: o.walk,
+      id, scale: k, round: o.round ?? info.round, walk: o.walk && over.walk,
       ...(st[0] !== 1 || st[1] !== 1 || st[2] !== 1 ? { stretch: st } : {}),
       ...(o.tint && { tint: o.tint }), ...(o.keep !== undefined && { keep: o.keep }), ...(o.dye && { dye: o.dye }),
       ...(o.lit && { lit: o.lit }), ...(o.flame && { flame: o.flame }),
     };
-    const prop: Prop = { kind: 'set', x: at.x + dx, y: s.y + (o.y ?? 0), z: at.z + dz, w: ((info.x1 - info.x0) / 2) * sx, d: ((info.z1 - info.z0) / 2) * sz, h: (info.y1 - info.y0) * sy, yaw, seed: seed++, set: look };
+    const prop: Prop = { kind: 'set', x: at.x + dx, y: s.y + (o.y ?? 0) + over.drop, z: at.z + dz, w: ((info.x1 - info.x0) / 2) * sx, d: ((info.z1 - info.z0) / 2) * sz, h: (info.y1 - info.y0) * sy, yaw, seed: seed++, set: look };
     props.push(prop);
     return prop;
   };
