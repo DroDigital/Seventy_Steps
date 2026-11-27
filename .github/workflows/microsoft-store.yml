@@ -73,11 +73,11 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p release/private-store-transfer
-          tar -C release/microsoft-store/package -cf "$RUNNER_TEMP/seventy-steps-package.tar" .
+          tar -C release/microsoft-store/package -cf "release/private-store-transfer/package.tar" .
           openssl cms -encrypt -binary -stream -aes-256-gcm -outform DER \
-            -in "$RUNNER_TEMP/seventy-steps-package.tar" -out "$RUNNER_TEMP/seventy-steps-package.cms" \
+            -in "release/private-store-transfer/package.tar" -out "release/private-store-transfer/package.cms" \
             packaging/store-transfer-recipient.pem
-          split -b 400M "$RUNNER_TEMP/seventy-steps-package.cms" release/private-store-transfer/part-
+          split -b 400M "release/private-store-transfer/package.cms" release/private-store-transfer/part-
           if [ -f release/private-store-transfer/part-ac ]; then
             echo 'The encrypted package exceeded the two-part transfer limit.'
             exit 1
