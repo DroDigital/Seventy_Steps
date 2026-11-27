@@ -40,6 +40,10 @@ synthetic (ElevenLabs), the sound effects CC0 recordings: disclosed on the store
   Playwright with a Chromium: see its header) writes `store/shots/` (1920 × 1080 stills of eight places) and `store/capsules/`
   (header, small, main, vertical, library and page background, the wordmark over a still). Run it on a real GPU for the final pictures:
   the first set was made with a software renderer, which is slow and flat.
+- **Walking stills of the realms:** `node tools/scene_shots.mjs [name ...]` (the same needs) writes `store/scenes/`: 26 pictures of the
+  investigator walking out from (or toward) an Elder Sign in each realm, lantern in hand, from the Miskatonic quad and Arkham's
+  carriage to the Pale Lattice and the Shore of Hours, each in its own hour and weather, with no HUD or prompt. The list and what each
+  shot's numbers mean are in its header; `W=1920 H=1080` sets the size.
 - **The trailer's footage:** open the game with `?trailer` (the picture alone, no HUD, no hints, the camera turning about eight of the
   dream's places, each held for 14 seconds, for ever), and record it with OBS or the Steam recorder; `?trailer&hold=3` stays at the
   fourth place. Photo mode (P) keeps a picture of any moment as a PNG.
