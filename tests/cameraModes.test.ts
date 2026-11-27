@@ -91,9 +91,12 @@ describe('the setting', () => {
     expect(SETTINGS.camera[1]).toBe(CAMERA_MODE_IDS.length - 1);
   });
 
-  it('keeps Classic close to its original free camera and frames locks', () => {
+  it('keeps Classic near its original free camera (2026-11-27: lower, further back, narrower) and frames locks', () => {
     const c = CAMERA_MODES.classic;
-    expect([c.pivotHeight, c.distance, c.shoulder, c.fov]).toEqual([CAMERA.pivotHeight, CAMERA.distance, CAMERA.shoulder, RENDER.fovDeg]);
+    expect(Math.abs(c.pivotHeight - CAMERA.pivotHeight)).toBeLessThan(0.25);
+    expect(Math.abs(c.distance - CAMERA.distance)).toBeLessThan(1);
+    expect(Math.abs(c.fov - RENDER.fovDeg)).toBeLessThan(10);
+    expect(c.distance * Math.tan((c.fov * RAD) / 2)).toBeLessThan(CAMERA.distance * Math.tan((RENDER.fovDeg * RAD) / 2)); // the figure no smaller
     expect(Math.abs(c.pitch - CAMERA.pitch)).toBeLessThan(0.1);
     expect(c.frame).not.toBeNull();
     expect(createCameraRig(0).mode).toBe('classic');
