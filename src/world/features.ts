@@ -12,7 +12,9 @@ import { createRng, type Rng } from '../core/rng';
 import type { PropKind } from '../data/regions';
 import type { HouseStyle } from '../data/regionFeatures';
 import { houseAddons, houseFrame } from './houseAddons';
+import { propsMeet } from './footprints';
 import { makeProp, type Prop } from './props';
+import { surface } from './terrain';
 
 export const FEATURE_KINDS = ['grove', 'graveyard', 'circle', 'ruin', 'outcrop', 'camp', 'landmark'] as const;
 export type FeatureKind = (typeof FEATURE_KINDS)[number];
@@ -203,9 +205,20 @@ function waymark(f: Filler, rng: Rng, ctx: FeatureContext): Prop[] {
   const out = [makeProp(kind, f.x, f.z, rng, f.yaw)];
   for (let k = 0; k < 2; k++) {
     const p = local(f, (rng() - 0.5) * 3.2, -1 - rng() * 1.2);
-    out.push(makeProp(k === 0 ? 'rock' : 'bush', p.x, p.z, rng));
+    out.push(k === 0 ? atFoot(out[0]!, makeProp('rock', p.x, p.z, rng)) : makeProp('bush', p.x, p.z, rng));
   }
   return out;
+}
+
+/** A rock at a mark's foot, rolled out from it until the two only touch: no lamp's post or cross stands up out of a boulder (2026-11-27). */
+function atFoot(mark: Prop, rock: Prop): Prop {
+  const [dx, dz] = [rock.x - mark.x, rock.z - mark.z];
+  const d = Math.hypot(dx, dz) || 1;
+  for (let k = 0; k <= 12 && propsMeet(mark, rock, 0.05); k++) {
+    const [x, z] = [rock.x + (dx / d) * 0.25, rock.z + (dz / d) * 0.25];
+    rock = { ...rock, x, y: surface(x, z), z };
+  }
+  return rock;
 }
 
 /** A rail fence run from local a to b, in lengths of about four metres. */
