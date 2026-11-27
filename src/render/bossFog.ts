@@ -13,6 +13,7 @@ import type { Game } from '../systems/components';
 import { gatePlan, type FogWall } from '../world/gatePlan';
 import { worldLayout } from '../world/placements';
 import type { GameAudio } from './audio/gameAudio';
+import { courtStands } from './courtsBuilt';
 import { bossFogMaterials, FOG_VERT, fogFrag, fogMaterial, type FogFragOptions } from './bossFogShader';
 import { createFogBreach, type BreachState, type FogBreach } from './fogBreach';
 import { createFogSight, type FogSight } from './fogSight';
@@ -133,7 +134,8 @@ export function createBossFog(scene: THREE.Scene, g: Game, particles: Particles,
         const near = wallGap(b.w, camera.position);
         const held = fights.some((f) => f.veiled && b.w.bosses.includes(f.id));
         const engaged = fights.some((f) => f.engaged && b.w.bosses.includes(f.id));
-        const want = hidden || slain || near > SEE ? 0 : fogSeen(near);
+        const alone = !!b.w.gate && !courtStands(b.w.bosses[0]!); // (an open gate's mist waits for its court's walls, as the gate does: courtsBuilt.ts)
+        const want = hidden || slain || alone || near > SEE ? 0 : fogSeen(near);
         b.vis += Math.sign(want - b.vis) * Math.min(Math.abs(want - b.vis), dt / (slain ? DISSOLVE : 1.2));
         b.held += ((held ? 1 : 0) - b.held) * Math.min(1, dt * 2);
         if (slain && b.vis <= 0.001) b.gone = true;

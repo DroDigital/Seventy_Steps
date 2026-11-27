@@ -22,6 +22,7 @@ import { baseCoverJob, mergeCover } from './baseCover';
 import { groundCoverJob } from './groundCover';
 import { propJob } from './propMeshes';
 import type { PropMat } from './propShapes';
+import { markCourt } from './courtsBuilt';
 import { arenaJob, dungeonJob } from './siteMeshes';
 import { terrainJob } from './terrainMesh';
 import type { LightSpot, WorldLights } from './worldLights';
@@ -43,6 +44,7 @@ interface Site {
   chunks: readonly number[]; // keys of the chunks its footprint touches
   job: (done: (meshes: THREE.Mesh[], lights?: LightSpot[]) => void) => Generator<void, void>;
   meshes: THREE.Mesh[] | null; // null while not loaded
+  arena?: string; // an open arena's first horror: its gate waits for this court (courtsBuilt.ts)
 }
 
 function footprint(r: Rect): number[] {
@@ -58,7 +60,7 @@ function sites(): Site[] {
     const r = a.radius + 12; // its dressing's ring stands outside it (round 13)
     const wall = a.house?.rect; // and its house's wall, whatever its outline (round 67: a keep stands behind the wall's line)
     const [x0, z0, x1, z1] = [a.x - r, a.z - r, a.x + r, a.z + r];
-    out.push({ chunks: footprint({ x0: Math.min(x0, wall ? wall.x0 - 4 : x0), z0: Math.min(z0, wall ? wall.z0 - 4 : z0), x1: Math.max(x1, wall ? wall.x1 + 4 : x1), z1: Math.max(z1, wall ? wall.z1 + 4 : z1) }), job: (done) => arenaJob(a, done), meshes: null });
+    out.push({ chunks: footprint({ x0: Math.min(x0, wall ? wall.x0 - 4 : x0), z0: Math.min(z0, wall ? wall.z0 - 4 : z0), x1: Math.max(x1, wall ? wall.x1 + 4 : x1), z1: Math.max(z1, wall ? wall.z1 + 4 : z1) }), job: (done) => arenaJob(a, done), meshes: null, arena: a.bosses[0] });
   }
   return out;
 }
@@ -120,12 +122,13 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
       if (wanted && !s.meshes) {
         const list: THREE.Mesh[] = [];
         s.meshes = list;
-        slicer.add(-1 - k, s.job((ms, spots) => (ms.forEach((m) => add(list, m)), lights?.add(-1 - k, spots ?? []))));
+        slicer.add(-1 - k, s.job((ms, spots) => (ms.forEach((m) => add(list, m)), lights?.add(-1 - k, spots ?? []), s.arena && markCourt(s.arena, true))));
       } else if (!wanted && s.meshes) {
         slicer.cancel(-1 - k);
         drop(s.meshes);
         s.meshes = null;
         lights?.remove(-1 - k);
+        if (s.arena) markCourt(s.arena, false);
       }
     });
   };
@@ -146,6 +149,7 @@ export function createWorldScene(lights?: WorldLights): WorldScene {
         drop(s.meshes);
         s.meshes = null;
         lights?.remove(-1 - k);
+        if (s.arena) markCourt(s.arena, false);
         again.push(-1 - k);
       });
       syncSites();
