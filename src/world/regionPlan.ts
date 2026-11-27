@@ -23,6 +23,7 @@ import { FEATURE_KINDS, FEATURE_RADIUS, featureProps, type Feature } from './fea
 import { worldLayout, type SpawnPoint } from './placements';
 import { planSpawns, settleSpawns } from './planSpawns';
 import { sealWings } from './sealWings';
+import { BUILT, clearHouses, propsMeet } from './footprints';
 import { planPois, type PoiSite } from './poiPlan';
 import { planTraderLamps } from './traderPlan';
 import type { TraderSpot } from '../data/traders';
@@ -206,6 +207,7 @@ function buildPlan(region: RegionDef): RegionPlan {
   props.push(...pois.props);
   spawns.push(...pois.spawns);
   sealWings(props); // (round 110: a house's wing that shuts a yard in is taken off its house, before the foes are settled about the walls that stand)
+  clearHouses(props); // (2026-11-27: no tree or rock left standing in a house's walls or wing, the wings now known)
   settleSpawns(region, props, spawns); // (round 110: a foe in a wall, a house's wing among them, is moved out, or left out where no place is near)
   const traders = planTraderLamps(region, props, roadClear, (x, z, m) => offSites(x, z, m), spawns); // and the trader's lamps, the very last (2026-11-06)
   const plan = bucket(layout, roads, features, ways, pois.sites, traders);
@@ -250,7 +252,8 @@ function planWays(region: RegionDef, props: Prop[], offSites: (x: number, z: num
     if (!way) continue;
     const plan = planWay(a, way);
     for (let i = props.length - 1; i >= 0; i--) if (clearsFor(plan, props[i])) props.splice(i, 1);
-    const marks = wayProps(plan);
+    const built = props.filter((p) => BUILT.has(p.kind));
+    const marks = wayProps(plan, (p) => built.some((q) => Math.hypot(q.x - p.x, q.z - p.z) < reach(p) + reach(q) + 1 && propsMeet(p, q, 0.5))); // (each row ended where it meets a house, a ruin, a wall or a fence: 2026-11-27)
     for (let i = marks.length - 1; i >= 0; i--) if (clearsRite(plan, marks[i]!)) marks.splice(i, 1); // off the way too: each rite's light, and the walk from the court to it
     for (const other of out) for (let i = marks.length - 1; i >= 0; i--) if (clearsFor(other, marks[i]!)) marks.splice(i, 1); // not across a court already laid
     for (let i = marks.length - 1; i >= 0; i--) if (!offSites(marks[i]!.x, marks[i]!.z)) marks.splice(i, 1); // nor on a sign's, a tome's or a door's ground, nor on a foe's post

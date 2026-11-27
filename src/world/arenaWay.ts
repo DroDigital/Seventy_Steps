@@ -94,9 +94,10 @@ export function along(plan: WayPlan, x: number, z: number): { d: number; off: nu
 /** Whether a point is within `m` metres of the path (its corridor). */
 export const nearPath = (plan: WayPlan, x: number, z: number, m: number): boolean => plan.path.some((p, i) => i > 0 && segmentDistance(x, z, plan.path[i - 1], p) < m);
 
-/** The pieces a mark stands, down the way. */
-function markProps(plan: WayPlan, m: Mark, rng: Rng): Prop[] {
+/** The pieces a mark stands, down the way: on each side, out from the gate until one would stand in a building (`blocked`), where that side's row ends (2026-11-27: Hutchinson's hedges ran on through the houses of Benefit Street). */
+function markProps(plan: WayPlan, m: Mark, rng: Rng, blocked?: (p: Prop) => boolean): Prop[] {
   const out: Prop[] = [];
+  const ended = new Set<number>(); // the rows that have met a building
   const [lo, hi] = Array.isArray(m.side) ? (m.side as readonly [number, number]) : [m.side as number, m.side as number];
   for (let d = m.from; d <= Math.min(m.to, plan.length - 1); d += m.every) {
     if (m.chance !== undefined && rng() > m.chance) continue;
@@ -120,16 +121,18 @@ function markProps(plan: WayPlan, m: Mark, rng: Rng): Prop[] {
       if (plan.pad && padDistance(plan.pad, p.x, p.z) < 0) continue; // nor on a place's ground (the pace-by-pace shift above has not been enough)
       if (p.y < WORLD.seaLevel + 0.6) continue; // not in the water
       if (along(plan, p.x, p.z).dist < plan.width / 2 + reach(p) + 0.3) continue; // nor over another reach of the path, where it bends back on itself
+      const row = m.mirror ? 0 : sign; // (a mirrored pair, an avenue, ends on both sides at once)
+      if (ended.has(row) || (blocked?.(p) && ended.add(row))) continue;
       out.push(p);
     }
   }
   return out;
 }
 
-/** Every piece of a court: its marks. */
-export function wayProps(plan: WayPlan): Prop[] {
+/** Every piece of a court: its marks, each row ended where it meets a building (`blocked`). */
+export function wayProps(plan: WayPlan, blocked?: (p: Prop) => boolean): Prop[] {
   const rng = createRng(hash2(Math.round(plan.path[0].x), Math.round(plan.path[0].z), WORLD.seed + 63) * 4294967296 >>> 0);
-  return plan.way.marks.flatMap((m) => markProps(plan, m, rng));
+  return plan.way.marks.flatMap((m) => markProps(plan, m, rng, blocked));
 }
 
 /** A rite's lights need room for a body to reach them from the court, including where they stand off its central way. */

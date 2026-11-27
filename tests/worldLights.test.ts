@@ -207,14 +207,14 @@ describe('what reports a light', () => {
   it("a legacy dungeon's every sconce flame is a torch, its braziers fires", () => {
     let total = 0;
     for (const d of worldLayout().dungeons) {
+      const lightsOf = (p: Prop): number => (p.kind === 'firepit' ? 1 : p.kind === 'set' ? setPieces(p, [0.5, 0.5, 0.5]).filter((x) => !!x.light).length : 0);
       let spots: LightSpot[] = [];
-      finish(dungeonJob({ ...d, decor: [] }, (_, l) => (spots = l))); // the walls alone
+      finish(dungeonJob({ ...d, decor: d.decor.filter((p) => !lightsOf(p)) }, (_, l) => (spots = l))); // the walls, and the set's pieces that give no light (2026-11-27: no torch hangs by a case of books, and a brazier steps clear of one)
       const [torches, fires] = [spots.filter((s) => s.kind === 'torch').length, spots.filter((s) => s.kind === 'fire').length]; // wall torches, and braziers standing in the halls (round 30)
       expect(torches + fires, d.layout.def.id).toBe(spots.length);
       total += torches;
       let dressed: LightSpot[] = [];
       finish(dungeonJob(d, (_, l) => (dressed = l)));
-      const lightsOf = (p: Prop): number => (p.kind === 'firepit' ? 1 : p.kind === 'set' ? setPieces(p, [0.5, 0.5, 0.5]).filter((x) => !!x.light).length : 0);
       expect(dressed.length - spots.length, d.layout.def.id).toBe(d.decor.reduce((n, p) => n + lightsOf(p), 0)); // and the boss room's braziers (round 13) and the lit pieces of its set (round 62: a hall's candles and lamps; round 122: the Cavern of Flame's rift, a fire and its three tongues)
     }
     expect(total).toBeGreaterThan(10);

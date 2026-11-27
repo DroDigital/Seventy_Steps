@@ -5,6 +5,7 @@ import { kept, weaponPartsOrOther, weaponsOrOther } from './keep.ts';
 
 /** The models the arenas and the places stand, by id (data/models): each pack's record and its index's. */
 const models = kept('models');
+const setKits = kept('setKits');
 const modelFiles = ['bossIndex', 'bossPack', 'kenneyIndex', 'kenneyPack', 'webIndex', 'webPack', 'gateIndex', 'gatePack'];
 const modelDecl: Record<string, string> = { bossIndex: 'BOSS_INFO', bossPack: 'BOSS_PACK', kenneyIndex: 'KENNEY_INFO', kenneyPack: 'KENNEY_PACK', webIndex: 'WEB_INFO', webPack: 'WEB_PACK', gateIndex: 'GATE_INFO', gatePack: 'GATE_PACK' };
 
@@ -13,6 +14,8 @@ export const rules: readonly PruneRule[] = [
   // the investigator's clips and parts: the weapons the demo keeps (a move of another weapon is `axe.guard`)
   { file: 'src/data/player/playerClips.ts', decl: 'PLAYER_CLIPS', shape: 'properties', keep: weaponsOrOther() },
   { file: 'src/data/player/playerIndex.ts', decl: 'PLAYER_PARTS', shape: 'elements', by: 'id', keep: weaponPartsOrOther() },
+  // the set pieces that burn (data/burns.ts, 2026-11-27): those the demo stands, a model or a built piece
+  { file: 'src/data/burns.ts', decl: 'BURNING_MODEL_IDS', shape: 'elements', by: 'self', keep: (id) => models(id) || setKits(id) },
 ];
 
 export const rest: readonly string[] = [];

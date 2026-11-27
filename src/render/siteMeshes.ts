@@ -19,7 +19,7 @@ import { markStairLights } from './stairLights';
 import { propJob } from './propMeshes';
 import type { BoxPart, Part } from '../world/dungeonParts';
 import { drawn } from '../world/wallJoins';
-import { dressing } from './dungeonDressing';
+import { dressing, kindlesBy } from './dungeonDressing';
 import { dungeonShell } from './dungeonShell';
 import { pillarFormOf, tinted } from './dungeonLook';
 import { pillarPieces } from './pillarForms';
@@ -242,11 +242,12 @@ export function* dungeonPieces(d: Dungeon, lights: LightSpot[]): Generator<void,
   const solids = d.parts.filter((q) => q.solid && q.look !== 'ceiling'); // what a torch must not hang inside
   const walls = d.parts.filter((q): q is BoxPart => q.shape === 'box' && q.solid && (q.look === 'wall' || q.look === 'ceiling'));
   const placed: LightSpot[] = []; // shared across wall sections, not the decorative fires in rooms
+  const kindles = kindlesBy(d.decor); // (2026-11-27: no torch by a case of books of a room's set)
   for (let k = 0; k < seen.length; k++) {
     const { part, index } = seen[k];
     const room = d.layout.rooms[part.room];
     const kit = kitOfRoom(d.layout, room); // each room its own kit (round 13)
-    const ctx = wallContext(d.layout, part, solids);
+    const ctx = wallContext(d.layout, part, solids, kindles);
     for (const { kind, geo, light } of partGeometry(part, colour(kit), kit, at, ctx, placed, walls, part.shape === 'cyl' ? pillarFormOf(d.layout, room) : 'round')) {
       if (geo) {
         geo.userData.part = index; // which of the dungeon's parts it is (the depth audit names its finds by it)
