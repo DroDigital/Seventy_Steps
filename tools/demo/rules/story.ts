@@ -56,6 +56,8 @@ export const rules: readonly PruneRule[] = [
   ...storyTable('creatures', entities),
   ...storyTable('creaturesMore', entities),
   ...storyTable('creaturesLast', entities),
+  ...storyTable('pois', kept('pois')),
+  ...storyTable('poisMore', kept('pois')),
 ];
 
 export const rest: readonly string[] = [];

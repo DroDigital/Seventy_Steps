@@ -12,6 +12,8 @@ import { ES_OVERHEARD } from './overheard';
 import { ES_PEOPLE } from './people';
 import { ES_PLACES } from './places';
 import { ES_PLACESFAR } from './placesFar';
+import { ES_POIS } from './pois';
+import { ES_POISMORE } from './poisMore';
 import { ES_QUESTS } from './quests';
 import { ES_RUMORS } from './rumors';
 
@@ -25,4 +27,5 @@ export const ES_STORY: StoryBook = {
   documents: { ...ES_DOCUMENTS, ...ES_DOCUMENTSMORE },
   places: { ...ES_PLACES, ...ES_PLACESFAR },
   creatures: { ...ES_CREATURES, ...ES_CREATURESMORE, ...ES_CREATURESLAST },
+  pois: { ...ES_POIS, ...ES_POISMORE },
 };

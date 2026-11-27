@@ -13,6 +13,7 @@ import { INTRO, introText } from '../src/data/intro';
 import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
+import { POIS } from '../src/data/pois';
 import { QUESTS } from '../src/data/quests';
 import { REGIONS } from '../src/data/regions';
 import { ENTITIES } from '../src/data/registry';
@@ -62,4 +63,6 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
       ENTITIES.map((d) => [d.id, lines(d.name, d.eldritchVariant?.name, d.bossVariant?.name, d.source, FIELD_NOTES[d.id], EPITHETS[d.id], EPITAPHS[d.id])] as const)
         .map(([id, l]) => [id, [...new Set(l)]] as const),
     ),
+  // the secrets of the land, by id: a name, the line said on finding it, and the line on coming back
+  pois: () => new Map(POIS.map((p) => [p.id, lines(p.name, p.line, p.again)])),
 };

@@ -12,6 +12,8 @@ import { DE_OVERHEARD } from './overheard';
 import { DE_PEOPLE } from './people';
 import { DE_PLACES } from './places';
 import { DE_PLACESFAR } from './placesFar';
+import { DE_POIS } from './pois';
+import { DE_POISMORE } from './poisMore';
 import { DE_QUESTS } from './quests';
 import { DE_RUMORS } from './rumors';
 
@@ -25,4 +27,5 @@ export const DE_STORY: StoryBook = {
   documents: { ...DE_DOCUMENTS, ...DE_DOCUMENTSMORE },
   places: { ...DE_PLACES, ...DE_PLACESFAR },
   creatures: { ...DE_CREATURES, ...DE_CREATURESMORE, ...DE_CREATURESLAST },
+  pois: { ...DE_POIS, ...DE_POISMORE },
 };
