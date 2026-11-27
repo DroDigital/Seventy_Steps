@@ -169,7 +169,7 @@ function step(g: Game, l: LiveTrap, me: V3, inRoom: boolean): void {
       const row = Number.isInteger(k) ? p.rows![k] : undefined;
       for (const at of row ?? []) {
         trapStrike(g, at, (q, body) => Math.hypot(q.x - at.x, q.z - at.z) < TRAP.tide.burst + body * 0.5, TRAP.tide.damage);
-        g.events.emit('WardLanded', { at, radius: TRAP.tide.burst, look: p.look, mute: at !== row![0] });
+        g.events.emit('WardLanded', { at, radius: TRAP.tide.burst, look: p.look, hush: at !== row![0] }); // (every point of the row is seen; the row is heard once)
       }
       break;
     }

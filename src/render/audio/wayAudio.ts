@@ -22,8 +22,8 @@ export function createWayAudio(g: Game, play: GameAudio['recipe'], recorded: (se
     const motif = motifOf(look);
     play(`way:warn:${motif}`, gather(TIMBRE[motif], Math.min(0.9, frames / 60)), { at, gain: ATTACK_MIX.landed * 0.55, range: RANGE });
   });
-  g.events.on('WardLanded', ({ at, radius, look, mute }) => {
-    if (mute || g.frame - landed < GAP) return;
+  g.events.on('WardLanded', ({ at, radius, look, mute, hush }) => {
+    if (mute || hush || g.frame - landed < GAP) return;
     landed = g.frame;
     const motif = motifOf(look);
     play(`way:burst:${motif}`, burst(TIMBRE[motif], Math.min(1, radius / 4)), { at, gain: ATTACK_MIX.burst * 0.8, range: RANGE + 20 });

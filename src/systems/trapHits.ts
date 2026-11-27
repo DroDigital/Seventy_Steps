@@ -27,7 +27,7 @@ export function bodiesIn(g: Game, at: V3, inside: (p: V3, radius: number) => boo
   return out;
 }
 
-/** Strikes every body `inside` the trap's reach at `at` for `damage`; returns those struck. */
+/** Strikes every body `inside` the trap's reach at `at` for `damage`; returns those it landed on (not one that rolled through it). */
 export function trapStrike(g: Game, at: V3, inside: (p: V3, radius: number) => boolean, damage: number): Entity[] {
   let last = struck.get(g);
   if (!last) struck.set(g, (last = new Map()));
@@ -36,14 +36,16 @@ export function trapStrike(g: Game, at: V3, inside: (p: V3, radius: number) => b
   const c = g.ecs.c;
   const source = g.ecs.spawn(); // a body of no kind the blow comes from: gone with it
   c.transform.set(source, { pos: { ...at }, prev: { ...at }, yaw: 0, prevYaw: 0 });
+  const landed: Entity[] = [];
   for (const id of hit) {
-    last.set(id, g.frame);
     const foe = id !== g.player.id;
     const dmg = foe ? Math.min(160, damage * 1.5 + 0.05 * (c.health.get(id)?.max ?? 0)) : damage; // (a foe takes the trap as a body would, a little more: luring them in is worth it)
-    strike(g, source, id, { damage: dmg, poise: 40, guard: 0, hitstop: 5, parryable: false, interrupts: false, unblockable: true, enemyScale: 1 }, at);
+    if (strike(g, source, id, { damage: dmg, poise: 40, guard: 0, hitstop: 5, parryable: false, interrupts: false, unblockable: true, enemyScale: 1 }, at) === 'dodged') continue; // (a roll's i-frames: no grace earned, and a dart flies on through)
+    last.set(id, g.frame);
+    landed.push(id);
   }
   g.ecs.despawn(source);
-  return hit;
+  return landed;
 }
 
 /** Whether `p` lies within `r` of the segment a..b in the ground plane. */

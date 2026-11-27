@@ -27,7 +27,7 @@ export interface GameEvents {
   StrikeWarned: { at: V3; radius: number; frames: number }; // a ring of light marks ground where a bolt will fall (systems/skyStrikes.ts; round 52)
   StrikeLanded: { at: V3; radius: number }; // the bolt falls
   WardWarned: { at: V3; radius: number; frames: number; look: string; mute?: boolean }; // a plate underfoot, a vent or a wave of a way wakes: its ring is marked, and it bursts in `frames` (systems/ways.ts; round 62)
-  WardLanded: { at: V3; radius: number; look: string; mute?: boolean }; // it bursts
+  WardLanded: { at: V3; radius: number; look: string; mute?: boolean; hush?: boolean }; // it bursts (`hush`: seen but not heard nor felt: a tide's row of bursts sounds once, 2026-11-27)
   TrapWarned: { kind: string; at: V3; look: string; frames: number; to?: V3 }; // 2026-11-27: a dungeon's trap shows it will strike (a plate's click, a tile's rattle, a nozzle's hiss, a slab's dust, a far wall's rumble): systems/dungeonTraps.ts
   TrapSprung: { kind: string; at: V3; look: string; to?: V3 }; // ...and strikes (a dart loosed, spikes up, a slab down, a jet, a puff, a blade's pass, a boulder's end)
   WayOmen: { words: string; sound?: string; shake: number; pitch: number }; // a line said on a way, and what is heard and felt under it (round 62)

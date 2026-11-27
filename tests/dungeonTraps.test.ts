@@ -9,6 +9,8 @@ import { TRAP } from '../src/data/tuning';
 import type { Game } from '../src/systems/components';
 import { createWorldGame } from '../src/systems/game';
 import { trapRun } from '../src/systems/dungeonTraps';
+import { trapStrike } from '../src/systems/trapHits';
+import { startMove } from '../src/systems/actions';
 import { roomPoint } from '../src/world/dungeonKit';
 import { partCollider } from '../src/world/dungeonParts';
 import { worldLayout } from '../src/world/placements';
@@ -131,6 +133,34 @@ describe('the traps at work', () => {
     const before = hp(g);
     run(g, TRAP.boulder.warn + 120);
     expect(hp(g)).toBeLessThan(before);
+  });
+
+  it('a roll through a trap is no blow: it earns no grace, so the next blow lands (Codex review of PR 319)', () => {
+    const g = standAt(first('gas').p.at); // (a vent takes the breath, never the body: nothing else strikes here meanwhile)
+    const me = () => ({ ...g.ecs.c.transform.get(g.player.id)!.pos });
+    const on = (at: { x: number; z: number }) => (q: { x: number; z: number }) => Math.hypot(q.x - at.x, q.z - at.z) < 0.05; // the investigator alone
+    const a = g.ecs.c.actor.get(g.player.id)!;
+    startMove(a, 'roll');
+    a.dir = { x: 0, z: 0 }; // rolled on the spot: in its i-frames
+    run(g, 4);
+    const here = me();
+    expect(trapStrike(g, here, on(here), 10)).toEqual([]); // dodged
+    run(g, 60); // the roll done, well within the grace a landed blow would earn
+    const there = me();
+    expect(trapStrike(g, there, on(there), 10)).toEqual([g.player.id]);
+  });
+
+  it('a tide’s row is seen at every point and heard once', () => {
+    const { p } = first('tide');
+    const g = standAt(p.rows![0]![0]!);
+    const landed = record(g, 'WardLanded');
+    const l = trapRun(g)!.live.find((x) => x.p === p)!;
+    Object.assign(l, { state: 'warn', left: 1, t: 0 });
+    run(g, 2 + TRAP.tide.step);
+    const row = landed.filter((e) => p.rows![0]!.some((q) => q.x === e.at.x && q.z === e.at.z));
+    expect(row.length).toBe(p.rows![0]!.length);
+    expect(row.some((e) => e.mute)).toBe(false); // none hidden from the eye
+    expect(row.filter((e) => !e.hush).length).toBe(1); // one sound for the row
   });
 
   it('nothing wakes while the investigator is at peace', () => {
