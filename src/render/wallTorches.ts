@@ -13,11 +13,11 @@ import { DIRS } from '../world/worldMap';
 import { isAbyss } from '../world/abyssStair';
 import { EDGE, facesOf, sconce } from './sconces';
 
-/** What a wall needs to know of its place to hang torches: which face looks into a room (outer walls have one), the floor each face looks onto, whether a point stands inside another solid of the dungeon, and (round 120) whether a face looks out over a flight over the void, where no torch hangs. */
-export type WallContext = { inner: (alongX: boolean) => number; floor: (x: number, z: number, fallback: number) => number; buried: (x: number, y: number, z: number) => boolean; void?: (x: number, z: number) => boolean };
+/** What a wall needs to know of its place to hang torches: which face looks into a room (outer walls have one), the floor each face looks onto, whether a point stands inside another solid of the dungeon, (round 120) whether a face looks out over a flight over the void, where no torch hangs, and (2026-11-27) whether a flame there would be by what burns: a case of books of the room's set. */
+export type WallContext = { inner: (alongX: boolean) => number; floor: (x: number, z: number, fallback: number) => number; buried: (x: number, y: number, z: number) => boolean; void?: (x: number, z: number) => boolean; kindles?: (x: number, y: number, z: number) => boolean };
 
 /** A wall part's torch context: the face of an outer wall that looks inward, the floor under any point, and whether a point is inside another of the dungeon's solids (`solids`, but for ceilings: only those near the wall are looked through). */
-export function wallContext(L: DungeonLayout, p: Part, solids: readonly Part[]): WallContext {
+export function wallContext(L: DungeonLayout, p: Part, solids: readonly Part[], kindles?: WallContext['kindles']): WallContext {
   const dir = 'outer' in p && p.outer ? DIRS[p.outer] : null;
   let close: readonly Part[] | undefined; // found when the first torch asks
   const near = (): readonly Part[] => (close ??= p.shape !== 'box' ? [] : solids.filter((q) => q !== p && q.shape === 'box' && q.min.x < p.max.x + 1 && q.max.x > p.min.x - 1 && q.min.z < p.max.z + 1 && q.max.z > p.min.z - 1));
@@ -28,6 +28,7 @@ export function wallContext(L: DungeonLayout, p: Part, solids: readonly Part[]):
       return r ? floorAt(r, x, z) : fallback;
     },
     void: (x, z) => isAbyss(roomAt(L, x, z)), // (round 120: a flight over the void is lit by its own newels' few fires, and a torch on the shaft's wall would hang over nothing)
+    kindles,
     buried: (x, y, z) => near().some((q) => q.shape === 'box' && x > q.min.x && x < q.max.x && z > q.min.z && z < q.max.z && y > q.min.y && y < q.max.y),
   };
 }
@@ -53,6 +54,7 @@ export function hangTorches(stops: readonly number[], w: { along: (t: number, ac
         const l = s.light;
         const [bx, bz] = w.alongX ? [0, across] : [across, 0]; // from the flame back to the wall's face
         if ([0, 1, 2].some((k) => [-1, 0, 1].some((side) => ctx.buried(l.x - bx * 0.11 * k + (w.alongX ? side * 0.12 : 0), l.y - 0.1, l.z - bz * 0.11 * k + (w.alongX ? 0 : side * 0.12))))) continue; // flame, cup and bracket
+        if (ctx.kindles?.(l.x, l.y, l.z)) continue; // nor by a case of books (2026-11-27)
         hung.push(s);
         return;
       }
