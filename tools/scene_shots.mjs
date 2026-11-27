@@ -11,7 +11,8 @@
  * away from the sign); `faceSign` walks toward the sign instead (`turn` adds to the heading); `walk` seconds of walking before the picture;
  * `phase` where in the night (0 gloaming, 0.3 the deep, 0.86 the waning's false dawn); `weather` rain, storm, gale or motes; `cam` the
  * camera's yaw off the investigator's back; `mount` summons the carriage, `stopFirst` seconds it stands before the picture. The camera
- * swings to the nearest angle whose line to the investigator no collider crosses. A software renderer takes four to eight minutes a shot.
+ * swings to the nearest angle whose line to the investigator no collider crosses. A software renderer takes four to eight minutes a shot. (Ulthar's,
+ * Dunwich Village's and the Elder Thing City's signs stand walled in: a walk out of them meets a wall.)
  */
 
 import { mkdirSync } from 'node:fs';
@@ -28,21 +29,19 @@ const SHOTS = [
   { name: '09_kingsport', sign: 'prov_kingsport', dist: 6, walk: 1.2, phase: 0.9, cam: 0.6 },
   { name: '10_vermont_dark_mountain', sign: 'vermont_dark', dist: 6, walk: 1.2, phase: 0.25, weather: 'gale' },
   { name: '11_mountains_lakes_camp', sign: 'mountains_camp', dist: 6, walk: 1, phase: 0.88, weather: 'gale', cam: 0.4 },
-  { name: '12_mountains_elder_city', sign: 'mountains_city', dist: 16, faceSign: true, walk: 0.5, phase: 0.5, weather: 'gale', cam: 0.6 },
-  { name: '13_pnakotus_desert', sign: 'pnakotus_camp', dist: 6, walk: 1.2, phase: 0.88 },
-  { name: '14_knyan_serpent_temple', sign: 'knyan_serpents', dist: 12, faceSign: true, walk: 0.5, phase: 0.4, cam: 0.5 },
-  { name: '15_dream_enchanted_wood', sign: 'dream_wood', dist: 6, walk: 1.2, phase: 0.3, weather: 'motes' },
-  { name: '16_dream_ulthar', sign: 'dream_ulthar', dist: 14, faceSign: true, walk: 0.5, phase: 0.06, cam: 0.5 },
-  { name: '17_dream_shores_of_ib', sign: 'dream_sarnath', dist: 6, walk: 1.2, phase: 0.9 },
-  { name: '18_dream_hatheg_kla', sign: 'dream_hatheg', dist: 6, walk: 1.2, phase: 0.3, cam: -0.5 },
-  { name: '19_rlyeh_great_door', sign: 'rlyeh_door', dist: 10, faceSign: true, turn: Math.PI, walk: 1.2, phase: 0.4, weather: 'storm' },
-  { name: '20_yuggoth_rivers_of_pitch', sign: 'yuggoth_pitch', dist: 6, walk: 1.2, phase: 0.4, cam: 0.5 },
-  { name: '21_beyond_last_shore', sign: 'beyond_shore', dist: 6, walk: 1.2, phase: 0.4 },
-  { name: '22_cloud_summit', sign: 'cloud_sign', dist: 6, walk: 1.2, phase: 0.4, cam: 0.5 },
-  { name: '23_black_wood', sign: 'wood_clearing', dist: 6, walk: 1.2, phase: 0.4 },
-  { name: '24_pale_lattice', sign: 'lattice_vertex', dist: 6, walk: 1.2, phase: 0.4, cam: -0.5 },
-  { name: '25_shore_of_hours', sign: 'spheres_shore', dist: 6, walk: 1.2, phase: 0.4 },
-  { name: '26_cavern_of_flame', sign: 'dream_cavern', dist: 2, walk: 0.4, phase: 0.4 },
+  { name: '12_pnakotus_desert', sign: 'pnakotus_camp', dist: 6, walk: 1.2, phase: 0.88 },
+  { name: '13_knyan_serpent_temple', sign: 'knyan_serpents', dist: 12, faceSign: true, walk: 0.5, phase: 0.4, cam: 0.5 },
+  { name: '14_dream_enchanted_wood', sign: 'dream_wood', dist: 6, walk: 1.2, phase: 0.3, weather: 'motes' },
+  { name: '15_dream_shores_of_ib', sign: 'dream_sarnath', dist: 6, walk: 1.2, phase: 0.9 },
+  { name: '16_dream_hatheg_kla', sign: 'dream_hatheg', dist: 6, walk: 1.2, phase: 0.3, cam: -0.5 },
+  { name: '17_rlyeh_great_door', sign: 'rlyeh_door', dist: 10, faceSign: true, turn: Math.PI, walk: 1.2, phase: 0.4, weather: 'storm' },
+  { name: '18_yuggoth_rivers_of_pitch', sign: 'yuggoth_pitch', dist: 6, walk: 1.2, phase: 0.4, cam: 0.5 },
+  { name: '19_beyond_last_shore', sign: 'beyond_shore', dist: 6, walk: 1.2, phase: 0.4 },
+  { name: '20_cloud_summit', sign: 'cloud_sign', dist: 6, walk: 1.2, phase: 0.4, cam: 0.5 },
+  { name: '21_black_wood', sign: 'wood_clearing', dist: 6, walk: 1.2, phase: 0.4 },
+  { name: '22_pale_lattice', sign: 'lattice_vertex', dist: 6, walk: 1.2, phase: 0.4, cam: -0.5 },
+  { name: '23_shore_of_hours', sign: 'spheres_shore', dist: 6, walk: 1.2, phase: 0.4 },
+  { name: '24_cavern_of_flame', sign: 'dream_cavern', dist: 2, walk: 0.4, phase: 0.4 },
 ];
 
 const args = process.argv.slice(2);
@@ -50,7 +49,8 @@ const base = args.find((a) => a.startsWith('http')) ?? 'http://localhost:5173';
 const only = args.filter((a) => !a.startsWith('http'));
 const [W, H] = [Number(process.env.W ?? 1600), Number(process.env.H ?? 900)];
 mkdirSync('store/scenes', { recursive: true });
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
+const pw = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
+const { chromium } = pw.chromium ? pw : pw.default; // (a path to the package's CommonJS index comes as its default)
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', ...(process.getuid?.() === 0 ? ['--no-sandbox'] : [])] });
 const page = await browser.newPage({ viewport: { width: W, height: H } });
 page.on('pageerror', (e) => console.log(String(e).slice(0, 160)));
