@@ -6,6 +6,7 @@
  * shut. Deterministic from where the arena stands. Pure: no Three.js.
  */
 
+import { walkOver } from './walkOver';
 import type { XZ } from '../core/geom';
 import { createRng, hash2, type Rng } from '../core/rng';
 import type { ArenaSet, Face, Layout, Piece, Put } from '../data/arenaSets';
@@ -120,9 +121,10 @@ function prop(piece: Piece, spot: Spot, y: number, yaw: number, rng: Rng): Prop 
   if (!info && !kit) return null;
   const [w, d, h] = piece.dims ?? (info ? [(info.x1 - info.x0) / 2, (info.z1 - info.z0) / 2, info.y1 - info.y0] : [kit.w, kit.d, kit.h]);
   const round = info?.round ?? kit?.round ?? false;
-  const walk = piece.walk ?? kit?.walk ?? false;
+  const over = piece.walk ?? kit?.walk ? walkOver(piece.of, w * k, d * k, h * k, lift) : { drop: 0, walk: false }; // (2026-11-27: no leg sunk in a piece walked over: world/walkOver.ts)
+  const walk = over.walk && (piece.walk ?? kit?.walk ?? false);
   return {
-    kind: 'set', x: spot.x, y: ground + lift, z: spot.z, w: w * k, d: d * k, h: h * k, yaw, seed: Math.floor(rng() * 1e6),
+    kind: 'set', x: spot.x, y: ground + lift + over.drop, z: spot.z, w: w * k, d: d * k, h: h * k, yaw, seed: Math.floor(rng() * 1e6),
     set: { id: piece.of, scale: k, tint: piece.tint, keep: piece.keep, round, walk, hung: piece.hung, wax: piece.wax, glow: piece.glow, lit: piece.lit },
   };
 }

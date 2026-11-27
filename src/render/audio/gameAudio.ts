@@ -52,6 +52,7 @@ import { createFoley } from './foley';
 import { createAttackAudio } from './attackAudio';
 import { createStormAudio } from './stormAudio';
 import { createWayAudio } from './wayAudio';
+import { createTrapAudio } from './trapAudio';
 import { STORM_MIX, thunderRoll } from '../../data/stormSounds';
 import { createMountAudio } from './mountAudio';
 import { createMountBed } from './mountBed';
@@ -137,6 +138,7 @@ export function createGameAudio(e: AudioEngine, drones: Drones, g: Game): GameAu
   };
   const mounts = createMountAudio(g, recipe, sampler, createMountBed(e)); // round 50: a ride heard, the hoofbeats the gait's own
   createStormAudio(g, recipe, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o)); // round 52: a bolt on the ground, its ring and its crack
+  createTrapAudio(g, recipe); // 2026-11-27: the dungeons' traps, their warnings and strokes
   createWayAudio(g, recipe, (set, at, o = {}) => recorded(set, at, at ? AUDIO.eventRange : 1, o)); // round 62: the wards, vents and waves of a way, and what is heard under its omens
   createAttackAudio(g, (set, at, o = {}) => recorded(set, at, o.range ?? AUDIO.eventRange, o));
   const atmosphere = createAtmosphereAudio({ e, g, sampler, recipe, recorded, listener, right }); // round 80: the places heard, the night's voices, the ground underfoot

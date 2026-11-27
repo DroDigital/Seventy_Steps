@@ -32,7 +32,7 @@ export function furnish(w: WorldLayout, region: RegionDef, dungeon: string, r: R
   const d = r.def;
   if (d.sign) {
     const p = pt(s.sign);
-    sign(region.id, p.x, p.z, p.y, d.sign.id, d.sign.name, r.axis, false, roomPoint(r, ...s.rest));
+    sign(region.id, p.x, p.z, p.y, d.sign.id, d.sign.name, r.axis, false, roomPoint(r, ...(d.sign.rest ?? s.rest)));
   }
   if (d.gate) {
     const p = pt(s.gate);

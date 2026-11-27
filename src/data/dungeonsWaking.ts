@@ -50,7 +50,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
       stair('back_stair', 'hallway', 'n', 4, { spawns: ['rat_swarm'], words: "THE SERVANTS' STAIR" }),
       room('lodgers', 'corridor', 'back_stair', 'n', { spawns: ['reanimated_corpse', 'rat_swarm'] }), // the lodgers' rooms, empty of lodgers
       room('dombrowski', 'hall', 'lodgers', 'e', { spawns: ['reanimated_corpse', 'rat_swarm', 'rat_swarm'] }),
-      room('landing', 'corridor', 'lodgers', 'w', { sign: { id: 'arkham_witch', name: 'Witch House Stair' } }),
+      room('landing', 'hall', 'lodgers', 'w', { sign: { id: 'arkham_witch', name: 'Witch House Stair', rest: [-0.6, -3] } }),
       room('closet', 'hall', 'landing', 'w', { hidden: { minInsight: 1 }, tome: { name: "Keziah's Formulae", insight: 1 } }),
       room('garret', 'hall', 'landing', 'n', { wide: true, boss: ['keziah_mason', 'brown_jenkin'] }),
       stair('stair', 'landing', 's', -4, { spawns: ['reanimated_corpse'] }), // the front stair, down to its barred foot in the parlour
@@ -141,7 +141,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     // to the choir and the belfry; from the belfry the tower stair goes down to its bar, and lifted, the steeple is a climb from the sign.
     id: 'starry_wisdom', name: 'Starry Wisdom Church', region: 'providence', rooms: [
       room('nave', 'hall', undefined, 's', { spawns: ['cthulhu_cultist', 'cthulhu_cultist'] }),
-      room('aisle', 'corridor', 'nave', 'n', { sign: { id: 'prov_church', name: 'Belfry Stair' } }),
+      room('aisle', 'hall', 'nave', 'n', { sign: { id: 'prov_church', name: 'Belfry Stair', rest: [-0.6, -3] } }),
       room('vestry', 'corridor', 'nave', 'e', { spawns: ['cthulhu_cultist'] }),
       stair('crypt_stair', 'vestry', 'e', -4),
       room('undercroft', 'hall', 'crypt_stair', 'e', { spawns: ['cthulhu_cultist', 'winged_hybrid'], words: 'THE UNDERCROFT' }),
@@ -168,7 +168,7 @@ export const WAKING_DUNGEONS: readonly DungeonDef[] = [
     id: 'akeley', name: 'Akeley Farmhouse', region: 'vermont', rooms: [
       room('porch', 'corridor', undefined, 's'),
       room('parlour', 'hall', 'porch', 'n', { spawns: ['martense_degenerate'] }),
-      room('kitchen', 'corridor', 'parlour', 'e', { sign: { id: 'vermont_farm', name: 'Akeley Farmhouse' } }),
+      room('kitchen', 'hall', 'parlour', 'e', { sign: { id: 'vermont_farm', name: 'Akeley Farmhouse', rest: [-0.6, -3] } }),
       room('barn', 'hall', 'kitchen', 'e', { spawns: ['martense_degenerate', 'martense_degenerate', 'rat_swarm'] }),
       room('study', 'hall', 'parlour', 'n', { wide: true, boss: ['whisperer'] }),
       stair('cellar', 'kitchen', 's', -4, { spawns: ['rat_swarm'] }),

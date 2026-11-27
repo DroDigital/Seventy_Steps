@@ -35,7 +35,7 @@ export interface RoomDef {
   lurk?: readonly string[]; // round 127: foes lying in wait, unseen, that spring when the investigator comes near (systems/ambush.ts)
   ally?: string;
   allyAt?: readonly [u: number, v: number]; // where its ally stands, across and along the room from its middle (round 123: the Cavern of Flame's priests, at a place of their own); else the room's first spot
-  sign?: { id: string; name: string }; // an Elder Sign
+  sign?: { id: string; name: string; rest?: readonly [u: number, v: number] }; // an Elder Sign (`rest`: where one rises at it, across and along the room, if not its kind's place: 2026-11-27, the signs moved clear of a corridor's walls kept the place they were risen at, which the land's roads are laid to)
   gate?: { id: string; name: string; to: string };
   tome?: { name: string; insight: number };
   vial?: string; // a Silver Vial lies here (its unique name): one more dose of West's Reagent

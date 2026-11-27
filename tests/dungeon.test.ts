@@ -1,8 +1,10 @@
+import { DUNGEON_TRAPS } from '../src/data/dungeonTraps';
+import { pitHoles } from '../src/world/pitForms';
 import { describe, expect, it } from 'vitest';
 import { SLUMBER_STEPS, type DungeonDef } from '../src/data/dungeons';
 import { DUNGEON } from '../src/data/tuning';
 import { hasLineOfSight, resolveCapsule } from '../src/world/colliders';
-import { floorAt, layoutDungeon, roomAt, type DungeonLayout } from '../src/world/dungeonKit';
+import { floorAt, layoutDungeon, roomAt, roomPoint, type DungeonLayout } from '../src/world/dungeonKit';
 import { worldLayout } from '../src/world/placements';
 import { createWorldCollision } from '../src/world/worldCollision';
 import { stepsOf } from '../src/world/dungeonParts';
@@ -62,11 +64,17 @@ describe('the dungeon kit', () => {
   it('pits stop feet at the edge but not eyes across', () => {
     const d = placed('yhanthlei');
     const pit = room(d, 'pits');
-    const pos = { x: pit.x, y: pit.level, z: pit.z };
+    const [u0, u1, v0, v1] = pitHoles(DUNGEON_TRAPS.yhanthlei!.pit!, pit.half - DUNGEON.ledge)[0]!; // (2026-11-27: each dungeon's pits cut in a form of its own)
+    const [u, v] = [(u0 + u1) / 2, (v0 + v1) / 2];
+    const mid = roomPoint(pit, u, v);
+    const pos = { x: mid.x, y: pit.level, z: mid.z };
     resolveCapsule(world, pos, 0.4, 1.8);
-    expect(Math.max(Math.abs(pos.x - pit.x), Math.abs(pos.z - pit.z))).toBeGreaterThan(pit.half - DUNGEON.ledge);
+    const a = DIRS[pit.axis];
+    const [pu, pv] = [(pos.x - pit.x) * a.z - (pos.z - pit.z) * a.x, (pos.x - pit.x) * a.x + (pos.z - pit.z) * a.z]; // back into the room's own frame
+    expect(pu < u0 || pu > u1 || pv < v0 || pv > v1, 'pushed out of the hole').toBe(true);
     const y = pit.level + 1.6;
-    expect(hasLineOfSight(world, { x: pit.x - 6, y, z: pit.z - 1 }, { x: pit.x + 6, y, z: pit.z + 1 })).toBe(true);
+    const [l, r] = [roomPoint(pit, u - 6, v), roomPoint(pit, u + 6, v)];
+    expect(hasLineOfSight(world, { x: l.x, y, z: l.z }, { x: r.x, y, z: r.z })).toBe(true);
   });
 
   it('the Stairs of Slumber are sealed and descend seventy, then seven hundred steps', () => {
