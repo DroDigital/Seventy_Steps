@@ -48,6 +48,8 @@ async function packageMicrosoft() {
   delete metadata.steam;
   writeFileSync(metadataFile, `${JSON.stringify(metadata, null, 2)}\n`);
   rmSync(join(app, 'node_modules', 'steamworks.js'), { recursive: true, force: true });
+  // The SDL package includes C++ sources for development. Windows ships its compiled binding.
+  rmSync(join(app, 'node_modules', '@kmamal', 'sdl', 'src', 'native'), { recursive: true, force: true });
 
   prepareMicrosoftStore(payload, metadata.version);
   run(process.execPath, [
@@ -57,8 +59,15 @@ async function packageMicrosoft() {
 
   rmSync(packages, { recursive: true, force: true });
   mkdirSync(packages, { recursive: true });
-  run('makepkg.exe', ['pack', '/msixvc2', '/d', payload, '/pc', '/pd', packages, '/validationcritical']);
-  const artifact = readdirSync(packages).find((file) => file.toLowerCase().endsWith('.msixvc'));
+  const packageFiles = () => readdirSync(packages).filter((file) => file.toLowerCase().endsWith('.msixvc'));
+  try {
+    run('makepkg.exe', ['pack', '/msixvc2', '/d', payload, '/pc', '/pd', packages, '/validationcritical']);
+  } catch (error) {
+    // MakePkg can leave an MSIXVC behind when validation fails. Keep the diagnostics for review.
+    for (const file of packageFiles()) rmSync(join(packages, file));
+    throw error;
+  }
+  const [artifact] = packageFiles();
   if (!artifact) throw new Error('MakePkg did not produce an MSIXVC package.');
   console.log(`Microsoft Store package: ${join(packages, artifact)}`);
 }
