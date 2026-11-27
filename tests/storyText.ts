@@ -5,13 +5,17 @@
  * never its [tags]).
  */
 
+import { FIELD_NOTES } from '../src/data/bestiaryNotes';
+import { EPITHETS } from '../src/data/bossCards';
 import { DOCUMENTS } from '../src/data/documents';
+import { EPITAPHS } from '../src/data/epitaphs';
 import { INTRO, introText } from '../src/data/intro';
 import { NPCS, TRADERS } from '../src/data/npcs';
 import { FATES } from '../src/data/epilogues';
 import { OVERHEARD } from '../src/data/overheard';
 import { QUESTS } from '../src/data/quests';
 import { REGIONS } from '../src/data/regions';
+import { ENTITIES } from '../src/data/registry';
 import { RUMORS } from '../src/data/rumors';
 import { placesOf } from '../src/world/namedPlaces';
 import { worldLayout } from '../src/world/placements';
@@ -52,4 +56,10 @@ export const STORY_SOURCES: Readonly<Record<StoryDomain, () => StorySource>> = {
     for (const { layout: d } of w.dungeons) add(d.region, d.def.name);
     return new Map([...by].map(([id, names]) => [id, [...names]]));
   },
+  // the creatures, by roster id: a name (and its variants'), the story it is from, its field note, the line under its name, its epitaph
+  creatures: () =>
+    new Map(
+      ENTITIES.map((d) => [d.id, lines(d.name, d.eldritchVariant?.name, d.bossVariant?.name, d.source, FIELD_NOTES[d.id], EPITHETS[d.id], EPITAPHS[d.id])] as const)
+        .map(([id, l]) => [id, [...new Set(l)]] as const),
+    ),
 };

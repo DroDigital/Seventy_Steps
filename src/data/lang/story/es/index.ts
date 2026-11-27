@@ -1,6 +1,9 @@
 /** The story in Spanish (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { ES_CREATURES } from './creatures';
+import { ES_CREATURESLAST } from './creaturesLast';
+import { ES_CREATURESMORE } from './creaturesMore';
 import { ES_DOCUMENTS } from './documents';
 import { ES_DOCUMENTSMORE } from './documentsMore';
 import { ES_FATES } from './fates';
@@ -21,4 +24,5 @@ export const ES_STORY: StoryBook = {
   quests: ES_QUESTS,
   documents: { ...ES_DOCUMENTS, ...ES_DOCUMENTSMORE },
   places: { ...ES_PLACES, ...ES_PLACESFAR },
+  creatures: { ...ES_CREATURES, ...ES_CREATURESMORE, ...ES_CREATURESLAST },
 };

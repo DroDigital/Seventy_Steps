@@ -108,7 +108,7 @@ export function gatherMarks(g: Game, view: MapView, realm: readonly RegionDef[],
       }, 1, full && detail >= DETAIL.doorNames ? { text: story(p.name), x, y, size: 10 * k, color: DOOR_NAME, gap: 0 } : null, 'doors');
     } else {
       const done = p.bosses.every(slain);
-      const known = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b)).map((b) => getEntity(b)?.name ?? '');
+      const known = p.bosses.filter((b) => g.mind.seen.has(b) || slain(b)).map((b) => story(getEntity(b)?.name ?? ''));
       add(middle, {
         kind: 'boss', x, y, state: { slain: done }, place: p,
         title: done ? 'A horror, slain' : "A horror's lair", name: known.join(' · '), note: done ? 'It will not rise again' : 'Something great dwells here',

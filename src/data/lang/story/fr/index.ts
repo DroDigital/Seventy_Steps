@@ -1,6 +1,9 @@
 /** The story in French (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { FR_CREATURES } from './creatures';
+import { FR_CREATURESLAST } from './creaturesLast';
+import { FR_CREATURESMORE } from './creaturesMore';
 import { FR_DOCUMENTS } from './documents';
 import { FR_DOCUMENTSMORE } from './documentsMore';
 import { FR_FATES } from './fates';
@@ -21,4 +24,5 @@ export const FR_STORY: StoryBook = {
   quests: FR_QUESTS,
   documents: { ...FR_DOCUMENTS, ...FR_DOCUMENTSMORE },
   places: { ...FR_PLACES, ...FR_PLACESFAR },
+  creatures: { ...FR_CREATURES, ...FR_CREATURESMORE, ...FR_CREATURESLAST },
 };

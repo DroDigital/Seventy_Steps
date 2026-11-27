@@ -6,7 +6,7 @@
  * theft, a full gaze, stone, the powder, the lamps).
  */
 
-import { t } from '../core/i18n';
+import { story, t } from '../core/i18n';
 import { engagedFights } from '../systems/bossFight';
 import type { Game } from '../systems/components';
 import { hooksOf } from '../systems/reality';
@@ -66,7 +66,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
   g.events.on('Petrified', () => say(t('boss.stone')));
   g.events.on('Title', (e) => show(e.text));
   g.events.on('Named', (e) => {
-    name.textContent = e.name;
+    name.textContent = story(e.name);
     nameUntil = performance.now() + NAME_MS * e.count; // it stays longer each time it comes
   });
 
@@ -79,7 +79,7 @@ export function createBossHud(g: Game, root: HTMLElement, say: (text: string) =>
         if (!fight) return;
         const [e, f] = fight;
         const h = g.ecs.c.health.get(e)!;
-        setText(s.name, (g.ecs.c.combatant.get(e)?.name ?? f.id).toUpperCase());
+        setText(s.name, story(g.ecs.c.combatant.get(e)?.name ?? f.id).toUpperCase());
         setStyle(s.fill, 'width', percent(h.hp, h.max));
         const now = performance.now();
         setStyle(s.chip, 'width', `${(tally.chip(e, h.hp / h.max, now) * 100).toFixed(1)}%`);

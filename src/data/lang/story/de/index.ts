@@ -1,6 +1,9 @@
 /** The story in German (data/lang/story/index.ts): a table for every domain. */
 
 import type { StoryBook } from '..';
+import { DE_CREATURES } from './creatures';
+import { DE_CREATURESLAST } from './creaturesLast';
+import { DE_CREATURESMORE } from './creaturesMore';
 import { DE_DOCUMENTS } from './documents';
 import { DE_DOCUMENTSMORE } from './documentsMore';
 import { DE_FATES } from './fates';
@@ -21,4 +24,5 @@ export const DE_STORY: StoryBook = {
   quests: DE_QUESTS,
   documents: { ...DE_DOCUMENTS, ...DE_DOCUMENTSMORE },
   places: { ...DE_PLACES, ...DE_PLACESFAR },
+  creatures: { ...DE_CREATURES, ...DE_CREATURESMORE, ...DE_CREATURESLAST },
 };

@@ -169,7 +169,7 @@ export function createHud(g: Game, canvas: HTMLCanvasElement, painter: MapPainte
   g.events.on('InsightChanged', (e) => {
     if (e.cause === 'tome' || e.cause === 'upgrade') say(`${e.source.toUpperCase()}  ${tr('hud.insightGain', { sign: sign(e.change), n: Math.abs(e.change) })}`);
   });
-  g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', e.name.toUpperCase(), EPITAPHS[creatureOf(g, e.entity)?.id ?? '']));
+  g.events.on('Vanquished', (e) => great.show(tr('hud.vanquished'), 'victory', story(e.name).toUpperCase(), story(EPITAPHS[creatureOf(g, e.entity)?.id ?? ''] ?? '') || undefined));
   g.events.on('Exhaled', (e) => setTimeout(() => great.show(tr('hud.breathes'), 'place', story(e.name).toUpperCase(), tr('hud.breathesNote')), 7500)); // after the fall's own words (round 26)
   g.events.on('Foreboding', (e) => setTimeout(() => great.show(tr('hud.stirs'), 'place', e.words, ''), 2500)); // after the sound has reached them (round 26)
   g.events.on('WayOmen', (e) => say(e.words)); // a line said on a trail to a horror (round 62)
