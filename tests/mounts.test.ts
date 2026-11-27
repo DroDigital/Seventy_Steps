@@ -7,7 +7,8 @@ import { DE } from '../src/data/lang/de';
 import { FR } from '../src/data/lang/fr';
 import { ES } from '../src/data/lang/es';
 import { QUESTS } from '../src/data/quests';
-import { CAMERA, PLAYER, SIM } from '../src/data/tuning';
+import { CAMERA_MODES } from '../src/data/cameraModes';
+import { PLAYER, SIM } from '../src/data/tuning';
 import { discover, rest, teleport, travel } from '../src/systems/checkpoints';
 import { strike } from '../src/systems/combat';
 import type { Game } from '../src/systems/components';
@@ -297,8 +298,8 @@ describe('the borrowed reins', () => {
       arrive();
       expect(g.camera.mountLift).toBe(0);
       expect(g.camera.prevMountLift).toBe(0);
-      expect(g.camera.dist).toBe(CAMERA.distance);
-      expect(g.camera.prevDist).toBe(CAMERA.distance);
+      expect(g.camera.dist).toBe(CAMERA_MODES[g.camera.mode].distance);
+      expect(g.camera.prevDist).toBe(CAMERA_MODES[g.camera.mode].distance);
     }
   });
 

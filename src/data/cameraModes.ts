@@ -1,5 +1,7 @@
 /**
- * The gameplay camera's three looks (Settings › Play). Classic is the default, with a slight refinement to its original angle.
+ * The gameplay camera's three looks (Settings › Play). Classic is the default: a little lower, further back and narrower than the original
+ * (2026-11-27), so the land ahead and the skyline fill the picture rather than the paving at the investigator's feet, and he stands a little
+ * left of the middle.
  * Low hero hangs lower and closer behind the shoulder with a wider lens. Tight shoulder hangs close and over the shoulder.
  * Classic and Low hero frame locked foes by size, moving the lens back and aiming between the investigator and the foe (a tall one at the
  * middle of the band from the investigator's feet to its top, round 104).
@@ -63,7 +65,11 @@ const BASE: CameraTuning = {
 export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
   classic: {
     ...BASE,
-    pitch: 0.23, // a little less downward than the original 0.25, with the same boom and lens
+    pivotHeight: 1.55, // the neck, not the crown (1.7): the figure sits a little higher in the picture
+    distance: 6, // (5.6) with the narrower lens, the figure is a little larger than before and the perspective flatter
+    shoulder: 0.6, // (0.45) off the middle, so what is ahead is not behind him
+    pitch: 0.17, // (0.23) the horizon higher, less of the ground before the lens
+    fov: 58, // (66) less of the wide lens's stretch at the picture's edges
     frame: {
       follow: 2.5,
       height: [1.6, 40],
@@ -74,7 +80,7 @@ export const CAMERA_MODES: Record<CameraMode, CameraTuning> = {
       lensUp: [2.6, 0.05, 2.65, 3.8], // keep a view down over the investigator when a short foe is close
       pitchMost: 0.48,
       tall: [3, 14],
-      fovTall: 64,
+      fovTall: 64, // a giant widens the lens a little (it narrowed from 66 to this before the lens was 58)
       fovMost: 72,
     },
   },
