@@ -3,7 +3,8 @@
  * met, and a time skip no longer takes the opening a recovery gives. Measured on the investigator's own moves, not on a number written here.
  */
 import { describe, expect, it } from 'vitest';
-import { ATTACKS, compileAttack } from '../src/data/attacks';
+import { ATTACKS, compileAttack, pacedAttack } from '../src/data/attacks';
+import { quickWeight } from '../src/data/bossPace';
 import { BOSS_BAND, PUNISH, bandOf, blowWeight, recoveryFor, type PunishBand } from '../src/data/bossPunish';
 import { BOSS_STANDING } from '../src/data/bossStanding';
 import { PLAYER_MOVES } from '../src/data/moves';
@@ -70,7 +71,7 @@ describe('the punish windows (round 83)', () => {
       const p = PUNISH[band];
       const moves = toCombatant(def).moves;
       for (const id of attacksOf(def)) {
-        const a = ATTACKS[id];
+        const a = pacedAttack(id, reachOf(def), band); // (wound up as its pace has it, 2026-11-27)
         const recovery = moves[id].frames - a.windup - a.active;
         if (a.follow) {
           expect(recovery, `${def.id} ${id}`).toBe(a.recovery); // a link that runs on, as the library has it
@@ -107,10 +108,12 @@ describe('the punish windows (round 83)', () => {
     expect(actor.moves.cthulhu_feelers).toBeUndefined();
     const extra = NYARLATHOTEP_SIGNATURE.extra!(g, boss, fight);
     expect(extra.map((a) => a.move)).toContain('cthulhu_feelers'); // Cthulhu's own (2026-11-24)
-    const feelers = ATTACKS.cthulhu_feelers;
+    const body = g.ecs.c.body.get(boss)!;
+    const paced = (id: keyof typeof ATTACKS) => pacedAttack(id, body.reach ?? body.height, bandOf(fight.id)); // (wound up as the borrower's pace has it)
+    const feelers = paced('cthulhu_feelers');
     expect(actor.moves.cthulhu_feelers.frames - feelers.windup - feelers.active).toBe(34); // Cthulhu's band is deep (39); the borrower's is last
     for (const { move } of extra) {
-      const attack = ATTACKS[move as keyof typeof ATTACKS];
+      const attack = paced(move as keyof typeof ATTACKS);
       expect(actor.moves[move].frames - attack.windup - attack.active, move).toBe(recoveryFor(attack, bandOf(fight.id)));
     }
     expect(actor.moves.cthulhu_claw_2, 'a borrowed chain runs on into its own next link').toBeDefined();
@@ -127,8 +130,9 @@ describe('the punish windows (round 83)', () => {
       const top = Math.max(...ids.map((x) => ATTACKS[x].power));
       for (const id of ids.filter((x) => ATTACKS[x].kind === 'melee')) {
         const was = Math.round(ATTACKS[id].power * def.stats.damage);
-        expect(moves[id].hit!.damage, `${def.id} ${id}`).toBe(Math.round(ATTACKS[id].power * def.stats.damage * blowWeight(bandOf(def.id)!, ATTACKS[id].power, top)));
-        expect(moves[id].hit!.damage, `${def.id} ${id}`).toBeGreaterThanOrEqual(was);
+        const quick = ATTACKS[id].power >= top ? 1 : quickWeight(pacedAttack(id, reachOf(def), bandOf(def.id)).windup); // a blow still quick when paced weighs less (2026-11-27)
+        expect(moves[id].hit!.damage, `${def.id} ${id}`).toBe(Math.round(ATTACKS[id].power * def.stats.damage * blowWeight(bandOf(def.id)!, ATTACKS[id].power, top) * quick));
+        if (quick === 1) expect(moves[id].hit!.damage, `${def.id} ${id}`).toBeGreaterThanOrEqual(was);
         expect(moves[id].hit!.damage, `${def.id} ${id}`).toBeLessThanOrEqual(Math.round(top * def.stats.damage)); // no blow passes the heaviest as it was
         if (ATTACKS[id].power >= top) expect(moves[id].hit!.damage, `${def.id} ${id}`).toBe(was); // and the heaviest is as it was
       }
