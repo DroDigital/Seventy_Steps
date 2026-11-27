@@ -23,6 +23,9 @@ const MOTIFS: Readonly<Record<'masonry' | 'timber' | 'none', readonly WallMotif[
   none: ['bare', 'damp', 'patched', 'shored'],
 };
 
+/** Metres a bare kit's dressing (shoring, damp, patches) rises: a stair's wall stands above the roof of the room below it, and what rose further showed through that roof (tests/roofView.test.ts). */
+export const BARE_REACH = 3.4;
+
 const seedOf = (id: string): number => [...id].reduce((h, ch) => (Math.imul(h, 31) + ch.charCodeAt(0)) | 0, 7);
 
 /** The motif of room `room` of dungeon `id`, of a kit trimmed `trim`: by its dungeon and its place, a step along the list from the room before. */

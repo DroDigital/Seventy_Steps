@@ -25,7 +25,7 @@ import { pillarFormOf, tinted } from './dungeonLook';
 import { pillarPieces } from './pillarForms';
 import type { PillarForm } from '../data/dungeonLooks';
 import { floorInlay } from './floorInlay';
-import { motifPieces, roomShade, wallMotifOf, type WallMotif } from './wallMotifs';
+import { BARE_REACH, motifPieces, roomShade, wallMotifOf, type WallMotif } from './wallMotifs';
 import { grateGeometry } from './grateShape';
 import type { ArenaPlace, Dungeon } from '../world/placements';
 import { box, tileUv, tint, worldUv } from './meshKit';
@@ -107,7 +107,7 @@ function wallDetail(min: V3, max: V3, c: Rgb, kit: DungeonKit, at: Origin, ctx: 
     const g = box(alongX ? l : t, hh, alongX ? t : l, 0, 0, 0, scaleRgb(mc, tone));
     return worldUv((alongX ? g.rotateZ(angle) : g.rotateX(angle)).translate(x, y, z), at);
   };
-  (woody ? wood : stone).push(...motifPieces(m, { len, thick, h, base: min.y, seed, slab: (l, t, hh, y, tt, tone) => tint(slab(l, t, hh, y, tt), scaleRgb(mc, 1 - (1 - tone) * 1.8)), tilt })); // (the motif's shades drawn out: in the gloom a tenth was not seen)
+  (woody ? wood : stone).push(...motifPieces(m, { len, thick, h: kit.trim === 'none' ? Math.min(h, BARE_REACH) : h, base: min.y, seed, slab: (l, t, hh, y, tt, tone) => tint(slab(l, t, hh, y, tt), scaleRgb(mc, 1 - (1 - tone) * 1.8)), tilt })); // (the motif's shades drawn out: in the gloom a tenth was not seen)
   torches(glow, stone, torchStops(len, kit.flames), { along, thick, alongX, base: min.y + 0.3, len }, ctx, placed, walls);
   for (let k = 0; k < Math.floor(len / 3); k++) { // rubble fallen from it
     const r = 0.12 + ((seed * (k + 3)) % 7) * 0.03;
