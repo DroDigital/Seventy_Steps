@@ -19,6 +19,7 @@ import type { Game } from '../systems/components';
 import { secondsOf } from '../systems/passages';
 import { regionAt } from '../world/worldMap';
 import type { GameAudio } from './audio/gameAudio';
+import { courtStands } from './courtsBuilt';
 import { gateRig, type GateRig } from './gateRig';
 import { modelsReady } from './modelKit';
 import type { Rgb } from './palette';
@@ -106,6 +107,7 @@ export function createGateView(scene: THREE.Scene, g: Game, id: Entity, def: Hid
   return {
     begin: sound,
     update(now, dt) {
+      group.visible = courtStands(door.style!); // (not before its walls: a gate standing alone in the open while its court is still being built)
       hang();
       const l = layer();
       k += (l.open - k) * Math.min(1, dt * 18);
