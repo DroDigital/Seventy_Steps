@@ -49,7 +49,7 @@ describe('the title opens independently of desktop audio', () => {
     title(s, vi.fn());
     await Promise.resolve();
     expect(s.veil.haunt).toHaveBeenCalledWith(true);
-    expect(s.veil.darken).not.toHaveBeenCalledWith('press any key');
+    expect(s.veil.darken).not.toHaveBeenCalledWith('press any key', true);
   });
 
   it('keeps the web gesture gate when the browser refuses audio', async () => {
@@ -58,7 +58,7 @@ describe('the title opens independently of desktop audio', () => {
     title(s, vi.fn());
     await Promise.resolve();
     await vi.advanceTimersByTimeAsync(THEME.wait * 1000);
-    expect(s.veil.darken).toHaveBeenCalledWith('press any key');
+    expect(s.veil.darken).toHaveBeenCalledWith('press any key', true);
     expect(s.veil.haunt).not.toHaveBeenCalled();
   });
 

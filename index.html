@@ -13,6 +13,11 @@
       html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
       body { display: flex; align-items: center; justify-content: center; }
       canvas { display: block; image-rendering: pixelated; }
+      /* the line waits a moment, so a quick start never shows it, then breathes while the game is made */
+      #startup { opacity: 0; animation: startup-in 0.9s ease-out 0.6s forwards, startup-breathe 2.4s ease-in-out 1.5s infinite alternate; }
+      @keyframes startup-in { to { opacity: 0.7; } }
+      @keyframes startup-breathe { from { opacity: 0.7; } to { opacity: 0.3; } }
+      @media (prefers-reduced-motion: reduce) { #startup { animation: none; opacity: 0.7; } }
     </style>
   </head>
   <body>

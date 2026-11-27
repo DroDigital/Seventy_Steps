@@ -14,6 +14,7 @@ import { makeAhead } from './loading';
 import { desktop } from './desktop';
 import type { Shell } from './shell';
 import { showTitle } from './titleScreen';
+import { t } from '../core/i18n';
 
 /** Shows the title; `start` makes the world once a choice is made (fresh: a new game, with its opening). */
 export function title(shell: Shell, start: (fresh: boolean, difficulty?: DifficultyId) => void): void {
@@ -23,7 +24,7 @@ export function title(shell: Shell, start: (fresh: boolean, difficulty?: Difficu
   let [opened, refused] = [false, false];
   void music.refused.then(() => {
     refused = true;
-    if (!opened && !desktop) shell.veil.darken('press any key');
+    if (!opened && !desktop) shell.veil.darken(t('title.press'), true); // the one call: inked out of the dark, then breathing
   });
   showTitle({
     slots: () => slotLines(shell.store),

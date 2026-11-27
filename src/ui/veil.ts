@@ -7,7 +7,10 @@
  * edges, breathing. While the world is made under it, a line beneath the name fills from its middle
  * outwards as the making goes (playtest round 10: a start was seconds of black with nothing to say
  * that anything was happening). Round 80: the name is larger and inks in a letter at a time once the dark covers all (ui/inkTitle.ts),
- * and the line beneath it comes a moment after the last letter.
+ * and the line beneath it comes a moment after the last letter. 2026-11-27: its breathing over the title begins from
+ * nothing and grows in as the dark draws back (it began mid-swell, a step in the ink's edge as the first breath
+ * took over: `hauntCoverage`), the receding dark leaves a brighter violet rim, its words fade rather than vanish,
+ * and a call (the title's "press any key") is inked in like a name and then breathes.
  */
 
 import { fbm } from '../core/noise';
@@ -20,15 +23,18 @@ const [W, H] = [240, 135]; // pixels, upscaled nearest-neighbour
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 const FRINGE = 0.05; // field units of purple beyond the ink's edge
 const HAUNT = 0.24; // coverage while haunting the title's edges
-const LINE = { y: 97, half: 34, ease: 5 }; // the making's line: its row, half its length (pixels), how fast it follows (1/s)
+const LINE = { y: 97, half: 34, ease: 5 };
+const BREATH = { depth: 0.03, period: 900 }; // the haunting's swell: coverage either way, and ms per radian
+const RIM = 1.6; // how much wider the purple fringe is as the dark first draws back from the title (none once it rests)
+const WORDS_OUT = 0.4; // seconds the words take to fade as the dark breaks // the making's line: its row, half its length (pixels), how fast it follows (1/s)
 
 export interface Veil {
   /** Draws the dark over the screen; resolves once it covers everything and has been shown. */
   cover(words?: string, seconds?: number, line?: string, light?: Light): Promise<void>; // `line`: said under the words (else the next lore line: loreLine.ts); `light`: a gate's journey (round 60): the dark wells up from the middle of the screen behind a ring of that light, wound into a vortex
   /** Draws it back; resolves once it has gone. */
   lift(seconds?: number): Promise<void>;
-  /** Covers at once (over a screen that is already dark). */
-  darken(words?: string): void;
+  /** Covers at once (over a screen that is already dark); `call`: the words ask for something (the title's key), and breathe once inked. */
+  darken(words?: string, call?: boolean): void;
   /** Haunts the edges (the title) or stops. */
   haunt(on: boolean): void;
   /** While it covers, the line beneath the name shows the making `share` (0..1) done; it never draws back until the next cover. */
@@ -99,6 +105,12 @@ function glyphMask(): Float32Array {
 
 const ease = (t: number): number => t * t * (3 - 2 * t);
 
+/** The haunting's coverage `ms` after it began, `p` (0..1) of the way from `from` to `to`: its breath grows in with the motion, so it starts from nothing and no step is seen where the motion gives way to it (both come to rest with no slope at p = 1). */
+export const hauntCoverage = (from: number, to: number, p: number, ms: number): number => {
+  const k = 1 - (1 - p) ** 3; // out at once, settling softly (a smoothstep held the screen black for a second after the key)
+  return from + (to - from) * k + BREATH.depth * Math.sin(ms / BREATH.period) * k;
+};
+
 export function createVeil(): Veil {
   const canvas = document.createElement('canvas');
   canvas.dataset.veil = '';
@@ -112,6 +124,7 @@ export function createVeil(): Veil {
   words.append(said, lore);
   let name = ''; // the words as said, inked in once the dark covers all
   let inked: Animation[] = [];
+  let beckon = false; // the words are a call, and breathe once inked
   const say = (text: string, line?: string): void => {
     for (const a of inked) a.cancel();
     inked = [];
@@ -123,6 +136,7 @@ export function createVeil(): Veil {
   const ink = (): void => {
     for (const a of inked) a.cancel();
     inked = playIn(inkLetters(said, name), inkSeed(name));
+    if (beckon && inked.length) inked.push(said.animate([{ opacity: 1 }, { opacity: 0.4 }], { duration: 1500, delay: VEIL.loreDelay + 400, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' }));
     if (lore.textContent && inked.length) inked.push(lore.animate([{ opacity: 0 }, { opacity: 0.6 }], { duration: VEIL.loreRise, delay: VEIL.loreDelay, easing: 'ease-out', fill: 'both' }));
   };
   document.body.append(canvas, words);
@@ -141,7 +155,9 @@ export function createVeil(): Veil {
   let shownAt = -1; // when full cover was first drawn (for the glyph's fade and the promise)
   let running = false;
   let settle: (() => void) | null = null;
-  let [made, shownMade, lastAt] = [-1, 0, 0]; // the making's share (-1: no line), as drawn, and the last frame's time
+  let [made, shownMade, lastAt] = [-1, 0, 0];
+  let wordsShown = 0; // how far the words and the sign show (0..1)
+  let rim = 0; // the fringe's widening as the dark draws back (0..1) // the making's share (-1: no line), as drawn, and the last frame's time
   let light: Light | null = null; // a gate's journey: the dark wells up from the middle behind a ring of this light
 
   /** The line beneath the name: a dim purple track, lit bone from the middle outwards in a purple glow, its tips glinting. */
@@ -167,7 +183,8 @@ export function createVeil(): Veil {
     const px = image.data;
     const t = now / 1000;
     const line = inkLine(coverage);
-    const sign = shownAt < 0 ? 0 : Math.min(1, (now - shownAt) / 450) * (0.75 + 0.25 * Math.sin(t * 2.2));
+    const fringe = FRINGE * (1 + RIM * rim);
+    const sign = wordsShown * (0.75 + 0.25 * Math.sin(t * 2.2)); // (it fades with the words as the dark breaks, where it went out in a frame)
     for (let y = 0, i = 0; y < H; y++) {
       for (let x = 0; x < W; x++, i++) {
         const dither = (BAYER[(y & 3) * 4 + (x & 3)] / 16 - 0.5) * 0.05;
@@ -184,7 +201,7 @@ export function createVeil(): Veil {
         const g = Math.min(1, glyph[i] * sign * 1.6); // the sign: a bone core in a purple glow
         const k = g * g;
         if (v > 0) [px[o], px[o + 1], px[o + 2], px[o + 3]] = [(106 + 111 * k) * g, (13 + 195 * k) * g, (173 + 11 * k) * g, 255];
-        else if (v > -FRINGE) [px[o], px[o + 1], px[o + 2], px[o + 3]] = [106, 13, 173, 150 * (1 + v / FRINGE)];
+        else if (v > -fringe) [px[o], px[o + 1], px[o + 2], px[o + 3]] = [106 + 60 * rim, 13 + 30 * rim, 173 + 40 * rim, 150 * (1 + v / fringe) * (1 + 0.5 * rim)];
         else px[o + 3] = 0;
       }
     }
@@ -194,15 +211,19 @@ export function createVeil(): Veil {
 
   function frame(now: number): void {
     const p = Math.min(1, (now - startedAt) / (seconds * 1000));
-    shownMade += (Math.max(0, made) - shownMade) * Math.min(1, ((now - lastAt) / 1000) * LINE.ease);
+    const dt = Math.min(0.1, (now - lastAt) / 1000);
+    shownMade += (Math.max(0, made) - shownMade) * Math.min(1, dt * LINE.ease);
     lastAt = now;
-    coverage = haunting && p >= 1 ? HAUNT + 0.03 * Math.sin(now / 900) : from + (to - from) * ease(p);
+    coverage = haunting ? hauntCoverage(from, to, p, now - startedAt) : from + (to - from) * ease(p);
+    rim = haunting && from > to ? Math.sin(Math.PI * Math.min(1, p * 1.4)) : 0; // a violet rim swells and fades on the dark's edge as it draws back
     const full = coverage >= 1;
     if (full && shownAt < 0) {
       shownAt = now;
       ink();
     } else if (!full) shownAt = -1;
-    words.style.opacity = full ? `${Math.min(1, (now - shownAt) / 450)}` : '0';
+    wordsShown = full ? Math.min(1, (now - shownAt) / 450) : Math.max(0, wordsShown - dt / WORDS_OUT);
+    words.style.opacity = `${wordsShown}`;
+    words.style.filter = full || !wordsShown ? '' : `blur(${(1 - wordsShown) * 4}px)`;
     canvas.style.display = coverage > 0 ? 'block' : 'none';
     if (coverage > 0) paint(now);
     if (p >= 1 && settle && (!full || now > shownAt)) {
@@ -210,7 +231,7 @@ export function createVeil(): Veil {
       settle = null;
       done();
     }
-    running = haunting || coverage > 0 || p < 1 || settle !== null;
+    running = haunting || coverage > 0 || p < 1 || settle !== null || wordsShown > 0;
     if (running) requestAnimationFrame(frame);
   }
 
@@ -227,6 +248,7 @@ export function createVeil(): Veil {
   return {
     cover(text = '', secs = 0.9, line, through) {
       haunting = false;
+      beckon = false;
       light = through ?? null;
       say(text, line);
       [made, shownMade] = [-1, 0];
@@ -234,13 +256,16 @@ export function createVeil(): Veil {
     },
     lift(secs = 1.2) {
       haunting = false;
+      beckon = false;
       light = null; // it opens as any journey does, from the middle out
       made = -1;
       return go(0, secs);
     },
-    darken(text = '') {
+    darken(text = '', call = false) {
       haunting = false;
+      beckon = call;
       say(text);
+      if (shownAt >= 0 && text) ink(); // already dark: the words come out of it as a name does
       void go(1, 0.01);
     },
     haunt(on) {
