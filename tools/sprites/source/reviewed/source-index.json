@@ -51,7 +51,9 @@
     "high_priest#eldritch: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 6 old frames dropped, right mirrored.",
     "azathoth: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (17 in place, 4 into places the old drawing left, 2 on a shelf), 10 old frames dropped, right mirrored, its 3 stoop frames (stoop, stoop_mid) drawn in place.",
     "zann_window_thing: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 17 frames drawn (17 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
-    "medusa_gorgon: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored."
+    "medusa_gorgon: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 23 frames drawn (23 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "great_ones: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 29 frames drawn (29 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right mirrored.",
+    "cthulhu: drawn again whole by the author and put in place of the old frames (tools/replace_reviewed_sprite.py); 39 frames drawn (39 in place, 0 into places the old drawing left, 0 on a shelf), 0 old frames dropped, right drawn, its 3 stoop frames (stoop, stoop_mid) drawn in place."
   ],
   "entities": [
     {
@@ -20418,12 +20420,12 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/cthulhu/movement/front/idle_0.png",
-                  "sha256": "8501aaf11e5c6cc8082d25ae0abd61d659cc466e525920efd1900792a0fb32ea"
+                  "sha256": "64ed38365c635d04bb9e1de1b6ad9d8c3ba147fcb159e8802342a5c4e7ae8e3e"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/cthulhu/movement/front/idle_1.png",
-                  "sha256": "c3ec272e8301b0c9bba167f6cf72adeb854d5e7c03927001b071006b20cbccf5"
+                  "sha256": "beb81aff7a4cbbf5aea452807333aff98ea549738b2cae8e13ee46b36082d40e"
                 }
               ]
             },
@@ -20433,22 +20435,22 @@
                 {
                   "name": "move_0",
                   "path": "bosses/cthulhu/movement/front/move_0.png",
-                  "sha256": "6b6e5dea72845d0fb639098b4cc9545b98b1e668ea619ee12c7ce5b09b73f996"
+                  "sha256": "0f0489cec2ad9e99faebca7b838376c46adc720f67311daba72d8a5dec6ecf8a"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/cthulhu/movement/front/move_1.png",
-                  "sha256": "0c8a7651f7f749024ea9ab72cea8223f5151c3e4cc1cbdf9b1a2d265f4656559"
+                  "sha256": "94b66c80e3902918566fafc2140104aaeef83ed236415f76f5170d509d5e1e0d"
                 },
                 {
                   "name": "move_2",
                   "path": "bosses/cthulhu/movement/front/move_2.png",
-                  "sha256": "9f71bf25ed7af42e89f49e95006938b0de3997d3aab5df0aff4cfef4ad10a9ad"
+                  "sha256": "e79fa4620cec2ed4cd173bf6f53b420b6149e753c520ff233115b2990c807fa6"
                 },
                 {
                   "name": "move_3",
                   "path": "bosses/cthulhu/movement/front/move_3.png",
-                  "sha256": "b33870dec24c1d7461e3b833e0fb3254a7d0974982d0f4859e34654a1807db43"
+                  "sha256": "f9c15312b73cd80862ea97f090c374913fe87427196727835f76f08f191cbcc4"
                 }
               ]
             },
@@ -20458,17 +20460,17 @@
                 {
                   "name": "attack_0",
                   "path": "bosses/cthulhu/movement/front/attack_0.png",
-                  "sha256": "fb0d8a6ca600abb86d1bc4ce2a5345d7dbd6881371e0112582a6007b5a2b2b69"
+                  "sha256": "7ef66df33a3cc1d5281f9f3163ebfa829f65c01278966b316f982dc2d2c9836a"
                 },
                 {
                   "name": "attack_1",
                   "path": "bosses/cthulhu/movement/front/attack_1.png",
-                  "sha256": "f935e254b1dfa9aa83ec0c9f34598b2b4848565ebc5addaf610312fc721f0729"
+                  "sha256": "58a6e49f1da7122db0986315b33f2f3f2b7fee729ff0e1b9ea35312e97219def"
                 },
                 {
                   "name": "attack_2",
                   "path": "bosses/cthulhu/movement/front/attack_2.png",
-                  "sha256": "c3e9af8e4ea618e5059b367bf9183cc328e1b3edd68da6293b24c8a5d1187ed1"
+                  "sha256": "ed34c0b0f71a1924e0c38703f65bffb2546c554b9b8a028727b9e5d8e94d89d9"
                 }
               ]
             },
@@ -20478,12 +20480,12 @@
                 {
                   "name": "hurt_0",
                   "path": "bosses/cthulhu/movement/front/hurt_0.png",
-                  "sha256": "4897eb8a0a96c319c97dc4ed0e7a8a461d6595f5a52967554ee50f2c0f7c4d7f"
+                  "sha256": "55964bfb251b1c8872f8e156207e7274718bf032e6871a7400a6eaf1e334ff64"
                 },
                 {
                   "name": "hurt_1",
                   "path": "bosses/cthulhu/movement/front/hurt_1.png",
-                  "sha256": "9af465efc5c9002ccaffafda72898f3e8722ac80067c2b93042d785c7798709a"
+                  "sha256": "2aa1d0d2f65b2cb46b41b4458eacbaafe14c579d407f76119541f202e76f7402"
                 }
               ]
             },
@@ -20493,12 +20495,12 @@
                 {
                   "name": "stoop_0",
                   "path": "bosses/cthulhu/movement/front/stoop_0.png",
-                  "sha256": "bc224589d8acd26d796c2ecab6f0ed6cefed9f84948fa5b04c662fb8b8906fed"
+                  "sha256": "f4510798c7291b43748561a3e80be7606b36b0eedc7ddd3042bd22125cd46ba4"
                 },
                 {
                   "name": "stoop_1",
                   "path": "bosses/cthulhu/movement/front/stoop_1.png",
-                  "sha256": "c05b227ff72220112819225c330c0d1d681fa14690830fede6c0fa0e4a4bd607"
+                  "sha256": "345837bf32198f8bf0b976862ef5162397e6f48d5f4c7eb6a5a5722999c443eb"
                 }
               ]
             },
@@ -20508,7 +20510,7 @@
                 {
                   "name": "stoop_mid_0",
                   "path": "bosses/cthulhu/movement/front/stoop_mid_0.png",
-                  "sha256": "24ee7b62ad4b827aee395e38523b353c83285a57731089890649bb2a84c1e4c3"
+                  "sha256": "968ee174fb44d880bd3bd47bec988b489e7e1db1fc6e4ee8e5ea2b2b5f1d7222"
                 }
               ]
             }
@@ -20524,12 +20526,12 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/cthulhu/movement/back/idle_0.png",
-                  "sha256": "94a41fb71145f26e94555f49f956dd97006052e7989e01f6e4581ff7fe0f483b"
+                  "sha256": "18c92b3ee3f23b72860fce47b170be659f2f02744ec1aed1fd4f951ff823b9a7"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/cthulhu/movement/back/idle_1.png",
-                  "sha256": "94f932a86964e0b6a03d2b117762261e10920269c0fe06290e2e5cf3eae40d19"
+                  "sha256": "36f6cbebcb009c18e6b7be5da2917e5ec41a96b7cc653f32a2d54448e17712b6"
                 }
               ]
             },
@@ -20539,22 +20541,22 @@
                 {
                   "name": "move_0",
                   "path": "bosses/cthulhu/movement/back/move_0.png",
-                  "sha256": "0fc98d8b28e1efd069402132d89aeb6f7b86ce9fa6b280b7ff6e6f8abb7e42f7"
+                  "sha256": "6f88fbdcbc28555be21fe26c05951b5a797876e8eb019d8d4598e4cea3c66a9e"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/cthulhu/movement/back/move_1.png",
-                  "sha256": "c47d1b2d99dadd7c3f2c30605ac4eaccb5af3cd1fbf7e28dc8af049a263596f3"
+                  "sha256": "b0789d95094f4c0c4e7a0e1962687e75a2e8da98ded8ad056213c8669a6abb1d"
                 },
                 {
                   "name": "move_2",
                   "path": "bosses/cthulhu/movement/back/move_2.png",
-                  "sha256": "4224099b3dfe05f72f736d6c0532291cfdbd6ff63d97007d06f27193ed695098"
+                  "sha256": "02f85d217bfcd6ef95db6f1bfa79792ea9bafbb377941c9141b86fc6bc28e771"
                 },
                 {
                   "name": "move_3",
                   "path": "bosses/cthulhu/movement/back/move_3.png",
-                  "sha256": "6ad31824744eb26fbf4317fd05416e7e9b9da401ad5251ca351e6e206fd560a2"
+                  "sha256": "4850454fcb49011303dd76b42fabed02d10b5a09cd210943a1323de8319b3c31"
                 }
               ]
             },
@@ -20564,17 +20566,17 @@
                 {
                   "name": "attack_0",
                   "path": "bosses/cthulhu/movement/back/attack_0.png",
-                  "sha256": "9dbedec26db358e6acc80fed38af8141a607154099d68e95f46a9e27e7d08c21"
+                  "sha256": "1daa139fc5e3dcf337876b73fec2014e93ce6eb3b8f6e905d5ddb7e82d7a2cac"
                 },
                 {
                   "name": "attack_1",
                   "path": "bosses/cthulhu/movement/back/attack_1.png",
-                  "sha256": "a8cbd5812423e2f378adf6afcd13bfb012630d9dc1dfd361275c8191b8698606"
+                  "sha256": "51dd48a640d69f3ee242b31f1a25a5c16166b8e98a0904ee95a33631a4dca45e"
                 },
                 {
                   "name": "attack_2",
                   "path": "bosses/cthulhu/movement/back/attack_2.png",
-                  "sha256": "5878b16ea5cfa39317f7183fd8afbc60f62ddc4b9594fab07c5691462af9d1bb"
+                  "sha256": "f8fbcfbd593dbfe0f863ec326af295135b34f6bf4a81628f5f26cb3927d427ee"
                 }
               ]
             },
@@ -20584,12 +20586,12 @@
                 {
                   "name": "hurt_0",
                   "path": "bosses/cthulhu/movement/back/hurt_0.png",
-                  "sha256": "54322847e58d00dff53d31f465e1237ff26784970a454029fa902d3aa60487c6"
+                  "sha256": "da281c3f61002d753f0bf1b7cebf69098f058ba6b69c7a3fd3773cb031cbf728"
                 },
                 {
                   "name": "hurt_1",
                   "path": "bosses/cthulhu/movement/back/hurt_1.png",
-                  "sha256": "032759a78c504bc375c2ff13f9c6a4525db9c00aa1b454b0ec973c814401315a"
+                  "sha256": "941e9a4c8121fa0e405a2917843812cb3ac76bb50a6ac3af81a357e708ed41df"
                 }
               ]
             }
@@ -20605,12 +20607,12 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/cthulhu/movement/left/idle_0.png",
-                  "sha256": "68ed97447585c97e5fc713c8a6d6d77b9d93f9bfb685378659bb9a9d55322a12"
+                  "sha256": "c4bd1ef2c98c61aeb44f72be5a93c15abda065f0d239f7fc1f261fd9e38ebdbb"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/cthulhu/movement/left/idle_1.png",
-                  "sha256": "a1ccf37311b536597905f17b41b1b3c137f952d9105d0a6a7e448adb2c68b615"
+                  "sha256": "b08e9a3bb6214870604b385673121dcc530abfbc9881a61da8f361026fd96962"
                 }
               ]
             },
@@ -20620,22 +20622,22 @@
                 {
                   "name": "move_0",
                   "path": "bosses/cthulhu/movement/left/move_0.png",
-                  "sha256": "fad877f0f17f9fcb7e9924c20de040b25cb013bb2da7fc5a572d0af29460ae49"
+                  "sha256": "f66429b3a13d7bd0d2ee2b3459f28048f0beb273e408acc43e27ec576510790a"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/cthulhu/movement/left/move_1.png",
-                  "sha256": "9f93cf9cd2add101f75350b40a27d13dae91d825908e96bcda9b3bc434a28d34"
+                  "sha256": "53514d51a9d3d9d9e8b76c342c29bdf34d9b7a9405d913cce727c459ef033840"
                 },
                 {
                   "name": "move_2",
                   "path": "bosses/cthulhu/movement/left/move_2.png",
-                  "sha256": "1370f0544664b035b28136bdfc3a09a063e01745f55a07cf616dd2ba68693dc4"
+                  "sha256": "1eb1be5332c86e754a09d9fede1edf2d726188fcae4a2768047f478e0960a2d3"
                 },
                 {
                   "name": "move_3",
                   "path": "bosses/cthulhu/movement/left/move_3.png",
-                  "sha256": "915a17e2853a4fb3a4e5f7ace7ffe5e3e26e2e1574b8c997be31bd028962da23"
+                  "sha256": "66e1ea6138888571f852fd806451961d951911ded8448b5155748bd2ec17a357"
                 }
               ]
             },
@@ -20645,17 +20647,17 @@
                 {
                   "name": "attack_0",
                   "path": "bosses/cthulhu/movement/left/attack_0.png",
-                  "sha256": "14a9b878dbed480523ba448aafe0e5f0cb89333371310184e8734f5e518d392d"
+                  "sha256": "172cf356af7e91b2bbd38e96b6d9c64a8488293890e762b73e91fcf276d1d3e3"
                 },
                 {
                   "name": "attack_1",
                   "path": "bosses/cthulhu/movement/left/attack_1.png",
-                  "sha256": "633c0109626d013781b399de8e4d69f67b5327f6ed781c4d2b88fd61a5e21f2b"
+                  "sha256": "af97ecb5c41f61f67d396161aaca453db1a3435cc209b4d4175ed21a6e51b34e"
                 },
                 {
                   "name": "attack_2",
                   "path": "bosses/cthulhu/movement/left/attack_2.png",
-                  "sha256": "de1ac808b42f07b3659e9dc4dd00870a36eb0eec529efa6f8d552bb07e3bf6e8"
+                  "sha256": "77d8f1f6d769da12a7487caa6fc302cf3520c378e55ea194b2444589024f2030"
                 }
               ]
             },
@@ -20665,12 +20667,12 @@
                 {
                   "name": "hurt_0",
                   "path": "bosses/cthulhu/movement/left/hurt_0.png",
-                  "sha256": "a26a345c7aa4dbfc4d34b0a61cf4d14e262acd269ce7380a76d5556fd774310e"
+                  "sha256": "7eca27c6b3a47376deab1abb6dd63f1148f14e5ce791cf469854b46b9d0f48ff"
                 },
                 {
                   "name": "hurt_1",
                   "path": "bosses/cthulhu/movement/left/hurt_1.png",
-                  "sha256": "6752da75b570d60ab1112a40e990b95dd0b0c8b03abcf79d4d29326ebfc3f05f"
+                  "sha256": "ce5b16ec85ae65a5f5a586e4c944959817a6e39d5a801e8e74726293512b3e5b"
                 }
               ]
             }
@@ -20686,12 +20688,12 @@
                 {
                   "name": "idle_0",
                   "path": "bosses/cthulhu/movement/right/idle_0.png",
-                  "sha256": "1ce38f2f515a8965d7fce9675bc3c57debefa212a65db901808ca48e1409e99f"
+                  "sha256": "e9a13034f413e25281c0bb248ce3a86161d16414da9669840a0e02fa04c3fee8"
                 },
                 {
                   "name": "idle_1",
                   "path": "bosses/cthulhu/movement/right/idle_1.png",
-                  "sha256": "bc54e4b2a932fb2694a53e18bb62fdc14701ebc1327a75df514ead754c86f940"
+                  "sha256": "29a58157d93c2b4048cd9551954c2c8c37274d0237f80f7272431f6728d9fc1e"
                 }
               ]
             },
@@ -20701,22 +20703,22 @@
                 {
                   "name": "move_0",
                   "path": "bosses/cthulhu/movement/right/move_0.png",
-                  "sha256": "df5484b48d1a9752ebe85c647fc5f032fb4460d41bb4527df242b72a87d57ac5"
+                  "sha256": "519911a56444698dc40515640014c550a9bbf901cb926620921181ee941c09c1"
                 },
                 {
                   "name": "move_1",
                   "path": "bosses/cthulhu/movement/right/move_1.png",
-                  "sha256": "ac15b93030aff195328068cac0df91c6da951264ad6d90bf9802d860169454fd"
+                  "sha256": "1f080f2e3bc001883a84cf000b269cb00e0e49957e8f46f836ed11599fe4550f"
                 },
                 {
                   "name": "move_2",
                   "path": "bosses/cthulhu/movement/right/move_2.png",
-                  "sha256": "7d900de9142505df5fac067bcb70e291fc79212d65cc0713a701118a76b9403e"
+                  "sha256": "2f24881aadc38066b4e834688d0079fe2947c9d023a2c49e4c43f8b9afcc82a9"
                 },
                 {
                   "name": "move_3",
                   "path": "bosses/cthulhu/movement/right/move_3.png",
-                  "sha256": "dbcec72b790a8df1d79a2b1e674bebb47e443f2497c92d9824fb047ef901ef0b"
+                  "sha256": "5f9aa69b0a39670a1d847eeca853a71ee52d74144cb7931549d0ae58a49db171"
                 }
               ]
             }
@@ -23542,12 +23544,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/front/idle_0.png",
-                  "sha256": "9f054534616ea5acdd3fc4a73c38d8a77bf978dc00e2d51673a17ea7da05983e"
+                  "sha256": "175362f756d36a13bc78c04153e140c730adcff638da749e8347575551045136"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/front/idle_1.png",
-                  "sha256": "58fd6a1e0ec1c9ef8575035f30a5e93af07d2ec0ae1877c20242ce11f24e2d46"
+                  "sha256": "73246597f6640a21981a263df0847d30b41de6d6259036ff4ef638ab5d688882"
                 }
               ]
             },
@@ -23557,32 +23559,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/front/move_0.png",
-                  "sha256": "fd5669e61817ddafcd332902a548e35ac1e3829537db8bc3b135968ef1152ede"
+                  "sha256": "d8e55ffded05b7c6669155223aade8278e948b8519cdf2beeaee87536059522c"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/front/move_1.png",
-                  "sha256": "290d96d209e910d498ccf824d898bd1666cf8bd2c7bf33091ecab3c746ca40c6"
+                  "sha256": "c7ef4934d7aaacdcedc5255d64127804093ff0723afc767b68735038709b69b4"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/front/move_2.png",
-                  "sha256": "0ac4040c57fe8062e2252d5cca50eb0c8129cc194bd386089958bab2d748a9c3"
+                  "sha256": "951976214f840e34df6906e4ecc888e366d6756f9bbb1f1a13109662e1a0b25e"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/front/move_3.png",
-                  "sha256": "8ece081168aaf3c07711d13306bdb7f023e772569e4d697de1d1151835e2b56c"
+                  "sha256": "e53289aafec31dcbd2e7f1184f77fece344b65dc6fb96996ec95c528bd4f6bff"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/front/move_4.png",
-                  "sha256": "786de45a78b7efc55df270ea5b51e74a487dfc212563e2b3562f65501042f2dd"
+                  "sha256": "80550fe20d5d85f087e2669854bb775daddaa6603f0f3192c8c5b948deb407ae"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/front/move_5.png",
-                  "sha256": "e06f6a3c4d5d8eae26c1f81c45031680c5d0e88f0150817151258ed799b1f08e"
+                  "sha256": "1f5f2989ea9405ea2c802017f742fcd2d57d60e0512d78529c70d91f2d7e6aff"
                 }
               ]
             },
@@ -23592,17 +23594,17 @@
                 {
                   "name": "attack_0",
                   "path": "sprites/great_ones/64x64/front/attack_0.png",
-                  "sha256": "c2789120bbc9307bb437d32e3cdfca59771bd5e172338515dcdf280a471b811c"
+                  "sha256": "eba3a8e8a3a3f236b249a30f91d451622e8b46a06338f5e0fb4956666baa0955"
                 },
                 {
                   "name": "attack_1",
                   "path": "sprites/great_ones/64x64/front/attack_1.png",
-                  "sha256": "c095d8c3f87326b92dc98377002b18f8b585a111ae958a572fadd8cf51c5cae3"
+                  "sha256": "75e33a82c547917402375737c8baea3b920a7c48f85dc57b83d60c2b39fab869"
                 },
                 {
                   "name": "attack_2",
                   "path": "sprites/great_ones/64x64/front/attack_2.png",
-                  "sha256": "71cc3cba5766a4f675eb1cca4e031292eba2a5140b1d8b6c033778581d1199f4"
+                  "sha256": "148564df0e1eaa093c5037b594b3666daa8c156b90a28a3192da1b000286ed86"
                 }
               ]
             },
@@ -23612,12 +23614,12 @@
                 {
                   "name": "hurt_0",
                   "path": "sprites/great_ones/64x64/front/hurt_0.png",
-                  "sha256": "51659fe775b5ec58299583667a71cd653f15cf08ede6c173cb191dfa08cf2436"
+                  "sha256": "5abd82f08c0217f2fc19378dc5255f21255eec6f53ac82a9bd109b2f210eb240"
                 },
                 {
                   "name": "hurt_1",
                   "path": "sprites/great_ones/64x64/front/hurt_1.png",
-                  "sha256": "1ac177970060bdfe9e0825fb174627a289d40da2ad3c675744f80a85535e04b6"
+                  "sha256": "b675c23a2c15c3760ee8b86c3f9e3183075a3219a12d2e75c297fdb082dd5abb"
                 }
               ]
             }
@@ -23633,12 +23635,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/back/idle_0.png",
-                  "sha256": "1d200e9e273d6b1ce878878e9f4d13ca1ff6ce25df3f03f56097f3ac2b145905"
+                  "sha256": "7583b0144c319898fb6d7fe938a1b6fb64d2f693f25263504ac5ecf27e123a94"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/back/idle_1.png",
-                  "sha256": "bb7173ef640a85d13145e851f66b25e747449e6bc61b00faca61f1ea500bfa6a"
+                  "sha256": "ffdef4e7d542f965405628f2d79abaa55d2041136ee4d52121d1095438ef845b"
                 }
               ]
             },
@@ -23648,32 +23650,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/back/move_0.png",
-                  "sha256": "b0712c5761bb4febc45a934a799d4782db036f634e4b4c468bd824788b12241b"
+                  "sha256": "a745f97f1f8723b62a790f937f59d01b8512124d9214399d63db74179bc02751"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/back/move_1.png",
-                  "sha256": "10bb11099ae29208a571a0305516bdc8a5d37b8a6fe41d856d91c6b7fafc2d3b"
+                  "sha256": "e9a2d31f6da3d76e389624d4629bebf0eac12bae1634e63bfff7c6a6ac8480dd"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/back/move_2.png",
-                  "sha256": "26c814fa3223942b028930a06adddeb1d1b61cb7f61206204fc18d6f18e5d218"
+                  "sha256": "77c66b32ab1cd909f8598c3022dc7677d818c28a7741aa58c6d878587a33d233"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/back/move_3.png",
-                  "sha256": "d6b6e4691e04f468b852726c379d02ca795e72def6ae8317d996e2ce7a26d437"
+                  "sha256": "76734a205e5115df4b2c18c9e6a31c553e6e8b57a73c4bc10099038ebe1589e2"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/back/move_4.png",
-                  "sha256": "8f9718398d367db54ac5f9ed238e090b71c58a42b58a4b7e003b14c0e5841057"
+                  "sha256": "22a834769247ad4361d5394eccd77e862da15f0f67b9d4f4584ed6e7eccaad8c"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/back/move_5.png",
-                  "sha256": "6a3356fd02ca8bf85914645d267b266e73c34af5b6a41027c146dc32ea31e6eb"
+                  "sha256": "4ae763ba393e129da3b7778c8d17319bc98548617dc0da16bb4b4b5aba129869"
                 }
               ]
             }
@@ -23689,12 +23691,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/left/idle_0.png",
-                  "sha256": "ee7a66e54f0d3fe63d90fe9d1a6af173122eb1a0fdfe6e3b7dc6d7b5bff334ec"
+                  "sha256": "0ac5c8914e8707ba3e040c1af52bd8f9613fdcea08be04c7325fd506a35c1829"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/left/idle_1.png",
-                  "sha256": "0e6631ecd4d2c46c0c1e1738f7bf660f0918c066631f53500d53ac4660b31960"
+                  "sha256": "92ca6b41351f54fef1fd954bb6c63957de63307d7e2861672b81204838986ea6"
                 }
               ]
             },
@@ -23704,32 +23706,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/left/move_0.png",
-                  "sha256": "850bcce7c718e186ab542138619cab15addb81bf2d053281ba14f4df5bf22566"
+                  "sha256": "d3280fbda136b00a35b1027845ed6ceeb3b12fb26435005165beaa03c68c36a6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/left/move_1.png",
-                  "sha256": "b9061e8b3d744c773ee90ccdf12d23cf621b8b6744817b148d29a2cd6b58d4ad"
+                  "sha256": "62303b6ba9cb07d8a9511c1179d70d860c9bf9502896d88ea7ff48351e612361"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/left/move_2.png",
-                  "sha256": "ad709cb46c2cb93e0fa864bcc345f1d16282468a18cdfe732e255ea5362028c9"
+                  "sha256": "7da0992ade1841ebc468da5775dd36a210638062fe4b305e766f8d48b64a90a6"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/left/move_3.png",
-                  "sha256": "7dac3fda93b09ec7f97d430c0b8567061fc60601e0d649200b4381e7e01fd62b"
+                  "sha256": "24dc43248a2e3578b73ab104821525a1253c69eb4c6c7172754efc182c7dbed8"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/left/move_4.png",
-                  "sha256": "633fec2980a14cc73300f10cbc6bb0a9c34d07f11abf574aa0ea2ddb582a92cf"
+                  "sha256": "c90ab156263bb12fee194d12ce3e92fa6389f3addd83765bff6863f4dcb7b29b"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/left/move_5.png",
-                  "sha256": "c916e43d624fc1f8b1c93dd26fb19f6cb4d4e1a850242cb678393e28e2d50171"
+                  "sha256": "afbb3542348694036058adb263c24c0d648cc15b60710cd7d8f8038e74bf497d"
                 }
               ]
             }
@@ -23745,12 +23747,12 @@
                 {
                   "name": "idle_0",
                   "path": "sprites/great_ones/64x64/left/idle_0.png",
-                  "sha256": "ee7a66e54f0d3fe63d90fe9d1a6af173122eb1a0fdfe6e3b7dc6d7b5bff334ec"
+                  "sha256": "0ac5c8914e8707ba3e040c1af52bd8f9613fdcea08be04c7325fd506a35c1829"
                 },
                 {
                   "name": "idle_1",
                   "path": "sprites/great_ones/64x64/left/idle_1.png",
-                  "sha256": "0e6631ecd4d2c46c0c1e1738f7bf660f0918c066631f53500d53ac4660b31960"
+                  "sha256": "92ca6b41351f54fef1fd954bb6c63957de63307d7e2861672b81204838986ea6"
                 }
               ]
             },
@@ -23760,32 +23762,32 @@
                 {
                   "name": "move_0",
                   "path": "sprites/great_ones/64x64/left/move_0.png",
-                  "sha256": "850bcce7c718e186ab542138619cab15addb81bf2d053281ba14f4df5bf22566"
+                  "sha256": "d3280fbda136b00a35b1027845ed6ceeb3b12fb26435005165beaa03c68c36a6"
                 },
                 {
                   "name": "move_1",
                   "path": "sprites/great_ones/64x64/left/move_1.png",
-                  "sha256": "b9061e8b3d744c773ee90ccdf12d23cf621b8b6744817b148d29a2cd6b58d4ad"
+                  "sha256": "62303b6ba9cb07d8a9511c1179d70d860c9bf9502896d88ea7ff48351e612361"
                 },
                 {
                   "name": "move_2",
                   "path": "sprites/great_ones/64x64/left/move_2.png",
-                  "sha256": "ad709cb46c2cb93e0fa864bcc345f1d16282468a18cdfe732e255ea5362028c9"
+                  "sha256": "7da0992ade1841ebc468da5775dd36a210638062fe4b305e766f8d48b64a90a6"
                 },
                 {
                   "name": "move_3",
                   "path": "sprites/great_ones/64x64/left/move_3.png",
-                  "sha256": "7dac3fda93b09ec7f97d430c0b8567061fc60601e0d649200b4381e7e01fd62b"
+                  "sha256": "24dc43248a2e3578b73ab104821525a1253c69eb4c6c7172754efc182c7dbed8"
                 },
                 {
                   "name": "move_4",
                   "path": "sprites/great_ones/64x64/left/move_4.png",
-                  "sha256": "633fec2980a14cc73300f10cbc6bb0a9c34d07f11abf574aa0ea2ddb582a92cf"
+                  "sha256": "c90ab156263bb12fee194d12ce3e92fa6389f3addd83765bff6863f4dcb7b29b"
                 },
                 {
                   "name": "move_5",
                   "path": "sprites/great_ones/64x64/left/move_5.png",
-                  "sha256": "c916e43d624fc1f8b1c93dd26fb19f6cb4d4e1a850242cb678393e28e2d50171"
+                  "sha256": "afbb3542348694036058adb263c24c0d648cc15b60710cd7d8f8038e74bf497d"
                 }
               ]
             }

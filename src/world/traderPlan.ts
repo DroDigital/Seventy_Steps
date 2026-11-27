@@ -2,6 +2,7 @@
  * Where the trader at the lamps stands, and the street lamp he leans on (2026-11-06; data/traders.ts lists the places he may stand): the first
  * of them with no road under him or his lamp, no house or model in the way and no foe's post within three metres, the ground about him cleared of
  * whatever the plan had put there, and the lamp raised as a prop like the towns' own (so it lights, casts, collides and is heard like theirs).
+ * A street lamp already standing within LAMP_APART of his is taken down: his stands in its stead (2026-11-27, Benefit Street had two 1.8 m apart).
  * Planned last, with a stream of its own: nothing earlier moves. Pure: no Three.js.
  */
 
@@ -12,7 +13,7 @@ import type { TraderSpot } from '../data/traders';
 import { WORLD } from '../data/tuning';
 import { reach } from './arenaDecor';
 import type { SpawnPoint } from './placements';
-import { makeProp, type Prop } from './props';
+import { LAMP_APART, makeProp, type Prop } from './props';
 
 const SEED = 0x7a1d;
 const KEEP = 1.1; // metres kept clear about the lamp and about the man (his own body and his turn)
@@ -37,6 +38,7 @@ export function planTraderLamps(
     for (let i = props.length - 1; i >= 0; i--) {
       const p = props[i]!;
       if (!HARD.has(p.kind) && [spot, spot.lamp].some((q) => Math.hypot(p.x - q.x, p.z - q.z) < reach(p) + KEEP)) props.splice(i, 1);
+      else if (p.kind === 'lamp' && !LAMPLESS.has(region.id) && Math.hypot(p.x - spot.lamp.x, p.z - spot.lamp.z) < LAMP_APART) props.splice(i, 1); // his lamp stands in its stead: never two a step apart (2026-11-27)
     }
     const rng = createRng([...site.id].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619), 2166136261) ^ SEED ^ WORLD.seed);
     if (!LAMPLESS.has(region.id)) props.push(makeProp('lamp', spot.lamp.x, spot.lamp.z, rng, 0));
